@@ -3,7 +3,6 @@ import { Link } from '@tanstack/react-router';
 import BetterAuthHeader from '../integrations/better-auth/header-user.tsx';
 import { useState } from 'react';
 import {
-  IconClipboard,
   IconHome,
   IconMenu2,
   IconNetwork,
@@ -121,32 +120,6 @@ export default function Header() {
           >
             <IconShoppingCart size={20} />
             <span className="font-medium">Store</span>
-          </Link>
-
-          <Link
-            to="/demo/form/simple"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <IconClipboard size={20} />
-            <span className="font-medium">Simple Form</span>
-          </Link>
-
-          <Link
-            to="/demo/form/address"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <IconClipboard size={20} />
-            <span className="font-medium">Address Form</span>
           </Link>
 
           {/* Demo Links End */}
