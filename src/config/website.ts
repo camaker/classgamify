@@ -1,4 +1,4 @@
-import type { WebsiteConfig } from './types';
+import type { WebsiteConfig } from '../types';
 
 /**
  * Website config
@@ -40,7 +40,6 @@ export const websiteConfig: WebsiteConfig = {
   },
   auth: {
     enableGoogleLogin: true,
-    enableGithubLogin: true,
     enableCredentialLogin: true,
   },
   i18n: {

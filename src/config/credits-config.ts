@@ -1,4 +1,4 @@
-import type { CreditPackageConfig } from './types';
+import type { CreditPackageConfig } from '../types';
 import { websiteConfig } from './website';
 
 /** Credit package with display copy (English) */

@@ -7,7 +7,7 @@ import {
   IconShieldCheck,
 } from '@tabler/icons-react';
 import { Routes } from '@/routes';
-import type { MenuItemConfig } from './types';
+import type { MenuItemConfig } from '../types';
 import { websiteConfig } from './website';
 
 /**

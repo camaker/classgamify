@@ -54,7 +54,6 @@ export interface AnalyticsConfig {
 
 export interface AuthConfig {
   enableGoogleLogin?: boolean;
-  enableGithubLogin?: boolean;
   enableCredentialLogin?: boolean;
 }
 

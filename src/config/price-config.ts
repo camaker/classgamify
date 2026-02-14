@@ -1,4 +1,4 @@
-import type { PlanConfig } from './types';
+import type { PlanConfig } from '../types';
 import { websiteConfig } from './website';
 
 /** Plan with display copy (English) for pricing table */

@@ -1,4 +1,4 @@
-import type { MenuItemConfig } from './types';
+import type { MenuItemConfig } from '../types';
 import { websiteConfig } from './website';
 
 /** Social link key for UI to map to icon component */
