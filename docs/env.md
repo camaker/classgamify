@@ -1,10 +1,15 @@
 # Environment Variables
 
-本项目约定：**构建时** 用 `import.meta.env`，**运行时** 用 `process.env`。部署目标为 Cloudflare Workers，且已开启 `nodejs_compat_populate_process_env`，Worker 的 vars/secrets 会出现在 `process.env` 中。
+本项目使用 **T3 Environment**（`@t3-oss/env-core`）做构建时与运行时的类型安全校验：
+
+- **`clientEnv`**（`src/env/client.ts`）：仅客户端/构建时变量，前缀 `VITE_`，来源 `import.meta.env`。
+- **`serverEnv`**（`src/env/server.ts`）：仅服务端变量，来源 `process.env`（Worker 的 vars/secrets 会注入其中）。
+
+约定：**构建时** 用 `clientEnv`，**运行时** 用 `serverEnv`。部署目标为 Cloudflare Workers，且已开启 `nodejs_compat_populate_process_env`。
 
 ---
 
-## 1. 构建时（`import.meta.env`）
+## 1. 构建时（clientEnv / `import.meta.env`）
 
 在 **执行 `vite dev` 或 `vite build` 时** 由 Vite 从 `.env*` 读取并**替换**进代码，值会打进 bundle，**不会**在 Worker 运行时再读环境变量。
 
@@ -21,13 +26,13 @@
 
 | 变量 | 用途 | 必填 | 说明 |
 |------|------|------|------|
-| `VITE_BASE_URL` | 站点 origin（如 `getBaseUrl()`） | 建议设置 | 未设置时使用代码内默认 `http://localhost:3000` |
+| `VITE_BASE_URL` | 站点 origin（如 `getBaseUrl()`） | 建议设置 | 未设置时使用 `clientEnv` 默认 `http://localhost:8888` |
 
 **不要**把 `VITE_*` 放在 `wrangler.jsonc` 的 `vars` 或 `wrangler secret` 里——它们是构建时用的，不是 Worker 运行时环境变量。
 
 ---
 
-## 2. 运行时（`process.env`）
+## 2. 运行时（serverEnv / `process.env`）
 
 在 **Worker 每次请求执行时** 才读取，用于密钥、API Key、业务配置等。
 
@@ -55,9 +60,9 @@
 
 ## 3. 关于 `VITE_BASE_URL` 和 `getBaseUrl()`
 
-当前实现：`getBaseUrl()` 使用 `import.meta.env.VITE_BASE_URL ?? DEFAULT_BASE_URL`，即**构建时**变量。
+当前实现：`getBaseUrl()` 通过 `clientEnv.VITE_BASE_URL` 读取（由 T3 校验并带默认值），即**构建时**变量。
 
-- **本地开发**：在 **`.env.local`** 中定义 `VITE_BASE_URL=http://localhost:3000`（也可不定义，用代码里的默认值）。
+- **本地开发**：在 **`.env.local`** 中定义 `VITE_BASE_URL=http://localhost:8888`（也可不定义，用 `clientEnv` 默认值）。
 - **生产部署**：在**执行 `pnpm build` 的环境**里提供 `VITE_BASE_URL`：
   - 若在本机 build：在 **`.env.production`** 中写 `VITE_BASE_URL=https://你的域名`（不要提交到 Git）。
   - 若在 CI/Cloudflare Pages 等 build：在对应流水线的 **构建环境变量** 里添加 `VITE_BASE_URL`。
@@ -79,4 +84,4 @@
 
 ## 5. Storage (R2)
 
-R2 使用 `wrangler.jsonc` 中的 **binding**（如 `FILES`），不是环境变量。若使用 R2 自定义域名，可把该 URL 放在 **运行时** 变量 `STORAGE_PUBLIC_URL`（`.env.local` / Worker vars 或 secret）中，代码通过 `process.env.STORAGE_PUBLIC_URL` 读取。
+R2 使用 `wrangler.jsonc` 中的 **binding**（如 `FILES`），不是环境变量。若使用 R2 自定义域名，可把该 URL 放在 **运行时** 变量 `STORAGE_PUBLIC_URL`（`.env.local` / Worker vars 或 secret）中，代码通过 `serverEnv.STORAGE_PUBLIC_URL` 读取。

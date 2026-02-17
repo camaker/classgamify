@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers';
+import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
 import type {
   MailProvider,
@@ -16,15 +16,9 @@ export type {
 
 let mailProvider: MailProvider | null = null;
 
-export interface MailEnv {
-  RESEND_API_KEY?: string;
-}
-
 function createProvider(): MailProvider {
   if (websiteConfig.mail?.provider === 'resend') {
-    const apiKey =
-      (env as MailEnv).RESEND_API_KEY ??
-      (typeof process !== 'undefined' && process.env?.RESEND_API_KEY);
+    const apiKey = serverEnv.RESEND_API_KEY;
     if (!apiKey) {
       throw new Error('RESEND_API_KEY is required.');
     }

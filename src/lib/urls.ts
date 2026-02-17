@@ -1,11 +1,11 @@
-/** Fallback when VITE_BASE_URL is not set in .env (see docs/env.md). */
-const DEFAULT_BASE_URL = 'http://localhost:8888';
+import { clientEnv } from '@/env/client';
 
 /**
- * Site origin (build-time). Read via import.meta.env; set in .env.local (dev) or .env.production (build).
+ * Site origin (build-time). Safe to call from both client and server:
+ * Vite inlines import.meta.env at build time, so server bundle gets the same value.
  */
 export function getBaseUrl(): string {
-  return import.meta.env.VITE_BASE_URL ?? DEFAULT_BASE_URL;
+  return clientEnv.VITE_BASE_URL;
 }
 
 /**

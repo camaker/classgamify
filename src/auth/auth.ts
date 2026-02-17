@@ -4,6 +4,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { getDb } from '@/db';
 import { sendEmail } from '@/mail';
 import { getBaseUrl } from '../lib/urls';
+import { serverEnv } from '@/env/server';
 import { messages } from '@/config/messages';
 import { websiteConfig } from '@/config/website';
 import { emailHarmony } from 'better-auth-harmony';
@@ -62,10 +63,16 @@ export const auth = betterAuth({
   },
   socialProviders: {
     // https://www.better-auth.com/docs/authentication/google
-    ...(websiteConfig.auth?.enableGoogleLogin ? { google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      } } : {}),
+    ...(websiteConfig.auth?.enableGoogleLogin &&
+    serverEnv.GOOGLE_CLIENT_ID &&
+    serverEnv.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: serverEnv.GOOGLE_CLIENT_ID,
+            clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+          },
+        }
+      : {}),
   },
   account: {
     // https://www.better-auth.com/docs/concepts/users-accounts#account-linking
