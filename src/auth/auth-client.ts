@@ -4,7 +4,7 @@ import {
   inferAdditionalFields,
 } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
-import { getBaseUrl } from '../lib/urls';
+import { getBaseUrl } from '@/lib/urls';
 import type { auth } from './auth';
 
 /**

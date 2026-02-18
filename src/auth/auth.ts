@@ -3,7 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { getDb } from '@/db';
 import { sendEmail } from '@/mail';
-import { getBaseUrl } from '../lib/urls';
+import { getBaseUrl } from '@/lib/urls';
 import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
 import { emailHarmony } from 'better-auth-harmony';
