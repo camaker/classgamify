@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { websiteConfig } from '@/config/website';
-import type { User } from 'better-auth';
+import type { User } from '@/auth/auth-types';
 import {
   IconDeviceDesktop,
   IconLogout,
@@ -51,7 +51,7 @@ export function SidebarUser({ user }: SidebarUserProps) {
           router.navigate({ to: '/' });
         },
         onError: (err) => {
-          toast.error('Log out failed');
+          toast.error(messages.auth.common.logoutFailed);
           console.error('sign out error:', err);
         },
       },

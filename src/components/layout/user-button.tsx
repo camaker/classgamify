@@ -1,6 +1,5 @@
 import { getAvatarLinks } from '@/config/avatar-config';
 import { authClient } from '@/auth/auth-client';
-import type { User } from 'better-auth';
 import { IconLogout } from '@tabler/icons-react';
 import { Link, useRouter } from '@tanstack/react-router';
 import {
@@ -14,6 +13,7 @@ import { UserAvatar } from './user-avatar';
 import { messages } from '@/config/messages';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import type { User } from '@/auth/auth-types';
 
 interface UserButtonProps {
   user: User;
@@ -31,7 +31,7 @@ export function UserButton({ user }: UserButtonProps) {
           router.navigate({ to: '/' });
         },
         onError: (err) => {
-          toast.error('Log out failed');
+          toast.error(messages.auth.common.logoutFailed);
           console.error('sign out error:', err);
         },
       },

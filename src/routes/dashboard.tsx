@@ -4,13 +4,13 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard')({
   ssr: false,
-  component: DashboardPage,
+  component: DashboardLayoutPage,
   server: {
     middleware: [authMiddleware],
   },
 });
 
-function DashboardPage() {
+function DashboardLayoutPage() {
   return (
     <AppSidebarLayout>
       <Outlet />

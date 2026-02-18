@@ -55,6 +55,7 @@ export const messages = {
       signup: 'Sign up',
       login: 'Log in',
       logout: 'Log out',
+      logoutFailed: 'Log out failed',
       byClickingContinue: 'By clicking continue, you agree to our ',
       termsOfService: 'Terms of Service',
       privacyPolicy: 'Privacy Policy',
