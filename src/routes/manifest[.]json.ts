@@ -4,8 +4,8 @@ import { websiteConfig } from '@/config/website';
 /**
  * Dynamic Web App Manifest (PWA)
  * Serves /manifest.json with name/description from config instead of a static file
- * @see https://tanstack.dev/start/latest/docs/framework/react/guide/seo#dynamic-sitemap
- * @see https://web.dev/add-manifest/
+ * https://tanstack.dev/start/latest/docs/framework/react/guide/seo#dynamic-sitemap
+ * https://web.dev/add-manifest/
  */
 export const Route = createFileRoute('/manifest.json')({
   server: {

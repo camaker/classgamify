@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -48,6 +49,11 @@ const WaitlistRoute = WaitlistRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/cookie': typeof CookieRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -302,6 +311,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/manifest.json'
     | '/privacy'
+    | '/robots.txt'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/cookie'
     | '/manifest.json'
     | '/privacy'
+    | '/robots.txt'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -365,6 +376,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/manifest.json'
     | '/privacy'
+    | '/robots.txt'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -398,6 +410,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   PrivacyRoute: typeof PrivacyRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   TermsRoute: typeof TermsRoute
   WaitlistRoute: typeof WaitlistRoute
   ApiContactRoute: typeof ApiContactRoute
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -674,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   PrivacyRoute: PrivacyRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   TermsRoute: TermsRoute,
   WaitlistRoute: WaitlistRoute,
   ApiContactRoute: ApiContactRoute,
