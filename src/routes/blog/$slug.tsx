@@ -21,6 +21,20 @@ export const Route = createFileRoute('/blog/$slug')({
     const description = post.description ?? websiteConfig.metadata?.description ?? '';
     const url = getCanonicalUrl(`/blog/${params.slug}`);
     const image = post.image ? getImageUrl(post.image) : undefined;
+    const siteName = websiteConfig.metadata?.name ?? '';
+    const articleJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description,
+      ...(image ? { image } : {}),
+      datePublished: post.date,
+      url,
+      publisher: {
+        '@type': 'Organization',
+        name: siteName,
+      },
+    };
     return {
       meta: [
         { title },
@@ -35,6 +49,12 @@ export const Route = createFileRoute('/blog/$slug')({
         ...(image ? [{ name: 'twitter:image', content: image }] : []),
       ],
       links: [{ rel: 'canonical', href: url }],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(articleJsonLd),
+        },
+      ],
     };
   },
   component: BlogPostPage,

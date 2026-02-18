@@ -16,16 +16,31 @@ import { websiteConfig } from '@/config/website';
 import { getCanonicalUrl } from '@/lib/urls';
 
 export const Route = createFileRoute('/')({
-  head: () => ({
-    meta: [
-      { title: websiteConfig.metadata?.title },
-      {
-        name: 'description',
-        content: websiteConfig.metadata?.description,
-      },
-    ],
-    links: [{ rel: 'canonical', href: getCanonicalUrl('/') }],
-  }),
+  head: () => {
+    const name = websiteConfig.metadata?.name ?? '';
+    const description = websiteConfig.metadata?.description ?? '';
+    const url = getCanonicalUrl('/');
+    const webSiteJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name,
+      description,
+      url,
+    };
+    return {
+      meta: [
+        { title: websiteConfig.metadata?.title },
+        { name: 'description', content: description },
+      ],
+      links: [{ rel: 'canonical', href: url }],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(webSiteJsonLd),
+        },
+      ],
+    };
+  },
   component: HomePage,
 });
 
