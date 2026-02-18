@@ -1,61 +1,32 @@
-import {
-  ErrorComponent,
-  Link,
-  rootRouteId,
-  useMatch,
-  useRouter,
-} from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import type { ErrorComponentProps } from '@tanstack/react-router';
+import { Logo } from '@/components/layout/logo';
+import { buttonVariants } from '@/components/ui/button';
 import { messages } from '@/config/messages';
+import { cn } from '@/lib/utils';
 
 const m = messages.catchBoundary;
 
 /**
- * Default catch boundary component for TanStack Router
- * https://github.com/TanStack/router/blob/main/examples/react/start-basic-cloudflare/src/components/DefaultCatchBoundary.tsx
+ * Default catch boundary for TanStack Router.
+ * Layout and styling aligned with NotFound for consistency.
  */
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
-  const router = useRouter();
-  const isRoot = useMatch({
-    strict: false,
-    select: (state) => state.id === rootRouteId,
-  });
-
-  console.error('DefaultCatchBoundary Error:', error);
+  const message = error?.message ?? m.description;
 
   return (
-    <div className="min-w-0 flex-1 p-4 flex flex-col items-center justify-center gap-6">
-      <ErrorComponent error={error} />
-      <div className="flex gap-2 items-center flex-wrap">
-        <button
-          type="button"
-          onClick={() => {
-            router.invalidate();
-          }}
-          className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
-        >
-          {m.tryAgain}
-        </button>
-        {isRoot ? (
-          <Link
-            to="/"
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
-          >
-            {m.backToHome}
-          </Link>
-        ) : (
-          <Link
-            to="/"
-            className={`px-2 py-1 bg-gray-600 dark:bg-gray-700 rounded-sm text-white uppercase font-extrabold`}
-            onClick={(e) => {
-              e.preventDefault();
-              window.history.back();
-            }}
-          >
-            {m.goBack}
-          </Link>
-        )}
-      </div>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 px-4">
+      <Logo className="size-12" />
+      <h1 className="text-4xl font-bold">{m.title}</h1>
+      <p className="text-balance text-center text-xl font-medium text-muted-foreground">
+        {message}
+      </p>
+      <Link
+        to="/"
+        className={cn(buttonVariants({ size: 'lg', variant: 'default' }))}
+      >
+        {m.backToHome}
+      </Link>
     </div>
   );
 }

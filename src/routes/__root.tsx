@@ -89,10 +89,7 @@ function RootComponent() {
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/settings');
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
-  const isNotFound =
-    pathname !== '/' &&
-    pathname !== '' &&
-    matches.length <= 1;
+  const isNotFound = pathname !== '/' && pathname !== '' && matches.length <= 1;
 
   if (isAuthPages || isProtectedPages || isNotFound) {
     return (

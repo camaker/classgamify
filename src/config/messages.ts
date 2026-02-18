@@ -158,7 +158,7 @@ export const messages = {
       growthSub: 'Meets growth projections',
     },
   },
-  
+
   settings: {
     profile: {
       title: 'Profile',
@@ -208,8 +208,7 @@ export const messages = {
       },
       deleteAccount: {
         title: 'Delete Account',
-        description:
-          'Permanently remove your account and all of its contents',
+        description: 'Permanently remove your account and all of its contents',
         warning:
           'This action is not reversible, so please continue with caution',
         button: 'Delete Account',
@@ -365,8 +364,8 @@ export const messages = {
   },
 
   catchBoundary: {
-    tryAgain: 'Try again',
-    goBack: 'Go back',
+    title: 'Something went wrong!',
+    description: 'We encountered an unexpected error. Please try again.',
     backToHome: 'Back to Home',
   },
 

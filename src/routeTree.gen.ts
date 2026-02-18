@@ -32,6 +32,8 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
+import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
 import { Route as pagesWaitlistRouteImport } from './routes/(pages)/waitlist'
 import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
 import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
@@ -161,6 +163,16 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const testsTestErrorRoute = testsTestErrorRouteImport.update({
+  id: '/(tests)/test-error',
+  path: '/test-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const testsTest404Route = testsTest404RouteImport.update({
+  id: '/(tests)/test-404',
+  path: '/test-404',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const pagesWaitlistRoute = pagesWaitlistRouteImport.update({
   id: '/(pages)/waitlist',
   path: '/waitlist',
@@ -243,6 +255,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof pagesAboutRoute
   '/contact': typeof pagesContactRoute
   '/waitlist': typeof pagesWaitlistRoute
+  '/test-404': typeof testsTest404Route
+  '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
@@ -278,6 +292,8 @@ export interface FileRoutesByTo {
   '/about': typeof pagesAboutRoute
   '/contact': typeof pagesContactRoute
   '/waitlist': typeof pagesWaitlistRoute
+  '/test-404': typeof testsTest404Route
+  '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
@@ -317,6 +333,8 @@ export interface FileRoutesById {
   '/(pages)/about': typeof pagesAboutRoute
   '/(pages)/contact': typeof pagesContactRoute
   '/(pages)/waitlist': typeof pagesWaitlistRoute
+  '/(tests)/test-404': typeof testsTest404Route
+  '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
@@ -357,6 +375,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/waitlist'
+    | '/test-404'
+    | '/test-error'
     | '/admin/users'
     | '/api/contact'
     | '/auth/error'
@@ -392,6 +412,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/waitlist'
+    | '/test-404'
+    | '/test-error'
     | '/admin/users'
     | '/api/contact'
     | '/auth/error'
@@ -430,6 +452,8 @@ export interface FileRouteTypes {
     | '/(pages)/about'
     | '/(pages)/contact'
     | '/(pages)/waitlist'
+    | '/(tests)/test-404'
+    | '/(tests)/test-error'
     | '/admin/users'
     | '/api/contact'
     | '/auth/error'
@@ -469,6 +493,8 @@ export interface RootRouteChildren {
   pagesAboutRoute: typeof pagesAboutRoute
   pagesContactRoute: typeof pagesContactRoute
   pagesWaitlistRoute: typeof pagesWaitlistRoute
+  testsTest404Route: typeof testsTest404Route
+  testsTestErrorRoute: typeof testsTestErrorRoute
   ApiContactRoute: typeof ApiContactRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -644,6 +670,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/(tests)/test-error': {
+      id: '/(tests)/test-error'
+      path: '/test-error'
+      fullPath: '/test-error'
+      preLoaderRoute: typeof testsTestErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(tests)/test-404': {
+      id: '/(tests)/test-404'
+      path: '/test-404'
+      fullPath: '/test-404'
+      preLoaderRoute: typeof testsTest404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(pages)/waitlist': {
       id: '/(pages)/waitlist'
       path: '/waitlist'
@@ -813,6 +853,8 @@ const rootRouteChildren: RootRouteChildren = {
   pagesAboutRoute: pagesAboutRoute,
   pagesContactRoute: pagesContactRoute,
   pagesWaitlistRoute: pagesWaitlistRoute,
+  testsTest404Route: testsTest404Route,
+  testsTestErrorRoute: testsTestErrorRoute,
   ApiContactRoute: ApiContactRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
