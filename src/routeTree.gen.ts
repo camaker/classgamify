@@ -32,7 +32,6 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
-import { Route as ApiUserFilesRouteImport } from './routes/api/user-files'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
 import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
@@ -44,7 +43,6 @@ import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
-import { Route as ApiUserFilesIdRouteImport } from './routes/api/user-files.$id'
 import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -164,11 +162,6 @@ const AuthErrorRoute = AuthErrorRouteImport.update({
   path: '/error',
   getParentRoute: () => AuthRoute,
 } as any)
-const ApiUserFilesRoute = ApiUserFilesRouteImport.update({
-  id: '/api/user-files',
-  path: '/api/user-files',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -224,11 +217,6 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUserFilesIdRoute = ApiUserFilesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ApiUserFilesRoute,
-} as any)
 const ApiStorageUploadRoute = ApiStorageUploadRouteImport.update({
   id: '/api/storage/upload',
   path: '/api/storage/upload',
@@ -265,7 +253,6 @@ export interface FileRoutesByFullPath {
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -284,7 +271,6 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
-  '/api/user-files/$id': typeof ApiUserFilesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -303,7 +289,6 @@ export interface FileRoutesByTo {
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -322,7 +307,6 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
-  '/api/user-files/$id': typeof ApiUserFilesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -345,7 +329,6 @@ export interface FileRoutesById {
   '/(tests)/test-404': typeof testsTest404Route
   '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -364,7 +347,6 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
-  '/api/user-files/$id': typeof ApiUserFilesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -388,7 +370,6 @@ export interface FileRouteTypes {
     | '/test-404'
     | '/test-error'
     | '/admin/users'
-    | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -407,7 +388,6 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/storage/upload'
-    | '/api/user-files/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -426,7 +406,6 @@ export interface FileRouteTypes {
     | '/test-404'
     | '/test-error'
     | '/admin/users'
-    | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -445,7 +424,6 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/storage/upload'
-    | '/api/user-files/$id'
   id:
     | '__root__'
     | '/'
@@ -467,7 +445,6 @@ export interface FileRouteTypes {
     | '/(tests)/test-404'
     | '/(tests)/test-error'
     | '/admin/users'
-    | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -486,7 +463,6 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/storage/upload'
-    | '/api/user-files/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -508,7 +484,6 @@ export interface RootRouteChildren {
   pagesWaitlistRoute: typeof pagesWaitlistRoute
   testsTest404Route: typeof testsTest404Route
   testsTestErrorRoute: typeof testsTestErrorRoute
-  ApiUserFilesRoute: typeof ApiUserFilesRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -679,13 +654,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthErrorRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/api/user-files': {
-      id: '/api/user-files'
-      path: '/api/user-files'
-      fullPath: '/api/user-files'
-      preLoaderRoute: typeof ApiUserFilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -762,13 +730,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/cookie'
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/user-files/$id': {
-      id: '/api/user-files/$id'
-      path: '/$id'
-      fullPath: '/api/user-files/$id'
-      preLoaderRoute: typeof ApiUserFilesIdRouteImport
-      parentRoute: typeof ApiUserFilesRoute
     }
     '/api/storage/upload': {
       id: '/api/storage/upload'
@@ -858,18 +819,6 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
   SettingsRouteChildren,
 )
 
-interface ApiUserFilesRouteChildren {
-  ApiUserFilesIdRoute: typeof ApiUserFilesIdRoute
-}
-
-const ApiUserFilesRouteChildren: ApiUserFilesRouteChildren = {
-  ApiUserFilesIdRoute: ApiUserFilesIdRoute,
-}
-
-const ApiUserFilesRouteWithChildren = ApiUserFilesRoute._addFileChildren(
-  ApiUserFilesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -889,7 +838,6 @@ const rootRouteChildren: RootRouteChildren = {
   pagesWaitlistRoute: pagesWaitlistRoute,
   testsTest404Route: testsTest404Route,
   testsTestErrorRoute: testsTestErrorRoute,
-  ApiUserFilesRoute: ApiUserFilesRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

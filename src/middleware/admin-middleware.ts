@@ -42,6 +42,7 @@ export const adminMiddleware = createMiddleware().server(async ({ next }) => {
 
 /**
  * Admin API middleware: same check as adminMiddleware but returns 401/403 Response for API routes.
+ * Passes context: { userId } so server function handlers can use them.
  */
 export const adminApiMiddleware = createMiddleware().server(
   async ({ next }) => {
@@ -55,6 +56,10 @@ export const adminApiMiddleware = createMiddleware().server(
       return forbiddenResponse();
     }
 
-    return await next();
+    return await next({
+      context: {
+        userId: session.user.id,
+      },
+    });
   }
 );

@@ -83,7 +83,7 @@ No storage-specific environment variables are required. Files are always served 
 ## Consumers
 
 - **Settings → Profile** (`UpdateAvatarCard`): When `websiteConfig.storage.enable` and `websiteConfig.features.enableUpdateAvatar` are true, the user can upload an avatar; the client uses `useUploadAvatarFile()` to upload to the API then updates `user.image` with the returned URL.
-- **Settings → Files**: User file uploads use the same R2 bucket and upload API; files are stored under `userFilesFolder` (see `routes/api/user-files.ts`, `api/storage/upload.ts`).
+- **Settings → Files**: List/delete via server functions in `src/api/user-files.ts`; upload via `routes/api/storage/upload.ts`. Files are stored under `userFilesFolder`.
 
 ## Notes
 

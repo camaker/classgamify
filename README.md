@@ -72,7 +72,7 @@ A full-stack web template built with **TanStack Start**, **React 19**, and **Vit
 │   │   ├── settings/           # profile, security, notifications, apikeys, files
 │   │   ├── admin.tsx           # Admin layout
 │   │   ├── admin/              # users, index
-│   │   └── api/                # auth/$, contact, storage (upload, file), user-files
+│   │   └── api/                # auth/$, storage (upload, file)
 │   ├── components/
 │   │   ├── layout/             # Navbar, footer, container, sidebar, dashboard, theme
 │   │   ├── blocks/             # Marketing sections (hero, features, pricing, newsletter, etc.)

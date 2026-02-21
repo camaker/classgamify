@@ -68,7 +68,8 @@ Requests go to `baseURL + /api/auth/*` and are handled by `auth.handler`.
 Session is obtained with **`auth.api.getSession({ headers })`** (from `@/auth/auth`). There is no shared `lib/session.ts`; each protected API route and middleware calls `getSession` directly.
 
 - **Middleware** (`auth-middleware.ts`, `admin-middleware.ts`): call `await auth.api.getSession({ headers })`; redirect to login or dashboard when null or when role is not admin.
-- **API routes** (e.g. `routes/api/storage/upload.ts`, `api/user-files.ts`): call `auth.api.getSession({ headers })` and return 401 or redirect when session is null.
+- **API routes** (e.g. `routes/api/storage/upload.ts`): call `auth.api.getSession({ headers })` and return 401 when session is null.
+- **Server functions** (e.g. `src/api/user-files.ts`): use `authApiMiddleware` so unauthenticated calls get 401.
 
 Server functions that need a session (e.g. `listUsers` in `src/api/users.ts`) use middleware such as `adminApiMiddleware`, which runs on the server and obtains the session the same way.
 

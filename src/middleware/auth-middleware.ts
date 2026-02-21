@@ -22,7 +22,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 
 /**
  * Auth API middleware: same as authMiddleware but returns 401 JSON for API routes.
- * Use with createFileRoute server: { middleware: [authApiMiddleware], handlers: { ... } }.
+ * Passes context: { userId } so server function handlers can use context.userId.
  */
 export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders();
@@ -35,5 +35,5 @@ export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
     );
   }
 
-  return await next();
+  return await next({ context: { userId: session.user.id } });
 });
