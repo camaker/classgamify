@@ -10,5 +10,15 @@ export function PlausibleAnalytics() {
   const script = clientEnv.VITE_PLAUSIBLE_SCRIPT;
   if (!script) return null;
 
-  return <ClientScript src={script} defer async />;
+  const inlineHtml = `
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init();
+  `;
+
+  return (
+    <>
+      <ClientScript id="plausible-analytics" src={script} async />
+      <ClientScript id="plausible-analytics-init" inlineHtml={inlineHtml} />
+    </>
+  );
 }

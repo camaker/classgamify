@@ -16,5 +16,5 @@ export function ClarityAnalytics() {
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "${projectId}");`;
 
-  return <ClientScript id="microsoft-clarity-init" inlineHtml={inlineHtml} />;
+  return <ClientScript id="clarity-analytics" inlineHtml={inlineHtml} />;
 }
