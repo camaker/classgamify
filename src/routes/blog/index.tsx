@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
@@ -26,15 +26,8 @@ export const Route = createFileRoute('/blog/')({
 
 function BlogListPage() {
   const { posts, totalPages, currentPage } = Route.useLoaderData();
-
   if (!websiteConfig.blog?.enable) {
-    return (
-      <Container className="py-16">
-        <p className="text-center text-muted-foreground">
-          {messages.blog.disabled}
-        </p>
-      </Container>
-    );
+    throw notFound();
   }
 
   return (

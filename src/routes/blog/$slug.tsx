@@ -57,17 +57,7 @@ export const Route = createFileRoute('/blog/$slug')({
 
 function BlogPostPage() {
   const post = Route.useLoaderData();
-  if (!post) throw notFound();
-
-  if (!websiteConfig.blog?.enable) {
-    return (
-      <Container className="py-16">
-        <p className="text-center text-muted-foreground">
-          {messages.blog.disabled}
-        </p>
-      </Container>
-    );
-  }
+  if (!post || !websiteConfig.blog?.enable) throw notFound();
 
   return (
     <Container className="py-16 px-4">

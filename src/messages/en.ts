@@ -512,7 +512,6 @@ export const messages = {
   blog: {
     title: 'Blog',
     description: 'Insights, updates and stories from our team',
-    disabled: 'Blog is disabled',
     noPosts: 'No posts yet',
     allPosts: 'All posts',
     previous: 'Previous',

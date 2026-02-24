@@ -40,7 +40,6 @@ export const websiteConfig: WebsiteConfig = {
   blog: {
     enable: true,
     paginationSize: 6,
-    relatedPostsSize: 3,
   },
   affiliates: {
     enable: false,

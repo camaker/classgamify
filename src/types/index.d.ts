@@ -73,7 +73,6 @@ export interface AuthConfig {
 export interface BlogConfig {
   enable: boolean;           // Whether to enable the blog
   paginationSize?: number;   // Number of posts per page
-  relatedPostsSize?: number; // Number of related posts to show
 }
 
 /** Affiliates configuration */
