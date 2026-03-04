@@ -17,9 +17,9 @@ export const clientEnv = createEnv({
     // Analytics
     VITE_GOOGLE_ANALYTICS_ID: z.string().optional(),
     VITE_CLARITY_PROJECT_ID: z.string().optional(),
-    VITE_PLAUSIBLE_SCRIPT: z.url().optional(),
+    VITE_PLAUSIBLE_SCRIPT: z.string().optional(),
     VITE_UMAMI_WEBSITE_ID: z.string().optional(),
-    VITE_UMAMI_SCRIPT: z.url().optional(),
+    VITE_UMAMI_SCRIPT: z.string().optional(),
 
     // Chatbot (Crisp Chat)
     VITE_CRISP_WEBSITE_ID: z.string().optional(),
