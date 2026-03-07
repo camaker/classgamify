@@ -65,7 +65,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                             href={item.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
+                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-semibold data-[active=true]:text-primary"
                           >
                             {item.title}
                           </a>
@@ -79,7 +79,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                                   ? 'true'
                                   : undefined
                             }
-                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
+                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-semibold data-[active=true]:text-primary"
                           >
                             {item.title}
                           </Link>
