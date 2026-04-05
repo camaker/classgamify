@@ -2,7 +2,6 @@ import '@fontsource/bricolage-grotesque/latin-400.css';
 import '@fontsource/bricolage-grotesque/latin-500.css';
 import '@fontsource/bricolage-grotesque/latin-600.css';
 import '@fontsource/bricolage-grotesque/latin-700.css';
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import {
   createRootRouteWithContext,
@@ -11,23 +10,25 @@ import {
   Scripts,
   useRouterState,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { AffonsoScript } from '@/components/affiliate/affonso';
 import { PromotekitScript } from '@/components/affiliate/promotekit';
 import { Analytics } from '@/components/analytics/analytics';
 import { CrispChat } from '@/components/chatbox/crisp-chat';
 import { ThemeProvider } from '@/components/theme/theme-provider';
-import { TailwindIndicator } from '@/integrations/tailwindcss/tailwind-indicator';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { DefaultNotFound } from '@/components/layout/default-not-found';
 import { Toaster } from '@/components/shared/toaster';
 import { websiteConfig } from '@/config/website';
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
 import { DefaultCatchBoundary } from '@/components/layout/default-catch-boundary';
 import { Routes } from '@/lib/routes';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { lazy } from 'react';
+
+const DevTools = import.meta.env.DEV
+  ? lazy(() => import('@/integrations/devtools'))
+  : () => null;
 
 /**
  * https://github.com/backpine/tanstack-start-on-cloudflare/blob/main/src/routes/__root.tsx
@@ -138,19 +139,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <Toaster richColors position="top-right" offset={64} />
           </TooltipProvider>
         </ThemeProvider>
-        <TailwindIndicator />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
+        <DevTools />
         <Analytics />
         <CrispChat />
         <AffonsoScript />
