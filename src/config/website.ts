@@ -7,6 +7,23 @@ import {
   DEFAULT_USER_FILES_FOLDER,
 } from '@/storage/types';
 
+// Payment provider controlled by env var: 'stripe' | 'creem'
+const paymentProvider = clientEnv.VITE_PAYMENT_PROVIDER;
+const isCreem = paymentProvider === 'creem';
+
+// Resolve price/product IDs based on the active payment provider
+const priceIds = {
+  proMonthly: isCreem
+    ? (clientEnv.VITE_CREEM_PRODUCT_PRO_MONTHLY ?? '')
+    : (clientEnv.VITE_STRIPE_PRICE_PRO_MONTHLY ?? ''),
+  proYearly: isCreem
+    ? (clientEnv.VITE_CREEM_PRODUCT_PRO_YEARLY ?? '')
+    : (clientEnv.VITE_STRIPE_PRICE_PRO_YEARLY ?? ''),
+  lifetime: isCreem
+    ? (clientEnv.VITE_CREEM_PRODUCT_LIFETIME ?? '')
+    : (clientEnv.VITE_STRIPE_PRICE_LIFETIME ?? ''),
+};
+
 /**
  * Website config
  */
@@ -71,12 +88,7 @@ export const websiteConfig: WebsiteConfig = {
   },
   payment: {
     enable: true,
-    provider: 'stripe',
-    // To use Creem instead of Stripe:
-    // 1. Set provider: 'creem'
-    // 2. Set env vars: CREEM_API_KEY, CREEM_WEBHOOK_SECRET, CREEM_IS_TEST
-    // 3. Replace priceId values with Creem product IDs (VITE_CREEM_PRODUCT_*)
-    // 4. Configure webhook URL in Creem Dashboard: https://your-domain.com/api/webhooks/creem
+    provider: paymentProvider,
     price: {
       plans: {
         free: {
@@ -94,14 +106,14 @@ export const websiteConfig: WebsiteConfig = {
           prices: [
             {
               type: 'subscription',
-              priceId: clientEnv.VITE_STRIPE_PRICE_PRO_MONTHLY ?? '',
+              priceId: priceIds.proMonthly,
               amount: 990,
               currency: 'USD',
               interval: 'month',
             },
             {
               type: 'subscription',
-              priceId: clientEnv.VITE_STRIPE_PRICE_PRO_YEARLY ?? '',
+              priceId: priceIds.proYearly,
               amount: 9900,
               currency: 'USD',
               interval: 'year',
@@ -120,7 +132,7 @@ export const websiteConfig: WebsiteConfig = {
           prices: [
             {
               type: 'one_time',
-              priceId: clientEnv.VITE_STRIPE_PRICE_LIFETIME ?? '',
+              priceId: priceIds.lifetime,
               amount: 19900,
               currency: 'USD',
               allowPromotionCode: true,

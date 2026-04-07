@@ -47,6 +47,7 @@ import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
+import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -240,6 +241,11 @@ const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
   path: '/api/webhooks/stripe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksCreemRoute = ApiWebhooksCreemRouteImport.update({
+  id: '/api/webhooks/creem',
+  path: '/api/webhooks/creem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStorageFileRoute = ApiStorageFileRouteImport.update({
   id: '/api/storage/file',
   path: '/api/storage/file',
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesByTo {
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesById {
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRouteTypes {
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
   id:
     | '__root__'
@@ -498,6 +509,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
   fileRoutesById: FileRoutesById
 }
@@ -525,6 +537,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
+  ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
   ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
 }
 
@@ -796,6 +809,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/creem': {
+      id: '/api/webhooks/creem'
+      path: '/api/webhooks/creem'
+      fullPath: '/api/webhooks/creem'
+      preLoaderRoute: typeof ApiWebhooksCreemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/storage/file': {
       id: '/api/storage/file'
       path: '/api/storage/file'
@@ -905,6 +925,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
+  ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
   ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,
 }
 export const routeTree = rootRouteImport

@@ -9,6 +9,9 @@ export const clientEnv = createEnv({
   client: {
     VITE_BASE_URL: z.url().default('http://localhost:3000'),
 
+    // Payment provider: 'stripe' | 'creem'
+    VITE_PAYMENT_PROVIDER: z.enum(['stripe', 'creem']).default('stripe'),
+
     // Payment (Stripe)
     VITE_STRIPE_PRICE_PRO_MONTHLY: z.string().optional(),
     VITE_STRIPE_PRICE_PRO_YEARLY: z.string().optional(),
