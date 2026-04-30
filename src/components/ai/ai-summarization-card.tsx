@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 const SAMPLE_TEXT = `Cloudflare Workers AI lets developers run machine learning models on the Cloudflare global network. It provides a serverless GPU-powered inference platform that brings popular open-source models close to end users without managing any infrastructure. Combined with Cloudflare AI Gateway, teams gain caching, analytics, rate limiting, and unified billing across many AI providers, making it easy to ship reliable AI features in production.`;
 
-export function AiTextCard() {
+export function AiSummarizationCard() {
   const [input, setInput] = useState(SAMPLE_TEXT.trim());
   const [summary, setSummary] = useState('');
   const [error, setError] = useState<string | undefined>();
@@ -41,22 +41,22 @@ export function AiTextCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconWand className="size-5 text-primary" />
-          Text Summarization
+          Summarization
         </CardTitle>
         <CardDescription>
           Powered by Cloudflare Workers AI{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             @cf/facebook/bart-large-cnn
-          </code>
-          .
+          </code>{' '}
+          to condense long text into a concise summary.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="ai-text-input">Your content</Label>
+            <Label htmlFor="ai-summarization-input">Source content</Label>
             <Textarea
-              id="ai-text-input"
+              id="ai-summarization-input"
               rows={10}
               value={input}
               onChange={(event) => setInput(event.target.value)}

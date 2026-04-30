@@ -11,15 +11,64 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
-const SAMPLE_PROMPT =
-  'A cute red panda wearing a tiny astronaut helmet floating among nebulas, cinematic lighting, ultra detailed';
+const PROMPT_PRESETS = [
+  {
+    id: 'astronaut-panda',
+    label: 'Astronaut Panda',
+    prompt:
+      'A cute red panda wearing a tiny astronaut helmet floating among nebulas, cinematic lighting, ultra detailed',
+  },
+  {
+    id: 'cyberpunk-tokyo',
+    label: 'Cyberpunk Tokyo',
+    prompt:
+      'Cyberpunk Tokyo street at night, rain-soaked neon reflections, holographic billboards, cinematic, ultra detailed',
+  },
+  {
+    id: 'watercolor-village',
+    label: 'Watercolor Village',
+    prompt:
+      'A peaceful Japanese mountain village at sunrise, watercolor painting style, soft light, delicate brush strokes',
+  },
+  {
+    id: 'product-earbuds',
+    label: 'Product Shot',
+    prompt:
+      'Minimalist product photo of sleek matte-black wireless earbuds on white marble, soft studio lighting, shallow depth of field',
+  },
+  {
+    id: 'pixel-dragon',
+    label: 'Pixel Dragon',
+    prompt:
+      '16-bit pixel art of a tiny dragon guarding a glowing crystal cave, retro game aesthetic, vibrant colors',
+  },
+] as const;
+
+type PresetId = (typeof PROMPT_PRESETS)[number]['id'];
 
 export function AiImageCard() {
-  const [prompt, setPrompt] = useState(SAMPLE_PROMPT);
+  const [activePreset, setActivePreset] = useState<PresetId | null>(
+    PROMPT_PRESETS[0].id
+  );
+  const [prompt, setPrompt] = useState<string>(PROMPT_PRESETS[0].prompt);
   const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
+
+  function onSelectPreset(id: PresetId) {
+    const preset = PROMPT_PRESETS.find((p) => p.id === id);
+    if (!preset) return;
+    setActivePreset(id);
+    setPrompt(preset.prompt);
+  }
+
+  function onPromptChange(value: string) {
+    setPrompt(value);
+    const match = PROMPT_PRESETS.find((p) => p.prompt === value);
+    setActivePreset(match?.id ?? null);
+  }
 
   async function onGenerate() {
     setError(undefined);
@@ -49,22 +98,43 @@ export function AiImageCard() {
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             fal-ai/flux/schnell
           </code>{' '}
-          via the TanStack AI fal adapter.
+          to generate vivid images from text prompts.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="ai-image-prompt">Prompt</Label>
+            <div className="flex flex-wrap gap-2">
+              {PROMPT_PRESETS.map((preset) => {
+                const isActive = activePreset === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => onSelectPreset(preset.id)}
+                    className={cn(
+                      'rounded-full border px-3 py-1 text-xs transition-colors',
+                      isActive
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
             <Textarea
               id="ai-image-prompt"
               rows={6}
               value={prompt}
-              onChange={(event) => setPrompt(event.target.value)}
+              onChange={(event) => onPromptChange(event.target.value)}
               placeholder="Describe the image you want to generate..."
             />
             <p className="text-xs text-muted-foreground">
               {prompt.length} characters
+              {activePreset === null && ' · custom prompt'}
             </p>
             <Button
               type="button"
