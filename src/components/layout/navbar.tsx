@@ -82,7 +82,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
               onValueChange={setMenuValue}
               className="flex-1 justify-center"
             >
-              <NavigationMenuList>
+              <NavigationMenuList role="menubar">
                 {menuLinks?.map((item) =>
                   item.items ? (
                     <NavigationMenuItem key={item.title} value={item.title}>
