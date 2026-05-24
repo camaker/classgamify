@@ -18,9 +18,9 @@ import { serverEnv } from '@/env/server';
  *
  * - Image generation (fal): fal.ai via the `@tanstack/ai-fal` adapter.
  *   Supports switching between `fal-ai/flux/schnell`,
- *   `fal-ai/gemini-25-flash-image` (Nano Banana), and `openai/gpt-image-2`.
+ *   `fal-ai/nano-banana` (Nano Banana), and `openai/gpt-image-2`.
  *
- * - Image editing / image-to-image (fal): `fal-ai/gemini-25-flash-image/edit`.
+ * - Image editing / image-to-image (fal): `fal-ai/nano-banana/edit`.
  *   Takes a base64 portrait + prompt and returns a stylized version (e.g.
  *   bobblehead caricature). Identity preservation is excellent on this model.
  *
@@ -87,7 +87,7 @@ const taglineSchema = z.object({
 
 const FAL_IMAGE_MODELS = [
   'fal-ai/flux/schnell',
-  'fal-ai/gemini-25-flash-image',
+  'fal-ai/nano-banana',
   'openai/gpt-image-2',
 ] as const;
 
@@ -96,7 +96,7 @@ const imageGenerationSchema = z.object({
     .string()
     .min(10, 'Prompt is too short.')
     .max(500, 'Prompt is too long, please keep it under 500 characters.'),
-  model: z.enum(FAL_IMAGE_MODELS).default('fal-ai/gemini-25-flash-image'),
+  model: z.enum(FAL_IMAGE_MODELS).default('fal-ai/nano-banana'),
 });
 
 const CF_IMAGE_MODELS = [
@@ -314,7 +314,7 @@ function parseTaglines(text: string): string[] {
 
 /**
  * Generate an image from a text prompt using fal.ai. Caller picks the model
- * (Flux Schnell, Gemini 2.5 Flash / Nano Banana, or GPT Image 2).
+ * (Flux Schnell, Nano Banana, or GPT Image 2).
  * Returns the hosted image URL produced by fal.
  */
 export const generateAiImage = createServerFn({ method: 'POST' })
@@ -354,7 +354,7 @@ export const generateAiImage = createServerFn({ method: 'POST' })
   });
 
 /**
- * Image-to-image edit using fal.ai Gemini 2.5 Flash Image (`/edit` endpoint).
+ * Image-to-image edit using fal.ai Nano Banana (`/edit` endpoint).
  * Sends the user's base64 image as a data URI in `image_urls` and returns a
  * stylized version. Great at preserving the subject's identity, so it works
  * well for portrait → caricature / cartoon / anime transformations.
@@ -373,7 +373,7 @@ export const editAiImage = createServerFn({ method: 'POST' })
       ? data.imageBase64
       : `data:image/jpeg;base64,${data.imageBase64}`;
 
-    const adapter = falImage('fal-ai/gemini-25-flash-image/edit', { apiKey });
+    const adapter = falImage('fal-ai/nano-banana/edit', { apiKey });
 
     const result = await generateImage({
       adapter,

@@ -126,7 +126,7 @@ export function AiImageEditCard() {
         <CardDescription>
           Powered by fal.ai{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            fal-ai/gemini-25-flash-image/edit
+            fal-ai/nano-banana/edit
           </code>{' '}
           to turn an uploaded portrait into a stylized cartoon, caricature, or
           anime version.

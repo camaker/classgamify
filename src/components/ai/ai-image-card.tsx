@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 
 type FalModel =
   | 'fal-ai/flux/schnell'
-  | 'fal-ai/gemini-25-flash-image'
+  | 'fal-ai/nano-banana'
   | 'openai/gpt-image-2';
 
 const FAL_MODELS: {
@@ -32,8 +32,8 @@ const FAL_MODELS: {
   hint: string;
 }[] = [
   {
-    value: 'fal-ai/gemini-25-flash-image',
-    label: 'Gemini 2.5 Flash · Nano Banana',
+    value: 'fal-ai/nano-banana',
+    label: 'Nano Banana',
     hint: "Google's image model · ~$0.039 / image",
   },
   {
@@ -88,7 +88,7 @@ export function AiImageCard() {
     PROMPT_PRESETS[0].id
   );
   const [prompt, setPrompt] = useState<string>(PROMPT_PRESETS[0].prompt);
-  const [model, setModel] = useState<FalModel>('fal-ai/gemini-25-flash-image');
+  const [model, setModel] = useState<FalModel>('fal-ai/nano-banana');
   const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);

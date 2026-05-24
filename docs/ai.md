@@ -69,8 +69,8 @@ Browser (card) ──▶ TanStack server function ──▶ provider API ──�
 | **synthesizeSpeech** | Workers AI · `@cf/deepgram/aura-1` | `text`, `speaker` (12 voices) | `{ audioUrl, bytes }` (`data:audio/mpeg;base64,...`) |
 | **captionImage** | Workers AI · `@cf/llava-hf/llava-1.5-7b-hf` | `imageBase64`, `prompt` | `{ description }` |
 | **generateCfImage** | Workers AI · Flux.1 Schnell / SDXL Lightning / DreamShaper 8 LCM | `prompt`, `model` (enum) | `{ imageUrl, model }` (`data:image/...;base64,...`) |
-| **generateAiImage** | fal.ai · Gemini 2.5 Flash / Flux Schnell / GPT Image 2 | `prompt`, `model` (enum) | `{ imageUrl, model }` (fal CDN URL) |
-| **editAiImage** | fal.ai · `fal-ai/gemini-25-flash-image/edit` | `imageBase64`, `prompt` | `{ imageUrl }` |
+| **generateAiImage** | fal.ai · Nano Banana / Flux Schnell / GPT Image 2 | `prompt`, `model` (enum) | `{ imageUrl, model }` (fal CDN URL) |
+| **editAiImage** | fal.ai · `fal-ai/nano-banana/edit` | `imageBase64`, `prompt` | `{ imageUrl }` |
 
 All functions throw a descriptive `Error` on missing env, non-2xx responses, or empty payloads — the cards surface the message in the result panel.
 
@@ -115,14 +115,14 @@ Demonstrates Workers AI's two response shapes (JSON envelope vs. raw binary). Th
 
 ### 7. Image Generator · fal.ai
 **Card:** `AiImageCard` · **Models:**
-- `fal-ai/gemini-25-flash-image` (default — Google "Nano Banana", ~$0.039 / image)
+- `fal-ai/nano-banana` (default — Google "Nano Banana", ~$0.039 / image)
 - `fal-ai/flux/schnell` (fast & cheap — ~$0.003 / image)
 - `openai/gpt-image-2` (premium — sharp text & photoreal; forced to `quality: 'low'` + `output_format: 'jpeg'` so it finishes in ~30 s within Cloudflare's subrequest budget)
 
 Uses the `@tanstack/ai` + `@tanstack/ai-fal` adapter via `falImage(model, { apiKey })` and `generateImage({ adapter, prompt })`. The adapter polls fal's queue under the hood. Returns the fal-hosted CDN URL.
 
 ### 8. Avatar Stylizer (image-to-image)
-**Card:** `AiImageEditCard` · **Model:** `fal-ai/gemini-25-flash-image/edit` (fal.ai)
+**Card:** `AiImageEditCard` · **Model:** `fal-ai/nano-banana/edit` (fal.ai)
 
 Upload a portrait, pick a style preset (Bobblehead Caricature / Pixar 3D / Anime Portrait) or write a custom prompt, get an identity-preserving stylized version back. Implementation passes the user image as a base64 `data:` URI inside `modelOptions.image_urls` — fal accepts data URIs natively, so no separate upload step is required.
 
