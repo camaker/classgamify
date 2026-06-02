@@ -6,7 +6,7 @@ TanStarter is the complete TanStack Start boilerplate for building profitable Sa
 
 ## Author
 
-This project is created by [Fox](https://x.com/indie_maker_fox), the founder of [TanStarter](https://tanstarter.dev), [MkSaaS](https://mksaas.com) and [Mkdirs](https://mkdirs.com).
+This project is created by [Fox](https://x.com/indie_maker_fox), the founder of [TanStarter](https://tanstarter.dev), [MkImage](https://mkimage.ai), [MkSaaS](https://mksaas.com) and [Mkdirs](https://mkdirs.com).
 
 ## Documentation
 
@@ -20,13 +20,6 @@ If you found anything that could be improved, please let me know.
 - 🌐 demo: [demo.tanstarter.dev](https://demo.tanstarter.dev)
 - 📚 documentation: [docs.tanstarter.dev](https://docs.tanstarter.dev)
 - 📹 video tutorials: [youtube@TanStarter](https://www.youtube.com/@TanStarter)
-
-## Repositories
-
-By default, you should have access to all 2 repositories. If you find that you’re unable to access any of them, please don’t hesitate to reach out to me, and I’ll assist you in resolving the issue.
-
-- [mkfast-template](https://github.com/MkFastHQ/mkfast-template): https://demo.tanstarter.dev
-- [mkfast-app](https://github.com/MkFastHQ/mkfast-app): https://mkimage.ai
 
 ## Notice
 
