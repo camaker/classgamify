@@ -6,8 +6,6 @@ import {
   Scripts,
   useRouterState,
 } from '@tanstack/react-router';
-import { AffonsoScript } from '@/components/affiliate/affonso';
-import { PromotekitScript } from '@/components/affiliate/promotekit';
 import { Analytics } from '@/components/analytics/analytics';
 import { CrispChat } from '@/components/chatbox/crisp-chat';
 import { ThemeProvider } from '@/components/theme/theme-provider';
@@ -142,8 +140,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <DevTools />
         <Analytics />
         <CrispChat />
-        <AffonsoScript />
-        <PromotekitScript />
         <Scripts />
       </body>
     </html>

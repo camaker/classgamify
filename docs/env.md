@@ -41,9 +41,6 @@ Values are read by Vite from `.env*` during `pnpm dev` / `pnpm build` and inline
 | `VITE_UMAMI_SCRIPT` | Umami script URL | No | |
 | **Chat & support** | | | |
 | `VITE_CRISP_WEBSITE_ID` | Crisp chat | No | Requires `features.enableCrispChat: true` in `src/config/website.ts` |
-| **Affiliate** | | | |
-| `VITE_AFFILIATE_AFFONSO_ID` | Affonso (PromosKit) | No | Requires `features.enableAffonsoAffiliate: true`; [affonso.com](https://affonso.com) |
-| `VITE_AFFILIATE_PROMOTEKIT_ID` | PromoteKit | No | Requires `features.enablePromotekitAffiliate: true`; [promotekit.com](https://www.promotekit.com) |
 
 Do **not** put `VITE_*` in Wrangler `vars` or `wrangler secret`—they are build-time only.
 

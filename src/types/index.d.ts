@@ -8,7 +8,6 @@ export interface WebsiteConfig {
   social?: SocialConfig;
   auth?: AuthConfig;
   blog?: BlogConfig;
-  affiliates?: AffiliatesConfig;
   mail?: MailConfig;
   newsletter?: NewsletterConfig;
   notification?: NotificationConfig;
@@ -66,12 +65,6 @@ export interface AuthConfig {
 export interface BlogConfig {
   enable: boolean;           // Whether to enable the blog
   paginationSize?: number;   // Number of posts per page
-}
-
-/** Affiliates configuration */
-export interface AffiliatesConfig {
-  enable: boolean;                     // Whether to enable the affiliates
-  provider?: 'affonso' | 'promotekit'; // The affiliate provider, supports affonso and promotekit
 }
 
 /** Mail configuration */

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
  *
  * IMPORTANT: injection is deferred until the browser is idle (via
  * requestIdleCallback, with setTimeout fallback). This keeps analytics /
- * chat / affiliate scripts from competing with the LCP hero image and
+ * chat scripts from competing with the LCP hero image and
  * initial React hydration — critical for Core Web Vitals on a content-heavy
  * landing page.
  */

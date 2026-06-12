@@ -1,6 +1,5 @@
 import { createCheckoutSession } from '@/api/payment';
 import { Button } from '@/components/ui/button';
-import { websiteConfig } from '@/config/website';
 import { cn } from '@/lib/utils';
 import { messages } from '@/messages';
 import { IconLoader2 } from '@tabler/icons-react';
@@ -43,47 +42,6 @@ export function CheckoutButton({
 
       // merge metadata with existing metadata
       const mergedMetadata = metadata ? { ...metadata } : {};
-
-      // add promotekit_referral to metadata if enabled promotekit affiliate
-      if (
-        websiteConfig.affiliates?.enable &&
-        websiteConfig.affiliates.provider === 'promotekit'
-      ) {
-        const promotekitReferral =
-          typeof window !== 'undefined'
-            ? (window as { promotekit_referral?: string }).promotekit_referral
-            : undefined;
-        if (promotekitReferral) {
-          console.log(
-            'create checkout button, promotekitReferral:',
-            promotekitReferral
-          );
-          mergedMetadata.promotekit_referral = promotekitReferral;
-        }
-      }
-
-      // add affonso_referral to metadata if enabled affonso affiliate
-      if (
-        websiteConfig.affiliates?.enable &&
-        websiteConfig.affiliates.provider === 'affonso'
-      ) {
-        const affonsoReferral =
-          typeof document !== 'undefined'
-            ? (() => {
-                const match = document.cookie.match(
-                  /(?:^|; )affonso_referral=([^;]*)/
-                );
-                return match ? decodeURIComponent(match[1]) : null;
-              })()
-            : null;
-        if (affonsoReferral) {
-          console.log(
-            'create checkout button, affonsoReferral:',
-            affonsoReferral
-          );
-          mergedMetadata.affonso_referral = affonsoReferral;
-        }
-      }
 
       const result = await createCheckoutSession({
         data: {

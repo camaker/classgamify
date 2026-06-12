@@ -31,10 +31,6 @@ export const clientEnv = createEnv({
 
     // Chatbot (Crisp Chat)
     VITE_CRISP_WEBSITE_ID: z.string().optional(),
-
-    // Affiliate (Affonso / PromoteKit)
-    VITE_AFFILIATE_AFFONSO_ID: z.string().optional(),
-    VITE_AFFILIATE_PROMOTEKIT_ID: z.string().optional(),
   },
   runtimeEnv: import.meta.env,
 });
