@@ -63,10 +63,6 @@ export const websiteConfig: WebsiteConfig = {
     enable: true,
     paginationSize: 6,
   },
-  affiliates: {
-    enable: false,
-    provider: 'affonso',
-  },
   mail: {
     enable: true,
     provider: 'cloudflare',
