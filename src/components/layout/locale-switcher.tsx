@@ -13,6 +13,7 @@ import {
   type Locale,
 } from '@/lib/locale';
 import { cn } from '@/lib/utils';
+import { m } from '@/locale/paraglide/messages';
 import { setLocale } from '@/locale/paraglide/runtime';
 import { IconLanguage } from '@tabler/icons-react';
 import { useLocation } from '@tanstack/react-router';
@@ -22,18 +23,28 @@ type LocaleSwitcherProps = {
   onLocaleChange?: () => void;
 };
 
-export function LocaleSwitcher({
-  className,
-  onLocaleChange,
-}: LocaleSwitcherProps) {
-  const location = useLocation();
+type UseLocaleSwitcherOptions = {
+  onLocaleChange?: () => void;
+};
 
-  if (locales.length <= 1) {
-    return null;
+function withUrlPartPrefix(value: string | undefined, prefix: '?' | '#') {
+  if (!value) {
+    return '';
   }
 
+  return value.startsWith(prefix) ? value : `${prefix}${value}`;
+}
+
+export function useLocaleSwitcher({
+  onLocaleChange,
+}: UseLocaleSwitcherOptions = {}) {
+  const location = useLocation();
   const currentLocale = getLocale();
-  const currentHref = `${location.pathname}${location.searchStr}${location.hash ?? ''}`;
+  const currentHref = [
+    location.pathname,
+    withUrlPartPrefix(location.searchStr, '?'),
+    withUrlPartPrefix(location.hash, '#'),
+  ].join('');
   const baseHref = deLocalizeHref(currentHref);
 
   function switchLocale(nextLocale: Locale) {
@@ -45,6 +56,21 @@ export function LocaleSwitcher({
     setLocale(nextLocale, { reload: false });
     onLocaleChange?.();
     window.location.assign(nextHref);
+  }
+
+  return { currentLocale, switchLocale };
+}
+
+export function LocaleSwitcher({
+  className,
+  onLocaleChange,
+}: LocaleSwitcherProps) {
+  const { currentLocale, switchLocale } = useLocaleSwitcher({
+    onLocaleChange,
+  });
+
+  if (locales.length <= 1) {
+    return null;
   }
 
   return (

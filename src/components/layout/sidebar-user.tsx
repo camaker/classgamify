@@ -19,8 +19,11 @@ import {
 } from '@/components/ui/sidebar';
 import { websiteConfig } from '@/config/website';
 import type { SessionUser } from '@/auth/types';
+import { localeConfig, locales, type Locale } from '@/lib/locale';
+import { useLocaleSwitcher } from '@/components/layout/locale-switcher';
 import {
   IconDeviceDesktop,
+  IconLanguage,
   IconLogout,
   IconMoon,
   IconSelector,
@@ -40,8 +43,12 @@ export function SidebarUser({ user }: SidebarUserProps) {
   const router = useRouter();
   const { setTheme, theme } = useTheme();
   const { isMobile } = useSidebar();
-  const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
   const [open, setOpen] = useState(false);
+  const { currentLocale, switchLocale } = useLocaleSwitcher({
+    onLocaleChange: () => setOpen(false),
+  });
+  const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
+  const showLocaleSwitch = locales.length > 1;
   const ThemeIcon =
     theme === 'system'
       ? IconDeviceDesktop
@@ -132,6 +139,33 @@ export function SidebarUser({ user }: SidebarUserProps) {
                         <IconDeviceDesktop className="mr-2 size-4" />
                         {m.common_mode_system()}
                       </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </>
+              )}
+
+              {showLocaleSwitch && (
+                <>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <IconLanguage className="mr-2 size-4" />
+                      {m.common_switch_language()}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {locales.map((locale: Locale) => (
+                        <DropdownMenuItem
+                          key={locale}
+                          onClick={() => switchLocale(locale)}
+                          disabled={locale === currentLocale}
+                        >
+                          {localeConfig[locale].flag ? (
+                            <span className="mr-2 text-base">
+                              {localeConfig[locale].flag}
+                            </span>
+                          ) : null}
+                          <span>{localeConfig[locale].name}</span>
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
                 </>

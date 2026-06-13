@@ -37,7 +37,9 @@ export function BlogCard({ post }: { post: BlogPost }) {
           </span>
         </CardHeader>
         <CardContent className="pb-4">
-          <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>
+          <CardTitle className="line-clamp-2 text-lg">
+            <h2>{post.title}</h2>
+          </CardTitle>
           {post.description && (
             <CardDescription className="mt-2 line-clamp-2">
               {post.description}

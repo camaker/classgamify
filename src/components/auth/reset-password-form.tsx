@@ -1,4 +1,4 @@
-import { getAuthErrorMessages } from '@/lib/locale';
+import { getAuthErrorMessage } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
@@ -75,13 +75,7 @@ export function ResetPasswordForm() {
           router.navigate({ to: Routes.Login });
         },
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const authErrorMessages = getAuthErrorMessages();
-          const friendlyMessage =
-            code && authErrorMessages[code]
-              ? authErrorMessages[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );

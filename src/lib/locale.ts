@@ -54,6 +54,32 @@ export function getAuthErrorMessages() {
   );
 }
 
+const authErrorMessageAliases: Record<string, string> = {
+  'Invalid email or password': 'invalid_email_or_password',
+  'Invalid email or password.': 'invalid_email_or_password',
+};
+
+type AuthErrorInput = {
+  code?: string;
+  message?: string;
+};
+
+export function getAuthErrorMessage(error: AuthErrorInput) {
+  const messages = getAuthErrorMessages();
+  const code = error.code;
+  const message = error.message;
+  const normalizedCode = code?.toLowerCase();
+  const aliasedCode = message ? authErrorMessageAliases[message] : undefined;
+
+  return (
+    (code ? messages[code] : undefined) ??
+    (normalizedCode ? messages[normalizedCode] : undefined) ??
+    (aliasedCode ? messages[aliasedCode] : undefined) ??
+    message ??
+    m.auth_error_try_again()
+  );
+}
+
 export function getCanonicalPathname(pathname: string) {
   return deLocalizeHref(pathname).split('?')[0]?.split('#')[0] ?? pathname;
 }

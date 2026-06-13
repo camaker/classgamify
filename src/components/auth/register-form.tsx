@@ -1,4 +1,4 @@
-import { getAuthErrorMessages } from '@/lib/locale';
+import { getAuthErrorMessage } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
 import { FormError } from '@/components/shared/form-error';
@@ -70,13 +70,7 @@ export function RegisterForm({
         onResponse: () => setIsPending(false),
         onSuccess: () => setSuccess(m.auth_register_check_email()),
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const authErrorMessages = getAuthErrorMessages();
-          const friendlyMessage =
-            code && authErrorMessages[code]
-              ? authErrorMessages[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );

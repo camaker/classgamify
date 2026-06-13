@@ -1,4 +1,4 @@
-import { getAuthErrorMessages } from '@/lib/locale';
+import { getAuthErrorMessage } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { Link } from '@tanstack/react-router';
 import { AuthCard } from '@/components/auth/auth-card';
@@ -78,13 +78,7 @@ export function LoginForm({
           onSuccess?.();
         },
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const authErrorMessages = getAuthErrorMessages();
-          const friendlyMessage =
-            code && authErrorMessages[code]
-              ? authErrorMessages[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );

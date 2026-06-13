@@ -113,9 +113,6 @@ export const Route = createRootRouteWithContext<{
         },
         { rel: 'icon', href: '/favicon.ico' },
         { rel: 'manifest', href: '/manifest.json' },
-        // Default canonical for the homepage. Pages that call seo() push their
-        // own canonical + hreflang alternates, which override this.
-        { rel: 'canonical', href: getCanonicalUrl('/') },
       ],
     };
   },
