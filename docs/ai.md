@@ -139,7 +139,7 @@ Each preset prompt explicitly tells the model to *keep the original facial featu
    - For fal.ai: `falImage(model, { apiKey: serverEnv.FAL_KEY })` + `generateImage({ adapter, prompt, modelOptions })`.
 2. **Card** — create `src/components/ai/ai-<name>-card.tsx` matching the existing layout (`Card` → header with title + `<code>` model id + description, `CardContent` with two-column grid). Reuse `downloadFile()` for any image / audio result.
 3. **Mount** — add `<section id="...">` to `src/routes/(pages)/ai.tsx`.
-4. **Navbar** — add a `Routes.Ai<Name>` entry in `src/lib/routes.ts`, add the `messages.nav.ai.<name>` block in both locale files, then push a sub-item to the AI dropdown in `src/config/navbar-config.ts` with an icon.
+4. **Navbar** — add a `Routes.Ai<Name>` entry in `src/lib/routes.ts`, add flat `nav_ai_<name>_*` keys in both locale JSON files, then push a sub-item to the AI dropdown in `src/config/navbar-config.ts` with an icon.
 
 ---
 

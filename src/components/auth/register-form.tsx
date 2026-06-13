@@ -1,3 +1,5 @@
+import { getAuthErrorMessage } from '@/lib/locale';
+import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
 import { FormError } from '@/components/shared/form-error';
 import { FormSuccess } from '@/components/shared/form-success';
@@ -19,15 +21,10 @@ import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { messages } from '@/messages';
 import { SocialLoginButton } from './social-login-button';
-
-const m = messages.auth.register;
-
 interface RegisterFormProps {
   callbackUrl?: string;
 }
-
 export function RegisterForm({
   callbackUrl: propCallbackUrl,
 }: RegisterFormProps) {
@@ -39,26 +36,23 @@ export function RegisterForm({
   const callbackUrl =
     propCallbackUrl ??
     (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
-
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? true;
-
   const RegisterSchema = z.object({
-    email: z.string().email({ message: m.emailRequired }),
-    password: z.string().min(1, { message: m.passwordRequired }),
-    name: z.string().min(1, { message: m.nameRequired }),
+    email: z.string().email({ message: m.auth_register_email_required() }),
+    password: z
+      .string()
+      .min(1, { message: m.auth_register_password_required() }),
+    name: z.string().min(1, { message: m.auth_register_name_required() }),
   });
-
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: { email: '', password: '', name: '' },
   });
-
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
     await authClient.signUp.email(
       {
@@ -74,27 +68,20 @@ export function RegisterForm({
           setSuccess('');
         },
         onResponse: () => setIsPending(false),
-        onSuccess: () => setSuccess(m.checkEmail),
+        onSuccess: () => setSuccess(m.auth_register_check_email()),
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const friendlyMessage =
-            code && messages.auth.error.codes[code]
-              ? messages.auth.error.codes[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );
   };
-
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-
   return (
     <AuthCard
-      headerLabel={m.createAccount}
-      bottomButtonLabel={m.signInHint}
+      headerLabel={m.auth_register_create_account()}
+      bottomButtonLabel={m.auth_register_sign_in_hint()}
       bottomButtonHref={Routes.Login}
     >
       {credentialLoginEnabled && (
@@ -106,12 +93,12 @@ export function RegisterForm({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{m.name}</FormLabel>
+                    <FormLabel>{m.auth_register_name()}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder={m.placeholderName}
+                        placeholder={m.auth_register_placeholder_name()}
                       />
                     </FormControl>
                     <FormMessage />
@@ -123,12 +110,12 @@ export function RegisterForm({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{m.email}</FormLabel>
+                    <FormLabel>{m.auth_register_email()}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder={m.placeholderEmail}
+                        placeholder={m.auth_register_placeholder_email()}
                         type="email"
                       />
                     </FormControl>
@@ -141,13 +128,13 @@ export function RegisterForm({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{m.password}</FormLabel>
+                    <FormLabel>{m.auth_register_password()}</FormLabel>
                     <div className="relative">
                       <FormControl>
                         <Input
                           {...field}
                           disabled={isPending}
-                          placeholder={m.placeholderPassword}
+                          placeholder={m.auth_register_placeholder_password()}
                           type={showPassword ? 'text' : 'password'}
                           className="pr-10"
                         />
@@ -166,7 +153,9 @@ export function RegisterForm({
                           <IconEye className="size-4 text-muted-foreground" />
                         )}
                         <span className="sr-only">
-                          {showPassword ? m.hidePassword : m.showPassword}
+                          {showPassword
+                            ? m.auth_register_hide_password()
+                            : m.auth_register_show_password()}
                         </span>
                       </Button>
                     </div>
@@ -184,7 +173,7 @@ export function RegisterForm({
               className="w-full flex items-center justify-center gap-2"
             >
               {isPending && <IconLoader2 className="size-4 animate-spin" />}
-              <span>{m.signUp}</span>
+              <span>{m.auth_register_sign_up()}</span>
             </Button>
           </form>
         </Form>

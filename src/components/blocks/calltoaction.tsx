@@ -1,16 +1,9 @@
+import { m } from '@/locale/paraglide/messages';
 import { ScrollReveal } from '@/components/shared/scroll-reveal';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
 import { Link } from '@tanstack/react-router';
-
-const m = {
-  title: 'Ready to get started?',
-  description: 'Join thousands of teams building with TanStarter today',
-  primaryButton: 'Get started',
-  secondaryButton: 'View pricing',
-};
-
 export default function CallToActionSection() {
   return (
     <section
@@ -22,23 +15,25 @@ export default function CallToActionSection() {
       <div className="relative mx-auto max-w-5xl px-6">
         <ScrollReveal className="text-center">
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-            {m.title}
+            {m.home_call_to_action_title()}
           </h2>
-          <p className="mt-4 text-muted-foreground text-lg">{m.description}</p>
+          <p className="mt-4 text-muted-foreground text-lg">
+            {m.home_call_to_action_description()}
+          </p>
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Link
               to={Routes.Login}
               className={cn(buttonVariants({ size: 'lg' }))}
             >
-              <span>{m.primaryButton}</span>
+              <span>{m.home_call_to_action_primary_button()}</span>
             </Link>
             <Link
               to="/"
               hash="pricing"
               className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))}
             >
-              <span>{m.secondaryButton}</span>
+              <span>{m.home_call_to_action_secondary_button()}</span>
             </Link>
           </div>
         </ScrollReveal>

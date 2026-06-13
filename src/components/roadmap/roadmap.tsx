@@ -1,9 +1,6 @@
+import { m } from '@/locale/paraglide/messages';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { messages } from '@/messages';
-
-const m = messages.roadmap;
-
 interface Task {
   id: string;
   title: string;
@@ -12,71 +9,72 @@ interface Task {
   assignee?: string;
   dueDate?: string;
 }
-
-const DEFAULT_COLUMNS: Record<string, Task[]> = {
-  backlog: [
-    {
-      id: '1',
-      title: 'Add authentication',
-      priority: 'high',
-      assignee: 'John Doe',
-      dueDate: '2026-04-01',
-    },
-    {
-      id: '2',
-      title: 'Create API endpoints',
-      priority: 'medium',
-      assignee: 'Jane Smith',
-      dueDate: '2026-04-05',
-    },
-    {
-      id: '3',
-      title: 'Write documentation',
-      priority: 'low',
-      assignee: 'Bob Johnson',
-      dueDate: '2026-04-10',
-    },
-  ],
-  inProgress: [
-    {
-      id: '4',
-      title: 'Design system updates',
-      priority: 'high',
-      assignee: 'Alice Brown',
-      dueDate: '2026-03-28',
-    },
-    {
-      id: '5',
-      title: 'Implement dark mode',
-      priority: 'medium',
-      assignee: 'Charlie Wilson',
-      dueDate: '2026-04-02',
-    },
-  ],
-  done: [
-    {
-      id: '7',
-      title: 'Setup project',
-      priority: 'high',
-      assignee: 'Eve Davis',
-      dueDate: '2026-03-25',
-    },
-    {
-      id: '8',
-      title: 'Initial commit',
-      priority: 'low',
-      assignee: 'Frank White',
-      dueDate: '2026-03-24',
-    },
-  ],
-};
-
 export function Roadmap() {
-  const columnTitles = m.columns;
-
+  const columnTitles = {
+    backlog: m.roadmap_columns_backlog(),
+    inProgress: m.roadmap_columns_in_progress(),
+    done: m.roadmap_columns_done(),
+  };
+  const columns = {
+    backlog: [
+      {
+        id: '1',
+        title: m.roadmap_board_tasks_backlog_0_title(),
+        priority: 'high',
+        assignee: 'John Doe',
+        dueDate: '2026-04-01',
+      },
+      {
+        id: '2',
+        title: m.roadmap_board_tasks_backlog_1_title(),
+        priority: 'medium',
+        assignee: 'Jane Smith',
+        dueDate: '2026-04-05',
+      },
+      {
+        id: '3',
+        title: m.roadmap_board_tasks_backlog_2_title(),
+        priority: 'low',
+        assignee: 'Bob Johnson',
+        dueDate: '2026-04-10',
+      },
+    ],
+    inProgress: [
+      {
+        id: '4',
+        title: m.roadmap_board_tasks_in_progress_0_title(),
+        priority: 'high',
+        assignee: 'Alice Brown',
+        dueDate: '2026-03-28',
+      },
+      {
+        id: '5',
+        title: m.roadmap_board_tasks_in_progress_1_title(),
+        priority: 'medium',
+        assignee: 'Charlie Wilson',
+        dueDate: '2026-04-02',
+      },
+    ],
+    done: [
+      {
+        id: '7',
+        title: m.roadmap_board_tasks_done_0_title(),
+        priority: 'high',
+        assignee: 'Eve Davis',
+        dueDate: '2026-03-25',
+      },
+      {
+        id: '8',
+        title: m.roadmap_board_tasks_done_1_title(),
+        priority: 'low',
+        assignee: 'Frank White',
+        dueDate: '2026-03-24',
+      },
+    ],
+  } satisfies Record<string, Task[]>;
   return (
     <div className="grid w-full auto-rows-auto grid-cols-1 gap-4 md:grid-cols-2 md:auto-rows-fr lg:grid-cols-3">
-      {Object.entries(DEFAULT_COLUMNS).map(([columnValue, tasks]) => (
+      {Object.entries(columns).map(([columnValue, tasks]) => (
         <TaskColumn
           key={columnValue}
           value={columnValue}
@@ -90,12 +88,15 @@ export function Roadmap() {
     </div>
   );
 }
-
 interface TaskCardProps {
   task: Task;
 }
-
 function TaskCard({ task }: TaskCardProps) {
+  const priority = {
+    high: m.roadmap_board_priority_high(),
+    medium: m.roadmap_board_priority_medium(),
+    low: m.roadmap_board_priority_low(),
+  }[task.priority];
   return (
     <div className="rounded-md border bg-card p-3 shadow-sm">
       <div className="flex flex-col gap-2">
@@ -112,7 +113,7 @@ function TaskCard({ task }: TaskCardProps) {
                   : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
             )}
           >
-            {task.priority}
+            {priority}
           </Badge>
         </div>
         <div className="flex items-center justify-between text-muted-foreground text-xs">
@@ -130,13 +131,11 @@ function TaskCard({ task }: TaskCardProps) {
     </div>
   );
 }
-
 interface TaskColumnProps {
   value: string;
   tasks: Task[];
   title: string;
 }
-
 function TaskColumn({ value, tasks, title }: TaskColumnProps) {
   return (
     <div key={value} className="flex flex-col gap-2">

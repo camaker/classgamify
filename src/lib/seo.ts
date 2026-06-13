@@ -1,5 +1,17 @@
 import { websiteConfig } from '@/config/website';
-import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
+import {
+  getCanonicalUrl,
+  getCanonicalUrlForLocale,
+  getOgImage,
+  twitterHandleFromUrl,
+} from '@/lib/urls';
+import {
+  baseLocale,
+  getLocale,
+  isLocalizedPath,
+  localeConfig,
+  locales,
+} from '@/lib/locale';
 
 /**
  * Build metadata + canonical link for a page
@@ -19,9 +31,25 @@ export function seo(
 ) {
   const url = getCanonicalUrl(path);
   const image = options.image ?? getOgImage();
+  const localized = isLocalizedPath(path);
+  const alternateLinks = localized
+    ? [
+        ...locales.map((locale) => ({
+          rel: 'alternate',
+          hrefLang: localeConfig[locale].hreflang,
+          href: getCanonicalUrlForLocale(path, locale),
+        })),
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
+          href: getCanonicalUrlForLocale(path, baseLocale),
+        },
+      ]
+    : [];
+
   return {
     meta: metadata({ ...options, url, image, type: options.type ?? 'website' }),
-    links: [{ rel: 'canonical', href: url }],
+    links: [{ rel: 'canonical', href: url }, ...alternateLinks],
   };
 }
 
@@ -43,6 +71,13 @@ export const metadata = ({
   const twitterSite = websiteConfig.social?.twitter
     ? twitterHandleFromUrl(websiteConfig.social.twitter)
     : null;
+  // OG locale format uses underscore (e.g. en_US, zh_CN), unlike BCP 47 used
+  // for <html lang> / hreflang which uses hyphens.
+  const currentLocale = getLocale();
+  const ogLocale = localeConfig[currentLocale].hreflang.replace('-', '_');
+  const alternateLocales = locales
+    .filter((l) => l !== currentLocale)
+    .map((l) => localeConfig[l].hreflang.replace('-', '_'));
   const metadata: Array<{
     title?: string;
     name?: string;
@@ -55,6 +90,11 @@ export const metadata = ({
     // OG metadata
     { property: 'og:type', content: type },
     { property: 'og:site_name', content: websiteConfig.metadata?.name ?? '' },
+    { property: 'og:locale', content: ogLocale },
+    ...alternateLocales.map((loc) => ({
+      property: 'og:locale:alternate',
+      content: loc,
+    })),
     { property: 'og:title', content: title },
     ...(description
       ? [{ property: 'og:description', content: description }]

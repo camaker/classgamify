@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { m } from '@/locale/paraglide/messages';
 import {
   flexRender,
   getCoreRowModel,
@@ -102,7 +103,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
             !table.getIsAllPageRowsSelected()
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label={m.common_select_all()}
         />
       </div>
     ),
@@ -111,7 +112,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
+          aria-label={m.common_select_row()}
         />
       </div>
     ),

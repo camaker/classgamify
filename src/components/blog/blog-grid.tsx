@@ -1,12 +1,11 @@
+import { m } from '@/locale/paraglide/messages';
 import type { BlogPost } from '@/lib/blog';
-import { messages } from '@/messages';
 import { BlogCard } from './blog-card';
-
 export function BlogGrid({ posts }: { posts: BlogPost[] }) {
   if (posts.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        {messages.blog.noPosts}
+        {m.blog_no_posts()}
       </div>
     );
   }

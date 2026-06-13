@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { LocaleSwitcher } from '@/components/layout/locale-switcher';
 import { ModeSwitcher } from '@/components/theme/mode-switcher';
 import { websiteConfig } from '@/config/website';
 import { Link } from '@tanstack/react-router';
@@ -76,6 +77,7 @@ export function DashboardHeader({
 
         <div className="ml-auto flex shrink-0 items-center gap-3 pl-4">
           {actions}
+          <LocaleSwitcher />
           {showModeSwitch && <ModeSwitcher />}
         </div>
       </div>

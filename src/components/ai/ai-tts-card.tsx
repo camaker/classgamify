@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { useState } from 'react';
 import { IconLoader2, IconMicrophone } from '@tabler/icons-react';
 import { synthesizeSpeech } from '@/api/ai';
@@ -18,7 +19,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-
 type Speaker =
   | 'angus'
   | 'asteria'
@@ -32,8 +32,10 @@ type Speaker =
   | 'helios'
   | 'hera'
   | 'stella';
-
-const SPEAKERS: { value: Speaker; label: string }[] = [
+const SPEAKERS: {
+  value: Speaker;
+  label: string;
+}[] = [
   { value: 'asteria', label: 'Asteria · Female (US)' },
   { value: 'luna', label: 'Luna · Female (US)' },
   { value: 'stella', label: 'Stella · Female (US)' },
@@ -47,17 +49,12 @@ const SPEAKERS: { value: Speaker; label: string }[] = [
   { value: 'helios', label: 'Helios · Male (UK)' },
   { value: 'zeus', label: 'Zeus · Male (US)' },
 ];
-
-const SAMPLE_TEXT =
-  'Hello from Cloudflare Workers AI. This demo turns text into natural-sounding speech in just one API call.';
-
 export function AiTtsCard() {
-  const [text, setText] = useState(SAMPLE_TEXT);
+  const [text, setText] = useState(m.ai_page_tts_sample());
   const [speaker, setSpeaker] = useState<Speaker>('asteria');
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
-
   async function onGenerate() {
     setError(undefined);
     setAudioUrl(undefined);
@@ -66,33 +63,31 @@ export function AiTtsCard() {
       const result = await synthesizeSpeech({ data: { text, speaker } });
       setAudioUrl(result.audioUrl);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to synthesize speech.'
-      );
+      setError(err instanceof Error ? err.message : m.ai_page_tts_error());
     } finally {
       setIsPending(false);
     }
   }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconMicrophone className="size-5 text-primary" />
-          Text to Speech
+          {m.ai_page_tts_title()}
         </CardTitle>
         <CardDescription>
-          Powered by Cloudflare Workers AI{' '}
+          {m.ai_page_tts_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             @cf/deepgram/aura-1
-          </code>{' '}
-          to synthesize natural speech from text input.
+          </code>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4 flex flex-wrap items-end gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Voice</Label>
+            <Label className="text-xs text-muted-foreground">
+              {m.ai_page_tts_voice()}
+            </Label>
             <Select
               value={speaker}
               onValueChange={(value) => {
@@ -115,17 +110,18 @@ export function AiTtsCard() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="ai-tts-input">Text</Label>
+            <Label htmlFor="ai-tts-input">{m.ai_page_tts_input_label()}</Label>
             <Textarea
               id="ai-tts-input"
               rows={6}
               value={text}
               onChange={(event) => setText(event.target.value)}
-              placeholder="Type or paste the text you want to read aloud..."
+              placeholder={m.ai_page_tts_placeholder()}
             />
             <p className="text-xs text-muted-foreground">
               {text.length} characters · ~$
-              {((text.length / 1000) * 0.015).toFixed(4)} per request
+              {((text.length / 1000) * 0.015).toFixed(4)}{' '}
+              {m.ai_page_tts_cost_suffix()}
             </p>
             <Button
               type="button"
@@ -135,15 +131,15 @@ export function AiTtsCard() {
               {isPending ? (
                 <>
                   <IconLoader2 className="mr-1 size-4 animate-spin" />
-                  Synthesizing...
+                  {m.ai_page_tts_pending()}
                 </>
               ) : (
-                'Synthesize Speech'
+                m.ai_page_tts_action()
               )}
             </Button>
           </div>
           <div className="space-y-2">
-            <Label>Audio</Label>
+            <Label>{m.ai_page_tts_output_label()}</Label>
             <div className="flex min-h-[160px] w-full items-center justify-center rounded-md border bg-muted/30 p-4">
               {error ? (
                 <span className="text-center text-sm text-destructive">
@@ -157,7 +153,7 @@ export function AiTtsCard() {
                 </audio>
               ) : (
                 <span className="text-center text-sm text-muted-foreground">
-                  The generated audio will appear here.
+                  {m.ai_page_tts_empty()}
                 </span>
               )}
             </div>

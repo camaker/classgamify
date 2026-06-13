@@ -1,14 +1,14 @@
+import { m } from '@/locale/paraglide/messages';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { Markdown } from '@/components/markdown/markdown';
 import { getPostBySlug } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
 import { getCanonicalUrl, getImageUrl } from '@/lib/urls';
+import { getLocale, localeConfig } from '@/lib/locale';
 import { seo } from '@/lib/seo';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { formatDate } from '@/lib/formatter';
-
 export const Route = createFileRoute('/blog/$slug')({
   loader: async ({ params }) => {
     const post = getPostBySlug(params.slug);
@@ -23,6 +23,7 @@ export const Route = createFileRoute('/blog/$slug')({
     const description =
       post.description ?? websiteConfig.metadata?.description ?? '';
     const image = post.image ? getImageUrl(post.image) : undefined;
+    const canonicalUrl = getCanonicalUrl(path);
     const metadata = seo(path, {
       title,
       description,
@@ -34,10 +35,15 @@ export const Route = createFileRoute('/blog/$slug')({
       '@type': 'Article',
       headline: post.title,
       description,
+      inLanguage: localeConfig[getLocale()].hreflang,
       ...(image && { image }),
       datePublished: new Date(post.date).toISOString(),
       dateModified: new Date(post.date).toISOString(),
-      url: getCanonicalUrl(path),
+      url: canonicalUrl,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': canonicalUrl,
+      },
       author: {
         '@type': 'Organization',
         name: websiteConfig.metadata?.name ?? '',
@@ -45,6 +51,12 @@ export const Route = createFileRoute('/blog/$slug')({
       publisher: {
         '@type': 'Organization',
         name: websiteConfig.metadata?.name ?? '',
+        logo: {
+          '@type': 'ImageObject',
+          url: getImageUrl(
+            websiteConfig.metadata?.images?.logoLight ?? '/logo.png'
+          ),
+        },
       },
     };
     return {
@@ -59,11 +71,9 @@ export const Route = createFileRoute('/blog/$slug')({
   },
   component: BlogPostPage,
 });
-
 function BlogPostPage() {
   const post = Route.useLoaderData();
   if (!post || !websiteConfig.blog?.enable) throw notFound();
-
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto max-w-4xl">
@@ -73,7 +83,7 @@ function BlogPostPage() {
           className="mb-6 inline-flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
         >
           <IconArrowLeft className="size-4" />
-          {messages.blog.allPosts}
+          {m.blog_all_posts()}
         </Link>
 
         <article>
@@ -106,7 +116,7 @@ function BlogPostPage() {
               className="inline-flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
             >
               <IconArrowLeft className="size-4" />
-              {messages.blog.allPosts}
+              {m.blog_all_posts()}
             </Link>
           </div>
         </article>

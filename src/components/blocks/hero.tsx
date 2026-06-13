@@ -1,19 +1,10 @@
+import { m } from '@/locale/paraglide/messages';
 import Container from '@/components/layout/container';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
 import { IconArrowRight } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
-
-const m = {
-  title: 'Ship Faster with TanStack, Cost Less with Cloudflare',
-  description:
-    'The complete TanStack Start boilerplate for building profitable SaaS, packed with AI, auth, database, storage, blog, email, newsletter, payments, dashboard, SEO, and more, fully deployed on Cloudflare Workers',
-  introduction: 'Introducing TanStarter',
-  primary: 'Get Started',
-  secondary: 'View Pricing',
-};
-
 export default function HeroSection() {
   return (
     <section id="hero" className="overflow-hidden">
@@ -38,7 +29,7 @@ export default function HeroSection() {
               className="animate-fade-up delay-0 hover:bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border border-border p-1 pl-4 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:rounded-full"
             >
               <span className="text-foreground text-sm font-medium">
-                {m.introduction}
+                {m.home_hero_introduction()}
               </span>
               <div className="size-6 overflow-hidden rounded-full bg-muted duration-500">
                 <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
@@ -54,12 +45,12 @@ export default function HeroSection() {
 
             {/* title */}
             <h1 className="animate-fade-up delay-1 mt-8 text-balance text-3xl font-bold sm:text-4xl md:text-5xl lg:mt-16 xl:text-[4rem]">
-              {m.title}
+              {m.home_hero_title()}
             </h1>
 
             {/* description */}
             <p className="animate-fade-up delay-2 mx-auto mt-6 max-w-5xl text-balance text-base text-muted-foreground sm:mt-8 sm:text-lg">
-              {m.description}
+              {m.home_hero_description()}
             </p>
 
             {/* action buttons */}
@@ -72,7 +63,7 @@ export default function HeroSection() {
                     'h-10.5 rounded-xl px-5 text-base'
                   )}
                 >
-                  <span className="text-nowrap">{m.primary}</span>
+                  <span className="text-nowrap">{m.home_hero_primary()}</span>
                 </Link>
               </div>
               <Link
@@ -83,7 +74,7 @@ export default function HeroSection() {
                   'h-10.5 rounded-xl px-5'
                 )}
               >
-                <span className="text-nowrap">{m.secondary}</span>
+                <span className="text-nowrap">{m.home_hero_secondary()}</span>
               </Link>
             </div>
           </div>
@@ -94,7 +85,7 @@ export default function HeroSection() {
               <img
                 className="bg-muted/50 relative hidden rounded-2xl dark:block w-full"
                 src="https://cdn.mksaas.com/blocks/music.png"
-                alt="TanStarter dashboard screenshot in dark mode"
+                alt={m.block_hero_image_alt({ mode: 'dark' })}
                 fetchPriority="high"
                 width={2796}
                 height={2008}
@@ -102,7 +93,7 @@ export default function HeroSection() {
               <img
                 className="z-2 border-border/25 relative rounded-2xl border dark:hidden w-full"
                 src="https://cdn.mksaas.com/blocks/music-light.png"
-                alt="TanStarter dashboard screenshot in light mode"
+                alt={m.block_hero_image_alt({ mode: 'light' })}
                 fetchPriority="high"
                 width={2796}
                 height={2008}

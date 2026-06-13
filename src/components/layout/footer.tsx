@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { getFooterLinks } from '@/config/footer-config';
 import { getSocialLinks } from '@/config/social-config';
 import { isLinkActive } from '@/lib/urls';
@@ -7,13 +8,10 @@ import { Logo } from '@/components/shared/logo';
 import BuiltWithButton from '@/components/shared/built-with-button';
 import { Link, useLocation } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
-
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
   const socialLinks = getSocialLinks();
-
   return (
     <footer className={cn('border-t', className)}>
       <Container className="px-4">
@@ -26,10 +24,10 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
               </span>
             </div>
             <p className="text-muted-foreground text-base py-2 md:pr-12">
-              {messages.footer.tagline}
+              {m.footer_tagline()}
             </p>
             <nav
-              aria-label="Social links"
+              aria-label={m.common_social_links()}
               className="flex items-center gap-4 pt-6"
             >
               {socialLinks?.map((link) => {
@@ -100,7 +98,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
         <Container className="px-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
           <span className="text-muted-foreground text-sm">
             &copy; {new Date().getFullYear()} {websiteConfig.metadata?.name}.{' '}
-            {messages.footer.rightsReserved}
+            {m.footer_rights_reserved()}
           </span>
           <BuiltWithButton />
         </Container>

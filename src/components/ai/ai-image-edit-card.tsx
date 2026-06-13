@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { useRef, useState } from 'react';
 import {
   IconDownload,
@@ -18,74 +19,67 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { downloadFile } from '@/lib/download';
 import { cn } from '@/lib/utils';
-
-const PROMPT_PRESETS = [
-  {
-    id: 'caricature',
-    label: 'Bobblehead Caricature',
-    prompt:
-      'Transform this person into a cute bobblehead-style cartoon caricature: oversized round head, tiny shoulders, glossy clean line art, vibrant flat colors, rosy cheeks, friendly smile, plain solid pastel background, sticker-style, keep the original facial features recognizable.',
-  },
-  {
-    id: 'pixar',
-    label: 'Pixar 3D',
-    prompt:
-      'Transform this person into a Pixar-style 3D animated character with big expressive eyes, smooth shaded skin, soft cinematic lighting, friendly smile, clean studio background, keep the original identity recognizable.',
-  },
-  {
-    id: 'anime',
-    label: 'Anime Portrait',
-    prompt:
-      'Transform this person into a high-quality anime character portrait, cel-shaded with crisp linework, expressive sparkling eyes, soft pastel background, Japanese animation style, keep the original facial features recognizable.',
-  },
-] as const;
-
-type PresetId = (typeof PROMPT_PRESETS)[number]['id'];
-
-const MAX_BYTES = 1_000_000; // 1 MB upload cap
-
+type PresetId = 'caricature' | 'pixar' | 'anime';
+const MAX_BYTES = 1000000; // 1 MB upload cap
 export function AiImageEditCard() {
+  const promptPresets = [
+    {
+      id: 'caricature' as const,
+      label: m.ai_page_image_edit_presets_0_label(),
+      prompt: m.ai_page_image_edit_presets_0_prompt(),
+    },
+    {
+      id: 'pixar' as const,
+      label: m.ai_page_image_edit_presets_1_label(),
+      prompt: m.ai_page_image_edit_presets_1_prompt(),
+    },
+    {
+      id: 'anime' as const,
+      label: m.ai_page_image_edit_presets_2_label(),
+      prompt: m.ai_page_image_edit_presets_2_prompt(),
+    },
+  ];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | undefined>();
   const [imageBase64, setImageBase64] = useState<string | undefined>();
   const [imageMeta, setImageMeta] = useState<
-    { name: string; size: number } | undefined
+    | {
+        name: string;
+        size: number;
+      }
+    | undefined
   >();
   const [activePreset, setActivePreset] = useState<PresetId | null>(
-    PROMPT_PRESETS[0].id
+    promptPresets[0].id
   );
-  const [prompt, setPrompt] = useState<string>(PROMPT_PRESETS[0].prompt);
+  const [prompt, setPrompt] = useState<string>(promptPresets[0].prompt);
   const [resultUrl, setResultUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
-
   function onSelectPreset(id: PresetId) {
-    const preset = PROMPT_PRESETS.find((p) => p.id === id);
+    const preset = promptPresets.find((p) => p.id === id);
     if (!preset) return;
     setActivePreset(id);
     setPrompt(preset.prompt);
   }
-
   function onPromptChange(value: string) {
     setPrompt(value);
-    const match = PROMPT_PRESETS.find((p) => p.prompt === value);
+    const match = promptPresets.find((p) => p.prompt === value);
     setActivePreset(match?.id ?? null);
   }
-
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file.');
+      setError(m.ai_page_common_upload_image_file());
       return;
     }
     if (file.size > MAX_BYTES) {
       setError(
-        `Image is too large (${(file.size / 1024).toFixed(0)} KB). Please use one under 1 MB.`
+        `Image is too large (${(file.size / 1024).toFixed(0)} KB). ${m.ai_page_common_image_too_large()}`
       );
       return;
     }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       const dataUrl = reader.result as string;
@@ -95,10 +89,9 @@ export function AiImageEditCard() {
       setResultUrl(undefined);
       setError(undefined);
     };
-    reader.onerror = () => setError('Could not read the selected file.');
+    reader.onerror = () => setError(m.ai_page_common_read_file_error());
     reader.readAsDataURL(file);
   }
-
   async function onTransform() {
     if (!imageBase64) return;
     setError(undefined);
@@ -110,33 +103,32 @@ export function AiImageEditCard() {
       });
       setResultUrl(result.imageUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to edit image.');
+      setError(
+        err instanceof Error ? err.message : m.ai_page_image_edit_error()
+      );
     } finally {
       setIsPending(false);
     }
   }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconPhotoEdit className="size-5 text-primary" />
-          Image Editing · Avatar Stylizer
+          {m.ai_page_image_edit_title()}
         </CardTitle>
         <CardDescription>
-          Powered by fal.ai{' '}
+          {m.ai_page_image_edit_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             fal-ai/nano-banana/edit
-          </code>{' '}
-          to turn an uploaded portrait into a stylized cartoon, caricature, or
-          anime version.
+          </code>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Source portrait (max 1 MB)</Label>
+              <Label>{m.ai_page_image_edit_image_label()}</Label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -152,7 +144,9 @@ export function AiImageEditCard() {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <IconUpload className="mr-1 size-4" />
-                  {imageMeta ? 'Change image' : 'Upload image'}
+                  {imageMeta
+                    ? m.ai_page_common_change_image()
+                    : m.ai_page_common_upload_image()}
                 </Button>
                 {imageMeta && (
                   <span className="text-xs text-muted-foreground">
@@ -164,21 +158,23 @@ export function AiImageEditCard() {
                 {imagePreview ? (
                   <img
                     src={imagePreview}
-                    alt="Source preview"
+                    alt={m.ai_page_image_edit_preview_alt()}
                     className="size-full object-cover"
                   />
                 ) : (
                   <span className="px-4 text-center text-sm text-muted-foreground">
-                    Upload a portrait to stylize.
+                    {m.ai_page_image_edit_empty_image()}
                   </span>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ai-image-edit-prompt">Style prompt</Label>
+              <Label htmlFor="ai-image-edit-prompt">
+                {m.ai_page_image_edit_prompt_label()}
+              </Label>
               <div className="flex flex-wrap gap-2">
-                {PROMPT_PRESETS.map((preset) => {
+                {promptPresets.map((preset) => {
                   const isActive = activePreset === preset.id;
                   return (
                     <button
@@ -202,7 +198,7 @@ export function AiImageEditCard() {
                 rows={4}
                 value={prompt}
                 onChange={(event) => onPromptChange(event.target.value)}
-                placeholder="Describe the style you want..."
+                placeholder={m.ai_page_image_edit_placeholder()}
               />
               <Button
                 type="button"
@@ -212,10 +208,10 @@ export function AiImageEditCard() {
                 {isPending ? (
                   <>
                     <IconLoader2 className="mr-1 size-4 animate-spin" />
-                    Stylizing...
+                    {m.ai_page_image_edit_pending()}
                   </>
                 ) : (
-                  'Stylize'
+                  m.ai_page_image_edit_action()
                 )}
               </Button>
             </div>
@@ -223,7 +219,7 @@ export function AiImageEditCard() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Result</Label>
+              <Label>{m.ai_page_common_result()}</Label>
               {resultUrl && !isPending && (
                 <Button
                   type="button"
@@ -234,7 +230,7 @@ export function AiImageEditCard() {
                   }
                 >
                   <IconDownload className="mr-1 size-4" />
-                  Download
+                  {m.ai_page_common_download()}
                 </Button>
               )}
             </div>
@@ -248,12 +244,12 @@ export function AiImageEditCard() {
               ) : resultUrl ? (
                 <img
                   src={resultUrl}
-                  alt="Stylized result"
+                  alt={m.ai_page_image_edit_result_alt()}
                   className="size-full object-cover"
                 />
               ) : (
                 <span className="px-4 text-center text-sm text-muted-foreground">
-                  Your stylized portrait will appear here.
+                  {m.ai_page_image_edit_empty()}
                 </span>
               )}
             </div>

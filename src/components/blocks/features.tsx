@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { HeaderSection } from '@/components/shared/header-section';
 import { ScrollReveal } from '@/components/shared/scroll-reveal';
 import {
@@ -14,47 +15,20 @@ import {
   IconId,
 } from '@tabler/icons-react';
 import { useState } from 'react';
-
-const m = {
-  title: 'FEATURES',
-  subtitle: 'Everything you need to ship',
-  description: 'Built-in features so you can focus on your product',
-  items: {
-    'item-1': {
-      title: 'Database',
-      description:
-        'Store and query your data with a powerful database layer. Supports relations, migrations, and type-safe access.',
-    },
-    'item-2': {
-      title: 'Authentication',
-      description:
-        'Secure auth with email, OAuth, and magic links. Session management and role-based access built in.',
-    },
-    'item-3': {
-      title: 'Identity',
-      description:
-        'User profiles, avatars, and account management. Connect multiple providers per user.',
-    },
-    'item-4': {
-      title: 'Analytics',
-      description:
-        'Track usage and conversions. Dashboards and reports out of the box.',
-    },
-  },
-};
-
 type ImageKey = 'item-1' | 'item-2' | 'item-3' | 'item-4';
-
 const icons: Record<ImageKey, Icon> = {
   'item-1': IconDatabase,
   'item-2': IconFingerprint,
   'item-3': IconId,
   'item-4': IconChartBar,
 };
-
 const images: Record<
   ImageKey,
-  { image: string; darkImage: string; alt: string }
+  {
+    image: string;
+    darkImage: string;
+    alt: string;
+  }
 > = {
   'item-1': {
     image: 'https://cdn.mksaas.com/blocks/charts-light.png',
@@ -77,18 +51,38 @@ const images: Record<
     alt: 'Product Feature Four',
   },
 };
-
 export default function FeaturesSection() {
   const [activeItem, setActiveItem] = useState<ImageKey>('item-1');
-
+  const featureItems = [
+    {
+      key: 'item-1' as const,
+      title: m.home_features_items_item_1_title(),
+      description: m.home_features_items_item_1_description(),
+    },
+    {
+      key: 'item-2' as const,
+      title: m.home_features_items_item_2_title(),
+      description: m.home_features_items_item_2_description(),
+    },
+    {
+      key: 'item-3' as const,
+      title: m.home_features_items_item_3_title(),
+      description: m.home_features_items_item_3_description(),
+    },
+    {
+      key: 'item-4' as const,
+      title: m.home_features_items_item_4_title(),
+      description: m.home_features_items_item_4_description(),
+    },
+  ];
   return (
     <section id="features" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-2 lg:px-0 space-y-8 lg:space-y-20 dark:[--color-border:color-mix(in_oklab,var(--color-white)_10%,transparent)]">
         <ScrollReveal>
           <HeaderSection
-            title={m.title}
-            subtitle={m.subtitle}
-            description={m.description}
+            title={m.home_features_title()}
+            subtitle={m.home_features_subtitle()}
+            description={m.home_features_description()}
           />
         </ScrollReveal>
 
@@ -97,9 +91,11 @@ export default function FeaturesSection() {
             <div className="flex flex-col gap-8 lg:col-span-5">
               <div className="text-left lg:pr-0">
                 <h3 className="py-1 text-3xl font-semibold leading-normal text-foreground lg:text-4xl">
-                  {m.title}
+                  {m.home_features_title()}
                 </h3>
-                <p className="mt-4 text-muted-foreground">{m.description}</p>
+                <p className="mt-4 text-muted-foreground">
+                  {m.home_features_description()}
+                </p>
               </div>
               <Accordion
                 value={[activeItem]}
@@ -108,18 +104,18 @@ export default function FeaturesSection() {
                 }
                 className="w-full"
               >
-                {(Object.keys(m.items) as ImageKey[]).map((key) => {
-                  const ItemIcon = icons[key];
+                {featureItems.map((item) => {
+                  const ItemIcon = icons[item.key];
                   return (
-                    <AccordionItem key={key} value={key}>
+                    <AccordionItem key={item.key} value={item.key}>
                       <AccordionTrigger>
                         <div className="flex items-center gap-2 text-base">
                           <ItemIcon className="size-4" />
-                          {m.items[key].title}
+                          {item.title}
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="text-muted-foreground">
-                        {m.items[key].description}
+                        {item.description}
                       </AccordionContent>
                     </AccordionItem>
                   );

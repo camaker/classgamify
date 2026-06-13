@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { useState } from 'react';
 import { IconLoader2, IconSparkles } from '@tabler/icons-react';
 import { generateTaglines } from '@/api/ai';
@@ -11,16 +12,11 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-
-const SAMPLE_PRODUCT =
-  'A SaaS boilerplate built with TanStack Start, Cloudflare Workers, Better Auth, and Drizzle ORM. Helps indie developers ship a production-ready app over a weekend.';
-
 export function AiTaglineCard() {
-  const [product, setProduct] = useState(SAMPLE_PRODUCT);
+  const [product, setProduct] = useState(m.ai_page_tagline_sample());
   const [taglines, setTaglines] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
-
   async function onGenerate() {
     setError(undefined);
     setTaglines([]);
@@ -29,42 +25,40 @@ export function AiTaglineCard() {
       const result = await generateTaglines({ data: { product } });
       setTaglines(result.taglines);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to generate taglines.'
-      );
+      setError(err instanceof Error ? err.message : m.ai_page_tagline_error());
     } finally {
       setIsPending(false);
     }
   }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconSparkles className="size-5 text-primary" />
-          SaaS Tagline Generator
+          {m.ai_page_tagline_title()}
         </CardTitle>
         <CardDescription>
-          Powered by Cloudflare Workers AI{' '}
+          {m.ai_page_tagline_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             @cf/meta/llama-3.1-8b-instruct
-          </code>{' '}
-          to generate punchy SaaS taglines from a description.
+          </code>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="ai-tagline-input">Product description</Label>
+            <Label htmlFor="ai-tagline-input">
+              {m.ai_page_tagline_input_label()}
+            </Label>
             <Textarea
               id="ai-tagline-input"
               rows={8}
               value={product}
               onChange={(event) => setProduct(event.target.value)}
-              placeholder="Describe what your SaaS does in one or two sentences..."
+              placeholder={m.ai_page_tagline_placeholder()}
             />
             <p className="text-xs text-muted-foreground">
-              {product.length} characters
+              {product.length} {m.ai_page_common_characters()}
             </p>
             <Button
               type="button"
@@ -74,15 +68,15 @@ export function AiTaglineCard() {
               {isPending ? (
                 <>
                   <IconLoader2 className="mr-1 size-4 animate-spin" />
-                  Generating...
+                  {m.ai_page_tagline_pending()}
                 </>
               ) : (
-                'Generate Taglines'
+                m.ai_page_tagline_action()
               )}
             </Button>
           </div>
           <div className="space-y-2">
-            <Label>Suggested taglines</Label>
+            <Label>{m.ai_page_tagline_output_label()}</Label>
             <div className="min-h-[208px] rounded-md border bg-muted/30 p-4 text-sm leading-relaxed">
               {error ? (
                 <span className="text-destructive">{error}</span>
@@ -94,7 +88,7 @@ export function AiTaglineCard() {
                 </ol>
               ) : (
                 <span className="text-muted-foreground">
-                  Five generated taglines will appear here.
+                  {m.ai_page_tagline_empty()}
                 </span>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import Container from '@/components/layout/container';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
@@ -5,25 +6,19 @@ import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { getMailtoUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
-import { messages } from '@/messages';
 import { IconBrandXFilled, IconMailFilled } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
-
-const m = messages.about;
-
 export const Route = createFileRoute('/(pages)/about')({
   head: () =>
     seo('/about', {
-      title: `${m.title} | ${websiteConfig.metadata?.name}`,
-      description: m.description,
+      title: `${m.about_title()} | ${websiteConfig.metadata?.name}`,
+      description: m.about_description(),
     }),
   component: AboutPage,
 });
-
 function AboutPage() {
   const twitter = websiteConfig.social?.twitter;
   const supportEmail = getMailtoUrl(websiteConfig.mail?.supportEmail);
-
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto max-w-4xl space-y-8">
@@ -36,7 +31,7 @@ function AboutPage() {
                   <AvatarImage
                     className="rounded-full border-border"
                     src="/logo.png"
-                    alt="Avatar"
+                    alt={m.about_avatar()}
                   />
                   <AvatarFallback className="absolute inset-0">
                     <div className="size-32 text-muted-foreground" />
@@ -47,7 +42,7 @@ function AboutPage() {
                     {websiteConfig.metadata?.name}
                   </h1>
                   <p className="mt-2 text-base text-muted-foreground">
-                    {m.bio}
+                    {m.about_bio()}
                   </p>
                 </div>
               </div>
@@ -55,7 +50,7 @@ function AboutPage() {
               {/* Introduction and social */}
               <div>
                 <p className="mb-8 text-base text-muted-foreground">
-                  {m.introduction}
+                  {m.about_introduction()}
                 </p>
                 <div className="flex flex-wrap items-center gap-4">
                   {twitter && (
@@ -69,7 +64,7 @@ function AboutPage() {
                       )}
                     >
                       <IconBrandXFilled className="mr-1 size-4" />
-                      {m.followUs}
+                      {m.about_follow_us()}
                     </a>
                   )}
                   {supportEmail && (
@@ -81,7 +76,7 @@ function AboutPage() {
                       )}
                     >
                       <IconMailFilled className="mr-1 size-4" />
-                      {m.contactUs}
+                      {m.about_contact_us()}
                     </a>
                   )}
                 </div>

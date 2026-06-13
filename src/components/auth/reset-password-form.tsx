@@ -1,3 +1,5 @@
+import { getAuthErrorMessage } from '@/lib/locale';
+import { m } from '@/locale/paraglide/messages';
 import { useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { AuthCard } from '@/components/auth/auth-card';
@@ -18,15 +20,10 @@ import { Routes } from '@/lib/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
-import { messages } from '@/messages';
 import * as z from 'zod';
-
-const m = messages.auth.resetPassword;
-
 const ResetPasswordSchema = z.object({
-  password: z.string().min(8, { message: m.minLength }),
+  password: z.string().min(8, { message: m.auth_reset_password_min_length() }),
 });
-
 export function ResetPasswordForm() {
   const router = useRouter();
   const token =
@@ -37,33 +34,30 @@ export function ResetPasswordForm() {
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('error')
       : null;
-
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: { password: '' },
   });
-
   if (!token || errorParam === 'invalid_token') {
     return (
       <AuthCard
-        headerLabel={m.title}
-        bottomButtonLabel={m.backToLogin}
+        headerLabel={m.auth_reset_password_title()}
+        bottomButtonLabel={m.auth_reset_password_back_to_login()}
         bottomButtonHref={Routes.Login}
       >
-        <p className="text-sm text-destructive py-4">{m.invalidToken}</p>
+        <p className="text-sm text-destructive py-4">
+          {m.auth_reset_password_invalid_token()}
+        </p>
       </AuthCard>
     );
   }
-
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-
   const onSubmit = async (values: z.infer<typeof ResetPasswordSchema>) => {
     await authClient.resetPassword(
       {
@@ -81,21 +75,15 @@ export function ResetPasswordForm() {
           router.navigate({ to: Routes.Login });
         },
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const friendlyMessage =
-            code && messages.auth.error.codes[code]
-              ? messages.auth.error.codes[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );
   };
-
   return (
     <AuthCard
-      headerLabel={m.title}
-      bottomButtonLabel={m.backToLogin}
+      headerLabel={m.auth_reset_password_title()}
+      bottomButtonLabel={m.auth_reset_password_back_to_login()}
       bottomButtonHref={Routes.Login}
     >
       <Form {...form}>
@@ -106,13 +94,13 @@ export function ResetPasswordForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{m.password}</FormLabel>
+                  <FormLabel>{m.auth_reset_password_password()}</FormLabel>
                   <div className="relative">
                     <FormControl>
                       <Input
                         {...field}
                         disabled={isPending}
-                        placeholder={m.placeholderPassword}
+                        placeholder={m.auth_reset_password_placeholder_password()}
                         type={showPassword ? 'text' : 'password'}
                         className="pr-10"
                       />
@@ -131,7 +119,9 @@ export function ResetPasswordForm() {
                         <IconEye className="size-4 text-muted-foreground" />
                       )}
                       <span className="sr-only">
-                        {showPassword ? m.hidePassword : m.showPassword}
+                        {showPassword
+                          ? m.auth_reset_password_hide_password()
+                          : m.auth_reset_password_show_password()}
                       </span>
                     </Button>
                   </div>
@@ -149,7 +139,7 @@ export function ResetPasswordForm() {
             className="w-full flex items-center justify-center gap-2"
           >
             {isPending && <IconLoader2 className="mr-2 size-4 animate-spin" />}
-            <span>{m.reset}</span>
+            <span>{m.auth_reset_password_reset()}</span>
           </Button>
         </form>
       </Form>

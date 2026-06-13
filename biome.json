@@ -21,6 +21,8 @@
       "!build",
       "!.wrangler",
       "!.content-collections",
+      "!project.inlang/.meta.json",
+      "!src/locale/paraglide",
       "!worker-configuration.d.ts",
       "!tailwind.config.ts",
       "!src/lib/utils.ts",

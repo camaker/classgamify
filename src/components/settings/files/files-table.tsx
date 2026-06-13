@@ -1,5 +1,4 @@
-'use client';
-
+import { m } from '@/locale/paraglide/messages';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -33,7 +32,6 @@ import type { UserFiles } from '@/db/types';
 import { formatBytes, formatDate } from '@/lib/formatter';
 import { getFileAccessUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
-import { messages } from '@/messages';
 import {
   type ColumnDef,
   type VisibilityState,
@@ -49,9 +47,6 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-
-const t = messages.settings.files;
-
 function TableRowSkeleton({ columns }: { columns: number }) {
   return (
     <TableRow className="h-14">
@@ -63,12 +58,10 @@ function TableRowSkeleton({ columns }: { columns: number }) {
     </TableRow>
   );
 }
-
 function toDate(value: number | Date | undefined | null): Date | null {
   if (value == null) return null;
   return value instanceof Date ? value : new Date(value);
 }
-
 interface FilesTableProps {
   data: UserFiles[];
   total: number;
@@ -85,7 +78,6 @@ interface FilesTableProps {
     description?: string;
   }) => Promise<void>;
 }
-
 export function FilesTable({
   data,
   total,
@@ -103,13 +95,12 @@ export function FilesTable({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isPublic, setIsPublic] = useState(false);
   const [description, setDescription] = useState('');
-
   const columns: ColumnDef<UserFiles>[] = useMemo(
     () => [
       {
         id: 'originalName',
         accessorKey: 'originalName',
-        header: t.columns.originalName,
+        header: m.settings_files_columns_original_name(),
         cell: ({ row }) => (
           <span className="font-medium">
             {row.original.originalName ?? '—'}
@@ -122,7 +113,7 @@ export function FilesTable({
       {
         id: 'contentType',
         accessorKey: 'contentType',
-        header: t.columns.contentType,
+        header: m.settings_files_columns_content_type(),
         cell: ({ row }) => (
           <span className="text-muted-foreground text-sm">
             {row.original.contentType ?? '—'}
@@ -135,7 +126,7 @@ export function FilesTable({
       {
         id: 'size',
         accessorKey: 'size',
-        header: t.columns.size,
+        header: m.settings_files_columns_size(),
         cell: ({ row }) => formatBytes(row.original.size ?? 0),
         minSize: 80,
         size: 100,
@@ -144,7 +135,7 @@ export function FilesTable({
       {
         id: 'isPublic',
         accessorKey: 'isPublic',
-        header: t.columns.isPublic,
+        header: m.settings_files_columns_is_public(),
         cell: ({ row }) => (
           <span
             className={cn(
@@ -164,7 +155,7 @@ export function FilesTable({
       {
         id: 'createdAt',
         accessorKey: 'createdAt',
-        header: t.columns.createdAt,
+        header: m.settings_files_columns_created_at(),
         cell: ({ row }) => {
           const d = toDate(row.original.createdAt ?? null);
           return d ? formatDate(d) : '—';
@@ -175,7 +166,7 @@ export function FilesTable({
       },
       {
         id: 'accessLink',
-        header: t.columns.accessLink,
+        header: m.settings_files_columns_access_link(),
         cell: ({ row }) => {
           const url = getFileAccessUrl(row.original.r2Key);
           return (
@@ -189,7 +180,7 @@ export function FilesTable({
               )}
             >
               <IconExternalLink className="size-3.5" />
-              {t.openLink}
+              {m.settings_files_open_link()}
             </a>
           );
         },
@@ -199,7 +190,7 @@ export function FilesTable({
       },
       {
         id: 'actions',
-        header: t.columns.actions,
+        header: m.settings_files_columns_actions(),
         cell: ({ row }) => {
           const id = row.original.id;
           return (
@@ -210,12 +201,14 @@ export function FilesTable({
                 )}
               >
                 <IconDots className="size-4" />
-                <span className="sr-only">{t.columns.actions}</span>
+                <span className="sr-only">
+                  {m.settings_files_columns_actions()}
+                </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => onDelete(id)}>
                   <IconTrash className="mr-2 size-4" />
-                  {t.delete}
+                  {m.settings_files_delete()}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -228,7 +221,6 @@ export function FilesTable({
     ],
     [onDelete]
   );
-
   const table = useReactTable({
     data,
     columns,
@@ -257,7 +249,6 @@ export function FilesTable({
     manualFiltering: true,
     enableMultiSort: false,
   });
-
   const handleUpload = async () => {
     if (!selectedFile) return;
     await onUpload({
@@ -270,12 +261,10 @@ export function FilesTable({
     setIsPublic(false);
     setUploadOpen(false);
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setSelectedFile(file ?? null);
   };
-
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
@@ -286,16 +275,22 @@ export function FilesTable({
             )}
           >
             <IconPlus className="size-4" />
-            {t.uploadButton}
+            {m.settings_files_upload_button()}
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t.uploadDialogTitle}</DialogTitle>
-              <DialogDescription>{t.uploadDialogDescription}</DialogDescription>
+              <DialogTitle>
+                {m.settings_files_upload_dialog_title()}
+              </DialogTitle>
+              <DialogDescription>
+                {m.settings_files_upload_dialog_description()}
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="file-input">{t.fileLabel}</Label>
+                <Label htmlFor="file-input">
+                  {m.settings_files_file_label()}
+                </Label>
                 <Input
                   id="file-input"
                   type="file"
@@ -314,13 +309,17 @@ export function FilesTable({
                   checked={isPublic}
                   onCheckedChange={setIsPublic}
                 />
-                <Label htmlFor="is-public">{t.isPublicLabel}</Label>
+                <Label htmlFor="is-public">
+                  {m.settings_files_is_public_label()}
+                </Label>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description">{t.descriptionLabel}</Label>
+                <Label htmlFor="description">
+                  {m.settings_files_description_label()}
+                </Label>
                 <Input
                   id="description"
-                  placeholder={t.descriptionPlaceholder}
+                  placeholder={m.settings_files_description_placeholder()}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={uploading}
@@ -333,13 +332,15 @@ export function FilesTable({
                 onClick={() => setUploadOpen(false)}
                 disabled={uploading}
               >
-                {t.cancel}
+                {m.settings_files_cancel()}
               </Button>
               <Button
                 onClick={handleUpload}
                 disabled={!selectedFile || uploading}
               >
-                {uploading ? t.uploading : t.upload}
+                {uploading
+                  ? m.settings_files_uploading()
+                  : m.settings_files_upload()}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -393,7 +394,7 @@ export function FilesTable({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    {t.noResults}
+                    {m.settings_files_no_results()}
                   </TableCell>
                 </TableRow>
               )}

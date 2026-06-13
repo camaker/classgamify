@@ -17,6 +17,13 @@ import { websiteConfig } from '@/config/website';
 import appCss from '../styles.css?url';
 import { DefaultCatchBoundary } from '@/components/layout/default-catch-boundary';
 import { Routes } from '@/lib/routes';
+import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
+import {
+  getCanonicalPathname,
+  getLocale,
+  localeConfig,
+  locales,
+} from '@/lib/locale';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { lazy } from 'react';
 
@@ -30,53 +37,85 @@ const DevTools = import.meta.env.DEV
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: websiteConfig.metadata?.title,
-      },
-      {
-        name: 'description',
-        content: websiteConfig.metadata?.description,
-      },
-      {
-        name: 'theme-color',
-        content: '#09090b',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-      {
-        rel: 'apple-touch-icon',
-        sizes: '180x180',
-        href: '/apple-touch-icon.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        href: '/favicon-32x32.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        href: '/favicon-16x16.png',
-      },
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'manifest', href: '/manifest.json' },
-    ],
-  }),
+  head: () => {
+    const ogImage = getOgImage();
+    const twitterSite = websiteConfig.social?.twitter
+      ? twitterHandleFromUrl(websiteConfig.social.twitter)
+      : null;
+    const currentLocale = getLocale();
+    // OG locale format uses underscore (e.g. en_US, zh_CN), unlike BCP 47 used
+    // for <html lang> / hreflang which uses hyphens.
+    const ogLocale = localeConfig[currentLocale].hreflang.replace('-', '_');
+    const alternateOgLocales = locales
+      .filter((l) => l !== currentLocale)
+      .map((l) => localeConfig[l].hreflang.replace('-', '_'));
+    return {
+      meta: [
+        { charSet: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { title: websiteConfig.metadata?.title },
+        { name: 'description', content: websiteConfig.metadata?.description },
+        { name: 'theme-color', content: '#09090b' },
+        // Default OG / Twitter / canonical — pages with their own head()
+        // override these with page-specific values. These ensure 404 / error
+        // pages and any future route that forgets to call seo() still get
+        // shareable social metadata.
+        { property: 'og:type', content: 'website' },
+        {
+          property: 'og:site_name',
+          content: websiteConfig.metadata?.name ?? '',
+        },
+        { property: 'og:locale', content: ogLocale },
+        ...alternateOgLocales.map((loc) => ({
+          property: 'og:locale:alternate',
+          content: loc,
+        })),
+        { property: 'og:title', content: websiteConfig.metadata?.title ?? '' },
+        {
+          property: 'og:description',
+          content: websiteConfig.metadata?.description ?? '',
+        },
+        { property: 'og:url', content: getCanonicalUrl('/') },
+        ...(ogImage ? [{ property: 'og:image', content: ogImage }] : []),
+        { name: 'twitter:title', content: websiteConfig.metadata?.title ?? '' },
+        ...(twitterSite
+          ? [{ name: 'twitter:site', content: twitterSite }]
+          : []),
+        {
+          name: 'twitter:description',
+          content: websiteConfig.metadata?.description ?? '',
+        },
+        ...(ogImage
+          ? [
+              { name: 'twitter:card', content: 'summary_large_image' as const },
+              { name: 'twitter:image', content: ogImage },
+            ]
+          : []),
+      ],
+      links: [
+        { rel: 'stylesheet', href: appCss },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/apple-touch-icon.png',
+        },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '32x32',
+          href: '/favicon-32x32.png',
+        },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '16x16',
+          href: '/favicon-16x16.png',
+        },
+        { rel: 'icon', href: '/favicon.ico' },
+        { rel: 'manifest', href: '/manifest.json' },
+      ],
+    };
+  },
   // shellComponent automatically wraps root component, errorComponent, and notFoundComponent
   shellComponent: RootDocument,
   component: RootComponent,
@@ -90,15 +129,18 @@ export const Route = createRootRouteWithContext<{
  */
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
+  const canonicalPathname = getCanonicalPathname(pathname);
   const matches = useRouterState({ select: (s) => s.matches }) ?? [];
-  const isAuthPages = pathname.startsWith(Routes.Auth);
+  const isAuthPages = canonicalPathname.startsWith(Routes.Auth);
   const isProtectedPages =
-    pathname.startsWith(Routes.Admin) ||
-    pathname.startsWith(Routes.Dashboard) ||
-    pathname.startsWith(Routes.Settings);
+    canonicalPathname.startsWith(Routes.Admin) ||
+    canonicalPathname.startsWith(Routes.Dashboard) ||
+    canonicalPathname.startsWith(Routes.Settings);
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
   const isNotFound =
-    pathname !== Routes.Root && pathname !== '' && matches.length <= 1;
+    canonicalPathname !== Routes.Root &&
+    canonicalPathname !== '' &&
+    matches.length <= 1;
 
   if (isAuthPages || isProtectedPages || isNotFound) {
     return (
@@ -126,7 +168,7 @@ function RootComponent() {
  */
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={localeConfig[getLocale()].hreflang} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

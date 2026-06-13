@@ -1,3 +1,5 @@
+import { getAuthErrorMessage } from '@/lib/locale';
+import { m } from '@/locale/paraglide/messages';
 import { useEffect, useState } from 'react';
 import { AuthCard } from '@/components/auth/auth-card';
 import { FormError } from '@/components/shared/form-error';
@@ -17,35 +19,28 @@ import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
-import { messages } from '@/messages';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
-const m = messages.auth.forgotPassword;
-
 export function ForgotPasswordForm({ className }: { className?: string }) {
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, setIsPending] = useState(false);
-
   const ForgotPasswordSchema = z.object({
-    email: z.string().email({ message: m.emailRequired }),
+    email: z
+      .string()
+      .email({ message: m.auth_forgot_password_email_required() }),
   });
-
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
     defaultValues: { email: '' },
   });
-
   const emailFromUrl =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('email')
       : null;
-
   useEffect(() => {
     if (emailFromUrl) form.setValue('email', emailFromUrl);
   }, [emailFromUrl, form]);
-
   const onSubmit = async (values: z.infer<typeof ForgotPasswordSchema>) => {
     await authClient.requestPasswordReset(
       {
@@ -59,23 +54,17 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
           setSuccess('');
         },
         onResponse: () => setIsPending(false),
-        onSuccess: () => setSuccess(m.checkEmail),
+        onSuccess: () => setSuccess(m.auth_forgot_password_check_email()),
         onError: (ctx) => {
-          const code = ctx.error.code;
-          const friendlyMessage =
-            code && messages.auth.error.codes[code]
-              ? messages.auth.error.codes[code]
-              : ctx.error.message;
-          setError(friendlyMessage);
+          setError(getAuthErrorMessage(ctx.error));
         },
       }
     );
   };
-
   return (
     <AuthCard
-      headerLabel={m.title}
-      bottomButtonLabel={m.backToLogin}
+      headerLabel={m.auth_forgot_password_title()}
+      bottomButtonLabel={m.auth_forgot_password_back_to_login()}
       bottomButtonHref={Routes.Login}
       className={cn('', className)}
     >
@@ -87,12 +76,12 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{m.email}</FormLabel>
+                  <FormLabel>{m.auth_forgot_password_email()}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder={m.placeholderEmail}
+                      placeholder={m.auth_forgot_password_placeholder_email()}
                       type="email"
                     />
                   </FormControl>
@@ -110,7 +99,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
             className="w-full flex items-center justify-center gap-2"
           >
             {isPending && <IconLoader2 className="mr-2 size-4 animate-spin" />}
-            <span>{m.send}</span>
+            <span>{m.auth_forgot_password_send()}</span>
           </Button>
         </form>
       </Form>

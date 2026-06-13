@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { HeaderSection } from '@/components/shared/header-section';
 import { ScrollReveal } from '@/components/shared/scroll-reveal';
 import { buttonVariants } from '@/components/ui/button';
@@ -14,37 +15,6 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react';
 import type { Icon } from '@tabler/icons-react';
-
-const m = {
-  title: 'INTEGRATIONS',
-  subtitle: 'Works with your stack',
-  description: 'Connect to the tools you already use',
-  learnMore: 'Learn More',
-  items: {
-    'item-1': {
-      title: 'AI & LLMs',
-      description: 'Connect to OpenAI, Anthropic, and more.',
-    },
-    'item-2': {
-      title: 'Replit',
-      description: 'Deploy and run in the cloud.',
-    },
-    'item-3': {
-      title: 'Magic UI',
-      description: 'Beautiful animated components.',
-    },
-    'item-4': {
-      title: 'VS Codium',
-      description: 'AI-powered code editor.',
-    },
-    'item-5': {
-      title: 'MediaWiki',
-      description: 'Knowledge base integration.',
-    },
-    'item-6': { title: 'Google PaLM', description: 'Google AI models.' },
-  },
-};
-
 // Brand colors (visible on both light and dark backgrounds)
 export const BRAND_COLORS = {
   openai: '#0d8c6c',
@@ -54,43 +24,63 @@ export const BRAND_COLORS = {
   wikipedia: '#9c27b0',
   google: '#2a6fdb',
 } as const;
-
-const items: Array<{
+function getItems(): Array<{
   title: string;
   description: string;
   icon: Icon;
   color: string;
-}> = [
-  { ...m.items['item-1'], icon: IconBrandOpenai, color: BRAND_COLORS.openai },
-  {
-    ...m.items['item-2'],
-    icon: IconBrandCodesandbox,
-    color: BRAND_COLORS.codesandbox,
-  },
-  { ...m.items['item-3'], icon: IconBrandReact, color: BRAND_COLORS.react },
-  { ...m.items['item-4'], icon: IconBrandVisualStudio, color: BRAND_COLORS.vs },
-  {
-    ...m.items['item-5'],
-    icon: IconBrandWikipedia,
-    color: BRAND_COLORS.wikipedia,
-  },
-  {
-    ...m.items['item-6'],
-    icon: IconBrandGoogleFilled,
-    color: BRAND_COLORS.google,
-  },
-];
-
+}> {
+  return [
+    {
+      title: m.home_integration_items_item_1_title(),
+      description: m.home_integration_items_item_1_description(),
+      icon: IconBrandOpenai,
+      color: BRAND_COLORS.openai,
+    },
+    {
+      title: m.home_integration_items_item_2_title(),
+      description: m.home_integration_items_item_2_description(),
+      icon: IconBrandCodesandbox,
+      color: BRAND_COLORS.codesandbox,
+    },
+    {
+      title: m.home_integration_items_item_3_title(),
+      description: m.home_integration_items_item_3_description(),
+      icon: IconBrandReact,
+      color: BRAND_COLORS.react,
+    },
+    {
+      title: m.home_integration_items_item_4_title(),
+      description: m.home_integration_items_item_4_description(),
+      icon: IconBrandVisualStudio,
+      color: BRAND_COLORS.vs,
+    },
+    {
+      title: m.home_integration_items_item_5_title(),
+      description: m.home_integration_items_item_5_description(),
+      icon: IconBrandWikipedia,
+      color: BRAND_COLORS.wikipedia,
+    },
+    {
+      title: m.home_integration_items_item_6_title(),
+      description: m.home_integration_items_item_6_description(),
+      icon: IconBrandGoogleFilled,
+      color: BRAND_COLORS.google,
+    },
+  ];
+}
 function IntegrationCard({
   title,
   description,
   icon: Icon,
   color,
+  learnMore,
 }: {
   title: string;
   description: string;
   icon: Icon;
   color: string;
+  learnMore: string;
 }) {
   return (
     <Card className="bg-transparent p-6 transition-colors duration-200 hover:bg-accent dark:hover:bg-card">
@@ -112,7 +102,7 @@ function IntegrationCard({
               'gap-1 pr-2 shadow-none'
             )}
           >
-            {m.learnMore}
+            {learnMore}
             <IconChevronRight className="ml-0 size-3.5 opacity-50" />
           </Link>
         </div>
@@ -120,16 +110,16 @@ function IntegrationCard({
     </Card>
   );
 }
-
 export default function IntegrationSection() {
+  const items = getItems();
   return (
     <section id="integration" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
           <HeaderSection
-            title={m.title}
-            subtitle={m.subtitle}
-            description={m.description}
+            title={m.home_integration_title()}
+            subtitle={m.home_integration_subtitle()}
+            description={m.home_integration_description()}
           />
         </ScrollReveal>
 
@@ -141,6 +131,7 @@ export default function IntegrationSection() {
                 description={item.description}
                 icon={item.icon}
                 color={item.color}
+                learnMore={m.home_integration_learn_more()}
               />
             </ScrollReveal>
           ))}

@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { authClient } from '@/auth/client';
 import { IconLogout } from '@tabler/icons-react';
@@ -10,20 +11,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from './user-avatar';
-import { messages } from '@/messages';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { SessionUser } from '@/auth/types';
-
 interface UserButtonProps {
   user: SessionUser;
 }
-
 export function UserButton({ user }: UserButtonProps) {
   const router = useRouter();
   const avatarLinks = getAvatarLinks();
   const [open, setOpen] = useState(false);
-
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: {
@@ -31,16 +28,15 @@ export function UserButton({ user }: UserButtonProps) {
           router.navigate({ to: '/' });
         },
         onError: (err) => {
-          toast.error(messages.auth.common.logoutFailed);
+          toast.error(m.auth_common_logout_failed());
           console.error('sign out error:', err);
         },
       },
     });
   };
-
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger aria-label="User menu">
+      <DropdownMenuTrigger aria-label={m.common_user_menu()}>
         <UserAvatar
           name={user.name ?? null}
           image={user.image ?? null}
@@ -76,7 +72,7 @@ export function UserButton({ user }: UserButtonProps) {
           }}
         >
           <IconLogout className="mr-2 size-4" />
-          {messages.auth.common.logout}
+          {m.auth_common_logout()}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
