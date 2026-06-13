@@ -101,6 +101,7 @@ export function AiTranslationCard() {
               {m.ai_page_translation_from()}
             </Label>
             <Select
+              items={LANGUAGES}
               value={sourceLang}
               onValueChange={(value) => {
                 if (value) setSourceLang(value as Language);
@@ -111,7 +112,11 @@ export function AiTranslationCard() {
               </SelectTrigger>
               <SelectContent>
                 {LANGUAGES.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value}>
+                  <SelectItem
+                    key={lang.value}
+                    value={lang.value}
+                    label={lang.label}
+                  >
                     {lang.label}
                   </SelectItem>
                 ))}
@@ -133,6 +138,7 @@ export function AiTranslationCard() {
               {m.ai_page_translation_to()}
             </Label>
             <Select
+              items={LANGUAGES}
               value={targetLang}
               onValueChange={(value) => {
                 if (value) setTargetLang(value as Language);
@@ -143,7 +149,11 @@ export function AiTranslationCard() {
               </SelectTrigger>
               <SelectContent>
                 {LANGUAGES.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value}>
+                  <SelectItem
+                    key={lang.value}
+                    value={lang.value}
+                    label={lang.label}
+                  >
                     {lang.label}
                   </SelectItem>
                 ))}

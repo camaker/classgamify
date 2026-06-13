@@ -48,6 +48,10 @@ const CF_MODELS: {
     hint: 'Photorealistic Stable Diffusion fine-tune',
   },
 ];
+const CF_MODEL_SELECT_ITEMS = CF_MODELS.map((model) => ({
+  ...model,
+  label: model.beta ? `${model.label} (Beta)` : model.label,
+}));
 type PresetId =
   | 'astronaut-panda'
   | 'cyberpunk-tokyo'
@@ -137,6 +141,7 @@ export function AiCfImageCard() {
             {m.ai_page_common_model()}
           </Label>
           <Select
+            items={CF_MODEL_SELECT_ITEMS}
             value={model}
             onValueChange={(value) => {
               if (value) setModel(value as CfImageModel);
@@ -146,10 +151,9 @@ export function AiCfImageCard() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CF_MODELS.map((m) => (
-                <SelectItem key={m.value} value={m.value}>
+              {CF_MODEL_SELECT_ITEMS.map((m) => (
+                <SelectItem key={m.value} value={m.value} label={m.label}>
                   {m.label}
-                  {m.beta ? ' (Beta)' : ''}
                 </SelectItem>
               ))}
             </SelectContent>

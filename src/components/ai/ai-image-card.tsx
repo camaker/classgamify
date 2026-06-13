@@ -133,6 +133,7 @@ export function AiImageCard() {
             {m.ai_page_common_model()}
           </Label>
           <Select
+            items={FAL_MODELS}
             value={model}
             onValueChange={(value) => {
               if (value) setModel(value as FalModel);
@@ -143,7 +144,7 @@ export function AiImageCard() {
             </SelectTrigger>
             <SelectContent>
               {FAL_MODELS.map((m) => (
-                <SelectItem key={m.value} value={m.value}>
+                <SelectItem key={m.value} value={m.value} label={m.label}>
                   {m.label}
                 </SelectItem>
               ))}

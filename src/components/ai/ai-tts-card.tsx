@@ -89,6 +89,7 @@ export function AiTtsCard() {
               {m.ai_page_tts_voice()}
             </Label>
             <Select
+              items={SPEAKERS}
               value={speaker}
               onValueChange={(value) => {
                 if (value) setSpeaker(value as Speaker);
@@ -99,7 +100,7 @@ export function AiTtsCard() {
               </SelectTrigger>
               <SelectContent>
                 {SPEAKERS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
+                  <SelectItem key={s.value} value={s.value} label={s.label}>
                     {s.label}
                   </SelectItem>
                 ))}
