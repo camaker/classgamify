@@ -1,20 +1,16 @@
+import { m } from '@/locale/paraglide/messages';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getPricePlans } from '@/lib/price-plan';
 import { cn } from '@/lib/utils';
-import { messages } from '@/messages';
 import type { PlanInterval, PricePlan } from '@/payment/types';
 import { PlanIntervals, PaymentTypes } from '@/payment/types';
 import { useState } from 'react';
 import { PricingCard } from './pricing-card';
-
-const m = messages.pricing;
-
 interface PricingTableProps {
   metadata?: Record<string, string>;
   currentPlan?: PricePlan | null;
   className?: string;
 }
-
 export function PricingTable({
   metadata,
   currentPlan,
@@ -23,7 +19,6 @@ export function PricingTable({
   const [interval, setInterval] = useState<PlanInterval>(PlanIntervals.MONTH);
   const plans = Object.values(getPricePlans());
   const currentPlanId = currentPlan?.id ?? null;
-
   const freePlans = plans.filter((p) => p.isFree && !p.disabled);
   const subscriptionPlans = plans.filter(
     (p) =>
@@ -39,7 +34,6 @@ export function PricingTable({
       !p.disabled &&
       p.prices.some((pr) => !pr.disabled && pr.type === PaymentTypes.ONE_TIME)
   );
-
   const hasMonthly = subscriptionPlans.some((p) =>
     p.prices.some(
       (pr) =>
@@ -54,10 +48,8 @@ export function PricingTable({
         pr.interval === PlanIntervals.YEAR
     )
   );
-
   const totalVisible =
     freePlans.length + subscriptionPlans.length + oneTimePlans.length;
-
   return (
     <div className={cn('flex flex-col gap-12', className)}>
       {(hasMonthly || hasYearly) && subscriptionPlans.length > 0 && (
@@ -77,7 +69,7 @@ export function PricingTable({
                 value="month"
                 className="rounded-md px-3 py-0 text-sm data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
-                {m.monthly}
+                {m.pricing_monthly()}
               </ToggleGroupItem>
             )}
             {hasYearly && (
@@ -85,7 +77,7 @@ export function PricingTable({
                 value="year"
                 className="rounded-md px-3 py-0 text-sm data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
-                {m.yearly}
+                {m.pricing_yearly()}
               </ToggleGroupItem>
             )}
           </ToggleGroup>

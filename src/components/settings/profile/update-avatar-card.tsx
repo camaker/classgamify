@@ -1,4 +1,4 @@
-import { messages } from '@/messages';
+import { m } from '@/locale/paraglide/messages';
 import { FormError } from '@/components/shared/form-error';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
@@ -18,13 +18,9 @@ import { IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { DEFAULT_MAX_FILE_SIZE } from '@/storage/constants';
-
 interface UpdateAvatarCardProps {
   className?: string;
 }
-
-const m = messages.settings.profile.avatar;
-
 /**
  * Update user avatar card
  */
@@ -33,23 +29,18 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
   const [avatarUrl, setAvatarUrl] = useState('');
   const { data: session, refetch } = authClient.useSession();
   const uploadMutation = useUploadUserAvatar();
-
   useEffect(() => {
     if (session?.user?.image) setAvatarUrl(session.user.image);
   }, [session]);
-
   if (!websiteConfig.storage?.enable) return null;
-
   const user = session?.user;
   if (!user) return null;
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFileUpload(file);
     // Reset so selecting the same file again triggers onChange
     e.target.value = '';
   };
-
   const handleFileUpload = (file: File) => {
     const maxSize = websiteConfig.storage?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE;
     if (file.size > maxSize) {
@@ -60,7 +51,6 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
     setError('');
     const tempUrl = URL.createObjectURL(file);
     setAvatarUrl(tempUrl);
-
     uploadMutation.mutate(file, {
       onSuccess: (result) => {
         authClient.updateUser(
@@ -69,20 +59,20 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
             onSuccess: () => {
               setAvatarUrl(result.url);
               URL.revokeObjectURL(tempUrl);
-              toast.success(m.success);
+              toast.success(m.settings_profile_avatar_success());
               refetch();
             },
             onError: (ctx) => {
               setError(`${ctx.error.status}: ${ctx.error.message}`);
               if (session?.user?.image) setAvatarUrl(session.user.image);
               URL.revokeObjectURL(tempUrl);
-              toast.error(m.fail);
+              toast.error(m.settings_profile_avatar_fail());
             },
           }
         );
       },
       onError: (err) => {
-        const msg = err.message || m.fail;
+        const msg = err.message || m.settings_profile_avatar_fail();
         setError(msg);
         if (session?.user?.image) setAvatarUrl(session.user.image);
         URL.revokeObjectURL(tempUrl);
@@ -90,7 +80,6 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
       },
     });
   };
-
   return (
     <Card
       className={cn(
@@ -99,8 +88,12 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
       )}
     >
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">{m.title}</CardTitle>
-        <CardDescription>{m.description}</CardDescription>
+        <CardTitle className="text-lg font-semibold">
+          {m.settings_profile_avatar_title()}
+        </CardTitle>
+        <CardDescription>
+          {m.settings_profile_avatar_description()}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 flex-1">
         <div className="flex flex-col items-center sm:flex-row gap-4 sm:gap-8">
@@ -124,13 +117,17 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
               className="sr-only"
               disabled={uploadMutation.isPending}
             />
-            {uploadMutation.isPending ? m.uploading : m.uploadAvatar}
+            {uploadMutation.isPending
+              ? m.settings_profile_avatar_uploading()
+              : m.settings_profile_avatar_upload_avatar()}
           </label>
         </div>
         <FormError message={error} />
       </CardContent>
       <CardFooter className="mt-auto px-6 py-4 flex justify-between items-center bg-muted rounded-none">
-        <p className="text-sm text-muted-foreground">{m.hint}</p>
+        <p className="text-sm text-muted-foreground">
+          {m.settings_profile_avatar_hint()}
+        </p>
       </CardFooter>
     </Card>
   );

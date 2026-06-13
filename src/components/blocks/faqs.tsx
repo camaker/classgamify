@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { HeaderSection } from '@/components/shared/header-section';
 import { ScrollReveal } from '@/components/shared/scroll-reveal';
 import {
@@ -6,50 +7,42 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-
-const m = {
-  title: 'FAQs',
-  subtitle: 'Frequently asked questions',
-  items: {
-    'item-1': {
-      question: 'Can I change my plan later?',
-      answer:
-        'Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of the next billing cycle.',
-    },
-    'item-2': {
-      question: 'What payment methods do you accept?',
-      answer:
-        'We accept all major credit cards, PayPal, and wire transfer for annual plans.',
-    },
-    'item-3': {
-      question: 'Is there a free trial?',
-      answer:
-        'Yes, we offer a 14-day free trial on all paid plans. No credit card required.',
-    },
-    'item-4': {
-      question: 'What is your refund policy?',
-      answer:
-        'We offer a 30-day money-back guarantee. Contact support for a full refund.',
-    },
-    'item-5': {
-      question: 'How do I get support?',
-      answer:
-        'Email support is included for all plans. Pro and above get priority support.',
-    },
-  },
-};
-
-const faqItems = Object.entries(m.items).map(([id, item]) => ({
-  id,
-  ...item,
-}));
-
 export default function FaqSection() {
+  const faqItems = [
+    {
+      id: 'item-1',
+      question: m.home_faqs_items_item_1_question(),
+      answer: m.home_faqs_items_item_1_answer(),
+    },
+    {
+      id: 'item-2',
+      question: m.home_faqs_items_item_2_question(),
+      answer: m.home_faqs_items_item_2_answer(),
+    },
+    {
+      id: 'item-3',
+      question: m.home_faqs_items_item_3_question(),
+      answer: m.home_faqs_items_item_3_answer(),
+    },
+    {
+      id: 'item-4',
+      question: m.home_faqs_items_item_4_question(),
+      answer: m.home_faqs_items_item_4_answer(),
+    },
+    {
+      id: 'item-5',
+      question: m.home_faqs_items_item_5_question(),
+      answer: m.home_faqs_items_item_5_answer(),
+    },
+  ];
   return (
     <section id="faqs" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-4xl">
         <ScrollReveal>
-          <HeaderSection title={m.title} subtitle={m.subtitle} />
+          <HeaderSection
+            title={m.home_faqs_title()}
+            subtitle={m.home_faqs_subtitle()}
+          />
         </ScrollReveal>
 
         <ScrollReveal delay={150} className="mx-auto mt-12 max-w-4xl">

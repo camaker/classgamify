@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { useState } from 'react';
 import { IconLoader2, IconWand } from '@tabler/icons-react';
 import { summarizeText } from '@/api/ai';
@@ -11,15 +12,11 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-
-const SAMPLE_TEXT = `Cloudflare Workers AI lets developers run machine learning models on the Cloudflare global network. It provides a serverless GPU-powered inference platform that brings popular open-source models close to end users without managing any infrastructure. Combined with Cloudflare AI Gateway, teams gain caching, analytics, rate limiting, and unified billing across many AI providers, making it easy to ship reliable AI features in production.`;
-
 export function AiSummarizationCard() {
-  const [input, setInput] = useState(SAMPLE_TEXT.trim());
+  const [input, setInput] = useState(m.ai_page_summarization_sample().trim());
   const [summary, setSummary] = useState('');
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
-
   async function onGenerate() {
     setError(undefined);
     setSummary('');
@@ -29,41 +26,41 @@ export function AiSummarizationCard() {
       setSummary(result.summary);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to summarize text.'
+        err instanceof Error ? err.message : m.ai_page_summarization_error()
       );
     } finally {
       setIsPending(false);
     }
   }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconWand className="size-5 text-primary" />
-          Summarization
+          {m.ai_page_summarization_title()}
         </CardTitle>
         <CardDescription>
-          Powered by Cloudflare Workers AI{' '}
+          {m.ai_page_summarization_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             @cf/facebook/bart-large-cnn
-          </code>{' '}
-          to condense long text into a concise summary.
+          </code>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="ai-summarization-input">Source content</Label>
+            <Label htmlFor="ai-summarization-input">
+              {m.ai_page_summarization_source_label()}
+            </Label>
             <Textarea
               id="ai-summarization-input"
               rows={10}
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Paste a long article or paragraph here..."
+              placeholder={m.ai_page_summarization_placeholder()}
             />
             <p className="text-xs text-muted-foreground">
-              {input.length} characters
+              {input.length} {m.ai_page_common_characters()}
             </p>
             <Button
               type="button"
@@ -73,15 +70,15 @@ export function AiSummarizationCard() {
               {isPending ? (
                 <>
                   <IconLoader2 className="mr-1 size-4 animate-spin" />
-                  Summarizing...
+                  {m.ai_page_summarization_pending()}
                 </>
               ) : (
-                'Summarize'
+                m.ai_page_summarization_action()
               )}
             </Button>
           </div>
           <div className="space-y-2">
-            <Label>Summary</Label>
+            <Label>{m.ai_page_summarization_output_label()}</Label>
             <div className="min-h-[256px] rounded-md border bg-muted/30 p-4 text-sm leading-relaxed whitespace-pre-wrap">
               {error ? (
                 <span className="text-destructive">{error}</span>
@@ -89,7 +86,7 @@ export function AiSummarizationCard() {
                 summary
               ) : (
                 <span className="text-muted-foreground">
-                  The summary will appear here.
+                  {m.ai_page_summarization_empty()}
                 </span>
               )}
             </div>

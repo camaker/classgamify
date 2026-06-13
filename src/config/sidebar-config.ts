@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import {
   IconBell,
   IconCreditCard,
@@ -12,30 +13,25 @@ import {
 } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
 import type { MenuItemConfig } from '../types';
-import { messages } from '@/messages';
 import { websiteConfig } from './website';
-
-const m = messages.dashboard.sidebar;
-const am = messages.admin;
-
 /**
  * Sidebar links
  */
 export function getSidebarLinks(): MenuItemConfig[] {
   return [
     {
-      title: m.dashboard,
+      title: m.dashboard_sidebar_dashboard(),
       icon: IconLayoutDashboard,
       href: Routes.Dashboard,
       external: false,
     },
     {
-      title: am.title,
+      title: m.admin_title(),
       icon: IconShieldCheck,
       authorizeOnly: ['admin'],
       items: [
         {
-          title: am.users.title,
+          title: m.admin_users_title(),
           icon: IconUsers,
           href: Routes.AdminUsers,
           external: false,
@@ -43,11 +39,11 @@ export function getSidebarLinks(): MenuItemConfig[] {
       ],
     },
     {
-      title: m.settings,
+      title: m.dashboard_sidebar_settings(),
       icon: IconSettings2,
       items: [
         {
-          title: m.profile,
+          title: m.dashboard_sidebar_profile(),
           icon: IconUserCircle,
           href: Routes.SettingsProfile,
           external: false,
@@ -55,7 +51,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
         ...(websiteConfig.payment?.enable
           ? [
               {
-                title: m.billing,
+                title: m.dashboard_sidebar_billing(),
                 icon: IconCreditCard,
                 href: Routes.SettingsBilling,
                 external: false,
@@ -63,19 +59,19 @@ export function getSidebarLinks(): MenuItemConfig[] {
             ]
           : []),
         {
-          title: m.security,
+          title: m.dashboard_sidebar_security(),
           icon: IconLock,
           href: Routes.SettingsSecurity,
           external: false,
         },
         {
-          title: m.files,
+          title: m.dashboard_sidebar_files(),
           icon: IconFileUpload,
           href: Routes.SettingsFiles,
           external: false,
         },
         {
-          title: m.apiKeys,
+          title: m.dashboard_sidebar_api_keys(),
           icon: IconKey,
           href: Routes.SettingsApiKeys,
           external: false,
@@ -83,7 +79,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
         ...(websiteConfig.newsletter?.enable
           ? [
               {
-                title: m.notifications,
+                title: m.dashboard_sidebar_notifications(),
                 icon: IconBell,
                 href: Routes.SettingsNotifications,
                 external: false,

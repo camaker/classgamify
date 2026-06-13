@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { checkPaymentCompletion } from '@/api/payment';
 import {
   Card,
@@ -9,7 +10,6 @@ import {
   PAYMENT_MAX_POLL_TIME,
   PAYMENT_POLL_INTERVAL,
 } from '@/payment/constants';
-import { messages } from '@/messages';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
@@ -19,11 +19,7 @@ import {
   IconLoader2,
 } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
-
-const m = messages.settings.payment;
-
 type PaymentStatus = 'processing' | 'success' | 'failed' | 'timeout';
-
 function getStatusContent(status: PaymentStatus): {
   title: string;
   description: string;
@@ -31,20 +27,28 @@ function getStatusContent(status: PaymentStatus): {
   switch (status) {
     case 'processing':
       return {
-        title: m.processing.title,
-        description: m.processing.description,
+        title: m.settings_payment_processing_title(),
+        description: m.settings_payment_processing_description(),
       };
     case 'success':
-      return { title: m.success.title, description: m.success.description };
+      return {
+        title: m.settings_payment_success_title(),
+        description: m.settings_payment_success_description(),
+      };
     case 'failed':
-      return { title: m.failed.title, description: m.failed.description };
+      return {
+        title: m.settings_payment_failed_title(),
+        description: m.settings_payment_failed_description(),
+      };
     case 'timeout':
-      return { title: m.timeout.title, description: m.timeout.description };
+      return {
+        title: m.settings_payment_timeout_title(),
+        description: m.settings_payment_timeout_description(),
+      };
     default:
       return { title: '', description: '' };
   }
 }
-
 function StatusIcon({ status }: { status: PaymentStatus }) {
   switch (status) {
     case 'processing':
@@ -63,12 +67,10 @@ function StatusIcon({ status }: { status: PaymentStatus }) {
       );
   }
 }
-
 type PaymentCardProps = {
   sessionId: string | undefined;
   callback?: string;
 };
-
 /**
  * Payment result card: polls for completion, shows status, invalidates plan cache and redirects on success.
  */
@@ -83,14 +85,11 @@ export function PaymentCard({
   );
   const pollEndRef = useRef(false);
   const startRef = useRef<number>(0);
-
   // Poll for payment completion
   useEffect(() => {
     if (!sessionId || status !== 'processing') return;
-
     pollEndRef.current = false;
     startRef.current = Date.now();
-
     const poll = async () => {
       while (
         !pollEndRef.current &&
@@ -110,14 +109,11 @@ export function PaymentCard({
       }
       if (!pollEndRef.current) setStatus('timeout');
     };
-
     poll();
   }, [sessionId, status]);
-
   // On success: invalidate currentPlan then redirect to callback
   useEffect(() => {
     if (status !== 'success' || !callback) return;
-
     const run = async () => {
       await queryClient.invalidateQueries({ queryKey: ['currentPlan'] });
       await queryClient.refetchQueries({ queryKey: ['currentPlan'] });
@@ -125,9 +121,7 @@ export function PaymentCard({
     };
     run();
   }, [status, callback, queryClient, navigate]);
-
   const { title, description } = getStatusContent(status);
-
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Card className="w-full max-w-md">

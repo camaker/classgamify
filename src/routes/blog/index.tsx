@@ -1,13 +1,13 @@
+import { m } from '@/locale/paraglide/messages';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
 import { getPaginatedPosts } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
 import { seo } from '@/lib/seo';
-import { getCanonicalUrl } from '@/lib/urls';
-
+import { getCanonicalUrlForLocale } from '@/lib/urls';
+import { getLocale, localeConfig } from '@/lib/locale';
 export const Route = createFileRoute('/blog/')({
   validateSearch: (search: Record<string, unknown>) => ({
     page:
@@ -27,47 +27,46 @@ export const Route = createFileRoute('/blog/')({
     const totalPages = loaderData?.totalPages ?? 1;
     const pageSuffix = currentPage > 1 ? ` - Page ${currentPage}` : '';
     const metadata = seo(path, {
-      title: `${messages.blog.title}${pageSuffix} | ${websiteConfig.metadata?.name}`,
-      description: messages.blog.description,
+      title: `${m.blog_title()}${pageSuffix} | ${websiteConfig.metadata?.name}`,
+      description: m.blog_description(),
     });
-
-    // Canonicalize each paginated page to itself so Google can index them
-    // independently instead of folding everything into /blog.
-    const canonicalHref =
-      currentPage > 1
-        ? `${getCanonicalUrl(path)}?page=${currentPage}`
-        : getCanonicalUrl(path);
-
-    const paginationLinks: Array<{ rel: string; href: string }> = [
-      { rel: 'canonical', href: canonicalHref },
-    ];
+    // Pass the current locale explicitly so canonical/prev/next are stable
+    // across SSR + CSR regardless of any mid-render locale swap.
+    const localizedUrl = (page?: number) => {
+      const base = getCanonicalUrlForLocale(path, getLocale());
+      return page && page > 1 ? `${base}?page=${page}` : base;
+    };
+    const canonicalHref = localizedUrl(currentPage);
+    const paginationLinks: Array<{
+      rel: string;
+      href: string;
+    }> = [{ rel: 'canonical', href: canonicalHref }];
     if (currentPage > 1) {
-      const prevPage = currentPage - 1;
       paginationLinks.push({
         rel: 'prev',
-        href:
-          prevPage === 1
-            ? getCanonicalUrl(path)
-            : `${getCanonicalUrl(path)}?page=${prevPage}`,
+        href: localizedUrl(currentPage - 1),
       });
     }
     if (currentPage < totalPages) {
       paginationLinks.push({
         rel: 'next',
-        href: `${getCanonicalUrl(path)}?page=${currentPage + 1}`,
+        href: localizedUrl(currentPage + 1),
       });
     }
-
     const blogJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'Blog',
-      name: messages.blog.title,
-      description: messages.blog.description,
-      url: getCanonicalUrl(path),
+      name: m.blog_title(),
+      description: m.blog_description(),
+      url: canonicalHref,
+      inLanguage: localeConfig[getLocale()].hreflang,
     };
     return {
       ...metadata,
-      links: paginationLinks,
+      links: [
+        ...paginationLinks,
+        ...metadata.links.filter((link) => link.rel !== 'canonical'),
+      ],
       scripts: [
         {
           type: 'application/ld+json',
@@ -78,22 +77,20 @@ export const Route = createFileRoute('/blog/')({
   },
   component: BlogListPage,
 });
-
 function BlogListPage() {
   const { posts, totalPages, currentPage } = Route.useLoaderData();
   if (!websiteConfig.blog?.enable) {
     throw notFound();
   }
-
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto space-y-8">
         <div className="space-y-4 text-center">
           <h1 className="text-3xl font-bold tracking-tight">
-            {messages.blog.title}
+            {m.blog_title()}
           </h1>
           <p className="text-muted-foreground text-lg">
-            {messages.blog.description}
+            {m.blog_description()}
           </p>
         </div>
         <BlogGrid posts={posts} />

@@ -88,7 +88,7 @@ All return 400 when newsletter is disabled or email invalid; throw or return err
 
 - **use-newsletter** — `useNewsletterStatus(email)` (query), `useSubscribeNewsletter()` / `useUnsubscribeNewsletter()` (mutations). Calls API with `getBaseUrl()` for correct origin. Invalidates status query on subscribe/unsubscribe success.
 - **NewsletterFormCard** — Renders only when `newsletter.enable` and user is logged in. Shows Switch bound to subscription status; toggling calls subscribe/unsubscribe and toast.
-- **NewsletterCard** — Renders only when `newsletter.enable`. Email input + submit; calls `subscribeNewsletter` server function. Uses `messages.newsletter` (title, description, email, placeholderEmail, subscribe, error, thanks, emailInvalid).
+- **NewsletterCard** — Renders only when `newsletter.enable`. Email input + submit; calls `subscribeNewsletter` server function. Uses flat Paraglide `m.newsletter_*()` message functions.
 
 ---
 

@@ -1,11 +1,8 @@
+import { m } from '@/locale/paraglide/messages';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ResetPasswordForm } from '@/components/auth/reset-password-form';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
 import { Routes } from '@/lib/routes';
-
-const m = messages.auth.resetPassword;
-
 export const Route = createFileRoute('/auth/reset-password')({
   beforeLoad: () => {
     if (!websiteConfig.auth?.enable) {
@@ -14,10 +11,12 @@ export const Route = createFileRoute('/auth/reset-password')({
   },
   component: ResetPasswordPage,
   head: () => ({
-    meta: [{ title: m.title }, { name: 'description', content: m.description }],
+    meta: [
+      { title: m.auth_reset_password_title() },
+      { name: 'description', content: m.auth_reset_password_description() },
+    ],
   }),
 });
-
 function ResetPasswordPage() {
   return <ResetPasswordForm />;
 }

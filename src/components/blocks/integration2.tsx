@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { Logo } from '@/components/shared/logo';
 import { ScrollReveal } from '@/components/shared/scroll-reveal';
 import { buttonVariants } from '@/components/ui/button';
@@ -11,17 +12,7 @@ import {
   IconBrandVisualStudio,
   IconBrandWikipedia,
 } from '@tabler/icons-react';
-
-const m = {
-  title: 'Integrate with your favorite tools',
-  description:
-    'Connect seamlessly with popular platforms and services to enhance your workflow',
-  primaryButton: 'Get Started',
-  secondaryButton: 'View Pricing',
-};
-
 import { BRAND_COLORS } from '@/components/blocks/integration';
-
 const BRAND_ICONS = [
   { Icon: IconBrandOpenai, color: BRAND_COLORS.openai },
   { Icon: IconBrandCodesandbox, color: BRAND_COLORS.codesandbox },
@@ -30,7 +21,6 @@ const BRAND_ICONS = [
   { Icon: IconBrandWikipedia, color: BRAND_COLORS.wikipedia },
   { Icon: IconBrandGoogleFilled, color: BRAND_COLORS.google },
 ];
-
 function IntegrationCard({
   children,
   className,
@@ -57,7 +47,6 @@ function IntegrationCard({
     </div>
   );
 }
-
 export default function Integration2Section() {
   const [b0, b1, b2, b3, b4, b5] = BRAND_ICONS;
   return (
@@ -103,16 +92,18 @@ export default function Integration2Section() {
               className="mx-auto max-w-lg space-y-6 text-center sm:text-left"
             >
               <h2 className="text-balance text-3xl font-semibold md:text-4xl">
-                {m.title}
+                {m.home_integration2_title()}
               </h2>
-              <p className="text-muted-foreground">{m.description}</p>
+              <p className="text-muted-foreground">
+                {m.home_integration2_description()}
+              </p>
 
               <div className="mt-12 flex flex-wrap justify-center gap-4 md:justify-start">
                 <Link
                   to="/auth/login"
                   className={cn(buttonVariants({ size: 'lg' }))}
                 >
-                  <span>{m.primaryButton}</span>
+                  <span>{m.home_integration2_primary_button()}</span>
                 </Link>
                 <Link
                   to="/"
@@ -121,7 +112,7 @@ export default function Integration2Section() {
                     buttonVariants({ size: 'lg', variant: 'outline' })
                   )}
                 >
-                  <span>{m.secondaryButton}</span>
+                  <span>{m.home_integration2_secondary_button()}</span>
                 </Link>
               </div>
             </ScrollReveal>

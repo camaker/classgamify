@@ -1,6 +1,5 @@
+import { m } from '@/locale/paraglide/messages';
 import { Link } from '@tanstack/react-router';
-import { messages } from '@/messages';
-
 export function BlogPagination({
   currentPage,
   totalPages,
@@ -9,14 +8,12 @@ export function BlogPagination({
   totalPages: number;
 }) {
   if (totalPages <= 1) return null;
-
   const prevPage = currentPage - 1;
   const nextPage = currentPage + 1;
-
   return (
     <nav
       className="mt-8 flex items-center justify-center gap-2"
-      aria-label="Blog pagination"
+      aria-label={m.blog_pagination()}
     >
       {currentPage > 1 ? (
         <Link
@@ -24,15 +21,15 @@ export function BlogPagination({
           search={prevPage <= 1 ? { page: undefined } : { page: prevPage }}
           className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
         >
-          {messages.blog.previous}
+          {m.blog_previous()}
         </Link>
       ) : (
         <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-border px-4 py-2 text-muted-foreground text-sm">
-          {messages.blog.previous}
+          {m.blog_previous()}
         </span>
       )}
       <span className="px-2 text-muted-foreground text-sm">
-        {messages.blog.page} {currentPage} {messages.blog.of} {totalPages}
+        {m.blog_page()} {currentPage} {m.blog_of()} {totalPages}
       </span>
       {currentPage < totalPages ? (
         <Link
@@ -40,11 +37,11 @@ export function BlogPagination({
           search={{ page: nextPage }}
           className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
         >
-          {messages.blog.next}
+          {m.blog_next()}
         </Link>
       ) : (
         <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-border px-4 py-2 text-muted-foreground text-sm">
-          {messages.blog.next}
+          {m.blog_next()}
         </span>
       )}
     </nav>

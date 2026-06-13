@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { useRef, useState } from 'react';
 import { IconLoader2, IconPhotoScan, IconUpload } from '@tabler/icons-react';
 import { captionImage } from '@/api/ai';
@@ -11,42 +12,41 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-
-const PROMPT_PRESETS = [
-  'Generate a caption for this image.',
-  'Describe what you see in this image in detail.',
-  'List 5 keywords that describe this image, comma-separated.',
-  'What objects are in this image?',
-] as const;
-
-const MAX_BYTES = 1_000_000; // 1 MB upload cap
-
+const MAX_BYTES = 1000000; // 1 MB upload cap
 export function AiCaptionCard() {
+  const promptPresets = [
+    m.ai_page_caption_presets_0(),
+    m.ai_page_caption_presets_1(),
+    m.ai_page_caption_presets_2(),
+    m.ai_page_caption_presets_3(),
+  ];
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | undefined>();
   const [imageBase64, setImageBase64] = useState<string | undefined>();
   const [imageMeta, setImageMeta] = useState<
-    { name: string; size: number } | undefined
+    | {
+        name: string;
+        size: number;
+      }
+    | undefined
   >();
-  const [prompt, setPrompt] = useState<string>(PROMPT_PRESETS[0]);
+  const [prompt, setPrompt] = useState<string>(promptPresets[0]);
   const [caption, setCaption] = useState('');
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
-
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file.');
+      setError(m.ai_page_common_upload_image_file());
       return;
     }
     if (file.size > MAX_BYTES) {
       setError(
-        `Image is too large (${(file.size / 1024).toFixed(0)} KB). Please use one under 1 MB.`
+        `Image is too large (${(file.size / 1024).toFixed(0)} KB). ${m.ai_page_common_image_too_large()}`
       );
       return;
     }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       const dataUrl = reader.result as string;
@@ -56,10 +56,9 @@ export function AiCaptionCard() {
       setCaption('');
       setError(undefined);
     };
-    reader.onerror = () => setError('Could not read the selected file.');
+    reader.onerror = () => setError(m.ai_page_common_read_file_error());
     reader.readAsDataURL(file);
   }
-
   async function onCaption() {
     if (!imageBase64) return;
     setError(undefined);
@@ -71,31 +70,29 @@ export function AiCaptionCard() {
       });
       setCaption(result.description);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to caption image.');
+      setError(err instanceof Error ? err.message : m.ai_page_caption_error());
     } finally {
       setIsPending(false);
     }
   }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconPhotoScan className="size-5 text-primary" />
-          Image Captioning
+          {m.ai_page_caption_title()}
         </CardTitle>
         <CardDescription>
-          Powered by Cloudflare Workers AI{' '}
+          {m.ai_page_caption_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             @cf/llava-hf/llava-1.5-7b-hf
-          </code>{' '}
-          to describe an image or answer a question about it.
+          </code>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Image (max 1 MB)</Label>
+            <Label>{m.ai_page_caption_image_label()}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -111,7 +108,9 @@ export function AiCaptionCard() {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <IconUpload className="mr-1 size-4" />
-                {imageMeta ? 'Change image' : 'Upload image'}
+                {imageMeta
+                  ? m.ai_page_common_change_image()
+                  : m.ai_page_common_upload_image()}
               </Button>
               {imageMeta && (
                 <span className="text-xs text-muted-foreground">
@@ -123,12 +122,12 @@ export function AiCaptionCard() {
               {imagePreview ? (
                 <img
                   src={imagePreview}
-                  alt="Preview"
+                  alt={m.ai_page_caption_preview_alt()}
                   className="size-full object-cover"
                 />
               ) : (
                 <span className="px-4 text-center text-sm text-muted-foreground">
-                  Upload an image to caption.
+                  {m.ai_page_caption_empty_image()}
                 </span>
               )}
             </div>
@@ -136,9 +135,11 @@ export function AiCaptionCard() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="ai-caption-prompt">Prompt</Label>
+              <Label htmlFor="ai-caption-prompt">
+                {m.ai_page_caption_prompt_label()}
+              </Label>
               <div className="flex flex-wrap gap-2">
-                {PROMPT_PRESETS.map((preset) => {
+                {promptPresets.map((preset) => {
                   const isActive = prompt === preset;
                   return (
                     <button
@@ -172,29 +173,29 @@ export function AiCaptionCard() {
                 {isPending ? (
                   <>
                     <IconLoader2 className="mr-1 size-4 animate-spin" />
-                    Captioning...
+                    {m.ai_page_caption_pending()}
                   </>
                 ) : (
-                  'Caption Image'
+                  m.ai_page_caption_action()
                 )}
               </Button>
             </div>
 
             <div className="space-y-2">
-              <Label>Result</Label>
+              <Label>{m.ai_page_caption_output_label()}</Label>
               <div className="min-h-[160px] rounded-md border bg-muted/30 p-4 text-sm leading-relaxed whitespace-pre-wrap">
                 {error ? (
                   <span className="text-destructive">{error}</span>
                 ) : isPending ? (
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <IconLoader2 className="size-4 animate-spin" />
-                    Reading the image...
+                    {m.ai_page_caption_reading()}
                   </span>
                 ) : caption ? (
                   caption
                 ) : (
                   <span className="text-muted-foreground">
-                    The caption will appear here.
+                    {m.ai_page_caption_empty()}
                   </span>
                 )}
               </div>

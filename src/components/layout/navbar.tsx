@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { useScroll } from '@/hooks/use-scroll';
 import { authClient } from '@/auth/client';
@@ -19,18 +20,16 @@ import Container from '@/components/layout/container';
 import { Logo } from '@/components/shared/logo';
 import { ModeSwitcher } from '@/components/theme/mode-switcher';
 import { NavbarMobile } from '@/components/layout/navbar-mobile';
+import { LocaleSwitcher } from '@/components/layout/locale-switcher';
 import { UserButton } from '@/components/shared/user-button';
 import { LoginWrapper } from '@/components/auth/login-wrapper';
 import { IconArrowUpRight } from '@tabler/icons-react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
-
 interface NavbarProps {
   scroll?: boolean;
 }
-
 export function Navbar({ scroll = true }: NavbarProps) {
   const pathname = useLocation().pathname;
   const scrolled = useScroll(50);
@@ -40,13 +39,11 @@ export function Navbar({ scroll = true }: NavbarProps) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const showBarBg = scroll && scrolled;
-
   // Sync mount (avoid auth hydration mismatch) and close menu on route change
   useEffect(() => {
     setMounted(true);
     setMenuValue(null);
   }, [pathname]);
-
   return (
     <header
       className={cn(
@@ -63,12 +60,12 @@ export function Navbar({ scroll = true }: NavbarProps) {
       <div className="relative z-10">
         <Container className="px-4">
           <nav
-            aria-label="Main navigation"
+            aria-label={m.common_main_navigation()}
             className="hidden lg:flex lg:items-center lg:justify-between lg:gap-4"
           >
             <Link
               to="/"
-              aria-label="Home"
+              aria-label={m.common_home()}
               className="flex items-center gap-2 shrink-0"
             >
               <Logo />
@@ -164,6 +161,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
             </NavigationMenu>
 
             <div className="flex items-center gap-4 shrink-0">
+              <LocaleSwitcher />
               <ModeSwitcher />
               {websiteConfig.auth?.enable &&
                 (!mounted || isPending ? (
@@ -183,14 +181,14 @@ export function Navbar({ scroll = true }: NavbarProps) {
                           'cursor-pointer'
                         )}
                       >
-                        {messages.auth.common.login}
+                        {m.auth_common_login()}
                       </button>
                     </LoginWrapper>
                     <Link
                       to={Routes.Register}
                       className={buttonVariants({ size: 'sm' })}
                     >
-                      {messages.auth.common.signup}
+                      {m.auth_common_signup()}
                     </Link>
                   </>
                 ))}

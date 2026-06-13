@@ -1,4 +1,4 @@
-import { messages } from '@/messages';
+import { m } from '@/locale/paraglide/messages';
 import { FormError } from '@/components/shared/form-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,37 +25,28 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-
 interface UpdateNameCardProps {
   className?: string;
 }
-
-const m = messages.settings.profile.name;
-
 const nameSchema = z.object({
   name: z
     .string()
-    .min(3, { message: m.minLength })
-    .max(30, { message: m.maxLength }),
+    .min(3, { message: m.settings_profile_name_min_length() })
+    .max(30, { message: m.settings_profile_name_max_length() }),
 });
-
 export function UpdateNameCard({ className }: UpdateNameCardProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const { data: session, refetch } = authClient.useSession();
-
   const form = useForm<z.infer<typeof nameSchema>>({
     resolver: zodResolver(nameSchema),
     defaultValues: { name: session?.user?.name || '' },
   });
-
   useEffect(() => {
     if (session?.user?.name) form.setValue('name', session.user.name);
   }, [session, form]);
-
   const user = session?.user;
   if (!user) return null;
-
   const onSubmit = async (values: z.infer<typeof nameSchema>) => {
     if (values.name === session?.user?.name) return;
     await authClient.updateUser(
@@ -69,18 +60,17 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
           setIsSaving(false);
         },
         onSuccess: () => {
-          toast.success(m.success);
+          toast.success(m.settings_profile_name_success());
           refetch();
           form.reset({ name: values.name });
         },
         onError: (ctx) => {
           setError(`${ctx.error.status}: ${ctx.error.message}`);
-          toast.error(m.fail);
+          toast.error(m.settings_profile_name_fail());
         },
       }
     );
   };
-
   return (
     <Card
       className={cn(
@@ -89,8 +79,12 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
       )}
     >
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">{m.title}</CardTitle>
-        <CardDescription>{m.description}</CardDescription>
+        <CardTitle className="text-lg font-semibold">
+          {m.settings_profile_name_title()}
+        </CardTitle>
+        <CardDescription>
+          {m.settings_profile_name_description()}
+        </CardDescription>
       </CardHeader>
       <Form {...form}>
         <form
@@ -103,9 +97,12 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{m.title}</FormLabel>
+                  <FormLabel>{m.settings_profile_name_title()}</FormLabel>
                   <FormControl>
-                    <Input placeholder={m.placeholder} {...field} />
+                    <Input
+                      placeholder={m.settings_profile_name_placeholder()}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -114,9 +111,13 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
             <FormError message={error} />
           </CardContent>
           <CardFooter className="mt-6 px-6 py-4 flex justify-between items-center bg-muted rounded-none">
-            <p className="text-sm text-muted-foreground">{m.hint}</p>
+            <p className="text-sm text-muted-foreground">
+              {m.settings_profile_name_hint()}
+            </p>
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? m.saving : m.save}
+              {isSaving
+                ? m.settings_profile_name_saving()
+                : m.settings_profile_name_save()}
             </Button>
           </CardFooter>
         </form>

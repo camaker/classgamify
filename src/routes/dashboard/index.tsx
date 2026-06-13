@@ -1,23 +1,20 @@
+import { m } from '@/locale/paraglide/messages';
 import { ChartAreaInteractive } from '@/components/dashboard/chart-area-interactive';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { DataTable } from '@/components/dashboard/data-table';
 import { SectionCards } from '@/components/dashboard/section-cards';
-import { messages } from '@/messages';
 import { createFileRoute } from '@tanstack/react-router';
 import data from './data.json';
-
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 });
-
 function DashboardPage() {
   const breadcrumbs = [
     {
-      label: messages.dashboard.title,
+      label: m.dashboard_title(),
       isCurrentPage: true,
     },
   ];
-
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />

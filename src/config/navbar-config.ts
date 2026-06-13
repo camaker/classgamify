@@ -1,5 +1,5 @@
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
-import { messages } from '@/messages';
 import {
   IconBuilding,
   IconBulb,
@@ -20,77 +20,78 @@ import {
 } from '@tabler/icons-react';
 import type { MenuItemConfig } from '../types';
 import { websiteConfig } from './website';
-
-const m = messages.nav;
-
 /**
  * Navbar links
  */
 export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
-    { title: m.features, href: Routes.Features, external: false },
+    { title: m.nav_features(), href: Routes.Features, external: false },
   ];
   if (websiteConfig.payment?.enable) {
-    links.push({ title: m.pricing, href: Routes.Pricing, external: false });
+    links.push({
+      title: m.nav_pricing(),
+      href: Routes.Pricing,
+      external: false,
+    });
   }
   if (websiteConfig.blog?.enable) {
-    links.push({ title: m.blog, href: Routes.Blog, external: false });
+    links.push({ title: m.nav_blog(), href: Routes.Blog, external: false });
   }
   links.push({
-    title: m.ai.title,
+    title: m.nav_ai_title(),
     items: [
       {
-        title: m.ai.summarization.title,
-        description: m.ai.summarization.description,
+        title: m.nav_ai_summarization_title(),
+        description: m.nav_ai_summarization_description(),
         href: Routes.AiSummarization,
         icon: IconWand,
         external: false,
       },
       {
-        title: m.ai.translation.title,
-        description: m.ai.translation.description,
+        title: m.nav_ai_translation_title(),
+        description: m.nav_ai_translation_description(),
         href: Routes.AiTranslation,
         icon: IconLanguage,
         external: false,
       },
       {
-        title: m.ai.tagline.title,
-        description: m.ai.tagline.description,
+        title: m.nav_ai_tagline_title(),
+        description: m.nav_ai_tagline_description(),
         href: Routes.AiTagline,
         icon: IconBulb,
         external: false,
       },
       {
-        title: m.ai.tts.title,
-        description: m.ai.tts.description,
+        title: m.nav_ai_tts_title(),
+        description: m.nav_ai_tts_description(),
         href: Routes.AiTts,
         icon: IconMicrophone,
         external: false,
       },
       {
-        title: m.ai.caption.title,
-        description: m.ai.caption.description,
+        title: m.nav_ai_caption_title(),
+        description: m.nav_ai_caption_description(),
         href: Routes.AiCaption,
         icon: IconPhotoScan,
         external: false,
       },
       {
-        title: m.ai.imageCf.title,
-        description: m.ai.imageCf.description,
+        title: m.nav_ai_image_cf_title(),
+        description: m.nav_ai_image_cf_description(),
         href: Routes.AiImageCf,
         icon: IconSparkles,
         external: false,
       },
       {
-        title: m.ai.imageFal.title,
-        description: m.ai.imageFal.description,
+        title: m.nav_ai_image_fal_title(),
+        description: m.nav_ai_image_fal_description(),
         href: Routes.AiImageFal,
         icon: IconPhoto,
         external: false,
       },
       {
-        title: m.ai.imageEdit.title,
-        description: m.ai.imageEdit.description,
+        title: m.nav_ai_image_edit_title(),
+        description: m.nav_ai_image_edit_description(),
         href: Routes.AiImageEdit,
         icon: IconPhotoEdit,
         external: false,
@@ -98,60 +99,60 @@ export function getNavbarLinks(): MenuItemConfig[] {
     ],
   });
   links.push({
-    title: m.pages,
+    title: m.nav_pages(),
     items: [
       {
-        title: m.about.title,
-        description: m.about.description,
+        title: m.nav_about_title(),
+        description: m.nav_about_description(),
         href: Routes.About,
         icon: IconBuilding,
         external: false,
       },
       {
-        title: m.contact.title,
-        description: m.contact.description,
+        title: m.nav_contact_title(),
+        description: m.nav_contact_description(),
         href: Routes.Contact,
         icon: IconMail,
         external: false,
       },
       {
-        title: m.waitlist.title,
-        description: m.waitlist.description,
+        title: m.nav_waitlist_title(),
+        description: m.nav_waitlist_description(),
         href: Routes.Waitlist,
         icon: IconMailbox,
         external: false,
       },
       {
-        title: m.changelog.title,
-        description: m.changelog.description,
+        title: m.nav_changelog_title(),
+        description: m.nav_changelog_description(),
         href: Routes.Changelog,
         icon: IconListCheck,
         external: false,
       },
       {
-        title: m.roadmap.title,
-        description: m.roadmap.description,
+        title: m.nav_roadmap_title(),
+        description: m.nav_roadmap_description(),
         href: Routes.Roadmap,
         icon: IconRoute,
         external: false,
       },
       {
-        title: m.cookiePolicy.title,
-        description: m.cookiePolicy.description,
+        title: m.nav_cookie_policy_title(),
+        description: m.nav_cookie_policy_description(),
         href: Routes.CookiePolicy,
         icon: IconCookie,
         external: false,
       },
       {
-        title: m.privacyPolicy.title,
-        description: m.privacyPolicy.description,
+        title: m.nav_privacy_policy_title(),
+        description: m.nav_privacy_policy_description(),
         href: Routes.PrivacyPolicy,
         icon: IconShieldCheck,
         external: false,
       },
       {
-        title: m.termsOfService.title,
-        description: m.termsOfService.description,
+        title: m.nav_terms_of_service_title(),
+        description: m.nav_terms_of_service_description(),
         href: Routes.TermsOfService,
         icon: IconFileText,
         external: false,

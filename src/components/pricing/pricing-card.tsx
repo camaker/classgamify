@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
@@ -21,8 +22,6 @@ import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
 import { CheckoutButton } from './create-checkout-button';
 import { Routes } from '@/lib/routes';
-import { messages } from '@/messages';
-
 function getPriceForPlan(
   plan: PricePlan,
   interval?: PlanInterval,
@@ -35,7 +34,6 @@ function getPriceForPlan(
     return p.type === PaymentTypes.SUBSCRIPTION && p.interval === interval;
   });
 }
-
 interface PricingCardProps {
   plan: PricePlan;
   interval?: PlanInterval;
@@ -44,7 +42,6 @@ interface PricingCardProps {
   className?: string;
   isCurrentPlan?: boolean;
 }
-
 export function PricingCard({
   plan,
   interval,
@@ -56,25 +53,23 @@ export function PricingCard({
   const price = getPriceForPlan(plan, interval, paymentType);
   const { data: session } = authClient.useSession();
   const currentUser = session?.user;
-  const card = messages.pricing.card;
-
   let formattedPrice = '';
   let priceLabel = '';
   if (plan.isFree) {
-    formattedPrice = card.free;
+    formattedPrice = m.pricing_card_free();
   } else if (price && price.amount > 0) {
     formattedPrice = formatPrice(price.amount, price.currency);
-    if (interval === PlanIntervals.MONTH) priceLabel = card.perMonth;
-    else if (interval === PlanIntervals.YEAR) priceLabel = card.perYear;
+    if (interval === PlanIntervals.MONTH)
+      priceLabel = m.pricing_card_per_month();
+    else if (interval === PlanIntervals.YEAR)
+      priceLabel = m.pricing_card_per_year();
   } else {
-    formattedPrice = card.notAvailable;
+    formattedPrice = m.pricing_card_not_available();
   }
-
   const isPaidPlan = !plan.isFree && !!price;
   const hasValidPriceId = !!price?.priceId?.trim();
   const hasTrialPeriod =
     price?.trialPeriodDays != null && price.trialPeriodDays > 0;
-
   return (
     <Card
       className={cn(
@@ -89,7 +84,7 @@ export function PricingCard({
             variant="default"
             className="bg-primary text-primary-foreground"
           >
-            {card.popular}
+            {m.pricing_card_popular()}
           </Badge>
         </div>
       )}
@@ -111,7 +106,7 @@ export function PricingCard({
         {plan.isFree ? (
           currentUser ? (
             <Button variant="outline" className="mt-4 w-full" disabled>
-              {card.getStartedForFree}
+              {m.pricing_card_get_started_for_free()}
             </Button>
           ) : (
             <Link
@@ -121,7 +116,7 @@ export function PricingCard({
                 'mt-4 w-full'
               )}
             >
-              {card.getStartedForFree}
+              {m.pricing_card_get_started_for_free()}
             </Link>
           )
         ) : isCurrentPlan ? (
@@ -129,7 +124,7 @@ export function PricingCard({
             disabled
             className="mt-4 w-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/10 dark:border-primary/30 dark:bg-primary/15 dark:text-primary dark:hover:bg-primary/15"
           >
-            {card.yourCurrentPlan}
+            {m.pricing_card_your_current_plan()}
           </Button>
         ) : isPaidPlan && price ? (
           currentUser && hasValidPriceId ? (
@@ -139,11 +134,13 @@ export function PricingCard({
               metadata={metadata}
               className="mt-4 w-full"
             >
-              {plan.isLifetime ? card.getLifetimeAccess : card.getStarted}
+              {plan.isLifetime
+                ? m.pricing_card_get_lifetime_access()
+                : m.pricing_card_get_started()}
             </CheckoutButton>
           ) : currentUser && !hasValidPriceId ? (
             <Button disabled className="mt-4 w-full">
-              {card.notAvailable}
+              {m.pricing_card_not_available()}
             </Button>
           ) : (
             <Link
@@ -153,12 +150,12 @@ export function PricingCard({
                 'mt-4 w-full'
               )}
             >
-              {card.getStarted}
+              {m.pricing_card_get_started()}
             </Link>
           )
         ) : (
           <Button disabled className="mt-4 w-full">
-            {card.notAvailable}
+            {m.pricing_card_not_available()}
           </Button>
         )}
       </CardHeader>
@@ -186,7 +183,7 @@ export function PricingCard({
         {hasTrialPeriod && price && (
           <div className="my-4">
             <span className="inline-block rounded-md border border-chart-2/20 bg-chart-2/10 px-2.5 py-1.5 text-xs font-medium text-chart-2 shadow-sm dark:border-chart-2/30 dark:bg-chart-2/15 dark:text-chart-2">
-              {price.trialPeriodDays} {card.daysFreeTrial}
+              {price.trialPeriodDays} {m.pricing_card_days_free_trial()}
             </span>
           </div>
         )}

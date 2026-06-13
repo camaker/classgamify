@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { authClient } from '@/auth/client';
 import { isLinkActive } from '@/lib/urls';
@@ -16,19 +17,16 @@ import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Logo } from '@/components/shared/logo';
 import { ModeSwitcherHorizontal } from '@/components/theme/mode-switcher-horizontal';
+import { LocaleSwitcher } from '@/components/layout/locale-switcher';
 import { UserButtonMobile } from '@/components/shared/user-button-mobile';
 import { LoginWrapper } from '@/components/auth/login-wrapper';
-import { messages } from '@/messages';
 import { websiteConfig } from '@/config/website';
-
 const mobileLinkClass =
   'flex w-full items-center rounded-md p-2 text-base text-muted-foreground transition-colors duration-150 hover:text-foreground';
 const mobileLinkActiveClass = 'font-semibold text-primary';
 const mobileSubLinkClass =
   'flex w-full items-center gap-4 rounded-md p-2 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground';
-
 interface NavbarMobileProps extends React.HTMLAttributes<HTMLDivElement> {}
-
 export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
   const pathname = useLocation().pathname;
   const [open, setOpen] = useState(false);
@@ -36,15 +34,12 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const menuLinks = getNavbarLinks();
-
   // Sync mount (avoid hydration mismatch) and close drawer on route change
   useEffect(() => {
     setMounted(true);
     setOpen(false);
   }, [pathname]);
-
   if (!mounted) return null;
-
   return (
     <>
       <div
@@ -70,7 +65,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
             variant="ghost"
             size="icon"
             aria-expanded={open}
-            aria-label="Toggle menu"
+            aria-label={m.common_toggle_menu()}
             onClick={() => setOpen((o) => !o)}
             className="size-8 rounded-md border"
           >
@@ -87,7 +82,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Mobile navigation"
+          aria-label={m.common_mobile_navigation()}
           className="fixed inset-0 top-14.25 z-50 flex flex-col overflow-y-auto bg-background animate-in fade-in-0 duration-200"
         >
           <div className="flex flex-1 flex-col items-start gap-4 p-4">
@@ -101,7 +96,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                     className="w-full"
                     onClick={() => setOpen(false)}
                   >
-                    {messages.auth.common.login}
+                    {m.auth_common_login()}
                   </Button>
                 </LoginWrapper>
                 <Link
@@ -109,7 +104,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                   onClick={() => setOpen(false)}
                   className={cn(buttonVariants({ size: 'lg' }), 'w-full')}
                 >
-                  {messages.auth.common.signup}
+                  {m.auth_common_signup()}
                 </Link>
               </div>
             )}
@@ -119,7 +114,6 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                 const active = item.href
                   ? isLinkActive(item.href, pathname)
                   : item.items?.some((sub) => isLinkActive(sub.href, pathname));
-
                 return (
                   <li key={item.title} className="py-1">
                     {item.items ? (
@@ -189,7 +183,8 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
               })}
             </ul>
 
-            <div className="mt-auto w-full border-t border-border/50 p-4 flex items-center justify-end">
+            <div className="mt-auto w-full border-t border-border/50 p-4 flex items-center justify-end gap-2">
+              <LocaleSwitcher onLocaleChange={() => setOpen(false)} />
               <ModeSwitcherHorizontal />
             </div>
           </div>

@@ -1,20 +1,15 @@
+import { m } from '@/locale/paraglide/messages';
 import { createFileRoute } from '@tanstack/react-router';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { AdminUsersContent } from '@/components/admin/users/admin-users-content';
-import { messages } from '@/messages';
-
-const m = messages.admin.users;
-
 export const Route = createFileRoute('/admin/users')({
   component: AdminUsersPage,
 });
-
 function AdminUsersPage() {
   const breadcrumbs = [
-    { label: messages.admin.title, isCurrentPage: false },
-    { label: m.title, isCurrentPage: true },
+    { label: m.admin_title(), isCurrentPage: false },
+    { label: m.admin_users_title(), isCurrentPage: true },
   ];
-
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />

@@ -1,23 +1,25 @@
+import { m } from '@/locale/paraglide/messages';
 import { createFileRoute, useSearch } from '@tanstack/react-router';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { PaymentCard } from '@/components/payment/payment-card';
-import { messages } from '@/messages';
-
 export const Route = createFileRoute('/settings/payment')({
-  validateSearch: (s): { session_id?: string; callback?: string } => ({
+  validateSearch: (
+    s
+  ): {
+    session_id?: string;
+    callback?: string;
+  } => ({
     session_id: typeof s?.session_id === 'string' ? s.session_id : undefined,
     callback: typeof s?.callback === 'string' ? s.callback : undefined,
   }),
   component: PaymentPage,
 });
-
 function PaymentPage() {
   const search = useSearch({ from: '/settings/payment' });
   const breadcrumbs = [
-    { label: messages.common.settings, isCurrentPage: false },
-    { label: messages.settings.billing.breadcrumb, isCurrentPage: true },
+    { label: m.common_settings(), isCurrentPage: false },
+    { label: m.settings_billing_breadcrumb(), isCurrentPage: true },
   ];
-
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />

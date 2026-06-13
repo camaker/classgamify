@@ -17,6 +17,10 @@ count.txt
 __unconfig*
 todos.json
 
+# locale
+project.inlang/cache
+src/locale/paraglide
+
 # claude code
 .claude
 

@@ -8,7 +8,9 @@ import {
   Tailwind,
   Text,
 } from '@react-email/components';
-import { messages } from '@/messages';
+import { m } from '@/locale/paraglide/messages';
+
+const en = { locale: 'en' as const };
 
 interface EmailLayoutProps {
   children: React.ReactNode;
@@ -35,10 +37,10 @@ export default function EmailLayout({ children }: EmailLayoutProps) {
             {children}
             <Hr className="my-8" />
             <Text className="mt-4">
-              {messages.site.name} {messages.mail.layout.team}
+              {m.site_name(undefined, en)} {m.mail_layout_team(undefined, en)}
             </Text>
             <Text>
-              ©️ {year} {messages.mail.layout.copyright}
+              ©️ {year} {m.mail_layout_copyright(undefined, en)}
             </Text>
           </Container>
         </Section>

@@ -1,5 +1,6 @@
 import { clientEnv } from '@/env/client';
 import { websiteConfig } from '@/config/website';
+import { getLocale, localizeHref, type Locale } from '@/lib/locale';
 
 /**
  * Site origin (build-time). Safe to call from both client and server:
@@ -16,8 +17,15 @@ export function getBaseUrl(): string {
  */
 export function getCanonicalUrl(path: string): string {
   const base = getBaseUrl().replace(/\/$/, '');
-  const p = path.startsWith('/') ? path : `/${path}`;
+  const rawPath = path.startsWith('/') ? path : `/${path}`;
+  const p = localizeHref(rawPath, { locale: getLocale() });
   return `${base}${p}`;
+}
+
+export function getCanonicalUrlForLocale(path: string, locale: Locale): string {
+  const base = getBaseUrl().replace(/\/$/, '');
+  const rawPath = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${localizeHref(rawPath, { locale })}`;
 }
 
 /**

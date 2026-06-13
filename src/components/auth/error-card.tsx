@@ -1,16 +1,15 @@
+import { getAuthErrorMessages } from '@/lib/locale';
+import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
-import { messages } from '@/messages';
 import { Routes } from '@/lib/routes';
 import { IconAlertTriangle } from '@tabler/icons-react';
-
-const m = messages.auth.error;
-
 function getDisplayMessage(
   errorCode: string | undefined,
   errorDescription: string | undefined
 ): string {
-  if (errorCode && m.codes[errorCode]) {
-    return m.codes[errorCode];
+  const authErrorMessages = getAuthErrorMessages();
+  if (errorCode && authErrorMessages[errorCode]) {
+    return authErrorMessages[errorCode];
   }
   if (errorDescription) {
     return errorDescription;
@@ -18,9 +17,8 @@ function getDisplayMessage(
   if (errorCode) {
     return errorCode;
   }
-  return m.tryAgain;
+  return m.auth_error_try_again();
 }
-
 export function ErrorCard({
   errorCode,
   errorDescription,
@@ -29,12 +27,11 @@ export function ErrorCard({
   errorDescription?: string;
 } = {}) {
   const displayMessage = getDisplayMessage(errorCode, errorDescription);
-
   return (
     <AuthCard
-      headerLabel={m.title}
+      headerLabel={m.auth_error_title()}
       bottomButtonHref={Routes.Login}
-      bottomButtonLabel={m.backToLogin}
+      bottomButtonLabel={m.auth_error_back_to_login()}
       className="border-none"
     >
       <div className="w-full flex flex-col justify-center items-center py-4 gap-2">
