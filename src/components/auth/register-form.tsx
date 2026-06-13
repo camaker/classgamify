@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -32,7 +33,7 @@ export function RegisterForm({
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('callbackUrl')
       : null;
-  const defaultCallbackUrl = DEFAULT_LOGIN_REDIRECT;
+  const defaultCallbackUrl = getPathWithLocale(DEFAULT_LOGIN_REDIRECT);
   const callbackUrl =
     propCallbackUrl ??
     (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
@@ -43,7 +44,7 @@ export function RegisterForm({
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? true;
   const RegisterSchema = z.object({
-    email: z.string().email({ message: m.auth_register_email_required() }),
+    email: z.email({ message: m.auth_register_email_required() }),
     password: z
       .string()
       .min(1, { message: m.auth_register_password_required() }),

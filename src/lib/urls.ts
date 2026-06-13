@@ -1,6 +1,11 @@
 import { clientEnv } from '@/env/client';
 import { websiteConfig } from '@/config/website';
-import { getLocale, localizeHref, type Locale } from '@/lib/locale';
+import {
+  deLocalizeHref,
+  getLocale,
+  localizeHref,
+  type Locale,
+} from '@/lib/locale';
 
 /**
  * Site origin (build-time). Safe to call from both client and server:
@@ -26,6 +31,18 @@ export function getCanonicalUrlForLocale(path: string, locale: Locale): string {
   const base = getBaseUrl().replace(/\/$/, '');
   const rawPath = path.startsWith('/') ? path : `/${path}`;
   return `${base}${localizeHref(rawPath, { locale })}`;
+}
+
+/**
+ * Get the path with the current or provided locale applied.
+ * e.g. getPathWithLocale('/dashboard', 'zh') => '/zh/dashboard'
+ * e.g. getPathWithLocale('/dashboard', 'en') => '/dashboard'
+ */
+export function getPathWithLocale(
+  path: string,
+  locale: Locale = getLocale()
+): string {
+  return localizeHref(deLocalizeHref(path), { locale });
 }
 
 /**
