@@ -198,8 +198,15 @@ export class StripeProvider implements PaymentProvider {
   public async createCheckout(
     params: CreateCheckoutParams
   ): Promise<CheckoutResult> {
-    const { planId, priceId, customerEmail, successUrl, cancelUrl, metadata } =
-      params;
+    const {
+      planId,
+      priceId,
+      customerEmail,
+      successUrl,
+      cancelUrl,
+      metadata,
+      locale,
+    } = params;
 
     try {
       // Get plan and price
@@ -252,6 +259,10 @@ export class StripeProvider implements PaymentProvider {
       // Add customer to checkout session
       checkoutParams.customer = customerId;
 
+      if (locale) {
+        checkoutParams.locale = this.mapLocaleToStripeLocale(locale);
+      }
+
       // Add payment intent data for one-time payments
       if (price.type === PaymentTypes.ONE_TIME) {
         checkoutParams.payment_intent_data = {
@@ -299,12 +310,13 @@ export class StripeProvider implements PaymentProvider {
   public async createCustomerPortal(
     params: CreatePortalParams
   ): Promise<PortalResult> {
-    const { customerId, returnUrl } = params;
+    const { customerId, returnUrl, locale } = params;
 
     try {
       const session = await this.stripe.billingPortal.sessions.create({
         customer: customerId,
         return_url: returnUrl ?? '',
+        locale: locale ? this.mapLocaleToStripeLocale(locale) : undefined,
       });
 
       return {
@@ -1135,5 +1147,60 @@ export class StripeProvider implements PaymentProvider {
       s?.items?.data?.[0]?.current_period_end ??
       undefined;
     return typeof endUnix === 'number' ? new Date(endUnix * 1000) : undefined;
+  }
+
+  /**
+   * Map application locale to Stripe's supported locale values.
+   */
+  private mapLocaleToStripeLocale(
+    locale: string
+  ): Stripe.Checkout.SessionCreateParams.Locale {
+    const stripeLocales = [
+      'bg',
+      'cs',
+      'da',
+      'de',
+      'el',
+      'en',
+      'es',
+      'et',
+      'fi',
+      'fil',
+      'fr',
+      'hr',
+      'hu',
+      'id',
+      'it',
+      'ja',
+      'ko',
+      'lt',
+      'lv',
+      'ms',
+      'mt',
+      'nb',
+      'nl',
+      'pl',
+      'pt',
+      'ro',
+      'ru',
+      'sk',
+      'sl',
+      'sv',
+      'th',
+      'tr',
+      'vi',
+      'zh',
+    ] as const;
+
+    if (stripeLocales.some((supported) => supported === locale)) {
+      return locale as Stripe.Checkout.SessionCreateParams.Locale;
+    }
+
+    const baseLocale = locale.split('-')[0];
+    if (stripeLocales.some((supported) => supported === baseLocale)) {
+      return baseLocale as Stripe.Checkout.SessionCreateParams.Locale;
+    }
+
+    return 'auto';
   }
 }
