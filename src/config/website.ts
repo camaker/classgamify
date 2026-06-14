@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_USER_FILES_FOLDER,
 } from '@/storage/constants';
+
 // Payment provider controlled by env var: 'stripe' | 'creem' | '' (empty means disabled)
 const paymentProvider = clientEnv.VITE_PAYMENT_PROVIDER;
 const isPaymentEnabled = paymentProvider !== '';
@@ -25,6 +26,7 @@ const priceIds = isPaymentEnabled
         : (clientEnv.VITE_STRIPE_PRICE_LIFETIME ?? ''),
     }
   : { proMonthly: '', proYearly: '', lifetime: '' };
+
 /**
  * Website config
  */

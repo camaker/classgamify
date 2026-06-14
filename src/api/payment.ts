@@ -1,7 +1,10 @@
 import { getDb } from '@/db';
 import { payment } from '@/db/app.schema';
 import { user } from '@/db/auth.schema';
+import { getLocale } from '@/lib/locale';
 import { findPlanByPriceId, getAllPricePlans } from '@/lib/price-plan';
+import { Routes } from '@/lib/routes';
+import { getCanonicalUrl } from '@/lib/urls';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createCheckout, createCustomerPortal } from '@/payment';
 import type {
@@ -37,18 +40,21 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       .limit(1);
     if (!userRow?.email) throw new Error('User email not found');
     const { planId, priceId, successUrl, cancelUrl, metadata } = data;
-    const baseUrl = process.env.VITE_BASE_URL ?? '';
+    const locale = getLocale();
     const isCreem = websiteConfig.payment?.provider === 'creem';
-    const cancel = cancelUrl ?? `${baseUrl}/settings/billing`;
+    const billingUrl = getCanonicalUrl(Routes.SettingsBilling);
+    const cancel = cancelUrl ?? billingUrl;
 
     // For Stripe: {CHECKOUT_SESSION_ID} is replaced by Stripe on redirect,
     // then the Payment page polls by sessionId until the webhook writes the DB record.
     // For Creem: Creem does NOT replace URL placeholders and has its own
     // payment confirmation page, so redirect straight to billing.
     const success = isCreem
-      ? (successUrl ?? `${baseUrl}/settings/billing`)
+      ? (successUrl ?? billingUrl)
       : (successUrl ??
-        `${baseUrl}/settings/payment?session_id={CHECKOUT_SESSION_ID}&callback=/settings/billing`);
+        getCanonicalUrl(
+          `${Routes.Payment}?session_id={CHECKOUT_SESSION_ID}&callback=${Routes.SettingsBilling}`
+        ));
     const checkoutMetadata = {
       ...metadata,
       userId,
@@ -62,6 +68,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       successUrl: success,
       cancelUrl: cancel,
       metadata: checkoutMetadata,
+      locale,
     });
     return { url: result.url, id: result.id };
   });
@@ -85,12 +92,12 @@ export const createCustomerPortalSession = createServerFn({ method: 'POST' })
     if (!row?.customerId) {
       throw new Error('No customer found for user');
     }
-    const baseUrl = process.env.VITE_BASE_URL ?? '';
-    const returnUrl = data.returnUrl ?? `${baseUrl}/settings/billing`;
+    const locale = getLocale();
+    const returnUrl = data.returnUrl ?? getCanonicalUrl(Routes.SettingsBilling);
     const result = await createCustomerPortal({
       customerId: row.customerId,
       returnUrl,
-      locale: data.locale,
+      locale: data.locale ?? locale,
     });
     return { url: result.url };
   });

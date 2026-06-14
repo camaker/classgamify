@@ -35,7 +35,7 @@ export const Routes = {
   CookiePolicy: '/cookie',
 
   // Payment routes
-  Payment: '/payment',
+  Payment: '/settings/payment',
 
   // Dashboard routes
   Dashboard: '/dashboard',
