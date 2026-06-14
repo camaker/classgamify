@@ -2,9 +2,11 @@ import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { NewsletterFormCard } from '@/components/settings/notification/newsletter-form-card';
 import { createFileRoute } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/settings/notifications')({
   component: NotificationsPage,
 });
+
 function NotificationsPage() {
   const breadcrumbs = [
     { label: m.common_settings(), isCurrentPage: false },

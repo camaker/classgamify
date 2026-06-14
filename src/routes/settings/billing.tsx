@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { BillingCard } from '@/components/settings/billing/billing-card';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
+
 export const Route = createFileRoute('/settings/billing')({
   beforeLoad: () => {
     if (websiteConfig.payment?.enable === false) {
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/settings/billing')({
   },
   component: BillingPage,
 });
+
 function BillingPage() {
   const breadcrumbs = [
     { label: m.common_settings(), isCurrentPage: false },

@@ -4,6 +4,7 @@ import Container from '@/components/layout/container';
 import { Roadmap } from '@/components/roadmap/roadmap';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
+
 export const Route = createFileRoute('/(pages)/roadmap')({
   head: () =>
     seo('/roadmap', {
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/(pages)/roadmap')({
     }),
   component: RoadmapPage,
 });
+
 /**
  * Roadmap page with kanban board. Inspired by https://nsui.irung.me/roadmap
  */

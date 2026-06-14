@@ -4,6 +4,7 @@ import Container from '@/components/layout/container';
 import { ContactFormCard } from '@/components/contact/contact-form-card';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
+
 export const Route = createFileRoute('/(pages)/contact')({
   head: () =>
     seo('/contact', {
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/(pages)/contact')({
     }),
   component: ContactPage,
 });
+
 function ContactPage() {
   return (
     <Container className="py-16 px-4">

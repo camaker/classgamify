@@ -8,6 +8,7 @@ import { getMailtoUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { IconBrandXFilled, IconMailFilled } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/(pages)/about')({
   head: () =>
     seo('/about', {
@@ -16,6 +17,7 @@ export const Route = createFileRoute('/(pages)/about')({
     }),
   component: AboutPage,
 });
+
 function AboutPage() {
   const twitter = websiteConfig.social?.twitter;
   const supportEmail = getMailtoUrl(websiteConfig.mail?.supportEmail);

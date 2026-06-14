@@ -9,6 +9,7 @@ import { getLocale, localeConfig } from '@/lib/locale';
 import { seo } from '@/lib/seo';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { formatDate } from '@/lib/formatter';
+
 export const Route = createFileRoute('/blog/$slug')({
   loader: async ({ params }) => {
     const post = getPostBySlug(params.slug);
@@ -71,6 +72,7 @@ export const Route = createFileRoute('/blog/$slug')({
   },
   component: BlogPostPage,
 });
+
 function BlogPostPage() {
   const post = Route.useLoaderData();
   if (!post || !websiteConfig.blog?.enable) throw notFound();

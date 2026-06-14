@@ -8,6 +8,7 @@ import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { getCanonicalUrlForLocale } from '@/lib/urls';
 import { getLocale, localeConfig } from '@/lib/locale';
+
 export const Route = createFileRoute('/blog/')({
   validateSearch: (search: Record<string, unknown>) => ({
     page:
@@ -77,6 +78,7 @@ export const Route = createFileRoute('/blog/')({
   },
   component: BlogListPage,
 });
+
 function BlogListPage() {
   const { posts, totalPages, currentPage } = Route.useLoaderData();
   if (!websiteConfig.blog?.enable) {

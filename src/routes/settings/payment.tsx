@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { createFileRoute, useSearch } from '@tanstack/react-router';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { PaymentCard } from '@/components/payment/payment-card';
+
 export const Route = createFileRoute('/settings/payment')({
   validateSearch: (
     s
@@ -14,6 +15,7 @@ export const Route = createFileRoute('/settings/payment')({
   }),
   component: PaymentPage,
 });
+
 function PaymentPage() {
   const search = useSearch({ from: '/settings/payment' });
   const breadcrumbs = [

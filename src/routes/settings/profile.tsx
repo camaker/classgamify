@@ -3,9 +3,11 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { UpdateAvatarCard } from '@/components/settings/profile/update-avatar-card';
 import { UpdateNameCard } from '@/components/settings/profile/update-name-card';
 import { createFileRoute } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/settings/profile')({
   component: ProfilePage,
 });
+
 function ProfilePage() {
   const breadcrumbs = [
     { label: m.common_settings(), isCurrentPage: false },

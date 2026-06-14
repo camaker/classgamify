@@ -2,9 +2,11 @@ import { m } from '@/locale/paraglide/messages';
 import { createFileRoute } from '@tanstack/react-router';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { AdminUsersContent } from '@/components/admin/users/admin-users-content';
+
 export const Route = createFileRoute('/admin/users')({
   component: AdminUsersPage,
 });
+
 function AdminUsersPage() {
   const breadcrumbs = [
     { label: m.admin_title(), isCurrentPage: false },

@@ -5,6 +5,7 @@ import { authClient } from '@/auth/client';
 import { guestRouteMiddleware } from '@/middlewares/guest-middleware';
 import { websiteConfig } from '@/config/website';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
+
 export const Route = createFileRoute('/auth/login')({
   beforeLoad: async () => {
     if (!websiteConfig.auth?.enable) {
@@ -30,6 +31,7 @@ export const Route = createFileRoute('/auth/login')({
     ],
   }),
 });
+
 function LoginPage() {
   return (
     <div className="flex flex-col gap-4">

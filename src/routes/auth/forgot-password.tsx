@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
+
 export const Route = createFileRoute('/auth/forgot-password')({
   beforeLoad: () => {
     if (!websiteConfig.auth?.enable) {
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/auth/forgot-password')({
     ],
   }),
 });
+
 function ForgotPasswordPage() {
   return <ForgotPasswordForm />;
 }

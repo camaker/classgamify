@@ -4,6 +4,7 @@ import Container from '@/components/layout/container';
 import { WaitlistFormCard } from '@/components/waitlist/waitlist-form-card';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
+
 export const Route = createFileRoute('/(pages)/waitlist')({
   head: () =>
     seo('/waitlist', {
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/(pages)/waitlist')({
     }),
   component: WaitlistPage,
 });
+
 function WaitlistPage() {
   return (
     <Container className="py-16 px-4">

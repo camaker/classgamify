@@ -8,6 +8,7 @@ import { useCurrentPlan } from '@/hooks/use-payment';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/(pages)/pricing')({
   beforeLoad: () => {
     if (websiteConfig.payment?.enable === false) {
@@ -21,6 +22,7 @@ export const Route = createFileRoute('/(pages)/pricing')({
     }),
   component: PricingPage,
 });
+
 function PricingPage() {
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;

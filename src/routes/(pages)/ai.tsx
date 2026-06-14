@@ -11,6 +11,7 @@ import { AiTranslationCard } from '@/components/ai/ai-translation-card';
 import { AiTtsCard } from '@/components/ai/ai-tts-card';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
+
 export const Route = createFileRoute('/(pages)/ai')({
   head: () =>
     seo('/ai', {
@@ -19,6 +20,7 @@ export const Route = createFileRoute('/(pages)/ai')({
     }),
   component: AiPage,
 });
+
 function AiPage() {
   return (
     <Container className="py-16 px-4">

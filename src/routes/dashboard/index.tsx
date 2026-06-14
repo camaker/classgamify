@@ -5,9 +5,11 @@ import { DataTable } from '@/components/dashboard/data-table';
 import { SectionCards } from '@/components/dashboard/section-cards';
 import { createFileRoute } from '@tanstack/react-router';
 import data from './data.json';
+
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 });
+
 function DashboardPage() {
   const breadcrumbs = [
     {

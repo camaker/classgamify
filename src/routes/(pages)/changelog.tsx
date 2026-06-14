@@ -5,6 +5,7 @@ import { websiteConfig } from '@/config/website';
 import { getChangelogReleases } from '@/lib/changelog';
 import { seo } from '@/lib/seo';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/(pages)/changelog')({
   loader: () => {
     const releases = getChangelogReleases();
@@ -18,6 +19,7 @@ export const Route = createFileRoute('/(pages)/changelog')({
     }),
   component: ChangelogPage,
 });
+
 function ChangelogPage() {
   const releases = Route.useLoaderData();
   return (

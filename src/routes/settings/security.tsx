@@ -4,9 +4,11 @@ import { DeleteAccountCard } from '@/components/settings/security/delete-account
 import { PasswordCardWrapper } from '@/components/settings/security/password-card-wrapper';
 import { websiteConfig } from '@/config/website';
 import { createFileRoute } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/settings/security')({
   component: SecurityPage,
 });
+
 function SecurityPage() {
   const breadcrumbs = [
     { label: m.common_settings(), isCurrentPage: false },

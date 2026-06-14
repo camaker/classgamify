@@ -2,9 +2,11 @@ import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { FilesPageContent } from '@/components/settings/files/files-page-content';
 import { createFileRoute } from '@tanstack/react-router';
+
 export const Route = createFileRoute('/settings/files')({
   component: FilesPage,
 });
+
 function FilesPage() {
   const breadcrumbs = [
     { label: m.common_settings(), isCurrentPage: false },
