@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 export function AiTaglineCard() {
@@ -40,7 +41,7 @@ export function AiTaglineCard() {
         <CardDescription>
           {m.ai_page_tagline_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            @cf/meta/llama-3.1-8b-instruct
+            {WORKERS_AI_MODELS.tagline}
           </code>
         </CardDescription>
       </CardHeader>

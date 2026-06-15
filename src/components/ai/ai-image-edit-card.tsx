@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { FAL_IMAGE_EDIT_MODEL } from '@/config/ai-models';
 import { downloadFile } from '@/lib/download';
 import { cn } from '@/lib/utils';
 type PresetId = 'caricature' | 'pixar' | 'anime';
@@ -120,7 +121,7 @@ export function AiImageEditCard() {
         <CardDescription>
           {m.ai_page_image_edit_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            fal-ai/nano-banana/edit
+            {FAL_IMAGE_EDIT_MODEL}
           </code>
         </CardDescription>
       </CardHeader>

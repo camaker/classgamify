@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 export function AiSummarizationCard() {
@@ -42,7 +43,7 @@ export function AiSummarizationCard() {
         <CardDescription>
           {m.ai_page_summarization_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            @cf/facebook/bart-large-cnn
+            {WORKERS_AI_MODELS.summarization}
           </code>
         </CardDescription>
       </CardHeader>

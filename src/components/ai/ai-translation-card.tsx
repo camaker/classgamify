@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -90,7 +91,7 @@ export function AiTranslationCard() {
         <CardDescription>
           {m.ai_page_translation_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            @cf/meta/m2m100-1.2b
+            {WORKERS_AI_MODELS.translation}
           </code>
         </CardDescription>
       </CardHeader>
