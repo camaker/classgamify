@@ -70,9 +70,9 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
 - **deleteFile(key)** (server)
   - Deletes the object from R2. Used by `deleteUserFile` server function (e.g. Settings → Files, avatar cleanup).
 
-- **uploadUserFile** (server function, in `@/api/user-files`): Accepts `FormData` (file, optional folder, isPublic, description). Requires session via `authApiMiddleware`. Validates file size and type, uploads to R2, optionally inserts into `userFiles` table; returns `{ url, key }`. Used by `useUploadUserFile()` and `useUploadAvatarFile()`.
+- **uploadUserFile** (server function, in `@/api/user-files`): Accepts `FormData` (file, optional folder, isPublic, description). Requires session via `authApiMiddleware`. Validates file size and type, uploads to R2, optionally inserts into `userFiles` table; returns `{ url, key }`. Used by `useUploadUserFile()` and `useUploadUserAvatar()`.
 
-- **useUploadAvatarFile()** (client, in `@/hooks/use-user-files`): Mutation that uploads a file with `folder: 'avatars'` via `uploadUserFile`; returns `{ url, key }`. Used by the avatar upload card.
+- **useUploadUserAvatar()** (client, in `@/hooks/use-user-files`): Mutation that uploads a public file with `folder: 'avatars'` via `uploadUserFile`; returns `{ url, key }`. Used by the avatar upload card.
 
 - **useUploadUserFile()** (client, in `@/hooks/use-user-files`): Mutation that uploads a user file via `uploadUserFile`; used by Settings → Files.
 
@@ -85,7 +85,7 @@ Upload is implemented as a **server function** (`uploadUserFile` in `src/api/use
 
 ## Consumers
 
-- **Settings → Profile** (`UpdateAvatarCard`): When `websiteConfig.storage.enable` and `websiteConfig.features.enableUpdateAvatar` are true, the user can upload an avatar; the client uses `useUploadAvatarFile()` (which calls `uploadUserFile`) then updates `user.image` with the returned URL.
+- **Settings → Profile** (`UpdateAvatarCard`): When `websiteConfig.storage.enable` is true, the user can upload an avatar; the client uses `useUploadUserAvatar()` (which calls `uploadUserFile`) then updates `user.image` with the returned URL.
 - **Settings → Files**: List/delete/upload via server functions in `src/api/user-files.ts` (`listUserFiles`, `deleteUserFile`, `uploadUserFile`). Files are stored under `userFilesFolder`.
 
 ## Notes

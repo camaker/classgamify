@@ -40,7 +40,7 @@ Values are read by Vite from `.env*` during `pnpm dev` / `pnpm build` and inline
 | `VITE_UMAMI_WEBSITE_ID` | Umami Analytics | No | |
 | `VITE_UMAMI_SCRIPT` | Umami script URL | No | |
 | **Chat & support** | | | |
-| `VITE_CRISP_WEBSITE_ID` | Crisp chat | No | Requires `features.enableCrispChat: true` in `src/config/website.ts` |
+| `VITE_CRISP_WEBSITE_ID` | Crisp chat | No | When set, `CrispChat` loads the Crisp SDK after browser idle time |
 
 Do **not** put `VITE_*` in Wrangler `vars` or `wrangler secret`—they are build-time only.
 
