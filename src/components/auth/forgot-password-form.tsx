@@ -82,6 +82,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
                       {...field}
                       disabled={isPending}
                       placeholder={m.auth_forgot_password_placeholder_email()}
+                      autoComplete="email"
                       type="email"
                     />
                   </FormControl>

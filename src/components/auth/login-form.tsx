@@ -109,6 +109,7 @@ export function LoginForm({
                         {...field}
                         disabled={isPending}
                         placeholder={m.auth_login_placeholder_email()}
+                        autoComplete="email"
                         type="email"
                       />
                     </FormControl>
@@ -136,6 +137,7 @@ export function LoginForm({
                           {...field}
                           disabled={isPending}
                           placeholder={m.auth_login_placeholder_password()}
+                          autoComplete="current-password"
                           type={showPassword ? 'text' : 'password'}
                           className="pr-10"
                         />

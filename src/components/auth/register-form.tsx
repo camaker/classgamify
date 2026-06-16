@@ -100,6 +100,7 @@ export function RegisterForm({
                         {...field}
                         disabled={isPending}
                         placeholder={m.auth_register_placeholder_name()}
+                        autoComplete="name"
                       />
                     </FormControl>
                     <FormMessage />
@@ -117,6 +118,7 @@ export function RegisterForm({
                         {...field}
                         disabled={isPending}
                         placeholder={m.auth_register_placeholder_email()}
+                        autoComplete="email"
                         type="email"
                       />
                     </FormControl>
@@ -136,6 +138,7 @@ export function RegisterForm({
                           {...field}
                           disabled={isPending}
                           placeholder={m.auth_register_placeholder_password()}
+                          autoComplete="new-password"
                           type={showPassword ? 'text' : 'password'}
                           className="pr-10"
                         />

@@ -101,6 +101,7 @@ export function ResetPasswordForm() {
                         {...field}
                         disabled={isPending}
                         placeholder={m.auth_reset_password_placeholder_password()}
+                        autoComplete="new-password"
                         type={showPassword ? 'text' : 'password'}
                         className="pr-10"
                       />
