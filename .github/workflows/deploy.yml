@@ -13,9 +13,9 @@ concurrency:
 
 jobs:
   deploy:
-    name: Build & Deploy
+    name: Check, Build & Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       NODE_OPTIONS: '--max-old-space-size=4096'
       # --- Cloudflare credentials (needed by cf-typegen in postinstall) ---
@@ -37,8 +37,6 @@ jobs:
       VITE_UMAMI_WEBSITE_ID: ${{ secrets.VITE_UMAMI_WEBSITE_ID }}
       VITE_UMAMI_SCRIPT: ${{ secrets.VITE_UMAMI_SCRIPT }}
       VITE_CRISP_WEBSITE_ID: ${{ secrets.VITE_CRISP_WEBSITE_ID }}
-      VITE_AFFILIATE_AFFONSO_ID: ${{ secrets.VITE_AFFILIATE_AFFONSO_ID }}
-      VITE_AFFILIATE_PROMOTEKIT_ID: ${{ secrets.VITE_AFFILIATE_PROMOTEKIT_ID }}
 
     steps:
       - name: Checkout code
@@ -56,8 +54,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check locale messages
+        run: pnpm locale:check
+
+      - name: Check formatting and lint
+        run: pnpm check
+
       - name: Build
         run: pnpm build
 
       - name: Deploy to Cloudflare Workers
-        run: pnpx wrangler deploy
+        run: pnpm exec wrangler deploy
