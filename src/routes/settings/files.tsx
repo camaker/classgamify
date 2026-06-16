@@ -1,11 +1,11 @@
 import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { FilesPageContent } from '@/components/settings/files/files-page-content';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/files')({
   beforeLoad: () => {
-    throw notFound();
+    throw notFound({ routeId: rootRouteId });
   },
   component: FilesPage,
 });

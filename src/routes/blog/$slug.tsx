@@ -1,5 +1,10 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  rootRouteId,
+} from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { Markdown } from '@/components/markdown/markdown';
 import { getPostBySlug } from '@/lib/blog';
@@ -13,7 +18,7 @@ import { formatDate } from '@/lib/formatter';
 export const Route = createFileRoute('/blog/$slug')({
   beforeLoad: () => {
     if (!websiteConfig.blog?.enable) {
-      throw notFound();
+      throw notFound({ routeId: rootRouteId });
     }
   },
   loader: async ({ params }) => {

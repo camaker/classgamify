@@ -1,5 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
@@ -12,7 +12,7 @@ import { getLocale, localeConfig } from '@/lib/locale';
 export const Route = createFileRoute('/blog/')({
   beforeLoad: () => {
     if (!websiteConfig.blog?.enable) {
-      throw notFound();
+      throw notFound({ routeId: rootRouteId });
     }
   },
   validateSearch: (search: Record<string, unknown>) => ({

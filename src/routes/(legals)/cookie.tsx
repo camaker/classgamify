@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { MarkdownPage } from '@/components/page/markdown-page';
 import { getPageBySlug } from '@/lib/pages';
@@ -7,7 +7,7 @@ import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(legals)/cookie')({
   beforeLoad: () => {
-    throw notFound();
+    throw notFound({ routeId: rootRouteId });
   },
   loader: () => {
     const page = getPageBySlug('cookie');

@@ -1,5 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { ContactFormCard } from '@/components/contact/contact-form-card';
 import { websiteConfig } from '@/config/website';
@@ -7,7 +7,7 @@ import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(pages)/contact')({
   beforeLoad: () => {
-    throw notFound();
+    throw notFound({ routeId: rootRouteId });
   },
   head: () =>
     seo('/contact', {

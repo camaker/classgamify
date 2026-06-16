@@ -7,11 +7,11 @@ import { seo } from '@/lib/seo';
 import { getMailtoUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { IconBrandXFilled, IconMailFilled } from '@tabler/icons-react';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/about')({
   beforeLoad: () => {
-    throw notFound();
+    throw notFound({ routeId: rootRouteId });
   },
   head: () =>
     seo('/about', {

@@ -4,11 +4,11 @@ import Container from '@/components/layout/container';
 import { websiteConfig } from '@/config/website';
 import { getChangelogReleases } from '@/lib/changelog';
 import { seo } from '@/lib/seo';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/changelog')({
   beforeLoad: () => {
-    throw notFound();
+    throw notFound({ routeId: rootRouteId });
   },
   loader: () => {
     const releases = getChangelogReleases();
