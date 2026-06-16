@@ -2,6 +2,7 @@ export const Routes = {
   Root: '/',
 
   // Marketing routes
+  Learn: '/learn',
   Features: '/#features',
   Faqs: '/#faqs',
   Pricing: '/pricing',

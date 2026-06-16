@@ -1,33 +1,33 @@
 import { HanziPracticePage } from '@/components/learn/hanzi-practice-page';
-import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
+import { getLocale, localeConfig } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { getCanonicalUrl } from '@/lib/urls';
-import { getLocale, localeConfig } from '@/lib/locale';
 import { createFileRoute } from '@tanstack/react-router';
-import { m } from '@/locale/paraglide/messages';
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/learn')({
   head: () => {
-    const name = websiteConfig.metadata?.name ?? '';
     const title = m.learn_seo_title();
     const description = m.learn_seo_description();
-    const url = getCanonicalUrl('/');
+    const url = getCanonicalUrl(Routes.Learn);
     const inLanguage = localeConfig[getLocale()].hreflang;
-    const webSiteJsonLd = {
+    const courseJsonLd = {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name,
+      '@type': 'Course',
+      name: title,
       description,
       url,
       inLanguage,
     };
-    const metadata = seo('/', { title, description });
+    const metadata = seo(Routes.Learn, { title, description });
+
     return {
       ...metadata,
       scripts: [
         {
           type: 'application/ld+json',
-          children: JSON.stringify(webSiteJsonLd),
+          children: JSON.stringify(courseJsonLd),
         },
       ],
     };

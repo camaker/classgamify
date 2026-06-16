@@ -10,6 +10,7 @@ import {
   IconMail,
   IconMailbox,
   IconMicrophone,
+  IconPencil,
   IconPhoto,
   IconPhotoEdit,
   IconPhotoScan,
@@ -25,6 +26,7 @@ import { websiteConfig } from './website';
  */
 export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
+    { title: m.nav_learn(), href: Routes.Learn, icon: IconPencil },
     { title: m.nav_features(), href: Routes.Features, external: false },
   ];
   if (websiteConfig.payment?.enable) {
