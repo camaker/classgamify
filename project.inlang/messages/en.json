@@ -751,7 +751,7 @@
   "settings_security_update_password_show_password": "Show password",
   "settings_security_update_password_success": "Password updated successfully",
   "settings_security_update_password_title": "Change Password",
-  "site_description": "Lang Study is a language learning application built with TanStack Start and Cloudflare Workers.",
+  "site_description": "Lang Study helps you build language skills from scripts and characters to words, pronunciation, and real reading.",
   "site_name": "Lang Study",
   "site_title": "Lang Study",
   "waitlist_description": "Join the waitlist for early access and updates",

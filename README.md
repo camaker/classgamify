@@ -1,7 +1,10 @@
 # Lang Study
 
 A language learning application built with TanStack Start and Cloudflare
-Workers.
+Workers. The production domain is <https://getlangstudy.com>.
+
+The first learning track focuses on Chinese characters. The product is
+structured to grow into additional languages over time.
 
 This project is based on the
 [TanStarter](https://tanstarter.dev) SaaS template.

@@ -44,8 +44,16 @@
 
   // Custom domains
   // https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
-  // Add your production custom domain here after it is connected in Cloudflare.
-  "routes": [],
+  "routes": [
+    {
+      "pattern": "getlangstudy.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.getlangstudy.com",
+      "custom_domain": true
+    }
+  ],
 
   /**
    * Bindings
