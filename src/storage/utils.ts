@@ -12,11 +12,30 @@ export const PUBLIC_FOLDERS: readonly string[] = [
 ] as const;
 
 /**
+ * Normalize a folder path into safe storage key segments.
+ */
+export function sanitizeFolder(folder?: string): string | undefined {
+  if (!folder) return undefined;
+
+  const segments = folder
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter((segment) => segment && segment !== '.' && segment !== '..');
+
+  if (segments.length === 0) return undefined;
+
+  return segments
+    .map((segment) => segment.replace(/[^a-zA-Z0-9._-]/g, '-'))
+    .join('/');
+}
+
+/**
  * Check if a folder is a public folder (shared resource, no user scoping).
  */
 export function isPublicFolder(folder?: string): boolean {
-  if (!folder) return false;
+  const normalizedFolder = sanitizeFolder(folder);
+  if (!normalizedFolder) return false;
   return PUBLIC_FOLDERS.some(
-    (pf) => folder === pf || folder.startsWith(`${pf}/`)
+    (pf) => normalizedFolder === pf || normalizedFolder.startsWith(`${pf}/`)
   );
 }
