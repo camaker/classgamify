@@ -385,16 +385,16 @@ function HanziPracticeCard({
         character.character,
         {
           delayBetweenStrokes: 280,
-          drawingColor: 'rgb(15 23 42)',
+          drawingColor: '#0f172a',
           height: size,
-          highlightColor: 'rgb(14 165 233)',
-          outlineColor: 'rgb(148 163 184)',
+          highlightColor: '#0ea5e9',
+          outlineColor: '#94a3b8',
           padding: 16,
-          radicalColor: 'rgb(16 185 129)',
+          radicalColor: '#10b981',
           showCharacter: false,
           showOutline: true,
           strokeAnimationSpeed: 1,
-          strokeColor: 'rgb(15 23 42)',
+          strokeColor: '#0f172a',
           width: size,
         }
       );
