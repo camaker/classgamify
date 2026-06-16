@@ -7,7 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import type { LessonCharacter } from '@/learn/hanzi-course';
+import {
+  getPracticeTargetCharacter,
+  getWorksheetCharactersForCharacter,
+  type LessonCharacter,
+} from '@/learn/hanzi-course';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -23,6 +27,14 @@ import { Link } from '@tanstack/react-router';
 export function HanziDetailPage({ character }: { character: LessonCharacter }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getHanziDetailCopy(currentLocale);
+  const worksheetCharacters = getWorksheetCharactersForCharacter(
+    character.character,
+    currentLocale
+  );
+  const practiceTarget = getPracticeTargetCharacter(
+    character.character,
+    currentLocale
+  );
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -64,16 +76,23 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                       {copy.description(character.meaning)}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      <Link to={Routes.Learn} className={buttonVariants()}>
+                      <Link
+                        to={Routes.Learn}
+                        search={{ character: practiceTarget }}
+                        className={buttonVariants()}
+                      >
                         <IconPencil className="size-4" />
                         {copy.practiceCta}
                       </Link>
                       <Link
                         to={Routes.Worksheets}
+                        search={{ characters: worksheetCharacters }}
                         className={cn(buttonVariants({ variant: 'outline' }))}
                       >
                         <IconFileText className="size-4" />
-                        {copy.worksheetCta}
+                        {character.premium
+                          ? copy.worksheetLockedCta
+                          : copy.worksheetCta}
                       </Link>
                     </div>
                   </div>
@@ -156,11 +175,16 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                   {copy.courseCta}
                 </Link>
                 <Link
-                  to={Routes.Pricing}
+                  to={character.premium ? Routes.Pricing : Routes.Worksheets}
+                  search={
+                    character.premium
+                      ? undefined
+                      : { characters: worksheetCharacters }
+                  }
                   className={cn(buttonVariants(), 'justify-start')}
                 >
                   <IconLock className="size-4" />
-                  {copy.pricingCta}
+                  {character.premium ? copy.pricingCta : copy.previewCta}
                 </Link>
               </CardContent>
             </Card>
@@ -210,6 +234,8 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
         `${character} (${pinyin}) 怎么写`,
       titleEyebrow: 'HSK1 入门汉字',
       worksheetCta: '打印练习纸',
+      worksheetLockedCta: '生成练习纸',
+      previewCta: '查看练习纸',
     };
   }
 
@@ -243,5 +269,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       `How to write ${character} (${pinyin})`,
     titleEyebrow: 'HSK1 starter character',
     worksheetCta: 'Print worksheet',
+    worksheetLockedCta: 'Create worksheet',
+    previewCta: 'See worksheet',
   };
 }

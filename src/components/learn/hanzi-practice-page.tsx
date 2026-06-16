@@ -148,7 +148,11 @@ function writeStoredProgress(progress: StoredProgress) {
   window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
 }
 
-export function HanziPracticePage() {
+export function HanziPracticePage({
+  initialCharacter,
+}: {
+  initialCharacter?: string;
+}) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getPracticeCopy(currentLocale);
   const lessonCharacters = useMemo(
@@ -156,7 +160,11 @@ export function HanziPracticePage() {
     [currentLocale]
   );
   const courseStats = useMemo(() => getCourseStats(), []);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const initialIndex = Math.max(
+    lessonCharacters.findIndex((item) => item.character === initialCharacter),
+    0
+  );
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState<StoredProgress>({});
   const currentCharacter = lessonCharacters[currentIndex];
   const completedCount = lessonCharacters.filter(
@@ -170,6 +178,10 @@ export function HanziPracticePage() {
   useEffect(() => {
     setProgress(readStoredProgress());
   }, []);
+
+  useEffect(() => {
+    setCurrentIndex(initialIndex);
+  }, [initialIndex]);
 
   const saveProgress = useCallback(
     (character: string, nextProgress: CharacterProgress) => {
@@ -186,16 +198,24 @@ export function HanziPracticePage() {
   );
 
   const resetLesson = useCallback(() => {
-    setCurrentIndex(0);
+    setCurrentIndex(initialIndex);
     setProgress({});
     writeStoredProgress({});
-  }, []);
+  }, [initialIndex]);
 
   const goToNext = useCallback(() => {
     setCurrentIndex((index) =>
       Math.min(index + 1, lessonCharacters.length - 1)
     );
   }, [lessonCharacters.length]);
+
+  const worksheetCharacters = useMemo(
+    () =>
+      lessonCharacters
+        .filter((item) => !item.premium)
+        .map((item) => item.character),
+    [lessonCharacters]
+  );
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -220,7 +240,11 @@ export function HanziPracticePage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Link to={Routes.Worksheets} className={buttonVariants()}>
+                <Link
+                  to={Routes.Worksheets}
+                  search={{ characters: worksheetCharacters }}
+                  className={buttonVariants()}
+                >
                   <IconFileText className="size-4" />
                   {copy.worksheetCta}
                 </Link>
@@ -630,6 +654,7 @@ function HanziPracticeCard({
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 to={Routes.Worksheets}
+                search={{ characters: worksheetCharacters }}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconFileText className="size-4" />

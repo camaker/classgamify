@@ -19,21 +19,38 @@ import {
   IconRefresh,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 
-export function WorksheetPage() {
+export function WorksheetPage({
+  initialCharacters,
+}: {
+  initialCharacters?: string[];
+}) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getWorksheetCopy(currentLocale);
   const characters = useMemo(
     () => getFreeCharacters(currentLocale),
     [currentLocale]
   );
+  const initialSelectedCharacters = useMemo(() => {
+    const filtered = initialCharacters?.filter((character) =>
+      characters.some((item) => item.character === character)
+    );
+    if (filtered && filtered.length > 0) {
+      return filtered;
+    }
+    return characters.slice(0, 6).map((item) => item.character);
+  }, [characters, initialCharacters]);
   const [selectedCharacters, setSelectedCharacters] = useState<string[]>(
-    characters.slice(0, 6).map((item) => item.character)
+    initialSelectedCharacters
   );
   const [gridCount, setGridCount] = useState<(typeof GRID_OPTIONS)[number]>(9);
+
+  useEffect(() => {
+    setSelectedCharacters(initialSelectedCharacters);
+  }, [initialSelectedCharacters]);
 
   const selectedItems = characters.filter((item) =>
     selectedCharacters.includes(item.character)
@@ -50,7 +67,7 @@ export function WorksheetPage() {
   };
 
   const resetSelection = () => {
-    setSelectedCharacters(characters.slice(0, 6).map((item) => item.character));
+    setSelectedCharacters(initialSelectedCharacters);
     setGridCount(9);
   };
 

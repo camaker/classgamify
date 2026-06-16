@@ -303,6 +303,48 @@ export function findHsk1Character(
   );
 }
 
+export function getPracticeTargetCharacter(
+  character: string,
+  locale: CourseLocale = 'en'
+) {
+  const lessonCharacter = findHsk1Character(character, locale);
+  if (!lessonCharacter) {
+    return getFreeCharacters(locale)[0]?.character;
+  }
+
+  if (!lessonCharacter.premium) {
+    return lessonCharacter.character;
+  }
+
+  const lesson = getHsk1CourseLessons(locale).find(
+    (item) => item.id === lessonCharacter.lesson
+  );
+  return (
+    lesson?.characters.find((item) => !item.premium)?.character ??
+    getFreeCharacters(locale)[0]?.character
+  );
+}
+
+export function getWorksheetCharactersForCharacter(
+  character: string,
+  locale: CourseLocale = 'en'
+) {
+  const lessonCharacter = findHsk1Character(character, locale);
+  if (!lessonCharacter) {
+    return getFreeCharacters(locale).map((item) => item.character);
+  }
+
+  const lesson = getHsk1CourseLessons(locale).find(
+    (item) => item.id === lessonCharacter.lesson
+  );
+  return (
+    lesson?.characters
+      .filter((item) => !item.premium)
+      .map((item) => item.character) ??
+    getFreeCharacters(locale).map((item) => item.character)
+  );
+}
+
 export function getCourseStats() {
   const free = getFreeCharacters();
   const locked = getLockedCharacters();

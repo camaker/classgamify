@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import {
   getCourseStats,
+  getFreeCharacters,
   getHanziPath,
   getHsk1CourseLessons,
   type CourseLesson,
@@ -37,6 +38,10 @@ export function HskCoursePage() {
     [currentLocale]
   );
   const stats = useMemo(() => getCourseStats(), []);
+  const freeCharacters = useMemo(
+    () => getFreeCharacters(currentLocale).map((item) => item.character),
+    [currentLocale]
+  );
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -58,12 +63,17 @@ export function HskCoursePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link to={Routes.Learn} className={buttonVariants()}>
+              <Link
+                to={Routes.Learn}
+                search={{ character: freeCharacters[0] }}
+                className={buttonVariants()}
+              >
                 <IconPencil className="size-4" />
                 {copy.practiceCta}
               </Link>
               <Link
                 to={Routes.Worksheets}
+                search={{ characters: freeCharacters }}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconFileText className="size-4" />
