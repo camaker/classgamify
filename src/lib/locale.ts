@@ -92,6 +92,7 @@ export function getCanonicalPathname(pathname: string) {
 export const LOCALIZED_PATHS = new Set([
   '/',
   '/learn',
+  '/worksheets',
   '/about',
   '/ai',
   '/blog',

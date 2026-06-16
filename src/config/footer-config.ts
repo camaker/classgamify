@@ -5,6 +5,23 @@ import type { MenuItemConfig } from '../types';
  * Footer links, grouped by section
  */
 export function getFooterLinks(): MenuItemConfig[] {
+  const productItems: MenuItemConfig[] = [
+    {
+      title: m.nav_learn(),
+      href: Routes.Learn,
+      external: false,
+    },
+    {
+      title: 'Worksheets',
+      href: Routes.Worksheets,
+      external: false,
+    },
+    {
+      title: m.nav_pricing(),
+      href: Routes.Pricing,
+      external: false,
+    },
+  ];
   const legalItems: MenuItemConfig[] = [
     {
       title: m.nav_privacy_policy_title(),
@@ -17,5 +34,8 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
   ];
-  return [{ title: m.nav_legal(), items: legalItems }];
+  return [
+    { title: m.nav_product(), items: productItems },
+    { title: m.nav_legal(), items: legalItems },
+  ];
 }

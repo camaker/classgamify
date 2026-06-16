@@ -13,7 +13,6 @@ const disallowedPaths = [
   '/changelog',
   '/contact',
   '/cookie',
-  '/pricing',
   '/roadmap',
   '/test-404',
   '/test-error',

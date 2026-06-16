@@ -1,6 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
-import { IconPencil } from '@tabler/icons-react';
+import { IconFileText, IconPencil, IconSparkles } from '@tabler/icons-react';
 import type { MenuItemConfig } from '../types';
 /**
  * Navbar links
@@ -8,6 +8,7 @@ import type { MenuItemConfig } from '../types';
 export function getNavbarLinks(): MenuItemConfig[] {
   return [
     { title: m.nav_learn(), href: Routes.Learn, icon: IconPencil },
-    { title: m.nav_features(), href: Routes.Features, external: false },
+    { title: 'Worksheets', href: Routes.Worksheets, icon: IconFileText },
+    { title: m.nav_pricing(), href: Routes.Pricing, icon: IconSparkles },
   ];
 }

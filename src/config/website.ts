@@ -117,14 +117,14 @@ export const websiteConfig: WebsiteConfig = {
             {
               type: 'subscription',
               priceId: priceIds.proMonthly,
-              amount: 990,
+              amount: 699,
               currency: 'USD',
               interval: 'month',
             },
             {
               type: 'subscription',
               priceId: priceIds.proYearly,
-              amount: 9900,
+              amount: 4900,
               currency: 'USD',
               interval: 'year',
             },
@@ -151,7 +151,7 @@ export const websiteConfig: WebsiteConfig = {
             {
               type: 'one_time',
               priceId: priceIds.lifetime,
-              amount: 19900,
+              amount: 7900,
               currency: 'USD',
               allowPromotionCode: true,
             },

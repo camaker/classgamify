@@ -1,6 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,16 +9,28 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import {
+  getCourseStats,
+  getFreeCharacters,
+  type LessonCharacter,
+} from '@/learn/hanzi-course';
+import { getLocale } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
+  IconBook2,
   IconCheck,
   IconCircleCheck,
+  IconFileText,
+  IconLock,
   IconPencil,
   IconPlayerPlay,
   IconReload,
   IconRotate,
+  IconSparkles,
 } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const HANZI_WRITER_SCRIPT =
@@ -57,14 +69,6 @@ type HanziWriterStatic = {
     character: string,
     options: Record<string, unknown>
   ) => HanziWriterInstance;
-};
-
-type LessonCharacter = {
-  character: string;
-  pinyin: string;
-  meaning: string;
-  hint: string;
-  strokes: number;
 };
 
 type CharacterProgress = {
@@ -144,34 +148,14 @@ function writeStoredProgress(progress: StoredProgress) {
   window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
 }
 
-function getLessonCharacters(): LessonCharacter[] {
-  return [
-    {
-      character: '人',
-      pinyin: 'rén',
-      meaning: m.learn_character_ren_meaning(),
-      hint: m.learn_character_ren_hint(),
-      strokes: 2,
-    },
-    {
-      character: '口',
-      pinyin: 'kǒu',
-      meaning: m.learn_character_kou_meaning(),
-      hint: m.learn_character_kou_hint(),
-      strokes: 3,
-    },
-    {
-      character: '日',
-      pinyin: 'rì',
-      meaning: m.learn_character_ri_meaning(),
-      hint: m.learn_character_ri_hint(),
-      strokes: 4,
-    },
-  ];
-}
-
 export function HanziPracticePage() {
-  const lessonCharacters = useMemo(() => getLessonCharacters(), []);
+  const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
+  const copy = getPracticeCopy(currentLocale);
+  const lessonCharacters = useMemo(
+    () => getFreeCharacters(currentLocale),
+    [currentLocale]
+  );
+  const courseStats = useMemo(() => getCourseStats(), []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState<StoredProgress>({});
   const currentCharacter = lessonCharacters[currentIndex];
@@ -219,22 +203,40 @@ export function HanziPracticePage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
           <div className="flex flex-col gap-5">
             <div className="space-y-4">
-              <Badge variant="outline" className="border-primary/30">
-                {m.learn_badge()}
-              </Badge>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="border-primary/30">
+                  {copy.badge}
+                </Badge>
+                <Badge variant="secondary">
+                  {copy.freeBadge(courseStats.free)}
+                </Badge>
+              </div>
               <div className="space-y-3">
                 <h1 className="text-balance text-3xl font-semibold tracking-normal sm:text-4xl">
-                  {m.learn_title()}
+                  {copy.title}
                 </h1>
                 <p className="max-w-2xl text-base text-muted-foreground">
-                  {m.learn_description()}
+                  {copy.description}
                 </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link to={Routes.Worksheets} className={buttonVariants()}>
+                  <IconFileText className="size-4" />
+                  {copy.worksheetCta}
+                </Link>
+                <Link
+                  to={Routes.Pricing}
+                  className={cn(buttonVariants({ variant: 'outline' }))}
+                >
+                  <IconSparkles className="size-4" />
+                  {copy.packCta}
+                </Link>
               </div>
             </div>
 
             <Card className="rounded-lg">
               <CardHeader>
-                <CardTitle>{m.learn_progress_title()}</CardTitle>
+                <CardTitle>{copy.courseTitle}</CardTitle>
                 <CardDescription>
                   {m.learn_progress_description({
                     completed: completedCount,
@@ -244,7 +246,7 @@ export function HanziPracticePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Progress value={progressValue} />
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   {lessonCharacters.map((item, index) => {
                     const done = progress[item.character]?.completed;
                     const active = index === currentIndex;
@@ -288,7 +290,7 @@ export function HanziPracticePage() {
               </CardContent>
             </Card>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {lessonCharacters.map((item) => (
                 <div
                   key={item.character}
@@ -310,9 +312,52 @@ export function HanziPracticePage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     {item.hint}
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {item.examples.map((example) => (
+                      <Badge
+                        key={example}
+                        variant="outline"
+                        className="rounded-md"
+                      >
+                        {example}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
+
+            <Card className="rounded-lg border-primary/20 bg-primary/5">
+              <CardHeader className="pb-3">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-background p-2 ring-1 ring-border">
+                    <IconBook2 className="size-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">
+                      {copy.packTitle}
+                    </CardTitle>
+                    <CardDescription>{copy.packDescription}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {[
+                    copy.statCharacters(courseStats.total),
+                    copy.statStrokes(courseStats.strokes),
+                    copy.statWorksheets,
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-lg border bg-background/80 p-3 text-sm"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <HanziPracticeCard
@@ -581,12 +626,69 @@ function HanziPracticeCard({
         {lessonComplete ? (
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
             <p className="font-medium">{m.learn_summary_title()}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {m.learn_summary_description()}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.summary}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                to={Routes.Worksheets}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconFileText className="size-4" />
+                {copy.makeWorksheetCta}
+              </Link>
+              <Link to={Routes.Pricing} className={buttonVariants()}>
+                <IconLock className="size-4" />
+                {copy.seePackCta}
+              </Link>
+            </div>
           </div>
         ) : null}
       </CardContent>
     </Card>
   );
+}
+
+function getPracticeCopy(locale: 'en' | 'zh') {
+  if (locale === 'zh') {
+    return {
+      badge: 'HSK1 入门课程',
+      courseTitle: 'HSK1 课程预览',
+      description:
+        '从一条实用的 HSK1 路径开始：观看笔顺、跟着描写、在本浏览器保存进度，并把同一组汉字生成可打印练习纸。',
+      freeBadge: (count: number) => `${count} 个免费汉字`,
+      makeWorksheetCta: '制作练习纸',
+      packCta: '查看 HSK1 套餐',
+      packDescription:
+        '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
+      packTitle: '继续学习完整 HSK1 路径',
+      seePackCta: '查看套餐',
+      statCharacters: (count: number) => `${count}+ 个启动汉字`,
+      statStrokes: (count: number) => `${count} 个引导笔画`,
+      statWorksheets: '练习纸已就绪',
+      summary:
+        '你已经完成免费入门组。下一步可以生成打印练习纸，或继续查看完整 HSK1 学习路径。',
+      title: '通过书写学会中文汉字',
+      worksheetCta: '生成练习纸',
+    };
+  }
+
+  return {
+    badge: 'HSK1 starter course',
+    courseTitle: 'HSK1 course preview',
+    description:
+      'Start with a practical HSK1 path: watch stroke order, trace each character, save progress in this browser, then turn the same set into printable practice sheets.',
+    freeBadge: (count: number) => `${count} free characters`,
+    makeWorksheetCta: 'Make worksheet',
+    packCta: 'View HSK1 pack',
+    packDescription:
+      'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
+    packTitle: 'Continue with the full HSK1 path',
+    seePackCta: 'See paid pack',
+    statCharacters: (count: number) => `${count}+ launch characters`,
+    statStrokes: (count: number) => `${count} guided strokes`,
+    statWorksheets: 'Worksheets ready',
+    summary:
+      'You finished the free starter set. Generate a printable worksheet now, or continue into the full HSK1 path.',
+    title: 'Learn Chinese characters by writing them',
+    worksheetCta: 'Create worksheet',
+  };
 }

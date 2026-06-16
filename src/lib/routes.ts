@@ -3,6 +3,7 @@ export const Routes = {
 
   // Marketing routes
   Learn: '/learn',
+  Worksheets: '/worksheets',
   Features: '/#features',
   Faqs: '/#faqs',
   Pricing: '/pricing',

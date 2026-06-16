@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorksheetsRouteImport } from './routes/worksheets'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -54,6 +55,11 @@ import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/cree
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const WorksheetsRoute = WorksheetsRouteImport.update({
+  id: '/worksheets',
+  path: '/worksheets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -375,6 +383,7 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/worksheets': typeof WorksheetsRoute
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
   '/(legals)/terms': typeof legalsTermsRoute
@@ -423,6 +432,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/worksheets'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/worksheets'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/worksheets'
     | '/(legals)/cookie'
     | '/(legals)/privacy'
     | '/(legals)/terms'
@@ -559,6 +571,7 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WorksheetsRoute: typeof WorksheetsRoute
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
   legalsTermsRoute: typeof legalsTermsRoute
@@ -582,6 +595,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/worksheets': {
+      id: '/worksheets'
+      path: '/worksheets'
+      fullPath: '/worksheets'
+      preLoaderRoute: typeof WorksheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -971,6 +991,7 @@ const rootRouteChildren: RootRouteChildren = {
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WorksheetsRoute: WorksheetsRoute,
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,
   legalsTermsRoute: legalsTermsRoute,
