@@ -99,3 +99,18 @@ Enforced by Biome (`biome.json`):
 
 ### Cloudflare Workers Constraint
 Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Node.js.
+
+## Deploy Configuration
+- Platform: GitHub Actions deploying to Cloudflare Workers
+- Production URL: https://getlangstudy.com
+- Deploy workflow: `.github/workflows/deploy.yml`
+- Deploy trigger: automatic on push to `main`, or manual `workflow_dispatch`
+- Pre-deploy checks: `pnpm locale:check`, `pnpm check`, `pnpm build`
+- Deploy command: `pnpm exec wrangler deploy`
+- Health check: `https://getlangstudy.com`
+
+GitHub Actions needs these repository secrets: `VITE_BASE_URL`,
+`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, and
+`CLOUDFLARE_DATABASE_ID`. Runtime secrets such as `BETTER_AUTH_SECRET`, OAuth
+keys, mail keys, payment keys, webhook secrets, and AI provider keys belong in
+Cloudflare Worker secrets, not committed files.
