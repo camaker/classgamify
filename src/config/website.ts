@@ -69,8 +69,8 @@ export const websiteConfig: WebsiteConfig = {
   mail: {
     enable: false,
     provider: 'cloudflare',
-    fromEmail: 'Lang Study <support@example.com>',
-    supportEmail: 'Lang Study <support@example.com>',
+    fromEmail: 'Lang Study <support@getlangstudy.com>',
+    supportEmail: 'Lang Study <support@getlangstudy.com>',
   },
   newsletter: {
     enable: false,

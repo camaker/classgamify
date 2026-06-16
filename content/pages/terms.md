@@ -1,50 +1,94 @@
 ---
 title: Terms of Service
-description: The terms and conditions governing the use of our services
-date: 2026-02-15
+description: Terms for using Lang Study's learning tools
+date: 2026-06-17
 ---
 
-## Introduction
+## Agreement
 
-These Terms of Service ("Terms") govern your use of our website and services. By accessing or using our services, you agree to be bound by these Terms.
+These Terms govern your use of Lang Study, a language-learning website for
+practicing writing systems, starting with Chinese characters, stroke order,
+guided tracing, and printable worksheets. By using Lang Study, you agree to
+these Terms.
 
-## Use of Services
+## Learning Product
 
-Our services are provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that our services will be uninterrupted, secure, or error-free.
+Lang Study provides educational tools, practice content, worksheets, and related
+learning workflows. We try to make the material useful and accurate, but we do
+not guarantee exam results, language proficiency, or uninterrupted learning
+progress.
 
-## User Accounts
+## Accounts
 
-When you create an account with us, you must provide accurate and complete information. You are responsible for safeguarding your account and for all activities that occur under your account.
+Some features may require an account. You are responsible for the accuracy of
+your account information, the security of your password, and activity under your
+account. Please contact us if you believe your account has been compromised.
 
-## Intellectual Property
+## Free and Paid Features
 
-Our website and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.
+Lang Study may offer free starter content and paid plans such as expanded HSK
+character packs, review history, custom lists, worksheet tools, or lifetime
+access. Paid features are only available when checkout and payment processing are
+enabled. If a paid purchase is offered, payment terms shown at checkout apply.
 
-## User Content
-
-You retain all rights to any content you submit, post, or display on or through our services. By submitting content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and distribute your content.
-
-## Prohibited Activities
+## Acceptable Use
 
 You agree not to:
 
-- Use our services in any way that violates any applicable law or regulation
-- Engage in any conduct that restricts or inhibits anyone's use or enjoyment of our services
-- Attempt to gain unauthorized access to our servers or networks
-- Use our services to distribute malware or other harmful code
+- use Lang Study for unlawful, abusive, or harmful activity
+- attempt to disrupt, overload, reverse engineer, or gain unauthorized access to
+  the service
+- upload, submit, or transmit malware, spam, or deceptive content
+- copy, resell, or redistribute paid content or worksheets as a competing product
+- interfere with another user's ability to use the service
+
+## Content and Worksheets
+
+Lang Study owns or licenses the product design, source code, learning structure,
+and original content we provide. You may use generated worksheets for personal
+learning, tutoring, family use, or classroom practice. You may not sell Lang
+Study worksheets, remove branding from paid materials where present, or package
+them as a separate commercial product without permission.
+
+## User Content and Feedback
+
+If you send feedback, support requests, custom lists, or other content to Lang
+Study, you keep your rights to that content. You give us permission to use it as
+needed to provide support, operate the product, improve learning features, and
+respond to your request.
+
+## Third-Party Services
+
+Lang Study may use third-party services for hosting, analytics, authentication,
+email, payments, and stroke-order data. We are not responsible for third-party
+services, outages, or policies, but we choose them to support the product.
+
+## Changes and Availability
+
+We may change, pause, or discontinue parts of Lang Study as the product evolves.
+We aim to keep the service available, but it is provided on an "as is" and "as
+available" basis.
 
 ## Termination
 
-We may terminate or suspend your account and access to our services immediately, without prior notice or liability, for any reason.
+We may suspend or terminate access if a user violates these Terms, creates
+security risk, abuses the service, or uses Lang Study in a way that harms other
+users or the product.
 
 ## Limitation of Liability
 
-In no event shall we be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our services.
+To the maximum extent permitted by law, Lang Study is not liable for indirect,
+incidental, special, consequential, or punitive damages arising from your use of
+the service.
 
-## Changes to Terms
+## Updates to These Terms
 
-We reserve the right to modify these Terms at any time. If we make changes, we will provide notice by posting the updated Terms on this page.
+We may update these Terms as the product adds new languages, learning tools,
+commercial plans, or account features. The latest version will be posted on this
+page with an updated date.
 
 ## Contact Us
 
-If you have any questions about these Terms, please [contact us](/contact).
+Questions about these Terms can be sent to
+[support@getlangstudy.com](mailto:support@getlangstudy.com), or through the
+[contact page](/contact).
