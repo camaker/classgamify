@@ -99,3 +99,24 @@ Enforced by Biome (`biome.json`):
 
 ### Cloudflare Workers Constraint
 Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Node.js.
+
+## Deploy Configuration (configured by /setup-deploy)
+- Platform: GitHub Actions deploying to Cloudflare Workers
+- Production URL: https://getlangstudy.com
+- Deploy workflow: .github/workflows/deploy.yml
+- Deploy status command: GitHub Actions workflow status, then poll production URL
+- Merge method: push to main
+- Project type: web app
+- Post-deploy health check: https://getlangstudy.com
+
+### Custom deploy hooks
+- Pre-merge: pnpm locale:check && pnpm check && pnpm build
+- Deploy trigger: automatic on push to main or manual workflow_dispatch
+- Deploy status: GitHub Actions workflow status
+- Health check: https://getlangstudy.com
+
+### Production secrets
+- GitHub Actions secrets: VITE_BASE_URL, CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_API_TOKEN, CLOUDFLARE_DATABASE_ID
+- Cloudflare Worker secrets: BETTER_AUTH_SECRET and any enabled OAuth, mail,
+  newsletter, payment, notification, or AI provider keys
