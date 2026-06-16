@@ -54,14 +54,11 @@ export const websiteConfig: WebsiteConfig = {
     },
   },
   social: {
-    github: 'https://github.com/MkFastHQ',
-    discord: 'https://mksaas.link/discord',
-    twitter: 'https://x.com/TanStarter',
-    youtube: 'https://www.youtube.com/@TanStarter',
+    github: 'https://github.com/camaker/lang-study',
   },
   auth: {
     enable: true,
-    enableGoogleLogin: true,
+    enableGoogleLogin: false,
     enableCredentialLogin: true,
     enableDeleteAccount: true,
   },
@@ -70,18 +67,18 @@ export const websiteConfig: WebsiteConfig = {
     paginationSize: 6,
   },
   mail: {
-    enable: true,
+    enable: false,
     provider: 'cloudflare',
-    fromEmail: 'TanStarter <support@tanstarter.dev>',
-    supportEmail: 'TanStarter <support@tanstarter.dev>',
+    fromEmail: 'Lang Study <support@example.com>',
+    supportEmail: 'Lang Study <support@example.com>',
   },
   newsletter: {
-    enable: true,
+    enable: false,
     provider: 'resend',
-    autoSubscribeAfterSignUp: true,
+    autoSubscribeAfterSignUp: false,
   },
   notification: {
-    enable: true,
+    enable: false,
     provider: 'discord',
   },
   storage: {

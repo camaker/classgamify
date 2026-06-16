@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mkfast-template",
+  "name": "lang-study",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": [
     // Enable Node.js API
@@ -44,12 +44,8 @@
 
   // Custom domains
   // https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
-  "routes": [
-    {
-      "pattern": "demo.tanstarter.dev",
-      "custom_domain": true
-    }
-  ],
+  // Add your production custom domain here after it is connected in Cloudflare.
+  "routes": [],
 
   /**
    * Bindings
@@ -58,22 +54,22 @@
    * https://developers.cloudflare.com/workers/runtime-apis/bindings/
    */
   /**
-   * D1: create database with `npx wrangler d1 create mkfast-template`
+   * D1: create database with `npx wrangler d1 create lang-study`
    */
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "mkfast-template",
-      "database_id": "dc34f04a-3445-4b5c-bf61-c4ec2328e239",
+      "database_name": "lang-study",
+      "database_id": "885df2bc-1419-458c-b8b6-0821eddfb399",
       "migrations_dir": "./src/db/migrations"
     }
   ],
   /**
-   * R2: create bucket with `npx wrangler r2 bucket create mkfast-template`
+   * R2: create bucket with `npx wrangler r2 bucket create lang-study`
    */
   "r2_buckets": [
     {
-      "bucket_name": "mkfast-template",
+      "bucket_name": "lang-study",
       "binding": "BUCKET"
     }
   ]

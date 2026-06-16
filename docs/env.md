@@ -50,7 +50,7 @@ Do **not** put `VITE_*` in Wrangler `vars` or `wrangler secret`—they are build
 
 Read at **Worker request time**. Used for secrets, API keys, and server-only config.
 
-**Where to set:** Local → `.env.local` (loaded into `process.env` by the dev process). Cloudflare Workers → **`wrangler secret put <NAME>`** for secrets, or **`vars`** in `wrangler.jsonc` for non-sensitive values. With `nodejs_compat_populate_process_env` enabled, vars and secrets appear on `process.env`. D1/R2 and other **bindings** are accessed via `env.DB`, `env.FILES`, etc., not `process.env`.
+**Where to set:** Local → `.env.local` (loaded into `process.env` by the dev process). Cloudflare Workers → **`wrangler secret put <NAME>`** for secrets, or **`vars`** in `wrangler.jsonc` for non-sensitive values. With `nodejs_compat_populate_process_env` enabled, vars and secrets appear on `process.env`. D1/R2 and other **bindings** are accessed via `env.DB`, `env.BUCKET`, etc., not `process.env`.
 
 ### Variables
 

@@ -10,20 +10,20 @@ The storage module provides file upload (and optional delete) using **Cloudflare
    npx wrangler r2 bucket create <BUCKET_NAME>
    ```
 
-   Use the same name as `bucket_name` in `wrangler.jsonc` (e.g. `mkfast-template`).
+   Use the same name as `bucket_name` in `wrangler.jsonc` (e.g. `lang-study`).
 
 2. **Configure the bucket in `wrangler.jsonc`**:
 
    ```jsonc
    "r2_buckets": [
      {
-       "bucket_name": "mkfast-template",
-       "binding": "FILES"
+      "bucket_name": "lang-study",
+      "binding": "BUCKET"
      }
    ]
    ```
 
-   The Worker receives the bucket as `env.FILES`. No extra env vars are required for upload/serve.
+   The Worker receives the bucket as `env.BUCKET`. No extra env vars are required for upload/serve.
 
 3. **Enable storage in website config** (`src/config/website.ts`):
 
@@ -58,7 +58,7 @@ src/storage/
   - `userFilesFolder`: Parent folder for per-user files (e.g. `'userfiles'`); used by Settings → Files and upload API.
 
 - **wrangler.jsonc**
-  - `r2_buckets`: Bind the R2 bucket with `binding: "FILES"` (and `bucket_name`). `getR2Bucket()` in `provider/r2.ts` reads `env.FILES` and is exported from `@/storage`.
+  - `r2_buckets`: Bind the R2 bucket with `binding: "BUCKET"` (and `bucket_name`). `R2Provider` in `provider/r2.ts` reads `env.BUCKET` and is exported from `@/storage`.
 
 Files are always served via the same-origin route `/api/storage/file?key=...`.
 
