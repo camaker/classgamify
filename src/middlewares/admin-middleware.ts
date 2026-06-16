@@ -23,7 +23,7 @@ function unauthorizedResponse() {
 
 /**
  * Admin Route middleware: requires authenticated user with role === 'admin'.
- * Use after auth or alone (redirects to login if not signed in, then to dashboard if not admin).
+ * Use after auth or alone (redirects to login if not signed in, then to learn if not admin).
  */
 export const adminRouteMiddleware = createMiddleware().server(
   async ({ next }) => {
@@ -40,7 +40,7 @@ export const adminRouteMiddleware = createMiddleware().server(
 
     const role = session.user.role;
     if (role !== ADMIN_ROLE) {
-      throw redirect({ to: Routes.Dashboard });
+      throw redirect({ to: Routes.Learn });
     }
 
     return await next();

@@ -1,9 +1,15 @@
 import { m } from '@/locale/paraglide/messages';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { NewsletterFormCard } from '@/components/settings/notification/newsletter-form-card';
-import { createFileRoute } from '@tanstack/react-router';
+import { websiteConfig } from '@/config/website';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/notifications')({
+  beforeLoad: () => {
+    if (websiteConfig.newsletter?.enable === false) {
+      throw notFound();
+    }
+  },
   component: NotificationsPage,
 });
 

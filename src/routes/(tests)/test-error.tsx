@@ -1,10 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(tests)/test-error')({
   loader: () => {
-    throw new Error(
-      'Intentional error for testing DefaultCatchBoundary (errorComponent)'
-    );
+    throw notFound({ routeId: rootRouteId });
   },
   component: TestErrorPage,
 });

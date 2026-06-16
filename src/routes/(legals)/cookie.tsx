@@ -6,6 +6,9 @@ import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(legals)/cookie')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   loader: () => {
     const page = getPageBySlug('cookie');
     if (!page) throw notFound();

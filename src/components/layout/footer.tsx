@@ -5,7 +5,6 @@ import { isLinkActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import Container from '@/components/layout/container';
 import { Logo } from '@/components/shared/logo';
-import BuiltWithButton from '@/components/shared/built-with-button';
 import { Link, useLocation } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
@@ -15,8 +14,8 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   return (
     <footer className={cn('border-t', className)}>
       <Container className="px-4">
-        <div className="grid grid-cols-2 gap-8 py-16 md:grid-cols-6">
-          <div className="col-span-full flex flex-col items-start md:col-span-2">
+        <div className="grid grid-cols-1 gap-8 py-12 md:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="flex flex-col items-start">
             <div className="flex items-center space-x-2">
               <Logo />
               <span className="text-xl font-semibold">
@@ -100,7 +99,6 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             &copy; {new Date().getFullYear()} {websiteConfig.metadata?.name}.{' '}
             {m.footer_rights_reserved()}
           </span>
-          <BuiltWithButton />
         </Container>
       </div>
     </footer>

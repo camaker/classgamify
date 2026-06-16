@@ -5,15 +5,12 @@ import Container from '@/components/layout/container';
 import { PricingTable } from '@/components/pricing/pricing-table';
 import { websiteConfig } from '@/config/website';
 import { useCurrentPlan } from '@/hooks/use-payment';
-import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/pricing')({
   beforeLoad: () => {
-    if (websiteConfig.payment?.enable === false) {
-      throw redirect({ to: Routes.Root });
-    }
+    throw notFound();
   },
   head: () =>
     seo('/pricing', {

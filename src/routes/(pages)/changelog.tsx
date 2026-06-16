@@ -7,6 +7,9 @@ import { seo } from '@/lib/seo';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/changelog')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   loader: () => {
     const releases = getChangelogReleases();
     if (!releases?.length) throw notFound();

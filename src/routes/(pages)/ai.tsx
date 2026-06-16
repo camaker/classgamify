@@ -1,5 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { AiCaptionCard } from '@/components/ai/ai-caption-card';
 import { AiCfImageCard } from '@/components/ai/ai-cf-image-card';
@@ -13,6 +13,9 @@ import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(pages)/ai')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   head: () =>
     seo('/ai', {
       title: `${m.ai_page_title()} | ${websiteConfig.metadata?.name}`,

@@ -7,9 +7,12 @@ import { seo } from '@/lib/seo';
 import { getMailtoUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { IconBrandXFilled, IconMailFilled } from '@tabler/icons-react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/about')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   head: () =>
     seo('/about', {
       title: `${m.about_title()} | ${websiteConfig.metadata?.name}`,

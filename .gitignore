@@ -43,3 +43,4 @@ src/locale/paraglide
 .worktrees/
 .security-key
 logs/security/
+.gstack/

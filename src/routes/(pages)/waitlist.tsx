@@ -1,11 +1,14 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { WaitlistFormCard } from '@/components/waitlist/waitlist-form-card';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(pages)/waitlist')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   head: () =>
     seo('/waitlist', {
       title: `${m.waitlist_title()} | ${websiteConfig.metadata?.name}`,

@@ -10,6 +10,11 @@ import { getCanonicalUrlForLocale } from '@/lib/urls';
 import { getLocale, localeConfig } from '@/lib/locale';
 
 export const Route = createFileRoute('/blog/')({
+  beforeLoad: () => {
+    if (!websiteConfig.blog?.enable) {
+      throw notFound();
+    }
+  },
   validateSearch: (search: Record<string, unknown>) => ({
     page:
       typeof search.page === 'number'

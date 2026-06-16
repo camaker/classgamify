@@ -1,11 +1,14 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { ContactFormCard } from '@/components/contact/contact-form-card';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(pages)/contact')({
+  beforeLoad: () => {
+    throw notFound();
+  },
   head: () =>
     seo('/contact', {
       title: `${m.contact_title()} | ${websiteConfig.metadata?.name}`,

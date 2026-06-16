@@ -1,9 +1,15 @@
 import { m } from '@/locale/paraglide/messages';
-import { createFileRoute, useSearch } from '@tanstack/react-router';
+import { createFileRoute, notFound, useSearch } from '@tanstack/react-router';
 import { DashboardHeader } from '@/components/layout/dashboard-header';
 import { PaymentCard } from '@/components/payment/payment-card';
+import { websiteConfig } from '@/config/website';
 
 export const Route = createFileRoute('/settings/payment')({
+  beforeLoad: () => {
+    if (websiteConfig.payment?.enable === false) {
+      throw notFound();
+    }
+  },
   validateSearch: (
     s
   ): {

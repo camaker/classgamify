@@ -2,7 +2,23 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getBaseUrl } from '@/lib/urls';
 import { baseLocale, locales, localizeHref } from '@/lib/locale';
 
-const disallowedPaths = ['/auth', '/admin', '/settings', '/dashboard'];
+const disallowedPaths = [
+  '/auth',
+  '/admin',
+  '/settings',
+  '/dashboard',
+  '/about',
+  '/ai',
+  '/blog',
+  '/changelog',
+  '/contact',
+  '/cookie',
+  '/pricing',
+  '/roadmap',
+  '/test-404',
+  '/test-error',
+  '/waitlist',
+];
 
 function getDisallowRules() {
   return disallowedPaths

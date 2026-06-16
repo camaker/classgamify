@@ -11,6 +11,11 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import { formatDate } from '@/lib/formatter';
 
 export const Route = createFileRoute('/blog/$slug')({
+  beforeLoad: () => {
+    if (!websiteConfig.blog?.enable) {
+      throw notFound();
+    }
+  },
   loader: async ({ params }) => {
     const post = getPostBySlug(params.slug);
     if (!post) throw notFound();
