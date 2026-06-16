@@ -12,6 +12,11 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      title: 'HSK1',
+      href: Routes.Hsk1,
+      external: false,
+    },
+    {
       title: 'Worksheets',
       href: Routes.Worksheets,
       external: false,

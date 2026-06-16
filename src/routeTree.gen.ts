@@ -30,6 +30,8 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
+import { Route as Hsk1RouteImport } from './routes/hsk/1'
+import { Route as HanziCharacterRouteImport } from './routes/hanzi/$character'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
@@ -159,6 +161,16 @@ const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
   id: '/apikeys',
   path: '/apikeys',
   getParentRoute: () => SettingsRoute,
+} as any)
+const Hsk1Route = Hsk1RouteImport.update({
+  id: '/hsk/1',
+  path: '/hsk/1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HanziCharacterRoute = HanziCharacterRouteImport.update({
+  id: '/hanzi/$character',
+  path: '/hanzi/$character',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -312,6 +324,8 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/hanzi/$character': typeof HanziCharacterRoute
+  '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -356,6 +370,8 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/hanzi/$character': typeof HanziCharacterRoute
+  '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -404,6 +420,8 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/hanzi/$character': typeof HanziCharacterRoute
+  '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -453,6 +471,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/hanzi/$character'
+    | '/hsk/1'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -497,6 +517,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/hanzi/$character'
+    | '/hsk/1'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -544,6 +566,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/hanzi/$character'
+    | '/hsk/1'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -586,6 +610,8 @@ export interface RootRouteChildren {
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  HanziCharacterRoute: typeof HanziCharacterRoute
+  Hsk1Route: typeof Hsk1Route
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
@@ -741,6 +767,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/apikeys'
       preLoaderRoute: typeof SettingsApikeysRouteImport
       parentRoute: typeof SettingsRoute
+    }
+    '/hsk/1': {
+      id: '/hsk/1'
+      path: '/hsk/1'
+      fullPath: '/hsk/1'
+      preLoaderRoute: typeof Hsk1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hanzi/$character': {
+      id: '/hanzi/$character'
+      path: '/hanzi/$character'
+      fullPath: '/hanzi/$character'
+      preLoaderRoute: typeof HanziCharacterRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -1006,6 +1046,8 @@ const rootRouteChildren: RootRouteChildren = {
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
+  HanziCharacterRoute: HanziCharacterRoute,
+  Hsk1Route: Hsk1Route,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,

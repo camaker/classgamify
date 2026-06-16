@@ -1,6 +1,15 @@
-export type CourseLocale = 'en' | 'zh';
+type CourseLocale = 'en' | 'zh';
 
 type LocalizedText = Record<CourseLocale, string>;
+
+const HSK1_LESSON_ORDER = [
+  'Foundations',
+  'Time',
+  'Nature',
+  'Core Words',
+] as const;
+
+type Hsk1LessonId = (typeof HSK1_LESSON_ORDER)[number];
 
 type LessonCharacterDefinition = {
   character: string;
@@ -8,7 +17,7 @@ type LessonCharacterDefinition = {
   meaning: LocalizedText;
   hint: LocalizedText;
   strokes: number;
-  lesson: string;
+  lesson: Hsk1LessonId;
   radical?: string;
   examples: string[];
   premium?: boolean;
@@ -20,6 +29,55 @@ export type LessonCharacter = Omit<
 > & {
   meaning: string;
   hint: string;
+  lessonLabel: string;
+};
+
+export type CourseLesson = {
+  id: Hsk1LessonId;
+  title: string;
+  description: string;
+  characters: LessonCharacter[];
+  freeCount: number;
+  lockedCount: number;
+  totalStrokes: number;
+};
+
+const HSK1_LESSON_LABELS: Record<Hsk1LessonId, LocalizedText> = {
+  Foundations: {
+    en: 'Foundations',
+    zh: '基础象形字',
+  },
+  Time: {
+    en: 'Time',
+    zh: '时间',
+  },
+  Nature: {
+    en: 'Nature',
+    zh: '自然',
+  },
+  'Core Words': {
+    en: 'Core Words',
+    zh: '核心词',
+  },
+};
+
+const HSK1_LESSON_DESCRIPTIONS: Record<Hsk1LessonId, LocalizedText> = {
+  Foundations: {
+    en: 'Start with compact shapes that appear everywhere in beginner Chinese.',
+    zh: '先学最常见、结构清楚的入门汉字。',
+  },
+  Time: {
+    en: 'Connect character shape with daily calendar words.',
+    zh: '把字形和日期、月份这些日常词连起来。',
+  },
+  Nature: {
+    en: 'Practice visual characters that make stroke direction easier to remember.',
+    zh: '用山水火木这些形象字建立笔顺感觉。',
+  },
+  'Core Words': {
+    en: 'Move into high-frequency words that unlock early HSK reading.',
+    zh: '进入高频词，为 HSK 入门阅读做准备。',
+  },
 };
 
 const HSK1_STARTER_DEFINITIONS: LessonCharacterDefinition[] = [
@@ -183,15 +241,14 @@ const HSK1_STARTER_DEFINITIONS: LessonCharacterDefinition[] = [
   },
 ];
 
-export const FREE_CHARACTER_LIMIT = 10;
+const FREE_CHARACTER_LIMIT = 10;
 
-export function getHsk1StarterCharacters(
-  locale: CourseLocale = 'en'
-): LessonCharacter[] {
+function getHsk1StarterCharacters(locale: CourseLocale = 'en') {
   return HSK1_STARTER_DEFINITIONS.map((item) => ({
     ...item,
     meaning: item.meaning[locale],
     hint: item.hint[locale],
+    lessonLabel: HSK1_LESSON_LABELS[item.lesson][locale],
   }));
 }
 
@@ -199,8 +256,51 @@ export function getFreeCharacters(locale: CourseLocale = 'en') {
   return getHsk1StarterCharacters(locale).slice(0, FREE_CHARACTER_LIMIT);
 }
 
-export function getLockedCharacters(locale: CourseLocale = 'en') {
+function getLockedCharacters(locale: CourseLocale = 'en') {
   return getHsk1StarterCharacters(locale).slice(FREE_CHARACTER_LIMIT);
+}
+
+export function getHsk1CourseLessons(
+  locale: CourseLocale = 'en'
+): CourseLesson[] {
+  const characters = getHsk1StarterCharacters(locale);
+
+  return HSK1_LESSON_ORDER.map((lesson) => {
+    const lessonCharacters = characters.filter(
+      (item) => item.lesson === lesson
+    );
+
+    return {
+      id: lesson,
+      title: HSK1_LESSON_LABELS[lesson][locale],
+      description: HSK1_LESSON_DESCRIPTIONS[lesson][locale],
+      characters: lessonCharacters,
+      freeCount: lessonCharacters.filter((item) => !item.premium).length,
+      lockedCount: lessonCharacters.filter((item) => item.premium).length,
+      totalStrokes: lessonCharacters.reduce(
+        (total, item) => total + item.strokes,
+        0
+      ),
+    };
+  });
+}
+
+export function getHsk1CharacterList() {
+  return HSK1_STARTER_DEFINITIONS.map((item) => item.character);
+}
+
+export function getHanziPath(character: string) {
+  return `/hanzi/${encodeURIComponent(character)}`;
+}
+
+export function findHsk1Character(
+  character: string,
+  locale: CourseLocale = 'en'
+) {
+  const normalizedCharacter = decodeCharacterParam(character);
+  return getHsk1StarterCharacters(locale).find(
+    (item) => item.character === normalizedCharacter
+  );
 }
 
 export function getCourseStats() {
@@ -216,4 +316,12 @@ export function getCourseStats() {
       0
     ),
   };
+}
+
+function decodeCharacterParam(character: string) {
+  try {
+    return decodeURIComponent(character).trim();
+  } catch {
+    return character.trim();
+  }
 }

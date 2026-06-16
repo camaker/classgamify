@@ -7,6 +7,7 @@ import {
   locales,
   localizeHref,
 } from '@/lib/locale';
+import { getHanziPath, getHsk1CharacterList } from '@/learn/hanzi-course';
 
 /**
  * Dynamic sitemap.xml
@@ -24,11 +25,20 @@ export const Route = createFileRoute('/sitemap.xml')({
         }[] = [
           { path: '/', changefreq: 'daily', priority: '1.0' },
           { path: '/learn', changefreq: 'daily', priority: '0.9' },
+          { path: '/hsk/1', changefreq: 'weekly', priority: '0.9' },
           { path: '/worksheets', changefreq: 'weekly', priority: '0.8' },
           { path: '/pricing', changefreq: 'weekly', priority: '0.6' },
           { path: '/terms', changefreq: 'monthly' },
           { path: '/privacy', changefreq: 'monthly' },
         ];
+
+        const hanziUrls = getHsk1CharacterList().map((character) => ({
+          path: getHanziPath(character),
+          changefreq: 'weekly',
+          priority: '0.7',
+        }));
+
+        const allUrls = [...staticUrls, ...hanziUrls];
 
         const alternates = (path: string) => {
           if (!isLocalizedPath(path)) {
@@ -37,13 +47,17 @@ export const Route = createFileRoute('/sitemap.xml')({
 
           const localeLinks = locales
             .map((locale) => {
-              const href = `${base}${localizeHref(path, { locale })}`;
+              const href = escapeXml(
+                `${base}${localizeHref(path, { locale })}`
+              );
               return `\n    <xhtml:link rel="alternate" hreflang="${localeConfig[locale].hreflang}" href="${href}" />`;
             })
             .join('');
-          const defaultHref = `${base}${localizeHref(path, {
-            locale: baseLocale,
-          })}`;
+          const defaultHref = escapeXml(
+            `${base}${localizeHref(path, {
+              locale: baseLocale,
+            })}`
+          );
           return `${localeLinks}\n    <xhtml:link rel="alternate" hreflang="x-default" href="${defaultHref}" />`;
         };
 
@@ -54,6 +68,7 @@ export const Route = createFileRoute('/sitemap.xml')({
           const loc = isLocalizedPath(path)
             ? localizeHref(path, { locale: baseLocale })
             : path;
+          const href = escapeXml(`${base}${loc}`);
           const lastmod = opts?.lastmod
             ? `\n    <lastmod>${opts.lastmod}</lastmod>`
             : '';
@@ -63,10 +78,10 @@ export const Route = createFileRoute('/sitemap.xml')({
           const priority = opts?.priority
             ? `\n    <priority>${opts.priority}</priority>`
             : '';
-          return `  <url>\n    <loc>${base}${loc}</loc>${alternates(path)}${lastmod}${changefreq}${priority}\n  </url>`;
+          return `  <url>\n    <loc>${href}</loc>${alternates(path)}${lastmod}${changefreq}${priority}\n  </url>`;
         };
 
-        const staticPart = staticUrls
+        const staticPart = allUrls
           .map((u) =>
             urlEntry(u.path, { changefreq: u.changefreq, priority: u.priority })
           )
@@ -87,3 +102,11 @@ ${staticPart}
     },
   },
 });
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}

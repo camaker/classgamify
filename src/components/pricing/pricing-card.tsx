@@ -104,21 +104,15 @@ export function PricingCard({
         </CardDescription>
 
         {plan.isFree ? (
-          currentUser ? (
-            <Button variant="outline" className="mt-4 w-full" disabled>
-              {m.pricing_card_get_started_for_free()}
-            </Button>
-          ) : (
-            <Link
-              to={Routes.Login}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'mt-4 w-full'
-              )}
-            >
-              {m.pricing_card_get_started_for_free()}
-            </Link>
-          )
+          <Link
+            to={Routes.Learn}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'mt-4 w-full'
+            )}
+          >
+            {m.pricing_card_get_started_for_free()}
+          </Link>
         ) : isCurrentPlan ? (
           <Button
             disabled
