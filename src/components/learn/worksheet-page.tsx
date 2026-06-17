@@ -16,6 +16,7 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconArrowLeft,
+  IconArrowRight,
   IconCircleCheck,
   IconClipboardText,
   IconCopy,
@@ -330,6 +331,16 @@ export function WorksheetPage({
       createCustomWorksheetCharacter(character, copy)
   );
   const normalizedAssignmentNote = normalizeAssignmentNote(assignmentNote);
+  const practiceSearch = useMemo(
+    () =>
+      selectedCharacters.length > 0
+        ? {
+            character: selectedCharacters[0],
+            characters: selectedCharacters,
+          }
+        : {},
+    [selectedCharacters]
+  );
 
   const shareUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -819,6 +830,19 @@ export function WorksheetPage({
                       <IconPrinter className="size-4" />
                       {copy.printCta}
                     </Button>
+                    <Link
+                      to={Routes.Learn}
+                      search={practiceSearch}
+                      aria-disabled={selectedCharacters.length === 0}
+                      className={cn(
+                        buttonVariants({ variant: 'outline' }),
+                        selectedCharacters.length === 0 &&
+                          'pointer-events-none opacity-50'
+                      )}
+                    >
+                      <IconArrowRight className="size-4" />
+                      {copy.practiceCta}
+                    </Link>
                     <Button
                       type="button"
                       variant="outline"
@@ -1117,6 +1141,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         letter: 'Letter',
       },
       previewTitle: 'HSK1 汉字书写练习',
+      practiceCta: '继续线上练习',
       printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
       printSettingsDescription:
@@ -1232,6 +1257,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       letter: 'Letter',
     },
     previewTitle: 'HSK1 Chinese Character Practice',
+    practiceCta: 'Continue online',
     printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
     printSettingsDescription:
