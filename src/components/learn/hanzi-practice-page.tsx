@@ -87,6 +87,11 @@ type ReviewItem = {
   progress: CharacterProgress;
 };
 
+type NextPracticeTarget = {
+  character: LessonCharacter;
+  index: number;
+};
+
 declare global {
   interface Window {
     HanziWriter?: HanziWriterStatic;
@@ -199,6 +204,18 @@ export function HanziPracticePage({
   );
   const reviewCharacters = reviewItems.map((item) => item.character.character);
   const lessonComplete = completedCount === lessonCharacters.length;
+  const nextPracticeTarget = useMemo<NextPracticeTarget | undefined>(() => {
+    const index = lessonCharacters.findIndex(
+      (item) => !progress[item.character]?.completed
+    );
+
+    if (index === -1) return undefined;
+
+    return {
+      character: lessonCharacters[index],
+      index,
+    };
+  }, [lessonCharacters, progress]);
   const progressValue = Math.round(
     (completedCount / lessonCharacters.length) * 100
   );
@@ -342,6 +359,17 @@ export function HanziPracticePage({
               </CardContent>
             </Card>
 
+            <LearningLoopCard
+              completedCount={completedCount}
+              copy={copy}
+              nextPracticeTarget={nextPracticeTarget}
+              onSelect={(index) => setCurrentIndex(index)}
+              reviewCharacters={reviewCharacters}
+              reviewItems={reviewItems}
+              total={lessonCharacters.length}
+              worksheetCharacters={worksheetCharacters}
+            />
+
             <ReviewQueueCard
               cleanCount={cleanCount}
               copy={copy}
@@ -424,6 +452,7 @@ export function HanziPracticePage({
           <HanziPracticeCard
             key={currentCharacter.character}
             character={currentCharacter}
+            copy={copy}
             currentIndex={currentIndex}
             total={lessonCharacters.length}
             progress={progress[currentCharacter.character]}
@@ -433,6 +462,7 @@ export function HanziPracticePage({
             }
             onNext={goToNext}
             onReset={resetLesson}
+            worksheetCharacters={worksheetCharacters}
           />
         </div>
       </div>
@@ -442,6 +472,7 @@ export function HanziPracticePage({
 
 type HanziPracticeCardProps = {
   character: LessonCharacter;
+  copy: ReturnType<typeof getPracticeCopy>;
   currentIndex: number;
   total: number;
   progress?: CharacterProgress;
@@ -449,10 +480,12 @@ type HanziPracticeCardProps = {
   onComplete: (progress: CharacterProgress) => void;
   onNext: () => void;
   onReset: () => void;
+  worksheetCharacters: string[];
 };
 
 function HanziPracticeCard({
   character,
+  copy,
   currentIndex,
   total,
   progress,
@@ -460,6 +493,7 @@ function HanziPracticeCard({
   onComplete,
   onNext,
   onReset,
+  worksheetCharacters,
 }: HanziPracticeCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
@@ -677,7 +711,7 @@ function HanziPracticeCard({
                   <IconReload className="size-4" />
                   {m.learn_restart_lesson()}
                 </Button>
-              ) : (
+              ) : !isLastCharacter ? (
                 <Button
                   type="button"
                   onClick={onNext}
@@ -686,7 +720,7 @@ function HanziPracticeCard({
                   <IconArrowRight className="size-4" />
                   {m.learn_next_character()}
                 </Button>
-              )}
+              ) : null}
             </div>
           </div>
         ) : null}
@@ -711,6 +745,100 @@ function HanziPracticeCard({
             </div>
           </div>
         ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function LearningLoopCard({
+  completedCount,
+  copy,
+  nextPracticeTarget,
+  onSelect,
+  reviewCharacters,
+  reviewItems,
+  total,
+  worksheetCharacters,
+}: {
+  completedCount: number;
+  copy: ReturnType<typeof getPracticeCopy>;
+  nextPracticeTarget?: NextPracticeTarget;
+  onSelect: (index: number) => void;
+  reviewCharacters: string[];
+  reviewItems: ReviewItem[];
+  total: number;
+  worksheetCharacters: string[];
+}) {
+  const firstReview = reviewItems[0];
+  const primaryAction = firstReview
+    ? {
+        description: copy.loopReviewDescription(
+          firstReview.character.character,
+          firstReview.progress.mistakes
+        ),
+        label: copy.loopReviewCta,
+        onClick: () => onSelect(firstReview.index),
+      }
+    : nextPracticeTarget
+      ? {
+          description: copy.loopNextDescription(
+            nextPracticeTarget.character.character,
+            nextPracticeTarget.character.pinyin
+          ),
+          label: copy.loopNextCta,
+          onClick: () => onSelect(nextPracticeTarget.index),
+        }
+      : undefined;
+
+  return (
+    <Card className="rounded-lg border-primary/20 bg-primary/5">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-background p-2 ring-1 ring-border">
+            <IconArrowRight className="size-5 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="text-base">{copy.loopTitle}</CardTitle>
+            <CardDescription>
+              {copy.loopDescription(completedCount, total)}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">
+            {primaryAction?.description ?? copy.loopCompleteDescription}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {reviewItems.length > 0
+              ? copy.loopReviewHint(reviewItems.length)
+              : copy.loopWorksheetHint}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
+          {primaryAction ? (
+            <Button type="button" onClick={primaryAction.onClick}>
+              <IconPencil className="size-4" />
+              {primaryAction.label}
+            </Button>
+          ) : null}
+          <Link
+            to={Routes.Worksheets}
+            search={{
+              characters:
+                reviewCharacters.length > 0
+                  ? reviewCharacters
+                  : worksheetCharacters,
+            }}
+            className={cn(buttonVariants({ variant: 'outline' }))}
+          >
+            <IconFileText className="size-4" />
+            {reviewCharacters.length > 0
+              ? copy.loopReviewWorksheetCta
+              : copy.loopWorksheetCta}
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
@@ -841,6 +969,22 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       description:
         '从一条实用的 HSK1 路径开始：观看笔顺、跟着描写、在本浏览器保存进度，并把同一组汉字生成可打印练习纸。',
       freeBadge: (count: number) => `${count} 个免费汉字`,
+      loopCompleteDescription:
+        '入门组已完成。现在最适合把整组汉字打印出来做纸笔复习。',
+      loopDescription: (completed: number, total: number) =>
+        `已完成 ${completed}/${total}，下一步保持练习节奏。`,
+      loopNextCta: '继续练习',
+      loopNextDescription: (character: string, pinyin: string) =>
+        `继续下一个汉字：${character} · ${pinyin}`,
+      loopReviewCta: '先复习',
+      loopReviewDescription: (character: string, mistakes: number) =>
+        `先处理最容易出错的字：${character}，上次错误 ${mistakes} 次。`,
+      loopReviewHint: (count: number) =>
+        `${count} 个汉字需要复习，可以直接生成错字练习纸。`,
+      loopReviewWorksheetCta: '打印错字纸',
+      loopTitle: '下一步',
+      loopWorksheetCta: '打印练习纸',
+      loopWorksheetHint: '打印后用纸笔复习，能把屏幕描写转成真正的书写记忆。',
       makeWorksheetCta: '制作练习纸',
       packCta: '查看 HSK1 套餐',
       packDescription:
@@ -874,6 +1018,23 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     description:
       'Start with a practical HSK1 path: watch stroke order, trace each character, save progress in this browser, then turn the same set into printable practice sheets.',
     freeBadge: (count: number) => `${count} free characters`,
+    loopCompleteDescription:
+      'Starter set complete. This is a good moment to print the whole set for paper review.',
+    loopDescription: (completed: number, total: number) =>
+      `${completed}/${total} complete. Keep the practice loop moving.`,
+    loopNextCta: 'Keep practicing',
+    loopNextDescription: (character: string, pinyin: string) =>
+      `Continue with ${character} · ${pinyin}`,
+    loopReviewCta: 'Review first',
+    loopReviewDescription: (character: string, mistakes: number) =>
+      `Start with the trickiest character: ${character}, missed ${mistakes} times last run.`,
+    loopReviewHint: (count: number) =>
+      `${count} characters need review. Turn them into a focused worksheet when you want paper practice.`,
+    loopReviewWorksheetCta: 'Print review sheet',
+    loopTitle: 'Next step',
+    loopWorksheetCta: 'Print worksheet',
+    loopWorksheetHint:
+      'Paper practice helps turn screen tracing into real handwriting memory.',
     makeWorksheetCta: 'Make worksheet',
     packCta: 'View HSK1 pack',
     packDescription:
