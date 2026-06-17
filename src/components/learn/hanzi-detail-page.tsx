@@ -215,43 +215,63 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {lessonCharacters.map((item) => (
-                    <Link
-                      className={cn(
-                        'group flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors',
-                        'hover:border-primary/50 hover:bg-muted/40',
-                        item.character === character.character &&
-                          'border-primary bg-primary/5'
-                      )}
-                      key={item.character}
-                      to={getHanziPath(item.character)}
-                    >
-                      <div className="flex size-12 items-center justify-center rounded-lg bg-muted text-2xl font-semibold">
-                        {item.character}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="truncate text-sm font-medium">
-                            {item.pinyin} · {item.meaning}
-                          </p>
-                          {item.character === character.character ? (
-                            <Badge variant="secondary" className="shrink-0">
-                              {copy.currentBadge}
-                            </Badge>
-                          ) : item.premium ? (
-                            <Badge variant="outline" className="shrink-0">
-                              <IconLock className="size-3.5" />
-                              {copy.proBadge}
-                            </Badge>
-                          ) : null}
+                  {lessonCharacters.map((item) => {
+                    const itemProgress = progress[item.character];
+                    const itemCompleted = itemProgress?.completed;
+                    const itemNeedsReview =
+                      itemCompleted && itemProgress.mistakes > 0;
+
+                    return (
+                      <Link
+                        className={cn(
+                          'group flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors',
+                          'hover:border-primary/50 hover:bg-muted/40',
+                          item.character === character.character &&
+                            'border-primary bg-primary/5'
+                        )}
+                        key={item.character}
+                        to={getHanziPath(item.character)}
+                      >
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-muted text-2xl font-semibold">
+                          {item.character}
                         </div>
-                        <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-                          {item.lessonLabel}
-                        </p>
-                      </div>
-                      <IconArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                  ))}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="truncate text-sm font-medium">
+                              {item.pinyin} · {item.meaning}
+                            </p>
+                            {item.character === character.character ? (
+                              <Badge variant="secondary" className="shrink-0">
+                                {copy.currentBadge}
+                              </Badge>
+                            ) : item.premium ? (
+                              <Badge variant="outline" className="shrink-0">
+                                <IconLock className="size-3.5" />
+                                {copy.proBadge}
+                              </Badge>
+                            ) : itemNeedsReview ? (
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 border-amber-500/40 text-amber-700 dark:text-amber-300"
+                              >
+                                <IconRotate className="size-3.5" />
+                                {copy.reviewBadge}
+                              </Badge>
+                            ) : itemCompleted ? (
+                              <Badge variant="secondary" className="shrink-0">
+                                <IconCheck className="size-3.5" />
+                                {copy.completedBadge}
+                              </Badge>
+                            ) : null}
+                          </div>
+                          <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                            {item.lessonLabel}
+                          </p>
+                        </div>
+                        <IconArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                      </Link>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -446,6 +466,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       back: '返回 HSK1 课程',
       badge: '汉字详情',
       courseCta: '查看 HSK1 路径',
+      completedBadge: '已完成',
       description: (meaning: string) =>
         `这个字的核心意思是：${meaning}。先理解形状，再用笔顺练习巩固。`,
       exampleLabel: '例词',
@@ -469,6 +490,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       practiceAgainCta: '再练一次',
       pricingCta: '查看完整套餐',
       reviewCta: '复习错笔',
+      reviewBadge: '复习',
       reviewWorksheetNote: (character: string) =>
         `优先复习 ${character} 的错笔，再回到同组汉字。`,
       proBadge: 'Pro 字',
@@ -515,6 +537,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     back: 'Back to HSK1 course',
     badge: 'Hanzi detail',
     courseCta: 'View HSK1 path',
+    completedBadge: 'Done',
     description: (meaning: string) =>
       `This character means ${meaning}. Learn the shape first, then reinforce it with guided stroke practice.`,
     exampleLabel: 'Example word',
@@ -541,6 +564,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     practiceAgainCta: 'Practice again',
     pricingCta: 'View complete pack',
     reviewCta: 'Review missed strokes',
+    reviewBadge: 'Review',
     reviewWorksheetNote: (character: string) =>
       `Review missed strokes for ${character} before returning to the lesson group.`,
     proBadge: 'Pro character',
