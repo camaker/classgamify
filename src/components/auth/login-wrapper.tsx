@@ -34,10 +34,10 @@ export function LoginWrapper({
     setMounted(true);
   }, []);
   const handleRedirect = () => {
-    const loginPath = callbackUrl
-      ? `${Routes.Login}?callbackUrl=${encodeURIComponent(callbackUrl)}`
-      : Routes.Login;
-    router.navigate({ to: loginPath });
+    router.navigate({
+      to: Routes.Login,
+      search: callbackUrl ? { callbackUrl } : {},
+    });
   };
   const handleModalSuccess = () => {
     setOpen(false);

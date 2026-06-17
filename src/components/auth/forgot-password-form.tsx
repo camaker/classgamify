@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
@@ -45,7 +46,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
     await authClient.requestPasswordReset(
       {
         email: values.email,
-        redirectTo: Routes.ResetPassword,
+        redirectTo: getPathWithLocale(Routes.ResetPassword),
       },
       {
         onRequest: () => {

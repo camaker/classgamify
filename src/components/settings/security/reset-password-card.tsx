@@ -23,10 +23,10 @@ export function ResetPasswordCard({ className }: ResetPasswordCardProps) {
   const { data: session } = authClient.useSession();
   const handleSetupPassword = () => {
     const email = session?.user?.email;
-    const path = email
-      ? `${Routes.ForgotPassword}?email=${encodeURIComponent(email)}`
-      : Routes.ForgotPassword;
-    navigate({ to: path });
+    navigate({
+      to: Routes.ForgotPassword,
+      search: email ? { email } : {},
+    });
   };
   return (
     <Card

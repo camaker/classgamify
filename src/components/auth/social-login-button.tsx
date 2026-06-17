@@ -32,7 +32,7 @@ export function SocialLoginButton({
       {
         provider,
         callbackURL: callbackUrl,
-        errorCallbackURL: Routes.AuthError,
+        errorCallbackURL: getPathWithLocale(Routes.AuthError),
       },
       {
         onRequest: () => setIsLoading(provider),
