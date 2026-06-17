@@ -21,6 +21,7 @@ import {
   readStoredHanziProgress,
   type CharacterProgress,
   type HanziProgressSummary,
+  type HanziReviewItem,
   type StoredProgress,
 } from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
@@ -254,6 +255,13 @@ function ContinueLearningCard({
                 : copy.finishedDescription}
           </p>
         </div>
+        {progressSummary.reviewItems.length > 0 ? (
+          <ReviewFocusList
+            copy={copy}
+            reviewItems={progressSummary.reviewItems}
+            scopeCharacters={worksheetCharacters}
+          />
+        ) : null}
       </div>
       <div className="flex flex-wrap gap-2 md:justify-end">
         {primaryCharacter ? (
@@ -382,6 +390,14 @@ function LessonSection({
             <p className="text-xs leading-5 text-muted-foreground">
               {lessonPrompt}
             </p>
+            {hasReview ? (
+              <ReviewFocusList
+                compact
+                copy={copy}
+                reviewItems={progressSummary.reviewItems}
+                scopeCharacters={worksheetCharacters}
+              />
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-2 md:justify-end">
             {actionCharacter ? (
@@ -423,6 +439,84 @@ function LessonSection({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function ReviewFocusList({
+  compact = false,
+  copy,
+  reviewItems,
+  scopeCharacters,
+}: {
+  compact?: boolean;
+  copy: ReturnType<typeof getCourseCopy>;
+  reviewItems: HanziReviewItem[];
+  scopeCharacters: string[];
+}) {
+  const visibleItems = reviewItems.slice(0, compact ? 2 : 3);
+
+  return (
+    <div
+      className={cn(
+        'grid gap-2',
+        compact ? 'sm:grid-cols-2' : 'sm:grid-cols-2 xl:grid-cols-3'
+      )}
+    >
+      {visibleItems.map((item) => {
+        const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+
+        return (
+          <Link
+            key={item.character.character}
+            to={Routes.Learn}
+            search={{
+              character: item.character.character,
+              characters: scopeCharacters,
+            }}
+            className={cn(
+              'group rounded-lg border bg-background/75 p-3 text-left',
+              'transition-colors hover:border-primary/50 hover:bg-background'
+            )}
+          >
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-2xl font-semibold">
+                {item.character.character}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium">
+                  {item.character.pinyin} · {item.character.meaning}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {copy.reviewFocusMistakes(item.progress.mistakes)}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {mistakeStrokes.length > 0 ? (
+                mistakeStrokes.slice(0, 3).map((stroke) => (
+                  <Badge
+                    key={`${item.character.character}-${stroke}`}
+                    variant="secondary"
+                    className="rounded-md"
+                  >
+                    {copy.reviewFocusStroke(stroke)}
+                  </Badge>
+                ))
+              ) : (
+                <Badge variant="outline" className="rounded-md">
+                  {copy.reviewFocusFullTrace}
+                </Badge>
+              )}
+              {mistakeStrokes.length > 3 ? (
+                <Badge variant="outline" className="rounded-md">
+                  {copy.reviewFocusMore(mistakeStrokes.length - 3)}
+                </Badge>
+              ) : null}
+            </div>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
@@ -551,6 +645,10 @@ function getCourseCopy(locale: 'en' | 'zh') {
       reviewCta: '先复习错字',
       reviewDescription: (character: string, mistakes: number) =>
         `先处理最容易出错的字：${character}，上次错误 ${mistakes} 次。`,
+      reviewFocusFullTrace: '完整描写',
+      reviewFocusMistakes: (count: number) => `${count} 次错误`,
+      reviewFocusMore: (count: number) => `+${count} 笔`,
+      reviewFocusStroke: (stroke: number) => `第 ${stroke} 笔`,
       reviewTitle: '先复习，再继续',
       reviewWorksheetCta: '打印错字复习纸',
       reviewWorksheetNote: (count: number) =>
@@ -621,6 +719,10 @@ function getCourseCopy(locale: 'en' | 'zh') {
     reviewCta: 'Review mistakes',
     reviewDescription: (character: string, mistakes: number) =>
       `Start with ${character}, the character you missed ${mistakes} times last run.`,
+    reviewFocusFullTrace: 'Full trace',
+    reviewFocusMistakes: (count: number) => `${count} mistakes`,
+    reviewFocusMore: (count: number) => `+${count} strokes`,
+    reviewFocusStroke: (stroke: number) => `Stroke ${stroke}`,
     reviewTitle: 'Review first, then continue',
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
