@@ -61,6 +61,11 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
   const currentProgress = progress[character.character];
   const needsReview =
     Boolean(currentProgress?.completed) && currentProgress.mistakes > 0;
+  const practiceCtaLabel = needsReview
+    ? copy.reviewCta
+    : currentProgress?.completed
+      ? copy.practiceAgainCta
+      : copy.practiceCta;
   const practiceSearch = {
     character: practiceTarget,
     characters: worksheetCharacters,
@@ -134,12 +139,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                         className={buttonVariants()}
                       >
                         <IconPencil className="size-4" />
-                        {currentProgress?.completed &&
-                        currentProgress.mistakes > 0
-                          ? copy.reviewCta
-                          : currentProgress?.completed
-                            ? copy.practiceAgainCta
-                            : copy.practiceCta}
+                        {practiceCtaLabel}
                       </Link>
                       <Link
                         to={Routes.Worksheets}
@@ -312,9 +312,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                   className={cn(buttonVariants(), 'justify-start')}
                 >
                   <IconPencil className="size-4" />
-                  {currentProgress?.completed && currentProgress.mistakes > 0
-                    ? copy.reviewCta
-                    : copy.practiceCta}
+                  {practiceCtaLabel}
                 </Link>
                 <Link
                   to={Routes.Hsk1}
