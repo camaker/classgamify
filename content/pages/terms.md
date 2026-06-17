@@ -58,7 +58,9 @@ Paid features are available only when checkout and payment processing are
 enabled. Prices, plan limits, included features, billing intervals, taxes,
 renewal terms, and cancellation instructions will be shown at checkout or in the
 billing interface where available. Checkout terms from the payment provider or
-merchant of record may also apply.
+merchant of record may also apply. Payment methods, plan names, and included
+features may change as the product evolves, and any change will be reflected in
+the pricing or billing UI when available.
 
 Subscription plans renew automatically unless canceled before the renewal date.
 You can cancel through the billing flow where available or by contacting support.
@@ -106,7 +108,10 @@ You may print and distribute worksheets to your own students, children, or
 tutoring clients as part of ordinary instruction. You may not sell Lang Study
 worksheets as standalone products, upload them to worksheet marketplaces,
 repackage them as a competing course or app, or remove required branding from
-paid materials without written permission.
+paid materials without written permission. If the worksheet preview or print
+footer includes the Lang Study domain or brand, that identifier is part of the
+worksheet attribution and may not be removed or obscured when the product
+requires it to remain visible.
 
 If you enter custom characters, word lists, assignments, comments, uploaded
 files, or other content, you remain responsible for that content and for having
@@ -132,7 +137,9 @@ practices. We are not responsible for third-party services, but we choose them
 to support Lang Study's operation.
 
 Hanzi Writer and related stroke-order data are used to power character animation
-and guided tracing. Payment providers such as Creem or Stripe may process
+and guided tracing. Cloudflare Workers AI, fal.ai, or similar providers may
+power AI demos, text generation, image generation, or future experimental
+learning features. Payment providers such as Creem or Stripe may process
 checkout, invoices, subscriptions, taxes, and fraud prevention if paid features
 are enabled.
 
@@ -152,6 +159,11 @@ available" basis.
 We may update these Terms from time to time. The updated version will be posted
 on this page with an updated date. Continued use after the updated Terms become
 effective means you accept the updated Terms.
+
+We may also release new languages, worksheet formats, review tools, AI
+experiments, account features, or billing options without updating every older
+marketing page first. Those additions will still be governed by these Terms and
+any feature-specific notices.
 
 ## Termination
 

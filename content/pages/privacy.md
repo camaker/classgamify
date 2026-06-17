@@ -8,8 +8,9 @@ date: 2026-06-17
 
 This Privacy Policy explains how Lang Study ("Lang Study", "we", "us", or
 "our") handles personal information when you use getlangstudy.com and related
-learning tools, including Chinese character practice, stroke-order tracing,
-custom worksheets, accounts, support, and paid features if they are enabled.
+learning tools, including Chinese character practice, stroke-order tracing, AI
+demos, custom worksheets, accounts, support, file uploads, and paid features if
+they are enabled.
 
 This policy is intended to describe the product as it operates today and as paid
 learning features are introduced. If a checkout page, payment processor, or
@@ -33,11 +34,18 @@ Lang Study.
   review history to your account.
 - **Worksheet and custom list content**: If you enter or paste custom
   characters, they may be processed in the browser to build printable
-  worksheets. Unless a saved-list feature is enabled, this content is not saved
-  to your account by default.
+  worksheets. Worksheet share links can also encode the current character set,
+  grid count, paper size, tracing mode, note text, and reference-info toggle so
+  you can reopen or share the same worksheet setup. Unless a saved-list feature
+  is enabled, this content is not saved to your account by default.
 - **Files and profile content**: If account file or avatar features are
   available and you upload files, we process the file name, type, size, storage
   key, upload time, and the file itself.
+- **AI prompts, uploads, and generated results**: If you use our AI demos or
+  image/text generation tools, we may process the text you enter, uploaded
+  images or files, and the generated output through the configured provider.
+  Depending on the feature, those inputs and outputs may also be logged for
+  abuse prevention, debugging, or rate limiting.
 - **Contact and support information**: If you email us, submit a contact form,
   or use a support channel, we receive the contact details and message content
   you choose to provide.
@@ -94,6 +102,8 @@ including:
   Google sign-in if enabled
 - **Hanzi Writer and Hanzi Writer data** for stroke-order animation and guided
   tracing
+- **Cloudflare Workers AI and fal.ai** for AI demos, text generation, image
+  generation, or related experimental features when those tools are enabled
 - **Analytics providers** such as Microsoft Clarity, Umami, Google Analytics, or
   Plausible, when configured
 - **Payment providers** such as Creem or Stripe, when paid checkout is enabled

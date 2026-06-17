@@ -16,6 +16,10 @@ progress available on the same device. This policy should be read together with
 our [Privacy Policy](/privacy), which explains how we handle personal
 information more broadly.
 
+Where the product offers worksheet sharing, the current worksheet state may be
+encoded in the URL so the same character set, paper size, tracing mode, note
+text, and display choices can be reopened on another device or browser.
+
 ## What Cookies and Similar Technologies Are
 
 Cookies are small text files that a website can store in your browser. Similar
