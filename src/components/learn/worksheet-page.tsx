@@ -29,6 +29,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
+const TRACE_MODES = ['first', 'guided', 'blank'] as const;
+const DEFAULT_TRACE_MODE: TraceMode = 'first';
 const MAX_WORKSHEET_CHARACTERS = 12;
 const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
@@ -39,6 +41,8 @@ const STARTER_SET_SIZE = 6;
 type WorksheetCharacter = ReturnType<typeof getFreeCharacters>[number] & {
   custom?: boolean;
 };
+
+type TraceMode = (typeof TRACE_MODES)[number];
 
 type WorksheetQuickSet = {
   characters: string[];
@@ -84,6 +88,7 @@ export function WorksheetPage({
   );
   const [customInput, setCustomInput] = useState('');
   const [gridCount, setGridCount] = useState<(typeof GRID_OPTIONS)[number]>(9);
+  const [traceMode, setTraceMode] = useState<TraceMode>(DEFAULT_TRACE_MODE);
   const quickSets = useMemo(
     () => createWorksheetQuickSets(characters, copy),
     [characters, copy]
@@ -166,6 +171,7 @@ export function WorksheetPage({
     setSelectedCharacters(initialSelectedCharacters);
     setCustomInput('');
     setGridCount(9);
+    setTraceMode(DEFAULT_TRACE_MODE);
   };
 
   const clearSelection = () => {
@@ -430,26 +436,57 @@ export function WorksheetPage({
                     </Button>
                   </div>
 
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">
-                      {copy.practiceBoxesLabel}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {GRID_OPTIONS.map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => setGridCount(option)}
-                          className={cn(
-                            'rounded-lg border px-3 py-2 text-sm transition-colors',
-                            'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                            gridCount === option &&
-                              'border-primary bg-primary/10 text-primary'
-                          )}
-                        >
-                          {copy.gridOption(option)}
-                        </button>
-                      ))}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">
+                        {copy.practiceBoxesLabel}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {GRID_OPTIONS.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => setGridCount(option)}
+                            className={cn(
+                              'rounded-lg border px-3 py-2 text-sm transition-colors',
+                              'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              gridCount === option &&
+                                'border-primary bg-primary/10 text-primary'
+                            )}
+                          >
+                            {copy.gridOption(option)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {copy.traceModeLabel}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {copy.traceModeDescription}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 rounded-lg border bg-muted/30 p-1">
+                        {TRACE_MODES.map((mode) => (
+                          <button
+                            key={mode}
+                            type="button"
+                            aria-pressed={traceMode === mode}
+                            onClick={() => setTraceMode(mode)}
+                            className={cn(
+                              'min-h-9 rounded-md px-2 text-sm transition-colors',
+                              'hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              traceMode === mode &&
+                                'bg-background font-medium text-primary shadow-sm'
+                            )}
+                          >
+                            {copy.traceModes[mode]}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -502,6 +539,7 @@ export function WorksheetPage({
                 copy={copy}
                 gridCount={gridCount}
                 selectedItems={selectedItems}
+                traceMode={traceMode}
               />
             </div>
           </div>
@@ -515,12 +553,14 @@ type WorksheetPreviewProps = {
   copy: WorksheetCopy;
   selectedItems: WorksheetCharacter[];
   gridCount: number;
+  traceMode: TraceMode;
 };
 
 function WorksheetPreview({
   copy,
   selectedItems,
   gridCount,
+  traceMode,
 }: WorksheetPreviewProps) {
   return (
     <div
@@ -620,7 +660,11 @@ function WorksheetPreview({
                 {Array.from({ length: gridCount }).map((_, index) => (
                   <PracticeBox
                     key={`${item.character}-${index}`}
-                    character={index === 0 ? item.character : undefined}
+                    character={
+                      shouldShowTraceCharacter(index, traceMode)
+                        ? item.character
+                        : undefined
+                    }
                   />
                 ))}
               </div>
@@ -736,6 +780,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       shareSuccess: '练习纸链接已复制。',
       sourceLabel: '生成来源',
       title: '打印中文汉字书写练习纸',
+      traceModeDescription: '选择练习格里显示多少描写提示。',
+      traceModeLabel: '描写辅助',
+      traceModes: {
+        blank: '空白挑战',
+        first: '第一格',
+        guided: '多描几格',
+      },
     };
   }
 
@@ -822,6 +873,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     shareSuccess: 'Worksheet link copied.',
     sourceLabel: 'Created with',
     title: 'Print Chinese character practice sheets',
+    traceModeDescription: 'Choose how much help appears in the practice boxes.',
+    traceModeLabel: 'Tracing guide',
+    traceModes: {
+      blank: 'Blank',
+      first: 'First box',
+      guided: 'Guided',
+    },
   };
 }
 
@@ -902,6 +960,18 @@ function createCustomWorksheetCharacter(
     pinyin: copy.customCharacterLabel,
     strokes: 0,
   };
+}
+
+function shouldShowTraceCharacter(index: number, traceMode: TraceMode) {
+  if (traceMode === 'blank') {
+    return false;
+  }
+
+  if (traceMode === 'guided') {
+    return index < 3;
+  }
+
+  return index === 0;
 }
 
 function PracticeBox({ character }: { character?: string }) {
