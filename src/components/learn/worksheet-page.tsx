@@ -17,12 +17,15 @@ import {
   IconLock,
   IconPrinter,
   IconRefresh,
+  IconWorldWww,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 const WORKSHEET_PRINT_MODE = 'worksheet';
+const WORKSHEET_DOMAIN = 'getlangstudy.com';
+const WORKSHEET_URL = 'getlangstudy.com/worksheets';
 
 function enableWorksheetPrintMode() {
   document.body.dataset.printMode = WORKSHEET_PRINT_MODE;
@@ -272,8 +275,20 @@ function WorksheetPreview({
             ____________________
           </p>
         </div>
-        <div className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
-          {copy.characterCount(selectedItems.length)}
+        <div
+          className="min-w-44 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+          data-print-brand
+        >
+          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <IconWorldWww className="size-3.5" />
+            {copy.sourceLabel}
+          </div>
+          <div className="mt-1 font-semibold text-slate-950">
+            {WORKSHEET_DOMAIN}
+          </div>
+          <div className="mt-0.5 text-xs text-slate-500">
+            {copy.characterCount(selectedItems.length)}
+          </div>
         </div>
       </div>
 
@@ -322,9 +337,23 @@ function WorksheetPreview({
         </div>
       )}
 
-      <div className="mt-6 flex items-center gap-2 border-t border-slate-200 pt-4 text-xs text-slate-500">
-        <IconCircleCheck className="size-4" />
-        {copy.footerTip}
+      <div
+        className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500"
+        data-print-footer
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          <IconCircleCheck className="size-4 shrink-0" />
+          <span>{copy.footerTip}</span>
+        </div>
+        <div className="flex min-w-0 items-center gap-2 font-medium text-slate-700">
+          <IconWorldWww className="size-4 shrink-0" />
+          <span>
+            {copy.footerSourcePrefix}{' '}
+            <span className="font-semibold text-slate-950">
+              {WORKSHEET_URL}
+            </span>
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -343,6 +372,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         '从免费 HSK1 入门组里选择汉字，生成一张干净的手写练习纸，适合自学、家长辅导和老师布置作业。',
       empty: '至少选择一个汉字来生成练习纸。',
       examplesLabel: '例词',
+      footerSourcePrefix: '更多练习纸：',
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
       freeBadge: '免费预览',
       gridOption: (count: number) => `每字 ${count} 格`,
@@ -356,6 +386,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       selectDescription:
         '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
       selectTitle: '选择汉字',
+      sourceLabel: '生成来源',
       title: '打印中文汉字书写练习纸',
     };
   }
@@ -369,6 +400,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'Pick characters from the free HSK1 starter set and print a clean handwriting worksheet for self-study, tutoring, or classroom practice.',
     empty: 'Select at least one character to build a worksheet.',
     examplesLabel: 'Examples',
+    footerSourcePrefix: 'Make more worksheets:',
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
     freeBadge: 'Free preview',
     gridOption: (count: number) => `${count} per character`,
@@ -382,6 +414,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     selectDescription:
       'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
     selectTitle: 'Select characters',
+    sourceLabel: 'Created with',
     title: 'Print Chinese character practice sheets',
   };
 }
