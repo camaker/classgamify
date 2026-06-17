@@ -59,7 +59,25 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
   );
   const [progress, setProgress] = useState<StoredProgress>({});
   const currentProgress = progress[character.character];
-  const practiceSearch = { character: practiceTarget };
+  const needsReview =
+    Boolean(currentProgress?.completed) && currentProgress.mistakes > 0;
+  const practiceSearch = {
+    character: practiceTarget,
+    characters: worksheetCharacters,
+  };
+  const worksheetSearch = needsReview
+    ? {
+        characters: [character.character],
+        details: true,
+        note: copy.reviewWorksheetNote(character.character),
+        trace: 'guided' as const,
+      }
+    : {
+        characters: worksheetCharacters,
+        details: true,
+        note: copy.lessonWorksheetNote(character.lessonLabel),
+        trace: 'first' as const,
+      };
   const lessonCharacters = lesson?.characters ?? [character];
 
   useEffect(() => {
@@ -125,7 +143,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                       </Link>
                       <Link
                         to={Routes.Worksheets}
-                        search={{ characters: worksheetCharacters }}
+                        search={worksheetSearch}
                         className={cn(buttonVariants({ variant: 'outline' }))}
                       >
                         <IconFileText className="size-4" />
@@ -290,11 +308,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                 </Link>
                 <Link
                   to={character.premium ? Routes.Pricing : Routes.Worksheets}
-                  search={
-                    character.premium
-                      ? undefined
-                      : { characters: worksheetCharacters }
-                  }
+                  search={character.premium ? undefined : worksheetSearch}
                   className={cn(
                     buttonVariants({ variant: 'outline' }),
                     'justify-start'
@@ -440,6 +454,8 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       factDescription: '练习前先确认读音和结构。',
       factTitle: '字卡',
       lessonLabel: '课程组',
+      lessonWorksheetNote: (lesson: string) =>
+        `${lesson}：把同一组汉字带到纸面上复习。`,
       meaningLabel: '意思',
       memoryDescription: '用一句形状提示降低第一次书写的记忆负担。',
       memoryTitle: '记忆提示',
@@ -453,6 +469,8 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       practiceAgainCta: '再练一次',
       pricingCta: '查看完整套餐',
       reviewCta: '复习错笔',
+      reviewWorksheetNote: (character: string) =>
+        `优先复习 ${character} 的错笔，再回到同组汉字。`,
       proBadge: 'Pro 字',
       radicalLabel: '部首',
       statusCleanDescription: '这次没有记录到错笔，可以继续学习同课的新字。',
@@ -505,6 +523,8 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     factDescription: 'Check pronunciation and structure before practicing.',
     factTitle: 'Character card',
     lessonLabel: 'Lesson',
+    lessonWorksheetNote: (lesson: string) =>
+      `${lesson}: take this lesson group onto paper for review.`,
     meaningLabel: 'Meaning',
     memoryDescription:
       'Use a simple shape cue to make the first writing attempt easier.',
@@ -521,6 +541,8 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     practiceAgainCta: 'Practice again',
     pricingCta: 'View complete pack',
     reviewCta: 'Review missed strokes',
+    reviewWorksheetNote: (character: string) =>
+      `Review missed strokes for ${character} before returning to the lesson group.`,
     proBadge: 'Pro character',
     radicalLabel: 'Radical',
     statusCleanDescription:
