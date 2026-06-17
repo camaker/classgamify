@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { getFreeCharacters } from '@/learn/hanzi-course';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
@@ -14,6 +15,7 @@ import { cn } from '@/lib/utils';
 import {
   IconArrowLeft,
   IconCircleCheck,
+  IconClipboardText,
   IconLock,
   IconPrinter,
   IconRefresh,
@@ -23,9 +25,15 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
+const MAX_WORKSHEET_CHARACTERS = 12;
 const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
 const WORKSHEET_URL = 'getlangstudy.com/worksheets';
+const HANZI_CHARACTER_PATTERN = /\p{Script=Han}/gu;
+
+type WorksheetCharacter = ReturnType<typeof getFreeCharacters>[number] & {
+  custom?: boolean;
+};
 
 function enableWorksheetPrintMode() {
   document.body.dataset.printMode = WORKSHEET_PRINT_MODE;
@@ -48,18 +56,21 @@ export function WorksheetPage({
     () => getFreeCharacters(currentLocale),
     [currentLocale]
   );
+  const characterMap = useMemo(
+    () => new Map(characters.map((item) => [item.character, item])),
+    [characters]
+  );
   const initialSelectedCharacters = useMemo(() => {
-    const filtered = initialCharacters?.filter((character) =>
-      characters.some((item) => item.character === character)
-    );
-    if (filtered && filtered.length > 0) {
-      return filtered;
+    const normalized = normalizeHanziCharacters(initialCharacters?.join(''));
+    if (normalized.length > 0) {
+      return normalized.slice(0, MAX_WORKSHEET_CHARACTERS);
     }
     return characters.slice(0, 6).map((item) => item.character);
   }, [characters, initialCharacters]);
   const [selectedCharacters, setSelectedCharacters] = useState<string[]>(
     initialSelectedCharacters
   );
+  const [customInput, setCustomInput] = useState('');
   const [gridCount, setGridCount] = useState<(typeof GRID_OPTIONS)[number]>(9);
 
   useEffect(() => {
@@ -77,8 +88,18 @@ export function WorksheetPage({
     };
   }, []);
 
-  const selectedItems = characters.filter((item) =>
-    selectedCharacters.includes(item.character)
+  const parsedCustomCharacters = useMemo(
+    () => normalizeHanziCharacters(customInput),
+    [customInput]
+  );
+  const customOverflowCount = Math.max(
+    0,
+    parsedCustomCharacters.length - MAX_WORKSHEET_CHARACTERS
+  );
+  const selectedItems = selectedCharacters.map(
+    (character) =>
+      characterMap.get(character) ??
+      createCustomWorksheetCharacter(character, copy)
   );
 
   const toggleCharacter = (character: string) => {
@@ -87,12 +108,23 @@ export function WorksheetPage({
         return current.filter((item) => item !== character);
       }
 
+      if (current.length >= MAX_WORKSHEET_CHARACTERS) {
+        return current;
+      }
+
       return [...current, character];
     });
   };
 
+  const applyCustomCharacters = () => {
+    setSelectedCharacters(
+      parsedCustomCharacters.slice(0, MAX_WORKSHEET_CHARACTERS)
+    );
+  };
+
   const resetSelection = () => {
     setSelectedCharacters(initialSelectedCharacters);
+    setCustomInput('');
     setGridCount(9);
   };
 
@@ -180,7 +212,53 @@ export function WorksheetPage({
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">Practice boxes</p>
+                    <label
+                      htmlFor="custom-worksheet-characters"
+                      className="text-sm font-medium"
+                    >
+                      {copy.customTitle}
+                    </label>
+                    <Textarea
+                      id="custom-worksheet-characters"
+                      value={customInput}
+                      onChange={(event) => setCustomInput(event.target.value)}
+                      placeholder={copy.customPlaceholder}
+                      className="min-h-24 resize-none"
+                    />
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <span>
+                        {copy.customCount(
+                          Math.min(
+                            parsedCustomCharacters.length,
+                            MAX_WORKSHEET_CHARACTERS
+                          ),
+                          MAX_WORKSHEET_CHARACTERS
+                        )}
+                      </span>
+                      {customOverflowCount > 0 ? (
+                        <Link
+                          to={Routes.Pricing}
+                          className="font-medium text-primary underline-offset-4 hover:underline"
+                        >
+                          {copy.customOverflow(customOverflowCount)}
+                        </Link>
+                      ) : null}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={applyCustomCharacters}
+                      disabled={parsedCustomCharacters.length === 0}
+                    >
+                      <IconClipboardText className="size-4" />
+                      {copy.customApplyCta}
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                      {copy.practiceBoxesLabel}
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {GRID_OPTIONS.map((option) => (
                         <button
@@ -247,7 +325,7 @@ export function WorksheetPage({
 
 type WorksheetPreviewProps = {
   copy: WorksheetCopy;
-  selectedItems: ReturnType<typeof getFreeCharacters>;
+  selectedItems: WorksheetCharacter[];
   gridCount: number;
 };
 
@@ -306,14 +384,19 @@ function WorksheetPreview({
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">
-                    {item.character} · {item.pinyin}
+                    {item.character} ·{' '}
+                    {item.custom ? copy.customCharacterLabel : item.pinyin}
                   </h3>
                   <p className="text-sm text-slate-600">
-                    {item.meaning} · {item.hint}
+                    {item.custom
+                      ? copy.customCharacterDescription
+                      : `${item.meaning} · ${item.hint}`}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {copy.examplesLabel}: {item.examples.join(', ')}
-                  </p>
+                  {item.examples.length > 0 ? (
+                    <p className="mt-1 text-xs text-slate-500">
+                      {copy.examplesLabel}: {item.examples.join(', ')}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -367,6 +450,16 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       back: '返回练习',
       badge: '练习纸生成器',
       characterCount: (count: number) => `${count} 个汉字`,
+      customApplyCta: '使用自定义字表',
+      customCharacterDescription: '自定义汉字，适合课堂、作业或个人复习。',
+      customCharacterLabel: '自定义',
+      customCount: (count: number, limit: number) =>
+        `${count}/${limit} 个可打印汉字`,
+      customHint: '先观察结构，再慢慢书写。',
+      customMeaning: '自定义汉字',
+      customOverflow: (count: number) => `${count} 个字将在 Pro 中解锁`,
+      customPlaceholder: '粘贴汉字，例如：你好学习中文',
+      customTitle: '粘贴自定义字表',
       dateLabel: '日期',
       description:
         '从免费 HSK1 入门组里选择汉字，生成一张干净的手写练习纸，适合自学、家长辅导和老师布置作业。',
@@ -382,6 +475,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       packTitle: '完整练习纸套装',
       previewTitle: 'HSK1 汉字书写练习',
       printCta: '打印练习纸',
+      practiceBoxesLabel: '练习格数量',
       resetCta: '重置',
       selectDescription:
         '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
@@ -395,6 +489,17 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     back: 'Back to practice',
     badge: 'Worksheet generator',
     characterCount: (count: number) => `${count} characters`,
+    customApplyCta: 'Use custom list',
+    customCharacterDescription:
+      'Custom character for classroom, homework, or personal review.',
+    customCharacterLabel: 'custom',
+    customCount: (count: number, limit: number) =>
+      `${count}/${limit} printable characters`,
+    customHint: 'Study the structure first, then write slowly.',
+    customMeaning: 'custom character',
+    customOverflow: (count: number) => `${count} more unlock with Pro`,
+    customPlaceholder: 'Paste characters, e.g. 你好学习中文',
+    customTitle: 'Paste a custom list',
     dateLabel: 'Date',
     description:
       'Pick characters from the free HSK1 starter set and print a clean handwriting worksheet for self-study, tutoring, or classroom practice.',
@@ -410,12 +515,43 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     packTitle: 'Complete worksheet pack',
     previewTitle: 'HSK1 Chinese Character Practice',
     printCta: 'Print worksheet',
+    practiceBoxesLabel: 'Practice boxes',
     resetCta: 'Reset',
     selectDescription:
       'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
     selectTitle: 'Select characters',
     sourceLabel: 'Created with',
     title: 'Print Chinese character practice sheets',
+  };
+}
+
+function normalizeHanziCharacters(value = '') {
+  return Array.from(value.matchAll(HANZI_CHARACTER_PATTERN)).reduce<string[]>(
+    (characters, match) => {
+      const character = match[0];
+      if (!characters.includes(character)) {
+        characters.push(character);
+      }
+      return characters;
+    },
+    []
+  );
+}
+
+function createCustomWorksheetCharacter(
+  character: string,
+  copy: WorksheetCopy
+): WorksheetCharacter {
+  return {
+    character,
+    custom: true,
+    examples: [],
+    hint: copy.customHint,
+    lesson: 'Foundations',
+    lessonLabel: copy.customCharacterLabel,
+    meaning: copy.customMeaning,
+    pinyin: copy.customCharacterLabel,
+    strokes: 0,
   };
 }
 
