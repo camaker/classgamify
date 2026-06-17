@@ -96,6 +96,7 @@ export const LOCALIZED_PATHS = new Set([
   '/worksheets',
   '/contact',
   '/pricing',
+  '/cookie',
   '/privacy',
   '/terms',
 ]);
