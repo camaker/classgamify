@@ -255,6 +255,12 @@ export function HanziPracticePage({
         .map((item) => item.character),
     [lessonCharacters]
   );
+  const worksheetSearch = {
+    characters: worksheetCharacters,
+    details: true,
+    note: copy.summaryWorksheetNote,
+    trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
+  } as const;
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -269,6 +275,12 @@ export function HanziPracticePage({
                 <Badge variant="secondary">
                   {copy.freeBadge(lessonCharacters.length)}
                 </Badge>
+                {progressSummary.reviewCharacters.length > 0 ? (
+                  <Badge variant="outline" className="border-amber-500/40">
+                    <IconRotate className="size-3.5" />
+                    {copy.reviewBadge(progressSummary.reviewCharacters.length)}
+                  </Badge>
+                ) : null}
               </div>
               <div className="space-y-3">
                 <h1 className="text-balance text-3xl font-semibold tracking-normal sm:text-4xl">
@@ -280,8 +292,15 @@ export function HanziPracticePage({
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link
+                  to={Routes.Hsk1}
+                  className={cn(buttonVariants({ variant: 'outline' }))}
+                >
+                  <IconBook2 className="size-4" />
+                  {copy.courseCta}
+                </Link>
+                <Link
                   to={Routes.Worksheets}
-                  search={{ characters: worksheetCharacters }}
+                  search={worksheetSearch}
                   className={buttonVariants()}
                 >
                   <IconFileText className="size-4" />
@@ -1193,6 +1212,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     return {
       backToCourseCta: '返回课程',
       badge: 'HSK1 入门课程',
+      courseCta: '查看课程路径',
       courseTitle: 'HSK1 课程预览',
       description:
         '从一条实用的 HSK1 路径开始：观看笔顺、跟着描写、在本浏览器保存进度，并把同一组汉字生成可打印练习纸。',
@@ -1229,6 +1249,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       progressNotStarted: '未开始',
       reviewCleanLabel: '零错完成',
       reviewDescription: '有错笔的汉字会自动进入这里，下一轮先复习它们。',
+      reviewBadge: (count: number) => `${count} 个待复习`,
       reviewDueLabel: '待复习',
       reviewEmptyDescription: '开始描写练习后，有错笔的字会自动出现在这里。',
       reviewEmptyTitle: '当前没有错字队列',
@@ -1264,6 +1285,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       statWorksheets: '练习纸已就绪',
       summary:
         '你已经完成免费入门组。下一步可以生成打印练习纸，或继续查看完整 HSK1 学习路径。',
+      summaryWorksheetNote: '把这一组汉字打印出来，完成一次纸笔复习。',
       title: '通过书写学会中文汉字',
       worksheetCta: '生成练习纸',
     };
@@ -1272,6 +1294,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
   return {
     backToCourseCta: 'Back to course',
     badge: 'HSK1 starter course',
+    courseCta: 'View course path',
     courseTitle: 'HSK1 course preview',
     description:
       'Start with a practical HSK1 path: watch stroke order, trace each character, save progress in this browser, then turn the same set into printable practice sheets.',
@@ -1311,6 +1334,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewCleanLabel: 'Clean runs',
     reviewDescription:
       'Characters with missed strokes are saved here so the next session has a clear focus.',
+    reviewBadge: (count: number) => `${count} to review`,
     reviewDueLabel: 'Due for review',
     reviewEmptyDescription:
       'Start a tracing quiz and missed characters will appear here automatically.',
@@ -1349,6 +1373,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     statWorksheets: 'Worksheets ready',
     summary:
       'You finished the free starter set. Generate a printable worksheet now, or continue into the full HSK1 path.',
+    summaryWorksheetNote:
+      'Print this character set and complete one paper review pass.',
     title: 'Learn Chinese characters by writing them',
     worksheetCta: 'Create worksheet',
   };
