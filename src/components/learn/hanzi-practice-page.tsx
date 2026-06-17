@@ -311,7 +311,9 @@ export function HanziPracticePage({
                 <Progress value={progressSummary.progressValue} />
                 <div className="grid grid-cols-5 gap-2">
                   {lessonCharacters.map((item, index) => {
-                    const done = progress[item.character]?.completed;
+                    const itemProgress = progress[item.character];
+                    const done = itemProgress?.completed;
+                    const needsReview = done && itemProgress.mistakes > 0;
                     const active = index === currentIndex;
                     return (
                       <button
@@ -322,14 +324,21 @@ export function HanziPracticePage({
                           'flex aspect-[5/4] flex-col items-center justify-center gap-1 rounded-lg border bg-card text-center transition-colors',
                           'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                           active && 'border-primary bg-primary/5',
-                          done && 'border-emerald-500/40 bg-emerald-500/10'
+                          done &&
+                            !needsReview &&
+                            'border-emerald-500/40 bg-emerald-500/10',
+                          needsReview && 'border-amber-500/40 bg-amber-500/10'
                         )}
                       >
                         <span className="text-3xl font-semibold leading-none">
                           {item.character}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {done ? m.learn_done() : item.pinyin}
+                          {needsReview
+                            ? copy.progressNeedsReview
+                            : done
+                              ? m.learn_done()
+                              : item.pinyin}
                         </span>
                       </button>
                     );
@@ -385,7 +394,17 @@ export function HanziPracticePage({
                       {item.character}
                     </span>
                     {progress[item.character]?.completed ? (
-                      <IconCheck className="size-4 text-emerald-600" />
+                      progress[item.character]?.mistakes ? (
+                        <Badge
+                          variant="outline"
+                          className="rounded-md border-amber-500/40 text-amber-700 dark:text-amber-300"
+                        >
+                          <IconRotate className="size-3.5" />
+                          {copy.progressNeedsReview}
+                        </Badge>
+                      ) : (
+                        <IconCheck className="size-4 text-emerald-600" />
+                      )
                     ) : (
                       <span className="text-xs text-muted-foreground">
                         {item.strokes}
@@ -1121,6 +1140,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       packDescription:
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packTitle: '继续学习完整 HSK1 路径',
+      progressNeedsReview: '复习',
       reviewCleanLabel: '零错完成',
       reviewDescription: '有错笔的汉字会自动进入这里，下一轮先复习它们。',
       reviewDueLabel: '待复习',
@@ -1196,6 +1216,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     packDescription:
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
     packTitle: 'Continue with the full HSK1 path',
+    progressNeedsReview: 'Review',
     reviewCleanLabel: 'Clean runs',
     reviewDescription:
       'Characters with missed strokes are saved here so the next session has a clear focus.',
