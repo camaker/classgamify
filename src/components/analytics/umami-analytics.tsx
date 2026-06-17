@@ -11,5 +11,5 @@ export function UmamiAnalytics() {
   const script = clientEnv.VITE_UMAMI_SCRIPT;
   if (!websiteId || !script) return null;
 
-  return <ClientScript src={script} async dataAttributes={{ websiteId }} />;
+  return <ClientScript src={script} defer dataAttributes={{ websiteId }} />;
 }
