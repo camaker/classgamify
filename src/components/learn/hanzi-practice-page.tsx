@@ -154,6 +154,10 @@ export function HanziPracticePage({
 
     return scopedCharacters.length > 0 ? scopedCharacters : freeCharacters;
   }, [freeCharacters, initialCharacters]);
+  const scopeLabel =
+    initialCharacters?.length && lessonCharacters.length < freeCharacters.length
+      ? lessonCharacters[0]?.lessonLabel
+      : undefined;
   const courseStats = useMemo(() => getCourseStats(), []);
   const initialIndex = Math.max(
     lessonCharacters.findIndex((item) => item.character === initialCharacter),
@@ -332,6 +336,7 @@ export function HanziPracticePage({
               onSelect={(index) => setCurrentIndex(index)}
               reviewCharacters={progressSummary.reviewCharacters}
               reviewItems={progressSummary.reviewItems}
+              scopeLabel={scopeLabel}
               total={lessonCharacters.length}
               worksheetCharacters={worksheetCharacters}
             />
@@ -428,6 +433,7 @@ export function HanziPracticePage({
             }
             onNext={goToNext}
             onReset={resetLesson}
+            scopeLabel={scopeLabel}
             worksheetCharacters={worksheetCharacters}
           />
         </div>
@@ -446,6 +452,7 @@ type HanziPracticeCardProps = {
   onComplete: (progress: CharacterProgress) => void;
   onNext: () => void;
   onReset: () => void;
+  scopeLabel?: string;
   worksheetCharacters: string[];
 };
 
@@ -459,6 +466,7 @@ function HanziPracticeCard({
   onComplete,
   onNext,
   onReset,
+  scopeLabel,
   worksheetCharacters,
 }: HanziPracticeCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -568,6 +576,16 @@ function HanziPracticeCard({
   const completed = progress?.completed;
   const lastStats = sessionStats ?? progress;
   const isLastCharacter = currentIndex === total - 1;
+  const completionSummary = scopeLabel
+    ? copy.scopedSummary(scopeLabel)
+    : copy.summary;
+  const completionWorksheetSearch = buildWorksheetSearch(worksheetCharacters, {
+    details: true,
+    note: scopeLabel
+      ? copy.scopedWorksheetNote(scopeLabel)
+      : copy.loopWorksheetNote,
+    trace: 'first',
+  });
 
   return (
     <Card className="rounded-lg">
@@ -695,19 +713,28 @@ function HanziPracticeCard({
         {lessonComplete ? (
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
             <p className="font-medium">{m.learn_summary_title()}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{copy.summary}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {completionSummary}
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
+              {scopeLabel ? (
+                <Link to={Routes.Hsk1} className={buttonVariants()}>
+                  <IconBook2 className="size-4" />
+                  {copy.backToCourseCta}
+                </Link>
+              ) : (
+                <Link to={Routes.Pricing} className={buttonVariants()}>
+                  <IconLock className="size-4" />
+                  {copy.seePackCta}
+                </Link>
+              )}
               <Link
                 to={Routes.Worksheets}
-                search={{ characters: worksheetCharacters }}
+                search={completionWorksheetSearch}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconFileText className="size-4" />
                 {copy.makeWorksheetCta}
-              </Link>
-              <Link to={Routes.Pricing} className={buttonVariants()}>
-                <IconLock className="size-4" />
-                {copy.seePackCta}
               </Link>
             </div>
           </div>
@@ -774,6 +801,7 @@ function LearningLoopCard({
   onSelect,
   reviewCharacters,
   reviewItems,
+  scopeLabel,
   total,
   worksheetCharacters,
 }: {
@@ -783,6 +811,7 @@ function LearningLoopCard({
   onSelect: (index: number) => void;
   reviewCharacters: string[];
   reviewItems: HanziReviewItem[];
+  scopeLabel?: string;
   total: number;
   worksheetCharacters: string[];
 }) {
@@ -796,7 +825,9 @@ function LearningLoopCard({
         })
       : buildWorksheetSearch(worksheetCharacters, {
           details: true,
-          note: copy.loopWorksheetNote,
+          note: scopeLabel
+            ? copy.scopedWorksheetNote(scopeLabel)
+            : copy.loopWorksheetNote,
           trace: 'first',
         });
   const primaryAction = firstReview
@@ -837,7 +868,10 @@ function LearningLoopCard({
       <CardContent className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <p className="text-sm font-medium">
-            {primaryAction?.description ?? copy.loopCompleteDescription}
+            {primaryAction?.description ??
+              (scopeLabel
+                ? copy.loopScopedCompleteDescription(scopeLabel)
+                : copy.loopCompleteDescription)}
           </p>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
             {reviewItems.length > 0
@@ -993,6 +1027,7 @@ function ReviewQueueCard({
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
+      backToCourseCta: '返回课程',
       badge: 'HSK1 入门课程',
       courseTitle: 'HSK1 课程预览',
       description:
@@ -1011,6 +1046,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       loopReviewHint: (count: number) =>
         `${count} 个汉字需要复习，可以直接生成错字练习纸。`,
       loopReviewWorksheetCta: '打印错字纸',
+      loopScopedCompleteDescription: (scope: string) =>
+        `${scope} 已完成。回到课程路径继续下一组，或先打印本组练习纸。`,
       loopTitle: '下一步',
       loopWorksheetCta: '打印练习纸',
       loopWorksheetHint: '打印后用纸笔复习，能把屏幕描写转成真正的书写记忆。',
@@ -1033,6 +1070,10 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewWorksheetCta: '打印复习纸',
       reviewWorksheetNote: (count: number) =>
         `先复习你错得最多的 ${count} 个汉字。`,
+      scopedSummary: (scope: string) =>
+        `你已经完成 ${scope} 这一组。下一步可以回到课程路径继续新组，或打印本组练习纸做纸笔巩固。`,
+      scopedWorksheetNote: (scope: string) =>
+        `${scope}：把这组汉字带到纸面上完成复习。`,
       seePackCta: '查看套餐',
       strokeCleanBadge: '零错',
       strokeCleanDescription: '这次没有记录到错笔，可以进入下一个汉字。',
@@ -1051,6 +1092,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
   }
 
   return {
+    backToCourseCta: 'Back to course',
     badge: 'HSK1 starter course',
     courseTitle: 'HSK1 course preview',
     description:
@@ -1069,6 +1111,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     loopReviewHint: (count: number) =>
       `${count} characters need review. Turn them into a focused worksheet when you want paper practice.`,
     loopReviewWorksheetCta: 'Print review sheet',
+    loopScopedCompleteDescription: (scope: string) =>
+      `${scope} complete. Return to the course path for the next lesson, or print this set first.`,
     loopTitle: 'Next step',
     loopWorksheetCta: 'Print worksheet',
     loopWorksheetHint:
@@ -1095,6 +1139,10 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
       `Start with the ${count} characters you missed most.`,
+    scopedSummary: (scope: string) =>
+      `You completed ${scope}. Return to the course path for the next lesson, or print this set for paper review.`,
+    scopedWorksheetNote: (scope: string) =>
+      `${scope}: take this character set onto paper for review.`,
     seePackCta: 'See paid pack',
     strokeCleanBadge: 'Clean',
     strokeCleanDescription:
