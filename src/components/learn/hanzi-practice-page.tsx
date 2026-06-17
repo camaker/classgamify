@@ -636,6 +636,7 @@ function HanziPracticeCard({
                 </p>
               </div>
             </div>
+            <StrokeFeedback copy={copy} progress={lastStats} />
             <div className="mt-4 flex flex-wrap gap-2">
               <Button type="button" variant="outline" onClick={startQuiz}>
                 <IconRotate className="size-4" />
@@ -682,6 +683,56 @@ function HanziPracticeCard({
         ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+function StrokeFeedback({
+  copy,
+  progress,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+  progress: CharacterProgress;
+}) {
+  const mistakeStrokes = progress.mistakeStrokes ?? [];
+
+  return (
+    <div
+      className={cn(
+        'mt-4 rounded-lg border bg-background/70 p-3',
+        mistakeStrokes.length > 0
+          ? 'border-amber-500/30'
+          : 'border-emerald-500/30'
+      )}
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">
+            {mistakeStrokes.length > 0
+              ? copy.strokeFeedbackTitle
+              : copy.strokeCleanTitle}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {mistakeStrokes.length > 0
+              ? copy.strokeFeedbackDescription
+              : copy.strokeCleanDescription}
+          </p>
+        </div>
+        {mistakeStrokes.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {mistakeStrokes.map((stroke) => (
+              <Badge key={stroke} variant="outline" className="rounded-md">
+                {copy.strokeNumber(stroke + 1)}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <Badge variant="secondary" className="w-fit rounded-md">
+            <IconCircleCheck className="size-3.5" />
+            {copy.strokeCleanBadge}
+          </Badge>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -952,6 +1003,12 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewWorksheetNote: (count: number) =>
         `先复习你错得最多的 ${count} 个汉字。`,
       seePackCta: '查看套餐',
+      strokeCleanBadge: '零错',
+      strokeCleanDescription: '这次没有记录到错笔，可以进入下一个汉字。',
+      strokeCleanTitle: '书写很稳',
+      strokeFeedbackDescription: '下一轮先看动画，再重点练这些笔画。',
+      strokeFeedbackTitle: '重点复习这些笔画',
+      strokeNumber: (stroke: number) => `第 ${stroke} 笔`,
       statCharacters: (count: number) => `${count}+ 个启动汉字`,
       statStrokes: (count: number) => `${count} 个引导笔画`,
       statWorksheets: '练习纸已就绪',
@@ -1008,6 +1065,14 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewWorksheetNote: (count: number) =>
       `Start with the ${count} characters you missed most.`,
     seePackCta: 'See paid pack',
+    strokeCleanBadge: 'Clean',
+    strokeCleanDescription:
+      'No missed strokes were recorded. Move on to the next character.',
+    strokeCleanTitle: 'Solid writing run',
+    strokeFeedbackDescription:
+      'Watch the animation once, then focus on these strokes next run.',
+    strokeFeedbackTitle: 'Revisit these strokes',
+    strokeNumber: (stroke: number) => `Stroke ${stroke}`,
     statCharacters: (count: number) => `${count}+ launch characters`,
     statStrokes: (count: number) => `${count} guided strokes`,
     statWorksheets: 'Worksheets ready',
