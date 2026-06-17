@@ -61,4 +61,4 @@ Lang Study 可能使用第三方服务来处理托管、分析、认证、邮件
 ## 联系我们
 
 如果你对本条款有任何问题，可以发送邮件到
-[support@getlangstudy.com](mailto:support@getlangstudy.com)，或通过[联系页面](/contact)联系我们。
+[support@mail.getlangstudy.com](mailto:support@mail.getlangstudy.com)，或通过[联系页面](/contact)联系我们。

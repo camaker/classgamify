@@ -70,7 +70,7 @@ export const websiteConfig: WebsiteConfig = {
     enable: true,
     provider: 'cloudflare',
     fromEmail: 'Lang Study <support@mail.getlangstudy.com>',
-    supportEmail: 'Lang Study <support@getlangstudy.com>',
+    supportEmail: 'Lang Study <support@mail.getlangstudy.com>',
   },
   newsletter: {
     enable: false,

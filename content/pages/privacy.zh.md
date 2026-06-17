@@ -65,4 +65,4 @@ Lang Study 可能适合家庭和课堂使用，但在当地法律要求的情况
 ## 联系我们
 
 如果你对隐私或数据处理有任何问题，可以发送邮件到
-[support@getlangstudy.com](mailto:support@getlangstudy.com)，或通过[联系页面](/contact)联系我们。
+[support@mail.getlangstudy.com](mailto:support@mail.getlangstudy.com)，或通过[联系页面](/contact)联系我们。

@@ -90,5 +90,5 @@ page with an updated date.
 ## Contact Us
 
 Questions about these Terms can be sent to
-[support@getlangstudy.com](mailto:support@getlangstudy.com), or through the
+[support@mail.getlangstudy.com](mailto:support@mail.getlangstudy.com), or through the
 [contact page](/contact).
