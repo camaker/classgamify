@@ -344,6 +344,7 @@ export function HanziPracticePage({
                     );
                   })}
                 </div>
+                <ProgressLegend copy={copy} />
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="outline" onClick={resetLesson}>
                     <IconReload className="size-4" />
@@ -499,6 +500,41 @@ type HanziPracticeCardProps = {
   worksheetCharacters: string[];
 };
 
+function ProgressLegend({
+  copy,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+}) {
+  const items = [
+    {
+      className: 'border-border bg-card',
+      label: copy.progressNotStarted,
+    },
+    {
+      className: 'border-emerald-500/40 bg-emerald-500/10',
+      label: copy.reviewCleanLabel,
+    },
+    {
+      className: 'border-amber-500/40 bg-amber-500/10',
+      label: copy.progressNeedsReview,
+    },
+  ];
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="inline-flex h-7 items-center gap-2 rounded-md border bg-background px-2.5 text-xs text-muted-foreground"
+        >
+          <span className={cn('size-2.5 rounded-sm border', item.className)} />
+          <span>{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function HanziPracticeCard({
   character,
   copy,
@@ -617,6 +653,7 @@ function HanziPracticeCard({
   }, [onComplete]);
 
   const completed = progress?.completed;
+  const needsReview = completed && progress.mistakes > 0;
   const lastStats = sessionStats ?? progress;
   const isLastCharacter = currentIndex === total - 1;
   const completionSummary = scopeLabel
@@ -649,9 +686,20 @@ function HanziPracticeCard({
             </CardTitle>
           </div>
           {completed ? (
-            <Badge variant="secondary" className="h-7 rounded-lg px-2.5">
-              <IconCheck className="size-4" />
-              {m.learn_done()}
+            <Badge
+              variant={needsReview ? 'outline' : 'secondary'}
+              className={cn(
+                'h-7 rounded-lg px-2.5',
+                needsReview &&
+                  'border-amber-500/40 text-amber-700 dark:text-amber-300'
+              )}
+            >
+              {needsReview ? (
+                <IconRotate className="size-4" />
+              ) : (
+                <IconCheck className="size-4" />
+              )}
+              {needsReview ? copy.progressNeedsReview : m.learn_done()}
             </Badge>
           ) : null}
         </div>
@@ -715,11 +763,26 @@ function HanziPracticeCard({
         ) : null}
 
         {lastStats?.completed ? (
-          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4">
+          <div
+            className={cn(
+              'rounded-lg border p-4',
+              lastStats.mistakes > 0
+                ? 'border-amber-500/30 bg-amber-500/10'
+                : 'border-emerald-500/30 bg-emerald-500/10'
+            )}
+          >
             <div className="flex items-start gap-3">
-              <IconCircleCheck className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+              {lastStats.mistakes > 0 ? (
+                <IconRotate className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-300" />
+              ) : (
+                <IconCircleCheck className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+              )}
               <div className="min-w-0 flex-1">
-                <p className="font-medium">{m.learn_character_complete()}</p>
+                <p className="font-medium">
+                  {lastStats.mistakes > 0
+                    ? copy.characterNeedsReview
+                    : m.learn_character_complete()}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {m.learn_character_stats({
                     mistakes: lastStats.mistakes,
@@ -1140,7 +1203,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       packDescription:
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packTitle: '继续学习完整 HSK1 路径',
+      characterNeedsReview: '已完成，需要复习',
       progressNeedsReview: '复习',
+      progressNotStarted: '未开始',
       reviewCleanLabel: '零错完成',
       reviewDescription: '有错笔的汉字会自动进入这里，下一轮先复习它们。',
       reviewDueLabel: '待复习',
@@ -1216,7 +1281,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     packDescription:
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
     packTitle: 'Continue with the full HSK1 path',
+    characterNeedsReview: 'Complete, review needed',
     progressNeedsReview: 'Review',
+    progressNotStarted: 'Not started',
     reviewCleanLabel: 'Clean runs',
     reviewDescription:
       'Characters with missed strokes are saved here so the next session has a clear focus.',
