@@ -34,9 +34,17 @@ const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
 const WORKSHEET_URL = 'getlangstudy.com/worksheets';
 const HANZI_CHARACTER_PATTERN = /\p{Script=Han}/gu;
+const STARTER_SET_SIZE = 6;
 
 type WorksheetCharacter = ReturnType<typeof getFreeCharacters>[number] & {
   custom?: boolean;
+};
+
+type WorksheetQuickSet = {
+  characters: string[];
+  description: string;
+  id: string;
+  title: string;
 };
 
 function enableWorksheetPrintMode() {
@@ -76,6 +84,10 @@ export function WorksheetPage({
   );
   const [customInput, setCustomInput] = useState('');
   const [gridCount, setGridCount] = useState<(typeof GRID_OPTIONS)[number]>(9);
+  const quickSets = useMemo(
+    () => createWorksheetQuickSets(characters, copy),
+    [characters, copy]
+  );
 
   useEffect(() => {
     setSelectedCharacters(initialSelectedCharacters);
@@ -141,6 +153,13 @@ export function WorksheetPage({
     setSelectedCharacters(
       parsedCustomCharacters.slice(0, MAX_WORKSHEET_CHARACTERS)
     );
+  };
+
+  const applyQuickSet = (quickSet: WorksheetQuickSet) => {
+    setSelectedCharacters(
+      quickSet.characters.slice(0, MAX_WORKSHEET_CHARACTERS)
+    );
+    setCustomInput('');
   };
 
   const resetSelection = () => {
@@ -226,6 +245,54 @@ export function WorksheetPage({
                   <CardDescription>{copy.selectDescription}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium">
+                        {copy.quickSetsTitle}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {copy.quickSetsDescription}
+                      </p>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {quickSets.map((quickSet) => {
+                        const active = isSameSelection(
+                          selectedCharacters,
+                          quickSet.characters
+                        );
+
+                        return (
+                          <button
+                            key={quickSet.id}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => applyQuickSet(quickSet)}
+                            className={cn(
+                              'rounded-lg border bg-background p-3 text-left transition-colors',
+                              'hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              active && 'border-primary bg-primary/10'
+                            )}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="font-medium">
+                                {quickSet.title}
+                              </span>
+                              <Badge variant="outline" className="rounded-md">
+                                {copy.quickSetCount(quickSet.characters.length)}
+                              </Badge>
+                            </div>
+                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                              {quickSet.description}
+                            </p>
+                            <p className="mt-2 truncate text-sm font-semibold">
+                              {quickSet.characters.join(' ')}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-5 gap-2">
                     {characters.map((item) => {
                       const selected = selectedCharacters.includes(
@@ -632,6 +699,27 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
       practiceBoxesLabel: '练习格数量',
+      quickSetCount: (count: number) => `${count} 字`,
+      quickSets: {
+        foundations: {
+          description: '先练结构最清楚、最适合第一次书写的基础字。',
+          title: '基础象形字',
+        },
+        fullFree: {
+          description: '把当前免费开放的 HSK1 入门字一次生成出来。',
+          title: '全部免费字',
+        },
+        nature: {
+          description: '适合用图像联想记住笔顺方向的一组字。',
+          title: '自然字',
+        },
+        starter: {
+          description: '适合第一节课、家庭作业或 10 分钟复习。',
+          title: '入门 6 字',
+        },
+      },
+      quickSetsDescription: '一键套用常用作业组合，再按需要微调。',
+      quickSetsTitle: '快速练习包',
       resetCta: '重置',
       removeCharacter: (character: string) => `移除 ${character}`,
       selectDescription:
@@ -692,6 +780,31 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
     practiceBoxesLabel: 'Practice boxes',
+    quickSetCount: (count: number) => `${count} chars`,
+    quickSets: {
+      foundations: {
+        description:
+          'Start with compact shapes that are easiest to write first.',
+        title: 'Foundation shapes',
+      },
+      fullFree: {
+        description:
+          'Generate every currently available free HSK1 starter character.',
+        title: 'All free characters',
+      },
+      nature: {
+        description:
+          'Use visual characters that make stroke direction easier to recall.',
+        title: 'Nature shapes',
+      },
+      starter: {
+        description: 'Good for a first class, homework, or 10-minute review.',
+        title: 'Starter six',
+      },
+    },
+    quickSetsDescription:
+      'Apply a common assignment set, then adjust the worksheet if needed.',
+    quickSetsTitle: 'Quick sets',
     resetCta: 'Reset',
     removeCharacter: (character: string) => `Remove ${character}`,
     selectDescription:
@@ -710,6 +823,55 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     sourceLabel: 'Created with',
     title: 'Print Chinese character practice sheets',
   };
+}
+
+function createWorksheetQuickSets(
+  characters: WorksheetCharacter[],
+  copy: WorksheetCopy
+): WorksheetQuickSet[] {
+  const charactersByLesson = new Map<string, string[]>();
+
+  for (const item of characters) {
+    const lessonCharacters = charactersByLesson.get(item.lesson) ?? [];
+    lessonCharacters.push(item.character);
+    charactersByLesson.set(item.lesson, lessonCharacters);
+  }
+
+  return [
+    {
+      characters: characters
+        .slice(0, STARTER_SET_SIZE)
+        .map((item) => item.character),
+      description: copy.quickSets.starter.description,
+      id: 'starter',
+      title: copy.quickSets.starter.title,
+    },
+    {
+      characters: charactersByLesson.get('Foundations') ?? [],
+      description: copy.quickSets.foundations.description,
+      id: 'foundations',
+      title: copy.quickSets.foundations.title,
+    },
+    {
+      characters: charactersByLesson.get('Nature') ?? [],
+      description: copy.quickSets.nature.description,
+      id: 'nature',
+      title: copy.quickSets.nature.title,
+    },
+    {
+      characters: characters.map((item) => item.character),
+      description: copy.quickSets.fullFree.description,
+      id: 'full-free',
+      title: copy.quickSets.fullFree.title,
+    },
+  ].filter((quickSet) => quickSet.characters.length > 0);
+}
+
+function isSameSelection(current: string[], next: string[]) {
+  return (
+    current.length === next.length &&
+    current.every((character, index) => character === next[index])
+  );
 }
 
 function normalizeHanziCharacters(value = '') {
