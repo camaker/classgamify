@@ -14,6 +14,11 @@ import {
   getWorksheetCharactersForCharacter,
   type LessonCharacter,
 } from '@/learn/hanzi-course';
+import {
+  readStoredHanziProgress,
+  type CharacterProgress,
+  type StoredProgress,
+} from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -28,9 +33,10 @@ import {
   IconLock,
   IconPencil,
   IconPrinter,
+  IconRotate,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type StudyStepIcon = 'observe' | 'trace' | 'print';
 
@@ -50,7 +56,14 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
     () => getPracticeTargetCharacter(character.character, currentLocale),
     [character.character, currentLocale]
   );
+  const [progress, setProgress] = useState<StoredProgress>({});
+  const currentProgress = progress[character.character];
+  const practiceSearch = { character: practiceTarget };
   const lessonCharacters = lesson?.characters ?? [character];
+
+  useEffect(() => {
+    setProgress(readStoredHanziProgress());
+  }, []);
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -91,14 +104,23 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                     <p className="max-w-2xl text-base leading-7 text-muted-foreground">
                       {copy.description(character.meaning)}
                     </p>
+                    <PracticeStatusSummary
+                      copy={copy}
+                      progress={currentProgress}
+                    />
                     <div className="flex flex-wrap gap-2">
                       <Link
                         to={Routes.Learn}
-                        search={{ character: practiceTarget }}
+                        search={practiceSearch}
                         className={buttonVariants()}
                       >
                         <IconPencil className="size-4" />
-                        {copy.practiceCta}
+                        {currentProgress?.completed &&
+                        currentProgress.mistakes > 0
+                          ? copy.reviewCta
+                          : currentProgress?.completed
+                            ? copy.practiceAgainCta
+                            : copy.practiceCta}
                       </Link>
                       <Link
                         to={Routes.Worksheets}
@@ -246,6 +268,16 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardHeader>
               <CardContent className="flex flex-col gap-2">
                 <Link
+                  to={Routes.Learn}
+                  search={practiceSearch}
+                  className={cn(buttonVariants(), 'justify-start')}
+                >
+                  <IconPencil className="size-4" />
+                  {currentProgress?.completed && currentProgress.mistakes > 0
+                    ? copy.reviewCta
+                    : copy.practiceCta}
+                </Link>
+                <Link
                   to={Routes.Hsk1}
                   className={cn(
                     buttonVariants({ variant: 'outline' }),
@@ -262,7 +294,10 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                       ? undefined
                       : { characters: worksheetCharacters }
                   }
-                  className={cn(buttonVariants(), 'justify-start')}
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'justify-start'
+                  )}
                 >
                   <IconLock className="size-4" />
                   {character.premium ? copy.pricingCta : copy.previewCta}
@@ -273,6 +308,81 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function PracticeStatusSummary({
+  copy,
+  progress,
+}: {
+  copy: ReturnType<typeof getHanziDetailCopy>;
+  progress?: CharacterProgress;
+}) {
+  if (!progress?.completed) {
+    return (
+      <div className="rounded-lg border border-dashed bg-background/80 p-3">
+        <div className="flex items-start gap-3">
+          <IconPencil className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+          <div>
+            <p className="text-sm font-medium">{copy.statusNotStartedTitle}</p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {copy.statusNotStartedDescription}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const mistakeStrokes = progress.mistakeStrokes ?? [];
+  const needsReview = progress.mistakes > 0;
+
+  return (
+    <div
+      className={cn(
+        'rounded-lg border p-3',
+        needsReview
+          ? 'border-amber-500/40 bg-amber-500/10'
+          : 'border-emerald-500/30 bg-emerald-500/10'
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {needsReview ? (
+          <IconRotate className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-300" />
+        ) : (
+          <IconCheck className="mt-0.5 size-4 shrink-0 text-emerald-700 dark:text-emerald-300" />
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-medium">
+            {needsReview ? copy.statusReviewTitle : copy.statusCleanTitle}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {needsReview
+              ? copy.statusReviewDescription(progress.mistakes)
+              : copy.statusCleanDescription}
+          </p>
+          {needsReview ? (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {mistakeStrokes.length > 0 ? (
+                mistakeStrokes.map((stroke) => (
+                  <Badge
+                    key={stroke}
+                    variant="secondary"
+                    className="rounded-md"
+                  >
+                    {copy.statusStroke(stroke)}
+                  </Badge>
+                ))
+              ) : (
+                <Badge variant="outline" className="rounded-md">
+                  {copy.statusFullTrace}
+                </Badge>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -339,9 +449,21 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       lessonGroupTitle: '同课汉字',
       pinyinLabel: '拼音',
       practiceCta: '打开描写练习',
+      practiceAgainCta: '再练一次',
       pricingCta: '查看完整套餐',
+      reviewCta: '复习错笔',
       proBadge: 'Pro 字',
       radicalLabel: '部首',
+      statusCleanDescription: '这次没有记录到错笔，可以继续学习同课的新字。',
+      statusCleanTitle: '已零错完成',
+      statusFullTrace: '完整描写',
+      statusNotStartedDescription:
+        '先打开描写练习，完成后这里会显示错笔和复习建议。',
+      statusNotStartedTitle: '还没有练过这个字',
+      statusReviewDescription: (mistakes: number) =>
+        `上次练习记录到 ${mistakes} 次错误，建议先复习这些笔画。`,
+      statusReviewTitle: '需要复习',
+      statusStroke: (stroke: number) => `第 ${stroke} 笔`,
       strokeCount: (count: number) => `${count} 画`,
       strokesLabel: '笔画',
       title: (character: string, pinyin: string) =>
@@ -395,9 +517,22 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     lessonGroupTitle: 'Lesson group',
     pinyinLabel: 'Pinyin',
     practiceCta: 'Open tracing practice',
+    practiceAgainCta: 'Practice again',
     pricingCta: 'View complete pack',
+    reviewCta: 'Review missed strokes',
     proBadge: 'Pro character',
     radicalLabel: 'Radical',
+    statusCleanDescription:
+      'No missed strokes were recorded. Continue with the next character in this lesson.',
+    statusCleanTitle: 'Completed cleanly',
+    statusFullTrace: 'Full trace',
+    statusNotStartedDescription:
+      'Open tracing practice first. After a run, this card will show missed strokes and review guidance.',
+    statusNotStartedTitle: 'Not practiced yet',
+    statusReviewDescription: (mistakes: number) =>
+      `Your last run recorded ${mistakes} mistakes. Review these strokes first.`,
+    statusReviewTitle: 'Review recommended',
+    statusStroke: (stroke: number) => `Stroke ${stroke}`,
     strokeCount: (count: number) => `${count} strokes`,
     strokesLabel: 'Strokes',
     title: (character: string, pinyin: string) =>
