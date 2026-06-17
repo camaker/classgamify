@@ -34,6 +34,10 @@ export type HanziProgressSummary = {
   total: number;
 };
 
+export function getDisplayStrokeNumber(strokeIndex: number) {
+  return strokeIndex + 1;
+}
+
 function getCompletedAtTime(completedAt?: string) {
   if (!completedAt) return Number.POSITIVE_INFINITY;
 

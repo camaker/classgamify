@@ -15,6 +15,7 @@ import {
   type LessonCharacter,
 } from '@/learn/hanzi-course';
 import {
+  getDisplayStrokeNumber,
   getHanziProgressSummary,
   readStoredHanziProgress,
   writeStoredHanziProgress,
@@ -802,7 +803,7 @@ function StrokeFeedback({
           <div className="flex flex-wrap gap-1.5">
             {mistakeStrokes.map((stroke) => (
               <Badge key={stroke} variant="outline" className="rounded-md">
-                {copy.strokeNumber(stroke + 1)}
+                {copy.strokeNumber(getDisplayStrokeNumber(stroke))}
               </Badge>
             ))}
           </div>
@@ -1015,7 +1016,9 @@ function ReviewQueueCard({
                                 variant="secondary"
                                 className="rounded-md"
                               >
-                                {copy.strokeNumber(stroke)}
+                                {copy.strokeNumber(
+                                  getDisplayStrokeNumber(stroke)
+                                )}
                               </Badge>
                             ))
                           ) : (

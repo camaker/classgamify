@@ -17,6 +17,7 @@ import {
   type LessonCharacter,
 } from '@/learn/hanzi-course';
 import {
+  getDisplayStrokeNumber,
   getHanziProgressSummary,
   readStoredHanziProgress,
   type CharacterProgress,
@@ -499,7 +500,7 @@ function ReviewFocusList({
                     variant="secondary"
                     className="rounded-md"
                   >
-                    {copy.reviewFocusStroke(stroke)}
+                    {copy.reviewFocusStroke(getDisplayStrokeNumber(stroke))}
                   </Badge>
                 ))
               ) : (

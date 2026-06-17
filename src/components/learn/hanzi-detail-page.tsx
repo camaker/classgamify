@@ -15,6 +15,7 @@ import {
   type LessonCharacter,
 } from '@/learn/hanzi-course';
 import {
+  getDisplayStrokeNumber,
   readStoredHanziProgress,
   type CharacterProgress,
   type StoredProgress,
@@ -370,7 +371,7 @@ function PracticeStatusSummary({
                     variant="secondary"
                     className="rounded-md"
                   >
-                    {copy.statusStroke(stroke)}
+                    {copy.statusStroke(getDisplayStrokeNumber(stroke))}
                   </Badge>
                 ))
               ) : (
