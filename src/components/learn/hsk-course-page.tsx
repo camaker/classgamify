@@ -387,7 +387,10 @@ function LessonSection({
             {actionCharacter ? (
               <Link
                 to={Routes.Learn}
-                search={{ character: actionCharacter.character }}
+                search={{
+                  character: actionCharacter.character,
+                  characters: worksheetCharacters,
+                }}
                 className={buttonVariants()}
               >
                 <IconPencil className="size-4" />

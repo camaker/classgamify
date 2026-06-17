@@ -133,15 +133,27 @@ function loadHanziWriter() {
 
 export function HanziPracticePage({
   initialCharacter,
+  initialCharacters,
 }: {
   initialCharacter?: string;
+  initialCharacters?: string[];
 }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getPracticeCopy(currentLocale);
-  const lessonCharacters = useMemo(
+  const freeCharacters = useMemo(
     () => getFreeCharacters(currentLocale),
     [currentLocale]
   );
+  const lessonCharacters = useMemo(() => {
+    if (!initialCharacters?.length) return freeCharacters;
+
+    const allowedCharacters = new Set(initialCharacters);
+    const scopedCharacters = freeCharacters.filter((item) =>
+      allowedCharacters.has(item.character)
+    );
+
+    return scopedCharacters.length > 0 ? scopedCharacters : freeCharacters;
+  }, [freeCharacters, initialCharacters]);
   const courseStats = useMemo(() => getCourseStats(), []);
   const initialIndex = Math.max(
     lessonCharacters.findIndex((item) => item.character === initialCharacter),
@@ -163,6 +175,12 @@ export function HanziPracticePage({
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
 
+  useEffect(() => {
+    setCurrentIndex((index) =>
+      Math.min(index, Math.max(lessonCharacters.length - 1, 0))
+    );
+  }, [lessonCharacters.length]);
+
   const saveProgress = useCallback(
     (character: string, nextProgress: CharacterProgress) => {
       setProgress((previous) => {
@@ -179,9 +197,22 @@ export function HanziPracticePage({
 
   const resetLesson = useCallback(() => {
     setCurrentIndex(initialIndex);
-    setProgress({});
-    writeStoredHanziProgress({});
-  }, [initialIndex]);
+    setProgress((previous) => {
+      const charactersToReset = new Set(
+        lessonCharacters.map((item) => item.character)
+      );
+      const updated: StoredProgress = {};
+
+      for (const [character, itemProgress] of Object.entries(previous)) {
+        if (!charactersToReset.has(character)) {
+          updated[character] = itemProgress;
+        }
+      }
+
+      writeStoredHanziProgress(updated);
+      return updated;
+    });
+  }, [initialIndex, lessonCharacters]);
 
   const goToNext = useCallback(() => {
     setCurrentIndex((index) =>
@@ -208,7 +239,7 @@ export function HanziPracticePage({
                   {copy.badge}
                 </Badge>
                 <Badge variant="secondary">
-                  {copy.freeBadge(courseStats.free)}
+                  {copy.freeBadge(lessonCharacters.length)}
                 </Badge>
               </div>
               <div className="space-y-3">

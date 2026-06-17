@@ -1,6 +1,7 @@
 import { HanziPracticePage } from '@/components/learn/hanzi-practice-page';
 import { m } from '@/locale/paraglide/messages';
 import { getPracticeTargetCharacter } from '@/learn/hanzi-course';
+import { parseCharactersSearch } from '@/lib/character-search';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -12,9 +13,11 @@ export const Route = createFileRoute('/learn')({
     search
   ): {
     character?: string;
+    characters?: string[];
   } => ({
     character:
       typeof search.character === 'string' ? search.character : undefined,
+    characters: parseCharactersSearch(search.characters),
   }),
   head: () => {
     const title = m.learn_seo_title();
@@ -45,10 +48,15 @@ export const Route = createFileRoute('/learn')({
 });
 
 function LearnRoutePage() {
-  const { character } = Route.useSearch();
+  const { character, characters } = Route.useSearch();
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const initialCharacter = character
     ? getPracticeTargetCharacter(character, currentLocale)
     : undefined;
-  return <HanziPracticePage initialCharacter={initialCharacter} />;
+  return (
+    <HanziPracticePage
+      initialCharacter={initialCharacter}
+      initialCharacters={characters}
+    />
+  );
 }

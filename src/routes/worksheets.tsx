@@ -4,6 +4,7 @@ import {
   type WorksheetPaperSize,
 } from '@/components/learn/worksheet-page';
 import { websiteConfig } from '@/config/website';
+import { parseCharactersSearch } from '@/lib/character-search';
 import { seo } from '@/lib/seo';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -53,38 +54,6 @@ function WorksheetRoutePage() {
       initialTraceMode={search.trace}
     />
   );
-}
-
-function parseCharactersSearch(value: unknown) {
-  if (Array.isArray(value)) {
-    return normalizeCharacters(value);
-  }
-
-  if (typeof value !== 'string') return undefined;
-
-  const trimmedValue = value.trim();
-  if (!trimmedValue) return undefined;
-
-  if (trimmedValue.startsWith('[')) {
-    try {
-      const parsedValue = JSON.parse(trimmedValue) as unknown;
-      if (Array.isArray(parsedValue)) {
-        return normalizeCharacters(parsedValue);
-      }
-    } catch {
-      return undefined;
-    }
-  }
-
-  return normalizeCharacters(trimmedValue.split(','));
-}
-
-function normalizeCharacters(values: unknown[]) {
-  const characters = values
-    .filter((item): item is string => typeof item === 'string')
-    .map((item) => item.trim())
-    .filter(Boolean);
-  return characters.length > 0 ? characters : undefined;
 }
 
 function parseGridSearch(value: unknown) {
