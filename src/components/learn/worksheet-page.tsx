@@ -17,9 +17,11 @@ import {
   IconCircleCheck,
   IconClipboardText,
   IconCopy,
+  IconEraser,
   IconLock,
   IconPrinter,
   IconRefresh,
+  IconX,
   IconWorldWww,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -113,6 +115,15 @@ export function WorksheetPage({
   }, [selectedCharacters]);
 
   const toggleCharacter = (character: string) => {
+    const selectionIsFull =
+      !selectedCharacters.includes(character) &&
+      selectedCharacters.length >= MAX_WORKSHEET_CHARACTERS;
+
+    if (selectionIsFull) {
+      toast.error(copy.selectionLimit(MAX_WORKSHEET_CHARACTERS));
+      return;
+    }
+
     setSelectedCharacters((current) => {
       if (current.includes(character)) {
         return current.filter((item) => item !== character);
@@ -138,7 +149,16 @@ export function WorksheetPage({
     setGridCount(9);
   };
 
+  const clearSelection = () => {
+    setSelectedCharacters([]);
+  };
+
   const printWorksheet = () => {
+    if (selectedCharacters.length === 0) {
+      toast.error(copy.printEmptyError);
+      return;
+    }
+
     enableWorksheetPrintMode();
     window.requestAnimationFrame(() => {
       window.print();
@@ -234,6 +254,71 @@ export function WorksheetPage({
                     })}
                   </div>
 
+                  <div className="rounded-lg border bg-muted/30 p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {copy.selectedTitle}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {copy.selectedDescription(
+                            selectedCharacters.length,
+                            MAX_WORKSHEET_CHARACTERS
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="rounded-md">
+                          {copy.selectedCount(
+                            selectedCharacters.length,
+                            MAX_WORKSHEET_CHARACTERS
+                          )}
+                        </Badge>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearSelection}
+                          disabled={selectedCharacters.length === 0}
+                          className="h-7 px-2 text-xs text-muted-foreground"
+                        >
+                          <IconEraser className="size-3.5" />
+                          {copy.clearSelectionCta}
+                        </Button>
+                      </div>
+                    </div>
+                    {selectedItems.length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedItems.map((item) => (
+                          <button
+                            key={item.character}
+                            type="button"
+                            onClick={() => toggleCharacter(item.character)}
+                            className={cn(
+                              'inline-flex h-8 items-center gap-1.5 rounded-md border bg-background px-2 text-sm transition-colors',
+                              'hover:border-primary/50 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                            )}
+                            aria-label={copy.removeCharacter(item.character)}
+                          >
+                            <span className="font-semibold">
+                              {item.character}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {item.custom
+                                ? copy.customCharacterLabel
+                                : item.pinyin}
+                            </span>
+                            <IconX className="size-3.5 text-muted-foreground" />
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-3 rounded-md border border-dashed bg-background p-3 text-sm text-muted-foreground">
+                        {copy.selectedEmpty}
+                      </p>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <label
                       htmlFor="custom-worksheet-characters"
@@ -302,7 +387,11 @@ export function WorksheetPage({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" onClick={printWorksheet}>
+                    <Button
+                      type="button"
+                      onClick={printWorksheet}
+                      disabled={selectedCharacters.length === 0}
+                    >
                       <IconPrinter className="size-4" />
                       {copy.printCta}
                     </Button>
@@ -515,6 +604,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       back: '返回练习',
       badge: '练习纸生成器',
       characterCount: (count: number) => `${count} 个汉字`,
+      clearSelectionCta: '清空',
       customApplyCta: '使用自定义字表',
       customCharacterDescription: '自定义汉字，适合课堂、作业或个人复习。',
       customCharacterLabel: '自定义',
@@ -539,12 +629,20 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         '完整版本将提供 HSK1 全量练习纸、自定义字表、答案提示和学生作业记录。',
       packTitle: '完整练习纸套装',
       previewTitle: 'HSK1 汉字书写练习',
+      printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
       practiceBoxesLabel: '练习格数量',
       resetCta: '重置',
+      removeCharacter: (character: string) => `移除 ${character}`,
       selectDescription:
         '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
       selectTitle: '选择汉字',
+      selectedCount: (count: number, limit: number) => `${count}/${limit}`,
+      selectedDescription: (count: number, limit: number) =>
+        `这张练习纸会打印 ${count} 个汉字，免费预览最多 ${limit} 个。`,
+      selectedEmpty: '从上方选择汉字，或粘贴自定义字表。',
+      selectedTitle: '当前练习纸',
+      selectionLimit: (limit: number) => `免费预览最多选择 ${limit} 个汉字。`,
       shareCta: '复制练习纸链接',
       shareError: '复制失败，请稍后重试。',
       shareSuccess: '练习纸链接已复制。',
@@ -565,6 +663,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     back: 'Back to practice',
     badge: 'Worksheet generator',
     characterCount: (count: number) => `${count} characters`,
+    clearSelectionCta: 'Clear selection',
     customApplyCta: 'Use custom list',
     customCharacterDescription:
       'Custom character for classroom, homework, or personal review.',
@@ -590,12 +689,21 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'The complete version will unlock full HSK1 worksheets, custom character lists, answer prompts, and saved student assignments.',
     packTitle: 'Complete worksheet pack',
     previewTitle: 'HSK1 Chinese Character Practice',
+    printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
     practiceBoxesLabel: 'Practice boxes',
     resetCta: 'Reset',
+    removeCharacter: (character: string) => `Remove ${character}`,
     selectDescription:
       'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
     selectTitle: 'Select characters',
+    selectedCount: (count: number, limit: number) => `${count}/${limit}`,
+    selectedDescription: (count: number, limit: number) =>
+      `This worksheet will print ${count} characters. Free preview supports up to ${limit}.`,
+    selectedEmpty: 'Select characters above, or paste a custom list.',
+    selectedTitle: 'Current worksheet',
+    selectionLimit: (limit: number) =>
+      `Free preview supports up to ${limit} characters.`,
     shareCta: 'Copy worksheet link',
     shareError: 'Could not copy the link. Please try again.',
     shareSuccess: 'Worksheet link copied.',
