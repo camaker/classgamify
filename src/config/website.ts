@@ -8,21 +8,32 @@ import {
   DEFAULT_USER_FILES_FOLDER,
 } from '@/storage/constants';
 
-// Payment provider controlled by env var: 'stripe' | 'creem' | '' (empty means disabled)
-const paymentProvider = clientEnv.VITE_PAYMENT_PROVIDER;
+const CREEM_LIVE_PRODUCTS = {
+  proMonthly: 'prod_4UAixAoqrbOrK5p7G6giUQ',
+  proYearly: 'prod_462uI05mvUFSP00oOs2ad9',
+  lifetime: 'prod_36Ljh9TXt43qnQBkSHYZk1',
+} as const;
+
+// Payment provider controlled by env var: 'stripe' | 'creem' | ''.
+// Production falls back to Creem live so missing CI/Cloudflare vars do not
+// disable the pricing page.
+const paymentProvider =
+  clientEnv.VITE_PAYMENT_PROVIDER || (import.meta.env.PROD ? 'creem' : '');
 const isPaymentEnabled = paymentProvider !== '';
 const isCreemPayment = paymentProvider === 'creem';
 // Resolve price/product IDs based on the active payment provider
 const priceIds = isPaymentEnabled
   ? {
       proMonthly: isCreemPayment
-        ? (clientEnv.VITE_CREEM_PRODUCT_PRO_MONTHLY ?? '')
+        ? clientEnv.VITE_CREEM_PRODUCT_PRO_MONTHLY ||
+          CREEM_LIVE_PRODUCTS.proMonthly
         : (clientEnv.VITE_STRIPE_PRICE_PRO_MONTHLY ?? ''),
       proYearly: isCreemPayment
-        ? (clientEnv.VITE_CREEM_PRODUCT_PRO_YEARLY ?? '')
+        ? clientEnv.VITE_CREEM_PRODUCT_PRO_YEARLY ||
+          CREEM_LIVE_PRODUCTS.proYearly
         : (clientEnv.VITE_STRIPE_PRICE_PRO_YEARLY ?? ''),
       lifetime: isCreemPayment
-        ? (clientEnv.VITE_CREEM_PRODUCT_LIFETIME ?? '')
+        ? clientEnv.VITE_CREEM_PRODUCT_LIFETIME || CREEM_LIVE_PRODUCTS.lifetime
         : (clientEnv.VITE_STRIPE_PRICE_LIFETIME ?? ''),
     }
   : { proMonthly: '', proYearly: '', lifetime: '' };
