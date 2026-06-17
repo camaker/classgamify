@@ -271,6 +271,7 @@ export function WorksheetPage({
   const [assignmentNote, setAssignmentNote] = useState(
     initialAssignmentNoteValue
   );
+  const [printSessionStarted, setPrintSessionStarted] = useState(false);
   const quickSets = useMemo(
     () => createWorksheetQuickSets(characters, copy),
     [characters, copy]
@@ -302,6 +303,7 @@ export function WorksheetPage({
 
   useEffect(() => {
     const handleBeforePrint = () => {
+      setPrintSessionStarted(true);
       enableWorksheetPrintMode();
       syncWorksheetPrintPaper(paperSize);
       syncWorksheetPrintStyles(paperSize);
@@ -410,10 +412,12 @@ export function WorksheetPage({
     setShowCharacterDetails(initialShowCharacterDetailsValue);
     setAssignmentNote(initialAssignmentNoteValue);
     setTraceMode(initialTraceModeValue);
+    setPrintSessionStarted(false);
   };
 
   const clearSelection = () => {
     setSelectedCharacters([]);
+    setPrintSessionStarted(false);
   };
 
   const printWorksheet = () => {
@@ -425,6 +429,7 @@ export function WorksheetPage({
     enableWorksheetPrintMode();
     syncWorksheetPrintPaper(paperSize);
     syncWorksheetPrintStyles(paperSize);
+    setPrintSessionStarted(true);
     window.requestAnimationFrame(() => {
       window.print();
     });
@@ -861,6 +866,50 @@ export function WorksheetPage({
                       {copy.resetCta}
                     </Button>
                   </div>
+
+                  {printSessionStarted && selectedCharacters.length > 0 ? (
+                    <div
+                      className="rounded-lg border border-primary/20 bg-primary/5 p-3"
+                      aria-live="polite"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex items-center gap-2 text-sm font-medium">
+                            <IconCircleCheck className="size-4 text-primary" />
+                            {copy.printFollowupTitle}
+                          </div>
+                          <p className="text-sm leading-6 text-muted-foreground">
+                            {copy.printFollowupDescription}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {copy.printFollowupSteps.map((step) => (
+                              <Badge
+                                key={step}
+                                variant="outline"
+                                className="rounded-md bg-background"
+                              >
+                                {step}
+                              </Badge>
+                            ))}
+                          </div>
+                          <p className="truncate text-sm font-semibold">
+                            {selectedCharacters.join(' ')}
+                          </p>
+                        </div>
+                        <Link
+                          to={Routes.Learn}
+                          search={practiceSearch}
+                          className={cn(
+                            buttonVariants(),
+                            'w-fit shrink-0 sm:mt-0'
+                          )}
+                        >
+                          <IconArrowRight className="size-4" />
+                          {copy.printFollowupCta}
+                        </Link>
+                      </div>
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
 
@@ -1144,6 +1193,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       practiceCta: '继续线上练习',
       printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
+      printFollowupCta: '复习这组汉字',
+      printFollowupDescription:
+        '纸面写完后，把圈出的难写字带回线上描写练习，优先处理同一组汉字。',
+      printFollowupSteps: ['圈出难写字', '回到线上复习', '再打印错字纸'],
+      printFollowupTitle: '打印后继续复习',
       printSettingsDescription:
         '这些设置会同步到打印预览和分享链接，适合不同打印机与作业场景。',
       printSettingsTitle: '打印设置',
@@ -1260,6 +1314,15 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     practiceCta: 'Continue online',
     printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
+    printFollowupCta: 'Review this set',
+    printFollowupDescription:
+      'After writing on paper, bring the hardest characters back into online tracing and review the same set first.',
+    printFollowupSteps: [
+      'Circle hard characters',
+      'Review online',
+      'Print a focused sheet',
+    ],
+    printFollowupTitle: 'Keep reviewing after print',
     printSettingsDescription:
       'These choices carry into print preview and shared worksheet links.',
     printSettingsTitle: 'Print settings',
