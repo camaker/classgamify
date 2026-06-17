@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 const WORKSHEET_GRID_OPTIONS = [6, 9, 12] as const;
 const WORKSHEET_TRACE_MODES = ['first', 'guided', 'blank'] as const;
+const MAX_WORKSHEET_NOTE_LENGTH = 180;
 
 type WorksheetGridCount = (typeof WORKSHEET_GRID_OPTIONS)[number];
 type WorksheetTraceMode = (typeof WORKSHEET_TRACE_MODES)[number];
@@ -15,10 +16,12 @@ export const Route = createFileRoute('/worksheets')({
   ): {
     characters?: string[];
     grid?: WorksheetGridCount;
+    note?: string;
     trace?: WorksheetTraceMode;
   } => ({
     characters: parseCharactersSearch(search.characters),
     grid: parseGridSearch(search.grid),
+    note: parseNoteSearch(search.note),
     trace: parseTraceSearch(search.trace),
   }),
   head: () =>
@@ -36,6 +39,7 @@ function WorksheetRoutePage() {
     <WorksheetPage
       initialCharacters={search.characters}
       initialGridCount={search.grid}
+      initialAssignmentNote={search.note}
       initialTraceMode={search.trace}
     />
   );
@@ -89,4 +93,15 @@ function parseTraceSearch(value: unknown) {
   if (typeof normalizedValue !== 'string') return undefined;
 
   return WORKSHEET_TRACE_MODES.find((mode) => mode === normalizedValue);
+}
+
+function parseNoteSearch(value: unknown) {
+  const normalizedValue = Array.isArray(value) ? value[0] : value;
+
+  if (typeof normalizedValue !== 'string') return undefined;
+
+  const note = normalizedValue.trim();
+  if (!note) return undefined;
+
+  return Array.from(note).slice(0, MAX_WORKSHEET_NOTE_LENGTH).join('');
 }

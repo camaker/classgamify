@@ -32,6 +32,7 @@ const GRID_OPTIONS = [6, 9, 12] as const;
 const TRACE_MODES = ['first', 'guided', 'blank'] as const;
 const DEFAULT_GRID_COUNT: WorksheetGridCount = 9;
 const DEFAULT_TRACE_MODE: TraceMode = 'first';
+const MAX_ASSIGNMENT_NOTE_LENGTH = 180;
 const MAX_WORKSHEET_CHARACTERS = 12;
 const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
@@ -66,10 +67,12 @@ function clearWorksheetPrintMode() {
 export function WorksheetPage({
   initialCharacters,
   initialGridCount,
+  initialAssignmentNote,
   initialTraceMode,
 }: {
   initialCharacters?: string[];
   initialGridCount?: WorksheetGridCount;
+  initialAssignmentNote?: string;
   initialTraceMode?: TraceMode;
 }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -93,12 +96,18 @@ export function WorksheetPage({
     initialSelectedCharacters
   );
   const [customInput, setCustomInput] = useState('');
+  const initialAssignmentNoteValue = normalizeAssignmentNote(
+    initialAssignmentNote
+  );
   const initialGridCountValue = initialGridCount ?? DEFAULT_GRID_COUNT;
   const initialTraceModeValue = initialTraceMode ?? DEFAULT_TRACE_MODE;
   const [gridCount, setGridCount] = useState<WorksheetGridCount>(
     initialGridCountValue
   );
   const [traceMode, setTraceMode] = useState<TraceMode>(initialTraceModeValue);
+  const [assignmentNote, setAssignmentNote] = useState(
+    initialAssignmentNoteValue
+  );
   const quickSets = useMemo(
     () => createWorksheetQuickSets(characters, copy),
     [characters, copy]
@@ -115,6 +124,10 @@ export function WorksheetPage({
   useEffect(() => {
     setTraceMode(initialTraceModeValue);
   }, [initialTraceModeValue]);
+
+  useEffect(() => {
+    setAssignmentNote(initialAssignmentNoteValue);
+  }, [initialAssignmentNoteValue]);
 
   useEffect(() => {
     window.addEventListener('beforeprint', enableWorksheetPrintMode);
@@ -140,6 +153,7 @@ export function WorksheetPage({
       characterMap.get(character) ??
       createCustomWorksheetCharacter(character, copy)
   );
+  const normalizedAssignmentNote = normalizeAssignmentNote(assignmentNote);
 
   const shareUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -148,8 +162,11 @@ export function WorksheetPage({
     }
     params.set('grid', String(gridCount));
     params.set('trace', traceMode);
+    if (normalizedAssignmentNote.length > 0) {
+      params.set('note', normalizedAssignmentNote);
+    }
     return `${Routes.Worksheets}?${params.toString()}`;
-  }, [gridCount, selectedCharacters, traceMode]);
+  }, [gridCount, normalizedAssignmentNote, selectedCharacters, traceMode]);
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -191,6 +208,7 @@ export function WorksheetPage({
     setSelectedCharacters(initialSelectedCharacters);
     setCustomInput('');
     setGridCount(initialGridCountValue);
+    setAssignmentNote(initialAssignmentNoteValue);
     setTraceMode(initialTraceModeValue);
   };
 
@@ -510,6 +528,39 @@ export function WorksheetPage({
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium">
+                        {copy.assignmentNoteLabel}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {copy.assignmentNoteDescription}
+                      </p>
+                    </div>
+                    <Textarea
+                      value={assignmentNote}
+                      onChange={(event) =>
+                        setAssignmentNote(
+                          truncateWorksheetText(
+                            event.target.value,
+                            MAX_ASSIGNMENT_NOTE_LENGTH
+                          )
+                        )
+                      }
+                      placeholder={copy.assignmentNotePlaceholder}
+                      className="min-h-20 resize-none"
+                    />
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <span>{copy.assignmentNoteHint}</span>
+                      <span>
+                        {copy.assignmentNoteCount(
+                          normalizedAssignmentNote.length,
+                          MAX_ASSIGNMENT_NOTE_LENGTH
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="flex flex-wrap gap-2">
                     <Button
                       type="button"
@@ -557,6 +608,7 @@ export function WorksheetPage({
             >
               <WorksheetPreview
                 copy={copy}
+                assignmentNote={normalizedAssignmentNote}
                 gridCount={gridCount}
                 selectedItems={selectedItems}
                 traceMode={traceMode}
@@ -571,6 +623,7 @@ export function WorksheetPage({
 
 type WorksheetPreviewProps = {
   copy: WorksheetCopy;
+  assignmentNote: string;
   selectedItems: WorksheetCharacter[];
   gridCount: number;
   traceMode: TraceMode;
@@ -578,6 +631,7 @@ type WorksheetPreviewProps = {
 
 function WorksheetPreview({
   copy,
+  assignmentNote,
   selectedItems,
   gridCount,
   traceMode,
@@ -629,6 +683,19 @@ function WorksheetPreview({
           <p className="mt-1 leading-6 text-slate-600">
             {copy.assignmentDescription}
           </p>
+          {assignmentNote ? (
+            <div
+              className="mt-3 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              data-print-assignment-note
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                {copy.assignmentNoteLabel}
+              </div>
+              <p className="mt-1 whitespace-pre-wrap leading-6">
+                {assignmentNote}
+              </p>
+            </div>
+          ) : null}
         </div>
         <div className="grid gap-2 text-xs text-slate-700">
           {copy.assignmentChecks.map((item) => (
@@ -731,6 +798,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       ],
       assignmentDescription:
         '建议每个汉字先读拼音和例词，再慢慢书写。完成后把最容易写错的字加入下一次复习。',
+      assignmentNoteCount: (count: number, limit: number) =>
+        `${count}/${limit}`,
+      assignmentNoteDescription:
+        '写一句课堂说明、家庭作业要求或复习提醒，会显示在打印页和分享链接里。',
+      assignmentNoteHint: '建议简短清楚，打印时更好读。',
+      assignmentNoteLabel: '作业备注',
+      assignmentNotePlaceholder: '例如：先描前三格，再独立完成后面的格子。',
       assignmentTitle: '练习任务',
       back: '返回练习',
       badge: '练习纸生成器',
@@ -818,6 +892,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     ],
     assignmentDescription:
       'Read each character aloud, study the structure, then write slowly. When finished, mark the characters that should come back in the next review session.',
+    assignmentNoteCount: (count: number, limit: number) => `${count}/${limit}`,
+    assignmentNoteDescription:
+      'Add one classroom instruction, homework reminder, or review cue. It appears in the printout and share link.',
+    assignmentNoteHint: 'Keep it short so the printed worksheet stays clean.',
+    assignmentNoteLabel: 'Assignment note',
+    assignmentNotePlaceholder:
+      'Example: Trace the first three boxes, then write the rest from memory.',
     assignmentTitle: 'Practice task',
     back: 'Back to practice',
     badge: 'Worksheet generator',
@@ -980,6 +1061,14 @@ function createCustomWorksheetCharacter(
     pinyin: copy.customCharacterLabel,
     strokes: 0,
   };
+}
+
+function normalizeAssignmentNote(value = '') {
+  return truncateWorksheetText(value.trim(), MAX_ASSIGNMENT_NOTE_LENGTH);
+}
+
+function truncateWorksheetText(value: string, limit: number) {
+  return Array.from(value).slice(0, limit).join('');
 }
 
 function shouldShowTraceCharacter(index: number, traceMode: TraceMode) {
