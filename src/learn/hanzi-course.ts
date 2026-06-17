@@ -285,6 +285,20 @@ export function getHsk1CourseLessons(
   });
 }
 
+export function getHsk1LessonForCharacter(
+  character: string,
+  locale: CourseLocale = 'en'
+) {
+  const lessonCharacter = findHsk1Character(character, locale);
+  if (!lessonCharacter) {
+    return;
+  }
+
+  return getHsk1CourseLessons(locale).find(
+    (item) => item.id === lessonCharacter.lesson
+  );
+}
+
 export function getHsk1CharacterList() {
   return HSK1_STARTER_DEFINITIONS.map((item) => item.character);
 }
