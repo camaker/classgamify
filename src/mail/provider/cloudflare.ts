@@ -8,6 +8,8 @@ import type {
   SendTemplateParams,
 } from '@/mail/types';
 
+type CloudflareEmailAddress = string | { address: string; name: string };
+
 /**
  * Cloudflare Email Service provider implementation.
  * Uses the REST API to send emails, compatible with any Node.js environment.
@@ -15,7 +17,7 @@ import type {
  * https://developers.cloudflare.com/email-service/api/send-emails/rest-api/
  */
 export class CloudflareProvider implements MailProvider {
-  private from: string;
+  private from: CloudflareEmailAddress;
   private accountId: string;
   private apiToken: string;
   private endpoint = 'https://api.cloudflare.com/client/v4/accounts';
@@ -29,7 +31,7 @@ export class CloudflareProvider implements MailProvider {
     if (!serverEnv.CLOUDFLARE_API_TOKEN) {
       throw new Error('CLOUDFLARE_API_TOKEN is required.');
     }
-    this.from = from;
+    this.from = toCloudflareEmailAddress(from);
     this.accountId = serverEnv.CLOUDFLARE_ACCOUNT_ID;
     this.apiToken = serverEnv.CLOUDFLARE_API_TOKEN;
   }
@@ -67,6 +69,7 @@ export class CloudflareProvider implements MailProvider {
     }
     try {
       const url = `${this.endpoint}/${this.accountId}/email/sending/send`;
+      const recipient = toCloudflareEmailAddress(to);
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -74,7 +77,7 @@ export class CloudflareProvider implements MailProvider {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to,
+          to: recipient,
           from: this.from,
           subject,
           html,
@@ -87,10 +90,10 @@ export class CloudflareProvider implements MailProvider {
         errors?: { code: number; message: string }[];
       };
 
-      if (!data.success) {
+      if (!response.ok || !data.success) {
         const errorMsg =
           data.errors?.map((e) => `${e.code}: ${e.message}`).join(', ') ||
-          'Unknown error';
+          `${response.status} ${response.statusText || 'Unknown error'}`;
         console.error('Error sending email via Cloudflare:', errorMsg);
         return { success: false, error: errorMsg };
       }
@@ -102,4 +105,23 @@ export class CloudflareProvider implements MailProvider {
       return { success: false, error };
     }
   }
+}
+
+function toCloudflareEmailAddress(value: string): CloudflareEmailAddress {
+  const trimmedValue = value.trim();
+  const namedAddressMatch = trimmedValue.match(/^(.*?)\s*<([^<>]+)>$/);
+
+  if (!namedAddressMatch) {
+    return trimmedValue;
+  }
+
+  const [, rawName, rawAddress] = namedAddressMatch;
+  const name = rawName.trim().replace(/^"|"$/g, '');
+  const address = rawAddress.trim();
+
+  if (!name) {
+    return address;
+  }
+
+  return { address, name };
 }
