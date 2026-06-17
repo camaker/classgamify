@@ -22,6 +22,17 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
+const WORKSHEET_PRINT_MODE = 'worksheet';
+
+function enableWorksheetPrintMode() {
+  document.body.dataset.printMode = WORKSHEET_PRINT_MODE;
+}
+
+function clearWorksheetPrintMode() {
+  if (document.body.dataset.printMode === WORKSHEET_PRINT_MODE) {
+    delete document.body.dataset.printMode;
+  }
+}
 
 export function WorksheetPage({
   initialCharacters,
@@ -52,6 +63,17 @@ export function WorksheetPage({
     setSelectedCharacters(initialSelectedCharacters);
   }, [initialSelectedCharacters]);
 
+  useEffect(() => {
+    window.addEventListener('beforeprint', enableWorksheetPrintMode);
+    window.addEventListener('afterprint', clearWorksheetPrintMode);
+
+    return () => {
+      window.removeEventListener('beforeprint', enableWorksheetPrintMode);
+      window.removeEventListener('afterprint', clearWorksheetPrintMode);
+      clearWorksheetPrintMode();
+    };
+  }, []);
+
   const selectedItems = characters.filter((item) =>
     selectedCharacters.includes(item.character)
   );
@@ -71,12 +93,26 @@ export function WorksheetPage({
     setGridCount(9);
   };
 
+  const printWorksheet = () => {
+    enableWorksheetPrintMode();
+    window.requestAnimationFrame(() => {
+      window.print();
+    });
+  };
+
   return (
-    <section className="min-h-[calc(100vh-12rem)] bg-background">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
+    <section
+      className="min-h-[calc(100vh-12rem)] bg-background"
+      data-print-page="worksheet"
+    >
+      <div
+        className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8"
+        data-print-shell
+      >
         <div className="flex flex-col gap-4">
           <Link
             to={Routes.Learn}
+            data-print-hidden
             className={cn(
               buttonVariants({ variant: 'ghost' }),
               'w-fit print:hidden'
@@ -86,8 +122,11 @@ export function WorksheetPage({
             {copy.back}
           </Link>
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start">
-            <div className="space-y-5 print:hidden">
+          <div
+            className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
+            data-print-layout
+          >
+            <div className="space-y-5 print:hidden" data-print-hidden>
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline" className="border-primary/30">
@@ -159,7 +198,7 @@ export function WorksheetPage({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" onClick={() => window.print()}>
+                    <Button type="button" onClick={printWorksheet}>
                       <IconPrinter className="size-4" />
                       {copy.printCta}
                     </Button>
@@ -186,7 +225,10 @@ export function WorksheetPage({
               </Card>
             </div>
 
-            <div className="rounded-lg border bg-background p-4 shadow-sm print:border-0 print:p-0 print:shadow-none">
+            <div
+              className="rounded-lg border bg-background p-4 shadow-sm print:border-0 print:p-0 print:shadow-none"
+              data-print-preview-frame
+            >
               <WorksheetPreview
                 copy={copy}
                 gridCount={gridCount}
@@ -212,8 +254,14 @@ function WorksheetPreview({
   gridCount,
 }: WorksheetPreviewProps) {
   return (
-    <div className="mx-auto max-w-[820px] bg-white p-6 text-slate-950 print:max-w-none print:p-0">
-      <div className="mb-5 flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+    <div
+      className="mx-auto max-w-[820px] bg-white p-6 text-slate-950 print:max-w-none print:p-0"
+      data-print-root
+    >
+      <div
+        className="mb-5 flex items-start justify-between gap-4 border-b border-slate-200 pb-4"
+        data-print-header
+      >
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
             Lang Study
@@ -232,7 +280,11 @@ function WorksheetPreview({
       {selectedItems.length > 0 ? (
         <div className="space-y-6">
           {selectedItems.map((item) => (
-            <section key={item.character} className="break-inside-avoid">
+            <section
+              key={item.character}
+              className="break-inside-avoid"
+              data-print-character
+            >
               <div className="mb-2 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
                 <div className="flex size-16 items-center justify-center rounded-lg border border-slate-300 text-4xl font-semibold">
                   {item.character}
@@ -250,7 +302,10 @@ function WorksheetPreview({
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              <div
+                className="grid grid-cols-3 gap-2 sm:grid-cols-6"
+                data-print-grid
+              >
                 {Array.from({ length: gridCount }).map((_, index) => (
                   <PracticeBox
                     key={`${item.character}-${index}`}
@@ -333,7 +388,10 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
 
 function PracticeBox({ character }: { character?: string }) {
   return (
-    <div className="relative aspect-square border border-slate-300">
+    <div
+      className="relative aspect-square border border-slate-300"
+      data-print-practice-box
+    >
       <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-slate-200" />
       <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-slate-200" />
       <div className="absolute inset-0 flex items-center justify-center text-4xl font-semibold text-slate-300">
