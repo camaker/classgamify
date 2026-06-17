@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
   getCourseStats,
   getFreeCharacters,
@@ -18,6 +19,7 @@ import {
 import {
   getHanziProgressSummary,
   readStoredHanziProgress,
+  type CharacterProgress,
   type HanziProgressSummary,
   type StoredProgress,
 } from '@/learn/hanzi-progress';
@@ -58,6 +60,26 @@ export function HskCoursePage() {
   const progressSummary = useMemo(
     () => getHanziProgressSummary(freeLessonCharacters, progress),
     [freeLessonCharacters, progress]
+  );
+  const lessonProgressItems = useMemo(
+    () =>
+      lessons.map((lesson) => {
+        const availableCharacters = lesson.characters.filter(
+          (item) => !item.premium
+        );
+
+        return {
+          lesson,
+          progressSummary: getHanziProgressSummary(
+            availableCharacters,
+            progress
+          ),
+          worksheetCharacters: availableCharacters.map(
+            (item) => item.character
+          ),
+        };
+      }),
+    [lessons, progress]
   );
 
   useEffect(() => {
@@ -129,12 +151,15 @@ export function HskCoursePage() {
         ) : null}
 
         <section className="grid gap-4">
-          {lessons.map((lesson, index) => (
+          {lessonProgressItems.map((item, index) => (
             <LessonSection
               copy={copy}
               index={index}
-              key={lesson.id}
-              lesson={lesson}
+              key={item.lesson.id}
+              lesson={item.lesson}
+              progress={progress}
+              progressSummary={item.progressSummary}
+              worksheetCharacters={item.worksheetCharacters}
             />
           ))}
         </section>
@@ -262,11 +287,54 @@ function LessonSection({
   copy,
   index,
   lesson,
+  progress,
+  progressSummary,
+  worksheetCharacters,
 }: {
   copy: ReturnType<typeof getCourseCopy>;
   index: number;
   lesson: CourseLesson;
+  progress: StoredProgress;
+  progressSummary: HanziProgressSummary;
+  worksheetCharacters: string[];
 }) {
+  const firstReview = progressSummary.reviewItems[0];
+  const actionCharacter =
+    firstReview?.character ??
+    progressSummary.nextPracticeTarget?.character ??
+    lesson.characters.find((item) => !item.premium);
+  const hasReview = progressSummary.reviewItems.length > 0;
+  const lessonComplete =
+    progressSummary.total > 0 && progressSummary.lessonComplete;
+  const lessonPrompt = hasReview
+    ? copy.lessonReviewPrompt(progressSummary.reviewItems.length)
+    : lessonComplete
+      ? copy.lessonCompletePrompt
+      : progressSummary.completedCount > 0
+        ? copy.lessonContinuePrompt(
+            progressSummary.completedCount,
+            progressSummary.total
+          )
+        : copy.lessonStartPrompt;
+  const lessonActionLabel = hasReview
+    ? copy.lessonReviewCta
+    : progressSummary.completedCount > 0
+      ? copy.lessonContinueCta
+      : copy.lessonStartCta;
+  const worksheetSearch = {
+    characters: hasReview
+      ? progressSummary.reviewCharacters
+      : worksheetCharacters,
+    details: true,
+    note: hasReview
+      ? copy.lessonReviewWorksheetNote(
+          lesson.title,
+          progressSummary.reviewCharacters.length
+        )
+      : copy.lessonWorksheetNote(lesson.title),
+    trace: hasReview ? ('guided' as const) : ('first' as const),
+  };
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
@@ -297,12 +365,56 @@ function LessonSection({
         </div>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 grid gap-3 rounded-lg bg-muted/30 p-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-medium">
+                {copy.lessonProgressTitle}
+              </span>
+              <span className="text-xs tabular-nums text-muted-foreground">
+                {copy.progressBadge(
+                  progressSummary.completedCount,
+                  progressSummary.total
+                )}
+              </span>
+            </div>
+            <Progress value={progressSummary.progressValue} />
+            <p className="text-xs leading-5 text-muted-foreground">
+              {lessonPrompt}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 md:justify-end">
+            {actionCharacter ? (
+              <Link
+                to={Routes.Learn}
+                search={{ character: actionCharacter.character }}
+                className={buttonVariants()}
+              >
+                <IconPencil className="size-4" />
+                {lessonActionLabel}
+              </Link>
+            ) : null}
+            {worksheetCharacters.length > 0 ? (
+              <Link
+                to={Routes.Worksheets}
+                search={worksheetSearch}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconFileText className="size-4" />
+                {hasReview
+                  ? copy.lessonReviewWorksheetCta
+                  : copy.lessonWorksheetCta}
+              </Link>
+            ) : null}
+          </div>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {lesson.characters.map((character) => (
             <CharacterTile
               character={character}
               copy={copy}
               key={character.character}
+              progress={progress[character.character]}
             />
           ))}
         </div>
@@ -314,10 +426,15 @@ function LessonSection({
 function CharacterTile({
   character,
   copy,
+  progress,
 }: {
   character: LessonCharacter;
   copy: ReturnType<typeof getCourseCopy>;
+  progress?: CharacterProgress;
 }) {
+  const completed = progress?.completed;
+  const needsReview = completed && progress.mistakes > 0;
+
   return (
     <Link
       to={getHanziPath(character.character)}
@@ -334,6 +451,19 @@ function CharacterTile({
           <Badge variant="outline" className="rounded-md">
             <IconLock className="size-3.5" />
             {copy.proBadge}
+          </Badge>
+        ) : needsReview ? (
+          <Badge
+            variant="outline"
+            className="rounded-md border-amber-500/40 text-amber-700 dark:text-amber-300"
+          >
+            <IconRotate className="size-3.5" />
+            {copy.tileReviewBadge}
+          </Badge>
+        ) : completed ? (
+          <Badge variant="secondary" className="rounded-md">
+            <IconCircleCheck className="size-3.5" />
+            {copy.tileCompleteBadge}
           </Badge>
         ) : (
           <Badge variant="secondary" className="rounded-md">
@@ -390,7 +520,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
         '免费入门组已经完成。现在适合打印整组练习纸，巩固真正的手写记忆。',
       finishedTitle: '入门组已完成',
       lessonCharacters: (count: number) => `${count} 个汉字`,
+      lessonCompletePrompt: '这一组已经完成，适合打印出来做一次纸笔巩固。',
+      lessonContinueCta: '继续本组',
+      lessonContinuePrompt: (completed: number, total: number) =>
+        `本组已完成 ${completed}/${total}，继续把剩下的字练完。`,
       lessonLabel: (index: number) => `第 ${index} 组`,
+      lessonProgressTitle: '本组进度',
+      lessonReviewCta: '复习本组错字',
+      lessonReviewPrompt: (count: number) =>
+        `${count} 个字有错笔，先复习它们再继续新字。`,
+      lessonReviewWorksheetCta: '打印本组错字',
+      lessonReviewWorksheetNote: (lesson: string, count: number) =>
+        `${lesson}：优先复习 ${count} 个有错笔的汉字。`,
+      lessonStartCta: '练这一组',
+      lessonStartPrompt: '从本组第一个免费汉字开始，先看笔顺再描写。',
+      lessonWorksheetCta: '打印本组',
+      lessonWorksheetNote: (lesson: string) =>
+        `${lesson}：完成这一组汉字的纸笔练习。`,
       levelBadge: '中文初学者',
       lockedCharacters: (count: number) => `${count} 个 Pro 字`,
       practiceCta: '开始练习',
@@ -410,6 +556,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
       strokeCount: (count: number) => `${count} 画`,
       summaryDescription: '当前公开的启动课程数据。',
       summaryTitle: 'HSK1 Starter',
+      tileCompleteBadge: '已完成',
+      tileReviewBadge: '复习',
       title: 'HSK1 汉字学习路径',
       totalLabel: '总汉字',
       upgradeCta: '查看套餐',
@@ -440,7 +588,25 @@ function getCourseCopy(locale: 'en' | 'zh') {
       'You finished the free starter set. Print the full set now to reinforce real handwriting memory.',
     finishedTitle: 'Starter set complete',
     lessonCharacters: (count: number) => `${count} characters`,
+    lessonCompletePrompt:
+      'This lesson is complete. Print it once to reinforce handwriting memory.',
+    lessonContinueCta: 'Continue lesson',
+    lessonContinuePrompt: (completed: number, total: number) =>
+      `${completed}/${total} complete in this lesson. Finish the remaining characters next.`,
     lessonLabel: (index: number) => `Lesson ${index}`,
+    lessonProgressTitle: 'Lesson progress',
+    lessonReviewCta: 'Review lesson',
+    lessonReviewPrompt: (count: number) =>
+      `${count} characters have missed strokes. Review them before adding new ones.`,
+    lessonReviewWorksheetCta: 'Print review',
+    lessonReviewWorksheetNote: (lesson: string, count: number) =>
+      `${lesson}: review the ${count} characters with missed strokes first.`,
+    lessonStartCta: 'Practice lesson',
+    lessonStartPrompt:
+      'Start with the first free character in this lesson: watch, trace, then review.',
+    lessonWorksheetCta: 'Print lesson',
+    lessonWorksheetNote: (lesson: string) =>
+      `${lesson}: finish this character set on paper.`,
     levelBadge: 'Beginner Chinese',
     lockedCharacters: (count: number) => `${count} Pro`,
     practiceCta: 'Start practice',
@@ -460,6 +626,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     strokeCount: (count: number) => `${count} strokes`,
     summaryDescription: 'Currently published starter course data.',
     summaryTitle: 'HSK1 Starter',
+    tileCompleteBadge: 'Done',
+    tileReviewBadge: 'Review',
     title: 'HSK1 Chinese Character Learning Path',
     totalLabel: 'Total',
     upgradeCta: 'View plans',
