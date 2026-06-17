@@ -3,6 +3,8 @@ import { ResendNewsletterProvider } from './provider/resend';
 import { BeehiivNewsletterProvider } from './provider/beehiiv';
 import type { NewsletterProvider, NewsletterProviderName } from './types';
 
+let newsletterProvider: NewsletterProvider | null = null;
+
 type ProviderFactory = () => NewsletterProvider;
 
 const providerRegistry: Record<NewsletterProviderName, ProviderFactory> = {
@@ -16,7 +18,7 @@ function createProvider(): NewsletterProvider {
     throw new Error('Newsletter is disabled or provider not set.');
   }
   const name = config.provider;
-  const factory = providerRegistry[name as NewsletterProviderName];
+  const factory = providerRegistry[name];
   if (!factory) {
     throw new Error(`Unsupported newsletter provider: ${name}.`);
   }
@@ -24,7 +26,8 @@ function createProvider(): NewsletterProvider {
 }
 
 export function getNewsletterProvider(): NewsletterProvider {
-  return createProvider();
+  if (!newsletterProvider) newsletterProvider = createProvider();
+  return newsletterProvider;
 }
 
 export async function subscribe(email: string): Promise<boolean> {
