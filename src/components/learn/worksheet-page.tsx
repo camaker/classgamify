@@ -30,6 +30,7 @@ import { toast } from 'sonner';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 const TRACE_MODES = ['first', 'guided', 'blank'] as const;
+const DEFAULT_GRID_COUNT: WorksheetGridCount = 9;
 const DEFAULT_TRACE_MODE: TraceMode = 'first';
 const MAX_WORKSHEET_CHARACTERS = 12;
 const WORKSHEET_PRINT_MODE = 'worksheet';
@@ -43,6 +44,7 @@ type WorksheetCharacter = ReturnType<typeof getFreeCharacters>[number] & {
 };
 
 type TraceMode = (typeof TRACE_MODES)[number];
+type WorksheetGridCount = (typeof GRID_OPTIONS)[number];
 
 type WorksheetQuickSet = {
   characters: string[];
@@ -63,8 +65,12 @@ function clearWorksheetPrintMode() {
 
 export function WorksheetPage({
   initialCharacters,
+  initialGridCount,
+  initialTraceMode,
 }: {
   initialCharacters?: string[];
+  initialGridCount?: WorksheetGridCount;
+  initialTraceMode?: TraceMode;
 }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getWorksheetCopy(currentLocale);
@@ -87,8 +93,12 @@ export function WorksheetPage({
     initialSelectedCharacters
   );
   const [customInput, setCustomInput] = useState('');
-  const [gridCount, setGridCount] = useState<(typeof GRID_OPTIONS)[number]>(9);
-  const [traceMode, setTraceMode] = useState<TraceMode>(DEFAULT_TRACE_MODE);
+  const initialGridCountValue = initialGridCount ?? DEFAULT_GRID_COUNT;
+  const initialTraceModeValue = initialTraceMode ?? DEFAULT_TRACE_MODE;
+  const [gridCount, setGridCount] = useState<WorksheetGridCount>(
+    initialGridCountValue
+  );
+  const [traceMode, setTraceMode] = useState<TraceMode>(initialTraceModeValue);
   const quickSets = useMemo(
     () => createWorksheetQuickSets(characters, copy),
     [characters, copy]
@@ -97,6 +107,14 @@ export function WorksheetPage({
   useEffect(() => {
     setSelectedCharacters(initialSelectedCharacters);
   }, [initialSelectedCharacters]);
+
+  useEffect(() => {
+    setGridCount(initialGridCountValue);
+  }, [initialGridCountValue]);
+
+  useEffect(() => {
+    setTraceMode(initialTraceModeValue);
+  }, [initialTraceModeValue]);
 
   useEffect(() => {
     window.addEventListener('beforeprint', enableWorksheetPrintMode);
@@ -128,8 +146,10 @@ export function WorksheetPage({
     for (const character of selectedCharacters) {
       params.append('characters', character);
     }
+    params.set('grid', String(gridCount));
+    params.set('trace', traceMode);
     return `${Routes.Worksheets}?${params.toString()}`;
-  }, [selectedCharacters]);
+  }, [gridCount, selectedCharacters, traceMode]);
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -170,8 +190,8 @@ export function WorksheetPage({
   const resetSelection = () => {
     setSelectedCharacters(initialSelectedCharacters);
     setCustomInput('');
-    setGridCount(9);
-    setTraceMode(DEFAULT_TRACE_MODE);
+    setGridCount(initialGridCountValue);
+    setTraceMode(initialTraceModeValue);
   };
 
   const clearSelection = () => {
