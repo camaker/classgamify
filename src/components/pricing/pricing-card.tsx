@@ -73,7 +73,7 @@ export function PricingCard({
   return (
     <Card
       className={cn(
-        'flex h-full flex-col',
+        'flex h-full flex-col overflow-visible py-3 sm:py-4',
         plan.popular && 'relative overflow-visible',
         className
       )}
@@ -89,15 +89,19 @@ export function PricingCard({
         </div>
       )}
 
-      <CardHeader>
+      <CardHeader className="gap-2 px-3 sm:px-4">
         <CardTitle>
           <h3 className="font-medium">{plan.name ?? plan.id}</h3>
         </CardTitle>
-        <div className="flex items-baseline gap-2">
-          <span className="my-4 block text-4xl font-semibold">
+        <div className="my-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 sm:my-4">
+          <span className="block text-3xl font-semibold sm:text-4xl">
             {formattedPrice}
           </span>
-          {priceLabel && <span className="text-2xl">{priceLabel}</span>}
+          {priceLabel && (
+            <span className="text-xl leading-none sm:text-2xl">
+              {priceLabel}
+            </span>
+          )}
         </div>
         <CardDescription>
           <p className="text-sm">{plan.description ?? ''}</p>
@@ -126,7 +130,7 @@ export function PricingCard({
               planId={plan.id}
               priceId={price.priceId}
               metadata={metadata}
-              className="mt-4 w-full"
+              className="mt-3 w-full sm:mt-4"
             >
               {plan.isLifetime
                 ? m.pricing_card_get_lifetime_access()
@@ -154,22 +158,22 @@ export function PricingCard({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 px-3 sm:space-y-4 sm:px-4">
         <hr className="border-dashed" />
 
-        <ul className="list-outside space-y-4 text-sm">
+        <ul className="list-outside space-y-3 text-sm sm:space-y-4">
           {plan.features?.map((feature, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <IconCircleCheck className="size-4 text-chart-2" />
-              <span>{feature}</span>
+            <li key={i} className="flex items-start gap-2">
+              <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-chart-2" />
+              <span className="min-w-0 leading-relaxed">{feature}</span>
             </li>
           ))}
         </ul>
-        <ul className="list-outside space-y-4 text-sm">
+        <ul className="list-outside space-y-3 text-sm sm:space-y-4">
           {plan.limits?.map((limit, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <IconCircleX className="size-4 text-muted-foreground" />
-              <span>{limit}</span>
+            <li key={i} className="flex items-start gap-2">
+              <IconCircleX className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <span className="min-w-0 leading-relaxed">{limit}</span>
             </li>
           ))}
         </ul>
