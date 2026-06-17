@@ -63,6 +63,30 @@ export function HskCoursePage() {
     () => getHanziProgressSummary(freeLessonCharacters, progress),
     [freeLessonCharacters, progress]
   );
+  const primaryPracticeCharacter =
+    progressSummary.reviewItems[0]?.character ??
+    progressSummary.nextPracticeTarget?.character ??
+    freeLessonCharacters[0];
+  const primaryPracticeLabel =
+    progressSummary.reviewItems.length > 0
+      ? copy.reviewCta
+      : progressSummary.completedCount > 0
+        ? progressSummary.lessonComplete
+          ? copy.practiceAgainCta
+          : copy.continueCta
+        : copy.practiceCta;
+  const primaryWorksheetSearch = {
+    characters:
+      progressSummary.reviewCharacters.length > 0
+        ? progressSummary.reviewCharacters
+        : freeCharacters,
+    details: true,
+    note:
+      progressSummary.reviewCharacters.length > 0
+        ? copy.reviewWorksheetNote(progressSummary.reviewCharacters.length)
+        : copy.continueWorksheetNote,
+    trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
+  };
   const lessonProgressItems = useMemo(
     () =>
       lessons.map((lesson) => {
@@ -108,21 +132,28 @@ export function HskCoursePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link
-                to={Routes.Learn}
-                search={{ character: freeCharacters[0] }}
-                className={buttonVariants()}
-              >
-                <IconPencil className="size-4" />
-                {copy.practiceCta}
-              </Link>
+              {primaryPracticeCharacter ? (
+                <Link
+                  to={Routes.Learn}
+                  search={{
+                    character: primaryPracticeCharacter.character,
+                    characters: freeCharacters,
+                  }}
+                  className={buttonVariants()}
+                >
+                  <IconPencil className="size-4" />
+                  {primaryPracticeLabel}
+                </Link>
+              ) : null}
               <Link
                 to={Routes.Worksheets}
-                search={{ characters: freeCharacters }}
+                search={primaryWorksheetSearch}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconFileText className="size-4" />
-                {copy.worksheetCta}
+                {progressSummary.reviewCharacters.length > 0
+                  ? copy.reviewWorksheetCta
+                  : copy.worksheetCta}
               </Link>
             </div>
           </div>
@@ -637,6 +668,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
         `${lesson}：完成这一组汉字的纸笔练习。`,
       levelBadge: '中文初学者',
       lockedCharacters: (count: number) => `${count} 个 Pro 字`,
+      practiceAgainCta: '再练一遍',
       practiceCta: '开始练习',
       premiumLabel: 'Pro 字',
       proBadge: 'Pro',
@@ -711,6 +743,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       `${lesson}: finish this character set on paper.`,
     levelBadge: 'Beginner Chinese',
     lockedCharacters: (count: number) => `${count} Pro`,
+    practiceAgainCta: 'Practice again',
     practiceCta: 'Start practice',
     premiumLabel: 'Pro',
     proBadge: 'Pro',
