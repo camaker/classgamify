@@ -16,6 +16,7 @@ import {
   IconArrowLeft,
   IconCircleCheck,
   IconClipboardText,
+  IconCopy,
   IconLock,
   IconPrinter,
   IconRefresh,
@@ -23,6 +24,7 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 const MAX_WORKSHEET_CHARACTERS = 12;
@@ -102,6 +104,14 @@ export function WorksheetPage({
       createCustomWorksheetCharacter(character, copy)
   );
 
+  const shareUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    for (const character of selectedCharacters) {
+      params.append('characters', character);
+    }
+    return `${Routes.Worksheets}?${params.toString()}`;
+  }, [selectedCharacters]);
+
   const toggleCharacter = (character: string) => {
     setSelectedCharacters((current) => {
       if (current.includes(character)) {
@@ -133,6 +143,19 @@ export function WorksheetPage({
     window.requestAnimationFrame(() => {
       window.print();
     });
+  };
+
+  const copyShareLink = async () => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(shareUrl, window.location.origin).toString();
+
+    try {
+      await window.navigator.clipboard.writeText(url);
+      toast.success(copy.shareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
   };
 
   return (
@@ -282,6 +305,15 @@ export function WorksheetPage({
                     <Button type="button" onClick={printWorksheet}>
                       <IconPrinter className="size-4" />
                       {copy.printCta}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={copyShareLink}
+                      disabled={selectedCharacters.length === 0}
+                    >
+                      <IconCopy className="size-4" />
+                      {copy.shareCta}
                     </Button>
                     <Button
                       type="button"
@@ -480,6 +512,9 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       selectDescription:
         '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
       selectTitle: '选择汉字',
+      shareCta: '复制练习纸链接',
+      shareError: '复制失败，请稍后重试。',
+      shareSuccess: '练习纸链接已复制。',
       sourceLabel: '生成来源',
       title: '打印中文汉字书写练习纸',
     };
@@ -520,6 +555,9 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     selectDescription:
       'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
     selectTitle: 'Select characters',
+    shareCta: 'Copy worksheet link',
+    shareError: 'Could not copy the link. Please try again.',
+    shareSuccess: 'Worksheet link copied.',
     sourceLabel: 'Created with',
     title: 'Print Chinese character practice sheets',
   };
