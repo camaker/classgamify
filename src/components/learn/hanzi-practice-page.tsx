@@ -14,6 +14,15 @@ import {
   getFreeCharacters,
   type LessonCharacter,
 } from '@/learn/hanzi-course';
+import {
+  getHanziProgressSummary,
+  readStoredHanziProgress,
+  writeStoredHanziProgress,
+  type CharacterProgress,
+  type HanziReviewItem,
+  type NextPracticeTarget,
+  type StoredProgress,
+} from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -36,7 +45,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 const HANZI_WRITER_SCRIPT =
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js';
 const HANZI_WRITER_SCRIPT_ID = 'hanzi-writer-cdn';
-const PROGRESS_STORAGE_KEY = 'lang-study:beginner-hanzi-progress:v1';
 
 type HanziWriterStatus = 'idle' | 'loading' | 'ready' | 'animating' | 'quiz';
 
@@ -69,27 +77,6 @@ type HanziWriterStatic = {
     character: string,
     options: Record<string, unknown>
   ) => HanziWriterInstance;
-};
-
-type CharacterProgress = {
-  completed: boolean;
-  completedAt?: string;
-  correctStrokes: number;
-  mistakeStrokes?: number[];
-  mistakes: number;
-};
-
-type StoredProgress = Record<string, CharacterProgress>;
-
-type ReviewItem = {
-  character: LessonCharacter;
-  index: number;
-  progress: CharacterProgress;
-};
-
-type NextPracticeTarget = {
-  character: LessonCharacter;
-  index: number;
 };
 
 declare global {
@@ -144,23 +131,6 @@ function loadHanziWriter() {
   return hanziWriterPromise;
 }
 
-function readStoredProgress(): StoredProgress {
-  if (typeof window === 'undefined') return {};
-
-  try {
-    const raw = window.localStorage.getItem(PROGRESS_STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as StoredProgress;
-  } catch {
-    return {};
-  }
-}
-
-function writeStoredProgress(progress: StoredProgress) {
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
-}
-
 export function HanziPracticePage({
   initialCharacter,
 }: {
@@ -180,48 +150,13 @@ export function HanziPracticePage({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState<StoredProgress>({});
   const currentCharacter = lessonCharacters[currentIndex];
-  const completedCount = lessonCharacters.filter(
-    (item) => progress[item.character]?.completed
-  ).length;
-  const cleanCount = lessonCharacters.filter((item) => {
-    const itemProgress = progress[item.character];
-    return itemProgress?.completed && itemProgress.mistakes === 0;
-  }).length;
-  const reviewItems = useMemo(
-    () =>
-      lessonCharacters
-        .map((character, index) => ({
-          character,
-          index,
-          progress: progress[character.character],
-        }))
-        .filter(
-          (item): item is ReviewItem =>
-            Boolean(item.progress?.completed) && item.progress.mistakes > 0
-        )
-        .sort((a, b) => b.progress.mistakes - a.progress.mistakes),
+  const progressSummary = useMemo(
+    () => getHanziProgressSummary(lessonCharacters, progress),
     [lessonCharacters, progress]
-  );
-  const reviewCharacters = reviewItems.map((item) => item.character.character);
-  const lessonComplete = completedCount === lessonCharacters.length;
-  const nextPracticeTarget = useMemo<NextPracticeTarget | undefined>(() => {
-    const index = lessonCharacters.findIndex(
-      (item) => !progress[item.character]?.completed
-    );
-
-    if (index === -1) return undefined;
-
-    return {
-      character: lessonCharacters[index],
-      index,
-    };
-  }, [lessonCharacters, progress]);
-  const progressValue = Math.round(
-    (completedCount / lessonCharacters.length) * 100
   );
 
   useEffect(() => {
-    setProgress(readStoredProgress());
+    setProgress(readStoredHanziProgress());
   }, []);
 
   useEffect(() => {
@@ -235,7 +170,7 @@ export function HanziPracticePage({
           ...previous,
           [character]: nextProgress,
         };
-        writeStoredProgress(updated);
+        writeStoredHanziProgress(updated);
         return updated;
       });
     },
@@ -245,7 +180,7 @@ export function HanziPracticePage({
   const resetLesson = useCallback(() => {
     setCurrentIndex(initialIndex);
     setProgress({});
-    writeStoredProgress({});
+    writeStoredHanziProgress({});
   }, [initialIndex]);
 
   const goToNext = useCallback(() => {
@@ -308,13 +243,13 @@ export function HanziPracticePage({
                 <CardTitle>{copy.courseTitle}</CardTitle>
                 <CardDescription>
                   {m.learn_progress_description({
-                    completed: completedCount,
+                    completed: progressSummary.completedCount,
                     total: lessonCharacters.length,
                   })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Progress value={progressValue} />
+                <Progress value={progressSummary.progressValue} />
                 <div className="grid grid-cols-5 gap-2">
                   {lessonCharacters.map((item, index) => {
                     const done = progress[item.character]?.completed;
@@ -346,7 +281,7 @@ export function HanziPracticePage({
                     <IconReload className="size-4" />
                     {m.learn_reset()}
                   </Button>
-                  {lessonComplete ? (
+                  {progressSummary.lessonComplete ? (
                     <Badge
                       variant="secondary"
                       className="h-8 rounded-lg px-3 text-sm"
@@ -360,22 +295,22 @@ export function HanziPracticePage({
             </Card>
 
             <LearningLoopCard
-              completedCount={completedCount}
+              completedCount={progressSummary.completedCount}
               copy={copy}
-              nextPracticeTarget={nextPracticeTarget}
+              nextPracticeTarget={progressSummary.nextPracticeTarget}
               onSelect={(index) => setCurrentIndex(index)}
-              reviewCharacters={reviewCharacters}
-              reviewItems={reviewItems}
+              reviewCharacters={progressSummary.reviewCharacters}
+              reviewItems={progressSummary.reviewItems}
               total={lessonCharacters.length}
               worksheetCharacters={worksheetCharacters}
             />
 
             <ReviewQueueCard
-              cleanCount={cleanCount}
+              cleanCount={progressSummary.cleanCount}
               copy={copy}
               onSelect={(index) => setCurrentIndex(index)}
-              reviewCharacters={reviewCharacters}
-              reviewItems={reviewItems}
+              reviewCharacters={progressSummary.reviewCharacters}
+              reviewItems={progressSummary.reviewItems}
               total={lessonCharacters.length}
             />
 
@@ -456,7 +391,7 @@ export function HanziPracticePage({
             currentIndex={currentIndex}
             total={lessonCharacters.length}
             progress={progress[currentCharacter.character]}
-            lessonComplete={lessonComplete}
+            lessonComplete={progressSummary.lessonComplete}
             onComplete={(nextProgress) =>
               saveProgress(currentCharacter.character, nextProgress)
             }
@@ -765,7 +700,7 @@ function LearningLoopCard({
   nextPracticeTarget?: NextPracticeTarget;
   onSelect: (index: number) => void;
   reviewCharacters: string[];
-  reviewItems: ReviewItem[];
+  reviewItems: HanziReviewItem[];
   total: number;
   worksheetCharacters: string[];
 }) {
@@ -863,7 +798,7 @@ function ReviewQueueCard({
   copy: ReturnType<typeof getPracticeCopy>;
   onSelect: (index: number) => void;
   reviewCharacters: string[];
-  reviewItems: ReviewItem[];
+  reviewItems: HanziReviewItem[];
   total: number;
 }) {
   const firstReview = reviewItems[0];
