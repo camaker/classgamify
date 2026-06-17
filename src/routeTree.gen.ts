@@ -21,7 +21,6 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
@@ -32,7 +31,6 @@ import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as Hsk1RouteImport } from './routes/hsk/1'
 import { Route as HanziCharacterRouteImport } from './routes/hanzi/$character'
-import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -42,16 +40,10 @@ import { Route as ApiPingRouteImport } from './routes/api/ping'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
 import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
-import { Route as pagesWaitlistRouteImport } from './routes/(pages)/waitlist'
-import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
 import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
 import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
-import { Route as pagesChangelogRouteImport } from './routes/(pages)/changelog'
-import { Route as pagesAiRouteImport } from './routes/(pages)/ai'
-import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
-import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
@@ -117,11 +109,6 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -172,11 +159,6 @@ const HanziCharacterRoute = HanziCharacterRouteImport.update({
   path: '/hanzi/$character',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -222,16 +204,6 @@ const testsTest404Route = testsTest404RouteImport.update({
   path: '/test-404',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesWaitlistRoute = pagesWaitlistRouteImport.update({
-  id: '/(pages)/waitlist',
-  path: '/waitlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const pagesRoadmapRoute = pagesRoadmapRouteImport.update({
-  id: '/(pages)/roadmap',
-  path: '/roadmap',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const pagesPricingRoute = pagesPricingRouteImport.update({
   id: '/(pages)/pricing',
   path: '/pricing',
@@ -242,21 +214,6 @@ const pagesContactRoute = pagesContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const pagesChangelogRoute = pagesChangelogRouteImport.update({
-  id: '/(pages)/changelog',
-  path: '/changelog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const pagesAiRoute = pagesAiRouteImport.update({
-  id: '/(pages)/ai',
-  path: '/ai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const pagesAboutRoute = pagesAboutRouteImport.update({
-  id: '/(pages)/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const legalsTermsRoute = legalsTermsRouteImport.update({
   id: '/(legals)/terms',
   path: '/terms',
@@ -265,11 +222,6 @@ const legalsTermsRoute = legalsTermsRouteImport.update({
 const legalsPrivacyRoute = legalsPrivacyRouteImport.update({
   id: '/(legals)/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const legalsCookieRoute = legalsCookieRouteImport.update({
-  id: '/(legals)/cookie',
-  path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
@@ -304,16 +256,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/worksheets': typeof WorksheetsRoute
-  '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
-  '/about': typeof pagesAboutRoute
-  '/ai': typeof pagesAiRoute
-  '/changelog': typeof pagesChangelogRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
-  '/roadmap': typeof pagesRoadmapRoute
-  '/waitlist': typeof pagesWaitlistRoute
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -323,7 +269,6 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -334,7 +279,6 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
-  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -350,16 +294,10 @@ export interface FileRoutesByTo {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/worksheets': typeof WorksheetsRoute
-  '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
-  '/about': typeof pagesAboutRoute
-  '/ai': typeof pagesAiRoute
-  '/changelog': typeof pagesChangelogRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
-  '/roadmap': typeof pagesRoadmapRoute
-  '/waitlist': typeof pagesWaitlistRoute
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -369,7 +307,6 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -380,7 +317,6 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin': typeof AdminIndexRoute
-  '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -400,16 +336,10 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/worksheets': typeof WorksheetsRoute
-  '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
   '/(legals)/terms': typeof legalsTermsRoute
-  '/(pages)/about': typeof pagesAboutRoute
-  '/(pages)/ai': typeof pagesAiRoute
-  '/(pages)/changelog': typeof pagesChangelogRoute
   '/(pages)/contact': typeof pagesContactRoute
   '/(pages)/pricing': typeof pagesPricingRoute
-  '/(pages)/roadmap': typeof pagesRoadmapRoute
-  '/(pages)/waitlist': typeof pagesWaitlistRoute
   '/(tests)/test-404': typeof testsTest404Route
   '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -419,7 +349,6 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -430,7 +359,6 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
-  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -451,16 +379,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/worksheets'
-    | '/cookie'
     | '/privacy'
     | '/terms'
-    | '/about'
-    | '/ai'
-    | '/changelog'
     | '/contact'
     | '/pricing'
-    | '/roadmap'
-    | '/waitlist'
     | '/test-404'
     | '/test-error'
     | '/admin/users'
@@ -470,7 +392,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
-    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -481,7 +402,6 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
-    | '/blog/'
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
@@ -497,16 +417,10 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/worksheets'
-    | '/cookie'
     | '/privacy'
     | '/terms'
-    | '/about'
-    | '/ai'
-    | '/changelog'
     | '/contact'
     | '/pricing'
-    | '/roadmap'
-    | '/waitlist'
     | '/test-404'
     | '/test-error'
     | '/admin/users'
@@ -516,7 +430,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
-    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -527,7 +440,6 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin'
-    | '/blog'
     | '/dashboard'
     | '/settings'
     | '/api/auth/$'
@@ -546,16 +458,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/worksheets'
-    | '/(legals)/cookie'
     | '/(legals)/privacy'
     | '/(legals)/terms'
-    | '/(pages)/about'
-    | '/(pages)/ai'
-    | '/(pages)/changelog'
     | '/(pages)/contact'
     | '/(pages)/pricing'
-    | '/(pages)/roadmap'
-    | '/(pages)/waitlist'
     | '/(tests)/test-404'
     | '/(tests)/test-error'
     | '/admin/users'
@@ -565,7 +471,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
-    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -576,7 +481,6 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
-    | '/blog/'
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
@@ -596,23 +500,15 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WorksheetsRoute: typeof WorksheetsRoute
-  legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
   legalsTermsRoute: typeof legalsTermsRoute
-  pagesAboutRoute: typeof pagesAboutRoute
-  pagesAiRoute: typeof pagesAiRoute
-  pagesChangelogRoute: typeof pagesChangelogRoute
   pagesContactRoute: typeof pagesContactRoute
   pagesPricingRoute: typeof pagesPricingRoute
-  pagesRoadmapRoute: typeof pagesRoadmapRoute
-  pagesWaitlistRoute: typeof pagesWaitlistRoute
   testsTest404Route: typeof testsTest404Route
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
-  BlogSlugRoute: typeof BlogSlugRoute
   HanziCharacterRoute: typeof HanziCharacterRoute
   Hsk1Route: typeof Hsk1Route
-  BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -705,13 +601,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -782,13 +671,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HanziCharacterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/reset-password': {
       id: '/auth/reset-password'
       path: '/reset-password'
@@ -852,20 +734,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof testsTest404RouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/waitlist': {
-      id: '/(pages)/waitlist'
-      path: '/waitlist'
-      fullPath: '/waitlist'
-      preLoaderRoute: typeof pagesWaitlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(pages)/roadmap': {
-      id: '/(pages)/roadmap'
-      path: '/roadmap'
-      fullPath: '/roadmap'
-      preLoaderRoute: typeof pagesRoadmapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(pages)/pricing': {
       id: '/(pages)/pricing'
       path: '/pricing'
@@ -880,27 +748,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof pagesContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(pages)/changelog': {
-      id: '/(pages)/changelog'
-      path: '/changelog'
-      fullPath: '/changelog'
-      preLoaderRoute: typeof pagesChangelogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(pages)/ai': {
-      id: '/(pages)/ai'
-      path: '/ai'
-      fullPath: '/ai'
-      preLoaderRoute: typeof pagesAiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(pages)/about': {
-      id: '/(pages)/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof pagesAboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(legals)/terms': {
       id: '/(legals)/terms'
       path: '/terms'
@@ -913,13 +760,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof legalsPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(legals)/cookie': {
-      id: '/(legals)/cookie'
-      path: '/cookie'
-      fullPath: '/cookie'
-      preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/webhooks/stripe': {
@@ -1032,23 +872,15 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WorksheetsRoute: WorksheetsRoute,
-  legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,
   legalsTermsRoute: legalsTermsRoute,
-  pagesAboutRoute: pagesAboutRoute,
-  pagesAiRoute: pagesAiRoute,
-  pagesChangelogRoute: pagesChangelogRoute,
   pagesContactRoute: pagesContactRoute,
   pagesPricingRoute: pagesPricingRoute,
-  pagesRoadmapRoute: pagesRoadmapRoute,
-  pagesWaitlistRoute: pagesWaitlistRoute,
   testsTest404Route: testsTest404Route,
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
-  BlogSlugRoute: BlogSlugRoute,
   HanziCharacterRoute: HanziCharacterRoute,
   Hsk1Route: Hsk1Route,
-  BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
