@@ -34,6 +34,11 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      title: m.nav_cookie_policy_title(),
+      href: Routes.CookiePolicy,
+      external: false,
+    },
+    {
       title: m.nav_terms_of_service_title(),
       href: Routes.TermsOfService,
       external: false,
