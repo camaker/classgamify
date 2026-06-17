@@ -43,3 +43,7 @@ src/locale/paraglide
 .worktrees/
 .security-key
 logs/security/
+
+# Playwright
+playwright-report
+test-results

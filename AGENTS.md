@@ -12,6 +12,9 @@ This file provides guidance to Code Agents (Codex, Cursor, etc.) when working wi
 pnpm dev                    # Dev server on port 3000
 pnpm build                  # Production build
 pnpm deploy                 # Build + deploy to Cloudflare Workers
+pnpm e2e                    # Run local Playwright E2E tests
+pnpm e2e:ui                 # Run Playwright E2E in UI mode
+pnpm e2e:install            # Install Playwright browser binaries
 
 pnpm lint                   # Biome lint + format with auto-fix
 pnpm check                  # Biome lint (read-only, no auto-fix)
@@ -29,7 +32,19 @@ pnpm email:dev              # React Email preview on port 3333
 pnpm cf-typegen             # Generate Cloudflare Worker types (also runs on postinstall)
 ```
 
-No test framework is configured. Manual testing via `pnpm dev` and test routes in `src/routes/(tests)/`.
+Playwright E2E is configured under `tests/e2e/`. E2E is local-first: use it for feature completion, release checks, and large refactors; keep CI focused on fast checks unless a dedicated E2E environment is provisioned.
+
+### E2E Workflow
+
+Follow `Spec → Code → Verify → Test → Green` for user-facing changes:
+
+1. **Spec**: update `tests/e2e/TEST-CATALOG.md` with the acceptance journey.
+2. **Code**: implement the feature.
+3. **Verify**: run the app and walk the real UI in a browser.
+4. **Test**: add/update the relevant Playwright spec in `tests/e2e/specs/`.
+5. **Green**: run the related spec locally; run full `pnpm e2e` before releases or large refactors.
+
+The test-only helper route `src/routes/api/e2e/users.ts` is disabled unless Vite runs locally with `import.meta.env.DEV === true`, `MODE=e2e`, and a matching `x-e2e-secret`. Keep E2E test accounts scoped to `e2e-*@example.test`.
 
 ## Architecture
 

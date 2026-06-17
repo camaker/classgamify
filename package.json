@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install",
+    "e2e:ui": "playwright test --ui",
     "knip": "knip",
     "check": "biome check",
     "lint": "biome check --write .",
@@ -95,6 +98,7 @@
     "@biomejs/biome": "2.3.12",
     "@content-collections/core": "^0.13.1",
     "@content-collections/vite": "^0.2.8",
+    "@playwright/test": "^1.61.0",
     "@react-email/preview-server": "5.2.5",
     "@tanstack/devtools-vite": "^0.3.11",
     "@types/node": "^22.10.2",
