@@ -339,10 +339,13 @@ function LessonSection({
   worksheetCharacters: string[];
 }) {
   const firstReview = progressSummary.reviewItems[0];
+  const firstAvailableCharacter = lesson.characters.find(
+    (item) => !item.premium
+  );
   const actionCharacter =
     firstReview?.character ??
     progressSummary.nextPracticeTarget?.character ??
-    lesson.characters.find((item) => !item.premium);
+    firstAvailableCharacter;
   const hasReview = progressSummary.reviewItems.length > 0;
   const lessonComplete =
     progressSummary.total > 0 && progressSummary.lessonComplete;
@@ -358,9 +361,11 @@ function LessonSection({
         : copy.lessonStartPrompt;
   const lessonActionLabel = hasReview
     ? copy.lessonReviewCta
-    : progressSummary.completedCount > 0
-      ? copy.lessonContinueCta
-      : copy.lessonStartCta;
+    : lessonComplete
+      ? copy.lessonPracticeAgainCta
+      : progressSummary.completedCount > 0
+        ? copy.lessonContinueCta
+        : copy.lessonStartCta;
   const worksheetSearch = {
     characters: hasReview
       ? progressSummary.reviewCharacters
@@ -654,6 +659,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       lessonContinuePrompt: (completed: number, total: number) =>
         `本组已完成 ${completed}/${total}，继续把剩下的字练完。`,
       lessonLabel: (index: number) => `第 ${index} 组`,
+      lessonPracticeAgainCta: '再练本组',
       lessonProgressTitle: '本组进度',
       lessonReviewCta: '复习本组错字',
       lessonReviewPrompt: (count: number) =>
@@ -728,6 +734,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
     lessonContinuePrompt: (completed: number, total: number) =>
       `${completed}/${total} complete in this lesson. Finish the remaining characters next.`,
     lessonLabel: (index: number) => `Lesson ${index}`,
+    lessonPracticeAgainCta: 'Practice again',
     lessonProgressTitle: 'Lesson progress',
     lessonReviewCta: 'Review lesson',
     lessonReviewPrompt: (count: number) =>
