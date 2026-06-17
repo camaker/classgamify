@@ -23,7 +23,7 @@ export const clientEnv = createEnv({
     VITE_CREEM_PRODUCT_LIFETIME: z.string().optional(),
 
     // Analytics
-    VITE_GOOGLE_ANALYTICS_ID: z.string().optional(),
+    VITE_GOOGLE_ANALYTICS_ID: z.string().default('G-VBFVVN386M'),
     VITE_CLARITY_PROJECT_ID: z.string().default('x87hl5xy62'),
     VITE_PLAUSIBLE_SCRIPT: z.string().optional(),
     VITE_UMAMI_WEBSITE_ID: z
