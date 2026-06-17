@@ -7,6 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { getFreeCharacters } from '@/learn/hanzi-course';
 import { getLocale } from '@/lib/locale';
@@ -30,11 +32,15 @@ import { toast } from 'sonner';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 const TRACE_MODES = ['first', 'guided', 'blank'] as const;
+export const WORKSHEET_PAPER_SIZES = ['a4', 'letter', 'legal', 'a5'] as const;
 const DEFAULT_GRID_COUNT: WorksheetGridCount = 9;
+const DEFAULT_PAPER_SIZE: WorksheetPaperSize = 'a4';
 const DEFAULT_TRACE_MODE: TraceMode = 'first';
+const DEFAULT_SHOW_CHARACTER_DETAILS = true;
 const MAX_ASSIGNMENT_NOTE_LENGTH = 180;
 const MAX_WORKSHEET_CHARACTERS = 12;
 const WORKSHEET_PRINT_MODE = 'worksheet';
+const WORKSHEET_PRINT_STYLE_ID = 'worksheet-print-style';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
 const WORKSHEET_URL = 'getlangstudy.com/worksheets';
 const HANZI_CHARACTER_PATTERN = /\p{Script=Han}/gu;
@@ -44,6 +50,7 @@ type WorksheetCharacter = ReturnType<typeof getFreeCharacters>[number] & {
   custom?: boolean;
 };
 
+export type WorksheetPaperSize = (typeof WORKSHEET_PAPER_SIZES)[number];
 type TraceMode = (typeof TRACE_MODES)[number];
 type WorksheetGridCount = (typeof GRID_OPTIONS)[number];
 
@@ -54,6 +61,78 @@ type WorksheetQuickSet = {
   title: string;
 };
 
+type WorksheetPaperPrintConfig = {
+  assignmentGap: string;
+  assignmentPadding: string;
+  characterMarginTop: string;
+  footerGap: string;
+  footerMarginTop: string;
+  gridGap: string;
+  gridMax: string;
+  gridMin: string;
+  margin: string;
+  pageSize: string;
+  headerGap: string;
+};
+
+const WORKSHEET_PAPER_PRINT_CONFIG: Record<
+  WorksheetPaperSize,
+  WorksheetPaperPrintConfig
+> = {
+  a4: {
+    assignmentGap: '8pt',
+    assignmentPadding: '8pt',
+    characterMarginTop: '14pt',
+    footerGap: '8pt',
+    footerMarginTop: '14pt',
+    gridGap: '5pt',
+    gridMax: '28mm',
+    gridMin: '22mm',
+    headerGap: '12pt',
+    margin: '10mm',
+    pageSize: 'A4',
+  },
+  a5: {
+    assignmentGap: '6pt',
+    assignmentPadding: '7pt',
+    characterMarginTop: '10pt',
+    footerGap: '6pt',
+    footerMarginTop: '10pt',
+    gridGap: '4pt',
+    gridMax: '21mm',
+    gridMin: '17mm',
+    headerGap: '8pt',
+    margin: '6mm',
+    pageSize: 'A5',
+  },
+  legal: {
+    assignmentGap: '8pt',
+    assignmentPadding: '8pt',
+    characterMarginTop: '14pt',
+    footerGap: '8pt',
+    footerMarginTop: '14pt',
+    gridGap: '5pt',
+    gridMax: '28mm',
+    gridMin: '22mm',
+    headerGap: '12pt',
+    margin: '10mm',
+    pageSize: 'Legal',
+  },
+  letter: {
+    assignmentGap: '8pt',
+    assignmentPadding: '8pt',
+    characterMarginTop: '14pt',
+    footerGap: '8pt',
+    footerMarginTop: '14pt',
+    gridGap: '5pt',
+    gridMax: '28mm',
+    gridMin: '22mm',
+    headerGap: '12pt',
+    margin: '10mm',
+    pageSize: 'Letter',
+  },
+};
+
 function enableWorksheetPrintMode() {
   document.body.dataset.printMode = WORKSHEET_PRINT_MODE;
 }
@@ -62,17 +141,91 @@ function clearWorksheetPrintMode() {
   if (document.body.dataset.printMode === WORKSHEET_PRINT_MODE) {
     delete document.body.dataset.printMode;
   }
+
+  clearWorksheetPrintPaper();
+  clearWorksheetPrintStyles();
+}
+
+function syncWorksheetPrintPaper(paperSize: WorksheetPaperSize) {
+  document.body.dataset.printPaper = paperSize;
+}
+
+function clearWorksheetPrintPaper() {
+  if (document.body.dataset.printPaper) {
+    delete document.body.dataset.printPaper;
+  }
+}
+
+function syncWorksheetPrintStyles(paperSize: WorksheetPaperSize) {
+  const currentConfig = WORKSHEET_PAPER_PRINT_CONFIG[paperSize];
+  let style = document.getElementById(
+    WORKSHEET_PRINT_STYLE_ID
+  ) as HTMLStyleElement | null;
+
+  if (!style) {
+    style = document.createElement('style');
+    style.id = WORKSHEET_PRINT_STYLE_ID;
+    document.head.append(style);
+  }
+
+  style.textContent = buildWorksheetPrintStyleText(paperSize, currentConfig);
+}
+
+function clearWorksheetPrintStyles() {
+  const style = document.getElementById(WORKSHEET_PRINT_STYLE_ID);
+  style?.remove();
+}
+
+function buildWorksheetPrintStyleText(
+  paperSize: WorksheetPaperSize,
+  config: WorksheetPaperPrintConfig
+) {
+  return `
+@media print {
+  @page {
+    size: ${config.pageSize};
+    margin: ${config.margin};
+  }
+
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-header] {
+    gap: ${config.headerGap} !important;
+  }
+
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-assignment] {
+    gap: ${config.assignmentGap} !important;
+    padding: ${config.assignmentPadding} !important;
+  }
+
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-character] {
+    margin-top: ${config.characterMarginTop} !important;
+  }
+
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-grid] {
+    gap: ${config.gridGap} !important;
+    grid-template-columns: repeat(auto-fit, minmax(${config.gridMin}, ${config.gridMax})) !important;
+  }
+
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-footer] {
+    gap: ${config.footerGap} !important;
+    margin-block-start: ${config.footerMarginTop} !important;
+  }
+}
+`;
 }
 
 export function WorksheetPage({
   initialCharacters,
   initialGridCount,
   initialAssignmentNote,
+  initialPaperSize,
+  initialShowCharacterDetails,
   initialTraceMode,
 }: {
   initialCharacters?: string[];
   initialGridCount?: WorksheetGridCount;
   initialAssignmentNote?: string;
+  initialPaperSize?: WorksheetPaperSize;
+  initialShowCharacterDetails?: boolean;
   initialTraceMode?: TraceMode;
 }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -100,9 +253,18 @@ export function WorksheetPage({
     initialAssignmentNote
   );
   const initialGridCountValue = initialGridCount ?? DEFAULT_GRID_COUNT;
+  const initialPaperSizeValue = initialPaperSize ?? DEFAULT_PAPER_SIZE;
+  const initialShowCharacterDetailsValue =
+    initialShowCharacterDetails ?? DEFAULT_SHOW_CHARACTER_DETAILS;
   const initialTraceModeValue = initialTraceMode ?? DEFAULT_TRACE_MODE;
   const [gridCount, setGridCount] = useState<WorksheetGridCount>(
     initialGridCountValue
+  );
+  const [paperSize, setPaperSize] = useState<WorksheetPaperSize>(
+    initialPaperSizeValue
+  );
+  const [showCharacterDetails, setShowCharacterDetails] = useState(
+    initialShowCharacterDetailsValue
   );
   const [traceMode, setTraceMode] = useState<TraceMode>(initialTraceModeValue);
   const [assignmentNote, setAssignmentNote] = useState(
@@ -122,6 +284,14 @@ export function WorksheetPage({
   }, [initialGridCountValue]);
 
   useEffect(() => {
+    setPaperSize(initialPaperSizeValue);
+  }, [initialPaperSizeValue]);
+
+  useEffect(() => {
+    setShowCharacterDetails(initialShowCharacterDetailsValue);
+  }, [initialShowCharacterDetailsValue]);
+
+  useEffect(() => {
     setTraceMode(initialTraceModeValue);
   }, [initialTraceModeValue]);
 
@@ -130,15 +300,21 @@ export function WorksheetPage({
   }, [initialAssignmentNoteValue]);
 
   useEffect(() => {
-    window.addEventListener('beforeprint', enableWorksheetPrintMode);
+    const handleBeforePrint = () => {
+      enableWorksheetPrintMode();
+      syncWorksheetPrintPaper(paperSize);
+      syncWorksheetPrintStyles(paperSize);
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
     window.addEventListener('afterprint', clearWorksheetPrintMode);
 
     return () => {
-      window.removeEventListener('beforeprint', enableWorksheetPrintMode);
+      window.removeEventListener('beforeprint', handleBeforePrint);
       window.removeEventListener('afterprint', clearWorksheetPrintMode);
       clearWorksheetPrintMode();
     };
-  }, []);
+  }, [paperSize]);
 
   const parsedCustomCharacters = useMemo(
     () => normalizeHanziCharacters(customInput),
@@ -161,12 +337,23 @@ export function WorksheetPage({
       params.append('characters', character);
     }
     params.set('grid', String(gridCount));
+    params.set('paper', paperSize);
     params.set('trace', traceMode);
+    if (!showCharacterDetails) {
+      params.set('details', 'off');
+    }
     if (normalizedAssignmentNote.length > 0) {
       params.set('note', normalizedAssignmentNote);
     }
     return `${Routes.Worksheets}?${params.toString()}`;
-  }, [gridCount, normalizedAssignmentNote, selectedCharacters, traceMode]);
+  }, [
+    gridCount,
+    normalizedAssignmentNote,
+    paperSize,
+    selectedCharacters,
+    showCharacterDetails,
+    traceMode,
+  ]);
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -208,6 +395,8 @@ export function WorksheetPage({
     setSelectedCharacters(initialSelectedCharacters);
     setCustomInput('');
     setGridCount(initialGridCountValue);
+    setPaperSize(initialPaperSizeValue);
+    setShowCharacterDetails(initialShowCharacterDetailsValue);
     setAssignmentNote(initialAssignmentNoteValue);
     setTraceMode(initialTraceModeValue);
   };
@@ -223,6 +412,8 @@ export function WorksheetPage({
     }
 
     enableWorksheetPrintMode();
+    syncWorksheetPrintPaper(paperSize);
+    syncWorksheetPrintStyles(paperSize);
     window.requestAnimationFrame(() => {
       window.print();
     });
@@ -474,56 +665,114 @@ export function WorksheetPage({
                     </Button>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
+                  <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+                    <div>
                       <p className="text-sm font-medium">
-                        {copy.practiceBoxesLabel}
+                        {copy.printSettingsTitle}
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {GRID_OPTIONS.map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={() => setGridCount(option)}
-                            className={cn(
-                              'rounded-lg border px-3 py-2 text-sm transition-colors',
-                              'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                              gridCount === option &&
-                                'border-primary bg-primary/10 text-primary'
-                            )}
-                          >
-                            {copy.gridOption(option)}
-                          </button>
-                        ))}
+                      <p className="text-xs text-muted-foreground">
+                        {copy.printSettingsDescription}
+                      </p>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          {copy.practiceBoxesLabel}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {GRID_OPTIONS.map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              onClick={() => setGridCount(option)}
+                              className={cn(
+                                'rounded-lg border bg-background px-3 py-2 text-sm transition-colors',
+                                'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                gridCount === option &&
+                                  'border-primary bg-primary/10 text-primary'
+                              )}
+                            >
+                              {copy.gridOption(option)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          {copy.paperSizeLabel}
+                        </p>
+                        <div className="grid grid-cols-2 gap-1 rounded-lg border bg-background p-1">
+                          {WORKSHEET_PAPER_SIZES.map((size) => (
+                            <button
+                              key={size}
+                              type="button"
+                              aria-pressed={paperSize === size}
+                              onClick={() => setPaperSize(size)}
+                              className={cn(
+                                'min-h-9 rounded-md px-2 text-sm transition-colors',
+                                'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                paperSize === size &&
+                                  'bg-primary/10 font-medium text-primary'
+                              )}
+                            >
+                              {copy.paperSizes[size]}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-sm font-medium">
-                          {copy.traceModeLabel}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {copy.traceModeDescription}
-                        </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {copy.traceModeLabel}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {copy.traceModeDescription}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
+                          {TRACE_MODES.map((mode) => (
+                            <button
+                              key={mode}
+                              type="button"
+                              aria-pressed={traceMode === mode}
+                              onClick={() => setTraceMode(mode)}
+                              className={cn(
+                                'min-h-9 rounded-md px-2 text-sm transition-colors',
+                                'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                traceMode === mode &&
+                                  'bg-primary/10 font-medium text-primary'
+                              )}
+                            >
+                              {copy.traceModes[mode]}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-1 rounded-lg border bg-muted/30 p-1">
-                        {TRACE_MODES.map((mode) => (
-                          <button
-                            key={mode}
-                            type="button"
-                            aria-pressed={traceMode === mode}
-                            onClick={() => setTraceMode(mode)}
-                            className={cn(
-                              'min-h-9 rounded-md px-2 text-sm transition-colors',
-                              'hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                              traceMode === mode &&
-                                'bg-background font-medium text-primary shadow-sm'
-                            )}
+
+                      <div className="flex min-h-24 items-start justify-between gap-3 rounded-lg border bg-background p-3">
+                        <div className="space-y-1">
+                          <Label
+                            htmlFor="worksheet-character-details"
+                            className="text-sm"
                           >
-                            {copy.traceModes[mode]}
-                          </button>
-                        ))}
+                            {copy.characterDetailsLabel}
+                          </Label>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {copy.characterDetailsDescription}
+                          </p>
+                        </div>
+                        <Switch
+                          id="worksheet-character-details"
+                          checked={showCharacterDetails}
+                          onCheckedChange={setShowCharacterDetails}
+                          aria-label={copy.characterDetailsLabel}
+                          className="mt-0.5"
+                        />
                       </div>
                     </div>
                   </div>
@@ -610,6 +859,7 @@ export function WorksheetPage({
                 copy={copy}
                 assignmentNote={normalizedAssignmentNote}
                 gridCount={gridCount}
+                showCharacterDetails={showCharacterDetails}
                 selectedItems={selectedItems}
                 traceMode={traceMode}
               />
@@ -626,6 +876,7 @@ type WorksheetPreviewProps = {
   assignmentNote: string;
   selectedItems: WorksheetCharacter[];
   gridCount: number;
+  showCharacterDetails: boolean;
   traceMode: TraceMode;
 };
 
@@ -634,8 +885,16 @@ function WorksheetPreview({
   assignmentNote,
   selectedItems,
   gridCount,
+  showCharacterDetails,
   traceMode,
 }: WorksheetPreviewProps) {
+  const assignmentChecks = showCharacterDetails
+    ? copy.assignmentChecks
+    : copy.handwritingAssignmentChecks;
+  const assignmentDescription = showCharacterDetails
+    ? copy.assignmentDescription
+    : copy.handwritingAssignmentDescription;
+
   return (
     <div
       className="mx-auto max-w-[820px] bg-white p-6 text-slate-950 print:max-w-none print:p-0"
@@ -681,7 +940,7 @@ function WorksheetPreview({
             {copy.assignmentTitle}
           </div>
           <p className="mt-1 leading-6 text-slate-600">
-            {copy.assignmentDescription}
+            {assignmentDescription}
           </p>
           {assignmentNote ? (
             <div
@@ -698,7 +957,7 @@ function WorksheetPreview({
           ) : null}
         </div>
         <div className="grid gap-2 text-xs text-slate-700">
-          {copy.assignmentChecks.map((item) => (
+          {assignmentChecks.map((item) => (
             <div key={item} className="flex items-start gap-2">
               <span
                 className="mt-0.5 size-3.5 shrink-0 rounded-sm border border-slate-400 bg-white"
@@ -718,26 +977,33 @@ function WorksheetPreview({
               className="break-inside-avoid"
               data-print-character
             >
-              <div className="mb-2 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
+              <div
+                className={cn(
+                  'mb-2 grid gap-3 sm:items-center',
+                  showCharacterDetails && 'sm:grid-cols-[auto_1fr]'
+                )}
+              >
                 <div className="flex size-16 items-center justify-center rounded-lg border border-slate-300 text-4xl font-semibold">
                   {item.character}
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {item.character} ·{' '}
-                    {item.custom ? copy.customCharacterLabel : item.pinyin}
-                  </h3>
-                  <p className="text-sm text-slate-600">
-                    {item.custom
-                      ? copy.customCharacterDescription
-                      : `${item.meaning} · ${item.hint}`}
-                  </p>
-                  {item.examples.length > 0 ? (
-                    <p className="mt-1 text-xs text-slate-500">
-                      {copy.examplesLabel}: {item.examples.join(', ')}
+                {showCharacterDetails ? (
+                  <div data-print-character-details>
+                    <h3 className="text-lg font-semibold">
+                      {item.character} ·{' '}
+                      {item.custom ? copy.customCharacterLabel : item.pinyin}
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      {item.custom
+                        ? copy.customCharacterDescription
+                        : `${item.meaning} · ${item.hint}`}
                     </p>
-                  ) : null}
-                </div>
+                    {item.examples.length > 0 ? (
+                      <p className="mt-1 text-xs text-slate-500">
+                        {copy.examplesLabel}: {item.examples.join(', ')}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <div
@@ -809,6 +1075,9 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       back: '返回练习',
       badge: '练习纸生成器',
       characterCount: (count: number) => `${count} 个汉字`,
+      characterDetailsDescription:
+        '开启时打印拼音、字义和例词；关闭时只保留字样本和书写格。',
+      characterDetailsLabel: '显示参考信息',
       clearSelectionCta: '清空',
       customApplyCta: '使用自定义字表',
       customCharacterDescription: '自定义汉字，适合课堂、作业或个人复习。',
@@ -829,13 +1098,30 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
       freeBadge: '免费预览',
       gridOption: (count: number) => `每字 ${count} 格`,
+      handwritingAssignmentChecks: [
+        '先描有提示的格子',
+        '后面的格子独立完成',
+        '最后挑一个最难写的字复习',
+      ],
+      handwritingAssignmentDescription:
+        '这是一张干净的手写作业纸。请按顺序慢慢书写，保持每个字居中、大小一致。',
       nameLabel: '姓名',
       packDescription:
         '完整版本将提供 HSK1 全量练习纸、自定义字表、答案提示和学生作业记录。',
       packTitle: '完整练习纸套装',
+      paperSizeLabel: '纸张大小',
+      paperSizes: {
+        a4: 'A4',
+        a5: 'A5',
+        legal: 'Legal',
+        letter: 'Letter',
+      },
       previewTitle: 'HSK1 汉字书写练习',
       printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
+      printSettingsDescription:
+        '这些设置会同步到打印预览和分享链接，适合不同打印机与作业场景。',
+      printSettingsTitle: '打印设置',
       practiceBoxesLabel: '练习格数量',
       quickSetCount: (count: number) => `${count} 字`,
       quickSets: {
@@ -903,6 +1189,9 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     back: 'Back to practice',
     badge: 'Worksheet generator',
     characterCount: (count: number) => `${count} characters`,
+    characterDetailsDescription:
+      'Show pinyin, meaning, and examples for study sheets; turn off for a cleaner handwriting assignment.',
+    characterDetailsLabel: 'Show reference info',
     clearSelectionCta: 'Clear selection',
     customApplyCta: 'Use custom list',
     customCharacterDescription:
@@ -924,13 +1213,30 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
     freeBadge: 'Free preview',
     gridOption: (count: number) => `${count} per character`,
+    handwritingAssignmentChecks: [
+      'Trace the guided boxes first',
+      'Finish the remaining boxes independently',
+      'Choose one difficult character for review',
+    ],
+    handwritingAssignmentDescription:
+      'This is a clean handwriting assignment sheet. Write slowly, keep each character centered, and use consistent size.',
     nameLabel: 'Name',
     packDescription:
       'The complete version will unlock full HSK1 worksheets, custom character lists, answer prompts, and saved student assignments.',
     packTitle: 'Complete worksheet pack',
+    paperSizeLabel: 'Paper size',
+    paperSizes: {
+      a4: 'A4',
+      a5: 'A5',
+      legal: 'Legal',
+      letter: 'Letter',
+    },
     previewTitle: 'HSK1 Chinese Character Practice',
     printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
+    printSettingsDescription:
+      'These choices carry into print preview and shared worksheet links.',
+    printSettingsTitle: 'Print settings',
     practiceBoxesLabel: 'Practice boxes',
     quickSetCount: (count: number) => `${count} chars`,
     quickSets: {

@@ -1,4 +1,8 @@
-import { WorksheetPage } from '@/components/learn/worksheet-page';
+import {
+  WORKSHEET_PAPER_SIZES,
+  WorksheetPage,
+  type WorksheetPaperSize,
+} from '@/components/learn/worksheet-page';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { createFileRoute } from '@tanstack/react-router';
@@ -15,13 +19,17 @@ export const Route = createFileRoute('/worksheets')({
     search
   ): {
     characters?: string[];
+    details?: boolean;
     grid?: WorksheetGridCount;
     note?: string;
+    paper?: WorksheetPaperSize;
     trace?: WorksheetTraceMode;
   } => ({
     characters: parseCharactersSearch(search.characters),
+    details: parseDetailsSearch(search.details),
     grid: parseGridSearch(search.grid),
     note: parseNoteSearch(search.note),
+    paper: parsePaperSearch(search.paper),
     trace: parseTraceSearch(search.trace),
   }),
   head: () =>
@@ -40,6 +48,8 @@ function WorksheetRoutePage() {
       initialCharacters={search.characters}
       initialGridCount={search.grid}
       initialAssignmentNote={search.note}
+      initialPaperSize={search.paper}
+      initialShowCharacterDetails={search.details}
       initialTraceMode={search.trace}
     />
   );
@@ -93,6 +103,35 @@ function parseTraceSearch(value: unknown) {
   if (typeof normalizedValue !== 'string') return undefined;
 
   return WORKSHEET_TRACE_MODES.find((mode) => mode === normalizedValue);
+}
+
+function parsePaperSearch(value: unknown) {
+  const normalizedValue = Array.isArray(value) ? value[0] : value;
+
+  if (typeof normalizedValue !== 'string') return undefined;
+
+  return WORKSHEET_PAPER_SIZES.find((size) => size === normalizedValue);
+}
+
+function parseDetailsSearch(value: unknown) {
+  const normalizedValue = Array.isArray(value) ? value[0] : value;
+
+  if (typeof normalizedValue === 'boolean') return normalizedValue;
+  if (typeof normalizedValue !== 'string') return undefined;
+
+  const normalizedDetails = normalizedValue.trim().toLowerCase();
+
+  if (
+    ['0', 'false', 'hide', 'hidden', 'no', 'off'].includes(normalizedDetails)
+  ) {
+    return false;
+  }
+
+  if (['1', 'on', 'show', 'true', 'yes'].includes(normalizedDetails)) {
+    return true;
+  }
+
+  return undefined;
 }
 
 function parseNoteSearch(value: unknown) {
