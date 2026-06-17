@@ -163,9 +163,14 @@ export function HanziPracticePage({
     lessonCharacters.findIndex((item) => item.character === initialCharacter),
     0
   );
+  const autoSelectedScopeRef = useRef<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [progressLoaded, setProgressLoaded] = useState(false);
   const [progress, setProgress] = useState<StoredProgress>({});
   const currentCharacter = lessonCharacters[currentIndex];
+  const lessonScopeKey = lessonCharacters
+    .map((item) => item.character)
+    .join('');
   const progressSummary = useMemo(
     () => getHanziProgressSummary(lessonCharacters, progress),
     [lessonCharacters, progress]
@@ -173,11 +178,29 @@ export function HanziPracticePage({
 
   useEffect(() => {
     setProgress(readStoredHanziProgress());
+    setProgressLoaded(true);
   }, []);
 
   useEffect(() => {
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
+
+  useEffect(() => {
+    if (
+      !progressLoaded ||
+      initialCharacter ||
+      autoSelectedScopeRef.current === lessonScopeKey
+    ) {
+      return;
+    }
+
+    autoSelectedScopeRef.current = lessonScopeKey;
+    const resumeTarget =
+      progressSummary.reviewItems[0] ?? progressSummary.nextPracticeTarget;
+    if (!resumeTarget) return;
+
+    setCurrentIndex(resumeTarget.index);
+  }, [initialCharacter, lessonScopeKey, progressLoaded, progressSummary]);
 
   useEffect(() => {
     setCurrentIndex((index) =>
