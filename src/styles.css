@@ -238,6 +238,15 @@
     margin-left: auto !important;
   }
 
+  body[data-print-mode="worksheet"] [data-print-assignment] {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    display: grid !important;
+    gap: 8pt !important;
+    margin-bottom: 12pt !important;
+    padding: 8pt !important;
+  }
+
   body[data-print-mode="worksheet"] [data-print-character] {
     break-inside: avoid;
     margin-top: 14pt !important;
@@ -278,6 +287,12 @@
   body[data-print-mode="worksheet"] [data-print-brand] {
     margin-left: 0 !important;
     width: 100% !important;
+  }
+
+  body[data-print-mode="worksheet"] [data-print-assignment] {
+    display: block !important;
+    margin-bottom: 10pt !important;
+    padding: 7pt !important;
   }
 
   body[data-print-mode="worksheet"] [data-print-character] {

@@ -402,6 +402,31 @@ function WorksheetPreview({
         </div>
       </div>
 
+      <div
+        className="mb-5 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm sm:grid-cols-[minmax(0,1fr)_minmax(12rem,0.55fr)]"
+        data-print-assignment
+      >
+        <div>
+          <div className="font-semibold text-slate-950">
+            {copy.assignmentTitle}
+          </div>
+          <p className="mt-1 leading-6 text-slate-600">
+            {copy.assignmentDescription}
+          </p>
+        </div>
+        <div className="grid gap-2 text-xs text-slate-700">
+          {copy.assignmentChecks.map((item) => (
+            <div key={item} className="flex items-start gap-2">
+              <span
+                className="mt-0.5 size-3.5 shrink-0 rounded-sm border border-slate-400 bg-white"
+                aria-hidden="true"
+              />
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {selectedItems.length > 0 ? (
         <div className="space-y-6">
           {selectedItems.map((item) => (
@@ -479,6 +504,14 @@ type WorksheetCopy = ReturnType<typeof getWorksheetCopy>;
 function getWorksheetCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
+      assignmentChecks: [
+        '先观察每个字的结构和例词',
+        '描第一格，再独立写完后面的格子',
+        '圈出最难的一笔，下次先复习',
+      ],
+      assignmentDescription:
+        '建议每个汉字先读拼音和例词，再慢慢书写。完成后把最容易写错的字加入下一次复习。',
+      assignmentTitle: '练习任务',
       back: '返回练习',
       badge: '练习纸生成器',
       characterCount: (count: number) => `${count} 个汉字`,
@@ -521,6 +554,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
   }
 
   return {
+    assignmentChecks: [
+      'Read the shape cue and example words first',
+      'Trace the first box, then write from memory',
+      'Circle the hardest stroke for the next review',
+    ],
+    assignmentDescription:
+      'Read each character aloud, study the structure, then write slowly. When finished, mark the characters that should come back in the next review session.',
+    assignmentTitle: 'Practice task',
     back: 'Back to practice',
     badge: 'Worksheet generator',
     characterCount: (count: number) => `${count} characters`,
