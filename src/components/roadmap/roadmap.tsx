@@ -5,9 +5,7 @@ interface Task {
   id: string;
   title: string;
   priority: 'low' | 'medium' | 'high';
-  description?: string;
-  assignee?: string;
-  dueDate?: string;
+  description: string;
 }
 export function Roadmap() {
   const columnTitles = {
@@ -20,55 +18,48 @@ export function Roadmap() {
       {
         id: '1',
         title: m.roadmap_board_tasks_backlog_0_title(),
+        description: m.roadmap_board_tasks_backlog_0_description(),
         priority: 'high',
-        assignee: 'John Doe',
-        dueDate: '2026-04-01',
       },
       {
         id: '2',
         title: m.roadmap_board_tasks_backlog_1_title(),
+        description: m.roadmap_board_tasks_backlog_1_description(),
         priority: 'medium',
-        assignee: 'Jane Smith',
-        dueDate: '2026-04-05',
       },
       {
         id: '3',
         title: m.roadmap_board_tasks_backlog_2_title(),
+        description: m.roadmap_board_tasks_backlog_2_description(),
         priority: 'low',
-        assignee: 'Bob Johnson',
-        dueDate: '2026-04-10',
       },
     ],
     inProgress: [
       {
         id: '4',
         title: m.roadmap_board_tasks_in_progress_0_title(),
+        description: m.roadmap_board_tasks_in_progress_0_description(),
         priority: 'high',
-        assignee: 'Alice Brown',
-        dueDate: '2026-03-28',
       },
       {
         id: '5',
         title: m.roadmap_board_tasks_in_progress_1_title(),
+        description: m.roadmap_board_tasks_in_progress_1_description(),
         priority: 'medium',
-        assignee: 'Charlie Wilson',
-        dueDate: '2026-04-02',
       },
     ],
     done: [
       {
         id: '7',
         title: m.roadmap_board_tasks_done_0_title(),
+        description: m.roadmap_board_tasks_done_0_description(),
         priority: 'high',
-        assignee: 'Eve Davis',
-        dueDate: '2026-03-25',
       },
       {
         id: '8',
         title: m.roadmap_board_tasks_done_1_title(),
+        description: m.roadmap_board_tasks_done_1_description(),
         priority: 'low',
-        assignee: 'Frank White',
-        dueDate: '2026-03-24',
       },
     ],
   } satisfies Record<string, Task[]>;
@@ -101,11 +92,11 @@ function TaskCard({ task }: TaskCardProps) {
     <div className="rounded-md border bg-card p-3 shadow-sm">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="line-clamp-1 font-medium text-sm">{task.title}</span>
+          <span className="line-clamp-2 font-medium text-sm">{task.title}</span>
           <Badge
             variant="outline"
             className={cn(
-              'pointer-events-none h-5 rounded-sm px-1.5 text-[11px] capitalize border-transparent',
+              'pointer-events-none h-5 shrink-0 rounded-sm px-1.5 text-[11px] capitalize border-transparent',
               task.priority === 'high'
                 ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                 : task.priority === 'medium'
@@ -116,17 +107,9 @@ function TaskCard({ task }: TaskCardProps) {
             {priority}
           </Badge>
         </div>
-        <div className="flex items-center justify-between text-muted-foreground text-xs">
-          {task.assignee && (
-            <div className="flex items-center gap-1">
-              <div className="size-2 rounded-full bg-primary/20" />
-              <span className="line-clamp-1">{task.assignee}</span>
-            </div>
-          )}
-          {task.dueDate && (
-            <time className="text-[10px] tabular-nums">{task.dueDate}</time>
-          )}
-        </div>
+        <p className="line-clamp-3 text-muted-foreground text-xs leading-5">
+          {task.description}
+        </p>
       </div>
     </div>
   );
