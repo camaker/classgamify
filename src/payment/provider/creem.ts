@@ -891,6 +891,7 @@ export class CreemProvider implements PaymentProvider {
   private mapBillingPeriodToInterval(billingPeriod?: string): PlanInterval {
     switch (billingPeriod) {
       case 'every-year':
+      case 'one-y':
         return PlanIntervals.YEAR;
       default:
         return PlanIntervals.MONTH;
