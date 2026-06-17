@@ -770,6 +770,18 @@ function LearningLoopCard({
   worksheetCharacters: string[];
 }) {
   const firstReview = reviewItems[0];
+  const worksheetSearch =
+    reviewItems.length > 0
+      ? buildWorksheetSearch(reviewCharacters, {
+          details: true,
+          note: copy.reviewWorksheetNote(reviewCharacters.length),
+          trace: 'guided',
+        })
+      : buildWorksheetSearch(worksheetCharacters, {
+          details: true,
+          note: copy.loopWorksheetNote,
+          trace: 'first',
+        });
   const primaryAction = firstReview
     ? {
         description: copy.loopReviewDescription(
@@ -825,12 +837,7 @@ function LearningLoopCard({
           ) : null}
           <Link
             to={Routes.Worksheets}
-            search={{
-              characters:
-                reviewCharacters.length > 0
-                  ? reviewCharacters
-                  : worksheetCharacters,
-            }}
+            search={worksheetSearch}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
             <IconFileText className="size-4" />
@@ -860,6 +867,11 @@ function ReviewQueueCard({
   total: number;
 }) {
   const firstReview = reviewItems[0];
+  const reviewWorksheetSearch = buildWorksheetSearch(reviewCharacters, {
+    details: true,
+    note: copy.reviewWorksheetNote(reviewCharacters.length),
+    trace: 'guided',
+  });
 
   return (
     <Card className="rounded-lg">
@@ -935,7 +947,7 @@ function ReviewQueueCard({
               </Button>
               <Link
                 to={Routes.Worksheets}
-                search={{ characters: reviewCharacters }}
+                search={reviewWorksheetSearch}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconFileText className="size-4" />
@@ -985,6 +997,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       loopTitle: '下一步',
       loopWorksheetCta: '打印练习纸',
       loopWorksheetHint: '打印后用纸笔复习，能把屏幕描写转成真正的书写记忆。',
+      loopWorksheetNote: '把这一组汉字带到纸面上完成练习。',
       makeWorksheetCta: '制作练习纸',
       packCta: '查看 HSK1 套餐',
       packDescription:
@@ -1001,6 +1014,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewTroubleStrokes: (count: number) =>
         count > 0 ? `${count} 个笔画需要注意` : '重新完整描写一遍',
       reviewWorksheetCta: '打印复习纸',
+      reviewWorksheetNote: (count: number) =>
+        `先复习你错得最多的 ${count} 个汉字。`,
       seePackCta: '查看套餐',
       statCharacters: (count: number) => `${count}+ 个启动汉字`,
       statStrokes: (count: number) => `${count} 个引导笔画`,
@@ -1035,6 +1050,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     loopWorksheetCta: 'Print worksheet',
     loopWorksheetHint:
       'Paper practice helps turn screen tracing into real handwriting memory.',
+    loopWorksheetNote:
+      'Take this lesson set onto paper to finish the practice loop.',
     makeWorksheetCta: 'Make worksheet',
     packCta: 'View HSK1 pack',
     packDescription:
@@ -1053,6 +1070,8 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewTroubleStrokes: (count: number) =>
       count > 0 ? `${count} strokes to revisit` : 'Trace it once more',
     reviewWorksheetCta: 'Print review sheet',
+    reviewWorksheetNote: (count: number) =>
+      `Start with the ${count} characters you missed most.`,
     seePackCta: 'See paid pack',
     statCharacters: (count: number) => `${count}+ launch characters`,
     statStrokes: (count: number) => `${count} guided strokes`,
@@ -1061,5 +1080,21 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'You finished the free starter set. Generate a printable worksheet now, or continue into the full HSK1 path.',
     title: 'Learn Chinese characters by writing them',
     worksheetCta: 'Create worksheet',
+  };
+}
+
+function buildWorksheetSearch(
+  characters: string[],
+  options: {
+    details?: boolean;
+    note?: string;
+    trace?: 'first' | 'guided' | 'blank';
+  }
+) {
+  return {
+    characters,
+    ...(options.details !== undefined ? { details: options.details } : {}),
+    ...(options.note ? { note: options.note } : {}),
+    ...(options.trace ? { trace: options.trace } : {}),
   };
 }
