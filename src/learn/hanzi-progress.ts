@@ -34,6 +34,13 @@ export type HanziProgressSummary = {
   total: number;
 };
 
+function getCompletedAtTime(completedAt?: string) {
+  if (!completedAt) return Number.POSITIVE_INFINITY;
+
+  const completedTime = Date.parse(completedAt);
+  return Number.isNaN(completedTime) ? Number.POSITIVE_INFINITY : completedTime;
+}
+
 export function readStoredHanziProgress(): StoredProgress {
   if (typeof window === 'undefined') return {};
 
@@ -76,7 +83,12 @@ export function getHanziProgressSummary(
       (item): item is HanziReviewItem =>
         Boolean(item.progress?.completed) && item.progress.mistakes > 0
     )
-    .sort((a, b) => b.progress.mistakes - a.progress.mistakes);
+    .sort(
+      (a, b) =>
+        b.progress.mistakes - a.progress.mistakes ||
+        getCompletedAtTime(a.progress.completedAt) -
+          getCompletedAtTime(b.progress.completedAt)
+    );
   const nextPracticeIndex = characters.findIndex(
     (item) => !progress[item.character]?.completed
   );

@@ -977,36 +977,64 @@ function ReviewQueueCard({
         {reviewItems.length > 0 ? (
           <>
             <div className="space-y-2">
-              {reviewItems.slice(0, 4).map((item) => (
-                <button
-                  key={item.character.character}
-                  type="button"
-                  onClick={() => onSelect(item.index)}
-                  className={cn(
-                    'flex w-full items-center justify-between gap-3 rounded-lg border bg-background p-3 text-left transition-colors',
-                    'hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-                  )}
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border bg-muted text-3xl font-semibold">
-                      {item.character.character}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-medium">
-                        {item.character.pinyin} · {item.character.meaning}
+              {reviewItems.slice(0, 4).map((item) => {
+                const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+
+                return (
+                  <button
+                    key={item.character.character}
+                    type="button"
+                    onClick={() => onSelect(item.index)}
+                    className={cn(
+                      'flex w-full flex-col gap-3 rounded-lg border',
+                      'bg-background p-3 text-left transition-colors',
+                      'hover:border-primary/50 hover:bg-muted/40',
+                      'focus-visible:outline-none focus-visible:ring-2',
+                      'focus-visible:ring-ring sm:flex-row sm:items-center',
+                      'sm:justify-between'
+                    )}
+                  >
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border bg-muted text-3xl font-semibold">
+                        {item.character.character}
                       </div>
-                      <div className="mt-0.5 text-xs text-muted-foreground">
-                        {copy.reviewTroubleStrokes(
-                          item.progress.mistakeStrokes?.length ?? 0
-                        )}
+                      <div className="min-w-0 space-y-2">
+                        <div>
+                          <div className="font-medium">
+                            {item.character.pinyin} · {item.character.meaning}
+                          </div>
+                          <div className="mt-0.5 text-xs text-muted-foreground">
+                            {copy.reviewFreshness(item.progress.completedAt)}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {mistakeStrokes.length > 0 ? (
+                            mistakeStrokes.map((stroke) => (
+                              <Badge
+                                key={`${item.character.character}-${stroke}`}
+                                variant="secondary"
+                                className="rounded-md"
+                              >
+                                {copy.strokeNumber(stroke)}
+                              </Badge>
+                            ))
+                          ) : (
+                            <Badge variant="outline" className="rounded-md">
+                              {copy.reviewFullTraceBadge}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <Badge variant="outline" className="shrink-0 rounded-md">
-                    {copy.reviewMistakes(item.progress.mistakes)}
-                  </Badge>
-                </button>
-              ))}
+                    <Badge
+                      variant="outline"
+                      className="w-fit shrink-0 rounded-md sm:ml-3"
+                    >
+                      {copy.reviewMistakes(item.progress.mistakes)}
+                    </Badge>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -1045,6 +1073,16 @@ function ReviewQueueCard({
       </CardContent>
     </Card>
   );
+}
+
+function getPracticeAgeDays(completedAt?: string) {
+  if (!completedAt) return null;
+
+  const completedTime = Date.parse(completedAt);
+  if (Number.isNaN(completedTime)) return null;
+
+  const dayMs = 24 * 60 * 60 * 1000;
+  return Math.max(0, Math.floor((Date.now() - completedTime) / dayMs));
 }
 
 function getPracticeCopy(locale: 'en' | 'zh') {
@@ -1086,6 +1124,14 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewEmptyDescription: '开始描写练习后，有错笔的字会自动出现在这里。',
       reviewEmptyTitle: '当前没有错字队列',
       reviewFirstCta: '复习第一个',
+      reviewFreshness: (completedAt?: string) => {
+        const days = getPracticeAgeDays(completedAt);
+        if (days === null) return '上次练习时间未记录';
+        if (days === 0) return '今天刚练过';
+        if (days === 1) return '上次练习：昨天';
+        return `上次练习：${days} 天前`;
+      },
+      reviewFullTraceBadge: '完整描写',
       reviewMistakes: (count: number) => `${count} 次错误`,
       reviewTitle: '复习队列',
       reviewTroubleStrokes: (count: number) =>
@@ -1155,6 +1201,14 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'Start a tracing quiz and missed characters will appear here automatically.',
     reviewEmptyTitle: 'No review queue yet',
     reviewFirstCta: 'Review first',
+    reviewFreshness: (completedAt?: string) => {
+      const days = getPracticeAgeDays(completedAt);
+      if (days === null) return 'Last practice date not saved';
+      if (days === 0) return 'Practiced today';
+      if (days === 1) return 'Last practiced yesterday';
+      return `Last practiced ${days} days ago`;
+    },
+    reviewFullTraceBadge: 'Full trace',
     reviewMistakes: (count: number) => `${count} mistakes`,
     reviewTitle: 'Review queue',
     reviewTroubleStrokes: (count: number) =>
