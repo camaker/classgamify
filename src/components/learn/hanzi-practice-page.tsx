@@ -666,6 +666,14 @@ function HanziPracticeCard({
       : copy.loopWorksheetNote,
     trace: 'first',
   });
+  const currentReviewWorksheetSearch = buildWorksheetSearch(
+    [character.character],
+    {
+      details: true,
+      note: copy.characterReviewWorksheetNote(character.character),
+      trace: 'guided',
+    }
+  );
 
   return (
     <Card className="rounded-lg">
@@ -797,6 +805,16 @@ function HanziPracticeCard({
                 <IconRotate className="size-4" />
                 {m.learn_practice_again()}
               </Button>
+              {lastStats.mistakes > 0 ? (
+                <Link
+                  to={Routes.Worksheets}
+                  search={currentReviewWorksheetSearch}
+                  className={cn(buttonVariants({ variant: 'outline' }))}
+                >
+                  <IconFileText className="size-4" />
+                  {copy.characterReviewWorksheetCta}
+                </Link>
+              ) : null}
               {lessonComplete ? (
                 <Button type="button" onClick={onReset}>
                   <IconReload className="size-4" />
@@ -1204,6 +1222,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packTitle: '继续学习完整 HSK1 路径',
       characterNeedsReview: '已完成，需要复习',
+      characterReviewWorksheetCta: '打印这个错字',
+      characterReviewWorksheetNote: (character: string) =>
+        `重点复习 ${character} 的错笔：先看引导格，再慢慢独立书写。`,
       progressNeedsReview: '复习',
       progressNotStarted: '未开始',
       reviewCleanLabel: '零错完成',
@@ -1282,6 +1303,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
     packTitle: 'Continue with the full HSK1 path',
     characterNeedsReview: 'Complete, review needed',
+    characterReviewWorksheetCta: 'Print this review',
+    characterReviewWorksheetNote: (character: string) =>
+      `Focus on missed strokes for ${character}: use the guided grid first, then write it slowly on your own.`,
     progressNeedsReview: 'Review',
     progressNotStarted: 'Not started',
     reviewCleanLabel: 'Clean runs',
