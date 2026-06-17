@@ -73,11 +73,19 @@ type HanziWriterStatic = {
 
 type CharacterProgress = {
   completed: boolean;
+  completedAt?: string;
   correctStrokes: number;
+  mistakeStrokes?: number[];
   mistakes: number;
 };
 
 type StoredProgress = Record<string, CharacterProgress>;
+
+type ReviewItem = {
+  character: LessonCharacter;
+  index: number;
+  progress: CharacterProgress;
+};
 
 declare global {
   interface Window {
@@ -170,6 +178,26 @@ export function HanziPracticePage({
   const completedCount = lessonCharacters.filter(
     (item) => progress[item.character]?.completed
   ).length;
+  const cleanCount = lessonCharacters.filter((item) => {
+    const itemProgress = progress[item.character];
+    return itemProgress?.completed && itemProgress.mistakes === 0;
+  }).length;
+  const reviewItems = useMemo(
+    () =>
+      lessonCharacters
+        .map((character, index) => ({
+          character,
+          index,
+          progress: progress[character.character],
+        }))
+        .filter(
+          (item): item is ReviewItem =>
+            Boolean(item.progress?.completed) && item.progress.mistakes > 0
+        )
+        .sort((a, b) => b.progress.mistakes - a.progress.mistakes),
+    [lessonCharacters, progress]
+  );
+  const reviewCharacters = reviewItems.map((item) => item.character.character);
   const lessonComplete = completedCount === lessonCharacters.length;
   const progressValue = Math.round(
     (completedCount / lessonCharacters.length) * 100
@@ -314,6 +342,15 @@ export function HanziPracticePage({
               </CardContent>
             </Card>
 
+            <ReviewQueueCard
+              cleanCount={cleanCount}
+              copy={copy}
+              onSelect={(index) => setCurrentIndex(index)}
+              reviewCharacters={reviewCharacters}
+              reviewItems={reviewItems}
+              total={lessonCharacters.length}
+            />
+
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {lessonCharacters.map((item) => (
                 <div
@@ -428,6 +465,7 @@ function HanziPracticeCard({
   const targetRef = useRef<HTMLDivElement>(null);
   const writerRef = useRef<HanziWriterInstance | null>(null);
   const mistakesRef = useRef(0);
+  const mistakeStrokesRef = useRef<number[]>([]);
   const correctStrokesRef = useRef(0);
   const [status, setStatus] = useState<HanziWriterStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -497,6 +535,7 @@ function HanziPracticeCard({
     if (!writerRef.current) return;
 
     mistakesRef.current = 0;
+    mistakeStrokesRef.current = [];
     correctStrokesRef.current = 0;
     setStatus('quiz');
     setSessionStats(null);
@@ -504,6 +543,9 @@ function HanziPracticeCard({
     writerRef.current.quiz({
       onMistake: (strokeData) => {
         mistakesRef.current = strokeData.totalMistakes;
+        mistakeStrokesRef.current = Array.from(
+          new Set([...mistakeStrokesRef.current, strokeData.strokeNum])
+        );
       },
       onCorrectStroke: () => {
         correctStrokesRef.current += 1;
@@ -511,7 +553,9 @@ function HanziPracticeCard({
       onComplete: (summaryData) => {
         const nextProgress = {
           completed: true,
+          completedAt: new Date().toISOString(),
           correctStrokes: correctStrokesRef.current,
+          mistakeStrokes: mistakeStrokesRef.current,
           mistakes: summaryData.totalMistakes,
         };
         setStatus('ready');
@@ -672,6 +716,123 @@ function HanziPracticeCard({
   );
 }
 
+function ReviewQueueCard({
+  cleanCount,
+  copy,
+  onSelect,
+  reviewCharacters,
+  reviewItems,
+  total,
+}: {
+  cleanCount: number;
+  copy: ReturnType<typeof getPracticeCopy>;
+  onSelect: (index: number) => void;
+  reviewCharacters: string[];
+  reviewItems: ReviewItem[];
+  total: number;
+}) {
+  const firstReview = reviewItems[0];
+
+  return (
+    <Card className="rounded-lg">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <IconRotate className="size-5 text-primary" />
+          {copy.reviewTitle}
+        </CardTitle>
+        <CardDescription>{copy.reviewDescription}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <div className="text-2xl font-semibold">{reviewItems.length}</div>
+            <div className="mt-1 text-muted-foreground">
+              {copy.reviewDueLabel}
+            </div>
+          </div>
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <div className="text-2xl font-semibold">
+              {cleanCount}/{total}
+            </div>
+            <div className="mt-1 text-muted-foreground">
+              {copy.reviewCleanLabel}
+            </div>
+          </div>
+        </div>
+
+        {reviewItems.length > 0 ? (
+          <>
+            <div className="space-y-2">
+              {reviewItems.slice(0, 4).map((item) => (
+                <button
+                  key={item.character.character}
+                  type="button"
+                  onClick={() => onSelect(item.index)}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-3 rounded-lg border bg-background p-3 text-left transition-colors',
+                    'hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border bg-muted text-3xl font-semibold">
+                      {item.character.character}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium">
+                        {item.character.pinyin} · {item.character.meaning}
+                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        {copy.reviewTroubleStrokes(
+                          item.progress.mistakeStrokes?.length ?? 0
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="shrink-0 rounded-md">
+                    {copy.reviewMistakes(item.progress.mistakes)}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  if (firstReview) onSelect(firstReview.index);
+                }}
+              >
+                <IconPencil className="size-4" />
+                {copy.reviewFirstCta}
+              </Button>
+              <Link
+                to={Routes.Worksheets}
+                search={{ characters: reviewCharacters }}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconFileText className="size-4" />
+                {copy.reviewWorksheetCta}
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-4">
+            <div className="flex items-start gap-3">
+              <IconCircleCheck className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+              <div>
+                <p className="font-medium">{copy.reviewEmptyTitle}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {copy.reviewEmptyDescription}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -685,6 +846,17 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       packDescription:
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packTitle: '继续学习完整 HSK1 路径',
+      reviewCleanLabel: '零错完成',
+      reviewDescription: '有错笔的汉字会自动进入这里，下一轮先复习它们。',
+      reviewDueLabel: '待复习',
+      reviewEmptyDescription: '开始描写练习后，有错笔的字会自动出现在这里。',
+      reviewEmptyTitle: '当前没有错字队列',
+      reviewFirstCta: '复习第一个',
+      reviewMistakes: (count: number) => `${count} 次错误`,
+      reviewTitle: '复习队列',
+      reviewTroubleStrokes: (count: number) =>
+        count > 0 ? `${count} 个笔画需要注意` : '重新完整描写一遍',
+      reviewWorksheetCta: '打印复习纸',
       seePackCta: '查看套餐',
       statCharacters: (count: number) => `${count}+ 个启动汉字`,
       statStrokes: (count: number) => `${count} 个引导笔画`,
@@ -707,6 +879,19 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     packDescription:
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
     packTitle: 'Continue with the full HSK1 path',
+    reviewCleanLabel: 'Clean runs',
+    reviewDescription:
+      'Characters with missed strokes are saved here so the next session has a clear focus.',
+    reviewDueLabel: 'Due for review',
+    reviewEmptyDescription:
+      'Start a tracing quiz and missed characters will appear here automatically.',
+    reviewEmptyTitle: 'No review queue yet',
+    reviewFirstCta: 'Review first',
+    reviewMistakes: (count: number) => `${count} mistakes`,
+    reviewTitle: 'Review queue',
+    reviewTroubleStrokes: (count: number) =>
+      count > 0 ? `${count} strokes to revisit` : 'Trace it once more',
+    reviewWorksheetCta: 'Print review sheet',
     seePackCta: 'See paid pack',
     statCharacters: (count: number) => `${count}+ launch characters`,
     statStrokes: (count: number) => `${count} guided strokes`,
