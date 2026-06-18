@@ -37,6 +37,7 @@ import {
   IconCopy,
   IconFileText,
   IconLock,
+  IconMailForward,
   IconPencil,
   IconPlayerPlay,
   IconReload,
@@ -1080,6 +1081,39 @@ function PracticeCompletionActions({
       toast.error(copy.shareError);
     }
   };
+  const copyAssignment = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const practiceUrl = new URL(
+      buildPracticePath(character.character, worksheetSearch.characters),
+      window.location.origin
+    ).toString();
+    const worksheetUrl = new URL(
+      buildWorksheetPath(worksheetSearch),
+      window.location.origin
+    ).toString();
+    const message = copy.characterAssignmentShareMessage({
+      character,
+      isLastCharacter,
+      lessonComplete,
+      practiceUrl,
+      progress,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.characterAssignmentShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
 
   return (
     <div className="mt-4 border-t border-border/70 pt-4">
@@ -1094,6 +1128,10 @@ function PracticeCompletionActions({
           <Button type="button" variant="outline" onClick={copyResult}>
             <IconCopy className="size-4" />
             {copy.characterResultShareCta}
+          </Button>
+          <Button type="button" variant="outline" onClick={copyAssignment}>
+            <IconMailForward className="size-4" />
+            {copy.characterAssignmentShareCta}
           </Button>
           {hasMistakes ? (
             <>
@@ -1515,6 +1553,11 @@ type CharacterResultShareMessageParams = {
   worksheetUrl: string;
 };
 
+type CharacterAssignmentShareMessageParams =
+  CharacterResultShareMessageParams & {
+    practiceUrl: string;
+  };
+
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -1554,6 +1597,42 @@ function getPracticeCopy(locale: 'en' | 'zh') {
         '为课堂、家长辅导和自学生成可打印练习纸',
       ],
       packTitle: '继续学习完整 HSK1 路径',
+      characterAssignmentShareCta: '复制下次作业',
+      characterAssignmentShareMessage: ({
+        character,
+        isLastCharacter,
+        lessonComplete,
+        practiceUrl,
+        progress,
+        worksheetUrl,
+      }: CharacterAssignmentShareMessageParams) => {
+        const mistakeStrokes = progress.mistakeStrokes ?? [];
+        const hasMistakes = progress.mistakes > 0;
+        const assignment = hasMistakes
+          ? '先打开线上复习链接，重练错笔；再打印单字练习纸，慢写一遍。'
+          : lessonComplete
+            ? '打印本组练习纸，完成纸笔复习后回课程路径继续下一组。'
+            : isLastCharacter
+              ? '回到课程路径开始下一组；开始前在线回看这个字。'
+              : '先在线回看这个字，再继续同组下一个汉字。';
+
+        return [
+          'Lang Study 下次汉字作业',
+          '',
+          `本次汉字：${character.character} · ${character.pinyin}`,
+          `完成情况：${hasMistakes ? `${progress.mistakes} 次错误` : '零错完成'}`,
+          mistakeStrokes.length > 0
+            ? `重点笔画：${mistakeStrokes
+                .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+                .join('、')}`
+            : '重点笔画：本次没有记录错笔',
+          `下次任务：${assignment}`,
+          `线上复习：${practiceUrl}`,
+          `打印练习纸：${worksheetUrl}`,
+          '来自：getlangstudy.com',
+        ].join('\n');
+      },
+      characterAssignmentShareSuccess: '下次作业说明已复制。',
       characterNeedsReview: '已完成，需要复习',
       characterResultShareCta: '复制本次结果',
       characterResultShareMessage: ({
@@ -1767,6 +1846,42 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'Create printable worksheets for tutoring, family practice, or self-study',
     ],
     packTitle: 'Continue with the full HSK1 path',
+    characterAssignmentShareCta: 'Copy assignment',
+    characterAssignmentShareMessage: ({
+      character,
+      isLastCharacter,
+      lessonComplete,
+      practiceUrl,
+      progress,
+      worksheetUrl,
+    }: CharacterAssignmentShareMessageParams) => {
+      const mistakeStrokes = progress.mistakeStrokes ?? [];
+      const hasMistakes = progress.mistakes > 0;
+      const assignment = hasMistakes
+        ? 'Open the online review first, retry the missed strokes, then print the single-character sheet and write it slowly once.'
+        : lessonComplete
+          ? 'Print this set, finish one paper pass, then return to the course path for the next set.'
+          : isLastCharacter
+            ? 'Return to the course path for the next set; quickly review this character online first.'
+            : 'Review this character online first, then continue with the next character in the same set.';
+
+      return [
+        'Lang Study next character assignment',
+        '',
+        `Character practiced: ${character.character} · ${character.pinyin}`,
+        `Result: ${hasMistakes ? `${progress.mistakes} mistakes` : 'clean run'}`,
+        mistakeStrokes.length > 0
+          ? `Focus strokes: ${mistakeStrokes
+              .map((stroke) => `stroke ${getDisplayStrokeNumber(stroke)}`)
+              .join(', ')}`
+          : 'Focus strokes: no missed strokes recorded',
+        `Next assignment: ${assignment}`,
+        `Online review: ${practiceUrl}`,
+        `Printable worksheet: ${worksheetUrl}`,
+        'From: getlangstudy.com',
+      ].join('\n');
+    },
+    characterAssignmentShareSuccess: 'Next assignment copied.',
     characterNeedsReview: 'Complete, review needed',
     characterResultShareCta: 'Copy result',
     characterResultShareMessage: ({
@@ -1986,4 +2101,17 @@ function buildWorksheetPath(search: ReturnType<typeof buildWorksheetSearch>) {
 
   const query = params.toString();
   return `${Routes.Worksheets}${query ? `?${query}` : ''}`;
+}
+
+function buildPracticePath(character: string, characters: string[]) {
+  const params = new URLSearchParams();
+
+  params.set('character', character);
+
+  for (const item of characters) {
+    params.append('characters', item);
+  }
+
+  const query = params.toString();
+  return `${Routes.Learn}${query ? `?${query}` : ''}`;
 }
