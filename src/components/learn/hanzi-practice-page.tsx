@@ -556,6 +556,7 @@ export function HanziPracticePage({
             character={currentCharacter}
             copy={copy}
             currentIndex={currentIndex}
+            currentLocale={currentLocale}
             total={lessonCharacters.length}
             progress={progress[currentCharacter.character]}
             lessonComplete={progressSummary.lessonComplete}
@@ -577,6 +578,7 @@ type HanziPracticeCardProps = {
   character: LessonCharacter;
   copy: ReturnType<typeof getPracticeCopy>;
   currentIndex: number;
+  currentLocale: 'en' | 'zh';
   total: number;
   progress?: CharacterProgress;
   lessonComplete: boolean;
@@ -626,6 +628,7 @@ function HanziPracticeCard({
   character,
   copy,
   currentIndex,
+  currentLocale,
   total,
   progress,
   lessonComplete,
