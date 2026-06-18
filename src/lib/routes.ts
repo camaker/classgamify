@@ -8,6 +8,7 @@ export const Routes = {
   Features: '/#features',
   Faqs: '/#faqs',
   Pricing: '/pricing',
+  Teachers: '/teachers',
   Blog: '/blog',
   Changelog: '/changelog',
   Roadmap: '/roadmap',

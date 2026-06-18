@@ -60,7 +60,7 @@ export function getFooterLinks(): MenuItemConfig[] {
     },
     {
       title: m.footer_link_teachers(),
-      href: Routes.ContactClassroom,
+      href: Routes.Teachers,
       description: m.footer_link_teachers_desc(),
       external: false,
     },
