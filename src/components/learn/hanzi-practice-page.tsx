@@ -22,6 +22,7 @@ import {
   readStoredHanziProgress,
   writeStoredHanziProgress,
   type CharacterProgress,
+  type HanziProgressSummary,
   type HanziReviewItem,
   type NextPracticeTarget,
   type StoredProgress,
@@ -53,6 +54,7 @@ import { toast } from 'sonner';
 const HANZI_WRITER_SCRIPT =
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js';
 const HANZI_WRITER_SCRIPT_ID = 'hanzi-writer-cdn';
+const DAILY_PRACTICE_TARGET = 3;
 
 type HanziWriterStatus = 'idle' | 'loading' | 'ready' | 'animating' | 'quiz';
 
@@ -440,6 +442,12 @@ export function HanziPracticePage({
               scopeLabel={scopeLabel}
               total={lessonCharacters.length}
               worksheetCharacters={worksheetCharacters}
+            />
+
+            <DailyRhythmCard
+              copy={copy}
+              progressSummary={progressSummary}
+              total={lessonCharacters.length}
             />
 
             <LearningGuideLinks mode="practice" />
@@ -1435,6 +1443,106 @@ function LearningLoopCard({
   );
 }
 
+function DailyRhythmCard({
+  copy,
+  progressSummary,
+  total,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+  progressSummary: HanziProgressSummary;
+  total: number;
+}) {
+  const dailyTarget = Math.min(DAILY_PRACTICE_TARGET, Math.max(total, 1));
+  const completedToday = Math.min(progressSummary.completedTodayCount, total);
+  const remainingToday = Math.max(dailyTarget - completedToday, 0);
+  const reviewCount = progressSummary.reviewItems.length;
+  const targetProgress =
+    dailyTarget > 0
+      ? Math.min(100, Math.round((completedToday / dailyTarget) * 100))
+      : 0;
+  const rhythmItems = [
+    {
+      detail:
+        remainingToday === 0
+          ? copy.dailyRhythmTargetMet()
+          : copy.dailyRhythmRemaining(remainingToday),
+      label: copy.dailyRhythmTodayLabel,
+      value: copy.dailyRhythmTodayValue(completedToday, dailyTarget),
+    },
+    {
+      detail: copy.dailyRhythmActiveValue(progressSummary.activeDayCount),
+      label: copy.dailyRhythmStreakLabel,
+      value: copy.dailyRhythmStreakValue(progressSummary.currentStreakDays),
+    },
+    {
+      detail:
+        reviewCount > 0
+          ? copy.dailyRhythmReviewDetail(reviewCount)
+          : copy.dailyRhythmCleanDetail,
+      label: copy.dailyRhythmLastPracticeLabel,
+      value: copy.dailyRhythmLastPracticeValue(progressSummary.lastPracticeAt),
+    },
+  ];
+
+  return (
+    <Card className="rounded-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-primary/10 p-2 ring-1 ring-primary/15">
+            <IconClockHour4 className="size-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <CardTitle className="text-base">{copy.dailyRhythmTitle}</CardTitle>
+            <CardDescription>
+              {copy.dailyRhythmDescription(
+                completedToday,
+                dailyTarget,
+                reviewCount,
+                progressSummary.lessonComplete
+              )}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Progress value={targetProgress} />
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
+          {rhythmItems.map((item) => (
+            <div
+              key={item.label}
+              className="min-w-0 rounded-lg border bg-muted/30 p-3"
+            >
+              <p className="text-xs font-medium text-muted-foreground">
+                {item.label}
+              </p>
+              <p className="mt-1 text-lg font-semibold">{item.value}</p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                {item.detail}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div
+          className={cn(
+            'rounded-lg border p-3 text-sm leading-6',
+            reviewCount > 0
+              ? 'border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-100'
+              : remainingToday === 0
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100'
+                : 'border-primary/20 bg-primary/5'
+          )}
+        >
+          {copy.dailyRhythmNudge(
+            remainingToday,
+            reviewCount,
+            progressSummary.lessonComplete
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ReviewQueueCard({
   cleanCount,
   copy,
@@ -1703,6 +1811,59 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       courseTitle: 'HSK1 课程预览',
       description:
         '从一条实用的 HSK1 路径开始：观看笔顺、跟着描写、在本浏览器保存进度，并把同一组汉字生成可打印练习纸。',
+      dailyRhythmActiveValue: (count: number) =>
+        count > 0 ? `累计 ${count} 天练习` : '完成第一天后开始记录',
+      dailyRhythmCleanDetail: '当前没有必须先处理的错字。',
+      dailyRhythmDescription: (
+        completedToday: number,
+        target: number,
+        reviewCount: number,
+        lessonComplete: boolean
+      ) => {
+        if (lessonComplete) {
+          return '本组已经完成，今天适合做一次短复习或打印纸笔练习。';
+        }
+        if (reviewCount > 0) {
+          return `今天先清 ${reviewCount} 个错字，再补足 ${target} 个练习目标。`;
+        }
+        return `今天已完成 ${completedToday}/${target} 个目标，保持短练习节奏。`;
+      },
+      dailyRhythmLastPracticeLabel: '最近练习',
+      dailyRhythmLastPracticeValue: (lastPracticeAt?: string) => {
+        if (!lastPracticeAt) return '还没有记录';
+
+        const days = getPracticeAgeDays(lastPracticeAt);
+        if (days === null) return '时间未记录';
+        if (days === 0) return '今天';
+        if (days === 1) return '昨天';
+        return `${days} 天前`;
+      },
+      dailyRhythmNudge: (
+        remainingToday: number,
+        reviewCount: number,
+        lessonComplete: boolean
+      ) => {
+        if (reviewCount > 0) {
+          return '先处理复习队列，再学新字。这样不会把错误笔顺带到下一轮。';
+        }
+        if (lessonComplete) {
+          return '今天的最佳下一步是打印本组，离开屏幕慢写一遍。';
+        }
+        if (remainingToday === 0) {
+          return '今天的短练目标已经完成。明天回来先快速看一遍错字队列。';
+        }
+        return `再完成 ${remainingToday} 个汉字，就够一次高质量短练。`;
+      },
+      dailyRhythmRemaining: (count: number) => `今天还差 ${count} 个汉字`,
+      dailyRhythmReviewDetail: (count: number) => `${count} 个汉字建议先复习`,
+      dailyRhythmStreakLabel: '连续节奏',
+      dailyRhythmStreakValue: (count: number) =>
+        count > 0 ? `${count} 天连续` : '还未开始',
+      dailyRhythmTargetMet: () => '今天目标已完成',
+      dailyRhythmTitle: '今日练习节奏',
+      dailyRhythmTodayLabel: '今日目标',
+      dailyRhythmTodayValue: (completed: number, target: number) =>
+        `${completed}/${target} 个汉字`,
       freeBadge: (count: number) => `${count} 个免费汉字`,
       loopCompleteDescription:
         '入门组已完成。现在最适合把整组汉字打印出来做纸笔复习。',
@@ -1992,6 +2153,60 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     courseTitle: 'HSK1 course preview',
     description:
       'Start with a practical HSK1 path: watch stroke order, trace each character, save progress in this browser, then turn the same set into printable practice sheets.',
+    dailyRhythmActiveValue: (count: number) =>
+      count > 0 ? `${count} active days total` : 'Tracked after day one',
+    dailyRhythmCleanDetail: 'No required review queue right now.',
+    dailyRhythmDescription: (
+      completedToday: number,
+      target: number,
+      reviewCount: number,
+      lessonComplete: boolean
+    ) => {
+      if (lessonComplete) {
+        return 'This set is complete. Today is best used for a short refresh or paper pass.';
+      }
+      if (reviewCount > 0) {
+        return `Clear ${reviewCount} review characters first, then fill the ${target}-character daily target.`;
+      }
+      return `${completedToday}/${target} daily target complete. Keep the session short and steady.`;
+    },
+    dailyRhythmLastPracticeLabel: 'Last practice',
+    dailyRhythmLastPracticeValue: (lastPracticeAt?: string) => {
+      if (!lastPracticeAt) return 'Not recorded yet';
+
+      const days = getPracticeAgeDays(lastPracticeAt);
+      if (days === null) return 'Date not saved';
+      if (days === 0) return 'Today';
+      if (days === 1) return 'Yesterday';
+      return `${days} days ago`;
+    },
+    dailyRhythmNudge: (
+      remainingToday: number,
+      reviewCount: number,
+      lessonComplete: boolean
+    ) => {
+      if (reviewCount > 0) {
+        return 'Handle the review queue before adding new characters so wrong stroke memory does not carry forward.';
+      }
+      if (lessonComplete) {
+        return 'The best next move today is to print this set and write it once away from the screen.';
+      }
+      if (remainingToday === 0) {
+        return "Today's short practice target is done. Tomorrow, start with the review queue first.";
+      }
+      return `Finish ${remainingToday} more characters to complete a focused short session.`;
+    },
+    dailyRhythmRemaining: (count: number) => `${count} characters left today`,
+    dailyRhythmReviewDetail: (count: number) =>
+      `${count} characters should come first`,
+    dailyRhythmStreakLabel: 'Practice rhythm',
+    dailyRhythmStreakValue: (count: number) =>
+      count > 0 ? `${count}-day streak` : 'Not started',
+    dailyRhythmTargetMet: () => "Today's target is complete",
+    dailyRhythmTitle: "Today's practice rhythm",
+    dailyRhythmTodayLabel: 'Daily target',
+    dailyRhythmTodayValue: (completed: number, target: number) =>
+      `${completed}/${target} characters`,
     freeBadge: (count: number) => `${count} free characters`,
     loopCompleteDescription:
       'Starter set complete. This is a good moment to print the whole set for paper review.',
