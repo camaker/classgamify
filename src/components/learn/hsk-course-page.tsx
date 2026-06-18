@@ -176,6 +176,7 @@ export function HskCoursePage() {
                 copy={copy}
                 progressSummary={progressSummary}
               />
+              <NextReturnCard copy={copy} progressSummary={progressSummary} />
             </CardContent>
           </Card>
         </div>
@@ -218,6 +219,56 @@ export function HskCoursePage() {
         </section>
       </div>
     </section>
+  );
+}
+
+function NextReturnCard({
+  copy,
+  progressSummary,
+}: {
+  copy: ReturnType<typeof getCourseCopy>;
+  progressSummary: HanziProgressSummary;
+}) {
+  const firstReview = progressSummary.reviewItems[0];
+  const nextCharacter = progressSummary.nextPracticeTarget?.character;
+  const title = firstReview
+    ? copy.returnReviewTitle(firstReview.character.character)
+    : progressSummary.lessonComplete
+      ? copy.returnCompleteTitle
+      : nextCharacter
+        ? copy.returnContinueTitle(nextCharacter.character)
+        : copy.returnStartTitle;
+  const description = firstReview
+    ? copy.returnReviewDescription(
+        firstReview.progress.mistakes,
+        firstReview.urgency
+      )
+    : progressSummary.lessonComplete
+      ? copy.returnCompleteDescription
+      : nextCharacter
+        ? copy.returnContinueDescription(nextCharacter.pinyin)
+        : copy.returnStartDescription;
+
+  return (
+    <div className="col-span-2 rounded-lg border bg-background p-3">
+      <div className="flex items-start gap-3">
+        <div className="rounded-md bg-primary/10 p-2 text-primary">
+          <IconFlame className="size-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">{copy.returnTitle}</div>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {copy.returnDescription}
+          </p>
+          <div className="mt-3 rounded-md border bg-muted/30 px-3 py-2">
+            <p className="text-sm font-medium">{title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -806,6 +857,26 @@ function getCourseCopy(locale: 'en' | 'zh') {
         overdue: '优先',
         unscheduled: '待安排',
       },
+      returnCompleteDescription:
+        '下次回来先打印整组练习纸，再把圈出的难字带回线上复习。',
+      returnCompleteTitle: '下次做纸笔巩固',
+      returnContinueDescription: (pinyin: string) =>
+        `先复习上次字形，再继续 ${pinyin} 这个字。`,
+      returnContinueTitle: (character: string) => `下次继续 ${character}`,
+      returnDescription:
+        '给下一次学习留一个明确入口，减少重新打开时的选择成本。',
+      returnReviewDescription: (
+        mistakes: number,
+        urgency: HanziReviewItem['urgency']
+      ) =>
+        urgency === 'fresh'
+          ? `今天已经练过但还有 ${mistakes} 次错误，适合短复习一次。`
+          : `上次记录 ${mistakes} 次错误，下次先清掉这个复习项。`,
+      returnReviewTitle: (character: string) => `下次先复习 ${character}`,
+      returnStartDescription:
+        '从第一个免费字开始，完成一次描写就能建立学习节奏。',
+      returnStartTitle: '下次从第一个字开始',
+      returnTitle: '下次回来',
       reviewTitle: '先复习，再继续',
       reviewWorksheetCta: '打印错字复习纸',
       reviewWorksheetNote: (count: number) =>
@@ -936,6 +1007,28 @@ function getCourseCopy(locale: 'en' | 'zh') {
       overdue: 'Priority',
       unscheduled: 'Needs date',
     },
+    returnCompleteDescription:
+      'Start by printing the set, then bring circled hard characters back into tracing.',
+    returnCompleteTitle: 'Do a paper reinforcement pass',
+    returnContinueDescription: (pinyin: string) =>
+      `Refresh the previous shape, then continue with ${pinyin}.`,
+    returnContinueTitle: (character: string) =>
+      `Continue with ${character} next`,
+    returnDescription:
+      'Leave a clear entry point for the next session so restarting takes less thought.',
+    returnReviewDescription: (
+      mistakes: number,
+      urgency: HanziReviewItem['urgency']
+    ) =>
+      urgency === 'fresh'
+        ? `You practiced today but still logged ${mistakes} mistakes. Make the next visit a short review.`
+        : `Last run logged ${mistakes} mistakes. Clear this review item first next time.`,
+    returnReviewTitle: (character: string) =>
+      `Review ${character} first next time`,
+    returnStartDescription:
+      'Start with the first free character and complete one tracing run to build rhythm.',
+    returnStartTitle: 'Start with the first character',
+    returnTitle: 'Next return',
     reviewTitle: 'Review first, then continue',
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
