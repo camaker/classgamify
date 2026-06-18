@@ -495,19 +495,26 @@ export function HanziPracticePage({
 
             <Card className="rounded-lg border-primary/20 bg-primary/5">
               <CardHeader className="pb-3">
-                <div className="flex items-start gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="rounded-lg bg-background p-2 ring-1 ring-border">
                     <IconBook2 className="size-5 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <CardTitle className="text-base">
                       {copy.packTitle}
                     </CardTitle>
                     <CardDescription>{copy.packDescription}</CardDescription>
                   </div>
+                  <Link
+                    to={Routes.Pricing}
+                    className={cn(buttonVariants(), 'w-fit shrink-0')}
+                  >
+                    <IconSparkles className="size-4" />
+                    {copy.packCta}
+                  </Link>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <div className="grid gap-2 sm:grid-cols-3">
                   {[
                     copy.statCharacters(courseStats.total),
@@ -519,6 +526,16 @@ export function HanziPracticePage({
                       className="rounded-lg border bg-background/80 p-3 text-sm"
                     >
                       {item}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {copy.packFeatures.map((feature) => (
+                    <div
+                      key={feature}
+                      className="rounded-lg border bg-background/70 p-3 text-sm leading-6 text-muted-foreground"
+                    >
+                      {feature}
                     </div>
                   ))}
                 </div>
@@ -1513,6 +1530,11 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       packCta: '查看 HSK1 套餐',
       packDescription:
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
+      packFeatures: [
+        '把免费入门组扩展成完整 HSK1 书写路径',
+        '用错字记录和复习队列安排下一次练习',
+        '为课堂、家长辅导和自学生成可打印练习纸',
+      ],
       packTitle: '继续学习完整 HSK1 路径',
       characterNeedsReview: '已完成，需要复习',
       characterResultShareCta: '复制本次结果',
@@ -1704,6 +1726,11 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     packCta: 'View HSK1 pack',
     packDescription:
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
+    packFeatures: [
+      'Extend the free starter into the full HSK1 writing path',
+      'Use mistake history and review queues to plan the next session',
+      'Create printable worksheets for tutoring, family practice, or self-study',
+    ],
     packTitle: 'Continue with the full HSK1 path',
     characterNeedsReview: 'Complete, review needed',
     characterResultShareCta: 'Copy result',

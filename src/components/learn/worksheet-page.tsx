@@ -25,6 +25,7 @@ import {
   IconLock,
   IconPrinter,
   IconRefresh,
+  IconSparkles,
   IconX,
   IconWorldWww,
 } from '@tabler/icons-react';
@@ -1398,13 +1399,33 @@ export function WorksheetPage({
               </Card>
 
               <Card className="rounded-lg border-primary/20 bg-primary/5">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <IconLock className="size-4" />
                     {copy.packTitle}
                   </CardTitle>
                   <CardDescription>{copy.packDescription}</CardDescription>
                 </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-2">
+                    {copy.packFeatures.map((feature) => (
+                      <div
+                        key={feature}
+                        className="flex items-start gap-2 rounded-lg border bg-background/80 p-3 text-sm leading-6"
+                      >
+                        <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link
+                    to={Routes.Pricing}
+                    className={cn(buttonVariants(), 'w-fit')}
+                  >
+                    <IconSparkles className="size-4" />
+                    {copy.packCta}
+                  </Link>
+                </CardContent>
               </Card>
             </div>
 
@@ -1789,8 +1810,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         '纸面写完后，回到线上先复习同一组汉字，再处理圈出的难写字。',
       onlineReviewLinkLabel: '线上复习链接',
       onlineReviewTitle: '线上复习同一组',
+      packCta: '查看完整套餐',
       packDescription:
         '完整版本将提供 HSK1 全量练习纸、自定义字表、答案提示和学生作业记录。',
+      packFeatures: [
+        '解锁完整 HSK1 字表和更多练习纸组合',
+        '保存常用自定义字表，方便老师和家长重复布置',
+        '围绕错字、复习和纸笔作业形成长期学习流程',
+      ],
       packTitle: '完整练习纸套装',
       paperSizeLabel: '纸张大小',
       paperSizes: {
@@ -1971,8 +1998,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'After paper practice, reopen the same character set online before reviewing circled hard characters.',
     onlineReviewLinkLabel: 'Online review link',
     onlineReviewTitle: 'Review the same set online',
+    packCta: 'View complete pack',
     packDescription:
       'The complete version will unlock full HSK1 worksheets, custom character lists, answer prompts, and saved student assignments.',
+    packFeatures: [
+      'Unlock the full HSK1 character set and more worksheet combinations',
+      'Save reusable custom lists for teachers, tutors, and parents',
+      'Connect mistakes, review, and paper assignments into one routine',
+    ],
     packTitle: 'Complete worksheet pack',
     paperSizeLabel: 'Paper size',
     paperSizes: {
