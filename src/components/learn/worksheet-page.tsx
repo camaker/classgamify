@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { getFreeCharacters } from '@/learn/hanzi-course';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowLeft,
@@ -549,9 +550,13 @@ export function WorksheetPage({
         : {},
     [selectedCharacters]
   );
-  const practicePrintUrl = useMemo(
-    () => buildPracticePrintUrl(selectedCharacters),
-    [selectedCharacters]
+  const practiceReviewUrl = useMemo(
+    () => buildPracticeReviewUrl(selectedCharacters, currentLocale),
+    [currentLocale, selectedCharacters]
+  );
+  const practiceReviewDisplayUrl = useMemo(
+    () => formatWorksheetDisplayUrl(practiceReviewUrl),
+    [practiceReviewUrl]
   );
 
   const shareUrl = useMemo(
@@ -695,7 +700,10 @@ export function WorksheetPage({
       buildWorksheetSharePath(recentSet),
       window.location.origin
     ).toString();
-    const reviewUrl = `https://${buildPracticePrintUrl(recentSet.characters)}`;
+    const reviewUrl = buildPracticeReviewUrl(
+      recentSet.characters,
+      currentLocale
+    );
     const message = copy.assignmentShareMessage({
       assignmentNote: recentSet.assignmentNote,
       characters: recentSet.characters,
@@ -762,15 +770,10 @@ export function WorksheetPage({
     if (typeof window === 'undefined') return;
 
     const worksheetUrl = new URL(shareUrl, window.location.origin).toString();
-    const reviewUrl = `https://${
-      selectedCharacters.length > 0
-        ? practicePrintUrl
-        : `${WORKSHEET_DOMAIN}${Routes.Learn}`
-    }`;
     const message = copy.assignmentShareMessage({
       assignmentNote: normalizedAssignmentNote,
       characters: selectedCharacters,
-      reviewUrl,
+      reviewUrl: practiceReviewUrl,
       worksheetUrl,
     });
 
@@ -1506,7 +1509,7 @@ export function WorksheetPage({
                     copy={copy}
                     assignmentNote={normalizedAssignmentNote}
                     gridCount={gridCount}
-                    practicePrintUrl={practicePrintUrl}
+                    practicePrintUrl={practiceReviewDisplayUrl}
                     showCharacterDetails={showCharacterDetails}
                     showFeedbackSection={showFeedbackSection}
                     selectedItems={selectedItems}
@@ -2254,13 +2257,30 @@ function createWorksheetQuickSets(
   ].filter((quickSet) => quickSet.characters.length > 0);
 }
 
-function buildPracticePrintUrl(characters: string[]) {
-  if (characters.length === 0) return `${WORKSHEET_DOMAIN}${Routes.Learn}`;
+function buildPracticeReviewUrl(characters: string[], locale: 'en' | 'zh') {
+  const path = getPathWithLocale(Routes.Learn, locale);
+  const params = new URLSearchParams();
 
-  return [
-    `${WORKSHEET_DOMAIN}${Routes.Learn}?character=${characters[0]}`,
-    `characters=${characters.join(',')}`,
-  ].join('&');
+  if (characters.length > 0) {
+    params.set('character', characters[0]);
+  }
+
+  if (characters.length > 0) {
+    params.set('characters', characters.join(','));
+  }
+
+  const search = params.toString();
+  return `https://${WORKSHEET_DOMAIN}${path}${search ? `?${search}` : ''}`;
+}
+
+function formatWorksheetDisplayUrl(url: string) {
+  const withoutProtocol = url.replace(/^https?:\/\//, '');
+
+  try {
+    return decodeURIComponent(withoutProtocol);
+  } catch {
+    return withoutProtocol;
+  }
 }
 
 function buildWorksheetSharePath(config: WorksheetShareConfig) {
