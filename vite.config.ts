@@ -41,7 +41,7 @@ const config = defineConfig({
         { match: '/manifest.json', exclude: true },
       ],
       emitTsDeclarations: true,
-      isServer: 'import.meta.env.SSR',
+      isServer: 'import.meta.env?.SSR === true',
     }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
