@@ -1144,6 +1144,13 @@ function ReviewQueueCard({
   total: number;
 }) {
   const firstReview = reviewItems[0];
+  const priorityCount = reviewItems.filter((item) =>
+    ['overdue', 'unscheduled'].includes(item.urgency)
+  ).length;
+  const dueCount = reviewItems.filter((item) => item.urgency === 'due').length;
+  const freshCount = reviewItems.filter(
+    (item) => item.urgency === 'fresh'
+  ).length;
   const reviewWorksheetSearch = buildWorksheetSearch(reviewCharacters, {
     details: true,
     note: copy.reviewWorksheetNote(reviewCharacters.length),
@@ -1160,11 +1167,23 @@ function ReviewQueueCard({
         <CardDescription>{copy.reviewDescription}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
           <div className="rounded-lg border bg-muted/30 p-3">
-            <div className="text-2xl font-semibold">{reviewItems.length}</div>
+            <div className="text-2xl font-semibold">{priorityCount}</div>
+            <div className="mt-1 text-muted-foreground">
+              {copy.reviewPriorityLabel}
+            </div>
+          </div>
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <div className="text-2xl font-semibold">{dueCount}</div>
             <div className="mt-1 text-muted-foreground">
               {copy.reviewDueLabel}
+            </div>
+          </div>
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <div className="text-2xl font-semibold">{freshCount}</div>
+            <div className="mt-1 text-muted-foreground">
+              {copy.reviewFreshLabel}
             </div>
           </div>
           <div className="rounded-lg border bg-muted/30 p-3">
@@ -1179,6 +1198,18 @@ function ReviewQueueCard({
 
         {reviewItems.length > 0 ? (
           <>
+            {firstReview ? (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <p className="text-sm font-medium">{copy.reviewPlanTitle}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {copy.reviewPlanDescription(
+                    firstReview.character.character,
+                    firstReview.urgency,
+                    priorityCount
+                  )}
+                </p>
+              </div>
+            ) : null}
             <div className="space-y-2">
               {reviewItems.slice(0, 4).map((item) => {
                 const mistakeStrokes = item.progress.mistakeStrokes ?? [];
@@ -1350,6 +1381,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewEmptyDescription: '开始描写练习后，有错笔的字会自动出现在这里。',
       reviewEmptyTitle: '当前没有错字队列',
       reviewFirstCta: '复习第一个',
+      reviewFreshLabel: '今日已练',
       reviewFreshness: (completedAt?: string) => {
         const days = getPracticeAgeDays(completedAt);
         if (days === null) return '上次练习时间未记录';
@@ -1359,6 +1391,26 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       },
       reviewFullTraceBadge: '完整描写',
       reviewMistakes: (count: number) => `${count} 次错误`,
+      reviewPlanDescription: (
+        character: string,
+        urgency: HanziReviewItem['urgency'],
+        priorityCount: number
+      ) => {
+        if (urgency === 'overdue') {
+          return `先复习 ${character}。它已经隔了几天，而且有错笔记录。`;
+        }
+        if (urgency === 'unscheduled') {
+          return `先复习 ${character}，重新记录一次练习时间，后续复习会更准确。`;
+        }
+        if (urgency === 'due') {
+          return `先复习 ${character}，今天完成一次可以把它从待复习队列里清掉。`;
+        }
+        return priorityCount > 0
+          ? `先处理优先复习的字，再回到 ${character}。`
+          : `今天刚练过 ${character}，可以快速修正错笔后继续新字。`;
+      },
+      reviewPlanTitle: '建议顺序',
+      reviewPriorityLabel: '优先',
       reviewTitle: '复习队列',
       reviewTroubleStrokes: (count: number) =>
         count > 0 ? `${count} 个笔画需要注意` : '重新完整描写一遍',
@@ -1453,6 +1505,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'Start a tracing quiz and missed characters will appear here automatically.',
     reviewEmptyTitle: 'No review queue yet',
     reviewFirstCta: 'Review first',
+    reviewFreshLabel: 'Practiced today',
     reviewFreshness: (completedAt?: string) => {
       const days = getPracticeAgeDays(completedAt);
       if (days === null) return 'Last practice date not saved';
@@ -1462,6 +1515,26 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     },
     reviewFullTraceBadge: 'Full trace',
     reviewMistakes: (count: number) => `${count} mistakes`,
+    reviewPlanDescription: (
+      character: string,
+      urgency: HanziReviewItem['urgency'],
+      priorityCount: number
+    ) => {
+      if (urgency === 'overdue') {
+        return `Start with ${character}. It has been waiting for a few days and still has missed strokes.`;
+      }
+      if (urgency === 'unscheduled') {
+        return `Start with ${character} and record a fresh practice date so future reviews are more accurate.`;
+      }
+      if (urgency === 'due') {
+        return `Start with ${character}. One review today can clear it from the due queue.`;
+      }
+      return priorityCount > 0
+        ? `Clear the priority characters first, then come back to ${character}.`
+        : `${character} was practiced today. Fix the missed strokes quickly, then continue.`;
+    },
+    reviewPlanTitle: 'Suggested order',
+    reviewPriorityLabel: 'Priority',
     reviewTitle: 'Review queue',
     reviewTroubleStrokes: (count: number) =>
       count > 0 ? `${count} strokes to revisit` : 'Trace it once more',
