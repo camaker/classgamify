@@ -302,8 +302,8 @@ export function HanziPracticePage({
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-          <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
+          <div className="flex min-w-0 flex-col gap-5">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="border-primary/30">
@@ -361,7 +361,7 @@ export function HanziPracticePage({
               </div>
             </div>
 
-            <Card className="rounded-lg">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle>{copy.courseTitle}</CardTitle>
                 <CardDescription>
@@ -448,11 +448,11 @@ export function HanziPracticePage({
               total={lessonCharacters.length}
             />
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {lessonCharacters.map((item) => (
                 <div
                   key={item.character}
-                  className="rounded-lg border bg-muted/30 p-4"
+                  className="min-w-0 rounded-lg border bg-muted/30 p-4"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-2xl font-semibold">
@@ -495,7 +495,7 @@ export function HanziPracticePage({
               ))}
             </div>
 
-            <Card className="rounded-lg border-primary/20 bg-primary/5">
+            <Card className="min-w-0 rounded-lg border-primary/20 bg-primary/5">
               <CardHeader className="pb-3">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="rounded-lg bg-background p-2 ring-1 ring-border">
@@ -517,7 +517,7 @@ export function HanziPracticePage({
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-3">
                   {[
                     copy.statCharacters(courseStats.total),
                     copy.statStrokes(courseStats.strokes),
@@ -531,7 +531,7 @@ export function HanziPracticePage({
                     </div>
                   ))}
                 </div>
-                <div className="grid gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-3">
                   {copy.packFeatures.map((feature) => (
                     <div
                       key={feature}
@@ -760,7 +760,7 @@ function HanziPracticeCard({
   );
 
   return (
-    <Card className="rounded-lg">
+    <Card className="min-w-0 rounded-lg">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -826,7 +826,7 @@ function HanziPracticeCard({
           )}
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
           <Button
             type="button"
             variant="outline"
@@ -1120,7 +1120,7 @@ function PracticeCompletionActions({
 
   return (
     <div className="mt-4 border-t border-border/70 pt-4">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <p className="text-sm font-medium">{title}</p>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">

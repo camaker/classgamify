@@ -796,10 +796,10 @@ export function WorksheetPage({
           </Link>
 
           <div
-            className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
+            className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
             data-print-layout
           >
-            <div className="space-y-5 print:hidden" data-print-hidden>
+            <div className="min-w-0 space-y-5 print:hidden" data-print-hidden>
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline" className="border-primary/30">
@@ -815,7 +815,7 @@ export function WorksheetPage({
                 </p>
               </div>
 
-              <Card className="rounded-lg">
+              <Card className="min-w-0 rounded-lg">
                 <CardHeader>
                   <CardTitle>{copy.selectTitle}</CardTitle>
                   <CardDescription>{copy.selectDescription}</CardDescription>
@@ -830,7 +830,7 @@ export function WorksheetPage({
                         {copy.quickSetsDescription}
                       </p>
                     </div>
-                    <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
                       {quickSets.map((quickSet) => {
                         const active = isSameSelection(
                           selectedCharacters,
@@ -844,23 +844,26 @@ export function WorksheetPage({
                             aria-pressed={active}
                             onClick={() => applyQuickSet(quickSet)}
                             className={cn(
-                              'rounded-lg border bg-background p-3 text-left transition-colors',
+                              'min-w-0 rounded-lg border bg-background p-3 text-left transition-colors',
                               'hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                               active && 'border-primary bg-primary/10'
                             )}
                           >
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="font-medium">
+                            <div className="flex min-w-0 items-start justify-between gap-3">
+                              <span className="min-w-0 font-medium">
                                 {quickSet.title}
                               </span>
-                              <Badge variant="outline" className="rounded-md">
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 rounded-md"
+                              >
                                 {copy.quickSetCount(quickSet.characters.length)}
                               </Badge>
                             </div>
                             <p className="mt-1 text-xs leading-5 text-muted-foreground">
                               {quickSet.description}
                             </p>
-                            <p className="mt-2 truncate text-sm font-semibold">
+                            <p className="mt-2 break-words text-sm font-semibold">
                               {quickSet.characters.join(' ')}
                             </p>
                           </button>
@@ -894,7 +897,7 @@ export function WorksheetPage({
                         {recentSets.map((recentSet) => (
                           <div
                             key={recentSet.id}
-                            className="grid gap-3 rounded-lg border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                            className="grid grid-cols-[minmax(0,1fr)] gap-3 rounded-lg border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                           >
                             <button
                               type="button"
@@ -1146,7 +1149,7 @@ export function WorksheetPage({
                       </p>
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <p className="text-sm font-medium">
                           {copy.practiceBoxesLabel}
@@ -1195,7 +1198,7 @@ export function WorksheetPage({
                       </div>
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <div>
                           <p className="text-sm font-medium">
@@ -1398,7 +1401,7 @@ export function WorksheetPage({
                 </CardContent>
               </Card>
 
-              <Card className="rounded-lg border-primary/20 bg-primary/5">
+              <Card className="min-w-0 rounded-lg border-primary/20 bg-primary/5">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <IconLock className="size-4" />
@@ -1430,7 +1433,7 @@ export function WorksheetPage({
             </div>
 
             <div
-              className="rounded-lg border bg-background p-4 shadow-sm print:border-0 print:p-0 print:shadow-none"
+              className="min-w-0 rounded-lg border bg-background p-4 shadow-sm print:border-0 print:p-0 print:shadow-none"
               data-print-preview-frame
             >
               <WorksheetPreview
@@ -1485,21 +1488,33 @@ function WorksheetPreview({
       data-print-root
     >
       <div
-        className="mb-5 flex items-start justify-between gap-4 border-b border-slate-200 pb-4"
+        className="mb-5 flex flex-col items-start gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:justify-between"
         data-print-header
       >
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
             Lang Study
           </p>
           <h2 className="mt-1 text-2xl font-semibold">{copy.previewTitle}</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            {copy.nameLabel}: ____________________ {copy.dateLabel}:
-            ____________________
-          </p>
+          <div className="mt-2 grid grid-cols-[minmax(0,1fr)] gap-2 text-sm text-slate-600 sm:grid-cols-2">
+            <div className="flex min-w-0 items-end gap-2">
+              <span className="shrink-0">{copy.nameLabel}:</span>
+              <span
+                className="h-6 min-w-0 flex-1 border-b border-slate-400"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="flex min-w-0 items-end gap-2">
+              <span className="shrink-0">{copy.dateLabel}:</span>
+              <span
+                className="h-6 min-w-0 flex-1 border-b border-slate-400"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
         </div>
         <div
-          className="min-w-44 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm sm:w-auto sm:min-w-44"
           data-print-brand
         >
           <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -1516,10 +1531,10 @@ function WorksheetPreview({
       </div>
 
       <div
-        className="mb-5 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm sm:grid-cols-[minmax(0,1fr)_minmax(12rem,0.55fr)]"
+        className="mb-5 grid grid-cols-[minmax(0,1fr)] gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm sm:grid-cols-[minmax(0,1fr)_minmax(12rem,0.55fr)]"
         data-print-assignment
       >
-        <div>
+        <div className="min-w-0">
           <div className="font-semibold text-slate-950">
             {copy.assignmentTitle}
           </div>

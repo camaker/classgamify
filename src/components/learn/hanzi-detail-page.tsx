@@ -158,9 +158,9 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
           {copy.back}
         </Link>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.55fr)] lg:items-start">
-          <div className="space-y-6">
-            <Card className="rounded-lg">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.55fr)] lg:items-start">
+          <div className="min-w-0 space-y-6">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline" className="border-primary/30">
@@ -218,7 +218,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                         {copy.studyPlanShareCta}
                       </button>
                     </div>
-                    <div className="grid gap-3 pt-2 sm:grid-cols-3">
+                    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 pt-2 sm:grid-cols-3">
                       {copy.studySteps.map((step, index) => (
                         <StudyStep
                           description={step.description}
@@ -234,7 +234,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardHeader>
             </Card>
 
-            <Card className="rounded-lg">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle>{copy.memoryTitle}</CardTitle>
                 <CardDescription>{copy.memoryDescription}</CardDescription>
@@ -247,7 +247,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardContent>
             </Card>
 
-            <Card className="rounded-lg">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <IconGripVertical className="size-4 text-muted-foreground" />
@@ -256,10 +256,10 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                 <CardDescription>{copy.examplesDescription}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
                   {character.examples.map((example) => (
                     <div
-                      className="rounded-lg border bg-card p-4"
+                      className="min-w-0 rounded-lg border bg-card p-4"
                       key={example}
                     >
                       <div className="text-2xl font-semibold">{example}</div>
@@ -272,7 +272,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardContent>
             </Card>
 
-            <Card className="rounded-lg">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <IconCheck className="size-4" />
@@ -281,7 +281,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                 <CardDescription>{copy.lessonGroupDescription}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {lessonCharacters.map((item) => {
                     const itemProgress = progress[item.character];
                     const itemCompleted = itemProgress?.completed;
@@ -344,8 +344,8 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
             </Card>
           </div>
 
-          <aside className="space-y-4">
-            <Card className="rounded-lg">
+          <aside className="min-w-0 space-y-4">
+            <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle>{copy.factTitle}</CardTitle>
                 <CardDescription>{copy.factDescription}</CardDescription>
@@ -364,7 +364,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
               </CardContent>
             </Card>
 
-            <Card className="rounded-lg border-primary/20 bg-primary/5">
+            <Card className="min-w-0 rounded-lg border-primary/20 bg-primary/5">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <IconBook2 className="size-4" />
@@ -451,14 +451,14 @@ function MemoryCueGrid({
   ];
 
   return (
-    <div className="mt-4 grid gap-3 md:grid-cols-3">
+    <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-3">
       {items.map((item) => {
         const Icon = item.icon;
 
         return (
           <div
             key={item.title}
-            className="rounded-lg border bg-background/80 p-3"
+            className="min-w-0 rounded-lg border bg-background/80 p-3"
           >
             <div className="flex items-center gap-2 text-sm font-medium">
               <Icon className="size-4 text-muted-foreground" />
