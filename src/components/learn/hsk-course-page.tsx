@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
+import { LearningGuideLinks } from '@/components/learn/learning-guide-links';
 import {
   getCourseStats,
   getFreeCharacters,
@@ -484,6 +485,8 @@ export function HskCoursePage() {
           progressSummary={progressSummary}
           worksheetCharacters={freeCharacters}
         />
+
+        <LearningGuideLinks mode="course" />
 
         <section className="grid gap-4">
           {lessonProgressItems.map((item, index) => (

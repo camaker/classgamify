@@ -64,6 +64,40 @@ export function websiteJsonLd({
   };
 }
 
+export function articleJsonLd({
+  datePublished,
+  description,
+  headline,
+  image,
+  inLanguage,
+  path,
+}: {
+  datePublished: string;
+  description: string;
+  headline: string;
+  image?: string;
+  inLanguage: string;
+  path: string;
+}): JsonLdNode {
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
+  const url = getCanonicalUrl(path);
+
+  return {
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    headline,
+    description,
+    url,
+    mainEntityOfPage: url,
+    datePublished,
+    dateModified: datePublished,
+    inLanguage,
+    author: { '@id': `${baseUrl}/#organization` },
+    publisher: { '@id': `${baseUrl}/#organization` },
+    ...(image ? { image: getImageUrl(image) } : {}),
+  };
+}
+
 export function graphJsonLd(nodes: JsonLdNode[]): JsonLdNode {
   return {
     '@context': 'https://schema.org',

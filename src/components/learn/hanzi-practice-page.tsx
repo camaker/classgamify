@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { LearningGuideLinks } from '@/components/learn/learning-guide-links';
 import {
   getCourseStats,
   getFreeCharacters,
@@ -438,6 +439,8 @@ export function HanziPracticePage({
               total={lessonCharacters.length}
               worksheetCharacters={worksheetCharacters}
             />
+
+            <LearningGuideLinks mode="practice" />
 
             <ReviewQueueCard
               cleanCount={progressSummary.cleanCount}
