@@ -751,7 +751,10 @@ function HanziPracticeCard({
     [character.character],
     {
       details: true,
-      note: copy.characterReviewWorksheetNote(character.character),
+      note: copy.characterReviewWorksheetNote(
+        character.character,
+        lastStats?.mistakeStrokes ?? []
+      ),
       trace: 'guided',
     }
   );
@@ -1668,8 +1671,18 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       },
       characterResultShareSuccess: '本次练习结果已复制。',
       characterReviewWorksheetCta: '打印这个错字',
-      characterReviewWorksheetNote: (character: string) =>
-        `重点复习 ${character} 的错笔：先看引导格，再慢慢独立书写。`,
+      characterReviewWorksheetNote: (
+        character: string,
+        mistakeStrokes: number[]
+      ) => {
+        if (mistakeStrokes.length === 0) {
+          return `重点复习 ${character}：先看引导格，再慢慢独立书写。`;
+        }
+
+        return `重点复习 ${character} 的${mistakeStrokes
+          .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+          .join('、')}：先看引导格，再慢慢独立书写。`;
+      },
       completionCleanDescription:
         '这一字可以暂时放下，继续新字；也可以把整组打印出来做一次纸笔巩固。',
       completionCleanTitle: '这一字已经稳了',
@@ -1917,8 +1930,22 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     },
     characterResultShareSuccess: 'Practice result copied.',
     characterReviewWorksheetCta: 'Print this review',
-    characterReviewWorksheetNote: (character: string) =>
-      `Focus on missed strokes for ${character}: use the guided grid first, then write it slowly on your own.`,
+    characterReviewWorksheetNote: (
+      character: string,
+      mistakeStrokes: number[]
+    ) => {
+      if (mistakeStrokes.length === 0) {
+        return `Focus on ${character}: use the guided grid first, then write it slowly on your own.`;
+      }
+
+      return `Focus on ${character} ${
+        mistakeStrokes.length === 1 ? 'stroke' : 'strokes'
+      } ${mistakeStrokes
+        .map((stroke) => getDisplayStrokeNumber(stroke))
+        .join(
+          ', '
+        )}: use the guided grid first, then write it slowly on your own.`;
+    },
     completionCleanDescription:
       'Move on while the shape is fresh, or print the full set for one paper pass.',
     completionCleanTitle: 'This character is solid',
