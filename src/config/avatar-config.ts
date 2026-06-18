@@ -1,5 +1,9 @@
 import { m } from '@/locale/paraglide/messages';
-import { IconCreditCard, IconSettings2 } from '@tabler/icons-react';
+import {
+  IconCreditCard,
+  IconLayoutDashboard,
+  IconSettings2,
+} from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
 import type { MenuItemConfig } from '../types';
 import { websiteConfig } from './website';
@@ -8,6 +12,11 @@ import { websiteConfig } from './website';
  */
 export function getAvatarLinks(): MenuItemConfig[] {
   return [
+    {
+      title: m.dashboard_avatar_dashboard(),
+      href: Routes.Dashboard,
+      icon: IconLayoutDashboard,
+    },
     ...(websiteConfig.payment?.enable
       ? [
           {

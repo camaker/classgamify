@@ -61,4 +61,4 @@ export const Routes = {
 } as const;
 
 /** Default login redirect route */
-export const DEFAULT_LOGIN_REDIRECT = Routes.Learn;
+export const DEFAULT_LOGIN_REDIRECT = Routes.Dashboard;

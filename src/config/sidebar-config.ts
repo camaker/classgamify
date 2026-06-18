@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import {
   IconBell,
   IconCreditCard,
+  IconLayoutDashboard,
   IconLock,
   IconSettings2,
   IconShieldCheck,
@@ -16,6 +17,12 @@ import { websiteConfig } from './website';
  */
 export function getSidebarLinks(): MenuItemConfig[] {
   return [
+    {
+      title: m.dashboard_sidebar_dashboard(),
+      icon: IconLayoutDashboard,
+      href: Routes.Dashboard,
+      external: false,
+    },
     {
       title: m.admin_title(),
       icon: IconShieldCheck,
