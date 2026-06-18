@@ -34,6 +34,7 @@ import {
   IconCircleCheck,
   IconClockHour4,
   IconCopy,
+  IconDatabaseExport,
   IconFileText,
   IconFlame,
   IconLock,
@@ -122,6 +123,30 @@ export function HskCoursePage() {
       toast.error(copy.shareError);
     }
   };
+  const copyProgressBackup = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const backup = buildProgressBackup({
+      locale: currentLocale,
+      progress,
+      progressSummary,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(
+        JSON.stringify(backup, null, 2)
+      );
+      toast.success(copy.progressBackupSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
   const dailyTarget = progressSummary.reviewItems.length > 0 ? 2 : 1;
   const lessonProgressItems = useMemo(
     () =>
@@ -198,6 +223,14 @@ export function HskCoursePage() {
               >
                 <IconCopy className="size-4" />
                 {copy.progressShareCta}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={copyProgressBackup}
+              >
+                <IconDatabaseExport className="size-4" />
+                {copy.progressBackupCta}
               </Button>
             </div>
           </div>
@@ -885,6 +918,12 @@ type ProgressShareMessageParams = {
   worksheetUrl: string;
 };
 
+type ProgressBackupParams = {
+  locale: 'en' | 'zh';
+  progress: StoredProgress;
+  progressSummary: HanziProgressSummary;
+};
+
 function getCourseCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -932,6 +971,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
       practiceCta: '开始练习',
       premiumLabel: 'Pro 字',
       proBadge: 'Pro',
+      progressBackupCta: '复制进度备份',
+      progressBackupSuccess: '进度备份已复制。',
       progressShareCta: '复制进度报告',
       progressShareMessage: ({
         nextCharacter,
@@ -1122,6 +1163,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     practiceCta: 'Start practice',
     premiumLabel: 'Pro',
     proBadge: 'Pro',
+    progressBackupCta: 'Copy progress backup',
+    progressBackupSuccess: 'Progress backup copied.',
     progressShareCta: 'Copy progress report',
     progressShareMessage: ({
       nextCharacter,
@@ -1305,4 +1348,30 @@ function buildCourseWorksheetUrl(search: CourseWorksheetSearch) {
   params.set('trace', search.trace);
 
   return `https://${COURSE_SHARE_DOMAIN}${Routes.Worksheets}?${params.toString()}`;
+}
+
+function buildProgressBackup({
+  locale,
+  progress,
+  progressSummary,
+}: ProgressBackupParams) {
+  return {
+    app: 'Lang Study',
+    exportedAt: new Date().toISOString(),
+    locale,
+    progress,
+    schemaVersion: 1,
+    source: `https://${COURSE_SHARE_DOMAIN}${Routes.Hsk1}`,
+    summary: {
+      activeDayCount: progressSummary.activeDayCount,
+      cleanCount: progressSummary.cleanCount,
+      completedCount: progressSummary.completedCount,
+      completedTodayCount: progressSummary.completedTodayCount,
+      currentStreakDays: progressSummary.currentStreakDays,
+      lessonComplete: progressSummary.lessonComplete,
+      reviewCharacters: progressSummary.reviewCharacters,
+      total: progressSummary.total,
+    },
+    type: 'hsk1-progress-backup',
+  };
 }
