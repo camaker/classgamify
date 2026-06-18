@@ -15,6 +15,7 @@
       "!.kiro",
       "!.conductor",
       "!.vscode",
+      "!.gstack",
       "!.source",
       "!node_modules",
       "!dist",

@@ -1099,7 +1099,7 @@ export function WorksheetPage({
                           <p className="text-sm font-medium">
                             {copy.practiceBoxesLabel}
                           </p>
-                          <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
+                          <div className="grid grid-cols-1 gap-1 rounded-lg border bg-background p-1 sm:grid-cols-3">
                             {GRID_OPTIONS.map((option) => (
                               <button
                                 key={option}
@@ -1107,7 +1107,7 @@ export function WorksheetPage({
                                 aria-pressed={gridCount === option}
                                 onClick={() => setGridCount(option)}
                                 className={cn(
-                                  'min-h-10 rounded-md px-2 text-sm leading-tight transition-colors',
+                                  'min-h-10 rounded-md px-2 text-sm transition-colors',
                                   'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                   gridCount === option &&
                                     'bg-primary/10 font-medium text-primary'
@@ -1153,7 +1153,7 @@ export function WorksheetPage({
                             {copy.traceModeDescription}
                           </p>
                         </div>
-                        <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
+                        <div className="grid grid-cols-1 gap-1 rounded-lg border bg-background p-1 sm:grid-cols-3">
                           {TRACE_MODES.map((mode) => (
                             <button
                               key={mode}
@@ -1161,7 +1161,7 @@ export function WorksheetPage({
                               aria-pressed={traceMode === mode}
                               onClick={() => setTraceMode(mode)}
                               className={cn(
-                                'min-h-10 rounded-md px-2 text-sm leading-tight transition-colors',
+                                'min-h-10 rounded-md px-2 text-sm transition-colors',
                                 'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                 traceMode === mode &&
                                   'bg-primary/10 font-medium text-primary'
