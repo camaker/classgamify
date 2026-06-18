@@ -38,6 +38,7 @@ const DEFAULT_GRID_COUNT: WorksheetGridCount = 9;
 const DEFAULT_PAPER_SIZE: WorksheetPaperSize = 'a4';
 const DEFAULT_TRACE_MODE: TraceMode = 'first';
 const DEFAULT_SHOW_CHARACTER_DETAILS = true;
+const DEFAULT_SHOW_FEEDBACK_SECTION = true;
 const MAX_ASSIGNMENT_NOTE_LENGTH = 180;
 const MAX_WORKSHEET_CHARACTERS = 12;
 const MAX_RECENT_WORKSHEET_SETS = 4;
@@ -71,6 +72,7 @@ type WorksheetRecentSet = {
   id: string;
   paperSize: WorksheetPaperSize;
   showCharacterDetails: boolean;
+  showFeedbackSection: boolean;
   traceMode: TraceMode;
   updatedAt: string;
 };
@@ -79,6 +81,8 @@ type WorksheetPaperPrintConfig = {
   assignmentGap: string;
   assignmentPadding: string;
   characterMarginTop: string;
+  feedbackMarginTop: string;
+  feedbackPadding: string;
   footerGap: string;
   footerMarginTop: string;
   gridGap: string;
@@ -97,6 +101,8 @@ const WORKSHEET_PAPER_PRINT_CONFIG: Record<
     assignmentGap: '8pt',
     assignmentPadding: '8pt',
     characterMarginTop: '14pt',
+    feedbackMarginTop: '14pt',
+    feedbackPadding: '8pt',
     footerGap: '8pt',
     footerMarginTop: '14pt',
     gridGap: '5pt',
@@ -110,6 +116,8 @@ const WORKSHEET_PAPER_PRINT_CONFIG: Record<
     assignmentGap: '6pt',
     assignmentPadding: '7pt',
     characterMarginTop: '10pt',
+    feedbackMarginTop: '10pt',
+    feedbackPadding: '7pt',
     footerGap: '6pt',
     footerMarginTop: '10pt',
     gridGap: '4pt',
@@ -123,6 +131,8 @@ const WORKSHEET_PAPER_PRINT_CONFIG: Record<
     assignmentGap: '8pt',
     assignmentPadding: '8pt',
     characterMarginTop: '14pt',
+    feedbackMarginTop: '14pt',
+    feedbackPadding: '8pt',
     footerGap: '8pt',
     footerMarginTop: '14pt',
     gridGap: '5pt',
@@ -136,6 +146,8 @@ const WORKSHEET_PAPER_PRINT_CONFIG: Record<
     assignmentGap: '8pt',
     assignmentPadding: '8pt',
     characterMarginTop: '14pt',
+    feedbackMarginTop: '14pt',
+    feedbackPadding: '8pt',
     footerGap: '8pt',
     footerMarginTop: '14pt',
     gridGap: '5pt',
@@ -253,10 +265,12 @@ function normalizeRecentWorksheetSet(value: unknown) {
       gridCount,
       paperSize,
       showCharacterDetails: item.showCharacterDetails !== false,
+      showFeedbackSection: item.showFeedbackSection !== false,
       traceMode,
     }),
     paperSize,
     showCharacterDetails: item.showCharacterDetails !== false,
+    showFeedbackSection: item.showFeedbackSection !== false,
     traceMode,
     updatedAt:
       typeof item.updatedAt === 'string'
@@ -271,6 +285,7 @@ function createRecentWorksheetSetId({
   gridCount,
   paperSize,
   showCharacterDetails,
+  showFeedbackSection,
   traceMode,
 }: Pick<
   WorksheetRecentSet,
@@ -279,6 +294,7 @@ function createRecentWorksheetSetId({
   | 'gridCount'
   | 'paperSize'
   | 'showCharacterDetails'
+  | 'showFeedbackSection'
   | 'traceMode'
 >) {
   return [
@@ -287,6 +303,7 @@ function createRecentWorksheetSetId({
     paperSize,
     traceMode,
     showCharacterDetails ? 'details' : 'simple',
+    showFeedbackSection ? 'feedback' : 'no-feedback',
     assignmentNote,
   ].join('|');
 }
@@ -325,6 +342,11 @@ function buildWorksheetPrintStyleText(
     margin-top: ${config.characterMarginTop} !important;
   }
 
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-feedback] {
+    margin-block-start: ${config.feedbackMarginTop} !important;
+    padding: ${config.feedbackPadding} !important;
+  }
+
   body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-grid] {
     gap: ${config.gridGap} !important;
     grid-template-columns: repeat(auto-fit, minmax(${config.gridMin}, ${config.gridMax})) !important;
@@ -344,6 +366,7 @@ export function WorksheetPage({
   initialAssignmentNote,
   initialPaperSize,
   initialShowCharacterDetails,
+  initialShowFeedbackSection,
   initialTraceMode,
 }: {
   initialCharacters?: string[];
@@ -351,6 +374,7 @@ export function WorksheetPage({
   initialAssignmentNote?: string;
   initialPaperSize?: WorksheetPaperSize;
   initialShowCharacterDetails?: boolean;
+  initialShowFeedbackSection?: boolean;
   initialTraceMode?: TraceMode;
 }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -381,6 +405,8 @@ export function WorksheetPage({
   const initialPaperSizeValue = initialPaperSize ?? DEFAULT_PAPER_SIZE;
   const initialShowCharacterDetailsValue =
     initialShowCharacterDetails ?? DEFAULT_SHOW_CHARACTER_DETAILS;
+  const initialShowFeedbackSectionValue =
+    initialShowFeedbackSection ?? DEFAULT_SHOW_FEEDBACK_SECTION;
   const initialTraceModeValue = initialTraceMode ?? DEFAULT_TRACE_MODE;
   const [gridCount, setGridCount] = useState<WorksheetGridCount>(
     initialGridCountValue
@@ -390,6 +416,9 @@ export function WorksheetPage({
   );
   const [showCharacterDetails, setShowCharacterDetails] = useState(
     initialShowCharacterDetailsValue
+  );
+  const [showFeedbackSection, setShowFeedbackSection] = useState(
+    initialShowFeedbackSectionValue
   );
   const [traceMode, setTraceMode] = useState<TraceMode>(initialTraceModeValue);
   const [assignmentNote, setAssignmentNote] = useState(
@@ -417,6 +446,10 @@ export function WorksheetPage({
   useEffect(() => {
     setShowCharacterDetails(initialShowCharacterDetailsValue);
   }, [initialShowCharacterDetailsValue]);
+
+  useEffect(() => {
+    setShowFeedbackSection(initialShowFeedbackSectionValue);
+  }, [initialShowFeedbackSectionValue]);
 
   useEffect(() => {
     setTraceMode(initialTraceModeValue);
@@ -484,6 +517,9 @@ export function WorksheetPage({
     if (!showCharacterDetails) {
       params.set('details', 'off');
     }
+    if (!showFeedbackSection) {
+      params.set('feedback', 'off');
+    }
     if (normalizedAssignmentNote.length > 0) {
       params.set('note', normalizedAssignmentNote);
     }
@@ -494,6 +530,7 @@ export function WorksheetPage({
     paperSize,
     selectedCharacters,
     showCharacterDetails,
+    showFeedbackSection,
     traceMode,
   ]);
 
@@ -548,6 +585,7 @@ export function WorksheetPage({
       characters: selectedCharacters,
       gridCount,
       paperSize,
+      showFeedbackSection,
       showCharacterDetails,
       traceMode,
       updatedAt: new Date().toISOString(),
@@ -567,6 +605,7 @@ export function WorksheetPage({
     setCustomInput('');
     setGridCount(recentSet.gridCount);
     setPaperSize(recentSet.paperSize);
+    setShowFeedbackSection(recentSet.showFeedbackSection);
     setShowCharacterDetails(recentSet.showCharacterDetails);
     setAssignmentNote(recentSet.assignmentNote);
     setTraceMode(recentSet.traceMode);
@@ -587,6 +626,7 @@ export function WorksheetPage({
     setCustomInput('');
     setGridCount(initialGridCountValue);
     setPaperSize(initialPaperSizeValue);
+    setShowFeedbackSection(initialShowFeedbackSectionValue);
     setShowCharacterDetails(initialShowCharacterDetailsValue);
     setAssignmentNote(initialAssignmentNoteValue);
     setTraceMode(initialTraceModeValue);
@@ -759,7 +799,8 @@ export function WorksheetPage({
                                 {copy.recentSetMeta(
                                   recentSet.gridCount,
                                   copy.paperSizes[recentSet.paperSize],
-                                  copy.traceModes[recentSet.traceMode]
+                                  copy.traceModes[recentSet.traceMode],
+                                  recentSet.showFeedbackSection
                                 )}
                               </p>
                               {recentSet.assignmentNote ? (
@@ -1060,6 +1101,27 @@ export function WorksheetPage({
                           className="mt-0.5"
                         />
                       </div>
+
+                      <div className="flex min-h-24 items-start justify-between gap-3 rounded-lg border bg-background p-3">
+                        <div className="space-y-1">
+                          <Label
+                            htmlFor="worksheet-feedback-section"
+                            className="text-sm"
+                          >
+                            {copy.feedbackSectionLabel}
+                          </Label>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {copy.feedbackSectionDescription}
+                          </p>
+                        </div>
+                        <Switch
+                          id="worksheet-feedback-section"
+                          checked={showFeedbackSection}
+                          onCheckedChange={setShowFeedbackSection}
+                          aria-label={copy.feedbackSectionLabel}
+                          className="mt-0.5"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -1203,6 +1265,7 @@ export function WorksheetPage({
                 assignmentNote={normalizedAssignmentNote}
                 gridCount={gridCount}
                 showCharacterDetails={showCharacterDetails}
+                showFeedbackSection={showFeedbackSection}
                 selectedItems={selectedItems}
                 traceMode={traceMode}
               />
@@ -1220,6 +1283,7 @@ type WorksheetPreviewProps = {
   selectedItems: WorksheetCharacter[];
   gridCount: number;
   showCharacterDetails: boolean;
+  showFeedbackSection: boolean;
   traceMode: TraceMode;
 };
 
@@ -1229,6 +1293,7 @@ function WorksheetPreview({
   selectedItems,
   gridCount,
   showCharacterDetails,
+  showFeedbackSection,
   traceMode,
 }: WorksheetPreviewProps) {
   const assignmentChecks = showCharacterDetails
@@ -1373,6 +1438,10 @@ function WorksheetPreview({
         </div>
       )}
 
+      {showFeedbackSection && selectedItems.length > 0 ? (
+        <WorksheetFeedbackSection copy={copy} />
+      ) : null}
+
       <div
         className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500"
         data-print-footer
@@ -1389,6 +1458,48 @@ function WorksheetPreview({
               {WORKSHEET_URL}
             </span>
           </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorksheetFeedbackSection({ copy }: { copy: WorksheetCopy }) {
+  return (
+    <div
+      className="mt-6 break-inside-avoid rounded-lg border border-slate-200 bg-white p-3 text-sm"
+      data-print-feedback
+    >
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(12rem,0.55fr)]">
+        <div>
+          <div className="font-semibold text-slate-950">
+            {copy.feedbackTitle}
+          </div>
+          <p className="mt-1 leading-6 text-slate-600">
+            {copy.feedbackDescription}
+          </p>
+          <div className="mt-3 grid gap-2 text-xs text-slate-700 sm:grid-cols-2">
+            {copy.feedbackFields.map((field) => (
+              <div
+                key={field}
+                className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2"
+              >
+                <span className="font-medium text-slate-600">{field}</span>
+                <span className="ml-2 text-slate-400">____________</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-2 text-xs text-slate-700">
+          {copy.feedbackChecks.map((item) => (
+            <div key={item} className="flex items-start gap-2">
+              <span
+                className="mt-0.5 size-3.5 shrink-0 rounded-sm border border-slate-400 bg-white"
+                aria-hidden="true"
+              />
+              <span>{item}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -1437,6 +1548,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         '从免费 HSK1 入门组里选择汉字，生成一张干净的手写练习纸，适合自学、家长辅导和老师布置作业。',
       empty: '至少选择一个汉字来生成练习纸。',
       examplesLabel: '例词',
+      feedbackChecks: ['选出最满意的一格', '圈出最难写的字', '写下下次复习字'],
+      feedbackDescription:
+        '完成后用这一栏做一次简短回收，老师、家长或学习者自己都能看见下一次该复习什么。',
+      feedbackFields: ['最好的一格', '最难的字', '下次复习'],
+      feedbackSectionDescription:
+        '打印页底部加入完成反馈栏，适合老师批改、家长回收和自学订正。',
+      feedbackSectionLabel: '显示完成反馈栏',
+      feedbackTitle: '完成后反馈',
       footerSourcePrefix: '更多练习纸：',
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
       freeBadge: '免费预览',
@@ -1503,8 +1622,12 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       recentSetMeta: (
         gridCount: number,
         paperSize: string,
-        traceMode: string
-      ) => `${paperSize} · 每字 ${gridCount} 格 · ${traceMode}`,
+        traceMode: string,
+        hasFeedback: boolean
+      ) =>
+        `${paperSize} · 每字 ${gridCount} 格 · ${traceMode}${
+          hasFeedback ? ' · 含反馈栏' : ''
+        }`,
       recentSetsDescription:
         '打印或复制链接后会保存在本机，方便下次继续布置同一组作业。',
       recentSetsTitle: '最近练习纸',
@@ -1573,6 +1696,18 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'Pick characters from the free HSK1 starter set and print a clean handwriting worksheet for self-study, tutoring, or classroom practice.',
     empty: 'Select at least one character to build a worksheet.',
     examplesLabel: 'Examples',
+    feedbackChecks: [
+      'Choose the best box',
+      'Circle the hardest character',
+      'Write the next review target',
+    ],
+    feedbackDescription:
+      'Use this section after writing so teachers, parents, or self-study learners can decide what should come back next.',
+    feedbackFields: ['Best box', 'Hardest character', 'Review next'],
+    feedbackSectionDescription:
+      'Add a completion section to the printout for grading, parent review, or self-correction.',
+    feedbackSectionLabel: 'Show feedback section',
+    feedbackTitle: 'After-practice feedback',
     footerSourcePrefix: 'Make more worksheets:',
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
     freeBadge: 'Free preview',
@@ -1645,8 +1780,15 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     recentRemoveLabel: 'Remove recent worksheet',
     recentRestoreCta: 'Restore',
     recentRestoreSuccess: 'Recent worksheet restored.',
-    recentSetMeta: (gridCount: number, paperSize: string, traceMode: string) =>
-      `${paperSize} · ${gridCount} boxes · ${traceMode}`,
+    recentSetMeta: (
+      gridCount: number,
+      paperSize: string,
+      traceMode: string,
+      hasFeedback: boolean
+    ) =>
+      `${paperSize} · ${gridCount} boxes · ${traceMode}${
+        hasFeedback ? ' · feedback' : ''
+      }`,
     recentSetsDescription:
       'Printing or copying a link saves the setup on this device so repeat assignments are faster.',
     recentSetsTitle: 'Recent worksheets',

@@ -21,6 +21,7 @@ export const Route = createFileRoute('/worksheets')({
   ): {
     characters?: string[];
     details?: boolean;
+    feedback?: boolean;
     grid?: WorksheetGridCount;
     note?: string;
     paper?: WorksheetPaperSize;
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/worksheets')({
   } => ({
     characters: parseCharactersSearch(search.characters),
     details: parseDetailsSearch(search.details),
+    feedback: parseDetailsSearch(search.feedback),
     grid: parseGridSearch(search.grid),
     note: parseNoteSearch(search.note),
     paper: parsePaperSearch(search.paper),
@@ -51,6 +53,7 @@ function WorksheetRoutePage() {
       initialAssignmentNote={search.note}
       initialPaperSize={search.paper}
       initialShowCharacterDetails={search.details}
+      initialShowFeedbackSection={search.feedback}
       initialTraceMode={search.trace}
     />
   );

@@ -266,6 +266,15 @@
     min-height: 0 !important;
   }
 
+  body[data-print-mode="worksheet"] [data-print-feedback] {
+    background: white !important;
+    border-color: #cbd5e1 !important;
+    break-inside: avoid;
+    margin-block-start: 14pt !important;
+    page-break-inside: avoid;
+    padding: 8pt !important;
+  }
+
   body[data-print-mode="worksheet"] [data-print-footer] {
     border-top-color: #cbd5e1 !important;
     gap: 8pt !important;
@@ -302,6 +311,11 @@
   body[data-print-mode="worksheet"] [data-print-grid] {
     gap: 4pt !important;
     grid-template-columns: repeat(auto-fit, minmax(17mm, 22mm)) !important;
+  }
+
+  body[data-print-mode="worksheet"] [data-print-feedback] {
+    margin-block-start: 10pt !important;
+    padding: 7pt !important;
   }
 
   body[data-print-mode="worksheet"] [data-print-footer] {
