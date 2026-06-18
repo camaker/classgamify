@@ -281,6 +281,21 @@
     margin-block-start: 14pt !important;
     padding-top: 10pt !important;
   }
+
+  body[data-print-mode="worksheet"] [data-print-footer-brand],
+  body[data-print-mode="worksheet"] [data-print-footer-links] {
+    border-color: #cbd5e1 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body[data-print-mode="worksheet"] [data-print-footer-brand] {
+    background: #f8fafc !important;
+  }
+
+  body[data-print-mode="worksheet"] [data-print-footer-domain] {
+    font-size: 16pt !important;
+  }
 }
 
 @media print and (max-width: 5in) {
@@ -319,8 +334,7 @@
   }
 
   body[data-print-mode="worksheet"] [data-print-footer] {
-    align-items: flex-start !important;
-    flex-direction: column !important;
     gap: 5pt !important;
+    grid-template-columns: 1fr !important;
   }
 }

@@ -1802,21 +1802,48 @@ function WorksheetPreview({
       ) : null}
 
       <div
-        className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500"
+        className="mt-6 grid gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]"
         data-print-footer
       >
-        <div className="flex min-w-0 items-center gap-2">
-          <IconCircleCheck className="size-4 shrink-0" />
-          <span>{copy.footerTip}</span>
+        <div
+          className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+          data-print-footer-brand
+        >
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <IconWorldWww className="size-3.5 shrink-0" />
+            {copy.footerBrandTitle}
+          </div>
+          <div
+            className="mt-1 break-all text-lg font-semibold leading-tight text-slate-950"
+            data-print-footer-domain
+          >
+            {WORKSHEET_DOMAIN}
+          </div>
+          <p className="mt-1 leading-5">{copy.footerBrandDescription}</p>
         </div>
-        <div className="flex min-w-0 items-center gap-2 font-medium text-slate-700">
-          <IconWorldWww className="size-4 shrink-0" />
-          <span>
-            {copy.footerSourcePrefix}{' '}
-            <span className="font-semibold text-slate-950">
-              {worksheetPrintUrl}
-            </span>
-          </span>
+        <div
+          className="grid min-w-0 gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2"
+          data-print-footer-links
+        >
+          <div className="flex min-w-0 items-start gap-2">
+            <IconCircleCheck className="mt-0.5 size-4 shrink-0" />
+            <span className="leading-5">{copy.footerTip}</span>
+          </div>
+          <div className="grid gap-1">
+            <div className="flex min-w-0 items-start gap-2 font-medium text-slate-700">
+              <IconArrowRight className="mt-0.5 size-4 shrink-0" />
+              <span className="min-w-0 leading-5">{copy.footerReviewHint}</span>
+            </div>
+            <div className="flex min-w-0 items-start gap-2 font-medium text-slate-700">
+              <IconWorldWww className="mt-0.5 size-4 shrink-0" />
+              <span className="min-w-0 leading-5">
+                {copy.footerSourcePrefix}{' '}
+                <span className="break-all font-semibold text-slate-950">
+                  {worksheetPrintUrl}
+                </span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1955,6 +1982,10 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         '打印页底部加入完成反馈栏，适合老师批改、家长回收和自学订正。',
       feedbackSectionLabel: '显示完成反馈栏',
       feedbackTitle: '完成后反馈',
+      footerBrandDescription:
+        '看到这张练习纸的人，可以输入域名继续生成练习纸、线上复习或分享同一组汉字。',
+      footerBrandTitle: '继续使用 Lang Study',
+      footerReviewHint: '写完后圈出最难的字，再回到线上复习同一组。',
       footerSourcePrefix: '更多练习纸：',
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
       freeBadge: '免费预览',
@@ -2169,6 +2200,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'Add a completion section to the printout for grading, parent review, or self-correction.',
     feedbackSectionLabel: 'Show feedback section',
     feedbackTitle: 'After-practice feedback',
+    footerBrandDescription:
+      'Scan or type the domain to make another worksheet, review strokes online, or share this set with a learner.',
+    footerBrandTitle: 'Continue with Lang Study',
+    footerReviewHint:
+      'After writing, circle the hardest character and review the same set online.',
     footerSourcePrefix: 'Make more worksheets:',
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
     freeBadge: 'Free preview',
