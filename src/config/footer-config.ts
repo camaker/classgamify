@@ -47,6 +47,12 @@ export function getFooterLinks(): MenuItemConfig[] {
   ];
   const supportItems: MenuItemConfig[] = [
     {
+      title: m.nav_roadmap_title(),
+      href: Routes.Roadmap,
+      description: m.nav_roadmap_description(),
+      external: false,
+    },
+    {
       title: m.footer_link_support(),
       href: Routes.Contact,
       description: m.footer_link_support_desc(),

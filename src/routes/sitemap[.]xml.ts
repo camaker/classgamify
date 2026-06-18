@@ -43,6 +43,7 @@ function buildSitemap() {
     { path: '/worksheets', changefreq: 'weekly', priority: '0.8' },
     { path: '/blog', changefreq: 'weekly', priority: '0.6' },
     { path: '/pricing', changefreq: 'weekly', priority: '0.6' },
+    { path: '/roadmap', changefreq: 'monthly', priority: '0.5' },
     { path: '/contact', changefreq: 'monthly', priority: '0.4' },
     { path: '/cookie', changefreq: 'monthly' },
     { path: '/terms', changefreq: 'monthly' },

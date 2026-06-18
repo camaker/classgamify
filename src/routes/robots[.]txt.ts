@@ -10,7 +10,6 @@ const disallowedPaths = [
   '/about',
   '/ai',
   '/changelog',
-  '/roadmap',
   '/test-404',
   '/test-error',
   '/waitlist',

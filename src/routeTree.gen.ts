@@ -42,6 +42,7 @@ import { Route as ApiPingRouteImport } from './routes/api/ping'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
 import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
+import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
 import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
 import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
@@ -217,6 +218,11 @@ const testsTest404Route = testsTest404RouteImport.update({
   path: '/test-404',
   getParentRoute: () => rootRouteImport,
 } as any)
+const pagesRoadmapRoute = pagesRoadmapRouteImport.update({
+  id: '/(pages)/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const pagesPricingRoute = pagesPricingRouteImport.update({
   id: '/(pages)/pricing',
   path: '/pricing',
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof legalsTermsRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
+  '/roadmap': typeof pagesRoadmapRoute
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/terms': typeof legalsTermsRoute
   '/contact': typeof pagesContactRoute
   '/pricing': typeof pagesPricingRoute
+  '/roadmap': typeof pagesRoadmapRoute
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -365,6 +373,7 @@ export interface FileRoutesById {
   '/(legals)/terms': typeof legalsTermsRoute
   '/(pages)/contact': typeof pagesContactRoute
   '/(pages)/pricing': typeof pagesPricingRoute
+  '/(pages)/roadmap': typeof pagesRoadmapRoute
   '/(tests)/test-404': typeof testsTest404Route
   '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/contact'
     | '/pricing'
+    | '/roadmap'
     | '/test-404'
     | '/test-error'
     | '/admin/users'
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/contact'
     | '/pricing'
+    | '/roadmap'
     | '/test-404'
     | '/test-error'
     | '/admin/users'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/(legals)/terms'
     | '/(pages)/contact'
     | '/(pages)/pricing'
+    | '/(pages)/roadmap'
     | '/(tests)/test-404'
     | '/(tests)/test-error'
     | '/admin/users'
@@ -541,6 +553,7 @@ export interface RootRouteChildren {
   legalsTermsRoute: typeof legalsTermsRoute
   pagesContactRoute: typeof pagesContactRoute
   pagesPricingRoute: typeof pagesPricingRoute
+  pagesRoadmapRoute: typeof pagesRoadmapRoute
   testsTest404Route: typeof testsTest404Route
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof testsTest404RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(pages)/roadmap': {
+      id: '/(pages)/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof pagesRoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(pages)/pricing': {
       id: '/(pages)/pricing'
       path: '/pricing'
@@ -937,6 +957,7 @@ const rootRouteChildren: RootRouteChildren = {
   legalsTermsRoute: legalsTermsRoute,
   pagesContactRoute: pagesContactRoute,
   pagesPricingRoute: pagesPricingRoute,
+  pagesRoadmapRoute: pagesRoadmapRoute,
   testsTest404Route: testsTest404Route,
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
