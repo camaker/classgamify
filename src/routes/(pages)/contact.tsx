@@ -36,13 +36,14 @@ export const Route = createFileRoute('/(pages)/contact')({
 
 function ContactPage() {
   const { subject } = Route.useSearch();
+  const isClassroom = subject === 'classroom';
   const supportEmail = websiteConfig.mail?.supportEmail;
   const emailAddress =
     supportEmail?.match(/<([^>]+)>/)?.[1] ?? supportEmail ?? '';
-  const directSubject =
-    subject === 'classroom'
-      ? 'Lang Study classroom workflow'
-      : 'Lang Study support';
+  const directSubject = isClassroom
+    ? 'Lang Study classroom workflow'
+    : 'Lang Study support';
+  const contactIntent = isClassroom ? 'classroom' : 'general';
   const mailto = getSupportMailto(supportEmail, directSubject);
   const supportTopics = [
     {
@@ -64,11 +65,23 @@ function ContactPage() {
       subject: 'Lang Study pricing or partnership',
     },
   ];
-  const checklist = [
-    m.contact_checklist_page(),
-    m.contact_checklist_device(),
-    m.contact_checklist_goal(),
-  ];
+  const checklistTitle = isClassroom
+    ? m.contact_classroom_checklist_title()
+    : m.contact_checklist_title();
+  const checklistDescription = isClassroom
+    ? m.contact_classroom_checklist_description()
+    : m.contact_checklist_description();
+  const checklist = isClassroom
+    ? [
+        m.contact_classroom_checklist_learners(),
+        m.contact_classroom_checklist_routine(),
+        m.contact_classroom_checklist_worksheets(),
+      ]
+    : [
+        m.contact_checklist_page(),
+        m.contact_checklist_device(),
+        m.contact_checklist_goal(),
+      ];
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -78,10 +91,12 @@ function ContactPage() {
             <IconMessageCircle className="size-5" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-            {m.contact_title()}
+            {isClassroom ? m.contact_classroom_title() : m.contact_title()}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-            {m.contact_description()}
+            {isClassroom
+              ? m.contact_classroom_description()
+              : m.contact_description()}
           </p>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
@@ -97,17 +112,16 @@ function ContactPage() {
         </div>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)]">
           <div className="space-y-4">
+            {isClassroom && <ClassroomInquiryPanel />}
             <div className="rounded-lg border bg-card p-5">
               <div className="flex items-start gap-3">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
                   <IconClipboardText className="size-4" />
                 </div>
                 <div className="space-y-1">
-                  <h2 className="font-semibold">
-                    {m.contact_checklist_title()}
-                  </h2>
+                  <h2 className="font-semibold">{checklistTitle}</h2>
                   <p className="text-sm text-muted-foreground">
-                    {m.contact_checklist_description()}
+                    {checklistDescription}
                   </p>
                 </div>
               </div>
@@ -138,7 +152,7 @@ function ContactPage() {
               )}
             </div>
           </div>
-          <ContactFormCard />
+          <ContactFormCard intent={contactIntent} />
         </div>
         {/* Keep the primary direct-email action visible after the support map. */}
         {mailto && (
@@ -157,6 +171,52 @@ function ContactPage() {
         )}
       </div>
     </Container>
+  );
+}
+
+function ClassroomInquiryPanel() {
+  const highlights = [
+    {
+      title: m.contact_classroom_panel_students_title(),
+      description: m.contact_classroom_panel_students_description(),
+    },
+    {
+      title: m.contact_classroom_panel_materials_title(),
+      description: m.contact_classroom_panel_materials_description(),
+    },
+    {
+      title: m.contact_classroom_panel_rollout_title(),
+      description: m.contact_classroom_panel_rollout_description(),
+    },
+  ];
+
+  return (
+    <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-background text-primary">
+          <IconUsers className="size-4" />
+        </div>
+        <div className="min-w-0 space-y-1">
+          <h2 className="font-semibold">{m.contact_classroom_panel_title()}</h2>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {m.contact_classroom_panel_description()}
+          </p>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {highlights.map((item) => (
+          <div
+            key={item.title}
+            className="min-w-0 rounded-lg border bg-background/80 p-3"
+          >
+            <p className="text-sm font-medium">{item.title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

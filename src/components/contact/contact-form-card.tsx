@@ -33,19 +33,36 @@ const schema = z.object({
     .max(500, m.contact_message_max()),
 });
 type FormValues = z.infer<typeof schema>;
-export function ContactFormCard() {
+
+type ContactIntent = 'general' | 'classroom';
+
+export function ContactFormCard({
+  intent = 'general',
+}: {
+  intent?: ContactIntent;
+}) {
   const [error, setError] = useState<string | undefined>();
+  const defaultMessage =
+    intent === 'classroom' ? m.contact_classroom_message_template() : '';
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', email: '', message: '' },
+    defaultValues: { name: '', email: '', message: defaultMessage },
   });
+  const formTitle =
+    intent === 'classroom'
+      ? m.contact_classroom_form_title()
+      : m.contact_form_title();
+  const messagePlaceholder =
+    intent === 'classroom'
+      ? m.contact_classroom_placeholder_message()
+      : m.contact_placeholder_message();
   const isPending = form.formState.isSubmitting;
   async function onSubmit(values: FormValues) {
     setError(undefined);
     try {
       await sendContactMessage({ data: values });
       toast.success(m.contact_success());
-      form.reset();
+      form.reset({ name: '', email: '', message: defaultMessage });
     } catch (err) {
       const msg = err instanceof Error ? err.message : m.contact_error();
       setError(msg);
@@ -55,9 +72,7 @@ export function ContactFormCard() {
   return (
     <Card className="mx-auto max-w-lg overflow-hidden pt-6 pb-0">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">
-          {m.contact_form_title()}
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">{formTitle}</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
@@ -103,8 +118,8 @@ export function ContactFormCard() {
                   <FormLabel>{m.contact_message()}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={m.contact_placeholder_message()}
-                      rows={3}
+                      placeholder={messagePlaceholder}
+                      rows={intent === 'classroom' ? 7 : 3}
                       {...field}
                     />
                   </FormControl>
