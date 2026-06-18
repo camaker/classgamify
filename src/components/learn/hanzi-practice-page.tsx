@@ -819,37 +819,17 @@ function HanziPracticeCard({
               </div>
             </div>
             <StrokeFeedback copy={copy} progress={lastStats} />
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button type="button" variant="outline" onClick={startQuiz}>
-                <IconRotate className="size-4" />
-                {m.learn_practice_again()}
-              </Button>
-              {lastStats.mistakes > 0 ? (
-                <Link
-                  to={Routes.Worksheets}
-                  search={currentReviewWorksheetSearch}
-                  className={cn(buttonVariants({ variant: 'outline' }))}
-                >
-                  <IconFileText className="size-4" />
-                  {copy.characterReviewWorksheetCta}
-                </Link>
-              ) : null}
-              {lessonComplete ? (
-                <Button type="button" onClick={onReset}>
-                  <IconReload className="size-4" />
-                  {m.learn_restart_lesson()}
-                </Button>
-              ) : !isLastCharacter ? (
-                <Button
-                  type="button"
-                  onClick={onNext}
-                  disabled={isLastCharacter}
-                >
-                  <IconArrowRight className="size-4" />
-                  {m.learn_next_character()}
-                </Button>
-              ) : null}
-            </div>
+            <PracticeCompletionActions
+              completionWorksheetSearch={completionWorksheetSearch}
+              copy={copy}
+              currentReviewWorksheetSearch={currentReviewWorksheetSearch}
+              isLastCharacter={isLastCharacter}
+              lessonComplete={lessonComplete}
+              onNext={onNext}
+              onReset={onReset}
+              onRetry={startQuiz}
+              progress={lastStats}
+            />
           </div>
         ) : null}
 
@@ -884,6 +864,108 @@ function HanziPracticeCard({
         ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+function PracticeCompletionActions({
+  completionWorksheetSearch,
+  copy,
+  currentReviewWorksheetSearch,
+  isLastCharacter,
+  lessonComplete,
+  onNext,
+  onReset,
+  onRetry,
+  progress,
+}: {
+  completionWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
+  copy: ReturnType<typeof getPracticeCopy>;
+  currentReviewWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
+  isLastCharacter: boolean;
+  lessonComplete: boolean;
+  onNext: () => void;
+  onReset: () => void;
+  onRetry: () => void;
+  progress: CharacterProgress;
+}) {
+  const hasMistakes = progress.mistakes > 0;
+  const title = hasMistakes
+    ? copy.completionReviewTitle
+    : lessonComplete
+      ? copy.completionLessonTitle
+      : copy.completionCleanTitle;
+  const description = hasMistakes
+    ? copy.completionReviewDescription
+    : lessonComplete
+      ? copy.completionLessonDescription
+      : copy.completionCleanDescription;
+
+  return (
+    <div className="mt-4 border-t border-border/70 pt-4">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">{title}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {description}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
+          {hasMistakes ? (
+            <>
+              <Button type="button" onClick={onRetry}>
+                <IconRotate className="size-4" />
+                {copy.completionRetryCta}
+              </Button>
+              <Link
+                to={Routes.Worksheets}
+                search={currentReviewWorksheetSearch}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconFileText className="size-4" />
+                {copy.characterReviewWorksheetCta}
+              </Link>
+              {lessonComplete ? (
+                <Button type="button" variant="outline" onClick={onReset}>
+                  <IconReload className="size-4" />
+                  {m.learn_restart_lesson()}
+                </Button>
+              ) : !isLastCharacter ? (
+                <Button type="button" variant="outline" onClick={onNext}>
+                  <IconArrowRight className="size-4" />
+                  {m.learn_next_character()}
+                </Button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              {lessonComplete ? (
+                <Button type="button" onClick={onReset}>
+                  <IconReload className="size-4" />
+                  {m.learn_restart_lesson()}
+                </Button>
+              ) : !isLastCharacter ? (
+                <Button type="button" onClick={onNext}>
+                  <IconArrowRight className="size-4" />
+                  {m.learn_next_character()}
+                </Button>
+              ) : null}
+              <Button type="button" variant="outline" onClick={onRetry}>
+                <IconRotate className="size-4" />
+                {m.learn_practice_again()}
+              </Button>
+              <Link
+                to={Routes.Worksheets}
+                search={completionWorksheetSearch}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconFileText className="size-4" />
+                {copy.completionPrintSetCta}
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1245,6 +1327,17 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       characterReviewWorksheetCta: '打印这个错字',
       characterReviewWorksheetNote: (character: string) =>
         `重点复习 ${character} 的错笔：先看引导格，再慢慢独立书写。`,
+      completionCleanDescription:
+        '这一字可以暂时放下，继续新字；也可以把整组打印出来做一次纸笔巩固。',
+      completionCleanTitle: '这一字已经稳了',
+      completionLessonDescription:
+        '完成一整组后，最好马上打印一次，隔着屏幕再写一遍。',
+      completionLessonTitle: '本组可以进入纸笔复习',
+      completionPrintSetCta: '打印本组',
+      completionRetryCta: '再练错笔',
+      completionReviewDescription:
+        '先把错笔修掉，或打印单字复习纸，避免把错误手感带到下一个字。',
+      completionReviewTitle: '先处理错笔',
       progressNeedsReview: '复习',
       progressNotStarted: '未开始',
       reviewCleanLabel: '零错完成',
@@ -1329,6 +1422,17 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     characterReviewWorksheetCta: 'Print this review',
     characterReviewWorksheetNote: (character: string) =>
       `Focus on missed strokes for ${character}: use the guided grid first, then write it slowly on your own.`,
+    completionCleanDescription:
+      'Move on while the shape is fresh, or print the full set for one paper pass.',
+    completionCleanTitle: 'This character is solid',
+    completionLessonDescription:
+      'After finishing a set, print it once and write it away from the screen.',
+    completionLessonTitle: 'Take this set to paper',
+    completionPrintSetCta: 'Print set',
+    completionRetryCta: 'Retry missed strokes',
+    completionReviewDescription:
+      'Fix the missed strokes first, or print a single-character review before moving on.',
+    completionReviewTitle: 'Review the missed strokes first',
     progressNeedsReview: 'Review',
     progressNotStarted: 'Not started',
     reviewCleanLabel: 'Clean runs',
