@@ -14,7 +14,10 @@ import { getLocale } from '@/lib/locale';
 import { seo } from '@/lib/seo';
 import {
   IconBook2,
+  IconCalendarMonth,
+  IconCalendarStats,
   IconCreditCard,
+  IconInfinity,
   IconPrinter,
   IconShieldCheck,
   IconUsers,
@@ -38,6 +41,7 @@ function PricingPage() {
   const currentPlan = planData?.currentPlan ?? null;
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const faqItems = getPricingFaqItems(currentLocale);
+  const planGuide = getPricingPlanGuide(currentLocale);
   const decisionCards = [
     {
       icon: IconBook2,
@@ -84,6 +88,32 @@ function PricingPage() {
           currentPlan={currentPlan}
           metadata={userId ? { userId } : undefined}
         />
+        <section className="space-y-4">
+          <div className="mx-auto max-w-2xl space-y-2 text-center">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {planGuide.title}
+            </h2>
+            <p className="text-muted-foreground">{planGuide.description}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {planGuide.items.map((item) => (
+              <div key={item.title} className="rounded-lg border bg-card p-5">
+                <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+                  <item.icon className="size-4" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-primary">
+                    {item.label}
+                  </p>
+                  <h3 className="font-semibold">{item.title}</h3>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
         <section className="grid gap-4 md:grid-cols-3">
           {decisionCards.map((card) => (
             <div key={card.title} className="rounded-lg border bg-card p-5">
@@ -130,6 +160,68 @@ function PricingPage() {
       </div>
     </Container>
   );
+}
+
+function getPricingPlanGuide(locale: 'en' | 'zh') {
+  if (locale === 'zh') {
+    return {
+      description:
+        '先按学习周期选择，再按是否需要持续打印练习纸和自定义字表升级。',
+      items: [
+        {
+          description:
+            '适合先验证学习节奏、短期自学，或者只想试用完整 HSK1 工具包的用户。',
+          icon: IconCalendarMonth,
+          label: '低承诺',
+          title: '月付',
+        },
+        {
+          description:
+            '适合准备系统完成 HSK1、每周复习和打印练习纸的学习者，长期成本更稳。',
+          icon: IconCalendarStats,
+          label: '推荐选择',
+          title: '年付',
+        },
+        {
+          description:
+            '适合老师、家长、tutor 和早期支持者，后续持续使用字表和练习纸更划算。',
+          icon: IconInfinity,
+          label: '长期使用',
+          title: '早期终身版',
+        },
+      ],
+      title: '应该选哪个计划？',
+    };
+  }
+
+  return {
+    description:
+      'Choose by learning horizon first, then by how often you need worksheets and custom character sets.',
+    items: [
+      {
+        description:
+          'Best for trying the full HSK1 toolkit, short self-study windows, or validating a new learning routine.',
+        icon: IconCalendarMonth,
+        label: 'Low commitment',
+        title: 'Monthly',
+      },
+      {
+        description:
+          'Best for learners planning to finish HSK1 with weekly review, printable worksheets, and lower long-term cost.',
+        icon: IconCalendarStats,
+        label: 'Recommended',
+        title: 'Yearly',
+      },
+      {
+        description:
+          'Best for teachers, parents, tutors, and early supporters who expect to reuse character lists and worksheets.',
+        icon: IconInfinity,
+        label: 'Long-term use',
+        title: 'Early Lifetime',
+      },
+    ],
+    title: 'Which plan should I choose?',
+  };
 }
 
 function TrustSignal({
