@@ -1870,7 +1870,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     reviewDescription: (character: string, mistakes: number) =>
       `Start with ${character}, the character you missed ${mistakes} times last run.`,
     reviewFocusFullTrace: 'Full trace',
-    reviewFocusMistakes: (count: number) => `${count} mistakes`,
+    reviewFocusMistakes: (count: number) =>
+      `${count} ${count === 1 ? 'mistake' : 'mistakes'}`,
     reviewFocusMore: (count: number) => `+${count} strokes`,
     reviewFocusStroke: (stroke: number) => `Stroke ${stroke}`,
     reviewFocusUrgency: {
@@ -1949,7 +1950,9 @@ function getCourseCopy(locale: 'en' | 'zh') {
       `Say ${pinyin}, watch stroke order, then finish one guided tracing run.`,
     todayQueueNewTitle: (character: string) => `Learn ${character}`,
     todayQueueReviewDescription: (mistakes: number, focus: string) =>
-      `Last run had ${mistakes} mistakes. Focus today: ${focus}.`,
+      `Last run had ${mistakes} ${
+        mistakes === 1 ? 'mistake' : 'mistakes'
+      }. Focus today: ${focus}.`,
     todayQueueReviewTitle: (character: string) => `Review ${character}`,
     todayQueueTitle: 'Today practice queue',
     todayQueueWorksheetBadge: 'Paper pass',
