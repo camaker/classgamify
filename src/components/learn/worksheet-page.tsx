@@ -397,6 +397,13 @@ export function WorksheetPage({
     );
   };
 
+  const applyFreePreviewCharacters = () => {
+    setSelectedCharacters(
+      parsedCustomCharacters.slice(0, MAX_WORKSHEET_CHARACTERS)
+    );
+    toast.success(copy.freePreviewApplied(MAX_WORKSHEET_CHARACTERS));
+  };
+
   const applyQuickSet = (quickSet: WorksheetQuickSet) => {
     setSelectedCharacters(
       quickSet.characters.slice(0, MAX_WORKSHEET_CHARACTERS)
@@ -670,6 +677,26 @@ export function WorksheetPage({
                         </Link>
                       ) : null}
                     </div>
+                    {customOverflowCount > 0 ? (
+                      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          {copy.freePreviewLimitHint(
+                            MAX_WORKSHEET_CHARACTERS,
+                            customOverflowCount
+                          )}
+                        </p>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={applyFreePreviewCharacters}
+                          className="mt-3"
+                        >
+                          <IconClipboardText className="size-4" />
+                          {copy.freePreviewLimitCta(MAX_WORKSHEET_CHARACTERS)}
+                        </Button>
+                      </div>
+                    ) : null}
                     <Button
                       type="button"
                       variant="secondary"
@@ -1170,6 +1197,10 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       footerSourcePrefix: '更多练习纸：',
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
       freeBadge: '免费预览',
+      freePreviewApplied: (limit: number) => `已保留前 ${limit} 个汉字。`,
+      freePreviewLimitCta: (limit: number) => `保留前 ${limit} 个继续`,
+      freePreviewLimitHint: (limit: number, overflow: number) =>
+        `免费预览可以马上打印前 ${limit} 个汉字，其余 ${overflow} 个适合用 Pro 自定义字表继续生成。`,
       gridOption: (count: number) => `每字 ${count} 格`,
       handwritingAssignmentChecks: [
         '先描有提示的格子',
@@ -1291,6 +1322,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     footerSourcePrefix: 'Make more worksheets:',
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
     freeBadge: 'Free preview',
+    freePreviewApplied: (limit: number) =>
+      `Kept the first ${limit} characters.`,
+    freePreviewLimitCta: (limit: number) => `Keep first ${limit}`,
+    freePreviewLimitHint: (limit: number, overflow: number) =>
+      `The free preview can print the first ${limit} characters now. The remaining ${overflow} fit better in Pro custom lists.`,
     gridOption: (count: number) => `${count} per character`,
     handwritingAssignmentChecks: [
       'Trace the guided boxes first',
