@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -33,6 +33,7 @@ import {
   IconBook2,
   IconCircleCheck,
   IconClockHour4,
+  IconCopy,
   IconFileText,
   IconFlame,
   IconLock,
@@ -43,6 +44,9 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+
+const COURSE_SHARE_DOMAIN = 'getlangstudy.com';
 
 export function HskCoursePage() {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -88,6 +92,35 @@ export function HskCoursePage() {
         ? copy.reviewWorksheetNote(progressSummary.reviewCharacters.length)
         : copy.continueWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
+  };
+  const primaryPracticeUrl = buildCoursePracticeUrl(
+    primaryPracticeCharacter?.character,
+    freeCharacters
+  );
+  const primaryWorksheetUrl = buildCourseWorksheetUrl(primaryWorksheetSearch);
+  const copyProgressReport = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const report = copy.progressShareMessage({
+      nextCharacter: primaryPracticeCharacter,
+      practiceUrl: primaryPracticeUrl,
+      progressSummary,
+      reviewItems: progressSummary.reviewItems,
+      worksheetUrl: primaryWorksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(report);
+      toast.success(copy.progressShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
   };
   const dailyTarget = progressSummary.reviewItems.length > 0 ? 2 : 1;
   const lessonProgressItems = useMemo(
@@ -158,6 +191,14 @@ export function HskCoursePage() {
                   ? copy.reviewWorksheetCta
                   : copy.worksheetCta}
               </Link>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={copyProgressReport}
+              >
+                <IconCopy className="size-4" />
+                {copy.progressShareCta}
+              </Button>
             </div>
           </div>
 
@@ -829,6 +870,21 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
+type CourseWorksheetSearch = {
+  characters: string[];
+  details: boolean;
+  note: string;
+  trace: 'first' | 'guided';
+};
+
+type ProgressShareMessageParams = {
+  nextCharacter?: LessonCharacter;
+  practiceUrl: string;
+  progressSummary: HanziProgressSummary;
+  reviewItems: HanziReviewItem[];
+  worksheetUrl: string;
+};
+
 function getCourseCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -876,6 +932,39 @@ function getCourseCopy(locale: 'en' | 'zh') {
       practiceCta: '开始练习',
       premiumLabel: 'Pro 字',
       proBadge: 'Pro',
+      progressShareCta: '复制进度报告',
+      progressShareMessage: ({
+        nextCharacter,
+        practiceUrl,
+        progressSummary,
+        reviewItems,
+        worksheetUrl,
+      }: ProgressShareMessageParams) => {
+        const reviewCharacters = reviewItems
+          .slice(0, 4)
+          .map((item) => item.character.character)
+          .join(' ');
+
+        return [
+          'Lang Study HSK1 学习进度',
+          '',
+          `已完成：${progressSummary.completedCount}/${progressSummary.total}`,
+          `今日练习：${progressSummary.completedTodayCount}`,
+          `连续记录：${progressSummary.currentStreakDays} 天`,
+          reviewItems.length > 0
+            ? `待复习：${reviewCharacters}${
+                reviewItems.length > 4 ? ` 等 ${reviewItems.length} 个` : ''
+              }`
+            : '待复习：暂无错字队列',
+          nextCharacter
+            ? `下一步：练习 ${nextCharacter.character} · ${nextCharacter.pinyin}`
+            : '下一步：打印整组练习纸做纸笔巩固',
+          '',
+          `线上练习：${practiceUrl}`,
+          `练习纸：${worksheetUrl}`,
+        ].join('\n');
+      },
+      progressShareSuccess: '学习进度报告已复制。',
       progressBadge: (completed: number, total: number) =>
         `${completed}/${total} 已完成`,
       reviewBadge: (count: number) => `${count} 个待复习`,
@@ -932,6 +1021,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       strokeCount: (count: number) => `${count} 画`,
       summaryDescription: '当前公开的启动课程数据。',
       summaryTitle: 'HSK1 Starter',
+      shareError: '复制失败，请稍后重试。',
       tileCompleteBadge: '已完成',
       tileReviewBadge: '复习',
       todayBadge: '今日计划',
@@ -1032,6 +1122,41 @@ function getCourseCopy(locale: 'en' | 'zh') {
     practiceCta: 'Start practice',
     premiumLabel: 'Pro',
     proBadge: 'Pro',
+    progressShareCta: 'Copy progress report',
+    progressShareMessage: ({
+      nextCharacter,
+      practiceUrl,
+      progressSummary,
+      reviewItems,
+      worksheetUrl,
+    }: ProgressShareMessageParams) => {
+      const reviewCharacters = reviewItems
+        .slice(0, 4)
+        .map((item) => item.character.character)
+        .join(' ');
+
+      return [
+        'Lang Study HSK1 progress report',
+        '',
+        `Completed: ${progressSummary.completedCount}/${progressSummary.total}`,
+        `Practiced today: ${progressSummary.completedTodayCount}`,
+        `Current streak: ${progressSummary.currentStreakDays} days`,
+        reviewItems.length > 0
+          ? `Review queue: ${reviewCharacters}${
+              reviewItems.length > 4
+                ? ` and ${reviewItems.length - 4} more`
+                : ''
+            }`
+          : 'Review queue: no missed-stroke items yet',
+        nextCharacter
+          ? `Next step: practice ${nextCharacter.character} · ${nextCharacter.pinyin}`
+          : 'Next step: print the full starter set for paper reinforcement',
+        '',
+        `Online practice: ${practiceUrl}`,
+        `Worksheet: ${worksheetUrl}`,
+      ].join('\n');
+    },
+    progressShareSuccess: 'Progress report copied.',
     progressBadge: (completed: number, total: number) =>
       `${completed}/${total} complete`,
     reviewBadge: (count: number) => `${count} to review`,
@@ -1091,6 +1216,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
     strokeCount: (count: number) => `${count} strokes`,
     summaryDescription: 'Currently published starter course data.',
     summaryTitle: 'HSK1 Starter',
+    shareError: 'Could not copy. Please try again.',
     tileCompleteBadge: 'Done',
     tileReviewBadge: 'Review',
     todayBadge: 'Today',
@@ -1145,4 +1271,38 @@ function getCourseCopy(locale: 'en' | 'zh') {
     upgradeTitle: 'Move from free practice into the complete HSK1 toolkit',
     worksheetCta: 'Make worksheet',
   };
+}
+
+function buildCoursePracticeUrl(
+  character: string | undefined,
+  characters: string[]
+) {
+  const params = new URLSearchParams();
+
+  if (character) {
+    params.set('character', character);
+  }
+
+  for (const item of characters) {
+    params.append('characters', item);
+  }
+
+  const search = params.toString();
+  return `https://${COURSE_SHARE_DOMAIN}${Routes.Learn}${
+    search ? `?${search}` : ''
+  }`;
+}
+
+function buildCourseWorksheetUrl(search: CourseWorksheetSearch) {
+  const params = new URLSearchParams();
+
+  for (const character of search.characters) {
+    params.append('characters', character);
+  }
+
+  params.set('details', search.details ? 'true' : 'false');
+  params.set('note', search.note);
+  params.set('trace', search.trace);
+
+  return `https://${COURSE_SHARE_DOMAIN}${Routes.Worksheets}?${params.toString()}`;
 }
