@@ -33,6 +33,7 @@ import {
   IconBook2,
   IconCheck,
   IconCircleCheck,
+  IconClockHour4,
   IconCopy,
   IconFileText,
   IconLock,
@@ -991,6 +992,23 @@ function PracticeSessionRecap({
               </div>
             ))}
           </div>
+          <div className="mt-3 rounded-md border bg-primary/5 px-3 py-2">
+            <div className="flex items-start gap-2">
+              <IconClockHour4 className="mt-0.5 size-3.5 shrink-0 text-primary" />
+              <div>
+                <p className="text-xs font-medium">
+                  {copy.sessionRecapReminderLabel}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {copy.sessionRecapReminder(
+                    hasMistakes,
+                    isLastCharacter,
+                    lessonComplete
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1667,6 +1685,23 @@ function getPracticeCopy(locale: 'en' | 'zh') {
         return '下次开始前快速看一遍。';
       },
       sessionRecapTimingLabel: '复习节奏',
+      sessionRecapReminder: (
+        hasMistakes: boolean,
+        isLastCharacter: boolean,
+        lessonComplete: boolean
+      ) => {
+        if (hasMistakes) {
+          return '下次回来先打开复习队列，把这个字的错笔清掉，再继续新字。';
+        }
+        if (lessonComplete) {
+          return '下次从课程路径继续下一组；如果时间短，先打印本组做纸笔复习。';
+        }
+        if (isLastCharacter) {
+          return '下次回到课程路径选下一组，先看第一个新字的笔顺。';
+        }
+        return '下次直接继续同组下一个字，开始前快速回看这个字的形状。';
+      },
+      sessionRecapReminderLabel: '下次回来',
       sessionRecapTitle: '本次复盘',
       scopedSummary: (scope: string) =>
         `你已经完成 ${scope} 这一组。下一步可以回到课程路径继续新组，或打印本组练习纸做纸笔巩固。`,
@@ -1868,6 +1903,23 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       return 'Refresh it briefly before your next session.';
     },
     sessionRecapTimingLabel: 'Timing',
+    sessionRecapReminder: (
+      hasMistakes: boolean,
+      isLastCharacter: boolean,
+      lessonComplete: boolean
+    ) => {
+      if (hasMistakes) {
+        return 'Next time, start from the review queue and clear the missed strokes before adding a new character.';
+      }
+      if (lessonComplete) {
+        return 'Next time, continue from the course path; for a short session, print this set for paper review first.';
+      }
+      if (isLastCharacter) {
+        return 'Next time, return to the course path and start the first character in the next set.';
+      }
+      return 'Next time, continue with the next character in this set after a quick shape refresh.';
+    },
+    sessionRecapReminderLabel: 'Next return',
     sessionRecapTitle: 'Session recap',
     scopedSummary: (scope: string) =>
       `You completed ${scope}. Return to the course path for the next lesson, or print this set for paper review.`,
