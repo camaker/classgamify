@@ -7,7 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
 import {
   getCourseStats,
   getFreeCharacters,
@@ -20,6 +29,7 @@ import {
   getDisplayStrokeNumber,
   getHanziProgressSummary,
   readStoredHanziProgress,
+  writeStoredHanziProgress,
   type CharacterProgress,
   type HanziProgressSummary,
   type HanziReviewItem,
@@ -35,6 +45,7 @@ import {
   IconClockHour4,
   IconCopy,
   IconDatabaseExport,
+  IconDatabaseImport,
   IconFileText,
   IconFlame,
   IconLock,
@@ -48,6 +59,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 const COURSE_SHARE_DOMAIN = 'getlangstudy.com';
+const PROGRESS_BACKUP_SCHEMA_VERSION = 1;
+const PROGRESS_BACKUP_TYPE = 'hsk1-progress-backup';
 
 export function HskCoursePage() {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -66,6 +79,8 @@ export function HskCoursePage() {
     [currentLocale]
   );
   const [progress, setProgress] = useState<StoredProgress>({});
+  const [backupInput, setBackupInput] = useState('');
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const progressSummary = useMemo(
     () => getHanziProgressSummary(freeLessonCharacters, progress),
     [freeLessonCharacters, progress]
@@ -82,7 +97,7 @@ export function HskCoursePage() {
           ? copy.practiceAgainCta
           : copy.continueCta
         : copy.practiceCta;
-  const primaryWorksheetSearch = {
+  const primaryWorksheetSearch: CourseWorksheetSearch = {
     characters:
       progressSummary.reviewCharacters.length > 0
         ? progressSummary.reviewCharacters
@@ -146,6 +161,26 @@ export function HskCoursePage() {
     } catch {
       toast.error(copy.shareError);
     }
+  };
+  const updateRestoreDialogOpen = (open: boolean) => {
+    setRestoreDialogOpen(open);
+
+    if (!open) {
+      setBackupInput('');
+    }
+  };
+  const restoreProgressBackup = () => {
+    const nextProgress = parseProgressBackup(backupInput);
+
+    if (!nextProgress) {
+      toast.error(copy.progressRestoreError);
+      return;
+    }
+
+    writeStoredHanziProgress(nextProgress);
+    setProgress(nextProgress);
+    updateRestoreDialogOpen(false);
+    toast.success(copy.progressRestoreSuccess);
   };
   const dailyTarget = progressSummary.reviewItems.length > 0 ? 2 : 1;
   const lessonProgressItems = useMemo(
@@ -232,6 +267,14 @@ export function HskCoursePage() {
                 <IconDatabaseExport className="size-4" />
                 {copy.progressBackupCta}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => updateRestoreDialogOpen(true)}
+              >
+                <IconDatabaseImport className="size-4" />
+                {copy.progressRestoreCta}
+              </Button>
             </div>
           </div>
 
@@ -256,6 +299,52 @@ export function HskCoursePage() {
             </CardContent>
           </Card>
         </div>
+
+        <Dialog open={restoreDialogOpen} onOpenChange={updateRestoreDialogOpen}>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>{copy.progressRestoreTitle}</DialogTitle>
+              <DialogDescription>
+                {copy.progressRestoreDescription}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium"
+                htmlFor="hsk-progress-backup"
+              >
+                {copy.progressRestoreInputLabel}
+              </label>
+              <Textarea
+                id="hsk-progress-backup"
+                value={backupInput}
+                onChange={(event) => setBackupInput(event.target.value)}
+                placeholder={copy.progressRestorePlaceholder}
+                className="min-h-48 resize-y font-mono text-xs leading-5"
+              />
+              <p className="text-xs leading-5 text-muted-foreground">
+                {copy.progressRestoreHint}
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => updateRestoreDialogOpen(false)}
+              >
+                {copy.cancelCta}
+              </Button>
+              <Button
+                type="button"
+                disabled={!backupInput.trim()}
+                onClick={restoreProgressBackup}
+              >
+                <IconDatabaseImport className="size-4" />
+                {copy.progressRestoreConfirmCta}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <DailyPracticePlanCard
           copy={copy}
@@ -405,7 +494,7 @@ function DailyPracticePlanCard({
     : hasStarted
       ? copy.continueWorksheetCta
       : copy.worksheetCta;
-  const reviewWorksheetSearch = {
+  const reviewWorksheetSearch: CourseWorksheetSearch = {
     characters:
       progressSummary.reviewCharacters.length > 0
         ? progressSummary.reviewCharacters
@@ -574,7 +663,7 @@ function LessonSection({
       : progressSummary.completedCount > 0
         ? copy.lessonContinueCta
         : copy.lessonStartCta;
-  const worksheetSearch = {
+  const worksheetSearch: CourseWorksheetSearch = {
     characters: hasReview
       ? progressSummary.reviewCharacters
       : worksheetCharacters,
@@ -936,6 +1025,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       freeLesson: '免费小课',
       activeDaysLabel: '活跃学习日',
       activeDaysValue: (count: number) => `${count} 天`,
+      cancelCta: '取消',
       continueBadge: '继续学习',
       continueCta: '继续练习',
       continueDescription: (character: string, pinyin: string) =>
@@ -973,6 +1063,17 @@ function getCourseCopy(locale: 'en' | 'zh') {
       proBadge: 'Pro',
       progressBackupCta: '复制进度备份',
       progressBackupSuccess: '进度备份已复制。',
+      progressRestoreConfirmCta: '恢复进度',
+      progressRestoreCta: '恢复进度',
+      progressRestoreDescription:
+        '粘贴之前复制的 Lang Study 进度备份。恢复后会替换这个浏览器里的 HSK1 本地进度，不会上传到服务器。',
+      progressRestoreError: '无法识别这个备份，请检查是否粘贴了完整 JSON。',
+      progressRestoreHint:
+        '只支持 Lang Study 生成的 HSK1 进度备份，恢复前建议先复制一份当前进度备份。',
+      progressRestoreInputLabel: '进度备份 JSON',
+      progressRestorePlaceholder: '粘贴从“复制进度备份”得到的 JSON 内容...',
+      progressRestoreSuccess: '进度已恢复。',
+      progressRestoreTitle: '恢复 HSK1 学习进度',
       progressShareCta: '复制进度报告',
       progressShareMessage: ({
         nextCharacter,
@@ -1126,6 +1227,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
     freeLesson: 'Free lesson',
     activeDaysLabel: 'Active days',
     activeDaysValue: (count: number) => `${count} days`,
+    cancelCta: 'Cancel',
     continueBadge: 'Continue',
     continueCta: 'Continue practice',
     continueDescription: (character: string, pinyin: string) =>
@@ -1165,6 +1267,18 @@ function getCourseCopy(locale: 'en' | 'zh') {
     proBadge: 'Pro',
     progressBackupCta: 'Copy progress backup',
     progressBackupSuccess: 'Progress backup copied.',
+    progressRestoreConfirmCta: 'Restore progress',
+    progressRestoreCta: 'Restore progress',
+    progressRestoreDescription:
+      'Paste a Lang Study progress backup you copied earlier. Restoring replaces the HSK1 progress stored in this browser and does not upload anything.',
+    progressRestoreError:
+      'This backup could not be read. Check that the full JSON was pasted.',
+    progressRestoreHint:
+      'Only HSK1 progress backups generated by Lang Study are supported. Copy your current backup first if you may need it later.',
+    progressRestoreInputLabel: 'Progress backup JSON',
+    progressRestorePlaceholder: 'Paste the JSON from "Copy progress backup"...',
+    progressRestoreSuccess: 'Progress restored.',
+    progressRestoreTitle: 'Restore HSK1 progress',
     progressShareCta: 'Copy progress report',
     progressShareMessage: ({
       nextCharacter,
@@ -1372,6 +1486,98 @@ function buildProgressBackup({
       reviewCharacters: progressSummary.reviewCharacters,
       total: progressSummary.total,
     },
-    type: 'hsk1-progress-backup',
+    type: PROGRESS_BACKUP_TYPE,
   };
+}
+
+function parseProgressBackup(value: string): StoredProgress | null {
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    return null;
+  }
+
+  if (
+    !isPlainRecord(parsed) ||
+    parsed.schemaVersion !== PROGRESS_BACKUP_SCHEMA_VERSION ||
+    parsed.type !== PROGRESS_BACKUP_TYPE ||
+    !isPlainRecord(parsed.progress)
+  ) {
+    return null;
+  }
+
+  const nextProgress: StoredProgress = {};
+
+  for (const [character, item] of Object.entries(parsed.progress)) {
+    const characterProgress = parseCharacterProgress(item);
+
+    if (!character.trim() || !characterProgress) {
+      return null;
+    }
+
+    nextProgress[character] = characterProgress;
+  }
+
+  return nextProgress;
+}
+
+function parseCharacterProgress(value: unknown): CharacterProgress | null {
+  if (!isPlainRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.completed !== 'boolean' ||
+    !isValidProgressCount(value.correctStrokes) ||
+    !isValidProgressCount(value.mistakes)
+  ) {
+    return null;
+  }
+
+  if (
+    value.completedAt !== undefined &&
+    (typeof value.completedAt !== 'string' ||
+      Number.isNaN(Date.parse(value.completedAt)))
+  ) {
+    return null;
+  }
+
+  const mistakeStrokes = parseMistakeStrokes(value.mistakeStrokes);
+
+  if (mistakeStrokes === null) {
+    return null;
+  }
+
+  return {
+    completed: value.completed,
+    completedAt: value.completedAt,
+    correctStrokes: value.correctStrokes,
+    mistakeStrokes,
+    mistakes: value.mistakes,
+  };
+}
+
+function parseMistakeStrokes(value: unknown): number[] | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (
+    !Array.isArray(value) ||
+    value.some((item) => !Number.isInteger(item) || item < 0)
+  ) {
+    return null;
+  }
+
+  return value;
+}
+
+function isValidProgressCount(value: unknown): value is number {
+  return Number.isInteger(value) && value >= 0;
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
