@@ -40,6 +40,8 @@ const DEFAULT_TRACE_MODE: TraceMode = 'first';
 const DEFAULT_SHOW_CHARACTER_DETAILS = true;
 const MAX_ASSIGNMENT_NOTE_LENGTH = 180;
 const MAX_WORKSHEET_CHARACTERS = 12;
+const MAX_RECENT_WORKSHEET_SETS = 4;
+const RECENT_WORKSHEET_SET_STORAGE_KEY = 'lang-study:recent-worksheet-sets:v1';
 const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_PRINT_STYLE_ID = 'worksheet-print-style';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
@@ -60,6 +62,17 @@ type WorksheetQuickSet = {
   description: string;
   id: string;
   title: string;
+};
+
+type WorksheetRecentSet = {
+  assignmentNote: string;
+  characters: string[];
+  gridCount: WorksheetGridCount;
+  id: string;
+  paperSize: WorksheetPaperSize;
+  showCharacterDetails: boolean;
+  traceMode: TraceMode;
+  updatedAt: string;
 };
 
 type WorksheetPaperPrintConfig = {
@@ -177,6 +190,117 @@ function clearWorksheetPrintStyles() {
   style?.remove();
 }
 
+function readStoredRecentWorksheetSets(): WorksheetRecentSet[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const raw = window.localStorage.getItem(RECENT_WORKSHEET_SET_STORAGE_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item) => normalizeRecentWorksheetSet(item))
+      .filter((item): item is WorksheetRecentSet => Boolean(item))
+      .slice(0, MAX_RECENT_WORKSHEET_SETS);
+  } catch {
+    return [];
+  }
+}
+
+function writeStoredRecentWorksheetSets(sets: WorksheetRecentSet[]) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(
+      RECENT_WORKSHEET_SET_STORAGE_KEY,
+      JSON.stringify(sets.slice(0, MAX_RECENT_WORKSHEET_SETS))
+    );
+  } catch {
+    // Storage can be unavailable in private browsing or restricted browsers.
+  }
+}
+
+function normalizeRecentWorksheetSet(value: unknown) {
+  if (!value || typeof value !== 'object') return null;
+
+  const item = value as Partial<WorksheetRecentSet>;
+  const characters = normalizeHanziCharacters(item.characters?.join('')).slice(
+    0,
+    MAX_WORKSHEET_CHARACTERS
+  );
+
+  if (characters.length === 0) return null;
+
+  const gridCount = GRID_OPTIONS.find((option) => option === item.gridCount);
+  const paperSize = WORKSHEET_PAPER_SIZES.find(
+    (option) => option === item.paperSize
+  );
+  const traceMode = TRACE_MODES.find((option) => option === item.traceMode);
+
+  if (!gridCount || !paperSize || !traceMode) return null;
+
+  const assignmentNote = normalizeAssignmentNote(item.assignmentNote);
+
+  return {
+    assignmentNote,
+    characters,
+    gridCount,
+    id: createRecentWorksheetSetId({
+      assignmentNote,
+      characters,
+      gridCount,
+      paperSize,
+      showCharacterDetails: item.showCharacterDetails !== false,
+      traceMode,
+    }),
+    paperSize,
+    showCharacterDetails: item.showCharacterDetails !== false,
+    traceMode,
+    updatedAt:
+      typeof item.updatedAt === 'string'
+        ? item.updatedAt
+        : new Date().toISOString(),
+  };
+}
+
+function createRecentWorksheetSetId({
+  assignmentNote,
+  characters,
+  gridCount,
+  paperSize,
+  showCharacterDetails,
+  traceMode,
+}: Pick<
+  WorksheetRecentSet,
+  | 'assignmentNote'
+  | 'characters'
+  | 'gridCount'
+  | 'paperSize'
+  | 'showCharacterDetails'
+  | 'traceMode'
+>) {
+  return [
+    characters.join(''),
+    gridCount,
+    paperSize,
+    traceMode,
+    showCharacterDetails ? 'details' : 'simple',
+    assignmentNote,
+  ].join('|');
+}
+
+function upsertRecentWorksheetSet(
+  current: WorksheetRecentSet[],
+  nextSet: WorksheetRecentSet
+) {
+  return [nextSet, ...current.filter((item) => item.id !== nextSet.id)].slice(
+    0,
+    MAX_RECENT_WORKSHEET_SETS
+  );
+}
+
 function buildWorksheetPrintStyleText(
   paperSize: WorksheetPaperSize,
   config: WorksheetPaperPrintConfig
@@ -272,6 +396,7 @@ export function WorksheetPage({
     initialAssignmentNoteValue
   );
   const [printSessionStarted, setPrintSessionStarted] = useState(false);
+  const [recentSets, setRecentSets] = useState<WorksheetRecentSet[]>([]);
   const quickSets = useMemo(
     () => createWorksheetQuickSets(characters, copy),
     [characters, copy]
@@ -300,6 +425,10 @@ export function WorksheetPage({
   useEffect(() => {
     setAssignmentNote(initialAssignmentNoteValue);
   }, [initialAssignmentNoteValue]);
+
+  useEffect(() => {
+    setRecentSets(readStoredRecentWorksheetSets());
+  }, []);
 
   useEffect(() => {
     const handleBeforePrint = () => {
@@ -411,6 +540,48 @@ export function WorksheetPage({
     setCustomInput('');
   };
 
+  const rememberCurrentSet = () => {
+    if (selectedCharacters.length === 0) return;
+
+    const nextSet = normalizeRecentWorksheetSet({
+      assignmentNote: normalizedAssignmentNote,
+      characters: selectedCharacters,
+      gridCount,
+      paperSize,
+      showCharacterDetails,
+      traceMode,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (!nextSet) return;
+
+    setRecentSets((current) => {
+      const updatedSets = upsertRecentWorksheetSet(current, nextSet);
+      writeStoredRecentWorksheetSets(updatedSets);
+      return updatedSets;
+    });
+  };
+
+  const applyRecentSet = (recentSet: WorksheetRecentSet) => {
+    setSelectedCharacters(recentSet.characters);
+    setCustomInput('');
+    setGridCount(recentSet.gridCount);
+    setPaperSize(recentSet.paperSize);
+    setShowCharacterDetails(recentSet.showCharacterDetails);
+    setAssignmentNote(recentSet.assignmentNote);
+    setTraceMode(recentSet.traceMode);
+    setPrintSessionStarted(false);
+    toast.success(copy.recentRestoreSuccess);
+  };
+
+  const removeRecentSet = (recentSet: WorksheetRecentSet) => {
+    setRecentSets((current) => {
+      const updatedSets = current.filter((item) => item.id !== recentSet.id);
+      writeStoredRecentWorksheetSets(updatedSets);
+      return updatedSets;
+    });
+  };
+
   const resetSelection = () => {
     setSelectedCharacters(initialSelectedCharacters);
     setCustomInput('');
@@ -436,6 +607,7 @@ export function WorksheetPage({
     enableWorksheetPrintMode();
     syncWorksheetPrintPaper(paperSize);
     syncWorksheetPrintStyles(paperSize);
+    rememberCurrentSet();
     setPrintSessionStarted(true);
     window.requestAnimationFrame(() => {
       window.print();
@@ -449,6 +621,7 @@ export function WorksheetPage({
 
     try {
       await window.navigator.clipboard.writeText(url);
+      rememberCurrentSet();
       toast.success(copy.shareSuccess);
     } catch {
       toast.error(copy.shareError);
@@ -550,6 +723,76 @@ export function WorksheetPage({
                       })}
                     </div>
                   </div>
+
+                  {recentSets.length > 0 ? (
+                    <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {copy.recentSetsTitle}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {copy.recentSetsDescription}
+                        </p>
+                      </div>
+                      <div className="grid gap-2">
+                        {recentSets.map((recentSet) => (
+                          <div
+                            key={recentSet.id}
+                            className="grid gap-3 rounded-lg border bg-background p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => applyRecentSet(recentSet)}
+                              className="min-w-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold">
+                                  {recentSet.characters.join(' ')}
+                                </span>
+                                <Badge variant="outline" className="rounded-md">
+                                  {copy.quickSetCount(
+                                    recentSet.characters.length
+                                  )}
+                                </Badge>
+                              </div>
+                              <p className="mt-1 truncate text-xs text-muted-foreground">
+                                {copy.recentSetMeta(
+                                  recentSet.gridCount,
+                                  copy.paperSizes[recentSet.paperSize],
+                                  copy.traceModes[recentSet.traceMode]
+                                )}
+                              </p>
+                              {recentSet.assignmentNote ? (
+                                <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                                  {recentSet.assignmentNote}
+                                </p>
+                              ) : null}
+                            </button>
+                            <div className="flex gap-2 sm:justify-end">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => applyRecentSet(recentSet)}
+                              >
+                                <IconRefresh className="size-3.5" />
+                                {copy.recentRestoreCta}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => removeRecentSet(recentSet)}
+                                aria-label={copy.recentRemoveLabel}
+                              >
+                                <IconX className="size-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div className="grid grid-cols-5 gap-2">
                     {characters.map((item) => {
@@ -1254,6 +1497,17 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       },
       quickSetsDescription: '一键套用常用作业组合，再按需要微调。',
       quickSetsTitle: '快速练习包',
+      recentRemoveLabel: '移除最近练习纸',
+      recentRestoreCta: '恢复',
+      recentRestoreSuccess: '已恢复最近练习纸。',
+      recentSetMeta: (
+        gridCount: number,
+        paperSize: string,
+        traceMode: string
+      ) => `${paperSize} · 每字 ${gridCount} 格 · ${traceMode}`,
+      recentSetsDescription:
+        '打印或复制链接后会保存在本机，方便下次继续布置同一组作业。',
+      recentSetsTitle: '最近练习纸',
       resetCta: '重置',
       removeCharacter: (character: string) => `移除 ${character}`,
       selectDescription:
@@ -1388,6 +1642,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     quickSetsDescription:
       'Apply a common assignment set, then adjust the worksheet if needed.',
     quickSetsTitle: 'Quick sets',
+    recentRemoveLabel: 'Remove recent worksheet',
+    recentRestoreCta: 'Restore',
+    recentRestoreSuccess: 'Recent worksheet restored.',
+    recentSetMeta: (gridCount: number, paperSize: string, traceMode: string) =>
+      `${paperSize} · ${gridCount} boxes · ${traceMode}`,
+    recentSetsDescription:
+      'Printing or copying a link saves the setup on this device so repeat assignments are faster.',
+    recentSetsTitle: 'Recent worksheets',
     resetCta: 'Reset',
     removeCharacter: (character: string) => `Remove ${character}`,
     selectDescription:
