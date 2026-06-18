@@ -178,6 +178,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                 <div className="rounded-lg border bg-muted/30 p-4">
                   <p className="text-base leading-7">{character.hint}</p>
                 </div>
+                <MemoryCueGrid character={character} copy={copy} />
               </CardContent>
             </Card>
 
@@ -342,6 +343,58 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function MemoryCueGrid({
+  character,
+  copy,
+}: {
+  character: LessonCharacter;
+  copy: ReturnType<typeof getHanziDetailCopy>;
+}) {
+  const items = [
+    {
+      description: character.hint,
+      icon: IconEye,
+      title: copy.memoryShapeTitle,
+    },
+    {
+      description: copy.memorySoundDescription(
+        character.pinyin,
+        character.meaning
+      ),
+      icon: IconBook2,
+      title: copy.memorySoundTitle,
+    },
+    {
+      description: copy.memoryUseDescription(character.examples),
+      icon: IconPencil,
+      title: copy.memoryUseTitle,
+    },
+  ];
+
+  return (
+    <div className="mt-4 grid gap-3 md:grid-cols-3">
+      {items.map((item) => {
+        const Icon = item.icon;
+
+        return (
+          <div
+            key={item.title}
+            className="rounded-lg border bg-background/80 p-3"
+          >
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Icon className="size-4 text-muted-foreground" />
+              {item.title}
+            </div>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {item.description}
+            </p>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -519,7 +572,16 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
         `${lesson}：把同一组汉字带到纸面上复习。`,
       meaningLabel: '意思',
       memoryDescription: '用一句形状提示降低第一次书写的记忆负担。',
+      memoryShapeTitle: '看形',
+      memorySoundDescription: (pinyin: string, meaning: string) =>
+        `读作 ${pinyin}，核心意思是「${meaning}」。先读出来，再写。`,
+      memorySoundTitle: '读音和意思',
       memoryTitle: '记忆提示',
+      memoryUseDescription: (examples: string[]) =>
+        examples.length > 0
+          ? `放进 ${examples.slice(0, 2).join('、')} 里记，避免只背单字。`
+          : '写完后自己造一个词，把这个字放进真实语境里。',
+      memoryUseTitle: '放进词里',
       nextDescription: '继续练完整组，或生成练习纸带到纸面上写。',
       nextTitle: '下一步',
       currentBadge: '当前',
@@ -638,7 +700,16 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     meaningLabel: 'Meaning',
     memoryDescription:
       'Use a simple shape cue to make the first writing attempt easier.',
+    memoryShapeTitle: 'See the shape',
+    memorySoundDescription: (pinyin: string, meaning: string) =>
+      `Read it as ${pinyin}. The core meaning is ${meaning}. Say it before writing.`,
+    memorySoundTitle: 'Sound and meaning',
     memoryTitle: 'Memory cue',
+    memoryUseDescription: (examples: string[]) =>
+      examples.length > 0
+        ? `Anchor it inside ${examples.slice(0, 2).join(', ')} instead of memorizing it alone.`
+        : 'After writing, make one word with it so the character has context.',
+    memoryUseTitle: 'Use it in words',
     nextDescription:
       'Keep practicing the full group, or move the same characters onto paper.',
     nextTitle: 'Next step',
