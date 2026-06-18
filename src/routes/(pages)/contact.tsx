@@ -20,6 +20,13 @@ import {
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/contact')({
+  validateSearch: (
+    search
+  ): {
+    subject?: 'classroom';
+  } => ({
+    subject: search.subject === 'classroom' ? 'classroom' : undefined,
+  }),
   head: () =>
     seo('/contact', {
       title: `${m.contact_title()} | ${websiteConfig.metadata?.name}`,
@@ -29,10 +36,15 @@ export const Route = createFileRoute('/(pages)/contact')({
 });
 
 function ContactPage() {
+  const { subject } = Route.useSearch();
   const supportEmail = websiteConfig.mail?.supportEmail;
   const emailAddress =
     supportEmail?.match(/<([^>]+)>/)?.[1] ?? supportEmail ?? '';
-  const mailto = getSupportMailto(supportEmail, 'Lang Study support');
+  const directSubject =
+    subject === 'classroom'
+      ? 'Lang Study classroom workflow'
+      : 'Lang Study support';
+  const mailto = getSupportMailto(supportEmail, directSubject);
   const github = websiteConfig.social?.github;
   const supportTopics = [
     {

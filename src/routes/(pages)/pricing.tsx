@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { authClient } from '@/auth/client';
 import Container from '@/components/layout/container';
 import { PricingTable } from '@/components/pricing/pricing-table';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Accordion,
   AccordionContent,
@@ -11,8 +12,11 @@ import {
 import { websiteConfig } from '@/config/website';
 import { useCurrentPlan } from '@/hooks/use-payment';
 import { getLocale } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { cn } from '@/lib/utils';
 import {
+  IconArrowRight,
   IconBook2,
   IconCalendarMonth,
   IconCalendarStats,
@@ -23,7 +27,7 @@ import {
   IconUsers,
   type TablerIcon,
 } from '@tabler/icons-react';
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/pricing')({
   head: () =>
@@ -41,6 +45,7 @@ function PricingPage() {
   const currentPlan = planData?.currentPlan ?? null;
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const faqItems = getPricingFaqItems(currentLocale);
+  const classroomCta = getPricingClassroomCta(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
   const decisionCards = [
     {
@@ -127,6 +132,26 @@ function PricingPage() {
             </div>
           ))}
         </section>
+        <section className="grid gap-4 rounded-lg border border-primary/20 bg-primary/5 p-5 md:grid-cols-[1fr_auto] md:items-center">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary">
+              <IconUsers className="size-4" />
+              {classroomCta.eyebrow}
+            </div>
+            <h2 className="text-xl font-semibold">{classroomCta.title}</h2>
+            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+              {classroomCta.description}
+            </p>
+          </div>
+          <Link
+            to={Routes.Contact}
+            search={{ subject: 'classroom' }}
+            className={cn(buttonVariants(), 'w-fit shrink-0')}
+          >
+            {classroomCta.cta}
+            <IconArrowRight className="size-4" />
+          </Link>
+        </section>
         <section className="mx-auto max-w-3xl space-y-4">
           <div className="space-y-2 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -160,6 +185,26 @@ function PricingPage() {
       </div>
     </Container>
   );
+}
+
+function getPricingClassroomCta(locale: 'en' | 'zh') {
+  if (locale === 'zh') {
+    return {
+      cta: '联系课堂方案',
+      description:
+        '如果你在为课堂、tutor 课程或家庭作业流设计汉字练习，可以告诉我们学生数量、打印需求和想覆盖的语言范围。',
+      eyebrow: '课堂和家庭使用',
+      title: '需要多人或长期作业场景？',
+    };
+  }
+
+  return {
+    cta: 'Contact for classroom use',
+    description:
+      'If you are planning character practice for a class, tutoring workflow, or family homework routine, tell us the learner count, worksheet needs, and future language scope.',
+    eyebrow: 'Classroom and family use',
+    title: 'Need a multi-learner or long-term assignment workflow?',
+  };
 }
 
 function getPricingPlanGuide(locale: 'en' | 'zh') {
