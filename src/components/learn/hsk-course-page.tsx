@@ -58,6 +58,7 @@ import {
   IconSparkles,
   IconTargetArrow,
   IconUpload,
+  IconUsers,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
@@ -507,21 +508,70 @@ export function HskCoursePage() {
           ))}
         </section>
 
-        <section className="grid grid-cols-[minmax(0,1fr)] gap-4 rounded-lg border border-primary/20 bg-primary/5 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-          <div className="min-w-0 space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-primary">
-              <IconSparkles className="size-4" />
-              {copy.upgradeEyebrow}
+        <section className="grid grid-cols-[minmax(0,1fr)] gap-5 rounded-lg border border-primary/20 bg-primary/5 p-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+          <div className="min-w-0 space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                <IconSparkles className="size-4" />
+                {copy.upgradeEyebrow}
+              </div>
+              <h2 className="text-xl font-semibold">{copy.upgradeTitle}</h2>
+              <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+                {copy.upgradeDescription}
+              </p>
             </div>
-            <h2 className="text-xl font-semibold">{copy.upgradeTitle}</h2>
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-              {copy.upgradeDescription}
-            </p>
+            <div className="grid gap-2 md:grid-cols-3">
+              {copy.upgradeValueItems.map((item) => (
+                <div
+                  key={item.title}
+                  className="min-w-0 rounded-lg border bg-background/85 p-3"
+                >
+                  <div className="mb-2 flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
+                    <item.icon className="size-4" />
+                  </div>
+                  <p className="text-sm font-medium">{item.title}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          <Link to={Routes.Pricing} className={buttonVariants()}>
-            <IconLock className="size-4" />
-            {copy.upgradeCta}
-          </Link>
+          <div className="min-w-0 rounded-lg border bg-background/85 p-3">
+            <p className="text-sm font-medium">{copy.upgradeSnapshotTitle}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {copy.upgradeSnapshotDescription}
+            </p>
+            <div className="mt-3 grid gap-2">
+              {copy.upgradeSnapshotStats(stats).map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center justify-between gap-3 rounded-md bg-muted/40 px-3 py-2"
+                >
+                  <span className="text-xs text-muted-foreground">
+                    {item.label}
+                  </span>
+                  <span className="text-sm font-semibold tabular-nums">
+                    {item.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 grid gap-2">
+              <Link to={Routes.Pricing} className={buttonVariants()}>
+                <IconLock className="size-4" />
+                {copy.upgradeCta}
+              </Link>
+              <Link
+                to={Routes.Contact}
+                search={{ subject: 'classroom' }}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconUsers className="size-4" />
+                {copy.upgradeClassroomCta}
+              </Link>
+            </div>
+          </div>
         </section>
       </div>
     </section>
@@ -1700,10 +1750,39 @@ function getCourseCopy(locale: 'en' | 'zh') {
       title: 'HSK1 汉字学习路径',
       totalLabel: '总汉字',
       upgradeCta: '查看套餐',
+      upgradeClassroomCta: '咨询课堂使用',
       upgradeDescription:
-        '下一阶段会把完整 HSK1 字表、间隔复习、错字历史、自定义字表和老师/家长作业场景串起来。现在先用公开内容验证真实学习体验。',
-      upgradeEyebrow: '商业化路径',
-      upgradeTitle: '从免费练习过渡到完整 HSK1 工具包',
+        '免费入门组已经覆盖真实练习流程：看笔顺、跟随描写、记录错笔、打印练习纸。完整工具包会把这些流程扩展到更多汉字和可重复布置的学习场景。',
+      upgradeEyebrow: '完整工具包预览',
+      upgradeSnapshotDescription:
+        '当前公开课程已经能验证核心体验；完整包围绕更长周期的练习、复习和作业布置继续扩展。',
+      upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
+        { label: '当前公开', value: `${stats.free} 字` },
+        { label: '完整路径', value: `${stats.total} 字` },
+        { label: '学习场景', value: '自学 / 家庭 / 课堂' },
+      ],
+      upgradeSnapshotTitle: '从免费入门到完整 HSK1',
+      upgradeTitle: '把一次练习变成可持续的 HSK1 学习流程',
+      upgradeValueItems: [
+        {
+          description:
+            '从免费字扩展到完整 HSK1 入门路径，适合按周完成、反复复习和打印巩固。',
+          icon: IconBook2,
+          title: '完整字表路径',
+        },
+        {
+          description:
+            '错笔、复习队列、今日目标和打印练习纸串在一起，减少每次重新安排的成本。',
+          icon: IconRotate,
+          title: '复习闭环',
+        },
+        {
+          description:
+            '给老师、tutor 和家长准备可复制的计划、练习纸和作业交付说明。',
+          icon: IconUsers,
+          title: '作业布置流程',
+        },
+      ],
       worksheetCta: '生成练习纸',
     };
   }
@@ -1991,10 +2070,39 @@ function getCourseCopy(locale: 'en' | 'zh') {
     title: 'HSK1 Chinese Character Learning Path',
     totalLabel: 'Total',
     upgradeCta: 'View plans',
+    upgradeClassroomCta: 'Ask about classroom use',
     upgradeDescription:
-      'The next stage connects the full HSK1 character list, spaced review, mistake history, custom lists, and teacher/parent assignment workflows. The public starter set validates the core learning experience first.',
-    upgradeEyebrow: 'Commercial path',
-    upgradeTitle: 'Move from free practice into the complete HSK1 toolkit',
+      'The free starter set already proves the core loop: watch stroke order, trace, save missed strokes, and print worksheets. The complete toolkit extends that loop across more characters and repeatable assignment workflows.',
+    upgradeEyebrow: 'Complete toolkit preview',
+    upgradeSnapshotDescription:
+      'The public course validates the learning experience today. The complete pack expands it for longer practice cycles, review, and assignment planning.',
+    upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
+      { label: 'Public now', value: `${stats.free} chars` },
+      { label: 'Full path', value: `${stats.total} chars` },
+      { label: 'Use cases', value: 'Self / family / class' },
+    ],
+    upgradeSnapshotTitle: 'From free starter to full HSK1',
+    upgradeTitle: 'Turn one practice run into a repeatable HSK1 routine',
+    upgradeValueItems: [
+      {
+        description:
+          'Move from the free characters into the complete HSK1 starter path for weekly practice, review, and paper reinforcement.',
+        icon: IconBook2,
+        title: 'Complete character path',
+      },
+      {
+        description:
+          'Connect missed strokes, review queues, daily targets, and printable worksheets so each session has a clear next step.',
+        icon: IconRotate,
+        title: 'Review loop',
+      },
+      {
+        description:
+          'Give teachers, tutors, and parents copyable plans, worksheets, and assignment handoff notes.',
+        icon: IconUsers,
+        title: 'Assignment workflow',
+      },
+    ],
     worksheetCta: 'Make worksheet',
   };
 }
