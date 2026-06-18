@@ -1118,78 +1118,144 @@ function PracticeCompletionActions({
     }
   };
 
+  if (hasMistakes) {
+    return (
+      <div className="mt-4 border-t border-amber-500/20 pt-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 rounded-md bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-300">
+            <IconRotate className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">{title}</p>
+            <p className="mt-1 max-w-[34rem] text-xs leading-5 text-muted-foreground">
+              {description}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <Button type="button" className="w-full" onClick={onRetry}>
+            <IconRotate className="size-4" />
+            {copy.completionRetryCta}
+          </Button>
+          <Link
+            to={Routes.Worksheets}
+            search={currentReviewWorksheetSearch}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background/80'
+            )}
+          >
+            <IconFileText className="size-4" />
+            {copy.characterReviewWorksheetCta}
+          </Link>
+        </div>
+
+        <div className="mt-3 border-t border-amber-500/20 pt-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-background/70 sm:w-auto"
+              onClick={copyResult}
+            >
+              <IconCopy className="size-4" />
+              {copy.characterResultShareCta}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-background/70 sm:w-auto"
+              onClick={copyAssignment}
+            >
+              <IconMailForward className="size-4" />
+              {copy.characterAssignmentShareCta}
+            </Button>
+            {lessonComplete ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-background/70 sm:w-auto"
+                onClick={onReset}
+              >
+                <IconReload className="size-4" />
+                {m.learn_restart_lesson()}
+              </Button>
+            ) : !isLastCharacter ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-background/70 sm:w-auto"
+                onClick={onNext}
+              >
+                <IconArrowRight className="size-4" />
+                {m.learn_next_character()}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 border-t border-border/70 pt-4">
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-        <div className="min-w-0">
-          <p className="text-sm font-medium">{title}</p>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            {description}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-          <Button type="button" variant="outline" onClick={copyResult}>
-            <IconCopy className="size-4" />
-            {copy.characterResultShareCta}
+      <div className="min-w-0">
+        <p className="text-sm font-medium">{title}</p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={copyResult}
+        >
+          <IconCopy className="size-4" />
+          {copy.characterResultShareCta}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={copyAssignment}
+        >
+          <IconMailForward className="size-4" />
+          {copy.characterAssignmentShareCta}
+        </Button>
+        {lessonComplete ? (
+          <Button type="button" className="w-full sm:w-auto" onClick={onReset}>
+            <IconReload className="size-4" />
+            {m.learn_restart_lesson()}
           </Button>
-          <Button type="button" variant="outline" onClick={copyAssignment}>
-            <IconMailForward className="size-4" />
-            {copy.characterAssignmentShareCta}
+        ) : !isLastCharacter ? (
+          <Button type="button" className="w-full sm:w-auto" onClick={onNext}>
+            <IconArrowRight className="size-4" />
+            {m.learn_next_character()}
           </Button>
-          {hasMistakes ? (
-            <>
-              <Button type="button" onClick={onRetry}>
-                <IconRotate className="size-4" />
-                {copy.completionRetryCta}
-              </Button>
-              <Link
-                to={Routes.Worksheets}
-                search={currentReviewWorksheetSearch}
-                className={cn(buttonVariants({ variant: 'outline' }))}
-              >
-                <IconFileText className="size-4" />
-                {copy.characterReviewWorksheetCta}
-              </Link>
-              {lessonComplete ? (
-                <Button type="button" variant="outline" onClick={onReset}>
-                  <IconReload className="size-4" />
-                  {m.learn_restart_lesson()}
-                </Button>
-              ) : !isLastCharacter ? (
-                <Button type="button" variant="outline" onClick={onNext}>
-                  <IconArrowRight className="size-4" />
-                  {m.learn_next_character()}
-                </Button>
-              ) : null}
-            </>
-          ) : (
-            <>
-              {lessonComplete ? (
-                <Button type="button" onClick={onReset}>
-                  <IconReload className="size-4" />
-                  {m.learn_restart_lesson()}
-                </Button>
-              ) : !isLastCharacter ? (
-                <Button type="button" onClick={onNext}>
-                  <IconArrowRight className="size-4" />
-                  {m.learn_next_character()}
-                </Button>
-              ) : null}
-              <Button type="button" variant="outline" onClick={onRetry}>
-                <IconRotate className="size-4" />
-                {m.learn_practice_again()}
-              </Button>
-              <Link
-                to={Routes.Worksheets}
-                search={completionWorksheetSearch}
-                className={cn(buttonVariants({ variant: 'outline' }))}
-              >
-                <IconFileText className="size-4" />
-                {copy.completionPrintSetCta}
-              </Link>
-            </>
+        ) : null}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={onRetry}
+        >
+          <IconRotate className="size-4" />
+          {m.learn_practice_again()}
+        </Button>
+        <Link
+          to={Routes.Worksheets}
+          search={completionWorksheetSearch}
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'w-full sm:w-auto'
           )}
-        </div>
+        >
+          <IconFileText className="size-4" />
+          {copy.completionPrintSetCta}
+        </Link>
       </div>
     </div>
   );
