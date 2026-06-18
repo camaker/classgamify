@@ -2,6 +2,7 @@ import { getAuthErrorMessages } from '@/lib/locale';
 import { m } from '@/locale/paraglide/messages';
 import { AuthCard } from '@/components/auth/auth-card';
 import { Routes } from '@/lib/routes';
+import { getSafeCallbackPath } from '@/lib/urls';
 import { IconAlertTriangle } from '@tabler/icons-react';
 function getDisplayMessage(
   errorCode: string | undefined,
@@ -20,18 +21,26 @@ function getDisplayMessage(
   return m.auth_error_try_again();
 }
 export function ErrorCard({
+  callbackUrl,
   errorCode,
   errorDescription,
 }: {
+  callbackUrl?: string;
   errorCode?: string;
   errorDescription?: string;
 } = {}) {
   const displayMessage = getDisplayMessage(errorCode, errorDescription);
+  const safeCallbackUrl = getSafeCallbackPath(callbackUrl, Routes.Learn);
+  const authSwitchSearch =
+    safeCallbackUrl === Routes.Learn
+      ? undefined
+      : { callbackUrl: safeCallbackUrl };
   return (
     <AuthCard
       headerLabel={m.auth_error_title()}
       bottomButtonHref={Routes.Login}
       bottomButtonLabel={m.auth_error_back_to_login()}
+      bottomButtonSearch={authSwitchSearch}
       className="border-none"
     >
       <div className="w-full flex flex-col justify-center items-center py-4 gap-2">

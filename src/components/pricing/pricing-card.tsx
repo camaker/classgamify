@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { authClient } from '@/auth/client';
+import { LoginWrapper } from '@/components/auth/login-wrapper';
 import { formatPrice } from '@/lib/formatter';
 import { cn } from '@/lib/utils';
 import type {
@@ -141,15 +142,17 @@ export function PricingCard({
               {m.pricing_card_not_available()}
             </Button>
           ) : (
-            <Link
-              to={Routes.Login}
-              className={cn(
-                buttonVariants({ variant: 'default' }),
-                'mt-4 w-full'
-              )}
-            >
-              {m.pricing_card_get_started()}
-            </Link>
+            <LoginWrapper asChild callbackUrl={Routes.Pricing} mode="modal">
+              <button
+                type="button"
+                className={cn(
+                  buttonVariants({ variant: 'default' }),
+                  'mt-4 w-full'
+                )}
+              >
+                {m.pricing_card_get_started()}
+              </button>
+            </LoginWrapper>
           )
         ) : (
           <Button disabled className="mt-4 w-full">

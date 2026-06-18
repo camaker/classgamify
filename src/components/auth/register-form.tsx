@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
-import { getPathWithLocale } from '@/lib/urls';
+import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -34,9 +34,12 @@ export function RegisterForm({
       ? new URLSearchParams(window.location.search).get('callbackUrl')
       : null;
   const defaultCallbackUrl = getPathWithLocale(DEFAULT_LOGIN_REDIRECT);
-  const callbackUrl =
-    propCallbackUrl ??
-    (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
+  const callbackUrl = getSafeCallbackPath(
+    propCallbackUrl ?? paramCallbackUrl,
+    defaultCallbackUrl
+  );
+  const authSwitchSearch =
+    callbackUrl === defaultCallbackUrl ? undefined : { callbackUrl };
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
@@ -89,6 +92,7 @@ export function RegisterForm({
       ]}
       bottomButtonLabel={m.auth_register_sign_in_hint()}
       bottomButtonHref={Routes.Login}
+      bottomButtonSearch={authSwitchSearch}
     >
       {credentialLoginEnabled && (
         <Form {...form}>

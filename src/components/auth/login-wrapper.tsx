@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Routes } from '@/lib/routes';
+import { getSafeCallbackPath } from '@/lib/urls';
 import { useRouter } from '@tanstack/react-router';
 import React, { useEffect, useState } from 'react';
 interface LoginWrapperProps {
@@ -16,6 +17,10 @@ interface LoginWrapperProps {
   asChild?: boolean;
   callbackUrl?: string;
 }
+type ClickableChildProps = {
+  onClick?: React.MouseEventHandler<HTMLElement>;
+};
+
 /**
  * Wraps content to trigger login
  * - mode="modal" opens a login dialog
@@ -34,15 +39,26 @@ export function LoginWrapper({
     setMounted(true);
   }, []);
   const handleRedirect = () => {
-    const loginPath = callbackUrl
-      ? `${Routes.Login}?callbackUrl=${encodeURIComponent(callbackUrl)}`
-      : Routes.Login;
-    router.navigate({ to: loginPath });
+    router.navigate({
+      to: Routes.Login,
+      search: callbackUrl
+        ? { callbackUrl: getSafeCallbackPath(callbackUrl, Routes.Learn) }
+        : undefined,
+    });
   };
   const handleModalSuccess = () => {
     setOpen(false);
     if (callbackUrl) {
-      router.navigate({ to: callbackUrl });
+      router.navigate({ to: getSafeCallbackPath(callbackUrl, Routes.Learn) });
+    }
+  };
+  const handleRedirectChildClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (React.isValidElement<ClickableChildProps>(children)) {
+      children.props.onClick?.(event);
+    }
+
+    if (!event.defaultPrevented) {
+      handleRedirect();
     }
   };
   if (!mounted) {
@@ -72,6 +88,11 @@ export function LoginWrapper({
         </DialogContent>
       </Dialog>
     );
+  }
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    return React.cloneElement(children, {
+      onClick: handleRedirectChildClick,
+    });
   }
   return (
     <button type="button" onClick={handleRedirect} className="inline">

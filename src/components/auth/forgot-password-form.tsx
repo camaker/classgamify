@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
+import { getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
@@ -38,6 +39,15 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('email')
       : null;
+  const callbackUrl =
+    typeof window !== 'undefined'
+      ? getSafeCallbackPath(
+          new URLSearchParams(window.location.search).get('callbackUrl'),
+          Routes.Learn
+        )
+      : Routes.Learn;
+  const authSwitchSearch =
+    callbackUrl === Routes.Learn ? undefined : { callbackUrl };
   useEffect(() => {
     if (emailFromUrl) form.setValue('email', emailFromUrl);
   }, [emailFromUrl, form]);
@@ -45,7 +55,12 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
     await authClient.requestPasswordReset(
       {
         email: values.email,
-        redirectTo: Routes.ResetPassword,
+        redirectTo:
+          callbackUrl === Routes.Learn
+            ? Routes.ResetPassword
+            : `${Routes.ResetPassword}?callbackUrl=${encodeURIComponent(
+                callbackUrl
+              )}`,
       },
       {
         onRequest: () => {
@@ -66,6 +81,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
       headerLabel={m.auth_forgot_password_title()}
       bottomButtonLabel={m.auth_forgot_password_back_to_login()}
       bottomButtonHref={Routes.Login}
+      bottomButtonSearch={authSwitchSearch}
       className={cn('', className)}
     >
       <Form {...form}>

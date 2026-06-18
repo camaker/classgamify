@@ -46,6 +46,35 @@ export function getPathWithLocale(
 }
 
 /**
+ * Normalize auth callback paths so login/register can keep product intent
+ * without accepting external redirects.
+ */
+export function getSafeCallbackPath(
+  value: string | null | undefined,
+  fallback: string
+): string {
+  if (!value) return fallback;
+
+  try {
+    const parsed = new URL(value, 'https://callback.local');
+
+    if (parsed.origin !== 'https://callback.local') {
+      return fallback;
+    }
+
+    const path = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+
+    if (!path.startsWith('/') || path.startsWith('//')) {
+      return fallback;
+    }
+
+    return path;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Get the URL of the image, if the image is a relative path, it will be prefixed with the base URL
  * @param image - The image URL
  * @returns The URL of the image

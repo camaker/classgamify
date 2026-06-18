@@ -17,6 +17,7 @@ interface AuthCardProps {
   benefits?: string[];
   bottomButtonLabel: string;
   bottomButtonHref: string;
+  bottomButtonSearch?: Record<string, string>;
   className?: string;
 }
 
@@ -26,6 +27,7 @@ export function AuthCard({
   benefits,
   bottomButtonLabel,
   bottomButtonHref,
+  bottomButtonSearch,
   className,
 }: AuthCardProps) {
   const hasBenefits = benefits && benefits.length > 0;
@@ -62,7 +64,11 @@ export function AuthCard({
       </CardHeader>
       <CardContent>{children}</CardContent>
       <CardFooter>
-        <BottomLink label={bottomButtonLabel} href={bottomButtonHref} />
+        <BottomLink
+          label={bottomButtonLabel}
+          href={bottomButtonHref}
+          search={bottomButtonSearch}
+        />
       </CardFooter>
     </Card>
   );

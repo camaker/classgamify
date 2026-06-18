@@ -18,7 +18,7 @@ import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
-import { getPathWithLocale } from '@/lib/urls';
+import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -40,9 +40,12 @@ export function LoginForm({
       ? new URLSearchParams(window.location.search).get('callbackUrl')
       : null;
   const defaultCallbackUrl = getPathWithLocale(DEFAULT_LOGIN_REDIRECT);
-  const callbackUrl =
-    propCallbackUrl ??
-    (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
+  const callbackUrl = getSafeCallbackPath(
+    propCallbackUrl ?? paramCallbackUrl,
+    defaultCallbackUrl
+  );
+  const authSwitchSearch =
+    callbackUrl === defaultCallbackUrl ? undefined : { callbackUrl };
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
@@ -96,6 +99,7 @@ export function LoginForm({
       ]}
       bottomButtonLabel={m.auth_login_sign_up_hint()}
       bottomButtonHref={Routes.Register}
+      bottomButtonSearch={authSwitchSearch}
       className={cn('', className)}
     >
       {credentialLoginEnabled && (
@@ -130,6 +134,7 @@ export function LoginForm({
                       <FormLabel>{m.auth_login_password()}</FormLabel>
                       <Link
                         to={Routes.ForgotPassword}
+                        search={authSwitchSearch}
                         className="text-xs font-normal text-muted-foreground hover:underline hover:underline-offset-4 hover:text-primary"
                       >
                         {m.auth_login_forgot_password()}

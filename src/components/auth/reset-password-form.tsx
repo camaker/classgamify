@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
 import { Routes } from '@/lib/routes';
+import { getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
@@ -34,6 +35,15 @@ export function ResetPasswordForm() {
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('error')
       : null;
+  const callbackUrl =
+    typeof window !== 'undefined'
+      ? getSafeCallbackPath(
+          new URLSearchParams(window.location.search).get('callbackUrl'),
+          Routes.Learn
+        )
+      : Routes.Learn;
+  const authSwitchSearch =
+    callbackUrl === Routes.Learn ? undefined : { callbackUrl };
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, setIsPending] = useState(false);
@@ -48,6 +58,7 @@ export function ResetPasswordForm() {
         headerLabel={m.auth_reset_password_title()}
         bottomButtonLabel={m.auth_reset_password_back_to_login()}
         bottomButtonHref={Routes.Login}
+        bottomButtonSearch={authSwitchSearch}
       >
         <p className="text-sm text-destructive py-4">
           {m.auth_reset_password_invalid_token()}
@@ -72,7 +83,10 @@ export function ResetPasswordForm() {
         },
         onResponse: () => setIsPending(false),
         onSuccess: () => {
-          router.navigate({ to: Routes.Login });
+          router.navigate({
+            to: Routes.Login,
+            search: authSwitchSearch,
+          });
         },
         onError: (ctx) => {
           setError(getAuthErrorMessage(ctx.error));
@@ -85,6 +99,7 @@ export function ResetPasswordForm() {
       headerLabel={m.auth_reset_password_title()}
       bottomButtonLabel={m.auth_reset_password_back_to_login()}
       bottomButtonHref={Routes.Login}
+      bottomButtonSearch={authSwitchSearch}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

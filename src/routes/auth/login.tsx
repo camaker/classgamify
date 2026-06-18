@@ -5,17 +5,26 @@ import { authClient } from '@/auth/client';
 import { guestRouteMiddleware } from '@/middlewares/guest-middleware';
 import { websiteConfig } from '@/config/website';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
+import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 
 export const Route = createFileRoute('/auth/login')({
-  beforeLoad: async () => {
+  validateSearch: (search: Record<string, unknown>) => ({
+    callbackUrl:
+      typeof search.callbackUrl === 'string' ? search.callbackUrl : undefined,
+  }),
+  beforeLoad: async ({ search }) => {
     if (!websiteConfig.auth?.enable) {
       throw redirect({ to: Routes.Root });
     }
+    const callbackUrl = getSafeCallbackPath(
+      search.callbackUrl,
+      getPathWithLocale(DEFAULT_LOGIN_REDIRECT)
+    );
     // Client-side navigation: check session via auth client
     if (typeof window !== 'undefined') {
       const { data: session } = await authClient.getSession();
       if (session?.user) {
-        throw redirect({ to: DEFAULT_LOGIN_REDIRECT });
+        throw redirect({ to: callbackUrl });
       }
     }
   },

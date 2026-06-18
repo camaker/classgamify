@@ -23,6 +23,7 @@ import {
   IconCalendarStats,
   IconCreditCard,
   IconInfinity,
+  IconPencil,
   IconPrinter,
   IconShieldCheck,
   IconUsers,
@@ -68,6 +69,7 @@ function PricingPage() {
   const faqItems = getPricingFaqItems(currentLocale);
   const classroomCta = getPricingClassroomCta(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
+  const nextStepCards = getPricingNextStepCards(currentLocale);
   const decisionCards = [
     {
       icon: IconBook2,
@@ -110,6 +112,27 @@ function PricingPage() {
             label={m.pricing_trust_free_preview()}
           />
         </div>
+        <section className="grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-3">
+          {nextStepCards.map((item) => (
+            <Link
+              key={item.title}
+              to={item.href}
+              search={item.search}
+              className="group min-w-0 rounded-lg border bg-background p-4 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted/40 text-primary">
+                  <item.icon className="size-4" />
+                </div>
+                <IconArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+              </div>
+              <p className="mt-4 text-sm font-medium">{item.title}</p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                {item.description}
+              </p>
+            </Link>
+          ))}
+        </section>
         <PricingTable
           currentPlan={currentPlan}
           metadata={userId ? { userId } : undefined}
@@ -206,6 +229,57 @@ function PricingPage() {
       </div>
     </Container>
   );
+}
+
+function getPricingNextStepCards(locale: 'en' | 'zh') {
+  if (locale === 'zh') {
+    return [
+      {
+        description: '先完成一个 HSK1 汉字，感受笔顺动画和跟随描写。',
+        href: Routes.Learn,
+        icon: IconPencil,
+        title: '先练一个字',
+      },
+      {
+        description: '打印一张免费样张，确认纸笔练习是否适合你的节奏。',
+        href: Routes.Worksheets,
+        icon: IconPrinter,
+        title: '试打一张练习纸',
+      },
+      {
+        description: '如果你在为学生、孩子或 tutor 课程规划，先告诉我们场景。',
+        href: Routes.Contact,
+        icon: IconUsers,
+        search: { subject: 'classroom' as const },
+        title: '咨询课堂使用',
+      },
+    ];
+  }
+
+  return [
+    {
+      description:
+        'Complete one HSK1 character first and feel the stroke-order loop.',
+      href: Routes.Learn,
+      icon: IconPencil,
+      title: 'Practice one character',
+    },
+    {
+      description:
+        'Print a free sample sheet and see if paper practice fits your routine.',
+      href: Routes.Worksheets,
+      icon: IconPrinter,
+      title: 'Try a worksheet',
+    },
+    {
+      description:
+        'Planning for students, children, or tutoring? Tell us the workflow.',
+      href: Routes.Contact,
+      icon: IconUsers,
+      search: { subject: 'classroom' as const },
+      title: 'Ask about classroom use',
+    },
+  ];
 }
 
 function getPricingClassroomCta(locale: 'en' | 'zh') {
