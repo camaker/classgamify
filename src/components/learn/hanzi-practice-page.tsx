@@ -820,6 +820,12 @@ function HanziPracticeCard({
               </div>
             </div>
             <StrokeFeedback copy={copy} progress={lastStats} />
+            <PracticeSessionRecap
+              copy={copy}
+              isLastCharacter={isLastCharacter}
+              lessonComplete={lessonComplete}
+              progress={lastStats}
+            />
             <PracticeCompletionActions
               completionWorksheetSearch={completionWorksheetSearch}
               copy={copy}
@@ -865,6 +871,69 @@ function HanziPracticeCard({
         ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+function PracticeSessionRecap({
+  copy,
+  isLastCharacter,
+  lessonComplete,
+  progress,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+  isLastCharacter: boolean;
+  lessonComplete: boolean;
+  progress: CharacterProgress;
+}) {
+  const hasMistakes = progress.mistakes > 0;
+  const items = [
+    {
+      label: copy.sessionRecapResultLabel,
+      value: copy.sessionRecapResult(progress.mistakes),
+    },
+    {
+      label: copy.sessionRecapNextLabel,
+      value: copy.sessionRecapNext(
+        hasMistakes,
+        isLastCharacter,
+        lessonComplete
+      ),
+    },
+    {
+      label: copy.sessionRecapTimingLabel,
+      value: copy.sessionRecapTiming(hasMistakes, lessonComplete),
+    },
+  ];
+
+  return (
+    <div className="mt-4 rounded-lg border bg-background/70 p-3">
+      <div className="flex items-start gap-3">
+        {hasMistakes ? (
+          <IconRotate className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-300" />
+        ) : (
+          <IconCircleCheck className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{copy.sessionRecapTitle}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {copy.sessionRecapDescription(hasMistakes, lessonComplete)}
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {items.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-md border bg-muted/30 px-3 py-2"
+              >
+                <p className="text-[11px] font-medium uppercase text-muted-foreground">
+                  {item.label}
+                </p>
+                <p className="mt-1 text-xs leading-5">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1423,6 +1492,39 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewWorksheetCta: '打印复习纸',
       reviewWorksheetNote: (count: number) =>
         `先复习你错得最多的 ${count} 个汉字。`,
+      sessionRecapDescription: (
+        hasMistakes: boolean,
+        lessonComplete: boolean
+      ) => {
+        if (hasMistakes) {
+          return '先把错误手感修掉，再决定要不要进入下一个字。';
+        }
+        if (lessonComplete) {
+          return '这组已经完成，马上做一次纸笔复习能巩固记忆。';
+        }
+        return '本次书写稳定，可以继续推进，但不要跳过短复习。';
+      },
+      sessionRecapNext: (
+        hasMistakes: boolean,
+        isLastCharacter: boolean,
+        lessonComplete: boolean
+      ) => {
+        if (hasMistakes) return '重做一次错笔，或打印单字复习纸。';
+        if (lessonComplete) return '打印本组练习纸，完成一次纸面复习。';
+        if (isLastCharacter) return '回到课程路径，选择下一组汉字。';
+        return '继续下一个字，保持同一组学习节奏。';
+      },
+      sessionRecapNextLabel: '下一步',
+      sessionRecapResult: (mistakes: number) =>
+        mistakes > 0 ? `${mistakes} 次错误` : '零错完成',
+      sessionRecapResultLabel: '本次结果',
+      sessionRecapTiming: (hasMistakes: boolean, lessonComplete: boolean) => {
+        if (hasMistakes) return '今天内再复习一次。';
+        if (lessonComplete) return '纸面复习后明天快速回看。';
+        return '下次开始前快速看一遍。';
+      },
+      sessionRecapTimingLabel: '复习节奏',
+      sessionRecapTitle: '本次复盘',
       scopedSummary: (scope: string) =>
         `你已经完成 ${scope} 这一组。下一步可以回到课程路径继续新组，或打印本组练习纸做纸笔巩固。`,
       scopedWorksheetNote: (scope: string) =>
@@ -1547,6 +1649,42 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
       `Start with the ${count} characters you missed most.`,
+    sessionRecapDescription: (
+      hasMistakes: boolean,
+      lessonComplete: boolean
+    ) => {
+      if (hasMistakes) {
+        return 'Fix the wrong stroke memory before deciding whether to move on.';
+      }
+      if (lessonComplete) {
+        return 'This set is complete. A paper pass now will lock in the memory.';
+      }
+      return 'This run is stable. Keep moving, but keep the refresh loop short.';
+    },
+    sessionRecapNext: (
+      hasMistakes: boolean,
+      isLastCharacter: boolean,
+      lessonComplete: boolean
+    ) => {
+      if (hasMistakes) {
+        return 'Retry the missed strokes, or print a single-character review.';
+      }
+      if (lessonComplete) return 'Print this set and complete one paper pass.';
+      if (isLastCharacter) return 'Return to the course path for the next set.';
+      return 'Continue with the next character in this set.';
+    },
+    sessionRecapNextLabel: 'Next',
+    sessionRecapResult: (mistakes: number) =>
+      mistakes > 0 ? `${mistakes} mistakes` : 'Clean run',
+    sessionRecapResultLabel: 'Result',
+    sessionRecapTiming: (hasMistakes: boolean, lessonComplete: boolean) => {
+      if (hasMistakes) return 'Review once more today.';
+      if (lessonComplete)
+        return 'Do a quick refresh tomorrow after paper work.';
+      return 'Refresh it briefly before your next session.';
+    },
+    sessionRecapTimingLabel: 'Timing',
+    sessionRecapTitle: 'Session recap',
     scopedSummary: (scope: string) =>
       `You completed ${scope}. Return to the course path for the next lesson, or print this set for paper review.`,
     scopedWorksheetNote: (scope: string) =>
