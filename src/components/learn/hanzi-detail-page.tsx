@@ -61,6 +61,7 @@ type StudyPlanMessageParams = {
   detailUrl: string;
   isReview: boolean;
   practiceUrl: string;
+  progress?: CharacterProgress;
   worksheetUrl: string;
 };
 
@@ -97,7 +98,10 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
     ? {
         characters: [character.character],
         details: true,
-        note: copy.reviewWorksheetNote(character.character),
+        note: copy.reviewWorksheetNote(
+          character.character,
+          currentProgress?.mistakeStrokes ?? []
+        ),
         trace: 'guided' as const,
       }
     : {
@@ -127,6 +131,7 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
       detailUrl,
       isReview: needsReview,
       practiceUrl,
+      progress: currentProgress,
       worksheetUrl,
     });
 
@@ -685,8 +690,15 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       pricingCta: '查看完整套餐',
       reviewCta: '复习错笔',
       reviewBadge: '复习',
-      reviewWorksheetNote: (character: string) =>
-        `优先复习 ${character} 的错笔，再回到同组汉字。`,
+      reviewWorksheetNote: (character: string, mistakeStrokes: number[]) => {
+        if (mistakeStrokes.length === 0) {
+          return `优先复习 ${character}：完整描写一遍，再回到同组汉字。`;
+        }
+
+        return `优先复习 ${character} 的${mistakeStrokes
+          .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+          .join('、')}，再回到同组汉字。`;
+      },
       proBadge: 'Pro 字',
       radicalLabel: '部首',
       shareError: '复制失败，请稍后重试。',
@@ -754,25 +766,67 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
         detailUrl,
         isReview,
         practiceUrl,
+        progress,
         worksheetUrl,
-      }: StudyPlanMessageParams) =>
-        [
+      }: StudyPlanMessageParams) => {
+        const mistakeStrokes = progress?.mistakeStrokes ?? [];
+        const ageDays = getPracticeAgeDays(progress?.completedAt);
+        const status = !progress?.completed
+          ? '练习状态：还没有练过'
+          : progress.mistakes > 0
+            ? `练习状态：上次 ${progress.mistakes} 次错误${
+                mistakeStrokes.length > 0
+                  ? `，重点笔画 ${mistakeStrokes
+                      .map(
+                        (stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`
+                      )
+                      .join('、')}`
+                  : '，需要完整复描'
+              }`
+            : `练习状态：零错完成${
+                ageDays === null
+                  ? ''
+                  : ageDays === 0
+                    ? '，今天刚练过'
+                    : `，${ageDays} 天前练过`
+              }`;
+        const timing = !progress?.completed
+          ? '现在先完成第一次描写。'
+          : ageDays === null
+            ? '重新练一次，刷新练习记录。'
+            : ageDays === 0
+              ? isReview
+                ? '今天内先修正错笔，不急着加新字。'
+                : '可以继续同课下一个字。'
+              : ageDays === 1
+                ? '今天先快速复练一次。'
+                : `${ageDays} 天前练过，先复练再加新字。`;
+        const assignment = isReview
+          ? mistakeStrokes.length > 0
+            ? `先复习 ${mistakeStrokes
+                .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+                .join('、')}，再打印单字复习纸。`
+            : '先完整复描一遍，再打印单字复习纸。'
+          : progress?.completed
+            ? '先快速回看字形，再继续同课下一个字。'
+            : '先看字形提示，再完成一次描写练习。';
+
+        return [
           'Lang Study 汉字学习计划',
           '',
           `今日汉字：${character.character} · ${character.pinyin}`,
           `意思：${character.meaning}`,
           `课程组：${character.lessonLabel}`,
-          `要求：${
-            isReview
-              ? '先复习错笔，再打印单字复习纸。'
-              : '先看字形提示，再完成一次描写练习。'
-          }`,
+          status,
+          `复习时机：${timing}`,
+          `要求：${assignment}`,
           `字卡：${detailUrl}`,
           `描写练习：${practiceUrl}`,
           `打印练习纸：${worksheetUrl}`,
           '',
           '建议流程：先读拼音和意思，跟着笔顺描写，再把同一组汉字带到纸面上慢慢写。',
-        ].join('\n'),
+        ].join('\n');
+      },
       studyPlanShareCta: '复制学习计划',
       studyPlanShareSuccess: '学习计划已复制。',
       title: (character: string, pinyin: string) =>
@@ -842,8 +896,17 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     pricingCta: 'View complete pack',
     reviewCta: 'Review missed strokes',
     reviewBadge: 'Review',
-    reviewWorksheetNote: (character: string) =>
-      `Review missed strokes for ${character} before returning to the lesson group.`,
+    reviewWorksheetNote: (character: string, mistakeStrokes: number[]) => {
+      if (mistakeStrokes.length === 0) {
+        return `Review ${character} with one full trace before returning to the lesson group.`;
+      }
+
+      return `Review ${character} ${
+        mistakeStrokes.length === 1 ? 'stroke' : 'strokes'
+      } ${mistakeStrokes
+        .map((stroke) => getDisplayStrokeNumber(stroke))
+        .join(', ')} before returning to the lesson group.`;
+    },
     proBadge: 'Pro character',
     radicalLabel: 'Radical',
     shareError: 'Could not copy. Please try again.',
@@ -914,25 +977,71 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       detailUrl,
       isReview,
       practiceUrl,
+      progress,
       worksheetUrl,
-    }: StudyPlanMessageParams) =>
-      [
+    }: StudyPlanMessageParams) => {
+      const mistakeStrokes = progress?.mistakeStrokes ?? [];
+      const ageDays = getPracticeAgeDays(progress?.completedAt);
+      const status = !progress?.completed
+        ? 'Practice status: not practiced yet'
+        : progress.mistakes > 0
+          ? `Practice status: ${progress.mistakes} ${
+              progress.mistakes === 1 ? 'mistake' : 'mistakes'
+            } last run${
+              mistakeStrokes.length > 0
+                ? `, focus ${
+                    mistakeStrokes.length === 1 ? 'stroke' : 'strokes'
+                  } ${mistakeStrokes
+                    .map((stroke) => getDisplayStrokeNumber(stroke))
+                    .join(', ')}`
+                : ', full trace needed'
+            }`
+          : `Practice status: clean run${
+              ageDays === null
+                ? ''
+                : ageDays === 0
+                  ? ', practiced today'
+                  : `, practiced ${ageDays} days ago`
+            }`;
+      const timing = !progress?.completed
+        ? 'Start with the first tracing run now.'
+        : ageDays === null
+          ? 'Run it once more to refresh the practice record.'
+          : ageDays === 0
+            ? isReview
+              ? 'Fix the missed strokes today before adding a new character.'
+              : 'Continue with the next lesson character.'
+            : ageDays === 1
+              ? 'Do one quick refresh today.'
+              : `Last practiced ${ageDays} days ago; refresh it before adding a new character.`;
+      const assignment = isReview
+        ? mistakeStrokes.length > 0
+          ? `Review ${
+              mistakeStrokes.length === 1 ? 'stroke' : 'strokes'
+            } ${mistakeStrokes
+              .map((stroke) => getDisplayStrokeNumber(stroke))
+              .join(', ')}, then print a focused sheet.`
+          : 'Do one full trace, then print a focused sheet.'
+        : progress?.completed
+          ? 'Quickly refresh the shape, then continue with the next lesson character.'
+          : 'Study the shape cue, then complete one tracing run.';
+
+      return [
         'Lang Study hanzi study plan',
         '',
         `Character: ${character.character} · ${character.pinyin}`,
         `Meaning: ${character.meaning}`,
         `Lesson group: ${character.lessonLabel}`,
-        `Assignment: ${
-          isReview
-            ? 'Review missed strokes first, then print a focused sheet.'
-            : 'Study the shape cue, then complete one tracing run.'
-        }`,
+        status,
+        `Review timing: ${timing}`,
+        `Assignment: ${assignment}`,
         `Character card: ${detailUrl}`,
         `Tracing practice: ${practiceUrl}`,
         `Printable worksheet: ${worksheetUrl}`,
         '',
         'Suggested flow: read the pinyin and meaning, trace with stroke order, then move the same character set onto paper.',
-      ].join('\n'),
+      ].join('\n');
+    },
     studyPlanShareCta: 'Copy study plan',
     studyPlanShareSuccess: 'Study plan copied.',
     title: (character: string, pinyin: string) =>
