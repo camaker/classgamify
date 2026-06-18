@@ -21,6 +21,7 @@ import {
   IconClipboardText,
   IconCopy,
   IconEraser,
+  IconMailForward,
   IconLock,
   IconPrinter,
   IconRefresh,
@@ -677,6 +678,31 @@ export function WorksheetPage({
     }
   };
 
+  const copyAssignmentMessage = async () => {
+    if (typeof window === 'undefined') return;
+
+    const worksheetUrl = new URL(shareUrl, window.location.origin).toString();
+    const reviewUrl = `https://${
+      selectedCharacters.length > 0
+        ? practicePrintUrl
+        : `${WORKSHEET_DOMAIN}${Routes.Learn}`
+    }`;
+    const message = copy.assignmentShareMessage({
+      assignmentNote: normalizedAssignmentNote,
+      characters: selectedCharacters,
+      reviewUrl,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      rememberCurrentSet();
+      toast.success(copy.assignmentShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
+
   return (
     <section
       className="min-h-[calc(100vh-12rem)] bg-background"
@@ -1201,6 +1227,15 @@ export function WorksheetPage({
                     <Button
                       type="button"
                       variant="outline"
+                      onClick={copyAssignmentMessage}
+                      disabled={selectedCharacters.length === 0}
+                    >
+                      <IconMailForward className="size-4" />
+                      {copy.assignmentShareCta}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
                       onClick={resetSelection}
                     >
                       <IconRefresh className="size-4" />
@@ -1551,6 +1586,13 @@ function WorksheetFeedbackSection({ copy }: { copy: WorksheetCopy }) {
 
 type WorksheetCopy = ReturnType<typeof getWorksheetCopy>;
 
+type WorksheetAssignmentShareMessageParams = {
+  assignmentNote: string;
+  characters: string[];
+  reviewUrl: string;
+  worksheetUrl: string;
+};
+
 function getWorksheetCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -1568,6 +1610,26 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       assignmentNoteHint: '建议简短清楚，打印时更好读。',
       assignmentNoteLabel: '作业备注',
       assignmentNotePlaceholder: '例如：先描前三格，再独立完成后面的格子。',
+      assignmentShareCta: '复制作业说明',
+      assignmentShareMessage: ({
+        assignmentNote,
+        characters,
+        reviewUrl,
+        worksheetUrl,
+      }: WorksheetAssignmentShareMessageParams) =>
+        [
+          'Lang Study 汉字练习作业',
+          '',
+          `本次练习：${characters.join(' ')}`,
+          assignmentNote ? `作业要求：${assignmentNote}` : undefined,
+          `打印练习纸：${worksheetUrl}`,
+          `线上复习同一组：${reviewUrl}`,
+          '',
+          '建议流程：先观察字形和例词，描写提示格，再独立完成剩余格子。完成后圈出最难写的字，下次先复习。',
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      assignmentShareSuccess: '作业说明已复制。',
       assignmentTitle: '练习任务',
       back: '返回练习',
       badge: '练习纸生成器',
@@ -1719,6 +1781,26 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     assignmentNoteLabel: 'Assignment note',
     assignmentNotePlaceholder:
       'Example: Trace the first three boxes, then write the rest from memory.',
+    assignmentShareCta: 'Copy assignment message',
+    assignmentShareMessage: ({
+      assignmentNote,
+      characters,
+      reviewUrl,
+      worksheetUrl,
+    }: WorksheetAssignmentShareMessageParams) =>
+      [
+        'Lang Study character practice assignment',
+        '',
+        `Practice set: ${characters.join(' ')}`,
+        assignmentNote ? `Assignment note: ${assignmentNote}` : undefined,
+        `Printable worksheet: ${worksheetUrl}`,
+        `Online review for the same set: ${reviewUrl}`,
+        '',
+        'Suggested flow: study the shape and example words, trace the guided boxes, then write the remaining boxes independently. Circle the hardest character so it comes back first next time.',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    assignmentShareSuccess: 'Assignment message copied.',
     assignmentTitle: 'Practice task',
     back: 'Back to practice',
     badge: 'Worksheet generator',
