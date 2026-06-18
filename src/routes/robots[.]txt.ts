@@ -37,19 +37,29 @@ export const Route = createFileRoute('/robots.txt')({
   server: {
     handlers: {
       GET: async () => {
-        const base = getBaseUrl().replace(/\/$/, '');
-        const robots = `User-agent: *
-Allow: /
-${getDisallowRules()}
-
-Sitemap: ${base}/sitemap.xml`;
-
-        return new Response(robots, {
-          headers: {
-            'Content-Type': 'text/plain',
-          },
+        return new Response(buildRobotsTxt(), {
+          headers: robotsHeaders,
+        });
+      },
+      HEAD: async () => {
+        return new Response(null, {
+          headers: robotsHeaders,
         });
       },
     },
   },
 });
+
+const robotsHeaders = {
+  'Content-Type': 'text/plain',
+};
+
+function buildRobotsTxt() {
+  const base = getBaseUrl().replace(/\/$/, '');
+
+  return `User-agent: *
+Allow: /
+${getDisallowRules()}
+
+Sitemap: ${base}/sitemap.xml`;
+}
