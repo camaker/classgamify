@@ -21,6 +21,7 @@ import {
   IconCircleCheck,
   IconClipboardText,
   IconCopy,
+  IconDeviceFloppy,
   IconEraser,
   IconMailForward,
   IconLock,
@@ -635,7 +636,7 @@ export function WorksheetPage({
   };
 
   const rememberCurrentSet = () => {
-    if (selectedCharacters.length === 0) return;
+    if (selectedCharacters.length === 0) return false;
 
     const nextSet = normalizeRecentWorksheetSet({
       assignmentNote: normalizedAssignmentNote,
@@ -648,13 +649,22 @@ export function WorksheetPage({
       updatedAt: new Date().toISOString(),
     });
 
-    if (!nextSet) return;
+    if (!nextSet) return false;
 
     setRecentSets((current) => {
       const updatedSets = upsertRecentWorksheetSet(current, nextSet);
       writeStoredRecentWorksheetSets(updatedSets);
       return updatedSets;
     });
+    return true;
+  };
+
+  const saveCurrentSet = () => {
+    if (rememberCurrentSet()) {
+      toast.success(copy.saveCurrentSetSuccess);
+    } else {
+      toast.error(copy.printEmptyError);
+    }
   };
 
   const applyRecentSet = (recentSet: WorksheetRecentSet) => {
@@ -1050,6 +1060,17 @@ export function WorksheetPage({
                             MAX_WORKSHEET_CHARACTERS
                           )}
                         </Badge>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={saveCurrentSet}
+                          disabled={selectedCharacters.length === 0}
+                          className="h-7 bg-background px-2 text-xs"
+                        >
+                          <IconDeviceFloppy className="size-3.5" />
+                          {copy.saveCurrentSetCta}
+                        </Button>
                         <Button
                           type="button"
                           variant="ghost"
@@ -1991,6 +2012,8 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       recentShareCta: '复制链接',
       resetCta: '重置',
       removeCharacter: (character: string) => `移除 ${character}`,
+      saveCurrentSetCta: '保存当前',
+      saveCurrentSetSuccess: '当前练习纸已保存到最近列表。',
       selectDescription:
         '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
       selectTitle: '选择汉字',
@@ -2200,6 +2223,8 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     recentShareCta: 'Copy link',
     resetCta: 'Reset',
     removeCharacter: (character: string) => `Remove ${character}`,
+    saveCurrentSetCta: 'Save current',
+    saveCurrentSetSuccess: 'Current worksheet saved to recent worksheets.',
     selectDescription:
       'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
     selectTitle: 'Select characters',
