@@ -19,6 +19,12 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      title: m.footer_link_articles(),
+      href: Routes.Blog,
+      description: m.footer_link_articles_desc(),
+      external: false,
+    },
+    {
       title: m.nav_pricing(),
       href: Routes.Pricing,
       description: m.footer_link_pricing_desc(),

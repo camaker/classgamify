@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
@@ -31,6 +32,7 @@ import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as Hsk1RouteImport } from './routes/hsk/1'
 import { Route as HanziCharacterRouteImport } from './routes/hanzi/$character'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -110,6 +112,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -158,6 +165,11 @@ const Hsk1Route = Hsk1RouteImport.update({
 const HanziCharacterRoute = HanziCharacterRouteImport.update({
   id: '/hanzi/$character',
   path: '/hanzi/$character',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
@@ -276,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -286,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -315,6 +329,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -325,6 +340,7 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -358,6 +374,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -368,6 +385,7 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -402,6 +420,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -412,6 +431,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
+    | '/blog/'
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
@@ -441,6 +461,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -451,6 +472,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin'
+    | '/blog'
     | '/dashboard'
     | '/settings'
     | '/api/auth/$'
@@ -483,6 +505,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/blog/$slug'
     | '/hanzi/$character'
     | '/hsk/1'
     | '/settings/apikeys'
@@ -493,6 +516,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
+    | '/blog/'
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
@@ -520,8 +544,10 @@ export interface RootRouteChildren {
   testsTest404Route: typeof testsTest404Route
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   HanziCharacterRoute: typeof HanziCharacterRoute
   Hsk1Route: typeof Hsk1Route
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -614,6 +640,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -682,6 +715,13 @@ declare module '@tanstack/react-router' {
       path: '/hanzi/$character'
       fullPath: '/hanzi/$character'
       preLoaderRoute: typeof HanziCharacterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password': {
@@ -900,8 +940,10 @@ const rootRouteChildren: RootRouteChildren = {
   testsTest404Route: testsTest404Route,
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
+  BlogSlugRoute: BlogSlugRoute,
   HanziCharacterRoute: HanziCharacterRoute,
   Hsk1Route: Hsk1Route,
+  BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,

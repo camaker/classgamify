@@ -94,6 +94,7 @@ export const LOCALIZED_PATHS = new Set([
   '/hsk/1',
   '/learn',
   '/worksheets',
+  '/blog',
   '/contact',
   '/pricing',
   '/cookie',
@@ -108,5 +109,5 @@ export const LOCALIZED_PATHS = new Set([
  */
 export function isLocalizedPath(path: string): boolean {
   if (LOCALIZED_PATHS.has(path)) return true;
-  return path.startsWith('/hanzi/');
+  return path.startsWith('/hanzi/') || path.startsWith('/blog/');
 }

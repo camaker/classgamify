@@ -1075,7 +1075,283 @@ export function WorksheetPage({
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-3 sm:p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {copy.printSettingsTitle}
+                        </p>
+                        <p className="text-xs leading-5 text-muted-foreground">
+                          {copy.printSettingsDescription}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="rounded-md bg-card">
+                        {copy.selectedCount(
+                          selectedCharacters.length,
+                          MAX_WORKSHEET_CHARACTERS
+                        )}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
+                      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">
+                            {copy.practiceBoxesLabel}
+                          </p>
+                          <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
+                            {GRID_OPTIONS.map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                aria-pressed={gridCount === option}
+                                onClick={() => setGridCount(option)}
+                                className={cn(
+                                  'min-h-10 rounded-md px-2 text-sm leading-tight transition-colors',
+                                  'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                  gridCount === option &&
+                                    'bg-primary/10 font-medium text-primary'
+                                )}
+                              >
+                                {copy.gridOption(option)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">
+                            {copy.paperSizeLabel}
+                          </p>
+                          <div className="grid grid-cols-2 gap-1 rounded-lg border bg-background p-1">
+                            {WORKSHEET_PAPER_SIZES.map((size) => (
+                              <button
+                                key={size}
+                                type="button"
+                                aria-pressed={paperSize === size}
+                                onClick={() => setPaperSize(size)}
+                                className={cn(
+                                  'min-h-10 rounded-md px-2 text-sm leading-tight transition-colors',
+                                  'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                  paperSize === size &&
+                                    'bg-primary/10 font-medium text-primary'
+                                )}
+                              >
+                                {copy.paperSizes[size]}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {copy.traceModeLabel}
+                          </p>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {copy.traceModeDescription}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
+                          {TRACE_MODES.map((mode) => (
+                            <button
+                              key={mode}
+                              type="button"
+                              aria-pressed={traceMode === mode}
+                              onClick={() => setTraceMode(mode)}
+                              className={cn(
+                                'min-h-10 rounded-md px-2 text-sm leading-tight transition-colors',
+                                'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                traceMode === mode &&
+                                  'bg-primary/10 font-medium text-primary'
+                              )}
+                            >
+                              {copy.traceModes[mode]}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <div className="flex items-start justify-between gap-3 rounded-lg border bg-background p-3">
+                          <div className="min-w-0 space-y-1">
+                            <Label
+                              htmlFor="worksheet-character-details"
+                              className="text-sm"
+                            >
+                              {copy.characterDetailsLabel}
+                            </Label>
+                            <p className="text-xs leading-5 text-muted-foreground">
+                              {copy.characterDetailsDescription}
+                            </p>
+                          </div>
+                          <Switch
+                            id="worksheet-character-details"
+                            checked={showCharacterDetails}
+                            onCheckedChange={setShowCharacterDetails}
+                            aria-label={copy.characterDetailsLabel}
+                            className="mt-0.5 shrink-0"
+                          />
+                        </div>
+
+                        <div className="flex items-start justify-between gap-3 rounded-lg border bg-background p-3">
+                          <div className="min-w-0 space-y-1">
+                            <Label
+                              htmlFor="worksheet-feedback-section"
+                              className="text-sm"
+                            >
+                              {copy.feedbackSectionLabel}
+                            </Label>
+                            <p className="text-xs leading-5 text-muted-foreground">
+                              {copy.feedbackSectionDescription}
+                            </p>
+                          </div>
+                          <Switch
+                            id="worksheet-feedback-section"
+                            checked={showFeedbackSection}
+                            onCheckedChange={setShowFeedbackSection}
+                            aria-label={copy.feedbackSectionLabel}
+                            className="mt-0.5 shrink-0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {copy.assignmentNoteLabel}
+                          </p>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {copy.assignmentNoteDescription}
+                          </p>
+                        </div>
+                        <Textarea
+                          value={assignmentNote}
+                          onChange={(event) =>
+                            setAssignmentNote(
+                              truncateWorksheetText(
+                                event.target.value,
+                                MAX_ASSIGNMENT_NOTE_LENGTH
+                              )
+                            )
+                          }
+                          placeholder={copy.assignmentNotePlaceholder}
+                          className="min-h-20 resize-none bg-background"
+                        />
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                          <span>{copy.assignmentNoteHint}</span>
+                          <span>
+                            {copy.assignmentNoteCount(
+                              normalizedAssignmentNote.length,
+                              MAX_ASSIGNMENT_NOTE_LENGTH
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
+                        <Button
+                          type="button"
+                          onClick={printWorksheet}
+                          disabled={selectedCharacters.length === 0}
+                          className="w-full justify-center sm:col-span-2"
+                        >
+                          <IconPrinter className="size-4" />
+                          {copy.printCta}
+                        </Button>
+                        <Link
+                          to={Routes.Learn}
+                          search={practiceSearch}
+                          aria-disabled={selectedCharacters.length === 0}
+                          className={cn(
+                            buttonVariants({ variant: 'outline' }),
+                            'w-full justify-center bg-background',
+                            selectedCharacters.length === 0 &&
+                              'pointer-events-none opacity-50'
+                          )}
+                        >
+                          <IconArrowRight className="size-4" />
+                          {copy.practiceCta}
+                        </Link>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={copyShareLink}
+                          disabled={selectedCharacters.length === 0}
+                          className="w-full justify-center bg-background"
+                        >
+                          <IconCopy className="size-4" />
+                          {copy.shareCta}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={copyAssignmentMessage}
+                          disabled={selectedCharacters.length === 0}
+                          className="w-full justify-center bg-background"
+                        >
+                          <IconMailForward className="size-4" />
+                          {copy.assignmentShareCta}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={resetSelection}
+                          className="w-full justify-center bg-background"
+                        >
+                          <IconRefresh className="size-4" />
+                          {copy.resetCta}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {printSessionStarted && selectedCharacters.length > 0 ? (
+                    <div
+                      className="rounded-lg border border-primary/20 bg-primary/5 p-3"
+                      aria-live="polite"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex items-center gap-2 text-sm font-medium">
+                            <IconCircleCheck className="size-4 text-primary" />
+                            {copy.printFollowupTitle}
+                          </div>
+                          <p className="text-sm leading-6 text-muted-foreground">
+                            {copy.printFollowupDescription}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {copy.printFollowupSteps.map((step) => (
+                              <Badge
+                                key={step}
+                                variant="outline"
+                                className="rounded-md bg-background"
+                              >
+                                {step}
+                              </Badge>
+                            ))}
+                          </div>
+                          <p className="truncate text-sm font-semibold">
+                            {selectedCharacters.join(' ')}
+                          </p>
+                        </div>
+                        <Link
+                          to={Routes.Learn}
+                          search={practiceSearch}
+                          className={cn(
+                            buttonVariants(),
+                            'w-fit shrink-0 sm:mt-0'
+                          )}
+                        >
+                          <IconArrowRight className="size-4" />
+                          {copy.printFollowupCta}
+                        </Link>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="space-y-2 rounded-lg border border-dashed bg-muted/10 p-3">
                     <label
                       htmlFor="custom-worksheet-characters"
                       className="text-sm font-medium"
@@ -1138,266 +1414,6 @@ export function WorksheetPage({
                       {copy.customApplyCta}
                     </Button>
                   </div>
-
-                  <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
-                    <div>
-                      <p className="text-sm font-medium">
-                        {copy.printSettingsTitle}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {copy.printSettingsDescription}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">
-                          {copy.practiceBoxesLabel}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {GRID_OPTIONS.map((option) => (
-                            <button
-                              key={option}
-                              type="button"
-                              onClick={() => setGridCount(option)}
-                              className={cn(
-                                'rounded-lg border bg-background px-3 py-2 text-sm transition-colors',
-                                'hover:border-primary/50 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                                gridCount === option &&
-                                  'border-primary bg-primary/10 text-primary'
-                              )}
-                            >
-                              {copy.gridOption(option)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">
-                          {copy.paperSizeLabel}
-                        </p>
-                        <div className="grid grid-cols-2 gap-1 rounded-lg border bg-background p-1">
-                          {WORKSHEET_PAPER_SIZES.map((size) => (
-                            <button
-                              key={size}
-                              type="button"
-                              aria-pressed={paperSize === size}
-                              onClick={() => setPaperSize(size)}
-                              className={cn(
-                                'min-h-9 rounded-md px-2 text-sm transition-colors',
-                                'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                                paperSize === size &&
-                                  'bg-primary/10 font-medium text-primary'
-                              )}
-                            >
-                              {copy.paperSizes[size]}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <div>
-                          <p className="text-sm font-medium">
-                            {copy.traceModeLabel}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {copy.traceModeDescription}
-                          </p>
-                        </div>
-                        <div className="grid grid-cols-3 gap-1 rounded-lg border bg-background p-1">
-                          {TRACE_MODES.map((mode) => (
-                            <button
-                              key={mode}
-                              type="button"
-                              aria-pressed={traceMode === mode}
-                              onClick={() => setTraceMode(mode)}
-                              className={cn(
-                                'min-h-9 rounded-md px-2 text-sm transition-colors',
-                                'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                                traceMode === mode &&
-                                  'bg-primary/10 font-medium text-primary'
-                              )}
-                            >
-                              {copy.traceModes[mode]}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex min-h-24 items-start justify-between gap-3 rounded-lg border bg-background p-3">
-                        <div className="space-y-1">
-                          <Label
-                            htmlFor="worksheet-character-details"
-                            className="text-sm"
-                          >
-                            {copy.characterDetailsLabel}
-                          </Label>
-                          <p className="text-xs leading-5 text-muted-foreground">
-                            {copy.characterDetailsDescription}
-                          </p>
-                        </div>
-                        <Switch
-                          id="worksheet-character-details"
-                          checked={showCharacterDetails}
-                          onCheckedChange={setShowCharacterDetails}
-                          aria-label={copy.characterDetailsLabel}
-                          className="mt-0.5"
-                        />
-                      </div>
-
-                      <div className="flex min-h-24 items-start justify-between gap-3 rounded-lg border bg-background p-3">
-                        <div className="space-y-1">
-                          <Label
-                            htmlFor="worksheet-feedback-section"
-                            className="text-sm"
-                          >
-                            {copy.feedbackSectionLabel}
-                          </Label>
-                          <p className="text-xs leading-5 text-muted-foreground">
-                            {copy.feedbackSectionDescription}
-                          </p>
-                        </div>
-                        <Switch
-                          id="worksheet-feedback-section"
-                          checked={showFeedbackSection}
-                          onCheckedChange={setShowFeedbackSection}
-                          aria-label={copy.feedbackSectionLabel}
-                          className="mt-0.5"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-sm font-medium">
-                        {copy.assignmentNoteLabel}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {copy.assignmentNoteDescription}
-                      </p>
-                    </div>
-                    <Textarea
-                      value={assignmentNote}
-                      onChange={(event) =>
-                        setAssignmentNote(
-                          truncateWorksheetText(
-                            event.target.value,
-                            MAX_ASSIGNMENT_NOTE_LENGTH
-                          )
-                        )
-                      }
-                      placeholder={copy.assignmentNotePlaceholder}
-                      className="min-h-20 resize-none"
-                    />
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-                      <span>{copy.assignmentNoteHint}</span>
-                      <span>
-                        {copy.assignmentNoteCount(
-                          normalizedAssignmentNote.length,
-                          MAX_ASSIGNMENT_NOTE_LENGTH
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      onClick={printWorksheet}
-                      disabled={selectedCharacters.length === 0}
-                    >
-                      <IconPrinter className="size-4" />
-                      {copy.printCta}
-                    </Button>
-                    <Link
-                      to={Routes.Learn}
-                      search={practiceSearch}
-                      aria-disabled={selectedCharacters.length === 0}
-                      className={cn(
-                        buttonVariants({ variant: 'outline' }),
-                        selectedCharacters.length === 0 &&
-                          'pointer-events-none opacity-50'
-                      )}
-                    >
-                      <IconArrowRight className="size-4" />
-                      {copy.practiceCta}
-                    </Link>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={copyShareLink}
-                      disabled={selectedCharacters.length === 0}
-                    >
-                      <IconCopy className="size-4" />
-                      {copy.shareCta}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={copyAssignmentMessage}
-                      disabled={selectedCharacters.length === 0}
-                    >
-                      <IconMailForward className="size-4" />
-                      {copy.assignmentShareCta}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={resetSelection}
-                    >
-                      <IconRefresh className="size-4" />
-                      {copy.resetCta}
-                    </Button>
-                  </div>
-
-                  {printSessionStarted && selectedCharacters.length > 0 ? (
-                    <div
-                      className="rounded-lg border border-primary/20 bg-primary/5 p-3"
-                      aria-live="polite"
-                    >
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0 space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <IconCircleCheck className="size-4 text-primary" />
-                            {copy.printFollowupTitle}
-                          </div>
-                          <p className="text-sm leading-6 text-muted-foreground">
-                            {copy.printFollowupDescription}
-                          </p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {copy.printFollowupSteps.map((step) => (
-                              <Badge
-                                key={step}
-                                variant="outline"
-                                className="rounded-md bg-background"
-                              >
-                                {step}
-                              </Badge>
-                            ))}
-                          </div>
-                          <p className="truncate text-sm font-semibold">
-                            {selectedCharacters.join(' ')}
-                          </p>
-                        </div>
-                        <Link
-                          to={Routes.Learn}
-                          search={practiceSearch}
-                          className={cn(
-                            buttonVariants(),
-                            'w-fit shrink-0 sm:mt-0'
-                          )}
-                        >
-                          <IconArrowRight className="size-4" />
-                          {copy.printFollowupCta}
-                        </Link>
-                      </div>
-                    </div>
-                  ) : null}
                 </CardContent>
               </Card>
 

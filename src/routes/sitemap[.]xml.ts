@@ -8,6 +8,7 @@ import {
   localizeHref,
 } from '@/lib/locale';
 import { getHanziPath, getHsk1CharacterList } from '@/learn/hanzi-course';
+import { getSortedPosts } from '@/lib/blog';
 
 /**
  * Dynamic sitemap.xml
@@ -40,6 +41,7 @@ function buildSitemap() {
     { path: '/learn', changefreq: 'daily', priority: '0.9' },
     { path: '/hsk/1', changefreq: 'weekly', priority: '0.9' },
     { path: '/worksheets', changefreq: 'weekly', priority: '0.8' },
+    { path: '/blog', changefreq: 'weekly', priority: '0.6' },
     { path: '/pricing', changefreq: 'weekly', priority: '0.6' },
     { path: '/contact', changefreq: 'monthly', priority: '0.4' },
     { path: '/cookie', changefreq: 'monthly' },
@@ -52,7 +54,13 @@ function buildSitemap() {
     changefreq: 'weekly',
     priority: '0.7',
   }));
-  const allUrls = [...staticUrls, ...hanziUrls];
+  const blogUrls = getSortedPosts(baseLocale).map((post) => ({
+    path: `/blog/${post.slug}`,
+    changefreq: 'monthly',
+    priority: '0.5',
+    lastmod: post.date,
+  }));
+  const allUrls = [...staticUrls, ...hanziUrls, ...blogUrls];
   const entries = allUrls.flatMap((url) =>
     isLocalizedPath(url.path)
       ? locales.map((locale) => urlEntry(url, locale))

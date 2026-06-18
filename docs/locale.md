@@ -21,8 +21,8 @@ Markdown content stays in the same collection directory. English content uses
 the base filename, while localized variants add the locale before `.md`:
 
 ```txt
-content/blog/getting-started.md
-content/blog/getting-started.zh.md
+content/blog/how-to-practice-hsk1-characters.md
+content/blog/how-to-practice-hsk1-characters.zh.md
 content/changelog/v1.0.0.md
 content/changelog/v1.0.0.zh.md
 content/pages/privacy.md
@@ -30,8 +30,9 @@ content/pages/privacy.zh.md
 ```
 
 `content-collections.ts` strips the `.zh` suffix from the route slug, so
-`getting-started.md` and `getting-started.zh.md` both map to `/blog/getting-started`
-under their respective URL locale.
+`how-to-practice-hsk1-characters.md` and
+`how-to-practice-hsk1-characters.zh.md` both map to
+`/blog/how-to-practice-hsk1-characters` under their respective URL locale.
 
 `src/locale/paraglide/` is generated code and is ignored by git.
 
