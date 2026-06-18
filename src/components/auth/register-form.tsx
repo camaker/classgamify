@@ -82,6 +82,11 @@ export function RegisterForm({
   return (
     <AuthCard
       headerLabel={m.auth_register_create_account()}
+      benefits={[
+        m.auth_register_benefit_progress(),
+        m.auth_register_benefit_worksheets(),
+        m.auth_register_benefit_review(),
+      ]}
       bottomButtonLabel={m.auth_register_sign_in_hint()}
       bottomButtonHref={Routes.Login}
     >

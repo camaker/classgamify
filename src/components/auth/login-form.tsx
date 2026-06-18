@@ -90,6 +90,10 @@ export function LoginForm({
   return (
     <AuthCard
       headerLabel={m.auth_login_welcome_back()}
+      benefits={[
+        m.auth_login_benefit_progress(),
+        m.auth_login_benefit_worksheets(),
+      ]}
       bottomButtonLabel={m.auth_login_sign_up_hint()}
       bottomButtonHref={Routes.Register}
       className={cn('', className)}
