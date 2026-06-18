@@ -38,6 +38,7 @@ import {
   IconPencil,
   IconRotate,
   IconSparkles,
+  IconTargetArrow,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -171,6 +172,10 @@ export function HskCoursePage() {
               <Stat label={copy.freeLabel} value={stats.free} />
               <Stat label={copy.premiumLabel} value={stats.locked} />
               <Stat label={copy.strokesLabel} value={stats.strokes} />
+              <LearningRhythmStats
+                copy={copy}
+                progressSummary={progressSummary}
+              />
             </CardContent>
           </Card>
         </div>
@@ -291,6 +296,12 @@ function DailyPracticePlanCard({
             <IconFlame className="size-3.5" />
             {copy.todayBadge}
           </Badge>
+          {hasStarted ? (
+            <Badge variant="outline" className="rounded-md">
+              <IconTargetArrow className="size-3.5" />
+              {copy.streakBadge(progressSummary.currentStreakDays)}
+            </Badge>
+          ) : null}
           {hasStarted ? (
             <Badge variant="outline" className="rounded-md">
               {copy.progressBadge(
@@ -594,6 +605,56 @@ function ReviewFocusList({
   );
 }
 
+function LearningRhythmStats({
+  copy,
+  progressSummary,
+}: {
+  copy: ReturnType<typeof getCourseCopy>;
+  progressSummary: HanziProgressSummary;
+}) {
+  const stats = [
+    {
+      label: copy.streakLabel,
+      value: copy.streakValue(progressSummary.currentStreakDays),
+    },
+    {
+      label: copy.activeDaysLabel,
+      value: copy.activeDaysValue(progressSummary.activeDayCount),
+    },
+  ];
+
+  return (
+    <div className="col-span-2 rounded-lg border bg-muted/30 p-3">
+      <div className="flex items-start gap-3">
+        <div className="rounded-md bg-background p-2 ring-1 ring-border">
+          <IconTargetArrow className="size-4 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">{copy.rhythmTitle}</div>
+          <div className="mt-1 text-xs leading-5 text-muted-foreground">
+            {progressSummary.completedCount > 0
+              ? copy.rhythmDescription(
+                  progressSummary.currentStreakDays,
+                  progressSummary.practicedToday
+                )
+              : copy.rhythmEmptyDescription}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {stats.map((item) => (
+              <div key={item.label} className="rounded-md bg-background p-2">
+                <div className="text-lg font-semibold">{item.value}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {item.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CharacterTile({
   character,
   copy,
@@ -680,6 +741,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
       freeBadge: '免费',
       freeLabel: '免费字',
       freeLesson: '免费小课',
+      activeDaysLabel: '活跃学习日',
+      activeDaysValue: (count: number) => `${count} 天`,
       continueBadge: '继续学习',
       continueCta: '继续练习',
       continueDescription: (character: string, pinyin: string) =>
@@ -729,6 +792,18 @@ function getCourseCopy(locale: 'en' | 'zh') {
       reviewWorksheetCta: '打印错字复习纸',
       reviewWorksheetNote: (count: number) =>
         `优先复习你错得最多的 ${count} 个汉字。`,
+      rhythmDescription: (streakDays: number, practicedToday: boolean) =>
+        practicedToday
+          ? `今天已经完成一次练习，连续学习 ${Math.max(streakDays, 1)} 天。`
+          : streakDays > 0
+            ? `昨天还在练，今天完成一个字就能延续 ${streakDays} 天连续记录。`
+            : '今天完成一个字，就能重新开始连续学习记录。',
+      rhythmEmptyDescription: '完成第一个描写练习后，这里会记录学习节奏。',
+      rhythmTitle: '学习节奏',
+      streakBadge: (count: number) =>
+        count > 0 ? `${count} 天连续` : '今日待练',
+      streakLabel: '连续天数',
+      streakValue: (count: number) => `${count} 天`,
       strokesLabel: '总笔画',
       strokeCount: (count: number) => `${count} 画`,
       summaryDescription: '当前公开的启动课程数据。',
@@ -788,6 +863,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     freeBadge: 'Free',
     freeLabel: 'Free',
     freeLesson: 'Free lesson',
+    activeDaysLabel: 'Active days',
+    activeDaysValue: (count: number) => `${count} days`,
     continueBadge: 'Continue',
     continueCta: 'Continue practice',
     continueDescription: (character: string, pinyin: string) =>
@@ -839,6 +916,19 @@ function getCourseCopy(locale: 'en' | 'zh') {
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
       `Review the ${count} characters you missed most.`,
+    rhythmDescription: (streakDays: number, practicedToday: boolean) =>
+      practicedToday
+        ? `You have practiced today and kept a ${Math.max(streakDays, 1)}-day streak.`
+        : streakDays > 0
+          ? `You practiced yesterday. Finish one character today to keep the ${streakDays}-day streak alive.`
+          : 'Finish one character today to restart your learning streak.',
+    rhythmEmptyDescription:
+      'Finish your first tracing run and this will start tracking your rhythm.',
+    rhythmTitle: 'Learning rhythm',
+    streakBadge: (count: number) =>
+      count > 0 ? `${count}-day streak` : 'Practice today',
+    streakLabel: 'Streak',
+    streakValue: (count: number) => `${count} days`,
     strokesLabel: 'Strokes',
     strokeCount: (count: number) => `${count} strokes`,
     summaryDescription: 'Currently published starter course data.',
