@@ -14,6 +14,7 @@ import { useCurrentPlan } from '@/hooks/use-payment';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { jsonLdScript } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -30,11 +31,31 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/pricing')({
-  head: () =>
-    seo('/pricing', {
+  head: () => {
+    const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
+    const faqItems = getPricingFaqItems(currentLocale);
+    const faqJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
+    const metadata = seo('/pricing', {
       title: `${m.pricing_title()} | ${websiteConfig.metadata?.name}`,
       description: m.pricing_description(),
-    }),
+    });
+
+    return {
+      ...metadata,
+      scripts: [jsonLdScript(faqJsonLd)],
+    };
+  },
   component: PricingPage,
 });
 

@@ -7,6 +7,7 @@ import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { getCanonicalUrl } from '@/lib/urls';
 import { createFileRoute } from '@tanstack/react-router';
+import { jsonLdScript } from '@/lib/structured-data';
 
 export const Route = createFileRoute('/learn')({
   validateSearch: (
@@ -36,12 +37,7 @@ export const Route = createFileRoute('/learn')({
 
     return {
       ...metadata,
-      scripts: [
-        {
-          type: 'application/ld+json',
-          children: JSON.stringify(courseJsonLd),
-        },
-      ],
+      scripts: [jsonLdScript(courseJsonLd)],
     };
   },
   component: LearnRoutePage,

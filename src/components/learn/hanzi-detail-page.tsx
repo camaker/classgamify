@@ -180,9 +180,9 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                   </div>
                   <div className="space-y-3">
                     <CardDescription>{copy.titleEyebrow}</CardDescription>
-                    <CardTitle className="text-3xl sm:text-4xl">
+                    <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                       {copy.title(character.character, character.pinyin)}
-                    </CardTitle>
+                    </h1>
                     <p className="max-w-2xl text-base leading-7 text-muted-foreground">
                       {copy.description(character.meaning)}
                     </p>

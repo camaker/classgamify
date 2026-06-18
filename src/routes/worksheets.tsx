@@ -5,7 +5,10 @@ import {
 } from '@/components/learn/worksheet-page';
 import { websiteConfig } from '@/config/website';
 import { parseCharactersSearch } from '@/lib/character-search';
+import { getLocale, localeConfig } from '@/lib/locale';
 import { seo } from '@/lib/seo';
+import { jsonLdScript } from '@/lib/structured-data';
+import { getCanonicalUrl } from '@/lib/urls';
 import { createFileRoute } from '@tanstack/react-router';
 
 const WORKSHEET_GRID_OPTIONS = [6, 9, 12] as const;
@@ -35,12 +38,47 @@ export const Route = createFileRoute('/worksheets')({
     paper: parsePaperSearch(search.paper),
     trace: parseTraceSearch(search.trace),
   }),
-  head: () =>
-    seo('/worksheets', {
-      title: `Chinese Character Worksheet Generator | ${websiteConfig.metadata?.name}`,
-      description:
-        'Create printable HSK1 Chinese character handwriting worksheets from the Lang Study starter set.',
-    }),
+  head: () => {
+    const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
+    const title =
+      currentLocale === 'zh'
+        ? `中文汉字练习纸生成器 | ${websiteConfig.metadata?.name}`
+        : `Chinese Character Worksheet Generator | ${websiteConfig.metadata?.name}`;
+    const description =
+      currentLocale === 'zh'
+        ? '从 HSK1 入门汉字生成可打印中文书写练习纸，适合自学、家长辅导和课堂作业。'
+        : 'Create printable HSK1 Chinese character handwriting worksheets from the Lang Study starter set.';
+    const url = getCanonicalUrl('/worksheets');
+    const applicationJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name:
+        currentLocale === 'zh'
+          ? '中文汉字练习纸生成器'
+          : 'Chinese Character Worksheet Generator',
+      description,
+      url,
+      inLanguage: localeConfig[getLocale()].hreflang,
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'Web',
+      provider: {
+        '@type': 'Organization',
+        name: websiteConfig.metadata?.name ?? '',
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+    };
+    const metadata = seo('/worksheets', { title, description });
+
+    return {
+      ...metadata,
+      scripts: [jsonLdScript(applicationJsonLd)],
+    };
+  },
   component: WorksheetRoutePage,
 });
 

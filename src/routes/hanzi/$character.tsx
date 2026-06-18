@@ -5,6 +5,7 @@ import { getLocale, localeConfig } from '@/lib/locale';
 import { seo } from '@/lib/seo';
 import { getCanonicalUrl } from '@/lib/urls';
 import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
+import { jsonLdScript } from '@/lib/structured-data';
 
 export const Route = createFileRoute('/hanzi/$character')({
   loader: ({ params }) => {
@@ -54,12 +55,7 @@ export const Route = createFileRoute('/hanzi/$character')({
 
     return {
       ...metadata,
-      scripts: [
-        {
-          type: 'application/ld+json',
-          children: JSON.stringify(learningJsonLd),
-        },
-      ],
+      scripts: [jsonLdScript(learningJsonLd)],
     };
   },
   component: HanziRoutePage,

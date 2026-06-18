@@ -10,19 +10,48 @@ import { localeMiddleware } from '@/locale/middleware';
 console.log("[server-entry]: using custom server entry in 'src/server.ts'");
 
 export default {
-  fetch(request: Request) {
+  async fetch(request: Request) {
     const url = new URL(request.url);
     if (url.hostname === 'www.getlangstudy.com') {
       url.hostname = 'getlangstudy.com';
       return Response.redirect(url.toString(), 301);
     }
 
-    return localeMiddleware(request, () =>
+    const response = await localeMiddleware(request, () =>
       handler.fetch(request, {
         context: {
           fromFetch: true,
         },
       })
     );
+
+    return withSeoHeaders(request, response);
   },
 };
+
+function withSeoHeaders(request: Request, response: Response) {
+  const headers = new Headers(response.headers);
+  const pathname = new URL(request.url).pathname;
+
+  if (response.status === 404) {
+    headers.set('X-Robots-Tag', 'noindex, follow');
+  }
+
+  if (response.status < 400 && isFingerprintedAssetPath(pathname)) {
+    headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+function isFingerprintedAssetPath(pathname: string) {
+  if (!pathname.startsWith('/assets/')) return false;
+
+  return /-[A-Za-z0-9_-]{8,}\.(?:css|js|mjs|woff2?|png|jpe?g|webp|svg)$/.test(
+    pathname
+  );
+}

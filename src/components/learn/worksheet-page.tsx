@@ -779,7 +779,7 @@ export function WorksheetPage({
       data-print-page="worksheet"
     >
       <div
-        className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-6 overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8"
         data-print-shell
       >
         <div className="flex flex-col gap-4">
@@ -1484,7 +1484,7 @@ function WorksheetPreview({
 
   return (
     <div
-      className="mx-auto max-w-[820px] bg-white p-6 text-slate-950 print:max-w-none print:p-0"
+      className="mx-auto w-full max-w-[820px] bg-white p-4 text-slate-950 sm:p-6 print:max-w-none print:p-0"
       data-print-root
     >
       <div

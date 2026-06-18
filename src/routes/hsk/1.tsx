@@ -1,11 +1,11 @@
 import { HskCoursePage } from '@/components/learn/hsk-course-page';
 import { websiteConfig } from '@/config/website';
-import { m } from '@/locale/paraglide/messages';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { getCanonicalUrl } from '@/lib/urls';
 import { createFileRoute } from '@tanstack/react-router';
+import { jsonLdScript } from '@/lib/structured-data';
 
 export const Route = createFileRoute('/hsk/1')({
   head: () => {
@@ -37,12 +37,7 @@ export const Route = createFileRoute('/hsk/1')({
 
     return {
       ...metadata,
-      scripts: [
-        {
-          type: 'application/ld+json',
-          children: JSON.stringify(courseJsonLd),
-        },
-      ],
+      scripts: [jsonLdScript(courseJsonLd)],
     };
   },
   component: HskCoursePage,
