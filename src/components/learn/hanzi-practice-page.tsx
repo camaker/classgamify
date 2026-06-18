@@ -312,7 +312,7 @@ export function HanziPracticePage({
     <section className="min-h-[calc(100vh-12rem)] bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-          <div className="flex min-w-0 flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-1">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="border-primary/30">
@@ -370,6 +370,34 @@ export function HanziPracticePage({
               </div>
             </div>
 
+            <PracticeStartGuide
+              copy={copy}
+              currentCharacter={currentCharacter}
+              reviewCount={progressSummary.reviewItems.length}
+            />
+          </div>
+
+          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            <HanziPracticeCard
+              key={currentCharacter.character}
+              character={currentCharacter}
+              copy={copy}
+              currentIndex={currentIndex}
+              currentLocale={currentLocale}
+              total={lessonCharacters.length}
+              progress={progress[currentCharacter.character]}
+              lessonComplete={progressSummary.lessonComplete}
+              onComplete={(nextProgress) =>
+                saveProgress(currentCharacter.character, nextProgress)
+              }
+              onNext={goToNext}
+              onReset={resetLesson}
+              scopeLabel={scopeLabel}
+              worksheetCharacters={worksheetCharacters}
+            />
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-2">
             <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle>{copy.courseTitle}</CardTitle>
@@ -565,24 +593,6 @@ export function HanziPracticePage({
               </CardContent>
             </Card>
           </div>
-
-          <HanziPracticeCard
-            key={currentCharacter.character}
-            character={currentCharacter}
-            copy={copy}
-            currentIndex={currentIndex}
-            currentLocale={currentLocale}
-            total={lessonCharacters.length}
-            progress={progress[currentCharacter.character]}
-            lessonComplete={progressSummary.lessonComplete}
-            onComplete={(nextProgress) =>
-              saveProgress(currentCharacter.character, nextProgress)
-            }
-            onNext={goToNext}
-            onReset={resetLesson}
-            scopeLabel={scopeLabel}
-            worksheetCharacters={worksheetCharacters}
-          />
         </div>
       </div>
     </section>
@@ -603,6 +613,78 @@ type HanziPracticeCardProps = {
   scopeLabel?: string;
   worksheetCharacters: string[];
 };
+
+function PracticeStartGuide({
+  copy,
+  currentCharacter,
+  reviewCount,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+  currentCharacter: LessonCharacter;
+  reviewCount: number;
+}) {
+  const items = [
+    {
+      description: copy.startGuideWatchDescription,
+      icon: IconPlayerPlay,
+      title: copy.startGuideWatchTitle,
+    },
+    {
+      description: copy.startGuideTraceDescription,
+      icon: IconPencil,
+      title: copy.startGuideTraceTitle,
+    },
+    {
+      description: copy.startGuideReviewDescription(reviewCount),
+      icon: IconRotate,
+      title: copy.startGuideReviewTitle(reviewCount),
+    },
+    {
+      description: copy.startGuidePrintDescription,
+      icon: IconFileText,
+      title: copy.startGuidePrintTitle,
+    },
+  ];
+
+  return (
+    <section className="space-y-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold">{copy.startGuideTitle}</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {copy.startGuideDescription(
+              currentCharacter.character,
+              currentCharacter.pinyin
+            )}
+          </p>
+        </div>
+        <Badge variant="secondary" className="w-fit shrink-0 rounded-lg">
+          {currentCharacter.character} · {currentCharacter.pinyin}
+        </Badge>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {items.map((item) => (
+          <div
+            key={item.title}
+            className="min-w-0 rounded-lg border bg-muted/30 p-3"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
+                <item.icon className="size-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{item.title}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function ProgressLegend({
   copy,
@@ -2001,6 +2083,23 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       dailyRhythmTodayValue: (completed: number, target: number) =>
         `${completed}/${target} 个汉字`,
       freeBadge: (count: number) => `${count} 个免费汉字`,
+      startGuideDescription: (character: string, pinyin: string) =>
+        `当前从 ${character} · ${pinyin} 开始，保持一次短练，把屏幕练习接到纸笔复习。`,
+      startGuidePrintDescription:
+        '一组稳定后打印出来，离开屏幕慢写一遍，老师和家长也方便交付。',
+      startGuidePrintTitle: '打印巩固',
+      startGuideReviewDescription: (count: number) =>
+        count > 0
+          ? `${count} 个错字排在新字前面，先清掉再继续。`
+          : '如果这次有错笔，它会进入下次复习队列。',
+      startGuideReviewTitle: (count: number) =>
+        count > 0 ? '先清复习' : '留下复习线索',
+      startGuideTitle: '本次短练怎么走',
+      startGuideTraceDescription:
+        '完成一次描写测试，系统会记录错笔和下一次重点。',
+      startGuideTraceTitle: '跟着描写',
+      startGuideWatchDescription: '先看一遍动画，注意起笔、方向和收笔位置。',
+      startGuideWatchTitle: '观察笔顺',
       loopCompleteDescription:
         '入门组已完成。现在最适合把整组汉字打印出来做纸笔复习。',
       loopDescription: (completed: number, total: number) =>
@@ -2394,6 +2493,24 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     dailyRhythmTodayValue: (completed: number, target: number) =>
       `${completed}/${target} characters`,
     freeBadge: (count: number) => `${count} free characters`,
+    startGuideDescription: (character: string, pinyin: string) =>
+      `Start from ${character} · ${pinyin}, keep the session short, and carry the same set into paper review.`,
+    startGuidePrintDescription:
+      'When the set feels stable, print it and write once away from the screen.',
+    startGuidePrintTitle: 'Print to reinforce',
+    startGuideReviewDescription: (count: number) =>
+      count > 0
+        ? `${count} review characters should come before new practice.`
+        : 'Any missed stroke from this run becomes the next review cue.',
+    startGuideReviewTitle: (count: number) =>
+      count > 0 ? 'Clear review first' : 'Leave review cues',
+    startGuideTitle: 'Today’s short practice loop',
+    startGuideTraceDescription:
+      'Complete one tracing quiz so missed strokes are saved for review.',
+    startGuideTraceTitle: 'Trace once',
+    startGuideWatchDescription:
+      'Watch the animation once and notice direction, corners, and final stroke placement.',
+    startGuideWatchTitle: 'Watch stroke order',
     loopCompleteDescription:
       'Starter set complete. This is a good moment to print the whole set for paper review.',
     loopDescription: (completed: number, total: number) =>
