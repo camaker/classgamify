@@ -47,6 +47,7 @@ import {
   IconDatabaseExport,
   IconDatabaseImport,
   IconDownload,
+  IconEyeCheck,
   IconFileText,
   IconFlame,
   IconLock,
@@ -85,6 +86,10 @@ export function HskCoursePage() {
   const [backupInput, setBackupInput] = useState('');
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const backupFileInputRef = useRef<HTMLInputElement>(null);
+  const backupPreview = useMemo(
+    () => parseProgressBackup(backupInput.trim())?.preview,
+    [backupInput]
+  );
   const progressSummary = useMemo(
     () => getHanziProgressSummary(freeLessonCharacters, progress),
     [freeLessonCharacters, progress]
@@ -224,15 +229,15 @@ export function HskCoursePage() {
     }
   };
   const restoreProgressBackup = () => {
-    const nextProgress = parseProgressBackup(backupInput);
+    const parsedBackup = parseProgressBackup(backupInput);
 
-    if (!nextProgress) {
+    if (!parsedBackup) {
       toast.error(copy.progressRestoreError);
       return;
     }
 
-    writeStoredHanziProgress(nextProgress);
-    setProgress(nextProgress);
+    writeStoredHanziProgress(parsedBackup.progress);
+    setProgress(parsedBackup.progress);
     updateRestoreDialogOpen(false);
     toast.success(copy.progressRestoreSuccess);
   };
@@ -408,6 +413,18 @@ export function HskCoursePage() {
               <p className="text-xs leading-5 text-muted-foreground">
                 {copy.progressRestoreHint}
               </p>
+              {backupInput.trim() ? (
+                backupPreview ? (
+                  <ProgressBackupPreviewCard
+                    copy={copy}
+                    preview={backupPreview}
+                  />
+                ) : (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+                    {copy.progressRestoreInvalidPreview}
+                  </div>
+                )
+              ) : null}
             </div>
             <DialogFooter>
               <Button
@@ -419,7 +436,7 @@ export function HskCoursePage() {
               </Button>
               <Button
                 type="button"
-                disabled={!backupInput.trim()}
+                disabled={!backupPreview}
                 onClick={restoreProgressBackup}
               >
                 <IconDatabaseImport className="size-4" />
@@ -1075,6 +1092,66 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
+function ProgressBackupPreviewCard({
+  copy,
+  preview,
+}: {
+  copy: ReturnType<typeof getCourseCopy>;
+  preview: ProgressBackupPreview;
+}) {
+  const stats = [
+    {
+      label: copy.progressRestorePreviewCompletedLabel,
+      value: copy.progressRestorePreviewCompleted(
+        preview.completedCount,
+        preview.total
+      ),
+    },
+    {
+      label: copy.progressRestorePreviewReviewLabel,
+      value: preview.reviewCount,
+    },
+    {
+      label: copy.streakLabel,
+      value: copy.streakValue(preview.currentStreakDays),
+    },
+  ];
+
+  return (
+    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+      <div className="flex items-start gap-3">
+        <div className="rounded-md bg-background p-2 ring-1 ring-border">
+          <IconEyeCheck className="size-4 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">
+            {copy.progressRestorePreviewTitle}
+          </div>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {copy.progressRestorePreviewDescription(
+              preview.exportedAt,
+              preview.locale
+            )}
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {stats.map((item) => (
+              <div key={item.label} className="rounded-md bg-background p-2">
+                <div className="text-base font-semibold">{item.value}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  {item.label}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            {copy.progressRestorePreviewWarning}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type CourseWorksheetSearch = {
   characters: string[];
   details: boolean;
@@ -1094,6 +1171,20 @@ type ProgressBackupParams = {
   locale: 'en' | 'zh';
   progress: StoredProgress;
   progressSummary: HanziProgressSummary;
+};
+
+type ProgressBackupPreview = {
+  completedCount: number;
+  currentStreakDays: number;
+  exportedAt?: string;
+  locale?: string;
+  reviewCount: number;
+  total: number;
+};
+
+type ParsedProgressBackup = {
+  preview: ProgressBackupPreview;
+  progress: StoredProgress;
 };
 
 function getCourseCopy(locale: 'en' | 'zh') {
@@ -1163,7 +1254,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
       progressRestoreHint:
         '只支持 Lang Study 生成的 HSK1 进度备份，恢复前建议先复制一份当前进度备份。',
       progressRestoreInputLabel: '进度备份 JSON',
+      progressRestoreInvalidPreview:
+        '这个备份无法预览，请检查 JSON 内容是否完整。',
       progressRestorePlaceholder: '粘贴从“复制进度备份”得到的 JSON 内容...',
+      progressRestorePreviewCompleted: (completed: number, total: number) =>
+        `${completed}/${total}`,
+      progressRestorePreviewCompletedLabel: '已完成',
+      progressRestorePreviewDescription: (
+        exportedAt?: string,
+        backupLocale?: string
+      ) =>
+        `导出时间：${formatBackupDate(exportedAt, 'zh')} · 语言：${
+          backupLocale === 'zh' ? '中文' : 'English'
+        }`,
+      progressRestorePreviewReviewLabel: '待复习',
+      progressRestorePreviewTitle: '备份预览',
+      progressRestorePreviewWarning:
+        '恢复后会覆盖当前浏览器里的 HSK1 本地进度。',
       progressRestoreSuccess: '进度已恢复。',
       progressRestoreTitle: '恢复 HSK1 学习进度',
       progressShareCta: '复制进度报告',
@@ -1378,7 +1485,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
     progressRestoreHint:
       'Only HSK1 progress backups generated by Lang Study are supported. Copy your current backup first if you may need it later.',
     progressRestoreInputLabel: 'Progress backup JSON',
+    progressRestoreInvalidPreview:
+      'This backup cannot be previewed. Check that the JSON is complete.',
     progressRestorePlaceholder: 'Paste the JSON from "Copy progress backup"...',
+    progressRestorePreviewCompleted: (completed: number, total: number) =>
+      `${completed}/${total}`,
+    progressRestorePreviewCompletedLabel: 'Completed',
+    progressRestorePreviewDescription: (
+      exportedAt?: string,
+      backupLocale?: string
+    ) =>
+      `Exported: ${formatBackupDate(exportedAt, 'en')} · Language: ${
+        backupLocale === 'zh' ? 'Chinese' : 'English'
+      }`,
+    progressRestorePreviewReviewLabel: 'Review queue',
+    progressRestorePreviewTitle: 'Backup preview',
+    progressRestorePreviewWarning:
+      'Restoring will replace the HSK1 progress stored in this browser.',
     progressRestoreSuccess: 'Progress restored.',
     progressRestoreTitle: 'Restore HSK1 progress',
     progressShareCta: 'Copy progress report',
@@ -1597,12 +1720,16 @@ function buildProgressBackupFileName() {
   return `lang-study-hsk1-progress-${date}.json`;
 }
 
-function parseProgressBackup(value: string): StoredProgress | null {
+function parseProgressBackup(value: string): ParsedProgressBackup | null {
   let parsed: unknown;
 
   try {
     parsed = JSON.parse(value);
   } catch {
+    return null;
+  }
+
+  if (!value.trim()) {
     return null;
   }
 
@@ -1627,7 +1754,10 @@ function parseProgressBackup(value: string): StoredProgress | null {
     nextProgress[character] = characterProgress;
   }
 
-  return nextProgress;
+  return {
+    preview: buildProgressBackupPreview(parsed, nextProgress),
+    progress: nextProgress,
+  };
 }
 
 function parseCharacterProgress(value: unknown): CharacterProgress | null {
@@ -1679,6 +1809,107 @@ function parseMistakeStrokes(value: unknown): number[] | null | undefined {
   }
 
   return value;
+}
+
+function buildProgressBackupPreview(
+  parsed: Record<string, unknown>,
+  progress: StoredProgress
+): ProgressBackupPreview {
+  const summary = isPlainRecord(parsed.summary) ? parsed.summary : {};
+  const stats = getProgressBackupStats(progress);
+  const completedCount = readPreviewCount(
+    summary.completedCount,
+    stats.completedCount
+  );
+  const reviewCount = Array.isArray(summary.reviewCharacters)
+    ? summary.reviewCharacters.length
+    : stats.reviewCount;
+  const total = readPreviewCount(
+    summary.total,
+    Math.max(stats.total, completedCount)
+  );
+
+  return {
+    completedCount,
+    currentStreakDays: readPreviewCount(
+      summary.currentStreakDays,
+      stats.currentStreakDays
+    ),
+    exportedAt:
+      typeof parsed.exportedAt === 'string' ? parsed.exportedAt : undefined,
+    locale: typeof parsed.locale === 'string' ? parsed.locale : undefined,
+    reviewCount,
+    total,
+  };
+}
+
+function getProgressBackupStats(progress: StoredProgress) {
+  const completedItems = Object.values(progress).filter(
+    (item) => item.completed
+  );
+  const dayKeys = new Set(
+    completedItems
+      .map((item) =>
+        item.completedAt ? getBackupLocalDayKey(new Date(item.completedAt)) : ''
+      )
+      .filter(Boolean)
+  );
+
+  return {
+    activeDayCount: dayKeys.size,
+    completedCount: completedItems.length,
+    currentStreakDays: getBackupCurrentStreakDays(dayKeys),
+    reviewCount: completedItems.filter((item) => item.mistakes > 0).length,
+    total: Object.keys(progress).length,
+  };
+}
+
+function getBackupCurrentStreakDays(dayKeys: Set<string>) {
+  if (dayKeys.size === 0) return 0;
+
+  const today = new Date();
+  const cursor = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  let streak = 0;
+
+  while (dayKeys.has(getBackupLocalDayKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+}
+
+function getBackupLocalDayKey(date: Date) {
+  if (Number.isNaN(date.getTime())) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function readPreviewCount(value: unknown, fallback: number) {
+  return Number.isInteger(value) && value >= 0 ? value : fallback;
+}
+
+function formatBackupDate(value: string | undefined, locale: 'en' | 'zh') {
+  if (!value) {
+    return locale === 'zh' ? '未知' : 'Unknown';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return locale === 'zh' ? '未知' : 'Unknown';
+  }
+
+  return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
 }
 
 function isValidProgressCount(value: unknown): value is number {
