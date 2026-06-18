@@ -30,12 +30,19 @@ import {
   IconWorldWww,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { toast } from 'sonner';
 
 const GRID_OPTIONS = [6, 9, 12] as const;
 const TRACE_MODES = ['first', 'guided', 'blank'] as const;
 export const WORKSHEET_PAPER_SIZES = ['a4', 'letter', 'legal', 'a5'] as const;
+const WORKSHEET_PAPER_PREVIEW_ASPECT_RATIO: Record<WorksheetPaperSize, string> =
+  {
+    a4: '210 / 297',
+    a5: '148 / 210',
+    legal: '8.5 / 14',
+    letter: '8.5 / 11',
+  };
 const DEFAULT_GRID_COUNT: WorksheetGridCount = 9;
 const DEFAULT_PAPER_SIZE: WorksheetPaperSize = 'a4';
 const DEFAULT_TRACE_MODE: TraceMode = 'first';
@@ -568,6 +575,9 @@ export function WorksheetPage({
       traceMode,
     ]
   );
+  const paperPreviewAspectRatio =
+    WORKSHEET_PAPER_PREVIEW_ASPECT_RATIO[paperSize];
+  const paperSizeDetail = copy.paperSizeDetails[paperSize];
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -1141,6 +1151,12 @@ export function WorksheetPage({
                               </button>
                             ))}
                           </div>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {copy.paperSizeDescription(
+                              copy.paperSizes[paperSize],
+                              paperSizeDetail
+                            )}
+                          </p>
                         </div>
                       </div>
 
@@ -1448,20 +1464,56 @@ export function WorksheetPage({
               </Card>
             </div>
 
-            <div
-              className="min-w-0 rounded-lg border bg-background p-4 shadow-sm print:border-0 print:p-0 print:shadow-none"
-              data-print-preview-frame
-            >
-              <WorksheetPreview
-                copy={copy}
-                assignmentNote={normalizedAssignmentNote}
-                gridCount={gridCount}
-                practicePrintUrl={practicePrintUrl}
-                showCharacterDetails={showCharacterDetails}
-                showFeedbackSection={showFeedbackSection}
-                selectedItems={selectedItems}
-                traceMode={traceMode}
-              />
+            <div className="min-w-0 space-y-3 print:space-y-0">
+              <div
+                className="flex flex-wrap items-start justify-between gap-3 print:hidden"
+                data-print-hidden
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">
+                    {copy.previewFrameTitle}
+                  </p>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {copy.previewFrameDescription(
+                      copy.paperSizes[paperSize],
+                      paperSizeDetail
+                    )}
+                  </p>
+                </div>
+                <Badge variant="outline" className="rounded-md">
+                  {copy.previewPaperBadge(
+                    copy.paperSizes[paperSize],
+                    paperSizeDetail
+                  )}
+                </Badge>
+              </div>
+
+              <div
+                className="min-w-0 rounded-lg border bg-muted/30 p-3 shadow-sm print:border-0 print:bg-white print:p-0 print:shadow-none"
+                data-print-preview-frame
+              >
+                <div
+                  className="mx-auto w-full max-w-[820px] overflow-y-auto rounded-md bg-white shadow-sm ring-1 ring-border/70 print:max-w-none print:overflow-visible print:rounded-none print:shadow-none print:ring-0 [aspect-ratio:var(--worksheet-paper-aspect)] print:[aspect-ratio:auto]"
+                  style={
+                    {
+                      '--worksheet-paper-aspect': paperPreviewAspectRatio,
+                    } as CSSProperties & {
+                      '--worksheet-paper-aspect': string;
+                    }
+                  }
+                >
+                  <WorksheetPreview
+                    copy={copy}
+                    assignmentNote={normalizedAssignmentNote}
+                    gridCount={gridCount}
+                    practicePrintUrl={practicePrintUrl}
+                    showCharacterDetails={showCharacterDetails}
+                    showFeedbackSection={showFeedbackSection}
+                    selectedItems={selectedItems}
+                    traceMode={traceMode}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1851,6 +1903,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       ],
       packTitle: '完整练习纸套装',
       paperSizeLabel: '纸张大小',
+      paperSizeDescription: (paper: string, detail: string) =>
+        `右侧预览按 ${paper} 比例显示（${detail}），实际页边距仍以浏览器打印设置为准。`,
+      paperSizeDetails: {
+        a4: '210 x 297 mm',
+        a5: '148 x 210 mm',
+        legal: '8.5 x 14 in',
+        letter: '8.5 x 11 in',
+      },
       paperSizes: {
         a4: 'A4',
         a5: 'A5',
@@ -1858,6 +1918,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         letter: 'Letter',
       },
       previewTitle: 'HSK1 汉字书写练习',
+      previewFrameDescription: (paper: string, detail: string) =>
+        `预览会跟随 ${paper} 的纸张比例（${detail}），便于在打印前检查版面。`,
+      previewFrameTitle: '纸张预览',
+      previewPaperBadge: (paper: string, detail: string) =>
+        `${paper} · ${detail}`,
       practiceCta: '继续线上练习',
       printEmptyError: '请先选择至少一个汉字。',
       printCta: '打印练习纸',
@@ -2039,6 +2104,14 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     ],
     packTitle: 'Complete worksheet pack',
     paperSizeLabel: 'Paper size',
+    paperSizeDescription: (paper: string, detail: string) =>
+      `The preview uses ${paper} proportions (${detail}). Browser print settings still control printer margins.`,
+    paperSizeDetails: {
+      a4: '210 x 297 mm',
+      a5: '148 x 210 mm',
+      legal: '8.5 x 14 in',
+      letter: '8.5 x 11 in',
+    },
     paperSizes: {
       a4: 'A4',
       a5: 'A5',
@@ -2046,6 +2119,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       letter: 'Letter',
     },
     previewTitle: 'HSK1 Chinese Character Practice',
+    previewFrameDescription: (paper: string, detail: string) =>
+      `The preview follows ${paper} paper proportions (${detail}) so layout problems are easier to catch before printing.`,
+    previewFrameTitle: 'Paper preview',
+    previewPaperBadge: (paper: string, detail: string) =>
+      `${paper} · ${detail}`,
     practiceCta: 'Continue online',
     printEmptyError: 'Select at least one character before printing.',
     printCta: 'Print worksheet',
