@@ -577,6 +577,18 @@ function ReviewFocusList({
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
+              <Badge
+                variant="outline"
+                className={cn(
+                  'rounded-md',
+                  item.urgency === 'overdue' &&
+                    'border-red-500/40 text-red-700 dark:text-red-300',
+                  item.urgency === 'due' &&
+                    'border-amber-500/40 text-amber-700 dark:text-amber-300'
+                )}
+              >
+                {copy.reviewFocusUrgency[item.urgency]}
+              </Badge>
               {mistakeStrokes.length > 0 ? (
                 mistakeStrokes.slice(0, 3).map((stroke) => (
                   <Badge
@@ -788,6 +800,12 @@ function getCourseCopy(locale: 'en' | 'zh') {
       reviewFocusMistakes: (count: number) => `${count} 次错误`,
       reviewFocusMore: (count: number) => `+${count} 笔`,
       reviewFocusStroke: (stroke: number) => `第 ${stroke} 笔`,
+      reviewFocusUrgency: {
+        due: '该复习',
+        fresh: '今日已练',
+        overdue: '优先',
+        unscheduled: '待安排',
+      },
       reviewTitle: '先复习，再继续',
       reviewWorksheetCta: '打印错字复习纸',
       reviewWorksheetNote: (count: number) =>
@@ -912,6 +930,12 @@ function getCourseCopy(locale: 'en' | 'zh') {
     reviewFocusMistakes: (count: number) => `${count} mistakes`,
     reviewFocusMore: (count: number) => `+${count} strokes`,
     reviewFocusStroke: (stroke: number) => `Stroke ${stroke}`,
+    reviewFocusUrgency: {
+      due: 'Due',
+      fresh: 'Today',
+      overdue: 'Priority',
+      unscheduled: 'Needs date',
+    },
     reviewTitle: 'Review first, then continue',
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>

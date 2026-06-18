@@ -13,10 +13,14 @@ export type CharacterProgress = {
 export type StoredProgress = Record<string, CharacterProgress>;
 
 export type HanziReviewItem = {
+  ageDays: number | null;
   character: LessonCharacter;
   index: number;
   progress: CharacterProgress;
+  urgency: HanziReviewUrgency;
 };
+
+export type HanziReviewUrgency = 'fresh' | 'due' | 'overdue' | 'unscheduled';
 
 export type NextPracticeTarget = {
   character: LessonCharacter;
@@ -53,6 +57,17 @@ export function getPracticeAgeDays(completedAt?: string) {
   const today = getLocalDayStart(new Date()).getTime();
   const completedDay = getLocalDayStart(new Date(completedTime)).getTime();
   return Math.max(0, Math.floor((today - completedDay) / DAY_MS));
+}
+
+export function getHanziReviewUrgency(
+  progress: CharacterProgress
+): HanziReviewUrgency {
+  const ageDays = getPracticeAgeDays(progress.completedAt);
+
+  if (ageDays === null) return 'unscheduled';
+  if (ageDays >= 3) return 'overdue';
+  if (ageDays >= 1) return 'due';
+  return 'fresh';
 }
 
 function getCompletedAtTime(completedAt?: string) {
@@ -99,17 +114,26 @@ export function getHanziProgressSummary(
     return itemProgress?.completed && itemProgress.mistakes === 0;
   }).length;
   const reviewItems = characters
-    .map((character, index) => ({
-      character,
-      index,
-      progress: progress[character.character],
-    }))
+    .map((character, index) => {
+      const itemProgress = progress[character.character];
+
+      return {
+        ageDays: getPracticeAgeDays(itemProgress?.completedAt),
+        character,
+        index,
+        progress: itemProgress,
+        urgency: itemProgress
+          ? getHanziReviewUrgency(itemProgress)
+          : 'unscheduled',
+      };
+    })
     .filter(
       (item): item is HanziReviewItem =>
         Boolean(item.progress?.completed) && item.progress.mistakes > 0
     )
     .sort(
       (a, b) =>
+        getReviewUrgencyRank(b.urgency) - getReviewUrgencyRank(a.urgency) ||
         b.progress.mistakes - a.progress.mistakes ||
         getCompletedAtTime(a.progress.completedAt) -
           getCompletedAtTime(b.progress.completedAt)
@@ -142,6 +166,15 @@ export function getHanziProgressSummary(
     reviewItems,
     total: characters.length,
   };
+}
+
+function getReviewUrgencyRank(urgency: HanziReviewUrgency) {
+  return {
+    fresh: 0,
+    due: 1,
+    overdue: 2,
+    unscheduled: 3,
+  }[urgency];
 }
 
 function getHanziPracticeStats(progressItems: CharacterProgress[]) {

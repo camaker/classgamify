@@ -1211,6 +1211,18 @@ function ReviewQueueCard({
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'rounded-md',
+                              item.urgency === 'overdue' &&
+                                'border-red-500/40 text-red-700 dark:text-red-300',
+                              item.urgency === 'due' &&
+                                'border-amber-500/40 text-amber-700 dark:text-amber-300'
+                            )}
+                          >
+                            {copy.reviewUrgency[item.urgency]}
+                          </Badge>
                           {mistakeStrokes.length > 0 ? (
                             mistakeStrokes.map((stroke) => (
                               <Badge
@@ -1350,6 +1362,12 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       reviewTitle: '复习队列',
       reviewTroubleStrokes: (count: number) =>
         count > 0 ? `${count} 个笔画需要注意` : '重新完整描写一遍',
+      reviewUrgency: {
+        due: '该复习',
+        fresh: '今日已练',
+        overdue: '优先复习',
+        unscheduled: '待安排',
+      },
       reviewWorksheetCta: '打印复习纸',
       reviewWorksheetNote: (count: number) =>
         `先复习你错得最多的 ${count} 个汉字。`,
@@ -1447,6 +1465,12 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewTitle: 'Review queue',
     reviewTroubleStrokes: (count: number) =>
       count > 0 ? `${count} strokes to revisit` : 'Trace it once more',
+    reviewUrgency: {
+      due: 'Due',
+      fresh: 'Practiced today',
+      overdue: 'Priority',
+      unscheduled: 'Needs date',
+    },
     reviewWorksheetCta: 'Print review sheet',
     reviewWorksheetNote: (count: number) =>
       `Start with the ${count} characters you missed most.`,
