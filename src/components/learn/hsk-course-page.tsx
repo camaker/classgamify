@@ -46,6 +46,7 @@ import {
   IconCopy,
   IconDatabaseExport,
   IconDatabaseImport,
+  IconDownload,
   IconFileText,
   IconFlame,
   IconLock,
@@ -53,14 +54,16 @@ import {
   IconRotate,
   IconSparkles,
   IconTargetArrow,
+  IconUpload,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 
 const COURSE_SHARE_DOMAIN = 'getlangstudy.com';
 const PROGRESS_BACKUP_SCHEMA_VERSION = 1;
 const PROGRESS_BACKUP_TYPE = 'hsk1-progress-backup';
+const MAX_PROGRESS_BACKUP_FILE_SIZE = 256 * 1024;
 
 export function HskCoursePage() {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -81,6 +84,7 @@ export function HskCoursePage() {
   const [progress, setProgress] = useState<StoredProgress>({});
   const [backupInput, setBackupInput] = useState('');
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const backupFileInputRef = useRef<HTMLInputElement>(null);
   const progressSummary = useMemo(
     () => getHanziProgressSummary(freeLessonCharacters, progress),
     [freeLessonCharacters, progress]
@@ -162,11 +166,61 @@ export function HskCoursePage() {
       toast.error(copy.shareError);
     }
   };
+  const downloadProgressBackup = () => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      toast.error(copy.progressBackupDownloadError);
+      return;
+    }
+
+    const backup = buildProgressBackup({
+      locale: currentLocale,
+      progress,
+      progressSummary,
+    });
+
+    try {
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: 'application/json',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = buildProgressBackupFileName();
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(copy.progressBackupDownloadSuccess);
+    } catch {
+      toast.error(copy.progressBackupDownloadError);
+    }
+  };
   const updateRestoreDialogOpen = (open: boolean) => {
     setRestoreDialogOpen(open);
 
     if (!open) {
       setBackupInput('');
+    }
+  };
+  const loadProgressBackupFile = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = '';
+
+    if (!file) return;
+
+    if (file.size > MAX_PROGRESS_BACKUP_FILE_SIZE) {
+      toast.error(copy.progressRestoreFileTooLarge);
+      return;
+    }
+
+    try {
+      setBackupInput(await file.text());
+      toast.success(copy.progressRestoreFileLoaded);
+    } catch {
+      toast.error(copy.progressRestoreError);
     }
   };
   const restoreProgressBackup = () => {
@@ -270,6 +324,14 @@ export function HskCoursePage() {
               <Button
                 type="button"
                 variant="outline"
+                onClick={downloadProgressBackup}
+              >
+                <IconDownload className="size-4" />
+                {copy.progressBackupDownloadCta}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => updateRestoreDialogOpen(true)}
               >
                 <IconDatabaseImport className="size-4" />
@@ -309,6 +371,27 @@ export function HskCoursePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-2">
+              <input
+                ref={backupFileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="sr-only"
+                onChange={loadProgressBackupFile}
+              />
+              <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {copy.progressRestoreFileHint}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => backupFileInputRef.current?.click()}
+                >
+                  <IconUpload className="size-4" />
+                  {copy.progressRestoreFileCta}
+                </Button>
+              </div>
               <label
                 className="text-sm font-medium"
                 htmlFor="hsk-progress-backup"
@@ -1062,12 +1145,21 @@ function getCourseCopy(locale: 'en' | 'zh') {
       premiumLabel: 'Pro 字',
       proBadge: 'Pro',
       progressBackupCta: '复制进度备份',
+      progressBackupDownloadCta: '下载备份',
+      progressBackupDownloadError: '备份文件生成失败，请稍后重试。',
+      progressBackupDownloadSuccess: '进度备份文件已下载。',
       progressBackupSuccess: '进度备份已复制。',
       progressRestoreConfirmCta: '恢复进度',
       progressRestoreCta: '恢复进度',
       progressRestoreDescription:
         '粘贴之前复制的 Lang Study 进度备份。恢复后会替换这个浏览器里的 HSK1 本地进度，不会上传到服务器。',
       progressRestoreError: '无法识别这个备份，请检查是否粘贴了完整 JSON。',
+      progressRestoreFileCta: '选择备份文件',
+      progressRestoreFileHint:
+        '你也可以直接选择从 Lang Study 下载的 .json 备份文件。',
+      progressRestoreFileLoaded: '备份文件已载入，请确认后恢复。',
+      progressRestoreFileTooLarge:
+        '备份文件过大，请选择 Lang Study 导出的 JSON 文件。',
       progressRestoreHint:
         '只支持 Lang Study 生成的 HSK1 进度备份，恢复前建议先复制一份当前进度备份。',
       progressRestoreInputLabel: '进度备份 JSON',
@@ -1266,6 +1358,10 @@ function getCourseCopy(locale: 'en' | 'zh') {
     premiumLabel: 'Pro',
     proBadge: 'Pro',
     progressBackupCta: 'Copy progress backup',
+    progressBackupDownloadCta: 'Download backup',
+    progressBackupDownloadError:
+      'Could not create a backup file. Please try again.',
+    progressBackupDownloadSuccess: 'Progress backup file downloaded.',
     progressBackupSuccess: 'Progress backup copied.',
     progressRestoreConfirmCta: 'Restore progress',
     progressRestoreCta: 'Restore progress',
@@ -1273,6 +1369,12 @@ function getCourseCopy(locale: 'en' | 'zh') {
       'Paste a Lang Study progress backup you copied earlier. Restoring replaces the HSK1 progress stored in this browser and does not upload anything.',
     progressRestoreError:
       'This backup could not be read. Check that the full JSON was pasted.',
+    progressRestoreFileCta: 'Choose backup file',
+    progressRestoreFileHint:
+      'You can also choose a .json backup file downloaded from Lang Study.',
+    progressRestoreFileLoaded: 'Backup file loaded. Review it, then restore.',
+    progressRestoreFileTooLarge:
+      'This backup file is too large. Choose a JSON file exported by Lang Study.',
     progressRestoreHint:
       'Only HSK1 progress backups generated by Lang Study are supported. Copy your current backup first if you may need it later.',
     progressRestoreInputLabel: 'Progress backup JSON',
@@ -1488,6 +1590,11 @@ function buildProgressBackup({
     },
     type: PROGRESS_BACKUP_TYPE,
   };
+}
+
+function buildProgressBackupFileName() {
+  const date = new Date().toISOString().slice(0, 10);
+  return `lang-study-hsk1-progress-${date}.json`;
 }
 
 function parseProgressBackup(value: string): StoredProgress | null {
