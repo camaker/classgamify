@@ -31,6 +31,7 @@ export type HanziProgressSummary = {
   activeDayCount: number;
   cleanCount: number;
   completedCount: number;
+  completedTodayCount: number;
   currentStreakDays: number;
   lastPracticeAt?: string;
   lessonComplete: boolean;
@@ -153,6 +154,7 @@ export function getHanziProgressSummary(
     activeDayCount: practiceStats.activeDayCount,
     cleanCount,
     completedCount,
+    completedTodayCount: practiceStats.completedTodayCount,
     currentStreakDays: practiceStats.currentStreakDays,
     lastPracticeAt: practiceStats.lastPracticeAt,
     lessonComplete: completedCount === characters.length,
@@ -189,19 +191,23 @@ function getHanziPracticeStats(progressItems: CharacterProgress[]) {
   if (completedItems.length === 0) {
     return {
       activeDayCount: 0,
+      completedTodayCount: 0,
       currentStreakDays: 0,
       lastPracticeAt: undefined,
       practicedToday: false,
     };
   }
 
-  const dayKeys = new Set(
-    completedItems.map((item) => getLocalDayKey(new Date(item.completedTime)))
-  );
   const today = getLocalDayStart(new Date());
   const yesterday = getOffsetLocalDay(today, -1);
   const todayKey = getLocalDayKey(today);
   const yesterdayKey = getLocalDayKey(yesterday);
+  const dayKeys = new Set(
+    completedItems.map((item) => getLocalDayKey(new Date(item.completedTime)))
+  );
+  const completedTodayCount = completedItems.filter(
+    (item) => getLocalDayKey(new Date(item.completedTime)) === todayKey
+  ).length;
   const practicedToday = dayKeys.has(todayKey);
   const streakStart = practicedToday
     ? today
@@ -221,6 +227,7 @@ function getHanziPracticeStats(progressItems: CharacterProgress[]) {
 
   return {
     activeDayCount: dayKeys.size,
+    completedTodayCount,
     currentStreakDays,
     lastPracticeAt: completedItems.reduce((latest, item) =>
       item.completedTime > latest.completedTime ? item : latest

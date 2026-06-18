@@ -32,6 +32,7 @@ import {
   IconArrowRight,
   IconBook2,
   IconCircleCheck,
+  IconClockHour4,
   IconFileText,
   IconFlame,
   IconLock,
@@ -88,6 +89,7 @@ export function HskCoursePage() {
         : copy.continueWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
   };
+  const dailyTarget = progressSummary.reviewItems.length > 0 ? 2 : 1;
   const lessonProgressItems = useMemo(
     () =>
       lessons.map((lesson) => {
@@ -183,6 +185,7 @@ export function HskCoursePage() {
 
         <DailyPracticePlanCard
           copy={copy}
+          dailyTarget={dailyTarget}
           progressSummary={progressSummary}
           worksheetCharacters={freeCharacters}
         />
@@ -274,10 +277,12 @@ function NextReturnCard({
 
 function DailyPracticePlanCard({
   copy,
+  dailyTarget,
   progressSummary,
   worksheetCharacters,
 }: {
   copy: ReturnType<typeof getCourseCopy>;
+  dailyTarget: number;
   progressSummary: HanziProgressSummary;
   worksheetCharacters: string[];
 }) {
@@ -338,6 +343,10 @@ function DailyPracticePlanCard({
         : copy.continueWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
   };
+  const targetProgressValue = Math.min(
+    100,
+    Math.round((progressSummary.completedTodayCount / dailyTarget) * 100)
+  );
 
   return (
     <section className="grid gap-5 rounded-lg border border-primary/20 bg-primary/5 p-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
@@ -383,6 +392,32 @@ function DailyPracticePlanCard({
         ) : null}
       </div>
       <div className="rounded-lg border bg-background/85 p-3">
+        <div className="mb-4 border-b pb-4">
+          <div className="flex items-start gap-3">
+            <div className="rounded-md bg-primary/10 p-2 text-primary">
+              <IconClockHour4 className="size-4 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium">{copy.todayTargetTitle}</p>
+                <Badge variant="secondary" className="rounded-md">
+                  {copy.todayTargetBadge(
+                    progressSummary.completedTodayCount,
+                    dailyTarget
+                  )}
+                </Badge>
+              </div>
+              <Progress className="mt-3" value={targetProgressValue} />
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {progressSummary.completedTodayCount >= dailyTarget
+                  ? copy.todayTargetComplete
+                  : copy.todayTargetDescription(
+                      dailyTarget - progressSummary.completedTodayCount
+                    )}
+              </p>
+            </div>
+          </div>
+        </div>
         <p className="text-sm font-medium">{copy.todayStepsTitle}</p>
         <ol className="mt-3 grid gap-2">
           {planSteps.map((step, index) => (
@@ -933,6 +968,12 @@ function getCourseCopy(locale: 'en' | 'zh') {
       ],
       todayStartTitle: '从 10 分钟入门练习开始',
       todayStepsTitle: '建议顺序',
+      todayTargetBadge: (completed: number, target: number) =>
+        `${completed}/${target} 今日目标`,
+      todayTargetComplete: '今天的最低练习量已经完成，可以进入纸笔巩固。',
+      todayTargetDescription: (remaining: number) =>
+        `再完成 ${remaining} 个汉字，就能达成今天的最低练习量。`,
+      todayTargetTitle: '今日目标',
       title: 'HSK1 汉字学习路径',
       totalLabel: '总汉字',
       upgradeCta: '查看套餐',
@@ -1086,6 +1127,15 @@ function getCourseCopy(locale: 'en' | 'zh') {
     ],
     todayStartTitle: 'Start with a 10-minute practice plan',
     todayStepsTitle: 'Suggested order',
+    todayTargetBadge: (completed: number, target: number) =>
+      `${completed}/${target} today`,
+    todayTargetComplete:
+      'The minimum practice target is complete. Move into paper reinforcement.',
+    todayTargetDescription: (remaining: number) =>
+      `Complete ${remaining} more ${
+        remaining === 1 ? 'character' : 'characters'
+      } to hit today's minimum practice target.`,
+    todayTargetTitle: "Today's target",
     title: 'HSK1 Chinese Character Learning Path',
     totalLabel: 'Total',
     upgradeCta: 'View plans',
