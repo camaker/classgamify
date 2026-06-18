@@ -33,6 +33,7 @@ import {
   IconBook2,
   IconCheck,
   IconCircleCheck,
+  IconCopy,
   IconFileText,
   IconLock,
   IconPencil,
@@ -43,6 +44,7 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const HANZI_WRITER_SCRIPT =
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js';
@@ -262,6 +264,38 @@ export function HanziPracticePage({
     note: copy.summaryWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
   } as const;
+  const practiceSharePath = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (currentCharacter?.character) {
+      params.set('character', currentCharacter.character);
+    }
+
+    for (const item of lessonCharacters) {
+      params.append('characters', item.character);
+    }
+
+    const search = params.toString();
+    return search ? `${Routes.Learn}?${search}` : Routes.Learn;
+  }, [currentCharacter?.character, lessonCharacters]);
+  const copyPracticeLink = useCallback(async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const url = new URL(practiceSharePath, window.location.origin).toString();
+
+    try {
+      await window.navigator.clipboard.writeText(url);
+      toast.success(copy.shareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  }, [copy.shareError, copy.shareSuccess, practiceSharePath]);
 
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
@@ -307,6 +341,14 @@ export function HanziPracticePage({
                   <IconFileText className="size-4" />
                   {copy.worksheetCta}
                 </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={copyPracticeLink}
+                >
+                  <IconCopy className="size-4" />
+                  {copy.sharePracticeCta}
+                </Button>
                 <Link
                   to={Routes.Pricing}
                   className={cn(buttonVariants({ variant: 'outline' }))}
@@ -1530,6 +1572,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       scopedWorksheetNote: (scope: string) =>
         `${scope}：把这组汉字带到纸面上完成复习。`,
       seePackCta: '查看套餐',
+      shareError: '复制失败，请稍后重试。',
+      sharePracticeCta: '复制练习链接',
+      shareSuccess: '练习链接已复制。',
       strokeCleanBadge: '零错',
       strokeCleanDescription: '这次没有记录到错笔，可以进入下一个汉字。',
       strokeCleanTitle: '书写很稳',
@@ -1690,6 +1735,9 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     scopedWorksheetNote: (scope: string) =>
       `${scope}: take this character set onto paper for review.`,
     seePackCta: 'See paid pack',
+    shareError: 'Could not copy the practice link. Please try again.',
+    sharePracticeCta: 'Copy practice link',
+    shareSuccess: 'Practice link copied.',
     strokeCleanBadge: 'Clean',
     strokeCleanDescription:
       'No missed strokes were recorded. Move on to the next character.',
