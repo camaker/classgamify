@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
   IconBook2,
-  IconBrandGithubFilled,
   IconClipboardText,
   IconMailFilled,
   IconMessageCircle,
@@ -45,7 +44,6 @@ function ContactPage() {
       ? 'Lang Study classroom workflow'
       : 'Lang Study support';
   const mailto = getSupportMailto(supportEmail, directSubject);
-  const github = websiteConfig.social?.github;
   const supportTopics = [
     {
       icon: IconBook2,
@@ -122,7 +120,7 @@ function ContactPage() {
                 ))}
               </ul>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4">
               {mailto && (
                 <a
                   href={mailto}
@@ -135,23 +133,6 @@ function ContactPage() {
                   </p>
                   <p className="mt-4 break-all text-sm font-medium text-primary">
                     {emailAddress}
-                  </p>
-                </a>
-              )}
-              {github && (
-                <a
-                  href={github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <IconBrandGithubFilled className="mb-4 size-5 text-primary" />
-                  <h2 className="font-semibold">{m.contact_github()}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {m.contact_github_description()}
-                  </p>
-                  <p className="mt-4 text-sm font-medium text-primary">
-                    camaker/lang-study
                   </p>
                 </a>
               )}

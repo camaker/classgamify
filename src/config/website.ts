@@ -64,9 +64,6 @@ export const websiteConfig: WebsiteConfig = {
       logoDark: '/logo-dark.png',
     },
   },
-  social: {
-    github: 'https://github.com/camaker/lang-study',
-  },
   auth: {
     enable: true,
     enableGoogleLogin: true,

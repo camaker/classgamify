@@ -40,7 +40,6 @@ export interface ImagesConfig {
 
 /** Social media configuration */
 export interface SocialConfig {
-  github?: string;
   twitter?: string;
   blueSky?: string;
   discord?: string;

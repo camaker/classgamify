@@ -15,7 +15,9 @@ export function organizationJsonLd(): JsonLdNode {
   const supportEmail =
     websiteConfig.mail?.supportEmail?.match(/<([^>]+)>/)?.[1] ??
     websiteConfig.mail?.supportEmail;
-  const sameAs = [websiteConfig.social?.github].filter(Boolean);
+  const sameAs = websiteConfig.social
+    ? Object.values(websiteConfig.social).filter(Boolean)
+    : [];
   const logoPath = websiteConfig.metadata?.images?.logoLight;
   const logo = logoPath ? getImageUrl(logoPath) : undefined;
 

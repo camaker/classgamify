@@ -4,7 +4,6 @@ import {
   IconBrandBluesky,
   IconBrandDiscordFilled,
   IconBrandFacebook,
-  IconBrandGithubFilled,
   IconBrandInstagram,
   IconBrandLinkedin,
   IconBrandMastodon,
@@ -23,14 +22,6 @@ export function getSocialLinks(): MenuItemConfig[] {
   const social: MenuItemConfig[] = [];
   const config = websiteConfig.social;
 
-  if (config?.github) {
-    social.push({
-      title: 'GitHub',
-      href: config.github,
-      icon: IconBrandGithubFilled,
-      external: true,
-    });
-  }
   if (config?.twitter) {
     social.push({
       title: 'Twitter',

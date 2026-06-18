@@ -11,11 +11,6 @@ const logos = [
     alt: 'Column Logo',
     h: 'h-4',
   },
-  {
-    src: 'https://cdn.mksaas.com/svg/github.svg',
-    alt: 'GitHub Logo',
-    h: 'h-4',
-  },
   { src: 'https://cdn.mksaas.com/svg/nike.svg', alt: 'Nike Logo', h: 'h-5' },
   {
     src: 'https://cdn.mksaas.com/svg/laravel.svg',
