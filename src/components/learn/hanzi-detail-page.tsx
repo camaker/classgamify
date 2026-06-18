@@ -362,6 +362,10 @@ function PracticeStatusSummary({
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {copy.statusNotStartedDescription}
             </p>
+            <StatusActionPlan
+              description={copy.statusStartPlanDescription}
+              label={copy.statusPlanLabel}
+            />
           </div>
         </div>
       </div>
@@ -402,6 +406,14 @@ function PracticeStatusSummary({
               {copy.statusRecencyDescription(ageDays, needsReview)}
             </p>
           </div>
+          <StatusActionPlan
+            description={copy.statusPlanDescription(
+              ageDays,
+              needsReview,
+              progress.mistakes
+            )}
+            label={copy.statusPlanLabel}
+          />
           {needsReview ? (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {mistakeStrokes.length > 0 ? (
@@ -421,6 +433,28 @@ function PracticeStatusSummary({
               )}
             </div>
           ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusActionPlan({
+  description,
+  label,
+}: {
+  description: string;
+  label: string;
+}) {
+  return (
+    <div className="mt-3 rounded-md border bg-background/80 px-3 py-2">
+      <div className="flex items-start gap-2">
+        <IconArrowRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+        <div>
+          <p className="text-xs font-medium">{label}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {description}
+          </p>
         </div>
       </div>
     </div>
@@ -507,6 +541,35 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       statusNotStartedDescription:
         '先打开描写练习，完成后这里会显示错笔和复习建议。',
       statusNotStartedTitle: '还没有练过这个字',
+      statusPlanDescription: (
+        ageDays: number | null,
+        needsReview: boolean,
+        mistakes: number
+      ) => {
+        if (needsReview) {
+          if (ageDays === null) {
+            return '先重新描写一次，补上练习记录，再按错笔生成复习纸。';
+          }
+          if (ageDays === 0) {
+            return `今天先修正 ${mistakes} 个错笔，不急着加新字。`;
+          }
+          if (ageDays <= 2) {
+            return '先看笔顺动画，再重做一次描写，把错笔压下去。';
+          }
+          return '先复习这个字，再打印单字复习纸做纸笔巩固。';
+        }
+
+        if (ageDays === null) {
+          return '快速复练一次，确认记录正常后再继续同组新字。';
+        }
+        if (ageDays === 0) {
+          return '可以继续同组下一个字，或打印本组做纸笔巩固。';
+        }
+        return '先快速复练一次，再继续学习新的同课汉字。';
+      },
+      statusPlanLabel: '本次行动',
+      statusStartPlanDescription:
+        '先完成一次完整描写，再根据结果继续新字或打印复习纸。',
       statusReviewDescription: (mistakes: number) =>
         `上次练习记录到 ${mistakes} 次错误，建议先复习这些笔画。`,
       statusReviewTitle: '需要复习',
@@ -600,6 +663,35 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     statusNotStartedDescription:
       'Open tracing practice first. After a run, this card will show missed strokes and review guidance.',
     statusNotStartedTitle: 'Not practiced yet',
+    statusPlanDescription: (
+      ageDays: number | null,
+      needsReview: boolean,
+      mistakes: number
+    ) => {
+      if (needsReview) {
+        if (ageDays === null) {
+          return 'Start with one fresh tracing run, then build a focused worksheet from missed strokes.';
+        }
+        if (ageDays === 0) {
+          return `Fix the ${mistakes} missed strokes today before adding a new character.`;
+        }
+        if (ageDays <= 2) {
+          return 'Watch the stroke animation, then repeat one guided tracing run.';
+        }
+        return 'Refresh this character first, then print a single-character review sheet.';
+      }
+
+      if (ageDays === null) {
+        return 'Do one quick refresh to restore the practice record before moving on.';
+      }
+      if (ageDays === 0) {
+        return 'Continue with the next lesson character, or print the lesson set for paper review.';
+      }
+      return 'Do one quick refresh, then continue with a new lesson character.';
+    },
+    statusPlanLabel: 'Action plan',
+    statusStartPlanDescription:
+      'Complete one guided tracing run, then continue or print based on the result.',
     statusReviewDescription: (mistakes: number) =>
       `Your last run recorded ${mistakes} mistakes. Review these strokes first.`,
     statusReviewTitle: 'Review recommended',
