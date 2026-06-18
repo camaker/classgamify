@@ -159,9 +159,12 @@ export function isLinkActive(
 ): boolean {
   if (!href) return false;
   if (href.includes('#')) return false;
-  const path = href.split('#')[0] ?? '/';
+  if (/^https?:\/\//.test(href)) return false;
+
+  const path = deLocalizeHref(href.split('#')[0] ?? '/');
+  const currentPath = deLocalizeHref(pathname);
   const normalizedHref = path === '/' ? '/' : path.replace(/\/$/, '') || '/';
   const normalizedPath =
-    pathname === '/' ? '/' : pathname.replace(/\/$/, '') || '/';
+    currentPath === '/' ? '/' : currentPath.replace(/\/$/, '') || '/';
   return normalizedPath === normalizedHref;
 }
