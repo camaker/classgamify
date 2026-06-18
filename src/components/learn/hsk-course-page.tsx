@@ -147,6 +147,30 @@ export function HskCoursePage() {
       toast.error(copy.shareError);
     }
   };
+  const copyNextLessonPlan = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const plan = copy.nextLessonPlanMessage({
+      nextCharacter: primaryPracticeCharacter,
+      practiceUrl: primaryPracticeUrl,
+      progressSummary,
+      reviewItems: progressSummary.reviewItems,
+      worksheetUrl: primaryWorksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(plan);
+      toast.success(copy.nextLessonPlanSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
   const copyProgressBackup = async () => {
     if (
       typeof window === 'undefined' ||
@@ -317,6 +341,14 @@ export function HskCoursePage() {
               >
                 <IconCopy className="size-4" />
                 {copy.progressShareCta}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={copyNextLessonPlan}
+              >
+                <IconTargetArrow className="size-4" />
+                {copy.nextLessonPlanCta}
               </Button>
               <Button
                 type="button"
@@ -1167,6 +1199,8 @@ type ProgressShareMessageParams = {
   worksheetUrl: string;
 };
 
+type NextLessonPlanMessageParams = ProgressShareMessageParams;
+
 type ProgressBackupParams = {
   locale: 'en' | 'zh';
   progress: StoredProgress;
@@ -1306,6 +1340,38 @@ function getCourseCopy(locale: 'en' | 'zh') {
         ].join('\n');
       },
       progressShareSuccess: '学习进度报告已复制。',
+      nextLessonPlanCta: '复制下次计划',
+      nextLessonPlanMessage: ({
+        nextCharacter,
+        practiceUrl,
+        progressSummary,
+        reviewItems,
+        worksheetUrl,
+      }: NextLessonPlanMessageParams) => {
+        const reviewCharacters = reviewItems
+          .slice(0, 6)
+          .map((item) => item.character.character)
+          .join(' ');
+        const assignment =
+          reviewItems.length > 0
+            ? `先复习错字：${reviewCharacters}。完成线上描写后，再打印错字练习纸。`
+            : nextCharacter
+              ? `继续练 ${nextCharacter.character} · ${nextCharacter.pinyin}。先看笔顺，再完成一次描写。`
+              : '免费入门组已完成。打印整组练习纸，完成一次纸笔巩固。';
+
+        return [
+          'Lang Study HSK1 下次学习计划',
+          '',
+          `当前进度：${progressSummary.completedCount}/${progressSummary.total}`,
+          `今日已练：${progressSummary.completedTodayCount}`,
+          `本次任务：${assignment}`,
+          `线上练习：${practiceUrl}`,
+          `打印练习纸：${worksheetUrl}`,
+          '',
+          '建议顺序：先线上描写记录错笔，再把同一组汉字带到纸面上慢慢写。完成后圈出最难写的字，下次先复习。',
+        ].join('\n');
+      },
+      nextLessonPlanSuccess: '下次学习计划已复制。',
       progressBadge: (completed: number, total: number) =>
         `${completed}/${total} 已完成`,
       reviewBadge: (count: number) => `${count} 个待复习`,
@@ -1539,6 +1605,38 @@ function getCourseCopy(locale: 'en' | 'zh') {
       ].join('\n');
     },
     progressShareSuccess: 'Progress report copied.',
+    nextLessonPlanCta: 'Copy next plan',
+    nextLessonPlanMessage: ({
+      nextCharacter,
+      practiceUrl,
+      progressSummary,
+      reviewItems,
+      worksheetUrl,
+    }: NextLessonPlanMessageParams) => {
+      const reviewCharacters = reviewItems
+        .slice(0, 6)
+        .map((item) => item.character.character)
+        .join(' ');
+      const assignment =
+        reviewItems.length > 0
+          ? `Review missed characters first: ${reviewCharacters}. Finish online tracing, then print a focused review sheet.`
+          : nextCharacter
+            ? `Continue with ${nextCharacter.character} · ${nextCharacter.pinyin}. Watch stroke order, then complete one tracing run.`
+            : 'The free starter set is complete. Print the full worksheet set for one paper reinforcement pass.';
+
+      return [
+        'Lang Study HSK1 next lesson plan',
+        '',
+        `Current progress: ${progressSummary.completedCount}/${progressSummary.total}`,
+        `Practiced today: ${progressSummary.completedTodayCount}`,
+        `Assignment: ${assignment}`,
+        `Online practice: ${practiceUrl}`,
+        `Printable worksheet: ${worksheetUrl}`,
+        '',
+        'Suggested order: trace online first to record missed strokes, then take the same character set onto paper. Circle the hardest character so the next session starts with review.',
+      ].join('\n');
+    },
+    nextLessonPlanSuccess: 'Next lesson plan copied.',
     progressBadge: (completed: number, total: number) =>
       `${completed}/${total} complete`,
     reviewBadge: (count: number) => `${count} to review`,
