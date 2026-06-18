@@ -21,11 +21,14 @@ import {
   IconBook2,
   IconCalendarMonth,
   IconCalendarStats,
+  IconCircleCheck,
   IconCreditCard,
   IconInfinity,
+  IconLock,
   IconPencil,
   IconPrinter,
   IconShieldCheck,
+  IconSparkles,
   IconUsers,
   type TablerIcon,
 } from '@tabler/icons-react';
@@ -68,6 +71,7 @@ function PricingPage() {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   const faqItems = getPricingFaqItems(currentLocale);
   const classroomCta = getPricingClassroomCta(currentLocale);
+  const planComparison = getPricingPlanComparison(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
   const nextStepCards = getPricingNextStepCards(currentLocale);
   const decisionCards = [
@@ -137,6 +141,7 @@ function PricingPage() {
           currentPlan={currentPlan}
           metadata={userId ? { userId } : undefined}
         />
+        <PlanComparisonSection comparison={planComparison} />
         <section className="space-y-4">
           <div className="mx-auto max-w-2xl space-y-2 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -231,6 +236,115 @@ function PricingPage() {
   );
 }
 
+type PricingComparisonState = 'included' | 'limited' | 'locked';
+
+type PricingComparisonRow = {
+  label: string;
+  state: PricingComparisonState;
+  value: string;
+};
+
+type PricingComparisonPlan = {
+  badge: string;
+  highlighted?: boolean;
+  rows: PricingComparisonRow[];
+  subtitle: string;
+  title: string;
+};
+
+type PricingComparisonCopy = {
+  description: string;
+  eyebrow: string;
+  plans: PricingComparisonPlan[];
+  title: string;
+};
+
+function PlanComparisonSection({
+  comparison,
+}: {
+  comparison: PricingComparisonCopy;
+}) {
+  return (
+    <section className="space-y-4">
+      <div className="mx-auto max-w-3xl space-y-2 text-center">
+        <p className="text-sm font-medium text-primary">{comparison.eyebrow}</p>
+        <h2 className="text-2xl font-semibold tracking-tight">
+          {comparison.title}
+        </h2>
+        <p className="text-muted-foreground">{comparison.description}</p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {comparison.plans.map((plan) => (
+          <PlanComparisonCard key={plan.title} plan={plan} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PlanComparisonCard({ plan }: { plan: PricingComparisonPlan }) {
+  return (
+    <div
+      className={cn(
+        'flex min-w-0 flex-col rounded-lg border bg-card p-5',
+        plan.highlighted && 'border-primary/30 bg-primary/5'
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="font-semibold">{plan.title}</p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {plan.subtitle}
+          </p>
+        </div>
+        <span
+          className={cn(
+            'shrink-0 rounded-md border px-2 py-1 text-xs font-medium',
+            plan.highlighted
+              ? 'border-primary/30 bg-primary/10 text-primary'
+              : 'bg-muted/40 text-muted-foreground'
+          )}
+        >
+          {plan.badge}
+        </span>
+      </div>
+      <div className="mt-5 space-y-3">
+        {plan.rows.map((row) => (
+          <PlanComparisonRowItem key={row.label} row={row} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PlanComparisonRowItem({ row }: { row: PricingComparisonRow }) {
+  const StateIcon =
+    row.state === 'included'
+      ? IconCircleCheck
+      : row.state === 'limited'
+        ? IconSparkles
+        : IconLock;
+
+  return (
+    <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] gap-3">
+      <StateIcon
+        className={cn(
+          'mt-1 size-4 shrink-0',
+          row.state === 'included' && 'text-emerald-600 dark:text-emerald-400',
+          row.state === 'limited' && 'text-amber-600 dark:text-amber-400',
+          row.state === 'locked' && 'text-muted-foreground'
+        )}
+      />
+      <div className="min-w-0">
+        <p className="text-sm font-medium">{row.label}</p>
+        <p className="mt-0.5 text-sm leading-6 text-muted-foreground">
+          {row.value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function getPricingNextStepCards(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return [
@@ -299,6 +413,205 @@ function getPricingClassroomCta(locale: 'en' | 'zh') {
       'If you are planning character practice for a class, tutoring workflow, or family homework routine, tell us the learner count, worksheet needs, and future language scope.',
     eyebrow: 'Classroom and family use',
     title: 'Need a multi-learner or long-term assignment workflow?',
+  };
+}
+
+function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
+  if (locale === 'zh') {
+    return {
+      description:
+        '免费版用于验证练字闭环，Pro 用于系统完成 HSK1，早期终身版适合会长期复用字表、练习纸和未来语言包的用户。',
+      eyebrow: '权益边界',
+      plans: [
+        {
+          badge: '先试用',
+          rows: [
+            {
+              label: '适合场景',
+              state: 'included',
+              value: '先确认笔顺动画、跟随描写和打印样张是否适合自己。',
+            },
+            {
+              label: '学习范围',
+              state: 'limited',
+              value: '当前免费 HSK1 入门汉字，适合建立第一轮练习节奏。',
+            },
+            {
+              label: '复习记录',
+              state: 'limited',
+              value: '在本浏览器保存错笔和复习提示，方便短期继续练。',
+            },
+            {
+              label: '练习纸',
+              state: 'limited',
+              value: '可生成基础打印样张，用来验证纸笔练习流程。',
+            },
+          ],
+          subtitle: '不需要先付款，先跑通一次真实练字流程。',
+          title: '免费入门',
+        },
+        {
+          badge: '推荐',
+          highlighted: true,
+          rows: [
+            {
+              label: '适合场景',
+              state: 'included',
+              value: '准备按完整 HSK1 路径持续练字、复习和打印。',
+            },
+            {
+              label: '学习范围',
+              state: 'included',
+              value: '完整 HSK1 书写路径，围绕每周练习节奏展开。',
+            },
+            {
+              label: '复习记录',
+              state: 'included',
+              value: '错笔历史、间隔复习和每日目标组成连续学习闭环。',
+            },
+            {
+              label: '练习纸',
+              state: 'included',
+              value: '更多练习纸、自定义字表和适合家教/家庭作业的交付。',
+            },
+          ],
+          subtitle: '把一次试练变成可持续完成 HSK1 的学习系统。',
+          title: 'HSK1 Pro',
+        },
+        {
+          badge: '长期',
+          rows: [
+            {
+              label: '适合场景',
+              state: 'included',
+              value: '老师、家长、tutor 和希望长期支持产品的早期用户。',
+            },
+            {
+              label: '学习范围',
+              state: 'included',
+              value: '包含 Pro，并优先获得后续文字系统和语言包访问。',
+            },
+            {
+              label: '复习记录',
+              state: 'included',
+              value: '适合长期复用不同学习者的练习计划和作业流程。',
+            },
+            {
+              label: '练习纸',
+              state: 'included',
+              value: '长期使用自定义字表、打印流程和课堂/家庭作业模板。',
+            },
+          ],
+          subtitle: '面向长期复用练习纸、字表和未来语言扩展的人。',
+          title: '早期终身版',
+        },
+      ],
+      title: '升级后到底多了什么？',
+    };
+  }
+
+  return {
+    description:
+      'Free Starter proves the writing loop, Pro turns it into a full HSK1 routine, and Early Lifetime is for people who expect to reuse lists, worksheets, and future language packs.',
+    eyebrow: 'Plan boundaries',
+    plans: [
+      {
+        badge: 'Try first',
+        rows: [
+          {
+            label: 'Best for',
+            state: 'included',
+            value:
+              'Testing stroke animation, guided tracing, and printable output before paying.',
+          },
+          {
+            label: 'Learning scope',
+            state: 'limited',
+            value:
+              'The current free HSK1 starter characters, enough to build the first practice rhythm.',
+          },
+          {
+            label: 'Review record',
+            state: 'limited',
+            value:
+              'Browser-saved missed strokes and review cues for short practice sessions.',
+          },
+          {
+            label: 'Worksheets',
+            state: 'limited',
+            value:
+              'Basic printable sample sheets to validate the paper practice workflow.',
+          },
+        ],
+        subtitle: 'Run one real writing session without paying first.',
+        title: 'Free Starter',
+      },
+      {
+        badge: 'Recommended',
+        highlighted: true,
+        rows: [
+          {
+            label: 'Best for',
+            state: 'included',
+            value:
+              'Learners who want to finish HSK1 with ongoing writing, review, and print practice.',
+          },
+          {
+            label: 'Learning scope',
+            state: 'included',
+            value:
+              'The complete HSK1 writing path organized around weekly practice.',
+          },
+          {
+            label: 'Review record',
+            state: 'included',
+            value:
+              'Mistake history, spaced review, and daily targets that keep the loop moving.',
+          },
+          {
+            label: 'Worksheets',
+            state: 'included',
+            value:
+              'More worksheets, custom character lists, and handoff tools for tutoring or family work.',
+          },
+        ],
+        subtitle: 'Turn the starter loop into a repeatable HSK1 system.',
+        title: 'HSK1 Pro',
+      },
+      {
+        badge: 'Long term',
+        rows: [
+          {
+            label: 'Best for',
+            state: 'included',
+            value:
+              'Teachers, parents, tutors, and early supporters who expect long-term use.',
+          },
+          {
+            label: 'Learning scope',
+            state: 'included',
+            value:
+              'Includes Pro plus early access to future writing systems and language packs.',
+          },
+          {
+            label: 'Review record',
+            state: 'included',
+            value:
+              'Useful when planning repeatable routines across learners and assignments.',
+          },
+          {
+            label: 'Worksheets',
+            state: 'included',
+            value:
+              'Long-term reuse of custom lists, print workflows, and classroom or family templates.',
+          },
+        ],
+        subtitle:
+          'For reusable worksheets, custom lists, and future languages.',
+        title: 'Early Lifetime',
+      },
+    ],
+    title: 'What changes when you upgrade?',
   };
 }
 
