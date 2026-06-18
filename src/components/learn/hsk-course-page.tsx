@@ -646,6 +646,11 @@ function DailyPracticePlanCard({
         : copy.continueWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
   };
+  const practiceQueueItems = buildDailyPracticeQueueItems({
+    copy,
+    progressSummary,
+    worksheetCharacters,
+  });
   const targetProgressValue = Math.min(
     100,
     Math.round((progressSummary.completedTodayCount / dailyTarget) * 100)
@@ -732,6 +737,12 @@ function DailyPracticePlanCard({
             </li>
           ))}
         </ol>
+        <DailyPracticeQueue
+          copy={copy}
+          items={practiceQueueItems}
+          worksheetCharacters={worksheetCharacters}
+          worksheetSearch={reviewWorksheetSearch}
+        />
         <div className="mt-4 flex flex-wrap gap-2">
           {primaryCharacter ? (
             <Link
@@ -757,6 +768,102 @@ function DailyPracticePlanCard({
         </div>
       </div>
     </section>
+  );
+}
+
+function DailyPracticeQueue({
+  copy,
+  items,
+  worksheetCharacters,
+  worksheetSearch,
+}: {
+  copy: ReturnType<typeof getCourseCopy>;
+  items: DailyPracticeQueueItem[];
+  worksheetCharacters: string[];
+  worksheetSearch: CourseWorksheetSearch;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-4 border-t pt-4">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">{copy.todayQueueTitle}</p>
+        <p className="text-xs leading-5 text-muted-foreground">
+          {copy.todayQueueDescription}
+        </p>
+      </div>
+      <div className="mt-3 grid gap-2">
+        {items.map((item, index) => {
+          const content = (
+            <>
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xs font-medium text-primary">
+                {index + 1}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 items-center gap-2">
+                  {item.kind === 'practice' ? (
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-xl font-semibold">
+                      {item.character.character}
+                    </span>
+                  ) : (
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-primary">
+                      <IconFileText className="size-4" />
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">
+                      {item.title}
+                    </div>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {item.badge}
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+              <IconArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+            </>
+          );
+
+          if (item.kind === 'worksheet') {
+            return (
+              <Link
+                key={`${item.kind}-${index}`}
+                to={Routes.Worksheets}
+                search={worksheetSearch}
+                className={cn(
+                  'group flex min-w-0 items-start gap-3 rounded-lg border',
+                  'bg-background/80 p-3 text-left transition-colors',
+                  'hover:border-primary/50 hover:bg-background'
+                )}
+              >
+                {content}
+              </Link>
+            );
+          }
+
+          return (
+            <Link
+              key={`${item.kind}-${item.character.character}`}
+              to={Routes.Learn}
+              search={{
+                character: item.character.character,
+                characters: worksheetCharacters,
+              }}
+              className={cn(
+                'group flex min-w-0 items-start gap-3 rounded-lg border',
+                'bg-background/80 p-3 text-left transition-colors',
+                'hover:border-primary/50 hover:bg-background'
+              )}
+            >
+              {content}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -1199,6 +1306,21 @@ type CourseWorksheetSearch = {
   trace: 'first' | 'guided';
 };
 
+type DailyPracticeQueueItem =
+  | {
+      badge: string;
+      character: LessonCharacter;
+      description: string;
+      kind: 'practice';
+      title: string;
+    }
+  | {
+      badge: string;
+      description: string;
+      kind: 'worksheet';
+      title: string;
+    };
+
 type ProgressShareMessageParams = {
   nextCharacter?: LessonCharacter;
   practiceUrl: string;
@@ -1228,6 +1350,85 @@ type ParsedProgressBackup = {
   preview: ProgressBackupPreview;
   progress: StoredProgress;
 };
+
+function buildDailyPracticeQueueItems({
+  copy,
+  progressSummary,
+  worksheetCharacters,
+}: {
+  copy: ReturnType<typeof getCourseCopy>;
+  progressSummary: HanziProgressSummary;
+  worksheetCharacters: string[];
+}): DailyPracticeQueueItem[] {
+  const items: DailyPracticeQueueItem[] = [];
+
+  for (const reviewItem of progressSummary.reviewItems.slice(0, 2)) {
+    items.push({
+      badge: copy.reviewFocusUrgency[reviewItem.urgency],
+      character: reviewItem.character,
+      description: copy.todayQueueReviewDescription(
+        reviewItem.progress.mistakes,
+        formatReviewStrokeFocus(reviewItem, copy)
+      ),
+      kind: 'practice',
+      title: copy.todayQueueReviewTitle(reviewItem.character.character),
+    });
+  }
+
+  const nextCharacter = progressSummary.nextPracticeTarget?.character;
+
+  if (
+    nextCharacter &&
+    !items.some(
+      (item) =>
+        item.kind === 'practice' &&
+        item.character.character === nextCharacter.character
+    )
+  ) {
+    items.push({
+      badge: copy.todayQueueNewBadge,
+      character: nextCharacter,
+      description: copy.todayQueueNewDescription(nextCharacter.pinyin),
+      kind: 'practice',
+      title: copy.todayQueueNewTitle(nextCharacter.character),
+    });
+  }
+
+  if (items.length < 3 && worksheetCharacters.length > 0) {
+    items.push({
+      badge: copy.todayQueueWorksheetBadge,
+      description: copy.todayQueueWorksheetDescription(
+        progressSummary.reviewItems.length
+      ),
+      kind: 'worksheet',
+      title: copy.todayQueueWorksheetTitle(
+        progressSummary.reviewItems.length > 0
+      ),
+    });
+  }
+
+  return items.slice(0, 3);
+}
+
+function formatReviewStrokeFocus(
+  item: HanziReviewItem,
+  copy: ReturnType<typeof getCourseCopy>
+) {
+  const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+
+  if (mistakeStrokes.length === 0) {
+    return copy.reviewFocusFullTrace;
+  }
+
+  const focus = mistakeStrokes
+    .slice(0, 3)
+    .map((stroke) => copy.reviewFocusStroke(getDisplayStrokeNumber(stroke)))
+    .join(', ');
+
+  if (mistakeStrokes.length <= 3) return focus;
+
+  return `${focus}, ${copy.reviewFocusMore(mistakeStrokes.length - 3)}`;
+}
 
 function getCourseCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
@@ -1456,6 +1657,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
         '把本组打印出来做纸面复习',
       ],
       todayContinueTitle: '接着上次继续',
+      todayQueueDescription:
+        '按这个顺序点开练习，先清错笔，再接新字，最后回到纸面巩固。',
+      todayQueueNewBadge: '新字',
+      todayQueueNewDescription: (pinyin: string) =>
+        `先听读 ${pinyin}，再看笔顺动画，最后完成一次跟随描写。`,
+      todayQueueNewTitle: (character: string) => `学习 ${character}`,
+      todayQueueReviewDescription: (mistakes: number, focus: string) =>
+        `上次错误 ${mistakes} 次。今天重点处理：${focus}。`,
+      todayQueueReviewTitle: (character: string) => `复习 ${character}`,
+      todayQueueTitle: '今日练习队列',
+      todayQueueWorksheetBadge: '纸笔',
+      todayQueueWorksheetDescription: (reviewCount: number) =>
+        reviewCount > 0
+          ? '线上复习后，把错字打印出来慢慢写一遍。'
+          : '线上描写后，把同一组汉字打印出来做一次独立书写。',
+      todayQueueWorksheetTitle: (hasReview: boolean) =>
+        hasReview ? '打印错字纸' : '打印本组练习纸',
       todayReviewDescription: (count: number) =>
         `${count} 个汉字有错笔记录。今天先把它们清掉，再继续新字。`,
       todayReviewSteps: (count: number) => [
@@ -1724,6 +1942,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
       'Print this lesson set for paper review',
     ],
     todayContinueTitle: 'Pick up where you left off',
+    todayQueueDescription:
+      'Open these in order: clear missed strokes, add the next character, then reinforce on paper.',
+    todayQueueNewBadge: 'New character',
+    todayQueueNewDescription: (pinyin: string) =>
+      `Say ${pinyin}, watch stroke order, then finish one guided tracing run.`,
+    todayQueueNewTitle: (character: string) => `Learn ${character}`,
+    todayQueueReviewDescription: (mistakes: number, focus: string) =>
+      `Last run had ${mistakes} mistakes. Focus today: ${focus}.`,
+    todayQueueReviewTitle: (character: string) => `Review ${character}`,
+    todayQueueTitle: 'Today practice queue',
+    todayQueueWorksheetBadge: 'Paper pass',
+    todayQueueWorksheetDescription: (reviewCount: number) =>
+      reviewCount > 0
+        ? 'After online review, print the missed characters and write them slowly once.'
+        : 'After online tracing, print the same set for one independent writing pass.',
+    todayQueueWorksheetTitle: (hasReview: boolean) =>
+      hasReview ? 'Print missed characters' : 'Print this set',
     todayReviewDescription: (count: number) =>
       `${count} characters have missed strokes saved. Clear those first, then add a new character.`,
     todayReviewSteps: (count: number) => [
