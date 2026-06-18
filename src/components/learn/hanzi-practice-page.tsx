@@ -369,15 +369,9 @@ export function HanziPracticePage({
                 </Link>
               </div>
             </div>
-
-            <PracticeStartGuide
-              copy={copy}
-              currentCharacter={currentCharacter}
-              reviewCount={progressSummary.reviewItems.length}
-            />
           </div>
 
-          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="min-w-0 lg:col-start-2 lg:row-span-3 lg:row-start-1">
             <HanziPracticeCard
               key={currentCharacter.character}
               character={currentCharacter}
@@ -397,7 +391,15 @@ export function HanziPracticePage({
             />
           </div>
 
-          <div className="flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-2">
+          <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+            <PracticeStartGuide
+              copy={copy}
+              currentCharacter={currentCharacter}
+              reviewCount={progressSummary.reviewItems.length}
+            />
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-3">
             <Card className="min-w-0 rounded-lg">
               <CardHeader>
                 <CardTitle>{copy.courseTitle}</CardTitle>
