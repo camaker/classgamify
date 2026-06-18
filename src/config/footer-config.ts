@@ -1,5 +1,4 @@
 import { m } from '@/locale/paraglide/messages';
-import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import type { MenuItemConfig } from '../types';
 /**
@@ -54,15 +53,6 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
   ];
-
-  if (websiteConfig.social?.github) {
-    supportItems.push({
-      title: 'GitHub',
-      href: websiteConfig.social.github,
-      description: m.footer_link_github_desc(),
-      external: true,
-    });
-  }
 
   const legalItems: MenuItemConfig[] = [
     {

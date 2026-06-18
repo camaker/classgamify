@@ -1,6 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
 import { getFooterLinks } from '@/config/footer-config';
-import { getSocialLinks } from '@/config/social-config';
 import { Routes } from '@/lib/routes';
 import { isLinkActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
@@ -19,7 +18,6 @@ import { websiteConfig } from '@/config/website';
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
-  const socialLinks = getSocialLinks();
   return (
     <footer
       className={cn(
@@ -92,26 +90,6 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                 </dd>
               </div>
             </dl>
-            <nav
-              aria-label={m.common_social_links()}
-              className="mt-5 flex items-center gap-2"
-            >
-              {socialLinks?.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <a
-                    key={link.title}
-                    href={link.href ?? '#'}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={link.title}
-                    className="inline-flex size-9 items-center justify-center rounded-full border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                  >
-                    {Icon ? <Icon className="size-4" /> : null}
-                  </a>
-                );
-              })}
-            </nav>
           </div>
 
           <nav
