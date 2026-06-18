@@ -78,6 +78,17 @@ type WorksheetRecentSet = {
   updatedAt: string;
 };
 
+type WorksheetShareConfig = Pick<
+  WorksheetRecentSet,
+  | 'assignmentNote'
+  | 'characters'
+  | 'gridCount'
+  | 'paperSize'
+  | 'showCharacterDetails'
+  | 'showFeedbackSection'
+  | 'traceMode'
+>;
+
 type WorksheetPaperPrintConfig = {
   assignmentGap: string;
   assignmentPadding: string;
@@ -516,33 +527,27 @@ export function WorksheetPage({
     [selectedCharacters]
   );
 
-  const shareUrl = useMemo(() => {
-    const params = new URLSearchParams();
-    for (const character of selectedCharacters) {
-      params.append('characters', character);
-    }
-    params.set('grid', String(gridCount));
-    params.set('paper', paperSize);
-    params.set('trace', traceMode);
-    if (!showCharacterDetails) {
-      params.set('details', 'off');
-    }
-    if (!showFeedbackSection) {
-      params.set('feedback', 'off');
-    }
-    if (normalizedAssignmentNote.length > 0) {
-      params.set('note', normalizedAssignmentNote);
-    }
-    return `${Routes.Worksheets}?${params.toString()}`;
-  }, [
-    gridCount,
-    normalizedAssignmentNote,
-    paperSize,
-    selectedCharacters,
-    showCharacterDetails,
-    showFeedbackSection,
-    traceMode,
-  ]);
+  const shareUrl = useMemo(
+    () =>
+      buildWorksheetSharePath({
+        assignmentNote: normalizedAssignmentNote,
+        characters: selectedCharacters,
+        gridCount,
+        paperSize,
+        showCharacterDetails,
+        showFeedbackSection,
+        traceMode,
+      }),
+    [
+      gridCount,
+      normalizedAssignmentNote,
+      paperSize,
+      selectedCharacters,
+      showCharacterDetails,
+      showFeedbackSection,
+      traceMode,
+    ]
+  );
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -629,6 +634,45 @@ export function WorksheetPage({
       writeStoredRecentWorksheetSets(updatedSets);
       return updatedSets;
     });
+  };
+
+  const copyRecentShareLink = async (recentSet: WorksheetRecentSet) => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(
+      buildWorksheetSharePath(recentSet),
+      window.location.origin
+    ).toString();
+
+    try {
+      await window.navigator.clipboard.writeText(url);
+      toast.success(copy.shareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
+
+  const copyRecentAssignmentMessage = async (recentSet: WorksheetRecentSet) => {
+    if (typeof window === 'undefined') return;
+
+    const worksheetUrl = new URL(
+      buildWorksheetSharePath(recentSet),
+      window.location.origin
+    ).toString();
+    const reviewUrl = `https://${buildPracticePrintUrl(recentSet.characters)}`;
+    const message = copy.assignmentShareMessage({
+      assignmentNote: recentSet.assignmentNote,
+      characters: recentSet.characters,
+      reviewUrl,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.assignmentShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
   };
 
   const resetSelection = () => {
@@ -844,7 +888,7 @@ export function WorksheetPage({
                                 </p>
                               ) : null}
                             </button>
-                            <div className="flex gap-2 sm:justify-end">
+                            <div className="flex flex-wrap gap-2 sm:justify-end">
                               <Button
                                 type="button"
                                 variant="secondary"
@@ -853,6 +897,26 @@ export function WorksheetPage({
                               >
                                 <IconRefresh className="size-3.5" />
                                 {copy.recentRestoreCta}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => copyRecentShareLink(recentSet)}
+                              >
+                                <IconCopy className="size-3.5" />
+                                {copy.recentShareCta}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  copyRecentAssignmentMessage(recentSet)
+                                }
+                              >
+                                <IconMailForward className="size-3.5" />
+                                {copy.recentAssignmentShareCta}
                               </Button>
                               <Button
                                 type="button"
@@ -1725,6 +1789,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       },
       quickSetsDescription: '一键套用常用作业组合，再按需要微调。',
       quickSetsTitle: '快速练习包',
+      recentAssignmentShareCta: '复制作业',
       recentRemoveLabel: '移除最近练习纸',
       recentRestoreCta: '恢复',
       recentRestoreSuccess: '已恢复最近练习纸。',
@@ -1740,6 +1805,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       recentSetsDescription:
         '打印或复制链接后会保存在本机，方便下次继续布置同一组作业。',
       recentSetsTitle: '最近练习纸',
+      recentShareCta: '复制链接',
       resetCta: '重置',
       removeCharacter: (character: string) => `移除 ${character}`,
       selectDescription:
@@ -1910,6 +1976,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     quickSetsDescription:
       'Apply a common assignment set, then adjust the worksheet if needed.',
     quickSetsTitle: 'Quick sets',
+    recentAssignmentShareCta: 'Copy assignment',
     recentRemoveLabel: 'Remove recent worksheet',
     recentRestoreCta: 'Restore',
     recentRestoreSuccess: 'Recent worksheet restored.',
@@ -1925,6 +1992,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     recentSetsDescription:
       'Printing or copying a link saves the setup on this device so repeat assignments are faster.',
     recentSetsTitle: 'Recent worksheets',
+    recentShareCta: 'Copy link',
     resetCta: 'Reset',
     removeCharacter: (character: string) => `Remove ${character}`,
     selectDescription:
@@ -2001,6 +2069,32 @@ function buildPracticePrintUrl(characters: string[]) {
     `${WORKSHEET_DOMAIN}${Routes.Learn}?character=${characters[0]}`,
     `characters=${characters.join(',')}`,
   ].join('&');
+}
+
+function buildWorksheetSharePath(config: WorksheetShareConfig) {
+  const params = new URLSearchParams();
+
+  for (const character of config.characters) {
+    params.append('characters', character);
+  }
+
+  params.set('grid', String(config.gridCount));
+  params.set('paper', config.paperSize);
+  params.set('trace', config.traceMode);
+
+  if (!config.showCharacterDetails) {
+    params.set('details', 'off');
+  }
+
+  if (!config.showFeedbackSection) {
+    params.set('feedback', 'off');
+  }
+
+  if (config.assignmentNote.length > 0) {
+    params.set('note', config.assignmentNote);
+  }
+
+  return `${Routes.Worksheets}?${params.toString()}`;
 }
 
 function isSameSelection(current: string[], next: string[]) {
