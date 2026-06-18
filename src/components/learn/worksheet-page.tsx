@@ -347,6 +347,11 @@ function buildWorksheetPrintStyleText(
     padding: ${config.feedbackPadding} !important;
   }
 
+  body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-online-review] {
+    margin-block-start: ${config.footerMarginTop} !important;
+    padding: ${config.feedbackPadding} !important;
+  }
+
   body[data-print-mode="worksheet"][data-print-paper="${paperSize}"] [data-print-grid] {
     gap: ${config.gridGap} !important;
     grid-template-columns: repeat(auto-fit, minmax(${config.gridMin}, ${config.gridMax})) !important;
@@ -503,6 +508,10 @@ export function WorksheetPage({
             characters: selectedCharacters,
           }
         : {},
+    [selectedCharacters]
+  );
+  const practicePrintUrl = useMemo(
+    () => buildPracticePrintUrl(selectedCharacters),
     [selectedCharacters]
   );
 
@@ -1264,6 +1273,7 @@ export function WorksheetPage({
                 copy={copy}
                 assignmentNote={normalizedAssignmentNote}
                 gridCount={gridCount}
+                practicePrintUrl={practicePrintUrl}
                 showCharacterDetails={showCharacterDetails}
                 showFeedbackSection={showFeedbackSection}
                 selectedItems={selectedItems}
@@ -1282,6 +1292,7 @@ type WorksheetPreviewProps = {
   assignmentNote: string;
   selectedItems: WorksheetCharacter[];
   gridCount: number;
+  practicePrintUrl: string;
   showCharacterDetails: boolean;
   showFeedbackSection: boolean;
   traceMode: TraceMode;
@@ -1292,6 +1303,7 @@ function WorksheetPreview({
   assignmentNote,
   selectedItems,
   gridCount,
+  practicePrintUrl,
   showCharacterDetails,
   showFeedbackSection,
   traceMode,
@@ -1442,6 +1454,37 @@ function WorksheetPreview({
         <WorksheetFeedbackSection copy={copy} />
       ) : null}
 
+      {selectedItems.length > 0 ? (
+        <div
+          className="mt-5 break-inside-avoid rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"
+          data-print-online-review
+        >
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(14rem,0.72fr)] sm:items-center">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 font-semibold text-slate-950">
+                <IconArrowRight className="size-4 shrink-0" />
+                {copy.onlineReviewTitle}
+              </div>
+              <p className="mt-1 leading-6 text-slate-600">
+                {copy.onlineReviewDescription}
+              </p>
+              <p className="mt-2 truncate font-semibold text-slate-950">
+                {selectedItems.map((item) => item.character).join(' ')}
+              </p>
+            </div>
+            <div className="min-w-0 rounded-md border border-slate-200 bg-white px-3 py-2">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                <IconWorldWww className="size-3.5 shrink-0" />
+                {copy.onlineReviewLinkLabel}
+              </div>
+              <div className="mt-1 break-all text-sm font-semibold leading-5 text-slate-950">
+                {practicePrintUrl}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div
         className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500"
         data-print-footer
@@ -1572,6 +1615,10 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       handwritingAssignmentDescription:
         '这是一张干净的手写作业纸。请按顺序慢慢书写，保持每个字居中、大小一致。',
       nameLabel: '姓名',
+      onlineReviewDescription:
+        '纸面写完后，回到线上先复习同一组汉字，再处理圈出的难写字。',
+      onlineReviewLinkLabel: '线上复习链接',
+      onlineReviewTitle: '线上复习同一组',
       packDescription:
         '完整版本将提供 HSK1 全量练习纸、自定义字表、答案提示和学生作业记录。',
       packTitle: '完整练习纸套装',
@@ -1725,6 +1772,10 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     handwritingAssignmentDescription:
       'This is a clean handwriting assignment sheet. Write slowly, keep each character centered, and use consistent size.',
     nameLabel: 'Name',
+    onlineReviewDescription:
+      'After paper practice, reopen the same character set online before reviewing circled hard characters.',
+    onlineReviewLinkLabel: 'Online review link',
+    onlineReviewTitle: 'Review the same set online',
     packDescription:
       'The complete version will unlock full HSK1 worksheets, custom character lists, answer prompts, and saved student assignments.',
     packTitle: 'Complete worksheet pack',
@@ -1859,6 +1910,15 @@ function createWorksheetQuickSets(
       title: copy.quickSets.fullFree.title,
     },
   ].filter((quickSet) => quickSet.characters.length > 0);
+}
+
+function buildPracticePrintUrl(characters: string[]) {
+  if (characters.length === 0) return `${WORKSHEET_DOMAIN}${Routes.Learn}`;
+
+  return [
+    `${WORKSHEET_DOMAIN}${Routes.Learn}?character=${characters[0]}`,
+    `characters=${characters.join(',')}`,
+  ].join('&');
 }
 
 function isSameSelection(current: string[], next: string[]) {
