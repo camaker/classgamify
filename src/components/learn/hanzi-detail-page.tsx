@@ -16,6 +16,7 @@ import {
 } from '@/learn/hanzi-course';
 import {
   getDisplayStrokeNumber,
+  getPracticeAgeDays,
   readStoredHanziProgress,
   type CharacterProgress,
   type StoredProgress,
@@ -369,6 +370,7 @@ function PracticeStatusSummary({
 
   const mistakeStrokes = progress.mistakeStrokes ?? [];
   const needsReview = progress.mistakes > 0;
+  const ageDays = getPracticeAgeDays(progress.completedAt);
 
   return (
     <div
@@ -394,6 +396,12 @@ function PracticeStatusSummary({
               ? copy.statusReviewDescription(progress.mistakes)
               : copy.statusCleanDescription}
           </p>
+          <div className="mt-3 rounded-md border bg-background/70 px-3 py-2">
+            <p className="text-xs font-medium">{copy.statusRecencyLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {copy.statusRecencyDescription(ageDays, needsReview)}
+            </p>
+          </div>
           {needsReview ? (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {mistakeStrokes.length > 0 ? (
@@ -502,6 +510,24 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       statusReviewDescription: (mistakes: number) =>
         `上次练习记录到 ${mistakes} 次错误，建议先复习这些笔画。`,
       statusReviewTitle: '需要复习',
+      statusRecencyDescription: (
+        ageDays: number | null,
+        needsReview: boolean
+      ) => {
+        if (ageDays === null) return '上次练习时间没有记录，建议重新练一遍。';
+        if (ageDays === 0) {
+          return needsReview
+            ? '今天刚练过，趁手感还在先把错笔修掉。'
+            : '今天已经练过，可以继续同组下一个字。';
+        }
+        if (ageDays === 1) {
+          return needsReview
+            ? '昨天练过但还有错笔，今天适合先复习这个字。'
+            : '昨天练过，今天可以快速复练一次保持记忆。';
+        }
+        return `${ageDays} 天前练过，建议先复练一次再进入新字。`;
+      },
+      statusRecencyLabel: '复习时机',
       statusStroke: (stroke: number) => `第 ${stroke} 笔`,
       strokeCount: (count: number) => `${count} 画`,
       strokesLabel: '笔画',
@@ -577,6 +603,26 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     statusReviewDescription: (mistakes: number) =>
       `Your last run recorded ${mistakes} mistakes. Review these strokes first.`,
     statusReviewTitle: 'Review recommended',
+    statusRecencyDescription: (
+      ageDays: number | null,
+      needsReview: boolean
+    ) => {
+      if (ageDays === null) {
+        return 'The last practice time was not saved. Run it once more.';
+      }
+      if (ageDays === 0) {
+        return needsReview
+          ? 'Practiced today. Fix the missed strokes while the shape is fresh.'
+          : 'Practiced today. Continue with the next character in this lesson.';
+      }
+      if (ageDays === 1) {
+        return needsReview
+          ? 'Practiced yesterday with missed strokes. Review this character first today.'
+          : 'Practiced yesterday. Do a quick refresh to keep it warm.';
+      }
+      return `Last practiced ${ageDays} days ago. Refresh this character before adding a new one.`;
+    },
+    statusRecencyLabel: 'Review timing',
     statusStroke: (stroke: number) => `Stroke ${stroke}`,
     strokeCount: (count: number) => `${count} strokes`,
     strokesLabel: 'Strokes',

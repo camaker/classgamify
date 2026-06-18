@@ -38,8 +38,21 @@ export type HanziProgressSummary = {
   total: number;
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function getDisplayStrokeNumber(strokeIndex: number) {
   return strokeIndex + 1;
+}
+
+export function getPracticeAgeDays(completedAt?: string) {
+  if (!completedAt) return null;
+
+  const completedTime = Date.parse(completedAt);
+  if (Number.isNaN(completedTime)) return null;
+
+  const today = getLocalDayStart(new Date()).getTime();
+  const completedDay = getLocalDayStart(new Date(completedTime)).getTime();
+  return Math.max(0, Math.floor((today - completedDay) / DAY_MS));
 }
 
 function getCompletedAtTime(completedAt?: string) {

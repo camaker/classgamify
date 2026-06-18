@@ -17,6 +17,7 @@ import {
 import {
   getDisplayStrokeNumber,
   getHanziProgressSummary,
+  getPracticeAgeDays,
   readStoredHanziProgress,
   writeStoredHanziProgress,
   type CharacterProgress,
@@ -1277,16 +1278,6 @@ function ReviewQueueCard({
       </CardContent>
     </Card>
   );
-}
-
-function getPracticeAgeDays(completedAt?: string) {
-  if (!completedAt) return null;
-
-  const completedTime = Date.parse(completedAt);
-  if (Number.isNaN(completedTime)) return null;
-
-  const dayMs = 24 * 60 * 60 * 1000;
-  return Math.max(0, Math.floor((Date.now() - completedTime) / dayMs));
 }
 
 function getPracticeCopy(locale: 'en' | 'zh') {
