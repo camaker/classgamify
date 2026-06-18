@@ -869,6 +869,7 @@ function HanziPracticeCard({
               progress={lastStats}
             />
             <PracticeCompletionActions
+              character={character}
               completionWorksheetSearch={completionWorksheetSearch}
               copy={copy}
               currentReviewWorksheetSearch={currentReviewWorksheetSearch}
@@ -980,6 +981,7 @@ function PracticeSessionRecap({
 }
 
 function PracticeCompletionActions({
+  character,
   completionWorksheetSearch,
   copy,
   currentReviewWorksheetSearch,
@@ -990,6 +992,7 @@ function PracticeCompletionActions({
   onRetry,
   progress,
 }: {
+  character: LessonCharacter;
   completionWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
   copy: ReturnType<typeof getPracticeCopy>;
   currentReviewWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
@@ -1001,6 +1004,9 @@ function PracticeCompletionActions({
   progress: CharacterProgress;
 }) {
   const hasMistakes = progress.mistakes > 0;
+  const worksheetSearch = hasMistakes
+    ? currentReviewWorksheetSearch
+    : completionWorksheetSearch;
   const title = hasMistakes
     ? copy.completionReviewTitle
     : lessonComplete
@@ -1011,6 +1017,34 @@ function PracticeCompletionActions({
     : lessonComplete
       ? copy.completionLessonDescription
       : copy.completionCleanDescription;
+  const copyResult = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const worksheetUrl = new URL(
+      buildWorksheetPath(worksheetSearch),
+      window.location.origin
+    ).toString();
+    const message = copy.characterResultShareMessage({
+      character,
+      isLastCharacter,
+      lessonComplete,
+      progress,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.characterResultShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
 
   return (
     <div className="mt-4 border-t border-border/70 pt-4">
@@ -1022,6 +1056,10 @@ function PracticeCompletionActions({
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
+          <Button type="button" variant="outline" onClick={copyResult}>
+            <IconCopy className="size-4" />
+            {copy.characterResultShareCta}
+          </Button>
           {hasMistakes ? (
             <>
               <Button type="button" onClick={onRetry}>
@@ -1434,6 +1472,14 @@ function ReviewQueueCard({
   );
 }
 
+type CharacterResultShareMessageParams = {
+  character: LessonCharacter;
+  isLastCharacter: boolean;
+  lessonComplete: boolean;
+  progress: CharacterProgress;
+  worksheetUrl: string;
+};
+
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -1469,6 +1515,39 @@ function getPracticeCopy(locale: 'en' | 'zh') {
         '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packTitle: '继续学习完整 HSK1 路径',
       characterNeedsReview: '已完成，需要复习',
+      characterResultShareCta: '复制本次结果',
+      characterResultShareMessage: ({
+        character,
+        isLastCharacter,
+        lessonComplete,
+        progress,
+        worksheetUrl,
+      }: CharacterResultShareMessageParams) => {
+        const mistakeStrokes = progress.mistakeStrokes ?? [];
+        const hasMistakes = progress.mistakes > 0;
+        const nextStep = hasMistakes
+          ? '先重练错笔，或打印单字复习纸。'
+          : lessonComplete
+            ? '打印本组练习纸，完成纸笔复习。'
+            : isLastCharacter
+              ? '回到课程路径，继续下一组。'
+              : '继续下一个字，保持学习节奏。';
+
+        return [
+          'Lang Study 汉字练习结果',
+          '',
+          `汉字：${character.character} · ${character.pinyin}`,
+          `结果：${hasMistakes ? `${progress.mistakes} 次错误` : '零错完成'}`,
+          mistakeStrokes.length > 0
+            ? `重点笔画：${mistakeStrokes
+                .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+                .join('、')}`
+            : '重点笔画：本次没有记录错笔',
+          `下一步：${nextStep}`,
+          `复习纸：${worksheetUrl}`,
+        ].join('\n');
+      },
+      characterResultShareSuccess: '本次练习结果已复制。',
       characterReviewWorksheetCta: '打印这个错字',
       characterReviewWorksheetNote: (character: string) =>
         `重点复习 ${character} 的错笔：先看引导格，再慢慢独立书写。`,
@@ -1627,6 +1706,39 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
     packTitle: 'Continue with the full HSK1 path',
     characterNeedsReview: 'Complete, review needed',
+    characterResultShareCta: 'Copy result',
+    characterResultShareMessage: ({
+      character,
+      isLastCharacter,
+      lessonComplete,
+      progress,
+      worksheetUrl,
+    }: CharacterResultShareMessageParams) => {
+      const mistakeStrokes = progress.mistakeStrokes ?? [];
+      const hasMistakes = progress.mistakes > 0;
+      const nextStep = hasMistakes
+        ? 'Retry the missed strokes or print a review.'
+        : lessonComplete
+          ? 'Print this set for paper reinforcement.'
+          : isLastCharacter
+            ? 'Return to the course path for the next set.'
+            : 'Continue with the next character while the rhythm is fresh.';
+
+      return [
+        'Lang Study character practice result',
+        '',
+        `Character: ${character.character} · ${character.pinyin}`,
+        `Result: ${hasMistakes ? `${progress.mistakes} mistakes` : 'clean run'}`,
+        mistakeStrokes.length > 0
+          ? `Focus strokes: ${mistakeStrokes
+              .map((stroke) => `stroke ${getDisplayStrokeNumber(stroke)}`)
+              .join(', ')}`
+          : 'Focus strokes: no missed strokes recorded',
+        `Next step: ${nextStep}`,
+        `Review sheet: ${worksheetUrl}`,
+      ].join('\n');
+    },
+    characterResultShareSuccess: 'Practice result copied.',
     characterReviewWorksheetCta: 'Print this review',
     characterReviewWorksheetNote: (character: string) =>
       `Focus on missed strokes for ${character}: use the guided grid first, then write it slowly on your own.`,
@@ -1772,4 +1884,27 @@ function buildWorksheetSearch(
     ...(options.note ? { note: options.note } : {}),
     ...(options.trace ? { trace: options.trace } : {}),
   };
+}
+
+function buildWorksheetPath(search: ReturnType<typeof buildWorksheetSearch>) {
+  const params = new URLSearchParams();
+
+  for (const character of search.characters) {
+    params.append('characters', character);
+  }
+
+  if (search.details !== undefined) {
+    params.set('details', search.details ? 'true' : 'false');
+  }
+
+  if (search.note) {
+    params.set('note', search.note);
+  }
+
+  if (search.trace) {
+    params.set('trace', search.trace);
+  }
+
+  const query = params.toString();
+  return `${Routes.Worksheets}${query ? `?${query}` : ''}`;
 }
