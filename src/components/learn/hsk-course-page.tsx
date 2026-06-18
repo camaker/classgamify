@@ -175,13 +175,11 @@ export function HskCoursePage() {
           </Card>
         </div>
 
-        {progressSummary.completedCount > 0 ? (
-          <ContinueLearningCard
-            copy={copy}
-            progressSummary={progressSummary}
-            worksheetCharacters={freeCharacters}
-          />
-        ) : null}
+        <DailyPracticePlanCard
+          copy={copy}
+          progressSummary={progressSummary}
+          worksheetCharacters={freeCharacters}
+        />
 
         <section className="grid gap-4">
           {lessonProgressItems.map((item, index) => (
@@ -218,7 +216,7 @@ export function HskCoursePage() {
   );
 }
 
-function ContinueLearningCard({
+function DailyPracticePlanCard({
   copy,
   progressSummary,
   worksheetCharacters,
@@ -231,6 +229,47 @@ function ContinueLearningCard({
   const nextCharacter =
     firstReview?.character ?? progressSummary.nextPracticeTarget?.character;
   const primaryCharacter = nextCharacter?.character ?? worksheetCharacters[0];
+  const hasReview = progressSummary.reviewItems.length > 0;
+  const hasStarted = progressSummary.completedCount > 0;
+  const planTitle = hasReview
+    ? copy.todayReviewTitle
+    : progressSummary.lessonComplete
+      ? copy.todayCompleteTitle
+      : hasStarted
+        ? copy.todayContinueTitle
+        : copy.todayStartTitle;
+  const planDescription =
+    hasReview && firstReview
+      ? copy.todayReviewDescription(progressSummary.reviewItems.length)
+      : progressSummary.lessonComplete
+        ? copy.todayCompleteDescription
+        : progressSummary.nextPracticeTarget
+          ? copy.todayContinueDescription(
+              progressSummary.nextPracticeTarget.character.character,
+              progressSummary.nextPracticeTarget.character.pinyin
+            )
+          : copy.todayStartDescription;
+  const planSteps = hasReview
+    ? copy.todayReviewSteps(progressSummary.reviewItems.length)
+    : progressSummary.lessonComplete
+      ? copy.todayCompleteSteps
+      : hasStarted && progressSummary.nextPracticeTarget
+        ? copy.todayContinueSteps(
+            progressSummary.nextPracticeTarget.character.character
+          )
+        : copy.todayStartSteps(primaryCharacter);
+  const primaryActionLabel = hasReview
+    ? copy.reviewCta
+    : progressSummary.lessonComplete
+      ? copy.practiceAgainCta
+      : hasStarted
+        ? copy.continueCta
+        : copy.practiceCta;
+  const worksheetActionLabel = hasReview
+    ? copy.reviewWorksheetCta
+    : hasStarted
+      ? copy.continueWorksheetCta
+      : copy.worksheetCta;
   const reviewWorksheetSearch = {
     characters:
       progressSummary.reviewCharacters.length > 0
@@ -245,20 +284,22 @@ function ContinueLearningCard({
   };
 
   return (
-    <section className="grid gap-4 rounded-lg border border-primary/20 bg-primary/5 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <section className="grid gap-5 rounded-lg border border-primary/20 bg-primary/5 p-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
             <IconFlame className="size-3.5" />
-            {copy.continueBadge}
+            {copy.todayBadge}
           </Badge>
-          <Badge variant="outline" className="rounded-md">
-            {copy.progressBadge(
-              progressSummary.completedCount,
-              progressSummary.total
-            )}
-          </Badge>
-          {progressSummary.reviewItems.length > 0 ? (
+          {hasStarted ? (
+            <Badge variant="outline" className="rounded-md">
+              {copy.progressBadge(
+                progressSummary.completedCount,
+                progressSummary.total
+              )}
+            </Badge>
+          ) : null}
+          {hasReview ? (
             <Badge variant="outline" className="rounded-md">
               <IconRotate className="size-3.5" />
               {copy.reviewBadge(progressSummary.reviewItems.length)}
@@ -266,28 +307,12 @@ function ContinueLearningCard({
           ) : null}
         </div>
         <div className="max-w-3xl space-y-1">
-          <h2 className="text-xl font-semibold">
-            {progressSummary.reviewItems.length > 0
-              ? copy.reviewTitle
-              : progressSummary.lessonComplete
-                ? copy.finishedTitle
-                : copy.continueTitle}
-          </h2>
+          <h2 className="text-xl font-semibold">{planTitle}</h2>
           <p className="text-sm leading-6 text-muted-foreground">
-            {progressSummary.reviewItems.length > 0 && firstReview
-              ? copy.reviewDescription(
-                  firstReview.character.character,
-                  firstReview.progress.mistakes
-                )
-              : progressSummary.nextPracticeTarget
-                ? copy.continueDescription(
-                    progressSummary.nextPracticeTarget.character.character,
-                    progressSummary.nextPracticeTarget.character.pinyin
-                  )
-                : copy.finishedDescription}
+            {planDescription}
           </p>
         </div>
-        {progressSummary.reviewItems.length > 0 ? (
+        {hasReview ? (
           <ReviewFocusList
             copy={copy}
             reviewItems={progressSummary.reviewItems}
@@ -295,29 +320,41 @@ function ContinueLearningCard({
           />
         ) : null}
       </div>
-      <div className="flex flex-wrap gap-2 md:justify-end">
-        {primaryCharacter ? (
+      <div className="rounded-lg border bg-background/85 p-3">
+        <p className="text-sm font-medium">{copy.todayStepsTitle}</p>
+        <ol className="mt-3 grid gap-2">
+          {planSteps.map((step, index) => (
+            <li key={step} className="flex items-start gap-2 text-sm">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xs font-medium text-primary">
+                {index + 1}
+              </span>
+              <span className="leading-5 text-muted-foreground">{step}</span>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {primaryCharacter ? (
+            <Link
+              to={Routes.Learn}
+              search={{
+                character: primaryCharacter,
+                characters: worksheetCharacters,
+              }}
+              className={buttonVariants()}
+            >
+              <IconPencil className="size-4" />
+              {primaryActionLabel}
+            </Link>
+          ) : null}
           <Link
-            to={Routes.Learn}
-            search={{ character: primaryCharacter }}
-            className={buttonVariants()}
+            to={Routes.Worksheets}
+            search={reviewWorksheetSearch}
+            className={cn(buttonVariants({ variant: 'outline' }))}
           >
-            <IconPencil className="size-4" />
-            {progressSummary.reviewItems.length > 0
-              ? copy.reviewCta
-              : copy.continueCta}
+            <IconFileText className="size-4" />
+            {worksheetActionLabel}
           </Link>
-        ) : null}
-        <Link
-          to={Routes.Worksheets}
-          search={reviewWorksheetSearch}
-          className={cn(buttonVariants({ variant: 'outline' }))}
-        >
-          <IconFileText className="size-4" />
-          {progressSummary.reviewItems.length > 0
-            ? copy.reviewWorksheetCta
-            : copy.continueWorksheetCta}
-        </Link>
+        </div>
       </div>
     </section>
   );
@@ -698,6 +735,40 @@ function getCourseCopy(locale: 'en' | 'zh') {
       summaryTitle: 'HSK1 Starter',
       tileCompleteBadge: '已完成',
       tileReviewBadge: '复习',
+      todayBadge: '今日计划',
+      todayCompleteDescription:
+        '免费入门组已经完成。今天适合做一次纸笔复习，再挑错笔回到线上巩固。',
+      todayCompleteSteps: [
+        '打印整组练习纸',
+        '圈出最难写的字',
+        '回到线上复习错笔',
+      ],
+      todayCompleteTitle: '今天做一次纸笔巩固',
+      todayContinueDescription: (character: string, pinyin: string) =>
+        `下一步练 ${character} · ${pinyin}，先看笔顺，再完成一次描写。`,
+      todayContinueSteps: (character: string) => [
+        `继续练 ${character}`,
+        '完成一次描写并记录错笔',
+        '把本组打印出来做纸面复习',
+      ],
+      todayContinueTitle: '接着上次继续',
+      todayReviewDescription: (count: number) =>
+        `${count} 个汉字有错笔记录。今天先把它们清掉，再继续新字。`,
+      todayReviewSteps: (count: number) => [
+        `先复习 ${count} 个错字`,
+        '重点看错笔对应的笔顺动画',
+        '打印错字复习纸做一遍纸笔练习',
+      ],
+      todayReviewTitle: '今天先复习错笔',
+      todayStartDescription:
+        '用 10 分钟完成第一个免费汉字：先看笔顺，再跟着描写，最后打印一张小练习纸。',
+      todayStartSteps: (character: string) => [
+        `从 ${character} 开始看笔顺`,
+        '完成一次跟随描写',
+        '打印入门 6 字练习纸',
+      ],
+      todayStartTitle: '从 10 分钟入门练习开始',
+      todayStepsTitle: '建议顺序',
       title: 'HSK1 汉字学习路径',
       totalLabel: '总汉字',
       upgradeCta: '查看套餐',
@@ -774,6 +845,40 @@ function getCourseCopy(locale: 'en' | 'zh') {
     summaryTitle: 'HSK1 Starter',
     tileCompleteBadge: 'Done',
     tileReviewBadge: 'Review',
+    todayBadge: 'Today',
+    todayCompleteDescription:
+      'The free starter set is complete. Use today for one paper pass, then bring tricky characters back into tracing.',
+    todayCompleteSteps: [
+      'Print the full starter set',
+      'Circle the hardest characters',
+      'Review missed strokes online',
+    ],
+    todayCompleteTitle: 'Do one paper review pass today',
+    todayContinueDescription: (character: string, pinyin: string) =>
+      `Next up: ${character} · ${pinyin}. Watch the stroke order, then finish one tracing run.`,
+    todayContinueSteps: (character: string) => [
+      `Continue with ${character}`,
+      'Finish one tracing run and record missed strokes',
+      'Print this lesson set for paper review',
+    ],
+    todayContinueTitle: 'Pick up where you left off',
+    todayReviewDescription: (count: number) =>
+      `${count} characters have missed strokes saved. Clear those first, then add a new character.`,
+    todayReviewSteps: (count: number) => [
+      `Review ${count} missed characters`,
+      'Watch the stroke animation for the missed strokes',
+      'Print a focused review sheet',
+    ],
+    todayReviewTitle: 'Review missed strokes first',
+    todayStartDescription:
+      'Spend 10 minutes on the first free character: watch stroke order, trace once, then print a small starter sheet.',
+    todayStartSteps: (character: string) => [
+      `Start with ${character}`,
+      'Complete one guided tracing run',
+      'Print the starter-six worksheet',
+    ],
+    todayStartTitle: 'Start with a 10-minute practice plan',
+    todayStepsTitle: 'Suggested order',
     title: 'HSK1 Chinese Character Learning Path',
     totalLabel: 'Total',
     upgradeCta: 'View plans',
