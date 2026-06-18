@@ -85,6 +85,7 @@ export function ContactFormCard({
                   <FormLabel>{m.contact_name()}</FormLabel>
                   <FormControl>
                     <Input
+                      autoComplete="name"
                       placeholder={m.contact_placeholder_name()}
                       {...field}
                     />
@@ -101,6 +102,7 @@ export function ContactFormCard({
                   <FormLabel>{m.contact_email()}</FormLabel>
                   <FormControl>
                     <Input
+                      autoComplete="email"
                       type="email"
                       placeholder={m.contact_placeholder_email()}
                       {...field}
