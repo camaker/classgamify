@@ -257,6 +257,10 @@ export function HanziPracticePage({
     );
   }, [lessonCharacters.length]);
 
+  const practiceCharacters = useMemo(
+    () => lessonCharacters.map((item) => item.character),
+    [lessonCharacters]
+  );
   const worksheetCharacters = useMemo(
     () =>
       lessonCharacters
@@ -277,14 +281,14 @@ export function HanziPracticePage({
       params.set('character', currentCharacter.character);
     }
 
-    for (const item of lessonCharacters) {
-      params.append('characters', item.character);
+    for (const item of practiceCharacters) {
+      params.append('characters', item);
     }
 
     const search = params.toString();
     const path = getPathWithLocale(Routes.Learn, currentLocale);
     return search ? `${path}?${search}` : path;
-  }, [currentCharacter?.character, currentLocale, lessonCharacters]);
+  }, [currentCharacter?.character, currentLocale, practiceCharacters]);
   const copyPracticeLink = useCallback(async () => {
     if (
       typeof window === 'undefined' ||
@@ -446,8 +450,11 @@ export function HanziPracticePage({
 
             <DailyRhythmCard
               copy={copy}
+              currentLocale={currentLocale}
+              practiceCharacters={practiceCharacters}
               progressSummary={progressSummary}
               total={lessonCharacters.length}
+              worksheetCharacters={worksheetCharacters}
             />
 
             <LearningGuideLinks mode="practice" />
@@ -1445,17 +1452,50 @@ function LearningLoopCard({
 
 function DailyRhythmCard({
   copy,
+  currentLocale,
+  practiceCharacters,
   progressSummary,
   total,
+  worksheetCharacters,
 }: {
   copy: ReturnType<typeof getPracticeCopy>;
+  currentLocale: 'en' | 'zh';
+  practiceCharacters: string[];
   progressSummary: HanziProgressSummary;
   total: number;
+  worksheetCharacters: string[];
 }) {
   const dailyTarget = Math.min(DAILY_PRACTICE_TARGET, Math.max(total, 1));
   const completedToday = Math.min(progressSummary.completedTodayCount, total);
   const remainingToday = Math.max(dailyTarget - completedToday, 0);
   const reviewCount = progressSummary.reviewItems.length;
+  const firstReview = progressSummary.reviewItems[0];
+  const nextCharacter =
+    firstReview?.character ?? progressSummary.nextPracticeTarget?.character;
+  const targetCharacters =
+    progressSummary.reviewCharacters.length > 0
+      ? progressSummary.reviewCharacters
+      : worksheetCharacters;
+  const targetWorksheetSearch = buildWorksheetSearch(targetCharacters, {
+    details: true,
+    note:
+      progressSummary.reviewCharacters.length > 0
+        ? copy.reviewWorksheetNote(progressSummary.reviewCharacters.length)
+        : copy.loopWorksheetNote,
+    trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
+  });
+  const practiceUrl = new URL(
+    buildPracticePath(
+      nextCharacter?.character ?? practiceCharacters[0] ?? '',
+      practiceCharacters,
+      currentLocale
+    ),
+    'https://getlangstudy.com'
+  ).toString();
+  const worksheetUrl = new URL(
+    buildWorksheetPath(targetWorksheetSearch, currentLocale),
+    'https://getlangstudy.com'
+  ).toString();
   const targetProgress =
     dailyTarget > 0
       ? Math.min(100, Math.round((completedToday / dailyTarget) * 100))
@@ -1483,6 +1523,31 @@ function DailyRhythmCard({
       value: copy.dailyRhythmLastPracticeValue(progressSummary.lastPracticeAt),
     },
   ];
+  const copyDailyPlan = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const message = copy.dailyRhythmShareMessage({
+      completedToday,
+      dailyTarget,
+      practiceUrl,
+      progressSummary,
+      remainingToday,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.dailyRhythmShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
 
   return (
     <Card className="rounded-lg">
@@ -1537,6 +1602,22 @@ function DailyRhythmCard({
             reviewCount,
             progressSummary.lessonComplete
           )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={copyDailyPlan}>
+            <IconMailForward className="size-4" />
+            {copy.dailyRhythmShareCta}
+          </Button>
+          <Link
+            to={Routes.Worksheets}
+            search={targetWorksheetSearch}
+            className={cn(buttonVariants({ variant: 'outline' }))}
+          >
+            <IconFileText className="size-4" />
+            {progressSummary.reviewCharacters.length > 0
+              ? copy.loopReviewWorksheetCta
+              : copy.loopWorksheetCta}
+          </Link>
         </div>
       </CardContent>
     </Card>
@@ -1802,6 +1883,15 @@ type ReviewAssignmentShareMessageParams = {
   worksheetUrl: string;
 };
 
+type DailyRhythmShareMessageParams = {
+  completedToday: number;
+  dailyTarget: number;
+  practiceUrl: string;
+  progressSummary: HanziProgressSummary;
+  remainingToday: number;
+  worksheetUrl: string;
+};
+
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -1856,6 +1946,52 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       },
       dailyRhythmRemaining: (count: number) => `今天还差 ${count} 个汉字`,
       dailyRhythmReviewDetail: (count: number) => `${count} 个汉字建议先复习`,
+      dailyRhythmShareCta: '复制今日计划',
+      dailyRhythmShareMessage: ({
+        completedToday,
+        dailyTarget,
+        practiceUrl,
+        progressSummary,
+        remainingToday,
+        worksheetUrl,
+      }: DailyRhythmShareMessageParams) => {
+        const reviewItems = progressSummary.reviewItems.slice(0, 4);
+        const reviewLines = reviewItems.map((item, index) => {
+          const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+          const strokeText =
+            mistakeStrokes.length > 0
+              ? mistakeStrokes
+                  .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+                  .join('、')
+              : '完整描写一遍';
+
+          return `${index + 1}. ${item.character.character} · ${
+            item.character.pinyin
+          }：${item.progress.mistakes} 次错误，重点 ${strokeText}`;
+        });
+        const nextStep =
+          reviewItems.length > 0
+            ? '先清复习队列，再继续新字。'
+            : progressSummary.lessonComplete
+              ? '打印本组练习纸，完成一次纸笔复习。'
+              : remainingToday === 0
+                ? '今天短练目标已完成，明天回来先看复习队列。'
+                : `再完成 ${remainingToday} 个汉字，完成今天短练目标。`;
+
+        return [
+          'Lang Study 今日练习计划',
+          '',
+          `今日目标：${completedToday}/${dailyTarget} 个汉字`,
+          `连续节奏：${progressSummary.currentStreakDays} 天连续，累计 ${progressSummary.activeDayCount} 天练习`,
+          reviewLines.length > 0 ? '优先复习：' : '优先复习：当前没有错字队列',
+          ...reviewLines,
+          `下一步：${nextStep}`,
+          `线上练习：${practiceUrl}`,
+          `打印练习纸：${worksheetUrl}`,
+          '来自：getlangstudy.com',
+        ].join('\n');
+      },
+      dailyRhythmShareSuccess: '今日练习计划已复制。',
       dailyRhythmStreakLabel: '连续节奏',
       dailyRhythmStreakValue: (count: number) =>
         count > 0 ? `${count} 天连续` : '还未开始',
@@ -2199,6 +2335,56 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     dailyRhythmRemaining: (count: number) => `${count} characters left today`,
     dailyRhythmReviewDetail: (count: number) =>
       `${count} characters should come first`,
+    dailyRhythmShareCta: 'Copy daily plan',
+    dailyRhythmShareMessage: ({
+      completedToday,
+      dailyTarget,
+      practiceUrl,
+      progressSummary,
+      remainingToday,
+      worksheetUrl,
+    }: DailyRhythmShareMessageParams) => {
+      const reviewItems = progressSummary.reviewItems.slice(0, 4);
+      const reviewLines = reviewItems.map((item, index) => {
+        const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+        const strokeText =
+          mistakeStrokes.length > 0
+            ? mistakeStrokes
+                .map((stroke) => `stroke ${getDisplayStrokeNumber(stroke)}`)
+                .join(', ')
+            : 'full trace';
+
+        return `${index + 1}. ${item.character.character} · ${
+          item.character.pinyin
+        }: ${item.progress.mistakes} ${
+          item.progress.mistakes === 1 ? 'mistake' : 'mistakes'
+        }, focus ${strokeText}`;
+      });
+      const nextStep =
+        reviewItems.length > 0
+          ? 'Clear the review queue before adding new characters.'
+          : progressSummary.lessonComplete
+            ? 'Print this set and complete one paper review pass.'
+            : remainingToday === 0
+              ? "Today's short practice target is done. Start with review tomorrow."
+              : `Finish ${remainingToday} more characters to complete today's short session.`;
+
+      return [
+        'Lang Study daily practice plan',
+        '',
+        `Daily target: ${completedToday}/${dailyTarget} characters`,
+        `Practice rhythm: ${progressSummary.currentStreakDays}-day streak, ${progressSummary.activeDayCount} active days total`,
+        reviewLines.length > 0
+          ? 'Review first:'
+          : 'Review first: no review queue right now',
+        ...reviewLines,
+        `Next step: ${nextStep}`,
+        `Online practice: ${practiceUrl}`,
+        `Printable worksheet: ${worksheetUrl}`,
+        'From: getlangstudy.com',
+      ].join('\n');
+    },
+    dailyRhythmShareSuccess: 'Daily practice plan copied.',
     dailyRhythmStreakLabel: 'Practice rhythm',
     dailyRhythmStreakValue: (count: number) =>
       count > 0 ? `${count}-day streak` : 'Not started',
