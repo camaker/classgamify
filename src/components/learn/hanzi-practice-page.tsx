@@ -447,6 +447,7 @@ export function HanziPracticePage({
             <ReviewQueueCard
               cleanCount={progressSummary.cleanCount}
               copy={copy}
+              currentLocale={currentLocale}
               onSelect={(index) => setCurrentIndex(index)}
               reviewCharacters={progressSummary.reviewCharacters}
               reviewItems={progressSummary.reviewItems}
@@ -1434,6 +1435,7 @@ function LearningLoopCard({
 function ReviewQueueCard({
   cleanCount,
   copy,
+  currentLocale,
   onSelect,
   reviewCharacters,
   reviewItems,
@@ -1441,6 +1443,7 @@ function ReviewQueueCard({
 }: {
   cleanCount: number;
   copy: ReturnType<typeof getPracticeCopy>;
+  currentLocale: 'en' | 'zh';
   onSelect: (index: number) => void;
   reviewCharacters: string[];
   reviewItems: HanziReviewItem[];
@@ -1459,6 +1462,41 @@ function ReviewQueueCard({
     note: copy.reviewWorksheetNote(reviewCharacters.length),
     trace: 'guided',
   });
+  const copyReviewAssignment = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText ||
+      !firstReview
+    ) {
+      toast.error(copy.shareError);
+      return;
+    }
+
+    const practiceUrl = new URL(
+      buildPracticePath(
+        firstReview.character.character,
+        reviewCharacters,
+        currentLocale
+      ),
+      window.location.origin
+    ).toString();
+    const worksheetUrl = new URL(
+      buildWorksheetPath(reviewWorksheetSearch, currentLocale),
+      window.location.origin
+    ).toString();
+    const message = copy.reviewAssignmentShareMessage({
+      practiceUrl,
+      reviewItems,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.reviewAssignmentShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
 
   return (
     <Card className="rounded-lg">
@@ -1606,6 +1644,14 @@ function ReviewQueueCard({
                 <IconFileText className="size-4" />
                 {copy.reviewWorksheetCta}
               </Link>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={copyReviewAssignment}
+              >
+                <IconMailForward className="size-4" />
+                {copy.reviewAssignmentShareCta}
+              </Button>
             </div>
           </>
         ) : (
@@ -1638,6 +1684,12 @@ type CharacterAssignmentShareMessageParams =
   CharacterResultShareMessageParams & {
     practiceUrl: string;
   };
+
+type ReviewAssignmentShareMessageParams = {
+  practiceUrl: string;
+  reviewItems: HanziReviewItem[];
+  worksheetUrl: string;
+};
 
 function getPracticeCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
@@ -1776,6 +1828,38 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       progressNotStarted: '未开始',
       reviewCleanLabel: '零错完成',
       reviewDescription: '有错笔的汉字会自动进入这里，下一轮先复习它们。',
+      reviewAssignmentShareCta: '复制复习作业',
+      reviewAssignmentShareMessage: ({
+        practiceUrl,
+        reviewItems,
+        worksheetUrl,
+      }: ReviewAssignmentShareMessageParams) => {
+        const focusItems = reviewItems.slice(0, 4).map((item, index) => {
+          const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+          const strokeText =
+            mistakeStrokes.length > 0
+              ? `重点笔画：${mistakeStrokes
+                  .map((stroke) => `第 ${getDisplayStrokeNumber(stroke)} 笔`)
+                  .join('、')}`
+              : '重点笔画：完整描写一遍';
+
+          return `${index + 1}. ${item.character.character} · ${
+            item.character.pinyin
+          }，${item.progress.mistakes} 次错误，${strokeText}`;
+        });
+
+        return [
+          'Lang Study 复习作业',
+          '',
+          `今天先复习 ${reviewItems.length} 个有错笔记录的汉字。`,
+          ...focusItems,
+          '',
+          `线上复习：${practiceUrl}`,
+          `打印复习纸：${worksheetUrl}`,
+          '来自：getlangstudy.com',
+        ].join('\n');
+      },
+      reviewAssignmentShareSuccess: '复习作业已复制。',
       reviewBadge: (count: number) => `${count} 个待复习`,
       reviewDueLabel: '待复习',
       reviewEmptyDescription: '开始描写练习后，有错笔的字会自动出现在这里。',
@@ -2040,6 +2124,40 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     reviewCleanLabel: 'Clean runs',
     reviewDescription:
       'Characters with missed strokes are saved here so the next session has a clear focus.',
+    reviewAssignmentShareCta: 'Copy review assignment',
+    reviewAssignmentShareMessage: ({
+      practiceUrl,
+      reviewItems,
+      worksheetUrl,
+    }: ReviewAssignmentShareMessageParams) => {
+      const focusItems = reviewItems.slice(0, 4).map((item, index) => {
+        const mistakeStrokes = item.progress.mistakeStrokes ?? [];
+        const strokeText =
+          mistakeStrokes.length > 0
+            ? `focus strokes: ${mistakeStrokes
+                .map((stroke) => `stroke ${getDisplayStrokeNumber(stroke)}`)
+                .join(', ')}`
+            : 'focus strokes: full trace';
+
+        return `${index + 1}. ${item.character.character} · ${
+          item.character.pinyin
+        }, ${item.progress.mistakes} ${
+          item.progress.mistakes === 1 ? 'mistake' : 'mistakes'
+        }, ${strokeText}`;
+      });
+
+      return [
+        'Lang Study review assignment',
+        '',
+        `Review ${reviewItems.length} characters with missed strokes first today.`,
+        ...focusItems,
+        '',
+        `Online review: ${practiceUrl}`,
+        `Printable review sheet: ${worksheetUrl}`,
+        'From: getlangstudy.com',
+      ].join('\n');
+    },
+    reviewAssignmentShareSuccess: 'Review assignment copied.',
     reviewBadge: (count: number) => `${count} to review`,
     reviewDueLabel: 'Due for review',
     reviewEmptyDescription:
