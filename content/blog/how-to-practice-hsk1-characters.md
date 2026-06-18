@@ -1,6 +1,6 @@
 ---
 title: How to practice HSK1 characters without rushing
-description: A practical HSK1 character routine for beginners: short online tracing, focused review, and printable worksheets.
+description: A practical HSK1 character routine for beginners with short online tracing, focused review, and printable worksheets.
 date: 2026-02-12
 category: HSK1
 image: https://getlangstudy.com/og.png
