@@ -284,11 +284,17 @@ function normalizeRecentWorksheetSet(value: unknown) {
     showCharacterDetails: item.showCharacterDetails !== false,
     showFeedbackSection: item.showFeedbackSection !== false,
     traceMode,
-    updatedAt:
-      typeof item.updatedAt === 'string'
-        ? item.updatedAt
-        : new Date().toISOString(),
+    updatedAt: normalizeRecentWorksheetUpdatedAt(item.updatedAt),
   };
+}
+
+function normalizeRecentWorksheetUpdatedAt(value: unknown) {
+  if (typeof value !== 'string') return new Date().toISOString();
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return new Date().toISOString();
+
+  return date.toISOString();
 }
 
 function createRecentWorksheetSetId({
@@ -328,6 +334,19 @@ function upsertRecentWorksheetSet(
     0,
     MAX_RECENT_WORKSHEET_SETS
   );
+}
+
+function formatRecentWorksheetDate(value: string, locale: 'en' | 'zh') {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return locale === 'zh' ? '未知时间' : 'unknown date';
+  }
+
+  return new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
 }
 
 function buildWorksheetPrintStyleText(
@@ -636,6 +655,12 @@ export function WorksheetPage({
     });
   };
 
+  const clearRecentSets = () => {
+    setRecentSets([]);
+    writeStoredRecentWorksheetSets([]);
+    toast.success(copy.recentClearSuccess);
+  };
+
   const copyRecentShareLink = async (recentSet: WorksheetRecentSet) => {
     if (typeof window === 'undefined') return;
 
@@ -845,13 +870,24 @@ export function WorksheetPage({
 
                   {recentSets.length > 0 ? (
                     <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
-                      <div>
-                        <p className="text-sm font-medium">
-                          {copy.recentSetsTitle}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {copy.recentSetsDescription}
-                        </p>
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {copy.recentSetsTitle}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {copy.recentSetsDescription}
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearRecentSets}
+                        >
+                          <IconEraser className="size-3.5" />
+                          {copy.recentClearCta}
+                        </Button>
                       </div>
                       <div className="grid gap-2">
                         {recentSets.map((recentSet) => (
@@ -880,6 +916,14 @@ export function WorksheetPage({
                                   copy.paperSizes[recentSet.paperSize],
                                   copy.traceModes[recentSet.traceMode],
                                   recentSet.showFeedbackSection
+                                )}
+                              </p>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {copy.recentSavedAt(
+                                  formatRecentWorksheetDate(
+                                    recentSet.updatedAt,
+                                    currentLocale
+                                  )
                                 )}
                               </p>
                               {recentSet.assignmentNote ? (
@@ -1790,9 +1834,12 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       quickSetsDescription: '一键套用常用作业组合，再按需要微调。',
       quickSetsTitle: '快速练习包',
       recentAssignmentShareCta: '复制作业',
+      recentClearCta: '清空最近',
+      recentClearSuccess: '最近练习纸已清空。',
       recentRemoveLabel: '移除最近练习纸',
       recentRestoreCta: '恢复',
       recentRestoreSuccess: '已恢复最近练习纸。',
+      recentSavedAt: (date: string) => `保存于 ${date}`,
       recentSetMeta: (
         gridCount: number,
         paperSize: string,
@@ -1977,9 +2024,12 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'Apply a common assignment set, then adjust the worksheet if needed.',
     quickSetsTitle: 'Quick sets',
     recentAssignmentShareCta: 'Copy assignment',
+    recentClearCta: 'Clear recent',
+    recentClearSuccess: 'Recent worksheets cleared.',
     recentRemoveLabel: 'Remove recent worksheet',
     recentRestoreCta: 'Restore',
     recentRestoreSuccess: 'Recent worksheet restored.',
+    recentSavedAt: (date: string) => `Saved ${date}`,
     recentSetMeta: (
       gridCount: number,
       paperSize: string,
