@@ -23,6 +23,7 @@ import {
 } from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowLeft,
@@ -115,15 +116,15 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
     if (typeof window === 'undefined' || !window.navigator.clipboard) return;
 
     const detailUrl = new URL(
-      getHanziPath(character.character),
+      getPathWithLocale(getHanziPath(character.character), currentLocale),
       window.location.origin
     ).toString();
     const practiceUrl = new URL(
-      buildDetailPracticePath(practiceSearch),
+      buildDetailPracticePath(practiceSearch, currentLocale),
       window.location.origin
     ).toString();
     const worksheetUrl = new URL(
-      buildDetailWorksheetPath(worksheetSearch),
+      buildDetailWorksheetPath(worksheetSearch, currentLocale),
       window.location.origin
     ).toString();
     const message = copy.studyPlanMessage({
@@ -629,17 +630,23 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function buildDetailPracticePath(search: DetailPracticeSearch) {
+function buildDetailPracticePath(
+  search: DetailPracticeSearch,
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
   params.set('character', search.character);
-  params.set('characters', search.characters.join(''));
+  params.set('characters', search.characters.join(','));
 
-  return `${Routes.Learn}?${params.toString()}`;
+  return `${getPathWithLocale(Routes.Learn, locale)}?${params.toString()}`;
 }
 
-function buildDetailWorksheetPath(search: DetailWorksheetSearch) {
+function buildDetailWorksheetPath(
+  search: DetailWorksheetSearch,
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
-  params.set('chars', search.characters.join(''));
+  params.set('characters', search.characters.join(','));
   params.set('details', search.details ? '1' : '0');
   params.set('trace', search.trace);
 
@@ -647,7 +654,7 @@ function buildDetailWorksheetPath(search: DetailWorksheetSearch) {
     params.set('note', search.note.trim());
   }
 
-  return `${Routes.Worksheets}?${params.toString()}`;
+  return `${getPathWithLocale(Routes.Worksheets, locale)}?${params.toString()}`;
 }
 
 function getHanziDetailCopy(locale: 'en' | 'zh') {

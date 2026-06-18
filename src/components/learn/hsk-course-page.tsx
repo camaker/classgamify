@@ -38,6 +38,7 @@ import {
 } from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -121,9 +122,13 @@ export function HskCoursePage() {
   };
   const primaryPracticeUrl = buildCoursePracticeUrl(
     primaryPracticeCharacter?.character,
-    freeCharacters
+    freeCharacters,
+    currentLocale
   );
-  const primaryWorksheetUrl = buildCourseWorksheetUrl(primaryWorksheetSearch);
+  const primaryWorksheetUrl = buildCourseWorksheetUrl(
+    primaryWorksheetSearch,
+    currentLocale
+  );
   const copyProgressReport = async () => {
     if (
       typeof window === 'undefined' ||
@@ -1758,7 +1763,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
 
 function buildCoursePracticeUrl(
   character: string | undefined,
-  characters: string[]
+  characters: string[],
+  locale: 'en' | 'zh'
 ) {
   const params = new URLSearchParams();
 
@@ -1771,12 +1777,16 @@ function buildCoursePracticeUrl(
   }
 
   const search = params.toString();
-  return `https://${COURSE_SHARE_DOMAIN}${Routes.Learn}${
-    search ? `?${search}` : ''
-  }`;
+  return `https://${COURSE_SHARE_DOMAIN}${getPathWithLocale(
+    Routes.Learn,
+    locale
+  )}${search ? `?${search}` : ''}`;
 }
 
-function buildCourseWorksheetUrl(search: CourseWorksheetSearch) {
+function buildCourseWorksheetUrl(
+  search: CourseWorksheetSearch,
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
 
   for (const character of search.characters) {
@@ -1787,7 +1797,10 @@ function buildCourseWorksheetUrl(search: CourseWorksheetSearch) {
   params.set('note', search.note);
   params.set('trace', search.trace);
 
-  return `https://${COURSE_SHARE_DOMAIN}${Routes.Worksheets}?${params.toString()}`;
+  return `https://${COURSE_SHARE_DOMAIN}${getPathWithLocale(
+    Routes.Worksheets,
+    locale
+  )}?${params.toString()}`;
 }
 
 function buildProgressBackup({
@@ -1801,7 +1814,10 @@ function buildProgressBackup({
     locale,
     progress,
     schemaVersion: 1,
-    source: `https://${COURSE_SHARE_DOMAIN}${Routes.Hsk1}`,
+    source: `https://${COURSE_SHARE_DOMAIN}${getPathWithLocale(
+      Routes.Hsk1,
+      locale
+    )}`,
     summary: {
       activeDayCount: progressSummary.activeDayCount,
       cleanCount: progressSummary.cleanCount,

@@ -28,6 +28,7 @@ import {
 } from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -279,8 +280,9 @@ export function HanziPracticePage({
     }
 
     const search = params.toString();
-    return search ? `${Routes.Learn}?${search}` : Routes.Learn;
-  }, [currentCharacter?.character, lessonCharacters]);
+    const path = getPathWithLocale(Routes.Learn, currentLocale);
+    return search ? `${path}?${search}` : path;
+  }, [currentCharacter?.character, currentLocale, lessonCharacters]);
   const copyPracticeLink = useCallback(async () => {
     if (
       typeof window === 'undefined' ||
@@ -897,6 +899,7 @@ function HanziPracticeCard({
               character={character}
               completionWorksheetSearch={completionWorksheetSearch}
               copy={copy}
+              currentLocale={currentLocale}
               currentReviewWorksheetSearch={currentReviewWorksheetSearch}
               isLastCharacter={isLastCharacter}
               lessonComplete={lessonComplete}
@@ -1026,6 +1029,7 @@ function PracticeCompletionActions({
   character,
   completionWorksheetSearch,
   copy,
+  currentLocale,
   currentReviewWorksheetSearch,
   isLastCharacter,
   lessonComplete,
@@ -1037,6 +1041,7 @@ function PracticeCompletionActions({
   character: LessonCharacter;
   completionWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
   copy: ReturnType<typeof getPracticeCopy>;
+  currentLocale: 'en' | 'zh';
   currentReviewWorksheetSearch: ReturnType<typeof buildWorksheetSearch>;
   isLastCharacter: boolean;
   lessonComplete: boolean;
@@ -1069,7 +1074,7 @@ function PracticeCompletionActions({
     }
 
     const worksheetUrl = new URL(
-      buildWorksheetPath(worksheetSearch),
+      buildWorksheetPath(worksheetSearch, currentLocale),
       window.location.origin
     ).toString();
     const message = copy.characterResultShareMessage({
@@ -1097,11 +1102,15 @@ function PracticeCompletionActions({
     }
 
     const practiceUrl = new URL(
-      buildPracticePath(character.character, worksheetSearch.characters),
+      buildPracticePath(
+        character.character,
+        worksheetSearch.characters,
+        currentLocale
+      ),
       window.location.origin
     ).toString();
     const worksheetUrl = new URL(
-      buildWorksheetPath(worksheetSearch),
+      buildWorksheetPath(worksheetSearch, currentLocale),
       window.location.origin
     ).toString();
     const message = copy.characterAssignmentShareMessage({
@@ -2176,7 +2185,10 @@ function buildWorksheetSearch(
   };
 }
 
-function buildWorksheetPath(search: ReturnType<typeof buildWorksheetSearch>) {
+function buildWorksheetPath(
+  search: ReturnType<typeof buildWorksheetSearch>,
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
 
   for (const character of search.characters) {
@@ -2196,10 +2208,15 @@ function buildWorksheetPath(search: ReturnType<typeof buildWorksheetSearch>) {
   }
 
   const query = params.toString();
-  return `${Routes.Worksheets}${query ? `?${query}` : ''}`;
+  const path = getPathWithLocale(Routes.Worksheets, locale);
+  return `${path}${query ? `?${query}` : ''}`;
 }
 
-function buildPracticePath(character: string, characters: string[]) {
+function buildPracticePath(
+  character: string,
+  characters: string[],
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
 
   params.set('character', character);
@@ -2209,5 +2226,6 @@ function buildPracticePath(character: string, characters: string[]) {
   }
 
   const query = params.toString();
-  return `${Routes.Learn}${query ? `?${query}` : ''}`;
+  const path = getPathWithLocale(Routes.Learn, locale);
+  return `${path}${query ? `?${query}` : ''}`;
 }
