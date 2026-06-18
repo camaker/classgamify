@@ -29,6 +29,7 @@ import {
   IconArrowRight,
   IconBook2,
   IconCheck,
+  IconCopy,
   IconEye,
   IconFileText,
   IconGripVertical,
@@ -39,8 +40,29 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 type StudyStepIcon = 'observe' | 'trace' | 'print';
+
+type DetailPracticeSearch = {
+  character: string;
+  characters: string[];
+};
+
+type DetailWorksheetSearch = {
+  characters: string[];
+  details: boolean;
+  note: string;
+  trace: 'first' | 'guided';
+};
+
+type StudyPlanMessageParams = {
+  character: LessonCharacter;
+  detailUrl: string;
+  isReview: boolean;
+  practiceUrl: string;
+  worksheetUrl: string;
+};
 
 export function HanziDetailPage({ character }: { character: LessonCharacter }) {
   const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -85,6 +107,36 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
         trace: 'first' as const,
       };
   const lessonCharacters = lesson?.characters ?? [character];
+  const copyStudyPlan = async () => {
+    if (typeof window === 'undefined' || !window.navigator.clipboard) return;
+
+    const detailUrl = new URL(
+      getHanziPath(character.character),
+      window.location.origin
+    ).toString();
+    const practiceUrl = new URL(
+      buildDetailPracticePath(practiceSearch),
+      window.location.origin
+    ).toString();
+    const worksheetUrl = new URL(
+      buildDetailWorksheetPath(worksheetSearch),
+      window.location.origin
+    ).toString();
+    const message = copy.studyPlanMessage({
+      character,
+      detailUrl,
+      isReview: needsReview,
+      practiceUrl,
+      worksheetUrl,
+    });
+
+    try {
+      await window.navigator.clipboard.writeText(message);
+      toast.success(copy.studyPlanShareSuccess);
+    } catch {
+      toast.error(copy.shareError);
+    }
+  };
 
   useEffect(() => {
     setProgress(readStoredHanziProgress());
@@ -152,6 +204,14 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                           ? copy.worksheetLockedCta
                           : copy.worksheetCta}
                       </Link>
+                      <button
+                        type="button"
+                        onClick={copyStudyPlan}
+                        className={cn(buttonVariants({ variant: 'outline' }))}
+                      >
+                        <IconCopy className="size-4" />
+                        {copy.studyPlanShareCta}
+                      </button>
                     </div>
                     <div className="grid gap-3 pt-2 sm:grid-cols-3">
                       {copy.studySteps.map((step, index) => (
@@ -337,6 +397,17 @@ export function HanziDetailPage({ character }: { character: LessonCharacter }) {
                   <IconLock className="size-4" />
                   {character.premium ? copy.pricingCta : copy.previewCta}
                 </Link>
+                <button
+                  type="button"
+                  onClick={copyStudyPlan}
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'justify-start'
+                  )}
+                >
+                  <IconCopy className="size-4" />
+                  {copy.studyPlanShareCta}
+                </button>
               </CardContent>
             </Card>
           </aside>
@@ -553,6 +624,27 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
+function buildDetailPracticePath(search: DetailPracticeSearch) {
+  const params = new URLSearchParams();
+  params.set('character', search.character);
+  params.set('characters', search.characters.join(''));
+
+  return `${Routes.Learn}?${params.toString()}`;
+}
+
+function buildDetailWorksheetPath(search: DetailWorksheetSearch) {
+  const params = new URLSearchParams();
+  params.set('chars', search.characters.join(''));
+  params.set('details', search.details ? '1' : '0');
+  params.set('trace', search.trace);
+
+  if (search.note.trim()) {
+    params.set('note', search.note.trim());
+  }
+
+  return `${Routes.Worksheets}?${params.toString()}`;
+}
+
 function getHanziDetailCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -597,6 +689,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
         `优先复习 ${character} 的错笔，再回到同组汉字。`,
       proBadge: 'Pro 字',
       radicalLabel: '部首',
+      shareError: '复制失败，请稍后重试。',
       statusCleanDescription: '这次没有记录到错笔，可以继续学习同课的新字。',
       statusCleanTitle: '已零错完成',
       statusFullTrace: '完整描写',
@@ -656,6 +749,32 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       statusStroke: (stroke: number) => `第 ${stroke} 笔`,
       strokeCount: (count: number) => `${count} 画`,
       strokesLabel: '笔画',
+      studyPlanMessage: ({
+        character,
+        detailUrl,
+        isReview,
+        practiceUrl,
+        worksheetUrl,
+      }: StudyPlanMessageParams) =>
+        [
+          'Lang Study 汉字学习计划',
+          '',
+          `今日汉字：${character.character} · ${character.pinyin}`,
+          `意思：${character.meaning}`,
+          `课程组：${character.lessonLabel}`,
+          `要求：${
+            isReview
+              ? '先复习错笔，再打印单字复习纸。'
+              : '先看字形提示，再完成一次描写练习。'
+          }`,
+          `字卡：${detailUrl}`,
+          `描写练习：${practiceUrl}`,
+          `打印练习纸：${worksheetUrl}`,
+          '',
+          '建议流程：先读拼音和意思，跟着笔顺描写，再把同一组汉字带到纸面上慢慢写。',
+        ].join('\n'),
+      studyPlanShareCta: '复制学习计划',
+      studyPlanShareSuccess: '学习计划已复制。',
       title: (character: string, pinyin: string) =>
         `${character} (${pinyin}) 怎么写`,
       titleEyebrow: 'HSK1 入门汉字',
@@ -727,6 +846,7 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
       `Review missed strokes for ${character} before returning to the lesson group.`,
     proBadge: 'Pro character',
     radicalLabel: 'Radical',
+    shareError: 'Could not copy. Please try again.',
     statusCleanDescription:
       'No missed strokes were recorded. Continue with the next character in this lesson.',
     statusCleanTitle: 'Completed cleanly',
@@ -789,6 +909,32 @@ function getHanziDetailCopy(locale: 'en' | 'zh') {
     statusStroke: (stroke: number) => `Stroke ${stroke}`,
     strokeCount: (count: number) => `${count} strokes`,
     strokesLabel: 'Strokes',
+    studyPlanMessage: ({
+      character,
+      detailUrl,
+      isReview,
+      practiceUrl,
+      worksheetUrl,
+    }: StudyPlanMessageParams) =>
+      [
+        'Lang Study hanzi study plan',
+        '',
+        `Character: ${character.character} · ${character.pinyin}`,
+        `Meaning: ${character.meaning}`,
+        `Lesson group: ${character.lessonLabel}`,
+        `Assignment: ${
+          isReview
+            ? 'Review missed strokes first, then print a focused sheet.'
+            : 'Study the shape cue, then complete one tracing run.'
+        }`,
+        `Character card: ${detailUrl}`,
+        `Tracing practice: ${practiceUrl}`,
+        `Printable worksheet: ${worksheetUrl}`,
+        '',
+        'Suggested flow: read the pinyin and meaning, trace with stroke order, then move the same character set onto paper.',
+      ].join('\n'),
+    studyPlanShareCta: 'Copy study plan',
+    studyPlanShareSuccess: 'Study plan copied.',
     title: (character: string, pinyin: string) =>
       `How to write ${character} (${pinyin})`,
     titleEyebrow: 'HSK1 starter character',
