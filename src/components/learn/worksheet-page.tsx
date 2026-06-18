@@ -56,7 +56,6 @@ const RECENT_WORKSHEET_SET_STORAGE_KEY = 'lang-study:recent-worksheet-sets:v1';
 const WORKSHEET_PRINT_MODE = 'worksheet';
 const WORKSHEET_PRINT_STYLE_ID = 'worksheet-print-style';
 const WORKSHEET_DOMAIN = 'getlangstudy.com';
-const WORKSHEET_URL = 'getlangstudy.com/worksheets';
 const HANZI_CHARACTER_PATTERN = /\p{Script=Han}/gu;
 const STARTER_SET_SIZE = 6;
 
@@ -561,16 +560,20 @@ export function WorksheetPage({
 
   const shareUrl = useMemo(
     () =>
-      buildWorksheetSharePath({
-        assignmentNote: normalizedAssignmentNote,
-        characters: selectedCharacters,
-        gridCount,
-        paperSize,
-        showCharacterDetails,
-        showFeedbackSection,
-        traceMode,
-      }),
+      buildWorksheetSharePath(
+        {
+          assignmentNote: normalizedAssignmentNote,
+          characters: selectedCharacters,
+          gridCount,
+          paperSize,
+          showCharacterDetails,
+          showFeedbackSection,
+          traceMode,
+        },
+        currentLocale
+      ),
     [
+      currentLocale,
       gridCount,
       normalizedAssignmentNote,
       paperSize,
@@ -583,6 +586,10 @@ export function WorksheetPage({
   const paperPreviewAspectRatio =
     WORKSHEET_PAPER_PREVIEW_ASPECT_RATIO[paperSize];
   const paperSizeDetail = copy.paperSizeDetails[paperSize];
+  const worksheetSourceDisplayUrl = useMemo(
+    () => formatWorksheetDisplayUrl(buildWorksheetSourceUrl(currentLocale)),
+    [currentLocale]
+  );
 
   const toggleCharacter = (character: string) => {
     const selectionIsFull =
@@ -681,7 +688,7 @@ export function WorksheetPage({
     if (typeof window === 'undefined') return;
 
     const url = new URL(
-      buildWorksheetSharePath(recentSet),
+      buildWorksheetSharePath(recentSet, currentLocale),
       window.location.origin
     ).toString();
 
@@ -697,7 +704,7 @@ export function WorksheetPage({
     if (typeof window === 'undefined') return;
 
     const worksheetUrl = new URL(
-      buildWorksheetSharePath(recentSet),
+      buildWorksheetSharePath(recentSet, currentLocale),
       window.location.origin
     ).toString();
     const reviewUrl = buildPracticeReviewUrl(
@@ -1514,6 +1521,7 @@ export function WorksheetPage({
                     showFeedbackSection={showFeedbackSection}
                     selectedItems={selectedItems}
                     traceMode={traceMode}
+                    worksheetPrintUrl={worksheetSourceDisplayUrl}
                   />
                 </div>
               </div>
@@ -1534,6 +1542,7 @@ type WorksheetPreviewProps = {
   showCharacterDetails: boolean;
   showFeedbackSection: boolean;
   traceMode: TraceMode;
+  worksheetPrintUrl: string;
 };
 
 function WorksheetPreview({
@@ -1545,6 +1554,7 @@ function WorksheetPreview({
   showCharacterDetails,
   showFeedbackSection,
   traceMode,
+  worksheetPrintUrl,
 }: WorksheetPreviewProps) {
   const assignmentChecks = showCharacterDetails
     ? copy.assignmentChecks
@@ -1748,7 +1758,7 @@ function WorksheetPreview({
           <span>
             {copy.footerSourcePrefix}{' '}
             <span className="font-semibold text-slate-950">
-              {WORKSHEET_URL}
+              {worksheetPrintUrl}
             </span>
           </span>
         </div>
@@ -2273,6 +2283,13 @@ function buildPracticeReviewUrl(characters: string[], locale: 'en' | 'zh') {
   return `https://${WORKSHEET_DOMAIN}${path}${search ? `?${search}` : ''}`;
 }
 
+function buildWorksheetSourceUrl(locale: 'en' | 'zh') {
+  return `https://${WORKSHEET_DOMAIN}${getPathWithLocale(
+    Routes.Worksheets,
+    locale
+  )}`;
+}
+
 function formatWorksheetDisplayUrl(url: string) {
   const withoutProtocol = url.replace(/^https?:\/\//, '');
 
@@ -2283,7 +2300,10 @@ function formatWorksheetDisplayUrl(url: string) {
   }
 }
 
-function buildWorksheetSharePath(config: WorksheetShareConfig) {
+function buildWorksheetSharePath(
+  config: WorksheetShareConfig,
+  locale: 'en' | 'zh'
+) {
   const params = new URLSearchParams();
 
   for (const character of config.characters) {
@@ -2306,7 +2326,7 @@ function buildWorksheetSharePath(config: WorksheetShareConfig) {
     params.set('note', config.assignmentNote);
   }
 
-  return `${Routes.Worksheets}?${params.toString()}`;
+  return `${getPathWithLocale(Routes.Worksheets, locale)}?${params.toString()}`;
 }
 
 function isSameSelection(current: string[], next: string[]) {
