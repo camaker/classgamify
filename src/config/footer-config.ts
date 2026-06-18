@@ -54,7 +54,7 @@ export function getFooterLinks(): MenuItemConfig[] {
     },
     {
       title: m.footer_link_teachers(),
-      href: Routes.Contact,
+      href: Routes.ContactClassroom,
       description: m.footer_link_teachers_desc(),
       external: false,
     },

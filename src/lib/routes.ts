@@ -13,6 +13,7 @@ export const Routes = {
   Roadmap: '/roadmap',
   About: '/about',
   Contact: '/contact',
+  ContactClassroom: '/contact?subject=classroom',
   Waitlist: '/waitlist',
   Ai: '/ai',
   AiSummarization: '/ai#text-summarization',
