@@ -725,6 +725,7 @@ export function WorksheetPage({
       assignmentNote: recentSet.assignmentNote,
       characters: recentSet.characters,
       reviewUrl,
+      sourceUrl: buildWorksheetSourceUrl(currentLocale),
       worksheetUrl,
     });
 
@@ -791,6 +792,7 @@ export function WorksheetPage({
       assignmentNote: normalizedAssignmentNote,
       characters: selectedCharacters,
       reviewUrl: practiceReviewUrl,
+      sourceUrl: buildWorksheetSourceUrl(currentLocale),
       worksheetUrl,
     });
 
@@ -1292,6 +1294,39 @@ export function WorksheetPage({
                             {copy.assignmentNoteCount(
                               normalizedAssignmentNote.length,
                               MAX_ASSIGNMENT_NOTE_LENGTH
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 rounded-lg border bg-background p-3">
+                        <div className="flex items-start gap-2">
+                          <IconMailForward className="mt-0.5 size-4 shrink-0 text-primary" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">
+                              {copy.assignmentHandoffTitle}
+                            </p>
+                            <p className="text-xs leading-5 text-muted-foreground">
+                              {copy.assignmentHandoffDescription}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          {copy.assignmentHandoffItems.map((item) => (
+                            <div
+                              key={item}
+                              className="flex min-w-0 items-start gap-2 rounded-md border bg-muted/20 p-2 text-xs leading-5"
+                            >
+                              <IconCircleCheck className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex min-w-0 items-center gap-2 rounded-md bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground">
+                          <IconWorldWww className="size-3.5 shrink-0" />
+                          <span className="min-w-0 truncate">
+                            {copy.assignmentHandoffSource(
+                              worksheetSourceDisplayUrl
                             )}
                           </span>
                         </div>
@@ -1836,6 +1871,7 @@ type WorksheetAssignmentShareMessageParams = {
   assignmentNote: string;
   characters: string[];
   reviewUrl: string;
+  sourceUrl: string;
   worksheetUrl: string;
 };
 
@@ -1861,6 +1897,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         assignmentNote,
         characters,
         reviewUrl,
+        sourceUrl,
         worksheetUrl,
       }: WorksheetAssignmentShareMessageParams) =>
         [
@@ -1870,12 +1907,23 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
           assignmentNote ? `作业要求：${assignmentNote}` : undefined,
           `打印练习纸：${worksheetUrl}`,
           `线上复习同一组：${reviewUrl}`,
+          `继续生成练习纸：${sourceUrl}`,
           '',
           '建议流程：先观察字形和例词，描写提示格，再独立完成剩余格子。完成后圈出最难写的字，下次先复习。',
+          '完成后请在纸面反馈栏写下“最满意的一格、最难的字、下次复习”，方便老师或家长回收。',
         ]
           .filter(Boolean)
           .join('\n'),
       assignmentShareSuccess: '作业说明已复制。',
+      assignmentHandoffDescription:
+        '复制出去的消息会同时包含练习纸、线上复习和来源域名，方便老师、家长或学习伙伴继续转发。',
+      assignmentHandoffItems: [
+        '打印纸面练习',
+        '写完回到线上复习',
+        '用反馈栏决定下次复习',
+      ],
+      assignmentHandoffSource: (url: string) => `来源域名：${url}`,
+      assignmentHandoffTitle: '作业交付清单',
       assignmentTitle: '练习任务',
       back: '返回练习',
       badge: '练习纸生成器',
@@ -1929,7 +1977,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       onlineReviewTitle: '线上复习同一组',
       packCta: '查看完整套餐',
       packDescription:
-        '完整版本将提供 HSK1 全量练习纸、自定义字表、答案提示和学生作业记录。',
+        '为长期学习、家庭辅导和课堂布置准备完整 HSK1 练习纸、自定义字表和复习流程。',
       packFeatures: [
         '解锁完整 HSK1 字表和更多练习纸组合',
         '保存常用自定义字表，方便老师和家长重复布置',
@@ -2015,7 +2063,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       saveCurrentSetCta: '保存当前',
       saveCurrentSetSuccess: '当前练习纸已保存到最近列表。',
       selectDescription:
-        '完整 HSK1 套装将支持自定义字表、保存作业和更多打印格式。',
+        '先从免费入门字开始，生成可打印、可分享、可继续线上复习的纸笔作业。',
       selectTitle: '选择汉字',
       selectedCount: (count: number, limit: number) => `${count}/${limit}`,
       selectedDescription: (count: number, limit: number) =>
@@ -2058,6 +2106,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       assignmentNote,
       characters,
       reviewUrl,
+      sourceUrl,
       worksheetUrl,
     }: WorksheetAssignmentShareMessageParams) =>
       [
@@ -2067,12 +2116,23 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         assignmentNote ? `Assignment note: ${assignmentNote}` : undefined,
         `Printable worksheet: ${worksheetUrl}`,
         `Online review for the same set: ${reviewUrl}`,
+        `Make more worksheets: ${sourceUrl}`,
         '',
         'Suggested flow: study the shape and example words, trace the guided boxes, then write the remaining boxes independently. Circle the hardest character so it comes back first next time.',
+        'After writing, fill in the feedback section with the best box, hardest character, and next review target so a teacher or parent can follow up.',
       ]
         .filter(Boolean)
         .join('\n'),
     assignmentShareSuccess: 'Assignment message copied.',
+    assignmentHandoffDescription:
+      'The copied message includes the worksheet, online review, and source domain so teachers, parents, or study partners can forward it cleanly.',
+    assignmentHandoffItems: [
+      'Print the paper sheet',
+      'Return to online review',
+      'Use feedback for next practice',
+    ],
+    assignmentHandoffSource: (url: string) => `Source domain: ${url}`,
+    assignmentHandoffTitle: 'Assignment handoff',
     assignmentTitle: 'Practice task',
     back: 'Back to practice',
     badge: 'Worksheet generator',
@@ -2132,7 +2192,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     onlineReviewTitle: 'Review the same set online',
     packCta: 'View complete pack',
     packDescription:
-      'The complete version will unlock full HSK1 worksheets, custom character lists, answer prompts, and saved student assignments.',
+      'Built for long-term study, family coaching, and classroom assignment routines with full HSK1 worksheets, custom lists, and review loops.',
     packFeatures: [
       'Unlock the full HSK1 character set and more worksheet combinations',
       'Save reusable custom lists for teachers, tutors, and parents',
@@ -2226,7 +2286,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     saveCurrentSetCta: 'Save current',
     saveCurrentSetSuccess: 'Current worksheet saved to recent worksheets.',
     selectDescription:
-      'The full HSK1 pack will support custom lists, saved assignments, and more printable formats.',
+      'Start with the free starter characters, then generate a worksheet that is printable, shareable, and ready for online review.',
     selectTitle: 'Select characters',
     selectedCount: (count: number, limit: number) => `${count}/${limit}`,
     selectedDescription: (count: number, limit: number) =>
