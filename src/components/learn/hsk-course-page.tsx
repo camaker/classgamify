@@ -935,6 +935,7 @@ function LessonSection({
   const firstAvailableCharacter = lesson.characters.find(
     (item) => !item.premium
   );
+  const isLockedLesson = !firstAvailableCharacter && lesson.lockedCount > 0;
   const actionCharacter =
     firstReview?.character ??
     progressSummary.nextPracticeTarget?.character ??
@@ -944,21 +945,25 @@ function LessonSection({
     progressSummary.total > 0 && progressSummary.lessonComplete;
   const lessonPrompt = hasReview
     ? copy.lessonReviewPrompt(progressSummary.reviewItems.length)
-    : lessonComplete
-      ? copy.lessonCompletePrompt
-      : progressSummary.completedCount > 0
-        ? copy.lessonContinuePrompt(
-            progressSummary.completedCount,
-            progressSummary.total
-          )
-        : copy.lessonStartPrompt;
+    : isLockedLesson
+      ? copy.lessonLockedPrompt(lesson.lockedCount)
+      : lessonComplete
+        ? copy.lessonCompletePrompt
+        : progressSummary.completedCount > 0
+          ? copy.lessonContinuePrompt(
+              progressSummary.completedCount,
+              progressSummary.total
+            )
+          : copy.lessonStartPrompt;
   const lessonActionLabel = hasReview
     ? copy.lessonReviewCta
-    : lessonComplete
-      ? copy.lessonPracticeAgainCta
-      : progressSummary.completedCount > 0
-        ? copy.lessonContinueCta
-        : copy.lessonStartCta;
+    : isLockedLesson
+      ? copy.lessonLockedCta
+      : lessonComplete
+        ? copy.lessonPracticeAgainCta
+        : progressSummary.completedCount > 0
+          ? copy.lessonContinueCta
+          : copy.lessonStartCta;
   const worksheetSearch: CourseWorksheetSearch = {
     characters: hasReview
       ? progressSummary.reviewCharacters
@@ -1030,7 +1035,12 @@ function LessonSection({
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2 md:justify-end">
-            {actionCharacter ? (
+            {isLockedLesson ? (
+              <Link to={Routes.Pricing} className={buttonVariants()}>
+                <IconLock className="size-4" />
+                {lessonActionLabel}
+              </Link>
+            ) : actionCharacter ? (
               <Link
                 to={Routes.Learn}
                 search={{
@@ -1508,6 +1518,9 @@ function getCourseCopy(locale: 'en' | 'zh') {
       lessonContinuePrompt: (completed: number, total: number) =>
         `本组已完成 ${completed}/${total}，继续把剩下的字练完。`,
       lessonLabel: (index: number) => `第 ${index} 组`,
+      lessonLockedCta: '查看 Pro 内容包',
+      lessonLockedPrompt: (count: number) =>
+        `这一组包含 ${count} 个 Pro 预览汉字。你可以先看字卡和例词，升级后再加入完整练习与作业流程。`,
       lessonPracticeAgainCta: '再练本组',
       lessonProgressTitle: '本组进度',
       lessonReviewCta: '复习本组错字',
@@ -1684,8 +1697,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
       streakValue: (count: number) => `${count} 天`,
       strokesLabel: '总笔画',
       strokeCount: (count: number) => `${count} 画`,
-      summaryDescription: '当前公开的启动课程数据。',
-      summaryTitle: 'HSK1 Starter',
+      summaryDescription: '当前已整理的 HSK1 第一阶段课程包。',
+      summaryTitle: 'HSK1 Launch Pack',
       shareError: '复制失败，请稍后重试。',
       tileCompleteBadge: '已完成',
       tileReviewBadge: '复习',
@@ -1757,17 +1770,17 @@ function getCourseCopy(locale: 'en' | 'zh') {
         '当前公开课程已经能验证核心体验；完整包围绕更长周期的练习、复习和作业布置继续扩展。',
       upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
         { label: '当前公开', value: `${stats.free} 字` },
-        { label: '完整路径', value: `${stats.total} 字` },
+        { label: '第一阶段内容包', value: `${stats.total} 字` },
         { label: '学习场景', value: '自学 / 家庭 / 课堂' },
       ],
-      upgradeSnapshotTitle: '从免费入门到完整 HSK1',
+      upgradeSnapshotTitle: '从免费入门到 HSK1 第一阶段内容包',
       upgradeTitle: '把一次练习变成可持续的 HSK1 学习流程',
       upgradeValueItems: [
         {
           description:
-            '从免费字扩展到完整 HSK1 入门路径，适合按周完成、反复复习和打印巩固。',
+            '从免费字扩展到更完整的 HSK1 第一阶段内容包，适合按周完成、反复复习和打印巩固。',
           icon: IconBook2,
-          title: '完整字表路径',
+          title: '扩展字表路径',
         },
         {
           description:
@@ -1814,6 +1827,9 @@ function getCourseCopy(locale: 'en' | 'zh') {
     lessonContinuePrompt: (completed: number, total: number) =>
       `${completed}/${total} complete in this lesson. Finish the remaining characters next.`,
     lessonLabel: (index: number) => `Lesson ${index}`,
+    lessonLockedCta: 'View Pro pack',
+    lessonLockedPrompt: (count: number) =>
+      `This lesson includes ${count} Pro preview characters. You can inspect the cards and example words now, then unlock full practice and assignment workflows when ready.`,
     lessonPracticeAgainCta: 'Practice again',
     lessonProgressTitle: 'Lesson progress',
     lessonReviewCta: 'Review lesson',
@@ -1999,8 +2015,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     streakValue: (count: number) => `${count} days`,
     strokesLabel: 'Strokes',
     strokeCount: (count: number) => `${count} strokes`,
-    summaryDescription: 'Currently published starter course data.',
-    summaryTitle: 'HSK1 Starter',
+    summaryDescription: 'Currently published HSK1 launch-pack data.',
+    summaryTitle: 'HSK1 Launch Pack',
     shareError: 'Could not copy. Please try again.',
     tileCompleteBadge: 'Done',
     tileReviewBadge: 'Review',
@@ -2077,17 +2093,17 @@ function getCourseCopy(locale: 'en' | 'zh') {
       'The public course validates the learning experience today. The complete pack expands it for longer practice cycles, review, and assignment planning.',
     upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
       { label: 'Public now', value: `${stats.free} chars` },
-      { label: 'Full path', value: `${stats.total} chars` },
+      { label: 'Launch pack', value: `${stats.total} chars` },
       { label: 'Use cases', value: 'Self / family / class' },
     ],
-    upgradeSnapshotTitle: 'From free starter to full HSK1',
+    upgradeSnapshotTitle: 'From free starter to HSK1 launch pack',
     upgradeTitle: 'Turn one practice run into a repeatable HSK1 routine',
     upgradeValueItems: [
       {
         description:
-          'Move from the free characters into the complete HSK1 starter path for weekly practice, review, and paper reinforcement.',
+          'Move from the free characters into a broader HSK1 launch pack for weekly practice, review, and paper reinforcement.',
         icon: IconBook2,
-        title: 'Complete character path',
+        title: 'Expanded character path',
       },
       {
         description:
