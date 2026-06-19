@@ -10,34 +10,20 @@ An HSK1 character list is most useful when it becomes a practice routine, not
 just a table to memorize. Beginners need a small path that connects the shape,
 the stroke order, the first writing attempt, and the next review.
 
-Lang Study is starting with an HSK1 launch pack: a free starter set for the
-core writing loop, plus a broader Pro preview of characters that will support
-longer practice, worksheet assignments, and teacher handoff.
+Lang Study is starting with a free 50-character HSK1 launch pack. The goal is
+not to put all 50 characters on one screen or one worksheet. The goal is to
+give beginners a complete first-stage path that can be practiced in small
+groups, reviewed online, and moved onto paper without feeling paywalled after
+the first few characters.
 
-## What the free starter covers
+## What the free launch pack covers
 
-The free starter focuses on characters that are easy to begin writing but still
-show important handwriting patterns:
+The free launch pack includes 50 beginner-friendly characters across practical
+groups:
 
-- 人, 口, 日, 月
-- 山, 水, 火, 木
-- 大, 小
-
-These characters are short enough for a beginner session, but they introduce
-real structure: boxes, vertical balance, side strokes, and simple pictographic
-memory cues. They are also useful for printing a first worksheet without
-overloading the learner.
-
-Start with the [HSK1 path](/hsk/1), or open the [practice page](/learn) and
-complete one guided tracing run before printing.
-
-## What the launch pack adds
-
-The expanded launch pack adds more HSK1-adjacent beginner characters across
-useful groups:
-
+- Foundations: 人, 口, 日
 - Numbers: 一, 二, 三, 十
-- Time: 日, 月, 年, 天, 明
+- Time: 月, 年, 天, 明
 - Nature: 山, 水, 火, 木, 土, 气
 - People: 人, 我, 你, 他, 女, 儿, 子
 - Places: 家, 学, 校, 上, 下
@@ -45,10 +31,27 @@ useful groups:
 - Daily actions: 来, 去, 看, 说, 听, 吃, 喝
 - Questions: 谁, 什, 么, 吗, 哪, 几
 
+The first few shapes are short enough for a beginner session, but the full
+launch pack introduces real structure: boxes, vertical balance, side strokes,
+left-right components, common radicals, and simple pictographic memory cues.
+Start with the [HSK1 path](/hsk/1), or open the [practice page](/learn) and
+complete one guided tracing run before printing.
+
 This is not presented as a claim that every HSK1 standard has the same
 character boundary. Different HSK versions and teaching programs group words
 and characters differently. The goal here is practical handwriting coverage
 for beginner Chinese study.
+
+## How to display 50 characters without overwhelming learners
+
+The best interface for 50 characters is a course map, not a giant character
+wall. Lang Study keeps the full set visible on the HSK1 path, but the primary
+actions stay group-based:
+
+- Practice one lesson group at a time.
+- Print a focused worksheet instead of all 50 characters at once.
+- Use review cues to bring difficult characters back first.
+- Treat the full list as orientation, not as a single assignment.
 
 ## How to practice the list
 
@@ -77,8 +80,8 @@ bring it back to online review before adding new characters.
 
 For a beginner, the best next step is simple:
 
-- Practice one free starter character online.
-- Print the starter worksheet.
+- Practice one free launch-pack character online.
+- Print a small worksheet group.
 - Return to the HSK1 path and continue with the next group.
 
 That loop is the foundation Lang Study is building on: character cards,

@@ -818,11 +818,12 @@ const HSK1_STARTER_DEFINITIONS: LessonCharacterDefinition[] = [
   },
 ];
 
-const FREE_CHARACTER_LIMIT = 10;
+const FREE_CHARACTER_LIMIT = 50;
 
 function getHsk1StarterCharacters(locale: CourseLocale = 'en') {
-  return HSK1_STARTER_DEFINITIONS.map((item) => ({
+  return HSK1_STARTER_DEFINITIONS.map((item, index) => ({
     ...item,
+    premium: index < FREE_CHARACTER_LIMIT ? false : (item.premium ?? true),
     meaning: item.meaning[locale],
     hint: item.hint[locale],
     lessonLabel: HSK1_LESSON_LABELS[item.lesson][locale],
@@ -948,6 +949,7 @@ export function getCourseStats() {
     total: HSK1_STARTER_DEFINITIONS.length,
     free: free.length,
     locked: locked.length,
+    groups: HSK1_LESSON_ORDER.length,
     strokes: HSK1_STARTER_DEFINITIONS.reduce(
       (total, item) => total + item.strokes,
       0

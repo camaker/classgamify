@@ -509,7 +509,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       description:
         '继续今天的汉字描写、复习错笔，或者把同一组汉字带到纸面练习。',
       practiceCompleteDescription:
-        '免费入门字已经完成。回到线上快速复习，再用练习纸做一轮慢写。',
+        '50 字第一阶段内容包已经完成。回到线上快速复习，再用练习纸做一轮慢写。',
       practiceNextDescription: (character: string) =>
         `从下一个汉字 ${character} 开始，保持短练习节奏。`,
       practiceReviewDescription: (count: number) =>
@@ -517,7 +517,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       practiceReviewTitle: '复习错笔',
       practiceTitle: '继续线上描写',
       pricingDescription:
-        '查看免费、Pro 和早期终身版的权益边界，决定是否需要完整 HSK1 和自定义练习纸。',
+        '查看免费、Pro 和早期终身版的权益边界，决定是否需要保存字表、自定义练习纸和可复用作业流程。',
       pricingTitle: '查看升级方案',
       printCta: '打印当前练习纸',
       copyPlanCta: '复制今日计划',
@@ -534,7 +534,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       }: DashboardPlanMessageInput) =>
         [
           'Lang Study 今日学习计划',
-          `进度：${completedCount}/${total} 个入门汉字已完成。`,
+          `进度：${completedCount}/${total} 个第一阶段汉字已完成。`,
           reviewCharacters.length > 0
             ? `先复习错笔：${reviewCharacters.join(' ')}`
             : nextCharacter
@@ -565,7 +565,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       practiceLinkLabel: '打开线上练习',
       practiceLinkTitle: '线上练习链接',
       progressLabel: (completed: number, total: number) =>
-        `${completed}/${total} 个入门汉字已完成`,
+        `${completed}/${total} 个第一阶段汉字已完成`,
       reviewLabel: (count: number) =>
         count > 0 ? `${count} 个待复习` : '暂无错笔队列',
       reviewWorksheetNote: (count: number) =>
@@ -581,7 +581,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
         return '先完成一个短练习：看笔顺、跟随描写、记录错笔，再打印同一组慢写。';
       },
       rhythmTitle: '今天从哪里继续？',
-      starterWorksheetNote: '用这组 HSK1 入门汉字完成一轮纸笔慢写。',
+      starterWorksheetNote: '用这组 HSK1 第一阶段汉字完成一轮纸笔慢写。',
       streakMetric: '连续节奏',
       streakValue: (count: number) => (count > 0 ? `${count} 天` : '未开始'),
       teachersDescription:
@@ -611,7 +611,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     description:
       'Continue character tracing, clear missed strokes, or take the same set onto paper.',
     practiceCompleteDescription:
-      'The free starter set is complete. Revisit online review, then print a slow paper pass.',
+      'The 50-character launch pack is complete. Revisit online review, then print a slow paper pass.',
     practiceNextDescription: (character: string) =>
       `Start from the next character, ${character}, and keep the session short.`,
     practiceReviewDescription: (count: number) =>
@@ -619,7 +619,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     practiceReviewTitle: 'Review missed strokes',
     practiceTitle: 'Continue online tracing',
     pricingDescription:
-      'Compare Free, Pro, and Early Lifetime boundaries before unlocking full HSK1 and custom worksheets.',
+      'Compare Free, Pro, and Early Lifetime boundaries before adding saved lists, custom worksheets, and repeatable assignment workflows.',
     pricingTitle: 'Review upgrade options',
     printCta: 'Print current worksheet',
     copyPlanCta: "Copy today's plan",
@@ -636,12 +636,12 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     }: DashboardPlanMessageInput) =>
       [
         'Lang Study daily study plan',
-        `Progress: ${completedCount}/${total} starter characters complete.`,
+        `Progress: ${completedCount}/${total} launch characters complete.`,
         reviewCharacters.length > 0
           ? `Review first: ${reviewCharacters.join(' ')}`
           : nextCharacter
             ? `Next character: ${nextCharacter}`
-            : 'Starter set complete: do one slow review pass.',
+            : 'Launch pack complete: do one slow review pass.',
         `Paper practice: ${worksheetCharacters.join(' ')}`,
         `Online practice: ${practiceUrl}`,
         `Printable worksheet: ${worksheetUrl}`,
@@ -658,7 +658,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       if (next) {
         return `Start from ${next}, then print the same set for slow handwriting.`;
       }
-      return 'The starter set is complete. Use today for a full slow paper review.';
+      return 'The launch pack is complete. Use today for a full slow paper review.';
     },
     planStepCourseLabel: 'Review path',
     planStepPracticeLabel: 'Online practice',
@@ -670,7 +670,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     practiceLinkLabel: 'Open online practice',
     practiceLinkTitle: 'Online practice link',
     progressLabel: (completed: number, total: number) =>
-      `${completed}/${total} starter characters complete`,
+      `${completed}/${total} launch characters complete`,
     reviewLabel: (count: number) =>
       count > 0 ? `${count} to review` : 'no review queue yet',
     reviewWorksheetNote: (count: number) =>
@@ -687,7 +687,7 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     },
     rhythmTitle: 'Where should today start?',
     starterWorksheetNote:
-      'Use this HSK1 starter set for one slow handwriting pass.',
+      'Use this HSK1 launch set for one slow handwriting pass.',
     streakMetric: 'practice streak',
     streakValue: (count: number) => (count > 0 ? `${count} days` : 'not yet'),
     teachersDescription:

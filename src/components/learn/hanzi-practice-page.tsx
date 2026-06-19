@@ -2155,7 +2155,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
         '当前 HSK1 练习进度保存在本浏览器。要换设备、清理浏览器或给学生交接前，请到 HSK1 路径复制或下载进度备份。',
       storageTitle: '进度保存在当前浏览器',
       loopCompleteDescription:
-        '入门组已完成。现在最适合把整组汉字打印出来做纸笔复习。',
+        '第一阶段内容包已完成。现在最适合把重点小组打印出来做纸笔复习。',
       loopDescription: (completed: number, total: number) =>
         `已完成 ${completed}/${total}，下一步保持练习节奏。`,
       loopNextCta: '继续练习',
@@ -2176,13 +2176,13 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       makeWorksheetCta: '制作练习纸',
       packCta: '查看 HSK1 套餐',
       packDescription:
-        '继续学习完整 HSK1 路径，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
+        '把免费 50 字练习扩展成可复用 HSK1 工作流，配套打印练习纸、复习历史和适合老师/家长的自定义字表。',
       packFeatures: [
-        '把免费入门组扩展成完整 HSK1 书写路径',
-        '用错字记录和复习队列安排下一次练习',
-        '为课堂、家长辅导和自学生成可打印练习纸',
+        '保存错字记录和复习队列，安排下一次练习',
+        '复用自定义字表和练习纸模板',
+        '为课堂、家长辅导和自学整理可交付作业',
       ],
-      packTitle: '继续学习完整 HSK1 路径',
+      packTitle: '升级可复用 HSK1 工作流',
       characterAssignmentShareCta: '复制下次作业',
       characterAssignmentShareMessage: ({
         character,
@@ -2428,7 +2428,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       statStrokes: (count: number) => `${count} 个引导笔画`,
       statWorksheets: '练习纸已就绪',
       summary:
-        '你已经完成免费入门组。下一步可以生成打印练习纸，或继续查看完整 HSK1 学习路径。',
+        '你已经完成免费 50 字第一阶段内容包。下一步可以生成打印练习纸，或开始集中复习。',
       summaryWorksheetNote: '把这一组汉字打印出来，完成一次纸笔复习。',
       title: '通过书写学会中文汉字',
       worksheetCta: '生成练习纸',
@@ -2570,7 +2570,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       'HSK1 practice progress is saved in this browser for now. Before switching devices, clearing browser data, or handing off to a learner, open the HSK1 path to copy or download a progress backup.',
     storageTitle: 'Progress is stored in this browser',
     loopCompleteDescription:
-      'Starter set complete. This is a good moment to print the whole set for paper review.',
+      'Launch pack complete. This is a good moment to print a focused group for paper review.',
     loopDescription: (completed: number, total: number) =>
       `${completed}/${total} complete. Keep the practice loop moving.`,
     loopNextCta: 'Keep practicing',
@@ -2593,13 +2593,13 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     makeWorksheetCta: 'Make worksheet',
     packCta: 'View HSK1 pack',
     packDescription:
-      'Continue into the full HSK1 path with printable worksheets, review history, and custom lists for teachers and parents.',
+      'Turn the free 50-character practice path into a reusable HSK1 workflow with worksheets, review history, and custom lists for teachers and parents.',
     packFeatures: [
-      'Extend the free starter into the full HSK1 writing path',
-      'Use mistake history and review queues to plan the next session',
-      'Create printable worksheets for tutoring, family practice, or self-study',
+      'Save mistake history and review queues to plan the next session',
+      'Reuse custom lists and worksheet templates',
+      'Create assignment handoffs for tutoring, family practice, or self-study',
     ],
-    packTitle: 'Continue with the full HSK1 path',
+    packTitle: 'Upgrade the reusable HSK1 workflow',
     characterAssignmentShareCta: 'Copy assignment',
     characterAssignmentShareMessage: ({
       character,
@@ -2858,7 +2858,7 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     statStrokes: (count: number) => `${count} guided strokes`,
     statWorksheets: 'Worksheets ready',
     summary:
-      'You finished the free starter set. Generate a printable worksheet now, or continue into the full HSK1 path.',
+      'You finished the free 50-character launch pack. Generate a printable worksheet now, or start a focused review pass.',
     summaryWorksheetNote:
       'Print this character set and complete one paper review pass.',
     title: 'Learn Chinese characters by writing them',

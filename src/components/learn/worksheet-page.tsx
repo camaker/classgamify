@@ -2071,12 +2071,12 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
         `${count}/${limit} 个可打印汉字`,
       customHint: '先观察结构，再慢慢书写。',
       customMeaning: '自定义汉字',
-      customOverflow: (count: number) => `${count} 个字将在 Pro 中解锁`,
+      customOverflow: (count: number) => `${count} 个字超出单张纸建议上限`,
       customPlaceholder: '粘贴汉字，例如：你好学习中文',
       customTitle: '粘贴自定义字表',
       dateLabel: '日期',
       description:
-        '从免费 HSK1 入门组里选择汉字，生成一张干净的手写练习纸，适合自学、家长辅导和老师布置作业。',
+        '从 50 个免费 HSK1 第一阶段汉字里选择一小组，生成一张干净的手写练习纸，适合自学、家长辅导和老师布置作业。',
       empty: '至少选择一个汉字来生成练习纸。',
       examplesLabel: '例词',
       feedbackChecks: ['选出最满意的一格', '圈出最难写的字', '写下下次复习字'],
@@ -2093,11 +2093,11 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       footerReviewHint: '写完后圈出最难的字，再回到线上复习同一组。',
       footerSourcePrefix: '更多练习纸：',
       footerTip: '慢慢练：先描第一格，再尝试凭记忆书写。',
-      freeBadge: '免费预览',
+      freeBadge: '免费 50 字',
       freePreviewApplied: (limit: number) => `已保留前 ${limit} 个汉字。`,
       freePreviewLimitCta: (limit: number) => `保留前 ${limit} 个继续`,
       freePreviewLimitHint: (limit: number, overflow: number) =>
-        `免费预览可以马上打印前 ${limit} 个汉字，其余 ${overflow} 个适合用 Pro 自定义字表继续生成。`,
+        `为了保持版面干净，单张练习纸建议最多打印 ${limit} 个汉字。其余 ${overflow} 个可以拆成下一张。`,
       gridOption: (count: number) => `每字 ${count} 格`,
       handwritingAssignmentChecks: [
         '先描有提示的格子',
@@ -2113,13 +2113,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       onlineReviewTitle: '线上复习同一组',
       packCta: '查看完整套餐',
       packDescription:
-        '为长期学习、家庭辅导和课堂布置准备完整 HSK1 练习纸、自定义字表和复习流程。',
+        '为长期学习、家庭辅导和课堂布置准备可复用练习纸、自定义字表和复习流程。',
       packFeatures: [
-        '解锁完整 HSK1 字表和更多练习纸组合',
-        '保存常用自定义字表，方便老师和家长重复布置',
+        '保存常用自定义字表，减少重复整理',
+        '复用练习纸模板，适合每周作业',
         '围绕错字、复习和纸笔作业形成长期学习流程',
       ],
-      packTitle: '完整练习纸套装',
+      packTitle: '可复用练习纸套装',
       paperSizeLabel: '纸张大小',
       paperSizeDescription: (paper: string, detail: string) =>
         `右侧预览按 ${paper} 比例显示（${detail}），实际页边距仍以浏览器打印设置为准。`,
@@ -2160,8 +2160,8 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
           title: '基础象形字',
         },
         fullFree: {
-          description: '把当前免费开放的 HSK1 入门字一次生成出来。',
-          title: '全部免费字',
+          description: '从 50 个免费字里自动保留适合一张纸的前 12 个。',
+          title: '免费 50 字节选',
         },
         nature: {
           description: '适合用图像联想记住笔顺方向的一组字。',
@@ -2199,14 +2199,15 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       saveCurrentSetCta: '保存当前',
       saveCurrentSetSuccess: '当前练习纸已保存到最近列表。',
       selectDescription:
-        '先从免费入门字开始，生成可打印、可分享、可继续线上复习的纸笔作业。',
+        '先从 50 个免费 HSK1 第一阶段汉字中选择一小组，生成可打印、可分享、可继续线上复习的纸笔作业。',
       selectTitle: '选择汉字',
       selectedCount: (count: number, limit: number) => `${count}/${limit}`,
       selectedDescription: (count: number, limit: number) =>
-        `这张练习纸会打印 ${count} 个汉字，免费预览最多 ${limit} 个。`,
+        `这张练习纸会打印 ${count} 个汉字，单张建议最多 ${limit} 个。`,
       selectedEmpty: '从上方选择汉字，或粘贴自定义字表。',
       selectedTitle: '当前练习纸',
-      selectionLimit: (limit: number) => `免费预览最多选择 ${limit} 个汉字。`,
+      selectionLimit: (limit: number) =>
+        `为了保持打印版面干净，单张最多选择 ${limit} 个汉字。`,
       shareCta: '复制练习纸链接',
       shareError: '复制失败，请稍后重试。',
       shareSuccess: '练习纸链接已复制。',
@@ -2298,12 +2299,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       `${count}/${limit} printable characters`,
     customHint: 'Study the structure first, then write slowly.',
     customMeaning: 'custom character',
-    customOverflow: (count: number) => `${count} more unlock with Pro`,
+    customOverflow: (count: number) =>
+      `${count} characters exceed the recommended sheet limit`,
     customPlaceholder: 'Paste characters, e.g. 你好学习中文',
     customTitle: 'Paste a custom list',
     dateLabel: 'Date',
     description:
-      'Pick characters from the free HSK1 starter set and print a clean handwriting worksheet for self-study, tutoring, or classroom practice.',
+      'Pick a small set from the 50 free HSK1 launch characters and print a clean handwriting worksheet for self-study, tutoring, or classroom practice.',
     empty: 'Select at least one character to build a worksheet.',
     examplesLabel: 'Examples',
     feedbackChecks: [
@@ -2325,12 +2327,12 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       'After writing, circle the hardest character and review the same set online.',
     footerSourcePrefix: 'Make more worksheets:',
     footerTip: 'Practice slowly: trace the first box, then write from memory.',
-    freeBadge: 'Free preview',
+    freeBadge: 'Free 50',
     freePreviewApplied: (limit: number) =>
       `Kept the first ${limit} characters.`,
     freePreviewLimitCta: (limit: number) => `Keep first ${limit}`,
     freePreviewLimitHint: (limit: number, overflow: number) =>
-      `The free preview can print the first ${limit} characters now. The remaining ${overflow} fit better in Pro custom lists.`,
+      `To keep the layout clean, one worksheet should print up to ${limit} characters. Split the remaining ${overflow} into another sheet.`,
     gridOption: (count: number) => `${count} per character`,
     handwritingAssignmentChecks: [
       'Trace the guided boxes first',
@@ -2346,13 +2348,13 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     onlineReviewTitle: 'Review the same set online',
     packCta: 'View complete pack',
     packDescription:
-      'Built for long-term study, family coaching, and classroom assignment routines with full HSK1 worksheets, custom lists, and review loops.',
+      'Built for long-term study, family coaching, and classroom assignment routines with reusable worksheets, custom lists, and review loops.',
     packFeatures: [
-      'Unlock the full HSK1 character set and more worksheet combinations',
       'Save reusable custom lists for teachers, tutors, and parents',
+      'Reuse worksheet templates for weekly assignments',
       'Connect mistakes, review, and paper assignments into one routine',
     ],
-    packTitle: 'Complete worksheet pack',
+    packTitle: 'Reusable worksheet pack',
     paperSizeLabel: 'Paper size',
     paperSizeDescription: (paper: string, detail: string) =>
       `The preview uses ${paper} proportions (${detail}). Browser print settings still control printer margins.`,
@@ -2399,8 +2401,8 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       },
       fullFree: {
         description:
-          'Generate every currently available free HSK1 starter character.',
-        title: 'All free characters',
+          'Use the first 12 characters from the free 50-character set so one sheet stays readable.',
+        title: 'Free 50 sample',
       },
       nature: {
         description:
@@ -2440,15 +2442,15 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     saveCurrentSetCta: 'Save current',
     saveCurrentSetSuccess: 'Current worksheet saved to recent worksheets.',
     selectDescription:
-      'Start with the free starter characters, then generate a worksheet that is printable, shareable, and ready for online review.',
+      'Start with a small set from the 50 free HSK1 launch characters, then generate a worksheet that is printable, shareable, and ready for online review.',
     selectTitle: 'Select characters',
     selectedCount: (count: number, limit: number) => `${count}/${limit}`,
     selectedDescription: (count: number, limit: number) =>
-      `This worksheet will print ${count} characters. Free preview supports up to ${limit}.`,
+      `This worksheet will print ${count} characters. One clean sheet supports up to ${limit}.`,
     selectedEmpty: 'Select characters above, or paste a custom list.',
     selectedTitle: 'Current worksheet',
     selectionLimit: (limit: number) =>
-      `Free preview supports up to ${limit} characters.`,
+      `To keep the print layout clean, one sheet supports up to ${limit} characters.`,
     shareCta: 'Copy worksheet link',
     shareError: 'Could not copy the link. Please try again.',
     shareSuccess: 'Worksheet link copied.',

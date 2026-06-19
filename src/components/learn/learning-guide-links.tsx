@@ -96,7 +96,7 @@ function getLearningGuideCopy(
           : '练习前先明确目标，练习后把错笔和纸面复习接回下一次学习。',
       links: [
         {
-          description: '查看免费入门组和 HSK1 第一阶段内容包如何分组练习。',
+          description: '查看 50 个免费 HSK1 第一阶段汉字如何按小组练习。',
           icon: IconListDetails,
           slug: 'hsk1-chinese-characters-list',
           title: 'HSK1 汉字表和练习顺序',
@@ -133,7 +133,7 @@ function getLearningGuideCopy(
     links: [
       {
         description:
-          'See how the free starter and expanded launch pack map into real practice groups.',
+          'See how the 50 free HSK1 launch characters map into real practice groups.',
         icon: IconListDetails,
         slug: 'hsk1-chinese-characters-list',
         title: 'HSK1 character list and practice order',

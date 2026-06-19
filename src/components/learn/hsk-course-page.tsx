@@ -387,7 +387,7 @@ export function HskCoursePage() {
             <CardContent className="grid grid-cols-2 gap-3 text-sm">
               <Stat label={copy.totalLabel} value={stats.total} />
               <Stat label={copy.freeLabel} value={stats.free} />
-              <Stat label={copy.premiumLabel} value={stats.locked} />
+              <Stat label={copy.groupsLabel} value={stats.groups} />
               <Stat label={copy.strokesLabel} value={stats.strokes} />
               <LearningRhythmStats
                 copy={copy}
@@ -1510,8 +1510,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
       continueWorksheetCta: '打印本课练习纸',
       continueWorksheetNote: '把已学汉字带到纸面上复习一遍。',
       finishedDescription:
-        '免费入门组已经完成。现在适合打印整组练习纸，巩固真正的手写记忆。',
-      finishedTitle: '入门组已完成',
+        '第一阶段内容包已经完成。现在适合打印重点小组，巩固真正的手写记忆。',
+      finishedTitle: '第一阶段已完成',
       lessonCharacters: (count: number) => `${count} 个汉字`,
       lessonCompletePrompt: '这一组已经完成，适合打印出来做一次纸笔巩固。',
       lessonContinueCta: '继续本组',
@@ -1530,7 +1530,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       lessonReviewWorksheetNote: (lesson: string, count: number) =>
         `${lesson}：优先复习 ${count} 个有错笔的汉字。`,
       lessonStartCta: '练这一组',
-      lessonStartPrompt: '从本组第一个免费汉字开始，先看笔顺再描写。',
+      lessonStartPrompt: '从本组第一个汉字开始，先看笔顺再描写。',
       lessonWorksheetCta: '打印本组',
       lessonWorksheetNote: (lesson: string) =>
         `${lesson}：完成这一组汉字的纸笔练习。`,
@@ -1538,6 +1538,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       lockedCharacters: (count: number) => `${count} 个 Pro 字`,
       practiceAgainCta: '再练一遍',
       practiceCta: '开始练习',
+      groupsLabel: '学习组',
       premiumLabel: 'Pro 字',
       proBadge: 'Pro',
       progressBackupCta: '复制进度备份',
@@ -1628,7 +1629,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
             ? `先复习错字：${reviewCharacters}。完成线上描写后，再打印错字练习纸。`
             : nextCharacter
               ? `继续练 ${nextCharacter.character} · ${nextCharacter.pinyin}。先看笔顺，再完成一次描写。`
-              : '免费入门组已完成。打印整组练习纸，完成一次纸笔巩固。';
+              : '第一阶段内容包已完成。打印重点小组，完成一次纸笔巩固。';
 
         return [
           'Lang Study HSK1 下次学习计划',
@@ -1704,7 +1705,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       tileReviewBadge: '复习',
       todayBadge: '今日计划',
       todayCompleteDescription:
-        '免费入门组已经完成。今天适合做一次纸笔复习，再挑错笔回到线上巩固。',
+        '第一阶段内容包已经完成。今天适合做一次纸笔复习，再挑错笔回到线上巩固。',
       todayCompleteSteps: [
         '打印整组练习纸',
         '圈出最难写的字',
@@ -1764,27 +1765,27 @@ function getCourseCopy(locale: 'en' | 'zh') {
       upgradeCta: '查看套餐',
       upgradeClassroomCta: '咨询课堂使用',
       upgradeDescription:
-        '免费入门组已经覆盖真实练习流程：看笔顺、跟随描写、记录错笔、打印练习纸。完整工具包会把这些流程扩展到更多汉字和可重复布置的学习场景。',
-      upgradeEyebrow: '完整工具包预览',
+        '当前 50 个 HSK1 第一阶段汉字已经免费开放。Pro 的价值不再是早早锁住基础字，而是把自定义字表、可复用练习纸、复习历史和课堂/家庭交接做成长期工作流。',
+      upgradeEyebrow: 'Pro 工作流预览',
       upgradeSnapshotDescription:
-        '当前公开课程已经能验证核心体验；完整包围绕更长周期的练习、复习和作业布置继续扩展。',
+        '免费课程适合完整体验第一阶段书写闭环；付费方案会围绕更长周期的复习、打印复用和作业布置继续扩展。',
       upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
-        { label: '当前公开', value: `${stats.free} 字` },
-        { label: '第一阶段内容包', value: `${stats.total} 字` },
-        { label: '学习场景', value: '自学 / 家庭 / 课堂' },
+        { label: '免费开放', value: `${stats.free} 字` },
+        { label: '学习分组', value: `${stats.groups} 组` },
+        { label: 'Pro 重点', value: '复用 / 自定义 / 课堂' },
       ],
-      upgradeSnapshotTitle: '从免费入门到 HSK1 第一阶段内容包',
-      upgradeTitle: '把一次练习变成可持续的 HSK1 学习流程',
+      upgradeSnapshotTitle: '50 字免费，Pro 做长期学习系统',
+      upgradeTitle: '把一次练习变成可持续的 HSK1 工作流',
       upgradeValueItems: [
         {
           description:
-            '从免费字扩展到更完整的 HSK1 第一阶段内容包，适合按周完成、反复复习和打印巩固。',
+            '保存常用字表、作业说明和打印设置，让老师、家长和自学者不用每次重新整理。',
           icon: IconBook2,
-          title: '扩展字表路径',
+          title: '可复用字表',
         },
         {
           description:
-            '错笔、复习队列、今日目标和打印练习纸串在一起，减少每次重新安排的成本。',
+            '把错笔、复习队列、今日目标和打印练习纸串在一起，形成稳定的下一步。',
           icon: IconRotate,
           title: '复习闭环',
         },
@@ -1818,8 +1819,8 @@ function getCourseCopy(locale: 'en' | 'zh') {
     continueWorksheetCta: 'Print lesson sheet',
     continueWorksheetNote: 'Review the characters you have learned on paper.',
     finishedDescription:
-      'You finished the free starter set. Print the full set now to reinforce real handwriting memory.',
-    finishedTitle: 'Starter set complete',
+      'You finished the launch pack. Print a focused group now to reinforce real handwriting memory.',
+    finishedTitle: 'Launch pack complete',
     lessonCharacters: (count: number) => `${count} characters`,
     lessonCompletePrompt:
       'This lesson is complete. Print it once to reinforce handwriting memory.',
@@ -1840,7 +1841,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
       `${lesson}: review the ${count} characters with missed strokes first.`,
     lessonStartCta: 'Practice lesson',
     lessonStartPrompt:
-      'Start with the first free character in this lesson: watch, trace, then review.',
+      'Start with the first character in this lesson: watch, trace, then review.',
     lessonWorksheetCta: 'Print lesson',
     lessonWorksheetNote: (lesson: string) =>
       `${lesson}: finish this character set on paper.`,
@@ -1848,6 +1849,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
     lockedCharacters: (count: number) => `${count} Pro`,
     practiceAgainCta: 'Practice again',
     practiceCta: 'Start practice',
+    groupsLabel: 'Groups',
     premiumLabel: 'Pro',
     proBadge: 'Pro',
     progressBackupCta: 'Copy progress backup',
@@ -1918,7 +1920,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
           : 'Review queue: no missed-stroke items yet',
         nextCharacter
           ? `Next step: practice ${nextCharacter.character} · ${nextCharacter.pinyin}`
-          : 'Next step: print the full starter set for paper reinforcement',
+          : 'Next step: print a focused launch-pack set for paper reinforcement',
         '',
         `Online practice: ${practiceUrl}`,
         `Worksheet: ${worksheetUrl}`,
@@ -1942,7 +1944,7 @@ function getCourseCopy(locale: 'en' | 'zh') {
           ? `Review missed characters first: ${reviewCharacters}. Finish online tracing, then print a focused review sheet.`
           : nextCharacter
             ? `Continue with ${nextCharacter.character} · ${nextCharacter.pinyin}. Watch stroke order, then complete one tracing run.`
-            : 'The free starter set is complete. Print the full worksheet set for one paper reinforcement pass.';
+            : 'The launch pack is complete. Print a focused worksheet set for one paper reinforcement pass.';
 
       return [
         'Lang Study HSK1 next lesson plan',
@@ -2022,9 +2024,9 @@ function getCourseCopy(locale: 'en' | 'zh') {
     tileReviewBadge: 'Review',
     todayBadge: 'Today',
     todayCompleteDescription:
-      'The free starter set is complete. Use today for one paper pass, then bring tricky characters back into tracing.',
+      'The launch pack is complete. Use today for one paper pass, then bring tricky characters back into tracing.',
     todayCompleteSteps: [
-      'Print the full starter set',
+      'Print a focused launch set',
       'Circle the hardest characters',
       'Review missed strokes online',
     ],
@@ -2087,23 +2089,23 @@ function getCourseCopy(locale: 'en' | 'zh') {
     upgradeCta: 'View plans',
     upgradeClassroomCta: 'Ask about classroom use',
     upgradeDescription:
-      'The free starter set already proves the core loop: watch stroke order, trace, save missed strokes, and print worksheets. The complete toolkit extends that loop across more characters and repeatable assignment workflows.',
-    upgradeEyebrow: 'Complete toolkit preview',
+      'The current 50-character HSK1 launch pack is free. Pro is not about locking beginner characters early; it is about reusable custom lists, richer worksheets, saved review history, and classroom or family handoff workflows.',
+    upgradeEyebrow: 'Pro workflow preview',
     upgradeSnapshotDescription:
-      'The public course validates the learning experience today. The complete pack expands it for longer practice cycles, review, and assignment planning.',
+      'The free course validates the full first-stage writing loop. Paid plans expand the product around longer review cycles, reusable print setup, and assignment planning.',
     upgradeSnapshotStats: (stats: ReturnType<typeof getCourseStats>) => [
-      { label: 'Public now', value: `${stats.free} chars` },
-      { label: 'Launch pack', value: `${stats.total} chars` },
-      { label: 'Use cases', value: 'Self / family / class' },
+      { label: 'Free now', value: `${stats.free} chars` },
+      { label: 'Lesson groups', value: `${stats.groups}` },
+      { label: 'Pro focus', value: 'Reuse / custom / class' },
     ],
-    upgradeSnapshotTitle: 'From free starter to HSK1 launch pack',
-    upgradeTitle: 'Turn one practice run into a repeatable HSK1 routine',
+    upgradeSnapshotTitle: '50 characters free, Pro for workflow depth',
+    upgradeTitle: 'Turn one practice run into a repeatable HSK1 workflow',
     upgradeValueItems: [
       {
         description:
-          'Move from the free characters into a broader HSK1 launch pack for weekly practice, review, and paper reinforcement.',
+          'Save reusable character sets, assignment notes, and print settings so recurring practice takes less setup.',
         icon: IconBook2,
-        title: 'Expanded character path',
+        title: 'Reusable lists',
       },
       {
         description:

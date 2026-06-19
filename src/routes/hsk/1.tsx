@@ -16,8 +16,8 @@ export const Route = createFileRoute('/hsk/1')({
         : `HSK1 Chinese Character Learning Path | ${websiteConfig.metadata?.name}`;
     const description =
       currentLocale === 'zh'
-        ? '查看 Lang Study 的 HSK1 汉字入门路径：免费描写练习、字卡详情、可打印练习纸和完整课程包入口。'
-        : 'Explore the Lang Study HSK1 character path with free tracing practice, character detail cards, printable worksheets, and the complete course pack.';
+        ? '查看 Lang Study 的免费 50 字 HSK1 第一阶段路径：描写练习、字卡详情、复习队列和可打印练习纸。'
+        : 'Explore the free 50-character Lang Study HSK1 launch path with tracing practice, character detail cards, review cues, and printable worksheets.';
     const url = getCanonicalUrl(Routes.Hsk1);
     const courseJsonLd = {
       '@context': 'https://schema.org',

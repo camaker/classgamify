@@ -521,7 +521,7 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
       },
       planLabels: {
         classroom: '课堂方案',
-        free: '免费入门',
+        free: '免费 50 字',
         lifetime: '早期终身版',
         pro: 'HSK1 Pro',
       },
@@ -540,15 +540,15 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
         },
         free: {
           description:
-            '先验证 Lang Study 的核心闭环：看笔顺、跟随描写、记录错笔，再打印同一组汉字。',
+            '先用 50 个免费 HSK1 第一阶段汉字验证核心闭环：看笔顺、跟随描写、记录错笔，再打印同一组汉字。',
           features: [
-            '免费 HSK1 入门汉字',
+            '50 个免费 HSK1 第一阶段汉字',
             '笔顺动画和跟随描写',
             '基础打印练习纸预览',
           ],
           primaryCta: '查看免费方案',
           secondaryCta: '制作练习纸',
-          title: '从免费入门开始',
+          title: '从免费 50 字开始',
         },
         lifetime: {
           description:
@@ -564,11 +564,11 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
         },
         pro: {
           description:
-            '适合准备系统完成 HSK1 的学习者，把一次试练变成每周练习、复习和打印的稳定流程。',
+            '适合需要长期复用练习纸、保存错字历史、整理自定义字表和交付作业的学习者。',
           features: [
-            '完整 HSK1 书写路径',
-            '错笔记录、复习队列和每日目标',
-            '更多练习纸和自定义字表能力',
+            '保存错笔记录、复习队列和每日目标',
+            '无限练习纸和可复用模板',
+            '自定义字表和老师/家长交接工具',
           ],
           primaryCta: '查看 HSK1 Pro',
           secondaryCta: '制作练习纸',
@@ -635,7 +635,7 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
     },
     planLabels: {
       classroom: 'classroom workflow',
-      free: 'Free Starter',
+      free: 'Free 50',
       lifetime: 'Early Lifetime',
       pro: 'HSK1 Pro',
     },
@@ -654,15 +654,15 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
       },
       free: {
         description:
-          'Use the free starter loop to test Lang Study: watch stroke order, trace, save missed strokes, then print the same set.',
+          'Use the free 50-character HSK1 launch pack to test Lang Study: watch stroke order, trace, save missed strokes, then print the same set.',
         features: [
-          'Free HSK1 starter characters',
+          '50 free HSK1 launch characters',
           'Stroke-order animation and guided tracing',
           'Basic printable worksheet preview',
         ],
         primaryCta: 'View free plan',
         secondaryCta: 'Make a worksheet',
-        title: 'Start with Free Starter',
+        title: 'Start with Free 50',
       },
       lifetime: {
         description:
@@ -678,11 +678,11 @@ function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
       },
       pro: {
         description:
-          'Best when you want to turn one successful starter session into a weekly HSK1 writing, review, and print routine.',
+          'Best when you need saved review history, reusable worksheets, custom lists, and assignment handoff tools.',
         features: [
-          'Complete HSK1 writing path',
-          'Missed-stroke history, review queue, and daily targets',
-          'More worksheets and custom character-list support',
+          'Saved missed-stroke history, review queue, and daily targets',
+          'Unlimited worksheets and reusable templates',
+          'Custom character-list support for learners, tutors, and parents',
         ],
         primaryCta: 'View HSK1 Pro',
         secondaryCta: 'Make a worksheet',
@@ -884,7 +884,7 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
   if (locale === 'zh') {
     return {
       description:
-        '免费版用于验证练字闭环，Pro 用于系统完成 HSK1，早期终身版适合会长期复用字表、练习纸和未来语言包的用户。',
+        '免费版开放当前 50 个 HSK1 第一阶段汉字，Pro 用于保存、复用和交付学习流程，早期终身版适合会长期复用字表、练习纸和未来语言包的用户。',
       eyebrow: '权益边界',
       plans: [
         {
@@ -893,12 +893,14 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
             {
               label: '适合场景',
               state: 'included',
-              value: '先确认笔顺动画、跟随描写和打印样张是否适合自己。',
+              value:
+                '先确认 50 字路径、笔顺动画、跟随描写和打印样张是否适合自己。',
             },
             {
               label: '学习范围',
               state: 'limited',
-              value: '当前免费 HSK1 入门汉字，适合建立第一轮练习节奏。',
+              value:
+                '当前 50 个免费 HSK1 第一阶段汉字，按小组建立第一轮练习节奏。',
             },
             {
               label: '复习记录',
@@ -912,7 +914,7 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
             },
           ],
           subtitle: '不需要先付款，先跑通一次真实练字流程。',
-          title: '免费入门',
+          title: '免费 50 字',
         },
         {
           badge: '推荐',
@@ -921,25 +923,26 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
             {
               label: '适合场景',
               state: 'included',
-              value: '准备按完整 HSK1 路径持续练字、复习和打印。',
+              value: '准备长期复用练习纸、复习历史、自定义字表和作业交付。',
             },
             {
               label: '学习范围',
               state: 'included',
-              value: '完整 HSK1 书写路径，围绕每周练习节奏展开。',
+              value: '在免费 50 字基础上，继续围绕每周练习节奏组织学习流程。',
             },
             {
               label: '复习记录',
               state: 'included',
-              value: '错笔历史、间隔复习和每日目标组成连续学习闭环。',
+              value: '保存错笔历史、间隔复习和每日目标，组成连续学习闭环。',
             },
             {
               label: '练习纸',
               state: 'included',
-              value: '更多练习纸、自定义字表和适合家教/家庭作业的交付。',
+              value:
+                '无限练习纸、可复用模板、自定义字表和适合家教/家庭作业的交付。',
             },
           ],
-          subtitle: '把一次试练变成可持续完成 HSK1 的学习系统。',
+          subtitle: '把一次试练变成可持续复用的 HSK1 学习系统。',
           title: 'HSK1 Pro',
         },
         {
@@ -976,7 +979,7 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
 
   return {
     description:
-      'Free Starter proves the writing loop, Pro turns it into a full HSK1 routine, and Early Lifetime is for people who expect to reuse lists, worksheets, and future language packs.',
+      'Free 50 proves the writing loop, Pro adds reusable workflow depth, and Early Lifetime is for people who expect to reuse lists, worksheets, and future language packs.',
     eyebrow: 'Plan boundaries',
     plans: [
       {
@@ -992,7 +995,7 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
             label: 'Learning scope',
             state: 'limited',
             value:
-              'The current free HSK1 starter characters, enough to build the first practice rhythm.',
+              'The current 50 free HSK1 launch characters, organized into small groups for the first practice rhythm.',
           },
           {
             label: 'Review record',
@@ -1008,7 +1011,7 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
           },
         ],
         subtitle: 'Run one real writing session without paying first.',
-        title: 'Free Starter',
+        title: 'Free 50',
       },
       {
         badge: 'Recommended',
@@ -1018,28 +1021,28 @@ function getPricingPlanComparison(locale: 'en' | 'zh'): PricingComparisonCopy {
             label: 'Best for',
             state: 'included',
             value:
-              'Learners who want to finish HSK1 with ongoing writing, review, and print practice.',
+              'Learners who want saved routines, reusable worksheets, and ongoing review beyond the free launch pack.',
           },
           {
             label: 'Learning scope',
             state: 'included',
             value:
-              'The complete HSK1 writing path organized around weekly practice.',
+              'Workflow depth on top of the free 50-character path, organized around weekly practice.',
           },
           {
             label: 'Review record',
             state: 'included',
             value:
-              'Mistake history, spaced review, and daily targets that keep the loop moving.',
+              'Saved mistake history, spaced review, and daily targets that keep the loop moving.',
           },
           {
             label: 'Worksheets',
             state: 'included',
             value:
-              'More worksheets, custom character lists, and handoff tools for tutoring or family work.',
+              'Unlimited worksheets, custom character lists, reusable templates, and handoff tools for tutoring or family work.',
           },
         ],
-        subtitle: 'Turn the starter loop into a repeatable HSK1 system.',
+        subtitle: 'Turn the free loop into a repeatable HSK1 workflow.',
         title: 'HSK1 Pro',
       },
       {
@@ -1087,7 +1090,7 @@ function getPricingPlanGuide(locale: 'en' | 'zh') {
       items: [
         {
           description:
-            '适合先验证学习节奏、短期自学，或者只想试用完整 HSK1 工具包的用户。',
+            '适合先验证学习节奏、短期自学，或者只想试用 50 字免费内容包的用户。',
           icon: IconCalendarMonth,
           label: '低承诺',
           title: '月付',
@@ -1117,7 +1120,7 @@ function getPricingPlanGuide(locale: 'en' | 'zh') {
     items: [
       {
         description:
-          'Best for trying the full HSK1 toolkit, short self-study windows, or validating a new learning routine.',
+          'Best for trying the free 50-character launch pack, short self-study windows, or validating a new learning routine.',
         icon: IconCalendarMonth,
         label: 'Low commitment',
         title: 'Monthly',
@@ -1162,12 +1165,12 @@ function getPricingFaqItems(locale: 'en' | 'zh') {
       {
         question: '免费版能用什么？',
         answer:
-          '免费版可以练习 HSK1 入门汉字、观看笔顺动画、跟随描写，并生成基础打印练习纸。',
+          '免费版包含当前 50 个 HSK1 第一阶段汉字、笔顺动画、跟随描写，并可以生成基础打印练习纸。',
       },
       {
         question: 'HSK1 Pro 会解锁什么？',
         answer:
-          'HSK1 Pro 解锁完整 HSK1 课程、间隔复习、错字历史、无限打印练习纸和自定义字表，适合想系统练完整套汉字的人。',
+          'HSK1 Pro 重点解锁保存错字历史、间隔复习、无限打印练习纸、自定义字表和可复用作业流程，适合需要长期学习系统的人。',
       },
       {
         question: '适合老师和家长吗？',
@@ -1182,21 +1185,21 @@ function getPricingFaqItems(locale: 'en' | 'zh') {
       {
         question: '应该选月付、年付还是终身版？',
         answer:
-          '短期自学可以先选月付；准备系统学完整 HSK1 或持续打印练习纸，年付更合适；老师、家长或早期支持者可以考虑终身版。',
+          '短期自学可以先选月付；准备持续复习、打印练习纸或保存自定义字表，年付更合适；老师、家长或早期支持者可以考虑终身版。',
       },
     ];
   }
 
   return [
     {
-      question: 'What is included in Free Starter?',
+      question: 'What is included in Free 50?',
       answer:
-        'Free Starter includes the first HSK1 characters, stroke-order animation, guided tracing, and a basic printable worksheet preview.',
+        'Free 50 includes the current 50-character HSK1 launch pack, stroke-order animation, guided tracing, and a basic printable worksheet preview.',
     },
     {
       question: 'What will HSK1 Pro unlock?',
       answer:
-        'HSK1 Pro unlocks the full HSK1 path, spaced review, mistake history, unlimited worksheets, and custom character lists for learners who want a structured writing routine.',
+        'HSK1 Pro unlocks saved review history, spaced review, unlimited worksheets, reusable templates, and custom character lists for learners who want a structured writing routine.',
     },
     {
       question: 'Is this useful for teachers and parents?',
@@ -1211,7 +1214,7 @@ function getPricingFaqItems(locale: 'en' | 'zh') {
     {
       question: 'Should I choose monthly, yearly, or lifetime?',
       answer:
-        'Choose monthly for short-term self-study, yearly if you plan to work through the full HSK1 path, and Early Lifetime if you are a teacher, parent, or early supporter who expects to keep using worksheet and character packs.',
+        'Choose monthly for short-term self-study, yearly if you plan to keep reviewing and printing worksheets, and Early Lifetime if you are a teacher, parent, or early supporter who expects to keep using worksheet and character packs.',
     },
   ];
 }
