@@ -15,6 +15,7 @@ export type RuntimeItem =
     }
   | {
       answer: string;
+      choices: string[];
       id: string;
       kind: 'pair';
       prompt: string;
@@ -38,13 +39,16 @@ export function getRuntimeItems(
 ): RuntimeItem[] {
   switch (templateType) {
     case 'match-up':
-    case 'matching-pairs':
+    case 'matching-pairs': {
+      const choices = content.pairs.map((pair) => pair.right);
       return content.pairs.map((pair) => ({
         answer: pair.right,
+        choices,
         id: pair.id,
         kind: 'pair',
         prompt: pair.left,
       }));
+    }
     case 'group-sort': {
       const choices = content.groups.map((group) => group.label);
       return content.groups.flatMap((group) =>

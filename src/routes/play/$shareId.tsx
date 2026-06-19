@@ -17,6 +17,7 @@ import {
   IconCheck,
   IconDeviceGamepad2,
   IconPlayerPlay,
+  IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
@@ -305,25 +306,12 @@ function RuntimeItemCard({
         </Badge>
       </div>
       {item.choices?.length ? (
-        <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_10rem]">
-          <Input
-            value={answer}
-            onChange={(event) => onAnswerChange(event.target.value)}
-            placeholder="Type or choose an answer"
-          />
-          <select
-            value={answer}
-            onChange={(event) => onAnswerChange(event.target.value)}
-            className="h-8 rounded-lg border border-input bg-background px-2.5 text-sm"
-          >
-            <option value="">Choose</option>
-            {item.choices.map((choice) => (
-              <option key={choice} value={choice}>
-                {choice}
-              </option>
-            ))}
-          </select>
-        </div>
+        <ChoiceGrid
+          answer={answer}
+          choices={item.choices}
+          disabled={revealAnswer}
+          onAnswerChange={onAnswerChange}
+        />
       ) : (
         <Input
           value={answer}
@@ -333,11 +321,70 @@ function RuntimeItemCard({
         />
       )}
       {revealAnswer && reviewItem ? (
-        <p className="mt-2 text-xs text-muted-foreground">
-          {reviewItem?.correct ? 'Correct' : 'Needs review'} · Correct answer:{' '}
-          {reviewItem?.correctAnswer}
-        </p>
+        <AnswerFeedback reviewItem={reviewItem} />
       ) : null}
+    </div>
+  );
+}
+
+function ChoiceGrid({
+  answer,
+  choices,
+  disabled,
+  onAnswerChange,
+}: {
+  answer: string;
+  choices: string[];
+  disabled: boolean;
+  onAnswerChange: (answer: string) => void;
+}) {
+  return (
+    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      {choices.map((choice) => {
+        const selected = answer === choice;
+        return (
+          <button
+            key={choice}
+            type="button"
+            disabled={disabled}
+            className={cn(
+              'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
+              'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
+              selected && 'border-primary bg-primary/10 text-primary'
+            )}
+            onClick={() => onAnswerChange(choice)}
+          >
+            {choice}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function AnswerFeedback({
+  reviewItem,
+}: {
+  reviewItem: PublicAttemptReviewItem;
+}) {
+  return (
+    <div
+      className={cn(
+        'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
+        reviewItem.correct
+          ? 'border-primary/25 bg-primary/5 text-primary'
+          : 'bg-muted/30 text-muted-foreground'
+      )}
+    >
+      {reviewItem.correct ? (
+        <IconCheck className="size-3.5" />
+      ) : (
+        <IconX className="size-3.5" />
+      )}
+      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
+      <span className="text-muted-foreground">
+        Correct answer: {reviewItem.correctAnswer}
+      </span>
     </div>
   );
 }
