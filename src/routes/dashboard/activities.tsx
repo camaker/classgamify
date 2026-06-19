@@ -2,7 +2,7 @@ import { activityTemplates, starterActivities } from '@/activities/catalog';
 import type { ActivityContent } from '@/activities/types';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useActivities } from '@/hooks/use-activities';
+import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -19,12 +20,14 @@ import {
   IconPlus,
   IconSparkles,
 } from '@tabler/icons-react';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 type ActivityCardData = {
   content: ActivityContent;
   description: string;
   id: string;
+  persisted: boolean;
   status: string;
   templateType: string;
   title: string;
@@ -102,6 +105,7 @@ function DashboardActivitiesPage() {
                   content: activity.contentJson,
                   description: activity.description ?? '',
                   id: activity.id,
+                  persisted: true,
                   status: activity.visibility,
                   templateType: activity.templateType,
                   title: activity.title,
@@ -137,6 +141,7 @@ function DashboardActivitiesPage() {
                     content: activity.content,
                     description: activity.description,
                     id: activity.id,
+                    persisted: false,
                     status: activity.status,
                     templateType: activity.templateType,
                     title: activity.title,
@@ -152,9 +157,28 @@ function DashboardActivitiesPage() {
 }
 
 function ActivityCard({ activity }: { activity: ActivityCardData }) {
+  const navigate = useNavigate();
+  const publishMutation = usePublishAssignment();
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
+
+  async function publishActivity() {
+    try {
+      const result = await publishMutation.mutateAsync(activity.id);
+      toast.success('Assignment link published.');
+      navigate({
+        to: Routes.DashboardAssignments,
+        search: { published: result.assignment.shareSlug },
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Assignment could not be published.'
+      );
+    }
+  }
 
   return (
     <Card className="rounded-lg">
@@ -206,6 +230,17 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
               ))}
           </div>
         </div>
+        {activity.persisted ? (
+          <Button
+            type="button"
+            className="w-full sm:w-fit"
+            disabled={publishMutation.isPending}
+            onClick={publishActivity}
+          >
+            <IconPlus className="size-4" />
+            Publish assignment
+          </Button>
+        ) : null}
       </CardContent>
     </Card>
   );
