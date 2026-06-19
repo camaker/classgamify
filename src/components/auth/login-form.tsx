@@ -92,11 +92,16 @@ export function LoginForm({
   };
   return (
     <AuthCard
+      eyebrow={m.auth_login_eyebrow()}
       headerLabel={m.auth_login_welcome_back()}
+      description={m.auth_login_context_description()}
+      returnHint={m.auth_login_return_hint()}
       benefits={[
         m.auth_login_benefit_progress(),
         m.auth_login_benefit_worksheets(),
+        m.auth_login_benefit_review(),
       ]}
+      trustNote={m.auth_login_trust_note()}
       bottomButtonLabel={m.auth_login_sign_up_hint()}
       bottomButtonHref={Routes.Register}
       bottomButtonSearch={authSwitchSearch}
