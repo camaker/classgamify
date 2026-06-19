@@ -11,6 +11,7 @@ import {
   IconBook2,
   IconClipboardText,
   IconFileText,
+  IconLayoutDashboard,
   IconMailForward,
   IconPencil,
   IconPrinter,
@@ -65,6 +66,18 @@ export const Route = createFileRoute('/(pages)/teachers')({
 function TeachersPage() {
   const locale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getTeachersCopy(locale);
+  const trialCharacters = ['人', '口', '日'];
+  const trialPracticeSearch = {
+    character: trialCharacters[0],
+    characters: trialCharacters,
+  };
+  const trialWorksheetSearch = {
+    characters: trialCharacters,
+    details: true,
+    feedback: true,
+    note: copy.trialWorksheetNote,
+    trace: 'guided' as const,
+  };
   const workflowCards = [
     {
       icon: IconPencil,
@@ -104,6 +117,31 @@ function TeachersPage() {
     copy.handoffItemWorksheet,
     copy.handoffItemReturn,
   ];
+  const trialPackActions = [
+    {
+      description: copy.trialPracticeDescription,
+      href: Routes.Learn,
+      icon: IconPencil,
+      label: copy.trialPracticeCta,
+      search: trialPracticeSearch,
+      title: copy.trialPracticeTitle,
+    },
+    {
+      description: copy.trialWorksheetDescription,
+      href: Routes.Worksheets,
+      icon: IconFileText,
+      label: copy.trialWorksheetCta,
+      search: trialWorksheetSearch,
+      title: copy.trialWorksheetTitle,
+    },
+    {
+      description: copy.trialDashboardDescription,
+      href: Routes.Dashboard,
+      icon: IconLayoutDashboard,
+      label: copy.trialDashboardCta,
+      title: copy.trialDashboardTitle,
+    },
+  ];
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -124,6 +162,7 @@ function TeachersPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to={Routes.Worksheets}
+                search={trialWorksheetSearch}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 <IconFileText className="size-4" />
@@ -169,6 +208,42 @@ function TeachersPage() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section className="grid gap-5 rounded-lg border bg-card p-4 md:p-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div className="min-w-0 space-y-3">
+            <p className="text-sm font-semibold uppercase tracking-normal text-primary">
+              {copy.trialPackEyebrow}
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {copy.trialPackTitle}
+            </h2>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {copy.trialPackDescription}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {trialCharacters.map((character) => (
+                <span
+                  key={character}
+                  className="flex size-9 items-center justify-center rounded-lg border bg-background text-lg font-semibold"
+                >
+                  {character}
+                </span>
+              ))}
+            </div>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {copy.trialPackNote}
+            </p>
+          </div>
+          <div className="grid min-w-0 gap-3 md:grid-cols-3">
+            {trialPackActions.map((action, index) => (
+              <TrialActionCard
+                key={action.title}
+                action={action}
+                index={index}
+              />
+            ))}
           </div>
         </section>
 
@@ -237,6 +312,50 @@ function TeachersPage() {
   );
 }
 
+function TrialActionCard({
+  action,
+  index,
+}: {
+  action: {
+    description: string;
+    href: string;
+    icon: TablerIcon;
+    label: string;
+    search?: Record<string, unknown>;
+    title: string;
+  };
+  index: number;
+}) {
+  return (
+    <Link
+      to={action.href}
+      search={action.search}
+      className={cn(
+        'group flex min-w-0 flex-col rounded-lg border bg-background p-4',
+        'transition-colors hover:border-primary/40 hover:bg-primary/5',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-card text-primary">
+          <action.icon className="size-4" />
+        </span>
+        <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+          {index + 1}
+        </span>
+      </div>
+      <h3 className="mt-4 text-sm font-semibold leading-5">{action.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        {action.description}
+      </p>
+      <span className="mt-auto inline-flex max-w-full items-center gap-1 pt-4 text-sm font-medium text-primary">
+        <span className="truncate">{action.label}</span>
+        <IconArrowRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
+  );
+}
+
 function FeatureCard({
   item,
 }: {
@@ -297,6 +416,25 @@ function getTeachersCopy(locale: 'en' | 'zh') {
       subtitle:
         'Lang Study 把笔顺动画、跟随描写、错笔复习和可打印练习纸放在同一个流程里，方便老师、辅导者和家长重复布置练习。',
       title: '给老师、辅导者和家长的中文汉字练习流程',
+      trialDashboardCta: '打开工作台',
+      trialDashboardDescription:
+        '登录后复制今日计划，把线上练习和打印练习纸一起发给学生或家长。',
+      trialDashboardTitle: '复制今日计划',
+      trialPackDescription:
+        '先用三个高频入门字试跑一遍：线上复习、纸面作业、下次交接都能直接打开。',
+      trialPackEyebrow: '课堂试用包',
+      trialPackNote: '这组字适合第一次试用，也方便检查打印和家长交接效果。',
+      trialPackTitle: '从一组小作业开始验证流程',
+      trialPracticeCta: '打开线上练习',
+      trialPracticeDescription:
+        '让学生先看笔顺并完成跟随描写，记录哪些字需要回到复习队列。',
+      trialPracticeTitle: '先线上描写',
+      trialWorksheetCta: '打开打印作业',
+      trialWorksheetDescription:
+        '同一组汉字会带上参考信息、反馈区和作业说明，适合直接打印。',
+      trialWorksheetNote:
+        '课堂试用：先线上描写，再完成纸面慢写并圈出最难的字。',
+      trialWorksheetTitle: '再打印练习纸',
       useCaseClassroomDescription:
         '适合把一组汉字作为课后任务：学生先线上描写，完成后打印同一组做慢写。',
       useCaseClassroomTitle: '课堂作业',
@@ -366,6 +504,26 @@ function getTeachersCopy(locale: 'en' | 'zh') {
     subtitle:
       'Lang Study connects stroke animation, guided tracing, missed-stroke review, and printable worksheets so teachers, tutors, and parents can assign repeatable Chinese writing practice.',
     title: 'Chinese character practice for teachers, tutors, and parents',
+    trialDashboardCta: 'Open dashboard',
+    trialDashboardDescription:
+      'After sign-in, copy the daily plan with both the online practice and printable worksheet links.',
+    trialDashboardTitle: "Copy today's plan",
+    trialPackDescription:
+      'Try one small assignment first: online review, paper homework, and the next-session handoff are all one click away.',
+    trialPackEyebrow: 'Classroom trial pack',
+    trialPackNote:
+      'This set is small enough for a first trial and useful for checking print and parent handoff quality.',
+    trialPackTitle: 'Validate the workflow with one small assignment',
+    trialPracticeCta: 'Open online practice',
+    trialPracticeDescription:
+      'Learners review stroke order and complete guided tracing before anything goes onto paper.',
+    trialPracticeTitle: 'Trace online first',
+    trialWorksheetCta: 'Open print assignment',
+    trialWorksheetDescription:
+      'The same characters open with reference details, a feedback section, and an assignment note.',
+    trialWorksheetNote:
+      'Classroom trial: trace online first, then write slowly on paper and circle the hardest character.',
+    trialWorksheetTitle: 'Print the worksheet',
     useCaseClassroomDescription:
       'Assign a character set after class: learners trace online first, then print the same set for slow handwriting.',
     useCaseClassroomTitle: 'Classroom homework',
