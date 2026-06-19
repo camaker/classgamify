@@ -30,9 +30,9 @@ export function ErrorCard({
   errorDescription?: string;
 } = {}) {
   const displayMessage = getDisplayMessage(errorCode, errorDescription);
-  const safeCallbackUrl = getSafeCallbackPath(callbackUrl, Routes.Learn);
+  const safeCallbackUrl = getSafeCallbackPath(callbackUrl, Routes.Create);
   const authSwitchSearch =
-    safeCallbackUrl === Routes.Learn
+    safeCallbackUrl === Routes.Create
       ? undefined
       : { callbackUrl: safeCallbackUrl };
   return (

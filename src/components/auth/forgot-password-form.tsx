@@ -39,7 +39,7 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('email')
       : null;
-  const defaultCallbackUrl = getPathWithLocale(Routes.Learn);
+  const defaultCallbackUrl = getPathWithLocale(Routes.Create);
   const callbackUrl =
     typeof window !== 'undefined'
       ? getSafeCallbackPath(

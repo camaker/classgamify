@@ -1,8 +1,10 @@
 import { m } from '@/locale/paraglide/messages';
 import {
+  IconDeviceGamepad2,
   IconBell,
   IconCreditCard,
   IconLayoutDashboard,
+  IconListCheck,
   IconLock,
   IconSettings2,
   IconShieldCheck,
@@ -21,6 +23,18 @@ export function getSidebarLinks(): MenuItemConfig[] {
       title: m.dashboard_sidebar_dashboard(),
       icon: IconLayoutDashboard,
       href: Routes.Dashboard,
+      external: false,
+    },
+    {
+      title: m.dashboard_sidebar_activities(),
+      icon: IconDeviceGamepad2,
+      href: Routes.DashboardActivities,
+      external: false,
+    },
+    {
+      title: m.dashboard_sidebar_assignments(),
+      icon: IconListCheck,
+      href: Routes.DashboardAssignments,
       external: false,
     },
     {

@@ -8,7 +8,11 @@ import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
-import { IconBook2, IconFileText, IconPencil } from '@tabler/icons-react';
+import {
+  IconDeviceGamepad2,
+  IconLayoutGrid,
+  IconPlus,
+} from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -22,12 +26,12 @@ export const Route = createFileRoute('/blog/')({
     const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
     const title =
       currentLocale === 'zh'
-        ? `汉字学习文章 | ${websiteConfig.metadata?.name}`
-        : `Chinese Character Learning Articles | ${websiteConfig.metadata?.name}`;
+        ? `课堂活动资源 | ${websiteConfig.metadata?.name}`
+        : `Classroom Activity Resources | ${websiteConfig.metadata?.name}`;
     const description =
       currentLocale === 'zh'
-        ? '阅读 Lang Study 关于中文汉字书写、HSK1 练习、打印练习纸和课堂使用的产品文章。'
-        : 'Read Lang Study articles about Chinese character handwriting, HSK1 practice, printable worksheets, and classroom use.';
+        ? '阅读 ClassGamify 关于游戏化活动、作业链接、课堂模板和 AI 辅助创建的产品文章。'
+        : 'Read ClassGamify articles about game-based activities, assignment links, classroom templates, and AI-assisted creation.';
 
     return seo(Routes.Blog, { title, description });
   },
@@ -42,37 +46,37 @@ function BlogListPage() {
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
           <p className="text-sm font-medium text-primary">
-            {currentLocale === 'zh' ? '学习方法' : 'Learning notes'}
+            {currentLocale === 'zh' ? '课堂活动' : 'Classroom activities'}
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">
             {currentLocale === 'zh'
-              ? '汉字书写、复习和练习纸'
-              : 'Chinese character writing, review, and worksheets'}
+              ? '模板、作业和游戏化课堂'
+              : 'Templates, assignments, and classroom games'}
           </h1>
           <p className="text-muted-foreground">
             {currentLocale === 'zh'
-              ? '围绕 HSK1 汉字、纸笔练习和课堂作业流程的短文章。'
-              : 'Short articles about HSK1 characters, paper practice, and classroom assignment workflows.'}
+              ? '围绕老师创建活动、发布作业和用 AI 加速备课的短文章。'
+              : 'Short articles about teacher activity creation, publishing assignments, and using AI to speed up prep.'}
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-2 rounded-lg border bg-muted/20 p-3">
-          <Link to={Routes.Learn} className={buttonVariants()}>
-            <IconPencil className="size-4" />
-            {currentLocale === 'zh' ? '开始练习' : 'Start practice'}
+          <Link to={Routes.Create} className={buttonVariants()}>
+            <IconPlus className="size-4" />
+            {currentLocale === 'zh' ? '创建活动' : 'Create activity'}
           </Link>
           <Link
-            to={Routes.Hsk1}
+            to={Routes.Templates}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
-            <IconBook2 className="size-4" />
-            {currentLocale === 'zh' ? '查看 HSK1 路径' : 'View HSK1 path'}
+            <IconLayoutGrid className="size-4" />
+            {currentLocale === 'zh' ? '浏览模板' : 'Browse templates'}
           </Link>
           <Link
-            to={Routes.Worksheets}
+            to={Routes.PlayDemo}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
-            <IconFileText className="size-4" />
-            {currentLocale === 'zh' ? '制作练习纸' : 'Make worksheet'}
+            <IconDeviceGamepad2 className="size-4" />
+            {currentLocale === 'zh' ? '学生预览' : 'Student preview'}
           </Link>
         </div>
         <BlogGrid posts={posts} />

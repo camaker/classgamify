@@ -11,12 +11,6 @@ console.log("[server-entry]: using custom server entry in 'src/server.ts'");
 
 export default {
   async fetch(request: Request) {
-    const url = new URL(request.url);
-    if (url.hostname === 'www.getlangstudy.com') {
-      url.hostname = 'getlangstudy.com';
-      return Response.redirect(url.toString(), 301);
-    }
-
     const response = await localeMiddleware(request, () =>
       handler.fetch(request, {
         context: {

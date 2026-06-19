@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorksheetsRouteImport } from './routes/worksheets'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreateRouteImport } from './routes/create'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,8 +32,11 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
+import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
 import { Route as Hsk1RouteImport } from './routes/hsk/1'
 import { Route as HanziCharacterRouteImport } from './routes/hanzi/$character'
+import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
+import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
@@ -58,6 +63,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 const WorksheetsRoute = WorksheetsRouteImport.update({
   id: '/worksheets',
   path: '/worksheets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -88,6 +98,11 @@ const LearnRoute = LearnRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -160,6 +175,11 @@ const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
   path: '/apikeys',
   getParentRoute: () => SettingsRoute,
 } as any)
+const PlayShareIdRoute = PlayShareIdRouteImport.update({
+  id: '/play/$shareId',
+  path: '/play/$shareId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Hsk1Route = Hsk1RouteImport.update({
   id: '/hsk/1',
   path: '/hsk/1',
@@ -169,6 +189,16 @@ const HanziCharacterRoute = HanziCharacterRouteImport.update({
   id: '/hanzi/$character',
   path: '/hanzi/$character',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAssignmentsRoute = DashboardAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardActivitiesRoute = DashboardActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -285,12 +315,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
@@ -309,8 +341,11 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
+  '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -331,10 +366,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/create': typeof CreateRoute
   '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
@@ -353,8 +390,11 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
+  '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -377,12 +417,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/templates': typeof TemplatesRoute
   '/worksheets': typeof WorksheetsRoute
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
@@ -401,8 +443,11 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRoute
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
+  '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -426,12 +471,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/create'
     | '/dashboard'
     | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/templates'
     | '/worksheets'
     | '/cookie'
     | '/privacy'
@@ -450,8 +497,11 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/dashboard/activities'
+    | '/dashboard/assignments'
     | '/hanzi/$character'
     | '/hsk/1'
+    | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -472,10 +522,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/create'
     | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/templates'
     | '/worksheets'
     | '/cookie'
     | '/privacy'
@@ -494,8 +546,11 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/dashboard/activities'
+    | '/dashboard/assignments'
     | '/hanzi/$character'
     | '/hsk/1'
+    | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -517,12 +572,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/create'
     | '/dashboard'
     | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/templates'
     | '/worksheets'
     | '/(legals)/cookie'
     | '/(legals)/privacy'
@@ -541,8 +598,11 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/dashboard/activities'
+    | '/dashboard/assignments'
     | '/hanzi/$character'
     | '/hsk/1'
+    | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -565,12 +625,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   LearnRoute: typeof LearnRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TemplatesRoute: typeof TemplatesRoute
   WorksheetsRoute: typeof WorksheetsRoute
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
@@ -585,6 +647,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   HanziCharacterRoute: typeof HanziCharacterRoute
   Hsk1Route: typeof Hsk1Route
+  PlayShareIdRoute: typeof PlayShareIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiE2eUsersRoute: typeof ApiE2eUsersRoute
@@ -600,6 +663,13 @@ declare module '@tanstack/react-router' {
       path: '/worksheets'
       fullPath: '/worksheets'
       preLoaderRoute: typeof WorksheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -642,6 +712,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -742,6 +819,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsApikeysRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/play/$shareId': {
+      id: '/play/$shareId'
+      path: '/play/$shareId'
+      fullPath: '/play/$shareId'
+      preLoaderRoute: typeof PlayShareIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hsk/1': {
       id: '/hsk/1'
       path: '/hsk/1'
@@ -755,6 +839,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/hanzi/$character'
       preLoaderRoute: typeof HanziCharacterRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/assignments': {
+      id: '/dashboard/assignments'
+      path: '/assignments'
+      fullPath: '/dashboard/assignments'
+      preLoaderRoute: typeof DashboardAssignmentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/activities': {
+      id: '/dashboard/activities'
+      path: '/activities'
+      fullPath: '/dashboard/activities'
+      preLoaderRoute: typeof DashboardActivitiesRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -944,10 +1042,14 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardActivitiesRoute: typeof DashboardActivitiesRoute
+  DashboardAssignmentsRoute: typeof DashboardAssignmentsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardActivitiesRoute: DashboardActivitiesRoute,
+  DashboardAssignmentsRoute: DashboardAssignmentsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -985,12 +1087,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  CreateRoute: CreateRoute,
   DashboardRoute: DashboardRouteWithChildren,
   LearnRoute: LearnRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TemplatesRoute: TemplatesRoute,
   WorksheetsRoute: WorksheetsRoute,
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,
@@ -1005,6 +1109,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   HanziCharacterRoute: HanziCharacterRoute,
   Hsk1Route: Hsk1Route,
+  PlayShareIdRoute: PlayShareIdRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiE2eUsersRoute: ApiE2eUsersRoute,

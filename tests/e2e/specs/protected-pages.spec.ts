@@ -15,6 +15,8 @@ import {
 
 const protectedPages = [
   { path: '/dashboard', name: 'dashboard' },
+  { path: '/dashboard/activities', name: 'activity library' },
+  { path: '/dashboard/assignments', name: 'assignments' },
   { path: '/admin/users', name: 'admin users' },
   { path: '/settings/profile', name: 'profile settings' },
   { path: '/settings/security', name: 'security settings' },

@@ -5,23 +5,23 @@ import type { MenuItemConfig } from '../types';
  * Footer links, grouped by section
  */
 export function getFooterLinks(): MenuItemConfig[] {
-  const learnItems: MenuItemConfig[] = [
+  const productItems: MenuItemConfig[] = [
     {
-      title: m.footer_link_start_practice(),
-      href: Routes.Learn,
-      description: m.footer_link_start_practice_desc(),
+      title: m.nav_templates(),
+      href: Routes.Templates,
+      description: m.footer_link_templates_desc(),
       external: false,
     },
     {
-      title: 'HSK1',
-      href: Routes.Hsk1,
-      description: m.footer_link_hsk_desc(),
+      title: m.nav_create(),
+      href: Routes.Create,
+      description: m.footer_link_create_desc(),
       external: false,
     },
     {
-      title: m.footer_link_articles(),
-      href: Routes.Blog,
-      description: m.footer_link_articles_desc(),
+      title: m.nav_play_demo(),
+      href: Routes.PlayDemo,
+      description: m.footer_link_play_desc(),
       external: false,
     },
     {
@@ -31,17 +31,17 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
   ];
-  const toolItems: MenuItemConfig[] = [
+  const platformItems: MenuItemConfig[] = [
     {
-      title: m.footer_link_worksheets(),
-      href: Routes.Worksheets,
-      description: m.footer_link_worksheets_desc(),
+      title: m.dashboard_sidebar_activities(),
+      href: Routes.DashboardActivities,
+      description: m.footer_link_activities_desc(),
       external: false,
     },
     {
-      title: m.footer_link_review_queue(),
-      href: Routes.Learn,
-      description: m.footer_link_review_queue_desc(),
+      title: m.dashboard_sidebar_assignments(),
+      href: Routes.DashboardAssignments,
+      description: m.footer_link_assignments_desc(),
       external: false,
     },
   ];
@@ -84,8 +84,8 @@ export function getFooterLinks(): MenuItemConfig[] {
     },
   ];
   return [
-    { title: m.footer_section_learn(), items: learnItems },
-    { title: m.footer_section_tools(), items: toolItems },
+    { title: m.footer_section_product(), items: productItems },
+    { title: m.footer_section_platform(), items: platformItems },
     { title: m.footer_section_support(), items: supportItems },
     { title: m.nav_legal(), items: legalItems },
   ];

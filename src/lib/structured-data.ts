@@ -24,7 +24,7 @@ export function organizationJsonLd(): JsonLdNode {
   return {
     '@type': 'Organization',
     '@id': `${baseUrl}/#organization`,
-    name: websiteConfig.metadata?.name ?? 'Lang Study',
+    name: websiteConfig.metadata?.name ?? 'ClassGamify',
     url: baseUrl,
     ...(logo ? { logo } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),

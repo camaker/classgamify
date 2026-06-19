@@ -35,7 +35,7 @@ export function LoginWrapper({
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  const defaultCallbackUrl = getPathWithLocale(Routes.Learn);
+  const defaultCallbackUrl = getPathWithLocale(Routes.Create);
   useEffect(() => {
     setMounted(true);
   }, []);

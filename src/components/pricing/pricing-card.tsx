@@ -110,7 +110,7 @@ export function PricingCard({
 
         {plan.isFree ? (
           <Link
-            to={Routes.Learn}
+            to={Routes.Create}
             className={cn(
               buttonVariants({ variant: 'outline' }),
               'mt-4 w-full'

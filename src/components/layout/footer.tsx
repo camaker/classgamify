@@ -1,25 +1,26 @@
 import { m } from '@/locale/paraglide/messages';
-import { getFooterLinks } from '@/config/footer-config';
-import { Routes } from '@/lib/routes';
-import { isLinkActive } from '@/lib/urls';
-import { cn } from '@/lib/utils';
 import Container from '@/components/layout/container';
 import { Logo } from '@/components/shared/logo';
 import { buttonVariants } from '@/components/ui/button';
+import { getFooterLinks } from '@/config/footer-config';
+import { websiteConfig } from '@/config/website';
+import { Routes } from '@/lib/routes';
+import { isLinkActive } from '@/lib/urls';
+import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
+  IconDeviceGamepad2,
   IconExternalLink,
-  IconFileText,
+  IconLayoutGrid,
   IconMail,
-  IconPencil,
+  IconPlus,
 } from '@tabler/icons-react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { websiteConfig } from '@/config/website';
-import { getCourseStats } from '@/learn/hanzi-course';
+
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
-  const courseStats = getCourseStats();
+
   return (
     <footer
       className={cn(
@@ -33,7 +34,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             <p className="text-xs font-semibold uppercase text-primary">
               {m.footer_cta_eyebrow()}
             </p>
-            <h2 className="mt-2 max-w-2xl text-2xl font-semibold tracking-normal text-balance sm:text-3xl">
+            <h2 className="mt-2 max-w-2xl text-balance text-2xl font-semibold tracking-normal sm:text-3xl">
               {m.footer_cta_title()}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
@@ -42,20 +43,20 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
           </div>
           <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
             <Link
-              to={Routes.Learn}
+              to={Routes.Create}
               className={cn(buttonVariants(), 'w-full sm:w-auto')}
             >
-              <IconPencil className="size-4" />
+              <IconPlus className="size-4" />
               {m.footer_cta_primary()}
             </Link>
             <Link
-              to={Routes.Worksheets}
+              to={Routes.Templates}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
                 'w-full bg-background sm:w-auto'
               )}
             >
-              <IconFileText className="size-4" />
+              <IconLayoutGrid className="size-4" />
               {m.footer_cta_secondary()}
             </Link>
           </div>
@@ -73,26 +74,12 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
               {m.footer_tagline()}
             </p>
             <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
-              <div className="border-l pl-3">
-                <dt className="text-lg font-semibold leading-none">HSK1</dt>
-                <dd className="mt-1 text-xs leading-4 text-muted-foreground">
-                  {m.footer_metric_course()}
-                </dd>
-              </div>
-              <div className="border-l pl-3">
-                <dt className="text-lg font-semibold leading-none">
-                  {courseStats.free}
-                </dt>
-                <dd className="mt-1 text-xs leading-4 text-muted-foreground">
-                  {m.footer_metric_characters()}
-                </dd>
-              </div>
-              <div className="border-l pl-3">
-                <dt className="text-lg font-semibold leading-none">PDF</dt>
-                <dd className="mt-1 text-xs leading-4 text-muted-foreground">
-                  {m.footer_metric_worksheets()}
-                </dd>
-              </div>
+              <FooterMetric label={m.footer_metric_templates()} value="6" />
+              <FooterMetric
+                label={m.footer_metric_assignments()}
+                value="Link"
+              />
+              <FooterMetric label={m.footer_metric_results()} value="Score" />
             </dl>
           </div>
 
@@ -100,7 +87,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             aria-label={m.footer_directory_label()}
             className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4"
           >
-            {footerLinks?.map((section) => (
+            {footerLinks.map((section) => (
               <div key={section.title} className="min-w-0">
                 <h2 className="text-xs font-semibold uppercase text-muted-foreground">
                   {section.title}
@@ -155,6 +142,18 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   );
 }
 
+function FooterMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-l pl-3">
+      <dt className="flex items-center gap-1.5 text-lg font-semibold leading-none">
+        <IconDeviceGamepad2 className="size-4 text-primary" />
+        {value}
+      </dt>
+      <dd className="mt-1 text-xs leading-4 text-muted-foreground">{label}</dd>
+    </div>
+  );
+}
+
 function FooterLink({
   item,
   pathname,
@@ -165,7 +164,7 @@ function FooterLink({
   const active =
     !item.external && isLinkActive(item.href, pathname) ? 'true' : undefined;
   const className =
-    'group/link block rounded-md -mx-2 px-2 py-1.5 transition-colors hover:bg-background/70 focus-visible:bg-background focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-[active=true]:bg-background data-[active=true]:text-primary';
+    'group/link -mx-2 block rounded-md px-2 py-1.5 transition-colors hover:bg-background/70 focus-visible:bg-background focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-[active=true]:bg-background data-[active=true]:text-primary';
   const content = (
     <>
       <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors group-hover/link:text-primary group-data-[active=true]/link:text-primary">

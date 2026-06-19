@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getBaseUrl } from '@/lib/urls';
+import { getSortedPosts } from '@/lib/blog';
 import {
   baseLocale,
   isLocalizedPath,
@@ -7,8 +7,8 @@ import {
   locales,
   localizeHref,
 } from '@/lib/locale';
-import { getHanziPath, getHsk1CharacterList } from '@/learn/hanzi-course';
-import { getSortedPosts } from '@/lib/blog';
+import { Routes } from '@/lib/routes';
+import { getBaseUrl } from '@/lib/urls';
 
 /**
  * Dynamic sitemap.xml
@@ -37,32 +37,26 @@ const sitemapHeaders = {
 
 function buildSitemap() {
   const staticUrls: SitemapUrl[] = [
-    { path: '/', changefreq: 'daily', priority: '1.0' },
-    { path: '/learn', changefreq: 'daily', priority: '0.9' },
-    { path: '/hsk/1', changefreq: 'weekly', priority: '0.9' },
-    { path: '/worksheets', changefreq: 'weekly', priority: '0.8' },
-    { path: '/blog', changefreq: 'weekly', priority: '0.6' },
-    { path: '/pricing', changefreq: 'weekly', priority: '0.6' },
-    { path: '/roadmap', changefreq: 'monthly', priority: '0.5' },
-    { path: '/teachers', changefreq: 'monthly', priority: '0.6' },
-    { path: '/contact', changefreq: 'monthly', priority: '0.4' },
-    { path: '/cookie', changefreq: 'monthly' },
-    { path: '/terms', changefreq: 'monthly' },
-    { path: '/privacy', changefreq: 'monthly' },
+    { path: Routes.Root, changefreq: 'daily', priority: '1.0' },
+    { path: Routes.Templates, changefreq: 'weekly', priority: '0.9' },
+    { path: Routes.Create, changefreq: 'weekly', priority: '0.8' },
+    { path: Routes.PlayDemo, changefreq: 'monthly', priority: '0.4' },
+    { path: Routes.Pricing, changefreq: 'weekly', priority: '0.7' },
+    { path: Routes.Teachers, changefreq: 'monthly', priority: '0.6' },
+    { path: Routes.Contact, changefreq: 'monthly', priority: '0.4' },
+    { path: Routes.Blog, changefreq: 'weekly', priority: '0.5' },
+    { path: Routes.Roadmap, changefreq: 'monthly', priority: '0.5' },
+    { path: Routes.CookiePolicy, changefreq: 'monthly' },
+    { path: Routes.TermsOfService, changefreq: 'monthly' },
+    { path: Routes.PrivacyPolicy, changefreq: 'monthly' },
   ];
-
-  const hanziUrls = getHsk1CharacterList().map((character) => ({
-    path: getHanziPath(character),
-    changefreq: 'weekly',
-    priority: '0.7',
-  }));
   const blogUrls = getSortedPosts(baseLocale).map((post) => ({
-    path: `/blog/${post.slug}`,
+    path: `${Routes.Blog}/${post.slug}`,
     changefreq: 'monthly',
     priority: '0.5',
     lastmod: post.date,
   }));
-  const allUrls = [...staticUrls, ...hanziUrls, ...blogUrls];
+  const allUrls = [...staticUrls, ...blogUrls];
   const entries = allUrls.flatMap((url) =>
     isLocalizedPath(url.path)
       ? locales.map((locale) => urlEntry(url, locale))

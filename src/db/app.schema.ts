@@ -4,9 +4,23 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { integer, sqliteTable, text, index } from 'drizzle-orm/sqlite-core';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { user } from './auth.schema';
-import type { PaymentScene, PaymentStatus, PaymentType, PlanInterval } from '@/payment/types';
+import type {
+  ActivityContent,
+  ActivityTemplateType,
+  ActivityVisibility,
+  AssignmentSettings,
+  AssignmentStatus,
+  AttemptAnswers,
+  AttemptResult,
+} from '@/activities/types';
+import type {
+  PaymentScene,
+  PaymentStatus,
+  PaymentType,
+  PlanInterval,
+} from '@/payment/types';
 
 /** 
  * Payment: subscription and one-time 
@@ -84,5 +98,126 @@ export const userFilesRelations = relations(userFiles, ({ one }) => ({
   user: one(user, {
     fields: [userFiles.userId],
     references: [user.id],
+  }),
+}));
+
+/**
+ * Activity definitions owned by teachers.
+ * contentJson is intentionally template-neutral so one lesson can render as
+ * quiz, match-up, group sort, fill-blank, and later game templates.
+ */
+export const activity = sqliteTable(
+  'activity',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    description: text('description'),
+    templateType: text('template_type').notNull().$type<ActivityTemplateType>(),
+    contentJson: text('content_json', { mode: 'json' })
+      .notNull()
+      .$type<ActivityContent>(),
+    visibility: text('visibility')
+      .notNull()
+      .$type<ActivityVisibility>()
+      .default('draft'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    index('activity_owner_id_idx').on(table.ownerId),
+    index('activity_template_type_idx').on(table.templateType),
+    index('activity_visibility_idx').on(table.visibility),
+    index('activity_owner_updated_idx').on(table.ownerId, table.updatedAt),
+  ]
+);
+
+export const activityRelations = relations(activity, ({ many, one }) => ({
+  owner: one(user, { fields: [activity.ownerId], references: [user.id] }),
+  assignments: many(assignment),
+}));
+
+/**
+ * Published delivery instances. One activity can be assigned many times with
+ * different settings, share slugs, due windows, or classroom instructions.
+ */
+export const assignment = sqliteTable(
+  'assignment',
+  {
+    id: text('id').primaryKey(),
+    activityId: text('activity_id')
+      .notNull()
+      .references(() => activity.id, { onDelete: 'cascade' }),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    shareSlug: text('share_slug').notNull().unique(),
+    title: text('title').notNull(),
+    settingsJson: text('settings_json', { mode: 'json' })
+      .notNull()
+      .$type<AssignmentSettings>(),
+    status: text('status')
+      .notNull()
+      .$type<AssignmentStatus>()
+      .default('draft'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    expiresAt: integer('expires_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    index('assignment_activity_id_idx').on(table.activityId),
+    index('assignment_owner_id_idx').on(table.ownerId),
+    index('assignment_share_slug_idx').on(table.shareSlug),
+    index('assignment_status_idx').on(table.status),
+  ]
+);
+
+export const assignmentRelations = relations(
+  assignment,
+  ({ many, one }) => ({
+    activity: one(activity, {
+      fields: [assignment.activityId],
+      references: [activity.id],
+    }),
+    owner: one(user, { fields: [assignment.ownerId], references: [user.id] }),
+    attempts: many(attempt),
+  })
+);
+
+/**
+ * Student completion sessions. Student identity can stay lightweight for v1:
+ * either a typed display name or an anonymous classroom token.
+ */
+export const attempt = sqliteTable(
+  'attempt',
+  {
+    id: text('id').primaryKey(),
+    assignmentId: text('assignment_id')
+      .notNull()
+      .references(() => assignment.id, { onDelete: 'cascade' }),
+    studentName: text('student_name'),
+    anonymousToken: text('anonymous_token'),
+    score: integer('score'),
+    maxScore: integer('max_score'),
+    answersJson: text('answers_json', { mode: 'json' })
+      .notNull()
+      .$type<AttemptAnswers>(),
+    resultJson: text('result_json', { mode: 'json' }).$type<AttemptResult>(),
+    startedAt: integer('started_at', { mode: 'timestamp_ms' }).notNull(),
+    completedAt: integer('completed_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    index('attempt_assignment_id_idx').on(table.assignmentId),
+    index('attempt_anonymous_token_idx').on(table.anonymousToken),
+    index('attempt_completed_at_idx').on(table.completedAt),
+  ]
+);
+
+export const attemptRelations = relations(attempt, ({ one }) => ({
+  assignment: one(assignment, {
+    fields: [attempt.assignmentId],
+    references: [assignment.id],
   }),
 }));

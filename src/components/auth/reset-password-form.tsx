@@ -39,11 +39,11 @@ export function ResetPasswordForm() {
     typeof window !== 'undefined'
       ? getSafeCallbackPath(
           new URLSearchParams(window.location.search).get('callbackUrl'),
-          Routes.Learn
+          Routes.Create
         )
-      : Routes.Learn;
+      : Routes.Create;
   const authSwitchSearch =
-    callbackUrl === Routes.Learn ? undefined : { callbackUrl };
+    callbackUrl === Routes.Create ? undefined : { callbackUrl };
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, setIsPending] = useState(false);

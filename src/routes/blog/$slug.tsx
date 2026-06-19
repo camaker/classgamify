@@ -16,7 +16,12 @@ import {
   organizationJsonLd,
 } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import { IconArrowLeft, IconFileText, IconPencil } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconDeviceGamepad2,
+  IconLayoutGrid,
+  IconPlus,
+} from '@tabler/icons-react';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/$slug')({
@@ -105,26 +110,33 @@ function BlogPostPage() {
             <div className="min-w-0 space-y-2">
               <h2 className="text-lg font-semibold tracking-normal">
                 {currentLocale === 'zh'
-                  ? '把方法放进今天的练习'
-                  : 'Put this method into practice'}
+                  ? '把方法放进下一个课堂活动'
+                  : 'Put this method into the next activity'}
               </h2>
               <p className="text-sm leading-6 text-muted-foreground">
                 {currentLocale === 'zh'
-                  ? '回到线上描写，或把这一组汉字生成干净的打印练习纸。'
-                  : 'Return to guided tracing, or turn the current set into a clean printable worksheet.'}
+                  ? '创建一个活动，浏览模板，或打开学生预览检查作业体验。'
+                  : 'Create an activity, browse templates, or open the student preview to check the assignment experience.'}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Link to={Routes.Learn} className={buttonVariants()}>
-                <IconPencil className="size-4" />
-                {currentLocale === 'zh' ? '开始练习' : 'Start practice'}
+              <Link to={Routes.Create} className={buttonVariants()}>
+                <IconPlus className="size-4" />
+                {currentLocale === 'zh' ? '创建活动' : 'Create activity'}
               </Link>
               <Link
-                to={Routes.Worksheets}
+                to={Routes.Templates}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
-                <IconFileText className="size-4" />
-                {currentLocale === 'zh' ? '制作练习纸' : 'Make worksheet'}
+                <IconLayoutGrid className="size-4" />
+                {currentLocale === 'zh' ? '浏览模板' : 'Browse templates'}
+              </Link>
+              <Link
+                to={Routes.PlayDemo}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                <IconDeviceGamepad2 className="size-4" />
+                {currentLocale === 'zh' ? '学生预览' : 'Student preview'}
               </Link>
             </div>
           </div>

@@ -1,18 +1,25 @@
-# Lang Study
+# ClassGamify
 
-A language learning application built with TanStack Start and Cloudflare
-Workers. The production domain is <https://getlangstudy.com>.
+ClassGamify is a teacher-facing, game-based classroom activity platform built
+with TanStack Start and Cloudflare Workers.
 
-The first learning track focuses on Chinese characters. The product is
-structured to grow into additional languages over time.
+The product direction is Wordwall-core: teachers create reusable activities,
+render them through focused game templates, publish assignment links for
+students, and review completion/results. AI-assisted activity creation will
+build on top of this activity/assignment foundation.
 
 This project is based on the
 [TanStarter](https://tanstarter.dev) SaaS template.
 
-## Documentation
+## Core Product Model
 
-The template documentation is available at
-[docs.tanstarter.dev](https://docs.tanstarter.dev/docs).
+- `Activity`: teacher-owned reusable activity definition.
+- `ActivityTemplate`: rendering/game type such as quiz, match-up, group sort,
+  fill-blank, matching pairs, or open-box.
+- `ActivityContent`: template-neutral structured lesson content.
+- `Assignment`: shareable classroom delivery instance.
+- `Attempt`: student completion/submission session.
+- `AttemptResult`: score, accuracy, completion, and duration summary.
 
 ## Development
 
@@ -21,6 +28,15 @@ pnpm dev
 ```
 
 The development server runs on <http://localhost:3000>.
+
+Useful checks:
+
+```bash
+pnpm locale:check
+pnpm check
+pnpm build
+pnpm e2e
+```
 
 ## Deployment
 
@@ -35,15 +51,16 @@ Configure these GitHub Actions secrets before the first deploy:
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_DATABASE_ID`
 
-The Cloudflare token must be able to deploy Workers, read/write Workers Assets,
-read D1, read R2, and manage the custom domains in `wrangler.jsonc`.
+Create ClassGamify Cloudflare resources before production deployment, then
+update `wrangler.jsonc` with the real D1 database ID and any final custom
+domains. The old copied-project domain is intentionally not bound here.
 
 Runtime secrets such as `BETTER_AUTH_SECRET`, OAuth keys, mail keys, payment
-keys, and webhook secrets belong in Cloudflare Worker secrets. Copy
-[.env.production.example](.env.production.example) to `.env.production`, fill in
-the real values, then run `pnpm sync-worker-secrets` after the Worker exists.
-Use `pnpm sync-github-secrets` only after installing and logging into the GitHub
-CLI.
+keys, webhook secrets, and AI provider keys belong in Cloudflare Worker secrets.
+Copy [.env.production.example](.env.production.example) to `.env.production`,
+fill in the real values, then run `pnpm sync-worker-secrets` after the Worker
+exists. Use `pnpm sync-github-secrets` only after installing and logging into the
+GitHub CLI.
 
 ## License
 
