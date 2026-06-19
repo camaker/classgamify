@@ -8,6 +8,7 @@ import type {
 } from '@/activities/types';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { ActivityPreview } from '@/components/activities/activity-preview';
+import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import Container from '@/components/layout/container';
@@ -316,6 +317,21 @@ function RuntimeItemList({
     return (
       <div className="mt-4">
         <GroupSortBoard
+          answers={answers}
+          disabled={disabled}
+          items={items}
+          revealAnswer={revealAnswer}
+          reviewItems={reviewItems}
+          onAnswerChange={onAnswerChange}
+        />
+      </div>
+    );
+  }
+
+  if (templateType === 'fill-blank') {
+    return (
+      <div className="mt-4">
+        <FillBlankWorksheet
           answers={answers}
           disabled={disabled}
           items={items}
