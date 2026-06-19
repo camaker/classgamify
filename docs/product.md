@@ -33,6 +33,12 @@ library. Editing uses the same `CreateActivityInput` contract as creation, with
 submission. Published assignments score against their snapshot; editing an
 activity only affects future assignments.
 
+The activity editor should make the selected template legible. When teachers
+choose quiz, match-up, group sort, matching pairs, fill-blank, or open-box, the
+editor shows the required content type and can load a template-specific scaffold
+that fills the matching structured fields. Scaffolds are examples, not hidden
+templates; teachers still review and edit before saving.
+
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
 answers after submission, whether items are shuffled, and the per-student

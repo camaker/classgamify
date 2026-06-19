@@ -1,4 +1,6 @@
 import { activityTemplates } from '@/activities/catalog';
+import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import type { ActivityContent } from '@/activities/types';
 import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
@@ -162,6 +164,21 @@ export function ActivityCreateForm({
           : 'Activity draft could not be generated.'
       );
     }
+  }
+
+  function applyTemplateScaffold() {
+    if (!template) return;
+
+    const current = form.getValues();
+    const scaffold = getActivityTemplateScaffold(selectedTemplate);
+    const nextValues = {
+      ...current,
+      ...scaffold,
+      templateType: selectedTemplate,
+    };
+    form.reset(nextValues);
+    setDraftSourceText(getDraftSourceText(nextValues));
+    toast.success(`${template.name} scaffold loaded.`);
   }
 
   async function onSubmit(values: CreateActivityInput) {
@@ -339,6 +356,46 @@ export function ActivityCreateForm({
                 )}
               />
             </div>
+
+            {template ? (
+              <div className="rounded-lg border bg-muted/20 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="rounded-md">
+                        {template.shortName}
+                      </Badge>
+                      <span className="text-sm font-medium">
+                        {template.name} setup
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {template.description}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {template.contentRequirements.map((requirement) => (
+                        <Badge
+                          key={requirement}
+                          variant="secondary"
+                          className="rounded-md"
+                        >
+                          Requires {getRequirementLabel(requirement)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full bg-background sm:w-fit"
+                    onClick={applyTemplateScaffold}
+                  >
+                    <IconSparkles className="size-4" />
+                    Load scaffold
+                  </Button>
+                </div>
+              </div>
+            ) : null}
 
             <FormField
               control={form.control}
@@ -597,4 +654,17 @@ function getDraftSourceText(values: CreateActivityInput) {
     values.questionsText?.trim() ||
     'apple, bread, milk, rice, water, egg'
   );
+}
+
+function getRequirementLabel(requirement: keyof ActivityContent) {
+  switch (requirement) {
+    case 'groups':
+      return 'groups';
+    case 'pairs':
+      return 'match pairs';
+    case 'questions':
+      return 'questions';
+    default:
+      return requirement;
+  }
 }
