@@ -13,7 +13,7 @@ Activity -> Assignment -> Attempt -> Results
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
-  groups, vocabulary, learning goal, and teacher notes.
+  groups, vocabulary, learning goal, answer explanations, and teacher notes.
 - `ActivityTemplate` is a runtime renderer and scoring strategy for that
   content, such as quiz, match-up, line match, group sort, fill blank,
   listening, matching pairs, or open box.
@@ -83,16 +83,17 @@ The submission contract remains template-neutral: every renderer stores
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
-produce per-item correct rates, reteach priorities, and item-level attempt
-reviews. This keeps the results loop useful for deciding what to explain again
-after homework.
+produce per-item correct rates, reteach priorities, item-level attempt reviews,
+and answer explanations from the assignment snapshot. This keeps the results
+loop useful for deciding what to explain again after homework.
 
 ## AI Authoring
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.
 The AI layer must not bypass the activity editor or persist content directly.
 Teachers should always see and edit the generated title, learning goal,
-vocabulary, questions, pairs, groups, and notes before saving.
+vocabulary, questions, answer explanations, pairs, groups, and notes before
+saving.
 
 Current flow:
 

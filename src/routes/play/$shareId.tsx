@@ -521,6 +521,11 @@ function AnswerFeedback({
       <span className="text-muted-foreground">
         Correct answer: {reviewItem.correctAnswer}
       </span>
+      {reviewItem.explanation ? (
+        <span className="basis-full text-muted-foreground">
+          Why: {reviewItem.explanation}
+        </span>
+      ) : null}
     </div>
   );
 }

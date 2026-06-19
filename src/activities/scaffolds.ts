@@ -26,7 +26,7 @@ export const activityTemplateScaffolds: Record<
       'Students can complete sentences with the correct target vocabulary.',
     pairsText: '',
     questionsText:
-      'I drink ___ in the morning. | milk | milk, rice, apple\nShe eats an ___ after lunch. | apple | apple, bread, water\nWe have ___ for dinner. | rice | rice, milk, egg',
+      'I drink ___ in the morning. | milk | milk, rice, apple | Milk is the drink that fits the sentence.\nShe eats an ___ after lunch. | apple | apple, bread, water | Apple fits after "an" and is a food.\nWe have ___ for dinner. | rice | rice, milk, egg | Rice is a common dinner food.',
     sourceSummary: 'Fill-blank scaffold from a short vocabulary lesson.',
     subject: 'English',
     teacherNotesText:
@@ -56,7 +56,7 @@ export const activityTemplateScaffolds: Record<
       'Students can understand short spoken food sentences and identify the key word.',
     pairsText: '',
     questionsText:
-      'I drink milk in the morning. | milk | milk, rice, apple\nShe eats an apple after lunch. | apple | apple, bread, water\nWe have rice for dinner. | rice | rice, milk, egg',
+      'I drink milk in the morning. | milk | milk, rice, apple | The spoken sentence says milk.\nShe eats an apple after lunch. | apple | apple, bread, water | The key word in the sentence is apple.\nWe have rice for dinner. | rice | rice, milk, egg | Rice is the food named in the sentence.',
     sourceSummary: 'Listening scaffold from short vocabulary sentences.',
     subject: 'English',
     teacherNotesText:
@@ -116,7 +116,7 @@ export const activityTemplateScaffolds: Record<
       'Students can answer short prompts using the target vocabulary.',
     pairsText: '',
     questionsText:
-      'Name one fruit you like. | apple\nWhat do you drink in the morning? | milk\nSay a sentence with rice. | rice',
+      'Name one fruit you like. | apple | | Apple is an example fruit answer.\nWhat do you drink in the morning? | milk | | Milk is a model answer for this prompt.\nSay a sentence with rice. | rice | | The answer should use rice in a sentence.',
     sourceSummary: 'Open-box scaffold from speaking prompts.',
     subject: 'English',
     teacherNotesText:
@@ -131,7 +131,7 @@ export const activityTemplateScaffolds: Record<
       'Students can choose the correct word from simple multiple-choice prompts.',
     pairsText: '',
     questionsText:
-      'Which word means a red or green fruit? | apple | apple, bread, water\nWhich drink is white? | milk | milk, rice, egg\nWhich food is often eaten from a bowl? | rice | rice, water, apple',
+      'Which word means a red or green fruit? | apple | apple, bread, water | Apple is the fruit clue.\nWhich drink is white? | milk | milk, rice, egg | Milk is the white drink.\nWhich food is often eaten from a bowl? | rice | rice, water, apple | Rice is commonly served in a bowl.',
     sourceSummary: 'Quiz scaffold from a unit vocabulary list.',
     subject: 'English',
     teacherNotesText:

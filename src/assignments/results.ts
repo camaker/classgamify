@@ -13,6 +13,7 @@ type AttemptForAnalysis = {
 export type AssignmentItemAnalysis = {
   correctCount: number;
   correctRate: number;
+  explanation?: string;
   expectedAnswer: string;
   itemId: string;
   kind: RuntimeItem['kind'];
@@ -26,6 +27,7 @@ export type AssignmentAttemptReview = {
     answer: string;
     correct: boolean;
     expectedAnswer: string;
+    explanation?: string;
     itemId: string;
     prompt: string;
   }>;
@@ -67,6 +69,7 @@ export function analyzeAssignmentResults({
           ? Math.round((correctCount / submittedCount) * 100)
           : 0,
       expectedAnswer: item.answer,
+      explanation: item.explanation,
       itemId: item.id,
       kind: item.kind,
       prompt: getRuntimePrompt(item),
@@ -83,6 +86,7 @@ export function analyzeAssignmentResults({
           answer: answer.answer,
           correct: Boolean(answer.correct),
           expectedAnswer: item?.answer ?? '',
+          explanation: item?.explanation,
           itemId: answer.itemId,
           prompt: item ? getRuntimePrompt(item) : answer.itemId,
         };

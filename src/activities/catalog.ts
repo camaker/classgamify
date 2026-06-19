@@ -110,6 +110,7 @@ export const starterActivities: ActivitySeed[] = [
           id: 'q-apple',
           prompt: 'Which word means a red or green fruit?',
           answer: 'apple',
+          explanation: 'Apple is the fruit clue in this vocabulary set.',
           options: [
             { id: 'apple', text: 'apple', isCorrect: true },
             { id: 'bread', text: 'bread' },
@@ -120,6 +121,7 @@ export const starterActivities: ActivitySeed[] = [
           id: 'q-milk',
           prompt: 'Which drink is white?',
           answer: 'milk',
+          explanation: 'Milk is the white drink among the answer choices.',
           options: [
             { id: 'milk', text: 'milk', isCorrect: true },
             { id: 'rice', text: 'rice' },
@@ -130,6 +132,8 @@ export const starterActivities: ActivitySeed[] = [
           id: 'q-rice',
           prompt: 'Which food is often eaten from a bowl?',
           answer: 'rice',
+          explanation:
+            'Rice is commonly served in a bowl, unlike the drink choices.',
           options: [
             { id: 'rice', text: 'rice', isCorrect: true },
             { id: 'water', text: 'water' },
@@ -179,6 +183,7 @@ export const starterActivities: ActivitySeed[] = [
           id: 'q-steam',
           prompt: 'Which item belongs with gases?',
           answer: 'steam',
+          explanation: 'Steam is water vapor, so it belongs with gases.',
           options: [
             { id: 'steam', text: 'steam', isCorrect: true },
             { id: 'wood', text: 'wood' },

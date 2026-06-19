@@ -18,6 +18,7 @@ export type PublicRuntimeItem = {
 export type PublicAttemptReviewItem = {
   correct: boolean;
   correctAnswer: string;
+  explanation?: string;
   itemId: string;
 };
 
@@ -74,6 +75,7 @@ export function buildAttemptReviewItems({
   return runtimeItems.map((item) => ({
     correct: correctnessByItemId.get(item.id) ?? false,
     correctAnswer: item.answer,
+    explanation: item.explanation,
     itemId: item.id,
   }));
 }

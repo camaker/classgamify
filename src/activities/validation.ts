@@ -99,7 +99,7 @@ function assertTemplateRequirements(
 
 function parseQuestions(raw?: string): ActivityQuestion[] {
   return parseRows(raw, 'question').map((row, index) => {
-    const [prompt, answer, optionsRaw] = row.parts;
+    const [prompt, answer, optionsRaw, explanation] = row.parts;
     if (!prompt || !answer) {
       throw new Error(
         `Question line ${row.lineNumber} needs "prompt | answer | options".`
@@ -114,6 +114,7 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
     return {
       answer,
       id: makeId('q', prompt, index),
+      explanation,
       options: allOptions.map((option, optionIndex) => ({
         id: makeId('o', option, optionIndex),
         isCorrect: option === answer,
@@ -184,10 +185,7 @@ function parseRows(raw: string | undefined, label: string) {
     .split(/\r?\n/u)
     .map((line, index) => ({
       lineNumber: index + 1,
-      parts: line
-        .split('|')
-        .map((part) => part.trim())
-        .filter(Boolean),
+      parts: line.split('|').map((part) => part.trim()),
       raw: line.trim(),
     }))
     .filter((row) => row.raw.length > 0)

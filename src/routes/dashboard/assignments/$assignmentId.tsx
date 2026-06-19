@@ -260,6 +260,11 @@ function ItemAnalysisCard({
         {item.correctCount}/{item.submittedCount} correct · answer:{' '}
         {item.expectedAnswer}
       </p>
+      {item.explanation ? (
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+          {item.explanation}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -308,6 +313,11 @@ function AttemptReviewCard({
               <p>Student: {answer.answer || '-'}</p>
               <p>Expected: {answer.expectedAnswer || '-'}</p>
             </div>
+            {answer.explanation ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {answer.explanation}
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

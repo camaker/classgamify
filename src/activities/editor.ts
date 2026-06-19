@@ -31,7 +31,10 @@ export function activityContentToEditorInput(
     questionsText: source.content.questions
       .map((question) => {
         const options = ensureOptionText(question.answer, question.options);
-        return `${question.prompt} | ${question.answer} | ${options.join(', ')}`;
+        const base = `${question.prompt} | ${question.answer} | ${options.join(', ')}`;
+        return question.explanation
+          ? `${base} | ${question.explanation}`
+          : base;
       })
       .join('\n'),
     sourceSummary: source.content.sourceSummary,

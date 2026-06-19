@@ -65,7 +65,7 @@ export const activityFormDefaultValues: CreateActivityInput = {
     'Students can recognize key words and connect them with simple meanings.',
   pairsText: 'apple | fruit\nmilk | drink\nrice | grain',
   questionsText:
-    'Which word means a red or green fruit? | apple | apple, bread, water\nWhich drink is white? | milk | milk, rice, egg',
+    'Which word means a red or green fruit? | apple | apple, bread, water | Apple is the fruit clue.\nWhich drink is white? | milk | milk, rice, egg | Milk is the white drink.',
   sourceSummary: 'Teacher-created activity from a unit vocabulary list.',
   subject: 'English',
   teacherNotesText:
@@ -523,12 +523,13 @@ export function ActivityCreateForm({
                       <Textarea
                         {...field}
                         rows={4}
-                        placeholder="Prompt | answer | option, option, option"
+                        placeholder="Prompt | answer | option, option, option | explanation"
                       />
                     </FormControl>
                     <FormDescription>
                       One question per line. Use vertical bars to separate the
-                      prompt, answer, and optional choices.
+                      prompt, answer, optional choices, and optional
+                      explanation.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

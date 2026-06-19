@@ -37,6 +37,7 @@ export type ActivityDraftResult = {
 
 const aiQuestionSchema = z.object({
   answer: z.string().trim().min(1).max(120),
+  explanation: z.string().trim().min(4).max(240).optional(),
   options: z.array(z.string().trim().min(1).max(120)).min(3).max(5),
   prompt: z.string().trim().min(4).max(240),
 });
@@ -147,7 +148,7 @@ function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     '  "sourceSummary": "short summary of the source",',
     '  "vocabulary": ["term one", "term two"],',
     '  "questions": [',
-    '    { "prompt": "question or fill-blank prompt", "answer": "correct answer", "options": ["correct answer", "distractor", "distractor"] }',
+    '    { "prompt": "question or fill-blank prompt", "answer": "correct answer", "options": ["correct answer", "distractor", "distractor"], "explanation": "one short answer explanation" }',
     '  ],',
     '  "pairs": [{ "left": "term", "right": "meaning or match" }],',
     '  "groups": [{ "label": "category", "items": ["item one", "item two"] }],',
@@ -158,6 +159,7 @@ function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     '- Include enough questions, pairs, and groups for the selected template and for reuse in other templates.',
     '- Keep wording age-appropriate and classroom-safe.',
     '- Every question answer must appear in its options array.',
+    '- Every question should include a brief teacher-approved explanation.',
     '- Return JSON only.',
   ].join('\n');
 }
@@ -202,7 +204,14 @@ function toCreateActivityInput(
     questionsText: draft.questions
       .map((question) => {
         const options = ensureAnswerOption(question.answer, question.options);
-        return `${question.prompt} | ${question.answer} | ${options.join(', ')}`;
+        return [
+          question.prompt,
+          question.answer,
+          options.join(', '),
+          question.explanation,
+        ]
+          .filter(Boolean)
+          .join(' | ');
       })
       .join('\n'),
     sourceSummary: draft.sourceSummary,
@@ -234,7 +243,7 @@ function createFallbackActivityDraft(
         `Which item belongs in this lesson set: ${term}? | ${term} | ${ensureAnswerOption(
           term,
           options
-        ).join(', ')}`
+        ).join(', ')} | ${term} is one of the target items from this lesson.`
     );
 
   const pairs = normalizedTerms

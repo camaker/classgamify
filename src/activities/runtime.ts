@@ -9,6 +9,7 @@ export type RuntimeItem =
   | {
       answer: string;
       choices?: string[];
+      explanation?: string;
       id: string;
       kind: 'question';
       prompt: string;
@@ -69,6 +70,7 @@ export function getRuntimeItems(
       return content.questions.map((question) => ({
         answer: question.answer,
         choices: question.options?.map((option) => option.text),
+        explanation: question.explanation,
         id: question.id,
         kind: 'question',
         prompt: question.prompt,
