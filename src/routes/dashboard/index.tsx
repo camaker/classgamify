@@ -1,6 +1,6 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { getFreeCharacters } from '@/learn/hanzi-course';
 import {
@@ -14,7 +14,9 @@ import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
   IconBook2,
+  IconClipboardCheck,
   IconFileText,
+  IconListCheck,
   IconPencil,
   IconPrinter,
   IconRotate,
@@ -24,10 +26,29 @@ import {
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 });
+
+type DashboardPlanMessageInput = {
+  completedCount: number;
+  nextCharacter?: string;
+  reviewCharacters: string[];
+  total: number;
+  worksheetCharacters: string[];
+};
+
+type SessionPlanStep = {
+  description: string;
+  href: string;
+  icon: TablerIcon;
+  label: string;
+  primary?: boolean;
+  search?: Record<string, unknown>;
+  title: string;
+};
 
 function DashboardPage() {
   const locale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -62,7 +83,7 @@ function DashboardPage() {
           note: copy.starterWorksheetNote,
           trace: 'first' as const,
         };
-  const nextSteps = [
+  const sessionPlan: SessionPlanStep[] = [
     {
       description:
         summary.reviewItems.length > 0
@@ -72,6 +93,7 @@ function DashboardPage() {
             : copy.practiceCompleteDescription,
       href: Routes.Learn,
       icon: IconPencil,
+      label: copy.planStepPracticeLabel,
       primary: true,
       search: practiceSearch,
       title:
@@ -86,6 +108,7 @@ function DashboardPage() {
           : copy.worksheetStarterDescription,
       href: Routes.Worksheets,
       icon: IconFileText,
+      label: copy.planStepPrintLabel,
       search: reviewWorksheetSearch,
       title:
         summary.reviewCharacters.length > 0
@@ -96,6 +119,7 @@ function DashboardPage() {
       description: copy.courseDescription,
       href: Routes.Hsk1,
       icon: IconBook2,
+      label: copy.planStepCourseLabel,
       title: copy.courseTitle,
     },
   ];
@@ -115,6 +139,30 @@ function DashboardPage() {
   ];
 
   const breadcrumbs = [{ label: copy.breadcrumb, isCurrentPage: true }];
+  const handoffPlan = copy.handoffPlanMessage({
+    completedCount: summary.completedCount,
+    nextCharacter: nextCharacter?.character,
+    reviewCharacters: summary.reviewCharacters,
+    total: summary.total,
+    worksheetCharacters: reviewWorksheetSearch.characters,
+  });
+
+  const handleCopyPlan = async () => {
+    if (
+      typeof window === 'undefined' ||
+      !window.navigator.clipboard?.writeText
+    ) {
+      toast.error(copy.copyPlanError);
+      return;
+    }
+
+    try {
+      await window.navigator.clipboard.writeText(handoffPlan);
+      toast.success(copy.copyPlanSuccess);
+    } catch {
+      toast.error(copy.copyPlanError);
+    }
+  };
 
   return (
     <DashboardLayout
@@ -182,11 +230,18 @@ function DashboardPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-3">
-          {nextSteps.map((item) => (
-            <ActionCard key={item.title} item={item} />
-          ))}
-        </section>
+        <SessionPlan
+          copyCta={copy.copyPlanCta}
+          description={copy.planDescription}
+          handoffLabel={copy.planHandoffLabel}
+          handoffNote={copy.planHandoffNote(
+            summary.reviewCharacters,
+            nextCharacter?.character
+          )}
+          onCopy={handleCopyPlan}
+          steps={sessionPlan}
+          title={copy.planTitle}
+        />
 
         <section className="grid gap-4 lg:grid-cols-2">
           {supportCards.map((item) => (
@@ -195,6 +250,92 @@ function DashboardPage() {
         </section>
       </div>
     </DashboardLayout>
+  );
+}
+
+function SessionPlan({
+  copyCta,
+  description,
+  handoffLabel,
+  handoffNote,
+  onCopy,
+  steps,
+  title,
+}: {
+  copyCta: string;
+  description: string;
+  handoffLabel: string;
+  handoffNote: string;
+  onCopy: () => void;
+  steps: SessionPlanStep[];
+  title: string;
+}) {
+  return (
+    <section className="min-w-0">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0">
+          <Badge variant="outline" className="rounded-md border-primary/30">
+            <IconListCheck className="size-3.5" />
+            {title}
+          </Badge>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full bg-background sm:w-auto"
+          onClick={onCopy}
+        >
+          <IconClipboardCheck className="size-4" />
+          {copyCta}
+        </Button>
+      </div>
+
+      <ol className="mt-4 grid gap-4 lg:grid-cols-3">
+        {steps.map((step, index) => (
+          <li key={step.label} className="min-w-0">
+            <Link
+              to={step.href}
+              search={step.search}
+              className={cn(
+                'group flex h-full min-w-0 flex-col rounded-lg border',
+                'bg-card p-4 transition-colors',
+                'hover:border-primary/40 hover:bg-primary/5',
+                'focus-visible:outline-none focus-visible:ring-2',
+                'focus-visible:ring-ring',
+                step.primary && 'border-primary/30 bg-primary/5'
+              )}
+            >
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
+                  <step.icon className="size-4" />
+                </span>
+                <span className="text-xs font-semibold uppercase">
+                  {index + 1}. {step.label}
+                </span>
+              </div>
+              <h2 className="mt-3 text-balance font-semibold text-sm leading-5">
+                {step.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {step.description}
+              </p>
+              <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary">
+                {step.label}
+                <IconArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+
+      <p className="mt-3 border-t pt-3 text-sm leading-6 text-muted-foreground">
+        <span className="font-medium text-foreground">{handoffLabel}</span>{' '}
+        {handoffNote}
+      </p>
+    </section>
   );
 }
 
@@ -263,12 +404,49 @@ function getDashboardCopy(locale: 'en' | 'zh') {
         `从下一个汉字 ${character} 开始，保持短练习节奏。`,
       practiceReviewDescription: (count: number) =>
         `先处理 ${count} 个有错笔记录的汉字，再加入新字。`,
-      practiceReviewTitle: '先复习错笔',
+      practiceReviewTitle: '复习错笔',
       practiceTitle: '继续线上描写',
       pricingDescription:
         '查看免费、Pro 和早期终身版的权益边界，决定是否需要完整 HSK1 和自定义练习纸。',
       pricingTitle: '查看升级方案',
       printCta: '打印当前练习纸',
+      copyPlanCta: '复制今日计划',
+      copyPlanError: '无法复制今日计划，请稍后重试。',
+      copyPlanSuccess: '今日学习计划已复制。',
+      handoffPlanMessage: ({
+        completedCount,
+        nextCharacter,
+        reviewCharacters,
+        total,
+        worksheetCharacters,
+      }: DashboardPlanMessageInput) =>
+        [
+          'Lang Study 今日学习计划',
+          `进度：${completedCount}/${total} 个入门汉字已完成。`,
+          reviewCharacters.length > 0
+            ? `先复习错笔：${reviewCharacters.join(' ')}`
+            : nextCharacter
+              ? `下一字：${nextCharacter}`
+              : '入门字已完成：做一轮慢速复习。',
+          `纸笔练习：${worksheetCharacters.join(' ')}`,
+          '继续学习：https://getlangstudy.com/dashboard',
+        ].join('\n'),
+      planDescription:
+        '把今天的线上描写、打印练习和课程复盘放在同一条路径里。老师、家长或自学者可以直接复制给下一次练习。',
+      planHandoffLabel: '交接说明：',
+      planHandoffNote: (reviewCharacters: string[], next?: string) => {
+        if (reviewCharacters.length > 0) {
+          return `今天优先处理 ${reviewCharacters.join(
+            ' '
+          )}，打印前先在线复习一次。`;
+        }
+        if (next) return `今天从 ${next} 开始，再把同组汉字打印成慢写作业。`;
+        return '入门字已经完成，今天适合打印整组汉字做复盘慢写。';
+      },
+      planStepCourseLabel: '复盘路径',
+      planStepPracticeLabel: '线上练习',
+      planStepPrintLabel: '打印练习',
+      planTitle: '今日练习计划',
       progressLabel: (completed: number, total: number) =>
         `${completed}/${total} 个入门汉字已完成`,
       reviewLabel: (count: number) =>
@@ -318,12 +496,51 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       `Start from the next character, ${character}, and keep the session short.`,
     practiceReviewDescription: (count: number) =>
       `Clear ${count} characters with missed strokes before adding new ones.`,
-    practiceReviewTitle: 'Review missed strokes first',
+    practiceReviewTitle: 'Review missed strokes',
     practiceTitle: 'Continue online tracing',
     pricingDescription:
       'Compare Free, Pro, and Early Lifetime boundaries before unlocking full HSK1 and custom worksheets.',
     pricingTitle: 'Review upgrade options',
     printCta: 'Print current worksheet',
+    copyPlanCta: "Copy today's plan",
+    copyPlanError: 'Could not copy the study plan. Try again later.',
+    copyPlanSuccess: "Today's study plan copied.",
+    handoffPlanMessage: ({
+      completedCount,
+      nextCharacter,
+      reviewCharacters,
+      total,
+      worksheetCharacters,
+    }: DashboardPlanMessageInput) =>
+      [
+        'Lang Study daily study plan',
+        `Progress: ${completedCount}/${total} starter characters complete.`,
+        reviewCharacters.length > 0
+          ? `Review first: ${reviewCharacters.join(' ')}`
+          : nextCharacter
+            ? `Next character: ${nextCharacter}`
+            : 'Starter set complete: do one slow review pass.',
+        `Paper practice: ${worksheetCharacters.join(' ')}`,
+        'Continue: https://getlangstudy.com/dashboard',
+      ].join('\n'),
+    planDescription:
+      'Keep online tracing, print practice, and course review in one clean path that can be reused by learners, parents, tutors, and teachers.',
+    planHandoffLabel: 'Handoff note:',
+    planHandoffNote: (reviewCharacters: string[], next?: string) => {
+      if (reviewCharacters.length > 0) {
+        return `Start with ${reviewCharacters.join(
+          ' '
+        )}, then print only after one online review pass.`;
+      }
+      if (next) {
+        return `Start from ${next}, then print the same set for slow handwriting.`;
+      }
+      return 'The starter set is complete. Use today for a full slow paper review.';
+    },
+    planStepCourseLabel: 'Review path',
+    planStepPracticeLabel: 'Online practice',
+    planStepPrintLabel: 'Paper practice',
+    planTitle: "Today's practice plan",
     progressLabel: (completed: number, total: number) =>
       `${completed}/${total} starter characters complete`,
     reviewLabel: (count: number) =>

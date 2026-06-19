@@ -1,64 +1,150 @@
 ## Design Context
 
+### Product
+
+Lang Study is a writing-practice product for language learners. The first
+public track focuses on HSK1 Chinese characters: stroke order, guided tracing,
+missed-stroke review, printable worksheets, and repeatable practice plans.
+
+The product should feel useful today while leaving room for more languages and
+writing systems later. Avoid copy, navigation, and UI structures that make the
+site feel like a generic SaaS template or a single-purpose Chinese-only toy.
+
 ### Users
 
-**Primary audience:** Indie hackers and solo founders building SaaS products on Cloudflare Workers. They are technically proficient developers who value speed, efficiency, and clean tooling. They use this boilerplate to skip setup and ship revenue-generating products faster. Their context is focused productivity — they want to configure, customize, and deploy without friction.
+**Primary learners:** Adult beginners and self-study learners who want a clear
+10-minute loop: watch the stroke order, trace the character, notice mistakes,
+and know what to practice next.
+
+**Teaching helpers:** Tutors, classroom teachers, and parents who need
+printable assignments, repeatable handoff notes, and quick progress signals
+without building their own worksheets every time.
+
+**Buyers:** Learners, families, tutors, and small classroom operators deciding
+whether the full HSK1 pack, saved lists, review history, and worksheet volume
+are worth paying for.
+
+### Product Principles
+
+1. **Practice First**
+   The first screen of core pages should lead to doing the work: trace,
+   review, print, copy a plan, or choose the next character. Avoid marketing
+   pages that explain the product while delaying the actual learning loop.
+
+2. **Clear Next Step**
+   Every learning surface should answer "what should I do next?" The answer
+   may be online practice, missed-stroke review, paper practice, or course
+   review. Avoid ambiguous dashboards and decorative metrics.
+
+3. **Paper Is Part Of The Product**
+   Worksheets are not a side export. Printed output must be clean,
+   brand-attributed, useful across common paper sizes, and free of website
+   chrome. On-screen worksheet controls can be dense, but print preview must
+   look like a prepared teaching handout.
+
+4. **Teacher And Parent Handoff**
+   Copyable plans, assignment notes, and printed footers should make it easy
+   for a tutor, parent, or student to continue later. The domain
+   `getlangstudy.com` should appear where it creates useful attribution and
+   referral value, especially in printable materials.
+
+5. **Expandable, Not Generic**
+   Keep language generality in the information architecture and copy where it
+   matters, but make the current Chinese character experience specific and
+   polished. Do not hide the actual launch product behind vague "learn any
+   language" claims.
 
 ### Brand Personality
 
-**Three words:** Modern, Professional, Technical
+**Three words:** Calm, precise, encouraging.
 
-**Voice & tone:** Direct, confident, and understated. No marketing fluff or unnecessary embellishment. Communicate with the precision developers expect. Every word earns its place.
+**Voice and tone:**
 
-**Emotional goals:**
-- **Confidence & trust** — The interface should feel solid, reliable, and production-ready
-- **Speed & efficiency** — Every interaction should feel fast and purposeful
-- **Calm focus** — Distraction-free, letting the content and functionality lead
-- **Technical credibility** — Developer-grade seriousness without being cold
-- **Subtle delight** — Small moments of polish that reward attention to detail
+- Direct and practical for controls, errors, pricing, and account surfaces.
+- Warm but not childish for learning guidance.
+- Specific about Chinese characters, HSK1, worksheets, and review when those
+  are the actual product surfaces.
+- Honest about what is live, what is paid, and what is planned.
 
-### Aesthetic Direction
+### Visual Direction
 
-**Visual tone:** Ultra-minimal. Monochrome neutral palette with zero decorative color. Dark mode is the default and primary experience. Surfaces are flat with minimal elevation — prefer subtle rings and translucent borders over shadows. Density is compact, respecting screen real estate.
+**Overall feel:** Quiet learning workspace, not a decorative education landing
+page. The UI should feel trustworthy enough for parents and teachers, but light
+enough for a learner to use daily.
 
-**Typography:** Bricolage Grotesque at medium weight (500) as the default. A distinctive but professional grotesque sans-serif that adds just enough personality without being distracting. Bold (700) for headings only.
+**Layout density:** Compact and scannable in operational tools such as
+dashboard, worksheets, settings, and pricing. Marketing and roadmap pages can
+use more breathing room, but should still expose real product workflows early.
 
-**Shape language:** Moderately rounded (8px base radius). Not pill-shaped, not sharp — balanced and quiet.
+**Shape language:** Use the existing 8px-ish radius system. Avoid nested cards,
+large pill-shaped blocks, and decorative floating sections.
 
-**Color philosophy:** Achromatic grayscale using oklch color space. The only chromatic accents are functional (destructive red, chart blues). No brand accent color — the monochrome palette IS the brand. Even more minimal than typical dark SaaS themes.
+**Color:** Use neutral surfaces as the base with restrained functional color.
+Do not let the interface collapse into a single purple, beige, blue-slate, or
+brown/orange theme. Color should clarify state, selection, review urgency, or
+print settings rather than decorate empty space.
 
-**Theme:** Dark-first with full light/dark/system support. Dark mode uses semi-transparent white borders for a subtle glassy depth effect.
+**Typography:** Use the existing Bricolage Grotesque setup. Keep dashboard,
+worksheet, and control text smaller and tighter than hero text. Do not scale
+font size with viewport width.
 
-**References (positive):**
-- Linear — clean, fast, developer-focused
-- Vercel — minimal, dark-first, professional
-- Raycast — compact, keyboard-driven, polished
-- Stripe — elegant, well-documented, trust-building
+**Icons:** Use Tabler icons for tool actions, worksheet controls, account
+navigation, and dashboard steps. Prefer icons plus short labels for concrete
+actions such as print, copy, review, practice, and settings.
 
-**Anti-references (explicitly avoid):**
-- Overly playful/cartoon-like interfaces (e.g., Notion's illustrations)
-- Enterprise/corporate heaviness (e.g., Salesforce, SAP)
-- Cluttered dashboards with excessive data density
-- Bland/generic Bootstrap-style templates
+### Page Standards
 
-### Design Principles
+**Home**
 
-1. **Content over chrome.** The interface should disappear. No decorative elements, no gratuitous color, no visual noise. Every pixel serves a purpose.
+- Show the actual learning loop above the fold.
+- Avoid template screenshots and abstract product claims.
+- Make the current HSK1 character workflow obvious, while mentioning future
+  language expansion only as a supporting point.
 
-2. **Quiet confidence.** The design should feel assured without being loud. Subtle polish (consistent spacing, precise alignment, smooth transitions) communicates quality better than bold visuals.
+**Learn and HSK pages**
 
-3. **Compact by default.** Respect the developer's screen. Use tight but breathable spacing. Default interactive elements at 32px height. Avoid bloated layouts.
+- The primary action should be practice, review, or continue.
+- Missed-stroke feedback should be visually close to the next action.
+- Upgrade prompts should connect to concrete unlocked value: full HSK1,
+  review history, saved lists, worksheets, and handoff workflows.
 
-4. **Dark-first, light-ready.** Design for dark mode first, then ensure light mode is equally refined. Use translucent borders and subtle depth cues that work in both themes.
+**Worksheets**
 
-5. **Accessible without compromise.** Meet WCAG 2.1 AA standards. Ensure sufficient contrast ratios, visible focus indicators (ring-3), and keyboard navigability throughout. Accessibility is not an afterthought — it's built into every component.
+- Controls should be ergonomic for repeated use: character set, paper size,
+  trace mode, feedback area, copy/share, and print.
+- Print output must exclude navigation, footer, sidebars, buttons, and other
+  website chrome.
+- Printed footer/domain attribution should be useful and unobtrusive.
 
-### Technical Design Stack
+**Dashboard**
 
-- **CSS Framework:** Tailwind CSS v4 with oklch color tokens
-- **Component Library:** shadcn/ui (base-nova style) + Base UI React primitives
-- **Variant System:** class-variance-authority (CVA) + clsx + tailwind-merge
-- **Icons:** Tabler Icons (`@tabler/icons-react`)
-- **Animation:** tw-animate-css (minimal, purposeful transitions)
-- **Font:** Bricolage Grotesque (400, 500, 600, 700 weights, Latin subset)
-- **Dark mode:** Class-based (`.dark` on `<html>`), localStorage-persisted
+- Focus on today's plan, not vanity analytics.
+- Surface review queue, next character, worksheet creation, and course path.
+- Support copyable handoff text for teachers, parents, tutors, and learners.
+
+**Pricing**
+
+- Clearly distinguish free starter, Pro, and lifetime access.
+- Tie each paid feature to a real learning or teaching workflow.
+- Payment state should be calm and transparent: sign-in requirement, hosted
+  checkout, plan limits, and billing management.
+
+**Legal and Trust**
+
+- Privacy, terms, and cookie pages should read like a live product, not a
+  template.
+- Be explicit about local progress, accounts, payment providers, email,
+  storage, and future AI/provider integrations.
+
+### Responsive And QA Standards
+
+- Every public page should be checked at mobile, tablet, and desktop widths.
+- No page may horizontally overflow at 375px wide.
+- Long English strings such as "Review missed strokes" must wrap gracefully in
+  cards and controls.
+- Fixed-format UI elements such as practice canvases, worksheet previews,
+  toolbars, and metrics need stable dimensions so hover states and dynamic text
+  do not resize the layout.
+- After visual changes, verify rendered pages with browser screenshots or
+  equivalent layout checks, including console errors and obvious network
+  failures.
