@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/accordion';
 import { websiteConfig } from '@/config/website';
 import { useCurrentPlan } from '@/hooks/use-payment';
+import { getTrialWorksheetSearch } from '@/learn/trial-workflow';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -35,8 +36,6 @@ import {
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-
-const PRICING_TRIAL_CHARACTERS = ['人', '口', '日'];
 
 export const Route = createFileRoute('/(pages)/pricing')({
   head: () => {
@@ -78,7 +77,12 @@ function PricingPage() {
   const planComparison = getPricingPlanComparison(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
   const planFit = getPricingPlanFit(currentLocale);
-  const trialWorksheetSearch = getPricingTrialWorksheetSearch(currentLocale);
+  const trialWorksheetSearch = getTrialWorksheetSearch({
+    note:
+      currentLocale === 'zh'
+        ? '购买前试用：先线上描写，再打印这组样张，检查纸笔练习和家长交接是否适合。'
+        : 'Pre-purchase trial: trace online first, then print this sample set to check paper practice and parent handoff.',
+  });
   const nextStepCards = getPricingNextStepCards(
     currentLocale,
     trialWorksheetSearch
@@ -854,19 +858,6 @@ function getPricingNextStepCards(
       title: 'Ask about classroom use',
     },
   ];
-}
-
-function getPricingTrialWorksheetSearch(locale: 'en' | 'zh') {
-  return {
-    characters: PRICING_TRIAL_CHARACTERS,
-    details: true,
-    feedback: true,
-    note:
-      locale === 'zh'
-        ? '购买前试用：先线上描写，再打印这组样张，检查纸笔练习和家长交接是否适合。'
-        : 'Pre-purchase trial: trace online first, then print this sample set to check paper practice and parent handoff.',
-    trace: 'guided',
-  };
 }
 
 function getPricingClassroomCta(locale: 'en' | 'zh') {

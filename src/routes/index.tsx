@@ -1,5 +1,9 @@
 import { HanziPracticePage } from '@/components/learn/hanzi-practice-page';
 import { websiteConfig } from '@/config/website';
+import {
+  getTrialWorksheetNote,
+  TRIAL_WORKFLOW_CHARACTERS,
+} from '@/learn/trial-workflow';
 import { seo } from '@/lib/seo';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { createFileRoute } from '@tanstack/react-router';
@@ -9,8 +13,6 @@ import {
   organizationJsonLd,
   websiteJsonLd,
 } from '@/lib/structured-data';
-
-const HOME_TRIAL_CHARACTERS = ['人', '口', '日'];
 
 export const Route = createFileRoute('/')({
   head: () => {
@@ -51,8 +53,7 @@ function HomePage() {
             '先用人、口、日跑通一个短练习：看笔顺、跟随描写、记录错笔，再打印同一组样张。',
           freeBadge: '3 个入门汉字',
           title: '从三个高频汉字开始练习',
-          worksheetNote:
-            '首页试用：先在线描写人、口、日，再打印同一组做纸面慢写。',
+          worksheetNote: getTrialWorksheetNote('zh'),
         }
       : {
           badge: 'Three-character trial',
@@ -60,14 +61,13 @@ function HomePage() {
             'Start with 人, 口, and 日: watch stroke order, trace once, save missed strokes, then print the same sample set.',
           freeBadge: '3 starter characters',
           title: 'Start with three high-frequency characters',
-          worksheetNote:
-            'Homepage trial: trace 人, 口, and 日 online first, then print the same set for slow handwriting.',
+          worksheetNote: getTrialWorksheetNote('en'),
         };
 
   return (
     <HanziPracticePage
-      initialCharacter={HOME_TRIAL_CHARACTERS[0]}
-      initialCharacters={HOME_TRIAL_CHARACTERS}
+      initialCharacter={TRIAL_WORKFLOW_CHARACTERS[0]}
+      initialCharacters={[...TRIAL_WORKFLOW_CHARACTERS]}
       introCopy={introCopy}
     />
   );

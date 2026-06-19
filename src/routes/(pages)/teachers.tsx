@@ -1,6 +1,11 @@
 import Container from '@/components/layout/container';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
+import {
+  getTrialPracticeSearch,
+  getTrialWorksheetSearch,
+  TRIAL_WORKFLOW_CHARACTERS,
+} from '@/learn/trial-workflow';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -66,18 +71,10 @@ export const Route = createFileRoute('/(pages)/teachers')({
 function TeachersPage() {
   const locale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getTeachersCopy(locale);
-  const trialCharacters = ['人', '口', '日'];
-  const trialPracticeSearch = {
-    character: trialCharacters[0],
-    characters: trialCharacters,
-  };
-  const trialWorksheetSearch = {
-    characters: trialCharacters,
-    details: true,
-    feedback: true,
+  const trialPracticeSearch = getTrialPracticeSearch();
+  const trialWorksheetSearch = getTrialWorksheetSearch({
     note: copy.trialWorksheetNote,
-    trace: 'guided' as const,
-  };
+  });
   const workflowCards = [
     {
       icon: IconPencil,
@@ -223,7 +220,7 @@ function TeachersPage() {
               {copy.trialPackDescription}
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {trialCharacters.map((character) => (
+              {TRIAL_WORKFLOW_CHARACTERS.map((character) => (
                 <span
                   key={character}
                   className="flex size-9 items-center justify-center rounded-lg border bg-background text-lg font-semibold"
