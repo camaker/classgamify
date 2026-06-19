@@ -895,9 +895,10 @@ export function WorksheetPage({
                             <p className="mt-1 text-xs leading-5 text-muted-foreground">
                               {quickSet.description}
                             </p>
-                            <p className="mt-2 break-words text-sm font-semibold">
-                              {quickSet.characters.join(' ')}
-                            </p>
+                            <QuickSetCharacterPreview
+                              characters={quickSet.characters}
+                              copy={copy}
+                            />
                           </button>
                         );
                       })}
@@ -1872,6 +1873,38 @@ function WorksheetFeedbackSection({ copy }: { copy: WorksheetCopy }) {
 
 type WorksheetCopy = ReturnType<typeof getWorksheetCopy>;
 
+function QuickSetCharacterPreview({
+  characters,
+  copy,
+}: {
+  characters: string[];
+  copy: WorksheetCopy;
+}) {
+  const visibleCharacters = characters.slice(0, MAX_WORKSHEET_CHARACTERS);
+  const overflowCount = Math.max(
+    0,
+    characters.length - visibleCharacters.length
+  );
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-1.5">
+      {visibleCharacters.map((character) => (
+        <span
+          key={character}
+          className="inline-flex size-7 items-center justify-center rounded-md border bg-muted/30 text-sm font-semibold"
+        >
+          {character}
+        </span>
+      ))}
+      {overflowCount > 0 ? (
+        <span className="inline-flex h-7 items-center rounded-md border bg-background px-2 text-xs font-medium text-muted-foreground">
+          {copy.quickSetMoreCount(overflowCount)}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 type WorksheetAssignmentShareMessageParams = {
   assignmentNote: string;
   characters: string[];
@@ -2154,6 +2187,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       printSettingsTitle: '打印设置',
       practiceBoxesLabel: '练习格数量',
       quickSetCount: (count: number) => `${count} 字`,
+      quickSetMoreCount: (count: number) => `+${count} 字`,
       quickSets: {
         foundations: {
           description: '先练结构最清楚、最适合第一次书写的基础字。',
@@ -2393,6 +2427,7 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     printSettingsTitle: 'Print settings',
     practiceBoxesLabel: 'Practice boxes',
     quickSetCount: (count: number) => `${count} chars`,
+    quickSetMoreCount: (count: number) => `+${count} more`,
     quickSets: {
       foundations: {
         description:
