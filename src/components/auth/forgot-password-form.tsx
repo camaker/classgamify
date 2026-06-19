@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { authClient } from '@/auth/client';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
-import { getSafeCallbackPath } from '@/lib/urls';
+import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
@@ -39,15 +39,17 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('email')
       : null;
+  const defaultCallbackUrl = getPathWithLocale(Routes.Learn);
   const callbackUrl =
     typeof window !== 'undefined'
       ? getSafeCallbackPath(
           new URLSearchParams(window.location.search).get('callbackUrl'),
-          Routes.Learn
+          defaultCallbackUrl
         )
-      : Routes.Learn;
+      : defaultCallbackUrl;
   const authSwitchSearch =
-    callbackUrl === Routes.Learn ? undefined : { callbackUrl };
+    callbackUrl === defaultCallbackUrl ? undefined : { callbackUrl };
+  const resetPasswordPath = getPathWithLocale(Routes.ResetPassword);
   useEffect(() => {
     if (emailFromUrl) form.setValue('email', emailFromUrl);
   }, [emailFromUrl, form]);
@@ -56,9 +58,9 @@ export function ForgotPasswordForm({ className }: { className?: string }) {
       {
         email: values.email,
         redirectTo:
-          callbackUrl === Routes.Learn
-            ? Routes.ResetPassword
-            : `${Routes.ResetPassword}?callbackUrl=${encodeURIComponent(
+          callbackUrl === defaultCallbackUrl
+            ? resetPasswordPath
+            : `${resetPasswordPath}?callbackUrl=${encodeURIComponent(
                 callbackUrl
               )}`,
       },

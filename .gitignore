@@ -44,3 +44,7 @@ src/locale/paraglide
 .security-key
 logs/security/
 .gstack/
+
+# Playwright
+playwright-report
+test-results

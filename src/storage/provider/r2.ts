@@ -16,6 +16,7 @@ import {
   StorageError,
   UploadError,
 } from '../types';
+import { sanitizeFolder } from '../utils';
 import { websiteConfig } from '@/config/website';
 
 const success = <T>(data: T): ValidationResult<T> => ({ success: true, data });
@@ -173,7 +174,8 @@ export class R2Provider implements StorageProvider {
       );
     }
     this.userFilesFolder =
-      websiteConfig.storage?.userFilesFolder ?? DEFAULT_USER_FILES_FOLDER;
+      sanitizeFolder(websiteConfig.storage?.userFilesFolder) ??
+      DEFAULT_USER_FILES_FOLDER;
     this.validator = createFileValidator({
       maxFileSize: websiteConfig.storage?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE,
       allowedTypes:
@@ -223,16 +225,19 @@ export class R2Provider implements StorageProvider {
     const fileId = generateId();
     const sanitized = sanitizeFilename(filename);
     const storedFilename = `${fileId}-${sanitized}`;
+    const sanitizedFolder = sanitizeFolder(folder);
 
     let r2Key: string;
     if (userId !== undefined) {
-      if (folder) {
-        r2Key = `${folder}/${userId}/${storedFilename}`;
+      if (sanitizedFolder) {
+        r2Key = `${sanitizedFolder}/${userId}/${storedFilename}`;
       } else {
         r2Key = `${this.userFilesFolder}/${userId}/${storedFilename}`;
       }
     } else {
-      r2Key = folder ? `${folder}/${storedFilename}` : storedFilename;
+      r2Key = sanitizedFolder
+        ? `${sanitizedFolder}/${storedFilename}`
+        : storedFilename;
     }
 
     const body = file instanceof Blob ? file : new Uint8Array(file as Buffer);

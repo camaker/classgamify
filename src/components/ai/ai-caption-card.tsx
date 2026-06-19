@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 const MAX_BYTES = 1000000; // 1 MB upload cap
@@ -85,7 +86,7 @@ export function AiCaptionCard() {
         <CardDescription>
           {m.ai_page_caption_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            @cf/llava-hf/llava-1.5-7b-hf
+            {WORKERS_AI_MODELS.imageCaption}
           </code>
         </CardDescription>
       </CardHeader>

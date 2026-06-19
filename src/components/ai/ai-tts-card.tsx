@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -78,7 +79,7 @@ export function AiTtsCard() {
         <CardDescription>
           {m.ai_page_tts_description()}{' '}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            @cf/deepgram/aura-1
+            {WORKERS_AI_MODELS.textToSpeech}
           </code>
         </CardDescription>
       </CardHeader>

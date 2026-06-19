@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Routes } from '@/lib/routes';
-import { getSafeCallbackPath } from '@/lib/urls';
+import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { useRouter } from '@tanstack/react-router';
 import React, { useEffect, useState } from 'react';
 interface LoginWrapperProps {
@@ -35,21 +35,29 @@ export function LoginWrapper({
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const defaultCallbackUrl = getPathWithLocale(Routes.Learn);
   useEffect(() => {
     setMounted(true);
   }, []);
   const handleRedirect = () => {
+    const safeCallbackUrl = getSafeCallbackPath(
+      callbackUrl,
+      defaultCallbackUrl
+    );
     router.navigate({
       to: Routes.Login,
-      search: callbackUrl
-        ? { callbackUrl: getSafeCallbackPath(callbackUrl, Routes.Learn) }
-        : undefined,
+      search:
+        safeCallbackUrl === defaultCallbackUrl
+          ? undefined
+          : { callbackUrl: safeCallbackUrl },
     });
   };
   const handleModalSuccess = () => {
     setOpen(false);
     if (callbackUrl) {
-      router.navigate({ to: getSafeCallbackPath(callbackUrl, Routes.Learn) });
+      router.navigate({
+        to: getSafeCallbackPath(callbackUrl, defaultCallbackUrl),
+      });
     }
   };
   const handleRedirectChildClick = (event: React.MouseEvent<HTMLElement>) => {

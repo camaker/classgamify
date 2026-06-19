@@ -12,13 +12,16 @@ The whole playground lives at **`/ai`** page and is reachable from the navbar **
 src/api/
 └── ai.ts                       # 7 server functions + helpers (runWorkersAi, parseTaglines, base64 utils)
 
+src/config/
+└── ai-models.ts                # Central model IDs shared by server functions and UI cards
+
 src/routes/(pages)/
 └── ai.tsx                      # Page that mounts each card inside <section id="..."> for hash-anchor nav
 
 src/components/ai/
-├── ai-summarization-card.tsx   # Text summarization (BART)
+├── ai-summarization-card.tsx   # Text summarization (Llama 3.2 chat)
 ├── ai-translation-card.tsx     # Translation (m2m100, 10 languages)
-├── ai-tagline-card.tsx         # Tagline generator (Llama 3.1 chat)
+├── ai-tagline-card.tsx         # Tagline generator (Llama 3.2 chat)
 ├── ai-tts-card.tsx             # Text-to-speech (Deepgram Aura, 12 voices)
 ├── ai-caption-card.tsx         # Image-to-text captioning (LLaVA)
 ├── ai-cf-image-card.tsx        # Text-to-image · Workers AI (Flux / SDXL / DreamShaper)
@@ -52,6 +55,7 @@ Browser (card) ──▶ TanStack server function ──▶ provider API ──�
 ```
 
 - **Validation** — every server function uses `.inputValidator(zodSchema)` for both type safety and runtime validation (max prompt length, file size cap, language enum, model enum, …).
+- **Model IDs** — runtime model IDs are centralized in `src/config/ai-models.ts` and imported by both server functions and UI cards.
 - **Workers AI helper** — `runWorkersAi<TResult>(model, body)` in `src/api/ai.ts` wraps the common JSON request flow (auth headers, `success` / `errors` envelope) so each demo only declares its model + payload.
 - **Binary responses** — TTS (`audio/mpeg`) and CF image gen (binary `image/*`) bypass `runWorkersAi` and base64-encode the body via `arrayBufferToBase64()` so the result can be returned as a `data:` URL the browser renders directly.
 - **Image bytes in / out** — captioning and image-edit accept the user's upload as a base64 string, decoded server-side via `base64ToBytes()` (LLaVA wants `Array.from(uint8)`) or forwarded as a `data:` URI (fal accepts data URIs natively).
@@ -63,9 +67,9 @@ Browser (card) ──▶ TanStack server function ──▶ provider API ──�
 
 | Export | Provider · Model | Input | Output |
 |--------|------------------|-------|--------|
-| **summarizeText** | Workers AI · `@cf/facebook/bart-large-cnn` | `text` (50–500 chars) | `{ summary }` |
+| **summarizeText** | Workers AI · `@cf/meta/llama-3.2-3b-instruct` (chat) | `text` (50–500 chars) | `{ summary }` |
 | **translateText** | Workers AI · `@cf/meta/m2m100-1.2b` | `text`, `sourceLang`, `targetLang` (10-language enum) | `{ translatedText }` |
-| **generateTaglines** | Workers AI · `@cf/meta/llama-3.1-8b-instruct` (chat) | `product` description | `{ taglines: string[] }` (parsed numbered list) |
+| **generateTaglines** | Workers AI · `@cf/meta/llama-3.2-3b-instruct` (chat) | `product` description | `{ taglines: string[] }` (parsed numbered list) |
 | **synthesizeSpeech** | Workers AI · `@cf/deepgram/aura-1` | `text`, `speaker` (12 voices) | `{ audioUrl, bytes }` (`data:audio/mpeg;base64,...`) |
 | **captionImage** | Workers AI · `@cf/llava-hf/llava-1.5-7b-hf` | `imageBase64`, `prompt` | `{ description }` |
 | **generateCfImage** | Workers AI · Flux.1 Schnell / SDXL Lightning / DreamShaper 8 LCM | `prompt`, `model` (enum) | `{ imageUrl, model }` (`data:image/...;base64,...`) |
@@ -81,9 +85,9 @@ All functions throw a descriptive `Error` on missing env, non-2xx responses, or 
 The page renders one section per demo, each wrapped in `<section id="...">` so the AI navbar dropdown can deep-link with hash anchors (e.g. `/ai#tagline-generator`).
 
 ### 1. Text Summarization
-**Card:** `AiSummarizationCard` · **Model:** `@cf/facebook/bart-large-cnn` (Workers AI)
+**Card:** `AiSummarizationCard` · **Model:** `@cf/meta/llama-3.2-3b-instruct` (Workers AI)
 
-Paste a long article (50–500 chars), get a concise summary back. Demonstrates the simplest Workers AI shape: `{ input_text }` → `{ summary }`.
+Paste a long article (50–500 chars), get a concise summary back. Demonstrates a single-shot chat call with `messages: [{ role, content }]` and a system prompt that constrains the response to summary text only.
 
 ### 2. Translation
 **Card:** `AiTranslationCard` · **Model:** `@cf/meta/m2m100-1.2b` (Workers AI)
@@ -91,7 +95,7 @@ Paste a long article (50–500 chars), get a concise summary back. Demonstrates 
 Many-to-many multilingual translation across 10 languages with a swap button. Shows how to declare a `z.enum(...)` schema for both source and target language and a `.refine()` rule preventing same-language translation.
 
 ### 3. Tagline Generator (Chat)
-**Card:** `AiTaglineCard` · **Model:** `@cf/meta/llama-3.1-8b-instruct` (Workers AI)
+**Card:** `AiTaglineCard` · **Model:** `@cf/meta/llama-3.2-3b-instruct` (Workers AI)
 
 Single-shot chat call with a system prompt that constrains output to a numbered list of 5 taglines. Shows how to call instruct chat models with `messages: [{ role, content }]` and parse semi-structured text back into JSON via `parseTaglines()`.
 

@@ -52,6 +52,7 @@ import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
+import { Route as ApiE2eUsersRouteImport } from './routes/api/e2e/users'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const WorksheetsRoute = WorksheetsRouteImport.update({
@@ -269,6 +270,11 @@ const ApiStorageFileRoute = ApiStorageFileRouteImport.update({
   path: '/api/storage/file',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiE2eUsersRoute = ApiE2eUsersRouteImport.update({
+  id: '/api/e2e/users',
+  path: '/api/e2e/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
@@ -360,6 +367,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/e2e/users': typeof ApiE2eUsersRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
@@ -455,6 +464,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
+    | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
@@ -498,6 +508,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/api/auth/$'
+    | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
@@ -544,6 +555,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/settings/'
     | '/api/auth/$'
+    | '/api/e2e/users'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
@@ -575,6 +587,7 @@ export interface RootRouteChildren {
   Hsk1Route: typeof Hsk1Route
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiE2eUsersRoute: typeof ApiE2eUsersRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
   ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
@@ -883,6 +896,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStorageFileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/e2e/users': {
+      id: '/api/e2e/users'
+      path: '/api/e2e/users'
+      fullPath: '/api/e2e/users'
+      preLoaderRoute: typeof ApiE2eUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -987,6 +1007,7 @@ const rootRouteChildren: RootRouteChildren = {
   Hsk1Route: Hsk1Route,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiE2eUsersRoute: ApiE2eUsersRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
   ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,

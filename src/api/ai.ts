@@ -2,39 +2,46 @@ import { generateImage } from '@tanstack/ai';
 import { falImage } from '@tanstack/ai-fal';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import {
+  CF_IMAGE_MODELS,
+  DEFAULT_CF_IMAGE_MODEL,
+  DEFAULT_FAL_IMAGE_MODEL,
+  FAL_IMAGE_EDIT_MODEL,
+  FAL_IMAGE_MODELS,
+  OPENAI_IMAGE_MODEL,
+  WORKERS_AI_MODELS,
+} from '@/config/ai-models';
 import { serverEnv } from '@/env/server';
 
 /**
  * AI demo server functions.
  *
- * - Text summarization: Cloudflare Workers AI (`@cf/facebook/bart-large-cnn`)
+ * - Text summarization: Cloudflare Workers AI (`WORKERS_AI_MODELS.summarization`)
  *   via the plain Workers AI REST API (no extra adapter needed).
  *   Endpoint: https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{model}
  *
- * - Translation: Cloudflare Workers AI (`@cf/meta/m2m100-1.2b`).
+ * - Translation: Cloudflare Workers AI (`WORKERS_AI_MODELS.translation`).
  *
  * - Tagline generation (Chat): Cloudflare Workers AI
- *   (`@cf/meta/llama-3.1-8b-instruct`) — system + user messages.
+ *   (`WORKERS_AI_MODELS.tagline`) — system + user messages.
  *
  * - Image generation (fal): fal.ai via the `@tanstack/ai-fal` adapter.
- *   Supports switching between `fal-ai/flux/schnell`,
- *   `fal-ai/nano-banana` (Nano Banana), and `openai/gpt-image-2`.
+ *   Supports switching between models declared in `FAL_IMAGE_MODELS`.
  *
- * - Image editing / image-to-image (fal): `fal-ai/nano-banana/edit`.
+ * - Image editing / image-to-image (fal): `FAL_IMAGE_EDIT_MODEL`.
  *   Takes a base64 portrait + prompt and returns a stylized version (e.g.
  *   bobblehead caricature). Identity preservation is excellent on this model.
  *
  * - Image generation (Cloudflare): Workers AI text-to-image models such as
- *   `@cf/black-forest-labs/flux-1-schnell` and
- *   `@cf/bytedance/stable-diffusion-xl-lightning`. These return the image
- *   either as base64 inside a JSON envelope or as a raw binary body — we
- *   detect via `Content-Type` and return a data URL either way.
+ *   `CF_IMAGE_MODELS`. These return the image either as base64 inside a JSON
+ *   envelope or as a raw binary body — we detect via `Content-Type` and return
+ *   a data URL either way.
  *
- * - Text-to-Speech: Cloudflare Workers AI (`@cf/deepgram/aura-1`) — returns
+ * - Text-to-Speech: Cloudflare Workers AI (`WORKERS_AI_MODELS.textToSpeech`) — returns
  *   the MP3 audio inline as a base64 data URL.
  *
  * - Image captioning (Image-to-Text): Cloudflare Workers AI
- *   (`@cf/llava-hf/llava-1.5-7b-hf`) — accepts a base64 image plus a prompt,
+ *   (`WORKERS_AI_MODELS.imageCaption`) — accepts a base64 image plus a prompt,
  *   returns a caption / answer about the image.
  *
  * Required env (Worker secrets):
@@ -85,34 +92,20 @@ const taglineSchema = z.object({
     .max(400, 'Description is too long, please keep it under 400 characters.'),
 });
 
-const FAL_IMAGE_MODELS = [
-  'fal-ai/flux/schnell',
-  'fal-ai/nano-banana',
-  'openai/gpt-image-2',
-] as const;
-
 const imageGenerationSchema = z.object({
   prompt: z
     .string()
     .min(10, 'Prompt is too short.')
     .max(500, 'Prompt is too long, please keep it under 500 characters.'),
-  model: z.enum(FAL_IMAGE_MODELS).default('fal-ai/nano-banana'),
+  model: z.enum(FAL_IMAGE_MODELS).default(DEFAULT_FAL_IMAGE_MODEL),
 });
-
-const CF_IMAGE_MODELS = [
-  '@cf/black-forest-labs/flux-1-schnell',
-  '@cf/bytedance/stable-diffusion-xl-lightning',
-  '@cf/lykon/dreamshaper-8-lcm',
-] as const;
 
 const cfImageGenerationSchema = z.object({
   prompt: z
     .string()
     .min(10, 'Prompt is too short.')
     .max(500, 'Prompt is too long, please keep it under 500 characters.'),
-  model: z
-    .enum(CF_IMAGE_MODELS)
-    .default('@cf/black-forest-labs/flux-1-schnell'),
+  model: z.enum(CF_IMAGE_MODELS).default(DEFAULT_CF_IMAGE_MODEL),
 });
 
 const TTS_SPEAKERS = [
@@ -217,33 +210,47 @@ async function runWorkersAi<TResult>(
 }
 
 /**
- * Summarize a long piece of text using Cloudflare Workers AI BART CNN
- * via the Workers AI REST API.
+ * Summarize a long piece of text using Cloudflare Workers AI
+ * `WORKERS_AI_MODELS.summarization` via the Workers AI REST API.
  */
 export const summarizeText = createServerFn({ method: 'POST' })
   .inputValidator(summarizationSchema)
   .handler(async ({ data }) => {
-    const result = await runWorkersAi<{ summary?: string }>(
-      '@cf/facebook/bart-large-cnn',
-      { input_text: data.text }
+    const result = await runWorkersAi<{ response?: string }>(
+      WORKERS_AI_MODELS.summarization,
+      {
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You summarize text clearly and concisely. Return only the summary, without an introduction, labels, markdown, or bullet points.',
+          },
+          {
+            role: 'user',
+            content: `Summarize this text in 1-2 sentences:\n\n${data.text}`,
+          },
+        ],
+        max_tokens: 180,
+        temperature: 0.2,
+      }
     );
 
-    if (!result.summary) {
+    if (!result.response) {
       throw new Error('Summarization returned an empty response.');
     }
 
-    return { summary: result.summary };
+    return { summary: result.response.trim() };
   });
 
 /**
  * Translate text between languages using Cloudflare Workers AI
- * `@cf/meta/m2m100-1.2b` (Many-to-Many multilingual translation).
+ * `WORKERS_AI_MODELS.translation` (Many-to-Many multilingual translation).
  */
 export const translateText = createServerFn({ method: 'POST' })
   .inputValidator(translationSchema)
   .handler(async ({ data }) => {
     const result = await runWorkersAi<{ translated_text?: string }>(
-      '@cf/meta/m2m100-1.2b',
+      WORKERS_AI_MODELS.translation,
       {
         text: data.text,
         source_lang: data.sourceLang,
@@ -260,7 +267,7 @@ export const translateText = createServerFn({ method: 'POST' })
 
 /**
  * Generate 5 SaaS taglines from a short product description using
- * Cloudflare Workers AI `@cf/meta/llama-3.1-8b-instruct` (chat model).
+ * Cloudflare Workers AI `WORKERS_AI_MODELS.tagline` (chat model).
  *
  * Demonstrates a single-shot chat call with a system prompt that constrains
  * the output to a numbered list — no follow-up turns are kept.
@@ -269,7 +276,7 @@ export const generateTaglines = createServerFn({ method: 'POST' })
   .inputValidator(taglineSchema)
   .handler(async ({ data }) => {
     const result = await runWorkersAi<{ response?: string }>(
-      '@cf/meta/llama-3.1-8b-instruct',
+      WORKERS_AI_MODELS.tagline,
       {
         messages: [
           {
@@ -334,7 +341,7 @@ export const generateAiImage = createServerFn({ method: 'POST' })
     // queue. Force the cheaper / faster `low` quality + jpeg encoding so it
     // completes in ~30s for the demo.
     const modelOptions =
-      data.model === 'openai/gpt-image-2'
+      data.model === OPENAI_IMAGE_MODEL
         ? { quality: 'low' as const, output_format: 'jpeg' as const }
         : undefined;
 
@@ -373,7 +380,7 @@ export const editAiImage = createServerFn({ method: 'POST' })
       ? data.imageBase64
       : `data:image/jpeg;base64,${data.imageBase64}`;
 
-    const adapter = falImage('fal-ai/nano-banana/edit', { apiKey });
+    const adapter = falImage(FAL_IMAGE_EDIT_MODEL, { apiKey });
 
     const result = await generateImage({
       adapter,
@@ -392,7 +399,7 @@ export const editAiImage = createServerFn({ method: 'POST' })
 
 /**
  * Synthesize speech from text using Cloudflare Workers AI Deepgram Aura
- * (`@cf/deepgram/aura-1`). Unlike the JSON-based models above, this endpoint
+ * (`WORKERS_AI_MODELS.textToSpeech`). Unlike the JSON-based models above, this endpoint
  * returns raw MP3 bytes (`Content-Type: audio/mpeg`), so we base64-encode
  * them and return a data URL the browser can feed straight to `<audio>`.
  */
@@ -408,7 +415,7 @@ export const synthesizeSpeech = createServerFn({ method: 'POST' })
     }
 
     const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/deepgram/aura-1`,
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${WORKERS_AI_MODELS.textToSpeech}`,
       {
         method: 'POST',
         headers: {
@@ -525,7 +532,7 @@ export const generateCfImage = createServerFn({ method: 'POST' })
 
 /**
  * Generate a caption (or answer a custom prompt) for an image using
- * Cloudflare Workers AI LLaVA 1.5 (`@cf/llava-hf/llava-1.5-7b-hf`).
+ * Cloudflare Workers AI LLaVA 1.5 (`WORKERS_AI_MODELS.imageCaption`).
  *
  * The model expects `image` as an array of byte values plus an optional
  * `prompt`; the client uploads a file, base64-encodes it, and we decode +
@@ -537,7 +544,7 @@ export const captionImage = createServerFn({ method: 'POST' })
     const bytes = base64ToBytes(data.imageBase64);
 
     const result = await runWorkersAi<{ description?: string }>(
-      '@cf/llava-hf/llava-1.5-7b-hf',
+      WORKERS_AI_MODELS.imageCaption,
       {
         image: Array.from(bytes),
         prompt: data.prompt,

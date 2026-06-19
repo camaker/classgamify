@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { IconDownload, IconLoader2, IconSparkles } from '@tabler/icons-react';
 import { generateCfImage } from '@/api/ai';
 import { Button } from '@/components/ui/button';
+import { CF_IMAGE_MODELS, DEFAULT_CF_IMAGE_MODEL } from '@/config/ai-models';
 import { downloadFile } from '@/lib/download';
 import {
   Card,
@@ -21,10 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-type CfImageModel =
-  | '@cf/black-forest-labs/flux-1-schnell'
-  | '@cf/bytedance/stable-diffusion-xl-lightning'
-  | '@cf/lykon/dreamshaper-8-lcm';
+type CfImageModel = (typeof CF_IMAGE_MODELS)[number];
 const CF_MODELS: {
   value: CfImageModel;
   label: string;
@@ -32,18 +30,18 @@ const CF_MODELS: {
   beta?: boolean;
 }[] = [
   {
-    value: '@cf/black-forest-labs/flux-1-schnell',
+    value: CF_IMAGE_MODELS[0],
     label: 'Flux.1 Schnell',
     hint: 'Default · 12B distilled flow transformer',
   },
   {
-    value: '@cf/bytedance/stable-diffusion-xl-lightning',
+    value: CF_IMAGE_MODELS[1],
     label: 'SDXL Lightning',
     hint: 'Lightning-fast 1024px generations',
     beta: true,
   },
   {
-    value: '@cf/lykon/dreamshaper-8-lcm',
+    value: CF_IMAGE_MODELS[2],
     label: 'DreamShaper 8 LCM',
     hint: 'Photorealistic Stable Diffusion fine-tune',
   },
@@ -90,9 +88,7 @@ export function AiCfImageCard() {
     promptPresets[0].id
   );
   const [prompt, setPrompt] = useState<string>(promptPresets[0].prompt);
-  const [model, setModel] = useState<CfImageModel>(
-    '@cf/black-forest-labs/flux-1-schnell'
-  );
+  const [model, setModel] = useState<CfImageModel>(DEFAULT_CF_IMAGE_MODEL);
   const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);

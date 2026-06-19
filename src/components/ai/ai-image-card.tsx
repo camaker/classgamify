@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { IconDownload, IconLoader2, IconPhoto } from '@tabler/icons-react';
 import { generateAiImage } from '@/api/ai';
 import { Button } from '@/components/ui/button';
+import {
+  DEFAULT_FAL_IMAGE_MODEL,
+  FAL_IMAGE_MODELS,
+  OPENAI_IMAGE_MODEL,
+} from '@/config/ai-models';
 import { downloadFile } from '@/lib/download';
 import {
   Card,
@@ -21,27 +26,24 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-type FalModel =
-  | 'fal-ai/flux/schnell'
-  | 'fal-ai/nano-banana'
-  | 'openai/gpt-image-2';
+type FalModel = (typeof FAL_IMAGE_MODELS)[number];
 const FAL_MODELS: {
   value: FalModel;
   label: string;
   hint: string;
 }[] = [
   {
-    value: 'fal-ai/nano-banana',
+    value: DEFAULT_FAL_IMAGE_MODEL,
     label: 'Nano Banana',
     hint: "Google's image model · ~$0.039 / image",
   },
   {
-    value: 'fal-ai/flux/schnell',
+    value: FAL_IMAGE_MODELS[0],
     label: 'Flux Schnell',
     hint: 'Fast & cheap · ~$0.003 / image',
   },
   {
-    value: 'openai/gpt-image-2',
+    value: OPENAI_IMAGE_MODEL,
     label: 'GPT Image 2',
     hint: "OpenAI's premium model · sharp text & photoreal · slower (~30s, quality=low)",
   },
@@ -84,7 +86,7 @@ export function AiImageCard() {
     promptPresets[0].id
   );
   const [prompt, setPrompt] = useState<string>(promptPresets[0].prompt);
-  const [model, setModel] = useState<FalModel>('fal-ai/nano-banana');
+  const [model, setModel] = useState<FalModel>(DEFAULT_FAL_IMAGE_MODEL);
   const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [isPending, setIsPending] = useState(false);
