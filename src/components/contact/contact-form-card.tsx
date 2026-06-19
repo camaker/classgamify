@@ -34,6 +34,7 @@ const schema = z.object({
     .max(1500, m.contact_message_max()),
   classroomLearners: z.string().max(80).optional(),
   classroomLevel: z.string().max(80).optional(),
+  classroomLanguages: z.string().max(120).optional(),
   classroomRoutine: z.string().max(120).optional(),
   classroomNeed: z.string().max(120).optional(),
 });
@@ -56,6 +57,7 @@ export function ContactFormCard({
     defaultValues: {
       classroomLearners: '',
       classroomLevel: '',
+      classroomLanguages: '',
       classroomNeed: '',
       classroomRoutine: '',
       email: '',
@@ -89,6 +91,7 @@ export function ContactFormCard({
       form.reset({
         classroomLearners: '',
         classroomLevel: '',
+        classroomLanguages: '',
         classroomNeed: '',
         classroomRoutine: '',
         email: '',
@@ -234,6 +237,23 @@ function ClassroomInquiryFields({
         />
         <FormField
           control={control}
+          name="classroomLanguages"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{copy.languagesLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder={copy.languagesPlaceholder}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
           name="classroomRoutine"
           render={({ field }) => (
             <FormItem>
@@ -278,6 +298,7 @@ function buildClassroomInquiryMessage(
   const structuredLines = [
     [copy.learnersLabel, values.classroomLearners],
     [copy.levelLabel, values.classroomLevel],
+    [copy.languagesLabel, values.classroomLanguages],
     [copy.routineLabel, values.classroomRoutine],
     [copy.needLabel, values.classroomNeed],
   ]
@@ -301,6 +322,8 @@ function getClassroomInquiryCopy(locale: 'en' | 'zh') {
       description:
         '这些信息会整理进邮件，方便我们直接判断你需要的是练习纸、复习流程、课堂试用还是未来语言扩展。',
       emailHeading: '课堂咨询信息',
+      languagesLabel: '未来语言范围',
+      languagesPlaceholder: '例如：先中文，之后日语假名 / 韩文 / 其他语言',
       learnersLabel: '学习者',
       learnersPlaceholder: '例如：8 名初学者 / 1 个孩子',
       levelLabel: '当前水平',
@@ -317,6 +340,9 @@ function getClassroomInquiryCopy(locale: 'en' | 'zh') {
     description:
       'These details are added to the email so we can tell whether you need worksheets, review workflow, classroom rollout, or future language expansion.',
     emailHeading: 'Classroom inquiry details',
+    languagesLabel: 'Future language scope',
+    languagesPlaceholder:
+      'e.g. Chinese first, then Japanese kana / Korean / another language',
     learnersLabel: 'Learners',
     learnersPlaceholder: 'e.g. 8 beginners / one child',
     levelLabel: 'Current level',
