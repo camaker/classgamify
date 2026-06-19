@@ -58,6 +58,24 @@ function RoadmapPage() {
     },
   ];
 
+  const validationItems = [
+    {
+      icon: IconBook2,
+      title: m.roadmap_validation_item_learning_title(),
+      description: m.roadmap_validation_item_learning_description(),
+    },
+    {
+      icon: IconFileText,
+      title: m.roadmap_validation_item_workflow_title(),
+      description: m.roadmap_validation_item_workflow_description(),
+    },
+    {
+      icon: IconSparkles,
+      title: m.roadmap_validation_item_business_title(),
+      description: m.roadmap_validation_item_business_description(),
+    },
+  ];
+
   return (
     <Container className="px-4 py-12 md:py-16">
       <div className="mx-auto max-w-6xl space-y-12 pb-16">
@@ -103,6 +121,25 @@ function RoadmapPage() {
 
         <Roadmap />
 
+        <section className="grid gap-6 rounded-lg border bg-background p-5 md:p-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
+          <div className="min-w-0 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-normal text-primary">
+              {m.roadmap_validation_eyebrow()}
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight text-balance">
+              {m.roadmap_validation_title()}
+            </h2>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {m.roadmap_validation_description()}
+            </p>
+          </div>
+          <ul className="min-w-0 divide-y">
+            {validationItems.map((item) => (
+              <RoadmapValidationItem key={item.title} item={item} />
+            ))}
+          </ul>
+        </section>
+
         <section className="grid gap-4 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:p-5">
           <div className="min-w-0 space-y-2">
             <h2 className="text-xl font-semibold">
@@ -131,6 +168,30 @@ function RoadmapPage() {
         </section>
       </div>
     </Container>
+  );
+}
+
+function RoadmapValidationItem({
+  item,
+}: {
+  item: {
+    description: string;
+    icon: TablerIcon;
+    title: string;
+  };
+}) {
+  return (
+    <li className="flex min-w-0 gap-3 py-4 first:pt-0 last:pb-0">
+      <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border bg-muted/40 text-primary">
+        <item.icon className="size-4" />
+      </div>
+      <div className="min-w-0">
+        <h3 className="font-medium leading-6">{item.title}</h3>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          {item.description}
+        </p>
+      </div>
+    </li>
   );
 }
 
