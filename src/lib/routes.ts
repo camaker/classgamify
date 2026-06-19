@@ -8,6 +8,7 @@ export const Routes = {
   Play: '/play/$shareId',
   Resources: '/blog',
   DashboardActivities: '/dashboard/activities',
+  DashboardActivityEdit: '/dashboard/activities/$activityId',
   DashboardAssignments: '/dashboard/assignments',
   DashboardAssignmentResults: '/dashboard/assignments/$assignmentId',
   LegacyLearn: '/learn',

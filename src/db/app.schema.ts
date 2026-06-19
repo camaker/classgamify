@@ -174,6 +174,29 @@ export const assignment = sqliteTable(
   ]
 );
 
+/**
+ * Immutable content snapshot captured when a teacher publishes an assignment.
+ * Activity edits should affect future assignments, not already shared links.
+ */
+export const assignmentSnapshot = sqliteTable(
+  'assignment_snapshot',
+  {
+    assignmentId: text('assignment_id')
+      .primaryKey()
+      .references(() => assignment.id, { onDelete: 'cascade' }),
+    activityTitle: text('activity_title').notNull(),
+    activityDescription: text('activity_description'),
+    templateType: text('template_type').notNull().$type<ActivityTemplateType>(),
+    contentJson: text('content_json', { mode: 'json' })
+      .notNull()
+      .$type<ActivityContent>(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (table) => [
+    index('assignment_snapshot_template_type_idx').on(table.templateType),
+  ]
+);
+
 export const assignmentRelations = relations(
   assignment,
   ({ many, one }) => ({
@@ -182,7 +205,21 @@ export const assignmentRelations = relations(
       references: [activity.id],
     }),
     owner: one(user, { fields: [assignment.ownerId], references: [user.id] }),
+    snapshot: one(assignmentSnapshot, {
+      fields: [assignment.id],
+      references: [assignmentSnapshot.assignmentId],
+    }),
     attempts: many(attempt),
+  })
+);
+
+export const assignmentSnapshotRelations = relations(
+  assignmentSnapshot,
+  ({ one }) => ({
+    assignment: one(assignment, {
+      fields: [assignmentSnapshot.assignmentId],
+      references: [assignment.id],
+    }),
   })
 );
 

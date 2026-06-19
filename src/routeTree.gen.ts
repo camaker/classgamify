@@ -55,6 +55,7 @@ import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
 import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
+import { Route as DashboardActivitiesActivityIdRouteImport } from './routes/dashboard/activities/$activityId'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
@@ -292,6 +293,12 @@ const DashboardAssignmentsAssignmentIdRoute =
     path: '/$assignmentId',
     getParentRoute: () => DashboardAssignmentsRoute,
   } as any)
+const DashboardActivitiesActivityIdRoute =
+  DashboardActivitiesActivityIdRouteImport.update({
+    id: '/$activityId',
+    path: '/$activityId',
+    getParentRoute: () => DashboardActivitiesRoute,
+  } as any)
 const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
   id: '/api/webhooks/stripe',
   path: '/api/webhooks/stripe',
@@ -348,7 +355,7 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
@@ -369,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesByTo {
@@ -398,7 +406,7 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
@@ -419,6 +427,7 @@ export interface FileRoutesByTo {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesById {
@@ -452,7 +461,7 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/activities': typeof DashboardActivitiesRoute
+  '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
@@ -473,6 +482,7 @@ export interface FileRoutesById {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRouteTypes {
@@ -528,6 +538,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -578,6 +589,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
   id:
     | '__root__'
@@ -631,6 +643,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
   fileRoutesById: FileRoutesById
 }
@@ -993,6 +1006,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAssignmentsAssignmentIdRouteImport
       parentRoute: typeof DashboardAssignmentsRoute
     }
+    '/dashboard/activities/$activityId': {
+      id: '/dashboard/activities/$activityId'
+      path: '/$activityId'
+      fullPath: '/dashboard/activities/$activityId'
+      preLoaderRoute: typeof DashboardActivitiesActivityIdRouteImport
+      parentRoute: typeof DashboardActivitiesRoute
+    }
     '/api/webhooks/stripe': {
       id: '/api/webhooks/stripe'
       path: '/api/webhooks/stripe'
@@ -1061,6 +1081,17 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface DashboardActivitiesRouteChildren {
+  DashboardActivitiesActivityIdRoute: typeof DashboardActivitiesActivityIdRoute
+}
+
+const DashboardActivitiesRouteChildren: DashboardActivitiesRouteChildren = {
+  DashboardActivitiesActivityIdRoute: DashboardActivitiesActivityIdRoute,
+}
+
+const DashboardActivitiesRouteWithChildren =
+  DashboardActivitiesRoute._addFileChildren(DashboardActivitiesRouteChildren)
+
 interface DashboardAssignmentsRouteChildren {
   DashboardAssignmentsAssignmentIdRoute: typeof DashboardAssignmentsAssignmentIdRoute
 }
@@ -1073,13 +1104,13 @@ const DashboardAssignmentsRouteWithChildren =
   DashboardAssignmentsRoute._addFileChildren(DashboardAssignmentsRouteChildren)
 
 interface DashboardRouteChildren {
-  DashboardActivitiesRoute: typeof DashboardActivitiesRoute
+  DashboardActivitiesRoute: typeof DashboardActivitiesRouteWithChildren
   DashboardAssignmentsRoute: typeof DashboardAssignmentsRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardActivitiesRoute: DashboardActivitiesRoute,
+  DashboardActivitiesRoute: DashboardActivitiesRouteWithChildren,
   DashboardAssignmentsRoute: DashboardAssignmentsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }

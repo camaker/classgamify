@@ -16,6 +16,7 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconDeviceGamepad2,
+  IconEdit,
   IconLayoutGrid,
   IconPlus,
   IconSparkles,
@@ -231,15 +232,28 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
           </div>
         </div>
         {activity.persisted ? (
-          <Button
-            type="button"
-            className="w-full sm:w-fit"
-            disabled={publishMutation.isPending}
-            onClick={publishActivity}
-          >
-            <IconPlus className="size-4" />
-            Publish assignment
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link
+              to="/dashboard/activities/$activityId"
+              params={{ activityId: activity.id }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background sm:w-fit'
+              )}
+            >
+              <IconEdit className="size-4" />
+              Edit activity
+            </Link>
+            <Button
+              type="button"
+              className="w-full sm:w-fit"
+              disabled={publishMutation.isPending}
+              onClick={publishActivity}
+            >
+              <IconPlus className="size-4" />
+              Publish assignment
+            </Button>
+          </div>
         ) : null}
       </CardContent>
     </Card>

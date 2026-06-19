@@ -35,6 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   useCreateActivity,
   useGenerateActivityDraft,
+  useUpdateActivity,
 } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -47,11 +48,11 @@ import {
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-const defaultValues: CreateActivityInput = {
+export const activityFormDefaultValues: CreateActivityInput = {
   description:
     'Quick classroom practice that can become a quiz, match game, or worksheet.',
   difficulty: 'starter',
@@ -78,25 +79,46 @@ const visibilityOptions = activityVisibilitySchema.options;
 const templateTypeOptions = activityTemplateTypeSchema.options;
 const draftItemCountOptions = [3, 5, 8, 10] as const;
 
-export function ActivityCreateForm() {
+type ActivityCreateFormProps = {
+  activityId?: string;
+  initialValues?: CreateActivityInput;
+  mode?: 'create' | 'edit';
+};
+
+export function ActivityCreateForm({
+  activityId,
+  initialValues,
+  mode = 'create',
+}: ActivityCreateFormProps) {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const createMutation = useCreateActivity();
   const draftMutation = useGenerateActivityDraft();
+  const updateMutation = useUpdateActivity();
   const navigate = useNavigate();
   const [draftSourceText, setDraftSourceText] = useState(
-    'apple, bread, milk, rice, water, egg'
+    getDraftSourceText(initialValues ?? activityFormDefaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
   const form = useForm<CreateActivityInput>({
-    defaultValues,
+    defaultValues: initialValues ?? activityFormDefaultValues,
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');
   const template = activityTemplates.find(
     (item) => item.type === selectedTemplate
   );
-  const isPending = createMutation.isPending || form.formState.isSubmitting;
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    form.formState.isSubmitting;
   const isGeneratingDraft = draftMutation.isPending;
+  const isEditMode = mode === 'edit';
+
+  useEffect(() => {
+    if (!initialValues) return;
+    form.reset(initialValues);
+    setDraftSourceText(getDraftSourceText(initialValues));
+  }, [form, initialValues]);
 
   async function onGenerateDraft() {
     if (!session?.user) {
@@ -149,6 +171,21 @@ export function ActivityCreateForm() {
     }
 
     try {
+      if (isEditMode) {
+        if (!activityId) {
+          toast.error('Activity could not be identified for editing.');
+          return;
+        }
+
+        await updateMutation.mutateAsync({
+          ...values,
+          id: activityId,
+        });
+        toast.success('Activity updated.');
+        form.reset(values);
+        return;
+      }
+
       const activity = await createMutation.mutateAsync(values);
       toast.success('Activity saved to your library.');
       navigate({
@@ -177,7 +214,11 @@ export function ActivityCreateForm() {
           ) : null}
         </div>
         <CardTitle>
-          <h2 className="text-xl font-semibold">Create a reusable activity</h2>
+          <h2 className="text-xl font-semibold">
+            {isEditMode
+              ? 'Edit reusable activity'
+              : 'Create a reusable activity'}
+          </h2>
         </CardTitle>
       </CardHeader>
       <Form {...form}>
@@ -517,8 +558,9 @@ export function ActivityCreateForm() {
           </CardContent>
           <CardFooter className="mt-6 flex flex-col gap-3 border-t bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              Saved activities appear in the teacher dashboard and can later be
-              published as assignments.
+              {isEditMode
+                ? 'Changes update the reusable activity used by future assignments.'
+                : 'Saved activities appear in the teacher dashboard and can later be published as assignments.'}
             </p>
             {session?.user ? (
               <Button type="submit" disabled={isPending}>
@@ -527,7 +569,7 @@ export function ActivityCreateForm() {
                 ) : (
                   <IconDeviceFloppy className="size-4" />
                 )}
-                Save activity
+                {isEditMode ? 'Save changes' : 'Save activity'}
               </Button>
             ) : (
               <Link
@@ -545,5 +587,14 @@ export function ActivityCreateForm() {
         </form>
       </Form>
     </Card>
+  );
+}
+
+function getDraftSourceText(values: CreateActivityInput) {
+  return (
+    values.sourceSummary?.trim() ||
+    values.vocabularyText?.trim() ||
+    values.questionsText?.trim() ||
+    'apple, bread, milk, rice, water, egg'
   );
 }

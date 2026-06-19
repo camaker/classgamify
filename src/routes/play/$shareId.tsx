@@ -320,16 +320,19 @@ function getRuntimePrompt(item: RuntimeItem) {
 }
 
 function mapPersistedActivity(data: NonNullable<PublicAssignmentData>) {
-  const content = data.activity.contentJson;
+  const content = data.snapshot?.contentJson ?? data.activity.contentJson;
+  const templateType =
+    data.snapshot?.templateType ?? data.activity.templateType;
 
   return {
     content,
-    description: data.activity.description ?? '',
+    description:
+      data.snapshot?.activityDescription ?? data.activity.description ?? '',
     estimatedMinutes: estimateMinutes(content.questions.length),
     id: data.activity.id,
     status: data.activity.visibility,
-    templateType: data.activity.templateType,
-    title: data.activity.title,
+    templateType,
+    title: data.snapshot?.activityTitle ?? data.activity.title,
   } satisfies ActivitySeed;
 }
 

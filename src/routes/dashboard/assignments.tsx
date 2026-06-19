@@ -111,13 +111,17 @@ function DashboardAssignmentsPage() {
               <AssignmentCard
                 key={item.assignment.id}
                 assignment={{
-                  activityDescription: item.activity.description ?? '',
+                  activityDescription:
+                    item.snapshot?.activityDescription ??
+                    item.activity.description ??
+                    '',
                   id: item.assignment.id,
                   maxAttempts: item.assignment.settingsJson.maxAttempts,
                   shareSlug: item.assignment.shareSlug,
                   stats: item.stats,
                   status: item.assignment.status,
-                  templateType: item.activity.templateType,
+                  templateType:
+                    item.snapshot?.templateType ?? item.activity.templateType,
                   title: item.assignment.title,
                 }}
               />

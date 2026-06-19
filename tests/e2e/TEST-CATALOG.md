@@ -100,6 +100,7 @@ assignment publishing is enabled.
 | 5 | Student runner adapts to template content | Create quiz, match-up, and group-sort activities, publish each one, open each `/play/:shareId`, verify the runner renders question, pair, and group-selection items respectively, submit answers, and verify scoring reflects the template-specific expected answers. |
 | 6 | Teacher can review assignment results | After at least one student attempt, open `/dashboard/assignments/:assignmentId`, verify completions, average accuracy, share link, and the attempt table show student name, score, accuracy, answered count, and submitted time. |
 | 7 | Teacher can generate an AI draft before saving | Sign in, open `/create`, add source notes, choose a template and item count, click generate draft, verify the title/content fields are filled with reviewable activity content, save the activity, and verify it appears in `/dashboard/activities`. |
+| 8 | Teacher can edit a saved activity | Sign in, open `/dashboard/activities`, choose a persisted activity, click edit, update the title/content/template fields, save, return to the library, and verify the updated activity metadata and compatible template counts persist after reload. Publish before editing and verify the existing student share link still uses its original assignment snapshot. |
 
 ## Deferred Coverage
 

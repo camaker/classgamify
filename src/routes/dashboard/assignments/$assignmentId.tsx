@@ -36,6 +36,12 @@ function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
   const title = data?.assignment.title ?? 'Assignment results';
+  const activityTitle =
+    data?.snapshot?.activityTitle ?? data?.activity.title ?? '';
+  const activityDescription =
+    data?.snapshot?.activityDescription ?? data?.activity.description ?? '';
+  const templateType =
+    data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
 
   return (
     <DashboardLayout
@@ -81,14 +87,14 @@ function AssignmentResultsPage() {
                   {data.assignment.status}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
-                  {data.activity.templateType}
+                  {templateType}
                 </Badge>
               </div>
               <CardTitle>
-                <h2 className="text-lg font-semibold">{data.activity.title}</h2>
+                <h2 className="text-lg font-semibold">{activityTitle}</h2>
               </CardTitle>
               <CardDescription>
-                <p>{data.activity.description}</p>
+                <p>{activityDescription}</p>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 sm:flex-row">

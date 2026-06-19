@@ -1,6 +1,11 @@
 import { evaluateRuntimeAnswers } from '@/activities/runtime';
 import { getDb } from '@/db';
-import { activity, assignment, attempt } from '@/db/app.schema';
+import {
+  activity,
+  assignment,
+  assignmentSnapshot,
+  attempt,
+} from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 import { and, avg, count, desc, eq } from 'drizzle-orm';
@@ -35,9 +40,14 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .select({
         activity,
         assignment,
+        snapshot: assignmentSnapshot,
       })
       .from(assignment)
       .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(where)
       .orderBy(desc(assignment.updatedAt))
       .limit(data.pageSize)
@@ -107,13 +117,27 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       updatedAt: now,
     });
 
+    await db.insert(assignmentSnapshot).values({
+      activityDescription: sourceActivity.description,
+      activityTitle: sourceActivity.title,
+      assignmentId: id,
+      contentJson: sourceActivity.contentJson,
+      createdAt: now,
+      templateType: sourceActivity.templateType,
+    });
+
     const [row] = await db
       .select({
         activity,
         assignment,
+        snapshot: assignmentSnapshot,
       })
       .from(assignment)
       .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(eq(assignment.id, id))
       .limit(1);
 
@@ -138,9 +162,14 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .select({
         activity,
         assignment,
+        snapshot: assignmentSnapshot,
       })
       .from(assignment)
       .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(
         and(
           eq(assignment.id, data.assignmentId),
@@ -199,9 +228,14 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       .select({
         activity,
         assignment,
+        snapshot: assignmentSnapshot,
       })
       .from(assignment)
       .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(
         and(
           eq(assignment.shareSlug, data.shareSlug),
@@ -242,9 +276,14 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       .select({
         activity,
         assignment,
+        snapshot: assignmentSnapshot,
       })
       .from(assignment)
       .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(
         and(
           eq(assignment.shareSlug, data.shareSlug),
@@ -257,11 +296,14 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       throw new Error('Assignment not found.');
     }
 
+    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
+    const templateType =
+      row.snapshot?.templateType ?? row.activity.templateType;
     const evaluation = evaluateRuntimeAnswers({
       answers: data.answers,
-      content: row.activity.contentJson,
+      content,
       durationSeconds: data.durationSeconds,
-      templateType: row.activity.templateType,
+      templateType,
     });
     const now = new Date();
     const id = nanoid(16);
@@ -269,7 +311,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     await db.insert(attempt).values({
       answersJson: {
         answers: evaluation.answers,
-        templateType: row.activity.templateType,
+        templateType,
       },
       assignmentId: row.assignment.id,
       completedAt: now,

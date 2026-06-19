@@ -36,6 +36,13 @@
       "when": 1781887555059,
       "tag": "0004_huge_mysterio",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1781893604463,
+      "tag": "0005_puzzling_william_stryker",
+      "breakpoints": true
     }
   ]
 }

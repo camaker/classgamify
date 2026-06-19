@@ -18,12 +18,20 @@ Activity -> Assignment -> Attempt -> Results
   content, such as quiz, match-up, group sort, fill blank, matching pairs, or
   open box.
 - `Assignment` is a shareable delivery instance of an activity.
+- `AssignmentSnapshot` freezes the published title, template, and content so
+  teacher edits do not silently change already shared homework links.
 - `Attempt` records a student's submitted answers and scored result.
 
 This shape keeps future templates from creating separate content tables for
 each game. New templates should first ask whether the existing content model can
 render and score the interaction. Only add new structured content when a mode
 cannot be represented by questions, pairs, or groups.
+
+Teachers must be able to reopen and edit saved activities from the activity
+library. Editing uses the same `CreateActivityInput` contract as creation, with
+`ActivityContent` converted back into the structured editor text fields before
+submission. Published assignments score against their snapshot; editing an
+activity only affects future assignments.
 
 ## AI Authoring
 
