@@ -551,7 +551,8 @@ export function ActivityCreateForm({
                       />
                     </FormControl>
                     <FormDescription>
-                      Used by match-up and matching-pairs templates.
+                      Used by match-up, line-match, and matching-pairs
+                      templates.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

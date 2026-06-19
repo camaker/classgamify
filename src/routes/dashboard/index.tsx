@@ -60,7 +60,7 @@ function DashboardPage() {
       icon: IconLayoutGrid,
       label: 'Templates',
       value: String(activityTemplates.length),
-      description: 'Quiz, match, sort, fill, listen, pairs, box',
+      description: 'Quiz, match, lines, sort, fill, listen, pairs, box',
     },
     {
       icon: IconClipboardList,

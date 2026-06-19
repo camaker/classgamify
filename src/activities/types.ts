@@ -1,6 +1,7 @@
 export const ACTIVITY_TEMPLATE_TYPES = [
   'quiz',
   'match-up',
+  'line-match',
   'group-sort',
   'fill-blank',
   'listening',

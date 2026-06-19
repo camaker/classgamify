@@ -98,7 +98,7 @@ function HomePage() {
               <Signal
                 icon={IconDeviceGamepad2}
                 label="Templates"
-                value="7 first"
+                value="8 first"
               />
               <Signal icon={IconUsers} label="Delivery" value="Share link" />
               <Signal icon={IconChartBar} label="Results" value="Attempt log" />
@@ -120,7 +120,7 @@ function HomePage() {
               icon: IconDeviceGamepad2,
               title: 'Template-first gameplay',
               description:
-                'The first platform skeleton supports quiz, match-up, group sort, fill-blank, listening, matching pairs, and open-box paths.',
+                'The first platform skeleton supports quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box paths.',
             },
             {
               icon: IconChartBar,

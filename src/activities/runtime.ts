@@ -38,6 +38,7 @@ export function getRuntimeItems(
   content: ActivityContent
 ): RuntimeItem[] {
   switch (templateType) {
+    case 'line-match':
     case 'match-up':
     case 'matching-pairs': {
       const choices = content.pairs.map((pair) => pair.right);

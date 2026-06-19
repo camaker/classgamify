@@ -26,6 +26,16 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     classroomMode: 'individual',
   },
   {
+    type: 'line-match',
+    name: 'Line match',
+    shortName: 'Lines',
+    description:
+      'Students connect prompts to matching answers in a worksheet-style flow.',
+    bestFor: 'Vocabulary translations, terms and definitions, cause and effect',
+    contentRequirements: ['pairs'],
+    classroomMode: 'individual',
+  },
+  {
     type: 'group-sort',
     name: 'Group sort',
     shortName: 'Sort',
@@ -82,7 +92,7 @@ export const starterActivities: ActivitySeed[] = [
     id: 'english-food-quiz',
     title: 'Food words quick check',
     description:
-      'A starter English vocabulary activity that can render as quiz, match, or pairs.',
+      'A starter English vocabulary activity that can render as quiz, match, lines, or pairs.',
     templateType: 'quiz',
     estimatedMinutes: 6,
     status: 'draft',
@@ -142,7 +152,7 @@ export const starterActivities: ActivitySeed[] = [
         { id: 'g-drink', label: 'Drink', items: ['milk', 'water'] },
       ],
       teacherNotes: [
-        'Use the same content as a quiz for homework or as matching pairs for class warmup.',
+        'Use the same content as a quiz for homework, line match for worksheet practice, or matching pairs for class warmup.',
         'Ask students to say one sentence after each correct answer.',
       ],
     },

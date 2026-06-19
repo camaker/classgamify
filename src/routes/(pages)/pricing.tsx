@@ -182,7 +182,7 @@ function getPricingCopy(locale: 'en' | 'zh') {
       valueCards: [
         {
           description:
-            '从 quiz、match-up、group sort、fill-blank、listening、matching pairs 和 open-box 等核心模板开始。',
+            '从 quiz、match-up、line-match、group sort、fill-blank、listening、matching pairs 和 open-box 等核心模板开始。',
           icon: IconLayoutGrid,
           title: '模板库',
         },
@@ -215,7 +215,7 @@ function getPricingCopy(locale: 'en' | 'zh') {
     valueCards: [
       {
         description:
-          'Start with core templates such as quiz, match-up, group sort, fill-blank, listening, matching pairs, and open-box activities.',
+          'Start with core templates such as quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box activities.',
         icon: IconLayoutGrid,
         title: 'Template library',
       },

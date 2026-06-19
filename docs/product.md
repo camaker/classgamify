@@ -15,8 +15,8 @@ Activity -> Assignment -> Attempt -> Results
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
   groups, vocabulary, learning goal, and teacher notes.
 - `ActivityTemplate` is a runtime renderer and scoring strategy for that
-  content, such as quiz, match-up, group sort, fill blank, listening, matching
-  pairs, or open box.
+  content, such as quiz, match-up, line match, group sort, fill blank,
+  listening, matching pairs, or open box.
 - `Assignment` is a shareable delivery instance of an activity.
 - `AssignmentSnapshot` freezes the published title, template, and content so
   teacher edits do not silently change already shared homework links.
@@ -34,8 +34,8 @@ submission. Published assignments score against their snapshot; editing an
 activity only affects future assignments.
 
 The activity editor should make the selected template legible. When teachers
-choose quiz, match-up, group sort, fill-blank, listening, matching pairs, or
-open-box, the editor shows the required content type and can load a
+choose quiz, match-up, line-match, group sort, fill-blank, listening, matching
+pairs, or open-box, the editor shows the required content type and can load a
 template-specific scaffold that fills the matching structured fields. Scaffolds
 are examples, not hidden templates; teachers still review and edit before
 saving.
@@ -54,9 +54,11 @@ token so max-attempt limits still work without collecting student names.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click
-choices. Fill-blank uses a worksheet-style renderer that places the answer
-input into the sentence blank when possible. Open-box uses a reveal-card flow
-where students choose a box, answer the prompt, and move between boxes.
+choices. Line-match uses the same pair content but gives students a
+worksheet-style two-column connection flow. Fill-blank uses a worksheet-style
+renderer that places the answer input into the sentence blank when possible.
+Open-box uses a reveal-card flow where students choose a box, answer the prompt,
+and move between boxes.
 Listening uses a browser-spoken track flow that hides the transcript until
 review, then records the student's selected or typed answer against the same
 question item. Group-sort uses a dedicated category board where students select

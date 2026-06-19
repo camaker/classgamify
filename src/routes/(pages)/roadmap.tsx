@@ -34,7 +34,7 @@ function RoadmapPage() {
       icon: IconCheck,
       items: [
         'Activity, assignment, attempt schema',
-        'Template catalog with seven starter types',
+        'Template catalog with eight starter types',
         'Teacher dashboard entry points',
         'Public student play route shell',
       ],

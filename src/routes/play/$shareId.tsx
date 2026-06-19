@@ -11,6 +11,7 @@ import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
 import { ListeningRunner } from '@/components/activities/listening-runner';
+import { LineMatchBoard } from '@/components/activities/line-match-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import { OpenBoxRunner } from '@/components/activities/open-box-runner';
 import Container from '@/components/layout/container';
@@ -300,6 +301,21 @@ function RuntimeItemList({
   reviewItems?: PublicAttemptReviewItem[];
   templateType: ActivityTemplateType;
 }) {
+  if (templateType === 'line-match') {
+    return (
+      <div className="mt-4">
+        <LineMatchBoard
+          answers={answers}
+          disabled={disabled}
+          items={items}
+          revealAnswer={revealAnswer}
+          reviewItems={reviewItems}
+          onAnswerChange={onAnswerChange}
+        />
+      </div>
+    );
+  }
+
   if (templateType === 'matching-pairs') {
     return (
       <div className="mt-4">

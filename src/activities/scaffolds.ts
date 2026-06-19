@@ -64,6 +64,21 @@ export const activityTemplateScaffolds: Record<
     title: 'Food listening check',
     vocabularyText: 'milk, apple, rice, bread, water, egg',
   },
+  'line-match': {
+    description: 'Worksheet-style line matching for terms and meanings.',
+    groupsText: '',
+    learningGoal:
+      'Students can connect each food word to the correct meaning or category.',
+    pairsText:
+      'apple | fruit\nbread | bakery food\nmilk | drink\nrice | grain\nwater | drink\negg | protein food',
+    questionsText: '',
+    sourceSummary: 'Line-match scaffold from a vocabulary matching task.',
+    subject: 'English',
+    teacherNotesText:
+      'Ask students to draw or tap one connection at a time.\nReview mismatched lines before moving to the next activity.',
+    title: 'Draw lines for food words',
+    vocabularyText: 'apple, bread, milk, rice, water, egg',
+  },
   'match-up': {
     description: 'Match terms with meanings for quick vocabulary practice.',
     groupsText: '',
