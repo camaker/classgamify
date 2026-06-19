@@ -352,14 +352,6 @@ export function HskCoursePage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={copyNextLessonPlan}
-              >
-                <IconTargetArrow className="size-4" />
-                {copy.nextLessonPlanCta}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
                 onClick={copyProgressBackup}
               >
                 <IconDatabaseExport className="size-4" />
@@ -488,6 +480,7 @@ export function HskCoursePage() {
         <DailyPracticePlanCard
           copy={copy}
           dailyTarget={dailyTarget}
+          onCopyPlan={copyNextLessonPlan}
           progressSummary={progressSummary}
           worksheetCharacters={freeCharacters}
         />
@@ -631,11 +624,13 @@ function NextReturnCard({
 function DailyPracticePlanCard({
   copy,
   dailyTarget,
+  onCopyPlan,
   progressSummary,
   worksheetCharacters,
 }: {
   copy: ReturnType<typeof getCourseCopy>;
   dailyTarget: number;
+  onCopyPlan: () => void;
   progressSummary: HanziProgressSummary;
   worksheetCharacters: string[];
 }) {
@@ -807,6 +802,10 @@ function DailyPracticePlanCard({
               {primaryActionLabel}
             </Link>
           ) : null}
+          <Button type="button" variant="outline" onClick={onCopyPlan}>
+            <IconCopy className="size-4" />
+            {copy.nextLessonPlanCta}
+          </Button>
           <Link
             to={Routes.Worksheets}
             search={reviewWorksheetSearch}
