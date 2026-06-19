@@ -1,4 +1,6 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
+import { getRuntimeItems } from '@/activities/runtime';
+import type { RuntimeItem } from '@/activities/runtime';
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
@@ -49,14 +51,18 @@ function PlayPage() {
     : assignment
       ? starterActivity
       : undefined;
-  const questionCount = activity?.content.questions.length ?? 0;
-  const canSubmit = Boolean(data) && questionCount > 0;
-  const completedCount = useMemo(
+  const runtimeItems = useMemo(
     () =>
-      activity?.content.questions.filter((question) =>
-        answers[question.id]?.trim()
-      ).length ?? 0,
-    [activity, answers]
+      activity
+        ? getRuntimeItems(activity.templateType, activity.content)
+        : ([] as RuntimeItem[]),
+    [activity]
+  );
+  const itemCount = runtimeItems.length;
+  const canSubmit = Boolean(data) && itemCount > 0;
+  const completedCount = useMemo(
+    () => runtimeItems.filter((item) => answers[item.id]?.trim()).length,
+    [answers, runtimeItems]
   );
 
   async function submitAnswers() {
@@ -67,9 +73,9 @@ function PlayPage() {
 
     try {
       const response = await submitAttemptMutation.mutateAsync({
-        answers: activity.content.questions.map((question) => ({
-          answer: answers[question.id] ?? '',
-          itemId: question.id,
+        answers: runtimeItems.map((item) => ({
+          answer: answers[item.id] ?? '',
+          itemId: item.id,
         })),
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         shareSlug: assignment?.shareId ?? shareId,
@@ -156,7 +162,7 @@ function PlayPage() {
               Student runner
             </div>
             <Badge variant="secondary" className="rounded-md">
-              {completedCount}/{questionCount} answered
+              {completedCount}/{itemCount} answered
             </Badge>
           </div>
 
@@ -197,28 +203,22 @@ function PlayPage() {
           </div>
 
           <div className="mt-4 grid gap-3">
-            {activity.content.questions.map((question, index) => (
-              <div key={question.id} className="rounded-lg border bg-card p-3">
-                <p className="text-sm font-medium">
-                  {index + 1}. {question.prompt}
-                </p>
-                <Input
-                  value={answers[question.id] ?? ''}
-                  onChange={(event) =>
-                    setAnswers((current) => ({
-                      ...current,
-                      [question.id]: event.target.value,
-                    }))
-                  }
-                  placeholder="Type your answer"
-                  className="mt-3"
-                />
-                {result && assignment.settings.showCorrectAnswers ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Correct answer: {question.answer}
-                  </p>
-                ) : null}
-              </div>
+            {runtimeItems.map((item, index) => (
+              <RuntimeItemCard
+                key={item.id}
+                answer={answers[item.id] ?? ''}
+                index={index}
+                item={item}
+                revealAnswer={Boolean(
+                  result && assignment.settings.showCorrectAnswers
+                )}
+                onAnswerChange={(answer) =>
+                  setAnswers((current) => ({
+                    ...current,
+                    [item.id]: answer,
+                  }))
+                }
+              />
             ))}
           </div>
 
@@ -243,6 +243,80 @@ function PlayPage() {
       </div>
     </Container>
   );
+}
+
+function RuntimeItemCard({
+  answer,
+  index,
+  item,
+  onAnswerChange,
+  revealAnswer,
+}: {
+  answer: string;
+  index: number;
+  item: RuntimeItem;
+  onAnswerChange: (answer: string) => void;
+  revealAnswer: boolean;
+}) {
+  const prompt = getRuntimePrompt(item);
+
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-sm font-medium">
+          {index + 1}. {prompt}
+        </p>
+        <Badge variant="outline" className="rounded-md">
+          {item.kind}
+        </Badge>
+      </div>
+      {item.choices?.length ? (
+        <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_10rem]">
+          <Input
+            value={answer}
+            onChange={(event) => onAnswerChange(event.target.value)}
+            placeholder="Type or choose an answer"
+          />
+          <select
+            value={answer}
+            onChange={(event) => onAnswerChange(event.target.value)}
+            className="h-8 rounded-lg border border-input bg-background px-2.5 text-sm"
+          >
+            <option value="">Choose</option>
+            {item.choices.map((choice) => (
+              <option key={choice} value={choice}>
+                {choice}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <Input
+          value={answer}
+          onChange={(event) => onAnswerChange(event.target.value)}
+          placeholder="Type your answer"
+          className="mt-3"
+        />
+      )}
+      {revealAnswer ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Correct answer: {item.answer}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function getRuntimePrompt(item: RuntimeItem) {
+  if (item.kind === 'pair') {
+    return `Match "${item.prompt}" with its pair.`;
+  }
+
+  if (item.kind === 'group-item') {
+    return `Choose the group for "${item.prompt}".`;
+  }
+
+  return item.prompt;
 }
 
 function mapPersistedActivity(data: NonNullable<PublicAssignmentData>) {

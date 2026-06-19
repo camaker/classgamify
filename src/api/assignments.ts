@@ -1,3 +1,4 @@
+import { evaluateRuntimeAnswers } from '@/activities/runtime';
 import { getDb } from '@/db';
 import { activity, assignment, attempt } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -193,59 +194,32 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       throw new Error('Assignment not found.');
     }
 
-    const questions = row.activity.contentJson.questions;
-    const answerMap = new Map(
-      data.answers.map((answer) => [answer.itemId, answer.answer.trim()])
-    );
-    const scoredAnswers = questions.map((question) => {
-      const submitted = answerMap.get(question.id) ?? '';
-      const correct =
-        submitted.localeCompare(question.answer, undefined, {
-          sensitivity: 'accent',
-        }) === 0;
-
-      return {
-        answer: submitted,
-        correct,
-        itemId: question.id,
-      };
+    const evaluation = evaluateRuntimeAnswers({
+      answers: data.answers,
+      content: row.activity.contentJson,
+      durationSeconds: data.durationSeconds,
+      templateType: row.activity.templateType,
     });
-    const correctItemCount = scoredAnswers.filter(
-      (answer) => answer.correct
-    ).length;
-    const totalPoints = questions.length;
-    const earnedPoints = correctItemCount;
-    const accuracy =
-      totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
     const now = new Date();
     const id = nanoid(16);
-    const result = {
-      accuracy,
-      completedItemCount: scoredAnswers.filter((answer) => answer.answer)
-        .length,
-      correctItemCount,
-      durationSeconds: data.durationSeconds,
-      earnedPoints,
-      totalPoints,
-    };
 
     await db.insert(attempt).values({
       answersJson: {
-        answers: scoredAnswers,
+        answers: evaluation.answers,
         templateType: row.activity.templateType,
       },
       assignmentId: row.assignment.id,
       completedAt: now,
       id,
-      maxScore: totalPoints,
-      resultJson: result,
-      score: earnedPoints,
+      maxScore: evaluation.result.totalPoints,
+      resultJson: evaluation.result,
+      score: evaluation.result.earnedPoints,
       startedAt: now,
       studentName: data.studentName?.trim() || null,
     });
 
     return {
       id,
-      result,
+      result: evaluation.result,
     };
   });

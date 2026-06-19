@@ -97,6 +97,7 @@ assignment publishing is enabled.
 | 2 | Template requirements are enforced | Sign in, open `/create`, choose a match-based template, clear match pairs, submit, and verify a validation error explains the missing content requirement. |
 | 3 | Teacher can publish a student share link | Sign in, create or open a saved activity, click publish assignment, expect redirect to `/dashboard/assignments`, open the generated `/play/:shareId` link, and verify the student activity shell loads the persisted title and questions. |
 | 4 | Student can submit an attempt | Open a persisted `/play/:shareId`, enter a student name and answers, submit, verify the score panel appears, reload `/dashboard/assignments` as the teacher, and verify completions/average score update. |
+| 5 | Student runner adapts to template content | Create quiz, match-up, and group-sort activities, publish each one, open each `/play/:shareId`, verify the runner renders question, pair, and group-selection items respectively, submit answers, and verify scoring reflects the template-specific expected answers. |
 
 ## Deferred Coverage
 
