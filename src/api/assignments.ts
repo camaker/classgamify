@@ -124,6 +124,69 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     return row;
   });
 
+const getAssignmentResultsInputSchema = z.object({
+  assignmentId: z.string().min(1),
+});
+
+export const getAssignmentResults = createServerFn({ method: 'GET' })
+  .inputValidator(getAssignmentResultsInputSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const [row] = await db
+      .select({
+        activity,
+        assignment,
+      })
+      .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .where(
+        and(
+          eq(assignment.id, data.assignmentId),
+          eq(assignment.ownerId, userId)
+        )
+      )
+      .limit(1);
+
+    if (!row) {
+      throw new Error('Assignment not found.');
+    }
+
+    const attempts = await db
+      .select()
+      .from(attempt)
+      .where(eq(attempt.assignmentId, row.assignment.id))
+      .orderBy(desc(attempt.completedAt));
+    const completions = attempts.length;
+    const averageScore =
+      completions > 0
+        ? Math.round(
+            attempts.reduce((sum, item) => {
+              const result = item.resultJson;
+              return sum + (result?.accuracy ?? 0);
+            }, 0) / completions
+          )
+        : 0;
+    const averagePoints =
+      completions > 0
+        ? Math.round(
+            attempts.reduce((sum, item) => sum + (item.score ?? 0), 0) /
+              completions
+          )
+        : 0;
+
+    return {
+      ...row,
+      attempts,
+      stats: {
+        averagePoints,
+        averageScore,
+        completions,
+      },
+    };
+  });
+
 const getPublicAssignmentInputSchema = z.object({
   shareSlug: z.string().min(1).max(80),
 });

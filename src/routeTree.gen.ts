@@ -54,6 +54,7 @@ import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
+import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
@@ -285,6 +286,12 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAssignmentsAssignmentIdRoute =
+  DashboardAssignmentsAssignmentIdRouteImport.update({
+    id: '/$assignmentId',
+    path: '/$assignmentId',
+    getParentRoute: () => DashboardAssignmentsRoute,
+  } as any)
 const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
   id: '/api/webhooks/stripe',
   path: '/api/webhooks/stripe',
@@ -342,7 +349,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRoute
-  '/dashboard/assignments': typeof DashboardAssignmentsRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
@@ -362,6 +369,7 @@ export interface FileRoutesByFullPath {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -391,7 +399,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRoute
-  '/dashboard/assignments': typeof DashboardAssignmentsRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
@@ -411,6 +419,7 @@ export interface FileRoutesByTo {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -444,7 +453,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRoute
-  '/dashboard/assignments': typeof DashboardAssignmentsRoute
+  '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
@@ -464,6 +473,7 @@ export interface FileRoutesById {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/assignments/$assignmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -567,6 +578,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/assignments/$assignmentId'
   id:
     | '__root__'
     | '/'
@@ -619,6 +631,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/dashboard/assignments/$assignmentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -973,6 +986,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/assignments/$assignmentId': {
+      id: '/dashboard/assignments/$assignmentId'
+      path: '/$assignmentId'
+      fullPath: '/dashboard/assignments/$assignmentId'
+      preLoaderRoute: typeof DashboardAssignmentsAssignmentIdRouteImport
+      parentRoute: typeof DashboardAssignmentsRoute
+    }
     '/api/webhooks/stripe': {
       id: '/api/webhooks/stripe'
       path: '/api/webhooks/stripe'
@@ -1041,15 +1061,26 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface DashboardAssignmentsRouteChildren {
+  DashboardAssignmentsAssignmentIdRoute: typeof DashboardAssignmentsAssignmentIdRoute
+}
+
+const DashboardAssignmentsRouteChildren: DashboardAssignmentsRouteChildren = {
+  DashboardAssignmentsAssignmentIdRoute: DashboardAssignmentsAssignmentIdRoute,
+}
+
+const DashboardAssignmentsRouteWithChildren =
+  DashboardAssignmentsRoute._addFileChildren(DashboardAssignmentsRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardActivitiesRoute: typeof DashboardActivitiesRoute
-  DashboardAssignmentsRoute: typeof DashboardAssignmentsRoute
+  DashboardAssignmentsRoute: typeof DashboardAssignmentsRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardActivitiesRoute: DashboardActivitiesRoute,
-  DashboardAssignmentsRoute: DashboardAssignmentsRoute,
+  DashboardAssignmentsRoute: DashboardAssignmentsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

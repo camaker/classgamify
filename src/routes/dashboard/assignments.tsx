@@ -213,14 +213,29 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             }
           />
         </div>
-        <Link
-          to="/play/$shareId"
-          params={{ shareId: assignment.shareSlug }}
-          className={cn(buttonVariants(), 'w-full lg:w-auto')}
-        >
-          <IconPlayerPlay className="size-4" />
-          Open share link
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+          {!assignment.id.startsWith('assignment-') ? (
+            <Link
+              to="/dashboard/assignments/$assignmentId"
+              params={{ assignmentId: assignment.id }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background lg:w-auto'
+              )}
+            >
+              <IconChartBar className="size-4" />
+              View results
+            </Link>
+          ) : null}
+          <Link
+            to="/play/$shareId"
+            params={{ shareId: assignment.shareSlug }}
+            className={cn(buttonVariants(), 'w-full lg:w-auto')}
+          >
+            <IconPlayerPlay className="size-4" />
+            Open share link
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

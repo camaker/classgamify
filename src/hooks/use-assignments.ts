@@ -1,4 +1,5 @@
 import {
+  getAssignmentResults,
   getPublicAssignment,
   listAssignments,
   publishAssignment,
@@ -13,6 +14,9 @@ import {
 
 export const assignmentsKeys = {
   all: ['assignments'] as const,
+  detail: (assignmentId: string) =>
+    [...assignmentsKeys.details(), assignmentId] as const,
+  details: () => [...assignmentsKeys.all, 'details'] as const,
   list: (params: { pageIndex: number; pageSize: number }) =>
     [...assignmentsKeys.lists(), params] as const,
   lists: () => [...assignmentsKeys.all, 'lists'] as const,
@@ -35,6 +39,14 @@ export function useAssignments({
   });
 }
 
+export function useAssignmentResults(assignmentId: string) {
+  return useQuery({
+    enabled: Boolean(assignmentId),
+    queryFn: () => getAssignmentResults({ data: { assignmentId } }),
+    queryKey: assignmentsKeys.detail(assignmentId),
+  });
+}
+
 export function usePublishAssignment() {
   const queryClient = useQueryClient();
 
@@ -43,6 +55,7 @@ export function usePublishAssignment() {
       publishAssignment({ data: { activityId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });
     },
   });
 }
@@ -67,6 +80,7 @@ export function useSubmitAttempt() {
     }) => submitAttempt({ data: input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });
     },
   });
 }

@@ -9,6 +9,7 @@ export const Routes = {
   Resources: '/blog',
   DashboardActivities: '/dashboard/activities',
   DashboardAssignments: '/dashboard/assignments',
+  DashboardAssignmentResults: '/dashboard/assignments/$assignmentId',
   LegacyLearn: '/learn',
   LegacyHsk1: '/hsk/1',
   LegacyWorksheets: '/worksheets',
