@@ -21,6 +21,7 @@ import { useAssignmentResults } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconCalendarTime,
   IconChartBar,
   IconClock,
   IconListDetails,
@@ -64,7 +65,7 @@ function AssignmentResultsPage() {
         </div>
       ) : (
         <div className="grid gap-6">
-          <section className="grid gap-4 md:grid-cols-3">
+          <section className="grid gap-4 md:grid-cols-4">
             <ResultMetric
               icon={IconUsers}
               label="Completions"
@@ -80,13 +81,21 @@ function AssignmentResultsPage() {
               label="Average points"
               value={String(data.stats.averagePoints)}
             />
+            <ResultMetric
+              icon={IconCalendarTime}
+              label="Closes"
+              value={formatAssignmentExpiry(data.assignment.expiresAt)}
+            />
           </section>
 
           <Card className="rounded-lg">
             <CardHeader>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="rounded-md">
-                  {data.assignment.status}
+                  {getAssignmentStatusLabel(
+                    data.assignment.status,
+                    data.assignment.expiresAt
+                  )}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
                   {templateType}
@@ -332,4 +341,25 @@ function formatAttemptDate(value: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(value);
+}
+
+function formatAssignmentExpiry(value: Date | null) {
+  if (!value) return 'No close time';
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(value);
+}
+
+function getAssignmentStatusLabel(status: string, expiresAt: Date | null) {
+  if (
+    status === 'published' &&
+    expiresAt &&
+    expiresAt.getTime() <= Date.now()
+  ) {
+    return 'Expired';
+  }
+  if (status === 'published') return 'Open';
+  if (status === 'closed') return 'Closed';
+  return 'Draft';
 }

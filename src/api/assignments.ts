@@ -104,6 +104,10 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const now = new Date();
     const id = nanoid(16);
     const shareSlug = nanoid(10);
+    const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+    if (expiresAt && expiresAt.getTime() <= now.getTime()) {
+      throw new Error('Choose a future close time for this assignment.');
+    }
     const settings = {
       ...defaultAssignmentSettings,
       ...data.settings,
@@ -114,6 +118,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       createdAt: now,
       id,
       ownerId: userId,
+      expiresAt,
       settingsJson: settings,
       shareSlug,
       status: 'published',
@@ -306,7 +311,7 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       )
       .limit(1);
 
-    if (!row) {
+    if (!row || !isAssignmentOpenForStudents(row.assignment)) {
       return null;
     }
 
@@ -325,6 +330,7 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
         visibility: row.activity.visibility,
       },
       assignment: {
+        expiresAt: row.assignment.expiresAt,
         id: row.assignment.id,
         settingsJson: {
           ...defaultAssignmentSettings,
@@ -396,6 +402,9 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     }
     if (row.assignment.status !== 'published') {
       throw new Error('This assignment is closed.');
+    }
+    if (isAssignmentExpired(row.assignment.expiresAt)) {
+      throw new Error('This assignment has expired.');
     }
 
     const settings = {
@@ -470,3 +479,17 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       result: evaluation.result,
     };
   });
+
+function isAssignmentOpenForStudents({
+  expiresAt,
+  status,
+}: {
+  expiresAt: Date | null;
+  status: string;
+}) {
+  return status === 'published' && !isAssignmentExpired(expiresAt);
+}
+
+function isAssignmentExpired(expiresAt: Date | null) {
+  return Boolean(expiresAt && expiresAt.getTime() <= Date.now());
+}

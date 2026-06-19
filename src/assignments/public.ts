@@ -31,6 +31,7 @@ export type PublicAssignmentPayload = {
   };
   assignment: {
     id: string;
+    expiresAt: Date | null;
     settingsJson: AssignmentSettings;
     shareSlug: string;
     status: AssignmentStatus;

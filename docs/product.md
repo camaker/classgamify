@@ -50,19 +50,20 @@ publish flow.
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
 answers after submission, whether items are shuffled, and the per-student
-attempt limit. These settings live on `Assignment.settingsJson`; immutable
-content lives on `AssignmentSnapshot`. Teachers can close and reopen published
-assignment links without changing the frozen snapshot, so public student access
-and submissions respect the assignment lifecycle while existing attempts remain
-available for review.
+attempt limit. They can also set an optional close-after time for homework
+windows. These settings live on `Assignment.settingsJson`; immutable content
+lives on `AssignmentSnapshot`, and the time window lives on `Assignment`.
+Teachers can close and reopen published assignment links without changing the
+frozen snapshot, so public student access and submissions respect the assignment
+lifecycle while existing attempts remain available for review.
 
 Public student links must return a sanitized assignment payload only while the
-assignment is open. Closed links do not expose runtime content, and submissions
-against closed links are rejected. The browser receives runtime prompts and
-choices, not `ActivityContent` with embedded answers. Correct answers are
-returned only after an attempt is scored and only when the assignment allows
-answer reveal. Anonymous assignments use a browser token so max-attempt limits
-still work without collecting student names.
+assignment is open. Closed or expired links do not expose runtime content, and
+submissions against closed or expired links are rejected. The browser receives
+runtime prompts and choices, not `ActivityContent` with embedded answers.
+Correct answers are returned only after an attempt is scored and only when the
+assignment allows answer reveal. Anonymous assignments use a browser token so
+max-attempt limits still work without collecting student names.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click

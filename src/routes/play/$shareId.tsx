@@ -566,6 +566,7 @@ function mapPersistedAssignment(data: NonNullable<PublicAssignmentData>) {
     activityId: data.activity.id,
     averageScore: 0,
     completions: 0,
+    expiresAt: data.assignment.expiresAt,
     id: data.assignment.id,
     settings: data.assignment.settingsJson,
     shareId: data.assignment.shareSlug,

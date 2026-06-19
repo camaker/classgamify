@@ -190,6 +190,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const [maxAttempts, setMaxAttempts] = useState(
     String(defaultAssignmentSettings.maxAttempts ?? 2)
   );
+  const [expiresAtLocal, setExpiresAtLocal] = useState('');
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
@@ -211,10 +212,20 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
       toast.error('Max attempts must be a whole number from 1 to 10.');
       return;
     }
+    const expiresAt = expiresAtLocal ? new Date(expiresAtLocal) : undefined;
+    if (expiresAtLocal && Number.isNaN(expiresAt?.getTime())) {
+      toast.error('Choose a valid close time.');
+      return;
+    }
+    if (expiresAt && expiresAt.getTime() <= Date.now()) {
+      toast.error('Close time must be in the future.');
+      return;
+    }
 
     try {
       const result = await publishMutation.mutateAsync({
         activityId: activity.id,
+        expiresAt: expiresAt?.toISOString(),
         settings: {
           collectStudentName,
           maxAttempts: attempts,
@@ -394,6 +405,22 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
                 onChange={(event) => setMaxAttempts(event.currentTarget.value)}
               />
             </div>
+            <div className="grid gap-2">
+              <label htmlFor={`expires-at-${activity.id}`}>Close after</label>
+              <Input
+                id={`expires-at-${activity.id}`}
+                type="datetime-local"
+                min={formatDateTimeLocal(new Date(Date.now() + 60 * 1000))}
+                value={expiresAtLocal}
+                onChange={(event) =>
+                  setExpiresAtLocal(event.currentTarget.value)
+                }
+              />
+              <p className="text-xs leading-5 text-muted-foreground">
+                Optional. Leave blank to keep the link open until it is closed
+                manually.
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -453,4 +480,9 @@ function ActivityStat({ label, value }: { label: string; value: number }) {
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
+}
+
+function formatDateTimeLocal(date: Date) {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return localDate.toISOString().slice(0, 16);
 }

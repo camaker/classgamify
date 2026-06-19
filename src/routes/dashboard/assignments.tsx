@@ -20,6 +20,7 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconCalendarTime,
   IconChartBar,
   IconClock,
   IconListCheck,
@@ -34,6 +35,7 @@ import { toast } from 'sonner';
 
 type AssignmentCardData = {
   activityDescription: string;
+  expiresAt: Date | null;
   id: string;
   maxAttempts?: number;
   shareSlug: string;
@@ -61,8 +63,8 @@ function DashboardAssignmentsPage() {
   });
   const assignments = data?.items ?? [];
   const hasAssignments = assignments.length > 0;
-  const openAssignmentCount = assignments.filter(
-    (item) => item.assignment.status === 'published'
+  const openAssignmentCount = assignments.filter((item) =>
+    isAssignmentOpen(item.assignment.status, item.assignment.expiresAt)
   ).length;
   const totalCompletions = assignments.reduce(
     (sum, item) => sum + item.stats.completions,
@@ -133,6 +135,7 @@ function DashboardAssignmentsPage() {
                     item.snapshot?.activityDescription ??
                     item.activity.description ??
                     '',
+                  expiresAt: item.assignment.expiresAt,
                   id: item.assignment.id,
                   maxAttempts: item.assignment.settingsJson.maxAttempts,
                   shareSlug: item.assignment.shareSlug,
@@ -173,6 +176,7 @@ function DashboardAssignmentsPage() {
                     key={assignment.id}
                     assignment={{
                       activityDescription: activity.description,
+                      expiresAt: null,
                       id: assignment.id,
                       maxAttempts: assignment.settings.maxAttempts,
                       shareSlug: assignment.shareId,
@@ -198,9 +202,11 @@ function DashboardAssignmentsPage() {
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const persisted = !assignment.id.startsWith('assignment-');
+  const expired = isAssignmentExpired(assignment.expiresAt);
   const canManageStatus =
     persisted &&
-    (assignment.status === 'published' || assignment.status === 'closed');
+    (assignment.status === 'published' ||
+      (assignment.status === 'closed' && !expired));
   const nextStatus = assignment.status === 'published' ? 'closed' : 'published';
 
   async function updateStatus() {
@@ -228,7 +234,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
-            {getAssignmentStatusLabel(assignment.status)}
+            {getAssignmentStatusLabel(assignment.status, assignment.expiresAt)}
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconListCheck className="size-3.5" />
@@ -243,7 +249,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <AssignmentStat
             icon={IconUsers}
             label="Completions"
@@ -260,6 +266,11 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             value={
               assignment.maxAttempts ? `${assignment.maxAttempts} max` : 'open'
             }
+          />
+          <AssignmentStat
+            icon={IconCalendarTime}
+            label="Closes"
+            value={formatAssignmentExpiry(assignment.expiresAt)}
           />
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
@@ -306,10 +317,32 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   );
 }
 
-function getAssignmentStatusLabel(status: AssignmentStatus) {
+function getAssignmentStatusLabel(
+  status: AssignmentStatus,
+  expiresAt: Date | null
+) {
+  if (status === 'published' && isAssignmentExpired(expiresAt)) {
+    return 'Expired';
+  }
   if (status === 'published') return 'Open';
   if (status === 'closed') return 'Closed';
   return 'Draft';
+}
+
+function isAssignmentOpen(status: AssignmentStatus, expiresAt: Date | null) {
+  return status === 'published' && !isAssignmentExpired(expiresAt);
+}
+
+function isAssignmentExpired(expiresAt: Date | null) {
+  return Boolean(expiresAt && expiresAt.getTime() <= Date.now());
+}
+
+function formatAssignmentExpiry(expiresAt: Date | null) {
+  if (!expiresAt) return 'No close time';
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(expiresAt);
 }
 
 function SummaryCard({

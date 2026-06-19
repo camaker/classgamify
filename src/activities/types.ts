@@ -112,6 +112,7 @@ export type AssignmentSeed = {
   activityId: string;
   settings: AssignmentSettings;
   status: AssignmentStatus;
+  expiresAt?: Date | null;
   completions: number;
   averageScore: number;
 };

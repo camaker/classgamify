@@ -17,6 +17,7 @@ export const assignmentSettingsSchema = z.object({
 
 export const publishAssignmentInputSchema = z.object({
   activityId: z.string().min(1),
+  expiresAt: z.string().datetime().optional(),
   settings: assignmentSettingsSchema.default(defaultAssignmentSettings),
   title: z.string().trim().min(3).max(120),
 });
