@@ -301,8 +301,8 @@ export function HskCoursePage() {
   return (
     <section className="min-h-[calc(100vh-12rem)] bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-          <div className="min-w-0 space-y-5">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+          <div className="min-w-0 space-y-4">
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="border-primary/30">
                 {copy.badge}
@@ -376,24 +376,21 @@ export function HskCoursePage() {
             </div>
           </div>
 
-          <Card className="min-w-0 rounded-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <IconBook2 className="size-4" />
-                {copy.summaryTitle}
+          <Card className="min-w-0 rounded-lg py-4">
+            <CardHeader className="px-4 pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <IconBook2 className="size-4 shrink-0" />
+                <span className="min-w-0 truncate">{copy.summaryTitle}</span>
               </CardTitle>
-              <CardDescription>{copy.summaryDescription}</CardDescription>
+              <CardDescription className="text-xs leading-5">
+                {copy.summaryDescription}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-3 text-sm">
+            <CardContent className="grid grid-cols-2 gap-2 px-4 text-sm">
               <Stat label={copy.totalLabel} value={stats.total} />
               <Stat label={copy.freeLabel} value={stats.free} />
               <Stat label={copy.groupsLabel} value={stats.groups} />
               <Stat label={copy.strokesLabel} value={stats.strokes} />
-              <LearningRhythmStats
-                copy={copy}
-                progressSummary={progressSummary}
-              />
-              <NextReturnCard copy={copy} progressSummary={progressSummary} />
             </CardContent>
           </Card>
         </div>
@@ -568,56 +565,6 @@ export function HskCoursePage() {
         </section>
       </div>
     </section>
-  );
-}
-
-function NextReturnCard({
-  copy,
-  progressSummary,
-}: {
-  copy: ReturnType<typeof getCourseCopy>;
-  progressSummary: HanziProgressSummary;
-}) {
-  const firstReview = progressSummary.reviewItems[0];
-  const nextCharacter = progressSummary.nextPracticeTarget?.character;
-  const title = firstReview
-    ? copy.returnReviewTitle(firstReview.character.character)
-    : progressSummary.lessonComplete
-      ? copy.returnCompleteTitle
-      : nextCharacter
-        ? copy.returnContinueTitle(nextCharacter.character)
-        : copy.returnStartTitle;
-  const description = firstReview
-    ? copy.returnReviewDescription(
-        firstReview.progress.mistakes,
-        firstReview.urgency
-      )
-    : progressSummary.lessonComplete
-      ? copy.returnCompleteDescription
-      : nextCharacter
-        ? copy.returnContinueDescription(nextCharacter.pinyin)
-        : copy.returnStartDescription;
-
-  return (
-    <div className="col-span-2 rounded-lg border bg-background p-3">
-      <div className="flex items-start gap-3">
-        <div className="rounded-md bg-primary/10 p-2 text-primary">
-          <IconFlame className="size-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">{copy.returnTitle}</div>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            {copy.returnDescription}
-          </p>
-          <div className="mt-3 rounded-md border bg-muted/30 px-3 py-2">
-            <p className="text-sm font-medium">{title}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              {description}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1172,56 +1119,6 @@ function ReviewFocusList({
   );
 }
 
-function LearningRhythmStats({
-  copy,
-  progressSummary,
-}: {
-  copy: ReturnType<typeof getCourseCopy>;
-  progressSummary: HanziProgressSummary;
-}) {
-  const stats = [
-    {
-      label: copy.streakLabel,
-      value: copy.streakValue(progressSummary.currentStreakDays),
-    },
-    {
-      label: copy.activeDaysLabel,
-      value: copy.activeDaysValue(progressSummary.activeDayCount),
-    },
-  ];
-
-  return (
-    <div className="col-span-2 rounded-lg border bg-muted/30 p-3">
-      <div className="flex items-start gap-3">
-        <div className="rounded-md bg-background p-2 ring-1 ring-border">
-          <IconTargetArrow className="size-4 text-primary" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">{copy.rhythmTitle}</div>
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">
-            {progressSummary.completedCount > 0
-              ? copy.rhythmDescription(
-                  progressSummary.currentStreakDays,
-                  progressSummary.practicedToday
-                )
-              : copy.rhythmEmptyDescription}
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {stats.map((item) => (
-              <div key={item.label} className="rounded-md bg-background p-2">
-                <div className="text-lg font-semibold">{item.value}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function CharacterTile({
   character,
   copy,
@@ -1291,9 +1188,11 @@ function CharacterTile({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border bg-muted/30 p-3">
-      <div className="text-2xl font-semibold">{value}</div>
-      <div className="mt-1 text-muted-foreground">{label}</div>
+    <div className="rounded-md border bg-muted/30 p-2.5">
+      <div className="text-xl font-semibold leading-none tabular-nums">
+        {value}
+      </div>
+      <div className="mt-1 truncate text-xs text-muted-foreground">{label}</div>
     </div>
   );
 }
