@@ -45,6 +45,7 @@ import {
   IconPlayerPlay,
   IconReload,
   IconRotate,
+  IconShieldCheck,
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -486,6 +487,8 @@ export function HanziPracticePage({
               total={lessonCharacters.length}
               worksheetCharacters={worksheetCharacters}
             />
+
+            <ProgressStorageCard copy={copy} />
 
             <LearningGuideLinks mode="practice" />
 
@@ -1708,6 +1711,40 @@ function DailyRhythmCard({
   );
 }
 
+function ProgressStorageCard({
+  copy,
+}: {
+  copy: ReturnType<typeof getPracticeCopy>;
+}) {
+  return (
+    <Card className="rounded-lg border-dashed">
+      <CardContent className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
+            <IconShieldCheck className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium">{copy.storageTitle}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {copy.storageDescription}
+            </p>
+          </div>
+        </div>
+        <Link
+          to={Routes.Hsk1}
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'w-full bg-background sm:w-auto'
+          )}
+        >
+          <IconBook2 className="size-4" />
+          {copy.storageCta}
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ReviewQueueCard({
   cleanCount,
   copy,
@@ -2102,6 +2139,10 @@ function getPracticeCopy(locale: 'en' | 'zh') {
       startGuideTraceTitle: '跟着描写',
       startGuideWatchDescription: '先看一遍动画，注意起笔、方向和收笔位置。',
       startGuideWatchTitle: '观察笔顺',
+      storageCta: '打开备份入口',
+      storageDescription:
+        '当前 HSK1 练习进度保存在本浏览器。要换设备、清理浏览器或给学生交接前，请到 HSK1 路径复制或下载进度备份。',
+      storageTitle: '进度保存在当前浏览器',
       loopCompleteDescription:
         '入门组已完成。现在最适合把整组汉字打印出来做纸笔复习。',
       loopDescription: (completed: number, total: number) =>
@@ -2513,6 +2554,10 @@ function getPracticeCopy(locale: 'en' | 'zh') {
     startGuideWatchDescription:
       'Watch the animation once and notice direction, corners, and final stroke placement.',
     startGuideWatchTitle: 'Watch stroke order',
+    storageCta: 'Open backup tools',
+    storageDescription:
+      'HSK1 practice progress is saved in this browser for now. Before switching devices, clearing browser data, or handing off to a learner, open the HSK1 path to copy or download a progress backup.',
+    storageTitle: 'Progress is stored in this browser',
     loopCompleteDescription:
       'Starter set complete. This is a good moment to print the whole set for paper review.',
     loopDescription: (completed: number, total: number) =>
