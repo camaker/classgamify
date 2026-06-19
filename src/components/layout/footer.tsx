@@ -15,9 +15,11 @@ import {
 } from '@tabler/icons-react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
+import { getCourseStats } from '@/learn/hanzi-course';
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
+  const courseStats = getCourseStats();
   return (
     <footer
       className={cn(
@@ -78,7 +80,9 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                 </dd>
               </div>
               <div className="border-l pl-3">
-                <dt className="text-lg font-semibold leading-none">10</dt>
+                <dt className="text-lg font-semibold leading-none">
+                  {courseStats.free}
+                </dt>
                 <dd className="mt-1 text-xs leading-4 text-muted-foreground">
                   {m.footer_metric_characters()}
                 </dd>
