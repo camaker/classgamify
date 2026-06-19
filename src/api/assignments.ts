@@ -8,6 +8,7 @@ import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   defaultAssignmentSettings,
   publishAssignmentInputSchema,
+  updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
 import { getDb } from '@/db';
 import {
@@ -146,6 +147,56 @@ export const publishAssignment = createServerFn({ method: 'POST' })
 
     if (!row) {
       throw new Error('Assignment was saved but could not be loaded.');
+    }
+
+    return row;
+  });
+
+export const updateAssignmentStatus = createServerFn({ method: 'POST' })
+  .inputValidator(updateAssignmentStatusInputSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const where = and(
+      eq(assignment.id, data.assignmentId),
+      eq(assignment.ownerId, userId)
+    );
+    const [existingAssignment] = await db
+      .select({ id: assignment.id })
+      .from(assignment)
+      .where(where)
+      .limit(1);
+
+    if (!existingAssignment) {
+      throw new Error('Assignment not found.');
+    }
+
+    await db
+      .update(assignment)
+      .set({
+        status: data.status,
+        updatedAt: new Date(),
+      })
+      .where(where);
+
+    const [row] = await db
+      .select({
+        activity,
+        assignment,
+        snapshot: assignmentSnapshot,
+      })
+      .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
+      .where(where)
+      .limit(1);
+
+    if (!row) {
+      throw new Error('Assignment status was saved but could not be loaded.');
     }
 
     return row;
@@ -337,16 +388,14 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(
-        and(
-          eq(assignment.shareSlug, data.shareSlug),
-          eq(assignment.status, 'published')
-        )
-      )
+      .where(eq(assignment.shareSlug, data.shareSlug))
       .limit(1);
 
     if (!row) {
       throw new Error('Assignment not found.');
+    }
+    if (row.assignment.status !== 'published') {
+      throw new Error('This assignment is closed.');
     }
 
     const settings = {

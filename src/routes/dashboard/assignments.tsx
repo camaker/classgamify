@@ -1,7 +1,11 @@
 import { getStarterActivity, starterAssignments } from '@/activities/catalog';
+import type {
+  ActivityTemplateType,
+  AssignmentStatus,
+} from '@/activities/types';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,26 +13,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useAssignments } from '@/hooks/use-assignments';
+import {
+  useAssignments,
+  useUpdateAssignmentStatus,
+} from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconChartBar,
   IconClock,
   IconListCheck,
+  IconLock,
+  IconLockOpen,
   IconPlayerPlay,
   IconShare3,
   IconUsers,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 type AssignmentCardData = {
   activityDescription: string;
   id: string;
   maxAttempts?: number;
   shareSlug: string;
-  status: string;
-  templateType: string;
+  status: AssignmentStatus;
+  templateType: ActivityTemplateType;
   title: string;
   stats: {
     averageScore: number;
@@ -51,6 +61,9 @@ function DashboardAssignmentsPage() {
   });
   const assignments = data?.items ?? [];
   const hasAssignments = assignments.length > 0;
+  const openAssignmentCount = assignments.filter(
+    (item) => item.assignment.status === 'published'
+  ).length;
   const totalCompletions = assignments.reduce(
     (sum, item) => sum + item.stats.completions,
     0
@@ -73,11 +86,16 @@ function DashboardAssignmentsPage() {
       description="Published activity instances with share links, classroom settings, and result metrics."
     >
       <div className="grid gap-6">
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-4">
+          <SummaryCard
+            icon={IconListCheck}
+            label="Assignments"
+            value={String(assignments.length)}
+          />
           <SummaryCard
             icon={IconShare3}
-            label="Published links"
-            value={String(assignments.length)}
+            label="Open links"
+            value={String(openAssignmentCount)}
           />
           <SummaryCard
             icon={IconUsers}
@@ -178,12 +196,39 @@ function DashboardAssignmentsPage() {
 }
 
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
+  const updateStatusMutation = useUpdateAssignmentStatus();
+  const persisted = !assignment.id.startsWith('assignment-');
+  const canManageStatus =
+    persisted &&
+    (assignment.status === 'published' || assignment.status === 'closed');
+  const nextStatus = assignment.status === 'published' ? 'closed' : 'published';
+
+  async function updateStatus() {
+    try {
+      await updateStatusMutation.mutateAsync({
+        assignmentId: assignment.id,
+        status: nextStatus,
+      });
+      toast.success(
+        nextStatus === 'closed'
+          ? 'Assignment link closed.'
+          : 'Assignment link reopened.'
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Assignment status could not be updated.'
+      );
+    }
+  }
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
-            {assignment.status}
+            {getAssignmentStatusLabel(assignment.status)}
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconListCheck className="size-3.5" />
@@ -218,7 +263,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
           />
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          {!assignment.id.startsWith('assignment-') ? (
+          {persisted ? (
             <Link
               to="/dashboard/assignments/$assignmentId"
               params={{ assignmentId: assignment.id }}
@@ -230,6 +275,22 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
               <IconChartBar className="size-4" />
               View results
             </Link>
+          ) : null}
+          {canManageStatus ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-background lg:w-auto"
+              disabled={updateStatusMutation.isPending}
+              onClick={updateStatus}
+            >
+              {assignment.status === 'published' ? (
+                <IconLock className="size-4" />
+              ) : (
+                <IconLockOpen className="size-4" />
+              )}
+              {assignment.status === 'published' ? 'Close link' : 'Reopen link'}
+            </Button>
           ) : null}
           <Link
             to="/play/$shareId"
@@ -243,6 +304,12 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       </CardContent>
     </Card>
   );
+}
+
+function getAssignmentStatusLabel(status: AssignmentStatus) {
+  if (status === 'published') return 'Open';
+  if (status === 'closed') return 'Closed';
+  return 'Draft';
 }
 
 function SummaryCard({

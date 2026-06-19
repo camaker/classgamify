@@ -4,8 +4,12 @@ import {
   listAssignments,
   publishAssignment,
   submitAttempt,
+  updateAssignmentStatus,
 } from '@/api/assignments';
-import type { PublishAssignmentInput } from '@/assignments/validation';
+import type {
+  PublishAssignmentInput,
+  UpdateAssignmentStatusInput,
+} from '@/assignments/validation';
 import {
   keepPreviousData,
   useMutation,
@@ -57,6 +61,24 @@ export function usePublishAssignment() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });
+    },
+  });
+}
+
+export function useUpdateAssignmentStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: UpdateAssignmentStatusInput) =>
+      updateAssignmentStatus({ data: input }),
+    onSuccess: (row, input) => {
+      queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: assignmentsKeys.detail(input.assignmentId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: assignmentsKeys.public(row.assignment.shareSlug),
+      });
     },
   });
 }

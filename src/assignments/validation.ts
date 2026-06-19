@@ -21,6 +21,15 @@ export const publishAssignmentInputSchema = z.object({
   title: z.string().trim().min(3).max(120),
 });
 
+export const updateAssignmentStatusInputSchema = z.object({
+  assignmentId: z.string().min(1),
+  status: z.enum(['published', 'closed']),
+});
+
 export type PublishAssignmentInput = z.infer<
   typeof publishAssignmentInputSchema
+>;
+
+export type UpdateAssignmentStatusInput = z.infer<
+  typeof updateAssignmentStatusInputSchema
 >;
