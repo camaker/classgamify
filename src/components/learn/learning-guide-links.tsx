@@ -5,6 +5,7 @@ import {
   IconArrowRight,
   IconBook2,
   IconFileText,
+  IconListDetails,
   IconPencil,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -95,6 +96,12 @@ function getLearningGuideCopy(
           : '练习前先明确目标，练习后把错笔和纸面复习接回下一次学习。',
       links: [
         {
+          description: '查看免费入门组和 HSK1 第一阶段内容包如何分组练习。',
+          icon: IconListDetails,
+          slug: 'hsk1-chinese-characters-list',
+          title: 'HSK1 汉字表和练习顺序',
+        },
+        {
           description: '用短练习推进新字、错字复习和打印练习纸。',
           icon: IconPencil,
           slug: 'how-to-practice-hsk1-characters',
@@ -124,6 +131,13 @@ function getLearningGuideCopy(
         ? 'Connect online tracing, review queues, and paper assignments into a steady study rhythm.'
         : 'Set the goal before practice, then feed missed strokes and paper review into the next session.',
     links: [
+      {
+        description:
+          'See how the free starter and expanded launch pack map into real practice groups.',
+        icon: IconListDetails,
+        slug: 'hsk1-chinese-characters-list',
+        title: 'HSK1 character list and practice order',
+      },
       {
         description:
           'Use short sessions to combine new characters, review, and printable worksheets.',

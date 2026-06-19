@@ -1,11 +1,15 @@
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
 import Container from '@/components/layout/container';
+import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { getPaginatedPosts } from '@/lib/blog';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { cn } from '@/lib/utils';
+import { IconBook2, IconFileText, IconPencil } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/')({
@@ -50,6 +54,26 @@ function BlogListPage() {
               ? '围绕 HSK1 汉字、纸笔练习和课堂作业流程的短文章。'
               : 'Short articles about HSK1 characters, paper practice, and classroom assignment workflows.'}
           </p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2 rounded-lg border bg-muted/20 p-3">
+          <Link to={Routes.Learn} className={buttonVariants()}>
+            <IconPencil className="size-4" />
+            {currentLocale === 'zh' ? '开始练习' : 'Start practice'}
+          </Link>
+          <Link
+            to={Routes.Hsk1}
+            className={cn(buttonVariants({ variant: 'outline' }))}
+          >
+            <IconBook2 className="size-4" />
+            {currentLocale === 'zh' ? '查看 HSK1 路径' : 'View HSK1 path'}
+          </Link>
+          <Link
+            to={Routes.Worksheets}
+            className={cn(buttonVariants({ variant: 'outline' }))}
+          >
+            <IconFileText className="size-4" />
+            {currentLocale === 'zh' ? '制作练习纸' : 'Make worksheet'}
+          </Link>
         </div>
         <BlogGrid posts={posts} />
         <BlogPagination currentPage={currentPage} totalPages={totalPages} />
