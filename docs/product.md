@@ -51,11 +51,13 @@ answers. Correct answers are returned only after an attempt is scored and only
 when the assignment allows answer reveal. Anonymous assignments use a browser
 token so max-attempt limits still work without collecting student names.
 
-Student runners should use the runtime item kind to choose the interaction:
-multiple-choice questions, match-up pairs, and group-sort items render as
-tap/click choices, while fill-blank and open-box prompts can still accept typed
-answers. The submission contract remains template-neutral: every renderer
-stores `{ itemId, answer }` so scoring and result analysis stay shared.
+Student runners should use the runtime item kind and template type to choose the
+interaction. Multiple-choice questions, match-up pairs, and group-sort items
+render as tap/click choices, while fill-blank and open-box prompts can still
+accept typed answers. Matching-pairs uses a dedicated left/right card board so
+students can select a prompt and attach a choice without seeing the answer map.
+The submission contract remains template-neutral: every renderer stores
+`{ itemId, answer }` so scoring and result analysis stay shared.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to

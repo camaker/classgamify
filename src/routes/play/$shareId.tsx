@@ -1,9 +1,14 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getRuntimeItems } from '@/activities/runtime';
 import type { RuntimeItem } from '@/activities/runtime';
-import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
+import type {
+  ActivitySeed,
+  ActivityTemplateType,
+  AssignmentSeed,
+} from '@/activities/types';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { ActivityPreview } from '@/components/activities/activity-preview';
+import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -159,9 +164,9 @@ function PlayPage() {
               {assignment.title}
             </h1>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              This public assignment loads from the teacher share link. The next
-              implementation pass fills in student identity, scoring, and
-              attempt submission.
+              This public assignment loads from the teacher share link, collects
+              answers, and scores against the teacher's frozen assignment
+              snapshot.
             </p>
           </div>
           <Link
@@ -227,33 +232,29 @@ function PlayPage() {
             ) : null}
           </div>
 
-          <div className="mt-4 grid gap-3">
-            {runtimeItems.map((item, index) => (
-              <RuntimeItemCard
-                key={item.id}
-                answer={answers[item.id] ?? ''}
-                index={index}
-                item={item}
-                reviewItem={result?.reviewItems.find(
-                  (reviewItem) => reviewItem.itemId === item.id
-                )}
-                revealAnswer={Boolean(
-                  result && assignment.settings.showCorrectAnswers
-                )}
-                onAnswerChange={(answer) =>
-                  setAnswers((current) => ({
-                    ...current,
-                    [item.id]: answer,
-                  }))
-                }
-              />
-            ))}
-          </div>
+          <RuntimeItemList
+            answers={answers}
+            disabled={Boolean(result)}
+            items={runtimeItems}
+            revealAnswer={Boolean(
+              result && assignment.settings.showCorrectAnswers
+            )}
+            reviewItems={result?.reviewItems}
+            templateType={activity.templateType}
+            onAnswerChange={(itemId, answer) =>
+              setAnswers((current) => ({
+                ...current,
+                [itemId]: answer,
+              }))
+            }
+          />
 
           <Button
             type="button"
             className="mt-4 w-full sm:w-fit"
-            disabled={!canSubmit || submitAttemptMutation.isPending}
+            disabled={
+              !canSubmit || Boolean(result) || submitAttemptMutation.isPending
+            }
             onClick={submitAnswers}
           >
             <IconCheck className="size-4" />
@@ -278,8 +279,61 @@ function PlayPage() {
   );
 }
 
+function RuntimeItemList({
+  answers,
+  disabled,
+  items,
+  onAnswerChange,
+  revealAnswer,
+  reviewItems,
+  templateType,
+}: {
+  answers: Record<string, string>;
+  disabled: boolean;
+  items: PublicRuntimeItem[];
+  onAnswerChange: (itemId: string, answer: string) => void;
+  revealAnswer: boolean;
+  reviewItems?: PublicAttemptReviewItem[];
+  templateType: ActivityTemplateType;
+}) {
+  if (templateType === 'matching-pairs') {
+    return (
+      <div className="mt-4">
+        <MatchingPairsBoard
+          answers={answers}
+          disabled={disabled}
+          items={items}
+          revealAnswer={revealAnswer}
+          reviewItems={reviewItems}
+          onAnswerChange={onAnswerChange}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 grid gap-3">
+      {items.map((item, index) => (
+        <RuntimeItemCard
+          key={item.id}
+          answer={answers[item.id] ?? ''}
+          disabled={disabled}
+          index={index}
+          item={item}
+          reviewItem={reviewItems?.find(
+            (reviewItem) => reviewItem.itemId === item.id
+          )}
+          revealAnswer={revealAnswer}
+          onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
+        />
+      ))}
+    </div>
+  );
+}
+
 function RuntimeItemCard({
   answer,
+  disabled,
   index,
   item,
   onAnswerChange,
@@ -287,6 +341,7 @@ function RuntimeItemCard({
   reviewItem,
 }: {
   answer: string;
+  disabled: boolean;
   index: number;
   item: PublicRuntimeItem;
   onAnswerChange: (answer: string) => void;
@@ -309,12 +364,13 @@ function RuntimeItemCard({
         <ChoiceGrid
           answer={answer}
           choices={item.choices}
-          disabled={revealAnswer}
+          disabled={disabled}
           onAnswerChange={onAnswerChange}
         />
       ) : (
         <Input
           value={answer}
+          disabled={disabled}
           onChange={(event) => onAnswerChange(event.target.value)}
           placeholder="Type your answer"
           className="mt-3"
