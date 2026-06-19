@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { authClient } from '@/auth/client';
 import Container from '@/components/layout/container';
 import { PricingTable } from '@/components/pricing/pricing-table';
+import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
   Accordion,
@@ -33,6 +34,7 @@ import {
   type TablerIcon,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/(pages)/pricing')({
   head: () => {
@@ -73,6 +75,7 @@ function PricingPage() {
   const classroomCta = getPricingClassroomCta(currentLocale);
   const planComparison = getPricingPlanComparison(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
+  const planFit = getPricingPlanFit(currentLocale);
   const nextStepCards = getPricingNextStepCards(currentLocale);
   const decisionCards = [
     {
@@ -137,10 +140,13 @@ function PricingPage() {
             </Link>
           ))}
         </section>
-        <PricingTable
-          currentPlan={currentPlan}
-          metadata={userId ? { userId } : undefined}
-        />
+        <PlanFitSection copy={planFit} />
+        <div id="plans" className="scroll-mt-24">
+          <PricingTable
+            currentPlan={currentPlan}
+            metadata={userId ? { userId } : undefined}
+          />
+        </div>
         <PlanComparisonSection comparison={planComparison} />
         <section className="space-y-4">
           <div className="mx-auto max-w-2xl space-y-2 text-center">
@@ -237,6 +243,9 @@ function PricingPage() {
 }
 
 type PricingComparisonState = 'included' | 'limited' | 'locked';
+type PricingFitCadence = 'repeat' | 'try' | 'weekly';
+type PricingFitPlan = 'classroom' | 'free' | 'lifetime' | 'pro';
+type PricingFitUseCase = 'classroom' | 'family' | 'self';
 
 type PricingComparisonRow = {
   label: string;
@@ -258,6 +267,434 @@ type PricingComparisonCopy = {
   plans: PricingComparisonPlan[];
   title: string;
 };
+
+type PricingFitOption<T extends string> = {
+  description: string;
+  icon: TablerIcon;
+  id: T;
+  label: string;
+};
+
+type PricingFitRecommendation = {
+  description: string;
+  features: string[];
+  primaryCta: string;
+  secondaryCta: string;
+  title: string;
+};
+
+type PricingFitCopy = {
+  cadenceLabel: string;
+  cadences: PricingFitOption<PricingFitCadence>[];
+  description: string;
+  planBadges: Record<PricingFitPlan, string>;
+  planLabels: Record<PricingFitPlan, string>;
+  recommendations: Record<PricingFitPlan, PricingFitRecommendation>;
+  summary: (input: {
+    cadence: string;
+    plan: string;
+    useCase: string;
+  }) => string;
+  title: string;
+  useCaseLabel: string;
+  useCases: PricingFitOption<PricingFitUseCase>[];
+};
+
+function PlanFitSection({ copy }: { copy: PricingFitCopy }) {
+  const [useCase, setUseCase] = useState<PricingFitUseCase>('self');
+  const [cadence, setCadence] = useState<PricingFitCadence>('weekly');
+  const plan = getPricingFitPlan(useCase, cadence);
+  const recommendation = copy.recommendations[plan];
+  const selectedUseCase = copy.useCases.find((item) => item.id === useCase);
+  const selectedCadence = copy.cadences.find((item) => item.id === cadence);
+
+  return (
+    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="min-w-0 space-y-5">
+        <div className="space-y-2">
+          <Badge variant="outline" className="rounded-md border-primary/30">
+            <IconSparkles className="size-3.5" />
+            {copy.title}
+          </Badge>
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+            {copy.description}
+          </p>
+        </div>
+
+        <PlanFitOptionGroup
+          label={copy.useCaseLabel}
+          options={copy.useCases}
+          value={useCase}
+          onChange={setUseCase}
+        />
+        <PlanFitOptionGroup
+          label={copy.cadenceLabel}
+          options={copy.cadences}
+          value={cadence}
+          onChange={setCadence}
+        />
+      </div>
+
+      <div className="flex min-w-0 flex-col rounded-lg border bg-background p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <Badge className="rounded-md">{copy.planBadges[plan]}</Badge>
+            <h2 className="mt-3 text-xl font-semibold">
+              {recommendation.title}
+            </h2>
+          </div>
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-primary/10 text-primary">
+            {plan === 'free' ? (
+              <IconPencil className="size-5" />
+            ) : plan === 'lifetime' ? (
+              <IconInfinity className="size-5" />
+            ) : plan === 'classroom' ? (
+              <IconUsers className="size-5" />
+            ) : (
+              <IconBook2 className="size-5" />
+            )}
+          </div>
+        </div>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {copy.summary({
+            cadence: selectedCadence?.label ?? '',
+            plan: copy.planLabels[plan],
+            useCase: selectedUseCase?.label ?? '',
+          })}
+        </p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          {recommendation.description}
+        </p>
+        <ul className="mt-4 space-y-2">
+          {recommendation.features.map((feature) => (
+            <li
+              key={feature}
+              className="grid grid-cols-[1rem_minmax(0,1fr)] gap-2 text-sm leading-6"
+            >
+              <IconCircleCheck className="mt-1 size-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-auto flex flex-col gap-2 pt-5 sm:flex-row lg:flex-col">
+          {plan === 'classroom' ? (
+            <Link
+              to={Routes.Contact}
+              search={{ subject: 'classroom' }}
+              className={cn(buttonVariants(), 'w-full')}
+            >
+              {recommendation.primaryCta}
+              <IconArrowRight className="size-4" />
+            </Link>
+          ) : (
+            <a href="#plans" className={cn(buttonVariants(), 'w-full')}>
+              {recommendation.primaryCta}
+              <IconArrowRight className="size-4" />
+            </a>
+          )}
+          <Link
+            to={Routes.Worksheets}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background'
+            )}
+          >
+            {recommendation.secondaryCta}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlanFitOptionGroup<T extends string>({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  onChange: (value: T) => void;
+  options: PricingFitOption<T>[];
+  value: T;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium">{label}</p>
+      <div className="grid gap-2 md:grid-cols-3">
+        {options.map((option) => {
+          const selected = option.id === value;
+
+          return (
+            <button
+              key={option.id}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(option.id)}
+              className={cn(
+                'min-w-0 rounded-lg border bg-background p-3 text-left',
+                'transition-colors hover:border-primary/40 hover:bg-primary/5',
+                'focus-visible:outline-none focus-visible:ring-2',
+                'focus-visible:ring-ring',
+                selected && 'border-primary/40 bg-primary/10'
+              )}
+            >
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <option.icon className="size-4 text-primary" />
+                {option.label}
+              </span>
+              <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                {option.description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function getPricingFitPlan(
+  useCase: PricingFitUseCase,
+  cadence: PricingFitCadence
+): PricingFitPlan {
+  if (useCase === 'classroom' && cadence === 'repeat') return 'classroom';
+  if (useCase === 'classroom') return 'pro';
+  if (useCase === 'family' && cadence === 'repeat') return 'lifetime';
+  if (cadence === 'try') return 'free';
+  if (cadence === 'repeat') return 'lifetime';
+  return 'pro';
+}
+
+function getPricingPlanFit(locale: 'en' | 'zh'): PricingFitCopy {
+  if (locale === 'zh') {
+    return {
+      cadenceLabel: '你准备怎么用？',
+      cadences: [
+        {
+          description: '先跑通一次线上描写和打印流程。',
+          icon: IconPencil,
+          id: 'try',
+          label: '先试用',
+        },
+        {
+          description: '每周练字、复习错笔，并打印练习纸。',
+          icon: IconCalendarStats,
+          id: 'weekly',
+          label: '每周练习',
+        },
+        {
+          description: '长期复用字表、练习纸和作业流程。',
+          icon: IconInfinity,
+          id: 'repeat',
+          label: '长期复用',
+        },
+      ],
+      description:
+        '根据真实使用场景快速判断该先免费试用、升级 HSK1 Pro、选择早期终身版，还是联系我们做课堂流程。',
+      planBadges: {
+        classroom: '课堂咨询',
+        free: '先免费',
+        lifetime: '长期更合适',
+        pro: '推荐 Pro',
+      },
+      planLabels: {
+        classroom: '课堂方案',
+        free: '免费入门',
+        lifetime: '早期终身版',
+        pro: 'HSK1 Pro',
+      },
+      recommendations: {
+        classroom: {
+          description:
+            '如果你要给多个学生持续布置汉字作业，先聊清楚学生数量、打印频率、是否需要自定义字表和未来语言扩展。',
+          features: [
+            '适合课堂、tutor 小班或家庭长期作业流',
+            '围绕可复用练习纸和复习交接设计',
+            '可以提前反馈你需要的语言包和班级流程',
+          ],
+          primaryCta: '联系课堂方案',
+          secondaryCta: '先试练习纸',
+          title: '先联系我们梳理课堂流程',
+        },
+        free: {
+          description:
+            '先验证 Lang Study 的核心闭环：看笔顺、跟随描写、记录错笔，再打印同一组汉字。',
+          features: [
+            '免费 HSK1 入门汉字',
+            '笔顺动画和跟随描写',
+            '基础打印练习纸预览',
+          ],
+          primaryCta: '查看免费方案',
+          secondaryCta: '制作练习纸',
+          title: '从免费入门开始',
+        },
+        lifetime: {
+          description:
+            '适合会长期反复使用字表、练习纸和未来语言包的用户，尤其是老师、家长和 tutor。',
+          features: [
+            '包含 HSK1 Pro 的完整学习闭环',
+            '长期复用自定义字表和打印流程',
+            '未来文字系统和语言包上线时更适合早期使用',
+          ],
+          primaryCta: '查看终身版',
+          secondaryCta: '先试练习纸',
+          title: '选择早期终身版',
+        },
+        pro: {
+          description:
+            '适合准备系统完成 HSK1 的学习者，把一次试练变成每周练习、复习和打印的稳定流程。',
+          features: [
+            '完整 HSK1 书写路径',
+            '错笔记录、复习队列和每日目标',
+            '更多练习纸和自定义字表能力',
+          ],
+          primaryCta: '查看 HSK1 Pro',
+          secondaryCta: '制作练习纸',
+          title: '选择 HSK1 Pro',
+        },
+      },
+      summary: ({ cadence, plan, useCase }) =>
+        `${useCase} + ${cadence}：建议先看 ${plan}。`,
+      title: '帮我选方案',
+      useCaseLabel: '你是谁？',
+      useCases: [
+        {
+          description: '自己学中文，希望短时间内建立练字节奏。',
+          icon: IconBook2,
+          id: 'self',
+          label: '自学者',
+        },
+        {
+          description: '陪孩子、学生或一对一学员练习。',
+          icon: IconUsers,
+          id: 'family',
+          label: '家长 / tutor',
+        },
+        {
+          description: '给一组学生布置长期作业或课堂练习。',
+          icon: IconShieldCheck,
+          id: 'classroom',
+          label: '课堂',
+        },
+      ],
+    };
+  }
+
+  return {
+    cadenceLabel: 'How will you use it?',
+    cadences: [
+      {
+        description: 'Validate the online tracing and print workflow first.',
+        icon: IconPencil,
+        id: 'try',
+        label: 'Try first',
+      },
+      {
+        description:
+          'Practice weekly, review missed strokes, and print sheets.',
+        icon: IconCalendarStats,
+        id: 'weekly',
+        label: 'Weekly practice',
+      },
+      {
+        description: 'Reuse lists, worksheets, and assignment routines often.',
+        icon: IconInfinity,
+        id: 'repeat',
+        label: 'Long-term reuse',
+      },
+    ],
+    description:
+      'Answer two practical questions to decide whether to start free, upgrade to HSK1 Pro, choose Early Lifetime, or contact us for a classroom workflow.',
+    planBadges: {
+      classroom: 'Classroom fit',
+      free: 'Start free',
+      lifetime: 'Long-term fit',
+      pro: 'Pro fit',
+    },
+    planLabels: {
+      classroom: 'classroom workflow',
+      free: 'Free Starter',
+      lifetime: 'Early Lifetime',
+      pro: 'HSK1 Pro',
+    },
+    recommendations: {
+      classroom: {
+        description:
+          'For multiple learners and repeat assignments, start by clarifying learner count, worksheet frequency, custom lists, and future language scope.',
+        features: [
+          'Useful for classes, tutoring groups, or family homework routines',
+          'Designed around reusable worksheets and review handoffs',
+          'Lets you shape the classroom and language-pack roadmap early',
+        ],
+        primaryCta: 'Contact for classroom use',
+        secondaryCta: 'Try a worksheet',
+        title: 'Talk through the classroom workflow',
+      },
+      free: {
+        description:
+          'Use the free starter loop to test Lang Study: watch stroke order, trace, save missed strokes, then print the same set.',
+        features: [
+          'Free HSK1 starter characters',
+          'Stroke-order animation and guided tracing',
+          'Basic printable worksheet preview',
+        ],
+        primaryCta: 'View free plan',
+        secondaryCta: 'Make a worksheet',
+        title: 'Start with Free Starter',
+      },
+      lifetime: {
+        description:
+          'Best when you expect to reuse character lists, worksheets, and future language packs for a long time.',
+        features: [
+          'Includes the full HSK1 Pro learning loop',
+          'Long-term reuse of custom lists and print workflows',
+          'Better fit for future writing systems and language packs',
+        ],
+        primaryCta: 'View lifetime plan',
+        secondaryCta: 'Try a worksheet',
+        title: 'Choose Early Lifetime',
+      },
+      pro: {
+        description:
+          'Best when you want to turn one successful starter session into a weekly HSK1 writing, review, and print routine.',
+        features: [
+          'Complete HSK1 writing path',
+          'Missed-stroke history, review queue, and daily targets',
+          'More worksheets and custom character-list support',
+        ],
+        primaryCta: 'View HSK1 Pro',
+        secondaryCta: 'Make a worksheet',
+        title: 'Choose HSK1 Pro',
+      },
+    },
+    summary: ({ cadence, plan, useCase }) =>
+      `${useCase} + ${cadence}: ${plan} is the best next step.`,
+    title: 'Find your plan fit',
+    useCaseLabel: 'Who are you buying for?',
+    useCases: [
+      {
+        description:
+          'You are learning Chinese and want a steady writing habit.',
+        icon: IconBook2,
+        id: 'self',
+        label: 'Self-study',
+      },
+      {
+        description: 'You help a child, student, or tutoring learner practice.',
+        icon: IconUsers,
+        id: 'family',
+        label: 'Parent / tutor',
+      },
+      {
+        description: 'You assign practice to a group of learners over time.',
+        icon: IconShieldCheck,
+        id: 'classroom',
+        label: 'Classroom',
+      },
+    ],
+  };
+}
 
 function PlanComparisonSection({
   comparison,
