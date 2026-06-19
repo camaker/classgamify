@@ -45,6 +45,12 @@ answers. Correct answers are returned only after an attempt is scored and only
 when the assignment allows answer reveal. Anonymous assignments use a browser
 token so max-attempt limits still work without collecting student names.
 
+Teacher results should answer the classroom question, not just report a score.
+The results API analyzes frozen runtime items and stored attempt answers to
+produce per-item correct rates, reteach priorities, and item-level attempt
+reviews. This keeps the results loop useful for deciding what to explain again
+after homework.
+
 ## AI Authoring
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.

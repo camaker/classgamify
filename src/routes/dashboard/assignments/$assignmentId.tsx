@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
   Table,
   TableBody,
@@ -22,6 +23,7 @@ import { cn } from '@/lib/utils';
 import {
   IconChartBar,
   IconClock,
+  IconListDetails,
   IconPlayerPlay,
   IconShare3,
   IconUsers,
@@ -113,6 +115,34 @@ function AssignmentResultsPage() {
             </CardContent>
           </Card>
 
+          {data.analysis.perItem.length > 0 ? (
+            <Card className="rounded-lg">
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-lg font-semibold">Reteach priorities</h2>
+                </CardTitle>
+                <CardDescription>
+                  <p>
+                    Items are sorted by the lowest correct rate so teachers can
+                    quickly decide what to review with the class.
+                  </p>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-3">
+                {data.analysis.needsReview.length > 0 ? (
+                  data.analysis.needsReview.map((item) => (
+                    <ItemAnalysisCard key={item.itemId} item={item} />
+                  ))
+                ) : (
+                  <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
+                    Submit at least one answered attempt to calculate item
+                    review priorities.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ) : null}
+
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
@@ -120,8 +150,8 @@ function AssignmentResultsPage() {
               </CardTitle>
               <CardDescription>
                 <p>
-                  Latest submitted attempts are shown first. Item-level review
-                  can build on the stored answers JSON in the next pass.
+                  Latest submitted attempts are shown first, with detailed
+                  answer review below.
                 </p>
               </CardDescription>
             </CardHeader>
@@ -173,9 +203,106 @@ function AssignmentResultsPage() {
               )}
             </CardContent>
           </Card>
+
+          {data.analysis.attempts.length > 0 ? (
+            <Card className="rounded-lg">
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-lg font-semibold">Answer review</h2>
+                </CardTitle>
+                <CardDescription>
+                  <p>
+                    Item-level answers are scored from the frozen assignment
+                    snapshot, so teacher edits never change historical results.
+                  </p>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3">
+                {data.analysis.attempts.map((attempt) => (
+                  <AttemptReviewCard key={attempt.id} attempt={attempt} />
+                ))}
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
       )}
     </DashboardLayout>
+  );
+}
+
+function ItemAnalysisCard({
+  item,
+}: {
+  item: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['perItem'][number];
+}) {
+  return (
+    <div className="rounded-lg border bg-background p-4">
+      <div className="flex items-center justify-between gap-3">
+        <Badge variant="outline" className="rounded-md">
+          {item.kind}
+        </Badge>
+        <span className="text-sm font-semibold">{item.correctRate}%</span>
+      </div>
+      <p className="mt-3 line-clamp-2 text-sm font-medium">{item.prompt}</p>
+      <Progress value={item.correctRate} className="mt-3 h-2" />
+      <p className="mt-2 text-xs text-muted-foreground">
+        {item.correctCount}/{item.submittedCount} correct · answer:{' '}
+        {item.expectedAnswer}
+      </p>
+    </div>
+  );
+}
+
+function AttemptReviewCard({
+  attempt,
+}: {
+  attempt: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['attempts'][number];
+}) {
+  return (
+    <div className="rounded-lg border bg-background p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <IconListDetails className="size-4 text-primary" />
+            <p className="font-medium text-sm">{attempt.studentLabel}</p>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {formatAttemptDate(attempt.completedAt)}
+          </p>
+        </div>
+        <Badge variant="secondary" className="rounded-md">
+          {attempt.score} pts · {attempt.accuracy}%
+        </Badge>
+      </div>
+      <div className="mt-3 grid gap-2">
+        {attempt.answers.map((answer, index) => (
+          <div
+            key={`${attempt.id}-${answer.itemId}`}
+            className="rounded-lg border bg-muted/20 p-3"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="min-w-0 text-sm font-medium">
+                {index + 1}. {answer.prompt}
+              </p>
+              <Badge
+                variant={answer.correct ? 'secondary' : 'outline'}
+                className="rounded-md"
+              >
+                {answer.correct ? 'Correct' : 'Review'}
+              </Badge>
+            </div>
+            <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+              <p>Student: {answer.answer || '-'}</p>
+              <p>Expected: {answer.expectedAnswer || '-'}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

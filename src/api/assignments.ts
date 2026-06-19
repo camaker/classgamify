@@ -4,6 +4,7 @@ import {
   estimateAssignmentMinutes,
   stripRuntimeAnswers,
 } from '@/assignments/public';
+import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   defaultAssignmentSettings,
   publishAssignmentInputSchema,
@@ -206,9 +207,17 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
               completions
           )
         : 0;
+    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
+    const templateType =
+      row.snapshot?.templateType ?? row.activity.templateType;
+    const runtimeItems = getRuntimeItems(templateType, content);
 
     return {
       ...row,
+      analysis: analyzeAssignmentResults({
+        attempts,
+        runtimeItems,
+      }),
       attempts,
       stats: {
         averagePoints,
