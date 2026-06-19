@@ -77,15 +77,15 @@ function RoadmapPage() {
   ];
 
   return (
-    <Container className="px-4 py-12 md:py-16">
-      <div className="mx-auto max-w-6xl space-y-12 pb-16">
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-end">
+    <Container className="px-4 pt-10 pb-12 md:pt-12 md:pb-14">
+      <div className="mx-auto max-w-6xl space-y-10 pb-14">
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-start">
           <div className="min-w-0 space-y-5">
             <p className="text-sm font-semibold uppercase tracking-normal text-primary">
               {m.roadmap_eyebrow()}
             </p>
             <div className="space-y-4">
-              <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
+              <h1 className="max-w-3xl text-3xl font-bold text-balance md:text-5xl">
                 {m.roadmap_title()}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">

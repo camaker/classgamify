@@ -1,4 +1,5 @@
 import { Markdown } from '@/components/markdown/markdown';
+import { BlogPostVisual } from '@/components/blog/blog-post-visual';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -89,15 +90,11 @@ function BlogPostPage() {
               {post.description}
             </p>
           </div>
-          <div className="aspect-[16/9] overflow-hidden rounded-lg border bg-muted">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="size-full object-cover"
-              width={1280}
-              height={720}
-            />
-          </div>
+          <BlogPostVisual
+            post={post}
+            size="hero"
+            className="rounded-lg border"
+          />
         </header>
         <Markdown
           content={post.content}
