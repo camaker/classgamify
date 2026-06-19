@@ -2,6 +2,7 @@ import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getRuntimeItems } from '@/activities/runtime';
 import type { RuntimeItem } from '@/activities/runtime';
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
+import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,11 @@ function PlayPage() {
   const [result, setResult] = useState<AttemptSubmissionResult>();
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
+  const starterRuntimeItems = useMemo(
+    () =>
+      getRuntimeItems(starterActivity.templateType, starterActivity.content),
+    [starterActivity]
+  );
   const assignment = data
     ? mapPersistedAssignment(data)
     : shareId === starterAssignment.shareId
@@ -52,13 +58,15 @@ function PlayPage() {
       ? starterActivity
       : undefined;
   const runtimeItems = useMemo(() => {
-    const items = activity
-      ? getRuntimeItems(activity.templateType, activity.content)
-      : ([] as RuntimeItem[]);
+    const items = data
+      ? data.runtimeItems
+      : activity
+        ? starterRuntimeItems
+        : ([] as RuntimeItem[]);
     return assignment?.settings.shuffleItems
       ? stableShuffle(items, assignment.shareId)
       : items;
-  }, [activity, assignment]);
+  }, [activity, assignment, data, starterRuntimeItems]);
   const itemCount = runtimeItems.length;
   const canSubmit = Boolean(data) && itemCount > 0;
   const completedCount = useMemo(
@@ -84,9 +92,15 @@ function PlayPage() {
         })),
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         shareSlug: assignment?.shareId ?? shareId,
+        anonymousToken: assignment?.settings.collectStudentName
+          ? undefined
+          : getAnonymousAttemptToken(assignment?.shareId ?? shareId),
         studentName: studentName.trim() || undefined,
       });
-      setResult(response.result);
+      setResult({
+        ...response.result,
+        reviewItems: response.reviewItems,
+      });
       toast.success('Attempt submitted.');
     } catch (error) {
       toast.error(
@@ -219,6 +233,9 @@ function PlayPage() {
                 answer={answers[item.id] ?? ''}
                 index={index}
                 item={item}
+                reviewItem={result?.reviewItems.find(
+                  (reviewItem) => reviewItem.itemId === item.id
+                )}
                 revealAnswer={Boolean(
                   result && assignment.settings.showCorrectAnswers
                 )}
@@ -249,7 +266,12 @@ function PlayPage() {
           ) : null}
         </div>
 
-        <ActivityPreview activity={activity} assignment={assignment} compact />
+        <ActivityPreview
+          activity={activity}
+          assignment={assignment}
+          compact
+          hideAnswers={Boolean(data)}
+        />
       </div>
     </Container>
   );
@@ -261,12 +283,14 @@ function RuntimeItemCard({
   item,
   onAnswerChange,
   revealAnswer,
+  reviewItem,
 }: {
   answer: string;
   index: number;
-  item: RuntimeItem;
+  item: PublicRuntimeItem;
   onAnswerChange: (answer: string) => void;
   revealAnswer: boolean;
+  reviewItem?: PublicAttemptReviewItem;
 }) {
   const prompt = getRuntimePrompt(item);
 
@@ -308,16 +332,17 @@ function RuntimeItemCard({
           className="mt-3"
         />
       )}
-      {revealAnswer ? (
+      {revealAnswer && reviewItem ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Correct answer: {item.answer}
+          {reviewItem?.correct ? 'Correct' : 'Needs review'} · Correct answer:{' '}
+          {reviewItem?.correctAnswer}
         </p>
       ) : null}
     </div>
   );
 }
 
-function getRuntimePrompt(item: RuntimeItem) {
+function getRuntimePrompt(item: PublicRuntimeItem) {
   if (item.kind === 'pair') {
     return `Match "${item.prompt}" with its pair.`;
   }
@@ -330,19 +355,26 @@ function getRuntimePrompt(item: RuntimeItem) {
 }
 
 function mapPersistedActivity(data: NonNullable<PublicAssignmentData>) {
-  const content = data.snapshot?.contentJson ?? data.activity.contentJson;
-  const templateType =
-    data.snapshot?.templateType ?? data.activity.templateType;
-
   return {
-    content,
-    description:
-      data.snapshot?.activityDescription ?? data.activity.description ?? '',
-    estimatedMinutes: estimateMinutes(content.questions.length),
+    content: {
+      difficulty: data.summary.difficulty,
+      gradeBand: data.summary.gradeBand,
+      groups: [],
+      language: data.summary.language,
+      learningGoal: data.summary.learningGoal,
+      pairs: [],
+      questions: [],
+      sourceSummary: '',
+      subject: data.summary.subject,
+      teacherNotes: [],
+      vocabulary: [],
+    },
+    description: data.activity.description ?? '',
+    estimatedMinutes: data.summary.estimatedMinutes,
     id: data.activity.id,
     status: data.activity.visibility,
-    templateType,
-    title: data.snapshot?.activityTitle ?? data.activity.title,
+    templateType: data.snapshot?.templateType ?? data.activity.templateType,
+    title: data.activity.title,
   } satisfies ActivitySeed;
 }
 
@@ -357,10 +389,6 @@ function mapPersistedAssignment(data: NonNullable<PublicAssignmentData>) {
     status: data.assignment.status,
     title: data.assignment.title,
   } satisfies AssignmentSeed;
-}
-
-function estimateMinutes(questionCount: number) {
-  return Math.max(5, Math.min(20, questionCount * 2));
 }
 
 function stableShuffle<T>(items: T[], seed: string) {
@@ -380,10 +408,27 @@ function hashSeed(seed: string) {
   }, 2166136261);
 }
 
+function getAnonymousAttemptToken(shareId: string) {
+  const storageKey = `classgamify:attempt-token:${shareId}`;
+  const existingToken = window.localStorage.getItem(storageKey);
+  if (existingToken) return existingToken;
+
+  const token =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  window.localStorage.setItem(storageKey, token);
+  return token;
+}
+
 type PublicAssignmentData = ReturnType<typeof usePublicAssignment>['data'];
+
+type PublicRuntimeItem =
+  NonNullable<PublicAssignmentData>['runtimeItems'][number];
 
 type AttemptSubmissionResult = {
   accuracy: number;
   earnedPoints: number;
+  reviewItems: PublicAttemptReviewItem[];
   totalPoints: number;
 };

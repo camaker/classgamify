@@ -28,12 +28,14 @@ type ActivityPreviewProps = {
   activity: ActivitySeed;
   assignment?: AssignmentSeed;
   compact?: boolean;
+  hideAnswers?: boolean;
 };
 
 export function ActivityPreview({
   activity,
   assignment,
   compact = false,
+  hideAnswers = false,
 }: ActivityPreviewProps) {
   const template = getTemplateByType(activity.templateType);
   const visibleQuestions = activity.content.questions.slice(0, 3);
@@ -78,7 +80,7 @@ export function ActivityPreview({
             </div>
           </div>
 
-          {!compact && (
+          {!compact && !hideAnswers && (
             <div className="grid gap-3 md:grid-cols-3">
               <PreviewPanel title="Questions" icon={IconListCheck}>
                 {visibleQuestions.map((question) => (

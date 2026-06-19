@@ -1,4 +1,9 @@
-import { evaluateRuntimeAnswers } from '@/activities/runtime';
+import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import {
+  buildAttemptReviewItems,
+  estimateAssignmentMinutes,
+  stripRuntimeAnswers,
+} from '@/assignments/public';
 import {
   defaultAssignmentSettings,
   publishAssignmentInputSchema,
@@ -245,10 +250,52 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       return null;
     }
 
-    return row;
+    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
+    const templateType =
+      row.snapshot?.templateType ?? row.activity.templateType;
+    const runtimeItems = getRuntimeItems(templateType, content);
+
+    return {
+      activity: {
+        description:
+          row.snapshot?.activityDescription ?? row.activity.description,
+        id: row.activity.id,
+        templateType,
+        title: row.snapshot?.activityTitle ?? row.activity.title,
+        visibility: row.activity.visibility,
+      },
+      assignment: {
+        id: row.assignment.id,
+        settingsJson: {
+          ...defaultAssignmentSettings,
+          ...row.assignment.settingsJson,
+        },
+        shareSlug: row.assignment.shareSlug,
+        status: row.assignment.status,
+        title: row.assignment.title,
+      },
+      runtimeItems: stripRuntimeAnswers(runtimeItems),
+      snapshot: row.snapshot
+        ? {
+            activityDescription: row.snapshot.activityDescription,
+            activityTitle: row.snapshot.activityTitle,
+            templateType: row.snapshot.templateType,
+          }
+        : null,
+      summary: {
+        difficulty: content.difficulty,
+        estimatedMinutes: estimateAssignmentMinutes(runtimeItems.length),
+        gradeBand: content.gradeBand,
+        itemCount: runtimeItems.length,
+        language: content.language,
+        learningGoal: content.learningGoal,
+        subject: content.subject,
+      },
+    };
   });
 
 const submitAttemptInputSchema = z.object({
+  anonymousToken: z.string().trim().min(12).max(120).optional(),
   answers: z.array(
     z.object({
       answer: z.string().trim().max(500),
@@ -298,20 +345,28 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       ...row.assignment.settingsJson,
     };
     const studentName = data.studentName?.trim();
+    const anonymousToken = data.anonymousToken?.trim();
     if (settings.collectStudentName && !studentName) {
       throw new Error('Student name is required for this assignment.');
     }
+    if (!settings.collectStudentName && !anonymousToken) {
+      throw new Error('Anonymous student token is required.');
+    }
 
-    if (settings.maxAttempts && settings.collectStudentName && studentName) {
+    if (settings.maxAttempts) {
+      const identityWhere =
+        settings.collectStudentName && studentName
+          ? eq(attempt.studentName, studentName)
+          : anonymousToken
+            ? eq(attempt.anonymousToken, anonymousToken)
+            : undefined;
+      if (!identityWhere) {
+        throw new Error('Attempt identity is required.');
+      }
       const [attemptCount] = await db
         .select({ count: count() })
         .from(attempt)
-        .where(
-          and(
-            eq(attempt.assignmentId, row.assignment.id),
-            eq(attempt.studentName, studentName)
-          )
-        );
+        .where(and(eq(attempt.assignmentId, row.assignment.id), identityWhere));
       if ((attemptCount?.count ?? 0) >= settings.maxAttempts) {
         throw new Error('This assignment has reached its attempt limit.');
       }
@@ -320,6 +375,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     const content = row.snapshot?.contentJson ?? row.activity.contentJson;
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
+    const runtimeItems = getRuntimeItems(templateType, content);
     const evaluation = evaluateRuntimeAnswers({
       answers: data.answers,
       content,
@@ -341,11 +397,18 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       resultJson: evaluation.result,
       score: evaluation.result.earnedPoints,
       startedAt: now,
+      anonymousToken: anonymousToken || null,
       studentName: studentName || null,
     });
 
     return {
       id,
+      reviewItems: settings.showCorrectAnswers
+        ? buildAttemptReviewItems({
+            answers: evaluation.answers,
+            runtimeItems,
+          })
+        : [],
       result: evaluation.result,
     };
   });

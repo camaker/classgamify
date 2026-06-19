@@ -39,6 +39,12 @@ answers after submission, whether items are shuffled, and the per-student
 attempt limit. These settings live on `Assignment.settingsJson`; immutable
 content lives on `AssignmentSnapshot`.
 
+Public student links must return a sanitized assignment payload. The browser
+receives runtime prompts and choices, not `ActivityContent` with embedded
+answers. Correct answers are returned only after an attempt is scored and only
+when the assignment allows answer reveal. Anonymous assignments use a browser
+token so max-attempt limits still work without collecting student names.
+
 ## AI Authoring
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.

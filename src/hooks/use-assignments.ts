@@ -74,6 +74,7 @@ export function useSubmitAttempt() {
 
   return useMutation({
     mutationFn: (input: {
+      anonymousToken?: string;
       answers: Array<{ answer: string; itemId: string }>;
       durationSeconds?: number;
       shareSlug: string;
