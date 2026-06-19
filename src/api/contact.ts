@@ -9,7 +9,7 @@ const schema = z.object({
   message: z
     .string()
     .min(10, m.contact_message_min())
-    .max(500, m.contact_message_max()),
+    .max(2000, m.contact_message_max()),
 });
 export const sendContactMessage = createServerFn({ method: 'POST' })
   .inputValidator(schema)

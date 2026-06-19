@@ -373,7 +373,7 @@
   "contact_error": "发送消息失败",
   "contact_form_title": "发送消息",
   "contact_message": "消息",
-  "contact_message_max": "消息不超过 500 个字符",
+  "contact_message_max": "消息不超过 1500 个字符",
   "contact_message_min": "消息至少 10 个字符",
   "contact_name": "姓名",
   "contact_name_max": "姓名不超过 30 个字符",

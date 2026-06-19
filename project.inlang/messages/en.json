@@ -373,7 +373,7 @@
   "contact_error": "Failed to send the message",
   "contact_form_title": "Send message",
   "contact_message": "Message",
-  "contact_message_max": "Message must not exceed 500 characters",
+  "contact_message_max": "Message must not exceed 1500 characters",
   "contact_message_min": "Message must be at least 10 characters",
   "contact_name": "Name",
   "contact_name_max": "Name must not exceed 30 characters",

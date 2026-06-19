@@ -18,10 +18,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { getLocale } from '@/lib/locale';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type Control } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 const schema = z.object({
@@ -30,7 +31,11 @@ const schema = z.object({
   message: z
     .string()
     .min(10, m.contact_message_min())
-    .max(500, m.contact_message_max()),
+    .max(1500, m.contact_message_max()),
+  classroomLearners: z.string().max(80).optional(),
+  classroomLevel: z.string().max(80).optional(),
+  classroomRoutine: z.string().max(120).optional(),
+  classroomNeed: z.string().max(120).optional(),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -42,11 +47,21 @@ export function ContactFormCard({
   intent?: ContactIntent;
 }) {
   const [error, setError] = useState<string | undefined>();
+  const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
+  const classroomCopy = getClassroomInquiryCopy(currentLocale);
   const defaultMessage =
     intent === 'classroom' ? m.contact_classroom_message_template() : '';
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', email: '', message: defaultMessage },
+    defaultValues: {
+      classroomLearners: '',
+      classroomLevel: '',
+      classroomNeed: '',
+      classroomRoutine: '',
+      email: '',
+      message: defaultMessage,
+      name: '',
+    },
   });
   const formTitle =
     intent === 'classroom'
@@ -60,9 +75,26 @@ export function ContactFormCard({
   async function onSubmit(values: FormValues) {
     setError(undefined);
     try {
-      await sendContactMessage({ data: values });
+      await sendContactMessage({
+        data: {
+          email: values.email,
+          message:
+            intent === 'classroom'
+              ? buildClassroomInquiryMessage(values, classroomCopy)
+              : values.message,
+          name: values.name,
+        },
+      });
       toast.success(m.contact_success());
-      form.reset({ name: '', email: '', message: defaultMessage });
+      form.reset({
+        classroomLearners: '',
+        classroomLevel: '',
+        classroomNeed: '',
+        classroomRoutine: '',
+        email: '',
+        message: defaultMessage,
+        name: '',
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : m.contact_error();
       setError(msg);
@@ -129,6 +161,12 @@ export function ContactFormCard({
                 </FormItem>
               )}
             />
+            {intent === 'classroom' ? (
+              <ClassroomInquiryFields
+                control={form.control}
+                copy={classroomCopy}
+              />
+            ) : null}
             <FormError message={error} />
           </CardContent>
           <CardFooter className="mt-6 flex items-center justify-between rounded-none border-t bg-muted px-6 py-4">
@@ -140,4 +178,153 @@ export function ContactFormCard({
       </Form>
     </Card>
   );
+}
+
+type ClassroomInquiryCopy = ReturnType<typeof getClassroomInquiryCopy>;
+
+function ClassroomInquiryFields({
+  control,
+  copy,
+}: {
+  control: Control<FormValues>;
+  copy: ClassroomInquiryCopy;
+}) {
+  return (
+    <div className="space-y-4 rounded-lg border bg-muted/30 p-3">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">{copy.title}</p>
+        <p className="text-xs leading-5 text-muted-foreground">
+          {copy.description}
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField
+          control={control}
+          name="classroomLearners"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{copy.learnersLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder={copy.learnersPlaceholder}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="classroomLevel"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{copy.levelLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder={copy.levelPlaceholder}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="classroomRoutine"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{copy.routineLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder={copy.routinePlaceholder}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="classroomNeed"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{copy.needLabel}</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder={copy.needPlaceholder}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    </div>
+  );
+}
+
+function buildClassroomInquiryMessage(
+  values: FormValues,
+  copy: ClassroomInquiryCopy
+) {
+  const structuredLines = [
+    [copy.learnersLabel, values.classroomLearners],
+    [copy.levelLabel, values.classroomLevel],
+    [copy.routineLabel, values.classroomRoutine],
+    [copy.needLabel, values.classroomNeed],
+  ]
+    .filter((item): item is [string, string] => Boolean(item[1]?.trim()))
+    .map(([label, value]) => `${label}: ${value.trim()}`);
+  const message = values.message.trim();
+
+  return [
+    copy.emailHeading,
+    ...structuredLines,
+    structuredLines.length > 0 ? '' : undefined,
+    message,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function getClassroomInquiryCopy(locale: 'en' | 'zh') {
+  if (locale === 'zh') {
+    return {
+      description:
+        '这些信息会整理进邮件，方便我们直接判断你需要的是练习纸、复习流程、课堂试用还是未来语言扩展。',
+      emailHeading: '课堂咨询信息',
+      learnersLabel: '学习者',
+      learnersPlaceholder: '例如：8 名初学者 / 1 个孩子',
+      levelLabel: '当前水平',
+      levelPlaceholder: '例如：HSK1 入门 / 零基础',
+      needLabel: '主要需求',
+      needPlaceholder: '例如：打印作业 / 复习错笔 / 家长交接',
+      routineLabel: '每周节奏',
+      routinePlaceholder: '例如：每周 2 节课，每次 30 分钟',
+      title: '课堂需求细节',
+    };
+  }
+
+  return {
+    description:
+      'These details are added to the email so we can tell whether you need worksheets, review workflow, classroom rollout, or future language expansion.',
+    emailHeading: 'Classroom inquiry details',
+    learnersLabel: 'Learners',
+    learnersPlaceholder: 'e.g. 8 beginners / one child',
+    levelLabel: 'Current level',
+    levelPlaceholder: 'e.g. HSK1 starter / complete beginner',
+    needLabel: 'Main need',
+    needPlaceholder: 'e.g. print homework / review mistakes',
+    routineLabel: 'Weekly routine',
+    routinePlaceholder: 'e.g. 2 classes per week, 30 minutes',
+    title: 'Classroom details',
+  };
 }
