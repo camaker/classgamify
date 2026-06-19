@@ -53,13 +53,14 @@ token so max-attempt limits still work without collecting student names.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click
-choices, while open-box prompts can still accept typed answers. Fill-blank uses
-a worksheet-style renderer that places the answer input into the sentence blank
-when possible. Group-sort uses a dedicated category board where students select
-an item and place it into a group. Matching-pairs uses a dedicated left/right
-card board so students can select a prompt and attach a choice without seeing
-the answer map. The submission contract remains template-neutral: every
-renderer stores `{ itemId, answer }` so scoring and result analysis stay shared.
+choices. Fill-blank uses a worksheet-style renderer that places the answer
+input into the sentence blank when possible. Open-box uses a reveal-card flow
+where students choose a box, answer the prompt, and move between boxes.
+Group-sort uses a dedicated category board where students select an item and
+place it into a group. Matching-pairs uses a dedicated left/right card board so
+students can select a prompt and attach a choice without seeing the answer map.
+The submission contract remains template-neutral: every renderer stores
+`{ itemId, answer }` so scoring and result analysis stay shared.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to

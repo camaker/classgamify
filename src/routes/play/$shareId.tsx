@@ -11,6 +11,7 @@ import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
+import { OpenBoxRunner } from '@/components/activities/open-box-runner';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -332,6 +333,21 @@ function RuntimeItemList({
     return (
       <div className="mt-4">
         <FillBlankWorksheet
+          answers={answers}
+          disabled={disabled}
+          items={items}
+          revealAnswer={revealAnswer}
+          reviewItems={reviewItems}
+          onAnswerChange={onAnswerChange}
+        />
+      </div>
+    );
+  }
+
+  if (templateType === 'open-box') {
+    return (
+      <div className="mt-4">
+        <OpenBoxRunner
           answers={answers}
           disabled={disabled}
           items={items}
