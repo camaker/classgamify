@@ -52,9 +52,10 @@ when the assignment allows answer reveal. Anonymous assignments use a browser
 token so max-attempt limits still work without collecting student names.
 
 Student runners should use the runtime item kind and template type to choose the
-interaction. Multiple-choice questions, match-up pairs, and group-sort items
-render as tap/click choices, while fill-blank and open-box prompts can still
-accept typed answers. Matching-pairs uses a dedicated left/right card board so
+interaction. Multiple-choice questions and match-up pairs render as tap/click
+choices, while fill-blank and open-box prompts can still accept typed answers.
+Group-sort uses a dedicated category board where students select an item and
+place it into a group. Matching-pairs uses a dedicated left/right card board so
 students can select a prompt and attach a choice without seeing the answer map.
 The submission contract remains template-neutral: every renderer stores
 `{ itemId, answer }` so scoring and result analysis stay shared.

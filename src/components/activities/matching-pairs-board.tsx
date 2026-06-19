@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -37,7 +38,7 @@ export function MatchingPairsBoard({
       ),
     [reviewItems]
   );
-  const choices = useMemo(() => getUniqueChoices(items), [items]);
+  const choices = useMemo(() => getUniqueRuntimeChoices(items), [items]);
   const selectedAnswer = selectedItemId ? answers[selectedItemId] : undefined;
 
   function selectChoice(choice: string) {
@@ -170,18 +171,6 @@ function PairReviewLine({
       <span>Correct answer: {reviewItem.correctAnswer}</span>
     </div>
   );
-}
-
-function getUniqueChoices(items: PublicRuntimeItem[]) {
-  const choices = new Set<string>();
-
-  for (const item of items) {
-    for (const choice of item.choices ?? []) {
-      choices.add(choice);
-    }
-  }
-
-  return [...choices];
 }
 
 function findChoiceOwner(answers: Record<string, string>, choice: string) {
