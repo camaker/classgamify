@@ -1,5 +1,6 @@
 import { activityTemplates, starterActivities } from '@/activities/catalog';
 import type { ActivityContent } from '@/activities/types';
+import { defaultAssignmentSettings } from '@/assignments/validation';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -10,6 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { useActivities } from '@/hooks/use-activities';
 import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
@@ -22,6 +33,7 @@ import {
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityCardData = {
@@ -160,14 +172,49 @@ function DashboardActivitiesPage() {
 function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const navigate = useNavigate();
   const publishMutation = usePublishAssignment();
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [assignmentTitle, setAssignmentTitle] = useState(activity.title);
+  const [collectStudentName, setCollectStudentName] = useState(
+    defaultAssignmentSettings.collectStudentName
+  );
+  const [showCorrectAnswers, setShowCorrectAnswers] = useState(
+    defaultAssignmentSettings.showCorrectAnswers
+  );
+  const [shuffleItems, setShuffleItems] = useState(
+    defaultAssignmentSettings.shuffleItems
+  );
+  const [maxAttempts, setMaxAttempts] = useState(
+    String(defaultAssignmentSettings.maxAttempts ?? 2)
+  );
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
 
   async function publishActivity() {
+    const title = assignmentTitle.trim();
+    const attempts = Number(maxAttempts);
+    if (!title) {
+      toast.error('Add an assignment title before publishing.');
+      return;
+    }
+    if (!Number.isInteger(attempts) || attempts < 1 || attempts > 10) {
+      toast.error('Max attempts must be a whole number from 1 to 10.');
+      return;
+    }
+
     try {
-      const result = await publishMutation.mutateAsync(activity.id);
+      const result = await publishMutation.mutateAsync({
+        activityId: activity.id,
+        settings: {
+          collectStudentName,
+          maxAttempts: attempts,
+          showCorrectAnswers,
+          shuffleItems,
+        },
+        title,
+      });
       toast.success('Assignment link published.');
+      setPublishDialogOpen(false);
       navigate({
         to: Routes.DashboardAssignments,
         search: { published: result.assignment.shareSlug },
@@ -248,7 +295,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
               type="button"
               className="w-full sm:w-fit"
               disabled={publishMutation.isPending}
-              onClick={publishActivity}
+              onClick={() => setPublishDialogOpen(true)}
             >
               <IconPlus className="size-4" />
               Publish assignment
@@ -256,7 +303,113 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
           </div>
         ) : null}
       </CardContent>
+      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Publish assignment</DialogTitle>
+            <DialogDescription>
+              Freeze this activity into a student share link with classroom
+              delivery settings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <label htmlFor={`assignment-title-${activity.id}`}>
+                Assignment title
+              </label>
+              <Input
+                id={`assignment-title-${activity.id}`}
+                value={assignmentTitle}
+                onChange={(event) =>
+                  setAssignmentTitle(event.currentTarget.value)
+                }
+              />
+            </div>
+            <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+              <PublishSetting
+                checked={collectStudentName}
+                description="Ask learners to type their name before submitting."
+                id={`collect-name-${activity.id}`}
+                label="Collect student name"
+                onCheckedChange={setCollectStudentName}
+              />
+              <PublishSetting
+                checked={showCorrectAnswers}
+                description="Reveal correct answers after an attempt is submitted."
+                id={`show-answers-${activity.id}`}
+                label="Show correct answers"
+                onCheckedChange={setShowCorrectAnswers}
+              />
+              <PublishSetting
+                checked={shuffleItems}
+                description="Prepare this assignment for randomized item order."
+                id={`shuffle-items-${activity.id}`}
+                label="Shuffle items"
+                onCheckedChange={setShuffleItems}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor={`max-attempts-${activity.id}`}>
+                Max attempts
+              </label>
+              <Input
+                id={`max-attempts-${activity.id}`}
+                type="number"
+                min={1}
+                max={10}
+                value={maxAttempts}
+                onChange={(event) => setMaxAttempts(event.currentTarget.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPublishDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={publishMutation.isPending}
+              onClick={publishActivity}
+            >
+              <IconPlus className="size-4" />
+              Publish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
+  );
+}
+
+function PublishSetting({
+  checked,
+  description,
+  id,
+  label,
+  onCheckedChange,
+}: {
+  checked: boolean;
+  description: string;
+  id: string;
+  label: string;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <label htmlFor={id} className="font-medium text-sm">
+          {label}
+        </label>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
   );
 }
 

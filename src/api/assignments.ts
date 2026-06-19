@@ -1,4 +1,8 @@
 import { evaluateRuntimeAnswers } from '@/activities/runtime';
+import {
+  defaultAssignmentSettings,
+  publishAssignmentInputSchema,
+} from '@/assignments/validation';
 import { getDb } from '@/db';
 import {
   activity,
@@ -11,13 +15,6 @@ import { createServerFn } from '@tanstack/react-start';
 import { and, avg, count, desc, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-
-const DEFAULT_ASSIGNMENT_SETTINGS = {
-  collectStudentName: true,
-  maxAttempts: 2,
-  showCorrectAnswers: true,
-  shuffleItems: true,
-};
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
@@ -79,10 +76,6 @@ export const listAssignments = createServerFn({ method: 'GET' })
     };
   });
 
-const publishAssignmentInputSchema = z.object({
-  activityId: z.string().min(1),
-});
-
 export const publishAssignment = createServerFn({ method: 'POST' })
   .inputValidator(publishAssignmentInputSchema)
   .middleware([authApiMiddleware])
@@ -104,16 +97,20 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const now = new Date();
     const id = nanoid(16);
     const shareSlug = nanoid(10);
+    const settings = {
+      ...defaultAssignmentSettings,
+      ...data.settings,
+    };
 
     await db.insert(assignment).values({
       activityId: sourceActivity.id,
       createdAt: now,
       id,
       ownerId: userId,
-      settingsJson: DEFAULT_ASSIGNMENT_SETTINGS,
+      settingsJson: settings,
       shareSlug,
       status: 'published',
-      title: sourceActivity.title,
+      title: data.title,
       updatedAt: now,
     });
 
@@ -296,6 +293,30 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       throw new Error('Assignment not found.');
     }
 
+    const settings = {
+      ...defaultAssignmentSettings,
+      ...row.assignment.settingsJson,
+    };
+    const studentName = data.studentName?.trim();
+    if (settings.collectStudentName && !studentName) {
+      throw new Error('Student name is required for this assignment.');
+    }
+
+    if (settings.maxAttempts && settings.collectStudentName && studentName) {
+      const [attemptCount] = await db
+        .select({ count: count() })
+        .from(attempt)
+        .where(
+          and(
+            eq(attempt.assignmentId, row.assignment.id),
+            eq(attempt.studentName, studentName)
+          )
+        );
+      if ((attemptCount?.count ?? 0) >= settings.maxAttempts) {
+        throw new Error('This assignment has reached its attempt limit.');
+      }
+    }
+
     const content = row.snapshot?.contentJson ?? row.activity.contentJson;
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
@@ -320,7 +341,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       resultJson: evaluation.result,
       score: evaluation.result.earnedPoints,
       startedAt: now,
-      studentName: data.studentName?.trim() || null,
+      studentName: studentName || null,
     });
 
     return {

@@ -5,6 +5,7 @@ import {
   publishAssignment,
   submitAttempt,
 } from '@/api/assignments';
+import type { PublishAssignmentInput } from '@/assignments/validation';
 import {
   keepPreviousData,
   useMutation,
@@ -51,8 +52,8 @@ export function usePublishAssignment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (activityId: string) =>
-      publishAssignment({ data: { activityId } }),
+    mutationFn: (input: PublishAssignmentInput) =>
+      publishAssignment({ data: input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });

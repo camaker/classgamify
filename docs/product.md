@@ -33,6 +33,12 @@ library. Editing uses the same `CreateActivityInput` contract as creation, with
 submission. Published assignments score against their snapshot; editing an
 activity only affects future assignments.
 
+Publishing an assignment is an explicit configuration step. Teachers choose the
+assignment title, whether to collect student names, whether students see correct
+answers after submission, whether items are shuffled, and the per-student
+attempt limit. These settings live on `Assignment.settingsJson`; immutable
+content lives on `AssignmentSnapshot`.
+
 ## AI Authoring
 
 AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.

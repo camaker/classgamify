@@ -51,13 +51,14 @@ function PlayPage() {
     : assignment
       ? starterActivity
       : undefined;
-  const runtimeItems = useMemo(
-    () =>
-      activity
-        ? getRuntimeItems(activity.templateType, activity.content)
-        : ([] as RuntimeItem[]),
-    [activity]
-  );
+  const runtimeItems = useMemo(() => {
+    const items = activity
+      ? getRuntimeItems(activity.templateType, activity.content)
+      : ([] as RuntimeItem[]);
+    return assignment?.settings.shuffleItems
+      ? stableShuffle(items, assignment.shareId)
+      : items;
+  }, [activity, assignment]);
   const itemCount = runtimeItems.length;
   const canSubmit = Boolean(data) && itemCount > 0;
   const completedCount = useMemo(
@@ -70,6 +71,10 @@ function PlayPage() {
       toast.error('This demo assignment is read-only for now.');
       return;
     }
+    if (assignment?.settings.collectStudentName && !studentName.trim()) {
+      toast.error('Type your name before submitting.');
+      return;
+    }
 
     try {
       const response = await submitAttemptMutation.mutateAsync({
@@ -79,7 +84,7 @@ function PlayPage() {
         })),
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         shareSlug: assignment?.shareId ?? shareId,
-        studentName,
+        studentName: studentName.trim() || undefined,
       });
       setResult(response.result);
       toast.success('Attempt submitted.');
@@ -167,25 +172,30 @@ function PlayPage() {
           </div>
 
           <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
-            <div>
-              <label
-                htmlFor="student-name"
-                className="text-sm font-medium text-foreground"
-              >
-                Student name
-              </label>
-              <Input
-                id="student-name"
-                value={studentName}
-                onChange={(event) => setStudentName(event.target.value)}
-                placeholder={
-                  assignment.settings.collectStudentName
-                    ? 'Type your name'
-                    : 'Optional'
-                }
-                className="mt-2"
-              />
-            </div>
+            {assignment.settings.collectStudentName ? (
+              <div>
+                <label
+                  htmlFor="student-name"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Student name
+                </label>
+                <Input
+                  id="student-name"
+                  value={studentName}
+                  onChange={(event) => setStudentName(event.target.value)}
+                  placeholder="Type your name"
+                  className="mt-2"
+                />
+              </div>
+            ) : (
+              <div className="rounded-lg border bg-muted/20 p-3">
+                <p className="text-sm font-medium">Anonymous attempt</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  This assignment does not collect student names.
+                </p>
+              </div>
+            )}
             {result ? (
               <div className="rounded-lg border bg-primary/5 p-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
@@ -351,6 +361,23 @@ function mapPersistedAssignment(data: NonNullable<PublicAssignmentData>) {
 
 function estimateMinutes(questionCount: number) {
   return Math.max(5, Math.min(20, questionCount * 2));
+}
+
+function stableShuffle<T>(items: T[], seed: string) {
+  const copy = [...items];
+  let state = hashSeed(seed);
+  for (let index = copy.length - 1; index > 0; index--) {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    const swapIndex = state % (index + 1);
+    [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+  }
+  return copy;
+}
+
+function hashSeed(seed: string) {
+  return seed.split('').reduce((hash, char) => {
+    return (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }, 2166136261);
 }
 
 type PublicAssignmentData = ReturnType<typeof usePublicAssignment>['data'];
