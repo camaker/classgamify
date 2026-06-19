@@ -1249,14 +1249,14 @@ function PracticeCompletionActions({
 
   if (hasMistakes) {
     return (
-      <div className="mt-4 border-t border-amber-500/20 pt-4">
+      <div className="mt-4 rounded-lg border border-amber-500/25 bg-amber-500/5 p-3">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-md bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-300">
             <IconRotate className="size-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">{title}</p>
-            <p className="mt-1 max-w-[34rem] text-xs leading-5 text-muted-foreground">
+            <p className="text-sm font-semibold leading-5">{title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
               {description}
             </p>
           </div>
@@ -1280,12 +1280,13 @@ function PracticeCompletionActions({
           </Link>
         </div>
 
-        <div className="mt-3 border-t border-amber-500/20 pt-3">
+        <div className="mt-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Button
               type="button"
-              variant="outline"
-              className="w-full bg-background/70 sm:w-auto"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start px-2 text-muted-foreground hover:text-foreground sm:w-auto"
               onClick={copyResult}
             >
               <IconCopy className="size-4" />
@@ -1293,8 +1294,9 @@ function PracticeCompletionActions({
             </Button>
             <Button
               type="button"
-              variant="outline"
-              className="w-full bg-background/70 sm:w-auto"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start px-2 text-muted-foreground hover:text-foreground sm:w-auto"
               onClick={copyAssignment}
             >
               <IconMailForward className="size-4" />
@@ -1303,8 +1305,9 @@ function PracticeCompletionActions({
             {lessonComplete ? (
               <Button
                 type="button"
-                variant="outline"
-                className="w-full bg-background/70 sm:w-auto"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start px-2 text-muted-foreground hover:text-foreground sm:w-auto"
                 onClick={onReset}
               >
                 <IconReload className="size-4" />
@@ -1313,8 +1316,9 @@ function PracticeCompletionActions({
             ) : !isLastCharacter ? (
               <Button
                 type="button"
-                variant="outline"
-                className="w-full bg-background/70 sm:w-auto"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start px-2 text-muted-foreground hover:text-foreground sm:w-auto"
                 onClick={onNext}
               >
                 <IconArrowRight className="size-4" />
