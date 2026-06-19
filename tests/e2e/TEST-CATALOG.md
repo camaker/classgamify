@@ -84,6 +84,18 @@ Verifies the signed-in profile update flow.
 |---|---|---|
 | 1 | User can update display name | Sign in, open `/settings/profile`, change the name, save, verify success toast, and reload to verify persistence. |
 
+## 5. Activity Authoring
+
+**File:** `specs/activity-authoring.spec.ts` | **Priority:** P1
+
+Verifies the core teacher loop for creating reusable activities before
+assignment publishing is enabled.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Teacher can save a structured activity | Sign in as a verified teacher, open `/create`, change the title/template/content fields, save the activity, expect redirect to `/dashboard/activities`, verify the activity title appears, reload, and verify it still appears from persisted D1 data. |
+| 2 | Template requirements are enforced | Sign in, open `/create`, choose a match-based template, clear match pairs, submit, and verify a validation error explains the missing content requirement. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:

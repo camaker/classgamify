@@ -1,0 +1,78 @@
+import {
+  createActivity,
+  getActivity,
+  listActivities,
+  updateActivity,
+} from '@/api/activities';
+import type { CreateActivityInput } from '@/activities/validation';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+
+export const activitiesKeys = {
+  all: ['activities'] as const,
+  detail: (id: string) => [...activitiesKeys.details(), id] as const,
+  details: () => [...activitiesKeys.all, 'details'] as const,
+  list: (params: { pageIndex: number; pageSize: number; search?: string }) =>
+    [...activitiesKeys.lists(), params] as const,
+  lists: () => [...activitiesKeys.all, 'lists'] as const,
+};
+
+export function useActivities({
+  pageIndex = 0,
+  pageSize = 24,
+  search,
+}: {
+  pageIndex?: number;
+  pageSize?: number;
+  search?: string;
+}) {
+  return useQuery({
+    placeholderData: keepPreviousData,
+    queryFn: () =>
+      listActivities({
+        data: {
+          pageIndex,
+          pageSize,
+          search,
+        },
+      }),
+    queryKey: activitiesKeys.list({ pageIndex, pageSize, search }),
+  });
+}
+
+export function useActivity(id: string) {
+  return useQuery({
+    enabled: Boolean(id),
+    queryFn: () => getActivity({ data: { id } }),
+    queryKey: activitiesKeys.detail(id),
+  });
+}
+
+export function useCreateActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateActivityInput) => createActivity({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
+  });
+}
+
+export function useUpdateActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateActivityInput & { id: string }) =>
+      updateActivity({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
+  });
+}

@@ -1,14 +1,12 @@
 import { ActivityPreview } from '@/components/activities/activity-preview';
+import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
 import { starterActivities } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
-import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
-import { cn } from '@/lib/utils';
-import { IconArrowRight, IconSparkles } from '@tabler/icons-react';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { IconSparkles } from '@tabler/icons-react';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/create')({
   head: () =>
@@ -30,45 +28,38 @@ function CreatePage() {
           <div className="space-y-4">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
-              AI creation target
+              Teacher activity builder
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-              Create once, render across game templates.
+              Create once, teach through many templates.
             </h1>
             <p className="text-lg leading-8 text-muted-foreground">
-              This skeleton establishes the contract AI will fill: questions,
-              pairs, groups, vocabulary, learning goal, and teacher notes. The
-              UI editor and generation endpoint can now build on a stable shape.
+              Start with structured classroom content: questions, match pairs,
+              categories, vocabulary, learning goal, and teacher notes. The same
+              saved activity can later become a quiz, match game, group sort,
+              worksheet, or assignment.
             </p>
           </div>
 
           <div className="rounded-lg border bg-card p-4">
-            <p className="text-sm font-medium">Next engineering milestones</p>
+            <p className="text-sm font-medium">Supported input shapes</p>
             <ol className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              <li>1. Persist teacher-owned activities in D1.</li>
-              <li>2. Add editor controls for structured content.</li>
-              <li>3. Generate the same content with AI.</li>
-              <li>4. Publish assignments and collect attempts.</li>
+              <li>1. Questions: prompt | answer | options.</li>
+              <li>2. Match pairs: left | right.</li>
+              <li>3. Groups: label | item one, item two.</li>
+              <li>4. Notes and vocabulary as simple lists.</li>
             </ol>
           </div>
         </div>
 
-        <ActivityPreview activity={activity} />
-
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Link to={Routes.Templates} className={cn(buttonVariants(), 'w-fit')}>
-            Browse templates
-            <IconArrowRight className="size-4" />
-          </Link>
-          <Link
-            to={Routes.PlayDemo}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-fit bg-background'
-            )}
-          >
-            Open student preview
-          </Link>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]">
+          <ActivityCreateForm />
+          <div className="space-y-4">
+            <p className="text-sm font-medium text-muted-foreground">
+              Example rendering
+            </p>
+            <ActivityPreview activity={activity} />
+          </div>
         </div>
       </div>
     </Container>
