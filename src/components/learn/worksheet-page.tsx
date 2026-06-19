@@ -1299,38 +1299,16 @@ export function WorksheetPage({
                         </div>
                       </div>
 
-                      <div className="space-y-3 rounded-lg border bg-background p-3">
-                        <div className="flex items-start gap-2">
-                          <IconMailForward className="mt-0.5 size-4 shrink-0 text-primary" />
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium">
-                              {copy.assignmentHandoffTitle}
-                            </p>
-                            <p className="text-xs leading-5 text-muted-foreground">
-                              {copy.assignmentHandoffDescription}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="grid gap-2 sm:grid-cols-3">
-                          {copy.assignmentHandoffItems.map((item) => (
-                            <div
-                              key={item}
-                              className="flex min-w-0 items-start gap-2 rounded-md border bg-muted/20 p-2 text-xs leading-5"
-                            >
-                              <IconCircleCheck className="mt-0.5 size-3.5 shrink-0 text-primary" />
-                              <span>{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex min-w-0 items-center gap-2 rounded-md bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground">
-                          <IconWorldWww className="size-3.5 shrink-0" />
-                          <span className="min-w-0 truncate">
-                            {copy.assignmentHandoffSource(
-                              worksheetSourceDisplayUrl
-                            )}
-                          </span>
-                        </div>
-                      </div>
+                      <WorksheetAssignmentPackageCard
+                        copy={copy}
+                        assignmentNote={normalizedAssignmentNote}
+                        paperSizeDetail={paperSizeDetail}
+                        paperSizeLabel={copy.paperSizes[paperSize]}
+                        selectedCharacters={selectedCharacters}
+                        showFeedbackSection={showFeedbackSection}
+                        traceModeLabel={copy.traceModes[traceMode]}
+                        worksheetSourceDisplayUrl={worksheetSourceDisplayUrl}
+                      />
 
                       <div className="grid grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-2">
                         <Button
@@ -1902,6 +1880,120 @@ type WorksheetAssignmentShareMessageParams = {
   worksheetUrl: string;
 };
 
+function WorksheetAssignmentPackageCard({
+  copy,
+  assignmentNote,
+  paperSizeDetail,
+  paperSizeLabel,
+  selectedCharacters,
+  showFeedbackSection,
+  traceModeLabel,
+  worksheetSourceDisplayUrl,
+}: {
+  copy: WorksheetCopy;
+  assignmentNote: string;
+  paperSizeDetail: string;
+  paperSizeLabel: string;
+  selectedCharacters: string[];
+  showFeedbackSection: boolean;
+  traceModeLabel: string;
+  worksheetSourceDisplayUrl: string;
+}) {
+  const hasCharacters = selectedCharacters.length > 0;
+  const hasAssignmentNote = assignmentNote.length > 0;
+  const packageItems = [
+    {
+      complete: hasCharacters,
+      label: hasCharacters
+        ? copy.assignmentPackageCharactersReady(
+            selectedCharacters.length,
+            selectedCharacters.join(' ')
+          )
+        : copy.assignmentPackageCharactersEmpty,
+    },
+    {
+      complete: true,
+      label: copy.assignmentPackagePaperReady(paperSizeLabel, paperSizeDetail),
+    },
+    {
+      complete: true,
+      label: copy.assignmentPackageTraceReady(traceModeLabel),
+    },
+    {
+      complete: hasAssignmentNote,
+      label: hasAssignmentNote
+        ? copy.assignmentPackageNoteReady
+        : copy.assignmentPackageNoteEmpty,
+    },
+    {
+      complete: showFeedbackSection,
+      label: showFeedbackSection
+        ? copy.assignmentPackageFeedbackReady
+        : copy.assignmentPackageFeedbackEmpty,
+    },
+  ];
+  const readyCount = packageItems.filter((item) => item.complete).length;
+
+  return (
+    <div className="space-y-3 rounded-lg border bg-background p-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-2">
+          <IconMailForward className="mt-0.5 size-4 shrink-0 text-primary" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium">{copy.assignmentHandoffTitle}</p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {copy.assignmentHandoffDescription}
+            </p>
+          </div>
+        </div>
+        <Badge variant="outline" className="rounded-md">
+          {copy.assignmentPackageReadyCount(readyCount, packageItems.length)}
+        </Badge>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {packageItems.map((item) => (
+          <div
+            key={item.label}
+            className={cn(
+              'flex min-w-0 items-start gap-2 rounded-md border p-2',
+              'text-xs leading-5',
+              item.complete ? 'bg-primary/5' : 'bg-muted/20'
+            )}
+          >
+            <IconCircleCheck
+              className={cn(
+                'mt-0.5 size-3.5 shrink-0',
+                item.complete ? 'text-primary' : 'text-muted-foreground/60'
+              )}
+            />
+            <span className="min-w-0 break-words">{item.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-3">
+        {copy.assignmentHandoffItems.map((item) => (
+          <div
+            key={item}
+            className="flex min-w-0 items-start gap-2 rounded-md border bg-muted/20 p-2 text-xs leading-5"
+          >
+            <IconArrowRight className="mt-0.5 size-3.5 shrink-0 text-primary" />
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex min-w-0 items-center gap-2 rounded-md bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground">
+        <IconWorldWww className="size-3.5 shrink-0" />
+        <span className="min-w-0 truncate">
+          {copy.assignmentHandoffSource(worksheetSourceDisplayUrl)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function getWorksheetCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -1951,6 +2043,19 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
       ],
       assignmentHandoffSource: (url: string) => `来源域名：${url}`,
       assignmentHandoffTitle: '作业交付清单',
+      assignmentPackageCharactersEmpty: '还没有选择汉字',
+      assignmentPackageCharactersReady: (count: number, characters: string) =>
+        `${count} 个汉字：${characters}`,
+      assignmentPackageFeedbackEmpty: '反馈栏已关闭',
+      assignmentPackageFeedbackReady: '已包含完成反馈栏',
+      assignmentPackageNoteEmpty: '可选：添加一句作业备注',
+      assignmentPackageNoteReady: '已包含作业备注',
+      assignmentPackagePaperReady: (paper: string, detail: string) =>
+        `${paper} 纸张比例 · ${detail}`,
+      assignmentPackageReadyCount: (ready: number, total: number) =>
+        `${ready}/${total} 就绪`,
+      assignmentPackageTraceReady: (traceMode: string) =>
+        `描写辅助：${traceMode}`,
       assignmentTitle: '练习任务',
       back: '返回练习',
       badge: '练习纸生成器',
@@ -2164,6 +2269,19 @@ function getWorksheetCopy(locale: 'en' | 'zh') {
     ],
     assignmentHandoffSource: (url: string) => `Source domain: ${url}`,
     assignmentHandoffTitle: 'Assignment handoff',
+    assignmentPackageCharactersEmpty: 'No characters selected yet',
+    assignmentPackageCharactersReady: (count: number, characters: string) =>
+      `${count} characters: ${characters}`,
+    assignmentPackageFeedbackEmpty: 'Feedback section is off',
+    assignmentPackageFeedbackReady: 'Feedback section included',
+    assignmentPackageNoteEmpty: 'Optional: add one assignment note',
+    assignmentPackageNoteReady: 'Assignment note included',
+    assignmentPackagePaperReady: (paper: string, detail: string) =>
+      `${paper} paper ratio · ${detail}`,
+    assignmentPackageReadyCount: (ready: number, total: number) =>
+      `${ready}/${total} ready`,
+    assignmentPackageTraceReady: (traceMode: string) =>
+      `Tracing guide: ${traceMode}`,
     assignmentTitle: 'Practice task',
     back: 'Back to practice',
     badge: 'Worksheet generator',
