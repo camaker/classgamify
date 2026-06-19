@@ -1,4 +1,8 @@
 import { activityTemplates, starterActivities } from '@/activities/catalog';
+import {
+  formatTemplateRequirement,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
 import type { ActivityContent } from '@/activities/types';
 import { defaultAssignmentSettings } from '@/assignments/validation';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -189,6 +193,12 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
+  const remixPlan = template
+    ? getTemplateRemixPlan({
+        content: activity.content,
+        currentTemplateType: template.type,
+      })
+    : undefined;
 
   async function publishActivity() {
     const title = assignmentTitle.trim();
@@ -262,21 +272,44 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
             Compatible template families
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {activityTemplates
-              .filter((item) =>
-                item.contentRequirements.every((requirement) => {
-                  const content = activity.content[requirement];
-                  return Array.isArray(content)
-                    ? content.length > 0
-                    : Boolean(content);
-                })
-              )
-              .map((item) => (
-                <Badge key={item.type} variant="outline" className="rounded-md">
-                  {item.shortName}
-                </Badge>
-              ))}
+            {remixPlan?.readyOptions.map((option) => (
+              <Badge
+                key={option.template.type}
+                variant={option.isCurrent ? 'secondary' : 'outline'}
+                className="rounded-md"
+              >
+                {option.template.shortName}
+              </Badge>
+            ))}
           </div>
+          {remixPlan?.suggestedOptions.length ? (
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
+              Ready to remix into{' '}
+              {remixPlan.suggestedOptions
+                .map((option) => option.template.shortName)
+                .join(', ')}
+              .
+            </p>
+          ) : null}
+          {remixPlan?.options.some((option) => !option.isReady) ? (
+            <div className="mt-3 grid gap-1.5">
+              {remixPlan.options
+                .filter((option) => !option.isReady)
+                .slice(0, 2)
+                .map((option) => (
+                  <p
+                    key={option.template.type}
+                    className="text-xs leading-5 text-muted-foreground"
+                  >
+                    Add{' '}
+                    {option.missingRequirements
+                      .map(formatTemplateRequirement)
+                      .join(', ')}{' '}
+                    to unlock {option.template.shortName}.
+                  </p>
+                ))}
+            </div>
+          ) : null}
         </div>
         {activity.persisted ? (
           <div className="flex flex-col gap-2 sm:flex-row">

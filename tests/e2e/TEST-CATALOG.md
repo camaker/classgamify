@@ -101,6 +101,7 @@ assignment publishing is enabled.
 | 6 | Teacher can review assignment results | After at least one student attempt, open `/dashboard/assignments/:assignmentId`, verify completions, average accuracy, share link, the attempt table, reteach priorities, per-item correct rates, and answer review details show scored student answers from the assignment snapshot. |
 | 7 | Teacher can generate an AI draft before saving | Sign in, open `/create`, add source notes, choose a template and item count, click generate draft, verify the title/content fields are filled with reviewable activity content, save the activity, and verify it appears in `/dashboard/activities`. |
 | 8 | Teacher can edit a saved activity | Sign in, open `/dashboard/activities`, choose a persisted activity, click edit, update the title/content/template fields, save, return to the library, and verify the updated activity metadata and compatible template counts persist after reload. Publish before editing and verify the existing student share link still uses its original assignment snapshot. |
+| 9 | Teacher sees template remix readiness | Sign in, create one activity with questions, pairs, and groups and another with only questions, open `/dashboard/activities`, verify the complete activity shows ready remix badges for all compatible templates, verify the question-only activity names missing match pairs or groups for locked templates, and verify the current template is visually distinct from suggested remix targets. |
 
 ## Deferred Coverage
 

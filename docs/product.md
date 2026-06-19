@@ -40,6 +40,13 @@ template-specific scaffold that fills the matching structured fields. Scaffolds
 are examples, not hidden templates; teachers still review and edit before
 saving.
 
+Template remixing should be treated as a content-readiness problem before it is
+treated as an AI feature. The app can inspect an activity's questions, pairs,
+and groups to show which templates are immediately usable and which templates
+need more structured content. AI transformations can then fill the missing
+fields, but the same readiness model should guide the editor, dashboard, and
+publish flow.
+
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
 answers after submission, whether items are shuffled, and the per-student
@@ -92,6 +99,9 @@ Implementation boundaries:
 - `src/ai/` owns provider helpers such as Cloudflare Workers AI REST calls.
 - `src/activities/ai-draft.ts` owns classroom-specific prompt, schema, parsing,
   fallback, and mapping into `CreateActivityInput`.
+- `src/activities/template-remix.ts` owns deterministic template readiness and
+  remix suggestions. AI remixing should build on this module instead of
+  duplicating template requirement logic in UI code.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
