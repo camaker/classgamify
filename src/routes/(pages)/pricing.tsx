@@ -36,6 +36,8 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
+const PRICING_TRIAL_CHARACTERS = ['人', '口', '日'];
+
 export const Route = createFileRoute('/(pages)/pricing')({
   head: () => {
     const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
@@ -76,7 +78,11 @@ function PricingPage() {
   const planComparison = getPricingPlanComparison(currentLocale);
   const planGuide = getPricingPlanGuide(currentLocale);
   const planFit = getPricingPlanFit(currentLocale);
-  const nextStepCards = getPricingNextStepCards(currentLocale);
+  const trialWorksheetSearch = getPricingTrialWorksheetSearch(currentLocale);
+  const nextStepCards = getPricingNextStepCards(
+    currentLocale,
+    trialWorksheetSearch
+  );
   const decisionCards = [
     {
       icon: IconBook2,
@@ -140,7 +146,10 @@ function PricingPage() {
             </Link>
           ))}
         </section>
-        <PlanFitSection copy={planFit} />
+        <PlanFitSection
+          copy={planFit}
+          trialWorksheetSearch={trialWorksheetSearch}
+        />
         <div id="plans" className="scroll-mt-24">
           <PricingTable
             currentPlan={currentPlan}
@@ -246,6 +255,7 @@ type PricingComparisonState = 'included' | 'limited' | 'locked';
 type PricingFitCadence = 'repeat' | 'try' | 'weekly';
 type PricingFitPlan = 'classroom' | 'free' | 'lifetime' | 'pro';
 type PricingFitUseCase = 'classroom' | 'family' | 'self';
+type PricingRouteSearch = Record<string, unknown>;
 
 type PricingComparisonRow = {
   label: string;
@@ -300,7 +310,13 @@ type PricingFitCopy = {
   useCases: PricingFitOption<PricingFitUseCase>[];
 };
 
-function PlanFitSection({ copy }: { copy: PricingFitCopy }) {
+function PlanFitSection({
+  copy,
+  trialWorksheetSearch,
+}: {
+  copy: PricingFitCopy;
+  trialWorksheetSearch: PricingRouteSearch;
+}) {
   const [useCase, setUseCase] = useState<PricingFitUseCase>('self');
   const [cadence, setCadence] = useState<PricingFitCadence>('weekly');
   const plan = getPricingFitPlan(useCase, cadence);
@@ -394,6 +410,7 @@ function PlanFitSection({ copy }: { copy: PricingFitCopy }) {
           )}
           <Link
             to={Routes.Worksheets}
+            search={trialWorksheetSearch}
             className={cn(
               buttonVariants({ variant: 'outline' }),
               'w-full bg-background'
@@ -782,7 +799,10 @@ function PlanComparisonRowItem({ row }: { row: PricingComparisonRow }) {
   );
 }
 
-function getPricingNextStepCards(locale: 'en' | 'zh') {
+function getPricingNextStepCards(
+  locale: 'en' | 'zh',
+  trialWorksheetSearch: PricingRouteSearch
+) {
   if (locale === 'zh') {
     return [
       {
@@ -792,9 +812,11 @@ function getPricingNextStepCards(locale: 'en' | 'zh') {
         title: '先练一个字',
       },
       {
-        description: '打印一张免费样张，确认纸笔练习是否适合你的节奏。',
+        description:
+          '直接打开 人、口、日 的预填样张，确认纸笔练习是否适合你的节奏。',
         href: Routes.Worksheets,
         icon: IconPrinter,
+        search: trialWorksheetSearch,
         title: '试打一张练习纸',
       },
       {
@@ -817,9 +839,10 @@ function getPricingNextStepCards(locale: 'en' | 'zh') {
     },
     {
       description:
-        'Print a free sample sheet and see if paper practice fits your routine.',
+        'Open a prefilled 人, 口, 日 sample sheet and see if paper practice fits your routine.',
       href: Routes.Worksheets,
       icon: IconPrinter,
+      search: trialWorksheetSearch,
       title: 'Try a worksheet',
     },
     {
@@ -831,6 +854,19 @@ function getPricingNextStepCards(locale: 'en' | 'zh') {
       title: 'Ask about classroom use',
     },
   ];
+}
+
+function getPricingTrialWorksheetSearch(locale: 'en' | 'zh') {
+  return {
+    characters: PRICING_TRIAL_CHARACTERS,
+    details: true,
+    feedback: true,
+    note:
+      locale === 'zh'
+        ? '购买前试用：先线上描写，再打印这组样张，检查纸笔练习和家长交接是否适合。'
+        : 'Pre-purchase trial: trace online first, then print this sample set to check paper practice and parent handoff.',
+    trace: 'guided',
+  };
 }
 
 function getPricingClassroomCta(locale: 'en' | 'zh') {
