@@ -10,6 +10,7 @@ import {
 } from '@/learn/hanzi-progress';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPathWithLocale } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -35,8 +36,10 @@ export const Route = createFileRoute('/dashboard/')({
 type DashboardPlanMessageInput = {
   completedCount: number;
   nextCharacter?: string;
+  practiceUrl: string;
   reviewCharacters: string[];
   total: number;
+  worksheetUrl: string;
   worksheetCharacters: string[];
 };
 
@@ -142,8 +145,14 @@ function DashboardPage() {
   const handoffPlan = copy.handoffPlanMessage({
     completedCount: summary.completedCount,
     nextCharacter: nextCharacter?.character,
+    practiceUrl: buildDashboardShareUrl(Routes.Learn, locale, practiceSearch),
     reviewCharacters: summary.reviewCharacters,
     total: summary.total,
+    worksheetUrl: buildDashboardShareUrl(
+      Routes.Worksheets,
+      locale,
+      reviewWorksheetSearch
+    ),
     worksheetCharacters: reviewWorksheetSearch.characters,
   });
 
@@ -388,6 +397,34 @@ function ActionCard({
   );
 }
 
+function buildDashboardShareUrl(
+  path: string,
+  locale: 'en' | 'zh',
+  search?: Record<string, unknown>
+) {
+  const url = new URL(
+    getPathWithLocale(path, locale),
+    'https://getlangstudy.com'
+  );
+
+  for (const [key, value] of Object.entries(search ?? {})) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (item !== undefined && item !== null && item !== '') {
+          url.searchParams.append(key, String(item));
+        }
+      }
+      continue;
+    }
+
+    if (value !== undefined && value !== null && value !== '') {
+      url.searchParams.set(key, String(value));
+    }
+  }
+
+  return url.toString();
+}
+
 function getDashboardCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
@@ -416,8 +453,10 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       handoffPlanMessage: ({
         completedCount,
         nextCharacter,
+        practiceUrl,
         reviewCharacters,
         total,
+        worksheetUrl,
         worksheetCharacters,
       }: DashboardPlanMessageInput) =>
         [
@@ -429,7 +468,8 @@ function getDashboardCopy(locale: 'en' | 'zh') {
               ? `下一字：${nextCharacter}`
               : '入门字已完成：做一轮慢速复习。',
           `纸笔练习：${worksheetCharacters.join(' ')}`,
-          '继续学习：https://getlangstudy.com/dashboard',
+          `线上练习：${practiceUrl}`,
+          `打印练习纸：${worksheetUrl}`,
         ].join('\n'),
       planDescription:
         '把今天的线上描写、打印练习和课程复盘放在同一条路径里。老师、家长或自学者可以直接复制给下一次练习。',
@@ -508,8 +548,10 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     handoffPlanMessage: ({
       completedCount,
       nextCharacter,
+      practiceUrl,
       reviewCharacters,
       total,
+      worksheetUrl,
       worksheetCharacters,
     }: DashboardPlanMessageInput) =>
       [
@@ -521,7 +563,8 @@ function getDashboardCopy(locale: 'en' | 'zh') {
             ? `Next character: ${nextCharacter}`
             : 'Starter set complete: do one slow review pass.',
         `Paper practice: ${worksheetCharacters.join(' ')}`,
-        'Continue: https://getlangstudy.com/dashboard',
+        `Online practice: ${practiceUrl}`,
+        `Printable worksheet: ${worksheetUrl}`,
       ].join('\n'),
     planDescription:
       'Keep online tracing, print practice, and course review in one clean path that can be reused by learners, parents, tutors, and teachers.',
