@@ -98,6 +98,14 @@ declare global {
 
 let hanziWriterPromise: Promise<HanziWriterStatic> | null = null;
 
+type HanziPracticeIntroCopy = {
+  badge?: string;
+  description?: string;
+  freeBadge?: string;
+  title?: string;
+  worksheetNote?: string;
+};
+
 function loadHanziWriter() {
   if (typeof window === 'undefined') {
     return Promise.reject(new Error('Hanzi Writer only runs in the browser.'));
@@ -143,9 +151,11 @@ function loadHanziWriter() {
 }
 
 export function HanziPracticePage({
+  introCopy,
   initialCharacter,
   initialCharacters,
 }: {
+  introCopy?: HanziPracticeIntroCopy;
   initialCharacter?: string;
   initialCharacters?: string[];
 }) {
@@ -272,7 +282,7 @@ export function HanziPracticePage({
   const worksheetSearch = {
     characters: worksheetCharacters,
     details: true,
-    note: copy.summaryWorksheetNote,
+    note: introCopy?.worksheetNote ?? copy.summaryWorksheetNote,
     trace: progressSummary.reviewCharacters.length > 0 ? 'guided' : 'first',
   } as const;
   const practiceSharePath = useMemo(() => {
@@ -317,10 +327,11 @@ export function HanziPracticePage({
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="border-primary/30">
-                  {copy.badge}
+                  {introCopy?.badge ?? copy.badge}
                 </Badge>
                 <Badge variant="secondary">
-                  {copy.freeBadge(lessonCharacters.length)}
+                  {introCopy?.freeBadge ??
+                    copy.freeBadge(lessonCharacters.length)}
                 </Badge>
                 {progressSummary.reviewCharacters.length > 0 ? (
                   <Badge variant="outline" className="border-amber-500/40">
@@ -331,10 +342,10 @@ export function HanziPracticePage({
               </div>
               <div className="space-y-3">
                 <h1 className="text-balance text-3xl font-semibold tracking-normal sm:text-4xl">
-                  {copy.title}
+                  {introCopy?.title ?? copy.title}
                 </h1>
                 <p className="max-w-2xl text-base text-muted-foreground">
-                  {copy.description}
+                  {introCopy?.description ?? copy.description}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
