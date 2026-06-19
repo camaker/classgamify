@@ -2,6 +2,7 @@ import { generateImage } from '@tanstack/ai';
 import { falImage } from '@tanstack/ai-fal';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { runWorkersAi } from '@/ai/workers';
 import {
   CF_IMAGE_MODELS,
   DEFAULT_CF_IMAGE_MODEL,
@@ -158,56 +159,6 @@ const captionSchema = z.object({
     .min(1, 'Please provide a prompt.')
     .max(300, 'Prompt is too long, please keep it under 300 characters.'),
 });
-
-/**
- * Helper: invoke the Cloudflare Workers AI REST endpoint for a given model.
- * Returns the parsed `result` object on success, throws on any error.
- */
-async function runWorkersAi<TResult>(
-  model: string,
-  body: Record<string, unknown>
-): Promise<TResult> {
-  const accountId = serverEnv.CLOUDFLARE_ACCOUNT_ID;
-  const apiKey = serverEnv.CLOUDFLARE_API_TOKEN;
-  if (!accountId || !apiKey) {
-    throw new Error(
-      'Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN env.'
-    );
-  }
-
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    }
-  );
-
-  if (!response.ok) {
-    const errBody = await response.text().catch(() => '');
-    throw new Error(
-      `Workers AI request failed (${response.status}): ${errBody.slice(0, 200)}`
-    );
-  }
-
-  const payload = (await response.json()) as {
-    success?: boolean;
-    result?: TResult;
-    errors?: Array<{ message?: string }>;
-  };
-
-  if (!payload.success || !payload.result) {
-    const message =
-      payload.errors?.[0]?.message ?? 'Empty response from Workers AI.';
-    throw new Error(`Workers AI error: ${message}`);
-  }
-
-  return payload.result;
-}
 
 /**
  * Summarize a long piece of text using Cloudflare Workers AI

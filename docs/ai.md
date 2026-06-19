@@ -2,6 +2,16 @@
 
 End-to-end AI playground showcasing how to integrate **Cloudflare Workers AI** and **fal.ai** in a TanStack Start + Cloudflare Workers app. All demos run as TanStack server functions (`createServerFn`) calling either the plain Workers AI REST API or the `@tanstack/ai` + `@tanstack/ai-fal` adapter, with simple React cards as the UI.
 
+ClassGamify also uses Workers AI for product authoring. The activity draft flow
+lives outside this playground:
+
+- `src/ai/workers.ts` provides the shared Workers AI REST helper.
+- `src/activities/ai-draft.ts` turns teacher source notes into validated
+  `CreateActivityInput` drafts.
+- `src/api/activity-ai.ts` exposes the authenticated draft server function.
+- `src/components/activities/activity-create-form.tsx` fills the editor; it
+  does not auto-save generated content.
+
 The whole playground lives at **`/ai`** page and is reachable from the navbar **AI** dropdown menus. Each demo is a self-contained card so you can copy any single piece into your own project.
 
 ---
@@ -10,7 +20,10 @@ The whole playground lives at **`/ai`** page and is reachable from the navbar **
 
 ```
 src/api/
-└── ai.ts                       # 7 server functions + helpers (runWorkersAi, parseTaglines, base64 utils)
+└── ai.ts                       # AI demo server functions and binary helpers
+
+src/ai/
+└── workers.ts                  # Shared Cloudflare Workers AI REST helper
 
 src/config/
 └── ai-models.ts                # Central model IDs shared by server functions and UI cards
@@ -56,7 +69,7 @@ Browser (card) ──▶ TanStack server function ──▶ provider API ──�
 
 - **Validation** — every server function uses `.inputValidator(zodSchema)` for both type safety and runtime validation (max prompt length, file size cap, language enum, model enum, …).
 - **Model IDs** — runtime model IDs are centralized in `src/config/ai-models.ts` and imported by both server functions and UI cards.
-- **Workers AI helper** — `runWorkersAi<TResult>(model, body)` in `src/api/ai.ts` wraps the common JSON request flow (auth headers, `success` / `errors` envelope) so each demo only declares its model + payload.
+- **Workers AI helper** — `runWorkersAi<TResult>(model, body)` in `src/ai/workers.ts` wraps the common JSON request flow (auth headers, `success` / `errors` envelope) so each demo or product feature only declares its model + payload.
 - **Binary responses** — TTS (`audio/mpeg`) and CF image gen (binary `image/*`) bypass `runWorkersAi` and base64-encode the body via `arrayBufferToBase64()` so the result can be returned as a `data:` URL the browser renders directly.
 - **Image bytes in / out** — captioning and image-edit accept the user's upload as a base64 string, decoded server-side via `base64ToBytes()` (LLaVA wants `Array.from(uint8)`) or forwarded as a `data:` URI (fal accepts data URIs natively).
 - **Client downloads** — image cards use `downloadFile()` from `src/lib/download.ts`, which fetches the image into a blob (handles CORS for fal CDN URLs) before clicking a hidden `<a download>` link, so the browser actually saves the file instead of navigating.

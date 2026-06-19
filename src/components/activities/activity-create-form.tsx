@@ -32,7 +32,10 @@ import {
   NativeSelectOption,
 } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreateActivity } from '@/hooks/use-activities';
+import {
+  useCreateActivity,
+  useGenerateActivityDraft,
+} from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { getPathWithLocale } from '@/lib/urls';
@@ -44,6 +47,7 @@ import {
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -72,11 +76,17 @@ const defaultValues: CreateActivityInput = {
 const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
 const templateTypeOptions = activityTemplateTypeSchema.options;
+const draftItemCountOptions = [3, 5, 8, 10] as const;
 
 export function ActivityCreateForm() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const createMutation = useCreateActivity();
+  const draftMutation = useGenerateActivityDraft();
   const navigate = useNavigate();
+  const [draftSourceText, setDraftSourceText] = useState(
+    'apple, bread, milk, rice, water, egg'
+  );
+  const [draftItemCount, setDraftItemCount] = useState(5);
   const form = useForm<CreateActivityInput>({
     defaultValues,
     resolver: zodResolver(createActivityInputSchema),
@@ -86,6 +96,51 @@ export function ActivityCreateForm() {
     (item) => item.type === selectedTemplate
   );
   const isPending = createMutation.isPending || form.formState.isSubmitting;
+  const isGeneratingDraft = draftMutation.isPending;
+
+  async function onGenerateDraft() {
+    if (!session?.user) {
+      toast.error('Sign in to generate AI activity drafts.');
+      return;
+    }
+
+    const sourceText = draftSourceText.trim();
+    if (!sourceText) {
+      toast.error('Add a topic, vocabulary list, or source notes first.');
+      return;
+    }
+
+    const current = form.getValues();
+    try {
+      const result = await draftMutation.mutateAsync({
+        difficulty: current.difficulty,
+        gradeBand: current.gradeBand || 'Primary',
+        itemCount: draftItemCount,
+        language: current.language || 'en',
+        sourceText,
+        subject: current.subject || 'English',
+        templateType: current.templateType,
+      });
+
+      form.reset({
+        ...result.activity,
+        visibility: current.visibility,
+      });
+
+      if (result.notice) {
+        toast.success('Draft filled from the local generator.');
+        return;
+      }
+
+      toast.success('AI activity draft generated.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Activity draft could not be generated.'
+      );
+    }
+  }
 
   async function onSubmit(values: CreateActivityInput) {
     if (!session?.user) {
@@ -128,6 +183,78 @@ export function ActivityCreateForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="rounded-md bg-background"
+                    >
+                      <IconSparkles className="size-3.5" />
+                      AI draft
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      Teacher reviews before saving
+                    </span>
+                  </div>
+                  <label
+                    htmlFor="activity-ai-source"
+                    className="font-medium text-sm"
+                  >
+                    Topic or source notes
+                  </label>
+                  <Textarea
+                    id="activity-ai-source"
+                    value={draftSourceText}
+                    onChange={(event) =>
+                      setDraftSourceText(event.currentTarget.value)
+                    }
+                    rows={3}
+                    placeholder="Paste vocabulary, a reading passage, or lesson notes."
+                  />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-[8rem_auto] lg:w-auto lg:grid-cols-[8rem_auto]">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="activity-ai-item-count"
+                      className="font-medium text-sm"
+                    >
+                      Items
+                    </label>
+                    <NativeSelect
+                      id="activity-ai-item-count"
+                      value={String(draftItemCount)}
+                      onChange={(event) =>
+                        setDraftItemCount(Number(event.currentTarget.value))
+                      }
+                      className="w-full"
+                    >
+                      {draftItemCountOptions.map((count) => (
+                        <NativeSelectOption key={count} value={String(count)}>
+                          {count}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={onGenerateDraft}
+                    disabled={isGeneratingDraft || !session?.user}
+                    className="self-end"
+                  >
+                    {isGeneratingDraft ? (
+                      <IconLoader2 className="size-4 animate-spin" />
+                    ) : (
+                      <IconSparkles className="size-4" />
+                    )}
+                    Generate draft
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}

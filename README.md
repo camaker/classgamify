@@ -11,6 +11,9 @@ build on top of this activity/assignment foundation.
 This project is based on the
 [TanStarter](https://tanstarter.dev) SaaS template.
 
+For the current product architecture and AI authoring boundaries, see
+[docs/product.md](docs/product.md).
+
 ## Core Product Model
 
 - `Activity`: teacher-owned reusable activity definition.

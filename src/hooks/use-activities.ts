@@ -4,6 +4,8 @@ import {
   listActivities,
   updateActivity,
 } from '@/api/activities';
+import { generateActivityDraft } from '@/api/activity-ai';
+import type { GenerateActivityDraftInput } from '@/activities/ai-draft';
 import type { CreateActivityInput } from '@/activities/validation';
 import {
   keepPreviousData,
@@ -61,6 +63,13 @@ export function useCreateActivity() {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
     },
+  });
+}
+
+export function useGenerateActivityDraft() {
+  return useMutation({
+    mutationFn: (input: GenerateActivityDraftInput) =>
+      generateActivityDraft({ data: input }),
   });
 }
 

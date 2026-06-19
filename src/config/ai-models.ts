@@ -1,4 +1,5 @@
 export const WORKERS_AI_MODELS = {
+  activityDraft: '@cf/meta/llama-3.2-3b-instruct',
   summarization: '@cf/meta/llama-3.2-3b-instruct',
   tagline: '@cf/meta/llama-3.2-3b-instruct',
   translation: '@cf/meta/m2m100-1.2b',

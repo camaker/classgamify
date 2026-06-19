@@ -99,6 +99,7 @@ assignment publishing is enabled.
 | 4 | Student can submit an attempt | Open a persisted `/play/:shareId`, enter a student name and answers, submit, verify the score panel appears, reload `/dashboard/assignments` as the teacher, and verify completions/average score update. |
 | 5 | Student runner adapts to template content | Create quiz, match-up, and group-sort activities, publish each one, open each `/play/:shareId`, verify the runner renders question, pair, and group-selection items respectively, submit answers, and verify scoring reflects the template-specific expected answers. |
 | 6 | Teacher can review assignment results | After at least one student attempt, open `/dashboard/assignments/:assignmentId`, verify completions, average accuracy, share link, and the attempt table show student name, score, accuracy, answered count, and submitted time. |
+| 7 | Teacher can generate an AI draft before saving | Sign in, open `/create`, add source notes, choose a template and item count, click generate draft, verify the title/content fields are filled with reviewable activity content, save the activity, and verify it appears in `/dashboard/activities`. |
 
 ## Deferred Coverage
 
@@ -110,4 +111,4 @@ These flows should be added after their dependencies are made deterministic:
 | R2 file uploads | Requires deterministic local storage assertions and small fixture files. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
-| AI activity creation | Requires provider mocks or stable fake responses to avoid cost and flake. |
+| AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |
