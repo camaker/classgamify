@@ -4,6 +4,7 @@ import { websiteConfig } from '@/config/website';
 import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import { jsonLdScript } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -23,11 +24,40 @@ export const Route = createFileRoute('/(pages)/teachers')({
   head: () => {
     const locale = getLocale() === 'zh' ? 'zh' : 'en';
     const copy = getTeachersCopy(locale);
-
-    return seo(Routes.Teachers, {
-      title: `${copy.title} | ${websiteConfig.metadata?.name}`,
+    const teacherPageJsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: copy.title,
       description: copy.description,
-    });
+      url: `https://getlangstudy.com${Routes.Teachers}`,
+      audience: [
+        {
+          '@type': 'Audience',
+          audienceType: copy.audienceTeachers,
+        },
+        {
+          '@type': 'Audience',
+          audienceType: copy.audienceParents,
+        },
+      ],
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: copy.workflowStructuredItems.map((item, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.name,
+          description: item.description,
+        })),
+      },
+    };
+
+    return {
+      ...seo(Routes.Teachers, {
+        title: `${copy.title} | ${websiteConfig.metadata?.name}`,
+        description: copy.description,
+      }),
+      scripts: [jsonLdScript(teacherPageJsonLd)],
+    };
   },
   component: TeachersPage,
 });
@@ -236,6 +266,8 @@ function FeatureCard({
 function getTeachersCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
+      audienceParents: '家长',
+      audienceTeachers: '中文老师、辅导者和 tutor',
       contactCta: '咨询课堂使用',
       ctaDescription:
         '告诉我们你的学习人数、当前 HSK 等级、每周节奏和练习纸需求，我们会帮你把最稳定的流程先跑起来。',
@@ -283,10 +315,27 @@ function getTeachersCopy(locale: 'en' | 'zh') {
       workflowTraceDescription:
         '学生先看笔顺动画，再跟着描写，系统记录本次错误和对应笔画。',
       workflowTraceTitle: '线上描写',
+      workflowStructuredItems: [
+        {
+          name: '线上描写',
+          description: '学生先看笔顺动画，再完成跟随描写，记录错笔和本次重点。',
+        },
+        {
+          name: '复习错笔',
+          description: '根据本地复习队列优先处理真正卡住的汉字和笔画。',
+        },
+        {
+          name: '打印作业',
+          description:
+            '把同一组汉字生成可打印练习纸，并保留线上复习入口和域名归因。',
+        },
+      ],
     };
   }
 
   return {
+    audienceParents: 'parents',
+    audienceTeachers: 'Chinese teachers, tutors, and instructors',
     contactCta: 'Ask about classroom use',
     ctaDescription:
       'Tell us learner count, current HSK level, weekly rhythm, and worksheet needs. We will point you to the most stable workflow first.',
@@ -335,5 +384,22 @@ function getTeachersCopy(locale: 'en' | 'zh') {
     workflowTraceDescription:
       'Learners watch stroke order, trace from memory, and the session records mistakes and missed strokes.',
     workflowTraceTitle: 'Trace online',
+    workflowStructuredItems: [
+      {
+        name: 'Trace online',
+        description:
+          'Learners watch stroke order, complete guided tracing, and record missed strokes.',
+      },
+      {
+        name: 'Review missed strokes',
+        description:
+          'The local review queue prioritizes characters and strokes that need another pass.',
+      },
+      {
+        name: 'Print homework',
+        description:
+          'The same character set becomes a printable worksheet with an online review link and Lang Study attribution.',
+      },
+    ],
   };
 }
