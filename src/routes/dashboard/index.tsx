@@ -53,6 +53,14 @@ type SessionPlanStep = {
   title: string;
 };
 
+type SessionPlanLink = {
+  description: string;
+  href: string;
+  icon: TablerIcon;
+  label: string;
+  title: string;
+};
+
 function DashboardPage() {
   const locale = getLocale() === 'zh' ? 'zh' : 'en';
   const copy = getDashboardCopy(locale);
@@ -142,17 +150,39 @@ function DashboardPage() {
   ];
 
   const breadcrumbs = [{ label: copy.breadcrumb, isCurrentPage: true }];
+  const practiceShareUrl = buildDashboardShareUrl(
+    Routes.Learn,
+    locale,
+    practiceSearch
+  );
+  const worksheetShareUrl = buildDashboardShareUrl(
+    Routes.Worksheets,
+    locale,
+    reviewWorksheetSearch
+  );
+  const handoffLinks: SessionPlanLink[] = [
+    {
+      description: copy.practiceLinkDescription,
+      href: practiceShareUrl,
+      icon: IconPencil,
+      label: copy.practiceLinkLabel,
+      title: copy.practiceLinkTitle,
+    },
+    {
+      description: copy.worksheetLinkDescription,
+      href: worksheetShareUrl,
+      icon: IconFileText,
+      label: copy.worksheetLinkLabel,
+      title: copy.worksheetLinkTitle,
+    },
+  ];
   const handoffPlan = copy.handoffPlanMessage({
     completedCount: summary.completedCount,
     nextCharacter: nextCharacter?.character,
-    practiceUrl: buildDashboardShareUrl(Routes.Learn, locale, practiceSearch),
+    practiceUrl: practiceShareUrl,
     reviewCharacters: summary.reviewCharacters,
     total: summary.total,
-    worksheetUrl: buildDashboardShareUrl(
-      Routes.Worksheets,
-      locale,
-      reviewWorksheetSearch
-    ),
+    worksheetUrl: worksheetShareUrl,
     worksheetCharacters: reviewWorksheetSearch.characters,
   });
 
@@ -247,6 +277,8 @@ function DashboardPage() {
             summary.reviewCharacters,
             nextCharacter?.character
           )}
+          linkListLabel={copy.planLinksLabel}
+          links={handoffLinks}
           onCopy={handleCopyPlan}
           steps={sessionPlan}
           title={copy.planTitle}
@@ -267,6 +299,8 @@ function SessionPlan({
   description,
   handoffLabel,
   handoffNote,
+  linkListLabel,
+  links,
   onCopy,
   steps,
   title,
@@ -275,6 +309,8 @@ function SessionPlan({
   description: string;
   handoffLabel: string;
   handoffNote: string;
+  linkListLabel: string;
+  links: SessionPlanLink[];
   onCopy: () => void;
   steps: SessionPlanStep[];
   title: string;
@@ -344,6 +380,43 @@ function SessionPlan({
         <span className="font-medium text-foreground">{handoffLabel}</span>{' '}
         {handoffNote}
       </p>
+
+      <div className="mt-4">
+        <p className="text-xs font-semibold uppercase text-muted-foreground">
+          {linkListLabel}
+        </p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {links.map((link) => (
+            <a
+              key={link.title}
+              href={link.href}
+              className={cn(
+                'group flex min-w-0 items-start gap-3 rounded-lg border',
+                'bg-card p-3 transition-colors',
+                'hover:border-primary/40 hover:bg-primary/5',
+                'focus-visible:outline-none focus-visible:ring-2',
+                'focus-visible:ring-ring'
+              )}
+            >
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
+                <link.icon className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium leading-5">
+                  {link.title}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                  {link.description}
+                </span>
+                <span className="mt-2 inline-flex max-w-full items-center gap-1 text-xs font-medium text-primary">
+                  <span className="truncate">{link.label}</span>
+                  <IconArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -487,6 +560,10 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       planStepPracticeLabel: '线上练习',
       planStepPrintLabel: '打印练习',
       planTitle: '今日练习计划',
+      planLinksLabel: '可直接打开的交接链接',
+      practiceLinkDescription: '先用同一汉字组复习笔顺和错笔记录。',
+      practiceLinkLabel: '打开线上练习',
+      practiceLinkTitle: '线上练习链接',
       progressLabel: (completed: number, total: number) =>
         `${completed}/${total} 个入门汉字已完成`,
       reviewLabel: (count: number) =>
@@ -514,6 +591,9 @@ function getDashboardCopy(locale: 'en' | 'zh') {
       todayMetric: '今日完成',
       worksheetReviewDescription: (count: number) =>
         `把 ${count} 个待复习汉字生成一张更聚焦的打印作业。`,
+      worksheetLinkDescription: '沿用当前字组、纸张设置和作业说明。',
+      worksheetLinkLabel: '打开打印练习纸',
+      worksheetLinkTitle: '打印练习纸链接',
       worksheetReviewTitle: '打印复习纸',
       worksheetStarterDescription:
         '把免费 HSK1 入门字生成干净练习纸，适合课堂、家庭或自学。',
@@ -584,6 +664,11 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     planStepPracticeLabel: 'Online practice',
     planStepPrintLabel: 'Paper practice',
     planTitle: "Today's practice plan",
+    planLinksLabel: 'Direct handoff links',
+    practiceLinkDescription:
+      'Review stroke order and missed strokes with the same character set first.',
+    practiceLinkLabel: 'Open online practice',
+    practiceLinkTitle: 'Online practice link',
     progressLabel: (completed: number, total: number) =>
       `${completed}/${total} starter characters complete`,
     reviewLabel: (count: number) =>
@@ -612,6 +697,10 @@ function getDashboardCopy(locale: 'en' | 'zh') {
     todayMetric: 'completed today',
     worksheetReviewDescription: (count: number) =>
       `Turn ${count} review characters into a focused paper assignment.`,
+    worksheetLinkDescription:
+      'Keep the current characters, paper setup, and assignment note.',
+    worksheetLinkLabel: 'Open printable worksheet',
+    worksheetLinkTitle: 'Printable worksheet link',
     worksheetReviewTitle: 'Print a review sheet',
     worksheetStarterDescription:
       'Generate a clean HSK1 starter sheet for class, family practice, or self-study.',
