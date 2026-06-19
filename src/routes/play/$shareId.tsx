@@ -3,14 +3,21 @@ import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { websiteConfig } from '@/config/website';
-import { usePublicAssignment } from '@/hooks/use-assignments';
+import { usePublicAssignment, useSubmitAttempt } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
-import { IconDeviceGamepad2, IconPlayerPlay } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconDeviceGamepad2,
+  IconPlayerPlay,
+} from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/play/$shareId')({
   head: ({ params }) =>
@@ -25,6 +32,11 @@ export const Route = createFileRoute('/play/$shareId')({
 function PlayPage() {
   const { shareId } = Route.useParams();
   const { data, isLoading } = usePublicAssignment(shareId);
+  const submitAttemptMutation = useSubmitAttempt();
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [studentName, setStudentName] = useState('');
+  const [startedAt] = useState(() => Date.now());
+  const [result, setResult] = useState<AttemptSubmissionResult>();
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
   const assignment = data
@@ -37,7 +49,40 @@ function PlayPage() {
     : assignment
       ? starterActivity
       : undefined;
+  const questionCount = activity?.content.questions.length ?? 0;
+  const canSubmit = Boolean(data) && questionCount > 0;
+  const completedCount = useMemo(
+    () =>
+      activity?.content.questions.filter((question) =>
+        answers[question.id]?.trim()
+      ).length ?? 0,
+    [activity, answers]
+  );
 
+  async function submitAnswers() {
+    if (!activity || !canSubmit) {
+      toast.error('This demo assignment is read-only for now.');
+      return;
+    }
+
+    try {
+      const response = await submitAttemptMutation.mutateAsync({
+        answers: activity.content.questions.map((question) => ({
+          answer: answers[question.id] ?? '',
+          itemId: question.id,
+        })),
+        durationSeconds: Math.round((Date.now() - startedAt) / 1000),
+        shareSlug: assignment?.shareId ?? shareId,
+        studentName,
+      });
+      setResult(response.result);
+      toast.success('Attempt submitted.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Attempt could not be saved.'
+      );
+    }
+  }
   if (isLoading) {
     return (
       <Container className="px-4 py-10 md:py-14">
@@ -105,20 +150,93 @@ function PlayPage() {
         </section>
 
         <div className="rounded-lg border bg-muted/20 p-4">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <IconPlayerPlay className="size-4 text-primary" />
-            Student runner placeholder
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <IconPlayerPlay className="size-4 text-primary" />
+              Student runner
+            </div>
+            <Badge variant="secondary" className="rounded-md">
+              {completedCount}/{questionCount} answered
+            </Badge>
           </div>
-          <div className="mt-4 grid gap-2 md:grid-cols-3">
-            {activity.content.questions.map((question) => (
-              <div key={question.id} className="rounded-lg border bg-card p-3">
-                <p className="text-sm font-medium">{question.prompt}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Correct answer: {question.answer}
+
+          <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
+            <div>
+              <label
+                htmlFor="student-name"
+                className="text-sm font-medium text-foreground"
+              >
+                Student name
+              </label>
+              <Input
+                id="student-name"
+                value={studentName}
+                onChange={(event) => setStudentName(event.target.value)}
+                placeholder={
+                  assignment.settings.collectStudentName
+                    ? 'Type your name'
+                    : 'Optional'
+                }
+                className="mt-2"
+              />
+            </div>
+            {result ? (
+              <div className="rounded-lg border bg-primary/5 p-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <IconCheck className="size-4 text-primary" />
+                  Score submitted
+                </div>
+                <p className="mt-2 text-2xl font-semibold">
+                  {result.earnedPoints}/{result.totalPoints}
                 </p>
+                <p className="text-xs text-muted-foreground">
+                  {result.accuracy}% accuracy
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            {activity.content.questions.map((question, index) => (
+              <div key={question.id} className="rounded-lg border bg-card p-3">
+                <p className="text-sm font-medium">
+                  {index + 1}. {question.prompt}
+                </p>
+                <Input
+                  value={answers[question.id] ?? ''}
+                  onChange={(event) =>
+                    setAnswers((current) => ({
+                      ...current,
+                      [question.id]: event.target.value,
+                    }))
+                  }
+                  placeholder="Type your answer"
+                  className="mt-3"
+                />
+                {result && assignment.settings.showCorrectAnswers ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Correct answer: {question.answer}
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>
+
+          <Button
+            type="button"
+            className="mt-4 w-full sm:w-fit"
+            disabled={!canSubmit || submitAttemptMutation.isPending}
+            onClick={submitAnswers}
+          >
+            <IconCheck className="size-4" />
+            Submit answers
+          </Button>
+          {!canSubmit ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Demo assignments are preview-only until they are saved from a
+              teacher account.
+            </p>
+          ) : null}
         </div>
 
         <ActivityPreview activity={activity} assignment={assignment} compact />
@@ -159,3 +277,9 @@ function estimateMinutes(questionCount: number) {
 }
 
 type PublicAssignmentData = ReturnType<typeof usePublicAssignment>['data'];
+
+type AttemptSubmissionResult = {
+  accuracy: number;
+  earnedPoints: number;
+  totalPoints: number;
+};

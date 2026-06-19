@@ -2,6 +2,7 @@ import {
   getPublicAssignment,
   listAssignments,
   publishAssignment,
+  submitAttempt,
 } from '@/api/assignments';
 import {
   keepPreviousData,
@@ -51,5 +52,21 @@ export function usePublicAssignment(shareSlug: string) {
     enabled: Boolean(shareSlug),
     queryFn: () => getPublicAssignment({ data: { shareSlug } }),
     queryKey: assignmentsKeys.public(shareSlug),
+  });
+}
+
+export function useSubmitAttempt() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: {
+      answers: Array<{ answer: string; itemId: string }>;
+      durationSeconds?: number;
+      shareSlug: string;
+      studentName?: string;
+    }) => submitAttempt({ data: input }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
+    },
   });
 }

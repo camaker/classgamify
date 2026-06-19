@@ -152,3 +152,100 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
 
     return row;
   });
+
+const submitAttemptInputSchema = z.object({
+  answers: z.array(
+    z.object({
+      answer: z.string().trim().max(500),
+      itemId: z.string().min(1).max(120),
+    })
+  ),
+  durationSeconds: z
+    .number()
+    .int()
+    .min(0)
+    .max(24 * 60 * 60)
+    .optional(),
+  shareSlug: z.string().min(1).max(80),
+  studentName: z.string().trim().min(1).max(80).optional(),
+});
+
+export const submitAttempt = createServerFn({ method: 'POST' })
+  .inputValidator(submitAttemptInputSchema)
+  .handler(async ({ data }) => {
+    const db = getDb();
+    const [row] = await db
+      .select({
+        activity,
+        assignment,
+      })
+      .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .where(
+        and(
+          eq(assignment.shareSlug, data.shareSlug),
+          eq(assignment.status, 'published')
+        )
+      )
+      .limit(1);
+
+    if (!row) {
+      throw new Error('Assignment not found.');
+    }
+
+    const questions = row.activity.contentJson.questions;
+    const answerMap = new Map(
+      data.answers.map((answer) => [answer.itemId, answer.answer.trim()])
+    );
+    const scoredAnswers = questions.map((question) => {
+      const submitted = answerMap.get(question.id) ?? '';
+      const correct =
+        submitted.localeCompare(question.answer, undefined, {
+          sensitivity: 'accent',
+        }) === 0;
+
+      return {
+        answer: submitted,
+        correct,
+        itemId: question.id,
+      };
+    });
+    const correctItemCount = scoredAnswers.filter(
+      (answer) => answer.correct
+    ).length;
+    const totalPoints = questions.length;
+    const earnedPoints = correctItemCount;
+    const accuracy =
+      totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+    const now = new Date();
+    const id = nanoid(16);
+    const result = {
+      accuracy,
+      completedItemCount: scoredAnswers.filter((answer) => answer.answer)
+        .length,
+      correctItemCount,
+      durationSeconds: data.durationSeconds,
+      earnedPoints,
+      totalPoints,
+    };
+
+    await db.insert(attempt).values({
+      answersJson: {
+        answers: scoredAnswers,
+        templateType: row.activity.templateType,
+      },
+      assignmentId: row.assignment.id,
+      completedAt: now,
+      id,
+      maxScore: totalPoints,
+      resultJson: result,
+      score: earnedPoints,
+      startedAt: now,
+      studentName: data.studentName?.trim() || null,
+    });
+
+    return {
+      id,
+      result,
+    };
+  });

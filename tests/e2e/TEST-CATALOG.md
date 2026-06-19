@@ -96,6 +96,7 @@ assignment publishing is enabled.
 | 1 | Teacher can save a structured activity | Sign in as a verified teacher, open `/create`, change the title/template/content fields, save the activity, expect redirect to `/dashboard/activities`, verify the activity title appears, reload, and verify it still appears from persisted D1 data. |
 | 2 | Template requirements are enforced | Sign in, open `/create`, choose a match-based template, clear match pairs, submit, and verify a validation error explains the missing content requirement. |
 | 3 | Teacher can publish a student share link | Sign in, create or open a saved activity, click publish assignment, expect redirect to `/dashboard/assignments`, open the generated `/play/:shareId` link, and verify the student activity shell loads the persisted title and questions. |
+| 4 | Student can submit an attempt | Open a persisted `/play/:shareId`, enter a student name and answers, submit, verify the score panel appears, reload `/dashboard/assignments` as the teacher, and verify completions/average score update. |
 
 ## Deferred Coverage
 
