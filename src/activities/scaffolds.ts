@@ -48,6 +48,22 @@ export const activityTemplateScaffolds: Record<
     title: 'Sort food and drink words',
     vocabularyText: 'apple, bread, rice, egg, milk, water, bowl, cup',
   },
+  listening: {
+    description:
+      'Short listening checks with spoken prompts and quick answers.',
+    groupsText: '',
+    learningGoal:
+      'Students can understand short spoken food sentences and identify the key word.',
+    pairsText: '',
+    questionsText:
+      'I drink milk in the morning. | milk | milk, rice, apple\nShe eats an apple after lunch. | apple | apple, bread, water\nWe have rice for dinner. | rice | rice, milk, egg',
+    sourceSummary: 'Listening scaffold from short vocabulary sentences.',
+    subject: 'English',
+    teacherNotesText:
+      'Ask students to listen before reading the transcript.\nUse answer reveal to show the spoken sentence after submission.',
+    title: 'Food listening check',
+    vocabularyText: 'milk, apple, rice, bread, water, egg',
+  },
   'match-up': {
     description: 'Match terms with meanings for quick vocabulary practice.',
     groupsText: '',

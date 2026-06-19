@@ -61,7 +61,7 @@ function TeachersPage() {
       icon: IconLayoutGrid,
       title: 'Choose a game template',
       description:
-        'Render the same content as quiz, match-up, group sort, fill-blank, matching pairs, or open-box play.',
+        'Render the same content as quiz, match-up, group sort, fill-blank, listening, matching pairs, or open-box play.',
     },
     {
       icon: IconShare3,
@@ -82,7 +82,7 @@ function TeachersPage() {
       icon: IconDeviceGamepad2,
       title: 'Live classroom play',
       description:
-        'Use open-box, sorting, and matching activities for warmups, review rounds, or small groups.',
+        'Use open-box, listening, sorting, and matching activities for warmups, review rounds, or small groups.',
     },
     {
       icon: IconChartBar,

@@ -46,6 +46,16 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     classroomMode: 'individual',
   },
   {
+    type: 'listening',
+    name: 'Listening',
+    shortName: 'Listen',
+    description:
+      'Students listen to a prompt or sentence, then answer from memory.',
+    bestFor: 'Dictation, listening checks, pronunciation follow-up',
+    contentRequirements: ['questions'],
+    classroomMode: 'individual',
+  },
+  {
     type: 'matching-pairs',
     name: 'Matching pairs',
     shortName: 'Pairs',

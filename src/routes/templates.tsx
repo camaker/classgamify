@@ -25,7 +25,7 @@ export const Route = createFileRoute('/templates')({
     seo('/templates', {
       title: `Activity templates | ${websiteConfig.metadata?.name}`,
       description:
-        'Browse the first ClassGamify activity templates for quiz, match-up, group sort, fill-blank, matching pairs, and open-box classroom play.',
+        'Browse the first ClassGamify activity templates for quiz, match-up, group sort, fill-blank, listening, matching pairs, and open-box classroom play.',
     }),
   component: TemplatesPage,
 });
@@ -40,7 +40,7 @@ function TemplatesPage() {
             Template engine skeleton
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Start with six classroom activity templates.
+            Start with seven classroom activity templates.
           </h1>
           <p className="text-lg leading-8 text-muted-foreground">
             These are intentionally small and foundational. Each template reads

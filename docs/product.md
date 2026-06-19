@@ -15,8 +15,8 @@ Activity -> Assignment -> Attempt -> Results
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
   groups, vocabulary, learning goal, and teacher notes.
 - `ActivityTemplate` is a runtime renderer and scoring strategy for that
-  content, such as quiz, match-up, group sort, fill blank, matching pairs, or
-  open box.
+  content, such as quiz, match-up, group sort, fill blank, listening, matching
+  pairs, or open box.
 - `Assignment` is a shareable delivery instance of an activity.
 - `AssignmentSnapshot` freezes the published title, template, and content so
   teacher edits do not silently change already shared homework links.
@@ -34,10 +34,11 @@ submission. Published assignments score against their snapshot; editing an
 activity only affects future assignments.
 
 The activity editor should make the selected template legible. When teachers
-choose quiz, match-up, group sort, matching pairs, fill-blank, or open-box, the
-editor shows the required content type and can load a template-specific scaffold
-that fills the matching structured fields. Scaffolds are examples, not hidden
-templates; teachers still review and edit before saving.
+choose quiz, match-up, group sort, fill-blank, listening, matching pairs, or
+open-box, the editor shows the required content type and can load a
+template-specific scaffold that fills the matching structured fields. Scaffolds
+are examples, not hidden templates; teachers still review and edit before
+saving.
 
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
@@ -56,9 +57,12 @@ interaction. Multiple-choice questions and match-up pairs render as tap/click
 choices. Fill-blank uses a worksheet-style renderer that places the answer
 input into the sentence blank when possible. Open-box uses a reveal-card flow
 where students choose a box, answer the prompt, and move between boxes.
-Group-sort uses a dedicated category board where students select an item and
-place it into a group. Matching-pairs uses a dedicated left/right card board so
-students can select a prompt and attach a choice without seeing the answer map.
+Listening uses a browser-spoken track flow that hides the transcript until
+review, then records the student's selected or typed answer against the same
+question item. Group-sort uses a dedicated category board where students select
+an item and place it into a group. Matching-pairs uses a dedicated left/right
+card board so students can select a prompt and attach a choice without seeing
+the answer map.
 The submission contract remains template-neutral: every renderer stores
 `{ itemId, answer }` so scoring and result analysis stay shared.
 
@@ -98,8 +102,8 @@ stable. Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
 ## Near-Term Template Roadmap
 
 - Wordwall-style: quiz, match-up, group sort, matching pairs, open box.
-- Liveworksheets-style: fill blanks, worksheet layout, listening prompts,
-  drag/drop classification, line matching.
+- Liveworksheets-style: fill blanks, worksheet layout, first listening prompts,
+  drag/drop classification, line matching, teacher audio upload.
 - AI enhancements: source-to-activity drafts, template transforms, distractor
   generation, leveled variants, answer explanations, listening scripts, and
   worksheet extraction from teacher-uploaded material.

@@ -3,6 +3,7 @@ export const ACTIVITY_TEMPLATE_TYPES = [
   'match-up',
   'group-sort',
   'fill-blank',
+  'listening',
   'matching-pairs',
   'open-box',
 ] as const;

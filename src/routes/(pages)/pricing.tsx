@@ -182,7 +182,7 @@ function getPricingCopy(locale: 'en' | 'zh') {
       valueCards: [
         {
           description:
-            '从 quiz、match-up、group sort、fill-blank、matching pairs 和 open-box 等核心模板开始。',
+            '从 quiz、match-up、group sort、fill-blank、listening、matching pairs 和 open-box 等核心模板开始。',
           icon: IconLayoutGrid,
           title: '模板库',
         },
@@ -215,7 +215,7 @@ function getPricingCopy(locale: 'en' | 'zh') {
     valueCards: [
       {
         description:
-          'Start with core templates such as quiz, match-up, group sort, fill-blank, matching pairs, and open-box activities.',
+          'Start with core templates such as quiz, match-up, group sort, fill-blank, listening, matching pairs, and open-box activities.',
         icon: IconLayoutGrid,
         title: 'Template library',
       },
@@ -251,7 +251,7 @@ function getPricingFaqItems(locale: 'en' | 'zh') {
       {
         question: '现在的模板数量为什么不多？',
         answer:
-          '第一版故意只保留 4-6 个高频课堂模板，先把创建、发布、学生完成和结果闭环做稳，再继续增加模板。',
+          '第一版故意只保留首批高频课堂模板，先把创建、发布、学生完成和结果闭环做稳，再继续增加模板。',
       },
       {
         question: '学生需要登录吗？',
@@ -280,7 +280,7 @@ function getPricingFaqItems(locale: 'en' | 'zh') {
     {
       question: 'Why are there only a few templates first?',
       answer:
-        'The first version intentionally starts with 4-6 high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+        'The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
     },
     {
       question: 'Do students need accounts?',

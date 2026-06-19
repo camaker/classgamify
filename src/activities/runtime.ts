@@ -62,6 +62,7 @@ export function getRuntimeItems(
       );
     }
     case 'fill-blank':
+    case 'listening':
     case 'open-box':
     case 'quiz':
       return content.questions.map((question) => ({
