@@ -22,6 +22,9 @@ Spec -> Code -> Verify -> Test -> Green
 E2E tests are intentionally local-first. CI should continue to prefer fast
 checks such as `pnpm check` and `pnpm build` unless a separate E2E environment is
 explicitly provisioned.
+Pure assignment-domain helpers also have a fast local gate via
+`pnpm test:domain`; run it when changing scoring, submission payload, identity,
+or result-summary helpers.
 
 ## Test Harness
 

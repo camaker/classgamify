@@ -11,6 +11,7 @@
     "e2e:ui": "playwright test --ui",
     "knip": "knip",
     "check": "biome check",
+    "test:domain": "tsx scripts/test-domain.ts",
     "lint": "biome check --write .",
     "format": "biome format --write .",
     "locale:sort": "tsx scripts/sort-locale-keys.ts",
