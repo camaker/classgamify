@@ -143,6 +143,10 @@ student tries to submit with unanswered items, the app asks for an explicit
 second confirmation instead of silently submitting blanks; this preserves
 teacher flexibility for partial attempts while reducing accidental empty
 homework.
+Timed assignments should start the student attempt clock only after the
+assignment payload and playable runtime items are available in the runner, so
+page loading time does not consume the student's timer or inflate submitted
+duration.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission

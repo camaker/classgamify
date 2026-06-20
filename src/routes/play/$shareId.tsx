@@ -49,7 +49,10 @@ function PlayPage() {
   const submitAttemptMutation = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [studentName, setStudentName] = useState('');
-  const [startedAt] = useState(() => Date.now());
+  const [attemptClock, setAttemptClock] = useState<{
+    shareId: string;
+    startedAt: number;
+  }>();
   const [result, setResult] = useState<AttemptSubmissionResult>();
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -82,6 +85,9 @@ function PlayPage() {
   }, [activity, assignment, data, starterRuntimeItems]);
   const itemCount = runtimeItems.length;
   const canSubmit = Boolean(data) && itemCount > 0;
+  const activeShareId = assignment?.shareId ?? shareId;
+  const startedAt =
+    attemptClock?.shareId === activeShareId ? attemptClock.startedAt : now;
   const elapsedSeconds = Math.max(0, Math.round((now - startedAt) / 1000));
   const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
   const remainingSeconds = timeLimitSeconds
@@ -103,6 +109,18 @@ function PlayPage() {
 
     return () => window.clearInterval(timer);
   }, [result, timeLimitSeconds]);
+
+  useEffect(() => {
+    if (!assignment || itemCount === 0 || result) return;
+    if (attemptClock?.shareId === activeShareId) return;
+
+    const nextStartedAt = Date.now();
+    setAttemptClock({
+      shareId: activeShareId,
+      startedAt: nextStartedAt,
+    });
+    setNow(nextStartedAt);
+  }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
 
   async function submitAnswers() {
     if (!activity || !canSubmit) {
