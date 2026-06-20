@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 import {
   IconChartBar,
   IconFilter,
+  IconCircleCheck,
   IconListCheck,
   IconLock,
   IconLockOpen,
@@ -115,6 +116,10 @@ function DashboardAssignmentsPage() {
   );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
+  const publishedAssignment = published
+    ? assignments.find((item) => item.assignment.shareSlug === published)
+        ?.assignment
+    : undefined;
   const summary = data?.summary ?? {
     averageScore: 0,
     completions: 0,
@@ -199,6 +204,24 @@ function DashboardAssignmentsPage() {
             value={`${summary.averageScore}%`}
           />
         </section>
+
+        {published ? (
+          <PublishedAssignmentPanel
+            assignment={publishedAssignment}
+            isLoading={isLoading}
+            onDismiss={() =>
+              void navigate({
+                replace: true,
+                search: {
+                  page: currentPage === 1 ? undefined : currentPage,
+                  q: searchQuery.trim() ? searchQuery : undefined,
+                  status: statusFilter === 'all' ? undefined : statusFilter,
+                },
+              })
+            }
+            shareSlug={published}
+          />
+        ) : null}
 
         <AssignmentListFilters
           isLoading={isLoading}
@@ -339,6 +362,86 @@ function DashboardAssignmentsPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function PublishedAssignmentPanel({
+  assignment,
+  isLoading,
+  onDismiss,
+  shareSlug,
+}: {
+  assignment:
+    | {
+        id: string;
+        title: string;
+      }
+    | undefined;
+  isLoading: boolean;
+  onDismiss: () => void;
+  shareSlug: string;
+}) {
+  return (
+    <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 text-sm font-medium text-primary">
+          <IconCircleCheck className="size-4" />
+          Assignment published
+        </div>
+        <h2 className="mt-2 text-lg font-semibold">
+          {assignment?.title ?? 'Student share link is ready.'}
+        </h2>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          Copy the student link for your class, open the student preview, or
+          jump into the results page before submissions arrive.
+        </p>
+        {!assignment && !isLoading ? (
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
+            The new assignment may be on another page after filtering. The share
+            link actions still use the published link id.
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+        {assignment ? (
+          <Link
+            to="/dashboard/assignments/$assignmentId"
+            params={{ assignmentId: assignment.id }}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background sm:w-auto'
+            )}
+          >
+            <IconChartBar className="size-4" />
+            View results
+          </Link>
+        ) : null}
+        <Link
+          to="/play/$shareId"
+          params={{ shareId: shareSlug }}
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'w-full bg-background sm:w-auto'
+          )}
+        >
+          <IconPlayerPlay className="size-4" />
+          Open link
+        </Link>
+        <CopyAssignmentShareLinkButton
+          shareSlug={shareSlug}
+          className="w-full bg-background sm:w-auto"
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full sm:w-auto"
+          onClick={onDismiss}
+        >
+          <IconX className="size-4" />
+          Dismiss
+        </Button>
+      </div>
+    </section>
   );
 }
 
