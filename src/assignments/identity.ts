@@ -1,4 +1,5 @@
 export const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
+export const ANONYMOUS_BROWSER_LABEL = 'Anonymous browser';
 
 type StudentIdentitySource = {
   anonymousToken?: string | null;
@@ -16,6 +17,16 @@ export function normalizeStudentName(value?: string | null) {
 
 export function normalizeAnonymousToken(value?: string | null) {
   return (value ?? '').trim();
+}
+
+export function getAnonymousBrowserLabel(value?: string | null) {
+  const anonymousToken = normalizeAnonymousToken(value);
+  if (!anonymousToken) return ANONYMOUS_BROWSER_LABEL;
+
+  const suffix = anonymousToken.replace(/[^a-z0-9]/gi, '').slice(-6);
+  return suffix
+    ? `${ANONYMOUS_BROWSER_LABEL} ${suffix.toUpperCase()}`
+    : ANONYMOUS_BROWSER_LABEL;
 }
 
 export function getStudentIdentityKey(source: StudentIdentitySource) {

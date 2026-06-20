@@ -124,6 +124,9 @@ runtime prompts and choices, not `ActivityContent` with embedded answers.
 Correct answers are returned only after an attempt is scored and only when the
 assignment allows answer reveal. Anonymous assignments use a browser token so
 max-attempt limits still work without collecting student names.
+Student runners explain that anonymous work is tied to the current browser and
+show a short browser label for the student, while teacher result views continue
+to use normalized anonymous student labels instead of exposing raw tokens.
 Attempt identity must be normalized through shared helpers before enforcing
 limits or aggregating results. Whitespace and case differences in a typed
 student name should not create a new attempt identity, while anonymous browser

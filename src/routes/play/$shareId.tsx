@@ -14,6 +14,7 @@ import { ListeningRunner } from '@/components/activities/listening-runner';
 import { LineMatchBoard } from '@/components/activities/line-match-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import { OpenBoxRunner } from '@/components/activities/open-box-runner';
+import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -56,6 +57,7 @@ function PlayPage() {
   const [result, setResult] = useState<AttemptSubmissionResult>();
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [anonymousToken, setAnonymousToken] = useState<string>();
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
   const starterRuntimeItems = useMemo(
@@ -94,6 +96,9 @@ function PlayPage() {
     ? Math.max(0, timeLimitSeconds - elapsedSeconds)
     : undefined;
   const timeExpired = Boolean(timeLimitSeconds && remainingSeconds === 0);
+  const anonymousBrowserLabel = assignment?.settings.collectStudentName
+    ? undefined
+    : getAnonymousBrowserLabel(anonymousToken);
   const completedCount = useMemo(
     () => runtimeItems.filter((item) => answers[item.id]?.trim()).length,
     [answers, runtimeItems]
@@ -122,6 +127,11 @@ function PlayPage() {
     setNow(nextStartedAt);
   }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
 
+  useEffect(() => {
+    if (!assignment || assignment.settings.collectStudentName) return;
+    setAnonymousToken(getAnonymousAttemptToken(activeShareId));
+  }, [activeShareId, assignment]);
+
   async function submitAnswers() {
     if (!activity || !canSubmit) {
       toast.error('This demo assignment is read-only for now.');
@@ -149,7 +159,7 @@ function PlayPage() {
         shareSlug: assignment?.shareId ?? shareId,
         anonymousToken: assignment?.settings.collectStudentName
           ? undefined
-          : getAnonymousAttemptToken(assignment?.shareId ?? shareId),
+          : (anonymousToken ?? getAnonymousAttemptToken(activeShareId)),
         studentName: studentName.trim() || undefined,
       });
       setResult({
@@ -271,7 +281,8 @@ function PlayPage() {
               <div className="rounded-lg border bg-muted/20 p-3">
                 <p className="text-sm font-medium">Anonymous attempt</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  This assignment does not collect student names.
+                  This assignment does not collect student names. This browser
+                  will submit as {anonymousBrowserLabel}.
                 </p>
               </div>
             )}
