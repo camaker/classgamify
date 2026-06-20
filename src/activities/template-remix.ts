@@ -151,3 +151,26 @@ export function formatTemplateRequirement(requirement: keyof ActivityContent) {
       return requirement;
   }
 }
+
+export function getActivityTemplateDraftGuidance(
+  templateType: ActivityTemplateType
+) {
+  switch (templateType) {
+    case 'fill-blank':
+      return 'Write each question prompt as a worksheet sentence with ___ or [blank] where the answer belongs.';
+    case 'group-sort':
+      return 'Make groups the primary structure; each group needs a clear category label and concrete sortable items.';
+    case 'line-match':
+      return 'Make pairs the primary structure; each left side should connect cleanly to one right-side answer for line matching.';
+    case 'listening':
+      return 'Write each question prompt as a short sentence that can be spoken aloud; the answer should be the key word or phrase students identify.';
+    case 'match-up':
+      return 'Make pairs the primary structure; use terms, definitions, translations, examples, or cause-and-effect matches.';
+    case 'matching-pairs':
+      return 'Make pairs the primary structure; keep both sides short enough for memory-style cards.';
+    case 'open-box':
+      return 'Write each question prompt as a reveal-card speaking or review prompt with a concise model answer.';
+    case 'quiz':
+      return 'Write each question as a concise multiple-choice check with plausible distractors.';
+  }
+}

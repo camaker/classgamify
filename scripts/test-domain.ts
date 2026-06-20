@@ -26,6 +26,7 @@ import {
 } from '@/activities/lifecycle';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import {
+  getActivityTemplateDraftGuidance,
   formatTemplateRequirementList,
   formatTemplateRequirement,
   getTemplateRemixPlan,
@@ -611,6 +612,39 @@ const groupSortDraftPrompt = buildActivityDraftPrompt({
 });
 assert.match(groupSortDraftPrompt, /Template requirements: groups/);
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
+const draftPromptInput = {
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 4,
+  language: 'en',
+  sourceText: 'shared source notes for template prompt coverage',
+  subject: 'Science',
+} as const;
+for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
+  const prompt = buildActivityDraftPrompt({
+    ...draftPromptInput,
+    templateType,
+  });
+  const guidance = getActivityTemplateDraftGuidance(templateType);
+
+  assert.ok(guidance.length > 20);
+  assert.match(prompt, /Template requirements:/);
+  assert.match(prompt, /Template guidance:/);
+  assert.ok(prompt.includes(guidance));
+  assert.match(prompt, /Target item count: 4/);
+  assert.match(
+    prompt,
+    /Source notes: shared source notes for template prompt coverage/
+  );
+  assert.match(prompt, /Return JSON only\./);
+}
+assert.match(getActivityTemplateDraftGuidance('listening'), /spoken aloud/);
+assert.match(getActivityTemplateDraftGuidance('open-box'), /reveal-card/);
+assert.match(getActivityTemplateDraftGuidance('line-match'), /line matching/);
+assert.match(
+  getActivityTemplateDraftGuidance('matching-pairs'),
+  /memory-style cards/
+);
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {
     difficulty: 'starter',
