@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
+import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
 
 type ExportAttempt = {
   completedAt: Date | string | null;
@@ -141,7 +142,10 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       answer.prompt,
       answer.answer,
       answer.expectedAnswer,
-      formatAcceptedAnswers(answer.acceptedAnswers),
+      formatAcceptedAnswerAlternatives(answer.acceptedAnswers, {
+        emptyValue: '',
+        separator: ' | ',
+      }),
       answer.correct ? 'correct' : 'review',
       answer.explanation ?? '',
     ]);
@@ -171,10 +175,6 @@ function formatCsvDate(value: Date | string | null) {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
   return date.toISOString();
-}
-
-function formatAcceptedAnswers(values: string[]) {
-  return values.length > 1 ? values.join(' | ') : '';
 }
 
 function slugifyFilename(value: string) {

@@ -275,8 +275,11 @@ follow-up, or offline analysis. CSV exports should include the assignment
 delivery policy, including identity mode, answer reveal, shuffle, attempts,
 timer, close time, and instructions, so offline records preserve the rules
 behind each result. Item rows should include both the primary expected answer
-and any accepted alternatives. This keeps the results loop useful for deciding
-what to explain again after homework.
+and any accepted alternatives. Result pages and CSV exports should share
+assignment-domain formatting for submitted dates and accepted-answer
+alternatives so teacher-facing tables, review cards, and offline records stay
+consistent. This keeps the results loop useful for deciding what to explain
+again after homework.
 Assignment attempt metrics such as completions, average accuracy, average
 points, and average duration should be computed through shared assignment-domain
 stats helpers before they reach assignment lists, result pages, classroom

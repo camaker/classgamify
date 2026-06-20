@@ -45,6 +45,10 @@ import {
   sortItemPerformance,
   sortStudentSummaries,
 } from '@/assignments/result-view';
+import {
+  formatAcceptedAnswerAlternatives,
+  formatAssignmentResultDate,
+} from '@/assignments/result-format';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
@@ -506,6 +510,28 @@ assert.equal(formatAttemptDuration(65), '1m 05s');
 assert.equal(formatAttemptDuration(-3), '-');
 assert.equal(formatAttemptDuration(65, { style: 'timer' }), '1:05');
 assert.equal(formatAttemptDuration(5, { style: 'timer' }), '5s');
+assert.equal(formatAssignmentResultDate(null), '-');
+assert.equal(formatAssignmentResultDate('not-a-date'), '-');
+assert.match(
+  formatAssignmentResultDate(new Date('2026-01-01T10:00:00.000Z'), {
+    locale: 'en-US',
+    timeZone: 'UTC',
+  }),
+  /Jan 1, 2026, 10:00 AM/
+);
+assert.equal(formatAcceptedAnswerAlternatives([]), '-');
+assert.equal(formatAcceptedAnswerAlternatives(['Paris']), '-');
+assert.equal(
+  formatAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
+  'Paris, Paris, France'
+);
+assert.equal(
+  formatAcceptedAnswerAlternatives(['Paris', 'Paris, France'], {
+    emptyValue: '',
+    separator: ' | ',
+  }),
+  'Paris | Paris, France'
+);
 assert.deepEqual(summarizeAssignmentAttempts([]), {
   averageDurationSeconds: 0,
   averagePoints: 0,

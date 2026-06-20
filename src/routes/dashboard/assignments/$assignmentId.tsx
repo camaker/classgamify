@@ -21,6 +21,10 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
+import {
+  formatAcceptedAnswerAlternatives,
+  formatAssignmentResultDate,
+} from '@/assignments/result-format';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -598,7 +602,7 @@ function AssignmentResultsPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {formatAttemptDate(attempt.completedAt)}
+                          {formatAssignmentResultDate(attempt.completedAt)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -867,7 +871,9 @@ function StudentSummaryTable({
             <TableCell>{student.averageAccuracy}%</TableCell>
             <TableCell>{student.bestAccuracy}%</TableCell>
             <TableCell>{student.needsReviewCount}</TableCell>
-            <TableCell>{formatAttemptDate(student.lastCompletedAt)}</TableCell>
+            <TableCell>
+              {formatAssignmentResultDate(student.lastCompletedAt)}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -965,7 +971,9 @@ function ItemPerformanceTable({
               {item.correctCount}/{item.submittedCount}
             </TableCell>
             <TableCell>{item.expectedAnswer || '-'}</TableCell>
-            <TableCell>{formatAcceptedAnswers(item.acceptedAnswers)}</TableCell>
+            <TableCell>
+              {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
+            </TableCell>
             <TableCell className="max-w-72">
               {item.explanation || '-'}
             </TableCell>
@@ -1027,7 +1035,7 @@ function AttemptReviewCard({
             <p className="font-medium text-sm">{attempt.studentLabel}</p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {formatAttemptDate(attempt.completedAt)}
+            {formatAssignmentResultDate(attempt.completedAt)}
           </p>
         </div>
         <Badge variant="secondary" className="rounded-md">
@@ -1090,16 +1098,4 @@ function ResultMetric({
       </CardContent>
     </Card>
   );
-}
-
-function formatAttemptDate(value: Date | null) {
-  if (!value) return '-';
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(value);
-}
-
-function formatAcceptedAnswers(values: string[]) {
-  return values.length > 1 ? values.join(', ') : '-';
 }
