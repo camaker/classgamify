@@ -198,7 +198,11 @@ homework.
 Timed assignments should start the student attempt clock only after the
 assignment payload and playable runtime items are available in the runner, so
 page loading time does not consume the student's timer or inflate submitted
-duration.
+duration. Attempt duration is still submitted by the browser, but the server
+normalizes it before scoring and persistence: negative or fractional values are
+rounded into whole non-negative seconds, and timed assignments cap stored
+duration at the assignment timer so teacher averages and CSV exports are not
+distorted by abnormal client clocks.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission

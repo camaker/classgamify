@@ -1,6 +1,7 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus, AttemptResult } from '@/activities/types';
+import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import {
   isSameStudentIdentity,
   normalizeAnonymousToken,
@@ -551,6 +552,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       ...defaultAssignmentSettings,
       ...row.assignment.settingsJson,
     };
+    const durationSeconds = normalizeAttemptDurationSeconds({
+      durationSeconds: data.durationSeconds,
+      timeLimitSeconds: settings.timeLimitSeconds,
+    });
     const studentName = normalizeStudentName(data.studentName);
     const anonymousToken = normalizeAnonymousToken(data.anonymousToken);
     if (settings.collectStudentName && !studentName) {
@@ -583,7 +588,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     const evaluation = evaluateRuntimeAnswers({
       answers: data.answers,
       content,
-      durationSeconds: data.durationSeconds,
+      durationSeconds,
       templateType,
     });
     const now = new Date();
