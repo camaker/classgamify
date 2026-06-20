@@ -10,7 +10,7 @@ import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, like } from 'drizzle-orm';
+import { and, count, desc, eq, like, or } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -26,9 +26,16 @@ export const listActivities = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const search = data.search?.trim();
-    const where = search
-      ? and(eq(activity.ownerId, userId), like(activity.title, `%${search}%`))
+    const search = normalizeActivitySearch(data.search);
+    const searchWhere = search
+      ? or(
+          like(activity.title, `%${search}%`),
+          like(activity.description, `%${search}%`),
+          like(activity.templateType, `%${search}%`)
+        )
+      : undefined;
+    const where = searchWhere
+      ? and(eq(activity.ownerId, userId), searchWhere)
       : eq(activity.ownerId, userId);
 
     const [totalRow] = await db
@@ -48,6 +55,11 @@ export const listActivities = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
+
+function normalizeActivitySearch(value?: string) {
+  const normalized = value?.replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
+}
 
 const getActivityInputSchema = z.object({
   id: z.string().min(1),

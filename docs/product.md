@@ -49,6 +49,10 @@ activity only affects future assignments.
 Teachers should also be able to duplicate an activity into a draft before
 making a variant, because copying protects the original activity and any
 published assignment snapshots while preserving the same structured content.
+The activity library should stay usable as a teacher's collection grows.
+Teachers can search their own activities by title, description, or template
+type from `/dashboard/activities`; the same authenticated list contract powers
+the dashboard cards so search never broadens beyond the current owner.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

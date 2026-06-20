@@ -40,8 +40,10 @@ import {
   IconEdit,
   IconLayoutGrid,
   IconPlus,
+  IconSearch,
   IconSparkles,
   IconSwitchHorizontal,
+  IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -60,17 +62,34 @@ type ActivityCardData = {
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
     created: typeof search.created === 'string' ? search.created : undefined,
+    q: typeof search.q === 'string' ? search.q : undefined,
   }),
   component: DashboardActivitiesPage,
 });
 
 function DashboardActivitiesPage() {
+  const navigate = useNavigate({ from: '/dashboard/activities' });
+  const { created, q } = Route.useSearch();
+  const searchQuery = q ?? '';
+  const normalizedSearchQuery = normalizeActivitySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
     pageIndex: 0,
     pageSize: 50,
+    search: normalizedSearchQuery,
   });
   const activities = data?.items ?? [];
   const hasActivities = activities.length > 0;
+  const hasSearch = Boolean(normalizedSearchQuery);
+
+  function updateSearchQuery(value: string) {
+    void navigate({
+      replace: true,
+      search: {
+        created,
+        q: value.trim() ? value : undefined,
+      },
+    });
+  }
 
   return (
     <DashboardLayout
@@ -106,6 +125,14 @@ function DashboardActivitiesPage() {
           </Link>
         </section>
 
+        <ActivityLibrarySearch
+          isLoading={isLoading}
+          onClear={() => updateSearchQuery('')}
+          onSearch={updateSearchQuery}
+          total={data?.total ?? 0}
+          value={searchQuery}
+        />
+
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             Activities could not be loaded. Refresh the page or sign in again.
@@ -139,7 +166,26 @@ function DashboardActivitiesPage() {
           </section>
         ) : null}
 
-        {!isLoading && !hasActivities ? (
+        {!isLoading && !hasActivities && hasSearch ? (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-6">
+            <h2 className="text-lg font-semibold">No matching activities.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Try a title, description, or template type from another classroom
+              activity.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4 bg-background"
+              onClick={() => updateSearchQuery('')}
+            >
+              <IconX className="size-4" />
+              Clear search
+            </Button>
+          </div>
+        ) : null}
+
+        {!isLoading && !hasActivities && !hasSearch ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">
@@ -177,6 +223,63 @@ function DashboardActivitiesPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function ActivityLibrarySearch({
+  isLoading,
+  onClear,
+  onSearch,
+  total,
+  value,
+}: {
+  isLoading: boolean;
+  onClear: () => void;
+  onSearch: (value: string) => void;
+  total: number;
+  value: string;
+}) {
+  const normalizedValue = normalizeActivitySearch(value);
+  const summary = normalizedValue
+    ? isLoading
+      ? 'Searching activities...'
+      : `${total} ${total === 1 ? 'match' : 'matches'}`
+    : isLoading
+      ? 'Loading activities...'
+      : `${total} saved ${total === 1 ? 'activity' : 'activities'}`;
+
+  return (
+    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+      <div className="grid gap-2">
+        <label
+          htmlFor="activity-library-search"
+          className="font-medium text-sm"
+        >
+          Search activities
+        </label>
+        <div className="relative max-w-xl">
+          <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
+          <Input
+            id="activity-library-search"
+            value={value}
+            placeholder="Search by title, description, or template"
+            className="pl-9 pr-9"
+            onChange={(event) => onSearch(event.currentTarget.value)}
+          />
+          {value ? (
+            <button
+              type="button"
+              aria-label="Clear activity search"
+              className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
+              onClick={onClear}
+            >
+              <IconX className="size-4" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground md:text-right">{summary}</p>
+    </section>
   );
 }
 
@@ -609,4 +712,9 @@ function ActivityStat({ label, value }: { label: string; value: number }) {
 function formatDateTimeLocal(date: Date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return localDate.toISOString().slice(0, 16);
+}
+
+function normalizeActivitySearch(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
 }
