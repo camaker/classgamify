@@ -1,7 +1,9 @@
 import type { RuntimeItem } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
+import { createStudentIdentityResolver } from '@/assignments/identity';
 
 type AttemptForAnalysis = {
+  anonymousToken?: string | null;
   answersJson: AttemptAnswers;
   completedAt: Date | null;
   id: string;
@@ -34,6 +36,7 @@ export type AssignmentAttemptReview = {
   completedAt: Date | null;
   id: string;
   score: number;
+  studentKey: string;
   studentLabel: string;
 };
 
@@ -44,6 +47,7 @@ export type AssignmentStudentSummary = {
   lastCompletedAt: Date | null;
   latestAccuracy: number;
   needsReviewCount: number;
+  studentKey: string;
   studentLabel: string;
 };
 
@@ -62,6 +66,7 @@ export function analyzeAssignmentResults({
   runtimeItems: RuntimeItem[];
 }): AssignmentResultsAnalysis {
   const runtimeItemById = new Map(runtimeItems.map((item) => [item.id, item]));
+  const identityResolver = createStudentIdentityResolver(attempts);
   const perItem = runtimeItems.map((item) => {
     const submittedAnswers = attempts
       .map((attempt) =>
@@ -88,24 +93,29 @@ export function analyzeAssignmentResults({
     };
   });
 
-  const attemptReviews = attempts.map((attempt) => ({
-    accuracy: attempt.resultJson?.accuracy ?? 0,
-    answers: attempt.answersJson.answers.map((answer) => {
-      const item = runtimeItemById.get(answer.itemId);
-      return {
-        answer: answer.answer,
-        correct: Boolean(answer.correct),
-        expectedAnswer: item?.answer ?? '',
-        explanation: item?.explanation,
-        itemId: answer.itemId,
-        prompt: item ? getRuntimePrompt(item) : answer.itemId,
-      };
-    }),
-    completedAt: attempt.completedAt,
-    id: attempt.id,
-    score: attempt.score ?? 0,
-    studentLabel: attempt.studentName || 'Anonymous student',
-  }));
+  const attemptReviews = attempts.map((attempt) => {
+    const identity = identityResolver.resolve(attempt);
+
+    return {
+      accuracy: attempt.resultJson?.accuracy ?? 0,
+      answers: attempt.answersJson.answers.map((answer) => {
+        const item = runtimeItemById.get(answer.itemId);
+        return {
+          answer: answer.answer,
+          correct: Boolean(answer.correct),
+          expectedAnswer: item?.answer ?? '',
+          explanation: item?.explanation,
+          itemId: answer.itemId,
+          prompt: item ? getRuntimePrompt(item) : answer.itemId,
+        };
+      }),
+      completedAt: attempt.completedAt,
+      id: attempt.id,
+      score: attempt.score ?? 0,
+      studentKey: identity.key,
+      studentLabel: identity.label,
+    };
+  });
 
   return {
     attempts: attemptReviews,
@@ -129,13 +139,13 @@ function buildStudentSummaries(
   const byStudent = new Map<string, AssignmentAttemptReview[]>();
 
   for (const attempt of attempts) {
-    const group = byStudent.get(attempt.studentLabel) ?? [];
+    const group = byStudent.get(attempt.studentKey) ?? [];
     group.push(attempt);
-    byStudent.set(attempt.studentLabel, group);
+    byStudent.set(attempt.studentKey, group);
   }
 
   return [...byStudent.entries()]
-    .map(([studentLabel, studentAttempts]) => {
+    .map(([studentKey, studentAttempts]) => {
       const sortedAttempts = [...studentAttempts].sort(
         (left, right) =>
           getDateTimestamp(right.completedAt) -
@@ -158,7 +168,8 @@ function buildStudentSummaries(
         needsReviewCount: latestAttempt
           ? latestAttempt.answers.filter((answer) => !answer.correct).length
           : 0,
-        studentLabel,
+        studentKey,
+        studentLabel: latestAttempt?.studentLabel ?? studentKey,
       };
     })
     .sort((left, right) => {

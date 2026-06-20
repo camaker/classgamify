@@ -85,6 +85,11 @@ runtime prompts and choices, not `ActivityContent` with embedded answers.
 Correct answers are returned only after an attempt is scored and only when the
 assignment allows answer reveal. Anonymous assignments use a browser token so
 max-attempt limits still work without collecting student names.
+Attempt identity must be normalized through shared helpers before enforcing
+limits or aggregating results. Whitespace and case differences in a typed
+student name should not create a new attempt identity, while anonymous browser
+tokens should remain separate students in teacher summaries without exposing the
+raw token.
 
 Student runners should use the runtime item kind and template type to choose the
 interaction. Multiple-choice questions and match-up pairs render as tap/click

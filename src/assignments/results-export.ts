@@ -84,12 +84,12 @@ const RESULT_EXPORT_COLUMNS = [
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
-  const studentsByLabel = new Map(
-    data.analysis.students.map((student) => [student.studentLabel, student])
+  const studentsByKey = new Map(
+    data.analysis.students.map((student) => [student.studentKey, student])
   );
   const rows = data.analysis.attempts.flatMap((attempt) => {
     const storedAttempt = attemptsById.get(attempt.id);
-    const studentSummary = studentsByLabel.get(attempt.studentLabel);
+    const studentSummary = studentsByKey.get(attempt.studentKey);
     const baseColumns = [
       data.assignment.id,
       data.assignment.title,

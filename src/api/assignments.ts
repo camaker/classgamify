@@ -1,4 +1,9 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import {
+  isSameStudentIdentity,
+  normalizeAnonymousToken,
+  normalizeStudentName,
+} from '@/assignments/identity';
 import { isAssignmentExpired, isAssignmentOpen } from '@/assignments/lifecycle';
 import {
   buildAttemptReviewItems,
@@ -428,8 +433,8 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       ...defaultAssignmentSettings,
       ...row.assignment.settingsJson,
     };
-    const studentName = data.studentName?.trim();
-    const anonymousToken = data.anonymousToken?.trim();
+    const studentName = normalizeStudentName(data.studentName);
+    const anonymousToken = normalizeAnonymousToken(data.anonymousToken);
     if (settings.collectStudentName && !studentName) {
       throw new Error('Student name is required for this assignment.');
     }
@@ -438,20 +443,17 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     }
 
     if (settings.maxAttempts) {
-      const identityWhere =
-        settings.collectStudentName && studentName
-          ? eq(attempt.studentName, studentName)
-          : anonymousToken
-            ? eq(attempt.anonymousToken, anonymousToken)
-            : undefined;
-      if (!identityWhere) {
-        throw new Error('Attempt identity is required.');
-      }
-      const [attemptCount] = await db
-        .select({ count: count() })
+      const previousAttempts = await db
+        .select({
+          anonymousToken: attempt.anonymousToken,
+          studentName: attempt.studentName,
+        })
         .from(attempt)
-        .where(and(eq(attempt.assignmentId, row.assignment.id), identityWhere));
-      if ((attemptCount?.count ?? 0) >= settings.maxAttempts) {
+        .where(eq(attempt.assignmentId, row.assignment.id));
+      const attemptCount = previousAttempts.filter((item) =>
+        isSameStudentIdentity(item, { anonymousToken, studentName })
+      ).length;
+      if (attemptCount >= settings.maxAttempts) {
         throw new Error('This assignment has reached its attempt limit.');
       }
     }
