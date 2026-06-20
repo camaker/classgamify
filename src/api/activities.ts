@@ -5,9 +5,13 @@ import {
   createActivityInputSchema,
 } from '@/activities/validation';
 import { buildDuplicatedActivityTitle } from '@/activities/duplicate';
-import { getTemplateByType } from '@/activities/catalog';
+import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import { getMissingTemplateRequirements } from '@/activities/template-remix';
+import {
+  getMissingTemplateRequirements,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
+import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -58,6 +62,7 @@ export const listActivities = createServerFn({ method: 'GET' })
       .select({ count: count() })
       .from(activity)
       .where(where);
+    const matchingActivities = await db.select().from(activity).where(where);
     const items = await db
       .select()
       .from(activity)
@@ -68,9 +73,53 @@ export const listActivities = createServerFn({ method: 'GET' })
 
     return {
       items,
+      summary: summarizeActivityLibrary(matchingActivities),
       total: totalRow?.count ?? 0,
     };
   });
+
+function summarizeActivityLibrary(
+  activities: Array<{
+    contentJson: ActivityContent;
+    templateType: ActivityTemplateType;
+    visibility: string;
+  }>
+) {
+  const templateTypes = new Set<ActivityTemplateType>();
+  let archivedActivities = 0;
+  let draftActivities = 0;
+  let remixReadyActivities = 0;
+  let totalReadyTemplateOptions = 0;
+
+  for (const item of activities) {
+    templateTypes.add(item.templateType);
+    if (item.visibility === 'archived') {
+      archivedActivities += 1;
+    }
+    if (item.visibility === 'draft') {
+      draftActivities += 1;
+    }
+
+    const remixPlan = getTemplateRemixPlan({
+      content: item.contentJson,
+      currentTemplateType: item.templateType,
+    });
+    totalReadyTemplateOptions += remixPlan.readyOptions.length;
+    if (remixPlan.suggestedOptions.length > 0) {
+      remixReadyActivities += 1;
+    }
+  }
+
+  return {
+    archivedActivities,
+    draftActivities,
+    remixReadyActivities,
+    templateCoverage: templateTypes.size,
+    templateCoverageTotal: activityTemplates.length,
+    totalActivities: activities.length,
+    totalReadyTemplateOptions,
+  };
+}
 
 function normalizeActivitySearch(value?: string) {
   const normalized = value?.replace(/\s+/g, ' ').trim();

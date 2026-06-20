@@ -118,6 +118,15 @@ function DashboardActivitiesPage() {
   });
   const activities = data?.items ?? [];
   const totalActivities = data?.total ?? 0;
+  const summary = data?.summary ?? {
+    archivedActivities: 0,
+    draftActivities: 0,
+    remixReadyActivities: 0,
+    templateCoverage: 0,
+    templateCoverageTotal: activityTemplates.length,
+    totalActivities,
+    totalReadyTemplateOptions: 0,
+  };
   const totalPages = Math.max(
     1,
     Math.ceil(totalActivities / ACTIVITY_LIBRARY_PAGE_SIZE)
@@ -219,6 +228,29 @@ function DashboardActivitiesPage() {
             <IconPlus className="size-4" />
             Create activity
           </Link>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-4">
+          <ActivitySummaryCard
+            icon={IconFolder}
+            label={hasFilters ? 'Matching activities' : 'Activities'}
+            value={String(summary.totalActivities)}
+          />
+          <ActivitySummaryCard
+            icon={IconDeviceGamepad2}
+            label="Template coverage"
+            value={`${summary.templateCoverage}/${summary.templateCoverageTotal}`}
+          />
+          <ActivitySummaryCard
+            icon={IconSwitchHorizontal}
+            label="Ready to remix"
+            value={String(summary.remixReadyActivities)}
+          />
+          <ActivitySummaryCard
+            icon={IconLayoutGrid}
+            label="Ready modes"
+            value={String(summary.totalReadyTemplateOptions)}
+          />
         </section>
 
         <ActivityLibrarySearch
@@ -993,6 +1025,26 @@ function ActivityStat({ label, value }: { label: string; value: number }) {
       <p className="text-xl font-semibold">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
+  );
+}
+
+function ActivitySummaryCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof IconFolder;
+  label: string;
+  value: string;
+}) {
+  return (
+    <Card className="rounded-lg">
+      <CardContent className="p-4">
+        <Icon className="size-5 text-primary" />
+        <p className="mt-4 text-2xl font-semibold">{value}</p>
+        <p className="text-sm text-muted-foreground">{label}</p>
+      </CardContent>
+    </Card>
   );
 }
 

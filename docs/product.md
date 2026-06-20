@@ -61,7 +61,10 @@ fill-blank, listening, matching pairs, line match, or open box, while preserving
 the filter state in the URL for reloads and shared teacher workflows. The
 library is paginated from the same owner-scoped list API, so large classroom
 collections load in bounded pages while search, status, and template filters
-reset to a predictable first page.
+reset to a predictable first page. Activity library overview cards summarize
+the full current filter result, not only the visible page, including matching
+activities, template-family coverage, activities ready to remix into another
+template, and total ready template modes.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured
