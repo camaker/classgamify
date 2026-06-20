@@ -3,12 +3,18 @@ import { ActivityCreateForm } from '@/components/activities/activity-create-form
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { starterActivities } from '@/activities/catalog';
+import { activityContentToEditorInput } from '@/activities/editor';
+import type { ActivityTemplateType } from '@/activities/types';
+import { activityTemplateTypeSchema } from '@/activities/validation';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { IconSparkles } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/create')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    template: parseTemplateSearch(search.template),
+  }),
   head: () =>
     seo('/create', {
       title: `Create activity | ${websiteConfig.metadata?.name}`,
@@ -19,7 +25,17 @@ export const Route = createFileRoute('/create')({
 });
 
 function CreatePage() {
+  const { template } = Route.useSearch();
   const activity = starterActivities[0];
+  const initialValues = template
+    ? activityContentToEditorInput({
+        content: activity.content,
+        description: activity.description,
+        templateType: template,
+        title: activity.title,
+        visibility: 'draft',
+      })
+    : undefined;
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -53,7 +69,7 @@ function CreatePage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]">
-          <ActivityCreateForm />
+          <ActivityCreateForm initialValues={initialValues} />
           <div className="space-y-4">
             <p className="text-sm font-medium text-muted-foreground">
               Example rendering
@@ -64,4 +80,10 @@ function CreatePage() {
       </div>
     </Container>
   );
+}
+
+function parseTemplateSearch(value: unknown): ActivityTemplateType | undefined {
+  if (typeof value !== 'string') return undefined;
+  const parsed = activityTemplateTypeSchema.safeParse(value);
+  return parsed.success ? parsed.data : undefined;
 }

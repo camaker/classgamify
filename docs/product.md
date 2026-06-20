@@ -74,6 +74,10 @@ are examples, not hidden templates; teachers still review and edit before
 saving. The editor should also preview template readiness from the current
 structured text fields before save, using the same parser and deterministic
 remix model as persisted activities.
+The public template directory should act as a real creation entry point:
+teachers can start from any template card and land in `/create` with that
+primary template selected, while the editor still uses the shared activity
+content conversion path.
 
 Template remixing should be treated as a content-readiness problem before it is
 treated as an AI feature. The app can inspect an activity's questions, pairs,
