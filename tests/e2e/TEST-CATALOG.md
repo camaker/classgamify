@@ -28,8 +28,9 @@ attempt metrics, duration formatting, assignment delivery summaries, activity
 lifecycle derivation rules, publish-setting input parsing, share-link helpers,
 student submit decisions, result-summary helpers, result formatting,
 activity/assignment list filters, item review priority, student follow-up
-priority, or result-view search, sort, review-filter rules, template remix
-readiness, AI draft source selection, AI draft metadata,
+priority, question option normalization, or result-view search, sort,
+review-filter rules, template remix readiness, AI draft source selection,
+AI draft metadata,
 template scaffold validity, template runtime ids, assignment item ordering, or
 exclusive runtime choice assignment, or deterministic AI draft fallback result
 behavior.

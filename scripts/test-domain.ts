@@ -33,6 +33,8 @@ import {
   buildActivityContent,
   createActivityInputSchema,
 } from '@/activities/validation';
+import { activityContentToEditorInput } from '@/activities/editor';
+import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
@@ -364,6 +366,44 @@ const questionOnlyContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: '',
 });
+assert.deepEqual(
+  buildQuestionOptionTexts({
+    answer: 'Paris',
+    options: [' paris ', 'Rome', 'ROME', 'Berlin', 'Madrid', 'Lisbon'],
+  }),
+  ['Paris', 'Rome', 'Berlin', 'Madrid', 'Lisbon']
+);
+const optionRoundTripContent = buildActivityContent({
+  description: 'Question option normalization',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer normalized option questions.',
+  pairsText: '',
+  questionsText: 'Capital of France? | Paris | paris, Rome, ROME, Berlin',
+  sourceSummary: 'Option normalization check',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Option normalization',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.deepEqual(
+  optionRoundTripContent.questions[0]?.options.map((option) => option.text),
+  ['Paris', 'Rome', 'Berlin']
+);
+assert.equal(
+  activityContentToEditorInput({
+    content: optionRoundTripContent,
+    description: 'Question option normalization',
+    templateType: 'quiz',
+    title: 'Option normalization',
+    visibility: 'draft',
+  }).questionsText,
+  'Capital of France? | Paris | Paris, Rome, Berlin'
+);
 const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',

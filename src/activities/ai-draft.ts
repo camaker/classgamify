@@ -10,6 +10,7 @@ import {
   createActivityInputSchema,
   type CreateActivityInput,
 } from '@/activities/validation';
+import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
 import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { z } from 'zod';
@@ -209,7 +210,10 @@ function toCreateActivityInput(
       .join('\n'),
     questionsText: draft.questions
       .map((question) => {
-        const options = ensureAnswerOption(question.answer, question.options);
+        const options = buildQuestionOptionTexts({
+          answer: question.answer,
+          options: question.options,
+        });
         return [
           question.prompt,
           question.answer,
@@ -278,15 +282,15 @@ export function createFallbackActivityDraft(
   const normalizedTerms = terms.length >= 3 ? terms : fallbackTerms(input);
   const options = normalizedTerms.slice(0, Math.max(3, input.itemCount));
 
-  const questions = normalizedTerms
-    .slice(0, input.itemCount)
-    .map(
-      (term) =>
-        `Which item belongs in this lesson set: ${term}? | ${term} | ${ensureAnswerOption(
-          term,
-          options
-        ).join(', ')} | ${term} is one of the target items from this lesson.`
-    );
+  const questions = normalizedTerms.slice(0, input.itemCount).map(
+    (term) =>
+      `Which item belongs in this lesson set: ${term}? | ${term} | ${buildQuestionOptionTexts(
+        {
+          answer: term,
+          options,
+        }
+      ).join(', ')} | ${term} is one of the target items from this lesson.`
+  );
 
   const pairs = normalizedTerms
     .slice(0, input.itemCount)
@@ -376,10 +380,6 @@ function createFallbackTitle(
 function summarizeSource(sourceText: string) {
   const compact = sourceText.replace(/\s+/g, ' ').trim();
   return compact.length > 280 ? `${compact.slice(0, 277)}...` : compact;
-}
-
-function ensureAnswerOption(answer: string, options: string[]) {
-  return unique([answer, ...options]).slice(0, 5);
 }
 
 function unique(values: string[]) {

@@ -9,6 +9,7 @@ import {
   type ActivityVisibility,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { z } from 'zod';
 
 export const activityTemplateTypeSchema = z.enum(ACTIVITY_TEMPLATE_TYPES);
@@ -120,10 +121,10 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
       );
     }
 
-    const optionTexts = parseInlineList(optionsRaw);
-    const allOptions = optionTexts.includes(answer)
-      ? optionTexts
-      : [answer, ...optionTexts];
+    const allOptions = buildQuestionOptionTexts({
+      answer,
+      options: parseInlineList(optionsRaw),
+    });
 
     return {
       answer,

@@ -1,4 +1,8 @@
 import type { ActivityContent, ActivityQuestion } from '@/activities/types';
+import {
+  buildQuestionOptionTexts,
+  normalizeQuestionOptionText,
+} from '@/activities/question-options';
 
 const DEFAULT_CHOICE_COUNT = 4;
 
@@ -15,15 +19,16 @@ export function buildQuestionChoices({
   const siblingAnswers = content.questions
     .filter((item) => item.id !== question.id)
     .map((item) => item.answer);
-  const candidates = uniqueChoices([
-    question.answer,
-    ...explicitOptions,
-    ...siblingAnswers,
-    ...content.vocabulary,
-  ]);
+  const candidates = buildQuestionOptionTexts({
+    answer: question.answer,
+    maxOptions: Number.POSITIVE_INFINITY,
+    options: [...explicitOptions, ...siblingAnswers, ...content.vocabulary],
+  });
   const distractors = candidates
     .filter(
-      (choice) => normalizeChoice(choice) !== normalizeChoice(question.answer)
+      (choice) =>
+        normalizeQuestionOptionText(choice) !==
+        normalizeQuestionOptionText(question.answer)
     )
     .sort(
       (left, right) =>
@@ -31,27 +36,11 @@ export function buildQuestionChoices({
         stableChoiceRank(question.id, right)
     );
 
-  return uniqueChoices([question.answer, ...distractors]).slice(0, targetCount);
-}
-
-function uniqueChoices(values: string[]) {
-  const seen = new Set<string>();
-  const choices: string[] = [];
-
-  for (const value of values) {
-    const choice = value.trim();
-    const key = normalizeChoice(choice);
-    if (!choice || seen.has(key)) continue;
-
-    seen.add(key);
-    choices.push(choice);
-  }
-
-  return choices;
-}
-
-function normalizeChoice(value: string) {
-  return value.normalize('NFKC').trim().toLowerCase();
+  return buildQuestionOptionTexts({
+    answer: question.answer,
+    maxOptions: targetCount,
+    options: distractors,
+  });
 }
 
 function stableChoiceRank(seed: string, value: string) {

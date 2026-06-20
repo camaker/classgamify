@@ -3,6 +3,7 @@ import type {
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import { buildQuestionOptionTexts } from '@/activities/question-options';
 import type { CreateActivityInput } from '@/activities/validation';
 
 type ActivityEditorSource = {
@@ -30,7 +31,10 @@ export function activityContentToEditorInput(
       .join('\n'),
     questionsText: source.content.questions
       .map((question) => {
-        const options = ensureOptionText(question.answer, question.options);
+        const options = buildQuestionOptionTexts({
+          answer: question.answer,
+          options: question.options?.map((option) => option.text),
+        });
         const base = `${question.prompt} | ${question.answer} | ${options.join(', ')}`;
         return question.explanation
           ? `${base} | ${question.explanation}`
@@ -45,15 +49,4 @@ export function activityContentToEditorInput(
     visibility: source.visibility,
     vocabularyText: source.content.vocabulary.join(', '),
   };
-}
-
-function ensureOptionText(
-  answer: string,
-  options?: Array<{ text: string }>
-): string[] {
-  return unique([answer, ...(options?.map((option) => option.text) ?? [])]);
-}
-
-function unique(values: string[]) {
-  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
 }
