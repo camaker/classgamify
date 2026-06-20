@@ -200,6 +200,25 @@ function AssignmentResultsPage() {
             </Card>
           ) : null}
 
+          {data.analysis.perItem.length > 0 ? (
+            <Card className="rounded-lg">
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-lg font-semibold">Item performance</h2>
+                </CardTitle>
+                <CardDescription>
+                  <p>
+                    Review every prompt from the frozen assignment snapshot,
+                    including submitted counts, correct rates, and answer notes.
+                  </p>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ItemPerformanceTable items={data.analysis.perItem} />
+              </CardContent>
+            </Card>
+          ) : null}
+
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
@@ -290,6 +309,47 @@ function AssignmentResultsPage() {
         </div>
       )}
     </DashboardLayout>
+  );
+}
+
+function ItemPerformanceTable({
+  items,
+}: {
+  items: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['perItem'];
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Item</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Correct rate</TableHead>
+          <TableHead>Submitted</TableHead>
+          <TableHead>Expected</TableHead>
+          <TableHead>Explanation</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((item, index) => (
+          <TableRow key={item.itemId}>
+            <TableCell className="max-w-80">
+              <span className="font-medium">{index + 1}.</span> {item.prompt}
+            </TableCell>
+            <TableCell>{item.kind}</TableCell>
+            <TableCell>{item.correctRate}%</TableCell>
+            <TableCell>
+              {item.correctCount}/{item.submittedCount}
+            </TableCell>
+            <TableCell>{item.expectedAnswer || '-'}</TableCell>
+            <TableCell className="max-w-72">
+              {item.explanation || '-'}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 
