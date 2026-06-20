@@ -18,7 +18,9 @@ deleted, because those old routes still share generated route-tree and locale
 infrastructure. Legacy learning URLs that remain mounted should behave as
 ClassGamify migration entry points and carry noindex metadata, so they guide
 humans toward the new product loop without competing with indexed product
-pages.
+pages. Once those routes no longer render the copied lesson UI, unmounted
+Lang Study/Hanzi implementation modules should be deleted in narrow verified
+waves instead of left as dormant product code.
 Public roadmap and dashboard copy should describe the current usable
 ClassGamify loop, not stale scaffold or skeleton milestones once those
 capabilities are live.
