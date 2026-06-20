@@ -21,6 +21,11 @@ import type {
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import {
+  formatAssignmentDateTimeLocal,
+  parseAssignmentDateTimeLocal,
+  parseOptionalWholeNumber,
+} from '@/assignments/publish-input';
 import { defaultAssignmentSettings } from '@/assignments/validation';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -531,7 +536,7 @@ function ActivityCard({
   const [timeLimitMinutes, setTimeLimitMinutes] = useState('');
   const [expiresAtLocal, setExpiresAtLocal] = useState('');
   const previewTimeLimit = parseOptionalWholeNumber(timeLimitMinutes);
-  const previewExpiresAt = parseDateTimeLocal(expiresAtLocal);
+  const previewExpiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
@@ -942,7 +947,9 @@ function ActivityCard({
               <Input
                 id={`expires-at-${activity.id}`}
                 type="datetime-local"
-                min={formatDateTimeLocal(new Date(Date.now() + 60 * 1000))}
+                min={formatAssignmentDateTimeLocal(
+                  new Date(Date.now() + 60 * 1000)
+                )}
                 value={expiresAtLocal}
                 onChange={(event) =>
                   setExpiresAtLocal(event.currentTarget.value)
@@ -1046,21 +1053,4 @@ function ActivitySummaryCard({
       </CardContent>
     </Card>
   );
-}
-
-function formatDateTimeLocal(date: Date) {
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return localDate.toISOString().slice(0, 16);
-}
-
-function parseOptionalWholeNumber(value: string) {
-  if (!value.trim()) return undefined;
-  const parsed = Number(value);
-  return Number.isInteger(parsed) ? parsed : undefined;
-}
-
-function parseDateTimeLocal(value: string) {
-  if (!value.trim()) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
 }

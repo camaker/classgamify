@@ -56,6 +56,11 @@ import {
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
+import {
+  formatAssignmentDateTimeLocal,
+  parseAssignmentDateTimeLocal,
+  parseOptionalWholeNumber,
+} from '@/assignments/publish-input';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   buildAttemptSubmissionAnswers,
@@ -182,6 +187,20 @@ assert.equal(
 assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
   'https://classgamify.test/play/abc%20123'
+);
+assert.equal(parseOptionalWholeNumber(''), undefined);
+assert.equal(parseOptionalWholeNumber(' 12 '), 12);
+assert.equal(parseOptionalWholeNumber('1.5'), undefined);
+assert.equal(parseOptionalWholeNumber('abc'), undefined);
+assert.equal(parseAssignmentDateTimeLocal(''), null);
+assert.equal(parseAssignmentDateTimeLocal('not-a-date'), null);
+assert.equal(
+  parseAssignmentDateTimeLocal('2026-01-10T09:30')?.getFullYear(),
+  2026
+);
+assert.match(
+  formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 );
 const publishedAssignments = [
   {

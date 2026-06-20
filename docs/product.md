@@ -144,6 +144,9 @@ teacher creates the share link, so configuration mistakes are visible before an
 assignment is frozen. Delivery summary labels, order, and fallback values should
 come from assignment-domain helpers before they are rendered in publish dialogs,
 assignment cards, result pages, or public student rule cards.
+Publish-dialog timer and close-time parsing should also live in assignment
+domain helpers so preview values and submitted settings use the same input
+rules.
 Assignment item ordering is also delivery policy. Shuffle behavior should use a
 stable assignment-domain helper keyed by the share link so the same frozen
 assignment loads in a predictable order while preserving the original snapshot
