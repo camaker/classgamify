@@ -63,6 +63,6 @@ function formatReviewStudents(students: AssignmentStudentSummary[]) {
 
   return students.map(
     (student) =>
-      `- ${student.studentLabel}: ${student.latestAccuracy}% latest accuracy, ${student.needsReviewCount} items to review`
+      `- ${student.studentLabel}: ${student.latestAccuracy}% latest accuracy, ${student.needsReviewCount} ${student.needsReviewCount === 1 ? 'item' : 'items'} to review`
   );
 }

@@ -321,7 +321,7 @@ assert.match(reteachPlan, /Student follow-up:/);
 assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
 assert.match(
   reteachPlan,
-  /Anonymous student 1: 0% latest accuracy, 1 items to review/
+  /Anonymous student 1: 0% latest accuracy, 1 item to review/
 );
 
 const itemReviewSummary = buildAssignmentItemReviewSummary({
