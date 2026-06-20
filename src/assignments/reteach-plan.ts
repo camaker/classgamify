@@ -2,6 +2,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 
 export type AssignmentReteachPlanInput = {
   assignmentTitle: string;
@@ -14,15 +15,9 @@ export function buildAssignmentReteachPlan({
   items,
   students,
 }: AssignmentReteachPlanInput) {
-  const reviewItems = items
-    .filter((item) => item.submittedCount > 0)
-    .sort((left, right) => {
-      if (left.correctRate !== right.correctRate) {
-        return left.correctRate - right.correctRate;
-      }
-      return right.submittedCount - left.submittedCount;
-    })
-    .slice(0, 5);
+  const reviewItems = getSubmittedAssignmentReviewPriorityItems(items, {
+    limit: 5,
+  });
   const reviewStudents = students
     .filter((student) => student.needsReviewCount > 0)
     .sort((left, right) => {

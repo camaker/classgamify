@@ -1,4 +1,5 @@
 import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import type { AssignmentItemAnalysis } from '@/assignments/results';
 
 export type AssignmentItemReviewSummaryInput = {
@@ -10,12 +11,7 @@ export function buildAssignmentItemReviewSummary({
   assignmentTitle,
   items,
 }: AssignmentItemReviewSummaryInput) {
-  const sortedItems = [...items].sort((left, right) => {
-    if (left.correctRate !== right.correctRate) {
-      return left.correctRate - right.correctRate;
-    }
-    return right.submittedCount - left.submittedCount;
-  });
+  const sortedItems = sortAssignmentItemsByReviewPriority(items);
 
   const lines = [
     `ClassGamify item review: ${assignmentTitle}`,

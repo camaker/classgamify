@@ -3,6 +3,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -142,10 +143,7 @@ export function sortItemPerformance(
 
   return [...items].sort((left, right) => {
     if (sort === 'accuracy') {
-      if (left.correctRate !== right.correctRate) {
-        return left.correctRate - right.correctRate;
-      }
-      return right.submittedCount - left.submittedCount;
+      return compareAssignmentItemsByReviewPriority(left, right);
     }
 
     if (sort === 'submitted') {

@@ -2,6 +2,7 @@ import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
+import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 
 type AttemptForAnalysis = {
   anonymousToken?: string | null;
@@ -126,15 +127,9 @@ export function analyzeAssignmentResults({
 
   return {
     attempts: attemptReviews,
-    needsReview: perItem
-      .filter((item) => item.submittedCount > 0)
-      .sort((left, right) => {
-        if (left.correctRate !== right.correctRate) {
-          return left.correctRate - right.correctRate;
-        }
-        return right.submittedCount - left.submittedCount;
-      })
-      .slice(0, 3),
+    needsReview: getSubmittedAssignmentReviewPriorityItems(perItem, {
+      limit: 3,
+    }),
     perItem,
     students: buildStudentSummaries(attemptReviews),
   };

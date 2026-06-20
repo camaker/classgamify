@@ -69,6 +69,10 @@ import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
 } from '@/assignments/result-format';
+import {
+  getSubmittedAssignmentReviewPriorityItems,
+  sortAssignmentItemsByReviewPriority,
+} from '@/assignments/review-priority';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
@@ -877,6 +881,65 @@ assert.deepEqual(
     (item) => item.itemId
   ),
   ['pair-1', 'q-1']
+);
+const reviewPriorityItems = [
+  {
+    acceptedAnswers: ['Seed'],
+    correctCount: 0,
+    correctRate: 0,
+    expectedAnswer: 'Seed',
+    itemId: 'unsubmitted',
+    kind: 'question',
+    prompt: 'Unsubmitted item',
+    submittedCount: 0,
+  },
+  {
+    acceptedAnswers: ['A'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'A',
+    itemId: 'tie-more-submitted',
+    kind: 'question',
+    prompt: 'Tie with more submissions',
+    submittedCount: 6,
+  },
+  {
+    acceptedAnswers: ['B'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'B',
+    itemId: 'tie-fewer-submitted',
+    kind: 'question',
+    prompt: 'Tie with fewer submissions',
+    submittedCount: 2,
+  },
+  {
+    acceptedAnswers: ['C'],
+    correctCount: 3,
+    correctRate: 75,
+    expectedAnswer: 'C',
+    itemId: 'higher-accuracy',
+    kind: 'question',
+    prompt: 'Higher accuracy',
+    submittedCount: 4,
+  },
+] satisfies typeof resultAnalysis.perItem;
+assert.deepEqual(
+  sortAssignmentItemsByReviewPriority(reviewPriorityItems).map(
+    (item) => item.itemId
+  ),
+  [
+    'unsubmitted',
+    'tie-more-submitted',
+    'tie-fewer-submitted',
+    'higher-accuracy',
+  ]
+);
+assert.deepEqual(
+  getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {
+    limit: 2,
+  }).map((item) => item.itemId),
+  ['tie-more-submitted', 'tie-fewer-submitted']
 );
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'submitted').map(
