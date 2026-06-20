@@ -17,6 +17,7 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
+  getAttemptSubmitDecision,
 } from '@/assignments/student-submission';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -164,10 +165,18 @@ function PlayPage() {
       toast.error('Type your name before submitting.');
       return;
     }
-    if (unansweredCount > 0 && !confirmIncompleteSubmit) {
+    const submitDecision = getAttemptSubmitDecision({
+      completionSummary,
+      confirmIncompleteSubmit,
+    });
+    if (submitDecision.type === 'confirm-incomplete') {
       setConfirmIncompleteSubmit(true);
       toast.error(
-        `${unansweredCount} ${unansweredCount === 1 ? 'question is' : 'questions are'} still unanswered.`
+        `${submitDecision.unansweredItemCount} ${
+          submitDecision.unansweredItemCount === 1
+            ? 'question is'
+            : 'questions are'
+        } still unanswered.`
       );
       return;
     }

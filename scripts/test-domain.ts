@@ -54,6 +54,7 @@ import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-fol
 import {
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
+  getAttemptSubmitDecision,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
 import type { RuntimeItem } from '@/activities/runtime';
@@ -82,6 +83,45 @@ assert.deepEqual(
     answeredItemCount: 1,
     itemCount: 3,
     unansweredItemCount: 2,
+  }
+);
+const incompleteCompletionSummary = getAttemptCompletionSummary({
+  answers,
+  runtimeItems: submissionRuntimeItems,
+});
+assert.deepEqual(
+  getAttemptSubmitDecision({
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+  }),
+  {
+    reason: 'unanswered-items',
+    type: 'confirm-incomplete',
+    unansweredItemCount: 2,
+  }
+);
+assert.deepEqual(
+  getAttemptSubmitDecision({
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: true,
+  }),
+  {
+    reason: 'confirmed-incomplete',
+    type: 'submit',
+  }
+);
+assert.deepEqual(
+  getAttemptSubmitDecision({
+    completionSummary: {
+      answeredItemCount: 3,
+      itemCount: 3,
+      unansweredItemCount: 0,
+    },
+    confirmIncompleteSubmit: false,
+  }),
+  {
+    reason: 'complete',
+    type: 'submit',
   }
 );
 

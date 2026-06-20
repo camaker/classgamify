@@ -15,6 +15,17 @@ export type AttemptCompletionSummary = {
   unansweredItemCount: number;
 };
 
+export type AttemptSubmitDecision =
+  | {
+      reason: 'complete' | 'confirmed-incomplete';
+      type: 'submit';
+    }
+  | {
+      reason: 'unanswered-items';
+      type: 'confirm-incomplete';
+      unansweredItemCount: number;
+    };
+
 export function getAttemptCompletionSummary({
   answers,
   runtimeItems,
@@ -45,6 +56,30 @@ export function buildAttemptSubmissionAnswers({
     answer: answers[item.id] ?? '',
     itemId: item.id,
   }));
+}
+
+export function getAttemptSubmitDecision({
+  confirmIncompleteSubmit,
+  completionSummary,
+}: {
+  confirmIncompleteSubmit: boolean;
+  completionSummary: AttemptCompletionSummary;
+}): AttemptSubmitDecision {
+  if (completionSummary.unansweredItemCount > 0 && !confirmIncompleteSubmit) {
+    return {
+      reason: 'unanswered-items',
+      type: 'confirm-incomplete',
+      unansweredItemCount: completionSummary.unansweredItemCount,
+    };
+  }
+
+  return {
+    reason:
+      completionSummary.unansweredItemCount > 0
+        ? 'confirmed-incomplete'
+        : 'complete',
+    type: 'submit',
+  };
 }
 
 export function isStudentAnswerFilled(answer: string | undefined) {

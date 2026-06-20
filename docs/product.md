@@ -226,9 +226,10 @@ The submission contract remains template-neutral: every renderer stores
 submission still allows partial attempts, but the server rejects answers for
 unknown item ids, duplicate item ids, or answer lists longer than the frozen
 runtime item count.
-Student progress counts and browser submission payloads should be derived from
-shared assignment-domain helpers, not per-template route math, so every runner
-counts answered items and submits frozen runtime item ids consistently.
+Student progress counts, browser submission payloads, and incomplete-submit
+decisions should be derived from shared assignment-domain helpers, not
+per-template route math, so every runner counts answered items, submits frozen
+runtime item ids, and prompts for partial attempts consistently.
 Pure assignment-domain helpers should have fast script-level coverage so core
 submission semantics can be verified without depending on the local Workers
 E2E runtime.
