@@ -40,6 +40,10 @@ import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
+import {
+  buildExclusiveChoiceAnswerChanges,
+  findChoiceOwner,
+} from '@/components/activities/runtime-choice-answers';
 import { buildAssignmentDeliverySummary } from '@/assignments/delivery-summary';
 import {
   normalizeAssignmentListSearch,
@@ -104,6 +108,41 @@ const answers = {
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
 assert.equal(isStudentAnswerFilled(' answer '), true);
+assert.equal(
+  findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Rome'),
+  'item-2'
+);
+assert.equal(
+  findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Berlin'),
+  undefined
+);
+assert.deepEqual(
+  buildExclusiveChoiceAnswerChanges({
+    answers: { 'item-1': 'Paris' },
+    choice: 'Rome',
+    itemId: 'item-2',
+  }),
+  [{ answer: 'Rome', itemId: 'item-2' }]
+);
+assert.deepEqual(
+  buildExclusiveChoiceAnswerChanges({
+    answers: { 'item-1': 'Paris', 'item-2': 'Rome' },
+    choice: 'Paris',
+    itemId: 'item-2',
+  }),
+  [
+    { answer: '', itemId: 'item-1' },
+    { answer: 'Paris', itemId: 'item-2' },
+  ]
+);
+assert.deepEqual(
+  buildExclusiveChoiceAnswerChanges({
+    answers: { 'item-1': 'Paris' },
+    choice: 'Paris',
+    itemId: 'item-1',
+  }),
+  [{ answer: 'Paris', itemId: 'item-1' }]
+);
 
 assert.deepEqual(
   getAttemptCompletionSummary({

@@ -30,7 +30,8 @@ student submit decisions, result-summary helpers, result formatting,
 activity/assignment list filters, or result-view search, sort, review-filter
 rules, template remix readiness, AI draft source selection, AI draft metadata,
 template scaffold validity, template runtime ids, assignment item ordering, or
-deterministic AI draft fallback result behavior.
+exclusive runtime choice assignment, or deterministic AI draft fallback result
+behavior.
 
 ## Test Harness
 

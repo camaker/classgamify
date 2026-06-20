@@ -4,6 +4,10 @@ import type {
 } from '@/assignments/public';
 import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
+import {
+  buildExclusiveChoiceAnswerChanges,
+  findChoiceOwner,
+} from '@/components/activities/runtime-choice-answers';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -44,11 +48,14 @@ export function MatchingPairsBoard({
 
   function selectChoice(choice: string) {
     if (!selectedItemId || disabled) return;
-    const usedByItemId = findChoiceOwner(answers, choice);
-    if (usedByItemId && usedByItemId !== selectedItemId) {
-      onAnswerChange(usedByItemId, '');
+
+    for (const change of buildExclusiveChoiceAnswerChanges({
+      answers,
+      choice,
+      itemId: selectedItemId,
+    })) {
+      onAnswerChange(change.itemId, change.answer);
     }
-    onAnswerChange(selectedItemId, choice);
     setSelectedItemId(undefined);
   }
 
@@ -149,8 +156,4 @@ export function MatchingPairsBoard({
       </div>
     </div>
   );
-}
-
-function findChoiceOwner(answers: Record<string, string>, choice: string) {
-  return Object.entries(answers).find(([, answer]) => answer === choice)?.[0];
 }
