@@ -10,7 +10,10 @@ import {
 } from '@/activities/library-filters';
 import { createFallbackActivityDraft } from '@/activities/ai-draft';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
-import { getTemplateRemixPlan } from '@/activities/template-remix';
+import {
+  formatTemplateRequirement,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
 import { buildActivityContent } from '@/activities/validation';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
@@ -245,6 +248,54 @@ assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
+const questionOnlyContent = buildActivityContent({
+  description: 'Question only activity',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer quick review questions.',
+  pairsText: '',
+  questionsText: ['Capital of France? | Paris', '2 + 2? | 4'].join('\n'),
+  sourceSummary: 'Quick review',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Question review',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+const questionOnlyRemixPlan = getTemplateRemixPlan({
+  content: questionOnlyContent,
+  currentTemplateType: 'quiz',
+});
+assert.ok(questionOnlyRemixPlan.readyOptions.length > 0);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'quiz'
+  )?.isCurrent,
+  true
+);
+assert.equal(
+  questionOnlyRemixPlan.suggestedOptions.some(
+    (option) => option.template.type === 'quiz'
+  ),
+  false
+);
+assert.deepEqual(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'match-up'
+  )?.missingRequirements,
+  ['pairs']
+);
+assert.deepEqual(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'group-sort'
+  )?.missingRequirements,
+  ['groups']
+);
+assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
+assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 2',
