@@ -44,6 +44,12 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
+import { findPublishedAssignmentInList } from '@/assignments/published-assignment';
+import {
+  buildAssignmentSharePath,
+  buildAssignmentShareUrl,
+  normalizeShareBaseUrl,
+} from '@/assignments/share-link';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   buildAttemptSubmissionAnswers,
@@ -117,6 +123,49 @@ assert.deepEqual(
 assert.deepEqual(
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id),
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id)
+);
+assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
+assert.equal(
+  buildAssignmentSharePath('class/6?homework=yes'),
+  '/play/class%2F6%3Fhomework%3Dyes'
+);
+assert.equal(
+  normalizeShareBaseUrl('https://classgamify.test///'),
+  'https://classgamify.test'
+);
+assert.equal(
+  buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
+  'https://classgamify.test/play/abc%20123'
+);
+const publishedAssignments = [
+  {
+    assignment: {
+      id: 'assignment-1',
+      shareSlug: 'share-1',
+      title: 'Week 1',
+    },
+  },
+  {
+    assignment: {
+      id: 'assignment-2',
+      shareSlug: 'share-2',
+      title: 'Week 2',
+    },
+  },
+];
+assert.deepEqual(
+  findPublishedAssignmentInList({
+    items: publishedAssignments,
+    shareSlug: 'share-2',
+  }),
+  publishedAssignments[1]?.assignment
+);
+assert.equal(
+  findPublishedAssignmentInList({
+    items: publishedAssignments,
+    shareSlug: 'missing',
+  }),
+  undefined
 );
 assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
   { id: 'attempts', label: 'Attempts', value: 'Open' },

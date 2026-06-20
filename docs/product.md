@@ -156,7 +156,10 @@ the page should surface the newly published share link with copy, student
 preview, and results actions so distribution is the immediate next step. The
 published share-slug context should be resolved through assignment-domain logic,
 not ad hoc route code, because pagination and filters may change how much of the
-list is visible. The assignment list should remain searchable as teachers reuse
+list is visible. Absolute share-link URL construction and `/play/:id` path
+encoding should also live in assignment-domain helpers so copied links are
+consistent across publish success panels, list cards, and result pages. The
+assignment list should remain searchable as teachers reuse
 the product across classes: teachers can filter their own assignments by title,
 share id, source activity text, or assignment status without broadening outside
 the current owner. It should also paginate from the same authenticated list API

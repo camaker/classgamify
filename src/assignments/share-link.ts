@@ -1,18 +1,22 @@
-import { getBaseUrl } from '@/lib/urls';
-
 export function buildAssignmentSharePath(shareSlug: string) {
   return `/play/${encodeURIComponent(shareSlug)}`;
 }
 
-export function buildAssignmentShareUrl(shareSlug: string) {
-  const baseUrl = getRuntimeBaseUrl();
-  return `${baseUrl}${buildAssignmentSharePath(shareSlug)}`;
+export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
+  const origin = normalizeShareBaseUrl(baseUrl ?? getRuntimeBaseUrl());
+  return `${origin}${buildAssignmentSharePath(shareSlug)}`;
+}
+
+export function normalizeShareBaseUrl(baseUrl: string) {
+  return baseUrl.replace(/\/+$/, '');
 }
 
 function getRuntimeBaseUrl() {
   if (typeof window !== 'undefined') {
-    return window.location.origin.replace(/\/$/, '');
+    return normalizeShareBaseUrl(window.location.origin);
   }
 
-  return getBaseUrl().replace(/\/$/, '');
+  return normalizeShareBaseUrl(
+    import.meta.env?.VITE_BASE_URL ?? 'http://localhost:3000'
+  );
 }
