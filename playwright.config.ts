@@ -14,15 +14,12 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: [
-      'pnpm db:migrate:local',
-      [
-        `VITE_BASE_URL=${baseURL}`,
-        'VITE_PAYMENT_PROVIDER=stripe',
-        'BETTER_AUTH_SECRET=e2e-better-auth-secret',
-        'pnpm dev --mode e2e',
-      ].join(' '),
-    ].join(' && '),
+    command: 'pnpm db:migrate:local && pnpm dev --mode e2e',
+    env: {
+      BETTER_AUTH_SECRET: 'e2e-better-auth-secret',
+      VITE_BASE_URL: baseURL,
+      VITE_PAYMENT_PROVIDER: 'stripe',
+    },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

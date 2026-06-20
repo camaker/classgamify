@@ -16,6 +16,7 @@ const publicPages = [
   { path: '/pricing', name: 'pricing' },
   { path: '/teachers', name: 'teachers' },
   { path: '/contact', name: 'contact' },
+  { path: '/contact?subject=classroom', name: 'classroom contact' },
   { path: '/roadmap', name: 'roadmap' },
   { path: '/blog', name: 'blog index' },
   { path: '/cookie', name: 'cookie policy' },
@@ -33,6 +34,23 @@ const smokeMatrix: Array<{ locale: LocaleMode; theme: ThemeMode }> = [
   { locale: 'zh', theme: 'dark' },
   { locale: 'zh', theme: 'light' },
 ];
+
+const classroomContactCases = [
+  {
+    fields: [
+      'Learners',
+      'Class or grade',
+      'Activity material',
+      'Weekly routine',
+      'Main need',
+    ],
+    locale: 'en',
+  },
+  {
+    fields: ['学习者', '班级或年级', '活动材料', '每周节奏', '主要需求'],
+    locale: 'zh',
+  },
+] as const;
 
 test.describe('public page smoke coverage', () => {
   for (const { locale, theme } of smokeMatrix) {
@@ -67,6 +85,28 @@ test.describe('public page smoke coverage', () => {
     await expect(dialog.locator('input[name="password"]')).toBeVisible();
     monitor.expectNoErrors('home login modal');
   });
+
+  for (const { fields, locale } of classroomContactCases) {
+    test(`shows classroom inquiry fields in ${locale}`, async ({ page }) => {
+      await setTheme(page, 'light');
+      const monitor = installPageHealthMonitor(page);
+
+      await expectHealthyPage(
+        page,
+        monitor,
+        localizedPath('/contact?subject=classroom', locale),
+        { theme: 'light' }
+      );
+
+      for (const field of fields) {
+        await expect(page.getByLabel(field)).toBeVisible();
+      }
+
+      const bodyText = (await page.locator('body').innerText()).trim();
+      expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
+      monitor.expectNoErrors(`classroom contact ${locale}`);
+    });
+  }
 
   test('health check responds with pong', async ({ request }) => {
     const response = await request.get('/api/ping');

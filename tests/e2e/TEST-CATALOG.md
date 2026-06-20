@@ -44,7 +44,7 @@ browser console errors or page errors.
 
 | # | Test name | Flow |
 |---|---|---|
-| 1 | Public pages render successfully | Open `/`, `/templates`, `/create`, `/play/demo-food`, `/pricing`, `/teachers`, `/contact`, `/roadmap`, `/blog`, `/cookie`, `/privacy`, `/terms`, `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/reset-password` for `en` and `zh`, in `dark` and `light` mode. Verify each returns 2xx, renders a visible body, applies the requested theme, and emits no browser errors. |
+| 1 | Public pages render successfully | Open `/`, `/templates`, `/create`, `/play/demo-food`, `/pricing`, `/teachers`, `/contact`, `/contact?subject=classroom`, `/roadmap`, `/blog`, `/cookie`, `/privacy`, `/terms`, `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/reset-password` for `en` and `zh`, in `dark` and `light` mode. Verify each returns 2xx, renders a visible body, applies the requested theme, and emits no browser errors. |
 | 2 | Home login modal opens | Open `/`, click the navbar login button, verify the login dialog and credential inputs are visible, and assert no browser errors. |
 | 3 | Health check responds with pong | Call `/api/ping` and verify `{ "message": "pong" }`. |
 
