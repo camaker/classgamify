@@ -9,6 +9,7 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
+  buildActivityDraftPrompt,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
 } from '@/activities/ai-draft';
@@ -541,6 +542,28 @@ const fallbackDraft = createFallbackActivityDraft({
   subject: 'Science',
   templateType: 'listening',
 });
+const fillBlankDraftPrompt = buildActivityDraftPrompt({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 5,
+  language: 'en',
+  sourceText: 'plants, root, stem, leaf',
+  subject: 'Science',
+  templateType: 'fill-blank',
+});
+assert.match(fillBlankDraftPrompt, /Template requirements: questions/);
+assert.match(fillBlankDraftPrompt, /worksheet sentence with ___/);
+const groupSortDraftPrompt = buildActivityDraftPrompt({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 5,
+  language: 'en',
+  sourceText: 'solid, liquid, gas',
+  subject: 'Science',
+  templateType: 'group-sort',
+});
+assert.match(groupSortDraftPrompt, /Template requirements: groups/);
+assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {
     difficulty: 'starter',

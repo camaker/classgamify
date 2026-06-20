@@ -11,6 +11,10 @@ import {
   type CreateActivityInput,
 } from '@/activities/validation';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
+import {
+  formatTemplateRequirement,
+  formatTemplateRequirementList,
+} from '@/activities/template-remix';
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
 import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { z } from 'zod';
@@ -129,7 +133,7 @@ export async function generateActivityDraftFromAi(
   };
 }
 
-function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
+export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
   const template = activityTemplates.find(
     (item) => item.type === input.templateType
   );
@@ -144,6 +148,8 @@ function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     `Language: ${input.language}`,
     `Difficulty: ${input.difficulty}`,
     `Primary template: ${templateContext}`,
+    `Template requirements: ${buildTemplateRequirementSummary(input.templateType)}`,
+    `Template guidance: ${buildTemplateDraftGuidance(input.templateType)}`,
     `Target item count: ${input.itemCount}`,
     `Source notes: ${input.sourceText}`,
     '',
@@ -169,6 +175,40 @@ function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     '- Every question should include a brief teacher-approved explanation.',
     '- Return JSON only.',
   ].join('\n');
+}
+
+function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
+  const template = activityTemplates.find((item) => item.type === templateType);
+  const requirements = template?.contentRequirements.map(
+    formatTemplateRequirement
+  );
+
+  if (!requirements?.length) {
+    return 'questions, match pairs, or groups depending on the selected template';
+  }
+
+  return formatTemplateRequirementList(requirements);
+}
+
+function buildTemplateDraftGuidance(templateType: ActivityTemplateType) {
+  switch (templateType) {
+    case 'fill-blank':
+      return 'Write each question prompt as a worksheet sentence with ___ or [blank] where the answer belongs.';
+    case 'group-sort':
+      return 'Make groups the primary structure; each group needs a clear category label and concrete sortable items.';
+    case 'line-match':
+      return 'Make pairs the primary structure; each left side should connect cleanly to one right-side answer for line matching.';
+    case 'listening':
+      return 'Write each question prompt as a short sentence that can be spoken aloud; the answer should be the key word or phrase students identify.';
+    case 'match-up':
+      return 'Make pairs the primary structure; use terms, definitions, translations, examples, or cause-and-effect matches.';
+    case 'matching-pairs':
+      return 'Make pairs the primary structure; keep both sides short enough for memory-style cards.';
+    case 'open-box':
+      return 'Write each question prompt as a reveal-card speaking or review prompt with a concise model answer.';
+    case 'quiz':
+      return 'Write each question as a concise multiple-choice check with plausible distractors.';
+  }
 }
 
 function parseAiDraftResponse(response: string): AiActivityDraft {
