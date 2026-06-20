@@ -1,6 +1,6 @@
 import { activityTemplates } from '@/activities/catalog';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
-import type { ActivityDraftMeta } from '@/activities/ai-draft';
+import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivityContent } from '@/activities/types';
 import {
   formatTemplateRequirement,
@@ -109,7 +109,7 @@ export function ActivityCreateForm({
     getDraftSourceText(initialValues ?? activityFormDefaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
-  const [draftMeta, setDraftMeta] = useState<ActivityDraftMeta>();
+  const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
   const form = useForm<CreateActivityInput>({
     defaultValues: initialValues ?? activityFormDefaultValues,
     resolver: zodResolver(createActivityInputSchema),
@@ -144,6 +144,7 @@ export function ActivityCreateForm({
     if (!initialValues) return;
     form.reset(initialValues);
     setDraftSourceText(getDraftSourceText(initialValues));
+    setDraftResult(undefined);
   }, [form, initialValues]);
 
   async function onGenerateDraft() {
@@ -174,7 +175,7 @@ export function ActivityCreateForm({
         ...result.activity,
         visibility: current.visibility,
       });
-      setDraftMeta(result.meta);
+      setDraftResult(result);
 
       if (result.notice) {
         toast.success('Draft filled from the local generator.');
@@ -203,6 +204,7 @@ export function ActivityCreateForm({
     };
     form.reset(nextValues);
     setDraftSourceText(getDraftSourceText(nextValues));
+    setDraftResult(undefined);
     toast.success(`${template.name} scaffold loaded.`);
   }
 
@@ -338,7 +340,9 @@ export function ActivityCreateForm({
               </div>
             </div>
 
-            {draftMeta ? <ActivityDraftMetaSummary meta={draftMeta} /> : null}
+            {draftResult ? (
+              <ActivityDraftMetaSummary result={draftResult} />
+            ) : null}
 
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
@@ -679,7 +683,9 @@ export function ActivityCreateForm({
   );
 }
 
-function ActivityDraftMetaSummary({ meta }: { meta: ActivityDraftMeta }) {
+function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
+  const { meta } = result;
+
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -690,9 +696,20 @@ function ActivityDraftMetaSummary({ meta }: { meta: ActivityDraftMeta }) {
             library.
           </p>
         </div>
-        <Badge variant="secondary" className="rounded-md">
-          {meta.readyTemplateCount} ready templates
-        </Badge>
+        <div className="flex flex-wrap gap-1.5">
+          <Badge variant="secondary" className="rounded-md">
+            {meta.readyTemplateCount} ready templates
+          </Badge>
+          <Badge variant="outline" className="rounded-md">
+            {result.provider === 'workers-ai' ? 'Workers AI' : 'Fallback'}
+          </Badge>
+        </div>
+      </div>
+      <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
+        <p>
+          Model: <span className="font-medium">{result.model}</span>
+        </p>
+        {result.notice ? <p className="mt-1">{result.notice}</p> : null}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
         <ActivityDraftCoverageStat
