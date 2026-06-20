@@ -1,3 +1,4 @@
+import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import type { AssignmentItemAnalysis } from '@/assignments/results';
 
 export type AssignmentItemReviewSummaryInput = {
@@ -34,7 +35,9 @@ function formatItems(items: AssignmentItemAnalysis[]) {
     const explanation = item.explanation ? ` Notes: ${item.explanation}` : '';
     const acceptedAnswers =
       item.acceptedAnswers.length > 1
-        ? ` Accepted answers: ${item.acceptedAnswers.join(', ')}.`
+        ? ` Accepted answers: ${formatAcceptedAnswerAlternatives(
+            item.acceptedAnswers
+          )}.`
         : '';
     return `- ${index + 1}. ${item.prompt} (${item.kind}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
   });
