@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +37,10 @@ export function MatchingPairsBoard({
   );
   const choices = useMemo(() => getUniqueRuntimeChoices(items), [items]);
   const selectedAnswer = selectedItemId ? answers[selectedItemId] : undefined;
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems: items,
+  });
 
   function selectChoice(choice: string) {
     if (!selectedItemId || disabled) return;
@@ -55,8 +60,8 @@ export function MatchingPairsBoard({
           Matching pairs
         </div>
         <Badge variant="outline" className="rounded-md">
-          {items.filter((item) => answers[item.id]?.trim()).length}/
-          {items.length} matched
+          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
+          matched
         </Badge>
       </div>
 

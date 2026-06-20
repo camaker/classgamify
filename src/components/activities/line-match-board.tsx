@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +36,10 @@ export function LineMatchBoard({
       ),
     [reviewItems]
   );
-  const matchedCount = items.filter((item) => answers[item.id]?.trim()).length;
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems: items,
+  });
 
   function selectPrompt(itemId: string) {
     if (disabled) return;
@@ -62,7 +66,8 @@ export function LineMatchBoard({
           Line match
         </div>
         <Badge variant="outline" className="rounded-md">
-          {matchedCount}/{items.length} connected
+          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
+          connected
         </Badge>
       </div>
 

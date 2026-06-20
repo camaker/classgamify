@@ -2,6 +2,10 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import {
+  getAttemptCompletionSummary,
+  isStudentAnswerFilled,
+} from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +49,10 @@ export function OpenBoxRunner({
     items.findIndex((item) => item.id === activeItemId)
   );
   const activeItem = items[activeIndex] ?? items[0];
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems: items,
+  });
 
   function moveActiveItem(offset: number) {
     if (!items.length) return;
@@ -66,8 +74,8 @@ export function OpenBoxRunner({
           Open the box
         </div>
         <Badge variant="outline" className="rounded-md">
-          {items.filter((item) => answers[item.id]?.trim()).length}/
-          {items.length} answered
+          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
+          answered
         </Badge>
       </div>
 
@@ -75,7 +83,7 @@ export function OpenBoxRunner({
         <div className="grid content-start gap-2">
           {items.map((item, index) => {
             const selected = item.id === activeItem.id;
-            const answered = Boolean(answers[item.id]?.trim());
+            const answered = isStudentAnswerFilled(answers[item.id]);
             const reviewItem = reviewByItemId.get(item.id);
 
             return (

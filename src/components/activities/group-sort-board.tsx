@@ -2,6 +2,10 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import {
+  getAttemptCompletionSummary,
+  isStudentAnswerFilled,
+} from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +50,13 @@ export function GroupSortBoard({
     [reviewItems]
   );
   const selectedItem = selectedItemId ? itemsById.get(selectedItemId) : null;
-  const unplacedItems = items.filter((item) => !answers[item.id]?.trim());
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems: items,
+  });
+  const unplacedItems = items.filter(
+    (item) => !isStudentAnswerFilled(answers[item.id])
+  );
 
   function placeSelectedItem(group: string) {
     if (!selectedItemId || disabled) return;
@@ -68,8 +78,8 @@ export function GroupSortBoard({
           Group sort
         </div>
         <Badge variant="outline" className="rounded-md">
-          {items.filter((item) => answers[item.id]?.trim()).length}/
-          {items.length} sorted
+          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
+          sorted
         </Badge>
       </div>
 

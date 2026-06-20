@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -33,6 +34,10 @@ export function FillBlankWorksheet({
       ),
     [reviewItems]
   );
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems: items,
+  });
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -42,8 +47,8 @@ export function FillBlankWorksheet({
           Fill blanks
         </div>
         <Badge variant="outline" className="rounded-md">
-          {items.filter((item) => answers[item.id]?.trim()).length}/
-          {items.length} completed
+          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
+          completed
         </Badge>
       </div>
 

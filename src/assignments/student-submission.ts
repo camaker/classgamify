@@ -24,7 +24,7 @@ export function getAttemptCompletionSummary({
 }): AttemptCompletionSummary {
   const itemCount = runtimeItems.length;
   const answeredItemCount = runtimeItems.filter((item) =>
-    isAnswered(answers[item.id])
+    isStudentAnswerFilled(answers[item.id])
   ).length;
 
   return {
@@ -47,6 +47,6 @@ export function buildAttemptSubmissionAnswers({
   }));
 }
 
-function isAnswered(answer: string | undefined) {
+export function isStudentAnswerFilled(answer: string | undefined) {
   return Boolean(answer?.trim());
 }
