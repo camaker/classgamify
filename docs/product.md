@@ -93,8 +93,8 @@ current structured text fields before save, using the same parser and
 deterministic remix model as persisted activities.
 The public template directory should act as a real creation entry point:
 teachers can start from any template card and land in `/create` with that
-primary template selected, while the editor still uses the shared activity
-content conversion path.
+primary template selected and its template-specific scaffold loaded, while the
+editor still uses the shared structured activity input contract.
 
 Template remixing should be treated as a content-readiness problem before it is
 treated as an AI feature. The app can inspect an activity's questions, pairs,

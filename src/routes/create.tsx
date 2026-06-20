@@ -1,9 +1,12 @@
 import { ActivityPreview } from '@/components/activities/activity-preview';
-import { ActivityCreateForm } from '@/components/activities/activity-create-form';
+import {
+  ActivityCreateForm,
+  activityFormDefaultValues,
+} from '@/components/activities/activity-create-form';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { starterActivities } from '@/activities/catalog';
-import { activityContentToEditorInput } from '@/activities/editor';
+import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityTemplateType } from '@/activities/types';
 import { activityTemplateTypeSchema } from '@/activities/validation';
 import { websiteConfig } from '@/config/website';
@@ -28,13 +31,12 @@ function CreatePage() {
   const { template } = Route.useSearch();
   const activity = starterActivities[0];
   const initialValues = template
-    ? activityContentToEditorInput({
-        content: activity.content,
-        description: activity.description,
+    ? {
+        ...activityFormDefaultValues,
+        ...getActivityTemplateScaffold(template),
         templateType: template,
-        title: activity.title,
-        visibility: 'draft',
-      })
+        visibility: activityFormDefaultValues.visibility,
+      }
     : undefined;
 
   return (
