@@ -68,7 +68,9 @@ collections load in bounded pages while search, status, and template filters
 reset to a predictable first page. Activity library overview cards summarize
 the full current filter result, not only the visible page, including matching
 activities, template-family coverage, activities ready to remix into another
-template, and total ready template modes.
+template, and total ready template modes. The summary logic belongs in the
+activity domain layer so dashboard surfaces and server functions reuse the same
+template-readiness calculation instead of duplicating UI-only math.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured

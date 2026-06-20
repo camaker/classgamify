@@ -5,13 +5,10 @@ import {
   createActivityInputSchema,
 } from '@/activities/validation';
 import { buildDuplicatedActivityTitle } from '@/activities/duplicate';
-import { activityTemplates, getTemplateByType } from '@/activities/catalog';
+import { getTemplateByType } from '@/activities/catalog';
+import { summarizeActivityLibrary } from '@/activities/library-summary';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import {
-  getMissingTemplateRequirements,
-  getTemplateRemixPlan,
-} from '@/activities/template-remix';
-import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
+import { getMissingTemplateRequirements } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -77,49 +74,6 @@ export const listActivities = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
-
-function summarizeActivityLibrary(
-  activities: Array<{
-    contentJson: ActivityContent;
-    templateType: ActivityTemplateType;
-    visibility: string;
-  }>
-) {
-  const templateTypes = new Set<ActivityTemplateType>();
-  let archivedActivities = 0;
-  let draftActivities = 0;
-  let remixReadyActivities = 0;
-  let totalReadyTemplateOptions = 0;
-
-  for (const item of activities) {
-    templateTypes.add(item.templateType);
-    if (item.visibility === 'archived') {
-      archivedActivities += 1;
-    }
-    if (item.visibility === 'draft') {
-      draftActivities += 1;
-    }
-
-    const remixPlan = getTemplateRemixPlan({
-      content: item.contentJson,
-      currentTemplateType: item.templateType,
-    });
-    totalReadyTemplateOptions += remixPlan.readyOptions.length;
-    if (remixPlan.suggestedOptions.length > 0) {
-      remixReadyActivities += 1;
-    }
-  }
-
-  return {
-    archivedActivities,
-    draftActivities,
-    remixReadyActivities,
-    templateCoverage: templateTypes.size,
-    templateCoverageTotal: activityTemplates.length,
-    totalActivities: activities.length,
-    totalReadyTemplateOptions,
-  };
-}
 
 function normalizeActivitySearch(value?: string) {
   const normalized = value?.replace(/\s+/g, ' ').trim();
