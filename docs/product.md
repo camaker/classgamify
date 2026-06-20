@@ -11,6 +11,12 @@ templates, publish assignments, and review student attempts.
 Activity -> Assignment -> Attempt -> Results
 ```
 
+Copied-template surfaces should be retired in narrow, verified waves. Public
+navigation and homepage entry points should point at ClassGamify templates,
+creation, assignment links, and results before legacy learning routes are
+deleted, because those old routes still share generated route-tree and locale
+infrastructure.
+
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
   groups, vocabulary, learning goal, answer explanations, and teacher notes.

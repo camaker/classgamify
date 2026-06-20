@@ -6,9 +6,10 @@ import { Link } from '@tanstack/react-router';
 import {
   IconArrowRight,
   IconCheck,
+  IconChartBar,
+  IconDeviceGamepad2,
   IconFileText,
-  IconPencil,
-  IconRotate,
+  IconShare3,
 } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
 
@@ -30,7 +31,7 @@ export default function HeroSection() {
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             {/* introduction */}
             <Link
-              to={Routes.Hsk1}
+              to={Routes.Templates}
               className="animate-fade-up delay-0 hover:bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border border-border p-1 pl-4 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:rounded-full"
             >
               <span className="text-foreground text-sm font-medium">
@@ -62,7 +63,7 @@ export default function HeroSection() {
             <div className="animate-fade-up delay-3 mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-12 sm:gap-4">
               <div className="bg-foreground/10 rounded-xl">
                 <Link
-                  to={Routes.Hsk1}
+                  to={Routes.Create}
                   className={cn(
                     buttonVariants({ size: 'lg' }),
                     'h-10.5 rounded-xl px-5 text-base'
@@ -72,7 +73,7 @@ export default function HeroSection() {
                 </Link>
               </div>
               <Link
-                to={Routes.Worksheets}
+                to={Routes.Templates}
                 className={cn(
                   buttonVariants({ size: 'lg', variant: 'outline' }),
                   'h-10.5 rounded-xl px-5'
@@ -94,11 +95,11 @@ export default function HeroSection() {
 }
 
 function ProductPreview() {
-  const characters = [
-    { character: '人', label: 'ren', state: 'done' },
-    { character: '口', label: 'kou', state: 'review' },
-    { character: '日', label: 'ri', state: 'active' },
-    { character: '月', label: 'yue', state: 'next' },
+  const activities = [
+    { label: 'Quiz', score: '86%', state: 'done' },
+    { label: 'Match', score: '12 pairs', state: 'active' },
+    { label: 'Sort', score: '3 groups', state: 'review' },
+    { label: 'Listen', score: '4 tracks', state: 'next' },
   ];
 
   return (
@@ -108,21 +109,21 @@ function ProductPreview() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                HSK1 Foundations
+                Class activity library
               </p>
               <h2 className="mt-1 text-2xl font-semibold">
-                Write 日 with guided strokes
+                Food vocabulary review
               </h2>
             </div>
             <div className="rounded-lg border bg-muted/40 px-3 py-2 text-sm tabular-nums">
-              3/10
+              18/21
             </div>
           </div>
 
           <div className="grid grid-cols-4 gap-2">
-            {characters.map((item) => (
+            {activities.map((item) => (
               <div
-                key={item.character}
+                key={item.label}
                 className={cn(
                   'flex aspect-square flex-col items-center justify-center rounded-lg border bg-card',
                   item.state === 'done' &&
@@ -132,11 +133,11 @@ function ProductPreview() {
                   item.state === 'active' && 'border-primary bg-primary/5'
                 )}
               >
-                <span className="text-3xl font-semibold leading-none">
-                  {item.character}
+                <span className="text-sm font-semibold leading-none">
+                  {item.label}
                 </span>
                 <span className="mt-1 text-xs text-muted-foreground">
-                  {item.label}
+                  {item.score}
                 </span>
               </div>
             ))}
@@ -145,20 +146,20 @@ function ProductPreview() {
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="rounded-lg border bg-muted/30 p-3 text-left">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <IconPencil className="size-4 text-primary" />
-                Guided tracing
+                <IconDeviceGamepad2 className="size-4 text-primary" />
+                Game templates
               </div>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Watch the order, then trace each highlighted stroke.
+                Turn one lesson into quiz, match, sort, and worksheet modes.
               </p>
             </div>
             <div className="rounded-lg border bg-muted/30 p-3 text-left">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <IconFileText className="size-4 text-primary" />
-                Printable review
+                Assignment links
               </div>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Turn missed strokes into focused handwriting sheets.
+                Share a student runner with settings, timer, and instructions.
               </p>
             </div>
           </div>
@@ -166,22 +167,43 @@ function ProductPreview() {
 
         <div className="flex min-h-[20rem] items-center justify-center rounded-xl border bg-muted/20 p-4">
           <div className="relative flex size-64 items-center justify-center rounded-xl border bg-background shadow-sm sm:size-72">
-            <div className="absolute inset-6 rounded-lg border border-dashed" />
-            <div className="absolute left-1/2 top-6 h-[calc(100%-3rem)] -translate-x-1/2 border-l border-dashed" />
-            <div className="absolute top-1/2 left-6 w-[calc(100%-3rem)] -translate-y-1/2 border-t border-dashed" />
-            <span className="relative text-9xl font-semibold leading-none">
-              日
-            </span>
+            <div className="absolute inset-5 grid gap-3">
+              <div className="rounded-lg border bg-primary/5 p-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <IconShare3 className="size-4 text-primary" />
+                  /play/food-review
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-primary/25">
+                  <div className="h-2 w-3/4 rounded-full bg-primary" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border bg-card p-3">
+                  <p className="text-xs text-muted-foreground">Average</p>
+                  <p className="mt-2 text-2xl font-semibold">84%</p>
+                </div>
+                <div className="rounded-lg border bg-card p-3">
+                  <p className="text-xs text-muted-foreground">Done</p>
+                  <p className="mt-2 text-2xl font-semibold">18</p>
+                </div>
+              </div>
+              <div className="rounded-lg border bg-card p-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <IconChartBar className="size-4 text-primary" />
+                  Reteach: drinks vs food
+                </div>
+              </div>
+            </div>
             <div className="absolute right-3 top-3 rounded-full border bg-background px-2.5 py-1 text-xs font-medium">
-              Stroke 2
+              Live
             </div>
             <div className="absolute bottom-3 left-3 flex gap-2">
               <span className="inline-flex items-center gap-1 rounded-full border bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-700 dark:text-emerald-300">
                 <IconCheck className="size-3.5" />
-                clean
+                scored
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border bg-amber-500/10 px-2.5 py-1 text-xs text-amber-700 dark:text-amber-300">
-                <IconRotate className="size-3.5" />
+                <IconChartBar className="size-3.5" />
                 review
               </span>
             </div>

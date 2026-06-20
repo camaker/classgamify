@@ -109,6 +109,7 @@ assignment publishing is enabled.
 | 14 | Answer matching accepts teacher-defined alternatives | Create a fill-blank or listening activity whose answer field contains alternatives separated by `/` or `;`, publish it, submit an answer with different casing or punctuation, and verify scoring treats the accepted alternative as correct while preserving the original review answer and showing the accepted alternatives only after submission. |
 | 15 | Time-limited assignments show attempt duration | Publish an assignment with a short time limit, verify `/dashboard/assignments` and `/dashboard/assignments/:assignmentId` show the shared settings summary with timer, attempt limit, close time, and instructions, open `/play/:shareId`, verify the countdown appears, submit an attempt, verify the score panel shows elapsed time, and verify the result page shows average time plus per-attempt duration. |
 | 16 | Quiz choices are completed from lesson content | Create or edit a quiz activity with question answers but sparse or missing choices plus vocabulary terms, publish it, open `/play/:shareId`, and verify the quiz renders deterministic multiple-choice options without exposing which option is correct before submission. |
+| 17 | Homepage routes into ClassGamify product loops | Open `/`, verify the hero preview and primary actions point to templates or activity creation rather than legacy Hanzi, HSK, or worksheet routes, then follow the primary CTA and verify the activity creation page loads. |
 
 ## Deferred Coverage
 
