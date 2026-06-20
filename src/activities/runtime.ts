@@ -1,4 +1,5 @@
 import { matchAnswer } from '@/activities/answer-matching';
+import { buildQuestionChoices } from '@/activities/distractors';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -67,10 +68,18 @@ export function getRuntimeItems(
     case 'fill-blank':
     case 'listening':
     case 'open-box':
-    case 'quiz':
       return content.questions.map((question) => ({
         answer: question.answer,
         choices: question.options?.map((option) => option.text),
+        explanation: question.explanation,
+        id: question.id,
+        kind: 'question',
+        prompt: question.prompt,
+      }));
+    case 'quiz':
+      return content.questions.map((question) => ({
+        answer: question.answer,
+        choices: buildQuestionChoices({ content, question }),
         explanation: question.explanation,
         id: question.id,
         kind: 'question',

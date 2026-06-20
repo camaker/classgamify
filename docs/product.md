@@ -91,7 +91,10 @@ Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission
 contract. Accepted alternatives are revealed only in the post-submit review when
-the assignment allows correct-answer reveal.
+the assignment allows correct-answer reveal. Quiz runtime can deterministically
+fill missing multiple-choice distractors from sibling answers and vocabulary so
+teacher-entered questions remain playable before AI distractor generation is
+connected.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
@@ -125,6 +128,9 @@ Implementation boundaries:
 - `src/activities/template-remix.ts` owns deterministic template readiness and
   remix suggestions. AI remixing should build on this module instead of
   duplicating template requirement logic in UI code.
+- `src/activities/distractors.ts` owns deterministic quiz choice completion.
+  AI distractor generation should write into the same question option structure
+  instead of changing the student submission contract.
 - `src/api/activity-ai.ts` exposes the authenticated server function.
 - `src/components/activities/activity-create-form.tsx` only collects draft
   inputs and fills the existing form.
