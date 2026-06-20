@@ -761,12 +761,12 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
                 </Badge>
               ) : null}
               <span className="text-xs text-muted-foreground">
-                {option.isReady ? 'Ready' : 'Needs more content'}
+                {option.readinessLabel}
               </span>
             </div>
             {!option.isReady ? (
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                Add {option.missingRequirements.join(', ')}.
+                {option.diagnosis}
               </p>
             ) : null}
           </div>
@@ -830,11 +830,7 @@ function ActivityTemplateReadinessPanel({
               key={option.template.type}
               className="text-muted-foreground text-xs leading-5"
             >
-              Add{' '}
-              {option.missingRequirements
-                .map(formatTemplateRequirement)
-                .join(', ')}{' '}
-              to unlock {option.template.shortName}.
+              {option.diagnosis}
             </p>
           ))}
         </div>

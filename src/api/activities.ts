@@ -12,7 +12,7 @@ import { getTemplateByType } from '@/activities/catalog';
 import { normalizeActivityLibrarySearch } from '@/activities/library-filters';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import { getMissingTemplateRequirements } from '@/activities/template-remix';
+import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -210,14 +210,13 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     if (!targetTemplate) {
       throw new Error('Template not found.');
     }
-    const missingRequirements = getMissingTemplateRequirements(
-      targetTemplate,
-      sourceActivity.contentJson
-    );
-    if (missingRequirements.length > 0) {
-      throw new Error(
-        `This activity needs ${missingRequirements.join(', ')} before remixing.`
-      );
+    const remixOption = getTemplateRemixOption({
+      content: sourceActivity.contentJson,
+      currentTemplateType: sourceActivity.templateType,
+      template: targetTemplate,
+    });
+    if (!remixOption.isReady) {
+      throw new Error(remixOption.diagnosis);
     }
 
     const now = new Date();

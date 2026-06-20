@@ -6,9 +6,13 @@ import type {
 } from '@/activities/types';
 
 export type TemplateRemixOption = {
+  diagnosis: string;
   isCurrent: boolean;
   isReady: boolean;
+  missingRequirementCount: number;
+  missingRequirementLabels: string[];
   missingRequirements: Array<keyof ActivityContent>;
+  readinessLabel: string;
   template: ActivityTemplateDefinition;
 };
 
@@ -26,19 +30,13 @@ export function getTemplateRemixPlan({
   content: ActivityContent;
   currentTemplateType: ActivityTemplateType;
 }): TemplateRemixPlan {
-  const options = activityTemplates.map((template) => {
-    const missingRequirements = getMissingTemplateRequirements(
+  const options = activityTemplates.map((template) =>
+    getTemplateRemixOption({
+      content,
+      currentTemplateType,
       template,
-      content
-    );
-
-    return {
-      isCurrent: template.type === currentTemplateType,
-      isReady: missingRequirements.length === 0,
-      missingRequirements,
-      template,
-    };
-  });
+    })
+  );
   const readyOptions = options.filter((option) => option.isReady);
   const suggestedOptions = readyOptions.filter((option) => !option.isCurrent);
 
@@ -50,6 +48,39 @@ export function getTemplateRemixPlan({
   };
 }
 
+export function getTemplateRemixOption({
+  content,
+  currentTemplateType,
+  template,
+}: {
+  content: ActivityContent;
+  currentTemplateType: ActivityTemplateType;
+  template: ActivityTemplateDefinition;
+}): TemplateRemixOption {
+  const missingRequirements = getMissingTemplateRequirements(template, content);
+  const isCurrent = template.type === currentTemplateType;
+  const isReady = missingRequirements.length === 0;
+  const missingRequirementLabels = missingRequirements.map(
+    formatTemplateRequirement
+  );
+
+  return {
+    diagnosis: buildTemplateRemixDiagnosis({
+      isCurrent,
+      isReady,
+      missingRequirementLabels,
+      template,
+    }),
+    isCurrent,
+    isReady,
+    missingRequirementCount: missingRequirements.length,
+    missingRequirementLabels,
+    missingRequirements,
+    readinessLabel: isReady ? 'Ready' : 'Needs more content',
+    template,
+  };
+}
+
 export function getMissingTemplateRequirements(
   template: ActivityTemplateDefinition,
   content: ActivityContent
@@ -58,6 +89,44 @@ export function getMissingTemplateRequirements(
     const value = content[requirement];
     return Array.isArray(value) ? value.length === 0 : !value;
   });
+}
+
+function buildTemplateRemixDiagnosis({
+  isCurrent,
+  isReady,
+  missingRequirementLabels,
+  template,
+}: {
+  isCurrent: boolean;
+  isReady: boolean;
+  missingRequirementLabels: string[];
+  template: ActivityTemplateDefinition;
+}) {
+  if (isReady && isCurrent) {
+    return `${template.shortName} is selected and ready.`;
+  }
+
+  if (isReady) {
+    return `Ready to remix into ${template.shortName}.`;
+  }
+
+  return `Add ${formatTemplateRequirementList(
+    missingRequirementLabels
+  )} to unlock ${template.shortName}.`;
+}
+
+export function formatTemplateRequirementList(requirements: string[]) {
+  if (requirements.length <= 1) {
+    return requirements[0] ?? '';
+  }
+
+  if (requirements.length === 2) {
+    return `${requirements[0]} and ${requirements[1]}`;
+  }
+
+  return `${requirements.slice(0, -1).join(', ')}, and ${
+    requirements[requirements.length - 1]
+  }`;
 }
 
 export function formatTemplateRequirement(requirement: keyof ActivityContent) {

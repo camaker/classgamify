@@ -25,6 +25,7 @@ import {
 } from '@/activities/lifecycle';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import {
+  formatTemplateRequirementList,
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
@@ -429,12 +430,57 @@ assert.deepEqual(
 );
 assert.deepEqual(
   questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'match-up'
+  )?.missingRequirementLabels,
+  ['match pairs']
+);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'match-up'
+  )?.missingRequirementCount,
+  1
+);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'match-up'
+  )?.readinessLabel,
+  'Needs more content'
+);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'match-up'
+  )?.diagnosis,
+  'Add match pairs to unlock Match.'
+);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'quiz'
+  )?.diagnosis,
+  'Quiz is selected and ready.'
+);
+assert.equal(
+  questionOnlyRemixPlan.options.find(
+    (option) => option.template.type === 'fill-blank'
+  )?.diagnosis,
+  'Ready to remix into Fill.'
+);
+assert.deepEqual(
+  questionOnlyRemixPlan.options.find(
     (option) => option.template.type === 'group-sort'
   )?.missingRequirements,
   ['groups']
 );
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
+assert.equal(formatTemplateRequirementList(['questions']), 'questions');
+assert.equal(
+  formatTemplateRequirementList(['questions', 'match pairs']),
+  'questions and match pairs'
+);
+assert.equal(
+  formatTemplateRequirementList(['questions', 'match pairs', 'groups']),
+  'questions, match pairs, and groups'
+);
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);
   const input = createActivityInputSchema.parse({
@@ -509,7 +555,10 @@ assert.equal(
 );
 assert.ok(
   fallbackDraftResult.meta.templateReadiness.some(
-    (option) => option.template === 'listening' && option.isCurrent
+    (option) =>
+      option.template === 'listening' &&
+      option.isCurrent &&
+      option.diagnosis === 'Listen is selected and ready.'
   )
 );
 assert.ok(
@@ -544,7 +593,10 @@ assert.equal(
 );
 assert.ok(
   fallbackDraftMeta.templateReadiness.some(
-    (option) => option.template === 'listening' && option.isCurrent
+    (option) =>
+      option.template === 'listening' &&
+      option.isCurrent &&
+      option.readinessLabel === 'Ready'
   )
 );
 assert.ok(

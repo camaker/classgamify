@@ -12,10 +12,7 @@ import {
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
-import {
-  formatTemplateRequirement,
-  getTemplateRemixPlan,
-} from '@/activities/template-remix';
+import { getTemplateRemixPlan } from '@/activities/template-remix';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -770,11 +767,7 @@ function ActivityCard({
                     key={option.template.type}
                     className="text-xs leading-5 text-muted-foreground"
                   >
-                    Add{' '}
-                    {option.missingRequirements
-                      .map(formatTemplateRequirement)
-                      .join(', ')}{' '}
-                    to unlock {option.template.shortName}.
+                    {option.diagnosis}
                   </p>
                 ))}
             </div>

@@ -1,7 +1,4 @@
-import {
-  formatTemplateRequirement,
-  getTemplateRemixPlan,
-} from '@/activities/template-remix';
+import { getTemplateRemixPlan } from '@/activities/template-remix';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
   buildActivityContent,
@@ -25,9 +22,12 @@ export type ActivityDraftMeta = {
 };
 
 export type ActivityDraftTemplateReadiness = {
+  diagnosis: string;
   isCurrent: boolean;
   isReady: boolean;
+  missingRequirementCount: number;
   missingRequirements: string[];
+  readinessLabel: string;
   shortName: string;
   template: ActivityTemplateType;
 };
@@ -65,11 +65,12 @@ export function buildActivityDraftMeta({
     suggestedTemplateCount: suggestedTemplates.length,
     suggestedTemplates,
     templateReadiness: remixPlan.options.map((option) => ({
+      diagnosis: option.diagnosis,
       isCurrent: option.isCurrent,
       isReady: option.isReady,
-      missingRequirements: option.missingRequirements.map(
-        formatTemplateRequirement
-      ),
+      missingRequirementCount: option.missingRequirementCount,
+      missingRequirements: option.missingRequirementLabels,
+      readinessLabel: option.readinessLabel,
       shortName: option.template.shortName,
       template: option.template.type,
     })),
