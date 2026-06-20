@@ -16,6 +16,7 @@ import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
+import { buildActivityDraftMeta } from '@/activities/draft-meta';
 import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
@@ -371,6 +372,10 @@ const fallbackRemixPlan = getTemplateRemixPlan({
   content: fallbackContent,
   currentTemplateType: fallbackDraft.templateType,
 });
+const fallbackDraftMeta = buildActivityDraftMeta({
+  activity: fallbackDraft,
+  currentTemplateType: fallbackDraft.templateType,
+});
 assert.equal(fallbackDraft.templateType, 'listening');
 assert.equal(fallbackDraftResult.provider, 'fallback');
 assert.equal(fallbackDraftResult.model, 'test-model');
@@ -407,6 +412,25 @@ assert.ok(
   )
 );
 assert.ok(fallbackRemixPlan.suggestedOptions.length >= 3);
+assert.deepEqual(fallbackDraftMeta.coverage, fallbackDraftResult.meta.coverage);
+assert.equal(
+  fallbackDraftMeta.readyTemplateCount,
+  fallbackDraftMeta.readyTemplates.length
+);
+assert.equal(
+  fallbackDraftMeta.suggestedTemplateCount,
+  fallbackDraftMeta.suggestedTemplates.length
+);
+assert.ok(
+  fallbackDraftMeta.templateReadiness.some(
+    (option) => option.template === 'listening' && option.isCurrent
+  )
+);
+assert.ok(
+  fallbackDraftMeta.reviewChecklist.some((item) =>
+    item.includes('Ready to remix after saving')
+  )
+);
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,

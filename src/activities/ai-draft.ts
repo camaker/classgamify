@@ -1,14 +1,12 @@
 import { activityTemplates } from '@/activities/catalog';
 import {
-  formatTemplateRequirement,
-  getTemplateRemixPlan,
-  type TemplateRemixPlan,
-} from '@/activities/template-remix';
+  buildActivityDraftMeta,
+  type ActivityDraftMeta,
+} from '@/activities/draft-meta';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
-  buildActivityContent,
   createActivityInputSchema,
   type CreateActivityInput,
 } from '@/activities/validation';
@@ -40,30 +38,6 @@ export type ActivityDraftResult = {
   model: string;
   notice?: string;
   provider: 'fallback' | 'workers-ai';
-};
-
-export type ActivityDraftMeta = {
-  coverage: {
-    groups: number;
-    pairs: number;
-    questions: number;
-    teacherNotes: number;
-    vocabulary: number;
-  };
-  readyTemplateCount: number;
-  readyTemplates: string[];
-  reviewChecklist: string[];
-  suggestedTemplateCount: number;
-  suggestedTemplates: string[];
-  templateReadiness: ActivityDraftTemplateReadiness[];
-};
-
-export type ActivityDraftTemplateReadiness = {
-  isCurrent: boolean;
-  isReady: boolean;
-  missingRequirements: string[];
-  shortName: string;
-  template: ActivityTemplateType;
 };
 
 const aiQuestionSchema = z.object({
@@ -265,69 +239,13 @@ function createActivityDraftResult({
   activity: CreateActivityInput;
   input: GenerateActivityDraftInput;
 }) {
-  const content = buildActivityContent(activity);
-  const remixPlan = getTemplateRemixPlan({
-    content,
-    currentTemplateType: input.templateType,
-  });
-
   return {
     activity,
-    meta: buildActivityDraftMeta(remixPlan, activity),
+    meta: buildActivityDraftMeta({
+      activity,
+      currentTemplateType: input.templateType,
+    }),
   };
-}
-
-function buildActivityDraftMeta(
-  remixPlan: TemplateRemixPlan,
-  activity: CreateActivityInput
-): ActivityDraftMeta {
-  const content = buildActivityContent(activity);
-  const suggestedTemplates = remixPlan.suggestedOptions.map(
-    (option) => option.template.shortName
-  );
-  const readyTemplates = remixPlan.readyOptions.map(
-    (option) => option.template.shortName
-  );
-
-  return {
-    coverage: {
-      groups: content.groups.length,
-      pairs: content.pairs.length,
-      questions: content.questions.length,
-      teacherNotes: content.teacherNotes.length,
-      vocabulary: content.vocabulary.length,
-    },
-    readyTemplateCount: remixPlan.readyOptions.length,
-    readyTemplates,
-    reviewChecklist: buildDraftReviewChecklist(activity, suggestedTemplates),
-    suggestedTemplateCount: suggestedTemplates.length,
-    suggestedTemplates,
-    templateReadiness: remixPlan.options.map((option) => ({
-      isCurrent: option.isCurrent,
-      isReady: option.isReady,
-      missingRequirements: option.missingRequirements.map(
-        formatTemplateRequirement
-      ),
-      shortName: option.template.shortName,
-      template: option.template.type,
-    })),
-  };
-}
-
-function buildDraftReviewChecklist(
-  activity: CreateActivityInput,
-  suggestedTemplates: string[]
-) {
-  return [
-    'Review every answer before saving.',
-    'Adjust wording for your class level.',
-    activity.questionsText?.includes('|')
-      ? 'Check explanations and distractor choices.'
-      : 'Add questions before publishing quiz-style work.',
-    suggestedTemplates.length > 0
-      ? `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
-      : 'Add more structured pairs or groups to unlock more templates.',
-  ];
 }
 
 export function createFallbackActivityDraftResult({
