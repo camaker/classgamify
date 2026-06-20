@@ -14,6 +14,17 @@ export type ItemPerformanceSort =
   | 'type';
 export type AttemptReviewFilter = 'all' | 'needs-review';
 
+export type ResultSearchSummaryInput = {
+  matchedAttempts: number;
+  matchedStudents: number;
+  search: string;
+};
+
+export type AttemptReviewSubmissionSummaryInput = {
+  shownAttempts: number;
+  totalAttempts: number;
+};
+
 export type AssignmentAttemptRowInput = {
   id: string;
   studentName: string | null;
@@ -94,6 +105,29 @@ export function filterAttemptReviews({
 
     return true;
   });
+}
+
+export function buildResultSearchSummary({
+  matchedAttempts,
+  matchedStudents,
+  search,
+}: ResultSearchSummaryInput) {
+  if (!normalizeResultSearch(search)) return 'All students';
+
+  return [
+    formatCount(matchedStudents, 'student'),
+    formatCount(matchedAttempts, 'attempt'),
+  ].join(' · ');
+}
+
+export function buildAttemptReviewSubmissionSummary({
+  shownAttempts,
+  totalAttempts,
+}: AttemptReviewSubmissionSummaryInput) {
+  return `Showing ${shownAttempts} of ${totalAttempts} ${pluralize(
+    totalAttempts,
+    'submission'
+  )}.`;
 }
 
 export function sortStudentSummaries(
@@ -197,4 +231,12 @@ function compareStudentsDescending(
 ) {
   if (leftValue !== rightValue) return rightValue - leftValue;
   return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
+}
+
+function formatCount(count: number, singularLabel: string) {
+  return `${count} ${pluralize(count, singularLabel)}`;
+}
+
+function pluralize(count: number, singularLabel: string) {
+  return count === 1 ? singularLabel : `${singularLabel}s`;
 }

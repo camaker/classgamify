@@ -58,7 +58,9 @@ import {
   stableShuffle,
 } from '@/assignments/item-order';
 import {
+  buildAttemptReviewSubmissionSummary,
   buildFilteredAttemptRows,
+  buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
   matchesResultSearch,
@@ -1142,6 +1144,44 @@ assert.equal(
 );
 assert.equal(matchesResultSearch('Anonymous student 1', 'student 1'), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
+assert.equal(
+  buildResultSearchSummary({
+    matchedAttempts: 3,
+    matchedStudents: 2,
+    search: '',
+  }),
+  'All students'
+);
+assert.equal(
+  buildResultSearchSummary({
+    matchedAttempts: 1,
+    matchedStudents: 1,
+    search: 'alice',
+  }),
+  '1 student · 1 attempt'
+);
+assert.equal(
+  buildResultSearchSummary({
+    matchedAttempts: 2,
+    matchedStudents: 1,
+    search: ' alice ',
+  }),
+  '1 student · 2 attempts'
+);
+assert.equal(
+  buildAttemptReviewSubmissionSummary({
+    shownAttempts: 1,
+    totalAttempts: 1,
+  }),
+  'Showing 1 of 1 submission.'
+);
+assert.equal(
+  buildAttemptReviewSubmissionSummary({
+    shownAttempts: 2,
+    totalAttempts: 3,
+  }),
+  'Showing 2 of 3 submissions.'
+);
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
 assert.equal(parseItemPerformanceSort('submitted'), 'submitted');

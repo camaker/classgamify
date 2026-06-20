@@ -8,10 +8,11 @@ import {
   type AttemptReviewFilter,
   type ItemPerformanceSort,
   type StudentSummarySort,
+  buildAttemptReviewSubmissionSummary,
   buildFilteredAttemptRows,
+  buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
-  normalizeResultSearch,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
@@ -647,12 +648,10 @@ function AssignmentResultsPage() {
                 </div>
                 <CardDescription>
                   <p>
-                    Showing {filteredAttemptReviews.length} of{' '}
-                    {data.analysis.attempts.length}{' '}
-                    {data.analysis.attempts.length === 1
-                      ? 'submission'
-                      : 'submissions'}
-                    .
+                    {buildAttemptReviewSubmissionSummary({
+                      shownAttempts: filteredAttemptReviews.length,
+                      totalAttempts: data.analysis.attempts.length,
+                    })}
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -773,10 +772,11 @@ function ResultStudentSearch({
   sort: StudentSummarySort;
   value: string;
 }) {
-  const hasSearch = Boolean(normalizeResultSearch(value));
-  const summary = hasSearch
-    ? `${matchedStudents} ${matchedStudents === 1 ? 'student' : 'students'} · ${matchedAttempts} ${matchedAttempts === 1 ? 'attempt' : 'attempts'}`
-    : 'All students';
+  const summary = buildResultSearchSummary({
+    matchedAttempts,
+    matchedStudents,
+    search: value,
+  });
 
   return (
     <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
