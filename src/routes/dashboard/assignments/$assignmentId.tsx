@@ -1007,7 +1007,7 @@ function ItemAnalysisCard({
       </p>
       {item.acceptedAnswers.length > 1 ? (
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          Accepted: {item.acceptedAnswers.join(', ')}
+          Accepted: {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
         </p>
       ) : null}
       {item.explanation ? (
@@ -1065,7 +1065,8 @@ function AttemptReviewCard({
             </div>
             {answer.acceptedAnswers.length > 1 ? (
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                Accepted answers: {answer.acceptedAnswers.join(', ')}
+                Accepted answers:{' '}
+                {formatAcceptedAnswerAlternatives(answer.acceptedAnswers)}
               </p>
             ) : null}
             {answer.explanation ? (

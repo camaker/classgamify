@@ -1,4 +1,5 @@
 import type { PublicAttemptReviewItem } from '@/assignments/public';
+import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import { cn } from '@/lib/utils';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
@@ -34,7 +35,8 @@ export function PublicAnswerFeedback({
       </span>
       {reviewItem.acceptedAnswers.length > 1 ? (
         <span className="basis-full text-muted-foreground">
-          Accepted answers: {reviewItem.acceptedAnswers.join(', ')}
+          Accepted answers:{' '}
+          {formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers)}
         </span>
       ) : null}
       {reviewItem.explanation ? (
