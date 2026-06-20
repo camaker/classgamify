@@ -4,6 +4,7 @@ import type {
   AssignmentStudentSummary,
 } from '@/assignments/results';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
+import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -122,16 +123,7 @@ export function sortStudentSummaries(
       );
     }
 
-    if (left.needsReviewCount !== right.needsReviewCount) {
-      return right.needsReviewCount - left.needsReviewCount;
-    }
-    if (left.latestAccuracy !== right.latestAccuracy) {
-      return left.latestAccuracy - right.latestAccuracy;
-    }
-    return (
-      getDateTimestamp(right.lastCompletedAt) -
-      getDateTimestamp(left.lastCompletedAt)
-    );
+    return compareAssignmentStudentsByFollowUpPriority(left, right);
   });
 }
 
@@ -205,8 +197,4 @@ function compareStudentsDescending(
 ) {
   if (leftValue !== rightValue) return rightValue - leftValue;
   return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
-}
-
-function getDateTimestamp(value: Date | null) {
-  return value?.getTime() ?? 0;
 }

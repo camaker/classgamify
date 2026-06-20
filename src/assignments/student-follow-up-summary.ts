@@ -1,3 +1,4 @@
+import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import type { AssignmentStudentSummary } from '@/assignments/results';
 
 export type AssignmentStudentFollowUpSummaryInput = {
@@ -9,15 +10,7 @@ export function buildAssignmentStudentFollowUpSummary({
   assignmentTitle,
   students,
 }: AssignmentStudentFollowUpSummaryInput) {
-  const sortedStudents = [...students].sort((left, right) => {
-    if (left.needsReviewCount !== right.needsReviewCount) {
-      return right.needsReviewCount - left.needsReviewCount;
-    }
-    if (left.latestAccuracy !== right.latestAccuracy) {
-      return left.latestAccuracy - right.latestAccuracy;
-    }
-    return left.studentLabel.localeCompare(right.studentLabel);
-  });
+  const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
 
   const lines = [
     `ClassGamify student follow-up: ${assignmentTitle}`,

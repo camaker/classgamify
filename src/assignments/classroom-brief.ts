@@ -4,6 +4,7 @@ import type {
 } from '@/assignments/results';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 
 export type AssignmentClassroomBriefStats = {
   averageDurationSeconds: number;
@@ -62,18 +63,7 @@ function getClassroomBriefFocusItems(items: AssignmentItemAnalysis[]) {
 function getClassroomBriefFollowUpStudents(
   students: AssignmentStudentSummary[]
 ) {
-  return students
-    .filter((student) => student.needsReviewCount > 0)
-    .sort((left, right) => {
-      if (left.needsReviewCount !== right.needsReviewCount) {
-        return right.needsReviewCount - left.needsReviewCount;
-      }
-      if (left.latestAccuracy !== right.latestAccuracy) {
-        return left.latestAccuracy - right.latestAccuracy;
-      }
-      return left.studentLabel.localeCompare(right.studentLabel);
-    })
-    .slice(0, 6);
+  return getAssignmentStudentFollowUpPriorityStudents(students, { limit: 6 });
 }
 
 function formatFocusItems(items: AssignmentItemAnalysis[]) {

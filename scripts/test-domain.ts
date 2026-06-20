@@ -73,6 +73,10 @@ import {
   getSubmittedAssignmentReviewPriorityItems,
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
+import {
+  getAssignmentStudentFollowUpPriorityStudents,
+  sortAssignmentStudentsByFollowUpPriority,
+} from '@/assignments/student-follow-up-priority';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
@@ -876,6 +880,60 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Anonymous student 1']
 );
+const followUpPriorityStudents = [
+  {
+    attempts: 1,
+    averageAccuracy: 0,
+    bestAccuracy: 0,
+    lastCompletedAt: new Date('2026-01-03T10:00:00.000Z'),
+    latestAccuracy: 0,
+    needsReviewCount: 0,
+    studentKey: 'name:no-review',
+    studentLabel: 'No review',
+  },
+  {
+    attempts: 1,
+    averageAccuracy: 70,
+    bestAccuracy: 70,
+    lastCompletedAt: new Date('2026-01-02T10:00:00.000Z'),
+    latestAccuracy: 70,
+    needsReviewCount: 3,
+    studentKey: 'name:more-review',
+    studentLabel: 'More review',
+  },
+  {
+    attempts: 1,
+    averageAccuracy: 10,
+    bestAccuracy: 10,
+    lastCompletedAt: new Date('2026-01-01T10:00:00.000Z'),
+    latestAccuracy: 10,
+    needsReviewCount: 1,
+    studentKey: 'name:lower-score',
+    studentLabel: 'Lower score',
+  },
+  {
+    attempts: 1,
+    averageAccuracy: 70,
+    bestAccuracy: 70,
+    lastCompletedAt: new Date('2026-01-04T10:00:00.000Z'),
+    latestAccuracy: 70,
+    needsReviewCount: 3,
+    studentKey: 'name:alpha-review',
+    studentLabel: 'Alpha review',
+  },
+] satisfies typeof resultAnalysis.students;
+assert.deepEqual(
+  sortAssignmentStudentsByFollowUpPriority(followUpPriorityStudents).map(
+    (student) => student.studentLabel
+  ),
+  ['Alpha review', 'More review', 'Lower score', 'No review']
+);
+assert.deepEqual(
+  getAssignmentStudentFollowUpPriorityStudents(followUpPriorityStudents, {
+    limit: 2,
+  }).map((student) => student.studentLabel),
+  ['Alpha review', 'More review']
+);
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'accuracy').map(
     (item) => item.itemId
@@ -1078,7 +1136,7 @@ assert.match(
 const reteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
-  students: resultAnalysis.students,
+  students: followUpPriorityStudents,
 });
 assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
 assert.match(reteachPlan, /Review first:/);
@@ -1086,7 +1144,7 @@ assert.match(reteachPlan, /Student follow-up:/);
 assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
 assert.match(
   reteachPlan,
-  /Anonymous student 1: 0% latest accuracy, 1 item to review/
+  /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
 );
 
 const itemReviewSummary = buildAssignmentItemReviewSummary({
@@ -1107,7 +1165,7 @@ assert.match(itemReviewSummary, /Notes: Paris is the capital of France\./);
 
 const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
   assignmentTitle: csvExportData.assignment.title,
-  students: resultAnalysis.students,
+  students: followUpPriorityStudents,
 });
 assert.match(
   studentFollowUpSummary,
@@ -1115,11 +1173,15 @@ assert.match(
 );
 assert.match(
   studentFollowUpSummary,
-  /Anonymous student 1: latest 0%, average 0%, best 0%, 1 attempt, 1 item to review/
+  /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
 );
 assert.match(
   studentFollowUpSummary,
-  /Alice: latest 100%, average 75%, best 100%, 2 attempts, 0 items to review/
+  /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
+);
+assert.match(
+  studentFollowUpSummary,
+  /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review/
 );
 
 console.log('Domain tests passed.');

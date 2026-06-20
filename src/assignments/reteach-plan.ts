@@ -3,6 +3,7 @@ import type {
   AssignmentStudentSummary,
 } from '@/assignments/results';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 
 export type AssignmentReteachPlanInput = {
   assignmentTitle: string;
@@ -18,15 +19,12 @@ export function buildAssignmentReteachPlan({
   const reviewItems = getSubmittedAssignmentReviewPriorityItems(items, {
     limit: 5,
   });
-  const reviewStudents = students
-    .filter((student) => student.needsReviewCount > 0)
-    .sort((left, right) => {
-      if (left.latestAccuracy !== right.latestAccuracy) {
-        return left.latestAccuracy - right.latestAccuracy;
-      }
-      return right.needsReviewCount - left.needsReviewCount;
-    })
-    .slice(0, 8);
+  const reviewStudents = getAssignmentStudentFollowUpPriorityStudents(
+    students,
+    {
+      limit: 8,
+    }
+  );
   const lines = [
     `ClassGamify reteach plan: ${assignmentTitle}`,
     '',
