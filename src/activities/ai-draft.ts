@@ -1,8 +1,13 @@
 import { activityTemplates } from '@/activities/catalog';
+import {
+  getTemplateRemixPlan,
+  type TemplateRemixPlan,
+} from '@/activities/template-remix';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
+  buildActivityContent,
   createActivityInputSchema,
   type CreateActivityInput,
 } from '@/activities/validation';
@@ -30,9 +35,25 @@ export type GenerateActivityDraftInput = z.infer<
 
 export type ActivityDraftResult = {
   activity: CreateActivityInput;
+  meta: ActivityDraftMeta;
   model: string;
   notice?: string;
   provider: 'fallback' | 'workers-ai';
+};
+
+export type ActivityDraftMeta = {
+  coverage: {
+    groups: number;
+    pairs: number;
+    questions: number;
+    teacherNotes: number;
+    vocabulary: number;
+  };
+  readyTemplateCount: number;
+  readyTemplates: string[];
+  reviewChecklist: string[];
+  suggestedTemplateCount: number;
+  suggestedTemplates: string[];
 };
 
 const aiQuestionSchema = z.object({
@@ -74,7 +95,10 @@ export async function generateActivityDraftFromAi(
 
   if (!hasWorkersAiCredentials()) {
     return {
-      activity: createFallbackActivityDraft(data),
+      ...createActivityDraftResult({
+        activity: createFallbackActivityDraft(data),
+        input: data,
+      }),
       model,
       notice:
         'Workers AI credentials are not configured, so a local deterministic draft was used.',
@@ -107,7 +131,10 @@ export async function generateActivityDraftFromAi(
     draft = parseAiDraftResponse(result.response);
   } catch {
     return {
-      activity: createFallbackActivityDraft(data),
+      ...createActivityDraftResult({
+        activity: createFallbackActivityDraft(data),
+        input: data,
+      }),
       model,
       notice:
         'Workers AI returned an invalid draft, so a local deterministic draft was used.',
@@ -116,7 +143,10 @@ export async function generateActivityDraftFromAi(
   }
 
   return {
-    activity: toCreateActivityInput(draft, data),
+    ...createActivityDraftResult({
+      activity: toCreateActivityInput(draft, data),
+      input: data,
+    }),
     model,
     provider: 'workers-ai',
   };
@@ -224,6 +254,69 @@ function toCreateActivityInput(
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+function createActivityDraftResult({
+  activity,
+  input,
+}: {
+  activity: CreateActivityInput;
+  input: GenerateActivityDraftInput;
+}) {
+  const content = buildActivityContent(activity);
+  const remixPlan = getTemplateRemixPlan({
+    content,
+    currentTemplateType: input.templateType,
+  });
+
+  return {
+    activity,
+    meta: buildActivityDraftMeta(remixPlan, activity),
+  };
+}
+
+function buildActivityDraftMeta(
+  remixPlan: TemplateRemixPlan,
+  activity: CreateActivityInput
+): ActivityDraftMeta {
+  const content = buildActivityContent(activity);
+  const suggestedTemplates = remixPlan.suggestedOptions.map(
+    (option) => option.template.shortName
+  );
+  const readyTemplates = remixPlan.readyOptions.map(
+    (option) => option.template.shortName
+  );
+
+  return {
+    coverage: {
+      groups: content.groups.length,
+      pairs: content.pairs.length,
+      questions: content.questions.length,
+      teacherNotes: content.teacherNotes.length,
+      vocabulary: content.vocabulary.length,
+    },
+    readyTemplateCount: remixPlan.readyOptions.length,
+    readyTemplates,
+    reviewChecklist: buildDraftReviewChecklist(activity, suggestedTemplates),
+    suggestedTemplateCount: suggestedTemplates.length,
+    suggestedTemplates,
+  };
+}
+
+function buildDraftReviewChecklist(
+  activity: CreateActivityInput,
+  suggestedTemplates: string[]
+) {
+  return [
+    'Review every answer before saving.',
+    'Adjust wording for your class level.',
+    activity.questionsText?.includes('|')
+      ? 'Check explanations and distractor choices.'
+      : 'Add questions before publishing quiz-style work.',
+    suggestedTemplates.length > 0
+      ? `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
+      : 'Add more structured pairs or groups to unlock more templates.',
+  ];
 }
 
 function createFallbackActivityDraft(

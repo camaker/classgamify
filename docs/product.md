@@ -153,7 +153,10 @@ AI-assisted creation drafts teacher-reviewable `CreateActivityInput` payloads.
 The AI layer must not bypass the activity editor or persist content directly.
 Teachers should always see and edit the generated title, learning goal,
 vocabulary, questions, answer explanations, pairs, groups, and notes before
-saving.
+saving. AI draft responses should also expose a lightweight coverage summary:
+question, pair, group, vocabulary, and teacher-note counts plus ready template
+families from the deterministic remix plan. This helps teachers judge whether a
+draft is ready for Wordwall-style remixes before they publish anything.
 
 Current flow:
 

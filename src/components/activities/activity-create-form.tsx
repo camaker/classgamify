@@ -1,5 +1,6 @@
 import { activityTemplates } from '@/activities/catalog';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import type { ActivityDraftMeta } from '@/activities/ai-draft';
 import type { ActivityContent } from '@/activities/types';
 import {
   activityDifficultySchema,
@@ -101,6 +102,7 @@ export function ActivityCreateForm({
     getDraftSourceText(initialValues ?? activityFormDefaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
+  const [draftMeta, setDraftMeta] = useState<ActivityDraftMeta>();
   const form = useForm<CreateActivityInput>({
     defaultValues: initialValues ?? activityFormDefaultValues,
     resolver: zodResolver(createActivityInputSchema),
@@ -150,6 +152,7 @@ export function ActivityCreateForm({
         ...result.activity,
         visibility: current.visibility,
       });
+      setDraftMeta(result.meta);
 
       if (result.notice) {
         toast.success('Draft filled from the local generator.');
@@ -312,6 +315,8 @@ export function ActivityCreateForm({
                 </div>
               </div>
             </div>
+
+            {draftMeta ? <ActivityDraftMetaSummary meta={draftMeta} /> : null}
 
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
@@ -647,6 +652,75 @@ export function ActivityCreateForm({
         </form>
       </Form>
     </Card>
+  );
+}
+
+function ActivityDraftMetaSummary({ meta }: { meta: ActivityDraftMeta }) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-semibold text-sm">AI draft coverage</h3>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            Review the generated content before saving it to the activity
+            library.
+          </p>
+        </div>
+        <Badge variant="secondary" className="rounded-md">
+          {meta.readyTemplateCount} ready templates
+        </Badge>
+      </div>
+      <div className="mt-4 grid gap-2 sm:grid-cols-5">
+        <ActivityDraftCoverageStat
+          label="Questions"
+          value={meta.coverage.questions}
+        />
+        <ActivityDraftCoverageStat label="Pairs" value={meta.coverage.pairs} />
+        <ActivityDraftCoverageStat
+          label="Groups"
+          value={meta.coverage.groups}
+        />
+        <ActivityDraftCoverageStat
+          label="Vocab"
+          value={meta.coverage.vocabulary}
+        />
+        <ActivityDraftCoverageStat
+          label="Notes"
+          value={meta.coverage.teacherNotes}
+        />
+      </div>
+      {meta.suggestedTemplates.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {meta.suggestedTemplates.map((template) => (
+            <Badge key={template} variant="outline" className="rounded-md">
+              {template}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
+      <div className="mt-4 grid gap-1.5">
+        {meta.reviewChecklist.map((item) => (
+          <p key={item} className="text-xs leading-5 text-muted-foreground">
+            {item}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityDraftCoverageStat({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="rounded-lg border bg-background p-3">
+      <p className="text-lg font-semibold">{value}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+    </div>
   );
 }
 
