@@ -163,11 +163,15 @@ so summary rows, attempt rows, and answer review cards stay aligned without
 exposing raw anonymous tokens. Student summaries can be sorted by review need,
 best score, student name, or attempt volume so teachers can choose the scan
 order that matches grading, reteaching, or participation follow-up. Teachers can
-also copy a text reteach plan built
-from the lowest-correct-rate items and student follow-up summaries, giving them
-a quick classroom script without exporting a spreadsheet. They can copy the full
-item review summary separately when they need a prompt-by-prompt artifact for
-lesson planning, team review, or parent follow-up. They can also copy a
+also view and copy a compact classroom brief that combines assignment-level
+metrics, the three lowest-performing submitted items, and the students who most
+need follow-up. The brief is teacher-only result data generated from the frozen
+assignment snapshot and stored attempts; it does not change the public student
+runner or expose raw anonymous tokens. Teachers can copy a text reteach plan
+built from the lowest-correct-rate items and student follow-up summaries, giving
+them a quick classroom script without exporting a spreadsheet. They can copy the
+full item review summary separately when they need a prompt-by-prompt artifact
+for lesson planning, team review, or parent follow-up. They can also copy a
 student follow-up summary sorted by review need so individual support lists can
 move into teacher notes without exposing raw anonymous tokens.
 

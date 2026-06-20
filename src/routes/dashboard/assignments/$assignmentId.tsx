@@ -1,3 +1,4 @@
+import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -43,6 +44,7 @@ import { cn } from '@/lib/utils';
 import {
   IconCalendarTime,
   IconChartBar,
+  IconClipboardText,
   IconClock,
   IconCopy,
   IconDownload,
@@ -122,6 +124,16 @@ function AssignmentResultsPage() {
       sortItemPerformance(data?.analysis.perItem ?? [], itemPerformanceSort),
     [data?.analysis.perItem, itemPerformanceSort]
   );
+  const classroomBrief = useMemo(() => {
+    if (!data) return null;
+
+    return buildAssignmentClassroomBrief({
+      assignmentTitle: data.assignment.title,
+      items: data.analysis.perItem,
+      stats: data.stats,
+      students: data.analysis.students,
+    });
+  }, [data]);
 
   function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
     void navigate({
@@ -201,6 +213,24 @@ function AssignmentResultsPage() {
         error instanceof Error
           ? error.message
           : 'Reteach plan could not be copied.'
+      );
+    }
+  }
+
+  async function handleCopyClassroomBrief() {
+    if (!data || !classroomBrief || data.attempts.length === 0) {
+      toast.error('Submit at least one attempt before copying a brief.');
+      return;
+    }
+
+    try {
+      await copyTextToClipboard(classroomBrief.text);
+      toast.success('Classroom brief copied.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Classroom brief could not be copied.'
       );
     }
   }
@@ -347,6 +377,16 @@ function AssignmentResultsPage() {
                   variant="outline"
                   className="w-full sm:w-auto"
                   disabled={!hasAttempts}
+                  onClick={handleCopyClassroomBrief}
+                >
+                  <IconClipboardText className="size-4" />
+                  Copy brief
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={!hasAttempts}
                   onClick={handleCopyReteachPlan}
                 >
                   <IconCopy className="size-4" />
@@ -387,15 +427,20 @@ function AssignmentResultsPage() {
           </Card>
 
           {hasAttempts ? (
-            <ResultStudentSearch
-              matchedAttempts={filteredAttemptRows.length}
-              matchedStudents={filteredStudents.length}
-              onClear={() => setStudentSearch('')}
-              onSearch={setStudentSearch}
-              onSortChange={updateStudentSort}
-              sort={studentSort}
-              value={studentSearch}
-            />
+            <>
+              {classroomBrief ? (
+                <ClassroomBriefCard brief={classroomBrief} />
+              ) : null}
+              <ResultStudentSearch
+                matchedAttempts={filteredAttemptRows.length}
+                matchedStudents={filteredStudents.length}
+                onClear={() => setStudentSearch('')}
+                onSearch={setStudentSearch}
+                onSortChange={updateStudentSort}
+                sort={studentSort}
+                value={studentSearch}
+              />
+            </>
           ) : null}
 
           {data.analysis.perItem.length > 0 ? (
@@ -572,6 +617,89 @@ function AssignmentResultsPage() {
         </div>
       )}
     </DashboardLayout>
+  );
+}
+
+function ClassroomBriefCard({
+  brief,
+}: {
+  brief: NonNullable<ReturnType<typeof buildAssignmentClassroomBrief>>;
+}) {
+  return (
+    <Card className="rounded-lg">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <IconClipboardText className="size-5 text-primary" />
+          <CardTitle>
+            <h2 className="text-lg font-semibold">Classroom brief</h2>
+          </CardTitle>
+        </div>
+        <CardDescription>
+          <p>
+            A compact class-ready summary built from the frozen assignment
+            snapshot and submitted attempts.
+          </p>
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border bg-muted/20 p-4">
+          <h3 className="font-medium text-sm">Class review focus</h3>
+          <div className="mt-3 grid gap-3">
+            {brief.focusItems.length > 0 ? (
+              brief.focusItems.map((item, index) => (
+                <div key={item.itemId} className="grid gap-1 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="min-w-0 font-medium">
+                      {index + 1}. {item.prompt}
+                    </p>
+                    <Badge variant="outline" className="rounded-md">
+                      {item.correctRate}%
+                    </Badge>
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    {item.correctCount}/{item.submittedCount} correct
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                No submitted item data yet.
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="rounded-lg border bg-muted/20 p-4">
+          <h3 className="font-medium text-sm">Student follow-up</h3>
+          <div className="mt-3 grid gap-3">
+            {brief.followUpStudents.length > 0 ? (
+              brief.followUpStudents.map((student) => (
+                <div
+                  key={student.studentKey}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">
+                      {student.studentLabel}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      Latest {student.latestAccuracy}% · best{' '}
+                      {student.bestAccuracy}%
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="rounded-md">
+                    {student.needsReviewCount} review
+                  </Badge>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-sm">
+                No student-specific review needs yet.
+              </p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
