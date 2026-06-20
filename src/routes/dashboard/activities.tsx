@@ -27,9 +27,11 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  useArchiveActivity,
   useActivities,
   useDuplicateActivity,
   useRemixActivityTemplate,
+  useRestoreActivity,
 } from '@/hooks/use-activities';
 import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
@@ -38,8 +40,11 @@ import {
   IconCopy,
   IconDeviceGamepad2,
   IconEdit,
+  IconFolder,
+  IconFolderOff,
   IconLayoutGrid,
   IconPlus,
+  IconRotateClockwise,
   IconSearch,
   IconSparkles,
   IconSwitchHorizontal,
@@ -59,34 +64,49 @@ type ActivityCardData = {
   title: string;
 };
 
+type ActivityLibraryStatus = 'active' | 'archived';
+
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
     created: typeof search.created === 'string' ? search.created : undefined,
     q: typeof search.q === 'string' ? search.q : undefined,
+    status:
+      search.status === 'archived' || search.status === 'active'
+        ? search.status
+        : undefined,
   }),
   component: DashboardActivitiesPage,
 });
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
-  const { created, q } = Route.useSearch();
+  const { created, q, status } = Route.useSearch();
   const searchQuery = q ?? '';
+  const libraryStatus = status ?? 'active';
   const normalizedSearchQuery = normalizeActivitySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
     pageIndex: 0,
     pageSize: 50,
     search: normalizedSearchQuery,
+    status: libraryStatus,
   });
   const activities = data?.items ?? [];
   const hasActivities = activities.length > 0;
   const hasSearch = Boolean(normalizedSearchQuery);
 
-  function updateSearchQuery(value: string) {
+  function updateLibraryFilters(next: {
+    q?: string;
+    status?: ActivityLibraryStatus;
+  }) {
+    const nextQuery = next.q ?? searchQuery;
+    const nextStatus = next.status ?? libraryStatus;
+
     void navigate({
       replace: true,
       search: {
         created,
-        q: value.trim() ? value : undefined,
+        q: nextQuery.trim() ? nextQuery : undefined,
+        status: nextStatus === 'active' ? undefined : nextStatus,
       },
     });
   }
@@ -127,8 +147,10 @@ function DashboardActivitiesPage() {
 
         <ActivityLibrarySearch
           isLoading={isLoading}
-          onClear={() => updateSearchQuery('')}
-          onSearch={updateSearchQuery}
+          onClear={() => updateLibraryFilters({ q: '' })}
+          onSearch={(value) => updateLibraryFilters({ q: value })}
+          onStatusChange={(value) => updateLibraryFilters({ status: value })}
+          status={libraryStatus}
           total={data?.total ?? 0}
           value={searchQuery}
         />
@@ -161,6 +183,7 @@ function DashboardActivitiesPage() {
                   templateType: activity.templateType,
                   title: activity.title,
                 }}
+                libraryStatus={libraryStatus}
               />
             ))}
           </section>
@@ -177,7 +200,7 @@ function DashboardActivitiesPage() {
               type="button"
               variant="outline"
               className="mt-4 bg-background"
-              onClick={() => updateSearchQuery('')}
+              onClick={() => updateLibraryFilters({ q: '' })}
             >
               <IconX className="size-4" />
               Clear search
@@ -216,6 +239,7 @@ function DashboardActivitiesPage() {
                     templateType: activity.templateType,
                     title: activity.title,
                   }}
+                  libraryStatus="active"
                 />
               ))}
             </section>
@@ -230,26 +254,31 @@ function ActivityLibrarySearch({
   isLoading,
   onClear,
   onSearch,
+  onStatusChange,
+  status,
   total,
   value,
 }: {
   isLoading: boolean;
   onClear: () => void;
   onSearch: (value: string) => void;
+  onStatusChange: (value: ActivityLibraryStatus) => void;
+  status: ActivityLibraryStatus;
   total: number;
   value: string;
 }) {
   const normalizedValue = normalizeActivitySearch(value);
+  const statusLabel = status === 'archived' ? 'archived' : 'saved';
   const summary = normalizedValue
     ? isLoading
       ? 'Searching activities...'
       : `${total} ${total === 1 ? 'match' : 'matches'}`
     : isLoading
       ? 'Loading activities...'
-      : `${total} saved ${total === 1 ? 'activity' : 'activities'}`;
+      : `${total} ${statusLabel} ${total === 1 ? 'activity' : 'activities'}`;
 
   return (
-    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
       <div className="grid gap-2">
         <label
           htmlFor="activity-library-search"
@@ -278,16 +307,46 @@ function ActivityLibrarySearch({
           ) : null}
         </div>
       </div>
-      <p className="text-sm text-muted-foreground md:text-right">{summary}</p>
+      <div className="flex flex-col gap-3 lg:items-end">
+        <div className="inline-flex rounded-lg border bg-background p-1">
+          <Button
+            type="button"
+            variant={status === 'active' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => onStatusChange('active')}
+          >
+            <IconFolder className="size-4" />
+            Active
+          </Button>
+          <Button
+            type="button"
+            variant={status === 'archived' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => onStatusChange('archived')}
+          >
+            <IconFolderOff className="size-4" />
+            Archived
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground lg:text-right">{summary}</p>
+      </div>
     </section>
   );
 }
 
-function ActivityCard({ activity }: { activity: ActivityCardData }) {
+function ActivityCard({
+  activity,
+  libraryStatus,
+}: {
+  activity: ActivityCardData;
+  libraryStatus: ActivityLibraryStatus;
+}) {
   const navigate = useNavigate();
+  const archiveMutation = useArchiveActivity();
   const duplicateMutation = useDuplicateActivity();
   const publishMutation = usePublishAssignment();
   const remixMutation = useRemixActivityTemplate();
+  const restoreMutation = useRestoreActivity();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [assignmentTitle, setAssignmentTitle] = useState(activity.title);
   const [assignmentInstructions, setAssignmentInstructions] = useState('');
@@ -415,6 +474,32 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
     }
   }
 
+  async function archiveActivity() {
+    try {
+      await archiveMutation.mutateAsync({ activityId: activity.id });
+      toast.success('Activity archived.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Activity could not be archived.'
+      );
+    }
+  }
+
+  async function restoreActivity() {
+    try {
+      await restoreMutation.mutateAsync({ activityId: activity.id });
+      toast.success('Activity restored to drafts.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Activity could not be restored.'
+      );
+    }
+  }
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
@@ -508,17 +593,19 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
         </div>
         {activity.persisted ? (
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Link
-              to="/dashboard/activities/$activityId"
-              params={{ activityId: activity.id }}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background sm:w-fit'
-              )}
-            >
-              <IconEdit className="size-4" />
-              Edit activity
-            </Link>
+            {libraryStatus === 'active' ? (
+              <Link
+                to="/dashboard/activities/$activityId"
+                params={{ activityId: activity.id }}
+                className={cn(
+                  buttonVariants({ variant: 'outline' }),
+                  'w-full bg-background sm:w-fit'
+                )}
+              >
+                <IconEdit className="size-4" />
+                Edit activity
+              </Link>
+            ) : null}
             <Button
               type="button"
               variant="outline"
@@ -529,15 +616,39 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
               <IconCopy className="size-4" />
               Duplicate
             </Button>
-            <Button
-              type="button"
-              className="w-full sm:w-fit"
-              disabled={publishMutation.isPending}
-              onClick={() => setPublishDialogOpen(true)}
-            >
-              <IconPlus className="size-4" />
-              Publish assignment
-            </Button>
+            {libraryStatus === 'active' ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full bg-background sm:w-fit"
+                  disabled={archiveMutation.isPending}
+                  onClick={archiveActivity}
+                >
+                  <IconFolderOff className="size-4" />
+                  Archive
+                </Button>
+                <Button
+                  type="button"
+                  className="w-full sm:w-fit"
+                  disabled={publishMutation.isPending}
+                  onClick={() => setPublishDialogOpen(true)}
+                >
+                  <IconPlus className="size-4" />
+                  Publish assignment
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                className="w-full sm:w-fit"
+                disabled={restoreMutation.isPending}
+                onClick={restoreActivity}
+              >
+                <IconRotateClockwise className="size-4" />
+                Restore
+              </Button>
+            )}
           </div>
         ) : null}
       </CardContent>

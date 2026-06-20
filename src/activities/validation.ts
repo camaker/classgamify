@@ -26,6 +26,14 @@ export const activityVisibilitySchema = z.enum([
   'unlisted',
 ]);
 
+export const activityPersistedVisibilitySchema = z.enum([
+  'archived',
+  'draft',
+  'private',
+  'public',
+  'unlisted',
+]);
+
 export const createActivityInputSchema = z.object({
   description: z.string().trim().max(400).optional(),
   difficulty: activityDifficultySchema.default('starter'),

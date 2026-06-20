@@ -11,7 +11,12 @@ export const ACTIVITY_TEMPLATE_TYPES = [
 
 export type ActivityTemplateType = (typeof ACTIVITY_TEMPLATE_TYPES)[number];
 
-export type ActivityVisibility = 'draft' | 'private' | 'public' | 'unlisted';
+export type ActivityVisibility =
+  | 'archived'
+  | 'draft'
+  | 'private'
+  | 'public'
+  | 'unlisted';
 
 export type AssignmentStatus = 'draft' | 'published' | 'closed';
 

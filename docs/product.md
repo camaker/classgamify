@@ -53,6 +53,10 @@ The activity library should stay usable as a teacher's collection grows.
 Teachers can search their own activities by title, description, or template
 type from `/dashboard/activities`; the same authenticated list contract powers
 the dashboard cards so search never broadens beyond the current owner.
+Teachers can soft-archive activities from the active library and restore them
+later from an archived view. Archiving hides an activity from the default
+library and prevents casual republishing, but it does not delete structured
+content or alter existing assignment snapshots.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

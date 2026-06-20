@@ -1,9 +1,11 @@
 import {
+  archiveActivity,
   createActivity,
   duplicateActivity,
   getActivity,
   listActivities,
   remixActivityTemplate,
+  restoreActivity,
   updateActivity,
 } from '@/api/activities';
 import { generateActivityDraft } from '@/api/activity-ai';
@@ -21,8 +23,12 @@ export const activitiesKeys = {
   all: ['activities'] as const,
   detail: (id: string) => [...activitiesKeys.details(), id] as const,
   details: () => [...activitiesKeys.all, 'details'] as const,
-  list: (params: { pageIndex: number; pageSize: number; search?: string }) =>
-    [...activitiesKeys.lists(), params] as const,
+  list: (params: {
+    pageIndex: number;
+    pageSize: number;
+    search?: string;
+    status?: 'active' | 'archived';
+  }) => [...activitiesKeys.lists(), params] as const,
   lists: () => [...activitiesKeys.all, 'lists'] as const,
 };
 
@@ -30,10 +36,12 @@ export function useActivities({
   pageIndex = 0,
   pageSize = 24,
   search,
+  status = 'active',
 }: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
+  status?: 'active' | 'archived';
 }) {
   return useQuery({
     placeholderData: keepPreviousData,
@@ -43,9 +51,10 @@ export function useActivities({
           pageIndex,
           pageSize,
           search,
+          status,
         },
       }),
-    queryKey: activitiesKeys.list({ pageIndex, pageSize, search }),
+    queryKey: activitiesKeys.list({ pageIndex, pageSize, search, status }),
   });
 }
 
@@ -82,6 +91,32 @@ export function useDuplicateActivity() {
   return useMutation({
     mutationFn: (input: { activityId: string }) =>
       duplicateActivity({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
+  });
+}
+
+export function useArchiveActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: { activityId: string }) =>
+      archiveActivity({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
+  });
+}
+
+export function useRestoreActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: { activityId: string }) =>
+      restoreActivity({ data: input }),
     onSuccess: (activity) => {
       queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
       queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);

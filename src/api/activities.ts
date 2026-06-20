@@ -1,5 +1,6 @@
 import {
   buildActivityContent,
+  activityPersistedVisibilitySchema,
   activityTemplateTypeSchema,
   createActivityInputSchema,
 } from '@/activities/validation';
@@ -10,14 +11,17 @@ import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, like, or } from 'drizzle-orm';
+import { and, count, desc, eq, like, ne, or } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
+
+const activityListStatusSchema = z.enum(['active', 'archived']);
 
 const listActivitiesInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
   search: z.string().trim().max(120).optional(),
+  status: activityListStatusSchema.default('active'),
 });
 
 export const listActivities = createServerFn({ method: 'GET' })
@@ -34,9 +38,13 @@ export const listActivities = createServerFn({ method: 'GET' })
           like(activity.templateType, `%${search}%`)
         )
       : undefined;
+    const statusWhere =
+      data.status === 'archived'
+        ? eq(activity.visibility, 'archived')
+        : ne(activity.visibility, 'archived');
     const where = searchWhere
-      ? and(eq(activity.ownerId, userId), searchWhere)
-      : eq(activity.ownerId, userId);
+      ? and(eq(activity.ownerId, userId), statusWhere, searchWhere)
+      : and(eq(activity.ownerId, userId), statusWhere);
 
     const [totalRow] = await db
       .select({ count: count() })
@@ -260,3 +268,65 @@ export const updateActivity = createServerFn({ method: 'POST' })
 
     return row;
   });
+
+const updateActivityVisibilityInputSchema = z.object({
+  activityId: z.string().min(1),
+  visibility: activityPersistedVisibilitySchema,
+});
+
+export const archiveActivity = createServerFn({ method: 'POST' })
+  .inputValidator(
+    updateActivityVisibilityInputSchema.pick({ activityId: true })
+  )
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) =>
+    updateActivityVisibility({
+      activityId: data.activityId,
+      ownerId: context.userId,
+      visibility: 'archived',
+    })
+  );
+
+export const restoreActivity = createServerFn({ method: 'POST' })
+  .inputValidator(
+    updateActivityVisibilityInputSchema.pick({ activityId: true })
+  )
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) =>
+    updateActivityVisibility({
+      activityId: data.activityId,
+      ownerId: context.userId,
+      visibility: 'draft',
+    })
+  );
+
+async function updateActivityVisibility({
+  activityId,
+  ownerId,
+  visibility,
+}: {
+  activityId: string;
+  ownerId: string;
+  visibility: z.infer<typeof activityPersistedVisibilitySchema>;
+}) {
+  const db = getDb();
+  await db
+    .update(activity)
+    .set({
+      updatedAt: new Date(),
+      visibility,
+    })
+    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)));
+
+  const [row] = await db
+    .select()
+    .from(activity)
+    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)))
+    .limit(1);
+
+  if (!row) {
+    throw new Error('Activity not found.');
+  }
+
+  return row;
+}
