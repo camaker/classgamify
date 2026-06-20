@@ -207,6 +207,9 @@ The submission contract remains template-neutral: every renderer stores
 submission still allows partial attempts, but the server rejects answers for
 unknown item ids, duplicate item ids, or answer lists longer than the frozen
 runtime item count.
+Student progress counts and browser submission payloads should be derived from
+shared assignment-domain helpers, not per-template route math, so every runner
+counts answered items and submits frozen runtime item ids consistently.
 Student runners should surface completion progress before submission. If a
 student tries to submit with unanswered items, the app asks for an explicit
 second confirmation instead of silently submitting blanks; this preserves

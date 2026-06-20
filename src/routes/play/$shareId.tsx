@@ -7,6 +7,10 @@ import type {
   AssignmentSeed,
 } from '@/activities/types';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
+import {
+  buildAttemptSubmissionAnswers,
+  getAttemptCompletionSummary,
+} from '@/assignments/student-submission';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -98,7 +102,15 @@ function PlayPage() {
       ? stableShuffle(items, assignment.shareId)
       : items;
   }, [activity, assignment, data, starterRuntimeItems]);
-  const itemCount = runtimeItems.length;
+  const completionSummary = useMemo(
+    () =>
+      getAttemptCompletionSummary({
+        answers,
+        runtimeItems,
+      }),
+    [answers, runtimeItems]
+  );
+  const itemCount = completionSummary.itemCount;
   const canSubmit = Boolean(data) && itemCount > 0;
   const activeShareId = assignment?.shareId ?? shareId;
   const startedAt =
@@ -112,11 +124,8 @@ function PlayPage() {
   const anonymousBrowserLabel = assignment?.settings.collectStudentName
     ? undefined
     : getAnonymousBrowserLabel(anonymousToken);
-  const completedCount = useMemo(
-    () => runtimeItems.filter((item) => answers[item.id]?.trim()).length,
-    [answers, runtimeItems]
-  );
-  const unansweredCount = Math.max(0, itemCount - completedCount);
+  const completedCount = completionSummary.answeredItemCount;
+  const unansweredCount = completionSummary.unansweredItemCount;
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -164,10 +173,10 @@ function PlayPage() {
 
     try {
       const response = await submitAttemptMutation.mutateAsync({
-        answers: runtimeItems.map((item) => ({
-          answer: answers[item.id] ?? '',
-          itemId: item.id,
-        })),
+        answers: buildAttemptSubmissionAnswers({
+          answers,
+          runtimeItems,
+        }),
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         shareSlug: assignment?.shareId ?? shareId,
         anonymousToken: assignment?.settings.collectStudentName
