@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
+import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { analyzeAssignmentResults } from '@/assignments/results';
@@ -6,6 +9,7 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
+import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
@@ -277,6 +281,80 @@ assert.match(csv, /"Paris is the capital of France\."/);
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
   'classgamify-capital-review-week-1-results.csv'
+);
+
+const classroomBrief = buildAssignmentClassroomBrief({
+  assignmentTitle: csvExportData.assignment.title,
+  items: resultAnalysis.perItem,
+  stats: csvExportData.stats,
+  students: resultAnalysis.students,
+});
+assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
+assert.equal(
+  classroomBrief.followUpStudents[0]?.studentLabel,
+  'Anonymous student 1'
+);
+assert.match(
+  classroomBrief.text,
+  /ClassGamify classroom brief: Capital Review, Week 1/
+);
+assert.match(classroomBrief.text, /Completions: 1/);
+assert.match(classroomBrief.text, /Average accuracy: 50%/);
+assert.match(classroomBrief.text, /Average time: 45s/);
+assert.match(
+  classroomBrief.text,
+  /- 1\. Match "Hot" with its pair\. \(50% correct, 1\/2\)/
+);
+assert.match(
+  classroomBrief.text,
+  /- 1\. Anonymous student 1: 0% latest, 1 item to review/
+);
+
+const reteachPlan = buildAssignmentReteachPlan({
+  assignmentTitle: csvExportData.assignment.title,
+  items: resultAnalysis.perItem,
+  students: resultAnalysis.students,
+});
+assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
+assert.match(reteachPlan, /Review first:/);
+assert.match(reteachPlan, /Student follow-up:/);
+assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
+assert.match(
+  reteachPlan,
+  /Anonymous student 1: 0% latest accuracy, 1 items to review/
+);
+
+const itemReviewSummary = buildAssignmentItemReviewSummary({
+  assignmentTitle: csvExportData.assignment.title,
+  items: resultAnalysis.perItem,
+});
+assert.match(
+  itemReviewSummary,
+  /ClassGamify item review: Capital Review, Week 1/
+);
+assert.match(
+  itemReviewSummary,
+  /Capital of France\? \(question\) - 67% correct, 2\/3 correct/
+);
+assert.match(itemReviewSummary, /Expected: Paris \/ Paris, France\./);
+assert.match(itemReviewSummary, /Accepted answers: Paris, Paris, France\./);
+assert.match(itemReviewSummary, /Notes: Paris is the capital of France\./);
+
+const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
+  assignmentTitle: csvExportData.assignment.title,
+  students: resultAnalysis.students,
+});
+assert.match(
+  studentFollowUpSummary,
+  /ClassGamify student follow-up: Capital Review, Week 1/
+);
+assert.match(
+  studentFollowUpSummary,
+  /Anonymous student 1: latest 0%, average 0%, best 0%, 1 attempt, 1 item to review/
+);
+assert.match(
+  studentFollowUpSummary,
+  /Alice: latest 100%, average 75%, best 100%, 2 attempts, 0 items to review/
 );
 
 console.log('Domain tests passed.');
