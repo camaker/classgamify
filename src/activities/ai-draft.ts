@@ -1,5 +1,6 @@
 import { activityTemplates } from '@/activities/catalog';
 import {
+  formatTemplateRequirement,
   getTemplateRemixPlan,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
@@ -54,6 +55,15 @@ export type ActivityDraftMeta = {
   reviewChecklist: string[];
   suggestedTemplateCount: number;
   suggestedTemplates: string[];
+  templateReadiness: ActivityDraftTemplateReadiness[];
+};
+
+export type ActivityDraftTemplateReadiness = {
+  isCurrent: boolean;
+  isReady: boolean;
+  missingRequirements: string[];
+  shortName: string;
+  template: ActivityTemplateType;
 };
 
 const aiQuestionSchema = z.object({
@@ -300,6 +310,15 @@ function buildActivityDraftMeta(
     reviewChecklist: buildDraftReviewChecklist(activity, suggestedTemplates),
     suggestedTemplateCount: suggestedTemplates.length,
     suggestedTemplates,
+    templateReadiness: remixPlan.options.map((option) => ({
+      isCurrent: option.isCurrent,
+      isReady: option.isReady,
+      missingRequirements: option.missingRequirements.map(
+        formatTemplateRequirement
+      ),
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })),
   };
 }
 

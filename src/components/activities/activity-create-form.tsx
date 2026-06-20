@@ -739,6 +739,39 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
           ))}
         </div>
       ) : null}
+      <div className="mt-4 grid gap-2 md:grid-cols-2">
+        {meta.templateReadiness.map((option) => (
+          <div
+            key={option.template}
+            className={cn(
+              'rounded-lg border bg-background p-3',
+              option.isReady && 'border-primary/25 bg-primary/5'
+            )}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant={option.isReady ? 'secondary' : 'outline'}
+                className="rounded-md"
+              >
+                {option.shortName}
+              </Badge>
+              {option.isCurrent ? (
+                <Badge variant="outline" className="rounded-md">
+                  selected
+                </Badge>
+              ) : null}
+              <span className="text-xs text-muted-foreground">
+                {option.isReady ? 'Ready' : 'Needs more content'}
+              </span>
+            </div>
+            {!option.isReady ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                Add {option.missingRequirements.join(', ')}.
+              </p>
+            ) : null}
+          </div>
+        ))}
+      </div>
       <div className="mt-4 grid gap-1.5">
         {meta.reviewChecklist.map((item) => (
           <p key={item} className="text-xs leading-5 text-muted-foreground">

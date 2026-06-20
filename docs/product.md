@@ -246,7 +246,10 @@ Teachers should always see and edit the generated title, learning goal,
 vocabulary, questions, answer explanations, pairs, groups, and notes before
 saving. AI draft responses should also expose a lightweight coverage summary:
 question, pair, group, vocabulary, and teacher-note counts plus ready template
-families from the deterministic remix plan. The editor should keep draft
+families from the deterministic remix plan. They should also expose the same
+per-template ready/locked diagnosis used by the editor and activity library, so
+teachers can see which game modes are immediately playable and which missing
+structured fields block a remix before saving. The editor should keep draft
 provenance visible, including provider, model, and fallback notice, so teachers
 can review generated content with the right level of trust. This helps teachers
 judge whether a draft is ready for Wordwall-style remixes before they publish
