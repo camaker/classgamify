@@ -26,6 +26,7 @@ export function seo(
     description?: string;
     keywords?: string;
     image?: string;
+    robots?: string;
     type?: 'website' | 'article';
   }
 ) {
@@ -58,6 +59,7 @@ export const metadata = ({
   description,
   keywords,
   image,
+  robots,
   url,
   type = 'website',
 }: {
@@ -66,6 +68,7 @@ export const metadata = ({
   image?: string;
   url?: string;
   keywords?: string;
+  robots?: string;
   type?: 'website' | 'article';
 }) => {
   const twitterSite = websiteConfig.social?.twitter
@@ -87,6 +90,7 @@ export const metadata = ({
     { title },
     ...(description ? [{ name: 'description', content: description }] : []),
     ...(keywords ? [{ name: 'keywords', content: keywords }] : []),
+    ...(robots ? [{ name: 'robots', content: robots }] : []),
     // OG metadata
     { property: 'og:type', content: type },
     { property: 'og:site_name', content: websiteConfig.metadata?.name ?? '' },

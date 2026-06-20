@@ -15,7 +15,10 @@ Copied-template surfaces should be retired in narrow, verified waves. Public
 navigation and homepage entry points should point at ClassGamify templates,
 creation, assignment links, and results before legacy learning routes are
 deleted, because those old routes still share generated route-tree and locale
-infrastructure.
+infrastructure. Legacy learning URLs that remain mounted should behave as
+ClassGamify migration entry points and carry noindex metadata, so they guide
+humans toward the new product loop without competing with indexed product
+pages.
 Public roadmap and dashboard copy should describe the current usable
 ClassGamify loop, not stale scaffold or skeleton milestones once those
 capabilities are live.
