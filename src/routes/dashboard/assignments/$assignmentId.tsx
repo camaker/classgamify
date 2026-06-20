@@ -1,4 +1,5 @@
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
@@ -29,6 +30,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAssignmentResults } from '@/hooks/use-assignments';
+import { copyTextToClipboard } from '@/lib/clipboard';
 import { downloadFile } from '@/lib/download';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -36,6 +38,7 @@ import {
   IconCalendarTime,
   IconChartBar,
   IconClock,
+  IconCopy,
   IconDownload,
   IconListDetails,
   IconPlayerPlay,
@@ -108,6 +111,30 @@ function AssignmentResultsPage() {
     const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
     await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
     toast.success('Results CSV downloaded.');
+  }
+
+  async function handleCopyReteachPlan() {
+    if (!data || data.attempts.length === 0) {
+      toast.error('Submit at least one attempt before copying a reteach plan.');
+      return;
+    }
+
+    try {
+      await copyTextToClipboard(
+        buildAssignmentReteachPlan({
+          assignmentTitle: data.assignment.title,
+          items: data.analysis.perItem,
+          students: data.analysis.students,
+        })
+      );
+      toast.success('Reteach plan copied.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Reteach plan could not be copied.'
+      );
+    }
   }
 
   return (
@@ -201,6 +228,16 @@ function AssignmentResultsPage() {
                   shareSlug={data.assignment.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={!hasAttempts}
+                  onClick={handleCopyReteachPlan}
+                >
+                  <IconCopy className="size-4" />
+                  Copy reteach plan
+                </Button>
                 <Button
                   type="button"
                   variant="outline"

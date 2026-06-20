@@ -145,7 +145,9 @@ priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. Teachers can search result
 views by normalized student display label, including anonymous student labels,
 so summary rows, attempt rows, and answer review cards stay aligned without
-exposing raw anonymous tokens.
+exposing raw anonymous tokens. Teachers can also copy a text reteach plan built
+from the lowest-correct-rate items and student follow-up summaries, giving them
+a quick classroom script without exporting a spreadsheet.
 
 ## AI Authoring
 
