@@ -141,7 +141,9 @@ timer, close time, student identity mode, answer reveal behavior, and item
 order, so a teacher can verify a link's rules without reopening the publish
 dialog. The publish dialog should show the same delivery preview before the
 teacher creates the share link, so configuration mistakes are visible before an
-assignment is frozen.
+assignment is frozen. Delivery summary labels, order, and fallback values should
+come from assignment-domain helpers before they are rendered in publish dialogs,
+assignment cards, result pages, or public student rule cards.
 Assignment item ordering is also delivery policy. Shuffle behavior should use a
 stable assignment-domain helper keyed by the share link so the same frozen
 assignment loads in a predictable order while preserving the original snapshot

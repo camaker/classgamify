@@ -1,4 +1,5 @@
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -20,10 +21,7 @@ import {
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
-import {
-  AssignmentSettingsSummary,
-  formatAssignmentExpiry,
-} from '@/components/assignments/assignment-settings-summary';
+import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';

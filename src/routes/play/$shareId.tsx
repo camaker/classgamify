@@ -6,6 +6,11 @@ import type {
   ActivityTemplateType,
   AssignmentSeed,
 } from '@/activities/types';
+import {
+  type AssignmentDeliverySummaryId,
+  buildAssignmentDeliverySummary,
+} from '@/assignments/delivery-summary';
+import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
@@ -20,14 +25,6 @@ import { LineMatchBoard } from '@/components/activities/line-match-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import { OpenBoxRunner } from '@/components/activities/open-box-runner';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
-import { getAnonymousBrowserLabel } from '@/assignments/identity';
-import {
-  formatAnswerReveal,
-  formatAssignmentAttempts,
-  formatAssignmentExpiry,
-  formatAssignmentTimeLimit,
-  formatStudentIdentity,
-} from '@/components/assignments/assignment-settings-summary';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -416,37 +413,26 @@ function PublicAssignmentRules({
   showCorrectAnswers: boolean;
   timeLimitSeconds?: number;
 }) {
+  const deliveryRules = buildAssignmentDeliverySummary({
+    collectStudentName,
+    expiresAt,
+    maxAttempts,
+    showCorrectAnswers,
+    timeLimitSeconds,
+  });
   const rules = [
     {
       icon: IconListCheck,
       label: 'Items',
       value: `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`,
     },
-    {
-      icon: IconRepeat,
-      label: 'Attempts',
-      value: formatAssignmentAttempts(maxAttempts),
-    },
-    {
-      icon: IconClock,
-      label: 'Timer',
-      value: formatAssignmentTimeLimit(timeLimitSeconds),
-    },
-    {
-      icon: IconUser,
-      label: 'Identity',
-      value: formatStudentIdentity(collectStudentName),
-    },
-    {
-      icon: IconEye,
-      label: 'Review',
-      value: formatAnswerReveal(showCorrectAnswers),
-    },
-    {
-      icon: IconClock,
-      label: 'Closes',
-      value: formatAssignmentExpiry(expiresAt),
-    },
+    ...deliveryRules
+      .filter((rule) => rule.id !== 'itemOrder')
+      .map((rule) => ({
+        icon: getPublicAssignmentRuleIcon(rule.id),
+        label: rule.id === 'answerReveal' ? 'Review' : rule.label,
+        value: rule.value,
+      })),
   ];
 
   return (
@@ -465,6 +451,13 @@ function PublicAssignmentRules({
       ))}
     </div>
   );
+}
+
+function getPublicAssignmentRuleIcon(id: AssignmentDeliverySummaryId) {
+  if (id === 'attempts') return IconRepeat;
+  if (id === 'identity') return IconUser;
+  if (id === 'answerReveal') return IconEye;
+  return IconClock;
 }
 
 function RuntimeItemList({

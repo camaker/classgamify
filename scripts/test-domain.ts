@@ -15,6 +15,7 @@ import { buildActivityContent } from '@/activities/validation';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import { buildAssignmentDeliverySummary } from '@/assignments/delivery-summary';
 import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -113,6 +114,32 @@ assert.deepEqual(
 assert.deepEqual(
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id),
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id)
+);
+assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
+  { id: 'attempts', label: 'Attempts', value: 'Open' },
+  { id: 'timer', label: 'Timer', value: 'No timer' },
+  { id: 'closes', label: 'Closes', value: 'No close time' },
+  { id: 'identity', label: 'Student identity', value: 'Names' },
+  { id: 'answerReveal', label: 'Answer reveal', value: 'After submit' },
+  { id: 'itemOrder', label: 'Item order', value: 'Shuffled' },
+]);
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    collectStudentName: false,
+    expiresAt: 'not-a-date',
+    maxAttempts: 3,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 90,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', '3 max'],
+    ['timer', '2 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'Hidden'],
+    ['itemOrder', 'Fixed order'],
+  ]
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);

@@ -1,3 +1,7 @@
+import {
+  type AssignmentDeliverySummaryId,
+  buildAssignmentDeliverySummary,
+} from '@/assignments/delivery-summary';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 import {
   IconArrowsShuffle,
@@ -28,6 +32,15 @@ export function AssignmentSettingsSummary({
   shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentSettingsSummaryProps) {
+  const summary = buildAssignmentDeliverySummary({
+    collectStudentName,
+    expiresAt,
+    maxAttempts,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitSeconds,
+  });
+
   return (
     <div className="grid gap-3">
       {instructions ? (
@@ -36,40 +49,40 @@ export function AssignmentSettingsSummary({
         </div>
       ) : null}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <AssignmentSettingTile
-          icon={IconRepeat}
-          label="Attempts"
-          value={formatAssignmentAttempts(maxAttempts)}
-        />
-        <AssignmentSettingTile
-          icon={IconClock}
-          label="Timer"
-          value={formatAssignmentTimeLimit(timeLimitSeconds)}
-        />
-        <AssignmentSettingTile
-          icon={IconCalendarTime}
-          label="Closes"
-          value={formatAssignmentExpiry(expiresAt)}
-        />
-        <AssignmentSettingTile
-          icon={collectStudentName ? IconUser : IconUserOff}
-          label="Student identity"
-          value={formatStudentIdentity(collectStudentName)}
-        />
-        <AssignmentSettingTile
-          icon={IconEye}
-          label="Answer reveal"
-          value={formatAnswerReveal(showCorrectAnswers)}
-        />
-        <AssignmentSettingTile
-          icon={IconArrowsShuffle}
-          label="Item order"
-          value={formatShuffleItems(shuffleItems)}
-        />
+        {summary.map((item) => (
+          <AssignmentSettingTile
+            icon={getAssignmentSettingIcon(item.id, collectStudentName)}
+            key={item.id}
+            label={item.label}
+            value={item.value}
+          />
+        ))}
       </div>
     </div>
   );
 }
+
+function getAssignmentSettingIcon(
+  id: AssignmentDeliverySummaryId,
+  collectStudentName: boolean
+) {
+  if (id === 'identity') {
+    return collectStudentName ? IconUser : IconUserOff;
+  }
+
+  return assignmentSettingIcons[id];
+}
+
+const assignmentSettingIcons = {
+  answerReveal: IconEye,
+  attempts: IconRepeat,
+  closes: IconCalendarTime,
+  itemOrder: IconArrowsShuffle,
+  timer: IconClock,
+} satisfies Record<
+  Exclude<AssignmentDeliverySummaryId, 'identity'>,
+  typeof IconClock
+>;
 
 function AssignmentSettingTile({
   icon: Icon,
@@ -87,38 +100,4 @@ function AssignmentSettingTile({
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
-}
-
-export function formatAssignmentAttempts(maxAttempts?: number) {
-  return maxAttempts ? `${maxAttempts} max` : 'Open';
-}
-
-export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
-  if (!expiresAt) return 'No close time';
-
-  const date = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-  if (Number.isNaN(date.getTime())) return 'No close time';
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date);
-}
-
-export function formatAssignmentTimeLimit(seconds?: number) {
-  if (!seconds) return 'No timer';
-  const minutes = Math.round(seconds / 60);
-  return `${minutes} min`;
-}
-
-export function formatStudentIdentity(collectStudentName: boolean) {
-  return collectStudentName ? 'Names' : 'Anonymous';
-}
-
-export function formatAnswerReveal(showCorrectAnswers: boolean) {
-  return showCorrectAnswers ? 'After submit' : 'Hidden';
-}
-
-export function formatShuffleItems(shuffleItems: boolean) {
-  return shuffleItems ? 'Shuffled' : 'Fixed order';
 }
