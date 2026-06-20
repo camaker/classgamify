@@ -14,7 +14,10 @@ import { getTemplateRemixPlan } from '@/activities/template-remix';
 import { buildActivityContent } from '@/activities/validation';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
-import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import {
+  formatAttemptDuration,
+  normalizeAttemptDurationSeconds,
+} from '@/assignments/attempt-duration';
 import { buildAssignmentDeliverySummary } from '@/assignments/delivery-summary';
 import {
   normalizeAssignmentListSearch,
@@ -300,6 +303,14 @@ assert.equal(
   }),
   60
 );
+assert.equal(formatAttemptDuration(undefined), '-');
+assert.equal(formatAttemptDuration(undefined, { emptyValue: '' }), '');
+assert.equal(formatAttemptDuration(0), '-');
+assert.equal(formatAttemptDuration(4.6), '5s');
+assert.equal(formatAttemptDuration(65), '1m 05s');
+assert.equal(formatAttemptDuration(-3), '-');
+assert.equal(formatAttemptDuration(65, { style: 'timer' }), '1:05');
+assert.equal(formatAttemptDuration(5, { style: 'timer' }), '5s');
 assert.deepEqual(summarizeAssignmentAttempts([]), {
   averageDurationSeconds: 0,
   averagePoints: 0,

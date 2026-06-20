@@ -1,4 +1,5 @@
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
@@ -341,7 +342,7 @@ function AssignmentResultsPage() {
             <ResultMetric
               icon={IconClock}
               label="Average time"
-              value={formatDuration(data.stats.averageDurationSeconds)}
+              value={formatAttemptDuration(data.stats.averageDurationSeconds)}
             />
             <ResultMetric
               icon={IconCalendarTime}
@@ -592,7 +593,7 @@ function AssignmentResultsPage() {
                           {attempt.resultJson?.totalPoints ?? 0}
                         </TableCell>
                         <TableCell>
-                          {formatDuration(
+                          {formatAttemptDuration(
                             attempt.resultJson?.durationSeconds ?? 0
                           )}
                         </TableCell>
@@ -1097,14 +1098,6 @@ function formatAttemptDate(value: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(value);
-}
-
-function formatDuration(seconds: number) {
-  if (!seconds) return '-';
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  if (minutes <= 0) return `${remainder}s`;
-  return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
 }
 
 function formatAcceptedAnswers(values: string[]) {

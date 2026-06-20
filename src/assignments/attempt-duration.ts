@@ -12,3 +12,28 @@ export function normalizeAttemptDurationSeconds({
 
   return Math.min(normalizedDuration, timeLimitSeconds);
 }
+
+export function formatAttemptDuration(
+  seconds?: number | null,
+  options?: {
+    emptyValue?: string;
+    style?: 'readable' | 'timer';
+  }
+) {
+  const emptyValue = options?.emptyValue ?? '-';
+  if (seconds === undefined || seconds === null) return emptyValue;
+
+  const normalizedSeconds = Math.max(0, Math.round(seconds));
+  if (normalizedSeconds <= 0) return emptyValue;
+
+  const minutes = Math.floor(normalizedSeconds / 60);
+  const remainder = normalizedSeconds % 60;
+
+  if (options?.style === 'timer') {
+    if (minutes <= 0) return `${remainder}s`;
+    return `${minutes}:${String(remainder).padStart(2, '0')}`;
+  }
+
+  if (minutes <= 0) return `${remainder}s`;
+  return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
+}

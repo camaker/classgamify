@@ -241,7 +241,9 @@ duration. Attempt duration is still submitted by the browser, but the server
 normalizes it before scoring and persistence: negative or fractional values are
 rounded into whole non-negative seconds, and timed assignments cap stored
 duration at the assignment timer so teacher averages and CSV exports are not
-distorted by abnormal client clocks.
+distorted by abnormal client clocks. Student timer badges, submitted attempt
+times, result-page averages, and per-attempt rows should format durations
+through assignment-domain helpers so time displays stay consistent.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission

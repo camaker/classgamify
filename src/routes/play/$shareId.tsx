@@ -10,6 +10,7 @@ import {
   type AssignmentDeliverySummaryId,
   buildAssignmentDeliverySummary,
 } from '@/assignments/delivery-summary';
+import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
@@ -285,7 +286,12 @@ function PlayPage() {
             </Badge>
             {timeLimitSeconds ? (
               <Badge variant="outline" className="rounded-md">
-                {timeExpired ? 'Time ended' : formatDuration(remainingSeconds)}
+                {timeExpired
+                  ? 'Time ended'
+                  : formatAttemptDuration(remainingSeconds, {
+                      emptyValue: '',
+                      style: 'timer',
+                    })}
               </Badge>
             ) : null}
           </div>
@@ -330,7 +336,13 @@ function PlayPage() {
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Time:{' '}
-                  {formatDuration(result.durationSeconds ?? elapsedSeconds)}
+                  {formatAttemptDuration(
+                    result.durationSeconds ?? elapsedSeconds,
+                    {
+                      emptyValue: '',
+                      style: 'timer',
+                    }
+                  )}
                 </p>
               </div>
             ) : null}
@@ -749,11 +761,3 @@ type AttemptSubmissionResult = {
   reviewItems: PublicAttemptReviewItem[];
   totalPoints: number;
 };
-
-function formatDuration(seconds?: number) {
-  if (seconds === undefined) return '';
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  if (minutes <= 0) return `${remainder}s`;
-  return `${minutes}:${String(remainder).padStart(2, '0')}`;
-}
