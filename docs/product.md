@@ -59,7 +59,10 @@ student timer, and close-after time for homework windows. These settings live on
 the close-after time window lives on `Assignment`.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
-lifecycle while existing attempts remain available for review.
+lifecycle while existing attempts remain available for review. Assignment
+status and expiry checks should flow through shared lifecycle helpers so
+student access, teacher lists, and result pages agree on open, closed, and
+expired states.
 
 Public student links must return a sanitized assignment payload only while the
 assignment is open. Closed or expired links do not expose runtime content, and

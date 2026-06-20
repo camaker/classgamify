@@ -3,6 +3,12 @@ import type {
   ActivityTemplateType,
   AssignmentStatus,
 } from '@/activities/types';
+import {
+  getAssignmentStatusLabel,
+  isAssignmentExpired,
+  isAssignmentOpen,
+} from '@/assignments/lifecycle';
+import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -20,9 +26,7 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
-  IconCalendarTime,
   IconChartBar,
-  IconClock,
   IconListCheck,
   IconLock,
   IconLockOpen,
@@ -254,41 +258,27 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
         <CardDescription>
           <p>{assignment.activityDescription}</p>
         </CardDescription>
-        {assignment.instructions ? (
-          <div className="mt-3 rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
-            {assignment.instructions}
-          </div>
-        ) : null}
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <AssignmentStat
-            icon={IconUsers}
-            label="Completions"
-            value={String(assignment.stats.completions)}
+        <div className="grid gap-4">
+          <AssignmentSettingsSummary
+            expiresAt={assignment.expiresAt}
+            instructions={assignment.instructions}
+            maxAttempts={assignment.maxAttempts}
+            timeLimitSeconds={assignment.timeLimitSeconds}
           />
-          <AssignmentStat
-            icon={IconChartBar}
-            label="Average"
-            value={`${assignment.stats.averageScore}%`}
-          />
-          <AssignmentStat
-            icon={IconClock}
-            label="Attempts"
-            value={
-              assignment.maxAttempts ? `${assignment.maxAttempts} max` : 'open'
-            }
-          />
-          <AssignmentStat
-            icon={IconClock}
-            label="Timer"
-            value={formatAssignmentTimeLimit(assignment.timeLimitSeconds)}
-          />
-          <AssignmentStat
-            icon={IconCalendarTime}
-            label="Closes"
-            value={formatAssignmentExpiry(assignment.expiresAt)}
-          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AssignmentStat
+              icon={IconUsers}
+              label="Completions"
+              value={String(assignment.stats.completions)}
+            />
+            <AssignmentStat
+              icon={IconChartBar}
+              label="Average"
+              value={`${assignment.stats.averageScore}%`}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
           {persisted ? (
@@ -332,40 +322,6 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       </CardContent>
     </Card>
   );
-}
-
-function getAssignmentStatusLabel(
-  status: AssignmentStatus,
-  expiresAt: Date | null
-) {
-  if (status === 'published' && isAssignmentExpired(expiresAt)) {
-    return 'Expired';
-  }
-  if (status === 'published') return 'Open';
-  if (status === 'closed') return 'Closed';
-  return 'Draft';
-}
-
-function isAssignmentOpen(status: AssignmentStatus, expiresAt: Date | null) {
-  return status === 'published' && !isAssignmentExpired(expiresAt);
-}
-
-function isAssignmentExpired(expiresAt: Date | null) {
-  return Boolean(expiresAt && expiresAt.getTime() <= Date.now());
-}
-
-function formatAssignmentExpiry(expiresAt: Date | null) {
-  if (!expiresAt) return 'No close time';
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(expiresAt);
-}
-
-function formatAssignmentTimeLimit(seconds?: number) {
-  if (!seconds) return 'No timer';
-  const minutes = Math.round(seconds / 60);
-  return `${minutes} min`;
 }
 
 function SummaryCard({

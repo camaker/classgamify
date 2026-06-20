@@ -1,3 +1,12 @@
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import {
+  buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvFilename,
+} from '@/assignments/results-export';
+import {
+  AssignmentSettingsSummary,
+  formatAssignmentExpiry,
+} from '@/components/assignments/assignment-settings-summary';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -17,10 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  buildAssignmentResultsCsv,
-  buildAssignmentResultsCsvFilename,
-} from '@/assignments/results-export';
 import { useAssignmentResults } from '@/hooks/use-assignments';
 import { downloadFile } from '@/lib/download';
 import { Routes } from '@/lib/routes';
@@ -132,35 +137,38 @@ function AssignmentResultsPage() {
               <CardDescription>
                 <p>{activityDescription}</p>
               </CardDescription>
-              {data.assignment.settingsJson.instructions ? (
-                <div className="mt-3 rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
-                  {data.assignment.settingsJson.instructions}
-                </div>
-              ) : null}
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/play/$shareId"
-                params={{ shareId: data.assignment.shareSlug }}
-                className={cn(buttonVariants(), 'w-full sm:w-auto')}
-              >
-                <IconPlayerPlay className="size-4" />
-                Open student link
-              </Link>
-              <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
-                <IconShare3 className="size-4" />
-                /play/{data.assignment.shareSlug}
+            <CardContent className="grid gap-4">
+              <AssignmentSettingsSummary
+                expiresAt={data.assignment.expiresAt}
+                instructions={data.assignment.settingsJson.instructions}
+                maxAttempts={data.assignment.settingsJson.maxAttempts}
+                timeLimitSeconds={data.assignment.settingsJson.timeLimitSeconds}
+              />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to="/play/$shareId"
+                  params={{ shareId: data.assignment.shareSlug }}
+                  className={cn(buttonVariants(), 'w-full sm:w-auto')}
+                >
+                  <IconPlayerPlay className="size-4" />
+                  Open student link
+                </Link>
+                <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
+                  <IconShare3 className="size-4" />
+                  /play/{data.assignment.shareSlug}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={!hasAttempts}
+                  onClick={handleExportResults}
+                >
+                  <IconDownload className="size-4" />
+                  Download CSV
+                </Button>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto"
-                disabled={!hasAttempts}
-                onClick={handleExportResults}
-              >
-                <IconDownload className="size-4" />
-                Download CSV
-              </Button>
             </CardContent>
           </Card>
 
@@ -405,25 +413,4 @@ function formatDuration(seconds: number) {
   const remainder = seconds % 60;
   if (minutes <= 0) return `${remainder}s`;
   return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
-}
-
-function formatAssignmentExpiry(value: Date | null) {
-  if (!value) return 'No close time';
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(value);
-}
-
-function getAssignmentStatusLabel(status: string, expiresAt: Date | null) {
-  if (
-    status === 'published' &&
-    expiresAt &&
-    expiresAt.getTime() <= Date.now()
-  ) {
-    return 'Expired';
-  }
-  if (status === 'published') return 'Open';
-  if (status === 'closed') return 'Closed';
-  return 'Draft';
 }

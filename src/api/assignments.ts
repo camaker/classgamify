@@ -1,4 +1,5 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import { isAssignmentExpired, isAssignmentOpen } from '@/assignments/lifecycle';
 import {
   buildAttemptReviewItems,
   estimateAssignmentMinutes,
@@ -324,7 +325,10 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       )
       .limit(1);
 
-    if (!row || !isAssignmentOpenForStudents(row.assignment)) {
+    if (
+      !row ||
+      !isAssignmentOpen(row.assignment.status, row.assignment.expiresAt)
+    ) {
       return null;
     }
 
@@ -492,17 +496,3 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       result: evaluation.result,
     };
   });
-
-function isAssignmentOpenForStudents({
-  expiresAt,
-  status,
-}: {
-  expiresAt: Date | null;
-  status: string;
-}) {
-  return status === 'published' && !isAssignmentExpired(expiresAt);
-}
-
-function isAssignmentExpired(expiresAt: Date | null) {
-  return Boolean(expiresAt && expiresAt.getTime() <= Date.now());
-}
