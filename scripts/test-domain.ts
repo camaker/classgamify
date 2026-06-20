@@ -9,6 +9,7 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import { createFallbackActivityDraft } from '@/activities/ai-draft';
+import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { getTemplateRemixPlan } from '@/activities/template-remix';
 import { buildActivityContent } from '@/activities/validation';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
@@ -125,6 +126,65 @@ assert.ok(
   )
 );
 assert.ok(fallbackRemixPlan.suggestedOptions.length >= 3);
+const multilingualGroupContent = buildActivityContent({
+  description: 'Multilingual group sort',
+  difficulty: 'starter',
+  gradeBand: 'Grade 1',
+  groupsText: ['水果 | 苹果, 香蕉', '饮品 | 牛奶, 水'].join('\n'),
+  language: 'zh',
+  learningGoal: 'Students can classify familiar Chinese food words.',
+  pairsText: '',
+  questionsText: '',
+  sourceSummary: 'Chinese food vocabulary classification.',
+  subject: 'Chinese',
+  teacherNotesText: 'Use categories first, then submit.',
+  templateType: 'group-sort',
+  title: '中文分类',
+  visibility: 'draft',
+  vocabularyText: '苹果, 香蕉, 牛奶, 水',
+});
+const multilingualGroupItems = getRuntimeItems(
+  'group-sort',
+  multilingualGroupContent
+);
+assert.deepEqual(
+  multilingualGroupItems.map((item) => item.id),
+  ['g-1-item-1', 'g-1-item-2', 'g-2-item-1', 'g-2-item-2']
+);
+assert.notEqual(multilingualGroupItems[0]?.id, multilingualGroupItems[1]?.id);
+assert.notEqual(multilingualGroupItems[2]?.id, multilingualGroupItems[3]?.id);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: multilingualGroupItems.map((item) => ({
+      answer: item.answer,
+      itemId: item.id,
+    })),
+    content: multilingualGroupContent,
+    templateType: 'group-sort',
+  }).result.accuracy,
+  100
+);
+const collidingGroupContent = buildActivityContent({
+  description: 'Collision group sort',
+  difficulty: 'starter',
+  gradeBand: 'Grade 2',
+  groupsText: 'Treats | ice cream, ice-cream',
+  language: 'en',
+  learningGoal: 'Students can classify similar written items safely.',
+  pairsText: '',
+  questionsText: '',
+  sourceSummary: 'Similar words should still receive unique runtime ids.',
+  subject: 'English',
+  teacherNotesText: 'Check item ids before publishing.',
+  templateType: 'group-sort',
+  title: 'Collision sort',
+  visibility: 'draft',
+  vocabularyText: 'ice cream, ice-cream',
+});
+assert.deepEqual(
+  getRuntimeItems('group-sort', collidingGroupContent).map((item) => item.id),
+  ['g-treats-ice-cream-1', 'g-treats-ice-cream-2']
+);
 
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({

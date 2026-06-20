@@ -55,15 +55,22 @@ export function getRuntimeItems(
     }
     case 'group-sort': {
       const choices = content.groups.map((group) => group.label);
-      return content.groups.flatMap((group) =>
-        group.items.map((item) => ({
+      return content.groups.flatMap((group) => {
+        const itemIdCounts = countStableItemIds(group.items);
+
+        return group.items.map((item, itemIndex) => ({
           answer: group.label,
           choices,
-          id: `${group.id}-${makeStableId(item)}`,
+          id: buildGroupItemRuntimeId({
+            groupId: group.id,
+            item,
+            itemIdCounts,
+            itemIndex,
+          }),
           kind: 'group-item',
           prompt: item,
-        }))
-      );
+        }));
+      });
     }
     case 'fill-blank':
     case 'listening':
@@ -155,4 +162,34 @@ function makeStableId(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 40);
+}
+
+function buildGroupItemRuntimeId({
+  groupId,
+  item,
+  itemIdCounts,
+  itemIndex,
+}: {
+  groupId: string;
+  item: string;
+  itemIdCounts: Map<string, number>;
+  itemIndex: number;
+}) {
+  const itemId = makeStableId(item);
+  if (itemId && itemIdCounts.get(itemId) === 1) {
+    return `${groupId}-${itemId}`;
+  }
+
+  return `${groupId}-${itemId || 'item'}-${itemIndex + 1}`;
+}
+
+function countStableItemIds(items: string[]) {
+  const counts = new Map<string, number>();
+
+  for (const item of items) {
+    const itemId = makeStableId(item);
+    counts.set(itemId, (counts.get(itemId) ?? 0) + 1);
+  }
+
+  return counts;
 }

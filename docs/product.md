@@ -208,6 +208,10 @@ question item. Group-sort uses a dedicated category board where students select
 an item and place it into a group. Matching-pairs uses a dedicated left/right
 card board so students can select a prompt and attach a choice without seeing
 the answer map.
+Group-sort runtime item ids must remain unique for multilingual classroom text,
+including Chinese labels and items whose punctuation normalizes to the same
+slug, because the same frozen ids drive browser answers, scoring, and teacher
+results.
 The submission contract remains template-neutral: every renderer stores
 `{ itemId, answer }` so scoring and result analysis stay shared. Public
 submission still allows partial attempts, but the server rejects answers for
