@@ -6,7 +6,11 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
-import { isAssignmentExpired, isAssignmentOpen } from '@/assignments/lifecycle';
+import {
+  assertAssignmentStatusTransition,
+  isAssignmentExpired,
+  isAssignmentOpen,
+} from '@/assignments/lifecycle';
 import {
   buildAttemptReviewItems,
   estimateAssignmentMinutes,
@@ -279,7 +283,11 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       eq(assignment.ownerId, userId)
     );
     const [existingAssignment] = await db
-      .select({ id: assignment.id })
+      .select({
+        expiresAt: assignment.expiresAt,
+        id: assignment.id,
+        status: assignment.status,
+      })
       .from(assignment)
       .where(where)
       .limit(1);
@@ -287,6 +295,11 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
     if (!existingAssignment) {
       throw new Error('Assignment not found.');
     }
+    assertAssignmentStatusTransition({
+      currentStatus: existingAssignment.status,
+      expiresAt: existingAssignment.expiresAt,
+      nextStatus: data.status,
+    });
 
     await db
       .update(assignment)

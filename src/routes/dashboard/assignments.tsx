@@ -4,8 +4,8 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import {
+  canUpdateAssignmentStatus,
   getAssignmentStatusLabel,
-  isAssignmentExpired,
 } from '@/assignments/lifecycle';
 import { findPublishedAssignmentInList } from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -540,12 +540,14 @@ function AssignmentListFilters({
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const persisted = !assignment.id.startsWith('assignment-');
-  const expired = isAssignmentExpired(assignment.expiresAt);
+  const nextStatus = assignment.status === 'published' ? 'closed' : 'published';
   const canManageStatus =
     persisted &&
-    (assignment.status === 'published' ||
-      (assignment.status === 'closed' && !expired));
-  const nextStatus = assignment.status === 'published' ? 'closed' : 'published';
+    canUpdateAssignmentStatus({
+      currentStatus: assignment.status,
+      expiresAt: assignment.expiresAt,
+      nextStatus,
+    });
 
   async function updateStatus() {
     try {

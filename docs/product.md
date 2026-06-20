@@ -149,7 +149,11 @@ frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment
 status and expiry checks should flow through shared lifecycle helpers so
 student access, teacher lists, and result pages agree on open, closed, and
-expired states.
+expired states. Server functions enforce the same lifecycle rules as the
+teacher UI: only published links can be closed, only closed links can be
+reopened, draft assignments cannot bypass the publish-and-snapshot flow, and
+expired assignments cannot be reopened without a future product action that
+changes the close window.
 
 Public student links must return a sanitized assignment payload only while the
 assignment is open. Closed or expired links do not expose runtime content, and
