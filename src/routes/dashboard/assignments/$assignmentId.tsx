@@ -61,6 +61,7 @@ import { toast } from 'sonner';
 
 type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 type ItemPerformanceSort = 'accuracy' | 'original' | 'submitted' | 'type';
+type AttemptReviewFilter = 'all' | 'needs-review';
 
 const studentSummarySortOptions: Array<{
   label: string;
@@ -82,9 +83,18 @@ const itemPerformanceSortOptions: Array<{
   { label: 'Item type', value: 'type' },
 ];
 
+const attemptReviewFilterOptions: Array<{
+  label: string;
+  value: AttemptReviewFilter;
+}> = [
+  { label: 'All answers', value: 'all' },
+  { label: 'Needs review only', value: 'needs-review' },
+];
+
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   validateSearch: (search: Record<string, unknown>) => ({
     itemSort: parseItemPerformanceSort(search.itemSort),
+    review: parseAttemptReviewFilter(search.review),
     sort: parseStudentSummarySort(search.sort),
   }),
   component: AssignmentResultsPage,
@@ -92,13 +102,14 @@ export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
 
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
-  const { itemSort, sort } = Route.useSearch();
+  const { itemSort, review, sort } = Route.useSearch();
   const navigate = useNavigate({
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
   const [studentSearch, setStudentSearch] = useState('');
   const itemPerformanceSort = itemSort ?? 'original';
+  const attemptReviewFilter = review ?? 'all';
   const studentSort = sort ?? 'needs-review';
   const title = data?.assignment.title ?? 'Assignment results';
   const activityTitle =
@@ -140,6 +151,7 @@ function AssignmentResultsPage() {
       replace: true,
       search: {
         itemSort: nextSort === 'original' ? undefined : nextSort,
+        review,
         sort,
       },
     });
@@ -150,7 +162,19 @@ function AssignmentResultsPage() {
       replace: true,
       search: {
         itemSort,
+        review,
         sort: nextSort === 'needs-review' ? undefined : nextSort,
+      },
+    });
+  }
+
+  function updateAttemptReviewFilter(nextFilter: AttemptReviewFilter) {
+    void navigate({
+      replace: true,
+      search: {
+        itemSort,
+        review: nextFilter === 'all' ? undefined : nextFilter,
+        sort,
       },
     });
   }
@@ -175,11 +199,19 @@ function AssignmentResultsPage() {
   }, [attemptReviewById, data?.attempts, normalizedStudentSearch]);
   const filteredAttemptReviews = useMemo(() => {
     const attempts = data?.analysis.attempts ?? [];
-    if (!normalizedStudentSearch) return attempts;
-    return attempts.filter((attempt) =>
-      matchesResultSearch(attempt.studentLabel, normalizedStudentSearch)
-    );
-  }, [data?.analysis.attempts, normalizedStudentSearch]);
+    return attempts.filter((attempt) => {
+      const matchesStudent = normalizedStudentSearch
+        ? matchesResultSearch(attempt.studentLabel, normalizedStudentSearch)
+        : true;
+      if (!matchesStudent) return false;
+
+      if (attemptReviewFilter === 'needs-review') {
+        return attempt.answers.some((answer) => !answer.correct);
+      }
+
+      return true;
+    });
+  }, [attemptReviewFilter, data?.analysis.attempts, normalizedStudentSearch]);
 
   async function handleExportResults() {
     if (!data || data.attempts.length === 0) {
@@ -593,13 +625,32 @@ function AssignmentResultsPage() {
           {data.analysis.attempts.length > 0 ? (
             <Card className="rounded-lg">
               <CardHeader>
-                <CardTitle>
-                  <h2 className="text-lg font-semibold">Answer review</h2>
-                </CardTitle>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <CardTitle>
+                      <h2 className="text-lg font-semibold">Answer review</h2>
+                    </CardTitle>
+                    <CardDescription>
+                      <p>
+                        Item-level answers are scored from the frozen assignment
+                        snapshot, so teacher edits never change historical
+                        results.
+                      </p>
+                    </CardDescription>
+                  </div>
+                  <AttemptReviewFilterControl
+                    filter={attemptReviewFilter}
+                    onFilterChange={updateAttemptReviewFilter}
+                  />
+                </div>
                 <CardDescription>
                   <p>
-                    Item-level answers are scored from the frozen assignment
-                    snapshot, so teacher edits never change historical results.
+                    Showing {filteredAttemptReviews.length} of{' '}
+                    {data.analysis.attempts.length}{' '}
+                    {data.analysis.attempts.length === 1
+                      ? 'submission'
+                      : 'submissions'}
+                    .
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -846,6 +897,35 @@ function ItemPerformanceSortControl({
         }
       >
         {itemPerformanceSortOptions.map((option) => (
+          <NativeSelectOption key={option.value} value={option.value}>
+            {option.label}
+          </NativeSelectOption>
+        ))}
+      </NativeSelect>
+    </div>
+  );
+}
+
+function AttemptReviewFilterControl({
+  filter,
+  onFilterChange,
+}: {
+  filter: AttemptReviewFilter;
+  onFilterChange: (filter: AttemptReviewFilter) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:w-48">
+      <label htmlFor="attempt-review-filter" className="font-medium text-sm">
+        Review view
+      </label>
+      <NativeSelect
+        id="attempt-review-filter"
+        value={filter}
+        onChange={(event) =>
+          onFilterChange(event.currentTarget.value as AttemptReviewFilter)
+        }
+      >
+        {attemptReviewFilterOptions.map((option) => (
           <NativeSelectOption key={option.value} value={option.value}>
             {option.label}
           </NativeSelectOption>
@@ -1120,6 +1200,12 @@ function parseItemPerformanceSort(
   return value === 'accuracy' || value === 'submitted' || value === 'type'
     ? value
     : undefined;
+}
+
+function parseAttemptReviewFilter(
+  value: unknown
+): AttemptReviewFilter | undefined {
+  return value === 'needs-review' ? value : undefined;
 }
 
 function normalizeResultSearch(value: string) {
