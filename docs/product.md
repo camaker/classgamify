@@ -62,7 +62,9 @@ reset to a predictable first page.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured
-content or alter existing assignment snapshots.
+content or alter existing assignment snapshots. Archived activities cannot be
+published, duplicated, or remixed into another template until they are restored;
+this rule is enforced by server functions, not only by dashboard buttons.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

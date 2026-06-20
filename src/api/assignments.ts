@@ -1,4 +1,5 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
 import {
   isSameStudentIdentity,
@@ -158,6 +159,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     if (!sourceActivity) {
       throw new Error('Activity not found.');
     }
+    assertActivityCanDeriveWork(sourceActivity.visibility);
 
     const now = new Date();
     const id = nanoid(16);

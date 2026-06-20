@@ -1,9 +1,18 @@
 import { activityTemplates, starterActivities } from '@/activities/catalog';
 import {
+  ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+  canDeriveActivityWork,
+  isActivityArchived,
+} from '@/activities/lifecycle';
+import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
-import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
+import type {
+  ActivityContent,
+  ActivityTemplateType,
+  ActivityVisibility,
+} from '@/activities/types';
 import { defaultAssignmentSettings } from '@/assignments/validation';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -66,7 +75,7 @@ type ActivityCardData = {
   description: string;
   id: string;
   persisted: boolean;
-  status: string;
+  status: ActivityVisibility;
   templateType: ActivityTemplateType;
   title: string;
 };
@@ -494,6 +503,8 @@ function ActivityCard({
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
+  const isArchived = isActivityArchived(activity.status);
+  const canCreateDerivedWork = canDeriveActivityWork(activity.status);
   const remixPlan = template
     ? getTemplateRemixPlan({
         content: activity.content,
@@ -502,6 +513,10 @@ function ActivityCard({
     : undefined;
 
   async function publishActivity() {
+    if (!canCreateDerivedWork) {
+      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+      return;
+    }
     const title = assignmentTitle.trim();
     const attempts = Number(maxAttempts);
     if (!title) {
@@ -563,6 +578,10 @@ function ActivityCard({
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
   ) {
+    if (!canCreateDerivedWork) {
+      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+      return;
+    }
     try {
       const result = await remixMutation.mutateAsync({
         activityId: activity.id,
@@ -583,6 +602,10 @@ function ActivityCard({
   }
 
   async function duplicateActivity() {
+    if (!canCreateDerivedWork) {
+      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+      return;
+    }
     try {
       const result = await duplicateMutation.mutateAsync({
         activityId: activity.id,
@@ -680,7 +703,9 @@ function ActivityCard({
               .
             </p>
           ) : null}
-          {activity.persisted && remixPlan?.suggestedOptions.length ? (
+          {activity.persisted &&
+          canCreateDerivedWork &&
+          remixPlan?.suggestedOptions.length ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {remixPlan.suggestedOptions.slice(0, 3).map((option) => (
                 <Button
@@ -733,16 +758,18 @@ function ActivityCard({
                 Edit activity
               </Link>
             ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-background sm:w-fit"
-              disabled={duplicateMutation.isPending}
-              onClick={duplicateActivity}
-            >
-              <IconCopy className="size-4" />
-              Duplicate
-            </Button>
+            {canCreateDerivedWork ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-background sm:w-fit"
+                disabled={duplicateMutation.isPending}
+                onClick={duplicateActivity}
+              >
+                <IconCopy className="size-4" />
+                Duplicate
+              </Button>
+            ) : null}
             {libraryStatus === 'active' ? (
               <>
                 <Button
@@ -766,15 +793,23 @@ function ActivityCard({
                 </Button>
               </>
             ) : (
-              <Button
-                type="button"
-                className="w-full sm:w-fit"
-                disabled={restoreMutation.isPending}
-                onClick={restoreActivity}
-              >
-                <IconRotateClockwise className="size-4" />
-                Restore
-              </Button>
+              <>
+                {isArchived ? (
+                  <p className="text-sm text-muted-foreground sm:mr-auto">
+                    Restore this activity before publishing, duplicating, or
+                    remixing it.
+                  </p>
+                ) : null}
+                <Button
+                  type="button"
+                  className="w-full sm:w-fit"
+                  disabled={restoreMutation.isPending}
+                  onClick={restoreActivity}
+                >
+                  <IconRotateClockwise className="size-4" />
+                  Restore
+                </Button>
+              </>
             )}
           </div>
         ) : null}

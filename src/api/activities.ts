@@ -6,6 +6,7 @@ import {
 } from '@/activities/validation';
 import { buildDuplicatedActivityTitle } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
+import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import { getMissingTemplateRequirements } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
@@ -151,6 +152,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     if (!sourceActivity) {
       throw new Error('Activity not found.');
     }
+    assertActivityCanDeriveWork(sourceActivity.visibility);
 
     const now = new Date();
     const id = nanoid(16);
@@ -197,6 +199,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     if (!sourceActivity) {
       throw new Error('Activity not found.');
     }
+    assertActivityCanDeriveWork(sourceActivity.visibility);
     if (sourceActivity.templateType === data.targetTemplateType) {
       throw new Error('Choose a different template to remix into.');
     }
