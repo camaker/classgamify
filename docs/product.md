@@ -194,7 +194,10 @@ an item and place it into a group. Matching-pairs uses a dedicated left/right
 card board so students can select a prompt and attach a choice without seeing
 the answer map.
 The submission contract remains template-neutral: every renderer stores
-`{ itemId, answer }` so scoring and result analysis stay shared.
+`{ itemId, answer }` so scoring and result analysis stay shared. Public
+submission still allows partial attempts, but the server rejects answers for
+unknown item ids, duplicate item ids, or answer lists longer than the frozen
+runtime item count.
 Student runners should surface completion progress before submission. If a
 student tries to submit with unanswered items, the app asks for an explicit
 second confirmation instead of silently submitting blanks; this preserves

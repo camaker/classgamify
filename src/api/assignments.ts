@@ -1,6 +1,7 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus, AttemptResult } from '@/activities/types';
+import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import {
   isSameStudentIdentity,
@@ -513,12 +514,14 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
 
 const submitAttemptInputSchema = z.object({
   anonymousToken: z.string().trim().min(12).max(120).optional(),
-  answers: z.array(
-    z.object({
-      answer: z.string().trim().max(500),
-      itemId: z.string().min(1).max(120),
-    })
-  ),
+  answers: z
+    .array(
+      z.object({
+        answer: z.string().trim().max(500),
+        itemId: z.string().min(1).max(120),
+      })
+    )
+    .max(200),
   durationSeconds: z
     .number()
     .int()
@@ -592,6 +595,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
     const runtimeItems = getRuntimeItems(templateType, content);
+    assertSubmittedAnswersMatchRuntimeItems({
+      answers: data.answers,
+      runtimeItems,
+    });
     const evaluation = evaluateRuntimeAnswers({
       answers: data.answers,
       content,
