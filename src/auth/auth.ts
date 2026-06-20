@@ -9,13 +9,19 @@ import { getBaseUrl } from '@/lib/urls';
 import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
 import { emailHarmony } from 'better-auth-harmony';
-import { admin, apiKey } from 'better-auth/plugins';
+import { admin, apiKey, oneTap } from 'better-auth/plugins';
 
 /**
  * Better Auth Configuration
  * https://www.better-auth.com/docs/reference/options
  * https://www.better-auth.com/docs/adapters/drizzle
  */
+const googleClientId = serverEnv.GOOGLE_CLIENT_ID?.trim();
+const googleClientSecret = serverEnv.GOOGLE_CLIENT_SECRET?.trim();
+const googleOAuthAvailable = Boolean(
+  websiteConfig.auth?.enableGoogleLogin && googleClientId && googleClientSecret
+);
+
 export const auth = betterAuth({
   baseURL: getBaseUrl(),
   appName: websiteConfig.metadata?.name,
@@ -65,13 +71,11 @@ export const auth = betterAuth({
   },
   socialProviders: {
     // https://www.better-auth.com/docs/authentication/google
-    ...(websiteConfig.auth?.enableGoogleLogin &&
-    serverEnv.GOOGLE_CLIENT_ID &&
-    serverEnv.GOOGLE_CLIENT_SECRET
+    ...(googleOAuthAvailable && googleClientId && googleClientSecret
       ? {
           google: {
-            clientId: serverEnv.GOOGLE_CLIENT_ID,
-            clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+            clientId: googleClientId,
+            clientSecret: googleClientSecret,
           },
         }
       : {}),
@@ -121,6 +125,10 @@ export const auth = betterAuth({
     // https://www.better-auth.com/docs/plugins/api-key
     // support API key management for user authentication
     apiKey(),
+    // https://www.better-auth.com/docs/plugins/one-tap
+    ...(googleOAuthAvailable && googleClientId
+      ? [oneTap({ clientId: googleClientId })]
+      : []),
     // https://github.com/gekorm/better-auth-harmony
     // email normalization and validation to prevent duplicate registrations
     emailHarmony({

@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-router';
 import { Analytics } from '@/components/analytics/analytics';
 import { CrispChat } from '@/components/chatbox/crisp-chat';
+import { GoogleOneTapPrompt } from '@/components/auth/google-one-tap-prompt';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -176,6 +177,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ThemeProvider>
           <TooltipProvider>
             {children}
+            <GoogleOneTapPrompt />
             <Toaster richColors position="top-right" offset={64} />
           </TooltipProvider>
         </ThemeProvider>
