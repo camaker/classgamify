@@ -83,9 +83,14 @@ choose quiz, match-up, line-match, group sort, fill-blank, listening, matching
 pairs, or open-box, the editor shows the required content type and can load a
 template-specific scaffold that fills the matching structured fields. Scaffolds
 are examples, not hidden templates; teachers still review and edit before
-saving. The editor should also preview template readiness from the current
-structured text fields before save, using the same parser and deterministic
-remix model as persisted activities.
+saving. Each scaffold should provide a coherent classroom lesson with
+questions, match pairs, groups, vocabulary, and teacher notes wherever possible,
+so loading a quiz, match-up, line-match, group-sort, fill-blank, listening,
+matching-pairs, or open-box scaffold immediately demonstrates the "one activity,
+many playable modes" model instead of only satisfying the selected template's
+minimum fields. The editor should also preview template readiness from the
+current structured text fields before save, using the same parser and
+deterministic remix model as persisted activities.
 The public template directory should act as a real creation entry point:
 teachers can start from any template card and land in `/create` with that
 primary template selected, while the editor still uses the shared activity
