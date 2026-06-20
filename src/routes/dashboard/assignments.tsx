@@ -10,6 +10,7 @@ import {
 } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
+import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -32,8 +33,6 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
-  IconChevronLeft,
-  IconChevronRight,
   IconChartBar,
   IconFilter,
   IconListCheck,
@@ -257,9 +256,10 @@ function DashboardAssignmentsPage() {
                 />
               ))}
             </section>
-            <AssignmentListPagination
+            <DashboardPagination
               currentPage={currentPage}
               isLoading={isLoading}
+              itemLabel="assignments"
               onPageChange={(nextPage) => navigateToAssignmentPage(nextPage)}
               pageSize={ASSIGNMENT_LIST_PAGE_SIZE}
               total={totalAssignments}
@@ -425,63 +425,6 @@ function AssignmentListFilters({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function AssignmentListPagination({
-  currentPage,
-  isLoading,
-  onPageChange,
-  pageSize,
-  total,
-  totalPages,
-}: {
-  currentPage: number;
-  isLoading: boolean;
-  onPageChange: (page: number) => void;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}) {
-  if (totalPages <= 1) return null;
-
-  const firstItem = (currentPage - 1) * pageSize + 1;
-  const lastItem = Math.min(total, currentPage * pageSize);
-
-  return (
-    <nav
-      aria-label="Assignment list pages"
-      className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <p className="text-sm text-muted-foreground">
-        Showing {firstItem}-{lastItem} of {total} assignments
-      </p>
-      <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          className="bg-background"
-          disabled={isLoading || currentPage <= 1}
-          onClick={() => onPageChange(currentPage - 1)}
-        >
-          <IconChevronLeft className="size-4" />
-          Previous
-        </Button>
-        <span className="min-w-24 text-center text-sm text-muted-foreground">
-          Page {currentPage} of {totalPages}
-        </span>
-        <Button
-          type="button"
-          variant="outline"
-          className="bg-background"
-          disabled={isLoading || currentPage >= totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-        >
-          Next
-          <IconChevronRight className="size-4" />
-        </Button>
-      </div>
-    </nav>
   );
 }
 
