@@ -3,6 +3,7 @@ import {
   activityTemplateTypeSchema,
   createActivityInputSchema,
 } from '@/activities/validation';
+import { buildDuplicatedActivityTitle } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
 import { getMissingTemplateRequirements } from '@/activities/template-remix';
 import { getDb } from '@/db';
@@ -97,6 +98,51 @@ export const createActivity = createServerFn({ method: 'POST' })
 
     if (!row) {
       throw new Error('Activity was saved but could not be loaded.');
+    }
+
+    return row;
+  });
+
+const duplicateActivityInputSchema = z.object({
+  activityId: z.string().min(1),
+});
+
+export const duplicateActivity = createServerFn({ method: 'POST' })
+  .inputValidator(duplicateActivityInputSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const [sourceActivity] = await db
+      .select()
+      .from(activity)
+      .where(
+        and(eq(activity.id, data.activityId), eq(activity.ownerId, userId))
+      )
+      .limit(1);
+
+    if (!sourceActivity) {
+      throw new Error('Activity not found.');
+    }
+
+    const now = new Date();
+    const id = nanoid(16);
+    await db.insert(activity).values({
+      contentJson: sourceActivity.contentJson,
+      createdAt: now,
+      description: sourceActivity.description,
+      id,
+      ownerId: userId,
+      templateType: sourceActivity.templateType,
+      title: buildDuplicatedActivityTitle(sourceActivity.title),
+      updatedAt: now,
+      visibility: 'draft',
+    });
+
+    const [row] = await db.select().from(activity).where(eq(activity.id, id));
+
+    if (!row) {
+      throw new Error('Duplicated activity was saved but could not be loaded.');
     }
 
     return row;

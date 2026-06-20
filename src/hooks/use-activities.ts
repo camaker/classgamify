@@ -1,5 +1,6 @@
 import {
   createActivity,
+  duplicateActivity,
   getActivity,
   listActivities,
   remixActivityTemplate,
@@ -72,6 +73,19 @@ export function useGenerateActivityDraft() {
   return useMutation({
     mutationFn: (input: GenerateActivityDraftInput) =>
       generateActivityDraft({ data: input }),
+  });
+}
+
+export function useDuplicateActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: { activityId: string }) =>
+      duplicateActivity({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
   });
 }
 

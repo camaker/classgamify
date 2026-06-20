@@ -113,6 +113,7 @@ assignment publishing is enabled.
 | 18 | Legal pages describe ClassGamify data surfaces | Open `/terms`, `/privacy`, and `/cookie` for `en` and `zh`, verify the pages mention ClassGamify classroom activities, assignment links, student attempts or cookies where relevant, and verify they do not mention the copied Lang Study, getlangstudy, HSK, or Hanzi product surfaces. |
 | 19 | Blog and release notes describe ClassGamify | Open `/blog`, each visible `/blog/:slug`, and the generated sitemap, verify public post slugs and cards reference ClassGamify templates, assignment links, AI authoring, or teacher results, and verify old HSK, Hanzi, and getlangstudy editorial URLs are absent. |
 | 20 | Attempt limits use normalized student identity | Publish an assignment with student names and a max-attempt limit, submit as `Alice`, then try again as ` alice ` or `ALICE` and verify the limit still applies. Publish an anonymous assignment and verify two browser tokens are summarized as separate anonymous students in teacher results. |
+| 21 | Teacher can duplicate an activity safely | Sign in, create a saved activity, click `Duplicate` in `/dashboard/activities`, verify a draft copy opens with the same structured content and `Copy of ...` title, edit the copy, and verify the original activity and its published assignments remain unchanged. |
 
 ## Deferred Coverage
 

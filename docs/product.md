@@ -46,6 +46,9 @@ library. Editing uses the same `CreateActivityInput` contract as creation, with
 `ActivityContent` converted back into the structured editor text fields before
 submission. Published assignments score against their snapshot; editing an
 activity only affects future assignments.
+Teachers should also be able to duplicate an activity into a draft before
+making a variant, because copying protects the original activity and any
+published assignment snapshots while preserving the same structured content.
 
 The activity editor should make the selected template legible. When teachers
 choose quiz, match-up, line-match, group sort, fill-blank, listening, matching

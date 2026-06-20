@@ -28,12 +28,14 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import {
   useActivities,
+  useDuplicateActivity,
   useRemixActivityTemplate,
 } from '@/hooks/use-activities';
 import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconCopy,
   IconDeviceGamepad2,
   IconEdit,
   IconLayoutGrid,
@@ -180,6 +182,7 @@ function DashboardActivitiesPage() {
 
 function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const navigate = useNavigate();
+  const duplicateMutation = useDuplicateActivity();
   const publishMutation = usePublishAssignment();
   const remixMutation = useRemixActivityTemplate();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
@@ -290,6 +293,25 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
     }
   }
 
+  async function duplicateActivity() {
+    try {
+      const result = await duplicateMutation.mutateAsync({
+        activityId: activity.id,
+      });
+      toast.success('Activity duplicated.');
+      navigate({
+        to: '/dashboard/activities/$activityId',
+        params: { activityId: result.id },
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Activity could not be duplicated.'
+      );
+    }
+  }
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
@@ -394,6 +416,16 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
               <IconEdit className="size-4" />
               Edit activity
             </Link>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-background sm:w-fit"
+              disabled={duplicateMutation.isPending}
+              onClick={duplicateActivity}
+            >
+              <IconCopy className="size-4" />
+              Duplicate
+            </Button>
             <Button
               type="button"
               className="w-full sm:w-fit"
