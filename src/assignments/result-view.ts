@@ -1,0 +1,214 @@
+import type {
+  AssignmentAttemptReview,
+  AssignmentItemAnalysis,
+  AssignmentStudentSummary,
+} from '@/assignments/results';
+
+export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
+export type ItemPerformanceSort =
+  | 'accuracy'
+  | 'original'
+  | 'submitted'
+  | 'type';
+export type AttemptReviewFilter = 'all' | 'needs-review';
+
+export type AssignmentAttemptRowInput = {
+  id: string;
+  studentName: string | null;
+};
+
+export type AssignmentAttemptReviewRow<
+  TAttempt extends AssignmentAttemptRowInput,
+> = {
+  attempt: TAttempt;
+  review: AssignmentAttemptReview | undefined;
+};
+
+export function filterAndSortStudentSummaries({
+  search,
+  sort,
+  students,
+}: {
+  search: string;
+  sort: StudentSummarySort;
+  students: AssignmentStudentSummary[];
+}) {
+  const normalizedSearch = normalizeResultSearch(search);
+  const matchedStudents = normalizedSearch
+    ? students.filter((student) =>
+        matchesResultSearch(student.studentLabel, normalizedSearch)
+      )
+    : students;
+
+  return sortStudentSummaries(matchedStudents, sort);
+}
+
+export function buildFilteredAttemptRows<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  attempts,
+  reviews,
+  search,
+}: {
+  attempts: TAttempt[];
+  reviews: AssignmentAttemptReview[];
+  search: string;
+}): Array<AssignmentAttemptReviewRow<TAttempt>> {
+  const normalizedSearch = normalizeResultSearch(search);
+  const reviewById = new Map(reviews.map((item) => [item.id, item]));
+
+  return attempts
+    .map((attempt) => ({
+      attempt,
+      review: reviewById.get(attempt.id),
+    }))
+    .filter((row) => {
+      if (!normalizedSearch) return true;
+      const label = row.review?.studentLabel ?? row.attempt.studentName;
+      return matchesResultSearch(label, normalizedSearch);
+    });
+}
+
+export function filterAttemptReviews({
+  attempts,
+  filter,
+  search,
+}: {
+  attempts: AssignmentAttemptReview[];
+  filter: AttemptReviewFilter;
+  search: string;
+}) {
+  const normalizedSearch = normalizeResultSearch(search);
+
+  return attempts.filter((attempt) => {
+    const matchesStudent = normalizedSearch
+      ? matchesResultSearch(attempt.studentLabel, normalizedSearch)
+      : true;
+    if (!matchesStudent) return false;
+
+    if (filter === 'needs-review') {
+      return attempt.answers.some((answer) => !answer.correct);
+    }
+
+    return true;
+  });
+}
+
+export function sortStudentSummaries(
+  students: AssignmentStudentSummary[],
+  sort: StudentSummarySort
+) {
+  return [...students].sort((left, right) => {
+    if (sort === 'best') {
+      return compareStudentsDescending(
+        left.bestAccuracy,
+        right.bestAccuracy,
+        left,
+        right
+      );
+    }
+
+    if (sort === 'name') {
+      return left.studentLabel.localeCompare(right.studentLabel);
+    }
+
+    if (sort === 'attempts') {
+      return compareStudentsDescending(
+        left.attempts,
+        right.attempts,
+        left,
+        right
+      );
+    }
+
+    if (left.needsReviewCount !== right.needsReviewCount) {
+      return right.needsReviewCount - left.needsReviewCount;
+    }
+    if (left.latestAccuracy !== right.latestAccuracy) {
+      return left.latestAccuracy - right.latestAccuracy;
+    }
+    return (
+      getDateTimestamp(right.lastCompletedAt) -
+      getDateTimestamp(left.lastCompletedAt)
+    );
+  });
+}
+
+export function sortItemPerformance(
+  items: AssignmentItemAnalysis[],
+  sort: ItemPerformanceSort
+) {
+  if (sort === 'original') return items;
+
+  return [...items].sort((left, right) => {
+    if (sort === 'accuracy') {
+      if (left.correctRate !== right.correctRate) {
+        return left.correctRate - right.correctRate;
+      }
+      return right.submittedCount - left.submittedCount;
+    }
+
+    if (sort === 'submitted') {
+      if (left.submittedCount !== right.submittedCount) {
+        return right.submittedCount - left.submittedCount;
+      }
+      return left.correctRate - right.correctRate;
+    }
+
+    if (sort === 'type') {
+      const typeCompare = left.kind.localeCompare(right.kind);
+      if (typeCompare !== 0) return typeCompare;
+      return left.prompt.localeCompare(right.prompt);
+    }
+
+    return 0;
+  });
+}
+
+export function parseStudentSummarySort(
+  value: unknown
+): StudentSummarySort | undefined {
+  return value === 'best' || value === 'name' || value === 'attempts'
+    ? value
+    : undefined;
+}
+
+export function parseItemPerformanceSort(
+  value: unknown
+): ItemPerformanceSort | undefined {
+  return value === 'accuracy' || value === 'submitted' || value === 'type'
+    ? value
+    : undefined;
+}
+
+export function parseAttemptReviewFilter(
+  value: unknown
+): AttemptReviewFilter | undefined {
+  return value === 'needs-review' ? value : undefined;
+}
+
+export function normalizeResultSearch(value: string | null | undefined) {
+  const normalized = value?.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  return normalized || undefined;
+}
+
+export function matchesResultSearch(
+  value: string | null | undefined,
+  search: string
+) {
+  return normalizeResultSearch(value)?.includes(search) ?? false;
+}
+
+function compareStudentsDescending(
+  leftValue: number,
+  rightValue: number,
+  leftStudent: AssignmentStudentSummary,
+  rightStudent: AssignmentStudentSummary
+) {
+  if (leftValue !== rightValue) return rightValue - leftValue;
+  return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
+}
+
+function getDateTimestamp(value: Date | null) {
+  return value?.getTime() ?? 0;
+}

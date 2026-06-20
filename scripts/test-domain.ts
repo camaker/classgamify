@@ -4,6 +4,18 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import {
+  buildFilteredAttemptRows,
+  filterAndSortStudentSummaries,
+  filterAttemptReviews,
+  matchesResultSearch,
+  normalizeResultSearch,
+  parseAttemptReviewFilter,
+  parseItemPerformanceSort,
+  parseStudentSummarySort,
+  sortItemPerformance,
+  sortStudentSummaries,
+} from '@/assignments/result-view';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
@@ -220,6 +232,82 @@ assert.equal(resultAnalysis.students[1]?.latestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.needsReviewCount, 0);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
 assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
+assert.equal(
+  normalizeResultSearch('  Anonymous   Student 1  '),
+  'anonymous student 1'
+);
+assert.equal(matchesResultSearch('Anonymous student 1', 'student 1'), true);
+assert.equal(matchesResultSearch(null, 'student 1'), false);
+assert.equal(parseStudentSummarySort('best'), 'best');
+assert.equal(parseStudentSummarySort('needs-review'), undefined);
+assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
+assert.equal(parseItemPerformanceSort('original'), undefined);
+assert.equal(parseAttemptReviewFilter('needs-review'), 'needs-review');
+assert.equal(parseAttemptReviewFilter('all'), undefined);
+assert.deepEqual(
+  sortStudentSummaries(resultAnalysis.students, 'attempts').map(
+    (student) => student.studentLabel
+  ),
+  ['Alice', 'Anonymous student 1']
+);
+assert.deepEqual(
+  filterAndSortStudentSummaries({
+    search: ' anonymous ',
+    sort: 'needs-review',
+    students: resultAnalysis.students,
+  }).map((student) => student.studentLabel),
+  ['Anonymous student 1']
+);
+assert.deepEqual(
+  sortItemPerformance(resultAnalysis.perItem, 'accuracy').map(
+    (item) => item.itemId
+  ),
+  ['pair-1', 'q-1']
+);
+assert.deepEqual(
+  sortItemPerformance(resultAnalysis.perItem, 'submitted').map(
+    (item) => item.itemId
+  ),
+  ['q-1', 'pair-1']
+);
+assert.deepEqual(
+  sortItemPerformance(resultAnalysis.perItem, 'type').map(
+    (item) => item.itemId
+  ),
+  ['pair-1', 'q-1']
+);
+assert.equal(
+  sortItemPerformance(resultAnalysis.perItem, 'original'),
+  resultAnalysis.perItem
+);
+assert.deepEqual(
+  buildFilteredAttemptRows({
+    attempts: [
+      { id: 'attempt-1', studentName: ' Alice ' },
+      { id: 'attempt-2', studentName: 'alice' },
+      { id: 'attempt-3', studentName: null },
+    ],
+    reviews: resultAnalysis.attempts,
+    search: 'anonymous',
+  }).map((row) => row.attempt.id),
+  ['attempt-3']
+);
+assert.deepEqual(
+  filterAttemptReviews({
+    attempts: resultAnalysis.attempts,
+    filter: 'needs-review',
+    search: '',
+  }).map((attempt) => attempt.id),
+  ['attempt-1', 'attempt-3']
+);
+assert.deepEqual(
+  filterAttemptReviews({
+    attempts: resultAnalysis.attempts,
+    filter: 'all',
+    search: ' alice ',
+  }).map((attempt) => attempt.id),
+  ['attempt-1', 'attempt-2']
+);
 
 const csvExportData = {
   activity: {

@@ -3,6 +3,19 @@ import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
+  type AttemptReviewFilter,
+  type ItemPerformanceSort,
+  type StudentSummarySort,
+  buildFilteredAttemptRows,
+  filterAndSortStudentSummaries,
+  filterAttemptReviews,
+  normalizeResultSearch,
+  parseAttemptReviewFilter,
+  parseItemPerformanceSort,
+  parseStudentSummarySort,
+  sortItemPerformance,
+} from '@/assignments/result-view';
+import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
@@ -58,10 +71,6 @@ import {
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-
-type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
-type ItemPerformanceSort = 'accuracy' | 'original' | 'submitted' | 'type';
-type AttemptReviewFilter = 'all' | 'needs-review';
 
 const studentSummarySortOptions: Array<{
   label: string;
@@ -119,17 +128,15 @@ function AssignmentResultsPage() {
   const templateType =
     data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
   const hasAttempts = Boolean(data?.attempts.length);
-  const normalizedStudentSearch = normalizeResultSearch(studentSearch);
-  const filteredStudents = useMemo(() => {
-    const students = data?.analysis.students ?? [];
-    const matchedStudents = normalizedStudentSearch
-      ? students.filter((student) =>
-          matchesResultSearch(student.studentLabel, normalizedStudentSearch)
-        )
-      : students;
-
-    return sortStudentSummaries(matchedStudents, studentSort);
-  }, [data?.analysis.students, normalizedStudentSearch, studentSort]);
+  const filteredStudents = useMemo(
+    () =>
+      filterAndSortStudentSummaries({
+        search: studentSearch,
+        sort: studentSort,
+        students: data?.analysis.students ?? [],
+      }),
+    [data?.analysis.students, studentSearch, studentSort]
+  );
   const sortedPerformanceItems = useMemo(
     () =>
       sortItemPerformance(data?.analysis.perItem ?? [], itemPerformanceSort),
@@ -179,39 +186,24 @@ function AssignmentResultsPage() {
     });
   }
 
-  const attemptReviewById = useMemo(
+  const filteredAttemptRows = useMemo(
     () =>
-      new Map((data?.analysis.attempts ?? []).map((item) => [item.id, item])),
-    [data?.analysis.attempts]
+      buildFilteredAttemptRows({
+        attempts: data?.attempts ?? [],
+        reviews: data?.analysis.attempts ?? [],
+        search: studentSearch,
+      }),
+    [data?.analysis.attempts, data?.attempts, studentSearch]
   );
-  const filteredAttemptRows = useMemo(() => {
-    const attempts = data?.attempts ?? [];
-    return attempts
-      .map((attempt) => ({
-        attempt,
-        review: attemptReviewById.get(attempt.id),
-      }))
-      .filter((row) => {
-        if (!normalizedStudentSearch) return true;
-        const label = row.review?.studentLabel ?? row.attempt.studentName ?? '';
-        return matchesResultSearch(label, normalizedStudentSearch);
-      });
-  }, [attemptReviewById, data?.attempts, normalizedStudentSearch]);
-  const filteredAttemptReviews = useMemo(() => {
-    const attempts = data?.analysis.attempts ?? [];
-    return attempts.filter((attempt) => {
-      const matchesStudent = normalizedStudentSearch
-        ? matchesResultSearch(attempt.studentLabel, normalizedStudentSearch)
-        : true;
-      if (!matchesStudent) return false;
-
-      if (attemptReviewFilter === 'needs-review') {
-        return attempt.answers.some((answer) => !answer.correct);
-      }
-
-      return true;
-    });
-  }, [attemptReviewFilter, data?.analysis.attempts, normalizedStudentSearch]);
+  const filteredAttemptReviews = useMemo(
+    () =>
+      filterAttemptReviews({
+        attempts: data?.analysis.attempts ?? [],
+        filter: attemptReviewFilter,
+        search: studentSearch,
+      }),
+    [attemptReviewFilter, data?.analysis.attempts, studentSearch]
+  );
 
   async function handleExportResults() {
     if (!data || data.attempts.length === 0) {
@@ -1119,123 +1111,4 @@ function formatDuration(seconds: number) {
 
 function formatAcceptedAnswers(values: string[]) {
   return values.length > 1 ? values.join(', ') : '-';
-}
-
-function sortStudentSummaries(
-  students: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['students'],
-  sort: StudentSummarySort
-) {
-  return [...students].sort((left, right) => {
-    if (sort === 'best') {
-      return compareDescending(
-        left.bestAccuracy,
-        right.bestAccuracy,
-        left,
-        right
-      );
-    }
-
-    if (sort === 'name') {
-      return left.studentLabel.localeCompare(right.studentLabel);
-    }
-
-    if (sort === 'attempts') {
-      return compareDescending(left.attempts, right.attempts, left, right);
-    }
-
-    if (left.needsReviewCount !== right.needsReviewCount) {
-      return right.needsReviewCount - left.needsReviewCount;
-    }
-    if (left.latestAccuracy !== right.latestAccuracy) {
-      return left.latestAccuracy - right.latestAccuracy;
-    }
-    return (
-      getDateTimestamp(right.lastCompletedAt) -
-      getDateTimestamp(left.lastCompletedAt)
-    );
-  });
-}
-
-function sortItemPerformance(
-  items: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['perItem'],
-  sort: ItemPerformanceSort
-) {
-  if (sort === 'original') return items;
-
-  return [...items].sort((left, right) => {
-    if (sort === 'accuracy') {
-      if (left.correctRate !== right.correctRate) {
-        return left.correctRate - right.correctRate;
-      }
-      return right.submittedCount - left.submittedCount;
-    }
-
-    if (sort === 'submitted') {
-      if (left.submittedCount !== right.submittedCount) {
-        return right.submittedCount - left.submittedCount;
-      }
-      return left.correctRate - right.correctRate;
-    }
-
-    if (sort === 'type') {
-      const typeCompare = left.kind.localeCompare(right.kind);
-      if (typeCompare !== 0) return typeCompare;
-      return left.prompt.localeCompare(right.prompt);
-    }
-
-    return 0;
-  });
-}
-
-function compareDescending(
-  leftValue: number,
-  rightValue: number,
-  leftStudent: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['students'][number],
-  rightStudent: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['students'][number]
-) {
-  if (leftValue !== rightValue) return rightValue - leftValue;
-  return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
-}
-
-function getDateTimestamp(value: Date | null) {
-  return value?.getTime() ?? 0;
-}
-
-function parseStudentSummarySort(
-  value: unknown
-): StudentSummarySort | undefined {
-  return value === 'best' || value === 'name' || value === 'attempts'
-    ? value
-    : undefined;
-}
-
-function parseItemPerformanceSort(
-  value: unknown
-): ItemPerformanceSort | undefined {
-  return value === 'accuracy' || value === 'submitted' || value === 'type'
-    ? value
-    : undefined;
-}
-
-function parseAttemptReviewFilter(
-  value: unknown
-): AttemptReviewFilter | undefined {
-  return value === 'needs-review' ? value : undefined;
-}
-
-function normalizeResultSearch(value: string) {
-  const normalized = value.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
-  return normalized || undefined;
-}
-
-function matchesResultSearch(value: string, search: string) {
-  return normalizeResultSearch(value)?.includes(search) ?? false;
 }

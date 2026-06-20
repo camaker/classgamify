@@ -264,6 +264,9 @@ submissions and submissions with at least one missed item, with the focused view
 stored in the URL for repeat review passes. Student summaries can be sorted by
 review need, best score, student name, or attempt volume so teachers can choose
 the scan order that matches grading, reteaching, or participation follow-up.
+Result-page search, sort, and review-filter rules belong in assignment-domain
+helpers so teacher tables, copied artifacts, and future API views do not drift
+from the same normalized student labels and item performance ordering.
 Teachers can also view and copy a compact classroom brief that combines
 assignment-level metrics, the three lowest-performing submitted items, and the
 students who most need follow-up. The brief is teacher-only result data
