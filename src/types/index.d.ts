@@ -25,9 +25,9 @@ export interface UiConfig {
 
 /** Website metadata */
 export interface MetadataConfig {
-  name?: string;         // The name of the website, e.g. 'Lang Study'
-  title?: string;        // The title of the website, e.g. 'Lang Study - Chinese Character Practice'
-  description?: string;  // The description of the website, e.g. 'Practice Chinese characters with guided tracing and printable worksheets.'
+  name?: string;         // The name of the website, e.g. 'ClassGamify'
+  title?: string;        // The title of the website, e.g. 'ClassGamify - Classroom Activity Builder'
+  description?: string;  // The description of the website, e.g. 'Create classroom games, worksheets, and assignment links.'
   images?: ImagesConfig; // The images of the website
 }
 

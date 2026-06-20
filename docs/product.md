@@ -36,6 +36,10 @@ Public editorial surfaces follow the same rule. Blog posts, release notes, and
 their generated sitemap URLs should describe ClassGamify templates, assignments,
 AI authoring, and teacher results instead of inherited course or handwriting
 content.
+Developer-facing examples and active account/contact copy should follow the
+same product boundary: visible surfaces may refer to legacy URLs only when they
+are explicit migration entry points, while current forms, billing pages, and
+configuration examples should speak in ClassGamify terms.
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
