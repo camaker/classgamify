@@ -3,6 +3,10 @@ import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-a
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
+  buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvFilename,
+} from '@/assignments/results-export';
+import {
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
@@ -212,5 +216,67 @@ assert.equal(resultAnalysis.students[1]?.latestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.needsReviewCount, 0);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
 assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
+
+const csvExportData = {
+  activity: {
+    description: 'Original activity',
+    templateType: 'quiz',
+    title: 'Original Capitals',
+  },
+  analysis: resultAnalysis,
+  assignment: {
+    expiresAt: new Date('2026-01-10T10:00:00.000Z'),
+    id: 'assignment-1',
+    settingsJson: {
+      collectStudentName: true,
+      instructions: 'Use "complete sentences", then submit.',
+      maxAttempts: 2,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 60,
+    },
+    shareSlug: 'share-123',
+    status: 'published',
+    title: 'Capital Review, Week 1',
+  },
+  attempts: [
+    {
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'attempt-1',
+      maxScore: 2,
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 2,
+        durationSeconds: 45,
+        totalPoints: 2,
+      },
+      score: 1,
+    },
+  ],
+  snapshot: {
+    activityDescription: 'Snapshot description',
+    activityTitle: 'Snapshot Capitals',
+    templateType: 'quiz',
+  },
+  stats: {
+    averageDurationSeconds: 45,
+    averagePoints: 1,
+    averageScore: 50,
+    completions: 1,
+  },
+} satisfies Parameters<typeof buildAssignmentResultsCsv>[0];
+
+const csv = buildAssignmentResultsCsv(csvExportData);
+assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
+assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123"/);
+assert.match(csv, /"Use ""complete sentences"", then submit\."/);
+assert.match(csv, /"Snapshot Capitals","quiz"/);
+assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
+assert.match(csv, /"Paris \| Paris, France","correct"/);
+assert.match(csv, /"Paris is the capital of France\."/);
+assert.equal(
+  buildAssignmentResultsCsvFilename(csvExportData),
+  'classgamify-capital-review-week-1-results.csv'
+);
 
 console.log('Domain tests passed.');
