@@ -28,7 +28,12 @@ import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
-import { buildActivityContent } from '@/activities/validation';
+import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
+import {
+  buildActivityContent,
+  createActivityInputSchema,
+} from '@/activities/validation';
+import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import {
@@ -343,6 +348,35 @@ assert.deepEqual(
 );
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
+for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
+  const scaffold = getActivityTemplateScaffold(templateType);
+  const input = createActivityInputSchema.parse({
+    ...scaffold,
+    difficulty: 'starter',
+    gradeBand: 'Primary',
+    language: 'en',
+    templateType,
+    visibility: 'draft',
+  });
+  const content = buildActivityContent(input);
+  const runtimeItems = getRuntimeItems(templateType, content);
+  const scaffoldRemixPlan = getTemplateRemixPlan({
+    content,
+    currentTemplateType: templateType,
+  });
+
+  assert.ok(content.questions.length >= 3);
+  assert.ok(content.pairs.length >= 3);
+  assert.ok(content.groups.length >= 2);
+  assert.ok(content.vocabulary.length >= 3);
+  assert.ok(content.teacherNotes.length >= 1);
+  assert.ok(runtimeItems.length >= 3);
+  assert.ok(
+    scaffoldRemixPlan.readyOptions.some(
+      (option) => option.template.type === templateType
+    )
+  );
+}
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 2',
