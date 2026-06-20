@@ -41,6 +41,8 @@ import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconChevronLeft,
+  IconChevronRight,
   IconCopy,
   IconDeviceGamepad2,
   IconEdit,
@@ -55,7 +57,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityCardData = {
@@ -71,9 +73,12 @@ type ActivityCardData = {
 type ActivityLibraryStatus = 'active' | 'archived';
 type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
+const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
+
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
     created: typeof search.created === 'string' ? search.created : undefined,
+    page: parseActivityLibraryPage(search.page),
     q: typeof search.q === 'string' ? search.q : undefined,
     status:
       search.status === 'archived' || search.status === 'active'
@@ -88,19 +93,25 @@ export const Route = createFileRoute('/dashboard/activities')({
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
-  const { created, q, status, template } = Route.useSearch();
+  const { created, page, q, status, template } = Route.useSearch();
   const searchQuery = q ?? '';
   const libraryStatus = status ?? 'active';
   const templateFilter: ActivityTemplateFilter = template ?? 'all';
+  const currentPage = page ?? 1;
   const normalizedSearchQuery = normalizeActivitySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
-    pageIndex: 0,
-    pageSize: 50,
+    pageIndex: currentPage - 1,
+    pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
     search: normalizedSearchQuery,
     status: libraryStatus,
     template,
   });
   const activities = data?.items ?? [];
+  const totalActivities = data?.total ?? 0;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalActivities / ACTIVITY_LIBRARY_PAGE_SIZE)
+  );
   const hasActivities = activities.length > 0;
   const hasFilters =
     Boolean(normalizedSearchQuery) ||
@@ -117,6 +128,12 @@ function DashboardActivitiesPage() {
       ? 'Archived activities will appear here after you move them out of the active library.'
       : 'Try another title, description, template keyword, or template family from your classroom activity library.';
 
+  useEffect(() => {
+    if (!isLoading && currentPage > totalPages) {
+      navigateToActivityPage(totalPages, true);
+    }
+  }, [currentPage, isLoading, totalActivities, totalPages]);
+
   function updateLibraryFilters(next: {
     q?: string;
     status?: ActivityLibraryStatus;
@@ -130,9 +147,25 @@ function DashboardActivitiesPage() {
       replace: true,
       search: {
         created,
+        page: undefined,
         q: nextQuery.trim() ? nextQuery : undefined,
         status: nextStatus === 'active' ? undefined : nextStatus,
         template: nextTemplate === 'all' ? undefined : nextTemplate,
+      },
+    });
+  }
+
+  function navigateToActivityPage(nextPage: number, replace = false) {
+    const boundedPage = Math.max(1, nextPage);
+
+    void navigate({
+      replace,
+      search: {
+        created,
+        page: boundedPage === 1 ? undefined : boundedPage,
+        q: searchQuery.trim() ? searchQuery : undefined,
+        status: libraryStatus === 'active' ? undefined : libraryStatus,
+        template: templateFilter === 'all' ? undefined : templateFilter,
       },
     });
   }
@@ -189,7 +222,7 @@ function DashboardActivitiesPage() {
           }
           status={libraryStatus}
           template={templateFilter}
-          total={data?.total ?? 0}
+          total={totalActivities}
           value={searchQuery}
         />
 
@@ -208,23 +241,33 @@ function DashboardActivitiesPage() {
         ) : null}
 
         {!isLoading && hasActivities ? (
-          <section className="grid gap-4 lg:grid-cols-2">
-            {activities.map((activity) => (
-              <ActivityCard
-                key={activity.id}
-                activity={{
-                  content: activity.contentJson,
-                  description: activity.description ?? '',
-                  id: activity.id,
-                  persisted: true,
-                  status: activity.visibility,
-                  templateType: activity.templateType,
-                  title: activity.title,
-                }}
-                libraryStatus={libraryStatus}
-              />
-            ))}
-          </section>
+          <>
+            <section className="grid gap-4 lg:grid-cols-2">
+              {activities.map((activity) => (
+                <ActivityCard
+                  key={activity.id}
+                  activity={{
+                    content: activity.contentJson,
+                    description: activity.description ?? '',
+                    id: activity.id,
+                    persisted: true,
+                    status: activity.visibility,
+                    templateType: activity.templateType,
+                    title: activity.title,
+                  }}
+                  libraryStatus={libraryStatus}
+                />
+              ))}
+            </section>
+            <ActivityLibraryPagination
+              currentPage={currentPage}
+              isLoading={isLoading}
+              onPageChange={(nextPage) => navigateToActivityPage(nextPage)}
+              pageSize={ACTIVITY_LIBRARY_PAGE_SIZE}
+              total={totalActivities}
+              totalPages={totalPages}
+            />
+          </>
         ) : null}
 
         {!isLoading && !hasActivities && hasFilters ? (
@@ -411,6 +454,63 @@ function ActivityLibrarySearch({
         ) : null}
       </div>
     </section>
+  );
+}
+
+function ActivityLibraryPagination({
+  currentPage,
+  isLoading,
+  onPageChange,
+  pageSize,
+  total,
+  totalPages,
+}: {
+  currentPage: number;
+  isLoading: boolean;
+  onPageChange: (page: number) => void;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}) {
+  if (totalPages <= 1) return null;
+
+  const firstItem = (currentPage - 1) * pageSize + 1;
+  const lastItem = Math.min(total, currentPage * pageSize);
+
+  return (
+    <nav
+      aria-label="Activity library pages"
+      className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p className="text-sm text-muted-foreground">
+        Showing {firstItem}-{lastItem} of {total} activities
+      </p>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="bg-background"
+          disabled={isLoading || currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          <IconChevronLeft className="size-4" />
+          Previous
+        </Button>
+        <span className="min-w-24 text-center text-sm text-muted-foreground">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          className="bg-background"
+          disabled={isLoading || currentPage >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          Next
+          <IconChevronRight className="size-4" />
+        </Button>
+      </div>
+    </nav>
   );
 }
 
@@ -908,6 +1008,12 @@ function formatDateTimeLocal(date: Date) {
 function normalizeActivitySearch(value: string) {
   const normalized = value.replace(/\s+/g, ' ').trim();
   return normalized || undefined;
+}
+
+function parseActivityLibraryPage(value: unknown) {
+  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+  const page = Number(value);
+  return Number.isInteger(page) && page > 1 ? page : undefined;
 }
 
 function isActivityTemplateType(value: unknown): value is ActivityTemplateType {
