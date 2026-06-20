@@ -2,7 +2,6 @@ import { activityTemplates } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
-import type { ActivityContent } from '@/activities/types';
 import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
@@ -411,7 +410,7 @@ export function ActivityCreateForm({
                           variant="secondary"
                           className="rounded-md"
                         >
-                          Requires {getRequirementLabel(requirement)}
+                          Requires {formatTemplateRequirement(requirement)}
                         </Badge>
                       ))}
                     </div>
@@ -857,17 +856,4 @@ function ActivityDraftCoverageStat({
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
-}
-
-function getRequirementLabel(requirement: keyof ActivityContent) {
-  switch (requirement) {
-    case 'groups':
-      return 'groups';
-    case 'pairs':
-      return 'match pairs';
-    case 'questions':
-      return 'questions';
-    default:
-      return requirement;
-  }
 }
