@@ -142,6 +142,10 @@ order, so a teacher can verify a link's rules without reopening the publish
 dialog. The publish dialog should show the same delivery preview before the
 teacher creates the share link, so configuration mistakes are visible before an
 assignment is frozen.
+Assignment item ordering is also delivery policy. Shuffle behavior should use a
+stable assignment-domain helper keyed by the share link so the same frozen
+assignment loads in a predictable order while preserving the original snapshot
+order when shuffle is off.
 Teacher assignment pages should support the real distribution workflow:
 teachers can open a student link for preview or copy the absolute `/play/:id`
 URL from the assignment list and results page before sending it through a class

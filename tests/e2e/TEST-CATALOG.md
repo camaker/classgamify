@@ -25,8 +25,8 @@ explicitly provisioned.
 Pure assignment-domain helpers also have a fast local gate via
 `pnpm test:domain`; run it when changing scoring, submission payload, identity,
 attempt metrics, result-summary helpers, activity/assignment list filters, or
-result-view search, sort, review-filter rules, template runtime ids, or
-deterministic AI draft fallback behavior.
+result-view search, sort, review-filter rules, template runtime ids, assignment
+item ordering, or deterministic AI draft fallback behavior.
 
 ## Test Harness
 

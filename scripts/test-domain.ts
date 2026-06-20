@@ -20,6 +20,10 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  orderAssignmentRuntimeItems,
+  stableShuffle,
+} from '@/assignments/item-order';
+import {
   buildFilteredAttemptRows,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
@@ -81,6 +85,34 @@ assert.deepEqual(
     { answer: '   ', itemId: 'item-2' },
     { answer: '', itemId: 'item-3' },
   ]
+);
+assert.equal(
+  orderAssignmentRuntimeItems({
+    items: submissionRuntimeItems,
+    shareSlug: 'share-1',
+    shuffleItems: false,
+  }),
+  submissionRuntimeItems
+);
+const shuffledOnce = orderAssignmentRuntimeItems({
+  items: submissionRuntimeItems,
+  shareSlug: 'share-1',
+  shuffleItems: true,
+});
+const shuffledAgain = orderAssignmentRuntimeItems({
+  items: submissionRuntimeItems,
+  shareSlug: 'share-1',
+  shuffleItems: true,
+});
+assert.deepEqual(shuffledOnce, shuffledAgain);
+assert.notEqual(shuffledOnce, submissionRuntimeItems);
+assert.deepEqual(
+  submissionRuntimeItems.map((item) => item.id),
+  ['item-1', 'item-2', 'item-3']
+);
+assert.deepEqual(
+  stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id),
+  stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id)
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
