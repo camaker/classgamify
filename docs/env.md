@@ -81,7 +81,8 @@ Read at **Worker request time**. Used for secrets, API keys, and server-only con
 | `CREEM_WEBHOOK_SECRET` | Creem webhook signing | No | Payment webhook (Creem) |
 | `CREEM_DEBUG` | Use Creem sandbox API | No | Set to `true` for test mode (`test-api.creem.io`) |
 | **AI** | | | |
-| `FAL_KEY` | fal.ai API key | No | [AI](../src/api/ai.ts); required for image generation/edit via fal.ai |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID | No | Activity draft generation via Workers AI; also used by Cloudflare mail when enabled |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token | No | Activity draft generation via Workers AI; also used by Cloudflare mail when enabled |
 
 ---
 
