@@ -20,6 +20,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
 import { Progress } from '@/components/ui/progress';
 import {
   Table,
@@ -47,18 +51,38 @@ import {
   IconUsers,
   IconX,
 } from '@tabler/icons-react';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
+
+const studentSummarySortOptions: Array<{
+  label: string;
+  value: StudentSummarySort;
+}> = [
+  { label: 'Needs review', value: 'needs-review' },
+  { label: 'Best score', value: 'best' },
+  { label: 'Student name', value: 'name' },
+  { label: 'Attempts', value: 'attempts' },
+];
+
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    sort: parseStudentSummarySort(search.sort),
+  }),
   component: AssignmentResultsPage,
 });
 
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
+  const { sort } = Route.useSearch();
+  const navigate = useNavigate({
+    from: '/dashboard/assignments/$assignmentId',
+  });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
   const [studentSearch, setStudentSearch] = useState('');
+  const studentSort = sort ?? 'needs-review';
   const title = data?.assignment.title ?? 'Assignment results';
   const activityTitle =
     data?.snapshot?.activityTitle ?? data?.activity.title ?? '';
@@ -70,11 +94,24 @@ function AssignmentResultsPage() {
   const normalizedStudentSearch = normalizeResultSearch(studentSearch);
   const filteredStudents = useMemo(() => {
     const students = data?.analysis.students ?? [];
-    if (!normalizedStudentSearch) return students;
-    return students.filter((student) =>
-      matchesResultSearch(student.studentLabel, normalizedStudentSearch)
-    );
-  }, [data?.analysis.students, normalizedStudentSearch]);
+    const matchedStudents = normalizedStudentSearch
+      ? students.filter((student) =>
+          matchesResultSearch(student.studentLabel, normalizedStudentSearch)
+        )
+      : students;
+
+    return sortStudentSummaries(matchedStudents, studentSort);
+  }, [data?.analysis.students, normalizedStudentSearch, studentSort]);
+
+  function updateStudentSort(nextSort: StudentSummarySort) {
+    void navigate({
+      replace: true,
+      search: {
+        sort: nextSort === 'needs-review' ? undefined : nextSort,
+      },
+    });
+  }
+
   const attemptReviewById = useMemo(
     () =>
       new Map((data?.analysis.attempts ?? []).map((item) => [item.id, item])),
@@ -258,6 +295,8 @@ function AssignmentResultsPage() {
               matchedStudents={filteredStudents.length}
               onClear={() => setStudentSearch('')}
               onSearch={setStudentSearch}
+              onSortChange={updateStudentSort}
+              sort={studentSort}
               value={studentSearch}
             />
           ) : null}
@@ -317,8 +356,8 @@ function AssignmentResultsPage() {
                 </CardTitle>
                 <CardDescription>
                   <p>
-                    Students are sorted by latest accuracy so follow-up work is
-                    easy to spot before reading every submitted answer.
+                    Sort students by review priority, best score, name, or
+                    attempt volume before reading every submitted answer.
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -438,12 +477,16 @@ function ResultStudentSearch({
   matchedStudents,
   onClear,
   onSearch,
+  onSortChange,
+  sort,
   value,
 }: {
   matchedAttempts: number;
   matchedStudents: number;
   onClear: () => void;
   onSearch: (value: string) => void;
+  onSortChange: (sort: StudentSummarySort) => void;
+  sort: StudentSummarySort;
   value: string;
 }) {
   const hasSearch = Boolean(normalizeResultSearch(value));
@@ -452,7 +495,7 @@ function ResultStudentSearch({
     : 'All students';
 
   return (
-    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
       <div className="grid gap-2">
         <label
           htmlFor="assignment-result-search"
@@ -480,6 +523,24 @@ function ResultStudentSearch({
             </button>
           ) : null}
         </div>
+      </div>
+      <div className="grid gap-2">
+        <label htmlFor="student-summary-sort" className="font-medium text-sm">
+          Sort students
+        </label>
+        <NativeSelect
+          id="student-summary-sort"
+          value={sort}
+          onChange={(event) =>
+            onSortChange(event.currentTarget.value as StudentSummarySort)
+          }
+        >
+          {studentSummarySortOptions.map((option) => (
+            <NativeSelectOption key={option.value} value={option.value}>
+              {option.label}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
       </div>
       <p className="text-sm text-muted-foreground md:text-right">{summary}</p>
     </section>
@@ -695,6 +756,69 @@ function formatDuration(seconds: number) {
   const remainder = seconds % 60;
   if (minutes <= 0) return `${remainder}s`;
   return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
+}
+
+function sortStudentSummaries(
+  students: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['students'],
+  sort: StudentSummarySort
+) {
+  return [...students].sort((left, right) => {
+    if (sort === 'best') {
+      return compareDescending(
+        left.bestAccuracy,
+        right.bestAccuracy,
+        left,
+        right
+      );
+    }
+
+    if (sort === 'name') {
+      return left.studentLabel.localeCompare(right.studentLabel);
+    }
+
+    if (sort === 'attempts') {
+      return compareDescending(left.attempts, right.attempts, left, right);
+    }
+
+    if (left.needsReviewCount !== right.needsReviewCount) {
+      return right.needsReviewCount - left.needsReviewCount;
+    }
+    if (left.latestAccuracy !== right.latestAccuracy) {
+      return left.latestAccuracy - right.latestAccuracy;
+    }
+    return (
+      getDateTimestamp(right.lastCompletedAt) -
+      getDateTimestamp(left.lastCompletedAt)
+    );
+  });
+}
+
+function compareDescending(
+  leftValue: number,
+  rightValue: number,
+  leftStudent: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['students'][number],
+  rightStudent: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['students'][number]
+) {
+  if (leftValue !== rightValue) return rightValue - leftValue;
+  return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
+}
+
+function getDateTimestamp(value: Date | null) {
+  return value?.getTime() ?? 0;
+}
+
+function parseStudentSummarySort(
+  value: unknown
+): StudentSummarySort | undefined {
+  return value === 'best' || value === 'name' || value === 'attempts'
+    ? value
+    : undefined;
 }
 
 function normalizeResultSearch(value: string) {
