@@ -7,6 +7,7 @@ import {
   getAssignmentStatusLabel,
   isAssignmentExpired,
 } from '@/assignments/lifecycle';
+import { findPublishedAssignmentInList } from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -116,10 +117,10 @@ function DashboardAssignmentsPage() {
   );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
-  const publishedAssignment = published
-    ? assignments.find((item) => item.assignment.shareSlug === published)
-        ?.assignment
-    : undefined;
+  const publishedAssignment = findPublishedAssignmentInList({
+    items: assignments,
+    shareSlug: published,
+  });
   const summary = data?.summary ?? {
     averageScore: 0,
     completions: 0,

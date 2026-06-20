@@ -133,13 +133,15 @@ URL from the assignment list and results page before sending it through a class
 chat, LMS, or email. After a publish action redirects into the assignment list,
 the page should surface the newly published share link with copy, student
 preview, and results actions so distribution is the immediate next step. The
-assignment list should remain searchable as teachers reuse the product across
-classes: teachers can filter their own assignments by title, share id, source
-activity text, or assignment status without broadening outside the current
-owner. It should also paginate from the same authenticated list API so teachers
-with many class links can move through bounded result pages without losing
-search or status filter state. Assignment list overview cards summarize the
-full current filter result, not only the visible page, so teachers can trust
+published share-slug context should be resolved through assignment-domain logic,
+not ad hoc route code, because pagination and filters may change how much of the
+list is visible. The assignment list should remain searchable as teachers reuse
+the product across classes: teachers can filter their own assignments by title,
+share id, source activity text, or assignment status without broadening outside
+the current owner. It should also paginate from the same authenticated list API
+so teachers with many class links can move through bounded result pages without
+losing search or status filter state. Assignment list overview cards summarize
+the full current filter result, not only the visible page, so teachers can trust
 open-link counts, total completions, and average accuracy while paging through a
 large class archive.
 Teachers can close and reopen published assignment links without changing the
