@@ -320,37 +320,39 @@ function getClassroomInquiryCopy(locale: 'en' | 'zh') {
   if (locale === 'zh') {
     return {
       description:
-        '这些信息会整理进邮件，方便我们直接判断你需要的是练习纸、复习流程、课堂试用还是未来语言扩展。',
+        '这些信息会整理进邮件，方便我们判断你需要的是模板活动、作业链接、学生结果复盘还是 AI 辅助备课。',
       emailHeading: '课堂咨询信息',
-      languagesLabel: '未来语言范围',
-      languagesPlaceholder: '例如：先中文，之后日语假名 / 韩文 / 其他语言',
+      languagesLabel: '活动材料',
+      languagesPlaceholder: '例如：英语单词、科学分类、数学概念或已有练习纸',
       learnersLabel: '学习者',
-      learnersPlaceholder: '例如：8 名初学者 / 1 个孩子',
-      levelLabel: '当前水平',
-      levelPlaceholder: '例如：HSK1 入门 / 零基础',
+      learnersPlaceholder: '例如：28 名三年级学生 / 1 对 1 辅导',
+      levelLabel: '班级或年级',
+      levelPlaceholder: '例如：小学三年级 / 初中词汇复习',
       needLabel: '主要需求',
-      needPlaceholder: '例如：打印作业 / 复习错笔 / 家长交接',
+      needPlaceholder: '例如：单词配对、拖拽分类、填空作业、结果导出',
       routineLabel: '每周节奏',
-      routinePlaceholder: '例如：每周 2 节课，每次 30 分钟',
+      routinePlaceholder: '例如：每周 2 节课，课后发一次作业链接',
       title: '课堂需求细节',
     };
   }
 
   return {
     description:
-      'These details are added to the email so we can tell whether you need worksheets, review workflow, classroom rollout, or future language expansion.',
+      'These details are added to the email so we can tell whether you need template activities, assignment links, student results, or AI-assisted prep.',
     emailHeading: 'Classroom inquiry details',
-    languagesLabel: 'Future language scope',
+    languagesLabel: 'Activity material',
     languagesPlaceholder:
-      'e.g. Chinese first, then Japanese kana / Korean / another language',
+      'e.g. English vocab, science groups, math concepts, existing worksheet',
     learnersLabel: 'Learners',
-    learnersPlaceholder: 'e.g. 8 beginners / one child',
-    levelLabel: 'Current level',
-    levelPlaceholder: 'e.g. HSK1 starter / complete beginner',
+    learnersPlaceholder: 'e.g. 28 third graders / 1:1 tutoring',
+    levelLabel: 'Class or grade',
+    levelPlaceholder: 'e.g. Grade 3 / middle-school vocabulary review',
     needLabel: 'Main need',
-    needPlaceholder: 'e.g. print homework / review mistakes',
+    needPlaceholder:
+      'e.g. word matching, drag sorting, fill blanks, result export',
     routineLabel: 'Weekly routine',
-    routinePlaceholder: 'e.g. 2 classes per week, 30 minutes',
+    routinePlaceholder:
+      'e.g. 2 classes per week, one homework link after class',
     title: 'Classroom details',
   };
 }
