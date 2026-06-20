@@ -83,6 +83,7 @@ const RESULT_EXPORT_COLUMNS = [
   'prompt',
   'student_answer',
   'expected_answer',
+  'accepted_answers',
   'correct',
   'explanation',
 ] as const;
@@ -130,7 +131,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
     ];
 
     if (attempt.answers.length === 0) {
-      return [[...baseColumns, '', '', '', '', '', '', '']];
+      return [[...baseColumns, '', '', '', '', '', '', '', '']];
     }
 
     return attempt.answers.map((answer, index) => [
@@ -140,6 +141,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       answer.prompt,
       answer.answer,
       answer.expectedAnswer,
+      formatAcceptedAnswers(answer.acceptedAnswers),
       answer.correct ? 'correct' : 'review',
       answer.explanation ?? '',
     ]);
@@ -169,6 +171,10 @@ function formatCsvDate(value: Date | string | null) {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
   return date.toISOString();
+}
+
+function formatAcceptedAnswers(values: string[]) {
+  return values.length > 1 ? values.join(' | ') : '';
 }
 
 function slugifyFilename(value: string) {

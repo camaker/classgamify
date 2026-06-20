@@ -1,3 +1,4 @@
+import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
@@ -13,6 +14,7 @@ type AttemptForAnalysis = {
 };
 
 export type AssignmentItemAnalysis = {
+  acceptedAnswers: string[];
   correctCount: number;
   correctRate: number;
   explanation?: string;
@@ -26,6 +28,7 @@ export type AssignmentItemAnalysis = {
 export type AssignmentAttemptReview = {
   accuracy: number;
   answers: Array<{
+    acceptedAnswers: string[];
     answer: string;
     correct: boolean;
     expectedAnswer: string;
@@ -68,6 +71,7 @@ export function analyzeAssignmentResults({
   const runtimeItemById = new Map(runtimeItems.map((item) => [item.id, item]));
   const identityResolver = createStudentIdentityResolver(attempts);
   const perItem = runtimeItems.map((item) => {
+    const acceptedAnswers = getAcceptedAnswers(item.answer);
     const submittedAnswers = attempts
       .map((attempt) =>
         attempt.answersJson.answers.find((answer) => answer.itemId === item.id)
@@ -79,6 +83,7 @@ export function analyzeAssignmentResults({
     const submittedCount = submittedAnswers.length;
 
     return {
+      acceptedAnswers,
       correctCount,
       correctRate:
         submittedCount > 0
@@ -100,7 +105,9 @@ export function analyzeAssignmentResults({
       accuracy: attempt.resultJson?.accuracy ?? 0,
       answers: attempt.answersJson.answers.map((answer) => {
         const item = runtimeItemById.get(answer.itemId);
+        const acceptedAnswers = item ? getAcceptedAnswers(item.answer) : [];
         return {
+          acceptedAnswers,
           answer: answer.answer,
           correct: Boolean(answer.correct),
           expectedAnswer: item?.answer ?? '',

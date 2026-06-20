@@ -32,6 +32,10 @@ function formatItems(items: AssignmentItemAnalysis[]) {
 
   return items.map((item, index) => {
     const explanation = item.explanation ? ` Notes: ${item.explanation}` : '';
-    return `- ${index + 1}. ${item.prompt} (${item.kind}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${explanation}`;
+    const acceptedAnswers =
+      item.acceptedAnswers.length > 1
+        ? ` Accepted answers: ${item.acceptedAnswers.join(', ')}.`
+        : '';
+    return `- ${index + 1}. ${item.prompt} (${item.kind}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
   });
 }

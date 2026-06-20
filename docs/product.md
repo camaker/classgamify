@@ -195,12 +195,16 @@ Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
 produce per-item correct rates, reteach priorities, item-level attempt reviews,
 student-level follow-up summaries, answer explanations from the assignment
-snapshot, and attempt duration metrics. Teachers can export the same private
-result data to CSV for gradebooks, parent follow-up, or offline analysis. CSV
-exports should include the assignment delivery policy, including identity mode,
-answer reveal, shuffle, attempts, timer, close time, and instructions, so
-offline records preserve the rules behind each result. This keeps the results
-loop useful for deciding what to explain again after homework.
+snapshot, accepted answer alternatives, and attempt duration metrics. Accepted
+alternatives must use the same parser as scoring and student post-submit
+review, especially for fill-blank, listening, and future open-answer templates.
+Teachers can export the same private result data to CSV for gradebooks, parent
+follow-up, or offline analysis. CSV exports should include the assignment
+delivery policy, including identity mode, answer reveal, shuffle, attempts,
+timer, close time, and instructions, so offline records preserve the rules
+behind each result. Item rows should include both the primary expected answer
+and any accepted alternatives. This keeps the results loop useful for deciding
+what to explain again after homework.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance

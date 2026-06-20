@@ -958,6 +958,7 @@ function ItemPerformanceTable({
           <TableHead>Correct rate</TableHead>
           <TableHead>Submitted</TableHead>
           <TableHead>Expected</TableHead>
+          <TableHead>Accepted</TableHead>
           <TableHead>Explanation</TableHead>
         </TableRow>
       </TableHeader>
@@ -973,6 +974,7 @@ function ItemPerformanceTable({
               {item.correctCount}/{item.submittedCount}
             </TableCell>
             <TableCell>{item.expectedAnswer || '-'}</TableCell>
+            <TableCell>{formatAcceptedAnswers(item.acceptedAnswers)}</TableCell>
             <TableCell className="max-w-72">
               {item.explanation || '-'}
             </TableCell>
@@ -1004,6 +1006,11 @@ function ItemAnalysisCard({
         {item.correctCount}/{item.submittedCount} correct · answer:{' '}
         {item.expectedAnswer}
       </p>
+      {item.acceptedAnswers.length > 1 ? (
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          Accepted: {item.acceptedAnswers.join(', ')}
+        </p>
+      ) : null}
       {item.explanation ? (
         <p className="mt-2 text-xs leading-5 text-muted-foreground">
           {item.explanation}
@@ -1057,6 +1064,11 @@ function AttemptReviewCard({
               <p>Student: {answer.answer || '-'}</p>
               <p>Expected: {answer.expectedAnswer || '-'}</p>
             </div>
+            {answer.acceptedAnswers.length > 1 ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                Accepted answers: {answer.acceptedAnswers.join(', ')}
+              </p>
+            ) : null}
             {answer.explanation ? (
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
                 {answer.explanation}
@@ -1103,6 +1115,10 @@ function formatDuration(seconds: number) {
   const remainder = seconds % 60;
   if (minutes <= 0) return `${remainder}s`;
   return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
+}
+
+function formatAcceptedAnswers(values: string[]) {
+  return values.length > 1 ? values.join(', ') : '-';
 }
 
 function sortStudentSummaries(
