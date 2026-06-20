@@ -140,6 +140,10 @@ runtime prompts and choices, not `ActivityContent` with embedded answers.
 Correct answers are returned only after an attempt is scored and only when the
 assignment allows answer reveal. Anonymous assignments use a browser token so
 max-attempt limits still work without collecting student names.
+Student runners should show a compact public rule summary before the activity
+starts: item count, attempt limit, timer, close time, identity mode, and review
+behavior. This summary comes from sanitized assignment settings and must not
+include answer keys or teacher-only content.
 Student runners explain that anonymous work is tied to the current browser and
 show a short browser label for the student, while teacher result views continue
 to use normalized anonymous student labels instead of exposing raw tokens.

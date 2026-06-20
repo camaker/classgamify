@@ -15,6 +15,13 @@ import { LineMatchBoard } from '@/components/activities/line-match-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import { OpenBoxRunner } from '@/components/activities/open-box-runner';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
+import {
+  formatAnswerReveal,
+  formatAssignmentAttempts,
+  formatAssignmentExpiry,
+  formatAssignmentTimeLimit,
+  formatStudentIdentity,
+} from '@/components/assignments/assignment-settings-summary';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -26,8 +33,13 @@ import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
   IconCheck,
+  IconClock,
   IconDeviceGamepad2,
+  IconEye,
+  IconListCheck,
   IconPlayerPlay,
+  IconRepeat,
+  IconUser,
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
@@ -232,6 +244,14 @@ function PlayPage() {
                 {assignment.settings.instructions}
               </div>
             ) : null}
+            <PublicAssignmentRules
+              collectStudentName={assignment.settings.collectStudentName}
+              expiresAt={assignment.expiresAt ?? null}
+              itemCount={itemCount}
+              maxAttempts={assignment.settings.maxAttempts}
+              showCorrectAnswers={assignment.settings.showCorrectAnswers}
+              timeLimitSeconds={assignment.settings.timeLimitSeconds}
+            />
           </div>
           <Link
             to={Routes.Create}
@@ -365,6 +385,72 @@ function PlayPage() {
         />
       </div>
     </Container>
+  );
+}
+
+function PublicAssignmentRules({
+  collectStudentName,
+  expiresAt,
+  itemCount,
+  maxAttempts,
+  showCorrectAnswers,
+  timeLimitSeconds,
+}: {
+  collectStudentName: boolean;
+  expiresAt: Date | null;
+  itemCount: number;
+  maxAttempts?: number;
+  showCorrectAnswers: boolean;
+  timeLimitSeconds?: number;
+}) {
+  const rules = [
+    {
+      icon: IconListCheck,
+      label: 'Items',
+      value: `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`,
+    },
+    {
+      icon: IconRepeat,
+      label: 'Attempts',
+      value: formatAssignmentAttempts(maxAttempts),
+    },
+    {
+      icon: IconClock,
+      label: 'Timer',
+      value: formatAssignmentTimeLimit(timeLimitSeconds),
+    },
+    {
+      icon: IconUser,
+      label: 'Identity',
+      value: formatStudentIdentity(collectStudentName),
+    },
+    {
+      icon: IconEye,
+      label: 'Review',
+      value: formatAnswerReveal(showCorrectAnswers),
+    },
+    {
+      icon: IconClock,
+      label: 'Closes',
+      value: formatAssignmentExpiry(expiresAt),
+    },
+  ];
+
+  return (
+    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      {rules.map((rule) => (
+        <div
+          key={rule.label}
+          className="flex min-w-0 items-center gap-2 rounded-lg border bg-background px-3 py-2"
+        >
+          <rule.icon className="size-4 shrink-0 text-primary" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{rule.value}</p>
+            <p className="text-xs text-muted-foreground">{rule.label}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
