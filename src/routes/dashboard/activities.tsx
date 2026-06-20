@@ -9,6 +9,10 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -65,6 +69,7 @@ type ActivityCardData = {
 };
 
 type ActivityLibraryStatus = 'active' | 'archived';
+type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -74,32 +79,52 @@ export const Route = createFileRoute('/dashboard/activities')({
       search.status === 'archived' || search.status === 'active'
         ? search.status
         : undefined,
+    template: isActivityTemplateType(search.template)
+      ? search.template
+      : undefined,
   }),
   component: DashboardActivitiesPage,
 });
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
-  const { created, q, status } = Route.useSearch();
+  const { created, q, status, template } = Route.useSearch();
   const searchQuery = q ?? '';
   const libraryStatus = status ?? 'active';
+  const templateFilter: ActivityTemplateFilter = template ?? 'all';
   const normalizedSearchQuery = normalizeActivitySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
     pageIndex: 0,
     pageSize: 50,
     search: normalizedSearchQuery,
     status: libraryStatus,
+    template,
   });
   const activities = data?.items ?? [];
   const hasActivities = activities.length > 0;
-  const hasSearch = Boolean(normalizedSearchQuery);
+  const hasFilters =
+    Boolean(normalizedSearchQuery) ||
+    templateFilter !== 'all' ||
+    libraryStatus !== 'active';
+  const hasContentFilters =
+    Boolean(normalizedSearchQuery) || templateFilter !== 'all';
+  const emptyFilterTitle =
+    libraryStatus === 'archived' && !hasContentFilters
+      ? 'No archived activities.'
+      : 'No matching activities.';
+  const emptyFilterDescription =
+    libraryStatus === 'archived' && !hasContentFilters
+      ? 'Archived activities will appear here after you move them out of the active library.'
+      : 'Try another title, description, template keyword, or template family from your classroom activity library.';
 
   function updateLibraryFilters(next: {
     q?: string;
     status?: ActivityLibraryStatus;
+    template?: ActivityTemplateFilter;
   }) {
     const nextQuery = next.q ?? searchQuery;
     const nextStatus = next.status ?? libraryStatus;
+    const nextTemplate = next.template ?? templateFilter;
 
     void navigate({
       replace: true,
@@ -107,7 +132,15 @@ function DashboardActivitiesPage() {
         created,
         q: nextQuery.trim() ? nextQuery : undefined,
         status: nextStatus === 'active' ? undefined : nextStatus,
+        template: nextTemplate === 'all' ? undefined : nextTemplate,
       },
+    });
+  }
+
+  function clearLibraryFilters() {
+    void navigate({
+      replace: true,
+      search: { created },
     });
   }
 
@@ -147,10 +180,15 @@ function DashboardActivitiesPage() {
 
         <ActivityLibrarySearch
           isLoading={isLoading}
-          onClear={() => updateLibraryFilters({ q: '' })}
+          onClearFilters={clearLibraryFilters}
+          onClearSearch={() => updateLibraryFilters({ q: '' })}
           onSearch={(value) => updateLibraryFilters({ q: value })}
           onStatusChange={(value) => updateLibraryFilters({ status: value })}
+          onTemplateChange={(value) =>
+            updateLibraryFilters({ template: value })
+          }
           status={libraryStatus}
+          template={templateFilter}
           total={data?.total ?? 0}
           value={searchQuery}
         />
@@ -189,26 +227,25 @@ function DashboardActivitiesPage() {
           </section>
         ) : null}
 
-        {!isLoading && !hasActivities && hasSearch ? (
+        {!isLoading && !hasActivities && hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">No matching activities.</h2>
+            <h2 className="text-lg font-semibold">{emptyFilterTitle}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Try a title, description, or template type from another classroom
-              activity.
+              {emptyFilterDescription}
             </p>
             <Button
               type="button"
               variant="outline"
               className="mt-4 bg-background"
-              onClick={() => updateLibraryFilters({ q: '' })}
+              onClick={clearLibraryFilters}
             >
               <IconX className="size-4" />
-              Clear search
+              Clear filters
             </Button>
           </div>
         ) : null}
 
-        {!isLoading && !hasActivities && !hasSearch ? (
+        {!isLoading && !hasActivities && !hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">
@@ -252,33 +289,40 @@ function DashboardActivitiesPage() {
 
 function ActivityLibrarySearch({
   isLoading,
-  onClear,
+  onClearFilters,
+  onClearSearch,
   onSearch,
   onStatusChange,
+  onTemplateChange,
   status,
+  template,
   total,
   value,
 }: {
   isLoading: boolean;
-  onClear: () => void;
+  onClearFilters: () => void;
+  onClearSearch: () => void;
   onSearch: (value: string) => void;
   onStatusChange: (value: ActivityLibraryStatus) => void;
+  onTemplateChange: (value: ActivityTemplateFilter) => void;
   status: ActivityLibraryStatus;
+  template: ActivityTemplateFilter;
   total: number;
   value: string;
 }) {
   const normalizedValue = normalizeActivitySearch(value);
   const statusLabel = status === 'archived' ? 'archived' : 'saved';
-  const summary = normalizedValue
+  const hasFilters = Boolean(normalizedValue) || template !== 'all';
+  const summary = hasFilters
     ? isLoading
-      ? 'Searching activities...'
+      ? 'Filtering activities...'
       : `${total} ${total === 1 ? 'match' : 'matches'}`
     : isLoading
       ? 'Loading activities...'
       : `${total} ${statusLabel} ${total === 1 ? 'activity' : 'activities'}`;
 
   return (
-    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
       <div className="grid gap-2">
         <label
           htmlFor="activity-library-search"
@@ -300,12 +344,36 @@ function ActivityLibrarySearch({
               type="button"
               aria-label="Clear activity search"
               className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={onClear}
+              onClick={onClearSearch}
             >
               <IconX className="size-4" />
             </button>
           ) : null}
         </div>
+      </div>
+      <div className="grid gap-2">
+        <label
+          htmlFor="activity-template-filter"
+          className="font-medium text-sm"
+        >
+          Template
+        </label>
+        <NativeSelect
+          id="activity-template-filter"
+          value={template}
+          onChange={(event) =>
+            onTemplateChange(
+              event.currentTarget.value as ActivityTemplateFilter
+            )
+          }
+        >
+          <NativeSelectOption value="all">All templates</NativeSelectOption>
+          {activityTemplates.map((option) => (
+            <NativeSelectOption key={option.type} value={option.type}>
+              {option.name}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
       </div>
       <div className="flex flex-col gap-3 lg:items-end">
         <div className="inline-flex rounded-lg border bg-background p-1">
@@ -329,6 +397,18 @@ function ActivityLibrarySearch({
           </Button>
         </div>
         <p className="text-sm text-muted-foreground lg:text-right">{summary}</p>
+        {hasFilters ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full bg-background lg:w-auto"
+            onClick={onClearFilters}
+          >
+            <IconX className="size-4" />
+            Clear filters
+          </Button>
+        ) : null}
       </div>
     </section>
   );
@@ -828,4 +908,11 @@ function formatDateTimeLocal(date: Date) {
 function normalizeActivitySearch(value: string) {
   const normalized = value.replace(/\s+/g, ' ').trim();
   return normalized || undefined;
+}
+
+function isActivityTemplateType(value: unknown): value is ActivityTemplateType {
+  return (
+    typeof value === 'string' &&
+    activityTemplates.some((template) => template.type === value)
+  );
 }

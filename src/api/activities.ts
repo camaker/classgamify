@@ -22,6 +22,7 @@ const listActivitiesInputSchema = z.object({
   pageSize: z.number().int().min(1).max(100).default(24),
   search: z.string().trim().max(120).optional(),
   status: activityListStatusSchema.default('active'),
+  template: activityTemplateTypeSchema.optional(),
 });
 
 export const listActivities = createServerFn({ method: 'GET' })
@@ -42,9 +43,15 @@ export const listActivities = createServerFn({ method: 'GET' })
       data.status === 'archived'
         ? eq(activity.visibility, 'archived')
         : ne(activity.visibility, 'archived');
-    const where = searchWhere
-      ? and(eq(activity.ownerId, userId), statusWhere, searchWhere)
-      : and(eq(activity.ownerId, userId), statusWhere);
+    const templateWhere = data.template
+      ? eq(activity.templateType, data.template)
+      : undefined;
+    const where = and(
+      eq(activity.ownerId, userId),
+      statusWhere,
+      templateWhere,
+      searchWhere
+    );
 
     const [totalRow] = await db
       .select({ count: count() })

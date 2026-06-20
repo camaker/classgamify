@@ -28,6 +28,7 @@ export const activitiesKeys = {
     pageSize: number;
     search?: string;
     status?: 'active' | 'archived';
+    template?: ActivityTemplateType;
   }) => [...activitiesKeys.lists(), params] as const,
   lists: () => [...activitiesKeys.all, 'lists'] as const,
 };
@@ -37,11 +38,13 @@ export function useActivities({
   pageSize = 24,
   search,
   status = 'active',
+  template,
 }: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
   status?: 'active' | 'archived';
+  template?: ActivityTemplateType;
 }) {
   return useQuery({
     placeholderData: keepPreviousData,
@@ -52,9 +55,16 @@ export function useActivities({
           pageSize,
           search,
           status,
+          template,
         },
       }),
-    queryKey: activitiesKeys.list({ pageIndex, pageSize, search, status }),
+    queryKey: activitiesKeys.list({
+      pageIndex,
+      pageSize,
+      search,
+      status,
+      template,
+    }),
   });
 }
 
