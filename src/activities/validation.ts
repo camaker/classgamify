@@ -63,7 +63,17 @@ export type CreateActivityPayload = CreateActivityInput & {
 export function buildActivityContent(
   input: CreateActivityPayload
 ): ActivityContent {
-  const content: ActivityContent = {
+  const content = parseActivityContent(input);
+
+  assertTemplateRequirements(input.templateType, content);
+
+  return content;
+}
+
+export function parseActivityContent(
+  input: CreateActivityPayload
+): ActivityContent {
+  return {
     difficulty: input.difficulty,
     gradeBand: input.gradeBand,
     groups: parseGroups(input.groupsText),
@@ -78,10 +88,6 @@ export function buildActivityContent(
     teacherNotes: parseLineList(input.teacherNotesText),
     vocabulary: parseVocabulary(input.vocabularyText),
   };
-
-  assertTemplateRequirements(input.templateType, content);
-
-  return content;
 }
 
 function assertTemplateRequirements(

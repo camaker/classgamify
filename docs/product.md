@@ -69,7 +69,9 @@ choose quiz, match-up, line-match, group sort, fill-blank, listening, matching
 pairs, or open-box, the editor shows the required content type and can load a
 template-specific scaffold that fills the matching structured fields. Scaffolds
 are examples, not hidden templates; teachers still review and edit before
-saving.
+saving. The editor should also preview template readiness from the current
+structured text fields before save, using the same parser and deterministic
+remix model as persisted activities.
 
 Template remixing should be treated as a content-readiness problem before it is
 treated as an AI feature. The app can inspect an activity's questions, pairs,

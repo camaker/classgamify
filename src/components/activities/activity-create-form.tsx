@@ -3,10 +3,16 @@ import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftMeta } from '@/activities/ai-draft';
 import type { ActivityContent } from '@/activities/types';
 import {
+  formatTemplateRequirement,
+  getTemplateRemixPlan,
+  type TemplateRemixPlan,
+} from '@/activities/template-remix';
+import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
   activityVisibilitySchema,
   createActivityInputSchema,
+  parseActivityContent,
   type CreateActivityInput,
 } from '@/activities/validation';
 import { authClient } from '@/auth/client';
@@ -46,12 +52,13 @@ import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconDeviceFloppy,
+  IconLayoutGrid,
   IconLoader2,
   IconLogin2,
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -108,9 +115,24 @@ export function ActivityCreateForm({
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');
+  const watchedValues = form.watch();
   const template = activityTemplates.find(
     (item) => item.type === selectedTemplate
   );
+  const templateReadiness = useMemo(() => {
+    const parsed = createActivityInputSchema.safeParse(watchedValues);
+    if (!parsed.success) return null;
+
+    try {
+      const content = parseActivityContent(parsed.data);
+      return getTemplateRemixPlan({
+        content,
+        currentTemplateType: parsed.data.templateType,
+      });
+    } catch {
+      return null;
+    }
+  }, [watchedValues]);
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -401,6 +423,8 @@ export function ActivityCreateForm({
                 </div>
               </div>
             ) : null}
+
+            <ActivityTemplateReadinessPanel remixPlan={templateReadiness} />
 
             <FormField
               control={form.control}
@@ -705,6 +729,66 @@ function ActivityDraftMetaSummary({ meta }: { meta: ActivityDraftMeta }) {
           </p>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityTemplateReadinessPanel({
+  remixPlan,
+}: {
+  remixPlan: TemplateRemixPlan | null;
+}) {
+  const readyTemplates =
+    remixPlan?.readyOptions.map((option) => option.template.shortName) ?? [];
+  const lockedTemplates =
+    remixPlan?.options.filter((option) => !option.isReady) ?? [];
+
+  return (
+    <div className="rounded-lg border bg-muted/20 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <IconLayoutGrid className="size-4 text-primary" />
+            <h3 className="font-semibold text-sm">Template readiness</h3>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            The same structured content can become multiple Wordwall-style
+            activity formats after saving.
+          </p>
+        </div>
+        <Badge variant="secondary" className="w-fit rounded-md">
+          {readyTemplates.length} ready
+        </Badge>
+      </div>
+      {readyTemplates.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {readyTemplates.map((templateName) => (
+            <Badge key={templateName} variant="outline" className="rounded-md">
+              {templateName}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 text-muted-foreground text-sm">
+          Add questions, pairs, or groups to unlock playable templates.
+        </p>
+      )}
+      {lockedTemplates.length > 0 ? (
+        <div className="mt-4 grid gap-1.5">
+          {lockedTemplates.slice(0, 4).map((option) => (
+            <p
+              key={option.template.type}
+              className="text-muted-foreground text-xs leading-5"
+            >
+              Add{' '}
+              {option.missingRequirements
+                .map(formatTemplateRequirement)
+                .join(', ')}{' '}
+              to unlock {option.template.shortName}.
+            </p>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
