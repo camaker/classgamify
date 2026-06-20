@@ -134,8 +134,11 @@ snapshot, and attempt duration metrics. Teachers can export the same private
 result data to CSV for gradebooks, parent follow-up, or offline analysis. This
 keeps the results loop useful for deciding what to explain again after homework.
 The teacher result page should show the student summary, the top reteach
-priorities, and the full item performance table so a teacher can scan the class
-before opening individual student answers.
+priorities, and the full item performance table so a teacher can scan the
+class before opening individual student answers. Teachers can search result
+views by normalized student display label, including anonymous student labels,
+so summary rows, attempt rows, and answer review cards stay aligned without
+exposing raw anonymous tokens.
 
 ## AI Authoring
 

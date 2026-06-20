@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import {
   Table,
@@ -38,10 +39,13 @@ import {
   IconDownload,
   IconListDetails,
   IconPlayerPlay,
+  IconSearch,
   IconShare3,
   IconUsers,
+  IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
@@ -51,6 +55,7 @@ export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
+  const [studentSearch, setStudentSearch] = useState('');
   const title = data?.assignment.title ?? 'Assignment results';
   const activityTitle =
     data?.snapshot?.activityTitle ?? data?.activity.title ?? '';
@@ -59,6 +64,39 @@ function AssignmentResultsPage() {
   const templateType =
     data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
   const hasAttempts = Boolean(data?.attempts.length);
+  const normalizedStudentSearch = normalizeResultSearch(studentSearch);
+  const filteredStudents = useMemo(() => {
+    const students = data?.analysis.students ?? [];
+    if (!normalizedStudentSearch) return students;
+    return students.filter((student) =>
+      matchesResultSearch(student.studentLabel, normalizedStudentSearch)
+    );
+  }, [data?.analysis.students, normalizedStudentSearch]);
+  const attemptReviewById = useMemo(
+    () =>
+      new Map((data?.analysis.attempts ?? []).map((item) => [item.id, item])),
+    [data?.analysis.attempts]
+  );
+  const filteredAttemptRows = useMemo(() => {
+    const attempts = data?.attempts ?? [];
+    return attempts
+      .map((attempt) => ({
+        attempt,
+        review: attemptReviewById.get(attempt.id),
+      }))
+      .filter((row) => {
+        if (!normalizedStudentSearch) return true;
+        const label = row.review?.studentLabel ?? row.attempt.studentName ?? '';
+        return matchesResultSearch(label, normalizedStudentSearch);
+      });
+  }, [attemptReviewById, data?.attempts, normalizedStudentSearch]);
+  const filteredAttemptReviews = useMemo(() => {
+    const attempts = data?.analysis.attempts ?? [];
+    if (!normalizedStudentSearch) return attempts;
+    return attempts.filter((attempt) =>
+      matchesResultSearch(attempt.studentLabel, normalizedStudentSearch)
+    );
+  }, [data?.analysis.attempts, normalizedStudentSearch]);
 
   async function handleExportResults() {
     if (!data || data.attempts.length === 0) {
@@ -177,6 +215,16 @@ function AssignmentResultsPage() {
             </CardContent>
           </Card>
 
+          {hasAttempts ? (
+            <ResultStudentSearch
+              matchedAttempts={filteredAttemptRows.length}
+              matchedStudents={filteredStudents.length}
+              onClear={() => setStudentSearch('')}
+              onSearch={setStudentSearch}
+              value={studentSearch}
+            />
+          ) : null}
+
           {data.analysis.perItem.length > 0 ? (
             <Card className="rounded-lg">
               <CardHeader>
@@ -238,7 +286,11 @@ function AssignmentResultsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <StudentSummaryTable students={data.analysis.students} />
+                {filteredStudents.length > 0 ? (
+                  <StudentSummaryTable students={filteredStudents} />
+                ) : (
+                  <NoMatchingStudents />
+                )}
               </CardContent>
             </Card>
           ) : null}
@@ -256,7 +308,7 @@ function AssignmentResultsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {data.attempts.length > 0 ? (
+              {filteredAttemptRows.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -269,10 +321,12 @@ function AssignmentResultsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.attempts.map((attempt) => (
+                    {filteredAttemptRows.map(({ attempt, review }) => (
                       <TableRow key={attempt.id}>
                         <TableCell>
-                          {attempt.studentName || 'Anonymous student'}
+                          {review?.studentLabel ||
+                            attempt.studentName ||
+                            'Anonymous student'}
                         </TableCell>
                         <TableCell>
                           {attempt.score ?? 0}/{attempt.maxScore ?? 0}
@@ -296,6 +350,8 @@ function AssignmentResultsPage() {
                     ))}
                   </TableBody>
                 </Table>
+              ) : data.attempts.length > 0 ? (
+                <NoMatchingStudents />
               ) : (
                 <div className="rounded-lg border border-dashed bg-muted/20 p-6">
                   <h2 className="text-base font-semibold">
@@ -324,15 +380,83 @@ function AssignmentResultsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3">
-                {data.analysis.attempts.map((attempt) => (
-                  <AttemptReviewCard key={attempt.id} attempt={attempt} />
-                ))}
+                {filteredAttemptReviews.length > 0 ? (
+                  filteredAttemptReviews.map((attempt) => (
+                    <AttemptReviewCard key={attempt.id} attempt={attempt} />
+                  ))
+                ) : (
+                  <NoMatchingStudents />
+                )}
               </CardContent>
             </Card>
           ) : null}
         </div>
       )}
     </DashboardLayout>
+  );
+}
+
+function ResultStudentSearch({
+  matchedAttempts,
+  matchedStudents,
+  onClear,
+  onSearch,
+  value,
+}: {
+  matchedAttempts: number;
+  matchedStudents: number;
+  onClear: () => void;
+  onSearch: (value: string) => void;
+  value: string;
+}) {
+  const hasSearch = Boolean(normalizeResultSearch(value));
+  const summary = hasSearch
+    ? `${matchedStudents} ${matchedStudents === 1 ? 'student' : 'students'} · ${matchedAttempts} ${matchedAttempts === 1 ? 'attempt' : 'attempts'}`
+    : 'All students';
+
+  return (
+    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+      <div className="grid gap-2">
+        <label
+          htmlFor="assignment-result-search"
+          className="font-medium text-sm"
+        >
+          Find student
+        </label>
+        <div className="relative max-w-xl">
+          <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
+          <Input
+            id="assignment-result-search"
+            value={value}
+            placeholder="Search by student name"
+            className="pl-9 pr-9"
+            onChange={(event) => onSearch(event.currentTarget.value)}
+          />
+          {value ? (
+            <button
+              type="button"
+              aria-label="Clear student search"
+              className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
+              onClick={onClear}
+            >
+              <IconX className="size-4" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground md:text-right">{summary}</p>
+    </section>
+  );
+}
+
+function NoMatchingStudents() {
+  return (
+    <div className="rounded-lg border border-dashed bg-muted/20 p-6">
+      <h2 className="text-base font-semibold">No matching students.</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        Clear the search or try another student name from this assignment.
+      </p>
+    </div>
   );
 }
 
@@ -534,4 +658,13 @@ function formatDuration(seconds: number) {
   const remainder = seconds % 60;
   if (minutes <= 0) return `${remainder}s`;
   return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
+}
+
+function normalizeResultSearch(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  return normalized || undefined;
+}
+
+function matchesResultSearch(value: string, search: string) {
+  return normalizeResultSearch(value)?.includes(search) ?? false;
 }
