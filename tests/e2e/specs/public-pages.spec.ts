@@ -12,6 +12,7 @@ const publicPages = [
   { path: '/', name: 'home' },
   { path: '/templates', name: 'templates' },
   { path: '/create', name: 'create' },
+  { path: '/worksheets', name: 'worksheets' },
   { path: '/play/demo-food', name: 'student play demo' },
   { path: '/pricing', name: 'pricing' },
   { path: '/teachers', name: 'teachers' },
@@ -107,6 +108,50 @@ test.describe('public page smoke coverage', () => {
       monitor.expectNoErrors(`classroom contact ${locale}`);
     });
   }
+
+  test('worksheets page enters template-specific creation flows', async ({
+    page,
+  }) => {
+    await setTheme(page, 'light');
+    const monitor = installPageHealthMonitor(page);
+
+    await expectHealthyPage(page, monitor, '/worksheets', { theme: 'light' });
+
+    await expect(
+      page.getByRole('heading', {
+        name: /worksheet modes for the same activity content/i,
+      })
+    ).toBeVisible();
+
+    for (const text of [
+      'Fill blanks',
+      'Line matching',
+      'Listening prompts',
+      'Drag sorting',
+    ]) {
+      await expect(page.getByText(text)).toBeVisible();
+    }
+
+    const actions = [
+      { name: /create fill-blank/i, template: 'fill-blank' },
+      { name: /start line match/i, template: 'line-match' },
+      { name: /create listening/i, template: 'listening' },
+      { name: /create sort/i, template: 'group-sort' },
+    ] as const;
+
+    for (const action of actions) {
+      const link = page.getByRole('link', { name: action.name }).first();
+
+      await expect(link).toHaveAttribute(
+        'href',
+        `/create?template=${action.template}`
+      );
+    }
+
+    const bodyText = (await page.locator('body').innerText()).trim();
+    expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
+    monitor.expectNoErrors('worksheets template entry');
+  });
 
   test('health check responds with pong', async ({ request }) => {
     const response = await request.get('/api/ping');

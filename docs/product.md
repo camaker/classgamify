@@ -95,6 +95,13 @@ The public template directory should act as a real creation entry point:
 teachers can start from any template card and land in `/create` with that
 primary template selected and its template-specific scaffold loaded, while the
 editor still uses the shared structured activity input contract.
+The public `/worksheets` route is the Liveworksheets-style entry point for the
+same model rather than a separate legacy worksheet product. It should introduce
+fill-blank, line-match, listening, and group-sort/classification modes, then
+send teachers into `/create?template=...` so the matching scaffold loads inside
+the normal activity editor. Printable follow-up and teacher-uploaded worksheet
+extraction should extend the same assignment snapshot, scoring, accepted-answer,
+and result-export model instead of creating a parallel worksheet data shape.
 
 Template remixing should be treated as a content-readiness problem before it is
 treated as an AI feature. The app can inspect an activity's questions, pairs,
@@ -275,7 +282,9 @@ stable. Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
 
 - Wordwall-style: quiz, match-up, group sort, matching pairs, open box.
 - Liveworksheets-style: fill blanks, worksheet layout, first listening prompts,
-  drag/drop classification, line matching, teacher audio upload.
+  drag/drop classification, line matching, teacher audio upload, printable
+  follow-up, and worksheet extraction while preserving the activity-assignment
+  data model.
 - AI enhancements: source-to-activity drafts, template transforms, distractor
   generation, leveled variants, answer explanations, listening scripts, and
   worksheet extraction from teacher-uploaded material.
