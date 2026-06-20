@@ -282,15 +282,11 @@ export function createFallbackActivityDraft(
   const normalizedTerms = terms.length >= 3 ? terms : fallbackTerms(input);
   const options = normalizedTerms.slice(0, Math.max(3, input.itemCount));
 
-  const questions = normalizedTerms.slice(0, input.itemCount).map(
-    (term) =>
-      `Which item belongs in this lesson set: ${term}? | ${term} | ${buildQuestionOptionTexts(
-        {
-          answer: term,
-          options,
-        }
-      ).join(', ')} | ${term} is one of the target items from this lesson.`
-  );
+  const questions = buildFallbackQuestions({
+    input,
+    options,
+    terms: normalizedTerms.slice(0, input.itemCount),
+  });
 
   const pairs = normalizedTerms
     .slice(0, input.itemCount)
@@ -325,6 +321,35 @@ export function createFallbackActivityDraft(
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+function buildFallbackQuestions({
+  input,
+  options,
+  terms,
+}: {
+  input: GenerateActivityDraftInput;
+  options: string[];
+  terms: string[];
+}) {
+  return terms.map((term) => {
+    const choices = buildQuestionOptionTexts({
+      answer: term,
+      options,
+    }).join(', ');
+    const explanation = `${term} is one of the target items from this lesson.`;
+
+    switch (input.templateType) {
+      case 'fill-blank':
+        return `In this ${input.subject} lesson, remember ___. | ${term} | ${choices} | ${explanation}`;
+      case 'listening':
+        return `Listen to this sentence: ${term} is important in ${input.subject}. | ${term} | ${choices} | The spoken sentence names ${term}.`;
+      case 'open-box':
+        return `Open the box and answer with this ${input.subject} idea: ${term}. | ${term} | | ${explanation}`;
+      default:
+        return `Which item belongs in this lesson set: ${term}? | ${term} | ${choices} | ${explanation}`;
+    }
+  });
 }
 
 function extractTerms(sourceText: string, subject: string) {

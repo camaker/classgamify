@@ -604,6 +604,59 @@ assert.ok(
     item.includes('Ready to remix after saving')
   )
 );
+const fallbackFillBlankDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 3,
+  language: 'en',
+  sourceText: 'plants, root, stem, leaf',
+  subject: 'Science',
+  templateType: 'fill-blank',
+});
+const fallbackFillBlankContent = buildActivityContent(fallbackFillBlankDraft);
+assert.ok(
+  fallbackFillBlankContent.questions.every((question) =>
+    question.prompt.includes('___')
+  )
+);
+assert.equal(getRuntimeItems('fill-blank', fallbackFillBlankContent).length, 3);
+const fallbackListeningDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 3,
+  language: 'en',
+  sourceText: 'weather, sunny, rainy, windy',
+  subject: 'Science',
+  templateType: 'listening',
+});
+const fallbackListeningContent = buildActivityContent(fallbackListeningDraft);
+assert.ok(
+  fallbackListeningContent.questions.every((question) =>
+    question.prompt.startsWith('Listen to this sentence:')
+  )
+);
+assert.equal(getRuntimeItems('listening', fallbackListeningContent).length, 3);
+const fallbackOpenBoxDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 3,
+  language: 'en',
+  sourceText: 'community, helper, school, clinic',
+  subject: 'Social studies',
+  templateType: 'open-box',
+});
+const fallbackOpenBoxContent = buildActivityContent(fallbackOpenBoxDraft);
+assert.ok(
+  fallbackOpenBoxContent.questions.every((question) =>
+    question.prompt.startsWith('Open the box')
+  )
+);
+assert.ok(
+  fallbackOpenBoxContent.questions.every(
+    (question) => question.options?.length === 1
+  )
+);
+assert.equal(getRuntimeItems('open-box', fallbackOpenBoxContent).length, 3);
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
