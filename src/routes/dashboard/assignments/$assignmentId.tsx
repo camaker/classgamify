@@ -1,4 +1,5 @@
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   buildAssignmentResultsCsv,
@@ -203,6 +204,29 @@ function AssignmentResultsPage() {
     }
   }
 
+  async function handleCopyItemReview() {
+    if (!data || data.analysis.perItem.length === 0) {
+      toast.error('Add assignment items before copying item review.');
+      return;
+    }
+
+    try {
+      await copyTextToClipboard(
+        buildAssignmentItemReviewSummary({
+          assignmentTitle: data.assignment.title,
+          items: data.analysis.perItem,
+        })
+      );
+      toast.success('Item review copied.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Item review could not be copied.'
+      );
+    }
+  }
+
   return (
     <DashboardLayout
       breadcrumbs={[
@@ -303,6 +327,16 @@ function AssignmentResultsPage() {
                 >
                   <IconCopy className="size-4" />
                   Copy reteach plan
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={data.analysis.perItem.length === 0}
+                  onClick={handleCopyItemReview}
+                >
+                  <IconCopy className="size-4" />
+                  Copy item review
                 </Button>
                 <Button
                   type="button"
