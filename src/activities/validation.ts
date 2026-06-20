@@ -10,6 +10,7 @@ import {
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
+import { getTemplateRemixOption } from '@/activities/template-remix';
 import { z } from 'zod';
 
 export const activityTemplateTypeSchema = z.enum(ACTIVITY_TEMPLATE_TYPES);
@@ -100,15 +101,14 @@ function assertTemplateRequirements(
     throw new Error('Unknown activity template.');
   }
 
-  const missing = template.contentRequirements.filter((requirement) => {
-    const value = content[requirement];
-    return Array.isArray(value) ? value.length === 0 : !value;
+  const remixOption = getTemplateRemixOption({
+    content,
+    currentTemplateType: templateType,
+    template,
   });
 
-  if (missing.length > 0) {
-    throw new Error(
-      `This template needs ${missing.join(', ')} content before saving.`
-    );
+  if (!remixOption.isReady) {
+    throw new Error(remixOption.diagnosis);
   }
 }
 

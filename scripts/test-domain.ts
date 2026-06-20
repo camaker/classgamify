@@ -405,6 +405,27 @@ assert.equal(
   }).questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
 );
+assert.throws(
+  () =>
+    buildActivityContent({
+      description: 'Missing pairs',
+      difficulty: 'starter',
+      gradeBand: 'Grade 3',
+      groupsText: '',
+      language: 'en',
+      learningGoal: 'Students match vocabulary terms to definitions.',
+      pairsText: '',
+      questionsText: 'Capital of France? | Paris',
+      sourceSummary: 'Missing pairs check',
+      subject: 'General',
+      teacherNotesText: '',
+      templateType: 'match-up',
+      title: 'Missing pairs',
+      visibility: 'draft',
+      vocabularyText: '',
+    }),
+  /Add match pairs to unlock Match\./
+);
 const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',
