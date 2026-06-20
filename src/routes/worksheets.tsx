@@ -6,7 +6,7 @@ export const Route = createFileRoute('/worksheets')({
   component: () => (
     <LegacyProductRoute
       title="Worksheets are becoming activity assignments"
-      description="The new ClassGamify skeleton keeps printable and fill-in practice in the broader assignment model, alongside quiz, matching, sorting, and other game templates."
+      description="ClassGamify keeps printable and fill-in practice inside the broader assignment model, alongside quiz, matching, sorting, listening, and other game templates."
       primaryHref={Routes.Templates}
       primaryLabel="View templates"
       secondaryHref={Routes.PlayDemo}
