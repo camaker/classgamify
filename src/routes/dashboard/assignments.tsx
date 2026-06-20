@@ -41,6 +41,7 @@ type AssignmentCardData = {
   shareSlug: string;
   status: AssignmentStatus;
   templateType: ActivityTemplateType;
+  timeLimitSeconds?: number;
   title: string;
   stats: {
     averageScore: number;
@@ -143,6 +144,8 @@ function DashboardAssignmentsPage() {
                   status: item.assignment.status,
                   templateType:
                     item.snapshot?.templateType ?? item.activity.templateType,
+                  timeLimitSeconds:
+                    item.assignment.settingsJson.timeLimitSeconds,
                   title: item.assignment.title,
                 }}
               />
@@ -186,6 +189,7 @@ function DashboardAssignmentsPage() {
                       },
                       status: assignment.status,
                       templateType: activity.templateType,
+                      timeLimitSeconds: assignment.settings.timeLimitSeconds,
                       title: assignment.title,
                     }}
                   />
@@ -249,7 +253,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           <AssignmentStat
             icon={IconUsers}
             label="Completions"
@@ -266,6 +270,11 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             value={
               assignment.maxAttempts ? `${assignment.maxAttempts} max` : 'open'
             }
+          />
+          <AssignmentStat
+            icon={IconClock}
+            label="Timer"
+            value={formatAssignmentTimeLimit(assignment.timeLimitSeconds)}
           />
           <AssignmentStat
             icon={IconCalendarTime}
@@ -343,6 +352,12 @@ function formatAssignmentExpiry(expiresAt: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(expiresAt);
+}
+
+function formatAssignmentTimeLimit(seconds?: number) {
+  if (!seconds) return 'No timer';
+  const minutes = Math.round(seconds / 60);
+  return `${minutes} min`;
 }
 
 function SummaryCard({
