@@ -2,9 +2,11 @@ import {
   createActivity,
   getActivity,
   listActivities,
+  remixActivityTemplate,
   updateActivity,
 } from '@/api/activities';
 import { generateActivityDraft } from '@/api/activity-ai';
+import type { ActivityTemplateType } from '@/activities/types';
 import type { GenerateActivityDraftInput } from '@/activities/ai-draft';
 import type { CreateActivityInput } from '@/activities/validation';
 import {
@@ -70,6 +72,21 @@ export function useGenerateActivityDraft() {
   return useMutation({
     mutationFn: (input: GenerateActivityDraftInput) =>
       generateActivityDraft({ data: input }),
+  });
+}
+
+export function useRemixActivityTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: {
+      activityId: string;
+      targetTemplateType: ActivityTemplateType;
+    }) => remixActivityTemplate({ data: input }),
+    onSuccess: (activity) => {
+      queryClient.invalidateQueries({ queryKey: activitiesKeys.lists() });
+      queryClient.setQueryData(activitiesKeys.detail(activity.id), activity);
+    },
   });
 }
 

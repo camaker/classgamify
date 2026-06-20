@@ -1,7 +1,10 @@
 import {
   buildActivityContent,
+  activityTemplateTypeSchema,
   createActivityInputSchema,
 } from '@/activities/validation';
+import { getTemplateByType } from '@/activities/catalog';
+import { getMissingTemplateRequirements } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -94,6 +97,69 @@ export const createActivity = createServerFn({ method: 'POST' })
 
     if (!row) {
       throw new Error('Activity was saved but could not be loaded.');
+    }
+
+    return row;
+  });
+
+const remixActivityTemplateInputSchema = z.object({
+  activityId: z.string().min(1),
+  targetTemplateType: activityTemplateTypeSchema,
+});
+
+export const remixActivityTemplate = createServerFn({ method: 'POST' })
+  .inputValidator(remixActivityTemplateInputSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const [sourceActivity] = await db
+      .select()
+      .from(activity)
+      .where(
+        and(eq(activity.id, data.activityId), eq(activity.ownerId, userId))
+      )
+      .limit(1);
+
+    if (!sourceActivity) {
+      throw new Error('Activity not found.');
+    }
+    if (sourceActivity.templateType === data.targetTemplateType) {
+      throw new Error('Choose a different template to remix into.');
+    }
+
+    const targetTemplate = getTemplateByType(data.targetTemplateType);
+    if (!targetTemplate) {
+      throw new Error('Template not found.');
+    }
+    const missingRequirements = getMissingTemplateRequirements(
+      targetTemplate,
+      sourceActivity.contentJson
+    );
+    if (missingRequirements.length > 0) {
+      throw new Error(
+        `This activity needs ${missingRequirements.join(', ')} before remixing.`
+      );
+    }
+
+    const now = new Date();
+    const id = nanoid(16);
+    await db.insert(activity).values({
+      contentJson: sourceActivity.contentJson,
+      createdAt: now,
+      description: sourceActivity.description,
+      id,
+      ownerId: userId,
+      templateType: targetTemplate.type,
+      title: `${sourceActivity.title} (${targetTemplate.shortName})`,
+      updatedAt: now,
+      visibility: 'draft',
+    });
+
+    const [row] = await db.select().from(activity).where(eq(activity.id, id));
+
+    if (!row) {
+      throw new Error('Remixed activity was saved but could not be loaded.');
     }
 
     return row;

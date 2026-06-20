@@ -45,7 +45,10 @@ treated as an AI feature. The app can inspect an activity's questions, pairs,
 and groups to show which templates are immediately usable and which templates
 need more structured content. AI transformations can then fill the missing
 fields, but the same readiness model should guide the editor, dashboard, and
-publish flow.
+publish flow. When an activity is already ready for another template, teachers
+can create a draft copy with the same content and a new `templateType`; this
+deterministic remix path is the foundation that later AI transformations should
+extend rather than replace.
 
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct

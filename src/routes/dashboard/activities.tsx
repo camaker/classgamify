@@ -3,7 +3,7 @@ import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
-import type { ActivityContent } from '@/activities/types';
+import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 import { defaultAssignmentSettings } from '@/assignments/validation';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { useActivities } from '@/hooks/use-activities';
+import {
+  useActivities,
+  useRemixActivityTemplate,
+} from '@/hooks/use-activities';
 import { usePublishAssignment } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -35,6 +38,7 @@ import {
   IconLayoutGrid,
   IconPlus,
   IconSparkles,
+  IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -46,7 +50,7 @@ type ActivityCardData = {
   id: string;
   persisted: boolean;
   status: string;
-  templateType: string;
+  templateType: ActivityTemplateType;
   title: string;
 };
 
@@ -176,6 +180,7 @@ function DashboardActivitiesPage() {
 function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const navigate = useNavigate();
   const publishMutation = usePublishAssignment();
+  const remixMutation = useRemixActivityTemplate();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [assignmentTitle, setAssignmentTitle] = useState(activity.title);
   const [collectStudentName, setCollectStudentName] = useState(
@@ -249,6 +254,28 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
     }
   }
 
+  async function remixActivity(
+    targetTemplateType: ActivityCardData['templateType']
+  ) {
+    try {
+      const result = await remixMutation.mutateAsync({
+        activityId: activity.id,
+        targetTemplateType,
+      });
+      toast.success('Template remix created.');
+      navigate({
+        to: '/dashboard/activities/$activityId',
+        params: { activityId: result.id },
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Activity could not be remixed.'
+      );
+    }
+  }
+
   return (
     <Card className="rounded-lg">
       <CardHeader>
@@ -301,6 +328,24 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
                 .join(', ')}
               .
             </p>
+          ) : null}
+          {activity.persisted && remixPlan?.suggestedOptions.length ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {remixPlan.suggestedOptions.slice(0, 3).map((option) => (
+                <Button
+                  key={option.template.type}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="bg-background"
+                  disabled={remixMutation.isPending}
+                  onClick={() => remixActivity(option.template.type)}
+                >
+                  <IconSwitchHorizontal className="size-4" />
+                  Copy as {option.template.shortName}
+                </Button>
+              ))}
+            </div>
           ) : null}
           {remixPlan?.options.some((option) => !option.isReady) ? (
             <div className="mt-3 grid gap-1.5">
