@@ -2,15 +2,11 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import {
-  IconArrowsExchange,
-  IconCheck,
-  IconCircle,
-  IconX,
-} from '@tabler/icons-react';
+import { IconArrowsExchange, IconCheck, IconCircle } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 
 type MatchingPairsBoardProps = {
@@ -110,7 +106,7 @@ export function MatchingPairsBoard({
                   </span>
                 ) : null}
                 {revealAnswer && reviewItem ? (
-                  <PairReviewLine reviewItem={reviewItem} />
+                  <PublicAnswerFeedback reviewItem={reviewItem} />
                 ) : null}
               </button>
             );
@@ -146,29 +142,6 @@ export function MatchingPairsBoard({
           })}
         </div>
       </div>
-    </div>
-  );
-}
-
-function PairReviewLine({
-  reviewItem,
-}: {
-  reviewItem: PublicAttemptReviewItem;
-}) {
-  return (
-    <div
-      className={cn(
-        'mt-3 flex flex-wrap items-center gap-2 text-xs',
-        reviewItem.correct ? 'text-primary' : 'text-muted-foreground'
-      )}
-    >
-      {reviewItem.correct ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconX className="size-3.5" />
-      )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
-      <span>Correct answer: {reviewItem.correctAnswer}</span>
     </div>
   );
 }

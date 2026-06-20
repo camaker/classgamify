@@ -199,10 +199,13 @@ Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission
 contract. Accepted alternatives are revealed only in the post-submit review when
-the assignment allows correct-answer reveal. Quiz runtime can deterministically
-fill missing multiple-choice distractors from sibling answers and vocabulary so
-teacher-entered questions remain playable before AI distractor generation is
-connected.
+the assignment allows correct-answer reveal. Student review feedback should use
+the same shared presentation across quiz, fill-blank, listening, line-match,
+matching-pairs, group-sort, and open-box templates so accepted alternatives and
+answer explanations do not disappear in template-specific runners. Quiz runtime
+can deterministically fill missing multiple-choice distractors from sibling
+answers and vocabulary so teacher-entered questions remain playable before AI
+distractor generation is connected.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to

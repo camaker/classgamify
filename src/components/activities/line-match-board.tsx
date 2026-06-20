@@ -2,16 +2,11 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import {
-  IconCheck,
-  IconCircle,
-  IconLineDashed,
-  IconLink,
-  IconX,
-} from '@tabler/icons-react';
+import { IconCircle, IconLineDashed, IconLink } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 
 type LineMatchBoardProps = {
@@ -116,7 +111,7 @@ export function LineMatchBoard({
                   </div>
                 ) : null}
                 {revealAnswer && reviewItem ? (
-                  <LineMatchReviewLine reviewItem={reviewItem} />
+                  <PublicAnswerFeedback reviewItem={reviewItem} />
                 ) : null}
               </button>
             );
@@ -162,29 +157,6 @@ export function LineMatchBoard({
       <p className="mt-3 text-xs leading-5 text-muted-foreground">
         Select a prompt on the left, then select its match on the right.
       </p>
-    </div>
-  );
-}
-
-function LineMatchReviewLine({
-  reviewItem,
-}: {
-  reviewItem: PublicAttemptReviewItem;
-}) {
-  return (
-    <div
-      className={cn(
-        'mt-3 flex flex-wrap items-center gap-2 text-xs',
-        reviewItem.correct ? 'text-primary' : 'text-muted-foreground'
-      )}
-    >
-      {reviewItem.correct ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconX className="size-3.5" />
-      )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
-      <span>Correct answer: {reviewItem.correctAnswer}</span>
     </div>
   );
 }

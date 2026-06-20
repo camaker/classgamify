@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,6 @@ import {
   IconCheck,
   IconCircle,
   IconLayoutColumns,
-  IconX,
 } from '@tabler/icons-react';
 import type { MouseEventHandler } from 'react';
 import { useMemo, useState } from 'react';
@@ -218,31 +218,11 @@ function GroupSortItemButton({
         )}
       </div>
       {revealAnswer && reviewItem ? (
-        <GroupSortReviewLine reviewItem={reviewItem} />
+        <PublicAnswerFeedback
+          correctLabel="Correct group"
+          reviewItem={reviewItem}
+        />
       ) : null}
     </button>
-  );
-}
-
-function GroupSortReviewLine({
-  reviewItem,
-}: {
-  reviewItem: PublicAttemptReviewItem;
-}) {
-  return (
-    <div
-      className={cn(
-        'mt-2 flex flex-wrap items-center gap-2 text-xs',
-        reviewItem.correct ? 'text-primary' : 'text-muted-foreground'
-      )}
-    >
-      {reviewItem.correct ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconX className="size-3.5" />
-      )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
-      <span>Correct group: {reviewItem.correctAnswer}</span>
-    </div>
   );
 }

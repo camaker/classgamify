@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,6 @@ import {
   IconArrowRight,
   IconBox,
   IconCheck,
-  IconX,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 
@@ -164,35 +164,10 @@ export function OpenBoxRunner({
           />
 
           {revealAnswer && activeReviewItem ? (
-            <OpenBoxReviewLine reviewItem={activeReviewItem} />
+            <PublicAnswerFeedback reviewItem={activeReviewItem} />
           ) : null}
         </div>
       </div>
-    </div>
-  );
-}
-
-function OpenBoxReviewLine({
-  reviewItem,
-}: {
-  reviewItem: PublicAttemptReviewItem;
-}) {
-  return (
-    <div
-      className={cn(
-        'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
-        reviewItem.correct
-          ? 'border-primary/25 bg-primary/5 text-primary'
-          : 'bg-muted/30 text-muted-foreground'
-      )}
-    >
-      {reviewItem.correct ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconX className="size-3.5" />
-      )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
-      <span>Correct answer: {reviewItem.correctAnswer}</span>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { ListeningRunner } from '@/components/activities/listening-runner';
 import { LineMatchBoard } from '@/components/activities/line-match-board';
 import { MatchingPairsBoard } from '@/components/activities/matching-pairs-board';
 import { OpenBoxRunner } from '@/components/activities/open-box-runner';
+import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import {
   formatAnswerReveal,
@@ -627,7 +628,7 @@ function RuntimeItemCard({
         />
       )}
       {revealAnswer && reviewItem ? (
-        <AnswerFeedback reviewItem={reviewItem} />
+        <PublicAnswerFeedback reviewItem={reviewItem} />
       ) : null}
     </div>
   );
@@ -664,43 +665,6 @@ function ChoiceGrid({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function AnswerFeedback({
-  reviewItem,
-}: {
-  reviewItem: PublicAttemptReviewItem;
-}) {
-  return (
-    <div
-      className={cn(
-        'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
-        reviewItem.correct
-          ? 'border-primary/25 bg-primary/5 text-primary'
-          : 'bg-muted/30 text-muted-foreground'
-      )}
-    >
-      {reviewItem.correct ? (
-        <IconCheck className="size-3.5" />
-      ) : (
-        <IconX className="size-3.5" />
-      )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
-      <span className="text-muted-foreground">
-        Correct answer: {reviewItem.correctAnswer}
-      </span>
-      {reviewItem.acceptedAnswers.length > 1 ? (
-        <span className="basis-full text-muted-foreground">
-          Accepted answers: {reviewItem.acceptedAnswers.join(', ')}
-        </span>
-      ) : null}
-      {reviewItem.explanation ? (
-        <span className="basis-full text-muted-foreground">
-          Why: {reviewItem.explanation}
-        </span>
-      ) : null}
     </div>
   );
 }
