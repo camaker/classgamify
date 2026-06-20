@@ -1,7 +1,8 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import type { AssignmentStatus, AttemptResult } from '@/activities/types';
+import type { AssignmentStatus } from '@/activities/types';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
+import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import {
   isSameStudentIdentity,
@@ -140,26 +141,6 @@ export const listAssignments = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
-
-function summarizeAssignmentAttempts(
-  attempts: Array<{ resultJson: AttemptResult | null }>
-) {
-  const completions = attempts.length;
-  const averageScore =
-    completions > 0
-      ? Math.round(
-          attempts.reduce(
-            (sum, item) => sum + (item.resultJson?.accuracy ?? 0),
-            0
-          ) / completions
-        )
-      : 0;
-
-  return {
-    averageScore,
-    completions,
-  };
-}
 
 function buildAssignmentListWhere({
   search,
@@ -385,35 +366,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .from(attempt)
       .where(eq(attempt.assignmentId, row.assignment.id))
       .orderBy(desc(attempt.completedAt));
-    const completions = attempts.length;
-    const averageScore =
-      completions > 0
-        ? Math.round(
-            attempts.reduce((sum, item) => {
-              const result = item.resultJson;
-              return sum + (result?.accuracy ?? 0);
-            }, 0) / completions
-          )
-        : 0;
-    const averagePoints =
-      completions > 0
-        ? Math.round(
-            attempts.reduce((sum, item) => sum + (item.score ?? 0), 0) /
-              completions
-          )
-        : 0;
-    const durationAttempts = attempts.filter(
-      (item) => item.resultJson?.durationSeconds !== undefined
-    );
-    const averageDurationSeconds =
-      durationAttempts.length > 0
-        ? Math.round(
-            durationAttempts.reduce(
-              (sum, item) => sum + (item.resultJson?.durationSeconds ?? 0),
-              0
-            ) / durationAttempts.length
-          )
-        : 0;
+    const stats = summarizeAssignmentAttempts(attempts);
     const content = row.snapshot?.contentJson ?? row.activity.contentJson;
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
@@ -426,12 +379,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
         runtimeItems,
       }),
       attempts,
-      stats: {
-        averagePoints,
-        averageDurationSeconds,
-        averageScore,
-        completions,
-      },
+      stats,
     };
   });
 

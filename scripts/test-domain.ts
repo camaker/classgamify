@@ -3,6 +3,7 @@ import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
+import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import {
   buildFilteredAttemptRows,
@@ -122,6 +123,58 @@ assert.equal(
     timeLimitSeconds: 60,
   }),
   60
+);
+assert.deepEqual(summarizeAssignmentAttempts([]), {
+  averageDurationSeconds: 0,
+  averagePoints: 0,
+  averageScore: 0,
+  completions: 0,
+});
+assert.deepEqual(
+  summarizeAssignmentAttempts([
+    {
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        durationSeconds: 30,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      score: 1,
+    },
+    {
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        durationSeconds: 61,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+      score: 2,
+    },
+    {
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 0,
+        correctItemCount: 0,
+        earnedPoints: 0,
+        totalPoints: 2,
+      },
+      score: null,
+    },
+    {
+      resultJson: null,
+      score: null,
+    },
+  ]),
+  {
+    averageDurationSeconds: 46,
+    averagePoints: 1,
+    averageScore: 38,
+    completions: 4,
+  }
 );
 
 const resultRuntimeItems = [

@@ -252,6 +252,10 @@ timer, close time, and instructions, so offline records preserve the rules
 behind each result. Item rows should include both the primary expected answer
 and any accepted alternatives. This keeps the results loop useful for deciding
 what to explain again after homework.
+Assignment attempt metrics such as completions, average accuracy, average
+points, and average duration should be computed through shared assignment-domain
+stats helpers before they reach assignment lists, result pages, classroom
+briefs, or CSV exports.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
 class before opening individual student answers. The full item performance
