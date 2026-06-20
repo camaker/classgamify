@@ -120,7 +120,10 @@ answers after submission, whether items are shuffled, and the per-student
 attempt limit. They can also set assignment-specific instructions, an optional
 student timer, and close-after time for homework windows. These settings live on
 `Assignment.settingsJson`; immutable content lives on `AssignmentSnapshot`, and
-the close-after time window lives on `Assignment`. Teacher-facing assignment
+the close-after time window lives on `Assignment`. Assignment settings should
+resolve through shared domain logic before reaching teacher pages, public
+student payloads, submission enforcement, results, or exports, so older or
+partial rows receive the same defaults everywhere. Teacher-facing assignment
 cards and result pages should summarize the full delivery policy: attempts,
 timer, close time, student identity mode, answer reveal behavior, and item
 order, so a teacher can verify a link's rules without reopening the publish

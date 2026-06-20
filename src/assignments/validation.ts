@@ -8,6 +8,15 @@ export const defaultAssignmentSettings: AssignmentSettings = {
   shuffleItems: true,
 };
 
+export function resolveAssignmentSettings(
+  settings?: Partial<AssignmentSettings> | null
+): AssignmentSettings {
+  return {
+    ...defaultAssignmentSettings,
+    ...settings,
+  };
+}
+
 export const assignmentSettingsSchema = z.object({
   collectStudentName: z.boolean().default(true),
   instructions: z.string().trim().max(500).optional(),

@@ -19,8 +19,8 @@ import {
 } from '@/assignments/public';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
-  defaultAssignmentSettings,
   publishAssignmentInputSchema,
+  resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
 import { getDb } from '@/db';
@@ -119,7 +119,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
         const stats = summarizeAssignmentAttempts(attempts);
 
         return {
-          ...item,
+          ...withResolvedAssignmentSettings(item),
           stats,
         };
       })
@@ -198,6 +198,22 @@ function normalizeAssignmentSearch(value?: string) {
   return normalized || undefined;
 }
 
+function withResolvedAssignmentSettings<
+  TItem extends {
+    assignment: {
+      settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+    };
+  },
+>(item: TItem) {
+  return {
+    ...item,
+    assignment: {
+      ...item.assignment,
+      settingsJson: resolveAssignmentSettings(item.assignment.settingsJson),
+    },
+  };
+}
+
 export const publishAssignment = createServerFn({ method: 'POST' })
   .inputValidator(publishAssignmentInputSchema)
   .middleware([authApiMiddleware])
@@ -224,10 +240,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     if (expiresAt && expiresAt.getTime() <= now.getTime()) {
       throw new Error('Choose a future close time for this assignment.');
     }
-    const settings = {
-      ...defaultAssignmentSettings,
-      ...data.settings,
-    };
+    const settings = resolveAssignmentSettings(data.settings);
 
     await db.insert(assignment).values({
       activityId: sourceActivity.id,
@@ -270,7 +283,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       throw new Error('Assignment was saved but could not be loaded.');
     }
 
-    return row;
+    return withResolvedAssignmentSettings(row);
   });
 
 export const updateAssignmentStatus = createServerFn({ method: 'POST' })
@@ -329,7 +342,7 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       throw new Error('Assignment status was saved but could not be loaded.');
     }
 
-    return row;
+    return withResolvedAssignmentSettings(row);
   });
 
 const getAssignmentResultsInputSchema = z.object({
@@ -406,7 +419,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     const runtimeItems = getRuntimeItems(templateType, content);
 
     return {
-      ...row,
+      ...withResolvedAssignmentSettings(row),
       analysis: analyzeAssignmentResults({
         attempts,
         runtimeItems,
@@ -473,10 +486,7 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       assignment: {
         expiresAt: row.assignment.expiresAt,
         id: row.assignment.id,
-        settingsJson: {
-          ...defaultAssignmentSettings,
-          ...row.assignment.settingsJson,
-        },
+        settingsJson: resolveAssignmentSettings(row.assignment.settingsJson),
         shareSlug: row.assignment.shareSlug,
         status: row.assignment.status,
         title: row.assignment.title,
@@ -548,10 +558,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       throw new Error('This assignment has expired.');
     }
 
-    const settings = {
-      ...defaultAssignmentSettings,
-      ...row.assignment.settingsJson,
-    };
+    const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const durationSeconds = normalizeAttemptDurationSeconds({
       durationSeconds: data.durationSeconds,
       timeLimitSeconds: settings.timeLimitSeconds,
