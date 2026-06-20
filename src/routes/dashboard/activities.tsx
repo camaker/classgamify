@@ -5,6 +5,7 @@ import {
 } from '@/activities/template-remix';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 import { defaultAssignmentSettings } from '@/assignments/validation';
+import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
@@ -488,6 +489,8 @@ function ActivityCard({
   );
   const [timeLimitMinutes, setTimeLimitMinutes] = useState('');
   const [expiresAtLocal, setExpiresAtLocal] = useState('');
+  const previewTimeLimit = parseOptionalWholeNumber(timeLimitMinutes);
+  const previewExpiresAt = parseDateTimeLocal(expiresAtLocal);
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
   );
@@ -510,7 +513,7 @@ function ActivityCard({
       toast.error('Max attempts must be a whole number from 1 to 10.');
       return;
     }
-    const timeLimit = timeLimitMinutes ? Number(timeLimitMinutes) : undefined;
+    const timeLimit = previewTimeLimit;
     if (
       timeLimitMinutes &&
       (!Number.isInteger(timeLimit) || timeLimit < 1 || timeLimit > 180)
@@ -518,7 +521,7 @@ function ActivityCard({
       toast.error('Time limit must be a whole number from 1 to 180 minutes.');
       return;
     }
-    const expiresAt = expiresAtLocal ? new Date(expiresAtLocal) : undefined;
+    const expiresAt = previewExpiresAt ?? undefined;
     if (expiresAtLocal && Number.isNaN(expiresAt?.getTime())) {
       toast.error('Choose a valid close time.');
       return;
@@ -883,6 +886,20 @@ function ActivityCard({
                 manually.
               </p>
             </div>
+            <div className="grid gap-2">
+              <p className="font-medium text-sm">Delivery preview</p>
+              <AssignmentSettingsSummary
+                collectStudentName={collectStudentName}
+                expiresAt={previewExpiresAt ?? null}
+                instructions={assignmentInstructions.trim() || undefined}
+                maxAttempts={Number(maxAttempts) || undefined}
+                showCorrectAnswers={showCorrectAnswers}
+                shuffleItems={shuffleItems}
+                timeLimitSeconds={
+                  previewTimeLimit ? previewTimeLimit * 60 : undefined
+                }
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -947,6 +964,18 @@ function ActivityStat({ label, value }: { label: string; value: number }) {
 function formatDateTimeLocal(date: Date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return localDate.toISOString().slice(0, 16);
+}
+
+function parseOptionalWholeNumber(value: string) {
+  if (!value.trim()) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : undefined;
+}
+
+function parseDateTimeLocal(value: string) {
+  if (!value.trim()) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function normalizeActivitySearch(value: string) {

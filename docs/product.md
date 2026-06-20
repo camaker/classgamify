@@ -93,7 +93,9 @@ the close-after time window lives on `Assignment`. Teacher-facing assignment
 cards and result pages should summarize the full delivery policy: attempts,
 timer, close time, student identity mode, answer reveal behavior, and item
 order, so a teacher can verify a link's rules without reopening the publish
-dialog.
+dialog. The publish dialog should show the same delivery preview before the
+teacher creates the share link, so configuration mistakes are visible before an
+assignment is frozen.
 Teacher assignment pages should support the real distribution workflow:
 teachers can open a student link for preview or copy the absolute `/play/:id`
 URL from the assignment list and results page before sending it through a class
