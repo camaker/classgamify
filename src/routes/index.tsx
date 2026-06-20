@@ -120,7 +120,7 @@ function HomePage() {
               icon: IconDeviceGamepad2,
               title: 'Template-first gameplay',
               description:
-                'The first platform skeleton supports quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box paths.',
+                'Quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box runners now share the same assignment flow.',
             },
             {
               icon: IconChartBar,
