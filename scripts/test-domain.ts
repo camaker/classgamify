@@ -625,6 +625,54 @@ assert.ok(
     item.includes('Ready to remix after saving')
   )
 );
+const questionOnlyDraftMeta = buildActivityDraftMeta({
+  activity: {
+    description: 'Question only draft',
+    difficulty: 'starter',
+    gradeBand: 'Grade 3',
+    groupsText: '',
+    language: 'en',
+    learningGoal: 'Students answer quick review questions.',
+    pairsText: '',
+    questionsText: 'Capital of France? | Paris',
+    sourceSummary: 'Question only source',
+    subject: 'General',
+    teacherNotesText: '',
+    templateType: 'quiz',
+    title: 'Question only draft',
+    visibility: 'draft',
+    vocabularyText: '',
+  },
+  currentTemplateType: 'quiz',
+});
+assert.ok(
+  questionOnlyDraftMeta.reviewChecklist.includes(
+    'Next content gap: Add match pairs to unlock Match.'
+  )
+);
+const lockedOnlyDraftMeta = buildActivityDraftMeta({
+  activity: {
+    description: 'Group only draft',
+    difficulty: 'starter',
+    gradeBand: 'Grade 3',
+    groupsText: 'Fruit | apple, banana\nDrink | milk, water',
+    language: 'en',
+    learningGoal: 'Students sort vocabulary terms into groups.',
+    pairsText: '',
+    questionsText: '',
+    sourceSummary: 'Group only source',
+    subject: 'General',
+    teacherNotesText: '',
+    templateType: 'group-sort',
+    title: 'Group only draft',
+    visibility: 'draft',
+    vocabularyText: 'apple, banana, milk, water',
+  },
+  currentTemplateType: 'group-sort',
+});
+assert.ok(
+  lockedOnlyDraftMeta.reviewChecklist.includes('Add questions to unlock Quiz.')
+);
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',

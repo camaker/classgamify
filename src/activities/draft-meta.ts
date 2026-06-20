@@ -50,6 +50,9 @@ export function buildActivityDraftMeta({
   const readyTemplates = remixPlan.readyOptions.map(
     (option) => option.template.shortName
   );
+  const lockedTemplateDiagnostics = remixPlan.options
+    .filter((option) => !option.isReady)
+    .map((option) => option.diagnosis);
 
   return {
     coverage: {
@@ -61,7 +64,11 @@ export function buildActivityDraftMeta({
     },
     readyTemplateCount: remixPlan.readyOptions.length,
     readyTemplates,
-    reviewChecklist: buildDraftReviewChecklist(activity, suggestedTemplates),
+    reviewChecklist: buildDraftReviewChecklist({
+      activity,
+      lockedTemplateDiagnostics,
+      suggestedTemplates,
+    }),
     suggestedTemplateCount: suggestedTemplates.length,
     suggestedTemplates,
     templateReadiness: remixPlan.options.map((option) => ({
@@ -77,18 +84,39 @@ export function buildActivityDraftMeta({
   };
 }
 
-function buildDraftReviewChecklist(
-  activity: CreateActivityInput,
-  suggestedTemplates: string[]
-) {
-  return [
+function buildDraftReviewChecklist({
+  activity,
+  lockedTemplateDiagnostics,
+  suggestedTemplates,
+}: {
+  activity: CreateActivityInput;
+  lockedTemplateDiagnostics: string[];
+  suggestedTemplates: string[];
+}) {
+  const checklist = [
     'Review every answer before saving.',
     'Adjust wording for your class level.',
     activity.questionsText?.includes('|')
       ? 'Check explanations and distractor choices.'
       : 'Add questions before publishing quiz-style work.',
-    suggestedTemplates.length > 0
-      ? `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
-      : 'Add more structured pairs or groups to unlock more templates.',
   ];
+
+  if (suggestedTemplates.length > 0) {
+    checklist.push(
+      `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
+    );
+
+    if (lockedTemplateDiagnostics[0]) {
+      checklist.push(`Next content gap: ${lockedTemplateDiagnostics[0]}`);
+    }
+
+    return checklist;
+  }
+
+  checklist.push(
+    lockedTemplateDiagnostics[0] ??
+      'Add more structured pairs or groups to unlock more templates.'
+  );
+
+  return checklist;
 }
