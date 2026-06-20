@@ -56,6 +56,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
+type ItemPerformanceSort = 'accuracy' | 'original' | 'submitted' | 'type';
 
 const studentSummarySortOptions: Array<{
   label: string;
@@ -67,8 +68,19 @@ const studentSummarySortOptions: Array<{
   { label: 'Attempts', value: 'attempts' },
 ];
 
+const itemPerformanceSortOptions: Array<{
+  label: string;
+  value: ItemPerformanceSort;
+}> = [
+  { label: 'Snapshot order', value: 'original' },
+  { label: 'Lowest accuracy', value: 'accuracy' },
+  { label: 'Most answered', value: 'submitted' },
+  { label: 'Item type', value: 'type' },
+];
+
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   validateSearch: (search: Record<string, unknown>) => ({
+    itemSort: parseItemPerformanceSort(search.itemSort),
     sort: parseStudentSummarySort(search.sort),
   }),
   component: AssignmentResultsPage,
@@ -76,12 +88,13 @@ export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
 
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
-  const { sort } = Route.useSearch();
+  const { itemSort, sort } = Route.useSearch();
   const navigate = useNavigate({
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
   const [studentSearch, setStudentSearch] = useState('');
+  const itemPerformanceSort = itemSort ?? 'original';
   const studentSort = sort ?? 'needs-review';
   const title = data?.assignment.title ?? 'Assignment results';
   const activityTitle =
@@ -102,11 +115,27 @@ function AssignmentResultsPage() {
 
     return sortStudentSummaries(matchedStudents, studentSort);
   }, [data?.analysis.students, normalizedStudentSearch, studentSort]);
+  const sortedPerformanceItems = useMemo(
+    () =>
+      sortItemPerformance(data?.analysis.perItem ?? [], itemPerformanceSort),
+    [data?.analysis.perItem, itemPerformanceSort]
+  );
+
+  function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
+    void navigate({
+      replace: true,
+      search: {
+        itemSort: nextSort === 'original' ? undefined : nextSort,
+        sort,
+      },
+    });
+  }
 
   function updateStudentSort(nextSort: StudentSummarySort) {
     void navigate({
       replace: true,
       search: {
+        itemSort,
         sort: nextSort === 'needs-review' ? undefined : nextSort,
       },
     });
@@ -343,7 +372,13 @@ function AssignmentResultsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ItemPerformanceTable items={data.analysis.perItem} />
+                <div className="grid gap-4">
+                  <ItemPerformanceSortControl
+                    onSortChange={updateItemPerformanceSort}
+                    sort={itemPerformanceSort}
+                  />
+                  <ItemPerformanceTable items={sortedPerformanceItems} />
+                </div>
               </CardContent>
             </Card>
           ) : null}
@@ -595,6 +630,35 @@ function StudentSummaryTable({
   );
 }
 
+function ItemPerformanceSortControl({
+  onSortChange,
+  sort,
+}: {
+  onSortChange: (sort: ItemPerformanceSort) => void;
+  sort: ItemPerformanceSort;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:w-52">
+      <label htmlFor="item-performance-sort" className="font-medium text-sm">
+        Sort items
+      </label>
+      <NativeSelect
+        id="item-performance-sort"
+        value={sort}
+        onChange={(event) =>
+          onSortChange(event.currentTarget.value as ItemPerformanceSort)
+        }
+      >
+        {itemPerformanceSortOptions.map((option) => (
+          <NativeSelectOption key={option.value} value={option.value}>
+            {option.label}
+          </NativeSelectOption>
+        ))}
+      </NativeSelect>
+    </div>
+  );
+}
+
 function ItemPerformanceTable({
   items,
 }: {
@@ -795,6 +859,39 @@ function sortStudentSummaries(
   });
 }
 
+function sortItemPerformance(
+  items: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['perItem'],
+  sort: ItemPerformanceSort
+) {
+  if (sort === 'original') return items;
+
+  return [...items].sort((left, right) => {
+    if (sort === 'accuracy') {
+      if (left.correctRate !== right.correctRate) {
+        return left.correctRate - right.correctRate;
+      }
+      return right.submittedCount - left.submittedCount;
+    }
+
+    if (sort === 'submitted') {
+      if (left.submittedCount !== right.submittedCount) {
+        return right.submittedCount - left.submittedCount;
+      }
+      return left.correctRate - right.correctRate;
+    }
+
+    if (sort === 'type') {
+      const typeCompare = left.kind.localeCompare(right.kind);
+      if (typeCompare !== 0) return typeCompare;
+      return left.prompt.localeCompare(right.prompt);
+    }
+
+    return 0;
+  });
+}
+
 function compareDescending(
   leftValue: number,
   rightValue: number,
@@ -817,6 +914,14 @@ function parseStudentSummarySort(
   value: unknown
 ): StudentSummarySort | undefined {
   return value === 'best' || value === 'name' || value === 'attempts'
+    ? value
+    : undefined;
+}
+
+function parseItemPerformanceSort(
+  value: unknown
+): ItemPerformanceSort | undefined {
+  return value === 'accuracy' || value === 'submitted' || value === 'type'
     ? value
     : undefined;
 }

@@ -155,7 +155,9 @@ result data to CSV for gradebooks, parent follow-up, or offline analysis. This
 keeps the results loop useful for deciding what to explain again after homework.
 The teacher result page should show the student summary, the top reteach
 priorities, and the full item performance table so a teacher can scan the
-class before opening individual student answers. Teachers can search result
+class before opening individual student answers. The full item performance
+table can keep snapshot order or sort by lowest accuracy, submitted count, or
+item type for different review passes. Teachers can search result
 views by normalized student display label, including anonymous student labels,
 so summary rows, attempt rows, and answer review cards stay aligned without
 exposing raw anonymous tokens. Student summaries can be sorted by review need,
