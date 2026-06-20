@@ -9,6 +9,7 @@ import {
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
+import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -318,6 +319,10 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             <IconPlayerPlay className="size-4" />
             Open share link
           </Link>
+          <CopyAssignmentShareLinkButton
+            shareSlug={assignment.shareSlug}
+            className="w-full bg-background lg:w-auto"
+          />
         </div>
       </CardContent>
     </Card>

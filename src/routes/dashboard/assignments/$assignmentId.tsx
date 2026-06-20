@@ -7,6 +7,7 @@ import {
   AssignmentSettingsSummary,
   formatAssignmentExpiry,
 } from '@/components/assignments/assignment-settings-summary';
+import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -158,6 +159,10 @@ function AssignmentResultsPage() {
                   <IconShare3 className="size-4" />
                   /play/{data.assignment.shareSlug}
                 </div>
+                <CopyAssignmentShareLinkButton
+                  shareSlug={data.assignment.shareSlug}
+                  className="w-full bg-background sm:w-auto"
+                />
                 <Button
                   type="button"
                   variant="outline"
