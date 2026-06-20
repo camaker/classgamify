@@ -2,6 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import {
   IconDeviceGamepad2,
+  IconListDetails,
   IconLayoutGrid,
   IconPlus,
   IconSparkles,
@@ -16,6 +17,11 @@ export function getNavbarLinks(): MenuItemConfig[] {
       title: m.nav_templates(),
       href: Routes.Templates,
       icon: IconLayoutGrid,
+    },
+    {
+      title: m.nav_worksheets(),
+      href: Routes.Worksheets,
+      icon: IconListDetails,
     },
     { title: m.nav_create(), href: Routes.Create, icon: IconPlus },
     {

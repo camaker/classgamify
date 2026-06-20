@@ -4,6 +4,7 @@ export const Routes = {
   // Marketing routes
   Templates: '/templates',
   Create: '/create',
+  Worksheets: '/worksheets',
   PlayDemo: '/play/demo-food',
   Play: '/play/$shareId',
   Resources: '/blog',

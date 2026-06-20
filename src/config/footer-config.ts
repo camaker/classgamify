@@ -13,6 +13,12 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      title: m.footer_link_worksheets(),
+      href: Routes.Worksheets,
+      description: m.footer_link_worksheets_desc(),
+      external: false,
+    },
+    {
       title: m.nav_create(),
       href: Routes.Create,
       description: m.footer_link_create_desc(),
