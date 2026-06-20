@@ -1,17 +1,31 @@
 import type { AssignmentDate } from '@/assignments/lifecycle';
-import { IconCalendarTime, IconClock, IconRepeat } from '@tabler/icons-react';
+import {
+  IconArrowsShuffle,
+  IconCalendarTime,
+  IconClock,
+  IconEye,
+  IconRepeat,
+  IconUser,
+  IconUserOff,
+} from '@tabler/icons-react';
 
 type AssignmentSettingsSummaryProps = {
+  collectStudentName?: boolean;
   expiresAt: AssignmentDate;
   instructions?: string;
   maxAttempts?: number;
+  showCorrectAnswers?: boolean;
+  shuffleItems?: boolean;
   timeLimitSeconds?: number;
 };
 
 export function AssignmentSettingsSummary({
+  collectStudentName = true,
   expiresAt,
   instructions,
   maxAttempts,
+  showCorrectAnswers = true,
+  shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentSettingsSummaryProps) {
   return (
@@ -21,7 +35,7 @@ export function AssignmentSettingsSummary({
           {instructions}
         </div>
       ) : null}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <AssignmentSettingTile
           icon={IconRepeat}
           label="Attempts"
@@ -36,6 +50,21 @@ export function AssignmentSettingsSummary({
           icon={IconCalendarTime}
           label="Closes"
           value={formatAssignmentExpiry(expiresAt)}
+        />
+        <AssignmentSettingTile
+          icon={collectStudentName ? IconUser : IconUserOff}
+          label="Student identity"
+          value={formatStudentIdentity(collectStudentName)}
+        />
+        <AssignmentSettingTile
+          icon={IconEye}
+          label="Answer reveal"
+          value={formatAnswerReveal(showCorrectAnswers)}
+        />
+        <AssignmentSettingTile
+          icon={IconArrowsShuffle}
+          label="Item order"
+          value={formatShuffleItems(shuffleItems)}
         />
       </div>
     </div>
@@ -80,4 +109,16 @@ export function formatAssignmentTimeLimit(seconds?: number) {
   if (!seconds) return 'No timer';
   const minutes = Math.round(seconds / 60);
   return `${minutes} min`;
+}
+
+export function formatStudentIdentity(collectStudentName: boolean) {
+  return collectStudentName ? 'Names' : 'Anonymous';
+}
+
+export function formatAnswerReveal(showCorrectAnswers: boolean) {
+  return showCorrectAnswers ? 'After submit' : 'Hidden';
+}
+
+export function formatShuffleItems(shuffleItems: boolean) {
+  return shuffleItems ? 'Shuffled' : 'Fixed order';
 }

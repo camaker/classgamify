@@ -51,11 +51,14 @@ import { toast } from 'sonner';
 
 type AssignmentCardData = {
   activityDescription: string;
+  collectStudentName?: boolean;
   expiresAt: Date | null;
   id: string;
   instructions?: string;
   maxAttempts?: number;
   shareSlug: string;
+  showCorrectAnswers?: boolean;
+  shuffleItems?: boolean;
   status: AssignmentStatus;
   templateType: ActivityTemplateType;
   timeLimitSeconds?: number;
@@ -241,11 +244,16 @@ function DashboardAssignmentsPage() {
                       item.snapshot?.activityDescription ??
                       item.activity.description ??
                       '',
+                    collectStudentName:
+                      item.assignment.settingsJson.collectStudentName,
                     expiresAt: item.assignment.expiresAt,
                     id: item.assignment.id,
                     instructions: item.assignment.settingsJson.instructions,
                     maxAttempts: item.assignment.settingsJson.maxAttempts,
                     shareSlug: item.assignment.shareSlug,
+                    showCorrectAnswers:
+                      item.assignment.settingsJson.showCorrectAnswers,
+                    shuffleItems: item.assignment.settingsJson.shuffleItems,
                     stats: item.stats,
                     status: item.assignment.status,
                     templateType:
@@ -313,11 +321,16 @@ function DashboardAssignmentsPage() {
                     key={assignment.id}
                     assignment={{
                       activityDescription: activity.description,
+                      collectStudentName:
+                        assignment.settings.collectStudentName,
                       expiresAt: null,
                       id: assignment.id,
                       instructions: assignment.settings.instructions,
                       maxAttempts: assignment.settings.maxAttempts,
                       shareSlug: assignment.shareId,
+                      showCorrectAnswers:
+                        assignment.settings.showCorrectAnswers,
+                      shuffleItems: assignment.settings.shuffleItems,
                       stats: {
                         averageScore: assignment.averageScore,
                         completions: assignment.completions,
@@ -481,9 +494,12 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="grid gap-4">
           <AssignmentSettingsSummary
+            collectStudentName={assignment.collectStudentName}
             expiresAt={assignment.expiresAt}
             instructions={assignment.instructions}
             maxAttempts={assignment.maxAttempts}
+            showCorrectAnswers={assignment.showCorrectAnswers}
+            shuffleItems={assignment.shuffleItems}
             timeLimitSeconds={assignment.timeLimitSeconds}
           />
           <div className="grid gap-3 sm:grid-cols-2">
