@@ -2,6 +2,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { formatAttemptDuration } from '@/assignments/attempt-duration';
 
 export type AssignmentClassroomBriefStats = {
   averageDurationSeconds: number;
@@ -37,7 +38,7 @@ export function buildAssignmentClassroomBrief({
     `Completions: ${stats.completions}`,
     `Average accuracy: ${stats.averageScore}%`,
     `Average points: ${stats.averagePoints}`,
-    `Average time: ${formatBriefDuration(stats.averageDurationSeconds)}`,
+    `Average time: ${formatAttemptDuration(stats.averageDurationSeconds)}`,
     '',
     'Class review focus:',
     ...formatFocusItems(focusItems),
@@ -102,12 +103,4 @@ function formatFollowUpStudents(students: AssignmentStudentSummary[]) {
     (student, index) =>
       `- ${index + 1}. ${student.studentLabel}: ${student.latestAccuracy}% latest, ${student.needsReviewCount} ${student.needsReviewCount === 1 ? 'item' : 'items'} to review`
   );
-}
-
-function formatBriefDuration(seconds: number) {
-  if (!seconds) return '-';
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  if (minutes <= 0) return `${remainder}s`;
-  return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
 }
