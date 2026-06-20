@@ -5,6 +5,14 @@ import {
   isActivityArchived,
 } from '@/activities/lifecycle';
 import {
+  type ActivityLibraryStatus,
+  type ActivityTemplateFilter,
+  isActivityTemplateType,
+  normalizeActivityLibrarySearch,
+  parseActivityLibraryStatus,
+  parseActivityTemplateFilter,
+} from '@/activities/library-filters';
+import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
@@ -80,9 +88,6 @@ type ActivityCardData = {
   title: string;
 };
 
-type ActivityLibraryStatus = 'active' | 'archived';
-type ActivityTemplateFilter = 'all' | ActivityTemplateType;
-
 const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
 
 export const Route = createFileRoute('/dashboard/activities')({
@@ -90,13 +95,8 @@ export const Route = createFileRoute('/dashboard/activities')({
     created: typeof search.created === 'string' ? search.created : undefined,
     page: parseDashboardPageSearch(search.page),
     q: typeof search.q === 'string' ? search.q : undefined,
-    status:
-      search.status === 'archived' || search.status === 'active'
-        ? search.status
-        : undefined,
-    template: isActivityTemplateType(search.template)
-      ? search.template
-      : undefined,
+    status: parseActivityLibraryStatus(search.status),
+    template: parseActivityTemplateFilter(search.template),
   }),
   component: DashboardActivitiesPage,
 });
@@ -108,7 +108,7 @@ function DashboardActivitiesPage() {
   const libraryStatus = status ?? 'active';
   const templateFilter: ActivityTemplateFilter = template ?? 'all';
   const currentPage = page ?? 1;
-  const normalizedSearchQuery = normalizeActivitySearch(searchQuery);
+  const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
     pageIndex: currentPage - 1,
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
@@ -396,7 +396,7 @@ function ActivityLibrarySearch({
   total: number;
   value: string;
 }) {
-  const normalizedValue = normalizeActivitySearch(value);
+  const normalizedValue = normalizeActivityLibrarySearch(value);
   const statusLabel = status === 'archived' ? 'archived' : 'saved';
   const hasFilters = Boolean(normalizedValue) || template !== 'all';
   const summary = hasFilters
@@ -1063,16 +1063,4 @@ function parseDateTimeLocal(value: string) {
   if (!value.trim()) return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function normalizeActivitySearch(value: string) {
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  return normalized || undefined;
-}
-
-function isActivityTemplateType(value: unknown): value is ActivityTemplateType {
-  return (
-    typeof value === 'string' &&
-    activityTemplates.some((template) => template.type === value)
-  );
 }

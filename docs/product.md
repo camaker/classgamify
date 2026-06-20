@@ -80,6 +80,9 @@ activities, template-family coverage, activities ready to remix into another
 template, and total ready template modes. The summary logic belongs in the
 activity domain layer so dashboard surfaces and server functions reuse the same
 template-readiness calculation instead of duplicating UI-only math.
+Activity library filter parsing and search normalization should also live in
+activity-domain helpers so URL state, dashboard controls, and list API queries
+share the same activity status and template-family rules.
 Teachers can soft-archive activities from the active library and restore them
 later from an archived view. Archiving hides an activity from the default
 library and prevents casual republishing, but it does not delete structured
@@ -156,6 +159,9 @@ losing search or status filter state. Assignment list overview cards summarize
 the full current filter result, not only the visible page, so teachers can trust
 open-link counts, total completions, and average accuracy while paging through a
 large class archive.
+Assignment list filter parsing and search normalization should live in
+assignment-domain helpers so route URLs, list API filters, and dashboard filter
+controls stay aligned.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment

@@ -4,6 +4,11 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import {
+  type AssignmentStatusFilter,
+  normalizeAssignmentListSearch,
+  parseAssignmentStatusFilter,
+} from '@/assignments/list-filters';
+import {
   canUpdateAssignmentStatus,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
@@ -70,8 +75,6 @@ type AssignmentCardData = {
   };
 };
 
-type AssignmentStatusFilter = 'all' | AssignmentStatus;
-
 const assignmentStatusFilterOptions: Array<{
   label: string;
   value: AssignmentStatusFilter;
@@ -101,7 +104,7 @@ function DashboardAssignmentsPage() {
   const searchQuery = q ?? '';
   const statusFilter = status ?? 'all';
   const currentPage = page ?? 1;
-  const normalizedSearchQuery = normalizeAssignmentSearch(searchQuery);
+  const normalizedSearchQuery = normalizeAssignmentListSearch(searchQuery);
   const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
   const { data, isError, isLoading } = useAssignments({
     pageIndex: currentPage - 1,
@@ -464,7 +467,7 @@ function AssignmentListFilters({
   total: number;
 }) {
   const hasFilters =
-    Boolean(normalizeAssignmentSearch(search)) || status !== 'all';
+    Boolean(normalizeAssignmentListSearch(search)) || status !== 'all';
   const summary = isLoading
     ? 'Loading assignments...'
     : hasFilters
@@ -658,19 +661,6 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       </CardContent>
     </Card>
   );
-}
-
-function parseAssignmentStatusFilter(
-  value: unknown
-): AssignmentStatusFilter | undefined {
-  return value === 'published' || value === 'closed' || value === 'draft'
-    ? value
-    : undefined;
-}
-
-function normalizeAssignmentSearch(value: string) {
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  return normalized || undefined;
 }
 
 function SummaryCard({

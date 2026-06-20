@@ -2,9 +2,19 @@ import assert from 'node:assert/strict';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
+import {
+  isActivityTemplateType,
+  normalizeActivityLibrarySearch,
+  parseActivityLibraryStatus,
+  parseActivityTemplateFilter,
+} from '@/activities/library-filters';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import {
+  normalizeAssignmentListSearch,
+  parseAssignmentStatusFilter,
+} from '@/assignments/list-filters';
 import {
   buildFilteredAttemptRows,
   filterAndSortStudentSummaries,
@@ -68,6 +78,18 @@ assert.deepEqual(
     { answer: '', itemId: 'item-3' },
   ]
 );
+assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
+assert.equal(normalizeActivityLibrarySearch('   '), undefined);
+assert.equal(parseActivityLibraryStatus('archived'), 'archived');
+assert.equal(parseActivityLibraryStatus('deleted'), undefined);
+assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
+assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
+assert.equal(isActivityTemplateType('open-box'), true);
+assert.equal(isActivityTemplateType('memory-game'), false);
+assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
+assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.equal(parseAssignmentStatusFilter('published'), 'published');
+assert.equal(parseAssignmentStatusFilter('all'), undefined);
 
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({

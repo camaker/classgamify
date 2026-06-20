@@ -9,6 +9,7 @@ import {
   buildRemixedActivityTitle,
 } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
+import { normalizeActivityLibrarySearch } from '@/activities/library-filters';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import { getMissingTemplateRequirements } from '@/activities/template-remix';
@@ -36,7 +37,7 @@ export const listActivities = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const search = normalizeActivitySearch(data.search);
+    const search = normalizeActivityLibrarySearch(data.search);
     const searchWhere = search
       ? or(
           like(activity.title, `%${search}%`),
@@ -77,11 +78,6 @@ export const listActivities = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
-
-function normalizeActivitySearch(value?: string) {
-  const normalized = value?.replace(/\s+/g, ' ').trim();
-  return normalized || undefined;
-}
 
 const getActivityInputSchema = z.object({
   id: z.string().min(1),

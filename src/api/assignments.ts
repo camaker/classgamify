@@ -9,6 +9,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
+import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
 import {
   assertAssignmentStatusTransition,
   isAssignmentExpired,
@@ -151,7 +152,7 @@ function buildAssignmentListWhere({
   status?: AssignmentStatus;
   userId: string;
 }) {
-  const normalizedSearch = normalizeAssignmentSearch(search);
+  const normalizedSearch = normalizeAssignmentListSearch(search);
   const filters: SQL[] = [eq(assignment.ownerId, userId)];
 
   if (status) {
@@ -173,11 +174,6 @@ function buildAssignmentListWhere({
   }
 
   return and(...filters);
-}
-
-function normalizeAssignmentSearch(value?: string) {
-  const normalized = value?.replace(/\s+/g, ' ').trim();
-  return normalized || undefined;
 }
 
 function withResolvedAssignmentSettings<
