@@ -30,31 +30,31 @@ export const Route = createFileRoute('/(pages)/roadmap')({
 function RoadmapPage() {
   const columns = [
     {
-      title: 'Live skeleton',
+      title: 'Usable core loop',
       icon: IconCheck,
       items: [
-        'Activity, assignment, attempt schema',
-        'Template catalog with eight starter types',
-        'Teacher dashboard entry points',
-        'Public student play route shell',
+        'Structured activities with template-neutral content',
+        'Publish dialog with delivery settings preview',
+        'Student play links with scoring and attempt limits',
+        'Teacher results with summaries, exports, and review filters',
       ],
     },
     {
-      title: 'Next build pass',
+      title: 'Template depth',
       icon: IconDeviceGamepad2,
       items: [
-        'Persist teacher-created activities',
-        'Structured activity editor',
-        'Interactive quiz and matching runners',
-        'Attempt submission and result view',
+        'Richer drag-and-drop polish for sort and matching modes',
+        'Worksheet extraction and printable follow-up flows',
+        'Teacher audio upload for listening activities',
+        'More classroom-ready variants from the same activity',
       ],
     },
     {
       title: 'AI advantage',
       icon: IconSparkles,
       items: [
-        'Generate activity content from lesson notes',
-        'Remix one activity into multiple templates',
+        'Improve lesson-note drafts with teacher-controlled provenance',
+        'Transform missing fields for locked template remixes',
         'Differentiate by grade or difficulty',
         'Suggest reteach activities from results',
       ],
@@ -98,8 +98,9 @@ function RoadmapPage() {
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
                 ClassGamify starts with teacher-owned activities, a focused
-                template catalog, public student play links, and basic results.
-                AI creation plugs into this foundation next.
+                template catalog, public student play links, and teacher result
+                review. The next product passes deepen template interactions and
+                make AI useful inside that loop.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

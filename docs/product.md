@@ -16,6 +16,9 @@ navigation and homepage entry points should point at ClassGamify templates,
 creation, assignment links, and results before legacy learning routes are
 deleted, because those old routes still share generated route-tree and locale
 infrastructure.
+Public roadmap and dashboard copy should describe the current usable
+ClassGamify loop, not stale scaffold or skeleton milestones once those
+capabilities are live.
 Public policy pages are also product surfaces: terms, privacy, and cookie copy
 must describe ClassGamify's teacher activity, public assignment link, student
 attempt, results, and AI-draft data model instead of the copied learning-site

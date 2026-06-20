@@ -94,7 +94,7 @@ function DashboardPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="rounded-md border-primary/30">
                 <IconSparkles className="size-3.5" />
-                Platform skeleton
+                Teacher workspace
               </Badge>
               <Badge variant="secondary" className="rounded-md">
                 Wordwall-core loop
@@ -105,8 +105,9 @@ function DashboardPage() {
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
               ClassGamify separates reusable teacher activities from published
-              assignments and student attempts. AI generation, editing, and game
-              rendering can now plug into the same data contract.
+              assignments and student attempts. Create, publish, play, and
+              review now share one activity data contract that AI drafting and
+              template remixing can build on.
             </p>
             <div className="mt-5 flex flex-col gap-2 sm:flex-row">
               <Link
@@ -136,10 +137,10 @@ function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ReadinessRow label="Content model" value={100} />
-              <ReadinessRow label="Teacher library" value={70} />
-              <ReadinessRow label="Student runner" value={35} />
-              <ReadinessRow label="Results view" value={45} />
+              <ReadinessRow label="Activity authoring" value={100} />
+              <ReadinessRow label="Assignment links" value={100} />
+              <ReadinessRow label="Student runner" value={85} />
+              <ReadinessRow label="Teacher results" value={90} />
             </CardContent>
           </Card>
         </section>
@@ -164,7 +165,7 @@ function DashboardPage() {
           <ActionCard
             icon={IconPlayerPlay}
             title="Student preview"
-            description="Open the public play route that will become the interactive activity runner."
+            description="Open a playable student assignment route with progress, timing, scoring, and review behavior."
             href={Routes.PlayDemo}
             cta="Preview play route"
           />
