@@ -39,6 +39,7 @@ import {
   useRestoreActivity,
 } from '@/hooks/use-activities';
 import { usePublishAssignment } from '@/hooks/use-assignments';
+import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -77,7 +78,7 @@ const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
     created: typeof search.created === 'string' ? search.created : undefined,
-    page: parseActivityLibraryPage(search.page),
+    page: parseDashboardPageSearch(search.page),
     q: typeof search.q === 'string' ? search.q : undefined,
     status:
       search.status === 'archived' || search.status === 'active'
@@ -951,12 +952,6 @@ function formatDateTimeLocal(date: Date) {
 function normalizeActivitySearch(value: string) {
   const normalized = value.replace(/\s+/g, ' ').trim();
   return normalized || undefined;
-}
-
-function parseActivityLibraryPage(value: unknown) {
-  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
-  const page = Number(value);
-  return Number.isInteger(page) && page > 1 ? page : undefined;
 }
 
 function isActivityTemplateType(value: unknown): value is ActivityTemplateType {

@@ -30,6 +30,7 @@ import {
   useAssignments,
   useUpdateAssignmentStatus,
 } from '@/hooks/use-assignments';
+import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -81,7 +82,7 @@ const ASSIGNMENT_LIST_PAGE_SIZE = 12;
 
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: (search: Record<string, unknown>) => ({
-    page: parseAssignmentListPage(search.page),
+    page: parseDashboardPageSearch(search.page),
     published:
       typeof search.published === 'string' ? search.published : undefined,
     q: typeof search.q === 'string' ? search.q : undefined,
@@ -552,12 +553,6 @@ function parseAssignmentStatusFilter(
   return value === 'published' || value === 'closed' || value === 'draft'
     ? value
     : undefined;
-}
-
-function parseAssignmentListPage(value: unknown) {
-  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
-  const page = Number(value);
-  return Number.isInteger(page) && page > 1 ? page : undefined;
 }
 
 function normalizeAssignmentSearch(value: string) {
