@@ -1,6 +1,6 @@
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -17,19 +17,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvFilename,
+} from '@/assignments/results-export';
 import { useAssignmentResults } from '@/hooks/use-assignments';
+import { downloadFile } from '@/lib/download';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconCalendarTime,
   IconChartBar,
   IconClock,
+  IconDownload,
   IconListDetails,
   IconPlayerPlay,
   IconShare3,
   IconUsers,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   component: AssignmentResultsPage,
@@ -45,6 +52,19 @@ function AssignmentResultsPage() {
     data?.snapshot?.activityDescription ?? data?.activity.description ?? '';
   const templateType =
     data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
+  const hasAttempts = Boolean(data?.attempts.length);
+
+  async function handleExportResults() {
+    if (!data || data.attempts.length === 0) {
+      toast.error('Submit at least one attempt before exporting results.');
+      return;
+    }
+
+    const csv = buildAssignmentResultsCsv(data);
+    const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+    await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
+    toast.success('Results CSV downloaded.');
+  }
 
   return (
     <DashboardLayout
@@ -131,6 +151,16 @@ function AssignmentResultsPage() {
                 <IconShare3 className="size-4" />
                 /play/{data.assignment.shareSlug}
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={!hasAttempts}
+                onClick={handleExportResults}
+              >
+                <IconDownload className="size-4" />
+                Download CSV
+              </Button>
             </CardContent>
           </Card>
 
