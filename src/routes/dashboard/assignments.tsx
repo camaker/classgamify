@@ -32,6 +32,8 @@ import {
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconChevronLeft,
+  IconChevronRight,
   IconChartBar,
   IconFilter,
   IconListCheck,
@@ -44,6 +46,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 type AssignmentCardData = {
@@ -75,8 +78,11 @@ const assignmentStatusFilterOptions: Array<{
   { label: 'Draft', value: 'draft' },
 ];
 
+const ASSIGNMENT_LIST_PAGE_SIZE = 12;
+
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: (search: Record<string, unknown>) => ({
+    page: parseAssignmentListPage(search.page),
     published:
       typeof search.published === 'string' ? search.published : undefined,
     q: typeof search.q === 'string' ? search.q : undefined,
@@ -87,18 +93,24 @@ export const Route = createFileRoute('/dashboard/assignments')({
 
 function DashboardAssignmentsPage() {
   const navigate = useNavigate({ from: '/dashboard/assignments' });
-  const { published, q, status } = Route.useSearch();
+  const { page, published, q, status } = Route.useSearch();
   const searchQuery = q ?? '';
   const statusFilter = status ?? 'all';
+  const currentPage = page ?? 1;
   const normalizedSearchQuery = normalizeAssignmentSearch(searchQuery);
   const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
   const { data, isError, isLoading } = useAssignments({
-    pageIndex: 0,
-    pageSize: 50,
+    pageIndex: currentPage - 1,
+    pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
     search: normalizedSearchQuery,
     status: filteredStatus,
   });
   const assignments = data?.items ?? [];
+  const totalAssignments = data?.total ?? 0;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalAssignments / ASSIGNMENT_LIST_PAGE_SIZE)
+  );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
   const openAssignmentCount = assignments.filter((item) =>
@@ -116,6 +128,12 @@ function DashboardAssignmentsPage() {
         )
       : 0;
 
+  useEffect(() => {
+    if (!isLoading && currentPage > totalPages) {
+      navigateToAssignmentPage(totalPages, true);
+    }
+  }, [currentPage, isLoading, totalAssignments, totalPages]);
+
   function updateFilters(next: {
     q?: string;
     status?: AssignmentStatusFilter;
@@ -126,9 +144,24 @@ function DashboardAssignmentsPage() {
     void navigate({
       replace: true,
       search: {
+        page: undefined,
         published,
         q: nextQuery.trim() ? nextQuery : undefined,
         status: nextStatus === 'all' ? undefined : nextStatus,
+      },
+    });
+  }
+
+  function navigateToAssignmentPage(nextPage: number, replace = false) {
+    const boundedPage = Math.max(1, nextPage);
+
+    void navigate({
+      replace,
+      search: {
+        page: boundedPage === 1 ? undefined : boundedPage,
+        published,
+        q: searchQuery.trim() ? searchQuery : undefined,
+        status: statusFilter === 'all' ? undefined : statusFilter,
       },
     });
   }
@@ -153,22 +186,22 @@ function DashboardAssignmentsPage() {
         <section className="grid gap-4 md:grid-cols-4">
           <SummaryCard
             icon={IconListCheck}
-            label="Assignments"
+            label="Shown"
             value={String(assignments.length)}
           />
           <SummaryCard
             icon={IconShare3}
-            label="Open links"
+            label="Open shown"
             value={String(openAssignmentCount)}
           />
           <SummaryCard
             icon={IconUsers}
-            label="Completions"
+            label="Page completions"
             value={String(totalCompletions)}
           />
           <SummaryCard
             icon={IconChartBar}
-            label="Average score"
+            label="Page average"
             value={`${averageScore}%`}
           />
         </section>
@@ -180,7 +213,7 @@ function DashboardAssignmentsPage() {
           onStatusChange={(value) => updateFilters({ status: value })}
           search={searchQuery}
           status={statusFilter}
-          total={data?.total ?? 0}
+          total={totalAssignments}
         />
 
         {isError ? (
@@ -198,31 +231,41 @@ function DashboardAssignmentsPage() {
         ) : null}
 
         {!isLoading && hasAssignments ? (
-          <section className="grid gap-4">
-            {assignments.map((item) => (
-              <AssignmentCard
-                key={item.assignment.id}
-                assignment={{
-                  activityDescription:
-                    item.snapshot?.activityDescription ??
-                    item.activity.description ??
-                    '',
-                  expiresAt: item.assignment.expiresAt,
-                  id: item.assignment.id,
-                  instructions: item.assignment.settingsJson.instructions,
-                  maxAttempts: item.assignment.settingsJson.maxAttempts,
-                  shareSlug: item.assignment.shareSlug,
-                  stats: item.stats,
-                  status: item.assignment.status,
-                  templateType:
-                    item.snapshot?.templateType ?? item.activity.templateType,
-                  timeLimitSeconds:
-                    item.assignment.settingsJson.timeLimitSeconds,
-                  title: item.assignment.title,
-                }}
-              />
-            ))}
-          </section>
+          <>
+            <section className="grid gap-4">
+              {assignments.map((item) => (
+                <AssignmentCard
+                  key={item.assignment.id}
+                  assignment={{
+                    activityDescription:
+                      item.snapshot?.activityDescription ??
+                      item.activity.description ??
+                      '',
+                    expiresAt: item.assignment.expiresAt,
+                    id: item.assignment.id,
+                    instructions: item.assignment.settingsJson.instructions,
+                    maxAttempts: item.assignment.settingsJson.maxAttempts,
+                    shareSlug: item.assignment.shareSlug,
+                    stats: item.stats,
+                    status: item.assignment.status,
+                    templateType:
+                      item.snapshot?.templateType ?? item.activity.templateType,
+                    timeLimitSeconds:
+                      item.assignment.settingsJson.timeLimitSeconds,
+                    title: item.assignment.title,
+                  }}
+                />
+              ))}
+            </section>
+            <AssignmentListPagination
+              currentPage={currentPage}
+              isLoading={isLoading}
+              onPageChange={(nextPage) => navigateToAssignmentPage(nextPage)}
+              pageSize={ASSIGNMENT_LIST_PAGE_SIZE}
+              total={totalAssignments}
+              totalPages={totalPages}
+            />
+          </>
         ) : null}
 
         {!isLoading && !hasAssignments && hasFilters ? (
@@ -385,6 +428,63 @@ function AssignmentListFilters({
   );
 }
 
+function AssignmentListPagination({
+  currentPage,
+  isLoading,
+  onPageChange,
+  pageSize,
+  total,
+  totalPages,
+}: {
+  currentPage: number;
+  isLoading: boolean;
+  onPageChange: (page: number) => void;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}) {
+  if (totalPages <= 1) return null;
+
+  const firstItem = (currentPage - 1) * pageSize + 1;
+  const lastItem = Math.min(total, currentPage * pageSize);
+
+  return (
+    <nav
+      aria-label="Assignment list pages"
+      className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p className="text-sm text-muted-foreground">
+        Showing {firstItem}-{lastItem} of {total} assignments
+      </p>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="bg-background"
+          disabled={isLoading || currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          <IconChevronLeft className="size-4" />
+          Previous
+        </Button>
+        <span className="min-w-24 text-center text-sm text-muted-foreground">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          className="bg-background"
+          disabled={isLoading || currentPage >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          Next
+          <IconChevronRight className="size-4" />
+        </Button>
+      </div>
+    </nav>
+  );
+}
+
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const persisted = !assignment.id.startsWith('assignment-');
@@ -509,6 +609,12 @@ function parseAssignmentStatusFilter(
   return value === 'published' || value === 'closed' || value === 'draft'
     ? value
     : undefined;
+}
+
+function parseAssignmentListPage(value: unknown) {
+  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+  const page = Number(value);
+  return Number.isInteger(page) && page > 1 ? page : undefined;
 }
 
 function normalizeAssignmentSearch(value: string) {
