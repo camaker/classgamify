@@ -521,6 +521,11 @@ function AnswerFeedback({
       <span className="text-muted-foreground">
         Correct answer: {reviewItem.correctAnswer}
       </span>
+      {reviewItem.acceptedAnswers.length > 1 ? (
+        <span className="basis-full text-muted-foreground">
+          Accepted answers: {reviewItem.acceptedAnswers.join(', ')}
+        </span>
+      ) : null}
       {reviewItem.explanation ? (
         <span className="basis-full text-muted-foreground">
           Why: {reviewItem.explanation}

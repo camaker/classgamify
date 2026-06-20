@@ -86,7 +86,8 @@ The submission contract remains template-neutral: every renderer stores
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission
-contract.
+contract. Accepted alternatives are revealed only in the post-submit review when
+the assignment allows correct-answer reveal.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to

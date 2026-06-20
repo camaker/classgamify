@@ -1,3 +1,4 @@
+import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
   ActivityDifficulty,
@@ -16,6 +17,7 @@ export type PublicRuntimeItem = {
 };
 
 export type PublicAttemptReviewItem = {
+  acceptedAnswers: string[];
   correct: boolean;
   correctAnswer: string;
   explanation?: string;
@@ -72,12 +74,17 @@ export function buildAttemptReviewItems({
     answers.map((answer) => [answer.itemId, Boolean(answer.correct)])
   );
 
-  return runtimeItems.map((item) => ({
-    correct: correctnessByItemId.get(item.id) ?? false,
-    correctAnswer: item.answer,
-    explanation: item.explanation,
-    itemId: item.id,
-  }));
+  return runtimeItems.map((item) => {
+    const acceptedAnswers = getAcceptedAnswers(item.answer);
+
+    return {
+      acceptedAnswers,
+      correct: correctnessByItemId.get(item.id) ?? false,
+      correctAnswer: acceptedAnswers[0] ?? item.answer,
+      explanation: item.explanation,
+      itemId: item.id,
+    };
+  });
 }
 
 export function estimateAssignmentMinutes(itemCount: number) {
