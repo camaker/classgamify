@@ -1,13 +1,19 @@
 import assert from 'node:assert/strict';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
+import type { RuntimeItem } from '@/activities/runtime';
 
-const runtimeItems = [{ id: 'item-1' }, { id: 'item-2' }, { id: 'item-3' }];
+const submissionRuntimeItems = [
+  { id: 'item-1' },
+  { id: 'item-2' },
+  { id: 'item-3' },
+];
 
 const answers = {
   'item-1': ' apple ',
@@ -21,7 +27,7 @@ assert.equal(isStudentAnswerFilled(' answer '), true);
 assert.deepEqual(
   getAttemptCompletionSummary({
     answers,
-    runtimeItems,
+    runtimeItems: submissionRuntimeItems,
   }),
   {
     answeredItemCount: 1,
@@ -33,7 +39,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildAttemptSubmissionAnswers({
     answers,
-    runtimeItems,
+    runtimeItems: submissionRuntimeItems,
   }),
   [
     { answer: ' apple ', itemId: 'item-1' },
@@ -45,7 +51,7 @@ assert.deepEqual(
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({
     answers: [{ itemId: 'item-1' }, { itemId: 'item-3' }],
-    runtimeItems,
+    runtimeItems: submissionRuntimeItems,
   })
 );
 
@@ -58,7 +64,7 @@ assert.throws(
         { itemId: 'item-3' },
         { itemId: 'item-4' },
       ],
-      runtimeItems,
+      runtimeItems: submissionRuntimeItems,
     }),
   /exceed assignment item count/
 );
@@ -67,7 +73,7 @@ assert.throws(
   () =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'unknown-item' }],
-      runtimeItems,
+      runtimeItems: submissionRuntimeItems,
     }),
   /unknown item/
 );
@@ -76,7 +82,7 @@ assert.throws(
   () =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }, { itemId: 'item-1' }],
-      runtimeItems,
+      runtimeItems: submissionRuntimeItems,
     }),
   /duplicate item/
 );
@@ -97,5 +103,114 @@ assert.equal(
   }),
   60
 );
+
+const resultRuntimeItems = [
+  {
+    answer: 'Paris / Paris, France',
+    choices: ['Paris', 'Rome'],
+    explanation: 'Paris is the capital of France.',
+    id: 'q-1',
+    kind: 'question',
+    prompt: 'Capital of France?',
+  },
+  {
+    answer: 'Cold',
+    choices: ['Cold', 'Warm'],
+    id: 'pair-1',
+    kind: 'pair',
+    prompt: 'Hot',
+  },
+] satisfies RuntimeItem[];
+
+const resultAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [
+          { answer: 'paris france', correct: true, itemId: 'q-1' },
+          { answer: 'Warm', correct: false, itemId: 'pair-1' },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'attempt-1',
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 2,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      score: 1,
+      studentName: ' Alice ',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [
+          { answer: 'Paris', correct: true, itemId: 'q-1' },
+          { answer: 'Cold', correct: true, itemId: 'pair-1' },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-02T10:00:00.000Z'),
+      id: 'attempt-2',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+      score: 2,
+      studentName: 'alice',
+    },
+    {
+      anonymousToken: 'browser-token-1',
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-03T10:00:00.000Z'),
+      id: 'attempt-3',
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        correctItemCount: 0,
+        earnedPoints: 0,
+        totalPoints: 2,
+      },
+      score: 0,
+      studentName: null,
+    },
+  ],
+  runtimeItems: resultRuntimeItems,
+});
+
+assert.equal(resultAnalysis.perItem[0]?.correctCount, 2);
+assert.equal(resultAnalysis.perItem[0]?.submittedCount, 3);
+assert.equal(resultAnalysis.perItem[0]?.correctRate, 67);
+assert.deepEqual(resultAnalysis.perItem[0]?.acceptedAnswers, [
+  'Paris',
+  'Paris, France',
+]);
+assert.equal(
+  resultAnalysis.attempts[0]?.answers[0]?.explanation,
+  'Paris is the capital of France.'
+);
+assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
+assert.equal(resultAnalysis.attempts[1]?.studentLabel, 'Alice');
+assert.equal(resultAnalysis.attempts[2]?.studentLabel, 'Anonymous student 1');
+assert.equal(resultAnalysis.students[0]?.studentLabel, 'Anonymous student 1');
+assert.equal(resultAnalysis.students[0]?.latestAccuracy, 0);
+assert.equal(resultAnalysis.students[1]?.studentKey, 'name:alice');
+assert.equal(resultAnalysis.students[1]?.attempts, 2);
+assert.equal(resultAnalysis.students[1]?.averageAccuracy, 75);
+assert.equal(resultAnalysis.students[1]?.bestAccuracy, 100);
+assert.equal(resultAnalysis.students[1]?.latestAccuracy, 100);
+assert.equal(resultAnalysis.students[1]?.needsReviewCount, 0);
+assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
+assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
 
 console.log('Domain tests passed.');
