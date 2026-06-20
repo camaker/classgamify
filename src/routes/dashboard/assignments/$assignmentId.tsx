@@ -65,7 +65,7 @@ function AssignmentResultsPage() {
         </div>
       ) : (
         <div className="grid gap-6">
-          <section className="grid gap-4 md:grid-cols-4">
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             <ResultMetric
               icon={IconUsers}
               label="Completions"
@@ -80,6 +80,11 @@ function AssignmentResultsPage() {
               icon={IconClock}
               label="Average points"
               value={String(data.stats.averagePoints)}
+            />
+            <ResultMetric
+              icon={IconClock}
+              label="Average time"
+              value={formatDuration(data.stats.averageDurationSeconds)}
             />
             <ResultMetric
               icon={IconCalendarTime}
@@ -173,6 +178,7 @@ function AssignmentResultsPage() {
                       <TableHead>Score</TableHead>
                       <TableHead>Accuracy</TableHead>
                       <TableHead>Answered</TableHead>
+                      <TableHead>Time</TableHead>
                       <TableHead>Submitted</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -191,6 +197,11 @@ function AssignmentResultsPage() {
                         <TableCell>
                           {attempt.resultJson?.completedItemCount ?? 0}/
                           {attempt.resultJson?.totalPoints ?? 0}
+                        </TableCell>
+                        <TableCell>
+                          {formatDuration(
+                            attempt.resultJson?.durationSeconds ?? 0
+                          )}
                         </TableCell>
                         <TableCell>
                           {formatAttemptDate(attempt.completedAt)}
@@ -351,6 +362,14 @@ function formatAttemptDate(value: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(value);
+}
+
+function formatDuration(seconds: number) {
+  if (!seconds) return '-';
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (minutes <= 0) return `${remainder}s`;
+  return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
 }
 
 function formatAssignmentExpiry(value: Date | null) {

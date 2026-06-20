@@ -263,6 +263,18 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
               completions
           )
         : 0;
+    const durationAttempts = attempts.filter(
+      (item) => item.resultJson?.durationSeconds !== undefined
+    );
+    const averageDurationSeconds =
+      durationAttempts.length > 0
+        ? Math.round(
+            durationAttempts.reduce(
+              (sum, item) => sum + (item.resultJson?.durationSeconds ?? 0),
+              0
+            ) / durationAttempts.length
+          )
+        : 0;
     const content = row.snapshot?.contentJson ?? row.activity.contentJson;
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
@@ -277,6 +289,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       attempts,
       stats: {
         averagePoints,
+        averageDurationSeconds,
         averageScore,
         completions,
       },

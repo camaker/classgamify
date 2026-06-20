@@ -195,6 +195,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const [maxAttempts, setMaxAttempts] = useState(
     String(defaultAssignmentSettings.maxAttempts ?? 2)
   );
+  const [timeLimitMinutes, setTimeLimitMinutes] = useState('');
   const [expiresAtLocal, setExpiresAtLocal] = useState('');
   const template = activityTemplates.find(
     (item) => item.type === activity.templateType
@@ -217,6 +218,14 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
       toast.error('Max attempts must be a whole number from 1 to 10.');
       return;
     }
+    const timeLimit = timeLimitMinutes ? Number(timeLimitMinutes) : undefined;
+    if (
+      timeLimitMinutes &&
+      (!Number.isInteger(timeLimit) || timeLimit < 1 || timeLimit > 180)
+    ) {
+      toast.error('Time limit must be a whole number from 1 to 180 minutes.');
+      return;
+    }
     const expiresAt = expiresAtLocal ? new Date(expiresAtLocal) : undefined;
     if (expiresAtLocal && Number.isNaN(expiresAt?.getTime())) {
       toast.error('Choose a valid close time.');
@@ -236,6 +245,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
           maxAttempts: attempts,
           showCorrectAnswers,
           shuffleItems,
+          timeLimitSeconds: timeLimit ? timeLimit * 60 : undefined,
         },
         title,
       });
@@ -449,6 +459,24 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
                 value={maxAttempts}
                 onChange={(event) => setMaxAttempts(event.currentTarget.value)}
               />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor={`time-limit-${activity.id}`}>Time limit</label>
+              <Input
+                id={`time-limit-${activity.id}`}
+                type="number"
+                min={1}
+                max={180}
+                value={timeLimitMinutes}
+                placeholder="No limit"
+                onChange={(event) =>
+                  setTimeLimitMinutes(event.currentTarget.value)
+                }
+              />
+              <p className="text-xs leading-5 text-muted-foreground">
+                Optional classroom timer in minutes. Leave blank for no time
+                limit.
+              </p>
             </div>
             <div className="grid gap-2">
               <label htmlFor={`expires-at-${activity.id}`}>Close after</label>

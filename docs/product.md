@@ -53,9 +53,10 @@ extend rather than replace.
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
 answers after submission, whether items are shuffled, and the per-student
-attempt limit. They can also set an optional close-after time for homework
-windows. These settings live on `Assignment.settingsJson`; immutable content
-lives on `AssignmentSnapshot`, and the time window lives on `Assignment`.
+attempt limit. They can also set an optional student timer and close-after time
+for homework windows. These settings live on `Assignment.settingsJson`;
+immutable content lives on `AssignmentSnapshot`, and the close-after time window
+lives on `Assignment`.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review.
@@ -92,8 +93,9 @@ the assignment allows correct-answer reveal.
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
 produce per-item correct rates, reteach priorities, item-level attempt reviews,
-and answer explanations from the assignment snapshot. This keeps the results
-loop useful for deciding what to explain again after homework.
+answer explanations from the assignment snapshot, and attempt duration metrics.
+This keeps the results loop useful for deciding what to explain again after
+homework.
 
 ## AI Authoring
 

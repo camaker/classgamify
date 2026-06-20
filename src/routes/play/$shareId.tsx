@@ -30,7 +30,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/play/$shareId')({
@@ -51,6 +51,7 @@ function PlayPage() {
   const [studentName, setStudentName] = useState('');
   const [startedAt] = useState(() => Date.now());
   const [result, setResult] = useState<AttemptSubmissionResult>();
+  const [now, setNow] = useState(() => Date.now());
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
   const starterRuntimeItems = useMemo(
@@ -80,10 +81,26 @@ function PlayPage() {
   }, [activity, assignment, data, starterRuntimeItems]);
   const itemCount = runtimeItems.length;
   const canSubmit = Boolean(data) && itemCount > 0;
+  const elapsedSeconds = Math.max(0, Math.round((now - startedAt) / 1000));
+  const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
+  const remainingSeconds = timeLimitSeconds
+    ? Math.max(0, timeLimitSeconds - elapsedSeconds)
+    : undefined;
+  const timeExpired = Boolean(timeLimitSeconds && remainingSeconds === 0);
   const completedCount = useMemo(
     () => runtimeItems.filter((item) => answers[item.id]?.trim()).length,
     [answers, runtimeItems]
   );
+
+  useEffect(() => {
+    if (result || !timeLimitSeconds) return;
+
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [result, timeLimitSeconds]);
 
   async function submitAnswers() {
     if (!activity || !canSubmit) {
@@ -194,6 +211,11 @@ function PlayPage() {
             <Badge variant="secondary" className="rounded-md">
               {completedCount}/{itemCount} answered
             </Badge>
+            {timeLimitSeconds ? (
+              <Badge variant="outline" className="rounded-md">
+                {timeExpired ? 'Time ended' : formatDuration(remainingSeconds)}
+              </Badge>
+            ) : null}
           </div>
 
           <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
@@ -233,13 +255,23 @@ function PlayPage() {
                 <p className="text-xs text-muted-foreground">
                   {result.accuracy}% accuracy
                 </p>
+                <p className="text-xs text-muted-foreground">
+                  Time:{' '}
+                  {formatDuration(result.durationSeconds ?? elapsedSeconds)}
+                </p>
               </div>
             ) : null}
           </div>
 
+          {timeExpired && !result ? (
+            <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
+              Time is up. Review your saved answers, then submit.
+            </div>
+          ) : null}
+
           <RuntimeItemList
             answers={answers}
-            disabled={Boolean(result)}
+            disabled={Boolean(result) || timeExpired}
             items={runtimeItems}
             revealAnswer={Boolean(
               result && assignment.settings.showCorrectAnswers
@@ -622,7 +654,16 @@ type PublicRuntimeItem =
 
 type AttemptSubmissionResult = {
   accuracy: number;
+  durationSeconds?: number;
   earnedPoints: number;
   reviewItems: PublicAttemptReviewItem[];
   totalPoints: number;
 };
+
+function formatDuration(seconds?: number) {
+  if (seconds === undefined) return '';
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (minutes <= 0) return `${remainder}s`;
+  return `${minutes}:${String(remainder).padStart(2, '0')}`;
+}

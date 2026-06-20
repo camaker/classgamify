@@ -13,6 +13,12 @@ export const assignmentSettingsSchema = z.object({
   maxAttempts: z.number().int().min(1).max(10).optional(),
   showCorrectAnswers: z.boolean().default(true),
   shuffleItems: z.boolean().default(true),
+  timeLimitSeconds: z
+    .number()
+    .int()
+    .min(60)
+    .max(3 * 60 * 60)
+    .optional(),
 });
 
 export const publishAssignmentInputSchema = z.object({
