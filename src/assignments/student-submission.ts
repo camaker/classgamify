@@ -26,6 +26,13 @@ export type AttemptSubmitDecision =
       unansweredItemCount: number;
     };
 
+export type AttemptCompletionCopy = {
+  confirmIncompleteSubmit: string;
+  progressLabel: string;
+  submitButtonLabel: string;
+  unansweredLabel?: string;
+};
+
 export function getAttemptCompletionSummary({
   answers,
   runtimeItems,
@@ -42,6 +49,33 @@ export function getAttemptCompletionSummary({
     answeredItemCount,
     itemCount,
     unansweredItemCount: Math.max(0, itemCount - answeredItemCount),
+  };
+}
+
+export function buildAttemptCompletionCopy({
+  completionSummary,
+  confirmIncompleteSubmit,
+}: {
+  completionSummary: AttemptCompletionSummary;
+  confirmIncompleteSubmit: boolean;
+}): AttemptCompletionCopy {
+  const { answeredItemCount, itemCount, unansweredItemCount } =
+    completionSummary;
+
+  return {
+    confirmIncompleteSubmit:
+      unansweredItemCount === 1
+        ? '1 question is still unanswered.'
+        : `${unansweredItemCount} questions are still unanswered.`,
+    progressLabel: `${answeredItemCount}/${itemCount} answered`,
+    submitButtonLabel:
+      confirmIncompleteSubmit && unansweredItemCount > 0
+        ? 'Submit anyway'
+        : 'Submit answers',
+    unansweredLabel:
+      unansweredItemCount > 0
+        ? `${unansweredItemCount} ${unansweredItemCount === 1 ? 'item' : 'items'} left unanswered.`
+        : undefined,
   };
 }
 

@@ -15,6 +15,7 @@ import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
+  buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -126,8 +127,10 @@ function PlayPage() {
   const anonymousBrowserLabel = assignment?.settings.collectStudentName
     ? undefined
     : getAnonymousBrowserLabel(anonymousToken);
-  const completedCount = completionSummary.answeredItemCount;
-  const unansweredCount = completionSummary.unansweredItemCount;
+  const completionCopy = buildAttemptCompletionCopy({
+    completionSummary,
+    confirmIncompleteSubmit,
+  });
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -171,13 +174,7 @@ function PlayPage() {
     });
     if (submitDecision.type === 'confirm-incomplete') {
       setConfirmIncompleteSubmit(true);
-      toast.error(
-        `${submitDecision.unansweredItemCount} ${
-          submitDecision.unansweredItemCount === 1
-            ? 'question is'
-            : 'questions are'
-        } still unanswered.`
-      );
+      toast.error(completionCopy.confirmIncompleteSubmit);
       return;
     }
 
@@ -291,7 +288,7 @@ function PlayPage() {
               Student runner
             </div>
             <Badge variant="secondary" className="rounded-md">
-              {completedCount}/{itemCount} answered
+              {completionCopy.progressLabel}
             </Badge>
             {timeLimitSeconds ? (
               <Badge variant="outline" className="rounded-md">
@@ -390,14 +387,11 @@ function PlayPage() {
             onClick={submitAnswers}
           >
             <IconCheck className="size-4" />
-            {confirmIncompleteSubmit && unansweredCount > 0
-              ? 'Submit anyway'
-              : 'Submit answers'}
+            {completionCopy.submitButtonLabel}
           </Button>
-          {!result && unansweredCount > 0 ? (
+          {!result && completionCopy.unansweredLabel ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              {unansweredCount} {unansweredCount === 1 ? 'item' : 'items'} left
-              unanswered.
+              {completionCopy.unansweredLabel}
             </p>
           ) : null}
           {!canSubmit ? (

@@ -99,6 +99,7 @@ import {
 } from '@/assignments/publish-input';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
+  buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -204,6 +205,50 @@ assert.deepEqual(
   {
     reason: 'complete',
     type: 'submit',
+  }
+);
+assert.deepEqual(
+  buildAttemptCompletionCopy({
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+  }),
+  {
+    confirmIncompleteSubmit: '2 questions are still unanswered.',
+    progressLabel: '1/3 answered',
+    submitButtonLabel: 'Submit answers',
+    unansweredLabel: '2 items left unanswered.',
+  }
+);
+assert.deepEqual(
+  buildAttemptCompletionCopy({
+    completionSummary: {
+      answeredItemCount: 2,
+      itemCount: 3,
+      unansweredItemCount: 1,
+    },
+    confirmIncompleteSubmit: true,
+  }),
+  {
+    confirmIncompleteSubmit: '1 question is still unanswered.',
+    progressLabel: '2/3 answered',
+    submitButtonLabel: 'Submit anyway',
+    unansweredLabel: '1 item left unanswered.',
+  }
+);
+assert.deepEqual(
+  buildAttemptCompletionCopy({
+    completionSummary: {
+      answeredItemCount: 3,
+      itemCount: 3,
+      unansweredItemCount: 0,
+    },
+    confirmIncompleteSubmit: true,
+  }),
+  {
+    confirmIncompleteSubmit: '0 questions are still unanswered.',
+    progressLabel: '3/3 answered',
+    submitButtonLabel: 'Submit answers',
+    unansweredLabel: undefined,
   }
 );
 
