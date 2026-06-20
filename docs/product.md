@@ -340,6 +340,8 @@ Implementation boundaries:
 - `src/ai/` owns provider helpers such as Cloudflare Workers AI REST calls.
 - `src/activities/ai-draft.ts` owns classroom-specific prompt, schema, parsing,
   fallback, and mapping into `CreateActivityInput`.
+- `src/activities/draft-source.ts` owns the source-text priority used when the
+  editor seeds or refreshes AI draft notes from existing structured content.
 - `src/activities/template-remix.ts` owns deterministic template readiness and
   remix suggestions. AI remixing should build on this module instead of
   duplicating template requirement logic in UI code.

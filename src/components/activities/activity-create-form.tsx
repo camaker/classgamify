@@ -1,4 +1,5 @@
 import { activityTemplates } from '@/activities/catalog';
+import { getActivityDraftSourceText } from '@/activities/draft-source';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivityContent } from '@/activities/types';
@@ -106,7 +107,7 @@ export function ActivityCreateForm({
   const updateMutation = useUpdateActivity();
   const navigate = useNavigate();
   const [draftSourceText, setDraftSourceText] = useState(
-    getDraftSourceText(initialValues ?? activityFormDefaultValues)
+    getActivityDraftSourceText(initialValues ?? activityFormDefaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
@@ -143,7 +144,7 @@ export function ActivityCreateForm({
   useEffect(() => {
     if (!initialValues) return;
     form.reset(initialValues);
-    setDraftSourceText(getDraftSourceText(initialValues));
+    setDraftSourceText(getActivityDraftSourceText(initialValues));
     setDraftResult(undefined);
   }, [form, initialValues]);
 
@@ -203,7 +204,7 @@ export function ActivityCreateForm({
       templateType: selectedTemplate,
     };
     form.reset(nextValues);
-    setDraftSourceText(getDraftSourceText(nextValues));
+    setDraftSourceText(getActivityDraftSourceText(nextValues));
     setDraftResult(undefined);
     toast.success(`${template.name} scaffold loaded.`);
   }
@@ -855,15 +856,6 @@ function ActivityDraftCoverageStat({
       <p className="text-lg font-semibold">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
-  );
-}
-
-function getDraftSourceText(values: CreateActivityInput) {
-  return (
-    values.sourceSummary?.trim() ||
-    values.vocabularyText?.trim() ||
-    values.questionsText?.trim() ||
-    'apple, bread, milk, rice, water, egg'
   );
 }
 

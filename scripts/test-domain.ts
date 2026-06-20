@@ -13,6 +13,10 @@ import {
   createFallbackActivityDraftResult,
 } from '@/activities/ai-draft';
 import {
+  DEFAULT_ACTIVITY_DRAFT_SOURCE,
+  getActivityDraftSourceText,
+} from '@/activities/draft-source';
+import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
   canDeriveActivityWork,
@@ -403,6 +407,42 @@ assert.ok(
   )
 );
 assert.ok(fallbackRemixPlan.suggestedOptions.length >= 3);
+assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    questionsText: 'Question source',
+    sourceSummary: '  Summary source  ',
+    vocabularyText: 'Vocabulary source',
+  }),
+  'Summary source'
+);
+assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    questionsText: 'Question source',
+    sourceSummary: '   ',
+    vocabularyText: '  Vocabulary source  ',
+  }),
+  'Vocabulary source'
+);
+assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    questionsText: '  Question source  ',
+    sourceSummary: '',
+    vocabularyText: '',
+  }),
+  'Question source'
+);
+assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    questionsText: '',
+    sourceSummary: '',
+    vocabularyText: '',
+  }),
+  DEFAULT_ACTIVITY_DRAFT_SOURCE
+);
 const multilingualGroupContent = buildActivityContent({
   description: 'Multilingual group sort',
   difficulty: 'starter',
