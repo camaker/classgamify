@@ -1,51 +1,80 @@
 import type { BlogPost } from '@/lib/blog';
 import { cn } from '@/lib/utils';
 
-type VisualTone = 'hsk' | 'learning' | 'worksheets';
+type VisualTone = 'templates' | 'assignments' | 'ai' | 'results';
 
 const visualCopy: Record<
   VisualTone,
   {
     accent: string;
-    characters: string[];
+    metrics: string[];
     footer: Record<'en' | 'zh', string>;
     label: Record<'en' | 'zh', string>;
+    title: Record<'en' | 'zh', string>;
   }
 > = {
-  hsk: {
-    accent: 'bg-primary',
-    characters: ['人', '口', '日'],
+  templates: {
+    accent: 'bg-indigo-600',
+    metrics: ['Quiz', 'Match', 'Sort'],
     footer: {
-      en: 'HSK1 stroke loop',
-      zh: 'HSK1 笔顺练习',
+      en: 'Template-ready content',
+      zh: '模板准备度',
     },
     label: {
-      en: 'Starter characters',
-      zh: '入门汉字',
+      en: 'Activity loop',
+      zh: '活动闭环',
+    },
+    title: {
+      en: 'Food review',
+      zh: '食物复习',
     },
   },
-  learning: {
+  assignments: {
     accent: 'bg-emerald-600',
-    characters: ['写', '读', '复'],
+    metrics: ['Link', 'Timer', 'Open'],
     footer: {
-      en: 'Screen to paper',
-      zh: '从屏幕到纸面',
+      en: 'Public student link',
+      zh: '公开作业链接',
     },
     label: {
-      en: 'Learning method',
-      zh: '学习方法',
+      en: 'Assignment',
+      zh: '作业',
+    },
+    title: {
+      en: '/play/food-review',
+      zh: '/play/food-review',
     },
   },
-  worksheets: {
-    accent: 'bg-sky-600',
-    characters: ['田', '字', '格'],
+  ai: {
+    accent: 'bg-violet-600',
+    metrics: ['Draft', 'Review', 'Save'],
     footer: {
-      en: 'Printable practice',
-      zh: '打印练习纸',
+      en: 'Teacher-reviewed AI',
+      zh: '老师审阅 AI',
     },
     label: {
-      en: 'Worksheet flow',
-      zh: '练习纸流程',
+      en: 'AI authoring',
+      zh: 'AI 创建',
+    },
+    title: {
+      en: 'Source notes',
+      zh: '课堂资料',
+    },
+  },
+  results: {
+    accent: 'bg-sky-600',
+    metrics: ['82%', '14', '3'],
+    footer: {
+      en: 'Reteach signal',
+      zh: '重讲信号',
+    },
+    label: {
+      en: 'Results',
+      zh: '结果',
+    },
+    title: {
+      en: 'Class summary',
+      zh: '班级汇总',
     },
   },
 };
@@ -68,36 +97,39 @@ export function BlogPostVisual({
     <div
       aria-hidden="true"
       className={cn(
-        'relative aspect-video overflow-hidden bg-[#fff8ef] text-zinc-950',
+        'relative aspect-video overflow-hidden bg-[#f8fafc] text-zinc-950',
         className
       )}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,#fff8ef_0%,#f8fafc_52%,#e0f2fe_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,#f8fafc_0%,#eef2ff_46%,#dcfce7_100%)]" />
       <div className="absolute inset-x-4 top-4 flex items-center justify-between text-[11px] font-semibold uppercase text-zinc-600 sm:inset-x-5 sm:top-5">
-        <span>Lang Study</span>
+        <span>ClassGamify</span>
         <span>{copy.label[locale]}</span>
       </div>
 
       <div className="absolute left-4 top-12 w-[44%] sm:left-5 sm:top-14">
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-          {copy.characters.map((character, index) => (
+        <div className="rounded-lg border border-zinc-200 bg-white/90 p-3 shadow-sm">
+          <div className={cn('mb-3 h-1.5 w-12 rounded-full', copy.accent)} />
+          <div className="space-y-2">
+            <div className="h-2 w-4/5 rounded-full bg-zinc-200" />
+            <div className="h-2 w-3/5 rounded-full bg-zinc-200" />
+            <div className="h-2 w-2/3 rounded-full bg-zinc-200" />
+          </div>
+          <p className="mt-4 truncate text-sm font-semibold">
+            {copy.title[locale]}
+          </p>
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
+          {copy.metrics.map((metric, index) => (
             <div
               className={cn(
-                'flex aspect-square items-center justify-center rounded-md border border-zinc-200 bg-white text-3xl font-bold shadow-sm sm:text-5xl',
-                isHero && 'sm:text-6xl'
+                'flex aspect-square items-center justify-center rounded-md border border-zinc-200 bg-white px-1 text-center text-[10px] font-bold shadow-sm sm:text-xs',
+                isHero && 'sm:text-sm'
               )}
-              key={`${character}-${index}`}
+              key={`${metric}-${index}`}
             >
-              {character}
+              {metric}
             </div>
-          ))}
-        </div>
-        <div className="mt-3 grid grid-cols-4 gap-1.5">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <span
-              className="aspect-square rounded-sm border border-dashed border-zinc-300 bg-white/70"
-              key={index}
-            />
           ))}
         </div>
       </div>
@@ -133,16 +165,24 @@ function getVisualTone(post: BlogPost): VisualTone {
   const text = `${post.category} ${post.title}`.toLowerCase();
 
   if (
-    text.includes('worksheet') ||
-    text.includes('classroom') ||
-    text.includes('练习纸')
+    text.includes('assignment') ||
+    text.includes('作业') ||
+    text.includes('lms')
   ) {
-    return 'worksheets';
+    return 'assignments';
   }
 
-  if (text.includes('hsk')) {
-    return 'hsk';
+  if (text.includes('ai') || text.includes('草稿') || text.includes('创建')) {
+    return 'ai';
   }
 
-  return 'learning';
+  if (
+    text.includes('result') ||
+    text.includes('reteach') ||
+    text.includes('结果')
+  ) {
+    return 'results';
+  }
+
+  return 'templates';
 }

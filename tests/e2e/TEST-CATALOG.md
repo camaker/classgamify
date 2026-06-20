@@ -111,6 +111,7 @@ assignment publishing is enabled.
 | 16 | Quiz choices are completed from lesson content | Create or edit a quiz activity with question answers but sparse or missing choices plus vocabulary terms, publish it, open `/play/:shareId`, and verify the quiz renders deterministic multiple-choice options without exposing which option is correct before submission. |
 | 17 | Homepage routes into ClassGamify product loops | Open `/`, verify the hero preview and primary actions point to templates or activity creation rather than legacy Hanzi, HSK, or worksheet routes, then follow the primary CTA and verify the activity creation page loads. |
 | 18 | Legal pages describe ClassGamify data surfaces | Open `/terms`, `/privacy`, and `/cookie` for `en` and `zh`, verify the pages mention ClassGamify classroom activities, assignment links, student attempts or cookies where relevant, and verify they do not mention the copied Lang Study, getlangstudy, HSK, or Hanzi product surfaces. |
+| 19 | Blog and release notes describe ClassGamify | Open `/blog`, each visible `/blog/:slug`, and the generated sitemap, verify public post slugs and cards reference ClassGamify templates, assignment links, AI authoring, or teacher results, and verify old HSK, Hanzi, and getlangstudy editorial URLs are absent. |
 
 ## Deferred Coverage
 
