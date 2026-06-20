@@ -159,9 +159,11 @@ Public student links must return a sanitized assignment payload only while the
 assignment is open. Closed or expired links do not expose runtime content, and
 submissions against closed or expired links are rejected. The browser receives
 runtime prompts and choices, not `ActivityContent` with embedded answers.
-Correct answers are returned only after an attempt is scored and only when the
-assignment allows answer reveal. Anonymous assignments use a browser token so
-max-attempt limits still work without collecting student names.
+Teacher-only answer data, accepted alternatives, and explanations stay out of
+the public runtime payload. Correct answers and explanations are returned only
+after an attempt is scored and only when the assignment allows answer reveal.
+Anonymous assignments use a browser token so max-attempt limits still work
+without collecting student names.
 Student runners should show a compact public rule summary before the activity
 starts: item count, attempt limit, timer, close time, identity mode, and review
 behavior. This summary comes from sanitized assignment settings and must not
