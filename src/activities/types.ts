@@ -59,6 +59,7 @@ export type ActivityContent = {
 
 export type AssignmentSettings = {
   collectStudentName: boolean;
+  instructions?: string;
   showCorrectAnswers: boolean;
   shuffleItems: boolean;
   timeLimitSeconds?: number;

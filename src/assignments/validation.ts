@@ -10,6 +10,7 @@ export const defaultAssignmentSettings: AssignmentSettings = {
 
 export const assignmentSettingsSchema = z.object({
   collectStudentName: z.boolean().default(true),
+  instructions: z.string().trim().max(500).optional(),
   maxAttempts: z.number().int().min(1).max(10).optional(),
   showCorrectAnswers: z.boolean().default(true),
   shuffleItems: z.boolean().default(true),

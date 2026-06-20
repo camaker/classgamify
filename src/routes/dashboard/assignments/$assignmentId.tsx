@@ -112,6 +112,11 @@ function AssignmentResultsPage() {
               <CardDescription>
                 <p>{activityDescription}</p>
               </CardDescription>
+              {data.assignment.settingsJson.instructions ? (
+                <div className="mt-3 rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
+                  {data.assignment.settingsJson.instructions}
+                </div>
+              ) : null}
             </CardHeader>
             <CardContent className="flex flex-col gap-3 sm:flex-row">
               <Link

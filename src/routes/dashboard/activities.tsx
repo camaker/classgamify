@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import {
   useActivities,
   useRemixActivityTemplate,
@@ -183,6 +184,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
   const remixMutation = useRemixActivityTemplate();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [assignmentTitle, setAssignmentTitle] = useState(activity.title);
+  const [assignmentInstructions, setAssignmentInstructions] = useState('');
   const [collectStudentName, setCollectStudentName] = useState(
     defaultAssignmentSettings.collectStudentName
   );
@@ -214,6 +216,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
       toast.error('Add an assignment title before publishing.');
       return;
     }
+    const instructions = assignmentInstructions.trim();
     if (!Number.isInteger(attempts) || attempts < 1 || attempts > 10) {
       toast.error('Max attempts must be a whole number from 1 to 10.');
       return;
@@ -242,6 +245,7 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
         expiresAt: expiresAt?.toISOString(),
         settings: {
           collectStudentName,
+          instructions: instructions || undefined,
           maxAttempts: attempts,
           showCorrectAnswers,
           shuffleItems,
@@ -421,6 +425,21 @@ function ActivityCard({ activity }: { activity: ActivityCardData }) {
                 value={assignmentTitle}
                 onChange={(event) =>
                   setAssignmentTitle(event.currentTarget.value)
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor={`assignment-instructions-${activity.id}`}>
+                Instructions
+              </label>
+              <Textarea
+                id={`assignment-instructions-${activity.id}`}
+                rows={3}
+                maxLength={500}
+                value={assignmentInstructions}
+                placeholder="Optional student instructions"
+                onChange={(event) =>
+                  setAssignmentInstructions(event.currentTarget.value)
                 }
               />
             </div>

@@ -190,6 +190,11 @@ function PlayPage() {
               answers, and scores against the teacher's frozen assignment
               snapshot.
             </p>
+            {assignment.settings.instructions ? (
+              <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6 text-muted-foreground">
+                {assignment.settings.instructions}
+              </div>
+            ) : null}
           </div>
           <Link
             to={Routes.Create}

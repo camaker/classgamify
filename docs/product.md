@@ -53,10 +53,10 @@ extend rather than replace.
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
 answers after submission, whether items are shuffled, and the per-student
-attempt limit. They can also set an optional student timer and close-after time
-for homework windows. These settings live on `Assignment.settingsJson`;
-immutable content lives on `AssignmentSnapshot`, and the close-after time window
-lives on `Assignment`.
+attempt limit. They can also set assignment-specific instructions, an optional
+student timer, and close-after time for homework windows. These settings live on
+`Assignment.settingsJson`; immutable content lives on `AssignmentSnapshot`, and
+the close-after time window lives on `Assignment`.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review.

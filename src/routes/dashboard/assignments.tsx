@@ -37,6 +37,7 @@ type AssignmentCardData = {
   activityDescription: string;
   expiresAt: Date | null;
   id: string;
+  instructions?: string;
   maxAttempts?: number;
   shareSlug: string;
   status: AssignmentStatus;
@@ -138,6 +139,7 @@ function DashboardAssignmentsPage() {
                     '',
                   expiresAt: item.assignment.expiresAt,
                   id: item.assignment.id,
+                  instructions: item.assignment.settingsJson.instructions,
                   maxAttempts: item.assignment.settingsJson.maxAttempts,
                   shareSlug: item.assignment.shareSlug,
                   stats: item.stats,
@@ -181,6 +183,7 @@ function DashboardAssignmentsPage() {
                       activityDescription: activity.description,
                       expiresAt: null,
                       id: assignment.id,
+                      instructions: assignment.settings.instructions,
                       maxAttempts: assignment.settings.maxAttempts,
                       shareSlug: assignment.shareId,
                       stats: {
@@ -251,6 +254,11 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
         <CardDescription>
           <p>{assignment.activityDescription}</p>
         </CardDescription>
+        {assignment.instructions ? (
+          <div className="mt-3 rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
+            {assignment.instructions}
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
