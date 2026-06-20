@@ -529,7 +529,8 @@ export function ActivityCreateForm({
                     <FormDescription>
                       One question per line. Use vertical bars to separate the
                       prompt, answer, optional choices, and optional
-                      explanation.
+                      explanation. Use / or ; inside the answer field for
+                      acceptable alternatives.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

@@ -1,3 +1,4 @@
+import { matchAnswer } from '@/activities/answer-matching';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -95,9 +96,13 @@ export function evaluateRuntimeAnswers({
   );
   const scoredAnswers = runtimeItems.map((item) => {
     const submitted = answerMap.get(item.id) ?? '';
+    const match = matchAnswer({
+      expectedAnswer: item.answer,
+      submittedAnswer: submitted,
+    });
     return {
       answer: submitted,
-      correct: normalizeAnswer(submitted) === normalizeAnswer(item.answer),
+      correct: match.correct,
       itemId: item.id,
     };
   });
@@ -133,10 +138,6 @@ export function getRuntimeSummary(
     itemCount: items.length,
     templateType,
   };
-}
-
-function normalizeAnswer(value: string) {
-  return value.trim().toLocaleLowerCase();
 }
 
 function makeStableId(value: string) {

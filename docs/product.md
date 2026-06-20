@@ -83,6 +83,10 @@ card board so students can select a prompt and attach a choice without seeing
 the answer map.
 The submission contract remains template-neutral: every renderer stores
 `{ itemId, answer }` so scoring and result analysis stay shared.
+Answer scoring is centralized and tolerant of case, spacing, and common
+punctuation differences. Teachers can use `/` or `;` inside an answer field to
+define acceptable alternatives without changing the student submission
+contract.
 
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
