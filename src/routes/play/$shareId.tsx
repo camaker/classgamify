@@ -51,6 +51,7 @@ function PlayPage() {
   const [studentName, setStudentName] = useState('');
   const [startedAt] = useState(() => Date.now());
   const [result, setResult] = useState<AttemptSubmissionResult>();
+  const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
@@ -91,6 +92,7 @@ function PlayPage() {
     () => runtimeItems.filter((item) => answers[item.id]?.trim()).length,
     [answers, runtimeItems]
   );
+  const unansweredCount = Math.max(0, itemCount - completedCount);
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -109,6 +111,13 @@ function PlayPage() {
     }
     if (assignment?.settings.collectStudentName && !studentName.trim()) {
       toast.error('Type your name before submitting.');
+      return;
+    }
+    if (unansweredCount > 0 && !confirmIncompleteSubmit) {
+      setConfirmIncompleteSubmit(true);
+      toast.error(
+        `${unansweredCount} ${unansweredCount === 1 ? 'question is' : 'questions are'} still unanswered.`
+      );
       return;
     }
 
@@ -283,12 +292,13 @@ function PlayPage() {
             )}
             reviewItems={result?.reviewItems}
             templateType={activity.templateType}
-            onAnswerChange={(itemId, answer) =>
+            onAnswerChange={(itemId, answer) => {
+              setConfirmIncompleteSubmit(false);
               setAnswers((current) => ({
                 ...current,
                 [itemId]: answer,
-              }))
-            }
+              }));
+            }}
           />
 
           <Button
@@ -300,8 +310,16 @@ function PlayPage() {
             onClick={submitAnswers}
           >
             <IconCheck className="size-4" />
-            Submit answers
+            {confirmIncompleteSubmit && unansweredCount > 0
+              ? 'Submit anyway'
+              : 'Submit answers'}
           </Button>
+          {!result && unansweredCount > 0 ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {unansweredCount} {unansweredCount === 1 ? 'item' : 'items'} left
+              unanswered.
+            </p>
+          ) : null}
           {!canSubmit ? (
             <p className="mt-2 text-xs text-muted-foreground">
               Demo assignments are preview-only until they are saved from a

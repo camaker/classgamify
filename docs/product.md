@@ -124,6 +124,11 @@ card board so students can select a prompt and attach a choice without seeing
 the answer map.
 The submission contract remains template-neutral: every renderer stores
 `{ itemId, answer }` so scoring and result analysis stay shared.
+Student runners should surface completion progress before submission. If a
+student tries to submit with unanswered items, the app asks for an explicit
+second confirmation instead of silently submitting blanks; this preserves
+teacher flexibility for partial attempts while reducing accidental empty
+homework.
 Answer scoring is centralized and tolerant of case, spacing, and common
 punctuation differences. Teachers can use `/` or `;` inside an answer field to
 define acceptable alternatives without changing the student submission
