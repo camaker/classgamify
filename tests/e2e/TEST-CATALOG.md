@@ -24,12 +24,12 @@ checks such as `pnpm check` and `pnpm build` unless a separate E2E environment i
 explicitly provisioned.
 Pure assignment-domain helpers also have a fast local gate via
 `pnpm test:domain`; run it when changing scoring, submission payload, identity,
-attempt metrics, duration formatting, assignment delivery summaries,
-publish-setting input parsing, share-link helpers, student submit decisions,
-result-summary helpers, result formatting, activity/assignment list filters, or
-result-view search, sort, review-filter rules, template remix readiness,
-template runtime ids, assignment item ordering, or deterministic AI draft
-fallback result behavior.
+attempt metrics, duration formatting, assignment delivery summaries, activity
+lifecycle derivation rules, publish-setting input parsing, share-link helpers,
+student submit decisions, result-summary helpers, result formatting,
+activity/assignment list filters, or result-view search, sort, review-filter
+rules, template remix readiness, template runtime ids, assignment item ordering,
+or deterministic AI draft fallback result behavior.
 
 ## Test Harness
 

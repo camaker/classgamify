@@ -12,6 +12,12 @@ import {
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
 } from '@/activities/ai-draft';
+import {
+  ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+  assertActivityCanDeriveWork,
+  canDeriveActivityWork,
+  isActivityArchived,
+} from '@/activities/lifecycle';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import {
   formatTemplateRequirement,
@@ -270,6 +276,16 @@ assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
 assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+assert.equal(isActivityArchived('archived'), true);
+assert.equal(isActivityArchived('draft'), false);
+assert.equal(canDeriveActivityWork('draft'), true);
+assert.equal(canDeriveActivityWork('published'), true);
+assert.equal(canDeriveActivityWork('archived'), false);
+assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
+assert.throws(
+  () => assertActivityCanDeriveWork('archived'),
+  new Error(ARCHIVED_ACTIVITY_DERIVATION_ERROR)
+);
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
