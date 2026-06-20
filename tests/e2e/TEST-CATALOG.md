@@ -115,6 +115,7 @@ assignment publishing is enabled.
 | 20 | Attempt limits use normalized student identity | Publish an assignment with student names and a max-attempt limit, submit as `Alice`, then try again as ` alice ` or `ALICE` and verify the limit still applies. Publish an anonymous assignment and verify two browser tokens are summarized as separate anonymous students in teacher results. |
 | 21 | Teacher can duplicate an activity safely | Sign in, create a saved activity, click `Duplicate` in `/dashboard/activities`, verify a draft copy opens with the same structured content and `Copy of ...` title, edit the copy, and verify the original activity and its published assignments remain unchanged. |
 | 22 | Teacher can search the activity library | Sign in, create multiple saved activities with distinct titles, descriptions, and template types, open `/dashboard/activities`, search by a title keyword, verify only matching activity cards remain and the URL keeps `q`, search by a description or template keyword, verify matching cards update, clear search, and verify the full library returns. |
+| 23 | Teacher can filter the assignment list | Sign in, publish multiple assignments with distinct titles and statuses, open `/dashboard/assignments`, search by assignment title, source activity text, or share id, verify only matching assignment cards remain and the URL keeps `q`, filter by published or closed status, verify counts and cards update, clear filters, and verify the full assignment list returns. |
 
 ## Deferred Coverage
 

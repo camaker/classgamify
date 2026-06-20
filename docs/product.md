@@ -81,7 +81,10 @@ the close-after time window lives on `Assignment`.
 Teacher assignment pages should support the real distribution workflow:
 teachers can open a student link for preview or copy the absolute `/play/:id`
 URL from the assignment list and results page before sending it through a class
-chat, LMS, or email.
+chat, LMS, or email. The assignment list should remain searchable as teachers
+reuse the product across classes: teachers can filter their own assignments by
+title, share id, source activity text, or assignment status without broadening
+outside the current owner.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment

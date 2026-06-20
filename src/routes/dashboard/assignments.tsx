@@ -20,6 +20,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
 import {
   useAssignments,
   useUpdateAssignmentStatus,
@@ -28,14 +33,17 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconChartBar,
+  IconFilter,
   IconListCheck,
   IconLock,
   IconLockOpen,
   IconPlayerPlay,
+  IconSearch,
   IconShare3,
   IconUsers,
+  IconX,
 } from '@tabler/icons-react';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 type AssignmentCardData = {
@@ -55,21 +63,44 @@ type AssignmentCardData = {
   };
 };
 
+type AssignmentStatusFilter = 'all' | AssignmentStatus;
+
+const assignmentStatusFilterOptions: Array<{
+  label: string;
+  value: AssignmentStatusFilter;
+}> = [
+  { label: 'All statuses', value: 'all' },
+  { label: 'Published', value: 'published' },
+  { label: 'Closed', value: 'closed' },
+  { label: 'Draft', value: 'draft' },
+];
+
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: (search: Record<string, unknown>) => ({
     published:
       typeof search.published === 'string' ? search.published : undefined,
+    q: typeof search.q === 'string' ? search.q : undefined,
+    status: parseAssignmentStatusFilter(search.status),
   }),
   component: DashboardAssignmentsPage,
 });
 
 function DashboardAssignmentsPage() {
+  const navigate = useNavigate({ from: '/dashboard/assignments' });
+  const { published, q, status } = Route.useSearch();
+  const searchQuery = q ?? '';
+  const statusFilter = status ?? 'all';
+  const normalizedSearchQuery = normalizeAssignmentSearch(searchQuery);
+  const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
   const { data, isError, isLoading } = useAssignments({
     pageIndex: 0,
     pageSize: 50,
+    search: normalizedSearchQuery,
+    status: filteredStatus,
   });
   const assignments = data?.items ?? [];
   const hasAssignments = assignments.length > 0;
+  const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
   const openAssignmentCount = assignments.filter((item) =>
     isAssignmentOpen(item.assignment.status, item.assignment.expiresAt)
   ).length;
@@ -84,6 +115,30 @@ function DashboardAssignmentsPage() {
             assignments.length
         )
       : 0;
+
+  function updateFilters(next: {
+    q?: string;
+    status?: AssignmentStatusFilter;
+  }) {
+    const nextQuery = next.q ?? searchQuery;
+    const nextStatus = next.status ?? statusFilter;
+
+    void navigate({
+      replace: true,
+      search: {
+        published,
+        q: nextQuery.trim() ? nextQuery : undefined,
+        status: nextStatus === 'all' ? undefined : nextStatus,
+      },
+    });
+  }
+
+  function clearFilters() {
+    void navigate({
+      replace: true,
+      search: { published },
+    });
+  }
 
   return (
     <DashboardLayout
@@ -117,6 +172,16 @@ function DashboardAssignmentsPage() {
             value={`${averageScore}%`}
           />
         </section>
+
+        <AssignmentListFilters
+          isLoading={isLoading}
+          onClear={clearFilters}
+          onSearch={(value) => updateFilters({ q: value })}
+          onStatusChange={(value) => updateFilters({ status: value })}
+          search={searchQuery}
+          status={statusFilter}
+          total={data?.total ?? 0}
+        />
 
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
@@ -160,7 +225,25 @@ function DashboardAssignmentsPage() {
           </section>
         ) : null}
 
-        {!isLoading && !hasAssignments ? (
+        {!isLoading && !hasAssignments && hasFilters ? (
+          <div className="rounded-lg border border-dashed bg-muted/20 p-6">
+            <h2 className="text-lg font-semibold">No matching assignments.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Try another assignment title, share id, activity name, or status.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4 bg-background"
+              onClick={clearFilters}
+            >
+              <IconX className="size-4" />
+              Clear filters
+            </Button>
+          </div>
+        ) : null}
+
+        {!isLoading && !hasAssignments && !hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">
@@ -208,6 +291,97 @@ function DashboardAssignmentsPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function AssignmentListFilters({
+  isLoading,
+  onClear,
+  onSearch,
+  onStatusChange,
+  search,
+  status,
+  total,
+}: {
+  isLoading: boolean;
+  onClear: () => void;
+  onSearch: (value: string) => void;
+  onStatusChange: (value: AssignmentStatusFilter) => void;
+  search: string;
+  status: AssignmentStatusFilter;
+  total: number;
+}) {
+  const hasFilters =
+    Boolean(normalizeAssignmentSearch(search)) || status !== 'all';
+  const summary = isLoading
+    ? 'Loading assignments...'
+    : hasFilters
+      ? `${total} ${total === 1 ? 'match' : 'matches'}`
+      : `${total} total ${total === 1 ? 'assignment' : 'assignments'}`;
+
+  return (
+    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
+      <div className="grid gap-2">
+        <label htmlFor="assignment-list-search" className="font-medium text-sm">
+          Search assignments
+        </label>
+        <div className="relative max-w-xl">
+          <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
+          <Input
+            id="assignment-list-search"
+            value={search}
+            placeholder="Search by assignment, activity, or share id"
+            className="pl-9 pr-9"
+            onChange={(event) => onSearch(event.currentTarget.value)}
+          />
+          {search ? (
+            <button
+              type="button"
+              aria-label="Clear assignment search"
+              className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => onSearch('')}
+            >
+              <IconX className="size-4" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <div className="grid gap-2">
+        <label
+          htmlFor="assignment-status-filter"
+          className="font-medium text-sm"
+        >
+          Status
+        </label>
+        <NativeSelect
+          id="assignment-status-filter"
+          value={status}
+          onChange={(event) =>
+            onStatusChange(event.currentTarget.value as AssignmentStatusFilter)
+          }
+        >
+          {assignmentStatusFilterOptions.map((option) => (
+            <NativeSelectOption key={option.value} value={option.value}>
+              {option.label}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </div>
+      <div className="flex flex-col gap-2 lg:items-end">
+        <p className="text-sm text-muted-foreground">{summary}</p>
+        {hasFilters ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full bg-background lg:w-auto"
+            onClick={onClear}
+          >
+            <IconFilter className="size-4" />
+            Clear filters
+          </Button>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -327,6 +501,19 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
       </CardContent>
     </Card>
   );
+}
+
+function parseAssignmentStatusFilter(
+  value: unknown
+): AssignmentStatusFilter | undefined {
+  return value === 'published' || value === 'closed' || value === 'draft'
+    ? value
+    : undefined;
+}
+
+function normalizeAssignmentSearch(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
 }
 
 function SummaryCard({

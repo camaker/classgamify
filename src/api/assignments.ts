@@ -1,4 +1,5 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import type { AssignmentStatus } from '@/activities/types';
 import {
   isSameStudentIdentity,
   normalizeAnonymousToken,
@@ -25,13 +26,17 @@ import {
 } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, avg, count, desc, eq } from 'drizzle-orm';
+import { and, avg, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
+
+const assignmentStatusFilterSchema = z.enum(['draft', 'published', 'closed']);
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
+  search: z.string().trim().max(120).optional(),
+  status: assignmentStatusFilterSchema.optional(),
 });
 
 export const listAssignments = createServerFn({ method: 'GET' })
@@ -40,11 +45,20 @@ export const listAssignments = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const where = eq(assignment.ownerId, userId);
+    const where = buildAssignmentListWhere({
+      search: data.search,
+      status: data.status,
+      userId,
+    });
 
     const [totalRow] = await db
       .select({ count: count() })
       .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
       .where(where);
     const items = await db
       .select({
@@ -88,6 +102,44 @@ export const listAssignments = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
+
+function buildAssignmentListWhere({
+  search,
+  status,
+  userId,
+}: {
+  search?: string;
+  status?: AssignmentStatus;
+  userId: string;
+}) {
+  const normalizedSearch = normalizeAssignmentSearch(search);
+  const filters: SQL[] = [eq(assignment.ownerId, userId)];
+
+  if (status) {
+    filters.push(eq(assignment.status, status));
+  }
+
+  if (normalizedSearch) {
+    filters.push(
+      or(
+        like(assignment.title, `%${normalizedSearch}%`),
+        like(assignment.shareSlug, `%${normalizedSearch}%`),
+        like(activity.title, `%${normalizedSearch}%`),
+        like(activity.description, `%${normalizedSearch}%`),
+        like(assignmentSnapshot.activityTitle, `%${normalizedSearch}%`),
+        like(assignmentSnapshot.activityDescription, `%${normalizedSearch}%`),
+        like(assignmentSnapshot.templateType, `%${normalizedSearch}%`)
+      ) as SQL
+    );
+  }
+
+  return and(...filters);
+}
+
+function normalizeAssignmentSearch(value?: string) {
+  const normalized = value?.replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
+}
 
 export const publishAssignment = createServerFn({ method: 'POST' })
   .inputValidator(publishAssignmentInputSchema)

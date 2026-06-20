@@ -22,8 +22,12 @@ export const assignmentsKeys = {
   detail: (assignmentId: string) =>
     [...assignmentsKeys.details(), assignmentId] as const,
   details: () => [...assignmentsKeys.all, 'details'] as const,
-  list: (params: { pageIndex: number; pageSize: number }) =>
-    [...assignmentsKeys.lists(), params] as const,
+  list: (params: {
+    pageIndex: number;
+    pageSize: number;
+    search?: string;
+    status?: 'draft' | 'published' | 'closed';
+  }) => [...assignmentsKeys.lists(), params] as const,
   lists: () => [...assignmentsKeys.all, 'lists'] as const,
   public: (shareSlug: string) =>
     [...assignmentsKeys.publics(), shareSlug] as const,
@@ -33,14 +37,19 @@ export const assignmentsKeys = {
 export function useAssignments({
   pageIndex = 0,
   pageSize = 24,
+  search,
+  status,
 }: {
   pageIndex?: number;
   pageSize?: number;
+  search?: string;
+  status?: 'draft' | 'published' | 'closed';
 }) {
   return useQuery({
     placeholderData: keepPreviousData,
-    queryFn: () => listAssignments({ data: { pageIndex, pageSize } }),
-    queryKey: assignmentsKeys.list({ pageIndex, pageSize }),
+    queryFn: () =>
+      listAssignments({ data: { pageIndex, pageSize, search, status } }),
+    queryKey: assignmentsKeys.list({ pageIndex, pageSize, search, status }),
   });
 }
 
