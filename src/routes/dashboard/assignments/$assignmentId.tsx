@@ -219,6 +219,25 @@ function AssignmentResultsPage() {
             </Card>
           ) : null}
 
+          {data.analysis.students.length > 0 ? (
+            <Card className="rounded-lg">
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-lg font-semibold">Student summary</h2>
+                </CardTitle>
+                <CardDescription>
+                  <p>
+                    Students are sorted by latest accuracy so follow-up work is
+                    easy to spot before reading every submitted answer.
+                  </p>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StudentSummaryTable students={data.analysis.students} />
+              </CardContent>
+            </Card>
+          ) : null}
+
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
@@ -309,6 +328,43 @@ function AssignmentResultsPage() {
         </div>
       )}
     </DashboardLayout>
+  );
+}
+
+function StudentSummaryTable({
+  students,
+}: {
+  students: NonNullable<
+    ReturnType<typeof useAssignmentResults>['data']
+  >['analysis']['students'];
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Student</TableHead>
+          <TableHead>Attempts</TableHead>
+          <TableHead>Latest</TableHead>
+          <TableHead>Average</TableHead>
+          <TableHead>Best</TableHead>
+          <TableHead>Needs review</TableHead>
+          <TableHead>Last submitted</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {students.map((student) => (
+          <TableRow key={student.studentLabel}>
+            <TableCell>{student.studentLabel}</TableCell>
+            <TableCell>{student.attempts}</TableCell>
+            <TableCell>{student.latestAccuracy}%</TableCell>
+            <TableCell>{student.averageAccuracy}%</TableCell>
+            <TableCell>{student.bestAccuracy}%</TableCell>
+            <TableCell>{student.needsReviewCount}</TableCell>
+            <TableCell>{formatAttemptDate(student.lastCompletedAt)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 

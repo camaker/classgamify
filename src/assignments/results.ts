@@ -37,10 +37,21 @@ export type AssignmentAttemptReview = {
   studentLabel: string;
 };
 
+export type AssignmentStudentSummary = {
+  attempts: number;
+  averageAccuracy: number;
+  bestAccuracy: number;
+  lastCompletedAt: Date | null;
+  latestAccuracy: number;
+  needsReviewCount: number;
+  studentLabel: string;
+};
+
 export type AssignmentResultsAnalysis = {
   attempts: AssignmentAttemptReview[];
   needsReview: AssignmentItemAnalysis[];
   perItem: AssignmentItemAnalysis[];
+  students: AssignmentStudentSummary[];
 };
 
 export function analyzeAssignmentResults({
@@ -77,25 +88,27 @@ export function analyzeAssignmentResults({
     };
   });
 
+  const attemptReviews = attempts.map((attempt) => ({
+    accuracy: attempt.resultJson?.accuracy ?? 0,
+    answers: attempt.answersJson.answers.map((answer) => {
+      const item = runtimeItemById.get(answer.itemId);
+      return {
+        answer: answer.answer,
+        correct: Boolean(answer.correct),
+        expectedAnswer: item?.answer ?? '',
+        explanation: item?.explanation,
+        itemId: answer.itemId,
+        prompt: item ? getRuntimePrompt(item) : answer.itemId,
+      };
+    }),
+    completedAt: attempt.completedAt,
+    id: attempt.id,
+    score: attempt.score ?? 0,
+    studentLabel: attempt.studentName || 'Anonymous student',
+  }));
+
   return {
-    attempts: attempts.map((attempt) => ({
-      accuracy: attempt.resultJson?.accuracy ?? 0,
-      answers: attempt.answersJson.answers.map((answer) => {
-        const item = runtimeItemById.get(answer.itemId);
-        return {
-          answer: answer.answer,
-          correct: Boolean(answer.correct),
-          expectedAnswer: item?.answer ?? '',
-          explanation: item?.explanation,
-          itemId: answer.itemId,
-          prompt: item ? getRuntimePrompt(item) : answer.itemId,
-        };
-      }),
-      completedAt: attempt.completedAt,
-      id: attempt.id,
-      score: attempt.score ?? 0,
-      studentLabel: attempt.studentName || 'Anonymous student',
-    })),
+    attempts: attemptReviews,
     needsReview: perItem
       .filter((item) => item.submittedCount > 0)
       .sort((left, right) => {
@@ -106,7 +119,61 @@ export function analyzeAssignmentResults({
       })
       .slice(0, 3),
     perItem,
+    students: buildStudentSummaries(attemptReviews),
   };
+}
+
+function buildStudentSummaries(
+  attempts: AssignmentAttemptReview[]
+): AssignmentStudentSummary[] {
+  const byStudent = new Map<string, AssignmentAttemptReview[]>();
+
+  for (const attempt of attempts) {
+    const group = byStudent.get(attempt.studentLabel) ?? [];
+    group.push(attempt);
+    byStudent.set(attempt.studentLabel, group);
+  }
+
+  return [...byStudent.entries()]
+    .map(([studentLabel, studentAttempts]) => {
+      const sortedAttempts = [...studentAttempts].sort(
+        (left, right) =>
+          getDateTimestamp(right.completedAt) -
+          getDateTimestamp(left.completedAt)
+      );
+      const latestAttempt = sortedAttempts[0];
+      const averageAccuracy = Math.round(
+        studentAttempts.reduce((sum, attempt) => sum + attempt.accuracy, 0) /
+          studentAttempts.length
+      );
+
+      return {
+        attempts: studentAttempts.length,
+        averageAccuracy,
+        bestAccuracy: Math.max(
+          ...studentAttempts.map((attempt) => attempt.accuracy)
+        ),
+        lastCompletedAt: latestAttempt?.completedAt ?? null,
+        latestAccuracy: latestAttempt?.accuracy ?? 0,
+        needsReviewCount: latestAttempt
+          ? latestAttempt.answers.filter((answer) => !answer.correct).length
+          : 0,
+        studentLabel,
+      };
+    })
+    .sort((left, right) => {
+      if (left.latestAccuracy !== right.latestAccuracy) {
+        return left.latestAccuracy - right.latestAccuracy;
+      }
+      return (
+        getDateTimestamp(right.lastCompletedAt) -
+        getDateTimestamp(left.lastCompletedAt)
+      );
+    });
+}
+
+function getDateTimestamp(value: Date | null) {
+  return value?.getTime() ?? 0;
 }
 
 function getRuntimePrompt(item: RuntimeItem) {

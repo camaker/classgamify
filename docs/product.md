@@ -99,12 +99,13 @@ connected.
 Teacher results should answer the classroom question, not just report a score.
 The results API analyzes frozen runtime items and stored attempt answers to
 produce per-item correct rates, reteach priorities, item-level attempt reviews,
-answer explanations from the assignment snapshot, and attempt duration metrics.
-Teachers can export the same private result data to CSV for gradebooks, parent
-follow-up, or offline analysis. This keeps the results loop useful for deciding
-what to explain again after homework. The teacher result page should show both
-the top reteach priorities and the full item performance table so a teacher can
-scan every prompt before opening individual student answers.
+student-level follow-up summaries, answer explanations from the assignment
+snapshot, and attempt duration metrics. Teachers can export the same private
+result data to CSV for gradebooks, parent follow-up, or offline analysis. This
+keeps the results loop useful for deciding what to explain again after homework.
+The teacher result page should show the student summary, the top reteach
+priorities, and the full item performance table so a teacher can scan the class
+before opening individual student answers.
 
 ## AI Authoring
 

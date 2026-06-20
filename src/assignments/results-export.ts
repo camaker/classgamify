@@ -68,6 +68,11 @@ const RESULT_EXPORT_COLUMNS = [
   'completed_items',
   'total_items',
   'duration_seconds',
+  'student_attempts',
+  'student_latest_accuracy',
+  'student_average_accuracy',
+  'student_best_accuracy',
+  'student_needs_review_count',
   'item_number',
   'item_id',
   'prompt',
@@ -79,8 +84,12 @@ const RESULT_EXPORT_COLUMNS = [
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
+  const studentsByLabel = new Map(
+    data.analysis.students.map((student) => [student.studentLabel, student])
+  );
   const rows = data.analysis.attempts.flatMap((attempt) => {
     const storedAttempt = attemptsById.get(attempt.id);
+    const studentSummary = studentsByLabel.get(attempt.studentLabel);
     const baseColumns = [
       data.assignment.id,
       data.assignment.title,
@@ -103,6 +112,11 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       storedAttempt?.resultJson?.completedItemCount ?? '',
       storedAttempt?.resultJson?.totalPoints ?? '',
       storedAttempt?.resultJson?.durationSeconds ?? '',
+      studentSummary?.attempts ?? '',
+      studentSummary?.latestAccuracy ?? '',
+      studentSummary?.averageAccuracy ?? '',
+      studentSummary?.bestAccuracy ?? '',
+      studentSummary?.needsReviewCount ?? '',
     ];
 
     if (attempt.answers.length === 0) {
