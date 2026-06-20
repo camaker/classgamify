@@ -4,7 +4,10 @@ import {
   activityTemplateTypeSchema,
   createActivityInputSchema,
 } from '@/activities/validation';
-import { buildDuplicatedActivityTitle } from '@/activities/duplicate';
+import {
+  buildDuplicatedActivityTitle,
+  buildRemixedActivityTitle,
+} from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
@@ -230,7 +233,10 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       id,
       ownerId: userId,
       templateType: targetTemplate.type,
-      title: `${sourceActivity.title} (${targetTemplate.shortName})`,
+      title: buildRemixedActivityTitle({
+        sourceTitle: sourceActivity.title,
+        targetShortName: targetTemplate.shortName,
+      }),
       updatedAt: now,
       visibility: 'draft',
     });

@@ -104,7 +104,8 @@ fields, but the same readiness model should guide the editor, dashboard, and
 publish flow. When an activity is already ready for another template, teachers
 can create a draft copy with the same content and a new `templateType`; this
 deterministic remix path is the foundation that later AI transformations should
-extend rather than replace.
+extend rather than replace. Remix draft titles should normalize whitespace and
+stay within the activity title length limit even when the source title is long.
 
 Publishing an assignment is an explicit configuration step. Teachers choose the
 assignment title, whether to collect student names, whether students see correct
