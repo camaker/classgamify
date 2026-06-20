@@ -28,7 +28,7 @@ attempt metrics, duration formatting, assignment delivery summaries,
 share-link helpers, student submit decisions, result-summary helpers,
 activity/assignment list filters, or result-view search, sort, review-filter
 rules, template remix readiness, template runtime ids, assignment item ordering,
-or deterministic AI draft fallback behavior.
+or deterministic AI draft fallback result behavior.
 
 ## Test Harness
 

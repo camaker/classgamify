@@ -8,7 +8,10 @@ import {
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
-import { createFallbackActivityDraft } from '@/activities/ai-draft';
+import {
+  createFallbackActivityDraft,
+  createFallbackActivityDraftResult,
+} from '@/activities/ai-draft';
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import {
   formatTemplateRequirement,
@@ -306,12 +309,45 @@ const fallbackDraft = createFallbackActivityDraft({
   subject: 'Science',
   templateType: 'listening',
 });
+const fallbackDraftResult = createFallbackActivityDraftResult({
+  input: {
+    difficulty: 'starter',
+    gradeBand: 'Grade 2',
+    itemCount: 5,
+    language: 'en',
+    sourceText:
+      'weather, sunny, rainy, cloudy, windy; students classify weather words and answer simple listening prompts',
+    subject: 'Science',
+    templateType: 'listening',
+  },
+  model: 'test-model',
+  notice: 'Fallback used for testing.',
+});
 const fallbackContent = buildActivityContent(fallbackDraft);
 const fallbackRemixPlan = getTemplateRemixPlan({
   content: fallbackContent,
   currentTemplateType: fallbackDraft.templateType,
 });
 assert.equal(fallbackDraft.templateType, 'listening');
+assert.equal(fallbackDraftResult.provider, 'fallback');
+assert.equal(fallbackDraftResult.model, 'test-model');
+assert.equal(fallbackDraftResult.notice, 'Fallback used for testing.');
+assert.equal(fallbackDraftResult.activity.templateType, 'listening');
+assert.equal(fallbackDraftResult.meta.coverage.questions, 5);
+assert.equal(
+  fallbackDraftResult.meta.readyTemplateCount,
+  fallbackDraftResult.meta.readyTemplates.length
+);
+assert.ok(
+  fallbackDraftResult.meta.templateReadiness.some(
+    (option) => option.template === 'listening' && option.isCurrent
+  )
+);
+assert.ok(
+  fallbackDraftResult.meta.reviewChecklist.some((item) =>
+    item.includes('Review every answer')
+  )
+);
 assert.equal(fallbackContent.questions.length, 5);
 assert.equal(fallbackContent.pairs.length, 5);
 assert.ok(fallbackContent.groups.length >= 2);

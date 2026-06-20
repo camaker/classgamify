@@ -104,16 +104,12 @@ export async function generateActivityDraftFromAi(
   const model = WORKERS_AI_MODELS.activityDraft;
 
   if (!hasWorkersAiCredentials()) {
-    return {
-      ...createActivityDraftResult({
-        activity: createFallbackActivityDraft(data),
-        input: data,
-      }),
+    return createFallbackActivityDraftResult({
+      input: data,
       model,
       notice:
         'Workers AI credentials are not configured, so a local deterministic draft was used.',
-      provider: 'fallback',
-    };
+    });
   }
 
   const result = await runWorkersAi<{ response?: string }>(model, {
@@ -140,16 +136,12 @@ export async function generateActivityDraftFromAi(
   try {
     draft = parseAiDraftResponse(result.response);
   } catch {
-    return {
-      ...createActivityDraftResult({
-        activity: createFallbackActivityDraft(data),
-        input: data,
-      }),
+    return createFallbackActivityDraftResult({
+      input: data,
       model,
       notice:
         'Workers AI returned an invalid draft, so a local deterministic draft was used.',
-      provider: 'fallback',
-    };
+    });
   }
 
   return {
@@ -336,6 +328,26 @@ function buildDraftReviewChecklist(
       ? `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
       : 'Add more structured pairs or groups to unlock more templates.',
   ];
+}
+
+export function createFallbackActivityDraftResult({
+  input,
+  model,
+  notice,
+}: {
+  input: GenerateActivityDraftInput;
+  model: string;
+  notice: string;
+}): ActivityDraftResult {
+  return {
+    ...createActivityDraftResult({
+      activity: createFallbackActivityDraft(input),
+      input,
+    }),
+    model,
+    notice,
+    provider: 'fallback',
+  };
 }
 
 export function createFallbackActivityDraft(
