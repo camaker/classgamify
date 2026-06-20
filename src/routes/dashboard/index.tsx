@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useActivities } from '@/hooks/use-activities';
+import { useAssignments } from '@/hooks/use-assignments';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -31,48 +33,46 @@ export const Route = createFileRoute('/dashboard/')({
 function DashboardPage() {
   const activity = starterActivities[0];
   const assignment = starterAssignments[0];
-  const publishedAssignments = starterAssignments.filter(
-    (item) => item.status === 'published'
-  );
-  const draftActivities = starterActivities.filter(
-    (item) => item.status === 'draft'
-  );
-  const totalCompletions = starterAssignments.reduce(
-    (sum, item) => sum + item.completions,
-    0
-  );
-  const averageScore =
-    starterAssignments.length > 0
-      ? Math.round(
-          starterAssignments.reduce((sum, item) => sum + item.averageScore, 0) /
-            starterAssignments.length
-        )
-      : 0;
+  const { data: activitiesData, isLoading: activitiesLoading } = useActivities({
+    pageIndex: 0,
+    pageSize: 1,
+    status: 'active',
+  });
+  const { data: assignmentsData, isLoading: assignmentsLoading } =
+    useAssignments({
+      pageIndex: 0,
+      pageSize: 1,
+    });
+  const activitySummary = activitiesData?.summary;
+  const assignmentSummary = assignmentsData?.summary;
+  const isMetricLoading = activitiesLoading || assignmentsLoading;
 
   const metrics = [
     {
       icon: IconDeviceGamepad2,
       label: 'Activities',
-      value: String(starterActivities.length),
-      description: `${draftActivities.length} draft ready to edit`,
+      value: formatMetricValue(activitySummary?.totalActivities),
+      description: isMetricLoading
+        ? 'Loading your library...'
+        : `${activitySummary?.draftActivities ?? 0} drafts in your active library`,
     },
     {
       icon: IconLayoutGrid,
       label: 'Templates',
-      value: String(activityTemplates.length),
-      description: 'Quiz, match, lines, sort, fill, listen, pairs, box',
+      value: `${activitySummary?.templateCoverage ?? 0}/${activityTemplates.length}`,
+      description: 'Template families represented by your active activities',
     },
     {
       icon: IconClipboardList,
       label: 'Assignments',
-      value: String(publishedAssignments.length),
-      description: 'Published classroom share links',
+      value: formatMetricValue(assignmentSummary?.openAssignments),
+      description: 'Open classroom share links',
     },
     {
       icon: IconChartBar,
       label: 'Results',
-      value: `${averageScore}%`,
-      description: `${totalCompletions} starter completions logged`,
+      value: `${assignmentSummary?.averageScore ?? 0}%`,
+      description: `${assignmentSummary?.completions ?? 0} submitted attempts logged`,
     },
   ];
 
@@ -151,7 +151,7 @@ function DashboardPage() {
           <ActionCard
             icon={IconDeviceGamepad2}
             title="Activities"
-            description="Review the starter activity library and the structured content each template consumes."
+            description="Review your activity library and the structured content each template consumes."
             href={Routes.DashboardActivities}
             cta="Open activities"
           />
@@ -173,6 +173,10 @@ function DashboardPage() {
       </div>
     </DashboardLayout>
   );
+}
+
+function formatMetricValue(value: number | undefined) {
+  return value === undefined ? '-' : String(value);
 }
 
 function MetricCard({

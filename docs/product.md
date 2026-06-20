@@ -19,6 +19,10 @@ infrastructure.
 Public roadmap and dashboard copy should describe the current usable
 ClassGamify loop, not stale scaffold or skeleton milestones once those
 capabilities are live.
+The authenticated teacher dashboard should use owner-scoped activity and
+assignment summaries for top metrics; starter/demo activities may appear as
+preview content, but they must not be counted as the teacher's real library,
+open links, or results.
 Public policy pages are also product surfaces: terms, privacy, and cookie copy
 must describe ClassGamify's teacher activity, public assignment link, student
 attempt, results, and AI-draft data model instead of the copied learning-site
