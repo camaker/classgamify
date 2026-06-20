@@ -6,7 +6,6 @@ import type {
 import {
   getAssignmentStatusLabel,
   isAssignmentExpired,
-  isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -116,20 +115,12 @@ function DashboardAssignmentsPage() {
   );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
-  const openAssignmentCount = assignments.filter((item) =>
-    isAssignmentOpen(item.assignment.status, item.assignment.expiresAt)
-  ).length;
-  const totalCompletions = assignments.reduce(
-    (sum, item) => sum + item.stats.completions,
-    0
-  );
-  const averageScore =
-    assignments.length > 0
-      ? Math.round(
-          assignments.reduce((sum, item) => sum + item.stats.averageScore, 0) /
-            assignments.length
-        )
-      : 0;
+  const summary = data?.summary ?? {
+    averageScore: 0,
+    completions: 0,
+    openAssignments: 0,
+    totalAssignments,
+  };
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
@@ -189,23 +180,23 @@ function DashboardAssignmentsPage() {
         <section className="grid gap-4 md:grid-cols-4">
           <SummaryCard
             icon={IconListCheck}
-            label="Shown"
-            value={String(assignments.length)}
+            label={hasFilters ? 'Matching' : 'Assignments'}
+            value={String(summary.totalAssignments)}
           />
           <SummaryCard
             icon={IconShare3}
-            label="Open shown"
-            value={String(openAssignmentCount)}
+            label="Open links"
+            value={String(summary.openAssignments)}
           />
           <SummaryCard
             icon={IconUsers}
-            label="Page completions"
-            value={String(totalCompletions)}
+            label="Completions"
+            value={String(summary.completions)}
           />
           <SummaryCard
             icon={IconChartBar}
-            label="Page average"
-            value={`${averageScore}%`}
+            label="Average"
+            value={`${summary.averageScore}%`}
           />
         </section>
 

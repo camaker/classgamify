@@ -106,7 +106,10 @@ reuse the product across classes: teachers can filter their own assignments by
 title, share id, source activity text, or assignment status without broadening
 outside the current owner. It should also paginate from the same authenticated
 list API so teachers with many class links can move through bounded result
-pages without losing search or status filter state.
+pages without losing search or status filter state. Assignment list overview
+cards summarize the full current filter result, not only the visible page, so
+teachers can trust open-link counts, total completions, and average accuracy
+while paging through a large class archive.
 Teachers can close and reopen published assignment links without changing the
 frozen snapshot, so public student access and submissions respect the assignment
 lifecycle while existing attempts remain available for review. Assignment

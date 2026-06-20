@@ -1,6 +1,6 @@
 import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
-import type { AssignmentStatus } from '@/activities/types';
+import type { AssignmentStatus, AttemptResult } from '@/activities/types';
 import {
   isSameStudentIdentity,
   normalizeAnonymousToken,
@@ -27,7 +27,7 @@ import {
 } from '@/db/app.schema';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, avg, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -61,6 +61,31 @@ export const listAssignments = createServerFn({ method: 'GET' })
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
       .where(where);
+    const matchingAssignments = await db
+      .select({
+        expiresAt: assignment.expiresAt,
+        id: assignment.id,
+        status: assignment.status,
+      })
+      .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
+      .where(where);
+    const summaryAttempts = await db
+      .select({
+        resultJson: attempt.resultJson,
+      })
+      .from(attempt)
+      .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
+      .where(where);
     const items = await db
       .select({
         activity,
@@ -80,29 +105,55 @@ export const listAssignments = createServerFn({ method: 'GET' })
 
     const enriched = await Promise.all(
       items.map(async (item) => {
-        const [stats] = await db
+        const attempts = await db
           .select({
-            averageScore: avg(attempt.score),
-            completions: count(attempt.id),
+            resultJson: attempt.resultJson,
           })
           .from(attempt)
           .where(eq(attempt.assignmentId, item.assignment.id));
+        const stats = summarizeAssignmentAttempts(attempts);
 
         return {
           ...item,
-          stats: {
-            averageScore: Math.round(Number(stats?.averageScore ?? 0)),
-            completions: stats?.completions ?? 0,
-          },
+          stats,
         };
       })
     );
+    const summaryStats = summarizeAssignmentAttempts(summaryAttempts);
 
     return {
       items: enriched,
+      summary: {
+        averageScore: summaryStats.averageScore,
+        completions: summaryStats.completions,
+        openAssignments: matchingAssignments.filter((item) =>
+          isAssignmentOpen(item.status, item.expiresAt)
+        ).length,
+        totalAssignments: totalRow?.count ?? 0,
+      },
       total: totalRow?.count ?? 0,
     };
   });
+
+function summarizeAssignmentAttempts(
+  attempts: Array<{ resultJson: AttemptResult | null }>
+) {
+  const completions = attempts.length;
+  const averageScore =
+    completions > 0
+      ? Math.round(
+          attempts.reduce(
+            (sum, item) => sum + (item.resultJson?.accuracy ?? 0),
+            0
+          ) / completions
+        )
+      : 0;
+
+  return {
+    averageScore,
+    completions,
+  };
+}
 
 function buildAssignmentListWhere({
   search,
