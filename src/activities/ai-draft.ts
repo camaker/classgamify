@@ -338,7 +338,7 @@ function buildDraftReviewChecklist(
   ];
 }
 
-function createFallbackActivityDraft(
+export function createFallbackActivityDraft(
   input: GenerateActivityDraftInput
 ): CreateActivityInput {
   const terms = extractTerms(input.sourceText, input.subject).slice(

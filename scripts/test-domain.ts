@@ -8,6 +8,9 @@ import {
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
+import { createFallbackActivityDraft } from '@/activities/ai-draft';
+import { getTemplateRemixPlan } from '@/activities/template-remix';
+import { buildActivityContent } from '@/activities/validation';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
@@ -90,6 +93,38 @@ assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
+const fallbackDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 2',
+  itemCount: 5,
+  language: 'en',
+  sourceText:
+    'weather, sunny, rainy, cloudy, windy; students classify weather words and answer simple listening prompts',
+  subject: 'Science',
+  templateType: 'listening',
+});
+const fallbackContent = buildActivityContent(fallbackDraft);
+const fallbackRemixPlan = getTemplateRemixPlan({
+  content: fallbackContent,
+  currentTemplateType: fallbackDraft.templateType,
+});
+assert.equal(fallbackDraft.templateType, 'listening');
+assert.equal(fallbackContent.questions.length, 5);
+assert.equal(fallbackContent.pairs.length, 5);
+assert.ok(fallbackContent.groups.length >= 2);
+assert.ok(fallbackContent.vocabulary.includes('weather'));
+assert.ok(fallbackContent.teacherNotes.length >= 2);
+assert.ok(
+  fallbackContent.questions.every((question) =>
+    question.options?.some((option) => option.text === question.answer)
+  )
+);
+assert.ok(
+  fallbackRemixPlan.readyOptions.some(
+    (option) => option.template.type === 'listening'
+  )
+);
+assert.ok(fallbackRemixPlan.suggestedOptions.length >= 3);
 
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({

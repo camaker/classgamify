@@ -330,7 +330,10 @@ Implementation boundaries:
 
 If Workers AI credentials are missing or model output is not valid JSON, the
 service returns a deterministic local draft so local development and CI remain
-stable. Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
+stable. The fallback draft generator is a product-domain contract, not throwaway
+demo code: it should still produce teacher-reviewable questions, pairs, groups,
+vocabulary, notes, and remix readiness from the teacher's source material.
+Production should still configure `CLOUDFLARE_ACCOUNT_ID` and
 `CLOUDFLARE_API_TOKEN` as Worker secrets.
 
 ## Near-Term Template Roadmap
