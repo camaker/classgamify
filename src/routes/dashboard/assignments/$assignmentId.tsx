@@ -5,6 +5,7 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
+import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   AssignmentSettingsSummary,
   formatAssignmentExpiry,
@@ -227,6 +228,29 @@ function AssignmentResultsPage() {
     }
   }
 
+  async function handleCopyStudentFollowUp() {
+    if (!data || data.analysis.students.length === 0) {
+      toast.error('Submit at least one attempt before copying follow-up.');
+      return;
+    }
+
+    try {
+      await copyTextToClipboard(
+        buildAssignmentStudentFollowUpSummary({
+          assignmentTitle: data.assignment.title,
+          students: data.analysis.students,
+        })
+      );
+      toast.success('Student follow-up copied.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Student follow-up could not be copied.'
+      );
+    }
+  }
+
   return (
     <DashboardLayout
       breadcrumbs={[
@@ -337,6 +361,16 @@ function AssignmentResultsPage() {
                 >
                   <IconCopy className="size-4" />
                   Copy item review
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={data.analysis.students.length === 0}
+                  onClick={handleCopyStudentFollowUp}
+                >
+                  <IconCopy className="size-4" />
+                  Copy follow-up
                 </Button>
                 <Button
                   type="button"
