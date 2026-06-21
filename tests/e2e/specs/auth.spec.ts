@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   cleanupE2EUsers,
   loginByForm,
@@ -6,6 +6,18 @@ import {
   updateE2EUser,
 } from '../fixtures/auth';
 import { createE2EUser } from '../fixtures/test-data';
+
+async function expectClassGamifyDashboard(page: Page) {
+  await expect(
+    page.getByRole('heading', { name: 'Teacher dashboard' })
+  ).toBeVisible();
+  await expect(
+    page.getByText('Activity content is now the center of the product.')
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: /^create activity$/i })
+  ).toBeVisible();
+}
 
 test.describe('authentication and protected routes', () => {
   test.beforeAll(async ({ request }) => {
@@ -30,7 +42,7 @@ test.describe('authentication and protected routes', () => {
     const user = await registerE2EUser(request);
 
     await loginByForm(page, user);
-    await expect(page.getByText('Total Revenue')).toBeVisible();
+    await expectClassGamifyDashboard(page);
   });
 
   test('allows a user to register from the register page', async ({
@@ -56,7 +68,7 @@ test.describe('authentication and protected routes', () => {
       role: 'user',
     });
     await loginByForm(page, user);
-    await expect(page.getByText('Total Revenue')).toBeVisible();
+    await expectClassGamifyDashboard(page);
   });
 
   test('redirects non-admin users away from admin pages', async ({

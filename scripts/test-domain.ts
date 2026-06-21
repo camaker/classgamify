@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
+import { stripJsonComments } from './parse-wrangler';
 import {
   buildActivityLibraryCardSummary,
   buildActivityLibraryFilterSummary,
@@ -177,6 +178,21 @@ const answers = {
   'item-1': ' apple ',
   'item-2': '   ',
 } satisfies Record<string, string>;
+
+assert.equal(
+  JSON.parse(
+    stripJsonComments(`{
+      // Line comments should be removed.
+      "script": "https://cloud.umami.is/script.js",
+      "quote": "She said \\"// keep this\\"",
+      /*
+       * Block comments should be removed.
+       */
+      "enabled": true
+    }`)
+  ).script,
+  'https://cloud.umami.is/script.js'
+);
 
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);

@@ -26,7 +26,7 @@ export function parseWranglerConfig(): WranglerConfig {
   const wranglerContent = fs.readFileSync(wranglerPath, 'utf8');
 
   // Remove comments from the JSONC content
-  const jsonContent = wranglerContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  const jsonContent = stripJsonComments(wranglerContent);
 
   // Fix trailing commas in objects and arrays (which are valid in JSONC but not in JSON)
   const fixedJsonContent = jsonContent.replace(/,\s*([}\]])/g, '$1'); // Replace trailing commas before closing brackets
@@ -37,6 +37,65 @@ export function parseWranglerConfig(): WranglerConfig {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to parse wrangler.jsonc: ${errorMessage}`);
   }
+}
+
+export function stripJsonComments(content: string) {
+  let output = '';
+  let inBlockComment = false;
+  let inLineComment = false;
+  let inString = false;
+  let isEscaped = false;
+
+  for (let index = 0; index < content.length; index += 1) {
+    const character = content[index];
+    const nextCharacter = content[index + 1];
+
+    if (inLineComment) {
+      if (character === '\n' || character === '\r') {
+        inLineComment = false;
+        output += character;
+      }
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (character === '*' && nextCharacter === '/') {
+        inBlockComment = false;
+        index += 1;
+        continue;
+      }
+
+      if (character === '\n' || character === '\r') {
+        output += character;
+      }
+      continue;
+    }
+
+    if (!inString && character === '/' && nextCharacter === '/') {
+      inLineComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (!inString && character === '/' && nextCharacter === '*') {
+      inBlockComment = true;
+      index += 1;
+      continue;
+    }
+
+    output += character;
+
+    if (character === '"' && !isEscaped) {
+      inString = !inString;
+    }
+
+    isEscaped = character === '\\' && !isEscaped;
+    if (character !== '\\') {
+      isEscaped = false;
+    }
+  }
+
+  return output;
 }
 
 /**
