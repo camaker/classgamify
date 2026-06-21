@@ -57,6 +57,7 @@ import {
 import { activityContentToEditorInput } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import {
@@ -707,6 +708,22 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     activityTemplateByType[templateType].contentRequirements.length > 0
   );
 }
+assert.deepEqual(
+  worksheetModeDefinitions.map((mode) => mode.template),
+  ['fill-blank', 'line-match', 'listening', 'group-sort']
+);
+assert.equal(
+  worksheetModeDefinitions.every((mode) =>
+    isActivityTemplateType(mode.template)
+  ),
+  true
+);
+assert.equal(
+  worksheetModeDefinitions.every(
+    (mode) => mode.action.length > 0 && mode.description.length > 0
+  ),
+  true
+);
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);

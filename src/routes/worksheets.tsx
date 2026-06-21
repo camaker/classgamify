@@ -1,7 +1,11 @@
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import type { ActivityTemplateType } from '@/activities/types';
+import {
+  worksheetModeDefinitions,
+  type WorksheetModeDefinition,
+  type WorksheetModeTemplate,
+} from '@/activities/worksheet-modes';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -30,45 +34,6 @@ export const Route = createFileRoute('/worksheets')({
 });
 
 function WorksheetsPage() {
-  const worksheetModes = [
-    {
-      icon: IconClipboardText,
-      title: 'Fill blanks',
-      description:
-        'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
-      href: Routes.Create,
-      search: { template: 'fill-blank' },
-      action: 'Create fill-blank',
-    },
-    {
-      icon: IconLayoutColumns,
-      title: 'Line matching',
-      description:
-        'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
-      href: Routes.Create,
-      search: { template: 'line-match' },
-      action: 'Start line match',
-    },
-    {
-      icon: IconHeadphones,
-      title: 'Listening prompts',
-      description:
-        'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
-      href: Routes.Create,
-      search: { template: 'listening' },
-      action: 'Create listening',
-    },
-    {
-      icon: IconCategory2,
-      title: 'Drag sorting',
-      description:
-        'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
-      href: Routes.Create,
-      search: { template: 'group-sort' },
-      action: 'Create sort',
-    },
-  ] as const;
-
   const workflow = [
     'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
     'Choose a worksheet-style template and review the scaffold before saving.',
@@ -147,7 +112,7 @@ function WorksheetsPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {worksheetModes.map((mode) => (
+          {worksheetModeDefinitions.map((mode) => (
             <WorksheetModeCard key={mode.title} mode={mode} />
           ))}
         </section>
@@ -204,30 +169,21 @@ function WorksheetsPage() {
   );
 }
 
-function WorksheetModeCard({
-  mode,
-}: {
-  mode: {
-    action: string;
-    description: string;
-    href: typeof Routes.Create;
-    icon: TablerIcon;
-    search: { template: ActivityTemplateType };
-    title: string;
-  };
-}) {
+function WorksheetModeCard({ mode }: { mode: WorksheetModeDefinition }) {
+  const Icon = worksheetModeIcons[mode.template];
+
   return (
     <div className="rounded-lg border bg-card p-5">
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-        <mode.icon className="size-4" />
+        <Icon className="size-4" />
       </div>
       <h2 className="mt-4 font-semibold">{mode.title}</h2>
       <p className="mt-2 min-h-24 text-sm leading-6 text-muted-foreground">
         {mode.description}
       </p>
       <Link
-        to={mode.href}
-        search={mode.search}
+        to={Routes.Create}
+        search={{ template: mode.template }}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'mt-4 w-full bg-background'
@@ -238,3 +194,10 @@ function WorksheetModeCard({
     </div>
   );
 }
+
+const worksheetModeIcons = {
+  'fill-blank': IconClipboardText,
+  'group-sort': IconCategory2,
+  'line-match': IconLayoutColumns,
+  listening: IconHeadphones,
+} satisfies Record<WorksheetModeTemplate, TablerIcon>;
