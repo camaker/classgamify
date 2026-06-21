@@ -717,11 +717,15 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
           value={meta.coverage.teacherNotes}
         />
       </div>
-      {meta.suggestedTemplates.length > 0 ? (
+      {meta.suggestedTemplateOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {meta.suggestedTemplates.map((template) => (
-            <Badge key={template} variant="outline" className="rounded-md">
-              {template}
+          {meta.suggestedTemplateOptions.map((option) => (
+            <Badge
+              key={option.template}
+              variant="outline"
+              className="rounded-md"
+            >
+              {option.shortName}
             </Badge>
           ))}
         </div>
@@ -775,8 +779,11 @@ function ActivityTemplateReadinessPanel({
 }: {
   remixPlan: TemplateRemixPlan | null;
 }) {
-  const readyTemplates =
-    remixPlan?.readyOptions.map((option) => option.template.shortName) ?? [];
+  const readyTemplateOptions =
+    remixPlan?.readyOptions.map((option) => ({
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })) ?? [];
   const lockedTemplates =
     remixPlan?.options.filter((option) => !option.isReady) ?? [];
 
@@ -794,14 +801,18 @@ function ActivityTemplateReadinessPanel({
           </p>
         </div>
         <Badge variant="secondary" className="w-fit rounded-md">
-          {readyTemplates.length} ready
+          {readyTemplateOptions.length} ready
         </Badge>
       </div>
-      {readyTemplates.length > 0 ? (
+      {readyTemplateOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {readyTemplates.map((templateName) => (
-            <Badge key={templateName} variant="outline" className="rounded-md">
-              {templateName}
+          {readyTemplateOptions.map((option) => (
+            <Badge
+              key={option.template}
+              variant="outline"
+              className="rounded-md"
+            >
+              {option.shortName}
             </Badge>
           ))}
         </div>
