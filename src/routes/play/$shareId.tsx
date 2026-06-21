@@ -29,6 +29,7 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
+  buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
@@ -161,6 +162,13 @@ function PlayPage() {
         totalPoints: result.totalPoints,
       })
     : undefined;
+  const attemptControlState = buildStudentAttemptControlState({
+    canSubmit,
+    hasResult: Boolean(result),
+    isSubmitting: submitAttemptMutation.isPending,
+    timeExpired: attemptTimer.timeExpired,
+    unansweredLabel: completionCopy.unansweredLabel,
+  });
   const currentAttemptSessionKey =
     assignment && itemCount > 0
       ? buildStudentAttemptSessionKey({
@@ -416,7 +424,7 @@ function PlayPage() {
             ) : null}
           </div>
 
-          {attemptTimer.timeExpired && !result ? (
+          {attemptControlState.showTimeExpiredMessage ? (
             <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
               {runnerCopy.timeExpiredMessage}
             </div>
@@ -424,7 +432,7 @@ function PlayPage() {
 
           <RuntimeItemList
             answers={answers}
-            disabled={Boolean(result) || attemptTimer.timeExpired}
+            disabled={attemptControlState.runtimeItemsDisabled}
             items={runtimeItems}
             revealAnswer={Boolean(
               result && assignment.settings.showCorrectAnswers
@@ -443,22 +451,20 @@ function PlayPage() {
           <Button
             type="button"
             className="mt-4 w-full sm:w-fit"
-            disabled={
-              !canSubmit || Boolean(result) || submitAttemptMutation.isPending
-            }
+            disabled={attemptControlState.submitDisabled}
             onClick={submitAnswers}
           >
             <IconCheck className="size-4" />
             {completionCopy.submitButtonLabel}
           </Button>
-          {!result && completionCopy.unansweredLabel ? (
+          {attemptControlState.unansweredLabel ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              {completionCopy.unansweredLabel}
+              {attemptControlState.unansweredLabel}
             </p>
           ) : null}
-          {!canSubmit ? (
+          {attemptControlState.readOnlyMessage ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              {runnerCopy.readOnlyPreviewMessage}
+              {attemptControlState.readOnlyMessage}
             </p>
           ) : null}
         </div>

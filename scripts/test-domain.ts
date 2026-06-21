@@ -232,6 +232,7 @@ import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
@@ -685,6 +686,69 @@ assert.deepEqual(
     accuracyLabel: '100% accuracy',
     durationLabel: 'Time: 5s',
     scoreLabel: '4/4',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptControlState({
+    canSubmit: true,
+    hasResult: false,
+    isSubmitting: false,
+    timeExpired: false,
+    unansweredLabel: '2 items left unanswered.',
+  }),
+  {
+    readOnlyMessage: undefined,
+    runtimeItemsDisabled: false,
+    showTimeExpiredMessage: false,
+    submitDisabled: false,
+    unansweredLabel: '2 items left unanswered.',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptControlState({
+    canSubmit: true,
+    hasResult: false,
+    isSubmitting: false,
+    timeExpired: true,
+  }),
+  {
+    readOnlyMessage: undefined,
+    runtimeItemsDisabled: true,
+    showTimeExpiredMessage: true,
+    submitDisabled: false,
+    unansweredLabel: undefined,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptControlState({
+    canSubmit: true,
+    hasResult: true,
+    isSubmitting: false,
+    timeExpired: true,
+    unansweredLabel: '1 item left unanswered.',
+  }),
+  {
+    readOnlyMessage: undefined,
+    runtimeItemsDisabled: true,
+    showTimeExpiredMessage: false,
+    submitDisabled: true,
+    unansweredLabel: undefined,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptControlState({
+    canSubmit: false,
+    hasResult: false,
+    isSubmitting: true,
+    timeExpired: false,
+  }),
+  {
+    readOnlyMessage:
+      'Preview assignments are read-only until a teacher publishes a share link.',
+    runtimeItemsDisabled: false,
+    showTimeExpiredMessage: false,
+    submitDisabled: true,
+    unansweredLabel: undefined,
   }
 );
 assert.deepEqual(

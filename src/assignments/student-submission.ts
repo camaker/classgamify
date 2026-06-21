@@ -96,6 +96,14 @@ type StudentAttemptResultDisplay = {
   scoreLabel: string;
 };
 
+type StudentAttemptControlState = {
+  readOnlyMessage?: string;
+  runtimeItemsDisabled: boolean;
+  showTimeExpiredMessage: boolean;
+  submitDisabled: boolean;
+  unansweredLabel?: string;
+};
+
 const STUDENT_RUNNER_COPY = {
   browseTemplatesLabel: 'Browse templates',
   loadingMessage: 'Loading student activity...',
@@ -159,6 +167,30 @@ export function buildStudentAttemptResultDisplay({
       }
     )}`,
     scoreLabel: `${earnedPoints}/${totalPoints}`,
+  };
+}
+
+export function buildStudentAttemptControlState({
+  canSubmit,
+  hasResult,
+  isSubmitting,
+  timeExpired,
+  unansweredLabel,
+}: {
+  canSubmit: boolean;
+  hasResult: boolean;
+  isSubmitting: boolean;
+  timeExpired: boolean;
+  unansweredLabel?: string;
+}): StudentAttemptControlState {
+  return {
+    readOnlyMessage: canSubmit
+      ? undefined
+      : STUDENT_RUNNER_COPY.readOnlyPreviewMessage,
+    runtimeItemsDisabled: hasResult || timeExpired,
+    showTimeExpiredMessage: timeExpired && !hasResult,
+    submitDisabled: !canSubmit || hasResult || isSubmitting,
+    unansweredLabel: hasResult ? undefined : unansweredLabel,
   };
 }
 
