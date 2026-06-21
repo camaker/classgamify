@@ -3991,6 +3991,31 @@ assert.ok(
   )
 );
 assert.equal(getRuntimeItems('listening', fallbackListeningContent).length, 3);
+const fallbackGroupSortDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 4,
+  language: 'en',
+  sourceText: 'weather, sunny, rainy, windy',
+  subject: 'Science',
+  templateType: 'group-sort',
+});
+const fallbackGroupSortContent = buildActivityContent(fallbackGroupSortDraft);
+assert.deepEqual(
+  fallbackGroupSortContent.groups.map((group) => group.label),
+  ['Review focus', 'Science examples']
+);
+assert.equal(
+  fallbackGroupSortContent.groups.every((group) => group.items.length > 0),
+  true
+);
+assert.equal(
+  fallbackGroupSortContent.groups.some((group) =>
+    ['Core ideas', 'Examples'].includes(group.label)
+  ),
+  false
+);
+assert.equal(getRuntimeItems('group-sort', fallbackGroupSortContent).length, 4);
 const fallbackOpenBoxDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',

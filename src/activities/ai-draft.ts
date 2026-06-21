@@ -520,13 +520,20 @@ function buildFallbackGroups(
   const midpoint = Math.max(1, Math.ceil(terms.length / 2));
   const first = terms.slice(0, midpoint);
   const second = terms.slice(midpoint);
-  const firstLabel = templateType === 'group-sort' ? 'Core ideas' : 'Practice';
-  const secondLabel = templateType === 'group-sort' ? 'Examples' : 'Review';
+  const [firstLabel, secondLabel] =
+    templateType === 'group-sort'
+      ? buildFallbackGroupSortLabels(subject)
+      : ['Practice', 'Review'];
 
   return [
     `${firstLabel} | ${first.join(', ')}`,
     `${secondLabel} | ${(second.length > 0 ? second : [subject]).join(', ')}`,
   ].join('\n');
+}
+
+function buildFallbackGroupSortLabels(subject: string) {
+  const normalizedSubject = subject.trim() || 'Lesson';
+  return ['Review focus', `${normalizedSubject} examples`] as const;
 }
 
 function createFallbackTitle(
