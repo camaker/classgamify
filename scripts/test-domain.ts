@@ -4194,8 +4194,17 @@ const fallbackListeningDraft = createFallbackActivityDraft({
 const fallbackListeningContent = buildActivityContent(fallbackListeningDraft);
 assert.ok(
   fallbackListeningContent.questions.every((question) =>
-    question.prompt.startsWith('Listen to this sentence:')
+    /^Track \d+:/.test(question.prompt)
   )
+);
+assert.equal(fallbackListeningContent.questions[0]?.answer, 'weather');
+assert.match(
+  fallbackListeningContent.questions[0]?.prompt ?? '',
+  /listening word is weather/
+);
+assert.match(
+  fallbackListeningContent.questions[0]?.explanation ?? '',
+  /spoken track names weather/
 );
 assert.equal(getRuntimeItems('listening', fallbackListeningContent).length, 3);
 const fallbackGroupSortDraft = createFallbackActivityDraft({

@@ -454,7 +454,7 @@ function buildFallbackQuestions({
   options: string[];
   terms: string[];
 }) {
-  return terms.map((term) => {
+  return terms.map((term, index) => {
     const choices = buildQuestionOptionTexts({
       answer: term,
       options,
@@ -465,7 +465,7 @@ function buildFallbackQuestions({
       case 'fill-blank':
         return `In this ${input.subject} lesson, remember ___. | ${term} | ${choices} | ${explanation}`;
       case 'listening':
-        return `Listen to this sentence: ${term} is important in ${input.subject}. | ${term} | ${choices} | The spoken sentence names ${term}.`;
+        return `Track ${index + 1}: The ${input.subject} listening word is ${term}. | ${term} | ${choices} | The spoken track names ${term}.`;
       case 'open-box':
         return `Open the box: explain or name the ${input.subject} idea from this lesson. | ${term} | | Model answer: ${term}. ${explanation}`;
       default:
