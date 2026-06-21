@@ -27,10 +27,12 @@ import {
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
+  buildAnonymousAttemptCopy,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
+  getStudentRunnerCopy,
 } from '@/assignments/student-submission';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -140,6 +142,10 @@ function PlayPage() {
   const anonymousBrowserLabel = assignment?.settings.collectStudentName
     ? undefined
     : getAnonymousBrowserLabel(anonymousToken);
+  const anonymousAttemptCopy = buildAnonymousAttemptCopy({
+    browserLabel: anonymousBrowserLabel,
+  });
+  const runnerCopy = getStudentRunnerCopy();
   const completionCopy = buildAttemptCompletionCopy({
     completionSummary,
     confirmIncompleteSubmit,
@@ -244,10 +250,12 @@ function PlayPage() {
         ...response.result,
         reviewItems: response.reviewItems,
       });
-      toast.success('Attempt submitted.');
+      toast.success(runnerCopy.submissionSuccessMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Attempt could not be saved.'
+        error instanceof Error
+          ? error.message
+          : runnerCopy.submissionFailureMessage
       );
     }
   }
@@ -256,7 +264,7 @@ function PlayPage() {
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-6xl rounded-lg border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            Loading student activity...
+            {runnerCopy.loadingMessage}
           </p>
         </div>
       </Container>
@@ -272,10 +280,10 @@ function PlayPage() {
             Student play route
           </Badge>
           <h1 className="mt-4 text-3xl font-bold tracking-tight">
-            Assignment not found
+            {runnerCopy.missingAssignmentTitle}
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            This link may have been unpublished, closed, or typed incorrectly.
+            {runnerCopy.missingAssignmentDescription}
           </p>
           <Link
             to={Routes.Templates}
@@ -370,10 +378,11 @@ function PlayPage() {
               </div>
             ) : (
               <div className="rounded-lg border bg-muted/20 p-3">
-                <p className="text-sm font-medium">Anonymous attempt</p>
+                <p className="text-sm font-medium">
+                  {anonymousAttemptCopy.title}
+                </p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  This assignment does not collect student names. This browser
-                  will submit as {anonymousBrowserLabel}.
+                  {anonymousAttemptCopy.description}
                 </p>
               </div>
             )}
@@ -405,7 +414,7 @@ function PlayPage() {
 
           {attemptTimer.timeExpired && !result ? (
             <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
-              Time is up. Review your saved answers, then submit.
+              {runnerCopy.timeExpiredMessage}
             </div>
           ) : null}
 
@@ -445,8 +454,7 @@ function PlayPage() {
           ) : null}
           {!canSubmit ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              Preview assignments are read-only until a teacher publishes a
-              share link.
+              {runnerCopy.readOnlyPreviewMessage}
             </p>
           ) : null}
         </div>

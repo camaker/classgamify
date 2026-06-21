@@ -1,4 +1,5 @@
 import {
+  ANONYMOUS_BROWSER_LABEL,
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
@@ -62,6 +63,50 @@ export type AttemptCompletionCopy = {
   submitButtonLabel: string;
   unansweredLabel?: string;
 };
+
+export type StudentRunnerCopy = {
+  loadingMessage: string;
+  missingAssignmentDescription: string;
+  missingAssignmentTitle: string;
+  readOnlyPreviewMessage: string;
+  submissionFailureMessage: string;
+  submissionSuccessMessage: string;
+  timeExpiredMessage: string;
+};
+
+export type AnonymousAttemptCopy = {
+  description: string;
+  title: string;
+};
+
+const STUDENT_RUNNER_COPY = {
+  loadingMessage: 'Loading student activity...',
+  missingAssignmentDescription:
+    'This link may have been unpublished, closed, or typed incorrectly.',
+  missingAssignmentTitle: 'Assignment not found',
+  readOnlyPreviewMessage:
+    'Preview assignments are read-only until a teacher publishes a share link.',
+  submissionFailureMessage: 'Attempt could not be saved.',
+  submissionSuccessMessage: 'Attempt submitted.',
+  timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
+} satisfies StudentRunnerCopy;
+
+export function getStudentRunnerCopy(): StudentRunnerCopy {
+  return STUDENT_RUNNER_COPY;
+}
+
+export function buildAnonymousAttemptCopy({
+  browserLabel,
+}: {
+  browserLabel?: string;
+}): AnonymousAttemptCopy {
+  const label = browserLabel?.trim() || ANONYMOUS_BROWSER_LABEL;
+
+  return {
+    description: `This assignment does not collect student names. This browser will submit as ${label}.`,
+    title: 'Anonymous attempt',
+  };
+}
 
 export function getAttemptCompletionSummary({
   answers,
@@ -205,8 +250,7 @@ export function buildStudentAttemptSubmitGate({
 }): StudentAttemptSubmitGate {
   if (!canSubmit) {
     return {
-      message:
-        'Preview assignments are read-only until a teacher publishes a share link.',
+      message: STUDENT_RUNNER_COPY.readOnlyPreviewMessage,
       reason: 'read-only',
       type: 'blocked',
     };

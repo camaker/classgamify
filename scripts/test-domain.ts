@@ -179,6 +179,7 @@ import {
 } from '@/assignments/identity';
 import {
   buildAttemptCompletionCopy,
+  buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
@@ -186,6 +187,7 @@ import {
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
+  getStudentRunnerCopy,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
 import type { RuntimeItem } from '@/activities/runtime';
@@ -254,6 +256,30 @@ assert.equal(
   }),
   'anon-token-3'
 );
+assert.deepEqual(buildAnonymousAttemptCopy({}), {
+  description:
+    'This assignment does not collect student names. This browser will submit as Anonymous browser.',
+  title: 'Anonymous attempt',
+});
+assert.deepEqual(
+  buildAnonymousAttemptCopy({ browserLabel: ' Anonymous browser A1B2C3 ' }),
+  {
+    description:
+      'This assignment does not collect student names. This browser will submit as Anonymous browser A1B2C3.',
+    title: 'Anonymous attempt',
+  }
+);
+assert.deepEqual(getStudentRunnerCopy(), {
+  loadingMessage: 'Loading student activity...',
+  missingAssignmentDescription:
+    'This link may have been unpublished, closed, or typed incorrectly.',
+  missingAssignmentTitle: 'Assignment not found',
+  readOnlyPreviewMessage:
+    'Preview assignments are read-only until a teacher publishes a share link.',
+  submissionFailureMessage: 'Attempt could not be saved.',
+  submissionSuccessMessage: 'Attempt submitted.',
+  timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
+});
 assert.equal(
   findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Rome'),
   'item-2'
