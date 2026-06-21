@@ -14,6 +14,10 @@ import {
   createFallbackActivityDraftResult,
 } from '@/activities/ai-draft';
 import {
+  activityTemplateByType,
+  activityTemplates,
+} from '@/activities/catalog';
+import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
@@ -385,6 +389,21 @@ assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
 assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+assert.deepEqual(
+  activityTemplates.map((template) => template.type),
+  ACTIVITY_TEMPLATE_TYPES
+);
+assert.deepEqual(
+  Object.keys(activityTemplateByType).sort(),
+  [...ACTIVITY_TEMPLATE_TYPES].sort()
+);
+for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
+  assert.equal(activityTemplateByType[templateType].type, templateType);
+  assert.ok(activityTemplateByType[templateType].name.length > 0);
+  assert.ok(
+    activityTemplateByType[templateType].contentRequirements.length > 0
+  );
+}
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);

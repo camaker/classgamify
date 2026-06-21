@@ -1,12 +1,13 @@
 import type {
+  ActivityTemplateType,
   ActivitySeed,
   ActivityTemplateDefinition,
   AssignmentSeed,
 } from './types';
+import { ACTIVITY_TEMPLATE_TYPES } from './types';
 
-export const activityTemplates: ActivityTemplateDefinition[] = [
-  {
-    type: 'quiz',
+export const activityTemplateByType = {
+  quiz: defineActivityTemplate('quiz', {
     name: 'Quiz',
     shortName: 'Quiz',
     description:
@@ -14,9 +15,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Vocabulary checks, reading comprehension, concept review',
     contentRequirements: ['questions'],
     classroomMode: 'individual',
-  },
-  {
-    type: 'match-up',
+  }),
+  'match-up': defineActivityTemplate('match-up', {
     name: 'Match up',
     shortName: 'Match',
     description:
@@ -24,9 +24,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Words and meanings, examples and categories, cause and effect',
     contentRequirements: ['pairs'],
     classroomMode: 'individual',
-  },
-  {
-    type: 'line-match',
+  }),
+  'line-match': defineActivityTemplate('line-match', {
     name: 'Line match',
     shortName: 'Lines',
     description:
@@ -34,9 +33,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Vocabulary translations, terms and definitions, cause and effect',
     contentRequirements: ['pairs'],
     classroomMode: 'individual',
-  },
-  {
-    type: 'group-sort',
+  }),
+  'group-sort': defineActivityTemplate('group-sort', {
     name: 'Group sort',
     shortName: 'Sort',
     description:
@@ -44,9 +42,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Grammar families, science groups, topic classification',
     contentRequirements: ['groups'],
     classroomMode: 'small-group',
-  },
-  {
-    type: 'fill-blank',
+  }),
+  'fill-blank': defineActivityTemplate('fill-blank', {
     name: 'Complete the sentence',
     shortName: 'Fill',
     description:
@@ -54,9 +51,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Sentence patterns, grammar practice, listening follow-up',
     contentRequirements: ['questions'],
     classroomMode: 'individual',
-  },
-  {
-    type: 'listening',
+  }),
+  listening: defineActivityTemplate('listening', {
     name: 'Listening',
     shortName: 'Listen',
     description:
@@ -64,9 +60,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Dictation, listening checks, pronunciation follow-up',
     contentRequirements: ['questions'],
     classroomMode: 'individual',
-  },
-  {
-    type: 'matching-pairs',
+  }),
+  'matching-pairs': defineActivityTemplate('matching-pairs', {
     name: 'Matching pairs',
     shortName: 'Pairs',
     description:
@@ -74,9 +69,8 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Recall, warmups, small-group review games',
     contentRequirements: ['pairs'],
     classroomMode: 'small-group',
-  },
-  {
-    type: 'open-box',
+  }),
+  'open-box': defineActivityTemplate('open-box', {
     name: 'Open the box',
     shortName: 'Box',
     description:
@@ -84,8 +78,12 @@ export const activityTemplates: ActivityTemplateDefinition[] = [
     bestFor: 'Speaking prompts, review rounds, classroom participation',
     contentRequirements: ['questions'],
     classroomMode: 'whole-class',
-  },
-];
+  }),
+} satisfies Record<ActivityTemplateType, ActivityTemplateDefinition>;
+
+export const activityTemplates = ACTIVITY_TEMPLATE_TYPES.map(
+  (type) => activityTemplateByType[type]
+);
 
 export const starterActivities: ActivitySeed[] = [
   {
@@ -226,8 +224,24 @@ export const starterAssignments: AssignmentSeed[] = [
   },
 ];
 
+function defineActivityTemplate<TType extends ActivityTemplateType>(
+  type: TType,
+  definition: Omit<ActivityTemplateDefinition, 'type'>
+): ActivityTemplateDefinition & { type: TType } {
+  return {
+    ...definition,
+    type,
+  };
+}
+
+export function getTemplateByType(
+  type: ActivityTemplateType
+): ActivityTemplateDefinition;
+export function getTemplateByType(
+  type: string
+): ActivityTemplateDefinition | undefined;
 export function getTemplateByType(type: string) {
-  return activityTemplates.find((template) => template.type === type);
+  return activityTemplateByType[type as ActivityTemplateType];
 }
 
 export function getStarterActivity(id?: string) {
