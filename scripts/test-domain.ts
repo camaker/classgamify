@@ -171,6 +171,7 @@ import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
+  buildAssignmentResultHeaderView,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
@@ -3897,6 +3898,62 @@ assert.deepEqual(
     { key: 'average-time', label: 'Average time', value: '2m 30s' },
     { key: 'closes', label: 'Closes', value: 'Jun 30, 2026' },
   ]
+);
+assert.deepEqual(
+  buildAssignmentResultHeaderView({
+    activity: {
+      description: 'Current activity description',
+      templateType: 'quiz',
+      title: 'Current activity title',
+    },
+    assignment: {
+      expiresAt: new Date('2026-07-01T00:00:00.000Z'),
+      shareSlug: 'share 123',
+      status: 'published',
+      title: 'Week 1 results',
+    },
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    snapshot: {
+      activityDescription: 'Snapshot description',
+      activityTitle: 'Snapshot title',
+      templateType: 'line-match',
+    },
+  }),
+  {
+    activityDescription: 'Snapshot description',
+    activityTitle: 'Snapshot title',
+    assignmentSharePath: '/play/share%20123',
+    assignmentTitle: 'Week 1 results',
+    shareSlug: 'share 123',
+    statusLabel: 'Open',
+    templateType: 'line-match',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultHeaderView({
+    activity: {
+      description: null,
+      templateType: 'quiz',
+      title: 'Current activity title',
+    },
+    assignment: {
+      expiresAt: new Date('2026-05-01T00:00:00.000Z'),
+      shareSlug: 'closed-share',
+      status: 'published',
+      title: 'Expired results',
+    },
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    snapshot: null,
+  }),
+  {
+    activityDescription: '',
+    activityTitle: 'Current activity title',
+    assignmentSharePath: '/play/closed-share',
+    assignmentTitle: 'Expired results',
+    shareSlug: 'closed-share',
+    statusLabel: 'Expired',
+    templateType: 'quiz',
+  }
 );
 assert.deepEqual(assignmentResultTableHeaders.studentAttempts, [
   'Student',

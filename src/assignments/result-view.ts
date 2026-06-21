@@ -4,12 +4,18 @@ import type {
   AssignmentStudentSummary,
 } from '@/assignments/results';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentResultDate } from '@/assignments/result-format';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
+import type {
+  ActivityTemplateType,
+  AssignmentStatus,
+} from '@/activities/types';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -106,6 +112,25 @@ type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
     totalPoints?: number;
   } | null;
   score: number | null;
+};
+
+type AssignmentResultHeaderSource = {
+  activity: {
+    description: string | null;
+    templateType: ActivityTemplateType;
+    title: string;
+  };
+  assignment: {
+    expiresAt: Date | string | null;
+    shareSlug: string;
+    status: AssignmentStatus | string;
+    title: string;
+  };
+  snapshot: {
+    activityDescription: string | null;
+    activityTitle: string;
+    templateType: ActivityTemplateType;
+  } | null;
 };
 
 export const assignmentResultPageCopy = {
@@ -270,6 +295,28 @@ export function buildAssignmentResultMetricItems({
     ...metric,
     value: valueByMetric[metric.key],
   }));
+}
+
+export function buildAssignmentResultHeaderView({
+  activity,
+  assignment,
+  now,
+  snapshot,
+}: AssignmentResultHeaderSource & { now?: number }) {
+  return {
+    activityDescription:
+      snapshot?.activityDescription ?? activity.description ?? '',
+    activityTitle: snapshot?.activityTitle ?? activity.title,
+    assignmentSharePath: buildAssignmentSharePath(assignment.shareSlug),
+    assignmentTitle: assignment.title,
+    shareSlug: assignment.shareSlug,
+    statusLabel: getAssignmentStatusLabel(
+      assignment.status,
+      assignment.expiresAt,
+      now
+    ),
+    templateType: snapshot?.templateType ?? activity.templateType,
+  };
 }
 
 export function buildAssignmentResultActionState({

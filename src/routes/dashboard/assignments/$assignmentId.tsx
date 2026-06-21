@@ -1,7 +1,6 @@
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
-import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   type AttemptReviewFilter,
   type AssignmentResultEmptyState,
@@ -12,6 +11,7 @@ import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
+  buildAssignmentResultHeaderView,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
@@ -133,13 +133,9 @@ function AssignmentResultsPage() {
   const itemPerformanceSort = itemSort ?? 'original';
   const attemptReviewFilter = review ?? 'all';
   const studentSort = sort ?? 'needs-review';
-  const title = data?.assignment.title ?? assignmentResultPageCopy.defaultTitle;
-  const activityTitle =
-    data?.snapshot?.activityTitle ?? data?.activity.title ?? '';
-  const activityDescription =
-    data?.snapshot?.activityDescription ?? data?.activity.description ?? '';
-  const templateType =
-    data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
+  const headerView = data ? buildAssignmentResultHeaderView(data) : null;
+  const title =
+    headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;
   const resultView = useMemo(
     () =>
       buildAssignmentResultViewModel({
@@ -258,9 +254,6 @@ function AssignmentResultsPage() {
     }
   }
 
-  const assignmentSharePath = data
-    ? buildAssignmentSharePath(data.assignment.shareSlug)
-    : '';
   const resultMetricItems = data
     ? buildAssignmentResultMetricItems({
         averageDurationLabel: formatAttemptDuration(
@@ -328,20 +321,19 @@ function AssignmentResultsPage() {
             <CardHeader>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="rounded-md">
-                  {getAssignmentStatusLabel(
-                    data.assignment.status,
-                    data.assignment.expiresAt
-                  )}
+                  {headerView.statusLabel}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
-                  {templateType}
+                  {headerView.templateType}
                 </Badge>
               </div>
               <CardTitle>
-                <h2 className="text-lg font-semibold">{activityTitle}</h2>
+                <h2 className="text-lg font-semibold">
+                  {headerView.activityTitle}
+                </h2>
               </CardTitle>
               <CardDescription>
-                <p>{activityDescription}</p>
+                <p>{headerView.activityDescription}</p>
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -361,7 +353,7 @@ function AssignmentResultsPage() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/play/$shareId"
-                  params={{ shareId: data.assignment.shareSlug }}
+                  params={{ shareId: headerView.shareSlug }}
                   className={cn(buttonVariants(), 'w-full sm:w-auto')}
                 >
                   <IconPlayerPlay className="size-4" />
@@ -369,10 +361,10 @@ function AssignmentResultsPage() {
                 </Link>
                 <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
                   <IconShare3 className="size-4" />
-                  {assignmentSharePath}
+                  {headerView.assignmentSharePath}
                 </div>
                 <CopyAssignmentShareLinkButton
-                  shareSlug={data.assignment.shareSlug}
+                  shareSlug={headerView.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
                 {resultActionButtons.map((actionButton) => {
