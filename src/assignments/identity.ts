@@ -1,6 +1,6 @@
-export const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
+const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
 export const ANONYMOUS_BROWSER_LABEL = 'Anonymous browser';
-export const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
+const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
 
 type StudentIdentitySource = {
   anonymousToken?: string | null;
@@ -39,7 +39,7 @@ export function buildAnonymousAttemptTokenStorageKey(shareId: string) {
   return `${ANONYMOUS_ATTEMPT_TOKEN_PREFIX}${shareId}`;
 }
 
-export function createAnonymousAttemptToken() {
+function createAnonymousAttemptToken() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
   }
@@ -65,7 +65,7 @@ export function getOrCreateAnonymousAttemptToken({
   return token;
 }
 
-export function getStudentIdentityKey(source: StudentIdentitySource) {
+function getStudentIdentityKey(source: StudentIdentitySource) {
   const studentName = normalizeStudentName(source.studentName);
   if (studentName) {
     return `name:${studentName.toLocaleLowerCase()}`;
