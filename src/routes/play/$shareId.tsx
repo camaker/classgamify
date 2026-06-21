@@ -24,6 +24,7 @@ import {
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
   getStudentRunnerCopy,
+  resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptState,
@@ -244,13 +245,15 @@ function PlayPage() {
     }
 
     try {
-      const nextAnonymousToken = assignment?.settings.collectStudentName
-        ? undefined
-        : (anonymousToken ??
+      const nextAnonymousToken = resolveStudentAttemptAnonymousToken({
+        collectStudentName: Boolean(assignment?.settings.collectStudentName),
+        currentAnonymousToken: anonymousToken,
+        createAnonymousToken: () =>
           getOrCreateAnonymousAttemptToken({
             shareId: activeShareId,
             storage: window.localStorage,
-          }));
+          }),
+      });
       const response = await submitAttemptMutation.mutateAsync(
         buildStudentAttemptSubmissionInput({
           answers,

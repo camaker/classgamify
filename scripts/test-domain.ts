@@ -305,6 +305,7 @@ import {
   getAttemptSubmitDecision,
   getStudentRunnerCopy,
   isStudentAnswerFilled,
+  resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import type { RuntimeItem } from '@/activities/runtime';
@@ -1030,6 +1031,43 @@ assert.deepEqual(
     shareSlug: 'share-two',
   }
 );
+let anonymousTokenCreateCount = 0;
+assert.equal(
+  resolveStudentAttemptAnonymousToken({
+    collectStudentName: true,
+    currentAnonymousToken: ' current-token ',
+    createAnonymousToken: () => {
+      anonymousTokenCreateCount += 1;
+      return 'created-token';
+    },
+  }),
+  undefined
+);
+assert.equal(anonymousTokenCreateCount, 0);
+assert.equal(
+  resolveStudentAttemptAnonymousToken({
+    collectStudentName: false,
+    currentAnonymousToken: ' current-token ',
+    createAnonymousToken: () => {
+      anonymousTokenCreateCount += 1;
+      return 'created-token';
+    },
+  }),
+  'current-token'
+);
+assert.equal(anonymousTokenCreateCount, 0);
+assert.equal(
+  resolveStudentAttemptAnonymousToken({
+    collectStudentName: false,
+    currentAnonymousToken: '   ',
+    createAnonymousToken: () => {
+      anonymousTokenCreateCount += 1;
+      return ' created-token ';
+    },
+  }),
+  'created-token'
+);
+assert.equal(anonymousTokenCreateCount, 1);
 assert.equal(
   orderAssignmentRuntimeItems({
     items: submissionRuntimeItems,

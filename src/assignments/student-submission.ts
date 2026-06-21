@@ -93,6 +93,12 @@ export type AnonymousAttemptCopy = {
   title: string;
 };
 
+type StudentAttemptAnonymousTokenResolver = {
+  collectStudentName: boolean;
+  createAnonymousToken: () => string;
+  currentAnonymousToken?: string;
+};
+
 type StudentAttemptResultDisplay = {
   accuracyLabel: string;
   durationLabel: string;
@@ -360,6 +366,19 @@ export function buildStudentAttemptSubmissionInput({
   }
 
   return input;
+}
+
+export function resolveStudentAttemptAnonymousToken({
+  collectStudentName,
+  createAnonymousToken,
+  currentAnonymousToken,
+}: StudentAttemptAnonymousTokenResolver) {
+  if (collectStudentName) return undefined;
+
+  const normalizedCurrentToken = normalizeAnonymousToken(currentAnonymousToken);
+  if (normalizedCurrentToken) return normalizedCurrentToken;
+
+  return normalizeAnonymousToken(createAnonymousToken()) || undefined;
 }
 
 export function buildStudentAttemptSubmitGate({
