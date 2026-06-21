@@ -1252,6 +1252,8 @@ const resultAnalysis = analyzeAssignmentResults({
 assert.equal(resultAnalysis.perItem[0]?.correctCount, 2);
 assert.equal(resultAnalysis.perItem[0]?.submittedCount, 3);
 assert.equal(resultAnalysis.perItem[0]?.correctRate, 67);
+assert.equal(resultAnalysis.perItem[0]?.kindLabel, 'Question');
+assert.equal(resultAnalysis.perItem[1]?.kindLabel, 'Pair');
 assert.deepEqual(resultAnalysis.perItem[0]?.acceptedAnswers, [
   'Paris',
   'Paris, France',
@@ -1405,6 +1407,7 @@ const reviewPriorityItems = [
     expectedAnswer: 'Seed',
     itemId: 'unsubmitted',
     kind: 'question',
+    kindLabel: 'Question',
     prompt: 'Unsubmitted item',
     submittedCount: 0,
   },
@@ -1415,6 +1418,7 @@ const reviewPriorityItems = [
     expectedAnswer: 'A',
     itemId: 'tie-more-submitted',
     kind: 'question',
+    kindLabel: 'Question',
     prompt: 'Tie with more submissions',
     submittedCount: 6,
   },
@@ -1425,6 +1429,7 @@ const reviewPriorityItems = [
     expectedAnswer: 'B',
     itemId: 'tie-fewer-submitted',
     kind: 'question',
+    kindLabel: 'Question',
     prompt: 'Tie with fewer submissions',
     submittedCount: 2,
   },
@@ -1435,6 +1440,7 @@ const reviewPriorityItems = [
     expectedAnswer: 'C',
     itemId: 'higher-accuracy',
     kind: 'question',
+    kindLabel: 'Question',
     prompt: 'Higher accuracy',
     submittedCount: 4,
   },
@@ -1614,7 +1620,11 @@ assert.match(
 );
 assert.match(
   itemReviewSummary,
-  /Capital of France\? \(question\) - 67% correct, 2\/3 correct/
+  /Capital of France\? \(Question\) - 67% correct, 2\/3 correct/
+);
+assert.match(
+  itemReviewSummary,
+  /Match "Hot" with its pair\. \(Pair\) - 50% correct, 1\/2 correct/
 );
 assert.match(itemReviewSummary, /Expected: Paris \/ Paris, France\./);
 assert.match(itemReviewSummary, /Accepted answers: Paris, Paris, France\./);

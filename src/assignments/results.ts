@@ -1,5 +1,9 @@
 import { getAcceptedAnswers } from '@/activities/answer-matching';
-import type { RuntimeItem } from '@/activities/runtime';
+import {
+  formatRuntimeItemKindLabel,
+  formatRuntimeItemPrompt,
+  type RuntimeItem,
+} from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
@@ -22,6 +26,7 @@ export type AssignmentItemAnalysis = {
   expectedAnswer: string;
   itemId: string;
   kind: RuntimeItem['kind'];
+  kindLabel: string;
   prompt: string;
   submittedCount: number;
 };
@@ -94,7 +99,8 @@ export function analyzeAssignmentResults({
       explanation: item.explanation,
       itemId: item.id,
       kind: item.kind,
-      prompt: getRuntimePrompt(item),
+      kindLabel: formatRuntimeItemKindLabel(item),
+      prompt: formatRuntimeItemPrompt(item),
       submittedCount,
     };
   });
@@ -114,7 +120,7 @@ export function analyzeAssignmentResults({
           expectedAnswer: item?.answer ?? '',
           explanation: item?.explanation,
           itemId: answer.itemId,
-          prompt: item ? getRuntimePrompt(item) : answer.itemId,
+          prompt: item ? formatRuntimeItemPrompt(item) : answer.itemId,
         };
       }),
       completedAt: attempt.completedAt,
@@ -187,16 +193,4 @@ function buildStudentSummaries(
 
 function getDateTimestamp(value: Date | null) {
   return value?.getTime() ?? 0;
-}
-
-function getRuntimePrompt(item: RuntimeItem) {
-  if (item.kind === 'pair') {
-    return `Match "${item.prompt}" with its pair.`;
-  }
-
-  if (item.kind === 'group-item') {
-    return `Choose the group for "${item.prompt}".`;
-  }
-
-  return item.prompt;
 }

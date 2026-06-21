@@ -965,7 +965,7 @@ function ItemPerformanceTable({
             <TableCell className="max-w-80">
               <span className="font-medium">{index + 1}.</span> {item.prompt}
             </TableCell>
-            <TableCell>{item.kind}</TableCell>
+            <TableCell>{item.kindLabel}</TableCell>
             <TableCell>{item.correctRate}%</TableCell>
             <TableCell>
               {item.correctCount}/{item.submittedCount}
@@ -995,7 +995,7 @@ function ItemAnalysisCard({
     <div className="rounded-lg border bg-background p-4">
       <div className="flex items-center justify-between gap-3">
         <Badge variant="outline" className="rounded-md">
-          {item.kind}
+          {item.kindLabel}
         </Badge>
         <span className="text-sm font-semibold">{item.correctRate}%</span>
       </div>

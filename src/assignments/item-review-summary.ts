@@ -35,6 +35,6 @@ function formatItems(items: AssignmentItemAnalysis[]) {
             item.acceptedAnswers
           )}.`
         : '';
-    return `- ${index + 1}. ${item.prompt} (${item.kind}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
+    return `- ${index + 1}. ${item.prompt} (${item.kindLabel}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
   });
 }
