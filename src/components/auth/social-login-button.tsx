@@ -4,6 +4,7 @@ import { DividerWithText } from '@/components/auth/divider-with-text';
 import { Button } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
+import { useAuthProviderStatus } from '@/hooks/use-auth-provider-status';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { IconBrandGoogleFilled, IconLoader2 } from '@tabler/icons-react';
@@ -28,8 +29,15 @@ export function SocialLoginButton({
     callbackUrl === defaultCallbackUrl
       ? Routes.AuthError
       : `${Routes.AuthError}?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  const googleLoginConfigured = websiteConfig.auth?.enableGoogleLogin ?? false;
+  const { isLoading: isProviderStatusLoading, providerStatus } =
+    useAuthProviderStatus(googleLoginConfigured);
   const [isLoading, setIsLoading] = useState<'google' | null>(null);
-  if (!websiteConfig.auth?.enableGoogleLogin) {
+  if (
+    !googleLoginConfigured ||
+    isProviderStatusLoading ||
+    !providerStatus.google
+  ) {
     return null;
   }
   const onClick = async (provider: 'google') => {
