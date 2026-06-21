@@ -13,6 +13,7 @@ import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
   buildAssignmentResultSearchState,
+  buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
   assignmentResultReviewCopy,
@@ -140,7 +141,6 @@ function AssignmentResultsPage() {
     data?.snapshot?.activityDescription ?? data?.activity.description ?? '';
   const templateType =
     data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
-  const hasAttempts = Boolean(data?.attempts.length);
   const resultView = useMemo(
     () =>
       buildAssignmentResultViewModel({
@@ -347,6 +347,13 @@ function AssignmentResultsPage() {
   });
   const resultActionButtons =
     buildAssignmentResultActionButtons(resultActionState);
+  const resultSectionState = buildAssignmentResultSectionState({
+    attemptCount: data?.attempts.length ?? 0,
+    attemptReviewCount: data?.analysis.attempts.length ?? 0,
+    classroomBriefReady: Boolean(classroomBrief),
+    itemCount: data?.analysis.perItem.length ?? 0,
+    studentCount: data?.analysis.students.length ?? 0,
+  });
   const resultActionHandlers = {
     'copy-brief': handleCopyClassroomBrief,
     'copy-follow-up': handleCopyStudentFollowUp,
@@ -456,9 +463,9 @@ function AssignmentResultsPage() {
             </CardContent>
           </Card>
 
-          {hasAttempts ? (
+          {resultSectionState.showStudentSearch ? (
             <>
-              {classroomBrief ? (
+              {resultSectionState.showClassroomBrief && classroomBrief ? (
                 <ClassroomBriefCard brief={classroomBrief} />
               ) : null}
               <ResultStudentSearch
@@ -472,7 +479,7 @@ function AssignmentResultsPage() {
             </>
           ) : null}
 
-          {data.analysis.perItem.length > 0 ? (
+          {resultSectionState.showReteachPriorities ? (
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
@@ -500,7 +507,7 @@ function AssignmentResultsPage() {
             </Card>
           ) : null}
 
-          {data.analysis.perItem.length > 0 ? (
+          {resultSectionState.showItemPerformance ? (
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
@@ -528,7 +535,7 @@ function AssignmentResultsPage() {
             </Card>
           ) : null}
 
-          {data.analysis.students.length > 0 ? (
+          {resultSectionState.showStudentSummary ? (
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
@@ -611,7 +618,7 @@ function AssignmentResultsPage() {
             </CardContent>
           </Card>
 
-          {data.analysis.attempts.length > 0 ? (
+          {resultSectionState.showAnswerReview ? (
             <Card className="rounded-lg">
               <CardHeader>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

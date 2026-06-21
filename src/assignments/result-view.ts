@@ -72,6 +72,15 @@ type AssignmentResultMetricDescriptor = {
   label: string;
 };
 
+type AssignmentResultSectionState = {
+  showAnswerReview: boolean;
+  showClassroomBrief: boolean;
+  showItemPerformance: boolean;
+  showReteachPriorities: boolean;
+  showStudentSearch: boolean;
+  showStudentSummary: boolean;
+};
+
 type AssignmentResultControlOption<TValue extends string> = {
   label: string;
   value: TValue;
@@ -307,6 +316,29 @@ export function getAssignmentResultActionGateFromState({
     itemCount: state.itemCount,
     studentCount: state.studentCount,
   });
+}
+
+export function buildAssignmentResultSectionState({
+  attemptCount,
+  attemptReviewCount,
+  classroomBriefReady,
+  itemCount,
+  studentCount,
+}: {
+  attemptCount: number;
+  attemptReviewCount: number;
+  classroomBriefReady: boolean;
+  itemCount: number;
+  studentCount: number;
+}): AssignmentResultSectionState {
+  return {
+    showAnswerReview: attemptReviewCount > 0,
+    showClassroomBrief: classroomBriefReady,
+    showItemPerformance: itemCount > 0,
+    showReteachPriorities: itemCount > 0,
+    showStudentSearch: attemptCount > 0,
+    showStudentSummary: studentCount > 0,
+  };
 }
 
 export function buildAssignmentAttemptRowDisplay({

@@ -161,6 +161,7 @@ import {
   buildAssignmentResultActionState,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
+  buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   buildAssignmentResultEmptyState,
   attemptReviewFilterOptions,
@@ -3755,6 +3756,57 @@ assert.deepEqual(
     state: readyAssignmentResultActionState,
   }),
   { type: 'ready' }
+);
+assert.deepEqual(
+  buildAssignmentResultSectionState({
+    attemptCount: 0,
+    attemptReviewCount: 0,
+    classroomBriefReady: false,
+    itemCount: 0,
+    studentCount: 0,
+  }),
+  {
+    showAnswerReview: false,
+    showClassroomBrief: false,
+    showItemPerformance: false,
+    showReteachPriorities: false,
+    showStudentSearch: false,
+    showStudentSummary: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSectionState({
+    attemptCount: 1,
+    attemptReviewCount: 0,
+    classroomBriefReady: false,
+    itemCount: 0,
+    studentCount: 0,
+  }),
+  {
+    showAnswerReview: false,
+    showClassroomBrief: false,
+    showItemPerformance: false,
+    showReteachPriorities: false,
+    showStudentSearch: true,
+    showStudentSummary: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSectionState({
+    attemptCount: 2,
+    attemptReviewCount: 2,
+    classroomBriefReady: true,
+    itemCount: 3,
+    studentCount: 1,
+  }),
+  {
+    showAnswerReview: true,
+    showClassroomBrief: true,
+    showItemPerformance: true,
+    showReteachPriorities: true,
+    showStudentSearch: true,
+    showStudentSummary: true,
+  }
 );
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
