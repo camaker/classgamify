@@ -409,9 +409,10 @@ export function createFallbackActivityDraft(
     terms: normalizedTerms.slice(0, input.itemCount),
   });
 
-  const pairs = normalizedTerms
-    .slice(0, input.itemCount)
-    .map((term) => `${term} | key idea from ${input.subject}`);
+  const pairs = buildFallbackPairs({
+    input,
+    terms: normalizedTerms.slice(0, input.itemCount),
+  });
 
   const groups = buildFallbackGroups(
     normalizedTerms,
@@ -470,6 +471,20 @@ function buildFallbackQuestions({
       default:
         return `Which item belongs in this lesson set: ${term}? | ${term} | ${choices} | ${explanation}`;
     }
+  });
+}
+
+function buildFallbackPairs({
+  input,
+  terms,
+}: {
+  input: GenerateActivityDraftInput;
+  terms: string[];
+}) {
+  return terms.map((term, index) => {
+    const characterCount = Array.from(term).length;
+    const clue = `${input.subject} lesson clue ${index + 1} (${characterCount} chars)`;
+    return `${term} | ${clue}`;
   });
 }
 

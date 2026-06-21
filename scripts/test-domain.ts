@@ -3530,6 +3530,17 @@ assert.ok(
 );
 assert.equal(fallbackContent.questions.length, 5);
 assert.equal(fallbackContent.pairs.length, 5);
+assert.equal(
+  new Set(fallbackContent.pairs.map((pair) => pair.right)).size,
+  fallbackContent.pairs.length
+);
+assert.ok(
+  fallbackContent.pairs.every(
+    (pair, index) =>
+      pair.right.startsWith(`Science lesson clue ${index + 1}`) &&
+      !pair.right.includes('key idea from')
+  )
+);
 assert.ok(fallbackContent.groups.length >= 2);
 assert.ok(fallbackContent.vocabulary.includes('weather'));
 assert.ok(fallbackContent.teacherNotes.length >= 2);
