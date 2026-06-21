@@ -4,6 +4,15 @@ export const ARCHIVED_ACTIVITY_DERIVATION_ERROR =
   'Restore this activity before publishing, duplicating, or remixing it.';
 
 export type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
+export type ActivityLifecycleAction =
+  | ActivityDerivativeAction
+  | 'archive'
+  | 'restore';
+
+export type ActivityLifecycleActionCopy = {
+  failureMessage: string;
+  successMessage: string;
+};
 
 export type ActivityDerivativeActionGate =
   | {
@@ -38,6 +47,43 @@ export function buildActivityDerivativeActionGate({
     action,
     message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
     type: 'blocked',
+  };
+}
+
+export function getActivityLifecycleActionCopy(
+  action: ActivityLifecycleAction
+): ActivityLifecycleActionCopy {
+  if (action === 'publish') {
+    return {
+      failureMessage: 'Assignment could not be published.',
+      successMessage: 'Assignment link published.',
+    };
+  }
+
+  if (action === 'remix') {
+    return {
+      failureMessage: 'Activity could not be remixed.',
+      successMessage: 'Template remix created.',
+    };
+  }
+
+  if (action === 'duplicate') {
+    return {
+      failureMessage: 'Activity could not be duplicated.',
+      successMessage: 'Activity duplicated.',
+    };
+  }
+
+  if (action === 'archive') {
+    return {
+      failureMessage: 'Activity could not be archived.',
+      successMessage: 'Activity archived.',
+    };
+  }
+
+  return {
+    failureMessage: 'Activity could not be restored.',
+    successMessage: 'Activity restored to drafts.',
   };
 }
 

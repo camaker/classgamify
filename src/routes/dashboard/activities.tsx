@@ -7,6 +7,7 @@ import {
   type ActivityDerivativeAction,
   buildActivityDerivativeActionGate,
   canDeriveActivityWork,
+  getActivityLifecycleActionCopy,
   isActivityArchived,
 } from '@/activities/lifecycle';
 import {
@@ -571,6 +572,7 @@ function ActivityCard({
 
   async function publishActivity() {
     const actionGate = getDerivativeActionGate('publish');
+    const actionCopy = getActivityLifecycleActionCopy('publish');
     if (actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -583,7 +585,7 @@ function ActivityCard({
 
     try {
       const result = await publishMutation.mutateAsync(draftResult.input);
-      toast.success('Assignment link published.');
+      toast.success(actionCopy.successMessage);
       setPublishDialogOpen(false);
       navigate({
         to: Routes.DashboardAssignments,
@@ -591,9 +593,7 @@ function ActivityCard({
       });
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Assignment could not be published.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
@@ -602,6 +602,7 @@ function ActivityCard({
     targetTemplateType: ActivityCardData['templateType']
   ) {
     const actionGate = getDerivativeActionGate('remix');
+    const actionCopy = getActivityLifecycleActionCopy('remix');
     if (actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -611,22 +612,21 @@ function ActivityCard({
         activityId: activity.id,
         targetTemplateType,
       });
-      toast.success('Template remix created.');
+      toast.success(actionCopy.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Activity could not be remixed.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function duplicateActivity() {
     const actionGate = getDerivativeActionGate('duplicate');
+    const actionCopy = getActivityLifecycleActionCopy('duplicate');
     if (actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -635,42 +635,38 @@ function ActivityCard({
       const result = await duplicateMutation.mutateAsync({
         activityId: activity.id,
       });
-      toast.success('Activity duplicated.');
+      toast.success(actionCopy.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Activity could not be duplicated.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function archiveActivity() {
+    const actionCopy = getActivityLifecycleActionCopy('archive');
     try {
       await archiveMutation.mutateAsync({ activityId: activity.id });
-      toast.success('Activity archived.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Activity could not be archived.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function restoreActivity() {
+    const actionCopy = getActivityLifecycleActionCopy('restore');
     try {
       await restoreMutation.mutateAsync({ activityId: activity.id });
-      toast.success('Activity restored to drafts.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Activity could not be restored.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
