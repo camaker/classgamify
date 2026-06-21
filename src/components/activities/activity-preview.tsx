@@ -52,7 +52,7 @@ export function ActivityPreview({
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="rounded-md">
               <IconDeviceGamepad2 className="size-3.5" />
-              {template?.name ?? activity.templateType}
+              {template.name}
             </Badge>
             <Badge variant="secondary" className="rounded-md">
               {activity.content.subject}

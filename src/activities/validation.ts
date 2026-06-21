@@ -97,10 +97,6 @@ function assertTemplateRequirements(
   content: ActivityContent
 ) {
   const template = getTemplateByType(templateType);
-  if (!template) {
-    throw new Error('Unknown activity template.');
-  }
-
   const remixOption = getTemplateRemixOption({
     content,
     currentTemplateType: templateType,
