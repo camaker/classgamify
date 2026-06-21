@@ -91,6 +91,44 @@ export function buildStudentRunnerView({
   };
 }
 
+export function buildSequentialRunnerView<
+  TItemView extends { item: { id: string } },
+>({
+  activeItemId,
+  itemLabel,
+  itemViews,
+}: {
+  activeItemId?: string;
+  itemLabel: string;
+  itemViews: TItemView[];
+}) {
+  const sequencedItemViews = itemViews.map((itemView, index) => ({
+    ...itemView,
+    sequenceLabel: formatSequentialRunnerItemLabel(itemLabel, index),
+  }));
+  const activeIndex = Math.max(
+    0,
+    sequencedItemViews.findIndex(
+      (itemView) => itemView.item.id === activeItemId
+    )
+  );
+  const activeItemView =
+    sequencedItemViews[activeIndex] ?? sequencedItemViews[0];
+
+  return {
+    activeIndex,
+    activeItem: activeItemView?.item,
+    activeItemView,
+    activeLabel: formatSequentialRunnerItemLabel(itemLabel, activeIndex),
+    itemViews: sequencedItemViews,
+  };
+}
+
+export function formatSequentialRunnerItemLabel(label: string, index: number) {
+  const normalizedLabel = label.trim() || 'Item';
+  return `${normalizedLabel} ${Math.max(0, index) + 1}`;
+}
+
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {
   const choices = new Set<string>();
 

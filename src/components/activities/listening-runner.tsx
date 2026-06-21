@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildSequentialRunnerView,
+  buildStudentRunnerView,
+} from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,13 +50,12 @@ export function ListeningRunner({
       }),
     [answers, copy.progressVerb, items, reviewItems]
   );
-  const activeIndex = Math.max(
-    0,
-    items.findIndex((item) => item.id === activeItemId)
-  );
-  const activeItemView =
-    runnerView.itemViews[activeIndex] ?? runnerView.itemViews[0];
-  const activeItem = activeItemView?.item;
+  const sequenceView = buildSequentialRunnerView({
+    activeItemId,
+    itemLabel: 'Track',
+    itemViews: runnerView.itemViews,
+  });
+  const activeItem = sequenceView.activeItem;
 
   useEffect(() => {
     setSpeechSupported(
@@ -76,7 +78,7 @@ export function ListeningRunner({
     return null;
   }
 
-  const activeReviewItem = activeItemView.reviewItem;
+  const activeReviewItem = sequenceView.activeItemView.reviewItem;
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -92,8 +94,8 @@ export function ListeningRunner({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
-          {runnerView.itemViews.map((itemView, index) => {
-            const { answered, item, reviewItem } = itemView;
+          {sequenceView.itemViews.map((itemView) => {
+            const { answered, item, reviewItem, sequenceLabel } = itemView;
             const selected = item.id === activeItem.id;
 
             return (
@@ -115,7 +117,7 @@ export function ListeningRunner({
                 onClick={() => setActiveItemId(item.id)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium">Track {index + 1}</span>
+                  <span className="text-sm font-medium">{sequenceLabel}</span>
                   {answered ? (
                     <IconCheck className="size-4 text-primary" />
                   ) : (
@@ -141,7 +143,7 @@ export function ListeningRunner({
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="secondary" className="rounded-md">
-              Track {activeIndex + 1}
+              {sequenceView.activeLabel}
             </Badge>
             <Button
               type="button"

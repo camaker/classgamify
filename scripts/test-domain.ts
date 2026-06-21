@@ -120,8 +120,10 @@ import {
   buildExclusiveChoiceAnswerChanges,
   buildPublicAnswerFeedbackView,
   buildRuntimeChoiceViews,
+  buildSequentialRunnerView,
   buildStudentRunnerView,
   findChoiceOwner,
+  formatSequentialRunnerItemLabel,
   getUniqueRuntimeChoices,
 } from '@/assignments/student-runner-view';
 import {
@@ -480,6 +482,74 @@ assert.deepEqual(
     },
   ]
 );
+const sequentialRunnerView = buildSequentialRunnerView({
+  activeItemId: 'item-2',
+  itemLabel: 'Track',
+  itemViews: [
+    {
+      item: {
+        id: 'item-1',
+        kind: 'question',
+        prompt: 'First prompt',
+      },
+    },
+    {
+      item: {
+        id: 'item-2',
+        kind: 'question',
+        prompt: 'Second prompt',
+      },
+    },
+  ],
+});
+assert.equal(sequentialRunnerView.activeIndex, 1);
+assert.equal(sequentialRunnerView.activeItem?.id, 'item-2');
+assert.equal(sequentialRunnerView.activeLabel, 'Track 2');
+assert.equal(sequentialRunnerView.itemViews[0]?.sequenceLabel, 'Track 1');
+assert.equal(sequentialRunnerView.itemViews[1]?.sequenceLabel, 'Track 2');
+assert.deepEqual(
+  buildSequentialRunnerView({
+    activeItemId: 'missing',
+    itemLabel: 'Box',
+    itemViews: [
+      {
+        item: {
+          id: 'box-1',
+          kind: 'question',
+          prompt: 'Open one',
+        },
+      },
+    ],
+  }),
+  {
+    activeIndex: 0,
+    activeItem: {
+      id: 'box-1',
+      kind: 'question',
+      prompt: 'Open one',
+    },
+    activeItemView: {
+      item: {
+        id: 'box-1',
+        kind: 'question',
+        prompt: 'Open one',
+      },
+      sequenceLabel: 'Box 1',
+    },
+    activeLabel: 'Box 1',
+    itemViews: [
+      {
+        item: {
+          id: 'box-1',
+          kind: 'question',
+          prompt: 'Open one',
+        },
+        sequenceLabel: 'Box 1',
+      },
+    ],
+  }
+);
+assert.equal(formatSequentialRunnerItemLabel(' ', -4), 'Item 1');
 assert.deepEqual(buildInlineBlankPromptView('I eat ___ for breakfast.'), {
   after: ' for breakfast.',
   before: 'I eat ',
