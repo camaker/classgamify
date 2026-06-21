@@ -75,7 +75,7 @@ const aiDraftSchema = z.object({
   vocabulary: z.array(z.string().trim().min(1).max(80)).min(3).max(16),
 });
 
-type AiActivityDraft = z.infer<typeof aiDraftSchema>;
+export type AiActivityDraft = z.infer<typeof aiDraftSchema>;
 
 export async function generateActivityDraftFromAi(
   input: GenerateActivityDraftInput
@@ -126,7 +126,7 @@ export async function generateActivityDraftFromAi(
 
   return {
     ...createActivityDraftResult({
-      activity: toCreateActivityInput(draft, data),
+      activity: createActivityInputFromAiDraft({ draft, input: data }),
       input: data,
     }),
     model,
@@ -204,23 +204,27 @@ function extractJsonObject(value: string) {
   return trimmed.slice(start, end + 1);
 }
 
-function toCreateActivityInput(
-  draft: AiActivityDraft,
-  input: GenerateActivityDraftInput
-): CreateActivityInput {
+export function createActivityInputFromAiDraft({
+  draft,
+  input,
+}: {
+  draft: AiActivityDraft;
+  input: GenerateActivityDraftInput;
+}): CreateActivityInput {
+  const shapedDraft = shapeAiDraftForPrimaryTemplate({ draft, input });
   const activity = {
-    description: draft.description,
+    description: shapedDraft.description,
     difficulty: input.difficulty,
     gradeBand: input.gradeBand,
-    groupsText: draft.groups
+    groupsText: shapedDraft.groups
       .map((group) => `${group.label} | ${group.items.join(', ')}`)
       .join('\n'),
     language: input.language,
-    learningGoal: draft.learningGoal,
-    pairsText: draft.pairs
+    learningGoal: shapedDraft.learningGoal,
+    pairsText: shapedDraft.pairs
       .map((pair) => `${pair.left} | ${pair.right}`)
       .join('\n'),
-    questionsText: draft.questions
+    questionsText: shapedDraft.questions
       .map((question) => {
         const options = buildQuestionOptionTexts({
           answer: question.answer,
@@ -236,16 +240,101 @@ function toCreateActivityInput(
           .join(' | ');
       })
       .join('\n'),
-    sourceSummary: draft.sourceSummary,
+    sourceSummary: shapedDraft.sourceSummary,
     subject: input.subject,
-    teacherNotesText: draft.teacherNotes.join('\n'),
+    teacherNotesText: shapedDraft.teacherNotes.join('\n'),
     templateType: input.templateType,
-    title: draft.title,
+    title: shapedDraft.title,
     visibility: 'draft',
-    vocabularyText: draft.vocabulary.join(', '),
+    vocabularyText: shapedDraft.vocabulary.join(', '),
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+function shapeAiDraftForPrimaryTemplate({
+  draft,
+  input,
+}: {
+  draft: AiActivityDraft;
+  input: GenerateActivityDraftInput;
+}): AiActivityDraft {
+  if (usesQuestionRuntimeItems(input.templateType)) {
+    return {
+      ...draft,
+      questions: draft.questions.slice(0, input.itemCount),
+    };
+  }
+
+  if (usesPairRuntimeItems(input.templateType)) {
+    return {
+      ...draft,
+      pairs: draft.pairs.slice(0, input.itemCount),
+    };
+  }
+
+  return {
+    ...draft,
+    groups: limitAiDraftGroupsToItemCount(draft.groups, input.itemCount),
+  };
+}
+
+function usesQuestionRuntimeItems(templateType: ActivityTemplateType) {
+  return (
+    templateType === 'fill-blank' ||
+    templateType === 'listening' ||
+    templateType === 'open-box' ||
+    templateType === 'quiz'
+  );
+}
+
+function usesPairRuntimeItems(templateType: ActivityTemplateType) {
+  return (
+    templateType === 'line-match' ||
+    templateType === 'match-up' ||
+    templateType === 'matching-pairs'
+  );
+}
+
+function limitAiDraftGroupsToItemCount(
+  groups: AiActivityDraft['groups'],
+  itemCount: number
+) {
+  const selectedGroups = groups.slice(0, Math.min(groups.length, itemCount));
+  const limitedGroups = selectedGroups.map((group) => ({
+    ...group,
+    items: [] as string[],
+  }));
+  let remainingItems = itemCount;
+
+  for (const [index, group] of selectedGroups.entries()) {
+    const item = group.items[0];
+    if (!item || remainingItems <= 0) continue;
+
+    limitedGroups[index]?.items.push(item);
+    remainingItems -= 1;
+  }
+
+  let itemIndex = 1;
+  while (remainingItems > 0) {
+    let addedItem = false;
+
+    for (const [groupIndex, group] of selectedGroups.entries()) {
+      const item = group.items[itemIndex];
+      if (!item) continue;
+
+      limitedGroups[groupIndex]?.items.push(item);
+      remainingItems -= 1;
+      addedItem = true;
+
+      if (remainingItems === 0) break;
+    }
+
+    if (!addedItem) break;
+    itemIndex += 1;
+  }
+
+  return limitedGroups.filter((group) => group.items.length > 0);
 }
 
 function createActivityDraftResult({

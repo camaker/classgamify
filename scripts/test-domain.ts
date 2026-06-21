@@ -10,8 +10,10 @@ import {
 } from '@/activities/library-filters';
 import {
   buildActivityDraftPrompt,
+  createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
+  type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
   activityTemplateByType,
@@ -888,6 +890,111 @@ assert.ok(
   fallbackDraftMeta.reviewChecklist.some((item) =>
     item.includes('Ready to remix after saving')
   )
+);
+const oversizedAiDraft = {
+  description: 'Oversized AI draft for item count shaping.',
+  groups: [
+    { label: 'Animals', items: ['cat', 'dog', 'bird'] },
+    { label: 'Plants', items: ['tree', 'flower', 'grass'] },
+    { label: 'Weather', items: ['rain', 'snow', 'wind'] },
+  ],
+  learningGoal: 'Students can classify and answer lesson review prompts.',
+  pairs: [
+    { left: 'cat', right: 'animal' },
+    { left: 'tree', right: 'plant' },
+    { left: 'rain', right: 'weather' },
+    { left: 'dog', right: 'animal' },
+    { left: 'flower', right: 'plant' },
+  ],
+  questions: [
+    {
+      answer: 'cat',
+      explanation: 'A cat is an animal.',
+      options: ['cat', 'tree', 'rain'],
+      prompt: 'Which word is an animal?',
+    },
+    {
+      answer: 'tree',
+      explanation: 'A tree is a plant.',
+      options: ['cat', 'tree', 'rain'],
+      prompt: 'Which word is a plant?',
+    },
+    {
+      answer: 'rain',
+      explanation: 'Rain is weather.',
+      options: ['cat', 'tree', 'rain'],
+      prompt: 'Which word is weather?',
+    },
+    {
+      answer: 'dog',
+      explanation: 'A dog is an animal.',
+      options: ['dog', 'grass', 'snow'],
+      prompt: 'Which word names an animal?',
+    },
+    {
+      answer: 'flower',
+      explanation: 'A flower is a plant.',
+      options: ['bird', 'flower', 'wind'],
+      prompt: 'Which word names a plant?',
+    },
+  ],
+  sourceSummary: 'Words about animals, plants, and weather.',
+  teacherNotes: ['Review AI output before assigning.'],
+  title: 'Nature word sort',
+  vocabulary: ['cat', 'dog', 'bird', 'tree', 'flower', 'rain', 'snow'],
+} satisfies AiActivityDraft;
+const aiDraftInputBase = {
+  difficulty: 'starter',
+  gradeBand: 'Grade 2',
+  itemCount: 3,
+  language: 'en',
+  sourceText: 'cat, dog, bird, tree, flower, rain, snow',
+  subject: 'Science',
+} as const;
+const shapedQuizDraft = createActivityInputFromAiDraft({
+  draft: oversizedAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'quiz',
+  },
+});
+assert.equal(
+  getRuntimeItems('quiz', buildActivityContent(shapedQuizDraft)).length,
+  3
+);
+const shapedMatchDraft = createActivityInputFromAiDraft({
+  draft: oversizedAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'match-up',
+  },
+});
+assert.equal(
+  getRuntimeItems('match-up', buildActivityContent(shapedMatchDraft)).length,
+  3
+);
+const shapedGroupSortDraft = createActivityInputFromAiDraft({
+  draft: oversizedAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'group-sort',
+  },
+});
+assert.deepEqual(
+  buildActivityContent(shapedGroupSortDraft).groups.map((group) => [
+    group.label,
+    group.items,
+  ]),
+  [
+    ['Animals', ['cat']],
+    ['Plants', ['tree']],
+    ['Weather', ['rain']],
+  ]
+);
+assert.equal(
+  getRuntimeItems('group-sort', buildActivityContent(shapedGroupSortDraft))
+    .length,
+  3
 );
 const questionOnlyDraftMeta = buildActivityDraftMeta({
   activity: {
