@@ -1,6 +1,11 @@
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import type { RuntimeItem } from '@/activities/runtime';
 import {
+  buildStudentAttemptSessionKey,
+  getAttemptCompletionSummary,
+  type StudentAnswerMap,
+} from '@/assignments/student-submission';
+import {
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
   stripRuntimeAnswers,
@@ -24,6 +29,15 @@ type StudentRunnerPageState =
       status: 'loading' | 'missing';
     }
   | StudentRunnerReadyState;
+
+type StudentRunnerAttemptState = {
+  activeShareId: string;
+  canSubmit: boolean;
+  completionSummary: ReturnType<typeof getAttemptCompletionSummary>;
+  currentAttemptSessionKey?: string;
+  itemCount: number;
+  runtimeItems: PublicRuntimeItem[];
+};
 
 export function buildStudentRunnerPageState({
   data,
@@ -76,6 +90,44 @@ export function buildStudentRunnerPageState({
     }),
     source: 'starter-preview',
     status: 'ready',
+  };
+}
+
+export function buildStudentRunnerAttemptState({
+  answers,
+  pageState,
+  shareId,
+}: {
+  answers: StudentAnswerMap;
+  pageState: StudentRunnerPageState;
+  shareId: string;
+}): StudentRunnerAttemptState {
+  const assignment =
+    pageState.status === 'ready' ? pageState.assignment : undefined;
+  const runtimeItems =
+    pageState.status === 'ready' ? pageState.runtimeItems : [];
+  const completionSummary = getAttemptCompletionSummary({
+    answers,
+    runtimeItems,
+  });
+  const itemCount = completionSummary.itemCount;
+  const canSubmit =
+    pageState.status === 'ready' && pageState.canSubmit && itemCount > 0;
+  const activeShareId = assignment?.shareId ?? shareId;
+
+  return {
+    activeShareId,
+    canSubmit,
+    completionSummary,
+    currentAttemptSessionKey:
+      assignment && itemCount > 0
+        ? buildStudentAttemptSessionKey({
+            runtimeItems,
+            shareSlug: activeShareId,
+          })
+        : undefined,
+    itemCount,
+    runtimeItems,
   };
 }
 

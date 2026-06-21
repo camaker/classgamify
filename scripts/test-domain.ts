@@ -255,7 +255,10 @@ import {
   buildAnonymousAttemptTokenStorageKey,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
-import { buildStudentRunnerPageState } from '@/assignments/student-runner-state';
+import {
+  buildStudentRunnerAttemptState,
+  buildStudentRunnerPageState,
+} from '@/assignments/student-runner-state';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
@@ -1586,6 +1589,30 @@ assert.equal(publicRunnerState.activity.title, 'Frozen activity title');
 assert.equal(publicRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicRunnerState.runtimeItems[0]!, false);
 assert.equal('explanation' in publicRunnerState.runtimeItems[0]!, false);
+assert.deepEqual(
+  buildStudentRunnerAttemptState({
+    answers: {
+      [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    },
+    pageState: publicRunnerState,
+    shareId: 'share-public',
+  }),
+  {
+    activeShareId: 'share-public',
+    canSubmit: true,
+    completionSummary: {
+      answeredItemCount: 1,
+      itemCount: publicRunnerState.runtimeItems.length,
+      unansweredItemCount: publicRunnerState.runtimeItems.length - 1,
+    },
+    currentAttemptSessionKey: buildStudentAttemptSessionKey({
+      runtimeItems: publicRunnerState.runtimeItems,
+      shareSlug: 'share-public',
+    }),
+    itemCount: publicRunnerState.runtimeItems.length,
+    runtimeItems: publicRunnerState.runtimeItems,
+  }
+);
 const starterRunnerState = buildStudentRunnerPageState({
   data: null,
   isLoading: false,
@@ -1604,6 +1631,47 @@ assert.equal(starterRunnerState.assignment.shareId, 'demo-runner');
 assert.equal(starterRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in starterRunnerState.runtimeItems[0]!, false);
 assert.equal('explanation' in starterRunnerState.runtimeItems[0]!, false);
+assert.deepEqual(
+  buildStudentRunnerAttemptState({
+    answers: {},
+    pageState: starterRunnerState,
+    shareId: 'demo-runner',
+  }),
+  {
+    activeShareId: 'demo-runner',
+    canSubmit: false,
+    completionSummary: {
+      answeredItemCount: 0,
+      itemCount: starterRunnerState.runtimeItems.length,
+      unansweredItemCount: starterRunnerState.runtimeItems.length,
+    },
+    currentAttemptSessionKey: buildStudentAttemptSessionKey({
+      runtimeItems: starterRunnerState.runtimeItems,
+      shareSlug: 'demo-runner',
+    }),
+    itemCount: starterRunnerState.runtimeItems.length,
+    runtimeItems: starterRunnerState.runtimeItems,
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptState({
+    answers: {},
+    pageState: { status: 'missing' },
+    shareId: 'missing-share',
+  }),
+  {
+    activeShareId: 'missing-share',
+    canSubmit: false,
+    completionSummary: {
+      answeredItemCount: 0,
+      itemCount: 0,
+      unansweredItemCount: 0,
+    },
+    currentAttemptSessionKey: undefined,
+    itemCount: 0,
+    runtimeItems: [],
+  }
+);
 assert.deepEqual(
   buildPublicAssignmentPreviewActivity(publicAssignmentPayload),
   {

@@ -26,12 +26,13 @@ import {
   buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
-  buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
-  getAttemptCompletionSummary,
   getStudentRunnerCopy,
 } from '@/assignments/student-submission';
-import { buildStudentRunnerPageState } from '@/assignments/student-runner-state';
+import {
+  buildStudentRunnerAttemptState,
+  buildStudentRunnerPageState,
+} from '@/assignments/student-runner-state';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -121,20 +122,20 @@ function PlayPage() {
     pageState.status === 'ready' ? pageState.assignment : undefined;
   const activity =
     pageState.status === 'ready' ? pageState.activity : undefined;
-  const runtimeItems =
-    pageState.status === 'ready' ? pageState.runtimeItems : [];
-  const completionSummary = useMemo(
+  const attemptState = useMemo(
     () =>
-      getAttemptCompletionSummary({
+      buildStudentRunnerAttemptState({
         answers,
-        runtimeItems,
+        pageState,
+        shareId,
       }),
-    [answers, runtimeItems]
+    [answers, pageState, shareId]
   );
-  const itemCount = completionSummary.itemCount;
-  const canSubmit =
-    pageState.status === 'ready' && pageState.canSubmit && itemCount > 0;
-  const activeShareId = assignment?.shareId ?? shareId;
+  const runtimeItems = attemptState.runtimeItems;
+  const completionSummary = attemptState.completionSummary;
+  const itemCount = attemptState.itemCount;
+  const canSubmit = attemptState.canSubmit;
+  const activeShareId = attemptState.activeShareId;
   const startedAt =
     attemptClock?.shareId === activeShareId ? attemptClock.startedAt : now;
   const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
@@ -170,13 +171,7 @@ function PlayPage() {
     timeExpired: attemptTimer.timeExpired,
     unansweredLabel: completionCopy.unansweredLabel,
   });
-  const currentAttemptSessionKey =
-    assignment && itemCount > 0
-      ? buildStudentAttemptSessionKey({
-          runtimeItems,
-          shareSlug: activeShareId,
-        })
-      : undefined;
+  const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
