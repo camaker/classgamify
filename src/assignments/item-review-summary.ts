@@ -1,4 +1,8 @@
 import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import {
+  formatAssignmentSummaryCorrectCount,
+  formatAssignmentSummaryCorrectRate,
+} from '@/assignments/result-summary-format';
 import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import type { AssignmentItemAnalysis } from '@/assignments/results';
 
@@ -35,6 +39,10 @@ function formatItems(items: AssignmentItemAnalysis[]) {
             item.acceptedAnswers
           )}.`
         : '';
-    return `- ${index + 1}. ${item.prompt} (${item.kindLabel}) - ${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount} correct. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
+    return `- ${index + 1}. ${item.prompt} (${item.kindLabel}) - ${formatAssignmentSummaryCorrectRate(
+      item.correctRate
+    )}, ${formatAssignmentSummaryCorrectCount(
+      item
+    )}. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
   });
 }

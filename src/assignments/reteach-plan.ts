@@ -2,6 +2,11 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import {
+  formatAssignmentSummaryAccuracy,
+  formatAssignmentSummaryItemPerformance,
+  formatAssignmentSummaryReviewItemCount,
+} from '@/assignments/result-summary-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 
@@ -45,7 +50,7 @@ function formatReviewItems(items: AssignmentItemAnalysis[]) {
 
   return items.map(
     (item, index) =>
-      `- ${index + 1}. ${item.prompt} (${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount})`
+      `- ${index + 1}. ${item.prompt} (${formatAssignmentSummaryItemPerformance(item)})`
   );
 }
 
@@ -56,6 +61,10 @@ function formatReviewStudents(students: AssignmentStudentSummary[]) {
 
   return students.map(
     (student) =>
-      `- ${student.studentLabel}: ${student.latestAccuracy}% latest accuracy, ${student.needsReviewCount} ${student.needsReviewCount === 1 ? 'item' : 'items'} to review`
+      `- ${student.studentLabel}: ${formatAssignmentSummaryAccuracy(
+        student.latestAccuracy
+      )} latest accuracy, ${formatAssignmentSummaryReviewItemCount(
+        student.needsReviewCount
+      )}`
   );
 }

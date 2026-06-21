@@ -3,6 +3,11 @@ import type {
   AssignmentStudentSummary,
 } from '@/assignments/results';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import {
+  formatAssignmentSummaryAccuracy,
+  formatAssignmentSummaryItemPerformance,
+  formatAssignmentSummaryReviewItemCount,
+} from '@/assignments/result-summary-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 
@@ -38,7 +43,7 @@ export function buildAssignmentClassroomBrief({
     `ClassGamify classroom brief: ${assignmentTitle}`,
     '',
     `Completions: ${stats.completions}`,
-    `Average accuracy: ${stats.averageScore}%`,
+    `Average accuracy: ${formatAssignmentSummaryAccuracy(stats.averageScore)}`,
     `Average points: ${stats.averagePoints}`,
     `Average time: ${formatAttemptDuration(stats.averageDurationSeconds)}`,
     '',
@@ -73,7 +78,7 @@ function formatFocusItems(items: AssignmentItemAnalysis[]) {
 
   return items.map(
     (item, index) =>
-      `- ${index + 1}. ${item.prompt} (${item.correctRate}% correct, ${item.correctCount}/${item.submittedCount})`
+      `- ${index + 1}. ${item.prompt} (${formatAssignmentSummaryItemPerformance(item)})`
   );
 }
 
@@ -84,6 +89,10 @@ function formatFollowUpStudents(students: AssignmentStudentSummary[]) {
 
   return students.map(
     (student, index) =>
-      `- ${index + 1}. ${student.studentLabel}: ${student.latestAccuracy}% latest, ${student.needsReviewCount} ${student.needsReviewCount === 1 ? 'item' : 'items'} to review`
+      `- ${index + 1}. ${student.studentLabel}: ${formatAssignmentSummaryAccuracy(
+        student.latestAccuracy
+      )} latest, ${formatAssignmentSummaryReviewItemCount(
+        student.needsReviewCount
+      )}`
   );
 }

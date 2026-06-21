@@ -1,3 +1,8 @@
+import {
+  formatAssignmentSummaryAccuracy,
+  formatAssignmentSummaryAttemptCount,
+  formatAssignmentSummaryReviewItemCount,
+} from '@/assignments/result-summary-format';
 import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import type { AssignmentStudentSummary } from '@/assignments/results';
 
@@ -28,6 +33,14 @@ function formatStudents(students: AssignmentStudentSummary[]) {
 
   return students.map(
     (student, index) =>
-      `- ${index + 1}. ${student.studentLabel}: latest ${student.latestAccuracy}%, average ${student.averageAccuracy}%, best ${student.bestAccuracy}%, ${student.attempts} ${student.attempts === 1 ? 'attempt' : 'attempts'}, ${student.needsReviewCount} ${student.needsReviewCount === 1 ? 'item' : 'items'} to review`
+      `- ${index + 1}. ${student.studentLabel}: latest ${formatAssignmentSummaryAccuracy(
+        student.latestAccuracy
+      )}, average ${formatAssignmentSummaryAccuracy(
+        student.averageAccuracy
+      )}, best ${formatAssignmentSummaryAccuracy(
+        student.bestAccuracy
+      )}, ${formatAssignmentSummaryAttemptCount(
+        student.attempts
+      )}, ${formatAssignmentSummaryReviewItemCount(student.needsReviewCount)}`
   );
 }

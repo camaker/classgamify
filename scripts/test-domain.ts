@@ -179,6 +179,14 @@ import {
   formatAssignmentResultDate,
 } from '@/assignments/result-format';
 import {
+  formatAssignmentSummaryAccuracy,
+  formatAssignmentSummaryAttemptCount,
+  formatAssignmentSummaryCorrectCount,
+  formatAssignmentSummaryCorrectRate,
+  formatAssignmentSummaryItemPerformance,
+  formatAssignmentSummaryReviewItemCount,
+} from '@/assignments/result-summary-format';
+import {
   getSubmittedAssignmentReviewPriorityItems,
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
@@ -2837,6 +2845,27 @@ assert.equal(
   }),
   'Paris | Paris, France'
 );
+assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
+assert.equal(formatAssignmentSummaryCorrectRate(67), '67% correct');
+assert.equal(
+  formatAssignmentSummaryCorrectCount({
+    correctCount: 2,
+    submittedCount: 3,
+  }),
+  '2/3 correct'
+);
+assert.equal(
+  formatAssignmentSummaryItemPerformance({
+    correctCount: 2,
+    correctRate: 67,
+    submittedCount: 3,
+  }),
+  '67% correct, 2/3'
+);
+assert.equal(formatAssignmentSummaryReviewItemCount(1), '1 item to review');
+assert.equal(formatAssignmentSummaryReviewItemCount(2), '2 items to review');
+assert.equal(formatAssignmentSummaryAttemptCount(1), '1 attempt');
+assert.equal(formatAssignmentSummaryAttemptCount(2), '2 attempts');
 assert.deepEqual(summarizeAssignmentAttempts([]), {
   averageDurationSeconds: 0,
   averagePoints: 0,
