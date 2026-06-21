@@ -247,6 +247,14 @@ export const attempt = sqliteTable(
   },
   (table) => [
     index('attempt_assignment_id_idx').on(table.assignmentId),
+    index('attempt_assignment_anonymous_token_idx').on(
+      table.assignmentId,
+      table.anonymousToken
+    ),
+    index('attempt_assignment_student_name_idx').on(
+      table.assignmentId,
+      table.studentName
+    ),
     index('attempt_anonymous_token_idx').on(table.anonymousToken),
     index('attempt_completed_at_idx').on(table.completedAt),
   ]

@@ -2,13 +2,13 @@ import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
+import {
+  countMatchingStudentIdentityAttempts,
+  resolveAttemptIdentityCountStrategy,
+  resolveAttemptSubmissionIdentity,
+} from '@/assignments/attempt-identity-query';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
-import {
-  isSameStudentIdentity,
-  normalizeAnonymousToken,
-  normalizeStudentName,
-} from '@/assignments/identity';
 import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
 import {
   assertAssignmentStatusTransition,
@@ -470,26 +470,24 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       durationSeconds: data.durationSeconds,
       timeLimitSeconds: settings.timeLimitSeconds,
     });
-    const studentName = normalizeStudentName(data.studentName);
-    const anonymousToken = normalizeAnonymousToken(data.anonymousToken);
-    if (settings.collectStudentName && !studentName) {
+    const submissionIdentity = resolveAttemptSubmissionIdentity({
+      anonymousToken: data.anonymousToken,
+      collectStudentName: settings.collectStudentName,
+      studentName: data.studentName,
+    });
+    if (settings.collectStudentName && !submissionIdentity.studentName) {
       throw new Error('Student name is required for this assignment.');
     }
-    if (!settings.collectStudentName && !anonymousToken) {
+    if (!settings.collectStudentName && !submissionIdentity.anonymousToken) {
       throw new Error('Anonymous student token is required.');
     }
 
     if (settings.maxAttempts) {
-      const previousAttempts = await db
-        .select({
-          anonymousToken: attempt.anonymousToken,
-          studentName: attempt.studentName,
-        })
-        .from(attempt)
-        .where(eq(attempt.assignmentId, row.assignment.id));
-      const attemptCount = previousAttempts.filter((item) =>
-        isSameStudentIdentity(item, { anonymousToken, studentName })
-      ).length;
+      const attemptCount = await countPreviousIdentityAttempts({
+        anonymousToken: submissionIdentity.anonymousToken ?? '',
+        assignmentId: row.assignment.id,
+        studentName: submissionIdentity.studentName ?? '',
+      });
       if (attemptCount >= settings.maxAttempts) {
         throw new Error('This assignment has reached its attempt limit.');
       }
@@ -524,8 +522,8 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       resultJson: evaluation.result,
       score: evaluation.result.earnedPoints,
       startedAt: now,
-      anonymousToken: anonymousToken || null,
-      studentName: studentName || null,
+      anonymousToken: submissionIdentity.anonymousToken,
+      studentName: submissionIdentity.studentName,
     });
 
     return {
@@ -538,3 +536,50 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       result: evaluation.result,
     };
   });
+
+async function countPreviousIdentityAttempts({
+  anonymousToken,
+  assignmentId,
+  studentName,
+}: {
+  anonymousToken: string;
+  assignmentId: string;
+  studentName: string;
+}) {
+  const db = getDb();
+  const strategy = resolveAttemptIdentityCountStrategy({
+    anonymousToken,
+    studentName,
+  });
+
+  if (strategy.type === 'anonymous-token') {
+    const [row] = await db
+      .select({ count: count() })
+      .from(attempt)
+      .where(
+        and(
+          eq(attempt.assignmentId, assignmentId),
+          eq(attempt.anonymousToken, strategy.identity.anonymousToken)
+        )
+      );
+
+    return row?.count ?? 0;
+  }
+
+  if (strategy.type === 'normalized-student-name') {
+    const previousAttempts = await db
+      .select({
+        anonymousToken: attempt.anonymousToken,
+        studentName: attempt.studentName,
+      })
+      .from(attempt)
+      .where(eq(attempt.assignmentId, assignmentId));
+
+    return countMatchingStudentIdentityAttempts({
+      attempts: previousAttempts,
+      identity: strategy.identity,
+    });
+  }
+
+  return 0;
+}

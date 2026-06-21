@@ -43,6 +43,13 @@
       "when": 1781893604463,
       "tag": "0005_puzzling_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1782084230552,
+      "tag": "0006_living_joseph",
+      "breakpoints": true
     }
   ]
 }

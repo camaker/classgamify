@@ -288,6 +288,11 @@ import {
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
 import {
+  countMatchingStudentIdentityAttempts,
+  resolveAttemptIdentityCountStrategy,
+  resolveAttemptSubmissionIdentity,
+} from '@/assignments/attempt-identity-query';
+import {
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
   buildStudentRunnerReadyState,
@@ -385,6 +390,112 @@ assert.equal(
     storage: anonymousTokenStore,
   }),
   'anon-token-3'
+);
+assert.deepEqual(
+  resolveAttemptIdentityCountStrategy({
+    anonymousToken: ' anonymous-token-1 ',
+    studentName: '   ',
+  }),
+  {
+    identity: {
+      anonymousToken: 'anonymous-token-1',
+    },
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptIdentityCountStrategy({
+    anonymousToken: 'stale-token',
+    studentName: ' Ava   Chen ',
+  }),
+  {
+    identity: {
+      studentName: 'Ava Chen',
+    },
+    type: 'normalized-student-name',
+  }
+);
+assert.deepEqual(
+  resolveAttemptIdentityCountStrategy({
+    anonymousToken: ' ',
+    studentName: ' ',
+  }),
+  {
+    type: 'unknown',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
+    anonymousToken: ' stale-token ',
+    collectStudentName: true,
+    studentName: ' Ava   Chen ',
+  }),
+  {
+    anonymousToken: null,
+    studentName: 'Ava Chen',
+    type: 'student-name',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
+    anonymousToken: ' anonymous-token-1 ',
+    collectStudentName: false,
+    studentName: 'Stale Name',
+  }),
+  {
+    anonymousToken: 'anonymous-token-1',
+    studentName: null,
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
+    collectStudentName: true,
+    studentName: '   ',
+  }),
+  {
+    anonymousToken: null,
+    studentName: null,
+    type: 'missing',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
+    anonymousToken: '   ',
+    collectStudentName: false,
+  }),
+  {
+    anonymousToken: null,
+    studentName: null,
+    type: 'missing',
+  }
+);
+assert.equal(
+  countMatchingStudentIdentityAttempts({
+    attempts: [
+      { anonymousToken: null, studentName: ' Ava   Chen ' },
+      { anonymousToken: 'ignored-token', studentName: 'ava chen' },
+      { anonymousToken: 'anonymous-token-1', studentName: null },
+      { anonymousToken: 'anonymous-token-1', studentName: 'Different' },
+    ],
+    identity: {
+      studentName: 'AVA CHEN',
+    },
+  }),
+  2
+);
+assert.equal(
+  countMatchingStudentIdentityAttempts({
+    attempts: [
+      { anonymousToken: ' anonymous-token-1 ', studentName: null },
+      { anonymousToken: 'anonymous-token-1', studentName: null },
+      { anonymousToken: 'anonymous-token-2', studentName: null },
+    ],
+    identity: {
+      anonymousToken: 'anonymous-token-1',
+    },
+  }),
+  2
 );
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   description:

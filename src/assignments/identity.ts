@@ -2,7 +2,7 @@ const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
 export const ANONYMOUS_BROWSER_LABEL = 'Anonymous browser';
 const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
 
-type StudentIdentitySource = {
+export type StudentIdentitySource = {
   anonymousToken?: string | null;
   studentName?: string | null;
 };

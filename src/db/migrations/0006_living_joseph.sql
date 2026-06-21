@@ -1,0 +1,2 @@
+CREATE INDEX `attempt_assignment_anonymous_token_idx` ON `attempt` (`assignment_id`,`anonymous_token`);--> statement-breakpoint
+CREATE INDEX `attempt_assignment_student_name_idx` ON `attempt` (`assignment_id`,`student_name`);
