@@ -16,7 +16,7 @@ import {
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
-import { getTemplateRemixPlan } from '@/activities/template-remix';
+import { buildActivityLibraryCardSummary } from '@/activities/library-summary';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -541,9 +541,9 @@ function ActivityCard({
   const template = getTemplateByType(activity.templateType);
   const isArchived = isActivityArchived(activity.status);
   const canCreateDerivedWork = canDeriveActivityWork(activity.status);
-  const remixPlan = getTemplateRemixPlan({
+  const cardSummary = buildActivityLibraryCardSummary({
     content: activity.content,
-    currentTemplateType: template.type,
+    templateType: template.type,
   });
 
   async function publishActivity() {
@@ -707,10 +707,13 @@ function ActivityCard({
         <div className="grid gap-3 sm:grid-cols-3">
           <ActivityStat
             label="Questions"
-            value={activity.content.questions.length}
+            value={cardSummary.contentCounts.questions}
           />
-          <ActivityStat label="Pairs" value={activity.content.pairs.length} />
-          <ActivityStat label="Groups" value={activity.content.groups.length} />
+          <ActivityStat label="Pairs" value={cardSummary.contentCounts.pairs} />
+          <ActivityStat
+            label="Groups"
+            value={cardSummary.contentCounts.groups}
+          />
         </div>
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -718,56 +721,61 @@ function ActivityCard({
             Compatible template families
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {remixPlan?.readyOptions.map((option) => (
+            {cardSummary.readyTemplateOptions.map((option) => (
               <Badge
-                key={option.template.type}
-                variant={option.isCurrent ? 'secondary' : 'outline'}
+                key={option.template}
+                variant={
+                  option.template === activity.templateType
+                    ? 'secondary'
+                    : 'outline'
+                }
                 className="rounded-md"
               >
-                {option.template.shortName}
+                {option.shortName}
               </Badge>
             ))}
           </div>
-          {remixPlan?.suggestedOptions.length ? (
+          {cardSummary.suggestedTemplateOptions.length ? (
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
               Ready to remix into{' '}
-              {remixPlan.suggestedOptions
-                .map((option) => option.template.shortName)
+              {cardSummary.suggestedTemplateOptions
+                .map((option) => option.shortName)
                 .join(', ')}
               .
             </p>
           ) : null}
           {activity.persisted &&
           canCreateDerivedWork &&
-          remixPlan?.suggestedOptions.length ? (
+          cardSummary.suggestedTemplateOptions.length ? (
             <div className="mt-3 flex flex-wrap gap-2">
-              {remixPlan.suggestedOptions.slice(0, 3).map((option) => (
-                <Button
-                  key={option.template.type}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="bg-background"
-                  disabled={remixMutation.isPending}
-                  onClick={() => remixActivity(option.template.type)}
-                >
-                  <IconSwitchHorizontal className="size-4" />
-                  Copy as {option.template.shortName}
-                </Button>
-              ))}
+              {cardSummary.suggestedTemplateOptions
+                .slice(0, 3)
+                .map((option) => (
+                  <Button
+                    key={option.template}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background"
+                    disabled={remixMutation.isPending}
+                    onClick={() => remixActivity(option.template)}
+                  >
+                    <IconSwitchHorizontal className="size-4" />
+                    Copy as {option.shortName}
+                  </Button>
+                ))}
             </div>
           ) : null}
-          {remixPlan?.options.some((option) => !option.isReady) ? (
+          {cardSummary.lockedTemplateDiagnostics.length ? (
             <div className="mt-3 grid gap-1.5">
-              {remixPlan.options
-                .filter((option) => !option.isReady)
+              {cardSummary.lockedTemplateDiagnostics
                 .slice(0, 2)
-                .map((option) => (
+                .map((diagnosis) => (
                   <p
-                    key={option.template.type}
+                    key={diagnosis}
                     className="text-xs leading-5 text-muted-foreground"
                   >
-                    {option.diagnosis}
+                    {diagnosis}
                   </p>
                 ))}
             </div>

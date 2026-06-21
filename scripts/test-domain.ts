@@ -3,6 +3,10 @@ import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
+  buildActivityLibraryCardSummary,
+  summarizeActivityLibrary,
+} from '@/activities/library-summary';
+import {
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
@@ -654,6 +658,30 @@ assert.deepEqual(
   )?.missingRequirements,
   ['groups']
 );
+const questionOnlyCardSummary = buildActivityLibraryCardSummary({
+  content: questionOnlyContent,
+  templateType: 'quiz',
+});
+assert.deepEqual(questionOnlyCardSummary.contentCounts, {
+  groups: 0,
+  pairs: 0,
+  questions: 2,
+});
+assert.deepEqual(
+  questionOnlyCardSummary.readyTemplateOptions.map((option) => option.template),
+  ['quiz', 'fill-blank', 'listening', 'open-box']
+);
+assert.deepEqual(
+  questionOnlyCardSummary.suggestedTemplateOptions.map(
+    (option) => option.template
+  ),
+  ['fill-blank', 'listening', 'open-box']
+);
+assert.ok(
+  questionOnlyCardSummary.lockedTemplateDiagnostics.includes(
+    'Add match pairs to unlock Match.'
+  )
+);
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
 assert.equal(formatTemplateRequirementList(['questions']), 'questions');
@@ -665,6 +693,40 @@ assert.equal(
   formatTemplateRequirementList(['questions', 'match pairs', 'groups']),
   'questions, match pairs, and groups'
 );
+const completeScaffoldContent = buildActivityContent({
+  ...getActivityTemplateScaffold('group-sort'),
+  difficulty: 'starter',
+  gradeBand: 'Primary',
+  language: 'en',
+  templateType: 'group-sort',
+  visibility: 'draft',
+});
+const completeScaffoldCardSummary = buildActivityLibraryCardSummary({
+  content: completeScaffoldContent,
+  templateType: 'group-sort',
+});
+const librarySummary = summarizeActivityLibrary([
+  {
+    contentJson: questionOnlyContent,
+    templateType: 'quiz',
+    visibility: 'draft',
+  },
+  {
+    contentJson: completeScaffoldContent,
+    templateType: 'group-sort',
+    visibility: 'archived',
+  },
+]);
+assert.equal(librarySummary.totalActivities, 2);
+assert.equal(librarySummary.draftActivities, 1);
+assert.equal(librarySummary.archivedActivities, 1);
+assert.equal(librarySummary.templateCoverage, 2);
+assert.equal(
+  librarySummary.totalReadyTemplateOptions,
+  questionOnlyCardSummary.readyTemplateOptions.length +
+    completeScaffoldCardSummary.readyTemplateOptions.length
+);
+assert.equal(librarySummary.remixReadyActivities, 2);
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);
   const input = createActivityInputSchema.parse({
