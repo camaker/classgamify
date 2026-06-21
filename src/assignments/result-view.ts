@@ -61,6 +61,7 @@ export type AssignmentResultCopyAction = Exclude<
 type AssignmentResultActionButton = {
   action: AssignmentResultAction;
   disabled: boolean;
+  gate: AssignmentResultActionGate;
   label: string;
 };
 
@@ -356,6 +357,7 @@ export function buildAssignmentResultActionButtons({
     return {
       action,
       disabled: gate.type === 'blocked',
+      gate,
       label: getAssignmentResultActionCopy(action).label,
     };
   });

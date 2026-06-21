@@ -4497,15 +4497,51 @@ assert.deepEqual(emptyAssignmentResultActionState, {
 assert.deepEqual(
   buildAssignmentResultActionButtons(emptyAssignmentResultActionState),
   [
-    { action: 'copy-brief', disabled: true, label: 'Copy brief' },
+    {
+      action: 'copy-brief',
+      disabled: true,
+      gate: {
+        message: 'Submit at least one attempt before copying a brief.',
+        type: 'blocked',
+      },
+      label: 'Copy brief',
+    },
     {
       action: 'copy-reteach-plan',
       disabled: true,
+      gate: {
+        message: 'Submit at least one attempt before copying a reteach plan.',
+        type: 'blocked',
+      },
       label: 'Copy reteach plan',
     },
-    { action: 'copy-item-review', disabled: true, label: 'Copy item review' },
-    { action: 'copy-follow-up', disabled: true, label: 'Copy follow-up' },
-    { action: 'export-csv', disabled: true, label: 'Download CSV' },
+    {
+      action: 'copy-item-review',
+      disabled: true,
+      gate: {
+        message: 'Add assignment items before copying item review.',
+        type: 'blocked',
+      },
+      label: 'Copy item review',
+    },
+    {
+      action: 'copy-follow-up',
+      disabled: true,
+      gate: {
+        message: 'Submit at least one attempt before copying follow-up.',
+        type: 'blocked',
+      },
+      label: 'Copy follow-up',
+    },
+    {
+      action: 'export-csv',
+      disabled: true,
+      gate: {
+        message: 'Submit at least one attempt before exporting results.',
+        type: 'blocked',
+      },
+      label: 'Download CSV',
+    },
   ]
 );
 const readyAssignmentResultActionState = buildAssignmentResultActionState({
@@ -4517,15 +4553,36 @@ const readyAssignmentResultActionState = buildAssignmentResultActionState({
 assert.deepEqual(
   buildAssignmentResultActionButtons(readyAssignmentResultActionState),
   [
-    { action: 'copy-brief', disabled: false, label: 'Copy brief' },
+    {
+      action: 'copy-brief',
+      disabled: false,
+      gate: { type: 'ready' },
+      label: 'Copy brief',
+    },
     {
       action: 'copy-reteach-plan',
       disabled: false,
+      gate: { type: 'ready' },
       label: 'Copy reteach plan',
     },
-    { action: 'copy-item-review', disabled: false, label: 'Copy item review' },
-    { action: 'copy-follow-up', disabled: false, label: 'Copy follow-up' },
-    { action: 'export-csv', disabled: false, label: 'Download CSV' },
+    {
+      action: 'copy-item-review',
+      disabled: false,
+      gate: { type: 'ready' },
+      label: 'Copy item review',
+    },
+    {
+      action: 'copy-follow-up',
+      disabled: false,
+      gate: { type: 'ready' },
+      label: 'Copy follow-up',
+    },
+    {
+      action: 'export-csv',
+      disabled: false,
+      gate: { type: 'ready' },
+      label: 'Download CSV',
+    },
   ]
 );
 assert.deepEqual(

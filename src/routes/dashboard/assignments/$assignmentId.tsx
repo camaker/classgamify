@@ -32,7 +32,6 @@ import {
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
   getAssignmentResultActionCopy,
-  getAssignmentResultActionGateFromState,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
@@ -200,17 +199,10 @@ function AssignmentResultsPage() {
     });
   }
 
-  function getActionGate(action: AssignmentResultAction) {
-    return getAssignmentResultActionGateFromState({
-      action,
-      state: resultActionState,
-    });
-  }
-
   async function handleExportResults() {
     const action = 'export-csv';
     const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getActionGate(action);
+    const actionGate = getResultActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -230,7 +222,7 @@ function AssignmentResultsPage() {
 
   async function handleCopyResultText(action: AssignmentResultCopyAction) {
     const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getActionGate(action);
+    const actionGate = getResultActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -273,6 +265,20 @@ function AssignmentResultsPage() {
   });
   const resultActionButtons =
     buildAssignmentResultActionButtons(resultActionState);
+  const resultActionGateByAction = new Map(
+    resultActionButtons.map((actionButton) => [
+      actionButton.action,
+      actionButton.gate,
+    ])
+  );
+  function getResultActionGate(action: AssignmentResultAction) {
+    return (
+      resultActionGateByAction.get(action) ?? {
+        message: getAssignmentResultActionCopy(action).failureMessage,
+        type: 'blocked',
+      }
+    );
+  }
   const resultSectionState = buildAssignmentResultSectionState({
     attemptCount: data?.attempts.length ?? 0,
     attemptReviewCount: data?.analysis.attempts.length ?? 0,
