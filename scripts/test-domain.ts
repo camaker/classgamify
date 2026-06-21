@@ -60,6 +60,7 @@ import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
   buildActivityDerivativeActionGate,
+  buildActivityEditAccessView,
   buildActivityLifecycleActionView,
   canDeriveActivityWork,
   getActivityLifecycleActionCopy,
@@ -2591,6 +2592,20 @@ assert.deepEqual(
     successMessage: 'Assignment link published.',
   }
 );
+assert.deepEqual(buildActivityEditAccessView('draft'), {
+  actionLabel: 'Edit activity',
+  canEdit: true,
+  description:
+    'Update reusable activity content before publishing or reusing it across templates.',
+  title: 'Edit reusable activity',
+});
+assert.deepEqual(buildActivityEditAccessView('archived'), {
+  actionLabel: 'Open archived activities',
+  canEdit: false,
+  description:
+    'Restore this activity from the archived library before editing its structured content.',
+  title: 'Activity is archived.',
+});
 assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),

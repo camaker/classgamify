@@ -28,6 +28,21 @@ type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
   gate: ActivityDerivativeActionGate;
 };
 
+const activityEditAccessCopy = {
+  archived: {
+    actionLabel: 'Open archived activities',
+    description:
+      'Restore this activity from the archived library before editing its structured content.',
+    title: 'Activity is archived.',
+  },
+  ready: {
+    actionLabel: 'Edit activity',
+    description:
+      'Update reusable activity content before publishing or reusing it across templates.',
+    title: 'Edit reusable activity',
+  },
+} as const;
+
 export function isActivityArchived(visibility: ActivityVisibility) {
   return visibility === 'archived';
 }
@@ -104,6 +119,20 @@ export function buildActivityLifecycleActionView({
       action,
       visibility,
     }),
+  };
+}
+
+export function buildActivityEditAccessView(visibility: ActivityVisibility) {
+  if (isActivityArchived(visibility)) {
+    return {
+      ...activityEditAccessCopy.archived,
+      canEdit: false,
+    };
+  }
+
+  return {
+    ...activityEditAccessCopy.ready,
+    canEdit: true,
   };
 }
 
