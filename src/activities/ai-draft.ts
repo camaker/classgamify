@@ -469,9 +469,27 @@ function buildFallbackQuestions({
       case 'open-box':
         return `Open the box: explain or name the ${input.subject} idea from this lesson. | ${term} | | Model answer: ${term}. ${explanation}`;
       default:
-        return `Which item belongs in this lesson set: ${term}? | ${term} | ${choices} | ${explanation}`;
+        return `${buildFallbackQuizPrompt({ input, term })} | ${term} | ${choices} | ${explanation}`;
     }
   });
+}
+
+function buildFallbackQuizPrompt({
+  input,
+  term,
+}: {
+  input: GenerateActivityDraftInput;
+  term: string;
+}) {
+  const characterCount = Array.from(term).length;
+  const characterCountLabel = `${characterCount} ${
+    characterCount === 1 ? 'character' : 'characters'
+  }`;
+  const firstCharacter = Array.from(term.trim()).find(Boolean) ?? term;
+
+  return `Which ${input.subject} lesson term starts with ${JSON.stringify(
+    firstCharacter
+  )} and has ${characterCountLabel}?`;
 }
 
 function buildFallbackPairs({

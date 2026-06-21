@@ -4183,6 +4183,28 @@ assert.ok(
   )
 );
 assert.equal(getRuntimeItems('fill-blank', fallbackFillBlankContent).length, 3);
+const fallbackQuizDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  itemCount: 3,
+  language: 'en',
+  sourceText: 'weather, sunny, rainy, windy',
+  subject: 'Science',
+  templateType: 'quiz',
+});
+const fallbackQuizContent = buildActivityContent(fallbackQuizDraft);
+const fallbackQuizRuntimeItems = getRuntimeItems('quiz', fallbackQuizContent);
+assert.equal(fallbackQuizContent.questions[0]?.answer, 'weather');
+assert.equal(
+  fallbackQuizContent.questions[0]?.prompt.includes('weather'),
+  false
+);
+assert.match(
+  fallbackQuizContent.questions[0]?.prompt ?? '',
+  /starts with "w" and has 7 characters/
+);
+assert.ok(fallbackQuizRuntimeItems[0]?.choices?.includes('weather') ?? false);
+assert.equal(fallbackQuizRuntimeItems.length, 3);
 const fallbackListeningDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
