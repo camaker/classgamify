@@ -6,7 +6,12 @@ import {
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
-import type { ActivityVisibility } from '@/activities/types';
+import type {
+  ActivityContent,
+  ActivitySeed,
+  ActivityTemplateType,
+  ActivityVisibility,
+} from '@/activities/types';
 
 type ActivityLibraryStatusOption = {
   label: string;
@@ -38,6 +43,25 @@ type ActivityLibraryCardActionState = {
   showRestoreAction: boolean;
   showRestoreRequiredMessage: boolean;
   showRemixActions: boolean;
+};
+
+type PersistedActivityLibraryCardSource = {
+  contentJson: ActivityContent;
+  description: string | null;
+  id: string;
+  templateType: ActivityTemplateType;
+  title: string;
+  visibility: ActivityVisibility;
+};
+
+type ActivityLibraryCardViewModel = {
+  content: ActivityContent;
+  description: string;
+  id: string;
+  persisted: boolean;
+  status: ActivityVisibility;
+  templateType: ActivityTemplateType;
+  title: string;
 };
 
 export const activityLibraryPageCopy = {
@@ -159,6 +183,34 @@ export function buildActivityLibraryCardStats({
     { key: 'pairs', label: 'Pairs', value: pairs },
     { key: 'groups', label: 'Groups', value: groups },
   ];
+}
+
+export function buildActivityLibraryCardViewModel(
+  activity: PersistedActivityLibraryCardSource
+): ActivityLibraryCardViewModel {
+  return {
+    content: activity.contentJson,
+    description: activity.description ?? '',
+    id: activity.id,
+    persisted: true,
+    status: activity.visibility,
+    templateType: activity.templateType,
+    title: activity.title,
+  };
+}
+
+export function buildStarterActivityLibraryCardViewModel(
+  activity: ActivitySeed
+): ActivityLibraryCardViewModel {
+  return {
+    content: activity.content,
+    description: activity.description,
+    id: activity.id,
+    persisted: false,
+    status: activity.status,
+    templateType: activity.templateType,
+    title: activity.title,
+  };
 }
 
 export function buildActivityLibraryRemixHint(shortNames: string[]) {

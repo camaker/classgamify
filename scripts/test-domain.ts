@@ -16,9 +16,11 @@ import {
   activityLibrarySearchCopy,
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
+  buildActivityLibraryCardViewModel,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
+  buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import {
   buildActivityLibraryRouteSearch,
@@ -39,6 +41,7 @@ import {
   activityTemplateByType,
   activityTemplates,
   formatActivityTemplateClassroomMode,
+  starterActivities,
 } from '@/activities/catalog';
 import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
@@ -2104,6 +2107,37 @@ assert.deepEqual(
     { key: 'groups', label: 'Groups', value: 2 },
   ]
 );
+const starterActivityCardView = buildStarterActivityLibraryCardViewModel(
+  starterActivities[0]
+);
+assert.deepEqual(
+  buildActivityLibraryCardViewModel({
+    contentJson: starterActivities[0].content,
+    description: null,
+    id: 'persisted-activity-1',
+    templateType: 'line-match',
+    title: 'Persisted line match',
+    visibility: 'private',
+  }),
+  {
+    content: starterActivities[0].content,
+    description: '',
+    id: 'persisted-activity-1',
+    persisted: true,
+    status: 'private',
+    templateType: 'line-match',
+    title: 'Persisted line match',
+  }
+);
+assert.deepEqual(starterActivityCardView, {
+  content: starterActivities[0].content,
+  description: starterActivities[0].description,
+  id: starterActivities[0].id,
+  persisted: false,
+  status: starterActivities[0].status,
+  templateType: starterActivities[0].templateType,
+  title: starterActivities[0].title,
+});
 assert.equal(
   buildActivityLibraryRemixHint(['Quiz', ' Fill ', '']),
   'Ready to remix into Quiz, Fill.'

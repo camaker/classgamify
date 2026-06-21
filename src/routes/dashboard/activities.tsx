@@ -31,15 +31,12 @@ import {
   activityLibrarySearchCopy,
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
+  buildActivityLibraryCardViewModel,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
+  buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
-import type {
-  ActivityContent,
-  ActivityTemplateType,
-  ActivityVisibility,
-} from '@/activities/types';
 import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
@@ -106,17 +103,9 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-type ActivityCardData = {
-  content: ActivityContent;
-  description: string;
-  id: string;
-  persisted: boolean;
-  status: ActivityVisibility;
-  templateType: ActivityTemplateType;
-  title: string;
-};
-
 const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
+
+type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -294,15 +283,7 @@ function DashboardActivitiesPage() {
               {activities.map((activity) => (
                 <ActivityCard
                   key={activity.id}
-                  activity={{
-                    content: activity.contentJson,
-                    description: activity.description ?? '',
-                    id: activity.id,
-                    persisted: true,
-                    status: activity.visibility,
-                    templateType: activity.templateType,
-                    title: activity.title,
-                  }}
+                  activity={buildActivityLibraryCardViewModel(activity)}
                   libraryStatus={libraryStatus}
                 />
               ))}
@@ -357,15 +338,9 @@ function DashboardActivitiesPage() {
                 {starterActivities.map((activity) => (
                   <ActivityCard
                     key={activity.id}
-                    activity={{
-                      content: activity.content,
-                      description: activity.description,
-                      id: activity.id,
-                      persisted: false,
-                      status: activity.status,
-                      templateType: activity.templateType,
-                      title: activity.title,
-                    }}
+                    activity={buildStarterActivityLibraryCardViewModel(
+                      activity
+                    )}
                     libraryStatus="active"
                   />
                 ))}
