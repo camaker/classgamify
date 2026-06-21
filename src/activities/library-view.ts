@@ -2,13 +2,15 @@ import type {
   ActivityLibraryStatus,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
+import { getTemplateByType } from '@/activities/catalog';
 import {
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
-import type {
-  ActivityLibraryCardSummary,
-  ActivityLibraryTemplateOption,
+import {
+  buildActivityLibraryCardSummary,
+  type ActivityLibraryCardSummary,
+  type ActivityLibraryTemplateOption,
 } from '@/activities/library-summary';
 import type {
   ActivityContent,
@@ -81,6 +83,14 @@ type ActivityLibraryCardViewModel = {
   status: ActivityVisibility;
   templateType: ActivityTemplateType;
   title: string;
+};
+
+type ActivityLibraryCardDisplayView = {
+  actionState: ActivityLibraryCardActionState;
+  compatibility: ActivityLibraryCompatibilityView;
+  stats: ActivityLibraryCardStat[];
+  templateName: string;
+  templateType: ActivityTemplateType;
 };
 
 export const activityLibraryPageCopy = {
@@ -229,6 +239,40 @@ export function buildStarterActivityLibraryCardViewModel(
     status: activity.status,
     templateType: activity.templateType,
     title: activity.title,
+  };
+}
+
+export function buildActivityLibraryCardDisplayView({
+  activity,
+  libraryStatus,
+}: {
+  activity: ActivityLibraryCardViewModel;
+  libraryStatus: ActivityLibraryStatus;
+}): ActivityLibraryCardDisplayView {
+  const template = getTemplateByType(activity.templateType);
+  const summary = buildActivityLibraryCardSummary({
+    content: activity.content,
+    templateType: template.type,
+  });
+
+  return {
+    actionState: buildActivityLibraryCardActionState({
+      libraryStatus,
+      persisted: activity.persisted,
+      readyRemixCount: summary.suggestedTemplateOptions.length,
+      visibility: activity.status,
+    }),
+    compatibility: buildActivityLibraryCompatibilityView({
+      currentTemplateType: activity.templateType,
+      summary,
+    }),
+    stats: buildActivityLibraryCardStats({
+      groups: summary.contentCounts.groups,
+      pairs: summary.contentCounts.pairs,
+      questions: summary.contentCounts.questions,
+    }),
+    templateName: template.name,
+    templateType: template.type,
   };
 }
 

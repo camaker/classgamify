@@ -1,8 +1,4 @@
-import {
-  activityTemplates,
-  getTemplateByType,
-  starterActivities,
-} from '@/activities/catalog';
+import { activityTemplates, starterActivities } from '@/activities/catalog';
 import {
   type ActivityDerivativeAction,
   buildActivityDerivativeActionGate,
@@ -18,7 +14,6 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
-  buildActivityLibraryCardSummary,
   buildActivityLibraryFilterSummary,
   buildActivityLibrarySummaryMetrics,
   type ActivityLibrarySummaryMetric,
@@ -29,10 +24,8 @@ import {
   activityLibraryCardCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
-  buildActivityLibraryCardActionState,
-  buildActivityLibraryCardStats,
+  buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardViewModel,
-  buildActivityLibraryCompatibilityView,
   buildActivityLibraryEmptyStateView,
   buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
@@ -555,25 +548,9 @@ function ActivityCard({
     isPublishing: publishMutation.isPending,
     validation: publishValidation,
   });
-  const template = getTemplateByType(activity.templateType);
-  const cardSummary = buildActivityLibraryCardSummary({
-    content: activity.content,
-    templateType: template.type,
-  });
-  const cardActionState = buildActivityLibraryCardActionState({
+  const cardDisplayView = buildActivityLibraryCardDisplayView({
+    activity,
     libraryStatus,
-    persisted: activity.persisted,
-    readyRemixCount: cardSummary.suggestedTemplateOptions.length,
-    visibility: activity.status,
-  });
-  const cardStats = buildActivityLibraryCardStats({
-    groups: cardSummary.contentCounts.groups,
-    pairs: cardSummary.contentCounts.pairs,
-    questions: cardSummary.contentCounts.questions,
-  });
-  const compatibilityView = buildActivityLibraryCompatibilityView({
-    currentTemplateType: activity.templateType,
-    summary: cardSummary,
   });
 
   function getDerivativeActionGate(action: ActivityDerivativeAction) {
@@ -693,7 +670,7 @@ function ActivityCard({
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconDeviceGamepad2 className="size-3.5" />
-            {template.name}
+            {cardDisplayView.templateName}
           </Badge>
         </div>
         <CardTitle>
@@ -705,7 +682,7 @@ function ActivityCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-3">
-          {cardStats.map((stat) => (
+          {cardDisplayView.stats.map((stat) => (
             <ActivityStat
               key={stat.key}
               label={stat.label}
@@ -719,55 +696,61 @@ function ActivityCard({
             {activityLibraryCardCopy.compatibleTemplatesLabel}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {compatibilityView.readyTemplateOptions.map((option) => (
-              <Badge
-                key={option.template}
-                variant={option.isCurrent ? 'secondary' : 'outline'}
-                className="rounded-md"
-              >
-                {option.shortName}
-              </Badge>
-            ))}
+            {cardDisplayView.compatibility.readyTemplateOptions.map(
+              (option) => (
+                <Badge
+                  key={option.template}
+                  variant={option.isCurrent ? 'secondary' : 'outline'}
+                  className="rounded-md"
+                >
+                  {option.shortName}
+                </Badge>
+              )
+            )}
           </div>
-          {compatibilityView.remixHint ? (
+          {cardDisplayView.compatibility.remixHint ? (
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              {compatibilityView.remixHint}
+              {cardDisplayView.compatibility.remixHint}
             </p>
           ) : null}
-          {cardActionState.showRemixActions ? (
+          {cardDisplayView.actionState.showRemixActions ? (
             <div className="mt-3 flex flex-wrap gap-2">
-              {compatibilityView.remixActionOptions.map((option) => (
-                <Button
-                  key={option.template}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="bg-background"
-                  disabled={remixMutation.isPending}
-                  onClick={() => remixActivity(option.template)}
-                >
-                  <IconSwitchHorizontal className="size-4" />
-                  {option.actionLabel}
-                </Button>
-              ))}
+              {cardDisplayView.compatibility.remixActionOptions.map(
+                (option) => (
+                  <Button
+                    key={option.template}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background"
+                    disabled={remixMutation.isPending}
+                    onClick={() => remixActivity(option.template)}
+                  >
+                    <IconSwitchHorizontal className="size-4" />
+                    {option.actionLabel}
+                  </Button>
+                )
+              )}
             </div>
           ) : null}
-          {compatibilityView.lockedTemplateDiagnostics.length ? (
+          {cardDisplayView.compatibility.lockedTemplateDiagnostics.length ? (
             <div className="mt-3 grid gap-1.5">
-              {compatibilityView.lockedTemplateDiagnostics.map((diagnosis) => (
-                <p
-                  key={diagnosis}
-                  className="text-xs leading-5 text-muted-foreground"
-                >
-                  {diagnosis}
-                </p>
-              ))}
+              {cardDisplayView.compatibility.lockedTemplateDiagnostics.map(
+                (diagnosis) => (
+                  <p
+                    key={diagnosis}
+                    className="text-xs leading-5 text-muted-foreground"
+                  >
+                    {diagnosis}
+                  </p>
+                )
+              )}
             </div>
           ) : null}
         </div>
-        {cardActionState.showPersistedActions ? (
+        {cardDisplayView.actionState.showPersistedActions ? (
           <div className="flex flex-col gap-2 sm:flex-row">
-            {cardActionState.showEditAction ? (
+            {cardDisplayView.actionState.showEditAction ? (
               <Link
                 to="/dashboard/activities/$activityId"
                 params={{ activityId: activity.id }}
@@ -780,7 +763,7 @@ function ActivityCard({
                 {activityLibraryCardCopy.actionLabels.edit}
               </Link>
             ) : null}
-            {cardActionState.showDerivativeActions ? (
+            {cardDisplayView.actionState.showDerivativeActions ? (
               <Button
                 type="button"
                 variant="outline"
@@ -792,10 +775,10 @@ function ActivityCard({
                 {activityLibraryCardCopy.actionLabels.duplicate}
               </Button>
             ) : null}
-            {cardActionState.showArchiveAction ||
-            cardActionState.showPublishAction ? (
+            {cardDisplayView.actionState.showArchiveAction ||
+            cardDisplayView.actionState.showPublishAction ? (
               <>
-                {cardActionState.showArchiveAction ? (
+                {cardDisplayView.actionState.showArchiveAction ? (
                   <Button
                     type="button"
                     variant="outline"
@@ -807,7 +790,7 @@ function ActivityCard({
                     {activityLibraryCardCopy.actionLabels.archive}
                   </Button>
                 ) : null}
-                {cardActionState.showPublishAction ? (
+                {cardDisplayView.actionState.showPublishAction ? (
                   <Button
                     type="button"
                     className="w-full sm:w-fit"
@@ -821,12 +804,12 @@ function ActivityCard({
               </>
             ) : (
               <>
-                {cardActionState.showRestoreRequiredMessage ? (
+                {cardDisplayView.actionState.showRestoreRequiredMessage ? (
                   <p className="text-sm text-muted-foreground sm:mr-auto">
                     {activityLibraryCardCopy.restoreRequiredMessage}
                   </p>
                 ) : null}
-                {cardActionState.showRestoreAction ? (
+                {cardDisplayView.actionState.showRestoreAction ? (
                   <Button
                     type="button"
                     className="w-full sm:w-fit"

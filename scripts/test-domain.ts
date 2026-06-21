@@ -16,6 +16,7 @@ import {
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
   buildActivityLibraryCardActionState,
+  buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardStats,
   buildActivityLibraryCardViewModel,
   buildActivityLibraryCompatibilityView,
@@ -2692,6 +2693,26 @@ assert.deepEqual(starterActivityCardView, {
   templateType: starterActivities[0].templateType,
   title: starterActivities[0].title,
 });
+const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
+  activity: starterActivityCardView,
+  libraryStatus: 'active',
+});
+assert.equal(starterActivityDisplayView.templateName, 'Quiz');
+assert.equal(starterActivityDisplayView.templateType, 'quiz');
+assert.deepEqual(starterActivityDisplayView.stats, [
+  { key: 'questions', label: 'Questions', value: 3 },
+  { key: 'pairs', label: 'Pairs', value: 4 },
+  { key: 'groups', label: 'Groups', value: 2 },
+]);
+assert.equal(
+  starterActivityDisplayView.actionState.showPersistedActions,
+  false
+);
+assert.ok(
+  starterActivityDisplayView.compatibility.readyTemplateOptions.some(
+    (option) => option.template === 'quiz' && option.isCurrent
+  )
+);
 assert.equal(
   buildActivityLibraryRemixHint(['Quiz', ' Fill ', '']),
   'Ready to remix into Quiz, Fill.'
