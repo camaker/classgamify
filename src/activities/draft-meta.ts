@@ -57,6 +57,17 @@ export type ActivityTemplateReadinessPanelSummary = {
   readyOptions: ActivityTemplateReadinessPanelOption[];
 };
 
+type ActivityDraftProvider = 'fallback' | 'workers-ai';
+
+type ActivityDraftMetaSummaryView = {
+  coverageStats: Array<{
+    label: string;
+    value: number;
+  }>;
+  providerLabel: string;
+  readyTemplateLabel: string;
+};
+
 export function buildActivityDraftMeta({
   activity,
   currentTemplateType,
@@ -116,6 +127,28 @@ export function buildActivityDraftMeta({
       shortName: option.template.shortName,
       template: option.template.type,
     })),
+  };
+}
+
+export function buildActivityDraftMetaSummaryView({
+  meta,
+  provider,
+}: {
+  meta: ActivityDraftMeta;
+  provider: ActivityDraftProvider;
+}): ActivityDraftMetaSummaryView {
+  return {
+    coverageStats: [
+      { label: 'Questions', value: meta.coverage.questions },
+      { label: 'Pairs', value: meta.coverage.pairs },
+      { label: 'Groups', value: meta.coverage.groups },
+      { label: 'Vocab', value: meta.coverage.vocabulary },
+      { label: 'Notes', value: meta.coverage.teacherNotes },
+    ],
+    providerLabel: provider === 'workers-ai' ? 'Workers AI' : 'Fallback',
+    readyTemplateLabel: `${meta.readyTemplateCount} ready ${
+      meta.readyTemplateCount === 1 ? 'template' : 'templates'
+    }`,
   };
 }
 

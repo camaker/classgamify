@@ -46,6 +46,7 @@ import {
 } from '@/activities/draft-source';
 import {
   buildActivityDraftMeta,
+  buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import {
@@ -3122,6 +3123,40 @@ assert.ok(
   fallbackDraftMeta.reviewChecklist.some((item) =>
     item.includes('Ready to remix after saving')
   )
+);
+assert.deepEqual(
+  buildActivityDraftMetaSummaryView({
+    meta: fallbackDraftMeta,
+    provider: 'fallback',
+  }),
+  {
+    coverageStats: [
+      { label: 'Questions', value: 5 },
+      { label: 'Pairs', value: 5 },
+      { label: 'Groups', value: fallbackDraftMeta.coverage.groups },
+      { label: 'Vocab', value: fallbackDraftMeta.coverage.vocabulary },
+      { label: 'Notes', value: fallbackDraftMeta.coverage.teacherNotes },
+    ],
+    providerLabel: 'Fallback',
+    readyTemplateLabel: `${fallbackDraftMeta.readyTemplateCount} ready templates`,
+  }
+);
+assert.equal(
+  buildActivityDraftMetaSummaryView({
+    meta: {
+      ...fallbackDraftMeta,
+      readyTemplateCount: 1,
+    },
+    provider: 'workers-ai',
+  }).readyTemplateLabel,
+  '1 ready template'
+);
+assert.equal(
+  buildActivityDraftMetaSummaryView({
+    meta: fallbackDraftMeta,
+    provider: 'workers-ai',
+  }).providerLabel,
+  'Workers AI'
 );
 const oversizedAiDraft = {
   description: 'Oversized AI draft for item count shaping.',

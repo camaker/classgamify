@@ -7,6 +7,7 @@ import {
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import {
+  buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
@@ -647,6 +648,10 @@ export function ActivityCreateForm({
 
 function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
   const { meta } = result;
+  const summaryView = buildActivityDraftMetaSummaryView({
+    meta,
+    provider: result.provider,
+  });
 
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
@@ -660,10 +665,10 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           <Badge variant="secondary" className="rounded-md">
-            {meta.readyTemplateCount} ready templates
+            {summaryView.readyTemplateLabel}
           </Badge>
           <Badge variant="outline" className="rounded-md">
-            {result.provider === 'workers-ai' ? 'Workers AI' : 'Fallback'}
+            {summaryView.providerLabel}
           </Badge>
         </div>
       </div>
@@ -674,23 +679,13 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
         {result.notice ? <p className="mt-1">{result.notice}</p> : null}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
-        <ActivityDraftCoverageStat
-          label="Questions"
-          value={meta.coverage.questions}
-        />
-        <ActivityDraftCoverageStat label="Pairs" value={meta.coverage.pairs} />
-        <ActivityDraftCoverageStat
-          label="Groups"
-          value={meta.coverage.groups}
-        />
-        <ActivityDraftCoverageStat
-          label="Vocab"
-          value={meta.coverage.vocabulary}
-        />
-        <ActivityDraftCoverageStat
-          label="Notes"
-          value={meta.coverage.teacherNotes}
-        />
+        {summaryView.coverageStats.map((stat) => (
+          <ActivityDraftCoverageStat
+            key={stat.label}
+            label={stat.label}
+            value={stat.value}
+          />
+        ))}
       </div>
       {meta.suggestedTemplateOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
