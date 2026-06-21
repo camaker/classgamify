@@ -70,12 +70,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/play/$shareId')({
-  head: ({ params }) =>
-    seo(`/play/${params.shareId}`, {
-      title: `Student activity | ${websiteConfig.metadata?.name}`,
-      description:
-        'Open a public student activity runner from a teacher assignment link.',
-    }),
+  head: ({ params }) => {
+    const runnerCopy = getStudentRunnerCopy();
+
+    return seo(`/play/${params.shareId}`, {
+      title: `${runnerCopy.seoTitlePrefix} | ${websiteConfig.metadata?.name}`,
+      description: runnerCopy.seoDescription,
+    });
+  },
   component: PlayPage,
 });
 

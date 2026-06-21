@@ -76,6 +76,8 @@ export type StudentRunnerCopy = {
   resultAccuracyLabel: string;
   resultSubmittedLabel: string;
   resultTimePrefix: string;
+  seoDescription: string;
+  seoTitlePrefix: string;
   missingStudentNameMessage: string;
   studentNameLabel: string;
   studentNamePlaceholder: string;
@@ -119,6 +121,9 @@ const STUDENT_RUNNER_COPY = {
   resultAccuracyLabel: 'accuracy',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
+  seoDescription:
+    'Open a public student activity runner from a teacher assignment link.',
+  seoTitlePrefix: 'Student activity',
   missingStudentNameMessage: 'Type your name before submitting.',
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',

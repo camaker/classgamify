@@ -352,6 +352,9 @@ assert.deepEqual(getStudentRunnerCopy(), {
   resultAccuracyLabel: 'accuracy',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
+  seoDescription:
+    'Open a public student activity runner from a teacher assignment link.',
+  seoTitlePrefix: 'Student activity',
   missingStudentNameMessage: 'Type your name before submitting.',
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',
