@@ -955,13 +955,8 @@ function ActivityCard({
                 {assignmentPublishDialogCopy.previewLabel}
               </p>
               <AssignmentSettingsSummary
-                collectStudentName={publishPreview.settings.collectStudentName}
                 expiresAt={publishPreview.expiresAt}
-                instructions={publishPreview.settings.instructions}
-                maxAttempts={publishPreview.settings.maxAttempts}
-                showCorrectAnswers={publishPreview.settings.showCorrectAnswers}
-                shuffleItems={publishPreview.settings.shuffleItems}
-                timeLimitSeconds={publishPreview.settings.timeLimitSeconds}
+                settings={publishPreview.settings}
               />
               {!publishValidation.ok ? (
                 <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">

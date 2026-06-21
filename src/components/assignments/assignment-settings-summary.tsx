@@ -1,6 +1,6 @@
 import {
   type AssignmentDeliverySummaryId,
-  buildAssignmentDeliverySummary,
+  buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
@@ -35,36 +35,30 @@ export function AssignmentSettingsSummary({
   shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentSettingsSummaryProps) {
-  const resolvedSettings = settings ?? {
+  const summaryView = buildAssignmentSettingsSummaryView({
     collectStudentName,
+    expiresAt,
     instructions,
     maxAttempts,
+    settings,
     showCorrectAnswers,
     shuffleItems,
     timeLimitSeconds,
-  };
-  const summary = buildAssignmentDeliverySummary({
-    collectStudentName: resolvedSettings.collectStudentName,
-    expiresAt,
-    maxAttempts: resolvedSettings.maxAttempts,
-    showCorrectAnswers: resolvedSettings.showCorrectAnswers,
-    shuffleItems: resolvedSettings.shuffleItems,
-    timeLimitSeconds: resolvedSettings.timeLimitSeconds,
   });
 
   return (
     <div className="grid gap-3">
-      {resolvedSettings.instructions ? (
+      {summaryView.instructions ? (
         <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
-          {resolvedSettings.instructions}
+          {summaryView.instructions}
         </div>
       ) : null}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {summary.map((item) => (
+        {summaryView.items.map((item) => (
           <AssignmentSettingTile
             icon={getAssignmentSettingIcon(
               item.id,
-              resolvedSettings.collectStudentName
+              summaryView.settings.collectStudentName
             )}
             key={item.id}
             label={item.label}

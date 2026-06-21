@@ -123,6 +123,7 @@ import {
   buildAssignmentDeliverySummary,
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
+  buildAssignmentSettingsSummaryView,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
@@ -1420,6 +1421,52 @@ assert.deepEqual(
     ['answerReveal', 'Hidden'],
     ['itemOrder', 'Fixed order'],
   ]
+);
+const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
+  expiresAt: null,
+  settings: {
+    collectStudentName: false,
+    instructions: 'Finish before class.',
+    maxAttempts: 3,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 90,
+  },
+});
+assert.equal(
+  assignmentSettingsSummaryView.instructions,
+  'Finish before class.'
+);
+assert.equal(assignmentSettingsSummaryView.settings.collectStudentName, false);
+assert.deepEqual(
+  assignmentSettingsSummaryView.items.map((item) => [item.id, item.value]),
+  [
+    ['attempts', '3 max'],
+    ['timer', '2 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'Hidden'],
+    ['itemOrder', 'Fixed order'],
+  ]
+);
+assert.deepEqual(
+  buildAssignmentSettingsSummaryView({
+    collectStudentName: false,
+    expiresAt: null,
+    instructions: 'Legacy field instructions.',
+    maxAttempts: 2,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }).settings,
+  {
+    collectStudentName: false,
+    instructions: 'Legacy field instructions.',
+    maxAttempts: 2,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }
 );
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');

@@ -34,6 +34,17 @@ export type AssignmentDeliverySummaryInput = {
   timeLimitSeconds?: number | null;
 };
 
+type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
+  instructions?: string;
+  settings?: AssignmentSettings;
+};
+
+type AssignmentSettingsSummaryView = {
+  instructions?: string;
+  items: AssignmentDeliverySummaryItem[];
+  settings: AssignmentSettings;
+};
+
 export function buildAssignmentDeliverySummary({
   collectStudentName = true,
   expiresAt,
@@ -74,6 +85,39 @@ export function buildAssignmentDeliverySummary({
       value: formatShuffleItems(shuffleItems),
     },
   ];
+}
+
+export function buildAssignmentSettingsSummaryView({
+  collectStudentName = true,
+  expiresAt,
+  instructions,
+  maxAttempts,
+  settings,
+  showCorrectAnswers = true,
+  shuffleItems = true,
+  timeLimitSeconds,
+}: AssignmentSettingsSummaryInput): AssignmentSettingsSummaryView {
+  const resolvedSettings = settings ?? {
+    collectStudentName,
+    instructions,
+    maxAttempts: maxAttempts ?? undefined,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitSeconds: timeLimitSeconds ?? undefined,
+  };
+
+  return {
+    instructions: resolvedSettings.instructions,
+    items: buildAssignmentDeliverySummary({
+      collectStudentName: resolvedSettings.collectStudentName,
+      expiresAt,
+      maxAttempts: resolvedSettings.maxAttempts,
+      showCorrectAnswers: resolvedSettings.showCorrectAnswers,
+      shuffleItems: resolvedSettings.shuffleItems,
+      timeLimitSeconds: resolvedSettings.timeLimitSeconds,
+    }),
+    settings: resolvedSettings,
+  };
 }
 
 export function buildPublicAssignmentRuleSummary({
