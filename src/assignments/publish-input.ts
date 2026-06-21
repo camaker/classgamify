@@ -80,6 +80,20 @@ export function buildAssignmentPublishDraftDefaults({
   };
 }
 
+export function buildAssignmentPublishDraft({
+  defaults,
+  values,
+}: {
+  defaults: AssignmentPublishDraft;
+  values: Partial<Omit<AssignmentPublishDraft, 'activityId' | 'now'>>;
+}): AssignmentPublishDraft {
+  return {
+    ...defaults,
+    ...values,
+    activityId: defaults.activityId,
+  };
+}
+
 export function buildAssignmentPublishPreviewFromDraft({
   collectStudentName,
   expiresAtLocal,

@@ -31,9 +31,10 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import {
+  buildAssignmentPublishDraft,
+  buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
-  buildAssignmentPublishDraftDefaults,
   formatAssignmentDateTimeLocal,
 } from '@/assignments/publish-input';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -539,17 +540,20 @@ function ActivityCard({
   const [expiresAtLocal, setExpiresAtLocal] = useState(
     publishDraftDefaults.expiresAtLocal
   );
-  const publishPreview = buildAssignmentPublishPreviewFromDraft({
-    activityId: publishDraftDefaults.activityId,
-    collectStudentName,
-    expiresAtLocal,
-    instructions: assignmentInstructions,
-    maxAttempts,
-    showCorrectAnswers,
-    shuffleItems,
-    timeLimitMinutes,
-    title: assignmentTitle,
+  const publishDraft = buildAssignmentPublishDraft({
+    defaults: publishDraftDefaults,
+    values: {
+      collectStudentName,
+      expiresAtLocal,
+      instructions: assignmentInstructions,
+      maxAttempts,
+      showCorrectAnswers,
+      shuffleItems,
+      timeLimitMinutes,
+      title: assignmentTitle,
+    },
   });
+  const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
   const template = getTemplateByType(activity.templateType);
   const isArchived = isActivityArchived(activity.status);
   const canCreateDerivedWork = canDeriveActivityWork(activity.status);
@@ -571,17 +575,7 @@ function ActivityCard({
       toast.error(actionGate.message);
       return;
     }
-    const draftResult = buildAssignmentPublishInputFromDraft({
-      activityId: publishDraftDefaults.activityId,
-      collectStudentName,
-      expiresAtLocal,
-      instructions: assignmentInstructions,
-      maxAttempts,
-      showCorrectAnswers,
-      shuffleItems,
-      timeLimitMinutes,
-      title: assignmentTitle,
-    });
+    const draftResult = buildAssignmentPublishInputFromDraft(publishDraft);
     if (!draftResult.ok) {
       toast.error(draftResult.message);
       return;

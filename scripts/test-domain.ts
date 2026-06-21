@@ -155,6 +155,7 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
@@ -589,6 +590,32 @@ assert.deepEqual(
     shuffleItems: true,
     timeLimitMinutes: '',
     title: 'Food groups',
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishDraft({
+    defaults: buildAssignmentPublishDraftDefaults({
+      activityId: 'activity-1',
+      title: 'Food groups',
+    }),
+    values: {
+      activityId: 'activity-should-stay-1',
+      collectStudentName: false,
+      instructions: 'Chapter 1 review',
+      maxAttempts: '3',
+      title: 'Week 1 homework',
+    } as Partial<ReturnType<typeof buildAssignmentPublishDraftDefaults>>,
+  }),
+  {
+    activityId: 'activity-1',
+    collectStudentName: false,
+    expiresAtLocal: '',
+    instructions: 'Chapter 1 review',
+    maxAttempts: '3',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 homework',
   }
 );
 assert.deepEqual(
