@@ -26,6 +26,12 @@ import {
   type ActivityLibrarySummaryMetric,
   type ActivityLibrarySummaryMetricId,
 } from '@/activities/library-summary';
+import {
+  activityLibraryHeroCopy,
+  activityLibraryPageCopy,
+  activityLibrarySearchCopy,
+  buildActivityLibraryEmptyStateView,
+} from '@/activities/library-view';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -94,7 +100,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityCardData = {
@@ -146,16 +152,11 @@ function DashboardActivitiesPage() {
     Boolean(normalizedSearchQuery) ||
     templateFilter !== 'all' ||
     libraryStatus !== 'active';
-  const hasContentFilters =
-    Boolean(normalizedSearchQuery) || templateFilter !== 'all';
-  const emptyFilterTitle =
-    libraryStatus === 'archived' && !hasContentFilters
-      ? 'No archived activities.'
-      : 'No matching activities.';
-  const emptyFilterDescription =
-    libraryStatus === 'archived' && !hasContentFilters
-      ? 'Archived activities will appear here after you move them out of the active library.'
-      : 'Try another title, description, template keyword, or template family from your classroom activity library.';
+  const emptyStateView = buildActivityLibraryEmptyStateView({
+    search: normalizedSearchQuery,
+    status: libraryStatus,
+    template: templateFilter,
+  });
   const summaryMetrics = buildActivityLibrarySummaryMetrics({
     hasFilters,
     summary: data?.summary,
@@ -214,26 +215,30 @@ function DashboardActivitiesPage() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: 'Dashboard', href: Routes.Dashboard },
-        { label: 'Activities', isCurrentPage: true },
+        {
+          label: activityLibraryPageCopy.breadcrumbDashboard,
+          href: Routes.Dashboard,
+        },
+        {
+          label: activityLibraryPageCopy.breadcrumbCurrent,
+          isCurrentPage: true,
+        },
       ]}
-      title="Activity library"
-      description="Reusable teacher-owned activities. Each activity stores template-neutral content so it can render as different classroom games."
+      title={activityLibraryPageCopy.title}
+      description={activityLibraryPageCopy.description}
     >
       <div className="grid gap-6">
         <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
-              Structured activity content
+              {activityLibraryHeroCopy.badgeLabel}
             </Badge>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              One lesson, several renderings.
+              {activityLibraryHeroCopy.title}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              The activity model separates questions, pairs, groups, vocabulary,
-              and teacher notes. Template switching and AI creation can both
-              build on this shared contract.
+              {activityLibraryHeroCopy.description}
             </p>
           </div>
           <Link
@@ -241,7 +246,7 @@ function DashboardActivitiesPage() {
             className={cn(buttonVariants(), 'h-fit w-full lg:w-auto')}
           >
             <IconPlus className="size-4" />
-            Create activity
+            {activityLibraryPageCopy.createActivityLabel}
           </Link>
         </section>
 
@@ -268,7 +273,7 @@ function DashboardActivitiesPage() {
 
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            Activities could not be loaded. Refresh the page or sign in again.
+            {activityLibraryPageCopy.loadErrorMessage}
           </div>
         ) : null}
 
@@ -313,9 +318,9 @@ function DashboardActivitiesPage() {
 
         {!isLoading && !hasActivities && hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">{emptyFilterTitle}</h2>
+            <h2 className="text-lg font-semibold">{emptyStateView.title}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {emptyFilterDescription}
+              {emptyStateView.description}
             </p>
             <Button
               type="button"
@@ -324,7 +329,7 @@ function DashboardActivitiesPage() {
               onClick={clearLibraryFilters}
             >
               <IconX className="size-4" />
-              Clear filters
+              {emptyStateView.actionLabel}
             </Button>
           </div>
         ) : null}
@@ -332,38 +337,37 @@ function DashboardActivitiesPage() {
         {!isLoading && !hasActivities && !hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-              <h2 className="text-lg font-semibold">
-                No saved activities yet.
-              </h2>
+              <h2 className="text-lg font-semibold">{emptyStateView.title}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Create the first reusable classroom activity, then publish it as
-                a student assignment link for your class.
+                {emptyStateView.description}
               </p>
               <Link
                 to={Routes.Create}
                 className={cn(buttonVariants(), 'mt-4 w-fit')}
               >
                 <IconPlus className="size-4" />
-                Create activity
+                {emptyStateView.actionLabel}
               </Link>
             </div>
-            <section className="grid gap-4 lg:grid-cols-2">
-              {starterActivities.map((activity) => (
-                <ActivityCard
-                  key={activity.id}
-                  activity={{
-                    content: activity.content,
-                    description: activity.description,
-                    id: activity.id,
-                    persisted: false,
-                    status: activity.status,
-                    templateType: activity.templateType,
-                    title: activity.title,
-                  }}
-                  libraryStatus="active"
-                />
-              ))}
-            </section>
+            {emptyStateView.showStarterActivities ? (
+              <section className="grid gap-4 lg:grid-cols-2">
+                {starterActivities.map((activity) => (
+                  <ActivityCard
+                    key={activity.id}
+                    activity={{
+                      content: activity.content,
+                      description: activity.description,
+                      id: activity.id,
+                      persisted: false,
+                      status: activity.status,
+                      templateType: activity.templateType,
+                      title: activity.title,
+                    }}
+                    libraryStatus="active"
+                  />
+                ))}
+              </section>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -410,21 +414,21 @@ function ActivityLibrarySearch({
           htmlFor="activity-library-search"
           className="font-medium text-sm"
         >
-          Search activities
+          {activityLibrarySearchCopy.label}
         </label>
         <div className="relative max-w-xl">
           <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
           <Input
             id="activity-library-search"
             value={value}
-            placeholder="Search by title, description, or template"
+            placeholder={activityLibrarySearchCopy.placeholder}
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {value ? (
             <button
               type="button"
-              aria-label="Clear activity search"
+              aria-label={activityLibrarySearchCopy.clearSearchLabel}
               className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
               onClick={onClearSearch}
             >
@@ -438,7 +442,7 @@ function ActivityLibrarySearch({
           htmlFor="activity-template-filter"
           className="font-medium text-sm"
         >
-          Template
+          {activityLibrarySearchCopy.templateLabel}
         </label>
         <NativeSelect
           id="activity-template-filter"
@@ -449,7 +453,9 @@ function ActivityLibrarySearch({
             )
           }
         >
-          <NativeSelectOption value="all">All templates</NativeSelectOption>
+          <NativeSelectOption value="all">
+            {activityLibrarySearchCopy.templatePlaceholder}
+          </NativeSelectOption>
           {activityTemplates.map((option) => (
             <NativeSelectOption key={option.type} value={option.type}>
               {option.name}
@@ -459,24 +465,22 @@ function ActivityLibrarySearch({
       </div>
       <div className="flex flex-col gap-3 lg:items-end">
         <div className="inline-flex rounded-lg border bg-background p-1">
-          <Button
-            type="button"
-            variant={status === 'active' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => onStatusChange('active')}
-          >
-            <IconFolder className="size-4" />
-            Active
-          </Button>
-          <Button
-            type="button"
-            variant={status === 'archived' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => onStatusChange('archived')}
-          >
-            <IconFolderOff className="size-4" />
-            Archived
-          </Button>
+          {activityLibrarySearchCopy.statusOptions.map((option) => {
+            const Icon = option.value === 'active' ? IconFolder : IconFolderOff;
+
+            return (
+              <Button
+                key={option.value}
+                type="button"
+                variant={status === option.value ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => onStatusChange(option.value)}
+              >
+                <Icon className="size-4" />
+                {option.label}
+              </Button>
+            );
+          })}
         </div>
         <p className="text-sm text-muted-foreground lg:text-right">
           {filterSummary.text}
@@ -490,7 +494,7 @@ function ActivityLibrarySearch({
             onClick={onClearFilters}
           >
             <IconX className="size-4" />
-            Clear filters
+            {activityLibrarySearchCopy.clearFiltersLabel}
           </Button>
         ) : null}
       </div>

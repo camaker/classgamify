@@ -10,6 +10,12 @@ import {
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
+  activityLibraryHeroCopy,
+  activityLibraryPageCopy,
+  activityLibrarySearchCopy,
+  buildActivityLibraryEmptyStateView,
+} from '@/activities/library-view';
+import {
   buildActivityLibraryRouteSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
@@ -1868,6 +1874,72 @@ assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),
   new Error(ARCHIVED_ACTIVITY_DERIVATION_ERROR)
+);
+assert.deepEqual(activityLibraryPageCopy, {
+  breadcrumbCurrent: 'Activities',
+  breadcrumbDashboard: 'Dashboard',
+  createActivityLabel: 'Create activity',
+  description:
+    'Reusable teacher-owned activities. Each activity stores template-neutral content so it can render as different classroom games.',
+  loadErrorMessage:
+    'Activities could not be loaded. Refresh the page or sign in again.',
+  title: 'Activity library',
+});
+assert.deepEqual(activityLibraryHeroCopy, {
+  badgeLabel: 'Structured activity content',
+  description:
+    'The activity model separates questions, pairs, groups, vocabulary, and teacher notes. Template switching and AI creation can both build on this shared contract.',
+  title: 'One lesson, several renderings.',
+});
+assert.equal(
+  activityLibrarySearchCopy.placeholder,
+  'Search by title, description, or template'
+);
+assert.deepEqual(
+  activityLibrarySearchCopy.statusOptions.map((option) => option.value),
+  ['active', 'archived']
+);
+assert.deepEqual(
+  buildActivityLibraryEmptyStateView({
+    search: undefined,
+    status: 'active',
+    template: 'all',
+  }),
+  {
+    actionLabel: 'Create activity',
+    description:
+      'Create the first reusable classroom activity, then publish it as a student assignment link for your class.',
+    showStarterActivities: true,
+    title: 'No saved activities yet.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryEmptyStateView({
+    search: undefined,
+    status: 'archived',
+    template: 'all',
+  }),
+  {
+    actionLabel: 'Clear filters',
+    description:
+      'Archived activities will appear here after you move them out of the active library.',
+    showStarterActivities: false,
+    title: 'No archived activities.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryEmptyStateView({
+    search: 'vocab',
+    status: 'active',
+    template: 'quiz',
+  }),
+  {
+    actionLabel: 'Clear filters',
+    description:
+      'Try another title, description, template keyword, or template family from your classroom activity library.',
+    showStarterActivities: false,
+    title: 'No matching activities.',
+  }
 );
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
