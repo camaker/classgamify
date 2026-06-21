@@ -2,6 +2,22 @@ import { activityTemplates } from '@/activities/catalog';
 import { getTemplateRemixPlan } from '@/activities/template-remix';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 
+export type ActivityLibraryTemplateOption = {
+  shortName: string;
+  template: ActivityTemplateType;
+};
+
+export type ActivityLibraryCardSummary = {
+  contentCounts: {
+    groups: number;
+    pairs: number;
+    questions: number;
+  };
+  lockedTemplateDiagnostics: string[];
+  readyTemplateOptions: ActivityLibraryTemplateOption[];
+  suggestedTemplateOptions: ActivityLibraryTemplateOption[];
+};
+
 export type ActivityLibrarySummarySource = {
   contentJson: ActivityContent;
   templateType: ActivityTemplateType;
@@ -36,12 +52,12 @@ export function summarizeActivityLibrary(
       draftActivities += 1;
     }
 
-    const remixPlan = getTemplateRemixPlan({
+    const cardSummary = buildActivityLibraryCardSummary({
       content: item.contentJson,
-      currentTemplateType: item.templateType,
+      templateType: item.templateType,
     });
-    totalReadyTemplateOptions += remixPlan.readyOptions.length;
-    if (remixPlan.suggestedOptions.length > 0) {
+    totalReadyTemplateOptions += cardSummary.readyTemplateOptions.length;
+    if (cardSummary.suggestedTemplateOptions.length > 0) {
       remixReadyActivities += 1;
     }
   }
@@ -54,5 +70,37 @@ export function summarizeActivityLibrary(
     templateCoverageTotal: activityTemplates.length,
     totalActivities: activities.length,
     totalReadyTemplateOptions,
+  };
+}
+
+export function buildActivityLibraryCardSummary({
+  content,
+  templateType,
+}: {
+  content: ActivityContent;
+  templateType: ActivityTemplateType;
+}): ActivityLibraryCardSummary {
+  const remixPlan = getTemplateRemixPlan({
+    content,
+    currentTemplateType: templateType,
+  });
+
+  return {
+    contentCounts: {
+      groups: content.groups.length,
+      pairs: content.pairs.length,
+      questions: content.questions.length,
+    },
+    lockedTemplateDiagnostics: remixPlan.options
+      .filter((option) => !option.isReady)
+      .map((option) => option.diagnosis),
+    readyTemplateOptions: remixPlan.readyOptions.map((option) => ({
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })),
+    suggestedTemplateOptions: remixPlan.suggestedOptions.map((option) => ({
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })),
   };
 }

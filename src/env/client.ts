@@ -26,8 +26,10 @@ export const clientEnv = createEnv({
     VITE_GOOGLE_ANALYTICS_ID: z.string().default('G-QH46LZCPE3'),
     VITE_CLARITY_PROJECT_ID: z.string().default('xa8pgti8e4'),
     VITE_PLAUSIBLE_SCRIPT: z.string().optional(),
-    VITE_UMAMI_WEBSITE_ID: z.string().optional(),
-    VITE_UMAMI_SCRIPT: z.string().optional(),
+    VITE_UMAMI_WEBSITE_ID: z
+      .string()
+      .default('367bc1f5-9e17-46c5-af53-661b08883331'),
+    VITE_UMAMI_SCRIPT: z.string().default('https://cloud.umami.is/script.js'),
 
     // Chatbot (Crisp Chat)
     VITE_CRISP_WEBSITE_ID: z.string().optional(),
