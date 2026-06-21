@@ -1,13 +1,12 @@
 import { authClient } from '@/auth/client';
 import { websiteConfig } from '@/config/website';
 import { useAuthProviderStatus } from '@/hooks/use-auth-provider-status';
-import { DEFAULT_LOGIN_REDIRECT } from '@/lib/routes';
+import { getCanonicalPathname } from '@/lib/locale';
+import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { oneTapClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import { useEffect, useMemo, useRef } from 'react';
-
-const PROMPT_SESSION_KEY = 'classgamify.google-one-tap.prompted-client-id';
 
 export function GoogleOneTapPrompt() {
   const { data: session, isPending } = authClient.useSession();
@@ -43,6 +42,9 @@ export function GoogleOneTapPrompt() {
           autoSelect: false,
           cancelOnTapOutside: true,
           context: 'signin',
+          promptOptions: {
+            fedCM: false,
+          },
         }),
       ],
     });
@@ -64,14 +66,8 @@ export function GoogleOneTapPrompt() {
       return;
     }
 
-    try {
-      if (window.sessionStorage.getItem(PROMPT_SESSION_KEY) === clientId) {
-        return;
-      }
-
-      window.sessionStorage.setItem(PROMPT_SESSION_KEY, clientId);
-    } catch {
-      // Storage can be unavailable; the ref still prevents duplicate prompts.
+    if (isAuthRoute(window.location.pathname)) {
+      return;
     }
 
     promptedClientIdRef.current = clientId;
@@ -93,4 +89,12 @@ export function GoogleOneTapPrompt() {
   ]);
 
   return null;
+}
+
+function isAuthRoute(pathname: string) {
+  const canonicalPathname = getCanonicalPathname(pathname);
+  return (
+    canonicalPathname === Routes.Auth ||
+    canonicalPathname.startsWith(`${Routes.Auth}/`)
+  );
 }

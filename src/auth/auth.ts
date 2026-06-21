@@ -74,6 +74,8 @@ export const auth = betterAuth({
     ...(googleOAuthAvailable && googleClientId && googleClientSecret
       ? {
           google: {
+            authorizationEndpoint:
+              'https://accounts.google.com/o/oauth2/v2/auth',
             clientId: googleClientId,
             clientSecret: googleClientSecret,
           },
@@ -82,6 +84,9 @@ export const auth = betterAuth({
   },
   account: {
     // https://www.better-auth.com/docs/concepts/users-accounts#account-linking
+    // Keep the OAuth state in an encrypted cookie so starting Google sign-in
+    // does not depend on a D1 verification write before Google redirects.
+    storeStateStrategy: 'cookie',
     accountLinking: {
       enabled: websiteConfig.auth?.enableGoogleLogin,
       trustedProviders: websiteConfig.auth?.enableGoogleLogin ? ['google'] : [],

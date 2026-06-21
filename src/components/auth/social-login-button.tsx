@@ -8,6 +8,7 @@ import { useAuthProviderStatus } from '@/hooks/use-auth-provider-status';
 import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/lib/routes';
 import { getPathWithLocale, getSafeCallbackPath } from '@/lib/urls';
 import { IconBrandGoogleFilled, IconLoader2 } from '@tabler/icons-react';
+import { toast } from 'sonner';
 interface SocialLoginButtonProps {
   callbackUrl?: string;
   showDivider?: boolean;
@@ -41,24 +42,41 @@ export function SocialLoginButton({
     return null;
   }
   const onClick = async (provider: 'google') => {
-    await authClient.signIn.social(
-      {
+    setIsLoading(provider);
+
+    try {
+      const result = await authClient.signIn.social({
         provider,
         callbackURL: callbackUrl,
+        disableRedirect: true,
         errorCallbackURL: errorCallbackUrl,
-      },
-      {
-        onRequest: () => setIsLoading(provider),
-        onResponse: () => setIsLoading(null),
-        onSuccess: () => setIsLoading(null),
-        onError: () => setIsLoading(null),
+      });
+      const authorizationUrl = result.data?.url;
+
+      if (
+        !authorizationUrl ||
+        !isValidGoogleAuthorizationUrl(authorizationUrl)
+      ) {
+        console.error('invalid google authorization url', {
+          hasUrl: Boolean(authorizationUrl),
+        });
+        toast.error(m.auth_error_try_again());
+        return;
       }
-    );
+
+      window.location.assign(authorizationUrl);
+    } catch (error) {
+      console.error('google sign in error:', error);
+      toast.error(m.auth_error_try_again());
+    } finally {
+      setIsLoading(null);
+    }
   };
   return (
     <div className="w-full flex flex-col gap-4">
       {showDivider && <DividerWithText text={m.auth_social_or()} />}
       <Button
+        type="button"
         size="lg"
         className="w-full"
         variant="outline"
@@ -74,4 +92,20 @@ export function SocialLoginButton({
       </Button>
     </div>
   );
+}
+
+function isValidGoogleAuthorizationUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.origin === 'https://accounts.google.com' &&
+      parsed.pathname === '/o/oauth2/v2/auth' &&
+      parsed.searchParams.get('response_type') === 'code' &&
+      Boolean(parsed.searchParams.get('client_id')) &&
+      Boolean(parsed.searchParams.get('redirect_uri')) &&
+      Boolean(parsed.searchParams.get('state'))
+    );
+  } catch {
+    return false;
+  }
 }
