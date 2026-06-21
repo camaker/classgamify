@@ -533,13 +533,8 @@ function AssignmentCard({
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="grid gap-4">
           <AssignmentSettingsSummary
-            collectStudentName={assignment.collectStudentName}
             expiresAt={assignment.expiresAt}
-            instructions={assignment.instructions}
-            maxAttempts={assignment.maxAttempts}
-            showCorrectAnswers={assignment.showCorrectAnswers}
-            shuffleItems={assignment.shuffleItems}
-            timeLimitSeconds={assignment.timeLimitSeconds}
+            settings={assignment.settings}
           />
           <div className="grid gap-3 sm:grid-cols-2">
             {stats.map((stat) => (

@@ -2481,22 +2481,24 @@ assert.deepEqual(
   }),
   {
     activityDescription: 'Frozen activity description',
-    collectStudentName: false,
     expiresAt: new Date('2026-02-01T00:00:00.000Z'),
     id: 'persisted-assignment-1',
-    instructions: 'Finish before Friday.',
-    maxAttempts: 3,
     persisted: true,
+    settings: {
+      collectStudentName: false,
+      instructions: 'Finish before Friday.',
+      maxAttempts: 3,
+      showCorrectAnswers: false,
+      shuffleItems: true,
+      timeLimitSeconds: 600,
+    },
     shareSlug: 'share-1',
-    showCorrectAnswers: false,
-    shuffleItems: true,
     stats: {
       averageScore: 76,
       completions: 9,
     },
     status: 'published',
     templateType: 'line-match',
-    timeLimitSeconds: 600,
     title: 'Persisted assignment',
   }
 );
@@ -2549,22 +2551,22 @@ assert.deepEqual(
   }),
   {
     activityDescription: 'Starter activity description',
-    collectStudentName: true,
     expiresAt: null,
     id: 'assignment-food-demo',
-    instructions: undefined,
-    maxAttempts: 2,
     persisted: false,
+    settings: {
+      collectStudentName: true,
+      maxAttempts: 2,
+      showCorrectAnswers: true,
+      shuffleItems: true,
+    },
     shareSlug: 'demo-food',
-    showCorrectAnswers: true,
-    shuffleItems: true,
     stats: {
       averageScore: 84,
       completions: 18,
     },
     status: 'published',
     templateType: 'group-sort',
-    timeLimitSeconds: undefined,
     title: 'Food words homework',
   }
 );

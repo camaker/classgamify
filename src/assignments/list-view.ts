@@ -21,18 +21,13 @@ type AssignmentListCardStat = {
 
 type AssignmentListCardViewModel = {
   activityDescription: string;
-  collectStudentName?: boolean;
   expiresAt: Date | null;
   id: string;
-  instructions?: string;
-  maxAttempts?: number;
   persisted: boolean;
+  settings: AssignmentSettings;
   shareSlug: string;
-  showCorrectAnswers?: boolean;
-  shuffleItems?: boolean;
   status: AssignmentStatus;
   templateType: ActivityTemplateType;
-  timeLimitSeconds?: number;
   title: string;
   stats: {
     averageScore: number;
@@ -184,12 +179,12 @@ export function buildAssignmentListCardViewModel({
   stats,
 }: AssignmentListCardSource): AssignmentListCardViewModel {
   return {
-    ...buildAssignmentListCardDeliverySettings(assignment.settingsJson),
     activityDescription:
       snapshot?.activityDescription ?? activity.description ?? '',
     expiresAt: assignment.expiresAt,
     id: assignment.id,
     persisted: true,
+    settings: assignment.settingsJson,
     shareSlug: assignment.shareSlug,
     stats,
     status: assignment.status,
@@ -203,11 +198,11 @@ export function buildStarterAssignmentListCardViewModel({
   assignment,
 }: StarterAssignmentListCardSource): AssignmentListCardViewModel {
   return {
-    ...buildAssignmentListCardDeliverySettings(assignment.settings),
     activityDescription: activity.description,
     expiresAt: assignment.expiresAt ?? null,
     id: assignment.id,
     persisted: false,
+    settings: assignment.settings,
     shareSlug: assignment.shareId,
     stats: {
       averageScore: assignment.averageScore,
@@ -237,16 +232,5 @@ export function getAssignmentListCardActionState({
       expiresAt,
       isPersisted: persisted,
     }),
-  };
-}
-
-function buildAssignmentListCardDeliverySettings(settings: AssignmentSettings) {
-  return {
-    collectStudentName: settings.collectStudentName,
-    instructions: settings.instructions,
-    maxAttempts: settings.maxAttempts,
-    showCorrectAnswers: settings.showCorrectAnswers,
-    shuffleItems: settings.shuffleItems,
-    timeLimitSeconds: settings.timeLimitSeconds,
   };
 }
