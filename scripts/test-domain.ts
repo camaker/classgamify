@@ -195,6 +195,7 @@ import {
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
   buildAssignmentResultHeaderView,
@@ -6298,6 +6299,53 @@ assert.equal(
     students: followUpPriorityStudents,
   }),
   studentFollowUpSummary
+);
+assert.deepEqual(
+  buildAssignmentResultActionPayload({
+    actionButton: {
+      action: 'copy-brief',
+      disabled: false,
+      failureMessage: 'Classroom brief could not be copied.',
+      gate: { type: 'ready' },
+      kind: 'copy-text',
+      label: 'Copy brief',
+      successMessage: 'Classroom brief copied.',
+    },
+    assignmentTitle: csvExportData.assignment.title,
+    classroomBriefText: classroomBrief.text,
+    exportData: csvExportData,
+    items: resultAnalysis.perItem,
+    students: resultAnalysis.students,
+  }),
+  {
+    kind: 'copy-text',
+    text: classroomBrief.text,
+  }
+);
+const downloadCsvPayload = buildAssignmentResultActionPayload({
+  actionButton: {
+    action: 'export-csv',
+    disabled: false,
+    failureMessage: 'Results CSV could not be downloaded.',
+    gate: { type: 'ready' },
+    kind: 'download-csv',
+    label: 'Download CSV',
+    successMessage: 'Results CSV downloaded.',
+  },
+  assignmentTitle: csvExportData.assignment.title,
+  classroomBriefText: classroomBrief.text,
+  exportData: csvExportData,
+  items: resultAnalysis.perItem,
+  students: resultAnalysis.students,
+});
+assert.equal(downloadCsvPayload.kind, 'download-csv');
+assert.equal(
+  downloadCsvPayload.kind === 'download-csv' ? downloadCsvPayload.filename : '',
+  buildAssignmentResultsCsvFilename(csvExportData)
+);
+assert.equal(
+  downloadCsvPayload.kind === 'download-csv' ? downloadCsvPayload.csv : '',
+  csv
 );
 
 console.log('Domain tests passed.');

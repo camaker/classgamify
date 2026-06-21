@@ -3,6 +3,10 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import {
+  buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvFilename,
+} from '@/assignments/results-export';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -80,6 +84,17 @@ export type AssignmentResultActionButton =
       kind: 'download-csv';
       label: string;
       successMessage: string;
+    };
+
+type AssignmentResultActionPayload =
+  | {
+      kind: 'copy-text';
+      text: string;
+    }
+  | {
+      csv: string;
+      filename: string;
+      kind: 'download-csv';
     };
 
 type AssignmentResultActionButtonBase = {
@@ -476,6 +491,41 @@ export function buildAssignmentResultCopyText({
     assignmentTitle,
     students,
   });
+}
+
+export function buildAssignmentResultActionPayload({
+  actionButton,
+  assignmentTitle,
+  classroomBriefText,
+  exportData,
+  items,
+  students,
+}: {
+  actionButton: AssignmentResultActionButton;
+  assignmentTitle: string;
+  classroomBriefText?: string;
+  exportData: Parameters<typeof buildAssignmentResultsCsv>[0];
+  items: AssignmentItemAnalysis[];
+  students: AssignmentStudentSummary[];
+}): AssignmentResultActionPayload {
+  if (actionButton.kind === 'download-csv') {
+    return {
+      csv: buildAssignmentResultsCsv(exportData),
+      filename: buildAssignmentResultsCsvFilename(exportData),
+      kind: 'download-csv',
+    };
+  }
+
+  return {
+    kind: 'copy-text',
+    text: buildAssignmentResultCopyText({
+      action: actionButton.action,
+      assignmentTitle,
+      classroomBriefText,
+      items,
+      students,
+    }),
+  };
 }
 
 export function buildAssignmentResultSectionState({

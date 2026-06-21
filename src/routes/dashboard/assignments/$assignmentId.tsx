@@ -6,8 +6,8 @@ import {
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
-  buildAssignmentResultCopyText,
   buildAssignmentResultHeaderView,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
@@ -32,10 +32,6 @@ import {
   parseStudentSummarySort,
   studentSummarySortOptions,
 } from '@/assignments/result-view';
-import {
-  buildAssignmentResultsCsv,
-  buildAssignmentResultsCsvFilename,
-} from '@/assignments/results-export';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -201,20 +197,22 @@ function AssignmentResultsPage() {
     }
 
     try {
-      if (actionButton.kind === 'download-csv') {
-        const csv = buildAssignmentResultsCsv(data);
-        const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
-        await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
+      const payload = buildAssignmentResultActionPayload({
+        actionButton,
+        assignmentTitle: data.assignment.title,
+        classroomBriefText: classroomBrief?.text,
+        exportData: data,
+        items: data.analysis.perItem,
+        students: data.analysis.students,
+      });
+
+      if (payload.kind === 'download-csv') {
+        const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(
+          payload.csv
+        )}`;
+        await downloadFile(csvUrl, payload.filename);
       } else {
-        await copyTextToClipboard(
-          buildAssignmentResultCopyText({
-            action: actionButton.action,
-            assignmentTitle: data.assignment.title,
-            classroomBriefText: classroomBrief?.text,
-            items: data.analysis.perItem,
-            students: data.analysis.students,
-          })
-        );
+        await copyTextToClipboard(payload.text);
       }
       toast.success(actionButton.successMessage);
     } catch (error) {
