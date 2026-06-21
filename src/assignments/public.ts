@@ -2,12 +2,15 @@ import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
   ActivityDifficulty,
+  ActivityContent,
   ActivityTemplateType,
   ActivityVisibility,
   AssignmentSettings,
   AssignmentStatus,
   AttemptAnswer,
 } from '@/activities/types';
+import { getRuntimeItems } from '@/activities/runtime';
+import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
   choices?: string[];
@@ -56,6 +59,76 @@ export type PublicAssignmentPayload = {
     subject: string;
   };
 };
+
+export type PublicAssignmentPayloadSource = {
+  activity: {
+    contentJson: ActivityContent;
+    description: string | null;
+    id: string;
+    templateType: ActivityTemplateType;
+    title: string;
+    visibility: ActivityVisibility;
+  };
+  assignment: {
+    expiresAt: Date | null;
+    id: string;
+    settingsJson: Partial<AssignmentSettings> | null | undefined;
+    shareSlug: string;
+    status: AssignmentStatus;
+    title: string;
+  };
+  snapshot?: {
+    activityDescription: string | null;
+    activityTitle: string;
+    contentJson: ActivityContent;
+    templateType: ActivityTemplateType;
+  } | null;
+};
+
+export function buildPublicAssignmentPayload({
+  activity,
+  assignment,
+  snapshot,
+}: PublicAssignmentPayloadSource): PublicAssignmentPayload {
+  const content = snapshot?.contentJson ?? activity.contentJson;
+  const templateType = snapshot?.templateType ?? activity.templateType;
+  const runtimeItems = getRuntimeItems(templateType, content);
+
+  return {
+    activity: {
+      description: snapshot?.activityDescription ?? activity.description,
+      id: activity.id,
+      templateType,
+      title: snapshot?.activityTitle ?? activity.title,
+      visibility: activity.visibility,
+    },
+    assignment: {
+      expiresAt: assignment.expiresAt,
+      id: assignment.id,
+      settingsJson: resolveAssignmentSettings(assignment.settingsJson),
+      shareSlug: assignment.shareSlug,
+      status: assignment.status,
+      title: assignment.title,
+    },
+    runtimeItems: stripRuntimeAnswers(runtimeItems),
+    snapshot: snapshot
+      ? {
+          activityDescription: snapshot.activityDescription,
+          activityTitle: snapshot.activityTitle,
+          templateType: snapshot.templateType,
+        }
+      : null,
+    summary: {
+      difficulty: content.difficulty,
+      estimatedMinutes: estimateAssignmentMinutes(runtimeItems.length),
+      gradeBand: content.gradeBand,
+      itemCount: runtimeItems.length,
+      language: content.language,
+      learningGoal: content.learningGoal,
+      subject: content.subject,
+    },
+  };
+}
 
 export function stripRuntimeAnswers(
   runtimeItems: RuntimeItem[]

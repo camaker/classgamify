@@ -72,6 +72,7 @@ import {
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
+  buildPublicAssignmentPayload,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
   stripRuntimeAnswer,
@@ -467,6 +468,90 @@ assert.deepEqual(
     { id: 'answerReveal', label: 'Review', value: 'Hidden' },
   ]
 );
+const publicPayloadActivityContent = buildActivityContent({
+  description: 'Original activity payload source',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer the current activity content.',
+  pairsText: '',
+  questionsText: 'Current prompt? | Current answer',
+  sourceSummary: 'Current activity content',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Current activity',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+const publicPayloadSnapshotContent = buildActivityContent({
+  description: 'Frozen assignment payload source',
+  difficulty: 'core',
+  gradeBand: 'Grade 4',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer the frozen snapshot content.',
+  pairsText: '',
+  questionsText:
+    'Frozen prompt? | Frozen answer / Frozen accepted | Frozen answer, Other | Frozen explanation',
+  sourceSummary: 'Frozen snapshot content',
+  subject: 'History',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Frozen activity',
+  visibility: 'draft',
+  vocabularyText: 'Frozen answer, Other',
+});
+const publicAssignmentPayload = buildPublicAssignmentPayload({
+  activity: {
+    contentJson: publicPayloadActivityContent,
+    description: 'Current activity description',
+    id: 'activity-public',
+    templateType: 'quiz',
+    title: 'Current activity title',
+    visibility: 'draft',
+  },
+  assignment: {
+    expiresAt: null,
+    id: 'assignment-public',
+    settingsJson: { collectStudentName: false },
+    shareSlug: 'share-public',
+    status: 'published',
+    title: 'Public assignment',
+  },
+  snapshot: {
+    activityDescription: 'Frozen activity description',
+    activityTitle: 'Frozen activity title',
+    contentJson: publicPayloadSnapshotContent,
+    templateType: 'quiz',
+  },
+});
+assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
+assert.equal(
+  publicAssignmentPayload.activity.description,
+  'Frozen activity description'
+);
+assert.equal(publicAssignmentPayload.summary.subject, 'History');
+assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
+assert.equal(publicAssignmentPayload.summary.itemCount, 1);
+assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+assert.equal(
+  publicAssignmentPayload.assignment.settingsJson.collectStudentName,
+  false
+);
+assert.equal(
+  publicAssignmentPayload.assignment.settingsJson.showCorrectAnswers,
+  true
+);
+assert.deepEqual(publicAssignmentPayload.snapshot, {
+  activityDescription: 'Frozen activity description',
+  activityTitle: 'Frozen activity title',
+  templateType: 'quiz',
+});
+assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
+assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
+assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
 const publicReviewMap = buildPublicAttemptReviewItemMap([
   {
     acceptedAnswers: ['Paris', 'Paris, France'],

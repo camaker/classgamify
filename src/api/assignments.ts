@@ -16,9 +16,8 @@ import {
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import {
+  buildPublicAssignmentPayload,
   buildPublicAttemptReviewItems,
-  estimateAssignmentMinutes,
-  stripRuntimeAnswers,
 } from '@/assignments/public';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
@@ -414,46 +413,7 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       return null;
     }
 
-    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
-    const templateType =
-      row.snapshot?.templateType ?? row.activity.templateType;
-    const runtimeItems = getRuntimeItems(templateType, content);
-
-    return {
-      activity: {
-        description:
-          row.snapshot?.activityDescription ?? row.activity.description,
-        id: row.activity.id,
-        templateType,
-        title: row.snapshot?.activityTitle ?? row.activity.title,
-        visibility: row.activity.visibility,
-      },
-      assignment: {
-        expiresAt: row.assignment.expiresAt,
-        id: row.assignment.id,
-        settingsJson: resolveAssignmentSettings(row.assignment.settingsJson),
-        shareSlug: row.assignment.shareSlug,
-        status: row.assignment.status,
-        title: row.assignment.title,
-      },
-      runtimeItems: stripRuntimeAnswers(runtimeItems),
-      snapshot: row.snapshot
-        ? {
-            activityDescription: row.snapshot.activityDescription,
-            activityTitle: row.snapshot.activityTitle,
-            templateType: row.snapshot.templateType,
-          }
-        : null,
-      summary: {
-        difficulty: content.difficulty,
-        estimatedMinutes: estimateAssignmentMinutes(runtimeItems.length),
-        gradeBand: content.gradeBand,
-        itemCount: runtimeItems.length,
-        language: content.language,
-        learningGoal: content.learningGoal,
-        subject: content.subject,
-      },
-    };
+    return buildPublicAssignmentPayload(row);
   });
 
 const submitAttemptInputSchema = z.object({
