@@ -16,6 +16,15 @@ import {
   type AssignmentListSummaryMetricId,
 } from '@/assignments/list-summary';
 import {
+  assignmentListActionCopy,
+  assignmentListPageCopy,
+  assignmentListPublishedPanelCopy,
+  assignmentListSearchCopy,
+  assignmentStatusFilterOptions,
+  buildAssignmentListCardStats,
+  getAssignmentListEmptyState,
+} from '@/assignments/list-view';
+import {
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
@@ -81,16 +90,6 @@ type AssignmentCardData = {
     completions: number;
   };
 };
-
-const assignmentStatusFilterOptions: Array<{
-  label: string;
-  value: AssignmentStatusFilter;
-}> = [
-  { label: 'All statuses', value: 'all' },
-  { label: 'Published', value: 'published' },
-  { label: 'Closed', value: 'closed' },
-  { label: 'Draft', value: 'draft' },
-];
 
 const ASSIGNMENT_LIST_PAGE_SIZE = 12;
 
@@ -188,11 +187,17 @@ function DashboardAssignmentsPage() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: 'Dashboard', href: Routes.Dashboard },
-        { label: 'Assignments', isCurrentPage: true },
+        {
+          label: assignmentListPageCopy.breadcrumbDashboard,
+          href: Routes.Dashboard,
+        },
+        {
+          label: assignmentListPageCopy.breadcrumbCurrent,
+          isCurrentPage: true,
+        },
       ]}
-      title="Assignments"
-      description="Published activity instances with share links, classroom settings, and result metrics."
+      title={assignmentListPageCopy.title}
+      description={assignmentListPageCopy.description}
     >
       <div className="grid gap-6">
         <section className="grid gap-4 md:grid-cols-4">
@@ -230,7 +235,7 @@ function DashboardAssignmentsPage() {
 
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            Assignments could not be loaded. Refresh the page or sign in again.
+            {assignmentListPageCopy.loadErrorMessage}
           </div>
         ) : null}
 
@@ -288,9 +293,11 @@ function DashboardAssignmentsPage() {
 
         {!isLoading && !hasAssignments && hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">No matching assignments.</h2>
+            <h2 className="text-lg font-semibold">
+              {getAssignmentListEmptyState({ hasFilters }).title}
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Try another assignment title, share id, activity name, or status.
+              {getAssignmentListEmptyState({ hasFilters }).description}
             </p>
             <Button
               type="button"
@@ -299,7 +306,7 @@ function DashboardAssignmentsPage() {
               onClick={clearFilters}
             >
               <IconX className="size-4" />
-              Clear filters
+              {assignmentListActionCopy.clearFilters}
             </Button>
           </div>
         ) : null}
@@ -308,18 +315,17 @@ function DashboardAssignmentsPage() {
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">
-                No published assignments yet.
+                {getAssignmentListEmptyState({ hasFilters }).title}
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Open the activity library and publish a saved activity to create
-                a student share link.
+                {getAssignmentListEmptyState({ hasFilters }).description}
               </p>
               <Link
                 to={Routes.DashboardActivities}
                 className={cn(buttonVariants(), 'mt-4 w-fit')}
               >
                 <IconListCheck className="size-4" />
-                Open activity library
+                {assignmentListActionCopy.openActivityLibrary}
               </Link>
             </div>
             <section className="grid gap-4">
@@ -383,7 +389,7 @@ function PublishedAssignmentPanel({
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-sm font-medium text-primary">
           <IconCircleCheck className="size-4" />
-          Assignment published
+          {assignmentListPublishedPanelCopy.publishedLabel}
         </div>
         <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -391,8 +397,7 @@ function PublishedAssignmentPanel({
         </p>
         {panelContext.showMissingHint ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            The new assignment may be on another page after filtering. The share
-            link actions still use the published link id.
+            {assignmentListPublishedPanelCopy.missingHint}
           </p>
         ) : null}
       </div>
@@ -407,7 +412,7 @@ function PublishedAssignmentPanel({
             )}
           >
             <IconChartBar className="size-4" />
-            View results
+            {assignmentListActionCopy.viewResults}
           </Link>
         ) : null}
         <Link
@@ -419,7 +424,7 @@ function PublishedAssignmentPanel({
           )}
         >
           <IconPlayerPlay className="size-4" />
-          Open link
+          {assignmentListActionCopy.openPublishedLink}
         </Link>
         <CopyAssignmentShareLinkButton
           shareSlug={shareSlug}
@@ -432,7 +437,7 @@ function PublishedAssignmentPanel({
           onClick={onDismiss}
         >
           <IconX className="size-4" />
-          Dismiss
+          {assignmentListActionCopy.dismiss}
         </Button>
       </div>
     </section>
@@ -469,21 +474,21 @@ function AssignmentListFilters({
     <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
       <div className="grid gap-2">
         <label htmlFor="assignment-list-search" className="font-medium text-sm">
-          Search assignments
+          {assignmentListSearchCopy.label}
         </label>
         <div className="relative max-w-xl">
           <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
           <Input
             id="assignment-list-search"
             value={search}
-            placeholder="Search by assignment, activity, or share id"
+            placeholder={assignmentListSearchCopy.placeholder}
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {search ? (
             <button
               type="button"
-              aria-label="Clear assignment search"
+              aria-label={assignmentListSearchCopy.clearSearchLabel}
               className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => onSearch('')}
             >
@@ -497,7 +502,7 @@ function AssignmentListFilters({
           htmlFor="assignment-status-filter"
           className="font-medium text-sm"
         >
-          Status
+          {assignmentListSearchCopy.statusLabel}
         </label>
         <NativeSelect
           id="assignment-status-filter"
@@ -523,7 +528,7 @@ function AssignmentListFilters({
             onClick={onClear}
           >
             <IconFilter className="size-4" />
-            Clear filters
+            {assignmentListActionCopy.clearFilters}
           </Button>
         ) : null}
       </div>
@@ -534,6 +539,7 @@ function AssignmentListFilters({
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const persisted = !assignment.id.startsWith('assignment-');
+  const stats = buildAssignmentListCardStats(assignment.stats);
   const statusAction = buildAssignmentStatusAction({
     currentStatus: assignment.status,
     expiresAt: assignment.expiresAt,
@@ -587,16 +593,14 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             timeLimitSeconds={assignment.timeLimitSeconds}
           />
           <div className="grid gap-3 sm:grid-cols-2">
-            <AssignmentStat
-              icon={IconUsers}
-              label="Completions"
-              value={String(assignment.stats.completions)}
-            />
-            <AssignmentStat
-              icon={IconChartBar}
-              label="Average"
-              value={`${assignment.stats.averageScore}%`}
-            />
+            {stats.map((stat) => (
+              <AssignmentStat
+                key={stat.key}
+                icon={assignmentListCardStatIcons[stat.key]}
+                label={stat.label}
+                value={stat.value}
+              />
+            ))}
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
@@ -610,7 +614,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
               )}
             >
               <IconChartBar className="size-4" />
-              View results
+              {assignmentListActionCopy.viewResults}
             </Link>
           ) : null}
           {statusAction ? (
@@ -635,7 +639,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
             className={cn(buttonVariants(), 'w-full lg:w-auto')}
           >
             <IconPlayerPlay className="size-4" />
-            Open share link
+            {assignmentListActionCopy.openShareLink}
           </Link>
           <CopyAssignmentShareLinkButton
             shareSlug={assignment.shareSlug}
@@ -669,6 +673,14 @@ const assignmentSummaryMetricIcons: Record<
   completions: IconUsers,
   open: IconShare3,
   total: IconListCheck,
+};
+
+const assignmentListCardStatIcons: Record<
+  ReturnType<typeof buildAssignmentListCardStats>[number]['key'],
+  typeof IconUsers
+> = {
+  average: IconChartBar,
+  completions: IconUsers,
 };
 
 function AssignmentStat({

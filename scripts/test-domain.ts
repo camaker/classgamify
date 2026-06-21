@@ -119,6 +119,15 @@ import {
   buildAssignmentListSummaryMetrics,
 } from '@/assignments/list-summary';
 import {
+  assignmentListActionCopy,
+  assignmentListPageCopy,
+  assignmentListPublishedPanelCopy,
+  assignmentListSearchCopy,
+  assignmentStatusFilterOptions,
+  buildAssignmentListCardStats,
+  getAssignmentListEmptyState,
+} from '@/assignments/list-view';
+import {
   buildAssignmentStatusAction,
   getAssignmentStatusActionCopy,
 } from '@/assignments/lifecycle';
@@ -1717,6 +1726,48 @@ assert.deepEqual(
     { id: 'open', label: 'Open links', value: '2' },
     { id: 'completions', label: 'Completions', value: '11' },
     { id: 'average', label: 'Average', value: '76%' },
+  ]
+);
+assert.deepEqual(
+  assignmentStatusFilterOptions.map((option) => option.value),
+  ['all', 'published', 'closed', 'draft']
+);
+assert.deepEqual(assignmentListPageCopy, {
+  breadcrumbCurrent: 'Assignments',
+  breadcrumbDashboard: 'Dashboard',
+  description:
+    'Published activity instances with share links, classroom settings, and result metrics.',
+  loadErrorMessage:
+    'Assignments could not be loaded. Refresh the page or sign in again.',
+  title: 'Assignments',
+});
+assert.equal(
+  assignmentListSearchCopy.placeholder,
+  'Search by assignment, activity, or share id'
+);
+assert.equal(assignmentListActionCopy.viewResults, 'View results');
+assert.equal(
+  assignmentListPublishedPanelCopy.publishedLabel,
+  'Assignment published'
+);
+assert.deepEqual(getAssignmentListEmptyState({ hasFilters: true }), {
+  description:
+    'Try another assignment title, share id, activity name, or status.',
+  title: 'No matching assignments.',
+});
+assert.deepEqual(getAssignmentListEmptyState({ hasFilters: false }), {
+  description:
+    'Open the activity library and publish a saved activity to create a student share link.',
+  title: 'No published assignments yet.',
+});
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: 83,
+    completions: 12,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '12' },
+    { key: 'average', label: 'Average', value: '83%' },
   ]
 );
 const questionOnlyContent = buildActivityContent({
