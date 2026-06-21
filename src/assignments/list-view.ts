@@ -4,7 +4,11 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
-import { buildAssignmentStatusAction } from '@/assignments/lifecycle';
+import {
+  type AssignmentStatusAction,
+  buildAssignmentStatusAction,
+  getAssignmentStatusLabel,
+} from '@/assignments/lifecycle';
 
 type AssignmentListControlOption = {
   label: string;
@@ -19,7 +23,15 @@ type AssignmentListCardStat = {
   value: string;
 };
 
+type AssignmentListCardActionState = {
+  isPersisted: boolean;
+  showResultsAction: boolean;
+  showShareActions: boolean;
+  statusAction: AssignmentStatusAction | undefined;
+};
+
 type AssignmentListCardViewModel = {
+  actionState: AssignmentListCardActionState;
   activityDescription: string;
   expiresAt: Date | null;
   id: string;
@@ -33,6 +45,8 @@ type AssignmentListCardViewModel = {
     averageScore: number;
     completions: number;
   };
+  statItems: AssignmentListCardStat[];
+  statusLabel: string;
 };
 
 type AssignmentListCardSource = {
@@ -53,6 +67,7 @@ type AssignmentListCardSource = {
     templateType: ActivityTemplateType;
   } | null;
   stats: AssignmentListCardViewModel['stats'];
+  now?: number;
 };
 
 type StarterAssignmentListCardSource = {
@@ -175,19 +190,34 @@ export function buildAssignmentListCardStats({
 export function buildAssignmentListCardViewModel({
   activity,
   assignment,
+  now,
   snapshot,
   stats,
 }: AssignmentListCardSource): AssignmentListCardViewModel {
+  const persisted = true;
+
   return {
+    actionState: getAssignmentListCardActionState({
+      expiresAt: assignment.expiresAt,
+      now,
+      persisted,
+      status: assignment.status,
+    }),
     activityDescription:
       snapshot?.activityDescription ?? activity.description ?? '',
     expiresAt: assignment.expiresAt,
     id: assignment.id,
-    persisted: true,
+    persisted,
     settings: assignment.settingsJson,
     shareSlug: assignment.shareSlug,
     stats,
+    statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
+    statusLabel: getAssignmentStatusLabel(
+      assignment.status,
+      assignment.expiresAt,
+      now
+    ),
     templateType: snapshot?.templateType ?? activity.templateType,
     title: assignment.title,
   };
@@ -197,18 +227,29 @@ export function buildStarterAssignmentListCardViewModel({
   activity,
   assignment,
 }: StarterAssignmentListCardSource): AssignmentListCardViewModel {
+  const expiresAt = assignment.expiresAt ?? null;
+  const persisted = false;
+  const stats = {
+    averageScore: assignment.averageScore,
+    completions: assignment.completions,
+  };
+
   return {
+    actionState: getAssignmentListCardActionState({
+      expiresAt,
+      persisted,
+      status: assignment.status,
+    }),
     activityDescription: activity.description,
-    expiresAt: assignment.expiresAt ?? null,
+    expiresAt,
     id: assignment.id,
-    persisted: false,
+    persisted,
     settings: assignment.settings,
     shareSlug: assignment.shareId,
-    stats: {
-      averageScore: assignment.averageScore,
-      completions: assignment.completions,
-    },
+    stats,
+    statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
+    statusLabel: getAssignmentStatusLabel(assignment.status, expiresAt),
     templateType: activity.templateType,
     title: assignment.title,
   };
@@ -216,13 +257,15 @@ export function buildStarterAssignmentListCardViewModel({
 
 export function getAssignmentListCardActionState({
   expiresAt,
+  now,
   persisted,
   status,
 }: {
   expiresAt: Date | null;
+  now?: number;
   persisted: boolean;
   status: AssignmentStatus;
-}) {
+}): AssignmentListCardActionState {
   return {
     isPersisted: persisted,
     showResultsAction: persisted,
@@ -231,6 +274,7 @@ export function getAssignmentListCardActionState({
       currentStatus: status,
       expiresAt,
       isPersisted: persisted,
+      now,
     }),
   };
 }

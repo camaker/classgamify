@@ -17,13 +17,10 @@ import {
   assignmentListPublishedPanelCopy,
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
-  buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
   buildStarterAssignmentListCardViewModel,
-  getAssignmentListCardActionState,
 } from '@/assignments/list-view';
-import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -487,13 +484,8 @@ function AssignmentCard({
   assignment: ReturnType<typeof buildAssignmentListCardViewModel>;
 }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
-  const stats = buildAssignmentListCardStats(assignment.stats);
   const { showResultsAction, showShareActions, statusAction } =
-    getAssignmentListCardActionState({
-      expiresAt: assignment.expiresAt,
-      persisted: assignment.persisted,
-      status: assignment.status,
-    });
+    assignment.actionState;
 
   async function updateStatus() {
     if (!statusAction) return;
@@ -516,7 +508,7 @@ function AssignmentCard({
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
-            {getAssignmentStatusLabel(assignment.status, assignment.expiresAt)}
+            {assignment.statusLabel}
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconListCheck className="size-3.5" />
@@ -537,7 +529,7 @@ function AssignmentCard({
             settings={assignment.settings}
           />
           <div className="grid gap-3 sm:grid-cols-2">
-            {stats.map((stat) => (
+            {assignment.statItems.map((stat) => (
               <AssignmentStat
                 key={stat.key}
                 icon={assignmentListCardStatIcons[stat.key]}
@@ -624,7 +616,9 @@ const assignmentSummaryMetricIcons: Record<
 };
 
 const assignmentListCardStatIcons: Record<
-  ReturnType<typeof buildAssignmentListCardStats>[number]['key'],
+  ReturnType<
+    typeof buildAssignmentListCardViewModel
+  >['statItems'][number]['key'],
   typeof IconUsers
 > = {
   average: IconChartBar,

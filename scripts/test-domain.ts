@@ -2566,8 +2566,21 @@ assert.deepEqual(
       averageScore: 76,
       completions: 9,
     },
+    now: new Date('2026-01-15T00:00:00.000Z').getTime(),
   }),
   {
+    actionState: {
+      isPersisted: true,
+      showResultsAction: true,
+      showShareActions: true,
+      statusAction: {
+        failureMessage: 'Assignment status could not be updated.',
+        kind: 'close-link',
+        label: 'Close link',
+        nextStatus: 'closed',
+        successMessage: 'Assignment link closed.',
+      },
+    },
     activityDescription: 'Frozen activity description',
     expiresAt: new Date('2026-02-01T00:00:00.000Z'),
     id: 'persisted-assignment-1',
@@ -2585,7 +2598,12 @@ assert.deepEqual(
       averageScore: 76,
       completions: 9,
     },
+    statItems: [
+      { key: 'completions', label: 'Completions', value: '9' },
+      { key: 'average', label: 'Average', value: '76%' },
+    ],
     status: 'published',
+    statusLabel: 'Open',
     templateType: 'line-match',
     title: 'Persisted assignment',
   }
@@ -2638,6 +2656,12 @@ assert.deepEqual(
     },
   }),
   {
+    actionState: {
+      isPersisted: false,
+      showResultsAction: false,
+      showShareActions: true,
+      statusAction: undefined,
+    },
     activityDescription: 'Starter activity description',
     expiresAt: null,
     id: 'assignment-food-demo',
@@ -2653,7 +2677,12 @@ assert.deepEqual(
       averageScore: 84,
       completions: 18,
     },
+    statItems: [
+      { key: 'completions', label: 'Completions', value: '18' },
+      { key: 'average', label: 'Average', value: '84%' },
+    ],
     status: 'published',
+    statusLabel: 'Open',
     templateType: 'group-sort',
     title: 'Food words homework',
   }
