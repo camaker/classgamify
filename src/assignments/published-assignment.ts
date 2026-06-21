@@ -1,3 +1,5 @@
+import { buildAssignmentSharePath } from '@/assignments/share-link';
+
 export type PublishedAssignmentListItem = {
   assignment: {
     id: string;
@@ -18,6 +20,7 @@ export function findPublishedAssignmentInList<
 export type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentListItem['assignment'];
   body: string;
+  sharePath: string;
   showMissingHint: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
@@ -40,6 +43,7 @@ export function buildPublishedAssignmentPanelContext<
     return {
       assignment,
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+      sharePath: buildAssignmentSharePath(shareSlug),
       showMissingHint: false,
       status: 'found',
       title: assignment.title,
@@ -49,6 +53,7 @@ export function buildPublishedAssignmentPanelContext<
   if (isLoading) {
     return {
       body: 'Loading the newly published assignment link and classroom actions.',
+      sharePath: buildAssignmentSharePath(shareSlug),
       showMissingHint: false,
       status: 'loading',
       title: 'Student share link is being prepared.',
@@ -57,6 +62,7 @@ export function buildPublishedAssignmentPanelContext<
 
   return {
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
+    sharePath: buildAssignmentSharePath(shareSlug),
     showMissingHint: true,
     status: 'missing',
     title: 'Student share link is ready.',

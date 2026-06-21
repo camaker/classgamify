@@ -392,6 +392,9 @@ function PublishedAssignmentPanel({
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
           {panelContext.body}
         </p>
+        <p className="mt-2 w-fit rounded-md border bg-background px-2 py-1 font-mono text-xs text-muted-foreground">
+          {panelContext.sharePath}
+        </p>
         {panelContext.showMissingHint ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {assignmentListPublishedPanelCopy.missingHint}
