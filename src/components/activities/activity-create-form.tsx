@@ -652,9 +652,10 @@ export function ActivityCreateForm({
 }
 
 function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
-  const { meta } = result;
   const summaryView = buildActivityDraftMetaSummaryView({
-    meta,
+    meta: result.meta,
+    model: result.model,
+    notice: result.notice,
     provider: result.provider,
   });
 
@@ -662,10 +663,9 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
     <div className="rounded-lg border bg-muted/20 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-sm">AI draft coverage</h3>
+          <h3 className="font-semibold text-sm">{summaryView.title}</h3>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            Review the generated content before saving it to the activity
-            library.
+            {summaryView.description}
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -679,9 +679,12 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
       </div>
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p>
-          Model: <span className="font-medium">{result.model}</span>
+          {summaryView.modelLabel}:{' '}
+          <span className="font-medium">{summaryView.modelName}</span>
         </p>
-        {result.notice ? <p className="mt-1">{result.notice}</p> : null}
+        {summaryView.notice ? (
+          <p className="mt-1">{summaryView.notice}</p>
+        ) : null}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
         {summaryView.coverageStats.map((stat) => (
@@ -692,9 +695,9 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
           />
         ))}
       </div>
-      {meta.suggestedTemplateOptions.length > 0 ? (
+      {summaryView.suggestedTemplateOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {meta.suggestedTemplateOptions.map((option) => (
+          {summaryView.suggestedTemplateOptions.map((option) => (
             <Badge
               key={option.template}
               variant="outline"
@@ -706,7 +709,7 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
         </div>
       ) : null}
       <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {meta.templateReadiness.map((option) => (
+        {summaryView.templateReadinessOptions.map((option) => (
           <div
             key={option.template}
             className={cn(
@@ -721,16 +724,16 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
               >
                 {option.shortName}
               </Badge>
-              {option.isCurrent ? (
+              {option.selectedLabel ? (
                 <Badge variant="outline" className="rounded-md">
-                  selected
+                  {option.selectedLabel}
                 </Badge>
               ) : null}
               <span className="text-xs text-muted-foreground">
                 {option.readinessLabel}
               </span>
             </div>
-            {!option.isReady ? (
+            {option.diagnosis ? (
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
                 {option.diagnosis}
               </p>
@@ -739,7 +742,7 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
         ))}
       </div>
       <div className="mt-4 grid gap-1.5">
-        {meta.reviewChecklist.map((item) => (
+        {summaryView.reviewChecklist.map((item) => (
           <p key={item} className="text-xs leading-5 text-muted-foreground">
             {item}
           </p>

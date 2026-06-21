@@ -59,13 +59,31 @@ export type ActivityTemplateReadinessPanelSummary = {
 
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
 
+type ActivityDraftMetaSummaryReadinessOption = {
+  diagnosis?: string;
+  isCurrent: boolean;
+  isReady: boolean;
+  readinessLabel: string;
+  selectedLabel?: string;
+  shortName: string;
+  template: ActivityTemplateType;
+};
+
 type ActivityDraftMetaSummaryView = {
   coverageStats: Array<{
     label: string;
     value: number;
   }>;
+  description: string;
+  modelLabel: string;
+  modelName: string;
+  notice?: string;
   providerLabel: string;
   readyTemplateLabel: string;
+  reviewChecklist: string[];
+  suggestedTemplateOptions: ActivityDraftTemplateOption[];
+  templateReadinessOptions: ActivityDraftMetaSummaryReadinessOption[];
+  title: string;
 };
 
 export function buildActivityDraftMeta({
@@ -132,9 +150,13 @@ export function buildActivityDraftMeta({
 
 export function buildActivityDraftMetaSummaryView({
   meta,
+  model,
+  notice,
   provider,
 }: {
   meta: ActivityDraftMeta;
+  model: string;
+  notice?: string;
   provider: ActivityDraftProvider;
 }): ActivityDraftMetaSummaryView {
   return {
@@ -145,10 +167,27 @@ export function buildActivityDraftMetaSummaryView({
       { label: 'Vocab', value: meta.coverage.vocabulary },
       { label: 'Notes', value: meta.coverage.teacherNotes },
     ],
+    description:
+      'Review the generated content before saving it to the activity library.',
+    modelLabel: 'Model',
+    modelName: model.trim() || 'Unknown model',
+    notice,
     providerLabel: provider === 'workers-ai' ? 'Workers AI' : 'Fallback',
     readyTemplateLabel: `${meta.readyTemplateCount} ready ${
       meta.readyTemplateCount === 1 ? 'template' : 'templates'
     }`,
+    reviewChecklist: meta.reviewChecklist,
+    suggestedTemplateOptions: meta.suggestedTemplateOptions,
+    templateReadinessOptions: meta.templateReadiness.map((option) => ({
+      diagnosis: option.isReady ? undefined : option.diagnosis,
+      isCurrent: option.isCurrent,
+      isReady: option.isReady,
+      readinessLabel: option.readinessLabel,
+      selectedLabel: option.isCurrent ? 'selected' : undefined,
+      shortName: option.shortName,
+      template: option.template,
+    })),
+    title: 'AI draft coverage',
   };
 }
 

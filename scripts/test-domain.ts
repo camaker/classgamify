@@ -3378,22 +3378,75 @@ assert.ok(
     item.includes('Ready to remix after saving')
   )
 );
+const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  meta: fallbackDraftMeta,
+  model: 'test-model',
+  notice: 'Fallback used for testing.',
+  provider: 'fallback',
+});
+assert.deepEqual(fallbackDraftMetaSummary.coverageStats, [
+  { label: 'Questions', value: 5 },
+  { label: 'Pairs', value: 5 },
+  { label: 'Groups', value: fallbackDraftMeta.coverage.groups },
+  { label: 'Vocab', value: fallbackDraftMeta.coverage.vocabulary },
+  { label: 'Notes', value: fallbackDraftMeta.coverage.teacherNotes },
+]);
+assert.equal(fallbackDraftMetaSummary.title, 'AI draft coverage');
+assert.equal(
+  fallbackDraftMetaSummary.description,
+  'Review the generated content before saving it to the activity library.'
+);
+assert.equal(fallbackDraftMetaSummary.modelLabel, 'Model');
+assert.equal(fallbackDraftMetaSummary.modelName, 'test-model');
+assert.equal(fallbackDraftMetaSummary.notice, 'Fallback used for testing.');
+assert.equal(fallbackDraftMetaSummary.providerLabel, 'Fallback');
+assert.equal(
+  fallbackDraftMetaSummary.readyTemplateLabel,
+  `${fallbackDraftMeta.readyTemplateCount} ready templates`
+);
+assert.equal(
+  fallbackDraftMetaSummary.reviewChecklist,
+  fallbackDraftMeta.reviewChecklist
+);
+assert.equal(
+  fallbackDraftMetaSummary.suggestedTemplateOptions,
+  fallbackDraftMeta.suggestedTemplateOptions
+);
 assert.deepEqual(
-  buildActivityDraftMetaSummaryView({
-    meta: fallbackDraftMeta,
-    provider: 'fallback',
-  }),
+  fallbackDraftMetaSummary.templateReadinessOptions.find(
+    (option) => option.template === 'listening'
+  ),
   {
-    coverageStats: [
-      { label: 'Questions', value: 5 },
-      { label: 'Pairs', value: 5 },
-      { label: 'Groups', value: fallbackDraftMeta.coverage.groups },
-      { label: 'Vocab', value: fallbackDraftMeta.coverage.vocabulary },
-      { label: 'Notes', value: fallbackDraftMeta.coverage.teacherNotes },
-    ],
-    providerLabel: 'Fallback',
-    readyTemplateLabel: `${fallbackDraftMeta.readyTemplateCount} ready templates`,
+    diagnosis: undefined,
+    isCurrent: true,
+    isReady: true,
+    readinessLabel: 'Ready',
+    selectedLabel: 'selected',
+    shortName: 'Listen',
+    template: 'listening',
   }
+);
+const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  meta: buildActivityDraftMeta({
+    activity: {
+      ...activityEditorDefaultInput,
+      groupsText: '',
+      pairsText: '',
+      questionsText: 'Question only? | Yes | Yes, No, Maybe',
+      templateType: 'quiz',
+    },
+    currentTemplateType: 'quiz',
+  }),
+  model: 'test-model',
+  provider: 'workers-ai',
+});
+assert.ok(
+  questionOnlyDraftMetaSummary.templateReadinessOptions.some(
+    (option) =>
+      option.template === 'line-match' &&
+      !option.isReady &&
+      option.diagnosis?.includes('match pairs')
+  )
 );
 assert.equal(
   buildActivityDraftMetaSummaryView({
@@ -3401,6 +3454,7 @@ assert.equal(
       ...fallbackDraftMeta,
       readyTemplateCount: 1,
     },
+    model: 'test-model',
     provider: 'workers-ai',
   }).readyTemplateLabel,
   '1 ready template'
@@ -3408,9 +3462,18 @@ assert.equal(
 assert.equal(
   buildActivityDraftMetaSummaryView({
     meta: fallbackDraftMeta,
+    model: 'test-model',
     provider: 'workers-ai',
   }).providerLabel,
   'Workers AI'
+);
+assert.equal(
+  buildActivityDraftMetaSummaryView({
+    meta: fallbackDraftMeta,
+    model: '   ',
+    provider: 'workers-ai',
+  }).modelName,
+  'Unknown model'
 );
 const oversizedAiDraft = {
   description: 'Oversized AI draft for item count shaping.',
