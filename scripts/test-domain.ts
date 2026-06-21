@@ -171,6 +171,7 @@ import {
   buildAttemptSubmissionAnswers,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
+  formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
   isStudentAnswerFilled,
@@ -444,6 +445,26 @@ assert.deepEqual(
     submitButtonLabel: 'Submit answers',
     unansweredLabel: undefined,
   }
+);
+assert.equal(
+  formatAttemptCompletionProgressLabel({
+    completionSummary: incompleteCompletionSummary,
+  }),
+  '1/3 answered'
+);
+assert.equal(
+  formatAttemptCompletionProgressLabel({
+    completionSummary: incompleteCompletionSummary,
+    verb: 'matched',
+  }),
+  '1/3 matched'
+);
+assert.equal(
+  formatAttemptCompletionProgressLabel({
+    completionSummary: incompleteCompletionSummary,
+    verb: '   ',
+  }),
+  '1/3 answered'
 );
 
 assert.deepEqual(

@@ -82,6 +82,18 @@ export function getAttemptCompletionSummary({
   };
 }
 
+export function formatAttemptCompletionProgressLabel({
+  completionSummary,
+  verb = 'answered',
+}: {
+  completionSummary: AttemptCompletionSummary;
+  verb?: string;
+}): string {
+  const progressVerb = verb.trim() || 'answered';
+
+  return `${completionSummary.answeredItemCount}/${completionSummary.itemCount} ${progressVerb}`;
+}
+
 export function buildAttemptCompletionCopy({
   completionSummary,
   confirmIncompleteSubmit,
@@ -89,15 +101,16 @@ export function buildAttemptCompletionCopy({
   completionSummary: AttemptCompletionSummary;
   confirmIncompleteSubmit: boolean;
 }): AttemptCompletionCopy {
-  const { answeredItemCount, itemCount, unansweredItemCount } =
-    completionSummary;
+  const { unansweredItemCount } = completionSummary;
 
   return {
     confirmIncompleteSubmit:
       unansweredItemCount === 1
         ? '1 question is still unanswered.'
         : `${unansweredItemCount} questions are still unanswered.`,
-    progressLabel: `${answeredItemCount}/${itemCount} answered`,
+    progressLabel: formatAttemptCompletionProgressLabel({
+      completionSummary,
+    }),
     submitButtonLabel:
       confirmIncompleteSubmit && unansweredItemCount > 0
         ? 'Submit anyway'

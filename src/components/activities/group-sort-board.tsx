@@ -4,6 +4,7 @@ import type {
 } from '@/assignments/public';
 import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import {
+  formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
@@ -76,8 +77,10 @@ export function GroupSortBoard({
           Group sort
         </div>
         <Badge variant="outline" className="rounded-md">
-          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
-          sorted
+          {formatAttemptCompletionProgressLabel({
+            completionSummary,
+            verb: 'sorted',
+          })}
         </Badge>
       </div>
 

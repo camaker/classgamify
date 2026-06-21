@@ -4,6 +4,7 @@ import type {
 } from '@/assignments/public';
 import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import {
+  formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
@@ -84,8 +85,7 @@ export function ListeningRunner({
           Listening
         </div>
         <Badge variant="outline" className="rounded-md">
-          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
-          answered
+          {formatAttemptCompletionProgressLabel({ completionSummary })}
         </Badge>
       </div>
 

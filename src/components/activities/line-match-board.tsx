@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
-import { getAttemptCompletionSummary } from '@/assignments/student-submission';
+import {
+  formatAttemptCompletionProgressLabel,
+  getAttemptCompletionSummary,
+} from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import {
   buildExclusiveChoiceAnswerChanges,
@@ -69,8 +72,10 @@ export function LineMatchBoard({
           Line match
         </div>
         <Badge variant="outline" className="rounded-md">
-          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
-          connected
+          {formatAttemptCompletionProgressLabel({
+            completionSummary,
+            verb: 'connected',
+          })}
         </Badge>
       </div>
 

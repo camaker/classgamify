@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
-import { getAttemptCompletionSummary } from '@/assignments/student-submission';
+import {
+  formatAttemptCompletionProgressLabel,
+  getAttemptCompletionSummary,
+} from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import {
   buildExclusiveChoiceAnswerChanges,
@@ -65,8 +68,10 @@ export function MatchingPairsBoard({
           Matching pairs
         </div>
         <Badge variant="outline" className="rounded-md">
-          {completionSummary.answeredItemCount}/{completionSummary.itemCount}{' '}
-          matched
+          {formatAttemptCompletionProgressLabel({
+            completionSummary,
+            verb: 'matched',
+          })}
         </Badge>
       </div>
 
