@@ -4125,8 +4125,17 @@ const fallbackOpenBoxDraft = createFallbackActivityDraft({
 const fallbackOpenBoxContent = buildActivityContent(fallbackOpenBoxDraft);
 assert.ok(
   fallbackOpenBoxContent.questions.every((question) =>
-    question.prompt.startsWith('Open the box')
+    question.prompt.startsWith('Open the box: explain or name')
   )
+);
+assert.equal(fallbackOpenBoxContent.questions[0]?.answer, 'community');
+assert.equal(
+  fallbackOpenBoxContent.questions[0]?.prompt.includes('community'),
+  false
+);
+assert.match(
+  fallbackOpenBoxContent.questions[0]?.explanation ?? '',
+  /Model answer: community\./
 );
 assert.ok(
   fallbackOpenBoxContent.questions.every(

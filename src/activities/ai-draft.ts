@@ -467,7 +467,7 @@ function buildFallbackQuestions({
       case 'listening':
         return `Listen to this sentence: ${term} is important in ${input.subject}. | ${term} | ${choices} | The spoken sentence names ${term}.`;
       case 'open-box':
-        return `Open the box and answer with this ${input.subject} idea: ${term}. | ${term} | | ${explanation}`;
+        return `Open the box: explain or name the ${input.subject} idea from this lesson. | ${term} | | Model answer: ${term}. ${explanation}`;
       default:
         return `Which item belongs in this lesson set: ${term}? | ${term} | ${choices} | ${explanation}`;
     }
