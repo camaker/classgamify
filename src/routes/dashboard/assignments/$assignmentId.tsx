@@ -878,7 +878,10 @@ function ItemAnalysisCard({
         </span>
       </div>
       <p className="mt-3 line-clamp-2 text-sm font-medium">{itemView.prompt}</p>
-      <Progress value={item.correctRate} className="mt-3 h-2" />
+      <Progress
+        value={itemView.correctRateProgressValue}
+        className="mt-3 h-2"
+      />
       <p className="mt-2 text-xs text-muted-foreground">
         {itemView.correctSummaryLabel} · {itemView.expectedAnswerLabel}:{' '}
         {itemView.expectedAnswerText}

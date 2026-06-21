@@ -615,6 +615,7 @@ export function buildAssignmentItemAnalysisCardView(
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedLabel,
     acceptedAnswersText,
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctRateProgressValue: clampProgressValue(item.correctRate),
     correctSummaryLabel: formatAssignmentItemCorrectSummary(item),
     expectedAnswerLabel: assignmentResultReviewCopy.itemAnswerLabel,
     expectedAnswerText: formatAssignmentResultValue(item.expectedAnswer),
@@ -694,6 +695,10 @@ export function formatAssignmentResultValue(value: string | null | undefined) {
 
 export function formatAssignmentReviewCount(count: number) {
   return `${count} ${count === 1 ? 'review' : 'reviews'}`;
+}
+
+function clampProgressValue(value: number) {
+  return Math.min(100, Math.max(0, value));
 }
 
 export type ResultSearchSummaryInput = {

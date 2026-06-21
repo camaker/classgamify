@@ -4700,6 +4700,7 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted',
     acceptedAnswersText: 'Paris, Paris, France',
     correctRateLabel: '67%',
+    correctRateProgressValue: 67,
     correctSummaryLabel: '2/3 correct',
     expectedAnswerLabel: 'answer',
     expectedAnswerText: 'Paris / Paris, France',
@@ -4719,6 +4720,7 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted',
     acceptedAnswersText: null,
     correctRateLabel: '50%',
+    correctRateProgressValue: 50,
     correctSummaryLabel: '1/2 correct',
     expectedAnswerLabel: 'answer',
     expectedAnswerText: '-',
@@ -4726,6 +4728,13 @@ assert.deepEqual(
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
   }
+);
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
+    correctRate: 120,
+  }).correctRateProgressValue,
+  100
 );
 assert.deepEqual(
   buildAssignmentItemPerformanceRowView({
