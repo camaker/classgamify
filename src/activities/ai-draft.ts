@@ -463,7 +463,7 @@ function buildFallbackQuestions({
 
     switch (input.templateType) {
       case 'fill-blank':
-        return `In this ${input.subject} lesson, remember ___. | ${term} | ${choices} | ${explanation}`;
+        return `${buildFallbackFillBlankPrompt({ input, term })} | ${term} | ${choices} | ${explanation}`;
       case 'listening':
         return `Track ${index + 1}: The ${input.subject} listening word is ${term}. | ${term} | ${choices} | The spoken track names ${term}.`;
       case 'open-box':
@@ -481,15 +481,33 @@ function buildFallbackQuizPrompt({
   input: GenerateActivityDraftInput;
   term: string;
 }) {
+  return `Which ${input.subject} lesson term ${buildFallbackTermClue(term)}?`;
+}
+
+function buildFallbackFillBlankPrompt({
+  input,
+  term,
+}: {
+  input: GenerateActivityDraftInput;
+  term: string;
+}) {
+  return `Complete the ${input.subject} sentence: The lesson term that ${buildFallbackTermClue(term)} is ___.`;
+}
+
+function buildFallbackTermClue(term: string) {
   const characterCount = Array.from(term).length;
   const characterCountLabel = `${characterCount} ${
     characterCount === 1 ? 'character' : 'characters'
   }`;
   const firstCharacter = Array.from(term.trim()).find(Boolean) ?? term;
 
-  return `Which ${input.subject} lesson term starts with ${JSON.stringify(
+  if (characterCount <= 1) {
+    return `has ${characterCountLabel}`;
+  }
+
+  return `starts with ${JSON.stringify(
     firstCharacter
-  )} and has ${characterCountLabel}?`;
+  )} and has ${characterCountLabel}`;
 }
 
 function buildFallbackPairs({

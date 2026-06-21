@@ -4196,6 +4196,15 @@ assert.ok(
     question.prompt.includes('___')
   )
 );
+assert.equal(fallbackFillBlankContent.questions[0]?.answer, 'plants');
+assert.equal(
+  fallbackFillBlankContent.questions[0]?.prompt.includes('plants'),
+  false
+);
+assert.match(
+  fallbackFillBlankContent.questions[0]?.prompt ?? '',
+  /starts with "p" and has 6 characters/
+);
 assert.equal(getRuntimeItems('fill-blank', fallbackFillBlankContent).length, 3);
 const fallbackQuizDraft = createFallbackActivityDraft({
   difficulty: 'starter',
