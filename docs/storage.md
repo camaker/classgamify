@@ -10,14 +10,14 @@ The storage module provides file upload (and optional delete) using **Cloudflare
    npx wrangler r2 bucket create <BUCKET_NAME>
    ```
 
-   Use the same name as `bucket_name` in `wrangler.jsonc` (e.g. `lang-study`).
+   Use the same name as `bucket_name` in `wrangler.jsonc` (e.g. `classgamify`).
 
 2. **Configure the bucket in `wrangler.jsonc`**:
 
    ```jsonc
    "r2_buckets": [
      {
-      "bucket_name": "lang-study",
+      "bucket_name": "classgamify",
       "binding": "BUCKET"
      }
    ]
