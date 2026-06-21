@@ -1,4 +1,8 @@
 import {
+  formatRuntimeItemKindLabel,
+  formatRuntimeItemPrompt,
+} from '@/activities/runtime';
+import {
   buildPublicAttemptReviewItemMap,
   type PublicAttemptReviewItem,
   type PublicRuntimeItem,
@@ -33,14 +37,18 @@ export function buildStudentRunnerView({
     runtimeItems: items,
   });
   const reviewByItemId = buildPublicAttemptReviewItemMap(reviewItems);
-  const itemViews = items.map((item) => {
+  const itemViews = items.map((item, index) => {
     const answer = answers[item.id] ?? '';
     const reviewItem = reviewByItemId.get(item.id);
+    const prompt = formatRuntimeItemPrompt(item);
 
     return {
       answer,
       answered: isStudentAnswerFilled(answer),
       item,
+      kindLabel: formatRuntimeItemKindLabel(item),
+      positionLabel: `${index + 1}. ${prompt}`,
+      prompt,
       reviewItem,
       status: getStudentRunnerReviewStatus(reviewItem),
     };

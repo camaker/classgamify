@@ -1,8 +1,6 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
-  formatRuntimeItemKindLabel,
-  formatRuntimeItemPrompt,
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
@@ -36,6 +34,7 @@ import {
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
 } from '@/assignments/student-runner-state';
+import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -545,6 +544,11 @@ function RuntimeItemList({
 }) {
   const runnerKind = getActivityTemplateRunnerKind(templateType);
   const runnerCopy = getActivityTemplateRunnerCopy(templateType);
+  const runnerView = buildStudentRunnerView({
+    answers,
+    items,
+    reviewItems,
+  });
 
   if (runnerKind === 'line-match') {
     return (
@@ -638,19 +642,18 @@ function RuntimeItemList({
 
   return (
     <div className="mt-4 grid gap-3">
-      {items.map((item, index) => (
+      {runnerView.itemViews.map((itemView) => (
         <RuntimeItemCard
-          key={item.id}
-          answer={answers[item.id] ?? ''}
+          key={itemView.item.id}
+          answer={itemView.answer}
           disabled={disabled}
-          index={index}
-          item={item}
-          reviewItem={reviewItems?.find(
-            (reviewItem) => reviewItem.itemId === item.id
-          )}
+          item={itemView.item}
+          kindLabel={itemView.kindLabel}
+          positionLabel={itemView.positionLabel}
+          reviewItem={itemView.reviewItem}
           runnerCopy={runnerCopy}
           revealAnswer={revealAnswer}
-          onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
+          onAnswerChange={(answer) => onAnswerChange(itemView.item.id, answer)}
         />
       ))}
     </div>
@@ -660,31 +663,28 @@ function RuntimeItemList({
 function RuntimeItemCard({
   answer,
   disabled,
-  index,
   item,
+  kindLabel,
   onAnswerChange,
+  positionLabel,
   revealAnswer,
   reviewItem,
   runnerCopy,
 }: {
   answer: string;
   disabled: boolean;
-  index: number;
   item: PublicRuntimeItem;
+  kindLabel: string;
   onAnswerChange: (answer: string) => void;
+  positionLabel: string;
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
   runnerCopy: ReturnType<typeof getActivityTemplateRunnerCopy>;
 }) {
-  const prompt = formatRuntimeItemPrompt(item);
-  const kindLabel = formatRuntimeItemKindLabel(item);
-
   return (
     <div className="rounded-lg border bg-card p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <p className="text-sm font-medium">
-          {index + 1}. {prompt}
-        </p>
+        <p className="text-sm font-medium">{positionLabel}</p>
         <Badge variant="outline" className="rounded-md">
           {kindLabel}
         </Badge>

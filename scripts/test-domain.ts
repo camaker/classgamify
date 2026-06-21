@@ -1837,10 +1837,26 @@ assert.deepEqual(studentRunnerView.choices, [
   'South',
 ]);
 assert.equal(studentRunnerView.itemViewsById.get('q-1')?.status, 'correct');
+assert.deepEqual(studentRunnerView.itemViews[0], {
+  answer: 'Paris',
+  answered: true,
+  item: {
+    choices: ['Paris', 'Lyon'],
+    id: 'q-1',
+    kind: 'question',
+    prompt: 'Capital of France?',
+  },
+  kindLabel: 'Question',
+  positionLabel: '1. Capital of France?',
+  prompt: 'Capital of France?',
+  reviewItem: publicReviewMap.get('q-1'),
+  status: 'correct',
+});
 assert.equal(
   studentRunnerView.itemViewsById.get('pair-1')?.status,
   'needs-review'
 );
+assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
 assert.deepEqual(
   buildPublicAttemptReviewItems({
