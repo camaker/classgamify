@@ -16,7 +16,7 @@ import {
   type AssignmentListSummaryMetricId,
 } from '@/assignments/list-summary';
 import {
-  canUpdateAssignmentStatus,
+  buildAssignmentStatusAction,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
 import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
@@ -534,31 +534,24 @@ function AssignmentListFilters({
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const persisted = !assignment.id.startsWith('assignment-');
-  const nextStatus = assignment.status === 'published' ? 'closed' : 'published';
-  const canManageStatus =
-    persisted &&
-    canUpdateAssignmentStatus({
-      currentStatus: assignment.status,
-      expiresAt: assignment.expiresAt,
-      nextStatus,
-    });
+  const statusAction = buildAssignmentStatusAction({
+    currentStatus: assignment.status,
+    expiresAt: assignment.expiresAt,
+    isPersisted: persisted,
+  });
 
   async function updateStatus() {
+    if (!statusAction) return;
+
     try {
       await updateStatusMutation.mutateAsync({
         assignmentId: assignment.id,
-        status: nextStatus,
+        status: statusAction.nextStatus,
       });
-      toast.success(
-        nextStatus === 'closed'
-          ? 'Assignment link closed.'
-          : 'Assignment link reopened.'
-      );
+      toast.success(statusAction.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Assignment status could not be updated.'
+        error instanceof Error ? error.message : statusAction.failureMessage
       );
     }
   }
@@ -620,7 +613,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
               View results
             </Link>
           ) : null}
-          {canManageStatus ? (
+          {statusAction ? (
             <Button
               type="button"
               variant="outline"
@@ -628,12 +621,12 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
               disabled={updateStatusMutation.isPending}
               onClick={updateStatus}
             >
-              {assignment.status === 'published' ? (
+              {statusAction.kind === 'close-link' ? (
                 <IconLock className="size-4" />
               ) : (
                 <IconLockOpen className="size-4" />
               )}
-              {assignment.status === 'published' ? 'Close link' : 'Reopen link'}
+              {statusAction.label}
             </Button>
           ) : null}
           <Link

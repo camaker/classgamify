@@ -111,6 +111,10 @@ import {
   buildAssignmentListSummaryMetrics,
 } from '@/assignments/list-summary';
 import {
+  buildAssignmentStatusAction,
+  getAssignmentStatusActionCopy,
+} from '@/assignments/lifecycle';
+import {
   orderAssignmentRuntimeItems,
   stableShuffle,
 } from '@/assignments/item-order';
@@ -580,6 +584,61 @@ assert.deepEqual(
 assert.deepEqual(
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id),
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id)
+);
+assert.deepEqual(getAssignmentStatusActionCopy('closed'), {
+  failureMessage: 'Assignment status could not be updated.',
+  label: 'Close link',
+  successMessage: 'Assignment link closed.',
+});
+assert.deepEqual(getAssignmentStatusActionCopy('published'), {
+  failureMessage: 'Assignment status could not be updated.',
+  label: 'Reopen link',
+  successMessage: 'Assignment link reopened.',
+});
+assert.deepEqual(
+  buildAssignmentStatusAction({
+    currentStatus: 'published',
+    expiresAt: null,
+    isPersisted: true,
+  }),
+  {
+    failureMessage: 'Assignment status could not be updated.',
+    kind: 'close-link',
+    label: 'Close link',
+    nextStatus: 'closed',
+    successMessage: 'Assignment link closed.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentStatusAction({
+    currentStatus: 'closed',
+    expiresAt: null,
+    isPersisted: true,
+  }),
+  {
+    failureMessage: 'Assignment status could not be updated.',
+    kind: 'reopen-link',
+    label: 'Reopen link',
+    nextStatus: 'published',
+    successMessage: 'Assignment link reopened.',
+  }
+);
+assert.equal(
+  buildAssignmentStatusAction({
+    currentStatus: 'closed',
+    expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+    isPersisted: true,
+    now: new Date('2026-01-01T10:00:00.000Z').getTime(),
+  }),
+  undefined
+);
+assert.equal(
+  buildAssignmentStatusAction({
+    currentStatus: 'published',
+    expiresAt: null,
+    isPersisted: false,
+  }),
+  undefined
 );
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
 assert.equal(

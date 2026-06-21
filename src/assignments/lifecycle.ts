@@ -5,6 +5,15 @@ export type ManagedAssignmentStatus = Extract<
   AssignmentStatus,
   'closed' | 'published'
 >;
+export type AssignmentStatusActionKind = 'close-link' | 'reopen-link';
+
+export type AssignmentStatusAction = {
+  failureMessage: string;
+  kind: AssignmentStatusActionKind;
+  label: string;
+  nextStatus: ManagedAssignmentStatus;
+  successMessage: string;
+};
 
 export function getAssignmentTimestamp(value: AssignmentDate) {
   if (!value) return undefined;
@@ -63,6 +72,63 @@ export function canUpdateAssignmentStatus({
   }
 
   return false;
+}
+
+export function getNextManagedAssignmentStatus(
+  currentStatus: AssignmentStatus
+): ManagedAssignmentStatus {
+  return currentStatus === 'published' ? 'closed' : 'published';
+}
+
+export function getAssignmentStatusActionCopy(
+  nextStatus: ManagedAssignmentStatus
+): Omit<AssignmentStatusAction, 'kind' | 'nextStatus'> {
+  if (nextStatus === 'closed') {
+    return {
+      failureMessage: 'Assignment status could not be updated.',
+      label: 'Close link',
+      successMessage: 'Assignment link closed.',
+    };
+  }
+
+  return {
+    failureMessage: 'Assignment status could not be updated.',
+    label: 'Reopen link',
+    successMessage: 'Assignment link reopened.',
+  };
+}
+
+export function buildAssignmentStatusAction({
+  currentStatus,
+  expiresAt,
+  isPersisted = true,
+  now = Date.now(),
+}: {
+  currentStatus: AssignmentStatus;
+  expiresAt: AssignmentDate;
+  isPersisted?: boolean;
+  now?: number;
+}): AssignmentStatusAction | undefined {
+  if (!isPersisted) return undefined;
+
+  const nextStatus = getNextManagedAssignmentStatus(currentStatus);
+
+  if (
+    !canUpdateAssignmentStatus({
+      currentStatus,
+      expiresAt,
+      nextStatus,
+      now,
+    })
+  ) {
+    return undefined;
+  }
+
+  return {
+    kind: nextStatus === 'closed' ? 'close-link' : 'reopen-link',
+    nextStatus,
+    ...getAssignmentStatusActionCopy(nextStatus),
+  };
 }
 
 export function getAssignmentStatusTransitionError({
