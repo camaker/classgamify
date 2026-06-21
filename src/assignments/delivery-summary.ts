@@ -1,3 +1,4 @@
+import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 
 export type AssignmentDeliverySummaryId =
@@ -94,6 +95,25 @@ export function buildPublicAssignmentRuleSummary({
         label: rule.id === 'answerReveal' ? 'Review' : rule.label,
       })),
   ];
+}
+
+export function buildPublicAssignmentRuleSummaryFromSettings({
+  expiresAt,
+  itemCount,
+  settings,
+}: {
+  expiresAt: AssignmentDate;
+  itemCount: number;
+  settings: AssignmentSettings;
+}): PublicAssignmentRuleSummaryItem[] {
+  return buildPublicAssignmentRuleSummary({
+    collectStudentName: settings.collectStudentName,
+    expiresAt,
+    itemCount,
+    maxAttempts: settings.maxAttempts,
+    showCorrectAnswers: settings.showCorrectAnswers,
+    timeLimitSeconds: settings.timeLimitSeconds,
+  });
 }
 
 export function formatAssignmentItemCount(itemCount: number) {

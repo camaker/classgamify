@@ -6,10 +6,13 @@ import {
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
-import type { ActivityTemplateType } from '@/activities/types';
+import type {
+  ActivityTemplateType,
+  AssignmentSettings,
+} from '@/activities/types';
 import {
   type PublicAssignmentRuleSummaryId,
-  buildPublicAssignmentRuleSummary,
+  buildPublicAssignmentRuleSummaryFromSettings,
 } from '@/assignments/delivery-summary';
 import {
   buildAttemptTimerState,
@@ -334,12 +337,9 @@ function PlayPage() {
               </div>
             ) : null}
             <PublicAssignmentRules
-              collectStudentName={assignment.settings.collectStudentName}
               expiresAt={assignment.expiresAt ?? null}
               itemCount={itemCount}
-              maxAttempts={assignment.settings.maxAttempts}
-              showCorrectAnswers={assignment.settings.showCorrectAnswers}
-              timeLimitSeconds={assignment.settings.timeLimitSeconds}
+              settings={assignment.settings}
             />
           </div>
           <Link
@@ -477,27 +477,18 @@ function PlayPage() {
 }
 
 function PublicAssignmentRules({
-  collectStudentName,
   expiresAt,
   itemCount,
-  maxAttempts,
-  showCorrectAnswers,
-  timeLimitSeconds,
+  settings,
 }: {
-  collectStudentName: boolean;
   expiresAt: Date | null;
   itemCount: number;
-  maxAttempts?: number;
-  showCorrectAnswers: boolean;
-  timeLimitSeconds?: number;
+  settings: AssignmentSettings;
 }) {
-  const rules = buildPublicAssignmentRuleSummary({
-    collectStudentName,
+  const rules = buildPublicAssignmentRuleSummaryFromSettings({
     expiresAt,
     itemCount,
-    maxAttempts,
-    showCorrectAnswers,
-    timeLimitSeconds,
+    settings,
   });
 
   return (

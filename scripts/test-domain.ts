@@ -122,6 +122,7 @@ import {
 import {
   buildAssignmentDeliverySummary,
   buildPublicAssignmentRuleSummary,
+  buildPublicAssignmentRuleSummaryFromSettings,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
@@ -1438,6 +1439,27 @@ assert.deepEqual(
     { id: 'closes', label: 'Closes', value: 'No close time' },
     { id: 'identity', label: 'Student identity', value: 'Anonymous' },
     { id: 'answerReveal', label: 'Review', value: 'Hidden' },
+  ]
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryFromSettings({
+    expiresAt: null,
+    itemCount: 2,
+    settings: {
+      collectStudentName: true,
+      maxAttempts: 3,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    },
+  }),
+  [
+    { id: 'items', label: 'Items', value: '2 items' },
+    { id: 'attempts', label: 'Attempts', value: '3 max' },
+    { id: 'timer', label: 'Timer', value: '2 min' },
+    { id: 'closes', label: 'Closes', value: 'No close time' },
+    { id: 'identity', label: 'Student identity', value: 'Names' },
+    { id: 'answerReveal', label: 'Review', value: 'After submit' },
   ]
 );
 const publicPayloadActivityContent = buildActivityContent({
