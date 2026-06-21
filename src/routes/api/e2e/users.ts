@@ -5,7 +5,7 @@ import { account, session, user } from '@/db/auth.schema';
 import { payment, userFiles } from '@/db/app.schema';
 
 const TEST_EMAIL_PATTERN = 'e2e-%@example.test';
-const TEST_API_SECRET = 'mkfast-e2e-secret';
+const TEST_API_SECRET = 'classgamify-e2e-secret';
 
 function assertE2EAccess(request: Request) {
   const requestSecret = request.headers.get('x-e2e-secret');

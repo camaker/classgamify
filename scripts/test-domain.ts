@@ -346,6 +346,8 @@ assert.equal(
 const activeShareSurfaceText = [
   readFileSync('CLAUDE.md', 'utf8'),
   readFileSync('public/og-source.svg', 'utf8'),
+  readFileSync('src/routes/api/e2e/users.ts', 'utf8'),
+  readFileSync('tests/e2e/fixtures/test-data.ts', 'utf8'),
 ].join('\n');
 assert.doesNotMatch(
   activeShareSurfaceText,
