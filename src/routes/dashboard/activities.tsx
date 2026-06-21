@@ -17,7 +17,12 @@ import {
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
-import { buildActivityLibraryCardSummary } from '@/activities/library-summary';
+import {
+  buildActivityLibraryCardSummary,
+  buildActivityLibrarySummaryMetrics,
+  type ActivityLibrarySummaryMetric,
+  type ActivityLibrarySummaryMetricId,
+} from '@/activities/library-summary';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -125,15 +130,6 @@ function DashboardActivitiesPage() {
   });
   const activities = data?.items ?? [];
   const totalActivities = data?.total ?? 0;
-  const summary = data?.summary ?? {
-    archivedActivities: 0,
-    draftActivities: 0,
-    remixReadyActivities: 0,
-    templateCoverage: 0,
-    templateCoverageTotal: activityTemplates.length,
-    totalActivities,
-    totalReadyTemplateOptions: 0,
-  };
   const totalPages = Math.max(
     1,
     Math.ceil(totalActivities / ACTIVITY_LIBRARY_PAGE_SIZE)
@@ -153,6 +149,11 @@ function DashboardActivitiesPage() {
     libraryStatus === 'archived' && !hasContentFilters
       ? 'Archived activities will appear here after you move them out of the active library.'
       : 'Try another title, description, template keyword, or template family from your classroom activity library.';
+  const summaryMetrics = buildActivityLibrarySummaryMetrics({
+    hasFilters,
+    summary: data?.summary,
+    totalActivities,
+  });
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
@@ -238,26 +239,9 @@ function DashboardActivitiesPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-4">
-          <ActivitySummaryCard
-            icon={IconFolder}
-            label={hasFilters ? 'Matching activities' : 'Activities'}
-            value={String(summary.totalActivities)}
-          />
-          <ActivitySummaryCard
-            icon={IconDeviceGamepad2}
-            label="Template coverage"
-            value={`${summary.templateCoverage}/${summary.templateCoverageTotal}`}
-          />
-          <ActivitySummaryCard
-            icon={IconSwitchHorizontal}
-            label="Ready to remix"
-            value={String(summary.remixReadyActivities)}
-          />
-          <ActivitySummaryCard
-            icon={IconLayoutGrid}
-            label="Ready modes"
-            value={String(summary.totalReadyTemplateOptions)}
-          />
+          {summaryMetrics.map((metric) => (
+            <ActivitySummaryCard key={metric.id} metric={metric} />
+          ))}
         </section>
 
         <ActivityLibrarySearch
@@ -1038,21 +1022,29 @@ function ActivityStat({ label, value }: { label: string; value: number }) {
 }
 
 function ActivitySummaryCard({
-  icon: Icon,
-  label,
-  value,
+  metric,
 }: {
-  icon: typeof IconFolder;
-  label: string;
-  value: string;
+  metric: ActivityLibrarySummaryMetric;
 }) {
+  const Icon = activitySummaryMetricIcons[metric.id];
+
   return (
     <Card className="rounded-lg">
       <CardContent className="p-4">
         <Icon className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">{value}</p>
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
+        <p className="text-sm text-muted-foreground">{metric.label}</p>
       </CardContent>
     </Card>
   );
 }
+
+const activitySummaryMetricIcons: Record<
+  ActivityLibrarySummaryMetricId,
+  typeof IconFolder
+> = {
+  coverage: IconDeviceGamepad2,
+  readyModes: IconLayoutGrid,
+  remix: IconSwitchHorizontal,
+  total: IconFolder,
+};

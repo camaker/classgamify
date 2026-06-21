@@ -34,6 +34,18 @@ export type ActivityLibrarySummary = {
   totalReadyTemplateOptions: number;
 };
 
+export type ActivityLibrarySummaryMetricId =
+  | 'total'
+  | 'coverage'
+  | 'remix'
+  | 'readyModes';
+
+export type ActivityLibrarySummaryMetric = {
+  id: ActivityLibrarySummaryMetricId;
+  label: string;
+  value: string;
+};
+
 export function summarizeActivityLibrary(
   activities: ActivityLibrarySummarySource[]
 ): ActivityLibrarySummary {
@@ -103,4 +115,47 @@ export function buildActivityLibraryCardSummary({
       template: option.template.type,
     })),
   };
+}
+
+export function buildActivityLibrarySummaryMetrics({
+  hasFilters,
+  summary,
+  totalActivities,
+}: {
+  hasFilters: boolean;
+  summary?: ActivityLibrarySummary;
+  totalActivities: number;
+}): ActivityLibrarySummaryMetric[] {
+  const resolvedSummary = summary ?? {
+    archivedActivities: 0,
+    draftActivities: 0,
+    remixReadyActivities: 0,
+    templateCoverage: 0,
+    templateCoverageTotal: activityTemplates.length,
+    totalActivities,
+    totalReadyTemplateOptions: 0,
+  };
+
+  return [
+    {
+      id: 'total',
+      label: hasFilters ? 'Matching activities' : 'Activities',
+      value: String(resolvedSummary.totalActivities),
+    },
+    {
+      id: 'coverage',
+      label: 'Template coverage',
+      value: `${resolvedSummary.templateCoverage}/${resolvedSummary.templateCoverageTotal}`,
+    },
+    {
+      id: 'remix',
+      label: 'Ready to remix',
+      value: String(resolvedSummary.remixReadyActivities),
+    },
+    {
+      id: 'readyModes',
+      label: 'Ready modes',
+      value: String(resolvedSummary.totalReadyTemplateOptions),
+    },
+  ];
 }

@@ -4,6 +4,7 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   buildActivityLibraryCardSummary,
+  buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
@@ -1169,6 +1170,43 @@ assert.equal(
     completeScaffoldCardSummary.readyTemplateOptions.length
 );
 assert.equal(librarySummary.remixReadyActivities, 2);
+assert.deepEqual(
+  buildActivityLibrarySummaryMetrics({
+    hasFilters: false,
+    totalActivities: 0,
+  }),
+  [
+    { id: 'total', label: 'Activities', value: '0' },
+    {
+      id: 'coverage',
+      label: 'Template coverage',
+      value: `0/${activityTemplates.length}`,
+    },
+    { id: 'remix', label: 'Ready to remix', value: '0' },
+    { id: 'readyModes', label: 'Ready modes', value: '0' },
+  ]
+);
+assert.deepEqual(
+  buildActivityLibrarySummaryMetrics({
+    hasFilters: true,
+    summary: librarySummary,
+    totalActivities: 99,
+  }),
+  [
+    { id: 'total', label: 'Matching activities', value: '2' },
+    {
+      id: 'coverage',
+      label: 'Template coverage',
+      value: `2/${activityTemplates.length}`,
+    },
+    { id: 'remix', label: 'Ready to remix', value: '2' },
+    {
+      id: 'readyModes',
+      label: 'Ready modes',
+      value: String(librarySummary.totalReadyTemplateOptions),
+    },
+  ]
+);
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);
   const input = createActivityInputSchema.parse({
