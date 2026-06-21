@@ -1,10 +1,12 @@
 import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
-  ActivityDifficulty,
   ActivityContent,
+  ActivityDifficulty,
+  ActivitySeed,
   ActivityTemplateType,
   ActivityVisibility,
+  AssignmentSeed,
   AssignmentSettings,
   AssignmentStatus,
   AttemptAnswer,
@@ -192,6 +194,48 @@ export function buildPublicAttemptReviewItemMap(
   return new Map(
     reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
   );
+}
+
+export function buildPublicAssignmentPreviewActivity(
+  data: PublicAssignmentPayload
+): ActivitySeed {
+  return {
+    content: {
+      difficulty: data.summary.difficulty,
+      gradeBand: data.summary.gradeBand,
+      groups: [],
+      language: data.summary.language,
+      learningGoal: data.summary.learningGoal,
+      pairs: [],
+      questions: [],
+      sourceSummary: '',
+      subject: data.summary.subject,
+      teacherNotes: [],
+      vocabulary: [],
+    },
+    description: data.activity.description ?? '',
+    estimatedMinutes: data.summary.estimatedMinutes,
+    id: data.activity.id,
+    status: data.activity.visibility,
+    templateType: data.snapshot?.templateType ?? data.activity.templateType,
+    title: data.activity.title,
+  };
+}
+
+export function buildPublicAssignmentPreviewAssignment(
+  data: PublicAssignmentPayload
+): AssignmentSeed {
+  return {
+    activityId: data.activity.id,
+    averageScore: 0,
+    completions: 0,
+    expiresAt: data.assignment.expiresAt,
+    id: data.assignment.id,
+    settings: data.assignment.settingsJson,
+    shareId: data.assignment.shareSlug,
+    status: data.assignment.status,
+    title: data.assignment.title,
+  };
 }
 
 export function estimateAssignmentMinutes(itemCount: number) {

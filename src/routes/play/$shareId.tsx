@@ -6,18 +6,18 @@ import {
   getRuntimeItems,
 } from '@/activities/runtime';
 import type { RuntimeItem } from '@/activities/runtime';
-import type {
-  ActivitySeed,
-  ActivityTemplateType,
-  AssignmentSeed,
-} from '@/activities/types';
+import type { ActivityTemplateType } from '@/activities/types';
 import {
   type PublicAssignmentRuleSummaryId,
   buildPublicAssignmentRuleSummary,
 } from '@/assignments/delivery-summary';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
-import type { PublicAttemptReviewItem } from '@/assignments/public';
+import {
+  buildPublicAssignmentPreviewActivity,
+  buildPublicAssignmentPreviewAssignment,
+  type PublicAttemptReviewItem,
+} from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
@@ -89,12 +89,12 @@ function PlayPage() {
     [starterActivity]
   );
   const assignment = data
-    ? mapPersistedAssignment(data)
+    ? buildPublicAssignmentPreviewAssignment(data)
     : shareId === starterAssignment.shareId
       ? starterAssignment
       : undefined;
   const activity = data
-    ? mapPersistedActivity(data)
+    ? buildPublicAssignmentPreviewActivity(data)
     : assignment
       ? starterActivity
       : undefined;
@@ -692,44 +692,6 @@ function ChoiceGrid({
       })}
     </div>
   );
-}
-
-function mapPersistedActivity(data: NonNullable<PublicAssignmentData>) {
-  return {
-    content: {
-      difficulty: data.summary.difficulty,
-      gradeBand: data.summary.gradeBand,
-      groups: [],
-      language: data.summary.language,
-      learningGoal: data.summary.learningGoal,
-      pairs: [],
-      questions: [],
-      sourceSummary: '',
-      subject: data.summary.subject,
-      teacherNotes: [],
-      vocabulary: [],
-    },
-    description: data.activity.description ?? '',
-    estimatedMinutes: data.summary.estimatedMinutes,
-    id: data.activity.id,
-    status: data.activity.visibility,
-    templateType: data.snapshot?.templateType ?? data.activity.templateType,
-    title: data.activity.title,
-  } satisfies ActivitySeed;
-}
-
-function mapPersistedAssignment(data: NonNullable<PublicAssignmentData>) {
-  return {
-    activityId: data.activity.id,
-    averageScore: 0,
-    completions: 0,
-    expiresAt: data.assignment.expiresAt,
-    id: data.assignment.id,
-    settings: data.assignment.settingsJson,
-    shareId: data.assignment.shareSlug,
-    status: data.assignment.status,
-    title: data.assignment.title,
-  } satisfies AssignmentSeed;
 }
 
 function getAnonymousAttemptToken(shareId: string) {

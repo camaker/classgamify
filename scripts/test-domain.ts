@@ -76,6 +76,8 @@ import {
 } from '@/assignments/delivery-summary';
 import {
   buildPublicAssignmentPayload,
+  buildPublicAssignmentPreviewActivity,
+  buildPublicAssignmentPreviewAssignment,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
   stripRuntimeAnswer,
@@ -556,6 +558,44 @@ assert.deepEqual(publicAssignmentPayload.snapshot, {
 assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
 assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
+assert.deepEqual(
+  buildPublicAssignmentPreviewActivity(publicAssignmentPayload),
+  {
+    content: {
+      difficulty: 'core',
+      gradeBand: 'Grade 4',
+      groups: [],
+      language: 'en',
+      learningGoal: 'Students answer the frozen snapshot content.',
+      pairs: [],
+      questions: [],
+      sourceSummary: '',
+      subject: 'History',
+      teacherNotes: [],
+      vocabulary: [],
+    },
+    description: 'Frozen activity description',
+    estimatedMinutes: 5,
+    id: 'activity-public',
+    status: 'draft',
+    templateType: 'quiz',
+    title: 'Frozen activity title',
+  }
+);
+assert.deepEqual(
+  buildPublicAssignmentPreviewAssignment(publicAssignmentPayload),
+  {
+    activityId: 'activity-public',
+    averageScore: 0,
+    completions: 0,
+    expiresAt: null,
+    id: 'assignment-public',
+    settings: publicAssignmentPayload.assignment.settingsJson,
+    shareId: 'share-public',
+    status: 'published',
+    title: 'Public assignment',
+  }
+);
 const publicReviewMap = buildPublicAttemptReviewItemMap([
   {
     acceptedAnswers: ['Paris', 'Paris, France'],
