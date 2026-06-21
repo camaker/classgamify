@@ -14,13 +14,15 @@ import {
 } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 
+type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
+
 type StudentRunnerReadyState = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   canSubmit: boolean;
   hidePreviewAnswers: boolean;
   runtimeItems: PublicRuntimeItem[];
-  source: 'public-assignment' | 'starter-preview';
+  source: StudentRunnerReadyStateSource;
   status: 'ready';
 };
 
@@ -61,34 +63,52 @@ export function buildStudentRunnerPageState({
   if (data) {
     const assignment = buildPublicAssignmentPreviewAssignment(data);
 
-    return {
+    return buildStudentRunnerReadyState({
       activity: buildPublicAssignmentPreviewActivity(data),
       assignment,
-      canSubmit: data.runtimeItems.length > 0,
-      hidePreviewAnswers: true,
       runtimeItems: orderStudentRunnerRuntimeItems({
         items: data.runtimeItems,
         assignment,
       }),
       source: 'public-assignment',
-      status: 'ready',
-    };
+    });
   }
 
   if (shareId !== starterAssignment.shareId) {
     return { status: 'missing' };
   }
 
-  return {
+  return buildStudentRunnerReadyState({
     activity: starterActivity,
     assignment: starterAssignment,
-    canSubmit: false,
-    hidePreviewAnswers: false,
     runtimeItems: orderStudentRunnerRuntimeItems({
       items: stripRuntimeAnswers(starterRuntimeItems),
       assignment: starterAssignment,
     }),
     source: 'starter-preview',
+  });
+}
+
+export function buildStudentRunnerReadyState({
+  activity,
+  assignment,
+  runtimeItems,
+  source,
+}: {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+  runtimeItems: PublicRuntimeItem[];
+  source: StudentRunnerReadyStateSource;
+}): StudentRunnerReadyState {
+  const publicAssignment = source === 'public-assignment';
+
+  return {
+    activity,
+    assignment,
+    canSubmit: publicAssignment && runtimeItems.length > 0,
+    hidePreviewAnswers: publicAssignment,
+    runtimeItems,
+    source,
     status: 'ready',
   };
 }

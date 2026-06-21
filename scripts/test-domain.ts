@@ -273,6 +273,7 @@ import {
 import {
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
+  buildStudentRunnerReadyState,
 } from '@/assignments/student-runner-state';
 import {
   buildAttemptCompletionCopy,
@@ -1834,6 +1835,40 @@ assert.equal(publicRunnerState.activity.title, 'Frozen activity title');
 assert.equal(publicRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicRunnerState.runtimeItems[0]!, false);
 assert.equal('explanation' in publicRunnerState.runtimeItems[0]!, false);
+assert.deepEqual(
+  buildStudentRunnerReadyState({
+    activity: publicRunnerState.activity,
+    assignment: publicRunnerState.assignment,
+    runtimeItems: [],
+    source: 'public-assignment',
+  }),
+  {
+    activity: publicRunnerState.activity,
+    assignment: publicRunnerState.assignment,
+    canSubmit: false,
+    hidePreviewAnswers: true,
+    runtimeItems: [],
+    source: 'public-assignment',
+    status: 'ready',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerReadyState({
+    activity: runnerStateStarterActivity,
+    assignment: runnerStateStarterAssignment,
+    runtimeItems: stripRuntimeAnswers(runnerStateStarterRuntimeItems),
+    source: 'starter-preview',
+  }),
+  {
+    activity: runnerStateStarterActivity,
+    assignment: runnerStateStarterAssignment,
+    canSubmit: false,
+    hidePreviewAnswers: false,
+    runtimeItems: stripRuntimeAnswers(runnerStateStarterRuntimeItems),
+    source: 'starter-preview',
+    status: 'ready',
+  }
+);
 assert.deepEqual(
   buildStudentRunnerAttemptState({
     answers: {
