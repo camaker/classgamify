@@ -115,7 +115,10 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
-import { findPublishedAssignmentInList } from '@/assignments/published-assignment';
+import {
+  buildPublishedAssignmentPanelContext,
+  findPublishedAssignmentInList,
+} from '@/assignments/published-assignment';
 import {
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
@@ -376,6 +379,46 @@ assert.equal(
     shareSlug: 'missing',
   }),
   undefined
+);
+assert.deepEqual(
+  buildPublishedAssignmentPanelContext({
+    isLoading: false,
+    items: publishedAssignments,
+    shareSlug: 'share-2',
+  }),
+  {
+    assignment: publishedAssignments[1]?.assignment,
+    body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+    showMissingHint: false,
+    status: 'found',
+    title: 'Week 2',
+  }
+);
+assert.deepEqual(
+  buildPublishedAssignmentPanelContext({
+    isLoading: true,
+    items: [],
+    shareSlug: 'share-2',
+  }),
+  {
+    body: 'Loading the newly published assignment link and classroom actions.',
+    showMissingHint: false,
+    status: 'loading',
+    title: 'Student share link is being prepared.',
+  }
+);
+assert.deepEqual(
+  buildPublishedAssignmentPanelContext({
+    isLoading: false,
+    items: publishedAssignments,
+    shareSlug: 'missing',
+  }),
+  {
+    body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
+    showMissingHint: true,
+    status: 'missing',
+    title: 'Student share link is ready.',
+  }
 );
 assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
   { id: 'attempts', label: 'Attempts', value: 'Open' },

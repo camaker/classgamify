@@ -12,7 +12,7 @@ import {
   canUpdateAssignmentStatus,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
-import { findPublishedAssignmentInList } from '@/assignments/published-assignment';
+import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -120,10 +120,13 @@ function DashboardAssignmentsPage() {
   );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
-  const publishedAssignment = findPublishedAssignmentInList({
-    items: assignments,
-    shareSlug: published,
-  });
+  const publishedPanelContext = published
+    ? buildPublishedAssignmentPanelContext({
+        isLoading,
+        items: assignments,
+        shareSlug: published,
+      })
+    : undefined;
   const summary = data?.summary ?? {
     averageScore: 0,
     completions: 0,
@@ -211,8 +214,7 @@ function DashboardAssignmentsPage() {
 
         {published ? (
           <PublishedAssignmentPanel
-            assignment={publishedAssignment}
-            isLoading={isLoading}
+            context={publishedPanelContext}
             onDismiss={() =>
               void navigate({
                 replace: true,
@@ -370,21 +372,23 @@ function DashboardAssignmentsPage() {
 }
 
 function PublishedAssignmentPanel({
-  assignment,
-  isLoading,
+  context,
   onDismiss,
   shareSlug,
 }: {
-  assignment:
-    | {
-        id: string;
-        title: string;
-      }
-    | undefined;
-  isLoading: boolean;
+  context: ReturnType<typeof buildPublishedAssignmentPanelContext> | undefined;
   onDismiss: () => void;
   shareSlug: string;
 }) {
+  const panelContext =
+    context ??
+    buildPublishedAssignmentPanelContext({
+      isLoading: true,
+      items: [],
+      shareSlug,
+    });
+  const { assignment } = panelContext;
+
   return (
     <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
       <div className="min-w-0">
@@ -392,14 +396,11 @@ function PublishedAssignmentPanel({
           <IconCircleCheck className="size-4" />
           Assignment published
         </div>
-        <h2 className="mt-2 text-lg font-semibold">
-          {assignment?.title ?? 'Student share link is ready.'}
-        </h2>
+        <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Copy the student link for your class, open the student preview, or
-          jump into the results page before submissions arrive.
+          {panelContext.body}
         </p>
-        {!assignment && !isLoading ? (
+        {panelContext.showMissingHint ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             The new assignment may be on another page after filtering. The share
             link actions still use the published link id.
