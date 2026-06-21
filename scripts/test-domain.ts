@@ -141,7 +141,9 @@ import {
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
   buildAssignmentListCardStats,
+  buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
+  buildStarterAssignmentListCardViewModel,
   getAssignmentListCardActionState,
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
@@ -2316,6 +2318,123 @@ assert.deepEqual(
     { key: 'completions', label: 'Completions', value: '12' },
     { key: 'average', label: 'Average', value: '83%' },
   ]
+);
+assert.deepEqual(
+  buildAssignmentListCardViewModel({
+    activity: {
+      description: 'Current activity description',
+      templateType: 'quiz',
+    },
+    assignment: {
+      expiresAt: new Date('2026-02-01T00:00:00.000Z'),
+      id: 'persisted-assignment-1',
+      settingsJson: {
+        collectStudentName: false,
+        instructions: 'Finish before Friday.',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: true,
+        timeLimitSeconds: 600,
+      },
+      shareSlug: 'share-1',
+      status: 'published',
+      title: 'Persisted assignment',
+    },
+    snapshot: {
+      activityDescription: 'Frozen activity description',
+      templateType: 'line-match',
+    },
+    stats: {
+      averageScore: 76,
+      completions: 9,
+    },
+  }),
+  {
+    activityDescription: 'Frozen activity description',
+    collectStudentName: false,
+    expiresAt: new Date('2026-02-01T00:00:00.000Z'),
+    id: 'persisted-assignment-1',
+    instructions: 'Finish before Friday.',
+    maxAttempts: 3,
+    shareSlug: 'share-1',
+    showCorrectAnswers: false,
+    shuffleItems: true,
+    stats: {
+      averageScore: 76,
+      completions: 9,
+    },
+    status: 'published',
+    templateType: 'line-match',
+    timeLimitSeconds: 600,
+    title: 'Persisted assignment',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListCardViewModel({
+    activity: {
+      description: null,
+      templateType: 'quiz',
+    },
+    assignment: {
+      expiresAt: null,
+      id: 'persisted-assignment-2',
+      settingsJson: {
+        collectStudentName: true,
+        showCorrectAnswers: true,
+        shuffleItems: false,
+      },
+      shareSlug: 'share-2',
+      status: 'closed',
+      title: 'Fallback assignment',
+    },
+    snapshot: null,
+    stats: {
+      averageScore: 0,
+      completions: 0,
+    },
+  }).activityDescription,
+  ''
+);
+assert.deepEqual(
+  buildStarterAssignmentListCardViewModel({
+    activity: {
+      description: 'Starter activity description',
+      templateType: 'group-sort',
+    },
+    assignment: {
+      averageScore: 84,
+      completions: 18,
+      id: 'assignment-food-demo',
+      settings: {
+        collectStudentName: true,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+      },
+      shareId: 'demo-food',
+      status: 'published',
+      title: 'Food words homework',
+    },
+  }),
+  {
+    activityDescription: 'Starter activity description',
+    collectStudentName: true,
+    expiresAt: null,
+    id: 'assignment-food-demo',
+    instructions: undefined,
+    maxAttempts: 2,
+    shareSlug: 'demo-food',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    stats: {
+      averageScore: 84,
+      completions: 18,
+    },
+    status: 'published',
+    templateType: 'group-sort',
+    timeLimitSeconds: undefined,
+    title: 'Food words homework',
+  }
 );
 assert.deepEqual(
   getAssignmentListCardActionState({

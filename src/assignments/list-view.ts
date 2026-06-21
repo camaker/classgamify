@@ -1,4 +1,8 @@
-import type { AssignmentStatus } from '@/activities/types';
+import type {
+  ActivityTemplateType,
+  AssignmentSettings,
+  AssignmentStatus,
+} from '@/activities/types';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
 import { buildAssignmentStatusAction } from '@/assignments/lifecycle';
 
@@ -13,6 +17,63 @@ type AssignmentListCardStat = {
   key: AssignmentListCardStatKey;
   label: string;
   value: string;
+};
+
+type AssignmentListCardViewModel = {
+  activityDescription: string;
+  collectStudentName?: boolean;
+  expiresAt: Date | null;
+  id: string;
+  instructions?: string;
+  maxAttempts?: number;
+  shareSlug: string;
+  showCorrectAnswers?: boolean;
+  shuffleItems?: boolean;
+  status: AssignmentStatus;
+  templateType: ActivityTemplateType;
+  timeLimitSeconds?: number;
+  title: string;
+  stats: {
+    averageScore: number;
+    completions: number;
+  };
+};
+
+type AssignmentListCardSource = {
+  activity: {
+    description: string | null;
+    templateType: ActivityTemplateType;
+  };
+  assignment: {
+    expiresAt: Date | null;
+    id: string;
+    settingsJson: AssignmentSettings;
+    shareSlug: string;
+    status: AssignmentStatus;
+    title: string;
+  };
+  snapshot?: {
+    activityDescription: string | null;
+    templateType: ActivityTemplateType;
+  } | null;
+  stats: AssignmentListCardViewModel['stats'];
+};
+
+type StarterAssignmentListCardSource = {
+  activity: {
+    description: string;
+    templateType: ActivityTemplateType;
+  };
+  assignment: {
+    expiresAt?: Date | null;
+    id: string;
+    settings: AssignmentSettings;
+    shareId: string;
+    status: AssignmentStatus;
+    title: string;
+    averageScore: number;
+    completions: number;
+  };
 };
 
 type AssignmentListEmptyStateView = {
@@ -115,6 +176,46 @@ export function buildAssignmentListCardStats({
   ];
 }
 
+export function buildAssignmentListCardViewModel({
+  activity,
+  assignment,
+  snapshot,
+  stats,
+}: AssignmentListCardSource): AssignmentListCardViewModel {
+  return {
+    ...buildAssignmentListCardDeliverySettings(assignment.settingsJson),
+    activityDescription:
+      snapshot?.activityDescription ?? activity.description ?? '',
+    expiresAt: assignment.expiresAt,
+    id: assignment.id,
+    shareSlug: assignment.shareSlug,
+    stats,
+    status: assignment.status,
+    templateType: snapshot?.templateType ?? activity.templateType,
+    title: assignment.title,
+  };
+}
+
+export function buildStarterAssignmentListCardViewModel({
+  activity,
+  assignment,
+}: StarterAssignmentListCardSource): AssignmentListCardViewModel {
+  return {
+    ...buildAssignmentListCardDeliverySettings(assignment.settings),
+    activityDescription: activity.description,
+    expiresAt: assignment.expiresAt ?? null,
+    id: assignment.id,
+    shareSlug: assignment.shareId,
+    stats: {
+      averageScore: assignment.averageScore,
+      completions: assignment.completions,
+    },
+    status: assignment.status,
+    templateType: activity.templateType,
+    title: assignment.title,
+  };
+}
+
 export function getAssignmentListCardActionState({
   expiresAt,
   id,
@@ -135,5 +236,16 @@ export function getAssignmentListCardActionState({
       expiresAt,
       isPersisted,
     }),
+  };
+}
+
+function buildAssignmentListCardDeliverySettings(settings: AssignmentSettings) {
+  return {
+    collectStudentName: settings.collectStudentName,
+    instructions: settings.instructions,
+    maxAttempts: settings.maxAttempts,
+    showCorrectAnswers: settings.showCorrectAnswers,
+    shuffleItems: settings.shuffleItems,
+    timeLimitSeconds: settings.timeLimitSeconds,
   };
 }

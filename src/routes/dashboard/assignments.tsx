@@ -1,8 +1,4 @@
 import { getStarterActivity, starterAssignments } from '@/activities/catalog';
-import type {
-  ActivityTemplateType,
-  AssignmentStatus,
-} from '@/activities/types';
 import {
   type AssignmentStatusFilter,
   buildAssignmentListRouteSearch,
@@ -22,7 +18,9 @@ import {
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
   buildAssignmentListCardStats,
+  buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
+  buildStarterAssignmentListCardViewModel,
   getAssignmentListCardActionState,
 } from '@/assignments/list-view';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
@@ -68,26 +66,6 @@ import {
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-
-type AssignmentCardData = {
-  activityDescription: string;
-  collectStudentName?: boolean;
-  expiresAt: Date | null;
-  id: string;
-  instructions?: string;
-  maxAttempts?: number;
-  shareSlug: string;
-  showCorrectAnswers?: boolean;
-  shuffleItems?: boolean;
-  status: AssignmentStatus;
-  templateType: ActivityTemplateType;
-  timeLimitSeconds?: number;
-  title: string;
-  stats: {
-    averageScore: number;
-    completions: number;
-  };
-};
 
 const ASSIGNMENT_LIST_PAGE_SIZE = 12;
 
@@ -252,29 +230,7 @@ function DashboardAssignmentsPage() {
               {assignments.map((item) => (
                 <AssignmentCard
                   key={item.assignment.id}
-                  assignment={{
-                    activityDescription:
-                      item.snapshot?.activityDescription ??
-                      item.activity.description ??
-                      '',
-                    collectStudentName:
-                      item.assignment.settingsJson.collectStudentName,
-                    expiresAt: item.assignment.expiresAt,
-                    id: item.assignment.id,
-                    instructions: item.assignment.settingsJson.instructions,
-                    maxAttempts: item.assignment.settingsJson.maxAttempts,
-                    shareSlug: item.assignment.shareSlug,
-                    showCorrectAnswers:
-                      item.assignment.settingsJson.showCorrectAnswers,
-                    shuffleItems: item.assignment.settingsJson.shuffleItems,
-                    stats: item.stats,
-                    status: item.assignment.status,
-                    templateType:
-                      item.snapshot?.templateType ?? item.activity.templateType,
-                    timeLimitSeconds:
-                      item.assignment.settingsJson.timeLimitSeconds,
-                    title: item.assignment.title,
-                  }}
+                  assignment={buildAssignmentListCardViewModel(item)}
                 />
               ))}
             </section>
@@ -330,27 +286,10 @@ function DashboardAssignmentsPage() {
                   return (
                     <AssignmentCard
                       key={assignment.id}
-                      assignment={{
-                        activityDescription: activity.description,
-                        collectStudentName:
-                          assignment.settings.collectStudentName,
-                        expiresAt: null,
-                        id: assignment.id,
-                        instructions: assignment.settings.instructions,
-                        maxAttempts: assignment.settings.maxAttempts,
-                        shareSlug: assignment.shareId,
-                        showCorrectAnswers:
-                          assignment.settings.showCorrectAnswers,
-                        shuffleItems: assignment.settings.shuffleItems,
-                        stats: {
-                          averageScore: assignment.averageScore,
-                          completions: assignment.completions,
-                        },
-                        status: assignment.status,
-                        templateType: activity.templateType,
-                        timeLimitSeconds: assignment.settings.timeLimitSeconds,
-                        title: assignment.title,
-                      }}
+                      assignment={buildStarterAssignmentListCardViewModel({
+                        activity,
+                        assignment,
+                      })}
                     />
                   );
                 })}
@@ -542,7 +481,11 @@ function AssignmentListFilters({
   );
 }
 
-function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
+function AssignmentCard({
+  assignment,
+}: {
+  assignment: ReturnType<typeof buildAssignmentListCardViewModel>;
+}) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const stats = buildAssignmentListCardStats(assignment.stats);
   const { showResultsAction, showShareActions, statusAction } =
