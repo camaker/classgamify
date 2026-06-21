@@ -3,26 +3,45 @@
 ClassGamify is a teacher-facing, game-based classroom activity platform built
 with TanStack Start and Cloudflare Workers.
 
-The product direction is Wordwall-core: teachers create reusable activities,
-render them through focused game templates, publish assignment links for
-students, and review completion/results. AI-assisted activity creation will
-build on top of this activity/assignment foundation.
+The product direction is Wordwall and Liveworksheets for classroom workflows:
+teachers create reusable structured activities, render them through focused
+game or worksheet templates, publish assignment links for students, and review
+attempt results. AI-assisted activity creation builds on top of this
+activity-to-assignment foundation rather than bypassing teacher review.
 
-This project is based on the
-[TanStarter](https://tanstarter.dev) SaaS template.
+The codebase began from a SaaS starter template, so inherited surfaces should
+be retired in narrow, verified waves. Current product behavior is defined by
+[docs/product.md](docs/product.md), and UI/product decisions should also follow
+[docs/design.md](docs/design.md).
 
-For the current product architecture and AI authoring boundaries, see
-[docs/product.md](docs/product.md).
+```txt
+Activity -> Assignment -> Attempt -> Results
+```
 
 ## Core Product Model
 
 - `Activity`: teacher-owned reusable activity definition.
 - `ActivityTemplate`: rendering/game type such as quiz, match-up, group sort,
-  fill-blank, matching pairs, or open-box.
+  line-match, fill-blank, listening, matching pairs, or open-box.
 - `ActivityContent`: template-neutral structured lesson content.
 - `Assignment`: shareable classroom delivery instance.
+- `AssignmentSnapshot`: frozen activity content for an already shared link.
 - `Attempt`: student completion/submission session.
 - `AttemptResult`: score, accuracy, completion, and duration summary.
+
+## Key Source Areas
+
+- `src/activities`: template catalog, validation, runtime item generation,
+  scaffolds, remix readiness, and AI draft mapping.
+- `src/assignments`: assignment settings, share links, lifecycle, public
+  payloads, submission rules, scoring/results, exports, and review summaries.
+- `src/routes`: TanStack Router routes for public pages, teacher dashboards,
+  public student runners, and API endpoints.
+- `src/db`: Drizzle schemas and migrations for auth, activities, assignments,
+  snapshots, attempts, files, and payments.
+- `tests/e2e`: local-first Playwright acceptance journeys.
+- `scripts/test-domain.ts`: fast domain contract checks for activity and
+  assignment helpers.
 
 ## Development
 
@@ -35,11 +54,17 @@ The development server runs on <http://localhost:3000>.
 Useful checks:
 
 ```bash
+pnpm test:domain
 pnpm locale:check
 pnpm check
 pnpm build
 pnpm e2e
 ```
+
+For user-facing changes, update `tests/e2e/TEST-CATALOG.md` with the journey,
+implement the feature, walk the UI locally when the Workers runtime is
+available, then add or update the matching Playwright spec. Keep fast domain
+logic covered in `scripts/test-domain.ts`.
 
 ## Deployment
 
@@ -67,4 +92,4 @@ GitHub CLI.
 
 ## License
 
-For template license details, see [LICENSE](LICENSE).
+See [LICENSE](LICENSE).
