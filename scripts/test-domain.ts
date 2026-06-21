@@ -59,6 +59,10 @@ import { activityContentToEditorInput } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
+import {
+  buildDashboardOverviewMetrics,
+  formatDashboardMetricValue,
+} from '@/dashboard/overview';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import {
@@ -807,6 +811,80 @@ assert.equal(
     (mode) => mode.action.length > 0 && mode.description.length > 0
   ),
   true
+);
+assert.equal(formatDashboardMetricValue(undefined), '-');
+assert.equal(formatDashboardMetricValue(0), '0');
+assert.deepEqual(
+  buildDashboardOverviewMetrics({
+    isLoading: true,
+  }),
+  [
+    {
+      description: 'Loading your library...',
+      id: 'activities',
+      label: 'Activities',
+      value: '-',
+    },
+    {
+      description: 'Template families represented by your active activities',
+      id: 'templates',
+      label: 'Templates',
+      value: `0/${activityTemplates.length}`,
+    },
+    {
+      description: 'Open classroom share links',
+      id: 'assignments',
+      label: 'Assignments',
+      value: '-',
+    },
+    {
+      description: '0 submitted attempts logged',
+      id: 'results',
+      label: 'Results',
+      value: '0%',
+    },
+  ]
+);
+assert.deepEqual(
+  buildDashboardOverviewMetrics({
+    activitySummary: {
+      draftActivities: 2,
+      templateCoverage: 5,
+      totalActivities: 9,
+    },
+    assignmentSummary: {
+      averageScore: 82,
+      completions: 14,
+      openAssignments: 3,
+    },
+    isLoading: false,
+  }),
+  [
+    {
+      description: '2 drafts in your active library',
+      id: 'activities',
+      label: 'Activities',
+      value: '9',
+    },
+    {
+      description: 'Template families represented by your active activities',
+      id: 'templates',
+      label: 'Templates',
+      value: `5/${activityTemplates.length}`,
+    },
+    {
+      description: 'Open classroom share links',
+      id: 'assignments',
+      label: 'Assignments',
+      value: '3',
+    },
+    {
+      description: '14 submitted attempts logged',
+      id: 'results',
+      label: 'Results',
+      value: '82%',
+    },
+  ]
 );
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);

@@ -1,8 +1,4 @@
-import {
-  activityTemplates,
-  starterActivities,
-  starterAssignments,
-} from '@/activities/catalog';
+import { starterActivities, starterAssignments } from '@/activities/catalog';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useActivities } from '@/hooks/use-activities';
 import { useAssignments } from '@/hooks/use-assignments';
+import {
+  buildDashboardOverviewMetrics,
+  type DashboardOverviewMetricId,
+} from '@/dashboard/overview';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -46,35 +46,11 @@ function DashboardPage() {
   const activitySummary = activitiesData?.summary;
   const assignmentSummary = assignmentsData?.summary;
   const isMetricLoading = activitiesLoading || assignmentsLoading;
-
-  const metrics = [
-    {
-      icon: IconDeviceGamepad2,
-      label: 'Activities',
-      value: formatMetricValue(activitySummary?.totalActivities),
-      description: isMetricLoading
-        ? 'Loading your library...'
-        : `${activitySummary?.draftActivities ?? 0} drafts in your active library`,
-    },
-    {
-      icon: IconLayoutGrid,
-      label: 'Templates',
-      value: `${activitySummary?.templateCoverage ?? 0}/${activityTemplates.length}`,
-      description: 'Template families represented by your active activities',
-    },
-    {
-      icon: IconClipboardList,
-      label: 'Assignments',
-      value: formatMetricValue(assignmentSummary?.openAssignments),
-      description: 'Open classroom share links',
-    },
-    {
-      icon: IconChartBar,
-      label: 'Results',
-      value: `${assignmentSummary?.averageScore ?? 0}%`,
-      description: `${assignmentSummary?.completions ?? 0} submitted attempts logged`,
-    },
-  ];
+  const metrics = buildDashboardOverviewMetrics({
+    activitySummary,
+    assignmentSummary,
+    isLoading: isMetricLoading,
+  });
 
   return (
     <DashboardLayout
@@ -85,7 +61,7 @@ function DashboardPage() {
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {metrics.map((metric) => (
-            <MetricCard key={metric.label} metric={metric} />
+            <MetricCard key={metric.id} metric={metric} />
           ))}
         </section>
 
@@ -175,24 +151,22 @@ function DashboardPage() {
   );
 }
 
-function formatMetricValue(value: number | undefined) {
-  return value === undefined ? '-' : String(value);
-}
-
 function MetricCard({
   metric,
 }: {
   metric: {
     description: string;
-    icon: TablerIcon;
+    id: DashboardOverviewMetricId;
     label: string;
     value: string;
   };
 }) {
+  const Icon = dashboardMetricIcons[metric.id];
+
   return (
     <Card className="rounded-lg">
       <CardContent className="p-4">
-        <metric.icon className="size-5 text-primary" />
+        <Icon className="size-5 text-primary" />
         <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
         <p className="text-sm font-medium">{metric.label}</p>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -202,6 +176,13 @@ function MetricCard({
     </Card>
   );
 }
+
+const dashboardMetricIcons: Record<DashboardOverviewMetricId, TablerIcon> = {
+  activities: IconDeviceGamepad2,
+  assignments: IconClipboardList,
+  results: IconChartBar,
+  templates: IconLayoutGrid,
+};
 
 function ReadinessRow({ label, value }: { label: string; value: number }) {
   return (
