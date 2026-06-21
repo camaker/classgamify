@@ -8,8 +8,10 @@ import { Progress } from '@/components/ui/progress';
 import { useActivities } from '@/hooks/use-activities';
 import { useAssignments } from '@/hooks/use-assignments';
 import {
+  buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
   type DashboardOverviewMetricId,
+  type DashboardCoreLoopReadinessRow,
 } from '@/dashboard/overview';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -51,6 +53,7 @@ function DashboardPage() {
     assignmentSummary,
     isLoading: isMetricLoading,
   });
+  const readinessRows = buildDashboardCoreLoopReadiness();
 
   return (
     <DashboardLayout
@@ -113,10 +116,9 @@ function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ReadinessRow label="Activity authoring" value={100} />
-              <ReadinessRow label="Assignment links" value={100} />
-              <ReadinessRow label="Student runner" value={85} />
-              <ReadinessRow label="Teacher results" value={90} />
+              {readinessRows.map((row) => (
+                <ReadinessRow key={row.id} row={row} />
+              ))}
             </CardContent>
           </Card>
         </section>
@@ -184,14 +186,14 @@ const dashboardMetricIcons: Record<DashboardOverviewMetricId, TablerIcon> = {
   templates: IconLayoutGrid,
 };
 
-function ReadinessRow({ label, value }: { label: string; value: number }) {
+function ReadinessRow({ row }: { row: DashboardCoreLoopReadinessRow }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 text-sm">
-        <span>{label}</span>
-        <span className="text-muted-foreground">{value}%</span>
+        <span>{row.label}</span>
+        <span className="text-muted-foreground">{row.value}%</span>
       </div>
-      <Progress value={value} />
+      <Progress value={row.value} />
     </div>
   );
 }

@@ -25,6 +25,18 @@ export type DashboardOverviewMetric = {
   value: string;
 };
 
+export type DashboardCoreLoopReadinessId =
+  | 'activity-authoring'
+  | 'assignment-links'
+  | 'student-runner'
+  | 'teacher-results';
+
+export type DashboardCoreLoopReadinessRow = {
+  id: DashboardCoreLoopReadinessId;
+  label: string;
+  value: number;
+};
+
 export function buildDashboardOverviewMetrics({
   activitySummary,
   assignmentSummary,
@@ -60,6 +72,31 @@ export function buildDashboardOverviewMetrics({
       id: 'results',
       label: 'Results',
       value: `${assignmentSummary?.averageScore ?? 0}%`,
+    },
+  ];
+}
+
+export function buildDashboardCoreLoopReadiness(): DashboardCoreLoopReadinessRow[] {
+  return [
+    {
+      id: 'activity-authoring',
+      label: 'Activity authoring',
+      value: 100,
+    },
+    {
+      id: 'assignment-links',
+      label: 'Assignment links',
+      value: 100,
+    },
+    {
+      id: 'student-runner',
+      label: 'Student runner',
+      value: 85,
+    },
+    {
+      id: 'teacher-results',
+      label: 'Teacher results',
+      value: 90,
     },
   ];
 }

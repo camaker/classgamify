@@ -69,6 +69,7 @@ import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
 import {
+  buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
   formatDashboardMetricValue,
 } from '@/dashboard/overview';
@@ -1279,6 +1280,28 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(buildDashboardCoreLoopReadiness(), [
+  {
+    id: 'activity-authoring',
+    label: 'Activity authoring',
+    value: 100,
+  },
+  {
+    id: 'assignment-links',
+    label: 'Assignment links',
+    value: 100,
+  },
+  {
+    id: 'student-runner',
+    label: 'Student runner',
+    value: 85,
+  },
+  {
+    id: 'teacher-results',
+    label: 'Teacher results',
+    value: 90,
+  },
+]);
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
