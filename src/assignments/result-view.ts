@@ -553,6 +553,31 @@ export function buildAssignmentAttemptReviewCardView(
   };
 }
 
+export function buildAssignmentClassroomBriefFocusItemView({
+  index,
+  item,
+}: {
+  index: number;
+  item: AssignmentItemAnalysis;
+}) {
+  return {
+    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctSummaryLabel: formatAssignmentItemCorrectSummary(item),
+    itemNumberLabel: `${Math.max(0, index) + 1}.`,
+    prompt: item.prompt,
+  };
+}
+
+export function buildAssignmentClassroomBriefFollowUpStudentView(
+  student: AssignmentStudentSummary
+) {
+  return {
+    accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
+    needsReviewLabel: formatAssignmentReviewCount(student.needsReviewCount),
+    studentLabel: student.studentLabel,
+  };
+}
+
 export function formatAssignmentBriefStudentAccuracy({
   bestAccuracy,
   latestAccuracy,

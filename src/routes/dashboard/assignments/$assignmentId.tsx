@@ -22,14 +22,12 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentClassroomBriefFocusItemView,
+  buildAssignmentClassroomBriefFollowUpStudentView,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultMetricItems,
   buildAssignmentStudentSummaryRowView,
-  formatAssignmentBriefStudentAccuracy,
-  formatAssignmentItemCorrectSummary,
-  formatAssignmentResultPercent,
-  formatAssignmentReviewCount,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
@@ -566,21 +564,28 @@ function ClassroomBriefCard({
           </h3>
           <div className="mt-3 grid gap-3">
             {brief.focusItems.length > 0 ? (
-              brief.focusItems.map((item, index) => (
-                <div key={item.itemId} className="grid gap-1 text-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="min-w-0 font-medium">
-                      {index + 1}. {item.prompt}
+              brief.focusItems.map((item, index) => {
+                const itemView = buildAssignmentClassroomBriefFocusItemView({
+                  index,
+                  item,
+                });
+
+                return (
+                  <div key={item.itemId} className="grid gap-1 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="min-w-0 font-medium">
+                        {itemView.itemNumberLabel} {itemView.prompt}
+                      </p>
+                      <Badge variant="outline" className="rounded-md">
+                        {itemView.correctRateLabel}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                      {itemView.correctSummaryLabel}
                     </p>
-                    <Badge variant="outline" className="rounded-md">
-                      {formatAssignmentResultPercent(item.correctRate)}
-                    </Badge>
                   </div>
-                  <p className="text-muted-foreground text-xs">
-                    {formatAssignmentItemCorrectSummary(item)}
-                  </p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-muted-foreground text-sm">
                 {assignmentResultSectionCopy.classReviewFocus.emptyMessage}
@@ -594,24 +599,29 @@ function ClassroomBriefCard({
           </h3>
           <div className="mt-3 grid gap-3">
             {brief.followUpStudents.length > 0 ? (
-              brief.followUpStudents.map((student) => (
-                <div
-                  key={student.studentKey}
-                  className="flex items-center justify-between gap-3 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {student.studentLabel}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {formatAssignmentBriefStudentAccuracy(student)}
-                    </p>
+              brief.followUpStudents.map((student) => {
+                const studentView =
+                  buildAssignmentClassroomBriefFollowUpStudentView(student);
+
+                return (
+                  <div
+                    key={student.studentKey}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
+                        {studentView.studentLabel}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {studentView.accuracyLabel}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="rounded-md">
+                      {studentView.needsReviewLabel}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="rounded-md">
-                    {formatAssignmentReviewCount(student.needsReviewCount)}
-                  </Badge>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-muted-foreground text-sm">
                 {assignmentResultSectionCopy.studentFollowUp.emptyMessage}

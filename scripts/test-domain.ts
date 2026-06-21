@@ -183,6 +183,8 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentClassroomBriefFocusItemView,
+  buildAssignmentClassroomBriefFollowUpStudentView,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultActionButtons,
@@ -5898,6 +5900,28 @@ assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
   'Anonymous student 1'
+);
+assert.deepEqual(
+  buildAssignmentClassroomBriefFocusItemView({
+    index: 0,
+    item: classroomBrief.focusItems[0]!,
+  }),
+  {
+    correctRateLabel: '50%',
+    correctSummaryLabel: '1/2 correct',
+    itemNumberLabel: '1.',
+    prompt: 'Match "Hot" with its pair.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentClassroomBriefFollowUpStudentView(
+    classroomBrief.followUpStudents[0]!
+  ),
+  {
+    accuracyLabel: 'Latest 0% · best 0%',
+    needsReviewLabel: '1 review',
+    studentLabel: 'Anonymous student 1',
+  }
 );
 assert.match(
   classroomBrief.text,
