@@ -989,6 +989,7 @@ assert.equal(
   'Freeze this activity into a student share link with classroom delivery settings.'
 );
 assert.equal(assignmentPublishDialogCopy.previewLabel, 'Delivery preview');
+assert.equal(assignmentPublishDialogCopy.timeLimitPlaceholder, 'No limit');
 assert.deepEqual(
   buildAssignmentPublishDraft({
     defaults: buildAssignmentPublishDraftDefaults({

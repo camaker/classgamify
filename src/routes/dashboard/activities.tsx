@@ -947,7 +947,7 @@ function ActivityCard({
                 min={1}
                 max={180}
                 value={timeLimitMinutes}
-                placeholder="No limit"
+                placeholder={assignmentPublishDialogCopy.timeLimitPlaceholder}
                 onChange={(event) =>
                   setTimeLimitMinutes(event.currentTarget.value)
                 }

@@ -94,6 +94,7 @@ export const assignmentPublishDialogCopy = {
   timeLimitHelp:
     'Optional classroom timer in minutes. Leave blank for no time limit.',
   timeLimitLabel: 'Time limit',
+  timeLimitPlaceholder: 'No limit',
   title: 'Publish assignment',
   titleLabel: 'Assignment title',
   previewLabel: 'Delivery preview',
