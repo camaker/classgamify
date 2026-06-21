@@ -17,6 +17,7 @@ import {
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
   buildActivityLibraryCardViewModel,
+  buildActivityLibraryCompatibilityView,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
@@ -3045,6 +3046,42 @@ assert.ok(
   questionOnlyCardSummary.lockedTemplateDiagnostics.includes(
     'Add match pairs to unlock Match.'
   )
+);
+assert.deepEqual(
+  buildActivityLibraryCompatibilityView({
+    currentTemplateType: 'quiz',
+    summary: questionOnlyCardSummary,
+  }),
+  {
+    lockedTemplateDiagnostics: [
+      'Add match pairs to unlock Match.',
+      'Add match pairs to unlock Lines.',
+    ],
+    readyTemplateOptions: [
+      { isCurrent: true, shortName: 'Quiz', template: 'quiz' },
+      { isCurrent: false, shortName: 'Fill', template: 'fill-blank' },
+      { isCurrent: false, shortName: 'Listen', template: 'listening' },
+      { isCurrent: false, shortName: 'Box', template: 'open-box' },
+    ],
+    remixActionOptions: [
+      {
+        actionLabel: 'Copy as Fill',
+        shortName: 'Fill',
+        template: 'fill-blank',
+      },
+      {
+        actionLabel: 'Copy as Listen',
+        shortName: 'Listen',
+        template: 'listening',
+      },
+      {
+        actionLabel: 'Copy as Box',
+        shortName: 'Box',
+        template: 'open-box',
+      },
+    ],
+    remixHint: 'Ready to remix into Fill, Listen, Box.',
+  }
 );
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');

@@ -32,9 +32,8 @@ import {
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
   buildActivityLibraryCardViewModel,
+  buildActivityLibraryCompatibilityView,
   buildActivityLibraryEmptyStateView,
-  buildActivityLibraryRemixActionLabel,
-  buildActivityLibraryRemixHint,
   buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import {
@@ -571,9 +570,10 @@ function ActivityCard({
     pairs: cardSummary.contentCounts.pairs,
     questions: cardSummary.contentCounts.questions,
   });
-  const remixHint = buildActivityLibraryRemixHint(
-    cardSummary.suggestedTemplateOptions.map((option) => option.shortName)
-  );
+  const compatibilityView = buildActivityLibraryCompatibilityView({
+    currentTemplateType: activity.templateType,
+    summary: cardSummary,
+  });
 
   function getDerivativeActionGate(action: ActivityDerivativeAction) {
     return buildActivityDerivativeActionGate({
@@ -718,57 +718,49 @@ function ActivityCard({
             {activityLibraryCardCopy.compatibleTemplatesLabel}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {cardSummary.readyTemplateOptions.map((option) => (
+            {compatibilityView.readyTemplateOptions.map((option) => (
               <Badge
                 key={option.template}
-                variant={
-                  option.template === activity.templateType
-                    ? 'secondary'
-                    : 'outline'
-                }
+                variant={option.isCurrent ? 'secondary' : 'outline'}
                 className="rounded-md"
               >
                 {option.shortName}
               </Badge>
             ))}
           </div>
-          {remixHint ? (
+          {compatibilityView.remixHint ? (
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              {remixHint}
+              {compatibilityView.remixHint}
             </p>
           ) : null}
           {cardActionState.showRemixActions ? (
             <div className="mt-3 flex flex-wrap gap-2">
-              {cardSummary.suggestedTemplateOptions
-                .slice(0, 3)
-                .map((option) => (
-                  <Button
-                    key={option.template}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="bg-background"
-                    disabled={remixMutation.isPending}
-                    onClick={() => remixActivity(option.template)}
-                  >
-                    <IconSwitchHorizontal className="size-4" />
-                    {buildActivityLibraryRemixActionLabel(option.shortName)}
-                  </Button>
-                ))}
+              {compatibilityView.remixActionOptions.map((option) => (
+                <Button
+                  key={option.template}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="bg-background"
+                  disabled={remixMutation.isPending}
+                  onClick={() => remixActivity(option.template)}
+                >
+                  <IconSwitchHorizontal className="size-4" />
+                  {option.actionLabel}
+                </Button>
+              ))}
             </div>
           ) : null}
-          {cardSummary.lockedTemplateDiagnostics.length ? (
+          {compatibilityView.lockedTemplateDiagnostics.length ? (
             <div className="mt-3 grid gap-1.5">
-              {cardSummary.lockedTemplateDiagnostics
-                .slice(0, 2)
-                .map((diagnosis) => (
-                  <p
-                    key={diagnosis}
-                    className="text-xs leading-5 text-muted-foreground"
-                  >
-                    {diagnosis}
-                  </p>
-                ))}
+              {compatibilityView.lockedTemplateDiagnostics.map((diagnosis) => (
+                <p
+                  key={diagnosis}
+                  className="text-xs leading-5 text-muted-foreground"
+                >
+                  {diagnosis}
+                </p>
+              ))}
             </div>
           ) : null}
         </div>

@@ -7,6 +7,10 @@ import {
   isActivityArchived,
 } from '@/activities/lifecycle';
 import type {
+  ActivityLibraryCardSummary,
+  ActivityLibraryTemplateOption,
+} from '@/activities/library-summary';
+import type {
   ActivityContent,
   ActivitySeed,
   ActivityTemplateType,
@@ -31,6 +35,21 @@ type ActivityLibraryCardStat = {
   key: ActivityLibraryCardStatKey;
   label: string;
   value: number;
+};
+
+type ActivityLibraryCompatibilityView = {
+  lockedTemplateDiagnostics: string[];
+  readyTemplateOptions: Array<
+    ActivityLibraryTemplateOption & {
+      isCurrent: boolean;
+    }
+  >;
+  remixActionOptions: Array<
+    ActivityLibraryTemplateOption & {
+      actionLabel: string;
+    }
+  >;
+  remixHint?: string;
 };
 
 type ActivityLibraryCardActionState = {
@@ -226,6 +245,31 @@ export function buildActivityLibraryRemixActionLabel(shortName: string) {
   const templateName = shortName.trim();
 
   return `Copy as ${templateName || 'template'}`;
+}
+
+export function buildActivityLibraryCompatibilityView({
+  currentTemplateType,
+  summary,
+}: {
+  currentTemplateType: ActivityTemplateType;
+  summary: ActivityLibraryCardSummary;
+}): ActivityLibraryCompatibilityView {
+  return {
+    lockedTemplateDiagnostics: summary.lockedTemplateDiagnostics.slice(0, 2),
+    readyTemplateOptions: summary.readyTemplateOptions.map((option) => ({
+      ...option,
+      isCurrent: option.template === currentTemplateType,
+    })),
+    remixActionOptions: summary.suggestedTemplateOptions
+      .slice(0, 3)
+      .map((option) => ({
+        ...option,
+        actionLabel: buildActivityLibraryRemixActionLabel(option.shortName),
+      })),
+    remixHint: buildActivityLibraryRemixHint(
+      summary.suggestedTemplateOptions.map((option) => option.shortName)
+    ),
+  };
 }
 
 export function buildActivityLibraryCardActionState({
