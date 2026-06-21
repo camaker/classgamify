@@ -26,6 +26,7 @@ type AssignmentListCardViewModel = {
   id: string;
   instructions?: string;
   maxAttempts?: number;
+  persisted: boolean;
   shareSlug: string;
   showCorrectAnswers?: boolean;
   shuffleItems?: boolean;
@@ -188,6 +189,7 @@ export function buildAssignmentListCardViewModel({
       snapshot?.activityDescription ?? activity.description ?? '',
     expiresAt: assignment.expiresAt,
     id: assignment.id,
+    persisted: true,
     shareSlug: assignment.shareSlug,
     stats,
     status: assignment.status,
@@ -205,6 +207,7 @@ export function buildStarterAssignmentListCardViewModel({
     activityDescription: activity.description,
     expiresAt: assignment.expiresAt ?? null,
     id: assignment.id,
+    persisted: false,
     shareSlug: assignment.shareId,
     stats: {
       averageScore: assignment.averageScore,
@@ -218,23 +221,21 @@ export function buildStarterAssignmentListCardViewModel({
 
 export function getAssignmentListCardActionState({
   expiresAt,
-  id,
+  persisted,
   status,
 }: {
   expiresAt: Date | null;
-  id: string;
+  persisted: boolean;
   status: AssignmentStatus;
 }) {
-  const isPersisted = !id.startsWith('assignment-');
-
   return {
-    isPersisted,
-    showResultsAction: isPersisted,
+    isPersisted: persisted,
+    showResultsAction: persisted,
     showShareActions: true,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
-      isPersisted,
+      isPersisted: persisted,
     }),
   };
 }

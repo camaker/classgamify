@@ -2392,6 +2392,7 @@ assert.deepEqual(
     id: 'persisted-assignment-1',
     instructions: 'Finish before Friday.',
     maxAttempts: 3,
+    persisted: true,
     shareSlug: 'share-1',
     showCorrectAnswers: false,
     shuffleItems: true,
@@ -2459,6 +2460,7 @@ assert.deepEqual(
     id: 'assignment-food-demo',
     instructions: undefined,
     maxAttempts: 2,
+    persisted: false,
     shareSlug: 'demo-food',
     showCorrectAnswers: true,
     shuffleItems: true,
@@ -2475,7 +2477,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
-    id: 'assignment-preview-1',
+    persisted: false,
     status: 'published',
   }),
   {
@@ -2488,7 +2490,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
-    id: 'persisted-assignment-1',
+    persisted: true,
     status: 'published',
   }),
   {
@@ -2507,7 +2509,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
-    id: 'persisted-assignment-2',
+    persisted: true,
     status: 'draft',
   }),
   {
@@ -2516,6 +2518,32 @@ assert.deepEqual(
     showShareActions: true,
     statusAction: undefined,
   }
+);
+assert.equal(
+  buildAssignmentListCardViewModel({
+    activity: {
+      description: 'Current activity description',
+      templateType: 'quiz',
+    },
+    assignment: {
+      expiresAt: null,
+      id: 'assignment-real-id-can-start-with-prefix',
+      settingsJson: {
+        collectStudentName: true,
+        showCorrectAnswers: true,
+        shuffleItems: false,
+      },
+      shareSlug: 'share-real',
+      status: 'published',
+      title: 'Real assignment id',
+    },
+    snapshot: null,
+    stats: {
+      averageScore: 0,
+      completions: 0,
+    },
+  }).persisted,
+  true
 );
 const questionOnlyContent = buildActivityContent({
   description: 'Question only activity',

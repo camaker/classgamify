@@ -491,7 +491,7 @@ function AssignmentCard({
   const { showResultsAction, showShareActions, statusAction } =
     getAssignmentListCardActionState({
       expiresAt: assignment.expiresAt,
-      id: assignment.id,
+      persisted: assignment.persisted,
       status: assignment.status,
     });
 
