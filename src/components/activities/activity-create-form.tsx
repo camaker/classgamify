@@ -5,7 +5,10 @@ import {
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
-import type { ActivityDraftResult } from '@/activities/ai-draft';
+import {
+  buildGenerateActivityDraftInputFromEditor,
+  type ActivityDraftResult,
+} from '@/activities/ai-draft';
 import {
   buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
@@ -131,15 +134,13 @@ export function ActivityCreateForm({
 
     const current = form.getValues();
     try {
-      const result = await draftMutation.mutateAsync({
-        difficulty: current.difficulty,
-        gradeBand: current.gradeBand || 'Primary',
-        itemCount: draftItemCount,
-        language: current.language || 'en',
-        sourceText,
-        subject: current.subject || 'English',
-        templateType: current.templateType,
-      });
+      const result = await draftMutation.mutateAsync(
+        buildGenerateActivityDraftInputFromEditor({
+          current,
+          itemCount: draftItemCount,
+          sourceText,
+        })
+      );
 
       form.reset({
         ...result.activity,

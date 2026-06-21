@@ -38,6 +38,26 @@ export type GenerateActivityDraftInput = z.infer<
   typeof generateActivityDraftInputSchema
 >;
 
+export function buildGenerateActivityDraftInputFromEditor({
+  current,
+  itemCount,
+  sourceText,
+}: {
+  current: CreateActivityInput;
+  itemCount: number;
+  sourceText: string;
+}): GenerateActivityDraftInput {
+  return generateActivityDraftInputSchema.parse({
+    difficulty: current.difficulty,
+    gradeBand: current.gradeBand || 'Primary',
+    itemCount,
+    language: current.language || 'en',
+    sourceText,
+    subject: current.subject || 'English',
+    templateType: current.templateType,
+  });
+}
+
 export type ActivityDraftResult = {
   activity: CreateActivityInput;
   meta: ActivityDraftMeta;

@@ -32,6 +32,7 @@ import {
 } from '@/activities/library-filters';
 import {
   buildActivityDraftPrompt,
+  buildGenerateActivityDraftInputFromEditor,
   createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
@@ -3086,6 +3087,58 @@ assert.deepEqual(
     ['Match "Hot" with its pair.', 'Pair'],
     ['Choose the group for "Apple".', 'Group item'],
   ]
+);
+assert.deepEqual(
+  buildGenerateActivityDraftInputFromEditor({
+    current: {
+      ...activityEditorDefaultInput,
+      gradeBand: '',
+      language: '',
+      subject: '',
+      templateType: 'line-match',
+    },
+    itemCount: 5,
+    sourceText: '  food, apple, bread, milk  ',
+  }),
+  {
+    difficulty: activityEditorDefaultInput.difficulty,
+    gradeBand: 'Primary',
+    itemCount: 5,
+    language: 'en',
+    sourceText: 'food, apple, bread, milk',
+    subject: 'English',
+    templateType: 'line-match',
+  }
+);
+assert.deepEqual(
+  buildGenerateActivityDraftInputFromEditor({
+    current: {
+      ...activityEditorDefaultInput,
+      difficulty: 'challenge',
+      gradeBand: 'Grade 5',
+      language: 'zh',
+      subject: 'Science',
+      templateType: 'group-sort',
+    },
+    itemCount: 8,
+    sourceText: 'states of matter, solid, liquid, gas',
+  }),
+  {
+    difficulty: 'challenge',
+    gradeBand: 'Grade 5',
+    itemCount: 8,
+    language: 'zh',
+    sourceText: 'states of matter, solid, liquid, gas',
+    subject: 'Science',
+    templateType: 'group-sort',
+  }
+);
+assert.throws(() =>
+  buildGenerateActivityDraftInputFromEditor({
+    current: activityEditorDefaultInput,
+    itemCount: 11,
+    sourceText: 'food, apple, bread, milk',
+  })
 );
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
