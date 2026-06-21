@@ -64,6 +64,16 @@ type AssignmentResultControlOption<TValue extends string> = {
   value: TValue;
 };
 
+type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
+  maxScore: number | null;
+  resultJson: {
+    accuracy?: number;
+    completedItemCount?: number;
+    totalPoints?: number;
+  } | null;
+  score: number | null;
+};
+
 export const assignmentResultPageCopy = {
   defaultTitle: 'Assignment results',
   description:
@@ -125,6 +135,47 @@ export const assignmentResultSectionCopy = {
   },
 } as const;
 
+export const assignmentResultTableHeaders = {
+  itemPerformance: [
+    'Item',
+    'Type',
+    'Correct rate',
+    'Submitted',
+    'Expected',
+    'Accepted',
+    'Explanation',
+  ],
+  studentAttempts: [
+    'Student',
+    'Score',
+    'Accuracy',
+    'Answered',
+    'Time',
+    'Submitted',
+  ],
+  studentSummary: [
+    'Student',
+    'Attempts',
+    'Latest',
+    'Average',
+    'Best',
+    'Needs review',
+    'Last submitted',
+  ],
+} as const;
+
+export const assignmentResultReviewCopy = {
+  acceptedAnswersLabel: 'Accepted answers',
+  acceptedLabel: 'Accepted',
+  anonymousStudentLabel: 'Anonymous student',
+  correctAnswerLabel: 'Correct',
+  emptyValue: '-',
+  expectedAnswerLabel: 'Expected',
+  itemAnswerLabel: 'answer',
+  reviewAnswerLabel: 'Review',
+  studentAnswerLabel: 'Student',
+} as const;
+
 const assignmentResultMetricDescriptors = [
   { key: 'completions', label: 'Completions' },
   { key: 'average-accuracy', label: 'Average accuracy' },
@@ -177,6 +228,101 @@ export function buildAssignmentResultMetricItems({
     ...metric,
     value: valueByMetric[metric.key],
   }));
+}
+
+export function buildAssignmentAttemptRowDisplay({
+  attempt,
+  durationLabel,
+  review,
+  submittedAtLabel,
+}: {
+  attempt: AssignmentAttemptRowDisplayInput;
+  durationLabel: string;
+  review: AssignmentAttemptReview | undefined;
+  submittedAtLabel: string;
+}) {
+  return {
+    accuracyLabel: formatAssignmentResultPercent(
+      attempt.resultJson?.accuracy ?? 0
+    ),
+    answeredLabel: formatAssignmentResultFraction(
+      attempt.resultJson?.completedItemCount ?? 0,
+      attempt.resultJson?.totalPoints ?? 0
+    ),
+    durationLabel,
+    scoreLabel: formatAssignmentResultFraction(
+      attempt.score ?? 0,
+      attempt.maxScore ?? 0
+    ),
+    studentLabel: getAssignmentAttemptStudentLabel({
+      reviewStudentLabel: review?.studentLabel,
+      studentName: attempt.studentName,
+    }),
+    submittedAtLabel,
+  };
+}
+
+function getAssignmentAttemptStudentLabel({
+  reviewStudentLabel,
+  studentName,
+}: {
+  reviewStudentLabel: string | undefined;
+  studentName: string | null | undefined;
+}) {
+  if (reviewStudentLabel) return reviewStudentLabel;
+
+  const normalizedStudentName = studentName?.trim();
+  return (
+    normalizedStudentName || assignmentResultReviewCopy.anonymousStudentLabel
+  );
+}
+
+export function getAssignmentAnswerReviewStatus(correct: boolean) {
+  return {
+    label: correct
+      ? assignmentResultReviewCopy.correctAnswerLabel
+      : assignmentResultReviewCopy.reviewAnswerLabel,
+    tone: correct ? 'correct' : 'review',
+  } as const;
+}
+
+export function formatAssignmentAttemptReviewBadge({
+  accuracy,
+  score,
+}: Pick<AssignmentAttemptReview, 'accuracy' | 'score'>) {
+  return `${score} pts · ${formatAssignmentResultPercent(accuracy)}`;
+}
+
+export function formatAssignmentBriefStudentAccuracy({
+  bestAccuracy,
+  latestAccuracy,
+}: Pick<AssignmentStudentSummary, 'bestAccuracy' | 'latestAccuracy'>) {
+  return `Latest ${formatAssignmentResultPercent(
+    latestAccuracy
+  )} · best ${formatAssignmentResultPercent(bestAccuracy)}`;
+}
+
+export function formatAssignmentItemCorrectSummary({
+  correctCount,
+  submittedCount,
+}: Pick<AssignmentItemAnalysis, 'correctCount' | 'submittedCount'>) {
+  return `${correctCount}/${submittedCount} correct`;
+}
+
+export function formatAssignmentResultFraction(value: number, total: number) {
+  return `${value}/${total}`;
+}
+
+export function formatAssignmentResultPercent(value: number) {
+  return `${value}%`;
+}
+
+export function formatAssignmentResultValue(value: string | null | undefined) {
+  return value || assignmentResultReviewCopy.emptyValue;
+}
+
+export function formatAssignmentReviewCount(count: number) {
+  return `${count} ${count === 1 ? 'review' : 'reviews'}`;
 }
 
 export type ResultSearchSummaryInput = {

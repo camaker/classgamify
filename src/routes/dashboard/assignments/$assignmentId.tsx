@@ -13,10 +13,21 @@ import {
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
+  assignmentResultReviewCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
+  assignmentResultTableHeaders,
   attemptReviewFilterOptions,
+  buildAssignmentAttemptRowDisplay,
   buildAssignmentResultMetricItems,
+  formatAssignmentAttemptReviewBadge,
+  formatAssignmentBriefStudentAccuracy,
+  formatAssignmentItemCorrectSummary,
+  formatAssignmentResultFraction,
+  formatAssignmentResultPercent,
+  formatAssignmentResultValue,
+  formatAssignmentReviewCount,
+  getAssignmentAnswerReviewStatus,
   getAssignmentResultActionGate,
   getAssignmentResultActionCopy,
   itemPerformanceSortOptions,
@@ -570,43 +581,38 @@ function AssignmentResultsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Accuracy</TableHead>
-                      <TableHead>Answered</TableHead>
-                      <TableHead>Time</TableHead>
-                      <TableHead>Submitted</TableHead>
+                      {assignmentResultTableHeaders.studentAttempts.map(
+                        (header) => (
+                          <TableHead key={header}>{header}</TableHead>
+                        )
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {resultView.filteredAttemptRows.map(
-                      ({ attempt, review }) => (
-                        <TableRow key={attempt.id}>
-                          <TableCell>
-                            {review?.studentLabel ||
-                              attempt.studentName ||
-                              'Anonymous student'}
-                          </TableCell>
-                          <TableCell>
-                            {attempt.score ?? 0}/{attempt.maxScore ?? 0}
-                          </TableCell>
-                          <TableCell>
-                            {attempt.resultJson?.accuracy ?? 0}%
-                          </TableCell>
-                          <TableCell>
-                            {attempt.resultJson?.completedItemCount ?? 0}/
-                            {attempt.resultJson?.totalPoints ?? 0}
-                          </TableCell>
-                          <TableCell>
-                            {formatAttemptDuration(
-                              attempt.resultJson?.durationSeconds ?? 0
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {formatAssignmentResultDate(attempt.completedAt)}
-                          </TableCell>
-                        </TableRow>
-                      )
+                      ({ attempt, review }) => {
+                        const rowDisplay = buildAssignmentAttemptRowDisplay({
+                          attempt,
+                          durationLabel: formatAttemptDuration(
+                            attempt.resultJson?.durationSeconds ?? 0
+                          ),
+                          review,
+                          submittedAtLabel: formatAssignmentResultDate(
+                            attempt.completedAt
+                          ),
+                        });
+
+                        return (
+                          <TableRow key={attempt.id}>
+                            <TableCell>{rowDisplay.studentLabel}</TableCell>
+                            <TableCell>{rowDisplay.scoreLabel}</TableCell>
+                            <TableCell>{rowDisplay.accuracyLabel}</TableCell>
+                            <TableCell>{rowDisplay.answeredLabel}</TableCell>
+                            <TableCell>{rowDisplay.durationLabel}</TableCell>
+                            <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
+                          </TableRow>
+                        );
+                      }
                     )}
                   </TableBody>
                 </Table>
@@ -696,11 +702,11 @@ function ClassroomBriefCard({
                       {index + 1}. {item.prompt}
                     </p>
                     <Badge variant="outline" className="rounded-md">
-                      {item.correctRate}%
+                      {formatAssignmentResultPercent(item.correctRate)}
                     </Badge>
                   </div>
                   <p className="text-muted-foreground text-xs">
-                    {item.correctCount}/{item.submittedCount} correct
+                    {formatAssignmentItemCorrectSummary(item)}
                   </p>
                 </div>
               ))
@@ -727,12 +733,11 @@ function ClassroomBriefCard({
                       {student.studentLabel}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Latest {student.latestAccuracy}% · best{' '}
-                      {student.bestAccuracy}%
+                      {formatAssignmentBriefStudentAccuracy(student)}
                     </p>
                   </div>
                   <Badge variant="secondary" className="rounded-md">
-                    {student.needsReviewCount} review
+                    {formatAssignmentReviewCount(student.needsReviewCount)}
                   </Badge>
                 </div>
               ))
@@ -844,13 +849,9 @@ function StudentSummaryTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Student</TableHead>
-          <TableHead>Attempts</TableHead>
-          <TableHead>Latest</TableHead>
-          <TableHead>Average</TableHead>
-          <TableHead>Best</TableHead>
-          <TableHead>Needs review</TableHead>
-          <TableHead>Last submitted</TableHead>
+          {assignmentResultTableHeaders.studentSummary.map((header) => (
+            <TableHead key={header}>{header}</TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -858,9 +859,15 @@ function StudentSummaryTable({
           <TableRow key={student.studentLabel}>
             <TableCell>{student.studentLabel}</TableCell>
             <TableCell>{student.attempts}</TableCell>
-            <TableCell>{student.latestAccuracy}%</TableCell>
-            <TableCell>{student.averageAccuracy}%</TableCell>
-            <TableCell>{student.bestAccuracy}%</TableCell>
+            <TableCell>
+              {formatAssignmentResultPercent(student.latestAccuracy)}
+            </TableCell>
+            <TableCell>
+              {formatAssignmentResultPercent(student.averageAccuracy)}
+            </TableCell>
+            <TableCell>
+              {formatAssignmentResultPercent(student.bestAccuracy)}
+            </TableCell>
             <TableCell>{student.needsReviewCount}</TableCell>
             <TableCell>
               {formatAssignmentResultDate(student.lastCompletedAt)}
@@ -941,13 +948,9 @@ function ItemPerformanceTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Item</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Correct rate</TableHead>
-          <TableHead>Submitted</TableHead>
-          <TableHead>Expected</TableHead>
-          <TableHead>Accepted</TableHead>
-          <TableHead>Explanation</TableHead>
+          {assignmentResultTableHeaders.itemPerformance.map((header) => (
+            <TableHead key={header}>{header}</TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -957,16 +960,23 @@ function ItemPerformanceTable({
               <span className="font-medium">{index + 1}.</span> {item.prompt}
             </TableCell>
             <TableCell>{item.kindLabel}</TableCell>
-            <TableCell>{item.correctRate}%</TableCell>
             <TableCell>
-              {item.correctCount}/{item.submittedCount}
+              {formatAssignmentResultPercent(item.correctRate)}
             </TableCell>
-            <TableCell>{item.expectedAnswer || '-'}</TableCell>
+            <TableCell>
+              {formatAssignmentResultFraction(
+                item.correctCount,
+                item.submittedCount
+              )}
+            </TableCell>
+            <TableCell>
+              {formatAssignmentResultValue(item.expectedAnswer)}
+            </TableCell>
             <TableCell>
               {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
             </TableCell>
             <TableCell className="max-w-72">
-              {item.explanation || '-'}
+              {formatAssignmentResultValue(item.explanation)}
             </TableCell>
           </TableRow>
         ))}
@@ -988,17 +998,21 @@ function ItemAnalysisCard({
         <Badge variant="outline" className="rounded-md">
           {item.kindLabel}
         </Badge>
-        <span className="text-sm font-semibold">{item.correctRate}%</span>
+        <span className="text-sm font-semibold">
+          {formatAssignmentResultPercent(item.correctRate)}
+        </span>
       </div>
       <p className="mt-3 line-clamp-2 text-sm font-medium">{item.prompt}</p>
       <Progress value={item.correctRate} className="mt-3 h-2" />
       <p className="mt-2 text-xs text-muted-foreground">
-        {item.correctCount}/{item.submittedCount} correct · answer:{' '}
-        {item.expectedAnswer}
+        {formatAssignmentItemCorrectSummary(item)} ·{' '}
+        {assignmentResultReviewCopy.itemAnswerLabel}:{' '}
+        {formatAssignmentResultValue(item.expectedAnswer)}
       </p>
       {item.acceptedAnswers.length > 1 ? (
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          Accepted: {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
+          {assignmentResultReviewCopy.acceptedLabel}:{' '}
+          {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
         </p>
       ) : null}
       {item.explanation ? (
@@ -1030,43 +1044,53 @@ function AttemptReviewCard({
           </p>
         </div>
         <Badge variant="secondary" className="rounded-md">
-          {attempt.score} pts · {attempt.accuracy}%
+          {formatAssignmentAttemptReviewBadge(attempt)}
         </Badge>
       </div>
       <div className="mt-3 grid gap-2">
-        {attempt.answers.map((answer, index) => (
-          <div
-            key={`${attempt.id}-${answer.itemId}`}
-            className="rounded-lg border bg-muted/20 p-3"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="min-w-0 text-sm font-medium">
-                {index + 1}. {answer.prompt}
-              </p>
-              <Badge
-                variant={answer.correct ? 'secondary' : 'outline'}
-                className="rounded-md"
-              >
-                {answer.correct ? 'Correct' : 'Review'}
-              </Badge>
+        {attempt.answers.map((answer, index) => {
+          const status = getAssignmentAnswerReviewStatus(answer.correct);
+
+          return (
+            <div
+              key={`${attempt.id}-${answer.itemId}`}
+              className="rounded-lg border bg-muted/20 p-3"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="min-w-0 text-sm font-medium">
+                  {index + 1}. {answer.prompt}
+                </p>
+                <Badge
+                  variant={status.tone === 'correct' ? 'secondary' : 'outline'}
+                  className="rounded-md"
+                >
+                  {status.label}
+                </Badge>
+              </div>
+              <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+                <p>
+                  {assignmentResultReviewCopy.studentAnswerLabel}:{' '}
+                  {formatAssignmentResultValue(answer.answer)}
+                </p>
+                <p>
+                  {assignmentResultReviewCopy.expectedAnswerLabel}:{' '}
+                  {formatAssignmentResultValue(answer.expectedAnswer)}
+                </p>
+              </div>
+              {answer.acceptedAnswers.length > 1 ? (
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {assignmentResultReviewCopy.acceptedAnswersLabel}:{' '}
+                  {formatAcceptedAnswerAlternatives(answer.acceptedAnswers)}
+                </p>
+              ) : null}
+              {answer.explanation ? (
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {answer.explanation}
+                </p>
+              ) : null}
             </div>
-            <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-              <p>Student: {answer.answer || '-'}</p>
-              <p>Expected: {answer.expectedAnswer || '-'}</p>
-            </div>
-            {answer.acceptedAnswers.length > 1 ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                Accepted answers:{' '}
-                {formatAcceptedAnswerAlternatives(answer.acceptedAnswers)}
-              </p>
-            ) : null}
-            {answer.explanation ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {answer.explanation}
-              </p>
-            ) : null}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

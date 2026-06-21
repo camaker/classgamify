@@ -128,9 +128,12 @@ import {
 } from '@/assignments/item-order';
 import {
   assignmentResultPageCopy,
+  assignmentResultReviewCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
+  assignmentResultTableHeaders,
   buildAttemptReviewSubmissionSummary,
+  buildAssignmentAttemptRowDisplay,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
@@ -140,6 +143,14 @@ import {
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
+  formatAssignmentAttemptReviewBadge,
+  formatAssignmentBriefStudentAccuracy,
+  formatAssignmentItemCorrectSummary,
+  formatAssignmentResultFraction,
+  formatAssignmentResultPercent,
+  formatAssignmentResultValue,
+  formatAssignmentReviewCount,
+  getAssignmentAnswerReviewStatus,
   itemPerformanceSortOptions,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -3033,6 +3044,114 @@ assert.deepEqual(
     { key: 'closes', label: 'Closes', value: 'Jun 30, 2026' },
   ]
 );
+assert.deepEqual(assignmentResultTableHeaders.studentAttempts, [
+  'Student',
+  'Score',
+  'Accuracy',
+  'Answered',
+  'Time',
+  'Submitted',
+]);
+assert.deepEqual(assignmentResultTableHeaders.studentSummary, [
+  'Student',
+  'Attempts',
+  'Latest',
+  'Average',
+  'Best',
+  'Needs review',
+  'Last submitted',
+]);
+assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
+  'Item',
+  'Type',
+  'Correct rate',
+  'Submitted',
+  'Expected',
+  'Accepted',
+  'Explanation',
+]);
+assert.equal(assignmentResultReviewCopy.emptyValue, '-');
+assert.deepEqual(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
+      id: 'attempt-row',
+      maxScore: 4,
+      resultJson: {
+        accuracy: 75,
+        completedItemCount: 3,
+        totalPoints: 4,
+      },
+      score: 3,
+      studentName: ' Raw student ',
+    },
+    durationLabel: '1m 02s',
+    review: {
+      accuracy: 80,
+      answers: [],
+      completedAt: new Date('2026-01-01T00:00:00.000Z'),
+      id: 'attempt-row',
+      score: 3,
+      studentKey: 'name:alice',
+      studentLabel: 'Alice',
+    },
+    submittedAtLabel: 'Jan 1, 2026, 8:00 AM',
+  }),
+  {
+    accuracyLabel: '75%',
+    answeredLabel: '3/4',
+    durationLabel: '1m 02s',
+    scoreLabel: '3/4',
+    studentLabel: 'Alice',
+    submittedAtLabel: 'Jan 1, 2026, 8:00 AM',
+  }
+);
+assert.equal(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
+      id: 'anonymous-row',
+      maxScore: null,
+      resultJson: null,
+      score: null,
+      studentName: '   ',
+    },
+    durationLabel: '0s',
+    review: undefined,
+    submittedAtLabel: '-',
+  }).studentLabel,
+  'Anonymous student'
+);
+assert.deepEqual(getAssignmentAnswerReviewStatus(true), {
+  label: 'Correct',
+  tone: 'correct',
+});
+assert.deepEqual(getAssignmentAnswerReviewStatus(false), {
+  label: 'Review',
+  tone: 'review',
+});
+assert.equal(
+  formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
+  '2 pts · 67%'
+);
+assert.equal(
+  formatAssignmentBriefStudentAccuracy({
+    bestAccuracy: 100,
+    latestAccuracy: 75,
+  }),
+  'Latest 75% · best 100%'
+);
+assert.equal(
+  formatAssignmentItemCorrectSummary({
+    correctCount: 2,
+    submittedCount: 3,
+  }),
+  '2/3 correct'
+);
+assert.equal(formatAssignmentResultFraction(2, 5), '2/5');
+assert.equal(formatAssignmentResultPercent(82), '82%');
+assert.equal(formatAssignmentResultValue(''), '-');
+assert.equal(formatAssignmentResultValue('Paris'), 'Paris');
+assert.equal(formatAssignmentReviewCount(1), '1 review');
+assert.equal(formatAssignmentReviewCount(3), '3 reviews');
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
 assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
