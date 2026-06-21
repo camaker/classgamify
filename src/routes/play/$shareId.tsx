@@ -28,8 +28,8 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
-  getAttemptSubmitDecision,
 } from '@/assignments/student-submission';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -176,21 +176,22 @@ function PlayPage() {
   }, [activeShareId, assignment]);
 
   async function submitAnswers() {
-    if (!activity || !canSubmit) {
-      toast.error('This demo assignment is read-only for now.');
-      return;
-    }
-    if (assignment?.settings.collectStudentName && !studentName.trim()) {
-      toast.error('Type your name before submitting.');
-      return;
-    }
-    const submitDecision = getAttemptSubmitDecision({
+    const submitGate = buildStudentAttemptSubmitGate({
+      canSubmit: Boolean(activity) && canSubmit,
+      collectStudentName: Boolean(assignment?.settings.collectStudentName),
       completionSummary,
       confirmIncompleteSubmit,
+      studentName,
     });
-    if (submitDecision.type === 'confirm-incomplete') {
+
+    if (submitGate.type === 'blocked') {
+      toast.error(submitGate.message);
+      return;
+    }
+
+    if (submitGate.type === 'confirm-incomplete') {
       setConfirmIncompleteSubmit(true);
-      toast.error(completionCopy.confirmIncompleteSubmit);
+      toast.error(submitGate.message);
       return;
     }
 

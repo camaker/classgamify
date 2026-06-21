@@ -26,6 +26,23 @@ export type AttemptSubmitDecision =
       unansweredItemCount: number;
     };
 
+export type StudentAttemptSubmitGate =
+  | {
+      message: string;
+      reason: 'missing-student-name' | 'read-only';
+      type: 'blocked';
+    }
+  | {
+      message: string;
+      reason: 'unanswered-items';
+      type: 'confirm-incomplete';
+      unansweredItemCount: number;
+    }
+  | {
+      reason: 'complete' | 'confirmed-incomplete';
+      type: 'submit';
+    };
+
 export type AttemptCompletionCopy = {
   confirmIncompleteSubmit: string;
   progressLabel: string;
@@ -90,6 +107,53 @@ export function buildAttemptSubmissionAnswers({
     answer: answers[item.id] ?? '',
     itemId: item.id,
   }));
+}
+
+export function buildStudentAttemptSubmitGate({
+  canSubmit,
+  collectStudentName,
+  completionSummary,
+  confirmIncompleteSubmit,
+  studentName,
+}: {
+  canSubmit: boolean;
+  collectStudentName: boolean;
+  completionSummary: AttemptCompletionSummary;
+  confirmIncompleteSubmit: boolean;
+  studentName: string;
+}): StudentAttemptSubmitGate {
+  if (!canSubmit) {
+    return {
+      message: 'This demo assignment is read-only for now.',
+      reason: 'read-only',
+      type: 'blocked',
+    };
+  }
+
+  if (collectStudentName && !studentName.trim()) {
+    return {
+      message: 'Type your name before submitting.',
+      reason: 'missing-student-name',
+      type: 'blocked',
+    };
+  }
+
+  const submitDecision = getAttemptSubmitDecision({
+    completionSummary,
+    confirmIncompleteSubmit,
+  });
+
+  if (submitDecision.type === 'confirm-incomplete') {
+    return {
+      ...submitDecision,
+      message: buildAttemptCompletionCopy({
+        completionSummary,
+        confirmIncompleteSubmit,
+      }).confirmIncompleteSubmit,
+    };
+  }
+
+  return submitDecision;
 }
 
 export function getAttemptSubmitDecision({

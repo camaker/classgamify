@@ -164,6 +164,7 @@ import {
 import {
   buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
   isStudentAnswerFilled,
@@ -314,6 +315,79 @@ assert.deepEqual(
       unansweredItemCount: 0,
     },
     confirmIncompleteSubmit: false,
+  }),
+  {
+    reason: 'complete',
+    type: 'submit',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmitGate({
+    canSubmit: false,
+    collectStudentName: false,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+    studentName: '',
+  }),
+  {
+    message: 'This demo assignment is read-only for now.',
+    reason: 'read-only',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmitGate({
+    canSubmit: true,
+    collectStudentName: true,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+    studentName: '   ',
+  }),
+  {
+    message: 'Type your name before submitting.',
+    reason: 'missing-student-name',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmitGate({
+    canSubmit: true,
+    collectStudentName: true,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+    studentName: 'Ava',
+  }),
+  {
+    message: '2 questions are still unanswered.',
+    reason: 'unanswered-items',
+    type: 'confirm-incomplete',
+    unansweredItemCount: 2,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmitGate({
+    canSubmit: true,
+    collectStudentName: true,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: true,
+    studentName: 'Ava',
+  }),
+  {
+    reason: 'confirmed-incomplete',
+    type: 'submit',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmitGate({
+    canSubmit: true,
+    collectStudentName: false,
+    completionSummary: {
+      answeredItemCount: 3,
+      itemCount: 3,
+      unansweredItemCount: 0,
+    },
+    confirmIncompleteSubmit: false,
+    studentName: '',
   }),
   {
     reason: 'complete',
