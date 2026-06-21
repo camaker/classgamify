@@ -150,6 +150,7 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
   parseAssignmentDateTimeLocal,
   parseOptionalWholeNumber,
@@ -428,6 +429,135 @@ assert.equal(
 assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: false,
+    expiresAtLocal: '2026-01-10T09:30',
+    instructions: '  Finish before class.  ',
+    maxAttempts: '3',
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitMinutes: '15',
+    title: '  Week 1 review  ',
+  }),
+  {
+    input: {
+      activityId: 'activity-1',
+      expiresAt: new Date('2026-01-10T09:30').toISOString(),
+      settings: {
+        collectStudentName: false,
+        instructions: 'Finish before class.',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 900,
+      },
+      title: 'Week 1 review',
+    },
+    ok: true,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '   ',
+    maxAttempts: '2',
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Untimed homework',
+  }),
+  {
+    input: {
+      activityId: 'activity-1',
+      expiresAt: undefined,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+      title: 'Untimed homework',
+    },
+    ok: true,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: '  ',
+  }),
+  {
+    message: 'Add an assignment title before publishing.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '11',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Max attempts must be a whole number from 1 to 10.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '1.5',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Time limit must be a whole number from 1 to 180 minutes.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '2025-12-31T23:59',
+    instructions: '',
+    maxAttempts: '2',
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Close time must be in the future.',
+    ok: false,
+  }
 );
 const publishedAssignments = [
   {

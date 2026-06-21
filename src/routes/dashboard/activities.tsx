@@ -30,6 +30,7 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import {
+  buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
   parseAssignmentDateTimeLocal,
   parseOptionalWholeNumber,
@@ -537,49 +538,24 @@ function ActivityCard({
       toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
       return;
     }
-    const title = assignmentTitle.trim();
-    const attempts = Number(maxAttempts);
-    if (!title) {
-      toast.error('Add an assignment title before publishing.');
-      return;
-    }
-    const instructions = assignmentInstructions.trim();
-    if (!Number.isInteger(attempts) || attempts < 1 || attempts > 10) {
-      toast.error('Max attempts must be a whole number from 1 to 10.');
-      return;
-    }
-    const timeLimit = previewTimeLimit;
-    if (
-      timeLimitMinutes &&
-      (!Number.isInteger(timeLimit) || timeLimit < 1 || timeLimit > 180)
-    ) {
-      toast.error('Time limit must be a whole number from 1 to 180 minutes.');
-      return;
-    }
-    const expiresAt = previewExpiresAt ?? undefined;
-    if (expiresAtLocal && Number.isNaN(expiresAt?.getTime())) {
-      toast.error('Choose a valid close time.');
-      return;
-    }
-    if (expiresAt && expiresAt.getTime() <= Date.now()) {
-      toast.error('Close time must be in the future.');
+    const draftResult = buildAssignmentPublishInputFromDraft({
+      activityId: activity.id,
+      collectStudentName,
+      expiresAtLocal,
+      instructions: assignmentInstructions,
+      maxAttempts,
+      showCorrectAnswers,
+      shuffleItems,
+      timeLimitMinutes,
+      title: assignmentTitle,
+    });
+    if (!draftResult.ok) {
+      toast.error(draftResult.message);
       return;
     }
 
     try {
-      const result = await publishMutation.mutateAsync({
-        activityId: activity.id,
-        expiresAt: expiresAt?.toISOString(),
-        settings: {
-          collectStudentName,
-          instructions: instructions || undefined,
-          maxAttempts: attempts,
-          showCorrectAnswers,
-          shuffleItems,
-          timeLimitSeconds: timeLimit ? timeLimit * 60 : undefined,
-        },
-        title,
-      });
+      const result = await publishMutation.mutateAsync(draftResult.input);
       toast.success('Assignment link published.');
       setPublishDialogOpen(false);
       navigate({
