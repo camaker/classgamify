@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -32,16 +33,17 @@ export function GroupSortBoard({
   revealAnswer,
   reviewItems,
 }: GroupSortBoardProps) {
+  const copy = getActivityRunnerKindCopy('group-sort');
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const runnerView = useMemo(
     () =>
       buildStudentRunnerView({
         answers,
         items,
-        progressVerb: 'sorted',
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
   const selectedItem = selectedItemId
     ? runnerView.itemViewsById.get(selectedItemId)?.item
@@ -67,7 +69,7 @@ export function GroupSortBoard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconCategory2 className="size-4 text-primary" />
-          Group sort
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -97,6 +99,7 @@ export function GroupSortBoard({
             {unplacedItemViews.length ? (
               unplacedItemViews.map(({ item, reviewItem }) => (
                 <GroupSortItemButton
+                  correctLabel={copy.correctAnswerLabel}
                   key={item.id}
                   item={item}
                   reviewItem={reviewItem}
@@ -150,6 +153,7 @@ export function GroupSortBoard({
                   {placedItemViews.map(({ item, reviewItem }) => (
                     <GroupSortItemButton
                       key={item.id}
+                      correctLabel={copy.correctAnswerLabel}
                       item={item}
                       reviewItem={reviewItem}
                       revealAnswer={revealAnswer}
@@ -178,6 +182,7 @@ export function GroupSortBoard({
 
 function GroupSortItemButton({
   compact = false,
+  correctLabel,
   disabled,
   item,
   onSelect,
@@ -186,6 +191,7 @@ function GroupSortItemButton({
   selected,
 }: {
   compact?: boolean;
+  correctLabel: string;
   disabled: boolean;
   item: PublicRuntimeItem;
   onSelect: MouseEventHandler<HTMLButtonElement>;
@@ -220,7 +226,7 @@ function GroupSortItemButton({
       </div>
       {revealAnswer && reviewItem ? (
         <PublicAnswerFeedback
-          correctLabel="Correct group"
+          correctLabel={correctLabel}
           reviewItem={reviewItem}
         />
       ) : null}

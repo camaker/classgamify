@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,7 @@ export function ListeningRunner({
   revealAnswer,
   reviewItems,
 }: ListeningRunnerProps) {
+  const copy = getActivityRunnerKindCopy('listening');
   const [activeItemId, setActiveItemId] = useState(items[0]?.id);
   const [speechSupported, setSpeechSupported] = useState(false);
   const runnerView = useMemo(
@@ -40,9 +42,10 @@ export function ListeningRunner({
       buildStudentRunnerView({
         answers,
         items,
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
   const activeIndex = Math.max(
     0,
@@ -80,7 +83,7 @@ export function ListeningRunner({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconVolume className="size-4 text-primary" />
-          Listening
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -160,7 +163,7 @@ export function ListeningRunner({
               Listen first
             </p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Use the play button, then answer what you heard.
+              {copy.helpText}
             </p>
             {revealAnswer ? (
               <p className="mt-4 text-base font-semibold leading-7">
@@ -198,13 +201,16 @@ export function ListeningRunner({
               onChange={(event) =>
                 onAnswerChange(activeItem.id, event.target.value)
               }
-              placeholder="Type what you heard"
+              placeholder={copy.inputPlaceholder}
               className="mt-4"
             />
           )}
 
           {revealAnswer && activeReviewItem ? (
-            <PublicAnswerFeedback reviewItem={activeReviewItem} />
+            <PublicAnswerFeedback
+              correctLabel={copy.correctAnswerLabel}
+              reviewItem={activeReviewItem}
+            />
           ) : null}
         </div>
       </div>

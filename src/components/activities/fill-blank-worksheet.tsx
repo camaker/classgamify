@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -27,15 +28,16 @@ export function FillBlankWorksheet({
   revealAnswer,
   reviewItems,
 }: FillBlankWorksheetProps) {
+  const copy = getActivityRunnerKindCopy('fill-blank');
   const runnerView = useMemo(
     () =>
       buildStudentRunnerView({
         answers,
         items,
-        progressVerb: 'completed',
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
 
   return (
@@ -43,7 +45,7 @@ export function FillBlankWorksheet({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconPencil className="size-4 text-primary" />
-          Fill blanks
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -79,6 +81,7 @@ export function FillBlankWorksheet({
               <InlineBlankPrompt
                 answer={answer}
                 disabled={disabled}
+                placeholder={copy.inputPlaceholder}
                 prompt={item.prompt}
                 onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
               />
@@ -97,11 +100,13 @@ function InlineBlankPrompt({
   answer,
   disabled,
   onAnswerChange,
+  placeholder,
   prompt,
 }: {
   answer: string;
   disabled: boolean;
   onAnswerChange: (answer: string) => void;
+  placeholder: string;
   prompt: string;
 }) {
   const parts = splitPromptAtBlank(prompt);
@@ -114,7 +119,7 @@ function InlineBlankPrompt({
           value={answer}
           disabled={disabled}
           onChange={(event) => onAnswerChange(event.target.value)}
-          placeholder="Type the missing word"
+          placeholder={placeholder}
         />
       </div>
     );

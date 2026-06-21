@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -33,15 +34,17 @@ export function OpenBoxRunner({
   revealAnswer,
   reviewItems,
 }: OpenBoxRunnerProps) {
+  const copy = getActivityRunnerKindCopy('open-box');
   const [activeItemId, setActiveItemId] = useState(items[0]?.id);
   const runnerView = useMemo(
     () =>
       buildStudentRunnerView({
         answers,
         items,
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
   const activeIndex = Math.max(
     0,
@@ -68,7 +71,7 @@ export function OpenBoxRunner({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconBox className="size-4 text-primary" />
-          Open the box
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -162,12 +165,15 @@ export function OpenBoxRunner({
             onChange={(event) =>
               onAnswerChange(activeItem.id, event.target.value)
             }
-            placeholder="Type your answer"
+            placeholder={copy.inputPlaceholder}
             className="mt-4"
           />
 
           {revealAnswer && activeReviewItem ? (
-            <PublicAnswerFeedback reviewItem={activeReviewItem} />
+            <PublicAnswerFeedback
+              correctLabel={copy.correctAnswerLabel}
+              reviewItem={activeReviewItem}
+            />
           ) : null}
         </div>
       </div>

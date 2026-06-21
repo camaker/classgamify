@@ -53,6 +53,10 @@ import {
   getRuntimeItems,
 } from '@/activities/runtime';
 import {
+  getActivityRunnerKindCopy,
+  getActivityTemplateRunnerCopy,
+} from '@/activities/runner-copy';
+import {
   getActivityTemplateDraftGuidance,
   formatTemplateRequirementList,
   formatTemplateRequirement,
@@ -285,6 +289,23 @@ assert.deepEqual(getStudentRunnerCopy(), {
   submissionSuccessMessage: 'Attempt submitted.',
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
 });
+assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
+  correctAnswerLabel: 'Correct match',
+  helpText: 'Select a prompt on the left, then select its match on the right.',
+  inputPlaceholder: 'Choose a match',
+  progressVerb: 'connected',
+  title: 'Line match',
+  usedChoiceLabel: 'Connected',
+});
+assert.equal(getActivityTemplateRunnerCopy('quiz').title, 'Quiz');
+assert.equal(
+  getActivityTemplateRunnerCopy('match-up').correctAnswerLabel,
+  'Correct match'
+);
+assert.equal(
+  getActivityTemplateRunnerCopy('matching-pairs').progressVerb,
+  'matched'
+);
 assert.equal(
   findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Rome'),
   'item-2'

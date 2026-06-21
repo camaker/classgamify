@@ -1,4 +1,5 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
+import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
   formatRuntimeItemKindLabel,
   formatRuntimeItemPrompt,
@@ -296,6 +297,8 @@ function PlayPage() {
     );
   }
 
+  const runnerUiCopy = getActivityTemplateRunnerCopy(activity.templateType);
+
   return (
     <Container className="px-4 py-10 md:py-14">
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
@@ -342,7 +345,7 @@ function PlayPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <IconPlayerPlay className="size-4 text-primary" />
-              Student runner
+              {runnerUiCopy.title}
             </div>
             <Badge variant="secondary" className="rounded-md">
               {completionCopy.progressLabel}
@@ -547,6 +550,7 @@ function RuntimeItemList({
   templateType: ActivityTemplateType;
 }) {
   const runnerKind = getActivityTemplateRunnerKind(templateType);
+  const runnerCopy = getActivityTemplateRunnerCopy(templateType);
 
   if (runnerKind === 'line-match') {
     return (
@@ -650,6 +654,7 @@ function RuntimeItemList({
           reviewItem={reviewItems?.find(
             (reviewItem) => reviewItem.itemId === item.id
           )}
+          runnerCopy={runnerCopy}
           revealAnswer={revealAnswer}
           onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
         />
@@ -666,6 +671,7 @@ function RuntimeItemCard({
   onAnswerChange,
   revealAnswer,
   reviewItem,
+  runnerCopy,
 }: {
   answer: string;
   disabled: boolean;
@@ -674,6 +680,7 @@ function RuntimeItemCard({
   onAnswerChange: (answer: string) => void;
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
+  runnerCopy: ReturnType<typeof getActivityTemplateRunnerCopy>;
 }) {
   const prompt = formatRuntimeItemPrompt(item);
   const kindLabel = formatRuntimeItemKindLabel(item);
@@ -700,12 +707,15 @@ function RuntimeItemCard({
           value={answer}
           disabled={disabled}
           onChange={(event) => onAnswerChange(event.target.value)}
-          placeholder="Type your answer"
+          placeholder={runnerCopy.inputPlaceholder}
           className="mt-3"
         />
       )}
       {revealAnswer && reviewItem ? (
-        <PublicAnswerFeedback reviewItem={reviewItem} />
+        <PublicAnswerFeedback
+          correctLabel={runnerCopy.correctAnswerLabel}
+          reviewItem={reviewItem}
+        />
       ) : null}
     </div>
   );

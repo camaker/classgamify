@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildExclusiveChoiceAnswerChanges,
   buildRuntimeChoiceViews,
@@ -30,16 +31,17 @@ export function LineMatchBoard({
   revealAnswer,
   reviewItems,
 }: LineMatchBoardProps) {
+  const copy = getActivityRunnerKindCopy('line-match');
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const runnerView = useMemo(
     () =>
       buildStudentRunnerView({
         answers,
         items,
-        progressVerb: 'connected',
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
   const choiceViews = useMemo(
     () =>
@@ -74,7 +76,7 @@ export function LineMatchBoard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconLineDashed className="size-4 text-primary" />
-          Line match
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -153,7 +155,7 @@ export function LineMatchBoard({
               <span className="font-medium">{choice}</span>
               {usedByItemId ? (
                 <Badge variant="outline" className="ml-2 rounded-md">
-                  Connected
+                  {copy.usedChoiceLabel}
                 </Badge>
               ) : null}
             </button>
@@ -162,7 +164,7 @@ export function LineMatchBoard({
       </div>
 
       <p className="mt-3 text-xs leading-5 text-muted-foreground">
-        Select a prompt on the left, then select its match on the right.
+        {copy.helpText}
       </p>
     </div>
   );

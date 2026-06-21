@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildExclusiveChoiceAnswerChanges,
   buildRuntimeChoiceViews,
@@ -30,16 +31,17 @@ export function MatchingPairsBoard({
   revealAnswer,
   reviewItems,
 }: MatchingPairsBoardProps) {
+  const copy = getActivityRunnerKindCopy('matching-pairs');
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const runnerView = useMemo(
     () =>
       buildStudentRunnerView({
         answers,
         items,
-        progressVerb: 'matched',
+        progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, items, reviewItems]
+    [answers, copy.progressVerb, items, reviewItems]
   );
   const choiceViews = useMemo(
     () =>
@@ -69,7 +71,7 @@ export function MatchingPairsBoard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <IconArrowsExchange className="size-4 text-primary" />
-          Matching pairs
+          {copy.title}
         </div>
         <Badge variant="outline" className="rounded-md">
           {runnerView.progressLabel}
@@ -145,7 +147,7 @@ export function MatchingPairsBoard({
               <span className="font-medium">{choice}</span>
               {usedByItemId ? (
                 <Badge variant="outline" className="ml-2 rounded-md">
-                  Used
+                  {copy.usedChoiceLabel}
                 </Badge>
               ) : null}
             </button>
