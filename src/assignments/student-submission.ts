@@ -76,6 +76,7 @@ export type StudentRunnerCopy = {
   resultAccuracyLabel: string;
   resultSubmittedLabel: string;
   resultTimePrefix: string;
+  missingStudentNameMessage: string;
   studentNameLabel: string;
   studentNamePlaceholder: string;
   submissionFailureMessage: string;
@@ -118,6 +119,7 @@ const STUDENT_RUNNER_COPY = {
   resultAccuracyLabel: 'accuracy',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
+  missingStudentNameMessage: 'Type your name before submitting.',
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',
   submissionFailureMessage: 'Attempt could not be saved.',
@@ -344,7 +346,7 @@ export function buildStudentAttemptSubmitGate({
 
   if (collectStudentName && !studentName.trim()) {
     return {
-      message: 'Type your name before submitting.',
+      message: STUDENT_RUNNER_COPY.missingStudentNameMessage,
       reason: 'missing-student-name',
       type: 'blocked',
     };

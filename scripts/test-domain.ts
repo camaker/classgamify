@@ -352,6 +352,7 @@ assert.deepEqual(getStudentRunnerCopy(), {
   resultAccuracyLabel: 'accuracy',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
+  missingStudentNameMessage: 'Type your name before submitting.',
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',
   submissionFailureMessage: 'Attempt could not be saved.',
