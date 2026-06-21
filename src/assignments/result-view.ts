@@ -14,6 +14,12 @@ export type ItemPerformanceSort =
   | 'type';
 export type AttemptReviewFilter = 'all' | 'needs-review';
 
+export type AssignmentResultSearchState = {
+  itemSort?: ItemPerformanceSort;
+  review?: AttemptReviewFilter;
+  sort?: StudentSummarySort;
+};
+
 export type ResultSearchSummaryInput = {
   matchedAttempts: number;
   matchedStudents: number;
@@ -209,6 +215,28 @@ export function parseAttemptReviewFilter(
   value: unknown
 ): AttemptReviewFilter | undefined {
   return value === 'needs-review' ? value : undefined;
+}
+
+export function buildAssignmentResultSearchState({
+  current,
+  next,
+}: {
+  current: AssignmentResultSearchState;
+  next: Partial<{
+    itemSort: ItemPerformanceSort;
+    review: AttemptReviewFilter;
+    sort: StudentSummarySort;
+  }>;
+}): AssignmentResultSearchState {
+  const itemSort = next.itemSort ?? current.itemSort;
+  const review = next.review ?? current.review;
+  const sort = next.sort ?? current.sort;
+
+  return {
+    itemSort: itemSort === 'original' ? undefined : itemSort,
+    review: review === 'all' ? undefined : review,
+    sort: sort === 'needs-review' ? undefined : sort,
+  };
 }
 
 export function normalizeResultSearch(value: string | null | undefined) {

@@ -111,6 +111,7 @@ import {
 } from '@/assignments/item-order';
 import {
   buildAttemptReviewSubmissionSummary,
+  buildAssignmentResultSearchState,
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
@@ -2555,6 +2556,57 @@ assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
 assert.equal(parseItemPerformanceSort('original'), undefined);
 assert.equal(parseAttemptReviewFilter('needs-review'), 'needs-review');
 assert.equal(parseAttemptReviewFilter('all'), undefined);
+assert.deepEqual(
+  buildAssignmentResultSearchState({
+    current: {},
+    next: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      sort: 'best',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: 'best',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSearchState({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      sort: 'best',
+    },
+    next: {
+      itemSort: 'original',
+      review: 'all',
+      sort: 'needs-review',
+    },
+  }),
+  {
+    itemSort: undefined,
+    review: undefined,
+    sort: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSearchState({
+    current: {
+      itemSort: 'submitted',
+      review: 'needs-review',
+      sort: 'attempts',
+    },
+    next: {
+      review: 'all',
+    },
+  }),
+  {
+    itemSort: 'submitted',
+    review: undefined,
+    sort: 'attempts',
+  }
+);
 assert.deepEqual(
   sortStudentSummaries(resultAnalysis.students, 'attempts').map(
     (student) => student.studentLabel

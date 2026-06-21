@@ -9,6 +9,7 @@ import {
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAttemptReviewSubmissionSummary,
+  buildAssignmentResultSearchState,
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
@@ -161,33 +162,30 @@ function AssignmentResultsPage() {
   function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
     void navigate({
       replace: true,
-      search: {
-        itemSort: nextSort === 'original' ? undefined : nextSort,
-        review,
-        sort,
-      },
+      search: buildAssignmentResultSearchState({
+        current: { itemSort, review, sort },
+        next: { itemSort: nextSort },
+      }),
     });
   }
 
   function updateStudentSort(nextSort: StudentSummarySort) {
     void navigate({
       replace: true,
-      search: {
-        itemSort,
-        review,
-        sort: nextSort === 'needs-review' ? undefined : nextSort,
-      },
+      search: buildAssignmentResultSearchState({
+        current: { itemSort, review, sort },
+        next: { sort: nextSort },
+      }),
     });
   }
 
   function updateAttemptReviewFilter(nextFilter: AttemptReviewFilter) {
     void navigate({
       replace: true,
-      search: {
-        itemSort,
-        review: nextFilter === 'all' ? undefined : nextFilter,
-        sort,
-      },
+      search: buildAssignmentResultSearchState({
+        current: { itemSort, review, sort },
+        next: { review: nextFilter },
+      }),
     });
   }
 
