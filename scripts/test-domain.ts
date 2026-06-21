@@ -116,6 +116,7 @@ import {
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
+  buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
   buildRuntimeChoiceViews,
   buildStudentRunnerView,
@@ -478,6 +479,25 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(buildInlineBlankPromptView('I eat ___ for breakfast.'), {
+  after: ' for breakfast.',
+  before: 'I eat ',
+  mode: 'inline',
+});
+assert.deepEqual(buildInlineBlankPromptView('The capital is [ blank ].'), {
+  after: '.',
+  before: 'The capital is ',
+  mode: 'inline',
+});
+assert.deepEqual(buildInlineBlankPromptView('Photosynthesis makes (blank).'), {
+  after: '.',
+  before: 'Photosynthesis makes ',
+  mode: 'inline',
+});
+assert.deepEqual(buildInlineBlankPromptView('Type the missing word.'), {
+  mode: 'standalone',
+  prompt: 'Type the missing word.',
+});
 
 assert.deepEqual(
   getAttemptCompletionSummary({

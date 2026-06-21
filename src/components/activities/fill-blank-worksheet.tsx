@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildInlineBlankPromptView,
+  buildStudentRunnerView,
+} from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -109,12 +112,12 @@ function InlineBlankPrompt({
   placeholder: string;
   prompt: string;
 }) {
-  const parts = splitPromptAtBlank(prompt);
+  const promptView = buildInlineBlankPromptView(prompt);
 
-  if (!parts) {
+  if (promptView.mode === 'standalone') {
     return (
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-center">
-        <p className="text-sm font-medium leading-7">{prompt}</p>
+        <p className="text-sm font-medium leading-7">{promptView.prompt}</p>
         <Input
           value={answer}
           disabled={disabled}
@@ -127,7 +130,7 @@ function InlineBlankPrompt({
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-medium leading-8">
-      <span>{parts.before}</span>
+      <span>{promptView.before}</span>
       <Input
         value={answer}
         disabled={disabled}
@@ -135,17 +138,7 @@ function InlineBlankPrompt({
         placeholder="answer"
         className="h-9 w-40 min-w-0 border-x-0 border-t-0 rounded-none bg-transparent px-2 text-center shadow-none focus-visible:ring-0"
       />
-      <span>{parts.after}</span>
+      <span>{promptView.after}</span>
     </div>
   );
-}
-
-function splitPromptAtBlank(prompt: string) {
-  const match = /_{2,}|\[\s*blank\s*\]|\(\s*blank\s*\)/i.exec(prompt);
-  if (!match) return null;
-
-  return {
-    after: prompt.slice(match.index + match[0].length),
-    before: prompt.slice(0, match.index),
-  };
 }

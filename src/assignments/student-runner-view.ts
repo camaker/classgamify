@@ -21,6 +21,17 @@ type RuntimeChoiceAnswerChange = {
   itemId: string;
 };
 
+type InlineBlankPromptView =
+  | {
+      after: string;
+      before: string;
+      mode: 'inline';
+    }
+  | {
+      mode: 'standalone';
+      prompt: string;
+    };
+
 export function buildStudentRunnerView({
   answers,
   items,
@@ -122,6 +133,24 @@ export function buildExclusiveChoiceAnswerChanges({
   changes.push({ answer: choice, itemId });
 
   return changes;
+}
+
+export function buildInlineBlankPromptView(
+  prompt: string
+): InlineBlankPromptView {
+  const match = /_{2,}|\[\s*blank\s*\]|\(\s*blank\s*\)/i.exec(prompt);
+  if (!match) {
+    return {
+      mode: 'standalone',
+      prompt,
+    };
+  }
+
+  return {
+    after: prompt.slice(match.index + match[0].length),
+    before: prompt.slice(0, match.index),
+    mode: 'inline',
+  };
 }
 
 function getStudentRunnerReviewStatus(
