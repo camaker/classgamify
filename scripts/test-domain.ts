@@ -26,6 +26,7 @@ import {
   buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import {
+  buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
@@ -150,6 +151,7 @@ import {
   stripRuntimeAnswers,
 } from '@/assignments/public';
 import {
+  buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -2549,6 +2551,42 @@ assert.deepEqual(
     template: 'group-sort',
   }
 );
+assert.deepEqual(
+  buildActivityLibraryPageRouteSearch({
+    current: {
+      created: 'activity-1',
+      q: '  word   match  ',
+      status: 'active',
+      template: 'all',
+    },
+    page: 0,
+  }),
+  {
+    created: 'activity-1',
+    page: undefined,
+    q: 'word match',
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryPageRouteSearch({
+    current: {
+      created: 'activity-1',
+      q: ' sort ',
+      status: 'archived',
+      template: 'group-sort',
+    },
+    page: 5,
+  }),
+  {
+    created: 'activity-1',
+    page: 5,
+    q: 'sort',
+    status: 'archived',
+    template: 'group-sort',
+  }
+);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
 assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
@@ -3099,6 +3137,38 @@ assert.deepEqual(
   }),
   {
     page: 4,
+    published: 'share-1',
+    q: 'week',
+    status: 'closed',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListPageRouteSearch({
+    current: {
+      published: 'share-1',
+      q: '  share   123  ',
+      status: 'all',
+    },
+    page: 0,
+  }),
+  {
+    page: undefined,
+    published: 'share-1',
+    q: 'share 123',
+    status: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListPageRouteSearch({
+    current: {
+      published: 'share-1',
+      q: ' week ',
+      status: 'closed',
+    },
+    page: 5,
+  }),
+  {
+    page: 5,
     published: 'share-1',
     q: 'week',
     status: 'closed',

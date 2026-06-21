@@ -47,6 +47,19 @@ export function buildActivityLibraryRouteSearch({
   };
 }
 
+export function buildActivityLibraryPageRouteSearch({
+  current,
+  page,
+}: {
+  current: Omit<ActivityLibrarySearchState, 'page'>;
+  page: number;
+}): ActivityLibraryRouteSearch {
+  return buildActivityLibraryRouteSearch({
+    ...current,
+    page,
+  });
+}
+
 export function parseActivityLibraryStatus(
   value: unknown
 ): ActivityLibraryStatus | undefined {

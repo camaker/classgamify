@@ -1,6 +1,7 @@
 import { getStarterActivity, starterAssignments } from '@/activities/catalog';
 import {
   type AssignmentStatusFilter,
+  buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -138,15 +139,15 @@ function DashboardAssignmentsPage() {
   }
 
   function navigateToAssignmentPage(nextPage: number, replace = false) {
-    const boundedPage = Math.max(1, nextPage);
-
     void navigate({
       replace,
-      search: buildAssignmentListRouteSearch({
-        page: boundedPage === 1 ? undefined : boundedPage,
-        published,
-        q: searchQuery.trim() ? searchQuery : undefined,
-        status: statusFilter,
+      search: buildAssignmentListPageRouteSearch({
+        current: {
+          published,
+          q: searchQuery,
+          status: statusFilter,
+        },
+        page: nextPage,
       }),
     });
   }

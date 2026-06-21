@@ -6,6 +6,7 @@ import {
 import {
   type ActivityLibraryStatus,
   type ActivityTemplateFilter,
+  buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
@@ -175,16 +176,16 @@ function DashboardActivitiesPage() {
   }
 
   function navigateToActivityPage(nextPage: number, replace = false) {
-    const boundedPage = Math.max(1, nextPage);
-
     void navigate({
       replace,
-      search: buildActivityLibraryRouteSearch({
-        created,
-        page: boundedPage === 1 ? undefined : boundedPage,
-        q: searchQuery.trim() ? searchQuery : undefined,
-        status: libraryStatus,
-        template: templateFilter,
+      search: buildActivityLibraryPageRouteSearch({
+        current: {
+          created,
+          q: searchQuery,
+          status: libraryStatus,
+          template: templateFilter,
+        },
+        page: nextPage,
       }),
     });
   }

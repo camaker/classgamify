@@ -39,6 +39,19 @@ export function buildAssignmentListRouteSearch({
   };
 }
 
+export function buildAssignmentListPageRouteSearch({
+  current,
+  page,
+}: {
+  current: Omit<AssignmentListSearchState, 'page'>;
+  page: number;
+}): AssignmentListRouteSearch {
+  return buildAssignmentListRouteSearch({
+    ...current,
+    page,
+  });
+}
+
 export function parseAssignmentStatusFilter(
   value: unknown
 ): AssignmentStatus | undefined {
