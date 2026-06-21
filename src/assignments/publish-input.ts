@@ -55,6 +55,15 @@ export type AssignmentPublishDraftResult =
       ok: false;
     };
 
+type AssignmentPublishDraftValidation =
+  | {
+      ok: true;
+    }
+  | {
+      message: string;
+      ok: false;
+    };
+
 export type AssignmentPublishPreview = {
   expiresAt: Date | null;
   settings: AssignmentSettings;
@@ -168,18 +177,13 @@ export function buildAssignmentPublishPreviewFromDraft({
   };
 }
 
-export function buildAssignmentPublishInputFromDraft({
-  activityId,
-  collectStudentName,
+export function validateAssignmentPublishDraft({
   expiresAtLocal,
-  instructions,
   maxAttempts,
   now = new Date(),
-  showCorrectAnswers,
-  shuffleItems,
   timeLimitMinutes,
   title,
-}: AssignmentPublishDraft): AssignmentPublishDraftResult {
+}: AssignmentPublishDraft): AssignmentPublishDraftValidation {
   const trimmedTitle = title.trim();
   if (!trimmedTitle) {
     return {
@@ -222,6 +226,39 @@ export function buildAssignmentPublishInputFromDraft({
     };
   }
 
+  return { ok: true };
+}
+
+export function buildAssignmentPublishInputFromDraft({
+  activityId,
+  collectStudentName,
+  expiresAtLocal,
+  instructions,
+  maxAttempts,
+  now = new Date(),
+  showCorrectAnswers,
+  shuffleItems,
+  timeLimitMinutes,
+  title,
+}: AssignmentPublishDraft): AssignmentPublishDraftResult {
+  const validation = validateAssignmentPublishDraft({
+    activityId,
+    collectStudentName,
+    expiresAtLocal,
+    instructions,
+    maxAttempts,
+    now,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitMinutes,
+    title,
+  });
+  if (!validation.ok) return validation;
+
+  const trimmedTitle = title.trim();
+  const attempts = Number(maxAttempts);
+  const timeLimit = parseOptionalWholeNumber(timeLimitMinutes);
+  const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
   const trimmedInstructions = instructions.trim();
 
   return {

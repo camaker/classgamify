@@ -39,6 +39,7 @@ import {
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
+  validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -571,6 +572,7 @@ function ActivityCard({
     },
   });
   const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
+  const publishValidation = validateAssignmentPublishDraft(publishDraft);
   const template = getTemplateByType(activity.templateType);
   const isArchived = isActivityArchived(activity.status);
   const canCreateDerivedWork = canDeriveActivityWork(activity.status);
@@ -969,6 +971,11 @@ function ActivityCard({
                 shuffleItems={publishPreview.settings.shuffleItems}
                 timeLimitSeconds={publishPreview.settings.timeLimitSeconds}
               />
+              {!publishValidation.ok ? (
+                <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
+                  {publishValidation.message}
+                </p>
+              ) : null}
             </div>
           </div>
           <DialogFooter>
@@ -981,7 +988,7 @@ function ActivityCard({
             </Button>
             <Button
               type="button"
-              disabled={publishMutation.isPending}
+              disabled={publishMutation.isPending || !publishValidation.ok}
               onClick={publishActivity}
             >
               <IconPlus className="size-4" />

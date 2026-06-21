@@ -220,6 +220,7 @@ import {
   formatAssignmentDateTimeLocal,
   parseAssignmentDateTimeLocal,
   parseOptionalWholeNumber,
+  validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
@@ -940,6 +941,89 @@ assert.deepEqual(
       shuffleItems: true,
       timeLimitSeconds: undefined,
     },
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  { ok: true }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '0',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Max attempts must be a whole number from 1 to 10.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '181',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Time limit must be a whole number from 1 to 180 minutes.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: 'not-a-date',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Choose a valid close time.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '2025-12-31T23:59',
+    instructions: '',
+    maxAttempts: '2',
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Close time must be in the future.',
+    ok: false,
   }
 );
 assert.deepEqual(
