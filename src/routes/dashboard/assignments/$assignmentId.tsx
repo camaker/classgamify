@@ -10,6 +10,7 @@ import {
   type AssignmentResultAction,
   type ItemPerformanceSort,
   type StudentSummarySort,
+  buildAssignmentResultActionButtons,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
@@ -101,6 +102,14 @@ const resultMetricIconByKey = {
   'average-time': IconClock,
   closes: IconCalendarTime,
   completions: IconUsers,
+} as const;
+
+const resultActionIconByAction = {
+  'copy-brief': IconClipboardText,
+  'copy-follow-up': IconCopy,
+  'copy-item-review': IconCopy,
+  'copy-reteach-plan': IconCopy,
+  'export-csv': IconDownload,
 } as const;
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
@@ -332,6 +341,19 @@ function AssignmentResultsPage() {
         completions: data.stats.completions,
       })
     : [];
+  const resultActionButtons = buildAssignmentResultActionButtons({
+    attemptCount: data?.attempts.length ?? 0,
+    classroomBriefReady: Boolean(classroomBrief),
+    itemCount: data?.analysis.perItem.length ?? 0,
+    studentCount: data?.analysis.students.length ?? 0,
+  });
+  const resultActionHandlers = {
+    'copy-brief': handleCopyClassroomBrief,
+    'copy-follow-up': handleCopyStudentFollowUp,
+    'copy-item-review': handleCopyItemReview,
+    'copy-reteach-plan': handleCopyReteachPlan,
+    'export-csv': handleExportResults,
+  } satisfies Record<AssignmentResultAction, () => Promise<void>>;
 
   return (
     <DashboardLayout
@@ -413,56 +435,23 @@ function AssignmentResultsPage() {
                   shareSlug={data.assignment.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  disabled={!hasAttempts}
-                  onClick={handleCopyClassroomBrief}
-                >
-                  <IconClipboardText className="size-4" />
-                  {getAssignmentResultActionCopy('copy-brief').label}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  disabled={!hasAttempts}
-                  onClick={handleCopyReteachPlan}
-                >
-                  <IconCopy className="size-4" />
-                  {getAssignmentResultActionCopy('copy-reteach-plan').label}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  disabled={data.analysis.perItem.length === 0}
-                  onClick={handleCopyItemReview}
-                >
-                  <IconCopy className="size-4" />
-                  {getAssignmentResultActionCopy('copy-item-review').label}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  disabled={data.analysis.students.length === 0}
-                  onClick={handleCopyStudentFollowUp}
-                >
-                  <IconCopy className="size-4" />
-                  {getAssignmentResultActionCopy('copy-follow-up').label}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  disabled={!hasAttempts}
-                  onClick={handleExportResults}
-                >
-                  <IconDownload className="size-4" />
-                  {getAssignmentResultActionCopy('export-csv').label}
-                </Button>
+                {resultActionButtons.map((actionButton) => {
+                  const Icon = resultActionIconByAction[actionButton.action];
+
+                  return (
+                    <Button
+                      key={actionButton.action}
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      disabled={actionButton.disabled}
+                      onClick={resultActionHandlers[actionButton.action]}
+                    >
+                      <Icon className="size-4" />
+                      {actionButton.label}
+                    </Button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

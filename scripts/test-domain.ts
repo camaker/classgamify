@@ -132,8 +132,10 @@ import {
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
+  assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentResultActionButtons,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
@@ -3152,6 +3154,51 @@ assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('Paris'), 'Paris');
 assert.equal(formatAssignmentReviewCount(1), '1 review');
 assert.equal(formatAssignmentReviewCount(3), '3 reviews');
+assert.deepEqual(assignmentResultActionOrder, [
+  'copy-brief',
+  'copy-reteach-plan',
+  'copy-item-review',
+  'copy-follow-up',
+  'export-csv',
+]);
+assert.deepEqual(
+  buildAssignmentResultActionButtons({
+    attemptCount: 0,
+    classroomBriefReady: false,
+    itemCount: 0,
+    studentCount: 0,
+  }),
+  [
+    { action: 'copy-brief', disabled: true, label: 'Copy brief' },
+    {
+      action: 'copy-reteach-plan',
+      disabled: true,
+      label: 'Copy reteach plan',
+    },
+    { action: 'copy-item-review', disabled: true, label: 'Copy item review' },
+    { action: 'copy-follow-up', disabled: true, label: 'Copy follow-up' },
+    { action: 'export-csv', disabled: true, label: 'Download CSV' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentResultActionButtons({
+    attemptCount: 2,
+    classroomBriefReady: true,
+    itemCount: 3,
+    studentCount: 1,
+  }),
+  [
+    { action: 'copy-brief', disabled: false, label: 'Copy brief' },
+    {
+      action: 'copy-reteach-plan',
+      disabled: false,
+      label: 'Copy reteach plan',
+    },
+    { action: 'copy-item-review', disabled: false, label: 'Copy item review' },
+    { action: 'copy-follow-up', disabled: false, label: 'Copy follow-up' },
+    { action: 'export-csv', disabled: false, label: 'Download CSV' },
+  ]
+);
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
 assert.equal(parseItemPerformanceSort('submitted'), 'submitted');

@@ -42,6 +42,12 @@ export type AssignmentResultActionCopy = {
   successMessage: string;
 };
 
+type AssignmentResultActionButton = {
+  action: AssignmentResultAction;
+  disabled: boolean;
+  label: string;
+};
+
 export type AssignmentResultEmptyState = {
   description: string;
   title: string;
@@ -184,6 +190,14 @@ const assignmentResultMetricDescriptors = [
   { key: 'closes', label: 'Closes' },
 ] satisfies Array<AssignmentResultMetricDescriptor>;
 
+export const assignmentResultActionOrder = [
+  'copy-brief',
+  'copy-reteach-plan',
+  'copy-item-review',
+  'copy-follow-up',
+  'export-csv',
+] satisfies AssignmentResultAction[];
+
 export const studentSummarySortOptions = [
   { label: 'Needs review', value: 'needs-review' },
   { label: 'Best score', value: 'best' },
@@ -228,6 +242,34 @@ export function buildAssignmentResultMetricItems({
     ...metric,
     value: valueByMetric[metric.key],
   }));
+}
+
+export function buildAssignmentResultActionButtons({
+  attemptCount,
+  classroomBriefReady = false,
+  itemCount,
+  studentCount,
+}: {
+  attemptCount: number;
+  classroomBriefReady?: boolean;
+  itemCount: number;
+  studentCount: number;
+}): AssignmentResultActionButton[] {
+  return assignmentResultActionOrder.map((action) => {
+    const gate = getAssignmentResultActionGate({
+      action,
+      attemptCount,
+      classroomBriefReady,
+      itemCount,
+      studentCount,
+    });
+
+    return {
+      action,
+      disabled: gate.type === 'blocked',
+      label: getAssignmentResultActionCopy(action).label,
+    };
+  });
 }
 
 export function buildAssignmentAttemptRowDisplay({
