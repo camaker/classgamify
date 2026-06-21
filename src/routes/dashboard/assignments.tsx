@@ -484,8 +484,7 @@ function AssignmentCard({
   assignment: ReturnType<typeof buildAssignmentListCardViewModel>;
 }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
-  const { showResultsAction, showShareActions, statusAction } =
-    assignment.actionState;
+  const { resultAction, shareAction, statusAction } = assignment.actionView;
 
   async function updateStatus() {
     if (!statusAction) return;
@@ -540,17 +539,17 @@ function AssignmentCard({
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          {showResultsAction ? (
+          {resultAction ? (
             <Link
               to="/dashboard/assignments/$assignmentId"
-              params={{ assignmentId: assignment.id }}
+              params={{ assignmentId: resultAction.assignmentId }}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
                 'w-full bg-background lg:w-auto'
               )}
             >
               <IconChartBar className="size-4" />
-              {assignmentListActionCopy.viewResults}
+              {resultAction.label}
             </Link>
           ) : null}
           {statusAction ? (
@@ -569,18 +568,18 @@ function AssignmentCard({
               {statusAction.label}
             </Button>
           ) : null}
-          {showShareActions ? (
+          {shareAction ? (
             <>
               <Link
                 to="/play/$shareId"
-                params={{ shareId: assignment.shareSlug }}
+                params={{ shareId: shareAction.shareSlug }}
                 className={cn(buttonVariants(), 'w-full lg:w-auto')}
               >
                 <IconPlayerPlay className="size-4" />
-                {assignmentListActionCopy.openShareLink}
+                {shareAction.label}
               </Link>
               <CopyAssignmentShareLinkButton
-                shareSlug={assignment.shareSlug}
+                shareSlug={shareAction.shareSlug}
                 className="w-full bg-background lg:w-auto"
               />
             </>

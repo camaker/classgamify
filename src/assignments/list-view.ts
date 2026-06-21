@@ -9,6 +9,7 @@ import {
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
 
 type AssignmentListControlOption = {
   label: string;
@@ -30,8 +31,26 @@ type AssignmentListCardActionState = {
   statusAction: AssignmentStatusAction | undefined;
 };
 
+type AssignmentListCardActionView = {
+  resultAction:
+    | {
+        assignmentId: string;
+        label: string;
+      }
+    | undefined;
+  shareAction:
+    | {
+        label: string;
+        sharePath: string;
+        shareSlug: string;
+      }
+    | undefined;
+  statusAction: AssignmentStatusAction | undefined;
+};
+
 type AssignmentListCardViewModel = {
   actionState: AssignmentListCardActionState;
+  actionView: AssignmentListCardActionView;
   activityDescription: string;
   expiresAt: Date | null;
   id: string;
@@ -195,13 +214,19 @@ export function buildAssignmentListCardViewModel({
   stats,
 }: AssignmentListCardSource): AssignmentListCardViewModel {
   const persisted = true;
+  const actionState = getAssignmentListCardActionState({
+    expiresAt: assignment.expiresAt,
+    now,
+    persisted,
+    status: assignment.status,
+  });
 
   return {
-    actionState: getAssignmentListCardActionState({
-      expiresAt: assignment.expiresAt,
-      now,
-      persisted,
-      status: assignment.status,
+    actionState,
+    actionView: buildAssignmentListCardActionView({
+      actionState,
+      assignmentId: assignment.id,
+      shareSlug: assignment.shareSlug,
     }),
     activityDescription:
       snapshot?.activityDescription ?? activity.description ?? '',
@@ -233,12 +258,18 @@ export function buildStarterAssignmentListCardViewModel({
     averageScore: assignment.averageScore,
     completions: assignment.completions,
   };
+  const actionState = getAssignmentListCardActionState({
+    expiresAt,
+    persisted,
+    status: assignment.status,
+  });
 
   return {
-    actionState: getAssignmentListCardActionState({
-      expiresAt,
-      persisted,
-      status: assignment.status,
+    actionState,
+    actionView: buildAssignmentListCardActionView({
+      actionState,
+      assignmentId: assignment.id,
+      shareSlug: assignment.shareId,
     }),
     activityDescription: activity.description,
     expiresAt,
@@ -266,15 +297,44 @@ export function getAssignmentListCardActionState({
   persisted: boolean;
   status: AssignmentStatus;
 }): AssignmentListCardActionState {
+  const hasPublishedSnapshot = status !== 'draft';
+
   return {
     isPersisted: persisted,
-    showResultsAction: persisted,
-    showShareActions: true,
+    showResultsAction: persisted && hasPublishedSnapshot,
+    showShareActions: hasPublishedSnapshot,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
       isPersisted: persisted,
       now,
     }),
+  };
+}
+
+export function buildAssignmentListCardActionView({
+  actionState,
+  assignmentId,
+  shareSlug,
+}: {
+  actionState: AssignmentListCardActionState;
+  assignmentId: string;
+  shareSlug: string;
+}): AssignmentListCardActionView {
+  return {
+    resultAction: actionState.showResultsAction
+      ? {
+          assignmentId,
+          label: assignmentListActionCopy.viewResults,
+        }
+      : undefined,
+    shareAction: actionState.showShareActions
+      ? {
+          label: assignmentListActionCopy.openShareLink,
+          sharePath: buildAssignmentSharePath(shareSlug),
+          shareSlug,
+        }
+      : undefined,
+    statusAction: actionState.statusAction,
   };
 }

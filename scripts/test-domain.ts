@@ -162,6 +162,7 @@ import {
   assignmentListPublishedPanelCopy,
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
+  buildAssignmentListCardActionView,
   buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
@@ -3034,6 +3035,24 @@ assert.deepEqual(
         successMessage: 'Assignment link closed.',
       },
     },
+    actionView: {
+      resultAction: {
+        assignmentId: 'persisted-assignment-1',
+        label: 'View results',
+      },
+      shareAction: {
+        label: 'Open share link',
+        sharePath: '/play/share-1',
+        shareSlug: 'share-1',
+      },
+      statusAction: {
+        failureMessage: 'Assignment status could not be updated.',
+        kind: 'close-link',
+        label: 'Close link',
+        nextStatus: 'closed',
+        successMessage: 'Assignment link closed.',
+      },
+    },
     activityDescription: 'Frozen activity description',
     expiresAt: new Date('2026-02-01T00:00:00.000Z'),
     id: 'persisted-assignment-1',
@@ -3115,6 +3134,15 @@ assert.deepEqual(
       showShareActions: true,
       statusAction: undefined,
     },
+    actionView: {
+      resultAction: undefined,
+      shareAction: {
+        label: 'Open share link',
+        sharePath: '/play/demo-food',
+        shareSlug: 'demo-food',
+      },
+      statusAction: undefined,
+    },
     activityDescription: 'Starter activity description',
     expiresAt: null,
     id: 'assignment-food-demo',
@@ -3180,8 +3208,49 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
-    showResultsAction: true,
-    showShareActions: true,
+    showResultsAction: false,
+    showShareActions: false,
+    statusAction: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListCardActionView({
+    actionState: {
+      isPersisted: true,
+      showResultsAction: true,
+      showShareActions: true,
+      statusAction: undefined,
+    },
+    assignmentId: 'assignment-with-space',
+    shareSlug: 'share 123',
+  }),
+  {
+    resultAction: {
+      assignmentId: 'assignment-with-space',
+      label: 'View results',
+    },
+    shareAction: {
+      label: 'Open share link',
+      sharePath: '/play/share%20123',
+      shareSlug: 'share 123',
+    },
+    statusAction: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListCardActionView({
+    actionState: {
+      isPersisted: true,
+      showResultsAction: false,
+      showShareActions: false,
+      statusAction: undefined,
+    },
+    assignmentId: 'draft-assignment',
+    shareSlug: 'draft-share',
+  }),
+  {
+    resultAction: undefined,
+    shareAction: undefined,
     statusAction: undefined,
   }
 );
