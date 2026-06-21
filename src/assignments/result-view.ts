@@ -58,11 +58,32 @@ export type AssignmentResultCopyAction = Exclude<
   'export-csv'
 >;
 
-type AssignmentResultActionButton = {
-  action: AssignmentResultAction;
+export type AssignmentResultActionButton =
+  | {
+      action: AssignmentResultCopyAction;
+      disabled: boolean;
+      failureMessage: string;
+      gate: AssignmentResultActionGate;
+      kind: 'copy-text';
+      label: string;
+      successMessage: string;
+    }
+  | {
+      action: 'export-csv';
+      disabled: boolean;
+      failureMessage: string;
+      gate: AssignmentResultActionGate;
+      kind: 'download-csv';
+      label: string;
+      successMessage: string;
+    };
+
+type AssignmentResultActionButtonBase = {
   disabled: boolean;
+  failureMessage: string;
   gate: AssignmentResultActionGate;
   label: string;
+  successMessage: string;
 };
 
 type AssignmentResultActionState = {
@@ -353,12 +374,27 @@ export function buildAssignmentResultActionButtons({
       itemCount,
       studentCount,
     });
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const base = {
+      disabled: gate.type === 'blocked',
+      failureMessage: actionCopy.failureMessage,
+      gate,
+      label: actionCopy.label,
+      successMessage: actionCopy.successMessage,
+    } satisfies AssignmentResultActionButtonBase;
+
+    if (action === 'export-csv') {
+      return {
+        ...base,
+        action,
+        kind: 'download-csv',
+      };
+    }
 
     return {
+      ...base,
       action,
-      disabled: gate.type === 'blocked',
-      gate,
-      label: getAssignmentResultActionCopy(action).label,
+      kind: 'copy-text',
     };
   });
 }

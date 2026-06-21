@@ -4,8 +4,7 @@ import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import {
   type AttemptReviewFilter,
   type AssignmentResultEmptyState,
-  type AssignmentResultAction,
-  type AssignmentResultCopyAction,
+  type AssignmentResultActionButton,
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultActionButtons,
@@ -31,7 +30,6 @@ import {
   formatAssignmentResultValue,
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
-  getAssignmentResultActionCopy,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
@@ -199,49 +197,38 @@ function AssignmentResultsPage() {
     });
   }
 
-  async function handleExportResults() {
-    const action = 'export-csv';
-    const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getResultActionGate(action);
-    if (!data || actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
-      return;
-    }
-
-    const csv = buildAssignmentResultsCsv(data);
-    const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
-    try {
-      await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
-      toast.success(actionCopy.successMessage);
-    } catch (error) {
+  async function handleResultAction(
+    actionButton: AssignmentResultActionButton
+  ) {
+    if (!data || actionButton.gate.type === 'blocked') {
       toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
+        actionButton.gate.type === 'blocked'
+          ? actionButton.gate.message
+          : actionButton.failureMessage
       );
-    }
-  }
-
-  async function handleCopyResultText(action: AssignmentResultCopyAction) {
-    const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getResultActionGate(action);
-    if (!data || actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
       return;
     }
 
     try {
-      await copyTextToClipboard(
-        buildAssignmentResultCopyText({
-          action,
-          assignmentTitle: data.assignment.title,
-          classroomBriefText: classroomBrief?.text,
-          items: data.analysis.perItem,
-          students: data.analysis.students,
-        })
-      );
-      toast.success(actionCopy.successMessage);
+      if (actionButton.kind === 'download-csv') {
+        const csv = buildAssignmentResultsCsv(data);
+        const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+        await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
+      } else {
+        await copyTextToClipboard(
+          buildAssignmentResultCopyText({
+            action: actionButton.action,
+            assignmentTitle: data.assignment.title,
+            classroomBriefText: classroomBrief?.text,
+            items: data.analysis.perItem,
+            students: data.analysis.students,
+          })
+        );
+      }
+      toast.success(actionButton.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
+        error instanceof Error ? error.message : actionButton.failureMessage
       );
     }
   }
@@ -265,20 +252,6 @@ function AssignmentResultsPage() {
   });
   const resultActionButtons =
     buildAssignmentResultActionButtons(resultActionState);
-  const resultActionGateByAction = new Map(
-    resultActionButtons.map((actionButton) => [
-      actionButton.action,
-      actionButton.gate,
-    ])
-  );
-  function getResultActionGate(action: AssignmentResultAction) {
-    return (
-      resultActionGateByAction.get(action) ?? {
-        message: getAssignmentResultActionCopy(action).failureMessage,
-        type: 'blocked',
-      }
-    );
-  }
   const resultSectionState = buildAssignmentResultSectionState({
     attemptCount: data?.attempts.length ?? 0,
     attemptReviewCount: data?.analysis.attempts.length ?? 0,
@@ -286,14 +259,6 @@ function AssignmentResultsPage() {
     itemCount: data?.analysis.perItem.length ?? 0,
     studentCount: data?.analysis.students.length ?? 0,
   });
-  const resultActionHandlers = {
-    'copy-brief': () => handleCopyResultText('copy-brief'),
-    'copy-follow-up': () => handleCopyResultText('copy-follow-up'),
-    'copy-item-review': () => handleCopyResultText('copy-item-review'),
-    'copy-reteach-plan': () => handleCopyResultText('copy-reteach-plan'),
-    'export-csv': handleExportResults,
-  } satisfies Record<AssignmentResultAction, () => Promise<void>>;
-
   return (
     <DashboardLayout
       breadcrumbs={[
@@ -374,7 +339,7 @@ function AssignmentResultsPage() {
                       variant="outline"
                       className="w-full sm:w-auto"
                       disabled={actionButton.disabled}
-                      onClick={resultActionHandlers[actionButton.action]}
+                      onClick={() => void handleResultAction(actionButton)}
                     >
                       <Icon className="size-4" />
                       {actionButton.label}
