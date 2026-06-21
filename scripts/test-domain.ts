@@ -56,7 +56,10 @@ import {
   buildActivityContent,
   createActivityInputSchema,
 } from '@/activities/validation';
-import { activityContentToEditorInput } from '@/activities/editor';
+import {
+  activityContentToEditorInput,
+  buildActivityEditorTemplateReadiness,
+} from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
@@ -1014,6 +1017,73 @@ assert.equal(
     visibility: 'draft',
   }).questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
+);
+const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
+  description: 'Editor readiness helper',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students can answer a question from editor input.',
+  pairsText: '',
+  questionsText: 'Capital of France? | Paris | Paris, Rome',
+  sourceSummary: 'Editor readiness source',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Editor readiness',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.equal(editorQuestionReadiness?.currentTemplateType, 'quiz');
+assert.equal(
+  editorQuestionReadiness?.options.find(
+    (option) => option.template.type === 'quiz'
+  )?.diagnosis,
+  'Quiz is selected and ready.'
+);
+assert.equal(
+  buildActivityEditorTemplateReadiness({
+    ...createActivityInputSchema.parse({
+      description: 'Invalid template readiness',
+      difficulty: 'starter',
+      gradeBand: 'Grade 3',
+      groupsText: '',
+      language: 'en',
+      learningGoal: 'Students can answer a question from editor input.',
+      pairsText: '',
+      questionsText: 'Capital of France? | Paris',
+      sourceSummary: 'Editor readiness source',
+      subject: 'General',
+      teacherNotesText: '',
+      templateType: 'quiz',
+      title: 'Editor readiness',
+      visibility: 'draft',
+      vocabularyText: '',
+    }),
+    title: 'No',
+  }),
+  null
+);
+assert.equal(
+  buildActivityEditorTemplateReadiness({
+    description: 'Invalid editor rows',
+    difficulty: 'starter',
+    gradeBand: 'Grade 3',
+    groupsText: '',
+    language: 'en',
+    learningGoal: 'Students can answer a question from editor input.',
+    pairsText: '',
+    questionsText: 'Missing answer only',
+    sourceSummary: 'Editor readiness source',
+    subject: 'General',
+    teacherNotesText: '',
+    templateType: 'quiz',
+    title: 'Invalid editor rows',
+    visibility: 'draft',
+    vocabularyText: '',
+  }),
+  null
 );
 assert.throws(
   () =>

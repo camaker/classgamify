@@ -4,7 +4,15 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
-import type { CreateActivityInput } from '@/activities/validation';
+import {
+  createActivityInputSchema,
+  parseActivityContent,
+  type CreateActivityInput,
+} from '@/activities/validation';
+import {
+  getTemplateRemixPlan,
+  type TemplateRemixPlan,
+} from '@/activities/template-remix';
 
 type ActivityEditorSource = {
   content: ActivityContent;
@@ -49,4 +57,21 @@ export function activityContentToEditorInput(
     visibility: source.visibility,
     vocabularyText: source.content.vocabulary.join(', '),
   };
+}
+
+export function buildActivityEditorTemplateReadiness(
+  input: unknown
+): TemplateRemixPlan | null {
+  const parsed = createActivityInputSchema.safeParse(input);
+  if (!parsed.success) return null;
+
+  try {
+    const content = parseActivityContent(parsed.data);
+    return getTemplateRemixPlan({
+      content,
+      currentTemplateType: parsed.data.templateType,
+    });
+  } catch {
+    return null;
+  }
 }

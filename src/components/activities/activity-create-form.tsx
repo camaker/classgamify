@@ -1,10 +1,10 @@
 import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
+import { buildActivityEditorTemplateReadiness } from '@/activities/editor';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import {
   formatTemplateRequirement,
-  getTemplateRemixPlan,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
 import {
@@ -12,7 +12,6 @@ import {
   activityTemplateTypeSchema,
   activityVisibilitySchema,
   createActivityInputSchema,
-  parseActivityContent,
   type CreateActivityInput,
 } from '@/activities/validation';
 import { authClient } from '@/auth/client';
@@ -117,20 +116,10 @@ export function ActivityCreateForm({
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
   const template = getTemplateByType(selectedTemplate);
-  const templateReadiness = useMemo(() => {
-    const parsed = createActivityInputSchema.safeParse(watchedValues);
-    if (!parsed.success) return null;
-
-    try {
-      const content = parseActivityContent(parsed.data);
-      return getTemplateRemixPlan({
-        content,
-        currentTemplateType: parsed.data.templateType,
-      });
-    } catch {
-      return null;
-    }
-  }, [watchedValues]);
+  const templateReadiness = useMemo(
+    () => buildActivityEditorTemplateReadiness(watchedValues),
+    [watchedValues]
+  );
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
