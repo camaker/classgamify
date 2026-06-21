@@ -10,6 +10,7 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListFilterSummary,
   buildAssignmentListSummaryMetrics,
   type AssignmentListSummaryMetric,
   type AssignmentListSummaryMetricId,
@@ -455,13 +456,14 @@ function AssignmentListFilters({
   status: AssignmentStatusFilter;
   total: number;
 }) {
-  const hasFilters =
-    Boolean(normalizeAssignmentListSearch(search)) || status !== 'all';
-  const summary = isLoading
-    ? 'Loading assignments...'
-    : hasFilters
-      ? `${total} ${total === 1 ? 'match' : 'matches'}`
-      : `${total} total ${total === 1 ? 'assignment' : 'assignments'}`;
+  const normalizedSearch = normalizeAssignmentListSearch(search);
+  const filterSummary = buildAssignmentListFilterSummary({
+    isLoading,
+    search: normalizedSearch,
+    status,
+    total,
+  });
+  const hasFilters = filterSummary.hasFilters;
 
   return (
     <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
@@ -512,7 +514,7 @@ function AssignmentListFilters({
         </NativeSelect>
       </div>
       <div className="flex flex-col gap-2 lg:items-end">
-        <p className="text-sm text-muted-foreground">{summary}</p>
+        <p className="text-sm text-muted-foreground">{filterSummary.text}</p>
         {hasFilters ? (
           <Button
             type="button"

@@ -100,7 +100,10 @@ import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
-import { buildAssignmentListSummaryMetrics } from '@/assignments/list-summary';
+import {
+  buildAssignmentListFilterSummary,
+  buildAssignmentListSummaryMetrics,
+} from '@/assignments/list-summary';
 import {
   orderAssignmentRuntimeItems,
   stableShuffle,
@@ -936,6 +939,33 @@ assert.deepEqual(
 );
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
+assert.deepEqual(
+  buildAssignmentListFilterSummary({
+    isLoading: true,
+    search: undefined,
+    status: 'all',
+    total: 0,
+  }),
+  { hasFilters: false, text: 'Loading assignments...' }
+);
+assert.deepEqual(
+  buildAssignmentListFilterSummary({
+    isLoading: false,
+    search: undefined,
+    status: 'all',
+    total: 1,
+  }),
+  { hasFilters: false, text: '1 total assignment' }
+);
+assert.deepEqual(
+  buildAssignmentListFilterSummary({
+    isLoading: false,
+    search: 'week',
+    status: 'published',
+    total: 2,
+  }),
+  { hasFilters: true, text: '2 matches' }
+);
 assert.deepEqual(
   buildAssignmentListSummaryMetrics({
     hasFilters: false,
