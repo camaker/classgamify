@@ -100,7 +100,7 @@ export function formatAssignmentItemCount(itemCount: number) {
   return `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
 }
 
-export function formatAssignmentAttempts(maxAttempts?: number | null) {
+function formatAssignmentAttempts(maxAttempts?: number | null) {
   return maxAttempts ? `${maxAttempts} max` : 'Open';
 }
 
@@ -116,20 +116,20 @@ export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
   }).format(date);
 }
 
-export function formatAssignmentTimeLimit(seconds?: number | null) {
+function formatAssignmentTimeLimit(seconds?: number | null) {
   if (!seconds) return 'No timer';
   const minutes = Math.round(seconds / 60);
   return `${minutes} min`;
 }
 
-export function formatStudentIdentity(collectStudentName: boolean) {
+function formatStudentIdentity(collectStudentName: boolean) {
   return collectStudentName ? 'Names' : 'Anonymous';
 }
 
-export function formatAnswerReveal(showCorrectAnswers: boolean) {
+function formatAnswerReveal(showCorrectAnswers: boolean) {
   return showCorrectAnswers ? 'After submit' : 'Hidden';
 }
 
-export function formatShuffleItems(shuffleItems: boolean) {
+function formatShuffleItems(shuffleItems: boolean) {
   return shuffleItems ? 'Shuffled' : 'Fixed order';
 }
