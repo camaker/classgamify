@@ -60,6 +60,54 @@ export type AssignmentPublishPreview = {
   settings: AssignmentSettings;
 };
 
+type AssignmentPublishToggleKey =
+  | 'collectStudentName'
+  | 'showCorrectAnswers'
+  | 'shuffleItems';
+
+type AssignmentPublishToggleOption = {
+  description: string;
+  key: AssignmentPublishToggleKey;
+  label: string;
+};
+
+export const assignmentPublishDialogCopy = {
+  cancelLabel: 'Cancel',
+  closeAfterHelp:
+    'Optional. Leave blank to keep the link open until it is closed manually.',
+  closeAfterLabel: 'Close after',
+  description:
+    'Freeze this activity into a student share link with classroom delivery settings.',
+  instructionsLabel: 'Instructions',
+  instructionsPlaceholder: 'Optional student instructions',
+  maxAttemptsLabel: 'Max attempts',
+  publishLabel: 'Publish',
+  timeLimitHelp:
+    'Optional classroom timer in minutes. Leave blank for no time limit.',
+  timeLimitLabel: 'Time limit',
+  title: 'Publish assignment',
+  titleLabel: 'Assignment title',
+  previewLabel: 'Delivery preview',
+} as const;
+
+export const assignmentPublishToggleOptions = [
+  {
+    description: 'Ask learners to type their name before submitting.',
+    key: 'collectStudentName',
+    label: 'Collect student name',
+  },
+  {
+    description: 'Reveal correct answers after an attempt is submitted.',
+    key: 'showCorrectAnswers',
+    label: 'Show correct answers',
+  },
+  {
+    description: 'Prepare this assignment for randomized item order.',
+    key: 'shuffleItems',
+    label: 'Shuffle items',
+  },
+] satisfies Array<AssignmentPublishToggleOption>;
+
 export function buildAssignmentPublishDraftDefaults({
   activityId,
   title,

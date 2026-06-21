@@ -211,6 +211,8 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  assignmentPublishDialogCopy,
+  assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishPreviewFromDraft,
@@ -852,6 +854,20 @@ assert.deepEqual(
     title: 'Food groups',
   }
 );
+assert.deepEqual(
+  assignmentPublishToggleOptions.map((option) => option.key),
+  ['collectStudentName', 'showCorrectAnswers', 'shuffleItems']
+);
+assert.deepEqual(
+  assignmentPublishToggleOptions.map((option) => option.label),
+  ['Collect student name', 'Show correct answers', 'Shuffle items']
+);
+assert.equal(assignmentPublishDialogCopy.title, 'Publish assignment');
+assert.equal(
+  assignmentPublishDialogCopy.description,
+  'Freeze this activity into a student share link with classroom delivery settings.'
+);
+assert.equal(assignmentPublishDialogCopy.previewLabel, 'Delivery preview');
 assert.deepEqual(
   buildAssignmentPublishDraft({
     defaults: buildAssignmentPublishDraftDefaults({

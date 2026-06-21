@@ -32,6 +32,8 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import {
+  assignmentPublishDialogCopy,
+  assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishPreviewFromDraft,
@@ -541,6 +543,20 @@ function ActivityCard({
   const [expiresAtLocal, setExpiresAtLocal] = useState(
     publishDraftDefaults.expiresAtLocal
   );
+  const publishToggleState = {
+    collectStudentName: {
+      checked: collectStudentName,
+      setChecked: setCollectStudentName,
+    },
+    showCorrectAnswers: {
+      checked: showCorrectAnswers,
+      setChecked: setShowCorrectAnswers,
+    },
+    shuffleItems: {
+      checked: shuffleItems,
+      setChecked: setShuffleItems,
+    },
+  };
   const publishDraft = buildAssignmentPublishDraft({
     defaults: publishDraftDefaults,
     values: {
@@ -842,16 +858,15 @@ function ActivityCard({
       <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Publish assignment</DialogTitle>
+            <DialogTitle>{assignmentPublishDialogCopy.title}</DialogTitle>
             <DialogDescription>
-              Freeze this activity into a student share link with classroom
-              delivery settings.
+              {assignmentPublishDialogCopy.description}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <label htmlFor={`assignment-title-${activity.id}`}>
-                Assignment title
+                {assignmentPublishDialogCopy.titleLabel}
               </label>
               <Input
                 id={`assignment-title-${activity.id}`}
@@ -863,45 +878,36 @@ function ActivityCard({
             </div>
             <div className="grid gap-2">
               <label htmlFor={`assignment-instructions-${activity.id}`}>
-                Instructions
+                {assignmentPublishDialogCopy.instructionsLabel}
               </label>
               <Textarea
                 id={`assignment-instructions-${activity.id}`}
                 rows={3}
                 maxLength={500}
                 value={assignmentInstructions}
-                placeholder="Optional student instructions"
+                placeholder={
+                  assignmentPublishDialogCopy.instructionsPlaceholder
+                }
                 onChange={(event) =>
                   setAssignmentInstructions(event.currentTarget.value)
                 }
               />
             </div>
             <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
-              <PublishSetting
-                checked={collectStudentName}
-                description="Ask learners to type their name before submitting."
-                id={`collect-name-${activity.id}`}
-                label="Collect student name"
-                onCheckedChange={setCollectStudentName}
-              />
-              <PublishSetting
-                checked={showCorrectAnswers}
-                description="Reveal correct answers after an attempt is submitted."
-                id={`show-answers-${activity.id}`}
-                label="Show correct answers"
-                onCheckedChange={setShowCorrectAnswers}
-              />
-              <PublishSetting
-                checked={shuffleItems}
-                description="Prepare this assignment for randomized item order."
-                id={`shuffle-items-${activity.id}`}
-                label="Shuffle items"
-                onCheckedChange={setShuffleItems}
-              />
+              {assignmentPublishToggleOptions.map((option) => (
+                <PublishSetting
+                  key={option.key}
+                  checked={publishToggleState[option.key].checked}
+                  description={option.description}
+                  id={`${option.key}-${activity.id}`}
+                  label={option.label}
+                  onCheckedChange={publishToggleState[option.key].setChecked}
+                />
+              ))}
             </div>
             <div className="grid gap-2">
               <label htmlFor={`max-attempts-${activity.id}`}>
-                Max attempts
+                {assignmentPublishDialogCopy.maxAttemptsLabel}
               </label>
               <Input
                 id={`max-attempts-${activity.id}`}
@@ -913,7 +919,9 @@ function ActivityCard({
               />
             </div>
             <div className="grid gap-2">
-              <label htmlFor={`time-limit-${activity.id}`}>Time limit</label>
+              <label htmlFor={`time-limit-${activity.id}`}>
+                {assignmentPublishDialogCopy.timeLimitLabel}
+              </label>
               <Input
                 id={`time-limit-${activity.id}`}
                 type="number"
@@ -926,12 +934,13 @@ function ActivityCard({
                 }
               />
               <p className="text-xs leading-5 text-muted-foreground">
-                Optional classroom timer in minutes. Leave blank for no time
-                limit.
+                {assignmentPublishDialogCopy.timeLimitHelp}
               </p>
             </div>
             <div className="grid gap-2">
-              <label htmlFor={`expires-at-${activity.id}`}>Close after</label>
+              <label htmlFor={`expires-at-${activity.id}`}>
+                {assignmentPublishDialogCopy.closeAfterLabel}
+              </label>
               <Input
                 id={`expires-at-${activity.id}`}
                 type="datetime-local"
@@ -944,12 +953,13 @@ function ActivityCard({
                 }
               />
               <p className="text-xs leading-5 text-muted-foreground">
-                Optional. Leave blank to keep the link open until it is closed
-                manually.
+                {assignmentPublishDialogCopy.closeAfterHelp}
               </p>
             </div>
             <div className="grid gap-2">
-              <p className="font-medium text-sm">Delivery preview</p>
+              <p className="font-medium text-sm">
+                {assignmentPublishDialogCopy.previewLabel}
+              </p>
               <AssignmentSettingsSummary
                 collectStudentName={publishPreview.settings.collectStudentName}
                 expiresAt={publishPreview.expiresAt}
@@ -967,7 +977,7 @@ function ActivityCard({
               variant="outline"
               onClick={() => setPublishDialogOpen(false)}
             >
-              Cancel
+              {assignmentPublishDialogCopy.cancelLabel}
             </Button>
             <Button
               type="button"
@@ -975,7 +985,7 @@ function ActivityCard({
               onClick={publishActivity}
             >
               <IconPlus className="size-4" />
-              Publish
+              {assignmentPublishDialogCopy.publishLabel}
             </Button>
           </DialogFooter>
         </DialogContent>
