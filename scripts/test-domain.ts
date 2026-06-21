@@ -62,6 +62,7 @@ import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import {
+  buildAttemptTimerState,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
@@ -1660,6 +1661,44 @@ assert.equal(
     timeLimitSeconds: 60,
   }),
   60
+);
+assert.deepEqual(
+  buildAttemptTimerState({
+    now: 1_000,
+    startedAt: 2_000,
+  }),
+  {
+    durationSeconds: 0,
+    elapsedSeconds: 0,
+    remainingSeconds: undefined,
+    timeExpired: false,
+  }
+);
+assert.deepEqual(
+  buildAttemptTimerState({
+    now: 6_500,
+    startedAt: 1_000,
+    timeLimitSeconds: 10,
+  }),
+  {
+    durationSeconds: 6,
+    elapsedSeconds: 6,
+    remainingSeconds: 4,
+    timeExpired: false,
+  }
+);
+assert.deepEqual(
+  buildAttemptTimerState({
+    now: 12_000,
+    startedAt: 1_000,
+    timeLimitSeconds: 10,
+  }),
+  {
+    durationSeconds: 11,
+    elapsedSeconds: 11,
+    remainingSeconds: 0,
+    timeExpired: true,
+  }
 );
 assert.equal(formatAttemptDuration(undefined), '-');
 assert.equal(formatAttemptDuration(undefined, { emptyValue: '' }), '');

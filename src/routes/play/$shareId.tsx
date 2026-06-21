@@ -11,7 +11,10 @@ import {
   type PublicAssignmentRuleSummaryId,
   buildPublicAssignmentRuleSummary,
 } from '@/assignments/delivery-summary';
-import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import {
+  buildAttemptTimerState,
+  formatAttemptDuration,
+} from '@/assignments/attempt-duration';
 import {
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
@@ -126,12 +129,12 @@ function PlayPage() {
   const activeShareId = assignment?.shareId ?? shareId;
   const startedAt =
     attemptClock?.shareId === activeShareId ? attemptClock.startedAt : now;
-  const elapsedSeconds = Math.max(0, Math.round((now - startedAt) / 1000));
   const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
-  const remainingSeconds = timeLimitSeconds
-    ? Math.max(0, timeLimitSeconds - elapsedSeconds)
-    : undefined;
-  const timeExpired = Boolean(timeLimitSeconds && remainingSeconds === 0);
+  const attemptTimer = buildAttemptTimerState({
+    now,
+    startedAt,
+    timeLimitSeconds,
+  });
   const anonymousBrowserLabel = assignment?.settings.collectStudentName
     ? undefined
     : getAnonymousBrowserLabel(anonymousToken);
@@ -197,7 +200,11 @@ function PlayPage() {
           answers,
           runtimeItems,
         }),
-        durationSeconds: Math.round((Date.now() - startedAt) / 1000),
+        durationSeconds: buildAttemptTimerState({
+          now: Date.now(),
+          startedAt,
+          timeLimitSeconds,
+        }).durationSeconds,
         shareSlug: assignment?.shareId ?? shareId,
         anonymousToken: assignment?.settings.collectStudentName
           ? undefined
@@ -309,9 +316,9 @@ function PlayPage() {
             </Badge>
             {timeLimitSeconds ? (
               <Badge variant="outline" className="rounded-md">
-                {timeExpired
+                {attemptTimer.timeExpired
                   ? 'Time ended'
-                  : formatAttemptDuration(remainingSeconds, {
+                  : formatAttemptDuration(attemptTimer.remainingSeconds, {
                       emptyValue: '',
                       style: 'timer',
                     })}
@@ -360,7 +367,7 @@ function PlayPage() {
                 <p className="text-xs text-muted-foreground">
                   Time:{' '}
                   {formatAttemptDuration(
-                    result.durationSeconds ?? elapsedSeconds,
+                    result.durationSeconds ?? attemptTimer.elapsedSeconds,
                     {
                       emptyValue: '',
                       style: 'timer',
@@ -371,7 +378,7 @@ function PlayPage() {
             ) : null}
           </div>
 
-          {timeExpired && !result ? (
+          {attemptTimer.timeExpired && !result ? (
             <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
               Time is up. Review your saved answers, then submit.
             </div>
@@ -379,7 +386,7 @@ function PlayPage() {
 
           <RuntimeItemList
             answers={answers}
-            disabled={Boolean(result) || timeExpired}
+            disabled={Boolean(result) || attemptTimer.timeExpired}
             items={runtimeItems}
             revealAnswer={Boolean(
               result && assignment.settings.showCorrectAnswers

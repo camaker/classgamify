@@ -13,6 +13,28 @@ export function normalizeAttemptDurationSeconds({
   return Math.min(normalizedDuration, timeLimitSeconds);
 }
 
+export function buildAttemptTimerState({
+  now,
+  startedAt,
+  timeLimitSeconds,
+}: {
+  now: number;
+  startedAt: number;
+  timeLimitSeconds?: number;
+}) {
+  const durationSeconds = Math.max(0, Math.round((now - startedAt) / 1000));
+  const remainingSeconds = timeLimitSeconds
+    ? Math.max(0, timeLimitSeconds - durationSeconds)
+    : undefined;
+
+  return {
+    durationSeconds,
+    elapsedSeconds: durationSeconds,
+    remainingSeconds,
+    timeExpired: Boolean(timeLimitSeconds && remainingSeconds === 0),
+  };
+}
+
 export function formatAttemptDuration(
   seconds?: number | null,
   options?: {
