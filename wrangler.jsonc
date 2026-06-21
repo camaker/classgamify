@@ -35,7 +35,8 @@
     "VITE_CREEM_PRODUCT_PRO_MONTHLY": "prod_4UAixAoqrbOrK5p7G6giUQ",
     "VITE_CREEM_PRODUCT_PRO_YEARLY": "prod_462uI05mvUFSP00oOs2ad9",
     "VITE_CREEM_PRODUCT_LIFETIME": "prod_36Ljh9TXt43qnQBkSHYZk1",
-    "VITE_GOOGLE_ANALYTICS_ID": "G-VBFVVN386M"
+    "VITE_GOOGLE_ANALYTICS_ID": "G-QH46LZCPE3",
+    "VITE_CLARITY_PROJECT_ID": "xa8pgti8e4"
   },
 
   // Enables automatically ingest, store, filter, and analyze logging data emitted from Cloudflare Workers
