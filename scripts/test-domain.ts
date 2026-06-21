@@ -258,6 +258,7 @@ import {
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
+  buildAssignmentPublishDialogState,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
@@ -1282,6 +1283,25 @@ assert.deepEqual(
   { ok: true }
 );
 assert.deepEqual(
+  buildAssignmentPublishDialogState({
+    validation: { ok: true },
+  }),
+  {
+    errorMessage: undefined,
+    publishDisabled: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishDialogState({
+    isPublishing: true,
+    validation: { ok: true },
+  }),
+  {
+    errorMessage: undefined,
+    publishDisabled: true,
+  }
+);
+assert.deepEqual(
   validateAssignmentPublishDraft({
     activityId: 'activity-1',
     collectStudentName: true,
@@ -1296,6 +1316,18 @@ assert.deepEqual(
   {
     message: 'Max attempts must be a whole number from 1 to 10.',
     ok: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishDialogState({
+    validation: {
+      message: 'Max attempts must be a whole number from 1 to 10.',
+      ok: false,
+    },
+  }),
+  {
+    errorMessage: 'Max attempts must be a whole number from 1 to 10.',
+    publishDisabled: true,
   }
 );
 assert.deepEqual(

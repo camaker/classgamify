@@ -69,6 +69,11 @@ export type AssignmentPublishPreview = {
   settings: AssignmentSettings;
 };
 
+type AssignmentPublishDialogState = {
+  errorMessage?: string;
+  publishDisabled: boolean;
+};
+
 type AssignmentPublishToggleKey =
   | 'collectStudentName'
   | 'showCorrectAnswers'
@@ -228,6 +233,19 @@ export function validateAssignmentPublishDraft({
   }
 
   return { ok: true };
+}
+
+export function buildAssignmentPublishDialogState({
+  isPublishing = false,
+  validation,
+}: {
+  isPublishing?: boolean;
+  validation: AssignmentPublishDraftValidation;
+}): AssignmentPublishDialogState {
+  return {
+    errorMessage: validation.ok ? undefined : validation.message,
+    publishDisabled: isPublishing || !validation.ok,
+  };
 }
 
 export function buildAssignmentPublishInputFromDraft({

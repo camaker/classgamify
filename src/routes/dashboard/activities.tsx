@@ -41,6 +41,7 @@ import {
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
+  buildAssignmentPublishDialogState,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
@@ -554,6 +555,10 @@ function ActivityCard({
   });
   const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
   const publishValidation = validateAssignmentPublishDraft(publishDraft);
+  const publishDialogState = buildAssignmentPublishDialogState({
+    isPublishing: publishMutation.isPending,
+    validation: publishValidation,
+  });
   const template = getTemplateByType(activity.templateType);
   const cardSummary = buildActivityLibraryCardSummary({
     content: activity.content,
@@ -950,9 +955,9 @@ function ActivityCard({
                 expiresAt={publishPreview.expiresAt}
                 settings={publishPreview.settings}
               />
-              {!publishValidation.ok ? (
+              {publishDialogState.errorMessage ? (
                 <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
-                  {publishValidation.message}
+                  {publishDialogState.errorMessage}
                 </p>
               ) : null}
             </div>
@@ -967,7 +972,7 @@ function ActivityCard({
             </Button>
             <Button
               type="button"
-              disabled={publishMutation.isPending || !publishValidation.ok}
+              disabled={publishDialogState.publishDisabled}
               onClick={publishActivity}
             >
               <IconPlus className="size-4" />
