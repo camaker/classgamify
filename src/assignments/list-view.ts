@@ -1,4 +1,6 @@
+import type { AssignmentStatus } from '@/activities/types';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
+import { buildAssignmentStatusAction } from '@/assignments/lifecycle';
 
 type AssignmentListControlOption = {
   label: string;
@@ -11,6 +13,12 @@ type AssignmentListCardStat = {
   key: AssignmentListCardStatKey;
   label: string;
   value: string;
+};
+
+type AssignmentListEmptyStateView = {
+  description: string;
+  showStarterAssignments: boolean;
+  title: string;
 };
 
 export const assignmentListPageCopy = {
@@ -75,6 +83,17 @@ export function getAssignmentListEmptyState({
     : assignmentListEmptyStateCopy.emptyLibrary;
 }
 
+export function buildAssignmentListEmptyStateView({
+  hasFilters,
+}: {
+  hasFilters: boolean;
+}): AssignmentListEmptyStateView {
+  return {
+    ...getAssignmentListEmptyState({ hasFilters }),
+    showStarterAssignments: !hasFilters,
+  };
+}
+
 export function buildAssignmentListCardStats({
   averageScore,
   completions,
@@ -94,4 +113,25 @@ export function buildAssignmentListCardStats({
       value: `${averageScore}%`,
     },
   ];
+}
+
+export function getAssignmentListCardActionState({
+  expiresAt,
+  id,
+  status,
+}: {
+  expiresAt: Date | null;
+  id: string;
+  status: AssignmentStatus;
+}) {
+  const isPersisted = !id.startsWith('assignment-');
+
+  return {
+    isPersisted,
+    statusAction: buildAssignmentStatusAction({
+      currentStatus: status,
+      expiresAt,
+      isPersisted,
+    }),
+  };
 }

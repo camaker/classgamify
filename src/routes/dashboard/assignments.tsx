@@ -22,12 +22,10 @@ import {
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
   buildAssignmentListCardStats,
-  getAssignmentListEmptyState,
+  buildAssignmentListEmptyStateView,
+  getAssignmentListCardActionState,
 } from '@/assignments/list-view';
-import {
-  buildAssignmentStatusAction,
-  getAssignmentStatusLabel,
-} from '@/assignments/lifecycle';
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -126,6 +124,7 @@ function DashboardAssignmentsPage() {
   );
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
+  const emptyState = buildAssignmentListEmptyStateView({ hasFilters });
   const publishedPanelContext = published
     ? buildPublishedAssignmentPanelContext({
         isLoading,
@@ -293,11 +292,9 @@ function DashboardAssignmentsPage() {
 
         {!isLoading && !hasAssignments && hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">
-              {getAssignmentListEmptyState({ hasFilters }).title}
-            </h2>
+            <h2 className="text-lg font-semibold">{emptyState.title}</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {getAssignmentListEmptyState({ hasFilters }).description}
+              {emptyState.description}
             </p>
             <Button
               type="button"
@@ -314,11 +311,9 @@ function DashboardAssignmentsPage() {
         {!isLoading && !hasAssignments && !hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-              <h2 className="text-lg font-semibold">
-                {getAssignmentListEmptyState({ hasFilters }).title}
-              </h2>
+              <h2 className="text-lg font-semibold">{emptyState.title}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {getAssignmentListEmptyState({ hasFilters }).description}
+                {emptyState.description}
               </p>
               <Link
                 to={Routes.DashboardActivities}
@@ -328,37 +323,39 @@ function DashboardAssignmentsPage() {
                 {assignmentListActionCopy.openActivityLibrary}
               </Link>
             </div>
-            <section className="grid gap-4">
-              {starterAssignments.map((assignment) => {
-                const activity = getStarterActivity(assignment.activityId);
-                return (
-                  <AssignmentCard
-                    key={assignment.id}
-                    assignment={{
-                      activityDescription: activity.description,
-                      collectStudentName:
-                        assignment.settings.collectStudentName,
-                      expiresAt: null,
-                      id: assignment.id,
-                      instructions: assignment.settings.instructions,
-                      maxAttempts: assignment.settings.maxAttempts,
-                      shareSlug: assignment.shareId,
-                      showCorrectAnswers:
-                        assignment.settings.showCorrectAnswers,
-                      shuffleItems: assignment.settings.shuffleItems,
-                      stats: {
-                        averageScore: assignment.averageScore,
-                        completions: assignment.completions,
-                      },
-                      status: assignment.status,
-                      templateType: activity.templateType,
-                      timeLimitSeconds: assignment.settings.timeLimitSeconds,
-                      title: assignment.title,
-                    }}
-                  />
-                );
-              })}
-            </section>
+            {emptyState.showStarterAssignments ? (
+              <section className="grid gap-4">
+                {starterAssignments.map((assignment) => {
+                  const activity = getStarterActivity(assignment.activityId);
+                  return (
+                    <AssignmentCard
+                      key={assignment.id}
+                      assignment={{
+                        activityDescription: activity.description,
+                        collectStudentName:
+                          assignment.settings.collectStudentName,
+                        expiresAt: null,
+                        id: assignment.id,
+                        instructions: assignment.settings.instructions,
+                        maxAttempts: assignment.settings.maxAttempts,
+                        shareSlug: assignment.shareId,
+                        showCorrectAnswers:
+                          assignment.settings.showCorrectAnswers,
+                        shuffleItems: assignment.settings.shuffleItems,
+                        stats: {
+                          averageScore: assignment.averageScore,
+                          completions: assignment.completions,
+                        },
+                        status: assignment.status,
+                        templateType: activity.templateType,
+                        timeLimitSeconds: assignment.settings.timeLimitSeconds,
+                        title: assignment.title,
+                      }}
+                    />
+                  );
+                })}
+              </section>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -538,12 +535,11 @@ function AssignmentListFilters({
 
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
-  const persisted = !assignment.id.startsWith('assignment-');
   const stats = buildAssignmentListCardStats(assignment.stats);
-  const statusAction = buildAssignmentStatusAction({
-    currentStatus: assignment.status,
+  const { isPersisted, statusAction } = getAssignmentListCardActionState({
     expiresAt: assignment.expiresAt,
-    isPersisted: persisted,
+    id: assignment.id,
+    status: assignment.status,
   });
 
   async function updateStatus() {
@@ -604,7 +600,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          {persisted ? (
+          {isPersisted ? (
             <Link
               to="/dashboard/assignments/$assignmentId"
               params={{ assignmentId: assignment.id }}

@@ -125,6 +125,8 @@ import {
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
   buildAssignmentListCardStats,
+  buildAssignmentListEmptyStateView,
+  getAssignmentListCardActionState,
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
@@ -1768,6 +1770,18 @@ assert.deepEqual(getAssignmentListEmptyState({ hasFilters: false }), {
     'Open the activity library and publish a saved activity to create a student share link.',
   title: 'No published assignments yet.',
 });
+assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: true }), {
+  description:
+    'Try another assignment title, share id, activity name, or status.',
+  showStarterAssignments: false,
+  title: 'No matching assignments.',
+});
+assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: false }), {
+  description:
+    'Open the activity library and publish a saved activity to create a student share link.',
+  showStarterAssignments: true,
+  title: 'No published assignments yet.',
+});
 assert.deepEqual(
   buildAssignmentListCardStats({
     averageScore: 83,
@@ -1777,6 +1791,45 @@ assert.deepEqual(
     { key: 'completions', label: 'Completions', value: '12' },
     { key: 'average', label: 'Average', value: '83%' },
   ]
+);
+assert.deepEqual(
+  getAssignmentListCardActionState({
+    expiresAt: null,
+    id: 'assignment-preview-1',
+    status: 'published',
+  }),
+  {
+    isPersisted: false,
+    statusAction: undefined,
+  }
+);
+assert.deepEqual(
+  getAssignmentListCardActionState({
+    expiresAt: null,
+    id: 'persisted-assignment-1',
+    status: 'published',
+  }),
+  {
+    isPersisted: true,
+    statusAction: {
+      failureMessage: 'Assignment status could not be updated.',
+      kind: 'close-link',
+      label: 'Close link',
+      nextStatus: 'closed',
+      successMessage: 'Assignment link closed.',
+    },
+  }
+);
+assert.deepEqual(
+  getAssignmentListCardActionState({
+    expiresAt: null,
+    id: 'persisted-assignment-2',
+    status: 'draft',
+  }),
+  {
+    isPersisted: true,
+    statusAction: undefined,
+  }
 );
 const questionOnlyContent = buildActivityContent({
   description: 'Question only activity',
