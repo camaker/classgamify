@@ -1,11 +1,13 @@
 import type {
   ActivityContent,
+  ActivitySeed,
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
+  buildActivityContent,
   createActivityInputSchema,
   parseActivityContent,
   type CreateActivityInput,
@@ -55,6 +57,22 @@ export function buildActivityEditorInitialValues(
     ...getActivityTemplateScaffold(templateType),
     templateType,
     visibility: activityEditorDefaultInput.visibility,
+  };
+}
+
+export function buildActivityEditorPreviewSeed(
+  input: CreateActivityInput = activityEditorDefaultInput
+): ActivitySeed {
+  const content = buildActivityContent(input);
+
+  return {
+    content,
+    description: input.description,
+    estimatedMinutes: 6,
+    id: 'activity-editor-preview',
+    status: input.visibility,
+    templateType: input.templateType,
+    title: input.title,
   };
 }
 

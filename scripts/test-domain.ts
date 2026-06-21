@@ -92,6 +92,7 @@ import {
   activityContentToEditorInput,
   activityEditorDefaultInput,
   buildActivityEditorInitialValues,
+  buildActivityEditorPreviewSeed,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
@@ -2681,6 +2682,27 @@ assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
   templateType: 'group-sort',
   visibility: 'draft',
 });
+const defaultEditorPreviewSeed = buildActivityEditorPreviewSeed();
+assert.deepEqual(
+  {
+    description: defaultEditorPreviewSeed.description,
+    templateType: defaultEditorPreviewSeed.templateType,
+    title: defaultEditorPreviewSeed.title,
+  },
+  {
+    description: activityEditorDefaultInput.description,
+    templateType: 'quiz',
+    title: activityEditorDefaultInput.title,
+  }
+);
+const lineMatchPreviewSeed = buildActivityEditorPreviewSeed(
+  buildActivityEditorInitialValues('line-match')
+);
+assert.equal(lineMatchPreviewSeed.id, 'activity-editor-preview');
+assert.equal(lineMatchPreviewSeed.status, 'draft');
+assert.equal(lineMatchPreviewSeed.templateType, 'line-match');
+assert.equal(lineMatchPreviewSeed.title, 'Draw lines for food words');
+assert.equal(lineMatchPreviewSeed.content.pairs.length, 8);
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   description: 'Editor readiness helper',
   difficulty: 'starter',

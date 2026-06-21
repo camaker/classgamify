@@ -2,8 +2,10 @@ import { ActivityPreview } from '@/components/activities/activity-preview';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
-import { starterActivities } from '@/activities/catalog';
-import { buildActivityEditorInitialValues } from '@/activities/editor';
+import {
+  buildActivityEditorInitialValues,
+  buildActivityEditorPreviewSeed,
+} from '@/activities/editor';
 import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
@@ -26,10 +28,13 @@ export const Route = createFileRoute('/create')({
 
 function CreatePage() {
   const { template } = Route.useSearch();
-  const activity = starterActivities[0];
   const initialValues = useMemo(
     () => buildActivityEditorInitialValues(template),
     [template]
+  );
+  const previewActivity = useMemo(
+    () => buildActivityEditorPreviewSeed(initialValues),
+    [initialValues]
   );
 
   return (
@@ -69,7 +74,7 @@ function CreatePage() {
             <p className="text-sm font-medium text-muted-foreground">
               Example rendering
             </p>
-            <ActivityPreview activity={activity} />
+            <ActivityPreview activity={previewActivity} />
           </div>
         </div>
       </div>
