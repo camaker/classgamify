@@ -1,7 +1,6 @@
 import { activityTemplates, starterActivities } from '@/activities/catalog';
 import {
-  type ActivityDerivativeAction,
-  buildActivityDerivativeActionGate,
+  buildActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
 } from '@/activities/lifecycle';
 import {
@@ -553,18 +552,13 @@ function ActivityCard({
     libraryStatus,
   });
 
-  function getDerivativeActionGate(action: ActivityDerivativeAction) {
-    return buildActivityDerivativeActionGate({
-      action,
+  async function publishActivity() {
+    const actionView = buildActivityLifecycleActionView({
+      action: 'publish',
       visibility: activity.status,
     });
-  }
-
-  async function publishActivity() {
-    const actionGate = getDerivativeActionGate('publish');
-    const actionCopy = getActivityLifecycleActionCopy('publish');
-    if (actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
+    if (actionView.gate.type === 'blocked') {
+      toast.error(actionView.gate.message);
       return;
     }
     const draftResult = buildAssignmentPublishInputFromDraft(publishDraft);
@@ -575,7 +569,7 @@ function ActivityCard({
 
     try {
       const result = await publishMutation.mutateAsync(draftResult.input);
-      toast.success(actionCopy.successMessage);
+      toast.success(actionView.successMessage);
       setPublishDialogOpen(false);
       navigate({
         to: Routes.DashboardAssignments,
@@ -583,7 +577,7 @@ function ActivityCard({
       });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
+        error instanceof Error ? error.message : actionView.failureMessage
       );
     }
   }
@@ -591,10 +585,12 @@ function ActivityCard({
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
   ) {
-    const actionGate = getDerivativeActionGate('remix');
-    const actionCopy = getActivityLifecycleActionCopy('remix');
-    if (actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
+    const actionView = buildActivityLifecycleActionView({
+      action: 'remix',
+      visibility: activity.status,
+    });
+    if (actionView.gate.type === 'blocked') {
+      toast.error(actionView.gate.message);
       return;
     }
     try {
@@ -602,37 +598,39 @@ function ActivityCard({
         activityId: activity.id,
         targetTemplateType,
       });
-      toast.success(actionCopy.successMessage);
+      toast.success(actionView.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
+        error instanceof Error ? error.message : actionView.failureMessage
       );
     }
   }
 
   async function duplicateActivity() {
-    const actionGate = getDerivativeActionGate('duplicate');
-    const actionCopy = getActivityLifecycleActionCopy('duplicate');
-    if (actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
+    const actionView = buildActivityLifecycleActionView({
+      action: 'duplicate',
+      visibility: activity.status,
+    });
+    if (actionView.gate.type === 'blocked') {
+      toast.error(actionView.gate.message);
       return;
     }
     try {
       const result = await duplicateMutation.mutateAsync({
         activityId: activity.id,
       });
-      toast.success(actionCopy.successMessage);
+      toast.success(actionView.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
+        error instanceof Error ? error.message : actionView.failureMessage
       );
     }
   }

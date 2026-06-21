@@ -60,6 +60,7 @@ import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
   buildActivityDerivativeActionGate,
+  buildActivityLifecycleActionView,
   canDeriveActivityWork,
   getActivityLifecycleActionCopy,
   isActivityArchived,
@@ -2564,6 +2565,32 @@ assert.deepEqual(getActivityLifecycleActionCopy('restore'), {
   failureMessage: 'Activity could not be restored.',
   successMessage: 'Activity restored to drafts.',
 });
+assert.deepEqual(
+  buildActivityLifecycleActionView({
+    action: 'remix',
+    visibility: 'published',
+  }),
+  {
+    failureMessage: 'Activity could not be remixed.',
+    gate: { type: 'ready' },
+    successMessage: 'Template remix created.',
+  }
+);
+assert.deepEqual(
+  buildActivityLifecycleActionView({
+    action: 'publish',
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Assignment could not be published.',
+    gate: {
+      action: 'publish',
+      message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+      type: 'blocked',
+    },
+    successMessage: 'Assignment link published.',
+  }
+);
 assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),

@@ -3,7 +3,7 @@ import type { ActivityVisibility } from '@/activities/types';
 export const ARCHIVED_ACTIVITY_DERIVATION_ERROR =
   'Restore this activity before publishing, duplicating, or remixing it.';
 
-export type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
+type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
 export type ActivityLifecycleAction =
   | ActivityDerivativeAction
   | 'archive'
@@ -23,6 +23,10 @@ export type ActivityDerivativeActionGate =
       message: string;
       type: 'blocked';
     };
+
+type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
+  gate: ActivityDerivativeActionGate;
+};
 
 export function isActivityArchived(visibility: ActivityVisibility) {
   return visibility === 'archived';
@@ -84,6 +88,22 @@ export function getActivityLifecycleActionCopy(
   return {
     failureMessage: 'Activity could not be restored.',
     successMessage: 'Activity restored to drafts.',
+  };
+}
+
+export function buildActivityLifecycleActionView({
+  action,
+  visibility,
+}: {
+  action: ActivityDerivativeAction;
+  visibility: ActivityVisibility;
+}): ActivityLifecycleActionView {
+  return {
+    ...getActivityLifecycleActionCopy(action),
+    gate: buildActivityDerivativeActionGate({
+      action,
+      visibility,
+    }),
   };
 }
 
