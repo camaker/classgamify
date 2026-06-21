@@ -278,7 +278,7 @@ function PlayPage() {
         <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
           <Badge variant="outline" className="rounded-md border-primary/30">
             <IconDeviceGamepad2 className="size-3.5" />
-            Student play route
+            {runnerCopy.publicRouteBadgeLabel}
           </Badge>
           <h1 className="mt-4 text-3xl font-bold tracking-tight">
             {runnerCopy.missingAssignmentTitle}
@@ -290,7 +290,7 @@ function PlayPage() {
             to={Routes.Templates}
             className={cn(buttonVariants(), 'mt-5 w-fit')}
           >
-            Browse templates
+            {runnerCopy.browseTemplatesLabel}
           </Link>
         </div>
       </Container>
@@ -306,15 +306,13 @@ function PlayPage() {
           <div className="min-w-0 space-y-3">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconDeviceGamepad2 className="size-3.5" />
-              Student play route
+              {runnerCopy.publicRouteBadgeLabel}
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight">
               {assignment.title}
             </h1>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              This public assignment loads from the teacher share link, collects
-              answers, and scores against the teacher's frozen assignment
-              snapshot.
+              {runnerCopy.publicAssignmentDescription}
             </p>
             {assignment.settings.instructions ? (
               <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6 text-muted-foreground">
@@ -337,7 +335,7 @@ function PlayPage() {
               'w-fit bg-background'
             )}
           >
-            Teacher view
+            {runnerCopy.teacherViewLabel}
           </Link>
         </section>
 
@@ -353,7 +351,7 @@ function PlayPage() {
             {timeLimitSeconds ? (
               <Badge variant="outline" className="rounded-md">
                 {attemptTimer.timeExpired
-                  ? 'Time ended'
+                  ? runnerCopy.timeEndedLabel
                   : formatAttemptDuration(attemptTimer.remainingSeconds, {
                       emptyValue: '',
                       style: 'timer',
@@ -369,13 +367,13 @@ function PlayPage() {
                   htmlFor="student-name"
                   className="text-sm font-medium text-foreground"
                 >
-                  Student name
+                  {runnerCopy.studentNameLabel}
                 </label>
                 <Input
                   id="student-name"
                   value={studentName}
                   onChange={(event) => setStudentName(event.target.value)}
-                  placeholder="Type your name"
+                  placeholder={runnerCopy.studentNamePlaceholder}
                   className="mt-2"
                 />
               </div>
@@ -393,16 +391,16 @@ function PlayPage() {
               <div className="rounded-lg border bg-primary/5 p-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <IconCheck className="size-4 text-primary" />
-                  Score submitted
+                  {runnerCopy.resultSubmittedLabel}
                 </div>
                 <p className="mt-2 text-2xl font-semibold">
                   {result.earnedPoints}/{result.totalPoints}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {result.accuracy}% accuracy
+                  {result.accuracy}% {runnerCopy.resultAccuracyLabel}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Time:{' '}
+                  {runnerCopy.resultTimePrefix}{' '}
                   {formatAttemptDuration(
                     result.durationSeconds ?? attemptTimer.elapsedSeconds,
                     {

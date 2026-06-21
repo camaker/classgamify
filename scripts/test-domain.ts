@@ -322,15 +322,26 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(getStudentRunnerCopy(), {
+  browseTemplatesLabel: 'Browse templates',
   loadingMessage: 'Loading student activity...',
   missingAssignmentDescription:
     'This link may have been unpublished, closed, or typed incorrectly.',
   missingAssignmentTitle: 'Assignment not found',
+  publicAssignmentDescription:
+    "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
+  publicRouteBadgeLabel: 'Student play route',
   readOnlyPreviewMessage:
     'Preview assignments are read-only until a teacher publishes a share link.',
+  resultAccuracyLabel: 'accuracy',
+  resultSubmittedLabel: 'Score submitted',
+  resultTimePrefix: 'Time:',
+  studentNameLabel: 'Student name',
+  studentNamePlaceholder: 'Type your name',
   submissionFailureMessage: 'Attempt could not be saved.',
   submissionSuccessMessage: 'Attempt submitted.',
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
+  timeEndedLabel: 'Time ended',
+  teacherViewLabel: 'Teacher view',
 });
 assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
   correctAnswerLabel: 'Correct match',
