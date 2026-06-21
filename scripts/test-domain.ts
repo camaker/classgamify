@@ -232,6 +232,7 @@ import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
@@ -658,6 +659,33 @@ assert.deepEqual(
     { answer: '   ', itemId: 'item-2' },
     { answer: '', itemId: 'item-3' },
   ]
+);
+assert.deepEqual(
+  buildStudentAttemptResultDisplay({
+    accuracy: 67,
+    durationSeconds: 65,
+    earnedPoints: 2,
+    fallbackDurationSeconds: 120,
+    totalPoints: 3,
+  }),
+  {
+    accuracyLabel: '67% accuracy',
+    durationLabel: 'Time: 1:05',
+    scoreLabel: '2/3',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptResultDisplay({
+    accuracy: 100,
+    earnedPoints: 4,
+    fallbackDurationSeconds: 5,
+    totalPoints: 4,
+  }),
+  {
+    accuracyLabel: '100% accuracy',
+    durationLabel: 'Time: 5s',
+    scoreLabel: '4/4',
+  }
 );
 assert.deepEqual(
   buildStudentAttemptSubmissionInput({

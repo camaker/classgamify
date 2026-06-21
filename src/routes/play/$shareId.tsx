@@ -29,6 +29,7 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
+  buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
@@ -151,6 +152,15 @@ function PlayPage() {
     completionSummary,
     confirmIncompleteSubmit,
   });
+  const attemptResultDisplay = result
+    ? buildStudentAttemptResultDisplay({
+        accuracy: result.accuracy,
+        durationSeconds: result.durationSeconds,
+        earnedPoints: result.earnedPoints,
+        fallbackDurationSeconds: attemptTimer.elapsedSeconds,
+        totalPoints: result.totalPoints,
+      })
+    : undefined;
   const currentAttemptSessionKey =
     assignment && itemCount > 0
       ? buildStudentAttemptSessionKey({
@@ -394,20 +404,13 @@ function PlayPage() {
                   {runnerCopy.resultSubmittedLabel}
                 </div>
                 <p className="mt-2 text-2xl font-semibold">
-                  {result.earnedPoints}/{result.totalPoints}
+                  {attemptResultDisplay?.scoreLabel}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {result.accuracy}% {runnerCopy.resultAccuracyLabel}
+                  {attemptResultDisplay?.accuracyLabel}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {runnerCopy.resultTimePrefix}{' '}
-                  {formatAttemptDuration(
-                    result.durationSeconds ?? attemptTimer.elapsedSeconds,
-                    {
-                      emptyValue: '',
-                      style: 'timer',
-                    }
-                  )}
+                  {attemptResultDisplay?.durationLabel}
                 </p>
               </div>
             ) : null}

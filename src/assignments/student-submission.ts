@@ -1,3 +1,4 @@
+import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import {
   ANONYMOUS_BROWSER_LABEL,
   normalizeAnonymousToken,
@@ -89,6 +90,12 @@ export type AnonymousAttemptCopy = {
   title: string;
 };
 
+type StudentAttemptResultDisplay = {
+  accuracyLabel: string;
+  durationLabel: string;
+  scoreLabel: string;
+};
+
 const STUDENT_RUNNER_COPY = {
   browseTemplatesLabel: 'Browse templates',
   loadingMessage: 'Loading student activity...',
@@ -126,6 +133,32 @@ export function buildAnonymousAttemptCopy({
   return {
     description: `This assignment does not collect student names. This browser will submit as ${label}.`,
     title: 'Anonymous attempt',
+  };
+}
+
+export function buildStudentAttemptResultDisplay({
+  accuracy,
+  durationSeconds,
+  earnedPoints,
+  fallbackDurationSeconds,
+  totalPoints,
+}: {
+  accuracy: number;
+  durationSeconds?: number;
+  earnedPoints: number;
+  fallbackDurationSeconds?: number;
+  totalPoints: number;
+}): StudentAttemptResultDisplay {
+  return {
+    accuracyLabel: `${accuracy}% ${STUDENT_RUNNER_COPY.resultAccuracyLabel}`,
+    durationLabel: `${STUDENT_RUNNER_COPY.resultTimePrefix} ${formatAttemptDuration(
+      durationSeconds ?? fallbackDurationSeconds,
+      {
+        emptyValue: '',
+        style: 'timer',
+      }
+    )}`,
+    scoreLabel: `${earnedPoints}/${totalPoints}`,
   };
 }
 
