@@ -7,6 +7,7 @@ import {
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
+  buildActivityLibraryRouteSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
@@ -79,6 +80,7 @@ import {
   stripRuntimeAnswers,
 } from '@/assignments/public';
 import {
+  buildAssignmentListRouteSearch,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
@@ -648,6 +650,38 @@ assert.deepEqual(
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
+assert.deepEqual(
+  buildActivityLibraryRouteSearch({
+    created: 'activity-1',
+    page: 1,
+    q: '  word   match  ',
+    status: 'active',
+    template: 'all',
+  }),
+  {
+    created: 'activity-1',
+    page: undefined,
+    q: 'word match',
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryRouteSearch({
+    created: 'activity-1',
+    page: 3,
+    q: ' sort ',
+    status: 'archived',
+    template: 'group-sort',
+  }),
+  {
+    created: 'activity-1',
+    page: 3,
+    q: 'sort',
+    status: 'archived',
+    template: 'group-sort',
+  }
+);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
 assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
@@ -684,6 +718,34 @@ assert.throws(
 );
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.deepEqual(
+  buildAssignmentListRouteSearch({
+    page: 1,
+    published: 'share-1',
+    q: '  share   123  ',
+    status: 'all',
+  }),
+  {
+    page: undefined,
+    published: 'share-1',
+    q: 'share 123',
+    status: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListRouteSearch({
+    page: 4,
+    published: 'share-1',
+    q: ' week ',
+    status: 'closed',
+  }),
+  {
+    page: 4,
+    published: 'share-1',
+    q: 'week',
+    status: 'closed',
+  }
+);
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
 const questionOnlyContent = buildActivityContent({

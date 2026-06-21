@@ -5,6 +5,7 @@ import type {
 } from '@/activities/types';
 import {
   type AssignmentStatusFilter,
+  buildAssignmentListRouteSearch,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
@@ -149,12 +150,12 @@ function DashboardAssignmentsPage() {
 
     void navigate({
       replace: true,
-      search: {
+      search: buildAssignmentListRouteSearch({
         page: undefined,
         published,
         q: nextQuery.trim() ? nextQuery : undefined,
-        status: nextStatus === 'all' ? undefined : nextStatus,
-      },
+        status: nextStatus,
+      }),
     });
   }
 
@@ -163,19 +164,19 @@ function DashboardAssignmentsPage() {
 
     void navigate({
       replace,
-      search: {
+      search: buildAssignmentListRouteSearch({
         page: boundedPage === 1 ? undefined : boundedPage,
         published,
         q: searchQuery.trim() ? searchQuery : undefined,
-        status: statusFilter === 'all' ? undefined : statusFilter,
-      },
+        status: statusFilter,
+      }),
     });
   }
 
   function clearFilters() {
     void navigate({
       replace: true,
-      search: { published },
+      search: buildAssignmentListRouteSearch({ published }),
     });
   }
 
@@ -218,11 +219,11 @@ function DashboardAssignmentsPage() {
             onDismiss={() =>
               void navigate({
                 replace: true,
-                search: {
+                search: buildAssignmentListRouteSearch({
                   page: currentPage === 1 ? undefined : currentPage,
                   q: searchQuery.trim() ? searchQuery : undefined,
-                  status: statusFilter === 'all' ? undefined : statusFilter,
-                },
+                  status: statusFilter,
+                }),
               })
             }
             shareSlug={published}

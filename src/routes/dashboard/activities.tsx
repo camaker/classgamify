@@ -11,6 +11,7 @@ import {
 import {
   type ActivityLibraryStatus,
   type ActivityTemplateFilter,
+  buildActivityLibraryRouteSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
@@ -170,13 +171,13 @@ function DashboardActivitiesPage() {
 
     void navigate({
       replace: true,
-      search: {
+      search: buildActivityLibraryRouteSearch({
         created,
         page: undefined,
         q: nextQuery.trim() ? nextQuery : undefined,
-        status: nextStatus === 'active' ? undefined : nextStatus,
-        template: nextTemplate === 'all' ? undefined : nextTemplate,
-      },
+        status: nextStatus,
+        template: nextTemplate,
+      }),
     });
   }
 
@@ -185,20 +186,20 @@ function DashboardActivitiesPage() {
 
     void navigate({
       replace,
-      search: {
+      search: buildActivityLibraryRouteSearch({
         created,
         page: boundedPage === 1 ? undefined : boundedPage,
         q: searchQuery.trim() ? searchQuery : undefined,
-        status: libraryStatus === 'active' ? undefined : libraryStatus,
-        template: templateFilter === 'all' ? undefined : templateFilter,
-      },
+        status: libraryStatus,
+        template: templateFilter,
+      }),
     });
   }
 
   function clearLibraryFilters() {
     void navigate({
       replace: true,
-      search: { created },
+      search: buildActivityLibraryRouteSearch({ created }),
     });
   }
 
