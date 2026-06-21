@@ -1,5 +1,7 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import {
+  formatRuntimeItemKindLabel,
+  formatRuntimeItemPrompt,
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
@@ -621,7 +623,8 @@ function RuntimeItemCard({
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
 }) {
-  const prompt = getRuntimePrompt(item);
+  const prompt = formatRuntimeItemPrompt(item);
+  const kindLabel = formatRuntimeItemKindLabel(item);
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -630,7 +633,7 @@ function RuntimeItemCard({
           {index + 1}. {prompt}
         </p>
         <Badge variant="outline" className="rounded-md">
-          {item.kind}
+          {kindLabel}
         </Badge>
       </div>
       {item.choices?.length ? (
@@ -689,18 +692,6 @@ function ChoiceGrid({
       })}
     </div>
   );
-}
-
-function getRuntimePrompt(item: PublicRuntimeItem) {
-  if (item.kind === 'pair') {
-    return `Match "${item.prompt}" with its pair.`;
-  }
-
-  if (item.kind === 'group-item') {
-    return `Choose the group for "${item.prompt}".`;
-  }
-
-  return item.prompt;
 }
 
 function mapPersistedActivity(data: NonNullable<PublicAssignmentData>) {

@@ -67,6 +67,32 @@ export function getActivityTemplateRunnerKind(
   }
 }
 
+export function formatRuntimeItemPrompt(
+  item: Pick<RuntimeItem, 'kind' | 'prompt'>
+) {
+  if (item.kind === 'pair') {
+    return `Match "${item.prompt}" with its pair.`;
+  }
+
+  if (item.kind === 'group-item') {
+    return `Choose the group for "${item.prompt}".`;
+  }
+
+  return item.prompt;
+}
+
+export function formatRuntimeItemKindLabel(item: Pick<RuntimeItem, 'kind'>) {
+  if (item.kind === 'group-item') {
+    return 'Group item';
+  }
+
+  if (item.kind === 'pair') {
+    return 'Pair';
+  }
+
+  return 'Question';
+}
+
 export function getRuntimeItems(
   templateType: ActivityTemplateType,
   content: ActivityContent

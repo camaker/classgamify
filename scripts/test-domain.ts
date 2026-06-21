@@ -31,6 +31,8 @@ import {
 } from '@/activities/lifecycle';
 import {
   evaluateRuntimeAnswers,
+  formatRuntimeItemKindLabel,
+  formatRuntimeItemPrompt,
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
@@ -645,6 +647,38 @@ assert.deepEqual(
     ['listening', 'listening'],
     ['matching-pairs', 'matching-pairs'],
     ['open-box', 'open-box'],
+  ]
+);
+assert.deepEqual(
+  [
+    {
+      answer: 'Paris',
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+    {
+      answer: 'Cold',
+      choices: ['Cold', 'Warm'],
+      id: 'p-1',
+      kind: 'pair',
+      prompt: 'Hot',
+    },
+    {
+      answer: 'Fruit',
+      choices: ['Fruit', 'Drink'],
+      id: 'g-1-apple',
+      kind: 'group-item',
+      prompt: 'Apple',
+    },
+  ].map((item) => [
+    formatRuntimeItemPrompt(item),
+    formatRuntimeItemKindLabel(item),
+  ]),
+  [
+    ['Capital of France?', 'Question'],
+    ['Match "Hot" with its pair.', 'Pair'],
+    ['Choose the group for "Apple".', 'Group item'],
   ]
 );
 const fallbackDraft = createFallbackActivityDraft({
