@@ -2,16 +2,16 @@ import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
-import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
-import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   type AttemptReviewFilter,
   type AssignmentResultEmptyState,
   type AssignmentResultAction,
+  type AssignmentResultCopyAction,
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyText,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
@@ -48,7 +48,6 @@ import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
 } from '@/assignments/result-format';
-import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -233,8 +232,7 @@ function AssignmentResultsPage() {
     }
   }
 
-  async function handleCopyReteachPlan() {
-    const action = 'copy-reteach-plan';
+  async function handleCopyResultText(action: AssignmentResultCopyAction) {
     const actionCopy = getAssignmentResultActionCopy(action);
     const actionGate = getActionGate(action);
     if (!data || actionGate.type === 'blocked') {
@@ -244,76 +242,11 @@ function AssignmentResultsPage() {
 
     try {
       await copyTextToClipboard(
-        buildAssignmentReteachPlan({
+        buildAssignmentResultCopyText({
+          action,
           assignmentTitle: data.assignment.title,
+          classroomBriefText: classroomBrief?.text,
           items: data.analysis.perItem,
-          students: data.analysis.students,
-        })
-      );
-      toast.success(actionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
-      );
-    }
-  }
-
-  async function handleCopyClassroomBrief() {
-    const action = 'copy-brief';
-    const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getActionGate(action);
-    if (!data || !classroomBrief || actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(classroomBrief.text);
-      toast.success(actionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
-      );
-    }
-  }
-
-  async function handleCopyItemReview() {
-    const action = 'copy-item-review';
-    const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getActionGate(action);
-    if (!data || actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(
-        buildAssignmentItemReviewSummary({
-          assignmentTitle: data.assignment.title,
-          items: data.analysis.perItem,
-        })
-      );
-      toast.success(actionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
-      );
-    }
-  }
-
-  async function handleCopyStudentFollowUp() {
-    const action = 'copy-follow-up';
-    const actionCopy = getAssignmentResultActionCopy(action);
-    const actionGate = getActionGate(action);
-    if (!data || actionGate.type === 'blocked') {
-      toast.error(actionGate.message);
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(
-        buildAssignmentStudentFollowUpSummary({
-          assignmentTitle: data.assignment.title,
           students: data.analysis.students,
         })
       );
@@ -355,10 +288,10 @@ function AssignmentResultsPage() {
     studentCount: data?.analysis.students.length ?? 0,
   });
   const resultActionHandlers = {
-    'copy-brief': handleCopyClassroomBrief,
-    'copy-follow-up': handleCopyStudentFollowUp,
-    'copy-item-review': handleCopyItemReview,
-    'copy-reteach-plan': handleCopyReteachPlan,
+    'copy-brief': () => handleCopyResultText('copy-brief'),
+    'copy-follow-up': () => handleCopyResultText('copy-follow-up'),
+    'copy-item-review': () => handleCopyResultText('copy-item-review'),
+    'copy-reteach-plan': () => handleCopyResultText('copy-reteach-plan'),
     'export-csv': handleExportResults,
   } satisfies Record<AssignmentResultAction, () => Promise<void>>;
 

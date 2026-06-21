@@ -159,6 +159,7 @@ import {
   buildAssignmentAttemptRowDisplay,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyText,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
@@ -4439,6 +4440,43 @@ assert.match(
 assert.match(
   studentFollowUpSummary,
   /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review/
+);
+assert.equal(
+  buildAssignmentResultCopyText({
+    action: 'copy-brief',
+    assignmentTitle: csvExportData.assignment.title,
+    classroomBriefText: classroomBrief.text,
+    items: resultAnalysis.perItem,
+    students: resultAnalysis.students,
+  }),
+  classroomBrief.text
+);
+assert.equal(
+  buildAssignmentResultCopyText({
+    action: 'copy-reteach-plan',
+    assignmentTitle: csvExportData.assignment.title,
+    items: resultAnalysis.perItem,
+    students: followUpPriorityStudents,
+  }),
+  reteachPlan
+);
+assert.equal(
+  buildAssignmentResultCopyText({
+    action: 'copy-item-review',
+    assignmentTitle: csvExportData.assignment.title,
+    items: resultAnalysis.perItem,
+    students: resultAnalysis.students,
+  }),
+  itemReviewSummary
+);
+assert.equal(
+  buildAssignmentResultCopyText({
+    action: 'copy-follow-up',
+    assignmentTitle: csvExportData.assignment.title,
+    items: resultAnalysis.perItem,
+    students: followUpPriorityStudents,
+  }),
+  studentFollowUpSummary
 );
 
 console.log('Domain tests passed.');

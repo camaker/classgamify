@@ -3,8 +3,11 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
+import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
+import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -41,6 +44,11 @@ export type AssignmentResultActionCopy = {
   label: string;
   successMessage: string;
 };
+
+export type AssignmentResultCopyAction = Exclude<
+  AssignmentResultAction,
+  'export-csv'
+>;
 
 type AssignmentResultActionButton = {
   action: AssignmentResultAction;
@@ -315,6 +323,44 @@ export function getAssignmentResultActionGateFromState({
     classroomBriefReady: state.classroomBriefReady,
     itemCount: state.itemCount,
     studentCount: state.studentCount,
+  });
+}
+
+export function buildAssignmentResultCopyText({
+  action,
+  assignmentTitle,
+  classroomBriefText,
+  items,
+  students,
+}: {
+  action: AssignmentResultCopyAction;
+  assignmentTitle: string;
+  classroomBriefText?: string;
+  items: AssignmentItemAnalysis[];
+  students: AssignmentStudentSummary[];
+}) {
+  if (action === 'copy-brief') {
+    return classroomBriefText ?? '';
+  }
+
+  if (action === 'copy-reteach-plan') {
+    return buildAssignmentReteachPlan({
+      assignmentTitle,
+      items,
+      students,
+    });
+  }
+
+  if (action === 'copy-item-review') {
+    return buildAssignmentItemReviewSummary({
+      assignmentTitle,
+      items,
+    });
+  }
+
+  return buildAssignmentStudentFollowUpSummary({
+    assignmentTitle,
+    students,
   });
 }
 
