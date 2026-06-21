@@ -4,7 +4,8 @@ import {
   starterActivities,
 } from '@/activities/catalog';
 import {
-  ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+  type ActivityDerivativeAction,
+  buildActivityDerivativeActionGate,
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
@@ -541,9 +542,17 @@ function ActivityCard({
     templateType: template.type,
   });
 
+  function getDerivativeActionGate(action: ActivityDerivativeAction) {
+    return buildActivityDerivativeActionGate({
+      action,
+      visibility: activity.status,
+    });
+  }
+
   async function publishActivity() {
-    if (!canCreateDerivedWork) {
-      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+    const actionGate = getDerivativeActionGate('publish');
+    if (actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
     const draftResult = buildAssignmentPublishInputFromDraft({
@@ -582,8 +591,9 @@ function ActivityCard({
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
   ) {
-    if (!canCreateDerivedWork) {
-      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+    const actionGate = getDerivativeActionGate('remix');
+    if (actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
     try {
@@ -606,8 +616,9 @@ function ActivityCard({
   }
 
   async function duplicateActivity() {
-    if (!canCreateDerivedWork) {
-      toast.error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+    const actionGate = getDerivativeActionGate('duplicate');
+    if (actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
     try {

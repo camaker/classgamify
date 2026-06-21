@@ -37,6 +37,7 @@ import { buildActivityDraftMeta } from '@/activities/draft-meta';
 import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
+  buildActivityDerivativeActionGate,
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
@@ -1215,6 +1216,24 @@ assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
 assert.equal(canDeriveActivityWork('published'), true);
 assert.equal(canDeriveActivityWork('archived'), false);
+assert.deepEqual(
+  buildActivityDerivativeActionGate({
+    action: 'publish',
+    visibility: 'draft',
+  }),
+  { type: 'ready' }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionGate({
+    action: 'duplicate',
+    visibility: 'archived',
+  }),
+  {
+    action: 'duplicate',
+    message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+    type: 'blocked',
+  }
+);
 assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),
