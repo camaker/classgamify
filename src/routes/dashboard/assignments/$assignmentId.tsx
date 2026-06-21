@@ -22,13 +22,12 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
+  buildAssignmentItemPerformanceRowView,
   buildAssignmentResultMetricItems,
   formatAssignmentAttemptReviewBadge,
   formatAssignmentBriefStudentAccuracy,
   formatAssignmentItemCorrectSummary,
-  formatAssignmentResultFraction,
   formatAssignmentResultPercent,
-  formatAssignmentResultValue,
   formatAssignmentReviewCount,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
@@ -41,10 +40,7 @@ import {
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
-import {
-  formatAcceptedAnswerAlternatives,
-  formatAssignmentResultDate,
-} from '@/assignments/result-format';
+import { formatAssignmentResultDate } from '@/assignments/result-format';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -829,32 +825,29 @@ function ItemPerformanceTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item, index) => (
-          <TableRow key={item.itemId}>
-            <TableCell className="max-w-80">
-              <span className="font-medium">{index + 1}.</span> {item.prompt}
-            </TableCell>
-            <TableCell>{item.kindLabel}</TableCell>
-            <TableCell>
-              {formatAssignmentResultPercent(item.correctRate)}
-            </TableCell>
-            <TableCell>
-              {formatAssignmentResultFraction(
-                item.correctCount,
-                item.submittedCount
-              )}
-            </TableCell>
-            <TableCell>
-              {formatAssignmentResultValue(item.expectedAnswer)}
-            </TableCell>
-            <TableCell>
-              {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
-            </TableCell>
-            <TableCell className="max-w-72">
-              {formatAssignmentResultValue(item.explanation)}
-            </TableCell>
-          </TableRow>
-        ))}
+        {items.map((item, index) => {
+          const rowView = buildAssignmentItemPerformanceRowView({
+            index,
+            item,
+          });
+
+          return (
+            <TableRow key={item.itemId}>
+              <TableCell className="max-w-80">
+                <span className="font-medium">{rowView.itemNumberLabel}</span>{' '}
+                {rowView.prompt}
+              </TableCell>
+              <TableCell>{rowView.kindLabel}</TableCell>
+              <TableCell>{rowView.correctRateLabel}</TableCell>
+              <TableCell>{rowView.submittedLabel}</TableCell>
+              <TableCell>{rowView.expectedAnswerText}</TableCell>
+              <TableCell>{rowView.acceptedAnswersText}</TableCell>
+              <TableCell className="max-w-72">
+                {rowView.explanationText}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

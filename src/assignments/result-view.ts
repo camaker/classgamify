@@ -570,6 +570,28 @@ export function buildAssignmentItemAnalysisCardView(
   };
 }
 
+export function buildAssignmentItemPerformanceRowView({
+  index,
+  item,
+}: {
+  index: number;
+  item: AssignmentItemAnalysis;
+}) {
+  return {
+    acceptedAnswersText: formatAcceptedAnswerAlternatives(item.acceptedAnswers),
+    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    expectedAnswerText: formatAssignmentResultValue(item.expectedAnswer),
+    explanationText: formatAssignmentResultValue(item.explanation),
+    itemNumberLabel: `${Math.max(0, index) + 1}.`,
+    kindLabel: item.kindLabel,
+    prompt: item.prompt,
+    submittedLabel: formatAssignmentResultFraction(
+      item.correctCount,
+      item.submittedCount
+    ),
+  };
+}
+
 export function buildAssignmentAttemptAnswerReviewView({
   answer,
   index,
