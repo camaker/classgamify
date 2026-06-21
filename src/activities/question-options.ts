@@ -13,7 +13,7 @@ export function buildQuestionOptionTexts({
   );
 }
 
-export function uniqueQuestionOptionTexts(values: string[]) {
+function uniqueQuestionOptionTexts(values: string[]) {
   const seen = new Set<string>();
   const options: string[] = [];
 

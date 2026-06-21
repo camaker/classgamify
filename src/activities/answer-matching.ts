@@ -39,7 +39,7 @@ export function getAcceptedAnswers(expectedAnswer: string) {
   );
 }
 
-export function normalizeAnswerForMatching(value: string) {
+function normalizeAnswerForMatching(value: string) {
   return value
     .normalize('NFKC')
     .trim()
