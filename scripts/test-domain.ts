@@ -92,6 +92,7 @@ import {
   activityContentToEditorInput,
   activityEditorDefaultInput,
   buildActivityEditorInitialValues,
+  buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
@@ -2703,6 +2704,19 @@ assert.equal(lineMatchPreviewSeed.status, 'draft');
 assert.equal(lineMatchPreviewSeed.templateType, 'line-match');
 assert.equal(lineMatchPreviewSeed.title, 'Draw lines for food words');
 assert.equal(lineMatchPreviewSeed.content.pairs.length, 8);
+const lineMatchPreviewPanel = buildActivityEditorPreviewPanel(
+  buildActivityEditorInitialValues('line-match')
+);
+assert.equal(lineMatchPreviewPanel.editorSectionId, 'activity-editor');
+assert.equal(lineMatchPreviewPanel.title, 'Line match scaffold preview');
+assert.match(lineMatchPreviewPanel.description, /still a draft/);
+assert.deepEqual(lineMatchPreviewPanel.actions, [
+  {
+    href: '#activity-editor',
+    icon: 'edit',
+    label: 'Review scaffold fields',
+  },
+]);
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   description: 'Editor readiness helper',
   difficulty: 'starter',

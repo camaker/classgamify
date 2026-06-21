@@ -15,6 +15,7 @@ import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconEdit,
   IconCards,
   IconChartBar,
   IconClock,
@@ -32,6 +33,23 @@ type ActivityPreviewProps = {
   assignment?: AssignmentSeed;
   compact?: boolean;
   hideAnswers?: boolean;
+  panel?: ActivityPreviewPanel;
+};
+
+type ActivityPreviewAction = {
+  href?: string;
+  icon?: ActivityPreviewActionIcon;
+  label: string;
+  to?: string;
+  variant?: 'default' | 'outline';
+};
+
+type ActivityPreviewActionIcon = 'edit' | 'share' | 'sparkles';
+
+type ActivityPreviewPanel = {
+  actions?: ActivityPreviewAction[];
+  description: string;
+  title: string;
 };
 
 export function ActivityPreview({
@@ -39,11 +57,13 @@ export function ActivityPreview({
   assignment,
   compact = false,
   hideAnswers = false,
+  panel,
 }: ActivityPreviewProps) {
   const template = getTemplateByType(activity.templateType);
   const visibleQuestions = activity.content.questions.slice(0, 3);
   const visiblePairs = activity.content.pairs.slice(0, 4);
   const visibleGroups = activity.content.groups.slice(0, 3);
+  const previewPanel = panel ?? defaultActivityPreviewPanel;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -114,13 +134,10 @@ export function ActivityPreview({
       <Card className="rounded-lg">
         <CardHeader>
           <CardTitle>
-            <h2 className="text-base font-semibold">Publish path</h2>
+            <h2 className="text-base font-semibold">{previewPanel.title}</h2>
           </CardTitle>
           <CardDescription>
-            <p>
-              The same activity can become class play, homework, or a printable
-              follow-up once the template runner is filled in.
-            </p>
+            <p>{previewPanel.description}</p>
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
@@ -143,27 +160,77 @@ export function ActivityPreview({
                 : 'completion + score'
             }
           />
-          <div className="mt-2 flex flex-col gap-2">
-            <Link to={Routes.Create} className={cn(buttonVariants(), 'w-full')}>
-              <IconSparkles className="size-4" />
-              Create activity
-            </Link>
-            <Link
-              to={Routes.PlayDemo}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background'
-              )}
-            >
-              <IconShare3 className="size-4" />
-              Open student preview
-            </Link>
-          </div>
+          {previewPanel.actions?.length ? (
+            <div className="mt-2 flex flex-col gap-2">
+              {previewPanel.actions.map((action) => (
+                <ActivityPreviewActionLink
+                  action={action}
+                  key={`${action.label}-${action.to ?? action.href}`}
+                />
+              ))}
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>
   );
 }
+
+function ActivityPreviewActionLink({
+  action,
+}: {
+  action: ActivityPreviewAction;
+}) {
+  const Icon = activityPreviewActionIcons[action.icon ?? 'sparkles'];
+  const className = cn(
+    buttonVariants(
+      action.variant === 'outline' ? { variant: 'outline' } : undefined
+    ),
+    action.variant === 'outline' && 'bg-background',
+    'w-full'
+  );
+
+  if (action.href) {
+    return (
+      <a href={action.href} className={className}>
+        <Icon className="size-4" />
+        {action.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={action.to ?? Routes.Create} className={className}>
+      <Icon className="size-4" />
+      {action.label}
+    </Link>
+  );
+}
+
+const defaultActivityPreviewPanel = {
+  actions: [
+    {
+      icon: 'sparkles',
+      label: 'Create activity',
+      to: Routes.Create,
+    },
+    {
+      icon: 'share',
+      label: 'Open student preview',
+      to: Routes.PlayDemo,
+      variant: 'outline',
+    },
+  ],
+  description:
+    'The same activity can become class play, homework, or a printable follow-up once the template runner is filled in.',
+  title: 'Publish path',
+} satisfies ActivityPreviewPanel;
+
+const activityPreviewActionIcons = {
+  edit: IconEdit,
+  share: IconShare3,
+  sparkles: IconSparkles,
+} satisfies Record<ActivityPreviewActionIcon, typeof IconSparkles>;
 
 function PreviewPanel({
   children,

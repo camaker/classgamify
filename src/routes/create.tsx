@@ -4,6 +4,7 @@ import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import {
   buildActivityEditorInitialValues,
+  buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
 } from '@/activities/editor';
 import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
@@ -34,6 +35,10 @@ function CreatePage() {
   );
   const previewActivity = useMemo(
     () => buildActivityEditorPreviewSeed(initialValues),
+    [initialValues]
+  );
+  const previewPanel = useMemo(
+    () => buildActivityEditorPreviewPanel(initialValues),
     [initialValues]
   );
 
@@ -69,12 +74,14 @@ function CreatePage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]">
-          <ActivityCreateForm initialValues={initialValues} />
+          <div id={previewPanel.editorSectionId}>
+            <ActivityCreateForm initialValues={initialValues} />
+          </div>
           <div className="space-y-4">
             <p className="text-sm font-medium text-muted-foreground">
               Example rendering
             </p>
-            <ActivityPreview activity={previewActivity} />
+            <ActivityPreview activity={previewActivity} panel={previewPanel} />
           </div>
         </div>
       </div>

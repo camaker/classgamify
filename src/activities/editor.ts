@@ -4,6 +4,7 @@ import type {
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import { getTemplateByType } from '@/activities/catalog';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
@@ -24,6 +25,19 @@ type ActivityEditorSource = {
   title: string;
   visibility: ActivityVisibility;
 };
+
+type ActivityEditorPreviewPanel = {
+  actions: Array<{
+    href: `#${string}`;
+    icon: 'edit';
+    label: string;
+  }>;
+  description: string;
+  editorSectionId: string;
+  title: string;
+};
+
+const activityEditorSectionId = 'activity-editor';
 
 export const activityEditorDefaultInput: CreateActivityInput = {
   description:
@@ -73,6 +87,25 @@ export function buildActivityEditorPreviewSeed(
     status: input.visibility,
     templateType: input.templateType,
     title: input.title,
+  };
+}
+
+export function buildActivityEditorPreviewPanel(
+  input: CreateActivityInput = activityEditorDefaultInput
+): ActivityEditorPreviewPanel {
+  const template = getTemplateByType(input.templateType);
+
+  return {
+    actions: [
+      {
+        href: `#${activityEditorSectionId}`,
+        icon: 'edit',
+        label: 'Review scaffold fields',
+      },
+    ],
+    description: `This ${template.shortName} scaffold is still a draft. Review the structured fields on the left, save it as an activity, then publish from your library to create the student link.`,
+    editorSectionId: activityEditorSectionId,
+    title: `${template.name} scaffold preview`,
   };
 }
 
