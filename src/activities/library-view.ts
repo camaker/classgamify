@@ -285,18 +285,19 @@ export function buildActivityLibraryCardActionState({
 }): ActivityLibraryCardActionState {
   const showActiveActions = libraryStatus === 'active';
   const canCreateDerivedWork = canDeriveActivityWork(visibility);
-  const showDerivativeActions = persisted && canCreateDerivedWork;
+  const archived = isActivityArchived(visibility);
+  const showDerivativeActions =
+    persisted && showActiveActions && canCreateDerivedWork;
 
   return {
     canCreateDerivedWork,
-    showArchiveAction: persisted && showActiveActions,
+    showArchiveAction: persisted && showActiveActions && !archived,
     showDerivativeActions,
-    showEditAction: persisted && showActiveActions,
+    showEditAction: persisted && showActiveActions && !archived,
     showPersistedActions: persisted,
-    showPublishAction: persisted && showActiveActions,
-    showRestoreAction: persisted && !showActiveActions,
-    showRestoreRequiredMessage:
-      persisted && !showActiveActions && isActivityArchived(visibility),
+    showPublishAction: persisted && showActiveActions && canCreateDerivedWork,
+    showRestoreAction: persisted && archived,
+    showRestoreRequiredMessage: persisted && archived,
     showRemixActions: showDerivativeActions && readyRemixCount > 0,
   };
 }

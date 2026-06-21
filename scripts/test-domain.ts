@@ -2724,6 +2724,25 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryCardActionState({
     libraryStatus: 'active',
+    persisted: true,
+    readyRemixCount: 2,
+    visibility: 'archived',
+  }),
+  {
+    canCreateDerivedWork: false,
+    showArchiveAction: false,
+    showDerivativeActions: false,
+    showEditAction: false,
+    showPersistedActions: true,
+    showPublishAction: false,
+    showRestoreAction: true,
+    showRestoreRequiredMessage: true,
+    showRemixActions: false,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'active',
     persisted: false,
     readyRemixCount: 2,
     visibility: 'draft',
