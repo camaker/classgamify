@@ -6,6 +6,7 @@ import {
   type WorksheetModeDefinition,
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
+import { buildWorksheetModeEntryAction } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -171,6 +172,7 @@ function WorksheetsPage() {
 
 function WorksheetModeCard({ mode }: { mode: WorksheetModeDefinition }) {
   const Icon = worksheetModeIcons[mode.template];
+  const action = buildWorksheetModeEntryAction(mode);
 
   return (
     <div className="rounded-lg border bg-card p-5">
@@ -183,13 +185,13 @@ function WorksheetModeCard({ mode }: { mode: WorksheetModeDefinition }) {
       </p>
       <Link
         to={Routes.Create}
-        search={{ template: mode.template }}
+        search={action.search}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'mt-4 w-full bg-background'
         )}
       >
-        {mode.action}
+        {action.label}
       </Link>
     </div>
   );

@@ -153,6 +153,79 @@ test.describe('public page smoke coverage', () => {
     monitor.expectNoErrors('worksheets template entry');
   });
 
+  test('templates page enters template-specific creation flows', async ({
+    page,
+  }) => {
+    await setTheme(page, 'light');
+    const monitor = installPageHealthMonitor(page);
+
+    await expectHealthyPage(page, monitor, '/templates', { theme: 'light' });
+
+    await expect(
+      page.getByRole('heading', {
+        name: /pick a game format for the same lesson content/i,
+      })
+    ).toBeVisible();
+
+    const actions = [
+      {
+        name: /start quiz/i,
+        template: 'quiz',
+      },
+      {
+        name: /start match/i,
+        template: 'match-up',
+      },
+      {
+        name: /start lines/i,
+        template: 'line-match',
+      },
+      {
+        name: /start sort/i,
+        template: 'group-sort',
+      },
+      {
+        name: /start fill/i,
+        template: 'fill-blank',
+      },
+      {
+        name: /start listen/i,
+        template: 'listening',
+      },
+      {
+        name: /start pairs/i,
+        template: 'matching-pairs',
+      },
+      {
+        name: /start box/i,
+        template: 'open-box',
+      },
+    ] as const;
+
+    for (const action of actions) {
+      const link = page.getByRole('link', { name: action.name }).first();
+
+      await expect(link).toHaveAttribute(
+        'href',
+        `/create?template=${action.template}`
+      );
+    }
+
+    await page
+      .getByRole('link', { name: /start lines/i })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/create\?template=line-match$/);
+    await expect(
+      page.getByDisplayValue('Draw lines for food words')
+    ).toBeVisible();
+    await expect(page.getByLabel('Primary template')).toHaveValue('line-match');
+
+    const bodyText = (await page.locator('body').innerText()).trim();
+    expect(bodyText).not.toMatch(/HSK|Hanzi|Lang Study|getlangstudy/i);
+    monitor.expectNoErrors('templates template entry');
+  });
+
   test('health check responds with pong', async ({ request }) => {
     const response = await request.get('/api/ping');
 

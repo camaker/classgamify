@@ -73,6 +73,11 @@ import {
   formatTemplateRequirement,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
+import {
+  buildTemplateCreateSearch,
+  buildTemplateEntryAction,
+  buildWorksheetModeEntryAction,
+} from '@/activities/template-entry';
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import {
   buildActivityContent,
@@ -1819,6 +1824,16 @@ assert.deepEqual(
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
 assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
+assert.deepEqual(buildTemplateCreateSearch('line-match'), {
+  template: 'line-match',
+});
+assert.deepEqual(
+  activityTemplates.map((template) => buildTemplateEntryAction(template)),
+  activityTemplates.map((template) => ({
+    label: `Start ${template.shortName}`,
+    search: { template: template.type },
+  }))
+);
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   assert.equal(activityTemplateByType[templateType].type, templateType);
   assert.ok(activityTemplateByType[templateType].name.length > 0);
@@ -1841,6 +1856,13 @@ assert.equal(
     (mode) => mode.action.length > 0 && mode.description.length > 0
   ),
   true
+);
+assert.deepEqual(
+  worksheetModeDefinitions.map((mode) => buildWorksheetModeEntryAction(mode)),
+  worksheetModeDefinitions.map((mode) => ({
+    label: mode.action,
+    search: { template: mode.template },
+  }))
 );
 assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');

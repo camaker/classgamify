@@ -11,6 +11,7 @@ import {
   activityTemplates,
   formatActivityTemplateClassroomMode,
 } from '@/activities/catalog';
+import { buildTemplateEntryAction } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -70,61 +71,65 @@ function TemplatesPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {activityTemplates.map((template) => (
-            <Card key={template.type} className="rounded-lg">
-              <CardHeader>
-                <div className="mb-2 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-                  <IconDeviceGamepad2 className="size-4" />
-                </div>
-                <CardTitle>
-                  <h2 className="font-semibold">{template.name}</h2>
-                </CardTitle>
-                <CardDescription>
-                  <p>{template.description}</p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="rounded-lg border bg-muted/30 p-3">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Best for
-                  </p>
-                  <p className="mt-1 text-sm">{template.bestFor}</p>
-                </div>
-                <div className="rounded-lg border bg-background p-3">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Classroom mode
-                  </p>
-                  <p className="mt-1 text-sm">
-                    {formatActivityTemplateClassroomMode(
-                      template.classroomMode
+          {activityTemplates.map((template) => {
+            const action = buildTemplateEntryAction(template);
+
+            return (
+              <Card key={template.type} className="rounded-lg">
+                <CardHeader>
+                  <div className="mb-2 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+                    <IconDeviceGamepad2 className="size-4" />
+                  </div>
+                  <CardTitle>
+                    <h2 className="font-semibold">{template.name}</h2>
+                  </CardTitle>
+                  <CardDescription>
+                    <p>{template.description}</p>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="rounded-lg border bg-muted/30 p-3">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Best for
+                    </p>
+                    <p className="mt-1 text-sm">{template.bestFor}</p>
+                  </div>
+                  <div className="rounded-lg border bg-background p-3">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Classroom mode
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {formatActivityTemplateClassroomMode(
+                        template.classroomMode
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {template.contentRequirements.map((requirement) => (
+                      <Badge
+                        key={requirement}
+                        variant="secondary"
+                        className="rounded-md"
+                      >
+                        {requirement}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Link
+                    to={Routes.Create}
+                    search={action.search}
+                    className={cn(
+                      buttonVariants({ variant: 'outline' }),
+                      'w-full bg-background'
                     )}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {template.contentRequirements.map((requirement) => (
-                    <Badge
-                      key={requirement}
-                      variant="secondary"
-                      className="rounded-md"
-                    >
-                      {requirement}
-                    </Badge>
-                  ))}
-                </div>
-                <Link
-                  to={Routes.Create}
-                  search={{ template: template.type }}
-                  className={cn(
-                    buttonVariants({ variant: 'outline' }),
-                    'w-full bg-background'
-                  )}
-                >
-                  <IconPlus className="size-4" />
-                  Start {template.shortName}
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+                  >
+                    <IconPlus className="size-4" />
+                    {action.label}
+                  </Link>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <div className="rounded-lg border bg-card p-5">
