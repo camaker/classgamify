@@ -338,17 +338,8 @@ function AssignmentResultsPage() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <AssignmentSettingsSummary
-                collectStudentName={
-                  data.assignment.settingsJson.collectStudentName
-                }
                 expiresAt={data.assignment.expiresAt}
-                instructions={data.assignment.settingsJson.instructions}
-                maxAttempts={data.assignment.settingsJson.maxAttempts}
-                showCorrectAnswers={
-                  data.assignment.settingsJson.showCorrectAnswers
-                }
-                shuffleItems={data.assignment.settingsJson.shuffleItems}
-                timeLimitSeconds={data.assignment.settingsJson.timeLimitSeconds}
+                settings={data.assignment.settingsJson}
               />
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
