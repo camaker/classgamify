@@ -15,6 +15,14 @@ type ActivityLibraryEmptyStateView = {
   title: string;
 };
 
+type ActivityLibraryCardStatKey = 'groups' | 'pairs' | 'questions';
+
+type ActivityLibraryCardStat = {
+  key: ActivityLibraryCardStatKey;
+  label: string;
+  value: number;
+};
+
 export const activityLibraryPageCopy = {
   breadcrumbCurrent: 'Activities',
   breadcrumbDashboard: 'Dashboard',
@@ -53,6 +61,19 @@ export const activityLibrarySearchCopy = {
   templateLabel: string;
   templatePlaceholder: string;
 };
+
+export const activityLibraryCardCopy = {
+  actionLabels: {
+    archive: 'Archive',
+    duplicate: 'Duplicate',
+    edit: 'Edit activity',
+    publish: 'Publish assignment',
+    restore: 'Restore',
+  },
+  compatibleTemplatesLabel: 'Compatible template families',
+  restoreRequiredMessage:
+    'Restore this activity before publishing, duplicating, or remixing it.',
+} as const;
 
 const activityLibraryEmptyStateCopy = {
   archived: {
@@ -105,4 +126,35 @@ export function buildActivityLibraryEmptyStateView({
     ...activityLibraryEmptyStateCopy.emptyLibrary,
     showStarterActivities: true,
   };
+}
+
+export function buildActivityLibraryCardStats({
+  groups,
+  pairs,
+  questions,
+}: {
+  groups: number;
+  pairs: number;
+  questions: number;
+}): ActivityLibraryCardStat[] {
+  return [
+    { key: 'questions', label: 'Questions', value: questions },
+    { key: 'pairs', label: 'Pairs', value: pairs },
+    { key: 'groups', label: 'Groups', value: groups },
+  ];
+}
+
+export function buildActivityLibraryRemixHint(shortNames: string[]) {
+  const templateList = shortNames
+    .map((shortName) => shortName.trim())
+    .filter(Boolean)
+    .join(', ');
+
+  return templateList ? `Ready to remix into ${templateList}.` : undefined;
+}
+
+export function buildActivityLibraryRemixActionLabel(shortName: string) {
+  const templateName = shortName.trim();
+
+  return `Copy as ${templateName || 'template'}`;
 }

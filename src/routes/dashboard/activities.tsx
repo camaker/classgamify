@@ -28,9 +28,13 @@ import {
 } from '@/activities/library-summary';
 import {
   activityLibraryHeroCopy,
+  activityLibraryCardCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryCardStats,
   buildActivityLibraryEmptyStateView,
+  buildActivityLibraryRemixActionLabel,
+  buildActivityLibraryRemixHint,
 } from '@/activities/library-view';
 import type {
   ActivityContent,
@@ -584,6 +588,14 @@ function ActivityCard({
     content: activity.content,
     templateType: template.type,
   });
+  const cardStats = buildActivityLibraryCardStats({
+    groups: cardSummary.contentCounts.groups,
+    pairs: cardSummary.contentCounts.pairs,
+    questions: cardSummary.contentCounts.questions,
+  });
+  const remixHint = buildActivityLibraryRemixHint(
+    cardSummary.suggestedTemplateOptions.map((option) => option.shortName)
+  );
 
   function getDerivativeActionGate(action: ActivityDerivativeAction) {
     return buildActivityDerivativeActionGate({
@@ -714,20 +726,18 @@ function ActivityCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-3">
-          <ActivityStat
-            label="Questions"
-            value={cardSummary.contentCounts.questions}
-          />
-          <ActivityStat label="Pairs" value={cardSummary.contentCounts.pairs} />
-          <ActivityStat
-            label="Groups"
-            value={cardSummary.contentCounts.groups}
-          />
+          {cardStats.map((stat) => (
+            <ActivityStat
+              key={stat.key}
+              label={stat.label}
+              value={stat.value}
+            />
+          ))}
         </div>
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <IconLayoutGrid className="size-4 text-primary" />
-            Compatible template families
+            {activityLibraryCardCopy.compatibleTemplatesLabel}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {cardSummary.readyTemplateOptions.map((option) => (
@@ -744,13 +754,9 @@ function ActivityCard({
               </Badge>
             ))}
           </div>
-          {cardSummary.suggestedTemplateOptions.length ? (
+          {remixHint ? (
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              Ready to remix into{' '}
-              {cardSummary.suggestedTemplateOptions
-                .map((option) => option.shortName)
-                .join(', ')}
-              .
+              {remixHint}
             </p>
           ) : null}
           {activity.persisted &&
@@ -770,7 +776,7 @@ function ActivityCard({
                     onClick={() => remixActivity(option.template)}
                   >
                     <IconSwitchHorizontal className="size-4" />
-                    Copy as {option.shortName}
+                    {buildActivityLibraryRemixActionLabel(option.shortName)}
                   </Button>
                 ))}
             </div>
@@ -802,7 +808,7 @@ function ActivityCard({
                 )}
               >
                 <IconEdit className="size-4" />
-                Edit activity
+                {activityLibraryCardCopy.actionLabels.edit}
               </Link>
             ) : null}
             {canCreateDerivedWork ? (
@@ -814,7 +820,7 @@ function ActivityCard({
                 onClick={duplicateActivity}
               >
                 <IconCopy className="size-4" />
-                Duplicate
+                {activityLibraryCardCopy.actionLabels.duplicate}
               </Button>
             ) : null}
             {libraryStatus === 'active' ? (
@@ -827,7 +833,7 @@ function ActivityCard({
                   onClick={archiveActivity}
                 >
                   <IconFolderOff className="size-4" />
-                  Archive
+                  {activityLibraryCardCopy.actionLabels.archive}
                 </Button>
                 <Button
                   type="button"
@@ -836,15 +842,14 @@ function ActivityCard({
                   onClick={() => setPublishDialogOpen(true)}
                 >
                   <IconPlus className="size-4" />
-                  Publish assignment
+                  {activityLibraryCardCopy.actionLabels.publish}
                 </Button>
               </>
             ) : (
               <>
                 {isArchived ? (
                   <p className="text-sm text-muted-foreground sm:mr-auto">
-                    Restore this activity before publishing, duplicating, or
-                    remixing it.
+                    {activityLibraryCardCopy.restoreRequiredMessage}
                   </p>
                 ) : null}
                 <Button
@@ -854,7 +859,7 @@ function ActivityCard({
                   onClick={restoreActivity}
                 >
                   <IconRotateClockwise className="size-4" />
-                  Restore
+                  {activityLibraryCardCopy.actionLabels.restore}
                 </Button>
               </>
             )}

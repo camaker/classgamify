@@ -10,10 +10,14 @@ import {
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
+  activityLibraryCardCopy,
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryCardStats,
   buildActivityLibraryEmptyStateView,
+  buildActivityLibraryRemixActionLabel,
+  buildActivityLibraryRemixHint,
 } from '@/activities/library-view';
 import {
   buildActivityLibraryRouteSearch,
@@ -1941,6 +1945,40 @@ assert.deepEqual(
     title: 'No matching activities.',
   }
 );
+assert.deepEqual(activityLibraryCardCopy.actionLabels, {
+  archive: 'Archive',
+  duplicate: 'Duplicate',
+  edit: 'Edit activity',
+  publish: 'Publish assignment',
+  restore: 'Restore',
+});
+assert.equal(
+  activityLibraryCardCopy.compatibleTemplatesLabel,
+  'Compatible template families'
+);
+assert.equal(
+  activityLibraryCardCopy.restoreRequiredMessage,
+  ARCHIVED_ACTIVITY_DERIVATION_ERROR
+);
+assert.deepEqual(
+  buildActivityLibraryCardStats({
+    groups: 2,
+    pairs: 4,
+    questions: 3,
+  }),
+  [
+    { key: 'questions', label: 'Questions', value: 3 },
+    { key: 'pairs', label: 'Pairs', value: 4 },
+    { key: 'groups', label: 'Groups', value: 2 },
+  ]
+);
+assert.equal(
+  buildActivityLibraryRemixHint(['Quiz', ' Fill ', '']),
+  'Ready to remix into Quiz, Fill.'
+);
+assert.equal(buildActivityLibraryRemixHint([]), undefined);
+assert.equal(buildActivityLibraryRemixActionLabel('Fill'), 'Copy as Fill');
+assert.equal(buildActivityLibraryRemixActionLabel('   '), 'Copy as template');
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
 assert.deepEqual(
