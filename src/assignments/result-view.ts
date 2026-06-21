@@ -39,6 +39,20 @@ export type AssignmentResultSearchState = {
   sort?: StudentSummarySort;
 };
 
+type AssignmentResultControlSearchUpdate =
+  | {
+      control: 'attempt-review-filter';
+      value: AttemptReviewFilter;
+    }
+  | {
+      control: 'item-performance-sort';
+      value: ItemPerformanceSort;
+    }
+  | {
+      control: 'student-sort';
+      value: StudentSummarySort;
+    };
+
 export type AssignmentResultAction =
   | 'copy-brief'
   | 'copy-follow-up'
@@ -1233,6 +1247,33 @@ export function buildAssignmentResultSearchState({
     review: review === 'all' ? undefined : review,
     sort: sort === 'needs-review' ? undefined : sort,
   };
+}
+
+export function buildAssignmentResultControlSearchState({
+  current,
+  update,
+}: {
+  current: AssignmentResultSearchState;
+  update: AssignmentResultControlSearchUpdate;
+}): AssignmentResultSearchState {
+  if (update.control === 'attempt-review-filter') {
+    return buildAssignmentResultSearchState({
+      current,
+      next: { review: update.value },
+    });
+  }
+
+  if (update.control === 'item-performance-sort') {
+    return buildAssignmentResultSearchState({
+      current,
+      next: { itemSort: update.value },
+    });
+  }
+
+  return buildAssignmentResultSearchState({
+    current,
+    next: { sort: update.value },
+  });
 }
 
 export function normalizeResultSearch(value: string | null | undefined) {

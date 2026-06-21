@@ -8,8 +8,8 @@ import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultControlSearchState,
   buildAssignmentResultHeaderView,
-  buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
@@ -157,9 +157,12 @@ function AssignmentResultsPage() {
   function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
     void navigate({
       replace: true,
-      search: buildAssignmentResultSearchState({
+      search: buildAssignmentResultControlSearchState({
         current: { itemSort, review, sort },
-        next: { itemSort: nextSort },
+        update: {
+          control: 'item-performance-sort',
+          value: nextSort,
+        },
       }),
     });
   }
@@ -167,9 +170,12 @@ function AssignmentResultsPage() {
   function updateStudentSort(nextSort: StudentSummarySort) {
     void navigate({
       replace: true,
-      search: buildAssignmentResultSearchState({
+      search: buildAssignmentResultControlSearchState({
         current: { itemSort, review, sort },
-        next: { sort: nextSort },
+        update: {
+          control: 'student-sort',
+          value: nextSort,
+        },
       }),
     });
   }
@@ -177,9 +183,12 @@ function AssignmentResultsPage() {
   function updateAttemptReviewFilter(nextFilter: AttemptReviewFilter) {
     void navigate({
       replace: true,
-      search: buildAssignmentResultSearchState({
+      search: buildAssignmentResultControlSearchState({
         current: { itemSort, review, sort },
-        next: { review: nextFilter },
+        update: {
+          control: 'attempt-review-filter',
+          value: nextFilter,
+        },
       }),
     });
   }

@@ -199,6 +199,7 @@ import {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
+  buildAssignmentResultControlSearchState,
   buildAssignmentResultHeaderView,
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
@@ -5800,6 +5801,58 @@ assert.deepEqual(
     itemSort: 'submitted',
     review: undefined,
     sort: 'attempts',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlSearchState({
+    current: {
+      review: 'needs-review',
+      sort: 'best',
+    },
+    update: {
+      control: 'item-performance-sort',
+      value: 'type',
+    },
+  }),
+  {
+    itemSort: 'type',
+    review: 'needs-review',
+    sort: 'best',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlSearchState({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      sort: 'attempts',
+    },
+    update: {
+      control: 'attempt-review-filter',
+      value: 'all',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: undefined,
+    sort: 'attempts',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlSearchState({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+    },
+    update: {
+      control: 'student-sort',
+      value: 'needs-review',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: undefined,
   }
 );
 assert.deepEqual(
