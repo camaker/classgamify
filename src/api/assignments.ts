@@ -16,7 +16,7 @@ import {
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import {
-  buildAttemptReviewItems,
+  buildPublicAttemptReviewItems,
   estimateAssignmentMinutes,
   stripRuntimeAnswers,
 } from '@/assignments/public';
@@ -570,12 +570,11 @@ export const submitAttempt = createServerFn({ method: 'POST' })
 
     return {
       id,
-      reviewItems: settings.showCorrectAnswers
-        ? buildAttemptReviewItems({
-            answers: evaluation.answers,
-            runtimeItems,
-          })
-        : [],
+      reviewItems: buildPublicAttemptReviewItems({
+        answers: evaluation.answers,
+        runtimeItems,
+        showCorrectAnswers: settings.showCorrectAnswers,
+      }),
       result: evaluation.result,
     };
   });

@@ -72,6 +72,7 @@ import {
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
+  buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
   stripRuntimeAnswer,
   stripRuntimeAnswers,
@@ -485,6 +486,46 @@ assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
 assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
+    answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris / Paris, France',
+        explanation: 'Paris is the capital of France.',
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+    ],
+    showCorrectAnswers: false,
+  }),
+  []
+);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
+    answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris / Paris, France',
+        explanation: 'Paris is the capital of France.',
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+    ],
+    showCorrectAnswers: true,
+  }),
+  [
+    {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      correct: true,
+      correctAnswer: 'Paris',
+      explanation: 'Paris is the capital of France.',
+      itemId: 'q-1',
+    },
+  ]
+);
 const publicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
   choices: ['Paris', 'Rome'],

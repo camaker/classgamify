@@ -96,6 +96,23 @@ export function buildAttemptReviewItems({
   });
 }
 
+export function buildPublicAttemptReviewItems({
+  answers,
+  runtimeItems,
+  showCorrectAnswers,
+}: {
+  answers: AttemptAnswer[];
+  runtimeItems: RuntimeItem[];
+  showCorrectAnswers: boolean;
+}): PublicAttemptReviewItem[] {
+  if (!showCorrectAnswers) return [];
+
+  return buildAttemptReviewItems({
+    answers,
+    runtimeItems,
+  });
+}
+
 export function buildPublicAttemptReviewItemMap(
   reviewItems: PublicAttemptReviewItem[] | undefined
 ) {
