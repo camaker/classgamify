@@ -692,6 +692,7 @@ assert.deepEqual(
   activityTemplates.map((template) => template.type),
   ACTIVITY_TEMPLATE_TYPES
 );
+assert.equal(activityTemplates.length, 8);
 assert.deepEqual(
   Object.keys(activityTemplateByType).sort(),
   [...ACTIVITY_TEMPLATE_TYPES].sort()

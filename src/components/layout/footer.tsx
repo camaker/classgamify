@@ -1,3 +1,4 @@
+import { activityTemplates } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 import Container from '@/components/layout/container';
 import { Logo } from '@/components/shared/logo';
@@ -74,7 +75,10 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
               {m.footer_tagline()}
             </p>
             <dl className="mt-5 grid grid-cols-3 gap-2 text-sm">
-              <FooterMetric label={m.footer_metric_templates()} value="6" />
+              <FooterMetric
+                label={m.footer_metric_templates()}
+                value={String(activityTemplates.length)}
+              />
               <FooterMetric
                 label={m.footer_metric_assignments()}
                 value="Link"
