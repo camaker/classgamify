@@ -20,12 +20,10 @@
   "ignoreDependencies": [
     "@fontsource/bricolage-grotesque",
     "@radix-ui/react-slot",
-    "@tanstack/ai-react",
     "@react-email/preview-server",
     "@tailwindcss/typography",
     "cloudflare",
     "embla-carousel-react",
-    "nanoid",
     "react-resizable-panels",
     "shadcn",
     "tailwindcss",
