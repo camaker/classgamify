@@ -191,6 +191,7 @@ import {
   getStudentRunnerCopy,
   isStudentAnswerFilled,
 } from '@/assignments/student-submission';
+import { resolveAssignmentSettings } from '@/assignments/validation';
 import type { RuntimeItem } from '@/activities/runtime';
 
 const submissionRuntimeItems = [
@@ -666,6 +667,47 @@ assert.equal(
     isPersisted: false,
   }),
   undefined
+);
+assert.deepEqual(resolveAssignmentSettings(null), {
+  collectStudentName: true,
+  instructions: undefined,
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(
+  resolveAssignmentSettings({
+    collectStudentName: false,
+    instructions: '  Finish before class.  ',
+    maxAttempts: 3,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 900,
+  }),
+  {
+    collectStudentName: false,
+    instructions: 'Finish before class.',
+    maxAttempts: 3,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 900,
+  }
+);
+assert.deepEqual(
+  resolveAssignmentSettings({
+    instructions: '   ',
+    maxAttempts: 99,
+    timeLimitSeconds: 30,
+  }),
+  {
+    collectStudentName: true,
+    instructions: undefined,
+    maxAttempts: 2,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }
 );
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
 assert.equal(
