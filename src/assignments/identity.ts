@@ -1,9 +1,15 @@
 export const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
 export const ANONYMOUS_BROWSER_LABEL = 'Anonymous browser';
+export const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
 
 type StudentIdentitySource = {
   anonymousToken?: string | null;
   studentName?: string | null;
+};
+
+type AnonymousAttemptTokenStorage = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
 };
 
 export type StudentIdentity = {
@@ -27,6 +33,36 @@ export function getAnonymousBrowserLabel(value?: string | null) {
   return suffix
     ? `${ANONYMOUS_BROWSER_LABEL} ${suffix.toUpperCase()}`
     : ANONYMOUS_BROWSER_LABEL;
+}
+
+export function buildAnonymousAttemptTokenStorageKey(shareId: string) {
+  return `${ANONYMOUS_ATTEMPT_TOKEN_PREFIX}${shareId}`;
+}
+
+export function createAnonymousAttemptToken() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function getOrCreateAnonymousAttemptToken({
+  createToken = createAnonymousAttemptToken,
+  shareId,
+  storage,
+}: {
+  createToken?: () => string;
+  shareId: string;
+  storage: AnonymousAttemptTokenStorage;
+}) {
+  const storageKey = buildAnonymousAttemptTokenStorageKey(shareId);
+  const existingToken = storage.getItem(storageKey);
+  if (existingToken) return existingToken;
+
+  const token = createToken();
+  storage.setItem(storageKey, token);
+  return token;
 }
 
 export function getStudentIdentityKey(source: StudentIdentitySource) {

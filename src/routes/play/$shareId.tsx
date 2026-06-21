@@ -12,7 +12,10 @@ import {
   buildPublicAssignmentRuleSummary,
 } from '@/assignments/delivery-summary';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import { getAnonymousBrowserLabel } from '@/assignments/identity';
+import {
+  getAnonymousBrowserLabel,
+  getOrCreateAnonymousAttemptToken,
+} from '@/assignments/identity';
 import {
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
@@ -161,7 +164,12 @@ function PlayPage() {
 
   useEffect(() => {
     if (!assignment || assignment.settings.collectStudentName) return;
-    setAnonymousToken(getAnonymousAttemptToken(activeShareId));
+    setAnonymousToken(
+      getOrCreateAnonymousAttemptToken({
+        shareId: activeShareId,
+        storage: window.localStorage,
+      })
+    );
   }, [activeShareId, assignment]);
 
   async function submitAnswers() {
@@ -193,7 +201,11 @@ function PlayPage() {
         shareSlug: assignment?.shareId ?? shareId,
         anonymousToken: assignment?.settings.collectStudentName
           ? undefined
-          : (anonymousToken ?? getAnonymousAttemptToken(activeShareId)),
+          : (anonymousToken ??
+            getOrCreateAnonymousAttemptToken({
+              shareId: activeShareId,
+              storage: window.localStorage,
+            })),
         studentName: studentName.trim() || undefined,
       });
       setResult({
@@ -692,19 +704,6 @@ function ChoiceGrid({
       })}
     </div>
   );
-}
-
-function getAnonymousAttemptToken(shareId: string) {
-  const storageKey = `classgamify:attempt-token:${shareId}`;
-  const existingToken = window.localStorage.getItem(storageKey);
-  if (existingToken) return existingToken;
-
-  const token =
-    typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  window.localStorage.setItem(storageKey, token);
-  return token;
 }
 
 type PublicAssignmentData = ReturnType<typeof usePublicAssignment>['data'];

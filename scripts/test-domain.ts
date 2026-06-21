@@ -139,6 +139,10 @@ import {
 } from '@/assignments/publish-input';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
+  buildAnonymousAttemptTokenStorageKey,
+  getOrCreateAnonymousAttemptToken,
+} from '@/assignments/identity';
+import {
   buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
   getAttemptCompletionSummary,
@@ -161,6 +165,41 @@ const answers = {
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
 assert.equal(isStudentAnswerFilled(' answer '), true);
+assert.equal(
+  buildAnonymousAttemptTokenStorageKey('share/one'),
+  'classgamify:attempt-token:share/one'
+);
+const anonymousTokenStorage = new Map<string, string>();
+const anonymousTokenStore = {
+  getItem: (key: string) => anonymousTokenStorage.get(key) ?? null,
+  setItem: (key: string, value: string) => {
+    anonymousTokenStorage.set(key, value);
+  },
+};
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
+    createToken: () => 'anon-token-1',
+    shareId: 'share-one',
+    storage: anonymousTokenStore,
+  }),
+  'anon-token-1'
+);
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
+    createToken: () => 'anon-token-2',
+    shareId: 'share-one',
+    storage: anonymousTokenStore,
+  }),
+  'anon-token-1'
+);
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
+    createToken: () => 'anon-token-3',
+    shareId: 'share-two',
+    storage: anonymousTokenStore,
+  }),
+  'anon-token-3'
+);
 assert.equal(
   findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Rome'),
   'item-2'
