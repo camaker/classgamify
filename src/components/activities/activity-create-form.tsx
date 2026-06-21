@@ -1,6 +1,9 @@
 import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
-import { buildActivityEditorTemplateReadiness } from '@/activities/editor';
+import {
+  activityEditorDefaultInput,
+  buildActivityEditorTemplateReadiness,
+} from '@/activities/editor';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import {
@@ -61,28 +64,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-export const activityFormDefaultValues: CreateActivityInput = {
-  description:
-    'Quick classroom practice that can become a quiz, match game, or worksheet.',
-  difficulty: 'starter',
-  gradeBand: 'Primary',
-  groupsText: 'Fruit | apple, banana\nDrink | milk, water',
-  language: 'en',
-  learningGoal:
-    'Students can recognize key words and connect them with simple meanings.',
-  pairsText: 'apple | fruit\nmilk | drink\nrice | grain',
-  questionsText:
-    'Which word means a red or green fruit? | apple | apple, bread, water | Apple is the fruit clue.\nWhich drink is white? | milk | milk, rice, egg | Milk is the white drink.',
-  sourceSummary: 'Teacher-created activity from a unit vocabulary list.',
-  subject: 'English',
-  teacherNotesText:
-    'Use quiz mode for homework.\nUse matching pairs as a class warmup.',
-  templateType: 'quiz',
-  title: 'Food words quick check',
-  visibility: 'draft',
-  vocabularyText: 'apple, bread, milk, rice, water, egg',
-};
-
 const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
 const templateTypeOptions = activityTemplateTypeSchema.options;
@@ -105,12 +86,12 @@ export function ActivityCreateForm({
   const updateMutation = useUpdateActivity();
   const navigate = useNavigate();
   const [draftSourceText, setDraftSourceText] = useState(
-    getActivityDraftSourceText(initialValues ?? activityFormDefaultValues)
+    getActivityDraftSourceText(initialValues ?? activityEditorDefaultInput)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
   const form = useForm<CreateActivityInput>({
-    defaultValues: initialValues ?? activityFormDefaultValues,
+    defaultValues: initialValues ?? activityEditorDefaultInput,
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');

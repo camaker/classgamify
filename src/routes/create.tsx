@@ -1,17 +1,15 @@
 import { ActivityPreview } from '@/components/activities/activity-preview';
-import {
-  ActivityCreateForm,
-  activityFormDefaultValues,
-} from '@/components/activities/activity-create-form';
+import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { starterActivities } from '@/activities/catalog';
+import { buildActivityEditorInitialValues } from '@/activities/editor';
 import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
-import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { IconSparkles } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
+import { useMemo } from 'react';
 
 export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -29,14 +27,10 @@ export const Route = createFileRoute('/create')({
 function CreatePage() {
   const { template } = Route.useSearch();
   const activity = starterActivities[0];
-  const initialValues = template
-    ? {
-        ...activityFormDefaultValues,
-        ...getActivityTemplateScaffold(template),
-        templateType: template,
-        visibility: activityFormDefaultValues.visibility,
-      }
-    : undefined;
+  const initialValues = useMemo(
+    () => buildActivityEditorInitialValues(template),
+    [template]
+  );
 
   return (
     <Container className="px-4 py-12 md:py-16">

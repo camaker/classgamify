@@ -4,6 +4,7 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
+import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
   createActivityInputSchema,
   parseActivityContent,
@@ -21,6 +22,41 @@ type ActivityEditorSource = {
   title: string;
   visibility: ActivityVisibility;
 };
+
+export const activityEditorDefaultInput: CreateActivityInput = {
+  description:
+    'Quick classroom practice that can become a quiz, match game, or worksheet.',
+  difficulty: 'starter',
+  gradeBand: 'Primary',
+  groupsText: 'Fruit | apple, banana\nDrink | milk, water',
+  language: 'en',
+  learningGoal:
+    'Students can recognize key words and connect them with simple meanings.',
+  pairsText: 'apple | fruit\nmilk | drink\nrice | grain',
+  questionsText:
+    'Which word means a red or green fruit? | apple | apple, bread, water | Apple is the fruit clue.\nWhich drink is white? | milk | milk, rice, egg | Milk is the white drink.',
+  sourceSummary: 'Teacher-created activity from a unit vocabulary list.',
+  subject: 'English',
+  teacherNotesText:
+    'Use quiz mode for homework.\nUse matching pairs as a class warmup.',
+  templateType: 'quiz',
+  title: 'Food words quick check',
+  visibility: 'draft',
+  vocabularyText: 'apple, bread, milk, rice, water, egg',
+};
+
+export function buildActivityEditorInitialValues(
+  templateType?: ActivityTemplateType
+): CreateActivityInput | undefined {
+  if (!templateType) return undefined;
+
+  return {
+    ...activityEditorDefaultInput,
+    ...getActivityTemplateScaffold(templateType),
+    templateType,
+    visibility: activityEditorDefaultInput.visibility,
+  };
+}
 
 export function activityContentToEditorInput(
   source: ActivityEditorSource

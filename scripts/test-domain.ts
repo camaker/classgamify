@@ -58,6 +58,8 @@ import {
 } from '@/activities/validation';
 import {
   activityContentToEditorInput,
+  activityEditorDefaultInput,
+  buildActivityEditorInitialValues,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
@@ -1018,6 +1020,18 @@ assert.equal(
   }).questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
 );
+assert.doesNotThrow(() =>
+  buildActivityContent(
+    createActivityInputSchema.parse(activityEditorDefaultInput)
+  )
+);
+assert.equal(buildActivityEditorInitialValues(undefined), undefined);
+assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
+  ...activityEditorDefaultInput,
+  ...getActivityTemplateScaffold('group-sort'),
+  templateType: 'group-sort',
+  visibility: 'draft',
+});
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   description: 'Editor readiness helper',
   difficulty: 'starter',
