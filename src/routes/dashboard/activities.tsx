@@ -33,9 +33,9 @@ import type {
 import {
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
+  buildAssignmentPublishDraftDefaults,
   formatAssignmentDateTimeLocal,
 } from '@/assignments/publish-input';
-import { defaultAssignmentSettings } from '@/assignments/validation';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -507,24 +507,40 @@ function ActivityCard({
   const remixMutation = useRemixActivityTemplate();
   const restoreMutation = useRestoreActivity();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-  const [assignmentTitle, setAssignmentTitle] = useState(activity.title);
-  const [assignmentInstructions, setAssignmentInstructions] = useState('');
+  const publishDraftDefaults = useMemo(
+    () =>
+      buildAssignmentPublishDraftDefaults({
+        activityId: activity.id,
+        title: activity.title,
+      }),
+    [activity.id, activity.title]
+  );
+  const [assignmentTitle, setAssignmentTitle] = useState(
+    publishDraftDefaults.title
+  );
+  const [assignmentInstructions, setAssignmentInstructions] = useState(
+    publishDraftDefaults.instructions
+  );
   const [collectStudentName, setCollectStudentName] = useState(
-    defaultAssignmentSettings.collectStudentName
+    publishDraftDefaults.collectStudentName
   );
   const [showCorrectAnswers, setShowCorrectAnswers] = useState(
-    defaultAssignmentSettings.showCorrectAnswers
+    publishDraftDefaults.showCorrectAnswers
   );
   const [shuffleItems, setShuffleItems] = useState(
-    defaultAssignmentSettings.shuffleItems
+    publishDraftDefaults.shuffleItems
   );
   const [maxAttempts, setMaxAttempts] = useState(
-    String(defaultAssignmentSettings.maxAttempts ?? 2)
+    publishDraftDefaults.maxAttempts
   );
-  const [timeLimitMinutes, setTimeLimitMinutes] = useState('');
-  const [expiresAtLocal, setExpiresAtLocal] = useState('');
+  const [timeLimitMinutes, setTimeLimitMinutes] = useState(
+    publishDraftDefaults.timeLimitMinutes
+  );
+  const [expiresAtLocal, setExpiresAtLocal] = useState(
+    publishDraftDefaults.expiresAtLocal
+  );
   const publishPreview = buildAssignmentPublishPreviewFromDraft({
-    activityId: activity.id,
+    activityId: publishDraftDefaults.activityId,
     collectStudentName,
     expiresAtLocal,
     instructions: assignmentInstructions,
@@ -556,7 +572,7 @@ function ActivityCard({
       return;
     }
     const draftResult = buildAssignmentPublishInputFromDraft({
-      activityId: activity.id,
+      activityId: publishDraftDefaults.activityId,
       collectStudentName,
       expiresAtLocal,
       instructions: assignmentInstructions,

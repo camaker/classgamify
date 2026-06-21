@@ -1,4 +1,5 @@
 import type { AssignmentSettings } from '@/activities/types';
+import { defaultAssignmentSettings } from '@/assignments/validation';
 
 export function formatAssignmentDateTimeLocal(date: Date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -58,6 +59,26 @@ export type AssignmentPublishPreview = {
   expiresAt: Date | null;
   settings: AssignmentSettings;
 };
+
+export function buildAssignmentPublishDraftDefaults({
+  activityId,
+  title,
+}: {
+  activityId: string;
+  title: string;
+}): AssignmentPublishDraft {
+  return {
+    activityId,
+    collectStudentName: defaultAssignmentSettings.collectStudentName,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: String(defaultAssignmentSettings.maxAttempts ?? 2),
+    showCorrectAnswers: defaultAssignmentSettings.showCorrectAnswers,
+    shuffleItems: defaultAssignmentSettings.shuffleItems,
+    timeLimitMinutes: '',
+    title,
+  };
+}
 
 export function buildAssignmentPublishPreviewFromDraft({
   collectStudentName,

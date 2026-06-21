@@ -154,6 +154,7 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
@@ -549,6 +550,23 @@ assert.equal(
 assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+);
+assert.deepEqual(
+  buildAssignmentPublishDraftDefaults({
+    activityId: 'activity-1',
+    title: 'Food groups',
+  }),
+  {
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Food groups',
+  }
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
