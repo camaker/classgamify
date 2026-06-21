@@ -67,7 +67,7 @@
     {
       "binding": "DB",
       "database_name": "classgamify",
-      "database_id": "885df2bc-1419-458c-b8b6-0821eddfb399",
+      "database_id": "1f45cc1c-e815-4e97-9c82-c991f2bb357b",
       "migrations_dir": "./src/db/migrations"
     }
   ],
