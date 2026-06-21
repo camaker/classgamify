@@ -65,6 +65,7 @@ import {
   buildPublicAssignmentRuleSummary,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
+import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -412,6 +413,25 @@ assert.deepEqual(
     { id: 'answerReveal', label: 'Review', value: 'Hidden' },
   ]
 );
+const publicReviewMap = buildPublicAttemptReviewItemMap([
+  {
+    acceptedAnswers: ['Paris', 'Paris, France'],
+    correct: true,
+    correctAnswer: 'Paris',
+    explanation: 'Paris is the capital of France.',
+    itemId: 'q-1',
+  },
+  {
+    acceptedAnswers: ['Cold'],
+    correct: false,
+    correctAnswer: 'Cold',
+    itemId: 'pair-1',
+  },
+]);
+assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
+assert.equal(publicReviewMap.get('pair-1')?.correct, false);
+assert.equal(publicReviewMap.get('missing'), undefined);
+assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');

@@ -92,6 +92,14 @@ export function buildAttemptReviewItems({
   });
 }
 
+export function buildPublicAttemptReviewItemMap(
+  reviewItems: PublicAttemptReviewItem[] | undefined
+) {
+  return new Map(
+    reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
+  );
+}
+
 export function estimateAssignmentMinutes(itemCount: number) {
   return Math.max(5, Math.min(20, itemCount * 2));
 }

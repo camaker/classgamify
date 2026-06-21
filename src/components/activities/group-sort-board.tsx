@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import {
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
@@ -43,10 +44,7 @@ export function GroupSortBoard({
     [items]
   );
   const reviewByItemId = useMemo(
-    () =>
-      new Map(
-        reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
-      ),
+    () => buildPublicAttemptReviewItemMap(reviewItems),
     [reviewItems]
   );
   const selectedItem = selectedItemId ? itemsById.get(selectedItemId) : null;

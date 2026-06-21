@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import {
   getAttemptCompletionSummary,
   isStudentAnswerFilled,
@@ -39,10 +40,7 @@ export function ListeningRunner({
   const [activeItemId, setActiveItemId] = useState(items[0]?.id);
   const [speechSupported, setSpeechSupported] = useState(false);
   const reviewByItemId = useMemo(
-    () =>
-      new Map(
-        reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
-      ),
+    () => buildPublicAttemptReviewItemMap(reviewItems),
     [reviewItems]
   );
   const activeIndex = Math.max(

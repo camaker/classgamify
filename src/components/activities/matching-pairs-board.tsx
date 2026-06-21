@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import {
@@ -33,10 +34,7 @@ export function MatchingPairsBoard({
 }: MatchingPairsBoardProps) {
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const reviewByItemId = useMemo(
-    () =>
-      new Map(
-        reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
-      ),
+    () => buildPublicAttemptReviewItemMap(reviewItems),
     [reviewItems]
   );
   const choices = useMemo(() => getUniqueRuntimeChoices(items), [items]);

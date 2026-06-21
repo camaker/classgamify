@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
 import { getAttemptCompletionSummary } from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -28,10 +29,7 @@ export function FillBlankWorksheet({
   reviewItems,
 }: FillBlankWorksheetProps) {
   const reviewByItemId = useMemo(
-    () =>
-      new Map(
-        reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
-      ),
+    () => buildPublicAttemptReviewItemMap(reviewItems),
     [reviewItems]
   );
   const completionSummary = getAttemptCompletionSummary({
