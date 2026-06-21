@@ -2,14 +2,8 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
-import {
-  formatAttemptCompletionProgressLabel,
-  getAttemptCompletionSummary,
-  isStudentAnswerFilled,
-} from '@/assignments/student-submission';
+import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
-import { getUniqueRuntimeChoices } from '@/components/activities/runtime-item-choices';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -39,22 +33,21 @@ export function GroupSortBoard({
   reviewItems,
 }: GroupSortBoardProps) {
   const [selectedItemId, setSelectedItemId] = useState<string>();
-  const groups = useMemo(() => getUniqueRuntimeChoices(items), [items]);
-  const itemsById = useMemo(
-    () => new Map(items.map((item) => [item.id, item])),
-    [items]
+  const runnerView = useMemo(
+    () =>
+      buildStudentRunnerView({
+        answers,
+        items,
+        progressVerb: 'sorted',
+        reviewItems,
+      }),
+    [answers, items, reviewItems]
   );
-  const reviewByItemId = useMemo(
-    () => buildPublicAttemptReviewItemMap(reviewItems),
-    [reviewItems]
-  );
-  const selectedItem = selectedItemId ? itemsById.get(selectedItemId) : null;
-  const completionSummary = getAttemptCompletionSummary({
-    answers,
-    runtimeItems: items,
-  });
-  const unplacedItems = items.filter(
-    (item) => !isStudentAnswerFilled(answers[item.id])
+  const selectedItem = selectedItemId
+    ? runnerView.itemViewsById.get(selectedItemId)?.item
+    : null;
+  const unplacedItemViews = runnerView.itemViews.filter(
+    (itemView) => !itemView.answered
   );
 
   function placeSelectedItem(group: string) {
@@ -77,10 +70,7 @@ export function GroupSortBoard({
           Group sort
         </div>
         <Badge variant="outline" className="rounded-md">
-          {formatAttemptCompletionProgressLabel({
-            completionSummary,
-            verb: 'sorted',
-          })}
+          {runnerView.progressLabel}
         </Badge>
       </div>
 
@@ -104,12 +94,12 @@ export function GroupSortBoard({
           </div>
 
           <div className="mt-3 grid gap-2">
-            {unplacedItems.length ? (
-              unplacedItems.map((item) => (
+            {unplacedItemViews.length ? (
+              unplacedItemViews.map(({ item, reviewItem }) => (
                 <GroupSortItemButton
                   key={item.id}
                   item={item}
-                  reviewItem={reviewByItemId.get(item.id)}
+                  reviewItem={reviewItem}
                   revealAnswer={revealAnswer}
                   selected={selectedItemId === item.id}
                   onSelect={() =>
@@ -129,9 +119,9 @@ export function GroupSortBoard({
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {groups.map((group) => {
-            const placedItems = items.filter(
-              (item) => answers[item.id] === group
+          {runnerView.choices.map((group) => {
+            const placedItemViews = runnerView.itemViews.filter(
+              (itemView) => itemView.answer === group
             );
 
             return (
@@ -151,17 +141,17 @@ export function GroupSortBoard({
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold">{group}</p>
                     <Badge variant="secondary" className="rounded-md">
-                      {placedItems.length}
+                      {placedItemViews.length}
                     </Badge>
                   </div>
                 </button>
 
                 <div className="mt-3 grid gap-2">
-                  {placedItems.map((item) => (
+                  {placedItemViews.map(({ item, reviewItem }) => (
                     <GroupSortItemButton
                       key={item.id}
                       item={item}
-                      reviewItem={reviewByItemId.get(item.id)}
+                      reviewItem={reviewItem}
                       revealAnswer={revealAnswer}
                       selected={selectedItemId === item.id}
                       onSelect={() =>
@@ -173,7 +163,7 @@ export function GroupSortBoard({
                       compact
                     />
                   ))}
-                  {!placedItems.length ? (
+                  {!placedItemViews.length ? (
                     <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
                   ) : null}
                 </div>

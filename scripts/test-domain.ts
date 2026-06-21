@@ -86,8 +86,11 @@ import {
 } from '@/assignments/attempt-duration';
 import {
   buildExclusiveChoiceAnswerChanges,
+  buildRuntimeChoiceViews,
+  buildStudentRunnerView,
   findChoiceOwner,
-} from '@/components/activities/runtime-choice-answers';
+  getUniqueRuntimeChoices,
+} from '@/assignments/student-runner-view';
 import {
   buildAssignmentDeliverySummary,
   buildPublicAssignmentRuleSummary,
@@ -316,6 +319,42 @@ assert.deepEqual(
     itemId: 'item-1',
   }),
   [{ answer: 'Paris', itemId: 'item-1' }]
+);
+assert.deepEqual(
+  getUniqueRuntimeChoices([
+    {
+      choices: [' Paris ', '', 'Rome'],
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital?',
+    },
+    {
+      choices: ['Paris', 'Berlin'],
+      id: 'q-2',
+      kind: 'question',
+      prompt: 'Another capital?',
+    },
+  ]),
+  ['Paris', 'Rome', 'Berlin']
+);
+assert.deepEqual(
+  buildRuntimeChoiceViews({
+    answers: { 'item-1': 'Paris' },
+    choices: ['Paris', 'Rome'],
+    selectedItemId: 'item-2',
+  }),
+  [
+    {
+      choice: 'Paris',
+      selected: false,
+      usedByItemId: 'item-1',
+    },
+    {
+      choice: 'Rome',
+      selected: false,
+      usedByItemId: undefined,
+    },
+  ]
 );
 
 assert.deepEqual(
@@ -1213,6 +1252,46 @@ assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
 assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
+const studentRunnerView = buildStudentRunnerView({
+  answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
+  items: [
+    {
+      choices: ['Paris', 'Lyon'],
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+    {
+      choices: ['Cold', 'Warm'],
+      id: 'pair-1',
+      kind: 'pair',
+      prompt: 'Hot',
+    },
+    {
+      choices: ['North', 'South'],
+      id: 'pair-2',
+      kind: 'pair',
+      prompt: 'Up',
+    },
+  ],
+  progressVerb: 'matched',
+  reviewItems: [...publicReviewMap.values()],
+});
+assert.equal(studentRunnerView.progressLabel, '2/3 matched');
+assert.deepEqual(studentRunnerView.choices, [
+  'Paris',
+  'Lyon',
+  'Cold',
+  'Warm',
+  'North',
+  'South',
+]);
+assert.equal(studentRunnerView.itemViewsById.get('q-1')?.status, 'correct');
+assert.equal(
+  studentRunnerView.itemViewsById.get('pair-1')?.status,
+  'needs-review'
+);
+assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
 assert.deepEqual(
   buildPublicAttemptReviewItems({
     answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],

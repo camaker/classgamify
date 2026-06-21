@@ -2,11 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
-import {
-  formatAttemptCompletionProgressLabel,
-  getAttemptCompletionSummary,
-} from '@/assignments/student-submission';
+import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -31,14 +27,16 @@ export function FillBlankWorksheet({
   revealAnswer,
   reviewItems,
 }: FillBlankWorksheetProps) {
-  const reviewByItemId = useMemo(
-    () => buildPublicAttemptReviewItemMap(reviewItems),
-    [reviewItems]
+  const runnerView = useMemo(
+    () =>
+      buildStudentRunnerView({
+        answers,
+        items,
+        progressVerb: 'completed',
+        reviewItems,
+      }),
+    [answers, items, reviewItems]
   );
-  const completionSummary = getAttemptCompletionSummary({
-    answers,
-    runtimeItems: items,
-  });
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -48,17 +46,12 @@ export function FillBlankWorksheet({
           Fill blanks
         </div>
         <Badge variant="outline" className="rounded-md">
-          {formatAttemptCompletionProgressLabel({
-            completionSummary,
-            verb: 'completed',
-          })}
+          {runnerView.progressLabel}
         </Badge>
       </div>
 
       <div className="mt-3 grid gap-3">
-        {items.map((item, index) => {
-          const reviewItem = reviewByItemId.get(item.id);
-
+        {runnerView.itemViews.map(({ answer, item, reviewItem }, index) => {
           return (
             <div
               key={item.id}
@@ -84,7 +77,7 @@ export function FillBlankWorksheet({
                 ) : null}
               </div>
               <InlineBlankPrompt
-                answer={answers[item.id] ?? ''}
+                answer={answer}
                 disabled={disabled}
                 prompt={item.prompt}
                 onAnswerChange={(answer) => onAnswerChange(item.id, answer)}

@@ -2,12 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
-import {
-  formatAttemptCompletionProgressLabel,
-  getAttemptCompletionSummary,
-  isStudentAnswerFilled,
-} from '@/assignments/student-submission';
+import { buildStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,19 +35,22 @@ export function ListeningRunner({
 }: ListeningRunnerProps) {
   const [activeItemId, setActiveItemId] = useState(items[0]?.id);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const reviewByItemId = useMemo(
-    () => buildPublicAttemptReviewItemMap(reviewItems),
-    [reviewItems]
+  const runnerView = useMemo(
+    () =>
+      buildStudentRunnerView({
+        answers,
+        items,
+        reviewItems,
+      }),
+    [answers, items, reviewItems]
   );
   const activeIndex = Math.max(
     0,
     items.findIndex((item) => item.id === activeItemId)
   );
-  const activeItem = items[activeIndex] ?? items[0];
-  const completionSummary = getAttemptCompletionSummary({
-    answers,
-    runtimeItems: items,
-  });
+  const activeItemView =
+    runnerView.itemViews[activeIndex] ?? runnerView.itemViews[0];
+  const activeItem = activeItemView?.item;
 
   useEffect(() => {
     setSpeechSupported(
@@ -75,7 +73,7 @@ export function ListeningRunner({
     return null;
   }
 
-  const activeReviewItem = reviewByItemId.get(activeItem.id);
+  const activeReviewItem = activeItemView.reviewItem;
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -85,16 +83,15 @@ export function ListeningRunner({
           Listening
         </div>
         <Badge variant="outline" className="rounded-md">
-          {formatAttemptCompletionProgressLabel({ completionSummary })}
+          {runnerView.progressLabel}
         </Badge>
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
-          {items.map((item, index) => {
+          {runnerView.itemViews.map((itemView, index) => {
+            const { answered, item, reviewItem } = itemView;
             const selected = item.id === activeItem.id;
-            const answered = isStudentAnswerFilled(answers[item.id]);
-            const reviewItem = reviewByItemId.get(item.id);
 
             return (
               <button
