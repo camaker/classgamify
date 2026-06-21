@@ -1,7 +1,10 @@
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { activityTemplates } from '@/activities/catalog';
+import {
+  activityTemplates,
+  formatActivityTemplateClassroomMode,
+} from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -144,7 +147,9 @@ function TeachersPage() {
                 >
                   <span className="text-sm font-medium">{template.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {template.classroomMode}
+                    {formatActivityTemplateClassroomMode(
+                      template.classroomMode
+                    )}
                   </span>
                 </div>
               ))}

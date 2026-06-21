@@ -244,6 +244,19 @@ export function getTemplateByType(type: string) {
   return activityTemplateByType[type as ActivityTemplateType];
 }
 
+export function formatActivityTemplateClassroomMode(
+  classroomMode: ActivityTemplateDefinition['classroomMode']
+) {
+  switch (classroomMode) {
+    case 'individual':
+      return 'Individual';
+    case 'small-group':
+      return 'Small group';
+    case 'whole-class':
+      return 'Whole class';
+  }
+}
+
 export function getStarterActivity(id?: string) {
   if (!id) return starterActivities[0];
   return (

@@ -7,7 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { activityTemplates } from '@/activities/catalog';
+import {
+  activityTemplates,
+  formatActivityTemplateClassroomMode,
+} from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -91,8 +94,10 @@ function TemplatesPage() {
                   <p className="text-xs font-medium text-muted-foreground">
                     Classroom mode
                   </p>
-                  <p className="mt-1 text-sm capitalize">
-                    {template.classroomMode.replace('-', ' ')}
+                  <p className="mt-1 text-sm">
+                    {formatActivityTemplateClassroomMode(
+                      template.classroomMode
+                    )}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">

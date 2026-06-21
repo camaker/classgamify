@@ -7,7 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getTemplateByType } from '@/activities/catalog';
+import {
+  formatActivityTemplateClassroomMode,
+  getTemplateByType,
+} from '@/activities/catalog';
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -129,7 +132,7 @@ export function ActivityPreview({
           <MetricRow
             icon={IconUsers}
             label="Classroom mode"
-            value={template?.classroomMode ?? 'individual'}
+            value={formatActivityTemplateClassroomMode(template.classroomMode)}
           />
           <MetricRow
             icon={IconChartBar}

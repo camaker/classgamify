@@ -16,6 +16,7 @@ import {
 import {
   activityTemplateByType,
   activityTemplates,
+  formatActivityTemplateClassroomMode,
 } from '@/activities/catalog';
 import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
@@ -397,6 +398,9 @@ assert.deepEqual(
   Object.keys(activityTemplateByType).sort(),
   [...ACTIVITY_TEMPLATE_TYPES].sort()
 );
+assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
+assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
+assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   assert.equal(activityTemplateByType[templateType].type, templateType);
   assert.ok(activityTemplateByType[templateType].name.length > 0);
