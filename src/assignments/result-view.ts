@@ -43,6 +43,60 @@ export type AssignmentAttemptReviewRow<
   review: AssignmentAttemptReview | undefined;
 };
 
+export function buildAssignmentResultViewModel<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  attemptReviewFilter,
+  attempts,
+  itemPerformanceSort,
+  reviews,
+  search,
+  studentSort,
+  students,
+  items,
+}: {
+  attemptReviewFilter: AttemptReviewFilter;
+  attempts: TAttempt[];
+  itemPerformanceSort: ItemPerformanceSort;
+  items: AssignmentItemAnalysis[];
+  reviews: AssignmentAttemptReview[];
+  search: string;
+  studentSort: StudentSummarySort;
+  students: AssignmentStudentSummary[];
+}) {
+  const filteredStudents = filterAndSortStudentSummaries({
+    search,
+    sort: studentSort,
+    students,
+  });
+  const filteredAttemptRows = buildFilteredAttemptRows({
+    attempts,
+    reviews,
+    search,
+  });
+  const filteredAttemptReviews = filterAttemptReviews({
+    attempts: reviews,
+    filter: attemptReviewFilter,
+    search,
+  });
+
+  return {
+    attemptReviewSubmissionSummary: buildAttemptReviewSubmissionSummary({
+      shownAttempts: filteredAttemptReviews.length,
+      totalAttempts: reviews.length,
+    }),
+    filteredAttemptReviews,
+    filteredAttemptRows,
+    filteredStudents,
+    resultSearchSummary: buildResultSearchSummary({
+      matchedAttempts: filteredAttemptRows.length,
+      matchedStudents: filteredStudents.length,
+      search,
+    }),
+    sortedPerformanceItems: sortItemPerformance(items, itemPerformanceSort),
+  };
+}
+
 export function filterAndSortStudentSummaries({
   search,
   sort,

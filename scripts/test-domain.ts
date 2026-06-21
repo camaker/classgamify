@@ -112,6 +112,7 @@ import {
 import {
   buildAttemptReviewSubmissionSummary,
   buildAssignmentResultSearchState,
+  buildAssignmentResultViewModel,
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
@@ -2620,6 +2621,85 @@ assert.deepEqual(
     students: resultAnalysis.students,
   }).map((student) => student.studentLabel),
   ['Anonymous student 1']
+);
+const assignmentResultViewModel = buildAssignmentResultViewModel({
+  attemptReviewFilter: 'needs-review',
+  attempts: [
+    {
+      completedAt: new Date('2026-01-03T10:00:00.000Z'),
+      id: 'attempt-1',
+      maxScore: 2,
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 2,
+        durationSeconds: 30,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      score: 1,
+      studentName: ' Alice ',
+    },
+    {
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-2',
+      maxScore: 2,
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        durationSeconds: 28,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+      score: 2,
+      studentName: 'Alice',
+    },
+    {
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'attempt-3',
+      maxScore: 2,
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        durationSeconds: 40,
+        earnedPoints: 0,
+        totalPoints: 2,
+      },
+      score: 0,
+      studentName: null,
+    },
+  ],
+  itemPerformanceSort: 'accuracy',
+  items: resultAnalysis.perItem,
+  reviews: resultAnalysis.attempts,
+  search: ' anonymous ',
+  studentSort: 'needs-review',
+  students: resultAnalysis.students,
+});
+assert.deepEqual(
+  assignmentResultViewModel.filteredStudents.map(
+    (student) => student.studentLabel
+  ),
+  ['Anonymous student 1']
+);
+assert.deepEqual(
+  assignmentResultViewModel.filteredAttemptRows.map((row) => row.attempt.id),
+  ['attempt-3']
+);
+assert.deepEqual(
+  assignmentResultViewModel.filteredAttemptReviews.map((attempt) => attempt.id),
+  ['attempt-3']
+);
+assert.deepEqual(
+  assignmentResultViewModel.sortedPerformanceItems.map((item) => item.itemId),
+  ['pair-1', 'q-1']
+);
+assert.equal(
+  assignmentResultViewModel.resultSearchSummary,
+  '1 student · 1 attempt'
+);
+assert.equal(
+  assignmentResultViewModel.attemptReviewSubmissionSummary,
+  'Showing 1 of 3 submissions.'
 );
 const followUpPriorityStudents = [
   {

@@ -8,16 +8,11 @@ import {
   type AttemptReviewFilter,
   type ItemPerformanceSort,
   type StudentSummarySort,
-  buildAttemptReviewSubmissionSummary,
   buildAssignmentResultSearchState,
-  buildFilteredAttemptRows,
-  buildResultSearchSummary,
-  filterAndSortStudentSummaries,
-  filterAttemptReviews,
+  buildAssignmentResultViewModel,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
-  sortItemPerformance,
 } from '@/assignments/result-view';
 import {
   buildAssignmentResultsCsv,
@@ -134,19 +129,28 @@ function AssignmentResultsPage() {
   const templateType =
     data?.snapshot?.templateType ?? data?.activity.templateType ?? '';
   const hasAttempts = Boolean(data?.attempts.length);
-  const filteredStudents = useMemo(
+  const resultView = useMemo(
     () =>
-      filterAndSortStudentSummaries({
+      buildAssignmentResultViewModel({
+        attemptReviewFilter,
+        attempts: data?.attempts ?? [],
+        itemPerformanceSort,
+        items: data?.analysis.perItem ?? [],
+        reviews: data?.analysis.attempts ?? [],
         search: studentSearch,
-        sort: studentSort,
+        studentSort,
         students: data?.analysis.students ?? [],
       }),
-    [data?.analysis.students, studentSearch, studentSort]
-  );
-  const sortedPerformanceItems = useMemo(
-    () =>
-      sortItemPerformance(data?.analysis.perItem ?? [], itemPerformanceSort),
-    [data?.analysis.perItem, itemPerformanceSort]
+    [
+      attemptReviewFilter,
+      data?.analysis.attempts,
+      data?.analysis.perItem,
+      data?.analysis.students,
+      data?.attempts,
+      itemPerformanceSort,
+      studentSearch,
+      studentSort,
+    ]
   );
   const classroomBrief = useMemo(() => {
     if (!data) return null;
@@ -188,25 +192,6 @@ function AssignmentResultsPage() {
       }),
     });
   }
-
-  const filteredAttemptRows = useMemo(
-    () =>
-      buildFilteredAttemptRows({
-        attempts: data?.attempts ?? [],
-        reviews: data?.analysis.attempts ?? [],
-        search: studentSearch,
-      }),
-    [data?.analysis.attempts, data?.attempts, studentSearch]
-  );
-  const filteredAttemptReviews = useMemo(
-    () =>
-      filterAttemptReviews({
-        attempts: data?.analysis.attempts ?? [],
-        filter: attemptReviewFilter,
-        search: studentSearch,
-      }),
-    [attemptReviewFilter, data?.analysis.attempts, studentSearch]
-  );
 
   async function handleExportResults() {
     if (!data || data.attempts.length === 0) {
@@ -470,8 +455,7 @@ function AssignmentResultsPage() {
                 <ClassroomBriefCard brief={classroomBrief} />
               ) : null}
               <ResultStudentSearch
-                matchedAttempts={filteredAttemptRows.length}
-                matchedStudents={filteredStudents.length}
+                summary={resultView.resultSearchSummary}
                 onClear={() => setStudentSearch('')}
                 onSearch={setStudentSearch}
                 onSortChange={updateStudentSort}
@@ -528,7 +512,9 @@ function AssignmentResultsPage() {
                     onSortChange={updateItemPerformanceSort}
                     sort={itemPerformanceSort}
                   />
-                  <ItemPerformanceTable items={sortedPerformanceItems} />
+                  <ItemPerformanceTable
+                    items={resultView.sortedPerformanceItems}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -548,8 +534,8 @@ function AssignmentResultsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {filteredStudents.length > 0 ? (
-                  <StudentSummaryTable students={filteredStudents} />
+                {resultView.filteredStudents.length > 0 ? (
+                  <StudentSummaryTable students={resultView.filteredStudents} />
                 ) : (
                   <NoMatchingStudents />
                 )}
@@ -570,7 +556,7 @@ function AssignmentResultsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {filteredAttemptRows.length > 0 ? (
+              {resultView.filteredAttemptRows.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -583,33 +569,35 @@ function AssignmentResultsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredAttemptRows.map(({ attempt, review }) => (
-                      <TableRow key={attempt.id}>
-                        <TableCell>
-                          {review?.studentLabel ||
-                            attempt.studentName ||
-                            'Anonymous student'}
-                        </TableCell>
-                        <TableCell>
-                          {attempt.score ?? 0}/{attempt.maxScore ?? 0}
-                        </TableCell>
-                        <TableCell>
-                          {attempt.resultJson?.accuracy ?? 0}%
-                        </TableCell>
-                        <TableCell>
-                          {attempt.resultJson?.completedItemCount ?? 0}/
-                          {attempt.resultJson?.totalPoints ?? 0}
-                        </TableCell>
-                        <TableCell>
-                          {formatAttemptDuration(
-                            attempt.resultJson?.durationSeconds ?? 0
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {formatAssignmentResultDate(attempt.completedAt)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {resultView.filteredAttemptRows.map(
+                      ({ attempt, review }) => (
+                        <TableRow key={attempt.id}>
+                          <TableCell>
+                            {review?.studentLabel ||
+                              attempt.studentName ||
+                              'Anonymous student'}
+                          </TableCell>
+                          <TableCell>
+                            {attempt.score ?? 0}/{attempt.maxScore ?? 0}
+                          </TableCell>
+                          <TableCell>
+                            {attempt.resultJson?.accuracy ?? 0}%
+                          </TableCell>
+                          <TableCell>
+                            {attempt.resultJson?.completedItemCount ?? 0}/
+                            {attempt.resultJson?.totalPoints ?? 0}
+                          </TableCell>
+                          <TableCell>
+                            {formatAttemptDuration(
+                              attempt.resultJson?.durationSeconds ?? 0
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {formatAssignmentResultDate(attempt.completedAt)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
                   </TableBody>
                 </Table>
               ) : data.attempts.length > 0 ? (
@@ -650,17 +638,12 @@ function AssignmentResultsPage() {
                   />
                 </div>
                 <CardDescription>
-                  <p>
-                    {buildAttemptReviewSubmissionSummary({
-                      shownAttempts: filteredAttemptReviews.length,
-                      totalAttempts: data.analysis.attempts.length,
-                    })}
-                  </p>
+                  <p>{resultView.attemptReviewSubmissionSummary}</p>
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3">
-                {filteredAttemptReviews.length > 0 ? (
-                  filteredAttemptReviews.map((attempt) => (
+                {resultView.filteredAttemptReviews.length > 0 ? (
+                  resultView.filteredAttemptReviews.map((attempt) => (
                     <AttemptReviewCard key={attempt.id} attempt={attempt} />
                   ))
                 ) : (
@@ -759,28 +742,20 @@ function ClassroomBriefCard({
 }
 
 function ResultStudentSearch({
-  matchedAttempts,
-  matchedStudents,
   onClear,
   onSearch,
   onSortChange,
   sort,
+  summary,
   value,
 }: {
-  matchedAttempts: number;
-  matchedStudents: number;
   onClear: () => void;
   onSearch: (value: string) => void;
   onSortChange: (sort: StudentSummarySort) => void;
   sort: StudentSummarySort;
+  summary: string;
   value: string;
 }) {
-  const summary = buildResultSearchSummary({
-    matchedAttempts,
-    matchedStudents,
-    search: value,
-  });
-
   return (
     <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
       <div className="grid gap-2">
