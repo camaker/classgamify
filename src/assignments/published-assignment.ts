@@ -21,7 +21,10 @@ export type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentListItem['assignment'];
   body: string;
   sharePath: string;
+  showDismissAction: boolean;
   showMissingHint: boolean;
+  showResultsAction: boolean;
+  showShareActions: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
 };
@@ -44,7 +47,10 @@ export function buildPublishedAssignmentPanelContext<
       assignment,
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
       sharePath: buildAssignmentSharePath(shareSlug),
+      showDismissAction: true,
       showMissingHint: false,
+      showResultsAction: true,
+      showShareActions: true,
       status: 'found',
       title: assignment.title,
     };
@@ -54,7 +60,10 @@ export function buildPublishedAssignmentPanelContext<
     return {
       body: 'Loading the newly published assignment link and classroom actions.',
       sharePath: buildAssignmentSharePath(shareSlug),
+      showDismissAction: true,
       showMissingHint: false,
+      showResultsAction: false,
+      showShareActions: true,
       status: 'loading',
       title: 'Student share link is being prepared.',
     };
@@ -63,7 +72,10 @@ export function buildPublishedAssignmentPanelContext<
   return {
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
     sharePath: buildAssignmentSharePath(shareSlug),
+    showDismissAction: true,
     showMissingHint: true,
+    showResultsAction: false,
+    showShareActions: true,
     status: 'missing',
     title: 'Student share link is ready.',
   };

@@ -1320,7 +1320,10 @@ assert.deepEqual(
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
     sharePath: '/play/share-2',
+    showDismissAction: true,
     showMissingHint: false,
+    showResultsAction: true,
+    showShareActions: true,
     status: 'found',
     title: 'Week 2',
   }
@@ -1334,7 +1337,10 @@ assert.deepEqual(
   {
     body: 'Loading the newly published assignment link and classroom actions.',
     sharePath: '/play/share-2',
+    showDismissAction: true,
     showMissingHint: false,
+    showResultsAction: false,
+    showShareActions: true,
     status: 'loading',
     title: 'Student share link is being prepared.',
   }
@@ -1348,7 +1354,10 @@ assert.deepEqual(
   {
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
     sharePath: '/play/missing',
+    showDismissAction: true,
     showMissingHint: true,
+    showResultsAction: false,
+    showShareActions: true,
     status: 'missing',
     title: 'Student share link is ready.',
   }

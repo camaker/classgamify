@@ -402,7 +402,7 @@ function PublishedAssignmentPanel({
         ) : null}
       </div>
       <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-        {assignment ? (
+        {panelContext.showResultsAction && assignment ? (
           <Link
             to="/dashboard/assignments/$assignmentId"
             params={{ assignmentId: assignment.id }}
@@ -415,30 +415,36 @@ function PublishedAssignmentPanel({
             {assignmentListActionCopy.viewResults}
           </Link>
         ) : null}
-        <Link
-          to="/play/$shareId"
-          params={{ shareId: shareSlug }}
-          className={cn(
-            buttonVariants({ variant: 'outline' }),
-            'w-full bg-background sm:w-auto'
-          )}
-        >
-          <IconPlayerPlay className="size-4" />
-          {assignmentListActionCopy.openPublishedLink}
-        </Link>
-        <CopyAssignmentShareLinkButton
-          shareSlug={shareSlug}
-          className="w-full bg-background sm:w-auto"
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          className="w-full sm:w-auto"
-          onClick={onDismiss}
-        >
-          <IconX className="size-4" />
-          {assignmentListActionCopy.dismiss}
-        </Button>
+        {panelContext.showShareActions ? (
+          <>
+            <Link
+              to="/play/$shareId"
+              params={{ shareId: shareSlug }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background sm:w-auto'
+              )}
+            >
+              <IconPlayerPlay className="size-4" />
+              {assignmentListActionCopy.openPublishedLink}
+            </Link>
+            <CopyAssignmentShareLinkButton
+              shareSlug={shareSlug}
+              className="w-full bg-background sm:w-auto"
+            />
+          </>
+        ) : null}
+        {panelContext.showDismissAction ? (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full sm:w-auto"
+            onClick={onDismiss}
+          >
+            <IconX className="size-4" />
+            {assignmentListActionCopy.dismiss}
+          </Button>
+        ) : null}
       </div>
     </section>
   );
