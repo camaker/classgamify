@@ -1,3 +1,9 @@
+import type { AssignmentSettings } from '@/activities/types';
+import type { AssignmentDate } from '@/assignments/lifecycle';
+import {
+  buildPublicAssignmentRuleSummaryFromSettings,
+  type PublicAssignmentRuleSummaryItem,
+} from '@/assignments/delivery-summary';
 import {
   formatRuntimeItemKindLabel,
   formatRuntimeItemPrompt,
@@ -11,6 +17,7 @@ import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import {
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
+  getStudentRunnerCopy,
   isStudentAnswerFilled,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
@@ -43,6 +50,40 @@ type PublicAnswerFeedbackView = {
   status: 'correct' | 'needs-review';
   statusLabel: string;
 };
+
+type StudentRunnerHeaderView = {
+  description: string;
+  instructions?: string;
+  ruleItems: PublicAssignmentRuleSummaryItem[];
+  teacherActionLabel: string;
+  title: string;
+};
+
+type StudentRunnerHeaderAssignment = {
+  expiresAt: AssignmentDate;
+  settings: AssignmentSettings;
+  title: string;
+};
+
+export function buildStudentRunnerHeaderView({
+  assignment,
+  itemCount,
+}: {
+  assignment: StudentRunnerHeaderAssignment;
+  itemCount: number;
+}): StudentRunnerHeaderView {
+  return {
+    description: getStudentRunnerCopy().publicAssignmentDescription,
+    instructions: assignment.settings.instructions?.trim() || undefined,
+    ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
+      expiresAt: assignment.expiresAt ?? null,
+      itemCount,
+      settings: assignment.settings,
+    }),
+    teacherActionLabel: getStudentRunnerCopy().teacherViewLabel,
+    title: assignment.title,
+  };
+}
 
 export function buildStudentRunnerView({
   answers,

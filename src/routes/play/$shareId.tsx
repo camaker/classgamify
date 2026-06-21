@@ -4,13 +4,10 @@ import {
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
+import type { ActivityTemplateType } from '@/activities/types';
 import type {
-  ActivityTemplateType,
-  AssignmentSettings,
-} from '@/activities/types';
-import {
-  type PublicAssignmentRuleSummaryId,
-  buildPublicAssignmentRuleSummaryFromSettings,
+  PublicAssignmentRuleSummaryId,
+  PublicAssignmentRuleSummaryItem,
 } from '@/assignments/delivery-summary';
 import { buildAttemptTimerState } from '@/assignments/attempt-duration';
 import {
@@ -32,7 +29,10 @@ import {
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
 } from '@/assignments/student-runner-state';
-import { buildStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildStudentRunnerHeaderView,
+  buildStudentRunnerView,
+} from '@/assignments/student-runner-view';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -316,6 +316,10 @@ function PlayPage() {
     );
   }
 
+  const headerView = buildStudentRunnerHeaderView({
+    assignment: pageState.assignment,
+    itemCount,
+  });
   const runnerUiCopy = getActivityTemplateRunnerCopy(activity.templateType);
 
   return (
@@ -328,21 +332,17 @@ function PlayPage() {
               {runnerCopy.publicRouteBadgeLabel}
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight">
-              {assignment.title}
+              {headerView.title}
             </h1>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              {runnerCopy.publicAssignmentDescription}
+              {headerView.description}
             </p>
-            {assignment.settings.instructions ? (
+            {headerView.instructions ? (
               <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6 text-muted-foreground">
-                {assignment.settings.instructions}
+                {headerView.instructions}
               </div>
             ) : null}
-            <PublicAssignmentRules
-              expiresAt={assignment.expiresAt ?? null}
-              itemCount={itemCount}
-              settings={assignment.settings}
-            />
+            <PublicAssignmentRules rules={headerView.ruleItems} />
           </div>
           <Link
             to={Routes.Create}
@@ -351,7 +351,7 @@ function PlayPage() {
               'w-fit bg-background'
             )}
           >
-            {runnerCopy.teacherViewLabel}
+            {headerView.teacherActionLabel}
           </Link>
         </section>
 
@@ -474,20 +474,10 @@ function PlayPage() {
 }
 
 function PublicAssignmentRules({
-  expiresAt,
-  itemCount,
-  settings,
+  rules,
 }: {
-  expiresAt: Date | null;
-  itemCount: number;
-  settings: AssignmentSettings;
+  rules: PublicAssignmentRuleSummaryItem[];
 }) {
-  const rules = buildPublicAssignmentRuleSummaryFromSettings({
-    expiresAt,
-    itemCount,
-    settings,
-  });
-
   return (
     <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {rules.map((rule) => (

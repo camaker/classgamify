@@ -125,6 +125,7 @@ import {
   buildPublicAnswerFeedbackView,
   buildRuntimeChoiceViews,
   buildSequentialRunnerView,
+  buildStudentRunnerHeaderView,
   buildStudentRunnerView,
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
@@ -1853,6 +1854,54 @@ assert.deepEqual(
     { id: 'identity', label: 'Student identity', value: 'Names' },
     { id: 'answerReveal', label: 'Review', value: 'After submit' },
   ]
+);
+assert.deepEqual(
+  buildStudentRunnerHeaderView({
+    assignment: {
+      expiresAt: null,
+      settings: {
+        collectStudentName: true,
+        instructions: '  Read each prompt carefully.  ',
+        maxAttempts: 3,
+        showCorrectAnswers: true,
+        shuffleItems: false,
+        timeLimitSeconds: 120,
+      },
+      title: 'Public assignment',
+    },
+    itemCount: 2,
+  }),
+  {
+    description:
+      "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
+    instructions: 'Read each prompt carefully.',
+    ruleItems: [
+      { id: 'items', label: 'Items', value: '2 items' },
+      { id: 'attempts', label: 'Attempts', value: '3 max' },
+      { id: 'timer', label: 'Timer', value: '2 min' },
+      { id: 'closes', label: 'Closes', value: 'No close time' },
+      { id: 'identity', label: 'Student identity', value: 'Names' },
+      { id: 'answerReveal', label: 'Review', value: 'After submit' },
+    ],
+    teacherActionLabel: 'Teacher view',
+    title: 'Public assignment',
+  }
+);
+assert.equal(
+  buildStudentRunnerHeaderView({
+    assignment: {
+      expiresAt: null,
+      settings: {
+        collectStudentName: false,
+        instructions: '   ',
+        showCorrectAnswers: false,
+        shuffleItems: true,
+      },
+      title: 'Anonymous assignment',
+    },
+    itemCount: 1,
+  }).instructions,
+  undefined
 );
 const publicPayloadActivityContent = buildActivityContent({
   description: 'Original activity payload source',
