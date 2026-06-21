@@ -1,4 +1,7 @@
-import { buildAssignmentShareUrl } from '@/assignments/share-link';
+import {
+  assignmentShareLinkActionCopy,
+  buildAssignmentShareUrl,
+} from '@/assignments/share-link';
 import { Button } from '@/components/ui/button';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import { IconCopy } from '@tabler/icons-react';
@@ -14,12 +17,12 @@ export function CopyAssignmentShareLinkButton({
   async function copyShareLink() {
     try {
       await copyTextToClipboard(buildAssignmentShareUrl(shareSlug));
-      toast.success('Student link copied.');
+      toast.success(assignmentShareLinkActionCopy.successMessage);
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Student link could not be copied.'
+          : assignmentShareLinkActionCopy.failureMessage
       );
     }
   }
@@ -32,7 +35,7 @@ export function CopyAssignmentShareLinkButton({
       onClick={copyShareLink}
     >
       <IconCopy className="size-4" />
-      Copy link
+      {assignmentShareLinkActionCopy.copyLabel}
     </Button>
   );
 }

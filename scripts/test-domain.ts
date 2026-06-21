@@ -206,6 +206,7 @@ import {
   findPublishedAssignmentInList,
 } from '@/assignments/published-assignment';
 import {
+  assignmentShareLinkActionCopy,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
@@ -824,6 +825,11 @@ assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
   'https://classgamify.test/play/abc%20123'
 );
+assert.deepEqual(assignmentShareLinkActionCopy, {
+  copyLabel: 'Copy link',
+  failureMessage: 'Student link could not be copied.',
+  successMessage: 'Student link copied.',
+});
 assert.equal(parseOptionalWholeNumber(''), undefined);
 assert.equal(parseOptionalWholeNumber(' 12 '), 12);
 assert.equal(parseOptionalWholeNumber('1.5'), undefined);

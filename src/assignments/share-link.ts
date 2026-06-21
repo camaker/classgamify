@@ -1,3 +1,9 @@
+export const assignmentShareLinkActionCopy = {
+  copyLabel: 'Copy link',
+  failureMessage: 'Student link could not be copied.',
+  successMessage: 'Student link copied.',
+} as const;
+
 export function buildAssignmentSharePath(shareSlug: string) {
   return `/play/${encodeURIComponent(shareSlug)}`;
 }
