@@ -6,6 +6,7 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   type AttemptReviewFilter,
+  type AssignmentResultEmptyState,
   type AssignmentResultAction,
   type ItemPerformanceSort,
   type StudentSummarySort,
@@ -554,7 +555,9 @@ function AssignmentResultsPage() {
                 {resultView.filteredStudents.length > 0 ? (
                   <StudentSummaryTable students={resultView.filteredStudents} />
                 ) : (
-                  <NoMatchingStudents />
+                  <ResultEmptyState
+                    state={resultView.emptyStates.studentSummary}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -618,17 +621,9 @@ function AssignmentResultsPage() {
                   </TableBody>
                 </Table>
               ) : data.attempts.length > 0 ? (
-                <NoMatchingStudents />
+                <ResultEmptyState state={resultView.emptyStates.attemptRows} />
               ) : (
-                <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-                  <h2 className="text-base font-semibold">
-                    No student attempts yet.
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Share the student link, then completed submissions will
-                    appear here.
-                  </p>
-                </div>
+                <ResultEmptyState state={resultView.emptyStates.attemptRows} />
               )}
             </CardContent>
           </Card>
@@ -664,7 +659,9 @@ function AssignmentResultsPage() {
                     <AttemptReviewCard key={attempt.id} attempt={attempt} />
                   ))
                 ) : (
-                  <NoMatchingStudents />
+                  <ResultEmptyState
+                    state={resultView.emptyStates.attemptReview}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -826,12 +823,18 @@ function ResultStudentSearch({
   );
 }
 
-function NoMatchingStudents() {
+function ResultEmptyState({
+  state,
+}: {
+  state: AssignmentResultEmptyState | undefined;
+}) {
+  if (!state) return null;
+
   return (
     <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-      <h2 className="text-base font-semibold">No matching students.</h2>
+      <h2 className="text-base font-semibold">{state.title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        Clear the search or try another student name from this assignment.
+        {state.description}
       </p>
     </div>
   );

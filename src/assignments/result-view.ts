@@ -36,6 +36,11 @@ export type AssignmentResultActionGate =
       type: 'blocked';
     };
 
+export type AssignmentResultEmptyState = {
+  description: string;
+  title: string;
+};
+
 export type ResultSearchSummaryInput = {
   matchedAttempts: number;
   matchedStudents: number;
@@ -101,6 +106,24 @@ export function buildAssignmentResultViewModel<
       shownAttempts: filteredAttemptReviews.length,
       totalAttempts: reviews.length,
     }),
+    emptyStates: {
+      attemptReview: buildAssignmentResultEmptyState({
+        filter: attemptReviewFilter,
+        search,
+        surface: 'attempt-review',
+        totalAttemptReviews: reviews.length,
+      }),
+      attemptRows: buildAssignmentResultEmptyState({
+        search,
+        surface: 'attempt-rows',
+        totalAttempts: attempts.length,
+      }),
+      studentSummary: buildAssignmentResultEmptyState({
+        search,
+        surface: 'student-summary',
+        totalStudents: students.length,
+      }),
+    },
     filteredAttemptReviews,
     filteredAttemptRows,
     filteredStudents,
@@ -111,6 +134,94 @@ export function buildAssignmentResultViewModel<
     }),
     sortedPerformanceItems: sortItemPerformance(items, itemPerformanceSort),
   };
+}
+
+export function buildAssignmentResultEmptyState(
+  input:
+    | {
+        search: string;
+        surface: 'student-summary';
+        totalStudents: number;
+      }
+    | {
+        search: string;
+        surface: 'attempt-rows';
+        totalAttempts: number;
+      }
+    | {
+        filter: AttemptReviewFilter;
+        search: string;
+        surface: 'attempt-review';
+        totalAttemptReviews: number;
+      }
+): AssignmentResultEmptyState | undefined {
+  const hasSearch = Boolean(normalizeResultSearch(input.search));
+
+  if (input.surface === 'student-summary') {
+    if (input.totalStudents === 0) {
+      return {
+        description:
+          'Student summaries appear after at least one submitted attempt.',
+        title: 'No student summaries yet.',
+      };
+    }
+
+    if (hasSearch) {
+      return {
+        description:
+          'Clear the search or try another student name from this assignment.',
+        title: 'No matching students.',
+      };
+    }
+
+    return undefined;
+  }
+
+  if (input.surface === 'attempt-rows') {
+    if (input.totalAttempts === 0) {
+      return {
+        description:
+          'Share the student link, then completed submissions will appear here.',
+        title: 'No student attempts yet.',
+      };
+    }
+
+    if (hasSearch) {
+      return {
+        description:
+          'Clear the search or try another student name from this assignment.',
+        title: 'No matching attempts.',
+      };
+    }
+
+    return undefined;
+  }
+
+  if (input.totalAttemptReviews === 0) {
+    return {
+      description:
+        'Completed submissions will show item-level answer details here.',
+      title: 'No answers to review yet.',
+    };
+  }
+
+  if (hasSearch) {
+    return {
+      description:
+        'Clear the search or try another student name from this assignment.',
+      title: 'No matching answer reviews.',
+    };
+  }
+
+  if (input.filter === 'needs-review') {
+    return {
+      description:
+        'Every shown submission is currently correct for this assignment snapshot.',
+      title: 'No answers need review.',
+    };
+  }
+
+  return undefined;
 }
 
 export function filterAndSortStudentSummaries({

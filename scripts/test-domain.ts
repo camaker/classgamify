@@ -114,6 +114,7 @@ import {
   buildAttemptReviewSubmissionSummary,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
+  buildAssignmentResultEmptyState,
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
@@ -2669,6 +2670,64 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildAssignmentResultEmptyState({
+    search: '',
+    surface: 'attempt-rows',
+    totalAttempts: 0,
+  }),
+  {
+    description:
+      'Share the student link, then completed submissions will appear here.',
+    title: 'No student attempts yet.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultEmptyState({
+    search: ' alice ',
+    surface: 'student-summary',
+    totalStudents: 2,
+  }),
+  {
+    description:
+      'Clear the search or try another student name from this assignment.',
+    title: 'No matching students.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultEmptyState({
+    filter: 'needs-review',
+    search: '',
+    surface: 'attempt-review',
+    totalAttemptReviews: 2,
+  }),
+  {
+    description:
+      'Every shown submission is currently correct for this assignment snapshot.',
+    title: 'No answers need review.',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultEmptyState({
+    filter: 'all',
+    search: ' nobody ',
+    surface: 'attempt-review',
+    totalAttemptReviews: 2,
+  }),
+  {
+    description:
+      'Clear the search or try another student name from this assignment.',
+    title: 'No matching answer reviews.',
+  }
+);
+assert.equal(
+  buildAssignmentResultEmptyState({
+    search: '',
+    surface: 'student-summary',
+    totalStudents: 2,
+  }),
+  undefined
+);
+assert.deepEqual(
   sortStudentSummaries(resultAnalysis.students, 'attempts').map(
     (student) => student.studentLabel
   ),
@@ -2761,6 +2820,23 @@ assert.equal(
   assignmentResultViewModel.attemptReviewSubmissionSummary,
   'Showing 1 of 3 submissions.'
 );
+assert.deepEqual(assignmentResultViewModel.emptyStates, {
+  attemptReview: {
+    description:
+      'Clear the search or try another student name from this assignment.',
+    title: 'No matching answer reviews.',
+  },
+  attemptRows: {
+    description:
+      'Clear the search or try another student name from this assignment.',
+    title: 'No matching attempts.',
+  },
+  studentSummary: {
+    description:
+      'Clear the search or try another student name from this assignment.',
+    title: 'No matching students.',
+  },
+});
 assert.deepEqual(
   getAssignmentResultActionGate({
     action: 'export-csv',
