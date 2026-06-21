@@ -6,7 +6,6 @@ import {
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
-import type { RuntimeItem } from '@/activities/runtime';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
   type PublicAssignmentRuleSummaryId,
@@ -20,12 +19,7 @@ import {
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
-import {
-  buildPublicAssignmentPreviewActivity,
-  buildPublicAssignmentPreviewAssignment,
-  type PublicAttemptReviewItem,
-} from '@/assignments/public';
-import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
+import type { PublicAttemptReviewItem } from '@/assignments/public';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
@@ -37,6 +31,7 @@ import {
   getAttemptCompletionSummary,
   getStudentRunnerCopy,
 } from '@/assignments/student-submission';
+import { buildStudentRunnerPageState } from '@/assignments/student-runner-state';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -103,28 +98,31 @@ function PlayPage() {
       getRuntimeItems(starterActivity.templateType, starterActivity.content),
     [starterActivity]
   );
-  const assignment = data
-    ? buildPublicAssignmentPreviewAssignment(data)
-    : shareId === starterAssignment.shareId
-      ? starterAssignment
-      : undefined;
-  const activity = data
-    ? buildPublicAssignmentPreviewActivity(data)
-    : assignment
-      ? starterActivity
-      : undefined;
-  const runtimeItems = useMemo(() => {
-    const items = data
-      ? data.runtimeItems
-      : activity
-        ? starterRuntimeItems
-        : ([] as RuntimeItem[]);
-    return orderAssignmentRuntimeItems({
-      items,
-      shareSlug: assignment?.shareId ?? shareId,
-      shuffleItems: Boolean(assignment?.settings.shuffleItems),
-    });
-  }, [activity, assignment, data, starterRuntimeItems]);
+  const pageState = useMemo(
+    () =>
+      buildStudentRunnerPageState({
+        data,
+        isLoading,
+        shareId,
+        starterActivity,
+        starterAssignment,
+        starterRuntimeItems,
+      }),
+    [
+      data,
+      isLoading,
+      shareId,
+      starterActivity,
+      starterAssignment,
+      starterRuntimeItems,
+    ]
+  );
+  const assignment =
+    pageState.status === 'ready' ? pageState.assignment : undefined;
+  const activity =
+    pageState.status === 'ready' ? pageState.activity : undefined;
+  const runtimeItems =
+    pageState.status === 'ready' ? pageState.runtimeItems : [];
   const completionSummary = useMemo(
     () =>
       getAttemptCompletionSummary({
@@ -134,7 +132,8 @@ function PlayPage() {
     [answers, runtimeItems]
   );
   const itemCount = completionSummary.itemCount;
-  const canSubmit = Boolean(data) && itemCount > 0;
+  const canSubmit =
+    pageState.status === 'ready' && pageState.canSubmit && itemCount > 0;
   const activeShareId = assignment?.shareId ?? shareId;
   const startedAt =
     attemptClock?.shareId === activeShareId ? attemptClock.startedAt : now;
@@ -280,7 +279,7 @@ function PlayPage() {
       );
     }
   }
-  if (isLoading) {
+  if (pageState.status === 'loading') {
     return (
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-6xl rounded-lg border bg-card p-6">
@@ -292,7 +291,7 @@ function PlayPage() {
     );
   }
 
-  if (!assignment || !activity) {
+  if (pageState.status === 'missing') {
     return (
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
@@ -475,7 +474,7 @@ function PlayPage() {
           activity={activity}
           assignment={assignment}
           compact
-          hideAnswers={Boolean(data)}
+          hideAnswers={pageState.hidePreviewAnswers}
         />
       </div>
     </Container>

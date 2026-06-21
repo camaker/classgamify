@@ -243,6 +243,7 @@ import {
   buildAnonymousAttemptTokenStorageKey,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
+import { buildStudentRunnerPageState } from '@/assignments/student-runner-state';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
@@ -1504,6 +1505,93 @@ assert.deepEqual(publicAssignmentPayload.snapshot, {
 assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
 assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
+const runnerStateStarterActivity = {
+  content: publicPayloadSnapshotContent,
+  description: 'Starter activity description',
+  estimatedMinutes: 5,
+  id: 'activity-starter',
+  status: 'draft' as const,
+  templateType: 'quiz' as const,
+  title: 'Starter activity',
+};
+const runnerStateStarterAssignment = {
+  activityId: 'activity-starter',
+  averageScore: 0,
+  completions: 0,
+  expiresAt: null,
+  id: 'assignment-starter',
+  settings: {
+    collectStudentName: true,
+    showCorrectAnswers: true,
+    shuffleItems: false,
+  },
+  shareId: 'demo-runner',
+  status: 'published' as const,
+  title: 'Starter assignment',
+};
+const runnerStateStarterRuntimeItems = getRuntimeItems(
+  'quiz',
+  publicPayloadSnapshotContent
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: publicAssignmentPayload,
+    isLoading: true,
+    shareId: 'share-public',
+    starterActivity: runnerStateStarterActivity,
+    starterAssignment: runnerStateStarterAssignment,
+    starterRuntimeItems: runnerStateStarterRuntimeItems,
+  }),
+  { status: 'loading' }
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: null,
+    isLoading: false,
+    shareId: 'missing-share',
+    starterActivity: runnerStateStarterActivity,
+    starterAssignment: runnerStateStarterAssignment,
+    starterRuntimeItems: runnerStateStarterRuntimeItems,
+  }),
+  { status: 'missing' }
+);
+const publicRunnerState = buildStudentRunnerPageState({
+  data: publicAssignmentPayload,
+  isLoading: false,
+  shareId: 'share-public',
+  starterActivity: runnerStateStarterActivity,
+  starterAssignment: runnerStateStarterAssignment,
+  starterRuntimeItems: runnerStateStarterRuntimeItems,
+});
+if (publicRunnerState.status !== 'ready') {
+  throw new Error('Expected public runner state to be ready.');
+}
+assert.equal(publicRunnerState.source, 'public-assignment');
+assert.equal(publicRunnerState.canSubmit, true);
+assert.equal(publicRunnerState.hidePreviewAnswers, true);
+assert.equal(publicRunnerState.assignment.shareId, 'share-public');
+assert.equal(publicRunnerState.activity.title, 'Frozen activity title');
+assert.equal(publicRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
+assert.equal('answer' in publicRunnerState.runtimeItems[0]!, false);
+assert.equal('explanation' in publicRunnerState.runtimeItems[0]!, false);
+const starterRunnerState = buildStudentRunnerPageState({
+  data: null,
+  isLoading: false,
+  shareId: 'demo-runner',
+  starterActivity: runnerStateStarterActivity,
+  starterAssignment: runnerStateStarterAssignment,
+  starterRuntimeItems: runnerStateStarterRuntimeItems,
+});
+if (starterRunnerState.status !== 'ready') {
+  throw new Error('Expected starter runner state to be ready.');
+}
+assert.equal(starterRunnerState.source, 'starter-preview');
+assert.equal(starterRunnerState.canSubmit, false);
+assert.equal(starterRunnerState.hidePreviewAnswers, false);
+assert.equal(starterRunnerState.assignment.shareId, 'demo-runner');
+assert.equal(starterRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
+assert.equal('answer' in starterRunnerState.runtimeItems[0]!, false);
+assert.equal('explanation' in starterRunnerState.runtimeItems[0]!, false);
 assert.deepEqual(
   buildPublicAssignmentPreviewActivity(publicAssignmentPayload),
   {
