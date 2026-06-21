@@ -94,6 +94,16 @@ export function formatAttemptCompletionProgressLabel({
   return `${completionSummary.answeredItemCount}/${completionSummary.itemCount} ${progressVerb}`;
 }
 
+export function buildStudentAttemptSessionKey({
+  runtimeItems,
+  shareSlug,
+}: {
+  runtimeItems: StudentSubmissionRuntimeItem[];
+  shareSlug: string;
+}): string {
+  return JSON.stringify([shareSlug, runtimeItems.map((item) => item.id)]);
+}
+
 export function buildAttemptCompletionCopy({
   completionSummary,
   confirmIncompleteSubmit,

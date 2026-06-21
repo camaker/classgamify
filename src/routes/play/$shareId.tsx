@@ -28,6 +28,7 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
   buildStudentAttemptSubmissionInput,
+  buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
 } from '@/assignments/student-submission';
@@ -87,6 +88,7 @@ function PlayPage() {
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [anonymousToken, setAnonymousToken] = useState<string>();
+  const [attemptSessionKey, setAttemptSessionKey] = useState<string>();
   const starterAssignment = getStarterAssignment(shareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
   const starterRuntimeItems = useMemo(
@@ -142,6 +144,13 @@ function PlayPage() {
     completionSummary,
     confirmIncompleteSubmit,
   });
+  const currentAttemptSessionKey =
+    assignment && itemCount > 0
+      ? buildStudentAttemptSessionKey({
+          runtimeItems,
+          shareSlug: activeShareId,
+        })
+      : undefined;
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -152,6 +161,19 @@ function PlayPage() {
 
     return () => window.clearInterval(timer);
   }, [result, timeLimitSeconds]);
+
+  useEffect(() => {
+    if (!currentAttemptSessionKey) return;
+    if (attemptSessionKey === currentAttemptSessionKey) return;
+
+    setAnswers({});
+    setResult(undefined);
+    setConfirmIncompleteSubmit(false);
+    setStudentName('');
+    setAttemptClock(undefined);
+    setAnonymousToken(undefined);
+    setAttemptSessionKey(currentAttemptSessionKey);
+  }, [attemptSessionKey, currentAttemptSessionKey]);
 
   useEffect(() => {
     if (!assignment || itemCount === 0 || result) return;

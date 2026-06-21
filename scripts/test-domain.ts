@@ -173,6 +173,7 @@ import {
   buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
   buildStudentAttemptSubmissionInput,
+  buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
@@ -468,6 +469,33 @@ assert.equal(
     verb: '   ',
   }),
   '1/3 answered'
+);
+assert.equal(
+  buildStudentAttemptSessionKey({
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+  }),
+  '["share-one",["item-1","item-2","item-3"]]'
+);
+assert.notEqual(
+  buildStudentAttemptSessionKey({
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+  }),
+  buildStudentAttemptSessionKey({
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-two',
+  })
+);
+assert.notEqual(
+  buildStudentAttemptSessionKey({
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+  }),
+  buildStudentAttemptSessionKey({
+    runtimeItems: submissionRuntimeItems.slice().reverse(),
+    shareSlug: 'share-one',
+  })
 );
 
 assert.deepEqual(
