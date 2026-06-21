@@ -344,7 +344,7 @@ const activeShareSurfaceText = [
 ].join('\n');
 assert.doesNotMatch(
   activeShareSurfaceText,
-  /getlangstudy|Lang Study|HSK1 starter loop/i
+  /getlangstudy|Lang Study|HSK1 starter loop|TanStarter|mkfast-template/i
 );
 assert.match(activeShareSurfaceText, /ClassGamify/);
 
