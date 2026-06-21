@@ -6,9 +6,8 @@ import {
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { starterActivities } from '@/activities/catalog';
+import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
-import type { ActivityTemplateType } from '@/activities/types';
-import { activityTemplateTypeSchema } from '@/activities/validation';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { IconSparkles } from '@tabler/icons-react';
@@ -16,7 +15,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
-    template: parseTemplateSearch(search.template),
+    template: parseCreateActivityTemplateSearch(search.template),
   }),
   head: () =>
     seo('/create', {
@@ -82,10 +81,4 @@ function CreatePage() {
       </div>
     </Container>
   );
-}
-
-function parseTemplateSearch(value: unknown): ActivityTemplateType | undefined {
-  if (typeof value !== 'string') return undefined;
-  const parsed = activityTemplateTypeSchema.safeParse(value);
-  return parsed.success ? parsed.data : undefined;
 }

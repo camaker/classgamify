@@ -59,6 +59,12 @@ export function parseActivityTemplateFilter(
   return isActivityTemplateType(value) ? value : undefined;
 }
 
+export function parseCreateActivityTemplateSearch(
+  value: unknown
+): ActivityTemplateType | undefined {
+  return isActivityTemplateType(value) ? value : undefined;
+}
+
 export function isActivityTemplateType(
   value: unknown
 ): value is ActivityTemplateType {

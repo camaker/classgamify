@@ -12,6 +12,7 @@ import {
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
   parseActivityTemplateFilter,
+  parseCreateActivityTemplateSearch,
 } from '@/activities/library-filters';
 import {
   buildActivityDraftPrompt,
@@ -687,6 +688,9 @@ assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
 assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
 assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
+assert.equal(parseCreateActivityTemplateSearch('line-match'), 'line-match');
+assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
+assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
 assert.deepEqual(
