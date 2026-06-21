@@ -2,6 +2,11 @@ import type {
   ActivityLibraryStatus,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
+import {
+  canDeriveActivityWork,
+  isActivityArchived,
+} from '@/activities/lifecycle';
+import type { ActivityVisibility } from '@/activities/types';
 
 type ActivityLibraryStatusOption = {
   label: string;
@@ -21,6 +26,18 @@ type ActivityLibraryCardStat = {
   key: ActivityLibraryCardStatKey;
   label: string;
   value: number;
+};
+
+type ActivityLibraryCardActionState = {
+  canCreateDerivedWork: boolean;
+  showArchiveAction: boolean;
+  showDerivativeActions: boolean;
+  showEditAction: boolean;
+  showPersistedActions: boolean;
+  showPublishAction: boolean;
+  showRestoreAction: boolean;
+  showRestoreRequiredMessage: boolean;
+  showRemixActions: boolean;
 };
 
 export const activityLibraryPageCopy = {
@@ -157,4 +174,33 @@ export function buildActivityLibraryRemixActionLabel(shortName: string) {
   const templateName = shortName.trim();
 
   return `Copy as ${templateName || 'template'}`;
+}
+
+export function buildActivityLibraryCardActionState({
+  libraryStatus,
+  persisted,
+  readyRemixCount,
+  visibility,
+}: {
+  libraryStatus: ActivityLibraryStatus;
+  persisted: boolean;
+  readyRemixCount: number;
+  visibility: ActivityVisibility;
+}): ActivityLibraryCardActionState {
+  const showActiveActions = libraryStatus === 'active';
+  const canCreateDerivedWork = canDeriveActivityWork(visibility);
+  const showDerivativeActions = persisted && canCreateDerivedWork;
+
+  return {
+    canCreateDerivedWork,
+    showArchiveAction: persisted && showActiveActions,
+    showDerivativeActions,
+    showEditAction: persisted && showActiveActions,
+    showPersistedActions: persisted,
+    showPublishAction: persisted && showActiveActions,
+    showRestoreAction: persisted && !showActiveActions,
+    showRestoreRequiredMessage:
+      persisted && !showActiveActions && isActivityArchived(visibility),
+    showRemixActions: showDerivativeActions && readyRemixCount > 0,
+  };
 }

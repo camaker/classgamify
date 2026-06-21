@@ -14,6 +14,7 @@ import {
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
@@ -1979,6 +1980,72 @@ assert.equal(
 assert.equal(buildActivityLibraryRemixHint([]), undefined);
 assert.equal(buildActivityLibraryRemixActionLabel('Fill'), 'Copy as Fill');
 assert.equal(buildActivityLibraryRemixActionLabel('   '), 'Copy as template');
+assert.deepEqual(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'active',
+    persisted: true,
+    readyRemixCount: 2,
+    visibility: 'draft',
+  }),
+  {
+    canCreateDerivedWork: true,
+    showArchiveAction: true,
+    showDerivativeActions: true,
+    showEditAction: true,
+    showPersistedActions: true,
+    showPublishAction: true,
+    showRestoreAction: false,
+    showRestoreRequiredMessage: false,
+    showRemixActions: true,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'archived',
+    persisted: true,
+    readyRemixCount: 2,
+    visibility: 'archived',
+  }),
+  {
+    canCreateDerivedWork: false,
+    showArchiveAction: false,
+    showDerivativeActions: false,
+    showEditAction: false,
+    showPersistedActions: true,
+    showPublishAction: false,
+    showRestoreAction: true,
+    showRestoreRequiredMessage: true,
+    showRemixActions: false,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'active',
+    persisted: false,
+    readyRemixCount: 2,
+    visibility: 'draft',
+  }),
+  {
+    canCreateDerivedWork: true,
+    showArchiveAction: false,
+    showDerivativeActions: false,
+    showEditAction: false,
+    showPersistedActions: false,
+    showPublishAction: false,
+    showRestoreAction: false,
+    showRestoreRequiredMessage: false,
+    showRemixActions: false,
+  }
+);
+assert.equal(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'active',
+    persisted: true,
+    readyRemixCount: 0,
+    visibility: 'published',
+  }).showRemixActions,
+  false
+);
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
 assert.deepEqual(

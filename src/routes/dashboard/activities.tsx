@@ -6,9 +6,7 @@ import {
 import {
   type ActivityDerivativeAction,
   buildActivityDerivativeActionGate,
-  canDeriveActivityWork,
   getActivityLifecycleActionCopy,
-  isActivityArchived,
 } from '@/activities/lifecycle';
 import {
   type ActivityLibraryStatus,
@@ -31,6 +29,7 @@ import {
   activityLibraryCardCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryCardActionState,
   buildActivityLibraryCardStats,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
@@ -582,11 +581,15 @@ function ActivityCard({
   const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
   const publishValidation = validateAssignmentPublishDraft(publishDraft);
   const template = getTemplateByType(activity.templateType);
-  const isArchived = isActivityArchived(activity.status);
-  const canCreateDerivedWork = canDeriveActivityWork(activity.status);
   const cardSummary = buildActivityLibraryCardSummary({
     content: activity.content,
     templateType: template.type,
+  });
+  const cardActionState = buildActivityLibraryCardActionState({
+    libraryStatus,
+    persisted: activity.persisted,
+    readyRemixCount: cardSummary.suggestedTemplateOptions.length,
+    visibility: activity.status,
   });
   const cardStats = buildActivityLibraryCardStats({
     groups: cardSummary.contentCounts.groups,
@@ -759,9 +762,7 @@ function ActivityCard({
               {remixHint}
             </p>
           ) : null}
-          {activity.persisted &&
-          canCreateDerivedWork &&
-          cardSummary.suggestedTemplateOptions.length ? (
+          {cardActionState.showRemixActions ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {cardSummary.suggestedTemplateOptions
                 .slice(0, 3)
@@ -796,9 +797,9 @@ function ActivityCard({
             </div>
           ) : null}
         </div>
-        {activity.persisted ? (
+        {cardActionState.showPersistedActions ? (
           <div className="flex flex-col gap-2 sm:flex-row">
-            {libraryStatus === 'active' ? (
+            {cardActionState.showEditAction ? (
               <Link
                 to="/dashboard/activities/$activityId"
                 params={{ activityId: activity.id }}
@@ -811,7 +812,7 @@ function ActivityCard({
                 {activityLibraryCardCopy.actionLabels.edit}
               </Link>
             ) : null}
-            {canCreateDerivedWork ? (
+            {cardActionState.showDerivativeActions ? (
               <Button
                 type="button"
                 variant="outline"
@@ -823,44 +824,51 @@ function ActivityCard({
                 {activityLibraryCardCopy.actionLabels.duplicate}
               </Button>
             ) : null}
-            {libraryStatus === 'active' ? (
+            {cardActionState.showArchiveAction ||
+            cardActionState.showPublishAction ? (
               <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full bg-background sm:w-fit"
-                  disabled={archiveMutation.isPending}
-                  onClick={archiveActivity}
-                >
-                  <IconFolderOff className="size-4" />
-                  {activityLibraryCardCopy.actionLabels.archive}
-                </Button>
-                <Button
-                  type="button"
-                  className="w-full sm:w-fit"
-                  disabled={publishMutation.isPending}
-                  onClick={() => setPublishDialogOpen(true)}
-                >
-                  <IconPlus className="size-4" />
-                  {activityLibraryCardCopy.actionLabels.publish}
-                </Button>
+                {cardActionState.showArchiveAction ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full bg-background sm:w-fit"
+                    disabled={archiveMutation.isPending}
+                    onClick={archiveActivity}
+                  >
+                    <IconFolderOff className="size-4" />
+                    {activityLibraryCardCopy.actionLabels.archive}
+                  </Button>
+                ) : null}
+                {cardActionState.showPublishAction ? (
+                  <Button
+                    type="button"
+                    className="w-full sm:w-fit"
+                    disabled={publishMutation.isPending}
+                    onClick={() => setPublishDialogOpen(true)}
+                  >
+                    <IconPlus className="size-4" />
+                    {activityLibraryCardCopy.actionLabels.publish}
+                  </Button>
+                ) : null}
               </>
             ) : (
               <>
-                {isArchived ? (
+                {cardActionState.showRestoreRequiredMessage ? (
                   <p className="text-sm text-muted-foreground sm:mr-auto">
                     {activityLibraryCardCopy.restoreRequiredMessage}
                   </p>
                 ) : null}
-                <Button
-                  type="button"
-                  className="w-full sm:w-fit"
-                  disabled={restoreMutation.isPending}
-                  onClick={restoreActivity}
-                >
-                  <IconRotateClockwise className="size-4" />
-                  {activityLibraryCardCopy.actionLabels.restore}
-                </Button>
+                {cardActionState.showRestoreAction ? (
+                  <Button
+                    type="button"
+                    className="w-full sm:w-fit"
+                    disabled={restoreMutation.isPending}
+                    onClick={restoreActivity}
+                  >
+                    <IconRotateClockwise className="size-4" />
+                    {activityLibraryCardCopy.actionLabels.restore}
+                  </Button>
+                ) : null}
               </>
             )}
           </div>
