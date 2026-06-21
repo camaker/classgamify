@@ -1655,6 +1655,51 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    expiresAt: null,
+    maxAttempts: 0,
+    timeLimitSeconds: 0,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', 'Open'],
+    ['timer', 'No timer'],
+    ['closes', 'No close time'],
+    ['identity', 'Names'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    expiresAt: null,
+    maxAttempts: -1,
+    timeLimitSeconds: -60,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', 'Open'],
+    ['timer', 'No timer'],
+    ['closes', 'No close time'],
+    ['identity', 'Names'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    expiresAt: null,
+    maxAttempts: 1.5,
+    timeLimitSeconds: 61,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', 'Open'],
+    ['timer', '2 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Names'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
 const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   expiresAt: null,
   settings: {

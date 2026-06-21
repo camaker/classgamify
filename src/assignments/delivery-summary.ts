@@ -165,7 +165,7 @@ export function formatAssignmentItemCount(itemCount: number) {
 }
 
 function formatAssignmentAttempts(maxAttempts?: number | null) {
-  return maxAttempts ? `${maxAttempts} max` : 'Open';
+  return isPositiveWholeNumber(maxAttempts) ? `${maxAttempts} max` : 'Open';
 }
 
 export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
@@ -181,9 +181,19 @@ export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
 }
 
 function formatAssignmentTimeLimit(seconds?: number | null) {
-  if (!seconds) return 'No timer';
-  const minutes = Math.round(seconds / 60);
+  if (!isPositiveWholeNumber(seconds)) return 'No timer';
+
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
   return `${minutes} min`;
+}
+
+function isPositiveWholeNumber(value?: number | null) {
+  return (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    Number.isInteger(value) &&
+    value > 0
+  );
 }
 
 function formatStudentIdentity(collectStudentName: boolean) {
