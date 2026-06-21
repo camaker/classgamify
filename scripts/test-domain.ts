@@ -150,6 +150,7 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
   parseAssignmentDateTimeLocal,
@@ -429,6 +430,54 @@ assert.equal(
 assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+);
+assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: false,
+    expiresAtLocal: '2026-01-10T09:30',
+    instructions: '  Finish before class.  ',
+    maxAttempts: '3',
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitMinutes: '15',
+    title: 'Week 1 review',
+  }),
+  {
+    expiresAt: new Date('2026-01-10T09:30'),
+    settings: {
+      collectStudentName: false,
+      instructions: 'Finish before class.',
+      maxAttempts: 3,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 900,
+    },
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: 'not-a-date',
+    instructions: '  ',
+    maxAttempts: 'abc',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '1.5',
+    title: 'Week 1 review',
+  }),
+  {
+    expiresAt: null,
+    settings: {
+      collectStudentName: true,
+      instructions: undefined,
+      maxAttempts: undefined,
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitSeconds: undefined,
+    },
+  }
 );
 assert.deepEqual(
   buildAssignmentPublishInputFromDraft({

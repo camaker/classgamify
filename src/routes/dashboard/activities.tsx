@@ -30,10 +30,9 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import {
+  buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   formatAssignmentDateTimeLocal,
-  parseAssignmentDateTimeLocal,
-  parseOptionalWholeNumber,
 } from '@/assignments/publish-input';
 import { defaultAssignmentSettings } from '@/assignments/validation';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -523,8 +522,17 @@ function ActivityCard({
   );
   const [timeLimitMinutes, setTimeLimitMinutes] = useState('');
   const [expiresAtLocal, setExpiresAtLocal] = useState('');
-  const previewTimeLimit = parseOptionalWholeNumber(timeLimitMinutes);
-  const previewExpiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
+  const publishPreview = buildAssignmentPublishPreviewFromDraft({
+    activityId: activity.id,
+    collectStudentName,
+    expiresAtLocal,
+    instructions: assignmentInstructions,
+    maxAttempts,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitMinutes,
+    title: assignmentTitle,
+  });
   const template = getTemplateByType(activity.templateType);
   const isArchived = isActivityArchived(activity.status);
   const canCreateDerivedWork = canDeriveActivityWork(activity.status);
@@ -926,15 +934,13 @@ function ActivityCard({
             <div className="grid gap-2">
               <p className="font-medium text-sm">Delivery preview</p>
               <AssignmentSettingsSummary
-                collectStudentName={collectStudentName}
-                expiresAt={previewExpiresAt ?? null}
-                instructions={assignmentInstructions.trim() || undefined}
-                maxAttempts={Number(maxAttempts) || undefined}
-                showCorrectAnswers={showCorrectAnswers}
-                shuffleItems={shuffleItems}
-                timeLimitSeconds={
-                  previewTimeLimit ? previewTimeLimit * 60 : undefined
-                }
+                collectStudentName={publishPreview.settings.collectStudentName}
+                expiresAt={publishPreview.expiresAt}
+                instructions={publishPreview.settings.instructions}
+                maxAttempts={publishPreview.settings.maxAttempts}
+                showCorrectAnswers={publishPreview.settings.showCorrectAnswers}
+                shuffleItems={publishPreview.settings.shuffleItems}
+                timeLimitSeconds={publishPreview.settings.timeLimitSeconds}
               />
             </div>
           </div>

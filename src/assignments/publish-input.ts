@@ -1,3 +1,5 @@
+import type { AssignmentSettings } from '@/activities/types';
+
 export function formatAssignmentDateTimeLocal(date: Date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return localDate.toISOString().slice(0, 16);
@@ -51,6 +53,37 @@ export type AssignmentPublishDraftResult =
       message: string;
       ok: false;
     };
+
+export type AssignmentPublishPreview = {
+  expiresAt: Date | null;
+  settings: AssignmentSettings;
+};
+
+export function buildAssignmentPublishPreviewFromDraft({
+  collectStudentName,
+  expiresAtLocal,
+  instructions,
+  maxAttempts,
+  showCorrectAnswers,
+  shuffleItems,
+  timeLimitMinutes,
+}: AssignmentPublishDraft): AssignmentPublishPreview {
+  const timeLimitMinutesNumber = parseOptionalWholeNumber(timeLimitMinutes);
+
+  return {
+    expiresAt: parseAssignmentDateTimeLocal(expiresAtLocal),
+    settings: {
+      collectStudentName,
+      instructions: instructions.trim() || undefined,
+      maxAttempts: parseOptionalWholeNumber(maxAttempts),
+      showCorrectAnswers,
+      shuffleItems,
+      timeLimitSeconds: timeLimitMinutesNumber
+        ? timeLimitMinutesNumber * 60
+        : undefined,
+    },
+  };
+}
 
 export function buildAssignmentPublishInputFromDraft({
   activityId,
