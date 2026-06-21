@@ -7,6 +7,7 @@ import {
   type PublicAttemptReviewItem,
   type PublicRuntimeItem,
 } from '@/assignments/public';
+import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import {
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
@@ -31,6 +32,17 @@ type InlineBlankPromptView =
       mode: 'standalone';
       prompt: string;
     };
+
+type PublicAnswerFeedbackView = {
+  acceptedAnswersLabel: string;
+  acceptedAnswersText: string | null;
+  correctAnswer: string;
+  correctAnswerLabel: string;
+  explanation: string | null;
+  explanationLabel: string;
+  status: 'correct' | 'needs-review';
+  statusLabel: string;
+};
 
 export function buildStudentRunnerView({
   answers,
@@ -150,6 +162,28 @@ export function buildInlineBlankPromptView(
     after: prompt.slice(match.index + match[0].length),
     before: prompt.slice(0, match.index),
     mode: 'inline',
+  };
+}
+
+export function buildPublicAnswerFeedbackView({
+  correctAnswerLabel = 'Correct answer',
+  reviewItem,
+}: {
+  correctAnswerLabel?: string;
+  reviewItem: PublicAttemptReviewItem;
+}): PublicAnswerFeedbackView {
+  return {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText:
+      reviewItem.acceptedAnswers.length > 1
+        ? formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers)
+        : null,
+    correctAnswer: reviewItem.correctAnswer,
+    correctAnswerLabel,
+    explanation: reviewItem.explanation ?? null,
+    explanationLabel: 'Why',
+    status: reviewItem.correct ? 'correct' : 'needs-review',
+    statusLabel: reviewItem.correct ? 'Correct' : 'Needs review',
   };
 }
 

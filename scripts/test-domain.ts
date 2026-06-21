@@ -118,6 +118,7 @@ import {
 import {
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
+  buildPublicAnswerFeedbackView,
   buildRuntimeChoiceViews,
   buildStudentRunnerView,
   findChoiceOwner,
@@ -498,6 +499,48 @@ assert.deepEqual(buildInlineBlankPromptView('Type the missing word.'), {
   mode: 'standalone',
   prompt: 'Type the missing word.',
 });
+assert.deepEqual(
+  buildPublicAnswerFeedbackView({
+    correctAnswerLabel: 'Correct match',
+    reviewItem: {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      correct: false,
+      correctAnswer: 'Paris',
+      explanation: 'Paris is the capital of France.',
+      itemId: 'item-1',
+    },
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText: 'Paris, Paris, France',
+    correctAnswer: 'Paris',
+    correctAnswerLabel: 'Correct match',
+    explanation: 'Paris is the capital of France.',
+    explanationLabel: 'Why',
+    status: 'needs-review',
+    statusLabel: 'Needs review',
+  }
+);
+assert.deepEqual(
+  buildPublicAnswerFeedbackView({
+    reviewItem: {
+      acceptedAnswers: ['Mitochondria'],
+      correct: true,
+      correctAnswer: 'Mitochondria',
+      itemId: 'item-2',
+    },
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText: null,
+    correctAnswer: 'Mitochondria',
+    correctAnswerLabel: 'Correct answer',
+    explanation: null,
+    explanationLabel: 'Why',
+    status: 'correct',
+    statusLabel: 'Correct',
+  }
+);
 
 assert.deepEqual(
   getAttemptCompletionSummary({

@@ -1,5 +1,5 @@
 import type { PublicAttemptReviewItem } from '@/assignments/public';
-import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import { buildPublicAnswerFeedbackView } from '@/assignments/student-runner-view';
 import { cn } from '@/lib/utils';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
@@ -14,34 +14,38 @@ export function PublicAnswerFeedback({
   correctLabel = 'Correct answer',
   reviewItem,
 }: PublicAnswerFeedbackProps) {
+  const feedback = buildPublicAnswerFeedbackView({
+    correctAnswerLabel: correctLabel,
+    reviewItem,
+  });
+
   return (
     <div
       className={cn(
         'mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs',
-        reviewItem.correct
+        feedback.status === 'correct'
           ? 'border-primary/25 bg-primary/5 text-primary'
           : 'bg-muted/30 text-muted-foreground',
         className
       )}
     >
-      {reviewItem.correct ? (
+      {feedback.status === 'correct' ? (
         <IconCheck className="size-3.5" />
       ) : (
         <IconX className="size-3.5" />
       )}
-      <span>{reviewItem.correct ? 'Correct' : 'Needs review'}</span>
+      <span>{feedback.statusLabel}</span>
       <span className="text-muted-foreground">
-        {correctLabel}: {reviewItem.correctAnswer}
+        {feedback.correctAnswerLabel}: {feedback.correctAnswer}
       </span>
-      {reviewItem.acceptedAnswers.length > 1 ? (
+      {feedback.acceptedAnswersText ? (
         <span className="basis-full text-muted-foreground">
-          Accepted answers:{' '}
-          {formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers)}
+          {feedback.acceptedAnswersLabel}: {feedback.acceptedAnswersText}
         </span>
       ) : null}
-      {reviewItem.explanation ? (
+      {feedback.explanation ? (
         <span className="basis-full text-muted-foreground">
-          Why: {reviewItem.explanation}
+          {feedback.explanationLabel}: {feedback.explanation}
         </span>
       ) : null}
     </div>
