@@ -10,6 +10,11 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListSummaryMetrics,
+  type AssignmentListSummaryMetric,
+  type AssignmentListSummaryMetricId,
+} from '@/assignments/list-summary';
+import {
   canUpdateAssignmentStatus,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
@@ -128,12 +133,11 @@ function DashboardAssignmentsPage() {
         shareSlug: published,
       })
     : undefined;
-  const summary = data?.summary ?? {
-    averageScore: 0,
-    completions: 0,
-    openAssignments: 0,
+  const summaryMetrics = buildAssignmentListSummaryMetrics({
+    hasFilters,
+    summary: data?.summary,
     totalAssignments,
-  };
+  });
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
@@ -191,26 +195,9 @@ function DashboardAssignmentsPage() {
     >
       <div className="grid gap-6">
         <section className="grid gap-4 md:grid-cols-4">
-          <SummaryCard
-            icon={IconListCheck}
-            label={hasFilters ? 'Matching' : 'Assignments'}
-            value={String(summary.totalAssignments)}
-          />
-          <SummaryCard
-            icon={IconShare3}
-            label="Open links"
-            value={String(summary.openAssignments)}
-          />
-          <SummaryCard
-            icon={IconUsers}
-            label="Completions"
-            value={String(summary.completions)}
-          />
-          <SummaryCard
-            icon={IconChartBar}
-            label="Average"
-            value={`${summary.averageScore}%`}
-          />
+          {summaryMetrics.map((metric) => (
+            <SummaryCard key={metric.id} metric={metric} />
+          ))}
         </section>
 
         {published ? (
@@ -665,25 +652,29 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   );
 }
 
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof IconShare3;
-  label: string;
-  value: string;
-}) {
+function SummaryCard({ metric }: { metric: AssignmentListSummaryMetric }) {
+  const Icon = assignmentSummaryMetricIcons[metric.id];
+
   return (
     <Card className="rounded-lg">
       <CardContent className="p-4">
         <Icon className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">{value}</p>
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
+        <p className="text-sm text-muted-foreground">{metric.label}</p>
       </CardContent>
     </Card>
   );
 }
+
+const assignmentSummaryMetricIcons: Record<
+  AssignmentListSummaryMetricId,
+  typeof IconShare3
+> = {
+  average: IconChartBar,
+  completions: IconUsers,
+  open: IconShare3,
+  total: IconListCheck,
+};
 
 function AssignmentStat({
   icon: Icon,

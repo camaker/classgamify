@@ -93,6 +93,7 @@ import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
+import { buildAssignmentListSummaryMetrics } from '@/assignments/list-summary';
 import {
   orderAssignmentRuntimeItems,
   stableShuffle,
@@ -928,6 +929,36 @@ assert.deepEqual(
 );
 assert.equal(parseAssignmentStatusFilter('published'), 'published');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
+assert.deepEqual(
+  buildAssignmentListSummaryMetrics({
+    hasFilters: false,
+    totalAssignments: 0,
+  }),
+  [
+    { id: 'total', label: 'Assignments', value: '0' },
+    { id: 'open', label: 'Open links', value: '0' },
+    { id: 'completions', label: 'Completions', value: '0' },
+    { id: 'average', label: 'Average', value: '0%' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListSummaryMetrics({
+    hasFilters: true,
+    summary: {
+      averageScore: 76,
+      completions: 11,
+      openAssignments: 2,
+      totalAssignments: 5,
+    },
+    totalAssignments: 99,
+  }),
+  [
+    { id: 'total', label: 'Matching', value: '5' },
+    { id: 'open', label: 'Open links', value: '2' },
+    { id: 'completions', label: 'Completions', value: '11' },
+    { id: 'average', label: 'Average', value: '76%' },
+  ]
+);
 const questionOnlyContent = buildActivityContent({
   description: 'Question only activity',
   difficulty: 'starter',
