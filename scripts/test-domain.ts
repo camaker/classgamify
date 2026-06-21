@@ -94,6 +94,7 @@ import {
   buildActivityEditorInitialValues,
   buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
+  buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
@@ -2717,6 +2718,15 @@ assert.deepEqual(lineMatchPreviewPanel.actions, [
     label: 'Review scaffold fields',
   },
 ]);
+assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
+  actionLabel: 'Load scaffold',
+  description:
+    'Students drag items into teacher-defined groups and compare patterns.',
+  requirementBadges: ['Requires groups'],
+  shortName: 'Sort',
+  successMessage: 'Group sort scaffold loaded.',
+  title: 'Group sort setup',
+});
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
   description: 'Editor readiness helper',
   difficulty: 'starter',

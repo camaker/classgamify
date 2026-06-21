@@ -15,6 +15,7 @@ import {
 } from '@/activities/validation';
 import {
   getTemplateRemixPlan,
+  formatTemplateRequirement,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
 
@@ -34,6 +35,15 @@ type ActivityEditorPreviewPanel = {
   }>;
   description: string;
   editorSectionId: string;
+  title: string;
+};
+
+type ActivityEditorTemplateSetupView = {
+  actionLabel: string;
+  description: string;
+  requirementBadges: string[];
+  shortName: string;
+  successMessage: string;
   title: string;
 };
 
@@ -106,6 +116,23 @@ export function buildActivityEditorPreviewPanel(
     description: `This ${template.shortName} scaffold is still a draft. Review the structured fields on the left, save it as an activity, then publish from your library to create the student link.`,
     editorSectionId: activityEditorSectionId,
     title: `${template.name} scaffold preview`,
+  };
+}
+
+export function buildActivityEditorTemplateSetupView(
+  templateType: ActivityTemplateType
+): ActivityEditorTemplateSetupView {
+  const template = getTemplateByType(templateType);
+
+  return {
+    actionLabel: 'Load scaffold',
+    description: template.description,
+    requirementBadges: template.contentRequirements.map(
+      (requirement) => `Requires ${formatTemplateRequirement(requirement)}`
+    ),
+    shortName: template.shortName,
+    successMessage: `${template.name} scaffold loaded.`,
+    title: `${template.name} setup`,
   };
 }
 

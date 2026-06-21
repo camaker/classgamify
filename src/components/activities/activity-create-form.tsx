@@ -2,6 +2,7 @@ import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
 import {
   activityEditorDefaultInput,
+  buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
@@ -14,7 +15,6 @@ import {
   buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
-import { formatTemplateRequirement } from '@/activities/template-remix';
 import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
@@ -102,6 +102,10 @@ export function ActivityCreateForm({
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
   const template = getTemplateByType(selectedTemplate);
+  const templateSetupView = useMemo(
+    () => buildActivityEditorTemplateSetupView(selectedTemplate),
+    [selectedTemplate]
+  );
   const templateReadiness = useMemo(
     () => buildActivityEditorTemplateReadiness(watchedValues),
     [watchedValues]
@@ -174,7 +178,7 @@ export function ActivityCreateForm({
     form.reset(nextValues);
     setDraftSourceText(getActivityDraftSourceText(nextValues));
     setDraftResult(undefined);
-    toast.success(`${template.name} scaffold loaded.`);
+    toast.success(templateSetupView.successMessage);
   }
 
   async function onSubmit(values: CreateActivityInput) {
@@ -355,23 +359,23 @@ export function ActivityCreateForm({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline" className="rounded-md">
-                      {template.shortName}
+                      {templateSetupView.shortName}
                     </Badge>
                     <span className="text-sm font-medium">
-                      {template.name} setup
+                      {templateSetupView.title}
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {template.description}
+                    {templateSetupView.description}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {template.contentRequirements.map((requirement) => (
+                    {templateSetupView.requirementBadges.map((requirement) => (
                       <Badge
                         key={requirement}
                         variant="secondary"
                         className="rounded-md"
                       >
-                        Requires {formatTemplateRequirement(requirement)}
+                        {requirement}
                       </Badge>
                     ))}
                   </div>
@@ -383,7 +387,7 @@ export function ActivityCreateForm({
                   onClick={applyTemplateScaffold}
                 >
                   <IconSparkles className="size-4" />
-                  Load scaffold
+                  {templateSetupView.actionLabel}
                 </Button>
               </div>
             </div>
