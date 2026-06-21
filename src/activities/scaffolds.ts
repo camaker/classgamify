@@ -50,7 +50,7 @@ const foodWordsScaffoldBase = {
   vocabularyText: 'apple, bread, milk, rice, water, egg, bowl, cup',
 } satisfies ActivityTemplateScaffold;
 
-export const activityTemplateScaffolds: Record<
+const activityTemplateScaffolds: Record<
   ActivityTemplateType,
   ActivityTemplateScaffold
 > = {

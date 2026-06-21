@@ -55,7 +55,7 @@ export function resolveAssignmentSettings(
   };
 }
 
-export const assignmentSettingsSchema = z.object({
+const assignmentSettingsSchema = z.object({
   collectStudentName: z.boolean().default(true),
   instructions: assignmentInstructionsSchema,
   maxAttempts: assignmentMaxAttemptsSchema,

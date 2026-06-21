@@ -201,18 +201,6 @@ export function evaluateRuntimeAnswers({
   };
 }
 
-export function getRuntimeSummary(
-  templateType: ActivityTemplateType,
-  content: ActivityContent
-) {
-  const items = getRuntimeItems(templateType, content);
-
-  return {
-    itemCount: items.length,
-    templateType,
-  };
-}
-
 function makeStableId(value: string) {
   return value
     .toLowerCase()

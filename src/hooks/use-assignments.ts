@@ -18,7 +18,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-export const assignmentsKeys = {
+const assignmentsKeys = {
   all: ['assignments'] as const,
   detail: (assignmentId: string) =>
     [...assignmentsKeys.details(), assignmentId] as const,

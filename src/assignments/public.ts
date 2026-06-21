@@ -147,7 +147,7 @@ export function stripRuntimeAnswer(item: RuntimeItem): PublicRuntimeItem {
   };
 }
 
-export function buildAttemptReviewItems({
+function buildAttemptReviewItems({
   answers,
   runtimeItems,
 }: {
@@ -238,6 +238,6 @@ export function buildPublicAssignmentPreviewAssignment(
   };
 }
 
-export function estimateAssignmentMinutes(itemCount: number) {
+function estimateAssignmentMinutes(itemCount: number) {
   return Math.max(5, Math.min(20, itemCount * 2));
 }

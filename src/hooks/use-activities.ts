@@ -19,7 +19,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-export const activitiesKeys = {
+const activitiesKeys = {
   all: ['activities'] as const,
   detail: (id: string) => [...activitiesKeys.details(), id] as const,
   details: () => [...activitiesKeys.all, 'details'] as const,

@@ -81,7 +81,7 @@ export function getTemplateRemixOption({
   };
 }
 
-export function getMissingTemplateRequirements(
+function getMissingTemplateRequirements(
   template: ActivityTemplateDefinition,
   content: ActivityContent
 ) {

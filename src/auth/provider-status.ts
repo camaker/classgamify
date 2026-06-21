@@ -5,7 +5,7 @@ function hasValue(value: string | undefined): boolean {
   return Boolean(value?.trim());
 }
 
-export function isGoogleOAuthAvailable(): boolean {
+function isGoogleOAuthAvailable(): boolean {
   return (
     Boolean(websiteConfig.auth?.enableGoogleLogin) &&
     hasValue(serverEnv.GOOGLE_CLIENT_ID) &&
