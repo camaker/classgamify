@@ -117,6 +117,7 @@ import {
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
+  getAssignmentResultActionGate,
   matchesResultSearch,
   normalizeResultSearch,
   parseAttemptReviewFilter,
@@ -2700,6 +2701,77 @@ assert.equal(
 assert.equal(
   assignmentResultViewModel.attemptReviewSubmissionSummary,
   'Showing 1 of 3 submissions.'
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'export-csv',
+    attemptCount: 0,
+    itemCount: 2,
+    studentCount: 1,
+  }),
+  {
+    message: 'Submit at least one attempt before exporting results.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-reteach-plan',
+    attemptCount: 0,
+    itemCount: 2,
+    studentCount: 1,
+  }),
+  {
+    message: 'Submit at least one attempt before copying a reteach plan.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-brief',
+    attemptCount: 1,
+    classroomBriefReady: false,
+    itemCount: 2,
+    studentCount: 1,
+  }),
+  {
+    message: 'Submit at least one attempt before copying a brief.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-item-review',
+    attemptCount: 0,
+    itemCount: 0,
+    studentCount: 0,
+  }),
+  {
+    message: 'Add assignment items before copying item review.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-follow-up',
+    attemptCount: 1,
+    itemCount: 2,
+    studentCount: 0,
+  }),
+  {
+    message: 'Submit at least one attempt before copying follow-up.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-brief',
+    attemptCount: 1,
+    classroomBriefReady: true,
+    itemCount: 2,
+    studentCount: 1,
+  }),
+  { type: 'ready' }
 );
 const followUpPriorityStudents = [
   {

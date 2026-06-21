@@ -6,10 +6,12 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   type AttemptReviewFilter,
+  type AssignmentResultAction,
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
+  getAssignmentResultActionGate,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
@@ -193,9 +195,20 @@ function AssignmentResultsPage() {
     });
   }
 
+  function getActionGate(action: AssignmentResultAction) {
+    return getAssignmentResultActionGate({
+      action,
+      attemptCount: data?.attempts.length ?? 0,
+      classroomBriefReady: Boolean(classroomBrief),
+      itemCount: data?.analysis.perItem.length ?? 0,
+      studentCount: data?.analysis.students.length ?? 0,
+    });
+  }
+
   async function handleExportResults() {
-    if (!data || data.attempts.length === 0) {
-      toast.error('Submit at least one attempt before exporting results.');
+    const actionGate = getActionGate('export-csv');
+    if (!data || actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
 
@@ -206,8 +219,9 @@ function AssignmentResultsPage() {
   }
 
   async function handleCopyReteachPlan() {
-    if (!data || data.attempts.length === 0) {
-      toast.error('Submit at least one attempt before copying a reteach plan.');
+    const actionGate = getActionGate('copy-reteach-plan');
+    if (!data || actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
 
@@ -230,8 +244,9 @@ function AssignmentResultsPage() {
   }
 
   async function handleCopyClassroomBrief() {
-    if (!data || !classroomBrief || data.attempts.length === 0) {
-      toast.error('Submit at least one attempt before copying a brief.');
+    const actionGate = getActionGate('copy-brief');
+    if (!data || !classroomBrief || actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
 
@@ -248,8 +263,9 @@ function AssignmentResultsPage() {
   }
 
   async function handleCopyItemReview() {
-    if (!data || data.analysis.perItem.length === 0) {
-      toast.error('Add assignment items before copying item review.');
+    const actionGate = getActionGate('copy-item-review');
+    if (!data || actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
 
@@ -271,8 +287,9 @@ function AssignmentResultsPage() {
   }
 
   async function handleCopyStudentFollowUp() {
-    if (!data || data.analysis.students.length === 0) {
-      toast.error('Submit at least one attempt before copying follow-up.');
+    const actionGate = getActionGate('copy-follow-up');
+    if (!data || actionGate.type === 'blocked') {
+      toast.error(actionGate.message);
       return;
     }
 

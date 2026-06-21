@@ -20,6 +20,22 @@ export type AssignmentResultSearchState = {
   sort?: StudentSummarySort;
 };
 
+export type AssignmentResultAction =
+  | 'copy-brief'
+  | 'copy-follow-up'
+  | 'copy-item-review'
+  | 'copy-reteach-plan'
+  | 'export-csv';
+
+export type AssignmentResultActionGate =
+  | {
+      type: 'ready';
+    }
+  | {
+      message: string;
+      type: 'blocked';
+    };
+
 export type ResultSearchSummaryInput = {
   matchedAttempts: number;
   matchedStudents: number;
@@ -190,6 +206,52 @@ export function buildAttemptReviewSubmissionSummary({
   )}.`;
 }
 
+export function getAssignmentResultActionGate({
+  action,
+  attemptCount,
+  classroomBriefReady = false,
+  itemCount,
+  studentCount,
+}: {
+  action: AssignmentResultAction;
+  attemptCount: number;
+  classroomBriefReady?: boolean;
+  itemCount: number;
+  studentCount: number;
+}): AssignmentResultActionGate {
+  if (action === 'copy-item-review') {
+    return itemCount > 0
+      ? { type: 'ready' }
+      : {
+          message: 'Add assignment items before copying item review.',
+          type: 'blocked',
+        };
+  }
+
+  if (action === 'copy-follow-up') {
+    return studentCount > 0
+      ? { type: 'ready' }
+      : {
+          message: 'Submit at least one attempt before copying follow-up.',
+          type: 'blocked',
+        };
+  }
+
+  if (action === 'copy-brief' && !classroomBriefReady) {
+    return {
+      message: 'Submit at least one attempt before copying a brief.',
+      type: 'blocked',
+    };
+  }
+
+  if (attemptCount > 0) return { type: 'ready' };
+
+  return {
+    message: getNoAttemptResultActionMessage(action),
+    type: 'blocked',
+  };
+}
+
 export function sortStudentSummaries(
   students: AssignmentStudentSummary[],
   sort: StudentSummarySort
@@ -317,6 +379,18 @@ function compareStudentsDescending(
 
 function formatCount(count: number, singularLabel: string) {
   return `${count} ${pluralize(count, singularLabel)}`;
+}
+
+function getNoAttemptResultActionMessage(action: AssignmentResultAction) {
+  if (action === 'export-csv') {
+    return 'Submit at least one attempt before exporting results.';
+  }
+
+  if (action === 'copy-reteach-plan') {
+    return 'Submit at least one attempt before copying a reteach plan.';
+  }
+
+  return 'Submit at least one attempt before copying a brief.';
 }
 
 function pluralize(count: number, singularLabel: string) {
