@@ -7,9 +7,10 @@ import {
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import {
-  formatTemplateRequirement,
-  type TemplateRemixPlan,
-} from '@/activities/template-remix';
+  buildActivityTemplateReadinessPanelSummary,
+  type ActivityTemplateReadinessPanelSummary,
+} from '@/activities/draft-meta';
+import { formatTemplateRequirement } from '@/activities/template-remix';
 import {
   activityDifficultySchema,
   activityTemplateTypeSchema,
@@ -385,7 +386,11 @@ export function ActivityCreateForm({
               </div>
             </div>
 
-            <ActivityTemplateReadinessPanel remixPlan={templateReadiness} />
+            <ActivityTemplateReadinessPanel
+              summary={buildActivityTemplateReadinessPanelSummary(
+                templateReadiness
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -745,18 +750,10 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
 }
 
 function ActivityTemplateReadinessPanel({
-  remixPlan,
+  summary,
 }: {
-  remixPlan: TemplateRemixPlan | null;
+  summary: ActivityTemplateReadinessPanelSummary;
 }) {
-  const readyTemplateOptions =
-    remixPlan?.readyOptions.map((option) => ({
-      shortName: option.template.shortName,
-      template: option.template.type,
-    })) ?? [];
-  const lockedTemplates =
-    remixPlan?.options.filter((option) => !option.isReady) ?? [];
-
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -771,12 +768,12 @@ function ActivityTemplateReadinessPanel({
           </p>
         </div>
         <Badge variant="secondary" className="w-fit rounded-md">
-          {readyTemplateOptions.length} ready
+          {summary.readyCount} ready
         </Badge>
       </div>
-      {readyTemplateOptions.length > 0 ? (
+      {summary.readyOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {readyTemplateOptions.map((option) => (
+          {summary.readyOptions.map((option) => (
             <Badge
               key={option.template}
               variant="outline"
@@ -788,14 +785,14 @@ function ActivityTemplateReadinessPanel({
         </div>
       ) : (
         <p className="mt-4 text-muted-foreground text-sm">
-          Add questions, pairs, or groups to unlock playable templates.
+          {summary.emptyText}
         </p>
       )}
-      {lockedTemplates.length > 0 ? (
+      {summary.lockedOptions.length > 0 ? (
         <div className="mt-4 grid gap-1.5">
-          {lockedTemplates.slice(0, 4).map((option) => (
+          {summary.lockedOptions.slice(0, 4).map((option) => (
             <p
-              key={option.template.type}
+              key={option.template}
               className="text-muted-foreground text-xs leading-5"
             >
               {option.diagnosis}

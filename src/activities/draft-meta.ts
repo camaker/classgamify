@@ -1,4 +1,5 @@
 import { getTemplateRemixPlan } from '@/activities/template-remix';
+import type { TemplateRemixPlan } from '@/activities/template-remix';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
   buildActivityContent,
@@ -37,6 +38,23 @@ export type ActivityDraftTemplateReadiness = {
   readinessLabel: string;
   shortName: string;
   template: ActivityTemplateType;
+};
+
+export type ActivityTemplateReadinessPanelOption = {
+  shortName: string;
+  template: ActivityTemplateType;
+};
+
+export type ActivityTemplateReadinessPanelLockedOption = {
+  diagnosis: string;
+  template: ActivityTemplateType;
+};
+
+export type ActivityTemplateReadinessPanelSummary = {
+  emptyText: string;
+  lockedOptions: ActivityTemplateReadinessPanelLockedOption[];
+  readyCount: number;
+  readyOptions: ActivityTemplateReadinessPanelOption[];
 };
 
 export function buildActivityDraftMeta({
@@ -98,6 +116,30 @@ export function buildActivityDraftMeta({
       shortName: option.template.shortName,
       template: option.template.type,
     })),
+  };
+}
+
+export function buildActivityTemplateReadinessPanelSummary(
+  remixPlan: TemplateRemixPlan | null
+): ActivityTemplateReadinessPanelSummary {
+  const readyOptions =
+    remixPlan?.readyOptions.map((option) => ({
+      shortName: option.template.shortName,
+      template: option.template.type,
+    })) ?? [];
+  const lockedOptions =
+    remixPlan?.options
+      .filter((option) => !option.isReady)
+      .map((option) => ({
+        diagnosis: option.diagnosis,
+        template: option.template.type,
+      })) ?? [];
+
+  return {
+    emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
+    lockedOptions,
+    readyCount: readyOptions.length,
+    readyOptions,
   };
 }
 

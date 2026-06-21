@@ -33,7 +33,10 @@ import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
-import { buildActivityDraftMeta } from '@/activities/draft-meta';
+import {
+  buildActivityDraftMeta,
+  buildActivityTemplateReadinessPanelSummary,
+} from '@/activities/draft-meta';
 import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   assertActivityCanDeriveWork,
@@ -1667,6 +1670,37 @@ assert.deepEqual(
   )?.missingRequirements,
   ['groups']
 );
+assert.deepEqual(
+  buildActivityTemplateReadinessPanelSummary(questionOnlyRemixPlan),
+  {
+    emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
+    lockedOptions: [
+      { diagnosis: 'Add match pairs to unlock Match.', template: 'match-up' },
+      { diagnosis: 'Add match pairs to unlock Lines.', template: 'line-match' },
+      {
+        diagnosis: 'Add groups to unlock Sort.',
+        template: 'group-sort',
+      },
+      {
+        diagnosis: 'Add match pairs to unlock Pairs.',
+        template: 'matching-pairs',
+      },
+    ],
+    readyCount: 4,
+    readyOptions: [
+      { shortName: 'Quiz', template: 'quiz' },
+      { shortName: 'Fill', template: 'fill-blank' },
+      { shortName: 'Listen', template: 'listening' },
+      { shortName: 'Box', template: 'open-box' },
+    ],
+  }
+);
+assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
+  emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
+  lockedOptions: [],
+  readyCount: 0,
+  readyOptions: [],
+});
 const questionOnlyCardSummary = buildActivityLibraryCardSummary({
   content: questionOnlyContent,
   templateType: 'quiz',
