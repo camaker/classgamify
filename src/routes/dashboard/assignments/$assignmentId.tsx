@@ -22,6 +22,7 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
@@ -309,6 +310,10 @@ function AssignmentResultsPage() {
     }
   }
 
+  const assignmentSharePath = data
+    ? buildAssignmentSharePath(data.assignment.shareSlug)
+    : '';
+
   return (
     <DashboardLayout
       breadcrumbs={[
@@ -401,7 +406,7 @@ function AssignmentResultsPage() {
                 </Link>
                 <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
                   <IconShare3 className="size-4" />
-                  /play/{data.assignment.shareSlug}
+                  {assignmentSharePath}
                 </div>
                 <CopyAssignmentShareLinkButton
                   shareSlug={data.assignment.shareSlug}
