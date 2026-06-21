@@ -423,8 +423,8 @@ function PlayPage() {
           ) : null}
           {!canSubmit ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              Demo assignments are preview-only until they are saved from a
-              teacher account.
+              Preview assignments are read-only until a teacher publishes a
+              share link.
             </p>
           ) : null}
         </div>

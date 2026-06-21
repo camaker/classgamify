@@ -336,7 +336,8 @@ assert.deepEqual(
     studentName: '',
   }),
   {
-    message: 'This demo assignment is read-only for now.',
+    message:
+      'Preview assignments are read-only until a teacher publishes a share link.',
     reason: 'read-only',
     type: 'blocked',
   }
