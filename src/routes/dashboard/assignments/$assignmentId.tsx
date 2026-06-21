@@ -15,11 +15,11 @@ import {
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
-  assignmentResultReviewCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
   attemptReviewFilterOptions,
+  buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentResultMetricItems,
@@ -30,7 +30,6 @@ import {
   formatAssignmentResultPercent,
   formatAssignmentResultValue,
   formatAssignmentReviewCount,
-  getAssignmentAnswerReviewStatus,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
@@ -925,7 +924,10 @@ function AttemptReviewCard({
       </div>
       <div className="mt-3 grid gap-2">
         {attempt.answers.map((answer, index) => {
-          const status = getAssignmentAnswerReviewStatus(answer.correct);
+          const answerView = buildAssignmentAttemptAnswerReviewView({
+            answer,
+            index,
+          });
 
           return (
             <div
@@ -934,34 +936,38 @@ function AttemptReviewCard({
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="min-w-0 text-sm font-medium">
-                  {index + 1}. {answer.prompt}
+                  {answerView.promptLabel}
                 </p>
                 <Badge
-                  variant={status.tone === 'correct' ? 'secondary' : 'outline'}
+                  variant={
+                    answerView.statusTone === 'correct'
+                      ? 'secondary'
+                      : 'outline'
+                  }
                   className="rounded-md"
                 >
-                  {status.label}
+                  {answerView.statusLabel}
                 </Badge>
               </div>
               <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
                 <p>
-                  {assignmentResultReviewCopy.studentAnswerLabel}:{' '}
-                  {formatAssignmentResultValue(answer.answer)}
+                  {answerView.studentAnswerLabel}:{' '}
+                  {answerView.studentAnswerText}
                 </p>
                 <p>
-                  {assignmentResultReviewCopy.expectedAnswerLabel}:{' '}
-                  {formatAssignmentResultValue(answer.expectedAnswer)}
+                  {answerView.expectedAnswerLabel}:{' '}
+                  {answerView.expectedAnswerText}
                 </p>
               </div>
-              {answer.acceptedAnswers.length > 1 ? (
+              {answerView.acceptedAnswersText ? (
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {assignmentResultReviewCopy.acceptedAnswersLabel}:{' '}
-                  {formatAcceptedAnswerAlternatives(answer.acceptedAnswers)}
+                  {answerView.acceptedAnswersLabel}:{' '}
+                  {answerView.acceptedAnswersText}
                 </p>
               ) : null}
-              {answer.explanation ? (
+              {answerView.explanationText ? (
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {answer.explanation}
+                  {answerView.explanationText}
                 </p>
               ) : null}
             </div>

@@ -570,6 +570,33 @@ export function buildAssignmentItemAnalysisCardView(
   };
 }
 
+export function buildAssignmentAttemptAnswerReviewView({
+  answer,
+  index,
+}: {
+  answer: AssignmentAttemptReview['answers'][number];
+  index: number;
+}) {
+  const status = getAssignmentAnswerReviewStatus(answer.correct);
+  const acceptedAnswersText =
+    answer.acceptedAnswers.length > 1
+      ? formatAcceptedAnswerAlternatives(answer.acceptedAnswers)
+      : null;
+
+  return {
+    acceptedAnswersLabel: assignmentResultReviewCopy.acceptedAnswersLabel,
+    acceptedAnswersText,
+    expectedAnswerLabel: assignmentResultReviewCopy.expectedAnswerLabel,
+    expectedAnswerText: formatAssignmentResultValue(answer.expectedAnswer),
+    explanationText: answer.explanation || null,
+    promptLabel: `${Math.max(0, index) + 1}. ${answer.prompt}`,
+    statusLabel: status.label,
+    statusTone: status.tone,
+    studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
+    studentAnswerText: formatAssignmentResultValue(answer.answer),
+  };
+}
+
 export function formatAssignmentItemCorrectSummary({
   correctCount,
   submittedCount,

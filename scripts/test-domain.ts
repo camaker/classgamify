@@ -180,6 +180,7 @@ import {
   assignmentResultTableHeaders,
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
+  buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentResultActionButtons,
@@ -4460,6 +4461,48 @@ assert.deepEqual(
 assert.equal(
   resultAnalysis.attempts[0]?.answers[0]?.explanation,
   'Paris is the capital of France.'
+);
+assert.deepEqual(
+  buildAssignmentAttemptAnswerReviewView({
+    answer: resultAnalysis.attempts[0]!.answers[0]!,
+    index: 0,
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText: 'Paris, Paris, France',
+    expectedAnswerLabel: 'Expected',
+    expectedAnswerText: 'Paris / Paris, France',
+    explanationText: 'Paris is the capital of France.',
+    promptLabel: '1. Capital of France?',
+    statusLabel: 'Correct',
+    statusTone: 'correct',
+    studentAnswerLabel: 'Student',
+    studentAnswerText: 'paris france',
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptAnswerReviewView({
+    answer: {
+      ...resultAnalysis.attempts[0]!.answers[1]!,
+      acceptedAnswers: ['Cold'],
+      answer: '',
+      expectedAnswer: '',
+      explanation: '',
+    },
+    index: -3,
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText: null,
+    expectedAnswerLabel: 'Expected',
+    expectedAnswerText: '-',
+    explanationText: null,
+    promptLabel: '1. Match "Hot" with its pair.',
+    statusLabel: 'Review',
+    statusTone: 'review',
+    studentAnswerLabel: 'Student',
+    studentAnswerText: '-',
+  }
 );
 assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
 assert.equal(resultAnalysis.attempts[1]?.studentLabel, 'Alice');
