@@ -60,12 +60,16 @@ export type PublicAssignmentPayload = {
 export function stripRuntimeAnswers(
   runtimeItems: RuntimeItem[]
 ): PublicRuntimeItem[] {
-  return runtimeItems.map((item) => ({
+  return runtimeItems.map(stripRuntimeAnswer);
+}
+
+export function stripRuntimeAnswer(item: RuntimeItem): PublicRuntimeItem {
+  return {
     choices: item.choices,
     id: item.id,
     kind: item.kind,
     prompt: item.prompt,
-  }));
+  };
 }
 
 export function buildAttemptReviewItems({

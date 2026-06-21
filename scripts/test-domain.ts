@@ -65,7 +65,11 @@ import {
   buildPublicAssignmentRuleSummary,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
-import { buildPublicAttemptReviewItemMap } from '@/assignments/public';
+import {
+  buildPublicAttemptReviewItemMap,
+  stripRuntimeAnswer,
+  stripRuntimeAnswers,
+} from '@/assignments/public';
 import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -432,6 +436,41 @@ assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
 assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
+const publicRuntimeItem = stripRuntimeAnswer({
+  answer: 'Paris',
+  choices: ['Paris', 'Rome'],
+  explanation: 'Paris is the capital of France.',
+  id: 'q-1',
+  kind: 'question',
+  prompt: 'Capital of France?',
+});
+assert.deepEqual(publicRuntimeItem, {
+  choices: ['Paris', 'Rome'],
+  id: 'q-1',
+  kind: 'question',
+  prompt: 'Capital of France?',
+});
+assert.equal('answer' in publicRuntimeItem, false);
+assert.equal('explanation' in publicRuntimeItem, false);
+assert.deepEqual(
+  stripRuntimeAnswers([
+    {
+      answer: 'Paris',
+      explanation: 'Paris is the capital of France.',
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+  ]),
+  [
+    {
+      choices: undefined,
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+  ]
+);
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
