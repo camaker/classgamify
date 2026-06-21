@@ -874,9 +874,28 @@ assert.equal(
   fallbackDraftMeta.readyTemplateCount,
   fallbackDraftMeta.readyTemplates.length
 );
+assert.deepEqual(
+  fallbackDraftMeta.readyTemplateOptions.map((option) => option.shortName),
+  fallbackDraftMeta.readyTemplates
+);
+assert.ok(
+  fallbackDraftMeta.readyTemplateOptions.some(
+    (option) => option.template === 'listening' && option.shortName === 'Listen'
+  )
+);
 assert.equal(
   fallbackDraftMeta.suggestedTemplateCount,
   fallbackDraftMeta.suggestedTemplates.length
+);
+assert.deepEqual(
+  fallbackDraftMeta.suggestedTemplateOptions.map((option) => option.shortName),
+  fallbackDraftMeta.suggestedTemplates
+);
+assert.equal(
+  fallbackDraftMeta.suggestedTemplateOptions.every(
+    (option) => option.template !== fallbackDraft.templateType
+  ),
+  true
 );
 assert.ok(
   fallbackDraftMeta.templateReadiness.some(

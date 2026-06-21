@@ -14,11 +14,18 @@ export type ActivityDraftMeta = {
     vocabulary: number;
   };
   readyTemplateCount: number;
+  readyTemplateOptions: ActivityDraftTemplateOption[];
   readyTemplates: string[];
   reviewChecklist: string[];
   suggestedTemplateCount: number;
+  suggestedTemplateOptions: ActivityDraftTemplateOption[];
   suggestedTemplates: string[];
   templateReadiness: ActivityDraftTemplateReadiness[];
+};
+
+export type ActivityDraftTemplateOption = {
+  shortName: string;
+  template: ActivityTemplateType;
 };
 
 export type ActivityDraftTemplateReadiness = {
@@ -47,9 +54,17 @@ export function buildActivityDraftMeta({
   const suggestedTemplates = remixPlan.suggestedOptions.map(
     (option) => option.template.shortName
   );
+  const suggestedTemplateOptions = remixPlan.suggestedOptions.map((option) => ({
+    shortName: option.template.shortName,
+    template: option.template.type,
+  }));
   const readyTemplates = remixPlan.readyOptions.map(
     (option) => option.template.shortName
   );
+  const readyTemplateOptions = remixPlan.readyOptions.map((option) => ({
+    shortName: option.template.shortName,
+    template: option.template.type,
+  }));
   const lockedTemplateDiagnostics = remixPlan.options
     .filter((option) => !option.isReady)
     .map((option) => option.diagnosis);
@@ -63,6 +78,7 @@ export function buildActivityDraftMeta({
       vocabulary: content.vocabulary.length,
     },
     readyTemplateCount: remixPlan.readyOptions.length,
+    readyTemplateOptions,
     readyTemplates,
     reviewChecklist: buildDraftReviewChecklist({
       activity,
@@ -70,6 +86,7 @@ export function buildActivityDraftMeta({
       suggestedTemplates,
     }),
     suggestedTemplateCount: suggestedTemplates.length,
+    suggestedTemplateOptions,
     suggestedTemplates,
     templateReadiness: remixPlan.options.map((option) => ({
       diagnosis: option.diagnosis,
