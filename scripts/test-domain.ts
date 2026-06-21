@@ -3608,20 +3608,22 @@ assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
   'Explanation',
 ]);
 assert.equal(assignmentResultReviewCopy.emptyValue, '-');
+const attemptRowCompletedAt = new Date('2026-01-01T00:00:00.000Z');
 assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
+      completedAt: attemptRowCompletedAt,
       id: 'attempt-row',
       maxScore: 4,
       resultJson: {
         accuracy: 75,
         completedItemCount: 3,
+        durationSeconds: 62,
         totalPoints: 4,
       },
       score: 3,
       studentName: ' Raw student ',
     },
-    durationLabel: '1m 02s',
     review: {
       accuracy: 80,
       answers: [],
@@ -3631,7 +3633,6 @@ assert.deepEqual(
       studentKey: 'name:alice',
       studentLabel: 'Alice',
     },
-    submittedAtLabel: 'Jan 1, 2026, 8:00 AM',
   }),
   {
     accuracyLabel: '75%',
@@ -3639,23 +3640,29 @@ assert.deepEqual(
     durationLabel: '1m 02s',
     scoreLabel: '3/4',
     studentLabel: 'Alice',
-    submittedAtLabel: 'Jan 1, 2026, 8:00 AM',
+    submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
   }
 );
-assert.equal(
+assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
+      completedAt: null,
       id: 'anonymous-row',
       maxScore: null,
       resultJson: null,
       score: null,
       studentName: '   ',
     },
-    durationLabel: '0s',
     review: undefined,
+  }),
+  {
+    accuracyLabel: '0%',
+    answeredLabel: '0/0',
+    durationLabel: '-',
+    scoreLabel: '0/0',
+    studentLabel: 'Anonymous student',
     submittedAtLabel: '-',
-  }).studentLabel,
-  'Anonymous student'
+  }
 );
 assert.deepEqual(getAssignmentAnswerReviewStatus(true), {
   label: 'Correct',

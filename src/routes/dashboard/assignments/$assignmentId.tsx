@@ -522,13 +522,7 @@ function AssignmentResultsPage() {
                       ({ attempt, review }) => {
                         const rowDisplay = buildAssignmentAttemptRowDisplay({
                           attempt,
-                          durationLabel: formatAttemptDuration(
-                            attempt.resultJson?.durationSeconds ?? 0
-                          ),
                           review,
-                          submittedAtLabel: formatAssignmentResultDate(
-                            attempt.completedAt
-                          ),
                         });
 
                         return (

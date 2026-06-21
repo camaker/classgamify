@@ -5,6 +5,8 @@ import type {
 } from '@/assignments/results';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
+import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import { formatAssignmentResultDate } from '@/assignments/result-format';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
@@ -95,10 +97,12 @@ type AssignmentResultControlOption<TValue extends string> = {
 };
 
 type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
+  completedAt: Date | string | null;
   maxScore: number | null;
   resultJson: {
     accuracy?: number;
     completedItemCount?: number;
+    durationSeconds?: number;
     totalPoints?: number;
   } | null;
   score: number | null;
@@ -389,14 +393,10 @@ export function buildAssignmentResultSectionState({
 
 export function buildAssignmentAttemptRowDisplay({
   attempt,
-  durationLabel,
   review,
-  submittedAtLabel,
 }: {
   attempt: AssignmentAttemptRowDisplayInput;
-  durationLabel: string;
   review: AssignmentAttemptReview | undefined;
-  submittedAtLabel: string;
 }) {
   return {
     accuracyLabel: formatAssignmentResultPercent(
@@ -406,7 +406,9 @@ export function buildAssignmentAttemptRowDisplay({
       attempt.resultJson?.completedItemCount ?? 0,
       attempt.resultJson?.totalPoints ?? 0
     ),
-    durationLabel,
+    durationLabel: formatAttemptDuration(
+      attempt.resultJson?.durationSeconds ?? 0
+    ),
     scoreLabel: formatAssignmentResultFraction(
       attempt.score ?? 0,
       attempt.maxScore ?? 0
@@ -415,7 +417,7 @@ export function buildAssignmentAttemptRowDisplay({
       reviewStudentLabel: review?.studentLabel,
       studentName: attempt.studentName,
     }),
-    submittedAtLabel,
+    submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
 }
 
