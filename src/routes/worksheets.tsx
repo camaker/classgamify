@@ -6,7 +6,10 @@ import {
   type WorksheetModeDefinition,
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
-import { buildWorksheetModeEntryAction } from '@/activities/template-entry';
+import {
+  buildWorksheetHeroActions,
+  buildWorksheetModeEntryAction,
+} from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
@@ -48,6 +51,7 @@ function WorksheetsPage() {
     'Reteach priorities',
     'CSV export',
   ];
+  const heroActions = buildWorksheetHeroActions(worksheetModeDefinitions);
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -72,21 +76,21 @@ function WorksheetsPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to={Routes.Create}
-                search={{ template: 'fill-blank' }}
+                search={heroActions[0].search}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 <IconPencilPlus className="size-4" />
-                Create fill-blank
+                {heroActions[0].label}
               </Link>
               <Link
                 to={Routes.Create}
-                search={{ template: 'line-match' }}
+                search={heroActions[1].search}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
                 )}
               >
-                Start line match
+                {heroActions[1].label}
                 <IconArrowRight className="size-4" />
               </Link>
             </div>

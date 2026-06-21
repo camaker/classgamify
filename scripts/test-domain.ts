@@ -86,6 +86,7 @@ import {
 import {
   buildTemplateCreateSearch,
   buildTemplateEntryAction,
+  buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
 } from '@/activities/template-entry';
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
@@ -2494,6 +2495,28 @@ assert.deepEqual(
     label: mode.action,
     search: { template: mode.template },
   }))
+);
+assert.deepEqual(buildWorksheetHeroActions(worksheetModeDefinitions), [
+  {
+    label: 'Create fill-blank',
+    search: { template: 'fill-blank' },
+    template: 'fill-blank',
+  },
+  {
+    label: 'Start line match',
+    search: { template: 'line-match' },
+    template: 'line-match',
+  },
+]);
+assert.deepEqual(
+  buildWorksheetHeroActions(
+    worksheetModeDefinitions.filter((mode) => mode.template !== 'line-match')
+  )[1],
+  {
+    label: 'Create line-match',
+    search: { template: 'line-match' },
+    template: 'line-match',
+  }
 );
 assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');

@@ -1,5 +1,8 @@
 import type { ActivityTemplateDefinition } from '@/activities/types';
-import type { WorksheetModeDefinition } from '@/activities/worksheet-modes';
+import type {
+  WorksheetModeDefinition,
+  WorksheetModeTemplate,
+} from '@/activities/worksheet-modes';
 
 type CreateActivityTemplateSearch = {
   template: ActivityTemplateDefinition['type'];
@@ -22,5 +25,33 @@ export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
   return {
     label: mode.action,
     search: buildTemplateCreateSearch(mode.template),
+  };
+}
+
+export function buildWorksheetHeroActions(
+  modes: readonly WorksheetModeDefinition[]
+) {
+  return [
+    buildWorksheetHeroAction(modes, 'fill-blank'),
+    buildWorksheetHeroAction(modes, 'line-match'),
+  ] as const;
+}
+
+function buildWorksheetHeroAction(
+  modes: readonly WorksheetModeDefinition[],
+  template: WorksheetModeTemplate
+) {
+  const mode = modes.find((item) => item.template === template);
+  if (!mode) {
+    return {
+      label: `Create ${template}`,
+      search: buildTemplateCreateSearch(template),
+      template,
+    };
+  }
+
+  return {
+    ...buildWorksheetModeEntryAction(mode),
+    template,
   };
 }
