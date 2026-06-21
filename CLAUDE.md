@@ -117,18 +117,18 @@ Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Nod
 
 ## Deploy Configuration (configured by /setup-deploy)
 - Platform: GitHub Actions deploying to Cloudflare Workers
-- Production URL: https://getlangstudy.com
+- Production URL: set `VITE_BASE_URL` to the ClassGamify domain
 - Deploy workflow: .github/workflows/deploy.yml
-- Deploy status command: GitHub Actions workflow status, then poll production URL
+- Deploy status command: GitHub Actions workflow status, then poll `VITE_BASE_URL`
 - Merge method: push to main
 - Project type: web app
-- Post-deploy health check: https://getlangstudy.com
+- Post-deploy health check: the configured ClassGamify `VITE_BASE_URL`
 
 ### Custom deploy hooks
 - Pre-merge: pnpm locale:check && pnpm check && pnpm build
 - Deploy trigger: automatic on push to main or manual workflow_dispatch
 - Deploy status: GitHub Actions workflow status
-- Health check: https://getlangstudy.com
+- Health check: the configured ClassGamify `VITE_BASE_URL`
 
 ### Production secrets
 - GitHub Actions secrets: VITE_BASE_URL, CLOUDFLARE_ACCOUNT_ID,

@@ -32,30 +32,30 @@
   <rect width="1600" height="900" fill="url(#bg)"/>
   <rect x="88" y="78" width="1424" height="744" rx="48" fill="#fffaf3" stroke="#fed7aa" stroke-width="2"/>
   <image href="logo.png" x="126" y="112" width="86" height="86" preserveAspectRatio="xMidYMid meet"/>
-  <text x="230" y="166" fill="#111827" font-size="56" font-weight="700">Lang Study</text>
-  <text x="128" y="306" fill="#111827" font-size="96" font-weight="700">Learn characters</text>
-  <text x="128" y="414" fill="#111827" font-size="96" font-weight="700">by writing</text>
-  <text x="132" y="500" fill="#475569" font-size="36" font-weight="400">Stroke order practice, printable worksheets,</text>
-  <text x="132" y="548" fill="#475569" font-size="36" font-weight="400">and review-first study.</text>
+  <text x="230" y="166" fill="#111827" font-size="56" font-weight="700">ClassGamify</text>
+  <text x="128" y="306" fill="#111827" font-size="96" font-weight="700">Create, publish,</text>
+  <text x="128" y="414" fill="#111827" font-size="96" font-weight="700">play, review</text>
+  <text x="132" y="500" fill="#475569" font-size="36" font-weight="400">Game-based classroom activities, assignment</text>
+  <text x="132" y="548" fill="#475569" font-size="36" font-weight="400">links, student attempts, and teacher results.</text>
   <g transform="translate(128 622)">
     <rect width="250" height="64" rx="24" fill="#de3500"/>
-    <text x="32" y="42" fill="#fff7ed" font-size="26" font-weight="700">Practice online</text>
+    <text x="32" y="42" fill="#fff7ed" font-size="26" font-weight="700">Create activity</text>
   </g>
   <g transform="translate(402 622)">
     <rect width="264" height="64" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-    <text x="32" y="42" fill="#111827" font-size="26" font-weight="700">Print worksheet</text>
+    <text x="32" y="42" fill="#111827" font-size="26" font-weight="700">Review results</text>
   </g>
   <g filter="url(#soft-shadow)" transform="translate(925 156)">
     <rect width="438" height="558" rx="34" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
     <rect x="38" y="38" width="362" height="76" rx="18" fill="#fff7ed" stroke="#fed7aa"/>
-    <text x="64" y="88" fill="#de3500" font-size="28" font-weight="700">HSK1 starter loop</text>
+    <text x="64" y="88" fill="#de3500" font-size="28" font-weight="700">Activity loop</text>
     <g transform="translate(44 158)">
       <rect width="108" height="108" rx="18" fill="#0f172a"/>
-      <text x="28" y="79" fill="#ffffff" font-size="72" font-weight="700">人</text>
+      <text x="30" y="78" fill="#ffffff" font-size="54" font-weight="700">Quiz</text>
       <rect x="128" width="108" height="108" rx="18" fill="#0f172a"/>
-      <text x="156" y="79" fill="#ffffff" font-size="72" font-weight="700">口</text>
+      <text x="152" y="78" fill="#ffffff" font-size="48" font-weight="700">Pair</text>
       <rect x="256" width="108" height="108" rx="18" fill="#0f172a"/>
-      <text x="284" y="79" fill="#ffffff" font-size="72" font-weight="700">日</text>
+      <text x="286" y="78" fill="#ffffff" font-size="48" font-weight="700">Sort</text>
     </g>
     <g transform="translate(44 306)" fill="#f8fafc" stroke="#cbd5e1">
       <rect width="72" height="72" rx="10" stroke-dasharray="8 8"/>
@@ -68,6 +68,6 @@
       <rect x="288" y="96" width="72" height="72" rx="10" stroke-dasharray="8 8"/>
     </g>
     <circle cx="68" cy="526" r="10" fill="#10b981"/>
-    <text x="92" y="536" fill="#334155" font-size="24" font-weight="600">from screen practice to paper review</text>
+    <text x="92" y="536" fill="#334155" font-size="24" font-weight="600">from activity to assignment results</text>
   </g>
 </svg>

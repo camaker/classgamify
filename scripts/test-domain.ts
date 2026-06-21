@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -326,6 +327,16 @@ assert.equal(
   ).script,
   'https://cloud.umami.is/script.js'
 );
+
+const activeShareSurfaceText = [
+  readFileSync('CLAUDE.md', 'utf8'),
+  readFileSync('public/og-source.svg', 'utf8'),
+].join('\n');
+assert.doesNotMatch(
+  activeShareSurfaceText,
+  /getlangstudy|Lang Study|HSK1 starter loop/i
+);
+assert.match(activeShareSurfaceText, /ClassGamify/);
 
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
