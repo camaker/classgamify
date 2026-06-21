@@ -1,5 +1,8 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
-import { getRuntimeItems } from '@/activities/runtime';
+import {
+  getActivityTemplateRunnerKind,
+  getRuntimeItems,
+} from '@/activities/runtime';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
   ActivitySeed,
@@ -489,7 +492,9 @@ function RuntimeItemList({
   reviewItems?: PublicAttemptReviewItem[];
   templateType: ActivityTemplateType;
 }) {
-  if (templateType === 'line-match') {
+  const runnerKind = getActivityTemplateRunnerKind(templateType);
+
+  if (runnerKind === 'line-match') {
     return (
       <div className="mt-4">
         <LineMatchBoard
@@ -504,7 +509,7 @@ function RuntimeItemList({
     );
   }
 
-  if (templateType === 'matching-pairs') {
+  if (runnerKind === 'matching-pairs') {
     return (
       <div className="mt-4">
         <MatchingPairsBoard
@@ -519,7 +524,7 @@ function RuntimeItemList({
     );
   }
 
-  if (templateType === 'group-sort') {
+  if (runnerKind === 'group-sort') {
     return (
       <div className="mt-4">
         <GroupSortBoard
@@ -534,7 +539,7 @@ function RuntimeItemList({
     );
   }
 
-  if (templateType === 'fill-blank') {
+  if (runnerKind === 'fill-blank') {
     return (
       <div className="mt-4">
         <FillBlankWorksheet
@@ -549,7 +554,7 @@ function RuntimeItemList({
     );
   }
 
-  if (templateType === 'open-box') {
+  if (runnerKind === 'open-box') {
     return (
       <div className="mt-4">
         <OpenBoxRunner
@@ -564,7 +569,7 @@ function RuntimeItemList({
     );
   }
 
-  if (templateType === 'listening') {
+  if (runnerKind === 'listening') {
     return (
       <div className="mt-4">
         <ListeningRunner

@@ -36,6 +36,37 @@ export type RuntimeEvaluation = {
   result: AttemptResult;
 };
 
+export type ActivityTemplateRunnerKind =
+  | 'choice-list'
+  | 'fill-blank'
+  | 'group-sort'
+  | 'line-match'
+  | 'listening'
+  | 'matching-pairs'
+  | 'open-box';
+
+export function getActivityTemplateRunnerKind(
+  templateType: ActivityTemplateType
+): ActivityTemplateRunnerKind {
+  switch (templateType) {
+    case 'fill-blank':
+      return 'fill-blank';
+    case 'group-sort':
+      return 'group-sort';
+    case 'line-match':
+      return 'line-match';
+    case 'listening':
+      return 'listening';
+    case 'matching-pairs':
+      return 'matching-pairs';
+    case 'open-box':
+      return 'open-box';
+    case 'match-up':
+    case 'quiz':
+      return 'choice-list';
+  }
+}
+
 export function getRuntimeItems(
   templateType: ActivityTemplateType,
   content: ActivityContent

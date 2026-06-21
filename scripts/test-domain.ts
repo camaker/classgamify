@@ -29,7 +29,11 @@ import {
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
-import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import {
+  evaluateRuntimeAnswers,
+  getActivityTemplateRunnerKind,
+  getRuntimeItems,
+} from '@/activities/runtime';
 import {
   getActivityTemplateDraftGuidance,
   formatTemplateRequirementList,
@@ -627,6 +631,22 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     )
   );
 }
+assert.deepEqual(
+  ACTIVITY_TEMPLATE_TYPES.map((templateType) => [
+    templateType,
+    getActivityTemplateRunnerKind(templateType),
+  ]),
+  [
+    ['quiz', 'choice-list'],
+    ['match-up', 'choice-list'],
+    ['line-match', 'line-match'],
+    ['group-sort', 'group-sort'],
+    ['fill-blank', 'fill-blank'],
+    ['listening', 'listening'],
+    ['matching-pairs', 'matching-pairs'],
+    ['open-box', 'open-box'],
+  ]
+);
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 2',
