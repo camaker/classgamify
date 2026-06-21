@@ -32,9 +32,9 @@ const schema = z.object({
     .string()
     .min(10, m.contact_message_min())
     .max(1500, m.contact_message_max()),
+  classroomGrade: z.string().max(80).optional(),
   classroomLearners: z.string().max(80).optional(),
-  classroomLevel: z.string().max(80).optional(),
-  classroomLanguages: z.string().max(120).optional(),
+  classroomMaterial: z.string().max(120).optional(),
   classroomRoutine: z.string().max(120).optional(),
   classroomNeed: z.string().max(120).optional(),
 });
@@ -55,9 +55,9 @@ export function ContactFormCard({
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      classroomGrade: '',
       classroomLearners: '',
-      classroomLevel: '',
-      classroomLanguages: '',
+      classroomMaterial: '',
       classroomNeed: '',
       classroomRoutine: '',
       email: '',
@@ -89,9 +89,9 @@ export function ContactFormCard({
       });
       toast.success(m.contact_success());
       form.reset({
+        classroomGrade: '',
         classroomLearners: '',
-        classroomLevel: '',
-        classroomLanguages: '',
+        classroomMaterial: '',
         classroomNeed: '',
         classroomRoutine: '',
         email: '',
@@ -220,14 +220,14 @@ function ClassroomInquiryFields({
         />
         <FormField
           control={control}
-          name="classroomLevel"
+          name="classroomGrade"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{copy.levelLabel}</FormLabel>
+              <FormLabel>{copy.gradeLabel}</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="off"
-                  placeholder={copy.levelPlaceholder}
+                  placeholder={copy.gradePlaceholder}
                   {...field}
                 />
               </FormControl>
@@ -237,14 +237,14 @@ function ClassroomInquiryFields({
         />
         <FormField
           control={control}
-          name="classroomLanguages"
+          name="classroomMaterial"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{copy.languagesLabel}</FormLabel>
+              <FormLabel>{copy.materialLabel}</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="off"
-                  placeholder={copy.languagesPlaceholder}
+                  placeholder={copy.materialPlaceholder}
                   {...field}
                 />
               </FormControl>
@@ -297,8 +297,8 @@ function buildClassroomInquiryMessage(
 ) {
   const structuredLines = [
     [copy.learnersLabel, values.classroomLearners],
-    [copy.levelLabel, values.classroomLevel],
-    [copy.languagesLabel, values.classroomLanguages],
+    [copy.gradeLabel, values.classroomGrade],
+    [copy.materialLabel, values.classroomMaterial],
     [copy.routineLabel, values.classroomRoutine],
     [copy.needLabel, values.classroomNeed],
   ]
@@ -322,12 +322,12 @@ function getClassroomInquiryCopy(locale: 'en' | 'zh') {
       description:
         '这些信息会整理进邮件，方便我们判断你需要的是模板活动、作业链接、学生结果复盘还是 AI 辅助备课。',
       emailHeading: '课堂咨询信息',
-      languagesLabel: '活动材料',
-      languagesPlaceholder: '例如：英语单词、科学分类、数学概念或已有练习纸',
+      gradeLabel: '班级或年级',
+      gradePlaceholder: '例如：小学三年级 / 初中词汇复习',
       learnersLabel: '学习者',
       learnersPlaceholder: '例如：28 名三年级学生 / 1 对 1 辅导',
-      levelLabel: '班级或年级',
-      levelPlaceholder: '例如：小学三年级 / 初中词汇复习',
+      materialLabel: '活动材料',
+      materialPlaceholder: '例如：英语单词、科学分类、数学概念或已有练习纸',
       needLabel: '主要需求',
       needPlaceholder: '例如：单词配对、拖拽分类、填空作业、结果导出',
       routineLabel: '每周节奏',
@@ -340,13 +340,13 @@ function getClassroomInquiryCopy(locale: 'en' | 'zh') {
     description:
       'These details are added to the email so we can tell whether you need template activities, assignment links, student results, or AI-assisted prep.',
     emailHeading: 'Classroom inquiry details',
-    languagesLabel: 'Activity material',
-    languagesPlaceholder:
-      'e.g. English vocab, science groups, math concepts, existing worksheet',
+    gradeLabel: 'Class or grade',
+    gradePlaceholder: 'e.g. Grade 3 / middle-school vocabulary review',
     learnersLabel: 'Learners',
     learnersPlaceholder: 'e.g. 28 third graders / 1:1 tutoring',
-    levelLabel: 'Class or grade',
-    levelPlaceholder: 'e.g. Grade 3 / middle-school vocabulary review',
+    materialLabel: 'Activity material',
+    materialPlaceholder:
+      'e.g. English vocab, science groups, math concepts, existing worksheet',
     needLabel: 'Main need',
     needPlaceholder:
       'e.g. word matching, drag sorting, fill blanks, result export',
