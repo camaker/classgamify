@@ -12,10 +12,7 @@ import {
   type PublicAssignmentRuleSummaryId,
   buildPublicAssignmentRuleSummaryFromSettings,
 } from '@/assignments/delivery-summary';
-import {
-  buildAttemptTimerState,
-  formatAttemptDuration,
-} from '@/assignments/attempt-duration';
+import { buildAttemptTimerState } from '@/assignments/attempt-duration';
 import {
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
@@ -28,6 +25,7 @@ import {
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
+  buildStudentAttemptTimerBadge,
   getStudentRunnerCopy,
 } from '@/assignments/student-submission';
 import {
@@ -172,6 +170,11 @@ function PlayPage() {
     isSubmitting: submitAttemptMutation.isPending,
     timeExpired: attemptTimer.timeExpired,
     unansweredLabel: completionCopy.unansweredLabel,
+  });
+  const attemptTimerBadge = buildStudentAttemptTimerBadge({
+    remainingSeconds: attemptTimer.remainingSeconds,
+    timeExpired: attemptTimer.timeExpired,
+    timeLimitSeconds,
   });
   const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
 
@@ -361,14 +364,9 @@ function PlayPage() {
             <Badge variant="secondary" className="rounded-md">
               {completionCopy.progressLabel}
             </Badge>
-            {timeLimitSeconds ? (
+            {attemptTimerBadge.show ? (
               <Badge variant="outline" className="rounded-md">
-                {attemptTimer.timeExpired
-                  ? runnerCopy.timeEndedLabel
-                  : formatAttemptDuration(attemptTimer.remainingSeconds, {
-                      emptyValue: '',
-                      style: 'timer',
-                    })}
+                {attemptTimerBadge.label}
               </Badge>
             ) : null}
           </div>

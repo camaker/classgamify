@@ -277,6 +277,7 @@ import {
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
+  buildStudentAttemptTimerBadge,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -793,6 +794,39 @@ assert.deepEqual(
     showTimeExpiredMessage: false,
     submitDisabled: true,
     unansweredLabel: undefined,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
+    remainingSeconds: undefined,
+    timeExpired: false,
+    timeLimitSeconds: undefined,
+  }),
+  {
+    label: '',
+    show: false,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
+    remainingSeconds: 65,
+    timeExpired: false,
+    timeLimitSeconds: 120,
+  }),
+  {
+    label: '1:05',
+    show: true,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
+    remainingSeconds: 0,
+    timeExpired: true,
+    timeLimitSeconds: 120,
+  }),
+  {
+    label: 'Time ended',
+    show: true,
   }
 );
 assert.deepEqual(

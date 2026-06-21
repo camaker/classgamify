@@ -107,6 +107,11 @@ type StudentAttemptControlState = {
   unansweredLabel?: string;
 };
 
+type StudentAttemptTimerBadge = {
+  label: string;
+  show: boolean;
+};
+
 const STUDENT_RUNNER_COPY = {
   browseTemplatesLabel: 'Browse templates',
   loadingMessage: 'Loading student activity...',
@@ -198,6 +203,33 @@ export function buildStudentAttemptControlState({
     showTimeExpiredMessage: timeExpired && !hasResult,
     submitDisabled: !canSubmit || hasResult || isSubmitting,
     unansweredLabel: hasResult ? undefined : unansweredLabel,
+  };
+}
+
+export function buildStudentAttemptTimerBadge({
+  remainingSeconds,
+  timeExpired,
+  timeLimitSeconds,
+}: {
+  remainingSeconds?: number;
+  timeExpired: boolean;
+  timeLimitSeconds?: number;
+}): StudentAttemptTimerBadge {
+  if (!timeLimitSeconds) {
+    return {
+      label: '',
+      show: false,
+    };
+  }
+
+  return {
+    label: timeExpired
+      ? STUDENT_RUNNER_COPY.timeEndedLabel
+      : formatAttemptDuration(remainingSeconds, {
+          emptyValue: '',
+          style: 'timer',
+        }),
+    show: true,
   };
 }
 
