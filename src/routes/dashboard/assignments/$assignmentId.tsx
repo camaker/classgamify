@@ -20,12 +20,12 @@ import {
   assignmentResultTableHeaders,
   attemptReviewFilterOptions,
   buildAssignmentAttemptAnswerReviewView,
+  buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultMetricItems,
   buildAssignmentStudentSummaryRowView,
-  formatAssignmentAttemptReviewBadge,
   formatAssignmentBriefStudentAccuracy,
   formatAssignmentItemCorrectSummary,
   formatAssignmentResultPercent,
@@ -894,20 +894,22 @@ function AttemptReviewCard({
     ReturnType<typeof useAssignmentResults>['data']
   >['analysis']['attempts'][number];
 }) {
+  const cardView = buildAssignmentAttemptReviewCardView(attempt);
+
   return (
     <div className="rounded-lg border bg-background p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <IconListDetails className="size-4 text-primary" />
-            <p className="font-medium text-sm">{attempt.studentLabel}</p>
+            <p className="font-medium text-sm">{cardView.studentLabel}</p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {formatAssignmentResultDate(attempt.completedAt)}
+            {cardView.submittedAtLabel}
           </p>
         </div>
         <Badge variant="secondary" className="rounded-md">
-          {formatAssignmentAttemptReviewBadge(attempt)}
+          {cardView.badgeLabel}
         </Badge>
       </div>
       <div className="mt-3 grid gap-2">

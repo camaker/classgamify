@@ -181,6 +181,7 @@ import {
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptAnswerReviewView,
+  buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
@@ -5082,6 +5083,32 @@ assert.deepEqual(getAssignmentAnswerReviewStatus(false), {
 assert.equal(
   formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
   '2 pts · 67%'
+);
+assert.deepEqual(
+  buildAssignmentAttemptReviewCardView({
+    accuracy: 67,
+    completedAt: attemptRowCompletedAt,
+    score: 2,
+    studentLabel: 'Alice',
+  }),
+  {
+    badgeLabel: '2 pts · 67%',
+    studentLabel: 'Alice',
+    submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptReviewCardView({
+    accuracy: 0,
+    completedAt: null,
+    score: 0,
+    studentLabel: 'Anonymous student',
+  }),
+  {
+    badgeLabel: '0 pts · 0%',
+    studentLabel: 'Anonymous student',
+    submittedAtLabel: '-',
+  }
 );
 assert.equal(
   formatAssignmentBriefStudentAccuracy({

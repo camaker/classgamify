@@ -540,6 +540,19 @@ export function formatAssignmentAttemptReviewBadge({
   return `${score} pts · ${formatAssignmentResultPercent(accuracy)}`;
 }
 
+export function buildAssignmentAttemptReviewCardView(
+  attempt: Pick<
+    AssignmentAttemptReview,
+    'accuracy' | 'completedAt' | 'score' | 'studentLabel'
+  >
+) {
+  return {
+    badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
+    studentLabel: attempt.studentLabel,
+    submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
+  };
+}
+
 export function formatAssignmentBriefStudentAccuracy({
   bestAccuracy,
   latestAccuracy,
