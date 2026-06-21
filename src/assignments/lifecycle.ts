@@ -15,7 +15,7 @@ export type AssignmentStatusAction = {
   successMessage: string;
 };
 
-export function getAssignmentTimestamp(value: AssignmentDate) {
+function getAssignmentTimestamp(value: AssignmentDate) {
   if (!value) return undefined;
 
   const timestamp =
@@ -52,7 +52,7 @@ export function getAssignmentStatusLabel(
   return 'Draft';
 }
 
-export function canUpdateAssignmentStatus({
+function canUpdateAssignmentStatus({
   currentStatus,
   expiresAt,
   nextStatus,
@@ -74,7 +74,7 @@ export function canUpdateAssignmentStatus({
   return false;
 }
 
-export function getNextManagedAssignmentStatus(
+function getNextManagedAssignmentStatus(
   currentStatus: AssignmentStatus
 ): ManagedAssignmentStatus {
   return currentStatus === 'published' ? 'closed' : 'published';
@@ -131,7 +131,7 @@ export function buildAssignmentStatusAction({
   };
 }
 
-export function getAssignmentStatusTransitionError({
+function getAssignmentStatusTransitionError({
   currentStatus,
   expiresAt,
   nextStatus,
