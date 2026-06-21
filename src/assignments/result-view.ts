@@ -7,6 +7,7 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
@@ -296,23 +297,23 @@ export const attemptReviewFilterOptions = [
 ] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
 
 export function buildAssignmentResultMetricItems({
-  averageDurationLabel,
+  averageDurationSeconds,
   averagePoints,
   averageScore,
-  closesLabel,
   completions,
+  expiresAt,
 }: {
-  averageDurationLabel: string;
+  averageDurationSeconds: number | null | undefined;
   averagePoints: number;
   averageScore: number;
-  closesLabel: string;
   completions: number;
+  expiresAt: Date | string | null | undefined;
 }) {
   const valueByMetric = {
     'average-accuracy': `${averageScore}%`,
     'average-points': String(averagePoints),
-    'average-time': averageDurationLabel,
-    closes: closesLabel,
+    'average-time': formatAttemptDuration(averageDurationSeconds),
+    closes: formatAssignmentExpiry(expiresAt),
     completions: String(completions),
   } satisfies Record<AssignmentResultMetricKey, string>;
 

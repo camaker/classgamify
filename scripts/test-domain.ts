@@ -132,6 +132,7 @@ import {
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
   buildAssignmentSettingsSummaryView,
+  formatAssignmentExpiry,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
@@ -4950,18 +4951,22 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentResultMetricItems({
-    averageDurationLabel: '2m 30s',
+    averageDurationSeconds: 150,
     averagePoints: 7,
     averageScore: 82,
-    closesLabel: 'Jun 30, 2026',
     completions: 12,
+    expiresAt: '2026-06-30T12:00:00.000Z',
   }),
   [
     { key: 'completions', label: 'Completions', value: '12' },
     { key: 'average-accuracy', label: 'Average accuracy', value: '82%' },
     { key: 'average-points', label: 'Average points', value: '7' },
     { key: 'average-time', label: 'Average time', value: '2m 30s' },
-    { key: 'closes', label: 'Closes', value: 'Jun 30, 2026' },
+    {
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry('2026-06-30T12:00:00.000Z'),
+    },
   ]
 );
 assert.deepEqual(

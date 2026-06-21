@@ -1,6 +1,4 @@
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import {
   type AttemptReviewFilter,
   type AssignmentResultEmptyState,
@@ -229,13 +227,11 @@ function AssignmentResultsPage() {
 
   const resultMetricItems = data
     ? buildAssignmentResultMetricItems({
-        averageDurationLabel: formatAttemptDuration(
-          data.stats.averageDurationSeconds
-        ),
+        averageDurationSeconds: data.stats.averageDurationSeconds,
         averagePoints: data.stats.averagePoints,
         averageScore: data.stats.averageScore,
-        closesLabel: formatAssignmentExpiry(data.assignment.expiresAt),
         completions: data.stats.completions,
+        expiresAt: data.assignment.expiresAt,
       })
     : [];
   const resultActionState = buildAssignmentResultActionState({
