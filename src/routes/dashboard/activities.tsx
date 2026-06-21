@@ -346,7 +346,7 @@ function DashboardActivitiesPage() {
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
                 Create the first reusable classroom activity, then publish it as
-                a student assignment in the next product wave.
+                a student assignment link for your class.
               </p>
               <Link
                 to={Routes.Create}
