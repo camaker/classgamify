@@ -12,11 +12,14 @@ import {
   type StudentSummarySort,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
+  attemptReviewFilterOptions,
   getAssignmentResultActionGate,
   getAssignmentResultActionCopy,
+  itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
+  studentSummarySortOptions,
 } from '@/assignments/result-view';
 import {
   buildAssignmentResultsCsv,
@@ -76,34 +79,6 @@ import {
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-
-const studentSummarySortOptions: Array<{
-  label: string;
-  value: StudentSummarySort;
-}> = [
-  { label: 'Needs review', value: 'needs-review' },
-  { label: 'Best score', value: 'best' },
-  { label: 'Student name', value: 'name' },
-  { label: 'Attempts', value: 'attempts' },
-];
-
-const itemPerformanceSortOptions: Array<{
-  label: string;
-  value: ItemPerformanceSort;
-}> = [
-  { label: 'Snapshot order', value: 'original' },
-  { label: 'Lowest accuracy', value: 'accuracy' },
-  { label: 'Most answered', value: 'submitted' },
-  { label: 'Item type', value: 'type' },
-];
-
-const attemptReviewFilterOptions: Array<{
-  label: string;
-  value: AttemptReviewFilter;
-}> = [
-  { label: 'All answers', value: 'all' },
-  { label: 'Needs review only', value: 'needs-review' },
-];
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   validateSearch: (search: Record<string, unknown>) => ({

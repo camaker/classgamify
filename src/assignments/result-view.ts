@@ -46,6 +46,30 @@ export type AssignmentResultEmptyState = {
   title: string;
 };
 
+type AssignmentResultControlOption<TValue extends string> = {
+  label: string;
+  value: TValue;
+};
+
+export const studentSummarySortOptions = [
+  { label: 'Needs review', value: 'needs-review' },
+  { label: 'Best score', value: 'best' },
+  { label: 'Student name', value: 'name' },
+  { label: 'Attempts', value: 'attempts' },
+] satisfies Array<AssignmentResultControlOption<StudentSummarySort>>;
+
+export const itemPerformanceSortOptions = [
+  { label: 'Snapshot order', value: 'original' },
+  { label: 'Lowest accuracy', value: 'accuracy' },
+  { label: 'Most answered', value: 'submitted' },
+  { label: 'Item type', value: 'type' },
+] satisfies Array<AssignmentResultControlOption<ItemPerformanceSort>>;
+
+export const attemptReviewFilterOptions = [
+  { label: 'All answers', value: 'all' },
+  { label: 'Needs review only', value: 'needs-review' },
+] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
+
 export type ResultSearchSummaryInput = {
   matchedAttempts: number;
   matchedStudents: number;

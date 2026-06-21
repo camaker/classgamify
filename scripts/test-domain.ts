@@ -131,10 +131,12 @@ import {
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   buildAssignmentResultEmptyState,
+  attemptReviewFilterOptions,
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
+  itemPerformanceSortOptions,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   matchesResultSearch,
@@ -142,6 +144,7 @@ import {
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
+  studentSummarySortOptions,
   sortItemPerformance,
   sortStudentSummaries,
 } from '@/assignments/result-view';
@@ -2972,6 +2975,18 @@ assert.equal(
     totalAttempts: 3,
   }),
   'Showing 2 of 3 submissions.'
+);
+assert.deepEqual(
+  studentSummarySortOptions.map((option) => option.value),
+  ['needs-review', 'best', 'name', 'attempts']
+);
+assert.deepEqual(
+  itemPerformanceSortOptions.map((option) => option.value),
+  ['original', 'accuracy', 'submitted', 'type']
+);
+assert.deepEqual(
+  attemptReviewFilterOptions.map((option) => option.value),
+  ['all', 'needs-review']
 );
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
