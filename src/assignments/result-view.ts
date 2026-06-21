@@ -7,7 +7,10 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import { formatAssignmentResultDate } from '@/assignments/result-format';
+import {
+  formatAcceptedAnswerAlternatives,
+  formatAssignmentResultDate,
+} from '@/assignments/result-format';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
@@ -544,6 +547,27 @@ export function formatAssignmentBriefStudentAccuracy({
   return `Latest ${formatAssignmentResultPercent(
     latestAccuracy
   )} · best ${formatAssignmentResultPercent(bestAccuracy)}`;
+}
+
+export function buildAssignmentItemAnalysisCardView(
+  item: AssignmentItemAnalysis
+) {
+  const acceptedAnswersText =
+    item.acceptedAnswers.length > 1
+      ? formatAcceptedAnswerAlternatives(item.acceptedAnswers)
+      : null;
+
+  return {
+    acceptedAnswersLabel: assignmentResultReviewCopy.acceptedLabel,
+    acceptedAnswersText,
+    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctSummaryLabel: formatAssignmentItemCorrectSummary(item),
+    expectedAnswerLabel: assignmentResultReviewCopy.itemAnswerLabel,
+    expectedAnswerText: formatAssignmentResultValue(item.expectedAnswer),
+    explanationText: item.explanation || null,
+    kindLabel: item.kindLabel,
+    prompt: item.prompt,
+  };
 }
 
 export function formatAssignmentItemCorrectSummary({

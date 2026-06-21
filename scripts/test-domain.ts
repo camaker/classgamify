@@ -181,6 +181,7 @@ import {
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentItemAnalysisCardView,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
@@ -4423,6 +4424,39 @@ assert.deepEqual(resultAnalysis.perItem[0]?.acceptedAnswers, [
   'Paris',
   'Paris, France',
 ]);
+assert.deepEqual(
+  buildAssignmentItemAnalysisCardView(resultAnalysis.perItem[0]!),
+  {
+    acceptedAnswersLabel: 'Accepted',
+    acceptedAnswersText: 'Paris, Paris, France',
+    correctRateLabel: '67%',
+    correctSummaryLabel: '2/3 correct',
+    expectedAnswerLabel: 'answer',
+    expectedAnswerText: 'Paris / Paris, France',
+    explanationText: 'Paris is the capital of France.',
+    kindLabel: 'Question',
+    prompt: 'Capital of France?',
+  }
+);
+assert.deepEqual(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[1]!,
+    acceptedAnswers: ['Cold'],
+    expectedAnswer: '',
+    explanation: '',
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted',
+    acceptedAnswersText: null,
+    correctRateLabel: '50%',
+    correctSummaryLabel: '1/2 correct',
+    expectedAnswerLabel: 'answer',
+    expectedAnswerText: '-',
+    explanationText: null,
+    kindLabel: 'Pair',
+    prompt: 'Match "Hot" with its pair.',
+  }
+);
 assert.equal(
   resultAnalysis.attempts[0]?.answers[0]?.explanation,
   'Paris is the capital of France.'

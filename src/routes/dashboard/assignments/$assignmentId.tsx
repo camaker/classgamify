@@ -21,6 +21,7 @@ import {
   assignmentResultTableHeaders,
   attemptReviewFilterOptions,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentItemAnalysisCardView,
   buildAssignmentResultMetricItems,
   formatAssignmentAttemptReviewBadge,
   formatAssignmentBriefStudentAccuracy,
@@ -867,32 +868,32 @@ function ItemAnalysisCard({
     ReturnType<typeof useAssignmentResults>['data']
   >['analysis']['perItem'][number];
 }) {
+  const itemView = buildAssignmentItemAnalysisCardView(item);
+
   return (
     <div className="rounded-lg border bg-background p-4">
       <div className="flex items-center justify-between gap-3">
         <Badge variant="outline" className="rounded-md">
-          {item.kindLabel}
+          {itemView.kindLabel}
         </Badge>
         <span className="text-sm font-semibold">
-          {formatAssignmentResultPercent(item.correctRate)}
+          {itemView.correctRateLabel}
         </span>
       </div>
-      <p className="mt-3 line-clamp-2 text-sm font-medium">{item.prompt}</p>
+      <p className="mt-3 line-clamp-2 text-sm font-medium">{itemView.prompt}</p>
       <Progress value={item.correctRate} className="mt-3 h-2" />
       <p className="mt-2 text-xs text-muted-foreground">
-        {formatAssignmentItemCorrectSummary(item)} ·{' '}
-        {assignmentResultReviewCopy.itemAnswerLabel}:{' '}
-        {formatAssignmentResultValue(item.expectedAnswer)}
+        {itemView.correctSummaryLabel} · {itemView.expectedAnswerLabel}:{' '}
+        {itemView.expectedAnswerText}
       </p>
-      {item.acceptedAnswers.length > 1 ? (
+      {itemView.acceptedAnswersText ? (
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          {assignmentResultReviewCopy.acceptedLabel}:{' '}
-          {formatAcceptedAnswerAlternatives(item.acceptedAnswers)}
+          {itemView.acceptedAnswersLabel}: {itemView.acceptedAnswersText}
         </p>
       ) : null}
-      {item.explanation ? (
+      {itemView.explanationText ? (
         <p className="mt-2 text-xs leading-5 text-muted-foreground">
-          {item.explanation}
+          {itemView.explanationText}
         </p>
       ) : null}
     </div>
