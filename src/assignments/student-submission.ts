@@ -285,9 +285,11 @@ export function buildAttemptCompletionCopy({
 
   return {
     confirmIncompleteSubmit:
-      unansweredItemCount === 1
-        ? '1 question is still unanswered.'
-        : `${unansweredItemCount} questions are still unanswered.`,
+      unansweredItemCount === 0
+        ? 'All items are answered.'
+        : unansweredItemCount === 1
+          ? '1 question is still unanswered.'
+          : `${unansweredItemCount} questions are still unanswered.`,
     progressLabel: formatAttemptCompletionProgressLabel({
       completionSummary,
     }),

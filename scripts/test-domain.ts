@@ -780,7 +780,7 @@ assert.deepEqual(
     confirmIncompleteSubmit: true,
   }),
   {
-    confirmIncompleteSubmit: '0 questions are still unanswered.',
+    confirmIncompleteSubmit: 'All items are answered.',
     progressLabel: '3/3 answered',
     submitButtonLabel: 'Submit answers',
     unansweredLabel: undefined,
