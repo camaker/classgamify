@@ -10,6 +10,7 @@ import type {
   PublishAssignmentInput,
   UpdateAssignmentStatusInput,
 } from '@/assignments/validation';
+import type { StudentAttemptSubmissionInput } from '@/assignments/student-submission';
 import {
   keepPreviousData,
   useMutation,
@@ -104,13 +105,8 @@ export function useSubmitAttempt() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: {
-      anonymousToken?: string;
-      answers: Array<{ answer: string; itemId: string }>;
-      durationSeconds?: number;
-      shareSlug: string;
-      studentName?: string;
-    }) => submitAttempt({ data: input }),
+    mutationFn: (input: StudentAttemptSubmissionInput) =>
+      submitAttempt({ data: input }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: assignmentsKeys.details() });

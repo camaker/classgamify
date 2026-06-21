@@ -1,3 +1,8 @@
+import {
+  normalizeAnonymousToken,
+  normalizeStudentName,
+} from '@/assignments/identity';
+
 export type StudentAnswerMap = Record<string, string>;
 
 export type StudentSubmissionRuntimeItem = {
@@ -7,6 +12,14 @@ export type StudentSubmissionRuntimeItem = {
 export type StudentSubmissionAnswer = {
   answer: string;
   itemId: string;
+};
+
+export type StudentAttemptSubmissionInput = {
+  anonymousToken?: string;
+  answers: StudentSubmissionAnswer[];
+  durationSeconds?: number;
+  shareSlug: string;
+  studentName?: string;
 };
 
 export type AttemptCompletionSummary = {
@@ -107,6 +120,51 @@ export function buildAttemptSubmissionAnswers({
     answer: answers[item.id] ?? '',
     itemId: item.id,
   }));
+}
+
+export function buildStudentAttemptSubmissionInput({
+  anonymousToken,
+  answers,
+  collectStudentName,
+  durationSeconds,
+  runtimeItems,
+  shareSlug,
+  studentName,
+}: {
+  anonymousToken?: string;
+  answers: StudentAnswerMap;
+  collectStudentName: boolean;
+  durationSeconds?: number;
+  runtimeItems: StudentSubmissionRuntimeItem[];
+  shareSlug: string;
+  studentName: string;
+}): StudentAttemptSubmissionInput {
+  const input: StudentAttemptSubmissionInput = {
+    answers: buildAttemptSubmissionAnswers({
+      answers,
+      runtimeItems,
+    }),
+    shareSlug,
+  };
+
+  if (durationSeconds !== undefined) {
+    input.durationSeconds = durationSeconds;
+  }
+
+  if (collectStudentName) {
+    const normalizedStudentName = normalizeStudentName(studentName);
+    if (normalizedStudentName) {
+      input.studentName = normalizedStudentName;
+    }
+    return input;
+  }
+
+  const normalizedAnonymousToken = normalizeAnonymousToken(anonymousToken);
+  if (normalizedAnonymousToken) {
+    input.anonymousToken = normalizedAnonymousToken;
+  }
+
+  return input;
 }
 
 export function buildStudentAttemptSubmitGate({

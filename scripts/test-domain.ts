@@ -164,6 +164,7 @@ import {
 import {
   buildAttemptCompletionCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -449,6 +450,46 @@ assert.deepEqual(
     { answer: '   ', itemId: 'item-2' },
     { answer: '', itemId: 'item-3' },
   ]
+);
+assert.deepEqual(
+  buildStudentAttemptSubmissionInput({
+    answers,
+    collectStudentName: true,
+    durationSeconds: 89,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    anonymousToken: ' anonymous-token-should-not-send ',
+    studentName: ' Ava   Chen ',
+  }),
+  {
+    answers: [
+      { answer: ' apple ', itemId: 'item-1' },
+      { answer: '   ', itemId: 'item-2' },
+      { answer: '', itemId: 'item-3' },
+    ],
+    durationSeconds: 89,
+    shareSlug: 'share-one',
+    studentName: 'Ava Chen',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmissionInput({
+    answers,
+    collectStudentName: false,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-two',
+    anonymousToken: ' anonymous-token-1 ',
+    studentName: 'Stale Name',
+  }),
+  {
+    anonymousToken: 'anonymous-token-1',
+    answers: [
+      { answer: ' apple ', itemId: 'item-1' },
+      { answer: '   ', itemId: 'item-2' },
+      { answer: '', itemId: 'item-3' },
+    ],
+    shareSlug: 'share-two',
+  }
 );
 assert.equal(
   orderAssignmentRuntimeItems({

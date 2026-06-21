@@ -27,7 +27,7 @@ import {
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildAttemptCompletionCopy,
-  buildAttemptSubmissionAnswers,
+  buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
   getAttemptCompletionSummary,
 } from '@/assignments/student-submission';
@@ -196,26 +196,28 @@ function PlayPage() {
     }
 
     try {
-      const response = await submitAttemptMutation.mutateAsync({
-        answers: buildAttemptSubmissionAnswers({
+      const nextAnonymousToken = assignment?.settings.collectStudentName
+        ? undefined
+        : (anonymousToken ??
+          getOrCreateAnonymousAttemptToken({
+            shareId: activeShareId,
+            storage: window.localStorage,
+          }));
+      const response = await submitAttemptMutation.mutateAsync(
+        buildStudentAttemptSubmissionInput({
           answers,
+          collectStudentName: Boolean(assignment?.settings.collectStudentName),
+          durationSeconds: buildAttemptTimerState({
+            now: Date.now(),
+            startedAt,
+            timeLimitSeconds,
+          }).durationSeconds,
           runtimeItems,
-        }),
-        durationSeconds: buildAttemptTimerState({
-          now: Date.now(),
-          startedAt,
-          timeLimitSeconds,
-        }).durationSeconds,
-        shareSlug: assignment?.shareId ?? shareId,
-        anonymousToken: assignment?.settings.collectStudentName
-          ? undefined
-          : (anonymousToken ??
-            getOrCreateAnonymousAttemptToken({
-              shareId: activeShareId,
-              storage: window.localStorage,
-            })),
-        studentName: studentName.trim() || undefined,
-      });
+          shareSlug: activeShareId,
+          anonymousToken: nextAnonymousToken,
+          studentName,
+        })
+      );
       setResult({
         ...response.result,
         reviewItems: response.reviewItems,
