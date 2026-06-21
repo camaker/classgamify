@@ -54,7 +54,11 @@ import {
   buildExclusiveChoiceAnswerChanges,
   findChoiceOwner,
 } from '@/components/activities/runtime-choice-answers';
-import { buildAssignmentDeliverySummary } from '@/assignments/delivery-summary';
+import {
+  buildAssignmentDeliverySummary,
+  buildPublicAssignmentRuleSummary,
+  formatAssignmentItemCount,
+} from '@/assignments/delivery-summary';
 import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
@@ -380,6 +384,26 @@ assert.deepEqual(
     ['identity', 'Anonymous'],
     ['answerReveal', 'Hidden'],
     ['itemOrder', 'Fixed order'],
+  ]
+);
+assert.equal(formatAssignmentItemCount(1), '1 item');
+assert.equal(formatAssignmentItemCount(3), '3 items');
+assert.deepEqual(
+  buildPublicAssignmentRuleSummary({
+    collectStudentName: false,
+    expiresAt: null,
+    itemCount: 1,
+    maxAttempts: 2,
+    showCorrectAnswers: false,
+    timeLimitSeconds: 60,
+  }),
+  [
+    { id: 'items', label: 'Items', value: '1 item' },
+    { id: 'attempts', label: 'Attempts', value: '2 max' },
+    { id: 'timer', label: 'Timer', value: '1 min' },
+    { id: 'closes', label: 'Closes', value: 'No close time' },
+    { id: 'identity', label: 'Student identity', value: 'Anonymous' },
+    { id: 'answerReveal', label: 'Review', value: 'Hidden' },
   ]
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');

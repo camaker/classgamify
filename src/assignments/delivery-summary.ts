@@ -14,6 +14,16 @@ export type AssignmentDeliverySummaryItem = {
   value: string;
 };
 
+export type PublicAssignmentRuleSummaryId =
+  | AssignmentDeliverySummaryId
+  | 'items';
+
+export type PublicAssignmentRuleSummaryItem = {
+  id: PublicAssignmentRuleSummaryId;
+  label: string;
+  value: string;
+};
+
 export type AssignmentDeliverySummaryInput = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
@@ -63,6 +73,31 @@ export function buildAssignmentDeliverySummary({
       value: formatShuffleItems(shuffleItems),
     },
   ];
+}
+
+export function buildPublicAssignmentRuleSummary({
+  itemCount,
+  ...input
+}: AssignmentDeliverySummaryInput & {
+  itemCount: number;
+}): PublicAssignmentRuleSummaryItem[] {
+  return [
+    {
+      id: 'items',
+      label: 'Items',
+      value: formatAssignmentItemCount(itemCount),
+    },
+    ...buildAssignmentDeliverySummary(input)
+      .filter((rule) => rule.id !== 'itemOrder')
+      .map((rule) => ({
+        ...rule,
+        label: rule.id === 'answerReveal' ? 'Review' : rule.label,
+      })),
+  ];
+}
+
+export function formatAssignmentItemCount(itemCount: number) {
+  return `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
 }
 
 export function formatAssignmentAttempts(maxAttempts?: number | null) {

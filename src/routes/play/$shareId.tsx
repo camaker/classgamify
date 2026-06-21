@@ -7,8 +7,8 @@ import type {
   AssignmentSeed,
 } from '@/activities/types';
 import {
-  type AssignmentDeliverySummaryId,
-  buildAssignmentDeliverySummary,
+  type PublicAssignmentRuleSummaryId,
+  buildPublicAssignmentRuleSummary,
 } from '@/assignments/delivery-summary';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
@@ -428,27 +428,14 @@ function PublicAssignmentRules({
   showCorrectAnswers: boolean;
   timeLimitSeconds?: number;
 }) {
-  const deliveryRules = buildAssignmentDeliverySummary({
+  const rules = buildPublicAssignmentRuleSummary({
     collectStudentName,
     expiresAt,
+    itemCount,
     maxAttempts,
     showCorrectAnswers,
     timeLimitSeconds,
   });
-  const rules = [
-    {
-      icon: IconListCheck,
-      label: 'Items',
-      value: `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`,
-    },
-    ...deliveryRules
-      .filter((rule) => rule.id !== 'itemOrder')
-      .map((rule) => ({
-        icon: getPublicAssignmentRuleIcon(rule.id),
-        label: rule.id === 'answerReveal' ? 'Review' : rule.label,
-        value: rule.value,
-      })),
-  ];
 
   return (
     <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -457,7 +444,7 @@ function PublicAssignmentRules({
           key={rule.label}
           className="flex min-w-0 items-center gap-2 rounded-lg border bg-background px-3 py-2"
         >
-          <rule.icon className="size-4 shrink-0 text-primary" />
+          <PublicAssignmentRuleIcon id={rule.id} />
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{rule.value}</p>
             <p className="text-xs text-muted-foreground">{rule.label}</p>
@@ -468,7 +455,17 @@ function PublicAssignmentRules({
   );
 }
 
-function getPublicAssignmentRuleIcon(id: AssignmentDeliverySummaryId) {
+function PublicAssignmentRuleIcon({
+  id,
+}: {
+  id: PublicAssignmentRuleSummaryId;
+}) {
+  const Icon = getPublicAssignmentRuleIcon(id);
+  return <Icon className="size-4 shrink-0 text-primary" />;
+}
+
+function getPublicAssignmentRuleIcon(id: PublicAssignmentRuleSummaryId) {
+  if (id === 'items') return IconListCheck;
   if (id === 'attempts') return IconRepeat;
   if (id === 'identity') return IconUser;
   if (id === 'answerReveal') return IconEye;
