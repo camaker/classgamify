@@ -128,6 +128,8 @@ export function getAssignmentListCardActionState({
 
   return {
     isPersisted,
+    showResultsAction: isPersisted,
+    showShareActions: true,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,

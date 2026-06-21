@@ -539,11 +539,12 @@ function AssignmentListFilters({
 function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
   const updateStatusMutation = useUpdateAssignmentStatus();
   const stats = buildAssignmentListCardStats(assignment.stats);
-  const { isPersisted, statusAction } = getAssignmentListCardActionState({
-    expiresAt: assignment.expiresAt,
-    id: assignment.id,
-    status: assignment.status,
-  });
+  const { showResultsAction, showShareActions, statusAction } =
+    getAssignmentListCardActionState({
+      expiresAt: assignment.expiresAt,
+      id: assignment.id,
+      status: assignment.status,
+    });
 
   async function updateStatus() {
     if (!statusAction) return;
@@ -603,7 +604,7 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          {isPersisted ? (
+          {showResultsAction ? (
             <Link
               to="/dashboard/assignments/$assignmentId"
               params={{ assignmentId: assignment.id }}
@@ -632,18 +633,22 @@ function AssignmentCard({ assignment }: { assignment: AssignmentCardData }) {
               {statusAction.label}
             </Button>
           ) : null}
-          <Link
-            to="/play/$shareId"
-            params={{ shareId: assignment.shareSlug }}
-            className={cn(buttonVariants(), 'w-full lg:w-auto')}
-          >
-            <IconPlayerPlay className="size-4" />
-            {assignmentListActionCopy.openShareLink}
-          </Link>
-          <CopyAssignmentShareLinkButton
-            shareSlug={assignment.shareSlug}
-            className="w-full bg-background lg:w-auto"
-          />
+          {showShareActions ? (
+            <>
+              <Link
+                to="/play/$shareId"
+                params={{ shareId: assignment.shareSlug }}
+                className={cn(buttonVariants(), 'w-full lg:w-auto')}
+              >
+                <IconPlayerPlay className="size-4" />
+                {assignmentListActionCopy.openShareLink}
+              </Link>
+              <CopyAssignmentShareLinkButton
+                shareSlug={assignment.shareSlug}
+                className="w-full bg-background lg:w-auto"
+              />
+            </>
+          ) : null}
         </div>
       </CardContent>
     </Card>

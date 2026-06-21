@@ -2202,6 +2202,8 @@ assert.deepEqual(
   }),
   {
     isPersisted: false,
+    showResultsAction: false,
+    showShareActions: true,
     statusAction: undefined,
   }
 );
@@ -2213,6 +2215,8 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    showResultsAction: true,
+    showShareActions: true,
     statusAction: {
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
@@ -2230,6 +2234,8 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    showResultsAction: true,
+    showShareActions: true,
     statusAction: undefined,
   }
 );
