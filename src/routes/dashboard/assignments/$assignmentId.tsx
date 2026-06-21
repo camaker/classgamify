@@ -11,6 +11,7 @@ import {
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionState,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
@@ -29,8 +30,8 @@ import {
   formatAssignmentResultValue,
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
-  getAssignmentResultActionGate,
   getAssignmentResultActionCopy,
+  getAssignmentResultActionGateFromState,
   itemPerformanceSortOptions,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
@@ -205,12 +206,9 @@ function AssignmentResultsPage() {
   }
 
   function getActionGate(action: AssignmentResultAction) {
-    return getAssignmentResultActionGate({
+    return getAssignmentResultActionGateFromState({
       action,
-      attemptCount: data?.attempts.length ?? 0,
-      classroomBriefReady: Boolean(classroomBrief),
-      itemCount: data?.analysis.perItem.length ?? 0,
-      studentCount: data?.analysis.students.length ?? 0,
+      state: resultActionState,
     });
   }
 
@@ -341,12 +339,14 @@ function AssignmentResultsPage() {
         completions: data.stats.completions,
       })
     : [];
-  const resultActionButtons = buildAssignmentResultActionButtons({
+  const resultActionState = buildAssignmentResultActionState({
     attemptCount: data?.attempts.length ?? 0,
     classroomBriefReady: Boolean(classroomBrief),
     itemCount: data?.analysis.perItem.length ?? 0,
     studentCount: data?.analysis.students.length ?? 0,
   });
+  const resultActionButtons =
+    buildAssignmentResultActionButtons(resultActionState);
   const resultActionHandlers = {
     'copy-brief': handleCopyClassroomBrief,
     'copy-follow-up': handleCopyStudentFollowUp,
@@ -605,8 +605,6 @@ function AssignmentResultsPage() {
                     )}
                   </TableBody>
                 </Table>
-              ) : data.attempts.length > 0 ? (
-                <ResultEmptyState state={resultView.emptyStates.attemptRows} />
               ) : (
                 <ResultEmptyState state={resultView.emptyStates.attemptRows} />
               )}

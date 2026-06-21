@@ -48,6 +48,13 @@ type AssignmentResultActionButton = {
   label: string;
 };
 
+type AssignmentResultActionState = {
+  attemptCount: number;
+  classroomBriefReady: boolean;
+  itemCount: number;
+  studentCount: number;
+};
+
 export type AssignmentResultEmptyState = {
   description: string;
   title: string;
@@ -244,7 +251,7 @@ export function buildAssignmentResultMetricItems({
   }));
 }
 
-export function buildAssignmentResultActionButtons({
+export function buildAssignmentResultActionState({
   attemptCount,
   classroomBriefReady = false,
   itemCount,
@@ -254,7 +261,21 @@ export function buildAssignmentResultActionButtons({
   classroomBriefReady?: boolean;
   itemCount: number;
   studentCount: number;
-}): AssignmentResultActionButton[] {
+}): AssignmentResultActionState {
+  return {
+    attemptCount,
+    classroomBriefReady,
+    itemCount,
+    studentCount,
+  };
+}
+
+export function buildAssignmentResultActionButtons({
+  attemptCount,
+  classroomBriefReady,
+  itemCount,
+  studentCount,
+}: AssignmentResultActionState): AssignmentResultActionButton[] {
   return assignmentResultActionOrder.map((action) => {
     const gate = getAssignmentResultActionGate({
       action,
@@ -269,6 +290,22 @@ export function buildAssignmentResultActionButtons({
       disabled: gate.type === 'blocked',
       label: getAssignmentResultActionCopy(action).label,
     };
+  });
+}
+
+export function getAssignmentResultActionGateFromState({
+  action,
+  state,
+}: {
+  action: AssignmentResultAction;
+  state: AssignmentResultActionState;
+}): AssignmentResultActionGate {
+  return getAssignmentResultActionGate({
+    action,
+    attemptCount: state.attemptCount,
+    classroomBriefReady: state.classroomBriefReady,
+    itemCount: state.itemCount,
+    studentCount: state.studentCount,
   });
 }
 

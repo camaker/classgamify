@@ -158,6 +158,7 @@ import {
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionState,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
@@ -178,6 +179,7 @@ import {
   itemPerformanceSortOptions,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
+  getAssignmentResultActionGateFromState,
   matchesResultSearch,
   normalizeResultSearch,
   parseAttemptReviewFilter,
@@ -3692,13 +3694,19 @@ assert.deepEqual(assignmentResultActionOrder, [
   'copy-follow-up',
   'export-csv',
 ]);
+const emptyAssignmentResultActionState = buildAssignmentResultActionState({
+  attemptCount: 0,
+  itemCount: 0,
+  studentCount: 0,
+});
+assert.deepEqual(emptyAssignmentResultActionState, {
+  attemptCount: 0,
+  classroomBriefReady: false,
+  itemCount: 0,
+  studentCount: 0,
+});
 assert.deepEqual(
-  buildAssignmentResultActionButtons({
-    attemptCount: 0,
-    classroomBriefReady: false,
-    itemCount: 0,
-    studentCount: 0,
-  }),
+  buildAssignmentResultActionButtons(emptyAssignmentResultActionState),
   [
     { action: 'copy-brief', disabled: true, label: 'Copy brief' },
     {
@@ -3711,13 +3719,14 @@ assert.deepEqual(
     { action: 'export-csv', disabled: true, label: 'Download CSV' },
   ]
 );
+const readyAssignmentResultActionState = buildAssignmentResultActionState({
+  attemptCount: 2,
+  classroomBriefReady: true,
+  itemCount: 3,
+  studentCount: 1,
+});
 assert.deepEqual(
-  buildAssignmentResultActionButtons({
-    attemptCount: 2,
-    classroomBriefReady: true,
-    itemCount: 3,
-    studentCount: 1,
-  }),
+  buildAssignmentResultActionButtons(readyAssignmentResultActionState),
   [
     { action: 'copy-brief', disabled: false, label: 'Copy brief' },
     {
@@ -3729,6 +3738,23 @@ assert.deepEqual(
     { action: 'copy-follow-up', disabled: false, label: 'Copy follow-up' },
     { action: 'export-csv', disabled: false, label: 'Download CSV' },
   ]
+);
+assert.deepEqual(
+  getAssignmentResultActionGateFromState({
+    action: 'copy-brief',
+    state: emptyAssignmentResultActionState,
+  }),
+  {
+    message: 'Submit at least one attempt before copying a brief.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGateFromState({
+    action: 'export-csv',
+    state: readyAssignmentResultActionState,
+  }),
+  { type: 'ready' }
 );
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
