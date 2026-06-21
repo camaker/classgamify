@@ -85,6 +85,10 @@ type AssignmentPublishToggleOption = {
   label: string;
 };
 
+type AssignmentPublishToggleView = AssignmentPublishToggleOption & {
+  checked: boolean;
+};
+
 export const assignmentPublishDialogCopy = {
   cancelLabel: 'Cancel',
   closeAfterHelp:
@@ -122,6 +126,26 @@ export const assignmentPublishToggleOptions = [
     label: 'Shuffle items',
   },
 ] satisfies Array<AssignmentPublishToggleOption>;
+
+export function buildAssignmentPublishToggleViews({
+  collectStudentName,
+  showCorrectAnswers,
+  shuffleItems,
+}: Pick<
+  AssignmentPublishDraft,
+  'collectStudentName' | 'showCorrectAnswers' | 'shuffleItems'
+>): AssignmentPublishToggleView[] {
+  const checkedByKey = {
+    collectStudentName,
+    showCorrectAnswers,
+    shuffleItems,
+  } satisfies Record<AssignmentPublishToggleKey, boolean>;
+
+  return assignmentPublishToggleOptions.map((option) => ({
+    ...option,
+    checked: checkedByKey[option.key],
+  }));
+}
 
 export function buildAssignmentPublishDraftDefaults({
   activityId,

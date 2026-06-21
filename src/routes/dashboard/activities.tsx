@@ -38,12 +38,12 @@ import {
 } from '@/activities/library-view';
 import {
   assignmentPublishDialogCopy,
-  assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
+  buildAssignmentPublishToggleViews,
   formatAssignmentDateTimeLocal,
   validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
@@ -526,19 +526,15 @@ function ActivityCard({
   const [expiresAtLocal, setExpiresAtLocal] = useState(
     publishDraftDefaults.expiresAtLocal
   );
-  const publishToggleState = {
-    collectStudentName: {
-      checked: collectStudentName,
-      setChecked: setCollectStudentName,
-    },
-    showCorrectAnswers: {
-      checked: showCorrectAnswers,
-      setChecked: setShowCorrectAnswers,
-    },
-    shuffleItems: {
-      checked: shuffleItems,
-      setChecked: setShuffleItems,
-    },
+  const publishToggleViews = buildAssignmentPublishToggleViews({
+    collectStudentName,
+    showCorrectAnswers,
+    shuffleItems,
+  });
+  const publishToggleSetters = {
+    collectStudentName: setCollectStudentName,
+    showCorrectAnswers: setShowCorrectAnswers,
+    shuffleItems: setShuffleItems,
   };
   const publishDraft = buildAssignmentPublishDraft({
     defaults: publishDraftDefaults,
@@ -885,14 +881,14 @@ function ActivityCard({
               />
             </div>
             <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
-              {assignmentPublishToggleOptions.map((option) => (
+              {publishToggleViews.map((option) => (
                 <PublishSetting
                   key={option.key}
-                  checked={publishToggleState[option.key].checked}
+                  checked={option.checked}
                   description={option.description}
                   id={`${option.key}-${activity.id}`}
                   label={option.label}
-                  onCheckedChange={publishToggleState[option.key].setChecked}
+                  onCheckedChange={publishToggleSetters[option.key]}
                 />
               ))}
             </div>

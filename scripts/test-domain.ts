@@ -261,6 +261,7 @@ import {
   buildAssignmentPublishDialogState,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
+  buildAssignmentPublishToggleViews,
   formatAssignmentDateTimeLocal,
   parseAssignmentDateTimeLocal,
   parseOptionalWholeNumber,
@@ -1186,6 +1187,33 @@ assert.deepEqual(
 assert.deepEqual(
   assignmentPublishToggleOptions.map((option) => option.label),
   ['Collect student name', 'Show correct answers', 'Shuffle items']
+);
+assert.deepEqual(
+  buildAssignmentPublishToggleViews({
+    collectStudentName: false,
+    showCorrectAnswers: true,
+    shuffleItems: false,
+  }),
+  [
+    {
+      checked: false,
+      description: 'Ask learners to type their name before submitting.',
+      key: 'collectStudentName',
+      label: 'Collect student name',
+    },
+    {
+      checked: true,
+      description: 'Reveal correct answers after an attempt is submitted.',
+      key: 'showCorrectAnswers',
+      label: 'Show correct answers',
+    },
+    {
+      checked: false,
+      description: 'Prepare this assignment for randomized item order.',
+      key: 'shuffleItems',
+      label: 'Shuffle items',
+    },
+  ]
 );
 assert.equal(assignmentPublishDialogCopy.title, 'Publish assignment');
 assert.equal(
