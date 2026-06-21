@@ -13,6 +13,7 @@ import {
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   getAssignmentResultActionGate,
+  getAssignmentResultActionCopy,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
@@ -207,7 +208,9 @@ function AssignmentResultsPage() {
   }
 
   async function handleExportResults() {
-    const actionGate = getActionGate('export-csv');
+    const action = 'export-csv';
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionGate = getActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -215,12 +218,20 @@ function AssignmentResultsPage() {
 
     const csv = buildAssignmentResultsCsv(data);
     const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
-    await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
-    toast.success('Results CSV downloaded.');
+    try {
+      await downloadFile(csvUrl, buildAssignmentResultsCsvFilename(data));
+      toast.success(actionCopy.successMessage);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : actionCopy.failureMessage
+      );
+    }
   }
 
   async function handleCopyReteachPlan() {
-    const actionGate = getActionGate('copy-reteach-plan');
+    const action = 'copy-reteach-plan';
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionGate = getActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -234,18 +245,18 @@ function AssignmentResultsPage() {
           students: data.analysis.students,
         })
       );
-      toast.success('Reteach plan copied.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Reteach plan could not be copied.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function handleCopyClassroomBrief() {
-    const actionGate = getActionGate('copy-brief');
+    const action = 'copy-brief';
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionGate = getActionGate(action);
     if (!data || !classroomBrief || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -253,18 +264,18 @@ function AssignmentResultsPage() {
 
     try {
       await copyTextToClipboard(classroomBrief.text);
-      toast.success('Classroom brief copied.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Classroom brief could not be copied.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function handleCopyItemReview() {
-    const actionGate = getActionGate('copy-item-review');
+    const action = 'copy-item-review';
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionGate = getActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -277,18 +288,18 @@ function AssignmentResultsPage() {
           items: data.analysis.perItem,
         })
       );
-      toast.success('Item review copied.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Item review could not be copied.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }
 
   async function handleCopyStudentFollowUp() {
-    const actionGate = getActionGate('copy-follow-up');
+    const action = 'copy-follow-up';
+    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionGate = getActionGate(action);
     if (!data || actionGate.type === 'blocked') {
       toast.error(actionGate.message);
       return;
@@ -301,12 +312,10 @@ function AssignmentResultsPage() {
           students: data.analysis.students,
         })
       );
-      toast.success('Student follow-up copied.');
+      toast.success(actionCopy.successMessage);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Student follow-up could not be copied.'
+        error instanceof Error ? error.message : actionCopy.failureMessage
       );
     }
   }

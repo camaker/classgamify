@@ -36,6 +36,11 @@ export type AssignmentResultActionGate =
       type: 'blocked';
     };
 
+export type AssignmentResultActionCopy = {
+  failureMessage: string;
+  successMessage: string;
+};
+
 export type AssignmentResultEmptyState = {
   description: string;
   title: string;
@@ -361,6 +366,38 @@ export function getAssignmentResultActionGate({
     message: getNoAttemptResultActionMessage(action),
     type: 'blocked',
   };
+}
+
+export function getAssignmentResultActionCopy(
+  action: AssignmentResultAction
+): AssignmentResultActionCopy {
+  switch (action) {
+    case 'copy-brief':
+      return {
+        failureMessage: 'Classroom brief could not be copied.',
+        successMessage: 'Classroom brief copied.',
+      };
+    case 'copy-follow-up':
+      return {
+        failureMessage: 'Student follow-up could not be copied.',
+        successMessage: 'Student follow-up copied.',
+      };
+    case 'copy-item-review':
+      return {
+        failureMessage: 'Item review could not be copied.',
+        successMessage: 'Item review copied.',
+      };
+    case 'copy-reteach-plan':
+      return {
+        failureMessage: 'Reteach plan could not be copied.',
+        successMessage: 'Reteach plan copied.',
+      };
+    case 'export-csv':
+      return {
+        failureMessage: 'Results CSV could not be downloaded.',
+        successMessage: 'Results CSV downloaded.',
+      };
+  }
 }
 
 export function sortStudentSummaries(

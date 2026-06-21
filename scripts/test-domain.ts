@@ -123,6 +123,7 @@ import {
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAttemptReviews,
+  getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   matchesResultSearch,
   normalizeResultSearch,
@@ -3020,6 +3021,26 @@ assert.deepEqual(
   }),
   { type: 'ready' }
 );
+assert.deepEqual(getAssignmentResultActionCopy('copy-brief'), {
+  failureMessage: 'Classroom brief could not be copied.',
+  successMessage: 'Classroom brief copied.',
+});
+assert.deepEqual(getAssignmentResultActionCopy('copy-follow-up'), {
+  failureMessage: 'Student follow-up could not be copied.',
+  successMessage: 'Student follow-up copied.',
+});
+assert.deepEqual(getAssignmentResultActionCopy('copy-item-review'), {
+  failureMessage: 'Item review could not be copied.',
+  successMessage: 'Item review copied.',
+});
+assert.deepEqual(getAssignmentResultActionCopy('copy-reteach-plan'), {
+  failureMessage: 'Reteach plan could not be copied.',
+  successMessage: 'Reteach plan copied.',
+});
+assert.deepEqual(getAssignmentResultActionCopy('export-csv'), {
+  failureMessage: 'Results CSV could not be downloaded.',
+  successMessage: 'Results CSV downloaded.',
+});
 const followUpPriorityStudents = [
   {
     attempts: 1,
