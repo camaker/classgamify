@@ -10,6 +10,9 @@ import { useAssignments } from '@/hooks/use-assignments';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
+  dashboardOverviewActionCards,
+  dashboardOverviewPageCopy,
+  type DashboardOverviewActionCardId,
   type DashboardOverviewMetricId,
   type DashboardCoreLoopReadinessRow,
 } from '@/dashboard/overview';
@@ -57,9 +60,14 @@ function DashboardPage() {
 
   return (
     <DashboardLayout
-      breadcrumbs={[{ label: 'Dashboard', isCurrentPage: true }]}
-      title="Teacher dashboard"
-      description="Manage reusable activities, publish classroom assignments, and track student attempts from one workspace."
+      breadcrumbs={[
+        {
+          label: dashboardOverviewPageCopy.breadcrumbLabel,
+          isCurrentPage: true,
+        },
+      ]}
+      title={dashboardOverviewPageCopy.title}
+      description={dashboardOverviewPageCopy.description}
     >
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -73,20 +81,17 @@ function DashboardPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="rounded-md border-primary/30">
                 <IconSparkles className="size-3.5" />
-                Teacher workspace
+                {dashboardOverviewPageCopy.heroBadge}
               </Badge>
               <Badge variant="secondary" className="rounded-md">
-                Wordwall-core loop
+                {dashboardOverviewPageCopy.loopBadge}
               </Badge>
             </div>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              Activity content is now the center of the product.
+              {dashboardOverviewPageCopy.heroTitle}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              ClassGamify separates reusable teacher activities from published
-              assignments and student attempts. Create, publish, play, and
-              review now share one activity data contract that AI drafting and
-              template remixing can build on.
+              {dashboardOverviewPageCopy.heroDescription}
             </p>
             <div className="mt-5 flex flex-col gap-2 sm:flex-row">
               <Link
@@ -94,7 +99,7 @@ function DashboardPage() {
                 className={cn(buttonVariants(), 'w-full sm:w-auto')}
               >
                 <IconPlus className="size-4" />
-                Create activity
+                {dashboardOverviewPageCopy.heroPrimaryAction}
               </Link>
               <Link
                 to={Routes.DashboardActivities}
@@ -104,7 +109,7 @@ function DashboardPage() {
                 )}
               >
                 <IconDeviceGamepad2 className="size-4" />
-                Open activity library
+                {dashboardOverviewPageCopy.heroSecondaryAction}
               </Link>
             </div>
           </div>
@@ -112,7 +117,9 @@ function DashboardPage() {
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
-                <h2 className="text-base font-semibold">Core loop readiness</h2>
+                <h2 className="text-base font-semibold">
+                  {dashboardOverviewPageCopy.readinessTitle}
+                </h2>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -126,27 +133,9 @@ function DashboardPage() {
         <ActivityPreview activity={activity} assignment={assignment} />
 
         <section className="grid gap-4 md:grid-cols-3">
-          <ActionCard
-            icon={IconDeviceGamepad2}
-            title="Activities"
-            description="Review your activity library and the structured content each template consumes."
-            href={Routes.DashboardActivities}
-            cta="Open activities"
-          />
-          <ActionCard
-            icon={IconListCheck}
-            title="Assignments"
-            description="Track published share links, assignment settings, completions, and average scores."
-            href={Routes.DashboardAssignments}
-            cta="Open assignments"
-          />
-          <ActionCard
-            icon={IconPlayerPlay}
-            title="Student preview"
-            description="Open a playable student assignment route with progress, timing, scoring, and review behavior."
-            href={Routes.PlayDemo}
-            cta="Preview play route"
-          />
+          {dashboardOverviewActionCards.map((card) => (
+            <ActionCard key={card.id} card={card} />
+          ))}
         </section>
       </div>
     </DashboardLayout>
@@ -186,6 +175,19 @@ const dashboardMetricIcons: Record<DashboardOverviewMetricId, TablerIcon> = {
   templates: IconLayoutGrid,
 };
 
+const dashboardActionIcons: Record<DashboardOverviewActionCardId, TablerIcon> =
+  {
+    activities: IconDeviceGamepad2,
+    assignments: IconListCheck,
+    'student-preview': IconPlayerPlay,
+  };
+
+const dashboardActionHrefs: Record<DashboardOverviewActionCardId, string> = {
+  activities: Routes.DashboardActivities,
+  assignments: Routes.DashboardAssignments,
+  'student-preview': Routes.PlayDemo,
+};
+
 function ReadinessRow({ row }: { row: DashboardCoreLoopReadinessRow }) {
   return (
     <div className="space-y-2">
@@ -199,32 +201,26 @@ function ReadinessRow({ row }: { row: DashboardCoreLoopReadinessRow }) {
 }
 
 function ActionCard({
-  cta,
-  description,
-  href,
-  icon: Icon,
-  title,
+  card,
 }: {
-  cta: string;
-  description: string;
-  href: string;
-  icon: TablerIcon;
-  title: string;
+  card: (typeof dashboardOverviewActionCards)[number];
 }) {
+  const Icon = dashboardActionIcons[card.id];
+
   return (
     <Link
-      to={href}
+      to={dashboardActionHrefs[card.id]}
       className="group rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
         <Icon className="size-4" />
       </div>
-      <h2 className="mt-4 font-semibold">{title}</h2>
+      <h2 className="mt-4 font-semibold">{card.title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        {description}
+        {card.description}
       </p>
       <span className="mt-4 inline-flex text-sm font-medium text-primary">
-        {cta}
+        {card.cta}
       </span>
     </Link>
   );

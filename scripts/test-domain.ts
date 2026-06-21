@@ -103,6 +103,8 @@ import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
+  dashboardOverviewActionCards,
+  dashboardOverviewPageCopy,
   formatDashboardMetricValue,
 } from '@/dashboard/overview';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
@@ -2124,6 +2126,28 @@ assert.deepEqual(buildDashboardCoreLoopReadiness(), [
     value: 90,
   },
 ]);
+assert.deepEqual(dashboardOverviewPageCopy, {
+  breadcrumbLabel: 'Dashboard',
+  description:
+    'Manage reusable activities, publish classroom assignments, and track student attempts from one workspace.',
+  heroBadge: 'Teacher workspace',
+  heroDescription:
+    'ClassGamify separates reusable teacher activities from published assignments and student attempts. Create, publish, play, and review now share one activity data contract that AI drafting and template remixing can build on.',
+  heroPrimaryAction: 'Create activity',
+  heroSecondaryAction: 'Open activity library',
+  heroTitle: 'Activity content is now the center of the product.',
+  loopBadge: 'Wordwall-core loop',
+  readinessTitle: 'Core loop readiness',
+  title: 'Teacher dashboard',
+});
+assert.deepEqual(
+  dashboardOverviewActionCards.map((card) => [card.id, card.title, card.cta]),
+  [
+    ['activities', 'Activities', 'Open activities'],
+    ['assignments', 'Assignments', 'Open assignments'],
+    ['student-preview', 'Student preview', 'Preview play route'],
+  ]
+);
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);

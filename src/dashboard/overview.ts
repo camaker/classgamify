@@ -25,6 +25,18 @@ export type DashboardOverviewMetric = {
   value: string;
 };
 
+export type DashboardOverviewActionCardId =
+  | 'activities'
+  | 'assignments'
+  | 'student-preview';
+
+type DashboardOverviewActionCard = {
+  cta: string;
+  description: string;
+  id: DashboardOverviewActionCardId;
+  title: string;
+};
+
 export type DashboardCoreLoopReadinessId =
   | 'activity-authoring'
   | 'assignment-links'
@@ -36,6 +48,45 @@ export type DashboardCoreLoopReadinessRow = {
   label: string;
   value: number;
 };
+
+export const dashboardOverviewPageCopy = {
+  breadcrumbLabel: 'Dashboard',
+  description:
+    'Manage reusable activities, publish classroom assignments, and track student attempts from one workspace.',
+  heroBadge: 'Teacher workspace',
+  heroDescription:
+    'ClassGamify separates reusable teacher activities from published assignments and student attempts. Create, publish, play, and review now share one activity data contract that AI drafting and template remixing can build on.',
+  heroPrimaryAction: 'Create activity',
+  heroSecondaryAction: 'Open activity library',
+  heroTitle: 'Activity content is now the center of the product.',
+  loopBadge: 'Wordwall-core loop',
+  readinessTitle: 'Core loop readiness',
+  title: 'Teacher dashboard',
+} as const;
+
+export const dashboardOverviewActionCards = [
+  {
+    cta: 'Open activities',
+    description:
+      'Review your activity library and the structured content each template consumes.',
+    id: 'activities',
+    title: 'Activities',
+  },
+  {
+    cta: 'Open assignments',
+    description:
+      'Track published share links, assignment settings, completions, and average scores.',
+    id: 'assignments',
+    title: 'Assignments',
+  },
+  {
+    cta: 'Preview play route',
+    description:
+      'Open a playable student assignment route with progress, timing, scoring, and review behavior.',
+    id: 'student-preview',
+    title: 'Student preview',
+  },
+] satisfies DashboardOverviewActionCard[];
 
 export function buildDashboardOverviewMetrics({
   activitySummary,
