@@ -1298,6 +1298,51 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '0',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '181',
+    title: 'Week 1 review',
+  }),
+  {
+    expiresAt: null,
+    settings: {
+      collectStudentName: true,
+      instructions: undefined,
+      maxAttempts: undefined,
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitSeconds: undefined,
+    },
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '11',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '180',
+    title: 'Week 1 review',
+  }).settings,
+  {
+    collectStudentName: true,
+    instructions: undefined,
+    maxAttempts: undefined,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: 10_800,
+  }
+);
+assert.deepEqual(
   validateAssignmentPublishDraft({
     activityId: 'activity-1',
     collectStudentName: true,

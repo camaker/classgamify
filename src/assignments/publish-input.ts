@@ -89,6 +89,16 @@ type AssignmentPublishToggleView = AssignmentPublishToggleOption & {
   checked: boolean;
 };
 
+const PUBLISH_ATTEMPTS_RANGE = {
+  max: 10,
+  min: 1,
+} as const;
+
+const PUBLISH_TIME_LIMIT_MINUTES_RANGE = {
+  max: 180,
+  min: 1,
+} as const;
+
 export const assignmentPublishDialogCopy = {
   cancelLabel: 'Cancel',
   closeAfterHelp:
@@ -190,18 +200,19 @@ export function buildAssignmentPublishPreviewFromDraft({
   shuffleItems,
   timeLimitMinutes,
 }: AssignmentPublishDraft): AssignmentPublishPreview {
-  const timeLimitMinutesNumber = parseOptionalWholeNumber(timeLimitMinutes);
+  const previewTimeLimitMinutes =
+    parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
 
   return {
     expiresAt: parseAssignmentDateTimeLocal(expiresAtLocal),
     settings: {
       collectStudentName,
       instructions: instructions.trim() || undefined,
-      maxAttempts: parseOptionalWholeNumber(maxAttempts),
+      maxAttempts: parseAssignmentPublishMaxAttempts(maxAttempts),
       showCorrectAnswers,
       shuffleItems,
-      timeLimitSeconds: timeLimitMinutesNumber
-        ? timeLimitMinutesNumber * 60
+      timeLimitSeconds: previewTimeLimitMinutes
+        ? previewTimeLimitMinutes * 60
         : undefined,
     },
   };
@@ -222,8 +233,8 @@ export function validateAssignmentPublishDraft({
     };
   }
 
-  const attempts = Number(maxAttempts);
-  if (!Number.isInteger(attempts) || attempts < 1 || attempts > 10) {
+  const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
+  if (attempts === undefined) {
     return {
       message: 'Max attempts must be a whole number from 1 to 10.',
       ok: false,
@@ -233,7 +244,7 @@ export function validateAssignmentPublishDraft({
   const timeLimit = parseOptionalWholeNumber(timeLimitMinutes);
   if (
     timeLimitMinutes.trim() &&
-    (!Number.isInteger(timeLimit) || timeLimit < 1 || timeLimit > 180)
+    !isWholeNumberInRange(timeLimit, PUBLISH_TIME_LIMIT_MINUTES_RANGE)
   ) {
     return {
       message: 'Time limit must be a whole number from 1 to 180 minutes.',
@@ -299,8 +310,15 @@ export function buildAssignmentPublishInputFromDraft({
   if (!validation.ok) return validation;
 
   const trimmedTitle = title.trim();
-  const attempts = Number(maxAttempts);
-  const timeLimit = parseOptionalWholeNumber(timeLimitMinutes);
+  const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
+  if (attempts === undefined) {
+    return {
+      message: 'Max attempts must be a whole number from 1 to 10.',
+      ok: false,
+    };
+  }
+
+  const timeLimit = parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
   const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
   const trimmedInstructions = instructions.trim();
 
@@ -320,4 +338,32 @@ export function buildAssignmentPublishInputFromDraft({
     },
     ok: true,
   };
+}
+
+function parseAssignmentPublishMaxAttempts(value: string) {
+  return parseWholeNumberInRange(value, PUBLISH_ATTEMPTS_RANGE);
+}
+
+function parseAssignmentPublishTimeLimitMinutes(value: string) {
+  return parseWholeNumberInRange(value, PUBLISH_TIME_LIMIT_MINUTES_RANGE);
+}
+
+function parseWholeNumberInRange(
+  value: string,
+  range: { max: number; min: number }
+) {
+  const parsed = parseOptionalWholeNumber(value);
+  return isWholeNumberInRange(parsed, range) ? parsed : undefined;
+}
+
+function isWholeNumberInRange(
+  value: number | undefined,
+  range: { max: number; min: number }
+) {
+  return (
+    value !== undefined &&
+    Number.isInteger(value) &&
+    value >= range.min &&
+    value <= range.max
+  );
 }
