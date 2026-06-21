@@ -1,6 +1,10 @@
 import { activityTemplates } from '@/activities/catalog';
 import { getTemplateRemixPlan } from '@/activities/template-remix';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
+import type {
+  ActivityLibraryStatus,
+  ActivityTemplateFilter,
+} from '@/activities/library-filters';
 
 export type ActivityLibraryTemplateOption = {
   shortName: string;
@@ -45,6 +49,39 @@ export type ActivityLibrarySummaryMetric = {
   label: string;
   value: string;
 };
+
+export function buildActivityLibraryFilterSummary({
+  isLoading,
+  search,
+  status,
+  template,
+  total,
+}: {
+  isLoading: boolean;
+  search?: string;
+  status: ActivityLibraryStatus;
+  template: ActivityTemplateFilter;
+  total: number;
+}) {
+  const hasFilters = Boolean(search) || template !== 'all';
+  if (hasFilters) {
+    return {
+      hasFilters,
+      text: isLoading
+        ? 'Filtering activities...'
+        : `${total} ${total === 1 ? 'match' : 'matches'}`,
+    };
+  }
+
+  const statusLabel = status === 'archived' ? 'archived' : 'saved';
+
+  return {
+    hasFilters,
+    text: isLoading
+      ? 'Loading activities...'
+      : `${total} ${statusLabel} ${total === 1 ? 'activity' : 'activities'}`,
+  };
+}
 
 export function summarizeActivityLibrary(
   activities: ActivityLibrarySummarySource[]

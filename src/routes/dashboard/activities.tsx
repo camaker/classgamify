@@ -19,6 +19,7 @@ import {
 } from '@/activities/library-filters';
 import {
   buildActivityLibraryCardSummary,
+  buildActivityLibraryFilterSummary,
   buildActivityLibrarySummaryMetrics,
   type ActivityLibrarySummaryMetric,
   type ActivityLibrarySummaryMetricId,
@@ -388,15 +389,13 @@ function ActivityLibrarySearch({
   value: string;
 }) {
   const normalizedValue = normalizeActivityLibrarySearch(value);
-  const statusLabel = status === 'archived' ? 'archived' : 'saved';
-  const hasFilters = Boolean(normalizedValue) || template !== 'all';
-  const summary = hasFilters
-    ? isLoading
-      ? 'Filtering activities...'
-      : `${total} ${total === 1 ? 'match' : 'matches'}`
-    : isLoading
-      ? 'Loading activities...'
-      : `${total} ${statusLabel} ${total === 1 ? 'activity' : 'activities'}`;
+  const filterSummary = buildActivityLibraryFilterSummary({
+    isLoading,
+    search: normalizedValue,
+    status,
+    template,
+    total,
+  });
 
   return (
     <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
@@ -473,8 +472,10 @@ function ActivityLibrarySearch({
             Archived
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground lg:text-right">{summary}</p>
-        {hasFilters ? (
+        <p className="text-sm text-muted-foreground lg:text-right">
+          {filterSummary.text}
+        </p>
+        {filterSummary.hasFilters ? (
           <Button
             type="button"
             variant="outline"

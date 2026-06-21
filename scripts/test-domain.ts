@@ -4,6 +4,7 @@ import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summ
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import {
   buildActivityLibraryCardSummary,
+  buildActivityLibraryFilterSummary,
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
@@ -1254,6 +1255,46 @@ assert.equal(
     completeScaffoldCardSummary.readyTemplateOptions.length
 );
 assert.equal(librarySummary.remixReadyActivities, 2);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: true,
+    search: undefined,
+    status: 'active',
+    template: 'all',
+    total: 0,
+  }),
+  { hasFilters: false, text: 'Loading activities...' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: 'food',
+    status: 'active',
+    template: 'all',
+    total: 1,
+  }),
+  { hasFilters: true, text: '1 match' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: undefined,
+    status: 'archived',
+    template: 'all',
+    total: 2,
+  }),
+  { hasFilters: false, text: '2 archived activities' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: undefined,
+    status: 'archived',
+    template: 'quiz',
+    total: 0,
+  }),
+  { hasFilters: true, text: '0 matches' }
+);
 assert.deepEqual(
   buildActivityLibrarySummaryMetrics({
     hasFilters: false,
