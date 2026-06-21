@@ -12,7 +12,11 @@ import {
   type StudentSummarySort,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
+  assignmentResultPageCopy,
+  assignmentResultSearchCopy,
+  assignmentResultSectionCopy,
   attemptReviewFilterOptions,
+  buildAssignmentResultMetricItems,
   getAssignmentResultActionGate,
   getAssignmentResultActionCopy,
   itemPerformanceSortOptions,
@@ -80,6 +84,14 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+const resultMetricIconByKey = {
+  'average-accuracy': IconChartBar,
+  'average-points': IconClock,
+  'average-time': IconClock,
+  closes: IconCalendarTime,
+  completions: IconUsers,
+} as const;
+
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   validateSearch: (search: Record<string, unknown>) => ({
     itemSort: parseItemPerformanceSort(search.itemSort),
@@ -100,7 +112,7 @@ function AssignmentResultsPage() {
   const itemPerformanceSort = itemSort ?? 'original';
   const attemptReviewFilter = review ?? 'all';
   const studentSort = sort ?? 'needs-review';
-  const title = data?.assignment.title ?? 'Assignment results';
+  const title = data?.assignment.title ?? assignmentResultPageCopy.defaultTitle;
   const activityTitle =
     data?.snapshot?.activityTitle ?? data?.activity.title ?? '';
   const activityDescription =
@@ -298,6 +310,17 @@ function AssignmentResultsPage() {
   const assignmentSharePath = data
     ? buildAssignmentSharePath(data.assignment.shareSlug)
     : '';
+  const resultMetricItems = data
+    ? buildAssignmentResultMetricItems({
+        averageDurationLabel: formatAttemptDuration(
+          data.stats.averageDurationSeconds
+        ),
+        averagePoints: data.stats.averagePoints,
+        averageScore: data.stats.averageScore,
+        closesLabel: formatAssignmentExpiry(data.assignment.expiresAt),
+        completions: data.stats.completions,
+      })
+    : [];
 
   return (
     <DashboardLayout
@@ -307,43 +330,25 @@ function AssignmentResultsPage() {
         { label: title, isCurrentPage: true },
       ]}
       title={title}
-      description="Review student attempts, scores, and assignment-level result metrics."
+      description={assignmentResultPageCopy.description}
     >
       {isLoading ? (
         <Card className="min-h-56 rounded-lg" />
       ) : isError || !data ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-          Assignment results could not be loaded. Refresh the page or return to
-          assignments.
+          {assignmentResultPageCopy.loadErrorMessage}
         </div>
       ) : (
         <div className="grid gap-6">
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            <ResultMetric
-              icon={IconUsers}
-              label="Completions"
-              value={String(data.stats.completions)}
-            />
-            <ResultMetric
-              icon={IconChartBar}
-              label="Average accuracy"
-              value={`${data.stats.averageScore}%`}
-            />
-            <ResultMetric
-              icon={IconClock}
-              label="Average points"
-              value={String(data.stats.averagePoints)}
-            />
-            <ResultMetric
-              icon={IconClock}
-              label="Average time"
-              value={formatAttemptDuration(data.stats.averageDurationSeconds)}
-            />
-            <ResultMetric
-              icon={IconCalendarTime}
-              label="Closes"
-              value={formatAssignmentExpiry(data.assignment.expiresAt)}
-            />
+            {resultMetricItems.map((metric) => (
+              <ResultMetric
+                key={metric.key}
+                icon={resultMetricIconByKey[metric.key]}
+                label={metric.label}
+                value={metric.value}
+              />
+            ))}
           </section>
 
           <Card className="rounded-lg">
@@ -387,7 +392,7 @@ function AssignmentResultsPage() {
                   className={cn(buttonVariants(), 'w-full sm:w-auto')}
                 >
                   <IconPlayerPlay className="size-4" />
-                  Open student link
+                  {assignmentResultPageCopy.openStudentLinkLabel}
                 </Link>
                 <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
                   <IconShare3 className="size-4" />
@@ -405,7 +410,7 @@ function AssignmentResultsPage() {
                   onClick={handleCopyClassroomBrief}
                 >
                   <IconClipboardText className="size-4" />
-                  Copy brief
+                  {getAssignmentResultActionCopy('copy-brief').label}
                 </Button>
                 <Button
                   type="button"
@@ -415,7 +420,7 @@ function AssignmentResultsPage() {
                   onClick={handleCopyReteachPlan}
                 >
                   <IconCopy className="size-4" />
-                  Copy reteach plan
+                  {getAssignmentResultActionCopy('copy-reteach-plan').label}
                 </Button>
                 <Button
                   type="button"
@@ -425,7 +430,7 @@ function AssignmentResultsPage() {
                   onClick={handleCopyItemReview}
                 >
                   <IconCopy className="size-4" />
-                  Copy item review
+                  {getAssignmentResultActionCopy('copy-item-review').label}
                 </Button>
                 <Button
                   type="button"
@@ -435,7 +440,7 @@ function AssignmentResultsPage() {
                   onClick={handleCopyStudentFollowUp}
                 >
                   <IconCopy className="size-4" />
-                  Copy follow-up
+                  {getAssignmentResultActionCopy('copy-follow-up').label}
                 </Button>
                 <Button
                   type="button"
@@ -445,7 +450,7 @@ function AssignmentResultsPage() {
                   onClick={handleExportResults}
                 >
                   <IconDownload className="size-4" />
-                  Download CSV
+                  {getAssignmentResultActionCopy('export-csv').label}
                 </Button>
               </div>
             </CardContent>
@@ -471,12 +476,13 @@ function AssignmentResultsPage() {
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
-                  <h2 className="text-lg font-semibold">Reteach priorities</h2>
+                  <h2 className="text-lg font-semibold">
+                    {assignmentResultSectionCopy.reteachPriorities.title}
+                  </h2>
                 </CardTitle>
                 <CardDescription>
                   <p>
-                    Items are sorted by the lowest correct rate so teachers can
-                    quickly decide what to review with the class.
+                    {assignmentResultSectionCopy.reteachPriorities.description}
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -487,8 +493,7 @@ function AssignmentResultsPage() {
                   ))
                 ) : (
                   <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
-                    Submit at least one answered attempt to calculate item
-                    review priorities.
+                    {assignmentResultSectionCopy.reteachPriorities.emptyMessage}
                   </div>
                 )}
               </CardContent>
@@ -499,12 +504,13 @@ function AssignmentResultsPage() {
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
-                  <h2 className="text-lg font-semibold">Item performance</h2>
+                  <h2 className="text-lg font-semibold">
+                    {assignmentResultSectionCopy.itemPerformance.title}
+                  </h2>
                 </CardTitle>
                 <CardDescription>
                   <p>
-                    Review every prompt from the frozen assignment snapshot,
-                    including submitted counts, correct rates, and answer notes.
+                    {assignmentResultSectionCopy.itemPerformance.description}
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -526,12 +532,13 @@ function AssignmentResultsPage() {
             <Card className="rounded-lg">
               <CardHeader>
                 <CardTitle>
-                  <h2 className="text-lg font-semibold">Student summary</h2>
+                  <h2 className="text-lg font-semibold">
+                    {assignmentResultSectionCopy.studentSummary.title}
+                  </h2>
                 </CardTitle>
                 <CardDescription>
                   <p>
-                    Sort students by review priority, best score, name, or
-                    attempt volume before reading every submitted answer.
+                    {assignmentResultSectionCopy.studentSummary.description}
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -550,13 +557,12 @@ function AssignmentResultsPage() {
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
-                <h2 className="text-lg font-semibold">Student attempts</h2>
+                <h2 className="text-lg font-semibold">
+                  {assignmentResultSectionCopy.studentAttempts.title}
+                </h2>
               </CardTitle>
               <CardDescription>
-                <p>
-                  Latest submitted attempts are shown first, with detailed
-                  answer review below.
-                </p>
+                <p>{assignmentResultSectionCopy.studentAttempts.description}</p>
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -618,13 +624,13 @@ function AssignmentResultsPage() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <CardTitle>
-                      <h2 className="text-lg font-semibold">Answer review</h2>
+                      <h2 className="text-lg font-semibold">
+                        {assignmentResultSectionCopy.answerReview.title}
+                      </h2>
                     </CardTitle>
                     <CardDescription>
                       <p>
-                        Item-level answers are scored from the frozen assignment
-                        snapshot, so teacher edits never change historical
-                        results.
+                        {assignmentResultSectionCopy.answerReview.description}
                       </p>
                     </CardDescription>
                   </div>
@@ -667,19 +673,20 @@ function ClassroomBriefCard({
         <div className="flex items-center gap-2">
           <IconClipboardText className="size-5 text-primary" />
           <CardTitle>
-            <h2 className="text-lg font-semibold">Classroom brief</h2>
+            <h2 className="text-lg font-semibold">
+              {assignmentResultSectionCopy.classroomBrief.title}
+            </h2>
           </CardTitle>
         </div>
         <CardDescription>
-          <p>
-            A compact class-ready summary built from the frozen assignment
-            snapshot and submitted attempts.
-          </p>
+          <p>{assignmentResultSectionCopy.classroomBrief.description}</p>
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-lg border bg-muted/20 p-4">
-          <h3 className="font-medium text-sm">Class review focus</h3>
+          <h3 className="font-medium text-sm">
+            {assignmentResultSectionCopy.classReviewFocus.title}
+          </h3>
           <div className="mt-3 grid gap-3">
             {brief.focusItems.length > 0 ? (
               brief.focusItems.map((item, index) => (
@@ -699,13 +706,15 @@ function ClassroomBriefCard({
               ))
             ) : (
               <p className="text-muted-foreground text-sm">
-                No submitted item data yet.
+                {assignmentResultSectionCopy.classReviewFocus.emptyMessage}
               </p>
             )}
           </div>
         </div>
         <div className="rounded-lg border bg-muted/20 p-4">
-          <h3 className="font-medium text-sm">Student follow-up</h3>
+          <h3 className="font-medium text-sm">
+            {assignmentResultSectionCopy.studentFollowUp.title}
+          </h3>
           <div className="mt-3 grid gap-3">
             {brief.followUpStudents.length > 0 ? (
               brief.followUpStudents.map((student) => (
@@ -729,7 +738,7 @@ function ClassroomBriefCard({
               ))
             ) : (
               <p className="text-muted-foreground text-sm">
-                No student-specific review needs yet.
+                {assignmentResultSectionCopy.studentFollowUp.emptyMessage}
               </p>
             )}
           </div>
@@ -761,21 +770,21 @@ function ResultStudentSearch({
           htmlFor="assignment-result-search"
           className="font-medium text-sm"
         >
-          Find student
+          {assignmentResultSearchCopy.findStudentLabel}
         </label>
         <div className="relative max-w-xl">
           <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
           <Input
             id="assignment-result-search"
             value={value}
-            placeholder="Search by student name"
+            placeholder={assignmentResultSearchCopy.placeholder}
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {value ? (
             <button
               type="button"
-              aria-label="Clear student search"
+              aria-label={assignmentResultSearchCopy.clearStudentSearchLabel}
               className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
               onClick={onClear}
             >
@@ -786,7 +795,7 @@ function ResultStudentSearch({
       </div>
       <div className="grid gap-2">
         <label htmlFor="student-summary-sort" className="font-medium text-sm">
-          Sort students
+          {assignmentResultSearchCopy.sortStudentsLabel}
         </label>
         <NativeSelect
           id="student-summary-sort"
@@ -873,7 +882,7 @@ function ItemPerformanceSortControl({
   return (
     <div className="flex flex-col gap-2 sm:w-52">
       <label htmlFor="item-performance-sort" className="font-medium text-sm">
-        Sort items
+        {assignmentResultSearchCopy.sortItemsLabel}
       </label>
       <NativeSelect
         id="item-performance-sort"
@@ -902,7 +911,7 @@ function AttemptReviewFilterControl({
   return (
     <div className="flex flex-col gap-2 sm:w-48">
       <label htmlFor="attempt-review-filter" className="font-medium text-sm">
-        Review view
+        {assignmentResultSearchCopy.reviewViewLabel}
       </label>
       <NativeSelect
         id="attempt-review-filter"

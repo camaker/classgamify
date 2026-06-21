@@ -38,6 +38,7 @@ export type AssignmentResultActionGate =
 
 export type AssignmentResultActionCopy = {
   failureMessage: string;
+  label: string;
   successMessage: string;
 };
 
@@ -46,10 +47,91 @@ export type AssignmentResultEmptyState = {
   title: string;
 };
 
+type AssignmentResultMetricKey =
+  | 'average-accuracy'
+  | 'average-points'
+  | 'average-time'
+  | 'closes'
+  | 'completions';
+
+type AssignmentResultMetricDescriptor = {
+  key: AssignmentResultMetricKey;
+  label: string;
+};
+
 type AssignmentResultControlOption<TValue extends string> = {
   label: string;
   value: TValue;
 };
+
+export const assignmentResultPageCopy = {
+  defaultTitle: 'Assignment results',
+  description:
+    'Review student attempts, scores, and assignment-level result metrics.',
+  loadErrorMessage:
+    'Assignment results could not be loaded. Refresh the page or return to assignments.',
+  openStudentLinkLabel: 'Open student link',
+} as const;
+
+export const assignmentResultSearchCopy = {
+  clearStudentSearchLabel: 'Clear student search',
+  findStudentLabel: 'Find student',
+  placeholder: 'Search by student name',
+  reviewViewLabel: 'Review view',
+  sortItemsLabel: 'Sort items',
+  sortStudentsLabel: 'Sort students',
+} as const;
+
+export const assignmentResultSectionCopy = {
+  answerReview: {
+    description:
+      'Item-level answers are scored from the frozen assignment snapshot, so teacher edits never change historical results.',
+    title: 'Answer review',
+  },
+  classroomBrief: {
+    description:
+      'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
+    title: 'Classroom brief',
+  },
+  classReviewFocus: {
+    emptyMessage: 'No submitted item data yet.',
+    title: 'Class review focus',
+  },
+  itemPerformance: {
+    description:
+      'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+    title: 'Item performance',
+  },
+  reteachPriorities: {
+    description:
+      'Items are sorted by the lowest correct rate so teachers can quickly decide what to review with the class.',
+    emptyMessage:
+      'Submit at least one answered attempt to calculate item review priorities.',
+    title: 'Reteach priorities',
+  },
+  studentAttempts: {
+    description:
+      'Latest submitted attempts are shown first, with detailed answer review below.',
+    title: 'Student attempts',
+  },
+  studentFollowUp: {
+    emptyMessage: 'No student-specific review needs yet.',
+    title: 'Student follow-up',
+  },
+  studentSummary: {
+    description:
+      'Sort students by review priority, best score, name, or attempt volume before reading every submitted answer.',
+    title: 'Student summary',
+  },
+} as const;
+
+const assignmentResultMetricDescriptors = [
+  { key: 'completions', label: 'Completions' },
+  { key: 'average-accuracy', label: 'Average accuracy' },
+  { key: 'average-points', label: 'Average points' },
+  { key: 'average-time', label: 'Average time' },
+  { key: 'closes', label: 'Closes' },
+] satisfies Array<AssignmentResultMetricDescriptor>;
 
 export const studentSummarySortOptions = [
   { label: 'Needs review', value: 'needs-review' },
@@ -69,6 +151,33 @@ export const attemptReviewFilterOptions = [
   { label: 'All answers', value: 'all' },
   { label: 'Needs review only', value: 'needs-review' },
 ] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
+
+export function buildAssignmentResultMetricItems({
+  averageDurationLabel,
+  averagePoints,
+  averageScore,
+  closesLabel,
+  completions,
+}: {
+  averageDurationLabel: string;
+  averagePoints: number;
+  averageScore: number;
+  closesLabel: string;
+  completions: number;
+}) {
+  const valueByMetric = {
+    'average-accuracy': `${averageScore}%`,
+    'average-points': String(averagePoints),
+    'average-time': averageDurationLabel,
+    closes: closesLabel,
+    completions: String(completions),
+  } satisfies Record<AssignmentResultMetricKey, string>;
+
+  return assignmentResultMetricDescriptors.map((metric) => ({
+    ...metric,
+    value: valueByMetric[metric.key],
+  }));
+}
 
 export type ResultSearchSummaryInput = {
   matchedAttempts: number;
@@ -399,26 +508,31 @@ export function getAssignmentResultActionCopy(
     case 'copy-brief':
       return {
         failureMessage: 'Classroom brief could not be copied.',
+        label: 'Copy brief',
         successMessage: 'Classroom brief copied.',
       };
     case 'copy-follow-up':
       return {
         failureMessage: 'Student follow-up could not be copied.',
+        label: 'Copy follow-up',
         successMessage: 'Student follow-up copied.',
       };
     case 'copy-item-review':
       return {
         failureMessage: 'Item review could not be copied.',
+        label: 'Copy item review',
         successMessage: 'Item review copied.',
       };
     case 'copy-reteach-plan':
       return {
         failureMessage: 'Reteach plan could not be copied.',
+        label: 'Copy reteach plan',
         successMessage: 'Reteach plan copied.',
       };
     case 'export-csv':
       return {
         failureMessage: 'Results CSV could not be downloaded.',
+        label: 'Download CSV',
         successMessage: 'Results CSV downloaded.',
       };
   }

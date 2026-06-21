@@ -127,7 +127,11 @@ import {
   stableShuffle,
 } from '@/assignments/item-order';
 import {
+  assignmentResultPageCopy,
+  assignmentResultSearchCopy,
+  assignmentResultSectionCopy,
   buildAttemptReviewSubmissionSummary,
+  buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultViewModel,
   buildAssignmentResultEmptyState,
@@ -2988,6 +2992,47 @@ assert.deepEqual(
   attemptReviewFilterOptions.map((option) => option.value),
   ['all', 'needs-review']
 );
+assert.equal(
+  assignmentResultPageCopy.description,
+  'Review student attempts, scores, and assignment-level result metrics.'
+);
+assert.deepEqual(Object.values(assignmentResultSearchCopy), [
+  'Clear student search',
+  'Find student',
+  'Search by student name',
+  'Review view',
+  'Sort items',
+  'Sort students',
+]);
+assert.deepEqual(
+  Object.values(assignmentResultSectionCopy).map((section) => section.title),
+  [
+    'Answer review',
+    'Classroom brief',
+    'Class review focus',
+    'Item performance',
+    'Reteach priorities',
+    'Student attempts',
+    'Student follow-up',
+    'Student summary',
+  ]
+);
+assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationLabel: '2m 30s',
+    averagePoints: 7,
+    averageScore: 82,
+    closesLabel: 'Jun 30, 2026',
+    completions: 12,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '12' },
+    { key: 'average-accuracy', label: 'Average accuracy', value: '82%' },
+    { key: 'average-points', label: 'Average points', value: '7' },
+    { key: 'average-time', label: 'Average time', value: '2m 30s' },
+    { key: 'closes', label: 'Closes', value: 'Jun 30, 2026' },
+  ]
+);
 assert.equal(parseStudentSummarySort('best'), 'best');
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
 assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
@@ -3286,22 +3331,27 @@ assert.deepEqual(
 );
 assert.deepEqual(getAssignmentResultActionCopy('copy-brief'), {
   failureMessage: 'Classroom brief could not be copied.',
+  label: 'Copy brief',
   successMessage: 'Classroom brief copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-follow-up'), {
   failureMessage: 'Student follow-up could not be copied.',
+  label: 'Copy follow-up',
   successMessage: 'Student follow-up copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-item-review'), {
   failureMessage: 'Item review could not be copied.',
+  label: 'Copy item review',
   successMessage: 'Item review copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-reteach-plan'), {
   failureMessage: 'Reteach plan could not be copied.',
+  label: 'Copy reteach plan',
   successMessage: 'Reteach plan copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('export-csv'), {
   failureMessage: 'Results CSV could not be downloaded.',
+  label: 'Download CSV',
   successMessage: 'Results CSV downloaded.',
 });
 const followUpPriorityStudents = [
