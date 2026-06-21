@@ -1,4 +1,4 @@
-import { activityTemplates } from '@/activities/catalog';
+import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import type { ActivityDraftResult } from '@/activities/ai-draft';
@@ -116,9 +116,7 @@ export function ActivityCreateForm({
   });
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
-  const template = activityTemplates.find(
-    (item) => item.type === selectedTemplate
-  );
+  const template = getTemplateByType(selectedTemplate);
   const templateReadiness = useMemo(() => {
     const parsed = createActivityInputSchema.safeParse(watchedValues);
     if (!parsed.success) return null;
@@ -193,8 +191,6 @@ export function ActivityCreateForm({
   }
 
   function applyTemplateScaffold() {
-    if (!template) return;
-
     const current = form.getValues();
     const scaffold = getActivityTemplateScaffold(selectedTemplate);
     const nextValues = {
@@ -251,11 +247,9 @@ export function ActivityCreateForm({
             <IconSparkles className="size-3.5" />
             Structured editor
           </Badge>
-          {template ? (
-            <Badge variant="secondary" className="rounded-md">
-              {template.name}
-            </Badge>
-          ) : null}
+          <Badge variant="secondary" className="rounded-md">
+            {template.name}
+          </Badge>
         </div>
         <CardTitle>
           <h2 className="text-xl font-semibold">
@@ -367,66 +361,59 @@ export function ActivityCreateForm({
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
                         {templateTypeOptions.map((type) => {
-                          const item = activityTemplates.find(
-                            (template) => template.type === type
-                          );
+                          const item = getTemplateByType(type);
                           return (
                             <NativeSelectOption key={type} value={type}>
-                              {item?.name ?? type}
+                              {item.name}
                             </NativeSelectOption>
                           );
                         })}
                       </NativeSelect>
                     </FormControl>
-                    <FormDescription>
-                      {template?.bestFor ??
-                        'Choose the game style teachers will see first.'}
-                    </FormDescription>
+                    <FormDescription>{template.bestFor}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {template ? (
-              <div className="rounded-lg border bg-muted/20 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="rounded-md">
-                        {template.shortName}
-                      </Badge>
-                      <span className="text-sm font-medium">
-                        {template.name} setup
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {template.description}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {template.contentRequirements.map((requirement) => (
-                        <Badge
-                          key={requirement}
-                          variant="secondary"
-                          className="rounded-md"
-                        >
-                          Requires {formatTemplateRequirement(requirement)}
-                        </Badge>
-                      ))}
-                    </div>
+            <div className="rounded-lg border bg-muted/20 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="rounded-md">
+                      {template.shortName}
+                    </Badge>
+                    <span className="text-sm font-medium">
+                      {template.name} setup
+                    </span>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full bg-background sm:w-fit"
-                    onClick={applyTemplateScaffold}
-                  >
-                    <IconSparkles className="size-4" />
-                    Load scaffold
-                  </Button>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {template.description}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {template.contentRequirements.map((requirement) => (
+                      <Badge
+                        key={requirement}
+                        variant="secondary"
+                        className="rounded-md"
+                      >
+                        Requires {formatTemplateRequirement(requirement)}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full bg-background sm:w-fit"
+                  onClick={applyTemplateScaffold}
+                >
+                  <IconSparkles className="size-4" />
+                  Load scaffold
+                </Button>
               </div>
-            ) : null}
+            </div>
 
             <ActivityTemplateReadinessPanel remixPlan={templateReadiness} />
 

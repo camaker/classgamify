@@ -1,4 +1,4 @@
-import { activityTemplates } from '@/activities/catalog';
+import { getTemplateByType } from '@/activities/catalog';
 import {
   buildActivityDraftMeta,
   type ActivityDraftMeta,
@@ -135,12 +135,8 @@ export async function generateActivityDraftFromAi(
 }
 
 export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
-  const template = activityTemplates.find(
-    (item) => item.type === input.templateType
-  );
-  const templateContext = template
-    ? `${template.name}: ${template.bestFor}`
-    : input.templateType;
+  const template = getTemplateByType(input.templateType);
+  const templateContext = `${template.name}: ${template.bestFor}`;
 
   return [
     `Create a reusable ClassGamify classroom activity draft.`,
@@ -179,14 +175,10 @@ export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
 }
 
 function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
-  const template = activityTemplates.find((item) => item.type === templateType);
-  const requirements = template?.contentRequirements.map(
+  const template = getTemplateByType(templateType);
+  const requirements = template.contentRequirements.map(
     formatTemplateRequirement
   );
-
-  if (!requirements?.length) {
-    return 'questions, match pairs, or groups depending on the selected template';
-  }
 
   return formatTemplateRequirementList(requirements);
 }

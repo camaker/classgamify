@@ -1,4 +1,8 @@
-import { activityTemplates, starterActivities } from '@/activities/catalog';
+import {
+  activityTemplates,
+  getTemplateByType,
+  starterActivities,
+} from '@/activities/catalog';
 import {
   ARCHIVED_ACTIVITY_DERIVATION_ERROR,
   canDeriveActivityWork,
@@ -534,17 +538,13 @@ function ActivityCard({
   const [expiresAtLocal, setExpiresAtLocal] = useState('');
   const previewTimeLimit = parseOptionalWholeNumber(timeLimitMinutes);
   const previewExpiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
-  const template = activityTemplates.find(
-    (item) => item.type === activity.templateType
-  );
+  const template = getTemplateByType(activity.templateType);
   const isArchived = isActivityArchived(activity.status);
   const canCreateDerivedWork = canDeriveActivityWork(activity.status);
-  const remixPlan = template
-    ? getTemplateRemixPlan({
-        content: activity.content,
-        currentTemplateType: template.type,
-      })
-    : undefined;
+  const remixPlan = getTemplateRemixPlan({
+    content: activity.content,
+    currentTemplateType: template.type,
+  });
 
   async function publishActivity() {
     if (!canCreateDerivedWork) {
@@ -693,7 +693,7 @@ function ActivityCard({
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconDeviceGamepad2 className="size-3.5" />
-            {template?.name ?? activity.templateType}
+            {template.name}
           </Badge>
         </div>
         <CardTitle>
