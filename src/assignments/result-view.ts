@@ -549,6 +549,22 @@ export function formatAssignmentBriefStudentAccuracy({
   )} · best ${formatAssignmentResultPercent(bestAccuracy)}`;
 }
 
+export function buildAssignmentStudentSummaryRowView(
+  student: AssignmentStudentSummary
+) {
+  return {
+    attemptsLabel: String(student.attempts),
+    averageAccuracyLabel: formatAssignmentResultPercent(
+      student.averageAccuracy
+    ),
+    bestAccuracyLabel: formatAssignmentResultPercent(student.bestAccuracy),
+    lastSubmittedLabel: formatAssignmentResultDate(student.lastCompletedAt),
+    latestAccuracyLabel: formatAssignmentResultPercent(student.latestAccuracy),
+    needsReviewLabel: String(student.needsReviewCount),
+    studentLabel: student.studentLabel,
+  };
+}
+
 export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
 ) {

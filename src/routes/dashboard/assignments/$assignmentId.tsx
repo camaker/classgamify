@@ -24,6 +24,7 @@ import {
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultMetricItems,
+  buildAssignmentStudentSummaryRowView,
   formatAssignmentAttemptReviewBadge,
   formatAssignmentBriefStudentAccuracy,
   formatAssignmentItemCorrectSummary,
@@ -40,7 +41,6 @@ import {
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
-import { formatAssignmentResultDate } from '@/assignments/result-format';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -726,25 +726,20 @@ function StudentSummaryTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {students.map((student) => (
-          <TableRow key={student.studentLabel}>
-            <TableCell>{student.studentLabel}</TableCell>
-            <TableCell>{student.attempts}</TableCell>
-            <TableCell>
-              {formatAssignmentResultPercent(student.latestAccuracy)}
-            </TableCell>
-            <TableCell>
-              {formatAssignmentResultPercent(student.averageAccuracy)}
-            </TableCell>
-            <TableCell>
-              {formatAssignmentResultPercent(student.bestAccuracy)}
-            </TableCell>
-            <TableCell>{student.needsReviewCount}</TableCell>
-            <TableCell>
-              {formatAssignmentResultDate(student.lastCompletedAt)}
-            </TableCell>
-          </TableRow>
-        ))}
+        {students.map((student) => {
+          const rowView = buildAssignmentStudentSummaryRowView(student);
+          return (
+            <TableRow key={student.studentKey}>
+              <TableCell>{rowView.studentLabel}</TableCell>
+              <TableCell>{rowView.attemptsLabel}</TableCell>
+              <TableCell>{rowView.latestAccuracyLabel}</TableCell>
+              <TableCell>{rowView.averageAccuracyLabel}</TableCell>
+              <TableCell>{rowView.bestAccuracyLabel}</TableCell>
+              <TableCell>{rowView.needsReviewLabel}</TableCell>
+              <TableCell>{rowView.lastSubmittedLabel}</TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

@@ -192,6 +192,7 @@ import {
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
+  buildAssignmentStudentSummaryRowView,
   buildAssignmentResultEmptyState,
   attemptReviewFilterOptions,
   buildFilteredAttemptRows,
@@ -4775,6 +4776,41 @@ assert.equal(resultAnalysis.students[1]?.averageAccuracy, 75);
 assert.equal(resultAnalysis.students[1]?.bestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.latestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.needsReviewCount, 0);
+assert.deepEqual(
+  buildAssignmentStudentSummaryRowView(resultAnalysis.students[1]!),
+  {
+    attemptsLabel: '2',
+    averageAccuracyLabel: '75%',
+    bestAccuracyLabel: '100%',
+    lastSubmittedLabel: formatAssignmentResultDate(
+      resultAnalysis.students[1]!.lastCompletedAt
+    ),
+    latestAccuracyLabel: '100%',
+    needsReviewLabel: '0',
+    studentLabel: 'Alice',
+  }
+);
+assert.deepEqual(
+  buildAssignmentStudentSummaryRowView({
+    attempts: 0,
+    averageAccuracy: 0,
+    bestAccuracy: 0,
+    lastCompletedAt: null,
+    latestAccuracy: 0,
+    needsReviewCount: 0,
+    studentKey: 'anonymous:empty',
+    studentLabel: 'Anonymous student 2',
+  }),
+  {
+    attemptsLabel: '0',
+    averageAccuracyLabel: '0%',
+    bestAccuracyLabel: '0%',
+    lastSubmittedLabel: '-',
+    latestAccuracyLabel: '0%',
+    needsReviewLabel: '0',
+    studentLabel: 'Anonymous student 2',
+  }
+);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
 assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
 assert.equal(
