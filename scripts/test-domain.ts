@@ -197,6 +197,7 @@ import {
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
   buildAssignmentResultHeaderView,
+  buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
@@ -5126,6 +5127,11 @@ assert.deepEqual(
     activityTitle: 'Snapshot title',
     assignmentSharePath: '/play/share%20123',
     assignmentTitle: 'Week 1 results',
+    shareAction: {
+      label: 'Open student link',
+      sharePath: '/play/share%20123',
+      shareSlug: 'share 123',
+    },
     shareSlug: 'share 123',
     statusLabel: 'Open',
     templateType: 'line-match',
@@ -5152,11 +5158,21 @@ assert.deepEqual(
     activityTitle: 'Current activity title',
     assignmentSharePath: '/play/closed-share',
     assignmentTitle: 'Expired results',
+    shareAction: {
+      label: 'Open student link',
+      sharePath: '/play/closed-share',
+      shareSlug: 'closed-share',
+    },
     shareSlug: 'closed-share',
     statusLabel: 'Expired',
     templateType: 'quiz',
   }
 );
+assert.deepEqual(buildAssignmentResultHeaderShareAction('share two'), {
+  label: 'Open student link',
+  sharePath: '/play/share%20two',
+  shareSlug: 'share two',
+});
 assert.deepEqual(assignmentResultTableHeaders.studentAttempts, [
   'Student',
   'Score',

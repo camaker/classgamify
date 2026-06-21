@@ -36,7 +36,6 @@ import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
-import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
@@ -305,18 +304,18 @@ function AssignmentResultsPage() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/play/$shareId"
-                  params={{ shareId: headerView.shareSlug }}
+                  params={{ shareId: headerView.shareAction.shareSlug }}
                   className={cn(buttonVariants(), 'w-full sm:w-auto')}
                 >
                   <IconPlayerPlay className="size-4" />
-                  {assignmentResultPageCopy.openStudentLinkLabel}
+                  {headerView.shareAction.label}
                 </Link>
                 <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
                   <IconShare3 className="size-4" />
-                  {headerView.assignmentSharePath}
+                  {headerView.shareAction.sharePath}
                 </div>
                 <CopyAssignmentShareLinkButton
-                  shareSlug={headerView.shareSlug}
+                  shareSlug={headerView.shareAction.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
                 {resultActionButtons.map((actionButton) => {

@@ -159,6 +159,12 @@ type AssignmentResultHeaderSource = {
   } | null;
 };
 
+type AssignmentResultHeaderShareAction = {
+  label: string;
+  sharePath: string;
+  shareSlug: string;
+};
+
 export const assignmentResultPageCopy = {
   defaultTitle: 'Assignment results',
   description:
@@ -329,19 +335,34 @@ export function buildAssignmentResultHeaderView({
   now,
   snapshot,
 }: AssignmentResultHeaderSource & { now?: number }) {
+  const shareAction = buildAssignmentResultHeaderShareAction(
+    assignment.shareSlug
+  );
+
   return {
     activityDescription:
       snapshot?.activityDescription ?? activity.description ?? '',
     activityTitle: snapshot?.activityTitle ?? activity.title,
-    assignmentSharePath: buildAssignmentSharePath(assignment.shareSlug),
+    assignmentSharePath: shareAction.sharePath,
     assignmentTitle: assignment.title,
-    shareSlug: assignment.shareSlug,
+    shareAction,
+    shareSlug: shareAction.shareSlug,
     statusLabel: getAssignmentStatusLabel(
       assignment.status,
       assignment.expiresAt,
       now
     ),
     templateType: snapshot?.templateType ?? activity.templateType,
+  };
+}
+
+export function buildAssignmentResultHeaderShareAction(
+  shareSlug: string
+): AssignmentResultHeaderShareAction {
+  return {
+    label: assignmentResultPageCopy.openStudentLinkLabel,
+    sharePath: buildAssignmentSharePath(shareSlug),
+    shareSlug,
   };
 }
 
