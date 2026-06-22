@@ -81,9 +81,12 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
               />
               <FooterMetric
                 label={m.footer_metric_assignments()}
-                value="Link"
+                value={m.footer_metric_assignment_value()}
               />
-              <FooterMetric label={m.footer_metric_results()} value="Score" />
+              <FooterMetric
+                label={m.footer_metric_results()}
+                value={m.footer_metric_result_value()}
+              />
             </dl>
           </div>
 
