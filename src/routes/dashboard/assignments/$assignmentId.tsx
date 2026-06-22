@@ -258,8 +258,14 @@ function AssignmentResultsPage() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: 'Dashboard', href: Routes.Dashboard },
-        { label: 'Assignments', href: Routes.DashboardAssignments },
+        {
+          label: assignmentResultPageCopy.breadcrumbDashboard,
+          href: Routes.Dashboard,
+        },
+        {
+          label: assignmentResultPageCopy.breadcrumbAssignments,
+          href: Routes.DashboardAssignments,
+        },
         { label: title, isCurrentPage: true },
       ]}
       title={title}

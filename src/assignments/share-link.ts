@@ -1,7 +1,15 @@
+import { m } from '@/locale/paraglide/messages';
+
 export const assignmentShareLinkActionCopy = {
-  copyLabel: 'Copy link',
-  failureMessage: 'Student link could not be copied.',
-  successMessage: 'Student link copied.',
+  get copyLabel() {
+    return m.assignment_share_link_copy_label();
+  },
+  get failureMessage() {
+    return m.assignment_share_link_copy_failure();
+  },
+  get successMessage() {
+    return m.assignment_share_link_copy_success();
+  },
 } as const;
 
 export function buildAssignmentSharePath(shareSlug: string) {

@@ -196,6 +196,12 @@ type AssignmentResultHeaderShareAction = {
 };
 
 export const assignmentResultPageCopy = {
+  get breadcrumbAssignments() {
+    return m.assignment_result_page_breadcrumb_assignments();
+  },
+  get breadcrumbDashboard() {
+    return m.assignment_result_page_breadcrumb_dashboard();
+  },
   get defaultTitle() {
     return m.assignment_result_page_default_title();
   },
