@@ -41,8 +41,14 @@ type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
   settings?: Partial<AssignmentSettings> | null;
 };
 
+type AssignmentInstructionSummary = {
+  isEmpty: boolean;
+  label: string;
+  value: string;
+};
+
 type AssignmentSettingsSummaryView = {
-  instructions?: string;
+  instructions: AssignmentInstructionSummary;
   items: AssignmentDeliverySummaryItem[];
   settings: AssignmentSettings;
 };
@@ -111,7 +117,9 @@ export function buildAssignmentSettingsSummaryView({
   );
 
   return {
-    instructions: resolvedSettings.instructions,
+    instructions: buildAssignmentInstructionSummary(
+      resolvedSettings.instructions
+    ),
     items: buildAssignmentDeliverySummary({
       collectStudentName: resolvedSettings.collectStudentName,
       expiresAt,
@@ -212,6 +220,19 @@ function isPositiveWholeNumber(value?: number | null) {
     Number.isInteger(value) &&
     value > 0
   );
+}
+
+function buildAssignmentInstructionSummary(
+  instructions: string | undefined
+): AssignmentInstructionSummary {
+  return {
+    isEmpty: !instructions,
+    label: m.assignment_delivery_label_instructions(),
+    value:
+      instructions && instructions.length > 0
+        ? instructions
+        : m.assignment_delivery_instructions_none(),
+  };
 }
 
 function formatStudentIdentity(collectStudentName: boolean) {

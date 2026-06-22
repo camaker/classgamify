@@ -4,10 +4,12 @@ import {
 } from '@/assignments/delivery-summary';
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
+import { cn } from '@/lib/utils';
 import {
   IconArrowsShuffle,
   IconCalendarTime,
   IconClock,
+  IconClipboardText,
   IconEye,
   IconRepeat,
   IconUser,
@@ -48,11 +50,20 @@ export function AssignmentSettingsSummary({
 
   return (
     <div className="grid gap-3">
-      {summaryView.instructions ? (
-        <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6 text-muted-foreground">
-          {summaryView.instructions}
+      <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6">
+        <div className="flex items-center gap-2 font-medium text-foreground">
+          <IconClipboardText className="size-4 text-primary" />
+          {summaryView.instructions.label}
         </div>
-      ) : null}
+        <p
+          className={cn(
+            'mt-2 text-muted-foreground',
+            summaryView.instructions.isEmpty && 'italic'
+          )}
+        >
+          {summaryView.instructions.value}
+        </p>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {summaryView.items.map((item) => (
           <AssignmentSettingTile

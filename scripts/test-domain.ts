@@ -2330,10 +2330,11 @@ const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
     timeLimitSeconds: 90,
   },
 });
-assert.equal(
-  assignmentSettingsSummaryView.instructions,
-  'Finish before class.'
-);
+assert.deepEqual(assignmentSettingsSummaryView.instructions, {
+  isEmpty: false,
+  label: 'Student instructions',
+  value: 'Finish before class.',
+});
 assert.equal(assignmentSettingsSummaryView.settings.collectStudentName, false);
 assert.deepEqual(
   assignmentSettingsSummaryView.items.map((item) => [item.id, item.value]),
@@ -2365,6 +2366,11 @@ assert.deepEqual(partialAssignmentSettingsSummaryView.settings, {
   shuffleItems: true,
   timeLimitSeconds: undefined,
 });
+assert.deepEqual(partialAssignmentSettingsSummaryView.instructions, {
+  isEmpty: false,
+  label: 'Student instructions',
+  value: 'Review before Friday.',
+});
 assert.deepEqual(
   partialAssignmentSettingsSummaryView.items.map((item) => [
     item.id,
@@ -2381,23 +2387,37 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentSettingsSummaryView({
-    collectStudentName: false,
     expiresAt: null,
-    instructions: 'Legacy field instructions.',
-    maxAttempts: 2,
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitSeconds: undefined,
-  }).settings,
+    settings: {},
+  }).instructions,
   {
-    collectStudentName: false,
-    instructions: 'Legacy field instructions.',
-    maxAttempts: 2,
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitSeconds: undefined,
+    isEmpty: true,
+    label: 'Student instructions',
+    value: 'No student instructions',
   }
 );
+const legacyAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
+  collectStudentName: false,
+  expiresAt: null,
+  instructions: 'Legacy field instructions.',
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(legacyAssignmentSettingsSummaryView.settings, {
+  collectStudentName: false,
+  instructions: 'Legacy field instructions.',
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(legacyAssignmentSettingsSummaryView.instructions, {
+  isEmpty: false,
+  label: 'Student instructions',
+  value: 'Legacy field instructions.',
+});
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');
 assert.deepEqual(
