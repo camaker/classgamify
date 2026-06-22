@@ -1,6 +1,7 @@
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
+import { m } from '@/locale/paraglide/messages';
 import type { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconArrowRight, IconDeviceGamepad2 } from '@tabler/icons-react';
@@ -28,7 +29,7 @@ export function LegacyProductRoute({
       <div className="mx-auto max-w-3xl space-y-6 pb-16">
         <Badge variant="outline" className="rounded-md border-primary/30">
           <IconDeviceGamepad2 className="size-3.5" />
-          Product reset
+          {m.legacy_product_route_badge()}
         </Badge>
         <div className="space-y-4">
           <h1 className="text-3xl font-bold tracking-tight md:text-5xl">

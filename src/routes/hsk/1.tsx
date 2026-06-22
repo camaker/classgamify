@@ -1,24 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { LegacyProductRoute } from '@/components/activities/legacy-product-route';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/hsk/1')({
   head: () =>
     seo('/hsk/1', {
-      title: 'Course practice moved | ClassGamify',
-      description:
-        'Legacy course-specific practice now points teachers toward ClassGamify classroom activity templates.',
+      title: m.legacy_course_seo_title(),
+      description: m.legacy_course_seo_description(),
       robots: 'noindex,follow',
     }),
   component: () => (
     <LegacyProductRoute
-      title="Course-specific practice has been retired"
-      description="ClassGamify now starts from teacher activities instead of fixed course pages. Use templates to build activities for any subject, grade band, or lesson."
+      title={m.legacy_course_title()}
+      description={m.legacy_course_description()}
       primaryHref={Routes.Create}
-      primaryLabel="Create activity"
+      primaryLabel={m.legacy_primary_create_activity()}
       secondaryHref={Routes.Templates}
-      secondaryLabel="Browse templates"
+      secondaryLabel={m.legacy_secondary_browse_templates()}
     />
   ),
 });
