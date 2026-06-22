@@ -1,4 +1,5 @@
 import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { m } from '@/locale/paraglide/messages';
 
 export type PublishedAssignmentListItem = {
   assignment: {
@@ -45,7 +46,7 @@ export function buildPublishedAssignmentPanelContext<
   if (assignment) {
     return {
       assignment,
-      body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+      body: m.assignment_published_panel_found_body(),
       sharePath: buildAssignmentSharePath(shareSlug),
       showDismissAction: true,
       showMissingHint: false,
@@ -58,25 +59,25 @@ export function buildPublishedAssignmentPanelContext<
 
   if (isLoading) {
     return {
-      body: 'Loading the newly published assignment link and classroom actions.',
+      body: m.assignment_published_panel_loading_body(),
       sharePath: buildAssignmentSharePath(shareSlug),
       showDismissAction: true,
       showMissingHint: false,
       showResultsAction: false,
       showShareActions: true,
       status: 'loading',
-      title: 'Student share link is being prepared.',
+      title: m.assignment_published_panel_loading_title(),
     };
   }
 
   return {
-    body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
+    body: m.assignment_published_panel_missing_body(),
     sharePath: buildAssignmentSharePath(shareSlug),
     showDismissAction: true,
     showMissingHint: true,
     showResultsAction: false,
     showShareActions: true,
     status: 'missing',
-    title: 'Student share link is ready.',
+    title: m.assignment_published_panel_missing_title(),
   };
 }

@@ -1,4 +1,5 @@
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentListSummary = {
   averageScore: number;
@@ -35,10 +36,10 @@ export function buildAssignmentListFilterSummary({
   return {
     hasFilters,
     text: isLoading
-      ? 'Loading assignments...'
+      ? m.assignment_list_filter_summary_loading()
       : hasFilters
-        ? `${total} ${total === 1 ? 'match' : 'matches'}`
-        : `${total} total ${total === 1 ? 'assignment' : 'assignments'}`,
+        ? formatAssignmentListMatches(total)
+        : formatAssignmentListTotal(total),
   };
 }
 
@@ -61,23 +62,41 @@ export function buildAssignmentListSummaryMetrics({
   return [
     {
       id: 'total',
-      label: hasFilters ? 'Matching' : 'Assignments',
+      label: hasFilters
+        ? m.assignment_list_summary_matching()
+        : m.assignment_list_summary_assignments(),
       value: String(resolvedSummary.totalAssignments),
     },
     {
       id: 'open',
-      label: 'Open links',
+      label: m.assignment_list_summary_open_links(),
       value: String(resolvedSummary.openAssignments),
     },
     {
       id: 'completions',
-      label: 'Completions',
+      label: m.assignment_list_summary_completions(),
       value: String(resolvedSummary.completions),
     },
     {
       id: 'average',
-      label: 'Average',
+      label: m.assignment_list_summary_average(),
       value: `${resolvedSummary.averageScore}%`,
     },
   ];
+}
+
+function formatAssignmentListMatches(count: number) {
+  if (count === 1) {
+    return m.assignment_list_filter_summary_matches_one({ count });
+  }
+
+  return m.assignment_list_filter_summary_matches_many({ count });
+}
+
+function formatAssignmentListTotal(count: number) {
+  if (count === 1) {
+    return m.assignment_list_filter_summary_total_one({ count });
+  }
+
+  return m.assignment_list_filter_summary_total_many({ count });
 }
