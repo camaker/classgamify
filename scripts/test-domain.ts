@@ -1952,7 +1952,7 @@ const publishedAssignments = [
 assert.deepEqual(
   findPublishedAssignmentInList({
     items: publishedAssignments,
-    shareSlug: 'share-2',
+    shareSlug: ' share-2 ',
   }),
   publishedAssignments[1]?.assignment
 );
@@ -1972,7 +1972,7 @@ assert.deepEqual(
   resolvePublishedAssignmentPanelAssignment({
     assignment: publishedAssignmentFromLookup,
     items: publishedAssignments,
-    shareSlug: 'share-3',
+    shareSlug: ' share-3 ',
   }),
   publishedAssignmentFromLookup
 );
@@ -1980,7 +1980,7 @@ assert.deepEqual(
   resolvePublishedAssignmentPanelAssignment({
     assignment: publishedAssignmentFromLookup,
     items: publishedAssignments,
-    shareSlug: 'share-2',
+    shareSlug: ' share-2 ',
   }),
   publishedAssignments[1]?.assignment
 );
@@ -1988,7 +1988,7 @@ assert.deepEqual(
   buildPublishedAssignmentPanelContext({
     assignment: publishedAssignments[1]?.assignment,
     isLoading: false,
-    shareSlug: 'share-2',
+    shareSlug: ' share-2 ',
   }),
   {
     assignment: publishedAssignments[1]?.assignment,

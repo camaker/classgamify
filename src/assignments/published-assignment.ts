@@ -1,4 +1,7 @@
-import { buildAssignmentSharePath } from '@/assignments/share-link';
+import {
+  buildAssignmentSharePath,
+  normalizeAssignmentShareSlug,
+} from '@/assignments/share-link';
 import { m } from '@/locale/paraglide/messages';
 
 export type PublishedAssignmentListItem = {
@@ -15,9 +18,10 @@ type PublishedAssignmentPanelAssignment =
 export function findPublishedAssignmentInList<
   TItem extends PublishedAssignmentListItem,
 >({ items, shareSlug }: { items: TItem[]; shareSlug?: string }) {
-  if (!shareSlug) return undefined;
+  const normalizedShareSlug = normalizeOptionalAssignmentShareSlug(shareSlug);
+  if (!normalizedShareSlug) return undefined;
 
-  return items.find((item) => item.assignment.shareSlug === shareSlug)
+  return items.find((item) => item.assignment.shareSlug === normalizedShareSlug)
     ?.assignment;
 }
 
@@ -32,10 +36,14 @@ export function resolvePublishedAssignmentPanelAssignment<
   items: TItem[];
   shareSlug?: string;
 }) {
-  if (!shareSlug) return undefined;
-  if (assignment?.shareSlug === shareSlug) return assignment;
+  const normalizedShareSlug = normalizeOptionalAssignmentShareSlug(shareSlug);
+  if (!normalizedShareSlug) return undefined;
+  if (assignment?.shareSlug === normalizedShareSlug) return assignment;
 
-  return findPublishedAssignmentInList({ items, shareSlug });
+  return findPublishedAssignmentInList({
+    items,
+    shareSlug: normalizedShareSlug,
+  });
 }
 
 export type PublishedAssignmentPanelContext = {
@@ -59,11 +67,13 @@ export function buildPublishedAssignmentPanelContext({
   isLoading: boolean;
   shareSlug: string;
 }): PublishedAssignmentPanelContext {
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+
   if (assignment) {
     return {
       assignment,
       body: m.assignment_published_panel_found_body(),
-      sharePath: buildAssignmentSharePath(shareSlug),
+      sharePath: buildAssignmentSharePath(normalizedShareSlug),
       showDismissAction: true,
       showMissingHint: false,
       showResultsAction: true,
@@ -76,7 +86,7 @@ export function buildPublishedAssignmentPanelContext({
   if (isLoading) {
     return {
       body: m.assignment_published_panel_loading_body(),
-      sharePath: buildAssignmentSharePath(shareSlug),
+      sharePath: buildAssignmentSharePath(normalizedShareSlug),
       showDismissAction: true,
       showMissingHint: false,
       showResultsAction: false,
@@ -88,7 +98,7 @@ export function buildPublishedAssignmentPanelContext({
 
   return {
     body: m.assignment_published_panel_missing_body(),
-    sharePath: buildAssignmentSharePath(shareSlug),
+    sharePath: buildAssignmentSharePath(normalizedShareSlug),
     showDismissAction: true,
     showMissingHint: true,
     showResultsAction: false,
@@ -96,4 +106,8 @@ export function buildPublishedAssignmentPanelContext({
     status: 'missing',
     title: m.assignment_published_panel_missing_title(),
   };
+}
+
+function normalizeOptionalAssignmentShareSlug(shareSlug?: string) {
+  return shareSlug ? normalizeAssignmentShareSlug(shareSlug) : '';
 }
