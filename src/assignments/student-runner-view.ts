@@ -13,7 +13,7 @@ import {
   type PublicAttemptReviewItem,
   type PublicRuntimeItem,
 } from '@/assignments/public';
-import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import { formatOptionalAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import {
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
@@ -277,12 +277,12 @@ export function buildPublicAnswerFeedbackView({
 }): PublicAnswerFeedbackView {
   return {
     acceptedAnswersLabel: m.student_runner_feedback_accepted_answers(),
-    acceptedAnswersText:
-      reviewItem.acceptedAnswers.length > 1
-        ? formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers, {
-            separator: ' | ',
-          })
-        : null,
+    acceptedAnswersText: formatOptionalAcceptedAnswerAlternatives(
+      reviewItem.acceptedAnswers,
+      {
+        separator: ' | ',
+      }
+    ),
     correctAnswer: reviewItem.correctAnswer,
     correctAnswerLabel,
     explanation: reviewItem.explanation ?? null,

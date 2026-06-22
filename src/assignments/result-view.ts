@@ -18,7 +18,9 @@ import {
 } from '@/assignments/identity';
 import {
   formatAcceptedAnswerAlternatives,
+  formatAssignmentResultValue,
   formatAssignmentResultDate,
+  formatOptionalAcceptedAnswerAlternatives,
 } from '@/assignments/result-format';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
@@ -862,14 +864,11 @@ export function buildAssignmentStudentSummaryRowView(
 export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
 ) {
-  const acceptedAnswersText =
-    item.acceptedAnswers.length > 1
-      ? formatAcceptedAnswerAlternatives(item.acceptedAnswers)
-      : null;
-
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedLabel,
-    acceptedAnswersText,
+    acceptedAnswersText: formatOptionalAcceptedAnswerAlternatives(
+      item.acceptedAnswers
+    ),
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
     correctRateProgressValue: clampProgressValue(item.correctRate),
     correctSummaryLabel: formatAssignmentItemCorrectSummary(item),
@@ -911,14 +910,12 @@ export function buildAssignmentAttemptAnswerReviewView({
   index: number;
 }) {
   const status = getAssignmentAnswerReviewStatus(answer.correct);
-  const acceptedAnswersText =
-    answer.acceptedAnswers.length > 1
-      ? formatAcceptedAnswerAlternatives(answer.acceptedAnswers)
-      : null;
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedAnswersLabel,
-    acceptedAnswersText,
+    acceptedAnswersText: formatOptionalAcceptedAnswerAlternatives(
+      answer.acceptedAnswers
+    ),
     expectedAnswerLabel: assignmentResultReviewCopy.expectedAnswerLabel,
     expectedAnswerText: formatAssignmentResultValue(answer.expectedAnswer),
     explanationText: answer.explanation || null,
@@ -946,10 +943,6 @@ export function formatAssignmentResultFraction(value: number, total: number) {
 
 export function formatAssignmentResultPercent(value: number) {
   return `${value}%`;
-}
-
-export function formatAssignmentResultValue(value: string | null | undefined) {
-  return value || assignmentResultReviewCopy.emptyValue;
 }
 
 export function formatAssignmentReviewCount(count: number) {

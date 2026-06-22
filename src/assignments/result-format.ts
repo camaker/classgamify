@@ -42,3 +42,23 @@ export function formatAcceptedAnswerAlternatives(
 
   return values.join(options?.separator ?? ', ');
 }
+
+export function formatOptionalAcceptedAnswerAlternatives(
+  values: string[],
+  options?: {
+    separator?: string;
+  }
+) {
+  if (values.length <= 1) return null;
+
+  return formatAcceptedAnswerAlternatives(values, options);
+}
+
+export function formatAssignmentResultValue(
+  value: string | null | undefined,
+  options?: {
+    emptyValue?: string;
+  }
+) {
+  return value || (options?.emptyValue ?? '-');
+}

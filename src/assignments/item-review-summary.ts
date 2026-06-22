@@ -1,4 +1,7 @@
-import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import {
+  formatAssignmentResultValue,
+  formatOptionalAcceptedAnswerAlternatives,
+} from '@/assignments/result-format';
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
@@ -36,18 +39,20 @@ function formatItems(items: AssignmentItemAnalysis[]) {
     const explanation = item.explanation
       ? m.assignment_item_review_notes({ notes: item.explanation })
       : '';
-    const acceptedAnswers =
-      item.acceptedAnswers.length > 1
-        ? m.assignment_item_review_accepted_answers({
-            answers: formatAcceptedAnswerAlternatives(item.acceptedAnswers),
-          })
-        : '';
+    const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
+      item.acceptedAnswers
+    );
+    const acceptedAnswers = acceptedAnswersText
+      ? m.assignment_item_review_accepted_answers({
+          answers: acceptedAnswersText,
+        })
+      : '';
 
     return m.assignment_item_review_line({
       acceptedAnswers,
       correctCount: formatAssignmentSummaryCorrectCount(item),
       correctRate: formatAssignmentSummaryCorrectRate(item.correctRate),
-      expected: item.expectedAnswer || '-',
+      expected: formatAssignmentResultValue(item.expectedAnswer),
       index: index + 1,
       kind: item.kindLabel,
       notes: explanation,

@@ -251,7 +251,6 @@ import {
   formatAssignmentItemCorrectSummary,
   formatAssignmentResultFraction,
   formatAssignmentResultPercent,
-  formatAssignmentResultValue,
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
   itemPerformanceSortOptions,
@@ -270,7 +269,9 @@ import {
 } from '@/assignments/result-view';
 import {
   formatAcceptedAnswerAlternatives,
+  formatAssignmentResultValue,
   formatAssignmentResultDate,
+  formatOptionalAcceptedAnswerAlternatives,
 } from '@/assignments/result-format';
 import {
   formatAssignmentSummaryAccuracy,
@@ -6638,6 +6639,21 @@ assert.equal(
   }),
   'Paris | Paris, France'
 );
+assert.equal(formatOptionalAcceptedAnswerAlternatives([]), null);
+assert.equal(formatOptionalAcceptedAnswerAlternatives(['Paris']), null);
+assert.equal(
+  formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
+  'Paris, Paris, France'
+);
+assert.equal(
+  formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France'], {
+    separator: ' | ',
+  }),
+  'Paris | Paris, France'
+);
+assert.equal(formatAssignmentResultValue(''), '-');
+assert.equal(formatAssignmentResultValue(null, { emptyValue: '' }), '');
+assert.equal(formatAssignmentResultValue('', { emptyValue: 'none' }), 'none');
 assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
 assert.equal(formatAssignmentSummaryCorrectRate(67), '67% correct');
 assert.equal(
