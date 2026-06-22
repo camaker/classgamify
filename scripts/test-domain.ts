@@ -157,6 +157,7 @@ import {
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
+  buildOpenPublicAssignmentPayload,
   buildPublicAssignmentPayload,
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
@@ -2329,7 +2330,7 @@ const publicPayloadSnapshotContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: 'Frozen answer, Other',
 });
-const publicAssignmentPayload = buildPublicAssignmentPayload({
+const publicAssignmentPayloadSource = {
   activity: {
     contentJson: publicPayloadActivityContent,
     description: 'Current activity description',
@@ -2352,7 +2353,10 @@ const publicAssignmentPayload = buildPublicAssignmentPayload({
     contentJson: publicPayloadSnapshotContent,
     templateType: 'quiz',
   },
-});
+} satisfies Parameters<typeof buildPublicAssignmentPayload>[0];
+const publicAssignmentPayload = buildPublicAssignmentPayload(
+  publicAssignmentPayloadSource
+);
 assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
 assert.equal(
   publicAssignmentPayload.activity.description,
@@ -2379,6 +2383,34 @@ assert.deepEqual(publicAssignmentPayload.snapshot, {
 assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
 assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
+assert.equal(
+  buildOpenPublicAssignmentPayload(publicAssignmentPayloadSource)?.assignment
+    .shareSlug,
+  'share-public'
+);
+assert.equal(
+  buildOpenPublicAssignmentPayload({
+    ...publicAssignmentPayloadSource,
+    assignment: {
+      ...publicAssignmentPayloadSource.assignment,
+      status: 'closed',
+    },
+  }),
+  null
+);
+assert.equal(
+  buildOpenPublicAssignmentPayload(
+    {
+      ...publicAssignmentPayloadSource,
+      assignment: {
+        ...publicAssignmentPayloadSource.assignment,
+        expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+      },
+    },
+    new Date('2026-01-01T10:00:00.000Z').getTime()
+  ),
+  null
+);
 const publicRuntimeSanitizationInput = {
   description: 'Sanitized runtime payload source',
   difficulty: 'core' as const,

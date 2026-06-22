@@ -12,6 +12,7 @@ import type {
   AttemptAnswer,
 } from '@/activities/types';
 import { getRuntimeItems } from '@/activities/runtime';
+import { isAssignmentOpen } from '@/assignments/lifecycle';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
@@ -87,6 +88,23 @@ export type PublicAssignmentPayloadSource = {
     templateType: ActivityTemplateType;
   } | null;
 };
+
+export function buildOpenPublicAssignmentPayload(
+  source: PublicAssignmentPayloadSource,
+  now = Date.now()
+): PublicAssignmentPayload | null {
+  if (
+    !isAssignmentOpen(
+      source.assignment.status,
+      source.assignment.expiresAt,
+      now
+    )
+  ) {
+    return null;
+  }
+
+  return buildPublicAssignmentPayload(source);
+}
 
 export function buildPublicAssignmentPayload({
   activity,

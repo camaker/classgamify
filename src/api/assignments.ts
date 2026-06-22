@@ -13,10 +13,9 @@ import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
 import {
   assertAssignmentStatusTransition,
   isAssignmentExpired,
-  isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import {
-  buildPublicAssignmentPayload,
+  buildOpenPublicAssignmentPayload,
   buildPublicAttemptReviewItems,
 } from '@/assignments/public';
 import { analyzeAssignmentResults } from '@/assignments/results';
@@ -430,14 +429,9 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
       )
       .limit(1);
 
-    if (
-      !row ||
-      !isAssignmentOpen(row.assignment.status, row.assignment.expiresAt)
-    ) {
-      return null;
-    }
+    if (!row) return null;
 
-    return buildPublicAssignmentPayload(row);
+    return buildOpenPublicAssignmentPayload(row);
   });
 
 const submitAttemptInputSchema = z.object({
