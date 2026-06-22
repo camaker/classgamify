@@ -106,7 +106,7 @@ import {
 } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
-import { worksheetModeDefinitions } from '@/activities/worksheet-modes';
+import { getWorksheetModeDefinitions } from '@/activities/worksheet-modes';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
@@ -2684,29 +2684,31 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   );
 }
 assert.deepEqual(
-  worksheetModeDefinitions.map((mode) => mode.template),
+  getWorksheetModeDefinitions().map((mode) => mode.template),
   ['fill-blank', 'line-match', 'listening', 'group-sort']
 );
 assert.equal(
-  worksheetModeDefinitions.every((mode) =>
+  getWorksheetModeDefinitions().every((mode) =>
     isActivityTemplateType(mode.template)
   ),
   true
 );
 assert.equal(
-  worksheetModeDefinitions.every(
+  getWorksheetModeDefinitions().every(
     (mode) => mode.action.length > 0 && mode.description.length > 0
   ),
   true
 );
 assert.deepEqual(
-  worksheetModeDefinitions.map((mode) => buildWorksheetModeEntryAction(mode)),
-  worksheetModeDefinitions.map((mode) => ({
+  getWorksheetModeDefinitions().map((mode) =>
+    buildWorksheetModeEntryAction(mode)
+  ),
+  getWorksheetModeDefinitions().map((mode) => ({
     label: mode.action,
     search: { template: mode.template },
   }))
 );
-assert.deepEqual(buildWorksheetHeroActions(worksheetModeDefinitions), [
+assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   {
     label: 'Create fill-blank',
     search: { template: 'fill-blank' },
@@ -2720,7 +2722,9 @@ assert.deepEqual(buildWorksheetHeroActions(worksheetModeDefinitions), [
 ]);
 assert.deepEqual(
   buildWorksheetHeroActions(
-    worksheetModeDefinitions.filter((mode) => mode.template !== 'line-match')
+    getWorksheetModeDefinitions().filter(
+      (mode) => mode.template !== 'line-match'
+    )
   )[1],
   {
     label: 'Create line-match',
