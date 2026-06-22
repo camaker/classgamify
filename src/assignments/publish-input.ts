@@ -15,9 +15,11 @@ export function parseAssignmentDateTimeLocal(value: string) {
 }
 
 export function parseOptionalWholeNumber(value: string) {
-  if (!value.trim()) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  if (!/^\d+$/.test(trimmed)) return undefined;
 
-  const parsed = Number(value);
+  const parsed = Number(trimmed);
   return Number.isInteger(parsed) ? parsed : undefined;
 }
 

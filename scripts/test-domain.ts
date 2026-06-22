@@ -1530,6 +1530,9 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
 assert.equal(parseOptionalWholeNumber(''), undefined);
 assert.equal(parseOptionalWholeNumber(' 12 '), 12);
 assert.equal(parseOptionalWholeNumber('1.5'), undefined);
+assert.equal(parseOptionalWholeNumber('1e1'), undefined);
+assert.equal(parseOptionalWholeNumber('0x10'), undefined);
+assert.equal(parseOptionalWholeNumber('+2'), undefined);
 assert.equal(parseOptionalWholeNumber('abc'), undefined);
 assert.equal(parseAssignmentDateTimeLocal(''), null);
 assert.equal(parseAssignmentDateTimeLocal('not-a-date'), null);
