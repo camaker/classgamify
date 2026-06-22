@@ -5208,6 +5208,43 @@ assert.match(
 );
 assert.ok(fallbackQuizRuntimeItems[0]?.choices?.includes('weather') ?? false);
 assert.equal(fallbackQuizRuntimeItems.length, 3);
+const fallbackChineseQuizDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: '小学三年级',
+  itemCount: 3,
+  language: 'zh-CN',
+  sourceText: '苹果，香蕉，牛奶，面包',
+  subject: '英语',
+  templateType: 'quiz',
+});
+const fallbackChineseQuizContent = buildActivityContent(
+  fallbackChineseQuizDraft
+);
+assert.equal(
+  fallbackChineseQuizDraft.description,
+  '根据课堂素材生成的英语活动，老师可检查后使用。'
+);
+assert.equal(
+  fallbackChineseQuizDraft.learningGoal,
+  '学生能够识别并运用本课的英语重点内容。'
+);
+assert.equal(fallbackChineseQuizDraft.title, '苹果快速练习');
+assert.match(
+  fallbackChineseQuizDraft.teacherNotesText,
+  /发布给小学三年级学生前，请先检查这份草稿。/
+);
+assert.match(
+  fallbackChineseQuizContent.questions[0]?.prompt ?? '',
+  /^哪个英语课堂词/
+);
+assert.match(
+  fallbackChineseQuizContent.questions[0]?.prompt ?? '',
+  /以"苹"开头，长度为2 个字符/
+);
+assert.equal(
+  fallbackChineseQuizContent.questions[0]?.explanation,
+  '苹果 是本课的目标内容之一。'
+);
 const fallbackListeningDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -5258,6 +5295,28 @@ assert.equal(
   false
 );
 assert.equal(getRuntimeItems('group-sort', fallbackGroupSortContent).length, 4);
+const fallbackChineseGroupSortDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  gradeBand: '小学三年级',
+  itemCount: 4,
+  language: '中文',
+  sourceText: '天气，晴天，雨天，刮风',
+  subject: '科学',
+  templateType: 'group-sort',
+});
+const fallbackChineseGroupSortContent = buildActivityContent(
+  fallbackChineseGroupSortDraft
+);
+assert.deepEqual(
+  fallbackChineseGroupSortContent.groups.map((group) => group.label),
+  ['复习重点', '科学例子']
+);
+assert.equal(
+  fallbackChineseGroupSortContent.groups.every(
+    (group) => group.items.length > 0
+  ),
+  true
+);
 const fallbackOpenBoxDraft = createFallbackActivityDraft({
   difficulty: 'starter',
   gradeBand: 'Grade 3',

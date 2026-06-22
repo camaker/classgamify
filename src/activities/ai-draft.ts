@@ -19,6 +19,7 @@ import {
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
 import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { m } from '@/locale/paraglide/messages';
+import type { Locale } from '@/locale/paraglide/runtime';
 import { z } from 'zod';
 
 export const generateActivityDraftInputSchema = z.object({
@@ -395,48 +396,62 @@ export function createFallbackActivityDraftResult({
 export function createFallbackActivityDraft(
   input: GenerateActivityDraftInput
 ): CreateActivityInput {
+  const locale = getFallbackDraftLocale(input.language);
   const terms = extractTerms(input.sourceText, input.subject).slice(
     0,
     input.itemCount
   );
-  const normalizedTerms = terms.length >= 3 ? terms : fallbackTerms(input);
+  const normalizedTerms =
+    terms.length >= 3 ? terms : fallbackTerms(input, locale);
   const options = normalizedTerms.slice(0, Math.max(3, input.itemCount));
 
   const questions = buildFallbackQuestions({
     input,
+    locale,
     options,
     terms: normalizedTerms.slice(0, input.itemCount),
   });
 
   const pairs = buildFallbackPairs({
     input,
+    locale,
     terms: normalizedTerms.slice(0, input.itemCount),
   });
 
   const groups = buildFallbackGroups(
     normalizedTerms,
     input.templateType,
-    input.subject
+    input.subject,
+    locale
   );
 
   const sourceSummary = summarizeSource(input.sourceText);
   const activity = {
-    description: `Teacher-ready ${input.subject} activity generated from lesson notes.`,
+    description: m.activity_ai_fallback_description(
+      { subject: input.subject },
+      { locale }
+    ),
     difficulty: input.difficulty,
     gradeBand: input.gradeBand,
     groupsText: groups,
     language: input.language,
-    learningGoal: `Students can recognize and use key ${input.subject} ideas from the lesson.`,
+    learningGoal: m.activity_ai_fallback_learning_goal(
+      { subject: input.subject },
+      { locale }
+    ),
     pairsText: pairs.join('\n'),
     questionsText: questions.join('\n'),
     sourceSummary,
     subject: input.subject,
     teacherNotesText: [
-      `Review the draft before assigning it to ${input.gradeBand} learners.`,
-      'Switch templates after saving to reuse the same content in another game mode.',
+      m.activity_ai_fallback_teacher_note_review(
+        { gradeBand: input.gradeBand },
+        { locale }
+      ),
+      m.activity_ai_fallback_teacher_note_remix({}, { locale }),
     ].join('\n'),
     templateType: input.templateType,
-    title: createFallbackTitle(input, normalizedTerms[0]),
+    title: createFallbackTitle(input, normalizedTerms[0], locale),
     visibility: 'draft',
     vocabularyText: normalizedTerms.join(', '),
   } satisfies CreateActivityInput;
@@ -446,10 +461,12 @@ export function createFallbackActivityDraft(
 
 function buildFallbackQuestions({
   input,
+  locale,
   options,
   terms,
 }: {
   input: GenerateActivityDraftInput;
+  locale: Locale;
   options: string[];
   terms: string[];
 }) {
@@ -458,67 +475,121 @@ function buildFallbackQuestions({
       answer: term,
       options,
     }).join(', ');
-    const explanation = `${term} is one of the target items from this lesson.`;
+    const explanation = m.activity_ai_fallback_question_explanation(
+      { term },
+      { locale }
+    );
 
     switch (input.templateType) {
       case 'fill-blank':
-        return `${buildFallbackFillBlankPrompt({ input, term })} | ${term} | ${choices} | ${explanation}`;
+        return `${buildFallbackFillBlankPrompt({ input, locale, term })} | ${term} | ${choices} | ${explanation}`;
       case 'listening':
-        return `Track ${index + 1}: The ${input.subject} listening word is ${term}. | ${term} | ${choices} | The spoken track names ${term}.`;
+        return `${m.activity_ai_fallback_listening_prompt(
+          { index: index + 1, subject: input.subject, term },
+          { locale }
+        )} | ${term} | ${choices} | ${m.activity_ai_fallback_listening_explanation(
+          { term },
+          { locale }
+        )}`;
       case 'open-box':
-        return `Open the box: explain or name the ${input.subject} idea from this lesson. | ${term} | | Model answer: ${term}. ${explanation}`;
+        return `${m.activity_ai_fallback_open_box_prompt(
+          { subject: input.subject },
+          { locale }
+        )} | ${term} | | ${m.activity_ai_fallback_open_box_explanation(
+          { explanation, term },
+          { locale }
+        )}`;
       default:
-        return `${buildFallbackQuizPrompt({ input, term })} | ${term} | ${choices} | ${explanation}`;
+        return `${buildFallbackQuizPrompt({ input, locale, term })} | ${term} | ${choices} | ${explanation}`;
     }
   });
 }
 
 function buildFallbackQuizPrompt({
   input,
+  locale,
   term,
 }: {
   input: GenerateActivityDraftInput;
+  locale: Locale;
   term: string;
 }) {
-  return `Which ${input.subject} lesson term ${buildFallbackTermClue(term)}?`;
+  return m.activity_ai_fallback_quiz_prompt(
+    {
+      clue: buildFallbackTermClue(term, locale),
+      subject: input.subject,
+    },
+    { locale }
+  );
 }
 
 function buildFallbackFillBlankPrompt({
   input,
+  locale,
   term,
 }: {
   input: GenerateActivityDraftInput;
+  locale: Locale;
   term: string;
 }) {
-  return `Complete the ${input.subject} sentence: The lesson term that ${buildFallbackTermClue(term)} is ___.`;
+  return m.activity_ai_fallback_fill_blank_prompt(
+    {
+      clue: buildFallbackTermClue(term, locale),
+      subject: input.subject,
+    },
+    { locale }
+  );
 }
 
-function buildFallbackTermClue(term: string) {
+function buildFallbackTermClue(term: string, locale: Locale) {
   const characterCount = Array.from(term).length;
-  const characterCountLabel = `${characterCount} ${
-    characterCount === 1 ? 'character' : 'characters'
-  }`;
+  const characterCountLabel =
+    characterCount === 1
+      ? m.activity_ai_fallback_character_count_one(
+          { count: characterCount },
+          { locale }
+        )
+      : m.activity_ai_fallback_character_count_many(
+          { count: characterCount },
+          { locale }
+        );
   const firstCharacter = Array.from(term.trim()).find(Boolean) ?? term;
 
   if (characterCount <= 1) {
-    return `has ${characterCountLabel}`;
+    return m.activity_ai_fallback_term_clue_single(
+      { characterCountLabel },
+      { locale }
+    );
   }
 
-  return `starts with ${JSON.stringify(
-    firstCharacter
-  )} and has ${characterCountLabel}`;
+  return m.activity_ai_fallback_term_clue_prefix(
+    {
+      characterCountLabel,
+      firstCharacter: JSON.stringify(firstCharacter),
+    },
+    { locale }
+  );
 }
 
 function buildFallbackPairs({
   input,
+  locale,
   terms,
 }: {
   input: GenerateActivityDraftInput;
+  locale: Locale;
   terms: string[];
 }) {
   return terms.map((term, index) => {
     const characterCount = Array.from(term).length;
-    const clue = `${input.subject} lesson clue ${index + 1} (${characterCount} chars)`;
+    const clue = m.activity_ai_fallback_pair_clue(
+      {
+        count: characterCount,
+        index: index + 1,
+        subject: input.subject,
+      },
+      { locale }
+    );
     return `${term} | ${clue}`;
   });
 }
@@ -536,29 +607,33 @@ function extractTerms(sourceText: string, subject: string) {
   return unique([...phrases, ...words, subject]).slice(0, 16);
 }
 
-function fallbackTerms(input: GenerateActivityDraftInput) {
+function fallbackTerms(input: GenerateActivityDraftInput, locale: Locale) {
   return unique([
     ...extractTerms(input.sourceText, input.subject),
-    'key word',
-    'example',
-    'meaning',
-    'category',
-    'review',
+    m.activity_ai_fallback_term_key_word({}, { locale }),
+    m.activity_ai_fallback_term_example({}, { locale }),
+    m.activity_ai_fallback_term_meaning({}, { locale }),
+    m.activity_ai_fallback_term_category({}, { locale }),
+    m.activity_ai_fallback_term_review({}, { locale }),
   ]).slice(0, Math.max(5, input.itemCount));
 }
 
 function buildFallbackGroups(
   terms: string[],
   templateType: ActivityTemplateType,
-  subject: string
+  subject: string,
+  locale: Locale
 ) {
   const midpoint = Math.max(1, Math.ceil(terms.length / 2));
   const first = terms.slice(0, midpoint);
   const second = terms.slice(midpoint);
   const [firstLabel, secondLabel] =
     templateType === 'group-sort'
-      ? buildFallbackGroupSortLabels(subject)
-      : ['Practice', 'Review'];
+      ? buildFallbackGroupSortLabels(subject, locale)
+      : [
+          m.activity_ai_fallback_group_practice({}, { locale }),
+          m.activity_ai_fallback_group_review({}, { locale }),
+        ];
 
   return [
     `${firstLabel} | ${first.join(', ')}`,
@@ -566,18 +641,35 @@ function buildFallbackGroups(
   ].join('\n');
 }
 
-function buildFallbackGroupSortLabels(subject: string) {
-  const normalizedSubject = subject.trim() || 'Lesson';
-  return ['Review focus', `${normalizedSubject} examples`] as const;
+function buildFallbackGroupSortLabels(subject: string, locale: Locale) {
+  const normalizedSubject =
+    subject.trim() || m.activity_ai_fallback_default_subject({}, { locale });
+  return [
+    m.activity_ai_fallback_group_review_focus({}, { locale }),
+    m.activity_ai_fallback_group_subject_examples(
+      { subject: normalizedSubject },
+      { locale }
+    ),
+  ] as const;
 }
 
 function createFallbackTitle(
   input: GenerateActivityDraftInput,
-  firstTerm?: string
+  firstTerm: string | undefined,
+  locale: Locale
 ) {
   const topic =
     firstTerm && firstTerm !== input.subject ? firstTerm : input.subject;
-  return `${topic} quick practice`.slice(0, 90);
+  return m.activity_ai_fallback_title({ topic }, { locale }).slice(0, 90);
+}
+
+function getFallbackDraftLocale(language: string): Locale {
+  const normalizedLanguage = language.trim().toLocaleLowerCase();
+  return normalizedLanguage.startsWith('zh') ||
+    normalizedLanguage.includes('chinese') ||
+    normalizedLanguage.includes('中文')
+    ? 'zh'
+    : 'en';
 }
 
 function summarizeSource(sourceText: string) {
