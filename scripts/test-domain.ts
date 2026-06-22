@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -346,17 +346,75 @@ assert.equal(
   'https://cloud.umami.is/script.js'
 );
 
-const activeShareSurfaceText = [
-  readFileSync('CLAUDE.md', 'utf8'),
-  readFileSync('public/og-source.svg', 'utf8'),
-  readFileSync('src/routes/api/e2e/users.ts', 'utf8'),
-  readFileSync('tests/e2e/fixtures/test-data.ts', 'utf8'),
-].join('\n');
-assert.doesNotMatch(
-  activeShareSurfaceText,
-  /getlangstudy|Lang Study|HSK1 starter loop|TanStarter|mkfast-template/i
+const copiedTemplateMarkerPattern = new RegExp(
+  [
+    'getlangstudy',
+    'Lang Study',
+    'HSK',
+    'Hanzi',
+    'HSK1 starter loop',
+    'TanStarter',
+    'mkfast-template',
+    'Chinese character',
+    'stroke-order',
+    'writing practice',
+  ].join('|'),
+  'i'
 );
-assert.match(activeShareSurfaceText, /ClassGamify/);
+
+const contentSurfaceFiles = [
+  'content/blog',
+  'content/changelog',
+  'content/pages',
+].flatMap((directoryPath) =>
+  readdirSync(directoryPath)
+    .filter((fileName) => fileName.endsWith('.md'))
+    .sort()
+    .map((fileName) => `${directoryPath}/${fileName}`)
+);
+
+const activeClassGamifySurfaceFiles = [
+  'CLAUDE.md',
+  'README.md',
+  'public/og-source.svg',
+  'src/config/footer-config.ts',
+  'src/config/navbar-config.ts',
+  'src/config/sidebar-config.ts',
+  'src/config/website.ts',
+  'src/routes/index.tsx',
+  'src/routes/templates.tsx',
+  'src/routes/worksheets.tsx',
+  'src/routes/create.tsx',
+  'src/routes/play/$shareId.tsx',
+  'src/routes/(pages)/contact.tsx',
+  'src/routes/(pages)/pricing.tsx',
+  'src/routes/(pages)/roadmap.tsx',
+  'src/routes/(pages)/teachers.tsx',
+  'src/routes/dashboard/index.tsx',
+  'src/routes/dashboard/activities.tsx',
+  'src/routes/dashboard/activities/$activityId.tsx',
+  'src/routes/dashboard/assignments.tsx',
+  'src/routes/dashboard/assignments/$assignmentId.tsx',
+  'src/routes/settings/billing.tsx',
+  'src/routes/api/e2e/users.ts',
+  'tests/e2e/fixtures/test-data.ts',
+  ...contentSurfaceFiles,
+];
+
+const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
+  .map((filePath) => {
+    const fileText = readFileSync(filePath, 'utf8');
+
+    assert.doesNotMatch(
+      fileText,
+      copiedTemplateMarkerPattern,
+      `${filePath} should use ClassGamify product language`
+    );
+
+    return fileText;
+  })
+  .join('\n');
+assert.match(activeClassGamifySurfaceText, /ClassGamify/);
 
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
