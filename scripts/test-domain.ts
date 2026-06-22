@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
+import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -4254,6 +4255,24 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
       (option) => option.template.type === templateType
     )
   );
+}
+overwriteGetLocale(() => 'zh');
+try {
+  const zhGroupSortScaffold = getActivityTemplateScaffold('group-sort');
+  assert.equal(zhGroupSortScaffold.title, '分类食物、饮品和容器');
+  const zhGroupSortInput = createActivityInputSchema.parse({
+    ...zhGroupSortScaffold,
+    difficulty: 'starter',
+    gradeBand: '小学',
+    language: 'zh',
+    templateType: 'group-sort',
+    visibility: 'draft',
+  });
+  const zhGroupSortContent = buildActivityContent(zhGroupSortInput);
+  assert.ok(zhGroupSortContent.groups.some((group) => group.label === '食物'));
+  assert.ok(getRuntimeItems('group-sort', zhGroupSortContent).length >= 3);
+} finally {
+  overwriteGetLocale(() => 'en');
 }
 assert.deepEqual(
   ACTIVITY_TEMPLATE_TYPES.map((templateType) => [
