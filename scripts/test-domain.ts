@@ -6243,7 +6243,9 @@ assert.equal(
   normalizeResultSearch('  Anonymous   Student 1  '),
   'anonymous student 1'
 );
+assert.equal(normalizeResultSearch('  Ａｖａ   Ｃｈｅｎ  '), 'ava chen');
 assert.equal(matchesResultSearch('Anonymous student 1', 'student 1'), true);
+assert.equal(matchesResultSearch('Ava Chen', '  ａｖａ '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
 assert.equal(
   buildResultSearchSummary({
@@ -7008,7 +7010,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   filterAndSortStudentSummaries({
-    search: ' anonymous ',
+    search: ' ａｎｏｎｙｍｏｕｓ ',
     sort: 'needs-review',
     students: resultAnalysis.students,
   }).map((student) => student.studentLabel),
@@ -7063,7 +7065,7 @@ const assignmentResultViewModel = buildAssignmentResultViewModel({
   itemPerformanceSort: 'accuracy',
   items: resultAnalysis.perItem,
   reviews: resultAnalysis.attempts,
-  search: ' anonymous ',
+  search: ' ａｎｏｎｙｍｏｕｓ ',
   studentSort: 'needs-review',
   students: resultAnalysis.students,
 });
@@ -7353,7 +7355,7 @@ assert.deepEqual(
       { id: 'attempt-3', studentName: null },
     ],
     reviews: resultAnalysis.attempts,
-    search: 'anonymous',
+    search: 'ａｎｏｎｙｍｏｕｓ',
   }).map((row) => row.attempt.id),
   ['attempt-3']
 );
@@ -7369,7 +7371,7 @@ assert.deepEqual(
   filterAttemptReviews({
     attempts: resultAnalysis.attempts,
     filter: 'all',
-    search: ' alice ',
+    search: ' ａｌｉｃｅ ',
   }).map((attempt) => attempt.id),
   ['attempt-1', 'attempt-2']
 );

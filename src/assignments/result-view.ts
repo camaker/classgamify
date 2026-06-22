@@ -1464,7 +1464,11 @@ export function buildAssignmentResultControlSearchState({
 }
 
 export function normalizeResultSearch(value: string | null | undefined) {
-  const normalized = value?.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  const normalized = value
+    ?.normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase();
   return normalized || undefined;
 }
 
@@ -1472,7 +1476,8 @@ export function matchesResultSearch(
   value: string | null | undefined,
   search: string
 ) {
-  return normalizeResultSearch(value)?.includes(search) ?? false;
+  const normalizedSearch = normalizeResultSearch(search) ?? search;
+  return normalizeResultSearch(value)?.includes(normalizedSearch) ?? false;
 }
 
 function compareStudentsDescending(
