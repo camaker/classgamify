@@ -68,6 +68,9 @@ type CreateActivityPayload = CreateActivityInput & {
 
 type ActivityContentRowKind = 'group' | 'pair' | 'question';
 
+const PRIMARY_ROW_SEPARATOR_PATTERN = /[|｜\t]/u;
+const FALLBACK_ROW_SEPARATOR_PATTERN = /[:：]/u;
+
 export function buildActivityContent(
   input: CreateActivityPayload
 ): ActivityContent {
@@ -225,7 +228,7 @@ function parseRows(raw: string | undefined, rowKind: ActivityContentRowKind) {
     .split(/\r?\n/u)
     .map((line, index) => ({
       lineNumber: index + 1,
-      parts: line.split(/[|｜]/u).map((part) => part.trim()),
+      parts: splitActivityContentRow(line),
       raw: line.trim(),
     }))
     .filter((row) => row.raw.length > 0)
@@ -239,6 +242,14 @@ function parseRows(raw: string | undefined, rowKind: ActivityContentRowKind) {
       }
       return row;
     });
+}
+
+function splitActivityContentRow(line: string) {
+  const separator = PRIMARY_ROW_SEPARATOR_PATTERN.test(line)
+    ? PRIMARY_ROW_SEPARATOR_PATTERN
+    : FALLBACK_ROW_SEPARATOR_PATTERN;
+
+  return line.split(separator).map((part) => part.trim());
 }
 
 function formatActivityContentRowKind(rowKind: ActivityContentRowKind) {

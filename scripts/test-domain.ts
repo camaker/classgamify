@@ -4712,6 +4712,85 @@ assert.equal(
   }).questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
 );
+const tabSeparatedQuestionContent = buildActivityContent({
+  description: 'Spreadsheet-pasted question rows',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'zh',
+  learningGoal: 'Students answer tab pasted review questions.',
+  pairsText: '',
+  questionsText: '中国的首都是？\t北京\t北京，上海，广州\t中国首都题',
+  sourceSummary: 'Spreadsheet pasted rows',
+  subject: '中文',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Tab row parser',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.equal(tabSeparatedQuestionContent.questions[0]?.answer, '北京');
+assert.deepEqual(
+  tabSeparatedQuestionContent.questions[0]?.options.map(
+    (option) => option.text
+  ),
+  ['北京', '上海', '广州']
+);
+assert.equal(
+  tabSeparatedQuestionContent.questions[0]?.explanation,
+  '中国首都题'
+);
+const fullwidthColonPairContent = buildActivityContent({
+  description: 'Fullwidth colon pair rows',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'zh',
+  learningGoal: 'Students match fullwidth colon pair rows.',
+  pairsText: '苹果：apple\n香蕉：banana',
+  questionsText: '',
+  sourceSummary: 'Fullwidth colon pair rows',
+  subject: '英语',
+  teacherNotesText: '',
+  templateType: 'line-match',
+  title: 'Colon pairs',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.deepEqual(
+  fullwidthColonPairContent.pairs.map((pair) => [pair.left, pair.right]),
+  [
+    ['苹果', 'apple'],
+    ['香蕉', 'banana'],
+  ]
+);
+const fullwidthColonGroupContent = buildActivityContent({
+  description: 'Fullwidth colon group rows',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '水果：苹果、香蕉\n蔬菜：胡萝卜，白菜',
+  language: 'zh',
+  learningGoal: 'Students sort fullwidth colon group rows.',
+  pairsText: '',
+  questionsText: '',
+  sourceSummary: 'Fullwidth colon group rows',
+  subject: '科学',
+  teacherNotesText: '',
+  templateType: 'group-sort',
+  title: 'Colon groups',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.deepEqual(
+  fullwidthColonGroupContent.groups.map((group) => ({
+    items: group.items,
+    label: group.label,
+  })),
+  [
+    { items: ['苹果', '香蕉'], label: '水果' },
+    { items: ['胡萝卜', '白菜'], label: '蔬菜' },
+  ]
+);
 const fullwidthAnswerContent = buildActivityContent({
   description: 'Fullwidth answer normalization',
   difficulty: 'starter',
