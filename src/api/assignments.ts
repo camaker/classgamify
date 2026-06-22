@@ -32,6 +32,7 @@ import {
   assignmentSnapshot,
   attempt,
 } from '@/db/app.schema';
+import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
@@ -206,7 +207,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!sourceActivity) {
-      throw new Error('Activity not found.');
+      throw new Error(m.assignment_api_error_activity_not_found());
     }
     assertActivityCanDeriveWork(sourceActivity.visibility);
 
@@ -215,7 +216,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const shareSlug = nanoid(10);
     const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
     if (expiresAt && expiresAt.getTime() <= now.getTime()) {
-      throw new Error('Choose a future close time for this assignment.');
+      throw new Error(m.assignment_api_error_close_time_future());
     }
     const settings = resolveAssignmentSettings(data.settings);
 
@@ -257,7 +258,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Assignment was saved but could not be loaded.');
+      throw new Error(m.assignment_api_error_create_load_failed());
     }
 
     return withResolvedAssignmentSettings(row);
@@ -284,7 +285,7 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!existingAssignment) {
-      throw new Error('Assignment not found.');
+      throw new Error(m.assignment_api_error_assignment_not_found());
     }
     assertAssignmentStatusTransition({
       currentStatus: existingAssignment.status,
@@ -316,7 +317,7 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Assignment status was saved but could not be loaded.');
+      throw new Error(m.assignment_api_error_status_load_failed());
     }
 
     return withResolvedAssignmentSettings(row);
@@ -353,7 +354,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Assignment not found.');
+      throw new Error(m.assignment_api_error_assignment_not_found());
     }
 
     const attempts = await db
@@ -456,13 +457,13 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Assignment not found.');
+      throw new Error(m.assignment_api_error_assignment_not_found());
     }
     if (row.assignment.status !== 'published') {
-      throw new Error('This assignment is closed.');
+      throw new Error(m.assignment_api_error_assignment_closed());
     }
     if (isAssignmentExpired(row.assignment.expiresAt)) {
-      throw new Error('This assignment has expired.');
+      throw new Error(m.assignment_api_error_assignment_expired());
     }
 
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
@@ -476,10 +477,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       studentName: data.studentName,
     });
     if (settings.collectStudentName && !submissionIdentity.studentName) {
-      throw new Error('Student name is required for this assignment.');
+      throw new Error(m.assignment_api_error_student_name_required());
     }
     if (!settings.collectStudentName && !submissionIdentity.anonymousToken) {
-      throw new Error('Anonymous student token is required.');
+      throw new Error(m.assignment_api_error_anonymous_token_required());
     }
 
     if (settings.maxAttempts) {
@@ -489,7 +490,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         studentName: submissionIdentity.studentName ?? '',
       });
       if (attemptCount >= settings.maxAttempts) {
-        throw new Error('This assignment has reached its attempt limit.');
+        throw new Error(m.assignment_api_error_attempt_limit_reached());
       }
     }
 
