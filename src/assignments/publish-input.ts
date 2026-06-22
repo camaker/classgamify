@@ -23,7 +23,7 @@ export function parseOptionalWholeNumber(value: string) {
   return Number.isInteger(parsed) ? parsed : undefined;
 }
 
-export type AssignmentPublishDraft = {
+type AssignmentPublishDraft = {
   activityId: string;
   collectStudentName: boolean;
   expiresAtLocal: string;
@@ -36,7 +36,7 @@ export type AssignmentPublishDraft = {
   title: string;
 };
 
-export type AssignmentPublishDraftResult =
+type AssignmentPublishDraftResult =
   | {
       input: {
         activityId: string;
@@ -67,7 +67,7 @@ type AssignmentPublishDraftValidation =
       ok: false;
     };
 
-export type AssignmentPublishPreview = {
+type AssignmentPublishPreview = {
   expiresAt: Date | null;
   settings: AssignmentSettings;
 };

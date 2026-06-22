@@ -9,7 +9,7 @@ import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;
 
-export type StudentSubmissionRuntimeItem = {
+type StudentSubmissionRuntimeItem = {
   id: string;
 };
 
@@ -26,13 +26,13 @@ export type StudentAttemptSubmissionInput = {
   studentName?: string;
 };
 
-export type AttemptCompletionSummary = {
+type AttemptCompletionSummary = {
   answeredItemCount: number;
   itemCount: number;
   unansweredItemCount: number;
 };
 
-export type AttemptSubmitDecision =
+type AttemptSubmitDecision =
   | {
       reason: 'complete' | 'confirmed-incomplete';
       type: 'submit';
@@ -43,7 +43,7 @@ export type AttemptSubmitDecision =
       unansweredItemCount: number;
     };
 
-export type StudentAttemptSubmitGate =
+type StudentAttemptSubmitGate =
   | {
       message: string;
       reason: 'missing-student-name' | 'read-only';
@@ -60,14 +60,14 @@ export type StudentAttemptSubmitGate =
       type: 'submit';
     };
 
-export type AttemptCompletionCopy = {
+type AttemptCompletionCopy = {
   confirmIncompleteSubmit: string;
   progressLabel: string;
   submitButtonLabel: string;
   unansweredLabel?: string;
 };
 
-export type StudentRunnerCopy = {
+type StudentRunnerCopy = {
   browseTemplatesLabel: string;
   loadingMessage: string;
   missingAssignmentDescription: string;
@@ -90,7 +90,7 @@ export type StudentRunnerCopy = {
   teacherViewLabel: string;
 };
 
-export type AnonymousAttemptCopy = {
+type AnonymousAttemptCopy = {
   description: string;
   title: string;
 };
