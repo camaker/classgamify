@@ -612,6 +612,15 @@ assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
   title: 'Line match',
   usedChoiceLabel: 'Connected',
 });
+assert.deepEqual(getActivityRunnerKindCopy('fill-blank'), {
+  correctAnswerLabel: 'Correct answer',
+  inlineBlankPlaceholder: 'answer',
+  inputPlaceholder: 'Type the missing word',
+  progressVerb: 'completed',
+  title: 'Fill blanks',
+  usedChoiceLabel: 'Used',
+  wordBankLabel: 'Word bank',
+});
 assert.equal(getActivityTemplateRunnerCopy('quiz').title, 'Quiz');
 assert.equal(
   getActivityTemplateRunnerCopy('match-up').correctAnswerLabel,

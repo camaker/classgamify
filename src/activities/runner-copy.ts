@@ -8,10 +8,12 @@ import { m } from '@/locale/paraglide/messages';
 type ActivityRunnerCopy = {
   correctAnswerLabel: string;
   helpText?: string;
+  inlineBlankPlaceholder?: string;
   inputPlaceholder: string;
   progressVerb: string;
   title: string;
   usedChoiceLabel: string;
+  wordBankLabel?: string;
 };
 
 export function getActivityRunnerKindCopy(
@@ -30,10 +32,12 @@ export function getActivityRunnerKindCopy(
   if (runnerKind === 'fill-blank') {
     return {
       correctAnswerLabel: m.activity_runner_correct_answer(),
+      inlineBlankPlaceholder: m.activity_runner_inline_blank_placeholder(),
       inputPlaceholder: m.activity_runner_missing_word_placeholder(),
       progressVerb: m.activity_runner_progress_completed(),
       title: m.activity_runner_fill_blanks_title(),
       usedChoiceLabel: m.activity_runner_used_used(),
+      wordBankLabel: m.activity_runner_word_bank_label(),
     };
   }
 

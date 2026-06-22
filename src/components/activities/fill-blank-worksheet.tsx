@@ -77,13 +77,16 @@ export function FillBlankWorksheet({
                 </Badge>
                 {item.choices?.length ? (
                   <p className="text-xs text-muted-foreground">
-                    Word bank: {item.choices.join(', ')}
+                    {copy.wordBankLabel}: {item.choices.join(', ')}
                   </p>
                 ) : null}
               </div>
               <InlineBlankPrompt
                 answer={answer}
                 disabled={disabled}
+                inlinePlaceholder={
+                  copy.inlineBlankPlaceholder ?? copy.inputPlaceholder
+                }
                 placeholder={copy.inputPlaceholder}
                 prompt={item.prompt}
                 onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
@@ -103,11 +106,13 @@ function InlineBlankPrompt({
   answer,
   disabled,
   onAnswerChange,
+  inlinePlaceholder,
   placeholder,
   prompt,
 }: {
   answer: string;
   disabled: boolean;
+  inlinePlaceholder: string;
   onAnswerChange: (answer: string) => void;
   placeholder: string;
   prompt: string;
@@ -135,7 +140,7 @@ function InlineBlankPrompt({
         value={answer}
         disabled={disabled}
         onChange={(event) => onAnswerChange(event.target.value)}
-        placeholder="answer"
+        placeholder={inlinePlaceholder}
         className="h-9 w-40 min-w-0 border-x-0 border-t-0 rounded-none bg-transparent px-2 text-center shadow-none focus-visible:ring-0"
       />
       <span>{promptView.after}</span>
