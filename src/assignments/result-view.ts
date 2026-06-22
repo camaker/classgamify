@@ -18,6 +18,7 @@ import {
 } from '@/assignments/identity';
 import {
   formatAcceptedAnswerAlternatives,
+  formatAssignmentResultPercent,
   formatAssignmentResultValue,
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
@@ -941,9 +942,7 @@ export function formatAssignmentResultFraction(value: number, total: number) {
   return `${value}/${total}`;
 }
 
-export function formatAssignmentResultPercent(value: number) {
-  return `${value}%`;
-}
+export { formatAssignmentResultPercent };
 
 export function formatAssignmentReviewCount(count: number) {
   if (count === 1) {

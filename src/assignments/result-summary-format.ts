@@ -1,7 +1,8 @@
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
 export function formatAssignmentSummaryAccuracy(value: number) {
-  return `${value}%`;
+  return formatAssignmentResultPercent(value);
 }
 
 export function formatAssignmentSummaryCorrectRate(value: number) {

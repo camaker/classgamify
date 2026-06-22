@@ -6783,6 +6783,8 @@ assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue(null, { emptyValue: '' }), '');
 assert.equal(formatAssignmentResultValue('', { emptyValue: 'none' }), 'none');
 assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
+assert.equal(formatAssignmentSummaryAccuracy(67.4), '67%');
+assert.equal(formatAssignmentSummaryAccuracy(Number.NaN), '-');
 assert.equal(formatAssignmentSummaryCorrectRate(67), '67% correct');
 assert.equal(
   formatAssignmentSummaryCorrectCount({
@@ -7541,6 +7543,8 @@ assert.equal(
 );
 assert.equal(formatAssignmentResultFraction(2, 5), '2/5');
 assert.equal(formatAssignmentResultPercent(82), '82%');
+assert.equal(formatAssignmentResultPercent(82.6), '83%');
+assert.equal(formatAssignmentResultPercent(Number.NaN), '-');
 assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('Paris'), 'Paris');
 assert.equal(formatAssignmentReviewCount(1), '1 review');

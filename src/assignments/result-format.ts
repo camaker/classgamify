@@ -30,6 +30,17 @@ export function formatAssignmentResultCsvDate(value: ResultDateValue) {
   return date.toISOString();
 }
 
+export function formatAssignmentResultPercent(
+  value: number,
+  options?: {
+    emptyValue?: string;
+  }
+) {
+  if (!Number.isFinite(value)) return options?.emptyValue ?? '-';
+
+  return `${Math.round(value)}%`;
+}
+
 export function formatAcceptedAnswerAlternatives(
   values: string[],
   options?: {
