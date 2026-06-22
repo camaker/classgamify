@@ -1498,6 +1498,8 @@
   "settings_files_upload_error": "无法上传文件，请检查文件后重试。",
   "settings_files_upload_success": "文件上传成功",
   "settings_files_uploading": "上传中…",
+  "settings_files_visibility_private": "私有",
+  "settings_files_visibility_public": "公开",
   "settings_notification_description": "管理您的通知偏好",
   "settings_notification_newsletter_description": "管理您的邮件列表订阅偏好",
   "settings_notification_newsletter_email_required": "订阅邮件列表需要邮箱",

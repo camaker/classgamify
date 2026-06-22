@@ -145,7 +145,9 @@ export function FilesTable({
                 : 'bg-muted text-muted-foreground'
             )}
           >
-            {row.original.isPublic ? 'Public' : 'Private'}
+            {row.original.isPublic
+              ? m.settings_files_visibility_public()
+              : m.settings_files_visibility_private()}
           </span>
         ),
         minSize: 80,

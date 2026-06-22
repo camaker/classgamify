@@ -1498,6 +1498,8 @@
   "settings_files_upload_error": "Could not upload the file. Please check the file and try again.",
   "settings_files_upload_success": "File uploaded successfully",
   "settings_files_uploading": "Uploading…",
+  "settings_files_visibility_private": "Private",
+  "settings_files_visibility_public": "Public",
   "settings_notification_description": "Manage your notification preferences",
   "settings_notification_newsletter_description": "Manage your newsletter subscription preferences",
   "settings_notification_newsletter_email_required": "Email is required to subscribe to the newsletter",
