@@ -5255,6 +5255,30 @@ assert.deepEqual(
 );
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
+assert.deepEqual(
+  (
+    [
+      'gradeBand',
+      'groups',
+      'learningGoal',
+      'pairs',
+      'questions',
+      'sourceSummary',
+      'teacherNotes',
+      'vocabulary',
+    ] as const
+  ).map(formatTemplateRequirement),
+  [
+    'grade band',
+    'groups',
+    'learning goal',
+    'match pairs',
+    'questions',
+    'source summary',
+    'teacher notes',
+    'vocabulary',
+  ]
+);
 assert.equal(formatTemplateRequirementList(['questions']), 'questions');
 assert.equal(
   formatTemplateRequirementList(['questions', 'match pairs']),

@@ -1,6 +1,7 @@
 import { getActivityTemplates } from '@/activities/catalog';
 import type {
   ActivityContent,
+  ActivityTemplateContentRequirement,
   ActivityTemplateDefinition,
   ActivityTemplateType,
 } from '@/activities/types';
@@ -22,7 +23,7 @@ export type TemplateRemixOption = {
   isReady: boolean;
   missingRequirementCount: number;
   missingRequirementLabels: string[];
-  missingRequirements: Array<keyof ActivityContent>;
+  missingRequirements: ActivityTemplateContentRequirement[];
   readinessLabel: string;
   template: ActivityTemplateDefinition;
 };
@@ -193,7 +194,9 @@ export function formatTemplateRequirementList(requirements: string[]) {
   });
 }
 
-export function formatTemplateRequirement(requirement: keyof ActivityContent) {
+export function formatTemplateRequirement(
+  requirement: ActivityTemplateContentRequirement
+) {
   switch (requirement) {
     case 'groups':
       return m.activity_template_requirement_groups();
@@ -211,8 +214,6 @@ export function formatTemplateRequirement(requirement: keyof ActivityContent) {
       return m.activity_template_requirement_grade_band();
     case 'vocabulary':
       return m.activity_template_requirement_vocabulary();
-    default:
-      return requirement;
   }
 }
 

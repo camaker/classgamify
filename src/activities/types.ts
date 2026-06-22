@@ -62,6 +62,16 @@ export type ActivityContent = {
   teacherNotes: string[];
 };
 
+export type ActivityTemplateContentRequirement =
+  | 'gradeBand'
+  | 'groups'
+  | 'learningGoal'
+  | 'pairs'
+  | 'questions'
+  | 'sourceSummary'
+  | 'teacherNotes'
+  | 'vocabulary';
+
 export type AssignmentSettings = {
   collectStudentName: boolean;
   instructions?: string;
@@ -97,7 +107,7 @@ export type ActivityTemplateDefinition = {
   shortName: string;
   description: string;
   bestFor: string;
-  contentRequirements: Array<keyof ActivityContent>;
+  contentRequirements: ActivityTemplateContentRequirement[];
   classroomMode: 'individual' | 'small-group' | 'whole-class';
 };
 
