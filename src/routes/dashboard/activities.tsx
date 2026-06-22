@@ -36,18 +36,7 @@ import {
   buildStarterActivityLibraryCardViewModel,
   resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
-import {
-  assignmentPublishDialogCopy,
-  buildAssignmentPublishDraft,
-  buildAssignmentPublishDraftDefaults,
-  buildAssignmentPublishDialogState,
-  buildAssignmentPublishPreviewFromDraft,
-  buildAssignmentPublishInputFromDraft,
-  buildAssignmentPublishToggleViews,
-  formatAssignmentDateTimeLocal,
-  validateAssignmentPublishDraft,
-} from '@/assignments/publish-input';
-import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
+import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
@@ -63,17 +52,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import {
   useArchiveActivity,
   useActivities,
@@ -81,7 +60,6 @@ import {
   useRemixActivityTemplate,
   useRestoreActivity,
 } from '@/hooks/use-activities';
-import { usePublishAssignment } from '@/hooks/use-assignments';
 import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -101,7 +79,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
@@ -394,6 +372,8 @@ function CreatedActivityPanel({
   context: ReturnType<typeof buildCreatedActivityPanelContext> | undefined;
   onDismiss: () => void;
 }) {
+  const navigate = useNavigate();
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const panelContext =
     context ??
     buildCreatedActivityPanelContext({
@@ -403,61 +383,90 @@ function CreatedActivityPanel({
   const { activity } = panelContext;
 
   return (
-    <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-medium text-primary">
-          <IconCircleCheck className="size-4" />
-          {activityLibraryCreatedPanelCopy.savedLabel}
-        </div>
-        <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          {panelContext.body}
-        </p>
-        {panelContext.showMissingHint ? (
-          <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            {activityLibraryCreatedPanelCopy.missingHint}
+    <>
+      <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-sm font-medium text-primary">
+            <IconCircleCheck className="size-4" />
+            {activityLibraryCreatedPanelCopy.savedLabel}
+          </div>
+          <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {panelContext.body}
           </p>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-        {panelContext.showEditAction && activity ? (
-          <Link
-            to="/dashboard/activities/$activityId"
-            params={{ activityId: activity.id }}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-full bg-background sm:w-auto'
-            )}
-          >
-            <IconEdit className="size-4" />
-            {activityLibraryCardCopy.actionLabels.edit}
-          </Link>
-        ) : null}
-        {panelContext.showCreateAction ? (
-          <Link
-            to={Routes.Create}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-full bg-background sm:w-auto'
-            )}
-          >
-            <IconPlus className="size-4" />
-            {activityLibraryPageCopy.createActivityLabel}
-          </Link>
-        ) : null}
-        {panelContext.showDismissAction ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full sm:w-auto"
-            onClick={onDismiss}
-          >
-            <IconX className="size-4" />
-            {activityLibraryActionCopy.dismiss}
-          </Button>
-        ) : null}
-      </div>
-    </section>
+          {panelContext.showMissingHint ? (
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {activityLibraryCreatedPanelCopy.missingHint}
+            </p>
+          ) : null}
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+          {panelContext.showPublishAction && activity ? (
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              onClick={() => setPublishDialogOpen(true)}
+            >
+              <IconPlus className="size-4" />
+              {activityLibraryCardCopy.actionLabels.publish}
+            </Button>
+          ) : null}
+          {panelContext.showEditAction && activity ? (
+            <Link
+              to="/dashboard/activities/$activityId"
+              params={{ activityId: activity.id }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background sm:w-auto'
+              )}
+            >
+              <IconEdit className="size-4" />
+              {activityLibraryCardCopy.actionLabels.edit}
+            </Link>
+          ) : null}
+          {panelContext.showCreateAction ? (
+            <Link
+              to={Routes.Create}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background sm:w-auto'
+              )}
+            >
+              <IconPlus className="size-4" />
+              {activityLibraryPageCopy.createActivityLabel}
+            </Link>
+          ) : null}
+          {panelContext.showDismissAction ? (
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={onDismiss}
+            >
+              <IconX className="size-4" />
+              {activityLibraryActionCopy.dismiss}
+            </Button>
+          ) : null}
+        </div>
+      </section>
+      {activity ? (
+        <ActivityPublishDialog
+          activity={{
+            id: activity.id,
+            title: activity.title,
+            visibility: activity.visibility,
+          }}
+          open={publishDialogOpen}
+          onOpenChange={setPublishDialogOpen}
+          onPublished={(result) =>
+            navigate({
+              to: Routes.DashboardAssignments,
+              search: { published: result.assignment.shareSlug },
+            })
+          }
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -598,105 +607,13 @@ function ActivityCard({
   const navigate = useNavigate();
   const archiveMutation = useArchiveActivity();
   const duplicateMutation = useDuplicateActivity();
-  const publishMutation = usePublishAssignment();
   const remixMutation = useRemixActivityTemplate();
   const restoreMutation = useRestoreActivity();
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-  const publishDraftDefaults = useMemo(
-    () =>
-      buildAssignmentPublishDraftDefaults({
-        activityId: activity.id,
-        title: activity.title,
-      }),
-    [activity.id, activity.title]
-  );
-  const [assignmentTitle, setAssignmentTitle] = useState(
-    publishDraftDefaults.title
-  );
-  const [assignmentInstructions, setAssignmentInstructions] = useState(
-    publishDraftDefaults.instructions
-  );
-  const [collectStudentName, setCollectStudentName] = useState(
-    publishDraftDefaults.collectStudentName
-  );
-  const [showCorrectAnswers, setShowCorrectAnswers] = useState(
-    publishDraftDefaults.showCorrectAnswers
-  );
-  const [shuffleItems, setShuffleItems] = useState(
-    publishDraftDefaults.shuffleItems
-  );
-  const [maxAttempts, setMaxAttempts] = useState(
-    publishDraftDefaults.maxAttempts
-  );
-  const [timeLimitMinutes, setTimeLimitMinutes] = useState(
-    publishDraftDefaults.timeLimitMinutes
-  );
-  const [expiresAtLocal, setExpiresAtLocal] = useState(
-    publishDraftDefaults.expiresAtLocal
-  );
-  const publishToggleViews = buildAssignmentPublishToggleViews({
-    collectStudentName,
-    showCorrectAnswers,
-    shuffleItems,
-  });
-  const publishToggleSetters = {
-    collectStudentName: setCollectStudentName,
-    showCorrectAnswers: setShowCorrectAnswers,
-    shuffleItems: setShuffleItems,
-  };
-  const publishDraft = buildAssignmentPublishDraft({
-    defaults: publishDraftDefaults,
-    values: {
-      collectStudentName,
-      expiresAtLocal,
-      instructions: assignmentInstructions,
-      maxAttempts,
-      showCorrectAnswers,
-      shuffleItems,
-      timeLimitMinutes,
-      title: assignmentTitle,
-    },
-  });
-  const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
-  const publishValidation = validateAssignmentPublishDraft(publishDraft);
-  const publishDialogState = buildAssignmentPublishDialogState({
-    isPublishing: publishMutation.isPending,
-    validation: publishValidation,
-  });
   const cardDisplayView = buildActivityLibraryCardDisplayView({
     activity,
     libraryStatus,
   });
-
-  async function publishActivity() {
-    const actionView = buildActivityLifecycleActionView({
-      action: 'publish',
-      visibility: activity.status,
-    });
-    if (actionView.gate.type === 'blocked') {
-      toast.error(actionView.gate.message);
-      return;
-    }
-    const draftResult = buildAssignmentPublishInputFromDraft(publishDraft);
-    if (!draftResult.ok) {
-      toast.error(draftResult.message);
-      return;
-    }
-
-    try {
-      const result = await publishMutation.mutateAsync(draftResult.input);
-      toast.success(actionView.successMessage);
-      setPublishDialogOpen(false);
-      navigate({
-        to: Routes.DashboardAssignments,
-        search: { published: result.assignment.shareSlug },
-      });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionView.failureMessage
-      );
-    }
-  }
 
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
@@ -908,7 +825,6 @@ function ActivityCard({
                   <Button
                     type="button"
                     className="w-full sm:w-fit"
-                    disabled={publishMutation.isPending}
                     onClick={() => setPublishDialogOpen(true)}
                   >
                     <IconPlus className="size-4" />
@@ -939,170 +855,22 @@ function ActivityCard({
           </div>
         ) : null}
       </CardContent>
-      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{assignmentPublishDialogCopy.title}</DialogTitle>
-            <DialogDescription>
-              {assignmentPublishDialogCopy.description}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <label htmlFor={`assignment-title-${activity.id}`}>
-                {assignmentPublishDialogCopy.titleLabel}
-              </label>
-              <Input
-                id={`assignment-title-${activity.id}`}
-                value={assignmentTitle}
-                onChange={(event) =>
-                  setAssignmentTitle(event.currentTarget.value)
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor={`assignment-instructions-${activity.id}`}>
-                {assignmentPublishDialogCopy.instructionsLabel}
-              </label>
-              <Textarea
-                id={`assignment-instructions-${activity.id}`}
-                rows={3}
-                maxLength={500}
-                value={assignmentInstructions}
-                placeholder={
-                  assignmentPublishDialogCopy.instructionsPlaceholder
-                }
-                onChange={(event) =>
-                  setAssignmentInstructions(event.currentTarget.value)
-                }
-              />
-            </div>
-            <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
-              {publishToggleViews.map((option) => (
-                <PublishSetting
-                  key={option.key}
-                  checked={option.checked}
-                  description={option.description}
-                  id={`${option.key}-${activity.id}`}
-                  label={option.label}
-                  onCheckedChange={publishToggleSetters[option.key]}
-                />
-              ))}
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor={`max-attempts-${activity.id}`}>
-                {assignmentPublishDialogCopy.maxAttemptsLabel}
-              </label>
-              <Input
-                id={`max-attempts-${activity.id}`}
-                type="number"
-                min={1}
-                max={10}
-                value={maxAttempts}
-                onChange={(event) => setMaxAttempts(event.currentTarget.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor={`time-limit-${activity.id}`}>
-                {assignmentPublishDialogCopy.timeLimitLabel}
-              </label>
-              <Input
-                id={`time-limit-${activity.id}`}
-                type="number"
-                min={1}
-                max={180}
-                value={timeLimitMinutes}
-                placeholder={assignmentPublishDialogCopy.timeLimitPlaceholder}
-                onChange={(event) =>
-                  setTimeLimitMinutes(event.currentTarget.value)
-                }
-              />
-              <p className="text-xs leading-5 text-muted-foreground">
-                {assignmentPublishDialogCopy.timeLimitHelp}
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor={`expires-at-${activity.id}`}>
-                {assignmentPublishDialogCopy.closeAfterLabel}
-              </label>
-              <Input
-                id={`expires-at-${activity.id}`}
-                type="datetime-local"
-                min={formatAssignmentDateTimeLocal(
-                  new Date(Date.now() + 60 * 1000)
-                )}
-                value={expiresAtLocal}
-                onChange={(event) =>
-                  setExpiresAtLocal(event.currentTarget.value)
-                }
-              />
-              <p className="text-xs leading-5 text-muted-foreground">
-                {assignmentPublishDialogCopy.closeAfterHelp}
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <p className="font-medium text-sm">
-                {assignmentPublishDialogCopy.previewLabel}
-              </p>
-              <AssignmentSettingsSummary
-                expiresAt={publishPreview.expiresAt}
-                settings={publishPreview.settings}
-              />
-              {publishDialogState.errorMessage ? (
-                <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
-                  {publishDialogState.errorMessage}
-                </p>
-              ) : null}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPublishDialogOpen(false)}
-            >
-              {assignmentPublishDialogCopy.cancelLabel}
-            </Button>
-            <Button
-              type="button"
-              disabled={publishDialogState.publishDisabled}
-              onClick={publishActivity}
-            >
-              <IconPlus className="size-4" />
-              {assignmentPublishDialogCopy.publishLabel}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ActivityPublishDialog
+        activity={{
+          id: activity.id,
+          title: activity.title,
+          visibility: activity.status,
+        }}
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        onPublished={(result) =>
+          navigate({
+            to: Routes.DashboardAssignments,
+            search: { published: result.assignment.shareSlug },
+          })
+        }
+      />
     </Card>
-  );
-}
-
-function PublishSetting({
-  checked,
-  description,
-  id,
-  label,
-  onCheckedChange,
-}: {
-  checked: boolean;
-  description: string;
-  id: string;
-  label: string;
-  onCheckedChange: (checked: boolean) => void;
-}) {
-  return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <label htmlFor={id} className="font-medium text-sm">
-          {label}
-        </label>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          {description}
-        </p>
-      </div>
-      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
-    </div>
   );
 }
 

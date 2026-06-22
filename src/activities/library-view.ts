@@ -108,6 +108,7 @@ type CreatedActivityPanelContext = {
   showDismissAction: boolean;
   showEditAction: boolean;
   showMissingHint: boolean;
+  showPublishAction: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
 };
@@ -314,6 +315,8 @@ export function buildCreatedActivityPanelContext({
   isLoading: boolean;
 }): CreatedActivityPanelContext {
   if (activity) {
+    const canPublish = canDeriveActivityWork(activity.visibility);
+
     return {
       activity,
       body: m.activity_created_panel_found_body(),
@@ -321,6 +324,7 @@ export function buildCreatedActivityPanelContext({
       showDismissAction: true,
       showEditAction: true,
       showMissingHint: false,
+      showPublishAction: canPublish,
       status: 'found',
       title: activity.title,
     };
@@ -333,6 +337,7 @@ export function buildCreatedActivityPanelContext({
       showDismissAction: true,
       showEditAction: false,
       showMissingHint: false,
+      showPublishAction: false,
       status: 'loading',
       title: m.activity_created_panel_loading_title(),
     };
@@ -344,6 +349,7 @@ export function buildCreatedActivityPanelContext({
     showDismissAction: true,
     showEditAction: false,
     showMissingHint: true,
+    showPublishAction: false,
     status: 'missing',
     title: m.activity_created_panel_missing_title(),
   };

@@ -2675,6 +2675,12 @@ const createdActivityFromLookup = {
   title: 'Definition lines',
   visibility: 'draft',
 } as const;
+const archivedCreatedActivity = {
+  id: 'activity-4',
+  templateType: 'quiz',
+  title: 'Archived words',
+  visibility: 'archived',
+} as const;
 assert.deepEqual(
   resolveCreatedActivityPanelActivity({
     activity: createdActivityFromLookup,
@@ -2711,9 +2717,17 @@ assert.deepEqual(
     showDismissAction: true,
     showEditAction: true,
     showMissingHint: false,
+    showPublishAction: true,
     status: 'found',
     title: 'Material groups',
   }
+);
+assert.equal(
+  buildCreatedActivityPanelContext({
+    activity: archivedCreatedActivity,
+    isLoading: false,
+  }).showPublishAction,
+  false
 );
 assert.deepEqual(
   buildCreatedActivityPanelContext({
@@ -2726,6 +2740,7 @@ assert.deepEqual(
     showDismissAction: true,
     showEditAction: false,
     showMissingHint: false,
+    showPublishAction: false,
     status: 'loading',
     title: 'New activity is being added to your library.',
   }
@@ -2741,6 +2756,7 @@ assert.deepEqual(
     showDismissAction: true,
     showEditAction: false,
     showMissingHint: true,
+    showPublishAction: false,
     status: 'missing',
     title: 'Activity saved to your library.',
   }
