@@ -13,6 +13,7 @@ import {
 } from '@/activities/catalog';
 import { buildTemplateEntryAction } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { buttonVariants } from '@/components/ui/button';
@@ -28,9 +29,8 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/templates')({
   head: () =>
     seo('/templates', {
-      title: `Activity templates | ${websiteConfig.metadata?.name}`,
-      description:
-        'Browse the first ClassGamify activity templates for quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box classroom play.',
+      title: `${m.templates_page_seo_title()} | ${websiteConfig.metadata?.name}`,
+      description: m.templates_page_seo_description(),
     }),
   component: TemplatesPage,
 });
@@ -42,20 +42,18 @@ function TemplatesPage() {
         <div className="max-w-3xl space-y-4">
           <Badge variant="outline" className="rounded-md border-primary/30">
             <IconLayoutGrid className="size-3.5" />
-            Template library
+            {m.templates_page_eyebrow()}
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Pick a game format for the same lesson content.
+            {m.templates_page_title()}
           </h1>
           <p className="text-lg leading-8 text-muted-foreground">
-            ClassGamify templates render shared questions, pairs, groups, and
-            vocabulary as quick checks, matching games, worksheet practice,
-            listening prompts, or whole-class reveal rounds.
+            {m.templates_page_description()}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link to={Routes.Create} className={cn(buttonVariants(), 'w-fit')}>
               <IconPlus className="size-4" />
-              Create from template
+              {m.templates_page_create_from_template()}
             </Link>
             <Link
               to={Routes.PlayDemo}
@@ -65,7 +63,7 @@ function TemplatesPage() {
               )}
             >
               <IconPlayerPlay className="size-4" />
-              Open student demo
+              {m.templates_page_open_student_demo()}
             </Link>
           </div>
         </div>
@@ -90,13 +88,13 @@ function TemplatesPage() {
                 <CardContent className="space-y-3">
                   <div className="rounded-lg border bg-muted/30 p-3">
                     <p className="text-xs font-medium text-muted-foreground">
-                      Best for
+                      {m.templates_page_best_for_label()}
                     </p>
                     <p className="mt-1 text-sm">{template.bestFor}</p>
                   </div>
                   <div className="rounded-lg border bg-background p-3">
                     <p className="text-xs font-medium text-muted-foreground">
-                      Classroom mode
+                      {m.templates_page_classroom_mode_label()}
                     </p>
                     <p className="mt-1 text-sm">
                       {formatActivityTemplateClassroomMode(
@@ -135,15 +133,16 @@ function TemplatesPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Ready to draft one?</h2>
+              <h2 className="text-xl font-semibold">
+                {m.templates_page_bottom_title()}
+              </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Open the editor, load a scaffold for the selected game format,
-                then publish it as a shareable student assignment link.
+                {m.templates_page_bottom_description()}
               </p>
             </div>
             <Link to={Routes.Create} className={cn(buttonVariants(), 'w-fit')}>
               <IconPlus className="size-4" />
-              Create activity
+              {m.templates_page_create_activity()}
             </Link>
           </div>
         </div>
