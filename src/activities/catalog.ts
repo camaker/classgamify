@@ -161,9 +161,6 @@ export function getActivityTemplates() {
   return ACTIVITY_TEMPLATE_TYPES.map((type) => templatesByType[type]);
 }
 
-export const starterActivities = getStarterActivities();
-export const starterAssignments = getStarterAssignments();
-
 export function getStarterActivities(): ActivitySeed[] {
   const foodWords = {
     apple: m.activity_starter_food_vocabulary_apple(),

@@ -51,8 +51,6 @@ import {
   getStarterActivities,
   getStarterAssignments,
   getTemplateByType,
-  starterActivities,
-  starterAssignments,
 } from '@/activities/catalog';
 import {
   buildDuplicatedActivityTitle,
@@ -2710,6 +2708,8 @@ assert.deepEqual(
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
 assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
+const starterActivities = getStarterActivities();
+const starterAssignments = getStarterAssignments();
 assert.equal(starterActivities[0]?.title, 'Food words quick check');
 assert.equal(starterAssignments[0]?.title, 'Food words homework');
 assert.equal(getStarterActivities()[0]?.title, 'Food words quick check');
