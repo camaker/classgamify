@@ -24,6 +24,7 @@ import type {
   ActivityTemplateType,
   AssignmentStatus,
 } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -195,113 +196,205 @@ type AssignmentResultHeaderShareAction = {
 };
 
 export const assignmentResultPageCopy = {
-  defaultTitle: 'Assignment results',
-  description:
-    'Review student attempts, scores, and assignment-level result metrics.',
-  loadErrorMessage:
-    'Assignment results could not be loaded. Refresh the page or return to assignments.',
-  openStudentLinkLabel: 'Open student link',
+  get defaultTitle() {
+    return m.assignment_result_page_default_title();
+  },
+  get description() {
+    return m.assignment_result_page_description();
+  },
+  get loadErrorMessage() {
+    return m.assignment_result_page_load_error();
+  },
+  get openStudentLinkLabel() {
+    return m.assignment_result_page_open_student_link();
+  },
 } as const;
 
 export const assignmentResultSearchCopy = {
-  clearStudentSearchLabel: 'Clear student search',
-  findStudentLabel: 'Find student',
-  placeholder: 'Search by student name',
-  reviewViewLabel: 'Review view',
-  sortItemsLabel: 'Sort items',
-  sortStudentsLabel: 'Sort students',
+  get clearStudentSearchLabel() {
+    return m.assignment_result_search_clear_student();
+  },
+  get findStudentLabel() {
+    return m.assignment_result_search_find_student();
+  },
+  get placeholder() {
+    return m.assignment_result_search_placeholder();
+  },
+  get reviewViewLabel() {
+    return m.assignment_result_search_review_view();
+  },
+  get sortItemsLabel() {
+    return m.assignment_result_search_sort_items();
+  },
+  get sortStudentsLabel() {
+    return m.assignment_result_search_sort_students();
+  },
 } as const;
 
 export const assignmentResultSectionCopy = {
   answerReview: {
-    description:
-      'Item-level answers are scored from the frozen assignment snapshot, so teacher edits never change historical results.',
-    title: 'Answer review',
+    get description() {
+      return m.assignment_result_section_answer_review_description();
+    },
+    get title() {
+      return m.assignment_result_section_answer_review_title();
+    },
   },
   classroomBrief: {
-    description:
-      'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
-    title: 'Classroom brief',
+    get description() {
+      return m.assignment_result_section_classroom_brief_description();
+    },
+    get title() {
+      return m.assignment_result_section_classroom_brief_title();
+    },
   },
   classReviewFocus: {
-    emptyMessage: 'No submitted item data yet.',
-    title: 'Class review focus',
+    get emptyMessage() {
+      return m.assignment_result_section_class_review_focus_empty();
+    },
+    get title() {
+      return m.assignment_result_section_class_review_focus_title();
+    },
   },
   itemPerformance: {
-    description:
-      'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
-    title: 'Item performance',
+    get description() {
+      return m.assignment_result_section_item_performance_description();
+    },
+    get title() {
+      return m.assignment_result_section_item_performance_title();
+    },
   },
   reteachPriorities: {
-    description:
-      'Items are sorted by the lowest correct rate so teachers can quickly decide what to review with the class.',
-    emptyMessage:
-      'Submit at least one answered attempt to calculate item review priorities.',
-    title: 'Reteach priorities',
+    get description() {
+      return m.assignment_result_section_reteach_priorities_description();
+    },
+    get emptyMessage() {
+      return m.assignment_result_section_reteach_priorities_empty();
+    },
+    get title() {
+      return m.assignment_result_section_reteach_priorities_title();
+    },
   },
   studentAttempts: {
-    description:
-      'Latest submitted attempts are shown first, with detailed answer review below.',
-    title: 'Student attempts',
+    get description() {
+      return m.assignment_result_section_student_attempts_description();
+    },
+    get title() {
+      return m.assignment_result_section_student_attempts_title();
+    },
   },
   studentFollowUp: {
-    emptyMessage: 'No student-specific review needs yet.',
-    title: 'Student follow-up',
+    get emptyMessage() {
+      return m.assignment_result_section_student_follow_up_empty();
+    },
+    get title() {
+      return m.assignment_result_section_student_follow_up_title();
+    },
   },
   studentSummary: {
-    description:
-      'Sort students by review priority, best score, name, or attempt volume before reading every submitted answer.',
-    title: 'Student summary',
+    get description() {
+      return m.assignment_result_section_student_summary_description();
+    },
+    get title() {
+      return m.assignment_result_section_student_summary_title();
+    },
   },
 } as const;
 
 export const assignmentResultTableHeaders = {
-  itemPerformance: [
-    'Item',
-    'Type',
-    'Correct rate',
-    'Submitted',
-    'Expected',
-    'Accepted',
-    'Explanation',
-  ],
-  studentAttempts: [
-    'Student',
-    'Score',
-    'Accuracy',
-    'Answered',
-    'Time',
-    'Submitted',
-  ],
-  studentSummary: [
-    'Student',
-    'Attempts',
-    'Latest',
-    'Average',
-    'Best',
-    'Needs review',
-    'Last submitted',
-  ],
+  get itemPerformance() {
+    return [
+      m.assignment_result_table_header_item(),
+      m.assignment_result_table_header_type(),
+      m.assignment_result_table_header_correct_rate(),
+      m.assignment_result_table_header_submitted(),
+      m.assignment_result_table_header_expected(),
+      m.assignment_result_table_header_accepted(),
+      m.assignment_result_table_header_explanation(),
+    ];
+  },
+  get studentAttempts() {
+    return [
+      m.assignment_result_table_header_student(),
+      m.assignment_result_table_header_score(),
+      m.assignment_result_table_header_accuracy(),
+      m.assignment_result_table_header_answered(),
+      m.assignment_result_table_header_time(),
+      m.assignment_result_table_header_submitted(),
+    ];
+  },
+  get studentSummary() {
+    return [
+      m.assignment_result_table_header_student(),
+      m.assignment_result_table_header_attempts(),
+      m.assignment_result_table_header_latest(),
+      m.assignment_result_table_header_average(),
+      m.assignment_result_table_header_best(),
+      m.assignment_result_table_header_needs_review(),
+      m.assignment_result_table_header_last_submitted(),
+    ];
+  },
 } as const;
 
 export const assignmentResultReviewCopy = {
-  acceptedAnswersLabel: 'Accepted answers',
-  acceptedLabel: 'Accepted',
-  anonymousStudentLabel: 'Anonymous student',
-  correctAnswerLabel: 'Correct',
+  get acceptedAnswersLabel() {
+    return m.assignment_result_review_accepted_answers();
+  },
+  get acceptedLabel() {
+    return m.assignment_result_review_accepted();
+  },
+  get anonymousStudentLabel() {
+    return m.student_identity_anonymous_student();
+  },
+  get correctAnswerLabel() {
+    return m.assignment_result_review_correct();
+  },
   emptyValue: '-',
-  expectedAnswerLabel: 'Expected',
-  itemAnswerLabel: 'answer',
-  reviewAnswerLabel: 'Review',
-  studentAnswerLabel: 'Student',
+  get expectedAnswerLabel() {
+    return m.assignment_result_review_expected();
+  },
+  get itemAnswerLabel() {
+    return m.assignment_result_review_item_answer();
+  },
+  get reviewAnswerLabel() {
+    return m.assignment_result_review_review();
+  },
+  get studentAnswerLabel() {
+    return m.assignment_result_review_student();
+  },
 } as const;
 
 const assignmentResultMetricDescriptors = [
-  { key: 'completions', label: 'Completions' },
-  { key: 'average-accuracy', label: 'Average accuracy' },
-  { key: 'average-points', label: 'Average points' },
-  { key: 'average-time', label: 'Average time' },
-  { key: 'closes', label: 'Closes' },
+  {
+    key: 'completions',
+    get label() {
+      return m.assignment_result_metric_completions();
+    },
+  },
+  {
+    key: 'average-accuracy',
+    get label() {
+      return m.assignment_result_metric_average_accuracy();
+    },
+  },
+  {
+    key: 'average-points',
+    get label() {
+      return m.assignment_result_metric_average_points();
+    },
+  },
+  {
+    key: 'average-time',
+    get label() {
+      return m.assignment_result_metric_average_time();
+    },
+  },
+  {
+    key: 'closes',
+    get label() {
+      return m.assignment_result_metric_closes();
+    },
+  },
 ] satisfies Array<AssignmentResultMetricDescriptor>;
 
 export const assignmentResultActionOrder = [
@@ -313,22 +406,72 @@ export const assignmentResultActionOrder = [
 ] satisfies AssignmentResultAction[];
 
 export const studentSummarySortOptions = [
-  { label: 'Needs review', value: 'needs-review' },
-  { label: 'Best score', value: 'best' },
-  { label: 'Student name', value: 'name' },
-  { label: 'Attempts', value: 'attempts' },
+  {
+    get label() {
+      return m.assignment_result_sort_needs_review();
+    },
+    value: 'needs-review',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_best_score();
+    },
+    value: 'best',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_student_name();
+    },
+    value: 'name',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_attempts();
+    },
+    value: 'attempts',
+  },
 ] satisfies Array<AssignmentResultControlOption<StudentSummarySort>>;
 
 export const itemPerformanceSortOptions = [
-  { label: 'Snapshot order', value: 'original' },
-  { label: 'Lowest accuracy', value: 'accuracy' },
-  { label: 'Most answered', value: 'submitted' },
-  { label: 'Item type', value: 'type' },
+  {
+    get label() {
+      return m.assignment_result_sort_snapshot_order();
+    },
+    value: 'original',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_lowest_accuracy();
+    },
+    value: 'accuracy',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_most_answered();
+    },
+    value: 'submitted',
+  },
+  {
+    get label() {
+      return m.assignment_result_sort_item_type();
+    },
+    value: 'type',
+  },
 ] satisfies Array<AssignmentResultControlOption<ItemPerformanceSort>>;
 
 export const attemptReviewFilterOptions = [
-  { label: 'All answers', value: 'all' },
-  { label: 'Needs review only', value: 'needs-review' },
+  {
+    get label() {
+      return m.assignment_result_filter_all_answers();
+    },
+    value: 'all',
+  },
+  {
+    get label() {
+      return m.assignment_result_filter_needs_review_only();
+    },
+    value: 'needs-review',
+  },
 ] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
 
 export function buildAssignmentResultMetricItems({
@@ -668,9 +811,10 @@ export function formatAssignmentBriefStudentAccuracy({
   bestAccuracy,
   latestAccuracy,
 }: Pick<AssignmentStudentSummary, 'bestAccuracy' | 'latestAccuracy'>) {
-  return `Latest ${formatAssignmentResultPercent(
-    latestAccuracy
-  )} · best ${formatAssignmentResultPercent(bestAccuracy)}`;
+  return m.assignment_result_brief_student_accuracy({
+    best: formatAssignmentResultPercent(bestAccuracy),
+    latest: formatAssignmentResultPercent(latestAccuracy),
+  });
 }
 
 export function buildAssignmentStudentSummaryRowView(
@@ -764,7 +908,10 @@ export function formatAssignmentItemCorrectSummary({
   correctCount,
   submittedCount,
 }: Pick<AssignmentItemAnalysis, 'correctCount' | 'submittedCount'>) {
-  return `${correctCount}/${submittedCount} correct`;
+  return m.assignment_result_summary_correct_count({
+    correctCount,
+    submittedCount,
+  });
 }
 
 export function formatAssignmentResultFraction(value: number, total: number) {
@@ -780,7 +927,11 @@ export function formatAssignmentResultValue(value: string | null | undefined) {
 }
 
 export function formatAssignmentReviewCount(count: number) {
-  return `${count} ${count === 1 ? 'review' : 'reviews'}`;
+  if (count === 1) {
+    return m.assignment_result_review_count_one({ count });
+  }
+
+  return m.assignment_result_review_count_many({ count });
 }
 
 function clampProgressValue(value: number) {
@@ -906,17 +1057,15 @@ export function buildAssignmentResultEmptyState(
   if (input.surface === 'student-summary') {
     if (input.totalStudents === 0) {
       return {
-        description:
-          'Student summaries appear after at least one submitted attempt.',
-        title: 'No student summaries yet.',
+        description: m.assignment_result_empty_student_summary_description(),
+        title: m.assignment_result_empty_student_summary_title(),
       };
     }
 
     if (hasSearch) {
       return {
-        description:
-          'Clear the search or try another student name from this assignment.',
-        title: 'No matching students.',
+        description: m.assignment_result_empty_search_students_description(),
+        title: m.assignment_result_empty_search_students_title(),
       };
     }
 
@@ -926,17 +1075,15 @@ export function buildAssignmentResultEmptyState(
   if (input.surface === 'attempt-rows') {
     if (input.totalAttempts === 0) {
       return {
-        description:
-          'Share the student link, then completed submissions will appear here.',
-        title: 'No student attempts yet.',
+        description: m.assignment_result_empty_attempt_rows_description(),
+        title: m.assignment_result_empty_attempt_rows_title(),
       };
     }
 
     if (hasSearch) {
       return {
-        description:
-          'Clear the search or try another student name from this assignment.',
-        title: 'No matching attempts.',
+        description: m.assignment_result_empty_search_attempts_description(),
+        title: m.assignment_result_empty_search_attempts_title(),
       };
     }
 
@@ -945,25 +1092,23 @@ export function buildAssignmentResultEmptyState(
 
   if (input.totalAttemptReviews === 0) {
     return {
-      description:
-        'Completed submissions will show item-level answer details here.',
-      title: 'No answers to review yet.',
+      description: m.assignment_result_empty_attempt_review_description(),
+      title: m.assignment_result_empty_attempt_review_title(),
     };
   }
 
   if (hasSearch) {
     return {
       description:
-        'Clear the search or try another student name from this assignment.',
-      title: 'No matching answer reviews.',
+        m.assignment_result_empty_search_answer_reviews_description(),
+      title: m.assignment_result_empty_search_answer_reviews_title(),
     };
   }
 
   if (input.filter === 'needs-review') {
     return {
-      description:
-        'Every shown submission is currently correct for this assignment snapshot.',
-      title: 'No answers need review.',
+      description: m.assignment_result_empty_needs_review_description(),
+      title: m.assignment_result_empty_needs_review_title(),
     };
   }
 
@@ -1045,11 +1190,13 @@ export function buildResultSearchSummary({
   matchedStudents,
   search,
 }: ResultSearchSummaryInput) {
-  if (!normalizeResultSearch(search)) return 'All students';
+  if (!normalizeResultSearch(search)) {
+    return m.assignment_result_search_summary_all_students();
+  }
 
   return [
-    formatCount(matchedStudents, 'student'),
-    formatCount(matchedAttempts, 'attempt'),
+    formatResultStudentCount(matchedStudents),
+    formatResultAttemptCount(matchedAttempts),
   ].join(' · ');
 }
 
@@ -1057,10 +1204,17 @@ export function buildAttemptReviewSubmissionSummary({
   shownAttempts,
   totalAttempts,
 }: AttemptReviewSubmissionSummaryInput) {
-  return `Showing ${shownAttempts} of ${totalAttempts} ${pluralize(
+  if (totalAttempts === 1) {
+    return m.assignment_result_attempt_review_submission_summary_one({
+      shownAttempts,
+      totalAttempts,
+    });
+  }
+
+  return m.assignment_result_attempt_review_submission_summary_many({
+    shownAttempts,
     totalAttempts,
-    'submission'
-  )}.`;
+  });
 }
 
 export function getAssignmentResultActionGate({
@@ -1080,7 +1234,7 @@ export function getAssignmentResultActionGate({
     return itemCount > 0
       ? { type: 'ready' }
       : {
-          message: 'Add assignment items before copying item review.',
+          message: m.assignment_result_action_gate_add_items_item_review(),
           type: 'blocked',
         };
   }
@@ -1089,14 +1243,14 @@ export function getAssignmentResultActionGate({
     return studentCount > 0
       ? { type: 'ready' }
       : {
-          message: 'Submit at least one attempt before copying follow-up.',
+          message: m.assignment_result_action_gate_submit_attempt_follow_up(),
           type: 'blocked',
         };
   }
 
   if (action === 'copy-brief' && !classroomBriefReady) {
     return {
-      message: 'Submit at least one attempt before copying a brief.',
+      message: m.assignment_result_action_gate_submit_attempt_brief(),
       type: 'blocked',
     };
   }
@@ -1115,33 +1269,33 @@ export function getAssignmentResultActionCopy(
   switch (action) {
     case 'copy-brief':
       return {
-        failureMessage: 'Classroom brief could not be copied.',
-        label: 'Copy brief',
-        successMessage: 'Classroom brief copied.',
+        failureMessage: m.assignment_result_action_copy_brief_failure(),
+        label: m.assignment_result_action_copy_brief_label(),
+        successMessage: m.assignment_result_action_copy_brief_success(),
       };
     case 'copy-follow-up':
       return {
-        failureMessage: 'Student follow-up could not be copied.',
-        label: 'Copy follow-up',
-        successMessage: 'Student follow-up copied.',
+        failureMessage: m.assignment_result_action_copy_follow_up_failure(),
+        label: m.assignment_result_action_copy_follow_up_label(),
+        successMessage: m.assignment_result_action_copy_follow_up_success(),
       };
     case 'copy-item-review':
       return {
-        failureMessage: 'Item review could not be copied.',
-        label: 'Copy item review',
-        successMessage: 'Item review copied.',
+        failureMessage: m.assignment_result_action_copy_item_review_failure(),
+        label: m.assignment_result_action_copy_item_review_label(),
+        successMessage: m.assignment_result_action_copy_item_review_success(),
       };
     case 'copy-reteach-plan':
       return {
-        failureMessage: 'Reteach plan could not be copied.',
-        label: 'Copy reteach plan',
-        successMessage: 'Reteach plan copied.',
+        failureMessage: m.assignment_result_action_copy_reteach_plan_failure(),
+        label: m.assignment_result_action_copy_reteach_plan_label(),
+        successMessage: m.assignment_result_action_copy_reteach_plan_success(),
       };
     case 'export-csv':
       return {
-        failureMessage: 'Results CSV could not be downloaded.',
-        label: 'Download CSV',
-        successMessage: 'Results CSV downloaded.',
+        failureMessage: m.assignment_result_action_export_csv_failure(),
+        label: m.assignment_result_action_export_csv_label(),
+        successMessage: m.assignment_result_action_export_csv_success(),
       };
   }
 }
@@ -1298,22 +1452,30 @@ function compareStudentsDescending(
   return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
 }
 
-function formatCount(count: number, singularLabel: string) {
-  return `${count} ${pluralize(count, singularLabel)}`;
+function formatResultStudentCount(count: number) {
+  if (count === 1) {
+    return m.assignment_result_search_summary_students_one({ count });
+  }
+
+  return m.assignment_result_search_summary_students_many({ count });
+}
+
+function formatResultAttemptCount(count: number) {
+  if (count === 1) {
+    return m.assignment_result_search_summary_attempts_one({ count });
+  }
+
+  return m.assignment_result_search_summary_attempts_many({ count });
 }
 
 function getNoAttemptResultActionMessage(action: AssignmentResultAction) {
   if (action === 'export-csv') {
-    return 'Submit at least one attempt before exporting results.';
+    return m.assignment_result_action_gate_submit_attempt_export();
   }
 
   if (action === 'copy-reteach-plan') {
-    return 'Submit at least one attempt before copying a reteach plan.';
+    return m.assignment_result_action_gate_submit_attempt_reteach();
   }
 
-  return 'Submit at least one attempt before copying a brief.';
-}
-
-function pluralize(count: number, singularLabel: string) {
-  return count === 1 ? singularLabel : `${singularLabel}s`;
+  return m.assignment_result_action_gate_submit_attempt_brief();
 }
