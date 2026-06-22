@@ -10,6 +10,7 @@ import {
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListControlOption = {
   label: string;
@@ -113,55 +114,112 @@ type AssignmentListEmptyStateView = {
 };
 
 export const assignmentListPageCopy = {
-  breadcrumbCurrent: 'Assignments',
-  breadcrumbDashboard: 'Dashboard',
-  description:
-    'Published activity instances with share links, classroom settings, and result metrics.',
-  loadErrorMessage:
-    'Assignments could not be loaded. Refresh the page or sign in again.',
-  title: 'Assignments',
+  get breadcrumbCurrent() {
+    return m.assignment_list_page_breadcrumb_current();
+  },
+  get breadcrumbDashboard() {
+    return m.assignment_list_page_breadcrumb_dashboard();
+  },
+  get description() {
+    return m.assignment_list_page_description();
+  },
+  get loadErrorMessage() {
+    return m.assignment_list_page_load_error();
+  },
+  get title() {
+    return m.assignment_list_page_title();
+  },
 } as const;
 
 export const assignmentListSearchCopy = {
-  clearSearchLabel: 'Clear assignment search',
-  label: 'Search assignments',
-  placeholder: 'Search by assignment, activity, or share id',
-  statusLabel: 'Status',
+  get clearSearchLabel() {
+    return m.assignment_list_search_clear();
+  },
+  get label() {
+    return m.assignment_list_search_label();
+  },
+  get placeholder() {
+    return m.assignment_list_search_placeholder();
+  },
+  get statusLabel() {
+    return m.assignment_list_search_status_label();
+  },
 } as const;
 
 export const assignmentListActionCopy = {
-  clearFilters: 'Clear filters',
-  dismiss: 'Dismiss',
-  openActivityLibrary: 'Open activity library',
-  openPublishedLink: 'Open link',
-  openShareLink: 'Open share link',
-  viewResults: 'View results',
+  get clearFilters() {
+    return m.assignment_list_action_clear_filters();
+  },
+  get dismiss() {
+    return m.assignment_list_action_dismiss();
+  },
+  get openActivityLibrary() {
+    return m.assignment_list_action_open_activity_library();
+  },
+  get openPublishedLink() {
+    return m.assignment_list_action_open_published_link();
+  },
+  get openShareLink() {
+    return m.assignment_list_action_open_share_link();
+  },
+  get viewResults() {
+    return m.assignment_list_action_view_results();
+  },
 } as const;
 
 export const assignmentListPublishedPanelCopy = {
-  missingHint:
-    'The new assignment may be on another page after filtering. The share link actions still use the published link id.',
-  publishedLabel: 'Assignment published',
+  get missingHint() {
+    return m.assignment_list_published_panel_missing_hint();
+  },
+  get publishedLabel() {
+    return m.assignment_list_published_panel_label();
+  },
 } as const;
 
 const assignmentListEmptyStateCopy = {
   emptyLibrary: {
-    description:
-      'Open the activity library and publish a saved activity to create a student share link.',
-    title: 'No published assignments yet.',
+    get description() {
+      return m.assignment_list_empty_library_description();
+    },
+    get title() {
+      return m.assignment_list_empty_library_title();
+    },
   },
   filtered: {
-    description:
-      'Try another assignment title, share id, activity name, or status.',
-    title: 'No matching assignments.',
+    get description() {
+      return m.assignment_list_empty_filtered_description();
+    },
+    get title() {
+      return m.assignment_list_empty_filtered_title();
+    },
   },
 } as const;
 
 export const assignmentStatusFilterOptions = [
-  { label: 'All statuses', value: 'all' },
-  { label: 'Published', value: 'published' },
-  { label: 'Closed', value: 'closed' },
-  { label: 'Draft', value: 'draft' },
+  {
+    get label() {
+      return m.assignment_list_status_filter_all();
+    },
+    value: 'all',
+  },
+  {
+    get label() {
+      return m.assignment_list_status_filter_published();
+    },
+    value: 'published',
+  },
+  {
+    get label() {
+      return m.assignment_list_status_filter_closed();
+    },
+    value: 'closed',
+  },
+  {
+    get label() {
+      return m.assignment_list_status_filter_draft();
+    },
+    value: 'draft',
+  },
 ] satisfies Array<AssignmentListControlOption>;
 
 export function getAssignmentListEmptyState({
@@ -195,12 +253,12 @@ export function buildAssignmentListCardStats({
   return [
     {
       key: 'completions',
-      label: 'Completions',
+      label: m.assignment_list_card_stat_completions(),
       value: String(completions),
     },
     {
       key: 'average',
-      label: 'Average',
+      label: m.assignment_list_card_stat_average(),
       value: `${averageScore}%`,
     },
   ];
