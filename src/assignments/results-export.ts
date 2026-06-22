@@ -78,7 +78,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.stats.completions,
       data.stats.averageScore,
       data.stats.averagePoints,
-      data.stats.averageDurationSeconds || '',
+      data.stats.completions > 0 ? data.stats.averageDurationSeconds : '',
       attempt.id,
       attempt.studentLabel,
       formatAssignmentResultCsvDate(attempt.completedAt),

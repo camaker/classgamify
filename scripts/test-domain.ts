@@ -7600,6 +7600,17 @@ assert.match(csv, /"Snapshot Capitals","quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
+const zeroAverageDurationCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  stats: {
+    ...csvExportData.stats,
+    averageDurationSeconds: 0,
+  },
+});
+assert.match(
+  zeroAverageDurationCsv,
+  /"Snapshot Capitals","quiz","1","50","1","0","attempt-1"/
+);
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
   'classgamify-capital-review-week-1-results.csv'
