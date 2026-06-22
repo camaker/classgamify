@@ -17,12 +17,9 @@ export const Routes = {
   Pricing: '/pricing',
   Teachers: '/teachers',
   Blog: '/blog',
-  Changelog: '/changelog',
   Roadmap: '/roadmap',
-  About: '/about',
   Contact: '/contact',
   ContactClassroom: '/contact?subject=classroom',
-  Waitlist: '/waitlist',
 
   // Auth routes
   Auth: '/auth',

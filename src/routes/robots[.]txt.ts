@@ -11,12 +11,8 @@ const disallowedPaths = [
   '/learn',
   '/hsk',
   '/hanzi',
-  '/about',
-  '/ai',
-  '/changelog',
   '/test-404',
   '/test-error',
-  '/waitlist',
 ];
 
 function getDisallowRules() {

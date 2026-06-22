@@ -442,11 +442,28 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
+const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
+const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);
 assert.match(robotsRouteSource, /['"]\/learn['"]/);
 assert.match(robotsRouteSource, /['"]\/hsk['"]/);
 assert.match(robotsRouteSource, /['"]\/hanzi['"]/);
+for (const retiredStubRoute of ['/about', '/ai', '/changelog', '/waitlist']) {
+  assert.doesNotMatch(robotsRouteSource, new RegExp(`['"]${retiredStubRoute}`));
+  assert.doesNotMatch(
+    routeConstantsSource,
+    new RegExp(`['"]${retiredStubRoute}`)
+  );
+}
+for (const retiredStubRouteFile of [
+  '-about.tsx',
+  '-ai.tsx',
+  '-changelog.tsx',
+  '-waitlist.tsx',
+]) {
+  assert.equal(excludedPageRouteFiles.includes(retiredStubRouteFile), false);
+}
 assert.match(sitemapRouteSource, /Routes\.Worksheets/);
 assert.doesNotMatch(sitemapRouteSource, /Routes\.PlayDemo/);
 assert.equal(isLocalizedPath('/worksheets'), true);
