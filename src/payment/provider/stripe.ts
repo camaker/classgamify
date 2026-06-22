@@ -619,7 +619,7 @@ export class StripeProvider implements PaymentProvider {
         })
         .where(eq(payment.id, paymentRecord.id));
 
-      // Process subscription benefits (no credits in MkFast)
+      // ClassGamify currently records plan access without credit grants.
       await this.processSubscriptionPurchase(userId, priceId);
     } catch (error) {
       console.error('<< Update subscription payment error:', error);
@@ -631,8 +631,8 @@ export class StripeProvider implements PaymentProvider {
 
   /**
    * Process subscription purchase
-   * @param _userId User ID (reserved for future use, e.g. credits)
-   * @param _priceId Price ID (reserved for future use, e.g. credits)
+   * @param _userId User ID (reserved for future classroom entitlements)
+   * @param _priceId Price ID (reserved for future plan entitlements)
    */
   private async processSubscriptionPurchase(
     _userId: string,
@@ -640,7 +640,7 @@ export class StripeProvider implements PaymentProvider {
   ): Promise<void> {
     console.log('>> Process subscription purchase');
 
-    // No credits in MkFast; keep log for consistency with MkSaaS flow
+    // Keep a single hook for future plan entitlement provisioning.
     console.log('<< Process subscription purchase success');
   }
 
@@ -673,7 +673,7 @@ export class StripeProvider implements PaymentProvider {
         })
         .where(eq(payment.id, paymentRecord.id));
 
-      // Process benefits: lifetime plan purchase only (no credits in MkFast)
+      // Process lifetime plan access for one-time purchases.
       if (paymentRecord.sessionId) {
         const session = await this.stripe.checkout.sessions.retrieve(
           paymentRecord.sessionId
@@ -938,7 +938,7 @@ export class StripeProvider implements PaymentProvider {
     const invoiceId: string | null = session.invoice as string | null;
     console.log('createOneTimePaymentRecord, invoiceId:', invoiceId);
 
-    // One-time payments in MkFast are lifetime only (no credits)
+    // One-time payments currently map to ClassGamify lifetime access.
     const scene = PaymentScenes.LIFETIME;
 
     // Create one-time payment record with proper status and paid=false
