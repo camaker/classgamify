@@ -11,6 +11,7 @@ import {
   buildAssignmentResultControlSearchState,
   buildAssignmentResultHeaderView,
   buildAssignmentResultSectionState,
+  buildAssignmentResultRouteSearch,
   buildAssignmentResultViewModel,
   assignmentResultPageCopy,
   assignmentResultSearchCopy,
@@ -27,9 +28,7 @@ import {
   buildAssignmentResultMetricItems,
   buildAssignmentStudentSummaryRowView,
   itemPerformanceSortOptions,
-  parseAttemptReviewFilter,
-  parseItemPerformanceSort,
-  parseStudentSummarySort,
+  resolveAssignmentResultViewState,
   studentSummarySortOptions,
 } from '@/assignments/result-view';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -98,25 +97,21 @@ const resultActionIconByAction = {
 } as const;
 
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
-  validateSearch: (search: Record<string, unknown>) => ({
-    itemSort: parseItemPerformanceSort(search.itemSort),
-    review: parseAttemptReviewFilter(search.review),
-    sort: parseStudentSummarySort(search.sort),
-  }),
+  validateSearch: buildAssignmentResultRouteSearch,
   component: AssignmentResultsPage,
 });
 
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
-  const { itemSort, review, sort } = Route.useSearch();
+  const search = Route.useSearch();
+  const { itemSort, review, sort } = search;
   const navigate = useNavigate({
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
   const [studentSearch, setStudentSearch] = useState('');
-  const itemPerformanceSort = itemSort ?? 'original';
-  const attemptReviewFilter = review ?? 'all';
-  const studentSort = sort ?? 'needs-review';
+  const { attemptReviewFilter, itemPerformanceSort, studentSort } =
+    resolveAssignmentResultViewState(search);
   const headerView = data ? buildAssignmentResultHeaderView(data) : null;
   const title =
     headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;

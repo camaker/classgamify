@@ -222,6 +222,7 @@ import {
   buildAssignmentResultHeaderView,
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
+  buildAssignmentResultRouteSearch,
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
@@ -249,6 +250,7 @@ import {
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
   parseStudentSummarySort,
+  resolveAssignmentResultViewState,
   studentSummarySortOptions,
   sortItemPerformance,
   sortStudentSummaries,
@@ -6784,6 +6786,59 @@ assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
 assert.equal(parseItemPerformanceSort('original'), undefined);
 assert.equal(parseAttemptReviewFilter('needs-review'), 'needs-review');
 assert.equal(parseAttemptReviewFilter('all'), undefined);
+assert.deepEqual(
+  buildAssignmentResultRouteSearch({
+    itemSort: 'submitted',
+    review: 'needs-review',
+    sort: 'attempts',
+  }),
+  {
+    itemSort: 'submitted',
+    review: 'needs-review',
+    sort: 'attempts',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultRouteSearch({
+    itemSort: 'original',
+    review: 'all',
+    sort: 'needs-review',
+  }),
+  {
+    itemSort: undefined,
+    review: undefined,
+    sort: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultRouteSearch({
+    itemSort: 'random',
+    review: 'done',
+    sort: ['best'],
+  }),
+  {
+    itemSort: undefined,
+    review: undefined,
+    sort: undefined,
+  }
+);
+assert.deepEqual(resolveAssignmentResultViewState({}), {
+  attemptReviewFilter: 'all',
+  itemPerformanceSort: 'original',
+  studentSort: 'needs-review',
+});
+assert.deepEqual(
+  resolveAssignmentResultViewState({
+    itemSort: 'type',
+    review: 'needs-review',
+    sort: 'name',
+  }),
+  {
+    attemptReviewFilter: 'needs-review',
+    itemPerformanceSort: 'type',
+    studentSort: 'name',
+  }
+);
 assert.deepEqual(
   buildAssignmentResultSearchState({
     current: {},

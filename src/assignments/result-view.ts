@@ -41,6 +41,12 @@ export type AssignmentResultSearchState = {
   sort?: StudentSummarySort;
 };
 
+type AssignmentResultResolvedViewState = {
+  attemptReviewFilter: AttemptReviewFilter;
+  itemPerformanceSort: ItemPerformanceSort;
+  studentSort: StudentSummarySort;
+};
+
 type AssignmentResultControlSearchUpdate =
   | {
       control: 'attempt-review-filter';
@@ -1386,6 +1392,26 @@ export function parseAttemptReviewFilter(
   value: unknown
 ): AttemptReviewFilter | undefined {
   return value === 'needs-review' ? value : undefined;
+}
+
+export function buildAssignmentResultRouteSearch(
+  search: Record<string, unknown>
+): AssignmentResultSearchState {
+  return {
+    itemSort: parseItemPerformanceSort(search.itemSort),
+    review: parseAttemptReviewFilter(search.review),
+    sort: parseStudentSummarySort(search.sort),
+  };
+}
+
+export function resolveAssignmentResultViewState(
+  search: AssignmentResultSearchState
+): AssignmentResultResolvedViewState {
+  return {
+    attemptReviewFilter: search.review ?? 'all',
+    itemPerformanceSort: search.itemSort ?? 'original',
+    studentSort: search.sort ?? 'needs-review',
+  };
 }
 
 export function buildAssignmentResultSearchState({
