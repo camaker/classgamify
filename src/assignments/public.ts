@@ -12,6 +12,7 @@ import type {
   AttemptAnswer,
 } from '@/activities/types';
 import { getRuntimeItems } from '@/activities/runtime';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
@@ -95,6 +96,7 @@ export function buildPublicAssignmentPayload({
   const content = snapshot?.contentJson ?? activity.contentJson;
   const templateType = snapshot?.templateType ?? activity.templateType;
   const runtimeItems = getRuntimeItems(templateType, content);
+  const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
 
   return {
     activity: {
@@ -108,7 +110,7 @@ export function buildPublicAssignmentPayload({
       expiresAt: assignment.expiresAt,
       id: assignment.id,
       settingsJson: resolveAssignmentSettings(assignment.settingsJson),
-      shareSlug: assignment.shareSlug,
+      shareSlug,
       status: assignment.status,
       title: assignment.title,
     },
@@ -232,7 +234,7 @@ export function buildPublicAssignmentPreviewAssignment(
     expiresAt: data.assignment.expiresAt,
     id: data.assignment.id,
     settings: data.assignment.settingsJson,
-    shareId: data.assignment.shareSlug,
+    shareId: normalizeAssignmentShareSlug(data.assignment.shareSlug),
     status: data.assignment.status,
     title: data.assignment.title,
   };

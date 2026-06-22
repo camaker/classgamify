@@ -2326,7 +2326,7 @@ const publicAssignmentPayload = buildPublicAssignmentPayload({
     expiresAt: null,
     id: 'assignment-public',
     settingsJson: { collectStudentName: false },
-    shareSlug: 'share-public',
+    shareSlug: ' share-public ',
     status: 'published',
     title: 'Public assignment',
   },
@@ -2346,6 +2346,7 @@ assert.equal(publicAssignmentPayload.summary.subject, 'History');
 assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
 assert.equal(publicAssignmentPayload.summary.itemCount, 1);
 assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+assert.equal(publicAssignmentPayload.assignment.shareSlug, 'share-public');
 assert.equal(
   publicAssignmentPayload.assignment.settingsJson.collectStudentName,
   false
@@ -2415,7 +2416,7 @@ assert.deepEqual(
 const publicRunnerState = buildStudentRunnerPageState({
   data: publicAssignmentPayload,
   isLoading: false,
-  shareId: 'share-public',
+  shareId: ' share-public ',
   starterActivity: runnerStateStarterActivity,
   starterAssignment: runnerStateStarterAssignment,
   starterRuntimeItems: runnerStateStarterRuntimeItems,
@@ -2471,7 +2472,7 @@ assert.deepEqual(
       [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
     },
     pageState: publicRunnerState,
-    shareId: 'share-public',
+    shareId: ' share-public ',
   }),
   {
     activeShareId: 'share-public',
@@ -2492,7 +2493,7 @@ assert.deepEqual(
 const starterRunnerState = buildStudentRunnerPageState({
   data: null,
   isLoading: false,
-  shareId: 'demo-runner',
+  shareId: ' demo-runner ',
   starterActivity: runnerStateStarterActivity,
   starterAssignment: runnerStateStarterAssignment,
   starterRuntimeItems: runnerStateStarterRuntimeItems,
@@ -2511,7 +2512,7 @@ assert.deepEqual(
   buildStudentRunnerAttemptState({
     answers: {},
     pageState: starterRunnerState,
-    shareId: 'demo-runner',
+    shareId: ' demo-runner ',
   }),
   {
     activeShareId: 'demo-runner',

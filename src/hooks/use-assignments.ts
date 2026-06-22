@@ -10,6 +10,7 @@ import type {
   PublishAssignmentInput,
   UpdateAssignmentStatusInput,
 } from '@/assignments/validation';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import type { StudentAttemptSubmissionInput } from '@/assignments/student-submission';
 import {
   keepPreviousData,
@@ -105,10 +106,13 @@ export function useUpdateAssignmentStatus() {
 }
 
 export function usePublicAssignment(shareSlug: string) {
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+
   return useQuery({
-    enabled: Boolean(shareSlug),
-    queryFn: () => getPublicAssignment({ data: { shareSlug } }),
-    queryKey: assignmentsKeys.public(shareSlug),
+    enabled: Boolean(normalizedShareSlug),
+    queryFn: () =>
+      getPublicAssignment({ data: { shareSlug: normalizedShareSlug } }),
+    queryKey: assignmentsKeys.public(normalizedShareSlug),
   });
 }
 

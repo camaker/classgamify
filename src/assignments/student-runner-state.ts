@@ -13,6 +13,7 @@ import {
   type PublicRuntimeItem,
 } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
 type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
 
@@ -60,6 +61,8 @@ export function buildStudentRunnerPageState({
     return { status: 'loading' };
   }
 
+  const normalizedShareId = normalizeAssignmentShareSlug(shareId);
+
   if (data) {
     const assignment = buildPublicAssignmentPreviewAssignment(data);
 
@@ -74,7 +77,10 @@ export function buildStudentRunnerPageState({
     });
   }
 
-  if (shareId !== starterAssignment.shareId) {
+  if (
+    normalizedShareId !==
+    normalizeAssignmentShareSlug(starterAssignment.shareId)
+  ) {
     return { status: 'missing' };
   }
 
@@ -101,10 +107,14 @@ export function buildStudentRunnerReadyState({
   source: StudentRunnerReadyStateSource;
 }): StudentRunnerReadyState {
   const publicAssignment = source === 'public-assignment';
+  const normalizedAssignment = {
+    ...assignment,
+    shareId: normalizeAssignmentShareSlug(assignment.shareId),
+  };
 
   return {
     activity,
-    assignment,
+    assignment: normalizedAssignment,
     canSubmit: publicAssignment && runtimeItems.length > 0,
     hidePreviewAnswers: publicAssignment,
     runtimeItems,
@@ -133,7 +143,9 @@ export function buildStudentRunnerAttemptState({
   const itemCount = completionSummary.itemCount;
   const canSubmit =
     pageState.status === 'ready' && pageState.canSubmit && itemCount > 0;
-  const activeShareId = assignment?.shareId ?? shareId;
+  const activeShareId = normalizeAssignmentShareSlug(
+    assignment?.shareId ?? shareId
+  );
 
   return {
     activeShareId,

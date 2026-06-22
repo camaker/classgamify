@@ -30,6 +30,7 @@ import {
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
 } from '@/assignments/student-runner-state';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildStudentRunnerHeaderView,
   buildStudentRunnerView,
@@ -80,7 +81,8 @@ export const Route = createFileRoute('/play/$shareId')({
 
 function PlayPage() {
   const { shareId } = Route.useParams();
-  const { data, isLoading } = usePublicAssignment(shareId);
+  const normalizedShareId = normalizeAssignmentShareSlug(shareId);
+  const { data, isLoading } = usePublicAssignment(normalizedShareId);
   const submitAttemptMutation = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [studentName, setStudentName] = useState('');
@@ -93,7 +95,7 @@ function PlayPage() {
   const [now, setNow] = useState(() => Date.now());
   const [anonymousToken, setAnonymousToken] = useState<string>();
   const [attemptSessionKey, setAttemptSessionKey] = useState<string>();
-  const starterAssignment = getStarterAssignment(shareId);
+  const starterAssignment = getStarterAssignment(normalizedShareId);
   const starterActivity = getStarterActivity(starterAssignment.activityId);
   const starterRuntimeItems = useMemo(
     () =>
@@ -105,7 +107,7 @@ function PlayPage() {
       buildStudentRunnerPageState({
         data,
         isLoading,
-        shareId,
+        shareId: normalizedShareId,
         starterActivity,
         starterAssignment,
         starterRuntimeItems,
@@ -113,7 +115,7 @@ function PlayPage() {
     [
       data,
       isLoading,
-      shareId,
+      normalizedShareId,
       starterActivity,
       starterAssignment,
       starterRuntimeItems,
@@ -128,9 +130,9 @@ function PlayPage() {
       buildStudentRunnerAttemptState({
         answers,
         pageState,
-        shareId,
+        shareId: normalizedShareId,
       }),
-    [answers, pageState, shareId]
+    [answers, pageState, normalizedShareId]
   );
   const runtimeItems = attemptState.runtimeItems;
   const completionSummary = attemptState.completionSummary;
