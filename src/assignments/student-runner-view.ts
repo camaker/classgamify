@@ -21,6 +21,7 @@ import {
   isStudentAnswerFilled,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
+import { m } from '@/locale/paraglide/messages';
 
 type StudentRunnerReviewStatus = 'correct' | 'idle' | 'needs-review';
 
@@ -166,8 +167,12 @@ export function buildSequentialRunnerView<
 }
 
 export function formatSequentialRunnerItemLabel(label: string, index: number) {
-  const normalizedLabel = label.trim() || 'Item';
-  return `${normalizedLabel} ${Math.max(0, index) + 1}`;
+  const normalizedLabel =
+    label.trim() || m.student_runner_sequential_default_item_label();
+  return m.student_runner_sequential_item_label({
+    index: Math.max(0, index) + 1,
+    label: normalizedLabel,
+  });
 }
 
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {
@@ -245,14 +250,14 @@ export function buildInlineBlankPromptView(
 }
 
 export function buildPublicAnswerFeedbackView({
-  correctAnswerLabel = 'Correct answer',
+  correctAnswerLabel = m.student_runner_feedback_correct_answer(),
   reviewItem,
 }: {
   correctAnswerLabel?: string;
   reviewItem: PublicAttemptReviewItem;
 }): PublicAnswerFeedbackView {
   return {
-    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersLabel: m.student_runner_feedback_accepted_answers(),
     acceptedAnswersText:
       reviewItem.acceptedAnswers.length > 1
         ? formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers)
@@ -260,9 +265,11 @@ export function buildPublicAnswerFeedbackView({
     correctAnswer: reviewItem.correctAnswer,
     correctAnswerLabel,
     explanation: reviewItem.explanation ?? null,
-    explanationLabel: 'Why',
+    explanationLabel: m.student_runner_feedback_explanation(),
     status: reviewItem.correct ? 'correct' : 'needs-review',
-    statusLabel: reviewItem.correct ? 'Correct' : 'Needs review',
+    statusLabel: reviewItem.correct
+      ? m.student_runner_feedback_status_correct()
+      : m.student_runner_feedback_status_needs_review(),
   };
 }
 
