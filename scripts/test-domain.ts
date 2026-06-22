@@ -6214,6 +6214,34 @@ assert.deepEqual(
   chinesePunctuationContent.questions[0]?.options.map((option) => option.text),
   ['苹果', '香蕉', '牛奶', '水']
 );
+const fullwidthRowSeparatorContent = buildActivityContent({
+  description: 'Fullwidth row separator classification',
+  difficulty: 'starter',
+  gradeBand: 'Grade 1',
+  groupsText: ['水果 ｜ 苹果，香蕉', '饮品 ｜ 牛奶、水'].join('\n'),
+  language: 'zh',
+  learningGoal: 'Students can use fullwidth separators in structured rows.',
+  pairsText: '苹果｜水果',
+  questionsText: '苹果是什么？｜苹果｜苹果，香蕉；牛奶、水｜苹果是水果。',
+  sourceSummary: 'Fullwidth row separators should parse like ASCII pipes.',
+  subject: 'Chinese',
+  teacherNotesText: 'Use natural Chinese input method punctuation.',
+  templateType: 'quiz',
+  title: '全角分隔符练习',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.equal(fullwidthRowSeparatorContent.pairs[0]?.right, '水果');
+assert.deepEqual(fullwidthRowSeparatorContent.groups[0]?.items, [
+  '苹果',
+  '香蕉',
+]);
+assert.deepEqual(
+  fullwidthRowSeparatorContent.questions[0]?.options.map(
+    (option) => option.text
+  ),
+  ['苹果', '香蕉', '牛奶', '水']
+);
 const chinesePunctuationGroupItems = getRuntimeItems(
   'group-sort',
   chinesePunctuationContent

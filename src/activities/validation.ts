@@ -211,7 +211,7 @@ function parseRows(raw: string | undefined, rowKind: ActivityContentRowKind) {
     .split(/\r?\n/u)
     .map((line, index) => ({
       lineNumber: index + 1,
-      parts: line.split('|').map((part) => part.trim()),
+      parts: line.split(/[|｜]/u).map((part) => part.trim()),
       raw: line.trim(),
     }))
     .filter((row) => row.raw.length > 0)
