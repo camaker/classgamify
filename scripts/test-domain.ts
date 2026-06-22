@@ -188,6 +188,7 @@ import {
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
+  assertAssignmentStatusTransition,
   buildAssignmentStatusAction,
   getAssignmentStatusActionCopy,
 } from '@/assignments/lifecycle';
@@ -1373,6 +1374,66 @@ assert.equal(
     isPersisted: false,
   }),
   undefined
+);
+assert.doesNotThrow(() =>
+  assertAssignmentStatusTransition({
+    currentStatus: 'published',
+    expiresAt: null,
+    nextStatus: 'closed',
+  })
+);
+assert.doesNotThrow(() =>
+  assertAssignmentStatusTransition({
+    currentStatus: 'closed',
+    expiresAt: null,
+    nextStatus: 'published',
+  })
+);
+assert.throws(
+  () =>
+    assertAssignmentStatusTransition({
+      currentStatus: 'published',
+      expiresAt: null,
+      nextStatus: 'published',
+    }),
+  /Assignment link is already open\./
+);
+assert.throws(
+  () =>
+    assertAssignmentStatusTransition({
+      currentStatus: 'closed',
+      expiresAt: null,
+      nextStatus: 'closed',
+    }),
+  /Assignment link is already closed\./
+);
+assert.throws(
+  () =>
+    assertAssignmentStatusTransition({
+      currentStatus: 'draft',
+      expiresAt: null,
+      nextStatus: 'closed',
+    }),
+  /Only published assignment links can be closed\./
+);
+assert.throws(
+  () =>
+    assertAssignmentStatusTransition({
+      currentStatus: 'draft',
+      expiresAt: null,
+      nextStatus: 'published',
+    }),
+  /Only closed assignment links can be reopened\./
+);
+assert.throws(
+  () =>
+    assertAssignmentStatusTransition({
+      currentStatus: 'closed',
+      expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+      nextStatus: 'published',
+      now: new Date('2026-01-01T10:00:00.000Z').getTime(),
+    }),
+  /Expired assignments cannot be reopened\./
 );
 assert.deepEqual(resolveAssignmentSettings(null), {
   collectStudentName: true,
