@@ -1,4 +1,8 @@
-import { getTemplateRemixPlan } from '@/activities/template-remix';
+import {
+  buildTemplateRemixSummary,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
+import type { TemplateRemixTemplateOption } from '@/activities/template-remix';
 import {
   ACTIVITY_TEMPLATE_TYPES,
   type ActivityContent,
@@ -10,10 +14,7 @@ import type {
 } from '@/activities/library-filters';
 import { m } from '@/locale/paraglide/messages';
 
-export type ActivityLibraryTemplateOption = {
-  shortName: string;
-  template: ActivityTemplateType;
-};
+export type ActivityLibraryTemplateOption = TemplateRemixTemplateOption;
 
 export type ActivityLibraryCardSummary = {
   contentCounts: {
@@ -150,6 +151,7 @@ export function buildActivityLibraryCardSummary({
     content,
     currentTemplateType: templateType,
   });
+  const remixSummary = buildTemplateRemixSummary(remixPlan);
 
   return {
     contentCounts: {
@@ -157,17 +159,9 @@ export function buildActivityLibraryCardSummary({
       pairs: content.pairs.length,
       questions: content.questions.length,
     },
-    lockedTemplateDiagnostics: remixPlan.options
-      .filter((option) => !option.isReady)
-      .map((option) => option.diagnosis),
-    readyTemplateOptions: remixPlan.readyOptions.map((option) => ({
-      shortName: option.template.shortName,
-      template: option.template.type,
-    })),
-    suggestedTemplateOptions: remixPlan.suggestedOptions.map((option) => ({
-      shortName: option.template.shortName,
-      template: option.template.type,
-    })),
+    lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
+    readyTemplateOptions: remixSummary.readyTemplateOptions,
+    suggestedTemplateOptions: remixSummary.suggestedTemplateOptions,
   };
 }
 

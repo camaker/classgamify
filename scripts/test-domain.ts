@@ -95,6 +95,7 @@ import {
 } from '@/activities/runner-copy';
 import {
   getActivityTemplateDraftGuidance,
+  buildTemplateRemixSummary,
   formatTemplateRequirementList,
   formatTemplateRequirement,
   getTemplateRemixPlan,
@@ -5058,6 +5059,9 @@ const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',
 });
+const questionOnlyRemixSummary = buildTemplateRemixSummary(
+  questionOnlyRemixPlan
+);
 assert.ok(questionOnlyRemixPlan.readyOptions.length > 0);
 assert.equal(
   questionOnlyRemixPlan.options.find(
@@ -5113,6 +5117,37 @@ assert.equal(
   )?.diagnosis,
   'Ready to remix into Fill.'
 );
+assert.deepEqual(questionOnlyRemixSummary, {
+  lockedTemplateDiagnostics: [
+    'Add match pairs to unlock Match.',
+    'Add match pairs to unlock Lines.',
+    'Add groups to unlock Sort.',
+    'Add match pairs to unlock Pairs.',
+  ],
+  lockedTemplateOptions: [
+    { diagnosis: 'Add match pairs to unlock Match.', template: 'match-up' },
+    { diagnosis: 'Add match pairs to unlock Lines.', template: 'line-match' },
+    {
+      diagnosis: 'Add groups to unlock Sort.',
+      template: 'group-sort',
+    },
+    {
+      diagnosis: 'Add match pairs to unlock Pairs.',
+      template: 'matching-pairs',
+    },
+  ],
+  readyTemplateOptions: [
+    { shortName: 'Quiz', template: 'quiz' },
+    { shortName: 'Fill', template: 'fill-blank' },
+    { shortName: 'Listen', template: 'listening' },
+    { shortName: 'Box', template: 'open-box' },
+  ],
+  suggestedTemplateOptions: [
+    { shortName: 'Fill', template: 'fill-blank' },
+    { shortName: 'Listen', template: 'listening' },
+    { shortName: 'Box', template: 'open-box' },
+  ],
+});
 assert.deepEqual(
   questionOnlyRemixPlan.options.find(
     (option) => option.template.type === 'group-sort'

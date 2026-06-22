@@ -1,5 +1,12 @@
-import { getTemplateRemixPlan } from '@/activities/template-remix';
-import type { TemplateRemixPlan } from '@/activities/template-remix';
+import {
+  buildTemplateRemixSummary,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
+import type {
+  TemplateRemixLockedOption,
+  TemplateRemixPlan,
+  TemplateRemixTemplateOption,
+} from '@/activities/template-remix';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 import {
   buildActivityContent,
@@ -25,10 +32,7 @@ export type ActivityDraftMeta = {
   templateReadiness: ActivityDraftTemplateReadiness[];
 };
 
-export type ActivityDraftTemplateOption = {
-  shortName: string;
-  template: ActivityTemplateType;
-};
+export type ActivityDraftTemplateOption = TemplateRemixTemplateOption;
 
 export type ActivityDraftTemplateReadiness = {
   diagnosis: string;
@@ -41,15 +45,10 @@ export type ActivityDraftTemplateReadiness = {
   template: ActivityTemplateType;
 };
 
-export type ActivityTemplateReadinessPanelOption = {
-  shortName: string;
-  template: ActivityTemplateType;
-};
+export type ActivityTemplateReadinessPanelOption = TemplateRemixTemplateOption;
 
-export type ActivityTemplateReadinessPanelLockedOption = {
-  diagnosis: string;
-  template: ActivityTemplateType;
-};
+export type ActivityTemplateReadinessPanelLockedOption =
+  TemplateRemixLockedOption;
 
 export type ActivityTemplateReadinessPanelSummary = {
   description: string;
@@ -102,23 +101,13 @@ export function buildActivityDraftMeta({
     content,
     currentTemplateType,
   });
-  const suggestedTemplates = remixPlan.suggestedOptions.map(
-    (option) => option.template.shortName
+  const remixSummary = buildTemplateRemixSummary(remixPlan);
+  const suggestedTemplates = remixSummary.suggestedTemplateOptions.map(
+    (option) => option.shortName
   );
-  const suggestedTemplateOptions = remixPlan.suggestedOptions.map((option) => ({
-    shortName: option.template.shortName,
-    template: option.template.type,
-  }));
-  const readyTemplates = remixPlan.readyOptions.map(
-    (option) => option.template.shortName
+  const readyTemplates = remixSummary.readyTemplateOptions.map(
+    (option) => option.shortName
   );
-  const readyTemplateOptions = remixPlan.readyOptions.map((option) => ({
-    shortName: option.template.shortName,
-    template: option.template.type,
-  }));
-  const lockedTemplateDiagnostics = remixPlan.options
-    .filter((option) => !option.isReady)
-    .map((option) => option.diagnosis);
 
   return {
     coverage: {
@@ -129,15 +118,15 @@ export function buildActivityDraftMeta({
       vocabulary: content.vocabulary.length,
     },
     readyTemplateCount: remixPlan.readyOptions.length,
-    readyTemplateOptions,
+    readyTemplateOptions: remixSummary.readyTemplateOptions,
     readyTemplates,
     reviewChecklist: buildDraftReviewChecklist({
       content,
-      lockedTemplateDiagnostics,
+      lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
       suggestedTemplates,
     }),
     suggestedTemplateCount: suggestedTemplates.length,
-    suggestedTemplateOptions,
+    suggestedTemplateOptions: remixSummary.suggestedTemplateOptions,
     suggestedTemplates,
     templateReadiness: remixPlan.options.map((option) => ({
       diagnosis: option.diagnosis,
@@ -222,18 +211,9 @@ export function buildActivityDraftMetaSummaryView({
 export function buildActivityTemplateReadinessPanelSummary(
   remixPlan: TemplateRemixPlan | null
 ): ActivityTemplateReadinessPanelSummary {
-  const readyOptions =
-    remixPlan?.readyOptions.map((option) => ({
-      shortName: option.template.shortName,
-      template: option.template.type,
-    })) ?? [];
-  const lockedOptions =
-    remixPlan?.options
-      .filter((option) => !option.isReady)
-      .map((option) => ({
-        diagnosis: option.diagnosis,
-        template: option.template.type,
-      })) ?? [];
+  const remixSummary = remixPlan ? buildTemplateRemixSummary(remixPlan) : null;
+  const readyOptions = remixSummary?.readyTemplateOptions ?? [];
+  const lockedOptions = remixSummary?.lockedTemplateOptions ?? [];
 
   return {
     description: m.activity_template_readiness_panel_description(),

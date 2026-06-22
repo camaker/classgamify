@@ -6,6 +6,16 @@ import type {
 } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
+export type TemplateRemixTemplateOption = {
+  shortName: string;
+  template: ActivityTemplateType;
+};
+
+export type TemplateRemixLockedOption = {
+  diagnosis: string;
+  template: ActivityTemplateType;
+};
+
 export type TemplateRemixOption = {
   diagnosis: string;
   isCurrent: boolean;
@@ -22,6 +32,13 @@ export type TemplateRemixPlan = {
   options: TemplateRemixOption[];
   readyOptions: TemplateRemixOption[];
   suggestedOptions: TemplateRemixOption[];
+};
+
+type TemplateRemixSummary = {
+  lockedTemplateDiagnostics: string[];
+  lockedTemplateOptions: TemplateRemixLockedOption[];
+  readyTemplateOptions: TemplateRemixTemplateOption[];
+  suggestedTemplateOptions: TemplateRemixTemplateOption[];
 };
 
 export function getTemplateRemixPlan({
@@ -46,6 +63,21 @@ export function getTemplateRemixPlan({
     options,
     readyOptions,
     suggestedOptions,
+  };
+}
+
+export function buildTemplateRemixSummary(
+  remixPlan: TemplateRemixPlan
+): TemplateRemixSummary {
+  const lockedOptions = remixPlan.options.filter((option) => !option.isReady);
+
+  return {
+    lockedTemplateDiagnostics: lockedOptions.map((option) => option.diagnosis),
+    lockedTemplateOptions: lockedOptions.map(toTemplateOptionDiagnostic),
+    readyTemplateOptions: remixPlan.readyOptions.map(toTemplateOptionSummary),
+    suggestedTemplateOptions: remixPlan.suggestedOptions.map(
+      toTemplateOptionSummary
+    ),
   };
 }
 
@@ -81,6 +113,24 @@ export function getTemplateRemixOption({
       ? m.template_remix_ready()
       : m.template_remix_needs_more_content(),
     template,
+  };
+}
+
+function toTemplateOptionSummary(
+  option: TemplateRemixOption
+): TemplateRemixTemplateOption {
+  return {
+    shortName: option.template.shortName,
+    template: option.template.type,
+  };
+}
+
+function toTemplateOptionDiagnostic(
+  option: TemplateRemixOption
+): TemplateRemixLockedOption {
+  return {
+    diagnosis: option.diagnosis,
+    template: option.template.type,
   };
 }
 
