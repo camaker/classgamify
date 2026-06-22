@@ -7,7 +7,10 @@ import {
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
-import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
+import {
+  summarizeAssignmentAttempts,
+  summarizeAssignmentAttemptsByAssignmentId,
+} from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
@@ -36,7 +39,7 @@ import {
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, like, or, type SQL } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -132,23 +135,24 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .orderBy(desc(assignment.updatedAt))
       .limit(data.pageSize)
       .offset(data.pageIndex * data.pageSize);
-
-    const enriched = await Promise.all(
-      items.map(async (item) => {
-        const attempts = await db
-          .select({
-            resultJson: attempt.resultJson,
-          })
-          .from(attempt)
-          .where(eq(attempt.assignmentId, item.assignment.id));
-        const stats = summarizeAssignmentAttempts(attempts);
-
-        return {
-          ...withResolvedAssignmentSettings(item),
-          stats,
-        };
-      })
-    );
+    const itemAssignmentIds = items.map((item) => item.assignment.id);
+    const itemAttempts =
+      itemAssignmentIds.length > 0
+        ? await db
+            .select({
+              assignmentId: attempt.assignmentId,
+              resultJson: attempt.resultJson,
+            })
+            .from(attempt)
+            .where(inArray(attempt.assignmentId, itemAssignmentIds))
+        : [];
+    const statsByAssignmentId =
+      summarizeAssignmentAttemptsByAssignmentId(itemAttempts);
+    const emptyStats = summarizeAssignmentAttempts([]);
+    const enriched = items.map((item) => ({
+      ...withResolvedAssignmentSettings(item),
+      stats: statsByAssignmentId.get(item.assignment.id) ?? emptyStats,
+    }));
     const summaryStats = summarizeAssignmentAttempts(summaryAttempts);
 
     return {

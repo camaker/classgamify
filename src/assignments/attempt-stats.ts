@@ -5,6 +5,10 @@ type AssignmentAttemptStatsSource = {
   score?: number | null;
 };
 
+type AssignmentAttemptStatsByAssignmentSource = AssignmentAttemptStatsSource & {
+  assignmentId: string;
+};
+
 type AssignmentAttemptStats = {
   averageDurationSeconds: number;
   averagePoints: number;
@@ -52,6 +56,30 @@ export function summarizeAssignmentAttempts(
     ),
     completions,
   };
+}
+
+export function summarizeAssignmentAttemptsByAssignmentId(
+  attempts: AssignmentAttemptStatsByAssignmentSource[]
+) {
+  const attemptsByAssignmentId = new Map<
+    string,
+    AssignmentAttemptStatsSource[]
+  >();
+
+  for (const attempt of attempts) {
+    const attemptsForAssignment =
+      attemptsByAssignmentId.get(attempt.assignmentId) ?? [];
+
+    attemptsForAssignment.push(attempt);
+    attemptsByAssignmentId.set(attempt.assignmentId, attemptsForAssignment);
+  }
+
+  return new Map(
+    [...attemptsByAssignmentId.entries()].map(([assignmentId, items]) => [
+      assignmentId,
+      summarizeAssignmentAttempts(items),
+    ])
+  );
 }
 
 function getAttemptPoints(item: AssignmentAttemptStatsSource) {

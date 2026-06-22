@@ -132,7 +132,10 @@ import {
 } from '@/dashboard/overview';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
-import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
+import {
+  summarizeAssignmentAttempts,
+  summarizeAssignmentAttemptsByAssignmentId,
+} from '@/assignments/attempt-stats';
 import {
   buildAttemptTimerState,
   formatAttemptDuration,
@@ -6593,6 +6596,54 @@ assert.deepEqual(
     completions: 4,
   }
 );
+const assignmentAttemptStatsById = summarizeAssignmentAttemptsByAssignmentId([
+  {
+    assignmentId: 'assignment-a',
+    resultJson: {
+      accuracy: 50,
+      completedItemCount: 1,
+      correctItemCount: 1,
+      durationSeconds: 30,
+      earnedPoints: 1,
+      totalPoints: 2,
+    },
+  },
+  {
+    assignmentId: 'assignment-b',
+    resultJson: {
+      accuracy: 100,
+      completedItemCount: 2,
+      correctItemCount: 2,
+      durationSeconds: 60,
+      earnedPoints: 2,
+      totalPoints: 2,
+    },
+  },
+  {
+    assignmentId: 'assignment-a',
+    resultJson: {
+      accuracy: 100,
+      completedItemCount: 2,
+      correctItemCount: 2,
+      durationSeconds: 60,
+      earnedPoints: 2,
+      totalPoints: 2,
+    },
+  },
+]);
+assert.deepEqual(assignmentAttemptStatsById.get('assignment-a'), {
+  averageDurationSeconds: 45,
+  averagePoints: 2,
+  averageScore: 75,
+  completions: 2,
+});
+assert.deepEqual(assignmentAttemptStatsById.get('assignment-b'), {
+  averageDurationSeconds: 60,
+  averagePoints: 2,
+  averageScore: 100,
+  completions: 1,
+});
+assert.equal(assignmentAttemptStatsById.get('assignment-c'), undefined);
 
 const resultRuntimeItems = [
   {
