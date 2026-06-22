@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
@@ -525,6 +525,11 @@ const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(
   retiredRouteDocumentationText,
   /\/about|\/zh\/about|waitlist|src\/components\/blocks\/newsletter-card\.tsx/
+);
+assert.equal(
+  existsSync('src/routes/hanzi/$character.tsx'),
+  false,
+  'Legacy Hanzi dynamic route should stay unmounted.'
 );
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);

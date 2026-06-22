@@ -34,7 +34,6 @@ import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
 import { Route as Hsk1RouteImport } from './routes/hsk/1'
-import { Route as HanziCharacterRouteImport } from './routes/hanzi/$character'
 import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
 import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
@@ -186,11 +185,6 @@ const PlayShareIdRoute = PlayShareIdRouteImport.update({
 const Hsk1Route = Hsk1RouteImport.update({
   id: '/hsk/1',
   path: '/hsk/1',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HanziCharacterRoute = HanziCharacterRouteImport.update({
-  id: '/hanzi/$character',
-  path: '/hanzi/$character',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardAssignmentsRoute = DashboardAssignmentsRouteImport.update({
@@ -363,7 +357,6 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -415,7 +408,6 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -471,7 +463,6 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hanzi/$character': typeof HanziCharacterRoute
   '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
@@ -528,7 +519,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hanzi/$character'
     | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
@@ -580,7 +570,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hanzi/$character'
     | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
@@ -635,7 +624,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hanzi/$character'
     | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
@@ -683,7 +671,6 @@ export interface RootRouteChildren {
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
-  HanziCharacterRoute: typeof HanziCharacterRoute
   Hsk1Route: typeof Hsk1Route
   PlayShareIdRoute: typeof PlayShareIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -870,13 +857,6 @@ declare module '@tanstack/react-router' {
       path: '/hsk/1'
       fullPath: '/hsk/1'
       preLoaderRoute: typeof Hsk1RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hanzi/$character': {
-      id: '/hanzi/$character'
-      path: '/hanzi/$character'
-      fullPath: '/hanzi/$character'
-      preLoaderRoute: typeof HanziCharacterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/assignments': {
@@ -1189,7 +1169,6 @@ const rootRouteChildren: RootRouteChildren = {
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
-  HanziCharacterRoute: HanziCharacterRoute,
   Hsk1Route: Hsk1Route,
   PlayShareIdRoute: PlayShareIdRoute,
   BlogIndexRoute: BlogIndexRoute,
