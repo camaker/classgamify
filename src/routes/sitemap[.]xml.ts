@@ -39,8 +39,8 @@ function buildSitemap() {
   const staticUrls: SitemapUrl[] = [
     { path: Routes.Root, changefreq: 'daily', priority: '1.0' },
     { path: Routes.Templates, changefreq: 'weekly', priority: '0.9' },
+    { path: Routes.Worksheets, changefreq: 'weekly', priority: '0.85' },
     { path: Routes.Create, changefreq: 'weekly', priority: '0.8' },
-    { path: Routes.PlayDemo, changefreq: 'monthly', priority: '0.4' },
     { path: Routes.Pricing, changefreq: 'weekly', priority: '0.7' },
     { path: Routes.Teachers, changefreq: 'monthly', priority: '0.6' },
     { path: Routes.Contact, changefreq: 'monthly', priority: '0.4' },

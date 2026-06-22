@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
+import { isLocalizedPath } from '@/lib/locale';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -434,6 +435,21 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
+const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
+assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
+assert.match(robotsRouteSource, /['"]\/play['"]/);
+assert.match(robotsRouteSource, /['"]\/learn['"]/);
+assert.match(robotsRouteSource, /['"]\/hsk['"]/);
+assert.match(robotsRouteSource, /['"]\/hanzi['"]/);
+assert.match(sitemapRouteSource, /Routes\.Worksheets/);
+assert.doesNotMatch(sitemapRouteSource, /Routes\.PlayDemo/);
+assert.equal(isLocalizedPath('/worksheets'), true);
+assert.equal(isLocalizedPath('/play/demo-food'), false);
+assert.match(
+  readFileSync('src/routes/play/$shareId.tsx', 'utf8'),
+  /robots: 'noindex,follow'/
+);
 
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);

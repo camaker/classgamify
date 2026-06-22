@@ -74,6 +74,7 @@ export const Route = createFileRoute('/play/$shareId')({
     return seo(`/play/${params.shareId}`, {
       title: `${runnerCopy.seoTitlePrefix} | ${websiteConfig.metadata?.name}`,
       description: runnerCopy.seoDescription,
+      robots: 'noindex,follow',
     });
   },
   component: PlayPage,

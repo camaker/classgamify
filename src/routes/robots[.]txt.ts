@@ -11,7 +11,6 @@ const disallowedPaths = [
   '/learn',
   '/hsk',
   '/hanzi',
-  '/worksheets',
   '/about',
   '/ai',
   '/changelog',
