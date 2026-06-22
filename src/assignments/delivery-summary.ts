@@ -1,5 +1,6 @@
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDeliverySummaryId =
   | 'answerReveal'
@@ -56,32 +57,32 @@ export function buildAssignmentDeliverySummary({
   return [
     {
       id: 'attempts',
-      label: 'Attempts',
+      label: m.assignment_delivery_label_attempts(),
       value: formatAssignmentAttempts(maxAttempts),
     },
     {
       id: 'timer',
-      label: 'Timer',
+      label: m.assignment_delivery_label_timer(),
       value: formatAssignmentTimeLimit(timeLimitSeconds),
     },
     {
       id: 'closes',
-      label: 'Closes',
+      label: m.assignment_delivery_label_closes(),
       value: formatAssignmentExpiry(expiresAt),
     },
     {
       id: 'identity',
-      label: 'Student identity',
+      label: m.assignment_delivery_label_identity(),
       value: formatStudentIdentity(collectStudentName),
     },
     {
       id: 'answerReveal',
-      label: 'Answer reveal',
+      label: m.assignment_delivery_label_answer_reveal(),
       value: formatAnswerReveal(showCorrectAnswers),
     },
     {
       id: 'itemOrder',
-      label: 'Item order',
+      label: m.assignment_delivery_label_item_order(),
       value: formatShuffleItems(shuffleItems),
     },
   ];
@@ -129,14 +130,17 @@ export function buildPublicAssignmentRuleSummary({
   return [
     {
       id: 'items',
-      label: 'Items',
+      label: m.assignment_delivery_label_items(),
       value: formatAssignmentItemCount(itemCount),
     },
     ...buildAssignmentDeliverySummary(input)
       .filter((rule) => rule.id !== 'itemOrder')
       .map((rule) => ({
         ...rule,
-        label: rule.id === 'answerReveal' ? 'Review' : rule.label,
+        label:
+          rule.id === 'answerReveal'
+            ? m.assignment_delivery_label_review()
+            : rule.label,
       })),
   ];
 }
@@ -161,18 +165,26 @@ export function buildPublicAssignmentRuleSummaryFromSettings({
 }
 
 export function formatAssignmentItemCount(itemCount: number) {
-  return `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
+  if (itemCount === 1) {
+    return m.assignment_delivery_item_count_one({ count: itemCount });
+  }
+
+  return m.assignment_delivery_item_count_many({ count: itemCount });
 }
 
 function formatAssignmentAttempts(maxAttempts?: number | null) {
-  return isPositiveWholeNumber(maxAttempts) ? `${maxAttempts} max` : 'Open';
+  return isPositiveWholeNumber(maxAttempts)
+    ? m.assignment_delivery_attempts_max({ count: maxAttempts })
+    : m.assignment_delivery_attempts_open();
 }
 
 export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
-  if (!expiresAt) return 'No close time';
+  if (!expiresAt) return m.assignment_delivery_expiry_none();
 
   const date = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-  if (Number.isNaN(date.getTime())) return 'No close time';
+  if (Number.isNaN(date.getTime())) {
+    return m.assignment_delivery_expiry_none();
+  }
 
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
@@ -181,10 +193,11 @@ export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
 }
 
 function formatAssignmentTimeLimit(seconds?: number | null) {
-  if (!isPositiveWholeNumber(seconds)) return 'No timer';
+  if (!isPositiveWholeNumber(seconds))
+    return m.assignment_delivery_timer_none();
 
   const minutes = Math.max(1, Math.ceil(seconds / 60));
-  return `${minutes} min`;
+  return m.assignment_delivery_timer_minutes({ minutes });
 }
 
 function isPositiveWholeNumber(value?: number | null) {
@@ -197,13 +210,19 @@ function isPositiveWholeNumber(value?: number | null) {
 }
 
 function formatStudentIdentity(collectStudentName: boolean) {
-  return collectStudentName ? 'Names' : 'Anonymous';
+  return collectStudentName
+    ? m.assignment_delivery_identity_names()
+    : m.assignment_delivery_identity_anonymous();
 }
 
 function formatAnswerReveal(showCorrectAnswers: boolean) {
-  return showCorrectAnswers ? 'After submit' : 'Hidden';
+  return showCorrectAnswers
+    ? m.assignment_delivery_answer_reveal_after_submit()
+    : m.assignment_delivery_answer_reveal_hidden();
 }
 
 function formatShuffleItems(shuffleItems: boolean) {
-  return shuffleItems ? 'Shuffled' : 'Fixed order';
+  return shuffleItems
+    ? m.assignment_delivery_item_order_shuffled()
+    : m.assignment_delivery_item_order_fixed();
 }
