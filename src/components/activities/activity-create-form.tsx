@@ -74,6 +74,8 @@ const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
 const templateTypeOptions = activityTemplateTypeSchema.options;
 const draftItemCountOptions = [3, 5, 8, 10] as const;
+type ActivityFormDifficulty = (typeof difficultyOptions)[number];
+type ActivityFormVisibility = (typeof visibilityOptions)[number];
 
 type ActivityCreateFormProps = {
   activityId?: string;
@@ -324,7 +326,7 @@ export function ActivityCreateForm({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>{m.activity_form_field_title()}</FormLabel>
                     <FormControl>
                       <Input {...field} autoComplete="off" />
                     </FormControl>
@@ -337,7 +339,9 @@ export function ActivityCreateForm({
                 name="templateType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primary template</FormLabel>
+                    <FormLabel>
+                      {m.activity_form_field_primary_template()}
+                    </FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
                         {templateTypeOptions.map((type) => {
@@ -406,7 +410,7 @@ export function ActivityCreateForm({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{m.activity_form_field_description()}</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={2} />
                   </FormControl>
@@ -421,7 +425,7 @@ export function ActivityCreateForm({
                 name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subject</FormLabel>
+                    <FormLabel>{m.activity_form_field_subject()}</FormLabel>
                     <FormControl>
                       <Input {...field} autoComplete="off" />
                     </FormControl>
@@ -434,7 +438,7 @@ export function ActivityCreateForm({
                 name="gradeBand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Grade band</FormLabel>
+                    <FormLabel>{m.activity_form_field_grade_band()}</FormLabel>
                     <FormControl>
                       <Input {...field} autoComplete="off" />
                     </FormControl>
@@ -447,12 +451,12 @@ export function ActivityCreateForm({
                 name="difficulty"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Difficulty</FormLabel>
+                    <FormLabel>{m.activity_form_field_difficulty()}</FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
                         {difficultyOptions.map((value) => (
                           <NativeSelectOption key={value} value={value}>
-                            {value}
+                            {formatActivityDifficulty(value)}
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
@@ -466,12 +470,12 @@ export function ActivityCreateForm({
                 name="visibility"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Visibility</FormLabel>
+                    <FormLabel>{m.activity_form_field_visibility()}</FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
                         {visibilityOptions.map((value) => (
                           <NativeSelectOption key={value} value={value}>
-                            {value}
+                            {formatActivityVisibility(value)}
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
@@ -487,7 +491,7 @@ export function ActivityCreateForm({
               name="learningGoal"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Learning goal</FormLabel>
+                  <FormLabel>{m.activity_form_field_learning_goal()}</FormLabel>
                   <FormControl>
                     <Textarea {...field} rows={2} />
                   </FormControl>
@@ -502,16 +506,16 @@ export function ActivityCreateForm({
                 name="vocabularyText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Vocabulary</FormLabel>
+                    <FormLabel>{m.activity_form_field_vocabulary()}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         rows={4}
-                        placeholder="apple, bread, milk"
+                        placeholder={m.activity_form_vocabulary_placeholder()}
                       />
                     </FormControl>
                     <FormDescription>
-                      Separate terms with commas, semicolons, or new lines.
+                      {m.activity_form_vocabulary_description()}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -522,19 +526,16 @@ export function ActivityCreateForm({
                 name="questionsText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Questions</FormLabel>
+                    <FormLabel>{m.activity_form_field_questions()}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         rows={4}
-                        placeholder="Prompt | answer | option, option, option | explanation"
+                        placeholder={m.activity_form_questions_placeholder()}
                       />
                     </FormControl>
                     <FormDescription>
-                      One question per line. Use vertical bars to separate the
-                      prompt, answer, optional choices, and optional
-                      explanation. Use / or ; inside the answer field for
-                      acceptable alternatives.
+                      {m.activity_form_questions_description()}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -548,17 +549,16 @@ export function ActivityCreateForm({
                 name="pairsText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Match pairs</FormLabel>
+                    <FormLabel>{m.activity_form_field_pairs()}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         rows={4}
-                        placeholder="term | definition"
+                        placeholder={m.activity_form_pairs_placeholder()}
                       />
                     </FormControl>
                     <FormDescription>
-                      Used by match-up, line-match, and matching-pairs
-                      templates.
+                      {m.activity_form_pairs_description()}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -569,16 +569,16 @@ export function ActivityCreateForm({
                 name="groupsText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Groups</FormLabel>
+                    <FormLabel>{m.activity_form_field_groups()}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         rows={4}
-                        placeholder="Group | item one, item two"
+                        placeholder={m.activity_form_groups_placeholder()}
                       />
                     </FormControl>
                     <FormDescription>
-                      Used by drag classification and category sorting.
+                      {m.activity_form_groups_description()}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -592,7 +592,9 @@ export function ActivityCreateForm({
                 name="sourceSummary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Source summary</FormLabel>
+                    <FormLabel>
+                      {m.activity_form_field_source_summary()}
+                    </FormLabel>
                     <FormControl>
                       <Textarea {...field} rows={3} />
                     </FormControl>
@@ -605,11 +607,15 @@ export function ActivityCreateForm({
                 name="teacherNotesText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Teacher notes</FormLabel>
+                    <FormLabel>
+                      {m.activity_form_field_teacher_notes()}
+                    </FormLabel>
                     <FormControl>
                       <Textarea {...field} rows={3} />
                     </FormControl>
-                    <FormDescription>One note per line.</FormDescription>
+                    <FormDescription>
+                      {m.activity_form_teacher_notes_description()}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -755,6 +761,30 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
       </div>
     </div>
   );
+}
+
+function formatActivityDifficulty(difficulty: ActivityFormDifficulty) {
+  switch (difficulty) {
+    case 'challenge':
+      return m.activity_form_difficulty_challenge();
+    case 'core':
+      return m.activity_form_difficulty_core();
+    case 'starter':
+      return m.activity_form_difficulty_starter();
+  }
+}
+
+function formatActivityVisibility(visibility: ActivityFormVisibility) {
+  switch (visibility) {
+    case 'draft':
+      return m.activity_form_visibility_draft();
+    case 'private':
+      return m.activity_form_visibility_private();
+    case 'public':
+      return m.activity_form_visibility_public();
+    case 'unlisted':
+      return m.activity_form_visibility_unlisted();
+  }
 }
 
 function ActivityTemplateReadinessPanel({
