@@ -50,43 +50,43 @@ type ActivityEditorTemplateSetupView = {
 
 const activityEditorSectionId = 'activity-editor';
 
-export const activityEditorDefaultInput: CreateActivityInput = {
-  description:
-    'Quick classroom practice that can become a quiz, match game, or worksheet.',
-  difficulty: 'starter',
-  gradeBand: 'Primary',
-  groupsText: 'Fruit | apple, banana\nDrink | milk, water',
-  language: 'en',
-  learningGoal:
-    'Students can recognize key words and connect them with simple meanings.',
-  pairsText: 'apple | fruit\nmilk | drink\nrice | grain',
-  questionsText:
-    'Which word means a red or green fruit? | apple | apple, bread, water | Apple is the fruit clue.\nWhich drink is white? | milk | milk, rice, egg | Milk is the white drink.',
-  sourceSummary: 'Teacher-created activity from a unit vocabulary list.',
-  subject: 'English',
-  teacherNotesText:
-    'Use quiz mode for homework.\nUse matching pairs as a class warmup.',
-  templateType: 'quiz',
-  title: 'Food words quick check',
-  visibility: 'draft',
-  vocabularyText: 'apple, bread, milk, rice, water, egg',
-};
+export function getActivityEditorDefaultInput(): CreateActivityInput {
+  return {
+    description: m.activity_editor_default_description(),
+    difficulty: 'starter',
+    gradeBand: m.activity_editor_default_grade_band(),
+    groupsText: m.activity_editor_default_groups_text(),
+    language: 'en',
+    learningGoal: m.activity_editor_default_learning_goal(),
+    pairsText: m.activity_editor_default_pairs_text(),
+    questionsText: m.activity_editor_default_questions_text(),
+    sourceSummary: m.activity_editor_default_source_summary(),
+    subject: m.activity_editor_default_subject(),
+    teacherNotesText: m.activity_editor_default_teacher_notes_text(),
+    templateType: 'quiz',
+    title: m.activity_editor_default_title(),
+    visibility: 'draft',
+    vocabularyText: m.activity_editor_default_vocabulary_text(),
+  };
+}
 
 export function buildActivityEditorInitialValues(
   templateType?: ActivityTemplateType
 ): CreateActivityInput | undefined {
   if (!templateType) return undefined;
 
+  const defaultInput = getActivityEditorDefaultInput();
+
   return {
-    ...activityEditorDefaultInput,
+    ...defaultInput,
     ...getActivityTemplateScaffold(templateType),
     templateType,
-    visibility: activityEditorDefaultInput.visibility,
+    visibility: defaultInput.visibility,
   };
 }
 
 export function buildActivityEditorPreviewSeed(
-  input: CreateActivityInput = activityEditorDefaultInput
+  input: CreateActivityInput = getActivityEditorDefaultInput()
 ): ActivitySeed {
   const content = buildActivityContent(input);
 
@@ -102,7 +102,7 @@ export function buildActivityEditorPreviewSeed(
 }
 
 export function buildActivityEditorPreviewPanel(
-  input: CreateActivityInput = activityEditorDefaultInput
+  input: CreateActivityInput = getActivityEditorDefaultInput()
 ): ActivityEditorPreviewPanel {
   const template = getTemplateByType(input.templateType);
 

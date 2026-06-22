@@ -1,7 +1,7 @@
 import { activityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
 import {
-  activityEditorDefaultInput,
+  getActivityEditorDefaultInput,
   buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
@@ -93,13 +93,17 @@ export function ActivityCreateForm({
   const draftMutation = useGenerateActivityDraft();
   const updateMutation = useUpdateActivity();
   const navigate = useNavigate();
+  const defaultValues = useMemo(
+    () => initialValues ?? getActivityEditorDefaultInput(),
+    [initialValues]
+  );
   const [draftSourceText, setDraftSourceText] = useState(
-    getActivityDraftSourceText(initialValues ?? activityEditorDefaultInput)
+    getActivityDraftSourceText(defaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(5);
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
   const form = useForm<CreateActivityInput>({
-    defaultValues: initialValues ?? activityEditorDefaultInput,
+    defaultValues,
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');

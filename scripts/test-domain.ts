@@ -102,7 +102,7 @@ import {
 } from '@/activities/validation';
 import {
   activityContentToEditorInput,
-  activityEditorDefaultInput,
+  getActivityEditorDefaultInput,
   buildActivityEditorInitialValues,
   buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
@@ -324,6 +324,8 @@ import {
 } from '@/assignments/student-submission';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import type { RuntimeItem } from '@/activities/runtime';
+
+const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
 const submissionRuntimeItems = [
   { id: 'item-1' },
