@@ -4279,6 +4279,7 @@ assert.deepEqual(
     ],
     status: 'published',
     statusLabel: 'Open',
+    templateLabel: 'Line match',
     templateType: 'line-match',
     title: 'Persisted assignment',
   }
@@ -4367,6 +4368,7 @@ assert.deepEqual(
     ],
     status: 'published',
     statusLabel: 'Open',
+    templateLabel: 'Group sort',
     templateType: 'group-sort',
     title: 'Food words homework',
   }
@@ -6862,6 +6864,7 @@ assert.deepEqual(
     },
     shareSlug: 'share 123',
     statusLabel: 'Open',
+    templateLabel: 'Line match',
     templateType: 'line-match',
   }
 );
@@ -6893,6 +6896,7 @@ assert.deepEqual(
     },
     shareSlug: 'closed-share',
     statusLabel: 'Expired',
+    templateLabel: 'Quiz',
     templateType: 'quiz',
   }
 );

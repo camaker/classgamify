@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
   AssignmentStatus,
 } from '@/activities/types';
+import { getTemplateByType } from '@/activities/catalog';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
 import {
   type AssignmentStatusAction,
@@ -59,6 +60,7 @@ type AssignmentListCardViewModel = {
   settings: AssignmentSettings;
   shareSlug: string;
   status: AssignmentStatus;
+  templateLabel: string;
   templateType: ActivityTemplateType;
   title: string;
   stats: {
@@ -272,6 +274,7 @@ export function buildAssignmentListCardViewModel({
   stats,
 }: AssignmentListCardSource): AssignmentListCardViewModel {
   const persisted = true;
+  const templateType = snapshot?.templateType ?? activity.templateType;
   const actionState = getAssignmentListCardActionState({
     expiresAt: assignment.expiresAt,
     now,
@@ -301,7 +304,8 @@ export function buildAssignmentListCardViewModel({
       assignment.expiresAt,
       now
     ),
-    templateType: snapshot?.templateType ?? activity.templateType,
+    templateLabel: getTemplateByType(templateType).name,
+    templateType,
     title: assignment.title,
   };
 }
@@ -339,6 +343,7 @@ export function buildStarterAssignmentListCardViewModel({
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
     statusLabel: getAssignmentStatusLabel(assignment.status, expiresAt),
+    templateLabel: getTemplateByType(activity.templateType).name,
     templateType: activity.templateType,
     title: assignment.title,
   };

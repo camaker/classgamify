@@ -518,7 +518,7 @@ function AssignmentCard({
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconListCheck className="size-3.5" />
-            {assignment.templateType}
+            {assignment.templateLabel}
           </Badge>
         </div>
         <CardTitle>

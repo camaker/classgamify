@@ -25,6 +25,7 @@ import type {
   ActivityTemplateType,
   AssignmentStatus,
 } from '@/activities/types';
+import { getTemplateByType } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
@@ -523,6 +524,7 @@ export function buildAssignmentResultHeaderView({
   const shareAction = buildAssignmentResultHeaderShareAction(
     assignment.shareSlug
   );
+  const templateType = snapshot?.templateType ?? activity.templateType;
 
   return {
     activityDescription:
@@ -537,7 +539,8 @@ export function buildAssignmentResultHeaderView({
       assignment.expiresAt,
       now
     ),
-    templateType: snapshot?.templateType ?? activity.templateType,
+    templateLabel: getTemplateByType(templateType).name,
+    templateType,
   };
 }
 

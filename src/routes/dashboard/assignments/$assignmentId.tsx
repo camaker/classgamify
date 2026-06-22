@@ -292,7 +292,7 @@ function AssignmentResultsPage() {
                   {headerView.statusLabel}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
-                  {headerView.templateType}
+                  {headerView.templateLabel}
                 </Badge>
               </div>
               <CardTitle>
