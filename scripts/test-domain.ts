@@ -58,6 +58,7 @@ import {
   buildRemixedActivityTitle,
 } from '@/activities/duplicate';
 import {
+  ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
@@ -5450,39 +5451,69 @@ assert.equal(getRuntimeItems('open-box', fallbackOpenBoxContent).length, 3);
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
+    groupsText: 'Group source',
+    pairsText: 'Pair source',
     questionsText: 'Question source',
     sourceSummary: '  Summary source  ',
+    teacherNotesText: 'Teacher note source',
     vocabularyText: 'Vocabulary source',
   }),
-  'Summary source'
+  [
+    'Summary source',
+    'Vocabulary source',
+    'Question source',
+    'Pair source',
+    'Group source',
+    'Teacher note source',
+  ].join('\n\n')
 );
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
+    groupsText: '',
+    pairsText: '',
     questionsText: 'Question source',
     sourceSummary: '   ',
+    teacherNotesText: '',
     vocabularyText: '  Vocabulary source  ',
   }),
-  'Vocabulary source'
+  ['Vocabulary source', 'Question source'].join('\n\n')
 );
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
-    questionsText: '  Question source  ',
+    groupsText: 'Group source',
+    pairsText: 'Pair source',
+    questionsText: 'Shared source',
     sourceSummary: '',
-    vocabularyText: '',
+    teacherNotesText: 'Shared source',
+    vocabularyText: '  Shared source  ',
   }),
-  'Question source'
+  ['Shared source', 'Pair source', 'Group source'].join('\n\n')
 );
 assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
+    groupsText: '',
+    pairsText: '',
     questionsText: '',
     sourceSummary: '',
+    teacherNotesText: '',
     vocabularyText: '',
   }),
   DEFAULT_ACTIVITY_DRAFT_SOURCE
 );
+const longDraftSourceText = getActivityDraftSourceText({
+  ...fallbackDraft,
+  groupsText: '',
+  pairsText: '',
+  questionsText: '',
+  sourceSummary: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH - 10),
+  teacherNotesText: '',
+  vocabularyText: 'Vocabulary source should be clipped.',
+});
+assert.equal(longDraftSourceText.length, ACTIVITY_DRAFT_SOURCE_MAX_LENGTH);
+assert.ok(longDraftSourceText.endsWith('...'));
 const multilingualGroupContent = buildActivityContent({
   description: 'Multilingual group sort',
   difficulty: 'starter',
