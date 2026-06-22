@@ -10,8 +10,9 @@ import { useAssignments } from '@/hooks/use-assignments';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
-  dashboardOverviewActionCards,
   dashboardOverviewPageCopy,
+  getDashboardOverviewActionCards,
+  type DashboardOverviewActionCard,
   type DashboardOverviewActionCardId,
   type DashboardOverviewMetricId,
   type DashboardCoreLoopReadinessRow,
@@ -57,6 +58,7 @@ function DashboardPage() {
     isLoading: isMetricLoading,
   });
   const readinessRows = buildDashboardCoreLoopReadiness();
+  const actionCards = getDashboardOverviewActionCards();
 
   return (
     <DashboardLayout
@@ -133,7 +135,7 @@ function DashboardPage() {
         <ActivityPreview activity={activity} assignment={assignment} />
 
         <section className="grid gap-4 md:grid-cols-3">
-          {dashboardOverviewActionCards.map((card) => (
+          {actionCards.map((card) => (
             <ActionCard key={card.id} card={card} />
           ))}
         </section>
@@ -200,11 +202,7 @@ function ReadinessRow({ row }: { row: DashboardCoreLoopReadinessRow }) {
   );
 }
 
-function ActionCard({
-  card,
-}: {
-  card: (typeof dashboardOverviewActionCards)[number];
-}) {
+function ActionCard({ card }: { card: DashboardOverviewActionCard }) {
   const Icon = dashboardActionIcons[card.id];
 
   return (

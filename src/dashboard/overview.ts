@@ -1,4 +1,5 @@
 import { activityTemplates } from '@/activities/catalog';
+import { m } from '@/locale/paraglide/messages';
 
 export type DashboardActivitySummary = {
   draftActivities: number;
@@ -30,7 +31,7 @@ export type DashboardOverviewActionCardId =
   | 'assignments'
   | 'student-preview';
 
-type DashboardOverviewActionCard = {
+export type DashboardOverviewActionCard = {
   cta: string;
   description: string;
   id: DashboardOverviewActionCardId;
@@ -50,43 +51,60 @@ export type DashboardCoreLoopReadinessRow = {
 };
 
 export const dashboardOverviewPageCopy = {
-  breadcrumbLabel: 'Dashboard',
-  description:
-    'Manage reusable activities, publish classroom assignments, and track student attempts from one workspace.',
-  heroBadge: 'Teacher workspace',
-  heroDescription:
-    'ClassGamify separates reusable teacher activities from published assignments and student attempts. Create, publish, play, and review now share one activity data contract that AI drafting and template remixing can build on.',
-  heroPrimaryAction: 'Create activity',
-  heroSecondaryAction: 'Open activity library',
-  heroTitle: 'Activity content is now the center of the product.',
-  loopBadge: 'Wordwall-core loop',
-  readinessTitle: 'Core loop readiness',
-  title: 'Teacher dashboard',
+  get breadcrumbLabel() {
+    return m.dashboard_overview_breadcrumb();
+  },
+  get description() {
+    return m.dashboard_overview_description();
+  },
+  get heroBadge() {
+    return m.dashboard_overview_hero_badge();
+  },
+  get heroDescription() {
+    return m.dashboard_overview_hero_description();
+  },
+  get heroPrimaryAction() {
+    return m.dashboard_overview_hero_primary_action();
+  },
+  get heroSecondaryAction() {
+    return m.dashboard_overview_hero_secondary_action();
+  },
+  get heroTitle() {
+    return m.dashboard_overview_hero_title();
+  },
+  get loopBadge() {
+    return m.dashboard_overview_loop_badge();
+  },
+  get readinessTitle() {
+    return m.dashboard_overview_readiness_title();
+  },
+  get title() {
+    return m.dashboard_overview_title();
+  },
 } as const;
 
-export const dashboardOverviewActionCards = [
-  {
-    cta: 'Open activities',
-    description:
-      'Review your activity library and the structured content each template consumes.',
-    id: 'activities',
-    title: 'Activities',
-  },
-  {
-    cta: 'Open assignments',
-    description:
-      'Track published share links, assignment settings, completions, and average scores.',
-    id: 'assignments',
-    title: 'Assignments',
-  },
-  {
-    cta: 'Preview play route',
-    description:
-      'Open a playable student assignment route with progress, timing, scoring, and review behavior.',
-    id: 'student-preview',
-    title: 'Student preview',
-  },
-] satisfies DashboardOverviewActionCard[];
+export function getDashboardOverviewActionCards(): DashboardOverviewActionCard[] {
+  return [
+    {
+      cta: m.dashboard_overview_action_activities_cta(),
+      description: m.dashboard_overview_action_activities_description(),
+      id: 'activities',
+      title: m.dashboard_overview_action_activities_title(),
+    },
+    {
+      cta: m.dashboard_overview_action_assignments_cta(),
+      description: m.dashboard_overview_action_assignments_description(),
+      id: 'assignments',
+      title: m.dashboard_overview_action_assignments_title(),
+    },
+    {
+      cta: m.dashboard_overview_action_student_preview_cta(),
+      description: m.dashboard_overview_action_student_preview_description(),
+      id: 'student-preview',
+      title: m.dashboard_overview_action_student_preview_title(),
+    },
+  ];
+}
 
 export function buildDashboardOverviewMetrics({
   activitySummary,
@@ -100,28 +118,32 @@ export function buildDashboardOverviewMetrics({
   return [
     {
       description: isLoading
-        ? 'Loading your library...'
-        : `${activitySummary?.draftActivities ?? 0} drafts in your active library`,
+        ? m.dashboard_overview_metric_activities_description_loading()
+        : formatDashboardDraftDescription(
+            activitySummary?.draftActivities ?? 0
+          ),
       id: 'activities',
-      label: 'Activities',
+      label: m.dashboard_overview_metric_activities_label(),
       value: formatDashboardMetricValue(activitySummary?.totalActivities),
     },
     {
-      description: 'Template families represented by your active activities',
+      description: m.dashboard_overview_metric_templates_description(),
       id: 'templates',
-      label: 'Templates',
+      label: m.dashboard_overview_metric_templates_label(),
       value: `${activitySummary?.templateCoverage ?? 0}/${activityTemplates.length}`,
     },
     {
-      description: 'Open classroom share links',
+      description: m.dashboard_overview_metric_assignments_description(),
       id: 'assignments',
-      label: 'Assignments',
+      label: m.dashboard_overview_metric_assignments_label(),
       value: formatDashboardMetricValue(assignmentSummary?.openAssignments),
     },
     {
-      description: `${assignmentSummary?.completions ?? 0} submitted attempts logged`,
+      description: m.dashboard_overview_metric_results_description({
+        count: assignmentSummary?.completions ?? 0,
+      }),
       id: 'results',
-      label: 'Results',
+      label: m.dashboard_overview_metric_results_label(),
       value: `${assignmentSummary?.averageScore ?? 0}%`,
     },
   ];
@@ -131,22 +153,22 @@ export function buildDashboardCoreLoopReadiness(): DashboardCoreLoopReadinessRow
   return [
     {
       id: 'activity-authoring',
-      label: 'Activity authoring',
+      label: m.dashboard_overview_readiness_activity_authoring(),
       value: 100,
     },
     {
       id: 'assignment-links',
-      label: 'Assignment links',
+      label: m.dashboard_overview_readiness_assignment_links(),
       value: 100,
     },
     {
       id: 'student-runner',
-      label: 'Student runner',
+      label: m.dashboard_overview_readiness_student_runner(),
       value: 85,
     },
     {
       id: 'teacher-results',
-      label: 'Teacher results',
+      label: m.dashboard_overview_readiness_teacher_results(),
       value: 90,
     },
   ];
@@ -154,4 +176,10 @@ export function buildDashboardCoreLoopReadiness(): DashboardCoreLoopReadinessRow
 
 export function formatDashboardMetricValue(value: number | undefined) {
   return value === undefined ? '-' : String(value);
+}
+
+function formatDashboardDraftDescription(count: number) {
+  return count === 1
+    ? m.dashboard_overview_metric_activities_description_one({ count })
+    : m.dashboard_overview_metric_activities_description_many({ count });
 }

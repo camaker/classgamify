@@ -111,9 +111,9 @@ import { getWorksheetModeDefinitions } from '@/activities/worksheet-modes';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
-  dashboardOverviewActionCards,
   dashboardOverviewPageCopy,
   formatDashboardMetricValue,
+  getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
@@ -2844,7 +2844,11 @@ assert.deepEqual(dashboardOverviewPageCopy, {
   title: 'Teacher dashboard',
 });
 assert.deepEqual(
-  dashboardOverviewActionCards.map((card) => [card.id, card.title, card.cta]),
+  getDashboardOverviewActionCards().map((card) => [
+    card.id,
+    card.title,
+    card.cta,
+  ]),
   [
     ['activities', 'Activities', 'Open activities'],
     ['assignments', 'Assignments', 'Open assignments'],
