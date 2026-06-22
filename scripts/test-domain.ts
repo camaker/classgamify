@@ -2363,6 +2363,63 @@ assert.deepEqual(publicAssignmentPayload.snapshot, {
 assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
 assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
+const publicRuntimeSanitizationInput = {
+  description: 'Sanitized runtime payload source',
+  difficulty: 'core' as const,
+  gradeBand: 'Grade 4',
+  groupsText: 'Animals | cat, dog\nPlants | tree, fern',
+  language: 'en',
+  learningGoal: 'Students answer every supported public activity mode.',
+  pairsText: 'Hot | Cold\nUp | Down',
+  questionsText:
+    'Capital? | Paris / Paris, France | Paris, Rome, Lyon | Paris explanation\nOpposite of day? | night | day, night, noon | Night explanation',
+  sourceSummary: 'A complete activity for public runtime sanitization.',
+  subject: 'General',
+  teacherNotesText: 'These notes should never reach public runtime items.',
+  title: 'Sanitized runtime activity',
+  visibility: 'draft' as const,
+  vocabularyText: 'Paris, France, night, cat, tree, Cold, Down',
+};
+for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
+  const content = buildActivityContent({
+    ...publicRuntimeSanitizationInput,
+    templateType,
+  });
+  const payload = buildPublicAssignmentPayload({
+    activity: {
+      contentJson: content,
+      description: 'Sanitized runtime activity description',
+      id: `activity-public-${templateType}`,
+      templateType,
+      title: `Sanitized ${templateType}`,
+      visibility: 'draft',
+    },
+    assignment: {
+      expiresAt: null,
+      id: `assignment-public-${templateType}`,
+      settingsJson: null,
+      shareSlug: ` share-${templateType} `,
+      status: 'published',
+      title: `Public ${templateType}`,
+    },
+    snapshot: null,
+  });
+  const runtimeItems = getRuntimeItems(templateType, content);
+
+  assert.equal(payload.assignment.shareSlug, `share-${templateType}`);
+  assert.equal(payload.runtimeItems.length, runtimeItems.length);
+  payload.runtimeItems.forEach((item, index) => {
+    assert.deepEqual(Object.keys(item).sort(), [
+      'choices',
+      'id',
+      'kind',
+      'prompt',
+    ]);
+    assert.equal('answer' in item, false);
+    assert.equal('explanation' in item, false);
+    assert.deepEqual(item.choices, runtimeItems[index]?.choices);
+  });
+}
 const runnerStateStarterActivity = {
   content: publicPayloadSnapshotContent,
   description: 'Starter activity description',
@@ -2718,6 +2775,17 @@ assert.deepEqual(publicRuntimeItem, {
 });
 assert.equal('answer' in publicRuntimeItem, false);
 assert.equal('explanation' in publicRuntimeItem, false);
+const runtimeChoiceSource = ['Paris', 'Rome'];
+const clonedPublicRuntimeItem = stripRuntimeAnswer({
+  answer: 'Paris',
+  choices: runtimeChoiceSource,
+  id: 'q-1',
+  kind: 'question',
+  prompt: 'Capital of France?',
+});
+assert.notStrictEqual(clonedPublicRuntimeItem.choices, runtimeChoiceSource);
+runtimeChoiceSource.push('Lyon');
+assert.deepEqual(clonedPublicRuntimeItem.choices, ['Paris', 'Rome']);
 assert.deepEqual(
   stripRuntimeAnswers([
     {

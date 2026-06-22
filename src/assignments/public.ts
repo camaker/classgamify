@@ -142,7 +142,7 @@ export function stripRuntimeAnswers(
 
 export function stripRuntimeAnswer(item: RuntimeItem): PublicRuntimeItem {
   return {
-    choices: item.choices,
+    choices: item.choices ? [...item.choices] : undefined,
     id: item.id,
     kind: item.kind,
     prompt: item.prompt,
