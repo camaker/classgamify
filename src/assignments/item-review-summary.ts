@@ -5,6 +5,7 @@ import {
 } from '@/assignments/result-summary-format';
 import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import type { AssignmentItemAnalysis } from '@/assignments/results';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentItemReviewSummaryInput = {
   assignmentTitle: string;
@@ -18,7 +19,7 @@ export function buildAssignmentItemReviewSummary({
   const sortedItems = sortAssignmentItemsByReviewPriority(items);
 
   const lines = [
-    `ClassGamify item review: ${assignmentTitle}`,
+    m.assignment_item_review_title({ title: assignmentTitle }),
     '',
     ...formatItems(sortedItems),
   ];
@@ -28,21 +29,29 @@ export function buildAssignmentItemReviewSummary({
 
 function formatItems(items: AssignmentItemAnalysis[]) {
   if (items.length === 0) {
-    return ['- No item performance data yet.'];
+    return [m.assignment_item_review_empty()];
   }
 
   return items.map((item, index) => {
-    const explanation = item.explanation ? ` Notes: ${item.explanation}` : '';
+    const explanation = item.explanation
+      ? m.assignment_item_review_notes({ notes: item.explanation })
+      : '';
     const acceptedAnswers =
       item.acceptedAnswers.length > 1
-        ? ` Accepted answers: ${formatAcceptedAnswerAlternatives(
-            item.acceptedAnswers
-          )}.`
+        ? m.assignment_item_review_accepted_answers({
+            answers: formatAcceptedAnswerAlternatives(item.acceptedAnswers),
+          })
         : '';
-    return `- ${index + 1}. ${item.prompt} (${item.kindLabel}) - ${formatAssignmentSummaryCorrectRate(
-      item.correctRate
-    )}, ${formatAssignmentSummaryCorrectCount(
-      item
-    )}. Expected: ${item.expectedAnswer || '-'}.${acceptedAnswers}${explanation}`;
+
+    return m.assignment_item_review_line({
+      acceptedAnswers,
+      correctCount: formatAssignmentSummaryCorrectCount(item),
+      correctRate: formatAssignmentSummaryCorrectRate(item.correctRate),
+      expected: item.expectedAnswer || '-',
+      index: index + 1,
+      kind: item.kindLabel,
+      notes: explanation,
+      prompt: item.prompt,
+    });
   });
 }

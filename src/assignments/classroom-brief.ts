@@ -10,6 +10,7 @@ import {
 } from '@/assignments/result-summary-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentClassroomBriefStats = {
   averageDurationSeconds: number;
@@ -40,17 +41,25 @@ export function buildAssignmentClassroomBrief({
   const focusItems = getClassroomBriefFocusItems(items);
   const followUpStudents = getClassroomBriefFollowUpStudents(students);
   const lines = [
-    `ClassGamify classroom brief: ${assignmentTitle}`,
+    m.assignment_classroom_brief_title({ title: assignmentTitle }),
     '',
-    `Completions: ${stats.completions}`,
-    `Average accuracy: ${formatAssignmentSummaryAccuracy(stats.averageScore)}`,
-    `Average points: ${stats.averagePoints}`,
-    `Average time: ${formatAttemptDuration(stats.averageDurationSeconds)}`,
+    m.assignment_classroom_brief_completions({
+      count: stats.completions,
+    }),
+    m.assignment_classroom_brief_average_accuracy({
+      accuracy: formatAssignmentSummaryAccuracy(stats.averageScore),
+    }),
+    m.assignment_classroom_brief_average_points({
+      points: stats.averagePoints,
+    }),
+    m.assignment_classroom_brief_average_time({
+      time: formatAttemptDuration(stats.averageDurationSeconds),
+    }),
     '',
-    'Class review focus:',
+    m.assignment_classroom_brief_focus_heading(),
     ...formatFocusItems(focusItems),
     '',
-    'Student follow-up:',
+    m.assignment_classroom_brief_follow_up_heading(),
     ...formatFollowUpStudents(followUpStudents),
   ];
 
@@ -73,26 +82,31 @@ function getClassroomBriefFollowUpStudents(
 
 function formatFocusItems(items: AssignmentItemAnalysis[]) {
   if (items.length === 0) {
-    return ['- No submitted item data yet.'];
+    return [m.assignment_classroom_brief_empty_items()];
   }
 
-  return items.map(
-    (item, index) =>
-      `- ${index + 1}. ${item.prompt} (${formatAssignmentSummaryItemPerformance(item)})`
+  return items.map((item, index) =>
+    m.assignment_classroom_brief_focus_item({
+      index: index + 1,
+      performance: formatAssignmentSummaryItemPerformance(item),
+      prompt: item.prompt,
+    })
   );
 }
 
 function formatFollowUpStudents(students: AssignmentStudentSummary[]) {
   if (students.length === 0) {
-    return ['- No student-specific review needs yet.'];
+    return [m.assignment_classroom_brief_empty_students()];
   }
 
-  return students.map(
-    (student, index) =>
-      `- ${index + 1}. ${student.studentLabel}: ${formatAssignmentSummaryAccuracy(
-        student.latestAccuracy
-      )} latest, ${formatAssignmentSummaryReviewItemCount(
+  return students.map((student, index) =>
+    m.assignment_classroom_brief_follow_up_student({
+      accuracy: formatAssignmentSummaryAccuracy(student.latestAccuracy),
+      index: index + 1,
+      reviewCount: formatAssignmentSummaryReviewItemCount(
         student.needsReviewCount
-      )}`
+      ),
+      student: student.studentLabel,
+    })
   );
 }

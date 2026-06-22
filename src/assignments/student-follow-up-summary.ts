@@ -5,6 +5,7 @@ import {
 } from '@/assignments/result-summary-format';
 import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import type { AssignmentStudentSummary } from '@/assignments/results';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentStudentFollowUpSummaryInput = {
   assignmentTitle: string;
@@ -18,7 +19,7 @@ export function buildAssignmentStudentFollowUpSummary({
   const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
 
   const lines = [
-    `ClassGamify student follow-up: ${assignmentTitle}`,
+    m.assignment_student_follow_up_title({ title: assignmentTitle }),
     '',
     ...formatStudents(sortedStudents),
   ];
@@ -28,19 +29,20 @@ export function buildAssignmentStudentFollowUpSummary({
 
 function formatStudents(students: AssignmentStudentSummary[]) {
   if (students.length === 0) {
-    return ['- No student attempts yet.'];
+    return [m.assignment_student_follow_up_empty()];
   }
 
-  return students.map(
-    (student, index) =>
-      `- ${index + 1}. ${student.studentLabel}: latest ${formatAssignmentSummaryAccuracy(
-        student.latestAccuracy
-      )}, average ${formatAssignmentSummaryAccuracy(
-        student.averageAccuracy
-      )}, best ${formatAssignmentSummaryAccuracy(
-        student.bestAccuracy
-      )}, ${formatAssignmentSummaryAttemptCount(
-        student.attempts
-      )}, ${formatAssignmentSummaryReviewItemCount(student.needsReviewCount)}`
+  return students.map((student, index) =>
+    m.assignment_student_follow_up_line({
+      attempts: formatAssignmentSummaryAttemptCount(student.attempts),
+      average: formatAssignmentSummaryAccuracy(student.averageAccuracy),
+      best: formatAssignmentSummaryAccuracy(student.bestAccuracy),
+      index: index + 1,
+      latest: formatAssignmentSummaryAccuracy(student.latestAccuracy),
+      reviewCount: formatAssignmentSummaryReviewItemCount(
+        student.needsReviewCount
+      ),
+      student: student.studentLabel,
+    })
   );
 }

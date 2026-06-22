@@ -1,9 +1,13 @@
+import { m } from '@/locale/paraglide/messages';
+
 export function formatAssignmentSummaryAccuracy(value: number) {
   return `${value}%`;
 }
 
 export function formatAssignmentSummaryCorrectRate(value: number) {
-  return `${formatAssignmentSummaryAccuracy(value)} correct`;
+  return m.assignment_result_summary_correct_rate({
+    accuracy: formatAssignmentSummaryAccuracy(value),
+  });
 }
 
 export function formatAssignmentSummaryCorrectCount({
@@ -13,15 +17,26 @@ export function formatAssignmentSummaryCorrectCount({
   correctCount: number;
   submittedCount: number;
 }) {
-  return `${correctCount}/${submittedCount} correct`;
+  return m.assignment_result_summary_correct_count({
+    correctCount,
+    submittedCount,
+  });
 }
 
 export function formatAssignmentSummaryReviewItemCount(count: number) {
-  return `${count} ${count === 1 ? 'item' : 'items'} to review`;
+  if (count === 1) {
+    return m.assignment_result_summary_review_items_one({ count });
+  }
+
+  return m.assignment_result_summary_review_items_many({ count });
 }
 
 export function formatAssignmentSummaryAttemptCount(count: number) {
-  return `${count} ${count === 1 ? 'attempt' : 'attempts'}`;
+  if (count === 1) {
+    return m.assignment_result_summary_attempts_one({ count });
+  }
+
+  return m.assignment_result_summary_attempts_many({ count });
 }
 
 export function formatAssignmentSummaryItemPerformance({
@@ -33,7 +48,9 @@ export function formatAssignmentSummaryItemPerformance({
   correctRate: number;
   submittedCount: number;
 }) {
-  return `${formatAssignmentSummaryCorrectRate(
-    correctRate
-  )}, ${correctCount}/${submittedCount}`;
+  return m.assignment_result_summary_item_performance({
+    correctCount,
+    correctRate: formatAssignmentSummaryCorrectRate(correctRate),
+    submittedCount,
+  });
 }
