@@ -2,6 +2,7 @@ import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
@@ -20,43 +21,79 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/(pages)/roadmap')({
   head: () =>
     seo(Routes.Roadmap, {
-      title: `Roadmap | ${websiteConfig.metadata?.name}`,
-      description:
-        'ClassGamify roadmap for templates, activity creation, assignments, student attempts, results, and AI-assisted remixing.',
+      title: `${m.roadmap_title()} | ${websiteConfig.metadata?.name}`,
+      description: m.roadmap_description(),
     }),
   component: RoadmapPage,
 });
 
 function RoadmapPage() {
+  const snapshots = [
+    {
+      title: m.roadmap_snapshot_live_title(),
+      description: m.roadmap_snapshot_live_description(),
+    },
+    {
+      title: m.roadmap_snapshot_loop_title(),
+      description: m.roadmap_snapshot_loop_description(),
+    },
+    {
+      title: m.roadmap_snapshot_expansion_title(),
+      description: m.roadmap_snapshot_expansion_description(),
+    },
+  ];
+
   const columns = [
     {
-      title: 'Usable core loop',
+      title: m.roadmap_columns_done(),
+      description: m.roadmap_columns_done_description(),
+      status: m.roadmap_status_available(),
       icon: IconCheck,
       items: [
-        'Structured activities with template-neutral content',
-        'Publish dialog with delivery settings preview',
-        'Student play links with scoring and attempt limits',
-        'Teacher results with summaries, exports, and review filters',
+        {
+          title: m.roadmap_board_tasks_done_0_title(),
+          description: m.roadmap_board_tasks_done_0_description(),
+        },
+        {
+          title: m.roadmap_board_tasks_done_1_title(),
+          description: m.roadmap_board_tasks_done_1_description(),
+        },
       ],
     },
     {
-      title: 'Template depth',
+      title: m.roadmap_columns_in_progress(),
+      description: m.roadmap_columns_in_progress_description(),
+      status: m.roadmap_status_improving(),
       icon: IconDeviceGamepad2,
       items: [
-        'Richer drag-and-drop polish for sort and matching modes',
-        'Worksheet extraction and printable follow-up flows',
-        'Teacher audio upload for listening activities',
-        'More classroom-ready variants from the same activity',
+        {
+          title: m.roadmap_board_tasks_in_progress_0_title(),
+          description: m.roadmap_board_tasks_in_progress_0_description(),
+        },
+        {
+          title: m.roadmap_board_tasks_in_progress_1_title(),
+          description: m.roadmap_board_tasks_in_progress_1_description(),
+        },
       ],
     },
     {
-      title: 'AI advantage',
+      title: m.roadmap_columns_backlog(),
+      description: m.roadmap_columns_backlog_description(),
+      status: m.roadmap_status_exploring(),
       icon: IconSparkles,
       items: [
-        'Improve lesson-note drafts with teacher-controlled provenance',
-        'Transform missing fields for locked template remixes',
-        'Differentiate by grade or difficulty',
-        'Suggest reteach activities from results',
+        {
+          title: m.roadmap_board_tasks_backlog_0_title(),
+          description: m.roadmap_board_tasks_backlog_0_description(),
+        },
+        {
+          title: m.roadmap_board_tasks_backlog_1_title(),
+          description: m.roadmap_board_tasks_backlog_1_description(),
+        },
+        {
+          title: m.roadmap_board_tasks_backlog_2_title(),
+          description: m.roadmap_board_tasks_backlog_2_description(),
+        },
       ],
     },
   ];
@@ -64,21 +101,18 @@ function RoadmapPage() {
   const principles = [
     {
       icon: IconLayoutGrid,
-      title: 'Template-first',
-      description:
-        'New features must preserve the Wordwall-style loop: pick a template, edit content, publish, and track.',
+      title: m.roadmap_principle_focus_title(),
+      description: m.roadmap_principle_focus_description(),
     },
     {
       icon: IconListCheck,
-      title: 'Assignment-aware',
-      description:
-        'Reusable activities and classroom delivery instances stay separate so teachers can reuse lessons cleanly.',
+      title: m.roadmap_principle_learning_title(),
+      description: m.roadmap_principle_learning_description(),
     },
     {
       icon: IconChartBar,
-      title: 'Results before polish',
-      description:
-        'Even simple completion and score data should arrive early, because teachers need feedback from every assignment.',
+      title: m.roadmap_validation_item_workflow_title(),
+      description: m.roadmap_validation_item_workflow_description(),
     },
   ];
 
@@ -89,18 +123,14 @@ function RoadmapPage() {
           <div className="space-y-5">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconDeviceGamepad2 className="size-3.5" />
-              Product roadmap
+              {m.roadmap_eyebrow()}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
-                Build the Wordwall-core loop first, then make AI the
-                accelerator.
+                {m.roadmap_title()}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                ClassGamify starts with teacher-owned activities, a focused
-                template catalog, public student play links, and teacher result
-                review. The next product passes deepen template interactions and
-                make AI useful inside that loop.
+                {m.roadmap_subtitle()}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -108,7 +138,7 @@ function RoadmapPage() {
                 to={Routes.Create}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
-                Create activity
+                {m.roadmap_primary_cta()}
                 <IconArrowRight className="size-4" />
               </Link>
               <Link
@@ -118,22 +148,27 @@ function RoadmapPage() {
                   'rounded-lg bg-background'
                 )}
               >
-                Browse templates
+                {m.roadmap_secondary_cta()}
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border bg-card p-5">
-            <p className="text-sm font-medium text-muted-foreground">
-              Current north star
-            </p>
-            <p className="mt-3 text-2xl font-semibold tracking-tight">
-              {'Create -> publish -> play -> results'}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Every implementation pass should make this loop more real for a
-              teacher and a student.
-            </p>
+            <div className="space-y-4">
+              {snapshots.map((snapshot, index) => (
+                <div
+                  key={snapshot.title}
+                  className={cn(index > 0 && 'border-t pt-4')}
+                >
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {snapshot.title}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {snapshot.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -148,6 +183,26 @@ function RoadmapPage() {
             <PrincipleCard key={item.title} item={item} />
           ))}
         </section>
+
+        <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-primary">
+              {m.roadmap_validation_eyebrow()}
+            </p>
+            <h2 className="mt-2 text-xl font-semibold">
+              {m.roadmap_validation_title()}
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+              {m.roadmap_validation_description()}
+            </p>
+          </div>
+          <Link
+            to={Routes.ContactClassroom}
+            className={cn(buttonVariants(), 'w-full md:w-auto')}
+          >
+            {m.roadmap_feedback_cta()}
+          </Link>
+        </section>
       </div>
     </Container>
   );
@@ -157,27 +212,47 @@ function RoadmapColumn({
   column,
 }: {
   column: {
+    description: string;
     icon: TablerIcon;
-    items: string[];
+    items: {
+      description: string;
+      title: string;
+    }[];
+    status: string;
     title: string;
   };
 }) {
   return (
     <div className="rounded-lg border bg-card p-5">
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-          <column.icon className="size-4" />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+            <column.icon className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="font-semibold">{column.title}</h2>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {column.description}
+            </p>
+          </div>
         </div>
-        <h2 className="font-semibold">{column.title}</h2>
+        <Badge variant="secondary" className="shrink-0 rounded-md">
+          {column.status}
+        </Badge>
       </div>
       <ul className="mt-5 space-y-3">
         {column.items.map((item) => (
           <li
-            key={item}
+            key={item.title}
             className="grid grid-cols-[1rem_minmax(0,1fr)] gap-2 text-sm leading-6"
           >
             <IconCheck className="mt-1 size-4 text-primary" />
-            <span>{item}</span>
+            <span>
+              <span className="block font-medium">{item.title}</span>
+              <span className="mt-1 block text-muted-foreground">
+                {item.description}
+              </span>
+            </span>
           </li>
         ))}
       </ul>
