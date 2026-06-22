@@ -511,6 +511,7 @@ const activeLocaleMessageText = [
   .join('\n');
 assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
 assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
+assert.doesNotMatch(activeLocaleMessageText, /"legacy_/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
@@ -535,6 +536,16 @@ assert.equal(
   existsSync('src/routes/hsk/1.tsx'),
   false,
   'Legacy HSK course route should stay unmounted.'
+);
+assert.equal(
+  existsSync('src/routes/learn.tsx'),
+  false,
+  'Legacy learning route should stay unmounted.'
+);
+assert.equal(
+  existsSync('src/components/activities/legacy-product-route.tsx'),
+  false,
+  'Legacy product migration component should stay removed.'
 );
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);

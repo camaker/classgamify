@@ -15,7 +15,6 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
-import { Route as LearnRouteImport } from './routes/learn'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -89,11 +88,6 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
   id: '/manifest.json',
   path: '/manifest.json',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnRoute = LearnRouteImport.update({
-  id: '/learn',
-  path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -325,7 +319,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -376,7 +369,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/create': typeof CreateRoute
-  '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -429,7 +421,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/learn': typeof LearnRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -484,7 +475,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create'
     | '/dashboard'
-    | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
@@ -535,7 +525,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/create'
-    | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -587,7 +576,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/create'
     | '/dashboard'
-    | '/learn'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
@@ -641,7 +629,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRouteWithChildren
-  LearnRoute: typeof LearnRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
@@ -711,13 +698,6 @@ declare module '@tanstack/react-router' {
       path: '/manifest.json'
       fullPath: '/manifest.json'
       preLoaderRoute: typeof ManifestDotjsonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learn': {
-      id: '/learn'
-      path: '/learn'
-      fullPath: '/learn'
-      preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1131,7 +1111,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRouteWithChildren,
-  LearnRoute: LearnRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
