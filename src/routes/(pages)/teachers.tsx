@@ -2,8 +2,8 @@ import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
-  activityTemplates,
   formatActivityTemplateClassroomMode,
+  getActivityTemplates,
 } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
@@ -133,7 +133,7 @@ function TeachersPage() {
               {m.teachers_page_template_panel_title()}
             </p>
             <div className="mt-4 grid gap-2">
-              {activityTemplates.map((template) => (
+              {getActivityTemplates().map((template) => (
                 <div
                   key={template.type}
                   className="flex items-center justify-between gap-3 rounded-lg border bg-background p-3"

@@ -47,6 +47,8 @@ import {
   activityTemplateByType,
   activityTemplates,
   formatActivityTemplateClassroomMode,
+  getActivityTemplates,
+  getTemplateByType,
   starterActivities,
 } from '@/activities/catalog';
 import {
@@ -2705,6 +2707,14 @@ assert.deepEqual(
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
 assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(getActivityTemplates()[0]?.name, '测验');
+  assert.equal(getTemplateByType('group-sort')?.shortName, '分类');
+  assert.equal(formatActivityTemplateClassroomMode('whole-class'), '全班互动');
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(buildTemplateCreateSearch('line-match'), {
   template: 'line-match',
 });

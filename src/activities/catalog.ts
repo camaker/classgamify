@@ -317,7 +317,7 @@ export function getTemplateByType(
   type: string
 ): ActivityTemplateDefinition | undefined;
 export function getTemplateByType(type: string) {
-  return activityTemplateByType[type as ActivityTemplateType];
+  return getLocalizedActivityTemplateByTypeMap()[type as ActivityTemplateType];
 }
 
 export function formatActivityTemplateClassroomMode(

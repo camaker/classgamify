@@ -1,4 +1,4 @@
-import { activityTemplates, getTemplateByType } from '@/activities/catalog';
+import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import { getActivityDraftSourceText } from '@/activities/draft-source';
 import {
   getActivityEditorDefaultInput,
@@ -17,7 +17,6 @@ import {
 } from '@/activities/draft-meta';
 import {
   activityDifficultySchema,
-  activityTemplateTypeSchema,
   activityVisibilitySchema,
   createActivityInputSchema,
   type CreateActivityInput,
@@ -72,7 +71,6 @@ import { toast } from 'sonner';
 
 const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
-const templateTypeOptions = activityTemplateTypeSchema.options;
 const draftItemCountOptions = [3, 5, 8, 10] as const;
 type ActivityFormDifficulty = (typeof difficultyOptions)[number];
 type ActivityFormVisibility = (typeof visibilityOptions)[number];
@@ -107,6 +105,7 @@ export function ActivityCreateForm({
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');
+  const localizedTemplates = getActivityTemplates();
   const watchedValues = form.watch();
   const template = getTemplateByType(selectedTemplate);
   const templateSetupView = useMemo(
@@ -348,14 +347,11 @@ export function ActivityCreateForm({
                     </FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
-                        {templateTypeOptions.map((type) => {
-                          const item = getTemplateByType(type);
-                          return (
-                            <NativeSelectOption key={type} value={type}>
-                              {item.name}
-                            </NativeSelectOption>
-                          );
-                        })}
+                        {localizedTemplates.map((item) => (
+                          <NativeSelectOption key={item.type} value={item.type}>
+                            {item.name}
+                          </NativeSelectOption>
+                        ))}
                       </NativeSelect>
                     </FormControl>
                     <FormDescription>{template.bestFor}</FormDescription>
