@@ -4,6 +4,7 @@ import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { formatDate } from '@/lib/formatter';
 import { getPostBySlug } from '@/lib/blog';
 import { getLocale, localeConfig } from '@/lib/locale';
@@ -68,7 +69,6 @@ export const Route = createFileRoute('/blog/$slug')({
 function BlogPostPage() {
   const { post } = Route.useLoaderData();
   if (!post) throw notFound();
-  const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
 
   return (
     <Container className="px-4 py-16">
@@ -78,7 +78,7 @@ function BlogPostPage() {
           className={cn(buttonVariants({ variant: 'ghost' }), 'px-0')}
         >
           <IconArrowLeft className="size-4" />
-          {currentLocale === 'zh' ? '返回文章列表' : 'Back to articles'}
+          {m.blog_post_back_to_articles()}
         </Link>
         <header className="space-y-5">
           <div className="flex flex-wrap items-center gap-3">
@@ -109,34 +109,30 @@ function BlogPostPage() {
           <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <div className="min-w-0 space-y-2">
               <h2 className="text-lg font-semibold tracking-normal">
-                {currentLocale === 'zh'
-                  ? '把方法放进下一个课堂活动'
-                  : 'Put this method into the next activity'}
+                {m.blog_post_cta_title()}
               </h2>
               <p className="text-sm leading-6 text-muted-foreground">
-                {currentLocale === 'zh'
-                  ? '创建一个活动，浏览模板，或打开学生预览检查作业体验。'
-                  : 'Create an activity, browse templates, or open the student preview to check the assignment experience.'}
+                {m.blog_post_cta_description()}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 sm:justify-end">
               <Link to={Routes.Create} className={buttonVariants()}>
                 <IconPlus className="size-4" />
-                {currentLocale === 'zh' ? '创建活动' : 'Create activity'}
+                {m.blog_page_create_activity()}
               </Link>
               <Link
                 to={Routes.Templates}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconLayoutGrid className="size-4" />
-                {currentLocale === 'zh' ? '浏览模板' : 'Browse templates'}
+                {m.blog_page_browse_templates()}
               </Link>
               <Link
                 to={Routes.PlayDemo}
                 className={cn(buttonVariants({ variant: 'outline' }))}
               >
                 <IconDeviceGamepad2 className="size-4" />
-                {currentLocale === 'zh' ? '学生预览' : 'Student preview'}
+                {m.blog_page_student_preview()}
               </Link>
             </div>
           </div>

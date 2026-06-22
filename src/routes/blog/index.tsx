@@ -3,8 +3,8 @@ import { BlogPagination } from '@/components/blog/blog-pagination';
 import Container from '@/components/layout/container';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { getPaginatedPosts } from '@/lib/blog';
-import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
@@ -23,60 +23,46 @@ export const Route = createFileRoute('/blog/')({
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: ({ deps }) => getPaginatedPosts(deps.page),
   head: () => {
-    const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
-    const title =
-      currentLocale === 'zh'
-        ? `课堂活动资源 | ${websiteConfig.metadata?.name}`
-        : `Classroom Activity Resources | ${websiteConfig.metadata?.name}`;
-    const description =
-      currentLocale === 'zh'
-        ? '阅读 ClassGamify 关于游戏化活动、作业链接、课堂模板和 AI 辅助创建的产品文章。'
-        : 'Read ClassGamify articles about game-based activities, assignment links, classroom templates, and AI-assisted creation.';
-
-    return seo(Routes.Blog, { title, description });
+    return seo(Routes.Blog, {
+      title: `${m.blog_page_seo_title()} | ${websiteConfig.metadata?.name}`,
+      description: m.blog_page_seo_description(),
+    });
   },
   component: BlogListPage,
 });
 
 function BlogListPage() {
   const { currentPage, posts, totalPages } = Route.useLoaderData();
-  const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
   return (
     <Container className="px-4 py-16">
       <div className="mx-auto max-w-6xl space-y-8">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
           <p className="text-sm font-medium text-primary">
-            {currentLocale === 'zh' ? '课堂活动' : 'Classroom activities'}
+            {m.blog_page_eyebrow()}
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">
-            {currentLocale === 'zh'
-              ? '模板、作业和游戏化课堂'
-              : 'Templates, assignments, and classroom games'}
+            {m.blog_page_title()}
           </h1>
-          <p className="text-muted-foreground">
-            {currentLocale === 'zh'
-              ? '围绕老师创建活动、发布作业和用 AI 加速备课的短文章。'
-              : 'Short articles about teacher activity creation, publishing assignments, and using AI to speed up prep.'}
-          </p>
+          <p className="text-muted-foreground">{m.blog_page_description()}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2 rounded-lg border bg-muted/20 p-3">
           <Link to={Routes.Create} className={buttonVariants()}>
             <IconPlus className="size-4" />
-            {currentLocale === 'zh' ? '创建活动' : 'Create activity'}
+            {m.blog_page_create_activity()}
           </Link>
           <Link
             to={Routes.Templates}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
             <IconLayoutGrid className="size-4" />
-            {currentLocale === 'zh' ? '浏览模板' : 'Browse templates'}
+            {m.blog_page_browse_templates()}
           </Link>
           <Link
             to={Routes.PlayDemo}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
             <IconDeviceGamepad2 className="size-4" />
-            {currentLocale === 'zh' ? '学生预览' : 'Student preview'}
+            {m.blog_page_student_preview()}
           </Link>
         </div>
         <BlogGrid posts={posts} />
