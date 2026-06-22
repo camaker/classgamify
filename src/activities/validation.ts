@@ -9,7 +9,10 @@ import {
   type ActivityVisibility,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
-import { buildQuestionOptionTexts } from '@/activities/question-options';
+import {
+  buildQuestionOptionTexts,
+  normalizeQuestionOptionDisplayText,
+} from '@/activities/question-options';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { m } from '@/locale/paraglide/messages';
 import { z } from 'zod';
@@ -122,18 +125,19 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
       );
     }
 
+    const normalizedAnswer = normalizeQuestionOptionDisplayText(answer);
     const allOptions = buildQuestionOptionTexts({
-      answer,
+      answer: normalizedAnswer,
       options: parseInlineList(optionsRaw),
     });
 
     return {
-      answer,
+      answer: normalizedAnswer,
       id: makeId('q', prompt, index),
       explanation,
       options: allOptions.map((option, optionIndex) => ({
         id: makeId('o', option, optionIndex),
-        isCorrect: option === answer,
+        isCorrect: option === normalizedAnswer,
         text: option,
       })),
       prompt,

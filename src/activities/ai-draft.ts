@@ -10,7 +10,10 @@ import {
   createActivityInputSchema,
   type CreateActivityInput,
 } from '@/activities/validation';
-import { buildQuestionOptionTexts } from '@/activities/question-options';
+import {
+  buildQuestionOptionTexts,
+  normalizeQuestionOptionDisplayText,
+} from '@/activities/question-options';
 import {
   formatTemplateRequirement,
   formatTemplateRequirementList,
@@ -250,13 +253,14 @@ export function createActivityInputFromAiDraft({
       .join('\n'),
     questionsText: shapedDraft.questions
       .map((question) => {
+        const answer = normalizeQuestionOptionDisplayText(question.answer);
         const options = buildQuestionOptionTexts({
-          answer: question.answer,
+          answer,
           options: question.options ?? [],
         });
         return [
           question.prompt,
-          question.answer,
+          answer,
           options.join(', '),
           question.explanation,
         ]

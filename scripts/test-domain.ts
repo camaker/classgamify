@@ -4231,6 +4231,13 @@ assert.deepEqual(
   }),
   ['Paris', 'Rome', 'Berlin', 'Madrid', 'Lisbon']
 );
+assert.deepEqual(
+  buildQuestionOptionTexts({
+    answer: ' Ｃａｔ ',
+    options: ['cat', ' CAT ', 'ｔｒｅｅ'],
+  }),
+  ['Cat', 'tree']
+);
 const optionRoundTripContent = buildActivityContent({
   description: 'Question option normalization',
   difficulty: 'starter',
@@ -4261,6 +4268,34 @@ assert.equal(
     visibility: 'draft',
   }).questionsText,
   'Capital of France? | Paris | Paris, Rome, Berlin'
+);
+const fullwidthAnswerContent = buildActivityContent({
+  description: 'Fullwidth answer normalization',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer normalized fullwidth option questions.',
+  pairsText: '',
+  questionsText: 'Which word is an animal? | Ｃａｔ | cat, ｔｒｅｅ',
+  sourceSummary: 'Fullwidth option normalization check',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Fullwidth option normalization',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.equal(fullwidthAnswerContent.questions[0]?.answer, 'Cat');
+assert.deepEqual(
+  fullwidthAnswerContent.questions[0]?.options.map((option) => [
+    option.text,
+    option.isCorrect,
+  ]),
+  [
+    ['Cat', true],
+    ['tree', false],
+  ]
 );
 assert.doesNotThrow(() =>
   buildActivityContent(
@@ -5384,7 +5419,7 @@ const duplicateOptionAiDraft = {
   ...oversizedAiDraft,
   questions: [
     {
-      answer: 'cat',
+      answer: 'ｃａｔ',
       explanation: 'A cat is an animal.',
       options: [' CAT ', 'cat', 'ｃａｔ', 'tree', ' TREE ', 'rain'],
       prompt: 'Which word is an animal?',
@@ -5403,14 +5438,19 @@ const duplicateOptionAiDraft = {
     },
   ],
 } satisfies AiActivityDraft;
+const duplicateOptionQuizDraft = createActivityInputFromAiDraft({
+  draft: duplicateOptionAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'quiz',
+  },
+});
+assert.equal(
+  duplicateOptionQuizDraft.questionsText.split('\n')[0],
+  'Which word is an animal? | cat | cat, tree, rain | A cat is an animal.'
+);
 const duplicateOptionQuizContent = buildActivityContent(
-  createActivityInputFromAiDraft({
-    draft: duplicateOptionAiDraft,
-    input: {
-      ...aiDraftInputBase,
-      templateType: 'quiz',
-    },
-  })
+  duplicateOptionQuizDraft
 );
 assert.deepEqual(
   duplicateOptionQuizContent.questions[0]?.options.map((option) => [

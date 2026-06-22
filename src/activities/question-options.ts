@@ -18,7 +18,7 @@ function uniqueQuestionOptionTexts(values: string[]) {
   const options: string[] = [];
 
   for (const value of values) {
-    const option = value.trim();
+    const option = normalizeQuestionOptionDisplayText(value);
     const key = normalizeQuestionOptionText(option);
     if (!option || seen.has(key)) continue;
 
@@ -30,5 +30,9 @@ function uniqueQuestionOptionTexts(values: string[]) {
 }
 
 export function normalizeQuestionOptionText(value: string) {
-  return value.normalize('NFKC').trim().toLowerCase();
+  return normalizeQuestionOptionDisplayText(value).toLowerCase();
+}
+
+export function normalizeQuestionOptionDisplayText(value: string) {
+  return value.normalize('NFKC').trim();
 }
