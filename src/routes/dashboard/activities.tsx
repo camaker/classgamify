@@ -23,14 +23,18 @@ import {
   type ActivityLibrarySummaryMetricId,
 } from '@/activities/library-summary';
 import {
+  activityLibraryActionCopy,
+  activityLibraryCreatedPanelCopy,
   activityLibraryHeroCopy,
   activityLibraryCardCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
   buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardViewModel,
+  buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
   buildStarterActivityLibraryCardViewModel,
+  resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import {
   assignmentPublishDialogCopy,
@@ -82,6 +86,7 @@ import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
+  IconCircleCheck,
   IconCopy,
   IconDeviceGamepad2,
   IconEdit,
@@ -105,7 +110,10 @@ type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
 
 export const Route = createFileRoute('/dashboard/activities')({
   validateSearch: (search: Record<string, unknown>) => ({
-    created: typeof search.created === 'string' ? search.created : undefined,
+    created:
+      typeof search.created === 'string' && search.created.trim()
+        ? search.created.trim()
+        : undefined,
     page: parseDashboardPageSearch(search.page),
     q: typeof search.q === 'string' ? search.q : undefined,
     status: parseActivityLibraryStatus(search.status),
@@ -123,6 +131,7 @@ function DashboardActivitiesPage() {
   const currentPage = page ?? 1;
   const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
   const { data, isError, isLoading } = useActivities({
+    createdActivityId: created,
     pageIndex: currentPage - 1,
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
     search: normalizedSearchQuery,
@@ -136,6 +145,17 @@ function DashboardActivitiesPage() {
     Math.ceil(totalActivities / ACTIVITY_LIBRARY_PAGE_SIZE)
   );
   const hasActivities = activities.length > 0;
+  const createdPanelActivity = resolveCreatedActivityPanelActivity({
+    activity: data?.createdActivity,
+    activityId: created,
+    items: activities,
+  });
+  const createdPanelContext = created
+    ? buildCreatedActivityPanelContext({
+        activity: createdPanelActivity,
+        isLoading,
+      })
+    : undefined;
   const hasFilters =
     Boolean(normalizedSearchQuery) ||
     templateFilter !== 'all' ||
@@ -245,6 +265,23 @@ function DashboardActivitiesPage() {
           ))}
         </section>
 
+        {created ? (
+          <CreatedActivityPanel
+            context={createdPanelContext}
+            onDismiss={() =>
+              void navigate({
+                replace: true,
+                search: buildActivityLibraryRouteSearch({
+                  page: currentPage === 1 ? undefined : currentPage,
+                  q: searchQuery.trim() ? searchQuery : undefined,
+                  status: libraryStatus,
+                  template: templateFilter,
+                }),
+              })
+            }
+          />
+        ) : null}
+
         <ActivityLibrarySearch
           isLoading={isLoading}
           onClearFilters={clearLibraryFilters}
@@ -347,6 +384,80 @@ function DashboardActivitiesPage() {
         ) : null}
       </div>
     </DashboardLayout>
+  );
+}
+
+function CreatedActivityPanel({
+  context,
+  onDismiss,
+}: {
+  context: ReturnType<typeof buildCreatedActivityPanelContext> | undefined;
+  onDismiss: () => void;
+}) {
+  const panelContext =
+    context ??
+    buildCreatedActivityPanelContext({
+      activity: undefined,
+      isLoading: true,
+    });
+  const { activity } = panelContext;
+
+  return (
+    <section className="grid gap-4 rounded-lg border border-primary/25 bg-primary/5 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 text-sm font-medium text-primary">
+          <IconCircleCheck className="size-4" />
+          {activityLibraryCreatedPanelCopy.savedLabel}
+        </div>
+        <h2 className="mt-2 text-lg font-semibold">{panelContext.title}</h2>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          {panelContext.body}
+        </p>
+        {panelContext.showMissingHint ? (
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
+            {activityLibraryCreatedPanelCopy.missingHint}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+        {panelContext.showEditAction && activity ? (
+          <Link
+            to="/dashboard/activities/$activityId"
+            params={{ activityId: activity.id }}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background sm:w-auto'
+            )}
+          >
+            <IconEdit className="size-4" />
+            {activityLibraryCardCopy.actionLabels.edit}
+          </Link>
+        ) : null}
+        {panelContext.showCreateAction ? (
+          <Link
+            to={Routes.Create}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background sm:w-auto'
+            )}
+          >
+            <IconPlus className="size-4" />
+            {activityLibraryPageCopy.createActivityLabel}
+          </Link>
+        ) : null}
+        {panelContext.showDismissAction ? (
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full sm:w-auto"
+            onClick={onDismiss}
+          >
+            <IconX className="size-4" />
+            {activityLibraryActionCopy.dismiss}
+          </Button>
+        ) : null}
+      </div>
+    </section>
   );
 }
 

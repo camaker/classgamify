@@ -21,10 +21,13 @@ import {
   buildActivityLibraryCardStats,
   buildActivityLibraryCardViewModel,
   buildActivityLibraryCompatibilityView,
+  buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
   buildStarterActivityLibraryCardViewModel,
+  findCreatedActivityInList,
+  resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import {
   buildActivityLibraryPageRouteSearch,
@@ -2637,6 +2640,110 @@ assert.deepEqual(
       prompt: 'Capital of France?',
     },
   ]
+);
+const createdActivities = [
+  {
+    id: 'activity-1',
+    templateType: 'quiz',
+    title: 'Food words',
+    visibility: 'draft',
+  },
+  {
+    id: 'activity-2',
+    templateType: 'group-sort',
+    title: 'Material groups',
+    visibility: 'private',
+  },
+] as const;
+assert.deepEqual(
+  findCreatedActivityInList({
+    activityId: 'activity-2',
+    items: createdActivities,
+  }),
+  createdActivities[1]
+);
+assert.equal(
+  findCreatedActivityInList({
+    activityId: 'missing',
+    items: createdActivities,
+  }),
+  undefined
+);
+const createdActivityFromLookup = {
+  id: 'activity-3',
+  templateType: 'line-match',
+  title: 'Definition lines',
+  visibility: 'draft',
+} as const;
+assert.deepEqual(
+  resolveCreatedActivityPanelActivity({
+    activity: createdActivityFromLookup,
+    activityId: 'activity-3',
+    items: createdActivities,
+  }),
+  createdActivityFromLookup
+);
+assert.deepEqual(
+  resolveCreatedActivityPanelActivity({
+    activity: createdActivityFromLookup,
+    activityId: 'activity-2',
+    items: createdActivities,
+  }),
+  createdActivities[1]
+);
+assert.equal(
+  resolveCreatedActivityPanelActivity({
+    activity: createdActivityFromLookup,
+    activityId: undefined,
+    items: createdActivities,
+  }),
+  undefined
+);
+assert.deepEqual(
+  buildCreatedActivityPanelContext({
+    activity: createdActivities[1],
+    isLoading: false,
+  }),
+  {
+    activity: createdActivities[1],
+    body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
+    showCreateAction: true,
+    showDismissAction: true,
+    showEditAction: true,
+    showMissingHint: false,
+    status: 'found',
+    title: 'Material groups',
+  }
+);
+assert.deepEqual(
+  buildCreatedActivityPanelContext({
+    activity: undefined,
+    isLoading: true,
+  }),
+  {
+    body: 'Loading the newly saved activity and next classroom actions.',
+    showCreateAction: true,
+    showDismissAction: true,
+    showEditAction: false,
+    showMissingHint: false,
+    status: 'loading',
+    title: 'New activity is being added to your library.',
+  }
+);
+assert.deepEqual(
+  buildCreatedActivityPanelContext({
+    activity: undefined,
+    isLoading: false,
+  }),
+  {
+    body: 'The activity was saved, but it is not visible in the current list view yet. Filters or pagination may be hiding it.',
+    showCreateAction: true,
+    showDismissAction: true,
+    showEditAction: false,
+    showMissingHint: true,
+    status: 'missing',
+    title: 'Activity saved to your library.',
+  }
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);

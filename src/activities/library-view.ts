@@ -94,6 +94,24 @@ type ActivityLibraryCardDisplayView = {
   templateType: ActivityTemplateType;
 };
 
+type CreatedActivityListItem = {
+  id: string;
+  templateType: ActivityTemplateType;
+  title: string;
+  visibility: ActivityVisibility;
+};
+
+type CreatedActivityPanelContext = {
+  activity?: CreatedActivityListItem;
+  body: string;
+  showCreateAction: boolean;
+  showDismissAction: boolean;
+  showEditAction: boolean;
+  showMissingHint: boolean;
+  status: 'found' | 'loading' | 'missing';
+  title: string;
+};
+
 export const activityLibraryPageCopy = {
   get breadcrumbCurrent() {
     return m.activity_library_breadcrumb_current();
@@ -112,6 +130,21 @@ export const activityLibraryPageCopy = {
   },
   get title() {
     return m.activity_library_page_title();
+  },
+} as const;
+
+export const activityLibraryActionCopy = {
+  get dismiss() {
+    return m.activity_library_action_dismiss();
+  },
+} as const;
+
+export const activityLibraryCreatedPanelCopy = {
+  get missingHint() {
+    return m.activity_library_created_panel_missing_hint();
+  },
+  get savedLabel() {
+    return m.activity_library_created_panel_label();
   },
 } as const;
 
@@ -245,6 +278,74 @@ export function buildActivityLibraryEmptyStateView({
   return {
     ...activityLibraryEmptyStateCopy.emptyLibrary,
     showStarterActivities: true,
+  };
+}
+
+export function findCreatedActivityInList<
+  TItem extends CreatedActivityListItem,
+>({ activityId, items }: { activityId?: string; items: TItem[] }) {
+  if (!activityId) return undefined;
+
+  return items.find((item) => item.id === activityId);
+}
+
+export function resolveCreatedActivityPanelActivity<
+  TItem extends CreatedActivityListItem,
+>({
+  activity,
+  activityId,
+  items,
+}: {
+  activity?: CreatedActivityListItem | null;
+  activityId?: string;
+  items: TItem[];
+}) {
+  if (!activityId) return undefined;
+  if (activity?.id === activityId) return activity;
+
+  return findCreatedActivityInList({ activityId, items });
+}
+
+export function buildCreatedActivityPanelContext({
+  activity,
+  isLoading,
+}: {
+  activity?: CreatedActivityListItem;
+  isLoading: boolean;
+}): CreatedActivityPanelContext {
+  if (activity) {
+    return {
+      activity,
+      body: m.activity_created_panel_found_body(),
+      showCreateAction: true,
+      showDismissAction: true,
+      showEditAction: true,
+      showMissingHint: false,
+      status: 'found',
+      title: activity.title,
+    };
+  }
+
+  if (isLoading) {
+    return {
+      body: m.activity_created_panel_loading_body(),
+      showCreateAction: true,
+      showDismissAction: true,
+      showEditAction: false,
+      showMissingHint: false,
+      status: 'loading',
+      title: m.activity_created_panel_loading_title(),
+    };
+  }
+
+  return {
+    body: m.activity_created_panel_missing_body(),
+    showCreateAction: true,
+    showDismissAction: true,
+    showEditAction: false,
+    showMissingHint: true,
+    status: 'missing',
+    title: m.activity_created_panel_missing_title(),
   };
 }
 

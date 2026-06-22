@@ -25,6 +25,7 @@ import { z } from 'zod';
 const activityListStatusSchema = z.enum(['active', 'archived']);
 
 const listActivitiesInputSchema = z.object({
+  createdActivityId: z.string().trim().min(1).max(80).optional(),
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
   search: z.string().trim().max(120).optional(),
@@ -65,6 +66,23 @@ export const listActivities = createServerFn({ method: 'GET' })
       .from(activity)
       .where(where);
     const matchingActivities = await db.select().from(activity).where(where);
+    const [createdActivity] = data.createdActivityId
+      ? await db
+          .select({
+            id: activity.id,
+            templateType: activity.templateType,
+            title: activity.title,
+            visibility: activity.visibility,
+          })
+          .from(activity)
+          .where(
+            and(
+              eq(activity.id, data.createdActivityId),
+              eq(activity.ownerId, userId)
+            )
+          )
+          .limit(1)
+      : [];
     const items = await db
       .select()
       .from(activity)
@@ -74,6 +92,7 @@ export const listActivities = createServerFn({ method: 'GET' })
       .offset(data.pageIndex * data.pageSize);
 
     return {
+      createdActivity,
       items,
       summary: summarizeActivityLibrary(matchingActivities),
       total: totalRow?.count ?? 0,

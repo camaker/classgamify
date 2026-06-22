@@ -24,6 +24,7 @@ const activitiesKeys = {
   detail: (id: string) => [...activitiesKeys.details(), id] as const,
   details: () => [...activitiesKeys.all, 'details'] as const,
   list: (params: {
+    createdActivityId?: string;
     pageIndex: number;
     pageSize: number;
     search?: string;
@@ -34,12 +35,14 @@ const activitiesKeys = {
 };
 
 export function useActivities({
+  createdActivityId,
   pageIndex = 0,
   pageSize = 24,
   search,
   status = 'active',
   template,
 }: {
+  createdActivityId?: string;
   pageIndex?: number;
   pageSize?: number;
   search?: string;
@@ -51,6 +54,7 @@ export function useActivities({
     queryFn: () =>
       listActivities({
         data: {
+          createdActivityId,
           pageIndex,
           pageSize,
           search,
@@ -59,6 +63,7 @@ export function useActivities({
         },
       }),
     queryKey: activitiesKeys.list({
+      createdActivityId,
       pageIndex,
       pageSize,
       search,
