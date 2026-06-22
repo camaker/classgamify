@@ -33,7 +33,7 @@ export function matchAnswer({
 export function getAcceptedAnswers(expectedAnswer: string) {
   return unique(
     expectedAnswer
-      .split(/\s*(?:\/|;|；)\s*/u)
+      .split(/\s*(?:\/|／|;|；)\s*/u)
       .map((answer) => answer.trim())
       .filter(Boolean)
   );

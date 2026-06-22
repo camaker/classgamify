@@ -122,6 +122,7 @@ import {
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { getWorksheetModeDefinitions } from '@/activities/worksheet-modes';
+import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
@@ -4571,6 +4572,19 @@ assert.deepEqual(
     ['Cat', true],
     ['tree', false],
   ]
+);
+assert.deepEqual(getAcceptedAnswers('苹果／苹果树；苹果'), ['苹果', '苹果树']);
+assert.deepEqual(
+  matchAnswer({
+    expectedAnswer: '苹果／苹果树；苹果',
+    submittedAnswer: ' 苹果树 ',
+  }),
+  {
+    acceptedAnswer: '苹果树',
+    correct: true,
+    normalizedAcceptedAnswer: '苹果树',
+    normalizedSubmittedAnswer: '苹果树',
+  }
 );
 assert.doesNotThrow(() =>
   buildActivityContent(
