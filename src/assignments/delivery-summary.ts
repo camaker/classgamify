@@ -1,5 +1,6 @@
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
+import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDeliverySummaryId =
@@ -152,15 +153,17 @@ export function buildPublicAssignmentRuleSummaryFromSettings({
 }: {
   expiresAt: AssignmentDate;
   itemCount: number;
-  settings: AssignmentSettings;
+  settings?: Partial<AssignmentSettings> | null;
 }): PublicAssignmentRuleSummaryItem[] {
+  const resolvedSettings = resolveAssignmentSettings(settings);
+
   return buildPublicAssignmentRuleSummary({
-    collectStudentName: settings.collectStudentName,
+    collectStudentName: resolvedSettings.collectStudentName,
     expiresAt,
     itemCount,
-    maxAttempts: settings.maxAttempts,
-    showCorrectAnswers: settings.showCorrectAnswers,
-    timeLimitSeconds: settings.timeLimitSeconds,
+    maxAttempts: resolvedSettings.maxAttempts,
+    showCorrectAnswers: resolvedSettings.showCorrectAnswers,
+    timeLimitSeconds: resolvedSettings.timeLimitSeconds,
   });
 }
 

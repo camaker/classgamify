@@ -4,6 +4,7 @@ import type {
 } from '@/activities/types';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 type ExportAttempt = {
@@ -29,7 +30,7 @@ export type AssignmentResultsExportData = {
   assignment: {
     expiresAt: Date | string | null;
     id: string;
-    settingsJson: AssignmentSettings;
+    settingsJson: Partial<AssignmentSettings> | null | undefined;
     shareSlug: string;
     status: string;
     title: string;
@@ -49,6 +50,7 @@ export type AssignmentResultsExportData = {
 };
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
+  const settings = resolveAssignmentSettings(data.assignment.settingsJson);
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
@@ -62,12 +64,12 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.assignment.shareSlug,
       data.assignment.status,
       formatCsvDate(data.assignment.expiresAt),
-      data.assignment.settingsJson.instructions ?? '',
-      data.assignment.settingsJson.collectStudentName,
-      data.assignment.settingsJson.showCorrectAnswers,
-      data.assignment.settingsJson.shuffleItems,
-      data.assignment.settingsJson.maxAttempts ?? '',
-      data.assignment.settingsJson.timeLimitSeconds ?? '',
+      settings.instructions ?? '',
+      settings.collectStudentName,
+      settings.showCorrectAnswers,
+      settings.shuffleItems,
+      settings.maxAttempts ?? '',
+      settings.timeLimitSeconds ?? '',
       data.snapshot?.activityTitle ?? data.activity.title,
       data.snapshot?.templateType ?? data.activity.templateType,
       data.stats.completions,

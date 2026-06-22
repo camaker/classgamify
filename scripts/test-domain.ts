@@ -2138,6 +2138,26 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
+  buildPublicAssignmentRuleSummaryFromSettings({
+    expiresAt: null,
+    itemCount: 4,
+    settings: {
+      collectStudentName: false,
+      maxAttempts: 99,
+      showCorrectAnswers: false,
+      timeLimitSeconds: 30,
+    },
+  }),
+  [
+    { id: 'items', label: 'Items', value: '4 items' },
+    { id: 'attempts', label: 'Attempts', value: '2 max' },
+    { id: 'timer', label: 'Timer', value: 'No timer' },
+    { id: 'closes', label: 'Closes', value: 'No close time' },
+    { id: 'identity', label: 'Student identity', value: 'Anonymous' },
+    { id: 'answerReveal', label: 'Review', value: 'Hidden' },
+  ]
+);
+assert.deepEqual(
   buildStudentRunnerHeaderView({
     assignment: {
       expiresAt: null,
@@ -6887,6 +6907,23 @@ assert.match(csv, /"Paris is the capital of France\."/);
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
   'classgamify-capital-review-week-1-results.csv'
+);
+const partialSettingsCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  assignment: {
+    ...csvExportData.assignment,
+    settingsJson: {
+      collectStudentName: false,
+      instructions: '  Review quietly.  ',
+      maxAttempts: 99,
+      showCorrectAnswers: false,
+      timeLimitSeconds: 30,
+    },
+  },
+});
+assert.match(
+  partialSettingsCsv,
+  /"Review quietly\.","false","false","true","2",""/
 );
 
 const classroomBrief = buildAssignmentClassroomBrief({
