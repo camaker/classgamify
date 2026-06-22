@@ -22,6 +22,25 @@ export function normalizeAttemptDurationSeconds({
   return Math.min(normalizedDuration, timeLimitSeconds);
 }
 
+export function buildAttemptStartedAt({
+  completedAt,
+  durationSeconds,
+}: {
+  completedAt: Date;
+  durationSeconds?: number;
+}) {
+  if (durationSeconds === undefined || !Number.isFinite(durationSeconds)) {
+    return completedAt;
+  }
+
+  const completedTimestamp = completedAt.getTime();
+  if (!Number.isFinite(completedTimestamp)) return completedAt;
+
+  return new Date(
+    completedTimestamp - Math.max(0, Math.round(durationSeconds)) * 1000
+  );
+}
+
 export function buildAttemptTimerState({
   now,
   startedAt,

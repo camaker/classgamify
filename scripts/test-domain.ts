@@ -137,6 +137,7 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
 } from '@/assignments/attempt-stats';
 import {
+  buildAttemptStartedAt,
   buildAttemptTimerState,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
@@ -6526,6 +6527,34 @@ assert.equal(
     timeLimitSeconds: -60,
   }),
   90
+);
+assert.equal(
+  buildAttemptStartedAt({
+    completedAt: new Date('2026-01-01T10:00:00.000Z'),
+    durationSeconds: 65,
+  }).toISOString(),
+  '2026-01-01T09:58:55.000Z'
+);
+assert.equal(
+  buildAttemptStartedAt({
+    completedAt: new Date('2026-01-01T10:00:00.000Z'),
+    durationSeconds: -3,
+  }).toISOString(),
+  '2026-01-01T10:00:00.000Z'
+);
+assert.equal(
+  buildAttemptStartedAt({
+    completedAt: new Date('2026-01-01T10:00:00.000Z'),
+    durationSeconds: Number.POSITIVE_INFINITY,
+  }).toISOString(),
+  '2026-01-01T10:00:00.000Z'
+);
+assert.equal(
+  buildAttemptStartedAt({
+    completedAt: new Date('not-a-date'),
+    durationSeconds: 65,
+  }).getTime(),
+  Number.NaN
 );
 assert.deepEqual(
   buildAttemptTimerState({

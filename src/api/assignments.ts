@@ -11,7 +11,10 @@ import {
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
 } from '@/assignments/attempt-stats';
-import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import {
+  buildAttemptStartedAt,
+  normalizeAttemptDurationSeconds,
+} from '@/assignments/attempt-duration';
 import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
@@ -530,6 +533,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       templateType,
     });
     const now = new Date();
+    const startedAt = buildAttemptStartedAt({
+      completedAt: now,
+      durationSeconds,
+    });
     const id = nanoid(16);
 
     await db.insert(attempt).values({
@@ -543,7 +550,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       maxScore: evaluation.result.totalPoints,
       resultJson: evaluation.result,
       score: evaluation.result.earnedPoints,
-      startedAt: now,
+      startedAt,
       anonymousToken: submissionIdentity.anonymousToken,
       studentName: submissionIdentity.studentName,
     });
