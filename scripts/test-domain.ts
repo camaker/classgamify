@@ -169,6 +169,7 @@ import {
 import {
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
+  buildAssignmentListValidatedSearch,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
@@ -3680,7 +3681,36 @@ assert.equal(
   false
 );
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
+assert.equal(normalizeAssignmentListSearch('  Ｗｅｅｋ   １  '), 'Week 1');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.deepEqual(
+  buildAssignmentListValidatedSearch({
+    page: '3',
+    published: ' share-1 ',
+    q: '  Ｗｅｅｋ   １  ',
+    status: 'published',
+  }),
+  {
+    page: 3,
+    published: 'share-1',
+    q: 'Week 1',
+    status: 'published',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListValidatedSearch({
+    page: '1',
+    published: '   ',
+    q: '   ',
+    status: 'all',
+  }),
+  {
+    page: undefined,
+    published: undefined,
+    q: undefined,
+    status: undefined,
+  }
+);
 assert.deepEqual(
   buildAssignmentListRouteSearch({
     page: 1,

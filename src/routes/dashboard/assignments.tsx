@@ -6,8 +6,8 @@ import {
   type AssignmentStatusFilter,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
+  buildAssignmentListValidatedSearch,
   normalizeAssignmentListSearch,
-  parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
   buildAssignmentListFilterSummary,
@@ -51,7 +51,6 @@ import {
   useAssignments,
   useUpdateAssignmentStatus,
 } from '@/hooks/use-assignments';
-import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -74,15 +73,7 @@ import { toast } from 'sonner';
 const ASSIGNMENT_LIST_PAGE_SIZE = 12;
 
 export const Route = createFileRoute('/dashboard/assignments')({
-  validateSearch: (search: Record<string, unknown>) => ({
-    page: parseDashboardPageSearch(search.page),
-    published:
-      typeof search.published === 'string' && search.published.trim()
-        ? search.published.trim()
-        : undefined,
-    q: typeof search.q === 'string' ? search.q : undefined,
-    status: parseAssignmentStatusFilter(search.status),
-  }),
+  validateSearch: buildAssignmentListValidatedSearch,
   component: DashboardAssignmentsPage,
 });
 

@@ -1,4 +1,5 @@
 import type { AssignmentStatus } from '@/activities/types';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
 export type AssignmentStatusFilter = 'all' | AssignmentStatus;
 
@@ -17,7 +18,12 @@ export type AssignmentListRouteSearch = {
 };
 
 export function normalizeAssignmentListSearch(value?: string | null) {
-  const normalized = value?.replace(/\s+/g, ' ').trim();
+  const normalized = value?.normalize('NFKC').replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
+}
+
+function normalizeAssignmentListPublishedSearch(value?: string | null) {
+  const normalized = value ? normalizeAssignmentShareSlug(value) : undefined;
   return normalized || undefined;
 }
 
@@ -33,7 +39,7 @@ export function buildAssignmentListRouteSearch({
 
   return {
     page: normalizedPage,
-    published,
+    published: normalizeAssignmentListPublishedSearch(published),
     q: normalizedSearch,
     status: status === 'all' ? undefined : status,
   };
@@ -58,4 +64,28 @@ export function parseAssignmentStatusFilter(
   return value === 'published' || value === 'closed' || value === 'draft'
     ? value
     : undefined;
+}
+
+export function buildAssignmentListValidatedSearch(
+  search: Record<string, unknown>
+): AssignmentListRouteSearch {
+  return {
+    page: parseAssignmentListPageSearch(search.page),
+    published:
+      typeof search.published === 'string'
+        ? normalizeAssignmentListPublishedSearch(search.published)
+        : undefined,
+    q:
+      typeof search.q === 'string'
+        ? normalizeAssignmentListSearch(search.q)
+        : undefined,
+    status: parseAssignmentStatusFilter(search.status),
+  };
+}
+
+function parseAssignmentListPageSearch(value: unknown) {
+  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+
+  const page = Number(value);
+  return Number.isInteger(page) && page > 1 ? page : undefined;
 }
