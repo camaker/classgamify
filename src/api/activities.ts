@@ -15,6 +15,7 @@ import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
+import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq, like, ne, or } from 'drizzle-orm';
@@ -96,7 +97,7 @@ export const getActivity = createServerFn({ method: 'GET' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Activity not found.');
+      throw new Error(m.activity_api_error_activity_not_found());
     }
 
     return row;
@@ -127,7 +128,7 @@ export const createActivity = createServerFn({ method: 'POST' })
     const [row] = await db.select().from(activity).where(eq(activity.id, id));
 
     if (!row) {
-      throw new Error('Activity was saved but could not be loaded.');
+      throw new Error(m.activity_api_error_create_load_failed());
     }
 
     return row;
@@ -152,7 +153,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!sourceActivity) {
-      throw new Error('Activity not found.');
+      throw new Error(m.activity_api_error_activity_not_found());
     }
     assertActivityCanDeriveWork(sourceActivity.visibility);
 
@@ -173,7 +174,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     const [row] = await db.select().from(activity).where(eq(activity.id, id));
 
     if (!row) {
-      throw new Error('Duplicated activity was saved but could not be loaded.');
+      throw new Error(m.activity_api_error_duplicate_load_failed());
     }
 
     return row;
@@ -199,16 +200,16 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!sourceActivity) {
-      throw new Error('Activity not found.');
+      throw new Error(m.activity_api_error_activity_not_found());
     }
     assertActivityCanDeriveWork(sourceActivity.visibility);
     if (sourceActivity.templateType === data.targetTemplateType) {
-      throw new Error('Choose a different template to remix into.');
+      throw new Error(m.activity_api_error_remix_same_template());
     }
 
     const targetTemplate = getTemplateByType(data.targetTemplateType);
     if (!targetTemplate) {
-      throw new Error('Template not found.');
+      throw new Error(m.activity_api_error_template_not_found());
     }
     const remixOption = getTemplateRemixOption({
       content: sourceActivity.contentJson,
@@ -239,7 +240,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     const [row] = await db.select().from(activity).where(eq(activity.id, id));
 
     if (!row) {
-      throw new Error('Remixed activity was saved but could not be loaded.');
+      throw new Error(m.activity_api_error_remix_load_failed());
     }
 
     return row;
@@ -277,7 +278,7 @@ export const updateActivity = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Activity not found.');
+      throw new Error(m.activity_api_error_activity_not_found());
     }
 
     return row;
@@ -339,7 +340,7 @@ async function updateActivityVisibility({
     .limit(1);
 
   if (!row) {
-    throw new Error('Activity not found.');
+    throw new Error(m.activity_api_error_activity_not_found());
   }
 
   return row;
