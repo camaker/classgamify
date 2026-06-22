@@ -1,6 +1,7 @@
 import { m } from '@/locale/paraglide/messages';
 
 const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
+const ANONYMOUS_BROWSER_CODE_LENGTH = 6;
 
 export type StudentIdentitySource = {
   anonymousToken?: string | null;
@@ -30,8 +31,7 @@ export function getAnonymousBrowserLabel(value?: string | null) {
   const baseLabel = m.student_identity_anonymous_browser();
   if (!anonymousToken) return baseLabel;
 
-  const suffix = anonymousToken.replace(/[^a-z0-9]/gi, '').slice(-6);
-  return suffix ? `${baseLabel} ${suffix.toUpperCase()}` : baseLabel;
+  return `${baseLabel} ${buildAnonymousBrowserCode(anonymousToken)}`;
 }
 
 export function buildAnonymousAttemptTokenStorageKey(shareId: string) {
@@ -44,6 +44,21 @@ function createAnonymousAttemptToken() {
   }
 
   return `anon-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function buildAnonymousBrowserCode(value: string) {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return (hash >>> 0)
+    .toString(36)
+    .toUpperCase()
+    .padStart(ANONYMOUS_BROWSER_CODE_LENGTH, '0')
+    .slice(-ANONYMOUS_BROWSER_CODE_LENGTH);
 }
 
 export function getOrCreateAnonymousAttemptToken({

@@ -315,6 +315,7 @@ import {
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   buildAnonymousAttemptTokenStorageKey,
+  getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
 import {
@@ -636,6 +637,18 @@ assert.equal(
   }),
   2
 );
+const anonymousBrowserLabel = getAnonymousBrowserLabel('anonymous-token-1');
+assert.equal(getAnonymousBrowserLabel(), 'Anonymous browser');
+assert.match(anonymousBrowserLabel, /^Anonymous browser [0-9A-Z]{6}$/);
+assert.equal(
+  getAnonymousBrowserLabel(' anonymous-token-1 '),
+  anonymousBrowserLabel
+);
+assert.notEqual(
+  getAnonymousBrowserLabel('anonymous-token-2'),
+  anonymousBrowserLabel
+);
+assert.equal(anonymousBrowserLabel.toLowerCase().includes('token'), false);
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   description:
     'This assignment does not collect student names. This browser will submit as Anonymous browser.',
