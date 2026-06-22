@@ -4586,6 +4586,27 @@ assert.deepEqual(
     normalizedSubmittedAnswer: '苹果树',
   }
 );
+const defaultSourceSummaryContent = buildActivityContent({
+  description: 'Default source summary',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer a question with default source metadata.',
+  pairsText: '',
+  questionsText: 'Default summary prompt? | Yes',
+  sourceSummary: '   ',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Default source summary',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.equal(
+  defaultSourceSummaryContent.sourceSummary,
+  'Teacher-created activity from structured editor input.'
+);
 assert.doesNotThrow(() =>
   buildActivityContent(
     createActivityInputSchema.parse(activityEditorDefaultInput)

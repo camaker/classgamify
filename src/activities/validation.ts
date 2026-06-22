@@ -91,7 +91,7 @@ export function parseActivityContent(
     questions: parseQuestions(input.questionsText),
     sourceSummary:
       input.sourceSummary?.trim() ||
-      'Teacher-created activity from structured editor input.',
+      m.activity_validation_default_source_summary(),
     subject: input.subject,
     teacherNotes: parseLineList(input.teacherNotesText),
     vocabulary: parseVocabulary(input.vocabularyText),

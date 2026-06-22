@@ -439,6 +439,7 @@
   "activity_template_requirement_teacher_notes": "teacher notes",
   "activity_template_requirement_vocabulary": "vocabulary",
   "activity_template_start_action": "Start {template}",
+  "activity_validation_default_source_summary": "Teacher-created activity from structured editor input.",
   "activity_validation_error_group_line": "Group line {lineNumber} needs \"group | item one, item two\".",
   "activity_validation_error_pair_line": "Pair line {lineNumber} needs \"left | right\".",
   "activity_validation_error_question_line": "Question line {lineNumber} needs \"prompt | answer | options\".",
