@@ -71,5 +71,6 @@ export function formatAssignmentResultValue(
     emptyValue?: string;
   }
 ) {
-  return value || (options?.emptyValue ?? '-');
+  const normalizedValue = value?.trim();
+  return normalizedValue || (options?.emptyValue ?? '-');
 }

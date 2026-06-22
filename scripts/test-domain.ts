@@ -6780,6 +6780,8 @@ assert.equal(
   'Paris | Paris, France'
 );
 assert.equal(formatAssignmentResultValue(''), '-');
+assert.equal(formatAssignmentResultValue('   '), '-');
+assert.equal(formatAssignmentResultValue(' Paris '), 'Paris');
 assert.equal(formatAssignmentResultValue(null, { emptyValue: '' }), '');
 assert.equal(formatAssignmentResultValue('', { emptyValue: 'none' }), 'none');
 assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
