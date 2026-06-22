@@ -2,6 +2,7 @@ import { DashboardSidebar } from '@/components/layout/dashboard-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/auth/client';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { Outlet, useNavigate } from '@tanstack/react-router';
 import { useEffect, type ReactNode } from 'react';
@@ -26,7 +27,7 @@ export function SidebarLayout({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <Spinner className="size-6" />
-        <span className="sr-only">Loading...</span>
+        <span className="sr-only">{m.common_loading()}</span>
       </div>
     );
   }
