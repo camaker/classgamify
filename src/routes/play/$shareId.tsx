@@ -9,6 +9,7 @@ import type {
   PublicAssignmentRuleSummaryId,
   PublicAssignmentRuleSummaryItem,
 } from '@/assignments/delivery-summary';
+import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { buildAttemptTimerState } from '@/assignments/attempt-duration';
 import {
   getAnonymousBrowserLabel,
@@ -185,8 +186,10 @@ function PlayPage() {
   const showStartAnotherAttempt = canStartAnotherStudentAttempt({
     canSubmit,
     hasResult: Boolean(result),
-    maxAttempts: assignment?.settings.maxAttempts,
-    submittedAttemptCount,
+    maxAttempts:
+      result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
+    submittedAttemptCount:
+      result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
   });
   const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
 
@@ -283,9 +286,10 @@ function PlayPage() {
       );
       setResult({
         ...response.result,
+        attemptUsage: response.attemptUsage,
         reviewItems: response.reviewItems,
       });
-      setSubmittedAttemptCount((count) => count + 1);
+      setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
       toast.success(runnerCopy.submissionSuccessMessage);
     } catch (error) {
       toast.error(
@@ -783,6 +787,7 @@ type PublicRuntimeItem =
 
 type AttemptSubmissionResult = {
   accuracy: number;
+  attemptUsage: AssignmentAttemptUsage;
   durationSeconds?: number;
   earnedPoints: number;
   reviewItems: PublicAttemptReviewItem[];

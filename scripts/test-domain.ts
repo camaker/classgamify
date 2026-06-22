@@ -138,6 +138,10 @@ import {
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
+  buildAssignmentAttemptUsage,
+  canUseAnotherAssignmentAttempt,
+} from '@/assignments/attempt-limits';
+import {
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
   buildPublicAnswerFeedbackView,
@@ -1236,6 +1240,58 @@ assert.deepEqual(
     submitDisabled: true,
     unansweredLabel: undefined,
   }
+);
+assert.deepEqual(
+  buildAssignmentAttemptUsage({
+    maxAttempts: 2,
+    previousAttemptCount: 0,
+  }),
+  {
+    maxAttempts: 2,
+    remainingAttempts: 1,
+    usedAttempts: 1,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptUsage({
+    maxAttempts: 2,
+    previousAttemptCount: 1,
+  }),
+  {
+    maxAttempts: 2,
+    remainingAttempts: 0,
+    usedAttempts: 2,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptUsage({
+    previousAttemptCount: 3,
+  }),
+  {
+    maxAttempts: undefined,
+    remainingAttempts: undefined,
+    usedAttempts: 4,
+  }
+);
+assert.equal(
+  canUseAnotherAssignmentAttempt({
+    maxAttempts: 2,
+    usedAttempts: 1,
+  }),
+  true
+);
+assert.equal(
+  canUseAnotherAssignmentAttempt({
+    maxAttempts: 2,
+    usedAttempts: 2,
+  }),
+  false
+);
+assert.equal(
+  canUseAnotherAssignmentAttempt({
+    usedAttempts: 25,
+  }),
+  true
 );
 assert.equal(
   canStartAnotherStudentAttempt({

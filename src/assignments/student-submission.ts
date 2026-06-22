@@ -1,4 +1,5 @@
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import { canUseAnotherAssignmentAttempt } from '@/assignments/attempt-limits';
 import {
   getAnonymousBrowserLabel,
   normalizeAnonymousToken,
@@ -267,15 +268,10 @@ export function canStartAnotherStudentAttempt({
 }) {
   if (!canSubmit || !hasResult) return false;
 
-  const normalizedSubmittedAttemptCount = normalizeSubmittedAttemptCount(
-    submittedAttemptCount
-  );
-  const normalizedMaxAttempts = normalizeMaxAttempts(maxAttempts);
-
-  return (
-    normalizedMaxAttempts === undefined ||
-    normalizedSubmittedAttemptCount < normalizedMaxAttempts
-  );
+  return canUseAnotherAssignmentAttempt({
+    maxAttempts,
+    usedAttempts: submittedAttemptCount,
+  });
 }
 
 export function buildStudentAttemptTimerBadge({
@@ -387,17 +383,6 @@ function formatStudentAttemptUnansweredLabel(count: number) {
   }
 
   return m.student_attempt_unanswered_label_many({ count });
-}
-
-function normalizeSubmittedAttemptCount(value: number) {
-  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
-}
-
-function normalizeMaxAttempts(value: number | undefined) {
-  if (value === undefined || !Number.isFinite(value)) return undefined;
-
-  const normalized = Math.trunc(value);
-  return normalized >= 1 ? normalized : undefined;
 }
 
 export function buildAttemptSubmissionAnswers({

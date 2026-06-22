@@ -9,6 +9,7 @@ import {
 } from '@/assignments/attempt-identity-query';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
 import {
   assertAssignmentStatusTransition,
@@ -500,13 +501,14 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       throw new Error(m.assignment_api_error_anonymous_token_required());
     }
 
+    let previousAttemptCount = 0;
     if (settings.maxAttempts) {
-      const attemptCount = await countPreviousIdentityAttempts({
+      previousAttemptCount = await countPreviousIdentityAttempts({
         anonymousToken: submissionIdentity.anonymousToken ?? '',
         assignmentId: row.assignment.id,
         studentName: submissionIdentity.studentName ?? '',
       });
-      if (attemptCount >= settings.maxAttempts) {
+      if (previousAttemptCount >= settings.maxAttempts) {
         throw new Error(m.assignment_api_error_attempt_limit_reached());
       }
     }
@@ -545,6 +547,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     });
 
     return {
+      attemptUsage: buildAssignmentAttemptUsage({
+        maxAttempts: settings.maxAttempts,
+        previousAttemptCount,
+      }),
       id,
       reviewItems: buildPublicAttemptReviewItems({
         answers: evaluation.answers,
