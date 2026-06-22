@@ -531,6 +531,11 @@ assert.equal(
   false,
   'Legacy Hanzi dynamic route should stay unmounted.'
 );
+assert.equal(
+  existsSync('src/routes/hsk/1.tsx'),
+  false,
+  'Legacy HSK course route should stay unmounted.'
+);
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);
 assert.match(robotsRouteSource, /['"]\/learn['"]/);

@@ -33,7 +33,6 @@ import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
-import { Route as Hsk1RouteImport } from './routes/hsk/1'
 import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
 import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
@@ -180,11 +179,6 @@ const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
 const PlayShareIdRoute = PlayShareIdRouteImport.update({
   id: '/play/$shareId',
   path: '/play/$shareId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Hsk1Route = Hsk1RouteImport.update({
-  id: '/hsk/1',
-  path: '/hsk/1',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardAssignmentsRoute = DashboardAssignmentsRouteImport.update({
@@ -357,7 +351,6 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -408,7 +401,6 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -463,7 +455,6 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
-  '/hsk/1': typeof Hsk1Route
   '/play/$shareId': typeof PlayShareIdRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -519,7 +510,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
@@ -570,7 +560,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
@@ -624,7 +613,6 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/dashboard/activities'
     | '/dashboard/assignments'
-    | '/hsk/1'
     | '/play/$shareId'
     | '/settings/apikeys'
     | '/settings/billing'
@@ -671,7 +659,6 @@ export interface RootRouteChildren {
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
-  Hsk1Route: typeof Hsk1Route
   PlayShareIdRoute: typeof PlayShareIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -850,13 +837,6 @@ declare module '@tanstack/react-router' {
       path: '/play/$shareId'
       fullPath: '/play/$shareId'
       preLoaderRoute: typeof PlayShareIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hsk/1': {
-      id: '/hsk/1'
-      path: '/hsk/1'
-      fullPath: '/hsk/1'
-      preLoaderRoute: typeof Hsk1RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/assignments': {
@@ -1169,7 +1149,6 @@ const rootRouteChildren: RootRouteChildren = {
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
-  Hsk1Route: Hsk1Route,
   PlayShareIdRoute: PlayShareIdRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
