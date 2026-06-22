@@ -5966,15 +5966,41 @@ assert.equal(normalizeAttemptDurationSeconds({ durationSeconds: -3 }), 0);
 assert.equal(normalizeAttemptDurationSeconds({ durationSeconds: 4.6 }), 5);
 assert.equal(
   normalizeAttemptDurationSeconds({
+    durationSeconds: Number.POSITIVE_INFINITY,
+  }),
+  undefined
+);
+assert.equal(
+  normalizeAttemptDurationSeconds({
     durationSeconds: 90,
     timeLimitSeconds: 60,
   }),
   60
 );
+assert.equal(
+  normalizeAttemptDurationSeconds({
+    durationSeconds: 90,
+    timeLimitSeconds: -60,
+  }),
+  90
+);
 assert.deepEqual(
   buildAttemptTimerState({
     now: 1_000,
     startedAt: 2_000,
+  }),
+  {
+    durationSeconds: 0,
+    elapsedSeconds: 0,
+    remainingSeconds: undefined,
+    timeExpired: false,
+  }
+);
+assert.deepEqual(
+  buildAttemptTimerState({
+    now: Number.NaN,
+    startedAt: 1_000,
+    timeLimitSeconds: Number.POSITIVE_INFINITY,
   }),
   {
     durationSeconds: 0,
@@ -6015,6 +6041,7 @@ assert.equal(formatAttemptDuration(0), '-');
 assert.equal(formatAttemptDuration(4.6), '5s');
 assert.equal(formatAttemptDuration(65), '1m 05s');
 assert.equal(formatAttemptDuration(-3), '-');
+assert.equal(formatAttemptDuration(Number.NaN, { style: 'timer' }), '-');
 assert.equal(formatAttemptDuration(65, { style: 'timer' }), '1:05');
 assert.equal(formatAttemptDuration(5, { style: 'timer' }), '5s');
 assert.equal(formatAssignmentResultDate(null), '-');

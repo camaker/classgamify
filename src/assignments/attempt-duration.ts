@@ -8,9 +8,16 @@ export function normalizeAttemptDurationSeconds({
   timeLimitSeconds?: number;
 }) {
   if (durationSeconds === undefined) return undefined;
+  if (!Number.isFinite(durationSeconds)) return undefined;
 
   const normalizedDuration = Math.max(0, Math.round(durationSeconds));
-  if (!timeLimitSeconds) return normalizedDuration;
+  if (
+    !timeLimitSeconds ||
+    !Number.isFinite(timeLimitSeconds) ||
+    timeLimitSeconds <= 0
+  ) {
+    return normalizedDuration;
+  }
 
   return Math.min(normalizedDuration, timeLimitSeconds);
 }
@@ -24,16 +31,25 @@ export function buildAttemptTimerState({
   startedAt: number;
   timeLimitSeconds?: number;
 }) {
-  const durationSeconds = Math.max(0, Math.round((now - startedAt) / 1000));
-  const remainingSeconds = timeLimitSeconds
-    ? Math.max(0, timeLimitSeconds - durationSeconds)
+  const elapsedMilliseconds = now - startedAt;
+  const durationSeconds = Number.isFinite(elapsedMilliseconds)
+    ? Math.max(0, Math.round(elapsedMilliseconds / 1000))
+    : 0;
+  const normalizedTimeLimitSeconds =
+    timeLimitSeconds &&
+    Number.isFinite(timeLimitSeconds) &&
+    timeLimitSeconds > 0
+      ? timeLimitSeconds
+      : undefined;
+  const remainingSeconds = normalizedTimeLimitSeconds
+    ? Math.max(0, normalizedTimeLimitSeconds - durationSeconds)
     : undefined;
 
   return {
     durationSeconds,
     elapsedSeconds: durationSeconds,
     remainingSeconds,
-    timeExpired: Boolean(timeLimitSeconds && remainingSeconds === 0),
+    timeExpired: Boolean(normalizedTimeLimitSeconds && remainingSeconds === 0),
   };
 }
 
@@ -46,6 +62,7 @@ export function formatAttemptDuration(
 ) {
   const emptyValue = options?.emptyValue ?? '-';
   if (seconds === undefined || seconds === null) return emptyValue;
+  if (!Number.isFinite(seconds)) return emptyValue;
 
   const normalizedSeconds = Math.max(0, Math.round(seconds));
   if (normalizedSeconds <= 0) return emptyValue;
