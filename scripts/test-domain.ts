@@ -396,6 +396,48 @@ const copiedTemplateMarkerPattern = new RegExp(
   'i'
 );
 
+const sensitiveOauthPattern = new RegExp(
+  [
+    'GOCSPX-[A-Za-z0-9_-]+',
+    '\\d{6,}-[a-z0-9_-]+\\.apps\\.googleusercontent\\.com',
+    '客户端密钥',
+  ].join('|'),
+  'i'
+);
+const secretScanFileExtensions = ['.json', '.md', '.ts', '.tsx', '.txt'];
+
+function collectTextFiles(directoryPath: string): string[] {
+  return readdirSync(directoryPath, { withFileTypes: true })
+    .flatMap((entry) => {
+      const filePath = `${directoryPath}/${entry.name}`;
+
+      if (entry.isDirectory()) {
+        return collectTextFiles(filePath);
+      }
+
+      return secretScanFileExtensions.some((extension) =>
+        entry.name.endsWith(extension)
+      )
+        ? [filePath]
+        : [];
+    })
+    .sort();
+}
+
+for (const filePath of [
+  ...collectTextFiles('content'),
+  ...collectTextFiles('docs'),
+  ...collectTextFiles('project.inlang/messages'),
+  ...collectTextFiles('scripts'),
+  ...collectTextFiles('src'),
+].filter((filePath) => filePath !== 'scripts/test-domain.ts')) {
+  assert.doesNotMatch(
+    readFileSync(filePath, 'utf8'),
+    sensitiveOauthPattern,
+    `${filePath} should not contain OAuth client secrets or concrete client ids.`
+  );
+}
+
 const contentSurfaceFiles = [
   'content/blog',
   'content/changelog',
