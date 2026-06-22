@@ -1764,6 +1764,7 @@
   "student_runner_seo_title_prefix": "Student activity",
   "student_runner_sequential_default_item_label": "Item",
   "student_runner_sequential_item_label": "{label} {index}",
+  "student_runner_start_another_attempt": "Start another attempt",
   "student_runner_student_name_label": "Student name",
   "student_runner_student_name_placeholder": "Type your name",
   "student_runner_submission_failure": "Attempt could not be saved.",

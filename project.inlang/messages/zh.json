@@ -1764,6 +1764,7 @@
   "student_runner_seo_title_prefix": "学生活动",
   "student_runner_sequential_default_item_label": "题目",
   "student_runner_sequential_item_label": "{label} {index}",
+  "student_runner_start_another_attempt": "再次作答",
   "student_runner_student_name_label": "学生姓名",
   "student_runner_student_name_placeholder": "输入你的姓名",
   "student_runner_submission_failure": "无法保存作答。",

@@ -333,6 +333,7 @@ import {
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
+  canStartAnotherStudentAttempt,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -660,6 +661,7 @@ assert.deepEqual(getStudentRunnerCopy(), {
   seoDescription:
     'Open a public student activity runner from a teacher assignment link.',
   seoTitlePrefix: 'Student activity',
+  startAnotherAttemptLabel: 'Start another attempt',
   missingStudentNameMessage: 'Type your name before submitting.',
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',
@@ -1234,6 +1236,59 @@ assert.deepEqual(
     submitDisabled: true,
     unansweredLabel: undefined,
   }
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: false,
+    hasResult: true,
+    maxAttempts: 2,
+    submittedAttemptCount: 1,
+  }),
+  false
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: true,
+    hasResult: false,
+    maxAttempts: 2,
+    submittedAttemptCount: 1,
+  }),
+  false
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: true,
+    hasResult: true,
+    maxAttempts: 2,
+    submittedAttemptCount: 1,
+  }),
+  true
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: true,
+    hasResult: true,
+    maxAttempts: 2,
+    submittedAttemptCount: 2,
+  }),
+  false
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: true,
+    hasResult: true,
+    submittedAttemptCount: 25,
+  }),
+  true
+);
+assert.equal(
+  canStartAnotherStudentAttempt({
+    canSubmit: true,
+    hasResult: true,
+    maxAttempts: 1,
+    submittedAttemptCount: Number.NaN,
+  }),
+  true
 );
 assert.deepEqual(
   buildStudentAttemptTimerBadge({

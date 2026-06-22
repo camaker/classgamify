@@ -80,6 +80,7 @@ type StudentRunnerCopy = {
   resultTimePrefix: string;
   seoDescription: string;
   seoTitlePrefix: string;
+  startAnotherAttemptLabel: string;
   missingStudentNameMessage: string;
   studentNameLabel: string;
   studentNamePlaceholder: string;
@@ -156,6 +157,9 @@ const STUDENT_RUNNER_COPY = {
   },
   get seoTitlePrefix() {
     return m.student_runner_seo_title_prefix();
+  },
+  get startAnotherAttemptLabel() {
+    return m.student_runner_start_another_attempt();
   },
   get missingStudentNameMessage() {
     return m.student_runner_missing_student_name();
@@ -248,6 +252,30 @@ export function buildStudentAttemptControlState({
     submitDisabled: !canSubmit || hasResult || isSubmitting,
     unansweredLabel: hasResult ? undefined : unansweredLabel,
   };
+}
+
+export function canStartAnotherStudentAttempt({
+  canSubmit,
+  hasResult,
+  maxAttempts,
+  submittedAttemptCount,
+}: {
+  canSubmit: boolean;
+  hasResult: boolean;
+  maxAttempts?: number;
+  submittedAttemptCount: number;
+}) {
+  if (!canSubmit || !hasResult) return false;
+
+  const normalizedSubmittedAttemptCount = normalizeSubmittedAttemptCount(
+    submittedAttemptCount
+  );
+  const normalizedMaxAttempts = normalizeMaxAttempts(maxAttempts);
+
+  return (
+    normalizedMaxAttempts === undefined ||
+    normalizedSubmittedAttemptCount < normalizedMaxAttempts
+  );
 }
 
 export function buildStudentAttemptTimerBadge({
@@ -359,6 +387,17 @@ function formatStudentAttemptUnansweredLabel(count: number) {
   }
 
   return m.student_attempt_unanswered_label_many({ count });
+}
+
+function normalizeSubmittedAttemptCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+}
+
+function normalizeMaxAttempts(value: number | undefined) {
+  if (value === undefined || !Number.isFinite(value)) return undefined;
+
+  const normalized = Math.trunc(value);
+  return normalized >= 1 ? normalized : undefined;
 }
 
 export function buildAttemptSubmissionAnswers({

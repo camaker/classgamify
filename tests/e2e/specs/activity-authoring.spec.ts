@@ -84,6 +84,36 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('button', { name: /^copy link$/i })
     ).toBeVisible();
+
+    await page.getByRole('link', { name: /^open published link$/i }).click();
+    await expect(page).toHaveURL(/\/play\/[^/]+$/);
+    await expect(
+      page.getByRole('heading', { name: assignmentTitle })
+    ).toBeVisible();
+
+    await page.getByLabel('Student name').fill('E2E Student');
+    await page
+      .getByRole('button', { name: /^apple$/i })
+      .first()
+      .click();
+    await page
+      .getByRole('button', { name: /^milk$/i })
+      .first()
+      .click();
+    await expect(page.getByText('2/2 answered')).toBeVisible();
+    await page.getByRole('button', { name: /^submit answers$/i }).click();
+
+    await expect(page.getByText('Score submitted')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /^start another attempt$/i })
+    ).toBeVisible();
+
+    await page
+      .getByRole('button', { name: /^start another attempt$/i })
+      .click();
+    await expect(page.getByText('Score submitted')).not.toBeVisible();
+    await expect(page.getByText('0/2 answered')).toBeVisible();
+    await expect(page.getByLabel('Student name')).toHaveValue('E2E Student');
     await expectNoBrowserErrors(monitor, 'publish assignment from saved panel');
   });
 });

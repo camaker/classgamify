@@ -23,6 +23,7 @@ import {
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
+  canStartAnotherStudentAttempt,
   getStudentRunnerCopy,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
@@ -92,6 +93,7 @@ function PlayPage() {
     startedAt: number;
   }>();
   const [result, setResult] = useState<AttemptSubmissionResult>();
+  const [submittedAttemptCount, setSubmittedAttemptCount] = useState(0);
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [anonymousToken, setAnonymousToken] = useState<string>();
@@ -180,6 +182,12 @@ function PlayPage() {
     timeExpired: attemptTimer.timeExpired,
     timeLimitSeconds,
   });
+  const showStartAnotherAttempt = canStartAnotherStudentAttempt({
+    canSubmit,
+    hasResult: Boolean(result),
+    maxAttempts: assignment?.settings.maxAttempts,
+    submittedAttemptCount,
+  });
   const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
 
   useEffect(() => {
@@ -201,6 +209,7 @@ function PlayPage() {
     setConfirmIncompleteSubmit(false);
     setStudentName('');
     setAttemptClock(undefined);
+    setSubmittedAttemptCount(0);
     setAnonymousToken(undefined);
     setAttemptSessionKey(currentAttemptSessionKey);
   }, [attemptSessionKey, currentAttemptSessionKey]);
@@ -276,6 +285,7 @@ function PlayPage() {
         ...response.result,
         reviewItems: response.reviewItems,
       });
+      setSubmittedAttemptCount((count) => count + 1);
       toast.success(runnerCopy.submissionSuccessMessage);
     } catch (error) {
       toast.error(
@@ -285,6 +295,16 @@ function PlayPage() {
       );
     }
   }
+
+  function startAnotherAttempt() {
+    const nextStartedAt = Date.now();
+    setAnswers({});
+    setResult(undefined);
+    setConfirmIncompleteSubmit(false);
+    setAttemptClock(undefined);
+    setNow(nextStartedAt);
+  }
+
   if (pageState.status === 'loading') {
     return (
       <Container className="px-4 py-10 md:py-14">
@@ -419,6 +439,18 @@ function PlayPage() {
                 <p className="text-xs text-muted-foreground">
                   {attemptResultDisplay?.durationLabel}
                 </p>
+                {showStartAnotherAttempt ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 w-full justify-start bg-background"
+                    onClick={startAnotherAttempt}
+                  >
+                    <IconRepeat className="size-4" />
+                    {runnerCopy.startAnotherAttemptLabel}
+                  </Button>
+                ) : null}
               </div>
             ) : null}
           </div>
