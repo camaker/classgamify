@@ -279,7 +279,9 @@ export function buildPublicAnswerFeedbackView({
     acceptedAnswersLabel: m.student_runner_feedback_accepted_answers(),
     acceptedAnswersText:
       reviewItem.acceptedAnswers.length > 1
-        ? formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers)
+        ? formatAcceptedAnswerAlternatives(reviewItem.acceptedAnswers, {
+            separator: ' | ',
+          })
         : null,
     correctAnswer: reviewItem.correctAnswer,
     correctAnswerLabel,

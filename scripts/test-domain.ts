@@ -924,7 +924,7 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
-    acceptedAnswersText: 'Paris, Paris, France',
+    acceptedAnswersText: 'Paris | Paris, France',
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
     explanation: 'Paris is the capital of France.',
