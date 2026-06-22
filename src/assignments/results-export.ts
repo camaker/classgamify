@@ -2,6 +2,7 @@ import type {
   ActivityTemplateType,
   AssignmentSettings,
 } from '@/activities/types';
+import { getTemplateByType } from '@/activities/catalog';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import {
   formatAcceptedAnswerAlternatives,
@@ -79,7 +80,9 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       settings.maxAttempts ?? '',
       settings.timeLimitSeconds ?? '',
       data.snapshot?.activityTitle ?? data.activity.title,
-      data.snapshot?.templateType ?? data.activity.templateType,
+      formatAssignmentExportTemplateLabel(
+        data.snapshot?.templateType ?? data.activity.templateType
+      ),
       data.stats.completions,
       data.stats.averageScore,
       data.stats.averagePoints,
@@ -175,6 +178,12 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_correct(),
     m.assignment_results_export_column_explanation(),
   ] as const;
+}
+
+function formatAssignmentExportTemplateLabel(
+  templateType: ActivityTemplateType
+) {
+  return getTemplateByType(templateType).name;
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {

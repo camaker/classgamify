@@ -7927,7 +7927,7 @@ assert.match(
 );
 assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
-assert.match(csv, /"Snapshot Capitals","quiz"/);
+assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
@@ -7940,7 +7940,19 @@ const zeroAverageDurationCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   zeroAverageDurationCsv,
-  /"Snapshot Capitals","quiz","1","50","1","0","attempt-1"/
+  /"Snapshot Capitals","Quiz","1","50","1","0","attempt-1"/
+);
+const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  activity: {
+    ...csvExportData.activity,
+    templateType: 'line-match',
+  },
+  snapshot: null,
+});
+assert.match(
+  activityTemplateFallbackCsv,
+  /"Original Capitals","Line match","1","50","1","45","attempt-1"/
 );
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
