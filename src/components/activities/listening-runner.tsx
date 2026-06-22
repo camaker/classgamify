@@ -52,7 +52,7 @@ export function ListeningRunner({
   );
   const sequenceView = buildSequentialRunnerView({
     activeItemId,
-    itemLabel: 'Track',
+    itemLabel: copy.sequenceItemLabel ?? copy.title,
     itemViews: runnerView.itemViews,
   });
   const activeItem = sequenceView.activeItem;
@@ -156,13 +156,13 @@ export function ListeningRunner({
               ) : (
                 <IconVolumeOff className="size-4" />
               )}
-              Play audio
+              {copy.playAudioLabel}
             </Button>
           </div>
 
           <div className="mt-6 rounded-lg border bg-muted/20 p-4">
             <p className="text-xs font-medium uppercase text-muted-foreground">
-              Listen first
+              {copy.listeningPromptLabel}
             </p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {copy.helpText}

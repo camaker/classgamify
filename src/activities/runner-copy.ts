@@ -6,11 +6,17 @@ import type { ActivityTemplateType } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
 type ActivityRunnerCopy = {
+  clearSelectionLabel?: string;
   correctAnswerLabel: string;
+  emptyItemsLabel?: string;
   helpText?: string;
   inlineBlankPlaceholder?: string;
   inputPlaceholder: string;
+  itemListLabel?: string;
+  listeningPromptLabel?: string;
+  playAudioLabel?: string;
   progressVerb: string;
+  sequenceItemLabel?: string;
   title: string;
   usedChoiceLabel: string;
   wordBankLabel?: string;
@@ -43,8 +49,11 @@ export function getActivityRunnerKindCopy(
 
   if (runnerKind === 'group-sort') {
     return {
+      clearSelectionLabel: m.activity_runner_clear_selection(),
       correctAnswerLabel: m.activity_runner_correct_group(),
+      emptyItemsLabel: m.activity_runner_all_items_sorted(),
       inputPlaceholder: m.activity_runner_choose_group_placeholder(),
+      itemListLabel: m.activity_runner_group_sort_items_label(),
       progressVerb: m.activity_runner_progress_sorted(),
       title: m.activity_runner_group_sort_title(),
       usedChoiceLabel: m.activity_runner_used_placed(),
@@ -67,7 +76,10 @@ export function getActivityRunnerKindCopy(
       correctAnswerLabel: m.activity_runner_correct_answer(),
       helpText: m.activity_runner_listening_help(),
       inputPlaceholder: m.activity_runner_listening_placeholder(),
+      listeningPromptLabel: m.activity_runner_listening_prompt_label(),
+      playAudioLabel: m.activity_runner_play_audio(),
       progressVerb: m.activity_runner_progress_answered(),
+      sequenceItemLabel: m.activity_runner_listening_track_label(),
       title: m.activity_runner_listening_title(),
       usedChoiceLabel: m.activity_runner_used_selected(),
     };
@@ -87,6 +99,7 @@ export function getActivityRunnerKindCopy(
     correctAnswerLabel: m.activity_runner_model_answer(),
     inputPlaceholder: m.activity_runner_type_answer_placeholder(),
     progressVerb: m.activity_runner_progress_answered(),
+    sequenceItemLabel: m.activity_runner_open_box_item_label(),
     title: m.activity_runner_open_box_title(),
     usedChoiceLabel: m.activity_runner_used_answered(),
   };

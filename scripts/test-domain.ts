@@ -621,6 +621,28 @@ assert.deepEqual(getActivityRunnerKindCopy('fill-blank'), {
   usedChoiceLabel: 'Used',
   wordBankLabel: 'Word bank',
 });
+assert.deepEqual(getActivityRunnerKindCopy('group-sort'), {
+  clearSelectionLabel: 'Clear',
+  correctAnswerLabel: 'Correct group',
+  emptyItemsLabel: 'All items sorted',
+  inputPlaceholder: 'Choose a group',
+  itemListLabel: 'Items',
+  progressVerb: 'sorted',
+  title: 'Group sort',
+  usedChoiceLabel: 'Placed',
+});
+assert.deepEqual(getActivityRunnerKindCopy('listening'), {
+  correctAnswerLabel: 'Correct answer',
+  helpText: 'Use the play button, then answer what you heard.',
+  inputPlaceholder: 'Type what you heard',
+  listeningPromptLabel: 'Listen first',
+  playAudioLabel: 'Play audio',
+  progressVerb: 'answered',
+  sequenceItemLabel: 'Track',
+  title: 'Listening',
+  usedChoiceLabel: 'Selected',
+});
+assert.equal(getActivityRunnerKindCopy('open-box').sequenceItemLabel, 'Box');
 assert.equal(getActivityTemplateRunnerCopy('quiz').title, 'Quiz');
 assert.equal(
   getActivityTemplateRunnerCopy('match-up').correctAnswerLabel,

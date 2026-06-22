@@ -51,7 +51,7 @@ export function OpenBoxRunner({
   );
   const sequenceView = buildSequentialRunnerView({
     activeItemId,
-    itemLabel: 'Box',
+    itemLabel: copy.sequenceItemLabel ?? copy.title,
     itemViews: runnerView.itemViews,
   });
   const activeItem = sequenceView.activeItem;

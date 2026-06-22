@@ -1,5 +1,6 @@
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import { buildPublicAnswerFeedbackView } from '@/assignments/student-runner-view';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
@@ -11,11 +12,12 @@ type PublicAnswerFeedbackProps = {
 
 export function PublicAnswerFeedback({
   className,
-  correctLabel = 'Correct answer',
+  correctLabel,
   reviewItem,
 }: PublicAnswerFeedbackProps) {
   const feedback = buildPublicAnswerFeedbackView({
-    correctAnswerLabel: correctLabel,
+    correctAnswerLabel:
+      correctLabel ?? m.student_runner_feedback_correct_answer(),
     reviewItem,
   });
 

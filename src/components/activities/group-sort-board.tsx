@@ -81,7 +81,7 @@ export function GroupSortBoard({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm font-medium">
               <IconLayoutColumns className="size-4 text-muted-foreground" />
-              Items
+              {copy.itemListLabel}
             </div>
             {selectedItem ? (
               <button
@@ -90,7 +90,7 @@ export function GroupSortBoard({
                 className="rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-default disabled:opacity-60"
                 onClick={clearSelectedItem}
               >
-                Clear
+                {copy.clearSelectionLabel}
               </button>
             ) : null}
           </div>
@@ -115,7 +115,7 @@ export function GroupSortBoard({
               ))
             ) : (
               <div className="min-h-14 rounded-lg border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
-                All items sorted
+                {copy.emptyItemsLabel}
               </div>
             )}
           </div>
