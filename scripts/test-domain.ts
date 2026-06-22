@@ -1086,6 +1086,19 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAttemptCompletionCopy({
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+    progressVerb: getActivityTemplateRunnerCopy('group-sort').progressVerb,
+  }),
+  {
+    confirmIncompleteSubmit: '2 questions are still unanswered.',
+    progressLabel: '1/3 sorted',
+    submitButtonLabel: 'Submit answers',
+    unansweredLabel: '2 items left unanswered.',
+  }
+);
+assert.deepEqual(
+  buildAttemptCompletionCopy({
     completionSummary: {
       answeredItemCount: 2,
       itemCount: 3,

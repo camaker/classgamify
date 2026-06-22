@@ -159,10 +159,14 @@ function PlayPage() {
   const anonymousAttemptCopy = buildAnonymousAttemptCopy({
     browserLabel: anonymousBrowserLabel,
   });
+  const activityRunnerCopy = activity
+    ? getActivityTemplateRunnerCopy(activity.templateType)
+    : undefined;
   const runnerCopy = getStudentRunnerCopy();
   const completionCopy = buildAttemptCompletionCopy({
     completionSummary,
     confirmIncompleteSubmit,
+    progressVerb: activityRunnerCopy?.progressVerb,
   });
   const attemptResultDisplay = result
     ? buildStudentAttemptResultDisplay({
@@ -355,7 +359,8 @@ function PlayPage() {
     assignment: pageState.assignment,
     itemCount,
   });
-  const runnerUiCopy = getActivityTemplateRunnerCopy(activity.templateType);
+  const runnerUiCopy =
+    activityRunnerCopy ?? getActivityTemplateRunnerCopy(activity.templateType);
 
   return (
     <Container className="px-4 py-10 md:py-14">

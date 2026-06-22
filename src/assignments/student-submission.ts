@@ -371,9 +371,11 @@ export function buildStudentAttemptSessionKey({
 export function buildAttemptCompletionCopy({
   completionSummary,
   confirmIncompleteSubmit,
+  progressVerb,
 }: {
   completionSummary: AttemptCompletionSummary;
   confirmIncompleteSubmit: boolean;
+  progressVerb?: string;
 }): AttemptCompletionCopy {
   const { unansweredItemCount } = completionSummary;
 
@@ -388,6 +390,7 @@ export function buildAttemptCompletionCopy({
             }),
     progressLabel: formatAttemptCompletionProgressLabel({
       completionSummary,
+      verb: progressVerb,
     }),
     submitButtonLabel:
       confirmIncompleteSubmit && unansweredItemCount > 0
