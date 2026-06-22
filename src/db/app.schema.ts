@@ -169,6 +169,12 @@ export const assignment = sqliteTable(
   (table) => [
     index('assignment_activity_id_idx').on(table.activityId),
     index('assignment_owner_id_idx').on(table.ownerId),
+    index('assignment_owner_updated_idx').on(table.ownerId, table.updatedAt),
+    index('assignment_owner_status_updated_idx').on(
+      table.ownerId,
+      table.status,
+      table.updatedAt
+    ),
     index('assignment_share_slug_idx').on(table.shareSlug),
     index('assignment_status_idx').on(table.status),
   ]
@@ -247,6 +253,10 @@ export const attempt = sqliteTable(
   },
   (table) => [
     index('attempt_assignment_id_idx').on(table.assignmentId),
+    index('attempt_assignment_completed_idx').on(
+      table.assignmentId,
+      table.completedAt
+    ),
     index('attempt_assignment_anonymous_token_idx').on(
       table.assignmentId,
       table.anonymousToken
