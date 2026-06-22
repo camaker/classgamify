@@ -1,4 +1,5 @@
 import type { AssignmentStatus } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDate = Date | string | null | undefined;
 export type ManagedAssignmentStatus = Extract<
@@ -45,11 +46,11 @@ export function getAssignmentStatusLabel(
   now = Date.now()
 ) {
   if (status === 'published' && isAssignmentExpired(expiresAt, now)) {
-    return 'Expired';
+    return m.assignment_status_label_expired();
   }
-  if (status === 'published') return 'Open';
-  if (status === 'closed') return 'Closed';
-  return 'Draft';
+  if (status === 'published') return m.assignment_status_label_open();
+  if (status === 'closed') return m.assignment_status_label_closed();
+  return m.assignment_status_label_draft();
 }
 
 function canUpdateAssignmentStatus({
@@ -85,16 +86,16 @@ export function getAssignmentStatusActionCopy(
 ): Omit<AssignmentStatusAction, 'kind' | 'nextStatus'> {
   if (nextStatus === 'closed') {
     return {
-      failureMessage: 'Assignment status could not be updated.',
-      label: 'Close link',
-      successMessage: 'Assignment link closed.',
+      failureMessage: m.assignment_status_action_failure(),
+      label: m.assignment_status_action_close_label(),
+      successMessage: m.assignment_status_action_close_success(),
     };
   }
 
   return {
-    failureMessage: 'Assignment status could not be updated.',
-    label: 'Reopen link',
-    successMessage: 'Assignment link reopened.',
+    failureMessage: m.assignment_status_action_failure(),
+    label: m.assignment_status_action_reopen_label(),
+    successMessage: m.assignment_status_action_reopen_success(),
   };
 }
 
@@ -144,21 +145,21 @@ function getAssignmentStatusTransitionError({
 }) {
   if (currentStatus === nextStatus) {
     return nextStatus === 'published'
-      ? 'Assignment link is already open.'
-      : 'Assignment link is already closed.';
+      ? m.assignment_status_error_already_open()
+      : m.assignment_status_error_already_closed();
   }
 
   if (nextStatus === 'closed' && currentStatus !== 'published') {
-    return 'Only published assignment links can be closed.';
+    return m.assignment_status_error_close_only_published();
   }
 
   if (nextStatus === 'published') {
     if (currentStatus !== 'closed') {
-      return 'Only closed assignment links can be reopened.';
+      return m.assignment_status_error_reopen_only_closed();
     }
 
     if (isAssignmentExpired(expiresAt, now)) {
-      return 'Expired assignments cannot be reopened.';
+      return m.assignment_status_error_reopen_expired();
     }
   }
 
@@ -175,6 +176,6 @@ export function assertAssignmentStatusTransition(input: {
 
   throw new Error(
     getAssignmentStatusTransitionError(input) ??
-      'Assignment status could not be updated.'
+      m.assignment_status_action_failure()
   );
 }
