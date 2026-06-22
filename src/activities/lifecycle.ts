@@ -6,17 +6,14 @@ export function getArchivedActivityDerivationError() {
 }
 
 type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
-export type ActivityLifecycleAction =
-  | ActivityDerivativeAction
-  | 'archive'
-  | 'restore';
+type ActivityLifecycleAction = ActivityDerivativeAction | 'archive' | 'restore';
 
-export type ActivityLifecycleActionCopy = {
+type ActivityLifecycleActionCopy = {
   failureMessage: string;
   successMessage: string;
 };
 
-export type ActivityDerivativeActionGate =
+type ActivityDerivativeActionGate =
   | {
       type: 'ready';
     }

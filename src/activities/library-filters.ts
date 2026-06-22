@@ -6,7 +6,7 @@ import {
 export type ActivityLibraryStatus = 'active' | 'archived';
 export type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
-export type ActivityLibrarySearchState = {
+type ActivityLibrarySearchState = {
   created?: string;
   page?: number;
   q?: string;
@@ -14,7 +14,7 @@ export type ActivityLibrarySearchState = {
   template?: ActivityTemplateFilter;
 };
 
-export type ActivityLibraryRouteSearch = {
+type ActivityLibraryRouteSearch = {
   created?: string;
   page?: number;
   q?: string;

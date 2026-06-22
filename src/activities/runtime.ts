@@ -32,7 +32,7 @@ export type RuntimeItem =
       prompt: string;
     };
 
-export type RuntimeEvaluation = {
+type RuntimeEvaluation = {
   answers: AttemptAnswer[];
   result: AttemptResult;
 };

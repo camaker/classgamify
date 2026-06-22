@@ -2,7 +2,7 @@ import type { ActivityTemplateType } from '@/activities/types';
 import type { CreateActivityInput } from '@/activities/validation';
 import { m } from '@/locale/paraglide/messages';
 
-export type ActivityTemplateScaffold = Pick<
+type ActivityTemplateScaffold = Pick<
   CreateActivityInput,
   | 'description'
   | 'groupsText'

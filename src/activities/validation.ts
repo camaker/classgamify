@@ -60,7 +60,7 @@ export const createActivityInputSchema = z.object({
 
 export type CreateActivityInput = z.infer<typeof createActivityInputSchema>;
 
-export type CreateActivityPayload = CreateActivityInput & {
+type CreateActivityPayload = CreateActivityInput & {
   difficulty: ActivityDifficulty;
   templateType: ActivityTemplateType;
   visibility: ActivityVisibility;
