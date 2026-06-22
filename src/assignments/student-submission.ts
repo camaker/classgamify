@@ -1,6 +1,6 @@
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import {
-  ANONYMOUS_BROWSER_LABEL,
+  getAnonymousBrowserLabel,
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
@@ -191,7 +191,7 @@ export function buildAnonymousAttemptCopy({
 }: {
   browserLabel?: string;
 }): AnonymousAttemptCopy {
-  const label = browserLabel?.trim() || ANONYMOUS_BROWSER_LABEL;
+  const label = browserLabel?.trim() || getAnonymousBrowserLabel();
 
   return {
     description: m.student_runner_anonymous_attempt_description({ label }),

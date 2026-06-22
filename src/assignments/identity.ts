@@ -1,5 +1,5 @@
-const ANONYMOUS_STUDENT_LABEL = 'Anonymous student';
-export const ANONYMOUS_BROWSER_LABEL = 'Anonymous browser';
+import { m } from '@/locale/paraglide/messages';
+
 const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
 
 export type StudentIdentitySource = {
@@ -27,12 +27,11 @@ export function normalizeAnonymousToken(value?: string | null) {
 
 export function getAnonymousBrowserLabel(value?: string | null) {
   const anonymousToken = normalizeAnonymousToken(value);
-  if (!anonymousToken) return ANONYMOUS_BROWSER_LABEL;
+  const baseLabel = m.student_identity_anonymous_browser();
+  if (!anonymousToken) return baseLabel;
 
   const suffix = anonymousToken.replace(/[^a-z0-9]/gi, '').slice(-6);
-  return suffix
-    ? `${ANONYMOUS_BROWSER_LABEL} ${suffix.toUpperCase()}`
-    : ANONYMOUS_BROWSER_LABEL;
+  return suffix ? `${baseLabel} ${suffix.toUpperCase()}` : baseLabel;
 }
 
 export function buildAnonymousAttemptTokenStorageKey(shareId: string) {
@@ -106,8 +105,8 @@ export function createStudentIdentityResolver(
     labelsByKey.set(
       key,
       anonymousToken
-        ? `${ANONYMOUS_STUDENT_LABEL} ${anonymousIndex++}`
-        : ANONYMOUS_STUDENT_LABEL
+        ? formatAnonymousStudentLabel(anonymousIndex++)
+        : formatAnonymousStudentLabel()
     );
   }
 
@@ -116,8 +115,14 @@ export function createStudentIdentityResolver(
       const key = getStudentIdentityKey(source);
       return {
         key,
-        label: labelsByKey.get(key) ?? ANONYMOUS_STUDENT_LABEL,
+        label: labelsByKey.get(key) ?? formatAnonymousStudentLabel(),
       };
     },
   };
+}
+
+function formatAnonymousStudentLabel(index?: number) {
+  return index
+    ? m.student_identity_anonymous_student_index({ index })
+    : m.student_identity_anonymous_student();
 }
