@@ -64,7 +64,7 @@ export type PublicAssignmentPayload = {
   };
 };
 
-export type PublicAssignmentPayloadSource = {
+type PublicAssignmentPayloadSource = {
   activity: {
     contentJson: ActivityContent;
     description: string | null;

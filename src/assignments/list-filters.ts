@@ -3,14 +3,14 @@ import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
 export type AssignmentStatusFilter = 'all' | AssignmentStatus;
 
-export type AssignmentListSearchState = {
+type AssignmentListSearchState = {
   page?: number;
   published?: string;
   q?: string;
   status?: AssignmentStatusFilter;
 };
 
-export type AssignmentListRouteSearch = {
+type AssignmentListRouteSearch = {
   page?: number;
   published?: string;
   q?: string;

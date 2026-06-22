@@ -26,13 +26,13 @@ export type ActivityLibraryCardSummary = {
   suggestedTemplateOptions: ActivityLibraryTemplateOption[];
 };
 
-export type ActivityLibrarySummarySource = {
+type ActivityLibrarySummarySource = {
   contentJson: ActivityContent;
   templateType: ActivityTemplateType;
   visibility: string;
 };
 
-export type ActivityLibrarySummary = {
+type ActivityLibrarySummary = {
   archivedActivities: number;
   draftActivities: number;
   remixReadyActivities: number;

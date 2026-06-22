@@ -11,7 +11,7 @@ export type AssignmentDeliverySummaryId =
   | 'itemOrder'
   | 'timer';
 
-export type AssignmentDeliverySummaryItem = {
+type AssignmentDeliverySummaryItem = {
   id: AssignmentDeliverySummaryId;
   label: string;
   value: string;
@@ -27,7 +27,7 @@ export type PublicAssignmentRuleSummaryItem = {
   value: string;
 };
 
-export type AssignmentDeliverySummaryInput = {
+type AssignmentDeliverySummaryInput = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
   maxAttempts?: number | null;
