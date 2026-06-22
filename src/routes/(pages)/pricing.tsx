@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/accordion';
 import { websiteConfig } from '@/config/website';
 import { useCurrentPlan } from '@/hooks/use-payment';
-import { getLocale } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { jsonLdScript } from '@/lib/structured-data';
@@ -32,8 +31,7 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/pricing')({
   head: () => {
-    const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
-    const faqItems = getPricingFaqItems(currentLocale);
+    const faqItems = getPricingFaqItems();
     const faqJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
@@ -63,9 +61,8 @@ function PricingPage() {
   const userId = session?.user?.id;
   const { data: planData } = useCurrentPlan(!!userId);
   const currentPlan = planData?.currentPlan ?? null;
-  const locale = getLocale() === 'zh' ? 'zh' : 'en';
-  const copy = getPricingCopy(locale);
-  const faqItems = getPricingFaqItems(locale);
+  const copy = getPricingCopy();
+  const faqItems = getPricingFaqItems();
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -167,130 +164,56 @@ function ValueCard({
   );
 }
 
-function getPricingCopy(locale: 'en' | 'zh') {
-  if (locale === 'zh') {
-    return {
-      eyebrow: 'ClassGamify 方案',
-      faqDescription:
-        '围绕活动模板、作业链接、学生结果和学校场景的购买前问题。',
-      faqTitle: '常见问题',
-      schoolCta: '咨询学校方案',
-      schoolDescription:
-        '如果你要给多个老师、校区或长期班级使用，先联系我们梳理教师席位、学生数据、模板需求和部署节奏。',
-      schoolEyebrow: '学校与机构',
-      schoolTitle: '需要多人教师工作区？',
-      valueCards: [
-        {
-          description:
-            '从 quiz、match-up、line-match、group sort、fill-blank、listening、matching pairs 和 open-box 等核心模板开始。',
-          icon: IconLayoutGrid,
-          title: '模板库',
-        },
-        {
-          description:
-            '把一节课的内容保存成可复用活动，再发布成不同班级的作业链接。',
-          icon: IconDeviceGamepad2,
-          title: '活动和作业',
-        },
-        {
-          description:
-            '付费方案会围绕 AI 生成、批量改编、更多模板和结果报表持续扩展。',
-          icon: IconSparkles,
-          title: 'AI 创建加速',
-        },
-      ],
-    };
-  }
-
+function getPricingCopy() {
   return {
-    eyebrow: 'ClassGamify plans',
-    faqDescription:
-      'Questions about activity templates, assignment links, student results, and school use.',
-    faqTitle: 'Frequently asked questions',
-    schoolCta: 'Talk to us',
-    schoolDescription:
-      'For multiple teachers, campuses, or long-running cohorts, contact us to plan teacher seats, student data handling, template needs, and rollout timing.',
-    schoolEyebrow: 'Schools and teams',
-    schoolTitle: 'Need a multi-teacher workspace?',
+    eyebrow: m.pricing_eyebrow(),
+    faqDescription: m.pricing_faq_description(),
+    faqTitle: m.pricing_faq_title(),
+    schoolCta: m.pricing_school_cta(),
+    schoolDescription: m.pricing_school_description(),
+    schoolEyebrow: m.pricing_school_eyebrow(),
+    schoolTitle: m.pricing_school_title(),
     valueCards: [
       {
-        description:
-          'Start with core templates such as quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, and open-box activities.',
+        description: m.pricing_value_templates_description(),
         icon: IconLayoutGrid,
-        title: 'Template library',
+        title: m.pricing_value_templates_title(),
       },
       {
-        description:
-          'Save lesson content as reusable activities, then publish separate assignment links for each class run.',
+        description: m.pricing_value_assignments_description(),
         icon: IconDeviceGamepad2,
-        title: 'Activities and assignments',
+        title: m.pricing_value_assignments_title(),
       },
       {
-        description:
-          'Paid plans will expand around AI creation, remixing, more templates, and result reporting.',
+        description: m.pricing_value_ai_description(),
         icon: IconSparkles,
-        title: 'AI creation speed',
+        title: m.pricing_value_ai_title(),
       },
     ],
   };
 }
 
-function getPricingFaqItems(locale: 'en' | 'zh') {
-  if (locale === 'zh') {
-    return [
-      {
-        question: '免费版适合做什么？',
-        answer:
-          '免费版适合试用核心创建流程：浏览模板、创建少量活动、打开学生预览，并验证是否适合你的课堂节奏。',
-      },
-      {
-        question: 'Pro 主要解锁什么？',
-        answer:
-          'Pro 会围绕更多活动数量、更多发布作业、结果追踪、AI 生成和模板改编能力扩展。',
-      },
-      {
-        question: '现在的模板数量为什么不多？',
-        answer:
-          '第一版故意只保留首批高频课堂模板，先把创建、发布、学生完成和结果闭环做稳，再继续增加模板。',
-      },
-      {
-        question: '学生需要登录吗？',
-        answer:
-          'v1 设计倾向于公开作业链接和轻量学生姓名/匿名 token。教师账号用于创建、发布和查看结果。',
-      },
-      {
-        question: '可以给学校或机构使用吗？',
-        answer:
-          '可以作为方向规划。学校场景需要进一步明确教师席位、学生数据、权限和合规要求，建议先联系我们。',
-      },
-    ];
-  }
-
+function getPricingFaqItems() {
   return [
     {
-      question: 'What is the free plan for?',
-      answer:
-        'The free plan is for testing the core creation loop: browse templates, create a small number of activities, open student previews, and see whether the workflow fits your class rhythm.',
+      question: m.pricing_faq_free_question(),
+      answer: m.pricing_faq_free_answer(),
     },
     {
-      question: 'What will Pro unlock?',
-      answer:
-        'Pro will expand around higher activity and assignment limits, result tracking, AI generation, and faster template remixing.',
+      question: m.pricing_faq_pro_question(),
+      answer: m.pricing_faq_pro_answer(),
     },
     {
-      question: 'Why are there only a few templates first?',
-      answer:
-        'The first version intentionally starts with a focused set of high-frequency classroom templates so creation, publishing, student play, and results become reliable before the catalog grows.',
+      question: m.pricing_faq_templates_question(),
+      answer: m.pricing_faq_templates_answer(),
     },
     {
-      question: 'Do students need accounts?',
-      answer:
-        'The v1 direction is public assignment links with a lightweight student name or anonymous token. Teacher accounts own creation, publishing, and results.',
+      question: m.pricing_faq_student_accounts_question(),
+      answer: m.pricing_faq_student_accounts_answer(),
     },
     {
-      question: 'Can schools or tutoring teams use it?',
-      answer:
-        'That is part of the product direction. School use needs teacher seats, student data rules, permissions, and rollout details, so contact us before a larger deployment.',
+      question: m.pricing_faq_schools_question(),
+      answer: m.pricing_faq_schools_answer(),
     },
   ];
 }
