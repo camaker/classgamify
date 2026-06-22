@@ -7,7 +7,7 @@ import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-
 import type { AssignmentStudentSummary } from '@/assignments/results';
 import { m } from '@/locale/paraglide/messages';
 
-export type AssignmentStudentFollowUpSummaryInput = {
+type AssignmentStudentFollowUpSummaryInput = {
   assignmentTitle: string;
   students: AssignmentStudentSummary[];
 };

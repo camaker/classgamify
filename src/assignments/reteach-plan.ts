@@ -11,7 +11,7 @@ import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import { m } from '@/locale/paraglide/messages';
 
-export type AssignmentReteachPlanInput = {
+type AssignmentReteachPlanInput = {
   assignmentTitle: string;
   items: AssignmentItemAnalysis[];
   students: AssignmentStudentSummary[];

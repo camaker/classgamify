@@ -12,21 +12,21 @@ import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import { m } from '@/locale/paraglide/messages';
 
-export type AssignmentClassroomBriefStats = {
+type AssignmentClassroomBriefStats = {
   averageDurationSeconds: number;
   averagePoints: number;
   averageScore: number;
   completions: number;
 };
 
-export type AssignmentClassroomBriefInput = {
+type AssignmentClassroomBriefInput = {
   assignmentTitle: string;
   items: AssignmentItemAnalysis[];
   stats: AssignmentClassroomBriefStats;
   students: AssignmentStudentSummary[];
 };
 
-export type AssignmentClassroomBrief = {
+type AssignmentClassroomBrief = {
   focusItems: AssignmentItemAnalysis[];
   followUpStudents: AssignmentStudentSummary[];
   text: string;

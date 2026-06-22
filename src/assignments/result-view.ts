@@ -35,7 +35,7 @@ export type ItemPerformanceSort =
   | 'type';
 export type AttemptReviewFilter = 'all' | 'needs-review';
 
-export type AssignmentResultSearchState = {
+type AssignmentResultSearchState = {
   itemSort?: ItemPerformanceSort;
   review?: AttemptReviewFilter;
   sort?: StudentSummarySort;
@@ -61,7 +61,7 @@ type AssignmentResultControlSearchUpdate =
       value: StudentSummarySort;
     };
 
-export type AssignmentResultAction =
+type AssignmentResultAction =
   | 'copy-brief'
   | 'copy-follow-up'
   | 'copy-item-review'
@@ -77,7 +77,7 @@ export type AssignmentResultActionGate =
       type: 'blocked';
     };
 
-export type AssignmentResultActionCopy = {
+type AssignmentResultActionCopy = {
   failureMessage: string;
   label: string;
   successMessage: string;
@@ -951,25 +951,23 @@ function clampProgressValue(value: number) {
   return Math.min(100, Math.max(0, value));
 }
 
-export type ResultSearchSummaryInput = {
+type ResultSearchSummaryInput = {
   matchedAttempts: number;
   matchedStudents: number;
   search: string;
 };
 
-export type AttemptReviewSubmissionSummaryInput = {
+type AttemptReviewSubmissionSummaryInput = {
   shownAttempts: number;
   totalAttempts: number;
 };
 
-export type AssignmentAttemptRowInput = {
+type AssignmentAttemptRowInput = {
   id: string;
   studentName: string | null;
 };
 
-export type AssignmentAttemptReviewRow<
-  TAttempt extends AssignmentAttemptRowInput,
-> = {
+type AssignmentAttemptReviewRow<TAttempt extends AssignmentAttemptRowInput> = {
   attempt: TAttempt;
   review: AssignmentAttemptReview | undefined;
 };

@@ -7,7 +7,7 @@ import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priori
 import type { AssignmentItemAnalysis } from '@/assignments/results';
 import { m } from '@/locale/paraglide/messages';
 
-export type AssignmentItemReviewSummaryInput = {
+type AssignmentItemReviewSummaryInput = {
   assignmentTitle: string;
   items: AssignmentItemAnalysis[];
 };
