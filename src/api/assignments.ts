@@ -25,6 +25,7 @@ import {
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-link';
 import { getDb } from '@/db';
 import {
   activity,
@@ -40,11 +41,15 @@ import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
 const assignmentStatusFilterSchema = z.enum(['draft', 'published', 'closed']);
+const assignmentShareSlugSchema = z
+  .string()
+  .transform(normalizeAssignmentShareSlug)
+  .pipe(z.string().min(1).max(80));
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
-  publishedShareSlug: z.string().trim().min(1).max(80).optional(),
+  publishedShareSlug: assignmentShareSlugSchema.optional(),
   search: z.string().trim().max(120).optional(),
   status: assignmentStatusFilterSchema.optional(),
 });
@@ -398,7 +403,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
   });
 
 const getPublicAssignmentInputSchema = z.object({
-  shareSlug: z.string().min(1).max(80),
+  shareSlug: assignmentShareSlugSchema,
 });
 
 export const getPublicAssignment = createServerFn({ method: 'GET' })
@@ -451,7 +456,7 @@ const submitAttemptInputSchema = z.object({
     .min(0)
     .max(24 * 60 * 60)
     .optional(),
-  shareSlug: z.string().min(1).max(80),
+  shareSlug: assignmentShareSlugSchema,
   studentName: z.string().trim().min(1).max(80).optional(),
 });
 

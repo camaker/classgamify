@@ -285,6 +285,7 @@ import {
   assignmentShareLinkActionCopy,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
+  normalizeAssignmentShareSlug,
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
@@ -1057,7 +1058,7 @@ assert.equal(
 assert.equal(
   buildStudentAttemptSessionKey({
     runtimeItems: submissionRuntimeItems,
-    shareSlug: 'share-one',
+    shareSlug: ' share-one ',
   }),
   '["share-one",["item-1","item-2","item-3"]]'
 );
@@ -1222,7 +1223,7 @@ assert.deepEqual(
     collectStudentName: true,
     durationSeconds: 89,
     runtimeItems: submissionRuntimeItems,
-    shareSlug: 'share-one',
+    shareSlug: ' share-one ',
     anonymousToken: ' anonymous-token-should-not-send ',
     studentName: ' Ava   Chen ',
   }),
@@ -1478,12 +1479,14 @@ assert.deepEqual(
   }
 );
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
+assert.equal(buildAssignmentSharePath('  abc 123  '), '/play/abc%20123');
 assert.equal(
   buildAssignmentSharePath('class/6?homework=yes'),
   '/play/class%2F6%3Fhomework%3Dyes'
 );
+assert.equal(normalizeAssignmentShareSlug('  share-one  '), 'share-one');
 assert.equal(
-  normalizeShareBaseUrl('https://classgamify.test///'),
+  normalizeShareBaseUrl('  https://classgamify.test///  '),
   'https://classgamify.test'
 );
 assert.equal(

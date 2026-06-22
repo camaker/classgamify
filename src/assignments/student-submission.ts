@@ -4,6 +4,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-link';
 import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;
@@ -314,7 +315,10 @@ export function buildStudentAttemptSessionKey({
   runtimeItems: StudentSubmissionRuntimeItem[];
   shareSlug: string;
 }): string {
-  return JSON.stringify([shareSlug, runtimeItems.map((item) => item.id)]);
+  return JSON.stringify([
+    normalizeAssignmentShareSlug(shareSlug),
+    runtimeItems.map((item) => item.id),
+  ]);
 }
 
 export function buildAttemptCompletionCopy({
@@ -392,7 +396,7 @@ export function buildStudentAttemptSubmissionInput({
       answers,
       runtimeItems,
     }),
-    shareSlug,
+    shareSlug: normalizeAssignmentShareSlug(shareSlug),
   };
 
   if (durationSeconds !== undefined) {

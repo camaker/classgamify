@@ -13,7 +13,7 @@ export const assignmentShareLinkActionCopy = {
 } as const;
 
 export function buildAssignmentSharePath(shareSlug: string) {
-  return `/play/${encodeURIComponent(shareSlug)}`;
+  return `/play/${encodeURIComponent(normalizeAssignmentShareSlug(shareSlug))}`;
 }
 
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
@@ -21,8 +21,12 @@ export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
   return `${origin}${buildAssignmentSharePath(shareSlug)}`;
 }
 
+export function normalizeAssignmentShareSlug(shareSlug: string) {
+  return shareSlug.trim();
+}
+
 export function normalizeShareBaseUrl(baseUrl: string) {
-  return baseUrl.replace(/\/+$/, '');
+  return baseUrl.trim().replace(/\/+$/, '');
 }
 
 function getRuntimeBaseUrl() {
