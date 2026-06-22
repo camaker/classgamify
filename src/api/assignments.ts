@@ -14,6 +14,7 @@ import {
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
+import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
   assertAssignmentStatusTransition,
   isAssignmentExpired,
@@ -153,19 +154,16 @@ export const listAssignments = createServerFn({ method: 'GET' })
       ...withResolvedAssignmentSettings(item),
       stats: statsByAssignmentId.get(item.assignment.id) ?? emptyStats,
     }));
-    const summaryStats = summarizeAssignmentAttempts(summaryAttempts);
+    const summary = buildAssignmentListSummary({
+      attempts: summaryAttempts,
+      assignments: matchingAssignments,
+      totalAssignments: totalRow?.count ?? 0,
+    });
 
     return {
       items: enriched,
       publishedAssignment,
-      summary: {
-        averageScore: summaryStats.averageScore,
-        completions: summaryStats.completions,
-        openAssignments: matchingAssignments.filter((item) =>
-          isAssignmentOpen(item.status, item.expiresAt)
-        ).length,
-        totalAssignments: totalRow?.count ?? 0,
-      },
+      summary,
       total: totalRow?.count ?? 0,
     };
   });

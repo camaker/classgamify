@@ -185,6 +185,7 @@ import {
 } from '@/assignments/list-filters';
 import {
   buildAssignmentListFilterSummary,
+  buildAssignmentListSummary,
   buildAssignmentListSummaryMetrics,
 } from '@/assignments/list-summary';
 import {
@@ -4179,6 +4180,53 @@ assert.deepEqual(
     total: 2,
   }),
   { hasFilters: true, text: '2 matches' }
+);
+assert.deepEqual(
+  buildAssignmentListSummary({
+    assignments: [
+      {
+        expiresAt: '2026-02-01T00:00:00.000Z',
+        status: 'published',
+      },
+      {
+        expiresAt: '2025-12-31T23:59:59.000Z',
+        status: 'published',
+      },
+      {
+        expiresAt: null,
+        status: 'closed',
+      },
+    ],
+    attempts: [
+      {
+        resultJson: {
+          accuracy: 50,
+          completedItemCount: 1,
+          correctItemCount: 1,
+          durationSeconds: 30,
+          earnedPoints: 1,
+          totalPoints: 2,
+        },
+      },
+      {
+        resultJson: {
+          accuracy: 100,
+          completedItemCount: 2,
+          correctItemCount: 2,
+          durationSeconds: 60,
+          earnedPoints: 2,
+          totalPoints: 2,
+        },
+      },
+    ],
+    now: Date.parse('2026-01-01T00:00:00.000Z'),
+  }),
+  {
+    averageScore: 75,
+    completions: 2,
+    openAssignments: 1,
+    totalAssignments: 3,
+  }
 );
 assert.deepEqual(
   buildAssignmentListSummaryMetrics({

@@ -1,13 +1,14 @@
 import type { AttemptResult } from '@/activities/types';
 
-type AssignmentAttemptStatsSource = {
+export type AssignmentAttemptStatsSource = {
   resultJson: AttemptResult | null;
   score?: number | null;
 };
 
-type AssignmentAttemptStatsByAssignmentSource = AssignmentAttemptStatsSource & {
+interface AssignmentAttemptStatsByAssignmentSource
+  extends AssignmentAttemptStatsSource {
   assignmentId: string;
-};
+}
 
 type AssignmentAttemptStats = {
   averageDurationSeconds: number;

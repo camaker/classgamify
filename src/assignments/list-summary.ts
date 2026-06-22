@@ -1,5 +1,16 @@
+import type { AssignmentStatus } from '@/activities/types';
+import {
+  summarizeAssignmentAttempts,
+  type AssignmentAttemptStatsSource,
+} from '@/assignments/attempt-stats';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
+import { type AssignmentDate, isAssignmentOpen } from '@/assignments/lifecycle';
 import { m } from '@/locale/paraglide/messages';
+
+type AssignmentListSummaryAssignmentSource = {
+  expiresAt: AssignmentDate;
+  status: AssignmentStatus | string;
+};
 
 type AssignmentListSummary = {
   averageScore: number;
@@ -19,6 +30,29 @@ export type AssignmentListSummaryMetric = {
   label: string;
   value: string;
 };
+
+export function buildAssignmentListSummary({
+  attempts,
+  assignments,
+  now = Date.now(),
+  totalAssignments = assignments.length,
+}: {
+  attempts: AssignmentAttemptStatsSource[];
+  assignments: AssignmentListSummaryAssignmentSource[];
+  now?: number;
+  totalAssignments?: number;
+}): AssignmentListSummary {
+  const stats = summarizeAssignmentAttempts(attempts);
+
+  return {
+    averageScore: stats.averageScore,
+    completions: stats.completions,
+    openAssignments: assignments.filter((item) =>
+      isAssignmentOpen(item.status, item.expiresAt, now)
+    ).length,
+    totalAssignments,
+  };
+}
 
 export function buildAssignmentListFilterSummary({
   isLoading,
