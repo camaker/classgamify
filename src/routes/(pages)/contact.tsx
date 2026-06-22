@@ -41,8 +41,8 @@ function ContactPage() {
   const emailAddress =
     supportEmail?.match(/<([^>]+)>/)?.[1] ?? supportEmail ?? '';
   const directSubject = isClassroom
-    ? 'ClassGamify classroom workflow'
-    : 'ClassGamify support';
+    ? m.contact_subject_classroom()
+    : m.contact_subject_general();
   const contactIntent = isClassroom ? 'classroom' : 'general';
   const mailto = getSupportMailto(supportEmail, directSubject);
   const supportTopics = [
@@ -50,19 +50,19 @@ function ContactPage() {
       icon: IconBook2,
       title: m.contact_topic_learning_title(),
       description: m.contact_topic_learning_description(),
-      subject: 'ClassGamify product support',
+      subject: m.contact_subject_product(),
     },
     {
       icon: IconUsers,
       title: m.contact_topic_classroom_title(),
       description: m.contact_topic_classroom_description(),
-      subject: 'ClassGamify classroom workflow',
+      subject: m.contact_subject_classroom(),
     },
     {
       icon: IconSparkles,
       title: m.contact_topic_partnership_title(),
       description: m.contact_topic_partnership_description(),
-      subject: 'ClassGamify pricing or partnership',
+      subject: m.contact_subject_pricing(),
     },
   ];
   const checklistTitle = isClassroom

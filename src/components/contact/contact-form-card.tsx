@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { getLocale } from '@/lib/locale';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -48,8 +47,7 @@ export function ContactFormCard({
   intent?: ContactIntent;
 }) {
   const [error, setError] = useState<string | undefined>();
-  const currentLocale = getLocale() === 'zh' ? 'zh' : 'en';
-  const classroomCopy = getClassroomInquiryCopy(currentLocale);
+  const classroomCopy = getClassroomInquiryCopy();
   const defaultMessage =
     intent === 'classroom' ? m.contact_classroom_message_template() : '';
   const form = useForm<FormValues>({
@@ -316,43 +314,20 @@ function buildClassroomInquiryMessage(
     .join('\n');
 }
 
-function getClassroomInquiryCopy(locale: 'en' | 'zh') {
-  if (locale === 'zh') {
-    return {
-      description:
-        '这些信息会整理进邮件，方便我们判断你需要的是模板活动、作业链接、学生结果复盘还是 AI 辅助备课。',
-      emailHeading: '课堂咨询信息',
-      gradeLabel: '班级或年级',
-      gradePlaceholder: '例如：小学三年级 / 初中词汇复习',
-      learnersLabel: '学习者',
-      learnersPlaceholder: '例如：28 名三年级学生 / 1 对 1 辅导',
-      materialLabel: '活动材料',
-      materialPlaceholder: '例如：英语单词、科学分类、数学概念或已有练习纸',
-      needLabel: '主要需求',
-      needPlaceholder: '例如：单词配对、拖拽分类、填空作业、结果导出',
-      routineLabel: '每周节奏',
-      routinePlaceholder: '例如：每周 2 节课，课后发一次作业链接',
-      title: '课堂需求细节',
-    };
-  }
-
+function getClassroomInquiryCopy() {
   return {
-    description:
-      'These details are added to the email so we can tell whether you need template activities, assignment links, student results, or AI-assisted prep.',
-    emailHeading: 'Classroom inquiry details',
-    gradeLabel: 'Class or grade',
-    gradePlaceholder: 'e.g. Grade 3 / middle-school vocabulary review',
-    learnersLabel: 'Learners',
-    learnersPlaceholder: 'e.g. 28 third graders / 1:1 tutoring',
-    materialLabel: 'Activity material',
-    materialPlaceholder:
-      'e.g. English vocab, science groups, math concepts, existing worksheet',
-    needLabel: 'Main need',
-    needPlaceholder:
-      'e.g. word matching, drag sorting, fill blanks, result export',
-    routineLabel: 'Weekly routine',
-    routinePlaceholder:
-      'e.g. 2 classes per week, one homework link after class',
-    title: 'Classroom details',
+    description: m.contact_classroom_details_description(),
+    emailHeading: m.contact_classroom_email_heading(),
+    gradeLabel: m.contact_classroom_grade_label(),
+    gradePlaceholder: m.contact_classroom_grade_placeholder(),
+    learnersLabel: m.contact_classroom_learners_label(),
+    learnersPlaceholder: m.contact_classroom_learners_placeholder(),
+    materialLabel: m.contact_classroom_material_label(),
+    materialPlaceholder: m.contact_classroom_material_placeholder(),
+    needLabel: m.contact_classroom_need_label(),
+    needPlaceholder: m.contact_classroom_need_placeholder(),
+    routineLabel: m.contact_classroom_routine_label(),
+    routinePlaceholder: m.contact_classroom_routine_placeholder(),
+    title: m.contact_classroom_details_title(),
   };
 }
