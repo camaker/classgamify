@@ -524,11 +524,18 @@ const retiredRouteDocumentationText = [
 ]
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
+const e2eTestCatalogText = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(
   retiredRouteDocumentationText,
   /\/about|\/zh\/about|waitlist|src\/components\/blocks\/newsletter-card\.tsx/
 );
+assert.doesNotMatch(
+  e2eTestCatalogText,
+  /ClassGamify migration entry point/,
+  'Retired legacy routes should not be documented as active migration pages.'
+);
+assert.match(e2eTestCatalogText, /retired legacy learning routes/);
 assert.equal(
   existsSync('src/routes/hanzi/$character.tsx'),
   false,
