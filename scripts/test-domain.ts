@@ -527,7 +527,13 @@ assert.match(robotsRouteSource, /['"]\/play['"]/);
 assert.match(robotsRouteSource, /['"]\/learn['"]/);
 assert.match(robotsRouteSource, /['"]\/hsk['"]/);
 assert.match(robotsRouteSource, /['"]\/hanzi['"]/);
-for (const retiredStubRoute of ['/about', '/ai', '/changelog', '/waitlist']) {
+for (const retiredStubRoute of [
+  '/about',
+  '/ai',
+  '/changelog',
+  '/settings/credits',
+  '/waitlist',
+]) {
   assert.doesNotMatch(robotsRouteSource, new RegExp(`['"]${retiredStubRoute}`));
   assert.doesNotMatch(
     routeConstantsSource,
