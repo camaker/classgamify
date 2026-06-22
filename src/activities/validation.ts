@@ -11,6 +11,7 @@ import {
 import { getTemplateByType } from '@/activities/catalog';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getTemplateRemixOption } from '@/activities/template-remix';
+import { m } from '@/locale/paraglide/messages';
 import { z } from 'zod';
 
 export const activityTemplateTypeSchema = z.enum(ACTIVITY_TEMPLATE_TYPES);
@@ -61,6 +62,8 @@ export type CreateActivityPayload = CreateActivityInput & {
   templateType: ActivityTemplateType;
   visibility: ActivityVisibility;
 };
+
+type ActivityContentRowKind = 'group' | 'pair' | 'question';
 
 export function buildActivityContent(
   input: CreateActivityPayload
@@ -113,7 +116,9 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
     const [prompt, answer, optionsRaw, explanation] = row.parts;
     if (!prompt || !answer) {
       throw new Error(
-        `Question line ${row.lineNumber} needs "prompt | answer | options".`
+        m.activity_validation_error_question_line({
+          lineNumber: row.lineNumber,
+        })
       );
     }
 
@@ -140,7 +145,11 @@ function parsePairs(raw?: string): ActivityPair[] {
   return parseRows(raw, 'pair').map((row, index) => {
     const [left, right] = row.parts;
     if (!left || !right) {
-      throw new Error(`Pair line ${row.lineNumber} needs "left | right".`);
+      throw new Error(
+        m.activity_validation_error_pair_line({
+          lineNumber: row.lineNumber,
+        })
+      );
     }
 
     return {
@@ -157,7 +166,9 @@ function parseGroups(raw?: string): ActivityGroup[] {
     const items = parseInlineList(itemsRaw);
     if (!label || items.length === 0) {
       throw new Error(
-        `Group line ${row.lineNumber} needs "group | item one, item two".`
+        m.activity_validation_error_group_line({
+          lineNumber: row.lineNumber,
+        })
       );
     }
 
@@ -191,7 +202,7 @@ function parseInlineList(raw?: string): string[] {
   );
 }
 
-function parseRows(raw: string | undefined, label: string) {
+function parseRows(raw: string | undefined, rowKind: ActivityContentRowKind) {
   return (raw ?? '')
     .split(/\r?\n/u)
     .map((line, index) => ({
@@ -202,10 +213,20 @@ function parseRows(raw: string | undefined, label: string) {
     .filter((row) => row.raw.length > 0)
     .map((row) => {
       if (row.parts.length < 2) {
-        throw new Error(`Each ${label} line must use "|" separators.`);
+        throw new Error(
+          m.activity_validation_error_row_separator({
+            label: formatActivityContentRowKind(rowKind),
+          })
+        );
       }
       return row;
     });
+}
+
+function formatActivityContentRowKind(rowKind: ActivityContentRowKind) {
+  if (rowKind === 'group') return m.activity_validation_row_kind_group();
+  if (rowKind === 'pair') return m.activity_validation_row_kind_pair();
+  return m.activity_validation_row_kind_question();
 }
 
 function unique(values: string[]) {

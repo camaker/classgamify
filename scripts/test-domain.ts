@@ -3749,6 +3749,57 @@ assert.doesNotThrow(() =>
     createActivityInputSchema.parse(activityEditorDefaultInput)
   )
 );
+const invalidStructuredInputBase = createActivityInputSchema.parse({
+  description: 'Invalid structured row messages',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: 'Fruit | apple, pear',
+  language: 'en',
+  learningGoal: 'Students can review structured activity input.',
+  pairsText: 'hot | cold',
+  questionsText: 'Capital of France? | Paris',
+  sourceSummary: 'Invalid structured rows',
+  subject: 'General',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Invalid rows',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+assert.throws(
+  () =>
+    buildActivityContent({
+      ...invalidStructuredInputBase,
+      questionsText: 'Missing answer |',
+    }),
+  /Question line 1 needs "prompt \| answer \| options"\./
+);
+assert.throws(
+  () =>
+    buildActivityContent({
+      ...invalidStructuredInputBase,
+      questionsText: 'Missing separator',
+    }),
+  /Each question line must use "\|" separators\./
+);
+assert.throws(
+  () =>
+    buildActivityContent({
+      ...invalidStructuredInputBase,
+      pairsText: 'Only left |',
+      templateType: 'match-up',
+    }),
+  /Pair line 1 needs "left \| right"\./
+);
+assert.throws(
+  () =>
+    buildActivityContent({
+      ...invalidStructuredInputBase,
+      groupsText: 'Group only |',
+      templateType: 'group-sort',
+    }),
+  /Group line 1 needs "group \| item one, item two"\./
+);
 assert.equal(buildActivityEditorInitialValues(undefined), undefined);
 assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
   ...activityEditorDefaultInput,
