@@ -623,6 +623,7 @@
   "assignment_result_action_gate_submit_attempt_export": "Submit at least one attempt before exporting results.",
   "assignment_result_action_gate_submit_attempt_follow_up": "Submit at least one attempt before copying follow-up.",
   "assignment_result_action_gate_submit_attempt_reteach": "Submit at least one attempt before copying a reteach plan.",
+  "assignment_result_attempt_review_badge": "{score} pts · {accuracy}",
   "assignment_result_attempt_review_submission_summary_many": "Showing {shownAttempts} of {totalAttempts} submissions.",
   "assignment_result_attempt_review_submission_summary_one": "Showing {shownAttempts} of {totalAttempts} submission.",
   "assignment_result_brief_student_accuracy": "Latest {latest} · best {best}",

@@ -782,7 +782,10 @@ export function formatAssignmentAttemptReviewBadge({
   accuracy,
   score,
 }: Pick<AssignmentAttemptReview, 'accuracy' | 'score'>) {
-  return `${score} pts · ${formatAssignmentResultPercent(accuracy)}`;
+  return m.assignment_result_attempt_review_badge({
+    accuracy: formatAssignmentResultPercent(accuracy),
+    score,
+  });
 }
 
 export function buildAssignmentAttemptReviewCardView(

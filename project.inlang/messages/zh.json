@@ -623,6 +623,7 @@
   "assignment_result_action_gate_submit_attempt_export": "请先至少提交一次作答，再导出结果。",
   "assignment_result_action_gate_submit_attempt_follow_up": "请先至少提交一次作答，再复制跟进。",
   "assignment_result_action_gate_submit_attempt_reteach": "请先至少提交一次作答，再复制再教学计划。",
+  "assignment_result_attempt_review_badge": "{score} 分 · {accuracy}",
   "assignment_result_attempt_review_submission_summary_many": "正在显示 {shownAttempts}/{totalAttempts} 次提交。",
   "assignment_result_attempt_review_submission_summary_one": "正在显示 {shownAttempts}/{totalAttempts} 次提交。",
   "assignment_result_brief_student_accuracy": "最近 {latest} · 最佳 {best}",

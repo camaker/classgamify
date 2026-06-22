@@ -7034,6 +7034,15 @@ assert.equal(
   formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
   '2 pts · 67%'
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
+    '2 分 · 67%'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildAssignmentAttemptReviewCardView({
     accuracy: 67,
