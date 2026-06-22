@@ -5079,6 +5079,40 @@ assert.equal(
   getRuntimeItems('quiz', buildActivityContent(shapedQuizDraft)).length,
   3
 );
+const missingOptionAiDraft = {
+  ...oversizedAiDraft,
+  questions: [
+    {
+      answer: 'cat',
+      explanation: 'A cat is an animal.',
+      prompt: 'Which word is an animal?',
+    },
+    {
+      answer: 'tree',
+      explanation: 'A tree is a plant.',
+      prompt: 'Which word is a plant?',
+    },
+    {
+      answer: 'rain',
+      explanation: 'Rain is weather.',
+      prompt: 'Which word is weather?',
+    },
+  ],
+} satisfies AiActivityDraft;
+const missingOptionQuizDraft = createActivityInputFromAiDraft({
+  draft: missingOptionAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'quiz',
+  },
+});
+const missingOptionQuizRuntimeItems = getRuntimeItems(
+  'quiz',
+  buildActivityContent(missingOptionQuizDraft)
+);
+assert.equal(missingOptionQuizRuntimeItems.length, 3);
+assert.ok(missingOptionQuizRuntimeItems[0]?.choices?.includes('cat') ?? false);
+assert.ok((missingOptionQuizRuntimeItems[0]?.choices?.length ?? 0) > 1);
 const shapedMatchDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
   input: {

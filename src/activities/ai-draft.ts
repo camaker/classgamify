@@ -71,7 +71,7 @@ export type ActivityDraftResult = {
 const aiQuestionSchema = z.object({
   answer: z.string().trim().min(1).max(120),
   explanation: z.string().trim().min(4).max(240).optional(),
-  options: z.array(z.string().trim().min(1).max(120)).min(3).max(5),
+  options: z.array(z.string().trim().min(1).max(120)).max(5).default([]),
   prompt: z.string().trim().min(4).max(240),
 });
 
@@ -97,7 +97,7 @@ const aiDraftSchema = z.object({
   vocabulary: z.array(z.string().trim().min(1).max(80)).min(3).max(16),
 });
 
-export type AiActivityDraft = z.infer<typeof aiDraftSchema>;
+export type AiActivityDraft = z.input<typeof aiDraftSchema>;
 
 export async function generateActivityDraftFromAi(
   input: GenerateActivityDraftInput
@@ -248,7 +248,7 @@ export function createActivityInputFromAiDraft({
       .map((question) => {
         const options = buildQuestionOptionTexts({
           answer: question.answer,
-          options: question.options,
+          options: question.options ?? [],
         });
         return [
           question.prompt,
