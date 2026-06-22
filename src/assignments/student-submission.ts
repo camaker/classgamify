@@ -4,6 +4,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
+import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;
 
@@ -119,30 +120,66 @@ type StudentAttemptTimerBadge = {
 };
 
 const STUDENT_RUNNER_COPY = {
-  browseTemplatesLabel: 'Browse templates',
-  loadingMessage: 'Loading student activity...',
-  missingAssignmentDescription:
-    'This link may have been unpublished, closed, or typed incorrectly.',
-  missingAssignmentTitle: 'Assignment not found',
-  publicAssignmentDescription:
-    "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
-  publicRouteBadgeLabel: 'Student play route',
-  readOnlyPreviewMessage:
-    'Preview assignments are read-only until a teacher publishes a share link.',
-  resultAccuracyLabel: 'accuracy',
-  resultSubmittedLabel: 'Score submitted',
-  resultTimePrefix: 'Time:',
-  seoDescription:
-    'Open a public student activity runner from a teacher assignment link.',
-  seoTitlePrefix: 'Student activity',
-  missingStudentNameMessage: 'Type your name before submitting.',
-  studentNameLabel: 'Student name',
-  studentNamePlaceholder: 'Type your name',
-  submissionFailureMessage: 'Attempt could not be saved.',
-  submissionSuccessMessage: 'Attempt submitted.',
-  timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
-  timeEndedLabel: 'Time ended',
-  teacherViewLabel: 'Teacher view',
+  get browseTemplatesLabel() {
+    return m.student_runner_browse_templates();
+  },
+  get loadingMessage() {
+    return m.student_runner_loading();
+  },
+  get missingAssignmentDescription() {
+    return m.student_runner_missing_assignment_description();
+  },
+  get missingAssignmentTitle() {
+    return m.student_runner_missing_assignment_title();
+  },
+  get publicAssignmentDescription() {
+    return m.student_runner_public_assignment_description();
+  },
+  get publicRouteBadgeLabel() {
+    return m.student_runner_public_route_badge();
+  },
+  get readOnlyPreviewMessage() {
+    return m.student_runner_read_only_preview();
+  },
+  get resultAccuracyLabel() {
+    return m.student_runner_result_accuracy();
+  },
+  get resultSubmittedLabel() {
+    return m.student_runner_result_submitted();
+  },
+  get resultTimePrefix() {
+    return m.student_runner_result_time_prefix();
+  },
+  get seoDescription() {
+    return m.student_runner_seo_description();
+  },
+  get seoTitlePrefix() {
+    return m.student_runner_seo_title_prefix();
+  },
+  get missingStudentNameMessage() {
+    return m.student_runner_missing_student_name();
+  },
+  get studentNameLabel() {
+    return m.student_runner_student_name_label();
+  },
+  get studentNamePlaceholder() {
+    return m.student_runner_student_name_placeholder();
+  },
+  get submissionFailureMessage() {
+    return m.student_runner_submission_failure();
+  },
+  get submissionSuccessMessage() {
+    return m.student_runner_submission_success();
+  },
+  get timeExpiredMessage() {
+    return m.student_runner_time_expired();
+  },
+  get timeEndedLabel() {
+    return m.student_runner_time_ended();
+  },
+  get teacherViewLabel() {
+    return m.student_runner_teacher_view();
+  },
 } satisfies StudentRunnerCopy;
 
 export function getStudentRunnerCopy(): StudentRunnerCopy {
@@ -157,8 +194,8 @@ export function buildAnonymousAttemptCopy({
   const label = browserLabel?.trim() || ANONYMOUS_BROWSER_LABEL;
 
   return {
-    description: `This assignment does not collect student names. This browser will submit as ${label}.`,
-    title: 'Anonymous attempt',
+    description: m.student_runner_anonymous_attempt_description({ label }),
+    title: m.student_runner_anonymous_attempt_title(),
   };
 }
 
@@ -260,12 +297,12 @@ export function getAttemptCompletionSummary({
 
 export function formatAttemptCompletionProgressLabel({
   completionSummary,
-  verb = 'answered',
+  verb = m.student_attempt_progress_answered(),
 }: {
   completionSummary: AttemptCompletionSummary;
   verb?: string;
 }): string {
-  const progressVerb = verb.trim() || 'answered';
+  const progressVerb = verb.trim() || m.student_attempt_progress_answered();
 
   return `${completionSummary.answeredItemCount}/${completionSummary.itemCount} ${progressVerb}`;
 }
@@ -292,22 +329,32 @@ export function buildAttemptCompletionCopy({
   return {
     confirmIncompleteSubmit:
       unansweredItemCount === 0
-        ? 'All items are answered.'
+        ? m.student_attempt_all_answered()
         : unansweredItemCount === 1
-          ? '1 question is still unanswered.'
-          : `${unansweredItemCount} questions are still unanswered.`,
+          ? m.student_attempt_unanswered_question_one()
+          : m.student_attempt_unanswered_question_many({
+              count: unansweredItemCount,
+            }),
     progressLabel: formatAttemptCompletionProgressLabel({
       completionSummary,
     }),
     submitButtonLabel:
       confirmIncompleteSubmit && unansweredItemCount > 0
-        ? 'Submit anyway'
-        : 'Submit answers',
+        ? m.student_attempt_submit_anyway()
+        : m.student_attempt_submit_answers(),
     unansweredLabel:
       unansweredItemCount > 0
-        ? `${unansweredItemCount} ${unansweredItemCount === 1 ? 'item' : 'items'} left unanswered.`
+        ? formatStudentAttemptUnansweredLabel(unansweredItemCount)
         : undefined,
   };
+}
+
+function formatStudentAttemptUnansweredLabel(count: number) {
+  if (count === 1) {
+    return m.student_attempt_unanswered_label_one();
+  }
+
+  return m.student_attempt_unanswered_label_many({ count });
 }
 
 export function buildAttemptSubmissionAnswers({
