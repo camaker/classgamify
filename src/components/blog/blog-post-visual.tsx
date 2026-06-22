@@ -43,7 +43,7 @@ export function BlogPostVisual({
     >
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#f8fafc_0%,#eef2ff_46%,#dcfce7_100%)]" />
       <div className="absolute inset-x-4 top-4 flex items-center justify-between text-[11px] font-semibold uppercase text-zinc-600 sm:inset-x-5 sm:top-5">
-        <span>ClassGamify</span>
+        <span>{m.built_with_brand()}</span>
         <span>{copy.label}</span>
       </div>
 

@@ -413,6 +413,7 @@ const activeClassGamifySurfaceFiles = [
   'docs/locale.md',
   'docs/newsletter.md',
   'public/og-source.svg',
+  'src/components/blog/blog-post-visual.tsx',
   'src/config/footer-config.ts',
   'src/config/navbar-config.ts',
   'src/config/sidebar-config.ts',
@@ -451,6 +452,11 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+assert.doesNotMatch(
+  readFileSync('src/components/blog/blog-post-visual.tsx', 'utf8'),
+  />ClassGamify</,
+  'Blog visual brand copy should come from locale messages.'
+);
 const activeLocaleMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
