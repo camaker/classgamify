@@ -5,6 +5,7 @@ import type {
   ActivityLibraryStatus,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
+import { m } from '@/locale/paraglide/messages';
 
 export type ActivityLibraryTemplateOption = {
   shortName: string;
@@ -68,18 +69,31 @@ export function buildActivityLibraryFilterSummary({
     return {
       hasFilters,
       text: isLoading
-        ? 'Filtering activities...'
-        : `${total} ${total === 1 ? 'match' : 'matches'}`,
+        ? m.activity_library_filter_summary_filtering()
+        : total === 1
+          ? m.activity_library_filter_summary_matches_one({ count: total })
+          : m.activity_library_filter_summary_matches_many({ count: total }),
     };
   }
 
-  const statusLabel = status === 'archived' ? 'archived' : 'saved';
+  const statusLabel =
+    status === 'archived'
+      ? m.activity_library_filter_summary_status_archived()
+      : m.activity_library_filter_summary_status_saved();
 
   return {
     hasFilters,
     text: isLoading
-      ? 'Loading activities...'
-      : `${total} ${statusLabel} ${total === 1 ? 'activity' : 'activities'}`,
+      ? m.activity_library_filter_summary_loading()
+      : total === 1
+        ? m.activity_library_filter_summary_total_one({
+            count: total,
+            status: statusLabel,
+          })
+        : m.activity_library_filter_summary_total_many({
+            count: total,
+            status: statusLabel,
+          }),
   };
 }
 
@@ -176,22 +190,24 @@ export function buildActivityLibrarySummaryMetrics({
   return [
     {
       id: 'total',
-      label: hasFilters ? 'Matching activities' : 'Activities',
+      label: hasFilters
+        ? m.activity_library_summary_matching_activities()
+        : m.activity_library_summary_activities(),
       value: String(resolvedSummary.totalActivities),
     },
     {
       id: 'coverage',
-      label: 'Template coverage',
+      label: m.activity_library_summary_template_coverage(),
       value: `${resolvedSummary.templateCoverage}/${resolvedSummary.templateCoverageTotal}`,
     },
     {
       id: 'remix',
-      label: 'Ready to remix',
+      label: m.activity_library_summary_ready_to_remix(),
       value: String(resolvedSummary.remixReadyActivities),
     },
     {
       id: 'readyModes',
-      label: 'Ready modes',
+      label: m.activity_library_summary_ready_modes(),
       value: String(resolvedSummary.totalReadyTemplateOptions),
     },
   ];

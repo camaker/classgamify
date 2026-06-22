@@ -18,6 +18,7 @@ import type {
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
 type ActivityLibraryStatusOption = {
   label: string;
@@ -94,34 +95,63 @@ type ActivityLibraryCardDisplayView = {
 };
 
 export const activityLibraryPageCopy = {
-  breadcrumbCurrent: 'Activities',
-  breadcrumbDashboard: 'Dashboard',
-  createActivityLabel: 'Create activity',
-  description:
-    'Reusable teacher-owned activities. Each activity stores template-neutral content so it can render as different classroom games.',
-  loadErrorMessage:
-    'Activities could not be loaded. Refresh the page or sign in again.',
-  title: 'Activity library',
+  get breadcrumbCurrent() {
+    return m.activity_library_breadcrumb_current();
+  },
+  get breadcrumbDashboard() {
+    return m.activity_library_breadcrumb_dashboard();
+  },
+  get createActivityLabel() {
+    return m.activity_library_page_create();
+  },
+  get description() {
+    return m.activity_library_page_description();
+  },
+  get loadErrorMessage() {
+    return m.activity_library_load_error();
+  },
+  get title() {
+    return m.activity_library_page_title();
+  },
 } as const;
 
 export const activityLibraryHeroCopy = {
-  badgeLabel: 'Structured activity content',
-  description:
-    'The activity model separates questions, pairs, groups, vocabulary, and teacher notes. Template switching and AI creation can both build on this shared contract.',
-  title: 'One lesson, several renderings.',
+  get badgeLabel() {
+    return m.activity_library_hero_badge();
+  },
+  get description() {
+    return m.activity_library_hero_description();
+  },
+  get title() {
+    return m.activity_library_hero_title();
+  },
 } as const;
 
 export const activityLibrarySearchCopy = {
-  clearFiltersLabel: 'Clear filters',
-  clearSearchLabel: 'Clear activity search',
-  label: 'Search activities',
-  placeholder: 'Search by title, description, or template',
-  statusOptions: [
-    { label: 'Active', value: 'active' },
-    { label: 'Archived', value: 'archived' },
-  ],
-  templateLabel: 'Template',
-  templatePlaceholder: 'All templates',
+  get clearFiltersLabel() {
+    return m.activity_library_filter_clear_filters();
+  },
+  get clearSearchLabel() {
+    return m.activity_library_filter_clear_search();
+  },
+  get label() {
+    return m.activity_library_filter_label();
+  },
+  get placeholder() {
+    return m.activity_library_filter_placeholder();
+  },
+  get statusOptions() {
+    return [
+      { label: m.activity_library_filter_active(), value: 'active' },
+      { label: m.activity_library_filter_archived(), value: 'archived' },
+    ];
+  },
+  get templateLabel() {
+    return m.activity_library_filter_template_label();
+  },
+  get templatePlaceholder() {
+    return m.activity_library_filter_template_placeholder();
+  },
 } satisfies {
   clearFiltersLabel: string;
   clearSearchLabel: string;
@@ -130,39 +160,59 @@ export const activityLibrarySearchCopy = {
   statusOptions: ActivityLibraryStatusOption[];
   templateLabel: string;
   templatePlaceholder: string;
-};
+} as const;
 
 export const activityLibraryCardCopy = {
-  actionLabels: {
-    archive: 'Archive',
-    duplicate: 'Duplicate',
-    edit: 'Edit activity',
-    publish: 'Publish assignment',
-    restore: 'Restore',
+  get actionLabels() {
+    return {
+      archive: m.activity_library_action_archive(),
+      duplicate: m.activity_library_action_duplicate(),
+      edit: m.activity_library_action_edit(),
+      publish: m.activity_library_action_publish(),
+      restore: m.activity_library_action_restore(),
+    };
   },
-  compatibleTemplatesLabel: 'Compatible template families',
-  restoreRequiredMessage:
-    'Restore this activity before publishing, duplicating, or remixing it.',
+  get compatibleTemplatesLabel() {
+    return m.activity_library_card_compatible_templates();
+  },
+  get restoreRequiredMessage() {
+    return m.activity_library_card_restore_required();
+  },
 } as const;
 
 const activityLibraryEmptyStateCopy = {
   archived: {
-    actionLabel: activityLibrarySearchCopy.clearFiltersLabel,
-    description:
-      'Archived activities will appear here after you move them out of the active library.',
-    title: 'No archived activities.',
+    get actionLabel() {
+      return activityLibrarySearchCopy.clearFiltersLabel;
+    },
+    get description() {
+      return m.activity_library_empty_archived_description();
+    },
+    get title() {
+      return m.activity_library_empty_archived_title();
+    },
   },
   emptyLibrary: {
-    actionLabel: activityLibraryPageCopy.createActivityLabel,
-    description:
-      'Create the first reusable classroom activity, then publish it as a student assignment link for your class.',
-    title: 'No saved activities yet.',
+    get actionLabel() {
+      return activityLibraryPageCopy.createActivityLabel;
+    },
+    get description() {
+      return m.activity_library_empty_saved_description();
+    },
+    get title() {
+      return m.activity_library_empty_saved_title();
+    },
   },
   filtered: {
-    actionLabel: activityLibrarySearchCopy.clearFiltersLabel,
-    description:
-      'Try another title, description, template keyword, or template family from your classroom activity library.',
-    title: 'No matching activities.',
+    get actionLabel() {
+      return activityLibrarySearchCopy.clearFiltersLabel;
+    },
+    get description() {
+      return m.activity_library_empty_filtered_description();
+    },
+    get title() {
+      return m.activity_library_empty_filtered_title();
+    },
   },
 } as const;
 
@@ -208,9 +258,13 @@ export function buildActivityLibraryCardStats({
   questions: number;
 }): ActivityLibraryCardStat[] {
   return [
-    { key: 'questions', label: 'Questions', value: questions },
-    { key: 'pairs', label: 'Pairs', value: pairs },
-    { key: 'groups', label: 'Groups', value: groups },
+    {
+      key: 'questions',
+      label: m.activity_library_stat_questions(),
+      value: questions,
+    },
+    { key: 'pairs', label: m.activity_library_stat_pairs(), value: pairs },
+    { key: 'groups', label: m.activity_library_stat_groups(), value: groups },
   ];
 }
 
@@ -282,13 +336,17 @@ export function buildActivityLibraryRemixHint(shortNames: string[]) {
     .filter(Boolean)
     .join(', ');
 
-  return templateList ? `Ready to remix into ${templateList}.` : undefined;
+  return templateList
+    ? m.activity_library_remix_hint({ templates: templateList })
+    : undefined;
 }
 
 export function buildActivityLibraryRemixActionLabel(shortName: string) {
   const templateName = shortName.trim();
 
-  return `Copy as ${templateName || 'template'}`;
+  return m.activity_library_remix_action({
+    template: templateName || m.activity_library_remix_action_fallback(),
+  });
 }
 
 export function buildActivityLibraryCompatibilityView({

@@ -1,4 +1,4 @@
-import { activityTemplates, starterActivities } from '@/activities/catalog';
+import { getActivityTemplates, starterActivities } from '@/activities/catalog';
 import {
   buildActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -427,7 +427,7 @@ function ActivityLibrarySearch({
           <NativeSelectOption value="all">
             {activityLibrarySearchCopy.templatePlaceholder}
           </NativeSelectOption>
-          {activityTemplates.map((option) => (
+          {getActivityTemplates().map((option) => (
             <NativeSelectOption key={option.type} value={option.type}>
               {option.name}
             </NativeSelectOption>
