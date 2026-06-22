@@ -1,6 +1,6 @@
 import { getTemplateRemixPlan } from '@/activities/template-remix';
 import type { TemplateRemixPlan } from '@/activities/template-remix';
-import type { ActivityTemplateType } from '@/activities/types';
+import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 import {
   buildActivityContent,
   type CreateActivityInput,
@@ -132,7 +132,7 @@ export function buildActivityDraftMeta({
     readyTemplateOptions,
     readyTemplates,
     reviewChecklist: buildDraftReviewChecklist({
-      activity,
+      content,
       lockedTemplateDiagnostics,
       suggestedTemplates,
     }),
@@ -249,20 +249,18 @@ export function buildActivityTemplateReadinessPanelSummary(
 }
 
 function buildDraftReviewChecklist({
-  activity,
+  content,
   lockedTemplateDiagnostics,
   suggestedTemplates,
 }: {
-  activity: CreateActivityInput;
+  content: ActivityContent;
   lockedTemplateDiagnostics: string[];
   suggestedTemplates: string[];
 }) {
   const checklist = [
     m.activity_draft_meta_checklist_review_answers(),
     m.activity_draft_meta_checklist_adjust_level(),
-    activity.questionsText?.includes('|')
-      ? m.activity_draft_meta_checklist_check_explanations()
-      : m.activity_draft_meta_checklist_add_questions(),
+    buildQuestionReviewChecklistItem(content),
   ];
 
   if (suggestedTemplates.length > 0) {
@@ -289,4 +287,16 @@ function buildDraftReviewChecklist({
   );
 
   return checklist;
+}
+
+function buildQuestionReviewChecklistItem(content: ActivityContent) {
+  if (content.questions.length === 0) {
+    return m.activity_draft_meta_checklist_add_questions();
+  }
+
+  if (content.questions.some((question) => !question.explanation)) {
+    return m.activity_draft_meta_checklist_add_explanations();
+  }
+
+  return m.activity_draft_meta_checklist_check_explanations();
 }

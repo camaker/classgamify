@@ -50,6 +50,7 @@
   "activity_created_panel_loading_title": "New activity is being added to your library.",
   "activity_created_panel_missing_body": "The activity was saved, but it is not visible in the current list view yet. Filters or pagination may be hiding it.",
   "activity_created_panel_missing_title": "Activity saved to your library.",
+  "activity_draft_meta_checklist_add_explanations": "Add short explanations before students see answer feedback.",
   "activity_draft_meta_checklist_add_more_structure": "Add more structured pairs or groups to unlock more templates.",
   "activity_draft_meta_checklist_add_questions": "Add questions before publishing quiz-style work.",
   "activity_draft_meta_checklist_adjust_level": "Adjust wording for your class level.",

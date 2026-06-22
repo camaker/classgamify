@@ -5233,6 +5233,11 @@ assert.ok(
     'Next content gap: Add match pairs to unlock Match.'
   )
 );
+assert.ok(
+  questionOnlyDraftMeta.reviewChecklist.includes(
+    'Add short explanations before students see answer feedback.'
+  )
+);
 const lockedOnlyDraftMeta = buildActivityDraftMeta({
   activity: {
     description: 'Group only draft',
