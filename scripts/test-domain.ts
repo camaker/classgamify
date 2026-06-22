@@ -2701,7 +2701,7 @@ assert.deepEqual(
   activityTemplates.map((template) => template.type),
   ACTIVITY_TEMPLATE_TYPES
 );
-assert.equal(activityTemplates.length, 8);
+assert.equal(activityTemplates.length, ACTIVITY_TEMPLATE_TYPES.length);
 assert.deepEqual(
   Object.keys(activityTemplateByType).sort(),
   [...ACTIVITY_TEMPLATE_TYPES].sort()
@@ -2816,7 +2816,7 @@ assert.deepEqual(
       description: 'Template families represented by your active activities',
       id: 'templates',
       label: 'Templates',
-      value: `0/${activityTemplates.length}`,
+      value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     {
       description: 'Open classroom share links',
@@ -2857,7 +2857,7 @@ assert.deepEqual(
       description: 'Template families represented by your active activities',
       id: 'templates',
       label: 'Templates',
-      value: `5/${activityTemplates.length}`,
+      value: `5/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     {
       description: 'Open classroom share links',
@@ -4281,7 +4281,7 @@ assert.deepEqual(
     {
       id: 'coverage',
       label: 'Template coverage',
-      value: `0/${activityTemplates.length}`,
+      value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     { id: 'remix', label: 'Ready to remix', value: '0' },
     { id: 'readyModes', label: 'Ready modes', value: '0' },
@@ -4298,7 +4298,7 @@ assert.deepEqual(
     {
       id: 'coverage',
       label: 'Template coverage',
-      value: `2/${activityTemplates.length}`,
+      value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     { id: 'remix', label: 'Ready to remix', value: '2' },
     {

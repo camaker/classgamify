@@ -1,6 +1,9 @@
-import { activityTemplates } from '@/activities/catalog';
 import { getTemplateRemixPlan } from '@/activities/template-remix';
-import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
+import {
+  ACTIVITY_TEMPLATE_TYPES,
+  type ActivityContent,
+  type ActivityTemplateType,
+} from '@/activities/types';
 import type {
   ActivityLibraryStatus,
   ActivityTemplateFilter,
@@ -130,7 +133,7 @@ export function summarizeActivityLibrary(
     draftActivities,
     remixReadyActivities,
     templateCoverage: templateTypes.size,
-    templateCoverageTotal: activityTemplates.length,
+    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
     totalActivities: activities.length,
     totalReadyTemplateOptions,
   };
@@ -182,7 +185,7 @@ export function buildActivityLibrarySummaryMetrics({
     draftActivities: 0,
     remixReadyActivities: 0,
     templateCoverage: 0,
-    templateCoverageTotal: activityTemplates.length,
+    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
     totalActivities,
     totalReadyTemplateOptions: 0,
   };

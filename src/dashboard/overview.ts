@@ -1,4 +1,4 @@
-import { activityTemplates } from '@/activities/catalog';
+import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
 export type DashboardActivitySummary = {
@@ -130,7 +130,7 @@ export function buildDashboardOverviewMetrics({
       description: m.dashboard_overview_metric_templates_description(),
       id: 'templates',
       label: m.dashboard_overview_metric_templates_label(),
-      value: `${activitySummary?.templateCoverage ?? 0}/${activityTemplates.length}`,
+      value: `${activitySummary?.templateCoverage ?? 0}/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     {
       description: m.dashboard_overview_metric_assignments_description(),
