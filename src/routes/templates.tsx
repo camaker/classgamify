@@ -8,10 +8,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  activityTemplates,
   formatActivityTemplateClassroomMode,
+  getActivityTemplates,
 } from '@/activities/catalog';
 import { buildTemplateEntryAction } from '@/activities/template-entry';
+import type { ActivityContent } from '@/activities/types';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -36,6 +37,8 @@ export const Route = createFileRoute('/templates')({
 });
 
 function TemplatesPage() {
+  const activityTemplates = getActivityTemplates();
+
   return (
     <Container className="px-4 py-12 md:py-16">
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
@@ -109,7 +112,7 @@ function TemplatesPage() {
                         variant="secondary"
                         className="rounded-md"
                       >
-                        {requirement}
+                        {formatContentRequirement(requirement)}
                       </Badge>
                     ))}
                   </div>
@@ -149,4 +152,27 @@ function TemplatesPage() {
       </div>
     </Container>
   );
+}
+
+function formatContentRequirement(requirement: keyof ActivityContent) {
+  switch (requirement) {
+    case 'groups':
+      return m.activity_template_requirement_groups();
+    case 'pairs':
+      return m.activity_template_requirement_pairs();
+    case 'questions':
+      return m.activity_template_requirement_questions();
+    case 'teacherNotes':
+      return m.activity_template_requirement_teacher_notes();
+    case 'learningGoal':
+      return m.activity_template_requirement_learning_goal();
+    case 'sourceSummary':
+      return m.activity_template_requirement_source_summary();
+    case 'gradeBand':
+      return m.activity_template_requirement_grade_band();
+    case 'vocabulary':
+      return m.activity_template_requirement_vocabulary();
+    default:
+      return requirement;
+  }
 }

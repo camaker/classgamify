@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import type { ActivityTemplateDefinition } from '@/activities/types';
 import type {
   WorksheetModeDefinition,
@@ -16,7 +17,7 @@ export function buildTemplateCreateSearch(
 
 export function buildTemplateEntryAction(template: ActivityTemplateDefinition) {
   return {
-    label: `Start ${template.shortName}`,
+    label: m.activity_template_start_action({ template: template.shortName }),
     search: buildTemplateCreateSearch(template.type),
   };
 }

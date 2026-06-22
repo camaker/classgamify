@@ -1,3 +1,4 @@
+import { m } from '@/locale/paraglide/messages';
 import type {
   ActivityTemplateType,
   ActivitySeed,
@@ -84,6 +85,81 @@ export const activityTemplateByType = {
 export const activityTemplates = ACTIVITY_TEMPLATE_TYPES.map(
   (type) => activityTemplateByType[type]
 );
+
+function getLocalizedActivityTemplateByTypeMap() {
+  return {
+    quiz: defineActivityTemplate('quiz', {
+      name: m.activity_template_quiz_name(),
+      shortName: m.activity_template_quiz_short_name(),
+      description: m.activity_template_quiz_description(),
+      bestFor: m.activity_template_quiz_best_for(),
+      contentRequirements: ['questions'],
+      classroomMode: 'individual',
+    }),
+    'match-up': defineActivityTemplate('match-up', {
+      name: m.activity_template_match_up_name(),
+      shortName: m.activity_template_match_up_short_name(),
+      description: m.activity_template_match_up_description(),
+      bestFor: m.activity_template_match_up_best_for(),
+      contentRequirements: ['pairs'],
+      classroomMode: 'individual',
+    }),
+    'line-match': defineActivityTemplate('line-match', {
+      name: m.activity_template_line_match_name(),
+      shortName: m.activity_template_line_match_short_name(),
+      description: m.activity_template_line_match_description(),
+      bestFor: m.activity_template_line_match_best_for(),
+      contentRequirements: ['pairs'],
+      classroomMode: 'individual',
+    }),
+    'group-sort': defineActivityTemplate('group-sort', {
+      name: m.activity_template_group_sort_name(),
+      shortName: m.activity_template_group_sort_short_name(),
+      description: m.activity_template_group_sort_description(),
+      bestFor: m.activity_template_group_sort_best_for(),
+      contentRequirements: ['groups'],
+      classroomMode: 'small-group',
+    }),
+    'fill-blank': defineActivityTemplate('fill-blank', {
+      name: m.activity_template_fill_blank_name(),
+      shortName: m.activity_template_fill_blank_short_name(),
+      description: m.activity_template_fill_blank_description(),
+      bestFor: m.activity_template_fill_blank_best_for(),
+      contentRequirements: ['questions'],
+      classroomMode: 'individual',
+    }),
+    listening: defineActivityTemplate('listening', {
+      name: m.activity_template_listening_name(),
+      shortName: m.activity_template_listening_short_name(),
+      description: m.activity_template_listening_description(),
+      bestFor: m.activity_template_listening_best_for(),
+      contentRequirements: ['questions'],
+      classroomMode: 'individual',
+    }),
+    'matching-pairs': defineActivityTemplate('matching-pairs', {
+      name: m.activity_template_matching_pairs_name(),
+      shortName: m.activity_template_matching_pairs_short_name(),
+      description: m.activity_template_matching_pairs_description(),
+      bestFor: m.activity_template_matching_pairs_best_for(),
+      contentRequirements: ['pairs'],
+      classroomMode: 'small-group',
+    }),
+    'open-box': defineActivityTemplate('open-box', {
+      name: m.activity_template_open_box_name(),
+      shortName: m.activity_template_open_box_short_name(),
+      description: m.activity_template_open_box_description(),
+      bestFor: m.activity_template_open_box_best_for(),
+      contentRequirements: ['questions'],
+      classroomMode: 'whole-class',
+    }),
+  } satisfies Record<ActivityTemplateType, ActivityTemplateDefinition>;
+}
+
+export function getActivityTemplates() {
+  const templatesByType = getLocalizedActivityTemplateByTypeMap();
+
+  return ACTIVITY_TEMPLATE_TYPES.map((type) => templatesByType[type]);
+}
 
 export const starterActivities: ActivitySeed[] = [
   {
@@ -249,11 +325,11 @@ export function formatActivityTemplateClassroomMode(
 ) {
   switch (classroomMode) {
     case 'individual':
-      return 'Individual';
+      return m.activity_template_classroom_mode_individual();
     case 'small-group':
-      return 'Small group';
+      return m.activity_template_classroom_mode_small_group();
     case 'whole-class':
-      return 'Whole class';
+      return m.activity_template_classroom_mode_whole_class();
   }
 }
 
