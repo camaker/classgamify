@@ -3,7 +3,10 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
-import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import {
+  formatAcceptedAnswerAlternatives,
+  formatAssignmentResultCsvDate,
+} from '@/assignments/result-format';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -63,7 +66,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.assignment.title,
       data.assignment.shareSlug,
       data.assignment.status,
-      formatCsvDate(data.assignment.expiresAt),
+      formatAssignmentResultCsvDate(data.assignment.expiresAt),
       settings.instructions ?? '',
       settings.collectStudentName,
       settings.showCorrectAnswers,
@@ -78,7 +81,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.stats.averageDurationSeconds || '',
       attempt.id,
       attempt.studentLabel,
-      formatCsvDate(attempt.completedAt),
+      formatAssignmentResultCsvDate(attempt.completedAt),
       storedAttempt?.score ?? attempt.score,
       storedAttempt?.maxScore ?? '',
       attempt.accuracy,
@@ -175,13 +178,6 @@ function rowsToCsv(rows: readonly (readonly unknown[])[]) {
 function formatCsvCell(value: unknown) {
   const text = value === null || value === undefined ? '' : String(value);
   return `"${text.replace(/"/g, '""')}"`;
-}
-
-function formatCsvDate(value: Date | string | null) {
-  if (!value) return '';
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toISOString();
 }
 
 function slugifyFilename(value: string) {
