@@ -12,6 +12,7 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -63,7 +64,7 @@ export function ActivityPreview({
   const visibleQuestions = activity.content.questions.slice(0, 3);
   const visiblePairs = activity.content.pairs.slice(0, 4);
   const visibleGroups = activity.content.groups.slice(0, 3);
-  const previewPanel = panel ?? defaultActivityPreviewPanel;
+  const previewPanel = panel ?? buildDefaultActivityPreviewPanel();
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -95,7 +96,9 @@ export function ActivityPreview({
             <div className="flex items-start gap-2">
               <IconSparkles className="mt-0.5 size-4 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Reusable activity content</p>
+                <p className="text-sm font-medium">
+                  {m.activity_preview_content_title()}
+                </p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   {activity.content.learningGoal}
                 </p>
@@ -105,12 +108,18 @@ export function ActivityPreview({
 
           {!compact && !hideAnswers && (
             <div className="grid gap-3 md:grid-cols-3">
-              <PreviewPanel title="Questions" icon={IconListCheck}>
+              <PreviewPanel
+                title={m.activity_preview_questions_title()}
+                icon={IconListCheck}
+              >
                 {visibleQuestions.map((question) => (
                   <li key={question.id}>{question.prompt}</li>
                 ))}
               </PreviewPanel>
-              <PreviewPanel title="Pairs" icon={IconCards}>
+              <PreviewPanel
+                title={m.activity_preview_pairs_title()}
+                icon={IconCards}
+              >
                 {visiblePairs.map((pair) => (
                   <li key={pair.id}>
                     {pair.left}
@@ -119,7 +128,10 @@ export function ActivityPreview({
                   </li>
                 ))}
               </PreviewPanel>
-              <PreviewPanel title="Groups" icon={IconSwitchHorizontal}>
+              <PreviewPanel
+                title={m.activity_preview_groups_title()}
+                icon={IconSwitchHorizontal}
+              >
                 {visibleGroups.map((group) => (
                   <li key={group.id}>
                     {group.label}: {group.items.join(', ')}
@@ -143,21 +155,26 @@ export function ActivityPreview({
         <CardContent className="grid gap-3">
           <MetricRow
             icon={IconClock}
-            label="Estimated time"
-            value={`${activity.estimatedMinutes} min`}
+            label={m.activity_preview_estimated_time_label()}
+            value={m.activity_preview_estimated_time_value({
+              minutes: activity.estimatedMinutes,
+            })}
           />
           <MetricRow
             icon={IconUsers}
-            label="Classroom mode"
+            label={m.activity_preview_classroom_mode_label()}
             value={formatActivityTemplateClassroomMode(template.classroomMode)}
           />
           <MetricRow
             icon={IconChartBar}
-            label="Result target"
+            label={m.activity_preview_result_target_label()}
             value={
               assignment
-                ? `${assignment.completions} completions · ${assignment.averageScore}% avg`
-                : 'completion + score'
+                ? m.activity_preview_assignment_result_value({
+                    averageScore: assignment.averageScore,
+                    completions: assignment.completions,
+                  })
+                : m.activity_preview_default_result_value()
             }
           />
           {previewPanel.actions?.length ? (
@@ -207,24 +224,25 @@ function ActivityPreviewActionLink({
   );
 }
 
-const defaultActivityPreviewPanel = {
-  actions: [
-    {
-      icon: 'sparkles',
-      label: 'Create activity',
-      to: Routes.Create,
-    },
-    {
-      icon: 'share',
-      label: 'Open student preview',
-      to: Routes.PlayDemo,
-      variant: 'outline',
-    },
-  ],
-  description:
-    'The same activity can become class play, homework, or a printable follow-up once the template runner is filled in.',
-  title: 'Publish path',
-} satisfies ActivityPreviewPanel;
+function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {
+  return {
+    actions: [
+      {
+        icon: 'sparkles',
+        label: m.activity_preview_create_activity(),
+        to: Routes.Create,
+      },
+      {
+        icon: 'share',
+        label: m.activity_preview_open_student_preview(),
+        to: Routes.PlayDemo,
+        variant: 'outline',
+      },
+    ],
+    description: m.activity_preview_default_panel_description(),
+    title: m.activity_preview_default_panel_title(),
+  };
+}
 
 const activityPreviewActionIcons = {
   edit: IconEdit,
