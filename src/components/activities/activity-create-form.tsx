@@ -54,6 +54,7 @@ import {
   useUpdateActivity,
 } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -126,13 +127,13 @@ export function ActivityCreateForm({
 
   async function onGenerateDraft() {
     if (!session?.user) {
-      toast.error('Sign in to generate AI activity drafts.');
+      toast.error(m.activity_form_toast_sign_in_generate_draft());
       return;
     }
 
     const sourceText = draftSourceText.trim();
     if (!sourceText) {
-      toast.error('Add a topic, vocabulary list, or source notes first.');
+      toast.error(m.activity_form_toast_missing_draft_source());
       return;
     }
 
@@ -153,16 +154,16 @@ export function ActivityCreateForm({
       setDraftResult(result);
 
       if (result.notice) {
-        toast.success('Draft filled from the local generator.');
+        toast.success(m.activity_form_toast_local_draft_generated());
         return;
       }
 
-      toast.success('AI activity draft generated.');
+      toast.success(m.activity_form_toast_ai_draft_generated());
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Activity draft could not be generated.'
+          : m.activity_form_toast_draft_generation_failed()
       );
     }
   }
@@ -183,14 +184,14 @@ export function ActivityCreateForm({
 
   async function onSubmit(values: CreateActivityInput) {
     if (!session?.user) {
-      toast.error('Sign in to save activities to your teacher library.');
+      toast.error(m.activity_form_toast_sign_in_save());
       return;
     }
 
     try {
       if (isEditMode) {
         if (!activityId) {
-          toast.error('Activity could not be identified for editing.');
+          toast.error(m.activity_form_toast_edit_missing_activity());
           return;
         }
 
@@ -198,20 +199,22 @@ export function ActivityCreateForm({
           ...values,
           id: activityId,
         });
-        toast.success('Activity updated.');
+        toast.success(m.activity_form_toast_activity_updated());
         form.reset(values);
         return;
       }
 
       const activity = await createMutation.mutateAsync(values);
-      toast.success('Activity saved to your library.');
+      toast.success(m.activity_form_toast_activity_saved());
       navigate({
         to: Routes.DashboardActivities,
         search: { created: activity.id },
       });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Activity could not be saved.'
+        error instanceof Error
+          ? error.message
+          : m.activity_form_toast_save_failed()
       );
     }
   }
@@ -222,7 +225,7 @@ export function ActivityCreateForm({
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="rounded-md border-primary/30">
             <IconSparkles className="size-3.5" />
-            Structured editor
+            {m.activity_form_editor_badge()}
           </Badge>
           <Badge variant="secondary" className="rounded-md">
             {template.name}
@@ -231,8 +234,8 @@ export function ActivityCreateForm({
         <CardTitle>
           <h2 className="text-xl font-semibold">
             {isEditMode
-              ? 'Edit reusable activity'
-              : 'Create a reusable activity'}
+              ? m.activity_form_title_edit()
+              : m.activity_form_title_create()}
           </h2>
         </CardTitle>
       </CardHeader>
@@ -248,17 +251,17 @@ export function ActivityCreateForm({
                       className="rounded-md bg-background"
                     >
                       <IconSparkles className="size-3.5" />
-                      AI draft
+                      {m.activity_form_ai_draft_badge()}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      Teacher reviews before saving
+                      {m.activity_form_ai_draft_review_note()}
                     </span>
                   </div>
                   <label
                     htmlFor="activity-ai-source"
                     className="font-medium text-sm"
                   >
-                    Topic or source notes
+                    {m.activity_form_ai_source_label()}
                   </label>
                   <Textarea
                     id="activity-ai-source"
@@ -267,7 +270,7 @@ export function ActivityCreateForm({
                       setDraftSourceText(event.currentTarget.value)
                     }
                     rows={3}
-                    placeholder="Paste vocabulary, a reading passage, or lesson notes."
+                    placeholder={m.activity_form_ai_source_placeholder()}
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-[8rem_auto] lg:w-auto lg:grid-cols-[8rem_auto]">
@@ -276,7 +279,7 @@ export function ActivityCreateForm({
                       htmlFor="activity-ai-item-count"
                       className="font-medium text-sm"
                     >
-                      Items
+                      {m.activity_form_ai_item_count_label()}
                     </label>
                     <NativeSelect
                       id="activity-ai-item-count"
@@ -305,7 +308,7 @@ export function ActivityCreateForm({
                     ) : (
                       <IconSparkles className="size-4" />
                     )}
-                    Generate draft
+                    {m.activity_form_generate_draft()}
                   </Button>
                 </div>
               </div>
@@ -614,14 +617,14 @@ export function ActivityCreateForm({
             </div>
 
             {!session?.user && !sessionPending ? (
-              <FormError message="You can draft the activity here, but saving requires a teacher account." />
+              <FormError message={m.activity_form_sign_in_required_message()} />
             ) : null}
           </CardContent>
           <CardFooter className="mt-6 flex flex-col gap-3 border-t bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
               {isEditMode
-                ? 'Changes update the reusable activity used by future assignments.'
-                : 'Saved activities appear in the teacher dashboard and can later be published as assignments.'}
+                ? m.activity_form_footer_edit_hint()
+                : m.activity_form_footer_create_hint()}
             </p>
             {session?.user ? (
               <Button type="submit" disabled={isPending}>
@@ -630,7 +633,9 @@ export function ActivityCreateForm({
                 ) : (
                   <IconDeviceFloppy className="size-4" />
                 )}
-                {isEditMode ? 'Save changes' : 'Save activity'}
+                {isEditMode
+                  ? m.activity_form_save_changes()
+                  : m.activity_form_save_activity()}
               </Button>
             ) : (
               <Link
@@ -641,7 +646,7 @@ export function ActivityCreateForm({
                 className={cn(buttonVariants(), 'w-full sm:w-auto')}
               >
                 <IconLogin2 className="size-4" />
-                Sign in to save
+                {m.activity_form_sign_in_to_save()}
               </Link>
             )}
           </CardFooter>
