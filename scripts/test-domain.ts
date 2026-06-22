@@ -5113,6 +5113,67 @@ const missingOptionQuizRuntimeItems = getRuntimeItems(
 assert.equal(missingOptionQuizRuntimeItems.length, 3);
 assert.ok(missingOptionQuizRuntimeItems[0]?.choices?.includes('cat') ?? false);
 assert.ok((missingOptionQuizRuntimeItems[0]?.choices?.length ?? 0) > 1);
+const duplicateOptionAiDraft = {
+  ...oversizedAiDraft,
+  questions: [
+    {
+      answer: 'cat',
+      explanation: 'A cat is an animal.',
+      options: [' CAT ', 'cat', 'ｃａｔ', 'tree', ' TREE ', 'rain'],
+      prompt: 'Which word is an animal?',
+    },
+    {
+      answer: 'tree',
+      explanation: 'A tree is a plant.',
+      options: ['tree', ' TREE ', 'cat', 'rain'],
+      prompt: 'Which word is a plant?',
+    },
+    {
+      answer: 'rain',
+      explanation: 'Rain is weather.',
+      options: ['rain', ' RAIN ', 'cat', 'tree'],
+      prompt: 'Which word is weather?',
+    },
+  ],
+} satisfies AiActivityDraft;
+const duplicateOptionQuizContent = buildActivityContent(
+  createActivityInputFromAiDraft({
+    draft: duplicateOptionAiDraft,
+    input: {
+      ...aiDraftInputBase,
+      templateType: 'quiz',
+    },
+  })
+);
+assert.deepEqual(
+  duplicateOptionQuizContent.questions[0]?.options.map((option) => [
+    option.text,
+    option.isCorrect,
+  ]),
+  [
+    ['cat', true],
+    ['tree', false],
+    ['rain', false],
+  ]
+);
+assert.deepEqual(
+  duplicateOptionQuizContent.questions[0]?.options.filter(
+    (option) => option.isCorrect
+  ),
+  [{ id: 'o-cat', isCorrect: true, text: 'cat' }]
+);
+const duplicateOptionRuntimeChoices =
+  getRuntimeItems('quiz', duplicateOptionQuizContent)[0]?.choices ?? [];
+assert.equal(
+  duplicateOptionRuntimeChoices.filter((choice) => choice === 'cat').length,
+  1
+);
+assert.equal(
+  duplicateOptionRuntimeChoices.filter((choice) =>
+    [' CAT ', 'ｃａｔ'].includes(choice)
+  ).length,
+  0
+);
 const shapedMatchDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
   input: {
