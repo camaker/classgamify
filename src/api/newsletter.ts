@@ -1,14 +1,15 @@
 import { createServerFn } from '@tanstack/react-start';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { sendEmail } from '@/mail';
 import { isSubscribed, subscribe, unsubscribe } from '@/newsletter';
 import { z } from 'zod';
 
-const emailSchema = z.email('Please enter a valid email address');
+const emailSchema = z.email(m.newsletter_email_invalid());
 
 function ensureNewsletterEnabled(): void {
   if (!websiteConfig.newsletter?.enable) {
-    throw new Error('Newsletter is disabled');
+    throw new Error(m.newsletter_error_disabled());
   }
 }
 
@@ -22,7 +23,7 @@ export const getNewsletterStatus = createServerFn({ method: 'GET' })
     } catch (error) {
       console.error('Check newsletter status error:', error);
       throw new Error(
-        error instanceof Error ? error.message : 'Something went wrong'
+        error instanceof Error ? error.message : m.newsletter_error_generic()
       );
     }
   });
@@ -34,7 +35,7 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
     try {
       const ok = await subscribe(data.email);
       if (!ok) {
-        throw new Error('Failed to subscribe to the newsletter');
+        throw new Error(m.newsletter_error());
       }
       if (websiteConfig.mail?.fromEmail) {
         // Wait for 3 seconds to ensure the newsletter is subscribed
@@ -52,7 +53,7 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Subscribe newsletter error:', error);
       throw new Error(
-        error instanceof Error ? error.message : 'Something went wrong'
+        error instanceof Error ? error.message : m.newsletter_error_generic()
       );
     }
   });
@@ -64,12 +65,12 @@ export const unsubscribeNewsletter = createServerFn({ method: 'POST' })
     try {
       const ok = await unsubscribe(data.email);
       if (!ok) {
-        throw new Error('Failed to unsubscribe from the newsletter');
+        throw new Error(m.newsletter_error_unsubscribe());
       }
     } catch (error) {
       console.error('Unsubscribe newsletter error:', error);
       throw new Error(
-        error instanceof Error ? error.message : 'Something went wrong'
+        error instanceof Error ? error.message : m.newsletter_error_generic()
       );
     }
   });

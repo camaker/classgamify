@@ -1,6 +1,7 @@
 import { getDb } from '@/db';
 import { userFiles } from '@/db/app.schema';
 import { getBaseUrl } from '@/lib/urls';
+import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
 import { StorageError, UploadError } from '@/storage/types';
@@ -56,7 +57,7 @@ export const deleteUserFile = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('File not found');
+      throw new Error(m.user_files_api_error_file_not_found());
     }
 
     await deleteFile(row.r2Key);
@@ -68,7 +69,7 @@ const uploadSchema = z
   .transform((fd) => {
     const file = fd.get('file');
     if (!file || !(file instanceof File)) {
-      throw new Error('File not provided');
+      throw new Error(m.user_files_api_error_file_not_provided());
     }
     const folderRaw = fd.get('folder');
     const folder = typeof folderRaw === 'string' ? folderRaw : undefined;
@@ -131,6 +132,6 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
       if (error instanceof UploadError || error instanceof StorageError) {
         throw new Error(error.message);
       }
-      throw new Error('Something went wrong while uploading the file');
+      throw new Error(m.user_files_api_error_upload_failed());
     }
   });

@@ -16,7 +16,7 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const supportEmail = websiteConfig.mail?.supportEmail;
     if (!supportEmail) {
-      throw new Error('Contact form is not configured');
+      throw new Error(m.contact_error_not_configured());
     }
     const result = await sendEmail({
       to: supportEmail,
@@ -28,6 +28,6 @@ export const sendContactMessage = createServerFn({ method: 'POST' })
       },
     });
     if (!result.success) {
-      throw new Error('Failed to send the message');
+      throw new Error(m.contact_error());
     }
   });

@@ -5,6 +5,7 @@ import { getLocale } from '@/lib/locale';
 import { findPlanByPriceId, getAllPricePlans } from '@/lib/price-plan';
 import { Routes } from '@/lib/routes';
 import { getCanonicalUrl } from '@/lib/urls';
+import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createCheckout, createCustomerPortal } from '@/payment';
 import type {
@@ -38,7 +39,9 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       .from(user)
       .where(eq(user.id, userId))
       .limit(1);
-    if (!userRow?.email) throw new Error('User email not found');
+    if (!userRow?.email) {
+      throw new Error(m.payment_api_error_user_email_not_found());
+    }
     const { planId, priceId, successUrl, cancelUrl, metadata } = data;
     const locale = getLocale();
     const isCreem = websiteConfig.payment?.provider === 'creem';
@@ -90,7 +93,7 @@ export const createCustomerPortalSession = createServerFn({ method: 'POST' })
       .where(eq(user.id, userId))
       .limit(1);
     if (!row?.customerId) {
-      throw new Error('No customer found for user');
+      throw new Error(m.payment_api_error_customer_not_found());
     }
     const locale = getLocale();
     const returnUrl = data.returnUrl ?? getCanonicalUrl(Routes.SettingsBilling);
