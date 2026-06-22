@@ -288,7 +288,7 @@ function DashboardActivitiesPage() {
             <DashboardPagination
               currentPage={currentPage}
               isLoading={isLoading}
-              itemLabel="activities"
+              itemKind="activities"
               onPageChange={(nextPage) => navigateToActivityPage(nextPage)}
               pageSize={ACTIVITY_LIBRARY_PAGE_SIZE}
               total={totalActivities}

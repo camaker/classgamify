@@ -239,7 +239,7 @@ function DashboardAssignmentsPage() {
             <DashboardPagination
               currentPage={currentPage}
               isLoading={isLoading}
-              itemLabel="assignments"
+              itemKind="assignments"
               onPageChange={(nextPage) => navigateToAssignmentPage(nextPage)}
               pageSize={ASSIGNMENT_LIST_PAGE_SIZE}
               total={totalAssignments}

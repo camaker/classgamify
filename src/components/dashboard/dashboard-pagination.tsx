@@ -1,10 +1,14 @@
 import { Button } from '@/components/ui/button';
+import {
+  buildDashboardPaginationView,
+  type DashboardPaginationItemKind,
+} from '@/dashboard/pagination';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 type DashboardPaginationProps = {
   currentPage: number;
   isLoading?: boolean;
-  itemLabel: string;
+  itemKind: DashboardPaginationItemKind;
   onPageChange: (page: number) => void;
   pageSize: number;
   total: number;
@@ -14,7 +18,7 @@ type DashboardPaginationProps = {
 export function DashboardPagination({
   currentPage,
   isLoading = false,
-  itemLabel,
+  itemKind,
   onPageChange,
   pageSize,
   total,
@@ -22,17 +26,20 @@ export function DashboardPagination({
 }: DashboardPaginationProps) {
   if (totalPages <= 1) return null;
 
-  const firstItem = (currentPage - 1) * pageSize + 1;
-  const lastItem = Math.min(total, currentPage * pageSize);
+  const view = buildDashboardPaginationView({
+    currentPage,
+    itemKind,
+    pageSize,
+    total,
+    totalPages,
+  });
 
   return (
     <nav
-      aria-label={`${itemLabel} pages`}
+      aria-label={view.ariaLabel}
       className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
     >
-      <p className="text-sm text-muted-foreground">
-        Showing {firstItem}-{lastItem} of {total} {itemLabel}
-      </p>
+      <p className="text-sm text-muted-foreground">{view.summary}</p>
       <div className="flex items-center gap-2">
         <Button
           type="button"
@@ -42,10 +49,10 @@ export function DashboardPagination({
           onClick={() => onPageChange(currentPage - 1)}
         >
           <IconChevronLeft className="size-4" />
-          Previous
+          {view.previousLabel}
         </Button>
         <span className="min-w-24 text-center text-sm text-muted-foreground">
-          Page {currentPage} of {totalPages}
+          {view.pageLabel}
         </span>
         <Button
           type="button"
@@ -54,7 +61,7 @@ export function DashboardPagination({
           disabled={isLoading || currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
         >
-          Next
+          {view.nextLabel}
           <IconChevronRight className="size-4" />
         </Button>
       </div>

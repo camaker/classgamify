@@ -123,6 +123,7 @@ import {
   formatDashboardMetricValue,
   getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
+import { buildDashboardPaginationView } from '@/dashboard/pagination';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import { summarizeAssignmentAttempts } from '@/assignments/attempt-stats';
 import {
@@ -2920,6 +2921,59 @@ assert.deepEqual(
     ['student-preview', 'Student preview', 'Preview play route'],
   ]
 );
+assert.deepEqual(
+  buildDashboardPaginationView({
+    currentPage: 2,
+    itemKind: 'activities',
+    pageSize: 12,
+    total: 31,
+    totalPages: 3,
+  }),
+  {
+    ariaLabel: 'Activity pages',
+    nextLabel: 'Next',
+    pageLabel: 'Page 2 of 3',
+    previousLabel: 'Previous',
+    summary: 'Showing 13-24 of 31 activities',
+  }
+);
+assert.deepEqual(
+  buildDashboardPaginationView({
+    currentPage: 1,
+    itemKind: 'assignments',
+    pageSize: 12,
+    total: 4,
+    totalPages: 1,
+  }),
+  {
+    ariaLabel: 'Assignment pages',
+    nextLabel: 'Next',
+    pageLabel: 'Page 1 of 1',
+    previousLabel: 'Previous',
+    summary: 'Showing 1-4 of 4 assignments',
+  }
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildDashboardPaginationView({
+      currentPage: 2,
+      itemKind: 'activities',
+      pageSize: 12,
+      total: 31,
+      totalPages: 3,
+    }),
+    {
+      ariaLabel: '活动分页',
+      nextLabel: '下一页',
+      pageLabel: '第 2 页，共 3 页',
+      previousLabel: '上一页',
+      summary: '显示第 13-24 项，共 31 个活动',
+    }
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
