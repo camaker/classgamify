@@ -9,7 +9,10 @@ import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultCsvDate,
 } from '@/assignments/result-format';
-import { formatAssignmentDeliveryPolicyText } from '@/assignments/delivery-summary';
+import {
+  buildAssignmentDeliverySummary,
+  formatAssignmentDeliveryPolicyText,
+} from '@/assignments/delivery-summary';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -58,6 +61,16 @@ type AssignmentResultsExportData = {
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
+  const deliverySummaryById = new Map(
+    buildAssignmentDeliverySummary({
+      collectStudentName: settings.collectStudentName,
+      expiresAt: data.assignment.expiresAt,
+      maxAttempts: settings.maxAttempts,
+      showCorrectAnswers: settings.showCorrectAnswers,
+      shuffleItems: settings.shuffleItems,
+      timeLimitSeconds: settings.timeLimitSeconds,
+    }).map((item) => [item.id, item.value])
+  );
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
@@ -80,9 +93,9 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         settings,
       }),
       settings.instructions ?? '',
-      settings.collectStudentName,
-      settings.showCorrectAnswers,
-      settings.shuffleItems,
+      deliverySummaryById.get('identity') ?? '',
+      deliverySummaryById.get('answerReveal') ?? '',
+      deliverySummaryById.get('itemOrder') ?? '',
       settings.maxAttempts ?? '',
       settings.timeLimitSeconds ?? '',
       data.snapshot?.activityTitle ?? data.activity.title,
