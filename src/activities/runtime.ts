@@ -6,6 +6,7 @@ import type {
   AttemptAnswer,
   AttemptResult,
 } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
 export type RuntimeItem =
   | {
@@ -71,11 +72,11 @@ export function formatRuntimeItemPrompt(
   item: Pick<RuntimeItem, 'kind' | 'prompt'>
 ) {
   if (item.kind === 'pair') {
-    return `Match "${item.prompt}" with its pair.`;
+    return m.activity_runtime_prompt_pair({ prompt: item.prompt });
   }
 
   if (item.kind === 'group-item') {
-    return `Choose the group for "${item.prompt}".`;
+    return m.activity_runtime_prompt_group_item({ prompt: item.prompt });
   }
 
   return item.prompt;
@@ -83,14 +84,14 @@ export function formatRuntimeItemPrompt(
 
 export function formatRuntimeItemKindLabel(item: Pick<RuntimeItem, 'kind'>) {
   if (item.kind === 'group-item') {
-    return 'Group item';
+    return m.activity_runtime_kind_group_item();
   }
 
   if (item.kind === 'pair') {
-    return 'Pair';
+    return m.activity_runtime_kind_pair();
   }
 
-  return 'Question';
+  return m.activity_runtime_kind_question();
 }
 
 export function getRuntimeItems(
