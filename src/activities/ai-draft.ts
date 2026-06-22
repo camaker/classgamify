@@ -71,7 +71,7 @@ export type ActivityDraftResult = {
 const aiQuestionSchema = z.object({
   answer: z.string().trim().min(1).max(120),
   explanation: z.string().trim().min(4).max(240).optional(),
-  options: z.array(z.string().trim().min(1).max(120)).max(5).default([]),
+  options: z.array(z.string().trim().min(1).max(120)).max(12).default([]),
   prompt: z.string().trim().min(4).max(240),
 });
 
@@ -231,7 +231,11 @@ export function createActivityInputFromAiDraft({
   draft: AiActivityDraft;
   input: GenerateActivityDraftInput;
 }): CreateActivityInput {
-  const shapedDraft = shapeAiDraftForPrimaryTemplate({ draft, input });
+  const normalizedDraft = aiDraftSchema.parse(draft);
+  const shapedDraft = shapeAiDraftForPrimaryTemplate({
+    draft: normalizedDraft,
+    input,
+  });
   const activity = {
     description: shapedDraft.description,
     difficulty: input.difficulty,

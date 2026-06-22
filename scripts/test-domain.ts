@@ -5149,6 +5149,78 @@ const aiDraftInputBase = {
   sourceText: 'cat, dog, bird, tree, flower, rain, snow',
   subject: 'Science',
 } as const;
+const spacedAiDraft = {
+  description: '  Spaced AI draft for schema normalization.  ',
+  groups: [
+    { label: ' Animals ', items: [' cat ', ' dog '] },
+    { label: ' Plants ', items: [' tree ', ' flower '] },
+  ],
+  learningGoal: '  Students can sort and answer nature words.  ',
+  pairs: [
+    { left: ' cat ', right: ' animal ' },
+    { left: ' tree ', right: ' plant ' },
+    { left: ' rain ', right: ' weather ' },
+  ],
+  questions: [
+    {
+      answer: ' cat ',
+      explanation: ' A cat is an animal. ',
+      options: [' CAT ', ' tree ', ' rain '],
+      prompt: ' Which word is an animal? ',
+    },
+    {
+      answer: ' tree ',
+      explanation: ' A tree is a plant. ',
+      options: [' tree ', ' cat ', ' rain '],
+      prompt: ' Which word is a plant? ',
+    },
+    {
+      answer: ' rain ',
+      explanation: ' Rain is weather. ',
+      options: [' rain ', ' cat ', ' tree '],
+      prompt: ' Which word is weather? ',
+    },
+  ],
+  sourceSummary: '  Nature source notes.  ',
+  teacherNotes: [' Check all answer keys. '],
+  title: '  Nature sort  ',
+  vocabulary: [' cat ', ' tree ', ' rain '],
+} satisfies AiActivityDraft;
+const normalizedSpacedDraft = createActivityInputFromAiDraft({
+  draft: spacedAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'quiz',
+  },
+});
+assert.equal(normalizedSpacedDraft.title, 'Nature sort');
+assert.equal(
+  normalizedSpacedDraft.description,
+  'Spaced AI draft for schema normalization.'
+);
+assert.equal(
+  normalizedSpacedDraft.questionsText.split('\n')[0],
+  'Which word is an animal? | cat | cat, tree, rain | A cat is an animal.'
+);
+assert.equal(normalizedSpacedDraft.pairsText.split('\n')[0], 'cat | animal');
+assert.equal(
+  normalizedSpacedDraft.groupsText.split('\n')[0],
+  'Animals | cat, dog'
+);
+assert.equal(normalizedSpacedDraft.vocabularyText, 'cat, tree, rain');
+assert.equal(normalizedSpacedDraft.teacherNotesText, 'Check all answer keys.');
+assert.throws(() =>
+  createActivityInputFromAiDraft({
+    draft: {
+      ...spacedAiDraft,
+      teacherNotes: [],
+    },
+    input: {
+      ...aiDraftInputBase,
+      templateType: 'quiz',
+    },
+  })
+);
 const shapedQuizDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
   input: {
