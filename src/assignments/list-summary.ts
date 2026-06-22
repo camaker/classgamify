@@ -5,6 +5,7 @@ import {
 } from '@/assignments/attempt-stats';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
 import { type AssignmentDate, isAssignmentOpen } from '@/assignments/lifecycle';
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListSummaryAssignmentSource = {
@@ -114,7 +115,7 @@ export function buildAssignmentListSummaryMetrics({
     {
       id: 'average',
       label: m.assignment_list_summary_average(),
-      value: `${resolvedSummary.averageScore}%`,
+      value: formatAssignmentResultPercent(resolvedSummary.averageScore),
     },
   ];
 }

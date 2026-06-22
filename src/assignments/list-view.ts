@@ -10,6 +10,7 @@ import {
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { m } from '@/locale/paraglide/messages';
 
@@ -261,7 +262,7 @@ export function buildAssignmentListCardStats({
     {
       key: 'average',
       label: m.assignment_list_card_stat_average(),
-      value: `${averageScore}%`,
+      value: formatAssignmentResultPercent(averageScore),
     },
   ];
 }

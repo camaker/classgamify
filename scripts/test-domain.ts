@@ -4299,7 +4299,7 @@ assert.deepEqual(
   buildAssignmentListSummaryMetrics({
     hasFilters: true,
     summary: {
-      averageScore: 76,
+      averageScore: 76.6,
       completions: 11,
       openAssignments: 2,
       totalAssignments: 5,
@@ -4310,7 +4310,7 @@ assert.deepEqual(
     { id: 'total', label: 'Matching', value: '5' },
     { id: 'open', label: 'Open links', value: '2' },
     { id: 'completions', label: 'Completions', value: '11' },
-    { id: 'average', label: 'Average', value: '76%' },
+    { id: 'average', label: 'Average', value: '77%' },
   ]
 );
 assert.deepEqual(
@@ -4365,6 +4365,16 @@ assert.deepEqual(
   [
     { key: 'completions', label: 'Completions', value: '12' },
     { key: 'average', label: 'Average', value: '83%' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: Number.NaN,
+    completions: 0,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '0' },
+    { key: 'average', label: 'Average', value: '-' },
   ]
 );
 assert.deepEqual(
