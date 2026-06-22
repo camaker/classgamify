@@ -45,7 +45,7 @@ function buildWorksheetHeroAction(
   const mode = modes.find((item) => item.template === template);
   if (!mode) {
     return {
-      label: `Create ${template}`,
+      label: m.worksheets_page_mode_fallback_action({ template }),
       search: buildTemplateCreateSearch(template),
       template,
     };

@@ -3562,6 +3562,23 @@ assert.deepEqual(
     template: 'line-match',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildWorksheetHeroActions(
+      getWorksheetModeDefinitions().filter(
+        (mode) => mode.template !== 'line-match'
+      )
+    )[1],
+    {
+      label: '创建line-match',
+      search: { template: 'line-match' },
+      template: 'line-match',
+    }
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');
 assert.deepEqual(

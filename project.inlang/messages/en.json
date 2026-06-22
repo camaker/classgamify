@@ -1702,6 +1702,7 @@
   "worksheets_page_delivery_loop_title": "Worksheet delivery loop",
   "worksheets_page_description": "ClassGamify treats fill-in practice, line matching, listening, and classification as playable assignment templates. Teachers create reusable content once, publish a student link, and review results without exposing answer keys before submission.",
   "worksheets_page_eyebrow": "Liveworksheets-style modes",
+  "worksheets_page_mode_fallback_action": "Create {template}",
   "worksheets_page_mode_fill_blank_action": "Create fill-blank",
   "worksheets_page_mode_fill_blank_description": "Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.",
   "worksheets_page_mode_fill_blank_title": "Fill blanks",
