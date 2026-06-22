@@ -1,9 +1,10 @@
-import { activityTemplates } from '@/activities/catalog';
+import { getActivityTemplates } from '@/activities/catalog';
 import type {
   ActivityContent,
   ActivityTemplateDefinition,
   ActivityTemplateType,
 } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
 export type TemplateRemixOption = {
   diagnosis: string;
@@ -30,7 +31,7 @@ export function getTemplateRemixPlan({
   content: ActivityContent;
   currentTemplateType: ActivityTemplateType;
 }): TemplateRemixPlan {
-  const options = activityTemplates.map((template) =>
+  const options = getActivityTemplates().map((template) =>
     getTemplateRemixOption({
       content,
       currentTemplateType,
@@ -76,7 +77,9 @@ export function getTemplateRemixOption({
     missingRequirementCount: missingRequirements.length,
     missingRequirementLabels,
     missingRequirements,
-    readinessLabel: isReady ? 'Ready' : 'Needs more content',
+    readinessLabel: isReady
+      ? m.template_remix_ready()
+      : m.template_remix_needs_more_content(),
     template,
   };
 }
@@ -103,16 +106,21 @@ function buildTemplateRemixDiagnosis({
   template: ActivityTemplateDefinition;
 }) {
   if (isReady && isCurrent) {
-    return `${template.shortName} is selected and ready.`;
+    return m.template_remix_diagnosis_selected_ready({
+      template: template.shortName,
+    });
   }
 
   if (isReady) {
-    return `Ready to remix into ${template.shortName}.`;
+    return m.template_remix_diagnosis_ready({
+      template: template.shortName,
+    });
   }
 
-  return `Add ${formatTemplateRequirementList(
-    missingRequirementLabels
-  )} to unlock ${template.shortName}.`;
+  return m.template_remix_diagnosis_locked({
+    requirements: formatTemplateRequirementList(missingRequirementLabels),
+    template: template.shortName,
+  });
 }
 
 export function formatTemplateRequirementList(requirements: string[]) {
@@ -121,32 +129,38 @@ export function formatTemplateRequirementList(requirements: string[]) {
   }
 
   if (requirements.length === 2) {
-    return `${requirements[0]} and ${requirements[1]}`;
+    return m.template_remix_requirement_list_pair({
+      first: requirements[0],
+      second: requirements[1],
+    });
   }
 
-  return `${requirements.slice(0, -1).join(', ')}, and ${
-    requirements[requirements.length - 1]
-  }`;
+  return m.template_remix_requirement_list_many({
+    head: requirements
+      .slice(0, -1)
+      .join(m.template_remix_requirement_list_separator()),
+    last: requirements[requirements.length - 1],
+  });
 }
 
 export function formatTemplateRequirement(requirement: keyof ActivityContent) {
   switch (requirement) {
     case 'groups':
-      return 'groups';
+      return m.activity_template_requirement_groups();
     case 'pairs':
-      return 'match pairs';
+      return m.activity_template_requirement_pairs();
     case 'questions':
-      return 'questions';
+      return m.activity_template_requirement_questions();
     case 'teacherNotes':
-      return 'teacher notes';
+      return m.activity_template_requirement_teacher_notes();
     case 'learningGoal':
-      return 'learning goal';
+      return m.activity_template_requirement_learning_goal();
     case 'sourceSummary':
-      return 'source summary';
+      return m.activity_template_requirement_source_summary();
     case 'gradeBand':
-      return 'grade band';
+      return m.activity_template_requirement_grade_band();
     case 'vocabulary':
-      return 'vocabulary';
+      return m.activity_template_requirement_vocabulary();
     default:
       return requirement;
   }
@@ -157,20 +171,20 @@ export function getActivityTemplateDraftGuidance(
 ) {
   switch (templateType) {
     case 'fill-blank':
-      return 'Write each question prompt as a worksheet sentence with ___ or [blank] where the answer belongs.';
+      return m.activity_template_draft_guidance_fill_blank();
     case 'group-sort':
-      return 'Make groups the primary structure; each group needs a clear category label and concrete sortable items.';
+      return m.activity_template_draft_guidance_group_sort();
     case 'line-match':
-      return 'Make pairs the primary structure; each left side should connect cleanly to one right-side answer for line matching.';
+      return m.activity_template_draft_guidance_line_match();
     case 'listening':
-      return 'Write each question prompt as a short sentence that can be spoken aloud; the answer should be the key word or phrase students identify.';
+      return m.activity_template_draft_guidance_listening();
     case 'match-up':
-      return 'Make pairs the primary structure; use terms, definitions, translations, examples, or cause-and-effect matches.';
+      return m.activity_template_draft_guidance_match_up();
     case 'matching-pairs':
-      return 'Make pairs the primary structure; keep both sides short enough for memory-style cards.';
+      return m.activity_template_draft_guidance_matching_pairs();
     case 'open-box':
-      return 'Write each question prompt as a reveal-card speaking or review prompt with a concise model answer.';
+      return m.activity_template_draft_guidance_open_box();
     case 'quiz':
-      return 'Write each question as a concise multiple-choice check with plausible distractors.';
+      return m.activity_template_draft_guidance_quiz();
   }
 }

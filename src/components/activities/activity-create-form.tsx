@@ -798,15 +798,14 @@ function ActivityTemplateReadinessPanel({
         <div>
           <div className="flex items-center gap-2">
             <IconLayoutGrid className="size-4 text-primary" />
-            <h3 className="font-semibold text-sm">Template readiness</h3>
+            <h3 className="font-semibold text-sm">{summary.title}</h3>
           </div>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            The same structured content can become multiple Wordwall-style
-            activity formats after saving.
+            {summary.description}
           </p>
         </div>
         <Badge variant="secondary" className="w-fit rounded-md">
-          {summary.readyCount} ready
+          {summary.readyCountLabel}
         </Badge>
       </div>
       {summary.readyOptions.length > 0 ? (

@@ -3904,6 +3904,8 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityTemplateReadinessPanelSummary(questionOnlyRemixPlan),
   {
+    description:
+      'The same structured content can become multiple Wordwall-style activity formats after saving.',
     emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
     lockedOptions: [
       { diagnosis: 'Add match pairs to unlock Match.', template: 'match-up' },
@@ -3918,19 +3920,25 @@ assert.deepEqual(
       },
     ],
     readyCount: 4,
+    readyCountLabel: '4 ready',
     readyOptions: [
       { shortName: 'Quiz', template: 'quiz' },
       { shortName: 'Fill', template: 'fill-blank' },
       { shortName: 'Listen', template: 'listening' },
       { shortName: 'Box', template: 'open-box' },
     ],
+    title: 'Template readiness',
   }
 );
 assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
+  description:
+    'The same structured content can become multiple Wordwall-style activity formats after saving.',
   emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
   lockedOptions: [],
   readyCount: 0,
+  readyCountLabel: '0 ready',
   readyOptions: [],
+  title: 'Template readiness',
 });
 const questionOnlyCardSummary = buildActivityLibraryCardSummary({
   content: questionOnlyContent,

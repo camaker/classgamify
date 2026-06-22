@@ -18,6 +18,7 @@ import {
 } from '@/activities/template-remix';
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
 import { WORKERS_AI_MODELS } from '@/config/ai-models';
+import { m } from '@/locale/paraglide/messages';
 import { z } from 'zod';
 
 export const generateActivityDraftInputSchema = z.object({
@@ -28,8 +29,8 @@ export const generateActivityDraftInputSchema = z.object({
   sourceText: z
     .string()
     .trim()
-    .min(8, 'Add a lesson topic, vocabulary list, or source notes.')
-    .max(2000, 'Source notes are too long. Keep them under 2000 characters.'),
+    .min(8, m.activity_ai_source_min_error())
+    .max(2000, m.activity_ai_source_max_error()),
   subject: z.string().trim().min(1).max(80).default('English'),
   templateType: activityTemplateTypeSchema.default('quiz'),
 });
@@ -107,8 +108,7 @@ export async function generateActivityDraftFromAi(
     return createFallbackActivityDraftResult({
       input: data,
       model,
-      notice:
-        'Workers AI credentials are not configured, so a local deterministic draft was used.',
+      notice: m.activity_ai_notice_missing_credentials(),
     });
   }
 
@@ -129,7 +129,7 @@ export async function generateActivityDraftFromAi(
   });
 
   if (!result.response) {
-    throw new Error('Activity draft generation returned an empty response.');
+    throw new Error(m.activity_ai_error_empty_response());
   }
 
   let draft: AiActivityDraft;
@@ -139,8 +139,7 @@ export async function generateActivityDraftFromAi(
     return createFallbackActivityDraftResult({
       input: data,
       model,
-      notice:
-        'Workers AI returned an invalid draft, so a local deterministic draft was used.',
+      notice: m.activity_ai_notice_invalid_draft(),
     });
   }
 
@@ -218,7 +217,7 @@ function extractJsonObject(value: string) {
   const start = trimmed.indexOf('{');
   const end = trimmed.lastIndexOf('}');
   if (start === -1 || end === -1 || end <= start) {
-    throw new Error('Could not parse JSON from the activity draft response.');
+    throw new Error(m.activity_ai_error_parse_response());
   }
 
   return trimmed.slice(start, end + 1);

@@ -5,6 +5,7 @@ import {
   buildActivityContent,
   type CreateActivityInput,
 } from '@/activities/validation';
+import { m } from '@/locale/paraglide/messages';
 
 export type ActivityDraftMeta = {
   coverage: {
@@ -51,10 +52,13 @@ export type ActivityTemplateReadinessPanelLockedOption = {
 };
 
 export type ActivityTemplateReadinessPanelSummary = {
+  description: string;
   emptyText: string;
   lockedOptions: ActivityTemplateReadinessPanelLockedOption[];
   readyCount: number;
+  readyCountLabel: string;
   readyOptions: ActivityTemplateReadinessPanelOption[];
+  title: string;
 };
 
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
@@ -161,21 +165,43 @@ export function buildActivityDraftMetaSummaryView({
 }): ActivityDraftMetaSummaryView {
   return {
     coverageStats: [
-      { label: 'Questions', value: meta.coverage.questions },
-      { label: 'Pairs', value: meta.coverage.pairs },
-      { label: 'Groups', value: meta.coverage.groups },
-      { label: 'Vocab', value: meta.coverage.vocabulary },
-      { label: 'Notes', value: meta.coverage.teacherNotes },
+      {
+        label: m.activity_draft_meta_coverage_questions(),
+        value: meta.coverage.questions,
+      },
+      {
+        label: m.activity_draft_meta_coverage_pairs(),
+        value: meta.coverage.pairs,
+      },
+      {
+        label: m.activity_draft_meta_coverage_groups(),
+        value: meta.coverage.groups,
+      },
+      {
+        label: m.activity_draft_meta_coverage_vocab(),
+        value: meta.coverage.vocabulary,
+      },
+      {
+        label: m.activity_draft_meta_coverage_notes(),
+        value: meta.coverage.teacherNotes,
+      },
     ],
-    description:
-      'Review the generated content before saving it to the activity library.',
-    modelLabel: 'Model',
-    modelName: model.trim() || 'Unknown model',
+    description: m.activity_draft_meta_description(),
+    modelLabel: m.activity_draft_meta_model_label(),
+    modelName: model.trim() || m.activity_draft_meta_unknown_model(),
     notice,
-    providerLabel: provider === 'workers-ai' ? 'Workers AI' : 'Fallback',
-    readyTemplateLabel: `${meta.readyTemplateCount} ready ${
-      meta.readyTemplateCount === 1 ? 'template' : 'templates'
-    }`,
+    providerLabel:
+      provider === 'workers-ai'
+        ? m.activity_draft_meta_provider_workers_ai()
+        : m.activity_draft_meta_provider_fallback(),
+    readyTemplateLabel:
+      meta.readyTemplateCount === 1
+        ? m.activity_draft_meta_ready_template_label_one({
+            count: meta.readyTemplateCount,
+          })
+        : m.activity_draft_meta_ready_template_label_many({
+            count: meta.readyTemplateCount,
+          }),
     reviewChecklist: meta.reviewChecklist,
     suggestedTemplateOptions: meta.suggestedTemplateOptions,
     templateReadinessOptions: meta.templateReadiness.map((option) => ({
@@ -183,11 +209,13 @@ export function buildActivityDraftMetaSummaryView({
       isCurrent: option.isCurrent,
       isReady: option.isReady,
       readinessLabel: option.readinessLabel,
-      selectedLabel: option.isCurrent ? 'selected' : undefined,
+      selectedLabel: option.isCurrent
+        ? m.activity_draft_meta_selected_label()
+        : undefined,
       shortName: option.shortName,
       template: option.template,
     })),
-    title: 'AI draft coverage',
+    title: m.activity_draft_meta_title(),
   };
 }
 
@@ -208,10 +236,15 @@ export function buildActivityTemplateReadinessPanelSummary(
       })) ?? [];
 
   return {
-    emptyText: 'Add questions, pairs, or groups to unlock playable templates.',
+    description: m.activity_template_readiness_panel_description(),
+    emptyText: m.activity_template_readiness_panel_empty(),
     lockedOptions,
     readyCount: readyOptions.length,
+    readyCountLabel: m.activity_template_readiness_panel_ready_label({
+      count: readyOptions.length,
+    }),
     readyOptions,
+    title: m.activity_template_readiness_panel_title(),
   };
 }
 
@@ -225,20 +258,26 @@ function buildDraftReviewChecklist({
   suggestedTemplates: string[];
 }) {
   const checklist = [
-    'Review every answer before saving.',
-    'Adjust wording for your class level.',
+    m.activity_draft_meta_checklist_review_answers(),
+    m.activity_draft_meta_checklist_adjust_level(),
     activity.questionsText?.includes('|')
-      ? 'Check explanations and distractor choices.'
-      : 'Add questions before publishing quiz-style work.',
+      ? m.activity_draft_meta_checklist_check_explanations()
+      : m.activity_draft_meta_checklist_add_questions(),
   ];
 
   if (suggestedTemplates.length > 0) {
     checklist.push(
-      `Ready to remix after saving: ${suggestedTemplates.join(', ')}.`
+      m.activity_draft_meta_checklist_ready_to_remix({
+        templates: suggestedTemplates.join(', '),
+      })
     );
 
     if (lockedTemplateDiagnostics[0]) {
-      checklist.push(`Next content gap: ${lockedTemplateDiagnostics[0]}`);
+      checklist.push(
+        m.activity_draft_meta_checklist_next_gap({
+          diagnosis: lockedTemplateDiagnostics[0],
+        })
+      );
     }
 
     return checklist;
@@ -246,7 +285,7 @@ function buildDraftReviewChecklist({
 
   checklist.push(
     lockedTemplateDiagnostics[0] ??
-      'Add more structured pairs or groups to unlock more templates.'
+      m.activity_draft_meta_checklist_add_more_structure()
   );
 
   return checklist;
