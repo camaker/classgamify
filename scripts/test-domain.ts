@@ -457,6 +457,7 @@ const activeLocaleMessageText = [
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
 assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
+assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
