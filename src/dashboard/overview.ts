@@ -1,13 +1,13 @@
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
-export type DashboardActivitySummary = {
+type DashboardActivitySummary = {
   draftActivities: number;
   templateCoverage: number;
   totalActivities: number;
 };
 
-export type DashboardAssignmentSummary = {
+type DashboardAssignmentSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;
@@ -19,7 +19,7 @@ export type DashboardOverviewMetricId =
   | 'assignments'
   | 'results';
 
-export type DashboardOverviewMetric = {
+type DashboardOverviewMetric = {
   description: string;
   id: DashboardOverviewMetricId;
   label: string;

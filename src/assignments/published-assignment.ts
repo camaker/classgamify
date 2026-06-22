@@ -2,7 +2,7 @@ import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
-export type PublishedAssignmentListItem = {
+type PublishedAssignmentListItem = {
   assignment: {
     id: string;
     shareSlug: string;
@@ -44,7 +44,7 @@ export function resolvePublishedAssignmentPanelAssignment<
   });
 }
 
-export type PublishedAssignmentPanelContext = {
+type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
   sharePath: string;

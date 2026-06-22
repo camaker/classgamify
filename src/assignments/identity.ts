@@ -12,7 +12,7 @@ type AnonymousAttemptTokenStorage = {
   setItem(key: string, value: string): void;
 };
 
-export type StudentIdentity = {
+type StudentIdentity = {
   key: string;
   label: string;
 };

@@ -23,7 +23,7 @@ type ExportAttempt = {
   score: number | null;
 };
 
-export type AssignmentResultsExportData = {
+type AssignmentResultsExportData = {
   activity: {
     description: string | null;
     templateType: ActivityTemplateType;

@@ -1,6 +1,6 @@
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
-export type AssignmentRuntimeOrderItem = {
+type AssignmentRuntimeOrderItem = {
   id: string;
 };
 

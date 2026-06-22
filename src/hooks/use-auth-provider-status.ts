@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export type AuthProviderStatus = {
+type AuthProviderStatus = {
   google: boolean;
   googleOneTapClientId?: string | null;
 };

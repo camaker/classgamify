@@ -1,7 +1,7 @@
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
 import { m } from '@/locale/paraglide/messages';
 
-export type AssignmentListSummary = {
+type AssignmentListSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;

@@ -1,4 +1,4 @@
-export type AnswerMatchResult = {
+type AnswerMatchResult = {
   acceptedAnswer: string;
   correct: boolean;
   normalizedAcceptedAnswer: string;
