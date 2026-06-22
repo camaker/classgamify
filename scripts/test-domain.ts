@@ -7915,12 +7915,13 @@ const csvExportData = {
     averageScore: 50,
     completions: 1,
   },
+  now: new Date('2026-01-02T10:00:00.000Z').getTime(),
 } satisfies Parameters<typeof buildAssignmentResultsCsv>[0];
 
 const csv = buildAssignmentResultsCsv(csvExportData);
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
 assert.match(csv, /"expires_at","delivery_policy","instructions"/);
-assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123"/);
+assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123","Open"/);
 assert.match(
   csv,
   /"Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min;/
@@ -7953,6 +7954,14 @@ const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
 assert.match(
   activityTemplateFallbackCsv,
   /"Original Capitals","Line match","1","50","1","45","attempt-1"/
+);
+const expiredAssignmentStatusCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  now: new Date('2026-01-11T10:00:00.000Z').getTime(),
+});
+assert.match(
+  expiredAssignmentStatusCsv,
+  /"assignment-1","Capital Review, Week 1","share-123","Expired"/
 );
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),

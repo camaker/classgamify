@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import {
   formatAcceptedAnswerAlternatives,
@@ -52,6 +53,7 @@ type AssignmentResultsExportData = {
     averageScore: number;
     completions: number;
   };
+  now?: number;
 };
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
@@ -67,7 +69,11 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.assignment.id,
       data.assignment.title,
       data.assignment.shareSlug,
-      data.assignment.status,
+      formatAssignmentExportStatusLabel({
+        expiresAt: data.assignment.expiresAt,
+        now: data.now,
+        status: data.assignment.status,
+      }),
       formatAssignmentResultCsvDate(data.assignment.expiresAt),
       formatAssignmentDeliveryPolicyText({
         expiresAt: data.assignment.expiresAt,
@@ -184,6 +190,18 @@ function formatAssignmentExportTemplateLabel(
   templateType: ActivityTemplateType
 ) {
   return getTemplateByType(templateType).name;
+}
+
+function formatAssignmentExportStatusLabel({
+  expiresAt,
+  now,
+  status,
+}: {
+  expiresAt: Date | string | null;
+  now: number | undefined;
+  status: string;
+}) {
+  return getAssignmentStatusLabel(status, expiresAt, now);
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {
