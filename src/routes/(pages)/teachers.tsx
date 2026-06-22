@@ -6,6 +6,7 @@ import {
   formatActivityTemplateClassroomMode,
 } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { jsonLdScript } from '@/lib/structured-data';
@@ -24,26 +25,27 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(pages)/teachers')({
   head: () => {
-    const description =
-      'Plan game-based classroom activities, publish assignment links, and collect student results with ClassGamify.';
+    const description = m.teachers_page_seo_description();
     const teacherPageJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
-      name: 'Teachers',
+      name: m.teachers_page_seo_title(),
       description,
       audience: {
         '@type': 'Audience',
-        audienceType: 'Teachers, tutors, and learning centers',
+        audienceType: m.teachers_page_audience_type(),
       },
       provider: {
         '@type': 'Organization',
-        name: websiteConfig.metadata?.name ?? 'ClassGamify',
+        name: websiteConfig.metadata?.name ?? m.site_name(),
       },
     };
 
     return {
       ...seo(Routes.Teachers, {
-        title: `Teachers | ${websiteConfig.metadata?.name}`,
+        title: `${m.teachers_page_seo_title()} | ${
+          websiteConfig.metadata?.name
+        }`,
         description,
       }),
       scripts: [jsonLdScript(teacherPageJsonLd)],
@@ -56,42 +58,36 @@ function TeachersPage() {
   const workflow = [
     {
       icon: IconSparkles,
-      title: 'Start from lesson content',
-      description:
-        'Paste vocabulary, questions, examples, or worksheet prompts into one structured activity model.',
+      title: m.teachers_page_workflow_0_title(),
+      description: m.teachers_page_workflow_0_description(),
     },
     {
       icon: IconLayoutGrid,
-      title: 'Choose a game template',
-      description:
-        'Render the same content as quiz, match-up, line-match, group sort, fill-blank, listening, matching pairs, or open-box play.',
+      title: m.teachers_page_workflow_1_title(),
+      description: m.teachers_page_workflow_1_description(),
     },
     {
       icon: IconShare3,
-      title: 'Publish an assignment',
-      description:
-        'Share a public student link while keeping the reusable activity in the teacher library.',
+      title: m.teachers_page_workflow_2_title(),
+      description: m.teachers_page_workflow_2_description(),
     },
   ];
 
   const useCases = [
     {
       icon: IconUsers,
-      title: 'Classroom homework',
-      description:
-        'Assign short games after class and see which students completed the activity.',
+      title: m.teachers_page_use_case_0_title(),
+      description: m.teachers_page_use_case_0_description(),
     },
     {
       icon: IconDeviceGamepad2,
-      title: 'Live classroom play',
-      description:
-        'Use open-box, listening, line matching, sorting, and matching activities for warmups, review rounds, or small groups.',
+      title: m.teachers_page_use_case_1_title(),
+      description: m.teachers_page_use_case_1_description(),
     },
     {
       icon: IconChartBar,
-      title: 'Result follow-up',
-      description:
-        'Use completions and scores to decide which items need reteaching or another activity.',
+      title: m.teachers_page_use_case_2_title(),
+      description: m.teachers_page_use_case_2_description(),
     },
   ];
 
@@ -102,17 +98,14 @@ function TeachersPage() {
           <div className="min-w-0 space-y-5">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconUsers className="size-3.5" />
-              Teachers and tutoring teams
+              {m.teachers_page_eyebrow()}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
-                Build repeatable game-based assignments from the lessons you
-                already teach.
+                {m.teachers_page_title()}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                ClassGamify is being rebuilt for the real Wordwall-style loop:
-                create an activity, switch templates, publish a share link, and
-                review student results.
+                {m.teachers_page_description()}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -120,7 +113,7 @@ function TeachersPage() {
                 to={Routes.Create}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
-                Create activity
+                {m.teachers_page_primary_cta()}
                 <IconArrowRight className="size-4" />
               </Link>
               <Link
@@ -130,14 +123,14 @@ function TeachersPage() {
                   'rounded-lg bg-background'
                 )}
               >
-                Talk to us
+                {m.teachers_page_secondary_cta()}
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border bg-card p-5">
             <p className="text-sm font-medium text-muted-foreground">
-              First template families
+              {m.teachers_page_template_panel_title()}
             </p>
             <div className="mt-4 grid gap-2">
               {activityTemplates.map((template) => (
@@ -166,18 +159,17 @@ function TeachersPage() {
         <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold">
-              Need a school or learning-center workflow?
+              {m.teachers_page_school_cta_title()}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              Multi-teacher use needs thoughtful decisions about student names,
-              result retention, template sharing, and classroom permissions.
+              {m.teachers_page_school_cta_description()}
             </p>
           </div>
           <Link
             to={Routes.ContactClassroom}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            Contact us
+            {m.teachers_page_school_cta()}
           </Link>
         </section>
 
