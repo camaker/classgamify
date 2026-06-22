@@ -1,3 +1,5 @@
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+
 export type AssignmentRuntimeOrderItem = {
   id: string;
 };
@@ -13,7 +15,9 @@ export function orderAssignmentRuntimeItems<
   shareSlug: string;
   shuffleItems: boolean;
 }) {
-  return shuffleItems ? stableShuffle(items, shareSlug) : items;
+  return shuffleItems
+    ? stableShuffle(items, normalizeAssignmentShareSlug(shareSlug))
+    : items;
 }
 
 export function stableShuffle<TItem>(items: TItem[], seed: string) {

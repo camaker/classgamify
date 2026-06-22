@@ -25,7 +25,7 @@ import {
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { getDb } from '@/db';
 import {
   activity,

@@ -4,7 +4,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;

@@ -1,7 +1,5 @@
-import {
-  buildAssignmentSharePath,
-  normalizeAssignmentShareSlug,
-} from '@/assignments/share-link';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
 export type PublishedAssignmentListItem = {

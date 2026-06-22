@@ -285,9 +285,9 @@ import {
   assignmentShareLinkActionCopy,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
-  normalizeAssignmentShareSlug,
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
@@ -1313,6 +1313,14 @@ const shuffledAgain = orderAssignmentRuntimeItems({
   shuffleItems: true,
 });
 assert.deepEqual(shuffledOnce, shuffledAgain);
+assert.deepEqual(
+  orderAssignmentRuntimeItems({
+    items: submissionRuntimeItems,
+    shareSlug: ' share-1 ',
+    shuffleItems: true,
+  }),
+  shuffledOnce
+);
 assert.notEqual(shuffledOnce, submissionRuntimeItems);
 assert.deepEqual(
   submissionRuntimeItems.map((item) => item.id),

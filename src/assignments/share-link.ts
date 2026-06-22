@@ -1,3 +1,4 @@
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
 export const assignmentShareLinkActionCopy = {
@@ -19,10 +20,6 @@ export function buildAssignmentSharePath(shareSlug: string) {
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
   const origin = normalizeShareBaseUrl(baseUrl ?? getRuntimeBaseUrl());
   return `${origin}${buildAssignmentSharePath(shareSlug)}`;
-}
-
-export function normalizeAssignmentShareSlug(shareSlug: string) {
-  return shareSlug.trim();
 }
 
 export function normalizeShareBaseUrl(baseUrl: string) {
