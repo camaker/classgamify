@@ -6,8 +6,8 @@ This project uses Paraglide JS for runtime locale support.
 
 - Base locale: `en`
 - Additional locale: `zh`
-- Default English URLs are unprefixed: `/about`
-- Chinese URLs use a prefix: `/zh/about`
+- Default English URLs are unprefixed: `/templates`
+- Chinese URLs use a prefix: `/zh/templates`
 
 ## Files
 

@@ -2,7 +2,7 @@
 
 Email subscribe / unsubscribe / status, driven by **Resend** or **Beehiiv**. Config via `websiteConfig.newsletter`; env from **serverEnv** (`src/env/server.ts`). See [Env](./env.md) for variable list and where to set them.
 
-**Consumers:** API routes (`/api/newsletter/subscribe`, `unsubscribe`, `status`), hooks (`use-newsletter`), settings card (`NewsletterFormCard`), marketing block (`NewsletterCard`). Optional welcome email after subscribe is sent by the **Mail** module when `websiteConfig.mail.fromEmail` is set.
+**Consumers:** TanStack Start server functions (`src/api/newsletter.ts`), hooks (`use-newsletter`), and the logged-in settings card (`NewsletterFormCard`). Optional welcome email after subscribe is sent by the **Mail** module when `websiteConfig.mail.fromEmail` is set.
 
 ---
 
@@ -24,7 +24,8 @@ src/newsletter/
 **Client** (outside `src/newsletter/`):
 - `src/hooks/use-newsletter.ts` — `useNewsletterStatus`, `useSubscribeNewsletter`, `useUnsubscribeNewsletter`, `newsletterKeys` (calls server functions from `@/api/newsletter`)
 - `src/components/settings/notification/newsletter-form-card.tsx` — logged-in user toggle (Switch) in Settings → Notifications
-- `src/components/blocks/newsletter-card.tsx` — public email form (e.g. homepage, waitlist)
+
+No public marketing newsletter form is currently mounted.
 
 ---
 
@@ -88,7 +89,7 @@ All return 400 when newsletter is disabled or email invalid; throw or return err
 
 - **use-newsletter** — `useNewsletterStatus(email)` (query), `useSubscribeNewsletter()` / `useUnsubscribeNewsletter()` (mutations). Calls API with `getBaseUrl()` for correct origin. Invalidates status query on subscribe/unsubscribe success.
 - **NewsletterFormCard** — Renders only when `newsletter.enable` and user is logged in. Shows Switch bound to subscription status; toggling calls subscribe/unsubscribe and toast.
-- **NewsletterCard** — Renders only when `newsletter.enable`. Email input + submit; calls `subscribeNewsletter` server function. Uses flat Paraglide `m.newsletter_*()` message functions.
+- Public newsletter capture is not currently mounted; add a dedicated component and route-level product placement before exposing anonymous subscribe UI.
 
 ---
 

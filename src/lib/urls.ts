@@ -16,7 +16,7 @@ export function getBaseUrl(): string {
 }
 
 /**
- * Build canonical URL for a path (e.g. /about -> https://example.com/about)
+ * Build canonical URL for a path (e.g. /templates -> https://example.com/templates)
  * @param path - The path to build the canonical URL for
  * @returns The canonical URL
  */

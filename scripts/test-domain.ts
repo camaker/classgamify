@@ -401,6 +401,8 @@ const contentSurfaceFiles = [
 const activeClassGamifySurfaceFiles = [
   'CLAUDE.md',
   'README.md',
+  'docs/locale.md',
+  'docs/newsletter.md',
   'public/og-source.svg',
   'src/config/footer-config.ts',
   'src/config/navbar-config.ts',
@@ -443,7 +445,18 @@ assert.match(activeClassGamifySurfaceText, /ClassGamify/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
+const retiredRouteDocumentationText = [
+  'docs/locale.md',
+  'docs/newsletter.md',
+  'src/lib/urls.ts',
+]
+  .map((filePath) => readFileSync(filePath, 'utf8'))
+  .join('\n');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
+assert.doesNotMatch(
+  retiredRouteDocumentationText,
+  /\/about|\/zh\/about|waitlist|src\/components\/blocks\/newsletter-card\.tsx/
+);
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);
 assert.match(robotsRouteSource, /['"]\/learn['"]/);
