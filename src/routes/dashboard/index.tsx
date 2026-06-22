@@ -1,4 +1,4 @@
-import { starterActivities, starterAssignments } from '@/activities/catalog';
+import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
@@ -37,8 +37,8 @@ export const Route = createFileRoute('/dashboard/')({
 });
 
 function DashboardPage() {
-  const activity = starterActivities[0];
-  const assignment = starterAssignments[0];
+  const activity = getStarterActivity();
+  const assignment = getStarterAssignment();
   const { data: activitiesData, isLoading: activitiesLoading } = useActivities({
     pageIndex: 0,
     pageSize: 1,

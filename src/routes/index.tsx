@@ -2,7 +2,7 @@ import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { starterActivities, starterAssignments } from '@/activities/catalog';
+import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
@@ -49,8 +49,8 @@ export const Route = createFileRoute('/')({
 });
 
 function HomePage() {
-  const activity = starterActivities[0];
-  const assignment = starterAssignments[0];
+  const activity = getStarterActivity();
+  const assignment = getStarterAssignment();
 
   return (
     <Container className="px-4 py-12 md:py-16">

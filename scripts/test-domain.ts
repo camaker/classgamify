@@ -48,8 +48,11 @@ import {
   activityTemplates,
   formatActivityTemplateClassroomMode,
   getActivityTemplates,
+  getStarterActivities,
+  getStarterAssignments,
   getTemplateByType,
   starterActivities,
+  starterAssignments,
 } from '@/activities/catalog';
 import {
   buildDuplicatedActivityTitle,
@@ -2707,11 +2710,25 @@ assert.deepEqual(
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
 assert.equal(formatActivityTemplateClassroomMode('whole-class'), 'Whole class');
+assert.equal(starterActivities[0]?.title, 'Food words quick check');
+assert.equal(starterAssignments[0]?.title, 'Food words homework');
+assert.equal(getStarterActivities()[0]?.title, 'Food words quick check');
+assert.equal(getStarterAssignments()[0]?.title, 'Food words homework');
 overwriteGetLocale(() => 'zh');
 try {
+  const localizedStarterActivities = getStarterActivities();
+  const localizedStarterAssignments = getStarterAssignments();
+
   assert.equal(getActivityTemplates()[0]?.name, '测验');
   assert.equal(getTemplateByType('group-sort')?.shortName, '分类');
   assert.equal(formatActivityTemplateClassroomMode('whole-class'), '全班互动');
+  assert.equal(localizedStarterActivities[0]?.title, '食物词汇快速检查');
+  assert.equal(
+    localizedStarterActivities[0]?.content.questions[0]?.prompt,
+    '哪个单词表示红色或绿色的水果？'
+  );
+  assert.equal(localizedStarterActivities[1]?.content.groups[0]?.label, '固体');
+  assert.equal(localizedStarterAssignments[0]?.title, '食物词汇作业');
 } finally {
   overwriteGetLocale(() => 'en');
 }

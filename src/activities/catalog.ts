@@ -161,144 +161,225 @@ export function getActivityTemplates() {
   return ACTIVITY_TEMPLATE_TYPES.map((type) => templatesByType[type]);
 }
 
-export const starterActivities: ActivitySeed[] = [
-  {
-    id: 'english-food-quiz',
-    title: 'Food words quick check',
-    description:
-      'A starter English vocabulary activity that can render as quiz, match, lines, or pairs.',
-    templateType: 'quiz',
-    estimatedMinutes: 6,
-    status: 'draft',
-    content: {
-      subject: 'English',
-      gradeBand: 'Primary',
-      language: 'en',
-      difficulty: 'starter',
-      sourceSummary: 'Unit vocabulary list about common food and drinks.',
-      learningGoal:
-        'Students can recognize core food words and connect them to simple meanings.',
-      vocabulary: ['apple', 'bread', 'milk', 'rice', 'water', 'egg'],
-      questions: [
-        {
-          id: 'q-apple',
-          prompt: 'Which word means a red or green fruit?',
-          answer: 'apple',
-          explanation: 'Apple is the fruit clue in this vocabulary set.',
-          options: [
-            { id: 'apple', text: 'apple', isCorrect: true },
-            { id: 'bread', text: 'bread' },
-            { id: 'water', text: 'water' },
-          ],
-        },
-        {
-          id: 'q-milk',
-          prompt: 'Which drink is white?',
-          answer: 'milk',
-          explanation: 'Milk is the white drink among the answer choices.',
-          options: [
-            { id: 'milk', text: 'milk', isCorrect: true },
-            { id: 'rice', text: 'rice' },
-            { id: 'egg', text: 'egg' },
-          ],
-        },
-        {
-          id: 'q-rice',
-          prompt: 'Which food is often eaten from a bowl?',
-          answer: 'rice',
-          explanation:
-            'Rice is commonly served in a bowl, unlike the drink choices.',
-          options: [
-            { id: 'rice', text: 'rice', isCorrect: true },
-            { id: 'water', text: 'water' },
-            { id: 'apple', text: 'apple' },
-          ],
-        },
-      ],
-      pairs: [
-        { id: 'p-apple', left: 'apple', right: 'fruit' },
-        { id: 'p-bread', left: 'bread', right: 'bakery food' },
-        { id: 'p-milk', left: 'milk', right: 'drink' },
-        { id: 'p-rice', left: 'rice', right: 'grain' },
-      ],
-      groups: [
-        {
-          id: 'g-food',
-          label: 'Food',
-          items: ['apple', 'bread', 'rice', 'egg'],
-        },
-        { id: 'g-drink', label: 'Drink', items: ['milk', 'water'] },
-      ],
-      teacherNotes: [
-        'Use the same content as a quiz for homework, line match for worksheet practice, or matching pairs for class warmup.',
-        'Ask students to say one sentence after each correct answer.',
-      ],
-    },
-  },
-  {
-    id: 'science-materials-sort',
-    title: 'Materials group sort',
-    description:
-      'A simple science classification activity for solids, liquids, and gases.',
-    templateType: 'group-sort',
-    estimatedMinutes: 8,
-    status: 'draft',
-    content: {
-      subject: 'Science',
-      gradeBand: 'Primary',
-      language: 'en',
-      difficulty: 'core',
-      sourceSummary: 'Lesson notes about states of matter.',
-      learningGoal:
-        'Students can classify everyday materials by observable state.',
-      vocabulary: ['wood', 'juice', 'steam', 'stone', 'oil', 'air'],
-      questions: [
-        {
-          id: 'q-steam',
-          prompt: 'Which item belongs with gases?',
-          answer: 'steam',
-          explanation: 'Steam is water vapor, so it belongs with gases.',
-          options: [
-            { id: 'steam', text: 'steam', isCorrect: true },
-            { id: 'wood', text: 'wood' },
-            { id: 'oil', text: 'oil' },
-          ],
-        },
-      ],
-      pairs: [
-        { id: 'p-wood', left: 'wood', right: 'solid' },
-        { id: 'p-juice', left: 'juice', right: 'liquid' },
-        { id: 'p-air', left: 'air', right: 'gas' },
-      ],
-      groups: [
-        { id: 'solid', label: 'Solid', items: ['wood', 'stone'] },
-        { id: 'liquid', label: 'Liquid', items: ['juice', 'oil'] },
-        { id: 'gas', label: 'Gas', items: ['steam', 'air'] },
-      ],
-      teacherNotes: [
-        'Use group sort in class, then publish the quiz version as homework.',
-      ],
-    },
-  },
-];
+export const starterActivities = getStarterActivities();
+export const starterAssignments = getStarterAssignments();
 
-export const starterAssignments: AssignmentSeed[] = [
-  {
-    id: 'assignment-food-demo',
-    shareId: 'demo-food',
-    title: 'Food words homework',
-    activityId: 'english-food-quiz',
-    completions: 18,
-    averageScore: 84,
-    status: 'published',
-    settings: {
-      collectStudentName: true,
-      showCorrectAnswers: true,
-      shuffleItems: true,
-      maxAttempts: 2,
+export function getStarterActivities(): ActivitySeed[] {
+  const foodWords = {
+    apple: m.activity_starter_food_vocabulary_apple(),
+    bread: m.activity_starter_food_vocabulary_bread(),
+    egg: m.activity_starter_food_vocabulary_egg(),
+    milk: m.activity_starter_food_vocabulary_milk(),
+    rice: m.activity_starter_food_vocabulary_rice(),
+    water: m.activity_starter_food_vocabulary_water(),
+  };
+  const scienceWords = {
+    air: m.activity_starter_science_vocabulary_air(),
+    juice: m.activity_starter_science_vocabulary_juice(),
+    oil: m.activity_starter_science_vocabulary_oil(),
+    steam: m.activity_starter_science_vocabulary_steam(),
+    stone: m.activity_starter_science_vocabulary_stone(),
+    wood: m.activity_starter_science_vocabulary_wood(),
+  };
+
+  return [
+    {
+      id: 'english-food-quiz',
+      title: m.activity_starter_food_title(),
+      description: m.activity_starter_food_description(),
+      templateType: 'quiz',
+      estimatedMinutes: 6,
+      status: 'draft',
+      content: {
+        subject: m.activity_starter_food_subject(),
+        gradeBand: m.activity_starter_food_grade_band(),
+        language: m.activity_starter_food_language(),
+        difficulty: 'starter',
+        sourceSummary: m.activity_starter_food_source_summary(),
+        learningGoal: m.activity_starter_food_learning_goal(),
+        vocabulary: [
+          foodWords.apple,
+          foodWords.bread,
+          foodWords.milk,
+          foodWords.rice,
+          foodWords.water,
+          foodWords.egg,
+        ],
+        questions: [
+          {
+            id: 'q-apple',
+            prompt: m.activity_starter_food_question_apple_prompt(),
+            answer: foodWords.apple,
+            explanation: m.activity_starter_food_question_apple_explanation(),
+            options: [
+              { id: 'apple', text: foodWords.apple, isCorrect: true },
+              { id: 'bread', text: foodWords.bread },
+              { id: 'water', text: foodWords.water },
+            ],
+          },
+          {
+            id: 'q-milk',
+            prompt: m.activity_starter_food_question_milk_prompt(),
+            answer: foodWords.milk,
+            explanation: m.activity_starter_food_question_milk_explanation(),
+            options: [
+              { id: 'milk', text: foodWords.milk, isCorrect: true },
+              { id: 'rice', text: foodWords.rice },
+              { id: 'egg', text: foodWords.egg },
+            ],
+          },
+          {
+            id: 'q-rice',
+            prompt: m.activity_starter_food_question_rice_prompt(),
+            answer: foodWords.rice,
+            explanation: m.activity_starter_food_question_rice_explanation(),
+            options: [
+              { id: 'rice', text: foodWords.rice, isCorrect: true },
+              { id: 'water', text: foodWords.water },
+              { id: 'apple', text: foodWords.apple },
+            ],
+          },
+        ],
+        pairs: [
+          {
+            id: 'p-apple',
+            left: foodWords.apple,
+            right: m.activity_starter_food_pair_apple_right(),
+          },
+          {
+            id: 'p-bread',
+            left: foodWords.bread,
+            right: m.activity_starter_food_pair_bread_right(),
+          },
+          {
+            id: 'p-milk',
+            left: foodWords.milk,
+            right: m.activity_starter_food_pair_milk_right(),
+          },
+          {
+            id: 'p-rice',
+            left: foodWords.rice,
+            right: m.activity_starter_food_pair_rice_right(),
+          },
+        ],
+        groups: [
+          {
+            id: 'g-food',
+            label: m.activity_starter_food_group_food_label(),
+            items: [
+              foodWords.apple,
+              foodWords.bread,
+              foodWords.rice,
+              foodWords.egg,
+            ],
+          },
+          {
+            id: 'g-drink',
+            label: m.activity_starter_food_group_drink_label(),
+            items: [foodWords.milk, foodWords.water],
+          },
+        ],
+        teacherNotes: [
+          m.activity_starter_food_teacher_note_1(),
+          m.activity_starter_food_teacher_note_2(),
+        ],
+      },
     },
-  },
-];
+    {
+      id: 'science-materials-sort',
+      title: m.activity_starter_science_title(),
+      description: m.activity_starter_science_description(),
+      templateType: 'group-sort',
+      estimatedMinutes: 8,
+      status: 'draft',
+      content: {
+        subject: m.activity_starter_science_subject(),
+        gradeBand: m.activity_starter_science_grade_band(),
+        language: m.activity_starter_science_language(),
+        difficulty: 'core',
+        sourceSummary: m.activity_starter_science_source_summary(),
+        learningGoal: m.activity_starter_science_learning_goal(),
+        vocabulary: [
+          scienceWords.wood,
+          scienceWords.juice,
+          scienceWords.steam,
+          scienceWords.stone,
+          scienceWords.oil,
+          scienceWords.air,
+        ],
+        questions: [
+          {
+            id: 'q-steam',
+            prompt: m.activity_starter_science_question_steam_prompt(),
+            answer: scienceWords.steam,
+            explanation:
+              m.activity_starter_science_question_steam_explanation(),
+            options: [
+              { id: 'steam', text: scienceWords.steam, isCorrect: true },
+              { id: 'wood', text: scienceWords.wood },
+              { id: 'oil', text: scienceWords.oil },
+            ],
+          },
+        ],
+        pairs: [
+          {
+            id: 'p-wood',
+            left: scienceWords.wood,
+            right: m.activity_starter_science_pair_wood_right(),
+          },
+          {
+            id: 'p-juice',
+            left: scienceWords.juice,
+            right: m.activity_starter_science_pair_juice_right(),
+          },
+          {
+            id: 'p-air',
+            left: scienceWords.air,
+            right: m.activity_starter_science_pair_air_right(),
+          },
+        ],
+        groups: [
+          {
+            id: 'solid',
+            label: m.activity_starter_science_group_solid_label(),
+            items: [scienceWords.wood, scienceWords.stone],
+          },
+          {
+            id: 'liquid',
+            label: m.activity_starter_science_group_liquid_label(),
+            items: [scienceWords.juice, scienceWords.oil],
+          },
+          {
+            id: 'gas',
+            label: m.activity_starter_science_group_gas_label(),
+            items: [scienceWords.steam, scienceWords.air],
+          },
+        ],
+        teacherNotes: [m.activity_starter_science_teacher_note_1()],
+      },
+    },
+  ];
+}
+
+export function getStarterAssignments(): AssignmentSeed[] {
+  return [
+    {
+      id: 'assignment-food-demo',
+      shareId: 'demo-food',
+      title: m.activity_starter_assignment_food_title(),
+      activityId: 'english-food-quiz',
+      completions: 18,
+      averageScore: 84,
+      status: 'published',
+      settings: {
+        collectStudentName: true,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        maxAttempts: 2,
+      },
+    },
+  ];
+}
 
 function defineActivityTemplate<TType extends ActivityTemplateType>(
   type: TType,
@@ -334,17 +415,16 @@ export function formatActivityTemplateClassroomMode(
 }
 
 export function getStarterActivity(id?: string) {
-  if (!id) return starterActivities[0];
-  return (
-    starterActivities.find((activity) => activity.id === id) ??
-    starterActivities[0]
-  );
+  const activities = getStarterActivities();
+  if (!id) return activities[0];
+  return activities.find((activity) => activity.id === id) ?? activities[0];
 }
 
 export function getStarterAssignment(shareId?: string) {
-  if (!shareId) return starterAssignments[0];
+  const assignments = getStarterAssignments();
+  if (!shareId) return assignments[0];
   return (
-    starterAssignments.find((assignment) => assignment.shareId === shareId) ??
-    starterAssignments[0]
+    assignments.find((assignment) => assignment.shareId === shareId) ??
+    assignments[0]
   );
 }

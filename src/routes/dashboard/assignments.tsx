@@ -1,4 +1,7 @@
-import { getStarterActivity, starterAssignments } from '@/activities/catalog';
+import {
+  getStarterActivity,
+  getStarterAssignments,
+} from '@/activities/catalog';
 import {
   type AssignmentStatusFilter,
   buildAssignmentListPageRouteSearch,
@@ -113,6 +116,7 @@ function DashboardAssignmentsPage() {
     summary: data?.summary,
     totalAssignments,
   });
+  const starterAssignments = getStarterAssignments();
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {

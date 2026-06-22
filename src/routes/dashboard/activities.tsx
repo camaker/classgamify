@@ -1,4 +1,7 @@
-import { getActivityTemplates, starterActivities } from '@/activities/catalog';
+import {
+  getActivityTemplates,
+  getStarterActivities,
+} from '@/activities/catalog';
 import {
   buildActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -147,6 +150,7 @@ function DashboardActivitiesPage() {
     summary: data?.summary,
     totalActivities,
   });
+  const starterActivities = getStarterActivities();
 
   useEffect(() => {
     if (!isLoading && currentPage > totalPages) {
