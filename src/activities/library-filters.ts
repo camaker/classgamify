@@ -23,7 +23,12 @@ export type ActivityLibraryRouteSearch = {
 };
 
 export function normalizeActivityLibrarySearch(value?: string | null) {
-  const normalized = value?.replace(/\s+/g, ' ').trim();
+  const normalized = value?.normalize('NFKC').replace(/\s+/g, ' ').trim();
+  return normalized || undefined;
+}
+
+function normalizeActivityLibraryCreatedSearch(value?: string | null) {
+  const normalized = value?.trim();
   return normalized || undefined;
 }
 
@@ -39,7 +44,7 @@ export function buildActivityLibraryRouteSearch({
     page && Number.isInteger(page) && page > 1 ? page : undefined;
 
   return {
-    created,
+    created: normalizeActivityLibraryCreatedSearch(created),
     page: normalizedPage,
     q: normalizedSearch,
     status: status === 'active' ? undefined : status,
@@ -78,6 +83,24 @@ export function parseCreateActivityTemplateSearch(
   return isActivityTemplateType(value) ? value : undefined;
 }
 
+export function buildActivityLibraryValidatedSearch(
+  search: Record<string, unknown>
+): ActivityLibraryRouteSearch {
+  return {
+    created:
+      typeof search.created === 'string'
+        ? normalizeActivityLibraryCreatedSearch(search.created)
+        : undefined,
+    page: parseActivityLibraryPageSearch(search.page),
+    q:
+      typeof search.q === 'string'
+        ? normalizeActivityLibrarySearch(search.q)
+        : undefined,
+    status: parseActivityLibraryStatus(search.status),
+    template: parseActivityTemplateFilter(search.template),
+  };
+}
+
 export function isActivityTemplateType(
   value: unknown
 ): value is ActivityTemplateType {
@@ -85,4 +108,11 @@ export function isActivityTemplateType(
     typeof value === 'string' &&
     ACTIVITY_TEMPLATE_TYPES.includes(value as ActivityTemplateType)
   );
+}
+
+function parseActivityLibraryPageSearch(value: unknown) {
+  if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+
+  const page = Number(value);
+  return Number.isInteger(page) && page > 1 ? page : undefined;
 }

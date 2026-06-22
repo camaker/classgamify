@@ -11,10 +11,9 @@ import {
   type ActivityTemplateFilter,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
+  buildActivityLibraryValidatedSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
-  parseActivityLibraryStatus,
-  parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
   buildActivityLibraryFilterSummary,
@@ -60,7 +59,6 @@ import {
   useRemixActivityTemplate,
   useRestoreActivity,
 } from '@/hooks/use-activities';
-import { parseDashboardPageSearch } from '@/lib/dashboard-pagination';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
@@ -87,16 +85,7 @@ const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
 type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
 
 export const Route = createFileRoute('/dashboard/activities')({
-  validateSearch: (search: Record<string, unknown>) => ({
-    created:
-      typeof search.created === 'string' && search.created.trim()
-        ? search.created.trim()
-        : undefined,
-    page: parseDashboardPageSearch(search.page),
-    q: typeof search.q === 'string' ? search.q : undefined,
-    status: parseActivityLibraryStatus(search.status),
-    template: parseActivityTemplateFilter(search.template),
-  }),
+  validateSearch: buildActivityLibraryValidatedSearch,
   component: DashboardActivitiesPage,
 });
 

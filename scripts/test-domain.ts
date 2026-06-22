@@ -33,6 +33,7 @@ import {
 import {
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
+  buildActivityLibraryValidatedSearch,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
@@ -2977,7 +2978,40 @@ assert.deepEqual(
   }
 );
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
+assert.equal(normalizeActivityLibrarySearch('  Ｇｒｏｕｐ   １  '), 'Group 1');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
+assert.deepEqual(
+  buildActivityLibraryValidatedSearch({
+    created: ' activity-1 ',
+    page: '4',
+    q: '  Ｇｒｏｕｐ   １  ',
+    status: 'archived',
+    template: 'group-sort',
+  }),
+  {
+    created: 'activity-1',
+    page: 4,
+    q: 'Group 1',
+    status: 'archived',
+    template: 'group-sort',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryValidatedSearch({
+    created: '   ',
+    page: '1',
+    q: '   ',
+    status: 'deleted',
+    template: 'flashcards',
+  }),
+  {
+    created: undefined,
+    page: undefined,
+    q: undefined,
+    status: undefined,
+    template: undefined,
+  }
+);
 assert.deepEqual(
   buildActivityLibraryRouteSearch({
     created: 'activity-1',
