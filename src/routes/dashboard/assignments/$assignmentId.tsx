@@ -470,10 +470,11 @@ function AssignmentResultsPage() {
                   </TableHeader>
                   <TableBody>
                     {resultView.filteredAttemptRows.map(
-                      ({ attempt, review }) => {
+                      ({ attempt, review, studentLabel }) => {
                         const rowDisplay = buildAssignmentAttemptRowDisplay({
                           attempt,
                           review,
+                          studentLabel,
                         });
 
                         return (

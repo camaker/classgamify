@@ -7267,6 +7267,34 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
+      completedAt: new Date('2026-01-03T10:00:00.000Z'),
+      id: 'attempt-3',
+      maxScore: 2,
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        durationSeconds: 40,
+        totalPoints: 2,
+      },
+      score: 0,
+      studentName: null,
+    },
+    review: resultAnalysis.attempts[2],
+  }),
+  {
+    accuracyLabel: '0%',
+    answeredLabel: '1/2',
+    durationLabel: '40s',
+    scoreLabel: '0/2',
+    studentLabel: 'Anonymous student 1',
+    submittedAtLabel: formatAssignmentResultDate(
+      new Date('2026-01-03T10:00:00.000Z')
+    ),
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
       completedAt: null,
       id: 'anonymous-row',
       maxScore: null,
@@ -8156,6 +8184,29 @@ assert.deepEqual(
     search: 'ａｎｏｎｙｍｏｕｓ',
   }).map((row) => row.attempt.id),
   ['attempt-3']
+);
+const fallbackIdentityAttemptRows = buildFilteredAttemptRows({
+  attempts: [
+    {
+      anonymousToken: 'browser-token-1',
+      id: 'fallback-anonymous-attempt',
+      studentName: null,
+    },
+  ],
+  reviews: [],
+  search: 'student 1',
+});
+assert.deepEqual(
+  fallbackIdentityAttemptRows.map((row) => ({
+    id: row.attempt.id,
+    studentLabel: row.studentLabel,
+  })),
+  [
+    {
+      id: 'fallback-anonymous-attempt',
+      studentLabel: 'Anonymous student 1',
+    },
+  ]
 );
 assert.deepEqual(
   filterAttemptReviews({

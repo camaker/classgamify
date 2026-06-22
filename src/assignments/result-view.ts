@@ -12,7 +12,10 @@ import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
-import { normalizeStudentName } from '@/assignments/identity';
+import {
+  createStudentIdentityResolver,
+  normalizeStudentName,
+} from '@/assignments/identity';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
@@ -727,9 +730,11 @@ export function buildAssignmentResultSectionState({
 export function buildAssignmentAttemptRowDisplay({
   attempt,
   review,
+  studentLabel,
 }: {
   attempt: AssignmentAttemptRowDisplayInput;
   review: AssignmentAttemptReview | undefined;
+  studentLabel?: string;
 }) {
   return {
     accuracyLabel: formatAssignmentResultPercent(
@@ -746,10 +751,12 @@ export function buildAssignmentAttemptRowDisplay({
       attempt.score ?? 0,
       attempt.maxScore ?? 0
     ),
-    studentLabel: getAssignmentAttemptStudentLabel({
-      reviewStudentLabel: review?.studentLabel,
-      studentName: attempt.studentName,
-    }),
+    studentLabel:
+      studentLabel ??
+      getAssignmentAttemptStudentLabel({
+        reviewStudentLabel: review?.studentLabel,
+        studentName: attempt.studentName,
+      }),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
 }
@@ -976,6 +983,7 @@ type AssignmentAttemptRowInput = {
 type AssignmentAttemptReviewRow<TAttempt extends AssignmentAttemptRowInput> = {
   attempt: TAttempt;
   review: AssignmentAttemptReview | undefined;
+  studentLabel: string;
 };
 
 export function buildAssignmentResultViewModel<
@@ -1164,16 +1172,23 @@ export function buildFilteredAttemptRows<
 }): Array<AssignmentAttemptReviewRow<TAttempt>> {
   const normalizedSearch = normalizeResultSearch(search);
   const reviewById = new Map(reviews.map((item) => [item.id, item]));
+  const fallbackIdentityResolver = createStudentIdentityResolver(attempts);
 
   return attempts
-    .map((attempt) => ({
-      attempt,
-      review: reviewById.get(attempt.id),
-    }))
+    .map((attempt) => {
+      const review = reviewById.get(attempt.id);
+
+      return {
+        attempt,
+        review,
+        studentLabel:
+          review?.studentLabel ??
+          fallbackIdentityResolver.resolve(attempt).label,
+      };
+    })
     .filter((row) => {
       if (!normalizedSearch) return true;
-      const label = row.review?.studentLabel ?? row.attempt.studentName;
-      return matchesResultSearch(label, normalizedSearch);
+      return matchesResultSearch(row.studentLabel, normalizedSearch);
     });
 }
 
