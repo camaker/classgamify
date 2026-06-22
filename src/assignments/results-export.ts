@@ -4,6 +4,7 @@ import type {
 } from '@/activities/types';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import { formatAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import { m } from '@/locale/paraglide/messages';
 
 type ExportAttempt = {
   completedAt: Date | string | null;
@@ -46,48 +47,6 @@ export type AssignmentResultsExportData = {
     completions: number;
   };
 };
-
-const RESULT_EXPORT_COLUMNS = [
-  'assignment_id',
-  'assignment_title',
-  'share_slug',
-  'assignment_status',
-  'expires_at',
-  'instructions',
-  'collect_student_name',
-  'show_correct_answers',
-  'shuffle_items',
-  'max_attempts',
-  'time_limit_seconds',
-  'activity_title',
-  'template_type',
-  'completions',
-  'average_accuracy',
-  'average_points',
-  'average_duration_seconds',
-  'attempt_id',
-  'student',
-  'submitted_at',
-  'score',
-  'max_score',
-  'attempt_accuracy',
-  'completed_items',
-  'total_items',
-  'duration_seconds',
-  'student_attempts',
-  'student_latest_accuracy',
-  'student_average_accuracy',
-  'student_best_accuracy',
-  'student_needs_review_count',
-  'item_number',
-  'item_id',
-  'prompt',
-  'student_answer',
-  'expected_answer',
-  'accepted_answers',
-  'correct',
-  'explanation',
-] as const;
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
@@ -146,19 +105,65 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         emptyValue: '',
         separator: ' | ',
       }),
-      answer.correct ? 'correct' : 'review',
+      answer.correct
+        ? m.assignment_results_export_status_correct()
+        : m.assignment_results_export_status_review(),
       answer.explanation ?? '',
     ]);
   });
 
-  return rowsToCsv([RESULT_EXPORT_COLUMNS, ...rows]);
+  return rowsToCsv([getAssignmentResultsExportColumns(), ...rows]);
 }
 
 export function buildAssignmentResultsCsvFilename(
   data: AssignmentResultsExportData
 ) {
   const title = slugifyFilename(data.assignment.title);
-  return `classgamify-${title}-results.csv`;
+  return m.assignment_results_export_filename({ title });
+}
+
+function getAssignmentResultsExportColumns() {
+  return [
+    m.assignment_results_export_column_assignment_id(),
+    m.assignment_results_export_column_assignment_title(),
+    m.assignment_results_export_column_share_slug(),
+    m.assignment_results_export_column_assignment_status(),
+    m.assignment_results_export_column_expires_at(),
+    m.assignment_results_export_column_instructions(),
+    m.assignment_results_export_column_collect_student_name(),
+    m.assignment_results_export_column_show_correct_answers(),
+    m.assignment_results_export_column_shuffle_items(),
+    m.assignment_results_export_column_max_attempts(),
+    m.assignment_results_export_column_time_limit_seconds(),
+    m.assignment_results_export_column_activity_title(),
+    m.assignment_results_export_column_template_type(),
+    m.assignment_results_export_column_completions(),
+    m.assignment_results_export_column_average_accuracy(),
+    m.assignment_results_export_column_average_points(),
+    m.assignment_results_export_column_average_duration_seconds(),
+    m.assignment_results_export_column_attempt_id(),
+    m.assignment_results_export_column_student(),
+    m.assignment_results_export_column_submitted_at(),
+    m.assignment_results_export_column_score(),
+    m.assignment_results_export_column_max_score(),
+    m.assignment_results_export_column_attempt_accuracy(),
+    m.assignment_results_export_column_completed_items(),
+    m.assignment_results_export_column_total_items(),
+    m.assignment_results_export_column_duration_seconds(),
+    m.assignment_results_export_column_student_attempts(),
+    m.assignment_results_export_column_student_latest_accuracy(),
+    m.assignment_results_export_column_student_average_accuracy(),
+    m.assignment_results_export_column_student_best_accuracy(),
+    m.assignment_results_export_column_student_needs_review_count(),
+    m.assignment_results_export_column_item_number(),
+    m.assignment_results_export_column_item_id(),
+    m.assignment_results_export_column_prompt(),
+    m.assignment_results_export_column_student_answer(),
+    m.assignment_results_export_column_expected_answer(),
+    m.assignment_results_export_column_accepted_answers(),
+    m.assignment_results_export_column_correct(),
+    m.assignment_results_export_column_explanation(),
+  ] as const;
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {
@@ -183,5 +188,5 @@ function slugifyFilename(value: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  return slug || 'assignment';
+  return slug || m.assignment_results_export_filename_fallback_assignment();
 }
