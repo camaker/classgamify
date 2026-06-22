@@ -1,10 +1,10 @@
 import { m } from '@/locale/paraglide/messages';
 
-export type SubmittedAttemptAnswer = {
+type SubmittedAttemptAnswer = {
   itemId: string;
 };
 
-export type AttemptAnswerRuntimeItem = {
+type AttemptAnswerRuntimeItem = {
   id: string;
 };
 
