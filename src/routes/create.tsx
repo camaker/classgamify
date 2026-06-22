@@ -9,6 +9,7 @@ import {
 } from '@/activities/editor';
 import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
 import { IconSparkles } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
@@ -20,9 +21,8 @@ export const Route = createFileRoute('/create')({
   }),
   head: () =>
     seo('/create', {
-      title: `Create activity | ${websiteConfig.metadata?.name}`,
-      description:
-        'Create a structured classroom activity that can render as game templates and publish to students.',
+      title: `${m.create_page_seo_title()} | ${websiteConfig.metadata?.name}`,
+      description: m.create_page_seo_description(),
     }),
   component: CreatePage,
 });
@@ -49,26 +49,25 @@ function CreatePage() {
           <div className="space-y-4">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
-              Teacher activity builder
+              {m.create_page_eyebrow()}
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-              Create once, teach through many templates.
+              {m.create_page_title()}
             </h1>
             <p className="text-lg leading-8 text-muted-foreground">
-              Start with structured classroom content: questions, match pairs,
-              categories, vocabulary, learning goal, and teacher notes. The same
-              saved activity can later become a quiz, match game, group sort,
-              worksheet, or assignment.
+              {m.create_page_description()}
             </p>
           </div>
 
           <div className="rounded-lg border bg-card p-4">
-            <p className="text-sm font-medium">Supported input shapes</p>
+            <p className="text-sm font-medium">
+              {m.create_page_input_shapes_title()}
+            </p>
             <ol className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              <li>1. Questions: prompt | answer | options.</li>
-              <li>2. Match pairs: left | right.</li>
-              <li>3. Groups: label | item one, item two.</li>
-              <li>4. Notes and vocabulary as simple lists.</li>
+              <li>{m.create_page_input_shape_questions()}</li>
+              <li>{m.create_page_input_shape_pairs()}</li>
+              <li>{m.create_page_input_shape_groups()}</li>
+              <li>{m.create_page_input_shape_notes()}</li>
             </ol>
           </div>
         </div>
@@ -79,7 +78,7 @@ function CreatePage() {
           </div>
           <div className="space-y-4">
             <p className="text-sm font-medium text-muted-foreground">
-              Example rendering
+              {m.create_page_preview_label()}
             </p>
             <ActivityPreview activity={previewActivity} panel={previewPanel} />
           </div>

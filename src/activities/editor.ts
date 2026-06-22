@@ -5,6 +5,7 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { m } from '@/locale/paraglide/messages';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
@@ -110,12 +111,14 @@ export function buildActivityEditorPreviewPanel(
       {
         href: `#${activityEditorSectionId}`,
         icon: 'edit',
-        label: 'Review scaffold fields',
+        label: m.activity_editor_review_scaffold_fields(),
       },
     ],
-    description: `This ${template.shortName} scaffold is still a draft. Review the structured fields on the left, save it as an activity, then publish from your library to create the student link.`,
+    description: m.activity_editor_preview_description({
+      template: template.shortName,
+    }),
     editorSectionId: activityEditorSectionId,
-    title: `${template.name} scaffold preview`,
+    title: m.activity_editor_preview_title({ template: template.name }),
   };
 }
 
@@ -125,14 +128,18 @@ export function buildActivityEditorTemplateSetupView(
   const template = getTemplateByType(templateType);
 
   return {
-    actionLabel: 'Load scaffold',
+    actionLabel: m.activity_editor_load_scaffold(),
     description: template.description,
-    requirementBadges: template.contentRequirements.map(
-      (requirement) => `Requires ${formatTemplateRequirement(requirement)}`
+    requirementBadges: template.contentRequirements.map((requirement) =>
+      m.activity_editor_requires_requirement({
+        requirement: formatTemplateRequirement(requirement),
+      })
     ),
     shortName: template.shortName,
-    successMessage: `${template.name} scaffold loaded.`,
-    title: `${template.name} setup`,
+    successMessage: m.activity_editor_scaffold_loaded({
+      template: template.name,
+    }),
+    title: m.activity_editor_setup_title({ template: template.name }),
   };
 }
 
