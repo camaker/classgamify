@@ -200,7 +200,7 @@ function parseLineList(raw?: string): string[] {
 function parseInlineList(raw?: string): string[] {
   return unique(
     (raw ?? '')
-      .split(/[\n,;]+/u)
+      .split(/[\n,;，；、]+/u)
       .map((value) => value.trim())
       .filter(Boolean)
   );

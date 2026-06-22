@@ -6133,6 +6133,53 @@ assert.equal(
   }).result.accuracy,
   100
 );
+const chinesePunctuationContent = buildActivityContent({
+  description: 'Chinese punctuation classification',
+  difficulty: 'starter',
+  gradeBand: 'Grade 1',
+  groupsText: ['水果 | 苹果，香蕉', '饮品 | 牛奶、水'].join('\n'),
+  language: 'zh',
+  learningGoal: 'Students can classify words entered with Chinese punctuation.',
+  pairsText: '',
+  questionsText: '苹果是什么？ | 苹果 | 苹果，香蕉；牛奶、水 | 苹果是水果。',
+  sourceSummary: 'Chinese punctuation should split inline structured lists.',
+  subject: 'Chinese',
+  teacherNotesText: 'Use natural Chinese punctuation in the editor.',
+  templateType: 'group-sort',
+  title: '中文标点分类',
+  visibility: 'draft',
+  vocabularyText: '苹果，香蕉；牛奶、水',
+});
+assert.deepEqual(chinesePunctuationContent.vocabulary, [
+  '苹果',
+  '香蕉',
+  '牛奶',
+  '水',
+]);
+assert.deepEqual(
+  chinesePunctuationContent.groups.flatMap((group) => group.items),
+  ['苹果', '香蕉', '牛奶', '水']
+);
+assert.deepEqual(
+  chinesePunctuationContent.questions[0]?.options.map((option) => option.text),
+  ['苹果', '香蕉', '牛奶', '水']
+);
+const chinesePunctuationGroupItems = getRuntimeItems(
+  'group-sort',
+  chinesePunctuationContent
+);
+assert.equal(chinesePunctuationGroupItems.length, 4);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: chinesePunctuationGroupItems.map((item) => ({
+      answer: item.answer,
+      itemId: item.id,
+    })),
+    content: chinesePunctuationContent,
+    templateType: 'group-sort',
+  }).result.accuracy,
+  100
+);
 const collidingGroupContent = buildActivityContent({
   description: 'Collision group sort',
   difficulty: 'starter',
