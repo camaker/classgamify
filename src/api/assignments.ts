@@ -44,6 +44,7 @@ const assignmentStatusFilterSchema = z.enum(['draft', 'published', 'closed']);
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
+  publishedShareSlug: z.string().trim().min(1).max(80).optional(),
   search: z.string().trim().max(120).optional(),
   status: assignmentStatusFilterSchema.optional(),
 });
@@ -94,6 +95,22 @@ export const listAssignments = createServerFn({ method: 'GET' })
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
       .where(where);
+    const [publishedAssignment] = data.publishedShareSlug
+      ? await db
+          .select({
+            id: assignment.id,
+            shareSlug: assignment.shareSlug,
+            title: assignment.title,
+          })
+          .from(assignment)
+          .where(
+            and(
+              eq(assignment.ownerId, userId),
+              eq(assignment.shareSlug, data.publishedShareSlug)
+            )
+          )
+          .limit(1)
+      : [];
     const items = await db
       .select({
         activity,
@@ -131,6 +148,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
 
     return {
       items: enriched,
+      publishedAssignment,
       summary: {
         averageScore: summaryStats.averageScore,
         completions: summaryStats.completions,

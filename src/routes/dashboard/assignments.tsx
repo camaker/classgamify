@@ -25,7 +25,10 @@ import {
   buildAssignmentListEmptyStateView,
   buildStarterAssignmentListCardViewModel,
 } from '@/assignments/list-view';
-import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
+import {
+  buildPublishedAssignmentPanelContext,
+  resolvePublishedAssignmentPanelAssignment,
+} from '@/assignments/published-assignment';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -74,7 +77,9 @@ export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: (search: Record<string, unknown>) => ({
     page: parseDashboardPageSearch(search.page),
     published:
-      typeof search.published === 'string' ? search.published : undefined,
+      typeof search.published === 'string' && search.published.trim()
+        ? search.published.trim()
+        : undefined,
     q: typeof search.q === 'string' ? search.q : undefined,
     status: parseAssignmentStatusFilter(search.status),
   }),
@@ -92,6 +97,7 @@ function DashboardAssignmentsPage() {
   const { data, isError, isLoading } = useAssignments({
     pageIndex: currentPage - 1,
     pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
+    publishedShareSlug: published,
     search: normalizedSearchQuery,
     status: filteredStatus,
   });
@@ -104,10 +110,15 @@ function DashboardAssignmentsPage() {
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
   const emptyState = buildAssignmentListEmptyStateView({ hasFilters });
+  const publishedPanelAssignment = resolvePublishedAssignmentPanelAssignment({
+    assignment: data?.publishedAssignment,
+    items: assignments,
+    shareSlug: published,
+  });
   const publishedPanelContext = published
     ? buildPublishedAssignmentPanelContext({
+        assignment: publishedPanelAssignment,
         isLoading,
-        items: assignments,
         shareSlug: published,
       })
     : undefined;
@@ -316,8 +327,8 @@ function PublishedAssignmentPanel({
   const panelContext =
     context ??
     buildPublishedAssignmentPanelContext({
+      assignment: undefined,
       isLoading: true,
-      items: [],
       shareSlug,
     });
   const { assignment } = panelContext;

@@ -272,6 +272,7 @@ import {
 import {
   buildPublishedAssignmentPanelContext,
   findPublishedAssignmentInList,
+  resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
 import {
   assignmentShareLinkActionCopy,
@@ -1892,10 +1893,31 @@ assert.equal(
   }),
   undefined
 );
+const publishedAssignmentFromLookup = {
+  id: 'assignment-3',
+  shareSlug: 'share-3',
+  title: 'Week 3',
+};
+assert.deepEqual(
+  resolvePublishedAssignmentPanelAssignment({
+    assignment: publishedAssignmentFromLookup,
+    items: publishedAssignments,
+    shareSlug: 'share-3',
+  }),
+  publishedAssignmentFromLookup
+);
+assert.deepEqual(
+  resolvePublishedAssignmentPanelAssignment({
+    assignment: publishedAssignmentFromLookup,
+    items: publishedAssignments,
+    shareSlug: 'share-2',
+  }),
+  publishedAssignments[1]?.assignment
+);
 assert.deepEqual(
   buildPublishedAssignmentPanelContext({
+    assignment: publishedAssignments[1]?.assignment,
     isLoading: false,
-    items: publishedAssignments,
     shareSlug: 'share-2',
   }),
   {
@@ -1912,8 +1934,8 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildPublishedAssignmentPanelContext({
+    assignment: undefined,
     isLoading: true,
-    items: [],
     shareSlug: 'share-2',
   }),
   {
@@ -1929,8 +1951,8 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildPublishedAssignmentPanelContext({
+    assignment: undefined,
     isLoading: false,
-    items: publishedAssignments,
     shareSlug: 'missing',
   }),
   {
@@ -1946,8 +1968,8 @@ assert.deepEqual(
 );
 assert.equal(
   buildPublishedAssignmentPanelContext({
+    assignment: undefined,
     isLoading: true,
-    items: [],
     shareSlug: 'share two',
   }).sharePath,
   '/play/share%20two'

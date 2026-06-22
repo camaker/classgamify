@@ -9,6 +9,9 @@ export type PublishedAssignmentListItem = {
   };
 };
 
+type PublishedAssignmentPanelAssignment =
+  PublishedAssignmentListItem['assignment'];
+
 export function findPublishedAssignmentInList<
   TItem extends PublishedAssignmentListItem,
 >({ items, shareSlug }: { items: TItem[]; shareSlug?: string }) {
@@ -18,8 +21,25 @@ export function findPublishedAssignmentInList<
     ?.assignment;
 }
 
+export function resolvePublishedAssignmentPanelAssignment<
+  TItem extends PublishedAssignmentListItem,
+>({
+  assignment,
+  items,
+  shareSlug,
+}: {
+  assignment?: PublishedAssignmentPanelAssignment | null;
+  items: TItem[];
+  shareSlug?: string;
+}) {
+  if (!shareSlug) return undefined;
+  if (assignment?.shareSlug === shareSlug) return assignment;
+
+  return findPublishedAssignmentInList({ items, shareSlug });
+}
+
 export type PublishedAssignmentPanelContext = {
-  assignment?: PublishedAssignmentListItem['assignment'];
+  assignment?: PublishedAssignmentPanelAssignment;
   body: string;
   sharePath: string;
   showDismissAction: boolean;
@@ -30,19 +50,15 @@ export type PublishedAssignmentPanelContext = {
   title: string;
 };
 
-export function buildPublishedAssignmentPanelContext<
-  TItem extends PublishedAssignmentListItem,
->({
+export function buildPublishedAssignmentPanelContext({
+  assignment,
   isLoading,
-  items,
   shareSlug,
 }: {
+  assignment?: PublishedAssignmentPanelAssignment;
   isLoading: boolean;
-  items: TItem[];
   shareSlug: string;
 }): PublishedAssignmentPanelContext {
-  const assignment = findPublishedAssignmentInList({ items, shareSlug });
-
   if (assignment) {
     return {
       assignment,
