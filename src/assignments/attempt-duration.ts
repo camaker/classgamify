@@ -1,3 +1,5 @@
+import { m } from '@/locale/paraglide/messages';
+
 export function normalizeAttemptDurationSeconds({
   durationSeconds,
   timeLimitSeconds,
@@ -50,12 +52,29 @@ export function formatAttemptDuration(
 
   const minutes = Math.floor(normalizedSeconds / 60);
   const remainder = normalizedSeconds % 60;
+  const paddedSeconds = String(remainder).padStart(2, '0');
 
   if (options?.style === 'timer') {
-    if (minutes <= 0) return `${remainder}s`;
-    return `${minutes}:${String(remainder).padStart(2, '0')}`;
+    if (minutes <= 0) {
+      return m.assignment_attempt_duration_timer_seconds({
+        seconds: remainder,
+      });
+    }
+
+    return m.assignment_attempt_duration_timer_minutes({
+      minutes,
+      seconds: paddedSeconds,
+    });
   }
 
-  if (minutes <= 0) return `${remainder}s`;
-  return `${minutes}m ${String(remainder).padStart(2, '0')}s`;
+  if (minutes <= 0) {
+    return m.assignment_attempt_duration_readable_seconds({
+      seconds: remainder,
+    });
+  }
+
+  return m.assignment_attempt_duration_readable_minutes({
+    minutes,
+    seconds: paddedSeconds,
+  });
 }
