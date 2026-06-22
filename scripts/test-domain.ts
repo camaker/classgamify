@@ -6285,6 +6285,42 @@ assert.deepEqual(
   getRuntimeItems('group-sort', collidingGroupContent).map((item) => item.id),
   ['g-treats-ice-cream-1', 'g-treats-ice-cream-2']
 );
+const collidingEditorContent = buildActivityContent({
+  description: 'Editor id collision coverage',
+  difficulty: 'starter',
+  gradeBand: 'Grade 2',
+  groupsText: ['Treats | ice cream', 'Treats | ice-cream'].join('\n'),
+  language: 'en',
+  learningGoal: 'Students can answer repeated structured editor rows safely.',
+  pairsText: ['ice cream | dessert', 'ice-cream | dessert'].join('\n'),
+  questionsText: [
+    'Frozen dessert? | ice cream | ice cream, ice-cream',
+    'Frozen dessert? | ice-cream',
+  ].join('\n'),
+  sourceSummary: 'Repeated classroom text should still receive unique ids.',
+  subject: 'English',
+  teacherNotesText: 'Duplicate rows can happen while drafting.',
+  templateType: 'quiz',
+  title: 'Editor id collisions',
+  visibility: 'draft',
+  vocabularyText: 'ice cream, ice-cream',
+});
+assert.deepEqual(
+  collidingEditorContent.questions.map((question) => question.id),
+  ['q-frozen-dessert-1', 'q-frozen-dessert-2']
+);
+assert.deepEqual(
+  collidingEditorContent.questions[0]?.options.map((option) => option.id),
+  ['o-ice-cream-1', 'o-ice-cream-2']
+);
+assert.deepEqual(
+  collidingEditorContent.pairs.map((pair) => pair.id),
+  ['p-ice-cream-dessert-1', 'p-ice-cream-dessert-2']
+);
+assert.deepEqual(
+  collidingEditorContent.groups.map((group) => group.id),
+  ['g-treats-1', 'g-treats-2']
+);
 
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({

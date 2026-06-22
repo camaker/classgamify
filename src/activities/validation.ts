@@ -115,7 +115,12 @@ function assertTemplateRequirements(
 }
 
 function parseQuestions(raw?: string): ActivityQuestion[] {
-  return parseRows(raw, 'question').map((row, index) => {
+  const rows = parseRows(raw, 'question');
+  const questionIdCounts = countStableIds(
+    rows.map((row) => row.parts[0] ?? '')
+  );
+
+  return rows.map((row, index) => {
     const [prompt, answer, optionsRaw, explanation] = row.parts;
     if (!prompt || !answer) {
       throw new Error(
@@ -130,13 +135,14 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
       answer: normalizedAnswer,
       options: parseInlineList(optionsRaw),
     });
+    const optionIdCounts = countStableIds(allOptions);
 
     return {
       answer: normalizedAnswer,
-      id: makeId('q', prompt, index),
+      id: makeId('q', prompt, index, questionIdCounts),
       explanation,
       options: allOptions.map((option, optionIndex) => ({
-        id: makeId('o', option, optionIndex),
+        id: makeId('o', option, optionIndex, optionIdCounts),
         isCorrect: option === normalizedAnswer,
         text: option,
       })),
@@ -146,7 +152,12 @@ function parseQuestions(raw?: string): ActivityQuestion[] {
 }
 
 function parsePairs(raw?: string): ActivityPair[] {
-  return parseRows(raw, 'pair').map((row, index) => {
+  const rows = parseRows(raw, 'pair');
+  const pairIdCounts = countStableIds(
+    rows.map((row) => `${row.parts[0] ?? ''}-${row.parts[1] ?? ''}`)
+  );
+
+  return rows.map((row, index) => {
     const [left, right] = row.parts;
     if (!left || !right) {
       throw new Error(
@@ -157,7 +168,7 @@ function parsePairs(raw?: string): ActivityPair[] {
     }
 
     return {
-      id: makeId('p', `${left}-${right}`, index),
+      id: makeId('p', `${left}-${right}`, index, pairIdCounts),
       left,
       right,
     };
@@ -165,7 +176,10 @@ function parsePairs(raw?: string): ActivityPair[] {
 }
 
 function parseGroups(raw?: string): ActivityGroup[] {
-  return parseRows(raw, 'group').map((row, index) => {
+  const rows = parseRows(raw, 'group');
+  const groupIdCounts = countStableIds(rows.map((row) => row.parts[0] ?? ''));
+
+  return rows.map((row, index) => {
     const [label, itemsRaw] = row.parts;
     const items = parseInlineList(itemsRaw);
     if (!label || items.length === 0) {
@@ -177,7 +191,7 @@ function parseGroups(raw?: string): ActivityGroup[] {
     }
 
     return {
-      id: makeId('g', label, index),
+      id: makeId('g', label, index, groupIdCounts),
       items,
       label,
     };
@@ -237,12 +251,40 @@ function unique(values: string[]) {
   return [...new Set(values)];
 }
 
-function makeId(prefix: string, value: string, index: number) {
-  const slug = value
+function makeId(
+  prefix: string,
+  value: string,
+  index: number,
+  idCounts?: Map<string, number>
+) {
+  const slug = makeStableId(value);
+
+  if (!slug) return `${prefix}-${index + 1}`;
+
+  if ((idCounts?.get(slug) ?? 0) > 1) {
+    return `${prefix}-${slug}-${index + 1}`;
+  }
+
+  return `${prefix}-${slug}`;
+}
+
+function makeStableId(value: string) {
+  return value
+    .normalize('NFKC')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 40);
+}
 
-  return `${prefix}-${slug || index + 1}`;
+function countStableIds(values: string[]) {
+  const counts = new Map<string, number>();
+
+  for (const value of values) {
+    const slug = makeStableId(value);
+    if (!slug) continue;
+    counts.set(slug, (counts.get(slug) ?? 0) + 1);
+  }
+
+  return counts;
 }
