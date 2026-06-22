@@ -25,6 +25,7 @@ import {
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
   canStartAnotherStudentAttempt,
+  formatStudentAttemptUsageLabel,
   getStudentRunnerCopy,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
@@ -191,6 +192,9 @@ function PlayPage() {
     submittedAttemptCount:
       result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
   });
+  const attemptUsageLabel = result
+    ? formatStudentAttemptUsageLabel(result.attemptUsage)
+    : undefined;
   const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
 
   useEffect(() => {
@@ -443,6 +447,11 @@ function PlayPage() {
                 <p className="text-xs text-muted-foreground">
                   {attemptResultDisplay?.durationLabel}
                 </p>
+                {attemptUsageLabel ? (
+                  <p className="text-xs text-muted-foreground">
+                    {attemptUsageLabel}
+                  </p>
+                ) : null}
                 {showStartAnotherAttempt ? (
                   <Button
                     type="button"

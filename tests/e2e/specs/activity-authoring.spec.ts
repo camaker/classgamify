@@ -104,6 +104,7 @@ test.describe('activity authoring', () => {
     await page.getByRole('button', { name: /^submit answers$/i }).click();
 
     await expect(page.getByText('Score submitted')).toBeVisible();
+    await expect(page.getByText('1 attempt left')).toBeVisible();
     await expect(
       page.getByRole('button', { name: /^start another attempt$/i })
     ).toBeVisible();

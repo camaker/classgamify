@@ -1,5 +1,8 @@
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import { canUseAnotherAssignmentAttempt } from '@/assignments/attempt-limits';
+import {
+  canUseAnotherAssignmentAttempt,
+  type AssignmentAttemptUsage,
+} from '@/assignments/attempt-limits';
 import {
   getAnonymousBrowserLabel,
   normalizeAnonymousToken,
@@ -271,6 +274,26 @@ export function canStartAnotherStudentAttempt({
   return canUseAnotherAssignmentAttempt({
     maxAttempts,
     usedAttempts: submittedAttemptCount,
+  });
+}
+
+export function formatStudentAttemptUsageLabel({
+  remainingAttempts,
+}: AssignmentAttemptUsage) {
+  if (remainingAttempts === undefined) {
+    return m.student_runner_attempts_remaining_open();
+  }
+
+  if (remainingAttempts <= 0) {
+    return m.student_runner_attempts_remaining_none();
+  }
+
+  if (remainingAttempts === 1) {
+    return m.student_runner_attempts_remaining_one();
+  }
+
+  return m.student_runner_attempts_remaining_many({
+    count: remainingAttempts,
   });
 }
 

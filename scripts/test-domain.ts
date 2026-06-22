@@ -338,6 +338,7 @@ import {
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
   canStartAnotherStudentAttempt,
+  formatStudentAttemptUsageLabel,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getAttemptSubmitDecision,
@@ -1292,6 +1293,36 @@ assert.equal(
     usedAttempts: 25,
   }),
   true
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    maxAttempts: 2,
+    remainingAttempts: 1,
+    usedAttempts: 1,
+  }),
+  '1 attempt left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    maxAttempts: 3,
+    remainingAttempts: 2,
+    usedAttempts: 1,
+  }),
+  '2 attempts left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    maxAttempts: 2,
+    remainingAttempts: 0,
+    usedAttempts: 2,
+  }),
+  'No attempts left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    usedAttempts: 12,
+  }),
+  'Additional attempts allowed'
 );
 assert.equal(
   canStartAnotherStudentAttempt({
