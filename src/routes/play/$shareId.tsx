@@ -58,6 +58,7 @@ import { cn } from '@/lib/utils';
 import {
   IconCheck,
   IconClock,
+  IconClipboardText,
   IconDeviceGamepad2,
   IconEye,
   IconListCheck,
@@ -372,8 +373,14 @@ function PlayPage() {
               {headerView.description}
             </p>
             {headerView.instructions ? (
-              <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6 text-muted-foreground">
-                {headerView.instructions}
+              <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
+                <div className="flex items-center gap-2 font-medium text-foreground">
+                  <IconClipboardText className="size-4 text-primary" />
+                  {headerView.instructions.label}
+                </div>
+                <p className="mt-2 text-muted-foreground">
+                  {headerView.instructions.value}
+                </p>
               </div>
             ) : null}
             <PublicAssignmentRules rules={headerView.ruleItems} />

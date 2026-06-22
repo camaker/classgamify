@@ -2518,7 +2518,10 @@ assert.deepEqual(
   {
     description:
       "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
-    instructions: 'Read each prompt carefully.',
+    instructions: {
+      label: 'Student instructions',
+      value: 'Read each prompt carefully.',
+    },
     ruleItems: [
       { id: 'items', label: 'Items', value: '2 items' },
       { id: 'attempts', label: 'Attempts', value: '3 max' },

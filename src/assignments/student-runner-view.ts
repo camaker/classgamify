@@ -52,9 +52,14 @@ type PublicAnswerFeedbackView = {
   statusLabel: string;
 };
 
+type StudentRunnerInstructionView = {
+  label: string;
+  value: string;
+};
+
 type StudentRunnerHeaderView = {
   description: string;
-  instructions?: string;
+  instructions?: StudentRunnerInstructionView;
   ruleItems: PublicAssignmentRuleSummaryItem[];
   teacherActionLabel: string;
   title: string;
@@ -75,7 +80,9 @@ export function buildStudentRunnerHeaderView({
 }): StudentRunnerHeaderView {
   return {
     description: getStudentRunnerCopy().publicAssignmentDescription,
-    instructions: assignment.settings.instructions?.trim() || undefined,
+    instructions: buildStudentRunnerInstructionView(
+      assignment.settings.instructions
+    ),
     ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
       expiresAt: assignment.expiresAt ?? null,
       itemCount,
@@ -83,6 +90,18 @@ export function buildStudentRunnerHeaderView({
     }),
     teacherActionLabel: getStudentRunnerCopy().teacherViewLabel,
     title: assignment.title,
+  };
+}
+
+function buildStudentRunnerInstructionView(
+  instructions: string | undefined
+): StudentRunnerInstructionView | undefined {
+  const value = instructions?.trim();
+  if (!value) return undefined;
+
+  return {
+    label: m.assignment_delivery_label_instructions(),
+    value,
   };
 }
 
