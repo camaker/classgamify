@@ -84,6 +84,10 @@ export function canDeriveActivityWork(visibility: ActivityVisibility) {
   return !isActivityArchived(visibility);
 }
 
+export function canEditActivity(visibility: ActivityVisibility) {
+  return !isActivityArchived(visibility);
+}
+
 export function buildActivityDerivativeActionGate({
   action,
   visibility,
@@ -156,7 +160,7 @@ export function buildActivityLifecycleActionView({
 }
 
 export function buildActivityEditAccessView(visibility: ActivityVisibility) {
-  if (isActivityArchived(visibility)) {
+  if (!canEditActivity(visibility)) {
     return {
       ...activityEditAccessCopy.archived,
       canEdit: false,
@@ -172,5 +176,11 @@ export function buildActivityEditAccessView(visibility: ActivityVisibility) {
 export function assertActivityCanDeriveWork(visibility: ActivityVisibility) {
   if (!canDeriveActivityWork(visibility)) {
     throw new Error(getArchivedActivityDerivationError());
+  }
+}
+
+export function assertActivityCanEdit(visibility: ActivityVisibility) {
+  if (!canEditActivity(visibility)) {
+    throw new Error(activityEditAccessCopy.archived.description);
   }
 }

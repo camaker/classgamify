@@ -11,7 +11,10 @@ import {
 import { getTemplateByType } from '@/activities/catalog';
 import { normalizeActivityLibrarySearch } from '@/activities/library-filters';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
-import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
+import {
+  assertActivityCanDeriveWork,
+  assertActivityCanEdit,
+} from '@/activities/lifecycle';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
@@ -275,6 +278,20 @@ export const updateActivity = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
+    const [existingActivity] = await db
+      .select({
+        id: activity.id,
+        visibility: activity.visibility,
+      })
+      .from(activity)
+      .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)))
+      .limit(1);
+
+    if (!existingActivity) {
+      throw new Error(m.activity_api_error_activity_not_found());
+    }
+    assertActivityCanEdit(existingActivity.visibility);
+
     const now = new Date();
     const content = buildActivityContent(data);
 
@@ -295,10 +312,6 @@ export const updateActivity = createServerFn({ method: 'POST' })
       .from(activity)
       .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)))
       .limit(1);
-
-    if (!row) {
-      throw new Error(m.activity_api_error_activity_not_found());
-    }
 
     return row;
   });

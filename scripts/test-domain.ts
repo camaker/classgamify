@@ -68,10 +68,12 @@ import {
 } from '@/activities/draft-meta';
 import {
   activityEditPageCopy,
+  assertActivityCanEdit,
   assertActivityCanDeriveWork,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
   buildActivityLifecycleActionView,
+  canEditActivity,
   canDeriveActivityWork,
   getArchivedActivityDerivationError,
   getActivityLifecycleActionCopy,
@@ -3125,6 +3127,9 @@ assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
 assert.equal(canDeriveActivityWork('published'), true);
 assert.equal(canDeriveActivityWork('archived'), false);
+assert.equal(canEditActivity('draft'), true);
+assert.equal(canEditActivity('published'), true);
+assert.equal(canEditActivity('archived'), false);
 const archivedActivityDerivationError = getArchivedActivityDerivationError();
 assert.deepEqual(
   buildActivityDerivativeActionGate({
@@ -3208,6 +3213,13 @@ assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),
   new Error(archivedActivityDerivationError)
+);
+assert.doesNotThrow(() => assertActivityCanEdit('draft'));
+assert.throws(
+  () => assertActivityCanEdit('archived'),
+  new Error(
+    'Restore this activity from the archived library before editing its structured content.'
+  )
 );
 assert.deepEqual(activityEditPageCopy, {
   backToLibraryLabel: 'Back to library',
