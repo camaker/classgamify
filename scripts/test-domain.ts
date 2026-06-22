@@ -2171,6 +2171,39 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+const partialAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView(
+  {
+    expiresAt: null,
+    settings: {
+      collectStudentName: false,
+      instructions: '  Review before Friday.  ',
+      maxAttempts: 99,
+      timeLimitSeconds: 30,
+    },
+  }
+);
+assert.deepEqual(partialAssignmentSettingsSummaryView.settings, {
+  collectStudentName: false,
+  instructions: 'Review before Friday.',
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(
+  partialAssignmentSettingsSummaryView.items.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['attempts', '2 max'],
+    ['timer', 'No timer'],
+    ['closes', 'No close time'],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
 assert.deepEqual(
   buildAssignmentSettingsSummaryView({
     collectStudentName: false,

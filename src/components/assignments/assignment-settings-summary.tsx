@@ -19,7 +19,7 @@ type AssignmentSettingsSummaryProps = {
   expiresAt: AssignmentDate;
   instructions?: string;
   maxAttempts?: number;
-  settings?: AssignmentSettings;
+  settings?: Partial<AssignmentSettings> | null;
   showCorrectAnswers?: boolean;
   shuffleItems?: boolean;
   timeLimitSeconds?: number;

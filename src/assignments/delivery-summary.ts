@@ -38,7 +38,7 @@ export type AssignmentDeliverySummaryInput = {
 
 type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
   instructions?: string;
-  settings?: AssignmentSettings;
+  settings?: Partial<AssignmentSettings> | null;
 };
 
 type AssignmentSettingsSummaryView = {
@@ -99,14 +99,16 @@ export function buildAssignmentSettingsSummaryView({
   shuffleItems = true,
   timeLimitSeconds,
 }: AssignmentSettingsSummaryInput): AssignmentSettingsSummaryView {
-  const resolvedSettings = settings ?? {
-    collectStudentName,
-    instructions,
-    maxAttempts: maxAttempts ?? undefined,
-    showCorrectAnswers,
-    shuffleItems,
-    timeLimitSeconds: timeLimitSeconds ?? undefined,
-  };
+  const resolvedSettings = resolveAssignmentSettings(
+    settings ?? {
+      collectStudentName,
+      instructions,
+      maxAttempts: maxAttempts ?? undefined,
+      showCorrectAnswers,
+      shuffleItems,
+      timeLimitSeconds: timeLimitSeconds ?? undefined,
+    }
+  );
 
   return {
     instructions: resolvedSettings.instructions,
