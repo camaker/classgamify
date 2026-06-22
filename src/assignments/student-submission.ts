@@ -449,7 +449,7 @@ export function buildStudentAttemptSubmitGate({
     };
   }
 
-  if (collectStudentName && !studentName.trim()) {
+  if (collectStudentName && !normalizeStudentName(studentName)) {
     return {
       message: STUDENT_RUNNER_COPY.missingStudentNameMessage,
       reason: 'missing-student-name',

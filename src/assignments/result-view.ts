@@ -12,6 +12,7 @@ import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
+import { normalizeStudentName } from '@/assignments/identity';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultDate,
@@ -753,7 +754,7 @@ function getAssignmentAttemptStudentLabel({
 }) {
   if (reviewStudentLabel) return reviewStudentLabel;
 
-  const normalizedStudentName = studentName?.trim();
+  const normalizedStudentName = normalizeStudentName(studentName);
   return (
     normalizedStudentName || assignmentResultReviewCopy.anonymousStudentLabel
   );

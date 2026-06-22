@@ -6102,6 +6102,27 @@ assert.deepEqual(
     submittedAtLabel: '-',
   }
 );
+assert.deepEqual(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
+      completedAt: null,
+      id: 'normalized-name-row',
+      maxScore: null,
+      resultJson: null,
+      score: null,
+      studentName: ' Ａｖａ   Ｃｈｅｎ ',
+    },
+    review: undefined,
+  }),
+  {
+    accuracyLabel: '0%',
+    answeredLabel: '0/0',
+    durationLabel: '-',
+    scoreLabel: '0/0',
+    studentLabel: 'Ava Chen',
+    submittedAtLabel: '-',
+  }
+);
 assert.deepEqual(getAssignmentAnswerReviewStatus(true), {
   label: 'Correct',
   tone: 'correct',
