@@ -449,6 +449,13 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const activeLocaleMessageText = [
+  'project.inlang/messages/en.json',
+  'project.inlang/messages/zh.json',
+]
+  .map((filePath) => readFileSync(filePath, 'utf8'))
+  .join('\n');
+assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
