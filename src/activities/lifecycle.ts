@@ -1,7 +1,9 @@
 import type { ActivityVisibility } from '@/activities/types';
+import { m } from '@/locale/paraglide/messages';
 
-export const ARCHIVED_ACTIVITY_DERIVATION_ERROR =
-  'Restore this activity before publishing, duplicating, or remixing it.';
+export function getArchivedActivityDerivationError() {
+  return m.activity_lifecycle_derivation_blocked();
+}
 
 type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
 export type ActivityLifecycleAction =
@@ -28,18 +30,49 @@ type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
   gate: ActivityDerivativeActionGate;
 };
 
+export const activityEditPageCopy = {
+  get backToLibraryLabel() {
+    return m.activity_edit_page_back_to_library();
+  },
+  get breadcrumbActivities() {
+    return m.activity_library_breadcrumb_current();
+  },
+  get breadcrumbDashboard() {
+    return m.activity_library_breadcrumb_dashboard();
+  },
+  get fallbackDescription() {
+    return m.activity_edit_access_ready_description();
+  },
+  get fallbackTitle() {
+    return m.activity_edit_access_ready_action();
+  },
+  get loadErrorMessage() {
+    return m.activity_edit_page_load_error();
+  },
+} as const;
+
 const activityEditAccessCopy = {
   archived: {
-    actionLabel: 'Open archived activities',
-    description:
-      'Restore this activity from the archived library before editing its structured content.',
-    title: 'Activity is archived.',
+    get actionLabel() {
+      return m.activity_edit_access_archived_action();
+    },
+    get description() {
+      return m.activity_edit_access_archived_description();
+    },
+    get title() {
+      return m.activity_edit_access_archived_title();
+    },
   },
   ready: {
-    actionLabel: 'Edit activity',
-    description:
-      'Update reusable activity content before publishing or reusing it across templates.',
-    title: 'Edit reusable activity',
+    get actionLabel() {
+      return m.activity_edit_access_ready_action();
+    },
+    get description() {
+      return m.activity_edit_access_ready_description();
+    },
+    get title() {
+      return m.activity_edit_access_ready_title();
+    },
   },
 } as const;
 
@@ -64,7 +97,7 @@ export function buildActivityDerivativeActionGate({
 
   return {
     action,
-    message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+    message: getArchivedActivityDerivationError(),
     type: 'blocked',
   };
 }
@@ -74,35 +107,35 @@ export function getActivityLifecycleActionCopy(
 ): ActivityLifecycleActionCopy {
   if (action === 'publish') {
     return {
-      failureMessage: 'Assignment could not be published.',
-      successMessage: 'Assignment link published.',
+      failureMessage: m.activity_lifecycle_publish_failure(),
+      successMessage: m.activity_lifecycle_publish_success(),
     };
   }
 
   if (action === 'remix') {
     return {
-      failureMessage: 'Activity could not be remixed.',
-      successMessage: 'Template remix created.',
+      failureMessage: m.activity_lifecycle_remix_failure(),
+      successMessage: m.activity_lifecycle_remix_success(),
     };
   }
 
   if (action === 'duplicate') {
     return {
-      failureMessage: 'Activity could not be duplicated.',
-      successMessage: 'Activity duplicated.',
+      failureMessage: m.activity_lifecycle_duplicate_failure(),
+      successMessage: m.activity_lifecycle_duplicate_success(),
     };
   }
 
   if (action === 'archive') {
     return {
-      failureMessage: 'Activity could not be archived.',
-      successMessage: 'Activity archived.',
+      failureMessage: m.activity_lifecycle_archive_failure(),
+      successMessage: m.activity_lifecycle_archive_success(),
     };
   }
 
   return {
-    failureMessage: 'Activity could not be restored.',
-    successMessage: 'Activity restored to drafts.',
+    failureMessage: m.activity_lifecycle_restore_failure(),
+    successMessage: m.activity_lifecycle_restore_success(),
   };
 }
 
@@ -138,6 +171,6 @@ export function buildActivityEditAccessView(visibility: ActivityVisibility) {
 
 export function assertActivityCanDeriveWork(visibility: ActivityVisibility) {
   if (!canDeriveActivityWork(visibility)) {
-    throw new Error(ARCHIVED_ACTIVITY_DERIVATION_ERROR);
+    throw new Error(getArchivedActivityDerivationError());
   }
 }

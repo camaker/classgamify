@@ -1,5 +1,8 @@
 import { activityContentToEditorInput } from '@/activities/editor';
-import { buildActivityEditAccessView } from '@/activities/lifecycle';
+import {
+  activityEditPageCopy,
+  buildActivityEditAccessView,
+} from '@/activities/lifecycle';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -17,7 +20,7 @@ export const Route = createFileRoute('/dashboard/activities/$activityId')({
 function ActivityEditPage() {
   const { activityId } = Route.useParams();
   const { data: activity, isError, isLoading } = useActivity(activityId);
-  const title = activity?.title ?? 'Edit activity';
+  const title = activity?.title ?? activityEditPageCopy.fallbackTitle;
   const editAccessView = activity
     ? buildActivityEditAccessView(activity.visibility)
     : null;
@@ -25,14 +28,19 @@ function ActivityEditPage() {
   return (
     <DashboardLayout
       breadcrumbs={[
-        { label: 'Dashboard', href: Routes.Dashboard },
-        { label: 'Activities', href: Routes.DashboardActivities },
+        {
+          label: activityEditPageCopy.breadcrumbDashboard,
+          href: Routes.Dashboard,
+        },
+        {
+          label: activityEditPageCopy.breadcrumbActivities,
+          href: Routes.DashboardActivities,
+        },
         { label: title, isCurrentPage: true },
       ]}
       title={title}
       description={
-        editAccessView?.description ??
-        'Update reusable activity content before publishing or reusing it across templates.'
+        editAccessView?.description ?? activityEditPageCopy.fallbackDescription
       }
     >
       <div className="grid gap-4">
@@ -44,15 +52,14 @@ function ActivityEditPage() {
           )}
         >
           <IconArrowLeft className="size-4" />
-          Back to library
+          {activityEditPageCopy.backToLibraryLabel}
         </Link>
 
         {isLoading ? (
           <Card className="min-h-96 rounded-lg" />
         ) : isError || !activity ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            Activity could not be loaded. Refresh the page or return to the
-            activity library.
+            {activityEditPageCopy.loadErrorMessage}
           </div>
         ) : editAccessView && !editAccessView.canEdit ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">

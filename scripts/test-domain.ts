@@ -58,12 +58,13 @@ import {
   buildActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import {
-  ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+  activityEditPageCopy,
   assertActivityCanDeriveWork,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
   buildActivityLifecycleActionView,
   canDeriveActivityWork,
+  getArchivedActivityDerivationError,
   getActivityLifecycleActionCopy,
   isActivityArchived,
 } from '@/activities/lifecycle';
@@ -2855,6 +2856,7 @@ assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
 assert.equal(canDeriveActivityWork('published'), true);
 assert.equal(canDeriveActivityWork('archived'), false);
+const archivedActivityDerivationError = getArchivedActivityDerivationError();
 assert.deepEqual(
   buildActivityDerivativeActionGate({
     action: 'publish',
@@ -2869,7 +2871,7 @@ assert.deepEqual(
   }),
   {
     action: 'duplicate',
-    message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+    message: archivedActivityDerivationError,
     type: 'blocked',
   }
 );
@@ -2913,7 +2915,7 @@ assert.deepEqual(
     failureMessage: 'Assignment could not be published.',
     gate: {
       action: 'publish',
-      message: ARCHIVED_ACTIVITY_DERIVATION_ERROR,
+      message: archivedActivityDerivationError,
       type: 'blocked',
     },
     successMessage: 'Assignment link published.',
@@ -2936,8 +2938,18 @@ assert.deepEqual(buildActivityEditAccessView('archived'), {
 assert.doesNotThrow(() => assertActivityCanDeriveWork('draft'));
 assert.throws(
   () => assertActivityCanDeriveWork('archived'),
-  new Error(ARCHIVED_ACTIVITY_DERIVATION_ERROR)
+  new Error(archivedActivityDerivationError)
 );
+assert.deepEqual(activityEditPageCopy, {
+  backToLibraryLabel: 'Back to library',
+  breadcrumbActivities: 'Activities',
+  breadcrumbDashboard: 'Dashboard',
+  fallbackDescription:
+    'Update reusable activity content before publishing or reusing it across templates.',
+  fallbackTitle: 'Edit activity',
+  loadErrorMessage:
+    'Activity could not be loaded. Refresh the page or return to the activity library.',
+});
 assert.deepEqual(activityLibraryPageCopy, {
   breadcrumbCurrent: 'Activities',
   breadcrumbDashboard: 'Dashboard',
@@ -3017,7 +3029,7 @@ assert.equal(
 );
 assert.equal(
   activityLibraryCardCopy.restoreRequiredMessage,
-  ARCHIVED_ACTIVITY_DERIVATION_ERROR
+  archivedActivityDerivationError
 );
 assert.deepEqual(
   buildActivityLibraryCardStats({
