@@ -8,14 +8,37 @@ export function formatAssignmentDateTimeLocal(date: Date) {
 }
 
 export function parseAssignmentDateTimeLocal(value: string) {
-  if (!value.trim()) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
 
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
+    trimmed
+  );
+  if (!match) return null;
+
+  const [, year, month, day, hour, minute, second = '0'] = match;
+  const date = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second)
+  );
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.getFullYear() === Number(year) &&
+    date.getMonth() === Number(month) - 1 &&
+    date.getDate() === Number(day) &&
+    date.getHours() === Number(hour) &&
+    date.getMinutes() === Number(minute) &&
+    date.getSeconds() === Number(second)
+    ? date
+    : null;
 }
 
 export function parseOptionalWholeNumber(value: string) {
-  const trimmed = value.trim();
+  const trimmed = value.normalize('NFKC').trim();
   if (!trimmed) return undefined;
   if (!/^\d+$/.test(trimmed)) return undefined;
 

@@ -1825,6 +1825,7 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
 });
 assert.equal(parseOptionalWholeNumber(''), undefined);
 assert.equal(parseOptionalWholeNumber(' 12 '), 12);
+assert.equal(parseOptionalWholeNumber(' １２ '), 12);
 assert.equal(parseOptionalWholeNumber('1.5'), undefined);
 assert.equal(parseOptionalWholeNumber('1e1'), undefined);
 assert.equal(parseOptionalWholeNumber('0x10'), undefined);
@@ -1832,9 +1833,15 @@ assert.equal(parseOptionalWholeNumber('+2'), undefined);
 assert.equal(parseOptionalWholeNumber('abc'), undefined);
 assert.equal(parseAssignmentDateTimeLocal(''), null);
 assert.equal(parseAssignmentDateTimeLocal('not-a-date'), null);
+assert.equal(parseAssignmentDateTimeLocal('2026-02-30T09:30'), null);
+assert.equal(parseAssignmentDateTimeLocal('2026-01-10 09:30'), null);
 assert.equal(
   parseAssignmentDateTimeLocal('2026-01-10T09:30')?.getFullYear(),
   2026
+);
+assert.equal(
+  parseAssignmentDateTimeLocal('2026-01-10T09:30:45')?.getSeconds(),
+  45
 );
 assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
@@ -1931,10 +1938,10 @@ assert.deepEqual(
     collectStudentName: false,
     expiresAtLocal: '2026-01-10T09:30',
     instructions: '  Finish before class.  ',
-    maxAttempts: '3',
+    maxAttempts: '３',
     showCorrectAnswers: false,
     shuffleItems: false,
-    timeLimitMinutes: '15',
+    timeLimitMinutes: '１５',
     title: 'Week 1 review',
   }),
   {
