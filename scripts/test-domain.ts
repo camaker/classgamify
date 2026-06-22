@@ -49,6 +49,10 @@ import {
   starterActivities,
 } from '@/activities/catalog';
 import {
+  buildDuplicatedActivityTitle,
+  buildRemixedActivityTitle,
+} from '@/activities/duplicate';
+import {
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
@@ -4214,6 +4218,44 @@ assert.deepEqual(
     ['Match "Hot" with its pair.', 'Pair'],
     ['Choose the group for "Apple".', 'Group item'],
   ]
+);
+assert.equal(
+  buildDuplicatedActivityTitle('  Food words quick check  '),
+  'Copy of Food words quick check'
+);
+assert.equal(buildDuplicatedActivityTitle('   '), 'Copy of Untitled activity');
+assert.equal(buildDuplicatedActivityTitle('A'.repeat(200)).length, 120);
+assert.equal(
+  buildDuplicatedActivityTitle('A'.repeat(200)),
+  `Copy of ${'A'.repeat(109)}...`
+);
+assert.equal(
+  buildRemixedActivityTitle({
+    sourceTitle: 'Food words quick check',
+    targetShortName: 'Match',
+  }),
+  'Food words quick check (Match)'
+);
+assert.equal(
+  buildRemixedActivityTitle({
+    sourceTitle: '   ',
+    targetShortName: 'Quiz',
+  }),
+  'Untitled activity (Quiz)'
+);
+assert.equal(
+  buildRemixedActivityTitle({
+    sourceTitle: 'A'.repeat(200),
+    targetShortName: 'Match',
+  }).length,
+  120
+);
+assert.equal(
+  buildRemixedActivityTitle({
+    sourceTitle: 'A'.repeat(200),
+    targetShortName: 'Match',
+  }),
+  `${'A'.repeat(109)}... (Match)`
 );
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({

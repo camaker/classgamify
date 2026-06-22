@@ -1,20 +1,14 @@
-const DUPLICATE_TITLE_PREFIX = 'Copy of ';
-const REMIX_TITLE_SEPARATOR = ' ';
+import { m } from '@/locale/paraglide/messages';
+
 const MAX_ACTIVITY_TITLE_LENGTH = 120;
 
 export function buildDuplicatedActivityTitle(title: string) {
-  const normalizedTitle =
-    title.normalize('NFKC').replace(/\s+/g, ' ').trim() || 'Untitled activity';
-  const maxSourceLength =
-    MAX_ACTIVITY_TITLE_LENGTH - DUPLICATE_TITLE_PREFIX.length;
+  const normalizedTitle = normalizeActivitySourceTitle(title);
+  const maxSourceLength = getDuplicatedTitleMaxSourceLength();
 
-  if (normalizedTitle.length <= maxSourceLength) {
-    return `${DUPLICATE_TITLE_PREFIX}${normalizedTitle}`;
-  }
-
-  return `${DUPLICATE_TITLE_PREFIX}${normalizedTitle
-    .slice(0, maxSourceLength - 3)
-    .trimEnd()}...`;
+  return formatDuplicatedTitle(
+    truncateActivitySourceTitle(normalizedTitle, maxSourceLength)
+  );
 }
 
 export function buildRemixedActivityTitle({
@@ -24,15 +18,54 @@ export function buildRemixedActivityTitle({
   sourceTitle: string;
   targetShortName: string;
 }) {
-  const normalizedTitle =
-    sourceTitle.normalize('NFKC').replace(/\s+/g, ' ').trim() ||
-    'Untitled activity';
-  const suffix = `${REMIX_TITLE_SEPARATOR}(${targetShortName})`;
-  const maxSourceLength = MAX_ACTIVITY_TITLE_LENGTH - suffix.length;
+  const normalizedTitle = normalizeActivitySourceTitle(sourceTitle);
+  const maxSourceLength = getRemixedTitleMaxSourceLength(targetShortName);
 
-  if (normalizedTitle.length <= maxSourceLength) {
-    return `${normalizedTitle}${suffix}`;
+  return formatRemixedTitle({
+    sourceTitle: truncateActivitySourceTitle(normalizedTitle, maxSourceLength),
+    targetShortName,
+  });
+}
+
+function normalizeActivitySourceTitle(title: string) {
+  return (
+    title.normalize('NFKC').replace(/\s+/g, ' ').trim() ||
+    m.activity_duplicate_untitled_title()
+  );
+}
+
+function truncateActivitySourceTitle(title: string, maxLength: number) {
+  if (title.length <= maxLength) {
+    return title;
   }
 
-  return `${normalizedTitle.slice(0, maxSourceLength - 3).trimEnd()}...${suffix}`;
+  return `${title.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`;
+}
+
+function formatDuplicatedTitle(title: string) {
+  return m.activity_duplicate_title_format({ title });
+}
+
+function formatRemixedTitle({
+  sourceTitle,
+  targetShortName,
+}: {
+  sourceTitle: string;
+  targetShortName: string;
+}) {
+  return m.activity_remix_title_format({
+    template: targetShortName,
+    title: sourceTitle,
+  });
+}
+
+function getDuplicatedTitleMaxSourceLength() {
+  return MAX_ACTIVITY_TITLE_LENGTH - formatDuplicatedTitle('').length;
+}
+
+function getRemixedTitleMaxSourceLength(targetShortName: string) {
+  return (
+    MAX_ACTIVITY_TITLE_LENGTH -
+    formatRemixedTitle({ sourceTitle: '', targetShortName }).length
+  );
 }
