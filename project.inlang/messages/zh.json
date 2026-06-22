@@ -850,6 +850,7 @@
   "assignment_results_export_column_completed_items": "已完成题目",
   "assignment_results_export_column_completions": "完成次数",
   "assignment_results_export_column_correct": "是否正确",
+  "assignment_results_export_column_delivery_policy": "投放规则",
   "assignment_results_export_column_duration_seconds": "用时秒数",
   "assignment_results_export_column_expected_answer": "预期答案",
   "assignment_results_export_column_expires_at": "关闭时间",

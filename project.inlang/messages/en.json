@@ -850,6 +850,7 @@
   "assignment_results_export_column_completed_items": "completed_items",
   "assignment_results_export_column_completions": "completions",
   "assignment_results_export_column_correct": "correct",
+  "assignment_results_export_column_delivery_policy": "delivery_policy",
   "assignment_results_export_column_duration_seconds": "duration_seconds",
   "assignment_results_export_column_expected_answer": "expected_answer",
   "assignment_results_export_column_expires_at": "expires_at",

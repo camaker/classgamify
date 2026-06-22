@@ -132,6 +132,23 @@ export function buildAssignmentSettingsSummaryView({
   };
 }
 
+export function formatAssignmentDeliveryPolicyText({
+  expiresAt,
+  settings,
+}: {
+  expiresAt: AssignmentDate;
+  settings?: Partial<AssignmentSettings> | null;
+}) {
+  const summaryView = buildAssignmentSettingsSummaryView({
+    expiresAt,
+    settings,
+  });
+
+  return [summaryView.instructions, ...summaryView.items]
+    .map((item) => `${item.label}: ${item.value}`)
+    .join('; ');
+}
+
 export function buildPublicAssignmentRuleSummary({
   itemCount,
   ...input

@@ -155,9 +155,10 @@ import {
 } from '@/assignments/student-runner-view';
 import {
   buildAssignmentDeliverySummary,
+  buildAssignmentSettingsSummaryView,
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
-  buildAssignmentSettingsSummaryView,
+  formatAssignmentDeliveryPolicyText,
   formatAssignmentExpiry,
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
@@ -2438,6 +2439,28 @@ assert.deepEqual(legacyAssignmentSettingsSummaryView.instructions, {
   label: 'Student instructions',
   value: 'Legacy field instructions.',
 });
+assert.equal(
+  formatAssignmentDeliveryPolicyText({
+    expiresAt: null,
+    settings: {
+      collectStudentName: false,
+      instructions: '  Review quietly.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    },
+  }),
+  [
+    'Student instructions: Review quietly.',
+    'Attempts: 3 max',
+    'Timer: 2 min',
+    'Closes: No close time',
+    'Student identity: Anonymous',
+    'Answer reveal: Hidden',
+    'Item order: Fixed order',
+  ].join('; ')
+);
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');
 assert.deepEqual(
@@ -7809,7 +7832,13 @@ const csvExportData = {
 
 const csv = buildAssignmentResultsCsv(csvExportData);
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
+assert.match(csv, /"expires_at","delivery_policy","instructions"/);
 assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123"/);
+assert.match(
+  csv,
+  /"Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min;/
+);
+assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(csv, /"Snapshot Capitals","quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
@@ -7847,6 +7876,11 @@ assert.match(
   partialSettingsCsv,
   /"Review quietly\.","false","false","true","2",""/
 );
+assert.match(
+  partialSettingsCsv,
+  /"Student instructions: Review quietly\.; Attempts: 2 max; Timer: No timer; Closes:/
+);
+assert.match(partialSettingsCsv, /Answer reveal: Hidden; Item order: Shuffled/);
 
 const classroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,

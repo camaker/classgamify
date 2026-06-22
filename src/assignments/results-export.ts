@@ -7,6 +7,7 @@ import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultCsvDate,
 } from '@/assignments/result-format';
+import { formatAssignmentDeliveryPolicyText } from '@/assignments/delivery-summary';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -67,6 +68,10 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       data.assignment.shareSlug,
       data.assignment.status,
       formatAssignmentResultCsvDate(data.assignment.expiresAt),
+      formatAssignmentDeliveryPolicyText({
+        expiresAt: data.assignment.expiresAt,
+        settings,
+      }),
       settings.instructions ?? '',
       settings.collectStudentName,
       settings.showCorrectAnswers,
@@ -134,6 +139,7 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_share_slug(),
     m.assignment_results_export_column_assignment_status(),
     m.assignment_results_export_column_expires_at(),
+    m.assignment_results_export_column_delivery_policy(),
     m.assignment_results_export_column_instructions(),
     m.assignment_results_export_column_collect_student_name(),
     m.assignment_results_export_column_show_correct_answers(),
