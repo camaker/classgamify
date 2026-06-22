@@ -1,5 +1,6 @@
 import type { AssignmentSettings } from '@/activities/types';
 import { defaultAssignmentSettings } from '@/assignments/validation';
+import { m } from '@/locale/paraglide/messages';
 
 export function formatAssignmentDateTimeLocal(date: Date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -100,40 +101,77 @@ const PUBLISH_TIME_LIMIT_MINUTES_RANGE = {
 } as const;
 
 export const assignmentPublishDialogCopy = {
-  cancelLabel: 'Cancel',
-  closeAfterHelp:
-    'Optional. Leave blank to keep the link open until it is closed manually.',
-  closeAfterLabel: 'Close after',
-  description:
-    'Freeze this activity into a student share link with classroom delivery settings.',
-  instructionsLabel: 'Instructions',
-  instructionsPlaceholder: 'Optional student instructions',
-  maxAttemptsLabel: 'Max attempts',
-  publishLabel: 'Publish',
-  timeLimitHelp:
-    'Optional classroom timer in minutes. Leave blank for no time limit.',
-  timeLimitLabel: 'Time limit',
-  timeLimitPlaceholder: 'No limit',
-  title: 'Publish assignment',
-  titleLabel: 'Assignment title',
-  previewLabel: 'Delivery preview',
+  get cancelLabel() {
+    return m.assignment_publish_dialog_cancel();
+  },
+  get closeAfterHelp() {
+    return m.assignment_publish_dialog_close_after_help();
+  },
+  get closeAfterLabel() {
+    return m.assignment_publish_dialog_close_after_label();
+  },
+  get description() {
+    return m.assignment_publish_dialog_description();
+  },
+  get instructionsLabel() {
+    return m.assignment_publish_dialog_instructions_label();
+  },
+  get instructionsPlaceholder() {
+    return m.assignment_publish_dialog_instructions_placeholder();
+  },
+  get maxAttemptsLabel() {
+    return m.assignment_publish_dialog_max_attempts_label();
+  },
+  get previewLabel() {
+    return m.assignment_publish_dialog_preview_label();
+  },
+  get publishLabel() {
+    return m.assignment_publish_dialog_publish();
+  },
+  get timeLimitHelp() {
+    return m.assignment_publish_dialog_time_limit_help();
+  },
+  get timeLimitLabel() {
+    return m.assignment_publish_dialog_time_limit_label();
+  },
+  get timeLimitPlaceholder() {
+    return m.assignment_publish_dialog_time_limit_placeholder();
+  },
+  get title() {
+    return m.assignment_publish_dialog_title();
+  },
+  get titleLabel() {
+    return m.assignment_publish_dialog_title_label();
+  },
 } as const;
 
 export const assignmentPublishToggleOptions = [
   {
-    description: 'Ask learners to type their name before submitting.',
+    get description() {
+      return m.assignment_publish_toggle_collect_name_description();
+    },
     key: 'collectStudentName',
-    label: 'Collect student name',
+    get label() {
+      return m.assignment_publish_toggle_collect_name_label();
+    },
   },
   {
-    description: 'Reveal correct answers after an attempt is submitted.',
+    get description() {
+      return m.assignment_publish_toggle_show_answers_description();
+    },
     key: 'showCorrectAnswers',
-    label: 'Show correct answers',
+    get label() {
+      return m.assignment_publish_toggle_show_answers_label();
+    },
   },
   {
-    description: 'Prepare this assignment for randomized item order.',
+    get description() {
+      return m.assignment_publish_toggle_shuffle_items_description();
+    },
     key: 'shuffleItems',
-    label: 'Shuffle items',
+    get label() {
+      return m.assignment_publish_toggle_shuffle_items_label();
+    },
   },
 ] satisfies Array<AssignmentPublishToggleOption>;
 
@@ -228,7 +266,7 @@ export function validateAssignmentPublishDraft({
   const trimmedTitle = title.trim();
   if (!trimmedTitle) {
     return {
-      message: 'Add an assignment title before publishing.',
+      message: m.assignment_publish_validation_title_required(),
       ok: false,
     };
   }
@@ -236,7 +274,7 @@ export function validateAssignmentPublishDraft({
   const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
   if (attempts === undefined) {
     return {
-      message: 'Max attempts must be a whole number from 1 to 10.',
+      message: m.assignment_publish_validation_max_attempts(),
       ok: false,
     };
   }
@@ -247,7 +285,7 @@ export function validateAssignmentPublishDraft({
     !isWholeNumberInRange(timeLimit, PUBLISH_TIME_LIMIT_MINUTES_RANGE)
   ) {
     return {
-      message: 'Time limit must be a whole number from 1 to 180 minutes.',
+      message: m.assignment_publish_validation_time_limit(),
       ok: false,
     };
   }
@@ -255,14 +293,14 @@ export function validateAssignmentPublishDraft({
   const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
   if (expiresAtLocal.trim() && !expiresAt) {
     return {
-      message: 'Choose a valid close time.',
+      message: m.assignment_publish_validation_close_time_valid(),
       ok: false,
     };
   }
 
   if (expiresAt && expiresAt.getTime() <= now.getTime()) {
     return {
-      message: 'Close time must be in the future.',
+      message: m.assignment_publish_validation_close_time_future(),
       ok: false,
     };
   }
@@ -313,7 +351,7 @@ export function buildAssignmentPublishInputFromDraft({
   const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
   if (attempts === undefined) {
     return {
-      message: 'Max attempts must be a whole number from 1 to 10.',
+      message: m.assignment_publish_validation_max_attempts(),
       ok: false,
     };
   }
