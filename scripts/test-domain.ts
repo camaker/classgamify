@@ -44,8 +44,6 @@ import {
   type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
-  activityTemplateByType,
-  activityTemplates,
   formatActivityTemplateClassroomMode,
   getActivityTemplates,
   getStarterActivities,
@@ -2697,14 +2695,17 @@ assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
 assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),
   ACTIVITY_TEMPLATE_TYPES
 );
 assert.equal(activityTemplates.length, ACTIVITY_TEMPLATE_TYPES.length);
 assert.deepEqual(
-  Object.keys(activityTemplateByType).sort(),
-  [...ACTIVITY_TEMPLATE_TYPES].sort()
+  ACTIVITY_TEMPLATE_TYPES.map(
+    (templateType) => getTemplateByType(templateType).type
+  ),
+  ACTIVITY_TEMPLATE_TYPES
 );
 assert.equal(formatActivityTemplateClassroomMode('individual'), 'Individual');
 assert.equal(formatActivityTemplateClassroomMode('small-group'), 'Small group');
@@ -2744,11 +2745,11 @@ assert.deepEqual(
   }))
 );
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
-  assert.equal(activityTemplateByType[templateType].type, templateType);
-  assert.ok(activityTemplateByType[templateType].name.length > 0);
-  assert.ok(
-    activityTemplateByType[templateType].contentRequirements.length > 0
-  );
+  const template = getTemplateByType(templateType);
+
+  assert.equal(template.type, templateType);
+  assert.ok(template.name.length > 0);
+  assert.ok(template.contentRequirements.length > 0);
 }
 assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) => mode.template),
