@@ -43,7 +43,8 @@ configuration examples should speak in ClassGamify terms.
 
 - `Activity` is the teacher-owned reusable content object.
 - `ActivityContent` is template-neutral lesson material: questions, pairs,
-  groups, vocabulary, learning goal, answer explanations, and teacher notes.
+  groups, vocabulary, learning goal, answer explanations, teacher notes, and
+  lightweight `sourceMaterials` references to teacher-uploaded classroom files.
 - `ActivityTemplate` is a runtime renderer and scoring strategy for that
   content, such as quiz, match-up, line match, group sort, fill blank,
   listening, matching pairs, or open box.
@@ -56,6 +57,12 @@ This shape keeps future templates from creating separate content tables for
 each game. New templates should first ask whether the existing content model can
 render and score the interaction. Only add new structured content when a mode
 cannot be represented by questions, pairs, or groups.
+Teacher-uploaded audio, worksheet images, worksheet documents, or spreadsheets
+can be linked to `ActivityContent.sourceMaterials` as compact references to
+the owner-scoped `userFiles` rows. Those references preserve draft provenance
+for editing, AI extraction, and future worksheet/audio tooling, but public
+student payloads still expose only sanitized runtime prompts and choices, not
+the teacher's file list or storage keys.
 
 Teachers must be able to reopen and edit saved activities from the activity
 library. Editing uses the same `CreateActivityInput` contract as creation, with

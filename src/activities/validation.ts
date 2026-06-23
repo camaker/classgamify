@@ -13,6 +13,7 @@ import {
   buildQuestionOptionTexts,
   normalizeQuestionOptionDisplayText,
 } from '@/activities/question-options';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { makeActivityStableId } from '@/activities/stable-id';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { m } from '@/locale/paraglide/messages';
@@ -51,6 +52,7 @@ export const createActivityInputSchema = z.object({
   pairsText: z.string().max(4000).optional(),
   questionsText: z.string().max(6000).optional(),
   sourceSummary: z.string().trim().max(500).optional(),
+  sourceMaterials: z.array(z.unknown()).optional(),
   subject: z.string().trim().min(1).max(80),
   teacherNotesText: z.string().max(2000).optional(),
   templateType: activityTemplateTypeSchema,
@@ -96,6 +98,7 @@ export function parseActivityContent(
     sourceSummary:
       input.sourceSummary?.trim() ||
       m.activity_validation_default_source_summary(),
+    sourceMaterials: normalizeActivityMaterialReferences(input.sourceMaterials),
     subject: input.subject,
     teacherNotes: parseLineList(input.teacherNotesText),
     vocabulary: parseVocabulary(input.vocabularyText),

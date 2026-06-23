@@ -73,6 +73,11 @@ import {
   buildActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import {
+  ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+  buildActivityMaterialReferenceFromUserFile,
+  normalizeActivityMaterialReferences,
+} from '@/activities/material-references';
+import {
   activityEditPageCopy,
   assertActivityCanEdit,
   assertActivityCanDeriveWork,
@@ -627,11 +632,81 @@ assert.equal(userFileMaterialSummary.privateFiles, 3);
 assert.equal(userFileMaterialSummary.audioFiles, 1);
 assert.equal(userFileMaterialSummary.worksheetFiles, 2);
 assert.equal(userFileMaterialSummary.byKind.spreadsheet, 1);
+const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
+  contentType: 'audio/mpeg',
+  id: 'file-listening-1',
+  originalName: ' 三年级听力.mp3 ',
+  size: 2_048.7,
+});
+assert.deepEqual(listeningMaterialReference, {
+  contentType: 'audio/mpeg',
+  fileId: 'file-listening-1',
+  kind: 'audio',
+  originalName: '三年级听力.mp3',
+  size: 2_048,
+});
+assert.equal(
+  buildActivityMaterialReferenceFromUserFile({
+    contentType: 'application/pdf',
+    id: ' ',
+    originalName: 'worksheet.pdf',
+  }),
+  null
+);
+assert.deepEqual(
+  normalizeActivityMaterialReferences([
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-worksheet-1',
+      kind: 'unknown-kind',
+      originalName: 'revision worksheet.pdf',
+      size: 512.9,
+    },
+    {
+      fileId: 'file-listening-1',
+      kind: 'audio',
+      originalName: 'duplicate.mp3',
+    },
+    { fileId: '', kind: 'audio', originalName: 'missing-id.mp3' },
+  ]),
+  [
+    {
+      contentType: 'audio/mpeg',
+      fileId: 'file-listening-1',
+      kind: 'audio',
+      originalName: '三年级听力.mp3',
+      size: 2_048,
+    },
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-worksheet-1',
+      kind: 'worksheet-document',
+      originalName: 'revision worksheet.pdf',
+      size: 512,
+    },
+  ]
+);
+assert.equal(
+  normalizeActivityMaterialReferences(
+    Array.from(
+      { length: ACTIVITY_SOURCE_MATERIALS_MAX_COUNT + 2 },
+      (_, index) => ({
+        fileId: `file-${index}`,
+        kind: 'worksheet-image',
+        originalName: `scan-${index}.png`,
+      })
+    )
+  ).length,
+  ACTIVITY_SOURCE_MATERIALS_MAX_COUNT
+);
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
 assert.match(storageModuleDocs, /content-disposition\.ts/);
 assert.match(storageModuleDocs, /file-materials\.ts/);
 assert.match(storageModuleDocs, /file-summary\.ts/);
+assert.match(storageModuleDocs, /material-references\.ts/);
+assert.match(storageModuleDocs, /ActivityContent\.sourceMaterials/);
 assert.match(storageModuleDocs, /current default is 10MB/);
 assert.match(storageModuleDocs, /`userFiles`\s+table/);
 assert.doesNotMatch(
@@ -2997,6 +3072,7 @@ const publicPayloadActivityContent = buildActivityContent({
   title: 'Current activity',
   visibility: 'draft',
   vocabularyText: '',
+  sourceMaterials: [listeningMaterialReference],
 });
 const publicPayloadSnapshotContent = buildActivityContent({
   description: 'Frozen assignment payload source',
@@ -3015,6 +3091,15 @@ const publicPayloadSnapshotContent = buildActivityContent({
   title: 'Frozen activity',
   visibility: 'draft',
   vocabularyText: 'Frozen answer, Other',
+  sourceMaterials: [
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-snapshot-worksheet',
+      kind: 'worksheet-document',
+      originalName: 'Frozen worksheet.pdf',
+      size: 512,
+    },
+  ],
 });
 const publicAssignmentPayloadSource = {
   activity: {
@@ -3052,6 +3137,11 @@ assert.equal(publicAssignmentPayload.summary.subject, 'History');
 assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
 assert.equal(publicAssignmentPayload.summary.itemCount, 1);
 assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+assert.equal('sourceMaterials' in publicAssignmentPayload.summary, false);
+assert.equal(
+  'sourceMaterials' in publicAssignmentPayload.runtimeItems[0]!,
+  false
+);
 assert.equal(publicAssignmentPayload.assignment.shareSlug, 'share-public');
 assert.equal(
   publicAssignmentPayload.assignment.settingsJson.collectStudentName,
@@ -3352,6 +3442,7 @@ assert.deepEqual(
       pairs: [],
       questions: [],
       sourceSummary: '',
+      sourceMaterials: [],
       subject: 'History',
       teacherNotes: [],
       vocabulary: [],

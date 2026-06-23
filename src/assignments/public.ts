@@ -229,6 +229,7 @@ export function buildPublicAssignmentPreviewActivity(
       pairs: [],
       questions: [],
       sourceSummary: '',
+      sourceMaterials: [],
       subject: data.summary.subject,
       teacherNotes: [],
       vocabulary: [],

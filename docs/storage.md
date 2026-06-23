@@ -63,6 +63,9 @@ src/storage/
 ├── utils.ts           # Folder and public-folder helpers
 └── provider/
     └── r2.ts          # R2Provider (upload, delete, download, list, …)
+
+src/activities/
+└── material-references.ts # Activity source-material reference normalization
 ```
 
 ## Configuration
@@ -114,6 +117,14 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   Files settings page and future activity/AI material pickers, including total
   files, bytes, access mix, audio count, and worksheet-material count.
 
+- **buildActivityMaterialReferenceFromUserFile** and
+  **normalizeActivityMaterialReferences** (shared helpers, in
+  `@/activities/material-references`): Convert owner-scoped `userFiles` rows
+  into compact `ActivityContent.sourceMaterials` references. These references
+  keep activity drafts linked to teacher audio, worksheet images, worksheet
+  documents, or spreadsheets for future AI extraction and editing workflows
+  without duplicating R2 keys or file-permission data inside activity JSON.
+
 - **buildAttachmentContentDisposition** (shared helper, in
   `@/storage/content-disposition`): Builds safe attachment headers that preserve
   teacher-uploaded original filenames, including Chinese names through
@@ -143,6 +154,10 @@ Upload is implemented as a **server function** (`uploadUserFile` in `src/api/use
   `uploadUserFile`). Files are stored under `userFilesFolder`; the table shows a
   teacher-facing material type while preserving the raw content type for
   troubleshooting.
+- **Activity content**: `ActivityContent.sourceMaterials` stores compact
+  references to teacher-owned `userFiles` records. Student assignment payloads
+  still expose only sanitized runtime prompts and choices; they do not expose
+  source-material references or storage keys.
 
 ## Notes
 

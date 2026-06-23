@@ -1,12 +1,21 @@
-export type UserFileMaterialKind =
-  | 'archive'
-  | 'audio'
-  | 'data'
-  | 'file'
-  | 'spreadsheet'
-  | 'video'
-  | 'worksheet-document'
-  | 'worksheet-image';
+export const USER_FILE_MATERIAL_KINDS = [
+  'archive',
+  'audio',
+  'data',
+  'file',
+  'spreadsheet',
+  'video',
+  'worksheet-document',
+  'worksheet-image',
+] as const;
+
+export type UserFileMaterialKind = (typeof USER_FILE_MATERIAL_KINDS)[number];
+
+export function isUserFileMaterialKind(
+  value: string | null | undefined
+): value is UserFileMaterialKind {
+  return USER_FILE_MATERIAL_KINDS.includes(value as UserFileMaterialKind);
+}
 
 interface UserFileMaterialInput {
   contentType?: string | null;

@@ -198,6 +198,7 @@ export function getStarterActivities(): ActivitySeed[] {
             items: [foodWords.milk, foodWords.water],
           },
         ],
+        sourceMaterials: [],
         teacherNotes: [
           m.activity_starter_food_teacher_note_1(),
           m.activity_starter_food_teacher_note_2(),
@@ -274,6 +275,7 @@ export function getStarterActivities(): ActivitySeed[] {
             items: [scienceWords.steam, scienceWords.air],
           },
         ],
+        sourceMaterials: [],
         teacherNotes: [m.activity_starter_science_teacher_note_1()],
       },
     },

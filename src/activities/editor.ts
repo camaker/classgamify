@@ -7,6 +7,7 @@ import type {
 import { getTemplateByType } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
   buildActivityContent,
@@ -61,6 +62,7 @@ export function getActivityEditorDefaultInput(): CreateActivityInput {
     pairsText: m.activity_editor_default_pairs_text(),
     questionsText: m.activity_editor_default_questions_text(),
     sourceSummary: m.activity_editor_default_source_summary(),
+    sourceMaterials: [],
     subject: m.activity_editor_default_subject(),
     teacherNotesText: m.activity_editor_default_teacher_notes_text(),
     templateType: 'quiz',
@@ -171,6 +173,9 @@ export function activityContentToEditorInput(
       })
       .join('\n'),
     sourceSummary: source.content.sourceSummary,
+    sourceMaterials: normalizeActivityMaterialReferences(
+      source.content.sourceMaterials
+    ),
     subject: source.content.subject,
     teacherNotesText: source.content.teacherNotes.join('\n'),
     templateType: source.templateType,

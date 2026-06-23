@@ -1,4 +1,5 @@
 import {
+  USER_FILE_MATERIAL_KINDS,
   resolveUserFileMaterialKind,
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
@@ -20,17 +21,6 @@ export interface UserFileMaterialSummary {
   totalFiles: number;
   worksheetFiles: number;
 }
-
-const USER_FILE_MATERIAL_KINDS: UserFileMaterialKind[] = [
-  'archive',
-  'audio',
-  'data',
-  'file',
-  'spreadsheet',
-  'video',
-  'worksheet-document',
-  'worksheet-image',
-];
 
 function createEmptyUserFileMaterialSummary(): UserFileMaterialSummary {
   return {

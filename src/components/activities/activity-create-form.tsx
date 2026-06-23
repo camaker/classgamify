@@ -154,6 +154,7 @@ export function ActivityCreateForm({
 
       form.reset({
         ...result.activity,
+        sourceMaterials: current.sourceMaterials ?? [],
         visibility: current.visibility,
       });
       setDraftResult(result);

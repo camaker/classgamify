@@ -1,3 +1,5 @@
+import type { UserFileMaterialKind } from '@/storage/file-materials';
+
 export const ACTIVITY_TEMPLATE_TYPES = [
   'quiz',
   'match-up',
@@ -48,6 +50,14 @@ export type ActivityGroup = {
   items: string[];
 };
 
+export type ActivityMaterialReference = {
+  contentType?: string;
+  fileId: string;
+  kind: UserFileMaterialKind;
+  originalName: string;
+  size?: number;
+};
+
 export type ActivityContent = {
   subject: string;
   gradeBand: string;
@@ -59,6 +69,7 @@ export type ActivityContent = {
   questions: ActivityQuestion[];
   pairs: ActivityPair[];
   groups: ActivityGroup[];
+  sourceMaterials: ActivityMaterialReference[];
   teacherNotes: string[];
 };
 
