@@ -75,6 +75,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
   );
+  const runtimeItemCount = data.analysis.perItem.length;
   const rows = data.analysis.attempts.flatMap((attempt) => {
     const storedAttempt = attemptsById.get(attempt.id);
     const studentSummary = studentsByKey.get(attempt.studentKey);
@@ -113,7 +114,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       storedAttempt?.maxScore ?? '',
       attempt.accuracy,
       storedAttempt?.resultJson?.completedItemCount ?? '',
-      storedAttempt?.resultJson?.totalPoints ?? '',
+      runtimeItemCount,
       storedAttempt?.resultJson?.durationSeconds ?? '',
       studentSummary?.attempts ?? '',
       studentSummary?.latestAccuracy ?? '',

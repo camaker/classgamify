@@ -9197,6 +9197,23 @@ assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
+const weightedScoreCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  attempts: [
+    {
+      ...csvExportData.attempts[0]!,
+      maxScore: 10,
+      resultJson: {
+        ...csvExportData.attempts[0]!.resultJson!,
+        totalPoints: 10,
+      },
+    },
+  ],
+});
+assert.match(
+  weightedScoreCsv,
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","45"/
+);
 const zeroAverageDurationCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   stats: {
