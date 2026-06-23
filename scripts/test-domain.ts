@@ -7529,10 +7529,10 @@ assert.equal(
     ...fallbackDraft,
     groupsText: 'Group source',
     pairsText: 'Pair source',
-    questionsText: 'Shared source',
-    sourceSummary: '',
-    teacherNotesText: 'Shared source',
-    vocabularyText: '  Shared source  ',
+    questionsText: 'Ｓｈａｒｅｄ source',
+    sourceSummary: 'Shared source',
+    teacherNotesText: 'shared source',
+    vocabularyText: '  shared   source  ',
   }),
   ['Shared source', 'Pair source', 'Group source'].join('\n\n')
 );

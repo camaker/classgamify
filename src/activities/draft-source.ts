@@ -74,5 +74,24 @@ function limitActivityDraftSourceText(parts: string[]) {
 }
 
 function unique(values: string[]) {
-  return [...new Set(values)];
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const key = normalizeDraftSourceTextKey(value);
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(value);
+  }
+
+  return result;
+}
+
+function normalizeDraftSourceTextKey(value: string) {
+  return value
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase();
 }
