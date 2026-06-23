@@ -6435,6 +6435,35 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(
+  buildActivityLibrarySummaryMetrics({
+    hasFilters: true,
+    summary: {
+      archivedActivities: 0,
+      draftActivities: 0,
+      remixReadyActivities: Number.NaN,
+      templateCoverage: -1,
+      templateCoverageTotal: Number.POSITIVE_INFINITY,
+      totalActivities: Number.NaN,
+      totalReadyTemplateOptions: -3,
+    },
+    totalActivities: 99,
+  }),
+  [
+    { id: 'total', label: 'Matching activities', value: '-' },
+    {
+      id: 'coverage',
+      label: 'Template coverage',
+      value: '-',
+    },
+    { id: 'remix', label: 'Ready to remix', value: '-' },
+    {
+      id: 'readyModes',
+      label: 'Ready modes',
+      value: '0',
+    },
+  ]
+);
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);
   const input = createActivityInputSchema.parse({

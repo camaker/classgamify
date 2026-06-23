@@ -190,22 +190,50 @@ export function buildActivityLibrarySummaryMetrics({
       label: hasFilters
         ? m.activity_library_summary_matching_activities()
         : m.activity_library_summary_activities(),
-      value: String(resolvedSummary.totalActivities),
+      value: formatActivityLibraryMetricNumber(resolvedSummary.totalActivities),
     },
     {
       id: 'coverage',
       label: m.activity_library_summary_template_coverage(),
-      value: `${resolvedSummary.templateCoverage}/${resolvedSummary.templateCoverageTotal}`,
+      value: formatActivityLibraryMetricFraction(
+        resolvedSummary.templateCoverage,
+        resolvedSummary.templateCoverageTotal
+      ),
     },
     {
       id: 'remix',
       label: m.activity_library_summary_ready_to_remix(),
-      value: String(resolvedSummary.remixReadyActivities),
+      value: formatActivityLibraryMetricNumber(
+        resolvedSummary.remixReadyActivities
+      ),
     },
     {
       id: 'readyModes',
       label: m.activity_library_summary_ready_modes(),
-      value: String(resolvedSummary.totalReadyTemplateOptions),
+      value: formatActivityLibraryMetricNumber(
+        resolvedSummary.totalReadyTemplateOptions
+      ),
     },
   ];
+}
+
+function formatActivityLibraryMetricNumber(value: number) {
+  const normalizedValue = normalizeActivityLibraryMetricNumber(value);
+  return normalizedValue === undefined ? '-' : String(normalizedValue);
+}
+
+function formatActivityLibraryMetricFraction(value: number, total: number) {
+  const normalizedValue = normalizeActivityLibraryMetricNumber(value);
+  const normalizedTotal = normalizeActivityLibraryMetricNumber(total);
+
+  if (normalizedValue === undefined || normalizedTotal === undefined) {
+    return '-';
+  }
+
+  return `${normalizedValue}/${normalizedTotal}`;
+}
+
+function normalizeActivityLibraryMetricNumber(value: number) {
+  if (!Number.isFinite(value)) return undefined;
+  return Math.max(0, value);
 }
