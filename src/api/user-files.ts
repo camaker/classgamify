@@ -59,6 +59,28 @@ export const listUserFiles = createServerFn({ method: 'GET' })
     };
   });
 
+export const listUserFileMaterials = createServerFn({ method: 'GET' })
+  .inputValidator(listSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+
+    return db
+      .select({
+        contentType: userFiles.contentType,
+        filename: userFiles.filename,
+        id: userFiles.id,
+        originalName: userFiles.originalName,
+        size: userFiles.size,
+      })
+      .from(userFiles)
+      .where(eq(userFiles.userId, userId))
+      .orderBy(desc(userFiles.createdAt))
+      .limit(data.pageSize)
+      .offset(data.pageIndex * data.pageSize);
+  });
+
 const deleteSchema = z.object({ id: z.string() });
 
 export const deleteUserFile = createServerFn({ method: 'POST' })

@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import {
   deleteUserFile,
+  listUserFileMaterials,
   listUserFiles,
   uploadUserFile,
 } from '@/api/user-files';
@@ -16,15 +17,35 @@ export const userFilesKeys = {
   lists: () => [...userFilesKeys.all, 'lists'] as const,
   list: (params: { pageIndex: number; pageSize: number }) =>
     [...userFilesKeys.lists(), params] as const,
+  materials: (params: { pageIndex: number; pageSize: number }) =>
+    [...userFilesKeys.all, 'materials', params] as const,
 };
 
 /**
  * Fetches a list of user files
  */
-export function useUserFiles(pageIndex: number, pageSize: number) {
+export function useUserFiles(
+  pageIndex: number,
+  pageSize: number,
+  options: { enabled?: boolean } = {}
+) {
   return useQuery({
+    enabled: options.enabled ?? true,
     queryKey: userFilesKeys.list({ pageIndex, pageSize }),
     queryFn: () => listUserFiles({ data: { pageIndex, pageSize } }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useUserFileMaterials(
+  pageIndex: number,
+  pageSize: number,
+  options: { enabled?: boolean } = {}
+) {
+  return useQuery({
+    enabled: options.enabled ?? true,
+    queryKey: userFilesKeys.materials({ pageIndex, pageSize }),
+    queryFn: () => listUserFileMaterials({ data: { pageIndex, pageSize } }),
     placeholderData: keepPreviousData,
   });
 }

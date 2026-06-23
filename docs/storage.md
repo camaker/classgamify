@@ -117,6 +117,12 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   Files settings page and future activity/AI material pickers, including total
   files, bytes, access mix, audio count, and worksheet-material count.
 
+- **listUserFileMaterials** (server function, in `@/api/user-files`): Returns
+  the compact owner-scoped material fields needed by the activity source-material
+  picker: `id`, `filename`, `originalName`, `contentType`, and `size`. It does
+  not return `r2Key`, access flags, or storage permission metadata to the
+  activity editor.
+
 - **buildActivityMaterialReferenceFromUserFile** and
   **normalizeActivityMaterialReferences** (shared helpers, in
   `@/activities/material-references`): Convert owner-scoped `userFiles` rows
@@ -155,9 +161,11 @@ Upload is implemented as a **server function** (`uploadUserFile` in `src/api/use
   teacher-facing material type while preserving the raw content type for
   troubleshooting.
 - **Activity content**: `ActivityContent.sourceMaterials` stores compact
-  references to teacher-owned `userFiles` records. Student assignment payloads
-  still expose only sanitized runtime prompts and choices; they do not expose
-  source-material references or storage keys.
+  references to teacher-owned `userFiles` records. The activity editor loads
+  selectable files through `listUserFileMaterials`, so it can attach classroom
+  materials without receiving R2 keys. Student assignment payloads still expose
+  only sanitized runtime prompts and choices; they do not expose source-material
+  references or storage keys.
 
 ## Notes
 

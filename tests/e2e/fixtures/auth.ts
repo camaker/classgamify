@@ -71,3 +71,31 @@ export async function loginByForm(page: Page, user: E2EUser) {
   await signInButton.click();
   await expect(page).toHaveURL(/\/dashboard\/?$/);
 }
+
+export async function seedE2EUserFile(
+  request: APIRequestContext,
+  data: {
+    contentType?: string;
+    email: string;
+    filename?: string;
+    id?: string;
+    originalName: string;
+    size?: number;
+  }
+) {
+  const response = await request.post('/api/e2e/users', {
+    headers: e2eHeaders,
+    data,
+  });
+
+  expect(response.ok(), await response.text()).toBeTruthy();
+
+  return (await response.json()) as {
+    file: {
+      contentType: string;
+      id: string;
+      originalName: string;
+      size: number;
+    };
+  };
+}

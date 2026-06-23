@@ -35,8 +35,8 @@ import { cn } from '@/lib/utils';
 import {
   normalizeUserFileContentType,
   resolveUserFileMaterialKind,
-  type UserFileMaterialKind,
 } from '@/storage/file-materials';
+import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 import {
   buildUserFileMaterialSummary,
   type UserFileMaterialSummary,
@@ -56,27 +56,6 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-
-function formatUserFileMaterialKind(kind: UserFileMaterialKind): string {
-  switch (kind) {
-    case 'archive':
-      return m.settings_files_material_type_archive();
-    case 'audio':
-      return m.settings_files_material_type_audio();
-    case 'data':
-      return m.settings_files_material_type_data();
-    case 'spreadsheet':
-      return m.settings_files_material_type_spreadsheet();
-    case 'video':
-      return m.settings_files_material_type_video();
-    case 'worksheet-document':
-      return m.settings_files_material_type_worksheet_document();
-    case 'worksheet-image':
-      return m.settings_files_material_type_worksheet_image();
-    default:
-      return m.settings_files_material_type_file();
-  }
-}
 
 function UserFileMaterialTypeCell({ file }: { file: UserFiles }) {
   const kind = resolveUserFileMaterialKind({

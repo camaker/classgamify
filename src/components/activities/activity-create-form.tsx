@@ -15,6 +15,7 @@ import {
   buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
+import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
 import {
   activityDifficultySchema,
   activityVisibilitySchema,
@@ -622,6 +623,23 @@ export function ActivityCreateForm({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="sourceMaterials"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <ActivitySourceMaterialsField
+                      canLoadFiles={Boolean(session?.user)}
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {!session?.user && !sessionPending ? (
               <FormError message={m.activity_form_sign_in_required_message()} />

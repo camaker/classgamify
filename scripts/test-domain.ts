@@ -371,6 +371,7 @@ import {
   getUserFileExtension,
   resolveUserFileMaterialKind,
 } from '@/storage/file-materials';
+import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
@@ -599,6 +600,11 @@ assert.equal(
   }),
   'wav'
 );
+assert.equal(formatUserFileMaterialKind('audio'), 'Audio');
+assert.equal(
+  formatUserFileMaterialKind('worksheet-document'),
+  'Worksheet document'
+);
 const userFileMaterialSummary = buildUserFileMaterialSummary([
   {
     contentType: 'audio/mpeg',
@@ -706,6 +712,8 @@ assert.match(storageModuleDocs, /content-disposition\.ts/);
 assert.match(storageModuleDocs, /file-materials\.ts/);
 assert.match(storageModuleDocs, /file-summary\.ts/);
 assert.match(storageModuleDocs, /material-references\.ts/);
+assert.match(storageModuleDocs, /listUserFileMaterials/);
+assert.match(storageModuleDocs, /does\s+not\s+return\s+`r2Key`/);
 assert.match(storageModuleDocs, /ActivityContent\.sourceMaterials/);
 assert.match(storageModuleDocs, /current default is 10MB/);
 assert.match(storageModuleDocs, /`userFiles`\s+table/);
@@ -5145,20 +5153,36 @@ const optionRoundTripContent = buildActivityContent({
   title: 'Option normalization',
   visibility: 'draft',
   vocabularyText: '',
+  sourceMaterials: [listeningMaterialReference],
 });
 assert.deepEqual(
   optionRoundTripContent.questions[0]?.options.map((option) => option.text),
   ['Paris', 'Rome', 'Berlin']
 );
+const optionRoundTripEditorInput = activityContentToEditorInput({
+  content: optionRoundTripContent,
+  description: 'Question option normalization',
+  templateType: 'quiz',
+  title: 'Option normalization',
+  visibility: 'draft',
+});
 assert.equal(
+  optionRoundTripEditorInput.questionsText,
+  'Capital of France? | Paris | Paris, Rome, Berlin'
+);
+assert.deepEqual(optionRoundTripEditorInput.sourceMaterials, [
+  listeningMaterialReference,
+]);
+assert.deepEqual(activityEditorDefaultInput.sourceMaterials, []);
+assert.deepEqual(
   activityContentToEditorInput({
     content: optionRoundTripContent,
     description: 'Question option normalization',
     templateType: 'quiz',
     title: 'Option normalization',
     visibility: 'draft',
-  }).questionsText,
-  'Capital of France? | Paris | Paris, Rome, Berlin'
+  }).sourceMaterials,
+  [listeningMaterialReference]
 );
 const tabSeparatedQuestionContent = buildActivityContent({
   description: 'Spreadsheet-pasted question rows',

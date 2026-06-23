@@ -3,6 +3,7 @@ import {
   cleanupE2EUsers,
   loginByForm,
   registerE2EUser,
+  seedE2EUserFile,
 } from '../fixtures/auth';
 import {
   installPageHealthMonitor,
@@ -116,5 +117,80 @@ test.describe('activity authoring', () => {
     await expect(page.getByText('0/2 answered')).toBeVisible();
     await expect(page.getByLabel('Student name')).toHaveValue('E2E Student');
     await expectNoBrowserErrors(monitor, 'publish assignment from saved panel');
+  });
+
+  test('attaches uploaded source materials to a saved activity', async ({
+    page,
+    request,
+  }) => {
+    const user = await registerE2EUser(request);
+    const monitor = installPageHealthMonitor(page);
+    const uniqueSuffix = Date.now().toString(36);
+    const activityTitle = `E2E source materials ${uniqueSuffix}`;
+
+    await seedE2EUserFile(request, {
+      contentType: 'audio/mpeg',
+      email: user.email,
+      filename: `listening-${uniqueSuffix}.mp3`,
+      id: `e2e-listening-${uniqueSuffix}`,
+      originalName: `Listening track ${uniqueSuffix}.mp3`,
+      size: 2048,
+    });
+    await seedE2EUserFile(request, {
+      contentType: 'application/pdf',
+      email: user.email,
+      filename: `worksheet-${uniqueSuffix}.pdf`,
+      id: `e2e-worksheet-${uniqueSuffix}`,
+      originalName: `Worksheet ${uniqueSuffix}.pdf`,
+      size: 4096,
+    });
+
+    await loginByForm(page, user);
+    await page.goto('/create');
+    await page.waitForLoadState('networkidle');
+
+    await expect(
+      page.getByRole('heading', { name: /^source materials$/i })
+    ).toBeVisible();
+    await expect(
+      page.getByText(`Listening track ${uniqueSuffix}.mp3`)
+    ).toBeVisible();
+    await expect(page.getByText(`Worksheet ${uniqueSuffix}.pdf`)).toBeVisible();
+    await page
+      .getByRole('button', {
+        name: new RegExp(`attach Listening track ${uniqueSuffix}\\.mp3`, 'i'),
+      })
+      .click();
+    await expect(page.getByText('1 attached')).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: new RegExp(`remove Listening track ${uniqueSuffix}\\.mp3`, 'i'),
+      })
+    ).toBeVisible();
+
+    await page.getByLabel('Title').fill(activityTitle);
+    await page.getByRole('button', { name: /^save activity$/i }).click();
+    await expect(page).toHaveURL(/\/dashboard\/activities\?created=/);
+    await expect(
+      page.getByRole('heading', { name: activityTitle })
+    ).toBeVisible();
+    await page
+      .getByRole('link', { name: /^edit activity$/i })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/dashboard\/activities\/[^/]+$/);
+    await expect(
+      page.getByRole('heading', { name: /^source materials$/i })
+    ).toBeVisible();
+    await expect(page.getByText('1 attached')).toBeVisible();
+    await expect(
+      page.getByText(`Listening track ${uniqueSuffix}.mp3`)
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: new RegExp(`remove Listening track ${uniqueSuffix}\\.mp3`, 'i'),
+      })
+    ).toBeVisible();
+    await expectNoBrowserErrors(monitor, 'source material attachment');
   });
 });
