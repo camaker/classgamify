@@ -6555,7 +6555,10 @@ assert.equal(normalizeListeningSpeechLanguage('zh'), 'zh-CN');
 assert.equal(normalizeListeningSpeechLanguage('中文'), 'zh-CN');
 assert.equal(normalizeListeningSpeechLanguage('Chinese'), 'zh-CN');
 assert.equal(normalizeListeningSpeechLanguage('zh-TW'), 'zh-TW');
+assert.equal(normalizeListeningSpeechLanguage('zh_CN'), 'zh-CN');
+assert.equal(normalizeListeningSpeechLanguage('zh_Hant'), 'zh-TW');
 assert.equal(normalizeListeningSpeechLanguage('en'), 'en-US');
+assert.equal(normalizeListeningSpeechLanguage('en_US'), 'en-US');
 assert.equal(normalizeListeningSpeechLanguage('pt-br'), 'pt-BR');
 assert.equal(normalizeListeningSpeechLanguage('  '), undefined);
 assert.equal(

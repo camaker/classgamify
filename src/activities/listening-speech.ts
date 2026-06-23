@@ -32,11 +32,13 @@ export function normalizeListeningSpeechLanguage(
 }
 
 function normalizeSpeechLanguageTag(value: string) {
-  if (!/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/iu.test(value)) {
+  const tag = value.replace(/_/g, '-');
+
+  if (!/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/iu.test(tag)) {
     return undefined;
   }
 
-  return value
+  return tag
     .split('-')
     .map((part, index) => {
       if (index === 0) return part.toLocaleLowerCase();
