@@ -647,6 +647,19 @@ assert.ok(
   ),
   'Storage-enabled workspaces should expose Settings → Files in the sidebar.'
 );
+const settingsFilesRouteSource = readFileSync(
+  'src/routes/settings/files.tsx',
+  'utf8'
+);
+assert.match(
+  settingsFilesRouteSource,
+  /websiteConfig\.storage\?\.enable !== true/
+);
+assert.doesNotMatch(
+  settingsFilesRouteSource,
+  /beforeLoad:\s*\(\)\s*=>\s*\{\s*throw notFound/s,
+  'Settings files route should only be hidden when storage is disabled.'
+);
 const retiredRouteDocumentationText = [
   'docs/locale.md',
   'docs/newsletter.md',
