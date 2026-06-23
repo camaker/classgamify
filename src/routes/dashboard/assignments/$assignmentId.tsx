@@ -310,22 +310,36 @@ function AssignmentResultsPage() {
                 settings={data.assignment.settingsJson}
               />
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Link
-                  to="/play/$shareId"
-                  params={{ shareId: headerView.shareAction.shareSlug }}
-                  className={cn(buttonVariants(), 'w-full sm:w-auto')}
-                >
-                  <IconPlayerPlay className="size-4" />
-                  {headerView.shareAction.label}
-                </Link>
+                {headerView.shareAction.isAvailable ? (
+                  <Link
+                    to="/play/$shareId"
+                    params={{ shareId: headerView.shareAction.shareSlug }}
+                    className={cn(buttonVariants(), 'w-full sm:w-auto')}
+                  >
+                    <IconPlayerPlay className="size-4" />
+                    {headerView.shareAction.label}
+                  </Link>
+                ) : (
+                  <Button type="button" className="w-full sm:w-auto" disabled>
+                    <IconPlayerPlay className="size-4" />
+                    {headerView.shareAction.label}
+                  </Button>
+                )}
                 <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
                   <IconShare3 className="size-4" />
                   {headerView.shareAction.sharePath}
                 </div>
                 <CopyAssignmentShareLinkButton
+                  disabled={!headerView.shareAction.isAvailable}
+                  disabledMessage={headerView.shareAction.disabledReason}
                   shareSlug={headerView.shareAction.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
+                {headerView.shareAction.disabledReason ? (
+                  <p className="basis-full text-sm text-muted-foreground">
+                    {headerView.shareAction.disabledReason}
+                  </p>
+                ) : null}
                 {resultActionButtons.map((actionButton) => {
                   const Icon = resultActionIconByAction[actionButton.action];
 

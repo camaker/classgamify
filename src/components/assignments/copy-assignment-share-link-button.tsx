@@ -9,12 +9,23 @@ import { toast } from 'sonner';
 
 export function CopyAssignmentShareLinkButton({
   className,
+  disabled,
+  disabledMessage,
   shareSlug,
 }: {
   className?: string;
+  disabled?: boolean;
+  disabledMessage?: string;
   shareSlug: string;
 }) {
   async function copyShareLink() {
+    if (disabled) {
+      toast.error(
+        disabledMessage ?? assignmentShareLinkActionCopy.failureMessage
+      );
+      return;
+    }
+
     try {
       await copyTextToClipboard(buildAssignmentShareUrl(shareSlug));
       toast.success(assignmentShareLinkActionCopy.successMessage);
@@ -32,6 +43,7 @@ export function CopyAssignmentShareLinkButton({
       type="button"
       variant="outline"
       className={className}
+      disabled={disabled}
       onClick={copyShareLink}
     >
       <IconCopy className="size-4" />

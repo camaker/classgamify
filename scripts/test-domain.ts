@@ -8095,6 +8095,8 @@ assert.deepEqual(
     assignmentSharePath: '/play/share%20123',
     assignmentTitle: 'Week 1 results',
     shareAction: {
+      disabledReason: undefined,
+      isAvailable: true,
       label: 'Open student link',
       sharePath: '/play/share%20123',
       shareSlug: 'share 123',
@@ -8127,7 +8129,10 @@ assert.deepEqual(
     assignmentSharePath: '/play/closed-share',
     assignmentTitle: 'Expired results',
     shareAction: {
-      label: 'Open student link',
+      disabledReason:
+        'This assignment link has expired. Students cannot open it from the results page.',
+      isAvailable: false,
+      label: 'Student link unavailable',
       sharePath: '/play/closed-share',
       shareSlug: 'closed-share',
     },
@@ -8137,11 +8142,80 @@ assert.deepEqual(
     templateType: 'quiz',
   }
 );
-assert.deepEqual(buildAssignmentResultHeaderShareAction('share two'), {
-  label: 'Open student link',
-  sharePath: '/play/share%20two',
-  shareSlug: 'share two',
-});
+assert.deepEqual(
+  buildAssignmentResultHeaderShareAction({
+    expiresAt: null,
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    shareSlug: 'share two',
+    status: 'published',
+  }),
+  {
+    disabledReason: undefined,
+    isAvailable: true,
+    label: 'Open student link',
+    sharePath: '/play/share%20two',
+    shareSlug: 'share two',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultHeaderShareAction({
+    expiresAt: null,
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    shareSlug: 'closed-share',
+    status: 'closed',
+  }),
+  {
+    disabledReason:
+      'This assignment is closed. Reopen it before sharing the student link.',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/closed-share',
+    shareSlug: 'closed-share',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultHeaderShareAction({
+    expiresAt: null,
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    shareSlug: 'draft-share',
+    status: 'draft',
+  }),
+  {
+    disabledReason: 'Publish this assignment before sharing a student link.',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/draft-share',
+    shareSlug: 'draft-share',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultHeaderShareAction({
+    expiresAt: new Date('2026-05-01T00:00:00.000Z'),
+    now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+    shareSlug: 'expired-share',
+    status: 'published',
+  }),
+  {
+    disabledReason:
+      'This assignment link has expired. Students cannot open it from the results page.',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/expired-share',
+    shareSlug: 'expired-share',
+  }
+);
+assert.equal(
+  assignmentResultPageCopy.studentLinkClosedMessage,
+  'This assignment is closed. Reopen it before sharing the student link.'
+);
+assert.equal(
+  assignmentResultPageCopy.studentLinkDraftMessage,
+  'Publish this assignment before sharing a student link.'
+);
+assert.equal(
+  assignmentResultPageCopy.studentLinkExpiredMessage,
+  'This assignment link has expired. Students cannot open it from the results page.'
+);
 assert.deepEqual(assignmentResultTableHeaders.studentAttempts, [
   'Student',
   'Score',

@@ -8,7 +8,11 @@ import {
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
-import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import {
+  getAssignmentStatusLabel,
+  isAssignmentExpired,
+  isAssignmentOpen,
+} from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
@@ -204,6 +208,8 @@ type AssignmentResultHeaderSource = {
 };
 
 type AssignmentResultHeaderShareAction = {
+  disabledReason: string | undefined;
+  isAvailable: boolean;
   label: string;
   sharePath: string;
   shareSlug: string;
@@ -227,6 +233,18 @@ export const assignmentResultPageCopy = {
   },
   get openStudentLinkLabel() {
     return m.assignment_result_page_open_student_link();
+  },
+  get studentLinkClosedMessage() {
+    return m.assignment_result_page_student_link_closed();
+  },
+  get studentLinkDraftMessage() {
+    return m.assignment_result_page_student_link_draft();
+  },
+  get studentLinkExpiredMessage() {
+    return m.assignment_result_page_student_link_expired();
+  },
+  get studentLinkUnavailableLabel() {
+    return m.assignment_result_page_student_link_unavailable();
   },
 } as const;
 
@@ -527,9 +545,12 @@ export function buildAssignmentResultHeaderView({
   now,
   snapshot,
 }: AssignmentResultHeaderSource & { now?: number }) {
-  const shareAction = buildAssignmentResultHeaderShareAction(
-    assignment.shareSlug
-  );
+  const shareAction = buildAssignmentResultHeaderShareAction({
+    expiresAt: assignment.expiresAt,
+    now,
+    shareSlug: assignment.shareSlug,
+    status: assignment.status,
+  });
   const templateType = snapshot?.templateType ?? activity.templateType;
 
   return {
@@ -550,14 +571,55 @@ export function buildAssignmentResultHeaderView({
   };
 }
 
-export function buildAssignmentResultHeaderShareAction(
-  shareSlug: string
-): AssignmentResultHeaderShareAction {
+export function buildAssignmentResultHeaderShareAction({
+  expiresAt,
+  now,
+  shareSlug,
+  status,
+}: {
+  expiresAt: Date | string | null | undefined;
+  now?: number;
+  shareSlug: string;
+  status: AssignmentStatus | string;
+}): AssignmentResultHeaderShareAction {
+  const resolvedNow = now ?? Date.now();
+  const isAvailable = isAssignmentOpen(status, expiresAt, resolvedNow);
+
   return {
-    label: assignmentResultPageCopy.openStudentLinkLabel,
+    disabledReason: isAvailable
+      ? undefined
+      : getAssignmentResultHeaderShareDisabledReason({
+          expiresAt,
+          now: resolvedNow,
+          status,
+        }),
+    isAvailable,
+    label: isAvailable
+      ? assignmentResultPageCopy.openStudentLinkLabel
+      : assignmentResultPageCopy.studentLinkUnavailableLabel,
     sharePath: buildAssignmentSharePath(shareSlug),
     shareSlug,
   };
+}
+
+function getAssignmentResultHeaderShareDisabledReason({
+  expiresAt,
+  now,
+  status,
+}: {
+  expiresAt: Date | string | null | undefined;
+  now: number;
+  status: AssignmentStatus | string;
+}) {
+  if (status === 'published' && isAssignmentExpired(expiresAt, now)) {
+    return assignmentResultPageCopy.studentLinkExpiredMessage;
+  }
+
+  if (status === 'closed') {
+    return assignmentResultPageCopy.studentLinkClosedMessage;
+  }
+
+  return assignmentResultPageCopy.studentLinkDraftMessage;
 }
 
 export function buildAssignmentResultActionState({
