@@ -1,8 +1,17 @@
-# Storage module
+# Storage Module
 
-The storage module provides file upload (and optional delete) using **Cloudflare R2** via the Worker bucket binding. No environment variables are required for storage (see [Env](./env.md) for project env overview). No S3 SDK or third-party storage library is used—only the [Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/). It is used for avatar uploads (Settings → Profile) when enabled.
+The storage module provides file upload, download, listing, and delete support
+using **Cloudflare R2** via the Worker bucket binding. No environment variables
+are required for storage (see [Env](./env.md) for project env overview). No S3
+SDK or third-party storage library is used; the provider talks directly to the
+[Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/).
 
-## Enabling storage (3 steps)
+In ClassGamify, this module is the foundation for teacher-managed classroom
+materials: future activity audio, worksheet images, worksheet documents,
+spreadsheets, and similar files. Avatar upload is still supported through the
+same server function, but it is not the only storage consumer.
+
+## Enabling Storage
 
 1. **Create the R2 bucket** (once per environment):
 
@@ -31,64 +40,103 @@ The storage module provides file upload (and optional delete) using **Cloudflare
    storage: {
      enable: true,
      provider: 'r2',
-     maxFileSize: 4 * 1024 * 1024,  // optional, default 4MB
-     allowedTypes: ['.jpg', '.jpeg', '.png', '.webp'],  // optional
+     maxFileSize: 10 * 1024 * 1024, // optional, default 10MB
+     allowedTypes: ['.pdf', '.png', '.jpg', '.mp3'], // optional
+     userFilesFolder: 'userfiles',
    },
    ```
 
-   After this, the upload server function and avatar card are active. Returned file URLs use the same-origin proxy `/api/storage/file?key=...`.
+   After this, the upload server function, settings file manager, and avatar
+   card are active. Returned file URLs use the same-origin proxy
+   `/api/storage/file?key=...`.
 
-## Directory structure
+## Directory Structure
 
 ```
 src/storage/
-├── index.ts           # getR2Bucket, getStorageProvider, uploadFile, deleteFile, …
-├── types.ts           # StorageConfig (provider options), R2BucketInterface, UploadFileResult, errors
+├── constants.ts       # Default size, folder, and allowed-type settings
+├── file-materials.ts  # Classroom material kind classification
+├── index.ts           # getStorageProvider, uploadFile, deleteFile, getFile, …
+├── types.ts           # R2BucketInterface, UploadFileResult, errors
+├── utils.ts           # Folder and public-folder helpers
 └── provider/
-    └── r2.ts          # getR2Bucket(), R2Provider (upload, delete, download, list, …)
+    └── r2.ts          # R2Provider (upload, delete, download, list, …)
 ```
 
 ## Configuration
 
 - **websiteConfig.storage** (`src/config/website.ts`)
-  - `enable`: Whether storage is enabled. When false, the upload API and avatar card are disabled.
+  - `enable`: Whether storage is enabled. When false, the upload API, file
+    manager, and avatar upload card are disabled.
   - `provider`: `'r2'`.
-  - `maxFileSize`: Max file size in bytes (e.g. 4MB or 10MB). Used by upload validation and avatar card.
+  - `maxFileSize`: Max file size in bytes. The current default is 10MB.
   - `allowedTypes`: Allowed file extensions (e.g. `['.jpg', '.jpeg', '.png', '.webp']`).
-  - `userFilesFolder`: Parent folder for per-user files (e.g. `'userfiles'`); used by Settings → Files and upload API.
+  - `userFilesFolder`: Parent folder for per-user files (e.g. `'userfiles'`);
+    used by Settings → Files and upload API.
 
 - **wrangler.jsonc**
-  - `r2_buckets`: Bind the R2 bucket with `binding: "BUCKET"` (and `bucket_name`). `R2Provider` in `provider/r2.ts` reads `env.BUCKET` and is exported from `@/storage`.
+  - `r2_buckets`: Bind the R2 bucket with `binding: "BUCKET"` (and
+    `bucket_name`). `R2Provider` in `provider/r2.ts` reads `env.BUCKET` and is
+    exported from `@/storage`.
 
 Files are always served via the same-origin route `/api/storage/file?key=...`.
 
 ## Core API
 
 - **uploadFile(file, filename, contentType, folder?)** (server, in `@/storage`)
-  - Uploads to R2; returns `Promise<{ url, key }>`. Used by the `uploadUserFile` server function.
+  - Uploads to R2; returns `Promise<{ url, key, metadata? }>`. Used by the
+    `uploadUserFile` server function.
 
 - **deleteFile(key)** (server)
-  - Deletes the object from R2. Used by `deleteUserFile` server function (e.g. Settings → Files, avatar cleanup).
+  - Deletes the object from R2. Used by `deleteUserFile` server function (e.g.
+    Settings → Files).
 
-- **uploadUserFile** (server function, in `@/api/user-files`): Accepts `FormData` (file, optional folder, isPublic, description). Requires session via `authApiMiddleware`. Validates file size and type, uploads to R2, optionally inserts into `userFiles` table; returns `{ url, key }`. Used by `useUploadUserFile()` and `useUploadUserAvatar()`.
+- **uploadUserFile** (server function, in `@/api/user-files`): Accepts
+  `FormData` (file, optional folder, isPublic, description). Requires session
+  via `authApiMiddleware`. Validates file size, extension, and content type;
+  uploads to R2; inserts private user-scoped uploads into the `userFiles`
+  table; and returns `{ url, key }`. Used by `useUploadUserFile()` and
+  `useUploadUserAvatar()`.
 
-- **useUploadUserAvatar()** (client, in `@/hooks/use-user-files`): Mutation that uploads a public file with `folder: 'avatars'` via `uploadUserFile`; returns `{ url, key }`. Used by the avatar upload card.
+- **formatUserFileUploadError** (server/domain helper, in
+  `@/api/user-file-errors`): Converts structured storage error codes into
+  Paraglide messages before errors reach UI toasts.
 
-- **useUploadUserFile()** (client, in `@/hooks/use-user-files`): Mutation that uploads a user file via `uploadUserFile`; used by Settings → Files.
+- **resolveUserFileMaterialKind** (shared helper, in
+  `@/storage/file-materials`): Classifies saved files as audio, worksheet image,
+  worksheet document, spreadsheet, video, archive, data file, or file using
+  `contentType` plus filename-extension fallback.
+
+- **useUploadUserAvatar()** (client, in `@/hooks/use-user-files`): Mutation
+  that uploads a public file with `folder: 'avatars'` via `uploadUserFile`;
+  returns `{ url, key }`. Used by the avatar upload card.
+
+- **useUploadUserFile()** (client, in `@/hooks/use-user-files`): Mutation that
+  uploads a user file via `uploadUserFile`; used by Settings → Files.
 
 ## API routes
 
 - **GET /api/storage/file?key=...**
-  - Streams the object from R2. Keys are unguessable (e.g. `avatars/<uuid>.<ext>`). Private files require session and ownership check.
+  - Streams the object from R2. Private `userFiles` entries require session and
+    ownership check. Public shared folders such as `avatars` remain accessible
+    by key.
 
 Upload is implemented as a **server function** (`uploadUserFile` in `src/api/user-files.ts`), not an API route.
 
 ## Consumers
 
 - **Settings → Profile** (`UpdateAvatarCard`): When `websiteConfig.storage.enable` is true, the user can upload an avatar; the client uses `useUploadUserAvatar()` (which calls `uploadUserFile`) then updates `user.image` with the returned URL.
-- **Settings → Files**: List/delete/upload via server functions in `src/api/user-files.ts` (`listUserFiles`, `deleteUserFile`, `uploadUserFile`). Files are stored under `userFilesFolder`.
+- **Settings → Files**: List/delete/upload classroom materials via server
+  functions in `src/api/user-files.ts` (`listUserFiles`, `deleteUserFile`,
+  `uploadUserFile`). Files are stored under `userFilesFolder`; the table shows a
+  teacher-facing material type while preserving the raw content type for
+  troubleshooting.
 
 ## Notes
 
 - The R2 bucket is provided by the Worker binding only; no S3-style credentials or endpoint are used.
-- For avatar use, the returned URL is stored in `user.image` (Better Auth). There is no separate file-metadata table in this project.
+- Storage validation errors use stable codes in `src/storage/types.ts`; UI copy
+  comes from Paraglide messages at the API boundary.
+- For avatar use, the returned URL is stored in `user.image` (Better Auth).
+  User-scoped classroom files are tracked in the `userFiles` table so teachers
+  can list, delete, and review uploaded materials.

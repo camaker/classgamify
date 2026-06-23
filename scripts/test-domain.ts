@@ -591,6 +591,16 @@ assert.equal(
   }),
   'wav'
 );
+const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
+assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
+assert.match(storageModuleDocs, /file-materials\.ts/);
+assert.match(storageModuleDocs, /current default is 10MB/);
+assert.match(storageModuleDocs, /`userFiles`\s+table/);
+assert.doesNotMatch(
+  storageModuleDocs,
+  /It is used for avatar uploads \(Settings → Profile\) when enabled\.|default 4MB|There is no separate file-metadata table/,
+  'Storage docs should describe current ClassGamify classroom-file behavior.'
+);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
