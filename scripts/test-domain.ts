@@ -560,6 +560,20 @@ assert.doesNotMatch(
   /Please select a file|File is too large|File type not supported/,
   'Storage infrastructure should expose error codes, not user-facing copy.'
 );
+const updateAvatarCardSource = readFileSync(
+  'src/components/settings/profile/update-avatar-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  updateAvatarCardSource,
+  /File size exceeds the server limit/,
+  'Avatar upload size errors should come from locale messages.'
+);
+assert.match(
+  updateAvatarCardSource,
+  /settings_profile_avatar_file_size_error/,
+  'Avatar upload size errors should use the localized profile avatar message.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(

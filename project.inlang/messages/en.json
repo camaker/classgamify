@@ -1570,6 +1570,7 @@
   "settings_payment_timeout_description": "You can close this page and check your billing page for the result",
   "settings_payment_timeout_title": "Taking longer than usual",
   "settings_profile_avatar_description": "Upload a teacher avatar for your classroom workspace.",
+  "settings_profile_avatar_file_size_error": "File size exceeds the classroom file storage limit.",
   "settings_profile_avatar_fail": "Could not update your avatar. Please try again.",
   "settings_profile_avatar_hint": "An avatar is optional, but it helps students recognize the teacher workspace.",
   "settings_profile_avatar_success": "Avatar updated successfully",

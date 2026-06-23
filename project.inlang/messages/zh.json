@@ -1570,6 +1570,7 @@
   "settings_payment_timeout_description": "您可以关闭本页，稍后在账单页查看结果",
   "settings_payment_timeout_title": "处理时间较长",
   "settings_profile_avatar_description": "上传教师头像，用于你的课堂工作区。",
+  "settings_profile_avatar_file_size_error": "文件大小超过课堂文件存储上限。",
   "settings_profile_avatar_fail": "无法更新头像，请重试。",
   "settings_profile_avatar_hint": "头像是可选的，但能帮助学生识别教师工作区。",
   "settings_profile_avatar_success": "头像更新成功",
