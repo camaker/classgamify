@@ -87,13 +87,17 @@ import {
 } from '@/activities/material-references';
 import {
   activityEditPageCopy,
+  assertActivityCanArchive,
   assertActivityCanEdit,
   assertActivityCanDeriveWork,
+  assertActivityCanRestore,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
   buildActivityLifecycleActionView,
+  canArchiveActivity,
   canEditActivity,
   canDeriveActivityWork,
+  canRestoreActivity,
   getArchivedActivityDerivationError,
   getActivityLifecycleActionCopy,
   isActivityArchived,
@@ -4448,6 +4452,31 @@ assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
 assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+assert.equal(canArchiveActivity('draft'), true);
+assert.equal(canArchiveActivity('archived'), false);
+assert.equal(canRestoreActivity('archived'), true);
+assert.equal(canRestoreActivity('draft'), false);
+assert.doesNotThrow(() => assertActivityCanArchive('private'));
+assert.throws(
+  () => assertActivityCanArchive('archived'),
+  /This activity is already archived\./
+);
+assert.doesNotThrow(() => assertActivityCanRestore('archived'));
+assert.throws(
+  () => assertActivityCanRestore('draft'),
+  /Only archived activities can be restored\./
+);
+const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
+assert.match(
+  activitiesApiSource,
+  /assertActivityCanArchive\(row\.visibility\)/,
+  'Archive activity API should enforce the activity lifecycle transition server-side.'
+);
+assert.match(
+  activitiesApiSource,
+  /assertActivityCanRestore\(row\.visibility\)/,
+  'Restore activity API should enforce the activity lifecycle transition server-side.'
+);
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),

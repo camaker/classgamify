@@ -85,6 +85,14 @@ export function canEditActivity(visibility: ActivityVisibility) {
   return !isActivityArchived(visibility);
 }
 
+export function canArchiveActivity(visibility: ActivityVisibility) {
+  return !isActivityArchived(visibility);
+}
+
+export function canRestoreActivity(visibility: ActivityVisibility) {
+  return isActivityArchived(visibility);
+}
+
 export function buildActivityDerivativeActionGate({
   action,
   visibility,
@@ -179,5 +187,17 @@ export function assertActivityCanDeriveWork(visibility: ActivityVisibility) {
 export function assertActivityCanEdit(visibility: ActivityVisibility) {
   if (!canEditActivity(visibility)) {
     throw new Error(activityEditAccessCopy.archived.description);
+  }
+}
+
+export function assertActivityCanArchive(visibility: ActivityVisibility) {
+  if (!canArchiveActivity(visibility)) {
+    throw new Error(m.activity_lifecycle_archive_blocked());
+  }
+}
+
+export function assertActivityCanRestore(visibility: ActivityVisibility) {
+  if (!canRestoreActivity(visibility)) {
+    throw new Error(m.activity_lifecycle_restore_blocked());
   }
 }

@@ -14,6 +14,8 @@ import { summarizeActivityLibrary } from '@/activities/library-summary';
 import {
   assertActivityCanDeriveWork,
   assertActivityCanEdit,
+  assertActivityCanArchive,
+  assertActivityCanRestore,
 } from '@/activities/lifecycle';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
@@ -328,9 +330,10 @@ export const archiveActivity = createServerFn({ method: 'POST' })
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) =>
     updateActivityVisibility({
+      action: 'archive',
       activityId: data.activityId,
       ownerId: context.userId,
-      visibility: 'archived',
+      nextVisibility: 'archived',
     })
   );
 
@@ -341,30 +344,25 @@ export const restoreActivity = createServerFn({ method: 'POST' })
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) =>
     updateActivityVisibility({
+      action: 'restore',
       activityId: data.activityId,
       ownerId: context.userId,
-      visibility: 'draft',
+      nextVisibility: 'draft',
     })
   );
 
 async function updateActivityVisibility({
+  action,
   activityId,
+  nextVisibility,
   ownerId,
-  visibility,
 }: {
+  action: 'archive' | 'restore';
   activityId: string;
+  nextVisibility: z.infer<typeof activityPersistedVisibilitySchema>;
   ownerId: string;
-  visibility: z.infer<typeof activityPersistedVisibilitySchema>;
 }) {
   const db = getDb();
-  await db
-    .update(activity)
-    .set({
-      updatedAt: new Date(),
-      visibility,
-    })
-    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)));
-
   const [row] = await db
     .select()
     .from(activity)
@@ -375,5 +373,30 @@ async function updateActivityVisibility({
     throw new Error(m.activity_api_error_activity_not_found());
   }
 
-  return row;
+  if (action === 'archive') {
+    assertActivityCanArchive(row.visibility);
+  } else {
+    assertActivityCanRestore(row.visibility);
+  }
+
+  const updatedAt = new Date();
+  await db
+    .update(activity)
+    .set({
+      updatedAt,
+      visibility: nextVisibility,
+    })
+    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)));
+
+  const [updatedRow] = await db
+    .select()
+    .from(activity)
+    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)))
+    .limit(1);
+
+  if (!updatedRow) {
+    throw new Error(m.activity_api_error_activity_not_found());
+  }
+
+  return updatedRow;
 }
