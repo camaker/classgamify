@@ -99,7 +99,7 @@ export function BillingCard() {
         </CardHeader>
         <CardContent className="space-y-4 flex-1">
           <div className="text-destructive text-sm">
-            {loadPaymentError?.message}
+            {m.settings_billing_card_load_error()}
           </div>
         </CardContent>
         <CardFooter className={footerClass}>

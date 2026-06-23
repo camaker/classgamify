@@ -853,6 +853,20 @@ assert.match(
   /toast\.error\(m\.settings_notification_newsletter_error\(\)\)/,
   'Newsletter settings toast failures should show the localized settings failure message.'
 );
+const billingCardSource = readFileSync(
+  'src/components/settings/billing/billing-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  billingCardSource,
+  /loadPaymentError\?\.message|loadPaymentError\.message|err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Billing status failures should use localized billing copy instead of raw payment or network errors.'
+);
+assert.match(
+  billingCardSource,
+  /m\.settings_billing_card_load_error\(\)/,
+  'Billing status failures should show the localized billing load failure message.'
+);
 const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
 assert.doesNotMatch(
   newsletterApiSource,
