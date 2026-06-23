@@ -30,7 +30,6 @@ import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
-import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as PlayShareIdRouteImport } from './routes/play/$shareId'
 import { Route as DashboardAssignmentsRouteImport } from './routes/dashboard/assignments'
 import { Route as DashboardActivitiesRouteImport } from './routes/dashboard/activities'
@@ -163,11 +162,6 @@ const SettingsFilesRoute = SettingsFilesRouteImport.update({
 const SettingsBillingRoute = SettingsBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
-  id: '/apikeys',
-  path: '/apikeys',
   getParentRoute: () => SettingsRoute,
 } as any)
 const PlayShareIdRoute = PlayShareIdRouteImport.update({
@@ -345,7 +339,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/play/$shareId': typeof PlayShareIdRoute
-  '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -394,7 +387,6 @@ export interface FileRoutesByTo {
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/play/$shareId': typeof PlayShareIdRoute
-  '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -447,7 +439,6 @@ export interface FileRoutesById {
   '/dashboard/activities': typeof DashboardActivitiesRouteWithChildren
   '/dashboard/assignments': typeof DashboardAssignmentsRouteWithChildren
   '/play/$shareId': typeof PlayShareIdRoute
-  '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -501,7 +492,6 @@ export interface FileRouteTypes {
     | '/dashboard/activities'
     | '/dashboard/assignments'
     | '/play/$shareId'
-    | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
@@ -550,7 +540,6 @@ export interface FileRouteTypes {
     | '/dashboard/activities'
     | '/dashboard/assignments'
     | '/play/$shareId'
-    | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
@@ -602,7 +591,6 @@ export interface FileRouteTypes {
     | '/dashboard/activities'
     | '/dashboard/assignments'
     | '/play/$shareId'
-    | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
@@ -803,13 +791,6 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/settings/billing'
       preLoaderRoute: typeof SettingsBillingRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/apikeys': {
-      id: '/settings/apikeys'
-      path: '/apikeys'
-      fullPath: '/settings/apikeys'
-      preLoaderRoute: typeof SettingsApikeysRouteImport
       parentRoute: typeof SettingsRoute
     }
     '/play/$shareId': {
@@ -1080,7 +1061,6 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 )
 
 interface SettingsRouteChildren {
-  SettingsApikeysRoute: typeof SettingsApikeysRoute
   SettingsBillingRoute: typeof SettingsBillingRoute
   SettingsFilesRoute: typeof SettingsFilesRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
@@ -1091,7 +1071,6 @@ interface SettingsRouteChildren {
 }
 
 const SettingsRouteChildren: SettingsRouteChildren = {
-  SettingsApikeysRoute: SettingsApikeysRoute,
   SettingsBillingRoute: SettingsBillingRoute,
   SettingsFilesRoute: SettingsFilesRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,

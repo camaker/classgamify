@@ -842,10 +842,6 @@ const settingsNotificationsRouteSource = readFileSync(
   'src/routes/settings/notifications.tsx',
   'utf8'
 );
-const settingsApiKeysRouteSource = readFileSync(
-  'src/routes/settings/apikeys.tsx',
-  'utf8'
-);
 const protectedPagesSpecSource = readFileSync(
   'tests/e2e/specs/protected-pages.spec.ts',
   'utf8'
@@ -881,11 +877,6 @@ assert.doesNotMatch(
   /SettingsApiKeys/,
   'Retired API key settings should not stay in public route constants.'
 );
-assert.doesNotMatch(
-  settingsApiKeysRouteSource,
-  /ApiKeysPageContent|DashboardLayout|settings_api_keys/,
-  'Retired API key settings route should not import or render its template UI.'
-);
 const retiredRouteDocumentationText = [
   'docs/locale.md',
   'docs/newsletter.md',
@@ -915,6 +906,11 @@ assert.doesNotMatch(
   localeMessageText,
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
+);
+assert.equal(
+  existsSync('src/routes/settings/apikeys.tsx'),
+  false,
+  'Retired API key settings route should stay unmounted.'
 );
 assert.equal(
   existsSync('src/components/settings/apikeys/apikeys-page-content.tsx'),
