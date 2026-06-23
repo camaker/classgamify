@@ -2,6 +2,7 @@ import type { AssignmentStatus } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDate = Date | string | null | undefined;
+export type AssignmentLifecycleStatus = 'closed' | 'draft' | 'expired' | 'open';
 export type ManagedAssignmentStatus = Extract<
   AssignmentStatus,
   'closed' | 'published'
@@ -37,7 +38,35 @@ export function isAssignmentOpen(
   expiresAt: AssignmentDate,
   now = Date.now()
 ) {
-  return status === 'published' && !isAssignmentExpired(expiresAt, now);
+  return getAssignmentLifecycleStatus(status, expiresAt, now) === 'open';
+}
+
+export function getAssignmentLifecycleStatus(
+  status: AssignmentStatus | string,
+  expiresAt: AssignmentDate,
+  now = Date.now()
+): AssignmentLifecycleStatus {
+  if (status === 'published') {
+    return isAssignmentExpired(expiresAt, now) ? 'expired' : 'open';
+  }
+
+  if (status === 'closed') return 'closed';
+
+  return 'draft';
+}
+
+export function matchesAssignmentLifecycleStatus({
+  expiresAt,
+  filter,
+  now = Date.now(),
+  status,
+}: {
+  expiresAt: AssignmentDate;
+  filter: AssignmentLifecycleStatus;
+  now?: number;
+  status: AssignmentStatus | string;
+}) {
+  return getAssignmentLifecycleStatus(status, expiresAt, now) === filter;
 }
 
 export function getAssignmentStatusLabel(
@@ -45,11 +74,12 @@ export function getAssignmentStatusLabel(
   expiresAt: AssignmentDate,
   now = Date.now()
 ) {
-  if (status === 'published' && isAssignmentExpired(expiresAt, now)) {
-    return m.assignment_status_label_expired();
-  }
-  if (status === 'published') return m.assignment_status_label_open();
-  if (status === 'closed') return m.assignment_status_label_closed();
+  const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
+
+  if (lifecycleStatus === 'expired') return m.assignment_status_label_expired();
+  if (lifecycleStatus === 'open') return m.assignment_status_label_open();
+  if (lifecycleStatus === 'closed') return m.assignment_status_label_closed();
+
   return m.assignment_status_label_draft();
 }
 

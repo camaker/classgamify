@@ -224,7 +224,11 @@ import {
 import {
   assertAssignmentStatusTransition,
   buildAssignmentStatusAction,
+  getAssignmentLifecycleStatus,
   getAssignmentStatusActionCopy,
+  getAssignmentStatusLabel,
+  isAssignmentOpen,
+  matchesAssignmentLifecycleStatus,
 } from '@/assignments/lifecycle';
 import {
   orderAssignmentRuntimeItems,
@@ -2120,6 +2124,85 @@ assert.deepEqual(getAssignmentStatusActionCopy('published'), {
   label: 'Reopen link',
   successMessage: 'Assignment link reopened.',
 });
+const assignmentLifecycleNow = new Date('2026-01-01T10:00:00.000Z').getTime();
+assert.equal(
+  getAssignmentLifecycleStatus(
+    'published',
+    new Date('2026-01-01T10:00:01.000Z'),
+    assignmentLifecycleNow
+  ),
+  'open'
+);
+assert.equal(
+  getAssignmentLifecycleStatus(
+    'published',
+    new Date('2026-01-01T10:00:00.000Z'),
+    assignmentLifecycleNow
+  ),
+  'expired'
+);
+assert.equal(
+  getAssignmentLifecycleStatus(
+    'published',
+    'not-a-date',
+    assignmentLifecycleNow
+  ),
+  'open'
+);
+assert.equal(
+  getAssignmentLifecycleStatus('closed', null, assignmentLifecycleNow),
+  'closed'
+);
+assert.equal(
+  getAssignmentLifecycleStatus('draft', null, assignmentLifecycleNow),
+  'draft'
+);
+assert.equal(
+  getAssignmentLifecycleStatus('legacy-status', null, assignmentLifecycleNow),
+  'draft'
+);
+assert.equal(
+  getAssignmentStatusLabel(
+    'published',
+    new Date('2026-01-01T10:00:00.000Z'),
+    assignmentLifecycleNow
+  ),
+  'Expired'
+);
+assert.equal(
+  isAssignmentOpen(
+    'published',
+    new Date('2026-01-01T10:00:01.000Z'),
+    assignmentLifecycleNow
+  ),
+  true
+);
+assert.equal(
+  isAssignmentOpen(
+    'published',
+    new Date('2026-01-01T10:00:00.000Z'),
+    assignmentLifecycleNow
+  ),
+  false
+);
+assert.equal(
+  matchesAssignmentLifecycleStatus({
+    expiresAt: new Date('2026-01-01T10:00:00.000Z'),
+    filter: 'expired',
+    now: assignmentLifecycleNow,
+    status: 'published',
+  }),
+  true
+);
+assert.equal(
+  matchesAssignmentLifecycleStatus({
+    expiresAt: null,
+    filter: 'open',
+    now: assignmentLifecycleNow,
+    status: 'closed',
+  }),
+  false
+);
 assert.deepEqual(
   buildAssignmentStatusAction({
     currentStatus: 'published',

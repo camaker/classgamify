@@ -1,10 +1,7 @@
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import type { AssignmentLifecycleStatus } from '@/assignments/lifecycle';
 
-export type AssignmentLifecycleStatusFilter =
-  | 'closed'
-  | 'draft'
-  | 'expired'
-  | 'open';
+export type AssignmentLifecycleStatusFilter = AssignmentLifecycleStatus;
 export type AssignmentStatusFilter = 'all' | AssignmentLifecycleStatusFilter;
 
 type AssignmentListSearchState = {

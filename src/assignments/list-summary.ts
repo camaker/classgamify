@@ -4,7 +4,10 @@ import {
   type AssignmentAttemptStatsSource,
 } from '@/assignments/attempt-stats';
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
-import { type AssignmentDate, isAssignmentOpen } from '@/assignments/lifecycle';
+import {
+  type AssignmentDate,
+  matchesAssignmentLifecycleStatus,
+} from '@/assignments/lifecycle';
 import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
@@ -49,7 +52,12 @@ export function buildAssignmentListSummary({
     averageScore: stats.averageScore,
     completions: stats.completions,
     openAssignments: assignments.filter((item) =>
-      isAssignmentOpen(item.status, item.expiresAt, now)
+      matchesAssignmentLifecycleStatus({
+        expiresAt: item.expiresAt,
+        filter: 'open',
+        now,
+        status: item.status,
+      })
     ).length,
     totalAssignments,
   };
