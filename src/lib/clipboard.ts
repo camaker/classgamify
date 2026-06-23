@@ -7,9 +7,16 @@ export async function copyTextToClipboard(value: string) {
   copyTextWithTextarea(value);
 }
 
+class ClipboardCopyError extends Error {
+  constructor() {
+    super();
+    this.name = 'ClipboardCopyError';
+  }
+}
+
 function copyTextWithTextarea(value: string) {
   if (typeof document === 'undefined') {
-    throw new Error('Clipboard is not available.');
+    throw new ClipboardCopyError();
   }
 
   const textarea = document.createElement('textarea');
@@ -21,9 +28,14 @@ function copyTextWithTextarea(value: string) {
   document.body.appendChild(textarea);
   textarea.select();
 
+  let copied = false;
   try {
-    document.execCommand('copy');
+    copied = document.execCommand('copy');
   } finally {
     document.body.removeChild(textarea);
+  }
+
+  if (!copied) {
+    throw new ClipboardCopyError();
   }
 }

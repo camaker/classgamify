@@ -648,6 +648,17 @@ assert.match(
   /toast\.error\(actionButton\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
 );
+const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
+assert.match(
+  clipboardSource,
+  /let copied = false;[\s\S]*copied = document\.execCommand\('copy'\);/,
+  'Clipboard textarea fallback should inspect whether execCommand actually copied.'
+);
+assert.match(
+  clipboardSource,
+  /if \(!copied\) {[\s\S]*throw new ClipboardCopyError\(\);[\s\S]*}/,
+  'Clipboard textarea fallback should fail instead of reporting a silent copy success.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(
