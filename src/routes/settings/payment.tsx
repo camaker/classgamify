@@ -11,7 +11,7 @@ import { websiteConfig } from '@/config/website';
 
 export const Route = createFileRoute('/settings/payment')({
   beforeLoad: () => {
-    if (websiteConfig.payment?.enable === false) {
+    if (websiteConfig.payment?.enable !== true) {
       throw notFound({ routeId: rootRouteId });
     }
   },

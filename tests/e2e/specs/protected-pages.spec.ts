@@ -20,11 +20,7 @@ const protectedPages = [
   { path: '/admin/users', name: 'admin users' },
   { path: '/settings/profile', name: 'profile settings' },
   { path: '/settings/security', name: 'security settings' },
-  { path: '/settings/apikeys', name: 'api keys settings' },
   { path: '/settings/files', name: 'files settings' },
-  { path: '/settings/billing', name: 'billing settings' },
-  { path: '/settings/payment', name: 'payment result' },
-  { path: '/settings/notifications', name: 'notification settings' },
 ] as const;
 
 const smokeMatrix: Array<{ locale: LocaleMode; theme: ThemeMode }> = [

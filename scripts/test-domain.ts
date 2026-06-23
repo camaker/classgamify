@@ -651,14 +651,47 @@ const settingsFilesRouteSource = readFileSync(
   'src/routes/settings/files.tsx',
   'utf8'
 );
+const settingsBillingRouteSource = readFileSync(
+  'src/routes/settings/billing.tsx',
+  'utf8'
+);
+const settingsPaymentRouteSource = readFileSync(
+  'src/routes/settings/payment.tsx',
+  'utf8'
+);
+const settingsNotificationsRouteSource = readFileSync(
+  'src/routes/settings/notifications.tsx',
+  'utf8'
+);
+const protectedPagesSpecSource = readFileSync(
+  'tests/e2e/specs/protected-pages.spec.ts',
+  'utf8'
+);
 assert.match(
   settingsFilesRouteSource,
   /websiteConfig\.storage\?\.enable !== true/
+);
+assert.match(
+  settingsBillingRouteSource,
+  /websiteConfig\.payment\?\.enable !== true/
+);
+assert.match(
+  settingsPaymentRouteSource,
+  /websiteConfig\.payment\?\.enable !== true/
+);
+assert.match(
+  settingsNotificationsRouteSource,
+  /websiteConfig\.newsletter\?\.enable !== true/
 );
 assert.doesNotMatch(
   settingsFilesRouteSource,
   /beforeLoad:\s*\(\)\s*=>\s*\{\s*throw notFound/s,
   'Settings files route should only be hidden when storage is disabled.'
+);
+assert.doesNotMatch(
+  protectedPagesSpecSource,
+  /\/settings\/(?:apikeys|billing|payment|notifications)/,
+  'Protected smoke tests should only require active default settings pages.'
 );
 const retiredRouteDocumentationText = [
   'docs/locale.md',

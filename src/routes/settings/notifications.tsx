@@ -6,7 +6,7 @@ import { createFileRoute, notFound, rootRouteId } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/settings/notifications')({
   beforeLoad: () => {
-    if (websiteConfig.newsletter?.enable === false) {
+    if (websiteConfig.newsletter?.enable !== true) {
       throw notFound({ routeId: rootRouteId });
     }
   },
