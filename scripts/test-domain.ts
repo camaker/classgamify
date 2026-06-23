@@ -728,6 +728,20 @@ assert.match(
   /toast\.error\(m\.activity_form_toast_save_failed\(\)\)/,
   'Activity save failures should use the localized save failure message.'
 );
+const contactFormCardSource = readFileSync(
+  'src/components/contact/contact-form-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  contactFormCardSource,
+  /err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Contact form failures should use localized contact copy instead of raw API or mail errors.'
+);
+assert.match(
+  contactFormCardSource,
+  /const msg = m\.contact_error\(\);/,
+  'Contact form failures should show the localized contact failure message.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,

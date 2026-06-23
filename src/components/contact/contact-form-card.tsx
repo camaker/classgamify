@@ -96,8 +96,8 @@ export function ContactFormCard({
         message: defaultMessage,
         name: '',
       });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : m.contact_error();
+    } catch {
+      const msg = m.contact_error();
       setError(msg);
       toast.error(msg);
     }
