@@ -158,6 +158,7 @@ import {
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
   getUniqueRuntimeChoices,
+  isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import {
   buildAssignmentDeliverySummary,
@@ -878,6 +879,10 @@ assert.equal(
   findChoiceOwner({ 'item-1': ' Ｐａｒｉｓ ', 'item-2': 'Rome' }, 'paris'),
   'item-1'
 );
+assert.equal(isSameRuntimeChoice(' Ｆｒｕｉｔ ', 'fruit'), true);
+assert.equal(isSameRuntimeChoice('New   York', ' new york '), true);
+assert.equal(isSameRuntimeChoice('', 'fruit'), false);
+assert.equal(isSameRuntimeChoice('Fruit', 'Drink'), false);
 assert.deepEqual(
   buildExclusiveChoiceAnswerChanges({
     answers: { 'item-1': 'Paris' },
@@ -3194,6 +3199,47 @@ assert.equal(
 );
 assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
+const groupSortRunnerView = buildStudentRunnerView({
+  answers: {
+    'group-drink-water': 'drink',
+    'group-fruit-apple': ' Ｆｒｕｉｔ ',
+  },
+  items: [
+    {
+      choices: ['Fruit', 'Drink'],
+      id: 'group-fruit-apple',
+      kind: 'group-item',
+      prompt: 'Apple',
+    },
+    {
+      choices: ['Fruit', 'Drink'],
+      id: 'group-drink-water',
+      kind: 'group-item',
+      prompt: 'Water',
+    },
+    {
+      choices: ['Fruit', 'Drink'],
+      id: 'group-fruit-pear',
+      kind: 'group-item',
+      prompt: 'Pear',
+    },
+  ],
+  progressVerb: 'sorted',
+});
+assert.equal(groupSortRunnerView.progressLabel, '2/3 sorted');
+assert.deepEqual(groupSortRunnerView.choices, ['Fruit', 'Drink']);
+assert.deepEqual(
+  groupSortRunnerView.itemViews
+    .filter((itemView) => isSameRuntimeChoice(itemView.answer, 'Fruit'))
+    .map((itemView) => itemView.item.id),
+  ['group-fruit-apple']
+);
+assert.deepEqual(
+  groupSortRunnerView.itemViews
+    .filter((itemView) => isSameRuntimeChoice(itemView.answer, 'Drink'))
+    .map((itemView) => itemView.item.id),
+  ['group-drink-water']
+);
 assert.deepEqual(
   buildPublicAttemptReviewItems({
     answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],

@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildStudentRunnerView,
+  isSameRuntimeChoice,
+} from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -123,8 +126,8 @@ export function GroupSortBoard({
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {runnerView.choices.map((group) => {
-            const placedItemViews = runnerView.itemViews.filter(
-              (itemView) => itemView.answer === group
+            const placedItemViews = runnerView.itemViews.filter((itemView) =>
+              isSameRuntimeChoice(itemView.answer, group)
             );
 
             return (

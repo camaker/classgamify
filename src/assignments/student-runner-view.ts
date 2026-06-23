@@ -214,9 +214,19 @@ export function findChoiceOwner(answers: StudentAnswerMap, choice: string) {
   const choiceKey = getRuntimeChoiceKey(choice);
   if (!choiceKey) return undefined;
 
-  return Object.entries(answers).find(
-    ([, answer]) => getRuntimeChoiceKey(answer) === choiceKey
+  return Object.entries(answers).find(([, answer]) =>
+    isSameRuntimeChoice(answer, choice)
   )?.[0];
+}
+
+export function isSameRuntimeChoice(
+  left: string | undefined,
+  right: string | undefined
+) {
+  const leftKey = getRuntimeChoiceKey(left);
+  if (!leftKey) return false;
+
+  return leftKey === getRuntimeChoiceKey(right);
 }
 
 export function buildRuntimeChoiceViews({
@@ -231,8 +241,7 @@ export function buildRuntimeChoiceViews({
   return choices.map((choice) => ({
     choice,
     selected: selectedItemId
-      ? getRuntimeChoiceKey(answers[selectedItemId]) ===
-        getRuntimeChoiceKey(choice)
+      ? isSameRuntimeChoice(answers[selectedItemId], choice)
       : false,
     usedByItemId: findChoiceOwner(answers, choice),
   }));
