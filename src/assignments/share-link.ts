@@ -18,7 +18,7 @@ export function buildAssignmentSharePath(shareSlug: string) {
 }
 
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
-  const origin = normalizeShareBaseUrl(baseUrl ?? getRuntimeBaseUrl());
+  const origin = normalizeShareBaseUrl(baseUrl ?? '') || getRuntimeBaseUrl();
   return `${origin}${buildAssignmentSharePath(shareSlug)}`;
 }
 

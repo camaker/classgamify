@@ -1819,6 +1819,10 @@ assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
   'https://classgamify.test/play/abc%20123'
 );
+assert.equal(
+  buildAssignmentShareUrl('abc 123', '   '),
+  buildAssignmentShareUrl('abc 123')
+);
 assert.deepEqual(assignmentShareLinkActionCopy, {
   copyLabel: 'Copy link',
   failureMessage: 'Student link could not be copied.',
