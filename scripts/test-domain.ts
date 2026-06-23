@@ -584,6 +584,36 @@ assert.match(
   /settings_profile_avatar_upload_not_configured/,
   'Avatar settings should use the localized storage-not-configured label.'
 );
+const adminUserDetailViewerSource = readFileSync(
+  'src/components/admin/users/user-detail-viewer.tsx',
+  'utf8'
+);
+const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
+assert.doesNotMatch(
+  adminUserDetailViewerSource,
+  /User ID is required/,
+  'Admin user detail errors should use localized copy instead of hard-coded English.'
+);
+assert.match(
+  adminUserDetailViewerSource,
+  /admin_users_user_id_required/,
+  'Admin user detail missing-id errors should use the localized admin message.'
+);
+assert.doesNotMatch(
+  useAuthSource,
+  /User ID is required|Failed to fetch user accounts/,
+  'Client auth hook errors should use localized security messages instead of hard-coded English.'
+);
+assert.match(
+  useAuthSource,
+  /settings_security_user_accounts_missing_user/,
+  'Client auth hook missing-user errors should use localized security copy.'
+);
+assert.match(
+  useAuthSource,
+  /settings_security_user_accounts_fetch_error/,
+  'Client auth hook account fetch errors should use localized security copy.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(
