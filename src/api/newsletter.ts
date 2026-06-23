@@ -22,9 +22,7 @@ export const getNewsletterStatus = createServerFn({ method: 'GET' })
       return { subscribed };
     } catch (error) {
       console.error('Check newsletter status error:', error);
-      throw new Error(
-        error instanceof Error ? error.message : m.newsletter_error_generic()
-      );
+      throw new Error(m.newsletter_error_generic());
     }
   });
 
@@ -52,9 +50,7 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
       }
     } catch (error) {
       console.error('Subscribe newsletter error:', error);
-      throw new Error(
-        error instanceof Error ? error.message : m.newsletter_error_generic()
-      );
+      throw new Error(m.newsletter_error());
     }
   });
 
@@ -69,8 +65,6 @@ export const unsubscribeNewsletter = createServerFn({ method: 'POST' })
       }
     } catch (error) {
       console.error('Unsubscribe newsletter error:', error);
-      throw new Error(
-        error instanceof Error ? error.message : m.newsletter_error_generic()
-      );
+      throw new Error(m.newsletter_error_unsubscribe());
     }
   });

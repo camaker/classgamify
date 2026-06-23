@@ -49,6 +49,10 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
     resolver: zodResolver(formSchema),
     defaultValues: { subscribed: false },
   });
+  const newsletterErrorMessage =
+    statusError || subscribeMutation.error || unsubscribeMutation.error
+      ? m.settings_notification_newsletter_error()
+      : undefined;
   useEffect(() => {
     if (newsletterStatus)
       form.setValue('subscribed', newsletterStatus.subscribed);
@@ -69,11 +73,7 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
       }
     } catch (err) {
       console.error('newsletter subscription error:', err);
-      const msg =
-        err instanceof Error
-          ? err.message
-          : m.settings_notification_newsletter_error();
-      toast.error(msg);
+      toast.error(m.settings_notification_newsletter_error());
       form.setValue('subscribed', newsletterStatus?.subscribed ?? false);
     }
   };
@@ -122,13 +122,7 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
                 </FormItem>
               )}
             />
-            <FormError
-              message={
-                statusError?.message ??
-                subscribeMutation.error?.message ??
-                unsubscribeMutation.error?.message
-              }
-            />
+            <FormError message={newsletterErrorMessage} />
           </CardContent>
           <CardFooter className="mt-6 px-6 py-4 bg-muted rounded-none">
             <p className="text-sm text-muted-foreground">

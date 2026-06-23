@@ -809,6 +809,46 @@ assert.match(
   /const msg = m\.contact_error\(\);/,
   'Contact form failures should show the localized contact failure message.'
 );
+const newsletterFormCardSource = readFileSync(
+  'src/components/settings/notification/newsletter-form-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  newsletterFormCardSource,
+  /err\.message|error\.message|statusError\?\.message|subscribeMutation\.error\?\.message|unsubscribeMutation\.error\?\.message|err instanceof Error|error instanceof Error/,
+  'Newsletter settings failures should use localized notification copy instead of raw status or mutation errors.'
+);
+assert.match(
+  newsletterFormCardSource,
+  /const newsletterErrorMessage =[\s\S]*m\.settings_notification_newsletter_error\(\)/,
+  'Newsletter settings inline errors should show the localized settings failure message.'
+);
+assert.match(
+  newsletterFormCardSource,
+  /toast\.error\(m\.settings_notification_newsletter_error\(\)\)/,
+  'Newsletter settings toast failures should show the localized settings failure message.'
+);
+const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
+assert.doesNotMatch(
+  newsletterApiSource,
+  /error instanceof Error \? error\.message|throw new Error\(\s*error\.message/,
+  'Newsletter server functions should not expose raw provider errors to clients.'
+);
+assert.match(
+  newsletterApiSource,
+  /throw new Error\(m\.newsletter_error_generic\(\)\);/,
+  'Newsletter status failures should use the localized generic failure message.'
+);
+assert.match(
+  newsletterApiSource,
+  /throw new Error\(m\.newsletter_error\(\)\);/,
+  'Newsletter subscribe failures should use the localized subscribe failure message.'
+);
+assert.match(
+  newsletterApiSource,
+  /throw new Error\(m\.newsletter_error_unsubscribe\(\)\);/,
+  'Newsletter unsubscribe failures should use the localized unsubscribe failure message.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,
