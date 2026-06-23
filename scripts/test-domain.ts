@@ -659,6 +659,20 @@ assert.match(
   /if \(!copied\) {[\s\S]*throw new ClipboardCopyError\(\);[\s\S]*}/,
   'Clipboard textarea fallback should fail instead of reporting a silent copy success.'
 );
+const filesPageContentSource = readFileSync(
+  'src/components/settings/files/files-page-content.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  filesPageContentSource,
+  /err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Classroom material upload failures should use localized settings copy instead of raw storage errors.'
+);
+assert.match(
+  filesPageContentSource,
+  /toast\.error\(m\.settings_files_upload_error\(\)\)/,
+  'Classroom material upload failures should show the localized upload failure message.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(

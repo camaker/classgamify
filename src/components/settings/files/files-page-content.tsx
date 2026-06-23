@@ -25,7 +25,7 @@ export function FilesPageContent() {
           resolve();
         },
         onError: (err) => {
-          toast.error(err.message || m.settings_files_upload_error());
+          toast.error(m.settings_files_upload_error());
           reject(err);
         },
       });
