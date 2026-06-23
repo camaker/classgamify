@@ -228,9 +228,10 @@ function formatCsvCell(value: unknown) {
 
 function slugifyFilename(value: string) {
   const slug = value
+    .normalize('NFKC')
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
   return slug || m.assignment_results_export_filename_fallback_assignment();
 }

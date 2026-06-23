@@ -8596,6 +8596,16 @@ assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
   'classgamify-capital-review-week-1-results.csv'
 );
+assert.equal(
+  buildAssignmentResultsCsvFilename({
+    ...csvExportData,
+    assignment: {
+      ...csvExportData.assignment,
+      title: '三年级｜听力复习 Ａ 班',
+    },
+  }),
+  'classgamify-三年级-听力复习-a-班-results.csv'
+);
 const partialSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   assignment: {
