@@ -11,6 +11,7 @@ import type {
 } from '@/assignments/delivery-summary';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { buildAttemptTimerState } from '@/assignments/attempt-duration';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
 import {
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
@@ -80,7 +81,7 @@ export const Route = createFileRoute('/play/$shareId')({
   head: ({ params }) => {
     const runnerCopy = getStudentRunnerCopy();
 
-    return seo(`/play/${params.shareId}`, {
+    return seo(buildAssignmentSharePath(params.shareId), {
       title: `${runnerCopy.seoTitlePrefix} | ${websiteConfig.metadata?.name}`,
       description: runnerCopy.seoDescription,
       robots: 'noindex,follow',

@@ -1093,9 +1093,17 @@ assert.equal(
   Routes.PlayDemo,
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
 );
+const playRouteSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
+assert.match(playRouteSource, /robots: 'noindex,follow'/);
 assert.match(
-  readFileSync('src/routes/play/$shareId.tsx', 'utf8'),
-  /robots: 'noindex,follow'/
+  playRouteSource,
+  /seo\(buildAssignmentSharePath\(params\.shareId\),/,
+  'Student play route SEO path should use the assignment share-path helper.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /seo\(`\/play\/\$\{params\.shareId\}`/,
+  'Student play route should not hand-build share paths in route metadata.'
 );
 
 assert.equal(isStudentAnswerFilled(undefined), false);
