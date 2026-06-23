@@ -6559,7 +6559,7 @@ const multilingualGroupItems = getRuntimeItems(
 );
 assert.deepEqual(
   multilingualGroupItems.map((item) => item.id),
-  ['g-1-item-1', 'g-1-item-2', 'g-2-item-1', 'g-2-item-2']
+  ['g-水果-苹果', 'g-水果-香蕉', 'g-饮品-牛奶', 'g-饮品-水']
 );
 assert.notEqual(multilingualGroupItems[0]?.id, multilingualGroupItems[1]?.id);
 assert.notEqual(multilingualGroupItems[2]?.id, multilingualGroupItems[3]?.id);
@@ -6633,11 +6633,16 @@ assert.deepEqual(
   ),
   ['苹果', '香蕉', '牛奶', '水']
 );
+assert.equal(fullwidthRowSeparatorContent.questions[0]?.id, 'q-苹果是什么');
 const chinesePunctuationGroupItems = getRuntimeItems(
   'group-sort',
   chinesePunctuationContent
 );
 assert.equal(chinesePunctuationGroupItems.length, 4);
+assert.deepEqual(
+  chinesePunctuationGroupItems.map((item) => item.id),
+  ['g-水果-苹果', 'g-水果-香蕉', 'g-饮品-牛奶', 'g-饮品-水']
+);
 assert.equal(
   evaluateRuntimeAnswers({
     answers: chinesePunctuationGroupItems.map((item) => ({

@@ -1,5 +1,6 @@
 import { matchAnswer } from '@/activities/answer-matching';
 import { buildQuestionChoices } from '@/activities/distractors';
+import { makeActivityStableId } from '@/activities/stable-id';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -202,14 +203,6 @@ export function evaluateRuntimeAnswers({
   };
 }
 
-function makeStableId(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 40);
-}
-
 function buildGroupItemRuntimeId({
   groupId,
   item,
@@ -221,7 +214,7 @@ function buildGroupItemRuntimeId({
   itemIdCounts: Map<string, number>;
   itemIndex: number;
 }) {
-  const itemId = makeStableId(item);
+  const itemId = makeActivityStableId(item);
   if (itemId && itemIdCounts.get(itemId) === 1) {
     return `${groupId}-${itemId}`;
   }
@@ -233,7 +226,7 @@ function countStableItemIds(items: string[]) {
   const counts = new Map<string, number>();
 
   for (const item of items) {
-    const itemId = makeStableId(item);
+    const itemId = makeActivityStableId(item);
     counts.set(itemId, (counts.get(itemId) ?? 0) + 1);
   }
 

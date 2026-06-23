@@ -13,6 +13,7 @@ import {
   buildQuestionOptionTexts,
   normalizeQuestionOptionDisplayText,
 } from '@/activities/question-options';
+import { makeActivityStableId } from '@/activities/stable-id';
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { m } from '@/locale/paraglide/messages';
 import { z } from 'zod';
@@ -268,7 +269,7 @@ function makeId(
   index: number,
   idCounts?: Map<string, number>
 ) {
-  const slug = makeStableId(value);
+  const slug = makeActivityStableId(value);
 
   if (!slug) return `${prefix}-${index + 1}`;
 
@@ -279,20 +280,11 @@ function makeId(
   return `${prefix}-${slug}`;
 }
 
-function makeStableId(value: string) {
-  return value
-    .normalize('NFKC')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 40);
-}
-
 function countStableIds(values: string[]) {
   const counts = new Map<string, number>();
 
   for (const value of values) {
-    const slug = makeStableId(value);
+    const slug = makeActivityStableId(value);
     if (!slug) continue;
     counts.set(slug, (counts.get(slug) ?? 0) + 1);
   }
