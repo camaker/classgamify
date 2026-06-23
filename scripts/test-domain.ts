@@ -361,6 +361,10 @@ import {
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  getUserFileExtension,
+  resolveUserFileMaterialKind,
+} from '@/storage/file-materials';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
 
@@ -553,6 +557,40 @@ assert.equal(
   '出于课堂安全考虑，这类文件不能上传。'
 );
 overwriteGetLocale(() => 'en');
+assert.equal(
+  resolveUserFileMaterialKind({
+    contentType: 'audio/mpeg',
+    originalName: '三年级听力.mp3',
+  }),
+  'audio'
+);
+assert.equal(
+  resolveUserFileMaterialKind({
+    contentType: 'image/png',
+    originalName: 'worksheet-scan.png',
+  }),
+  'worksheet-image'
+);
+assert.equal(
+  resolveUserFileMaterialKind({
+    contentType: 'application/pdf',
+    originalName: '复习练习纸.pdf',
+  }),
+  'worksheet-document'
+);
+assert.equal(
+  resolveUserFileMaterialKind({
+    contentType: 'application/octet-stream',
+    originalName: 'scores.xlsx',
+  }),
+  'spreadsheet'
+);
+assert.equal(
+  getUserFileExtension({
+    originalName: 'C:\\class\\六月材料\\听力复习.WAV',
+  }),
+  'wav'
+);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');

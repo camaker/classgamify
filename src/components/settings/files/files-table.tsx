@@ -33,6 +33,11 @@ import { formatBytes, formatDate } from '@/lib/formatter';
 import { getFileAccessUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
+  normalizeUserFileContentType,
+  resolveUserFileMaterialKind,
+  type UserFileMaterialKind,
+} from '@/storage/file-materials';
+import {
   type ColumnDef,
   type VisibilityState,
   flexRender,
@@ -47,6 +52,48 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+
+function formatUserFileMaterialKind(kind: UserFileMaterialKind): string {
+  switch (kind) {
+    case 'archive':
+      return m.settings_files_material_type_archive();
+    case 'audio':
+      return m.settings_files_material_type_audio();
+    case 'data':
+      return m.settings_files_material_type_data();
+    case 'spreadsheet':
+      return m.settings_files_material_type_spreadsheet();
+    case 'video':
+      return m.settings_files_material_type_video();
+    case 'worksheet-document':
+      return m.settings_files_material_type_worksheet_document();
+    case 'worksheet-image':
+      return m.settings_files_material_type_worksheet_image();
+    default:
+      return m.settings_files_material_type_file();
+  }
+}
+
+function UserFileMaterialTypeCell({ file }: { file: UserFiles }) {
+  const kind = resolveUserFileMaterialKind({
+    contentType: file.contentType,
+    filename: file.filename,
+    originalName: file.originalName,
+  });
+  const contentType = normalizeUserFileContentType(file.contentType);
+
+  return (
+    <span className="flex min-w-0 flex-col">
+      <span className="font-medium">{formatUserFileMaterialKind(kind)}</span>
+      {contentType && (
+        <span className="text-muted-foreground truncate text-xs">
+          {contentType}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function TableRowSkeleton({ columns }: { columns: number }) {
   return (
     <TableRow className="h-14">
@@ -114,13 +161,9 @@ export function FilesTable({
         id: 'contentType',
         accessorKey: 'contentType',
         header: m.settings_files_columns_content_type(),
-        cell: ({ row }) => (
-          <span className="text-muted-foreground text-sm">
-            {row.original.contentType ?? '—'}
-          </span>
-        ),
+        cell: ({ row }) => <UserFileMaterialTypeCell file={row.original} />,
         minSize: 100,
-        size: 120,
+        size: 150,
         enableSorting: false,
       },
       {

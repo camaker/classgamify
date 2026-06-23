@@ -85,6 +85,7 @@ without browser console errors or page errors.
 | # | Test name | Flow |
 |---|---|---|
 | 1 | Protected pages render successfully | Sign in as an admin E2E user, then open `/dashboard`, `/dashboard/activities`, `/dashboard/assignments`, `/admin/users`, `/settings/profile`, `/settings/security`, `/settings/apikeys`, `/settings/files`, `/settings/billing`, `/settings/payment`, `/settings/notifications` for `en` and `zh`, in `dark` and `light` mode. Verify each returns 2xx, renders a visible body, applies the requested theme, and emits no browser errors. |
+| 2 | Settings files classify classroom materials | Seed saved file rows for audio, worksheet image, worksheet document, spreadsheet, and unknown classroom materials, then open `/settings/files` for `en` and `zh`. Verify the Material column shows localized teacher-facing labels while preserving the raw content type as secondary detail for troubleshooting. |
 
 ## 4. Profile Settings
 
@@ -139,7 +140,7 @@ These flows should be added after their dependencies are made deterministic:
 | Area | Reason |
 |---|---|
 | Payment checkout and portal | Requires Stripe or Creem test fixtures, webhook simulation, and provider-specific env. |
-| R2 file uploads | Requires deterministic local storage assertions and small fixture files. |
+| R2 file uploads | Requires deterministic local storage assertions and small fixture files. Include audio, worksheet image, document, spreadsheet, and unknown-material fixtures so upload behavior and material labels can be verified together. |
 | Transactional email | Requires a fake mail provider or captured verification links. |
 | Interactive template runners | Requires deterministic runner fixtures and attempt submission assertions. |
 | AI provider quality checks | Requires provider mocks or stable fake responses to avoid cost and flake. |
