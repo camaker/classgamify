@@ -5585,22 +5585,22 @@ const lineMatchPreviewPanel = buildActivityEditorPreviewPanel(
   buildActivityEditorInitialValues('line-match')
 );
 assert.equal(lineMatchPreviewPanel.editorSectionId, 'activity-editor');
-assert.equal(lineMatchPreviewPanel.title, 'Line match scaffold preview');
+assert.equal(lineMatchPreviewPanel.title, 'Line match example preview');
 assert.match(lineMatchPreviewPanel.description, /still a draft/);
 assert.deepEqual(lineMatchPreviewPanel.actions, [
   {
     href: '#activity-editor',
     icon: 'edit',
-    label: 'Review scaffold fields',
+    label: 'Review example fields',
   },
 ]);
 assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
-  actionLabel: 'Load scaffold',
+  actionLabel: 'Load example',
   description:
     'Students drag items into teacher-defined groups and compare patterns.',
   requirementBadges: ['Requires groups'],
   shortName: 'Sort',
-  successMessage: 'Group sort scaffold loaded.',
+  successMessage: 'Group sort example loaded.',
   title: 'Group sort setup',
 });
 const editorQuestionReadiness = buildActivityEditorTemplateReadiness({
