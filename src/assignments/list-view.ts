@@ -9,6 +9,7 @@ import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
+  isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
@@ -368,11 +369,12 @@ export function getAssignmentListCardActionState({
   status: AssignmentStatus;
 }): AssignmentListCardActionState {
   const hasPublishedSnapshot = status !== 'draft';
+  const canShareStudentLink = isAssignmentOpen(status, expiresAt, now);
 
   return {
     isPersisted: persisted,
     showResultsAction: persisted && hasPublishedSnapshot,
-    showShareActions: hasPublishedSnapshot,
+    showShareActions: canShareStudentLink,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,

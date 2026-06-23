@@ -5496,6 +5496,45 @@ assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
     persisted: true,
+    status: 'closed',
+  }),
+  {
+    isPersisted: true,
+    showResultsAction: true,
+    showShareActions: false,
+    statusAction: {
+      failureMessage: 'Assignment status could not be updated.',
+      kind: 'reopen-link',
+      label: 'Reopen link',
+      nextStatus: 'published',
+      successMessage: 'Assignment link reopened.',
+    },
+  }
+);
+assert.deepEqual(
+  getAssignmentListCardActionState({
+    expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+    now: new Date('2026-01-01T10:00:00.000Z').getTime(),
+    persisted: true,
+    status: 'published',
+  }),
+  {
+    isPersisted: true,
+    showResultsAction: true,
+    showShareActions: false,
+    statusAction: {
+      failureMessage: 'Assignment status could not be updated.',
+      kind: 'close-link',
+      label: 'Close link',
+      nextStatus: 'closed',
+      successMessage: 'Assignment link closed.',
+    },
+  }
+);
+assert.deepEqual(
+  getAssignmentListCardActionState({
+    expiresAt: null,
+    persisted: true,
     status: 'draft',
   }),
   {
