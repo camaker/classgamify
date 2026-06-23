@@ -59,6 +59,12 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
+      title: m.footer_link_articles(),
+      href: Routes.Blog,
+      description: m.footer_link_articles_desc(),
+      external: false,
+    },
+    {
       title: m.footer_link_support(),
       href: Routes.Contact,
       description: m.footer_link_support_desc(),

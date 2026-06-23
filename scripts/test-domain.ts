@@ -3,6 +3,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getFooterLinks } from '@/config/footer-config';
+import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
 import { formatUserFileUploadError } from '@/api/user-file-errors';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
@@ -811,6 +813,7 @@ assert.doesNotMatch(chineseDownloadDisposition, /\r|\n|C:\\/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
+const websiteConfigSource = readFileSync('src/config/website.ts', 'utf8');
 const storageFileRouteSource = readFileSync(
   'src/routes/api/storage/file.ts',
   'utf8'
@@ -824,6 +827,30 @@ assert.doesNotMatch(
   storageFileRouteSource,
   /Content-Disposition'\] = 'attachment'/,
   'Storage file route should preserve original filenames for attachments.'
+);
+assert.match(
+  websiteConfigSource,
+  /blog:\s*\{\s*enable:\s*true,\s*paginationSize:\s*6,/s,
+  'ClassGamify articles should be enabled because /blog is an indexed product resource.'
+);
+assert.ok(
+  getNavbarLinks().some(
+    (item) => item.href === Routes.Blog && item.title === 'Blog'
+  ),
+  'Top navigation should expose the ClassGamify articles route.'
+);
+const footerSupportItem = getFooterLinks().find(
+  (item) => item.title === 'Support'
+);
+assert.ok(
+  footerSupportItem?.items?.some(
+    (item) =>
+      item.href === Routes.Blog &&
+      item.title === 'Articles' &&
+      item.description ===
+        'Read short guides for templates, assignments, and classroom review.'
+  ),
+  'Footer support links should expose ClassGamify articles.'
 );
 const sidebarSettingsItem = getSidebarLinks().find(
   (item) => item.href === undefined && item.title === 'Settings'
