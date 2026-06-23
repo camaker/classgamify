@@ -5,6 +5,7 @@ import { auth } from '@/auth/auth';
 import { getDb } from '@/db';
 import { userFiles } from '@/db/app.schema';
 import { getFile } from '@/storage';
+import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { isPublicFolder } from '@/storage/utils';
 import { ConfigurationError } from '@/storage/types';
 
@@ -30,7 +31,11 @@ export const Route = createFileRoute('/api/storage/file')({
 
           const db = getDb();
           const [fileRecord] = await db
-            .select({ userId: userFiles.userId, isPublic: userFiles.isPublic })
+            .select({
+              isPublic: userFiles.isPublic,
+              originalName: userFiles.originalName,
+              userId: userFiles.userId,
+            })
             .from(userFiles)
             .where(eq(userFiles.r2Key, key))
             .limit(1);
@@ -71,7 +76,8 @@ export const Route = createFileRoute('/api/storage/file')({
             'X-Content-Type-Options': 'nosniff',
           };
           if (!safeInlineTypes.includes(file.contentType)) {
-            responseHeaders['Content-Disposition'] = 'attachment';
+            responseHeaders['Content-Disposition'] =
+              buildAttachmentContentDisposition(fileRecord?.originalName);
           }
 
           return new Response(file.body, { headers: responseHeaders });

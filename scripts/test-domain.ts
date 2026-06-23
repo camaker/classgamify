@@ -365,6 +365,7 @@ import {
   getUserFileExtension,
   resolveUserFileMaterialKind,
 } from '@/storage/file-materials';
+import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
 
@@ -593,6 +594,7 @@ assert.equal(
 );
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
+assert.match(storageModuleDocs, /content-disposition\.ts/);
 assert.match(storageModuleDocs, /file-materials\.ts/);
 assert.match(storageModuleDocs, /current default is 10MB/);
 assert.match(storageModuleDocs, /`userFiles`\s+table/);
@@ -601,9 +603,39 @@ assert.doesNotMatch(
   /It is used for avatar uploads \(Settings → Profile\) when enabled\.|default 4MB|There is no separate file-metadata table/,
   'Storage docs should describe current ClassGamify classroom-file behavior.'
 );
+assert.equal(
+  buildAttachmentContentDisposition('scores final.csv'),
+  'attachment; filename="scores final.csv"; filename*=UTF-8\'\'scores%20final.csv'
+);
+const chineseDownloadDisposition = buildAttachmentContentDisposition(
+  'C:\\class\\六月材料\\听力复习.WAV'
+);
+assert.match(
+  chineseDownloadDisposition,
+  /^attachment; filename="classgamify-file\.wav"; filename\*=UTF-8''/
+);
+assert.match(
+  chineseDownloadDisposition,
+  /%E5%90%AC%E5%8A%9B%E5%A4%8D%E4%B9%A0\.WAV/
+);
+assert.doesNotMatch(chineseDownloadDisposition, /\r|\n|C:\\/);
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');
+const storageFileRouteSource = readFileSync(
+  'src/routes/api/storage/file.ts',
+  'utf8'
+);
+assert.match(storageFileRouteSource, /originalName: userFiles\.originalName/);
+assert.match(
+  storageFileRouteSource,
+  /buildAttachmentContentDisposition\(fileRecord\?\.originalName\)/
+);
+assert.doesNotMatch(
+  storageFileRouteSource,
+  /Content-Disposition'\] = 'attachment'/,
+  'Storage file route should preserve original filenames for attachments.'
+);
 const retiredRouteDocumentationText = [
   'docs/locale.md',
   'docs/newsletter.md',

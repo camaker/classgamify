@@ -54,6 +54,7 @@ same server function, but it is not the only storage consumer.
 
 ```
 src/storage/
+├── content-disposition.ts # Safe attachment filename headers
 ├── constants.ts       # Default size, folder, and allowed-type settings
 ├── file-materials.ts  # Classroom material kind classification
 ├── index.ts           # getStorageProvider, uploadFile, deleteFile, getFile, …
@@ -106,6 +107,11 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   `@/storage/file-materials`): Classifies saved files as audio, worksheet image,
   worksheet document, spreadsheet, video, archive, data file, or file using
   `contentType` plus filename-extension fallback.
+
+- **buildAttachmentContentDisposition** (shared helper, in
+  `@/storage/content-disposition`): Builds safe attachment headers that preserve
+  teacher-uploaded original filenames, including Chinese names through
+  `filename*`, while keeping an ASCII fallback.
 
 - **useUploadUserAvatar()** (client, in `@/hooks/use-user-files`): Mutation
   that uploads a public file with `folder: 'avatars'` via `uploadUserFile`;
