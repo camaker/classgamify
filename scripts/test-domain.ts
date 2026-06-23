@@ -5888,6 +5888,10 @@ assert.deepEqual(getAcceptedAnswers('Paris, France／Paris'), [
   'Paris, France',
   'Paris',
 ]);
+assert.deepEqual(getAcceptedAnswers('Paris／ paris ; Ｐａｒｉｓ'), ['Paris']);
+assert.deepEqual(getAcceptedAnswers('ice cream / ice-cream / ice—cream'), [
+  'ice cream',
+]);
 assert.deepEqual(
   matchAnswer({
     expectedAnswer: '苹果／苹果树；苹果公司',

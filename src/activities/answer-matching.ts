@@ -31,7 +31,7 @@ export function matchAnswer({
 }
 
 export function getAcceptedAnswers(expectedAnswer: string) {
-  return unique(
+  return uniqueAcceptedAnswers(
     expectedAnswer
       .split(/\s*(?:\/|／|;|；|、)\s*/u)
       .map((answer) => answer.trim())
@@ -51,6 +51,18 @@ function normalizeAnswerForMatching(value: string) {
     .trim();
 }
 
-function unique(values: string[]) {
-  return [...new Set(values)];
+function uniqueAcceptedAnswers(values: string[]) {
+  const seen = new Set<string>();
+  const acceptedAnswers: string[] = [];
+
+  for (const value of values) {
+    const normalized = normalizeAnswerForMatching(value);
+
+    if (!normalized || seen.has(normalized)) continue;
+
+    seen.add(normalized);
+    acceptedAnswers.push(value);
+  }
+
+  return acceptedAnswers;
 }
