@@ -8219,6 +8219,20 @@ assert.equal(
   }).correctRateProgressValue,
   100
 );
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
+    correctRate: Number.NaN,
+  }).correctRateProgressValue,
+  0
+);
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
+    correctRate: -20,
+  }).correctRateProgressValue,
+  0
+);
 assert.deepEqual(
   buildAssignmentItemPerformanceRowView({
     index: 0,
@@ -8848,6 +8862,10 @@ assert.equal(
   '2/3 correct'
 );
 assert.equal(formatAssignmentResultFraction(2, 5), '2/5');
+assert.equal(formatAssignmentResultFraction(-1, 5), '0/5');
+assert.equal(formatAssignmentResultFraction(2.5, 5), '2.5/5');
+assert.equal(formatAssignmentResultFraction(Number.NaN, 5), '-');
+assert.equal(formatAssignmentResultFraction(2, Number.POSITIVE_INFINITY), '-');
 assert.equal(formatAssignmentResultPercent(82), '82%');
 assert.equal(formatAssignmentResultPercent(82.6), '83%');
 assert.equal(formatAssignmentResultPercent(Number.NaN), '-');

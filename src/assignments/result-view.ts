@@ -1001,7 +1001,14 @@ export function formatAssignmentItemCorrectSummary({
 }
 
 export function formatAssignmentResultFraction(value: number, total: number) {
-  return `${value}/${total}`;
+  const normalizedValue = normalizeResultFractionNumber(value);
+  const normalizedTotal = normalizeResultFractionNumber(total);
+
+  if (normalizedValue === undefined || normalizedTotal === undefined) {
+    return assignmentResultReviewCopy.emptyValue;
+  }
+
+  return `${normalizedValue}/${normalizedTotal}`;
 }
 
 export { formatAssignmentResultPercent };
@@ -1015,7 +1022,13 @@ export function formatAssignmentReviewCount(count: number) {
 }
 
 function clampProgressValue(value: number) {
+  if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, value));
+}
+
+function normalizeResultFractionNumber(value: number) {
+  if (!Number.isFinite(value)) return undefined;
+  return Math.max(0, value);
 }
 
 type ResultSearchSummaryInput = {
