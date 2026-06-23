@@ -69,6 +69,7 @@ import {
   IconFolder,
   IconFolderOff,
   IconLayoutGrid,
+  IconPaperclip,
   IconPlus,
   IconRotateClockwise,
   IconSearch,
@@ -710,6 +711,28 @@ function ActivityCard({
             />
           ))}
         </div>
+        {cardDisplayView.sourceMaterials.hasMaterials ? (
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <IconPaperclip className="size-4 text-primary" />
+              {cardDisplayView.sourceMaterials.title}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <Badge variant="secondary" className="rounded-md">
+                {cardDisplayView.sourceMaterials.countLabel}
+              </Badge>
+              {cardDisplayView.sourceMaterials.kindBadges.map((badge) => (
+                <Badge
+                  key={badge.kind}
+                  variant="outline"
+                  className="rounded-md"
+                >
+                  {badge.label}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <IconLayoutGrid className="size-4 text-primary" />

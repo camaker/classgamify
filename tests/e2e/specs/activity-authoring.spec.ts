@@ -174,6 +174,9 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('heading', { name: activityTitle })
     ).toBeVisible();
+    await expect(page.getByText('Source materials')).toBeVisible();
+    await expect(page.getByText('1 file')).toBeVisible();
+    await expect(page.getByText('Audio')).toBeVisible();
     await page
       .getByRole('link', { name: /^edit activity$/i })
       .first()

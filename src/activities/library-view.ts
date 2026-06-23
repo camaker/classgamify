@@ -12,6 +12,10 @@ import {
   type ActivityLibraryCardSummary,
   type ActivityLibraryTemplateOption,
 } from '@/activities/library-summary';
+import {
+  buildActivitySourceMaterialSummaryView,
+  type ActivitySourceMaterialSummaryView,
+} from '@/activities/material-summary';
 import type {
   ActivityContent,
   ActivitySeed,
@@ -89,6 +93,7 @@ type ActivityLibraryCardViewModel = {
 type ActivityLibraryCardDisplayView = {
   actionState: ActivityLibraryCardActionState;
   compatibility: ActivityLibraryCompatibilityView;
+  sourceMaterials: ActivitySourceMaterialSummaryView;
   stats: ActivityLibraryCardStat[];
   templateName: string;
   templateType: ActivityTemplateType;
@@ -427,6 +432,9 @@ export function buildActivityLibraryCardDisplayView({
       currentTemplateType: activity.templateType,
       summary,
     }),
+    sourceMaterials: buildActivitySourceMaterialSummaryView(
+      activity.content.sourceMaterials
+    ),
     stats: buildActivityLibraryCardStats({
       groups: summary.contentCounts.groups,
       pairs: summary.contentCounts.pairs,

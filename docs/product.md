@@ -87,6 +87,10 @@ activities, template-family coverage, activities ready to remix into another
 template, and total ready template modes. The summary logic belongs in the
 activity domain layer so dashboard surfaces and server functions reuse the same
 template-readiness calculation instead of duplicating UI-only math.
+Individual activity cards should also summarize attached source materials by
+count and material kind, so teachers can see which reusable activities have
+audio, worksheet images, documents, or spreadsheet provenance before reopening
+the editor.
 Activity library filter parsing and search normalization should also live in
 activity-domain helpers so URL state, dashboard controls, and list API queries
 share the same activity status and template-family rules.

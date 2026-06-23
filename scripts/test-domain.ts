@@ -73,6 +73,10 @@ import {
   buildActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import {
+  buildActivitySourceMaterialSummaryView,
+  summarizeActivitySourceMaterials,
+} from '@/activities/material-summary';
+import {
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
   normalizeActivityMaterialReferences,
@@ -693,6 +697,61 @@ assert.deepEqual(
     },
   ]
 );
+const sourceMaterialSummary = summarizeActivitySourceMaterials([
+  listeningMaterialReference,
+  {
+    contentType: 'application/pdf',
+    fileId: 'file-worksheet-1',
+    kind: 'worksheet-document',
+    originalName: 'revision worksheet.pdf',
+    size: 512,
+  },
+  {
+    contentType: 'application/pdf',
+    fileId: 'file-worksheet-2',
+    kind: 'worksheet-document',
+    originalName: 'extra worksheet.pdf',
+    size: 256,
+  },
+]);
+assert.equal(sourceMaterialSummary.total, 3);
+assert.equal(sourceMaterialSummary.byKind.audio, 1);
+assert.equal(sourceMaterialSummary.byKind['worksheet-document'], 2);
+assert.deepEqual(sourceMaterialSummary.kindSummaries, [
+  { count: 1, kind: 'audio' },
+  { count: 2, kind: 'worksheet-document' },
+]);
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-worksheet-1',
+      kind: 'worksheet-document',
+      originalName: 'revision worksheet.pdf',
+      size: 512,
+    },
+  ]),
+  {
+    countLabel: '2 files',
+    hasMaterials: true,
+    kindBadges: [
+      { count: 1, kind: 'audio', label: 'Audio' },
+      {
+        count: 1,
+        kind: 'worksheet-document',
+        label: 'Worksheet document',
+      },
+    ],
+    title: 'Source materials',
+  }
+);
+assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
+  countLabel: '0 files',
+  hasMaterials: false,
+  kindBadges: [],
+  title: 'Source materials',
+});
 assert.equal(
   normalizeActivityMaterialReferences(
     Array.from(
@@ -4453,6 +4512,30 @@ assert.deepEqual(starterActivityDisplayView.stats, [
   { key: 'pairs', label: 'Pairs', value: 4 },
   { key: 'groups', label: 'Groups', value: 2 },
 ]);
+assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
+  countLabel: '0 files',
+  hasMaterials: false,
+  kindBadges: [],
+  title: 'Source materials',
+});
+assert.deepEqual(
+  buildActivityLibraryCardDisplayView({
+    activity: {
+      ...starterActivityCardView,
+      content: {
+        ...starterActivityCardView.content,
+        sourceMaterials: [listeningMaterialReference],
+      },
+    },
+    libraryStatus: 'active',
+  }).sourceMaterials,
+  {
+    countLabel: '1 file',
+    hasMaterials: true,
+    kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
+    title: 'Source materials',
+  }
+);
 assert.equal(
   starterActivityDisplayView.actionState.showPersistedActions,
   false
