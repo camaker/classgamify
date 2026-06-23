@@ -2344,6 +2344,10 @@ assert.equal(
 );
 assert.equal(assignmentPublishDialogCopy.previewLabel, 'Delivery preview');
 assert.equal(assignmentPublishDialogCopy.timeLimitPlaceholder, 'No limit');
+assert.equal(
+  assignmentPublishDialogCopy.maxAttemptsHelp,
+  'Leave blank for unlimited attempts. Use 1-10 to cap each student identity.'
+);
 assert.deepEqual(
   buildAssignmentPublishDraft({
     defaults: buildAssignmentPublishDraftDefaults({
@@ -2464,6 +2468,27 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '   ',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Open practice',
+  }).settings,
+  {
+    collectStudentName: true,
+    instructions: undefined,
+    maxAttempts: undefined,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }
+);
+assert.deepEqual(
   validateAssignmentPublishDraft({
     activityId: 'activity-1',
     collectStudentName: true,
@@ -2474,6 +2499,20 @@ assert.deepEqual(
     shuffleItems: true,
     timeLimitMinutes: '',
     title: 'Week 1 review',
+  }),
+  { ok: true }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Open practice',
   }),
   { ok: true }
 );
@@ -2603,6 +2642,36 @@ assert.deepEqual(
         timeLimitSeconds: 900,
       },
       title: 'Week 1 review',
+    },
+    ok: true,
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishInputFromDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '',
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Open practice',
+  }),
+  {
+    input: {
+      activityId: 'activity-1',
+      expiresAt: undefined,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: undefined,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+      title: 'Open practice',
     },
     ok: true,
   }

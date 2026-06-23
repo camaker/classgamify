@@ -67,7 +67,7 @@ type AssignmentPublishDraftResult =
         settings: {
           collectStudentName: boolean;
           instructions?: string;
-          maxAttempts: number;
+          maxAttempts?: number;
           showCorrectAnswers: boolean;
           shuffleItems: boolean;
           timeLimitSeconds?: number;
@@ -146,6 +146,9 @@ export const assignmentPublishDialogCopy = {
   },
   get maxAttemptsLabel() {
     return m.assignment_publish_dialog_max_attempts_label();
+  },
+  get maxAttemptsHelp() {
+    return m.assignment_publish_dialog_max_attempts_help();
   },
   get previewLabel() {
     return m.assignment_publish_dialog_preview_label();
@@ -296,8 +299,10 @@ export function validateAssignmentPublishDraft({
     };
   }
 
-  const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
-  if (attempts === undefined) {
+  if (
+    !isAssignmentPublishMaxAttemptsBlank(maxAttempts) &&
+    parseAssignmentPublishMaxAttempts(maxAttempts) === undefined
+  ) {
     return {
       message: m.assignment_publish_validation_max_attempts(),
       ok: false,
@@ -374,7 +379,10 @@ export function buildAssignmentPublishInputFromDraft({
 
   const trimmedTitle = title.trim();
   const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
-  if (attempts === undefined) {
+  if (
+    !isAssignmentPublishMaxAttemptsBlank(maxAttempts) &&
+    attempts === undefined
+  ) {
     return {
       message: m.assignment_publish_validation_max_attempts(),
       ok: false,
@@ -404,7 +412,13 @@ export function buildAssignmentPublishInputFromDraft({
 }
 
 function parseAssignmentPublishMaxAttempts(value: string) {
+  if (isAssignmentPublishMaxAttemptsBlank(value)) return undefined;
+
   return parseWholeNumberInRange(value, PUBLISH_ATTEMPTS_RANGE);
+}
+
+function isAssignmentPublishMaxAttemptsBlank(value: string) {
+  return value.trim().length === 0;
 }
 
 function parseAssignmentPublishTimeLimitMinutes(value: string) {

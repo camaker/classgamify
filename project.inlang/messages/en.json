@@ -601,6 +601,7 @@
   "assignment_publish_dialog_description": "Freeze this activity into a student share link with classroom delivery settings.",
   "assignment_publish_dialog_instructions_label": "Instructions",
   "assignment_publish_dialog_instructions_placeholder": "Optional student instructions",
+  "assignment_publish_dialog_max_attempts_help": "Leave blank for unlimited attempts. Use 1-10 to cap each student identity.",
   "assignment_publish_dialog_max_attempts_label": "Max attempts",
   "assignment_publish_dialog_preview_label": "Delivery preview",
   "assignment_publish_dialog_publish": "Publish",

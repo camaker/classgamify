@@ -215,6 +215,9 @@ export function ActivityPublishDialog({
               value={maxAttempts}
               onChange={(event) => setMaxAttempts(event.currentTarget.value)}
             />
+            <p className="text-xs leading-5 text-muted-foreground">
+              {assignmentPublishDialogCopy.maxAttemptsHelp}
+            </p>
           </div>
           <div className="grid gap-2">
             <label htmlFor={`time-limit-${activity.id}`}>

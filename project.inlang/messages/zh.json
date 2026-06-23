@@ -601,6 +601,7 @@
   "assignment_publish_dialog_description": "将这份活动冻结为学生分享链接，并配置课堂交付设置。",
   "assignment_publish_dialog_instructions_label": "说明",
   "assignment_publish_dialog_instructions_placeholder": "可选的学生说明",
+  "assignment_publish_dialog_max_attempts_help": "留空表示不限次数。填写 1-10 可限制每个学生身份的作答次数。",
   "assignment_publish_dialog_max_attempts_label": "最多作答次数",
   "assignment_publish_dialog_preview_label": "交付预览",
   "assignment_publish_dialog_publish": "发布",
