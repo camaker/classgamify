@@ -1279,7 +1279,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentAttemptResultDisplay({
-    accuracy: 67,
+    accuracy: 66.6,
     durationSeconds: 65,
     earnedPoints: 2,
     fallbackDurationSeconds: 120,
@@ -7299,13 +7299,13 @@ assert.deepEqual(
   buildAssignmentResultMetricItems({
     averageDurationSeconds: 150,
     averagePoints: 7,
-    averageScore: 82,
+    averageScore: 82.6,
     completions: 12,
     expiresAt: '2026-06-30T12:00:00.000Z',
   }),
   [
     { key: 'completions', label: 'Completions', value: '12' },
-    { key: 'average-accuracy', label: 'Average accuracy', value: '82%' },
+    { key: 'average-accuracy', label: 'Average accuracy', value: '83%' },
     { key: 'average-points', label: 'Average points', value: '7' },
     { key: 'average-time', label: 'Average time', value: '2m 30s' },
     {

@@ -8,6 +8,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
@@ -222,7 +223,9 @@ export function buildStudentAttemptResultDisplay({
   totalPoints: number;
 }): StudentAttemptResultDisplay {
   return {
-    accuracyLabel: `${accuracy}% ${STUDENT_RUNNER_COPY.resultAccuracyLabel}`,
+    accuracyLabel: `${formatAssignmentResultPercent(accuracy)} ${
+      STUDENT_RUNNER_COPY.resultAccuracyLabel
+    }`,
     durationLabel: `${STUDENT_RUNNER_COPY.resultTimePrefix} ${formatAttemptDuration(
       durationSeconds ?? fallbackDurationSeconds,
       {

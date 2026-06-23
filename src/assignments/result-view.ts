@@ -508,7 +508,7 @@ export function buildAssignmentResultMetricItems({
   expiresAt: Date | string | null | undefined;
 }) {
   const valueByMetric = {
-    'average-accuracy': `${averageScore}%`,
+    'average-accuracy': formatAssignmentResultPercent(averageScore),
     'average-points': String(averagePoints),
     'average-time': formatAttemptDuration(averageDurationSeconds),
     closes: formatAssignmentExpiry(expiresAt),
