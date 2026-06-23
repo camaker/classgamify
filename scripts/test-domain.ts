@@ -599,6 +599,10 @@ assert.equal(
   buildAnonymousAttemptTokenStorageKey('share/one'),
   'classgamify:attempt-token:share/one'
 );
+assert.equal(
+  buildAnonymousAttemptTokenStorageKey('  share/one  '),
+  'classgamify:attempt-token:share/one'
+);
 const anonymousTokenStorage = new Map<string, string>();
 const anonymousTokenStore = {
   getItem: (key: string) => anonymousTokenStorage.get(key) ?? null,
@@ -624,11 +628,37 @@ assert.equal(
 );
 assert.equal(
   getOrCreateAnonymousAttemptToken({
+    createToken: () => 'anon-token-spaced-share',
+    shareId: ' share-one ',
+    storage: anonymousTokenStore,
+  }),
+  'anon-token-1'
+);
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
     createToken: () => 'anon-token-3',
     shareId: 'share-two',
     storage: anonymousTokenStore,
   }),
   'anon-token-3'
+);
+anonymousTokenStorage.set(
+  buildAnonymousAttemptTokenStorageKey('blank-token-share'),
+  '   '
+);
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
+    createToken: () => ' replacement-token ',
+    shareId: 'blank-token-share',
+    storage: anonymousTokenStore,
+  }),
+  'replacement-token'
+);
+assert.equal(
+  anonymousTokenStorage.get(
+    buildAnonymousAttemptTokenStorageKey('blank-token-share')
+  ),
+  'replacement-token'
 );
 assert.deepEqual(
   resolveAttemptIdentityCountStrategy({

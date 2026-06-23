@@ -1,4 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
 const ANONYMOUS_ATTEMPT_TOKEN_PREFIX = 'classgamify:attempt-token:';
 const ANONYMOUS_BROWSER_CODE_LENGTH = 6;
@@ -35,7 +36,9 @@ export function getAnonymousBrowserLabel(value?: string | null) {
 }
 
 export function buildAnonymousAttemptTokenStorageKey(shareId: string) {
-  return `${ANONYMOUS_ATTEMPT_TOKEN_PREFIX}${shareId}`;
+  return `${ANONYMOUS_ATTEMPT_TOKEN_PREFIX}${normalizeAssignmentShareSlug(
+    shareId
+  )}`;
 }
 
 function createAnonymousAttemptToken() {
@@ -71,10 +74,17 @@ export function getOrCreateAnonymousAttemptToken({
   storage: AnonymousAttemptTokenStorage;
 }) {
   const storageKey = buildAnonymousAttemptTokenStorageKey(shareId);
-  const existingToken = storage.getItem(storageKey);
-  if (existingToken) return existingToken;
+  const existingTokenValue = storage.getItem(storageKey);
+  const existingToken = normalizeAnonymousToken(existingTokenValue);
+  if (existingToken) {
+    if (existingToken !== existingTokenValue) {
+      storage.setItem(storageKey, existingToken);
+    }
 
-  const token = createToken();
+    return existingToken;
+  }
+
+  const token = normalizeAnonymousToken(createToken());
   storage.setItem(storageKey, token);
   return token;
 }
