@@ -66,11 +66,10 @@ export function UserDetailViewer({ user }: UserDetailViewerProps) {
       toast.success(m.admin_users_ban_success());
       setBanReason(m.admin_users_ban_default_reason());
       setBanExpiresAt(undefined);
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : m.admin_users_ban_error();
-      setError(msg);
-      toast.error(msg);
+    } catch {
+      const message = m.admin_users_ban_error();
+      setError(message);
+      toast.error(message);
     }
   };
   const handleUnban = async () => {
@@ -82,11 +81,10 @@ export function UserDetailViewer({ user }: UserDetailViewerProps) {
     try {
       await unbanUserMutation.mutateAsync({ userId: user.id });
       toast.success(m.admin_users_unban_success());
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : m.admin_users_unban_error();
-      setError(msg);
-      toast.error(msg);
+    } catch {
+      const message = m.admin_users_unban_error();
+      setError(message);
+      toast.error(message);
     }
   };
   return (

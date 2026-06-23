@@ -658,6 +658,21 @@ assert.match(
   'Admin user detail missing-id errors should use the localized admin message.'
 );
 assert.doesNotMatch(
+  adminUserDetailViewerSource,
+  /err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Admin user ban/unban failures should use localized admin copy instead of raw mutation errors.'
+);
+assert.match(
+  adminUserDetailViewerSource,
+  /const message = m\.admin_users_ban_error\(\);/,
+  'Admin user ban failures should use the localized ban failure message.'
+);
+assert.match(
+  adminUserDetailViewerSource,
+  /const message = m\.admin_users_unban_error\(\);/,
+  'Admin user unban failures should use the localized unban failure message.'
+);
+assert.doesNotMatch(
   useAuthSource,
   /User ID is required|Failed to fetch user accounts/,
   'Client auth hook errors should use localized security messages instead of hard-coded English.'
