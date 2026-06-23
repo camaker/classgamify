@@ -3,6 +3,7 @@ import {
   IconDeviceGamepad2,
   IconBell,
   IconCreditCard,
+  IconFiles,
   IconLayoutDashboard,
   IconListCheck,
   IconLock,
@@ -60,6 +61,16 @@ export function getSidebarLinks(): MenuItemConfig[] {
           href: Routes.SettingsProfile,
           external: false,
         },
+        ...(websiteConfig.storage?.enable
+          ? [
+              {
+                title: m.dashboard_sidebar_files(),
+                icon: IconFiles,
+                href: Routes.SettingsFiles,
+                external: false,
+              },
+            ]
+          : []),
         ...(websiteConfig.payment?.enable
           ? [
               {

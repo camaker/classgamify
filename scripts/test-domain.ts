@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getSidebarLinks } from '@/config/sidebar-config';
 import { formatUserFileUploadError } from '@/api/user-file-errors';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
@@ -635,6 +636,16 @@ assert.doesNotMatch(
   storageFileRouteSource,
   /Content-Disposition'\] = 'attachment'/,
   'Storage file route should preserve original filenames for attachments.'
+);
+const sidebarSettingsItem = getSidebarLinks().find(
+  (item) => item.href === undefined && item.title === 'Settings'
+);
+assert.ok(sidebarSettingsItem?.items, 'Settings sidebar group should exist.');
+assert.ok(
+  sidebarSettingsItem.items.some(
+    (item) => item.href === Routes.SettingsFiles && item.title === 'Files'
+  ),
+  'Storage-enabled workspaces should expose Settings → Files in the sidebar.'
 );
 const retiredRouteDocumentationText = [
   'docs/locale.md',

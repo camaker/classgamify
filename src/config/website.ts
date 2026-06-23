@@ -17,8 +17,9 @@ const CREEM_LIVE_PRODUCTS = {
 // Payment provider controlled by env var: 'stripe' | 'creem' | ''.
 // Production falls back to Creem live so missing CI/Cloudflare vars do not
 // disable the pricing page.
+const isProductionBuild = import.meta.env?.PROD === true;
 const paymentProvider =
-  clientEnv.VITE_PAYMENT_PROVIDER || (import.meta.env.PROD ? 'creem' : '');
+  clientEnv.VITE_PAYMENT_PROVIDER || (isProductionBuild ? 'creem' : '');
 const isPaymentEnabled = paymentProvider !== '';
 const isCreemPayment = paymentProvider === 'creem';
 // Resolve price/product IDs based on the active payment provider
