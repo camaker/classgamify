@@ -52,11 +52,13 @@ type AssignmentResultSearchState = {
   itemSort?: ItemPerformanceSort;
   review?: AttemptReviewFilter;
   sort?: StudentSummarySort;
+  student?: string;
 };
 
 type AssignmentResultResolvedViewState = {
   attemptReviewFilter: AttemptReviewFilter;
   itemPerformanceSort: ItemPerformanceSort;
+  studentSearch: string;
   studentSort: StudentSummarySort;
 };
 
@@ -72,6 +74,10 @@ type AssignmentResultControlSearchUpdate =
   | {
       control: 'student-sort';
       value: StudentSummarySort;
+    }
+  | {
+      control: 'student-search';
+      value: string;
     };
 
 type AssignmentResultAction =
@@ -1485,6 +1491,12 @@ export function parseAttemptReviewFilter(
   return value === 'needs-review' ? value : undefined;
 }
 
+export function parseResultStudentSearch(value: unknown): string | undefined {
+  return typeof value === 'string'
+    ? normalizeResultSearchQuery(value)
+    : undefined;
+}
+
 export function buildAssignmentResultRouteSearch(
   search: Record<string, unknown>
 ): AssignmentResultSearchState {
@@ -1492,6 +1504,7 @@ export function buildAssignmentResultRouteSearch(
     itemSort: parseItemPerformanceSort(search.itemSort),
     review: parseAttemptReviewFilter(search.review),
     sort: parseStudentSummarySort(search.sort),
+    student: parseResultStudentSearch(search.student),
   };
 }
 
@@ -1501,6 +1514,7 @@ export function resolveAssignmentResultViewState(
   return {
     attemptReviewFilter: search.review ?? 'all',
     itemPerformanceSort: search.itemSort ?? 'original',
+    studentSearch: search.student ?? '',
     studentSort: search.sort ?? 'needs-review',
   };
 }
@@ -1514,16 +1528,19 @@ export function buildAssignmentResultSearchState({
     itemSort: ItemPerformanceSort;
     review: AttemptReviewFilter;
     sort: StudentSummarySort;
+    student: string;
   }>;
 }): AssignmentResultSearchState {
   const itemSort = next.itemSort ?? current.itemSort;
   const review = next.review ?? current.review;
   const sort = next.sort ?? current.sort;
+  const student = next.student ?? current.student;
 
   return {
     itemSort: itemSort === 'original' ? undefined : itemSort,
     review: review === 'all' ? undefined : review,
     sort: sort === 'needs-review' ? undefined : sort,
+    student: normalizeResultSearchQuery(student),
   };
 }
 
@@ -1548,19 +1565,26 @@ export function buildAssignmentResultControlSearchState({
     });
   }
 
+  if (update.control === 'student-search') {
+    return buildAssignmentResultSearchState({
+      current,
+      next: { student: update.value },
+    });
+  }
+
   return buildAssignmentResultSearchState({
     current,
     next: { sort: update.value },
   });
 }
 
-export function normalizeResultSearch(value: string | null | undefined) {
-  const normalized = value
-    ?.normalize('NFKC')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLocaleLowerCase();
+export function normalizeResultSearchQuery(value: string | null | undefined) {
+  const normalized = value?.normalize('NFKC').replace(/\s+/g, ' ').trim();
   return normalized || undefined;
+}
+
+export function normalizeResultSearch(value: string | null | undefined) {
+  return normalizeResultSearchQuery(value)?.toLocaleLowerCase();
 }
 
 export function matchesResultSearch(

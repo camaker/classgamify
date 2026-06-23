@@ -291,8 +291,10 @@ import {
   getAssignmentResultActionGateFromState,
   matchesResultSearch,
   normalizeResultSearch,
+  normalizeResultSearchQuery,
   parseAttemptReviewFilter,
   parseItemPerformanceSort,
+  parseResultStudentSearch,
   parseStudentSummarySort,
   resolveAssignmentResultViewState,
   studentSummarySortOptions,
@@ -9403,16 +9405,22 @@ assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
 assert.equal(parseItemPerformanceSort('original'), undefined);
 assert.equal(parseAttemptReviewFilter('needs-review'), 'needs-review');
 assert.equal(parseAttemptReviewFilter('all'), undefined);
+assert.equal(parseResultStudentSearch('  Ａｖａ   Ｃｈｅｎ  '), 'Ava Chen');
+assert.equal(parseResultStudentSearch('   '), undefined);
+assert.equal(parseResultStudentSearch(['Ava Chen']), undefined);
+assert.equal(normalizeResultSearchQuery('  Mei   Lin  '), 'Mei Lin');
 assert.deepEqual(
   buildAssignmentResultRouteSearch({
     itemSort: 'submitted',
     review: 'needs-review',
     sort: 'attempts',
+    student: '  Ａｖａ   Ｃｈｅｎ  ',
   }),
   {
     itemSort: 'submitted',
     review: 'needs-review',
     sort: 'attempts',
+    student: 'Ava Chen',
   }
 );
 assert.deepEqual(
@@ -9420,11 +9428,13 @@ assert.deepEqual(
     itemSort: 'original',
     review: 'all',
     sort: 'needs-review',
+    student: '   ',
   }),
   {
     itemSort: undefined,
     review: undefined,
     sort: undefined,
+    student: undefined,
   }
 );
 assert.deepEqual(
@@ -9432,16 +9442,19 @@ assert.deepEqual(
     itemSort: 'random',
     review: 'done',
     sort: ['best'],
+    student: ['Ava'],
   }),
   {
     itemSort: undefined,
     review: undefined,
     sort: undefined,
+    student: undefined,
   }
 );
 assert.deepEqual(resolveAssignmentResultViewState({}), {
   attemptReviewFilter: 'all',
   itemPerformanceSort: 'original',
+  studentSearch: '',
   studentSort: 'needs-review',
 });
 assert.deepEqual(
@@ -9449,10 +9462,12 @@ assert.deepEqual(
     itemSort: 'type',
     review: 'needs-review',
     sort: 'name',
+    student: 'Ava Chen',
   }),
   {
     attemptReviewFilter: 'needs-review',
     itemPerformanceSort: 'type',
+    studentSearch: 'Ava Chen',
     studentSort: 'name',
   }
 );
@@ -9463,12 +9478,14 @@ assert.deepEqual(
       itemSort: 'accuracy',
       review: 'needs-review',
       sort: 'best',
+      student: '  Ava   Chen  ',
     },
   }),
   {
     itemSort: 'accuracy',
     review: 'needs-review',
     sort: 'best',
+    student: 'Ava Chen',
   }
 );
 assert.deepEqual(
@@ -9477,17 +9494,20 @@ assert.deepEqual(
       itemSort: 'accuracy',
       review: 'needs-review',
       sort: 'best',
+      student: 'Ava Chen',
     },
     next: {
       itemSort: 'original',
       review: 'all',
       sort: 'needs-review',
+      student: '',
     },
   }),
   {
     itemSort: undefined,
     review: undefined,
     sort: undefined,
+    student: undefined,
   }
 );
 assert.deepEqual(
@@ -9496,6 +9516,7 @@ assert.deepEqual(
       itemSort: 'submitted',
       review: 'needs-review',
       sort: 'attempts',
+      student: 'Ava Chen',
     },
     next: {
       review: 'all',
@@ -9505,6 +9526,7 @@ assert.deepEqual(
     itemSort: 'submitted',
     review: undefined,
     sort: 'attempts',
+    student: 'Ava Chen',
   }
 );
 assert.deepEqual(
@@ -9512,6 +9534,7 @@ assert.deepEqual(
     current: {
       review: 'needs-review',
       sort: 'best',
+      student: 'Mei Lin',
     },
     update: {
       control: 'item-performance-sort',
@@ -9522,6 +9545,7 @@ assert.deepEqual(
     itemSort: 'type',
     review: 'needs-review',
     sort: 'best',
+    student: 'Mei Lin',
   }
 );
 assert.deepEqual(
@@ -9530,6 +9554,7 @@ assert.deepEqual(
       itemSort: 'accuracy',
       review: 'needs-review',
       sort: 'attempts',
+      student: 'Ava Chen',
     },
     update: {
       control: 'attempt-review-filter',
@@ -9540,6 +9565,7 @@ assert.deepEqual(
     itemSort: 'accuracy',
     review: undefined,
     sort: 'attempts',
+    student: 'Ava Chen',
   }
 );
 assert.deepEqual(
@@ -9547,6 +9573,7 @@ assert.deepEqual(
     current: {
       itemSort: 'accuracy',
       review: 'needs-review',
+      student: 'Ava Chen',
     },
     update: {
       control: 'student-sort',
@@ -9557,6 +9584,45 @@ assert.deepEqual(
     itemSort: 'accuracy',
     review: 'needs-review',
     sort: undefined,
+    student: 'Ava Chen',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlSearchState({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      student: 'Ava Chen',
+    },
+    update: {
+      control: 'student-search',
+      value: '  Mei   Lin  ',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: undefined,
+    student: 'Mei Lin',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlSearchState({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      student: 'Ava Chen',
+    },
+    update: {
+      control: 'student-search',
+      value: '',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: undefined,
+    student: undefined,
   }
 );
 assert.deepEqual(

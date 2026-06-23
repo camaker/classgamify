@@ -77,7 +77,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { toast } from 'sonner';
 
 const resultMetricIconByKey = {
@@ -104,14 +104,17 @@ export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
   const search = Route.useSearch();
-  const { itemSort, review, sort } = search;
+  const { itemSort, review, sort, student } = search;
   const navigate = useNavigate({
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
-  const [studentSearch, setStudentSearch] = useState('');
-  const { attemptReviewFilter, itemPerformanceSort, studentSort } =
-    resolveAssignmentResultViewState(search);
+  const {
+    attemptReviewFilter,
+    itemPerformanceSort,
+    studentSearch,
+    studentSort,
+  } = resolveAssignmentResultViewState(search);
   const headerView = data ? buildAssignmentResultHeaderView(data) : null;
   const title =
     headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;
@@ -153,7 +156,7 @@ function AssignmentResultsPage() {
     void navigate({
       replace: true,
       search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort },
+        current: { itemSort, review, sort, student },
         update: {
           control: 'item-performance-sort',
           value: nextSort,
@@ -166,7 +169,7 @@ function AssignmentResultsPage() {
     void navigate({
       replace: true,
       search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort },
+        current: { itemSort, review, sort, student },
         update: {
           control: 'student-sort',
           value: nextSort,
@@ -179,10 +182,23 @@ function AssignmentResultsPage() {
     void navigate({
       replace: true,
       search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort },
+        current: { itemSort, review, sort, student },
         update: {
           control: 'attempt-review-filter',
           value: nextFilter,
+        },
+      }),
+    });
+  }
+
+  function updateStudentSearch(nextSearch: string) {
+    void navigate({
+      replace: true,
+      search: buildAssignmentResultControlSearchState({
+        current: { itemSort, review, sort, student },
+        update: {
+          control: 'student-search',
+          value: nextSearch,
         },
       }),
     });
@@ -368,8 +384,8 @@ function AssignmentResultsPage() {
               ) : null}
               <ResultStudentSearch
                 summary={resultView.resultSearchSummary}
-                onClear={() => setStudentSearch('')}
-                onSearch={setStudentSearch}
+                onClear={() => updateStudentSearch('')}
+                onSearch={updateStudentSearch}
                 onSortChange={updateStudentSort}
                 sort={studentSort}
                 value={studentSearch}
