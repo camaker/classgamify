@@ -8348,6 +8348,60 @@ assert.deepEqual(
     studentLabel: 'Anonymous student 2',
   }
 );
+const sanitizedResultAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-invalid-score',
+      resultJson: {
+        accuracy: Number.NaN,
+        completedItemCount: 1,
+        correctItemCount: 0,
+        earnedPoints: Number.NaN,
+        totalPoints: 2,
+      },
+      score: Number.NaN,
+      studentName: 'Beta',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'attempt-earned-points-fallback',
+      resultJson: {
+        accuracy: Number.POSITIVE_INFINITY,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 4,
+        totalPoints: 4,
+      },
+      score: null,
+      studentName: ' beta ',
+    },
+  ],
+  runtimeItems: resultRuntimeItems,
+});
+assert.deepEqual(
+  sanitizedResultAnalysis.attempts.map((attempt) => ({
+    accuracy: attempt.accuracy,
+    score: attempt.score,
+  })),
+  [
+    { accuracy: 0, score: 0 },
+    { accuracy: 0, score: 4 },
+  ]
+);
+assert.equal(sanitizedResultAnalysis.students[0]?.averageAccuracy, 0);
+assert.equal(sanitizedResultAnalysis.students[0]?.bestAccuracy, 0);
+assert.equal(sanitizedResultAnalysis.students[0]?.latestAccuracy, 0);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
 assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
 assert.equal(

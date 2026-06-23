@@ -109,7 +109,7 @@ export function analyzeAssignmentResults({
     const identity = identityResolver.resolve(attempt);
 
     return {
-      accuracy: attempt.resultJson?.accuracy ?? 0,
+      accuracy: getAttemptReviewAccuracy(attempt),
       answers: attempt.answersJson.answers.map((answer) => {
         const item = runtimeItemById.get(answer.itemId);
         const acceptedAnswers = item ? getAcceptedAnswers(item.answer) : [];
@@ -125,7 +125,7 @@ export function analyzeAssignmentResults({
       }),
       completedAt: attempt.completedAt,
       id: attempt.id,
-      score: attempt.score ?? 0,
+      score: getAttemptReviewScore(attempt),
       studentKey: identity.key,
       studentLabel: identity.label,
     };
@@ -139,6 +139,21 @@ export function analyzeAssignmentResults({
     perItem,
     students: buildStudentSummaries(attemptReviews),
   };
+}
+
+function getAttemptReviewAccuracy(attempt: AttemptForAnalysis) {
+  return getFiniteNumber(attempt.resultJson?.accuracy, 0);
+}
+
+function getAttemptReviewScore(attempt: AttemptForAnalysis) {
+  const score = getFiniteNumber(attempt.score);
+  if (score !== undefined) return score;
+
+  return getFiniteNumber(attempt.resultJson?.earnedPoints, 0);
+}
+
+function getFiniteNumber(value: number | null | undefined, fallback?: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
 function buildStudentSummaries(
