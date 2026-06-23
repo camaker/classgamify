@@ -663,6 +663,10 @@ const settingsNotificationsRouteSource = readFileSync(
   'src/routes/settings/notifications.tsx',
   'utf8'
 );
+const settingsApiKeysRouteSource = readFileSync(
+  'src/routes/settings/apikeys.tsx',
+  'utf8'
+);
 const protectedPagesSpecSource = readFileSync(
   'tests/e2e/specs/protected-pages.spec.ts',
   'utf8'
@@ -693,6 +697,16 @@ assert.doesNotMatch(
   /\/settings\/(?:apikeys|billing|payment|notifications)/,
   'Protected smoke tests should only require active default settings pages.'
 );
+assert.doesNotMatch(
+  routeConstantsSource,
+  /SettingsApiKeys/,
+  'Retired API key settings should not stay in public route constants.'
+);
+assert.doesNotMatch(
+  settingsApiKeysRouteSource,
+  /ApiKeysPageContent|DashboardLayout|settings_api_keys/,
+  'Retired API key settings route should not import or render its template UI.'
+);
 const retiredRouteDocumentationText = [
   'docs/locale.md',
   'docs/newsletter.md',
@@ -720,8 +734,23 @@ assert.doesNotMatch(
 assert.match(e2eTestCatalogText, /retired legacy learning routes/);
 assert.doesNotMatch(
   localeMessageText,
-  /Manage your account information|Manage your security settings|管理您的账户信息|管理您的安全设置/,
+  /settings_api_keys_|Manage your account information|Manage your security settings|管理您的账户信息|管理您的安全设置/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
+);
+assert.equal(
+  existsSync('src/components/settings/apikeys/apikeys-page-content.tsx'),
+  false,
+  'Retired API key settings page content should stay deleted.'
+);
+assert.equal(
+  existsSync('src/components/settings/apikeys/apikeys-table.tsx'),
+  false,
+  'Retired API key settings table should stay deleted.'
+);
+assert.equal(
+  existsSync('src/hooks/use-apikeys.ts'),
+  false,
+  'Retired API key settings hook should stay deleted.'
 );
 assert.equal(
   existsSync('src/routes/hanzi/$character.tsx'),
