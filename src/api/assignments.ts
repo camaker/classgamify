@@ -119,6 +119,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
     const summaryAttempts = await db
       .select({
         resultJson: attempt.resultJson,
+        settingsJson: assignment.settingsJson,
       })
       .from(attempt)
       .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
@@ -167,19 +168,22 @@ export const listAssignments = createServerFn({ method: 'GET' })
             .select({
               assignmentId: attempt.assignmentId,
               resultJson: attempt.resultJson,
+              settingsJson: assignment.settingsJson,
             })
             .from(attempt)
+            .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
             .where(inArray(attempt.assignmentId, itemAssignmentIds))
         : [];
-    const statsByAssignmentId =
-      summarizeAssignmentAttemptsByAssignmentId(itemAttempts);
+    const statsByAssignmentId = summarizeAssignmentAttemptsByAssignmentId(
+      itemAttempts.map(withAttemptStatsSettings)
+    );
     const emptyStats = summarizeAssignmentAttempts([]);
     const enriched = items.map((item) => ({
       ...withResolvedAssignmentSettings(item),
       stats: statsByAssignmentId.get(item.assignment.id) ?? emptyStats,
     }));
     const summary = buildAssignmentListSummary({
-      attempts: summaryAttempts,
+      attempts: summaryAttempts.map(withAttemptStatsSettings),
       assignments: matchingAssignments,
       totalAssignments: totalRow?.count ?? 0,
     });
@@ -262,6 +266,19 @@ function withResolvedAssignmentSettings<
       ...item.assignment,
       settingsJson: resolveAssignmentSettings(item.assignment.settingsJson),
     },
+  };
+}
+
+function withAttemptStatsSettings<
+  TItem extends {
+    settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+  },
+>(item: TItem) {
+  const settings = resolveAssignmentSettings(item.settingsJson);
+
+  return {
+    ...item,
+    timeLimitSeconds: settings.timeLimitSeconds,
   };
 }
 
@@ -435,7 +452,10 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .from(attempt)
       .where(eq(attempt.assignmentId, row.assignment.id))
       .orderBy(desc(attempt.completedAt));
-    const stats = summarizeAssignmentAttempts(attempts);
+    const settings = resolveAssignmentSettings(row.assignment.settingsJson);
+    const stats = summarizeAssignmentAttempts(attempts, {
+      timeLimitSeconds: settings.timeLimitSeconds,
+    });
     const content = row.snapshot?.contentJson ?? row.activity.contentJson;
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;

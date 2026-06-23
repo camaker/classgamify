@@ -8156,6 +8156,41 @@ assert.deepEqual(
     completions: 3,
   }
 );
+assert.deepEqual(
+  summarizeAssignmentAttempts(
+    [
+      {
+        resultJson: {
+          accuracy: 100,
+          completedItemCount: 2,
+          correctItemCount: 2,
+          durationSeconds: 120,
+          earnedPoints: 2,
+          totalPoints: 2,
+        },
+        score: 2,
+      },
+      {
+        resultJson: {
+          accuracy: 50,
+          completedItemCount: 1,
+          correctItemCount: 1,
+          durationSeconds: 30,
+          earnedPoints: 1,
+          totalPoints: 2,
+        },
+        score: 1,
+      },
+    ],
+    { timeLimitSeconds: 60 }
+  ),
+  {
+    averageDurationSeconds: 45,
+    averagePoints: 2,
+    averageScore: 75,
+    completions: 2,
+  }
+);
 const assignmentAttemptStatsById = summarizeAssignmentAttemptsByAssignmentId([
   {
     assignmentId: 'assignment-a',
@@ -8204,6 +8239,52 @@ assert.deepEqual(assignmentAttemptStatsById.get('assignment-b'), {
   completions: 1,
 });
 assert.equal(assignmentAttemptStatsById.get('assignment-c'), undefined);
+const clampedAssignmentAttemptStatsById =
+  summarizeAssignmentAttemptsByAssignmentId([
+    {
+      assignmentId: 'assignment-a',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        durationSeconds: 120,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+      timeLimitSeconds: 60,
+    },
+    {
+      assignmentId: 'assignment-a',
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        durationSeconds: 30,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      timeLimitSeconds: 60,
+    },
+    {
+      assignmentId: 'assignment-b',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        durationSeconds: 120,
+        earnedPoints: 2,
+        totalPoints: 2,
+      },
+    },
+  ]);
+assert.equal(
+  clampedAssignmentAttemptStatsById.get('assignment-a')?.averageDurationSeconds,
+  45
+);
+assert.equal(
+  clampedAssignmentAttemptStatsById.get('assignment-b')?.averageDurationSeconds,
+  120
+);
 
 const resultRuntimeItems = [
   {

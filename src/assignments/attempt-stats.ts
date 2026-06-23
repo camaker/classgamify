@@ -4,6 +4,7 @@ import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration'
 export type AssignmentAttemptStatsSource = {
   resultJson: AttemptResult | null;
   score?: number | null;
+  timeLimitSeconds?: number | null;
 };
 
 interface AssignmentAttemptStatsByAssignmentSource
@@ -19,7 +20,10 @@ type AssignmentAttemptStats = {
 };
 
 export function summarizeAssignmentAttempts(
-  attempts: AssignmentAttemptStatsSource[]
+  attempts: AssignmentAttemptStatsSource[],
+  options?: {
+    timeLimitSeconds?: number | null;
+  }
 ): AssignmentAttemptStats {
   const completions = attempts.length;
 
@@ -33,7 +37,7 @@ export function summarizeAssignmentAttempts(
   }
 
   const durationSeconds = attempts
-    .map(getAttemptDurationSeconds)
+    .map((attempt) => getAttemptDurationSeconds(attempt, options))
     .filter((duration): duration is number => duration !== undefined);
 
   return {
@@ -56,9 +60,15 @@ export function summarizeAssignmentAttempts(
   };
 }
 
-function getAttemptDurationSeconds(item: AssignmentAttemptStatsSource) {
+function getAttemptDurationSeconds(
+  item: AssignmentAttemptStatsSource,
+  options?: {
+    timeLimitSeconds?: number | null;
+  }
+) {
   return normalizeAttemptDurationSeconds({
     durationSeconds: item.resultJson?.durationSeconds,
+    timeLimitSeconds: item.timeLimitSeconds ?? options?.timeLimitSeconds,
   });
 }
 
