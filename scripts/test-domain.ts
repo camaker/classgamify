@@ -701,6 +701,12 @@ const retiredRouteDocumentationText = [
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
 const e2eTestCatalogText = readFileSync('tests/e2e/TEST-CATALOG.md', 'utf8');
+const localeMessageText = [
+  'project.inlang/messages/en.json',
+  'project.inlang/messages/zh.json',
+]
+  .map((filePath) => readFileSync(filePath, 'utf8'))
+  .join('\n');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(
   retiredRouteDocumentationText,
@@ -712,6 +718,11 @@ assert.doesNotMatch(
   'Retired legacy routes should not be documented as active migration pages.'
 );
 assert.match(e2eTestCatalogText, /retired legacy learning routes/);
+assert.doesNotMatch(
+  localeMessageText,
+  /Manage your account information|Manage your security settings|管理您的账户信息|管理您的安全设置/,
+  'Visible settings copy should use ClassGamify teacher-workspace language.'
+);
 assert.equal(
   existsSync('src/routes/hanzi/$character.tsx'),
   false,
