@@ -1,3 +1,5 @@
+import { getUniqueAcceptedAnswers } from '@/activities/answer-matching';
+
 type ResultDateValue = Date | string | null | undefined;
 
 export function formatAssignmentResultDate(
@@ -66,9 +68,10 @@ export function formatAcceptedAnswerAlternatives(
   }
 ) {
   const emptyValue = options?.emptyValue ?? '-';
-  if (values.length <= 1) return emptyValue;
+  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  if (acceptedAnswers.length <= 1) return emptyValue;
 
-  return values.join(options?.separator ?? ', ');
+  return acceptedAnswers.join(options?.separator ?? ', ');
 }
 
 export function formatOptionalAcceptedAnswerAlternatives(
@@ -77,9 +80,10 @@ export function formatOptionalAcceptedAnswerAlternatives(
     separator?: string;
   }
 ) {
-  if (values.length <= 1) return null;
+  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  if (acceptedAnswers.length <= 1) return null;
 
-  return formatAcceptedAnswerAlternatives(values, options);
+  return acceptedAnswers.join(options?.separator ?? ', ');
 }
 
 export function formatAssignmentResultValue(

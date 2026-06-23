@@ -8007,8 +8007,22 @@ assert.equal(
   }),
   'Paris | Paris, France'
 );
+assert.equal(
+  formatAcceptedAnswerAlternatives([
+    ' Paris ',
+    '',
+    'paris',
+    'Ｐａｒｉｓ',
+    'Paris, France',
+  ]),
+  'Paris, Paris, France'
+);
 assert.equal(formatOptionalAcceptedAnswerAlternatives([]), null);
 assert.equal(formatOptionalAcceptedAnswerAlternatives(['Paris']), null);
+assert.equal(
+  formatOptionalAcceptedAnswerAlternatives(['Paris', ' paris ', 'Ｐａｒｉｓ']),
+  null
+);
 assert.equal(
   formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
   'Paris, Paris, France'

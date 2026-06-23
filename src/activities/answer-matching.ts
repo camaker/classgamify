@@ -31,12 +31,29 @@ export function matchAnswer({
 }
 
 export function getAcceptedAnswers(expectedAnswer: string) {
-  return uniqueAcceptedAnswers(
+  return getUniqueAcceptedAnswers(
     expectedAnswer
       .split(/\s*(?:\/|／|;|；|、)\s*/u)
       .map((answer) => answer.trim())
       .filter(Boolean)
   );
+}
+
+export function getUniqueAcceptedAnswers(values: string[]) {
+  const seen = new Set<string>();
+  const acceptedAnswers: string[] = [];
+
+  for (const value of values) {
+    const displayValue = value.trim();
+    const normalized = normalizeAnswerForMatching(displayValue);
+
+    if (!normalized || seen.has(normalized)) continue;
+
+    seen.add(normalized);
+    acceptedAnswers.push(displayValue);
+  }
+
+  return acceptedAnswers;
 }
 
 function normalizeAnswerForMatching(value: string) {
@@ -49,20 +66,4 @@ function normalizeAnswerForMatching(value: string) {
     .replace(/[.,!?;:，。！？；：、()[\]{}"“”\-_‐‑‒–—―]/gu, ' ')
     .replace(/\s+/gu, ' ')
     .trim();
-}
-
-function uniqueAcceptedAnswers(values: string[]) {
-  const seen = new Set<string>();
-  const acceptedAnswers: string[] = [];
-
-  for (const value of values) {
-    const normalized = normalizeAnswerForMatching(value);
-
-    if (!normalized || seen.has(normalized)) continue;
-
-    seen.add(normalized);
-    acceptedAnswers.push(value);
-  }
-
-  return acceptedAnswers;
 }
