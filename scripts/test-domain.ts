@@ -779,6 +779,23 @@ assert.equal(
   ).length,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT
 );
+const whitespaceMaterialReference = buildActivityMaterialReferenceFromUserFile({
+  contentType: ' application/pdf ',
+  id: ' file\tmessy\nid ',
+  originalName: '  Worksheet\nScan\t1.pdf  ',
+  size: 1024.9,
+});
+assert.deepEqual(whitespaceMaterialReference, {
+  contentType: 'application/pdf',
+  fileId: 'file messy id',
+  kind: 'worksheet-document',
+  originalName: 'Worksheet Scan 1.pdf',
+  size: 1024,
+});
+assert.equal(
+  buildActivitySourceMaterialDraftNotes([whitespaceMaterialReference]),
+  'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf'
+);
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
 assert.match(storageModuleDocs, /content-disposition\.ts/);

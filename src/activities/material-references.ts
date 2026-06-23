@@ -105,7 +105,7 @@ function compactActivityMaterialReference(
 function normalizeReferenceText(value: unknown, maxLength: number) {
   if (typeof value !== 'string') return undefined;
 
-  const normalized = value.trim();
+  const normalized = value.normalize('NFKC').replace(/\s+/g, ' ').trim();
   if (!normalized) return undefined;
 
   return normalized.slice(0, maxLength);
