@@ -495,6 +495,7 @@ function PlayPage() {
               result && assignment.settings.showCorrectAnswers
             )}
             reviewItems={result?.reviewItems}
+            language={activity.content.language}
             templateType={activity.templateType}
             onAnswerChange={(itemId, answer) => {
               setConfirmIncompleteSubmit(false);
@@ -581,6 +582,7 @@ function RuntimeItemList({
   answers,
   disabled,
   items,
+  language,
   onAnswerChange,
   revealAnswer,
   reviewItems,
@@ -589,6 +591,7 @@ function RuntimeItemList({
   answers: Record<string, string>;
   disabled: boolean;
   items: PublicRuntimeItem[];
+  language?: string;
   onAnswerChange: (itemId: string, answer: string) => void;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
@@ -684,6 +687,7 @@ function RuntimeItemList({
           answers={answers}
           disabled={disabled}
           items={items}
+          language={language}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
           onAnswerChange={onAnswerChange}

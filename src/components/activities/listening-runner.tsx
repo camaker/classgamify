@@ -8,6 +8,7 @@ import {
   buildStudentRunnerView,
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
+import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ type ListeningRunnerProps = {
   answers: Record<string, string>;
   disabled: boolean;
   items: PublicRuntimeItem[];
+  language?: string;
   onAnswerChange: (itemId: string, answer: string) => void;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
@@ -34,6 +36,7 @@ export function ListeningRunner({
   answers,
   disabled,
   items,
+  language,
   onAnswerChange,
   revealAnswer,
   reviewItems,
@@ -71,8 +74,14 @@ export function ListeningRunner({
       return;
     }
 
+    const utterance = new SpeechSynthesisUtterance(prompt);
+    const speechLanguage = normalizeListeningSpeechLanguage(language);
+    if (speechLanguage) {
+      utterance.lang = speechLanguage;
+    }
+
     window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance(prompt));
+    window.speechSynthesis.speak(utterance);
   }
 
   if (!activeItem) {

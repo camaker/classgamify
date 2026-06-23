@@ -106,6 +106,7 @@ import {
   getActivityRunnerKindCopy,
   getActivityTemplateRunnerCopy,
 } from '@/activities/runner-copy';
+import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
 import {
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
@@ -6017,6 +6018,17 @@ assert.deepEqual(
     ['matching-pairs', 'matching-pairs'],
     ['open-box', 'open-box'],
   ]
+);
+assert.equal(normalizeListeningSpeechLanguage('zh'), 'zh-CN');
+assert.equal(normalizeListeningSpeechLanguage('中文'), 'zh-CN');
+assert.equal(normalizeListeningSpeechLanguage('Chinese'), 'zh-CN');
+assert.equal(normalizeListeningSpeechLanguage('zh-TW'), 'zh-TW');
+assert.equal(normalizeListeningSpeechLanguage('en'), 'en-US');
+assert.equal(normalizeListeningSpeechLanguage('pt-br'), 'pt-BR');
+assert.equal(normalizeListeningSpeechLanguage('  '), undefined);
+assert.equal(
+  normalizeListeningSpeechLanguage('not a language tag!'),
+  undefined
 );
 assert.deepEqual(
   [
