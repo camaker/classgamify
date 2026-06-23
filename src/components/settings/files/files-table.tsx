@@ -38,6 +38,10 @@ import {
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
 import {
+  buildUserFileMaterialSummary,
+  type UserFileMaterialSummary,
+} from '@/storage/file-summary';
+import {
   type ColumnDef,
   type VisibilityState,
   flexRender,
@@ -105,12 +109,48 @@ function TableRowSkeleton({ columns }: { columns: number }) {
     </TableRow>
   );
 }
+
+function FilesSummaryStrip({ summary }: { summary: UserFileMaterialSummary }) {
+  const items = [
+    {
+      label: m.settings_files_summary_total_files(),
+      value: String(summary.totalFiles),
+    },
+    {
+      label: m.settings_files_summary_total_storage(),
+      value: formatBytes(summary.totalBytes),
+    },
+    {
+      label: m.settings_files_summary_worksheet_materials(),
+      value: String(summary.worksheetFiles),
+    },
+    {
+      label: m.settings_files_summary_audio_materials(),
+      value: String(summary.audioFiles),
+    },
+  ];
+
+  return (
+    <div className="grid gap-3 rounded-lg border bg-muted/20 p-3 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item) => (
+        <div key={item.label} className="min-w-0">
+          <div className="text-muted-foreground text-xs font-medium">
+            {item.label}
+          </div>
+          <div className="truncate font-semibold text-base">{item.value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function toDate(value: number | Date | undefined | null): Date | null {
   if (value == null) return null;
   return value instanceof Date ? value : new Date(value);
 }
 interface FilesTableProps {
   data: UserFiles[];
+  summary?: UserFileMaterialSummary;
   total: number;
   pageIndex: number;
   pageSize: number;
@@ -127,6 +167,7 @@ interface FilesTableProps {
 }
 export function FilesTable({
   data,
+  summary,
   total,
   pageIndex,
   pageSize,
@@ -142,6 +183,10 @@ export function FilesTable({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isPublic, setIsPublic] = useState(false);
   const [description, setDescription] = useState('');
+  const materialSummary = useMemo(
+    () => summary ?? buildUserFileMaterialSummary(data),
+    [data, summary]
+  );
   const columns: ColumnDef<UserFiles>[] = useMemo(
     () => [
       {
@@ -391,6 +436,8 @@ export function FilesTable({
           </DialogContent>
         </Dialog>
       </div>
+
+      <FilesSummaryStrip summary={materialSummary} />
 
       <div className="relative flex flex-col gap-4 overflow-auto">
         <div className="overflow-hidden rounded-lg border">

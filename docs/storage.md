@@ -57,6 +57,7 @@ src/storage/
 ├── content-disposition.ts # Safe attachment filename headers
 ├── constants.ts       # Default size, folder, and allowed-type settings
 ├── file-materials.ts  # Classroom material kind classification
+├── file-summary.ts    # Classroom material summary metrics
 ├── index.ts           # getStorageProvider, uploadFile, deleteFile, getFile, …
 ├── types.ts           # R2BucketInterface, UploadFileResult, errors
 ├── utils.ts           # Folder and public-folder helpers
@@ -107,6 +108,11 @@ Files are always served via the same-origin route `/api/storage/file?key=...`.
   `@/storage/file-materials`): Classifies saved files as audio, worksheet image,
   worksheet document, spreadsheet, video, archive, data file, or file using
   `contentType` plus filename-extension fallback.
+
+- **buildUserFileMaterialSummary** (shared helper, in
+  `@/storage/file-summary`): Builds reusable classroom-material totals for the
+  Files settings page and future activity/AI material pickers, including total
+  files, bytes, access mix, audio count, and worksheet-material count.
 
 - **buildAttachmentContentDisposition** (shared helper, in
   `@/storage/content-disposition`): Builds safe attachment headers that preserve

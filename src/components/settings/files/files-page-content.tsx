@@ -39,6 +39,7 @@ export function FilesPageContent() {
   return (
     <FilesTable
       data={data?.items ?? []}
+      summary={data?.summary}
       total={data?.total ?? 0}
       pageIndex={page}
       pageSize={pageSize}

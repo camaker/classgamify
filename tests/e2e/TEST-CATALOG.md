@@ -85,7 +85,7 @@ without browser console errors or page errors.
 | # | Test name | Flow |
 |---|---|---|
 | 1 | Protected pages render successfully | Sign in as an admin E2E user, then open `/dashboard`, `/dashboard/activities`, `/dashboard/assignments`, `/admin/users`, `/settings/profile`, `/settings/security`, and `/settings/files` for `en` and `zh`, in `dark` and `light` mode. Verify each active product page returns 2xx, renders a visible body, applies the requested theme, and emits no browser errors. |
-| 2 | Settings files classify classroom materials | With storage enabled, open the dashboard sidebar, follow the settings Files entry, and verify `/settings/files` loads for `en` and `zh`. Seed saved file rows for audio, worksheet image, worksheet document, spreadsheet, and unknown classroom materials, then verify the Material column shows localized teacher-facing labels while preserving the raw content type as secondary detail for troubleshooting. |
+| 2 | Settings files classify classroom materials | With storage enabled, open the dashboard sidebar, follow the settings Files entry, and verify `/settings/files` loads for `en` and `zh`. Seed saved file rows for audio, worksheet image, worksheet document, spreadsheet, and unknown classroom materials, then verify the Material column shows localized teacher-facing labels while preserving the raw content type as secondary detail for troubleshooting. Verify the summary strip shows total materials, storage used, worksheet material count, and audio material count from the full file library rather than only the visible page. |
 
 ## 4. Profile Settings
 

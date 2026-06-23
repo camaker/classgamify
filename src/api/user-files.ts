@@ -4,6 +4,7 @@ import { getBaseUrl } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
+import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { StorageError, UploadError } from '@/storage/types';
 import { isPublicFolder } from '@/storage/utils';
 import { createServerFn } from '@tanstack/react-start';
@@ -40,7 +41,22 @@ export const listUserFiles = createServerFn({ method: 'GET' })
       .limit(pageSize)
       .offset(pageIndex * pageSize);
 
-    return { items, total };
+    const summaryItems = await db
+      .select({
+        contentType: userFiles.contentType,
+        filename: userFiles.filename,
+        isPublic: userFiles.isPublic,
+        originalName: userFiles.originalName,
+        size: userFiles.size,
+      })
+      .from(userFiles)
+      .where(where);
+
+    return {
+      items,
+      summary: buildUserFileMaterialSummary(summaryItems),
+      total,
+    };
   });
 
 const deleteSchema = z.object({ id: z.string() });

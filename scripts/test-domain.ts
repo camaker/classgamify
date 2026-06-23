@@ -366,6 +366,7 @@ import {
   getUserFileExtension,
   resolveUserFileMaterialKind,
 } from '@/storage/file-materials';
+import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
@@ -593,10 +594,44 @@ assert.equal(
   }),
   'wav'
 );
+const userFileMaterialSummary = buildUserFileMaterialSummary([
+  {
+    contentType: 'audio/mpeg',
+    isPublic: false,
+    originalName: '三年级听力.mp3',
+    size: 2_048,
+  },
+  {
+    contentType: 'image/png',
+    isPublic: true,
+    originalName: 'worksheet-scan.png',
+    size: 1_024,
+  },
+  {
+    contentType: 'application/pdf',
+    isPublic: false,
+    originalName: '复习练习纸.pdf',
+    size: 512,
+  },
+  {
+    contentType: 'application/octet-stream',
+    isPublic: false,
+    originalName: 'scores.xlsx',
+    size: 256,
+  },
+]);
+assert.equal(userFileMaterialSummary.totalFiles, 4);
+assert.equal(userFileMaterialSummary.totalBytes, 3_840);
+assert.equal(userFileMaterialSummary.publicFiles, 1);
+assert.equal(userFileMaterialSummary.privateFiles, 3);
+assert.equal(userFileMaterialSummary.audioFiles, 1);
+assert.equal(userFileMaterialSummary.worksheetFiles, 2);
+assert.equal(userFileMaterialSummary.byKind.spreadsheet, 1);
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
 assert.match(storageModuleDocs, /content-disposition\.ts/);
 assert.match(storageModuleDocs, /file-materials\.ts/);
+assert.match(storageModuleDocs, /file-summary\.ts/);
 assert.match(storageModuleDocs, /current default is 10MB/);
 assert.match(storageModuleDocs, /`userFiles`\s+table/);
 assert.doesNotMatch(
