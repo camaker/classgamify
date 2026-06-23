@@ -65,6 +65,7 @@ import {
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
+  buildActivitySourceMaterialDraftNotes,
   getActivityDraftSourceText,
 } from '@/activities/draft-source';
 import {
@@ -6975,12 +6976,72 @@ assert.equal(
   ['Shared source', 'Pair source', 'Group source'].join('\n\n')
 );
 assert.equal(
+  buildActivitySourceMaterialDraftNotes([
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-worksheet-1',
+      kind: 'worksheet-document',
+      originalName: 'revision worksheet.pdf',
+      size: 512,
+    },
+  ]),
+  [
+    'Attached classroom source materials:',
+    '- Audio: 三年级听力.mp3',
+    '- Worksheet document: revision worksheet.pdf',
+  ].join('\n')
+);
+const materialDraftSourceText = getActivityDraftSourceText({
+  ...fallbackDraft,
+  groupsText: '',
+  pairsText: '',
+  questionsText: '',
+  sourceMaterials: [listeningMaterialReference],
+  sourceSummary: 'Safe source summary',
+  teacherNotesText: '',
+  vocabularyText: '',
+});
+assert.equal(
+  materialDraftSourceText,
+  [
+    'Safe source summary',
+    'Attached classroom source materials:\n- Audio: 三年级听力.mp3',
+  ].join('\n\n')
+);
+assert.doesNotMatch(materialDraftSourceText, /r2Key|userfiles\/|fileId/);
+assert.equal(
+  buildGenerateActivityDraftInputFromEditor({
+    current: {
+      ...activityEditorDefaultInput,
+      sourceMaterials: [listeningMaterialReference],
+    },
+    itemCount: 5,
+    sourceText: materialDraftSourceText,
+  }).sourceText,
+  materialDraftSourceText
+);
+assert.equal(
   getActivityDraftSourceText({
     ...fallbackDraft,
     groupsText: '',
     pairsText: '',
     questionsText: '',
     sourceSummary: '',
+    sourceMaterials: [listeningMaterialReference],
+    teacherNotesText: '',
+    vocabularyText: '',
+  }),
+  'Attached classroom source materials:\n- Audio: 三年级听力.mp3'
+);
+assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    groupsText: '',
+    pairsText: '',
+    questionsText: '',
+    sourceSummary: '',
+    sourceMaterials: [],
     teacherNotesText: '',
     vocabularyText: '',
   }),

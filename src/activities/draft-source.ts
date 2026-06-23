@@ -1,4 +1,7 @@
 import type { CreateActivityInput } from '@/activities/validation';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import { m } from '@/locale/paraglide/messages';
+import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 
 export const DEFAULT_ACTIVITY_DRAFT_SOURCE =
   'apple, bread, milk, rice, water, egg';
@@ -14,11 +17,27 @@ const ACTIVITY_DRAFT_SOURCE_FIELDS = [
 ] as const satisfies ReadonlyArray<keyof CreateActivityInput>;
 
 export function getActivityDraftSourceText(values: CreateActivityInput) {
-  const sourceText = buildActivityDraftSourceText(
-    ACTIVITY_DRAFT_SOURCE_FIELDS.map((field) => values[field])
-  );
+  const sourceText = buildActivityDraftSourceText([
+    ...ACTIVITY_DRAFT_SOURCE_FIELDS.map((field) => values[field]),
+    buildActivitySourceMaterialDraftNotes(values.sourceMaterials),
+  ]);
 
   return sourceText || DEFAULT_ACTIVITY_DRAFT_SOURCE;
+}
+
+export function buildActivitySourceMaterialDraftNotes(value: unknown) {
+  const materials = normalizeActivityMaterialReferences(value);
+  if (materials.length === 0) return undefined;
+
+  return [
+    m.activity_draft_source_materials_heading(),
+    ...materials.map((material) =>
+      m.activity_draft_source_materials_item({
+        kind: formatUserFileMaterialKind(material.kind),
+        name: material.originalName,
+      })
+    ),
+  ].join('\n');
 }
 
 function buildActivityDraftSourceText(values: Array<string | undefined>) {

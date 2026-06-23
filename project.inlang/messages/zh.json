@@ -72,6 +72,8 @@
   "activity_draft_meta_selected_label": "当前选择",
   "activity_draft_meta_title": "AI 草稿覆盖情况",
   "activity_draft_meta_unknown_model": "未知模型",
+  "activity_draft_source_materials_heading": "已附加课堂来源素材：",
+  "activity_draft_source_materials_item": "- {kind}：{name}",
   "activity_duplicate_title_format": "复制：{title}",
   "activity_duplicate_untitled_title": "未命名活动",
   "activity_edit_access_archived_action": "打开归档活动",

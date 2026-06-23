@@ -72,6 +72,8 @@
   "activity_draft_meta_selected_label": "selected",
   "activity_draft_meta_title": "AI draft coverage",
   "activity_draft_meta_unknown_model": "Unknown model",
+  "activity_draft_source_materials_heading": "Attached classroom source materials:",
+  "activity_draft_source_materials_item": "- {kind}: {name}",
   "activity_duplicate_title_format": "Copy of {title}",
   "activity_duplicate_untitled_title": "Untitled activity",
   "activity_edit_access_archived_action": "Open archived activities",
