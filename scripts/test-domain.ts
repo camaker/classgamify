@@ -546,6 +546,31 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const environmentTemplateFiles = ['.env.example', '.env.production.example'];
+for (const filePath of environmentTemplateFiles) {
+  const fileText = readFileSync(filePath, 'utf8');
+
+  assert.doesNotMatch(
+    fileText,
+    copiedTemplateMarkerPattern,
+    `${filePath} should not point new ClassGamify deploys at copied product domains.`
+  );
+  assert.match(
+    fileText,
+    /VITE_BASE_URL='https:\/\/classgamify\.example'/,
+    `${filePath} should use a ClassGamify placeholder base URL.`
+  );
+  assert.match(
+    fileText,
+    /https:\/\/classgamify\.example\/api\/auth\/callback\/google/,
+    `${filePath} should document the ClassGamify Google callback URL.`
+  );
+  assert.doesNotMatch(
+    fileText,
+    /885df2bc-1419-458c-b8b6-0821eddfb399|G-QH46LZCPE3|367bc1f5-9e17-46c5-af53-661b08883331|xa8pgti8e4/,
+    `${filePath} should not carry copied Cloudflare or analytics identifiers.`
+  );
+}
 assert.doesNotMatch(
   readFileSync('src/components/blog/blog-post-visual.tsx', 'utf8'),
   />ClassGamify</,
