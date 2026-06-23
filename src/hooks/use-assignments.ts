@@ -6,6 +6,7 @@ import {
   submitAttempt,
   updateAssignmentStatus,
 } from '@/api/assignments';
+import type { AssignmentLifecycleStatusFilter } from '@/assignments/list-filters';
 import type {
   PublishAssignmentInput,
   UpdateAssignmentStatusInput,
@@ -29,7 +30,7 @@ const assignmentsKeys = {
     pageSize: number;
     publishedShareSlug?: string;
     search?: string;
-    status?: 'draft' | 'published' | 'closed';
+    status?: AssignmentLifecycleStatusFilter;
   }) => [...assignmentsKeys.lists(), params] as const,
   lists: () => [...assignmentsKeys.all, 'lists'] as const,
   public: (shareSlug: string) =>
@@ -48,7 +49,7 @@ export function useAssignments({
   pageSize?: number;
   publishedShareSlug?: string;
   search?: string;
-  status?: 'draft' | 'published' | 'closed';
+  status?: AssignmentLifecycleStatusFilter;
 }) {
   return useQuery({
     placeholderData: keepPreviousData,

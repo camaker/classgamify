@@ -1,7 +1,11 @@
-import type { AssignmentStatus } from '@/activities/types';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
-export type AssignmentStatusFilter = 'all' | AssignmentStatus;
+export type AssignmentLifecycleStatusFilter =
+  | 'closed'
+  | 'draft'
+  | 'expired'
+  | 'open';
+export type AssignmentStatusFilter = 'all' | AssignmentLifecycleStatusFilter;
 
 type AssignmentListSearchState = {
   page?: number;
@@ -14,7 +18,7 @@ type AssignmentListRouteSearch = {
   page?: number;
   published?: string;
   q?: string;
-  status?: AssignmentStatus;
+  status?: AssignmentLifecycleStatusFilter;
 };
 
 export function normalizeAssignmentListSearch(value?: string | null) {
@@ -60,10 +64,13 @@ export function buildAssignmentListPageRouteSearch({
 
 export function parseAssignmentStatusFilter(
   value: unknown
-): AssignmentStatus | undefined {
-  return value === 'published' || value === 'closed' || value === 'draft'
-    ? value
-    : undefined;
+): AssignmentLifecycleStatusFilter | undefined {
+  if (value === 'published' || value === 'open') return 'open';
+  if (value === 'expired' || value === 'closed' || value === 'draft') {
+    return value;
+  }
+
+  return undefined;
 }
 
 export function buildAssignmentListValidatedSearch(

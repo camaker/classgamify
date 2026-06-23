@@ -4764,7 +4764,7 @@ assert.deepEqual(
     page: 3,
     published: 'share-1',
     q: 'Week 1',
-    status: 'published',
+    status: 'open',
   }
 );
 assert.deepEqual(
@@ -4800,13 +4800,13 @@ assert.deepEqual(
     page: 4,
     published: 'share-1',
     q: ' week ',
-    status: 'closed',
+    status: 'expired',
   }),
   {
     page: 4,
     published: 'share-1',
     q: 'week',
-    status: 'closed',
+    status: 'expired',
   }
 );
 assert.deepEqual(
@@ -4841,7 +4841,9 @@ assert.deepEqual(
     status: 'closed',
   }
 );
-assert.equal(parseAssignmentStatusFilter('published'), 'published');
+assert.equal(parseAssignmentStatusFilter('published'), 'open');
+assert.equal(parseAssignmentStatusFilter('open'), 'open');
+assert.equal(parseAssignmentStatusFilter('expired'), 'expired');
 assert.equal(parseAssignmentStatusFilter('all'), undefined);
 assert.deepEqual(
   buildAssignmentListFilterSummary({
@@ -4865,7 +4867,7 @@ assert.deepEqual(
   buildAssignmentListFilterSummary({
     isLoading: false,
     search: 'week',
-    status: 'published',
+    status: 'open',
     total: 2,
   }),
   { hasFilters: true, text: '2 matches' }
@@ -4949,7 +4951,11 @@ assert.deepEqual(
 );
 assert.deepEqual(
   assignmentStatusFilterOptions.map((option) => option.value),
-  ['all', 'published', 'closed', 'draft']
+  ['all', 'open', 'expired', 'closed', 'draft']
+);
+assert.deepEqual(
+  assignmentStatusFilterOptions.map((option) => option.label),
+  ['All statuses', 'Open', 'Expired', 'Closed', 'Draft']
 );
 assert.deepEqual(assignmentListPageCopy, {
   breadcrumbCurrent: 'Assignments',

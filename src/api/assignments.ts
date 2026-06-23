@@ -16,7 +16,10 @@ import {
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
 import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
-import { normalizeAssignmentListSearch } from '@/assignments/list-filters';
+import {
+  type AssignmentLifecycleStatusFilter,
+  normalizeAssignmentListSearch,
+} from '@/assignments/list-filters';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
   assertAssignmentStatusTransition,
@@ -43,11 +46,29 @@ import {
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, inArray, like, or, type SQL } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  like,
+  lte,
+  or,
+  type SQL,
+} from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
-const assignmentStatusFilterSchema = z.enum(['draft', 'published', 'closed']);
+const assignmentStatusFilterSchema = z.enum([
+  'closed',
+  'draft',
+  'expired',
+  'open',
+]);
 const assignmentShareSlugSchema = z
   .string()
   .transform(normalizeAssignmentShareSlug)
@@ -172,19 +193,21 @@ export const listAssignments = createServerFn({ method: 'GET' })
   });
 
 function buildAssignmentListWhere({
+  now = new Date(),
   search,
   status,
   userId,
 }: {
+  now?: Date;
   search?: string;
-  status?: AssignmentStatus;
+  status?: AssignmentLifecycleStatusFilter;
   userId: string;
 }) {
   const normalizedSearch = normalizeAssignmentListSearch(search);
   const filters: SQL[] = [eq(assignment.ownerId, userId)];
 
   if (status) {
-    filters.push(eq(assignment.status, status));
+    filters.push(buildAssignmentStatusFilter(status, now));
   }
 
   if (normalizedSearch) {
@@ -202,6 +225,28 @@ function buildAssignmentListWhere({
   }
 
   return and(...filters);
+}
+
+function buildAssignmentStatusFilter(
+  status: AssignmentLifecycleStatusFilter,
+  now: Date
+) {
+  if (status === 'open') {
+    return and(
+      eq(assignment.status, 'published'),
+      or(isNull(assignment.expiresAt), gt(assignment.expiresAt, now))
+    ) as SQL;
+  }
+
+  if (status === 'expired') {
+    return and(
+      eq(assignment.status, 'published'),
+      isNotNull(assignment.expiresAt),
+      lte(assignment.expiresAt, now)
+    ) as SQL;
+  }
+
+  return eq(assignment.status, status);
 }
 
 function withResolvedAssignmentSettings<

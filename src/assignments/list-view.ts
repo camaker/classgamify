@@ -209,7 +209,13 @@ export const assignmentStatusFilterOptions = [
     get label() {
       return m.assignment_list_status_filter_published();
     },
-    value: 'published',
+    value: 'open',
+  },
+  {
+    get label() {
+      return m.assignment_list_status_filter_expired();
+    },
+    value: 'expired',
   },
   {
     get label() {
