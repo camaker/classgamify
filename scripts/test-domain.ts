@@ -9932,6 +9932,16 @@ assert.equal(
   }),
   'classgamify-三年级-听力复习-a-班-results.csv'
 );
+assert.equal(
+  buildAssignmentResultsCsvFilename({
+    ...csvExportData,
+    assignment: {
+      ...csvExportData.assignment,
+      title: 'A '.repeat(120),
+    },
+  }),
+  `classgamify-${`${'a-'.repeat(39)}a`}-results.csv`
+);
 const partialSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   assignment: {

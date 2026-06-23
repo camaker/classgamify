@@ -16,6 +16,8 @@ import {
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
+const ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH = 80;
+
 type ExportAttempt = {
   completedAt: Date | string | null;
   id: string;
@@ -234,5 +236,12 @@ function slugifyFilename(value: string) {
     .toLowerCase()
     .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
-  return slug || m.assignment_results_export_filename_fallback_assignment();
+  const truncatedSlug = [...slug]
+    .slice(0, ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH)
+    .join('')
+    .replace(/-+$/g, '');
+
+  return (
+    truncatedSlug || m.assignment_results_export_filename_fallback_assignment()
+  );
 }
