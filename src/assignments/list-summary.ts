@@ -8,7 +8,10 @@ import {
   type AssignmentDate,
   matchesAssignmentLifecycleStatus,
 } from '@/assignments/lifecycle';
-import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  formatAssignmentResultNumber,
+  formatAssignmentResultPercent,
+} from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListSummaryAssignmentSource = {
@@ -108,17 +111,23 @@ export function buildAssignmentListSummaryMetrics({
       label: hasFilters
         ? m.assignment_list_summary_matching()
         : m.assignment_list_summary_assignments(),
-      value: String(resolvedSummary.totalAssignments),
+      value: formatAssignmentResultNumber(resolvedSummary.totalAssignments, {
+        min: 0,
+      }),
     },
     {
       id: 'open',
       label: m.assignment_list_summary_open_links(),
-      value: String(resolvedSummary.openAssignments),
+      value: formatAssignmentResultNumber(resolvedSummary.openAssignments, {
+        min: 0,
+      }),
     },
     {
       id: 'completions',
       label: m.assignment_list_summary_completions(),
-      value: String(resolvedSummary.completions),
+      value: formatAssignmentResultNumber(resolvedSummary.completions, {
+        min: 0,
+      }),
     },
     {
       id: 'average',

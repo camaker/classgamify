@@ -1,5 +1,8 @@
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
-import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  formatAssignmentResultNumber,
+  formatAssignmentResultPercent,
+} from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
 type DashboardActivitySummary = {
@@ -178,7 +181,7 @@ export function buildDashboardCoreLoopReadiness(): DashboardCoreLoopReadinessRow
 }
 
 export function formatDashboardMetricValue(value: number | undefined) {
-  return value === undefined ? '-' : String(value);
+  return formatAssignmentResultNumber(value, { min: 0 });
 }
 
 function formatDashboardDraftDescription(count: number) {

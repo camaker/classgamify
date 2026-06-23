@@ -22,6 +22,7 @@ import {
 } from '@/assignments/identity';
 import {
   formatAcceptedAnswerAlternatives,
+  formatAssignmentResultNumber,
   formatAssignmentResultPercent,
   formatAssignmentResultValue,
   formatAssignmentResultDate,
@@ -527,10 +528,10 @@ export function buildAssignmentResultMetricItems({
 }) {
   const valueByMetric = {
     'average-accuracy': formatAssignmentResultPercent(averageScore),
-    'average-points': String(averagePoints),
+    'average-points': formatAssignmentResultNumber(averagePoints, { min: 0 }),
     'average-time': formatAttemptDuration(averageDurationSeconds),
     closes: formatAssignmentExpiry(expiresAt),
-    completions: String(completions),
+    completions: formatAssignmentResultNumber(completions, { min: 0 }),
   } satisfies Record<AssignmentResultMetricKey, string>;
 
   return assignmentResultMetricDescriptors.map((metric) => ({
@@ -912,14 +913,16 @@ export function buildAssignmentStudentSummaryRowView(
   student: AssignmentStudentSummary
 ) {
   return {
-    attemptsLabel: String(student.attempts),
+    attemptsLabel: formatAssignmentResultNumber(student.attempts, { min: 0 }),
     averageAccuracyLabel: formatAssignmentResultPercent(
       student.averageAccuracy
     ),
     bestAccuracyLabel: formatAssignmentResultPercent(student.bestAccuracy),
     lastSubmittedLabel: formatAssignmentResultDate(student.lastCompletedAt),
     latestAccuracyLabel: formatAssignmentResultPercent(student.latestAccuracy),
-    needsReviewLabel: String(student.needsReviewCount),
+    needsReviewLabel: formatAssignmentResultNumber(student.needsReviewCount, {
+      min: 0,
+    }),
     studentLabel: student.studentLabel,
   };
 }
@@ -1011,7 +1014,7 @@ export function formatAssignmentResultFraction(value: number, total: number) {
   return `${normalizedValue}/${normalizedTotal}`;
 }
 
-export { formatAssignmentResultPercent };
+export { formatAssignmentResultNumber, formatAssignmentResultPercent };
 
 export function formatAssignmentReviewCount(count: number) {
   if (count === 1) {

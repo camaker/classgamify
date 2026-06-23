@@ -11,7 +11,10 @@ import {
   getAssignmentStatusLabel,
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
-import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  formatAssignmentResultNumber,
+  formatAssignmentResultPercent,
+} from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { m } from '@/locale/paraglide/messages';
 
@@ -264,7 +267,7 @@ export function buildAssignmentListCardStats({
     {
       key: 'completions',
       label: m.assignment_list_card_stat_completions(),
-      value: String(completions),
+      value: formatAssignmentResultNumber(completions, { min: 0 }),
     },
     {
       key: 'average',

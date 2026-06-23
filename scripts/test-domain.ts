@@ -277,6 +277,7 @@ import {
   formatAssignmentBriefStudentAccuracy,
   formatAssignmentItemCorrectSummary,
   formatAssignmentResultFraction,
+  formatAssignmentResultNumber,
   formatAssignmentResultPercent,
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
@@ -4486,6 +4487,8 @@ try {
 }
 assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');
+assert.equal(formatDashboardMetricValue(Number.NaN), '-');
+assert.equal(formatDashboardMetricValue(-3), '0');
 assert.deepEqual(
   buildDashboardOverviewMetrics({
     isLoading: true,
@@ -5252,6 +5255,24 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
+  buildAssignmentListSummaryMetrics({
+    hasFilters: true,
+    summary: {
+      averageScore: Number.NaN,
+      completions: Number.NaN,
+      openAssignments: -2,
+      totalAssignments: Number.POSITIVE_INFINITY,
+    },
+    totalAssignments: 99,
+  }),
+  [
+    { id: 'total', label: 'Matching', value: '-' },
+    { id: 'open', label: 'Open links', value: '0' },
+    { id: 'completions', label: 'Completions', value: '-' },
+    { id: 'average', label: 'Average', value: '-' },
+  ]
+);
+assert.deepEqual(
   assignmentStatusFilterOptions.map((option) => option.value),
   ['all', 'open', 'expired', 'closed', 'draft']
 );
@@ -5312,10 +5333,10 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentListCardStats({
     averageScore: Number.NaN,
-    completions: 0,
+    completions: Number.NaN,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
+    { key: 'completions', label: 'Completions', value: '-' },
     { key: 'average', label: 'Average', value: '-' },
   ]
 );
@@ -8522,6 +8543,26 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationSeconds: Number.NaN,
+    averagePoints: Number.NaN,
+    averageScore: Number.NaN,
+    completions: Number.POSITIVE_INFINITY,
+    expiresAt: 'not-a-date',
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '-' },
+    { key: 'average-accuracy', label: 'Average accuracy', value: '-' },
+    { key: 'average-points', label: 'Average points', value: '-' },
+    { key: 'average-time', label: 'Average time', value: '-' },
+    {
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry('not-a-date'),
+    },
+  ]
+);
+assert.deepEqual(
   buildAssignmentResultHeaderView({
     activity: {
       description: 'Current activity description',
@@ -8866,6 +8907,10 @@ assert.equal(formatAssignmentResultFraction(-1, 5), '0/5');
 assert.equal(formatAssignmentResultFraction(2.5, 5), '2.5/5');
 assert.equal(formatAssignmentResultFraction(Number.NaN, 5), '-');
 assert.equal(formatAssignmentResultFraction(2, Number.POSITIVE_INFINITY), '-');
+assert.equal(formatAssignmentResultNumber(2.5), '2.5');
+assert.equal(formatAssignmentResultNumber(Number.NaN), '-');
+assert.equal(formatAssignmentResultNumber(null), '-');
+assert.equal(formatAssignmentResultNumber(-3, { min: 0 }), '0');
 assert.equal(formatAssignmentResultPercent(82), '82%');
 assert.equal(formatAssignmentResultPercent(82.6), '83%');
 assert.equal(formatAssignmentResultPercent(Number.NaN), '-');

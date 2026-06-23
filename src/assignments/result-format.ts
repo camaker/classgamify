@@ -41,6 +41,23 @@ export function formatAssignmentResultPercent(
   return `${Math.round(value)}%`;
 }
 
+export function formatAssignmentResultNumber(
+  value: number | null | undefined,
+  options?: {
+    emptyValue?: string;
+    min?: number;
+  }
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return options?.emptyValue ?? '-';
+  }
+
+  const normalizedValue =
+    options?.min === undefined ? value : Math.max(options.min, value);
+
+  return String(normalizedValue);
+}
+
 export function formatAcceptedAnswerAlternatives(
   values: string[],
   options?: {
