@@ -7978,7 +7978,7 @@ assert.deepEqual(
         earnedPoints: 0,
         totalPoints: 2,
       },
-      score: null,
+      score: Number.NaN,
     },
     {
       resultJson: null,
@@ -7990,6 +7990,49 @@ assert.deepEqual(
     averagePoints: 1,
     averageScore: 38,
     completions: 4,
+  }
+);
+assert.deepEqual(
+  summarizeAssignmentAttempts([
+    {
+      resultJson: {
+        accuracy: Number.NaN,
+        completedItemCount: 0,
+        correctItemCount: 0,
+        durationSeconds: Number.POSITIVE_INFINITY,
+        earnedPoints: Number.NaN,
+        totalPoints: 2,
+      },
+      score: Number.NaN,
+    },
+    {
+      resultJson: {
+        accuracy: 80,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        durationSeconds: -3,
+        earnedPoints: 4,
+        totalPoints: 5,
+      },
+      score: null,
+    },
+    {
+      resultJson: {
+        accuracy: Number.POSITIVE_INFINITY,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        durationSeconds: 4.4,
+        earnedPoints: Number.POSITIVE_INFINITY,
+        totalPoints: 5,
+      },
+      score: 3,
+    },
+  ]),
+  {
+    averageDurationSeconds: 2,
+    averagePoints: 2,
+    averageScore: 27,
+    completions: 3,
   }
 );
 const assignmentAttemptStatsById = summarizeAssignmentAttemptsByAssignmentId([

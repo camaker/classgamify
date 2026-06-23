@@ -1,4 +1,5 @@
 import type { AttemptResult } from '@/activities/types';
+import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 
 export type AssignmentAttemptStatsSource = {
   resultJson: AttemptResult | null;
@@ -31,18 +32,16 @@ export function summarizeAssignmentAttempts(
     };
   }
 
-  const durationAttempts = attempts.filter(
-    (item) => item.resultJson?.durationSeconds !== undefined
-  );
+  const durationSeconds = attempts
+    .map(getAttemptDurationSeconds)
+    .filter((duration): duration is number => duration !== undefined);
 
   return {
     averageDurationSeconds:
-      durationAttempts.length > 0
+      durationSeconds.length > 0
         ? Math.round(
-            durationAttempts.reduce(
-              (sum, item) => sum + (item.resultJson?.durationSeconds ?? 0),
-              0
-            ) / durationAttempts.length
+            durationSeconds.reduce((sum, duration) => sum + duration, 0) /
+              durationSeconds.length
           )
         : 0,
     averagePoints: Math.round(
@@ -50,13 +49,32 @@ export function summarizeAssignmentAttempts(
         completions
     ),
     averageScore: Math.round(
-      attempts.reduce(
-        (sum, item) => sum + (item.resultJson?.accuracy ?? 0),
-        0
-      ) / completions
+      attempts.reduce((sum, item) => sum + getAttemptAccuracy(item), 0) /
+        completions
     ),
     completions,
   };
+}
+
+function getAttemptDurationSeconds(item: AssignmentAttemptStatsSource) {
+  return normalizeAttemptDurationSeconds({
+    durationSeconds: item.resultJson?.durationSeconds,
+  });
+}
+
+function getAttemptAccuracy(item: AssignmentAttemptStatsSource) {
+  return getFiniteNumber(item.resultJson?.accuracy, 0);
+}
+
+function getAttemptPoints(item: AssignmentAttemptStatsSource) {
+  const score = getFiniteNumber(item.score);
+  if (score !== undefined) return score;
+
+  return getFiniteNumber(item.resultJson?.earnedPoints, 0);
+}
+
+function getFiniteNumber(value: number | null | undefined, fallback?: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
 export function summarizeAssignmentAttemptsByAssignmentId(
@@ -81,8 +99,4 @@ export function summarizeAssignmentAttemptsByAssignmentId(
       summarizeAssignmentAttempts(items),
     ])
   );
-}
-
-function getAttemptPoints(item: AssignmentAttemptStatsSource) {
-  return item.score ?? item.resultJson?.earnedPoints ?? 0;
 }
