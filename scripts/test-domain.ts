@@ -734,7 +734,7 @@ assert.doesNotMatch(
 assert.match(e2eTestCatalogText, /retired legacy learning routes/);
 assert.doesNotMatch(
   localeMessageText,
-  /settings_api_keys_|Manage your account information|Manage your security settings|管理您的账户信息|管理您的安全设置/,
+  /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
 );
 assert.equal(
