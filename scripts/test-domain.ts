@@ -590,6 +590,16 @@ assert.match(
   /settings_profile_avatar_upload_not_configured/,
   'Avatar settings should use the localized storage-not-configured label.'
 );
+assert.doesNotMatch(
+  updateAvatarCardSource,
+  /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Avatar update failures should use localized profile copy instead of raw storage or auth errors.'
+);
+assert.match(
+  updateAvatarCardSource,
+  /const message = m\.settings_profile_avatar_fail\(\);/,
+  'Avatar update failures should use the localized profile avatar failure message.'
+);
 const adminUserDetailViewerSource = readFileSync(
   'src/components/admin/users/user-detail-viewer.tsx',
   'utf8'

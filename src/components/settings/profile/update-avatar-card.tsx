@@ -65,21 +65,22 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
               toast.success(m.settings_profile_avatar_success());
               refetch();
             },
-            onError: (ctx) => {
-              setError(`${ctx.error.status}: ${ctx.error.message}`);
+            onError: () => {
+              const message = m.settings_profile_avatar_fail();
+              setError(message);
               if (session?.user?.image) setAvatarUrl(session.user.image);
               URL.revokeObjectURL(tempUrl);
-              toast.error(m.settings_profile_avatar_fail());
+              toast.error(message);
             },
           }
         );
       },
-      onError: (err) => {
-        const msg = err.message || m.settings_profile_avatar_fail();
-        setError(msg);
+      onError: () => {
+        const message = m.settings_profile_avatar_fail();
+        setError(message);
         if (session?.user?.image) setAvatarUrl(session.user.image);
         URL.revokeObjectURL(tempUrl);
-        toast.error(msg);
+        toast.error(message);
       },
     });
   };
