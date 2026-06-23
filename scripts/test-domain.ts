@@ -333,7 +333,10 @@ import {
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  isSameAssignmentShareSlug,
+  normalizeAssignmentShareSlug,
+} from '@/assignments/share-slug';
 import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
@@ -2486,11 +2489,15 @@ assert.deepEqual(
 );
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
 assert.equal(buildAssignmentSharePath('  abc 123  '), '/play/abc%20123');
+assert.equal(buildAssignmentSharePath('　abc １２３　'), '/play/abc%20123');
 assert.equal(
   buildAssignmentSharePath('class/6?homework=yes'),
   '/play/class%2F6%3Fhomework%3Dyes'
 );
 assert.equal(normalizeAssignmentShareSlug('  share-one  '), 'share-one');
+assert.equal(normalizeAssignmentShareSlug('　share-１２３　'), 'share-123');
+assert.equal(isSameAssignmentShareSlug(' share-１２３ ', 'share-123'), true);
+assert.equal(isSameAssignmentShareSlug('share-123', 'share-124'), false);
 assert.equal(
   normalizeShareBaseUrl('  https://classgamify.test///  '),
   'https://classgamify.test'
@@ -3033,7 +3040,7 @@ const publishedAssignments = [
   {
     assignment: {
       id: 'assignment-2',
-      shareSlug: 'share-2',
+      shareSlug: ' share-２ ',
       title: 'Week 2',
     },
   },
@@ -3054,7 +3061,7 @@ assert.equal(
 );
 const publishedAssignmentFromLookup = {
   id: 'assignment-3',
-  shareSlug: 'share-3',
+  shareSlug: ' share-３ ',
   title: 'Week 3',
 };
 assert.deepEqual(

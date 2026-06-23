@@ -1,5 +1,8 @@
 import { buildAssignmentSharePath } from '@/assignments/share-link';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  isSameAssignmentShareSlug,
+  normalizeAssignmentShareSlug,
+} from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
 type PublishedAssignmentListItem = {
@@ -19,8 +22,9 @@ export function findPublishedAssignmentInList<
   const normalizedShareSlug = normalizeOptionalAssignmentShareSlug(shareSlug);
   if (!normalizedShareSlug) return undefined;
 
-  return items.find((item) => item.assignment.shareSlug === normalizedShareSlug)
-    ?.assignment;
+  return items.find((item) =>
+    isSameAssignmentShareSlug(item.assignment.shareSlug, normalizedShareSlug)
+  )?.assignment;
 }
 
 export function resolvePublishedAssignmentPanelAssignment<
@@ -36,7 +40,12 @@ export function resolvePublishedAssignmentPanelAssignment<
 }) {
   const normalizedShareSlug = normalizeOptionalAssignmentShareSlug(shareSlug);
   if (!normalizedShareSlug) return undefined;
-  if (assignment?.shareSlug === normalizedShareSlug) return assignment;
+  if (
+    assignment &&
+    isSameAssignmentShareSlug(assignment.shareSlug, normalizedShareSlug)
+  ) {
+    return assignment;
+  }
 
   return findPublishedAssignmentInList({
     items,
