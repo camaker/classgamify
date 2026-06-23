@@ -648,6 +648,53 @@ assert.match(
   /toast\.error\(actionButton\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
 );
+const activityDashboardRouteSource = readFileSync(
+  'src/routes/dashboard/activities.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  activityDashboardRouteSource,
+  /error\.message|error instanceof Error/,
+  'Activity dashboard actions should use localized action failure copy instead of raw server or network errors.'
+);
+assert.match(
+  activityDashboardRouteSource,
+  /toast\.error\(actionView\.failureMessage\)/,
+  'Activity remix and duplicate failures should use localized derivative action failure copy.'
+);
+assert.match(
+  activityDashboardRouteSource,
+  /toast\.error\(actionCopy\.failureMessage\)/,
+  'Activity archive and restore failures should use localized lifecycle action failure copy.'
+);
+const assignmentDashboardRouteSource = readFileSync(
+  'src/routes/dashboard/assignments.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  assignmentDashboardRouteSource,
+  /error\.message|error instanceof Error/,
+  'Assignment dashboard status actions should use localized action failure copy instead of raw server or network errors.'
+);
+assert.match(
+  assignmentDashboardRouteSource,
+  /toast\.error\(statusAction\.failureMessage\)/,
+  'Assignment close and reopen failures should use localized status action failure copy.'
+);
+const activityPublishDialogSource = readFileSync(
+  'src/components/activities/activity-publish-dialog.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  activityPublishDialogSource,
+  /error\.message|error instanceof Error/,
+  'Assignment publish failures should use localized publish action copy instead of raw server or network errors.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /toast\.error\(actionView\.failureMessage\)/,
+  'Assignment publish failures should use localized publish failure copy.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,

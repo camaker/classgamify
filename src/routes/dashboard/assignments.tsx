@@ -502,10 +502,8 @@ function AssignmentCard({
         status: statusAction.nextStatus,
       });
       toast.success(statusAction.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : statusAction.failureMessage
-      );
+    } catch {
+      toast.error(statusAction.failureMessage);
     }
   }
 

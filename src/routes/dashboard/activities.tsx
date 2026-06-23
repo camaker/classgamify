@@ -626,10 +626,8 @@ function ActivityCard({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionView.failureMessage
-      );
+    } catch {
+      toast.error(actionView.failureMessage);
     }
   }
 
@@ -651,10 +649,8 @@ function ActivityCard({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionView.failureMessage
-      );
+    } catch {
+      toast.error(actionView.failureMessage);
     }
   }
 
@@ -663,10 +659,8 @@ function ActivityCard({
     try {
       await archiveMutation.mutateAsync({ activityId: activity.id });
       toast.success(actionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
-      );
+    } catch {
+      toast.error(actionCopy.failureMessage);
     }
   }
 
@@ -675,10 +669,8 @@ function ActivityCard({
     try {
       await restoreMutation.mutateAsync({ activityId: activity.id });
       toast.success(actionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionCopy.failureMessage
-      );
+    } catch {
+      toast.error(actionCopy.failureMessage);
     }
   }
 

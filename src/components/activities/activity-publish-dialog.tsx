@@ -147,10 +147,8 @@ export function ActivityPublishDialog({
       toast.success(actionView.successMessage);
       onOpenChange(false);
       onPublished?.(result);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionView.failureMessage
-      );
+    } catch {
+      toast.error(actionView.failureMessage);
     }
   }
 
