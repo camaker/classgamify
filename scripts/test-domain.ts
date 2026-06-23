@@ -6606,10 +6606,24 @@ assert.equal(
 );
 assert.equal(
   buildRemixedActivityTitle({
+    sourceTitle: '  Food\nwords\tquick check  ',
+    targetShortName: '  Match\npairs  ',
+  }),
+  'Food words quick check (Match pairs)'
+);
+assert.equal(
+  buildRemixedActivityTitle({
     sourceTitle: '   ',
     targetShortName: 'Quiz',
   }),
   'Untitled activity (Quiz)'
+);
+assert.equal(
+  buildRemixedActivityTitle({
+    sourceTitle: 'Food words quick check',
+    targetShortName: '   ',
+  }),
+  'Food words quick check (template)'
 );
 assert.equal(
   buildRemixedActivityTitle({

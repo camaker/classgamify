@@ -19,11 +19,15 @@ export function buildRemixedActivityTitle({
   targetShortName: string;
 }) {
   const normalizedTitle = normalizeActivitySourceTitle(sourceTitle);
-  const maxSourceLength = getRemixedTitleMaxSourceLength(targetShortName);
+  const normalizedTargetShortName =
+    normalizeActivityTargetShortName(targetShortName);
+  const maxSourceLength = getRemixedTitleMaxSourceLength(
+    normalizedTargetShortName
+  );
 
   return formatRemixedTitle({
     sourceTitle: truncateActivitySourceTitle(normalizedTitle, maxSourceLength),
-    targetShortName,
+    targetShortName: normalizedTargetShortName,
   });
 }
 
@@ -31,6 +35,13 @@ function normalizeActivitySourceTitle(title: string) {
   return (
     title.normalize('NFKC').replace(/\s+/g, ' ').trim() ||
     m.activity_duplicate_untitled_title()
+  );
+}
+
+function normalizeActivityTargetShortName(targetShortName: string) {
+  return (
+    targetShortName.normalize('NFKC').replace(/\s+/g, ' ').trim() ||
+    m.activity_remix_title_template_fallback()
   );
 }
 

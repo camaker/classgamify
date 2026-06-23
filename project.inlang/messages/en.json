@@ -76,6 +76,7 @@
   "activity_draft_source_materials_item": "- {kind}: {name}",
   "activity_duplicate_title_format": "Copy of {title}",
   "activity_duplicate_untitled_title": "Untitled activity",
+  "activity_remix_title_template_fallback": "template",
   "activity_edit_access_archived_action": "Open archived activities",
   "activity_edit_access_archived_description": "Restore this activity from the archived library before editing its structured content.",
   "activity_edit_access_archived_title": "Activity is archived.",

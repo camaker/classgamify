@@ -76,6 +76,7 @@
   "activity_draft_source_materials_item": "- {kind}：{name}",
   "activity_duplicate_title_format": "复制：{title}",
   "activity_duplicate_untitled_title": "未命名活动",
+  "activity_remix_title_template_fallback": "模板",
   "activity_edit_access_archived_action": "打开归档活动",
   "activity_edit_access_archived_description": "请先从归档活动库恢复这份活动，再编辑它的结构化内容。",
   "activity_edit_access_archived_title": "活动已归档。",
