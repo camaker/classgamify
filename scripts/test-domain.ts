@@ -187,6 +187,7 @@ import {
 } from '@/assignments/delivery-summary';
 import {
   buildOpenPublicAssignmentPayload,
+  buildPublicAssignmentLookupResult,
   buildPublicAssignmentPayload,
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
@@ -222,9 +223,11 @@ import {
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
+  assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
   buildAssignmentStatusAction,
   getAssignmentLifecycleStatus,
+  getAssignmentSubmissionErrorMessage,
   getAssignmentStatusActionCopy,
   getAssignmentStatusLabel,
   isAssignmentOpen,
@@ -368,6 +371,7 @@ import {
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
+  buildStudentRunnerMissingView,
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   formatAttemptCompletionProgressLabel,
@@ -1217,6 +1221,26 @@ assert.deepEqual(getStudentRunnerCopy(), {
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
   timeEndedLabel: 'Time ended',
   teacherViewLabel: 'Teacher view',
+});
+assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
+  description:
+    'This link may have been unpublished, closed, or typed incorrectly.',
+  title: 'Assignment not found',
+});
+assert.deepEqual(buildStudentRunnerMissingView('closed'), {
+  description:
+    'This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.',
+  title: 'Assignment closed',
+});
+assert.deepEqual(buildStudentRunnerMissingView('expired'), {
+  description:
+    'This assignment link has expired. Students can no longer open the activity from this link.',
+  title: 'Assignment expired',
+});
+assert.deepEqual(buildStudentRunnerMissingView('draft'), {
+  description:
+    'This assignment has not been published for students yet. Ask your teacher to share the published link.',
+  title: 'Assignment not published',
 });
 assert.deepEqual(getActivityRunnerKindCopy('line-match'), {
   correctAnswerLabel: 'Correct match',
@@ -2202,6 +2226,72 @@ assert.equal(
     status: 'closed',
   }),
   false
+);
+assert.equal(
+  getAssignmentSubmissionErrorMessage({
+    expiresAt: new Date('2026-01-01T10:00:01.000Z'),
+    now: assignmentLifecycleNow,
+    status: 'published',
+  }),
+  undefined
+);
+assert.equal(
+  getAssignmentSubmissionErrorMessage({
+    expiresAt: null,
+    now: assignmentLifecycleNow,
+    status: 'closed',
+  }),
+  'This assignment is closed.'
+);
+assert.equal(
+  getAssignmentSubmissionErrorMessage({
+    expiresAt: new Date('2026-01-01T10:00:00.000Z'),
+    now: assignmentLifecycleNow,
+    status: 'published',
+  }),
+  'This assignment has expired.'
+);
+assert.equal(
+  getAssignmentSubmissionErrorMessage({
+    expiresAt: null,
+    now: assignmentLifecycleNow,
+    status: 'draft',
+  }),
+  'This assignment has not been published for students yet.'
+);
+assert.doesNotThrow(() =>
+  assertAssignmentAcceptsSubmissions({
+    expiresAt: new Date('2026-01-01T10:00:01.000Z'),
+    now: assignmentLifecycleNow,
+    status: 'published',
+  })
+);
+assert.throws(
+  () =>
+    assertAssignmentAcceptsSubmissions({
+      expiresAt: null,
+      now: assignmentLifecycleNow,
+      status: 'closed',
+    }),
+  /This assignment is closed\./
+);
+assert.throws(
+  () =>
+    assertAssignmentAcceptsSubmissions({
+      expiresAt: new Date('2026-01-01T10:00:00.000Z'),
+      now: assignmentLifecycleNow,
+      status: 'published',
+    }),
+  /This assignment has expired\./
+);
+assert.throws(
+  () =>
+    assertAssignmentAcceptsSubmissions({
+      expiresAt: null,
+      now: assignmentLifecycleNow,
+      status: 'draft',
+    }),
+  /This assignment has not been published for students yet\./
 );
 assert.deepEqual(
   buildAssignmentStatusAction({
@@ -3374,6 +3464,9 @@ const publicAssignmentPayloadSource = {
 const publicAssignmentPayload = buildPublicAssignmentPayload(
   publicAssignmentPayloadSource
 );
+const publicAssignmentLookupAvailable = buildPublicAssignmentLookupResult(
+  publicAssignmentPayloadSource
+);
 assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
 assert.equal(
   publicAssignmentPayload.activity.description,
@@ -3410,6 +3503,10 @@ assert.equal(
     .shareSlug,
   'share-public'
 );
+assert.deepEqual(publicAssignmentLookupAvailable, {
+  payload: publicAssignmentPayload,
+  status: 'available',
+});
 assert.equal(
   buildOpenPublicAssignmentPayload({
     ...publicAssignmentPayloadSource,
@@ -3419,6 +3516,19 @@ assert.equal(
     },
   }),
   null
+);
+assert.deepEqual(
+  buildPublicAssignmentLookupResult({
+    ...publicAssignmentPayloadSource,
+    assignment: {
+      ...publicAssignmentPayloadSource.assignment,
+      status: 'closed',
+    },
+  }),
+  {
+    reason: 'closed',
+    status: 'unavailable',
+  }
 );
 assert.equal(
   buildOpenPublicAssignmentPayload(
@@ -3432,6 +3542,35 @@ assert.equal(
     new Date('2026-01-01T10:00:00.000Z').getTime()
   ),
   null
+);
+assert.deepEqual(
+  buildPublicAssignmentLookupResult(
+    {
+      ...publicAssignmentPayloadSource,
+      assignment: {
+        ...publicAssignmentPayloadSource.assignment,
+        expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+      },
+    },
+    new Date('2026-01-01T10:00:00.000Z').getTime()
+  ),
+  {
+    reason: 'expired',
+    status: 'unavailable',
+  }
+);
+assert.deepEqual(
+  buildPublicAssignmentLookupResult({
+    ...publicAssignmentPayloadSource,
+    assignment: {
+      ...publicAssignmentPayloadSource.assignment,
+      status: 'draft',
+    },
+  }),
+  {
+    reason: 'draft',
+    status: 'unavailable',
+  }
 );
 const publicRuntimeSanitizationInput = {
   description: 'Sanitized runtime payload source',
@@ -3520,7 +3659,7 @@ const runnerStateStarterRuntimeItems = getRuntimeItems(
 );
 assert.deepEqual(
   buildStudentRunnerPageState({
-    data: publicAssignmentPayload,
+    data: publicAssignmentLookupAvailable,
     isLoading: true,
     shareId: 'share-public',
     starterActivity: runnerStateStarterActivity,
@@ -3538,10 +3677,52 @@ assert.deepEqual(
     starterAssignment: runnerStateStarterAssignment,
     starterRuntimeItems: runnerStateStarterRuntimeItems,
   }),
-  { status: 'missing' }
+  { reason: 'not-found', status: 'missing' }
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: {
+      reason: 'closed',
+      status: 'unavailable',
+    },
+    isLoading: false,
+    shareId: 'share-public',
+    starterActivity: runnerStateStarterActivity,
+    starterAssignment: runnerStateStarterAssignment,
+    starterRuntimeItems: runnerStateStarterRuntimeItems,
+  }),
+  { reason: 'closed', status: 'missing' }
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: {
+      reason: 'expired',
+      status: 'unavailable',
+    },
+    isLoading: false,
+    shareId: 'share-public',
+    starterActivity: runnerStateStarterActivity,
+    starterAssignment: runnerStateStarterAssignment,
+    starterRuntimeItems: runnerStateStarterRuntimeItems,
+  }),
+  { reason: 'expired', status: 'missing' }
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: {
+      reason: 'draft',
+      status: 'unavailable',
+    },
+    isLoading: false,
+    shareId: 'share-public',
+    starterActivity: runnerStateStarterActivity,
+    starterAssignment: runnerStateStarterAssignment,
+    starterRuntimeItems: runnerStateStarterRuntimeItems,
+  }),
+  { reason: 'draft', status: 'missing' }
 );
 const publicRunnerState = buildStudentRunnerPageState({
-  data: publicAssignmentPayload,
+  data: publicAssignmentLookupAvailable,
   isLoading: false,
   shareId: ' share-public ',
   starterActivity: runnerStateStarterActivity,
@@ -3664,7 +3845,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildStudentRunnerAttemptState({
     answers: {},
-    pageState: { status: 'missing' },
+    pageState: { reason: 'not-found', status: 'missing' },
     shareId: 'missing-share',
   }),
   {

@@ -4,12 +4,13 @@ import {
   buildStudentAttemptSessionKey,
   getAttemptCompletionSummary,
   type StudentAnswerMap,
+  type StudentRunnerMissingReason,
 } from '@/assignments/student-submission';
 import {
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
   stripRuntimeAnswers,
-  type PublicAssignmentPayload,
+  type PublicAssignmentLookupResult,
   type PublicRuntimeItem,
 } from '@/assignments/public';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
@@ -29,7 +30,11 @@ type StudentRunnerReadyState = {
 
 type StudentRunnerPageState =
   | {
-      status: 'loading' | 'missing';
+      status: 'loading';
+    }
+  | {
+      reason: StudentRunnerMissingReason;
+      status: 'missing';
     }
   | StudentRunnerReadyState;
 
@@ -50,7 +55,7 @@ export function buildStudentRunnerPageState({
   starterAssignment,
   starterRuntimeItems,
 }: {
-  data?: PublicAssignmentPayload | null;
+  data?: PublicAssignmentLookupResult | null;
   isLoading: boolean;
   shareId: string;
   starterActivity: ActivitySeed;
@@ -63,25 +68,29 @@ export function buildStudentRunnerPageState({
 
   const normalizedShareId = normalizeAssignmentShareSlug(shareId);
 
-  if (data) {
-    const assignment = buildPublicAssignmentPreviewAssignment(data);
+  if (data?.status === 'available') {
+    const assignment = buildPublicAssignmentPreviewAssignment(data.payload);
 
     return buildStudentRunnerReadyState({
-      activity: buildPublicAssignmentPreviewActivity(data),
+      activity: buildPublicAssignmentPreviewActivity(data.payload),
       assignment,
       runtimeItems: orderStudentRunnerRuntimeItems({
-        items: data.runtimeItems,
+        items: data.payload.runtimeItems,
         assignment,
       }),
       source: 'public-assignment',
     });
   }
 
+  if (data?.status === 'unavailable') {
+    return { reason: data.reason, status: 'missing' };
+  }
+
   if (
     normalizedShareId !==
     normalizeAssignmentShareSlug(starterAssignment.shareId)
   ) {
-    return { status: 'missing' };
+    return { reason: 'not-found', status: 'missing' };
   }
 
   return buildStudentRunnerReadyState({

@@ -69,6 +69,40 @@ export function matchesAssignmentLifecycleStatus({
   return getAssignmentLifecycleStatus(status, expiresAt, now) === filter;
 }
 
+export function getAssignmentSubmissionErrorMessage({
+  expiresAt,
+  now = Date.now(),
+  status,
+}: {
+  expiresAt: AssignmentDate;
+  now?: number;
+  status: AssignmentStatus | string;
+}) {
+  const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
+
+  if (lifecycleStatus === 'open') return undefined;
+  if (lifecycleStatus === 'expired') {
+    return m.assignment_api_error_assignment_expired();
+  }
+  if (lifecycleStatus === 'closed') {
+    return m.assignment_api_error_assignment_closed();
+  }
+
+  return m.assignment_api_error_assignment_not_published();
+}
+
+export function assertAssignmentAcceptsSubmissions(input: {
+  expiresAt: AssignmentDate;
+  now?: number;
+  status: AssignmentStatus | string;
+}) {
+  const errorMessage = getAssignmentSubmissionErrorMessage(input);
+
+  if (errorMessage) {
+    throw new Error(errorMessage);
+  }
+}
+
 export function getAssignmentStatusLabel(
   status: AssignmentStatus | string,
   expiresAt: AssignmentDate,

@@ -15,7 +15,10 @@ import {
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
-import type { PublicAttemptReviewItem } from '@/assignments/public';
+import type {
+  PublicAttemptReviewItem,
+  PublicRuntimeItem,
+} from '@/assignments/public';
 import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
@@ -24,6 +27,7 @@ import {
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
+  buildStudentRunnerMissingView,
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   getStudentRunnerCopy,
@@ -332,6 +336,8 @@ function PlayPage() {
   }
 
   if (pageState.status === 'missing') {
+    const missingView = buildStudentRunnerMissingView(pageState.reason);
+
     return (
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
@@ -340,10 +346,10 @@ function PlayPage() {
             {runnerCopy.publicRouteBadgeLabel}
           </Badge>
           <h1 className="mt-4 text-3xl font-bold tracking-tight">
-            {runnerCopy.missingAssignmentTitle}
+            {missingView.title}
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            {runnerCopy.missingAssignmentDescription}
+            {missingView.description}
           </p>
           <Link
             to={Routes.Templates}
@@ -805,11 +811,6 @@ function ChoiceGrid({
     </div>
   );
 }
-
-type PublicAssignmentData = ReturnType<typeof usePublicAssignment>['data'];
-
-type PublicRuntimeItem =
-  NonNullable<PublicAssignmentData>['runtimeItems'][number];
 
 type AttemptSubmissionResult = {
   accuracy: number;

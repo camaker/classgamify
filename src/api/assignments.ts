@@ -22,11 +22,11 @@ import {
 } from '@/assignments/list-filters';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
+  assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
-  isAssignmentExpired,
 } from '@/assignments/lifecycle';
 import {
-  buildOpenPublicAssignmentPayload,
+  buildPublicAssignmentLookupResult,
   buildPublicAttemptReviewItems,
 } from '@/assignments/public';
 import { analyzeAssignmentResults } from '@/assignments/results';
@@ -472,17 +472,12 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(
-        and(
-          eq(assignment.shareSlug, data.shareSlug),
-          eq(assignment.status, 'published')
-        )
-      )
+      .where(eq(assignment.shareSlug, data.shareSlug))
       .limit(1);
 
     if (!row) return null;
 
-    return buildOpenPublicAssignmentPayload(row);
+    return buildPublicAssignmentLookupResult(row);
   });
 
 const submitAttemptInputSchema = z.object({
@@ -527,12 +522,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     if (!row) {
       throw new Error(m.assignment_api_error_assignment_not_found());
     }
-    if (row.assignment.status !== 'published') {
-      throw new Error(m.assignment_api_error_assignment_closed());
-    }
-    if (isAssignmentExpired(row.assignment.expiresAt)) {
-      throw new Error(m.assignment_api_error_assignment_expired());
-    }
+    assertAssignmentAcceptsSubmissions({
+      expiresAt: row.assignment.expiresAt,
+      status: row.assignment.status,
+    });
 
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const durationSeconds = normalizeAttemptDurationSeconds({

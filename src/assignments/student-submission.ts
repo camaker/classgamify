@@ -126,6 +126,17 @@ type StudentAttemptTimerBadge = {
   show: boolean;
 };
 
+export type StudentRunnerMissingReason =
+  | 'closed'
+  | 'draft'
+  | 'expired'
+  | 'not-found';
+
+type StudentRunnerMissingView = {
+  description: string;
+  title: string;
+};
+
 const STUDENT_RUNNER_COPY = {
   get browseTemplatesLabel() {
     return m.student_runner_browse_templates();
@@ -194,6 +205,36 @@ const STUDENT_RUNNER_COPY = {
 
 export function getStudentRunnerCopy(): StudentRunnerCopy {
   return STUDENT_RUNNER_COPY;
+}
+
+export function buildStudentRunnerMissingView(
+  reason: StudentRunnerMissingReason
+): StudentRunnerMissingView {
+  if (reason === 'closed') {
+    return {
+      description: m.student_runner_missing_assignment_closed_description(),
+      title: m.student_runner_missing_assignment_closed_title(),
+    };
+  }
+
+  if (reason === 'expired') {
+    return {
+      description: m.student_runner_missing_assignment_expired_description(),
+      title: m.student_runner_missing_assignment_expired_title(),
+    };
+  }
+
+  if (reason === 'draft') {
+    return {
+      description: m.student_runner_missing_assignment_draft_description(),
+      title: m.student_runner_missing_assignment_draft_title(),
+    };
+  }
+
+  return {
+    description: STUDENT_RUNNER_COPY.missingAssignmentDescription,
+    title: STUDENT_RUNNER_COPY.missingAssignmentTitle,
+  };
 }
 
 export function buildAnonymousAttemptCopy({

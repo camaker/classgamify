@@ -12,7 +12,11 @@ import type {
   AttemptAnswer,
 } from '@/activities/types';
 import { getRuntimeItems } from '@/activities/runtime';
-import { isAssignmentOpen } from '@/assignments/lifecycle';
+import {
+  type AssignmentLifecycleStatus,
+  getAssignmentLifecycleStatus,
+  isAssignmentOpen,
+} from '@/assignments/lifecycle';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
@@ -64,6 +68,21 @@ export type PublicAssignmentPayload = {
   };
 };
 
+export type PublicAssignmentUnavailableReason = Exclude<
+  AssignmentLifecycleStatus,
+  'open'
+>;
+
+export type PublicAssignmentLookupResult =
+  | {
+      payload: PublicAssignmentPayload;
+      status: 'available';
+    }
+  | {
+      reason: PublicAssignmentUnavailableReason;
+      status: 'unavailable';
+    };
+
 type PublicAssignmentPayloadSource = {
   activity: {
     contentJson: ActivityContent;
@@ -104,6 +123,29 @@ export function buildOpenPublicAssignmentPayload(
   }
 
   return buildPublicAssignmentPayload(source);
+}
+
+export function buildPublicAssignmentLookupResult(
+  source: PublicAssignmentPayloadSource,
+  now = Date.now()
+): PublicAssignmentLookupResult {
+  const lifecycleStatus = getAssignmentLifecycleStatus(
+    source.assignment.status,
+    source.assignment.expiresAt,
+    now
+  );
+
+  if (lifecycleStatus === 'open') {
+    return {
+      payload: buildPublicAssignmentPayload(source),
+      status: 'available',
+    };
+  }
+
+  return {
+    reason: lifecycleStatus,
+    status: 'unavailable',
+  };
 }
 
 export function buildPublicAssignmentPayload({
