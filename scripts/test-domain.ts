@@ -4921,17 +4921,25 @@ assert.deepEqual(
     ['tree', false],
   ]
 );
-assert.deepEqual(getAcceptedAnswers('苹果／苹果树；苹果'), ['苹果', '苹果树']);
+assert.deepEqual(getAcceptedAnswers('苹果／苹果树；苹果、苹果公司'), [
+  '苹果',
+  '苹果树',
+  '苹果公司',
+]);
+assert.deepEqual(getAcceptedAnswers('Paris, France／Paris'), [
+  'Paris, France',
+  'Paris',
+]);
 assert.deepEqual(
   matchAnswer({
-    expectedAnswer: '苹果／苹果树；苹果',
-    submittedAnswer: ' 苹果树 ',
+    expectedAnswer: '苹果／苹果树；苹果公司',
+    submittedAnswer: ' 苹果公司 ',
   }),
   {
-    acceptedAnswer: '苹果树',
+    acceptedAnswer: '苹果公司',
     correct: true,
-    normalizedAcceptedAnswer: '苹果树',
-    normalizedSubmittedAnswer: '苹果树',
+    normalizedAcceptedAnswer: '苹果公司',
+    normalizedSubmittedAnswer: '苹果公司',
   }
 );
 const defaultSourceSummaryContent = buildActivityContent({
