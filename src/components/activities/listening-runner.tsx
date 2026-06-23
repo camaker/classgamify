@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialRunnerView,
   buildStudentRunnerView,
+  isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -177,7 +178,10 @@ export function ListeningRunner({
           {activeItem.choices?.length ? (
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {activeItem.choices.map((choice) => {
-                const selected = answers[activeItem.id] === choice;
+                const selected = isSameRuntimeChoice(
+                  answers[activeItem.id],
+                  choice
+                );
 
                 return (
                   <button

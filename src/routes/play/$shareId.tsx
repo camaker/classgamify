@@ -37,6 +37,7 @@ import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildStudentRunnerHeaderView,
   buildStudentRunnerView,
+  isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
@@ -780,7 +781,7 @@ function ChoiceGrid({
   return (
     <div className="mt-3 grid gap-2 sm:grid-cols-2">
       {choices.map((choice) => {
-        const selected = answer === choice;
+        const selected = isSameRuntimeChoice(answer, choice);
         return (
           <button
             key={choice}
