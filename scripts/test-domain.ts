@@ -574,6 +574,16 @@ assert.match(
   /settings_profile_avatar_file_size_error/,
   'Avatar upload size errors should use the localized profile avatar message.'
 );
+assert.doesNotMatch(
+  updateAvatarCardSource,
+  /if \(!websiteConfig\.storage\?\.enable\) return null/,
+  'Avatar settings should explain disabled classroom file storage instead of hiding the card.'
+);
+assert.match(
+  updateAvatarCardSource,
+  /settings_profile_avatar_upload_not_configured/,
+  'Avatar settings should use the localized storage-not-configured label.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(

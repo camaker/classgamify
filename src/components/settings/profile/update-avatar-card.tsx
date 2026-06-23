@@ -29,10 +29,10 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
   const [avatarUrl, setAvatarUrl] = useState('');
   const { data: session, refetch } = authClient.useSession();
   const uploadMutation = useUploadUserAvatar();
+  const storageEnabled = Boolean(websiteConfig.storage?.enable);
   useEffect(() => {
     if (session?.user?.image) setAvatarUrl(session.user.image);
   }, [session]);
-  if (!websiteConfig.storage?.enable) return null;
   const user = session?.user;
   if (!user) return null;
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +42,8 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
     e.target.value = '';
   };
   const handleFileUpload = (file: File) => {
+    if (!storageEnabled) return;
+
     const maxSize = websiteConfig.storage?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE;
     if (file.size > maxSize) {
       const message = m.settings_profile_avatar_file_size_error();
@@ -108,7 +110,8 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
             className={cn(
               buttonVariants({ variant: 'outline', size: 'sm' }),
               'cursor-pointer',
-              uploadMutation.isPending && 'pointer-events-none opacity-50'
+              (!storageEnabled || uploadMutation.isPending) &&
+                'pointer-events-none opacity-50'
             )}
           >
             <input
@@ -116,11 +119,13 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
               accept="image/png, image/jpeg, image/webp"
               onChange={handleFileChange}
               className="sr-only"
-              disabled={uploadMutation.isPending}
+              disabled={!storageEnabled || uploadMutation.isPending}
             />
-            {uploadMutation.isPending
-              ? m.settings_profile_avatar_uploading()
-              : m.settings_profile_avatar_upload_avatar()}
+            {!storageEnabled
+              ? m.settings_profile_avatar_upload_not_configured()
+              : uploadMutation.isPending
+                ? m.settings_profile_avatar_uploading()
+                : m.settings_profile_avatar_upload_avatar()}
           </label>
         </div>
         <FormError message={error} />
