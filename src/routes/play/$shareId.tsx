@@ -306,12 +306,8 @@ function PlayPage() {
       });
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
       toast.success(runnerCopy.submissionSuccessMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : runnerCopy.submissionFailureMessage
-      );
+    } catch {
+      toast.error(runnerCopy.submissionFailureMessage);
     }
   }
 

@@ -695,6 +695,20 @@ assert.match(
   /toast\.error\(actionView\.failureMessage\)/,
   'Assignment publish failures should use localized publish failure copy.'
 );
+const publicPlayRouteSource = readFileSync(
+  'src/routes/play/$shareId.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  publicPlayRouteSource,
+  /error\.message|error instanceof Error/,
+  'Student attempt submission failures should use localized runner copy instead of raw server or network errors.'
+);
+assert.match(
+  publicPlayRouteSource,
+  /toast\.error\(runnerCopy\.submissionFailureMessage\)/,
+  'Student attempt submission failures should show the localized runner failure message.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,
