@@ -113,23 +113,7 @@ export function getRuntimeItems(
       }));
     }
     case 'group-sort': {
-      const choices = content.groups.map((group) => group.label);
-      return content.groups.flatMap((group) => {
-        const itemIdCounts = countStableItemIds(group.items);
-
-        return group.items.map((item, itemIndex) => ({
-          answer: group.label,
-          choices,
-          id: buildGroupItemRuntimeId({
-            groupId: group.id,
-            item,
-            itemIdCounts,
-            itemIndex,
-          }),
-          kind: 'group-item',
-          prompt: item,
-        }));
-      });
+      return buildGroupSortRuntimeItems(content);
     }
     case 'fill-blank':
     case 'listening':
@@ -203,31 +187,56 @@ export function evaluateRuntimeAnswers({
   };
 }
 
-function buildGroupItemRuntimeId({
+function buildGroupSortRuntimeItems(content: ActivityContent): RuntimeItem[] {
+  const choices = content.groups.map((group) => group.label);
+  const candidates = content.groups.flatMap((group) =>
+    group.items.map((item) => ({
+      answer: group.label,
+      baseId: buildGroupItemRuntimeBaseId({
+        groupId: group.id,
+        item,
+      }),
+      choices,
+      item,
+    }))
+  );
+  const baseIdCounts = countCandidateBaseIds(candidates);
+  const seenBaseIds = new Map<string, number>();
+
+  return candidates.map((candidate) => {
+    const seenCount = (seenBaseIds.get(candidate.baseId) ?? 0) + 1;
+    seenBaseIds.set(candidate.baseId, seenCount);
+
+    return {
+      answer: candidate.answer,
+      choices: candidate.choices,
+      id:
+        baseIdCounts.get(candidate.baseId) === 1
+          ? candidate.baseId
+          : `${candidate.baseId}-${seenCount}`,
+      kind: 'group-item',
+      prompt: candidate.item,
+    };
+  });
+}
+
+function buildGroupItemRuntimeBaseId({
   groupId,
   item,
-  itemIdCounts,
-  itemIndex,
 }: {
   groupId: string;
   item: string;
-  itemIdCounts: Map<string, number>;
-  itemIndex: number;
 }) {
   const itemId = makeActivityStableId(item);
-  if (itemId && itemIdCounts.get(itemId) === 1) {
-    return `${groupId}-${itemId}`;
-  }
 
-  return `${groupId}-${itemId || 'item'}-${itemIndex + 1}`;
+  return `${groupId}-${itemId || 'item'}`;
 }
 
-function countStableItemIds(items: string[]) {
+function countCandidateBaseIds(candidates: Array<{ baseId: string }>) {
   const counts = new Map<string, number>();
 
-  for (const item of items) {
-    const itemId = makeActivityStableId(item);
-    counts.set(itemId, (counts.get(itemId) ?? 0) + 1);
+  for (const candidate of candidates) {
+    counts.set(candidate.baseId, (counts.get(candidate.baseId) ?? 0) + 1);
   }
 
   return counts;

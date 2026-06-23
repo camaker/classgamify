@@ -7288,6 +7288,24 @@ assert.deepEqual(
   getRuntimeItems('group-sort', collidingGroupContent).map((item) => item.id),
   ['g-treats-ice-cream-1', 'g-treats-ice-cream-2']
 );
+assert.deepEqual(
+  getRuntimeItems('group-sort', {
+    ...collidingGroupContent,
+    groups: [
+      {
+        id: 'g-food',
+        items: ['苹果', '苹果！'],
+        label: '食物',
+      },
+      {
+        id: 'g-food',
+        items: ['苹果', '苹果！'],
+        label: '水果',
+      },
+    ],
+  }).map((item) => item.id),
+  ['g-food-苹果-1', 'g-food-苹果-2', 'g-food-苹果-3', 'g-food-苹果-4']
+);
 const collidingEditorContent = buildActivityContent({
   description: 'Editor id collision coverage',
   difficulty: 'starter',
