@@ -5636,7 +5636,7 @@ assert.deepEqual(
       statusAction: undefined,
     },
     assignmentId: 'assignment-with-space',
-    shareSlug: 'share 123',
+    shareSlug: '　share １２３　',
   }),
   {
     resultAction: {
@@ -8638,7 +8638,7 @@ assert.deepEqual(
     },
     assignment: {
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
-      shareSlug: 'share 123',
+      shareSlug: '　share １２３　',
       status: 'published',
       title: 'Week 1 results',
     },
@@ -8706,7 +8706,7 @@ assert.deepEqual(
   buildAssignmentResultHeaderShareAction({
     expiresAt: null,
     now: new Date('2026-06-01T00:00:00.000Z').getTime(),
-    shareSlug: 'share two',
+    shareSlug: '　share ｔｗｏ　',
     status: 'published',
   }),
   {

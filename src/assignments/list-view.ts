@@ -16,6 +16,7 @@ import {
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListControlOption = {
@@ -396,6 +397,8 @@ export function buildAssignmentListCardActionView({
   assignmentId: string;
   shareSlug: string;
 }): AssignmentListCardActionView {
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+
   return {
     resultAction: actionState.showResultsAction
       ? {
@@ -406,8 +409,8 @@ export function buildAssignmentListCardActionView({
     shareAction: actionState.showShareActions
       ? {
           label: assignmentListActionCopy.openShareLink,
-          sharePath: buildAssignmentSharePath(shareSlug),
-          shareSlug,
+          sharePath: buildAssignmentSharePath(normalizedShareSlug),
+          shareSlug: normalizedShareSlug,
         }
       : undefined,
     statusAction: actionState.statusAction,

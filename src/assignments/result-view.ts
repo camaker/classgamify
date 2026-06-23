@@ -30,6 +30,7 @@ import {
 } from '@/assignments/result-format';
 import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import type {
@@ -585,6 +586,7 @@ export function buildAssignmentResultHeaderShareAction({
 }): AssignmentResultHeaderShareAction {
   const resolvedNow = now ?? Date.now();
   const isAvailable = isAssignmentOpen(status, expiresAt, resolvedNow);
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
 
   return {
     disabledReason: isAvailable
@@ -598,8 +600,8 @@ export function buildAssignmentResultHeaderShareAction({
     label: isAvailable
       ? assignmentResultPageCopy.openStudentLinkLabel
       : assignmentResultPageCopy.studentLinkUnavailableLabel,
-    sharePath: buildAssignmentSharePath(shareSlug),
-    shareSlug,
+    sharePath: buildAssignmentSharePath(normalizedShareSlug),
+    shareSlug: normalizedShareSlug,
   };
 }
 
