@@ -709,6 +709,25 @@ assert.match(
   /toast\.error\(runnerCopy\.submissionFailureMessage\)/,
   'Student attempt submission failures should show the localized runner failure message.'
 );
+const activityCreateFormSource = readFileSync(
+  'src/components/activities/activity-create-form.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  activityCreateFormSource,
+  /error\.message|error instanceof Error/,
+  'Activity create form failures should use localized form copy instead of raw AI or save errors.'
+);
+assert.match(
+  activityCreateFormSource,
+  /toast\.error\(m\.activity_form_toast_draft_generation_failed\(\)\)/,
+  'Activity draft generation failures should use the localized draft failure message.'
+);
+assert.match(
+  activityCreateFormSource,
+  /toast\.error\(m\.activity_form_toast_save_failed\(\)\)/,
+  'Activity save failures should use the localized save failure message.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,

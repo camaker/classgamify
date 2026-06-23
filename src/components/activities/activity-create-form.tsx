@@ -166,12 +166,8 @@ export function ActivityCreateForm({
       }
 
       toast.success(m.activity_form_toast_ai_draft_generated());
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : m.activity_form_toast_draft_generation_failed()
-      );
+    } catch {
+      toast.error(m.activity_form_toast_draft_generation_failed());
     }
   }
 
@@ -217,12 +213,8 @@ export function ActivityCreateForm({
         to: Routes.DashboardActivities,
         search: { created: activity.id },
       });
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : m.activity_form_toast_save_failed()
-      );
+    } catch {
+      toast.error(m.activity_form_toast_save_failed());
     }
   }
 
