@@ -235,10 +235,8 @@ function AssignmentResultsPage() {
         await copyTextToClipboard(payload.text);
       }
       toast.success(actionButton.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : actionButton.failureMessage
-      );
+    } catch {
+      toast.error(actionButton.failureMessage);
     }
   }
 

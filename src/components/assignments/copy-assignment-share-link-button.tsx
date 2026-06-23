@@ -29,12 +29,8 @@ export function CopyAssignmentShareLinkButton({
     try {
       await copyTextToClipboard(buildAssignmentShareUrl(shareSlug));
       toast.success(assignmentShareLinkActionCopy.successMessage);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : assignmentShareLinkActionCopy.failureMessage
-      );
+    } catch {
+      toast.error(assignmentShareLinkActionCopy.failureMessage);
     }
   }
 

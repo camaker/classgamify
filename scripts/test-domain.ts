@@ -620,6 +620,34 @@ assert.match(
   /settings_security_user_accounts_fetch_error/,
   'Client auth hook account fetch errors should use localized security copy.'
 );
+const copyAssignmentShareLinkButtonSource = readFileSync(
+  'src/components/assignments/copy-assignment-share-link-button.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  copyAssignmentShareLinkButtonSource,
+  /error\.message|error instanceof Error/,
+  'Share-link copy failures should use localized assignment copy instead of raw clipboard errors.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
+  /assignmentShareLinkActionCopy\.failureMessage/,
+  'Share-link copy failures should keep using localized assignment failure copy.'
+);
+const assignmentResultsRouteSource = readFileSync(
+  'src/routes/dashboard/assignments/$assignmentId.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  assignmentResultsRouteSource,
+  /error\.message|error instanceof Error/,
+  'Result copy/download failures should not expose raw browser or network errors.'
+);
+assert.match(
+  assignmentResultsRouteSource,
+  /toast\.error\(actionButton\.failureMessage\)/,
+  'Result copy/download failures should use the localized action failure copy.'
+);
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(
