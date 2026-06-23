@@ -218,6 +218,7 @@
   "activity_library_remix_action": "Copy as {template}",
   "activity_library_remix_action_fallback": "template",
   "activity_library_remix_hint": "Ready to remix into {templates}.",
+  "activity_library_status_archived": "Archived",
   "activity_library_stat_groups": "Groups",
   "activity_library_stat_pairs": "Pairs",
   "activity_library_stat_questions": "Questions",

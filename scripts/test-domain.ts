@@ -31,6 +31,7 @@ import {
   buildActivityLibraryRemixHint,
   buildStarterActivityLibraryCardViewModel,
   findCreatedActivityInList,
+  formatActivityLibraryStatusLabel,
   resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import {
@@ -4574,6 +4575,7 @@ const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
 });
 assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
+assert.equal(starterActivityDisplayView.statusLabel, 'Draft');
 assert.deepEqual(starterActivityDisplayView.stats, [
   { key: 'questions', label: 'Questions', value: 3 },
   { key: 'pairs', label: 'Pairs', value: 4 },
@@ -4602,6 +4604,18 @@ assert.deepEqual(
     kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
     title: 'Source materials',
   }
+);
+assert.equal(formatActivityLibraryStatusLabel('archived'), 'Archived');
+assert.equal(formatActivityLibraryStatusLabel('private'), 'Private');
+assert.equal(
+  buildActivityLibraryCardDisplayView({
+    activity: {
+      ...starterActivityCardView,
+      status: 'archived',
+    },
+    libraryStatus: 'archived',
+  }).statusLabel,
+  'Archived'
 );
 assert.equal(
   starterActivityDisplayView.actionState.showPersistedActions,

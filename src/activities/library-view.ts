@@ -95,6 +95,7 @@ type ActivityLibraryCardDisplayView = {
   compatibility: ActivityLibraryCompatibilityView;
   sourceMaterials: ActivitySourceMaterialSummaryView;
   stats: ActivityLibraryCardStat[];
+  statusLabel: string;
   templateName: string;
   templateType: ActivityTemplateType;
 };
@@ -440,9 +441,27 @@ export function buildActivityLibraryCardDisplayView({
       pairs: summary.contentCounts.pairs,
       questions: summary.contentCounts.questions,
     }),
+    statusLabel: formatActivityLibraryStatusLabel(activity.status),
     templateName: template.name,
     templateType: template.type,
   };
+}
+
+export function formatActivityLibraryStatusLabel(
+  visibility: ActivityVisibility
+) {
+  switch (visibility) {
+    case 'archived':
+      return m.activity_library_status_archived();
+    case 'draft':
+      return m.activity_form_visibility_draft();
+    case 'private':
+      return m.activity_form_visibility_private();
+    case 'public':
+      return m.activity_form_visibility_public();
+    case 'unlisted':
+      return m.activity_form_visibility_unlisted();
+  }
 }
 
 export function buildActivityLibraryRemixHint(shortNames: string[]) {

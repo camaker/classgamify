@@ -687,7 +687,7 @@ function ActivityCard({
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
-            {activity.status}
+            {cardDisplayView.statusLabel}
           </Badge>
           <Badge variant="outline" className="rounded-md">
             <IconDeviceGamepad2 className="size-3.5" />
