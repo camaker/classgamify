@@ -64,16 +64,21 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       userName: userRow.name ?? '',
     };
 
-    const result = await createCheckout({
-      planId,
-      priceId,
-      customerEmail: userRow.email,
-      successUrl: success,
-      cancelUrl: cancel,
-      metadata: checkoutMetadata,
-      locale,
-    });
-    return { url: result.url, id: result.id };
+    try {
+      const result = await createCheckout({
+        planId,
+        priceId,
+        customerEmail: userRow.email,
+        successUrl: success,
+        cancelUrl: cancel,
+        metadata: checkoutMetadata,
+        locale,
+      });
+      return { url: result.url, id: result.id };
+    } catch (error) {
+      console.error('Payment checkout creation failed:', error);
+      throw new Error(m.pricing_checkout_failed());
+    }
   });
 
 const portalSchema = z.object({
@@ -97,12 +102,17 @@ export const createCustomerPortalSession = createServerFn({ method: 'POST' })
     }
     const locale = getLocale();
     const returnUrl = data.returnUrl ?? getCanonicalUrl(Routes.SettingsBilling);
-    const result = await createCustomerPortal({
-      customerId: row.customerId,
-      returnUrl,
-      locale: data.locale ?? locale,
-    });
-    return { url: result.url };
+    try {
+      const result = await createCustomerPortal({
+        customerId: row.customerId,
+        returnUrl,
+        locale: data.locale ?? locale,
+      });
+      return { url: result.url };
+    } catch (error) {
+      console.error('Payment customer portal creation failed:', error);
+      throw new Error(m.pricing_customer_portal_failed());
+    }
   });
 
 export const getCurrentPlan = createServerFn({ method: 'GET' })

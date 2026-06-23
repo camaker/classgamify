@@ -888,6 +888,22 @@ assert.match(
   /throw new Error\(m\.newsletter_error_unsubscribe\(\)\);/,
   'Newsletter unsubscribe failures should use the localized unsubscribe failure message.'
 );
+const paymentApiSource = readFileSync('src/api/payment.ts', 'utf8');
+assert.doesNotMatch(
+  paymentApiSource,
+  /error instanceof Error \? error\.message|throw new Error\(\s*error\.message/,
+  'Payment server functions should not expose raw provider errors to clients.'
+);
+assert.match(
+  paymentApiSource,
+  /catch \(error\) {[\s\S]*?Payment checkout creation failed:[\s\S]*?throw new Error\(m\.pricing_checkout_failed\(\)\);/,
+  'Checkout creation failures should use the localized checkout failure message.'
+);
+assert.match(
+  paymentApiSource,
+  /catch \(error\) {[\s\S]*?Payment customer portal creation failed:[\s\S]*?throw new Error\(m\.pricing_customer_portal_failed\(\)\);/,
+  'Customer portal failures should use the localized portal failure message.'
+);
 const clipboardSource = readFileSync('src/lib/clipboard.ts', 'utf8');
 assert.match(
   clipboardSource,
