@@ -1,4 +1,5 @@
 import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
 type DashboardActivitySummary = {
@@ -144,7 +145,9 @@ export function buildDashboardOverviewMetrics({
       }),
       id: 'results',
       label: m.dashboard_overview_metric_results_label(),
-      value: `${assignmentSummary?.averageScore ?? 0}%`,
+      value: formatAssignmentResultPercent(
+        assignmentSummary?.averageScore ?? 0
+      ),
     },
   ];
 }

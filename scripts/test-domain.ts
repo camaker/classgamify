@@ -4525,7 +4525,7 @@ assert.deepEqual(
       totalActivities: 9,
     },
     assignmentSummary: {
-      averageScore: 82,
+      averageScore: 82.6,
       completions: 14,
       openAssignments: 3,
     },
@@ -4554,9 +4554,20 @@ assert.deepEqual(
       description: '14 submitted attempts logged',
       id: 'results',
       label: 'Results',
-      value: '82%',
+      value: '83%',
     },
   ]
+);
+assert.equal(
+  buildDashboardOverviewMetrics({
+    assignmentSummary: {
+      averageScore: Number.NaN,
+      completions: 1,
+      openAssignments: 1,
+    },
+    isLoading: false,
+  })[3]?.value,
+  '-'
 );
 assert.deepEqual(buildDashboardCoreLoopReadiness(), [
   {
