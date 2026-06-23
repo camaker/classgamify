@@ -195,22 +195,28 @@ export function formatSequentialRunnerItemLabel(label: string, index: number) {
 }
 
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {
-  const choices = new Set<string>();
+  const choicesByKey = new Map<string, string>();
 
   for (const item of items) {
     for (const choice of item.choices ?? []) {
-      const normalizedChoice = choice.trim();
-      if (normalizedChoice) {
-        choices.add(normalizedChoice);
-      }
+      const normalizedChoice = normalizeRuntimeChoiceDisplayText(choice);
+      const choiceKey = getRuntimeChoiceKey(normalizedChoice);
+      if (!choiceKey || choicesByKey.has(choiceKey)) continue;
+
+      choicesByKey.set(choiceKey, normalizedChoice);
     }
   }
 
-  return [...choices];
+  return [...choicesByKey.values()];
 }
 
 export function findChoiceOwner(answers: StudentAnswerMap, choice: string) {
-  return Object.entries(answers).find(([, answer]) => answer === choice)?.[0];
+  const choiceKey = getRuntimeChoiceKey(choice);
+  if (!choiceKey) return undefined;
+
+  return Object.entries(answers).find(
+    ([, answer]) => getRuntimeChoiceKey(answer) === choiceKey
+  )?.[0];
 }
 
 export function buildRuntimeChoiceViews({
@@ -224,7 +230,10 @@ export function buildRuntimeChoiceViews({
 }) {
   return choices.map((choice) => ({
     choice,
-    selected: selectedItemId ? answers[selectedItemId] === choice : false,
+    selected: selectedItemId
+      ? getRuntimeChoiceKey(answers[selectedItemId]) ===
+        getRuntimeChoiceKey(choice)
+      : false,
     usedByItemId: findChoiceOwner(answers, choice),
   }));
 }
@@ -299,4 +308,12 @@ function getStudentRunnerReviewStatus(
 ): StudentRunnerReviewStatus {
   if (!reviewItem) return 'idle';
   return reviewItem.correct ? 'correct' : 'needs-review';
+}
+
+function normalizeRuntimeChoiceDisplayText(value: string) {
+  return value.normalize('NFKC').replace(/\s+/g, ' ').trim();
+}
+
+function getRuntimeChoiceKey(value?: string) {
+  return normalizeRuntimeChoiceDisplayText(value ?? '').toLocaleLowerCase();
 }

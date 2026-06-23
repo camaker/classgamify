@@ -874,6 +874,10 @@ assert.equal(
   findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Berlin'),
   undefined
 );
+assert.equal(
+  findChoiceOwner({ 'item-1': ' Ｐａｒｉｓ ', 'item-2': 'Rome' }, 'paris'),
+  'item-1'
+);
 assert.deepEqual(
   buildExclusiveChoiceAnswerChanges({
     answers: { 'item-1': 'Paris' },
@@ -884,13 +888,13 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildExclusiveChoiceAnswerChanges({
-    answers: { 'item-1': 'Paris', 'item-2': 'Rome' },
-    choice: 'Paris',
+    answers: { 'item-1': ' Ｐａｒｉｓ ', 'item-2': 'Rome' },
+    choice: 'paris',
     itemId: 'item-2',
   }),
   [
     { answer: '', itemId: 'item-1' },
-    { answer: 'Paris', itemId: 'item-2' },
+    { answer: 'paris', itemId: 'item-2' },
   ]
 );
 assert.deepEqual(
@@ -904,23 +908,23 @@ assert.deepEqual(
 assert.deepEqual(
   getUniqueRuntimeChoices([
     {
-      choices: [' Paris ', '', 'Rome'],
+      choices: [' Paris ', '', 'Rome', 'ＰＡＲＩＳ'],
       id: 'q-1',
       kind: 'question',
       prompt: 'Capital?',
     },
     {
-      choices: ['Paris', 'Berlin'],
+      choices: ['Paris', 'Berlin', 'New   York', 'New York'],
       id: 'q-2',
       kind: 'question',
       prompt: 'Another capital?',
     },
   ]),
-  ['Paris', 'Rome', 'Berlin']
+  ['Paris', 'Rome', 'Berlin', 'New York']
 );
 assert.deepEqual(
   buildRuntimeChoiceViews({
-    answers: { 'item-1': 'Paris' },
+    answers: { 'item-1': 'Ｐａｒｉｓ', 'item-2': 'rome' },
     choices: ['Paris', 'Rome'],
     selectedItemId: 'item-2',
   }),
@@ -932,8 +936,8 @@ assert.deepEqual(
     },
     {
       choice: 'Rome',
-      selected: false,
-      usedByItemId: undefined,
+      selected: true,
+      usedByItemId: 'item-2',
     },
   ]
 );
