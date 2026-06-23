@@ -68,9 +68,10 @@ export function UpdatePasswordCard({ className }: UpdatePasswordCardProps) {
           toast.success(m.settings_security_update_password_success());
           form.reset();
         },
-        onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`);
-          toast.error(m.settings_security_update_password_fail());
+        onError: () => {
+          const message = m.settings_security_update_password_fail();
+          setError(message);
+          toast.error(message);
         },
       }
     );

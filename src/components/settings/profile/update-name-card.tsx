@@ -64,9 +64,10 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
           refetch();
           form.reset({ name: values.name });
         },
-        onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`);
-          toast.error(m.settings_profile_name_fail());
+        onError: () => {
+          const message = m.settings_profile_name_fail();
+          setError(message);
+          toast.error(message);
         },
       }
     );

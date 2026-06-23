@@ -47,9 +47,10 @@ export function DeleteAccountCard() {
           refetch();
           navigate({ to: '/' });
         },
-        onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`);
-          toast.error(m.settings_security_delete_account_fail());
+        onError: () => {
+          const message = m.settings_security_delete_account_fail();
+          setError(message);
+          toast.error(message);
         },
       }
     );

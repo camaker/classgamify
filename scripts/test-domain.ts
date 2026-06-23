@@ -600,6 +600,48 @@ assert.match(
   /const message = m\.settings_profile_avatar_fail\(\);/,
   'Avatar update failures should use the localized profile avatar failure message.'
 );
+const updateNameCardSource = readFileSync(
+  'src/components/settings/profile/update-name-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  updateNameCardSource,
+  /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Profile name update failures should use localized profile copy instead of raw auth errors.'
+);
+assert.match(
+  updateNameCardSource,
+  /const message = m\.settings_profile_name_fail\(\);/,
+  'Profile name update failures should use the localized name failure message.'
+);
+const updatePasswordCardSource = readFileSync(
+  'src/components/settings/security/update-password-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  updatePasswordCardSource,
+  /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Password update failures should use localized security copy instead of raw auth errors.'
+);
+assert.match(
+  updatePasswordCardSource,
+  /const message = m\.settings_security_update_password_fail\(\);/,
+  'Password update failures should use the localized password failure message.'
+);
+const deleteAccountCardSource = readFileSync(
+  'src/components/settings/security/delete-account-card.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  deleteAccountCardSource,
+  /ctx\.error|err\.message|error\.message|err instanceof Error|error instanceof Error/,
+  'Account deletion failures should use localized security copy instead of raw auth errors.'
+);
+assert.match(
+  deleteAccountCardSource,
+  /const message = m\.settings_security_delete_account_fail\(\);/,
+  'Account deletion failures should use the localized delete-account failure message.'
+);
 const adminUserDetailViewerSource = readFileSync(
   'src/components/admin/users/user-detail-viewer.tsx',
   'utf8'
