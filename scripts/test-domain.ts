@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
+import { Routes } from '@/lib/routes';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -123,6 +124,7 @@ import {
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import { getWorksheetModeDefinitions } from '@/activities/worksheet-modes';
+import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
 import {
   buildDashboardCoreLoopReadiness,
@@ -586,8 +588,13 @@ for (const retiredStubRouteFile of [
 }
 assert.match(sitemapRouteSource, /Routes\.Worksheets/);
 assert.doesNotMatch(sitemapRouteSource, /Routes\.PlayDemo/);
+assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);
 assert.equal(isLocalizedPath('/play/demo-food'), false);
+assert.equal(
+  Routes.PlayDemo,
+  buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
+);
 assert.match(
   readFileSync('src/routes/play/$shareId.tsx', 'utf8'),
   /robots: 'noindex,follow'/
@@ -3577,6 +3584,7 @@ const starterActivities = getStarterActivities();
 const starterAssignments = getStarterAssignments();
 assert.equal(starterActivities[0]?.title, 'Food words quick check');
 assert.equal(starterAssignments[0]?.title, 'Food words homework');
+assert.equal(starterAssignments[0]?.shareId, STARTER_FOOD_ASSIGNMENT_SHARE_ID);
 assert.equal(getStarterActivities()[0]?.title, 'Food words quick check');
 assert.equal(getStarterAssignments()[0]?.title, 'Food words homework');
 overwriteGetLocale(() => 'zh');

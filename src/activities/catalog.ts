@@ -1,4 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
+import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type {
   ActivityTemplateType,
   ActivitySeed,
@@ -283,7 +284,7 @@ export function getStarterAssignments(): AssignmentSeed[] {
   return [
     {
       id: 'assignment-food-demo',
-      shareId: 'demo-food',
+      shareId: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
       title: m.activity_starter_assignment_food_title(),
       activityId: 'english-food-quiz',
       completions: 18,
