@@ -5900,6 +5900,18 @@ assert.deepEqual(
     normalizedSubmittedAnswer: '苹果公司',
   }
 );
+assert.deepEqual(
+  matchAnswer({
+    expectedAnswer: 'ice cream',
+    submittedAnswer: 'ice-cream',
+  }),
+  {
+    acceptedAnswer: 'ice cream',
+    correct: true,
+    normalizedAcceptedAnswer: 'ice cream',
+    normalizedSubmittedAnswer: 'ice cream',
+  }
+);
 const defaultSourceSummaryContent = buildActivityContent({
   description: 'Default source summary',
   difficulty: 'starter',

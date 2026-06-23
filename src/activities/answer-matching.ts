@@ -46,7 +46,7 @@ function normalizeAnswerForMatching(value: string) {
     .toLocaleLowerCase()
     .replace(/[’‘`´']/gu, '')
     .replace(/&/gu, ' and ')
-    .replace(/[.,!?;:，。！？；：、()[\]{}"“”]/gu, ' ')
+    .replace(/[.,!?;:，。！？；：、()[\]{}"“”\-_‐‑‒–—―]/gu, ' ')
     .replace(/\s+/gu, ' ')
     .trim();
 }
