@@ -154,8 +154,13 @@ export function buildStudentRunnerAttemptState({
     currentAttemptSessionKey:
       assignment && itemCount > 0
         ? buildStudentAttemptSessionKey({
+            assignmentId: assignment.id,
             runtimeItems,
             shareSlug: activeShareId,
+            templateType:
+              pageState.status === 'ready'
+                ? pageState.activity.templateType
+                : undefined,
           })
         : undefined,
     itemCount,

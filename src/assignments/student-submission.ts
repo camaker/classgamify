@@ -359,16 +359,42 @@ export function formatAttemptCompletionProgressLabel({
 }
 
 export function buildStudentAttemptSessionKey({
+  assignmentId,
   runtimeItems,
   shareSlug,
+  templateType,
 }: {
+  assignmentId?: string;
   runtimeItems: StudentSubmissionRuntimeItem[];
   shareSlug: string;
+  templateType?: string;
 }): string {
-  return JSON.stringify([
-    normalizeAssignmentShareSlug(shareSlug),
-    runtimeItems.map((item) => item.id),
-  ]);
+  const normalizedAssignmentId = normalizeSessionKeyPart(assignmentId);
+  const normalizedTemplateType = normalizeSessionKeyPart(templateType);
+  const context =
+    normalizedAssignmentId || normalizedTemplateType
+      ? {
+          assignmentId: normalizedAssignmentId,
+          templateType: normalizedTemplateType,
+        }
+      : undefined;
+
+  return JSON.stringify(
+    context
+      ? [
+          normalizeAssignmentShareSlug(shareSlug),
+          context,
+          runtimeItems.map((item) => item.id),
+        ]
+      : [
+          normalizeAssignmentShareSlug(shareSlug),
+          runtimeItems.map((item) => item.id),
+        ]
+  );
+}
+
+function normalizeSessionKeyPart(value: string | undefined) {
+  return value?.trim() || undefined;
 }
 
 export function buildAttemptCompletionCopy({

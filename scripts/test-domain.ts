@@ -1699,6 +1699,34 @@ assert.notEqual(
     shareSlug: 'share-one',
   })
 );
+assert.notEqual(
+  buildStudentAttemptSessionKey({
+    assignmentId: 'assignment-one',
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    templateType: 'quiz',
+  }),
+  buildStudentAttemptSessionKey({
+    assignmentId: 'assignment-two',
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    templateType: 'quiz',
+  })
+);
+assert.notEqual(
+  buildStudentAttemptSessionKey({
+    assignmentId: 'assignment-one',
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    templateType: 'quiz',
+  }),
+  buildStudentAttemptSessionKey({
+    assignmentId: 'assignment-one',
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    templateType: 'line-match',
+  })
+);
 
 assert.deepEqual(
   buildAttemptSubmissionAnswers({
@@ -3499,8 +3527,10 @@ assert.deepEqual(
       unansweredItemCount: publicRunnerState.runtimeItems.length - 1,
     },
     currentAttemptSessionKey: buildStudentAttemptSessionKey({
+      assignmentId: publicRunnerState.assignment.id,
       runtimeItems: publicRunnerState.runtimeItems,
       shareSlug: 'share-public',
+      templateType: publicRunnerState.activity.templateType,
     }),
     itemCount: publicRunnerState.runtimeItems.length,
     runtimeItems: publicRunnerState.runtimeItems,
@@ -3539,8 +3569,10 @@ assert.deepEqual(
       unansweredItemCount: starterRunnerState.runtimeItems.length,
     },
     currentAttemptSessionKey: buildStudentAttemptSessionKey({
+      assignmentId: starterRunnerState.assignment.id,
       runtimeItems: starterRunnerState.runtimeItems,
       shareSlug: 'demo-runner',
+      templateType: starterRunnerState.activity.templateType,
     }),
     itemCount: starterRunnerState.runtimeItems.length,
     runtimeItems: starterRunnerState.runtimeItems,
