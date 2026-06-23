@@ -4612,6 +4612,27 @@ assert.match(
   /assertActivityCanRestore\(row\.visibility\)/,
   'Restore activity API should enforce the activity lifecycle transition server-side.'
 );
+assert.match(
+  activitiesApiSource,
+  /export const duplicateActivity[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
+  'Duplicate activity API should block archived activities server-side.'
+);
+assert.match(
+  activitiesApiSource,
+  /export const remixActivityTemplate[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
+  'Template remix API should block archived activities server-side.'
+);
+assert.match(
+  activitiesApiSource,
+  /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)/,
+  'Update activity API should block edits to archived activities server-side.'
+);
+const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
+assert.match(
+  assignmentsApiSource,
+  /export const publishAssignment[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
+  'Publish assignment API should block archived source activities server-side before snapshotting.'
+);
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),
