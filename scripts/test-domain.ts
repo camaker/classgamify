@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { formatUserFileUploadError } from '@/api/user-file-errors';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
@@ -360,6 +361,7 @@ import {
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import { resolveAssignmentSettings } from '@/assignments/validation';
+import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
@@ -518,6 +520,39 @@ const activeLocaleMessageText = [
 assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
 assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
 assert.doesNotMatch(activeLocaleMessageText, /"legacy_/);
+const storageTypesSource = readFileSync('src/storage/types.ts', 'utf8');
+assert.doesNotMatch(
+  storageTypesSource,
+  /Please select a file|File is too large|File type not supported/,
+  'Storage infrastructure should expose error codes, not user-facing copy.'
+);
+overwriteGetLocale(() => 'en');
+assert.equal(
+  formatUserFileUploadError(
+    new UploadError(STORAGE_ERROR_CODES.FILE_TOO_LARGE, {
+      maxMegabytes: 4,
+    })
+  ),
+  'The file is too large. Choose a file up to 4 MB.'
+);
+assert.equal(
+  formatUserFileUploadError(
+    new UploadError(STORAGE_ERROR_CODES.INVALID_FILE_TYPE, {
+      supportedExtensions: '.pdf, .mp3',
+    })
+  ),
+  'This file type is not supported. Supported types: .pdf, .mp3.'
+);
+overwriteGetLocale(() => 'zh');
+assert.equal(
+  formatUserFileUploadError(
+    new UploadError(STORAGE_ERROR_CODES.DANGEROUS_CONTENT_TYPE, {
+      contentType: 'text/html',
+    })
+  ),
+  '出于课堂安全考虑，这类文件不能上传。'
+);
+overwriteGetLocale(() => 'en');
 const robotsRouteSource = readFileSync('src/routes/robots[.]txt.ts', 'utf8');
 const sitemapRouteSource = readFileSync('src/routes/sitemap[.]xml.ts', 'utf8');
 const routeConstantsSource = readFileSync('src/lib/routes.ts', 'utf8');

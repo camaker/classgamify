@@ -9,6 +9,7 @@ import { isPublicFolder } from '@/storage/utils';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { formatUserFileUploadError } from './user-file-errors';
 
 const listSchema = z.object({
   pageIndex: z.number().int().min(0),
@@ -130,7 +131,7 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
       return result;
     } catch (error) {
       if (error instanceof UploadError || error instanceof StorageError) {
-        throw new Error(error.message);
+        throw new Error(formatUserFileUploadError(error));
       }
       throw new Error(m.user_files_api_error_upload_failed());
     }

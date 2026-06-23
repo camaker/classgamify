@@ -7,12 +7,14 @@ import {
 import {
   type FileMetadata,
   type R2BucketInterface,
+  type StorageErrorCode,
+  type StorageErrorDetails,
   type StorageProvider,
   type UploadFileParams,
   type UploadFileResult,
   type ValidationResult,
   ConfigurationError,
-  R2_ERROR_CODES,
+  STORAGE_ERROR_CODES,
   StorageError,
   UploadError,
 } from '../types';
@@ -20,10 +22,13 @@ import { sanitizeFolder } from '../utils';
 import { websiteConfig } from '@/config/website';
 
 const success = <T>(data: T): ValidationResult<T> => ({ success: true, data });
-const fail = (error: string, code?: string): ValidationResult<never> => ({
+const fail = (
+  code: StorageErrorCode,
+  details?: StorageErrorDetails
+): ValidationResult<never> => ({
   success: false,
-  error,
   code,
+  details,
 });
 
 interface FileValidatorConfig {
@@ -46,10 +51,9 @@ function createFileValidator(config: FileValidatorConfig) {
       const size = file.size;
       if (size > maxFileSize) {
         const maxMB = Math.round(maxFileSize / (1024 * 1024));
-        return fail(
-          `${R2_ERROR_CODES.FILE_TOO_LARGE} (max ${maxMB}MB)`,
-          'FILE_TOO_LARGE'
-        );
+        return fail(STORAGE_ERROR_CODES.FILE_TOO_LARGE, {
+          maxMegabytes: maxMB,
+        });
       }
       if (allowedTypes.length > 0 && originalName) {
         const ext =
@@ -65,10 +69,9 @@ function createFileValidator(config: FileValidatorConfig) {
           const formatted = allowedTypes
             .map((t: string) => (t.startsWith('.') ? t : `.${t}`))
             .join(', ');
-          return fail(
-            `${R2_ERROR_CODES.INVALID_FILE_TYPE}. Supported: ${formatted}`,
-            'INVALID_FILE_TYPE'
-          );
+          return fail(STORAGE_ERROR_CODES.INVALID_FILE_TYPE, {
+            supportedExtensions: formatted,
+          });
         }
       }
       return success(true);
@@ -121,10 +124,10 @@ function validateContentType(
 
   const allowedExts = MIME_TO_EXTENSIONS[contentType.toLowerCase()];
   if (allowedExts && !allowedExts.includes(ext)) {
-    return fail(
-      `Content type '${contentType}' does not match file extension '.${ext}'`,
-      'CONTENT_TYPE_MISMATCH'
-    );
+    return fail(STORAGE_ERROR_CODES.CONTENT_TYPE_MISMATCH, {
+      contentType,
+      extension: ext,
+    });
   }
 
   // Block dangerous MIME types regardless of extension
@@ -136,10 +139,9 @@ function validateContentType(
     'application/xhtml+xml',
   ];
   if (dangerousTypes.includes(contentType.toLowerCase())) {
-    return fail(
-      `Content type '${contentType}' is not allowed for uploads`,
-      'DANGEROUS_CONTENT_TYPE'
-    );
+    return fail(STORAGE_ERROR_CODES.DANGEROUS_CONTENT_TYPE, {
+      contentType,
+    });
   }
 
   return success(true);
@@ -214,12 +216,15 @@ export class R2Provider implements StorageProvider {
           );
     const validation = this.validator.validateFile(fileForValidation, filename);
     if (!validation.success) {
-      throw new UploadError(validation.error);
+      throw new UploadError(validation.code, validation.details);
     }
 
     const contentTypeValidation = validateContentType(contentType, filename);
     if (!contentTypeValidation.success) {
-      throw new UploadError(contentTypeValidation.error);
+      throw new UploadError(
+        contentTypeValidation.code,
+        contentTypeValidation.details
+      );
     }
 
     const fileId = generateId();

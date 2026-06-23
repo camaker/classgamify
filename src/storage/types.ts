@@ -55,38 +55,65 @@ export interface FileMetadata {
  */
 export type ValidationResult<T> =
   | { success: true; data: T }
-  | { success: false; error: string; code?: string };
+  | {
+      success: false;
+      code: StorageErrorCode;
+      details?: StorageErrorDetails;
+    };
 
-export const R2_ERROR_CODES = {
-  FILE_TOO_LARGE: 'File is too large. Please choose a smaller file',
-  INVALID_FILE_TYPE: 'File type not supported. Please choose a different file',
-  NO_FILE_PROVIDED: 'Please select a file to upload',
-  UPLOAD_FAILED: 'Upload failed. Please check your connection and try again',
-  R2_STORAGE_NOT_CONFIGURED:
-    'File storage is temporarily unavailable. Please try again later',
-  LIST_FILES_FAILED: 'Unable to load your files. Please refresh the page',
+export const STORAGE_ERROR_CODES = {
+  CONTENT_TYPE_MISMATCH: 'CONTENT_TYPE_MISMATCH',
+  DANGEROUS_CONTENT_TYPE: 'DANGEROUS_CONTENT_TYPE',
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+  NO_FILE_PROVIDED: 'NO_FILE_PROVIDED',
+  R2_STORAGE_NOT_CONFIGURED: 'R2_STORAGE_NOT_CONFIGURED',
+  UPLOAD_FAILED: 'UPLOAD_FAILED',
 } as const;
+
+export type StorageErrorCode =
+  (typeof STORAGE_ERROR_CODES)[keyof typeof STORAGE_ERROR_CODES];
+
+export interface StorageErrorDetails {
+  contentType?: string;
+  extension?: string;
+  maxMegabytes?: number;
+  supportedExtensions?: string;
+}
 
 /**
  * Storage provider error types
  */
 export class StorageError extends Error {
-  constructor(message: string) {
+  readonly code?: StorageErrorCode;
+  readonly details?: StorageErrorDetails;
+
+  constructor(
+    message: string,
+    code?: StorageErrorCode,
+    details?: StorageErrorDetails
+  ) {
     super(message);
     this.name = 'StorageError';
+    this.code = code;
+    this.details = details;
   }
 }
 
 export class ConfigurationError extends StorageError {
-  constructor(message: string) {
-    super(message);
+  constructor(
+    message = STORAGE_ERROR_CODES.R2_STORAGE_NOT_CONFIGURED,
+    code: StorageErrorCode = STORAGE_ERROR_CODES.R2_STORAGE_NOT_CONFIGURED,
+    details?: StorageErrorDetails
+  ) {
+    super(message, code, details);
     this.name = 'ConfigurationError';
   }
 }
 
 export class UploadError extends StorageError {
-  constructor(message: string) {
-    super(message);
+  constructor(code: StorageErrorCode, details?: StorageErrorDetails) {
+    super(code, code, details);
     this.name = 'UploadError';
   }
 }
