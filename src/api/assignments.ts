@@ -240,7 +240,9 @@ function buildAssignmentListWhere({
           assignmentSnapshot.activityDescription,
           normalizedSearch
         ),
-        sqlLikeContains(assignmentSnapshot.templateType, normalizedSearch)
+        sqlLikeContains(assignmentSnapshot.templateType, normalizedSearch),
+        sqlLikeContains(activity.contentJson, normalizedSearch),
+        sqlLikeContains(assignmentSnapshot.contentJson, normalizedSearch)
       ) as SQL
     );
   }

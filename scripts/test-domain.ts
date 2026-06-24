@@ -5898,6 +5898,16 @@ assert.match(
   /sqlLikeContains\(assignment\.title, normalizedSearch\)/,
   'Assignment list search should escape SQL LIKE wildcard characters.'
 );
+assert.match(
+  assignmentsApiSource,
+  /sqlLikeContains\(activity\.contentJson, normalizedSearch\)/,
+  'Assignment list search should include current source activity structured text.'
+);
+assert.match(
+  assignmentsApiSource,
+  /sqlLikeContains\(assignmentSnapshot\.contentJson, normalizedSearch\)/,
+  'Assignment list search should include frozen assignment snapshot structured text.'
+);
 assert.doesNotMatch(
   assignmentsApiSource,
   /like\(assignment\.title, `%\$\{normalizedSearch\}%`\)/,
