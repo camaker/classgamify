@@ -1236,41 +1236,67 @@ assert.deepEqual(sourceMaterialSummary.readiness, {
   hasSpreadsheet: false,
   hasWorksheet: true,
 });
+assert.deepEqual(sourceMaterialSummary.extractionActions, [
+  {
+    capability: 'audio-extraction',
+    id: 'extract-audio',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'audio' }],
+  },
+  {
+    capability: 'worksheet-extraction',
+    id: 'extract-worksheet',
+    sourceCount: 2,
+    sourceKindCounts: [{ count: 2, kind: 'worksheet-document' }],
+  },
+]);
 assert.deepEqual(sourceMaterialSummary.kindSummaries, [
   { count: 1, kind: 'audio' },
   { count: 2, kind: 'worksheet-document' },
 ]);
-assert.deepEqual(
-  summarizeActivitySourceMaterials([
-    {
-      fileId: 'file-archive',
-      kind: 'archive',
-      originalName: 'classroom.zip',
-    },
-    {
-      fileId: 'file-sheet',
-      kind: 'spreadsheet',
-      originalName: 'word-list.xlsx',
-    },
-    {
-      fileId: 'file-scan',
-      kind: 'worksheet-image',
-      originalName: 'scan.png',
-    },
-    {
-      fileId: 'file-video',
-      kind: 'video',
-      originalName: 'lesson.mp4',
-    },
-  ]).readiness,
+const mixedSourceMaterialSummary = summarizeActivitySourceMaterials([
   {
-    capabilities: ['spreadsheet-import', 'worksheet-extraction'],
-    extractableCount: 2,
-    hasAudio: false,
-    hasSpreadsheet: true,
-    hasWorksheet: true,
-  }
-);
+    fileId: 'file-archive',
+    kind: 'archive',
+    originalName: 'classroom.zip',
+  },
+  {
+    fileId: 'file-sheet',
+    kind: 'spreadsheet',
+    originalName: 'word-list.xlsx',
+  },
+  {
+    fileId: 'file-scan',
+    kind: 'worksheet-image',
+    originalName: 'scan.png',
+  },
+  {
+    fileId: 'file-video',
+    kind: 'video',
+    originalName: 'lesson.mp4',
+  },
+]);
+assert.deepEqual(mixedSourceMaterialSummary.readiness, {
+  capabilities: ['spreadsheet-import', 'worksheet-extraction'],
+  extractableCount: 2,
+  hasAudio: false,
+  hasSpreadsheet: true,
+  hasWorksheet: true,
+});
+assert.deepEqual(mixedSourceMaterialSummary.extractionActions, [
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
+  },
+  {
+    capability: 'worksheet-extraction',
+    id: 'extract-worksheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'worksheet-image' }],
+  },
+]);
 assert.deepEqual(
   buildActivitySourceMaterialSummaryView([
     listeningMaterialReference,
@@ -1284,6 +1310,20 @@ assert.deepEqual(
   ]),
   {
     countLabel: '2 files',
+    extractionActions: [
+      {
+        capability: 'audio-extraction',
+        id: 'extract-audio',
+        sourceCount: 1,
+        sourceKindCounts: [{ count: 1, kind: 'audio' }],
+      },
+      {
+        capability: 'worksheet-extraction',
+        id: 'extract-worksheet',
+        sourceCount: 1,
+        sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
+      },
+    ],
     hasMaterials: true,
     kindBadges: [
       { count: 1, kind: 'audio', label: 'Audio' },
@@ -1305,6 +1345,7 @@ assert.deepEqual(
 );
 assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   countLabel: '0 files',
+  extractionActions: [],
   hasMaterials: false,
   kindBadges: [],
   readiness: {
@@ -6261,6 +6302,7 @@ assert.deepEqual(starterActivityDisplayView.stats, [
 ]);
 assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
   countLabel: '0 files',
+  extractionActions: [],
   hasMaterials: false,
   kindBadges: [],
   readiness: {
@@ -6285,6 +6327,14 @@ assert.deepEqual(
   }).sourceMaterials,
   {
     countLabel: '1 file',
+    extractionActions: [
+      {
+        capability: 'audio-extraction',
+        id: 'extract-audio',
+        sourceCount: 1,
+        sourceKindCounts: [{ count: 1, kind: 'audio' }],
+      },
+    ],
     hasMaterials: true,
     kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
     readiness: {

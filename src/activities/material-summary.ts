@@ -6,15 +6,27 @@ import {
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 
-type ActivitySourceMaterialKindSummary = {
+export type ActivitySourceMaterialKindSummary = {
   count: number;
   kind: UserFileMaterialKind;
 };
+
+export type ActivitySourceMaterialExtractionActionId =
+  | 'extract-audio'
+  | 'extract-worksheet'
+  | 'import-spreadsheet';
 
 export type ActivitySourceMaterialReadinessCapability =
   | 'audio-extraction'
   | 'spreadsheet-import'
   | 'worksheet-extraction';
+
+export type ActivitySourceMaterialExtractionAction = {
+  capability: ActivitySourceMaterialReadinessCapability;
+  id: ActivitySourceMaterialExtractionActionId;
+  sourceCount: number;
+  sourceKindCounts: ActivitySourceMaterialKindSummary[];
+};
 
 export type ActivitySourceMaterialReadiness = {
   capabilities: ActivitySourceMaterialReadinessCapability[];
@@ -26,6 +38,7 @@ export type ActivitySourceMaterialReadiness = {
 
 type ActivitySourceMaterialSummary = {
   byKind: Record<UserFileMaterialKind, number>;
+  extractionActions: ActivitySourceMaterialExtractionAction[];
   kindSummaries: ActivitySourceMaterialKindSummary[];
   readiness: ActivitySourceMaterialReadiness;
   total: number;
@@ -33,6 +46,7 @@ type ActivitySourceMaterialSummary = {
 
 export type ActivitySourceMaterialSummaryView = {
   countLabel: string;
+  extractionActions: ActivitySourceMaterialExtractionAction[];
   hasMaterials: boolean;
   kindBadges: Array<{
     count: number;
@@ -55,6 +69,7 @@ export function summarizeActivitySourceMaterials(
 
   return {
     byKind,
+    extractionActions: buildActivitySourceMaterialExtractionActions(byKind),
     kindSummaries: USER_FILE_MATERIAL_KINDS.flatMap((kind) =>
       byKind[kind] > 0 ? [{ count: byKind[kind], kind }] : []
     ),
@@ -77,6 +92,7 @@ export function buildActivitySourceMaterialSummaryView(
         : m.activity_source_material_summary_count_many({
             count: summary.total,
           }),
+    extractionActions: summary.extractionActions,
     hasMaterials: summary.total > 0,
     kindBadges: summary.kindSummaries.map((item) => ({
       ...item,
@@ -87,10 +103,59 @@ export function buildActivitySourceMaterialSummaryView(
   };
 }
 
+type ActivitySourceMaterialExtractionActionDefinition = {
+  capability: ActivitySourceMaterialReadinessCapability;
+  id: ActivitySourceMaterialExtractionActionId;
+  sourceKinds: UserFileMaterialKind[];
+};
+
+const ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS = [
+  {
+    capability: 'audio-extraction',
+    id: 'extract-audio',
+    sourceKinds: ['audio'],
+  },
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceKinds: ['spreadsheet'],
+  },
+  {
+    capability: 'worksheet-extraction',
+    id: 'extract-worksheet',
+    sourceKinds: ['worksheet-document', 'worksheet-image'],
+  },
+] satisfies ActivitySourceMaterialExtractionActionDefinition[];
+
 function createEmptyMaterialKindCounts() {
   return Object.fromEntries(
     USER_FILE_MATERIAL_KINDS.map((kind) => [kind, 0])
   ) as Record<UserFileMaterialKind, number>;
+}
+
+function buildActivitySourceMaterialExtractionActions(
+  byKind: Record<UserFileMaterialKind, number>
+): ActivitySourceMaterialExtractionAction[] {
+  return ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.flatMap((action) => {
+    const sourceKindCounts = action.sourceKinds.flatMap((kind) =>
+      byKind[kind] > 0 ? [{ count: byKind[kind], kind }] : []
+    );
+    const sourceCount = sourceKindCounts.reduce(
+      (total, item) => total + item.count,
+      0
+    );
+
+    return sourceCount > 0
+      ? [
+          {
+            capability: action.capability,
+            id: action.id,
+            sourceCount,
+            sourceKindCounts,
+          },
+        ]
+      : [];
+  });
 }
 
 function buildActivitySourceMaterialReadiness(
