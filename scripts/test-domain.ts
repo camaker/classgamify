@@ -547,6 +547,64 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const localizedLegalPageRequirements = [
+  {
+    filePath: 'content/pages/terms.zh.md',
+    patterns: [
+      /ClassGamify/,
+      /课堂活动/,
+      /作业链接/,
+      /学生(?:作答|提交)/,
+      /结果/,
+      /AI/,
+    ],
+  },
+  {
+    filePath: 'content/pages/privacy.zh.md',
+    patterns: [
+      /ClassGamify/,
+      /课堂活动/,
+      /作业链接/,
+      /学生参与数据|学生作答/,
+      /老师结果|结果/,
+      /AI/,
+    ],
+  },
+  {
+    filePath: 'content/pages/cookie.zh.md',
+    patterns: [
+      /ClassGamify/,
+      /课堂活动/,
+      /作业链接/,
+      /匿名学生|匿名尝试/,
+      /本地作答状态/,
+      /AI/,
+    ],
+  },
+] as const;
+for (const { filePath, patterns } of localizedLegalPageRequirements) {
+  assert.equal(
+    existsSync(filePath),
+    true,
+    `${filePath} should exist so zh legal routes do not fall back to English.`
+  );
+
+  const fileText = readFileSync(filePath, 'utf8');
+
+  assert.doesNotMatch(
+    fileText,
+    copiedTemplateMarkerPattern,
+    `${filePath} should not mention copied learning-site product language.`
+  );
+
+  for (const pattern of patterns) {
+    assert.match(
+      fileText,
+      pattern,
+      `${filePath} should describe the ClassGamify classroom activity, assignment, student attempt, results, and AI/file data model.`
+    );
+  }
+}
 const environmentTemplateFiles = ['.env.example', '.env.production.example'];
 for (const filePath of environmentTemplateFiles) {
   const fileText = readFileSync(filePath, 'utf8');
