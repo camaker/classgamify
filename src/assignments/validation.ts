@@ -8,13 +8,32 @@ export const defaultAssignmentSettings: AssignmentSettings = {
   shuffleItems: true,
 };
 
+export const ASSIGNMENT_MAX_ATTEMPTS_RANGE = {
+  max: 10,
+  min: 1,
+} as const;
+
+export const ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE = {
+  max: 3 * 60 * 60,
+  min: 60,
+} as const;
+
+export const ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE = {
+  max: ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.max / 60,
+  min: ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.min / 60,
+} as const;
+
 const assignmentInstructionsSchema = z.preprocess(
   (value) =>
     typeof value === 'string' && value.trim().length === 0 ? undefined : value,
   z.string().trim().max(500).optional()
 );
 
-const assignmentLimitedMaxAttemptsSchema = z.number().int().min(1).max(10);
+const assignmentLimitedMaxAttemptsSchema = z
+  .number()
+  .int()
+  .min(ASSIGNMENT_MAX_ATTEMPTS_RANGE.min)
+  .max(ASSIGNMENT_MAX_ATTEMPTS_RANGE.max);
 
 const assignmentMaxAttemptsSchema = assignmentLimitedMaxAttemptsSchema
   .nullable()
@@ -23,8 +42,8 @@ const assignmentMaxAttemptsSchema = assignmentLimitedMaxAttemptsSchema
 const assignmentTimeLimitSecondsSchema = z
   .number()
   .int()
-  .min(60)
-  .max(3 * 60 * 60)
+  .min(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.min)
+  .max(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.max)
   .optional();
 
 export function resolveAssignmentSettings(

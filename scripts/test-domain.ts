@@ -437,7 +437,12 @@ import {
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  ASSIGNMENT_MAX_ATTEMPTS_RANGE,
+  ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
+  ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE,
+  resolveAssignmentSettings,
+} from '@/assignments/validation';
 import {
   getUserFileExtension,
   resolveUserFileMaterialKind,
@@ -3323,6 +3328,34 @@ assert.deepEqual(
     shuffleItems: true,
     timeLimitSeconds: undefined,
   }
+);
+assert.deepEqual(ASSIGNMENT_MAX_ATTEMPTS_RANGE, { max: 10, min: 1 });
+assert.deepEqual(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE, {
+  max: 10_800,
+  min: 60,
+});
+assert.deepEqual(ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE, {
+  max: 180,
+  min: 1,
+});
+const assignmentPublishInputSource = readFileSync(
+  'src/assignments/publish-input.ts',
+  'utf8'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /ASSIGNMENT_MAX_ATTEMPTS_RANGE/,
+  'Publish dialog input parsing should reuse the assignment-domain max-attempt range.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE/,
+  'Publish dialog input parsing should reuse the assignment-domain timer range.'
+);
+assert.doesNotMatch(
+  assignmentPublishInputSource,
+  /const PUBLISH_ATTEMPTS_RANGE|const PUBLISH_TIME_LIMIT_MINUTES_RANGE/,
+  'Publish dialog input parsing should not maintain separate local delivery ranges.'
 );
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
 assert.equal(buildAssignmentSharePath('  abc 123  '), '/play/abc%20123');

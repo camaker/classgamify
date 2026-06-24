@@ -1,5 +1,9 @@
 import type { AssignmentSettings } from '@/activities/types';
-import { defaultAssignmentSettings } from '@/assignments/validation';
+import {
+  ASSIGNMENT_MAX_ATTEMPTS_RANGE,
+  ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
+  defaultAssignmentSettings,
+} from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 export function formatAssignmentDateTimeLocal(date: Date) {
@@ -118,16 +122,6 @@ type AssignmentPublishToggleOption = {
 type AssignmentPublishToggleView = AssignmentPublishToggleOption & {
   checked: boolean;
 };
-
-const PUBLISH_ATTEMPTS_RANGE = {
-  max: 10,
-  min: 1,
-} as const;
-
-const PUBLISH_TIME_LIMIT_MINUTES_RANGE = {
-  max: 180,
-  min: 1,
-} as const;
 
 export const assignmentPublishDialogCopy = {
   get cancelLabel() {
@@ -319,7 +313,7 @@ export function validateAssignmentPublishDraft({
   const timeLimit = parseOptionalWholeNumber(timeLimitMinutes);
   if (
     timeLimitMinutes.trim() &&
-    !isWholeNumberInRange(timeLimit, PUBLISH_TIME_LIMIT_MINUTES_RANGE)
+    !isWholeNumberInRange(timeLimit, ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE)
   ) {
     return {
       message: m.assignment_publish_validation_time_limit(),
@@ -421,7 +415,7 @@ export function buildAssignmentPublishInputFromDraft({
 function parseAssignmentPublishMaxAttempts(value: string) {
   if (isAssignmentPublishMaxAttemptsBlank(value)) return undefined;
 
-  return parseWholeNumberInRange(value, PUBLISH_ATTEMPTS_RANGE);
+  return parseWholeNumberInRange(value, ASSIGNMENT_MAX_ATTEMPTS_RANGE);
 }
 
 function isAssignmentPublishMaxAttemptsBlank(value: string) {
@@ -429,7 +423,7 @@ function isAssignmentPublishMaxAttemptsBlank(value: string) {
 }
 
 function parseAssignmentPublishTimeLimitMinutes(value: string) {
-  return parseWholeNumberInRange(value, PUBLISH_TIME_LIMIT_MINUTES_RANGE);
+  return parseWholeNumberInRange(value, ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE);
 }
 
 function parseWholeNumberInRange(
