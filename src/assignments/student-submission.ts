@@ -207,6 +207,31 @@ export function getStudentRunnerCopy(): StudentRunnerCopy {
   return STUDENT_RUNNER_COPY;
 }
 
+export function resolveStudentAttemptSubmissionFailureMessage(error: unknown) {
+  const fallbackMessage = STUDENT_RUNNER_COPY.submissionFailureMessage;
+  if (!(error instanceof Error)) return fallbackMessage;
+
+  const message = error.message.trim();
+  return getSafeStudentAttemptSubmissionFailureMessages().includes(message)
+    ? message
+    : fallbackMessage;
+}
+
+function getSafeStudentAttemptSubmissionFailureMessages() {
+  return [
+    m.assignment_api_error_anonymous_token_required(),
+    m.assignment_api_error_assignment_closed(),
+    m.assignment_api_error_assignment_expired(),
+    m.assignment_api_error_assignment_not_found(),
+    m.assignment_api_error_assignment_not_published(),
+    m.assignment_api_error_attempt_limit_reached(),
+    m.assignment_api_error_student_name_required(),
+    m.assignment_attempt_answers_error_duplicate_item(),
+    m.assignment_attempt_answers_error_too_many(),
+    m.assignment_attempt_answers_error_unknown_item(),
+  ];
+}
+
 export function buildStudentRunnerMissingView(
   reason: StudentRunnerMissingReason
 ): StudentRunnerMissingView {

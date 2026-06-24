@@ -397,6 +397,7 @@ import {
   getAttemptSubmitDecision,
   getStudentRunnerCopy,
   isStudentAnswerFilled,
+  resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import { resolveAssignmentSettings } from '@/assignments/validation';
@@ -867,8 +868,8 @@ assert.doesNotMatch(
 );
 assert.match(
   publicPlayRouteSource,
-  /toast\.error\(runnerCopy\.submissionFailureMessage\)/,
-  'Student attempt submission failures should show the localized runner failure message.'
+  /toast\.error\(resolveStudentAttemptSubmissionFailureMessage\(error\)\)/,
+  'Student attempt submission failures should resolve through the safe localized failure helper.'
 );
 const directRunnerFeedbackSources = [
   'src/components/activities/fill-blank-worksheet.tsx',
@@ -1730,6 +1731,22 @@ assert.deepEqual(getStudentRunnerCopy(), {
   timeEndedLabel: 'Time ended',
   teacherViewLabel: 'Teacher view',
 });
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new Error('This assignment has reached its attempt limit.')
+  ),
+  'This assignment has reached its attempt limit.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new Error('database timeout for assignment_attempts')
+  ),
+  'Attempt could not be saved.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage('network closed'),
+  'Attempt could not be saved.'
+);
 assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
   description:
     'This link may have been unpublished, closed, or typed incorrectly.',

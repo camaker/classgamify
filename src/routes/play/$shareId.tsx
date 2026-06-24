@@ -32,6 +32,7 @@ import {
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   getStudentRunnerCopy,
+  resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import {
@@ -306,8 +307,8 @@ function PlayPage() {
       });
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
       toast.success(runnerCopy.submissionSuccessMessage);
-    } catch {
-      toast.error(runnerCopy.submissionFailureMessage);
+    } catch (error) {
+      toast.error(resolveStudentAttemptSubmissionFailureMessage(error));
     }
   }
 
