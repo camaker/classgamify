@@ -127,7 +127,10 @@ export function LineMatchBoard({
                   </div>
                 ) : null}
                 {revealAnswer && reviewItem ? (
-                  <PublicAnswerFeedback reviewItem={reviewItem} />
+                  <PublicAnswerFeedback
+                    correctLabel={copy.correctAnswerLabel}
+                    reviewItem={reviewItem}
+                  />
                 ) : null}
               </button>
             );

@@ -801,6 +801,20 @@ assert.match(
   /toast\.error\(runnerCopy\.submissionFailureMessage\)/,
   'Student attempt submission failures should show the localized runner failure message.'
 );
+const directRunnerFeedbackSources = [
+  'src/components/activities/fill-blank-worksheet.tsx',
+  'src/components/activities/line-match-board.tsx',
+  'src/components/activities/listening-runner.tsx',
+  'src/components/activities/matching-pairs-board.tsx',
+  'src/components/activities/open-box-runner.tsx',
+];
+for (const filePath of directRunnerFeedbackSources) {
+  assert.match(
+    readFileSync(filePath, 'utf8'),
+    /<PublicAnswerFeedback[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
+    `${filePath} should use the template-specific correct-answer label in student review feedback.`
+  );
+}
 const activityCreateFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'

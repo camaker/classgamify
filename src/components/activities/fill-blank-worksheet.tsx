@@ -92,7 +92,10 @@ export function FillBlankWorksheet({
                 onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
               />
               {revealAnswer && reviewItem ? (
-                <PublicAnswerFeedback reviewItem={reviewItem} />
+                <PublicAnswerFeedback
+                  correctLabel={copy.correctAnswerLabel}
+                  reviewItem={reviewItem}
+                />
               ) : null}
             </div>
           );

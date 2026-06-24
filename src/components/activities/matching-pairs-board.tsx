@@ -123,7 +123,10 @@ export function MatchingPairsBoard({
                   </span>
                 ) : null}
                 {revealAnswer && reviewItem ? (
-                  <PublicAnswerFeedback reviewItem={reviewItem} />
+                  <PublicAnswerFeedback
+                    correctLabel={copy.correctAnswerLabel}
+                    reviewItem={reviewItem}
+                  />
                 ) : null}
               </button>
             );
