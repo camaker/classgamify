@@ -7819,7 +7819,7 @@ assert.deepEqual(
     (option) => option.template === 'listening'
   ),
   {
-    diagnosis: undefined,
+    diagnosis: 'Listen is selected and ready.',
     isCurrent: true,
     isReady: true,
     readinessLabel: 'Ready',

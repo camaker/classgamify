@@ -63,7 +63,7 @@ export type ActivityTemplateReadinessPanelSummary = {
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
 
 type ActivityDraftMetaSummaryReadinessOption = {
-  diagnosis?: string;
+  diagnosis: string;
   isCurrent: boolean;
   isReady: boolean;
   readinessLabel: string;
@@ -194,7 +194,7 @@ export function buildActivityDraftMetaSummaryView({
     reviewChecklist: meta.reviewChecklist,
     suggestedTemplateOptions: meta.suggestedTemplateOptions,
     templateReadinessOptions: meta.templateReadiness.map((option) => ({
-      diagnosis: option.isReady ? undefined : option.diagnosis,
+      diagnosis: option.diagnosis,
       isCurrent: option.isCurrent,
       isReady: option.isReady,
       readinessLabel: option.readinessLabel,
