@@ -81,11 +81,15 @@ export function analyzeAssignmentResults({
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getAcceptedAnswers(item.answer);
-    const submittedAnswers = completedAttempts.map((attempt) =>
-      attempt.answersJson.answers.find((answer) => answer.itemId === item.id)
-    );
+    const submittedAnswers = completedAttempts.flatMap((attempt) => {
+      const answer = attempt.answersJson.answers.find(
+        (attemptAnswer) => attemptAnswer.itemId === item.id
+      );
+
+      return answer?.answer.trim() ? [answer] : [];
+    });
     const correctCount = submittedAnswers.filter(
-      (answer) => answer?.correct
+      (answer) => answer.correct
     ).length;
     const submittedCount = submittedAnswers.length;
 

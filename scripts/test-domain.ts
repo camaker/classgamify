@@ -10360,9 +10360,9 @@ assert.deepEqual(
   {
     acceptedAnswersLabel: 'Accepted',
     acceptedAnswersText: null,
-    correctRateLabel: '33%',
-    correctRateProgressValue: 33,
-    correctSummaryLabel: '1/3 correct',
+    correctRateLabel: '50%',
+    correctRateProgressValue: 50,
+    correctSummaryLabel: '1/2 correct',
     expectedAnswerLabel: 'answer',
     expectedAnswerText: '-',
     explanationText: null,
@@ -10419,13 +10419,13 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersText: '-',
-    correctRateLabel: '33%',
+    correctRateLabel: '50%',
     expectedAnswerText: '-',
     explanationText: '-',
     itemNumberLabel: '1.',
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
-    submittedLabel: '1/3',
+    submittedLabel: '1/2',
   }
 );
 assert.equal(
@@ -10584,7 +10584,7 @@ assert.deepEqual(
       correctCount: 0,
       correctRate: 0,
       itemId: 'pair-1',
-      submittedCount: 1,
+      submittedCount: 0,
     },
     {
       correctCount: 1,
@@ -10596,7 +10596,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   runtimeOrderedResultAnalysis.needsReview.map((item) => item.itemId),
-  ['pair-1', 'q-1']
+  ['q-1']
 );
 const sanitizedResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -10653,7 +10653,7 @@ assert.equal(sanitizedResultAnalysis.students[0]?.averageAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.bestAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.latestAccuracy, 0);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
-assert.equal(resultAnalysis.needsReview[0]?.correctRate, 33);
+assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
 assert.equal(
   normalizeResultSearch('  Anonymous   Student 1  '),
   'anonymous student 1'
@@ -12042,7 +12042,7 @@ assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'submitted').map(
     (item) => item.itemId
   ),
-  ['pair-1', 'q-1']
+  ['q-1', 'pair-1']
 );
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'type').map(
@@ -12370,8 +12370,8 @@ assert.deepEqual(
     item: classroomBrief.focusItems[0]!,
   }),
   {
-    correctRateLabel: '33%',
-    correctSummaryLabel: '1/3 correct',
+    correctRateLabel: '50%',
+    correctSummaryLabel: '1/2 correct',
     itemNumberLabel: '1.',
     prompt: 'Match "Hot" with its pair.',
   }
@@ -12395,7 +12395,7 @@ assert.match(classroomBrief.text, /Average accuracy: 50%/);
 assert.match(classroomBrief.text, /Average time: 45s/);
 assert.match(
   classroomBrief.text,
-  /- 1\. Match "Hot" with its pair\. \(33% correct, 1\/3\)/
+  /- 1\. Match "Hot" with its pair\. \(50% correct, 1\/2\)/
 );
 assert.match(
   classroomBrief.text,
@@ -12410,7 +12410,7 @@ const reteachPlan = buildAssignmentReteachPlan({
 assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
 assert.match(reteachPlan, /Review first:/);
 assert.match(reteachPlan, /Student follow-up:/);
-assert.match(reteachPlan, /Match "Hot" with its pair\. \(33% correct, 1\/3\)/);
+assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
 assert.match(
   reteachPlan,
   /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
@@ -12430,7 +12430,7 @@ assert.match(
 );
 assert.match(
   itemReviewSummary,
-  /Match "Hot" with its pair\. \(Pair\) - 33% correct, 1\/3 correct/
+  /Match "Hot" with its pair\. \(Pair\) - 50% correct, 1\/2 correct/
 );
 assert.match(itemReviewSummary, /Expected: Paris \/ Paris, France\./);
 assert.match(itemReviewSummary, /Accepted answers: Paris, Paris, France\./);
