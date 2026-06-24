@@ -4,6 +4,13 @@ import type { AssignmentLifecycleStatus } from '@/assignments/lifecycle';
 export type AssignmentLifecycleStatusFilter = AssignmentLifecycleStatus;
 export type AssignmentStatusFilter = 'all' | AssignmentLifecycleStatusFilter;
 
+export const ASSIGNMENT_LIFECYCLE_STATUS_FILTERS = [
+  'closed',
+  'draft',
+  'expired',
+  'open',
+] as const satisfies readonly AssignmentLifecycleStatusFilter[];
+
 type AssignmentListSearchState = {
   page?: number;
   published?: string;
@@ -62,9 +69,14 @@ export function buildAssignmentListPageRouteSearch({
 export function parseAssignmentStatusFilter(
   value: unknown
 ): AssignmentLifecycleStatusFilter | undefined {
-  if (value === 'published' || value === 'open') return 'open';
-  if (value === 'expired' || value === 'closed' || value === 'draft') {
-    return value;
+  if (value === 'published') return 'open';
+  if (typeof value !== 'string') return undefined;
+  if (
+    ASSIGNMENT_LIFECYCLE_STATUS_FILTERS.includes(
+      value as AssignmentLifecycleStatusFilter
+    )
+  ) {
+    return value as AssignmentLifecycleStatusFilter;
   }
 
   return undefined;

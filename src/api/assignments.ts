@@ -20,8 +20,10 @@ import {
   canUseAnotherAssignmentAttempt,
 } from '@/assignments/attempt-limits';
 import {
+  ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   type AssignmentLifecycleStatusFilter,
   normalizeAssignmentListSearch,
+  parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
@@ -72,12 +74,10 @@ import {
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
-const assignmentStatusFilterSchema = z.enum([
-  'closed',
-  'draft',
-  'expired',
-  'open',
-]);
+const assignmentStatusFilterSchema = z.preprocess(
+  parseAssignmentStatusFilter,
+  z.enum(ASSIGNMENT_LIFECYCLE_STATUS_FILTERS).optional()
+);
 const assignmentShareSlugSchema = z
   .string()
   .transform(normalizeAssignmentShareSlug)
@@ -88,7 +88,7 @@ const listAssignmentsInputSchema = z.object({
   pageSize: z.number().int().min(1).max(100).default(24),
   publishedShareSlug: assignmentShareSlugSchema.optional(),
   search: z.string().trim().max(120).optional(),
-  status: assignmentStatusFilterSchema.optional(),
+  status: assignmentStatusFilterSchema,
 });
 
 export const listAssignments = createServerFn({ method: 'GET' })

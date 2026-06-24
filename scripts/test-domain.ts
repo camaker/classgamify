@@ -224,6 +224,7 @@ import {
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
+  ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
@@ -5895,6 +5896,21 @@ assert.match(
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
 assert.match(
   assignmentsApiSource,
+  /ASSIGNMENT_LIFECYCLE_STATUS_FILTERS/,
+  'Assignment list API should reuse the assignment-domain status filter values.'
+);
+assert.match(
+  assignmentsApiSource,
+  /z\.preprocess\(\s*parseAssignmentStatusFilter,\s*z\.enum\(ASSIGNMENT_LIFECYCLE_STATUS_FILTERS\)\.optional\(\)\s*\)/,
+  'Assignment list API should parse status filters through assignment-domain helpers.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /const assignmentStatusFilterSchema = z\.enum\(\[/,
+  'Assignment list API should not maintain a separate hand-written status filter enum.'
+);
+assert.match(
+  assignmentsApiSource,
   /sqlLikeContains\(assignment\.title, normalizedSearch\)/,
   'Assignment list search should escape SQL LIKE wildcard characters.'
 );
@@ -7114,6 +7130,10 @@ assert.equal(
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('  Ｗｅｅｋ   １  '), 'Week 1');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.deepEqual(
+  [...ASSIGNMENT_LIFECYCLE_STATUS_FILTERS],
+  ['closed', 'draft', 'expired', 'open']
+);
 assert.deepEqual(
   buildAssignmentListValidatedSearch({
     page: '3',
