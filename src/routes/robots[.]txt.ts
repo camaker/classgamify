@@ -7,6 +7,7 @@ const disallowedPaths = [
   '/admin',
   '/settings',
   '/dashboard',
+  '/print',
   '/play',
   '/learn',
   '/hsk',

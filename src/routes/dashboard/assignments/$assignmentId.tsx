@@ -73,6 +73,7 @@ import {
   IconDownload,
   IconListDetails,
   IconPlayerPlay,
+  IconPrinter,
   IconSearch,
   IconShare3,
   IconUsers,
@@ -366,6 +367,17 @@ function AssignmentResultsPage() {
                   shareSlug={headerView.shareAction.shareSlug}
                   className="w-full bg-background sm:w-auto"
                 />
+                <Link
+                  to="/print/assignments/$assignmentId"
+                  params={{ assignmentId }}
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'w-full bg-background sm:w-auto'
+                  )}
+                >
+                  <IconPrinter className="size-4" />
+                  {assignmentResultPageCopy.printWorksheetLabel}
+                </Link>
                 {headerView.shareAction.disabledReason ? (
                   <p className="basis-full text-sm text-muted-foreground">
                     {headerView.shareAction.disabledReason}

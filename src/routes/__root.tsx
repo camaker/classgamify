@@ -136,6 +136,7 @@ function RootComponent() {
   const isProtectedPages =
     canonicalPathname.startsWith(Routes.Admin) ||
     canonicalPathname.startsWith(Routes.Dashboard) ||
+    canonicalPathname.startsWith('/print') ||
     canonicalPathname.startsWith(Routes.Settings);
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
   const isNotFound =

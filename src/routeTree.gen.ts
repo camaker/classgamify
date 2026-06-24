@@ -50,6 +50,7 @@ import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
+import { Route as PrintAssignmentsAssignmentIdRouteImport } from './routes/print/assignments/$assignmentId'
 import { Route as DashboardAssignmentsAssignmentIdRouteImport } from './routes/dashboard/assignments/$assignmentId'
 import { Route as DashboardActivitiesActivityIdRouteImport } from './routes/dashboard/activities/$activityId'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
@@ -264,6 +265,12 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrintAssignmentsAssignmentIdRoute =
+  PrintAssignmentsAssignmentIdRouteImport.update({
+    id: '/print/assignments/$assignmentId',
+    path: '/print/assignments/$assignmentId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardAssignmentsAssignmentIdRoute =
   DashboardAssignmentsAssignmentIdRouteImport.update({
     id: '/$assignmentId',
@@ -357,6 +364,7 @@ export interface FileRoutesByFullPath {
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
+  '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -405,6 +413,7 @@ export interface FileRoutesByTo {
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
+  '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -457,6 +466,7 @@ export interface FileRoutesById {
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/dashboard/activities/$activityId': typeof DashboardActivitiesActivityIdRoute
   '/dashboard/assignments/$assignmentId': typeof DashboardAssignmentsAssignmentIdRoute
+  '/print/assignments/$assignmentId': typeof PrintAssignmentsAssignmentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -510,6 +520,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
+    | '/print/assignments/$assignmentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -558,6 +569,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
+    | '/print/assignments/$assignmentId'
   id:
     | '__root__'
     | '/'
@@ -609,6 +621,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/stripe'
     | '/dashboard/activities/$activityId'
     | '/dashboard/assignments/$assignmentId'
+    | '/print/assignments/$assignmentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -642,6 +655,7 @@ export interface RootRouteChildren {
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
   ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
+  PrintAssignmentsAssignmentIdRoute: typeof PrintAssignmentsAssignmentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -933,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/print/assignments/$assignmentId': {
+      id: '/print/assignments/$assignmentId'
+      path: '/print/assignments/$assignmentId'
+      fullPath: '/print/assignments/$assignmentId'
+      preLoaderRoute: typeof PrintAssignmentsAssignmentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/assignments/$assignmentId': {
       id: '/dashboard/assignments/$assignmentId'
       path: '/$assignmentId'
@@ -1115,6 +1136,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
   ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,
+  PrintAssignmentsAssignmentIdRoute: PrintAssignmentsAssignmentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -5314,6 +5314,75 @@ assert.match(
   /assignmentsKeys\.detail\(assignmentId\)[\s\S]*'printable'[\s\S]*includeAnswerKey/,
   'Printable worksheet hook should cache printable variants separately by answer-key visibility.'
 );
+const printableWorksheetViewSource = readFileSync(
+  'src/assignments/printable-worksheet-view.ts',
+  'utf8'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /formatRuntimeItemPrompt/,
+  'Printable worksheet view should reuse runtime item prompt formatting.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /formatRuntimeItemKindLabel/,
+  'Printable worksheet view should reuse runtime item kind labels.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /m\.assignment_printable_response_line_match/,
+  'Printable worksheet view should localize response-mode helper text.'
+);
+const printableAssignmentRouteSource = readFileSync(
+  'src/routes/print/assignments/$assignmentId.tsx',
+  'utf8'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /middleware: \[authRouteMiddleware\]/,
+  'Printable worksheet route should require authenticated teacher access.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /usePrintableAssignmentWorksheet\(\{[\s\S]*includeAnswerKey: answerKey/,
+  'Printable worksheet route should load teacher-only answer keys only when explicitly requested.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /search: \{ answerKey: nextAnswerKey \? true : undefined \}/,
+  'Printable worksheet answer-key toggle should persist in route search state.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /document\.body\.dataset\.printMode = 'worksheet'/,
+  'Printable worksheet route should activate print-mode page chrome hiding.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /to="\/dashboard\/assignments\/\$assignmentId"/,
+  'Printable worksheet route should link teachers back to assignment results.'
+);
+assert.match(
+  assignmentResultsRouteSource,
+  /to="\/print\/assignments\/\$assignmentId"/,
+  'Assignment results page should expose the printable worksheet teacher action.'
+);
+const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
+assert.match(
+  rootRouteSource,
+  /canonicalPathname\.startsWith\('\/print'\)/,
+  'Printable worksheet pages should render without public marketing chrome.'
+);
+assert.match(
+  robotsRouteSource,
+  /'\/print'/,
+  'Printable worksheet pages should be disallowed in robots.txt.'
+);
+assert.match(
+  e2eTestCatalogText,
+  /printable worksheet action[\s\S]*\/print\/assignments\/:assignmentId[\s\S]*answerKey=true/,
+  'E2E catalog should cover the teacher printable worksheet journey and answer-key toggle.'
+);
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),

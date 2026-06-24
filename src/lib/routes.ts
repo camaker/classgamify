@@ -19,6 +19,7 @@ export const Routes = {
   DashboardActivityEdit: '/dashboard/activities/$activityId',
   DashboardAssignments: '/dashboard/assignments',
   DashboardAssignmentResults: '/dashboard/assignments/$assignmentId',
+  PrintAssignmentWorksheet: '/print/assignments/$assignmentId',
   Features: '/#features',
   Faqs: '/#faqs',
   Pricing: '/pricing',

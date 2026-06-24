@@ -248,6 +248,9 @@ export const assignmentResultPageCopy = {
   get openStudentLinkLabel() {
     return m.assignment_result_page_open_student_link();
   },
+  get printWorksheetLabel() {
+    return m.assignment_result_page_print_worksheet();
+  },
   get studentLinkClosedMessage() {
     return m.assignment_result_page_student_link_closed();
   },
