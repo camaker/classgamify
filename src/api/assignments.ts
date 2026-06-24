@@ -30,6 +30,7 @@ import {
   buildPublicAssignmentLookupResult,
   buildPublicAttemptReviewItems,
 } from '@/assignments/public';
+import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   publishAssignmentInputSchema,
@@ -427,6 +428,10 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
 const getAssignmentResultsInputSchema = z.object({
   assignmentId: z.string().min(1),
 });
+const getPrintableAssignmentWorksheetInputSchema = z.object({
+  assignmentId: z.string().min(1),
+  includeAnswerKey: z.boolean().optional(),
+});
 
 export const getAssignmentResults = createServerFn({ method: 'GET' })
   .inputValidator(getAssignmentResultsInputSchema)
@@ -486,6 +491,51 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       attempts,
       stats,
     };
+  });
+
+export const getPrintableAssignmentWorksheet = createServerFn({
+  method: 'GET',
+})
+  .inputValidator(getPrintableAssignmentWorksheetInputSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const [row] = await db
+      .select({
+        activity,
+        assignment,
+        snapshot: assignmentSnapshot,
+      })
+      .from(assignment)
+      .innerJoin(activity, eq(assignment.activityId, activity.id))
+      .leftJoin(
+        assignmentSnapshot,
+        eq(assignmentSnapshot.assignmentId, assignment.id)
+      )
+      .where(
+        and(
+          eq(assignment.id, data.assignmentId),
+          eq(assignment.ownerId, userId)
+        )
+      )
+      .limit(1);
+
+    if (!row) {
+      throw new Error(m.assignment_api_error_assignment_not_found());
+    }
+
+    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
+    const templateType =
+      row.snapshot?.templateType ?? row.activity.templateType;
+
+    return buildPrintableAssignmentWorksheet({
+      activity: row.activity,
+      assignment: row.assignment,
+      includeAnswerKey: data.includeAnswerKey,
+      runtimeItems: getRuntimeItems(templateType, content),
+      snapshot: row.snapshot,
+    });
   });
 
 const getPublicAssignmentInputSchema = z.object({

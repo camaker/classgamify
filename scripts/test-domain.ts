@@ -5267,8 +5267,52 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet = createServerFn\(\{[\s\S]*method: 'GET'[\s\S]*\}\)[\s\S]*\.middleware\(\[authApiMiddleware\]\)/,
+  'Printable worksheet API should require authenticated teacher access.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)/,
+  'Printable worksheet API should stay owner-scoped to the signed-in teacher.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet[\s\S]*const content = row\.snapshot\?\.contentJson \?\? row\.activity\.contentJson/,
+  'Printable worksheet API should print from the frozen assignment snapshot when present.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet[\s\S]*const templateType =[\s\S]*row\.snapshot\?\.templateType \?\? row\.activity\.templateType/,
+  'Printable worksheet API should use the frozen snapshot template when present.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet[\s\S]*includeAnswerKey: data\.includeAnswerKey/,
+  'Printable worksheet API should pass the explicit answer-key choice into the worksheet builder.'
+);
+assert.match(
+  assignmentsApiSource,
   /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
   'Assignment attempt limits should only count completed attempts with scored results.'
+);
+const useAssignmentsHookSource = readFileSync(
+  'src/hooks/use-assignments.ts',
+  'utf8'
+);
+assert.match(
+  useAssignmentsHookSource,
+  /export function usePrintableAssignmentWorksheet/,
+  'Assignments hook should expose a teacher-facing printable worksheet query.'
+);
+assert.match(
+  useAssignmentsHookSource,
+  /queryFn: \(\) =>[\s\S]*getPrintableAssignmentWorksheet\(\{[\s\S]*data: \{ assignmentId, includeAnswerKey \}/,
+  'Printable worksheet hook should call the owner-scoped printable worksheet server function.'
+);
+assert.match(
+  useAssignmentsHookSource,
+  /assignmentsKeys\.detail\(assignmentId\)[\s\S]*'printable'[\s\S]*includeAnswerKey/,
+  'Printable worksheet hook should cache printable variants separately by answer-key visibility.'
 );
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(

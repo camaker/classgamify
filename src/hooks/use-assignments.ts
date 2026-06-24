@@ -1,5 +1,6 @@
 import {
   getAssignmentResults,
+  getPrintableAssignmentWorksheet,
   getPublicAssignment,
   listAssignments,
   publishAssignment,
@@ -72,6 +73,27 @@ export function useAssignmentResults(assignmentId: string) {
     enabled: Boolean(assignmentId),
     queryFn: () => getAssignmentResults({ data: { assignmentId } }),
     queryKey: assignmentsKeys.detail(assignmentId),
+  });
+}
+
+export function usePrintableAssignmentWorksheet({
+  assignmentId,
+  includeAnswerKey = false,
+}: {
+  assignmentId: string;
+  includeAnswerKey?: boolean;
+}) {
+  return useQuery({
+    enabled: Boolean(assignmentId),
+    queryFn: () =>
+      getPrintableAssignmentWorksheet({
+        data: { assignmentId, includeAnswerKey },
+      }),
+    queryKey: [
+      ...assignmentsKeys.detail(assignmentId),
+      'printable',
+      { includeAnswerKey },
+    ] as const,
   });
 }
 
