@@ -1229,10 +1229,48 @@ const sourceMaterialSummary = summarizeActivitySourceMaterials([
 assert.equal(sourceMaterialSummary.total, 3);
 assert.equal(sourceMaterialSummary.byKind.audio, 1);
 assert.equal(sourceMaterialSummary.byKind['worksheet-document'], 2);
+assert.deepEqual(sourceMaterialSummary.readiness, {
+  capabilities: ['audio-extraction', 'worksheet-extraction'],
+  extractableCount: 3,
+  hasAudio: true,
+  hasSpreadsheet: false,
+  hasWorksheet: true,
+});
 assert.deepEqual(sourceMaterialSummary.kindSummaries, [
   { count: 1, kind: 'audio' },
   { count: 2, kind: 'worksheet-document' },
 ]);
+assert.deepEqual(
+  summarizeActivitySourceMaterials([
+    {
+      fileId: 'file-archive',
+      kind: 'archive',
+      originalName: 'classroom.zip',
+    },
+    {
+      fileId: 'file-sheet',
+      kind: 'spreadsheet',
+      originalName: 'word-list.xlsx',
+    },
+    {
+      fileId: 'file-scan',
+      kind: 'worksheet-image',
+      originalName: 'scan.png',
+    },
+    {
+      fileId: 'file-video',
+      kind: 'video',
+      originalName: 'lesson.mp4',
+    },
+  ]).readiness,
+  {
+    capabilities: ['spreadsheet-import', 'worksheet-extraction'],
+    extractableCount: 2,
+    hasAudio: false,
+    hasSpreadsheet: true,
+    hasWorksheet: true,
+  }
+);
 assert.deepEqual(
   buildActivitySourceMaterialSummaryView([
     listeningMaterialReference,

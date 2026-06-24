@@ -11,9 +11,23 @@ type ActivitySourceMaterialKindSummary = {
   kind: UserFileMaterialKind;
 };
 
+export type ActivitySourceMaterialReadinessCapability =
+  | 'audio-extraction'
+  | 'spreadsheet-import'
+  | 'worksheet-extraction';
+
+type ActivitySourceMaterialReadiness = {
+  capabilities: ActivitySourceMaterialReadinessCapability[];
+  extractableCount: number;
+  hasAudio: boolean;
+  hasSpreadsheet: boolean;
+  hasWorksheet: boolean;
+};
+
 type ActivitySourceMaterialSummary = {
   byKind: Record<UserFileMaterialKind, number>;
   kindSummaries: ActivitySourceMaterialKindSummary[];
+  readiness: ActivitySourceMaterialReadiness;
   total: number;
 };
 
@@ -43,6 +57,7 @@ export function summarizeActivitySourceMaterials(
     kindSummaries: USER_FILE_MATERIAL_KINDS.flatMap((kind) =>
       byKind[kind] > 0 ? [{ count: byKind[kind], kind }] : []
     ),
+    readiness: buildActivitySourceMaterialReadiness(byKind),
     total: materials.length,
   };
 }
@@ -74,4 +89,30 @@ function createEmptyMaterialKindCounts() {
   return Object.fromEntries(
     USER_FILE_MATERIAL_KINDS.map((kind) => [kind, 0])
   ) as Record<UserFileMaterialKind, number>;
+}
+
+function buildActivitySourceMaterialReadiness(
+  byKind: Record<UserFileMaterialKind, number>
+): ActivitySourceMaterialReadiness {
+  const hasAudio = byKind.audio > 0;
+  const hasSpreadsheet = byKind.spreadsheet > 0;
+  const hasWorksheet =
+    byKind['worksheet-document'] > 0 || byKind['worksheet-image'] > 0;
+  const capabilities: ActivitySourceMaterialReadinessCapability[] = [];
+
+  if (hasAudio) capabilities.push('audio-extraction');
+  if (hasSpreadsheet) capabilities.push('spreadsheet-import');
+  if (hasWorksheet) capabilities.push('worksheet-extraction');
+
+  return {
+    capabilities,
+    extractableCount:
+      byKind.audio +
+      byKind.spreadsheet +
+      byKind['worksheet-document'] +
+      byKind['worksheet-image'],
+    hasAudio,
+    hasSpreadsheet,
+    hasWorksheet,
+  };
 }
