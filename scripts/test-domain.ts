@@ -4978,6 +4978,7 @@ assert.deepEqual(
       averageScore: 82.6,
       completions: 14,
       openAssignments: 3,
+      totalAssignments: 6,
     },
     isLoading: false,
   }),
@@ -5014,6 +5015,7 @@ assert.equal(
       averageScore: Number.NaN,
       completions: 1,
       openAssignments: 1,
+      totalAssignments: 1,
     },
     isLoading: false,
   })[3]?.value,
@@ -5023,24 +5025,172 @@ assert.deepEqual(buildDashboardCoreLoopReadiness(), [
   {
     id: 'activity-authoring',
     label: 'Activity authoring',
-    value: 100,
+    value: 0,
   },
   {
     id: 'assignment-links',
     label: 'Assignment links',
-    value: 100,
+    value: 0,
   },
   {
     id: 'student-runner',
     label: 'Student runner',
-    value: 85,
+    value: 0,
   },
   {
     id: 'teacher-results',
     label: 'Teacher results',
-    value: 90,
+    value: 0,
   },
 ]);
+assert.deepEqual(
+  buildDashboardCoreLoopReadiness({
+    activitySummary: {
+      draftActivities: 1,
+      templateCoverage: 1,
+      totalActivities: 1,
+    },
+    assignmentSummary: {
+      averageScore: 0,
+      completions: 0,
+      openAssignments: 0,
+      totalAssignments: 0,
+    },
+  }),
+  [
+    {
+      id: 'activity-authoring',
+      label: 'Activity authoring',
+      value: 100,
+    },
+    {
+      id: 'assignment-links',
+      label: 'Assignment links',
+      value: 0,
+    },
+    {
+      id: 'student-runner',
+      label: 'Student runner',
+      value: 0,
+    },
+    {
+      id: 'teacher-results',
+      label: 'Teacher results',
+      value: 0,
+    },
+  ]
+);
+assert.deepEqual(
+  buildDashboardCoreLoopReadiness({
+    activitySummary: {
+      draftActivities: 0,
+      templateCoverage: 2,
+      totalActivities: 2,
+    },
+    assignmentSummary: {
+      averageScore: 0,
+      completions: 0,
+      openAssignments: 1,
+      totalAssignments: 1,
+    },
+  }),
+  [
+    {
+      id: 'activity-authoring',
+      label: 'Activity authoring',
+      value: 100,
+    },
+    {
+      id: 'assignment-links',
+      label: 'Assignment links',
+      value: 100,
+    },
+    {
+      id: 'student-runner',
+      label: 'Student runner',
+      value: 75,
+    },
+    {
+      id: 'teacher-results',
+      label: 'Teacher results',
+      value: 0,
+    },
+  ]
+);
+assert.deepEqual(
+  buildDashboardCoreLoopReadiness({
+    activitySummary: {
+      draftActivities: 0,
+      templateCoverage: 3,
+      totalActivities: 3,
+    },
+    assignmentSummary: {
+      averageScore: 86,
+      completions: 8,
+      openAssignments: 0,
+      totalAssignments: 2,
+    },
+  }),
+  [
+    {
+      id: 'activity-authoring',
+      label: 'Activity authoring',
+      value: 100,
+    },
+    {
+      id: 'assignment-links',
+      label: 'Assignment links',
+      value: 60,
+    },
+    {
+      id: 'student-runner',
+      label: 'Student runner',
+      value: 100,
+    },
+    {
+      id: 'teacher-results',
+      label: 'Teacher results',
+      value: 100,
+    },
+  ]
+);
+assert.deepEqual(
+  buildDashboardCoreLoopReadiness({
+    activitySummary: {
+      draftActivities: Number.NaN,
+      templateCoverage: Number.NaN,
+      totalActivities: Number.NaN,
+    },
+    assignmentSummary: {
+      averageScore: Number.NaN,
+      completions: Number.POSITIVE_INFINITY,
+      openAssignments: -1,
+      totalAssignments: 1.4,
+    },
+  }),
+  [
+    {
+      id: 'activity-authoring',
+      label: 'Activity authoring',
+      value: 0,
+    },
+    {
+      id: 'assignment-links',
+      label: 'Assignment links',
+      value: 60,
+    },
+    {
+      id: 'student-runner',
+      label: 'Student runner',
+      value: 40,
+    },
+    {
+      id: 'teacher-results',
+      label: 'Teacher results',
+      value: 0,
+    },
+  ]
+);
 assert.deepEqual(dashboardOverviewPageCopy, {
   breadcrumbLabel: 'Dashboard',
   description:

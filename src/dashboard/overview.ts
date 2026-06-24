@@ -15,6 +15,7 @@ type DashboardAssignmentSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;
+  totalAssignments: number;
 };
 
 export type DashboardOverviewMetricId =
@@ -155,27 +156,53 @@ export function buildDashboardOverviewMetrics({
   ];
 }
 
-export function buildDashboardCoreLoopReadiness(): DashboardCoreLoopReadinessRow[] {
+export function buildDashboardCoreLoopReadiness({
+  activitySummary,
+  assignmentSummary,
+}: {
+  activitySummary?: DashboardActivitySummary;
+  assignmentSummary?: DashboardAssignmentSummary;
+} = {}): DashboardCoreLoopReadinessRow[] {
+  const totalActivities = normalizeDashboardSummaryCount(
+    activitySummary?.totalActivities
+  );
+  const totalAssignments = normalizeDashboardSummaryCount(
+    assignmentSummary?.totalAssignments
+  );
+  const openAssignments = normalizeDashboardSummaryCount(
+    assignmentSummary?.openAssignments
+  );
+  const completions = normalizeDashboardSummaryCount(
+    assignmentSummary?.completions
+  );
+
   return [
     {
       id: 'activity-authoring',
       label: m.dashboard_overview_readiness_activity_authoring(),
-      value: 100,
+      value: totalActivities > 0 ? 100 : 0,
     },
     {
       id: 'assignment-links',
       label: m.dashboard_overview_readiness_assignment_links(),
-      value: 100,
+      value: getDashboardAssignmentLinkReadiness({
+        openAssignments,
+        totalAssignments,
+      }),
     },
     {
       id: 'student-runner',
       label: m.dashboard_overview_readiness_student_runner(),
-      value: 85,
+      value: getDashboardStudentRunnerReadiness({
+        completions,
+        openAssignments,
+        totalAssignments,
+      }),
     },
     {
       id: 'teacher-results',
       label: m.dashboard_overview_readiness_teacher_results(),
-      value: 90,
+      value: completions > 0 ? 100 : 0,
     },
   ];
 }
@@ -188,4 +215,38 @@ function formatDashboardDraftDescription(count: number) {
   return count === 1
     ? m.dashboard_overview_metric_activities_description_one({ count })
     : m.dashboard_overview_metric_activities_description_many({ count });
+}
+
+function normalizeDashboardSummaryCount(value: number | undefined) {
+  if (value === undefined || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.round(value));
+}
+
+function getDashboardAssignmentLinkReadiness({
+  openAssignments,
+  totalAssignments,
+}: {
+  openAssignments: number;
+  totalAssignments: number;
+}) {
+  if (openAssignments > 0) return 100;
+  if (totalAssignments > 0) return 60;
+
+  return 0;
+}
+
+function getDashboardStudentRunnerReadiness({
+  completions,
+  openAssignments,
+  totalAssignments,
+}: {
+  completions: number;
+  openAssignments: number;
+  totalAssignments: number;
+}) {
+  if (completions > 0) return 100;
+  if (openAssignments > 0) return 75;
+  if (totalAssignments > 0) return 40;
+
+  return 0;
 }

@@ -57,7 +57,10 @@ function DashboardPage() {
     assignmentSummary,
     isLoading: isMetricLoading,
   });
-  const readinessRows = buildDashboardCoreLoopReadiness();
+  const readinessRows = buildDashboardCoreLoopReadiness({
+    activitySummary,
+    assignmentSummary,
+  });
   const actionCards = getDashboardOverviewActionCards();
 
   return (
