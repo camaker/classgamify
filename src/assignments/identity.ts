@@ -89,7 +89,7 @@ export function getOrCreateAnonymousAttemptToken({
   return token;
 }
 
-function getStudentIdentityKey(source: StudentIdentitySource) {
+function getStudentIdentityGroupingKey(source: StudentIdentitySource) {
   const studentName = normalizeStudentName(source.studentName);
   if (studentName) {
     return `name:${studentName.toLocaleLowerCase()}`;
@@ -107,40 +107,62 @@ export function isSameStudentIdentity(
   left: StudentIdentitySource,
   right: StudentIdentitySource
 ) {
-  return getStudentIdentityKey(left) === getStudentIdentityKey(right);
+  return (
+    getStudentIdentityGroupingKey(left) === getStudentIdentityGroupingKey(right)
+  );
 }
 
 export function createStudentIdentityResolver(
   attempts: StudentIdentitySource[]
 ) {
-  const labelsByKey = new Map<string, string>();
+  const identitiesByGroupingKey = new Map<string, StudentIdentity>();
   let anonymousIndex = 1;
 
   for (const attempt of attempts) {
-    const key = getStudentIdentityKey(attempt);
-    if (labelsByKey.has(key)) continue;
+    const groupingKey = getStudentIdentityGroupingKey(attempt);
+    if (identitiesByGroupingKey.has(groupingKey)) continue;
 
     const studentName = normalizeStudentName(attempt.studentName);
     if (studentName) {
-      labelsByKey.set(key, studentName);
+      identitiesByGroupingKey.set(groupingKey, {
+        key: `name:${studentName.toLocaleLowerCase()}`,
+        label: studentName,
+      });
       continue;
     }
 
     const anonymousToken = normalizeAnonymousToken(attempt.anonymousToken);
-    labelsByKey.set(
-      key,
-      anonymousToken
-        ? formatAnonymousStudentLabel(anonymousIndex++)
-        : formatAnonymousStudentLabel()
-    );
+    const label = anonymousToken
+      ? formatAnonymousStudentLabel(anonymousIndex)
+      : formatAnonymousStudentLabel();
+
+    identitiesByGroupingKey.set(groupingKey, {
+      key: anonymousToken ? `anonymous:${anonymousIndex}` : 'anonymous:unknown',
+      label,
+    });
+
+    if (anonymousToken) {
+      anonymousIndex += 1;
+    }
   }
 
   return {
     resolve(source: StudentIdentitySource): StudentIdentity {
-      const key = getStudentIdentityKey(source);
+      const groupingKey = getStudentIdentityGroupingKey(source);
+      const identity = identitiesByGroupingKey.get(groupingKey);
+      if (identity) return identity;
+
+      const studentName = normalizeStudentName(source.studentName);
+      if (studentName) {
+        return {
+          key: `name:${studentName.toLocaleLowerCase()}`,
+          label: studentName,
+        };
+      }
+
       return {
-        key,
-        label: labelsByKey.get(key) ?? formatAnonymousStudentLabel(),
+        key: 'anonymous:unknown',
+        label: formatAnonymousStudentLabel(),
       };
     },
   };

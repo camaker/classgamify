@@ -381,6 +381,7 @@ import {
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import {
   buildAnonymousAttemptTokenStorageKey,
+  createStudentIdentityResolver,
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
@@ -1841,6 +1842,55 @@ assert.notEqual(
   anonymousBrowserLabel
 );
 assert.equal(anonymousBrowserLabel.toLowerCase().includes('token'), false);
+const studentIdentityResolver = createStudentIdentityResolver([
+  { anonymousToken: ' browser-token-1 ', studentName: null },
+  { anonymousToken: 'browser-token-1', studentName: null },
+  { anonymousToken: 'browser-token-2', studentName: null },
+  { anonymousToken: 'ignored-token', studentName: ' Alice ' },
+]);
+assert.deepEqual(
+  studentIdentityResolver.resolve({
+    anonymousToken: 'browser-token-1',
+    studentName: null,
+  }),
+  {
+    key: 'anonymous:1',
+    label: 'Anonymous student 1',
+  }
+);
+assert.deepEqual(
+  studentIdentityResolver.resolve({
+    anonymousToken: 'browser-token-2',
+    studentName: null,
+  }),
+  {
+    key: 'anonymous:2',
+    label: 'Anonymous student 2',
+  }
+);
+assert.deepEqual(
+  studentIdentityResolver.resolve({
+    anonymousToken: 'ignored-token',
+    studentName: 'alice',
+  }),
+  {
+    key: 'name:alice',
+    label: 'Alice',
+  }
+);
+assert.equal(
+  JSON.stringify([
+    studentIdentityResolver.resolve({
+      anonymousToken: 'browser-token-1',
+      studentName: null,
+    }),
+    studentIdentityResolver.resolve({
+      anonymousToken: 'browser-token-2',
+      studentName: null,
+    }),
+  ]).includes('browser-token'),
+  false
+);
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   description:
     'This assignment does not collect student names. This browser will submit as Anonymous browser.',
@@ -10427,7 +10477,9 @@ assert.deepEqual(
 );
 assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
 assert.equal(resultAnalysis.attempts[1]?.studentLabel, 'Alice');
+assert.equal(resultAnalysis.attempts[2]?.studentKey, 'anonymous:1');
 assert.equal(resultAnalysis.attempts[2]?.studentLabel, 'Anonymous student 1');
+assert.equal(resultAnalysis.students[0]?.studentKey, 'anonymous:1');
 assert.equal(resultAnalysis.students[0]?.studentLabel, 'Anonymous student 1');
 assert.equal(resultAnalysis.students[0]?.latestAccuracy, 0);
 assert.equal(resultAnalysis.students[1]?.studentKey, 'name:alice');
@@ -10436,6 +10488,7 @@ assert.equal(resultAnalysis.students[1]?.averageAccuracy, 75);
 assert.equal(resultAnalysis.students[1]?.bestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.latestAccuracy, 100);
 assert.equal(resultAnalysis.students[1]?.needsReviewCount, 0);
+assert.equal(JSON.stringify(resultAnalysis).includes('browser-token-1'), false);
 assert.deepEqual(
   buildAssignmentStudentSummaryRowView(resultAnalysis.students[1]!),
   {
@@ -12131,12 +12184,17 @@ assert.match(
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
+assert.match(
+  csv,
+  /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z"/
+);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
 assert.match(
   csv,
   /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","review"/
 );
+assert.equal(csv.includes('browser-token-1'), false);
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: resultAnalysisWithUnscoredAttempt,
