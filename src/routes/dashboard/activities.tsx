@@ -723,6 +723,27 @@ function ActivityCard({
                 </Badge>
               ))}
             </div>
+            {cardDisplayView.sourceMaterials.extractionActions.length ? (
+              <div className="mt-3 border-t pt-3">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {cardDisplayView.sourceMaterials.extractionTitle}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {cardDisplayView.sourceMaterials.extractionActions.map(
+                    (action) => (
+                      <Badge
+                        key={action.id}
+                        variant="outline"
+                        className="rounded-md bg-background"
+                      >
+                        <IconSparkles className="size-3" />
+                        {action.label}
+                      </Badge>
+                    )
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <div className="rounded-lg border bg-muted/30 p-3">

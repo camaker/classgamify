@@ -1314,16 +1314,19 @@ assert.deepEqual(
       {
         capability: 'audio-extraction',
         id: 'extract-audio',
+        label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
       },
       {
         capability: 'worksheet-extraction',
         id: 'extract-worksheet',
+        label: 'Worksheet extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
       },
     ],
+    extractionTitle: 'Ready for future AI extraction',
     hasMaterials: true,
     kindBadges: [
       { count: 1, kind: 'audio', label: 'Audio' },
@@ -1346,6 +1349,7 @@ assert.deepEqual(
 assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   countLabel: '0 files',
   extractionActions: [],
+  extractionTitle: 'Ready for future AI extraction',
   hasMaterials: false,
   kindBadges: [],
   readiness: {
@@ -6303,6 +6307,7 @@ assert.deepEqual(starterActivityDisplayView.stats, [
 assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
   countLabel: '0 files',
   extractionActions: [],
+  extractionTitle: 'Ready for future AI extraction',
   hasMaterials: false,
   kindBadges: [],
   readiness: {
@@ -6331,10 +6336,12 @@ assert.deepEqual(
       {
         capability: 'audio-extraction',
         id: 'extract-audio',
+        label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
       },
     ],
+    extractionTitle: 'Ready for future AI extraction',
     hasMaterials: true,
     kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
     readiness: {

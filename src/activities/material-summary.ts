@@ -28,6 +28,11 @@ export type ActivitySourceMaterialExtractionAction = {
   sourceKindCounts: ActivitySourceMaterialKindSummary[];
 };
 
+export type ActivitySourceMaterialExtractionActionView =
+  ActivitySourceMaterialExtractionAction & {
+    label: string;
+  };
+
 export type ActivitySourceMaterialReadiness = {
   capabilities: ActivitySourceMaterialReadinessCapability[];
   extractableCount: number;
@@ -46,7 +51,8 @@ type ActivitySourceMaterialSummary = {
 
 export type ActivitySourceMaterialSummaryView = {
   countLabel: string;
-  extractionActions: ActivitySourceMaterialExtractionAction[];
+  extractionActions: ActivitySourceMaterialExtractionActionView[];
+  extractionTitle: string;
   hasMaterials: boolean;
   kindBadges: Array<{
     count: number;
@@ -92,7 +98,10 @@ export function buildActivitySourceMaterialSummaryView(
         : m.activity_source_material_summary_count_many({
             count: summary.total,
           }),
-    extractionActions: summary.extractionActions,
+    extractionActions: summary.extractionActions.map(
+      toActivitySourceMaterialExtractionActionView
+    ),
+    extractionTitle: m.activity_source_material_extraction_title(),
     hasMaterials: summary.total > 0,
     kindBadges: summary.kindSummaries.map((item) => ({
       ...item,
@@ -156,6 +165,28 @@ function buildActivitySourceMaterialExtractionActions(
         ]
       : [];
   });
+}
+
+function toActivitySourceMaterialExtractionActionView(
+  action: ActivitySourceMaterialExtractionAction
+): ActivitySourceMaterialExtractionActionView {
+  return {
+    ...action,
+    label: formatActivitySourceMaterialExtractionAction(action.id),
+  };
+}
+
+function formatActivitySourceMaterialExtractionAction(
+  id: ActivitySourceMaterialExtractionActionId
+) {
+  switch (id) {
+    case 'extract-audio':
+      return m.activity_source_material_extraction_audio();
+    case 'extract-worksheet':
+      return m.activity_source_material_extraction_worksheet();
+    case 'import-spreadsheet':
+      return m.activity_source_material_extraction_spreadsheet();
+  }
 }
 
 function buildActivitySourceMaterialReadiness(
