@@ -25,7 +25,8 @@ export function summarizeAssignmentAttempts(
     timeLimitSeconds?: number | null;
   }
 ): AssignmentAttemptStats {
-  const completions = attempts.length;
+  const completedAttempts = attempts.filter(hasAttemptResult);
+  const completions = completedAttempts.length;
 
   if (completions === 0) {
     return {
@@ -36,7 +37,7 @@ export function summarizeAssignmentAttempts(
     };
   }
 
-  const durationSeconds = attempts
+  const durationSeconds = completedAttempts
     .map((attempt) => getAttemptDurationSeconds(attempt, options))
     .filter((duration): duration is number => duration !== undefined);
 
@@ -49,15 +50,23 @@ export function summarizeAssignmentAttempts(
           )
         : 0,
     averagePoints: Math.round(
-      attempts.reduce((sum, item) => sum + getAttemptPoints(item), 0) /
+      completedAttempts.reduce((sum, item) => sum + getAttemptPoints(item), 0) /
         completions
     ),
     averageScore: Math.round(
-      attempts.reduce((sum, item) => sum + getAttemptAccuracy(item), 0) /
-        completions
+      completedAttempts.reduce(
+        (sum, item) => sum + getAttemptAccuracy(item),
+        0
+      ) / completions
     ),
     completions,
   };
+}
+
+function hasAttemptResult(
+  attempt: AssignmentAttemptStatsSource
+): attempt is AssignmentAttemptStatsSource & { resultJson: AttemptResult } {
+  return attempt.resultJson != null;
 }
 
 function getAttemptDurationSeconds(

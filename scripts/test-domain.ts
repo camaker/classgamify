@@ -8966,8 +8966,22 @@ assert.deepEqual(
   {
     averageDurationSeconds: 46,
     averagePoints: 1,
-    averageScore: 38,
-    completions: 4,
+    averageScore: 50,
+    completions: 3,
+  }
+);
+assert.deepEqual(
+  summarizeAssignmentAttempts([
+    {
+      resultJson: null,
+      score: 10,
+    },
+  ]),
+  {
+    averageDurationSeconds: 0,
+    averagePoints: 0,
+    averageScore: 0,
+    completions: 0,
   }
 );
 assert.deepEqual(
@@ -9096,6 +9110,21 @@ assert.deepEqual(assignmentAttemptStatsById.get('assignment-b'), {
   completions: 1,
 });
 assert.equal(assignmentAttemptStatsById.get('assignment-c'), undefined);
+assert.deepEqual(
+  summarizeAssignmentAttemptsByAssignmentId([
+    {
+      assignmentId: 'assignment-c',
+      resultJson: null,
+      score: 10,
+    },
+  ]).get('assignment-c'),
+  {
+    averageDurationSeconds: 0,
+    averagePoints: 0,
+    averageScore: 0,
+    completions: 0,
+  }
+);
 const clampedAssignmentAttemptStatsById =
   summarizeAssignmentAttemptsByAssignmentId([
     {
