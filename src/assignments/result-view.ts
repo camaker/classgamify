@@ -58,6 +58,32 @@ export type ItemPerformanceSort =
   | 'type';
 export type AttemptReviewFilter = 'all' | 'needs-review';
 
+export const DEFAULT_STUDENT_SUMMARY_SORT =
+  'needs-review' satisfies StudentSummarySort;
+export const DEFAULT_ITEM_PERFORMANCE_SORT =
+  'original' satisfies ItemPerformanceSort;
+export const DEFAULT_ATTEMPT_REVIEW_FILTER =
+  'all' satisfies AttemptReviewFilter;
+
+export const STUDENT_SUMMARY_SORT_VALUES = [
+  DEFAULT_STUDENT_SUMMARY_SORT,
+  'best',
+  'name',
+  'attempts',
+] as const satisfies readonly StudentSummarySort[];
+
+export const ITEM_PERFORMANCE_SORT_VALUES = [
+  DEFAULT_ITEM_PERFORMANCE_SORT,
+  'accuracy',
+  'submitted',
+  'type',
+] as const satisfies readonly ItemPerformanceSort[];
+
+export const ATTEMPT_REVIEW_FILTER_VALUES = [
+  DEFAULT_ATTEMPT_REVIEW_FILTER,
+  'needs-review',
+] as const satisfies readonly AttemptReviewFilter[];
+
 type AssignmentResultSearchState = {
   itemSort?: ItemPerformanceSort;
   review?: AttemptReviewFilter;
@@ -472,25 +498,25 @@ export const studentSummarySortOptions = [
     get label() {
       return m.assignment_result_sort_needs_review();
     },
-    value: 'needs-review',
+    value: DEFAULT_STUDENT_SUMMARY_SORT,
   },
   {
     get label() {
       return m.assignment_result_sort_best_score();
     },
-    value: 'best',
+    value: STUDENT_SUMMARY_SORT_VALUES[1],
   },
   {
     get label() {
       return m.assignment_result_sort_student_name();
     },
-    value: 'name',
+    value: STUDENT_SUMMARY_SORT_VALUES[2],
   },
   {
     get label() {
       return m.assignment_result_sort_attempts();
     },
-    value: 'attempts',
+    value: STUDENT_SUMMARY_SORT_VALUES[3],
   },
 ] satisfies Array<AssignmentResultControlOption<StudentSummarySort>>;
 
@@ -499,25 +525,25 @@ export const itemPerformanceSortOptions = [
     get label() {
       return m.assignment_result_sort_snapshot_order();
     },
-    value: 'original',
+    value: DEFAULT_ITEM_PERFORMANCE_SORT,
   },
   {
     get label() {
       return m.assignment_result_sort_lowest_accuracy();
     },
-    value: 'accuracy',
+    value: ITEM_PERFORMANCE_SORT_VALUES[1],
   },
   {
     get label() {
       return m.assignment_result_sort_most_answered();
     },
-    value: 'submitted',
+    value: ITEM_PERFORMANCE_SORT_VALUES[2],
   },
   {
     get label() {
       return m.assignment_result_sort_item_type();
     },
-    value: 'type',
+    value: ITEM_PERFORMANCE_SORT_VALUES[3],
   },
 ] satisfies Array<AssignmentResultControlOption<ItemPerformanceSort>>;
 
@@ -526,13 +552,13 @@ export const attemptReviewFilterOptions = [
     get label() {
       return m.assignment_result_filter_all_answers();
     },
-    value: 'all',
+    value: DEFAULT_ATTEMPT_REVIEW_FILTER,
   },
   {
     get label() {
       return m.assignment_result_filter_needs_review_only();
     },
-    value: 'needs-review',
+    value: ATTEMPT_REVIEW_FILTER_VALUES[1],
   },
 ] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
 
@@ -1540,7 +1566,7 @@ export function sortItemPerformance(
 export function parseStudentSummarySort(
   value: unknown
 ): StudentSummarySort | undefined {
-  return value === 'best' || value === 'name' || value === 'attempts'
+  return isStudentSummarySort(value) && value !== DEFAULT_STUDENT_SUMMARY_SORT
     ? value
     : undefined;
 }
@@ -1548,7 +1574,7 @@ export function parseStudentSummarySort(
 export function parseItemPerformanceSort(
   value: unknown
 ): ItemPerformanceSort | undefined {
-  return value === 'accuracy' || value === 'submitted' || value === 'type'
+  return isItemPerformanceSort(value) && value !== DEFAULT_ITEM_PERFORMANCE_SORT
     ? value
     : undefined;
 }
@@ -1556,7 +1582,9 @@ export function parseItemPerformanceSort(
 export function parseAttemptReviewFilter(
   value: unknown
 ): AttemptReviewFilter | undefined {
-  return value === 'needs-review' ? value : undefined;
+  return isAttemptReviewFilter(value) && value !== DEFAULT_ATTEMPT_REVIEW_FILTER
+    ? value
+    : undefined;
 }
 
 export function parseResultStudentSearch(value: unknown): string | undefined {
@@ -1580,10 +1608,10 @@ export function resolveAssignmentResultViewState(
   search: AssignmentResultSearchState
 ): AssignmentResultResolvedViewState {
   return {
-    attemptReviewFilter: search.review ?? 'all',
-    itemPerformanceSort: search.itemSort ?? 'original',
+    attemptReviewFilter: search.review ?? DEFAULT_ATTEMPT_REVIEW_FILTER,
+    itemPerformanceSort: search.itemSort ?? DEFAULT_ITEM_PERFORMANCE_SORT,
     studentSearch: search.student ?? '',
-    studentSort: search.sort ?? 'needs-review',
+    studentSort: search.sort ?? DEFAULT_STUDENT_SUMMARY_SORT,
   };
 }
 
@@ -1605,9 +1633,9 @@ export function buildAssignmentResultSearchState({
   const student = next.student ?? current.student;
 
   return {
-    itemSort: itemSort === 'original' ? undefined : itemSort,
-    review: review === 'all' ? undefined : review,
-    sort: sort === 'needs-review' ? undefined : sort,
+    itemSort: itemSort === DEFAULT_ITEM_PERFORMANCE_SORT ? undefined : itemSort,
+    review: review === DEFAULT_ATTEMPT_REVIEW_FILTER ? undefined : review,
+    sort: sort === DEFAULT_STUDENT_SUMMARY_SORT ? undefined : sort,
     student: normalizeResultSearchQuery(student),
   };
 }
@@ -1661,6 +1689,27 @@ export function matchesResultSearch(
 ) {
   const normalizedSearch = normalizeResultSearch(search) ?? search;
   return normalizeResultSearch(value)?.includes(normalizedSearch) ?? false;
+}
+
+function isStudentSummarySort(value: unknown): value is StudentSummarySort {
+  return (
+    typeof value === 'string' &&
+    STUDENT_SUMMARY_SORT_VALUES.includes(value as StudentSummarySort)
+  );
+}
+
+function isItemPerformanceSort(value: unknown): value is ItemPerformanceSort {
+  return (
+    typeof value === 'string' &&
+    ITEM_PERFORMANCE_SORT_VALUES.includes(value as ItemPerformanceSort)
+  );
+}
+
+function isAttemptReviewFilter(value: unknown): value is AttemptReviewFilter {
+  return (
+    typeof value === 'string' &&
+    ATTEMPT_REVIEW_FILTER_VALUES.includes(value as AttemptReviewFilter)
+  );
 }
 
 function compareStudentsDescending(

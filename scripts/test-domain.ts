@@ -301,8 +301,12 @@ import {
   buildAssignmentResultViewModel,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentResultEmptyState,
+  ATTEMPT_REVIEW_FILTER_VALUES,
   attemptReviewFilterOptions,
   buildFilteredAttemptRows,
+  DEFAULT_ATTEMPT_REVIEW_FILTER,
+  DEFAULT_ITEM_PERFORMANCE_SORT,
+  DEFAULT_STUDENT_SUMMARY_SORT,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
   filterAssignmentResultCompletedAttemptRows,
@@ -320,6 +324,7 @@ import {
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
+  ITEM_PERFORMANCE_SORT_VALUES,
   matchesResultSearch,
   normalizeResultSearch,
   normalizeResultSearchQuery,
@@ -328,6 +333,7 @@ import {
   parseResultStudentSearch,
   parseStudentSummarySort,
   resolveAssignmentResultViewState,
+  STUDENT_SUMMARY_SORT_VALUES,
   studentSummarySortOptions,
   sortItemPerformance,
   sortStudentSummaries,
@@ -11349,6 +11355,22 @@ assert.equal(
   }),
   'Showing 2 of 3 submissions.'
 );
+assert.equal(DEFAULT_STUDENT_SUMMARY_SORT, 'needs-review');
+assert.equal(DEFAULT_ITEM_PERFORMANCE_SORT, 'original');
+assert.equal(DEFAULT_ATTEMPT_REVIEW_FILTER, 'all');
+assert.deepEqual(STUDENT_SUMMARY_SORT_VALUES, [
+  'needs-review',
+  'best',
+  'name',
+  'attempts',
+]);
+assert.deepEqual(ITEM_PERFORMANCE_SORT_VALUES, [
+  'original',
+  'accuracy',
+  'submitted',
+  'type',
+]);
+assert.deepEqual(ATTEMPT_REVIEW_FILTER_VALUES, ['all', 'needs-review']);
 assert.deepEqual(
   studentSummarySortOptions.map((option) => option.value),
   ['needs-review', 'best', 'name', 'attempts']
