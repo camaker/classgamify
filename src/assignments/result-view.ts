@@ -37,6 +37,7 @@ import {
 } from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
 import type {
@@ -565,18 +566,21 @@ export function buildAssignmentResultHeaderView({
   now,
   snapshot,
 }: AssignmentResultHeaderSource & { now?: number }) {
+  const resolvedSource = resolveAssignmentSnapshotSource({
+    activity,
+    snapshot,
+  });
   const shareAction = buildAssignmentResultHeaderShareAction({
     expiresAt: assignment.expiresAt,
     now,
     shareSlug: assignment.shareSlug,
     status: assignment.status,
   });
-  const templateType = snapshot?.templateType ?? activity.templateType;
+  const templateType = resolvedSource.templateType;
 
   return {
-    activityDescription:
-      snapshot?.activityDescription ?? activity.description ?? '',
-    activityTitle: snapshot?.activityTitle ?? activity.title,
+    activityDescription: resolvedSource.activityDescription ?? '',
+    activityTitle: resolvedSource.activityTitle,
     assignmentSharePath: shareAction.sharePath,
     assignmentTitle: assignment.title,
     shareAction,

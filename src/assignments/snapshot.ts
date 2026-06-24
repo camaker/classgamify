@@ -16,6 +16,28 @@ export type AssignmentSnapshotInsert = {
   templateType: ActivityTemplateType;
 };
 
+export type AssignmentSnapshotFallbackActivity = {
+  contentJson?: ActivityContent;
+  description: string | null;
+  templateType: ActivityTemplateType;
+  title: string;
+};
+
+export type AssignmentSnapshotFallbackSnapshot = {
+  activityDescription: string | null;
+  activityTitle: string;
+  contentJson?: ActivityContent;
+  templateType: ActivityTemplateType;
+} | null;
+
+export type ResolvedAssignmentSnapshotSource = {
+  activityDescription: string | null;
+  activityTitle: string;
+  contentJson?: ActivityContent;
+  hasSnapshot: boolean;
+  templateType: ActivityTemplateType;
+};
+
 export function buildAssignmentSnapshotInsert({
   assignmentId,
   createdAt,
@@ -32,5 +54,23 @@ export function buildAssignmentSnapshotInsert({
     contentJson: structuredClone(sourceActivity.contentJson),
     createdAt,
     templateType: sourceActivity.templateType,
+  };
+}
+
+export function resolveAssignmentSnapshotSource({
+  activity,
+  snapshot,
+}: {
+  activity: AssignmentSnapshotFallbackActivity;
+  snapshot?: AssignmentSnapshotFallbackSnapshot;
+}): ResolvedAssignmentSnapshotSource {
+  return {
+    activityDescription: snapshot
+      ? snapshot.activityDescription
+      : activity.description,
+    activityTitle: snapshot ? snapshot.activityTitle : activity.title,
+    contentJson: snapshot?.contentJson ?? activity.contentJson,
+    hasSnapshot: Boolean(snapshot),
+    templateType: snapshot?.templateType ?? activity.templateType,
   };
 }

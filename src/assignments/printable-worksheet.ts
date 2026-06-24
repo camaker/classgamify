@@ -14,6 +14,7 @@ import {
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PrintableWorksheetResponseMode =
@@ -95,7 +96,11 @@ export function buildPrintableAssignmentWorksheet({
 }: PrintableAssignmentWorksheetSource): PrintableAssignmentWorksheet {
   const settings = resolveAssignmentSettings(assignment.settingsJson);
   const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
-  const templateType = snapshot?.templateType ?? activity.templateType;
+  const resolvedSource = resolveAssignmentSnapshotSource({
+    activity,
+    snapshot,
+  });
+  const templateType = resolvedSource.templateType;
   const orderedRuntimeItems = orderAssignmentRuntimeItems({
     items: runtimeItems,
     shareSlug,
@@ -103,9 +108,8 @@ export function buildPrintableAssignmentWorksheet({
   });
 
   return {
-    activityDescription:
-      snapshot?.activityDescription ?? activity.description ?? null,
-    activityTitle: snapshot?.activityTitle ?? activity.title,
+    activityDescription: resolvedSource.activityDescription ?? null,
+    activityTitle: resolvedSource.activityTitle,
     answerKey: includeAnswerKey
       ? orderedRuntimeItems.map(toPrintableWorksheetAnswerKeyItem)
       : undefined,

@@ -14,6 +14,7 @@ import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
+import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -64,6 +65,7 @@ type AssignmentResultsExportData = {
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
+  const resolvedSource = resolveAssignmentSnapshotSource(data);
   const deliverySummaryById = new Map(
     buildAssignmentDeliverySummary({
       collectStudentName: settings.collectStudentName,
@@ -106,10 +108,8 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       deliverySummaryById.get('itemOrder') ?? '',
       settings.maxAttempts ?? '',
       settings.timeLimitSeconds ?? '',
-      data.snapshot?.activityTitle ?? data.activity.title,
-      formatAssignmentExportTemplateLabel(
-        data.snapshot?.templateType ?? data.activity.templateType
-      ),
+      resolvedSource.activityTitle,
+      formatAssignmentExportTemplateLabel(resolvedSource.templateType),
       data.stats.completions,
       data.stats.averageScore,
       data.stats.averagePoints,

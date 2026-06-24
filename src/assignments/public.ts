@@ -19,6 +19,7 @@ import {
 } from '@/assignments/lifecycle';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
@@ -154,8 +155,12 @@ export function buildPublicAssignmentPayload({
   assignment,
   snapshot,
 }: PublicAssignmentPayloadSource): PublicAssignmentPayload {
-  const content = snapshot?.contentJson ?? activity.contentJson;
-  const templateType = snapshot?.templateType ?? activity.templateType;
+  const resolvedSource = resolveAssignmentSnapshotSource({
+    activity,
+    snapshot,
+  });
+  const content = resolvedSource.contentJson ?? activity.contentJson;
+  const templateType = resolvedSource.templateType;
   const runtimeItems = getRuntimeItems(templateType, content);
   const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
   const settings = resolveAssignmentSettings(assignment.settingsJson);
@@ -167,10 +172,10 @@ export function buildPublicAssignmentPayload({
 
   return {
     activity: {
-      description: snapshot?.activityDescription ?? activity.description,
+      description: resolvedSource.activityDescription,
       id: activity.id,
       templateType,
-      title: snapshot?.activityTitle ?? activity.title,
+      title: resolvedSource.activityTitle,
       visibility: activity.visibility,
     },
     assignment: {
@@ -287,7 +292,7 @@ export function buildPublicAssignmentPreviewActivity(
     estimatedMinutes: data.summary.estimatedMinutes,
     id: data.activity.id,
     status: data.activity.visibility,
-    templateType: data.snapshot?.templateType ?? data.activity.templateType,
+    templateType: data.activity.templateType,
     title: data.activity.title,
   };
 }

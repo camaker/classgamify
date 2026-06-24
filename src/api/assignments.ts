@@ -38,7 +38,10 @@ import {
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { buildAssignmentSnapshotInsert } from '@/assignments/snapshot';
+import {
+  buildAssignmentSnapshotInsert,
+  resolveAssignmentSnapshotSource,
+} from '@/assignments/snapshot';
 import { getDb } from '@/db';
 import {
   activity,
@@ -477,9 +480,9 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     const stats = summarizeAssignmentAttempts(attempts, {
       timeLimitSeconds: settings.timeLimitSeconds,
     });
-    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
-    const templateType =
-      row.snapshot?.templateType ?? row.activity.templateType;
+    const resolvedSource = resolveAssignmentSnapshotSource(row);
+    const content = resolvedSource.contentJson ?? row.activity.contentJson;
+    const templateType = resolvedSource.templateType;
     const runtimeItems = getRuntimeItems(templateType, content);
 
     return {
@@ -525,9 +528,9 @@ export const getPrintableAssignmentWorksheet = createServerFn({
       throw new Error(m.assignment_api_error_assignment_not_found());
     }
 
-    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
-    const templateType =
-      row.snapshot?.templateType ?? row.activity.templateType;
+    const resolvedSource = resolveAssignmentSnapshotSource(row);
+    const content = resolvedSource.contentJson ?? row.activity.contentJson;
+    const templateType = resolvedSource.templateType;
 
     return buildPrintableAssignmentWorksheet({
       activity: row.activity,
@@ -642,9 +645,9 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       }
     }
 
-    const content = row.snapshot?.contentJson ?? row.activity.contentJson;
-    const templateType =
-      row.snapshot?.templateType ?? row.activity.templateType;
+    const resolvedSource = resolveAssignmentSnapshotSource(row);
+    const content = resolvedSource.contentJson ?? row.activity.contentJson;
+    const templateType = resolvedSource.templateType;
     const runtimeItems = getRuntimeItems(templateType, content);
     const orderedRuntimeItems = orderAssignmentRuntimeItems({
       items: runtimeItems,

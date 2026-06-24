@@ -17,6 +17,7 @@ import {
 } from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListControlOption = {
@@ -286,7 +287,11 @@ export function buildAssignmentListCardViewModel({
   stats,
 }: AssignmentListCardSource): AssignmentListCardViewModel {
   const persisted = true;
-  const templateType = snapshot?.templateType ?? activity.templateType;
+  const resolvedSource = resolveAssignmentSnapshotSource({
+    activity,
+    snapshot,
+  });
+  const templateType = resolvedSource.templateType;
   const actionState = getAssignmentListCardActionState({
     expiresAt: assignment.expiresAt,
     now,
@@ -301,8 +306,7 @@ export function buildAssignmentListCardViewModel({
       assignmentId: assignment.id,
       shareSlug: assignment.shareSlug,
     }),
-    activityDescription:
-      snapshot?.activityDescription ?? activity.description ?? '',
+    activityDescription: resolvedSource.activityDescription ?? '',
     expiresAt: assignment.expiresAt,
     id: assignment.id,
     persisted,

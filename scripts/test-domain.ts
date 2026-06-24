@@ -215,7 +215,10 @@ import {
   stripRuntimeAnswer,
   stripRuntimeAnswers,
 } from '@/assignments/public';
-import { buildAssignmentSnapshotInsert } from '@/assignments/snapshot';
+import {
+  buildAssignmentSnapshotInsert,
+  resolveAssignmentSnapshotSource,
+} from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
   buildAssignmentListPageRouteSearch,
@@ -4173,6 +4176,47 @@ assert.deepEqual(assignmentSnapshotInsert, {
   createdAt: assignmentSnapshotCreatedAt,
   templateType: 'quiz',
 });
+assert.deepEqual(
+  resolveAssignmentSnapshotSource({
+    activity: {
+      contentJson: publicPayloadActivityContent,
+      description: 'Current activity description',
+      templateType: 'match-up',
+      title: 'Current activity title',
+    },
+    snapshot: {
+      activityDescription: 'Frozen activity description',
+      activityTitle: 'Frozen activity title',
+      contentJson: publicPayloadSnapshotContent,
+      templateType: 'quiz',
+    },
+  }),
+  {
+    activityDescription: 'Frozen activity description',
+    activityTitle: 'Frozen activity title',
+    contentJson: publicPayloadSnapshotContent,
+    hasSnapshot: true,
+    templateType: 'quiz',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentSnapshotSource({
+    activity: {
+      contentJson: publicPayloadActivityContent,
+      description: 'Current activity description',
+      templateType: 'match-up',
+      title: 'Current activity title',
+    },
+    snapshot: null,
+  }),
+  {
+    activityDescription: 'Current activity description',
+    activityTitle: 'Current activity title',
+    contentJson: publicPayloadActivityContent,
+    hasSnapshot: false,
+    templateType: 'match-up',
+  }
+);
 const publicAssignmentPayloadSource = {
   activity: {
     contentJson: publicPayloadActivityContent,
@@ -5590,13 +5634,13 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getPrintableAssignmentWorksheet[\s\S]*const content = row\.snapshot\?\.contentJson \?\? row\.activity\.contentJson/,
-  'Printable worksheet API should print from the frozen assignment snapshot when present.'
+  /export const getPrintableAssignmentWorksheet[\s\S]*const resolvedSource = resolveAssignmentSnapshotSource\(row\)[\s\S]*const content = resolvedSource\.contentJson \?\? row\.activity\.contentJson/,
+  'Printable worksheet API should resolve frozen assignment content through the snapshot domain helper.'
 );
 assert.match(
   assignmentsApiSource,
-  /export const getPrintableAssignmentWorksheet[\s\S]*const templateType =[\s\S]*row\.snapshot\?\.templateType \?\? row\.activity\.templateType/,
-  'Printable worksheet API should use the frozen snapshot template when present.'
+  /export const getPrintableAssignmentWorksheet[\s\S]*const templateType = resolvedSource\.templateType/,
+  'Printable worksheet API should resolve the frozen snapshot template through the snapshot domain helper.'
 );
 assert.match(
   assignmentsApiSource,
