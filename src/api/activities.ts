@@ -7,6 +7,7 @@ import {
 import {
   buildDuplicatedActivityTitle,
   buildRemixedActivityTitle,
+  cloneActivityContentForDerivative,
 } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
 import {
@@ -201,7 +202,9 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     const now = new Date();
     const id = nanoid(16);
     await db.insert(activity).values({
-      contentJson: sourceActivity.contentJson,
+      contentJson: cloneActivityContentForDerivative(
+        sourceActivity.contentJson
+      ),
       createdAt: now,
       description: sourceActivity.description,
       id,
@@ -264,7 +267,9 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     const now = new Date();
     const id = nanoid(16);
     await db.insert(activity).values({
-      contentJson: sourceActivity.contentJson,
+      contentJson: cloneActivityContentForDerivative(
+        sourceActivity.contentJson
+      ),
       createdAt: now,
       description: sourceActivity.description,
       id,

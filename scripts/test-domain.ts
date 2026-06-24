@@ -69,6 +69,7 @@ import {
 import {
   buildDuplicatedActivityTitle,
   buildRemixedActivityTitle,
+  cloneActivityContentForDerivative,
 } from '@/activities/duplicate';
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
@@ -5858,6 +5859,16 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
+  /export const duplicateActivity[\s\S]*cloneActivityContentForDerivative\(\s*sourceActivity\.contentJson\s*\)/,
+  'Duplicate activity API should clone derivative activity content explicitly.'
+);
+assert.match(
+  activitiesApiSource,
+  /export const remixActivityTemplate[\s\S]*cloneActivityContentForDerivative\(\s*sourceActivity\.contentJson\s*\)/,
+  'Template remix API should clone derivative activity content explicitly.'
+);
+assert.match(
+  activitiesApiSource,
   /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)/,
   'Update activity API should block edits to archived activities server-side.'
 );
@@ -8797,6 +8808,87 @@ assert.equal(
     targetShortName: 'Match',
   }),
   `${'A'.repeat(109)}... (Match)`
+);
+const derivativeSourceContent = buildActivityContent({
+  description: 'Derivative source content',
+  difficulty: 'core',
+  gradeBand: 'Grade 4',
+  groupsText: 'Foods | apple, bread',
+  language: 'en',
+  learningGoal: 'Students classify and answer food vocabulary prompts.',
+  pairsText: 'hot | cold',
+  questionsText: 'Favorite food? | apple | apple, bread | Choose the food.',
+  sourceMaterials: [
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: ' file-worksheet-derivative ',
+      kind: 'unknown-kind',
+      originalName: ' worksheet derivative.pdf ',
+      r2Key: 'userfiles/teacher/private.pdf',
+      size: 512.9,
+    },
+    {
+      fileId: 'file-listening-1',
+      kind: 'audio',
+      originalName: 'Duplicate should be ignored.mp3',
+    },
+  ],
+  sourceSummary: 'Derivative source summary',
+  subject: 'English',
+  teacherNotesText: 'Use after vocabulary warmup.',
+  templateType: 'group-sort',
+  title: 'Derivative source',
+  visibility: 'draft',
+  vocabularyText: 'apple, bread',
+});
+const derivativeClonedContent = cloneActivityContentForDerivative(
+  derivativeSourceContent
+);
+assert.deepEqual(derivativeClonedContent, {
+  ...derivativeSourceContent,
+  sourceMaterials: [
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-worksheet-derivative',
+      kind: 'worksheet-document',
+      originalName: 'worksheet derivative.pdf',
+      size: 512,
+    },
+  ],
+});
+assert.notEqual(derivativeClonedContent, derivativeSourceContent);
+assert.notEqual(
+  derivativeClonedContent.questions,
+  derivativeSourceContent.questions
+);
+assert.notEqual(
+  derivativeClonedContent.questions[0],
+  derivativeSourceContent.questions[0]
+);
+assert.notEqual(
+  derivativeClonedContent.questions[0]?.options,
+  derivativeSourceContent.questions[0]?.options
+);
+assert.notEqual(
+  derivativeClonedContent.groups[0]?.items,
+  derivativeSourceContent.groups[0]?.items
+);
+assert.notEqual(
+  derivativeClonedContent.sourceMaterials[0],
+  derivativeSourceContent.sourceMaterials[0]
+);
+derivativeClonedContent.questions[0]!.prompt = 'Edited cloned prompt';
+derivativeClonedContent.questions[0]!.options![0]!.text = 'Edited option';
+derivativeClonedContent.groups[0]!.items[0] = 'edited item';
+derivativeClonedContent.sourceMaterials[0]!.originalName = 'Edited audio.mp3';
+assert.equal(derivativeSourceContent.questions[0]?.prompt, 'Favorite food?');
+assert.equal(derivativeSourceContent.questions[0]?.options?.[0]?.text, 'apple');
+assert.equal(derivativeSourceContent.groups[0]?.items[0], 'apple');
+assert.equal(
+  derivativeSourceContent.sourceMaterials[0]?.originalName,
+  '三年级听力.mp3'
 );
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({

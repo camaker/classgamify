@@ -1,6 +1,32 @@
 import { m } from '@/locale/paraglide/messages';
+import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import type { ActivityContent, ActivityQuestion } from '@/activities/types';
 
 const MAX_ACTIVITY_TITLE_LENGTH = 120;
+
+export function cloneActivityContentForDerivative(
+  content: ActivityContent
+): ActivityContent {
+  return {
+    difficulty: content.difficulty,
+    gradeBand: content.gradeBand,
+    groups: content.groups.map((group) => ({
+      ...group,
+      items: [...group.items],
+    })),
+    language: content.language,
+    learningGoal: content.learningGoal,
+    pairs: content.pairs.map((pair) => ({ ...pair })),
+    questions: content.questions.map(cloneActivityQuestion),
+    sourceMaterials: normalizeActivityMaterialReferences(
+      content.sourceMaterials
+    ),
+    sourceSummary: content.sourceSummary,
+    subject: content.subject,
+    teacherNotes: [...content.teacherNotes],
+    vocabulary: [...content.vocabulary],
+  };
+}
 
 export function buildDuplicatedActivityTitle(title: string) {
   const normalizedTitle = normalizeActivitySourceTitle(title);
@@ -29,6 +55,24 @@ export function buildRemixedActivityTitle({
     sourceTitle: truncateActivitySourceTitle(normalizedTitle, maxSourceLength),
     targetShortName: normalizedTargetShortName,
   });
+}
+
+function cloneActivityQuestion(question: ActivityQuestion): ActivityQuestion {
+  return {
+    answer: question.answer,
+    ...(question.explanation !== undefined
+      ? { explanation: question.explanation }
+      : {}),
+    id: question.id,
+    ...(question.options
+      ? {
+          options: question.options.map((option) => ({
+            ...option,
+          })),
+        }
+      : {}),
+    prompt: question.prompt,
+  };
 }
 
 function normalizeActivitySourceTitle(title: string) {
