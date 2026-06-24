@@ -264,10 +264,12 @@ function DashboardActivitiesPage() {
           onClearFilters={clearLibraryFilters}
           onClearSearch={() => updateLibraryFilters({ q: '' })}
           onSearch={(value) => updateLibraryFilters({ q: value })}
+          onSourceChange={(value) => updateLibraryFilters({ source: value })}
           onStatusChange={(value) => updateLibraryFilters({ status: value })}
           onTemplateChange={(value) =>
             updateLibraryFilters({ template: value })
           }
+          source={sourceFilter}
           status={libraryStatus}
           template={templateFilter}
           total={totalActivities}
@@ -474,8 +476,10 @@ function ActivityLibrarySearch({
   onClearFilters,
   onClearSearch,
   onSearch,
+  onSourceChange,
   onStatusChange,
   onTemplateChange,
+  source,
   status,
   template,
   total,
@@ -485,8 +489,10 @@ function ActivityLibrarySearch({
   onClearFilters: () => void;
   onClearSearch: () => void;
   onSearch: (value: string) => void;
+  onSourceChange: (value: ActivitySourceMaterialFilter) => void;
   onStatusChange: (value: ActivityLibraryStatus) => void;
   onTemplateChange: (value: ActivityTemplateFilter) => void;
+  source: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
   template: ActivityTemplateFilter;
   total: number;
@@ -496,13 +502,14 @@ function ActivityLibrarySearch({
   const filterSummary = buildActivityLibraryFilterSummary({
     isLoading,
     search: normalizedValue,
+    source,
     status,
     template,
     total,
   });
 
   return (
-    <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
+    <section className="grid gap-4 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_auto] xl:items-end">
       <div className="grid gap-2">
         <label
           htmlFor="activity-library-search"
@@ -553,6 +560,26 @@ function ActivityLibrarySearch({
           {getActivityTemplates().map((option) => (
             <NativeSelectOption key={option.type} value={option.type}>
               {option.name}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </div>
+      <div className="grid gap-2">
+        <label htmlFor="activity-source-filter" className="font-medium text-sm">
+          {activityLibrarySearchCopy.sourceLabel}
+        </label>
+        <NativeSelect
+          id="activity-source-filter"
+          value={source}
+          onChange={(event) =>
+            onSourceChange(
+              event.currentTarget.value as ActivitySourceMaterialFilter
+            )
+          }
+        >
+          {activityLibrarySearchCopy.sourceOptions.map((option) => (
+            <NativeSelectOption key={option.value} value={option.value}>
+              {option.label}
             </NativeSelectOption>
           ))}
         </NativeSelect>

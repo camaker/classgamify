@@ -14,6 +14,7 @@ import {
 } from '@/activities/material-summary';
 import type {
   ActivityLibraryStatus,
+  ActivitySourceMaterialFilter,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
 import { m } from '@/locale/paraglide/messages';
@@ -68,17 +69,19 @@ export type ActivityLibrarySummaryMetric = {
 export function buildActivityLibraryFilterSummary({
   isLoading,
   search,
+  source = 'all',
   status,
   template,
   total,
 }: {
   isLoading: boolean;
   search?: string;
+  source?: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
   template: ActivityTemplateFilter;
   total: number;
 }) {
-  const hasFilters = Boolean(search) || template !== 'all';
+  const hasFilters = Boolean(search) || source !== 'all' || template !== 'all';
   if (hasFilters) {
     return {
       hasFilters,

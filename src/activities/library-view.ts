@@ -1,5 +1,6 @@
 import type {
   ActivityLibraryStatus,
+  ActivitySourceMaterialFilter,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
 import { getTemplateByType } from '@/activities/catalog';
@@ -27,6 +28,11 @@ import { m } from '@/locale/paraglide/messages';
 type ActivityLibraryStatusOption = {
   label: string;
   value: ActivityLibraryStatus;
+};
+
+type ActivitySourceMaterialFilterOption = {
+  label: string;
+  value: ActivitySourceMaterialFilter;
 };
 
 type ActivityLibraryEmptyStateView = {
@@ -186,6 +192,27 @@ export const activityLibrarySearchCopy = {
       { label: m.activity_library_filter_archived(), value: 'archived' },
     ];
   },
+  get sourceLabel() {
+    return m.activity_library_filter_source_label();
+  },
+  get sourceOptions() {
+    return [
+      { label: m.activity_library_filter_source_all(), value: 'all' },
+      {
+        label: m.activity_library_filter_source_extractable(),
+        value: 'extractable',
+      },
+      { label: m.activity_library_filter_source_audio(), value: 'audio' },
+      {
+        label: m.activity_library_filter_source_spreadsheet(),
+        value: 'spreadsheet',
+      },
+      {
+        label: m.activity_library_filter_source_worksheet(),
+        value: 'worksheet',
+      },
+    ];
+  },
   get templateLabel() {
     return m.activity_library_filter_template_label();
   },
@@ -197,6 +224,8 @@ export const activityLibrarySearchCopy = {
   clearSearchLabel: string;
   label: string;
   placeholder: string;
+  sourceLabel: string;
+  sourceOptions: ActivitySourceMaterialFilterOption[];
   statusOptions: ActivityLibraryStatusOption[];
   templateLabel: string;
   templatePlaceholder: string;

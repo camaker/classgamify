@@ -5475,6 +5475,16 @@ assert.match(
   /source: sourceFilter/,
   'Activity library route should pass the source-material filter to list queries and preserve it in pagination.'
 );
+assert.match(
+  dashboardActivitiesRouteSource,
+  /id="activity-source-filter"/,
+  'Activity library route should render a source-material filter control.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /onSourceChange=\{\(value\) =>[\s\S]*updateLibraryFilters\(\{ source: value \}\)/,
+  'Activity library source-material filter control should update route filters.'
+);
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
 assert.match(
   assignmentsApiSource,
@@ -6330,6 +6340,11 @@ assert.equal(
 assert.deepEqual(
   activityLibrarySearchCopy.statusOptions.map((option) => option.value),
   ['active', 'archived']
+);
+assert.equal(activityLibrarySearchCopy.sourceLabel, 'Source material');
+assert.deepEqual(
+  activityLibrarySearchCopy.sourceOptions.map((option) => option.value),
+  ['all', 'extractable', 'audio', 'spreadsheet', 'worksheet']
 );
 assert.deepEqual(
   buildActivityLibraryEmptyStateView({
@@ -7968,6 +7983,17 @@ assert.deepEqual(
     total: 1,
   }),
   { hasFilters: true, text: '1 match' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: undefined,
+    source: 'worksheet',
+    status: 'active',
+    template: 'all',
+    total: 3,
+  }),
+  { hasFilters: true, text: '3 matches' }
 );
 assert.deepEqual(
   buildActivityLibraryFilterSummary({
