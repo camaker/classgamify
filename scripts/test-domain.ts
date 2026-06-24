@@ -261,6 +261,7 @@ import {
   getAssignmentListEmptyState,
 } from '@/assignments/list-view';
 import {
+  ASSIGNMENT_MANAGED_STATUSES,
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
   buildAssignmentStatusAction,
@@ -445,6 +446,7 @@ import {
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
   ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE,
   resolveAssignmentSettings,
+  updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
 import {
   getUserFileExtension,
@@ -3004,6 +3006,27 @@ assert.deepEqual(
 assert.deepEqual(
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id),
   stableShuffle(submissionRuntimeItems, 'share-2').map((item) => item.id)
+);
+assert.deepEqual(ASSIGNMENT_MANAGED_STATUSES, ['published', 'closed']);
+assert.equal(
+  updateAssignmentStatusInputSchema.parse({
+    assignmentId: 'assignment-1',
+    status: 'published',
+  }).status,
+  'published'
+);
+assert.equal(
+  updateAssignmentStatusInputSchema.parse({
+    assignmentId: 'assignment-1',
+    status: 'closed',
+  }).status,
+  'closed'
+);
+assert.throws(() =>
+  updateAssignmentStatusInputSchema.parse({
+    assignmentId: 'assignment-1',
+    status: 'draft',
+  })
 );
 assert.deepEqual(getAssignmentStatusActionCopy('closed'), {
   failureMessage: 'Assignment status could not be updated.',
@@ -6160,6 +6183,20 @@ assert.doesNotMatch(
   activityAiApiSource,
   /getDb|db\.|insert\(activity\)|from\(activity\)|@\/db/,
   'AI draft server function should not write directly to the activity database.'
+);
+const assignmentValidationSource = readFileSync(
+  'src/assignments/validation.ts',
+  'utf8'
+);
+assert.match(
+  assignmentValidationSource,
+  /status: z\.enum\(ASSIGNMENT_MANAGED_STATUSES\)/,
+  'Assignment status update schema should reuse lifecycle managed statuses.'
+);
+assert.doesNotMatch(
+  assignmentValidationSource,
+  /status: z\.enum\(\['published', 'closed'\]\)/,
+  'Assignment status update schema should not maintain a local managed-status enum.'
 );
 const activityAiDraftSource = readFileSync(
   'src/activities/ai-draft.ts',

@@ -1,4 +1,5 @@
 import type { AssignmentSettings } from '@/activities/types';
+import { ASSIGNMENT_MANAGED_STATUSES } from '@/assignments/lifecycle';
 import { z } from 'zod';
 
 export const defaultAssignmentSettings: AssignmentSettings = {
@@ -93,7 +94,7 @@ export const publishAssignmentInputSchema = z.object({
 
 export const updateAssignmentStatusInputSchema = z.object({
   assignmentId: z.string().min(1),
-  status: z.enum(['published', 'closed']),
+  status: z.enum(ASSIGNMENT_MANAGED_STATUSES),
 });
 
 export type PublishAssignmentInput = z.infer<

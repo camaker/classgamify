@@ -3,9 +3,10 @@ import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDate = Date | string | null | undefined;
 export type AssignmentLifecycleStatus = 'closed' | 'draft' | 'expired' | 'open';
+export const ASSIGNMENT_MANAGED_STATUSES = ['published', 'closed'] as const;
 export type ManagedAssignmentStatus = Extract<
   AssignmentStatus,
-  'closed' | 'published'
+  (typeof ASSIGNMENT_MANAGED_STATUSES)[number]
 >;
 export type AssignmentStatusActionKind = 'close-link' | 'reopen-link';
 
