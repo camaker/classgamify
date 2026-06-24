@@ -143,7 +143,10 @@ import {
 } from '@/activities/editor';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
-import { getWorksheetModeDefinitions } from '@/activities/worksheet-modes';
+import {
+  getWorksheetModeDefinitions,
+  WORKSHEET_MODE_TEMPLATES,
+} from '@/activities/worksheet-modes';
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
 import {
@@ -5060,7 +5063,18 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
 }
 assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) => mode.template),
-  ['fill-blank', 'line-match', 'listening', 'group-sort']
+  [...WORKSHEET_MODE_TEMPLATES]
+);
+const worksheetsRouteSource = readFileSync('src/routes/worksheets.tsx', 'utf8');
+assert.match(
+  worksheetsRouteSource,
+  /<WorksheetModeCard key=\{mode\.template\} mode=\{mode\} \/>/,
+  'Worksheet mode cards should use stable template keys, not localized titles.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /key=\{mode\.title\}/,
+  'Worksheet mode cards should not key by locale-dependent titles.'
 );
 assert.equal(
   getWorksheetModeDefinitions().every((mode) =>

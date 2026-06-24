@@ -13,31 +13,51 @@ export type WorksheetModeTemplate = Extract<
   'fill-blank' | 'group-sort' | 'line-match' | 'listening'
 >;
 
+export const WORKSHEET_MODE_TEMPLATES = [
+  'fill-blank',
+  'line-match',
+  'listening',
+  'group-sort',
+] as const satisfies readonly WorksheetModeTemplate[];
+
 export function getWorksheetModeDefinitions(): WorksheetModeDefinition[] {
-  return [
-    {
-      action: m.worksheets_page_mode_fill_blank_action(),
-      description: m.worksheets_page_mode_fill_blank_description(),
-      template: 'fill-blank',
-      title: m.worksheets_page_mode_fill_blank_title(),
-    },
-    {
-      action: m.worksheets_page_mode_line_match_action(),
-      description: m.worksheets_page_mode_line_match_description(),
-      template: 'line-match',
-      title: m.worksheets_page_mode_line_match_title(),
-    },
-    {
-      action: m.worksheets_page_mode_listening_action(),
-      description: m.worksheets_page_mode_listening_description(),
-      template: 'listening',
-      title: m.worksheets_page_mode_listening_title(),
-    },
-    {
-      action: m.worksheets_page_mode_group_sort_action(),
-      description: m.worksheets_page_mode_group_sort_description(),
-      template: 'group-sort',
-      title: m.worksheets_page_mode_group_sort_title(),
-    },
-  ];
+  return WORKSHEET_MODE_TEMPLATES.map(getWorksheetModeDefinition);
+}
+
+function getWorksheetModeDefinition(
+  template: WorksheetModeTemplate
+): WorksheetModeDefinition {
+  switch (template) {
+    case 'fill-blank':
+      return {
+        action: m.worksheets_page_mode_fill_blank_action(),
+        description: m.worksheets_page_mode_fill_blank_description(),
+        template,
+        title: m.worksheets_page_mode_fill_blank_title(),
+      };
+    case 'group-sort':
+      return {
+        action: m.worksheets_page_mode_group_sort_action(),
+        description: m.worksheets_page_mode_group_sort_description(),
+        template,
+        title: m.worksheets_page_mode_group_sort_title(),
+      };
+    case 'line-match':
+      return {
+        action: m.worksheets_page_mode_line_match_action(),
+        description: m.worksheets_page_mode_line_match_description(),
+        template,
+        title: m.worksheets_page_mode_line_match_title(),
+      };
+    case 'listening':
+      return {
+        action: m.worksheets_page_mode_listening_action(),
+        description: m.worksheets_page_mode_listening_description(),
+        template,
+        title: m.worksheets_page_mode_listening_title(),
+      };
+  }
+
+  const exhaustiveTemplate: never = template;
+  return exhaustiveTemplate;
 }

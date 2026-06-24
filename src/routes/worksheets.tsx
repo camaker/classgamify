@@ -116,7 +116,7 @@ function WorksheetsPage() {
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {worksheetModeDefinitions.map((mode) => (
-            <WorksheetModeCard key={mode.title} mode={mode} />
+            <WorksheetModeCard key={mode.template} mode={mode} />
           ))}
         </section>
 
