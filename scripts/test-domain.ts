@@ -40,6 +40,8 @@ import {
 } from '@/activities/library-view';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
+  ACTIVITY_LIBRARY_STATUSES,
+  ACTIVITY_SOURCE_MATERIAL_FILTERS,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
@@ -5718,6 +5720,14 @@ assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
 assert.equal(ACTIVITY_LIBRARY_PAGE_SIZE, 12);
+assert.deepEqual(ACTIVITY_LIBRARY_STATUSES, ['active', 'archived']);
+assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_FILTERS, [
+  'all',
+  'audio',
+  'extractable',
+  'spreadsheet',
+  'worksheet',
+]);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
@@ -5829,6 +5839,26 @@ assert.match(
   activitiesApiSource,
   /source: activityListSourceSchema\.default\('all'\)/,
   'Activity list API should accept a source-material filter with an all default.'
+);
+assert.match(
+  activitiesApiSource,
+  /z\.enum\(ACTIVITY_LIBRARY_STATUSES\)/,
+  'Activity list API should reuse the activity-domain status filter values.'
+);
+assert.match(
+  activitiesApiSource,
+  /z\.enum\(ACTIVITY_SOURCE_MATERIAL_FILTERS\)/,
+  'Activity list API should reuse the activity-domain source-material filter values.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /const activityListStatusSchema = z\.enum\(\[/,
+  'Activity list API should not maintain a separate hand-written status filter enum.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /const activityListSourceSchema = z\.enum\(\[/,
+  'Activity list API should not maintain a separate hand-written source-material filter enum.'
 );
 assert.match(
   activitiesApiSource,

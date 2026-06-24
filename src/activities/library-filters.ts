@@ -15,6 +15,23 @@ export type ActivitySourceMaterialFilter =
 export type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
 export const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
+export const ACTIVITY_LIBRARY_STATUSES = [
+  'active',
+  'archived',
+] as const satisfies readonly ActivityLibraryStatus[];
+export const ACTIVITY_SOURCE_MATERIAL_FILTERS = [
+  'all',
+  'audio',
+  'extractable',
+  'spreadsheet',
+  'worksheet',
+] as const satisfies readonly ActivitySourceMaterialFilter[];
+export const ACTIVITY_FILTERABLE_SOURCE_MATERIALS = [
+  'audio',
+  'extractable',
+  'spreadsheet',
+  'worksheet',
+] as const satisfies readonly Exclude<ActivitySourceMaterialFilter, 'all'>[];
 
 type ActivityLibrarySearchState = {
   created?: string;
@@ -82,21 +99,13 @@ export function buildActivityLibraryPageRouteSearch({
 export function parseActivityLibraryStatus(
   value: unknown
 ): ActivityLibraryStatus | undefined {
-  return value === 'archived' || value === 'active' ? value : undefined;
+  return isActivityLibraryStatus(value) ? value : undefined;
 }
 
 export function parseActivitySourceMaterialFilter(
   value: unknown
 ): Exclude<ActivitySourceMaterialFilter, 'all'> | undefined {
-  switch (value) {
-    case 'audio':
-    case 'extractable':
-    case 'spreadsheet':
-    case 'worksheet':
-      return value;
-    default:
-      return undefined;
-  }
+  return isActivityFilterableSourceMaterial(value) ? value : undefined;
 }
 
 export function parseActivityTemplateFilter(
@@ -136,6 +145,26 @@ export function isActivityTemplateType(
   return (
     typeof value === 'string' &&
     ACTIVITY_TEMPLATE_TYPES.includes(value as ActivityTemplateType)
+  );
+}
+
+function isActivityLibraryStatus(
+  value: unknown
+): value is ActivityLibraryStatus {
+  return (
+    typeof value === 'string' &&
+    ACTIVITY_LIBRARY_STATUSES.includes(value as ActivityLibraryStatus)
+  );
+}
+
+function isActivityFilterableSourceMaterial(
+  value: unknown
+): value is Exclude<ActivitySourceMaterialFilter, 'all'> {
+  return (
+    typeof value === 'string' &&
+    ACTIVITY_FILTERABLE_SOURCE_MATERIALS.includes(
+      value as Exclude<ActivitySourceMaterialFilter, 'all'>
+    )
   );
 }
 

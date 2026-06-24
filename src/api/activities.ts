@@ -12,6 +12,8 @@ import {
 import { getTemplateByType } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
+  ACTIVITY_LIBRARY_STATUSES,
+  ACTIVITY_SOURCE_MATERIAL_FILTERS,
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
@@ -33,14 +35,8 @@ import { and, eq, ne, or } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
-const activityListStatusSchema = z.enum(['active', 'archived']);
-const activityListSourceSchema = z.enum([
-  'all',
-  'audio',
-  'extractable',
-  'spreadsheet',
-  'worksheet',
-]);
+const activityListStatusSchema = z.enum(ACTIVITY_LIBRARY_STATUSES);
+const activityListSourceSchema = z.enum(ACTIVITY_SOURCE_MATERIAL_FILTERS);
 
 const listActivitiesInputSchema = z.object({
   createdActivityId: z.string().trim().min(1).max(80).optional(),
