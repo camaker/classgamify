@@ -656,6 +656,14 @@ export function buildAssignmentResultActionState({
   };
 }
 
+export function getAssignmentResultCompletedAttemptCount(
+  completions: number | null | undefined
+) {
+  return Number.isFinite(completions)
+    ? Math.max(0, Math.trunc(completions))
+    : 0;
+}
+
 export function buildAssignmentResultActionButtons({
   attemptCount,
   classroomBriefReady,

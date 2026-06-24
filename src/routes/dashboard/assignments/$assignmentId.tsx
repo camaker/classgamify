@@ -13,6 +13,7 @@ import {
   buildAssignmentResultSectionState,
   buildAssignmentResultRouteSearch,
   buildAssignmentResultViewModel,
+  getAssignmentResultCompletedAttemptCount,
   assignmentResultPageCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
@@ -249,8 +250,15 @@ function AssignmentResultsPage() {
         expiresAt: data.assignment.expiresAt,
       })
     : [];
+  const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
+    data?.stats.completions
+  );
+  const completedAttemptReviewCount = Math.min(
+    completedAttemptCount,
+    data?.analysis.attempts.length ?? 0
+  );
   const resultActionState = buildAssignmentResultActionState({
-    attemptCount: data?.attempts.length ?? 0,
+    attemptCount: completedAttemptCount,
     classroomBriefReady: Boolean(classroomBrief),
     itemCount: data?.analysis.perItem.length ?? 0,
     studentCount: data?.analysis.students.length ?? 0,
@@ -258,8 +266,8 @@ function AssignmentResultsPage() {
   const resultActionButtons =
     buildAssignmentResultActionButtons(resultActionState);
   const resultSectionState = buildAssignmentResultSectionState({
-    attemptCount: data?.attempts.length ?? 0,
-    attemptReviewCount: data?.analysis.attempts.length ?? 0,
+    attemptCount: completedAttemptCount,
+    attemptReviewCount: completedAttemptReviewCount,
     classroomBriefReady: Boolean(classroomBrief),
     itemCount: data?.analysis.perItem.length ?? 0,
     studentCount: data?.analysis.students.length ?? 0,

@@ -290,6 +290,7 @@ import {
   formatAssignmentResultPercent,
   formatAssignmentReviewCount,
   getAssignmentAnswerReviewStatus,
+  getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -870,6 +871,25 @@ assert.match(
   publicPlayRouteSource,
   /toast\.error\(resolveStudentAttemptSubmissionFailureMessage\(error\)\)/,
   'Student attempt submission failures should resolve through the safe localized failure helper.'
+);
+const assignmentResultRouteSource = readFileSync(
+  'src/routes/dashboard/assignments/$assignmentId.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /attemptCount:\s*data\?\.attempts\.length/,
+  'Assignment result actions should not unlock from raw stored attempt rows.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
+  'Assignment result actions should derive attempt availability from completed attempt stats.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /attemptReviewCount:\s*completedAttemptReviewCount/,
+  'Assignment answer review sections should not unlock from raw review rows alone.'
 );
 const directRunnerFeedbackSources = [
   'src/components/activities/fill-blank-worksheet.tsx',
@@ -10029,6 +10049,11 @@ assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('Paris'), 'Paris');
 assert.equal(formatAssignmentReviewCount(1), '1 review');
 assert.equal(formatAssignmentReviewCount(3), '3 reviews');
+assert.equal(getAssignmentResultCompletedAttemptCount(2), 2);
+assert.equal(getAssignmentResultCompletedAttemptCount(2.8), 2);
+assert.equal(getAssignmentResultCompletedAttemptCount(-1), 0);
+assert.equal(getAssignmentResultCompletedAttemptCount(Number.NaN), 0);
+assert.equal(getAssignmentResultCompletedAttemptCount(null), 0);
 assert.deepEqual(assignmentResultActionOrder, [
   'copy-brief',
   'copy-reteach-plan',
