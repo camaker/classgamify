@@ -4,6 +4,8 @@ import type { AssignmentLifecycleStatus } from '@/assignments/lifecycle';
 export type AssignmentLifecycleStatusFilter = AssignmentLifecycleStatus;
 export type AssignmentStatusFilter = 'all' | AssignmentLifecycleStatusFilter;
 
+export const ASSIGNMENT_LIST_PAGE_SIZE = 12;
+
 export const ASSIGNMENT_LIFECYCLE_STATUS_FILTERS = [
   'closed',
   'draft',
@@ -97,6 +99,23 @@ export function buildAssignmentListValidatedSearch(
         : undefined,
     status: parseAssignmentStatusFilter(search.status),
   };
+}
+
+export function getAssignmentListTotalPages({
+  pageSize = ASSIGNMENT_LIST_PAGE_SIZE,
+  total,
+}: {
+  pageSize?: number;
+  total: number;
+}) {
+  const normalizedPageSize =
+    Number.isInteger(pageSize) && pageSize > 0
+      ? pageSize
+      : ASSIGNMENT_LIST_PAGE_SIZE;
+  const normalizedTotal =
+    Number.isFinite(total) && total > 0 ? Math.floor(total) : 0;
+
+  return Math.max(1, Math.ceil(normalizedTotal / normalizedPageSize));
 }
 
 function parseAssignmentListPageSearch(value: unknown) {

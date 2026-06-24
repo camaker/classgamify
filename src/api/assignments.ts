@@ -20,6 +20,7 @@ import {
   canUseAnotherAssignmentAttempt,
 } from '@/assignments/attempt-limits';
 import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   type AssignmentLifecycleStatusFilter,
   normalizeAssignmentListSearch,
@@ -85,7 +86,7 @@ const assignmentShareSlugSchema = z
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
-  pageSize: z.number().int().min(1).max(100).default(24),
+  pageSize: z.number().int().min(1).max(100).default(ASSIGNMENT_LIST_PAGE_SIZE),
   publishedShareSlug: assignmentShareSlugSchema.optional(),
   search: z.string().trim().max(120).optional(),
   status: assignmentStatusFilterSchema,

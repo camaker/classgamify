@@ -3,10 +3,12 @@ import {
   getStarterAssignments,
 } from '@/activities/catalog';
 import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentStatusFilter,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
+  getAssignmentListTotalPages,
   normalizeAssignmentListSearch,
 } from '@/assignments/list-filters';
 import {
@@ -70,8 +72,6 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-const ASSIGNMENT_LIST_PAGE_SIZE = 12;
-
 export const Route = createFileRoute('/dashboard/assignments')({
   validateSearch: buildAssignmentListValidatedSearch,
   component: DashboardAssignmentsPage,
@@ -94,10 +94,10 @@ function DashboardAssignmentsPage() {
   });
   const assignments = data?.items ?? [];
   const totalAssignments = data?.total ?? 0;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalAssignments / ASSIGNMENT_LIST_PAGE_SIZE)
-  );
+  const totalPages = getAssignmentListTotalPages({
+    pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
+    total: totalAssignments,
+  });
   const hasAssignments = assignments.length > 0;
   const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
   const emptyState = buildAssignmentListEmptyStateView({ hasFilters });

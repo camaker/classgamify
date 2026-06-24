@@ -224,10 +224,12 @@ import {
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
+  getAssignmentListTotalPages,
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
@@ -5894,6 +5896,15 @@ assert.match(
   'Activity library source-material filter control should update route filters.'
 );
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
+const dashboardAssignmentsRouteSource = readFileSync(
+  'src/routes/dashboard/assignments.tsx',
+  'utf8'
+);
+assert.match(
+  assignmentsApiSource,
+  /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
+  'Assignment list API should default page size through the assignment-domain pagination constant.'
+);
 assert.match(
   assignmentsApiSource,
   /ASSIGNMENT_LIFECYCLE_STATUS_FILTERS/,
@@ -5963,6 +5974,25 @@ assert.match(
   assignmentsApiSource,
   /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
   'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
+);
+const useAssignmentsSource = readFileSync(
+  'src/hooks/use-assignments.ts',
+  'utf8'
+);
+assert.match(
+  useAssignmentsSource,
+  /pageSize = ASSIGNMENT_LIST_PAGE_SIZE/,
+  'useAssignments should default page size through the assignment-domain pagination constant.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /getAssignmentListTotalPages\(\{[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*total: totalAssignments,[\s\S]*\}\)/,
+  'Assignment dashboard route should calculate total pages through the assignment-domain helper.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /const ASSIGNMENT_LIST_PAGE_SIZE = 12/,
+  'Assignment dashboard route should not maintain a local page-size constant.'
 );
 assert.match(
   assignmentsApiSource,
@@ -7130,6 +7160,10 @@ assert.equal(
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('  Ｗｅｅｋ   １  '), 'Week 1');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.equal(ASSIGNMENT_LIST_PAGE_SIZE, 12);
+assert.equal(getAssignmentListTotalPages({ total: 0 }), 1);
+assert.equal(getAssignmentListTotalPages({ pageSize: 12, total: 31 }), 3);
+assert.equal(getAssignmentListTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.deepEqual(
   [...ASSIGNMENT_LIFECYCLE_STATUS_FILTERS],
   ['closed', 'draft', 'expired', 'open']

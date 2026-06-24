@@ -7,7 +7,10 @@ import {
   submitAttempt,
   updateAssignmentStatus,
 } from '@/api/assignments';
-import type { AssignmentLifecycleStatusFilter } from '@/assignments/list-filters';
+import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
+  type AssignmentLifecycleStatusFilter,
+} from '@/assignments/list-filters';
 import type {
   PublishAssignmentInput,
   UpdateAssignmentStatusInput,
@@ -41,7 +44,7 @@ const assignmentsKeys = {
 
 export function useAssignments({
   pageIndex = 0,
-  pageSize = 24,
+  pageSize = ASSIGNMENT_LIST_PAGE_SIZE,
   publishedShareSlug,
   search,
   status,
