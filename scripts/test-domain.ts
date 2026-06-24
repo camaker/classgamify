@@ -5405,6 +5405,21 @@ assert.match(
   /sqlLikeContains\(activity\.title, search\)/,
   'Activity list search should escape SQL LIKE wildcard characters.'
 );
+assert.match(
+  activitiesApiSource,
+  /source: activityListSourceSchema\.default\('all'\)/,
+  'Activity list API should accept a source-material filter with an all default.'
+);
+assert.match(
+  activitiesApiSource,
+  /matchingRows\.filter\(\(item\) =>[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source: data\.source/,
+  'Activity list API should apply source-material filtering before pagination and summary.'
+);
+assert.match(
+  activitiesApiSource,
+  /summary: summarizeActivityLibrary\(matchingActivities\)/,
+  'Activity list summary should reflect source-material filtered activities.'
+);
 assert.doesNotMatch(
   activitiesApiSource,
   /like\(activity\.title, `%\$\{search\}%`\)/,
@@ -5434,6 +5449,31 @@ assert.match(
   activitiesApiSource,
   /export const updateActivity[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)/,
   'Update activity API should block edits to archived activities server-side.'
+);
+const useActivitiesSource = readFileSync('src/hooks/use-activities.ts', 'utf8');
+assert.match(
+  useActivitiesSource,
+  /source\?: ActivitySourceMaterialFilter/,
+  'useActivities should expose source-material filtering to route callers.'
+);
+assert.match(
+  useActivitiesSource,
+  /queryKey: activitiesKeys\.list\({[\s\S]*source,[\s\S]*}\)/,
+  'useActivities query key should include the source-material filter.'
+);
+const dashboardActivitiesRouteSource = readFileSync(
+  'src/routes/dashboard/activities.tsx',
+  'utf8'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /const \{ created, page, q, source, status, template \} = Route\.useSearch\(\)/,
+  'Activity library route should read the source-material filter from URL search.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /source: sourceFilter/,
+  'Activity library route should pass the source-material filter to list queries and preserve it in pagination.'
 );
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
 assert.match(

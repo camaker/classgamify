@@ -12,6 +12,7 @@ import { generateActivityDraft } from '@/api/activity-ai';
 import type { ActivityTemplateType } from '@/activities/types';
 import type { GenerateActivityDraftInput } from '@/activities/ai-draft';
 import type { CreateActivityInput } from '@/activities/validation';
+import type { ActivitySourceMaterialFilter } from '@/activities/library-filters';
 import {
   keepPreviousData,
   useMutation,
@@ -28,6 +29,7 @@ const activitiesKeys = {
     pageIndex: number;
     pageSize: number;
     search?: string;
+    source?: ActivitySourceMaterialFilter;
     status?: 'active' | 'archived';
     template?: ActivityTemplateType;
   }) => [...activitiesKeys.lists(), params] as const,
@@ -39,6 +41,7 @@ export function useActivities({
   pageIndex = 0,
   pageSize = 24,
   search,
+  source = 'all',
   status = 'active',
   template,
 }: {
@@ -46,6 +49,7 @@ export function useActivities({
   pageIndex?: number;
   pageSize?: number;
   search?: string;
+  source?: ActivitySourceMaterialFilter;
   status?: 'active' | 'archived';
   template?: ActivityTemplateType;
 }) {
@@ -58,6 +62,7 @@ export function useActivities({
           pageIndex,
           pageSize,
           search,
+          source,
           status,
           template,
         },
@@ -67,6 +72,7 @@ export function useActivities({
       pageIndex,
       pageSize,
       search,
+      source,
       status,
       template,
     }),

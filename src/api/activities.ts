@@ -9,7 +9,10 @@ import {
   buildRemixedActivityTitle,
 } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
-import { normalizeActivityLibrarySearch } from '@/activities/library-filters';
+import {
+  matchesActivitySourceMaterialFilter,
+  normalizeActivityLibrarySearch,
+} from '@/activities/library-filters';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import {
   assertActivityCanDeriveWork,
@@ -24,17 +27,25 @@ import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, ne, or } from 'drizzle-orm';
+import { and, eq, ne, or } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
 const activityListStatusSchema = z.enum(['active', 'archived']);
+const activityListSourceSchema = z.enum([
+  'all',
+  'audio',
+  'extractable',
+  'spreadsheet',
+  'worksheet',
+]);
 
 const listActivitiesInputSchema = z.object({
   createdActivityId: z.string().trim().min(1).max(80).optional(),
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z.number().int().min(1).max(100).default(24),
   search: z.string().trim().max(120).optional(),
+  source: activityListSourceSchema.default('all'),
   status: activityListStatusSchema.default('active'),
   template: activityTemplateTypeSchema.optional(),
 });
@@ -67,11 +78,17 @@ export const listActivities = createServerFn({ method: 'GET' })
       searchWhere
     );
 
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(activity)
-      .where(where);
-    const matchingActivities = await db.select().from(activity).where(where);
+    const matchingRows = await db.select().from(activity).where(where);
+    const matchingActivities =
+      data.source === 'all'
+        ? matchingRows
+        : matchingRows.filter((item) =>
+            matchesActivitySourceMaterialFilter({
+              content: item.contentJson,
+              source: data.source,
+            })
+          );
+    const total = matchingActivities.length;
     const [createdActivity] = data.createdActivityId
       ? await db
           .select({
@@ -89,19 +106,18 @@ export const listActivities = createServerFn({ method: 'GET' })
           )
           .limit(1)
       : [];
-    const items = await db
-      .select()
-      .from(activity)
-      .where(where)
-      .orderBy(desc(activity.updatedAt))
-      .limit(data.pageSize)
-      .offset(data.pageIndex * data.pageSize);
+    const items = matchingActivities
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      .slice(
+        data.pageIndex * data.pageSize,
+        (data.pageIndex + 1) * data.pageSize
+      );
 
     return {
       createdActivity,
       items,
       summary: summarizeActivityLibrary(matchingActivities),
-      total: totalRow?.count ?? 0,
+      total,
     };
   });
 

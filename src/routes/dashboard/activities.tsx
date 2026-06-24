@@ -8,6 +8,7 @@ import {
 } from '@/activities/lifecycle';
 import {
   type ActivityLibraryStatus,
+  type ActivitySourceMaterialFilter,
   type ActivityTemplateFilter,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
@@ -92,9 +93,10 @@ export const Route = createFileRoute('/dashboard/activities')({
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
-  const { created, page, q, status, template } = Route.useSearch();
+  const { created, page, q, source, status, template } = Route.useSearch();
   const searchQuery = q ?? '';
   const libraryStatus = status ?? 'active';
+  const sourceFilter: ActivitySourceMaterialFilter = source ?? 'all';
   const templateFilter: ActivityTemplateFilter = template ?? 'all';
   const currentPage = page ?? 1;
   const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
@@ -103,6 +105,7 @@ function DashboardActivitiesPage() {
     pageIndex: currentPage - 1,
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
     search: normalizedSearchQuery,
+    source: sourceFilter,
     status: libraryStatus,
     template,
   });
@@ -126,6 +129,7 @@ function DashboardActivitiesPage() {
     : undefined;
   const hasFilters =
     Boolean(normalizedSearchQuery) ||
+    sourceFilter !== 'all' ||
     templateFilter !== 'all' ||
     libraryStatus !== 'active';
   const emptyStateView = buildActivityLibraryEmptyStateView({
@@ -148,10 +152,12 @@ function DashboardActivitiesPage() {
 
   function updateLibraryFilters(next: {
     q?: string;
+    source?: ActivitySourceMaterialFilter;
     status?: ActivityLibraryStatus;
     template?: ActivityTemplateFilter;
   }) {
     const nextQuery = next.q ?? searchQuery;
+    const nextSource = next.source ?? sourceFilter;
     const nextStatus = next.status ?? libraryStatus;
     const nextTemplate = next.template ?? templateFilter;
 
@@ -161,6 +167,7 @@ function DashboardActivitiesPage() {
         created,
         page: undefined,
         q: nextQuery.trim() ? nextQuery : undefined,
+        source: nextSource,
         status: nextStatus,
         template: nextTemplate,
       }),
@@ -174,6 +181,7 @@ function DashboardActivitiesPage() {
         current: {
           created,
           q: searchQuery,
+          source: sourceFilter,
           status: libraryStatus,
           template: templateFilter,
         },
@@ -242,6 +250,7 @@ function DashboardActivitiesPage() {
                 search: buildActivityLibraryRouteSearch({
                   page: currentPage === 1 ? undefined : currentPage,
                   q: searchQuery.trim() ? searchQuery : undefined,
+                  source: sourceFilter,
                   status: libraryStatus,
                   template: templateFilter,
                 }),
