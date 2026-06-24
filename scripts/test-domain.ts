@@ -133,7 +133,10 @@ import {
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
 } from '@/activities/template-entry';
-import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
+import {
+  ACTIVITY_TEMPLATE_TYPES,
+  type ActivityTemplateType,
+} from '@/activities/types';
 import {
   buildActivityContent,
   createActivityInputSchema,
@@ -212,6 +215,7 @@ import {
   stripRuntimeAnswer,
   stripRuntimeAnswers,
 } from '@/assignments/public';
+import { buildAssignmentSnapshotInsert } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
   buildAssignmentListPageRouteSearch,
@@ -4127,6 +4131,29 @@ const publicPayloadSnapshotContent = buildActivityContent({
       size: 512,
     },
   ],
+});
+const assignmentSnapshotCreatedAt = new Date('2026-01-15T12:30:00.000Z');
+const assignmentSnapshotSourceActivity = {
+  contentJson: publicPayloadSnapshotContent,
+  description: 'Snapshot source description',
+  templateType: 'quiz' as ActivityTemplateType,
+  title: 'Snapshot source title',
+};
+const assignmentSnapshotInsert = buildAssignmentSnapshotInsert({
+  assignmentId: 'assignment-snapshot-1',
+  createdAt: assignmentSnapshotCreatedAt,
+  sourceActivity: assignmentSnapshotSourceActivity,
+});
+assignmentSnapshotSourceActivity.description = 'Edited after publish';
+assignmentSnapshotSourceActivity.templateType = 'match-up';
+assignmentSnapshotSourceActivity.title = 'Edited source title';
+assert.deepEqual(assignmentSnapshotInsert, {
+  activityDescription: 'Snapshot source description',
+  activityTitle: 'Snapshot source title',
+  assignmentId: 'assignment-snapshot-1',
+  contentJson: publicPayloadSnapshotContent,
+  createdAt: assignmentSnapshotCreatedAt,
+  templateType: 'quiz',
 });
 const publicAssignmentPayloadSource = {
   activity: {

@@ -38,6 +38,7 @@ import {
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { buildAssignmentSnapshotInsert } from '@/assignments/snapshot';
 import { getDb } from '@/db';
 import {
   activity,
@@ -334,14 +335,13 @@ export const publishAssignment = createServerFn({ method: 'POST' })
         updatedAt: now,
       });
 
-      await tx.insert(assignmentSnapshot).values({
-        activityDescription: sourceActivity.description,
-        activityTitle: sourceActivity.title,
-        assignmentId: id,
-        contentJson: sourceActivity.contentJson,
-        createdAt: now,
-        templateType: sourceActivity.templateType,
-      });
+      await tx.insert(assignmentSnapshot).values(
+        buildAssignmentSnapshotInsert({
+          assignmentId: id,
+          createdAt: now,
+          sourceActivity,
+        })
+      );
     });
 
     const [row] = await db
