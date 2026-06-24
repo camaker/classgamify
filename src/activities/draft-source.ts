@@ -1,5 +1,6 @@
 import type { CreateActivityInput } from '@/activities/validation';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import type { ActivityMaterialReference } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 
@@ -29,15 +30,26 @@ export function buildActivitySourceMaterialDraftNotes(value: unknown) {
   const materials = normalizeActivityMaterialReferences(value);
   if (materials.length === 0) return undefined;
 
+  const safeNotes = materials.map(toActivitySourceMaterialDraftNote);
+
   return [
     m.activity_draft_source_materials_heading(),
-    ...materials.map((material) =>
+    ...safeNotes.map((note) =>
       m.activity_draft_source_materials_item({
-        kind: formatUserFileMaterialKind(material.kind),
-        name: material.originalName,
+        kind: note.kindLabel,
+        name: note.name,
       })
     ),
   ].join('\n');
+}
+
+function toActivitySourceMaterialDraftNote(
+  material: ActivityMaterialReference
+) {
+  return {
+    kindLabel: formatUserFileMaterialKind(material.kind),
+    name: material.originalName,
+  };
 }
 
 function buildActivityDraftSourceText(values: Array<string | undefined>) {

@@ -8361,6 +8361,32 @@ assert.equal(
     '- Worksheet document: revision worksheet.pdf',
   ].join('\n')
 );
+const unsafeMaterialMetadataPattern =
+  /r2Key|userfiles\/|fileId|contentType|size|permission|ownerId|storageKey/i;
+const sensitiveMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
+  {
+    contentType: 'application/pdf',
+    fileId: 'file-secret-worksheet',
+    kind: 'worksheet-document',
+    originalName: 'safe worksheet.pdf',
+    ownerId: 'teacher-secret',
+    permission: 'owner-only',
+    r2Key: 'userfiles/teacher-secret/safe worksheet.pdf',
+    size: 512,
+    storageKey: 'private-storage-key',
+  },
+]);
+assert.equal(
+  sensitiveMaterialDraftNotes,
+  [
+    'Attached classroom source materials:',
+    '- Worksheet document: safe worksheet.pdf',
+  ].join('\n')
+);
+assert.doesNotMatch(
+  sensitiveMaterialDraftNotes ?? '',
+  unsafeMaterialMetadataPattern
+);
 const materialDraftSourceText = getActivityDraftSourceText({
   ...fallbackDraft,
   groupsText: '',
@@ -8378,7 +8404,7 @@ assert.equal(
     'Attached classroom source materials:\n- Audio: 三年级听力.mp3',
   ].join('\n\n')
 );
-assert.doesNotMatch(materialDraftSourceText, /r2Key|userfiles\/|fileId/);
+assert.doesNotMatch(materialDraftSourceText, unsafeMaterialMetadataPattern);
 assert.equal(
   buildGenerateActivityDraftInputFromEditor({
     current: {
