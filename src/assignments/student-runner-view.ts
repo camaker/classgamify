@@ -316,6 +316,7 @@ function getStudentRunnerReviewStatus(
   reviewItem?: PublicAttemptReviewItem
 ): StudentRunnerReviewStatus {
   if (!reviewItem) return 'idle';
+  if (!reviewItem.submitted) return 'idle';
   return reviewItem.correct ? 'correct' : 'needs-review';
 }
 

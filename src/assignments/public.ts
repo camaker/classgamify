@@ -35,6 +35,7 @@ export type PublicAttemptReviewItem = {
   correctAnswer: string;
   explanation?: string;
   itemId: string;
+  submitted: boolean;
 };
 
 export type PublicAssignmentPayload = {
@@ -228,19 +229,21 @@ function buildAttemptReviewItems({
   answers: AttemptAnswer[];
   runtimeItems: RuntimeItem[];
 }): PublicAttemptReviewItem[] {
-  const correctnessByItemId = new Map(
-    answers.map((answer) => [answer.itemId, Boolean(answer.correct)])
+  const answerByItemId = new Map(
+    answers.map((answer) => [answer.itemId, answer])
   );
 
   return runtimeItems.map((item) => {
     const acceptedAnswers = getAcceptedAnswers(item.answer);
+    const answer = answerByItemId.get(item.id);
 
     return {
       acceptedAnswers,
-      correct: correctnessByItemId.get(item.id) ?? false,
+      correct: Boolean(answer?.correct),
       correctAnswer: acceptedAnswers[0] ?? item.answer,
       explanation: item.explanation,
       itemId: item.id,
+      submitted: Boolean(answer?.answer.trim()),
     };
   });
 }

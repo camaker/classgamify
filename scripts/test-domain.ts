@@ -2227,6 +2227,7 @@ assert.deepEqual(
       correctAnswer: 'Paris',
       explanation: 'Paris is the capital of France.',
       itemId: 'item-1',
+      submitted: true,
     },
   }),
   {
@@ -2247,6 +2248,7 @@ assert.deepEqual(
       correct: true,
       correctAnswer: 'Mitochondria',
       itemId: 'item-2',
+      submitted: true,
     },
   }),
   {
@@ -5035,12 +5037,14 @@ const publicReviewMap = buildPublicAttemptReviewItemMap([
     correctAnswer: 'Paris',
     explanation: 'Paris is the capital of France.',
     itemId: 'q-1',
+    submitted: true,
   },
   {
     acceptedAnswers: ['Cold'],
     correct: false,
     correctAnswer: 'Cold',
     itemId: 'pair-1',
+    submitted: true,
   },
 ]);
 assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
@@ -5181,8 +5185,68 @@ assert.deepEqual(
       correctAnswer: 'Paris',
       explanation: 'Paris is the capital of France.',
       itemId: 'q-1',
+      submitted: true,
     },
   ]
+);
+const partialPublicReviewItems = buildPublicAttemptReviewItems({
+  answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+  runtimeItems: [
+    {
+      answer: 'Paris / Paris, France',
+      explanation: 'Paris is the capital of France.',
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+    {
+      answer: 'Cold',
+      choices: ['Cold', 'Warm'],
+      id: 'pair-1',
+      kind: 'pair',
+      prompt: 'Hot',
+    },
+  ],
+  showCorrectAnswers: true,
+});
+assert.deepEqual(partialPublicReviewItems, [
+  {
+    acceptedAnswers: ['Paris', 'Paris, France'],
+    correct: true,
+    correctAnswer: 'Paris',
+    explanation: 'Paris is the capital of France.',
+    itemId: 'q-1',
+    submitted: true,
+  },
+  {
+    acceptedAnswers: ['Cold'],
+    correct: false,
+    correctAnswer: 'Cold',
+    explanation: undefined,
+    itemId: 'pair-1',
+    submitted: false,
+  },
+]);
+assert.equal(
+  buildStudentRunnerView({
+    answers: { 'q-1': 'Paris' },
+    items: [
+      {
+        choices: ['Paris', 'Rome'],
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+      {
+        choices: ['Cold', 'Warm'],
+        id: 'pair-1',
+        kind: 'pair',
+        prompt: 'Hot',
+      },
+    ],
+    reviewItems: partialPublicReviewItems,
+  }).itemViewsById.get('pair-1')?.status,
+  'idle'
 );
 const publicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
