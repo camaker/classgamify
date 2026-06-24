@@ -44,6 +44,7 @@ import {
   assignmentSnapshot,
   attempt,
 } from '@/db/app.schema';
+import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
@@ -56,7 +57,6 @@ import {
   inArray,
   isNotNull,
   isNull,
-  like,
   lte,
   or,
   type SQL,
@@ -218,13 +218,16 @@ function buildAssignmentListWhere({
   if (normalizedSearch) {
     filters.push(
       or(
-        like(assignment.title, `%${normalizedSearch}%`),
-        like(assignment.shareSlug, `%${normalizedSearch}%`),
-        like(activity.title, `%${normalizedSearch}%`),
-        like(activity.description, `%${normalizedSearch}%`),
-        like(assignmentSnapshot.activityTitle, `%${normalizedSearch}%`),
-        like(assignmentSnapshot.activityDescription, `%${normalizedSearch}%`),
-        like(assignmentSnapshot.templateType, `%${normalizedSearch}%`)
+        sqlLikeContains(assignment.title, normalizedSearch),
+        sqlLikeContains(assignment.shareSlug, normalizedSearch),
+        sqlLikeContains(activity.title, normalizedSearch),
+        sqlLikeContains(activity.description, normalizedSearch),
+        sqlLikeContains(assignmentSnapshot.activityTitle, normalizedSearch),
+        sqlLikeContains(
+          assignmentSnapshot.activityDescription,
+          normalizedSearch
+        ),
+        sqlLikeContains(assignmentSnapshot.templateType, normalizedSearch)
       ) as SQL
     );
   }

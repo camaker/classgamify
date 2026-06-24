@@ -20,10 +20,11 @@ import {
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
+import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, like, ne, or } from 'drizzle-orm';
+import { and, count, desc, eq, ne, or } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -47,9 +48,9 @@ export const listActivities = createServerFn({ method: 'GET' })
     const search = normalizeActivityLibrarySearch(data.search);
     const searchWhere = search
       ? or(
-          like(activity.title, `%${search}%`),
-          like(activity.description, `%${search}%`),
-          like(activity.templateType, `%${search}%`)
+          sqlLikeContains(activity.title, search),
+          sqlLikeContains(activity.description, search),
+          sqlLikeContains(activity.templateType, search)
         )
       : undefined;
     const statusWhere =

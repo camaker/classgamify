@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
@@ -4839,6 +4840,10 @@ assert.deepEqual(
 assert.equal(normalizeActivityLibrarySearch('  word   match  '), 'word match');
 assert.equal(normalizeActivityLibrarySearch('  Ｇｒｏｕｐ   １  '), 'Group 1');
 assert.equal(normalizeActivityLibrarySearch('   '), undefined);
+assert.equal(
+  buildSqlLikeContainsPattern('100%_ \\ review'),
+  String.raw`%100\%\_ \\ review%`
+);
 assert.deepEqual(
   buildActivityLibraryValidatedSearch({
     created: ' activity-1 ',
@@ -4965,6 +4970,16 @@ assert.throws(
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 assert.match(
   activitiesApiSource,
+  /sqlLikeContains\(activity\.title, search\)/,
+  'Activity list search should escape SQL LIKE wildcard characters.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /like\(activity\.title, `%\$\{search\}%`\)/,
+  'Activity list search should not pass raw user text directly to LIKE.'
+);
+assert.match(
+  activitiesApiSource,
   /assertActivityCanArchive\(row\.visibility\)/,
   'Archive activity API should enforce the activity lifecycle transition server-side.'
 );
@@ -4989,6 +5004,16 @@ assert.match(
   'Update activity API should block edits to archived activities server-side.'
 );
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
+assert.match(
+  assignmentsApiSource,
+  /sqlLikeContains\(assignment\.title, normalizedSearch\)/,
+  'Assignment list search should escape SQL LIKE wildcard characters.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /like\(assignment\.title, `%\$\{normalizedSearch\}%`\)/,
+  'Assignment list search should not pass raw user text directly to LIKE.'
+);
 assert.match(
   assignmentsApiSource,
   /export const publishAssignment[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
