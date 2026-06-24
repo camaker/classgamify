@@ -614,6 +614,20 @@ for (const { filePath, patterns } of localizedLegalPageRequirements) {
     );
   }
 }
+for (const filePath of [
+  'content/pages/terms.md',
+  'content/pages/privacy.md',
+  'content/pages/cookie.md',
+  'content/pages/terms.zh.md',
+  'content/pages/privacy.zh.md',
+  'content/pages/cookie.zh.md',
+]) {
+  assert.doesNotMatch(
+    readFileSync(filePath, 'utf8'),
+    /\bAI demos?\b/i,
+    `${filePath} should describe AI as teacher-reviewed product capability, not demo positioning.`
+  );
+}
 const environmentTemplateFiles = ['.env.example', '.env.production.example'];
 for (const filePath of environmentTemplateFiles) {
   const fileText = readFileSync(filePath, 'utf8');

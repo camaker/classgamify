@@ -1,7 +1,7 @@
 ---
 title: Terms of Service
 description: Terms for using ClassGamify's classroom activity platform
-date: 2026-06-20
+date: 2026-06-24
 ---
 
 ## Agreement
@@ -168,12 +168,12 @@ and security. These services may have their own terms, policies, outages,
 limits, and data practices. We are not responsible for third-party services, but
 we choose them to support ClassGamify's operation.
 
-Cloudflare Workers AI, fal.ai, or similar providers may power AI demos, text
-generation, image generation, or future experimental classroom features. Payment
-providers such as Creem or Stripe may process checkout, invoices,
-subscriptions, taxes, and fraud prevention if paid features are enabled. Email,
-storage, authentication, and analytics providers may process information needed
-to operate those features.
+Cloudflare Workers AI, fal.ai, or similar providers may power AI-assisted
+activity drafts, text generation, image generation, worksheet extraction, or
+future experimental classroom features. Payment providers such as Creem or
+Stripe may process checkout, invoices, subscriptions, taxes, and fraud
+prevention if paid features are enabled. Email, storage, authentication, and
+analytics providers may process information needed to operate those features.
 
 ## Privacy
 
