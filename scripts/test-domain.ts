@@ -5982,6 +5982,31 @@ assert.match(
   /buildPublicAssignmentPayload[\s\S]*resolveAssignmentRuntimeSource\(\{[\s\S]*runtimeItems = resolvedSource\.runtimeItems/,
   'Public assignment payloads should build sanitized runtime items from the shared frozen assignment runtime source.'
 );
+const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
+assert.match(
+  activityAiApiSource,
+  /generateActivityDraftFromAi\(data\)/,
+  'AI draft server function should return a teacher-reviewable activity draft instead of persisting activity rows.'
+);
+assert.doesNotMatch(
+  activityAiApiSource,
+  /getDb|db\.|insert\(activity\)|from\(activity\)|@\/db/,
+  'AI draft server function should not write directly to the activity database.'
+);
+const activityAiDraftSource = readFileSync(
+  'src/activities/ai-draft.ts',
+  'utf8'
+);
+assert.match(
+  activityAiDraftSource,
+  /function createActivityDraftResult[\s\S]*activity,[\s\S]*meta: buildActivityDraftMeta\(\{[\s\S]*currentTemplateType: input\.templateType/,
+  'AI draft results should include deterministic coverage and template-readiness metadata for editor review.'
+);
+assert.match(
+  activityAiDraftSource,
+  /type ActivityDraftResult = \{[\s\S]*activity: CreateActivityInput;[\s\S]*meta: ActivityDraftMeta;[\s\S]*provider: 'fallback' \| 'workers-ai';/,
+  'AI draft result contract should expose editor input, meta, provider, and model provenance.'
+);
 assert.match(
   assignmentsApiSource,
   /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
