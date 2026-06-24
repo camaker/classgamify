@@ -1293,6 +1293,13 @@ assert.deepEqual(
         label: 'Worksheet document',
       },
     ],
+    readiness: {
+      capabilities: ['audio-extraction', 'worksheet-extraction'],
+      extractableCount: 2,
+      hasAudio: true,
+      hasSpreadsheet: false,
+      hasWorksheet: true,
+    },
     title: 'Source materials',
   }
 );
@@ -1300,6 +1307,13 @@ assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   countLabel: '0 files',
   hasMaterials: false,
   kindBadges: [],
+  readiness: {
+    capabilities: [],
+    extractableCount: 0,
+    hasAudio: false,
+    hasSpreadsheet: false,
+    hasWorksheet: false,
+  },
   title: 'Source materials',
 });
 assert.equal(
@@ -6249,6 +6263,13 @@ assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
   countLabel: '0 files',
   hasMaterials: false,
   kindBadges: [],
+  readiness: {
+    capabilities: [],
+    extractableCount: 0,
+    hasAudio: false,
+    hasSpreadsheet: false,
+    hasWorksheet: false,
+  },
   title: 'Source materials',
 });
 assert.deepEqual(
@@ -6266,6 +6287,13 @@ assert.deepEqual(
     countLabel: '1 file',
     hasMaterials: true,
     kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
+    readiness: {
+      capabilities: ['audio-extraction'],
+      extractableCount: 1,
+      hasAudio: true,
+      hasSpreadsheet: false,
+      hasWorksheet: false,
+    },
     title: 'Source materials',
   }
 );

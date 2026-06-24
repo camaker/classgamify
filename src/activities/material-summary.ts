@@ -16,7 +16,7 @@ export type ActivitySourceMaterialReadinessCapability =
   | 'spreadsheet-import'
   | 'worksheet-extraction';
 
-type ActivitySourceMaterialReadiness = {
+export type ActivitySourceMaterialReadiness = {
   capabilities: ActivitySourceMaterialReadinessCapability[];
   extractableCount: number;
   hasAudio: boolean;
@@ -39,6 +39,7 @@ export type ActivitySourceMaterialSummaryView = {
     kind: UserFileMaterialKind;
     label: string;
   }>;
+  readiness: ActivitySourceMaterialReadiness;
   title: string;
 };
 
@@ -81,6 +82,7 @@ export function buildActivitySourceMaterialSummaryView(
       ...item,
       label: formatUserFileMaterialKind(item.kind),
     })),
+    readiness: summary.readiness,
     title: m.activity_source_material_summary_title(),
   };
 }
