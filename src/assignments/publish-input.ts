@@ -7,6 +7,10 @@ export function formatAssignmentDateTimeLocal(date: Date) {
   return localDate.toISOString().slice(0, 16);
 }
 
+export function buildAssignmentPublishCloseAfterMinLocal(now = new Date()) {
+  return formatAssignmentDateTimeLocal(new Date(now.getTime() + 60 * 1000));
+}
+
 export function parseAssignmentDateTimeLocal(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return null;

@@ -3,12 +3,12 @@ import { buildActivityLifecycleActionView } from '@/activities/lifecycle';
 import {
   assignmentPublishDialogCopy,
   buildAssignmentPublishDraft,
+  buildAssignmentPublishCloseAfterMinLocal,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishInputFromDraft,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishToggleViews,
-  formatAssignmentDateTimeLocal,
   validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -243,9 +243,7 @@ export function ActivityPublishDialog({
             <Input
               id={`expires-at-${activity.id}`}
               type="datetime-local"
-              min={formatAssignmentDateTimeLocal(
-                new Date(Date.now() + 60 * 1000)
-              )}
+              min={buildAssignmentPublishCloseAfterMinLocal()}
               value={expiresAtLocal}
               onChange={(event) => setExpiresAtLocal(event.currentTarget.value)}
             />

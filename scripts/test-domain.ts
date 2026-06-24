@@ -347,6 +347,7 @@ import {
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
+  buildAssignmentPublishCloseAfterMinLocal,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishPreviewFromDraft,
@@ -786,6 +787,11 @@ assert.match(
   activityPublishDialogSource,
   /toast\.error\(actionView\.failureMessage\)/,
   'Assignment publish failures should use localized publish failure copy.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /min=\{buildAssignmentPublishCloseAfterMinLocal\(\)\}/,
+  'Assignment publish close-time input minimum should come from the assignment publish domain helper.'
 );
 const publicPlayRouteSource = readFileSync(
   'src/routes/play/$shareId.tsx',
@@ -2929,6 +2935,10 @@ assert.equal(
 assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+);
+assert.equal(
+  buildAssignmentPublishCloseAfterMinLocal(new Date(2026, 0, 10, 9, 30, 45)),
+  '2026-01-10T09:31'
 );
 assert.deepEqual(
   buildAssignmentPublishDraftDefaults({
