@@ -5072,6 +5072,16 @@ assert.match(
   /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
   'Submit attempt API should build student review payloads in the same stable delivery order.'
 );
+assert.match(
+  assignmentsApiSource,
+  /export const getAssignmentResults[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*analyzeAssignmentResults/,
+  'Assignment results API should only return completed attempts with scored results.'
+);
+assert.match(
+  assignmentsApiSource,
+  /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
+  'Assignment attempt limits should only count completed attempts with scored results.'
+);
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),

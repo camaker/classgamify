@@ -454,7 +454,12 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     const attempts = await db
       .select()
       .from(attempt)
-      .where(eq(attempt.assignmentId, row.assignment.id))
+      .where(
+        and(
+          eq(attempt.assignmentId, row.assignment.id),
+          isNotNull(attempt.resultJson)
+        )
+      )
       .orderBy(desc(attempt.completedAt));
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const stats = summarizeAssignmentAttempts(attempts, {
@@ -659,7 +664,8 @@ async function countPreviousIdentityAttempts({
       .where(
         and(
           eq(attempt.assignmentId, assignmentId),
-          eq(attempt.anonymousToken, strategy.identity.anonymousToken)
+          eq(attempt.anonymousToken, strategy.identity.anonymousToken),
+          isNotNull(attempt.resultJson)
         )
       );
 
@@ -673,7 +679,12 @@ async function countPreviousIdentityAttempts({
         studentName: attempt.studentName,
       })
       .from(attempt)
-      .where(eq(attempt.assignmentId, assignmentId));
+      .where(
+        and(
+          eq(attempt.assignmentId, assignmentId),
+          isNotNull(attempt.resultJson)
+        )
+      );
 
     return countMatchingStudentIdentityAttempts({
       attempts: previousAttempts,
