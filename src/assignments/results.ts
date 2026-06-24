@@ -74,11 +74,12 @@ export function analyzeAssignmentResults({
   attempts: AttemptForAnalysis[];
   runtimeItems: RuntimeItem[];
 }): AssignmentResultsAnalysis {
+  const completedAttempts = attempts.filter(hasAttemptResult);
   const runtimeItemById = new Map(runtimeItems.map((item) => [item.id, item]));
-  const identityResolver = createStudentIdentityResolver(attempts);
+  const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getAcceptedAnswers(item.answer);
-    const submittedAnswers = attempts
+    const submittedAnswers = completedAttempts
       .map((attempt) =>
         attempt.answersJson.answers.find((answer) => answer.itemId === item.id)
       )
@@ -105,7 +106,7 @@ export function analyzeAssignmentResults({
     };
   });
 
-  const attemptReviews = attempts.map((attempt) => {
+  const attemptReviews = completedAttempts.map((attempt) => {
     const identity = identityResolver.resolve(attempt);
 
     return {
@@ -139,6 +140,12 @@ export function analyzeAssignmentResults({
     perItem,
     students: buildStudentSummaries(attemptReviews),
   };
+}
+
+function hasAttemptResult(
+  attempt: AttemptForAnalysis
+): attempt is AttemptForAnalysis & { resultJson: AttemptResult } {
+  return attempt.resultJson != null;
 }
 
 function getAttemptReviewAccuracy(attempt: AttemptForAnalysis) {

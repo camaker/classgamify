@@ -9293,6 +9293,55 @@ const resultAnalysis = analyzeAssignmentResults({
   runtimeItems: resultRuntimeItems,
 });
 
+const resultAnalysisWithUnscoredAttempt = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'completed-attempt',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'Alice',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: null,
+      id: 'unscored-attempt',
+      resultJson: null,
+      score: null,
+      studentName: 'Bob',
+    },
+  ],
+  runtimeItems: resultRuntimeItems,
+});
+assert.deepEqual(
+  resultAnalysisWithUnscoredAttempt.attempts.map((attempt) => attempt.id),
+  ['completed-attempt']
+);
+assert.equal(resultAnalysisWithUnscoredAttempt.perItem[0]?.submittedCount, 1);
+assert.equal(resultAnalysisWithUnscoredAttempt.perItem[0]?.correctRate, 100);
+assert.deepEqual(
+  resultAnalysisWithUnscoredAttempt.students.map((student) => ({
+    attempts: student.attempts,
+    studentLabel: student.studentLabel,
+  })),
+  [{ attempts: 1, studentLabel: 'Alice' }]
+);
+
 assert.equal(resultAnalysis.perItem[0]?.correctCount, 2);
 assert.equal(resultAnalysis.perItem[0]?.submittedCount, 3);
 assert.equal(resultAnalysis.perItem[0]?.correctRate, 67);
@@ -11075,6 +11124,39 @@ assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
+const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
+  ...csvExportData,
+  analysis: resultAnalysisWithUnscoredAttempt,
+  attempts: [
+    {
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'completed-attempt',
+      maxScore: 1,
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        durationSeconds: 20,
+        totalPoints: 1,
+      },
+      score: 1,
+    },
+    {
+      completedAt: null,
+      id: 'unscored-attempt',
+      maxScore: null,
+      resultJson: null,
+      score: null,
+    },
+  ],
+  stats: {
+    averageDurationSeconds: 20,
+    averagePoints: 1,
+    averageScore: 100,
+    completions: 1,
+  },
+});
+assert.match(csvWithUnscoredAttempt, /"completed-attempt","Alice"/);
+assert.doesNotMatch(csvWithUnscoredAttempt, /unscored-attempt|Bob|Rome/);
 const weightedScoreCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   attempts: [
