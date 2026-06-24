@@ -80,11 +80,9 @@ export function analyzeAssignmentResults({
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getAcceptedAnswers(item.answer);
-    const submittedAnswers = completedAttempts
-      .map((attempt) =>
-        attempt.answersJson.answers.find((answer) => answer.itemId === item.id)
-      )
-      .filter((answer) => answer?.answer.trim());
+    const submittedAnswers = completedAttempts.map((attempt) =>
+      attempt.answersJson.answers.find((answer) => answer.itemId === item.id)
+    );
     const correctCount = submittedAnswers.filter(
       (answer) => answer?.correct
     ).length;
