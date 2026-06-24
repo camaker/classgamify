@@ -11,7 +11,6 @@ import type {
   AssignmentStatus,
   AttemptAnswer,
 } from '@/activities/types';
-import { getRuntimeItems } from '@/activities/runtime';
 import {
   type AssignmentLifecycleStatus,
   getAssignmentLifecycleStatus,
@@ -19,7 +18,7 @@ import {
 } from '@/assignments/lifecycle';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
+import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
@@ -156,13 +155,13 @@ export function buildPublicAssignmentPayload({
   assignment,
   snapshot,
 }: PublicAssignmentPayloadSource): PublicAssignmentPayload {
-  const resolvedSource = resolveAssignmentSnapshotSource({
+  const resolvedSource = resolveAssignmentRuntimeSource({
     activity,
     snapshot,
   });
-  const content = resolvedSource.contentJson ?? activity.contentJson;
+  const content = resolvedSource.contentJson;
   const templateType = resolvedSource.templateType;
-  const runtimeItems = getRuntimeItems(templateType, content);
+  const runtimeItems = resolvedSource.runtimeItems;
   const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
   const settings = resolveAssignmentSettings(assignment.settingsJson);
   const orderedRuntimeItems = orderAssignmentRuntimeItems({

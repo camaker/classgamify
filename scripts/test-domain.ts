@@ -219,6 +219,7 @@ import {
 } from '@/assignments/public';
 import {
   buildAssignmentSnapshotInsert,
+  resolveAssignmentRuntimeSource,
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
@@ -4425,6 +4426,51 @@ assert.deepEqual(
     templateType: 'match-up',
   }
 );
+const resolvedAssignmentRuntimeSource = resolveAssignmentRuntimeSource({
+  activity: {
+    contentJson: {
+      ...publicPayloadActivityContent,
+      pairs: [
+        {
+          id: 'current-pair',
+          left: 'Current left',
+          right: 'Current right',
+        },
+      ],
+    },
+    description: 'Current activity description',
+    templateType: 'match-up',
+    title: 'Current activity title',
+  },
+  snapshot: {
+    activityDescription: 'Frozen activity description',
+    activityTitle: 'Frozen activity title',
+    contentJson: publicPayloadSnapshotContent,
+    templateType: 'quiz',
+  },
+});
+assert.equal(resolvedAssignmentRuntimeSource.hasSnapshot, true);
+assert.equal(resolvedAssignmentRuntimeSource.templateType, 'quiz');
+assert.equal(
+  resolvedAssignmentRuntimeSource.contentJson.learningGoal,
+  'Students answer the frozen snapshot content.'
+);
+assert.deepEqual(
+  resolvedAssignmentRuntimeSource.runtimeItems.map((item) => [
+    item.id,
+    item.kind,
+    item.prompt,
+    item.answer,
+  ]),
+  [
+    [
+      'q-frozen-prompt',
+      'question',
+      'Frozen prompt?',
+      'Frozen answer / Frozen accepted',
+    ],
+  ]
+);
 const publicAssignmentPayloadSource = {
   activity: {
     contentJson: publicPayloadActivityContent,
@@ -5884,6 +5930,11 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const submitAttempt[\s\S]*const resolvedSource = resolveAssignmentRuntimeSource\(row\)[\s\S]*items: resolvedSource\.runtimeItems/,
+  'Submit attempt API should resolve playable content and template through the shared assignment runtime helper.'
+);
+assert.match(
+  assignmentsApiSource,
   /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
   'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
 );
@@ -5899,6 +5950,11 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const getAssignmentResults[\s\S]*const resolvedSource = resolveAssignmentRuntimeSource\(row\)[\s\S]*runtimeItems: resolvedSource\.runtimeItems/,
+  'Assignment results API should analyze attempts against the shared frozen assignment runtime source.'
+);
+assert.match(
+  assignmentsApiSource,
   /export const getPrintableAssignmentWorksheet = createServerFn\(\{[\s\S]*method: 'GET'[\s\S]*\}\)[\s\S]*\.middleware\(\[authApiMiddleware\]\)/,
   'Printable worksheet API should require authenticated teacher access.'
 );
@@ -5909,18 +5965,22 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getPrintableAssignmentWorksheet[\s\S]*const resolvedSource = resolveAssignmentSnapshotSource\(row\)[\s\S]*const content = resolvedSource\.contentJson \?\? row\.activity\.contentJson/,
-  'Printable worksheet API should resolve frozen assignment content through the snapshot domain helper.'
-);
-assert.match(
-  assignmentsApiSource,
-  /export const getPrintableAssignmentWorksheet[\s\S]*const templateType = resolvedSource\.templateType/,
-  'Printable worksheet API should resolve the frozen snapshot template through the snapshot domain helper.'
+  /export const getPrintableAssignmentWorksheet[\s\S]*const resolvedSource = resolveAssignmentRuntimeSource\(row\)[\s\S]*runtimeItems: resolvedSource\.runtimeItems/,
+  'Printable worksheet API should resolve frozen assignment content and template through the shared runtime helper.'
 );
 assert.match(
   assignmentsApiSource,
   /export const getPrintableAssignmentWorksheet[\s\S]*includeAnswerKey: data\.includeAnswerKey/,
   'Printable worksheet API should pass the explicit answer-key choice into the worksheet builder.'
+);
+const assignmentsPublicSource = readFileSync(
+  'src/assignments/public.ts',
+  'utf8'
+);
+assert.match(
+  assignmentsPublicSource,
+  /buildPublicAssignmentPayload[\s\S]*resolveAssignmentRuntimeSource\(\{[\s\S]*runtimeItems = resolvedSource\.runtimeItems/,
+  'Public assignment payloads should build sanitized runtime items from the shared frozen assignment runtime source.'
 );
 assert.match(
   assignmentsApiSource,

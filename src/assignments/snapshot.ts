@@ -1,3 +1,4 @@
+import { getRuntimeItems, type RuntimeItem } from '@/activities/runtime';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
 
 export type AssignmentSnapshotSourceActivity = {
@@ -38,6 +39,12 @@ export type ResolvedAssignmentSnapshotSource = {
   templateType: ActivityTemplateType;
 };
 
+export type ResolvedAssignmentRuntimeSource =
+  ResolvedAssignmentSnapshotSource & {
+    contentJson: ActivityContent;
+    runtimeItems: RuntimeItem[];
+  };
+
 export function buildAssignmentSnapshotInsert({
   assignmentId,
   createdAt,
@@ -72,5 +79,31 @@ export function resolveAssignmentSnapshotSource({
     contentJson: snapshot?.contentJson ?? activity.contentJson,
     hasSnapshot: Boolean(snapshot),
     templateType: snapshot?.templateType ?? activity.templateType,
+  };
+}
+
+export function resolveAssignmentRuntimeSource({
+  activity,
+  snapshot,
+}: {
+  activity: AssignmentSnapshotFallbackActivity & {
+    contentJson: ActivityContent;
+  };
+  snapshot?:
+    | (NonNullable<AssignmentSnapshotFallbackSnapshot> & {
+        contentJson: ActivityContent;
+      })
+    | null;
+}): ResolvedAssignmentRuntimeSource {
+  const resolvedSource = resolveAssignmentSnapshotSource({
+    activity,
+    snapshot,
+  });
+  const contentJson = resolvedSource.contentJson ?? activity.contentJson;
+
+  return {
+    ...resolvedSource,
+    contentJson,
+    runtimeItems: getRuntimeItems(resolvedSource.templateType, contentJson),
   };
 }

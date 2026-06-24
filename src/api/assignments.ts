@@ -1,4 +1,4 @@
-import { evaluateRuntimeAnswers, getRuntimeItems } from '@/activities/runtime';
+import { evaluateRuntimeAnswers } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
@@ -43,7 +43,7 @@ import {
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildAssignmentSnapshotInsert,
-  resolveAssignmentSnapshotSource,
+  resolveAssignmentRuntimeSource,
 } from '@/assignments/snapshot';
 import { getDb } from '@/db';
 import {
@@ -483,16 +483,13 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     const stats = summarizeAssignmentAttempts(attempts, {
       timeLimitSeconds: settings.timeLimitSeconds,
     });
-    const resolvedSource = resolveAssignmentSnapshotSource(row);
-    const content = resolvedSource.contentJson ?? row.activity.contentJson;
-    const templateType = resolvedSource.templateType;
-    const runtimeItems = getRuntimeItems(templateType, content);
+    const resolvedSource = resolveAssignmentRuntimeSource(row);
 
     return {
       ...withResolvedAssignmentSettings(row),
       analysis: analyzeAssignmentResults({
         attempts,
-        runtimeItems,
+        runtimeItems: resolvedSource.runtimeItems,
       }),
       attempts,
       stats,
@@ -531,15 +528,13 @@ export const getPrintableAssignmentWorksheet = createServerFn({
       throw new Error(m.assignment_api_error_assignment_not_found());
     }
 
-    const resolvedSource = resolveAssignmentSnapshotSource(row);
-    const content = resolvedSource.contentJson ?? row.activity.contentJson;
-    const templateType = resolvedSource.templateType;
+    const resolvedSource = resolveAssignmentRuntimeSource(row);
 
     return buildPrintableAssignmentWorksheet({
       activity: row.activity,
       assignment: row.assignment,
       includeAnswerKey: data.includeAnswerKey,
-      runtimeItems: getRuntimeItems(templateType, content),
+      runtimeItems: resolvedSource.runtimeItems,
       snapshot: row.snapshot,
     });
   });
@@ -653,12 +648,11 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       }
     }
 
-    const resolvedSource = resolveAssignmentSnapshotSource(row);
-    const content = resolvedSource.contentJson ?? row.activity.contentJson;
+    const resolvedSource = resolveAssignmentRuntimeSource(row);
+    const content = resolvedSource.contentJson;
     const templateType = resolvedSource.templateType;
-    const runtimeItems = getRuntimeItems(templateType, content);
     const orderedRuntimeItems = orderAssignmentRuntimeItems({
-      items: runtimeItems,
+      items: resolvedSource.runtimeItems,
       shareSlug: row.assignment.shareSlug,
       shuffleItems: settings.shuffleItems,
     });
