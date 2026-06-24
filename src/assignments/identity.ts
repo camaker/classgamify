@@ -6,6 +6,7 @@ const ANONYMOUS_BROWSER_CODE_LENGTH = 6;
 
 export type StudentIdentitySource = {
   anonymousToken?: string | null;
+  completedAt?: Date | string | null;
   studentName?: string | null;
 };
 
@@ -116,13 +117,33 @@ export function createStudentIdentityResolver(
   attempts: StudentIdentitySource[]
 ) {
   const identitiesByGroupingKey = new Map<string, StudentIdentity>();
+  const firstSourcesByGroupingKey = new Map<
+    string,
+    StudentIdentitySource & { order: number }
+  >();
+
+  attempts.forEach((attempt, order) => {
+    const groupingKey = getStudentIdentityGroupingKey(attempt);
+    const existing = firstSourcesByGroupingKey.get(groupingKey);
+    if (
+      existing &&
+      compareStudentIdentitySources(existing, { ...attempt, order }) <= 0
+    ) {
+      return;
+    }
+
+    firstSourcesByGroupingKey.set(groupingKey, { ...attempt, order });
+  });
+
+  const sources = [...firstSourcesByGroupingKey.entries()].sort(
+    ([leftKey, left], [rightKey, right]) =>
+      compareStudentIdentitySources(left, right) ||
+      leftKey.localeCompare(rightKey)
+  );
   let anonymousIndex = 1;
 
-  for (const attempt of attempts) {
-    const groupingKey = getStudentIdentityGroupingKey(attempt);
-    if (identitiesByGroupingKey.has(groupingKey)) continue;
-
-    const studentName = normalizeStudentName(attempt.studentName);
+  for (const [groupingKey, source] of sources) {
+    const studentName = normalizeStudentName(source.studentName);
     if (studentName) {
       identitiesByGroupingKey.set(groupingKey, {
         key: `name:${studentName.toLocaleLowerCase()}`,
@@ -131,7 +152,7 @@ export function createStudentIdentityResolver(
       continue;
     }
 
-    const anonymousToken = normalizeAnonymousToken(attempt.anonymousToken);
+    const anonymousToken = normalizeAnonymousToken(source.anonymousToken);
     const label = anonymousToken
       ? formatAnonymousStudentLabel(anonymousIndex)
       : formatAnonymousStudentLabel();
@@ -166,6 +187,31 @@ export function createStudentIdentityResolver(
       };
     },
   };
+}
+
+function compareStudentIdentitySources(
+  left: StudentIdentitySource & { order: number },
+  right: StudentIdentitySource & { order: number }
+) {
+  const leftTimestamp = getStudentIdentitySourceTimestamp(left);
+  const rightTimestamp = getStudentIdentitySourceTimestamp(right);
+
+  if (leftTimestamp !== rightTimestamp) {
+    return leftTimestamp - rightTimestamp;
+  }
+
+  return left.order - right.order;
+}
+
+function getStudentIdentitySourceTimestamp(source: StudentIdentitySource) {
+  const timestamp =
+    source.completedAt instanceof Date
+      ? source.completedAt.getTime()
+      : typeof source.completedAt === 'string'
+        ? Date.parse(source.completedAt)
+        : Number.POSITIVE_INFINITY;
+
+  return Number.isFinite(timestamp) ? timestamp : Number.POSITIVE_INFINITY;
 }
 
 function formatAnonymousStudentLabel(index?: number) {

@@ -1093,6 +1093,8 @@ type AttemptReviewSubmissionSummaryInput = {
 };
 
 type AssignmentAttemptRowInput = {
+  anonymousToken?: string | null;
+  completedAt?: Date | string | null;
   id: string;
   studentName: string | null;
 };

@@ -1891,6 +1891,43 @@ assert.equal(
   ]).includes('browser-token'),
   false
 );
+const chronologicalStudentIdentityResolver = createStudentIdentityResolver([
+  {
+    anonymousToken: 'newer-browser-token',
+    completedAt: new Date('2026-01-03T10:00:00.000Z'),
+    studentName: null,
+  },
+  {
+    anonymousToken: 'older-browser-token',
+    completedAt: new Date('2026-01-01T10:00:00.000Z'),
+    studentName: null,
+  },
+  {
+    anonymousToken: 'newer-browser-token',
+    completedAt: new Date('2026-01-02T10:00:00.000Z'),
+    studentName: null,
+  },
+]);
+assert.deepEqual(
+  chronologicalStudentIdentityResolver.resolve({
+    anonymousToken: 'older-browser-token',
+    studentName: null,
+  }),
+  {
+    key: 'anonymous:1',
+    label: 'Anonymous student 1',
+  }
+);
+assert.deepEqual(
+  chronologicalStudentIdentityResolver.resolve({
+    anonymousToken: 'newer-browser-token',
+    studentName: null,
+  }),
+  {
+    key: 'anonymous:2',
+    label: 'Anonymous student 2',
+  }
+);
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
   description:
     'This assignment does not collect student names. This browser will submit as Anonymous browser.',
@@ -10266,6 +10303,89 @@ const resultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems,
 });
+
+const chronologicalAnonymousResultAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: 'newer-browser-token',
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-03T10:00:00.000Z'),
+      id: 'newer-anonymous-attempt',
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        correctItemCount: 0,
+        earnedPoints: 0,
+        totalPoints: 1,
+      },
+      score: 0,
+      studentName: null,
+    },
+    {
+      anonymousToken: 'older-browser-token',
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'older-anonymous-attempt',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: null,
+    },
+  ],
+  runtimeItems: resultRuntimeItems.slice(0, 1),
+});
+assert.deepEqual(
+  chronologicalAnonymousResultAnalysis.attempts.map((attempt) => ({
+    id: attempt.id,
+    studentKey: attempt.studentKey,
+    studentLabel: attempt.studentLabel,
+  })),
+  [
+    {
+      id: 'newer-anonymous-attempt',
+      studentKey: 'anonymous:2',
+      studentLabel: 'Anonymous student 2',
+    },
+    {
+      id: 'older-anonymous-attempt',
+      studentKey: 'anonymous:1',
+      studentLabel: 'Anonymous student 1',
+    },
+  ]
+);
+assert.deepEqual(
+  chronologicalAnonymousResultAnalysis.students.map((student) => ({
+    studentKey: student.studentKey,
+    studentLabel: student.studentLabel,
+  })),
+  [
+    {
+      studentKey: 'anonymous:2',
+      studentLabel: 'Anonymous student 2',
+    },
+    {
+      studentKey: 'anonymous:1',
+      studentLabel: 'Anonymous student 1',
+    },
+  ]
+);
+assert.equal(
+  JSON.stringify(chronologicalAnonymousResultAnalysis).includes(
+    'browser-token'
+  ),
+  false
+);
 
 const resultAnalysisWithUnscoredAttempt = analyzeAssignmentResults({
   attempts: [
