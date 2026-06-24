@@ -74,10 +74,7 @@ export function buildStudentRunnerPageState({
     return buildStudentRunnerReadyState({
       activity: buildPublicAssignmentPreviewActivity(data.payload),
       assignment,
-      runtimeItems: orderStudentRunnerRuntimeItems({
-        items: data.payload.runtimeItems,
-        assignment,
-      }),
+      runtimeItems: data.payload.runtimeItems,
       source: 'public-assignment',
     });
   }

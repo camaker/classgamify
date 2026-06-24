@@ -25,6 +25,7 @@ import {
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
 } from '@/assignments/lifecycle';
+import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildPublicAssignmentLookupResult,
   buildPublicAttemptReviewItems,
@@ -580,9 +581,14 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     const templateType =
       row.snapshot?.templateType ?? row.activity.templateType;
     const runtimeItems = getRuntimeItems(templateType, content);
+    const orderedRuntimeItems = orderAssignmentRuntimeItems({
+      items: runtimeItems,
+      shareSlug: row.assignment.shareSlug,
+      shuffleItems: settings.shuffleItems,
+    });
     assertSubmittedAnswersMatchRuntimeItems({
       answers: data.answers,
-      runtimeItems,
+      runtimeItems: orderedRuntimeItems,
     });
     const evaluation = evaluateRuntimeAnswers({
       answers: data.answers,
@@ -621,7 +627,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       id,
       reviewItems: buildPublicAttemptReviewItems({
         answers: evaluation.answers,
-        runtimeItems,
+        runtimeItems: orderedRuntimeItems,
         showCorrectAnswers: settings.showCorrectAnswers,
       }),
       result: evaluation.result,

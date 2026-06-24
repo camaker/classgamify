@@ -4067,9 +4067,17 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     snapshot: null,
   });
   const runtimeItems = getRuntimeItems(templateType, content);
+  const expectedPublicRuntimeItems = stripRuntimeAnswers(
+    orderAssignmentRuntimeItems({
+      items: runtimeItems,
+      shareSlug: `share-${templateType}`,
+      shuffleItems: true,
+    })
+  );
 
   assert.equal(payload.assignment.shareSlug, `share-${templateType}`);
   assert.equal(payload.runtimeItems.length, runtimeItems.length);
+  assert.deepEqual(payload.runtimeItems, expectedPublicRuntimeItems);
   payload.runtimeItems.forEach((item, index) => {
     assert.deepEqual(Object.keys(item).sort(), [
       'choices',
@@ -4079,9 +4087,85 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     ]);
     assert.equal('answer' in item, false);
     assert.equal('explanation' in item, false);
-    assert.deepEqual(item.choices, runtimeItems[index]?.choices);
+    assert.deepEqual(item, expectedPublicRuntimeItems[index]);
   });
 }
+const publicRuntimeOrderingContent = buildActivityContent({
+  ...publicRuntimeSanitizationInput,
+  templateType: 'quiz',
+});
+const publicRuntimeOrderingItems = getRuntimeItems(
+  'quiz',
+  publicRuntimeOrderingContent
+);
+const publicRuntimeOrderingSource = {
+  activity: {
+    contentJson: publicRuntimeOrderingContent,
+    description: 'Public runtime ordering activity',
+    id: 'activity-public-order',
+    templateType: 'quiz',
+    title: 'Public runtime ordering',
+    visibility: 'draft',
+  },
+  assignment: {
+    expiresAt: null,
+    id: 'assignment-public-order',
+    settingsJson: {
+      collectStudentName: true,
+      showCorrectAnswers: true,
+      shuffleItems: true,
+    },
+    shareSlug: ' share-public-order ',
+    status: 'published',
+    title: 'Ordered public assignment',
+  },
+  snapshot: null,
+} satisfies Parameters<typeof buildPublicAssignmentPayload>[0];
+const expectedPublicRuntimeOrderingIds = orderAssignmentRuntimeItems({
+  items: publicRuntimeOrderingItems,
+  shareSlug: 'share-public-order',
+  shuffleItems: true,
+}).map((item) => item.id);
+const publicRuntimeOrderingPayload = buildPublicAssignmentPayload(
+  publicRuntimeOrderingSource
+);
+assert.deepEqual(
+  publicRuntimeOrderingPayload.runtimeItems.map((item) => item.id),
+  expectedPublicRuntimeOrderingIds
+);
+assert.notDeepEqual(
+  publicRuntimeOrderingPayload.runtimeItems.map((item) => item.id),
+  publicRuntimeOrderingItems.map((item) => item.id)
+);
+assert.deepEqual(
+  buildPublicAssignmentPayload({
+    ...publicRuntimeOrderingSource,
+    assignment: {
+      ...publicRuntimeOrderingSource.assignment,
+      settingsJson: {
+        ...publicRuntimeOrderingSource.assignment.settingsJson,
+        shuffleItems: false,
+      },
+    },
+  }).runtimeItems.map((item) => item.id),
+  publicRuntimeOrderingItems.map((item) => item.id)
+);
+const publicRuntimeOrderingLookup = buildPublicAssignmentLookupResult(
+  publicRuntimeOrderingSource
+);
+if (publicRuntimeOrderingLookup.status !== 'available') {
+  throw new Error('Expected public runtime ordering lookup to be available.');
+}
+assert.deepEqual(
+  publicRuntimeOrderingLookup.payload.runtimeItems.map((item) => item.id),
+  expectedPublicRuntimeOrderingIds
+);
+assert.deepEqual(
+  buildOpenPublicAssignmentPayload(
+    publicRuntimeOrderingSource
+  )?.runtimeItems.map((item) => item.id),
+  expectedPublicRuntimeOrderingIds
+);
 const runnerStateStarterActivity = {
   content: publicPayloadSnapshotContent,
   description: 'Starter activity description',
@@ -4193,6 +4277,21 @@ assert.equal(publicRunnerState.activity.title, 'Frozen activity title');
 assert.equal(publicRunnerState.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicRunnerState.runtimeItems[0]!, false);
 assert.equal('explanation' in publicRunnerState.runtimeItems[0]!, false);
+const orderedPublicRunnerState = buildStudentRunnerPageState({
+  data: publicRuntimeOrderingLookup,
+  isLoading: false,
+  shareId: ' share-public-order ',
+  starterActivity: runnerStateStarterActivity,
+  starterAssignment: runnerStateStarterAssignment,
+  starterRuntimeItems: runnerStateStarterRuntimeItems,
+});
+if (orderedPublicRunnerState.status !== 'ready') {
+  throw new Error('Expected ordered public runner state to be ready.');
+}
+assert.deepEqual(
+  orderedPublicRunnerState.runtimeItems.map((item) => item.id),
+  expectedPublicRuntimeOrderingIds
+);
 assert.deepEqual(
   buildStudentRunnerReadyState({
     activity: publicRunnerState.activity,
@@ -4832,6 +4931,16 @@ assert.match(
   assignmentsApiSource,
   /export const publishAssignment[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
   'Publish assignment API should block archived source activities server-side before snapshotting.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const submitAttempt[\s\S]*const orderedRuntimeItems = orderAssignmentRuntimeItems\(\{[\s\S]*shareSlug: row\.assignment\.shareSlug,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*\}\)/,
+  'Submit attempt API should apply the assignment delivery item order before validating submitted answers.'
+);
+assert.match(
+  assignmentsApiSource,
+  /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
+  'Submit attempt API should build student review payloads in the same stable delivery order.'
 );
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(

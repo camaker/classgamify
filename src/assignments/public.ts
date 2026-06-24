@@ -17,6 +17,7 @@ import {
   getAssignmentLifecycleStatus,
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
+import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
@@ -157,6 +158,12 @@ export function buildPublicAssignmentPayload({
   const templateType = snapshot?.templateType ?? activity.templateType;
   const runtimeItems = getRuntimeItems(templateType, content);
   const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
+  const settings = resolveAssignmentSettings(assignment.settingsJson);
+  const orderedRuntimeItems = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug,
+    shuffleItems: settings.shuffleItems,
+  });
 
   return {
     activity: {
@@ -169,12 +176,12 @@ export function buildPublicAssignmentPayload({
     assignment: {
       expiresAt: assignment.expiresAt,
       id: assignment.id,
-      settingsJson: resolveAssignmentSettings(assignment.settingsJson),
+      settingsJson: settings,
       shareSlug,
       status: assignment.status,
       title: assignment.title,
     },
-    runtimeItems: stripRuntimeAnswers(runtimeItems),
+    runtimeItems: stripRuntimeAnswers(orderedRuntimeItems),
     snapshot: snapshot
       ? {
           activityDescription: snapshot.activityDescription,
@@ -186,7 +193,7 @@ export function buildPublicAssignmentPayload({
       difficulty: content.difficulty,
       estimatedMinutes: estimateAssignmentMinutes(runtimeItems.length),
       gradeBand: content.gradeBand,
-      itemCount: runtimeItems.length,
+      itemCount: orderedRuntimeItems.length,
       language: content.language,
       learningGoal: content.learningGoal,
       subject: content.subject,
