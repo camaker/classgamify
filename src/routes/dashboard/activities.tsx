@@ -7,12 +7,14 @@ import {
   getActivityLifecycleActionCopy,
 } from '@/activities/lifecycle';
 import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
   type ActivitySourceMaterialFilter,
   type ActivityTemplateFilter,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
+  getActivityLibraryTotalPages,
   isActivityTemplateType,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
@@ -82,8 +84,6 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
-
 type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
 
 export const Route = createFileRoute('/dashboard/activities')({
@@ -111,10 +111,10 @@ function DashboardActivitiesPage() {
   });
   const activities = data?.items ?? [];
   const totalActivities = data?.total ?? 0;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalActivities / ACTIVITY_LIBRARY_PAGE_SIZE)
-  );
+  const totalPages = getActivityLibraryTotalPages({
+    pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
+    total: totalActivities,
+  });
   const hasActivities = activities.length > 0;
   const createdPanelActivity = resolveCreatedActivityPanelActivity({
     activity: data?.createdActivity,

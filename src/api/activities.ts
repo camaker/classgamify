@@ -11,6 +11,7 @@ import {
 } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
 import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
@@ -44,7 +45,12 @@ const activityListSourceSchema = z.enum([
 const listActivitiesInputSchema = z.object({
   createdActivityId: z.string().trim().min(1).max(80).optional(),
   pageIndex: z.number().int().min(0).default(0),
-  pageSize: z.number().int().min(1).max(100).default(24),
+  pageSize: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .default(ACTIVITY_LIBRARY_PAGE_SIZE),
   search: z.string().trim().max(120).optional(),
   source: activityListSourceSchema.default('all'),
   status: activityListStatusSchema.default('active'),

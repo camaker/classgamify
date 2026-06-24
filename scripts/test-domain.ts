@@ -39,9 +39,11 @@ import {
   resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
+  getActivityLibraryTotalPages,
   isActivityTemplateType,
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
@@ -5715,6 +5717,12 @@ assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
 assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+assert.equal(ACTIVITY_LIBRARY_PAGE_SIZE, 12);
+assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 31 }), 3);
+assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
+assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
+assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: -3 }), 1);
+assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 12.9 }), 1);
 const sourceMaterialFilterBaseContent = buildActivityContent({
   description: 'Source filter fixture',
   difficulty: 'starter',
@@ -5832,6 +5840,11 @@ assert.match(
   /summary: summarizeActivityLibrary\(matchingActivities\)/,
   'Activity list summary should reflect source-material filtered activities.'
 );
+assert.match(
+  activitiesApiSource,
+  /default\(ACTIVITY_LIBRARY_PAGE_SIZE\)/,
+  'Activity list API should default page size through the activity-domain pagination constant.'
+);
 assert.doesNotMatch(
   activitiesApiSource,
   /like\(activity\.title, `%\$\{search\}%`\)/,
@@ -5875,6 +5888,11 @@ assert.match(
 const useActivitiesSource = readFileSync('src/hooks/use-activities.ts', 'utf8');
 assert.match(
   useActivitiesSource,
+  /pageSize = ACTIVITY_LIBRARY_PAGE_SIZE/,
+  'useActivities should default page size through the activity-domain pagination constant.'
+);
+assert.match(
+  useActivitiesSource,
   /source\?: ActivitySourceMaterialFilter/,
   'useActivities should expose source-material filtering to route callers.'
 );
@@ -5906,6 +5924,16 @@ assert.match(
   dashboardActivitiesRouteSource,
   /onSourceChange=\{\(value\) =>[\s\S]*updateLibraryFilters\(\{ source: value \}\)/,
   'Activity library source-material filter control should update route filters.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /getActivityLibraryTotalPages\(\{[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*total: totalActivities,[\s\S]*\}\)/,
+  'Activity dashboard route should calculate total pages through the activity-domain helper.'
+);
+assert.doesNotMatch(
+  dashboardActivitiesRouteSource,
+  /const ACTIVITY_LIBRARY_PAGE_SIZE = 12/,
+  'Activity dashboard route should not maintain a local page-size constant.'
 );
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
 const dashboardAssignmentsRouteSource = readFileSync(

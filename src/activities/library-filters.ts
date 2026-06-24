@@ -14,6 +14,8 @@ export type ActivitySourceMaterialFilter =
   | 'worksheet';
 export type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
+export const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
+
 type ActivityLibrarySearchState = {
   created?: string;
   page?: number;
@@ -158,6 +160,23 @@ export function matchesActivitySourceMaterialFilter({
     case 'worksheet':
       return summary.readiness.hasWorksheet;
   }
+}
+
+export function getActivityLibraryTotalPages({
+  pageSize = ACTIVITY_LIBRARY_PAGE_SIZE,
+  total,
+}: {
+  pageSize?: number;
+  total: number;
+}) {
+  const normalizedPageSize =
+    Number.isInteger(pageSize) && pageSize > 0
+      ? pageSize
+      : ACTIVITY_LIBRARY_PAGE_SIZE;
+  const normalizedTotal =
+    Number.isFinite(total) && total > 0 ? Math.floor(total) : 0;
+
+  return Math.max(1, Math.ceil(normalizedTotal / normalizedPageSize));
 }
 
 function parseActivityLibraryPageSearch(value: unknown) {

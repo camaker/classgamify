@@ -12,7 +12,10 @@ import { generateActivityDraft } from '@/api/activity-ai';
 import type { ActivityTemplateType } from '@/activities/types';
 import type { GenerateActivityDraftInput } from '@/activities/ai-draft';
 import type { CreateActivityInput } from '@/activities/validation';
-import type { ActivitySourceMaterialFilter } from '@/activities/library-filters';
+import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
+  type ActivitySourceMaterialFilter,
+} from '@/activities/library-filters';
 import {
   keepPreviousData,
   useMutation,
@@ -39,7 +42,7 @@ const activitiesKeys = {
 export function useActivities({
   createdActivityId,
   pageIndex = 0,
-  pageSize = 24,
+  pageSize = ACTIVITY_LIBRARY_PAGE_SIZE,
   search,
   source = 'all',
   status = 'active',
