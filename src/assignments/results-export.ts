@@ -13,6 +13,7 @@ import {
 } from '@/assignments/result-format';
 import {
   buildAssignmentDeliverySummary,
+  formatAssignmentAttempts,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
@@ -107,7 +108,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       deliverySummaryById.get('identity') ?? '',
       deliverySummaryById.get('answerReveal') ?? '',
       deliverySummaryById.get('itemOrder') ?? '',
-      settings.maxAttempts ?? '',
+      formatAssignmentAttempts(settings.maxAttempts),
       settings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),

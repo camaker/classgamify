@@ -208,7 +208,7 @@ export function formatAssignmentItemCount(itemCount: number) {
   return m.assignment_delivery_item_count_many({ count: itemCount });
 }
 
-function formatAssignmentAttempts(maxAttempts?: number | null) {
+export function formatAssignmentAttempts(maxAttempts?: number | null) {
   return isPositiveWholeNumber(maxAttempts)
     ? m.assignment_delivery_attempts_max({ count: maxAttempts })
     : m.assignment_delivery_attempts_open();

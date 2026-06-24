@@ -12470,7 +12470,7 @@ assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
-  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2 max","60"/
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
@@ -12635,13 +12635,31 @@ const partialSettingsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   partialSettingsCsv,
-  /"Review quietly\.","Anonymous","Hidden","Shuffled","2",""/
+  /"Review quietly\.","Anonymous","Hidden","Shuffled","2 max",""/
 );
 assert.match(
   partialSettingsCsv,
   /"Student instructions: Review quietly\.; Attempts: 2 max; Timer: No timer; Closes:/
 );
 assert.match(partialSettingsCsv, /Answer reveal: Hidden; Item order: Shuffled/);
+const unlimitedAttemptsCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  assignment: {
+    ...csvExportData.assignment,
+    settingsJson: {
+      ...csvExportData.assignment.settingsJson,
+      maxAttempts: null,
+    },
+  },
+});
+assert.match(
+  unlimitedAttemptsCsv,
+  /"Student instructions: Use ""complete sentences"", then submit\.; Attempts: Open; Timer: 1 min;/
+);
+assert.match(
+  unlimitedAttemptsCsv,
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","Open","60"/
+);
 
 const classroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
