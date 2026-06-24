@@ -5,6 +5,7 @@ import {
 } from '@/activities/draft-meta';
 import type { ActivityTemplateType } from '@/activities/types';
 import {
+  buildActivityContent,
   activityDifficultySchema,
   activityTemplateTypeSchema,
   createActivityInputSchema,
@@ -102,6 +103,21 @@ const aiDraftSchema = z.object({
 
 export type AiActivityDraft = z.input<typeof aiDraftSchema>;
 
+const aiDraftCompletionSchema = z.object({
+  description: z.string().trim().min(8).max(220).optional(),
+  groups: z.array(aiGroupSchema).max(4).optional(),
+  learningGoal: z.string().trim().min(8).max(260).optional(),
+  pairs: z.array(aiPairSchema).max(10).optional(),
+  questions: z.array(aiQuestionSchema).max(10).optional(),
+  sourceSummary: z.string().trim().min(8).max(300).optional(),
+  teacherNotes: z.array(z.string().trim().min(1).max(160)).max(5).optional(),
+  title: z.string().trim().min(3).max(90).optional(),
+  vocabulary: z.array(z.string().trim().min(1).max(80)).max(16).optional(),
+});
+
+type AiActivityDraftCompletion = z.output<typeof aiDraftCompletionSchema>;
+type NormalizedAiActivityDraft = z.output<typeof aiDraftSchema>;
+
 export async function generateActivityDraftFromAi(
   input: GenerateActivityDraftInput
 ): Promise<ActivityDraftResult> {
@@ -136,9 +152,12 @@ export async function generateActivityDraftFromAi(
     throw new Error(m.activity_ai_error_empty_response());
   }
 
-  let draft: AiActivityDraft;
+  let parsedDraft: {
+    draft: NormalizedAiActivityDraft;
+    usedLocalCompletion: boolean;
+  };
   try {
-    draft = parseAiDraftResponse(result.response);
+    parsedDraft = parseAiDraftResponse(result.response, data);
   } catch {
     return createFallbackActivityDraftResult({
       input: data,
@@ -149,10 +168,16 @@ export async function generateActivityDraftFromAi(
 
   return {
     ...createActivityDraftResult({
-      activity: createActivityInputFromAiDraft({ draft, input: data }),
+      activity: createActivityInputFromAiDraft({
+        draft: parsedDraft.draft,
+        input: data,
+      }),
       input: data,
     }),
     model,
+    notice: parsedDraft.usedLocalCompletion
+      ? m.activity_ai_notice_completed_draft()
+      : undefined,
     provider: 'workers-ai',
   };
 }
@@ -206,10 +231,13 @@ function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
   return formatTemplateRequirementList(requirements);
 }
 
-function parseAiDraftResponse(response: string): AiActivityDraft {
+function parseAiDraftResponse(
+  response: string,
+  input: GenerateActivityDraftInput
+) {
   const jsonText = extractJsonObject(response);
   const parsed = JSON.parse(jsonText) as unknown;
-  return aiDraftSchema.parse(parsed);
+  return normalizeAiActivityDraft({ draft: parsed, input });
 }
 
 function extractJsonObject(value: string) {
@@ -231,10 +259,13 @@ export function createActivityInputFromAiDraft({
   draft,
   input,
 }: {
-  draft: AiActivityDraft;
+  draft: unknown;
   input: GenerateActivityDraftInput;
 }): CreateActivityInput {
-  const normalizedDraft = aiDraftSchema.parse(draft);
+  const { draft: normalizedDraft } = normalizeAiActivityDraft({
+    draft,
+    input,
+  });
   const shapedDraft = shapeAiDraftForPrimaryTemplate({
     draft: normalizedDraft,
     input,
@@ -278,6 +309,229 @@ export function createActivityInputFromAiDraft({
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+export function normalizeAiActivityDraft({
+  draft,
+  input,
+}: {
+  draft: unknown;
+  input: GenerateActivityDraftInput;
+}): {
+  draft: NormalizedAiActivityDraft;
+  usedLocalCompletion: boolean;
+} {
+  const fallbackDraft = createFallbackAiActivityDraft(input);
+  const strictDraft = aiDraftSchema.safeParse(draft);
+
+  if (strictDraft.success) {
+    return completeAiActivityDraft({
+      draft: strictDraft.data,
+      fallbackDraft,
+      input,
+    });
+  }
+
+  const completionDraft = aiDraftCompletionSchema.safeParse(draft);
+
+  if (!completionDraft.success) {
+    throw new Error(m.activity_ai_error_parse_response());
+  }
+
+  const completedDraft = completeAiActivityDraft({
+    draft: completionDraft.data,
+    fallbackDraft,
+    input,
+  });
+
+  return {
+    draft: completedDraft.draft,
+    usedLocalCompletion: true,
+  };
+}
+
+function completeAiActivityDraft({
+  draft,
+  fallbackDraft,
+  input,
+}: {
+  draft: AiActivityDraftCompletion;
+  fallbackDraft: NormalizedAiActivityDraft;
+  input: GenerateActivityDraftInput;
+}) {
+  const targetItemCount = Math.max(3, input.itemCount);
+  const completedQuestions = completeAiDraftList({
+    fallback: fallbackDraft.questions,
+    getKey: (question) => `${question.prompt}\u0000${question.answer}`,
+    max: 10,
+    primary: draft.questions,
+    targetMin: targetItemCount,
+  });
+  const completedPairs = completeAiDraftList({
+    fallback: fallbackDraft.pairs,
+    getKey: (pair) => `${pair.left}\u0000${pair.right}`,
+    max: 10,
+    primary: draft.pairs,
+    targetMin: targetItemCount,
+  });
+  const completedGroups = completeAiDraftGroups({
+    fallback: fallbackDraft.groups,
+    input,
+    primary: draft.groups,
+  });
+  const completedVocabulary = completeAiDraftList({
+    fallback: fallbackDraft.vocabulary,
+    getKey: (value) => value,
+    max: 16,
+    primary: draft.vocabulary,
+    targetMin: targetItemCount,
+  });
+  const completedTeacherNotes = completeAiDraftList({
+    fallback: fallbackDraft.teacherNotes,
+    getKey: (value) => value,
+    max: 5,
+    primary: draft.teacherNotes,
+    targetMin: 1,
+  });
+  const completedDraft = {
+    description: draft.description ?? fallbackDraft.description,
+    groups: completedGroups.items,
+    learningGoal: draft.learningGoal ?? fallbackDraft.learningGoal,
+    pairs: completedPairs.items,
+    questions: completedQuestions.items,
+    sourceSummary: draft.sourceSummary ?? fallbackDraft.sourceSummary,
+    teacherNotes: completedTeacherNotes.items,
+    title: draft.title ?? fallbackDraft.title,
+    vocabulary: completedVocabulary.items,
+  } satisfies AiActivityDraft;
+  const usedLocalCompletion =
+    draft.description === undefined ||
+    draft.learningGoal === undefined ||
+    draft.sourceSummary === undefined ||
+    draft.title === undefined ||
+    completedGroups.usedLocalCompletion ||
+    completedPairs.usedLocalCompletion ||
+    completedQuestions.usedLocalCompletion ||
+    completedTeacherNotes.usedLocalCompletion ||
+    completedVocabulary.usedLocalCompletion;
+
+  return {
+    draft: aiDraftSchema.parse(completedDraft),
+    usedLocalCompletion,
+  };
+}
+
+function completeAiDraftList<T>({
+  fallback,
+  getKey,
+  max,
+  primary,
+  targetMin,
+}: {
+  fallback: T[];
+  getKey: (value: T) => string;
+  max: number;
+  primary: T[] | undefined;
+  targetMin: number;
+}) {
+  const items: T[] = [];
+  const seen = new Set<string>();
+  const addItem = (item: T) => {
+    const key = getKey(item);
+    if (seen.has(key) || items.length >= max) return false;
+    seen.add(key);
+    items.push(item);
+    return true;
+  };
+
+  for (const item of primary ?? []) {
+    addItem(item);
+  }
+
+  const primaryCount = items.length;
+
+  for (const item of fallback) {
+    if (items.length >= targetMin) break;
+    addItem(item);
+  }
+
+  return {
+    items,
+    usedLocalCompletion:
+      primary === undefined ||
+      primary.length !== primaryCount ||
+      items.length > primaryCount,
+  };
+}
+
+function completeAiDraftGroups({
+  fallback,
+  input,
+  primary,
+}: {
+  fallback: NormalizedAiActivityDraft['groups'];
+  input: GenerateActivityDraftInput;
+  primary: AiActivityDraftCompletion['groups'];
+}) {
+  const groups: NormalizedAiActivityDraft['groups'] = [];
+  const addGroup = (group: NormalizedAiActivityDraft['groups'][number]) => {
+    const existingGroup = groups.find((item) => item.label === group.label);
+    const targetGroup =
+      existingGroup ??
+      (groups.length < 4
+        ? {
+            items: [],
+            label: group.label,
+          }
+        : undefined);
+
+    if (!targetGroup) return false;
+    if (!existingGroup) groups.push(targetGroup);
+
+    const previousItemCount = targetGroup.items.length;
+    targetGroup.items = unique([...targetGroup.items, ...group.items]).slice(
+      0,
+      8
+    );
+
+    return targetGroup.items.length > previousItemCount || !existingGroup;
+  };
+
+  for (const group of primary ?? []) {
+    addGroup(group);
+  }
+
+  const primaryGroupCount = groups.length;
+  const primaryItemCount = countAiDraftGroupItems(groups);
+  const targetItemCount =
+    input.templateType === 'group-sort' ? Math.max(3, input.itemCount) : 3;
+
+  for (const group of fallback) {
+    if (
+      groups.length >= 2 &&
+      countAiDraftGroupItems(groups) >= targetItemCount
+    ) {
+      break;
+    }
+    addGroup(group);
+  }
+
+  for (const group of fallback) {
+    if (countAiDraftGroupItems(groups) >= targetItemCount) break;
+    addGroup(group);
+  }
+
+  return {
+    items: groups,
+    usedLocalCompletion:
+      primary === undefined ||
+      groups.length !== primaryGroupCount ||
+      countAiDraftGroupItems(groups) !== primaryItemCount,
+  };
+}
+
+function countAiDraftGroupItems(groups: NormalizedAiActivityDraft['groups']) {
+  return groups.reduce((total, group) => total + group.items.length, 0);
 }
 
 function shapeAiDraftForPrimaryTemplate({
@@ -379,6 +633,36 @@ function createActivityDraftResult({
       currentTemplateType: input.templateType,
     }),
   };
+}
+
+function createFallbackAiActivityDraft(
+  input: GenerateActivityDraftInput
+): NormalizedAiActivityDraft {
+  const activity = createFallbackActivityDraft(input);
+  const content = buildActivityContent(activity);
+
+  return aiDraftSchema.parse({
+    description: activity.description,
+    groups: content.groups.map((group) => ({
+      items: group.items,
+      label: group.label,
+    })),
+    learningGoal: activity.learningGoal,
+    pairs: content.pairs.map((pair) => ({
+      left: pair.left,
+      right: pair.right,
+    })),
+    questions: content.questions.map((question) => ({
+      answer: question.answer,
+      explanation: question.explanation,
+      options: question.options?.map((option) => option.text) ?? [],
+      prompt: question.prompt,
+    })),
+    sourceSummary: activity.sourceSummary,
+    teacherNotes: content.teacherNotes,
+    title: activity.title,
+    vocabulary: content.vocabulary,
+  });
 }
 
 export function createFallbackActivityDraftResult({

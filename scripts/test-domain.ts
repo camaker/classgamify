@@ -53,6 +53,7 @@ import {
   createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
+  normalizeAiActivityDraft,
   type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
@@ -7997,17 +7998,70 @@ assert.equal(
 );
 assert.equal(normalizedSpacedDraft.vocabularyText, 'cat, tree, rain');
 assert.equal(normalizedSpacedDraft.teacherNotesText, 'Check all answer keys.');
-assert.throws(() =>
-  createActivityInputFromAiDraft({
-    draft: {
-      ...spacedAiDraft,
-      teacherNotes: [],
+const completedMissingNotesDraft = normalizeAiActivityDraft({
+  draft: {
+    ...spacedAiDraft,
+    teacherNotes: [],
+  },
+  input: {
+    ...aiDraftInputBase,
+    templateType: 'quiz',
+  },
+});
+assert.equal(completedMissingNotesDraft.usedLocalCompletion, true);
+assert.equal(
+  completedMissingNotesDraft.draft.questions[0]?.prompt,
+  'Which word is an animal?'
+);
+assert.ok(completedMissingNotesDraft.draft.teacherNotes.length >= 1);
+const partialAiDraft = {
+  description: 'AI provided a usable but incomplete draft.',
+  learningGoal: 'Students can sort and answer nature review prompts.',
+  questions: [
+    {
+      answer: 'cat',
+      explanation: 'A cat is an animal.',
+      options: ['cat', 'tree', 'rain'],
+      prompt: 'Which word is an animal?',
     },
-    input: {
-      ...aiDraftInputBase,
-      templateType: 'quiz',
-    },
-  })
+  ],
+  sourceSummary: 'Nature source notes from the AI response.',
+  title: 'AI nature draft',
+  vocabulary: ['cat'],
+};
+const completedPartialAiDraft = normalizeAiActivityDraft({
+  draft: partialAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    itemCount: 4,
+    templateType: 'quiz',
+  },
+});
+assert.equal(completedPartialAiDraft.usedLocalCompletion, true);
+assert.equal(completedPartialAiDraft.draft.title, 'AI nature draft');
+assert.equal(
+  completedPartialAiDraft.draft.questions[0]?.prompt,
+  'Which word is an animal?'
+);
+assert.equal(completedPartialAiDraft.draft.questions.length, 4);
+assert.equal(completedPartialAiDraft.draft.pairs.length, 4);
+assert.ok(completedPartialAiDraft.draft.groups.length >= 2);
+assert.ok(completedPartialAiDraft.draft.vocabulary.includes('cat'));
+assert.ok(completedPartialAiDraft.draft.vocabulary.length >= 4);
+assert.ok(completedPartialAiDraft.draft.teacherNotes.length >= 1);
+const completedPartialActivityDraft = createActivityInputFromAiDraft({
+  draft: partialAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    itemCount: 4,
+    templateType: 'quiz',
+  },
+});
+assert.equal(completedPartialActivityDraft.title, 'AI nature draft');
+assert.equal(
+  getRuntimeItems('quiz', buildActivityContent(completedPartialActivityDraft))
+    .length,
+  4
 );
 const shapedQuizDraft = createActivityInputFromAiDraft({
   draft: oversizedAiDraft,
