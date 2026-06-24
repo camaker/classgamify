@@ -144,6 +144,15 @@ test.describe('activity authoring', () => {
       originalName: `Worksheet ${uniqueSuffix}.pdf`,
       size: 4096,
     });
+    await seedE2EUserFile(request, {
+      contentType:
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      email: user.email,
+      filename: `words-${uniqueSuffix}.xlsx`,
+      id: `e2e-spreadsheet-${uniqueSuffix}`,
+      originalName: `Word list ${uniqueSuffix}.xlsx`,
+      size: 3072,
+    });
 
     await loginByForm(page, user);
     await page.goto('/create');
@@ -162,6 +171,18 @@ test.describe('activity authoring', () => {
       })
       .click();
     await expect(page.getByText('1 attached')).toBeVisible();
+    await page
+      .getByRole('button', {
+        name: new RegExp(`attach Worksheet ${uniqueSuffix}\\.pdf`, 'i'),
+      })
+      .click();
+    await expect(page.getByText('2 attached')).toBeVisible();
+    await page
+      .getByRole('button', {
+        name: new RegExp(`attach Word list ${uniqueSuffix}\\.xlsx`, 'i'),
+      })
+      .click();
+    await expect(page.getByText('3 attached')).toBeVisible();
     await expect(
       page.getByRole('button', {
         name: new RegExp(`remove Listening track ${uniqueSuffix}\\.mp3`, 'i'),
@@ -175,8 +196,36 @@ test.describe('activity authoring', () => {
       page.getByRole('heading', { name: activityTitle })
     ).toBeVisible();
     await expect(page.getByText('Source materials')).toBeVisible();
-    await expect(page.getByText('1 file')).toBeVisible();
+    await expect(page.getByText('3 files')).toBeVisible();
     await expect(page.getByText('Audio')).toBeVisible();
+    await expect(page.getByText('Worksheet document')).toBeVisible();
+    await expect(page.getByText('Spreadsheet')).toBeVisible();
+    await expect(
+      page.getByText('Ready for future AI extraction')
+    ).toBeVisible();
+    await expect(page.getByText('Audio extraction')).toBeVisible();
+    await expect(page.getByText('Worksheet extraction')).toBeVisible();
+    await expect(page.getByText('Spreadsheet import')).toBeVisible();
+
+    await page.getByLabel('Source material').selectOption('worksheet');
+    await expect(page).toHaveURL(/source=worksheet/);
+    await expect(
+      page.getByRole('heading', { name: activityTitle })
+    ).toBeVisible();
+    await expect(page.getByText('Source extraction')).toBeVisible();
+    await page.getByLabel('Source material').selectOption('spreadsheet');
+    await expect(page).toHaveURL(/source=spreadsheet/);
+    await expect(
+      page.getByRole('heading', { name: activityTitle })
+    ).toBeVisible();
+    await page.getByLabel('Source material').selectOption('audio');
+    await expect(page).toHaveURL(/source=audio/);
+    await expect(
+      page.getByRole('heading', { name: activityTitle })
+    ).toBeVisible();
+    await page.getByRole('button', { name: /^clear filters$/i }).click();
+    await expect(page).not.toHaveURL(/source=/);
+
     await page
       .getByRole('link', { name: /^edit activity$/i })
       .first()
@@ -185,7 +234,7 @@ test.describe('activity authoring', () => {
     await expect(
       page.getByRole('heading', { name: /^source materials$/i })
     ).toBeVisible();
-    await expect(page.getByText('1 attached')).toBeVisible();
+    await expect(page.getByText('3 attached')).toBeVisible();
     await expect(
       page.getByText(`Listening track ${uniqueSuffix}.mp3`)
     ).toBeVisible();
