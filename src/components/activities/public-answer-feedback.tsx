@@ -21,6 +21,8 @@ export function PublicAnswerFeedback({
     reviewItem,
   });
 
+  if (!feedback) return null;
+
   return (
     <div
       className={cn(

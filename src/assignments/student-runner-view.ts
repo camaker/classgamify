@@ -292,7 +292,9 @@ export function buildPublicAnswerFeedbackView({
 }: {
   correctAnswerLabel?: string;
   reviewItem: PublicAttemptReviewItem;
-}): PublicAnswerFeedbackView {
+}): PublicAnswerFeedbackView | null {
+  if (!reviewItem.submitted) return null;
+
   return {
     acceptedAnswersLabel: m.student_runner_feedback_accepted_answers(),
     acceptedAnswersText: formatOptionalAcceptedAnswerAlternatives(

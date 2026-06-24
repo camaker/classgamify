@@ -2262,6 +2262,18 @@ assert.deepEqual(
     statusLabel: 'Correct',
   }
 );
+assert.equal(
+  buildPublicAnswerFeedbackView({
+    reviewItem: {
+      acceptedAnswers: ['Cold'],
+      correct: false,
+      correctAnswer: 'Cold',
+      itemId: 'pair-1',
+      submitted: false,
+    },
+  }),
+  null
+);
 
 assert.deepEqual(
   getAttemptCompletionSummary({
