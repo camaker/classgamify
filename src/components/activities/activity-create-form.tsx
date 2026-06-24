@@ -1,5 +1,9 @@
 import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
-import { getActivityDraftSourceText } from '@/activities/draft-source';
+import {
+  appendActivitySourceMaterialDraftNotes,
+  getActivityDraftSourceText,
+  hasActivitySourceMaterialDraftNotes,
+} from '@/activities/draft-source';
 import {
   getActivityEditorDefaultInput,
   buildActivityEditorTemplateSetupView,
@@ -63,6 +67,7 @@ import {
   IconLayoutGrid,
   IconLoader2,
   IconLogin2,
+  IconPaperclip,
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -108,6 +113,13 @@ export function ActivityCreateForm({
   const selectedTemplate = form.watch('templateType');
   const localizedTemplates = getActivityTemplates();
   const watchedValues = form.watch();
+  const hasAttachedSourceMaterials =
+    Array.isArray(watchedValues.sourceMaterials) &&
+    watchedValues.sourceMaterials.length > 0;
+  const hasDraftSourceMaterialNotes =
+    hasActivitySourceMaterialDraftNotes(draftSourceText);
+  const canSyncDraftSourceMaterials =
+    hasAttachedSourceMaterials || hasDraftSourceMaterialNotes;
   const template = getTemplateByType(selectedTemplate);
   const templateSetupView = useMemo(
     () => buildActivityEditorTemplateSetupView(selectedTemplate),
@@ -185,6 +197,16 @@ export function ActivityCreateForm({
     toast.success(templateSetupView.successMessage);
   }
 
+  function useAttachedMaterialsForDraft() {
+    setDraftSourceText(
+      appendActivitySourceMaterialDraftNotes({
+        sourceMaterials: form.getValues('sourceMaterials'),
+        sourceText: draftSourceText,
+      })
+    );
+    toast.success(m.activity_form_toast_source_materials_synced());
+  }
+
   async function onSubmit(values: CreateActivityInput) {
     if (!session?.user) {
       toast.error(m.activity_form_toast_sign_in_save());
@@ -256,12 +278,25 @@ export function ActivityCreateForm({
                       {m.activity_form_ai_draft_review_note()}
                     </span>
                   </div>
-                  <label
-                    htmlFor="activity-ai-source"
-                    className="font-medium text-sm"
-                  >
-                    {m.activity_form_ai_source_label()}
-                  </label>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label
+                      htmlFor="activity-ai-source"
+                      className="font-medium text-sm"
+                    >
+                      {m.activity_form_ai_source_label()}
+                    </label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="bg-background"
+                      onClick={useAttachedMaterialsForDraft}
+                      disabled={!canSyncDraftSourceMaterials}
+                    >
+                      <IconPaperclip className="size-3.5" />
+                      {m.activity_form_use_attached_materials()}
+                    </Button>
+                  </div>
                   <Textarea
                     id="activity-ai-source"
                     value={draftSourceText}

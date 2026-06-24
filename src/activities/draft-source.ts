@@ -43,6 +43,28 @@ export function buildActivitySourceMaterialDraftNotes(value: unknown) {
   ].join('\n');
 }
 
+export function appendActivitySourceMaterialDraftNotes({
+  sourceMaterials,
+  sourceText,
+}: {
+  sourceMaterials: unknown;
+  sourceText: string;
+}) {
+  const sourceMaterialNotes =
+    buildActivitySourceMaterialDraftNotes(sourceMaterials);
+  const cleanSourceText = removeActivitySourceMaterialDraftNotes(sourceText);
+
+  if (!sourceMaterialNotes) return cleanSourceText;
+
+  return buildActivityDraftSourceText([cleanSourceText, sourceMaterialNotes]);
+}
+
+export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
+  return getActivityDraftSourceTextParagraphs(sourceText).some(
+    isActivitySourceMaterialDraftNotesParagraph
+  );
+}
+
 function toActivitySourceMaterialDraftNote(
   material: ActivityMaterialReference
 ) {
@@ -83,6 +105,25 @@ function limitActivityDraftSourceText(parts: string[]) {
   }
 
   return sourceText;
+}
+
+function removeActivitySourceMaterialDraftNotes(sourceText: string) {
+  return getActivityDraftSourceTextParagraphs(sourceText)
+    .filter((part) => !isActivitySourceMaterialDraftNotesParagraph(part))
+    .join('\n\n');
+}
+
+function getActivityDraftSourceTextParagraphs(sourceText: string) {
+  return sourceText
+    .split(/\r?\n\s*\r?\n/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function isActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
+  const heading = m.activity_draft_source_materials_heading().trim();
+
+  return paragraph.split(/\r?\n/)[0]?.trim() === heading;
 }
 
 function unique(values: string[]) {

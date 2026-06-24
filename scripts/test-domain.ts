@@ -72,8 +72,10 @@ import {
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
+  appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNotes,
   getActivityDraftSourceText,
+  hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
 import {
   buildActivityDraftMeta,
@@ -9235,6 +9237,57 @@ assert.equal(
 assert.doesNotMatch(
   sensitiveMaterialDraftNotes ?? '',
   unsafeMaterialMetadataPattern
+);
+const appendedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes({
+  sourceMaterials: [listeningMaterialReference],
+  sourceText: 'Teacher source notes',
+});
+assert.equal(
+  appendedMaterialDraftSourceText,
+  [
+    'Teacher source notes',
+    'Attached classroom source materials:\n- Audio: 三年级听力.mp3',
+  ].join('\n\n')
+);
+assert.doesNotMatch(
+  appendedMaterialDraftSourceText,
+  unsafeMaterialMetadataPattern
+);
+assert.equal(
+  hasActivitySourceMaterialDraftNotes(appendedMaterialDraftSourceText),
+  true
+);
+assert.equal(
+  hasActivitySourceMaterialDraftNotes('Teacher source notes only'),
+  false
+);
+const refreshedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes(
+  {
+    sourceMaterials: [
+      {
+        contentType: 'application/pdf',
+        fileId: 'file-worksheet-2',
+        kind: 'worksheet-document',
+        originalName: 'updated worksheet.pdf',
+        size: 1024,
+      },
+    ],
+    sourceText: appendedMaterialDraftSourceText,
+  }
+);
+assert.equal(
+  refreshedMaterialDraftSourceText,
+  [
+    'Teacher source notes',
+    'Attached classroom source materials:\n- Worksheet document: updated worksheet.pdf',
+  ].join('\n\n')
+);
+assert.equal(
+  appendActivitySourceMaterialDraftNotes({
+    sourceMaterials: [],
+    sourceText: refreshedMaterialDraftSourceText,
+  }),
+  'Teacher source notes'
 );
 const materialDraftSourceText = getActivityDraftSourceText({
   ...fallbackDraft,
