@@ -1083,6 +1083,20 @@ type AssignmentAttemptReviewRow<TAttempt extends AssignmentAttemptRowInput> = {
   studentLabel: string;
 };
 
+export function filterAssignmentResultCompletedAttemptRows<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  attempts,
+  reviews,
+}: {
+  attempts: TAttempt[];
+  reviews: AssignmentAttemptReview[];
+}) {
+  const completedAttemptIds = new Set(reviews.map((review) => review.id));
+
+  return attempts.filter((attempt) => completedAttemptIds.has(attempt.id));
+}
+
 export function buildAssignmentResultViewModel<
   TAttempt extends AssignmentAttemptRowInput,
 >({

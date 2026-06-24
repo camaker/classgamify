@@ -281,6 +281,7 @@ import {
   buildFilteredAttemptRows,
   buildResultSearchSummary,
   filterAndSortStudentSummaries,
+  filterAssignmentResultCompletedAttemptRows,
   filterAttemptReviews,
   formatAssignmentAttemptReviewBadge,
   formatAssignmentBriefStudentAccuracy,
@@ -890,6 +891,11 @@ assert.match(
   assignmentResultRouteSource,
   /attemptReviewCount:\s*completedAttemptReviewCount/,
   'Assignment answer review sections should not unlock from raw review rows alone.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /filterAssignmentResultCompletedAttemptRows/,
+  'Assignment attempt rows should be filtered to completed result reviews before display.'
 );
 const directRunnerFeedbackSources = [
   'src/components/activities/fill-blank-worksheet.tsx',
@@ -9340,6 +9346,16 @@ assert.deepEqual(
     studentLabel: student.studentLabel,
   })),
   [{ attempts: 1, studentLabel: 'Alice' }]
+);
+assert.deepEqual(
+  filterAssignmentResultCompletedAttemptRows({
+    attempts: [
+      { id: 'completed-attempt', studentName: 'Alice' },
+      { id: 'unscored-attempt', studentName: 'Bob' },
+    ],
+    reviews: resultAnalysisWithUnscoredAttempt.attempts,
+  }).map((attempt) => attempt.id),
+  ['completed-attempt']
 );
 
 assert.equal(resultAnalysis.perItem[0]?.correctCount, 2);

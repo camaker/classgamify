@@ -14,6 +14,7 @@ import {
   buildAssignmentResultRouteSearch,
   buildAssignmentResultViewModel,
   getAssignmentResultCompletedAttemptCount,
+  filterAssignmentResultCompletedAttemptRows,
   assignmentResultPageCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
@@ -119,11 +120,19 @@ function AssignmentResultsPage() {
   const headerView = data ? buildAssignmentResultHeaderView(data) : null;
   const title =
     headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;
+  const completedAttempts = useMemo(
+    () =>
+      filterAssignmentResultCompletedAttemptRows({
+        attempts: data?.attempts ?? [],
+        reviews: data?.analysis.attempts ?? [],
+      }),
+    [data?.analysis.attempts, data?.attempts]
+  );
   const resultView = useMemo(
     () =>
       buildAssignmentResultViewModel({
         attemptReviewFilter,
-        attempts: data?.attempts ?? [],
+        attempts: completedAttempts,
         itemPerformanceSort,
         items: data?.analysis.perItem ?? [],
         reviews: data?.analysis.attempts ?? [],
@@ -136,7 +145,7 @@ function AssignmentResultsPage() {
       data?.analysis.attempts,
       data?.analysis.perItem,
       data?.analysis.students,
-      data?.attempts,
+      completedAttempts,
       itemPerformanceSort,
       studentSearch,
       studentSort,
