@@ -417,6 +417,11 @@ import {
   getOrCreateAnonymousAttemptToken,
 } from '@/assignments/identity';
 import {
+  ASSIGNMENT_SUBMISSION_ANSWER_LIMITS,
+  ASSIGNMENT_SUBMISSION_DURATION_RANGE,
+  ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS,
+} from '@/assignments/submission-limits';
+import {
   countMatchingStudentIdentityAttempts,
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
@@ -6145,6 +6150,36 @@ assert.match(
   /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
   'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
 );
+assert.match(
+  assignmentsApiSource,
+  /anonymousToken:[\s\S]*ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS\.anonymousTokenMinLength[\s\S]*ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS\.anonymousTokenMaxLength/,
+  'Submit attempt API should reuse anonymous-token submission limits.'
+);
+assert.match(
+  assignmentsApiSource,
+  /answer:[\s\S]*ASSIGNMENT_SUBMISSION_ANSWER_LIMITS\.answerMaxLength[\s\S]*itemId:[\s\S]*ASSIGNMENT_SUBMISSION_ANSWER_LIMITS\.itemIdMaxLength[\s\S]*\.max\(ASSIGNMENT_SUBMISSION_ANSWER_LIMITS\.maxAnswers\)/,
+  'Submit attempt API should reuse answer payload submission limits.'
+);
+assert.match(
+  assignmentsApiSource,
+  /durationSeconds:[\s\S]*ASSIGNMENT_SUBMISSION_DURATION_RANGE\.min[\s\S]*ASSIGNMENT_SUBMISSION_DURATION_RANGE\.max/,
+  'Submit attempt API should reuse duration submission limits.'
+);
+assert.match(
+  assignmentsApiSource,
+  /studentName:[\s\S]*ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS\.studentNameMaxLength/,
+  'Submit attempt API should reuse student-name submission limits.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /anonymousToken: z\.string\(\)\.trim\(\)\.min\(12\)\.max\(120\)/,
+  'Submit attempt API should not keep local anonymous-token bounds.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /\.max\(24 \* 60 \* 60\)/,
+  'Submit attempt API should not keep a local duration upper bound.'
+);
 const useAssignmentsSource = readFileSync(
   'src/hooks/use-assignments.ts',
   'utf8'
@@ -10446,6 +10481,20 @@ assert.deepEqual(
   ['g-treats-1', 'g-treats-2']
 );
 
+assert.deepEqual(ASSIGNMENT_SUBMISSION_ANSWER_LIMITS, {
+  answerMaxLength: 500,
+  itemIdMaxLength: 120,
+  maxAnswers: 200,
+});
+assert.deepEqual(ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS, {
+  anonymousTokenMaxLength: 120,
+  anonymousTokenMinLength: 12,
+  studentNameMaxLength: 80,
+});
+assert.deepEqual(ASSIGNMENT_SUBMISSION_DURATION_RANGE, {
+  max: 24 * 60 * 60,
+  min: 0,
+});
 assert.doesNotThrow(() =>
   assertSubmittedAnswersMatchRuntimeItems({
     answers: [{ itemId: 'item-1' }, { itemId: 'item-3' }],

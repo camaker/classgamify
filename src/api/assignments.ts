@@ -39,6 +39,11 @@ import {
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
+  ASSIGNMENT_SUBMISSION_ANSWER_LIMITS,
+  ASSIGNMENT_SUBMISSION_DURATION_RANGE,
+  ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS,
+} from '@/assignments/submission-limits';
+import {
   publishAssignmentInputSchema,
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
@@ -571,23 +576,39 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
   });
 
 const submitAttemptInputSchema = z.object({
-  anonymousToken: z.string().trim().min(12).max(120).optional(),
+  anonymousToken: z
+    .string()
+    .trim()
+    .min(ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS.anonymousTokenMinLength)
+    .max(ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS.anonymousTokenMaxLength)
+    .optional(),
   answers: z
     .array(
       z.object({
-        answer: z.string().trim().max(500),
-        itemId: z.string().min(1).max(120),
+        answer: z
+          .string()
+          .trim()
+          .max(ASSIGNMENT_SUBMISSION_ANSWER_LIMITS.answerMaxLength),
+        itemId: z
+          .string()
+          .min(1)
+          .max(ASSIGNMENT_SUBMISSION_ANSWER_LIMITS.itemIdMaxLength),
       })
     )
-    .max(200),
+    .max(ASSIGNMENT_SUBMISSION_ANSWER_LIMITS.maxAnswers),
   durationSeconds: z
     .number()
     .int()
-    .min(0)
-    .max(24 * 60 * 60)
+    .min(ASSIGNMENT_SUBMISSION_DURATION_RANGE.min)
+    .max(ASSIGNMENT_SUBMISSION_DURATION_RANGE.max)
     .optional(),
   shareSlug: assignmentShareSlugSchema,
-  studentName: z.string().trim().min(1).max(80).optional(),
+  studentName: z
+    .string()
+    .trim()
+    .min(1)
+    .max(ASSIGNMENT_SUBMISSION_IDENTITY_LIMITS.studentNameMaxLength)
+    .optional(),
 });
 
 export const submitAttempt = createServerFn({ method: 'POST' })
