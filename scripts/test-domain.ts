@@ -5060,6 +5060,16 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
+  /const summaryAttempts = await db[\s\S]*\.where\(and\(where, isNotNull\(attempt\.resultJson\)\)\)/,
+  'Assignment list summaries should only read completed attempts with scored results.'
+);
+assert.match(
+  assignmentsApiSource,
+  /const itemAttempts =[\s\S]*\.where\(\s*and\(\s*inArray\(attempt\.assignmentId, itemAssignmentIds\),\s*isNotNull\(attempt\.resultJson\)\s*\)\s*\)/,
+  'Assignment list card stats should only read completed attempts with scored results.'
+);
+assert.match(
+  assignmentsApiSource,
   /export const publishAssignment[\s\S]*assertActivityCanDeriveWork\(sourceActivity\.visibility\)/,
   'Publish assignment API should block archived source activities server-side before snapshotting.'
 );

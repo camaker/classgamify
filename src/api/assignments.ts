@@ -129,7 +129,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(where);
+      .where(and(where, isNotNull(attempt.resultJson)));
     const [publishedAssignment] = data.publishedShareSlug
       ? await db
           .select({
@@ -173,7 +173,12 @@ export const listAssignments = createServerFn({ method: 'GET' })
             })
             .from(attempt)
             .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
-            .where(inArray(attempt.assignmentId, itemAssignmentIds))
+            .where(
+              and(
+                inArray(attempt.assignmentId, itemAssignmentIds),
+                isNotNull(attempt.resultJson)
+              )
+            )
         : [];
     const statsByAssignmentId = summarizeAssignmentAttemptsByAssignmentId(
       itemAttempts.map(withAttemptStatsSettings)
