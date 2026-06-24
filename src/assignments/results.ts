@@ -49,6 +49,8 @@ export type AssignmentAttemptReview = {
   studentLabel: string;
 };
 
+type AssignmentAttemptReviewAnswer = AssignmentAttemptReview['answers'][number];
+
 export type AssignmentStudentSummary = {
   attempts: number;
   averageAccuracy: number;
@@ -75,7 +77,6 @@ export function analyzeAssignmentResults({
   runtimeItems: RuntimeItem[];
 }): AssignmentResultsAnalysis {
   const completedAttempts = attempts.filter(hasAttemptResult);
-  const runtimeItemById = new Map(runtimeItems.map((item) => [item.id, item]));
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getAcceptedAnswers(item.answer);
@@ -111,18 +112,9 @@ export function analyzeAssignmentResults({
 
     return {
       accuracy: getAttemptReviewAccuracy(attempt),
-      answers: attempt.answersJson.answers.map((answer) => {
-        const item = runtimeItemById.get(answer.itemId);
-        const acceptedAnswers = item ? getAcceptedAnswers(item.answer) : [];
-        return {
-          acceptedAnswers,
-          answer: answer.answer,
-          correct: Boolean(answer.correct),
-          expectedAnswer: item?.answer ?? '',
-          explanation: item?.explanation,
-          itemId: answer.itemId,
-          prompt: item ? formatRuntimeItemPrompt(item) : answer.itemId,
-        };
+      answers: buildAttemptReviewAnswers({
+        attempt,
+        runtimeItems,
       }),
       completedAt: attempt.completedAt,
       id: attempt.id,
@@ -140,6 +132,32 @@ export function analyzeAssignmentResults({
     perItem,
     students: buildStudentSummaries(attemptReviews),
   };
+}
+
+function buildAttemptReviewAnswers({
+  attempt,
+  runtimeItems,
+}: {
+  attempt: AttemptForAnalysis;
+  runtimeItems: RuntimeItem[];
+}): AssignmentAttemptReviewAnswer[] {
+  const answerByItemId = new Map(
+    attempt.answersJson.answers.map((answer) => [answer.itemId, answer])
+  );
+
+  return runtimeItems.map((item) => {
+    const submittedAnswer = answerByItemId.get(item.id);
+
+    return {
+      acceptedAnswers: getAcceptedAnswers(item.answer),
+      answer: submittedAnswer?.answer ?? '',
+      correct: Boolean(submittedAnswer?.correct),
+      expectedAnswer: item.answer,
+      explanation: item.explanation,
+      itemId: item.id,
+      prompt: formatRuntimeItemPrompt(item),
+    };
+  });
 }
 
 function hasAttemptResult(

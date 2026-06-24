@@ -9650,6 +9650,51 @@ assert.deepEqual(
     studentLabel: 'Anonymous student 2',
   }
 );
+const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-missing-answer',
+      resultJson: {
+        accuracy: 50,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      score: 1,
+      studentName: 'Casey',
+    },
+  ],
+  runtimeItems: resultRuntimeItems.slice().reverse(),
+});
+assert.deepEqual(
+  runtimeOrderedResultAnalysis.attempts[0]?.answers.map((answer) => ({
+    answer: answer.answer,
+    correct: answer.correct,
+    itemId: answer.itemId,
+    prompt: answer.prompt,
+  })),
+  [
+    {
+      answer: '',
+      correct: false,
+      itemId: 'pair-1',
+      prompt: 'Match "Hot" with its pair.',
+    },
+    {
+      answer: 'Paris',
+      correct: true,
+      itemId: 'q-1',
+      prompt: 'Capital of France?',
+    },
+  ]
+);
 const sanitizedResultAnalysis = analyzeAssignmentResults({
   attempts: [
     {
@@ -11425,7 +11470,7 @@ assert.deepEqual(
   ),
   {
     accuracyLabel: 'Latest 0% · best 0%',
-    needsReviewLabel: '1 review',
+    needsReviewLabel: '2 reviews',
     studentLabel: 'Anonymous student 1',
   }
 );
@@ -11442,7 +11487,7 @@ assert.match(
 );
 assert.match(
   classroomBrief.text,
-  /- 1\. Anonymous student 1: 0% latest, 1 item to review/
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review/
 );
 
 const reteachPlan = buildAssignmentReteachPlan({
