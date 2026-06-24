@@ -36,6 +36,7 @@ import {
 import {
   compareAssignmentItemsByReviewPriority,
   compareAssignmentItemsByStableOrder,
+  compareAssignmentItemsByType,
 } from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
@@ -1529,7 +1530,7 @@ export function sortItemPerformance(
     }
 
     if (sort === 'type') {
-      return compareAssignmentItemsByStableOrder(left, right);
+      return compareAssignmentItemsByType(left, right);
     }
 
     return 0;

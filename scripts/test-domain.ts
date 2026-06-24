@@ -342,6 +342,7 @@ import {
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
 import {
+  compareAssignmentItemsByType,
   getSubmittedAssignmentReviewPriorityItems,
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
@@ -12537,6 +12538,12 @@ const stableTieReviewPriorityItems = [
   },
 ] satisfies typeof resultAnalysis.perItem;
 const stableTieItemOrder = ['group-z', 'pair-z', 'question-a', 'question-b'];
+assert.deepEqual(
+  [...stableTieReviewPriorityItems]
+    .sort(compareAssignmentItemsByType)
+    .map((item) => item.itemId),
+  stableTieItemOrder
+);
 assert.deepEqual(
   sortAssignmentItemsByReviewPriority(stableTieReviewPriorityItems).map(
     (item) => item.itemId

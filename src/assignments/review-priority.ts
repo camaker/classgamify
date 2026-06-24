@@ -19,6 +19,13 @@ export function compareAssignmentItemsByStableOrder(
   left: AssignmentItemAnalysis,
   right: AssignmentItemAnalysis
 ) {
+  return compareAssignmentItemsByType(left, right);
+}
+
+export function compareAssignmentItemsByType(
+  left: AssignmentItemAnalysis,
+  right: AssignmentItemAnalysis
+) {
   const kindCompare = left.kind.localeCompare(right.kind);
   if (kindCompare !== 0) return kindCompare;
 
