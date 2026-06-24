@@ -1,8 +1,9 @@
 import { m } from '@/locale/paraglide/messages';
 import type { ActivityTemplateDefinition } from '@/activities/types';
-import type {
-  WorksheetModeDefinition,
-  WorksheetModeTemplate,
+import {
+  WORKSHEET_MODE_TEMPLATES,
+  type WorksheetModeDefinition,
+  type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
 
 type CreateActivityTemplateSearch = {
@@ -32,10 +33,9 @@ export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
 export function buildWorksheetHeroActions(
   modes: readonly WorksheetModeDefinition[]
 ) {
-  return [
-    buildWorksheetHeroAction(modes, 'fill-blank'),
-    buildWorksheetHeroAction(modes, 'line-match'),
-  ] as const;
+  return WORKSHEET_MODE_TEMPLATES.map((template) =>
+    buildWorksheetHeroAction(modes, template)
+  );
 }
 
 function buildWorksheetHeroAction(

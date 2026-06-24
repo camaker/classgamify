@@ -71,26 +71,26 @@ function WorksheetsPage() {
                 {m.worksheets_page_description()}
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                to={Routes.Create}
-                search={heroActions[0].search}
-                className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
-              >
-                <IconPencilPlus className="size-4" />
-                {heroActions[0].label}
-              </Link>
-              <Link
-                to={Routes.Create}
-                search={heroActions[1].search}
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'lg' }),
-                  'rounded-lg bg-background'
-                )}
-              >
-                {heroActions[1].label}
-                <IconArrowRight className="size-4" />
-              </Link>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {heroActions.map((action, index) => (
+                <Link
+                  key={action.template}
+                  to={Routes.Create}
+                  search={action.search}
+                  className={cn(
+                    buttonVariants({
+                      size: 'lg',
+                      variant: index === 0 ? 'default' : 'outline',
+                    }),
+                    'rounded-lg',
+                    index === 0 ? '' : 'bg-background'
+                  )}
+                >
+                  {index === 0 ? <IconPencilPlus className="size-4" /> : null}
+                  {action.label}
+                  {index === 0 ? null : <IconArrowRight className="size-4" />}
+                </Link>
+              ))}
             </div>
           </div>
 

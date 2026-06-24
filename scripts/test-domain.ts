@@ -5185,6 +5185,16 @@ assert.doesNotMatch(
   /key=\{mode\.title\}/,
   'Worksheet mode cards should not key by locale-dependent titles.'
 );
+assert.match(
+  worksheetsRouteSource,
+  /heroActions\.map\(\(action, index\) =>/,
+  'Worksheet hero should render every worksheet mode entry action.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /heroActions\[[01]\]/,
+  'Worksheet hero should not hard-code only the first two worksheet modes.'
+);
 assert.equal(
   getWorksheetModeDefinitions().every((mode) =>
     isActivityTemplateType(mode.template)
@@ -5216,6 +5226,16 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
     label: 'Start line match',
     search: { template: 'line-match' },
     template: 'line-match',
+  },
+  {
+    label: 'Create listening',
+    search: { template: 'listening' },
+    template: 'listening',
+  },
+  {
+    label: 'Create sort',
+    search: { template: 'group-sort' },
+    template: 'group-sort',
   },
 ]);
 assert.deepEqual(
