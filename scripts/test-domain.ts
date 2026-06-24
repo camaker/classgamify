@@ -10646,6 +10646,59 @@ assert.deepEqual(
     'higher-accuracy',
   ]
 );
+const stableTieReviewPriorityItems = [
+  {
+    acceptedAnswers: ['Question B'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'Question B',
+    itemId: 'question-b',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'Same prompt',
+    submittedCount: 3,
+  },
+  {
+    acceptedAnswers: ['Pair Z'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'Pair Z',
+    itemId: 'pair-z',
+    kind: 'pair',
+    kindLabel: 'Pair',
+    prompt: 'Alpha prompt',
+    submittedCount: 3,
+  },
+  {
+    acceptedAnswers: ['Question A'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'Question A',
+    itemId: 'question-a',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'Same prompt',
+    submittedCount: 3,
+  },
+  {
+    acceptedAnswers: ['Group Z'],
+    correctCount: 1,
+    correctRate: 50,
+    expectedAnswer: 'Group Z',
+    itemId: 'group-z',
+    kind: 'group-item',
+    kindLabel: 'Group item',
+    prompt: 'Zoo prompt',
+    submittedCount: 3,
+  },
+] satisfies typeof resultAnalysis.perItem;
+const stableTieItemOrder = ['group-z', 'pair-z', 'question-a', 'question-b'];
+assert.deepEqual(
+  sortAssignmentItemsByReviewPriority(stableTieReviewPriorityItems).map(
+    (item) => item.itemId
+  ),
+  stableTieItemOrder
+);
 assert.deepEqual(
   getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {
     limit: 2,
@@ -10663,6 +10716,18 @@ assert.deepEqual(
     (item) => item.itemId
   ),
   ['pair-1', 'q-1']
+);
+assert.deepEqual(
+  sortItemPerformance(stableTieReviewPriorityItems, 'submitted').map(
+    (item) => item.itemId
+  ),
+  stableTieItemOrder
+);
+assert.deepEqual(
+  sortItemPerformance(stableTieReviewPriorityItems, 'type').map(
+    (item) => item.itemId
+  ),
+  stableTieItemOrder
 );
 assert.equal(
   sortItemPerformance(resultAnalysis.perItem, 'original'),

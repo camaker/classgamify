@@ -31,7 +31,10 @@ import {
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
 } from '@/assignments/result-format';
-import { compareAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
+import {
+  compareAssignmentItemsByReviewPriority,
+  compareAssignmentItemsByStableOrder,
+} from '@/assignments/review-priority';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
@@ -1464,13 +1467,14 @@ export function sortItemPerformance(
       if (left.submittedCount !== right.submittedCount) {
         return right.submittedCount - left.submittedCount;
       }
-      return left.correctRate - right.correctRate;
+      if (left.correctRate !== right.correctRate) {
+        return left.correctRate - right.correctRate;
+      }
+      return compareAssignmentItemsByStableOrder(left, right);
     }
 
     if (sort === 'type') {
-      const typeCompare = left.kind.localeCompare(right.kind);
-      if (typeCompare !== 0) return typeCompare;
-      return left.prompt.localeCompare(right.prompt);
+      return compareAssignmentItemsByStableOrder(left, right);
     }
 
     return 0;

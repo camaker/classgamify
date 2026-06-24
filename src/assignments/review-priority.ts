@@ -8,7 +8,24 @@ export function compareAssignmentItemsByReviewPriority(
     return left.correctRate - right.correctRate;
   }
 
-  return right.submittedCount - left.submittedCount;
+  if (left.submittedCount !== right.submittedCount) {
+    return right.submittedCount - left.submittedCount;
+  }
+
+  return compareAssignmentItemsByStableOrder(left, right);
+}
+
+export function compareAssignmentItemsByStableOrder(
+  left: AssignmentItemAnalysis,
+  right: AssignmentItemAnalysis
+) {
+  const kindCompare = left.kind.localeCompare(right.kind);
+  if (kindCompare !== 0) return kindCompare;
+
+  const promptCompare = left.prompt.localeCompare(right.prompt);
+  if (promptCompare !== 0) return promptCompare;
+
+  return left.itemId.localeCompare(right.itemId);
 }
 
 export function sortAssignmentItemsByReviewPriority(
