@@ -1461,7 +1461,7 @@
   "pricing_faq_title": "Frequently asked questions",
   "pricing_monthly": "Monthly",
   "pricing_plans_free_description": "Try the core activity creation loop without a credit card.",
-  "pricing_plans_free_features": "[\"Browse starter templates\",\"Create sample activities\",\"Open student previews\",\"Basic assignment shell\"]",
+  "pricing_plans_free_features": "[\"Browse starter templates\",\"Create sample activities\",\"Open student previews\",\"Publish a sample assignment link\"]",
   "pricing_plans_free_limits": "[\"Higher activity limits\",\"AI generation\",\"Advanced results\"]",
   "pricing_plans_free_name": "Starter",
   "pricing_plans_lifetime_description": "Early access for teachers who want to shape the template and AI roadmap.",

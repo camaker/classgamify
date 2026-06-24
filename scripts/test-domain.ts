@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
+import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
@@ -1556,6 +1557,25 @@ const localeMessageText = [
 ]
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
+const pricingMessageText = [
+  'project.inlang/messages/en.json',
+  'project.inlang/messages/zh.json',
+]
+  .map((filePath) => {
+    const messages = JSON.parse(readFileSync(filePath, 'utf8')) as Record<
+      string,
+      string
+    >;
+
+    return Object.entries(messages)
+      .filter(
+        ([key]) =>
+          key.startsWith('pricing_') || key.startsWith('settings_billing_')
+      )
+      .map(([, value]) => value)
+      .join('\n');
+  })
+  .join('\n');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(
   retiredRouteDocumentationText,
@@ -1571,6 +1591,38 @@ assert.doesNotMatch(
   localeMessageText,
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
+);
+assert.doesNotMatch(
+  pricingMessageText,
+  /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|saved character|skeleton|shell|脚手架|骨架|汉字|中文分级/,
+  'Pricing and billing copy should describe ClassGamify plans, not copied learning or unfinished scaffold language.'
+);
+overwriteGetLocale(() => 'en');
+const pricePlans = getPricePlans();
+assert.deepEqual(Object.keys(pricePlans), ['free', 'pro', 'lifetime']);
+assert.ok(
+  pricePlans.free?.features?.some((feature) =>
+    feature.toLowerCase().includes('assignment link')
+  ),
+  'The free plan should describe a real sample assignment-link workflow.'
+);
+assert.ok(
+  pricePlans.pro?.features?.some((feature) =>
+    feature.toLowerCase().includes('student completion')
+  ),
+  'The Pro plan should include student completion and score tracking.'
+);
+assert.ok(
+  pricePlans.pro?.features?.some((feature) =>
+    feature.toLowerCase().includes('ai-assisted')
+  ),
+  'The Pro plan should include AI-assisted activity drafting.'
+);
+assert.ok(
+  pricePlans.lifetime?.features?.some((feature) =>
+    feature.toLowerCase().includes('new templates')
+  ),
+  'The lifetime plan should preserve early access to new ClassGamify templates.'
 );
 assert.equal(
   existsSync('src/routes/settings/apikeys.tsx'),
