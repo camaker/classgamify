@@ -3007,8 +3007,23 @@ assert.equal(
   'https://classgamify.test'
 );
 assert.equal(
+  normalizeShareBaseUrl('https://classgamify.test/app?utm=teacher#share'),
+  'https://classgamify.test'
+);
+assert.equal(
+  normalizeShareBaseUrl('http://localhost:3000/base/path'),
+  'http://localhost:3000'
+);
+assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
   'https://classgamify.test/play/abc%20123'
+);
+assert.equal(
+  buildAssignmentShareUrl(
+    'class/6',
+    'https://classgamify.test/dashboard/assignments?published=class'
+  ),
+  'https://classgamify.test/play/class%2F6'
 );
 assert.equal(
   buildAssignmentShareUrl('abc 123', '   '),

@@ -23,7 +23,14 @@ export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
 }
 
 export function normalizeShareBaseUrl(baseUrl: string) {
-  return baseUrl.trim().replace(/\/+$/, '');
+  const normalized = baseUrl.trim();
+  if (!normalized) return '';
+
+  try {
+    return new URL(normalized).origin;
+  } catch {
+    return normalized.replace(/\/+$/, '');
+  }
 }
 
 function getRuntimeBaseUrl() {
