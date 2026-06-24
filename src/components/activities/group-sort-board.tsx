@@ -5,7 +5,9 @@ import type {
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildStudentRunnerView,
+  getStudentRunnerReviewStatusClassName,
   isSameRuntimeChoice,
+  type StudentRunnerReviewStatus,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -100,7 +102,7 @@ export function GroupSortBoard({
 
           <div className="mt-3 grid gap-2">
             {unplacedItemViews.length ? (
-              unplacedItemViews.map(({ item, reviewItem }) => (
+              unplacedItemViews.map(({ item, reviewItem, status }) => (
                 <GroupSortItemButton
                   correctLabel={copy.correctAnswerLabel}
                   key={item.id}
@@ -108,6 +110,7 @@ export function GroupSortBoard({
                   reviewItem={reviewItem}
                   revealAnswer={revealAnswer}
                   selected={selectedItemId === item.id}
+                  status={status}
                   onSelect={() =>
                     setSelectedItemId((current) =>
                       current === item.id ? undefined : item.id
@@ -153,7 +156,7 @@ export function GroupSortBoard({
                 </button>
 
                 <div className="mt-3 grid gap-2">
-                  {placedItemViews.map(({ item, reviewItem }) => (
+                  {placedItemViews.map(({ item, reviewItem, status }) => (
                     <GroupSortItemButton
                       key={item.id}
                       correctLabel={copy.correctAnswerLabel}
@@ -161,6 +164,7 @@ export function GroupSortBoard({
                       reviewItem={reviewItem}
                       revealAnswer={revealAnswer}
                       selected={selectedItemId === item.id}
+                      status={status}
                       onSelect={() =>
                         setSelectedItemId((current) =>
                           current === item.id ? undefined : item.id
@@ -192,6 +196,7 @@ function GroupSortItemButton({
   revealAnswer,
   reviewItem,
   selected,
+  status,
 }: {
   compact?: boolean;
   correctLabel: string;
@@ -201,6 +206,7 @@ function GroupSortItemButton({
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
   selected: boolean;
+  status: StudentRunnerReviewStatus;
 }) {
   return (
     <button
@@ -210,11 +216,7 @@ function GroupSortItemButton({
         'w-full rounded-lg border bg-background p-3 text-left transition-colors',
         'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
         selected && 'border-primary bg-primary/10',
-        revealAnswer && reviewItem?.correct && 'border-primary/35 bg-primary/5',
-        revealAnswer &&
-          reviewItem &&
-          !reviewItem.correct &&
-          'border-destructive/30 bg-destructive/5',
+        revealAnswer && getStudentRunnerReviewStatusClassName(status),
         compact && 'p-2'
       )}
       onClick={onSelect}

@@ -192,6 +192,7 @@ import {
   buildStudentRunnerView,
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
+  getStudentRunnerReviewStatusClassName,
   getUniqueRuntimeChoices,
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
@@ -2265,6 +2266,15 @@ assert.deepEqual(
     statusLabel: 'Correct',
   }
 );
+assert.equal(
+  getStudentRunnerReviewStatusClassName('correct'),
+  'border-primary/35 bg-primary/5'
+);
+assert.equal(
+  getStudentRunnerReviewStatusClassName('needs-review'),
+  'border-destructive/30 bg-destructive/5'
+);
+assert.equal(getStudentRunnerReviewStatusClassName('idle'), undefined);
 assert.equal(
   buildPublicAnswerFeedbackView({
     reviewItem: {

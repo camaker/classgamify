@@ -25,6 +25,8 @@ import { m } from '@/locale/paraglide/messages';
 
 type StudentRunnerReviewStatus = 'correct' | 'idle' | 'needs-review';
 
+export type { StudentRunnerReviewStatus };
+
 type RuntimeChoiceAnswerChange = {
   answer: string;
   itemId: string;
@@ -312,6 +314,17 @@ export function buildPublicAnswerFeedbackView({
       ? m.student_runner_feedback_status_correct()
       : m.student_runner_feedback_status_needs_review(),
   };
+}
+
+export function getStudentRunnerReviewStatusClassName(
+  status: StudentRunnerReviewStatus
+) {
+  if (status === 'correct') return 'border-primary/35 bg-primary/5';
+  if (status === 'needs-review') {
+    return 'border-destructive/30 bg-destructive/5';
+  }
+
+  return undefined;
 }
 
 function getStudentRunnerReviewStatus(

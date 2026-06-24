@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialRunnerView,
   buildStudentRunnerView,
+  getStudentRunnerReviewStatusClassName,
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
@@ -105,7 +106,7 @@ export function ListeningRunner({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
           {sequenceView.itemViews.map((itemView) => {
-            const { answered, item, reviewItem, sequenceLabel } = itemView;
+            const { answered, item, sequenceLabel, status } = itemView;
             const selected = item.id === activeItem.id;
 
             return (
@@ -116,13 +117,7 @@ export function ListeningRunner({
                   'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5',
                   selected && 'border-primary bg-primary/10',
-                  revealAnswer &&
-                    reviewItem?.correct &&
-                    'border-primary/35 bg-primary/5',
-                  revealAnswer &&
-                    reviewItem &&
-                    !reviewItem.correct &&
-                    'border-destructive/30 bg-destructive/5'
+                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
                 onClick={() => setActiveItemId(item.id)}
               >
@@ -143,12 +138,10 @@ export function ListeningRunner({
           className={cn(
             'rounded-lg border bg-background p-4',
             revealAnswer &&
-              activeReviewItem?.correct &&
-              'border-primary/35 bg-primary/5',
-            revealAnswer &&
-              activeReviewItem &&
-              !activeReviewItem.correct &&
-              'border-destructive/30 bg-destructive/5'
+              sequenceView.activeItemView &&
+              getStudentRunnerReviewStatusClassName(
+                sequenceView.activeItemView.status
+              )
           )}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">

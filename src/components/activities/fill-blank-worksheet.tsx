@@ -5,6 +5,7 @@ import type {
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildInlineBlankPromptView,
+  getStudentRunnerReviewStatusClassName,
   buildStudentRunnerView,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -56,19 +57,15 @@ export function FillBlankWorksheet({
       </div>
 
       <div className="mt-3 grid gap-3">
-        {runnerView.itemViews.map(({ answer, item, reviewItem }, index) => {
+        {runnerView.itemViews.map((itemView, index) => {
+          const { answer, item, reviewItem, status } = itemView;
+
           return (
             <div
               key={item.id}
               className={cn(
                 'rounded-lg border bg-background p-3',
-                revealAnswer &&
-                  reviewItem?.correct &&
-                  'border-primary/35 bg-primary/5',
-                revealAnswer &&
-                  reviewItem &&
-                  !reviewItem.correct &&
-                  'border-destructive/30 bg-destructive/5'
+                revealAnswer && getStudentRunnerReviewStatusClassName(status)
               )}
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">

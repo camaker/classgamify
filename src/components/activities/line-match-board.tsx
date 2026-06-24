@@ -7,6 +7,7 @@ import {
   buildExclusiveChoiceAnswerChanges,
   buildRuntimeChoiceViews,
   buildStudentRunnerView,
+  getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -86,7 +87,7 @@ export function LineMatchBoard({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
           {runnerView.itemViews.map((itemView, index) => {
-            const { answer, item, reviewItem } = itemView;
+            const { answer, item, reviewItem, status } = itemView;
             const selected = selectedItemId === item.id;
 
             return (
@@ -98,13 +99,7 @@ export function LineMatchBoard({
                   'min-h-16 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
                   selected && 'border-primary bg-primary/10',
-                  revealAnswer &&
-                    reviewItem?.correct &&
-                    'border-primary/35 bg-primary/5',
-                  revealAnswer &&
-                    reviewItem &&
-                    !reviewItem.correct &&
-                    'border-destructive/30 bg-destructive/5'
+                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
                 onClick={() => selectPrompt(item.id)}
               >

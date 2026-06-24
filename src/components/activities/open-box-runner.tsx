@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialRunnerView,
   buildStudentRunnerView,
+  getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -84,7 +85,7 @@ export function OpenBoxRunner({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
           {sequenceView.itemViews.map((itemView) => {
-            const { answered, item, reviewItem, sequenceLabel } = itemView;
+            const { answered, item, sequenceLabel, status } = itemView;
             const selected = item.id === activeItem.id;
 
             return (
@@ -95,13 +96,7 @@ export function OpenBoxRunner({
                   'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5',
                   selected && 'border-primary bg-primary/10',
-                  revealAnswer &&
-                    reviewItem?.correct &&
-                    'border-primary/35 bg-primary/5',
-                  revealAnswer &&
-                    reviewItem &&
-                    !reviewItem.correct &&
-                    'border-destructive/30 bg-destructive/5'
+                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
                 onClick={() => setActiveItemId(item.id)}
               >
@@ -122,12 +117,10 @@ export function OpenBoxRunner({
           className={cn(
             'rounded-lg border bg-background p-4',
             revealAnswer &&
-              activeReviewItem?.correct &&
-              'border-primary/35 bg-primary/5',
-            revealAnswer &&
-              activeReviewItem &&
-              !activeReviewItem.correct &&
-              'border-destructive/30 bg-destructive/5'
+              sequenceView.activeItemView &&
+              getStudentRunnerReviewStatusClassName(
+                sequenceView.activeItemView.status
+              )
           )}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
