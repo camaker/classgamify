@@ -13,7 +13,6 @@ import {
 } from '@/assignments/result-format';
 import {
   buildAssignmentDeliverySummary,
-  formatAssignmentAttempts,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
@@ -108,7 +107,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       deliverySummaryById.get('identity') ?? '',
       deliverySummaryById.get('answerReveal') ?? '',
       deliverySummaryById.get('itemOrder') ?? '',
-      formatAssignmentAttempts(settings.maxAttempts),
+      formatAssignmentExportMaxAttempts(settings.maxAttempts),
       settings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
@@ -245,6 +244,10 @@ function formatAssignmentExportStatusLabel({
   status: string;
 }) {
   return getAssignmentStatusLabel(status, expiresAt, now);
+}
+
+function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
+  return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {

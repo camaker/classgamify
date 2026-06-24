@@ -12541,7 +12541,7 @@ assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
-  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2 max","60"/
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
@@ -12706,7 +12706,7 @@ const partialSettingsCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   partialSettingsCsv,
-  /"Review quietly\.","Anonymous","Hidden","Shuffled","2 max",""/
+  /"Review quietly\.","Anonymous","Hidden","Shuffled","2",""/
 );
 assert.match(
   partialSettingsCsv,
