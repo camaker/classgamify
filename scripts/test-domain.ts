@@ -208,6 +208,7 @@ import {
   stripRuntimeAnswer,
   stripRuntimeAnswers,
 } from '@/assignments/public';
+import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
@@ -4096,6 +4097,112 @@ assert.deepEqual(publicAssignmentLookupAvailable, {
   payload: publicAssignmentPayload,
   status: 'available',
 });
+const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet({
+  activity: {
+    description: 'Current activity description',
+    templateType: 'quiz',
+    title: 'Current activity title',
+  },
+  assignment: {
+    expiresAt: null,
+    settingsJson: {
+      collectStudentName: false,
+      instructions: '  Finish on paper.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    },
+    shareSlug: ' printable-１ ',
+    title: 'Printable assignment',
+  },
+  runtimeItems: getRuntimeItems('quiz', publicPayloadSnapshotContent),
+  snapshot: {
+    activityDescription: 'Frozen activity description',
+    activityTitle: 'Frozen activity title',
+    templateType: 'quiz',
+  },
+});
+assert.equal(printableSnapshotWorksheet.activityTitle, 'Frozen activity title');
+assert.equal(
+  printableSnapshotWorksheet.activityDescription,
+  'Frozen activity description'
+);
+assert.equal(
+  printableSnapshotWorksheet.assignmentTitle,
+  'Printable assignment'
+);
+assert.equal(printableSnapshotWorksheet.includeAnswerKey, false);
+assert.equal(printableSnapshotWorksheet.answerKey, undefined);
+assert.equal(printableSnapshotWorksheet.instructions, 'Finish on paper.');
+assert.equal(printableSnapshotWorksheet.shareSlug, 'printable-1');
+assert.equal(printableSnapshotWorksheet.sharePath, '/play/printable-1');
+assert.match(
+  printableSnapshotWorksheet.deliveryPolicyText,
+  /Student instructions: Finish on paper\./
+);
+assert.deepEqual(
+  printableSnapshotWorksheet.deliverySummary.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['attempts', '3 max'],
+    ['timer', '2 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'Hidden'],
+    ['itemOrder', 'Fixed order'],
+  ]
+);
+assert.deepEqual(printableSnapshotWorksheet.items[0], {
+  answerSpaceLines: 1,
+  choices: ['Frozen answer / Frozen accepted', 'Frozen answer', 'Other'],
+  id: 'q-frozen-prompt',
+  kind: 'question',
+  prompt: 'Frozen prompt?',
+  responseMode: 'choice',
+  sequenceNumber: 1,
+});
+const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
+  {
+    activity: {
+      description: 'Current activity description',
+      templateType: 'quiz',
+      title: 'Current activity title',
+    },
+    assignment: {
+      expiresAt: null,
+      settingsJson: {
+        collectStudentName: false,
+        instructions: '  Finish on paper.  ',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 120,
+      },
+      shareSlug: ' printable-１ ',
+      title: 'Printable assignment',
+    },
+    includeAnswerKey: true,
+    runtimeItems: getRuntimeItems('quiz', publicPayloadSnapshotContent),
+    snapshot: {
+      activityDescription: 'Frozen activity description',
+      activityTitle: 'Frozen activity title',
+      templateType: 'quiz',
+    },
+  }
+);
+assert.deepEqual(printableSnapshotWorksheetWithAnswers.answerKey, [
+  {
+    acceptedAnswers: ['Frozen answer', 'Frozen accepted'],
+    answer: 'Frozen answer',
+    explanation: 'Frozen explanation',
+    id: 'q-frozen-prompt',
+    prompt: 'Frozen prompt?',
+    sequenceNumber: 1,
+  },
+]);
 assert.equal(
   buildOpenPublicAssignmentPayload({
     ...publicAssignmentPayloadSource,
@@ -4178,6 +4285,16 @@ const publicRuntimeSanitizationInput = {
   visibility: 'draft' as const,
   vocabularyText: 'Paris, France, night, cat, tree, Cold, Down',
 };
+const printableResponseModeByTemplate = {
+  'fill-blank': 'short-answer',
+  'group-sort': 'group-choice',
+  'line-match': 'line-match',
+  'match-up': 'choice',
+  'matching-pairs': 'matching-pairs',
+  'open-box': 'short-answer',
+  listening: 'short-answer',
+  quiz: 'choice',
+} as const;
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const content = buildActivityContent({
     ...publicRuntimeSanitizationInput,
@@ -4214,6 +4331,32 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   assert.equal(payload.assignment.shareSlug, `share-${templateType}`);
   assert.equal(payload.runtimeItems.length, runtimeItems.length);
   assert.deepEqual(payload.runtimeItems, expectedPublicRuntimeItems);
+  const printableWorksheet = buildPrintableAssignmentWorksheet({
+    activity: {
+      description: 'Printable runtime activity description',
+      templateType,
+      title: `Printable ${templateType}`,
+    },
+    assignment: {
+      expiresAt: null,
+      settingsJson: {
+        shuffleItems: false,
+      },
+      shareSlug: ` printable-${templateType} `,
+      title: `Printable ${templateType}`,
+    },
+    runtimeItems,
+    snapshot: null,
+  });
+  assert.equal(printableWorksheet.items.length, runtimeItems.length);
+  assert.equal(
+    printableWorksheet.items.every(
+      (item) =>
+        item.responseMode === printableResponseModeByTemplate[templateType]
+    ),
+    true
+  );
+  assert.equal(printableWorksheet.answerKey, undefined);
   payload.runtimeItems.forEach((item, index) => {
     assert.deepEqual(Object.keys(item).sort(), [
       'choices',

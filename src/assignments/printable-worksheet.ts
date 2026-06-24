@@ -1,0 +1,195 @@
+import { getAcceptedAnswers } from '@/activities/answer-matching';
+import {
+  getActivityTemplateRunnerKind,
+  type RuntimeItem,
+} from '@/activities/runtime';
+import type {
+  ActivityTemplateType,
+  AssignmentSettings,
+} from '@/activities/types';
+import {
+  buildAssignmentDeliverySummary,
+  formatAssignmentDeliveryPolicyText,
+} from '@/assignments/delivery-summary';
+import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
+import { buildAssignmentSharePath } from '@/assignments/share-link';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { resolveAssignmentSettings } from '@/assignments/validation';
+
+export type PrintableWorksheetResponseMode =
+  | 'choice'
+  | 'group-choice'
+  | 'line-match'
+  | 'matching-pairs'
+  | 'short-answer';
+
+export type PrintableWorksheetItem = {
+  answerSpaceLines: number;
+  choices: string[];
+  id: string;
+  kind: RuntimeItem['kind'];
+  prompt: string;
+  responseMode: PrintableWorksheetResponseMode;
+  sequenceNumber: number;
+};
+
+export type PrintableWorksheetAnswerKeyItem = {
+  acceptedAnswers: string[];
+  answer: string;
+  explanation?: string;
+  id: string;
+  prompt: string;
+  sequenceNumber: number;
+};
+
+export type PrintableAssignmentWorksheet = {
+  activityDescription: string | null;
+  activityTitle: string;
+  answerKey?: PrintableWorksheetAnswerKeyItem[];
+  assignmentTitle: string;
+  deliveryPolicyText: string;
+  deliverySummary: ReturnType<typeof buildAssignmentDeliverySummary>;
+  includeAnswerKey: boolean;
+  instructions?: string;
+  items: PrintableWorksheetItem[];
+  sharePath: string;
+  shareSlug: string;
+  templateType: ActivityTemplateType;
+};
+
+type PrintableAssignmentWorksheetSource = {
+  activity: {
+    description: string | null;
+    templateType: ActivityTemplateType;
+    title: string;
+  };
+  assignment: {
+    expiresAt: Date | string | null;
+    settingsJson: Partial<AssignmentSettings> | null | undefined;
+    shareSlug: string;
+    title: string;
+  };
+  includeAnswerKey?: boolean;
+  runtimeItems: RuntimeItem[];
+  snapshot?: {
+    activityDescription: string | null;
+    activityTitle: string;
+    templateType: ActivityTemplateType;
+  } | null;
+};
+
+export function buildPrintableAssignmentWorksheet({
+  activity,
+  assignment,
+  includeAnswerKey = false,
+  runtimeItems,
+  snapshot,
+}: PrintableAssignmentWorksheetSource): PrintableAssignmentWorksheet {
+  const settings = resolveAssignmentSettings(assignment.settingsJson);
+  const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
+  const templateType = snapshot?.templateType ?? activity.templateType;
+  const orderedRuntimeItems = orderAssignmentRuntimeItems({
+    items: runtimeItems,
+    shareSlug,
+    shuffleItems: settings.shuffleItems,
+  });
+
+  return {
+    activityDescription:
+      snapshot?.activityDescription ?? activity.description ?? null,
+    activityTitle: snapshot?.activityTitle ?? activity.title,
+    answerKey: includeAnswerKey
+      ? orderedRuntimeItems.map(toPrintableWorksheetAnswerKeyItem)
+      : undefined,
+    assignmentTitle: assignment.title,
+    deliveryPolicyText: formatAssignmentDeliveryPolicyText({
+      expiresAt: assignment.expiresAt,
+      settings,
+    }),
+    deliverySummary: buildAssignmentDeliverySummary({
+      collectStudentName: settings.collectStudentName,
+      expiresAt: assignment.expiresAt,
+      maxAttempts: settings.maxAttempts,
+      showCorrectAnswers: settings.showCorrectAnswers,
+      shuffleItems: settings.shuffleItems,
+      timeLimitSeconds: settings.timeLimitSeconds,
+    }),
+    includeAnswerKey,
+    instructions: settings.instructions,
+    items: orderedRuntimeItems.map((item, index) =>
+      toPrintableWorksheetItem({
+        item,
+        sequenceNumber: index + 1,
+        templateType,
+      })
+    ),
+    sharePath: buildAssignmentSharePath(shareSlug),
+    shareSlug,
+    templateType,
+  };
+}
+
+function toPrintableWorksheetItem({
+  item,
+  sequenceNumber,
+  templateType,
+}: {
+  item: RuntimeItem;
+  sequenceNumber: number;
+  templateType: ActivityTemplateType;
+}): PrintableWorksheetItem {
+  const responseMode = getPrintableWorksheetResponseMode(templateType);
+
+  return {
+    answerSpaceLines: getPrintableWorksheetAnswerSpaceLines(responseMode),
+    choices: item.choices ? [...item.choices] : [],
+    id: item.id,
+    kind: item.kind,
+    prompt: item.prompt,
+    responseMode,
+    sequenceNumber,
+  };
+}
+
+function toPrintableWorksheetAnswerKeyItem(
+  item: RuntimeItem,
+  index: number
+): PrintableWorksheetAnswerKeyItem {
+  const acceptedAnswers = getAcceptedAnswers(item.answer);
+
+  return {
+    acceptedAnswers,
+    answer: acceptedAnswers[0] ?? item.answer,
+    explanation: item.explanation,
+    id: item.id,
+    prompt: item.prompt,
+    sequenceNumber: index + 1,
+  };
+}
+
+function getPrintableWorksheetResponseMode(
+  templateType: ActivityTemplateType
+): PrintableWorksheetResponseMode {
+  const runnerKind = getActivityTemplateRunnerKind(templateType);
+
+  switch (runnerKind) {
+    case 'choice-list':
+      return 'choice';
+    case 'group-sort':
+      return 'group-choice';
+    case 'line-match':
+      return 'line-match';
+    case 'matching-pairs':
+      return 'matching-pairs';
+    case 'fill-blank':
+    case 'listening':
+    case 'open-box':
+      return 'short-answer';
+  }
+}
+
+function getPrintableWorksheetAnswerSpaceLines(
+  responseMode: PrintableWorksheetResponseMode
+) {
+  return responseMode === 'short-answer' ? 2 : 1;
+}
