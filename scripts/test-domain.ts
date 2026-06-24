@@ -55,11 +55,14 @@ import {
   parseCreateActivityTemplateSearch,
 } from '@/activities/library-filters';
 import {
+  ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildActivityDraftPrompt,
   buildGenerateActivityDraftInputFromEditor,
   createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
+  generateActivityDraftInputSchema,
   normalizeAiActivityDraft,
   type AiActivityDraft,
 } from '@/activities/ai-draft';
@@ -6173,6 +6176,21 @@ assert.match(
   'AI draft result contract should expose editor input, meta, provider, and model provenance.'
 );
 assert.match(
+  activityAiDraftSource,
+  /itemCount: z[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.min[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.max[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.default/,
+  'AI draft input schema should reuse the domain item-count range.'
+);
+assert.match(
+  activityAiDraftSource,
+  /function completeAiActivityDraft[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.questions[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.pairs[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.vocabulary[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.teacherNotes/,
+  'AI draft completion should reuse domain completion limits.'
+);
+assert.match(
+  activityAiDraftSource,
+  /function completeAiDraftGroups[\s\S]*ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.groups[\s\S]*ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.groupItems/,
+  'AI draft group completion should reuse domain group limits.'
+);
+assert.match(
   assignmentsApiSource,
   /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
   'Assignment attempt limits should only count completed attempts with scored results.'
@@ -8987,6 +9005,33 @@ assert.equal(
   derivativeSourceContent.sourceMaterials[0]?.originalName,
   '三年级听力.mp3'
 );
+assert.deepEqual(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE, {
+  default: 5,
+  max: 10,
+  min: 3,
+});
+assert.deepEqual(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS, {
+  groups: 4,
+  groupItems: 8,
+  pairs: 10,
+  questions: 10,
+  teacherNotes: 5,
+  vocabulary: 16,
+});
+assert.deepEqual(
+  buildGenerateActivityDraftInputFromEditor({
+    current: activityEditorDefaultInput,
+    itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default,
+    sourceText: 'food, apple, bread, milk',
+  }).itemCount,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
+);
+assert.equal(
+  generateActivityDraftInputSchema.parse({
+    sourceText: 'food, apple, bread, milk',
+  }).itemCount,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
+);
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({
     current: {
@@ -9035,7 +9080,14 @@ assert.deepEqual(
 assert.throws(() =>
   buildGenerateActivityDraftInputFromEditor({
     current: activityEditorDefaultInput,
-    itemCount: 11,
+    itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max + 1,
+    sourceText: 'food, apple, bread, milk',
+  })
+);
+assert.throws(() =>
+  buildGenerateActivityDraftInputFromEditor({
+    current: activityEditorDefaultInput,
+    itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min - 1,
     sourceText: 'food, apple, bread, milk',
   })
 );
@@ -9486,6 +9538,32 @@ assert.ok(completedPartialAiDraft.draft.groups.length >= 2);
 assert.ok(completedPartialAiDraft.draft.vocabulary.includes('cat'));
 assert.ok(completedPartialAiDraft.draft.vocabulary.length >= 4);
 assert.ok(completedPartialAiDraft.draft.teacherNotes.length >= 1);
+const maxCountCompletedAiDraft = normalizeAiActivityDraft({
+  draft: partialAiDraft,
+  input: {
+    ...aiDraftInputBase,
+    itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max,
+    sourceText:
+      'cat, dog, bird, tree, flower, grass, rain, snow, wind, cloud, sun, moon',
+    templateType: 'quiz',
+  },
+});
+assert.equal(
+  maxCountCompletedAiDraft.draft.questions.length,
+  ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.questions
+);
+assert.equal(
+  maxCountCompletedAiDraft.draft.pairs.length,
+  ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.pairs
+);
+assert.equal(
+  maxCountCompletedAiDraft.draft.vocabulary.length,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max
+);
+assert.ok(
+  maxCountCompletedAiDraft.draft.teacherNotes.length <=
+    ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.teacherNotes
+);
 const completedPartialActivityDraft = createActivityInputFromAiDraft({
   draft: partialAiDraft,
   input: {
