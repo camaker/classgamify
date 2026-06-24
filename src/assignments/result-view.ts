@@ -1,8 +1,10 @@
 import type {
   AssignmentAttemptReview,
+  AssignmentAttemptReviewAnswerStatus,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
@@ -879,12 +881,21 @@ function getAssignmentAttemptStudentLabel({
   );
 }
 
-export function getAssignmentAnswerReviewStatus(correct: boolean) {
+export function getAssignmentAnswerReviewStatus(
+  answer: AssignmentAttemptReviewAnswerStatus
+) {
+  if (!answer.submitted) {
+    return {
+      label: assignmentResultReviewCopy.unansweredAnswerText,
+      tone: 'idle',
+    } as const;
+  }
+
   return {
-    label: correct
+    label: answer.correct
       ? assignmentResultReviewCopy.correctAnswerLabel
       : assignmentResultReviewCopy.reviewAnswerLabel,
-    tone: correct ? 'correct' : 'review',
+    tone: answer.correct ? 'correct' : 'review',
   } as const;
 }
 
@@ -1012,7 +1023,7 @@ export function buildAssignmentAttemptAnswerReviewView({
   answer: AssignmentAttemptReview['answers'][number];
   index: number;
 }) {
-  const status = getAssignmentAnswerReviewStatus(answer.correct);
+  const status = getAssignmentAnswerReviewStatus(answer);
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedAnswersLabel,
@@ -1343,7 +1354,7 @@ export function filterAttemptReviews({
     if (!matchesStudent) return false;
 
     if (filter === 'needs-review') {
-      return attempt.answers.some((answer) => !answer.correct);
+      return attempt.answers.some(isAssignmentAttemptAnswerNeedsReview);
     }
 
     return true;

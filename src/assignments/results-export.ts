@@ -6,6 +6,7 @@ import { getTemplateByType } from '@/activities/catalog';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
+import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultCsvDate,
@@ -145,9 +146,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         emptyValue: '',
         separator: ' | ',
       }),
-      answer.correct
-        ? m.assignment_results_export_status_correct()
-        : m.assignment_results_export_status_review(),
+      formatAssignmentExportAnswerStatus(answer),
       answer.explanation ?? '',
     ]);
   });
@@ -221,6 +220,18 @@ function formatAssignmentExportStudentAnswer(
   }
 
   return answer.answer;
+}
+
+function formatAssignmentExportAnswerStatus(
+  answer: AssignmentResultsAnalysis['attempts'][number]['answers'][number]
+) {
+  if (!answer.submitted) {
+    return m.assignment_results_export_status_unanswered();
+  }
+
+  return isAssignmentAttemptAnswerNeedsReview(answer)
+    ? m.assignment_results_export_status_review()
+    : m.assignment_results_export_status_correct();
 }
 
 function formatAssignmentExportStatusLabel({

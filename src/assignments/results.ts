@@ -52,6 +52,11 @@ export type AssignmentAttemptReview = {
 
 type AssignmentAttemptReviewAnswer = AssignmentAttemptReview['answers'][number];
 
+export type AssignmentAttemptReviewAnswerStatus = Pick<
+  AssignmentAttemptReviewAnswer,
+  'correct' | 'submitted'
+>;
+
 export type AssignmentStudentSummary = {
   attempts: number;
   averageAccuracy: number;
@@ -220,7 +225,8 @@ function buildStudentSummaries(
         lastCompletedAt: latestAttempt?.completedAt ?? null,
         latestAccuracy: latestAttempt?.accuracy ?? 0,
         needsReviewCount: latestAttempt
-          ? latestAttempt.answers.filter((answer) => !answer.correct).length
+          ? latestAttempt.answers.filter(isAssignmentAttemptAnswerNeedsReview)
+              .length
           : 0,
         studentKey,
         studentLabel: latestAttempt?.studentLabel ?? studentKey,
@@ -239,4 +245,10 @@ function buildStudentSummaries(
 
 function getDateTimestamp(value: Date | null) {
   return value?.getTime() ?? 0;
+}
+
+export function isAssignmentAttemptAnswerNeedsReview(
+  answer: AssignmentAttemptReviewAnswerStatus
+) {
+  return answer.submitted && !answer.correct;
 }

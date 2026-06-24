@@ -343,7 +343,10 @@ import {
   getAssignmentStudentFollowUpPriorityStudents,
   sortAssignmentStudentsByFollowUpPriority,
 } from '@/assignments/student-follow-up-priority';
-import { analyzeAssignmentResults } from '@/assignments/results';
+import {
+  analyzeAssignmentResults,
+  isAssignmentAttemptAnswerNeedsReview,
+} from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
@@ -10646,6 +10649,18 @@ assert.deepEqual(
     studentAnswerText: 'paris france',
   }
 );
+assert.equal(
+  isAssignmentAttemptAnswerNeedsReview({ correct: false, submitted: true }),
+  true
+);
+assert.equal(
+  isAssignmentAttemptAnswerNeedsReview({ correct: false, submitted: false }),
+  false
+);
+assert.equal(
+  isAssignmentAttemptAnswerNeedsReview({ correct: true, submitted: true }),
+  false
+);
 assert.deepEqual(
   buildAssignmentAttemptAnswerReviewView({
     answer: {
@@ -10665,8 +10680,8 @@ assert.deepEqual(
     expectedAnswerText: '-',
     explanationText: null,
     promptLabel: '1. Match "Hot" with its pair.',
-    statusLabel: 'Review',
-    statusTone: 'review',
+    statusLabel: 'Unanswered',
+    statusTone: 'idle',
     studentAnswerLabel: 'Student',
     studentAnswerText: 'Unanswered',
   }
@@ -11279,14 +11294,27 @@ assert.deepEqual(
     submittedAtLabel: '-',
   }
 );
-assert.deepEqual(getAssignmentAnswerReviewStatus(true), {
-  label: 'Correct',
-  tone: 'correct',
-});
-assert.deepEqual(getAssignmentAnswerReviewStatus(false), {
-  label: 'Review',
-  tone: 'review',
-});
+assert.deepEqual(
+  getAssignmentAnswerReviewStatus({ correct: true, submitted: true }),
+  {
+    label: 'Correct',
+    tone: 'correct',
+  }
+);
+assert.deepEqual(
+  getAssignmentAnswerReviewStatus({ correct: false, submitted: true }),
+  {
+    label: 'Review',
+    tone: 'review',
+  }
+);
+assert.deepEqual(
+  getAssignmentAnswerReviewStatus({ correct: false, submitted: false }),
+  {
+    label: 'Unanswered',
+    tone: 'idle',
+  }
+);
 assert.equal(
   formatAssignmentAttemptReviewBadge({ accuracy: 67, score: 2 }),
   '2 pts · 67%'
@@ -12307,6 +12335,34 @@ assert.deepEqual(
 );
 assert.deepEqual(
   filterAttemptReviews({
+    attempts: [
+      {
+        accuracy: 0,
+        answers: [
+          {
+            acceptedAnswers: ['Cold'],
+            answer: '',
+            correct: false,
+            expectedAnswer: 'Cold',
+            itemId: 'pair-1',
+            prompt: 'Hot',
+            submitted: false,
+          },
+        ],
+        completedAt: new Date('2026-01-05T10:00:00.000Z'),
+        id: 'only-unanswered',
+        score: 0,
+        studentKey: 'name:casey',
+        studentLabel: 'Casey',
+      },
+    ],
+    filter: 'needs-review',
+    search: '',
+  }).map((attempt) => attempt.id),
+  []
+);
+assert.deepEqual(
+  filterAttemptReviews({
     attempts: resultAnalysis.attempts,
     filter: 'all',
     search: ' ａｌｉｃｅ ',
@@ -12388,7 +12444,7 @@ assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
 assert.match(
   csv,
-  /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","review"/
+  /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/
 );
 assert.equal(csv.includes('browser-token-1'), false);
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
@@ -12578,7 +12634,7 @@ assert.deepEqual(
   ),
   {
     accuracyLabel: 'Latest 0% · best 0%',
-    needsReviewLabel: '2 reviews',
+    needsReviewLabel: '1 review',
     studentLabel: 'Anonymous student 1',
   }
 );
@@ -12595,7 +12651,7 @@ assert.match(
 );
 assert.match(
   classroomBrief.text,
-  /- 1\. Anonymous student 1: 0% latest, 2 items to review/
+  /- 1\. Anonymous student 1: 0% latest, 1 item to review/
 );
 
 const reteachPlan = buildAssignmentReteachPlan({
