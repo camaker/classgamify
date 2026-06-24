@@ -41,6 +41,7 @@ export type AssignmentAttemptReview = {
     explanation?: string;
     itemId: string;
     prompt: string;
+    submitted: boolean;
   }>;
   completedAt: Date | null;
   id: string;
@@ -154,6 +155,9 @@ function buildAttemptReviewAnswers({
       explanation: item.explanation,
       itemId: item.id,
       prompt: formatRuntimeItemPrompt(item),
+      submitted:
+        submittedAnswer !== undefined &&
+        submittedAnswer.answer.trim().length > 0,
     };
   });
 }

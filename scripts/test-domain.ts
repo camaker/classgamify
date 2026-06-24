@@ -9593,6 +9593,7 @@ assert.deepEqual(
       answer: '',
       expectedAnswer: '',
       explanation: '',
+      submitted: false,
     },
     index: -3,
   }),
@@ -9606,7 +9607,7 @@ assert.deepEqual(
     statusLabel: 'Review',
     statusTone: 'review',
     studentAnswerLabel: 'Student',
-    studentAnswerText: '-',
+    studentAnswerText: 'Unanswered',
   }
 );
 assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
@@ -9684,6 +9685,7 @@ assert.deepEqual(
     correct: answer.correct,
     itemId: answer.itemId,
     prompt: answer.prompt,
+    submitted: answer.submitted,
   })),
   [
     {
@@ -9691,12 +9693,14 @@ assert.deepEqual(
       correct: false,
       itemId: 'pair-1',
       prompt: 'Match "Hot" with its pair.',
+      submitted: false,
     },
     {
       answer: 'Paris',
       correct: true,
       itemId: 'q-1',
       prompt: 'Capital of France?',
+      submitted: true,
     },
   ]
 );
@@ -11314,6 +11318,10 @@ assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(csv, /"Paris \| Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
+assert.match(
+  csv,
+  /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","review"/
+);
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: resultAnalysisWithUnscoredAttempt,

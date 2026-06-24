@@ -139,7 +139,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       index + 1,
       answer.itemId,
       answer.prompt,
-      answer.answer,
+      formatAssignmentExportStudentAnswer(answer),
       answer.expectedAnswer,
       formatAcceptedAnswerAlternatives(answer.acceptedAnswers, {
         emptyValue: '',
@@ -211,6 +211,16 @@ function formatAssignmentExportTemplateLabel(
   templateType: ActivityTemplateType
 ) {
   return getTemplateByType(templateType).name;
+}
+
+function formatAssignmentExportStudentAnswer(
+  answer: AssignmentResultsAnalysis['attempts'][number]['answers'][number]
+) {
+  if (!answer.submitted) {
+    return m.assignment_results_export_status_unanswered();
+  }
+
+  return answer.answer;
 }
 
 function formatAssignmentExportStatusLabel({

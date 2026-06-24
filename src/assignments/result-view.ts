@@ -414,6 +414,9 @@ export const assignmentResultReviewCopy = {
   get studentAnswerLabel() {
     return m.assignment_result_review_student();
   },
+  get unansweredAnswerText() {
+    return m.assignment_result_review_unanswered();
+  },
 } as const;
 
 const assignmentResultMetricDescriptors = [
@@ -1016,8 +1019,18 @@ export function buildAssignmentAttemptAnswerReviewView({
     statusLabel: status.label,
     statusTone: status.tone,
     studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
-    studentAnswerText: formatAssignmentResultValue(answer.answer),
+    studentAnswerText: formatAssignmentReviewStudentAnswer(answer),
   };
+}
+
+function formatAssignmentReviewStudentAnswer(
+  answer: AssignmentAttemptReview['answers'][number]
+) {
+  if (!answer.submitted) {
+    return assignmentResultReviewCopy.unansweredAnswerText;
+  }
+
+  return formatAssignmentResultValue(answer.answer);
 }
 
 export function formatAssignmentItemCorrectSummary({
