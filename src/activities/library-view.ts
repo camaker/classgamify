@@ -441,10 +441,21 @@ export function buildActivityLibraryCardDisplayView({
       pairs: summary.contentCounts.pairs,
       questions: summary.contentCounts.questions,
     }),
-    statusLabel: formatActivityLibraryStatusLabel(activity.status),
+    statusLabel: formatActivityLibraryCardStatusLabel(activity),
     templateName: template.name,
     templateType: template.type,
   };
+}
+
+function formatActivityLibraryCardStatusLabel({
+  persisted,
+  status,
+}: Pick<ActivityLibraryCardViewModel, 'persisted' | 'status'>) {
+  if (!persisted) {
+    return m.activity_library_status_preview();
+  }
+
+  return formatActivityLibraryStatusLabel(status);
 }
 
 export function formatActivityLibraryStatusLabel(

@@ -311,11 +311,12 @@ export function buildAssignmentListCardViewModel({
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
-    statusLabel: getAssignmentStatusLabel(
-      assignment.status,
-      assignment.expiresAt,
-      now
-    ),
+    statusLabel: getAssignmentListCardStatusLabel({
+      expiresAt: assignment.expiresAt,
+      now,
+      persisted,
+      status: assignment.status,
+    }),
     templateLabel: getTemplateByType(templateType).name,
     templateType,
     title: assignment.title,
@@ -354,11 +355,33 @@ export function buildStarterAssignmentListCardViewModel({
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
-    statusLabel: getAssignmentStatusLabel(assignment.status, expiresAt),
+    statusLabel: getAssignmentListCardStatusLabel({
+      expiresAt,
+      persisted,
+      status: assignment.status,
+    }),
     templateLabel: getTemplateByType(activity.templateType).name,
     templateType: activity.templateType,
     title: assignment.title,
   };
+}
+
+function getAssignmentListCardStatusLabel({
+  expiresAt,
+  now,
+  persisted,
+  status,
+}: {
+  expiresAt: Date | null;
+  now?: number;
+  persisted: boolean;
+  status: AssignmentStatus;
+}) {
+  if (!persisted) {
+    return m.assignment_list_status_preview();
+  }
+
+  return getAssignmentStatusLabel(status, expiresAt, now);
 }
 
 export function getAssignmentListCardActionState({

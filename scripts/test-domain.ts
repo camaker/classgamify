@@ -5851,7 +5851,7 @@ const starterActivityDisplayView = buildActivityLibraryCardDisplayView({
 });
 assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
-assert.equal(starterActivityDisplayView.statusLabel, 'Draft');
+assert.equal(starterActivityDisplayView.statusLabel, 'Preview');
 assert.deepEqual(starterActivityDisplayView.stats, [
   { key: 'questions', label: 'Questions', value: 3 },
   { key: 'pairs', label: 'Pairs', value: 4 },
@@ -5891,7 +5891,7 @@ assert.equal(
     },
     libraryStatus: 'archived',
   }).statusLabel,
-  'Archived'
+  'Preview'
 );
 assert.equal(
   starterActivityDisplayView.actionState.showPersistedActions,
@@ -6452,7 +6452,7 @@ assert.deepEqual(
       { key: 'average', label: 'Average', value: '84%' },
     ],
     status: 'published',
-    statusLabel: 'Open',
+    statusLabel: 'Preview',
     templateLabel: 'Group sort',
     templateType: 'group-sort',
     title: 'Food words homework',
