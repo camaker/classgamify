@@ -29,7 +29,7 @@ export function buildAssignmentSnapshotInsert({
     activityDescription: sourceActivity.description,
     activityTitle: sourceActivity.title,
     assignmentId,
-    contentJson: sourceActivity.contentJson,
+    contentJson: structuredClone(sourceActivity.contentJson),
     createdAt,
     templateType: sourceActivity.templateType,
   };

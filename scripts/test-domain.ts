@@ -4134,7 +4134,7 @@ const publicPayloadSnapshotContent = buildActivityContent({
 });
 const assignmentSnapshotCreatedAt = new Date('2026-01-15T12:30:00.000Z');
 const assignmentSnapshotSourceActivity = {
-  contentJson: publicPayloadSnapshotContent,
+  contentJson: structuredClone(publicPayloadSnapshotContent),
   description: 'Snapshot source description',
   templateType: 'quiz' as ActivityTemplateType,
   title: 'Snapshot source title',
@@ -4147,11 +4147,29 @@ const assignmentSnapshotInsert = buildAssignmentSnapshotInsert({
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
 assignmentSnapshotSourceActivity.title = 'Edited source title';
+assignmentSnapshotSourceActivity.contentJson.questions[0]!.prompt =
+  'Edited prompt after publish';
+assignmentSnapshotSourceActivity.contentJson.sourceMaterials[0]!.originalName =
+  'Edited worksheet after publish.pdf';
 assert.deepEqual(assignmentSnapshotInsert, {
   activityDescription: 'Snapshot source description',
   activityTitle: 'Snapshot source title',
   assignmentId: 'assignment-snapshot-1',
-  contentJson: publicPayloadSnapshotContent,
+  contentJson: {
+    ...publicPayloadSnapshotContent,
+    questions: [
+      {
+        ...publicPayloadSnapshotContent.questions[0]!,
+        prompt: 'Frozen prompt?',
+      },
+    ],
+    sourceMaterials: [
+      {
+        ...publicPayloadSnapshotContent.sourceMaterials[0]!,
+        originalName: 'Frozen worksheet.pdf',
+      },
+    ],
+  },
   createdAt: assignmentSnapshotCreatedAt,
   templateType: 'quiz',
 });
