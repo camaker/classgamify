@@ -5090,6 +5090,11 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const publishAssignment[\s\S]*await db\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)/,
+  'Publish assignment API should write the assignment and frozen snapshot atomically.'
+);
+assert.match(
+  assignmentsApiSource,
   /export const submitAttempt[\s\S]*const orderedRuntimeItems = orderAssignmentRuntimeItems\(\{[\s\S]*shareSlug: row\.assignment\.shareSlug,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*\}\)/,
   'Submit attempt API should apply the assignment delivery item order before validating submitted answers.'
 );

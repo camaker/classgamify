@@ -319,26 +319,28 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     }
     const settings = resolveAssignmentSettings(data.settings);
 
-    await db.insert(assignment).values({
-      activityId: sourceActivity.id,
-      createdAt: now,
-      id,
-      ownerId: userId,
-      expiresAt,
-      settingsJson: settings,
-      shareSlug,
-      status: 'published',
-      title: data.title,
-      updatedAt: now,
-    });
+    await db.transaction(async (tx) => {
+      await tx.insert(assignment).values({
+        activityId: sourceActivity.id,
+        createdAt: now,
+        id,
+        ownerId: userId,
+        expiresAt,
+        settingsJson: settings,
+        shareSlug,
+        status: 'published',
+        title: data.title,
+        updatedAt: now,
+      });
 
-    await db.insert(assignmentSnapshot).values({
-      activityDescription: sourceActivity.description,
-      activityTitle: sourceActivity.title,
-      assignmentId: id,
-      contentJson: sourceActivity.contentJson,
-      createdAt: now,
-      templateType: sourceActivity.templateType,
+      await tx.insert(assignmentSnapshot).values({
+        activityDescription: sourceActivity.description,
+        activityTitle: sourceActivity.title,
+        assignmentId: id,
+        contentJson: sourceActivity.contentJson,
+        createdAt: now,
+        templateType: sourceActivity.templateType,
+      });
     });
 
     const [row] = await db
