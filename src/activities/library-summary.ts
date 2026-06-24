@@ -8,6 +8,10 @@ import {
   type ActivityContent,
   type ActivityTemplateType,
 } from '@/activities/types';
+import {
+  type ActivitySourceMaterialReadinessCapability,
+  summarizeActivitySourceMaterials,
+} from '@/activities/material-summary';
 import type {
   ActivityLibraryStatus,
   ActivityTemplateFilter,
@@ -36,10 +40,16 @@ type ActivityLibrarySummarySource = {
 type ActivityLibrarySummary = {
   archivedActivities: number;
   draftActivities: number;
+  extractableSourceActivities: number;
+  sourceMaterialCapabilityCounts: Record<
+    ActivitySourceMaterialReadinessCapability,
+    number
+  >;
   remixReadyActivities: number;
   templateCoverage: number;
   templateCoverageTotal: number;
   totalActivities: number;
+  totalExtractableSourceMaterials: number;
   totalReadyTemplateOptions: number;
 };
 
@@ -107,7 +117,11 @@ export function summarizeActivityLibrary(
   const templateTypes = new Set<ActivityTemplateType>();
   let archivedActivities = 0;
   let draftActivities = 0;
+  let extractableSourceActivities = 0;
   let remixReadyActivities = 0;
+  const sourceMaterialCapabilityCounts =
+    createEmptySourceMaterialCapabilityCounts();
+  let totalExtractableSourceMaterials = 0;
   let totalReadyTemplateOptions = 0;
 
   for (const item of activities) {
@@ -117,6 +131,18 @@ export function summarizeActivityLibrary(
     }
     if (item.visibility === 'draft') {
       draftActivities += 1;
+    }
+
+    const sourceMaterialSummary = summarizeActivitySourceMaterials(
+      item.contentJson.sourceMaterials
+    );
+    if (sourceMaterialSummary.readiness.extractableCount > 0) {
+      extractableSourceActivities += 1;
+    }
+    totalExtractableSourceMaterials +=
+      sourceMaterialSummary.readiness.extractableCount;
+    for (const capability of sourceMaterialSummary.readiness.capabilities) {
+      sourceMaterialCapabilityCounts[capability] += 1;
     }
 
     const cardSummary = buildActivityLibraryCardSummary({
@@ -132,10 +158,13 @@ export function summarizeActivityLibrary(
   return {
     archivedActivities,
     draftActivities,
+    extractableSourceActivities,
+    sourceMaterialCapabilityCounts,
     remixReadyActivities,
     templateCoverage: templateTypes.size,
     templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
     totalActivities: activities.length,
+    totalExtractableSourceMaterials,
     totalReadyTemplateOptions,
   };
 }
@@ -177,10 +206,13 @@ export function buildActivityLibrarySummaryMetrics({
   const resolvedSummary = summary ?? {
     archivedActivities: 0,
     draftActivities: 0,
+    extractableSourceActivities: 0,
+    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
     remixReadyActivities: 0,
     templateCoverage: 0,
     templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
     totalActivities,
+    totalExtractableSourceMaterials: 0,
     totalReadyTemplateOptions: 0,
   };
 
@@ -236,4 +268,12 @@ function formatActivityLibraryMetricFraction(value: number, total: number) {
 function normalizeActivityLibraryMetricNumber(value: number) {
   if (!Number.isFinite(value)) return undefined;
   return Math.max(0, value);
+}
+
+function createEmptySourceMaterialCapabilityCounts() {
+  return {
+    'audio-extraction': 0,
+    'spreadsheet-import': 0,
+    'worksheet-extraction': 0,
+  } satisfies Record<ActivitySourceMaterialReadinessCapability, number>;
 }

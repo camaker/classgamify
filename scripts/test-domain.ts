@@ -7766,12 +7766,29 @@ const completeScaffoldCardSummary = buildActivityLibraryCardSummary({
 });
 const librarySummary = summarizeActivityLibrary([
   {
-    contentJson: questionOnlyContent,
+    contentJson: {
+      ...questionOnlyContent,
+      sourceMaterials: [listeningMaterialReference],
+    },
     templateType: 'quiz',
     visibility: 'draft',
   },
   {
-    contentJson: completeScaffoldContent,
+    contentJson: {
+      ...completeScaffoldContent,
+      sourceMaterials: [
+        {
+          fileId: 'file-worksheet-library',
+          kind: 'worksheet-document',
+          originalName: 'library worksheet.pdf',
+        },
+        {
+          fileId: 'file-spreadsheet-library',
+          kind: 'spreadsheet',
+          originalName: 'library words.xlsx',
+        },
+      ],
+    },
     templateType: 'group-sort',
     visibility: 'archived',
   },
@@ -7780,6 +7797,13 @@ assert.equal(librarySummary.totalActivities, 2);
 assert.equal(librarySummary.draftActivities, 1);
 assert.equal(librarySummary.archivedActivities, 1);
 assert.equal(librarySummary.templateCoverage, 2);
+assert.equal(librarySummary.extractableSourceActivities, 2);
+assert.equal(librarySummary.totalExtractableSourceMaterials, 3);
+assert.deepEqual(librarySummary.sourceMaterialCapabilityCounts, {
+  'audio-extraction': 1,
+  'spreadsheet-import': 1,
+  'worksheet-extraction': 1,
+});
 assert.equal(
   librarySummary.totalReadyTemplateOptions,
   questionOnlyCardSummary.readyTemplateOptions.length +
@@ -7869,10 +7893,17 @@ assert.deepEqual(
     summary: {
       archivedActivities: 0,
       draftActivities: 0,
+      extractableSourceActivities: Number.NaN,
       remixReadyActivities: Number.NaN,
+      sourceMaterialCapabilityCounts: {
+        'audio-extraction': Number.NaN,
+        'spreadsheet-import': Number.NaN,
+        'worksheet-extraction': Number.NaN,
+      },
       templateCoverage: -1,
       templateCoverageTotal: Number.POSITIVE_INFINITY,
       totalActivities: Number.NaN,
+      totalExtractableSourceMaterials: Number.NaN,
       totalReadyTemplateOptions: -3,
     },
     totalActivities: 99,
