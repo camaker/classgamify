@@ -15,6 +15,8 @@ export function assertSubmittedAnswersMatchRuntimeItems({
   answers: SubmittedAttemptAnswer[];
   runtimeItems: AttemptAnswerRuntimeItem[];
 }) {
+  assertRuntimeItemIdsAreUnique(runtimeItems);
+
   if (answers.length > runtimeItems.length) {
     throw new Error(m.assignment_attempt_answers_error_too_many());
   }
@@ -32,5 +34,19 @@ export function assertSubmittedAnswersMatchRuntimeItems({
     }
 
     submittedItemIds.add(answer.itemId);
+  }
+}
+
+function assertRuntimeItemIdsAreUnique(
+  runtimeItems: AttemptAnswerRuntimeItem[]
+) {
+  const runtimeItemIds = new Set<string>();
+
+  for (const item of runtimeItems) {
+    if (runtimeItemIds.has(item.id)) {
+      throw new Error(m.assignment_attempt_answers_error_duplicate_item());
+    }
+
+    runtimeItemIds.add(item.id);
   }
 }

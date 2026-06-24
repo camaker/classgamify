@@ -8857,6 +8857,15 @@ assert.throws(
   /duplicate item/
 );
 
+assert.throws(
+  () =>
+    assertSubmittedAnswersMatchRuntimeItems({
+      answers: [{ itemId: 'item-1' }, { itemId: 'item-2' }],
+      runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
+    }),
+  /duplicate item/
+);
+
 assert.equal(
   normalizeAttemptDurationSeconds({
     durationSeconds: undefined,
