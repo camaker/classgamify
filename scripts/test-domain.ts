@@ -4157,6 +4157,7 @@ assert.deepEqual(
 );
 assert.deepEqual(printableSnapshotWorksheet.items[0], {
   answerSpaceLines: 1,
+  choicePresentation: 'choice-list',
   choices: ['Frozen answer / Frozen accepted', 'Frozen answer', 'Other'],
   id: 'q-frozen-prompt',
   kind: 'question',
@@ -4295,6 +4296,16 @@ const printableResponseModeByTemplate = {
   listening: 'short-answer',
   quiz: 'choice',
 } as const;
+const printableChoicePresentationByTemplate = {
+  'fill-blank': 'none',
+  'group-sort': 'group-bank',
+  'line-match': 'answer-bank',
+  'match-up': 'choice-list',
+  'matching-pairs': 'answer-bank',
+  'open-box': 'none',
+  listening: 'none',
+  quiz: 'choice-list',
+} as const;
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const content = buildActivityContent({
     ...publicRuntimeSanitizationInput,
@@ -4353,6 +4364,14 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     printableWorksheet.items.every(
       (item) =>
         item.responseMode === printableResponseModeByTemplate[templateType]
+    ),
+    true
+  );
+  assert.equal(
+    printableWorksheet.items.every(
+      (item) =>
+        item.choicePresentation ===
+        printableChoicePresentationByTemplate[templateType]
     ),
     true
   );
@@ -5330,6 +5349,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /choicePresentation: item\.choicePresentation/,
+  'Printable worksheet view should preserve structured choice presentation metadata.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
 );
@@ -5356,6 +5380,11 @@ assert.match(
   printableAssignmentRouteSource,
   /document\.body\.dataset\.printMode = 'worksheet'/,
   'Printable worksheet route should activate print-mode page chrome hiding.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /data-print-choice-bank=\{itemView\.choicePresentation\}/,
+  'Printable worksheet route should render choice-bank presentation metadata for print layout variants.'
 );
 assert.match(
   printableAssignmentRouteSource,

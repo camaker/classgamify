@@ -79,6 +79,7 @@ export function buildPrintableWorksheetHeaderView(
 
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   return {
+    choicePresentation: item.choicePresentation,
     choices: item.choices,
     kindLabel: formatRuntimeItemKindLabel(item),
     prompt: formatRuntimeItemPrompt(item),

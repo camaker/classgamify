@@ -23,8 +23,15 @@ export type PrintableWorksheetResponseMode =
   | 'matching-pairs'
   | 'short-answer';
 
+export type PrintableWorksheetChoicePresentation =
+  | 'answer-bank'
+  | 'choice-list'
+  | 'group-bank'
+  | 'none';
+
 export type PrintableWorksheetItem = {
   answerSpaceLines: number;
+  choicePresentation: PrintableWorksheetChoicePresentation;
   choices: string[];
   id: string;
   kind: RuntimeItem['kind'];
@@ -142,6 +149,7 @@ function toPrintableWorksheetItem({
 
   return {
     answerSpaceLines: getPrintableWorksheetAnswerSpaceLines(responseMode),
+    choicePresentation: getPrintableWorksheetChoicePresentation(responseMode),
     choices: item.choices ? [...item.choices] : [],
     id: item.id,
     kind: item.kind,
@@ -192,4 +200,20 @@ function getPrintableWorksheetAnswerSpaceLines(
   responseMode: PrintableWorksheetResponseMode
 ) {
   return responseMode === 'short-answer' ? 2 : 1;
+}
+
+function getPrintableWorksheetChoicePresentation(
+  responseMode: PrintableWorksheetResponseMode
+): PrintableWorksheetChoicePresentation {
+  switch (responseMode) {
+    case 'choice':
+      return 'choice-list';
+    case 'group-choice':
+      return 'group-bank';
+    case 'line-match':
+    case 'matching-pairs':
+      return 'answer-bank';
+    case 'short-answer':
+      return 'none';
+  }
 }

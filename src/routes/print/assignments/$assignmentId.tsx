@@ -323,7 +323,10 @@ function PrintableWorksheetItem({
         </Badge>
       </div>
       {itemView.choices.length > 0 ? (
-        <div data-print-choice-bank className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div
+          data-print-choice-bank={itemView.choicePresentation}
+          className="mt-4 grid gap-2 sm:grid-cols-2"
+        >
           {itemView.choices.map((choice, index) => (
             <div
               key={`${item.id}-${choice}-${index}`}
