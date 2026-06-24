@@ -228,6 +228,7 @@
   "activity_library_summary_matching_activities": "Matching activities",
   "activity_library_summary_ready_modes": "Ready modes",
   "activity_library_summary_ready_to_remix": "Ready to remix",
+  "activity_library_summary_source_extraction": "Source extraction",
   "activity_library_summary_template_coverage": "Template coverage",
   "activity_lifecycle_archive_blocked": "This activity is already archived.",
   "activity_lifecycle_archive_failure": "Activity could not be archived.",

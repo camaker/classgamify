@@ -7863,7 +7863,11 @@ assert.deepEqual(
       value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     { id: 'remix', label: 'Ready to remix', value: '0' },
-    { id: 'readyModes', label: 'Ready modes', value: '0' },
+    {
+      id: 'sourceExtraction',
+      label: 'Source extraction',
+      value: '0',
+    },
   ]
 );
 assert.deepEqual(
@@ -7881,9 +7885,9 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '2' },
     {
-      id: 'readyModes',
-      label: 'Ready modes',
-      value: String(librarySummary.totalReadyTemplateOptions),
+      id: 'sourceExtraction',
+      label: 'Source extraction',
+      value: String(librarySummary.totalExtractableSourceMaterials),
     },
   ]
 );
@@ -7917,9 +7921,9 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '-' },
     {
-      id: 'readyModes',
-      label: 'Ready modes',
-      value: '0',
+      id: 'sourceExtraction',
+      label: 'Source extraction',
+      value: '-',
     },
   ]
 );

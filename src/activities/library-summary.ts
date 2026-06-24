@@ -57,7 +57,7 @@ export type ActivityLibrarySummaryMetricId =
   | 'total'
   | 'coverage'
   | 'remix'
-  | 'readyModes';
+  | 'sourceExtraction';
 
 export type ActivityLibrarySummaryMetric = {
   id: ActivityLibrarySummaryMetricId;
@@ -240,10 +240,10 @@ export function buildActivityLibrarySummaryMetrics({
       ),
     },
     {
-      id: 'readyModes',
-      label: m.activity_library_summary_ready_modes(),
+      id: 'sourceExtraction',
+      label: m.activity_library_summary_source_extraction(),
       value: formatActivityLibraryMetricNumber(
-        resolvedSummary.totalReadyTemplateOptions
+        resolvedSummary.totalExtractableSourceMaterials
       ),
     },
   ];

@@ -931,7 +931,7 @@ const activitySummaryMetricIcons: Record<
   typeof IconFolder
 > = {
   coverage: IconDeviceGamepad2,
-  readyModes: IconLayoutGrid,
   remix: IconSwitchHorizontal,
+  sourceExtraction: IconPaperclip,
   total: IconFolder,
 };
