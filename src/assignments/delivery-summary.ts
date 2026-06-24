@@ -59,7 +59,7 @@ type AssignmentSettingsSummaryView = {
 export function buildAssignmentDeliverySummary({
   collectStudentName = true,
   expiresAt,
-  maxAttempts,
+  maxAttempts = defaultAssignmentSettings.maxAttempts,
   showCorrectAnswers = true,
   shuffleItems = true,
   timeLimitSeconds,

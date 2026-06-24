@@ -3929,13 +3929,27 @@ assert.equal(
   '/play/share%20two'
 );
 assert.deepEqual(buildAssignmentDeliverySummary({ expiresAt: null }), [
-  { id: 'attempts', label: 'Attempts', value: 'Open' },
+  { id: 'attempts', label: 'Attempts', value: '2 max' },
   { id: 'timer', label: 'Timer', value: 'No timer' },
   { id: 'closes', label: 'Closes', value: 'No close time' },
   { id: 'identity', label: 'Student identity', value: 'Names' },
   { id: 'answerReveal', label: 'Answer reveal', value: 'After submit' },
   { id: 'itemOrder', label: 'Item order', value: 'Shuffled' },
 ]);
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    expiresAt: null,
+    maxAttempts: null,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', 'Open'],
+    ['timer', 'No timer'],
+    ['closes', 'No close time'],
+    ['identity', 'Names'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
 assert.deepEqual(
   buildAssignmentDeliverySummary({
     collectStudentName: false,
