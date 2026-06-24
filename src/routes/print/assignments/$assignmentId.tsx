@@ -2,6 +2,7 @@ import {
   buildPrintableWorksheetHeaderView,
   buildPrintableWorksheetItemView,
   formatPrintableWorksheetAcceptedAnswers,
+  formatPrintableWorksheetAnswerKeyPrompt,
   formatPrintableWorksheetValue,
   getPrintableWorksheetAnswerLines,
   printableWorksheetPageCopy,
@@ -269,7 +270,7 @@ function PrintableAssignmentWorksheetPage() {
                         })}
                       </p>
                       <p className="mt-1 text-muted-foreground">
-                        {item.prompt}
+                        {formatPrintableWorksheetAnswerKeyPrompt(item)}
                       </p>
                       {acceptedAnswers ? (
                         <p className="mt-1 text-muted-foreground">

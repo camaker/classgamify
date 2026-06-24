@@ -4,6 +4,7 @@ import {
 } from '@/activities/runtime';
 import type {
   PrintableAssignmentWorksheet,
+  PrintableWorksheetAnswerKeyItem,
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
@@ -114,6 +115,13 @@ export function formatPrintableWorksheetAcceptedAnswers(values: string[]) {
 
 export function formatPrintableWorksheetValue(value: string | undefined) {
   return formatAssignmentResultValue(value);
+}
+
+export function formatPrintableWorksheetAnswerKeyPrompt({
+  kind,
+  prompt,
+}: Pick<PrintableWorksheetAnswerKeyItem, 'kind' | 'prompt'>) {
+  return formatRuntimeItemPrompt({ kind, prompt });
 }
 
 function getPrintableWorksheetResponseHelp(

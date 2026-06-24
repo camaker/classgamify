@@ -4200,6 +4200,7 @@ assert.deepEqual(printableSnapshotWorksheetWithAnswers.answerKey, [
     answer: 'Frozen answer',
     explanation: 'Frozen explanation',
     id: 'q-frozen-prompt',
+    kind: 'question',
     prompt: 'Frozen prompt?',
     sequenceNumber: 1,
   },
@@ -5364,6 +5365,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /formatPrintableWorksheetAnswerKeyPrompt[\s\S]*formatRuntimeItemPrompt/,
+  'Printable worksheet answer keys should reuse the same runtime prompt formatting as printable items.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
 );
@@ -5405,6 +5411,11 @@ assert.match(
   printableAssignmentRouteSource,
   /itemView\.choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
   'Printable worksheet route should render lettered choice labels only when the choice-bank view asks for them.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /formatPrintableWorksheetAnswerKeyPrompt\(item\)/,
+  'Printable worksheet route should render formatted answer-key prompts.'
 );
 assert.match(
   printableAssignmentRouteSource,

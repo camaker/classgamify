@@ -45,6 +45,7 @@ export type PrintableWorksheetAnswerKeyItem = {
   answer: string;
   explanation?: string;
   id: string;
+  kind: RuntimeItem['kind'];
   prompt: string;
   sequenceNumber: number;
 };
@@ -170,6 +171,7 @@ function toPrintableWorksheetAnswerKeyItem(
     answer: acceptedAnswers[0] ?? item.answer,
     explanation: item.explanation,
     id: item.id,
+    kind: item.kind,
     prompt: item.prompt,
     sequenceNumber: index + 1,
   };
