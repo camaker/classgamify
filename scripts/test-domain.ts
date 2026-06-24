@@ -42,8 +42,10 @@ import {
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
   isActivityTemplateType,
+  matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
+  parseActivitySourceMaterialFilter,
   parseActivityTemplateFilter,
   parseCreateActivityTemplateSearch,
 } from '@/activities/library-filters';
@@ -5182,6 +5184,7 @@ assert.deepEqual(
     created: ' activity-1 ',
     page: '4',
     q: '  Ｇｒｏｕｐ   １  ',
+    source: 'worksheet',
     status: 'archived',
     template: 'group-sort',
   }),
@@ -5189,6 +5192,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: 4,
     q: 'Group 1',
+    source: 'worksheet',
     status: 'archived',
     template: 'group-sort',
   }
@@ -5198,6 +5202,7 @@ assert.deepEqual(
     created: '   ',
     page: '1',
     q: '   ',
+    source: 'video',
     status: 'deleted',
     template: 'flashcards',
   }),
@@ -5205,6 +5210,7 @@ assert.deepEqual(
     created: undefined,
     page: undefined,
     q: undefined,
+    source: undefined,
     status: undefined,
     template: undefined,
   }
@@ -5214,6 +5220,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: 1,
     q: '  word   match  ',
+    source: 'all',
     status: 'active',
     template: 'all',
   }),
@@ -5221,6 +5228,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: undefined,
     q: 'word match',
+    source: undefined,
     status: undefined,
     template: undefined,
   }
@@ -5230,6 +5238,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: 3,
     q: ' sort ',
+    source: 'audio',
     status: 'archived',
     template: 'group-sort',
   }),
@@ -5237,6 +5246,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: 3,
     q: 'sort',
+    source: 'audio',
     status: 'archived',
     template: 'group-sort',
   }
@@ -5246,6 +5256,7 @@ assert.deepEqual(
     current: {
       created: 'activity-1',
       q: '  word   match  ',
+      source: 'all',
       status: 'active',
       template: 'all',
     },
@@ -5255,6 +5266,7 @@ assert.deepEqual(
     created: 'activity-1',
     page: undefined,
     q: 'word match',
+    source: undefined,
     status: undefined,
     template: undefined,
   }
@@ -5264,6 +5276,7 @@ assert.deepEqual(
     current: {
       created: 'activity-1',
       q: ' sort ',
+      source: 'spreadsheet',
       status: 'archived',
       template: 'group-sort',
     },
@@ -5273,12 +5286,16 @@ assert.deepEqual(
     created: 'activity-1',
     page: 5,
     q: 'sort',
+    source: 'spreadsheet',
     status: 'archived',
     template: 'group-sort',
   }
 );
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
+assert.equal(parseActivitySourceMaterialFilter('extractable'), 'extractable');
+assert.equal(parseActivitySourceMaterialFilter('worksheet'), 'worksheet');
+assert.equal(parseActivitySourceMaterialFilter('video'), undefined);
 assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
 assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
 assert.equal(parseCreateActivityTemplateSearch('line-match'), 'line-match');
@@ -5286,6 +5303,88 @@ assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
 assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
+const sourceMaterialFilterBaseContent = buildActivityContent({
+  description: 'Source filter fixture',
+  difficulty: 'starter',
+  gradeBand: 'Primary',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer source filter questions.',
+  pairsText: '',
+  questionsText: 'Capital of France? | Paris',
+  sourceSummary: 'Source filter notes',
+  subject: 'Geography',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Source filter',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+const sourceMaterialFilterContent = {
+  ...sourceMaterialFilterBaseContent,
+  sourceMaterials: [
+    listeningMaterialReference,
+    {
+      fileId: 'file-sheet-filter',
+      kind: 'spreadsheet',
+      originalName: 'filter words.xlsx',
+    },
+    {
+      fileId: 'file-worksheet-filter',
+      kind: 'worksheet-image',
+      originalName: 'filter worksheet.png',
+    },
+  ],
+};
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterContent,
+    source: 'all',
+  }),
+  true
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterContent,
+    source: 'audio',
+  }),
+  true
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterContent,
+    source: 'extractable',
+  }),
+  true
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterContent,
+    source: 'spreadsheet',
+  }),
+  true
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterContent,
+    source: 'worksheet',
+  }),
+  true
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterBaseContent,
+    source: 'extractable',
+  }),
+  false
+);
+assert.equal(
+  matchesActivitySourceMaterialFilter({
+    content: sourceMaterialFilterBaseContent,
+    source: 'worksheet',
+  }),
+  false
+);
 assert.equal(canArchiveActivity('draft'), true);
 assert.equal(canArchiveActivity('archived'), false);
 assert.equal(canRestoreActivity('archived'), true);
