@@ -14,7 +14,10 @@ import {
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
-import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import {
+  formatAttemptDuration,
+  normalizeAttemptDurationSeconds,
+} from '@/assignments/attempt-duration';
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import {
   createStudentIdentityResolver,
@@ -805,11 +808,18 @@ export function buildAssignmentAttemptRowDisplay({
   attempt,
   review,
   studentLabel,
+  timeLimitSeconds,
 }: {
   attempt: AssignmentAttemptRowDisplayInput;
   review: AssignmentAttemptReview | undefined;
   studentLabel?: string;
+  timeLimitSeconds?: number | null;
 }) {
+  const durationSeconds = normalizeAttemptDurationSeconds({
+    durationSeconds: attempt.resultJson?.durationSeconds,
+    timeLimitSeconds: timeLimitSeconds ?? undefined,
+  });
+
   return {
     accuracyLabel: formatAssignmentResultPercent(
       attempt.resultJson?.accuracy ?? 0
@@ -818,9 +828,7 @@ export function buildAssignmentAttemptRowDisplay({
       attempt.resultJson?.completedItemCount ?? 0,
       attempt.resultJson?.totalPoints ?? 0
     ),
-    durationLabel: formatAttemptDuration(
-      attempt.resultJson?.durationSeconds ?? 0
-    ),
+    durationLabel: formatAttemptDuration(durationSeconds),
     scoreLabel: formatAssignmentResultFraction(
       attempt.score ?? 0,
       attempt.maxScore ?? 0

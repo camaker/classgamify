@@ -503,6 +503,8 @@ function AssignmentResultsPage() {
                           attempt,
                           review,
                           studentLabel,
+                          timeLimitSeconds:
+                            data?.assignment.settingsJson.timeLimitSeconds,
                         });
 
                         return (

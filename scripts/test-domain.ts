@@ -9528,6 +9528,33 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
+      completedAt: attemptRowCompletedAt,
+      id: 'timed-attempt-row',
+      maxScore: 4,
+      resultJson: {
+        accuracy: 75,
+        completedItemCount: 3,
+        durationSeconds: 62,
+        totalPoints: 4,
+      },
+      score: 3,
+      studentName: ' Raw student ',
+    },
+    review: undefined,
+    timeLimitSeconds: 60,
+  }),
+  {
+    accuracyLabel: '75%',
+    answeredLabel: '3/4',
+    durationLabel: '1m 00s',
+    scoreLabel: '3/4',
+    studentLabel: 'Raw student',
+    submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
       completedAt: new Date('2026-01-03T10:00:00.000Z'),
       id: 'attempt-3',
       maxScore: 2,
