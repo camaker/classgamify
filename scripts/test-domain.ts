@@ -6569,6 +6569,35 @@ assert.deepEqual(dashboardOverviewPageCopy, {
   readinessTitle: 'Core loop readiness',
   title: 'Teacher dashboard',
 });
+const dashboardOverviewRouteSource = readFileSync(
+  'src/routes/dashboard/index.tsx',
+  'utf8'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /useActivities\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1,[\s\S]*status: 'active'/,
+  'Dashboard overview metrics should read the owner-scoped activity summary from the activities API.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /useAssignments\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1/,
+  'Dashboard overview metrics should read the owner-scoped assignment summary from the assignments API.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /const activitySummary = activitiesData\?\.summary[\s\S]*const assignmentSummary = assignmentsData\?\.summary[\s\S]*buildDashboardOverviewMetrics\(\{[\s\S]*activitySummary,[\s\S]*assignmentSummary,/,
+  'Dashboard overview metric cards should be derived from API summaries instead of starter preview data.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /buildDashboardCoreLoopReadiness\(\{[\s\S]*activitySummary,[\s\S]*assignmentSummary,/,
+  'Dashboard core-loop readiness should be derived from API summaries instead of starter preview data.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /<ActivityPreview activity=\{activity\} assignment=\{assignment\} \/>/,
+  'Dashboard starter activity and assignment should remain limited to the preview surface.'
+);
 assert.deepEqual(
   getDashboardOverviewActionCards().map((card) => [
     card.id,
