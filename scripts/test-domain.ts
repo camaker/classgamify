@@ -1613,13 +1613,13 @@ assert.equal(
 );
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);
-assert.match(robotsRouteSource, /['"]\/learn['"]/);
-assert.match(robotsRouteSource, /['"]\/hsk['"]/);
-assert.match(robotsRouteSource, /['"]\/hanzi['"]/);
 for (const retiredStubRoute of [
   '/about',
   '/ai',
   '/changelog',
+  '/hanzi',
+  '/hsk',
+  '/learn',
   '/settings/credits',
   '/waitlist',
 ]) {

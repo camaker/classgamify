@@ -9,9 +9,6 @@ const disallowedPaths = [
   '/dashboard',
   '/print',
   '/play',
-  '/learn',
-  '/hsk',
-  '/hanzi',
   '/test-404',
   '/test-error',
 ];
