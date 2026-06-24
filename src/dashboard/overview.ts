@@ -135,7 +135,9 @@ export function buildDashboardOverviewMetrics({
       description: m.dashboard_overview_metric_templates_description(),
       id: 'templates',
       label: m.dashboard_overview_metric_templates_label(),
-      value: `${activitySummary?.templateCoverage ?? 0}/${ACTIVITY_TEMPLATE_TYPES.length}`,
+      value: formatDashboardTemplateCoverageValue(
+        activitySummary?.templateCoverage
+      ),
     },
     {
       description: m.dashboard_overview_metric_assignments_description(),
@@ -209,6 +211,12 @@ export function buildDashboardCoreLoopReadiness({
 
 export function formatDashboardMetricValue(value: number | undefined) {
   return formatAssignmentResultNumber(value, { min: 0 });
+}
+
+export function formatDashboardTemplateCoverageValue(
+  value: number | undefined
+) {
+  return `${normalizeDashboardSummaryCount(value)}/${ACTIVITY_TEMPLATE_TYPES.length}`;
 }
 
 function formatDashboardDraftDescription(count: number) {

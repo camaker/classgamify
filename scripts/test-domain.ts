@@ -151,6 +151,7 @@ import {
   buildDashboardOverviewMetrics,
   dashboardOverviewPageCopy,
   formatDashboardMetricValue,
+  formatDashboardTemplateCoverageValue,
   getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
@@ -5127,6 +5128,22 @@ assert.equal(formatDashboardMetricValue(undefined), '-');
 assert.equal(formatDashboardMetricValue(0), '0');
 assert.equal(formatDashboardMetricValue(Number.NaN), '-');
 assert.equal(formatDashboardMetricValue(-3), '0');
+assert.equal(
+  formatDashboardTemplateCoverageValue(undefined),
+  `0/${ACTIVITY_TEMPLATE_TYPES.length}`
+);
+assert.equal(
+  formatDashboardTemplateCoverageValue(Number.NaN),
+  `0/${ACTIVITY_TEMPLATE_TYPES.length}`
+);
+assert.equal(
+  formatDashboardTemplateCoverageValue(-3),
+  `0/${ACTIVITY_TEMPLATE_TYPES.length}`
+);
+assert.equal(
+  formatDashboardTemplateCoverageValue(2.4),
+  `2/${ACTIVITY_TEMPLATE_TYPES.length}`
+);
 assert.deepEqual(
   buildDashboardOverviewMetrics({
     isLoading: true,
@@ -5199,6 +5216,17 @@ assert.deepEqual(
       value: '83%',
     },
   ]
+);
+assert.equal(
+  buildDashboardOverviewMetrics({
+    activitySummary: {
+      draftActivities: 0,
+      templateCoverage: Number.NaN,
+      totalActivities: 1,
+    },
+    isLoading: false,
+  })[1]?.value,
+  `0/${ACTIVITY_TEMPLATE_TYPES.length}`
 );
 assert.equal(
   buildDashboardOverviewMetrics({
