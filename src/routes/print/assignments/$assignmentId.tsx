@@ -322,19 +322,31 @@ function PrintableWorksheetItem({
           {itemView.responseHelp}
         </Badge>
       </div>
-      {itemView.choices.length > 0 ? (
+      {itemView.choiceBank.choices.length > 0 ? (
         <div
-          data-print-choice-bank={itemView.choicePresentation}
-          className="mt-4 grid gap-2 sm:grid-cols-2"
+          data-print-choice-bank={itemView.choiceBank.presentation}
+          className={cn(
+            'mt-4 grid gap-2',
+            itemView.choiceBank.presentation === 'group-bank'
+              ? 'sm:grid-cols-3'
+              : 'sm:grid-cols-2'
+          )}
         >
-          {itemView.choices.map((choice, index) => (
+          {itemView.choiceBank.choices.map(({ choice, indexLabel }) => (
             <div
-              key={`${item.id}-${choice}-${index}`}
-              className="flex items-center gap-2 rounded-md border bg-muted/20 px-3 py-2 text-sm"
+              key={`${item.id}-${choice}`}
+              className={cn(
+                'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
+                itemView.choiceBank.presentation === 'group-bank'
+                  ? 'justify-center bg-background font-medium'
+                  : 'bg-muted/20'
+              )}
             >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
-                {String.fromCharCode(65 + index)}
-              </span>
+              {itemView.choiceBank.showIndexLabels ? (
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
+                  {indexLabel}
+                </span>
+              ) : null}
               <span>{choice}</span>
             </div>
           ))}

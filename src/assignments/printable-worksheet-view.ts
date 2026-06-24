@@ -79,6 +79,7 @@ export function buildPrintableWorksheetHeaderView(
 
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   return {
+    choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
     choices: item.choices,
     kindLabel: formatRuntimeItemKindLabel(item),
@@ -87,6 +88,17 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
     sequenceLabel: m.assignment_printable_item_sequence({
       sequenceNumber: item.sequenceNumber,
     }),
+  };
+}
+
+function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
+  return {
+    choices: item.choices.map((choice, index) => ({
+      choice,
+      indexLabel: formatPrintableWorksheetChoiceIndex(index),
+    })),
+    presentation: item.choicePresentation,
+    showIndexLabels: item.choicePresentation !== 'group-bank',
   };
 }
 
@@ -119,4 +131,10 @@ function getPrintableWorksheetResponseHelp(
     case 'short-answer':
       return m.assignment_printable_response_short_answer();
   }
+}
+
+function formatPrintableWorksheetChoiceIndex(index: number) {
+  return index >= 0 && index < 26
+    ? String.fromCharCode(65 + index)
+    : `${index + 1}`;
 }

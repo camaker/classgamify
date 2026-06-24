@@ -5354,6 +5354,16 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /choiceBank: buildPrintableWorksheetChoiceBankView\(item\)/,
+  'Printable worksheet view should normalize printable choice-bank display data.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /showIndexLabels: item\.choicePresentation !== 'group-bank'/,
+  'Printable worksheet view should hide lettered choice labels for classification group banks.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
 );
@@ -5383,8 +5393,18 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /data-print-choice-bank=\{itemView\.choicePresentation\}/,
+  /data-print-choice-bank=\{itemView\.choiceBank\.presentation\}/,
   'Printable worksheet route should render choice-bank presentation metadata for print layout variants.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /itemView\.choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
+  'Printable worksheet route should render group banks as a denser classification layout.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /itemView\.choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
+  'Printable worksheet route should render lettered choice labels only when the choice-bank view asks for them.'
 );
 assert.match(
   printableAssignmentRouteSource,
