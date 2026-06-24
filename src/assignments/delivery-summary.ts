@@ -1,6 +1,9 @@
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  defaultAssignmentSettings,
+  resolveAssignmentSettings,
+} from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDeliverySummaryId =
@@ -109,7 +112,10 @@ export function buildAssignmentSettingsSummaryView({
     settings ?? {
       collectStudentName,
       instructions,
-      maxAttempts: maxAttempts ?? undefined,
+      maxAttempts:
+        maxAttempts === undefined
+          ? defaultAssignmentSettings.maxAttempts
+          : maxAttempts,
       showCorrectAnswers,
       shuffleItems,
       timeLimitSeconds: timeLimitSeconds ?? undefined,

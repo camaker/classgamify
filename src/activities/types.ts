@@ -89,7 +89,7 @@ export type AssignmentSettings = {
   showCorrectAnswers: boolean;
   shuffleItems: boolean;
   timeLimitSeconds?: number;
-  maxAttempts?: number;
+  maxAttempts?: number | null;
 };
 
 export type AttemptAnswer = {

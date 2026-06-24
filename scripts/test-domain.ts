@@ -2670,6 +2670,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentAttemptUsage({
+    maxAttempts: null,
     previousAttemptCount: 3,
   }),
   {
@@ -2694,6 +2695,7 @@ assert.equal(
 );
 assert.equal(
   canUseAnotherAssignmentAttempt({
+    maxAttempts: null,
     usedAttempts: 25,
   }),
   true
@@ -3197,6 +3199,32 @@ assert.deepEqual(resolveAssignmentSettings(null), {
 });
 assert.deepEqual(
   resolveAssignmentSettings({
+    maxAttempts: null,
+  }),
+  {
+    collectStudentName: true,
+    instructions: undefined,
+    maxAttempts: null,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }
+);
+assert.deepEqual(
+  resolveAssignmentSettings({
+    maxAttempts: undefined,
+  }),
+  {
+    collectStudentName: true,
+    instructions: undefined,
+    maxAttempts: 2,
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitSeconds: undefined,
+  }
+);
+assert.deepEqual(
+  resolveAssignmentSettings({
     collectStudentName: false,
     instructions: '  Finish before class.  ',
     maxAttempts: 3,
@@ -3496,7 +3524,7 @@ assert.deepEqual(
   {
     collectStudentName: true,
     instructions: undefined,
-    maxAttempts: undefined,
+    maxAttempts: null,
     showCorrectAnswers: true,
     shuffleItems: true,
     timeLimitSeconds: undefined,
@@ -3680,7 +3708,7 @@ assert.deepEqual(
       settings: {
         collectStudentName: true,
         instructions: undefined,
-        maxAttempts: undefined,
+        maxAttempts: null,
         showCorrectAnswers: true,
         shuffleItems: true,
         timeLimitSeconds: undefined,

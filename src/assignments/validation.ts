@@ -14,7 +14,11 @@ const assignmentInstructionsSchema = z.preprocess(
   z.string().trim().max(500).optional()
 );
 
-const assignmentMaxAttemptsSchema = z.number().int().min(1).max(10).optional();
+const assignmentLimitedMaxAttemptsSchema = z.number().int().min(1).max(10);
+
+const assignmentMaxAttemptsSchema = assignmentLimitedMaxAttemptsSchema
+  .nullable()
+  .optional();
 
 const assignmentTimeLimitSecondsSchema = z
   .number()
@@ -26,7 +30,8 @@ const assignmentTimeLimitSecondsSchema = z
 export function resolveAssignmentSettings(
   settings?: Partial<AssignmentSettings> | null
 ): AssignmentSettings {
-  const source = settings && typeof settings === 'object' ? settings : {};
+  const source: Partial<AssignmentSettings> =
+    settings && typeof settings === 'object' ? settings : {};
 
   return {
     collectStudentName: resolveBooleanSetting(
@@ -34,11 +39,7 @@ export function resolveAssignmentSettings(
       defaultAssignmentSettings.collectStudentName
     ),
     instructions: resolveOptionalStringSetting(source.instructions),
-    maxAttempts: resolveOptionalNumberSetting(
-      source.maxAttempts,
-      defaultAssignmentSettings.maxAttempts,
-      assignmentMaxAttemptsSchema
-    ),
+    maxAttempts: resolveMaxAttemptsSetting(source),
     showCorrectAnswers: resolveBooleanSetting(
       source.showCorrectAnswers,
       defaultAssignmentSettings.showCorrectAnswers
@@ -96,8 +97,21 @@ function resolveOptionalStringSetting(value: unknown) {
 function resolveOptionalNumberSetting(
   value: unknown,
   fallback: number | undefined,
-  schema: typeof assignmentMaxAttemptsSchema
+  schema: typeof assignmentTimeLimitSecondsSchema
 ) {
   const result = schema.safeParse(value);
   return result.success ? (result.data ?? fallback) : fallback;
+}
+
+function resolveMaxAttemptsSetting(source: Partial<AssignmentSettings>) {
+  if (!Object.hasOwn(source, 'maxAttempts')) {
+    return defaultAssignmentSettings.maxAttempts;
+  }
+
+  const value = source.maxAttempts;
+  if (value === null) return null;
+  if (value === undefined) return defaultAssignmentSettings.maxAttempts;
+
+  const result = assignmentLimitedMaxAttemptsSchema.safeParse(value);
+  return result.success ? result.data : defaultAssignmentSettings.maxAttempts;
 }

@@ -71,7 +71,7 @@ type AssignmentPublishDraftResult =
         settings: {
           collectStudentName: boolean;
           instructions?: string;
-          maxAttempts?: number;
+          maxAttempts?: number | null;
           showCorrectAnswers: boolean;
           shuffleItems: boolean;
           timeLimitSeconds?: number;
@@ -272,13 +272,16 @@ export function buildAssignmentPublishPreviewFromDraft({
 }: AssignmentPublishDraft): AssignmentPublishPreview {
   const previewTimeLimitMinutes =
     parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
+  const previewMaxAttempts = isAssignmentPublishMaxAttemptsBlank(maxAttempts)
+    ? null
+    : parseAssignmentPublishMaxAttempts(maxAttempts);
 
   return {
     expiresAt: parseAssignmentDateTimeLocal(expiresAtLocal),
     settings: {
       collectStudentName,
       instructions: instructions.trim() || undefined,
-      maxAttempts: parseAssignmentPublishMaxAttempts(maxAttempts),
+      maxAttempts: previewMaxAttempts,
       showCorrectAnswers,
       shuffleItems,
       timeLimitSeconds: previewTimeLimitMinutes
@@ -404,7 +407,7 @@ export function buildAssignmentPublishInputFromDraft({
       settings: {
         collectStudentName,
         instructions: trimmedInstructions || undefined,
-        maxAttempts: attempts,
+        maxAttempts: attempts ?? null,
         showCorrectAnswers,
         shuffleItems,
         timeLimitSeconds: timeLimit ? timeLimit * 60 : undefined,

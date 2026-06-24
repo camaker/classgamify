@@ -8,7 +8,7 @@ export function buildAssignmentAttemptUsage({
   maxAttempts,
   previousAttemptCount,
 }: {
-  maxAttempts?: number;
+  maxAttempts?: number | null;
   previousAttemptCount: number;
 }): AssignmentAttemptUsage {
   const usedAttempts =
@@ -29,7 +29,7 @@ export function canUseAnotherAssignmentAttempt({
   maxAttempts,
   usedAttempts,
 }: {
-  maxAttempts?: number;
+  maxAttempts?: number | null;
   usedAttempts: number;
 }) {
   const normalizedMaxAttempts = normalizeAssignmentMaxAttempts(maxAttempts);
@@ -44,8 +44,10 @@ function normalizeAssignmentAttemptCount(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
-function normalizeAssignmentMaxAttempts(value: number | undefined) {
-  if (value === undefined || !Number.isFinite(value)) return undefined;
+function normalizeAssignmentMaxAttempts(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return undefined;
+  }
 
   const normalized = Math.trunc(value);
   return normalized >= 1 ? normalized : undefined;

@@ -335,7 +335,7 @@ export function canStartAnotherStudentAttempt({
 }: {
   canSubmit: boolean;
   hasResult: boolean;
-  maxAttempts?: number;
+  maxAttempts?: number | null;
   submittedAttemptCount: number;
 }) {
   if (!canSubmit || !hasResult) return false;

@@ -20,7 +20,7 @@ type AssignmentSettingsSummaryProps = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
   instructions?: string;
-  maxAttempts?: number;
+  maxAttempts?: number | null;
   settings?: Partial<AssignmentSettings> | null;
   showCorrectAnswers?: boolean;
   shuffleItems?: boolean;
