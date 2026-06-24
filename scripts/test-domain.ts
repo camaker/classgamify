@@ -143,10 +143,16 @@ import {
   buildWorksheetModeEntryAction,
 } from '@/activities/template-entry';
 import {
+  ACTIVITY_CREATABLE_VISIBILITIES,
+  ACTIVITY_DIFFICULTIES,
+  ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
   type ActivityTemplateType,
 } from '@/activities/types';
 import {
+  activityDifficultySchema,
+  activityPersistedVisibilitySchema,
+  activityVisibilitySchema,
   buildActivityContent,
   createActivityInputSchema,
 } from '@/activities/validation';
@@ -5894,6 +5900,35 @@ assert.throws(
   () => assertActivityCanRestore('draft'),
   /Only archived activities can be restored\./
 );
+const activityValidationSource = readFileSync(
+  'src/activities/validation.ts',
+  'utf8'
+);
+assert.match(
+  activityValidationSource,
+  /activityDifficultySchema = z\.enum\(ACTIVITY_DIFFICULTIES\)/,
+  'Activity difficulty schema should reuse the activity-domain difficulty values.'
+);
+assert.match(
+  activityValidationSource,
+  /activityVisibilitySchema = z\.enum\(ACTIVITY_CREATABLE_VISIBILITIES\)/,
+  'Activity creation visibility schema should reuse creatable visibility values.'
+);
+assert.match(
+  activityValidationSource,
+  /activityPersistedVisibilitySchema = z\.enum\(\s*ACTIVITY_PERSISTED_VISIBILITIES\s*\)/,
+  'Activity persisted visibility schema should reuse persisted visibility values.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /z\.enum\(\[\s*'starter'/,
+  'Activity difficulty schema should not maintain local difficulty values.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /activityVisibilitySchema = z\.enum\(\[\s*'draft'/,
+  'Activity creation visibility schema should not maintain local visibility values.'
+);
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 assert.match(
   activitiesApiSource,
@@ -7944,6 +7979,21 @@ assert.equal(
   }).persisted,
   true
 );
+assert.deepEqual(ACTIVITY_DIFFICULTIES, ['starter', 'core', 'challenge']);
+assert.deepEqual(ACTIVITY_CREATABLE_VISIBILITIES, [
+  'draft',
+  'private',
+  'public',
+  'unlisted',
+]);
+assert.deepEqual(ACTIVITY_PERSISTED_VISIBILITIES, [
+  'archived',
+  ...ACTIVITY_CREATABLE_VISIBILITIES,
+]);
+assert.equal(activityDifficultySchema.parse('core'), 'core');
+assert.equal(activityVisibilitySchema.parse('private'), 'private');
+assert.equal(activityPersistedVisibilitySchema.parse('archived'), 'archived');
+assert.throws(() => activityVisibilitySchema.parse('archived'));
 const questionOnlyContent = buildActivityContent({
   description: 'Question only activity',
   difficulty: 'starter',

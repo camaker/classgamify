@@ -1,4 +1,7 @@
 import {
+  ACTIVITY_CREATABLE_VISIBILITIES,
+  ACTIVITY_DIFFICULTIES,
+  ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
   type ActivityContent,
   type ActivityDifficulty,
@@ -21,26 +24,13 @@ import { z } from 'zod';
 
 export const activityTemplateTypeSchema = z.enum(ACTIVITY_TEMPLATE_TYPES);
 
-export const activityDifficultySchema = z.enum([
-  'starter',
-  'core',
-  'challenge',
-]);
+export const activityDifficultySchema = z.enum(ACTIVITY_DIFFICULTIES);
 
-export const activityVisibilitySchema = z.enum([
-  'draft',
-  'private',
-  'public',
-  'unlisted',
-]);
+export const activityVisibilitySchema = z.enum(ACTIVITY_CREATABLE_VISIBILITIES);
 
-export const activityPersistedVisibilitySchema = z.enum([
-  'archived',
-  'draft',
-  'private',
-  'public',
-  'unlisted',
-]);
+export const activityPersistedVisibilitySchema = z.enum(
+  ACTIVITY_PERSISTED_VISIBILITIES
+);
 
 export const createActivityInputSchema = z.object({
   description: z.string().trim().max(400).optional(),

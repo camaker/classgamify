@@ -13,16 +13,26 @@ export const ACTIVITY_TEMPLATE_TYPES = [
 
 export type ActivityTemplateType = (typeof ACTIVITY_TEMPLATE_TYPES)[number];
 
+export const ACTIVITY_DIFFICULTIES = ['starter', 'core', 'challenge'] as const;
+
+export const ACTIVITY_CREATABLE_VISIBILITIES = [
+  'draft',
+  'private',
+  'public',
+  'unlisted',
+] as const;
+
+export const ACTIVITY_PERSISTED_VISIBILITIES = [
+  'archived',
+  ...ACTIVITY_CREATABLE_VISIBILITIES,
+] as const;
+
 export type ActivityVisibility =
-  | 'archived'
-  | 'draft'
-  | 'private'
-  | 'public'
-  | 'unlisted';
+  (typeof ACTIVITY_PERSISTED_VISIBILITIES)[number];
 
 export type AssignmentStatus = 'draft' | 'published' | 'closed';
 
-export type ActivityDifficulty = 'starter' | 'core' | 'challenge';
+export type ActivityDifficulty = (typeof ACTIVITY_DIFFICULTIES)[number];
 
 export type ActivityQuestionOption = {
   id: string;
