@@ -15,7 +15,10 @@ import {
   buildAttemptStartedAt,
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
-import { buildAssignmentAttemptUsage } from '@/assignments/attempt-limits';
+import {
+  buildAssignmentAttemptUsage,
+  canUseAnotherAssignmentAttempt,
+} from '@/assignments/attempt-limits';
 import {
   type AssignmentLifecycleStatusFilter,
   normalizeAssignmentListSearch,
@@ -640,7 +643,12 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         assignmentId: row.assignment.id,
         studentName: submissionIdentity.studentName ?? '',
       });
-      if (previousAttemptCount >= settings.maxAttempts) {
+      if (
+        !canUseAnotherAssignmentAttempt({
+          maxAttempts: settings.maxAttempts,
+          usedAttempts: previousAttemptCount,
+        })
+      ) {
         throw new Error(m.assignment_api_error_attempt_limit_reached());
       }
     }

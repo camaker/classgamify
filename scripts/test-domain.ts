@@ -5884,6 +5884,11 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
+  'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
+);
+assert.match(
+  assignmentsApiSource,
   /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
   'Submit attempt API should build student review payloads in the same stable delivery order.'
 );
