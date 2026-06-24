@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import {
@@ -81,6 +82,10 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const rows = data.analysis.attempts.flatMap((attempt) => {
     const storedAttempt = attemptsById.get(attempt.id);
     const studentSummary = studentsByKey.get(attempt.studentKey);
+    const attemptDurationSeconds = normalizeAttemptDurationSeconds({
+      durationSeconds: storedAttempt?.resultJson?.durationSeconds,
+      timeLimitSeconds: settings.timeLimitSeconds,
+    });
     const baseColumns = [
       data.assignment.id,
       data.assignment.title,
@@ -117,7 +122,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       attempt.accuracy,
       storedAttempt?.resultJson?.completedItemCount ?? '',
       runtimeItemCount,
-      storedAttempt?.resultJson?.durationSeconds ?? '',
+      attemptDurationSeconds ?? '',
       studentSummary?.attempts ?? '',
       studentSummary?.latestAccuracy ?? '',
       studentSummary?.averageAccuracy ?? '',

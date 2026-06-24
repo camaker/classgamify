@@ -10495,6 +10495,36 @@ assert.match(
   weightedScoreCsv,
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","45"/
 );
+function buildCsvWithStoredAttemptDuration(durationSeconds: number) {
+  return buildAssignmentResultsCsv({
+    ...csvExportData,
+    attempts: [
+      {
+        ...csvExportData.attempts[0]!,
+        resultJson: {
+          ...csvExportData.attempts[0]!.resultJson!,
+          durationSeconds,
+        },
+      },
+    ],
+  });
+}
+assert.match(
+  buildCsvWithStoredAttemptDuration(120),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","60"/
+);
+assert.match(
+  buildCsvWithStoredAttemptDuration(-3),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","0"/
+);
+assert.match(
+  buildCsvWithStoredAttemptDuration(4.6),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","5"/
+);
+assert.match(
+  buildCsvWithStoredAttemptDuration(Number.POSITIVE_INFINITY),
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2",""/
+);
 const zeroAverageDurationCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   stats: {
