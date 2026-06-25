@@ -1,4 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
+import { getTemplateByType } from '@/activities/catalog';
 import type { ActivityTemplateDefinition } from '@/activities/types';
 import {
   WORKSHEET_MODE_TEMPLATES,
@@ -44,8 +45,12 @@ function buildWorksheetHeroAction(
 ) {
   const mode = modes.find((item) => item.template === template);
   if (!mode) {
+    const fallbackTemplate = getTemplateByType(template);
+
     return {
-      label: m.worksheets_page_mode_fallback_action({ template }),
+      label: m.worksheets_page_mode_fallback_action({
+        template: fallbackTemplate.shortName,
+      }),
       search: buildTemplateCreateSearch(template),
       template,
     };

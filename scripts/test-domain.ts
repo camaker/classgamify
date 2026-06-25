@@ -7147,7 +7147,7 @@ assert.deepEqual(
 );
 assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   {
-    label: 'Create fill-blank',
+    label: 'Create fill blanks',
     search: { template: 'fill-blank' },
     template: 'fill-blank',
   },
@@ -7174,10 +7174,60 @@ assert.deepEqual(
     )
   )[1],
   {
-    label: 'Create line-match',
+    label: 'Create Lines',
     search: { template: 'line-match' },
     template: 'line-match',
   }
+);
+const templateEntrySource = readFileSync(
+  'src/activities/template-entry.ts',
+  'utf8'
+);
+const publicCopyMessages = {
+  en: JSON.parse(
+    readFileSync('project.inlang/messages/en.json', 'utf8')
+  ) as Record<string, string>,
+  zh: JSON.parse(
+    readFileSync('project.inlang/messages/zh.json', 'utf8')
+  ) as Record<string, string>,
+};
+const publicCopyKeys = [
+  'activity_form_pairs_description',
+  'activity_scaffold_quiz_teacher_notes_text',
+  'footer_link_worksheets_desc',
+  'home_features_items_item_2_description',
+  'home_integration_items_item_2_description',
+  'pricing_value_templates_description',
+  'roadmap_board_tasks_done_1_description',
+  'roadmap_board_tasks_in_progress_1_description',
+  'teachers_page_use_case_1_description',
+  'teachers_page_workflow_1_description',
+  'templates_page_description',
+  'templates_page_seo_description',
+  'worksheets_page_mode_fill_blank_action',
+  'worksheets_page_templates_cta_description',
+] as const;
+for (const [locale, messages] of Object.entries(publicCopyMessages) as [
+  'en' | 'zh',
+  Record<string, string>,
+][]) {
+  for (const key of publicCopyKeys) {
+    assert.doesNotMatch(
+      messages[key] ?? '',
+      /(?:fill-blank|line-match|match-up|matching-pairs|open-box)/,
+      `${locale}.${key} should not expose raw template ids.`
+    );
+  }
+}
+assert.match(
+  templateEntrySource,
+  /getTemplateByType\(template\)[\s\S]*fallbackTemplate\.shortName/,
+  'Worksheet fallback actions should use localized template short names.'
+);
+assert.doesNotMatch(
+  templateEntrySource,
+  /worksheets_page_mode_fallback_action\(\{ template \}\)/,
+  'Worksheet fallback actions should not render raw internal template ids.'
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -7188,7 +7238,7 @@ try {
       )
     )[1],
     {
-      label: '创建line-match',
+      label: '创建连线',
       search: { template: 'line-match' },
       template: 'line-match',
     }

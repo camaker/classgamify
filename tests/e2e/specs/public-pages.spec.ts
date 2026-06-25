@@ -133,7 +133,7 @@ test.describe('public page smoke coverage', () => {
     }
 
     const actions = [
-      { name: /create fill-blank/i, template: 'fill-blank' },
+      { name: /create fill blanks/i, template: 'fill-blank' },
       { name: /start line match/i, template: 'line-match' },
       { name: /create listening/i, template: 'listening' },
       { name: /create sort/i, template: 'group-sort' },
