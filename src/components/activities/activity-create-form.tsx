@@ -75,6 +75,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
+  lockedOptions: 4,
+} as const;
+
 const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
 const draftItemCountOptions = [3, 5, 8, 10] as const;
@@ -873,14 +877,16 @@ function ActivityTemplateReadinessPanel({
       )}
       {summary.lockedOptions.length > 0 ? (
         <div className="mt-4 grid gap-1.5">
-          {summary.lockedOptions.slice(0, 4).map((option) => (
-            <p
-              key={option.template}
-              className="text-muted-foreground text-xs leading-5"
-            >
-              {option.diagnosis}
-            </p>
-          ))}
+          {summary.lockedOptions
+            .slice(0, ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions)
+            .map((option) => (
+              <p
+                key={option.template}
+                className="text-muted-foreground text-xs leading-5"
+              >
+                {option.diagnosis}
+              </p>
+            ))}
         </div>
       ) : null}
     </div>

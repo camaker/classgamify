@@ -17,18 +17,23 @@ type AssignmentReteachPlanInput = {
   students: AssignmentStudentSummary[];
 };
 
+export const ASSIGNMENT_RETEACH_PLAN_LIMITS = {
+  reviewItems: 5,
+  reviewStudents: 8,
+} as const;
+
 export function buildAssignmentReteachPlan({
   assignmentTitle,
   items,
   students,
 }: AssignmentReteachPlanInput) {
   const reviewItems = getSubmittedAssignmentReviewPriorityItems(items, {
-    limit: 5,
+    limit: ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems,
   });
   const reviewStudents = getAssignmentStudentFollowUpPriorityStudents(
     students,
     {
-      limit: 8,
+      limit: ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents,
     }
   );
   const lines = [

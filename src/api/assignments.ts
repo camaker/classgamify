@@ -20,6 +20,7 @@ import {
   canUseAnotherAssignmentAttempt,
 } from '@/assignments/attempt-limits';
 import {
+  ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   type AssignmentLifecycleStatusFilter,
@@ -63,6 +64,7 @@ import {
   assignmentSnapshot,
   attempt,
 } from '@/db/app.schema';
+import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -99,9 +101,18 @@ const assignmentShareSlugSchema = z
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
-  pageSize: z.number().int().min(1).max(100).default(ASSIGNMENT_LIST_PAGE_SIZE),
+  pageSize: z
+    .number()
+    .int()
+    .min(ASSIGNMENT_LIST_INPUT_LIMITS.pageSizeMin)
+    .max(ASSIGNMENT_LIST_INPUT_LIMITS.pageSizeMax)
+    .default(ASSIGNMENT_LIST_PAGE_SIZE),
   publishedShareSlug: assignmentShareSlugSchema.optional(),
-  search: z.string().trim().max(120).optional(),
+  search: z
+    .string()
+    .trim()
+    .max(ASSIGNMENT_LIST_INPUT_LIMITS.searchMaxLength)
+    .optional(),
   status: assignmentStatusFilterSchema,
 });
 
@@ -335,7 +346,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     assertActivityCanDeriveWork(sourceActivity.visibility);
 
     const now = new Date();
-    const id = nanoid(16);
+    const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
     const shareSlug = nanoid(ASSIGNMENT_SHARE_SLUG_LENGTH.generated);
     const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
     if (expiresAt && expiresAt.getTime() <= now.getTime()) {
@@ -703,7 +714,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       completedAt: now,
       durationSeconds,
     });
-    const id = nanoid(16);
+    const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
     await db.insert(attempt).values({
       answersJson: {

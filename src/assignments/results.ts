@@ -75,6 +75,10 @@ export type AssignmentResultsAnalysis = {
   students: AssignmentStudentSummary[];
 };
 
+export const ASSIGNMENT_RESULTS_ANALYSIS_LIMITS = {
+  needsReviewItems: 3,
+} as const;
+
 export function analyzeAssignmentResults({
   attempts,
   runtimeItems,
@@ -135,7 +139,7 @@ export function analyzeAssignmentResults({
   return {
     attempts: attemptReviews,
     needsReview: getSubmittedAssignmentReviewPriorityItems(perItem, {
-      limit: 3,
+      limit: ASSIGNMENT_RESULTS_ANALYSIS_LIMITS.needsReviewItems,
     }),
     perItem,
     students: buildStudentSummaries(attemptReviews),

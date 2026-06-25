@@ -11,6 +11,7 @@ import {
 } from '@/activities/duplicate';
 import { getTemplateByType } from '@/activities/catalog';
 import {
+  ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
@@ -27,6 +28,7 @@ import {
 import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
+import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -39,15 +41,24 @@ const activityListStatusSchema = z.enum(ACTIVITY_LIBRARY_STATUSES);
 const activityListSourceSchema = z.enum(ACTIVITY_SOURCE_MATERIAL_FILTERS);
 
 const listActivitiesInputSchema = z.object({
-  createdActivityId: z.string().trim().min(1).max(80).optional(),
+  createdActivityId: z
+    .string()
+    .trim()
+    .min(ACTIVITY_LIBRARY_INPUT_LIMITS.idMinLength)
+    .max(ACTIVITY_LIBRARY_INPUT_LIMITS.createdActivityIdMaxLength)
+    .optional(),
   pageIndex: z.number().int().min(0).default(0),
   pageSize: z
     .number()
     .int()
-    .min(1)
-    .max(100)
+    .min(ACTIVITY_LIBRARY_INPUT_LIMITS.pageSizeMin)
+    .max(ACTIVITY_LIBRARY_INPUT_LIMITS.pageSizeMax)
     .default(ACTIVITY_LIBRARY_PAGE_SIZE),
-  search: z.string().trim().max(120).optional(),
+  search: z
+    .string()
+    .trim()
+    .max(ACTIVITY_LIBRARY_INPUT_LIMITS.searchMaxLength)
+    .optional(),
   source: activityListSourceSchema.default('all'),
   status: activityListStatusSchema.default('active'),
   template: activityTemplateTypeSchema.optional(),
@@ -154,7 +165,7 @@ export const createActivity = createServerFn({ method: 'POST' })
     const { userId } = context;
     const db = getDb();
     const now = new Date();
-    const id = nanoid(16);
+    const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
     const content = buildActivityContent(data);
 
     await db.insert(activity).values({
@@ -202,7 +213,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     assertActivityCanDeriveWork(sourceActivity.visibility);
 
     const now = new Date();
-    const id = nanoid(16);
+    const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
     await db.insert(activity).values({
       contentJson: cloneActivityContentForDerivative(
         sourceActivity.contentJson
@@ -267,7 +278,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     }
 
     const now = new Date();
-    const id = nanoid(16);
+    const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
     await db.insert(activity).values({
       contentJson: cloneActivityContentForDerivative(
         sourceActivity.contentJson

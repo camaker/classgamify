@@ -15,6 +15,13 @@ export type ActivitySourceMaterialFilter =
 export type ActivityTemplateFilter = 'all' | ActivityTemplateType;
 
 export const ACTIVITY_LIBRARY_PAGE_SIZE = 12;
+export const ACTIVITY_LIBRARY_INPUT_LIMITS = {
+  createdActivityIdMaxLength: 80,
+  idMinLength: 1,
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+  searchMaxLength: 120,
+} as const;
 export const ACTIVITY_LIBRARY_STATUSES = [
   'active',
   'archived',

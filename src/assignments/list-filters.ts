@@ -5,6 +5,11 @@ export type AssignmentLifecycleStatusFilter = AssignmentLifecycleStatus;
 export type AssignmentStatusFilter = 'all' | AssignmentLifecycleStatusFilter;
 
 export const ASSIGNMENT_LIST_PAGE_SIZE = 12;
+export const ASSIGNMENT_LIST_INPUT_LIMITS = {
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+  searchMaxLength: 120,
+} as const;
 
 export const ASSIGNMENT_LIFECYCLE_STATUS_FILTERS = [
   'closed',

@@ -19,7 +19,9 @@ import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
-const ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH = 80;
+export const ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS = {
+  titleMaxLength: 80,
+} as const;
 
 type ExportAttempt = {
   completedAt: Date | string | null;
@@ -267,7 +269,7 @@ function slugifyFilename(value: string) {
     .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
   const truncatedSlug = [...slug]
-    .slice(0, ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH)
+    .slice(0, ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.titleMaxLength)
     .join('')
     .replace(/-+$/g, '');
 

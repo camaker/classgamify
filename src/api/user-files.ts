@@ -12,9 +12,18 @@ import { and, count, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { formatUserFileUploadError } from './user-file-errors';
 
+export const USER_FILE_LIST_INPUT_LIMITS = {
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+} as const;
+
 const listSchema = z.object({
   pageIndex: z.number().int().min(0),
-  pageSize: z.number().int().min(1).max(100),
+  pageSize: z
+    .number()
+    .int()
+    .min(USER_FILE_LIST_INPUT_LIMITS.pageSizeMin)
+    .max(USER_FILE_LIST_INPUT_LIMITS.pageSizeMax),
 });
 
 export const listUserFiles = createServerFn({ method: 'GET' })

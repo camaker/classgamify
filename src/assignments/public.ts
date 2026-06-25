@@ -85,6 +85,12 @@ export type PublicAssignmentLookupResult =
       status: 'unavailable';
     };
 
+export const PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES = {
+  max: 20,
+  min: 5,
+  perItem: 2,
+} as const;
+
 type PublicAssignmentPayloadSource = {
   activity: {
     contentJson: ActivityContent;
@@ -316,5 +322,11 @@ export function buildPublicAssignmentPreviewAssignment(
 }
 
 function estimateAssignmentMinutes(itemCount: number) {
-  return Math.max(5, Math.min(20, itemCount * 2));
+  return Math.max(
+    PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.min,
+    Math.min(
+      PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.max,
+      itemCount * PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.perItem
+    )
+  );
 }

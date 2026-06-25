@@ -65,6 +65,11 @@ type ActivityLibraryCompatibilityView = {
   remixHint?: string;
 };
 
+export const ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS = {
+  lockedTemplateDiagnostics: 2,
+  remixActionOptions: 3,
+} as const;
+
 type ActivityLibraryCardActionState = {
   canCreateDerivedWork: boolean;
   showArchiveAction: boolean;
@@ -531,13 +536,16 @@ export function buildActivityLibraryCompatibilityView({
   summary: ActivityLibraryCardSummary;
 }): ActivityLibraryCompatibilityView {
   return {
-    lockedTemplateDiagnostics: summary.lockedTemplateDiagnostics.slice(0, 2),
+    lockedTemplateDiagnostics: summary.lockedTemplateDiagnostics.slice(
+      0,
+      ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics
+    ),
     readyTemplateOptions: summary.readyTemplateOptions.map((option) => ({
       ...option,
       isCurrent: option.template === currentTemplateType,
     })),
     remixActionOptions: summary.suggestedTemplateOptions
-      .slice(0, 3)
+      .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions)
       .map((option) => ({
         ...option,
         actionLabel: buildActivityLibraryRemixActionLabel(option.shortName),

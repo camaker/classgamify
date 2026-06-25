@@ -53,6 +53,12 @@ type ActivityPreviewPanel = {
   title: string;
 };
 
+export const ACTIVITY_PREVIEW_CONTENT_LIMITS = {
+  groups: 3,
+  pairs: 4,
+  questions: 3,
+} as const;
+
 export function ActivityPreview({
   activity,
   assignment,
@@ -61,9 +67,18 @@ export function ActivityPreview({
   panel,
 }: ActivityPreviewProps) {
   const template = getTemplateByType(activity.templateType);
-  const visibleQuestions = activity.content.questions.slice(0, 3);
-  const visiblePairs = activity.content.pairs.slice(0, 4);
-  const visibleGroups = activity.content.groups.slice(0, 3);
+  const visibleQuestions = activity.content.questions.slice(
+    0,
+    ACTIVITY_PREVIEW_CONTENT_LIMITS.questions
+  );
+  const visiblePairs = activity.content.pairs.slice(
+    0,
+    ACTIVITY_PREVIEW_CONTENT_LIMITS.pairs
+  );
+  const visibleGroups = activity.content.groups.slice(
+    0,
+    ACTIVITY_PREVIEW_CONTENT_LIMITS.groups
+  );
   const previewPanel = panel ?? buildDefaultActivityPreviewPanel();
 
   return (

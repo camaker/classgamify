@@ -5,6 +5,7 @@ import { isLocalizedPath } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
+import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
@@ -14,7 +15,10 @@ import {
   buildAssignmentClassroomBrief,
 } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
-import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
+import {
+  ASSIGNMENT_RETEACH_PLAN_LIMITS,
+  buildAssignmentReteachPlan,
+} from '@/assignments/reteach-plan';
 import { stripJsonComments } from './parse-wrangler';
 import {
   buildActivityLibraryCardSummary,
@@ -23,6 +27,7 @@ import {
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
+  ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS,
   activityLibraryCardCopy,
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
@@ -42,6 +47,7 @@ import {
   resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import {
+  ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
@@ -128,6 +134,10 @@ import {
   getActivityTemplateRunnerKind,
   getRuntimeItems,
 } from '@/activities/runtime';
+import {
+  ACTIVITY_STABLE_ID_LENGTH,
+  makeActivityStableId,
+} from '@/activities/stable-id';
 import {
   getActivityRunnerKindCopy,
   getActivityTemplateRunnerCopy,
@@ -234,6 +244,7 @@ import {
   buildPublicAssignmentPreviewAssignment,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
+  PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
   stripRuntimeAnswer,
   stripRuntimeAnswers,
 } from '@/assignments/public';
@@ -244,6 +255,7 @@ import {
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
+  ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   buildAssignmentListPageRouteSearch,
@@ -378,10 +390,12 @@ import {
   sortAssignmentStudentsByFollowUpPriority,
 } from '@/assignments/student-follow-up-priority';
 import {
+  ASSIGNMENT_RESULTS_ANALYSIS_LIMITS,
   analyzeAssignmentResults,
   isAssignmentAttemptAnswerNeedsReview,
 } from '@/assignments/results';
 import {
+  ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
@@ -908,6 +922,150 @@ assert.doesNotMatch(
   /limit: 3|limit: 6/,
   'Classroom brief selection should not maintain local numeric limits.'
 );
+const assignmentReteachPlanSource = readFileSync(
+  'src/assignments/reteach-plan.ts',
+  'utf8'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /ASSIGNMENT_RETEACH_PLAN_LIMITS[\s\S]*reviewItems: 5[\s\S]*reviewStudents: 8/,
+  'Reteach plan review and follow-up limits should be named assignment-domain constants.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /getSubmittedAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_RETEACH_PLAN_LIMITS\.reviewItems/,
+  'Reteach plan review-item selection should reuse the reteach plan limit.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /getAssignmentStudentFollowUpPriorityStudents\([\s\S]*ASSIGNMENT_RETEACH_PLAN_LIMITS\.reviewStudents/,
+  'Reteach plan student follow-up selection should reuse the reteach plan limit.'
+);
+assert.doesNotMatch(
+  assignmentReteachPlanSource,
+  /limit: 5|limit: 8/,
+  'Reteach plan selection should not maintain local numeric limits.'
+);
+const assignmentResultsSource = readFileSync(
+  'src/assignments/results.ts',
+  'utf8'
+);
+assert.match(
+  assignmentResultsSource,
+  /ASSIGNMENT_RESULTS_ANALYSIS_LIMITS[\s\S]*needsReviewItems: 3/,
+  'Assignment result analysis should expose its default review-priority limit.'
+);
+assert.match(
+  assignmentResultsSource,
+  /limit: ASSIGNMENT_RESULTS_ANALYSIS_LIMITS\.needsReviewItems/,
+  'Assignment result analysis should reuse the named review-priority limit.'
+);
+assert.doesNotMatch(
+  assignmentResultsSource,
+  /limit: 3/,
+  'Assignment result analysis should not keep a local review-priority limit.'
+);
+const assignmentResultsExportSource = readFileSync(
+  'src/assignments/results-export.ts',
+  'utf8'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS[\s\S]*titleMaxLength: 80/,
+  'Assignment results export filename limits should be named.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /slice\(0, ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.titleMaxLength\)/,
+  'Assignment results export filename truncation should reuse the named limit.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH|slice\(0, 80\)/,
+  'Assignment results export filenames should not keep local title length limits.'
+);
+const publicAssignmentSource = readFileSync(
+  'src/assignments/public.ts',
+  'utf8'
+);
+assert.match(
+  publicAssignmentSource,
+  /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
+  'Public assignment estimated minutes should expose named domain limits.'
+);
+assert.match(
+  publicAssignmentSource,
+  /itemCount \* PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES\.perItem/,
+  'Public assignment estimated minutes should reuse the per-item estimate.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /Math\.max\(5, Math\.min\(20, itemCount \* 2\)\)/,
+  'Public assignment estimated minutes should not keep local numeric limits.'
+);
+const activityLibraryViewSource = readFileSync(
+  'src/activities/library-view.ts',
+  'utf8'
+);
+assert.match(
+  activityLibraryViewSource,
+  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS[\s\S]*lockedTemplateDiagnostics: 2[\s\S]*remixActionOptions: 3/,
+  'Activity library compatibility view should expose named display limits.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS\.lockedTemplateDiagnostics[\s\S]*ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS\.remixActionOptions/,
+  'Activity library compatibility view should reuse named display limits.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /slice\(0, 2\)|slice\(0, 3\)/,
+  'Activity library compatibility view should not keep local display limits.'
+);
+const activityPreviewSource = readFileSync(
+  'src/components/activities/activity-preview.tsx',
+  'utf8'
+);
+assert.match(
+  activityPreviewSource,
+  /ACTIVITY_PREVIEW_CONTENT_LIMITS[\s\S]*groups: 3[\s\S]*pairs: 4[\s\S]*questions: 3/,
+  'Activity preview content slices should expose named display limits.'
+);
+assert.match(
+  activityPreviewSource,
+  /ACTIVITY_PREVIEW_CONTENT_LIMITS\.questions[\s\S]*ACTIVITY_PREVIEW_CONTENT_LIMITS\.pairs[\s\S]*ACTIVITY_PREVIEW_CONTENT_LIMITS\.groups/,
+  'Activity preview should reuse named display limits for questions, pairs, and groups.'
+);
+assert.doesNotMatch(
+  activityPreviewSource,
+  /slice\(0, 3\)|slice\(0, 4\)/,
+  'Activity preview should not keep local content slice limits.'
+);
+const activityEditorFormSource = readFileSync(
+  'src/components/activities/activity-create-form.tsx',
+  'utf8'
+);
+assert.match(
+  activityEditorFormSource,
+  /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS[\s\S]*lockedOptions: 4/,
+  'Activity editor readiness panel should expose its locked-option display limit.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS\.lockedOptions/,
+  'Activity editor readiness panel should reuse the named locked-option limit.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /summary\.lockedOptions\.slice\(0, 4\)/,
+  'Activity editor readiness panel should not keep a local locked-option display limit.'
+);
+const entityIdSource = readFileSync('src/lib/entity-id.ts', 'utf8');
+assert.match(
+  entityIdSource,
+  /APP_ENTITY_ID_LENGTH[\s\S]*generated: 16/,
+  'Generated app entity ids should expose a shared length constant.'
+);
 const activityDashboardRouteSource = readFileSync(
   'src/routes/dashboard/activities.tsx',
   'utf8'
@@ -1139,6 +1297,22 @@ assert.match(
   filesPageContentSource,
   /toast\.error\(m\.settings_files_upload_error\(\)\)/,
   'Classroom material upload failures should show the localized upload failure message.'
+);
+const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
+assert.match(
+  userFilesApiSource,
+  /USER_FILE_LIST_INPUT_LIMITS[\s\S]*pageSizeMax: 100[\s\S]*pageSizeMin: 1/,
+  'User file list pagination should expose named API input limits.'
+);
+assert.match(
+  userFilesApiSource,
+  /pageSize:[\s\S]*USER_FILE_LIST_INPUT_LIMITS\.pageSizeMin[\s\S]*USER_FILE_LIST_INPUT_LIMITS\.pageSizeMax/,
+  'User file list APIs should reuse the named page-size input limits.'
+);
+assert.doesNotMatch(
+  userFilesApiSource,
+  /pageSize: z\.number\(\)\.int\(\)\.min\(1\)\.max\(100\)/,
+  'User file list APIs should not keep local page-size limits.'
 );
 overwriteGetLocale(() => 'en');
 assert.equal(
@@ -4622,6 +4796,11 @@ const publicAssignmentPayload = buildPublicAssignmentPayload(
 const publicAssignmentLookupAvailable = buildPublicAssignmentLookupResult(
   publicAssignmentPayloadSource
 );
+assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
+  max: 20,
+  min: 5,
+  perItem: 2,
+});
 assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
 assert.equal(
   publicAssignmentPayload.activity.description,
@@ -4631,6 +4810,23 @@ assert.equal(publicAssignmentPayload.summary.subject, 'History');
 assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
 assert.equal(publicAssignmentPayload.summary.itemCount, 1);
 assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+assert.equal(
+  buildPublicAssignmentPayload({
+    ...publicAssignmentPayloadSource,
+    snapshot: {
+      ...publicAssignmentPayloadSource.snapshot,
+      contentJson: {
+        ...publicAssignmentPayloadSource.snapshot.contentJson,
+        questions: Array.from({ length: 20 }, (_, index) => ({
+          answer: `Answer ${index}`,
+          id: `question-${index}`,
+          prompt: `Prompt ${index}?`,
+        })),
+      },
+    },
+  }).summary.estimatedMinutes,
+  PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.max
+);
 assert.equal('sourceMaterials' in publicAssignmentPayload.summary, false);
 assert.equal(
   'sourceMaterials' in publicAssignmentPayload.runtimeItems[0]!,
@@ -5832,6 +6028,23 @@ assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
 assert.equal(ACTIVITY_LIBRARY_PAGE_SIZE, 12);
+assert.deepEqual(ACTIVITY_LIBRARY_INPUT_LIMITS, {
+  createdActivityIdMaxLength: 80,
+  idMinLength: 1,
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+  searchMaxLength: 120,
+});
+assert.deepEqual(ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS, {
+  lockedTemplateDiagnostics: 2,
+  remixActionOptions: 3,
+});
+assert.deepEqual(APP_ENTITY_ID_LENGTH, { generated: 16 });
+assert.deepEqual(ACTIVITY_STABLE_ID_LENGTH, { max: 40 });
+assert.equal(
+  makeActivityStableId('A'.repeat(ACTIVITY_STABLE_ID_LENGTH.max + 5)).length,
+  ACTIVITY_STABLE_ID_LENGTH.max
+);
 assert.deepEqual(ACTIVITY_LIBRARY_STATUSES, ['active', 'archived']);
 assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_FILTERS, [
   'all',
@@ -6015,6 +6228,25 @@ assert.doesNotMatch(
   /teacherNotesText: z\.string\(\)\.max\(2000\)/,
   'Activity notes schema should not maintain a local field length.'
 );
+const activityStableIdSource = readFileSync(
+  'src/activities/stable-id.ts',
+  'utf8'
+);
+assert.match(
+  activityStableIdSource,
+  /ACTIVITY_STABLE_ID_LENGTH[\s\S]*max: 40/,
+  'Activity stable ids should expose their maximum length as a named domain constant.'
+);
+assert.match(
+  activityStableIdSource,
+  /slice\(0, ACTIVITY_STABLE_ID_LENGTH\.max\)/,
+  'Activity stable id generation should reuse the stable-id length constant.'
+);
+assert.doesNotMatch(
+  activityStableIdSource,
+  /slice\(0, 40\)/,
+  'Activity stable id generation should not keep a local maximum length.'
+);
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 assert.match(
   activitiesApiSource,
@@ -6060,6 +6292,31 @@ assert.match(
   activitiesApiSource,
   /default\(ACTIVITY_LIBRARY_PAGE_SIZE\)/,
   'Activity list API should default page size through the activity-domain pagination constant.'
+);
+assert.match(
+  activitiesApiSource,
+  /createdActivityId:[\s\S]*ACTIVITY_LIBRARY_INPUT_LIMITS\.idMinLength[\s\S]*ACTIVITY_LIBRARY_INPUT_LIMITS\.createdActivityIdMaxLength/,
+  'Activity list API should reuse activity-domain limits for created activity ids.'
+);
+assert.match(
+  activitiesApiSource,
+  /pageSize:[\s\S]*ACTIVITY_LIBRARY_INPUT_LIMITS\.pageSizeMin[\s\S]*ACTIVITY_LIBRARY_INPUT_LIMITS\.pageSizeMax/,
+  'Activity list API should reuse activity-domain page-size input limits.'
+);
+assert.match(
+  activitiesApiSource,
+  /search:[\s\S]*ACTIVITY_LIBRARY_INPUT_LIMITS\.searchMaxLength/,
+  'Activity list API should reuse the activity-domain search input limit.'
+);
+assert.match(
+  activitiesApiSource,
+  /nanoid\(APP_ENTITY_ID_LENGTH\.generated\)/,
+  'Activity API generated ids should reuse the shared app entity id length.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /nanoid\(16\)|pageSize:[\s\S]*\.max\(100\)|search:[\s\S]*\.max\(120\)/,
+  'Activity API should not keep local id or list input limits.'
 );
 assert.doesNotMatch(
   activitiesApiSource,
@@ -6160,6 +6417,26 @@ assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
   'Assignment list API should default page size through the assignment-domain pagination constant.'
+);
+assert.match(
+  assignmentsApiSource,
+  /pageSize:[\s\S]*ASSIGNMENT_LIST_INPUT_LIMITS\.pageSizeMin[\s\S]*ASSIGNMENT_LIST_INPUT_LIMITS\.pageSizeMax/,
+  'Assignment list API should reuse assignment-domain page-size input limits.'
+);
+assert.match(
+  assignmentsApiSource,
+  /search:[\s\S]*ASSIGNMENT_LIST_INPUT_LIMITS\.searchMaxLength/,
+  'Assignment list API should reuse the assignment-domain search input limit.'
+);
+assert.match(
+  assignmentsApiSource,
+  /nanoid\(APP_ENTITY_ID_LENGTH\.generated\)/,
+  'Assignment and attempt APIs should reuse the shared app entity id length.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /nanoid\(16\)|pageSize:[\s\S]*\.max\(100\)|search:[\s\S]*\.max\(120\)/,
+  'Assignment API should not keep local id or list input limits.'
 );
 assert.match(
   assignmentsApiSource,
@@ -7520,6 +7797,11 @@ assert.equal(
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
 assert.equal(normalizeAssignmentListSearch('  Ｗｅｅｋ   １  '), 'Week 1');
 assert.equal(normalizeAssignmentListSearch('   '), undefined);
+assert.deepEqual(ASSIGNMENT_LIST_INPUT_LIMITS, {
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+  searchMaxLength: 120,
+});
 assert.equal(ASSIGNMENT_LIST_PAGE_SIZE, 12);
 assert.equal(getAssignmentListTotalPages({ total: 0 }), 1);
 assert.equal(getAssignmentListTotalPages({ pageSize: 12, total: 31 }), 3);
@@ -8807,6 +9089,18 @@ assert.deepEqual(
     ],
     remixHint: 'Ready to remix into Fill, Listen, Box.',
   }
+);
+const questionOnlyCompatibilityView = buildActivityLibraryCompatibilityView({
+  currentTemplateType: 'quiz',
+  summary: questionOnlyCardSummary,
+});
+assert.equal(
+  questionOnlyCompatibilityView.lockedTemplateDiagnostics.length,
+  ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics
+);
+assert.equal(
+  questionOnlyCompatibilityView.remixActionOptions.length,
+  ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.remixActionOptions
 );
 assert.equal(formatTemplateRequirement('pairs'), 'match pairs');
 assert.equal(formatTemplateRequirement('learningGoal'), 'learning goal');
@@ -11330,6 +11624,9 @@ const resultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems,
 });
+assert.deepEqual(ASSIGNMENT_RESULTS_ANALYSIS_LIMITS, {
+  needsReviewItems: 3,
+});
 
 const chronologicalAnonymousResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -13532,6 +13829,9 @@ assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
   'classgamify-capital-review-week-1-results.csv'
 );
+assert.deepEqual(ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS, {
+  titleMaxLength: 80,
+});
 assert.equal(
   buildAssignmentResultsCsvFilename({
     ...csvExportData,
@@ -13667,6 +13967,10 @@ assert.equal(
   ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.followUpStudents
 );
 
+assert.deepEqual(ASSIGNMENT_RETEACH_PLAN_LIMITS, {
+  reviewItems: 5,
+  reviewStudents: 8,
+});
 const reteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
@@ -13679,6 +13983,55 @@ assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
 assert.match(
   reteachPlan,
   /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
+);
+const expandedReteachPlan = buildAssignmentReteachPlan({
+  assignmentTitle: csvExportData.assignment.title,
+  items: [
+    ...reviewPriorityItems,
+    {
+      acceptedAnswers: ['D'],
+      correctCount: 1,
+      correctRate: 20,
+      expectedAnswer: 'D',
+      itemId: 'lower-than-tie',
+      kind: 'question',
+      kindLabel: 'Question',
+      prompt: 'Lower than tie',
+      submittedCount: 5,
+    },
+    {
+      acceptedAnswers: ['E'],
+      correctCount: 2,
+      correctRate: 40,
+      expectedAnswer: 'E',
+      itemId: 'another-reviewed',
+      kind: 'question',
+      kindLabel: 'Question',
+      prompt: 'Another reviewed item',
+      submittedCount: 1,
+    },
+  ],
+  students: [
+    ...followUpPriorityStudents,
+    ...followUpPriorityStudents.map((student, index) => ({
+      ...student,
+      studentKey: `${student.studentKey}-reteach-extra-${index}`,
+      studentLabel: `${student.studentLabel} reteach extra ${index}`,
+    })),
+    ...followUpPriorityStudents.map((student, index) => ({
+      ...student,
+      studentKey: `${student.studentKey}-reteach-more-${index}`,
+      studentLabel: `${student.studentLabel} reteach more ${index}`,
+    })),
+  ],
+});
+assert.equal(
+  (expandedReteachPlan.match(/^- \d+\. /gm) ?? []).length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems
+);
+assert.equal(
+  (expandedReteachPlan.match(/^- .*latest accuracy/gm) ?? []).length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents
 );
 
 const itemReviewSummary = buildAssignmentItemReviewSummary({
