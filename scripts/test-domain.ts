@@ -145,6 +145,7 @@ import {
 import {
   ACTIVITY_CREATABLE_VISIBILITIES,
   ACTIVITY_DIFFICULTIES,
+  ACTIVITY_EDITOR_FIELD_LIMITS,
   ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
   ACTIVITY_TITLE_LENGTH,
@@ -5936,6 +5937,26 @@ assert.match(
   /title: z[\s\S]*ACTIVITY_TITLE_LENGTH\.min[\s\S]*ACTIVITY_TITLE_LENGTH\.max/,
   'Activity title schema should reuse the activity-domain title length range.'
 );
+assert.match(
+  activityValidationSource,
+  /description:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.descriptionMaxLength[\s\S]*gradeBand:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.gradeBandMinLength[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.gradeBandMaxLength[\s\S]*groupsText:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.groupsTextMaxLength/,
+  'Activity editor schema should reuse field limits for overview and group inputs.'
+);
+assert.match(
+  activityValidationSource,
+  /language:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.languageMinLength[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.languageMaxLength[\s\S]*learningGoal:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.learningGoalMinLength[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.learningGoalMaxLength/,
+  'Activity editor schema should reuse field limits for language and learning goal inputs.'
+);
+assert.match(
+  activityValidationSource,
+  /pairsText:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.pairsTextMaxLength[\s\S]*questionsText:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.questionsTextMaxLength[\s\S]*sourceSummary:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.sourceSummaryMaxLength/,
+  'Activity editor schema should reuse field limits for structured source inputs.'
+);
+assert.match(
+  activityValidationSource,
+  /subject:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.subjectMinLength[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.subjectMaxLength[\s\S]*teacherNotesText:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.teacherNotesTextMaxLength[\s\S]*vocabularyText:[\s\S]*ACTIVITY_EDITOR_FIELD_LIMITS\.vocabularyTextMaxLength/,
+  'Activity editor schema should reuse field limits for subject, notes, and vocabulary inputs.'
+);
 assert.doesNotMatch(
   activityValidationSource,
   /z\.enum\(\[\s*'starter'/,
@@ -5950,6 +5971,21 @@ assert.doesNotMatch(
   activityValidationSource,
   /title: z\.string\(\)\.trim\(\)\.min\(3\)\.max\(120\)/,
   'Activity title schema should not maintain local title length values.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /description: z\.string\(\)\.trim\(\)\.max\(400\)/,
+  'Activity description schema should not maintain a local field length.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /questionsText: z\.string\(\)\.max\(6000\)/,
+  'Activity question text schema should not maintain a local field length.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /teacherNotesText: z\.string\(\)\.max\(2000\)/,
+  'Activity notes schema should not maintain a local field length.'
 );
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 assert.match(
@@ -8063,6 +8099,23 @@ assert.deepEqual(ACTIVITY_PERSISTED_VISIBILITIES, [
   ...ACTIVITY_CREATABLE_VISIBILITIES,
 ]);
 assert.deepEqual(ACTIVITY_TITLE_LENGTH, { max: 120, min: 3 });
+assert.deepEqual(ACTIVITY_EDITOR_FIELD_LIMITS, {
+  descriptionMaxLength: 400,
+  gradeBandMaxLength: 80,
+  gradeBandMinLength: 1,
+  groupsTextMaxLength: 4000,
+  languageMaxLength: 20,
+  languageMinLength: 2,
+  learningGoalMaxLength: 400,
+  learningGoalMinLength: 8,
+  pairsTextMaxLength: 4000,
+  questionsTextMaxLength: 6000,
+  sourceSummaryMaxLength: 500,
+  subjectMaxLength: 80,
+  subjectMinLength: 1,
+  teacherNotesTextMaxLength: 2000,
+  vocabularyTextMaxLength: 2000,
+});
 assert.equal(activityDifficultySchema.parse('core'), 'core');
 assert.equal(activityVisibilitySchema.parse('private'), 'private');
 assert.equal(activityPersistedVisibilitySchema.parse('archived'), 'archived');

@@ -1,6 +1,7 @@
 import {
   ACTIVITY_CREATABLE_VISIBILITIES,
   ACTIVITY_DIFFICULTIES,
+  ACTIVITY_EDITOR_FIELD_LIMITS,
   ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
   ACTIVITY_TITLE_LENGTH,
@@ -34,18 +35,55 @@ export const activityPersistedVisibilitySchema = z.enum(
 );
 
 export const createActivityInputSchema = z.object({
-  description: z.string().trim().max(400).optional(),
+  description: z
+    .string()
+    .trim()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.descriptionMaxLength)
+    .optional(),
   difficulty: activityDifficultySchema.default('starter'),
-  gradeBand: z.string().trim().min(1).max(80),
-  groupsText: z.string().max(4000).optional(),
-  language: z.string().trim().min(2).max(20).default('en'),
-  learningGoal: z.string().trim().min(8).max(400),
-  pairsText: z.string().max(4000).optional(),
-  questionsText: z.string().max(6000).optional(),
-  sourceSummary: z.string().trim().max(500).optional(),
+  gradeBand: z
+    .string()
+    .trim()
+    .min(ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMinLength)
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMaxLength),
+  groupsText: z
+    .string()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.groupsTextMaxLength)
+    .optional(),
+  language: z
+    .string()
+    .trim()
+    .min(ACTIVITY_EDITOR_FIELD_LIMITS.languageMinLength)
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.languageMaxLength)
+    .default('en'),
+  learningGoal: z
+    .string()
+    .trim()
+    .min(ACTIVITY_EDITOR_FIELD_LIMITS.learningGoalMinLength)
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.learningGoalMaxLength),
+  pairsText: z
+    .string()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.pairsTextMaxLength)
+    .optional(),
+  questionsText: z
+    .string()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.questionsTextMaxLength)
+    .optional(),
+  sourceSummary: z
+    .string()
+    .trim()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.sourceSummaryMaxLength)
+    .optional(),
   sourceMaterials: z.array(z.unknown()).optional(),
-  subject: z.string().trim().min(1).max(80),
-  teacherNotesText: z.string().max(2000).optional(),
+  subject: z
+    .string()
+    .trim()
+    .min(ACTIVITY_EDITOR_FIELD_LIMITS.subjectMinLength)
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.subjectMaxLength),
+  teacherNotesText: z
+    .string()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.teacherNotesTextMaxLength)
+    .optional(),
   templateType: activityTemplateTypeSchema,
   title: z
     .string()
@@ -53,7 +91,10 @@ export const createActivityInputSchema = z.object({
     .min(ACTIVITY_TITLE_LENGTH.min)
     .max(ACTIVITY_TITLE_LENGTH.max),
   visibility: activityVisibilitySchema.default('draft'),
-  vocabularyText: z.string().max(2000).optional(),
+  vocabularyText: z
+    .string()
+    .max(ACTIVITY_EDITOR_FIELD_LIMITS.vocabularyTextMaxLength)
+    .optional(),
 });
 
 export type CreateActivityInput = z.infer<typeof createActivityInputSchema>;

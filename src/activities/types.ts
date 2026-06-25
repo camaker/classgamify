@@ -32,6 +32,24 @@ export const ACTIVITY_TITLE_LENGTH = {
   min: 3,
 } as const;
 
+export const ACTIVITY_EDITOR_FIELD_LIMITS = {
+  descriptionMaxLength: 400,
+  gradeBandMaxLength: 80,
+  gradeBandMinLength: 1,
+  groupsTextMaxLength: 4000,
+  languageMaxLength: 20,
+  languageMinLength: 2,
+  learningGoalMaxLength: 400,
+  learningGoalMinLength: 8,
+  pairsTextMaxLength: 4000,
+  questionsTextMaxLength: 6000,
+  sourceSummaryMaxLength: 500,
+  subjectMaxLength: 80,
+  subjectMinLength: 1,
+  teacherNotesTextMaxLength: 2000,
+  vocabularyTextMaxLength: 2000,
+} as const;
+
 export type ActivityVisibility =
   (typeof ACTIVITY_PERSISTED_VISIBILITIES)[number];
 
