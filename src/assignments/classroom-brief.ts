@@ -3,9 +3,12 @@ import type {
   AssignmentStudentSummary,
 } from '@/assignments/results';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import {
   formatAssignmentSummaryAccuracy,
+  formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryItemPerformance,
+  formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
@@ -27,9 +30,26 @@ type AssignmentClassroomBriefInput = {
 };
 
 type AssignmentClassroomBrief = {
+  focusItemViews: AssignmentClassroomBriefFocusItemView[];
   focusItems: AssignmentItemAnalysis[];
+  followUpStudentViews: AssignmentClassroomBriefFollowUpStudentView[];
   followUpStudents: AssignmentStudentSummary[];
   text: string;
+};
+
+export type AssignmentClassroomBriefFocusItemView = {
+  correctRateLabel: string;
+  correctSummaryLabel: string;
+  itemId: string;
+  itemNumberLabel: string;
+  prompt: string;
+};
+
+export type AssignmentClassroomBriefFollowUpStudentView = {
+  accuracyLabel: string;
+  needsReviewLabel: string;
+  studentKey: string;
+  studentLabel: string;
 };
 
 export const ASSIGNMENT_CLASSROOM_BRIEF_LIMITS = {
@@ -69,10 +89,58 @@ export function buildAssignmentClassroomBrief({
   ];
 
   return {
+    focusItemViews: focusItems.map((item, index) =>
+      buildAssignmentClassroomBriefFocusItemView({
+        index,
+        item,
+      })
+    ),
     focusItems,
+    followUpStudentViews: followUpStudents.map(
+      buildAssignmentClassroomBriefFollowUpStudentView
+    ),
     followUpStudents,
     text: lines.join('\n'),
   };
+}
+
+export function buildAssignmentClassroomBriefFocusItemView({
+  index,
+  item,
+}: {
+  index: number;
+  item: AssignmentItemAnalysis;
+}): AssignmentClassroomBriefFocusItemView {
+  return {
+    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctSummaryLabel: formatAssignmentSummaryCorrectCount(item),
+    itemId: item.itemId,
+    itemNumberLabel: `${Math.max(0, index) + 1}.`,
+    prompt: item.prompt,
+  };
+}
+
+export function buildAssignmentClassroomBriefFollowUpStudentView(
+  student: AssignmentStudentSummary
+): AssignmentClassroomBriefFollowUpStudentView {
+  return {
+    accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
+    needsReviewLabel: formatAssignmentSummaryReviewCount(
+      student.needsReviewCount
+    ),
+    studentKey: student.studentKey,
+    studentLabel: student.studentLabel,
+  };
+}
+
+export function formatAssignmentBriefStudentAccuracy({
+  bestAccuracy,
+  latestAccuracy,
+}: Pick<AssignmentStudentSummary, 'bestAccuracy' | 'latestAccuracy'>) {
+  return m.assignment_result_brief_student_accuracy({
+    best: formatAssignmentResultPercent(bestAccuracy),
+    latest: formatAssignmentResultPercent(latestAccuracy),
+  });
 }
 
 function getClassroomBriefFocusItems(items: AssignmentItemAnalysis[]) {

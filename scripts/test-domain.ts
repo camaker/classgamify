@@ -13,6 +13,9 @@ import { formatUserFileUploadError } from '@/api/user-file-errors';
 import {
   ASSIGNMENT_CLASSROOM_BRIEF_LIMITS,
   buildAssignmentClassroomBrief,
+  buildAssignmentClassroomBriefFocusItemView,
+  buildAssignmentClassroomBriefFollowUpStudentView,
+  formatAssignmentBriefStudentAccuracy,
 } from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import {
@@ -318,8 +321,6 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
-  buildAssignmentClassroomBriefFocusItemView,
-  buildAssignmentClassroomBriefFollowUpStudentView,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultActionButtons,
@@ -347,7 +348,6 @@ import {
   filterAssignmentResultCompletedAttemptRows,
   filterAttemptReviews,
   formatAssignmentAttemptReviewBadge,
-  formatAssignmentBriefStudentAccuracy,
   formatAssignmentItemCorrectSummary,
   formatAssignmentResultFraction,
   formatAssignmentResultNumber,
@@ -14299,10 +14299,18 @@ assert.deepEqual(
   {
     correctRateLabel: '50%',
     correctSummaryLabel: '1/2 correct',
+    itemId: 'pair-1',
     itemNumberLabel: '1.',
     prompt: 'Match "Hot" with its pair.',
   }
 );
+assert.deepEqual(classroomBrief.focusItemViews[0], {
+  correctRateLabel: '50%',
+  correctSummaryLabel: '1/2 correct',
+  itemId: 'pair-1',
+  itemNumberLabel: '1.',
+  prompt: 'Match "Hot" with its pair.',
+});
 assert.deepEqual(
   buildAssignmentClassroomBriefFollowUpStudentView(
     classroomBrief.followUpStudents[0]!
@@ -14310,9 +14318,16 @@ assert.deepEqual(
   {
     accuracyLabel: 'Latest 0% · best 0%',
     needsReviewLabel: '1 review',
+    studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
   }
 );
+assert.deepEqual(classroomBrief.followUpStudentViews[0], {
+  accuracyLabel: 'Latest 0% · best 0%',
+  needsReviewLabel: '1 review',
+  studentKey: 'anonymous:1',
+  studentLabel: 'Anonymous student 1',
+});
 assert.match(
   classroomBrief.text,
   /ClassGamify classroom brief: Capital Review, Week 1/

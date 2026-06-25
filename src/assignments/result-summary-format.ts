@@ -32,6 +32,14 @@ export function formatAssignmentSummaryReviewItemCount(count: number) {
   return m.assignment_result_summary_review_items_many({ count });
 }
 
+export function formatAssignmentSummaryReviewCount(count: number) {
+  if (count === 1) {
+    return m.assignment_result_review_count_one({ count });
+  }
+
+  return m.assignment_result_review_count_many({ count });
+}
+
 export function formatAssignmentSummaryAttemptCount(count: number) {
   if (count === 1) {
     return m.assignment_result_summary_attempts_one({ count });

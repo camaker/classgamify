@@ -33,6 +33,7 @@ import {
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
 } from '@/assignments/result-format';
+import { formatAssignmentSummaryReviewCount } from '@/assignments/result-summary-format';
 import {
   compareAssignmentItemsByReviewPriority,
   compareAssignmentItemsByStableOrder,
@@ -949,41 +950,6 @@ export function buildAssignmentAttemptReviewCardView(
   };
 }
 
-export function buildAssignmentClassroomBriefFocusItemView({
-  index,
-  item,
-}: {
-  index: number;
-  item: AssignmentItemAnalysis;
-}) {
-  return {
-    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
-    correctSummaryLabel: formatAssignmentItemCorrectSummary(item),
-    itemNumberLabel: `${Math.max(0, index) + 1}.`,
-    prompt: item.prompt,
-  };
-}
-
-export function buildAssignmentClassroomBriefFollowUpStudentView(
-  student: AssignmentStudentSummary
-) {
-  return {
-    accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
-    needsReviewLabel: formatAssignmentReviewCount(student.needsReviewCount),
-    studentLabel: student.studentLabel,
-  };
-}
-
-export function formatAssignmentBriefStudentAccuracy({
-  bestAccuracy,
-  latestAccuracy,
-}: Pick<AssignmentStudentSummary, 'bestAccuracy' | 'latestAccuracy'>) {
-  return m.assignment_result_brief_student_accuracy({
-    best: formatAssignmentResultPercent(bestAccuracy),
-    latest: formatAssignmentResultPercent(latestAccuracy),
-  });
-}
-
 export function buildAssignmentStudentSummaryRowView(
   student: AssignmentStudentSummary
 ) {
@@ -1102,11 +1068,7 @@ export function formatAssignmentResultFraction(value: number, total: number) {
 export { formatAssignmentResultNumber, formatAssignmentResultPercent };
 
 export function formatAssignmentReviewCount(count: number) {
-  if (count === 1) {
-    return m.assignment_result_review_count_one({ count });
-  }
-
-  return m.assignment_result_review_count_many({ count });
+  return formatAssignmentSummaryReviewCount(count);
 }
 
 function clampProgressValue(value: number) {

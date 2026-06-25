@@ -23,8 +23,6 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
-  buildAssignmentClassroomBriefFocusItemView,
-  buildAssignmentClassroomBriefFollowUpStudentView,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentResultMetricItems,
@@ -626,29 +624,22 @@ function ClassroomBriefCard({
             {assignmentResultSectionCopy.classReviewFocus.title}
           </h3>
           <div className="mt-3 grid gap-3">
-            {brief.focusItems.length > 0 ? (
-              brief.focusItems.map((item, index) => {
-                const itemView = buildAssignmentClassroomBriefFocusItemView({
-                  index,
-                  item,
-                });
-
-                return (
-                  <div key={item.itemId} className="grid gap-1 text-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="min-w-0 font-medium">
-                        {itemView.itemNumberLabel} {itemView.prompt}
-                      </p>
-                      <Badge variant="outline" className="rounded-md">
-                        {itemView.correctRateLabel}
-                      </Badge>
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {itemView.correctSummaryLabel}
+            {brief.focusItemViews.length > 0 ? (
+              brief.focusItemViews.map((itemView) => (
+                <div key={itemView.itemId} className="grid gap-1 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="min-w-0 font-medium">
+                      {itemView.itemNumberLabel} {itemView.prompt}
                     </p>
+                    <Badge variant="outline" className="rounded-md">
+                      {itemView.correctRateLabel}
+                    </Badge>
                   </div>
-                );
-              })
+                  <p className="text-muted-foreground text-xs">
+                    {itemView.correctSummaryLabel}
+                  </p>
+                </div>
+              ))
             ) : (
               <p className="text-muted-foreground text-sm">
                 {assignmentResultSectionCopy.classReviewFocus.emptyMessage}
@@ -661,30 +652,25 @@ function ClassroomBriefCard({
             {assignmentResultSectionCopy.studentFollowUp.title}
           </h3>
           <div className="mt-3 grid gap-3">
-            {brief.followUpStudents.length > 0 ? (
-              brief.followUpStudents.map((student) => {
-                const studentView =
-                  buildAssignmentClassroomBriefFollowUpStudentView(student);
-
-                return (
-                  <div
-                    key={student.studentKey}
-                    className="flex items-center justify-between gap-3 text-sm"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">
-                        {studentView.studentLabel}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {studentView.accuracyLabel}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="rounded-md">
-                      {studentView.needsReviewLabel}
-                    </Badge>
+            {brief.followUpStudentViews.length > 0 ? (
+              brief.followUpStudentViews.map((studentView) => (
+                <div
+                  key={studentView.studentKey}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">
+                      {studentView.studentLabel}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {studentView.accuracyLabel}
+                    </p>
                   </div>
-                );
-              })
+                  <Badge variant="secondary" className="rounded-md">
+                    {studentView.needsReviewLabel}
+                  </Badge>
+                </div>
+              ))
             ) : (
               <p className="text-muted-foreground text-sm">
                 {assignmentResultSectionCopy.studentFollowUp.emptyMessage}
