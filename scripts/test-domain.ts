@@ -391,6 +391,7 @@ import {
   normalizeShareBaseUrl,
 } from '@/assignments/share-link';
 import {
+  ASSIGNMENT_SHARE_SLUG_LENGTH,
   isSameAssignmentShareSlug,
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
@@ -3394,6 +3395,11 @@ assert.doesNotMatch(
   /const PUBLISH_ATTEMPTS_RANGE|const PUBLISH_TIME_LIMIT_MINUTES_RANGE/,
   'Publish dialog input parsing should not maintain separate local delivery ranges.'
 );
+assert.deepEqual(ASSIGNMENT_SHARE_SLUG_LENGTH, {
+  generated: 10,
+  max: 80,
+  min: 1,
+});
 assert.equal(buildAssignmentSharePath('abc 123'), '/play/abc%20123');
 assert.equal(buildAssignmentSharePath('  abc 123  '), '/play/abc%20123');
 assert.equal(buildAssignmentSharePath('　abc １２３　'), '/play/abc%20123');
@@ -6079,6 +6085,26 @@ assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
   'Assignment list API should default page size through the assignment-domain pagination constant.'
+);
+assert.match(
+  assignmentsApiSource,
+  /assignmentShareSlugSchema[\s\S]*ASSIGNMENT_SHARE_SLUG_LENGTH\.min[\s\S]*ASSIGNMENT_SHARE_SLUG_LENGTH\.max/,
+  'Assignment share-slug schema should reuse the assignment-domain slug length range.'
+);
+assert.match(
+  assignmentsApiSource,
+  /const shareSlug = nanoid\(ASSIGNMENT_SHARE_SLUG_LENGTH\.generated\)/,
+  'Published assignment share slugs should reuse the generated slug length constant.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /\.pipe\(z\.string\(\)\.min\(1\)\.max\(80\)\)/,
+  'Assignment share-slug schema should not keep local length bounds.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /const shareSlug = nanoid\(10\)/,
+  'Published assignment share slugs should not keep a local generated length.'
 );
 assert.match(
   assignmentsApiSource,

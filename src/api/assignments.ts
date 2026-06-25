@@ -48,7 +48,10 @@ import {
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  ASSIGNMENT_SHARE_SLUG_LENGTH,
+  normalizeAssignmentShareSlug,
+} from '@/assignments/share-slug';
 import {
   buildAssignmentSnapshotInsert,
   resolveAssignmentRuntimeSource,
@@ -87,7 +90,12 @@ const assignmentStatusFilterSchema = z.preprocess(
 const assignmentShareSlugSchema = z
   .string()
   .transform(normalizeAssignmentShareSlug)
-  .pipe(z.string().min(1).max(80));
+  .pipe(
+    z
+      .string()
+      .min(ASSIGNMENT_SHARE_SLUG_LENGTH.min)
+      .max(ASSIGNMENT_SHARE_SLUG_LENGTH.max)
+  );
 
 const listAssignmentsInputSchema = z.object({
   pageIndex: z.number().int().min(0).default(0),
@@ -328,7 +336,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
 
     const now = new Date();
     const id = nanoid(16);
-    const shareSlug = nanoid(10);
+    const shareSlug = nanoid(ASSIGNMENT_SHARE_SLUG_LENGTH.generated);
     const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
     if (expiresAt && expiresAt.getTime() <= now.getTime()) {
       throw new Error(m.assignment_api_error_close_time_future());
