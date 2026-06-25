@@ -1,6 +1,7 @@
 import type { AssignmentSettings } from '@/activities/types';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
+  ASSIGNMENT_PUBLISH_FIELD_LIMITS,
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
   defaultAssignmentSettings,
 } from '@/assignments/validation';
@@ -287,6 +288,7 @@ export function buildAssignmentPublishPreviewFromDraft({
 
 export function validateAssignmentPublishDraft({
   expiresAtLocal,
+  instructions,
   maxAttempts,
   now = new Date(),
   timeLimitMinutes,
@@ -296,6 +298,36 @@ export function validateAssignmentPublishDraft({
   if (!trimmedTitle) {
     return {
       message: m.assignment_publish_validation_title_required(),
+      ok: false,
+    };
+  }
+
+  if (trimmedTitle.length < ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength) {
+    return {
+      message: m.assignment_publish_validation_title_min({
+        min: ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength,
+      }),
+      ok: false,
+    };
+  }
+
+  if (trimmedTitle.length > ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMaxLength) {
+    return {
+      message: m.assignment_publish_validation_title_max({
+        max: ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMaxLength,
+      }),
+      ok: false,
+    };
+  }
+
+  if (
+    instructions.trim().length >
+    ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength
+  ) {
+    return {
+      message: m.assignment_publish_validation_instructions_max({
+        max: ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength,
+      }),
       ok: false,
     };
   }

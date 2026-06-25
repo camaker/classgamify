@@ -37,6 +37,13 @@ export const ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE = {
   min: 3,
 } as const;
 
+export const ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS = [
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default,
+  8,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max,
+] as const;
+
 export const ACTIVITY_AI_DRAFT_COMPLETION_LIMITS = {
   groups: 4,
   groupItems: 8,

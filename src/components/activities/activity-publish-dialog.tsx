@@ -11,6 +11,11 @@ import {
   buildAssignmentPublishToggleViews,
   validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
+import {
+  ASSIGNMENT_MAX_ATTEMPTS_RANGE,
+  ASSIGNMENT_PUBLISH_FIELD_LIMITS,
+  ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
+} from '@/assignments/validation';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { Button } from '@/components/ui/button';
 import {
@@ -181,7 +186,7 @@ export function ActivityPublishDialog({
             <Textarea
               id={`assignment-instructions-${activity.id}`}
               rows={3}
-              maxLength={500}
+              maxLength={ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength}
               value={assignmentInstructions}
               placeholder={assignmentPublishDialogCopy.instructionsPlaceholder}
               onChange={(event) =>
@@ -208,8 +213,8 @@ export function ActivityPublishDialog({
             <Input
               id={`max-attempts-${activity.id}`}
               type="number"
-              min={1}
-              max={10}
+              min={ASSIGNMENT_MAX_ATTEMPTS_RANGE.min}
+              max={ASSIGNMENT_MAX_ATTEMPTS_RANGE.max}
               value={maxAttempts}
               onChange={(event) => setMaxAttempts(event.currentTarget.value)}
             />
@@ -224,8 +229,8 @@ export function ActivityPublishDialog({
             <Input
               id={`time-limit-${activity.id}`}
               type="number"
-              min={1}
-              max={180}
+              min={ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE.min}
+              max={ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE.max}
               value={timeLimitMinutes}
               placeholder={assignmentPublishDialogCopy.timeLimitPlaceholder}
               onChange={(event) =>

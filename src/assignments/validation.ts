@@ -24,10 +24,20 @@ export const ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE = {
   min: ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.min / 60,
 } as const;
 
+export const ASSIGNMENT_PUBLISH_FIELD_LIMITS = {
+  instructionsMaxLength: 500,
+  titleMaxLength: 120,
+  titleMinLength: 3,
+} as const;
+
 const assignmentInstructionsSchema = z.preprocess(
   (value) =>
     typeof value === 'string' && value.trim().length === 0 ? undefined : value,
-  z.string().trim().max(500).optional()
+  z
+    .string()
+    .trim()
+    .max(ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength)
+    .optional()
 );
 
 const assignmentLimitedMaxAttemptsSchema = z
@@ -89,7 +99,11 @@ export const publishAssignmentInputSchema = z.object({
   activityId: z.string().min(1),
   expiresAt: z.string().datetime().optional(),
   settings: assignmentSettingsSchema.default(defaultAssignmentSettings),
-  title: z.string().trim().min(3).max(120),
+  title: z
+    .string()
+    .trim()
+    .min(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength)
+    .max(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMaxLength),
 });
 
 export const updateAssignmentStatusInputSchema = z.object({

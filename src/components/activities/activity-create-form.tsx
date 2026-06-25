@@ -11,6 +11,8 @@ import {
 } from '@/activities/editor';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildGenerateActivityDraftInputFromEditor,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
@@ -81,7 +83,6 @@ export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
 
 const difficultyOptions = activityDifficultySchema.options;
 const visibilityOptions = activityVisibilitySchema.options;
-const draftItemCountOptions = [3, 5, 8, 10] as const;
 type ActivityFormDifficulty = (typeof difficultyOptions)[number];
 type ActivityFormVisibility = (typeof visibilityOptions)[number];
 
@@ -108,7 +109,9 @@ export function ActivityCreateForm({
   const [draftSourceText, setDraftSourceText] = useState(
     getActivityDraftSourceText(defaultValues)
   );
-  const [draftItemCount, setDraftItemCount] = useState(5);
+  const [draftItemCount, setDraftItemCount] = useState(
+    ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
+  );
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
   const form = useForm<CreateActivityInput>({
     defaultValues,
@@ -327,7 +330,7 @@ export function ActivityCreateForm({
                       }
                       className="w-full"
                     >
-                      {draftItemCountOptions.map((count) => (
+                      {ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS.map((count) => (
                         <NativeSelectOption key={count} value={String(count)}>
                           {count}
                         </NativeSelectOption>

@@ -64,6 +64,7 @@ import {
   parseCreateActivityTemplateSearch,
 } from '@/activities/library-filters';
 import {
+  ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
@@ -475,8 +476,10 @@ import {
 } from '@/assignments/student-submission';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
+  ASSIGNMENT_PUBLISH_FIELD_LIMITS,
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
   ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE,
+  publishAssignmentInputSchema,
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
 } from '@/assignments/validation';
@@ -1055,10 +1058,25 @@ assert.match(
   /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS\.lockedOptions/,
   'Activity editor readiness panel should reuse the named locked-option limit.'
 );
+assert.match(
+  activityEditorFormSource,
+  /ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS/,
+  'Activity editor AI draft item-count options should come from the AI draft domain contract.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.default/,
+  'Activity editor AI draft item-count default should come from the AI draft domain contract.'
+);
 assert.doesNotMatch(
   activityEditorFormSource,
   /summary\.lockedOptions\.slice\(0, 4\)/,
   'Activity editor readiness panel should not keep a local locked-option display limit.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /const draftItemCountOptions = \[3, 5, 8, 10\]|useState\(5\)/,
+  'Activity editor should not keep local AI draft item-count options or defaults.'
 );
 const entityIdSource = readFileSync('src/lib/entity-id.ts', 'utf8');
 assert.match(
@@ -1117,6 +1135,26 @@ assert.match(
   activityPublishDialogSource,
   /min=\{buildAssignmentPublishCloseAfterMinLocal\(\)\}/,
   'Assignment publish close-time input minimum should come from the assignment publish domain helper.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /ASSIGNMENT_PUBLISH_FIELD_LIMITS\.instructionsMaxLength/,
+  'Assignment publish instructions input length should reuse the assignment-domain field limit.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /ASSIGNMENT_MAX_ATTEMPTS_RANGE\.min[\s\S]*ASSIGNMENT_MAX_ATTEMPTS_RANGE\.max/,
+  'Assignment publish max-attempts input bounds should reuse the assignment-domain attempt range.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.min[\s\S]*ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.max/,
+  'Assignment publish timer input bounds should reuse the assignment-domain timer range.'
+);
+assert.doesNotMatch(
+  activityPublishDialogSource,
+  /maxLength=\{500\}|min=\{1\}|max=\{10\}|max=\{180\}/,
+  'Assignment publish dialog should not keep local field or numeric bounds.'
 );
 const publicPlayRouteSource = readFileSync(
   'src/routes/play/$shareId.tsx',
@@ -3580,6 +3618,40 @@ assert.deepEqual(ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE, {
   max: 180,
   min: 1,
 });
+assert.deepEqual(ASSIGNMENT_PUBLISH_FIELD_LIMITS, {
+  instructionsMaxLength: 500,
+  titleMaxLength: 120,
+  titleMinLength: 3,
+});
+assert.deepEqual(
+  publishAssignmentInputSchema.parse({
+    activityId: 'activity-1',
+    settings: {
+      instructions: 'A'.repeat(
+        ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength
+      ),
+    },
+    title: 'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength),
+  }).title,
+  'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength)
+);
+assert.throws(() =>
+  publishAssignmentInputSchema.parse({
+    activityId: 'activity-1',
+    title: 'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength - 1),
+  })
+);
+assert.throws(() =>
+  publishAssignmentInputSchema.parse({
+    activityId: 'activity-1',
+    settings: {
+      instructions: 'A'.repeat(
+        ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength + 1
+      ),
+    },
+    title: 'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength),
+  })
+);
 const assignmentPublishInputSource = readFileSync(
   'src/assignments/publish-input.ts',
   'utf8'
@@ -3593,6 +3665,11 @@ assert.match(
   assignmentPublishInputSource,
   /ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE/,
   'Publish dialog input parsing should reuse the assignment-domain timer range.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /ASSIGNMENT_PUBLISH_FIELD_LIMITS/,
+  'Publish dialog input validation should reuse assignment-domain field limits.'
 );
 assert.doesNotMatch(
   assignmentPublishInputSource,
@@ -3905,6 +3982,59 @@ assert.deepEqual(
     title: 'Open practice',
   }),
   { ok: true }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'AB',
+  }),
+  {
+    message: 'Assignment title must be at least 3 characters.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: '',
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'A'.repeat(ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMaxLength + 1),
+  }),
+  {
+    message: 'Assignment title must be 120 characters or fewer.',
+    ok: false,
+  }
+);
+assert.deepEqual(
+  validateAssignmentPublishDraft({
+    activityId: 'activity-1',
+    collectStudentName: true,
+    expiresAtLocal: '',
+    instructions: 'A'.repeat(
+      ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength + 1
+    ),
+    maxAttempts: '2',
+    showCorrectAnswers: true,
+    shuffleItems: true,
+    timeLimitMinutes: '',
+    title: 'Week 1 review',
+  }),
+  {
+    message: 'Instructions must be 500 characters or fewer.',
+    ok: false,
+  }
 );
 assert.deepEqual(
   buildAssignmentPublishDialogState({
@@ -6645,6 +6775,26 @@ assert.doesNotMatch(
   assignmentValidationSource,
   /status: z\.enum\(\['published', 'closed'\]\)/,
   'Assignment status update schema should not maintain a local managed-status enum.'
+);
+assert.match(
+  assignmentValidationSource,
+  /ASSIGNMENT_PUBLISH_FIELD_LIMITS[\s\S]*instructionsMaxLength: 500[\s\S]*titleMaxLength: 120[\s\S]*titleMinLength: 3/,
+  'Assignment publish field lengths should expose a named domain contract.'
+);
+assert.match(
+  assignmentValidationSource,
+  /const assignmentInstructionsSchema[\s\S]*ASSIGNMENT_PUBLISH_FIELD_LIMITS\.instructionsMaxLength[\s\S]*instructions: assignmentInstructionsSchema/,
+  'Assignment settings schema should reuse the assignment publish instructions limit.'
+);
+assert.match(
+  assignmentValidationSource,
+  /title:[\s\S]*ASSIGNMENT_PUBLISH_FIELD_LIMITS\.titleMinLength[\s\S]*ASSIGNMENT_PUBLISH_FIELD_LIMITS\.titleMaxLength/,
+  'Assignment publish schema should reuse assignment-domain title limits.'
+);
+assert.doesNotMatch(
+  assignmentValidationSource,
+  /\.max\(500\)|\.min\(3\)\.max\(120\)/,
+  'Assignment publish validation should not keep local title or instructions limits.'
 );
 const activityAiDraftSource = readFileSync(
   'src/activities/ai-draft.ts',
@@ -9592,6 +9742,7 @@ assert.deepEqual(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE, {
   max: 10,
   min: 3,
 });
+assert.deepEqual(ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS, [3, 5, 8, 10]);
 assert.deepEqual(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS, {
   groups: 4,
   groupItems: 8,
