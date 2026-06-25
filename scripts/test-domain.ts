@@ -93,6 +93,7 @@ import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   appendActivitySourceMaterialDraftNotes,
+  buildActivitySourceMaterialDraftNoteViews,
   buildActivitySourceMaterialDraftNotes,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
@@ -11059,7 +11060,7 @@ assert.equal(
 );
 const unsafeMaterialMetadataPattern =
   /r2Key|userfiles\/|fileId|contentType|size|permission|ownerId|storageKey/i;
-const sensitiveMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
+const sensitiveMaterialReferences = [
   {
     contentType: 'application/pdf',
     fileId: 'file-secret-worksheet',
@@ -11071,7 +11072,22 @@ const sensitiveMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
     size: 512,
     storageKey: 'private-storage-key',
   },
+] as const;
+const sensitiveMaterialDraftNoteViews =
+  buildActivitySourceMaterialDraftNoteViews(sensitiveMaterialReferences);
+assert.deepEqual(sensitiveMaterialDraftNoteViews, [
+  {
+    kindLabel: 'Worksheet document',
+    name: 'safe worksheet.pdf',
+  },
 ]);
+assert.deepEqual(Object.keys(sensitiveMaterialDraftNoteViews[0] ?? {}).sort(), [
+  'kindLabel',
+  'name',
+]);
+const sensitiveMaterialDraftNotes = buildActivitySourceMaterialDraftNotes(
+  sensitiveMaterialReferences
+);
 assert.equal(
   sensitiveMaterialDraftNotes,
   [

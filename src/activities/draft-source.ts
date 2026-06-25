@@ -8,6 +8,11 @@ export const DEFAULT_ACTIVITY_DRAFT_SOURCE =
   'apple, bread, milk, rice, water, egg';
 export const ACTIVITY_DRAFT_SOURCE_MAX_LENGTH = 2000;
 
+export type ActivitySourceMaterialDraftNoteView = {
+  kindLabel: string;
+  name: string;
+};
+
 const ACTIVITY_DRAFT_SOURCE_FIELDS = [
   'sourceSummary',
   'vocabularyText',
@@ -26,11 +31,18 @@ export function getActivityDraftSourceText(values: CreateActivityInput) {
   return sourceText || DEFAULT_ACTIVITY_DRAFT_SOURCE;
 }
 
-export function buildActivitySourceMaterialDraftNotes(value: unknown) {
-  const materials = normalizeActivityMaterialReferences(value);
-  if (materials.length === 0) return undefined;
+export function buildActivitySourceMaterialDraftNoteViews(
+  value: unknown
+): ActivitySourceMaterialDraftNoteView[] {
+  return normalizeActivityMaterialReferences(value).map(
+    toActivitySourceMaterialDraftNoteView
+  );
+}
 
-  const safeNotes = materials.map(toActivitySourceMaterialDraftNote);
+export function buildActivitySourceMaterialDraftNotes(value: unknown) {
+  const safeNotes = buildActivitySourceMaterialDraftNoteViews(value);
+
+  if (safeNotes.length === 0) return undefined;
 
   return [
     m.activity_draft_source_materials_heading(),
@@ -65,9 +77,9 @@ export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
   );
 }
 
-function toActivitySourceMaterialDraftNote(
+function toActivitySourceMaterialDraftNoteView(
   material: ActivityMaterialReference
-) {
+): ActivitySourceMaterialDraftNoteView {
   return {
     kindLabel: formatUserFileMaterialKind(material.kind),
     name: material.originalName,
