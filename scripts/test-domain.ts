@@ -264,6 +264,7 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
+import { buildPrintableWorksheetAnswerKeyItemView } from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -5156,6 +5157,18 @@ assert.deepEqual(printableSnapshotWorksheetWithAnswers.answerKey, [
     sequenceNumber: 1,
   },
 ]);
+assert.deepEqual(
+  buildPrintableWorksheetAnswerKeyItemView(
+    printableSnapshotWorksheetWithAnswers.answerKey[0]!
+  ),
+  {
+    acceptedAnswersLabel: 'Accepted alternatives: Frozen accepted',
+    answerLabel: '1. Frozen answer',
+    explanationLabel: 'Explanation: Frozen explanation',
+    id: 'q-frozen-prompt',
+    prompt: 'Frozen prompt?',
+  }
+);
 assert.equal(
   buildOpenPublicAssignmentPayload({
     ...publicAssignmentPayloadSource,
@@ -6970,6 +6983,16 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /buildPrintableWorksheetAnswerKeyItemView[\s\S]*formatPrintableWorksheetAnswerKeyPrompt/,
+  'Printable worksheet answer-key item views should own formatted answer-key prompt text.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetAnswerKeyItemView[\s\S]*assignment_printable_answer_key_item/,
+  'Printable worksheet answer-key item views should localize answer labels in the view layer.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
 );
@@ -7014,8 +7037,8 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /formatPrintableWorksheetAnswerKeyPrompt\(item\)/,
-  'Printable worksheet route should render formatted answer-key prompts.'
+  /buildPrintableWorksheetAnswerKeyItemView\(item\)/,
+  'Printable worksheet route should render answer-key items through the printable worksheet view helper.'
 );
 assert.match(
   printableAssignmentRouteSource,

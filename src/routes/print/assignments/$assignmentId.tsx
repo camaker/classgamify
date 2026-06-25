@@ -1,9 +1,7 @@
 import {
   buildPrintableWorksheetHeaderView,
+  buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetItemView,
-  formatPrintableWorksheetAcceptedAnswers,
-  formatPrintableWorksheetAnswerKeyPrompt,
-  formatPrintableWorksheetValue,
   getPrintableWorksheetAnswerLines,
   printableWorksheetPageCopy,
 } from '@/assignments/printable-worksheet-view';
@@ -253,37 +251,26 @@ function PrintableAssignmentWorksheetPage() {
               </div>
               <div className="grid gap-2">
                 {answerKeyItems.map((item) => {
-                  const acceptedAnswers =
-                    formatPrintableWorksheetAcceptedAnswers(
-                      item.acceptedAnswers
-                    );
+                  const itemView =
+                    buildPrintableWorksheetAnswerKeyItemView(item);
 
                   return (
                     <div
-                      key={item.id}
+                      key={itemView.id}
                       className="rounded-lg border bg-muted/20 p-3 text-sm"
                     >
-                      <p className="font-medium">
-                        {m.assignment_printable_answer_key_item({
-                          answer: formatPrintableWorksheetValue(item.answer),
-                          sequenceNumber: item.sequenceNumber,
-                        })}
-                      </p>
+                      <p className="font-medium">{itemView.answerLabel}</p>
                       <p className="mt-1 text-muted-foreground">
-                        {formatPrintableWorksheetAnswerKeyPrompt(item)}
+                        {itemView.prompt}
                       </p>
-                      {acceptedAnswers ? (
+                      {itemView.acceptedAnswersLabel ? (
                         <p className="mt-1 text-muted-foreground">
-                          {m.assignment_printable_answer_key_accepted({
-                            acceptedAnswers,
-                          })}
+                          {itemView.acceptedAnswersLabel}
                         </p>
                       ) : null}
-                      {item.explanation ? (
+                      {itemView.explanationLabel ? (
                         <p className="mt-1 text-muted-foreground">
-                          {m.assignment_printable_answer_key_explanation({
-                            explanation: item.explanation,
-                          })}
+                          {itemView.explanationLabel}
                         </p>
                       ) : null}
                     </div>

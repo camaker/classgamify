@@ -92,6 +92,33 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   };
 }
 
+export function buildPrintableWorksheetAnswerKeyItemView(
+  item: PrintableWorksheetAnswerKeyItem
+) {
+  const acceptedAnswers = formatPrintableWorksheetAcceptedAnswers(
+    item.acceptedAnswers
+  );
+
+  return {
+    acceptedAnswersLabel: acceptedAnswers
+      ? m.assignment_printable_answer_key_accepted({
+          acceptedAnswers,
+        })
+      : undefined,
+    answerLabel: m.assignment_printable_answer_key_item({
+      answer: formatPrintableWorksheetValue(item.answer),
+      sequenceNumber: item.sequenceNumber,
+    }),
+    explanationLabel: item.explanation
+      ? m.assignment_printable_answer_key_explanation({
+          explanation: item.explanation,
+        })
+      : undefined,
+    id: item.id,
+    prompt: formatPrintableWorksheetAnswerKeyPrompt(item),
+  };
+}
+
 function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
   return {
     choices: item.choices.map((choice, index) => ({
