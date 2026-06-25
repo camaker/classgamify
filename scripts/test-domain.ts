@@ -10060,6 +10060,19 @@ const fillBlankDraftPrompt = buildActivityDraftPrompt({
 });
 assert.match(fillBlankDraftPrompt, /Template requirements: questions/);
 assert.match(fillBlankDraftPrompt, /worksheet sentence with ___/);
+const fillBlankPromptJsonExample = fillBlankDraftPrompt.match(
+  /Return exactly this JSON object shape:\n([\s\S]*?)\n\nRules:/
+)?.[1];
+assert.ok(fillBlankPromptJsonExample);
+const fillBlankPromptJsonShape = JSON.parse(fillBlankPromptJsonExample) as {
+  questions?: Array<{ prompt?: string }>;
+  title?: string;
+};
+assert.equal(fillBlankPromptJsonShape.title, 'short teacher-facing title');
+assert.equal(
+  fillBlankPromptJsonShape.questions?.[0]?.prompt,
+  'question or fill-in prompt'
+);
 const groupSortDraftPrompt = buildActivityDraftPrompt({
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -10073,6 +10086,8 @@ assert.match(groupSortDraftPrompt, /Template requirements: groups/);
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
 const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
 assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
+assert.match(aiDraftSource, /buildActivityDraftPromptJsonExample\(\)/);
+assert.match(aiDraftSource, /m\.activity_ai_prompt_json_title\(\)/);
 assert.doesNotMatch(
   aiDraftSource,
   /Create a reusable ClassGamify classroom activity draft\./
@@ -10121,6 +10136,17 @@ try {
   assert.match(zhFillBlankDraftPrompt, /请返回以下 JSON 对象结构：/);
   assert.match(zhFillBlankDraftPrompt, /规则：/);
   assert.match(zhFillBlankDraftPrompt, /只返回 JSON。/);
+  const zhPromptJsonExample = zhFillBlankDraftPrompt.match(
+    /请返回以下 JSON 对象结构：\n([\s\S]*?)\n\n规则：/
+  )?.[1];
+
+  assert.ok(zhPromptJsonExample);
+  const zhPromptJsonShape = JSON.parse(zhPromptJsonExample) as {
+    questions?: Array<{ prompt?: string }>;
+    title?: string;
+  };
+  assert.equal(zhPromptJsonShape.title, '面向老师的简短标题');
+  assert.equal(zhPromptJsonShape.questions?.[0]?.prompt, '题目或填空提示');
 } finally {
   overwriteGetLocale(() => 'en');
 }

@@ -472,19 +472,7 @@ export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     m.activity_ai_prompt_source_notes({ sourceText: input.sourceText }),
     '',
     m.activity_ai_prompt_return_shape(),
-    '{',
-    '  "title": "short teacher-facing title",',
-    '  "description": "one sentence summary",',
-    '  "learningGoal": "students can ...",',
-    '  "sourceSummary": "short summary of the source",',
-    '  "vocabulary": ["term one", "term two"],',
-    '  "questions": [',
-    '    { "prompt": "question or fill-in prompt", "answer": "correct answer", "options": ["correct answer", "distractor", "distractor"], "explanation": "one short answer explanation" }',
-    '  ],',
-    '  "pairs": [{ "left": "term", "right": "meaning or match" }],',
-    '  "groups": [{ "label": "category", "items": ["item one", "item two"] }],',
-    '  "teacherNotes": ["short usage note"]',
-    '}',
+    buildActivityDraftPromptJsonExample(),
     '',
     m.activity_ai_prompt_rules_heading(),
     m.activity_ai_prompt_rule_reusable_content(),
@@ -493,6 +481,51 @@ export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     m.activity_ai_prompt_rule_explanation(),
     m.activity_ai_prompt_rule_json_only(),
   ].join('\n');
+}
+
+function buildActivityDraftPromptJsonExample() {
+  return JSON.stringify(
+    {
+      title: m.activity_ai_prompt_json_title(),
+      description: m.activity_ai_prompt_json_description(),
+      learningGoal: m.activity_ai_prompt_json_learning_goal(),
+      sourceSummary: m.activity_ai_prompt_json_source_summary(),
+      vocabulary: [
+        m.activity_ai_prompt_json_vocabulary_term_one(),
+        m.activity_ai_prompt_json_vocabulary_term_two(),
+      ],
+      questions: [
+        {
+          answer: m.activity_ai_prompt_json_answer(),
+          explanation: m.activity_ai_prompt_json_explanation(),
+          options: [
+            m.activity_ai_prompt_json_answer(),
+            m.activity_ai_prompt_json_distractor(),
+            m.activity_ai_prompt_json_distractor(),
+          ],
+          prompt: m.activity_ai_prompt_json_question_prompt(),
+        },
+      ],
+      pairs: [
+        {
+          left: m.activity_ai_prompt_json_pair_left(),
+          right: m.activity_ai_prompt_json_pair_right(),
+        },
+      ],
+      groups: [
+        {
+          items: [
+            m.activity_ai_prompt_json_group_item_one(),
+            m.activity_ai_prompt_json_group_item_two(),
+          ],
+          label: m.activity_ai_prompt_json_group_label(),
+        },
+      ],
+      teacherNotes: [m.activity_ai_prompt_json_teacher_note()],
+    },
+    null,
+    2
+  );
 }
 
 function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
