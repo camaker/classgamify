@@ -12,7 +12,7 @@ import {
   getActivityTemplates,
 } from '@/activities/catalog';
 import { buildTemplateEntryAction } from '@/activities/template-entry';
-import type { ActivityContent } from '@/activities/types';
+import { formatTemplateRequirement } from '@/activities/template-remix';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -112,7 +112,7 @@ function TemplatesPage() {
                         variant="secondary"
                         className="rounded-md"
                       >
-                        {formatContentRequirement(requirement)}
+                        {formatTemplateRequirement(requirement)}
                       </Badge>
                     ))}
                   </div>
@@ -152,27 +152,4 @@ function TemplatesPage() {
       </div>
     </Container>
   );
-}
-
-function formatContentRequirement(requirement: keyof ActivityContent) {
-  switch (requirement) {
-    case 'groups':
-      return m.activity_template_requirement_groups();
-    case 'pairs':
-      return m.activity_template_requirement_pairs();
-    case 'questions':
-      return m.activity_template_requirement_questions();
-    case 'teacherNotes':
-      return m.activity_template_requirement_teacher_notes();
-    case 'learningGoal':
-      return m.activity_template_requirement_learning_goal();
-    case 'sourceSummary':
-      return m.activity_template_requirement_source_summary();
-    case 'gradeBand':
-      return m.activity_template_requirement_grade_band();
-    case 'vocabulary':
-      return m.activity_template_requirement_vocabulary();
-    default:
-      return requirement;
-  }
 }

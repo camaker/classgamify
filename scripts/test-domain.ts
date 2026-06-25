@@ -742,6 +742,17 @@ assert.doesNotMatch(
   />ClassGamify</,
   'Blog visual brand copy should come from locale messages.'
 );
+const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
+assert.match(
+  templatesRouteSource,
+  /formatTemplateRequirement\(requirement\)/,
+  'Templates page should reuse the activity-domain requirement formatter.'
+);
+assert.doesNotMatch(
+  templatesRouteSource,
+  /function formatContentRequirement|return requirement;/,
+  'Templates page should not render raw activity content requirement field names.'
+);
 const activeLocaleMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
