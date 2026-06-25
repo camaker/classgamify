@@ -56,6 +56,7 @@ import {
 } from '@/activities/library-filters';
 import {
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
+  ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildActivityDraftPrompt,
   buildGenerateActivityDraftInputFromEditor,
@@ -6362,6 +6363,31 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
+  /sourceText: z[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceText\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceText\.max/,
+  'AI draft source-text input schema should reuse the shared source-text field limit.'
+);
+assert.match(
+  activityAiDraftSource,
+  /const aiQuestionSchema[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.answer\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.answer\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.option\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.option\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.options\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.prompt\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.prompt\.max/,
+  'AI draft question schema should reuse named AI draft field limits.'
+);
+assert.match(
+  activityAiDraftSource,
+  /const aiDraftSchema[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.description\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.description\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.learningGoal\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.learningGoal\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceSummary\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceSummary\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.teacherNote\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.teacherNote\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.title\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.title\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.vocabulary\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.vocabulary\.max/,
+  'AI draft response schema should reuse named AI draft field limits.'
+);
+assert.doesNotMatch(
+  activityAiDraftSource,
+  /sourceText: z[\s\S]*\.max\(2000,/,
+  'AI draft source-text schema should not maintain a local source-text maximum.'
+);
+assert.doesNotMatch(
+  activityAiDraftSource,
+  /title: z\.string\(\)\.trim\(\)\.min\(3\)\.max\(90\)/,
+  'AI draft title schema should not maintain local title field limits.'
+);
+assert.match(
+  activityAiDraftSource,
   /function completeAiActivityDraft[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.questions[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.pairs[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.vocabulary[\s\S]*max: ACTIVITY_AI_DRAFT_COMPLETION_LIMITS\.teacherNotes/,
   'AI draft completion should reuse domain completion limits.'
 );
@@ -9253,6 +9279,86 @@ assert.deepEqual(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS, {
   teacherNotes: 5,
   vocabulary: 16,
 });
+assert.deepEqual(ACTIVITY_AI_DRAFT_FIELD_LIMITS, {
+  answer: {
+    max: 120,
+    min: 1,
+  },
+  description: {
+    max: 220,
+    min: 8,
+  },
+  explanation: {
+    max: 240,
+    min: 4,
+  },
+  gradeBand: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMinLength,
+  },
+  groupItem: {
+    max: 80,
+    min: 1,
+  },
+  groupLabel: {
+    max: 80,
+    min: 1,
+  },
+  language: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.languageMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.languageMinLength,
+  },
+  learningGoal: {
+    max: 260,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.learningGoalMinLength,
+  },
+  option: {
+    max: 120,
+    min: 1,
+  },
+  options: {
+    max: 12,
+  },
+  pairLeft: {
+    max: 100,
+    min: 1,
+  },
+  pairRight: {
+    max: 140,
+    min: 1,
+  },
+  prompt: {
+    max: 240,
+    min: 4,
+  },
+  sourceSummary: {
+    max: 300,
+    min: 8,
+  },
+  sourceSummaryFallback: {
+    max: 280,
+  },
+  sourceText: {
+    max: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+    min: 8,
+  },
+  subject: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.subjectMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.subjectMinLength,
+  },
+  teacherNote: {
+    max: 160,
+    min: 1,
+  },
+  title: {
+    max: 90,
+    min: ACTIVITY_TITLE_LENGTH.min,
+  },
+  vocabulary: {
+    max: 80,
+    min: 1,
+  },
+});
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({
     current: activityEditorDefaultInput,
@@ -9324,6 +9430,17 @@ assert.throws(() =>
     current: activityEditorDefaultInput,
     itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min - 1,
     sourceText: 'food, apple, bread, milk',
+  })
+);
+assert.equal(
+  generateActivityDraftInputSchema.parse({
+    sourceText: 'A'.repeat(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.max),
+  }).sourceText.length,
+  ACTIVITY_DRAFT_SOURCE_MAX_LENGTH
+);
+assert.throws(() =>
+  generateActivityDraftInputSchema.parse({
+    sourceText: 'A'.repeat(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.max + 1),
   })
 );
 const fallbackDraft = createFallbackActivityDraft({

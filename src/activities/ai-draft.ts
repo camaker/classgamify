@@ -3,7 +3,12 @@ import {
   buildActivityDraftMeta,
   type ActivityDraftMeta,
 } from '@/activities/draft-meta';
-import type { ActivityTemplateType } from '@/activities/types';
+import { ACTIVITY_DRAFT_SOURCE_MAX_LENGTH } from '@/activities/draft-source';
+import {
+  ACTIVITY_EDITOR_FIELD_LIMITS,
+  ACTIVITY_TITLE_LENGTH,
+  type ActivityTemplateType,
+} from '@/activities/types';
 import {
   buildActivityContent,
   activityDifficultySchema,
@@ -41,22 +46,124 @@ export const ACTIVITY_AI_DRAFT_COMPLETION_LIMITS = {
   vocabulary: 16,
 } as const;
 
+export const ACTIVITY_AI_DRAFT_FIELD_LIMITS = {
+  answer: {
+    max: 120,
+    min: 1,
+  },
+  description: {
+    max: 220,
+    min: 8,
+  },
+  explanation: {
+    max: 240,
+    min: 4,
+  },
+  gradeBand: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.gradeBandMinLength,
+  },
+  groupItem: {
+    max: 80,
+    min: 1,
+  },
+  groupLabel: {
+    max: 80,
+    min: 1,
+  },
+  language: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.languageMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.languageMinLength,
+  },
+  learningGoal: {
+    max: 260,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.learningGoalMinLength,
+  },
+  option: {
+    max: 120,
+    min: 1,
+  },
+  options: {
+    max: 12,
+  },
+  pairLeft: {
+    max: 100,
+    min: 1,
+  },
+  pairRight: {
+    max: 140,
+    min: 1,
+  },
+  prompt: {
+    max: 240,
+    min: 4,
+  },
+  sourceSummary: {
+    max: 300,
+    min: 8,
+  },
+  sourceSummaryFallback: {
+    max: 280,
+  },
+  sourceText: {
+    max: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+    min: 8,
+  },
+  subject: {
+    max: ACTIVITY_EDITOR_FIELD_LIMITS.subjectMaxLength,
+    min: ACTIVITY_EDITOR_FIELD_LIMITS.subjectMinLength,
+  },
+  teacherNote: {
+    max: 160,
+    min: 1,
+  },
+  title: {
+    max: 90,
+    min: ACTIVITY_TITLE_LENGTH.min,
+  },
+  vocabulary: {
+    max: 80,
+    min: 1,
+  },
+} as const;
+
 export const generateActivityDraftInputSchema = z.object({
   difficulty: activityDifficultySchema.default('starter'),
-  gradeBand: z.string().trim().min(1).max(80).default('Primary'),
+  gradeBand: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.gradeBand.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.gradeBand.max)
+    .default('Primary'),
   itemCount: z
     .number()
     .int()
     .min(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min)
     .max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max)
     .default(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default),
-  language: z.string().trim().min(2).max(20).default('en'),
+  language: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.language.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.language.max)
+    .default('en'),
   sourceText: z
     .string()
     .trim()
-    .min(8, m.activity_ai_source_min_error())
-    .max(2000, m.activity_ai_source_max_error()),
-  subject: z.string().trim().min(1).max(80).default('English'),
+    .min(
+      ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.min,
+      m.activity_ai_source_min_error()
+    )
+    .max(
+      ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.max,
+      m.activity_ai_source_max_error()
+    ),
+  subject: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.subject.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.subject.max)
+    .default('English'),
   templateType: activityTemplateTypeSchema.default('quiz'),
 });
 
@@ -93,32 +200,80 @@ export type ActivityDraftResult = {
 };
 
 const aiQuestionSchema = z.object({
-  answer: z.string().trim().min(1).max(120),
-  explanation: z.string().trim().min(4).max(240).optional(),
-  options: z.array(z.string().trim().min(1).max(120)).max(12).default([]),
-  prompt: z.string().trim().min(4).max(240),
+  answer: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.answer.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.answer.max),
+  explanation: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.explanation.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.explanation.max)
+    .optional(),
+  options: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.option.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.option.max)
+    )
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.options.max)
+    .default([]),
+  prompt: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.prompt.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.prompt.max),
 });
 
 const aiPairSchema = z.object({
-  left: z.string().trim().min(1).max(100),
-  right: z.string().trim().min(1).max(140),
+  left: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.pairLeft.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.pairLeft.max),
+  right: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.pairRight.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.pairRight.max),
 });
 
 const aiGroupSchema = z.object({
   items: z
-    .array(z.string().trim().min(1).max(80))
-    .min(1)
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupItem.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupItem.max)
+    )
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupItem.min)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groupItems),
-  label: z.string().trim().min(1).max(80),
+  label: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupLabel.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupLabel.max),
 });
 
 const aiDraftSchema = z.object({
-  description: z.string().trim().min(8).max(220),
+  description: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.description.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.description.max),
   groups: z
     .array(aiGroupSchema)
     .min(2)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groups),
-  learningGoal: z.string().trim().min(8).max(260),
+  learningGoal: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.learningGoal.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.learningGoal.max),
   pairs: z
     .array(aiPairSchema)
     .min(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min)
@@ -127,14 +282,34 @@ const aiDraftSchema = z.object({
     .array(aiQuestionSchema)
     .min(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.questions),
-  sourceSummary: z.string().trim().min(8).max(300),
+  sourceSummary: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceSummary.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceSummary.max),
   teacherNotes: z
-    .array(z.string().trim().min(1).max(160))
-    .min(1)
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.teacherNote.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.teacherNote.max)
+    )
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.teacherNote.min)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.teacherNotes),
-  title: z.string().trim().min(3).max(90),
+  title: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.title.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.title.max),
   vocabulary: z
-    .array(z.string().trim().min(1).max(80))
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.vocabulary.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.vocabulary.max)
+    )
     .min(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.vocabulary),
 });
@@ -142,12 +317,22 @@ const aiDraftSchema = z.object({
 export type AiActivityDraft = z.input<typeof aiDraftSchema>;
 
 const aiDraftCompletionSchema = z.object({
-  description: z.string().trim().min(8).max(220).optional(),
+  description: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.description.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.description.max)
+    .optional(),
   groups: z
     .array(aiGroupSchema)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groups)
     .optional(),
-  learningGoal: z.string().trim().min(8).max(260).optional(),
+  learningGoal: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.learningGoal.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.learningGoal.max)
+    .optional(),
   pairs: z
     .array(aiPairSchema)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.pairs)
@@ -156,14 +341,36 @@ const aiDraftCompletionSchema = z.object({
     .array(aiQuestionSchema)
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.questions)
     .optional(),
-  sourceSummary: z.string().trim().min(8).max(300).optional(),
+  sourceSummary: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceSummary.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceSummary.max)
+    .optional(),
   teacherNotes: z
-    .array(z.string().trim().min(1).max(160))
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.teacherNote.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.teacherNote.max)
+    )
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.teacherNotes)
     .optional(),
-  title: z.string().trim().min(3).max(90).optional(),
+  title: z
+    .string()
+    .trim()
+    .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.title.min)
+    .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.title.max)
+    .optional(),
   vocabulary: z
-    .array(z.string().trim().min(1).max(80))
+    .array(
+      z
+        .string()
+        .trim()
+        .min(ACTIVITY_AI_DRAFT_FIELD_LIMITS.vocabulary.min)
+        .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.vocabulary.max)
+    )
     .max(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.vocabulary)
     .optional(),
 });
@@ -1021,7 +1228,9 @@ function createFallbackTitle(
 ) {
   const topic =
     firstTerm && firstTerm !== input.subject ? firstTerm : input.subject;
-  return m.activity_ai_fallback_title({ topic }, { locale }).slice(0, 90);
+  return m
+    .activity_ai_fallback_title({ topic }, { locale })
+    .slice(0, ACTIVITY_AI_DRAFT_FIELD_LIMITS.title.max);
 }
 
 function getFallbackDraftLocale(language: string): Locale {
@@ -1035,7 +1244,11 @@ function getFallbackDraftLocale(language: string): Locale {
 
 function summarizeSource(sourceText: string) {
   const compact = sourceText.replace(/\s+/g, ' ').trim();
-  return compact.length > 280 ? `${compact.slice(0, 277)}...` : compact;
+  const maxLength = ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceSummaryFallback.max;
+
+  return compact.length > maxLength
+    ? `${compact.slice(0, maxLength - 3)}...`
+    : compact;
 }
 
 function unique(values: string[]) {
