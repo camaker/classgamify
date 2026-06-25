@@ -81,6 +81,8 @@ type ActivityDraftMetaSummaryView = {
   modelLabel: string;
   modelName: string;
   notice?: string;
+  noticeLabel: string;
+  providerDescription: string;
   providerLabel: string;
   readyTemplateLabel: string;
   reviewChecklist: string[];
@@ -179,6 +181,11 @@ export function buildActivityDraftMetaSummaryView({
     modelLabel: m.activity_draft_meta_model_label(),
     modelName: model.trim() || m.activity_draft_meta_unknown_model(),
     notice,
+    noticeLabel: m.activity_draft_meta_notice_label(),
+    providerDescription: buildActivityDraftProviderDescription({
+      notice,
+      provider,
+    }),
     providerLabel:
       provider === 'workers-ai'
         ? m.activity_draft_meta_provider_workers_ai()
@@ -206,6 +213,24 @@ export function buildActivityDraftMetaSummaryView({
     })),
     title: m.activity_draft_meta_title(),
   };
+}
+
+function buildActivityDraftProviderDescription({
+  notice,
+  provider,
+}: {
+  notice?: string;
+  provider: ActivityDraftProvider;
+}) {
+  if (provider === 'fallback') {
+    return m.activity_draft_meta_provider_description_fallback();
+  }
+
+  if (notice) {
+    return m.activity_draft_meta_provider_description_workers_ai_completed();
+  }
+
+  return m.activity_draft_meta_provider_description_workers_ai();
 }
 
 export function buildActivityTemplateReadinessPanelSummary(

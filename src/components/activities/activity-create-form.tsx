@@ -746,8 +746,12 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
           {summaryView.modelLabel}:{' '}
           <span className="font-medium">{summaryView.modelName}</span>
         </p>
+        <p className="mt-1">{summaryView.providerDescription}</p>
         {summaryView.notice ? (
-          <p className="mt-1">{summaryView.notice}</p>
+          <p className="mt-1">
+            <span className="font-medium">{summaryView.noticeLabel}:</span>{' '}
+            {summaryView.notice}
+          </p>
         ) : null}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
