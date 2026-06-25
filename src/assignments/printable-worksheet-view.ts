@@ -80,6 +80,7 @@ export function buildPrintableWorksheetHeaderView(
 
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   return {
+    answerLines: getPrintableWorksheetAnswerLines(item),
     choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
     choices: item.choices,
@@ -124,6 +125,7 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
     choices: item.choices.map((choice, index) => ({
       choice,
       indexLabel: formatPrintableWorksheetChoiceIndex(index),
+      key: `${item.id}-choice-${index}`,
     })),
     presentation: item.choicePresentation,
     showIndexLabels: item.choicePresentation !== 'group-bank',
@@ -131,7 +133,9 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
 }
 
 export function getPrintableWorksheetAnswerLines(item: PrintableWorksheetItem) {
-  return Array.from({ length: item.answerSpaceLines }, (_, index) => index);
+  return Array.from({ length: item.answerSpaceLines }, (_, index) => ({
+    key: `${item.id}-answer-line-${index}`,
+  }));
 }
 
 export function formatPrintableWorksheetAcceptedAnswers(values: string[]) {

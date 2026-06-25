@@ -2,7 +2,6 @@ import {
   buildPrintableWorksheetHeaderView,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetItemView,
-  getPrintableWorksheetAnswerLines,
   printableWorksheetPageCopy,
 } from '@/assignments/printable-worksheet-view';
 import { Badge } from '@/components/ui/badge';
@@ -320,9 +319,9 @@ function PrintableWorksheetItem({
               : 'sm:grid-cols-2'
           )}
         >
-          {itemView.choiceBank.choices.map(({ choice, indexLabel }) => (
+          {itemView.choiceBank.choices.map(({ choice, indexLabel, key }) => (
             <div
-              key={`${item.id}-${choice}`}
+              key={key}
               className={cn(
                 'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
                 itemView.choiceBank.presentation === 'group-bank'
@@ -341,8 +340,8 @@ function PrintableWorksheetItem({
         </div>
       ) : null}
       <div className="mt-4 grid gap-3">
-        {getPrintableWorksheetAnswerLines(item).map((line) => (
-          <div key={line} className="h-8 border-b" />
+        {itemView.answerLines.map((line) => (
+          <div key={line.key} className="h-8 border-b" />
         ))}
       </div>
     </section>

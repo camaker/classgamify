@@ -264,7 +264,10 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
-import { buildPrintableWorksheetAnswerKeyItemView } from '@/assignments/printable-worksheet-view';
+import {
+  buildPrintableWorksheetAnswerKeyItemView,
+  buildPrintableWorksheetItemView,
+} from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -5117,6 +5120,29 @@ assert.deepEqual(printableSnapshotWorksheet.items[0], {
   responseMode: 'choice',
   sequenceNumber: 1,
 });
+const printableSnapshotItemView = buildPrintableWorksheetItemView(
+  printableSnapshotWorksheet.items[0]!
+);
+assert.deepEqual(printableSnapshotItemView.answerLines, [
+  { key: 'q-frozen-prompt-answer-line-0' },
+]);
+assert.deepEqual(printableSnapshotItemView.choiceBank.choices, [
+  {
+    choice: 'Frozen answer / Frozen accepted',
+    indexLabel: 'A',
+    key: 'q-frozen-prompt-choice-0',
+  },
+  {
+    choice: 'Frozen answer',
+    indexLabel: 'B',
+    key: 'q-frozen-prompt-choice-1',
+  },
+  {
+    choice: 'Other',
+    indexLabel: 'C',
+    key: 'q-frozen-prompt-choice-2',
+  },
+]);
 const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
   {
     activity: {
@@ -6973,8 +6999,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /answerLines: getPrintableWorksheetAnswerLines\(item\)/,
+  'Printable worksheet item views should own printable answer-line display data.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /showIndexLabels: item\.choicePresentation !== 'group-bank'/,
   'Printable worksheet view should hide lettered choice labels for classification group banks.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /key: `\$\{item\.id\}-choice-\$\{index\}`/,
+  'Printable worksheet choice-bank views should expose stable per-choice keys.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -7034,6 +7070,11 @@ assert.match(
   printableAssignmentRouteSource,
   /itemView\.choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
   'Printable worksheet route should render lettered choice labels only when the choice-bank view asks for them.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /itemView\.answerLines\.map/,
+  'Printable worksheet route should render answer lines from the printable item view.'
 );
 assert.match(
   printableAssignmentRouteSource,
