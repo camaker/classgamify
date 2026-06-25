@@ -10071,6 +10071,12 @@ const groupSortDraftPrompt = buildActivityDraftPrompt({
 });
 assert.match(groupSortDraftPrompt, /Template requirements: groups/);
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
+const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
+assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
+assert.doesNotMatch(
+  aiDraftSource,
+  /Create a reusable ClassGamify classroom activity draft\./
+);
 const draftPromptInput = {
   difficulty: 'starter',
   gradeBand: 'Grade 3',
@@ -10096,6 +10102,27 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     /Source notes: shared source notes for template prompt coverage/
   );
   assert.match(prompt, /Return JSON only\./);
+}
+overwriteGetLocale(() => 'zh');
+try {
+  const zhFillBlankDraftPrompt = buildActivityDraftPrompt({
+    difficulty: 'starter',
+    gradeBand: 'Grade 3',
+    itemCount: 5,
+    language: 'en',
+    sourceText: 'plants, root, stem, leaf',
+    subject: 'Science',
+    templateType: 'fill-blank',
+  });
+
+  assert.match(zhFillBlankDraftPrompt, /主题：Science/);
+  assert.match(zhFillBlankDraftPrompt, /年级：Grade 3/);
+  assert.match(zhFillBlankDraftPrompt, /模板要求：题目/);
+  assert.match(zhFillBlankDraftPrompt, /请返回以下 JSON 对象结构：/);
+  assert.match(zhFillBlankDraftPrompt, /规则：/);
+  assert.match(zhFillBlankDraftPrompt, /只返回 JSON。/);
+} finally {
+  overwriteGetLocale(() => 'en');
 }
 assert.match(getActivityTemplateDraftGuidance('listening'), /spoken aloud/);
 assert.match(getActivityTemplateDraftGuidance('open-box'), /reveal-card/);
