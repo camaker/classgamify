@@ -7191,30 +7191,16 @@ const publicCopyMessages = {
     readFileSync('project.inlang/messages/zh.json', 'utf8')
   ) as Record<string, string>,
 };
-const publicCopyKeys = [
-  'activity_form_pairs_description',
-  'activity_scaffold_quiz_teacher_notes_text',
-  'footer_link_worksheets_desc',
-  'home_features_items_item_2_description',
-  'home_integration_items_item_2_description',
-  'pricing_value_templates_description',
-  'roadmap_board_tasks_done_1_description',
-  'roadmap_board_tasks_in_progress_1_description',
-  'teachers_page_use_case_1_description',
-  'teachers_page_workflow_1_description',
-  'templates_page_description',
-  'templates_page_seo_description',
-  'worksheets_page_mode_fill_blank_action',
-  'worksheets_page_templates_cta_description',
-] as const;
+const rawTemplateIdCopyPattern =
+  /(?:fill-blank|group-sort|line-match|match-up|matching-pairs|open-box)/i;
 for (const [locale, messages] of Object.entries(publicCopyMessages) as [
   'en' | 'zh',
   Record<string, string>,
 ][]) {
-  for (const key of publicCopyKeys) {
+  for (const [key, value] of Object.entries(messages)) {
     assert.doesNotMatch(
-      messages[key] ?? '',
-      /(?:fill-blank|line-match|match-up|matching-pairs|open-box)/,
+      value,
+      rawTemplateIdCopyPattern,
       `${locale}.${key} should not expose raw template ids.`
     );
   }
