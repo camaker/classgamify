@@ -9,7 +9,10 @@ import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
 import { formatUserFileUploadError } from '@/api/user-file-errors';
-import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import {
+  ASSIGNMENT_CLASSROOM_BRIEF_LIMITS,
+  buildAssignmentClassroomBrief,
+} from '@/assignments/classroom-brief';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
 import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
 import { stripJsonComments } from './parse-wrangler';
@@ -880,6 +883,30 @@ assert.match(
   assignmentResultsRouteSource,
   /toast\.error\(actionButton\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
+);
+const assignmentClassroomBriefSource = readFileSync(
+  'src/assignments/classroom-brief.ts',
+  'utf8'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /ASSIGNMENT_CLASSROOM_BRIEF_LIMITS[\s\S]*focusItems: 3[\s\S]*followUpStudents: 6/,
+  'Classroom brief focus and follow-up limits should be named assignment-domain constants.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /getSubmittedAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.focusItems/,
+  'Classroom brief focus-item selection should reuse the classroom brief limit.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /getAssignmentStudentFollowUpPriorityStudents\(students,[\s\S]*ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.followUpStudents/,
+  'Classroom brief student follow-up selection should reuse the classroom brief limit.'
+);
+assert.doesNotMatch(
+  assignmentClassroomBriefSource,
+  /limit: 3|limit: 6/,
+  'Classroom brief selection should not maintain local numeric limits.'
 );
 const activityDashboardRouteSource = readFileSync(
   'src/routes/dashboard/activities.tsx',
@@ -13566,6 +13593,10 @@ assert.match(
   /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","Open","60"/
 );
 
+assert.deepEqual(ASSIGNMENT_CLASSROOM_BRIEF_LIMITS, {
+  focusItems: 3,
+  followUpStudents: 6,
+});
 const classroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
@@ -13613,6 +13644,27 @@ assert.match(
 assert.match(
   classroomBrief.text,
   /- 1\. Anonymous student 1: 0% latest, 1 item to review/
+);
+const expandedClassroomBrief = buildAssignmentClassroomBrief({
+  assignmentTitle: csvExportData.assignment.title,
+  items: reviewPriorityItems,
+  stats: csvExportData.stats,
+  students: [
+    ...followUpPriorityStudents,
+    ...followUpPriorityStudents.map((student, index) => ({
+      ...student,
+      studentKey: `${student.studentKey}-extra-${index}`,
+      studentLabel: `${student.studentLabel} extra ${index}`,
+    })),
+  ],
+});
+assert.equal(
+  expandedClassroomBrief.focusItems.length,
+  ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.focusItems
+);
+assert.equal(
+  expandedClassroomBrief.followUpStudents.length,
+  ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.followUpStudents
 );
 
 const reteachPlan = buildAssignmentReteachPlan({

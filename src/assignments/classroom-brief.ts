@@ -32,6 +32,11 @@ type AssignmentClassroomBrief = {
   text: string;
 };
 
+export const ASSIGNMENT_CLASSROOM_BRIEF_LIMITS = {
+  focusItems: 3,
+  followUpStudents: 6,
+} as const;
+
 export function buildAssignmentClassroomBrief({
   assignmentTitle,
   items,
@@ -71,13 +76,17 @@ export function buildAssignmentClassroomBrief({
 }
 
 function getClassroomBriefFocusItems(items: AssignmentItemAnalysis[]) {
-  return getSubmittedAssignmentReviewPriorityItems(items, { limit: 3 });
+  return getSubmittedAssignmentReviewPriorityItems(items, {
+    limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.focusItems,
+  });
 }
 
 function getClassroomBriefFollowUpStudents(
   students: AssignmentStudentSummary[]
 ) {
-  return getAssignmentStudentFollowUpPriorityStudents(students, { limit: 6 });
+  return getAssignmentStudentFollowUpPriorityStudents(students, {
+    limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.followUpStudents,
+  });
 }
 
 function formatFocusItems(items: AssignmentItemAnalysis[]) {
