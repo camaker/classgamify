@@ -3,6 +3,7 @@ import {
   ACTIVITY_DIFFICULTIES,
   ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
+  ACTIVITY_TITLE_LENGTH,
   type ActivityContent,
   type ActivityDifficulty,
   type ActivityGroup,
@@ -46,7 +47,11 @@ export const createActivityInputSchema = z.object({
   subject: z.string().trim().min(1).max(80),
   teacherNotesText: z.string().max(2000).optional(),
   templateType: activityTemplateTypeSchema,
-  title: z.string().trim().min(3).max(120),
+  title: z
+    .string()
+    .trim()
+    .min(ACTIVITY_TITLE_LENGTH.min)
+    .max(ACTIVITY_TITLE_LENGTH.max),
   visibility: activityVisibilitySchema.default('draft'),
   vocabularyText: z.string().max(2000).optional(),
 });

@@ -147,6 +147,7 @@ import {
   ACTIVITY_DIFFICULTIES,
   ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
+  ACTIVITY_TITLE_LENGTH,
   type ActivityTemplateType,
 } from '@/activities/types';
 import {
@@ -5930,6 +5931,11 @@ assert.match(
   /activityPersistedVisibilitySchema = z\.enum\(\s*ACTIVITY_PERSISTED_VISIBILITIES\s*\)/,
   'Activity persisted visibility schema should reuse persisted visibility values.'
 );
+assert.match(
+  activityValidationSource,
+  /title: z[\s\S]*ACTIVITY_TITLE_LENGTH\.min[\s\S]*ACTIVITY_TITLE_LENGTH\.max/,
+  'Activity title schema should reuse the activity-domain title length range.'
+);
 assert.doesNotMatch(
   activityValidationSource,
   /z\.enum\(\[\s*'starter'/,
@@ -5939,6 +5945,11 @@ assert.doesNotMatch(
   activityValidationSource,
   /activityVisibilitySchema = z\.enum\(\[\s*'draft'/,
   'Activity creation visibility schema should not maintain local visibility values.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /title: z\.string\(\)\.trim\(\)\.min\(3\)\.max\(120\)/,
+  'Activity title schema should not maintain local title length values.'
 );
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
 assert.match(
@@ -8051,6 +8062,7 @@ assert.deepEqual(ACTIVITY_PERSISTED_VISIBILITIES, [
   'archived',
   ...ACTIVITY_CREATABLE_VISIBILITIES,
 ]);
+assert.deepEqual(ACTIVITY_TITLE_LENGTH, { max: 120, min: 3 });
 assert.equal(activityDifficultySchema.parse('core'), 'core');
 assert.equal(activityVisibilitySchema.parse('private'), 'private');
 assert.equal(activityPersistedVisibilitySchema.parse('archived'), 'archived');
@@ -9024,8 +9036,30 @@ assert.equal(
   buildDuplicatedActivityTitle('  Food words quick check  '),
   'Copy of Food words quick check'
 );
+const activityDuplicateSource = readFileSync(
+  'src/activities/duplicate.ts',
+  'utf8'
+);
+assert.match(
+  activityDuplicateSource,
+  /ACTIVITY_TITLE_LENGTH\.max - formatDuplicatedTitle\(''\)\.length/,
+  'Duplicate activity titles should reuse the activity-domain title length.'
+);
+assert.match(
+  activityDuplicateSource,
+  /ACTIVITY_TITLE_LENGTH\.max -[\s\S]*formatRemixedTitle/,
+  'Remix activity titles should reuse the activity-domain title length.'
+);
+assert.doesNotMatch(
+  activityDuplicateSource,
+  /const MAX_ACTIVITY_TITLE_LENGTH = 120/,
+  'Activity duplicate helpers should not maintain a local title length.'
+);
 assert.equal(buildDuplicatedActivityTitle('   '), 'Copy of Untitled activity');
-assert.equal(buildDuplicatedActivityTitle('A'.repeat(200)).length, 120);
+assert.equal(
+  buildDuplicatedActivityTitle('A'.repeat(200)).length,
+  ACTIVITY_TITLE_LENGTH.max
+);
 assert.equal(
   buildDuplicatedActivityTitle('A'.repeat(200)),
   `Copy of ${'A'.repeat(109)}...`
@@ -9063,7 +9097,7 @@ assert.equal(
     sourceTitle: 'A'.repeat(200),
     targetShortName: 'Match',
   }).length,
-  120
+  ACTIVITY_TITLE_LENGTH.max
 );
 assert.equal(
   buildRemixedActivityTitle({

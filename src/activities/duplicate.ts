@@ -1,8 +1,10 @@
 import { m } from '@/locale/paraglide/messages';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
-import type { ActivityContent, ActivityQuestion } from '@/activities/types';
-
-const MAX_ACTIVITY_TITLE_LENGTH = 120;
+import {
+  ACTIVITY_TITLE_LENGTH,
+  type ActivityContent,
+  type ActivityQuestion,
+} from '@/activities/types';
 
 export function cloneActivityContentForDerivative(
   content: ActivityContent
@@ -115,12 +117,12 @@ function formatRemixedTitle({
 }
 
 function getDuplicatedTitleMaxSourceLength() {
-  return MAX_ACTIVITY_TITLE_LENGTH - formatDuplicatedTitle('').length;
+  return ACTIVITY_TITLE_LENGTH.max - formatDuplicatedTitle('').length;
 }
 
 function getRemixedTitleMaxSourceLength(targetShortName: string) {
   return (
-    MAX_ACTIVITY_TITLE_LENGTH -
+    ACTIVITY_TITLE_LENGTH.max -
     formatRemixedTitle({ sourceTitle: '', targetShortName }).length
   );
 }

@@ -27,6 +27,11 @@ export const ACTIVITY_PERSISTED_VISIBILITIES = [
   ...ACTIVITY_CREATABLE_VISIBILITIES,
 ] as const;
 
+export const ACTIVITY_TITLE_LENGTH = {
+  max: 120,
+  min: 3,
+} as const;
+
 export type ActivityVisibility =
   (typeof ACTIVITY_PERSISTED_VISIBILITIES)[number];
 
