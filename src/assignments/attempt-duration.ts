@@ -1,5 +1,11 @@
 import { m } from '@/locale/paraglide/messages';
 
+export const ASSIGNMENT_ATTEMPT_DURATION_UNITS = {
+  millisecondsPerSecond: 1000,
+  secondsPerMinute: 60,
+  timerSecondPaddingLength: 2,
+} as const;
+
 export function normalizeAttemptDurationSeconds({
   durationSeconds,
   timeLimitSeconds,
@@ -37,7 +43,9 @@ export function buildAttemptStartedAt({
   if (!Number.isFinite(completedTimestamp)) return completedAt;
 
   return new Date(
-    completedTimestamp - Math.max(0, Math.round(durationSeconds)) * 1000
+    completedTimestamp -
+      Math.max(0, Math.round(durationSeconds)) *
+        ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond
   );
 }
 
@@ -52,7 +60,13 @@ export function buildAttemptTimerState({
 }) {
   const elapsedMilliseconds = now - startedAt;
   const durationSeconds = Number.isFinite(elapsedMilliseconds)
-    ? Math.max(0, Math.round(elapsedMilliseconds / 1000))
+    ? Math.max(
+        0,
+        Math.round(
+          elapsedMilliseconds /
+            ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond
+        )
+      )
     : 0;
   const normalizedTimeLimitSeconds =
     timeLimitSeconds &&
@@ -86,9 +100,15 @@ export function formatAttemptDuration(
   const normalizedSeconds = Math.max(0, Math.round(seconds));
   if (normalizedSeconds <= 0) return emptyValue;
 
-  const minutes = Math.floor(normalizedSeconds / 60);
-  const remainder = normalizedSeconds % 60;
-  const paddedSeconds = String(remainder).padStart(2, '0');
+  const minutes = Math.floor(
+    normalizedSeconds / ASSIGNMENT_ATTEMPT_DURATION_UNITS.secondsPerMinute
+  );
+  const remainder =
+    normalizedSeconds % ASSIGNMENT_ATTEMPT_DURATION_UNITS.secondsPerMinute;
+  const paddedSeconds = String(remainder).padStart(
+    ASSIGNMENT_ATTEMPT_DURATION_UNITS.timerSecondPaddingLength,
+    '0'
+  );
 
   if (options?.style === 'timer') {
     if (minutes <= 0) {

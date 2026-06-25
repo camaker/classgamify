@@ -182,6 +182,10 @@ import {
   buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
+import {
+  buildQuestionChoices,
+  DEFAULT_QUESTION_CHOICE_COUNT,
+} from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
@@ -205,6 +209,7 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
 } from '@/assignments/attempt-stats';
 import {
+  ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptStartedAt,
   buildAttemptTimerState,
   formatAttemptDuration,
@@ -1990,6 +1995,49 @@ assert.doesNotMatch(
   playRouteSource,
   /seo\(`\/play\/\$\{params\.shareId\}`/,
   'Student play route should not hand-build share paths in route metadata.'
+);
+assert.match(
+  playRouteSource,
+  /window\.setInterval\([\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS\.millisecondsPerSecond/,
+  'Student play route timer refresh should reuse the assignment duration unit contract.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /window\.setInterval\([\s\S]*,\s*1000\)/,
+  'Student play route timer refresh should not keep a local millisecond interval.'
+);
+const attemptDurationSource = readFileSync(
+  'src/assignments/attempt-duration.ts',
+  'utf8'
+);
+assert.match(
+  attemptDurationSource,
+  /ASSIGNMENT_ATTEMPT_DURATION_UNITS[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60[\s\S]*timerSecondPaddingLength: 2/,
+  'Attempt duration helpers should expose named time-unit constants.'
+);
+assert.doesNotMatch(
+  attemptDurationSource,
+  /\* 1000|\/ 1000|\/ 60|% 60|padStart\(2,/,
+  'Attempt duration helpers should not keep local time-unit or timer-padding numbers.'
+);
+const activityDistractorsSource = readFileSync(
+  'src/activities/distractors.ts',
+  'utf8'
+);
+assert.match(
+  activityDistractorsSource,
+  /DEFAULT_QUESTION_CHOICE_COUNT = 4/,
+  'Question choice completion should expose the default quiz choice count.'
+);
+assert.match(
+  activityDistractorsSource,
+  /targetCount = DEFAULT_QUESTION_CHOICE_COUNT/,
+  'Question choice completion should reuse the default quiz choice count.'
+);
+assert.doesNotMatch(
+  activityDistractorsSource,
+  /const DEFAULT_CHOICE_COUNT|targetCount = 4/,
+  'Question choice completion should not keep a local unnamed default choice count.'
 );
 
 assert.equal(isStudentAnswerFilled(undefined), false);
@@ -8683,6 +8731,35 @@ assert.deepEqual(
   }).sourceMaterials,
   [listeningMaterialReference]
 );
+assert.equal(DEFAULT_QUESTION_CHOICE_COUNT, 4);
+const choiceCompletionContent = buildActivityContent({
+  description: 'Choice completion activity',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer quick quiz choices.',
+  pairsText: '',
+  questionsText: [
+    'Capital of France? | Paris | Paris, Rome',
+    'Capital of Italy? | Rome',
+    'Capital of Germany? | Berlin',
+  ].join('\n'),
+  sourceSummary: 'European capitals',
+  subject: 'Geography',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Capital Choices',
+  visibility: 'draft',
+  vocabularyText: 'Madrid, Lisbon',
+});
+assert.deepEqual(
+  buildQuestionChoices({
+    content: choiceCompletionContent,
+    question: choiceCompletionContent.questions[0]!,
+  }).length,
+  DEFAULT_QUESTION_CHOICE_COUNT
+);
 const tabSeparatedQuestionContent = buildActivityContent({
   description: 'Spreadsheet-pasted question rows',
   difficulty: 'starter',
@@ -11252,6 +11329,11 @@ assert.equal(
   }),
   undefined
 );
+assert.deepEqual(ASSIGNMENT_ATTEMPT_DURATION_UNITS, {
+  millisecondsPerSecond: 1000,
+  secondsPerMinute: 60,
+  timerSecondPaddingLength: 2,
+});
 assert.equal(normalizeAttemptDurationSeconds({ durationSeconds: -3 }), 0);
 assert.equal(normalizeAttemptDurationSeconds({ durationSeconds: 4.6 }), 5);
 assert.equal(

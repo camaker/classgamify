@@ -10,7 +10,10 @@ import type {
   PublicAssignmentRuleSummaryItem,
 } from '@/assignments/delivery-summary';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
-import { buildAttemptTimerState } from '@/assignments/attempt-duration';
+import {
+  ASSIGNMENT_ATTEMPT_DURATION_UNITS,
+  buildAttemptTimerState,
+} from '@/assignments/attempt-duration';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import {
   getAnonymousBrowserLabel,
@@ -214,7 +217,7 @@ function PlayPage() {
 
     const timer = window.setInterval(() => {
       setNow(Date.now());
-    }, 1000);
+    }, ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond);
 
     return () => window.clearInterval(timer);
   }, [result, timeLimitSeconds]);

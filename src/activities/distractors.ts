@@ -4,12 +4,12 @@ import {
   normalizeQuestionOptionText,
 } from '@/activities/question-options';
 
-const DEFAULT_CHOICE_COUNT = 4;
+export const DEFAULT_QUESTION_CHOICE_COUNT = 4;
 
 export function buildQuestionChoices({
   content,
   question,
-  targetCount = DEFAULT_CHOICE_COUNT,
+  targetCount = DEFAULT_QUESTION_CHOICE_COUNT,
 }: {
   content: ActivityContent;
   question: ActivityQuestion;
