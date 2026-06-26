@@ -31,6 +31,22 @@ export function normalizeListeningSpeechLanguage(
   return tag;
 }
 
+export function buildListeningPromptView({
+  language,
+  prompt,
+  revealAnswer,
+}: {
+  language: string | null | undefined;
+  prompt: string;
+  revealAnswer: boolean;
+}) {
+  return {
+    speechLanguage: normalizeListeningSpeechLanguage(language),
+    speechText: prompt,
+    transcriptText: revealAnswer ? prompt : undefined,
+  };
+}
+
 function normalizeSpeechLanguageTag(value: string) {
   const tag = value.replace(/_/g, '-');
 

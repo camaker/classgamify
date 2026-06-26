@@ -7,7 +7,7 @@ import {
   buildSequentialStudentRunnerView,
   getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
-import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
+import { buildListeningPromptView } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -64,6 +64,17 @@ export function ListeningRunner({
     ]
   );
   const { activeItem, sequenceView } = runnerView;
+  const activePromptView = useMemo(
+    () =>
+      activeItem
+        ? buildListeningPromptView({
+            language,
+            prompt: activeItem.prompt,
+            revealAnswer,
+          })
+        : undefined,
+    [activeItem, language, revealAnswer]
+  );
 
   useEffect(() => {
     setSpeechSupported(
@@ -73,15 +84,18 @@ export function ListeningRunner({
     );
   }, []);
 
-  function playPrompt(prompt: string) {
-    if (!speechSupported || typeof SpeechSynthesisUtterance === 'undefined') {
+  function playPrompt() {
+    if (
+      !activePromptView ||
+      !speechSupported ||
+      typeof SpeechSynthesisUtterance === 'undefined'
+    ) {
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(prompt);
-    const speechLanguage = normalizeListeningSpeechLanguage(language);
-    if (speechLanguage) {
-      utterance.lang = speechLanguage;
+    const utterance = new SpeechSynthesisUtterance(activePromptView.speechText);
+    if (activePromptView.speechLanguage) {
+      utterance.lang = activePromptView.speechLanguage;
     }
 
     window.speechSynthesis.cancel();
@@ -153,7 +167,7 @@ export function ListeningRunner({
               type="button"
               variant="outline"
               disabled={!speechSupported}
-              onClick={() => playPrompt(activeItem.prompt)}
+              onClick={playPrompt}
             >
               {speechSupported ? (
                 <IconPlayerPlay className="size-4" />
@@ -171,9 +185,9 @@ export function ListeningRunner({
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {copy.helpText}
             </p>
-            {revealAnswer ? (
+            {activePromptView?.transcriptText ? (
               <p className="mt-4 text-base font-semibold leading-7">
-                {activeItem.prompt}
+                {activePromptView.transcriptText}
               </p>
             ) : null}
           </div>

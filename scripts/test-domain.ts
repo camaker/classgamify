@@ -157,7 +157,10 @@ import {
   getActivityRunnerKindCopy,
   getActivityTemplateRunnerCopy,
 } from '@/activities/runner-copy';
-import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
+import {
+  buildListeningPromptView,
+  normalizeListeningSpeechLanguage,
+} from '@/activities/listening-speech';
 import {
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
@@ -1897,10 +1900,15 @@ assert.match(
   /runnerView\.activeChoiceViews/,
   'Listening runner should render choice state from the sequential runner view.'
 );
+assert.match(
+  listeningRunnerSource,
+  /buildListeningPromptView/,
+  'Listening runner should delegate speech language and transcript visibility to the listening prompt view helper.'
+);
 assert.doesNotMatch(
   listeningRunnerSource,
-  /isSameRuntimeChoice|activeItem\.choices|answers\[activeItem\.id\]/,
-  'Listening runner should not rebuild active choice or input value state directly.'
+  /normalizeListeningSpeechLanguage|isSameRuntimeChoice|activeItem\.choices|answers\[activeItem\.id\]|revealAnswer \?[\s\S]*activeItem\.prompt/,
+  'Listening runner should not rebuild speech language, transcript visibility, active choice, or input value state directly.'
 );
 const openBoxRunnerSource = readFileSync(
   'src/components/activities/open-box-runner.tsx',
@@ -13233,6 +13241,30 @@ assert.equal(normalizeListeningSpeechLanguage('  '), undefined);
 assert.equal(
   normalizeListeningSpeechLanguage('not a language tag!'),
   undefined
+);
+assert.deepEqual(
+  buildListeningPromptView({
+    language: '中文',
+    prompt: '今天天气很好。',
+    revealAnswer: false,
+  }),
+  {
+    speechLanguage: 'zh-CN',
+    speechText: '今天天气很好。',
+    transcriptText: undefined,
+  }
+);
+assert.deepEqual(
+  buildListeningPromptView({
+    language: 'en_US',
+    prompt: 'The weather is sunny.',
+    revealAnswer: true,
+  }),
+  {
+    speechLanguage: 'en-US',
+    speechText: 'The weather is sunny.',
+    transcriptText: 'The weather is sunny.',
+  }
 );
 assert.deepEqual(
   [
