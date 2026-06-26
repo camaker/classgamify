@@ -358,6 +358,7 @@ import {
   buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
+  buildAssignmentResultsPageViewModel,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentResultEmptyState,
   ATTEMPT_REVIEW_FILTER_VALUES,
@@ -1014,6 +1015,10 @@ const assignmentResultsSource = readFileSync(
   'src/assignments/results.ts',
   'utf8'
 );
+const assignmentResultViewSource = readFileSync(
+  'src/assignments/result-view.ts',
+  'utf8'
+);
 assert.match(
   assignmentResultsSource,
   /ASSIGNMENT_RESULTS_ANALYSIS_LIMITS[\s\S]*needsReviewItems: 3/,
@@ -1242,16 +1247,26 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
+  /buildAssignmentResultsPageViewModel/,
+  'Assignment result route should consume the assignment-domain page view-model.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /getAssignmentResultCompletedAttemptCount|filterAssignmentResultCompletedAttemptRows|buildAssignmentResultActionState|buildAssignmentResultSectionState|buildAssignmentResultMetricItems/,
+  'Assignment result route should not rebuild completed-attempt, metric, action, or section state directly.'
+);
+assert.match(
+  assignmentResultViewSource,
   /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
   'Assignment result actions should derive attempt availability from completed attempt stats.'
 );
 assert.match(
-  assignmentResultRouteSource,
+  assignmentResultViewSource,
   /attemptReviewCount:\s*completedAttemptReviewCount/,
   'Assignment answer review sections should not unlock from raw review rows alone.'
 );
 assert.match(
-  assignmentResultRouteSource,
+  assignmentResultViewSource,
   /filterAssignmentResultCompletedAttemptRows/,
   'Assignment attempt rows should be filtered to completed result reviews before display.'
 );
@@ -13011,6 +13026,166 @@ assert.deepEqual(
     reviews: resultAnalysisWithUnscoredAttempt.attempts,
   }).map((attempt) => attempt.id),
   ['completed-attempt']
+);
+const emptyResultsPageView = buildAssignmentResultsPageViewModel({
+  data: null,
+  search: {},
+});
+assert.deepEqual(
+  {
+    actionCount: emptyResultsPageView.actionButtons.length,
+    breadcrumbs: emptyResultsPageView.breadcrumbs,
+    completedAttemptCount: emptyResultsPageView.completedAttemptCount,
+    headerView: emptyResultsPageView.headerView,
+    metricItems: emptyResultsPageView.metricItems,
+    sectionState: emptyResultsPageView.sectionState,
+    title: emptyResultsPageView.title,
+    viewState: emptyResultsPageView.viewState,
+  },
+  {
+    actionCount: 5,
+    breadcrumbs: [
+      { href: '/dashboard', label: 'Dashboard' },
+      { href: '/dashboard/assignments', label: 'Assignments' },
+      { isCurrentPage: true, label: 'Assignment results' },
+    ],
+    completedAttemptCount: 0,
+    headerView: null,
+    metricItems: [],
+    sectionState: {
+      showAnswerReview: false,
+      showClassroomBrief: false,
+      showItemPerformance: false,
+      showReteachPriorities: false,
+      showStudentSearch: false,
+      showStudentSummary: false,
+    },
+    title: 'Assignment results',
+    viewState: {
+      attemptReviewFilter: 'all',
+      itemPerformanceSort: 'original',
+      studentSearch: '',
+      studentSort: 'needs-review',
+    },
+  }
+);
+const scoredResultsPageView = buildAssignmentResultsPageViewModel({
+  data: {
+    activity: {
+      description: 'Current activity description',
+      templateType: 'quiz',
+      title: 'Current activity title',
+    },
+    analysis: resultAnalysisWithUnscoredAttempt,
+    assignment: {
+      expiresAt: null,
+      shareSlug: 'result-share',
+      status: 'published',
+      title: 'Week 1 results',
+    },
+    attempts: [
+      {
+        completedAt: new Date('2026-01-01T10:00:00.000Z'),
+        id: 'completed-attempt',
+        maxScore: 1,
+        resultJson: {
+          accuracy: 100,
+          completedItemCount: 1,
+          durationSeconds: 30,
+          totalPoints: 1,
+        },
+        score: 1,
+        studentName: 'Alice',
+      },
+      {
+        completedAt: null,
+        id: 'unscored-attempt',
+        maxScore: null,
+        resultJson: null,
+        score: null,
+        studentName: 'Bob',
+      },
+    ],
+    snapshot: null,
+    stats: {
+      averageDurationSeconds: 30,
+      averagePoints: 1,
+      averageScore: 100,
+      completions: 1,
+    },
+  },
+  search: {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: 'name',
+    student: 'Alice',
+  },
+});
+assert.deepEqual(
+  {
+    actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
+      button.action,
+      button.disabled,
+    ]),
+    breadcrumbs: scoredResultsPageView.breadcrumbs.map(
+      (breadcrumb) => breadcrumb.label
+    ),
+    completedAttemptIds: scoredResultsPageView.completedAttempts.map(
+      (attempt) => attempt.id
+    ),
+    completedAttemptReviewCount:
+      scoredResultsPageView.completedAttemptReviewCount,
+    classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
+    filteredAttemptIds:
+      scoredResultsPageView.resultView.filteredAttemptRows.map(
+        ({ attempt }) => attempt.id
+      ),
+    headerTitle: scoredResultsPageView.headerView?.assignmentTitle,
+    metricValues: scoredResultsPageView.metricItems.map((metric) => [
+      metric.key,
+      metric.value,
+    ]),
+    sectionState: scoredResultsPageView.sectionState,
+    title: scoredResultsPageView.title,
+    viewState: scoredResultsPageView.viewState,
+  },
+  {
+    actionDisabled: [
+      ['copy-brief', false],
+      ['copy-reteach-plan', false],
+      ['copy-item-review', false],
+      ['copy-follow-up', false],
+      ['export-csv', false],
+    ],
+    breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
+    completedAttemptIds: ['completed-attempt'],
+    completedAttemptReviewCount: 1,
+    classroomBriefReady: true,
+    filteredAttemptIds: ['completed-attempt'],
+    headerTitle: 'Week 1 results',
+    metricValues: [
+      ['completions', '1'],
+      ['average-accuracy', '100%'],
+      ['average-points', '1'],
+      ['average-time', '30s'],
+      ['closes', 'No close time'],
+    ],
+    sectionState: {
+      showAnswerReview: true,
+      showClassroomBrief: true,
+      showItemPerformance: true,
+      showReteachPriorities: true,
+      showStudentSearch: true,
+      showStudentSummary: true,
+    },
+    title: 'Week 1 results',
+    viewState: {
+      attemptReviewFilter: 'needs-review',
+      itemPerformanceSort: 'accuracy',
+      studentSearch: 'Alice',
+      studentSort: 'name',
+    },
+  }
 );
 
 assert.equal(resultAnalysis.perItem[0]?.correctCount, 2);

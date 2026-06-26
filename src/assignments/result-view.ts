@@ -4,6 +4,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import {
   buildAssignmentResultsCsv,
@@ -50,6 +51,7 @@ import type {
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
+import { Routes } from '@/lib/routes';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -216,6 +218,12 @@ type AssignmentResultSectionState = {
   showStudentSummary: boolean;
 };
 
+type AssignmentResultPageBreadcrumb = {
+  href?: string;
+  isCurrentPage?: boolean;
+  label: string;
+};
+
 type AssignmentResultControlOption<TValue extends string> = {
   label: string;
   value: TValue;
@@ -258,6 +266,42 @@ type AssignmentResultHeaderShareAction = {
   label: string;
   sharePath: string;
   shareSlug: string;
+};
+
+type AssignmentResultsPageData<TAttempt extends AssignmentAttemptRowInput> =
+  AssignmentResultHeaderSource & {
+    analysis: {
+      attempts: AssignmentAttemptReview[];
+      perItem: AssignmentItemAnalysis[];
+      students: AssignmentStudentSummary[];
+    };
+    attempts: TAttempt[];
+    stats: {
+      averageDurationSeconds: number | null | undefined;
+      averagePoints: number;
+      averageScore: number;
+      completions: number;
+    };
+  };
+
+type AssignmentResultsPageViewModel<
+  TAttempt extends AssignmentAttemptRowInput,
+> = {
+  actionButtons: AssignmentResultActionButton[];
+  actionState: AssignmentResultActionState;
+  breadcrumbs: AssignmentResultPageBreadcrumb[];
+  classroomBrief: ReturnType<typeof buildAssignmentClassroomBrief> | null;
+  completedAttemptCount: number;
+  completedAttemptReviewCount: number;
+  completedAttempts: TAttempt[];
+  description: string;
+  headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
+  loadErrorMessage: string;
+  metricItems: ReturnType<typeof buildAssignmentResultMetricItems>;
+  resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
+  sectionState: AssignmentResultSectionState;
+  title: string;
+  viewState: AssignmentResultResolvedViewState;
 };
 
 export const assignmentResultPageCopy = {
@@ -1574,6 +1618,98 @@ export function resolveAssignmentResultViewState(
     itemPerformanceSort: search.itemSort ?? DEFAULT_ITEM_PERFORMANCE_SORT,
     studentSearch: search.student ?? '',
     studentSort: search.sort ?? DEFAULT_STUDENT_SUMMARY_SORT,
+  };
+}
+
+export function buildAssignmentResultsPageViewModel<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  data,
+  search,
+}: {
+  data?: AssignmentResultsPageData<TAttempt> | null;
+  search: AssignmentResultSearchState;
+}): AssignmentResultsPageViewModel<TAttempt> {
+  const viewState = resolveAssignmentResultViewState(search);
+  const headerView = data ? buildAssignmentResultHeaderView(data) : null;
+  const title =
+    headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;
+  const completedAttempts = filterAssignmentResultCompletedAttemptRows({
+    attempts: data?.attempts ?? [],
+    reviews: data?.analysis.attempts ?? [],
+  });
+  const resultView = buildAssignmentResultViewModel({
+    attemptReviewFilter: viewState.attemptReviewFilter,
+    attempts: completedAttempts,
+    itemPerformanceSort: viewState.itemPerformanceSort,
+    items: data?.analysis.perItem ?? [],
+    reviews: data?.analysis.attempts ?? [],
+    search: viewState.studentSearch,
+    studentSort: viewState.studentSort,
+    students: data?.analysis.students ?? [],
+  });
+  const classroomBrief = data
+    ? buildAssignmentClassroomBrief({
+        assignmentTitle: data.assignment.title,
+        items: data.analysis.perItem,
+        stats: data.stats,
+        students: data.analysis.students,
+      })
+    : null;
+  const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
+    data?.stats.completions
+  );
+  const completedAttemptReviewCount = Math.min(
+    completedAttemptCount,
+    data?.analysis.attempts.length ?? 0
+  );
+  const actionState = buildAssignmentResultActionState({
+    attemptCount: completedAttemptCount,
+    classroomBriefReady: Boolean(classroomBrief),
+    itemCount: data?.analysis.perItem.length ?? 0,
+    studentCount: data?.analysis.students.length ?? 0,
+  });
+
+  return {
+    actionButtons: buildAssignmentResultActionButtons(actionState),
+    actionState,
+    breadcrumbs: [
+      {
+        href: Routes.Dashboard,
+        label: assignmentResultPageCopy.breadcrumbDashboard,
+      },
+      {
+        href: Routes.DashboardAssignments,
+        label: assignmentResultPageCopy.breadcrumbAssignments,
+      },
+      { isCurrentPage: true, label: title },
+    ],
+    classroomBrief,
+    completedAttemptCount,
+    completedAttemptReviewCount,
+    completedAttempts,
+    description: assignmentResultPageCopy.description,
+    headerView,
+    loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
+    metricItems: data
+      ? buildAssignmentResultMetricItems({
+          averageDurationSeconds: data.stats.averageDurationSeconds,
+          averagePoints: data.stats.averagePoints,
+          averageScore: data.stats.averageScore,
+          completions: data.stats.completions,
+          expiresAt: data.assignment.expiresAt,
+        })
+      : [],
+    resultView,
+    sectionState: buildAssignmentResultSectionState({
+      attemptCount: completedAttemptCount,
+      attemptReviewCount: completedAttemptReviewCount,
+      classroomBriefReady: Boolean(classroomBrief),
+      itemCount: data?.analysis.perItem.length ?? 0,
+      studentCount: data?.analysis.students.length ?? 0,
+    }),
+    title,
+    viewState,
   };
 }
 

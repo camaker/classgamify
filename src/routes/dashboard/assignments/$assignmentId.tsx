@@ -1,20 +1,13 @@
-import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import {
   type AttemptReviewFilter,
   type AssignmentResultEmptyState,
   type AssignmentResultActionButton,
   type ItemPerformanceSort,
   type StudentSummarySort,
-  buildAssignmentResultActionButtons,
   buildAssignmentResultActionPayload,
-  buildAssignmentResultActionState,
   buildAssignmentResultControlSearchState,
-  buildAssignmentResultHeaderView,
-  buildAssignmentResultSectionState,
   buildAssignmentResultRouteSearch,
-  buildAssignmentResultViewModel,
-  getAssignmentResultCompletedAttemptCount,
-  filterAssignmentResultCompletedAttemptRows,
+  buildAssignmentResultsPageViewModel,
   assignmentResultPageCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
@@ -25,10 +18,8 @@ import {
   buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
-  buildAssignmentResultMetricItems,
   buildAssignmentStudentSummaryRowView,
   itemPerformanceSortOptions,
-  resolveAssignmentResultViewState,
   studentSummarySortOptions,
 } from '@/assignments/result-view';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -60,7 +51,6 @@ import {
 import { useAssignmentResults } from '@/hooks/use-assignments';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import { downloadFile } from '@/lib/download';
-import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconCalendarTime,
@@ -110,57 +100,14 @@ function AssignmentResultsPage() {
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
-  const {
-    attemptReviewFilter,
-    itemPerformanceSort,
-    studentSearch,
-    studentSort,
-  } = resolveAssignmentResultViewState(search);
-  const headerView = data ? buildAssignmentResultHeaderView(data) : null;
-  const title =
-    headerView?.assignmentTitle ?? assignmentResultPageCopy.defaultTitle;
-  const completedAttempts = useMemo(
+  const pageView = useMemo(
     () =>
-      filterAssignmentResultCompletedAttemptRows({
-        attempts: data?.attempts ?? [],
-        reviews: data?.analysis.attempts ?? [],
+      buildAssignmentResultsPageViewModel({
+        data,
+        search,
       }),
-    [data?.analysis.attempts, data?.attempts]
+    [data, search]
   );
-  const resultView = useMemo(
-    () =>
-      buildAssignmentResultViewModel({
-        attemptReviewFilter,
-        attempts: completedAttempts,
-        itemPerformanceSort,
-        items: data?.analysis.perItem ?? [],
-        reviews: data?.analysis.attempts ?? [],
-        search: studentSearch,
-        studentSort,
-        students: data?.analysis.students ?? [],
-      }),
-    [
-      attemptReviewFilter,
-      data?.analysis.attempts,
-      data?.analysis.perItem,
-      data?.analysis.students,
-      completedAttempts,
-      itemPerformanceSort,
-      studentSearch,
-      studentSort,
-    ]
-  );
-  const classroomBrief = useMemo(() => {
-    if (!data) return null;
-
-    return buildAssignmentClassroomBrief({
-      assignmentTitle: data.assignment.title,
-      items: data.analysis.perItem,
-      stats: data.stats,
-      students: data.analysis.students,
-    });
-  }, [data]);
-
   function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
     void navigate({
       replace: true,
@@ -229,7 +176,7 @@ function AssignmentResultsPage() {
       const payload = buildAssignmentResultActionPayload({
         actionButton,
         assignmentTitle: data.assignment.title,
-        classroomBriefText: classroomBrief?.text,
+        classroomBriefText: pageView.classroomBrief?.text,
         exportData: data,
         items: data.analysis.perItem,
         students: data.analysis.students,
@@ -249,352 +196,349 @@ function AssignmentResultsPage() {
     }
   }
 
-  const resultMetricItems = data
-    ? buildAssignmentResultMetricItems({
-        averageDurationSeconds: data.stats.averageDurationSeconds,
-        averagePoints: data.stats.averagePoints,
-        averageScore: data.stats.averageScore,
-        completions: data.stats.completions,
-        expiresAt: data.assignment.expiresAt,
-      })
-    : [];
-  const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
-    data?.stats.completions
-  );
-  const completedAttemptReviewCount = Math.min(
-    completedAttemptCount,
-    data?.analysis.attempts.length ?? 0
-  );
-  const resultActionState = buildAssignmentResultActionState({
-    attemptCount: completedAttemptCount,
-    classroomBriefReady: Boolean(classroomBrief),
-    itemCount: data?.analysis.perItem.length ?? 0,
-    studentCount: data?.analysis.students.length ?? 0,
-  });
-  const resultActionButtons =
-    buildAssignmentResultActionButtons(resultActionState);
-  const resultSectionState = buildAssignmentResultSectionState({
-    attemptCount: completedAttemptCount,
-    attemptReviewCount: completedAttemptReviewCount,
-    classroomBriefReady: Boolean(classroomBrief),
-    itemCount: data?.analysis.perItem.length ?? 0,
-    studentCount: data?.analysis.students.length ?? 0,
-  });
   return (
     <DashboardLayout
-      breadcrumbs={[
-        {
-          label: assignmentResultPageCopy.breadcrumbDashboard,
-          href: Routes.Dashboard,
-        },
-        {
-          label: assignmentResultPageCopy.breadcrumbAssignments,
-          href: Routes.DashboardAssignments,
-        },
-        { label: title, isCurrentPage: true },
-      ]}
-      title={title}
-      description={assignmentResultPageCopy.description}
+      breadcrumbs={pageView.breadcrumbs}
+      title={pageView.title}
+      description={pageView.description}
     >
       {isLoading ? (
         <Card className="min-h-56 rounded-lg" />
       ) : isError || !data ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-          {assignmentResultPageCopy.loadErrorMessage}
+          {pageView.loadErrorMessage}
         </div>
       ) : (
-        <div className="grid gap-6">
-          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {resultMetricItems.map((metric) => (
-              <ResultMetric
-                key={metric.key}
-                icon={resultMetricIconByKey[metric.key]}
-                label={metric.label}
-                value={metric.value}
-              />
-            ))}
-          </section>
-
-          <Card className="rounded-lg">
-            <CardHeader>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary" className="rounded-md">
-                  {headerView.statusLabel}
-                </Badge>
-                <Badge variant="outline" className="rounded-md">
-                  {headerView.templateLabel}
-                </Badge>
-              </div>
-              <CardTitle>
-                <h2 className="text-lg font-semibold">
-                  {headerView.activityTitle}
-                </h2>
-              </CardTitle>
-              <CardDescription>
-                <p>{headerView.activityDescription}</p>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <AssignmentSettingsSummary
-                expiresAt={data.assignment.expiresAt}
-                settings={data.assignment.settingsJson}
-              />
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {headerView.shareAction.isAvailable ? (
-                  <Link
-                    to="/play/$shareId"
-                    params={{ shareId: headerView.shareAction.shareSlug }}
-                    className={cn(buttonVariants(), 'w-full sm:w-auto')}
-                  >
-                    <IconPlayerPlay className="size-4" />
-                    {headerView.shareAction.label}
-                  </Link>
-                ) : (
-                  <Button type="button" className="w-full sm:w-auto" disabled>
-                    <IconPlayerPlay className="size-4" />
-                    {headerView.shareAction.label}
-                  </Button>
-                )}
-                <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
-                  <IconShare3 className="size-4" />
-                  {headerView.shareAction.sharePath}
-                </div>
-                <CopyAssignmentShareLinkButton
-                  disabled={!headerView.shareAction.isAvailable}
-                  disabledMessage={headerView.shareAction.disabledReason}
-                  shareSlug={headerView.shareAction.shareSlug}
-                  className="w-full bg-background sm:w-auto"
-                />
-                <Link
-                  to="/print/assignments/$assignmentId"
-                  params={{ assignmentId }}
-                  className={cn(
-                    buttonVariants({ variant: 'outline' }),
-                    'w-full bg-background sm:w-auto'
-                  )}
-                >
-                  <IconPrinter className="size-4" />
-                  {assignmentResultPageCopy.printWorksheetLabel}
-                </Link>
-                {headerView.shareAction.disabledReason ? (
-                  <p className="basis-full text-sm text-muted-foreground">
-                    {headerView.shareAction.disabledReason}
-                  </p>
-                ) : null}
-                {resultActionButtons.map((actionButton) => {
-                  const Icon = resultActionIconByAction[actionButton.action];
-
-                  return (
-                    <Button
-                      key={actionButton.action}
-                      type="button"
-                      variant="outline"
-                      className="w-full sm:w-auto"
-                      disabled={actionButton.disabled}
-                      onClick={() => void handleResultAction(actionButton)}
-                    >
-                      <Icon className="size-4" />
-                      {actionButton.label}
-                    </Button>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {resultSectionState.showStudentSearch ? (
-            <>
-              {resultSectionState.showClassroomBrief && classroomBrief ? (
-                <ClassroomBriefCard brief={classroomBrief} />
-              ) : null}
-              <ResultStudentSearch
-                summary={resultView.resultSearchSummary}
-                onClear={() => updateStudentSearch('')}
-                onSearch={updateStudentSearch}
-                onSortChange={updateStudentSort}
-                sort={studentSort}
-                value={studentSearch}
-              />
-            </>
-          ) : null}
-
-          {resultSectionState.showReteachPriorities ? (
-            <Card className="rounded-lg">
-              <CardHeader>
-                <CardTitle>
-                  <h2 className="text-lg font-semibold">
-                    {assignmentResultSectionCopy.reteachPriorities.title}
-                  </h2>
-                </CardTitle>
-                <CardDescription>
-                  <p>
-                    {assignmentResultSectionCopy.reteachPriorities.description}
-                  </p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3 md:grid-cols-3">
-                {data.analysis.needsReview.length > 0 ? (
-                  data.analysis.needsReview.map((item) => (
-                    <ItemAnalysisCard key={item.itemId} item={item} />
-                  ))
-                ) : (
-                  <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
-                    {assignmentResultSectionCopy.reteachPriorities.emptyMessage}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {resultSectionState.showItemPerformance ? (
-            <Card className="rounded-lg">
-              <CardHeader>
-                <CardTitle>
-                  <h2 className="text-lg font-semibold">
-                    {assignmentResultSectionCopy.itemPerformance.title}
-                  </h2>
-                </CardTitle>
-                <CardDescription>
-                  <p>
-                    {assignmentResultSectionCopy.itemPerformance.description}
-                  </p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  <ItemPerformanceSortControl
-                    onSortChange={updateItemPerformanceSort}
-                    sort={itemPerformanceSort}
-                  />
-                  <ItemPerformanceTable
-                    items={resultView.sortedPerformanceItems}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ) : null}
-
-          {resultSectionState.showStudentSummary ? (
-            <Card className="rounded-lg">
-              <CardHeader>
-                <CardTitle>
-                  <h2 className="text-lg font-semibold">
-                    {assignmentResultSectionCopy.studentSummary.title}
-                  </h2>
-                </CardTitle>
-                <CardDescription>
-                  <p>
-                    {assignmentResultSectionCopy.studentSummary.description}
-                  </p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {resultView.filteredStudents.length > 0 ? (
-                  <StudentSummaryTable students={resultView.filteredStudents} />
-                ) : (
-                  <ResultEmptyState
-                    state={resultView.emptyStates.studentSummary}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <Card className="rounded-lg">
-            <CardHeader>
-              <CardTitle>
-                <h2 className="text-lg font-semibold">
-                  {assignmentResultSectionCopy.studentAttempts.title}
-                </h2>
-              </CardTitle>
-              <CardDescription>
-                <p>{assignmentResultSectionCopy.studentAttempts.description}</p>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {resultView.filteredAttemptRows.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      {assignmentResultTableHeaders.studentAttempts.map(
-                        (header) => (
-                          <TableHead key={header}>{header}</TableHead>
-                        )
-                      )}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {resultView.filteredAttemptRows.map(
-                      ({ attempt, review, studentLabel }) => {
-                        const rowDisplay = buildAssignmentAttemptRowDisplay({
-                          attempt,
-                          review,
-                          studentLabel,
-                          timeLimitSeconds:
-                            data?.assignment.settingsJson.timeLimitSeconds,
-                        });
-
-                        return (
-                          <TableRow key={attempt.id}>
-                            <TableCell>{rowDisplay.studentLabel}</TableCell>
-                            <TableCell>{rowDisplay.scoreLabel}</TableCell>
-                            <TableCell>{rowDisplay.accuracyLabel}</TableCell>
-                            <TableCell>{rowDisplay.answeredLabel}</TableCell>
-                            <TableCell>{rowDisplay.durationLabel}</TableCell>
-                            <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
-                          </TableRow>
-                        );
-                      }
-                    )}
-                  </TableBody>
-                </Table>
-              ) : (
-                <ResultEmptyState state={resultView.emptyStates.attemptRows} />
-              )}
-            </CardContent>
-          </Card>
-
-          {resultSectionState.showAnswerReview ? (
-            <Card className="rounded-lg">
-              <CardHeader>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <CardTitle>
-                      <h2 className="text-lg font-semibold">
-                        {assignmentResultSectionCopy.answerReview.title}
-                      </h2>
-                    </CardTitle>
-                    <CardDescription>
-                      <p>
-                        {assignmentResultSectionCopy.answerReview.description}
-                      </p>
-                    </CardDescription>
-                  </div>
-                  <AttemptReviewFilterControl
-                    filter={attemptReviewFilter}
-                    onFilterChange={updateAttemptReviewFilter}
-                  />
-                </div>
-                <CardDescription>
-                  <p>{resultView.attemptReviewSubmissionSummary}</p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3">
-                {resultView.filteredAttemptReviews.length > 0 ? (
-                  resultView.filteredAttemptReviews.map((attempt) => (
-                    <AttemptReviewCard key={attempt.id} attempt={attempt} />
-                  ))
-                ) : (
-                  <ResultEmptyState
-                    state={resultView.emptyStates.attemptReview}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          ) : null}
-        </div>
+        <LoadedAssignmentResultsPage
+          assignmentId={assignmentId}
+          data={data}
+          pageView={pageView}
+          onAttemptReviewFilterChange={updateAttemptReviewFilter}
+          onItemPerformanceSortChange={updateItemPerformanceSort}
+          onResultAction={handleResultAction}
+          onStudentSearch={updateStudentSearch}
+          onStudentSearchClear={() => updateStudentSearch('')}
+          onStudentSortChange={updateStudentSort}
+        />
       )}
     </DashboardLayout>
+  );
+}
+
+function LoadedAssignmentResultsPage({
+  assignmentId,
+  data,
+  onAttemptReviewFilterChange,
+  onItemPerformanceSortChange,
+  onResultAction,
+  onStudentSearch,
+  onStudentSearchClear,
+  onStudentSortChange,
+  pageView,
+}: {
+  assignmentId: string;
+  data: NonNullable<ReturnType<typeof useAssignmentResults>['data']>;
+  onAttemptReviewFilterChange: (filter: AttemptReviewFilter) => void;
+  onItemPerformanceSortChange: (sort: ItemPerformanceSort) => void;
+  onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
+  onStudentSearch: (value: string) => void;
+  onStudentSearchClear: () => void;
+  onStudentSortChange: (sort: StudentSummarySort) => void;
+  pageView: ReturnType<typeof buildAssignmentResultsPageViewModel>;
+}) {
+  const headerView = pageView.headerView;
+  if (!headerView) return null;
+
+  return (
+    <div className="grid gap-6">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {pageView.metricItems.map((metric) => (
+          <ResultMetric
+            key={metric.key}
+            icon={resultMetricIconByKey[metric.key]}
+            label={metric.label}
+            value={metric.value}
+          />
+        ))}
+      </section>
+
+      <Card className="rounded-lg">
+        <CardHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary" className="rounded-md">
+              {headerView.statusLabel}
+            </Badge>
+            <Badge variant="outline" className="rounded-md">
+              {headerView.templateLabel}
+            </Badge>
+          </div>
+          <CardTitle>
+            <h2 className="text-lg font-semibold">
+              {headerView.activityTitle}
+            </h2>
+          </CardTitle>
+          <CardDescription>
+            <p>{headerView.activityDescription}</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <AssignmentSettingsSummary
+            expiresAt={data.assignment.expiresAt}
+            settings={data.assignment.settingsJson}
+          />
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {headerView.shareAction.isAvailable ? (
+              <Link
+                to="/play/$shareId"
+                params={{
+                  shareId: headerView.shareAction.shareSlug,
+                }}
+                className={cn(buttonVariants(), 'w-full sm:w-auto')}
+              >
+                <IconPlayerPlay className="size-4" />
+                {headerView.shareAction.label}
+              </Link>
+            ) : (
+              <Button type="button" className="w-full sm:w-auto" disabled>
+                <IconPlayerPlay className="size-4" />
+                {headerView.shareAction.label}
+              </Button>
+            )}
+            <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
+              <IconShare3 className="size-4" />
+              {headerView.shareAction.sharePath}
+            </div>
+            <CopyAssignmentShareLinkButton
+              disabled={!headerView.shareAction.isAvailable}
+              disabledMessage={headerView.shareAction.disabledReason}
+              shareSlug={headerView.shareAction.shareSlug}
+              className="w-full bg-background sm:w-auto"
+            />
+            <Link
+              to="/print/assignments/$assignmentId"
+              params={{ assignmentId }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background sm:w-auto'
+              )}
+            >
+              <IconPrinter className="size-4" />
+              {assignmentResultPageCopy.printWorksheetLabel}
+            </Link>
+            {headerView.shareAction.disabledReason ? (
+              <p className="basis-full text-sm text-muted-foreground">
+                {headerView.shareAction.disabledReason}
+              </p>
+            ) : null}
+            {pageView.actionButtons.map((actionButton) => {
+              const Icon = resultActionIconByAction[actionButton.action];
+
+              return (
+                <Button
+                  key={actionButton.action}
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  disabled={actionButton.disabled}
+                  onClick={() => void onResultAction(actionButton)}
+                >
+                  <Icon className="size-4" />
+                  {actionButton.label}
+                </Button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {pageView.sectionState.showStudentSearch ? (
+        <>
+          {pageView.sectionState.showClassroomBrief &&
+          pageView.classroomBrief ? (
+            <ClassroomBriefCard brief={pageView.classroomBrief} />
+          ) : null}
+          <ResultStudentSearch
+            summary={pageView.resultView.resultSearchSummary}
+            onClear={onStudentSearchClear}
+            onSearch={onStudentSearch}
+            onSortChange={onStudentSortChange}
+            sort={pageView.viewState.studentSort}
+            value={pageView.viewState.studentSearch}
+          />
+        </>
+      ) : null}
+
+      {pageView.sectionState.showReteachPriorities ? (
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle>
+              <h2 className="text-lg font-semibold">
+                {assignmentResultSectionCopy.reteachPriorities.title}
+              </h2>
+            </CardTitle>
+            <CardDescription>
+              <p>{assignmentResultSectionCopy.reteachPriorities.description}</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-3">
+            {data.analysis.needsReview.length > 0 ? (
+              data.analysis.needsReview.map((item) => (
+                <ItemAnalysisCard key={item.itemId} item={item} />
+              ))
+            ) : (
+              <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
+                {assignmentResultSectionCopy.reteachPriorities.emptyMessage}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {pageView.sectionState.showItemPerformance ? (
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle>
+              <h2 className="text-lg font-semibold">
+                {assignmentResultSectionCopy.itemPerformance.title}
+              </h2>
+            </CardTitle>
+            <CardDescription>
+              <p>{assignmentResultSectionCopy.itemPerformance.description}</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <ItemPerformanceSortControl
+                onSortChange={onItemPerformanceSortChange}
+                sort={pageView.viewState.itemPerformanceSort}
+              />
+              <ItemPerformanceTable
+                items={pageView.resultView.sortedPerformanceItems}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {pageView.sectionState.showStudentSummary ? (
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle>
+              <h2 className="text-lg font-semibold">
+                {assignmentResultSectionCopy.studentSummary.title}
+              </h2>
+            </CardTitle>
+            <CardDescription>
+              <p>{assignmentResultSectionCopy.studentSummary.description}</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {pageView.resultView.filteredStudents.length > 0 ? (
+              <StudentSummaryTable
+                students={pageView.resultView.filteredStudents}
+              />
+            ) : (
+              <ResultEmptyState
+                state={pageView.resultView.emptyStates.studentSummary}
+              />
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card className="rounded-lg">
+        <CardHeader>
+          <CardTitle>
+            <h2 className="text-lg font-semibold">
+              {assignmentResultSectionCopy.studentAttempts.title}
+            </h2>
+          </CardTitle>
+          <CardDescription>
+            <p>{assignmentResultSectionCopy.studentAttempts.description}</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {pageView.resultView.filteredAttemptRows.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {assignmentResultTableHeaders.studentAttempts.map(
+                    (header) => (
+                      <TableHead key={header}>{header}</TableHead>
+                    )
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pageView.resultView.filteredAttemptRows.map(
+                  ({ attempt, review, studentLabel }) => {
+                    const rowDisplay = buildAssignmentAttemptRowDisplay({
+                      attempt,
+                      review,
+                      studentLabel,
+                      timeLimitSeconds:
+                        data.assignment.settingsJson.timeLimitSeconds,
+                    });
+
+                    return (
+                      <TableRow key={attempt.id}>
+                        <TableCell>{rowDisplay.studentLabel}</TableCell>
+                        <TableCell>{rowDisplay.scoreLabel}</TableCell>
+                        <TableCell>{rowDisplay.accuracyLabel}</TableCell>
+                        <TableCell>{rowDisplay.answeredLabel}</TableCell>
+                        <TableCell>{rowDisplay.durationLabel}</TableCell>
+                        <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
+                      </TableRow>
+                    );
+                  }
+                )}
+              </TableBody>
+            </Table>
+          ) : (
+            <ResultEmptyState
+              state={pageView.resultView.emptyStates.attemptRows}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {pageView.sectionState.showAnswerReview ? (
+        <Card className="rounded-lg">
+          <CardHeader>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <CardTitle>
+                  <h2 className="text-lg font-semibold">
+                    {assignmentResultSectionCopy.answerReview.title}
+                  </h2>
+                </CardTitle>
+                <CardDescription>
+                  <p>{assignmentResultSectionCopy.answerReview.description}</p>
+                </CardDescription>
+              </div>
+              <AttemptReviewFilterControl
+                filter={pageView.viewState.attemptReviewFilter}
+                onFilterChange={onAttemptReviewFilterChange}
+              />
+            </div>
+            <CardDescription>
+              <p>{pageView.resultView.attemptReviewSubmissionSummary}</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            {pageView.resultView.filteredAttemptReviews.length > 0 ? (
+              pageView.resultView.filteredAttemptReviews.map((attempt) => (
+                <AttemptReviewCard key={attempt.id} attempt={attempt} />
+              ))
+            ) : (
+              <ResultEmptyState
+                state={pageView.resultView.emptyStates.attemptReview}
+              />
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
   );
 }
 
