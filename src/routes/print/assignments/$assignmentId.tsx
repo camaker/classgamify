@@ -5,7 +5,8 @@ import {
 } from '@/assignments/printable-worksheet';
 import {
   buildPrintableWorksheetPageViewModel,
-  printableWorksheetPageCopy,
+  buildPrintableWorksheetErrorView,
+  buildPrintableWorksheetLoadingView,
 } from '@/assignments/printable-worksheet-view';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -45,6 +46,10 @@ type PrintableWorksheetItemView = ReturnType<
   typeof buildPrintableWorksheetPageViewModel
 >['itemViews'][number];
 
+type PrintableWorksheetAssignmentFieldView = ReturnType<
+  typeof buildPrintableWorksheetPageViewModel
+>['assignmentFieldViews'][number];
+
 function PrintableAssignmentWorksheetPage() {
   const { assignmentId } = Route.useParams();
   const { answerKey = false } = Route.useSearch();
@@ -81,7 +86,7 @@ function PrintableAssignmentWorksheetPage() {
       >
         <Spinner className="size-6" />
         <span className="sr-only">
-          {printableWorksheetPageCopy.loadingLabel}
+          {buildPrintableWorksheetLoadingView().message}
         </span>
       </main>
     );
@@ -95,7 +100,7 @@ function PrintableAssignmentWorksheetPage() {
       >
         <Card className="w-full rounded-lg">
           <CardContent className="p-6 text-sm text-destructive">
-            {printableWorksheetPageCopy.loadErrorMessage}
+            {buildPrintableWorksheetErrorView().message}
           </CardContent>
         </Card>
       </main>
@@ -106,6 +111,7 @@ function PrintableAssignmentWorksheetPage() {
     answerKey,
     worksheet: data,
   });
+  const { controlView, headerView } = pageView;
 
   return (
     <main
@@ -126,7 +132,7 @@ function PrintableAssignmentWorksheetPage() {
             className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
           >
             <IconArrowLeft className="size-4" />
-            {printableWorksheetPageCopy.backToResultsLabel}
+            {controlView.backToResultsLabel}
           </Link>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <label
@@ -135,14 +141,14 @@ function PrintableAssignmentWorksheetPage() {
             >
               <Switch
                 id="printable-answer-key"
-                checked={answerKey}
+                checked={controlView.answerKeyValue}
                 onCheckedChange={updateAnswerKey}
               />
-              <span>{printableWorksheetPageCopy.answerKeyLabel}</span>
+              <span>{controlView.answerKeyLabel}</span>
             </label>
             <Button type="button" onClick={() => window.print()}>
               <IconPrinter className="size-4" />
-              {printableWorksheetPageCopy.printButtonLabel}
+              {controlView.printButtonLabel}
             </Button>
           </div>
         </div>
@@ -155,21 +161,21 @@ function PrintableAssignmentWorksheetPage() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="rounded-md">
-                  {printableWorksheetPageCopy.printModeLabel}
+                  {headerView.printModeLabel}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
-                  {pageView.headerView.templateLabel}
+                  {headerView.templateLabel}
                 </Badge>
               </div>
               <h1 className="mt-3 text-2xl font-semibold leading-tight">
-                {pageView.headerView.assignmentTitle}
+                {headerView.assignmentTitle}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                {pageView.headerView.activityTitle}
+                {headerView.activityTitle}
               </p>
-              {pageView.headerView.activityDescription ? (
+              {headerView.activityDescription ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {pageView.headerView.activityDescription}
+                  {headerView.activityDescription}
                 </p>
               ) : null}
             </div>
@@ -179,10 +185,10 @@ function PrintableAssignmentWorksheetPage() {
             >
               <div className="flex items-center gap-2 font-medium">
                 <IconSchool className="size-4" />
-                {printableWorksheetPageCopy.brandLabel}
+                {headerView.brandLabel}
               </div>
               <p className="mt-1 text-muted-foreground">
-                {pageView.headerView.sharePath}
+                {headerView.sharePath}
               </p>
             </div>
           </header>
@@ -191,36 +197,12 @@ function PrintableAssignmentWorksheetPage() {
             data-print-assignment
             className="grid gap-3 rounded-lg border bg-muted/20 p-4 text-sm sm:grid-cols-2"
           >
-            <div>
-              <p className="font-medium">
-                {printableWorksheetPageCopy.studentNameLabel}
-              </p>
-              <div className="mt-3 h-8 border-b" />
-            </div>
-            <div>
-              <p className="font-medium">
-                {printableWorksheetPageCopy.sharePathLabel}
-              </p>
-              <p className="mt-2 text-muted-foreground">
-                {pageView.headerView.sharePath}
-              </p>
-            </div>
-            <div>
-              <p className="font-medium">
-                {printableWorksheetPageCopy.instructionsLabel}
-              </p>
-              <p className="mt-2 text-muted-foreground">
-                {pageView.headerView.instructions}
-              </p>
-            </div>
-            <div>
-              <p className="font-medium">
-                {printableWorksheetPageCopy.deliveryPolicyLabel}
-              </p>
-              <p className="mt-2 text-muted-foreground">
-                {pageView.headerView.deliveryPolicy}
-              </p>
-            </div>
+            {pageView.assignmentFieldViews.map((fieldView) => (
+              <PrintableWorksheetAssignmentField
+                key={fieldView.id}
+                fieldView={fieldView}
+              />
+            ))}
           </section>
 
           {pageView.itemViews.length > 0 ? (
@@ -231,30 +213,28 @@ function PrintableAssignmentWorksheetPage() {
             </section>
           ) : (
             <section className="rounded-lg border border-dashed p-6">
-              <h2 className="font-semibold">
-                {printableWorksheetPageCopy.emptyTitle}
-              </h2>
+              <h2 className="font-semibold">{pageView.emptyState.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {printableWorksheetPageCopy.emptyDescription}
+                {pageView.emptyState.description}
               </p>
             </section>
           )}
 
-          {pageView.showAnswerKey ? (
+          {pageView.answerKeyView.show ? (
             <section data-print-answer-key className="grid gap-3 border-t pt-5">
               <div className="flex items-center gap-2">
                 <IconKey className="size-5 text-primary" />
                 <div>
                   <h2 className="font-semibold">
-                    {printableWorksheetPageCopy.answerKeyTitle}
+                    {pageView.answerKeyView.title}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    {printableWorksheetPageCopy.answerKeyDescription}
+                    {pageView.answerKeyView.description}
                   </p>
                 </div>
               </div>
               <div className="grid gap-2">
-                {pageView.answerKeyItemViews.map((itemView) => (
+                {pageView.answerKeyView.itemViews.map((itemView) => (
                   <div
                     key={itemView.id}
                     className="rounded-lg border bg-muted/20 p-3 text-sm"
@@ -281,6 +261,23 @@ function PrintableAssignmentWorksheetPage() {
         </article>
       </div>
     </main>
+  );
+}
+
+function PrintableWorksheetAssignmentField({
+  fieldView,
+}: {
+  fieldView: PrintableWorksheetAssignmentFieldView;
+}) {
+  return (
+    <div>
+      <p className="font-medium">{fieldView.label}</p>
+      {fieldView.kind === 'blank-line' ? (
+        <div className="mt-3 h-8 border-b" />
+      ) : (
+        <p className="mt-2 text-muted-foreground">{fieldView.value}</p>
+      )}
+    </div>
   );
 }
 

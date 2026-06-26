@@ -24,8 +24,48 @@ type PrintableWorksheetAnswerKeyItemView = ReturnType<
   typeof buildPrintableWorksheetAnswerKeyItemView
 >;
 
+type PrintableWorksheetAssignmentFieldView =
+  | {
+      id: 'student-name';
+      kind: 'blank-line';
+      label: string;
+    }
+  | {
+      id: 'delivery-policy' | 'instructions' | 'share-path';
+      kind: 'text';
+      label: string;
+      value: string;
+    };
+
+type PrintableWorksheetAnswerKeyView = {
+  description: string;
+  itemViews: PrintableWorksheetAnswerKeyItemView[];
+  show: boolean;
+  title: string;
+};
+
+type PrintableWorksheetControlView = {
+  answerKeyLabel: string;
+  answerKeyValue: boolean;
+  backToResultsLabel: string;
+  printButtonLabel: string;
+};
+
+type PrintableWorksheetEmptyState = {
+  description: string;
+  title: string;
+};
+
+type PrintableWorksheetLoadStateView = {
+  message: string;
+};
+
 type PrintableWorksheetPageViewModel = {
+  answerKeyView: PrintableWorksheetAnswerKeyView;
   answerKeyItemViews: PrintableWorksheetAnswerKeyItemView[];
+  assignmentFieldViews: PrintableWorksheetAssignmentFieldView[];
+  controlView: PrintableWorksheetControlView;
+  emptyState: PrintableWorksheetEmptyState;
   headerView: PrintableWorksheetHeaderView;
   itemViews: PrintableWorksheetItemView[];
   showAnswerKey: boolean;
@@ -89,9 +129,11 @@ export function buildPrintableWorksheetHeaderView(
     activityDescription: worksheet.activityDescription,
     activityTitle: worksheet.activityTitle,
     assignmentTitle: worksheet.assignmentTitle,
+    brandLabel: printableWorksheetPageCopy.brandLabel,
     deliveryPolicy: worksheet.deliveryPolicyText,
     instructions:
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
+    printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
     templateLabel: getTemplateByType(worksheet.templateType).name,
   };
@@ -107,12 +149,99 @@ export function buildPrintableWorksheetPageViewModel({
   const answerKeyItemViews = worksheet.answerKey?.map(
     buildPrintableWorksheetAnswerKeyItemView
   );
+  const headerView = buildPrintableWorksheetHeaderView(worksheet);
+  const answerKeyView = buildPrintableWorksheetAnswerKeyView({
+    answerKey,
+    itemViews: answerKeyItemViews ?? [],
+  });
 
   return {
+    answerKeyView,
     answerKeyItemViews: answerKeyItemViews ?? [],
-    headerView: buildPrintableWorksheetHeaderView(worksheet),
+    assignmentFieldViews:
+      buildPrintableWorksheetAssignmentFieldViews(headerView),
+    controlView: buildPrintableWorksheetControlView({ answerKey }),
+    emptyState: buildPrintableWorksheetEmptyState(),
+    headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
-    showAnswerKey: answerKey && Boolean(answerKeyItemViews?.length),
+    showAnswerKey: answerKeyView.show,
+  };
+}
+
+export function buildPrintableWorksheetLoadingView(): PrintableWorksheetLoadStateView {
+  return {
+    message: printableWorksheetPageCopy.loadingLabel,
+  };
+}
+
+export function buildPrintableWorksheetErrorView(): PrintableWorksheetLoadStateView {
+  return {
+    message: printableWorksheetPageCopy.loadErrorMessage,
+  };
+}
+
+export function buildPrintableWorksheetControlView({
+  answerKey,
+}: {
+  answerKey: boolean;
+}): PrintableWorksheetControlView {
+  return {
+    answerKeyLabel: printableWorksheetPageCopy.answerKeyLabel,
+    answerKeyValue: answerKey,
+    backToResultsLabel: printableWorksheetPageCopy.backToResultsLabel,
+    printButtonLabel: printableWorksheetPageCopy.printButtonLabel,
+  };
+}
+
+export function buildPrintableWorksheetAssignmentFieldViews(
+  headerView: PrintableWorksheetHeaderView
+): PrintableWorksheetAssignmentFieldView[] {
+  return [
+    {
+      id: 'student-name',
+      kind: 'blank-line',
+      label: printableWorksheetPageCopy.studentNameLabel,
+    },
+    {
+      id: 'share-path',
+      kind: 'text',
+      label: printableWorksheetPageCopy.sharePathLabel,
+      value: headerView.sharePath,
+    },
+    {
+      id: 'instructions',
+      kind: 'text',
+      label: printableWorksheetPageCopy.instructionsLabel,
+      value: headerView.instructions,
+    },
+    {
+      id: 'delivery-policy',
+      kind: 'text',
+      label: printableWorksheetPageCopy.deliveryPolicyLabel,
+      value: headerView.deliveryPolicy,
+    },
+  ];
+}
+
+export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyState {
+  return {
+    description: printableWorksheetPageCopy.emptyDescription,
+    title: printableWorksheetPageCopy.emptyTitle,
+  };
+}
+
+export function buildPrintableWorksheetAnswerKeyView({
+  answerKey,
+  itemViews,
+}: {
+  answerKey: boolean;
+  itemViews: PrintableWorksheetAnswerKeyItemView[];
+}): PrintableWorksheetAnswerKeyView {
+  return {
+    description: printableWorksheetPageCopy.answerKeyDescription,
+    itemViews,
+    show: answerKey && itemViews.length > 0,
+    title: printableWorksheetPageCopy.answerKeyTitle,
   };
 }
 

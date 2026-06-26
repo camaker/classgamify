@@ -317,7 +317,9 @@ import {
 } from '@/assignments/printable-worksheet';
 import {
   buildPrintableWorksheetAnswerKeyItemView,
+  buildPrintableWorksheetErrorView,
   buildPrintableWorksheetItemView,
+  buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
 } from '@/assignments/printable-worksheet-view';
 import {
@@ -6031,21 +6033,76 @@ const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
 });
 assert.deepEqual(
   {
+    answerKeyView: {
+      description: printableWorksheetPageView.answerKeyView.description,
+      itemIds: printableWorksheetPageView.answerKeyView.itemViews.map(
+        (item) => item.id
+      ),
+      show: printableWorksheetPageView.answerKeyView.show,
+      title: printableWorksheetPageView.answerKeyView.title,
+    },
     answerKeyItemIds: printableWorksheetPageView.answerKeyItemViews.map(
       (item) => item.id
     ),
+    assignmentFieldViews: printableWorksheetPageView.assignmentFieldViews,
+    controlView: printableWorksheetPageView.controlView,
+    emptyState: printableWorksheetPageView.emptyState,
     headerView: printableWorksheetPageView.headerView,
     itemIds: printableWorksheetPageView.itemViews.map((item) => item.id),
     showAnswerKey: printableWorksheetPageView.showAnswerKey,
   },
   {
+    answerKeyView: {
+      description: 'Teacher-only answers from the frozen assignment snapshot.',
+      itemIds: ['q-frozen-prompt'],
+      show: true,
+      title: 'Answer key',
+    },
     answerKeyItemIds: ['q-frozen-prompt'],
+    assignmentFieldViews: [
+      {
+        id: 'student-name',
+        kind: 'blank-line',
+        label: 'Student name',
+      },
+      {
+        id: 'share-path',
+        kind: 'text',
+        label: 'Student link',
+        value: '/play/printable-1',
+      },
+      {
+        id: 'instructions',
+        kind: 'text',
+        label: 'Instructions',
+        value: 'Finish on paper.',
+      },
+      {
+        id: 'delivery-policy',
+        kind: 'text',
+        label: 'Delivery policy',
+        value: printableSnapshotWorksheetWithAnswers.deliveryPolicyText,
+      },
+    ],
+    controlView: {
+      answerKeyLabel: 'Include answer key',
+      answerKeyValue: true,
+      backToResultsLabel: 'Back to results',
+      printButtonLabel: 'Print',
+    },
+    emptyState: {
+      description:
+        'Add questions, pairs, or groups to the activity before printing this assignment.',
+      title: 'No printable items yet.',
+    },
     headerView: {
       activityDescription: 'Frozen activity description',
       activityTitle: 'Frozen activity title',
       assignmentTitle: 'Printable assignment',
+      brandLabel: 'ClassGamify worksheet',
       deliveryPolicy: printableSnapshotWorksheetWithAnswers.deliveryPolicyText,
       instructions: 'Finish on paper.',
+      printModeLabel: 'Printable practice',
       sharePath: '/play/printable-1',
       templateLabel: 'Quiz',
     },
@@ -6057,9 +6114,16 @@ assert.deepEqual(
   buildPrintableWorksheetPageViewModel({
     answerKey: false,
     worksheet: printableSnapshotWorksheetWithAnswers,
-  }).showAnswerKey,
+  }).answerKeyView.show,
   false
 );
+assert.deepEqual(buildPrintableWorksheetLoadingView(), {
+  message: 'Loading printable worksheet',
+});
+assert.deepEqual(buildPrintableWorksheetErrorView(), {
+  message:
+    'Printable worksheet could not be loaded. Return to results and try again.',
+});
 assert.equal(
   buildOpenPublicAssignmentPayload({
     ...publicAssignmentPayloadSource,
@@ -8332,6 +8396,26 @@ assert.match(
   /buildPrintableWorksheetPageViewModel[\s\S]*worksheet\.answerKey\?\.map\(\s*buildPrintableWorksheetAnswerKeyItemView\s*\)/,
   'Printable worksheet page view-model should own formatted answer-key item views.'
 );
+assert.match(
+  printableWorksheetViewSource,
+  /controlView: buildPrintableWorksheetControlView\(\{ answerKey \}\)/,
+  'Printable worksheet page view-model should own printable toolbar state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /assignmentFieldViews:[\s\S]*buildPrintableWorksheetAssignmentFieldViews/,
+  'Printable worksheet page view-model should own printable assignment field rows.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /const answerKeyView = buildPrintableWorksheetAnswerKeyView/,
+  'Printable worksheet page view-model should own answer-key section state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /emptyState: buildPrintableWorksheetEmptyState\(\)/,
+  'Printable worksheet page view-model should own empty worksheet state.'
+);
 const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
   'utf8'
@@ -8381,6 +8465,31 @@ assert.doesNotMatch(
   /buildPrintableWorksheetHeaderView|buildPrintableWorksheetItemView|buildPrintableWorksheetAnswerKeyItemView/,
   'Printable worksheet route should not directly rebuild header, item, or answer-key display state.'
 );
+assert.doesNotMatch(
+  printableAssignmentRouteSource,
+  /printableWorksheetPageCopy/,
+  'Printable worksheet route should render localized page copy through printable worksheet view models.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /pageView\.assignmentFieldViews\.map/,
+  'Printable worksheet route should render assignment fields from the printable worksheet page view-model.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /pageView\.answerKeyView\.show/,
+  'Printable worksheet route should render answer-key visibility from the printable worksheet page view-model.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /pageView\.emptyState\.title/,
+  'Printable worksheet route should render the empty printable state from the printable worksheet page view-model.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /controlView\.printButtonLabel/,
+  'Printable worksheet route should render toolbar copy from the printable worksheet control view.'
+);
 assert.match(
   printableAssignmentRouteSource,
   /data-print-choice-bank=\{itemView\.choiceBank\.presentation\}/,
@@ -8403,7 +8512,7 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /pageView\.answerKeyItemViews\.map/,
+  /pageView\.answerKeyView\.itemViews\.map/,
   'Printable worksheet route should render answer-key items from the printable worksheet page view-model.'
 );
 assert.match(
