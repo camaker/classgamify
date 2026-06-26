@@ -4,6 +4,7 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import {
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentLifecycleStatusFilter,
@@ -466,16 +467,21 @@ export function buildAssignmentListCardStats({
   averageScore: number;
   completions: number;
 }): AssignmentListCardStat[] {
+  const statsView = buildAssignmentAttemptStatsView({
+    averageScore,
+    completions,
+  });
+
   return [
     {
       key: 'completions',
       label: m.assignment_list_card_stat_completions(),
-      value: formatAssignmentResultNumber(completions, { min: 0 }),
+      value: formatAssignmentResultNumber(statsView.completions, { min: 0 }),
     },
     {
       key: 'average',
       label: m.assignment_list_card_stat_average(),
-      value: formatAssignmentResultPercent(averageScore),
+      value: formatAssignmentResultPercent(statsView.averageScore),
     },
   ];
 }

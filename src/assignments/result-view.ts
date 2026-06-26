@@ -5,6 +5,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import {
@@ -694,12 +695,22 @@ export function buildAssignmentResultMetricItems({
   completions: number;
   expiresAt: Date | string | null | undefined;
 }) {
+  const statsView = buildAssignmentAttemptStatsView({
+    averageDurationSeconds,
+    averagePoints,
+    averageScore,
+    completions,
+  });
   const valueByMetric = {
-    'average-accuracy': formatAssignmentResultPercent(averageScore),
-    'average-points': formatAssignmentResultNumber(averagePoints, { min: 0 }),
-    'average-time': formatAttemptDuration(averageDurationSeconds),
+    'average-accuracy': formatAssignmentResultPercent(statsView.averageScore),
+    'average-points': formatAssignmentResultNumber(statsView.averagePoints, {
+      min: 0,
+    }),
+    'average-time': formatAttemptDuration(statsView.averageDurationSeconds),
     closes: formatAssignmentExpiry(expiresAt),
-    completions: formatAssignmentResultNumber(completions, { min: 0 }),
+    completions: formatAssignmentResultNumber(statsView.completions, {
+      min: 0,
+    }),
   } satisfies Record<AssignmentResultMetricKey, string>;
 
   return assignmentResultMetricDescriptors.map((metric) => ({
@@ -820,9 +831,11 @@ export function buildAssignmentResultActionState({
 export function getAssignmentResultCompletedAttemptCount(
   completions: number | null | undefined
 ) {
-  return Number.isFinite(completions)
-    ? Math.max(0, Math.trunc(completions))
-    : 0;
+  return (
+    buildAssignmentAttemptStatsView({
+      completions: completions ?? undefined,
+    }).completions ?? 0
+  );
 }
 
 export function buildAssignmentResultActionButtons({
@@ -895,12 +908,7 @@ export function buildAssignmentResultCopyText({
     return buildAssignmentClassroomBrief({
       assignmentTitle,
       items,
-      stats: {
-        averageDurationSeconds: data.stats.averageDurationSeconds ?? null,
-        averagePoints: data.stats.averagePoints,
-        averageScore: data.stats.averageScore,
-        completions: data.stats.completions,
-      },
+      stats: getAssignmentResultClassroomBriefStats(data.stats),
       students,
     }).text;
   }
@@ -1825,12 +1833,7 @@ export function buildAssignmentResultsPageViewModel<
     ? buildAssignmentClassroomBrief({
         assignmentTitle: data.assignment.title,
         items: data.analysis.perItem,
-        stats: {
-          averageDurationSeconds: data.stats.averageDurationSeconds ?? null,
-          averagePoints: data.stats.averagePoints,
-          averageScore: data.stats.averageScore,
-          completions: data.stats.completions,
-        },
+        stats: getAssignmentResultClassroomBriefStats(data.stats),
         students: data.analysis.students,
       })
     : null;
@@ -2102,4 +2105,18 @@ function getNoAttemptResultActionMessage(action: AssignmentResultAction) {
   }
 
   return m.assignment_result_action_gate_submit_attempt_brief();
+}
+
+function getAssignmentResultClassroomBriefStats({
+  averageDurationSeconds,
+  averagePoints,
+  averageScore,
+  completions,
+}: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>['stats']) {
+  return {
+    averageDurationSeconds: averageDurationSeconds ?? null,
+    averagePoints,
+    averageScore,
+    completions,
+  };
 }

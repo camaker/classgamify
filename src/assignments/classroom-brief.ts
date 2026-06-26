@@ -2,8 +2,12 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  formatAssignmentResultNumber,
+  formatAssignmentResultPercent,
+} from '@/assignments/result-format';
 import {
   formatAssignmentSummaryAccuracy,
   formatAssignmentSummaryCorrectCount,
@@ -65,20 +69,21 @@ export function buildAssignmentClassroomBrief({
 }: AssignmentClassroomBriefInput): AssignmentClassroomBrief {
   const focusItems = getClassroomBriefFocusItems(items);
   const followUpStudents = getClassroomBriefFollowUpStudents(students);
+  const statsView = buildAssignmentAttemptStatsView(stats);
   const lines = [
     m.assignment_classroom_brief_title({ title: assignmentTitle }),
     '',
     m.assignment_classroom_brief_completions({
-      count: stats.completions,
+      count: statsView.completions ?? 0,
     }),
     m.assignment_classroom_brief_average_accuracy({
-      accuracy: formatAssignmentSummaryAccuracy(stats.averageScore),
+      accuracy: formatAssignmentSummaryAccuracy(statsView.averageScore),
     }),
     m.assignment_classroom_brief_average_points({
-      points: stats.averagePoints,
+      points: formatAssignmentResultNumber(statsView.averagePoints),
     }),
     m.assignment_classroom_brief_average_time({
-      time: formatAttemptDuration(stats.averageDurationSeconds),
+      time: formatAttemptDuration(statsView.averageDurationSeconds),
     }),
     '',
     m.assignment_classroom_brief_focus_heading(),

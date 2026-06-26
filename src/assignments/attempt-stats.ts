@@ -12,11 +12,19 @@ interface AssignmentAttemptStatsByAssignmentSource
   assignmentId: string;
 }
 
-type AssignmentAttemptStats = {
+export type AssignmentAttemptStats = {
   averageDurationSeconds: number;
   averagePoints: number;
   averageScore: number;
   completions: number;
+};
+
+export type AssignmentAttemptStatsView = {
+  averageDurationSeconds: number | undefined;
+  averagePoints: number | undefined;
+  averageScore: number | undefined;
+  completed: boolean;
+  completions: number | undefined;
 };
 
 export function summarizeAssignmentAttempts(
@@ -118,4 +126,96 @@ export function summarizeAssignmentAttemptsByAssignmentId(
       summarizeAssignmentAttempts(items),
     ])
   );
+}
+
+export function normalizeAssignmentAttemptStats(
+  stats: Partial<AssignmentAttemptStats> | null | undefined
+): AssignmentAttemptStats {
+  return {
+    averageDurationSeconds: normalizeStatsNumber(
+      stats?.averageDurationSeconds,
+      {
+        round: true,
+      }
+    ),
+    averagePoints: normalizeStatsNumber(stats?.averagePoints, {
+      round: true,
+    }),
+    averageScore: normalizeStatsNumber(stats?.averageScore, {
+      round: true,
+    }),
+    completions: normalizeStatsNumber(stats?.completions, {
+      floor: true,
+    }),
+  };
+}
+
+export function buildAssignmentAttemptStatsView(
+  stats: Partial<AssignmentAttemptStats> | null | undefined
+): AssignmentAttemptStatsView {
+  const completions = normalizeStatsViewCount(stats?.completions, {
+    floor: true,
+  });
+  const completed = completions !== undefined && completions > 0;
+
+  return {
+    averageDurationSeconds: completed
+      ? normalizeStatsViewAverage(stats?.averageDurationSeconds, {
+          round: true,
+        })
+      : undefined,
+    averagePoints: completed
+      ? normalizeStatsViewAverage(stats?.averagePoints, {
+          round: true,
+        })
+      : undefined,
+    averageScore: completed
+      ? normalizeStatsViewAverage(stats?.averageScore, {
+          round: true,
+        })
+      : undefined,
+    completed,
+    completions,
+  };
+}
+
+function normalizeStatsNumber(
+  value: number | null | undefined,
+  options?: {
+    floor?: boolean;
+    round?: boolean;
+  }
+) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+
+  const boundedValue = Math.max(0, value);
+  if (options?.floor) return Math.floor(boundedValue);
+  return options?.round ? Math.round(boundedValue) : boundedValue;
+}
+
+function normalizeStatsViewCount(
+  value: number | null | undefined,
+  options?: {
+    floor?: boolean;
+    round?: boolean;
+  }
+) {
+  if (value === null || value === undefined) return 0;
+  if (!Number.isFinite(value)) return undefined;
+
+  return normalizeStatsNumber(value, options);
+}
+
+function normalizeStatsViewAverage(
+  value: number | null | undefined,
+  options?: {
+    floor?: boolean;
+    round?: boolean;
+  }
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return undefined;
+  }
+
+  return normalizeStatsNumber(value, options);
 }

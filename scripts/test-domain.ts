@@ -253,6 +253,8 @@ import {
 } from '@/pages/public-page-view';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import {
+  buildAssignmentAttemptStatsView,
+  normalizeAssignmentAttemptStats,
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
 } from '@/assignments/attempt-stats';
@@ -1043,6 +1045,11 @@ const assignmentClassroomBriefSource = readFileSync(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /buildAssignmentAttemptStatsView\(stats\)/,
+  'Classroom brief should format assignment-level metrics through the shared attempt stats view.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /ASSIGNMENT_CLASSROOM_BRIEF_LIMITS[\s\S]*focusItems: 3[\s\S]*followUpStudents: 6/,
   'Classroom brief focus and follow-up limits should be named assignment-domain constants.'
 );
@@ -1093,6 +1100,43 @@ const assignmentResultViewSource = readFileSync(
   'src/assignments/result-view.ts',
   'utf8'
 );
+const assignmentAttemptStatsSource = readFileSync(
+  'src/assignments/attempt-stats.ts',
+  'utf8'
+);
+const assignmentListSummarySource = readFileSync(
+  'src/assignments/list-summary.ts',
+  'utf8'
+);
+const assignmentListViewStatsSource = readFileSync(
+  'src/assignments/list-view.ts',
+  'utf8'
+);
+assert.match(
+  assignmentAttemptStatsSource,
+  /export function normalizeAssignmentAttemptStats/,
+  'Assignment attempt stats should expose a shared normalization helper.'
+);
+assert.match(
+  assignmentAttemptStatsSource,
+  /export function buildAssignmentAttemptStatsView/,
+  'Assignment attempt stats should expose a shared display view helper.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentAttemptStatsView\(\{[\s\S]*averageDurationSeconds[\s\S]*completions[\s\S]*\}\)/,
+  'Assignment result metrics should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentListSummarySource,
+  /buildAssignmentAttemptStatsView\(resolvedSummary\)/,
+  'Assignment list summary metrics should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentListViewStatsSource,
+  /buildAssignmentAttemptStatsView\(\{[\s\S]*averageScore,[\s\S]*completions,[\s\S]*\}\)/,
+  'Assignment list cards should format values through the shared attempt stats view.'
+);
 assert.match(
   assignmentResultsSource,
   /ASSIGNMENT_RESULTS_ANALYSIS_LIMITS[\s\S]*needsReviewItems: 3/,
@@ -1111,6 +1155,16 @@ assert.doesNotMatch(
 const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /const statsView = buildAssignmentAttemptStatsView\(data\.stats\)/,
+  'Assignment CSV export should format aggregate metrics through the shared attempt stats view.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /data\.stats\.completions > 0/,
+  'Assignment CSV export should not use a local raw completion-count check for average duration.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -11989,7 +12043,7 @@ assert.deepEqual(
     { id: 'total', label: 'Assignments', value: '0' },
     { id: 'open', label: 'Open links', value: '0' },
     { id: 'completions', label: 'Completions', value: '0' },
-    { id: 'average', label: 'Average', value: '0%' },
+    { id: 'average', label: 'Average', value: '-' },
   ]
 );
 assert.deepEqual(
@@ -12118,7 +12172,7 @@ assert.deepEqual(
       { id: 'total', label: 'Assignments', value: '0' },
       { id: 'open', label: 'Open links', value: '0' },
       { id: 'completions', label: 'Completions', value: '0' },
-      { id: 'average', label: 'Average', value: '0%' },
+      { id: 'average', label: 'Average', value: '-' },
     ],
     title: 'Assignments',
     totalAssignments: 0,
@@ -12272,6 +12326,16 @@ assert.deepEqual(
   }),
   [
     { key: 'completions', label: 'Completions', value: '-' },
+    { key: 'average', label: 'Average', value: '-' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: 0,
+    completions: 0,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '0' },
     { key: 'average', label: 'Average', value: '-' },
   ]
 );
@@ -16460,6 +16524,93 @@ assert.deepEqual(summarizeAssignmentAttempts([]), {
   averageScore: 0,
   completions: 0,
 });
+assert.deepEqual(normalizeAssignmentAttemptStats(null), {
+  averageDurationSeconds: 0,
+  averagePoints: 0,
+  averageScore: 0,
+  completions: 0,
+});
+assert.deepEqual(
+  normalizeAssignmentAttemptStats({
+    averageDurationSeconds: 12.4,
+    averagePoints: -1,
+    averageScore: Number.NaN,
+    completions: 2.8,
+  }),
+  {
+    averageDurationSeconds: 12,
+    averagePoints: 0,
+    averageScore: 0,
+    completions: 2,
+  }
+);
+assert.deepEqual(buildAssignmentAttemptStatsView(undefined), {
+  averageDurationSeconds: undefined,
+  averagePoints: undefined,
+  averageScore: undefined,
+  completed: false,
+  completions: 0,
+});
+assert.deepEqual(
+  buildAssignmentAttemptStatsView({
+    averageDurationSeconds: 0,
+    averagePoints: 0,
+    averageScore: 0,
+    completions: 0,
+  }),
+  {
+    averageDurationSeconds: undefined,
+    averagePoints: undefined,
+    averageScore: undefined,
+    completed: false,
+    completions: 0,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptStatsView({
+    averageDurationSeconds: 12.4,
+    averagePoints: 1.6,
+    averageScore: 76.6,
+    completions: 2.8,
+  }),
+  {
+    averageDurationSeconds: 12,
+    averagePoints: 2,
+    averageScore: 77,
+    completed: true,
+    completions: 2,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptStatsView({
+    averageDurationSeconds: Number.NaN,
+    averagePoints: Number.POSITIVE_INFINITY,
+    averageScore: -4,
+    completions: 2,
+  }),
+  {
+    averageDurationSeconds: undefined,
+    averagePoints: undefined,
+    averageScore: 0,
+    completed: true,
+    completions: 2,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptStatsView({
+    averageDurationSeconds: 60,
+    averagePoints: 2,
+    averageScore: 50,
+    completions: Number.POSITIVE_INFINITY,
+  }),
+  {
+    averageDurationSeconds: undefined,
+    averagePoints: undefined,
+    averageScore: undefined,
+    completed: false,
+    completions: undefined,
+  }
+);
 assert.deepEqual(
   summarizeAssignmentAttempts([
     {
@@ -17811,6 +17962,26 @@ assert.deepEqual(
       key: 'closes',
       label: 'Closes',
       value: formatAssignmentExpiry('not-a-date'),
+    },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationSeconds: 0,
+    averagePoints: 0,
+    averageScore: 0,
+    completions: 0,
+    expiresAt: null,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '0' },
+    { key: 'average-accuracy', label: 'Average accuracy', value: '-' },
+    { key: 'average-points', label: 'Average points', value: '-' },
+    { key: 'average-time', label: 'Average time', value: '-' },
+    {
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry(null),
     },
   ]
 );
@@ -19836,6 +20007,21 @@ assert.match(
   classroomBrief.text,
   /- 1\. Anonymous student 1: 0% latest, 1 item to review/
 );
+const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
+  assignmentTitle: csvExportData.assignment.title,
+  items: resultAnalysis.perItem,
+  stats: {
+    averageDurationSeconds: Number.NaN,
+    averagePoints: Number.POSITIVE_INFINITY,
+    averageScore: Number.NaN,
+    completions: Number.POSITIVE_INFINITY,
+  },
+  students: resultAnalysis.students,
+});
+assert.match(invalidStatsClassroomBrief.text, /Completions: 0/);
+assert.match(invalidStatsClassroomBrief.text, /Average accuracy: -/);
+assert.match(invalidStatsClassroomBrief.text, /Average points: -/);
+assert.match(invalidStatsClassroomBrief.text, /Average time: -/);
 const expandedClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
   items: reviewPriorityItems,

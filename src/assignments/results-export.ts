@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
@@ -70,6 +71,7 @@ type AssignmentResultsExportData = {
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
   const resolvedSource = resolveAssignmentSnapshotSource(data);
+  const statsView = buildAssignmentAttemptStatsView(data.stats);
   const deliverySummaryById = new Map(
     buildAssignmentDeliverySummary({
       collectStudentName: settings.collectStudentName,
@@ -114,11 +116,11 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       settings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
-      formatAssignmentExportNumber(data.stats.completions, { min: 0 }),
-      formatAssignmentExportNumber(data.stats.averageScore, { min: 0 }),
-      formatAssignmentExportNumber(data.stats.averagePoints, { min: 0 }),
-      data.stats.completions > 0
-        ? formatAssignmentExportNumber(data.stats.averageDurationSeconds, {
+      formatAssignmentExportNumber(statsView.completions, { min: 0 }),
+      formatAssignmentExportNumber(statsView.averageScore, { min: 0 }),
+      formatAssignmentExportNumber(statsView.averagePoints, { min: 0 }),
+      statsView.completed
+        ? formatAssignmentExportNumber(statsView.averageDurationSeconds, {
             min: 0,
             round: true,
           })

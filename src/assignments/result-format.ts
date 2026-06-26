@@ -33,12 +33,14 @@ export function formatAssignmentResultCsvDate(value: ResultDateValue) {
 }
 
 export function formatAssignmentResultPercent(
-  value: number,
+  value: number | null | undefined,
   options?: {
     emptyValue?: string;
   }
 ) {
-  if (!Number.isFinite(value)) return options?.emptyValue ?? '-';
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return options?.emptyValue ?? '-';
+  }
 
   return `${Math.round(value)}%`;
 }

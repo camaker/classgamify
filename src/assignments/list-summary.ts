@@ -1,5 +1,6 @@
 import type { AssignmentStatus } from '@/activities/types';
 import {
+  buildAssignmentAttemptStatsView,
   summarizeAssignmentAttempts,
   type AssignmentAttemptStatsSource,
 } from '@/assignments/attempt-stats';
@@ -109,6 +110,7 @@ export function buildAssignmentListSummaryMetrics({
     openAssignments: 0,
     totalAssignments,
   };
+  const statsView = buildAssignmentAttemptStatsView(resolvedSummary);
 
   return [
     {
@@ -130,14 +132,14 @@ export function buildAssignmentListSummaryMetrics({
     {
       id: 'completions',
       label: m.assignment_list_summary_completions(),
-      value: formatAssignmentResultNumber(resolvedSummary.completions, {
+      value: formatAssignmentResultNumber(statsView.completions, {
         min: 0,
       }),
     },
     {
       id: 'average',
       label: m.assignment_list_summary_average(),
-      value: formatAssignmentResultPercent(resolvedSummary.averageScore),
+      value: formatAssignmentResultPercent(statsView.averageScore),
     },
   ];
 }
