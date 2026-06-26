@@ -532,6 +532,7 @@ import {
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
+  buildStudentRunnerSeoView,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
@@ -2438,10 +2439,25 @@ assert.match(
   /buildStudentRunnerPageViewModel/,
   'Student play route should consume the assignment-domain runner page view-model.'
 );
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerSeoView/,
+  'Student play route should consume assignment-domain SEO view state.'
+);
 assert.doesNotMatch(
   playRouteSource,
   /getStudentRunnerAttemptStartedAt|buildStudentRunnerAttemptState|buildAttemptTimerState|buildAttemptCompletionCopy|buildAnonymousAttemptCopy|buildStudentAttemptControlState|buildStudentAttemptResultDisplay|buildStudentAttemptTimerBadge|canStartAnotherStudentAttempt|formatStudentAttemptUsageLabel|buildStudentRunnerHeaderView/,
   'Student play route should not rebuild runner page, timer, completion, result, or header view state directly.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /getStudentRunnerCopy|buildStudentRunnerMissingView/,
+  'Student play route should render student-runner shell copy from the page view-model.'
+);
+assert.match(
+  playRouteSource,
+  /runnerPageView\.loadingView|runnerPageView\.missingView|runnerPageView\.controlView|runnerPageView\.identityView|runnerPageView\.resultPanelView/,
+  'Student play route should consume route-facing student-runner view fields.'
 );
 assert.match(
   playRouteSource,
@@ -2843,6 +2859,11 @@ assert.deepEqual(getStudentRunnerCopy(), {
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
   timeEndedLabel: 'Time ended',
   teacherViewLabel: 'Teacher view',
+});
+assert.deepEqual(buildStudentRunnerSeoView(), {
+  description:
+    'Open a public student activity runner from a teacher assignment link.',
+  titlePrefix: 'Student activity',
 });
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -6667,12 +6688,19 @@ assert.deepEqual(
     attemptTimerBadge: studentRunnerPageView.attemptTimerBadge,
     attemptUsageLabel: studentRunnerPageView.attemptUsageLabel,
     completionCopy: studentRunnerPageView.completionCopy,
+    controlView: studentRunnerPageView.controlView,
     currentAttemptSessionKey: studentRunnerPageView.currentAttemptSessionKey,
     headerView: studentRunnerPageView.headerView,
+    identityView: studentRunnerPageView.identityView,
     itemCount: studentRunnerPageView.itemCount,
+    loadingView: studentRunnerPageView.loadingView,
+    missingView: studentRunnerPageView.missingView,
+    resultPanelView: studentRunnerPageView.resultPanelView,
+    routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
     runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: studentRunnerPageView.showStartAnotherAttempt,
     startedAt: studentRunnerPageView.startedAt,
+    submissionSuccessMessage: studentRunnerPageView.submissionSuccessMessage,
     timeLimitSeconds: studentRunnerPageView.timeLimitSeconds,
   },
   {
@@ -6704,6 +6732,21 @@ assert.deepEqual(
       submitButtonLabel: 'Submit answers',
       unansweredLabel: undefined,
     },
+    controlView: {
+      progressLabel: '1/1 answered',
+      readOnlyMessage: undefined,
+      runnerTitle: 'Quiz',
+      runtimeItemsDisabled: true,
+      showTimeExpiredMessage: false,
+      submitButtonLabel: 'Submit answers',
+      submitDisabled: true,
+      timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
+      timerBadge: {
+        label: '',
+        show: false,
+      },
+      unansweredLabel: undefined,
+    },
     currentAttemptSessionKey: buildStudentAttemptSessionKey({
       assignmentId: publicRunnerState.assignment.id,
       runtimeItems: publicRunnerState.runtimeItems,
@@ -6714,10 +6757,33 @@ assert.deepEqual(
       assignment: publicRunnerState.assignment,
       itemCount: publicRunnerState.runtimeItems.length,
     }),
+    identityView: {
+      copy: {
+        description: `This assignment does not collect student names. This browser will submit as ${getAnonymousBrowserLabel('browser-1')}.`,
+        title: 'Anonymous attempt',
+      },
+      mode: 'anonymous',
+    },
     itemCount: publicRunnerState.runtimeItems.length,
+    loadingView: {
+      message: 'Loading student activity...',
+    },
+    missingView: undefined,
+    resultPanelView: {
+      accuracyLabel: '50% accuracy',
+      attemptUsageLabel: '1 attempt left',
+      durationLabel: 'Time: 1:20',
+      scoreLabel: '1/2',
+      show: true,
+      showStartAnotherAttempt: true,
+      startAnotherAttemptLabel: 'Start another attempt',
+      statusLabel: 'Score submitted',
+    },
+    routeBadgeLabel: 'Student play route',
     runtimeItemIds: publicRunnerState.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: true,
     startedAt: 1_000,
+    submissionSuccessMessage: 'Attempt submitted.',
     timeLimitSeconds: undefined,
   }
 );
@@ -6741,6 +6807,49 @@ assert.deepEqual(
     unansweredLabel: undefined,
   }
 );
+const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 2_000,
+  isSubmitting: false,
+  pageState: { reason: 'closed', status: 'missing' },
+  shareId: 'missing-share',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(missingStudentRunnerPageView.loadingView, {
+  message: 'Loading student activity...',
+});
+assert.deepEqual(missingStudentRunnerPageView.missingView, {
+  badgeLabel: 'Student play route',
+  browseTemplatesLabel: 'Browse templates',
+  description:
+    'This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.',
+  title: 'Assignment closed',
+});
+assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
+  show: false,
+});
+assert.equal(missingStudentRunnerPageView.identityView, undefined);
+const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 2_000,
+  isSubmitting: false,
+  pageState: starterRunnerState,
+  shareId: 'demo-runner',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(namedStudentRunnerPageView.identityView, {
+  label: 'Student name',
+  mode: 'student-name',
+  placeholder: 'Type your name',
+});
+assert.equal(namedStudentRunnerPageView.controlView.runnerTitle, 'Quiz');
+assert.deepEqual(namedStudentRunnerPageView.resultPanelView, {
+  show: false,
+});
 assert.deepEqual(
   buildStudentRunnerAttemptClock({
     activeShareId: ' share-public ',

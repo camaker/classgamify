@@ -21,8 +21,6 @@ import {
   buildStudentAnswerChange,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
-  buildStudentRunnerMissingView,
-  getStudentRunnerCopy,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
   resolveStudentAttemptSubmissionDurationSeconds,
@@ -32,6 +30,7 @@ import {
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
+  buildStudentRunnerSeoView,
   shouldStartStudentRunnerAttemptClock,
   shouldResetStudentRunnerAttemptSession,
   type StudentRunnerAttemptClock,
@@ -73,11 +72,11 @@ import { toast } from 'sonner';
 
 export const Route = createFileRoute('/play/$shareId')({
   head: ({ params }) => {
-    const runnerCopy = getStudentRunnerCopy();
+    const seoView = buildStudentRunnerSeoView();
 
     return seo(buildAssignmentSharePath(params.shareId), {
-      title: `${runnerCopy.seoTitlePrefix} | ${websiteConfig.metadata?.name}`,
-      description: runnerCopy.seoDescription,
+      title: `${seoView.titlePrefix} | ${websiteConfig.metadata?.name}`,
+      description: seoView.description,
       robots: 'noindex,follow',
     });
   },
@@ -158,13 +157,9 @@ function PlayPage() {
   const activeShareId = runnerPageView.activeShareId;
   const startedAt = runnerPageView.startedAt;
   const timeLimitSeconds = runnerPageView.timeLimitSeconds;
-  const runnerCopy = getStudentRunnerCopy();
-  const completionCopy = runnerPageView.completionCopy;
-  const attemptResultDisplay = runnerPageView.attemptResultDisplay;
-  const attemptControlState = runnerPageView.attemptControlState;
-  const attemptTimerBadge = runnerPageView.attemptTimerBadge;
-  const showStartAnotherAttempt = runnerPageView.showStartAnotherAttempt;
-  const attemptUsageLabel = runnerPageView.attemptUsageLabel;
+  const controlView = runnerPageView.controlView;
+  const identityView = runnerPageView.identityView;
+  const resultPanelView = runnerPageView.resultPanelView;
   const currentAttemptSessionKey = runnerPageView.currentAttemptSessionKey;
 
   useEffect(() => {
@@ -282,7 +277,7 @@ function PlayPage() {
         reviewItems: response.reviewItems,
       });
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
-      toast.success(runnerCopy.submissionSuccessMessage);
+      toast.success(runnerPageView.submissionSuccessMessage);
     } catch (error) {
       toast.error(resolveStudentAttemptSubmissionFailureMessage(error));
     }
@@ -303,7 +298,7 @@ function PlayPage() {
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-6xl rounded-lg border bg-card p-6">
           <p className="text-sm text-muted-foreground">
-            {runnerCopy.loadingMessage}
+            {runnerPageView.loadingView.message}
           </p>
         </div>
       </Container>
@@ -311,14 +306,15 @@ function PlayPage() {
   }
 
   if (pageState.status === 'missing') {
-    const missingView = buildStudentRunnerMissingView(pageState.reason);
+    const missingView = runnerPageView.missingView;
+    if (!missingView) return null;
 
     return (
       <Container className="px-4 py-10 md:py-14">
         <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
           <Badge variant="outline" className="rounded-md border-primary/30">
             <IconDeviceGamepad2 className="size-3.5" />
-            {runnerCopy.publicRouteBadgeLabel}
+            {missingView.badgeLabel}
           </Badge>
           <h1 className="mt-4 text-3xl font-bold tracking-tight">
             {missingView.title}
@@ -330,7 +326,7 @@ function PlayPage() {
             to={Routes.Templates}
             className={cn(buttonVariants(), 'mt-5 w-fit')}
           >
-            {runnerCopy.browseTemplatesLabel}
+            {missingView.browseTemplatesLabel}
           </Link>
         </div>
       </Container>
@@ -338,9 +334,7 @@ function PlayPage() {
   }
 
   const headerView = runnerPageView.headerView;
-  if (!activity || !assignment || !headerView) return null;
-
-  const runnerUiCopy = getActivityTemplateRunnerCopy(activity.templateType);
+  if (!activity || !assignment || !headerView || !identityView) return null;
 
   return (
     <Container className="px-4 py-10 md:py-14">
@@ -349,7 +343,7 @@ function PlayPage() {
           <div className="min-w-0 space-y-3">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconDeviceGamepad2 className="size-3.5" />
-              {runnerCopy.publicRouteBadgeLabel}
+              {runnerPageView.routeBadgeLabel}
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight">
               {headerView.title}
@@ -385,66 +379,64 @@ function PlayPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-medium">
               <IconPlayerPlay className="size-4 text-primary" />
-              {runnerUiCopy.title}
+              {controlView.runnerTitle}
             </div>
             <Badge variant="secondary" className="rounded-md">
-              {completionCopy.progressLabel}
+              {controlView.progressLabel}
             </Badge>
-            {attemptTimerBadge.show ? (
+            {controlView.timerBadge.show ? (
               <Badge variant="outline" className="rounded-md">
-                {attemptTimerBadge.label}
+                {controlView.timerBadge.label}
               </Badge>
             ) : null}
           </div>
 
           <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
-            {assignment.settings.collectStudentName ? (
+            {identityView.mode === 'student-name' ? (
               <div>
                 <label
                   htmlFor="student-name"
                   className="text-sm font-medium text-foreground"
                 >
-                  {runnerCopy.studentNameLabel}
+                  {identityView.label}
                 </label>
                 <Input
                   id="student-name"
                   value={studentName}
                   onChange={(event) => setStudentName(event.target.value)}
-                  placeholder={runnerCopy.studentNamePlaceholder}
+                  placeholder={identityView.placeholder}
                   className="mt-2"
                 />
               </div>
             ) : (
               <div className="rounded-lg border bg-muted/20 p-3">
-                <p className="text-sm font-medium">
-                  {runnerPageView.anonymousAttemptCopy.title}
-                </p>
+                <p className="text-sm font-medium">{identityView.copy.title}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {runnerPageView.anonymousAttemptCopy.description}
+                  {identityView.copy.description}
                 </p>
               </div>
             )}
-            {result ? (
+            {resultPanelView.show ? (
               <div className="rounded-lg border bg-primary/5 p-3">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <IconCheck className="size-4 text-primary" />
-                  {runnerCopy.resultSubmittedLabel}
+                  {resultPanelView.statusLabel}
                 </div>
                 <p className="mt-2 text-2xl font-semibold">
-                  {attemptResultDisplay?.scoreLabel}
+                  {resultPanelView.scoreLabel}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {attemptResultDisplay?.accuracyLabel}
+                  {resultPanelView.accuracyLabel}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {attemptResultDisplay?.durationLabel}
+                  {resultPanelView.durationLabel}
                 </p>
-                {attemptUsageLabel ? (
+                {resultPanelView.attemptUsageLabel ? (
                   <p className="text-xs text-muted-foreground">
-                    {attemptUsageLabel}
+                    {resultPanelView.attemptUsageLabel}
                   </p>
                 ) : null}
-                {showStartAnotherAttempt ? (
+                {resultPanelView.showStartAnotherAttempt ? (
                   <Button
                     type="button"
                     size="sm"
@@ -453,22 +445,22 @@ function PlayPage() {
                     onClick={startAnotherAttempt}
                   >
                     <IconRepeat className="size-4" />
-                    {runnerCopy.startAnotherAttemptLabel}
+                    {resultPanelView.startAnotherAttemptLabel}
                   </Button>
                 ) : null}
               </div>
             ) : null}
           </div>
 
-          {attemptControlState.showTimeExpiredMessage ? (
+          {controlView.showTimeExpiredMessage ? (
             <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
-              {runnerCopy.timeExpiredMessage}
+              {controlView.timeExpiredMessage}
             </div>
           ) : null}
 
           <RuntimeItemList
             answers={answers}
-            disabled={attemptControlState.runtimeItemsDisabled}
+            disabled={controlView.runtimeItemsDisabled}
             items={runtimeItems}
             revealAnswer={Boolean(
               result && assignment.settings.showCorrectAnswers
@@ -491,20 +483,20 @@ function PlayPage() {
           <Button
             type="button"
             className="mt-4 w-full sm:w-fit"
-            disabled={attemptControlState.submitDisabled}
+            disabled={controlView.submitDisabled}
             onClick={submitAnswers}
           >
             <IconCheck className="size-4" />
-            {completionCopy.submitButtonLabel}
+            {controlView.submitButtonLabel}
           </Button>
-          {attemptControlState.unansweredLabel ? (
+          {controlView.unansweredLabel ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              {attemptControlState.unansweredLabel}
+              {controlView.unansweredLabel}
             </p>
           ) : null}
-          {attemptControlState.readOnlyMessage ? (
+          {controlView.readOnlyMessage ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              {attemptControlState.readOnlyMessage}
+              {controlView.readOnlyMessage}
             </p>
           ) : null}
         </div>

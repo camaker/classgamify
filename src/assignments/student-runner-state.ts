@@ -10,9 +10,11 @@ import {
   buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptTimerBadge,
+  buildStudentRunnerMissingView,
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   getAttemptCompletionSummary,
+  getStudentRunnerCopy,
   type StudentAnswerMap,
   type StudentRunnerMissingReason,
 } from '@/assignments/student-submission';
@@ -67,6 +69,61 @@ type StudentRunnerAttemptResult = {
   totalPoints: number;
 };
 
+type StudentRunnerLoadingView = {
+  message: string;
+};
+
+type StudentRunnerMissingPageView = {
+  badgeLabel: string;
+  browseTemplatesLabel: string;
+  description: string;
+  title: string;
+};
+
+type StudentRunnerIdentityView =
+  | {
+      label: string;
+      mode: 'student-name';
+      placeholder: string;
+    }
+  | {
+      copy: ReturnType<typeof buildAnonymousAttemptCopy>;
+      mode: 'anonymous';
+    };
+
+type StudentRunnerControlView = {
+  progressLabel: string;
+  readOnlyMessage?: string;
+  runnerTitle: string;
+  runtimeItemsDisabled: boolean;
+  showTimeExpiredMessage: boolean;
+  submitButtonLabel: string;
+  submitDisabled: boolean;
+  timeExpiredMessage: string;
+  timerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
+  unansweredLabel?: string;
+};
+
+type StudentRunnerResultPanelView =
+  | {
+      show: false;
+    }
+  | {
+      accuracyLabel: string;
+      attemptUsageLabel?: string;
+      durationLabel: string;
+      scoreLabel: string;
+      show: true;
+      showStartAnotherAttempt: boolean;
+      startAnotherAttemptLabel: string;
+      statusLabel: string;
+    };
+
+type StudentRunnerSeoView = {
+  description: string;
+  titlePrefix: string;
+};
+
 type StudentRunnerPageViewModel = {
   activeShareId: string;
   activity: ActivitySeed | undefined;
@@ -79,12 +136,19 @@ type StudentRunnerPageViewModel = {
   attemptTimerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
   attemptUsageLabel?: string;
   completionCopy: ReturnType<typeof buildAttemptCompletionCopy>;
+  controlView: StudentRunnerControlView;
   currentAttemptSessionKey?: string;
   headerView?: ReturnType<typeof buildStudentRunnerHeaderView>;
+  identityView?: StudentRunnerIdentityView;
   itemCount: number;
+  loadingView: StudentRunnerLoadingView;
+  missingView?: StudentRunnerMissingPageView;
+  resultPanelView: StudentRunnerResultPanelView;
+  routeBadgeLabel: string;
   runtimeItems: PublicRuntimeItem[];
   showStartAnotherAttempt: boolean;
   startedAt: number;
+  submissionSuccessMessage: string;
   timeLimitSeconds?: number;
 };
 
@@ -101,6 +165,15 @@ export type StudentRunnerAttemptClock = {
   shareId: string;
   startedAt: number;
 };
+
+export function buildStudentRunnerSeoView(): StudentRunnerSeoView {
+  const runnerCopy = getStudentRunnerCopy();
+
+  return {
+    description: runnerCopy.seoDescription,
+    titlePrefix: runnerCopy.seoTitlePrefix,
+  };
+}
 
 export function buildStudentRunnerPageState({
   data,
@@ -276,6 +349,7 @@ export function buildStudentRunnerPageViewModel({
   const activityRunnerCopy = activity
     ? getActivityTemplateRunnerCopy(activity.templateType)
     : undefined;
+  const runnerCopy = getStudentRunnerCopy();
   const completionCopy = buildAttemptCompletionCopy({
     completionSummary: attemptState.completionSummary,
     confirmIncompleteSubmit,
@@ -297,6 +371,22 @@ export function buildStudentRunnerPageViewModel({
     timeExpired: attemptTimer.timeExpired,
     unansweredLabel: completionCopy.unansweredLabel,
   });
+  const attemptTimerBadge = buildStudentAttemptTimerBadge({
+    remainingSeconds: attemptTimer.remainingSeconds,
+    timeExpired: attemptTimer.timeExpired,
+    timeLimitSeconds,
+  });
+  const attemptUsageLabel = result
+    ? formatStudentAttemptUsageLabel(result.attemptUsage)
+    : undefined;
+  const showStartAnotherAttempt = canStartAnotherStudentAttempt({
+    canSubmit: attemptState.canSubmit,
+    hasResult: Boolean(result),
+    maxAttempts:
+      result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
+    submittedAttemptCount:
+      result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
+  });
 
   return {
     activeShareId,
@@ -311,15 +401,21 @@ export function buildStudentRunnerPageViewModel({
     attemptResultDisplay,
     attemptState,
     attemptTimer,
-    attemptTimerBadge: buildStudentAttemptTimerBadge({
-      remainingSeconds: attemptTimer.remainingSeconds,
-      timeExpired: attemptTimer.timeExpired,
-      timeLimitSeconds,
-    }),
-    attemptUsageLabel: result
-      ? formatStudentAttemptUsageLabel(result.attemptUsage)
-      : undefined,
+    attemptTimerBadge,
+    attemptUsageLabel,
     completionCopy,
+    controlView: {
+      progressLabel: completionCopy.progressLabel,
+      readOnlyMessage: attemptControlState.readOnlyMessage,
+      runnerTitle: activityRunnerCopy?.title ?? '',
+      runtimeItemsDisabled: attemptControlState.runtimeItemsDisabled,
+      showTimeExpiredMessage: attemptControlState.showTimeExpiredMessage,
+      submitButtonLabel: completionCopy.submitButtonLabel,
+      submitDisabled: attemptControlState.submitDisabled,
+      timeExpiredMessage: runnerCopy.timeExpiredMessage,
+      timerBadge: attemptTimerBadge,
+      unansweredLabel: attemptControlState.unansweredLabel,
+    },
     currentAttemptSessionKey: attemptState.currentAttemptSessionKey,
     headerView:
       assignment && pageState.status === 'ready'
@@ -328,18 +424,97 @@ export function buildStudentRunnerPageViewModel({
             itemCount: attemptState.itemCount,
           })
         : undefined,
+    identityView: assignment
+      ? buildStudentRunnerIdentityView({
+          anonymousToken,
+          collectStudentName: assignment.settings.collectStudentName,
+        })
+      : undefined,
     itemCount: attemptState.itemCount,
-    runtimeItems: attemptState.runtimeItems,
-    showStartAnotherAttempt: canStartAnotherStudentAttempt({
-      canSubmit: attemptState.canSubmit,
-      hasResult: Boolean(result),
-      maxAttempts:
-        result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
-      submittedAttemptCount:
-        result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
+    loadingView: {
+      message: runnerCopy.loadingMessage,
+    },
+    missingView:
+      pageState.status === 'missing'
+        ? buildStudentRunnerMissingPageView(pageState.reason)
+        : undefined,
+    resultPanelView: buildStudentRunnerResultPanelView({
+      attemptResultDisplay,
+      attemptUsageLabel,
+      showStartAnotherAttempt,
     }),
+    routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
+    runtimeItems: attemptState.runtimeItems,
+    showStartAnotherAttempt,
     startedAt,
+    submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
+  };
+}
+
+function buildStudentRunnerMissingPageView(
+  reason: StudentRunnerMissingReason
+): StudentRunnerMissingPageView {
+  const runnerCopy = getStudentRunnerCopy();
+  const missingView = buildStudentRunnerMissingView(reason);
+
+  return {
+    badgeLabel: runnerCopy.publicRouteBadgeLabel,
+    browseTemplatesLabel: runnerCopy.browseTemplatesLabel,
+    description: missingView.description,
+    title: missingView.title,
+  };
+}
+
+function buildStudentRunnerIdentityView({
+  anonymousToken,
+  collectStudentName,
+}: {
+  anonymousToken?: string;
+  collectStudentName: boolean;
+}): StudentRunnerIdentityView {
+  if (collectStudentName) {
+    const runnerCopy = getStudentRunnerCopy();
+
+    return {
+      label: runnerCopy.studentNameLabel,
+      mode: 'student-name',
+      placeholder: runnerCopy.studentNamePlaceholder,
+    };
+  }
+
+  return {
+    copy: buildAnonymousAttemptCopy({
+      browserLabel: getAnonymousBrowserLabel(anonymousToken),
+    }),
+    mode: 'anonymous',
+  };
+}
+
+function buildStudentRunnerResultPanelView({
+  attemptResultDisplay,
+  attemptUsageLabel,
+  showStartAnotherAttempt,
+}: {
+  attemptResultDisplay?: ReturnType<typeof buildStudentAttemptResultDisplay>;
+  attemptUsageLabel?: string;
+  showStartAnotherAttempt: boolean;
+}): StudentRunnerResultPanelView {
+  if (!attemptResultDisplay) {
+    return { show: false };
+  }
+
+  const runnerCopy = getStudentRunnerCopy();
+
+  return {
+    accuracyLabel: attemptResultDisplay.accuracyLabel,
+    attemptUsageLabel,
+    durationLabel: attemptResultDisplay.durationLabel,
+    scoreLabel: attemptResultDisplay.scoreLabel,
+    show: true,
+    showStartAnotherAttempt,
+    startAnotherAttemptLabel: runnerCopy.startAnotherAttemptLabel,
+    statusLabel: runnerCopy.resultSubmittedLabel,
   };
 }
 
