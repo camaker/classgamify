@@ -584,6 +584,7 @@ import {
 } from '@/assignments/validation';
 import {
   getUserFileExtension,
+  normalizeUserFileContentType,
   resolveUserFileMaterialKind,
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
@@ -2168,6 +2169,20 @@ assert.equal(
   'worksheet-document'
 );
 assert.equal(
+  normalizeUserFileContentType(
+    ' Ａｐｐｌｉｃａｔｉｏｎ／ＰＤＦ ; charset=UTF-8 '
+  ),
+  'application/pdf'
+);
+assert.equal(normalizeUserFileContentType(' ; charset=UTF-8 '), undefined);
+assert.equal(
+  resolveUserFileMaterialKind({
+    contentType: ' Application / Pdf ; charset=UTF-8 ',
+    originalName: 'fallback.bin',
+  }),
+  'worksheet-document'
+);
+assert.equal(
   resolveUserFileMaterialKind({
     contentType: 'application/octet-stream',
     originalName: 'scores.xlsx',
@@ -2179,6 +2194,12 @@ assert.equal(
     originalName: 'C:\\class\\六月材料\\听力复习.WAV',
   }),
   'wav'
+);
+assert.equal(
+  getUserFileExtension({
+    originalName: 'C:\\class\\六月材料\\复习练习纸．ＰＤＦ',
+  }),
+  'pdf'
 );
 assert.equal(formatUserFileMaterialKind('audio'), 'Audio');
 assert.equal(
@@ -2218,6 +2239,32 @@ assert.equal(userFileMaterialSummary.privateFiles, 3);
 assert.equal(userFileMaterialSummary.audioFiles, 1);
 assert.equal(userFileMaterialSummary.worksheetFiles, 2);
 assert.equal(userFileMaterialSummary.byKind.spreadsheet, 1);
+const abnormalUserFileMaterialSummary = buildUserFileMaterialSummary([
+  {
+    contentType: 'application/pdf; charset=utf-8',
+    isPublic: true,
+    originalName: 'worksheet.pdf',
+    size: 128.9,
+  },
+  {
+    contentType: 'audio/mpeg',
+    isPublic: false,
+    originalName: 'listening.mp3',
+    size: Number.POSITIVE_INFINITY,
+  },
+  {
+    contentType: 'image/png',
+    isPublic: null,
+    originalName: 'scan.png',
+    size: -4,
+  },
+]);
+assert.equal(abnormalUserFileMaterialSummary.totalFiles, 3);
+assert.equal(abnormalUserFileMaterialSummary.totalBytes, 128);
+assert.equal(abnormalUserFileMaterialSummary.publicFiles, 1);
+assert.equal(abnormalUserFileMaterialSummary.privateFiles, 2);
+assert.equal(abnormalUserFileMaterialSummary.audioFiles, 1);
+assert.equal(abnormalUserFileMaterialSummary.worksheetFiles, 2);
 const activityMaterialReferencesSource = readFileSync(
   'src/activities/material-references.ts',
   'utf8'
@@ -2293,6 +2340,33 @@ assert.deepEqual(
       kind: 'worksheet-document',
       originalName: 'revision worksheet.pdf',
       size: 512,
+    },
+  ]
+);
+assert.deepEqual(
+  normalizeActivityMaterialReferences([
+    {
+      contentType: ' Application / Pdf ; charset=UTF-8 ',
+      fileId: ' File １ ',
+      kind: 'unknown-kind',
+      originalName: '  Worksheet\tScan.pdf  ',
+      size: -10,
+    },
+    {
+      contentType: 'application/pdf',
+      fileId: 'file 1',
+      kind: 'worksheet-document',
+      originalName: 'duplicate worksheet.pdf',
+      size: 512,
+    },
+  ]),
+  [
+    {
+      contentType: 'application/pdf',
+      fileId: 'File 1',
+      kind: 'worksheet-document',
+      originalName: 'Worksheet Scan.pdf',
+      size: 0,
     },
   ]
 );
@@ -2382,6 +2456,70 @@ assert.deepEqual(mixedSourceMaterialSummary.extractionActions, [
     id: 'extract-worksheet',
     sourceCount: 1,
     sourceKindCounts: [{ count: 1, kind: 'worksheet-image' }],
+  },
+]);
+const normalizedSourceMaterialSummary = summarizeActivitySourceMaterials([
+  {
+    contentType: ' audio / mpeg ',
+    fileId: 'audio-１',
+    kind: 'unknown-kind',
+    originalName: ' listening.mp3 ',
+    size: Number.NaN,
+  },
+  {
+    contentType: 'audio/mpeg',
+    fileId: 'audio-1',
+    kind: 'audio',
+    originalName: 'duplicate-listening.mp3',
+  },
+  {
+    contentType: ' application/pdf ; charset=utf-8 ',
+    fileId: 'worksheet-1',
+    kind: 'unknown-kind',
+    originalName: 'worksheet.pdf',
+  },
+  {
+    contentType: ' text/csv ',
+    fileId: 'sheet-1',
+    kind: 'unknown-kind',
+    originalName: 'words.csv',
+  },
+]);
+assert.equal(normalizedSourceMaterialSummary.total, 3);
+assert.deepEqual(normalizedSourceMaterialSummary.kindSummaries, [
+  { count: 1, kind: 'audio' },
+  { count: 1, kind: 'spreadsheet' },
+  { count: 1, kind: 'worksheet-document' },
+]);
+assert.deepEqual(normalizedSourceMaterialSummary.readiness, {
+  capabilities: [
+    'audio-extraction',
+    'spreadsheet-import',
+    'worksheet-extraction',
+  ],
+  extractableCount: 3,
+  hasAudio: true,
+  hasSpreadsheet: true,
+  hasWorksheet: true,
+});
+assert.deepEqual(normalizedSourceMaterialSummary.extractionActions, [
+  {
+    capability: 'audio-extraction',
+    id: 'extract-audio',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'audio' }],
+  },
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
+  },
+  {
+    capability: 'worksheet-extraction',
+    id: 'extract-worksheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
   },
 ]);
 assert.deepEqual(
@@ -15501,6 +15639,20 @@ assert.equal(
   ['Shared source', 'Pair source', 'Group source'].join('\n\n')
 );
 assert.equal(
+  getActivityDraftSourceText({
+    ...fallbackDraft,
+    groupsText: ' Group\t source ',
+    pairsText: 'Pair   source',
+    questionsText: 'Question   source',
+    sourceSummary: '  Ｓｈａｒｅｄ\t source  ',
+    teacherNotesText: 'Shared source',
+    vocabularyText: 'shared   source',
+  }),
+  ['Shared source', 'Question source', 'Pair source', 'Group source'].join(
+    '\n\n'
+  )
+);
+assert.equal(
   buildActivitySourceMaterialDraftNotes([
     listeningMaterialReference,
     {
@@ -15540,6 +15692,22 @@ assert.deepEqual(sensitiveMaterialDraftNoteViews, [
     name: 'safe worksheet.pdf',
   },
 ]);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViews([
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-messy-worksheet',
+      kind: 'worksheet-document',
+      originalName: '  Ｗｏｒｋｓｈｅｅｔ\tScan   1.pdf  ',
+    },
+  ]),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Worksheet Scan 1.pdf',
+    },
+  ]
+);
 assert.deepEqual(Object.keys(sensitiveMaterialDraftNoteViews[0] ?? {}).sort(), [
   'kindLabel',
   'name',
@@ -15600,6 +15768,26 @@ assert.equal(
   [
     'Teacher source notes',
     'Attached classroom source materials:\n- Worksheet document: updated worksheet.pdf',
+  ].join('\n\n')
+);
+assert.equal(
+  appendActivitySourceMaterialDraftNotes({
+    sourceMaterials: [
+      {
+        contentType: 'application/pdf',
+        fileId: 'file-worksheet-3',
+        kind: 'worksheet-document',
+        originalName: ' Ｕｐｄａｔｅｄ\tworksheet.pdf ',
+      },
+    ],
+    sourceText: [
+      ' Teacher   source notes ',
+      'Attached classroom source materials:\n- Audio: stale.mp3',
+    ].join('\n\n'),
+  }),
+  [
+    'Teacher source notes',
+    'Attached classroom source materials:\n- Worksheet document: Updated worksheet.pdf',
   ].join('\n\n')
 );
 assert.equal(

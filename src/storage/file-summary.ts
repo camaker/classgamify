@@ -45,7 +45,7 @@ export function buildUserFileMaterialSummary(
     const kind = resolveUserFileMaterialKind(file);
 
     summary.totalFiles += 1;
-    summary.totalBytes += Math.max(0, file.size ?? 0);
+    summary.totalBytes += normalizeUserFileSummaryBytes(file.size);
     summary.byKind[kind] += 1;
 
     if (file.isPublic) {
@@ -64,4 +64,12 @@ export function buildUserFileMaterialSummary(
   }
 
   return summary;
+}
+
+function normalizeUserFileSummaryBytes(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor(value));
 }

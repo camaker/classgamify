@@ -70,17 +70,21 @@ export function summarizeActivitySourceMaterials(
   const byKind = createEmptyMaterialKindCounts();
 
   for (const material of materials) {
-    byKind[material.kind] += 1;
+    byKind[material.kind] = normalizeMaterialSummaryCount(
+      byKind[material.kind] + 1
+    );
   }
 
   return {
     byKind,
     extractionActions: buildActivitySourceMaterialExtractionActions(byKind),
     kindSummaries: USER_FILE_MATERIAL_KINDS.flatMap((kind) =>
-      byKind[kind] > 0 ? [{ count: byKind[kind], kind }] : []
+      normalizeMaterialSummaryCount(byKind[kind]) > 0
+        ? [{ count: normalizeMaterialSummaryCount(byKind[kind]), kind }]
+        : []
     ),
     readiness: buildActivitySourceMaterialReadiness(byKind),
-    total: materials.length,
+    total: normalizeMaterialSummaryCount(materials.length),
   };
 }
 
@@ -146,9 +150,10 @@ function buildActivitySourceMaterialExtractionActions(
   byKind: Record<UserFileMaterialKind, number>
 ): ActivitySourceMaterialExtractionAction[] {
   return ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.flatMap((action) => {
-    const sourceKindCounts = action.sourceKinds.flatMap((kind) =>
-      byKind[kind] > 0 ? [{ count: byKind[kind], kind }] : []
-    );
+    const sourceKindCounts = action.sourceKinds.flatMap((kind) => {
+      const count = normalizeMaterialSummaryCount(byKind[kind]);
+      return count > 0 ? [{ count, kind }] : [];
+    });
     const sourceCount = sourceKindCounts.reduce(
       (total, item) => total + item.count,
       0
@@ -192,10 +197,17 @@ function formatActivitySourceMaterialExtractionAction(
 function buildActivitySourceMaterialReadiness(
   byKind: Record<UserFileMaterialKind, number>
 ): ActivitySourceMaterialReadiness {
-  const hasAudio = byKind.audio > 0;
-  const hasSpreadsheet = byKind.spreadsheet > 0;
-  const hasWorksheet =
-    byKind['worksheet-document'] > 0 || byKind['worksheet-image'] > 0;
+  const audioCount = normalizeMaterialSummaryCount(byKind.audio);
+  const spreadsheetCount = normalizeMaterialSummaryCount(byKind.spreadsheet);
+  const worksheetDocumentCount = normalizeMaterialSummaryCount(
+    byKind['worksheet-document']
+  );
+  const worksheetImageCount = normalizeMaterialSummaryCount(
+    byKind['worksheet-image']
+  );
+  const hasAudio = audioCount > 0;
+  const hasSpreadsheet = spreadsheetCount > 0;
+  const hasWorksheet = worksheetDocumentCount > 0 || worksheetImageCount > 0;
   const capabilities: ActivitySourceMaterialReadinessCapability[] = [];
 
   if (hasAudio) capabilities.push('audio-extraction');
@@ -205,12 +217,17 @@ function buildActivitySourceMaterialReadiness(
   return {
     capabilities,
     extractableCount:
-      byKind.audio +
-      byKind.spreadsheet +
-      byKind['worksheet-document'] +
-      byKind['worksheet-image'],
+      audioCount +
+      spreadsheetCount +
+      worksheetDocumentCount +
+      worksheetImageCount,
     hasAudio,
     hasSpreadsheet,
     hasWorksheet,
   };
+}
+
+function normalizeMaterialSummaryCount(count: number) {
+  if (!Number.isFinite(count)) return 0;
+  return Math.max(0, Math.floor(count));
 }

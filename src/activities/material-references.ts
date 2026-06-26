@@ -58,9 +58,10 @@ export function normalizeActivityMaterialReferences(
 
   for (const item of values) {
     const material = normalizeActivityMaterialReference(item);
-    if (!material || materials.has(material.fileId)) continue;
+    const materialKey = normalizeReferenceKey(material?.fileId);
+    if (!material || !materialKey || materials.has(materialKey)) continue;
 
-    materials.set(material.fileId, material);
+    materials.set(materialKey, material);
 
     if (materials.size >= ACTIVITY_SOURCE_MATERIALS_MAX_COUNT) break;
   }
@@ -118,10 +119,14 @@ function compactActivityMaterialReference(
 function normalizeReferenceText(value: unknown, maxLength: number) {
   if (typeof value !== 'string') return undefined;
 
-  const normalized = value.normalize('NFKC').replace(/\s+/g, ' ').trim();
+  const normalized = value.normalize('NFKC').replace(/\s+/gu, ' ').trim();
   if (!normalized) return undefined;
 
   return normalized.slice(0, maxLength);
+}
+
+function normalizeReferenceKey(value: string | undefined) {
+  return value?.normalize('NFKC').replace(/\s+/gu, ' ').trim().toLowerCase();
 }
 
 function normalizeReferenceSize(value: unknown) {

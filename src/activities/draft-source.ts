@@ -82,13 +82,13 @@ function toActivitySourceMaterialDraftNoteView(
 ): ActivitySourceMaterialDraftNoteView {
   return {
     kindLabel: formatUserFileMaterialKind(material.kind),
-    name: material.originalName,
+    name: normalizeDraftSourceText(material.originalName),
   };
 }
 
 function buildActivityDraftSourceText(values: Array<string | undefined>) {
   const parts = unique(
-    values.map((value) => value?.trim() ?? '').filter(Boolean)
+    values.map((value) => normalizeDraftSourceText(value)).filter(Boolean)
   );
 
   return limitActivityDraftSourceText(parts);
@@ -128,7 +128,7 @@ function removeActivitySourceMaterialDraftNotes(sourceText: string) {
 function getActivityDraftSourceTextParagraphs(sourceText: string) {
   return sourceText
     .split(/\r?\n\s*\r?\n/)
-    .map((part) => part.trim())
+    .map(normalizeDraftSourceText)
     .filter(Boolean);
 }
 
@@ -154,9 +154,14 @@ function unique(values: string[]) {
 }
 
 function normalizeDraftSourceTextKey(value: string) {
-  return value
-    .normalize('NFKC')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLocaleLowerCase();
+  return normalizeDraftSourceText(value).toLocaleLowerCase();
+}
+
+function normalizeDraftSourceText(value: string | undefined) {
+  return (
+    value
+      ?.normalize('NFKC')
+      .replace(/[ \t]+/gu, ' ')
+      .trim() ?? ''
+  );
 }

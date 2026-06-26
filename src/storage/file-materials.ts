@@ -51,7 +51,7 @@ export function getUserFileExtension(
   const name = file.originalName ?? file.filename;
   if (!name) return undefined;
 
-  const lastSegment = name.split(/[\\/]/).at(-1) ?? name;
+  const lastSegment = name.normalize('NFKC').split(/[\\/]/).at(-1) ?? name;
   const dotIndex = lastSegment.lastIndexOf('.');
   if (dotIndex < 0 || dotIndex === lastSegment.length - 1) {
     return undefined;
@@ -66,7 +66,11 @@ export function getUserFileExtension(
 export function normalizeUserFileContentType(
   contentType: string | null | undefined
 ): string | undefined {
-  const normalized = contentType?.trim().toLowerCase();
+  const normalized = contentType
+    ?.normalize('NFKC')
+    .split(';')[0]
+    ?.replace(/\s+/gu, '')
+    .toLowerCase();
   return normalized === '' ? undefined : normalized;
 }
 
