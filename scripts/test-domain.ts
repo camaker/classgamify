@@ -17534,12 +17534,19 @@ assert.equal(
   }),
   '2/3 correct'
 );
+assert.equal(
+  formatAssignmentItemCorrectSummary({
+    correctCount: 2.9,
+    submittedCount: Number.POSITIVE_INFINITY,
+  }),
+  '2/0 correct'
+);
 assert.equal(formatAssignmentResultFraction(2, 5), '2/5');
 assert.equal(formatAssignmentResultFraction(-1, 5), '0/5');
-assert.equal(formatAssignmentResultFraction(2.5, 5), '2.5/5');
+assert.equal(formatAssignmentResultFraction(2.5, 5), '2/5');
 assert.equal(formatAssignmentResultFraction(Number.NaN, 5), '-');
 assert.equal(formatAssignmentResultFraction(2, Number.POSITIVE_INFINITY), '-');
-assert.equal(formatAssignmentResultNumber(2.5), '2.5');
+assert.equal(formatAssignmentResultNumber(2.5), '2');
 assert.equal(formatAssignmentResultNumber(Number.NaN), '-');
 assert.equal(formatAssignmentResultNumber(null), '-');
 assert.equal(formatAssignmentResultNumber(-3, { min: 0 }), '0');

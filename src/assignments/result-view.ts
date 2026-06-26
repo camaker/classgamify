@@ -35,7 +35,10 @@ import {
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
 } from '@/assignments/result-format';
-import { formatAssignmentSummaryReviewCount } from '@/assignments/result-summary-format';
+import {
+  formatAssignmentSummaryCorrectCount,
+  formatAssignmentSummaryReviewCount,
+} from '@/assignments/result-summary-format';
 import {
   compareAssignmentItemsByReviewPriority,
   compareAssignmentItemsByStableOrder,
@@ -1209,7 +1212,7 @@ export function formatAssignmentItemCorrectSummary({
   correctCount,
   submittedCount,
 }: Pick<AssignmentItemAnalysis, 'correctCount' | 'submittedCount'>) {
-  return m.assignment_result_summary_correct_count({
+  return formatAssignmentSummaryCorrectCount({
     correctCount,
     submittedCount,
   });
@@ -1239,7 +1242,7 @@ function clampProgressValue(value: number) {
 
 function normalizeResultFractionNumber(value: number) {
   if (!Number.isFinite(value)) return undefined;
-  return Math.max(0, value);
+  return Math.floor(Math.max(0, value));
 }
 
 type ResultSearchSummaryInput = {

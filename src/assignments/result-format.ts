@@ -54,8 +54,9 @@ export function formatAssignmentResultNumber(
     return options?.emptyValue ?? '-';
   }
 
-  const normalizedValue =
-    options?.min === undefined ? value : Math.max(options.min, value);
+  const normalizedValue = Math.floor(
+    options?.min === undefined ? value : Math.max(options.min, value)
+  );
 
   return String(normalizedValue);
 }
