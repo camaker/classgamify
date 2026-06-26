@@ -73,6 +73,25 @@ type StudentAttemptSubmitGate =
       type: 'submit';
     };
 
+type StudentAttemptSubmissionPlan =
+  | {
+      message: string;
+      reason: 'missing-student-name' | 'read-only';
+      type: 'blocked';
+    }
+  | {
+      message: string;
+      reason: 'unanswered-items';
+      type: 'confirm-incomplete';
+      unansweredItemCount: number;
+    }
+  | {
+      anonymousToken?: string;
+      input: StudentAttemptSubmissionInput;
+      reason: 'complete' | 'confirmed-incomplete';
+      type: 'submit';
+    };
+
 type AttemptCompletionCopy = {
   confirmIncompleteSubmit: string;
   progressLabel: string;
@@ -726,6 +745,71 @@ export function buildStudentAttemptSubmissionInput({
   }
 
   return input;
+}
+
+export function buildStudentAttemptSubmissionPlan({
+  anonymousToken,
+  answers,
+  canSubmit,
+  collectStudentName,
+  completionSummary,
+  confirmIncompleteSubmit,
+  createAnonymousToken,
+  now,
+  runtimeItems,
+  shareSlug,
+  startedAt,
+  studentName,
+  timeLimitSeconds,
+}: {
+  anonymousToken?: string;
+  answers: StudentAnswerMap;
+  canSubmit: boolean;
+  collectStudentName: boolean;
+  completionSummary: AttemptCompletionSummary;
+  confirmIncompleteSubmit: boolean;
+  createAnonymousToken: () => string;
+  now: number;
+  runtimeItems: StudentSubmissionRuntimeItem[];
+  shareSlug: string;
+  startedAt: number;
+  studentName: string;
+  timeLimitSeconds?: number;
+}): StudentAttemptSubmissionPlan {
+  const submitGate = buildStudentAttemptSubmitGate({
+    canSubmit,
+    collectStudentName,
+    completionSummary,
+    confirmIncompleteSubmit,
+    studentName,
+  });
+
+  if (submitGate.type !== 'submit') return submitGate;
+
+  const nextAnonymousToken = resolveStudentAttemptAnonymousToken({
+    collectStudentName,
+    createAnonymousToken,
+    currentAnonymousToken: anonymousToken,
+  });
+
+  return {
+    anonymousToken: nextAnonymousToken,
+    input: buildStudentAttemptSubmissionInput({
+      answers,
+      collectStudentName,
+      durationSeconds: resolveStudentAttemptSubmissionDurationSeconds({
+        now,
+        startedAt,
+        timeLimitSeconds,
+      }),
+      runtimeItems,
+      shareSlug,
+      anonymousToken: nextAnonymousToken,
+      studentName,
+    }),
+    reason: submitGate.reason,
+    type: 'submit',
+  };
 }
 
 export function resolveStudentAttemptAnonymousToken({

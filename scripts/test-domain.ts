@@ -571,6 +571,7 @@ import {
   buildStudentAnswerChange,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
+  buildStudentAttemptSubmissionPlan,
   buildStudentAttemptSessionKey,
   buildStudentAttemptSubmitGate,
   buildStudentAttemptTimerBadge,
@@ -3389,13 +3390,13 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /resolveStudentAttemptSubmissionDurationSeconds\(/,
-  'Student play route should resolve submitted duration through assignment-domain helpers.'
+  /buildStudentAttemptSubmissionPlan\(/,
+  'Student play route should build submission payloads through the assignment-domain submission plan.'
 );
 assert.doesNotMatch(
   playRouteSource,
-  /durationSeconds:\s*buildAttemptTimerState\(/,
-  'Student play route should not read timer-state internals when building the submission payload.'
+  /buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(/,
+  'Student play route should not rebuild submit gates, anonymous identity, duration, or submission input locally.'
 );
 assert.match(
   playRouteSource,
@@ -5190,6 +5191,104 @@ assert.deepEqual(
       { answer: '', itemId: 'item-3' },
     ],
     shareSlug: 'share-two',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmissionPlan({
+    answers,
+    canSubmit: true,
+    collectStudentName: true,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: false,
+    createAnonymousToken: () => {
+      throw new Error('Anonymous token should not be created before confirm.');
+    },
+    now: 6_500,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: ' share-one ',
+    startedAt: 1_000,
+    studentName: 'Ava',
+    timeLimitSeconds: 10,
+  }),
+  {
+    message: '2 questions are still unanswered.',
+    reason: 'unanswered-items',
+    type: 'confirm-incomplete',
+    unansweredItemCount: 2,
+  }
+);
+let submissionPlanAnonymousTokenCreateCount = 0;
+assert.deepEqual(
+  buildStudentAttemptSubmissionPlan({
+    answers,
+    canSubmit: true,
+    collectStudentName: false,
+    completionSummary: incompleteCompletionSummary,
+    confirmIncompleteSubmit: true,
+    createAnonymousToken: () => {
+      submissionPlanAnonymousTokenCreateCount += 1;
+      return ' created-plan-token ';
+    },
+    now: 6_500,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: ' share-two ',
+    startedAt: 1_000,
+    studentName: 'Stale Name',
+    timeLimitSeconds: 10,
+  }),
+  {
+    anonymousToken: 'created-plan-token',
+    input: {
+      anonymousToken: 'created-plan-token',
+      answers: [
+        { answer: 'apple', itemId: 'item-1' },
+        { answer: '', itemId: 'item-2' },
+        { answer: '', itemId: 'item-3' },
+      ],
+      durationSeconds: 6,
+      shareSlug: 'share-two',
+    },
+    reason: 'confirmed-incomplete',
+    type: 'submit',
+  }
+);
+assert.equal(submissionPlanAnonymousTokenCreateCount, 1);
+assert.deepEqual(
+  buildStudentAttemptSubmissionPlan({
+    anonymousToken: ' current-plan-token ',
+    answers,
+    canSubmit: true,
+    collectStudentName: true,
+    completionSummary: {
+      answeredItemCount: 3,
+      itemCount: 3,
+      unansweredItemCount: 0,
+    },
+    confirmIncompleteSubmit: false,
+    createAnonymousToken: () => {
+      throw new Error('Named submissions should not create anonymous tokens.');
+    },
+    now: 12_000,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: ' share-three ',
+    startedAt: 1_000,
+    studentName: ' Ava   Chen ',
+    timeLimitSeconds: 10,
+  }),
+  {
+    anonymousToken: undefined,
+    input: {
+      answers: [
+        { answer: 'apple', itemId: 'item-1' },
+        { answer: '', itemId: 'item-2' },
+        { answer: '', itemId: 'item-3' },
+      ],
+      durationSeconds: 11,
+      shareSlug: 'share-three',
+      studentName: 'Ava Chen',
+    },
+    reason: 'complete',
+    type: 'submit',
   }
 );
 assert.equal(

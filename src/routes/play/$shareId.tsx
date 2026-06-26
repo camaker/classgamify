@@ -7,11 +7,8 @@ import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import {
   buildStudentAnswerChange,
-  buildStudentAttemptSubmissionInput,
-  buildStudentAttemptSubmitGate,
+  buildStudentAttemptSubmissionPlan,
   resolveStudentAttemptSubmissionFailureMessage,
-  resolveStudentAttemptAnonymousToken,
-  resolveStudentAttemptSubmissionDurationSeconds,
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptClock,
@@ -197,50 +194,42 @@ function PlayPage() {
   }, [activeShareId, assignment]);
 
   async function submitAnswers() {
-    const submitGate = buildStudentAttemptSubmitGate({
+    const submissionPlan = buildStudentAttemptSubmissionPlan({
+      anonymousToken,
+      answers,
       canSubmit: Boolean(activity) && runnerPageView.attemptState.canSubmit,
       collectStudentName: Boolean(assignment?.settings.collectStudentName),
       completionSummary,
       confirmIncompleteSubmit,
+      createAnonymousToken: () =>
+        getOrCreateAnonymousAttemptToken({
+          shareId: activeShareId,
+          storage: window.localStorage,
+        }),
+      now: Date.now(),
+      runtimeItems,
+      shareSlug: activeShareId,
+      startedAt,
       studentName,
+      timeLimitSeconds,
     });
 
-    if (submitGate.type === 'blocked') {
-      toast.error(submitGate.message);
+    if (submissionPlan.type === 'blocked') {
+      toast.error(submissionPlan.message);
       return;
     }
 
-    if (submitGate.type === 'confirm-incomplete') {
+    if (submissionPlan.type === 'confirm-incomplete') {
       setConfirmIncompleteSubmit(true);
-      toast.error(submitGate.message);
+      toast.error(submissionPlan.message);
       return;
     }
 
     try {
-      const nextAnonymousToken = resolveStudentAttemptAnonymousToken({
-        collectStudentName: Boolean(assignment?.settings.collectStudentName),
-        currentAnonymousToken: anonymousToken,
-        createAnonymousToken: () =>
-          getOrCreateAnonymousAttemptToken({
-            shareId: activeShareId,
-            storage: window.localStorage,
-          }),
-      });
       const response = await submitAttemptMutation.mutateAsync(
-        buildStudentAttemptSubmissionInput({
-          answers,
-          collectStudentName: Boolean(assignment?.settings.collectStudentName),
-          durationSeconds: resolveStudentAttemptSubmissionDurationSeconds({
-            now: Date.now(),
-            startedAt,
-            timeLimitSeconds,
-          }),
-          runtimeItems,
-          shareSlug: activeShareId,
-          anonymousToken: nextAnonymousToken,
-          studentName,
-        })
+        submissionPlan.input
       );
+      setAnonymousToken(submissionPlan.anonymousToken);
       setResult({
         ...response.result,
         attemptUsage: response.attemptUsage,
