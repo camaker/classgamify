@@ -9749,23 +9749,51 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   assert.ok(template.name.length > 0);
   assert.ok(template.contentRequirements.length > 0);
 }
+const worksheetModeDefinitions = getWorksheetModeDefinitions();
+const worksheetsPageView = buildWorksheetsPageViewModel();
+assert.deepEqual(WORKSHEET_MODE_TEMPLATES, [
+  'fill-blank',
+  'line-match',
+  'listening',
+  'group-sort',
+]);
 assert.deepEqual(
-  getWorksheetModeDefinitions().map((mode) => mode.template),
+  worksheetModeDefinitions.map((mode) => mode.template),
   [...WORKSHEET_MODE_TEMPLATES]
 );
 assert.equal(
-  getWorksheetModeDefinitions().every((mode) =>
-    isActivityTemplateType(mode.template)
+  WORKSHEET_MODE_TEMPLATES.every((templateType) =>
+    isActivityTemplateType(templateType)
   ),
   true
 );
 assert.equal(
-  getWorksheetModeDefinitions().every(
+  worksheetModeDefinitions.every(
     (mode) => mode.action.length > 0 && mode.description.length > 0
   ),
   true
 );
-assert.deepEqual(buildWorksheetsPageViewModel(), {
+assert.deepEqual(
+  worksheetModeDefinitions.map((mode) => mode.template),
+  WORKSHEET_MODE_TEMPLATES.map(
+    (templateType) => getTemplateByType(templateType).type
+  )
+);
+for (const templateType of WORKSHEET_MODE_TEMPLATES) {
+  const scaffold = getActivityTemplateScaffold(templateType);
+
+  assert.ok(scaffold.title.length > 0);
+  assert.ok(scaffold.description.length > 0);
+}
+assert.deepEqual(
+  worksheetsPageView.heroActions.map((action) => action.template),
+  [...WORKSHEET_MODE_TEMPLATES]
+);
+assert.deepEqual(
+  worksheetsPageView.modeCards.map((card) => card.template),
+  [...WORKSHEET_MODE_TEMPLATES]
+);
+assert.deepEqual(worksheetsPageView, {
   hero: {
     badgeLabel: 'Liveworksheets-style modes',
     description:
