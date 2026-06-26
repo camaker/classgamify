@@ -55,7 +55,7 @@ export function parseOptionalWholeNumber(value: string) {
   return Number.isInteger(parsed) ? parsed : undefined;
 }
 
-type AssignmentPublishDraft = {
+export type AssignmentPublishDraft = {
   activityId: string;
   collectStudentName: boolean;
   expiresAtLocal: string;
@@ -109,11 +109,11 @@ type AssignmentPublishDialogState = {
   publishDisabled: boolean;
 };
 
-type AssignmentPublishDraftValues = Partial<
+export type AssignmentPublishDraftValues = Partial<
   Omit<AssignmentPublishDraft, 'activityId' | 'now'>
 >;
 
-type AssignmentPublishDialogViewModel = {
+export type AssignmentPublishDialogViewModel = {
   dialogState: AssignmentPublishDialogState;
   draft: AssignmentPublishDraft;
   preview: AssignmentPublishPreview;
@@ -121,7 +121,7 @@ type AssignmentPublishDialogViewModel = {
   validation: AssignmentPublishDraftValidation;
 };
 
-type AssignmentPublishToggleKey =
+export type AssignmentPublishToggleKey =
   | 'collectStudentName'
   | 'showCorrectAnswers'
   | 'shuffleItems';
@@ -132,7 +132,7 @@ type AssignmentPublishToggleOption = {
   label: string;
 };
 
-type AssignmentPublishToggleView = AssignmentPublishToggleOption & {
+export type AssignmentPublishToggleView = AssignmentPublishToggleOption & {
   checked: boolean;
 };
 

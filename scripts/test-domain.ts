@@ -1416,6 +1416,10 @@ const activityPublishDialogSource = readFileSync(
   'src/components/activities/activity-publish-dialog.tsx',
   'utf8'
 );
+const activityPublishSettingsFormSource = readFileSync(
+  'src/components/activities/activity-publish-settings-form.tsx',
+  'utf8'
+);
 const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
 const templateDirectoryCardSource = readFileSync(
   'src/components/activities/template-directory-card.tsx',
@@ -1437,39 +1441,54 @@ assert.match(
   'Assignment publish failures should use localized publish failure copy.'
 );
 assert.match(
-  activityPublishDialogSource,
+  activityPublishSettingsFormSource,
   /min=\{buildAssignmentPublishCloseAfterMinLocal\(\)\}/,
   'Assignment publish close-time input minimum should come from the assignment publish domain helper.'
 );
 assert.match(
-  activityPublishDialogSource,
+  activityPublishSettingsFormSource,
   /ASSIGNMENT_PUBLISH_FIELD_LIMITS\.instructionsMaxLength/,
   'Assignment publish instructions input length should reuse the assignment-domain field limit.'
 );
 assert.match(
-  activityPublishDialogSource,
+  activityPublishSettingsFormSource,
   /ASSIGNMENT_MAX_ATTEMPTS_RANGE\.min[\s\S]*ASSIGNMENT_MAX_ATTEMPTS_RANGE\.max/,
   'Assignment publish max-attempts input bounds should reuse the assignment-domain attempt range.'
 );
 assert.match(
-  activityPublishDialogSource,
+  activityPublishSettingsFormSource,
   /ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.min[\s\S]*ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.max/,
   'Assignment publish timer input bounds should reuse the assignment-domain timer range.'
 );
 assert.doesNotMatch(
-  activityPublishDialogSource,
+  `${activityPublishDialogSource}\n${activityPublishSettingsFormSource}`,
   /maxLength=\{500\}|min=\{1\}|max=\{10\}|max=\{180\}/,
-  'Assignment publish dialog should not keep local field or numeric bounds.'
+  'Assignment publish surfaces should not keep local field or numeric bounds.'
 );
 assert.match(
   activityPublishDialogSource,
   /buildAssignmentPublishDialogViewModel/,
   'Assignment publish dialog should consume the assignment-domain dialog view-model.'
 );
+assert.match(
+  activityPublishDialogSource,
+  /ActivityPublishSettingsForm[\s\S]*draft=\{publishView\.draft\}[\s\S]*view=\{publishView\}/,
+  'Assignment publish dialog should delegate settings inputs and preview rendering.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft/,
+  'Assignment publish settings form should consume the assignment-domain dialog view-model and draft contract.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /AssignmentSettingsSummary[\s\S]*view\.preview\.settings/,
+  'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
+);
 assert.doesNotMatch(
   activityPublishDialogSource,
-  /buildAssignmentPublishDraft\(|buildAssignmentPublishPreviewFromDraft|validateAssignmentPublishDraft|buildAssignmentPublishDialogState|buildAssignmentPublishToggleViews/,
-  'Assignment publish dialog should not rebuild draft, preview, validation, dialog state, or toggle views directly.'
+  /buildAssignmentPublishDraft\(|buildAssignmentPublishPreviewFromDraft|validateAssignmentPublishDraft|buildAssignmentPublishDialogState|buildAssignmentPublishToggleViews|AssignmentSettingsSummary|ASSIGNMENT_PUBLISH_FIELD_LIMITS|ASSIGNMENT_MAX_ATTEMPTS_RANGE|ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE|buildAssignmentPublishCloseAfterMinLocal|function PublishSetting|<Input|<Textarea|<Switch/,
+  'Assignment publish dialog should not rebuild draft, preview, validation, dialog state, field bounds, or setting controls directly.'
 );
 assert.match(
   templatesRouteSource,
