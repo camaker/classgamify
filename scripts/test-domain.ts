@@ -6106,6 +6106,9 @@ assert.equal(
 );
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');
+assert.equal(formatAssignmentItemCount(3.9), '3 items');
+assert.equal(formatAssignmentItemCount(-1), '0 items');
+assert.equal(formatAssignmentItemCount(Number.NaN), '0 items');
 assert.deepEqual(
   buildPublicAssignmentRuleSummary({
     collectStudentName: false,
@@ -6123,6 +6126,13 @@ assert.deepEqual(
     { id: 'identity', label: 'Student identity', value: 'Anonymous' },
     { id: 'answerReveal', label: 'Review', value: 'Hidden' },
   ]
+);
+assert.equal(
+  buildPublicAssignmentRuleSummary({
+    expiresAt: null,
+    itemCount: Number.POSITIVE_INFINITY,
+  })[0]?.value,
+  '0 items'
 );
 assert.deepEqual(
   buildPublicAssignmentRuleSummaryFromSettings({

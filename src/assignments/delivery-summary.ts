@@ -201,11 +201,19 @@ export function buildPublicAssignmentRuleSummaryFromSettings({
 }
 
 export function formatAssignmentItemCount(itemCount: number) {
-  if (itemCount === 1) {
-    return m.assignment_delivery_item_count_one({ count: itemCount });
+  const normalizedItemCount = normalizeAssignmentItemCount(itemCount);
+
+  if (normalizedItemCount === 1) {
+    return m.assignment_delivery_item_count_one({
+      count: normalizedItemCount,
+    });
   }
 
-  return m.assignment_delivery_item_count_many({ count: itemCount });
+  return m.assignment_delivery_item_count_many({ count: normalizedItemCount });
+}
+
+function normalizeAssignmentItemCount(itemCount: number) {
+  return Number.isFinite(itemCount) ? Math.max(0, Math.floor(itemCount)) : 0;
 }
 
 export function formatAssignmentAttempts(maxAttempts?: number | null) {
