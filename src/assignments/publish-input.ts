@@ -4,6 +4,7 @@ import {
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
   defaultAssignmentSettings,
+  resolveAssignmentSettings,
 } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -326,19 +327,20 @@ export function buildAssignmentPublishPreviewFromDraft({
   const previewMaxAttempts = isAssignmentPublishMaxAttemptsBlank(maxAttempts)
     ? null
     : parseAssignmentPublishMaxAttempts(maxAttempts);
+  const settings = resolveAssignmentSettings({
+    collectStudentName,
+    instructions: instructions.trim() || undefined,
+    maxAttempts: previewMaxAttempts,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitSeconds: previewTimeLimitMinutes
+      ? previewTimeLimitMinutes * 60
+      : undefined,
+  });
 
   return {
     expiresAt: parseAssignmentDateTimeLocal(expiresAtLocal),
-    settings: {
-      collectStudentName,
-      instructions: instructions.trim() || undefined,
-      maxAttempts: previewMaxAttempts,
-      showCorrectAnswers,
-      shuffleItems,
-      timeLimitSeconds: previewTimeLimitMinutes
-        ? previewTimeLimitMinutes * 60
-        : undefined,
-    },
+    settings,
   };
 }
 

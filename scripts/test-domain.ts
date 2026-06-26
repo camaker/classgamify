@@ -5247,7 +5247,7 @@ assert.deepEqual(
     settings: {
       collectStudentName: true,
       instructions: undefined,
-      maxAttempts: undefined,
+      maxAttempts: 2,
       showCorrectAnswers: true,
       shuffleItems: true,
       timeLimitSeconds: undefined,
@@ -5271,7 +5271,7 @@ assert.deepEqual(
     settings: {
       collectStudentName: true,
       instructions: undefined,
-      maxAttempts: undefined,
+      maxAttempts: 2,
       showCorrectAnswers: true,
       shuffleItems: true,
       timeLimitSeconds: undefined,
@@ -5293,7 +5293,7 @@ assert.deepEqual(
   {
     collectStudentName: true,
     instructions: undefined,
-    maxAttempts: undefined,
+    maxAttempts: 2,
     showCorrectAnswers: true,
     shuffleItems: true,
     timeLimitSeconds: 10_800,
