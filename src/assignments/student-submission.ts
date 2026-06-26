@@ -1,6 +1,7 @@
 import {
   buildAttemptTimerState,
   formatAttemptDuration,
+  normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
   canUseAnotherAssignmentAttempt,
@@ -291,19 +292,31 @@ export function buildStudentAttemptResultDisplay({
   fallbackDurationSeconds?: number;
   totalPoints: number;
 }): StudentAttemptResultDisplay {
+  const normalizedEarnedPoints = normalizeStudentResultScore(earnedPoints);
+  const normalizedTotalPoints = normalizeStudentResultScore(totalPoints);
+  const normalizedDurationSeconds =
+    normalizeAttemptDurationSeconds({ durationSeconds }) ??
+    normalizeAttemptDurationSeconds({
+      durationSeconds: fallbackDurationSeconds,
+    });
+
   return {
     accuracyLabel: `${formatAssignmentResultPercent(accuracy)} ${
       STUDENT_RUNNER_COPY.resultAccuracyLabel
     }`,
     durationLabel: `${STUDENT_RUNNER_COPY.resultTimePrefix} ${formatAttemptDuration(
-      durationSeconds ?? fallbackDurationSeconds,
+      normalizedDurationSeconds,
       {
         emptyValue: '',
         style: 'timer',
       }
     )}`,
-    scoreLabel: `${earnedPoints}/${totalPoints}`,
+    scoreLabel: `${normalizedEarnedPoints}/${normalizedTotalPoints}`,
   };
+}
+
+function normalizeStudentResultScore(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
 export function buildStudentAttemptControlState({
@@ -595,9 +608,12 @@ export function buildStudentAttemptSubmissionInput({
     }),
     shareSlug: normalizeAssignmentShareSlug(shareSlug),
   };
+  const normalizedDurationSeconds = normalizeAttemptDurationSeconds({
+    durationSeconds,
+  });
 
-  if (durationSeconds !== undefined) {
-    input.durationSeconds = durationSeconds;
+  if (normalizedDurationSeconds !== undefined) {
+    input.durationSeconds = normalizedDurationSeconds;
   }
 
   if (collectStudentName) {

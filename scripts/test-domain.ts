@@ -4161,6 +4161,33 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildStudentAttemptResultDisplay({
+    accuracy: Number.NaN,
+    durationSeconds: Number.POSITIVE_INFINITY,
+    earnedPoints: Number.NaN,
+    fallbackDurationSeconds: 4.6,
+    totalPoints: -2,
+  }),
+  {
+    accuracyLabel: '- accuracy',
+    durationLabel: 'Time: 5s',
+    scoreLabel: '0/0',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptResultDisplay({
+    accuracy: 50,
+    earnedPoints: 1.9,
+    fallbackDurationSeconds: 5,
+    totalPoints: 2.9,
+  }),
+  {
+    accuracyLabel: '50% accuracy',
+    durationLabel: 'Time: 5s',
+    scoreLabel: '1/2',
+  }
+);
+assert.deepEqual(
   buildStudentAttemptControlState({
     canSubmit: true,
     hasResult: false,
@@ -4467,6 +4494,45 @@ assert.deepEqual(
       { answer: '', itemId: 'item-3' },
     ],
     durationSeconds: 89,
+    shareSlug: 'share-one',
+    studentName: 'Ava Chen',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmissionInput({
+    answers,
+    collectStudentName: true,
+    durationSeconds: Number.POSITIVE_INFINITY,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    studentName: 'Ava Chen',
+  }),
+  {
+    answers: [
+      { answer: ' apple ', itemId: 'item-1' },
+      { answer: '   ', itemId: 'item-2' },
+      { answer: '', itemId: 'item-3' },
+    ],
+    shareSlug: 'share-one',
+    studentName: 'Ava Chen',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptSubmissionInput({
+    answers,
+    collectStudentName: true,
+    durationSeconds: 4.6,
+    runtimeItems: submissionRuntimeItems,
+    shareSlug: 'share-one',
+    studentName: 'Ava Chen',
+  }),
+  {
+    answers: [
+      { answer: ' apple ', itemId: 'item-1' },
+      { answer: '   ', itemId: 'item-2' },
+      { answer: '', itemId: 'item-3' },
+    ],
+    durationSeconds: 5,
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
   }
