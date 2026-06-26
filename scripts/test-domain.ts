@@ -103,6 +103,10 @@ import {
   hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
 import {
+  buildActivityPreviewViewModel,
+  buildDefaultActivityPreviewPanel,
+} from '@/activities/preview-view';
+import {
   buildActivityDraftMeta,
   buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
@@ -209,6 +213,7 @@ import { getAcceptedAnswers, matchAnswer } from '@/activities/answer-matching';
 import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
+  buildDashboardOverviewPageViewModel,
   dashboardOverviewPageCopy,
   formatDashboardMetricValue,
   formatDashboardTemplateCoverageValue,
@@ -240,10 +245,13 @@ import {
   canUseAnotherAssignmentAttempt,
 } from '@/assignments/attempt-limits';
 import {
+  buildChoicePairingRunnerView,
+  buildGroupSortRunnerView,
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
   buildPublicAnswerFeedbackView,
   buildRuntimeChoiceViews,
+  buildSequentialStudentRunnerView,
   buildSequentialRunnerView,
   buildStudentRunnerHeaderView,
   buildStudentRunnerView,
@@ -287,6 +295,7 @@ import {
 import {
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetItemView,
+  buildPrintableWorksheetPageViewModel,
 } from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
@@ -346,8 +355,10 @@ import {
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentAttemptRowViews,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemPerformanceRowView,
+  buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
@@ -362,6 +373,7 @@ import {
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
   buildAssignmentStudentSummaryRowView,
+  buildAssignmentStudentSummaryRowViews,
   buildAssignmentResultEmptyState,
   ATTEMPT_REVIEW_FILTER_VALUES,
   attemptReviewFilterOptions,
@@ -486,6 +498,7 @@ import {
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
+  buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
@@ -1098,20 +1111,108 @@ const activityPreviewSource = readFileSync(
   'src/components/activities/activity-preview.tsx',
   'utf8'
 );
+const activityPreviewViewSource = readFileSync(
+  'src/activities/preview-view.ts',
+  'utf8'
+);
+const activityPreviewFixture = {
+  content: buildActivityContent({
+    description: 'Preview description',
+    difficulty: 'core',
+    gradeBand: 'Grade 4',
+    groupsText:
+      'Group A | one, two\nGroup B | three\nGroup C | four\nGroup D | five',
+    language: 'en',
+    learningGoal: 'Students reuse one activity across templates.',
+    pairsText: 'A | 1\nB | 2\nC | 3\nD | 4\nE | 5',
+    questionsText: 'Q1? | A\nQ2? | B\nQ3? | C\nQ4? | D\nQ5? | E',
+    sourceSummary: 'Preview fixture',
+    subject: 'ELA',
+    teacherNotesText: 'Review before publishing.',
+    templateType: 'quiz',
+    title: 'Preview activity',
+    visibility: 'draft',
+    vocabularyText: 'one, two, three',
+  }),
+  description: 'Preview description',
+  estimatedMinutes: 9,
+  id: 'preview-activity',
+  status: 'draft' as const,
+  templateType: 'quiz' as const,
+  title: 'Preview activity',
+};
+const activityPreviewView = buildActivityPreviewViewModel({
+  activity: activityPreviewFixture,
+  assignment: {
+    activityId: 'preview-activity',
+    averageScore: 74,
+    completions: 6,
+    expiresAt: null,
+    id: 'preview-assignment',
+    settings: {
+      collectStudentName: true,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+    },
+    shareId: 'preview-share',
+    status: 'published',
+    title: 'Preview assignment',
+  },
+});
+assert.deepEqual(
+  {
+    actionLabels: activityPreviewView.panel.actions?.map(
+      (action) => action.label
+    ),
+    groupCount: activityPreviewView.content.visibleGroups.length,
+    pairCount: activityPreviewView.content.visiblePairs.length,
+    questionCount: activityPreviewView.content.visibleQuestions.length,
+    metrics: activityPreviewView.metrics,
+    templateName: activityPreviewView.templateName,
+  },
+  {
+    actionLabels: ['Create activity', 'Open student preview'],
+    groupCount: 3,
+    pairCount: 4,
+    questionCount: 3,
+    metrics: {
+      classroomMode: 'Individual',
+      estimatedTime: '9 min',
+      resultTarget: '6 completions · 74% avg',
+    },
+    templateName: 'Quiz',
+  }
+);
+assert.deepEqual(
+  buildDefaultActivityPreviewPanel().actions?.map((action) => action.to),
+  [Routes.Create, Routes.PlayDemo]
+);
 assert.match(
-  activityPreviewSource,
+  activityPreviewViewSource,
   /ACTIVITY_PREVIEW_CONTENT_LIMITS[\s\S]*groups: 3[\s\S]*pairs: 4[\s\S]*questions: 3/,
   'Activity preview content slices should expose named display limits.'
 );
+for (const key of ['questions', 'pairs', 'groups']) {
+  assert.match(
+    activityPreviewViewSource,
+    new RegExp(`ACTIVITY_PREVIEW_CONTENT_LIMITS\\.${key}`),
+    `Activity preview should reuse the named ${key} display limit.`
+  );
+}
+assert.doesNotMatch(
+  activityPreviewViewSource,
+  /slice\(0, 3\)|slice\(0, 4\)/,
+  'Activity preview should not keep local content slice limits.'
+);
 assert.match(
   activityPreviewSource,
-  /ACTIVITY_PREVIEW_CONTENT_LIMITS\.questions[\s\S]*ACTIVITY_PREVIEW_CONTENT_LIMITS\.pairs[\s\S]*ACTIVITY_PREVIEW_CONTENT_LIMITS\.groups/,
-  'Activity preview should reuse named display limits for questions, pairs, and groups.'
+  /buildActivityPreviewViewModel/,
+  'Activity preview component should consume the activity-domain preview view-model.'
 );
 assert.doesNotMatch(
   activityPreviewSource,
-  /slice\(0, 3\)|slice\(0, 4\)/,
-  'Activity preview should not keep local content slice limits.'
+  /ACTIVITY_PREVIEW_CONTENT_LIMITS|const visibleQuestions|const visiblePairs|const visibleGroups|buildDefaultActivityPreviewPanel/,
+  'Activity preview component should not rebuild content slices or default panel state.'
 );
 const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
@@ -1265,8 +1366,38 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
-  /getAssignmentResultCompletedAttemptCount|filterAssignmentResultCompletedAttemptRows|buildAssignmentResultActionState|buildAssignmentResultSectionState|buildAssignmentResultMetricItems/,
-  'Assignment result route should not rebuild completed-attempt, metric, action, or section state directly.'
+  /getAssignmentResultCompletedAttemptCount|filterAssignmentResultCompletedAttemptRows|buildAssignmentResultActionState|buildAssignmentResultSectionState|buildAssignmentResultMetricItems|buildAssignmentAttemptRowDisplay|buildAssignmentStudentSummaryRowView|buildAssignmentItemPerformanceRowView/,
+  'Assignment result route should not rebuild completed-attempt, metric, action, section, attempt-row, student-row, or item-row state directly.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.attemptRowViews\.map/,
+  'Assignment result route should render attempt rows from the assignment-domain page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /attemptRowViews: buildAssignmentAttemptRowViews|const attemptRowViews = data[\s\S]*buildAssignmentAttemptRowViews/,
+  'Assignment result page view-model should own formatted attempt row views.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.studentSummaryRowViews/,
+  'Assignment result route should render student summary rows from the assignment-domain page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /studentSummaryRowViews: buildAssignmentStudentSummaryRowViews|const studentSummaryRowViews = buildAssignmentStudentSummaryRowViews/,
+  'Assignment result page view-model should own formatted student summary row views.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.itemPerformanceRowViews/,
+  'Assignment result route should render item performance rows from the assignment-domain page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /itemPerformanceRowViews: buildAssignmentItemPerformanceRowViews|const itemPerformanceRowViews = buildAssignmentItemPerformanceRowViews/,
+  'Assignment result page view-model should own formatted item performance row views.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1295,6 +1426,42 @@ for (const filePath of directRunnerFeedbackSources) {
     readFileSync(filePath, 'utf8'),
     /<PublicAnswerFeedback[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
     `${filePath} should use the template-specific correct-answer label in student review feedback.`
+  );
+}
+const groupSortBoardSource = readFileSync(
+  'src/components/activities/group-sort-board.tsx',
+  'utf8'
+);
+assert.match(
+  groupSortBoardSource,
+  /buildGroupSortRunnerView/,
+  'Group-sort runner should consume the assignment-domain board view helper.'
+);
+assert.match(
+  groupSortBoardSource,
+  /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
+  'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
+);
+assert.doesNotMatch(
+  groupSortBoardSource,
+  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter/,
+  'Group-sort runner should not rebuild selected, unplaced, or grouped item views in the component.'
+);
+for (const filePath of [
+  'src/components/activities/listening-runner.tsx',
+  'src/components/activities/open-box-runner.tsx',
+]) {
+  const source = readFileSync(filePath, 'utf8');
+
+  assert.match(
+    source,
+    /buildSequentialStudentRunnerView/,
+    `${filePath} should consume the assignment-domain sequential runner view helper.`
+  );
+  assert.doesNotMatch(
+    source,
+    /buildSequentialRunnerView|buildStudentRunnerView/,
+    `${filePath} should not manually compose generic runner and sequence views.`
   );
 }
 const activityCreateFormSource = readFileSync(
@@ -2069,6 +2236,10 @@ assert.equal(
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
 );
 const playRouteSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
+const studentRunnerStateSource = readFileSync(
+  'src/assignments/student-runner-state.ts',
+  'utf8'
+);
 assert.match(playRouteSource, /robots: 'noindex,follow'/);
 assert.match(
   playRouteSource,
@@ -2092,8 +2263,18 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
+  /buildStudentRunnerPageViewModel/,
+  'Student play route should consume the assignment-domain runner page view-model.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /getStudentRunnerAttemptStartedAt|buildStudentRunnerAttemptState|buildAttemptTimerState|buildAttemptCompletionCopy|buildAnonymousAttemptCopy|buildStudentAttemptControlState|buildStudentAttemptResultDisplay|buildStudentAttemptTimerBadge|canStartAnotherStudentAttempt|formatStudentAttemptUsageLabel|buildStudentRunnerHeaderView/,
+  'Student play route should not rebuild runner page, timer, completion, result, or header view state directly.'
+);
+assert.match(
+  studentRunnerStateSource,
   /getStudentRunnerAttemptStartedAt\(/,
-  'Student play route should resolve attempt start times through assignment-domain helpers.'
+  'Student runner page view-model should resolve attempt start times through assignment-domain helpers.'
 );
 assert.match(
   playRouteSource,
@@ -2712,6 +2893,39 @@ assert.deepEqual(
   }
 );
 assert.equal(formatSequentialRunnerItemLabel(' ', -4), 'Item 1');
+const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
+  activeItemId: 'q-1',
+  answers: { 'q-1': 'Paris' },
+  itemLabel: 'Track',
+  items: [
+    {
+      choices: ['Paris', 'Lyon'],
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+    {
+      choices: ['Cold', 'Warm'],
+      id: 'pair-1',
+      kind: 'pair',
+      prompt: 'Hot',
+    },
+  ],
+  progressVerb: 'answered',
+  reviewItems: [
+    {
+      acceptedAnswers: ['Paris'],
+      correct: true,
+      correctAnswer: 'Paris',
+      itemId: 'q-1',
+      submitted: true,
+    },
+  ],
+});
+assert.equal(sequentialStudentRunnerView.progressLabel, '1/2 answered');
+assert.equal(sequentialStudentRunnerView.activeItem?.id, 'q-1');
+assert.equal(sequentialStudentRunnerView.activeReviewItem?.correct, true);
+assert.equal(sequentialStudentRunnerView.sequenceView.activeLabel, 'Track 1');
 assert.deepEqual(buildInlineBlankPromptView('I eat ___ for breakfast.'), {
   after: ' for breakfast.',
   before: 'I eat ',
@@ -5391,6 +5605,7 @@ assert.deepEqual(printableSnapshotWorksheet.items[0], {
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
+assert.equal(printableSnapshotItemView.id, 'q-frozen-prompt');
 assert.deepEqual(printableSnapshotItemView.answerLines, [
   { key: 'q-frozen-prompt-answer-line-0' },
 ]);
@@ -5462,6 +5677,41 @@ assert.deepEqual(
     id: 'q-frozen-prompt',
     prompt: 'Frozen prompt?',
   }
+);
+const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
+  answerKey: true,
+  worksheet: printableSnapshotWorksheetWithAnswers,
+});
+assert.deepEqual(
+  {
+    answerKeyItemIds: printableWorksheetPageView.answerKeyItemViews.map(
+      (item) => item.id
+    ),
+    headerView: printableWorksheetPageView.headerView,
+    itemIds: printableWorksheetPageView.itemViews.map((item) => item.id),
+    showAnswerKey: printableWorksheetPageView.showAnswerKey,
+  },
+  {
+    answerKeyItemIds: ['q-frozen-prompt'],
+    headerView: {
+      activityDescription: 'Frozen activity description',
+      activityTitle: 'Frozen activity title',
+      assignmentTitle: 'Printable assignment',
+      deliveryPolicy: printableSnapshotWorksheetWithAnswers.deliveryPolicyText,
+      instructions: 'Finish on paper.',
+      sharePath: '/play/printable-1',
+      templateLabel: 'Quiz',
+    },
+    itemIds: ['q-frozen-prompt'],
+    showAnswerKey: true,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetPageViewModel({
+    answerKey: false,
+    worksheet: printableSnapshotWorksheetWithAnswers,
+  }).showAnswerKey,
+  false
 );
 assert.equal(
   buildOpenPublicAssignmentPayload({
@@ -5970,6 +6220,116 @@ assert.deepEqual(
     runtimeItems: [],
   }
 );
+const studentRunnerPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: 'browser-1',
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 91_000,
+  isSubmitting: false,
+  pageState: publicRunnerState,
+  result: {
+    accuracy: 50,
+    attemptUsage: {
+      maxAttempts: 2,
+      remainingAttempts: 1,
+      usedAttempts: 1,
+    },
+    durationSeconds: 80,
+    earnedPoints: 1,
+    totalPoints: 2,
+  },
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  {
+    activeShareId: studentRunnerPageView.activeShareId,
+    anonymousAttemptCopy: studentRunnerPageView.anonymousAttemptCopy,
+    attemptControlState: studentRunnerPageView.attemptControlState,
+    attemptResultDisplay: studentRunnerPageView.attemptResultDisplay,
+    attemptTimerBadge: studentRunnerPageView.attemptTimerBadge,
+    attemptUsageLabel: studentRunnerPageView.attemptUsageLabel,
+    completionCopy: studentRunnerPageView.completionCopy,
+    currentAttemptSessionKey: studentRunnerPageView.currentAttemptSessionKey,
+    headerView: studentRunnerPageView.headerView,
+    itemCount: studentRunnerPageView.itemCount,
+    runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
+    showStartAnotherAttempt: studentRunnerPageView.showStartAnotherAttempt,
+    startedAt: studentRunnerPageView.startedAt,
+    timeLimitSeconds: studentRunnerPageView.timeLimitSeconds,
+  },
+  {
+    activeShareId: 'share-public',
+    anonymousAttemptCopy: {
+      description: `This assignment does not collect student names. This browser will submit as ${getAnonymousBrowserLabel('browser-1')}.`,
+      title: 'Anonymous attempt',
+    },
+    attemptControlState: {
+      readOnlyMessage: undefined,
+      runtimeItemsDisabled: true,
+      showTimeExpiredMessage: false,
+      submitDisabled: true,
+      unansweredLabel: undefined,
+    },
+    attemptResultDisplay: {
+      accuracyLabel: '50% accuracy',
+      durationLabel: 'Time: 1:20',
+      scoreLabel: '1/2',
+    },
+    attemptTimerBadge: {
+      label: '',
+      show: false,
+    },
+    attemptUsageLabel: '1 attempt left',
+    completionCopy: {
+      confirmIncompleteSubmit: 'All items are answered.',
+      progressLabel: '1/1 answered',
+      submitButtonLabel: 'Submit answers',
+      unansweredLabel: undefined,
+    },
+    currentAttemptSessionKey: buildStudentAttemptSessionKey({
+      assignmentId: publicRunnerState.assignment.id,
+      runtimeItems: publicRunnerState.runtimeItems,
+      shareSlug: 'share-public',
+      templateType: publicRunnerState.activity.templateType,
+    }),
+    headerView: buildStudentRunnerHeaderView({
+      assignment: publicRunnerState.assignment,
+      itemCount: publicRunnerState.runtimeItems.length,
+    }),
+    itemCount: publicRunnerState.runtimeItems.length,
+    runtimeItemIds: publicRunnerState.runtimeItems.map((item) => item.id),
+    showStartAnotherAttempt: true,
+    startedAt: 1_000,
+    timeLimitSeconds: undefined,
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerPageViewModel({
+    answers: {},
+    attemptClock: undefined,
+    confirmIncompleteSubmit: false,
+    fallbackStartedAt: 2_000,
+    isSubmitting: false,
+    pageState: { reason: 'not-found', status: 'missing' },
+    shareId: 'missing-share',
+    submittedAttemptCount: 0,
+  }).attemptControlState,
+  {
+    readOnlyMessage:
+      'Preview assignments are read-only until a teacher publishes a share link.',
+    runtimeItemsDisabled: false,
+    showTimeExpiredMessage: false,
+    submitDisabled: true,
+    unansweredLabel: undefined,
+  }
+);
 assert.deepEqual(
   buildStudentRunnerAttemptClock({
     activeShareId: ' share-public ',
@@ -6200,6 +6560,21 @@ assert.equal(
 );
 assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
+const choicePairingRunnerView = buildChoicePairingRunnerView({
+  answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
+  items: studentRunnerView.itemViews.map((itemView) => itemView.item),
+  progressVerb: 'matched',
+  selectedItemId: 'pair-2',
+});
+assert.equal(choicePairingRunnerView.progressLabel, '2/3 matched');
+assert.deepEqual(choicePairingRunnerView.choiceViews, [
+  { choice: 'Paris', selected: false, usedByItemId: 'q-1' },
+  { choice: 'Lyon', selected: false, usedByItemId: undefined },
+  { choice: 'Cold', selected: false, usedByItemId: 'pair-1' },
+  { choice: 'Warm', selected: false, usedByItemId: undefined },
+  { choice: 'North', selected: false, usedByItemId: undefined },
+  { choice: 'South', selected: false, usedByItemId: undefined },
+]);
 const groupSortRunnerView = buildStudentRunnerView({
   answers: {
     'group-drink-water': 'drink',
@@ -6240,6 +6615,30 @@ assert.deepEqual(
     .filter((itemView) => isSameRuntimeChoice(itemView.answer, 'Drink'))
     .map((itemView) => itemView.item.id),
   ['group-drink-water']
+);
+const groupSortBoardView = buildGroupSortRunnerView({
+  answers: {
+    'group-drink-water': 'drink',
+    'group-fruit-apple': ' Ｆｒｕｉｔ ',
+  },
+  items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+  progressVerb: 'sorted',
+  selectedItemId: 'group-fruit-pear',
+});
+assert.equal(groupSortBoardView.selectedItem?.id, 'group-fruit-pear');
+assert.deepEqual(
+  groupSortBoardView.unplacedItemViews.map((itemView) => itemView.item.id),
+  ['group-fruit-pear']
+);
+assert.deepEqual(
+  groupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
+    group,
+    placedItemViews.map((itemView) => itemView.item.id),
+  ]),
+  [
+    ['Fruit', ['group-fruit-apple']],
+    ['Drink', ['group-drink-water']],
+  ]
 );
 assert.deepEqual(
   buildPublicAttemptReviewItems({
@@ -7438,6 +7837,21 @@ assert.match(
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
 );
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetPageViewModel[\s\S]*buildPrintableWorksheetHeaderView/,
+  'Printable worksheet page view-model should own formatted worksheet header state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetPageViewModel[\s\S]*worksheet\.items\.map\(buildPrintableWorksheetItemView\)/,
+  'Printable worksheet page view-model should own formatted printable item views.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetPageViewModel[\s\S]*worksheet\.answerKey\?\.map\(\s*buildPrintableWorksheetAnswerKeyItemView\s*\)/,
+  'Printable worksheet page view-model should own formatted answer-key item views.'
+);
 const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
   'utf8'
@@ -7479,6 +7893,16 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
+  /buildPrintableWorksheetPageViewModel\(\{[\s\S]*answerKey,[\s\S]*worksheet: data/,
+  'Printable worksheet route should consume the assignment-domain page view-model.'
+);
+assert.doesNotMatch(
+  printableAssignmentRouteSource,
+  /buildPrintableWorksheetHeaderView|buildPrintableWorksheetItemView|buildPrintableWorksheetAnswerKeyItemView/,
+  'Printable worksheet route should not directly rebuild header, item, or answer-key display state.'
+);
+assert.match(
+  printableAssignmentRouteSource,
   /data-print-choice-bank=\{itemView\.choiceBank\.presentation\}/,
   'Printable worksheet route should render choice-bank presentation metadata for print layout variants.'
 );
@@ -7499,8 +7923,8 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /buildPrintableWorksheetAnswerKeyItemView\(item\)/,
-  'Printable worksheet route should render answer-key items through the printable worksheet view helper.'
+  /pageView\.answerKeyItemViews\.map/,
+  'Printable worksheet route should render answer-key items from the printable worksheet page view-model.'
 );
 assert.match(
   printableAssignmentRouteSource,
@@ -8245,6 +8669,40 @@ assert.equal(
   })[3]?.value,
   '-'
 );
+const dashboardOverviewPageView = buildDashboardOverviewPageViewModel({
+  activitySummary: {
+    draftActivities: 2,
+    templateCoverage: 5,
+    totalActivities: 9,
+  },
+  assignmentSummary: {
+    averageScore: 82.6,
+    completions: 14,
+    openAssignments: 3,
+    totalAssignments: 6,
+  },
+  isLoading: false,
+});
+assert.deepEqual(
+  {
+    actionCardIds: dashboardOverviewPageView.actionCards.map((card) => card.id),
+    metricIds: dashboardOverviewPageView.metrics.map((metric) => metric.id),
+    readinessValues: dashboardOverviewPageView.readinessRows.map((row) => [
+      row.id,
+      row.value,
+    ]),
+  },
+  {
+    actionCardIds: ['activities', 'assignments', 'student-preview'],
+    metricIds: ['activities', 'templates', 'assignments', 'results'],
+    readinessValues: [
+      ['activity-authoring', 100],
+      ['assignment-links', 100],
+      ['student-runner', 100],
+      ['teacher-results', 100],
+    ],
+  }
+);
 assert.deepEqual(buildDashboardCoreLoopReadiness(), [
   {
     id: 'activity-authoring',
@@ -8445,13 +8903,13 @@ assert.match(
 );
 assert.match(
   dashboardOverviewRouteSource,
-  /const activitySummary = activitiesData\?\.summary[\s\S]*const assignmentSummary = assignmentsData\?\.summary[\s\S]*buildDashboardOverviewMetrics\(\{[\s\S]*activitySummary,[\s\S]*assignmentSummary,/,
-  'Dashboard overview metric cards should be derived from API summaries instead of starter preview data.'
+  /buildDashboardOverviewPageViewModel\(\{[\s\S]*activitySummary: activitiesData\?\.summary,[\s\S]*assignmentSummary: assignmentsData\?\.summary,[\s\S]*isLoading: activitiesLoading \|\| assignmentsLoading/,
+  'Dashboard overview route should pass owner-scoped API summaries into the page view-model.'
 );
-assert.match(
+assert.doesNotMatch(
   dashboardOverviewRouteSource,
-  /buildDashboardCoreLoopReadiness\(\{[\s\S]*activitySummary,[\s\S]*assignmentSummary,/,
-  'Dashboard core-loop readiness should be derived from API summaries instead of starter preview data.'
+  /buildDashboardOverviewMetrics|buildDashboardCoreLoopReadiness|getDashboardOverviewActionCards/,
+  'Dashboard overview route should not directly rebuild metrics, readiness rows, or action cards.'
 );
 assert.match(
   dashboardOverviewRouteSource,
@@ -13542,6 +14000,9 @@ const scoredResultsPageView = buildAssignmentResultsPageViewModel({
     analysis: resultAnalysisWithUnscoredAttempt,
     assignment: {
       expiresAt: null,
+      settingsJson: {
+        timeLimitSeconds: 60,
+      },
       shareSlug: 'result-share',
       status: 'published',
       title: 'Week 1 results',
@@ -13590,6 +14051,11 @@ assert.deepEqual(
       button.action,
       button.disabled,
     ]),
+    attemptRowViews: scoredResultsPageView.attemptRowViews.map((row) => [
+      row.id,
+      row.studentLabel,
+      row.durationLabel,
+    ]),
     breadcrumbs: scoredResultsPageView.breadcrumbs.map(
       (breadcrumb) => breadcrumb.label
     ),
@@ -13604,11 +14070,17 @@ assert.deepEqual(
         ({ attempt }) => attempt.id
       ),
     headerTitle: scoredResultsPageView.headerView?.assignmentTitle,
+    itemPerformanceRowViews: scoredResultsPageView.itemPerformanceRowViews.map(
+      (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
+    ),
     metricValues: scoredResultsPageView.metricItems.map((metric) => [
       metric.key,
       metric.value,
     ]),
     sectionState: scoredResultsPageView.sectionState,
+    studentSummaryRowViews: scoredResultsPageView.studentSummaryRowViews.map(
+      (row) => [row.studentLabel, row.needsReviewLabel]
+    ),
     title: scoredResultsPageView.title,
     viewState: scoredResultsPageView.viewState,
   },
@@ -13620,12 +14092,17 @@ assert.deepEqual(
       ['copy-follow-up', false],
       ['export-csv', false],
     ],
+    attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
     classroomBriefReady: true,
     filteredAttemptIds: ['completed-attempt'],
     headerTitle: 'Week 1 results',
+    itemPerformanceRowViews: [
+      ['pair-1', '1.', '0%'],
+      ['q-1', '2.', '100%'],
+    ],
     metricValues: [
       ['completions', '1'],
       ['average-accuracy', '100%'],
@@ -13641,6 +14118,7 @@ assert.deepEqual(
       showStudentSearch: true,
       showStudentSummary: true,
     },
+    studentSummaryRowViews: [['Alice', '0']],
     title: 'Week 1 results',
     viewState: {
       attemptReviewFilter: 'needs-review',
@@ -13753,6 +14231,17 @@ assert.deepEqual(
     submittedLabel: '1/2',
   }
 );
+assert.deepEqual(
+  buildAssignmentItemPerformanceRowViews(resultAnalysis.perItem).map((row) => [
+    row.id,
+    row.itemNumberLabel,
+    row.correctRateLabel,
+  ]),
+  [
+    ['q-1', '1.', '67%'],
+    ['pair-1', '2.', '50%'],
+  ]
+);
 assert.equal(
   resultAnalysis.attempts[0]?.answers[0]?.explanation,
   'Paris is the capital of France.'
@@ -13860,6 +14349,25 @@ assert.deepEqual(
     needsReviewLabel: '0',
     studentLabel: 'Anonymous student 2',
   }
+);
+assert.deepEqual(
+  buildAssignmentStudentSummaryRowViews([
+    resultAnalysis.students[1]!,
+    {
+      attempts: 0,
+      averageAccuracy: 0,
+      bestAccuracy: 0,
+      lastCompletedAt: null,
+      latestAccuracy: 0,
+      needsReviewCount: 0,
+      studentKey: 'anonymous:empty',
+      studentLabel: 'Anonymous student 2',
+    },
+  ]).map((row) => [row.id, row.studentLabel, row.attemptsLabel]),
+  [
+    ['name:alice', 'Alice', '2'],
+    ['anonymous:empty', 'Anonymous student 2', '0'],
+  ]
 );
 const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -14435,6 +14943,41 @@ assert.deepEqual(
     studentLabel: 'Ava Chen',
     submittedAtLabel: '-',
   }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowViews({
+    rows: [
+      {
+        attempt: {
+          completedAt: attemptRowCompletedAt,
+          id: 'row-view-1',
+          maxScore: 4,
+          resultJson: {
+            accuracy: 75,
+            completedItemCount: 3,
+            durationSeconds: 62,
+            totalPoints: 4,
+          },
+          score: 3,
+          studentName: ' Raw student ',
+        },
+        review: undefined,
+        studentLabel: 'Displayed student',
+      },
+    ],
+    timeLimitSeconds: 60,
+  }),
+  [
+    {
+      accuracyLabel: '75%',
+      answeredLabel: '3/4',
+      durationLabel: '1m 00s',
+      id: 'row-view-1',
+      scoreLabel: '3/4',
+      studentLabel: 'Displayed student',
+      submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
+    },
+  ]
 );
 assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: true, submitted: true }),

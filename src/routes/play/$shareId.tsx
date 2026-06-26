@@ -10,31 +10,18 @@ import type {
   PublicAssignmentRuleSummaryItem,
 } from '@/assignments/delivery-summary';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
-import {
-  ASSIGNMENT_ATTEMPT_DURATION_UNITS,
-  buildAttemptTimerState,
-} from '@/assignments/attempt-duration';
+import { ASSIGNMENT_ATTEMPT_DURATION_UNITS } from '@/assignments/attempt-duration';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
-import {
-  getAnonymousBrowserLabel,
-  getOrCreateAnonymousAttemptToken,
-} from '@/assignments/identity';
+import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
 import {
-  buildAttemptCompletionCopy,
-  buildAnonymousAttemptCopy,
-  buildStudentAttemptControlState,
   buildStudentAnswerChange,
-  buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
-  buildStudentAttemptTimerBadge,
   buildStudentRunnerMissingView,
-  canStartAnotherStudentAttempt,
-  formatStudentAttemptUsageLabel,
   getStudentRunnerCopy,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
@@ -42,17 +29,15 @@ import {
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptClock,
-  buildStudentRunnerAttemptState,
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
-  getStudentRunnerAttemptStartedAt,
+  buildStudentRunnerPageViewModel,
   shouldStartStudentRunnerAttemptClock,
   shouldResetStudentRunnerAttemptSession,
   type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
-  buildStudentRunnerHeaderView,
   buildStudentRunnerView,
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
@@ -142,83 +127,48 @@ function PlayPage() {
       starterRuntimeItems,
     ]
   );
-  const assignment =
-    pageState.status === 'ready' ? pageState.assignment : undefined;
-  const activity =
-    pageState.status === 'ready' ? pageState.activity : undefined;
-  const attemptState = useMemo(
+  const runnerPageView = useMemo(
     () =>
-      buildStudentRunnerAttemptState({
+      buildStudentRunnerPageViewModel({
+        anonymousToken,
         answers,
+        attemptClock,
+        confirmIncompleteSubmit,
+        fallbackStartedAt: now,
+        isSubmitting: submitAttemptMutation.isPending,
         pageState,
+        result,
         shareId: normalizedShareId,
+        submittedAttemptCount,
       }),
-    [answers, pageState, normalizedShareId]
+    [
+      anonymousToken,
+      answers,
+      attemptClock,
+      confirmIncompleteSubmit,
+      now,
+      pageState,
+      result,
+      submitAttemptMutation.isPending,
+      normalizedShareId,
+      submittedAttemptCount,
+    ]
   );
-  const runtimeItems = attemptState.runtimeItems;
-  const completionSummary = attemptState.completionSummary;
-  const itemCount = attemptState.itemCount;
-  const canSubmit = attemptState.canSubmit;
-  const activeShareId = attemptState.activeShareId;
-  const startedAt = getStudentRunnerAttemptStartedAt({
-    activeShareId,
-    attemptClock,
-    fallbackStartedAt: now,
-  });
-  const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
-  const attemptTimer = buildAttemptTimerState({
-    now,
-    startedAt,
-    timeLimitSeconds,
-  });
-  const anonymousBrowserLabel = assignment?.settings.collectStudentName
-    ? undefined
-    : getAnonymousBrowserLabel(anonymousToken);
-  const anonymousAttemptCopy = buildAnonymousAttemptCopy({
-    browserLabel: anonymousBrowserLabel,
-  });
-  const activityRunnerCopy = activity
-    ? getActivityTemplateRunnerCopy(activity.templateType)
-    : undefined;
+  const { activity, assignment } = runnerPageView;
+  const runtimeItems = runnerPageView.runtimeItems;
+  const completionSummary = runnerPageView.attemptState.completionSummary;
+  const itemCount = runnerPageView.itemCount;
+  const activeShareId = runnerPageView.activeShareId;
+  const startedAt = runnerPageView.startedAt;
+  const timeLimitSeconds = runnerPageView.timeLimitSeconds;
   const runnerCopy = getStudentRunnerCopy();
-  const completionCopy = buildAttemptCompletionCopy({
-    completionSummary,
-    confirmIncompleteSubmit,
-    progressVerb: activityRunnerCopy?.progressVerb,
-  });
-  const attemptResultDisplay = result
-    ? buildStudentAttemptResultDisplay({
-        accuracy: result.accuracy,
-        durationSeconds: result.durationSeconds,
-        earnedPoints: result.earnedPoints,
-        fallbackDurationSeconds: attemptTimer.elapsedSeconds,
-        totalPoints: result.totalPoints,
-      })
-    : undefined;
-  const attemptControlState = buildStudentAttemptControlState({
-    canSubmit,
-    hasResult: Boolean(result),
-    isSubmitting: submitAttemptMutation.isPending,
-    timeExpired: attemptTimer.timeExpired,
-    unansweredLabel: completionCopy.unansweredLabel,
-  });
-  const attemptTimerBadge = buildStudentAttemptTimerBadge({
-    remainingSeconds: attemptTimer.remainingSeconds,
-    timeExpired: attemptTimer.timeExpired,
-    timeLimitSeconds,
-  });
-  const showStartAnotherAttempt = canStartAnotherStudentAttempt({
-    canSubmit,
-    hasResult: Boolean(result),
-    maxAttempts:
-      result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
-    submittedAttemptCount:
-      result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
-  });
-  const attemptUsageLabel = result
-    ? formatStudentAttemptUsageLabel(result.attemptUsage)
-    : undefined;
-  const currentAttemptSessionKey = attemptState.currentAttemptSessionKey;
+  const completionCopy = runnerPageView.completionCopy;
+  const attemptResultDisplay = runnerPageView.attemptResultDisplay;
+  const attemptControlState = runnerPageView.attemptControlState;
+  const attemptTimerBadge = runnerPageView.attemptTimerBadge;
+  const showStartAnotherAttempt = runnerPageView.showStartAnotherAttempt;
+  const attemptUsageLabel = runnerPageView.attemptUsageLabel;
+  const currentAttemptSessionKey = runnerPageView.currentAttemptSessionKey;
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -286,7 +236,7 @@ function PlayPage() {
 
   async function submitAnswers() {
     const submitGate = buildStudentAttemptSubmitGate({
-      canSubmit: Boolean(activity) && canSubmit,
+      canSubmit: Boolean(activity) && runnerPageView.attemptState.canSubmit,
       collectStudentName: Boolean(assignment?.settings.collectStudentName),
       completionSummary,
       confirmIncompleteSubmit,
@@ -390,12 +340,10 @@ function PlayPage() {
     );
   }
 
-  const headerView = buildStudentRunnerHeaderView({
-    assignment: pageState.assignment,
-    itemCount,
-  });
-  const runnerUiCopy =
-    activityRunnerCopy ?? getActivityTemplateRunnerCopy(activity.templateType);
+  const headerView = runnerPageView.headerView;
+  if (!activity || !assignment || !headerView) return null;
+
+  const runnerUiCopy = getActivityTemplateRunnerCopy(activity.templateType);
 
   return (
     <Container className="px-4 py-10 md:py-14">
@@ -472,10 +420,10 @@ function PlayPage() {
             ) : (
               <div className="rounded-lg border bg-muted/20 p-3">
                 <p className="text-sm font-medium">
-                  {anonymousAttemptCopy.title}
+                  {runnerPageView.anonymousAttemptCopy.title}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {anonymousAttemptCopy.description}
+                  {runnerPageView.anonymousAttemptCopy.description}
                 </p>
               </div>
             )}

@@ -4,8 +4,7 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
-  buildSequentialRunnerView,
-  buildStudentRunnerView,
+  buildSequentialStudentRunnerView,
   getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -42,33 +41,37 @@ export function OpenBoxRunner({
   const [activeItemId, setActiveItemId] = useState(items[0]?.id);
   const runnerView = useMemo(
     () =>
-      buildStudentRunnerView({
+      buildSequentialStudentRunnerView({
+        activeItemId,
         answers,
+        itemLabel: copy.sequenceItemLabel ?? copy.title,
         items,
         progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, copy.progressVerb, items, reviewItems]
+    [
+      activeItemId,
+      answers,
+      copy.progressVerb,
+      copy.sequenceItemLabel,
+      copy.title,
+      items,
+      reviewItems,
+    ]
   );
-  const sequenceView = buildSequentialRunnerView({
-    activeItemId,
-    itemLabel: copy.sequenceItemLabel ?? copy.title,
-    itemViews: runnerView.itemViews,
-  });
-  const activeItem = sequenceView.activeItem;
+  const { activeItem, sequenceView } = runnerView;
 
   function moveActiveItem(offset: number) {
     if (!items.length) return;
     const nextIndex =
-      (sequenceView.activeIndex + offset + items.length) % items.length;
+      (runnerView.sequenceView.activeIndex + offset + items.length) %
+      items.length;
     setActiveItemId(items[nextIndex]?.id);
   }
 
   if (!activeItem) {
     return null;
   }
-
-  const activeReviewItem = sequenceView.activeItemView.reviewItem;
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -165,10 +168,10 @@ export function OpenBoxRunner({
             className="mt-4"
           />
 
-          {revealAnswer && activeReviewItem ? (
+          {revealAnswer && runnerView.activeReviewItem ? (
             <PublicAnswerFeedback
               correctLabel={copy.correctAnswerLabel}
-              reviewItem={activeReviewItem}
+              reviewItem={runnerView.activeReviewItem}
             />
           ) : null}
         </div>

@@ -1,7 +1,17 @@
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import type { RuntimeItem } from '@/activities/runtime';
+import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
+import { buildAttemptTimerState } from '@/assignments/attempt-duration';
+import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import {
+  buildAnonymousAttemptCopy,
+  buildAttemptCompletionCopy,
   buildStudentAttemptSessionKey,
+  buildStudentAttemptControlState,
+  buildStudentAttemptResultDisplay,
+  buildStudentAttemptTimerBadge,
+  canStartAnotherStudentAttempt,
+  formatStudentAttemptUsageLabel,
   getAttemptCompletionSummary,
   type StudentAnswerMap,
   type StudentRunnerMissingReason,
@@ -13,8 +23,10 @@ import {
   type PublicAssignmentLookupResult,
   type PublicRuntimeItem,
 } from '@/assignments/public';
+import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { buildStudentRunnerHeaderView } from '@/assignments/student-runner-view';
 
 type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
 
@@ -45,6 +57,35 @@ type StudentRunnerAttemptState = {
   currentAttemptSessionKey?: string;
   itemCount: number;
   runtimeItems: PublicRuntimeItem[];
+};
+
+type StudentRunnerAttemptResult = {
+  accuracy: number;
+  attemptUsage: AssignmentAttemptUsage;
+  durationSeconds?: number;
+  earnedPoints: number;
+  totalPoints: number;
+};
+
+type StudentRunnerPageViewModel = {
+  activeShareId: string;
+  activity: ActivitySeed | undefined;
+  anonymousAttemptCopy: ReturnType<typeof buildAnonymousAttemptCopy>;
+  assignment: AssignmentSeed | undefined;
+  attemptControlState: ReturnType<typeof buildStudentAttemptControlState>;
+  attemptResultDisplay?: ReturnType<typeof buildStudentAttemptResultDisplay>;
+  attemptState: StudentRunnerAttemptState;
+  attemptTimer: ReturnType<typeof buildAttemptTimerState>;
+  attemptTimerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
+  attemptUsageLabel?: string;
+  completionCopy: ReturnType<typeof buildAttemptCompletionCopy>;
+  currentAttemptSessionKey?: string;
+  headerView?: ReturnType<typeof buildStudentRunnerHeaderView>;
+  itemCount: number;
+  runtimeItems: PublicRuntimeItem[];
+  showStartAnotherAttempt: boolean;
+  startedAt: number;
+  timeLimitSeconds?: number;
 };
 
 export type StudentRunnerAttemptResetState = {
@@ -185,6 +226,120 @@ export function buildStudentRunnerAttemptState({
         : undefined,
     itemCount,
     runtimeItems,
+  };
+}
+
+export function buildStudentRunnerPageViewModel({
+  anonymousToken,
+  answers,
+  attemptClock,
+  confirmIncompleteSubmit,
+  fallbackStartedAt,
+  isSubmitting,
+  pageState,
+  result,
+  shareId,
+  submittedAttemptCount,
+}: {
+  anonymousToken?: string;
+  answers: StudentAnswerMap;
+  attemptClock?: StudentRunnerAttemptClock;
+  confirmIncompleteSubmit: boolean;
+  fallbackStartedAt: number;
+  isSubmitting: boolean;
+  pageState: StudentRunnerPageState;
+  result?: StudentRunnerAttemptResult;
+  shareId: string;
+  submittedAttemptCount: number;
+}): StudentRunnerPageViewModel {
+  const attemptState = buildStudentRunnerAttemptState({
+    answers,
+    pageState,
+    shareId,
+  });
+  const assignment =
+    pageState.status === 'ready' ? pageState.assignment : undefined;
+  const activity =
+    pageState.status === 'ready' ? pageState.activity : undefined;
+  const activeShareId = attemptState.activeShareId;
+  const startedAt = getStudentRunnerAttemptStartedAt({
+    activeShareId,
+    attemptClock,
+    fallbackStartedAt,
+  });
+  const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
+  const attemptTimer = buildAttemptTimerState({
+    now: fallbackStartedAt,
+    startedAt,
+    timeLimitSeconds,
+  });
+  const activityRunnerCopy = activity
+    ? getActivityTemplateRunnerCopy(activity.templateType)
+    : undefined;
+  const completionCopy = buildAttemptCompletionCopy({
+    completionSummary: attemptState.completionSummary,
+    confirmIncompleteSubmit,
+    progressVerb: activityRunnerCopy?.progressVerb,
+  });
+  const attemptResultDisplay = result
+    ? buildStudentAttemptResultDisplay({
+        accuracy: result.accuracy,
+        durationSeconds: result.durationSeconds,
+        earnedPoints: result.earnedPoints,
+        fallbackDurationSeconds: attemptTimer.elapsedSeconds,
+        totalPoints: result.totalPoints,
+      })
+    : undefined;
+  const attemptControlState = buildStudentAttemptControlState({
+    canSubmit: attemptState.canSubmit,
+    hasResult: Boolean(result),
+    isSubmitting,
+    timeExpired: attemptTimer.timeExpired,
+    unansweredLabel: completionCopy.unansweredLabel,
+  });
+
+  return {
+    activeShareId,
+    activity,
+    anonymousAttemptCopy: buildAnonymousAttemptCopy({
+      browserLabel: assignment?.settings.collectStudentName
+        ? undefined
+        : getAnonymousBrowserLabel(anonymousToken),
+    }),
+    assignment,
+    attemptControlState,
+    attemptResultDisplay,
+    attemptState,
+    attemptTimer,
+    attemptTimerBadge: buildStudentAttemptTimerBadge({
+      remainingSeconds: attemptTimer.remainingSeconds,
+      timeExpired: attemptTimer.timeExpired,
+      timeLimitSeconds,
+    }),
+    attemptUsageLabel: result
+      ? formatStudentAttemptUsageLabel(result.attemptUsage)
+      : undefined,
+    completionCopy,
+    currentAttemptSessionKey: attemptState.currentAttemptSessionKey,
+    headerView:
+      assignment && pageState.status === 'ready'
+        ? buildStudentRunnerHeaderView({
+            assignment,
+            itemCount: attemptState.itemCount,
+          })
+        : undefined,
+    itemCount: attemptState.itemCount,
+    runtimeItems: attemptState.runtimeItems,
+    showStartAnotherAttempt: canStartAnotherStudentAttempt({
+      canSubmit: attemptState.canSubmit,
+      hasResult: Boolean(result),
+      maxAttempts:
+        result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
+      submittedAttemptCount:
+        result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
+    }),
+    startedAt,
+    timeLimitSeconds,
   };
 }
 

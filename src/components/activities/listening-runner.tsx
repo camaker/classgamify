@@ -4,8 +4,7 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
-  buildSequentialRunnerView,
-  buildStudentRunnerView,
+  buildSequentialStudentRunnerView,
   getStudentRunnerReviewStatusClassName,
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
@@ -47,20 +46,25 @@ export function ListeningRunner({
   const [speechSupported, setSpeechSupported] = useState(false);
   const runnerView = useMemo(
     () =>
-      buildStudentRunnerView({
+      buildSequentialStudentRunnerView({
+        activeItemId,
         answers,
+        itemLabel: copy.sequenceItemLabel ?? copy.title,
         items,
         progressVerb: copy.progressVerb,
         reviewItems,
       }),
-    [answers, copy.progressVerb, items, reviewItems]
+    [
+      activeItemId,
+      answers,
+      copy.progressVerb,
+      copy.sequenceItemLabel,
+      copy.title,
+      items,
+      reviewItems,
+    ]
   );
-  const sequenceView = buildSequentialRunnerView({
-    activeItemId,
-    itemLabel: copy.sequenceItemLabel ?? copy.title,
-    itemViews: runnerView.itemViews,
-  });
-  const activeItem = sequenceView.activeItem;
+  const { activeItem, sequenceView } = runnerView;
 
   useEffect(() => {
     setSpeechSupported(
@@ -88,8 +92,6 @@ export function ListeningRunner({
   if (!activeItem) {
     return null;
   }
-
-  const activeReviewItem = sequenceView.activeItemView.reviewItem;
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -214,10 +216,10 @@ export function ListeningRunner({
             />
           )}
 
-          {revealAnswer && activeReviewItem ? (
+          {revealAnswer && runnerView.activeReviewItem ? (
             <PublicAnswerFeedback
               correctLabel={copy.correctAnswerLabel}
-              reviewItem={activeReviewItem}
+              reviewItem={runnerView.activeReviewItem}
             />
           ) : null}
         </div>

@@ -8,9 +8,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  formatActivityTemplateClassroomMode,
-  getTemplateByType,
-} from '@/activities/catalog';
+  buildActivityPreviewViewModel,
+  type ActivityPreviewAction,
+  type ActivityPreviewActionIcon,
+  type ActivityPreviewPanel,
+} from '@/activities/preview-view';
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -37,28 +39,6 @@ type ActivityPreviewProps = {
   panel?: ActivityPreviewPanel;
 };
 
-type ActivityPreviewAction = {
-  href?: string;
-  icon?: ActivityPreviewActionIcon;
-  label: string;
-  to?: string;
-  variant?: 'default' | 'outline';
-};
-
-type ActivityPreviewActionIcon = 'edit' | 'share' | 'sparkles';
-
-type ActivityPreviewPanel = {
-  actions?: ActivityPreviewAction[];
-  description: string;
-  title: string;
-};
-
-export const ACTIVITY_PREVIEW_CONTENT_LIMITS = {
-  groups: 3,
-  pairs: 4,
-  questions: 3,
-} as const;
-
 export function ActivityPreview({
   activity,
   assignment,
@@ -66,20 +46,11 @@ export function ActivityPreview({
   hideAnswers = false,
   panel,
 }: ActivityPreviewProps) {
-  const template = getTemplateByType(activity.templateType);
-  const visibleQuestions = activity.content.questions.slice(
-    0,
-    ACTIVITY_PREVIEW_CONTENT_LIMITS.questions
-  );
-  const visiblePairs = activity.content.pairs.slice(
-    0,
-    ACTIVITY_PREVIEW_CONTENT_LIMITS.pairs
-  );
-  const visibleGroups = activity.content.groups.slice(
-    0,
-    ACTIVITY_PREVIEW_CONTENT_LIMITS.groups
-  );
-  const previewPanel = panel ?? buildDefaultActivityPreviewPanel();
+  const previewView = buildActivityPreviewViewModel({
+    activity,
+    assignment,
+    panel,
+  });
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -88,22 +59,22 @@ export function ActivityPreview({
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="rounded-md">
               <IconDeviceGamepad2 className="size-3.5" />
-              {template.name}
+              {previewView.templateName}
             </Badge>
             <Badge variant="secondary" className="rounded-md">
-              {activity.content.subject}
+              {previewView.content.subject}
             </Badge>
             <Badge variant="secondary" className="rounded-md">
-              {activity.content.gradeBand}
+              {previewView.content.gradeBand}
             </Badge>
           </div>
           <CardTitle>
             <h2 className="text-xl font-semibold tracking-tight">
-              {activity.title}
+              {previewView.title}
             </h2>
           </CardTitle>
           <CardDescription>
-            <p>{activity.description}</p>
+            <p>{previewView.description}</p>
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -115,7 +86,7 @@ export function ActivityPreview({
                   {m.activity_preview_content_title()}
                 </p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  {activity.content.learningGoal}
+                  {previewView.content.learningGoal}
                 </p>
               </div>
             </div>
@@ -127,7 +98,7 @@ export function ActivityPreview({
                 title={m.activity_preview_questions_title()}
                 icon={IconListCheck}
               >
-                {visibleQuestions.map((question) => (
+                {previewView.content.visibleQuestions.map((question) => (
                   <li key={question.id}>{question.prompt}</li>
                 ))}
               </PreviewPanel>
@@ -135,7 +106,7 @@ export function ActivityPreview({
                 title={m.activity_preview_pairs_title()}
                 icon={IconCards}
               >
-                {visiblePairs.map((pair) => (
+                {previewView.content.visiblePairs.map((pair) => (
                   <li key={pair.id}>
                     {pair.left}
                     {' -> '}
@@ -147,7 +118,7 @@ export function ActivityPreview({
                 title={m.activity_preview_groups_title()}
                 icon={IconSwitchHorizontal}
               >
-                {visibleGroups.map((group) => (
+                {previewView.content.visibleGroups.map((group) => (
                   <li key={group.id}>
                     {group.label}: {group.items.join(', ')}
                   </li>
@@ -161,40 +132,33 @@ export function ActivityPreview({
       <Card className="rounded-lg">
         <CardHeader>
           <CardTitle>
-            <h2 className="text-base font-semibold">{previewPanel.title}</h2>
+            <h2 className="text-base font-semibold">
+              {previewView.panel.title}
+            </h2>
           </CardTitle>
           <CardDescription>
-            <p>{previewPanel.description}</p>
+            <p>{previewView.panel.description}</p>
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
           <MetricRow
             icon={IconClock}
             label={m.activity_preview_estimated_time_label()}
-            value={m.activity_preview_estimated_time_value({
-              minutes: activity.estimatedMinutes,
-            })}
+            value={previewView.metrics.estimatedTime}
           />
           <MetricRow
             icon={IconUsers}
             label={m.activity_preview_classroom_mode_label()}
-            value={formatActivityTemplateClassroomMode(template.classroomMode)}
+            value={previewView.metrics.classroomMode}
           />
           <MetricRow
             icon={IconChartBar}
             label={m.activity_preview_result_target_label()}
-            value={
-              assignment
-                ? m.activity_preview_assignment_result_value({
-                    averageScore: assignment.averageScore,
-                    completions: assignment.completions,
-                  })
-                : m.activity_preview_default_result_value()
-            }
+            value={previewView.metrics.resultTarget}
           />
-          {previewPanel.actions?.length ? (
+          {previewView.panel.actions?.length ? (
             <div className="mt-2 flex flex-col gap-2">
-              {previewPanel.actions.map((action) => (
+              {previewView.panel.actions.map((action) => (
                 <ActivityPreviewActionLink
                   action={action}
                   key={`${action.label}-${action.to ?? action.href}`}
@@ -237,26 +201,6 @@ function ActivityPreviewActionLink({
       {action.label}
     </Link>
   );
-}
-
-function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {
-  return {
-    actions: [
-      {
-        icon: 'sparkles',
-        label: m.activity_preview_create_activity(),
-        to: Routes.Create,
-      },
-      {
-        icon: 'share',
-        label: m.activity_preview_open_student_preview(),
-        to: Routes.PlayDemo,
-        variant: 'outline',
-      },
-    ],
-    description: m.activity_preview_default_panel_description(),
-    title: m.activity_preview_default_panel_title(),
-  };
 }
 
 const activityPreviewActionIcons = {

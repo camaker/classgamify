@@ -4,9 +4,8 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
-  buildStudentRunnerView,
+  buildGroupSortRunnerView,
   getStudentRunnerReviewStatusClassName,
-  isSameRuntimeChoice,
   type StudentRunnerReviewStatus,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -42,19 +41,14 @@ export function GroupSortBoard({
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const runnerView = useMemo(
     () =>
-      buildStudentRunnerView({
+      buildGroupSortRunnerView({
         answers,
         items,
         progressVerb: copy.progressVerb,
         reviewItems,
+        selectedItemId,
       }),
-    [answers, copy.progressVerb, items, reviewItems]
-  );
-  const selectedItem = selectedItemId
-    ? runnerView.itemViewsById.get(selectedItemId)?.item
-    : null;
-  const unplacedItemViews = runnerView.itemViews.filter(
-    (itemView) => !itemView.answered
+    [answers, copy.progressVerb, items, reviewItems, selectedItemId]
   );
 
   function placeSelectedItem(group: string) {
@@ -88,7 +82,7 @@ export function GroupSortBoard({
               <IconLayoutColumns className="size-4 text-muted-foreground" />
               {copy.itemListLabel}
             </div>
-            {selectedItem ? (
+            {runnerView.selectedItem ? (
               <button
                 type="button"
                 disabled={disabled}
@@ -101,24 +95,26 @@ export function GroupSortBoard({
           </div>
 
           <div className="mt-3 grid gap-2">
-            {unplacedItemViews.length ? (
-              unplacedItemViews.map(({ item, reviewItem, status }) => (
-                <GroupSortItemButton
-                  correctLabel={copy.correctAnswerLabel}
-                  key={item.id}
-                  item={item}
-                  reviewItem={reviewItem}
-                  revealAnswer={revealAnswer}
-                  selected={selectedItemId === item.id}
-                  status={status}
-                  onSelect={() =>
-                    setSelectedItemId((current) =>
-                      current === item.id ? undefined : item.id
-                    )
-                  }
-                  disabled={disabled}
-                />
-              ))
+            {runnerView.unplacedItemViews.length ? (
+              runnerView.unplacedItemViews.map(
+                ({ item, reviewItem, status }) => (
+                  <GroupSortItemButton
+                    correctLabel={copy.correctAnswerLabel}
+                    key={item.id}
+                    item={item}
+                    reviewItem={reviewItem}
+                    revealAnswer={revealAnswer}
+                    selected={selectedItemId === item.id}
+                    status={status}
+                    onSelect={() =>
+                      setSelectedItemId((current) =>
+                        current === item.id ? undefined : item.id
+                      )
+                    }
+                    disabled={disabled}
+                  />
+                )
+              )
             ) : (
               <div className="min-h-14 rounded-lg border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
                 {copy.emptyItemsLabel}
@@ -128,11 +124,7 @@ export function GroupSortBoard({
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {runnerView.choices.map((group) => {
-            const placedItemViews = runnerView.itemViews.filter((itemView) =>
-              isSameRuntimeChoice(itemView.answer, group)
-            );
-
+          {runnerView.groupViews.map(({ group, placedItemViews }) => {
             return (
               <div key={group} className="rounded-lg border bg-background p-3">
                 <button

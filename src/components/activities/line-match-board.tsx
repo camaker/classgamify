@@ -4,9 +4,8 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
+  buildChoicePairingRunnerView,
   buildExclusiveChoiceAnswerChanges,
-  buildRuntimeChoiceViews,
-  buildStudentRunnerView,
   getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -36,22 +35,14 @@ export function LineMatchBoard({
   const [selectedItemId, setSelectedItemId] = useState<string>();
   const runnerView = useMemo(
     () =>
-      buildStudentRunnerView({
+      buildChoicePairingRunnerView({
         answers,
         items,
         progressVerb: copy.progressVerb,
         reviewItems,
-      }),
-    [answers, copy.progressVerb, items, reviewItems]
-  );
-  const choiceViews = useMemo(
-    () =>
-      buildRuntimeChoiceViews({
-        answers,
-        choices: runnerView.choices,
         selectedItemId,
       }),
-    [answers, runnerView.choices, selectedItemId]
+    [answers, copy.progressVerb, items, reviewItems, selectedItemId]
   );
 
   function selectPrompt(itemId: string) {
@@ -137,7 +128,7 @@ export function LineMatchBoard({
         </div>
 
         <div className="grid content-start gap-2">
-          {choiceViews.map(({ choice, selected, usedByItemId }) => (
+          {runnerView.choiceViews.map(({ choice, selected, usedByItemId }) => (
             <button
               key={choice}
               type="button"

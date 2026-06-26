@@ -32,6 +32,19 @@ type RuntimeChoiceAnswerChange = {
   itemId: string;
 };
 
+type ChoicePairingRunnerView = ReturnType<typeof buildStudentRunnerView> & {
+  choiceViews: ReturnType<typeof buildRuntimeChoiceViews>;
+};
+
+type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
+  groupViews: Array<{
+    group: string;
+    placedItemViews: ReturnType<typeof buildStudentRunnerView>['itemViews'];
+  }>;
+  selectedItem?: PublicRuntimeItem;
+  unplacedItemViews: ReturnType<typeof buildStudentRunnerView>['itemViews'];
+};
+
 type InlineBlankPromptView =
   | {
       after: string;
@@ -187,6 +200,41 @@ export function buildSequentialRunnerView<
   };
 }
 
+export function buildSequentialStudentRunnerView({
+  activeItemId,
+  answers,
+  itemLabel,
+  items,
+  progressVerb,
+  reviewItems,
+}: {
+  activeItemId?: string;
+  answers: StudentAnswerMap;
+  itemLabel: string;
+  items: PublicRuntimeItem[];
+  progressVerb?: string;
+  reviewItems?: PublicAttemptReviewItem[];
+}) {
+  const runnerView = buildStudentRunnerView({
+    answers,
+    items,
+    progressVerb,
+    reviewItems,
+  });
+  const sequenceView = buildSequentialRunnerView({
+    activeItemId,
+    itemLabel,
+    itemViews: runnerView.itemViews,
+  });
+
+  return {
+    ...runnerView,
+    activeItem: sequenceView.activeItem,
+    activeReviewItem: sequenceView.activeItemView?.reviewItem,
+    sequenceView,
+  };
+}
+
 export function formatSequentialRunnerItemLabel(label: string, index: number) {
   const normalizedLabel =
     label.trim() || m.student_runner_sequential_default_item_label();
@@ -247,6 +295,73 @@ export function buildRuntimeChoiceViews({
       : false,
     usedByItemId: findChoiceOwner(answers, choice),
   }));
+}
+
+export function buildChoicePairingRunnerView({
+  answers,
+  items,
+  progressVerb,
+  reviewItems,
+  selectedItemId,
+}: {
+  answers: StudentAnswerMap;
+  items: PublicRuntimeItem[];
+  progressVerb?: string;
+  reviewItems?: PublicAttemptReviewItem[];
+  selectedItemId?: string;
+}): ChoicePairingRunnerView {
+  const runnerView = buildStudentRunnerView({
+    answers,
+    items,
+    progressVerb,
+    reviewItems,
+  });
+
+  return {
+    ...runnerView,
+    choiceViews: buildRuntimeChoiceViews({
+      answers,
+      choices: runnerView.choices,
+      selectedItemId,
+    }),
+  };
+}
+
+export function buildGroupSortRunnerView({
+  answers,
+  items,
+  progressVerb,
+  reviewItems,
+  selectedItemId,
+}: {
+  answers: StudentAnswerMap;
+  items: PublicRuntimeItem[];
+  progressVerb?: string;
+  reviewItems?: PublicAttemptReviewItem[];
+  selectedItemId?: string;
+}): GroupSortRunnerView {
+  const runnerView = buildStudentRunnerView({
+    answers,
+    items,
+    progressVerb,
+    reviewItems,
+  });
+
+  return {
+    ...runnerView,
+    groupViews: runnerView.choices.map((group) => ({
+      group,
+      placedItemViews: runnerView.itemViews.filter((itemView) =>
+        isSameRuntimeChoice(itemView.answer, group)
+      ),
+    })),
+    selectedItem: selectedItemId
+      ? runnerView.itemViewsById.get(selectedItemId)?.item
+      : undefined,
+    unplacedItemViews: runnerView.itemViews.filter(
+      (itemView) => !itemView.answered
+    ),
+  };
 }
 
 export function buildExclusiveChoiceAnswerChanges({

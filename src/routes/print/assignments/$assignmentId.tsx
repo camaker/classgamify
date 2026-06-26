@@ -4,9 +4,7 @@ import {
   type PrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
-  buildPrintableWorksheetHeaderView,
-  buildPrintableWorksheetAnswerKeyItemView,
-  buildPrintableWorksheetItemView,
+  buildPrintableWorksheetPageViewModel,
   printableWorksheetPageCopy,
 } from '@/assignments/printable-worksheet-view';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +40,10 @@ export const Route = createFileRoute('/print/assignments/$assignmentId')({
   },
   component: PrintableAssignmentWorksheetPage,
 });
+
+type PrintableWorksheetItemView = ReturnType<
+  typeof buildPrintableWorksheetPageViewModel
+>['itemViews'][number];
 
 function PrintableAssignmentWorksheetPage() {
   const { assignmentId } = Route.useParams();
@@ -100,8 +102,10 @@ function PrintableAssignmentWorksheetPage() {
     );
   }
 
-  const headerView = buildPrintableWorksheetHeaderView(data);
-  const answerKeyItems = data.answerKey ?? [];
+  const pageView = buildPrintableWorksheetPageViewModel({
+    answerKey,
+    worksheet: data,
+  });
 
   return (
     <main
@@ -154,18 +158,18 @@ function PrintableAssignmentWorksheetPage() {
                   {printableWorksheetPageCopy.printModeLabel}
                 </Badge>
                 <Badge variant="outline" className="rounded-md">
-                  {headerView.templateLabel}
+                  {pageView.headerView.templateLabel}
                 </Badge>
               </div>
               <h1 className="mt-3 text-2xl font-semibold leading-tight">
-                {headerView.assignmentTitle}
+                {pageView.headerView.assignmentTitle}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                {headerView.activityTitle}
+                {pageView.headerView.activityTitle}
               </p>
-              {headerView.activityDescription ? (
+              {pageView.headerView.activityDescription ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {headerView.activityDescription}
+                  {pageView.headerView.activityDescription}
                 </p>
               ) : null}
             </div>
@@ -178,7 +182,7 @@ function PrintableAssignmentWorksheetPage() {
                 {printableWorksheetPageCopy.brandLabel}
               </div>
               <p className="mt-1 text-muted-foreground">
-                {headerView.sharePath}
+                {pageView.headerView.sharePath}
               </p>
             </div>
           </header>
@@ -198,7 +202,7 @@ function PrintableAssignmentWorksheetPage() {
                 {printableWorksheetPageCopy.sharePathLabel}
               </p>
               <p className="mt-2 text-muted-foreground">
-                {headerView.sharePath}
+                {pageView.headerView.sharePath}
               </p>
             </div>
             <div>
@@ -206,7 +210,7 @@ function PrintableAssignmentWorksheetPage() {
                 {printableWorksheetPageCopy.instructionsLabel}
               </p>
               <p className="mt-2 text-muted-foreground">
-                {headerView.instructions}
+                {pageView.headerView.instructions}
               </p>
             </div>
             <div>
@@ -214,15 +218,15 @@ function PrintableAssignmentWorksheetPage() {
                 {printableWorksheetPageCopy.deliveryPolicyLabel}
               </p>
               <p className="mt-2 text-muted-foreground">
-                {headerView.deliveryPolicy}
+                {pageView.headerView.deliveryPolicy}
               </p>
             </div>
           </section>
 
-          {data.items.length > 0 ? (
+          {pageView.itemViews.length > 0 ? (
             <section data-print-items className="grid gap-4">
-              {data.items.map((item) => (
-                <PrintableWorksheetItem key={item.id} item={item} />
+              {pageView.itemViews.map((itemView) => (
+                <PrintableWorksheetItem key={itemView.id} itemView={itemView} />
               ))}
             </section>
           ) : (
@@ -236,7 +240,7 @@ function PrintableAssignmentWorksheetPage() {
             </section>
           )}
 
-          {answerKey && answerKeyItems.length > 0 ? (
+          {pageView.showAnswerKey ? (
             <section data-print-answer-key className="grid gap-3 border-t pt-5">
               <div className="flex items-center gap-2">
                 <IconKey className="size-5 text-primary" />
@@ -250,32 +254,27 @@ function PrintableAssignmentWorksheetPage() {
                 </div>
               </div>
               <div className="grid gap-2">
-                {answerKeyItems.map((item) => {
-                  const itemView =
-                    buildPrintableWorksheetAnswerKeyItemView(item);
-
-                  return (
-                    <div
-                      key={itemView.id}
-                      className="rounded-lg border bg-muted/20 p-3 text-sm"
-                    >
-                      <p className="font-medium">{itemView.answerLabel}</p>
+                {pageView.answerKeyItemViews.map((itemView) => (
+                  <div
+                    key={itemView.id}
+                    className="rounded-lg border bg-muted/20 p-3 text-sm"
+                  >
+                    <p className="font-medium">{itemView.answerLabel}</p>
+                    <p className="mt-1 text-muted-foreground">
+                      {itemView.prompt}
+                    </p>
+                    {itemView.acceptedAnswersLabel ? (
                       <p className="mt-1 text-muted-foreground">
-                        {itemView.prompt}
+                        {itemView.acceptedAnswersLabel}
                       </p>
-                      {itemView.acceptedAnswersLabel ? (
-                        <p className="mt-1 text-muted-foreground">
-                          {itemView.acceptedAnswersLabel}
-                        </p>
-                      ) : null}
-                      {itemView.explanationLabel ? (
-                        <p className="mt-1 text-muted-foreground">
-                          {itemView.explanationLabel}
-                        </p>
-                      ) : null}
-                    </div>
-                  );
-                })}
+                    ) : null}
+                    {itemView.explanationLabel ? (
+                      <p className="mt-1 text-muted-foreground">
+                        {itemView.explanationLabel}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
               </div>
             </section>
           ) : null}
@@ -286,14 +285,10 @@ function PrintableAssignmentWorksheetPage() {
 }
 
 function PrintableWorksheetItem({
-  item,
+  itemView,
 }: {
-  item: NonNullable<
-    ReturnType<typeof usePrintableAssignmentWorksheet>['data']
-  >['items'][number];
+  itemView: PrintableWorksheetItemView;
 }) {
-  const itemView = buildPrintableWorksheetItemView(item);
-
   return (
     <section
       data-print-item

@@ -15,10 +15,7 @@ import {
   attemptReviewFilterOptions,
   buildAssignmentAttemptAnswerReviewView,
   buildAssignmentAttemptReviewCardView,
-  buildAssignmentAttemptRowDisplay,
   buildAssignmentItemAnalysisCardView,
-  buildAssignmentItemPerformanceRowView,
-  buildAssignmentStudentSummaryRowView,
   itemPerformanceSortOptions,
   studentSummarySortOptions,
 } from '@/assignments/result-view';
@@ -412,9 +409,7 @@ function LoadedAssignmentResultsPage({
                 onSortChange={onItemPerformanceSortChange}
                 sort={pageView.viewState.itemPerformanceSort}
               />
-              <ItemPerformanceTable
-                items={pageView.resultView.sortedPerformanceItems}
-              />
+              <ItemPerformanceTable items={pageView.itemPerformanceRowViews} />
             </div>
           </CardContent>
         </Card>
@@ -434,9 +429,7 @@ function LoadedAssignmentResultsPage({
           </CardHeader>
           <CardContent>
             {pageView.resultView.filteredStudents.length > 0 ? (
-              <StudentSummaryTable
-                students={pageView.resultView.filteredStudents}
-              />
+              <StudentSummaryTable students={pageView.studentSummaryRowViews} />
             ) : (
               <ResultEmptyState
                 state={pageView.resultView.emptyStates.studentSummary}
@@ -470,28 +463,16 @@ function LoadedAssignmentResultsPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pageView.resultView.filteredAttemptRows.map(
-                  ({ attempt, review, studentLabel }) => {
-                    const rowDisplay = buildAssignmentAttemptRowDisplay({
-                      attempt,
-                      review,
-                      studentLabel,
-                      timeLimitSeconds:
-                        data.assignment.settingsJson.timeLimitSeconds,
-                    });
-
-                    return (
-                      <TableRow key={attempt.id}>
-                        <TableCell>{rowDisplay.studentLabel}</TableCell>
-                        <TableCell>{rowDisplay.scoreLabel}</TableCell>
-                        <TableCell>{rowDisplay.accuracyLabel}</TableCell>
-                        <TableCell>{rowDisplay.answeredLabel}</TableCell>
-                        <TableCell>{rowDisplay.durationLabel}</TableCell>
-                        <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
-                      </TableRow>
-                    );
-                  }
-                )}
+                {pageView.attemptRowViews.map((rowDisplay) => (
+                  <TableRow key={rowDisplay.id}>
+                    <TableCell>{rowDisplay.studentLabel}</TableCell>
+                    <TableCell>{rowDisplay.scoreLabel}</TableCell>
+                    <TableCell>{rowDisplay.accuracyLabel}</TableCell>
+                    <TableCell>{rowDisplay.answeredLabel}</TableCell>
+                    <TableCell>{rowDisplay.durationLabel}</TableCell>
+                    <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           ) : (
@@ -715,9 +696,9 @@ function ResultEmptyState({
 function StudentSummaryTable({
   students,
 }: {
-  students: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['students'];
+  students: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['studentSummaryRowViews'];
 }) {
   return (
     <Table>
@@ -729,20 +710,17 @@ function StudentSummaryTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {students.map((student) => {
-          const rowView = buildAssignmentStudentSummaryRowView(student);
-          return (
-            <TableRow key={student.studentKey}>
-              <TableCell>{rowView.studentLabel}</TableCell>
-              <TableCell>{rowView.attemptsLabel}</TableCell>
-              <TableCell>{rowView.latestAccuracyLabel}</TableCell>
-              <TableCell>{rowView.averageAccuracyLabel}</TableCell>
-              <TableCell>{rowView.bestAccuracyLabel}</TableCell>
-              <TableCell>{rowView.needsReviewLabel}</TableCell>
-              <TableCell>{rowView.lastSubmittedLabel}</TableCell>
-            </TableRow>
-          );
-        })}
+        {students.map((rowView) => (
+          <TableRow key={rowView.id}>
+            <TableCell>{rowView.studentLabel}</TableCell>
+            <TableCell>{rowView.attemptsLabel}</TableCell>
+            <TableCell>{rowView.latestAccuracyLabel}</TableCell>
+            <TableCell>{rowView.averageAccuracyLabel}</TableCell>
+            <TableCell>{rowView.bestAccuracyLabel}</TableCell>
+            <TableCell>{rowView.needsReviewLabel}</TableCell>
+            <TableCell>{rowView.lastSubmittedLabel}</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );
@@ -809,9 +787,9 @@ function AttemptReviewFilterControl({
 function ItemPerformanceTable({
   items,
 }: {
-  items: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['perItem'];
+  items: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['itemPerformanceRowViews'];
 }) {
   return (
     <Table>
@@ -823,29 +801,22 @@ function ItemPerformanceTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item, index) => {
-          const rowView = buildAssignmentItemPerformanceRowView({
-            index,
-            item,
-          });
-
-          return (
-            <TableRow key={item.itemId}>
-              <TableCell className="max-w-80">
-                <span className="font-medium">{rowView.itemNumberLabel}</span>{' '}
-                {rowView.prompt}
-              </TableCell>
-              <TableCell>{rowView.kindLabel}</TableCell>
-              <TableCell>{rowView.correctRateLabel}</TableCell>
-              <TableCell>{rowView.submittedLabel}</TableCell>
-              <TableCell>{rowView.expectedAnswerText}</TableCell>
-              <TableCell>{rowView.acceptedAnswersText}</TableCell>
-              <TableCell className="max-w-72">
-                {rowView.explanationText}
-              </TableCell>
-            </TableRow>
-          );
-        })}
+        {items.map((rowView) => (
+          <TableRow key={rowView.id}>
+            <TableCell className="max-w-80">
+              <span className="font-medium">{rowView.itemNumberLabel}</span>{' '}
+              {rowView.prompt}
+            </TableCell>
+            <TableCell>{rowView.kindLabel}</TableCell>
+            <TableCell>{rowView.correctRateLabel}</TableCell>
+            <TableCell>{rowView.submittedLabel}</TableCell>
+            <TableCell>{rowView.expectedAnswerText}</TableCell>
+            <TableCell>{rowView.acceptedAnswersText}</TableCell>
+            <TableCell className="max-w-72">
+              {rowView.explanationText}
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

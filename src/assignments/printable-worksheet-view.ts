@@ -12,6 +12,25 @@ import { formatAssignmentResultValue } from '@/assignments/result-format';
 import { getTemplateByType } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 
+type PrintableWorksheetHeaderView = ReturnType<
+  typeof buildPrintableWorksheetHeaderView
+>;
+
+type PrintableWorksheetItemView = ReturnType<
+  typeof buildPrintableWorksheetItemView
+>;
+
+type PrintableWorksheetAnswerKeyItemView = ReturnType<
+  typeof buildPrintableWorksheetAnswerKeyItemView
+>;
+
+type PrintableWorksheetPageViewModel = {
+  answerKeyItemViews: PrintableWorksheetAnswerKeyItemView[];
+  headerView: PrintableWorksheetHeaderView;
+  itemViews: PrintableWorksheetItemView[];
+  showAnswerKey: boolean;
+};
+
 export const printableWorksheetPageCopy = {
   get answerKeyDescription() {
     return m.assignment_printable_answer_key_description();
@@ -78,12 +97,32 @@ export function buildPrintableWorksheetHeaderView(
   };
 }
 
+export function buildPrintableWorksheetPageViewModel({
+  answerKey,
+  worksheet,
+}: {
+  answerKey: boolean;
+  worksheet: PrintableAssignmentWorksheet;
+}): PrintableWorksheetPageViewModel {
+  const answerKeyItemViews = worksheet.answerKey?.map(
+    buildPrintableWorksheetAnswerKeyItemView
+  );
+
+  return {
+    answerKeyItemViews: answerKeyItemViews ?? [],
+    headerView: buildPrintableWorksheetHeaderView(worksheet),
+    itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
+    showAnswerKey: answerKey && Boolean(answerKeyItemViews?.length),
+  };
+}
+
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   return {
     answerLines: getPrintableWorksheetAnswerLines(item),
     choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
     choices: item.choices,
+    id: item.id,
     kindLabel: formatRuntimeItemKindLabel(item),
     prompt: formatRuntimeItemPrompt(item),
     responseHelp: getPrintableWorksheetResponseHelp(item.responseMode),

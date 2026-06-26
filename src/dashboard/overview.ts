@@ -31,6 +31,12 @@ type DashboardOverviewMetric = {
   value: string;
 };
 
+type DashboardOverviewPageViewModel = {
+  actionCards: DashboardOverviewActionCard[];
+  metrics: DashboardOverviewMetric[];
+  readinessRows: DashboardCoreLoopReadinessRow[];
+};
+
 export type DashboardOverviewActionCardId =
   | 'activities'
   | 'assignments'
@@ -109,6 +115,29 @@ export function getDashboardOverviewActionCards(): DashboardOverviewActionCard[]
       title: m.dashboard_overview_action_student_preview_title(),
     },
   ];
+}
+
+export function buildDashboardOverviewPageViewModel({
+  activitySummary,
+  assignmentSummary,
+  isLoading,
+}: {
+  activitySummary?: DashboardActivitySummary;
+  assignmentSummary?: DashboardAssignmentSummary;
+  isLoading: boolean;
+}): DashboardOverviewPageViewModel {
+  return {
+    actionCards: getDashboardOverviewActionCards(),
+    metrics: buildDashboardOverviewMetrics({
+      activitySummary,
+      assignmentSummary,
+      isLoading,
+    }),
+    readinessRows: buildDashboardCoreLoopReadiness({
+      activitySummary,
+      assignmentSummary,
+    }),
+  };
 }
 
 export function buildDashboardOverviewMetrics({

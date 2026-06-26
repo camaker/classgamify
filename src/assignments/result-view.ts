@@ -249,6 +249,9 @@ type AssignmentResultHeaderSource = {
   };
   assignment: {
     expiresAt: Date | string | null;
+    settingsJson: {
+      timeLimitSeconds?: number;
+    };
     shareSlug: string;
     status: AssignmentStatus | string;
     title: string;
@@ -268,27 +271,29 @@ type AssignmentResultHeaderShareAction = {
   shareSlug: string;
 };
 
-type AssignmentResultsPageData<TAttempt extends AssignmentAttemptRowInput> =
-  AssignmentResultHeaderSource & {
-    analysis: {
-      attempts: AssignmentAttemptReview[];
-      perItem: AssignmentItemAnalysis[];
-      students: AssignmentStudentSummary[];
-    };
-    attempts: TAttempt[];
-    stats: {
-      averageDurationSeconds: number | null | undefined;
-      averagePoints: number;
-      averageScore: number;
-      completions: number;
-    };
+type AssignmentResultsPageData<
+  TAttempt extends AssignmentAttemptRowDisplayInput,
+> = AssignmentResultHeaderSource & {
+  analysis: {
+    attempts: AssignmentAttemptReview[];
+    perItem: AssignmentItemAnalysis[];
+    students: AssignmentStudentSummary[];
   };
+  attempts: TAttempt[];
+  stats: {
+    averageDurationSeconds: number | null | undefined;
+    averagePoints: number;
+    averageScore: number;
+    completions: number;
+  };
+};
 
 type AssignmentResultsPageViewModel<
-  TAttempt extends AssignmentAttemptRowInput,
+  TAttempt extends AssignmentAttemptRowDisplayInput,
 > = {
   actionButtons: AssignmentResultActionButton[];
   actionState: AssignmentResultActionState;
+  attemptRowViews: Array<ReturnType<typeof buildAssignmentAttemptRowDisplay>>;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: ReturnType<typeof buildAssignmentClassroomBrief> | null;
   completedAttemptCount: number;
@@ -297,9 +302,15 @@ type AssignmentResultsPageViewModel<
   description: string;
   headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
   loadErrorMessage: string;
+  itemPerformanceRowViews: ReturnType<
+    typeof buildAssignmentItemPerformanceRowViews
+  >;
   metricItems: ReturnType<typeof buildAssignmentResultMetricItems>;
   resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
   sectionState: AssignmentResultSectionState;
+  studentSummaryRowViews: ReturnType<
+    typeof buildAssignmentStudentSummaryRowViews
+  >;
   title: string;
   viewState: AssignmentResultResolvedViewState;
 };
@@ -938,6 +949,26 @@ export function buildAssignmentAttemptRowDisplay({
   };
 }
 
+export function buildAssignmentAttemptRowViews<
+  TAttempt extends AssignmentAttemptRowDisplayInput,
+>({
+  rows,
+  timeLimitSeconds,
+}: {
+  rows: Array<AssignmentAttemptReviewRow<TAttempt>>;
+  timeLimitSeconds?: number | null;
+}) {
+  return rows.map(({ attempt, review, studentLabel }) => ({
+    id: attempt.id,
+    ...buildAssignmentAttemptRowDisplay({
+      attempt,
+      review,
+      studentLabel,
+      timeLimitSeconds,
+    }),
+  }));
+}
+
 function getAssignmentAttemptStudentLabel({
   reviewStudentLabel,
   studentName,
@@ -1012,6 +1043,15 @@ export function buildAssignmentStudentSummaryRowView(
   };
 }
 
+export function buildAssignmentStudentSummaryRowViews(
+  students: AssignmentStudentSummary[]
+) {
+  return students.map((student) => ({
+    id: student.studentKey,
+    ...buildAssignmentStudentSummaryRowView(student),
+  }));
+}
+
 export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
 ) {
@@ -1051,6 +1091,15 @@ export function buildAssignmentItemPerformanceRowView({
       item.submittedCount
     ),
   };
+}
+
+export function buildAssignmentItemPerformanceRowViews(
+  items: AssignmentItemAnalysis[]
+) {
+  return items.map((item, index) => ({
+    id: item.itemId,
+    ...buildAssignmentItemPerformanceRowView({ index, item }),
+  }));
 }
 
 export function buildAssignmentAttemptAnswerReviewView({
@@ -1622,7 +1671,7 @@ export function resolveAssignmentResultViewState(
 }
 
 export function buildAssignmentResultsPageViewModel<
-  TAttempt extends AssignmentAttemptRowInput,
+  TAttempt extends AssignmentAttemptRowDisplayInput,
 >({
   data,
   search,
@@ -1648,6 +1697,18 @@ export function buildAssignmentResultsPageViewModel<
     studentSort: viewState.studentSort,
     students: data?.analysis.students ?? [],
   });
+  const attemptRowViews = data
+    ? buildAssignmentAttemptRowViews({
+        rows: resultView.filteredAttemptRows,
+        timeLimitSeconds: data.assignment.settingsJson.timeLimitSeconds,
+      })
+    : [];
+  const studentSummaryRowViews = buildAssignmentStudentSummaryRowViews(
+    resultView.filteredStudents
+  );
+  const itemPerformanceRowViews = buildAssignmentItemPerformanceRowViews(
+    resultView.sortedPerformanceItems
+  );
   const classroomBrief = data
     ? buildAssignmentClassroomBrief({
         assignmentTitle: data.assignment.title,
@@ -1673,6 +1734,7 @@ export function buildAssignmentResultsPageViewModel<
   return {
     actionButtons: buildAssignmentResultActionButtons(actionState),
     actionState,
+    attemptRowViews,
     breadcrumbs: [
       {
         href: Routes.Dashboard,
@@ -1690,6 +1752,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttempts,
     description: assignmentResultPageCopy.description,
     headerView,
+    itemPerformanceRowViews,
     loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
     metricItems: data
       ? buildAssignmentResultMetricItems({
@@ -1708,6 +1771,7 @@ export function buildAssignmentResultsPageViewModel<
       itemCount: data?.analysis.perItem.length ?? 0,
       studentCount: data?.analysis.students.length ?? 0,
     }),
+    studentSummaryRowViews,
     title,
     viewState,
   };

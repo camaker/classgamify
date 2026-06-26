@@ -8,10 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { useActivities } from '@/hooks/use-activities';
 import { useAssignments } from '@/hooks/use-assignments';
 import {
-  buildDashboardCoreLoopReadiness,
-  buildDashboardOverviewMetrics,
+  buildDashboardOverviewPageViewModel,
   dashboardOverviewPageCopy,
-  getDashboardOverviewActionCards,
   type DashboardOverviewActionCard,
   type DashboardOverviewActionCardId,
   type DashboardOverviewMetricId,
@@ -49,19 +47,11 @@ function DashboardPage() {
       pageIndex: 0,
       pageSize: 1,
     });
-  const activitySummary = activitiesData?.summary;
-  const assignmentSummary = assignmentsData?.summary;
-  const isMetricLoading = activitiesLoading || assignmentsLoading;
-  const metrics = buildDashboardOverviewMetrics({
-    activitySummary,
-    assignmentSummary,
-    isLoading: isMetricLoading,
+  const pageView = buildDashboardOverviewPageViewModel({
+    activitySummary: activitiesData?.summary,
+    assignmentSummary: assignmentsData?.summary,
+    isLoading: activitiesLoading || assignmentsLoading,
   });
-  const readinessRows = buildDashboardCoreLoopReadiness({
-    activitySummary,
-    assignmentSummary,
-  });
-  const actionCards = getDashboardOverviewActionCards();
 
   return (
     <DashboardLayout
@@ -76,7 +66,7 @@ function DashboardPage() {
     >
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map((metric) => (
+          {pageView.metrics.map((metric) => (
             <MetricCard key={metric.id} metric={metric} />
           ))}
         </section>
@@ -128,7 +118,7 @@ function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {readinessRows.map((row) => (
+              {pageView.readinessRows.map((row) => (
                 <ReadinessRow key={row.id} row={row} />
               ))}
             </CardContent>
@@ -138,7 +128,7 @@ function DashboardPage() {
         <ActivityPreview activity={activity} assignment={assignment} />
 
         <section className="grid gap-4 md:grid-cols-3">
-          {actionCards.map((card) => (
+          {pageView.actionCards.map((card) => (
             <ActionCard key={card.id} card={card} />
           ))}
         </section>
