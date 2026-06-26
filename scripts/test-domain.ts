@@ -13285,6 +13285,30 @@ assert.deepEqual(
     totalPages: 1,
   }
 );
+assert.equal(
+  buildActivityLibraryPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: -2 },
+  }).resolvedSearch.currentPage,
+  1
+);
+assert.equal(
+  buildActivityLibraryPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: 1.5 },
+  }).resolvedSearch.currentPage,
+  1
+);
+assert.equal(
+  buildActivityLibraryPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: 0 },
+  }).resolvedSearch.currentPage,
+  1
+);
 const filteredActivityLibraryPageView = buildActivityLibraryPageViewModel({
   data: {
     createdActivity: {

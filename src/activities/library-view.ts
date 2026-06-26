@@ -526,7 +526,10 @@ export function resolveActivityLibraryPageSearch(
   const libraryStatus = search.status ?? 'active';
   const sourceFilter = search.source ?? 'all';
   const templateFilter = search.template ?? 'all';
-  const currentPage = search.page ?? 1;
+  const currentPage =
+    search.page && Number.isInteger(search.page) && search.page > 0
+      ? search.page
+      : 1;
   const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
 
   return {
