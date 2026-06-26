@@ -3319,6 +3319,30 @@ assert.equal(
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
+    new Error('Assignment runtime items include a duplicate item id.')
+  ),
+  'Attempt could not be saved.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new Error('Submitted answers include an unknown item.')
+  ),
+  'Submitted answers include an unknown item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new Error('Submitted answers include a duplicate item.')
+  ),
+  'Submitted answers include a duplicate item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new Error('Submitted answers exceed assignment item count.')
+  ),
+  'Submitted answers exceed assignment item count.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
     new Error('database timeout for assignment_attempts')
   ),
   'Attempt could not be saved.'
