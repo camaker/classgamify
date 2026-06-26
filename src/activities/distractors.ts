@@ -16,19 +16,33 @@ export function buildQuestionChoices({
   targetCount?: number;
 }) {
   const explicitOptions = question.options?.map((option) => option.text) ?? [];
+  const explicitChoices = buildQuestionOptionTexts({
+    answer: question.answer,
+    maxOptions: targetCount,
+    options: explicitOptions,
+  });
+
+  if (explicitChoices.length >= targetCount) {
+    return explicitChoices;
+  }
+
   const siblingAnswers = content.questions
     .filter((item) => item.id !== question.id)
     .map((item) => item.answer);
   const candidates = buildQuestionOptionTexts({
     answer: question.answer,
     maxOptions: Number.POSITIVE_INFINITY,
-    options: [...explicitOptions, ...siblingAnswers, ...content.vocabulary],
+    options: [...siblingAnswers, ...content.vocabulary],
   });
+  const existingChoiceKeys = new Set(
+    explicitChoices.map(normalizeQuestionOptionText)
+  );
   const distractors = candidates
     .filter(
       (choice) =>
         normalizeQuestionOptionText(choice) !==
-        normalizeQuestionOptionText(question.answer)
+          normalizeQuestionOptionText(question.answer) &&
+        !existingChoiceKeys.has(normalizeQuestionOptionText(choice))
     )
     .sort(
       (left, right) =>
@@ -39,7 +53,7 @@ export function buildQuestionChoices({
   return buildQuestionOptionTexts({
     answer: question.answer,
     maxOptions: targetCount,
-    options: distractors,
+    options: [...explicitChoices, ...distractors],
   });
 }
 

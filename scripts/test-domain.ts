@@ -11859,12 +11859,42 @@ const choiceCompletionContent = buildActivityContent({
   visibility: 'draft',
   vocabularyText: 'Madrid, Lisbon',
 });
+const completedQuestionChoices = buildQuestionChoices({
+  content: choiceCompletionContent,
+  question: choiceCompletionContent.questions[0]!,
+});
+assert.deepEqual(
+  completedQuestionChoices.length,
+  DEFAULT_QUESTION_CHOICE_COUNT
+);
+assert.deepEqual(completedQuestionChoices, [
+  'Paris',
+  'Rome',
+  'Berlin',
+  'Lisbon',
+]);
 assert.deepEqual(
   buildQuestionChoices({
     content: choiceCompletionContent,
     question: choiceCompletionContent.questions[0]!,
-  }).length,
-  DEFAULT_QUESTION_CHOICE_COUNT
+    targetCount: 5,
+  }),
+  ['Paris', 'Rome', 'Berlin', 'Lisbon', 'Madrid']
+);
+assert.deepEqual(
+  buildQuestionChoices({
+    content: choiceCompletionContent,
+    question: choiceCompletionContent.questions[0]!,
+  }),
+  completedQuestionChoices
+);
+assert.deepEqual(
+  getRuntimeItems('quiz', choiceCompletionContent)[0]?.choices,
+  completedQuestionChoices
+);
+assert.equal(
+  new Set(completedQuestionChoices.map((choice) => choice.toLowerCase())).size,
+  completedQuestionChoices.length
 );
 const tabSeparatedQuestionContent = buildActivityContent({
   description: 'Spreadsheet-pasted question rows',
