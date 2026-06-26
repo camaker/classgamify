@@ -49,7 +49,7 @@ export type TemplatesPageViewModel = {
     badgeLabel: string;
     createFromTemplateLabel: string;
     description: string;
-    openStudentDemoLabel: string;
+    openStudentPreviewLabel: string;
     title: string;
   };
 };
@@ -115,7 +115,7 @@ export function buildTemplatesPageViewModel({
       badgeLabel: m.templates_page_eyebrow(),
       createFromTemplateLabel: m.templates_page_create_from_template(),
       description: m.templates_page_description(),
-      openStudentDemoLabel: m.templates_page_open_student_demo(),
+      openStudentPreviewLabel: m.templates_page_open_student_preview(),
       title: m.templates_page_title(),
     },
   };

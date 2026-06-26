@@ -1226,7 +1226,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildDefaultActivityPreviewPanel().actions?.map((action) => action.to),
-  [Routes.Create, Routes.PlayDemo]
+  [Routes.Create, Routes.StudentPreview]
 );
 assert.match(
   activityPreviewViewSource,
@@ -2696,12 +2696,12 @@ for (const retiredStubRouteFile of [
   assert.equal(excludedPageRouteFiles.includes(retiredStubRouteFile), false);
 }
 assert.match(sitemapRouteSource, /Routes\.Worksheets/);
-assert.doesNotMatch(sitemapRouteSource, /Routes\.PlayDemo/);
+assert.doesNotMatch(sitemapRouteSource, /Routes\.StudentPreview/);
 assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);
 assert.equal(isLocalizedPath('/play/demo-food'), false);
 assert.equal(
-  Routes.PlayDemo,
+  Routes.StudentPreview,
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
 );
 const playRouteSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
@@ -9458,7 +9458,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     createFromTemplateLabel: 'Create from template',
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
-    openStudentDemoLabel: 'Open student preview',
+    openStudentPreviewLabel: 'Open student preview',
     title: 'Pick a game format for the same lesson content.',
   },
 });

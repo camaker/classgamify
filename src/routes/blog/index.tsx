@@ -58,7 +58,7 @@ function BlogListPage() {
             {m.blog_page_browse_templates()}
           </Link>
           <Link
-            to={Routes.PlayDemo}
+            to={Routes.StudentPreview}
             className={cn(buttonVariants({ variant: 'outline' }))}
           >
             <IconDeviceGamepad2 className="size-4" />

@@ -26,8 +26,8 @@ export function getNavbarLinks(): MenuItemConfig[] {
     },
     { title: m.nav_create(), href: Routes.Create, icon: IconPlus },
     {
-      title: m.nav_play_demo(),
-      href: Routes.PlayDemo,
+      title: m.nav_student_preview(),
+      href: Routes.StudentPreview,
       icon: IconDeviceGamepad2,
     },
     { title: m.nav_pricing(), href: Routes.Pricing, icon: IconSparkles },

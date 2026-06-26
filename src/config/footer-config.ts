@@ -25,8 +25,8 @@ export function getFooterLinks(): MenuItemConfig[] {
       external: false,
     },
     {
-      title: m.nav_play_demo(),
-      href: Routes.PlayDemo,
+      title: m.nav_student_preview(),
+      href: Routes.StudentPreview,
       description: m.footer_link_play_desc(),
       external: false,
     },

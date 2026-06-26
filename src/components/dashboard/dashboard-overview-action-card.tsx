@@ -49,5 +49,5 @@ const dashboardActionIcons: Record<DashboardOverviewActionCardId, TablerIcon> =
 const dashboardActionHrefs: Record<DashboardOverviewActionCardId, string> = {
   activities: Routes.DashboardActivities,
   assignments: Routes.DashboardAssignments,
-  'student-preview': Routes.PlayDemo,
+  'student-preview': Routes.StudentPreview,
 };

@@ -43,14 +43,14 @@ function TemplatesPage() {
               {pageView.hero.createFromTemplateLabel}
             </Link>
             <Link
-              to={Routes.PlayDemo}
+              to={Routes.StudentPreview}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
                 'w-fit bg-background'
               )}
             >
               <IconPlayerPlay className="size-4" />
-              {pageView.hero.openStudentDemoLabel}
+              {pageView.hero.openStudentPreviewLabel}
             </Link>
           </div>
         </div>

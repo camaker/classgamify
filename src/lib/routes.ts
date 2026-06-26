@@ -12,7 +12,7 @@ export const Routes = {
   Templates: '/templates',
   Create: '/create',
   Worksheets: '/worksheets',
-  PlayDemo: STARTER_PLAY_PATH,
+  StudentPreview: STARTER_PLAY_PATH,
   Play: '/play/$shareId',
   Resources: '/blog',
   DashboardActivities: '/dashboard/activities',

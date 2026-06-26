@@ -109,7 +109,7 @@ export function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {
       {
         icon: 'share',
         label: m.activity_preview_open_student_preview(),
-        to: Routes.PlayDemo,
+        to: Routes.StudentPreview,
         variant: 'outline',
       },
     ],
