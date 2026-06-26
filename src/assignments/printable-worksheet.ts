@@ -101,6 +101,16 @@ export function parsePrintableAssignmentSearch(
   };
 }
 
+export function buildPrintableAssignmentSearch({
+  answerKey,
+}: {
+  answerKey: boolean;
+}): PrintableAssignmentSearch {
+  return {
+    answerKey: answerKey ? true : undefined,
+  };
+}
+
 export function buildPrintableAssignmentWorksheet({
   activity,
   assignment,

@@ -1,4 +1,5 @@
 import {
+  buildPrintableAssignmentSearch,
   parsePrintableAssignmentSearch,
   type PrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
@@ -66,7 +67,7 @@ function PrintableAssignmentWorksheetPage() {
   function updateAnswerKey(nextAnswerKey: boolean) {
     void navigate({
       replace: true,
-      search: { answerKey: nextAnswerKey ? true : undefined },
+      search: buildPrintableAssignmentSearch({ answerKey: nextAnswerKey }),
     });
   }
 

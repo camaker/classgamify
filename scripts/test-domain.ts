@@ -264,6 +264,7 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import {
+  buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
@@ -5101,6 +5102,18 @@ assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'true' }), {
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '1' }), {
   answerKey: true,
 });
+assert.deepEqual(buildPrintableAssignmentSearch({ answerKey: true }), {
+  answerKey: true,
+});
+assert.deepEqual(buildPrintableAssignmentSearch({ answerKey: false }), {
+  answerKey: undefined,
+});
+assert.deepEqual(
+  parsePrintableAssignmentSearch(
+    buildPrintableAssignmentSearch({ answerKey: true })
+  ),
+  { answerKey: true }
+);
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'yes' }), {
   answerKey: undefined,
 });
@@ -7064,6 +7077,11 @@ assert.match(
   /parsePrintableAssignmentSearch/,
   'Printable worksheet route should reuse the assignment-domain search parser.'
 );
+assert.match(
+  printableAssignmentRouteSource,
+  /buildPrintableAssignmentSearch\(\{ answerKey: nextAnswerKey \}\)/,
+  'Printable worksheet answer-key toggle should reuse the assignment-domain search builder.'
+);
 assert.doesNotMatch(
   printableAssignmentRouteSource,
   /answerKey === 'true'|answerKey === '1'/,
@@ -7076,8 +7094,8 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /search: \{ answerKey: nextAnswerKey \? true : undefined \}/,
-  'Printable worksheet answer-key toggle should persist in route search state.'
+  /search: buildPrintableAssignmentSearch/,
+  'Printable worksheet answer-key toggle should persist through the shared route search builder.'
 );
 assert.match(
   printableAssignmentRouteSource,
