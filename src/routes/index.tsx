@@ -7,6 +7,11 @@ import { websiteConfig } from '@/config/website';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import {
+  buildHomePageViewModel,
+  type HomePageFeatureId,
+  type HomePageSignalId,
+} from '@/pages/public-page-view';
 import * as m from '@/locale/paraglide/messages';
 import {
   graphJsonLd,
@@ -22,6 +27,7 @@ import {
   IconPlus,
   IconSparkles,
   IconUsers,
+  type TablerIcon,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 
@@ -51,6 +57,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   const activity = getStarterActivity();
   const assignment = getStarterAssignment();
+  const pageView = buildHomePageViewModel();
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -59,14 +66,14 @@ function HomePage() {
           <div className="min-w-0 space-y-6">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
-              {m.home_hero_introduction()}
+              {pageView.hero.badgeLabel}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-balance md:text-6xl">
-                {m.home_hero_title()}
+                {pageView.hero.title}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {m.home_hero_description()}
+                {pageView.hero.description}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -75,7 +82,7 @@ function HomePage() {
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 <IconPlus className="size-4" />
-                {m.home_hero_primary()}
+                {pageView.hero.primaryActionLabel}
               </Link>
               <Link
                 to={Routes.Templates}
@@ -85,28 +92,21 @@ function HomePage() {
                 )}
               >
                 <IconLayoutGrid className="size-4" />
-                {m.home_hero_browse_templates()}
+                {pageView.hero.browseTemplatesLabel}
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border bg-card p-4">
             <div className="grid gap-3 sm:grid-cols-3">
-              <Signal
-                icon={IconDeviceGamepad2}
-                label={m.home_signal_templates_label()}
-                value={m.home_signal_templates_value()}
-              />
-              <Signal
-                icon={IconUsers}
-                label={m.home_signal_delivery_label()}
-                value={m.home_signal_delivery_value()}
-              />
-              <Signal
-                icon={IconChartBar}
-                label={m.home_signal_results_label()}
-                value={m.home_signal_results_value()}
-              />
+              {pageView.signals.map((signal) => (
+                <Signal
+                  key={signal.id}
+                  icon={homeSignalIcons[signal.id]}
+                  label={signal.label}
+                  value={signal.value}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -114,38 +114,21 @@ function HomePage() {
         <ActivityPreview activity={activity} assignment={assignment} />
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              icon: IconSparkles,
-              title: m.home_features_items_item_1_title(),
-              description: m.home_features_items_item_1_description(),
-            },
-            {
-              icon: IconDeviceGamepad2,
-              title: m.home_features_items_item_2_title(),
-              description: m.home_features_items_item_2_description(),
-            },
-            {
-              icon: IconChartBar,
-              title: m.home_features_items_item_3_title(),
-              description: m.home_features_items_item_3_description(),
-            },
-            {
-              icon: IconUsers,
-              title: m.home_features_items_item_4_title(),
-              description: m.home_features_items_item_4_description(),
-            },
-          ].map((item) => (
-            <div key={item.title} className="rounded-lg border bg-card p-5">
-              <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-                <item.icon className="size-4" />
+          {pageView.features.map((item) => {
+            const Icon = homeFeatureIcons[item.id];
+
+            return (
+              <div key={item.id} className="rounded-lg border bg-card p-5">
+                <div className="mb-4 flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
+                  <Icon className="size-4" />
+                </div>
+                <h2 className="font-semibold">{item.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
-              <h2 className="font-semibold">{item.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </section>
       </div>
     </Container>
@@ -157,7 +140,7 @@ function Signal({
   label,
   value,
 }: {
-  icon: typeof IconDeviceGamepad2;
+  icon: TablerIcon;
   label: string;
   value: string;
 }) {
@@ -169,3 +152,16 @@ function Signal({
     </div>
   );
 }
+
+const homeFeatureIcons = {
+  'activity-templates': IconDeviceGamepad2,
+  'assignment-links': IconUsers,
+  results: IconChartBar,
+  'teacher-workflows': IconSparkles,
+} satisfies Record<HomePageFeatureId, TablerIcon>;
+
+const homeSignalIcons = {
+  delivery: IconUsers,
+  results: IconChartBar,
+  templates: IconDeviceGamepad2,
+} satisfies Record<HomePageSignalId, TablerIcon>;

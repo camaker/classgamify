@@ -1,15 +1,16 @@
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import {
-  formatActivityTemplateClassroomMode,
-  getActivityTemplates,
-} from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { jsonLdScript } from '@/lib/structured-data';
+import {
+  buildTeachersPageViewModel,
+  type TeachersPageUseCaseId,
+  type TeachersPageWorkflowId,
+} from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -55,41 +56,7 @@ export const Route = createFileRoute('/(pages)/teachers')({
 });
 
 function TeachersPage() {
-  const workflow = [
-    {
-      icon: IconSparkles,
-      title: m.teachers_page_workflow_0_title(),
-      description: m.teachers_page_workflow_0_description(),
-    },
-    {
-      icon: IconLayoutGrid,
-      title: m.teachers_page_workflow_1_title(),
-      description: m.teachers_page_workflow_1_description(),
-    },
-    {
-      icon: IconShare3,
-      title: m.teachers_page_workflow_2_title(),
-      description: m.teachers_page_workflow_2_description(),
-    },
-  ];
-
-  const useCases = [
-    {
-      icon: IconUsers,
-      title: m.teachers_page_use_case_0_title(),
-      description: m.teachers_page_use_case_0_description(),
-    },
-    {
-      icon: IconDeviceGamepad2,
-      title: m.teachers_page_use_case_1_title(),
-      description: m.teachers_page_use_case_1_description(),
-    },
-    {
-      icon: IconChartBar,
-      title: m.teachers_page_use_case_2_title(),
-      description: m.teachers_page_use_case_2_description(),
-    },
-  ];
+  const pageView = buildTeachersPageViewModel();
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -98,14 +65,14 @@ function TeachersPage() {
           <div className="min-w-0 space-y-5">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconUsers className="size-3.5" />
-              {m.teachers_page_eyebrow()}
+              {pageView.hero.badgeLabel}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
-                {m.teachers_page_title()}
+                {pageView.hero.title}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {m.teachers_page_description()}
+                {pageView.hero.description}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -113,7 +80,7 @@ function TeachersPage() {
                 to={Routes.Create}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
-                {m.teachers_page_primary_cta()}
+                {pageView.hero.primaryActionLabel}
                 <IconArrowRight className="size-4" />
               </Link>
               <Link
@@ -123,26 +90,24 @@ function TeachersPage() {
                   'rounded-lg bg-background'
                 )}
               >
-                {m.teachers_page_secondary_cta()}
+                {pageView.hero.secondaryActionLabel}
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border bg-card p-5">
             <p className="text-sm font-medium text-muted-foreground">
-              {m.teachers_page_template_panel_title()}
+              {pageView.templatePanel.title}
             </p>
             <div className="mt-4 grid gap-2">
-              {getActivityTemplates().map((template) => (
+              {pageView.templatePanel.templates.map((template) => (
                 <div
-                  key={template.type}
+                  key={template.templateType}
                   className="flex items-center justify-between gap-3 rounded-lg border bg-background p-3"
                 >
                   <span className="text-sm font-medium">{template.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {formatActivityTemplateClassroomMode(
-                      template.classroomMode
-                    )}
+                    {template.classroomMode}
                   </span>
                 </div>
               ))}
@@ -151,31 +116,39 @@ function TeachersPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
-          {workflow.map((item) => (
-            <FeatureCard key={item.title} item={item} />
+          {pageView.workflow.map((item) => (
+            <FeatureCard
+              key={item.id}
+              icon={teacherWorkflowIcons[item.id]}
+              item={item}
+            />
           ))}
         </section>
 
         <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold">
-              {m.teachers_page_school_cta_title()}
+              {pageView.schoolCta.title}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              {m.teachers_page_school_cta_description()}
+              {pageView.schoolCta.description}
             </p>
           </div>
           <Link
             to={Routes.ContactClassroom}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {m.teachers_page_school_cta()}
+            {pageView.schoolCta.label}
           </Link>
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
-          {useCases.map((item) => (
-            <FeatureCard key={item.title} item={item} />
+          {pageView.useCases.map((item) => (
+            <FeatureCard
+              key={item.id}
+              icon={teacherUseCaseIcons[item.id]}
+              item={item}
+            />
           ))}
         </section>
       </div>
@@ -184,18 +157,19 @@ function TeachersPage() {
 }
 
 function FeatureCard({
+  icon: Icon,
   item,
 }: {
+  icon: TablerIcon;
   item: {
     description: string;
-    icon: TablerIcon;
     title: string;
   };
 }) {
   return (
     <div className="rounded-lg border bg-card p-5">
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-        <item.icon className="size-4" />
+        <Icon className="size-4" />
       </div>
       <h2 className="mt-4 font-semibold">{item.title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -204,3 +178,15 @@ function FeatureCard({
     </div>
   );
 }
+
+const teacherUseCaseIcons = {
+  classrooms: IconUsers,
+  games: IconDeviceGamepad2,
+  results: IconChartBar,
+} satisfies Record<TeachersPageUseCaseId, TablerIcon>;
+
+const teacherWorkflowIcons = {
+  draft: IconSparkles,
+  publish: IconLayoutGrid,
+  share: IconShare3,
+} satisfies Record<TeachersPageWorkflowId, TablerIcon>;

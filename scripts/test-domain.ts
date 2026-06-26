@@ -211,6 +211,14 @@ import {
   getDashboardOverviewActionCards,
 } from '@/dashboard/overview';
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
+import {
+  buildContactPageViewModel,
+  buildHomePageViewModel,
+  buildPricingFaqItems,
+  buildPricingPageViewModel,
+  buildRoadmapPageViewModel,
+  buildTeachersPageViewModel,
+} from '@/pages/public-page-view';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import {
   summarizeAssignmentAttempts,
@@ -7398,6 +7406,119 @@ assert.deepEqual(
     search: { template: template.type },
   }))
 );
+assert.deepEqual(buildHomePageViewModel(), {
+  features: [
+    {
+      description:
+        'Build reusable questions, pairs, groups, vocabulary, learning goals, and teacher notes in one structured editor.',
+      id: 'teacher-workflows',
+      title: 'Structured activities',
+    },
+    {
+      description:
+        'Render the same content as quiz, matching games, line matching, group sorting, fill-in, listening, pair matching, or box reveals.',
+      id: 'activity-templates',
+      title: 'Template switching',
+    },
+    {
+      description:
+        'Publish student links with attempt limits, timers, answer reveal, shuffle, and close-time settings.',
+      id: 'assignment-links',
+      title: 'Assignment links',
+    },
+    {
+      description:
+        'Review scores, item performance, accepted answers, reteach priorities, and student follow-up summaries.',
+      id: 'results',
+      title: 'Teacher results',
+    },
+  ],
+  hero: {
+    badgeLabel: 'Wordwall-style classroom activities',
+    browseTemplatesLabel: 'Browse templates',
+    description:
+      'Create game-based classroom activities, publish assignment links, and review student attempts from the same structured content.',
+    primaryActionLabel: 'Create activity',
+    title: 'Make classroom practice feel like a game',
+  },
+  signals: [
+    { id: 'templates', label: 'Templates', value: '8 first' },
+    { id: 'delivery', label: 'Delivery', value: 'Share link' },
+    { id: 'results', label: 'Results', value: 'Attempt log' },
+  ],
+});
+assert.deepEqual(
+  buildContactPageViewModel().topics.map((topic) => [
+    topic.id,
+    topic.title,
+    topic.subject,
+  ]),
+  [
+    ['product', 'Activity support', 'ClassGamify product support'],
+    ['classroom', 'Teachers and parents', 'ClassGamify classroom workflow'],
+    [
+      'partnership',
+      'Pricing or partnership',
+      'ClassGamify pricing or partnership',
+    ],
+  ]
+);
+assert.deepEqual(buildContactPageViewModel().hero, {
+  description:
+    'Reach the ClassGamify team for product feedback, classroom use, account support, or partnership questions.',
+  title: 'Contact',
+});
+assert.deepEqual(buildContactPageViewModel().checklist, {
+  description: 'A little context helps us answer faster.',
+  items: [
+    'Share the activity, template, assignment, page URL, or workflow you mean.',
+    'Tell us which device, browser, or printer setup you used.',
+    'Say whether this is for a class, tutoring group, family practice, or worksheet follow-up.',
+  ],
+  title: 'What to include',
+});
+assert.equal(buildContactPageViewModel().intent, 'general');
+assert.equal(buildContactPageViewModel().inquiryPanel, undefined);
+assert.equal(
+  buildContactPageViewModel('classroom').directSubject,
+  'ClassGamify classroom workflow'
+);
+assert.deepEqual(buildContactPageViewModel('classroom').hero, {
+  description:
+    'Tell us how you want to use ClassGamify with students, tutoring groups, or a school team, and we will help shape the workflow around your routine.',
+  title: 'Classroom inquiry',
+});
+assert.deepEqual(
+  buildContactPageViewModel('classroom').inquiryPanel?.highlights.map(
+    (item) => item.id
+  ),
+  ['students', 'materials', 'rollout']
+);
+assert.deepEqual(buildPricingPageViewModel().hero, {
+  eyebrow: 'ClassGamify plans',
+  subtitle:
+    'Start with the classroom activity loop, then upgrade for more creation, assignment, AI, and result workflows.',
+  title: 'ClassGamify Plans',
+});
+assert.deepEqual(
+  buildPricingPageViewModel().valueCards.map((card) => [card.id, card.title]),
+  [
+    ['templates', 'Template library'],
+    ['assignments', 'Activities and assignments'],
+    ['ai', 'AI creation speed'],
+  ]
+);
+assert.deepEqual(
+  buildPricingFaqItems().map((item) => item.question),
+  [
+    'What is the free plan for?',
+    'What will Pro unlock?',
+    'Why are there only a few templates first?',
+    'Do students need accounts?',
+    'Can schools or tutoring teams use it?',
+  ]
+);
+assert.deepEqual(buildPricingPageViewModel().faq.items, buildPricingFaqItems());
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
@@ -7429,6 +7550,194 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     openStudentDemoLabel: 'Open student demo',
     title: 'Pick a game format for the same lesson content.',
   },
+});
+assert.deepEqual(buildRoadmapPageViewModel(), {
+  columns: [
+    {
+      description:
+        'The teacher and student foundation that must stay reliable while copied starter surfaces are retired.',
+      id: 'done',
+      items: [
+        {
+          description:
+            'Teachers can create reusable structured activities, publish assignment links, and keep snapshots stable for student attempts.',
+          title: 'Activity to assignment loop',
+        },
+        {
+          description:
+            'Quiz, matching games, group sorting, line matching, fill-ins, listening, pair matching, and box reveal modes share one content model.',
+          title: 'Playable template foundation',
+        },
+      ],
+      status: 'Live',
+      title: 'Available now',
+    },
+    {
+      description:
+        'Current focus: make results, worksheet delivery, and template polish more classroom-ready.',
+      id: 'in-progress',
+      items: [
+        {
+          description:
+            'Make completion, scores, item misses, exports, and review filters clearer for teacher follow-up.',
+          title: 'Results and reteach summaries',
+        },
+        {
+          description:
+            'Tighten printable follow-up, fill-in, line matching, and listening flows around the same assignment snapshot.',
+          title: 'Worksheet-style delivery',
+        },
+      ],
+      status: 'Improving',
+      title: 'Improving now',
+    },
+    {
+      description:
+        'Next product bets once the core classroom loop stays dependable.',
+      id: 'backlog',
+      items: [
+        {
+          description:
+            'Turn teacher notes, vocabulary lists, and worksheet prompts into reviewable activity drafts without bypassing teacher control.',
+          title: 'AI-assisted activity drafting',
+        },
+        {
+          description:
+            'Read teacher-uploaded worksheets into structured prompts, accepted answers, and printable follow-up modes.',
+          title: 'Worksheet extraction',
+        },
+        {
+          description:
+            'Add multi-teacher sharing, class-level result retention, and permission rules for schools and learning centers.',
+          title: 'School team workflows',
+        },
+      ],
+      status: 'Exploring',
+      title: 'Next bets',
+    },
+  ],
+  hero: {
+    badgeLabel: 'Product direction',
+    description:
+      'A practical view of what is already usable, what is being tightened now, and where AI-assisted classroom activity creation comes next.',
+    primaryActionLabel: 'Create activity',
+    secondaryActionLabel: 'Browse templates',
+    title: 'ClassGamify product roadmap',
+  },
+  principles: [
+    {
+      description:
+        'We build around the Activity -> Assignment -> Attempt -> Results loop before adding parallel surfaces.',
+      id: 'focus',
+      title: 'Core loop before breadth',
+    },
+    {
+      description:
+        'The same structured content should render as games, worksheets, listening prompts, and printable follow-up.',
+      id: 'learning',
+      title: 'One content model',
+    },
+    {
+      description:
+        'Classroom and learning-center workflows should handle sharing links, student names, result retention, and team permissions deliberately.',
+      id: 'validation',
+      title: 'School-ready operations',
+    },
+  ],
+  snapshots: [
+    {
+      description:
+        'Reusable activities, assignment links, student runners, and teacher result review are the product foundation.',
+      id: 'live',
+      title: 'Usable classroom core',
+    },
+    {
+      description:
+        'The next passes deepen worksheet-style delivery, listening prompts, drag interactions, and reteach summaries.',
+      id: 'loop',
+      title: 'Template depth now',
+    },
+    {
+      description:
+        'AI should draft, remix, differentiate, and summarize inside the teacher-reviewed activity model.',
+      id: 'expansion',
+      title: 'AI and worksheet extraction next',
+    },
+  ],
+  validation: {
+    ctaLabel: 'Share classroom feedback',
+    description:
+      'We prioritize work that can be tested in the teacher flow, improves assignment delivery or review, and strengthens the data model instead of creating one-off demos.',
+    eyebrowLabel: 'How we decide',
+    title: 'Every roadmap item needs classroom proof',
+  },
+});
+assert.deepEqual(buildTeachersPageViewModel(), {
+  hero: {
+    badgeLabel: 'Teachers and learning teams',
+    description:
+      'ClassGamify supports the real Wordwall-style loop: create an activity, switch templates, publish a share link, and review student results.',
+    primaryActionLabel: 'Create activity',
+    secondaryActionLabel: 'Talk to us',
+    title:
+      'Build repeatable game-based assignments from the lessons you already teach.',
+  },
+  schoolCta: {
+    description:
+      'Multi-teacher use needs thoughtful decisions about student names, result retention, template sharing, and classroom permissions.',
+    label: 'Contact us',
+    title: 'Need a school or learning-center workflow?',
+  },
+  templatePanel: {
+    templates: activityTemplates.map((template) => ({
+      classroomMode: formatActivityTemplateClassroomMode(
+        template.classroomMode
+      ),
+      name: template.name,
+      templateType: template.type,
+    })),
+    title: 'First template families',
+  },
+  useCases: [
+    {
+      description:
+        'Assign short games after class and see which students completed the activity.',
+      id: 'classrooms',
+      title: 'Classroom homework',
+    },
+    {
+      description:
+        'Use box reveals, listening, line matching, sorting, and matching activities for warmups, review rounds, or small groups.',
+      id: 'games',
+      title: 'Live classroom play',
+    },
+    {
+      description:
+        'Use completions and scores to decide which items need reteaching or another activity.',
+      id: 'results',
+      title: 'Result follow-up',
+    },
+  ],
+  workflow: [
+    {
+      description:
+        'Paste vocabulary, questions, examples, or worksheet prompts into one structured activity model.',
+      id: 'draft',
+      title: 'Start from lesson content',
+    },
+    {
+      description:
+        'Render the same content as quiz, matching games, line matching, group sorting, fill-ins, listening, pair matching, or box reveal play.',
+      id: 'publish',
+      title: 'Choose a game template',
+    },
+    {
+      description:
+        'Share a public student link while keeping the reusable activity in the teacher library.',
+      id: 'share',
+      title: 'Publish an assignment',
+    },
+  ],
 });
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const template = getTemplateByType(templateType);

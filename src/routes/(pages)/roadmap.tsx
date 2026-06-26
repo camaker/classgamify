@@ -5,6 +5,11 @@ import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
+import {
+  buildRoadmapPageViewModel,
+  type RoadmapColumnId,
+  type RoadmapPrincipleId,
+} from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -28,93 +33,7 @@ export const Route = createFileRoute('/(pages)/roadmap')({
 });
 
 function RoadmapPage() {
-  const snapshots = [
-    {
-      title: m.roadmap_snapshot_live_title(),
-      description: m.roadmap_snapshot_live_description(),
-    },
-    {
-      title: m.roadmap_snapshot_loop_title(),
-      description: m.roadmap_snapshot_loop_description(),
-    },
-    {
-      title: m.roadmap_snapshot_expansion_title(),
-      description: m.roadmap_snapshot_expansion_description(),
-    },
-  ];
-
-  const columns = [
-    {
-      title: m.roadmap_columns_done(),
-      description: m.roadmap_columns_done_description(),
-      status: m.roadmap_status_available(),
-      icon: IconCheck,
-      items: [
-        {
-          title: m.roadmap_board_tasks_done_0_title(),
-          description: m.roadmap_board_tasks_done_0_description(),
-        },
-        {
-          title: m.roadmap_board_tasks_done_1_title(),
-          description: m.roadmap_board_tasks_done_1_description(),
-        },
-      ],
-    },
-    {
-      title: m.roadmap_columns_in_progress(),
-      description: m.roadmap_columns_in_progress_description(),
-      status: m.roadmap_status_improving(),
-      icon: IconDeviceGamepad2,
-      items: [
-        {
-          title: m.roadmap_board_tasks_in_progress_0_title(),
-          description: m.roadmap_board_tasks_in_progress_0_description(),
-        },
-        {
-          title: m.roadmap_board_tasks_in_progress_1_title(),
-          description: m.roadmap_board_tasks_in_progress_1_description(),
-        },
-      ],
-    },
-    {
-      title: m.roadmap_columns_backlog(),
-      description: m.roadmap_columns_backlog_description(),
-      status: m.roadmap_status_exploring(),
-      icon: IconSparkles,
-      items: [
-        {
-          title: m.roadmap_board_tasks_backlog_0_title(),
-          description: m.roadmap_board_tasks_backlog_0_description(),
-        },
-        {
-          title: m.roadmap_board_tasks_backlog_1_title(),
-          description: m.roadmap_board_tasks_backlog_1_description(),
-        },
-        {
-          title: m.roadmap_board_tasks_backlog_2_title(),
-          description: m.roadmap_board_tasks_backlog_2_description(),
-        },
-      ],
-    },
-  ];
-
-  const principles = [
-    {
-      icon: IconLayoutGrid,
-      title: m.roadmap_principle_focus_title(),
-      description: m.roadmap_principle_focus_description(),
-    },
-    {
-      icon: IconListCheck,
-      title: m.roadmap_principle_learning_title(),
-      description: m.roadmap_principle_learning_description(),
-    },
-    {
-      icon: IconChartBar,
-      title: m.roadmap_validation_item_workflow_title(),
-      description: m.roadmap_validation_item_workflow_description(),
-    },
-  ];
+  const pageView = buildRoadmapPageViewModel();
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -123,14 +42,14 @@ function RoadmapPage() {
           <div className="space-y-5">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconDeviceGamepad2 className="size-3.5" />
-              {m.roadmap_eyebrow()}
+              {pageView.hero.badgeLabel}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
-                {m.roadmap_title()}
+                {pageView.hero.title}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {m.roadmap_subtitle()}
+                {pageView.hero.description}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -138,7 +57,7 @@ function RoadmapPage() {
                 to={Routes.Create}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
-                {m.roadmap_primary_cta()}
+                {pageView.hero.primaryActionLabel}
                 <IconArrowRight className="size-4" />
               </Link>
               <Link
@@ -148,16 +67,16 @@ function RoadmapPage() {
                   'rounded-lg bg-background'
                 )}
               >
-                {m.roadmap_secondary_cta()}
+                {pageView.hero.secondaryActionLabel}
               </Link>
             </div>
           </div>
 
           <div className="rounded-lg border bg-card p-5">
             <div className="space-y-4">
-              {snapshots.map((snapshot, index) => (
+              {pageView.snapshots.map((snapshot, index) => (
                 <div
-                  key={snapshot.title}
+                  key={snapshot.id}
                   className={cn(index > 0 && 'border-t pt-4')}
                 >
                   <p className="text-sm font-medium text-muted-foreground">
@@ -173,34 +92,34 @@ function RoadmapPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-3">
-          {columns.map((column) => (
-            <RoadmapColumn key={column.title} column={column} />
+          {pageView.columns.map((column) => (
+            <RoadmapColumn key={column.id} column={column} />
           ))}
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
-          {principles.map((item) => (
-            <PrincipleCard key={item.title} item={item} />
+          {pageView.principles.map((item) => (
+            <PrincipleCard key={item.id} item={item} />
           ))}
         </section>
 
         <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
           <div className="min-w-0">
             <p className="text-sm font-medium text-primary">
-              {m.roadmap_validation_eyebrow()}
+              {pageView.validation.eyebrowLabel}
             </p>
             <h2 className="mt-2 text-xl font-semibold">
-              {m.roadmap_validation_title()}
+              {pageView.validation.title}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              {m.roadmap_validation_description()}
+              {pageView.validation.description}
             </p>
           </div>
           <Link
             to={Routes.ContactClassroom}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {m.roadmap_feedback_cta()}
+            {pageView.validation.ctaLabel}
           </Link>
         </section>
       </div>
@@ -211,23 +130,16 @@ function RoadmapPage() {
 function RoadmapColumn({
   column,
 }: {
-  column: {
-    description: string;
-    icon: TablerIcon;
-    items: {
-      description: string;
-      title: string;
-    }[];
-    status: string;
-    title: string;
-  };
+  column: ReturnType<typeof buildRoadmapPageViewModel>['columns'][number];
 }) {
+  const Icon = roadmapColumnIcons[column.id];
+
   return (
     <div className="rounded-lg border bg-card p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-            <column.icon className="size-4" />
+            <Icon className="size-4" />
           </div>
           <div className="min-w-0">
             <h2 className="font-semibold">{column.title}</h2>
@@ -263,16 +175,14 @@ function RoadmapColumn({
 function PrincipleCard({
   item,
 }: {
-  item: {
-    description: string;
-    icon: TablerIcon;
-    title: string;
-  };
+  item: ReturnType<typeof buildRoadmapPageViewModel>['principles'][number];
 }) {
+  const Icon = roadmapPrincipleIcons[item.id];
+
   return (
     <div className="rounded-lg border bg-card p-5">
       <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-        <item.icon className="size-4" />
+        <Icon className="size-4" />
       </div>
       <h2 className="mt-4 font-semibold">{item.title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -281,3 +191,15 @@ function PrincipleCard({
     </div>
   );
 }
+
+const roadmapColumnIcons = {
+  backlog: IconSparkles,
+  done: IconCheck,
+  'in-progress': IconDeviceGamepad2,
+} satisfies Record<RoadmapColumnId, TablerIcon>;
+
+const roadmapPrincipleIcons = {
+  focus: IconLayoutGrid,
+  learning: IconListCheck,
+  validation: IconChartBar,
+} satisfies Record<RoadmapPrincipleId, TablerIcon>;

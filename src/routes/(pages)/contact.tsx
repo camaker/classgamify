@@ -5,6 +5,11 @@ import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { seo } from '@/lib/seo';
 import { getMailtoUrl } from '@/lib/urls';
+import {
+  buildContactPageViewModel,
+  type ContactIntent,
+  type ContactTopicId,
+} from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -36,52 +41,13 @@ export const Route = createFileRoute('/(pages)/contact')({
 
 function ContactPage() {
   const { subject } = Route.useSearch();
-  const isClassroom = subject === 'classroom';
+  const intent: ContactIntent =
+    subject === 'classroom' ? 'classroom' : 'general';
+  const pageView = buildContactPageViewModel(intent);
   const supportEmail = websiteConfig.mail?.supportEmail;
   const emailAddress =
     supportEmail?.match(/<([^>]+)>/)?.[1] ?? supportEmail ?? '';
-  const directSubject = isClassroom
-    ? m.contact_subject_classroom()
-    : m.contact_subject_general();
-  const contactIntent = isClassroom ? 'classroom' : 'general';
-  const mailto = getSupportMailto(supportEmail, directSubject);
-  const supportTopics = [
-    {
-      icon: IconBook2,
-      title: m.contact_topic_learning_title(),
-      description: m.contact_topic_learning_description(),
-      subject: m.contact_subject_product(),
-    },
-    {
-      icon: IconUsers,
-      title: m.contact_topic_classroom_title(),
-      description: m.contact_topic_classroom_description(),
-      subject: m.contact_subject_classroom(),
-    },
-    {
-      icon: IconSparkles,
-      title: m.contact_topic_partnership_title(),
-      description: m.contact_topic_partnership_description(),
-      subject: m.contact_subject_pricing(),
-    },
-  ];
-  const checklistTitle = isClassroom
-    ? m.contact_classroom_checklist_title()
-    : m.contact_checklist_title();
-  const checklistDescription = isClassroom
-    ? m.contact_classroom_checklist_description()
-    : m.contact_checklist_description();
-  const checklist = isClassroom
-    ? [
-        m.contact_classroom_checklist_learners(),
-        m.contact_classroom_checklist_routine(),
-        m.contact_classroom_checklist_worksheets(),
-      ]
-    : [
-        m.contact_checklist_page(),
-        m.contact_checklist_device(),
-        m.contact_checklist_goal(),
-      ];
+  const mailto = getSupportMailto(supportEmail, pageView.directSubject);
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -91,19 +57,17 @@ function ContactPage() {
             <IconMessageCircle className="size-5" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-            {isClassroom ? m.contact_classroom_title() : m.contact_title()}
+            {pageView.hero.title}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-            {isClassroom
-              ? m.contact_classroom_description()
-              : m.contact_description()}
+            {pageView.hero.description}
           </p>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
-          {supportTopics.map((topic) => (
+          {pageView.topics.map((topic) => (
             <SupportTopicCard
-              key={topic.subject}
-              icon={topic.icon}
+              key={topic.id}
+              icon={contactTopicIcons[topic.id]}
               title={topic.title}
               description={topic.description}
               href={getSupportMailto(supportEmail, topic.subject)}
@@ -112,21 +76,23 @@ function ContactPage() {
         </div>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)]">
           <div className="space-y-4">
-            {isClassroom && <ClassroomInquiryPanel />}
+            {pageView.inquiryPanel ? (
+              <ClassroomInquiryPanel panel={pageView.inquiryPanel} />
+            ) : null}
             <div className="rounded-lg border bg-card p-5">
               <div className="flex items-start gap-3">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background text-primary">
                   <IconClipboardText className="size-4" />
                 </div>
                 <div className="space-y-1">
-                  <h2 className="font-semibold">{checklistTitle}</h2>
+                  <h2 className="font-semibold">{pageView.checklist.title}</h2>
                   <p className="text-sm text-muted-foreground">
-                    {checklistDescription}
+                    {pageView.checklist.description}
                   </p>
                 </div>
               </div>
               <ul className="mt-5 grid gap-3 text-sm text-muted-foreground">
-                {checklist.map((item) => (
+                {pageView.checklist.items.map((item) => (
                   <li key={item} className="flex gap-3">
                     <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
                     <span>{item}</span>
@@ -135,27 +101,28 @@ function ContactPage() {
               </ul>
             </div>
             <div className="grid gap-4">
-              {mailto && (
+              {mailto ? (
                 <a
                   href={mailto}
                   className="rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <IconMailFilled className="mb-4 size-5 text-primary" />
-                  <h2 className="font-semibold">{m.contact_email_support()}</h2>
+                  <h2 className="font-semibold">
+                    {pageView.supportEmail.title}
+                  </h2>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {m.contact_email_support_description()}
+                    {pageView.supportEmail.description}
                   </p>
                   <p className="mt-4 break-all text-sm font-medium text-primary">
                     {emailAddress}
                   </p>
                 </a>
-              )}
+              ) : null}
             </div>
           </div>
-          <ContactFormCard intent={contactIntent} />
+          <ContactFormCard intent={pageView.intent} />
         </div>
-        {/* Keep the primary direct-email action visible after the support map. */}
-        {mailto && (
+        {mailto ? (
           <div className="flex justify-center">
             <a
               href={mailto}
@@ -165,31 +132,22 @@ function ContactPage() {
               )}
             >
               <IconMailFilled className="size-4" />
-              {m.contact_support_cta()}
+              {pageView.supportCtaLabel}
             </a>
           </div>
-        )}
+        ) : null}
       </div>
     </Container>
   );
 }
 
-function ClassroomInquiryPanel() {
-  const highlights = [
-    {
-      title: m.contact_classroom_panel_students_title(),
-      description: m.contact_classroom_panel_students_description(),
-    },
-    {
-      title: m.contact_classroom_panel_materials_title(),
-      description: m.contact_classroom_panel_materials_description(),
-    },
-    {
-      title: m.contact_classroom_panel_rollout_title(),
-      description: m.contact_classroom_panel_rollout_description(),
-    },
-  ];
-
+function ClassroomInquiryPanel({
+  panel,
+}: {
+  panel: NonNullable<
+    ReturnType<typeof buildContactPageViewModel>['inquiryPanel']
+  >;
+}) {
   return (
     <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
       <div className="flex items-start gap-3">
@@ -197,16 +155,16 @@ function ClassroomInquiryPanel() {
           <IconUsers className="size-4" />
         </div>
         <div className="min-w-0 space-y-1">
-          <h2 className="font-semibold">{m.contact_classroom_panel_title()}</h2>
+          <h2 className="font-semibold">{panel.title}</h2>
           <p className="text-sm leading-6 text-muted-foreground">
-            {m.contact_classroom_panel_description()}
+            {panel.description}
           </p>
         </div>
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        {highlights.map((item) => (
+        {panel.highlights.map((item) => (
           <div
-            key={item.title}
+            key={item.id}
             className="min-w-0 rounded-lg border bg-background/80 p-3"
           >
             <p className="text-sm font-medium">{item.title}</p>
@@ -237,7 +195,9 @@ function SupportTopicCard({
         <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
           <IconComponent className="size-4" />
         </div>
-        {href && <IconArrowRight className="size-4 text-muted-foreground" />}
+        {href ? (
+          <IconArrowRight className="size-4 text-muted-foreground" />
+        ) : null}
       </div>
       <div className="mt-5 space-y-2">
         <h2 className="font-semibold">{title}</h2>
@@ -268,3 +228,9 @@ function getSupportMailto(
   if (!baseMailto) return undefined;
   return `${baseMailto}?subject=${encodeURIComponent(subject)}`;
 }
+
+const contactTopicIcons = {
+  classroom: IconUsers,
+  partnership: IconSparkles,
+  product: IconBook2,
+} satisfies Record<ContactTopicId, TablerIcon>;
