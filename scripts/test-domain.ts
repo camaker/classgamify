@@ -17453,6 +17453,121 @@ assert.deepEqual(
 assert.equal(sanitizedResultAnalysis.students[0]?.averageAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.bestAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.latestAccuracy, 0);
+const normalizedResultDisplayAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [
+          {
+            answer: '  Ｐａｒｉｓ\tFrance  ',
+            correct: true,
+            itemId: 'messy-q',
+          },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-06T10:00:00.000Z'),
+      id: 'messy-result-attempt-1',
+      resultJson: {
+        accuracy: 150,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 2.9,
+        totalPoints: 1,
+      },
+      score: -3.4,
+      studentName: ' Messy Student ',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [
+          {
+            answer: '  ',
+            correct: false,
+            itemId: 'messy-q',
+          },
+        ],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-07T10:00:00.000Z'),
+      id: 'messy-result-attempt-2',
+      resultJson: {
+        accuracy: -20,
+        completedItemCount: 0,
+        correctItemCount: 0,
+        earnedPoints: Number.POSITIVE_INFINITY,
+        totalPoints: 1,
+      },
+      score: null,
+      studentName: 'messy student',
+    },
+  ],
+  runtimeItems: [
+    {
+      answer: ' Paris / Ｐａｒｉｓ / Paris, France ',
+      explanation: '  France\tcapital.  ',
+      id: 'messy-q',
+      kind: 'question',
+      prompt: '  Capital   of   France?  ',
+    },
+  ],
+});
+assert.deepEqual(normalizedResultDisplayAnalysis.perItem, [
+  {
+    acceptedAnswers: ['Paris', 'Paris, France'],
+    correctCount: 1,
+    correctRate: 100,
+    expectedAnswer: 'Paris / Paris / Paris, France',
+    explanation: 'France capital.',
+    itemId: 'messy-q',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'Capital of France?',
+    submittedCount: 1,
+  },
+]);
+assert.deepEqual(
+  normalizedResultDisplayAnalysis.attempts.map((attempt) => ({
+    accuracy: attempt.accuracy,
+    answer: attempt.answers[0]?.answer,
+    expectedAnswer: attempt.answers[0]?.expectedAnswer,
+    explanation: attempt.answers[0]?.explanation,
+    score: attempt.score,
+    submitted: attempt.answers[0]?.submitted,
+  })),
+  [
+    {
+      accuracy: 100,
+      answer: 'Paris France',
+      expectedAnswer: 'Paris / Paris / Paris, France',
+      explanation: 'France capital.',
+      score: 0,
+      submitted: true,
+    },
+    {
+      accuracy: 0,
+      answer: '',
+      expectedAnswer: 'Paris / Paris / Paris, France',
+      explanation: 'France capital.',
+      score: 0,
+      submitted: false,
+    },
+  ]
+);
+assert.deepEqual(normalizedResultDisplayAnalysis.students, [
+  {
+    attempts: 2,
+    averageAccuracy: 50,
+    bestAccuracy: 100,
+    lastCompletedAt: new Date('2026-01-07T10:00:00.000Z'),
+    latestAccuracy: 0,
+    needsReviewCount: 0,
+    studentKey: 'name:messy student',
+    studentLabel: 'Messy Student',
+  },
+]);
 assert.equal(resultAnalysis.needsReview[0]?.itemId, 'pair-1');
 assert.equal(resultAnalysis.needsReview[0]?.correctRate, 50);
 assert.equal(

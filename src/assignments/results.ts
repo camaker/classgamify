@@ -7,6 +7,12 @@ import {
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayList,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 
 type AttemptForAnalysis = {
   anonymousToken?: string | null;
@@ -89,7 +95,7 @@ export function analyzeAssignmentResults({
   const completedAttempts = attempts.filter(hasAttemptResult);
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
-    const acceptedAnswers = getAcceptedAnswers(item.answer);
+    const acceptedAnswers = getResultAcceptedAnswers(item.answer);
     const submittedAnswers = completedAttempts.flatMap((attempt) => {
       const answer = attempt.answersJson.answers.find(
         (attemptAnswer) => attemptAnswer.itemId === item.id
@@ -104,18 +110,19 @@ export function analyzeAssignmentResults({
 
     return {
       acceptedAnswers,
-      correctCount,
-      correctRate:
+      correctCount: normalizeResultCount(correctCount),
+      correctRate: normalizeResultPercent(
         submittedCount > 0
           ? Math.round((correctCount / submittedCount) * 100)
-          : 0,
-      expectedAnswer: item.answer,
-      explanation: item.explanation,
+          : 0
+      ),
+      expectedAnswer: normalizeRuntimeDisplayText(item.answer),
+      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
       itemId: item.id,
       kind: item.kind,
       kindLabel: formatRuntimeItemKindLabel(item),
-      prompt: formatRuntimeItemPrompt(item),
-      submittedCount,
+      prompt: normalizeRuntimeDisplayText(formatRuntimeItemPrompt(item)),
+      submittedCount: normalizeResultCount(submittedCount),
     };
   });
 
@@ -159,15 +166,16 @@ function buildAttemptReviewAnswers({
 
   return runtimeItems.map((item) => {
     const submittedAnswer = answerByItemId.get(item.id);
+    const acceptedAnswers = getResultAcceptedAnswers(item.answer);
 
     return {
-      acceptedAnswers: getAcceptedAnswers(item.answer),
-      answer: submittedAnswer?.answer ?? '',
+      acceptedAnswers,
+      answer: normalizeRuntimeDisplayText(submittedAnswer?.answer),
       correct: Boolean(submittedAnswer?.correct),
-      expectedAnswer: item.answer,
-      explanation: item.explanation,
+      expectedAnswer: normalizeRuntimeDisplayText(item.answer),
+      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
       itemId: item.id,
-      prompt: formatRuntimeItemPrompt(item),
+      prompt: normalizeRuntimeDisplayText(formatRuntimeItemPrompt(item)),
       submitted:
         submittedAnswer !== undefined &&
         submittedAnswer.answer.trim().length > 0,
@@ -182,14 +190,18 @@ function hasAttemptResult(
 }
 
 function getAttemptReviewAccuracy(attempt: AttemptForAnalysis) {
-  return getFiniteNumber(attempt.resultJson?.accuracy, 0);
+  return normalizeResultPercent(
+    getFiniteNumber(attempt.resultJson?.accuracy, 0)
+  );
 }
 
 function getAttemptReviewScore(attempt: AttemptForAnalysis) {
   const score = getFiniteNumber(attempt.score);
-  if (score !== undefined) return score;
+  if (score !== undefined) return normalizeResultCount(score);
 
-  return getFiniteNumber(attempt.resultJson?.earnedPoints, 0);
+  return normalizeResultCount(
+    getFiniteNumber(attempt.resultJson?.earnedPoints, 0)
+  );
 }
 
 function getFiniteNumber(value: number | null | undefined, fallback?: number) {
@@ -215,19 +227,22 @@ function buildStudentSummaries(
           getDateTimestamp(left.completedAt)
       );
       const latestAttempt = sortedAttempts[0];
-      const averageAccuracy = Math.round(
-        studentAttempts.reduce((sum, attempt) => sum + attempt.accuracy, 0) /
-          studentAttempts.length
+      const normalizedAccuracies = studentAttempts.map((attempt) =>
+        normalizeResultPercent(attempt.accuracy)
+      );
+      const averageAccuracy = normalizeResultPercent(
+        Math.round(
+          normalizedAccuracies.reduce((sum, accuracy) => sum + accuracy, 0) /
+            normalizedAccuracies.length
+        )
       );
 
       return {
-        attempts: studentAttempts.length,
+        attempts: normalizeResultCount(studentAttempts.length),
         averageAccuracy,
-        bestAccuracy: Math.max(
-          ...studentAttempts.map((attempt) => attempt.accuracy)
-        ),
+        bestAccuracy: Math.max(...normalizedAccuracies),
         lastCompletedAt: latestAttempt?.completedAt ?? null,
-        latestAccuracy: latestAttempt?.accuracy ?? 0,
+        latestAccuracy: normalizeResultPercent(latestAttempt?.accuracy ?? 0),
         needsReviewCount: latestAttempt
           ? latestAttempt.answers.filter(isAssignmentAttemptAnswerNeedsReview)
               .length
@@ -255,4 +270,22 @@ export function isAssignmentAttemptAnswerNeedsReview(
   answer: AssignmentAttemptReviewAnswerStatus
 ) {
   return answer.submitted && !answer.correct;
+}
+
+function getResultAcceptedAnswers(answer: string) {
+  return (
+    normalizeRuntimeDisplayList(getAcceptedAnswers(answer)) ??
+    [normalizeRuntimeDisplayText(answer)].filter(Boolean)
+  );
+}
+
+function normalizeResultCount(value: number | undefined) {
+  return normalizeRuntimeDisplayCount(value ?? 0);
+}
+
+function normalizeResultPercent(value: number | undefined) {
+  return normalizeRuntimeDisplayCount(value ?? 0, {
+    max: 100,
+    min: 0,
+  });
 }
