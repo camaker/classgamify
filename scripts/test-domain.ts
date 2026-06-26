@@ -1431,6 +1431,54 @@ const assignmentResultRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'utf8'
 );
+const assignmentResultsMetricCardSource = readFileSync(
+  'src/components/assignments/assignment-results-metric-card.tsx',
+  'utf8'
+);
+const assignmentResultsHeaderCardSource = readFileSync(
+  'src/components/assignments/assignment-results-header-card.tsx',
+  'utf8'
+);
+const assignmentResultsClassroomBriefCardSource = readFileSync(
+  'src/components/assignments/assignment-results-classroom-brief-card.tsx',
+  'utf8'
+);
+const assignmentResultsStudentSearchSource = readFileSync(
+  'src/components/assignments/assignment-results-student-search.tsx',
+  'utf8'
+);
+const assignmentResultsAttemptReviewFilterSource = readFileSync(
+  'src/components/assignments/assignment-results-attempt-review-filter-control.tsx',
+  'utf8'
+);
+const assignmentResultsItemPerformanceSortSource = readFileSync(
+  'src/components/assignments/assignment-results-item-performance-sort-control.tsx',
+  'utf8'
+);
+const assignmentResultsItemPerformanceTableSource = readFileSync(
+  'src/components/assignments/assignment-results-item-performance-table.tsx',
+  'utf8'
+);
+const assignmentResultsStudentSummaryTableSource = readFileSync(
+  'src/components/assignments/assignment-results-student-summary-table.tsx',
+  'utf8'
+);
+const assignmentResultsAttemptsTableSource = readFileSync(
+  'src/components/assignments/assignment-results-attempts-table.tsx',
+  'utf8'
+);
+const assignmentResultsItemAnalysisCardSource = readFileSync(
+  'src/components/assignments/assignment-results-item-analysis-card.tsx',
+  'utf8'
+);
+const assignmentResultsAttemptReviewCardSource = readFileSync(
+  'src/components/assignments/assignment-results-attempt-review-card.tsx',
+  'utf8'
+);
+const assignmentResultsEmptyStateSource = readFileSync(
+  'src/components/assignments/assignment-results-empty-state.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -1458,18 +1506,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.controlViews\.studentSearch/,
-  'Assignment result route should render student search controls from the assignment-domain control view.'
+  /AssignmentResultsStudentSearch[\s\S]*view=\{pageView\.controlViews\.studentSearch\}/,
+  'Assignment result route should delegate student search controls with the assignment-domain control view.'
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.controlViews\.itemPerformanceSort/,
-  'Assignment result route should render item performance controls from the assignment-domain control view.'
+  /AssignmentResultsItemPerformanceSortControl[\s\S]*view=\{pageView\.controlViews\.itemPerformanceSort\}/,
+  'Assignment result route should delegate item performance controls with the assignment-domain control view.'
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.controlViews\.attemptReviewFilter/,
-  'Assignment result route should render answer review controls from the assignment-domain control view.'
+  /AssignmentResultsAttemptReviewFilterControl[\s\S]*view=\{pageView\.controlViews\.attemptReviewFilter\}/,
+  'Assignment result route should delegate answer review controls with the assignment-domain control view.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1478,8 +1526,8 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.attemptRowViews\.map/,
-  'Assignment result route should render attempt rows from the assignment-domain page view-model.'
+  /AssignmentResultsAttemptsTable[\s\S]*attempts=\{pageView\.attemptRowViews\}/,
+  'Assignment result route should delegate attempt row rendering with the assignment-domain page view-model rows.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1488,8 +1536,8 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.studentSummaryRowViews/,
-  'Assignment result route should render student summary rows from the assignment-domain page view-model.'
+  /AssignmentResultsStudentSummaryTable[\s\S]*students=\{pageView\.studentSummaryRowViews\}/,
+  'Assignment result route should delegate student summary row rendering with the assignment-domain page view-model rows.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1498,8 +1546,8 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.itemPerformanceRowViews/,
-  'Assignment result route should render item performance rows from the assignment-domain page view-model.'
+  /AssignmentResultsItemPerformanceTable[\s\S]*items=\{pageView\.itemPerformanceRowViews\}/,
+  'Assignment result route should delegate item performance row rendering with the assignment-domain page view-model rows.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1508,8 +1556,8 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.itemAnalysisCardViews/,
-  'Assignment result route should render reteach-priority cards from the assignment-domain page view-model.'
+  /AssignmentResultsItemAnalysisCard[\s\S]*itemView=\{itemView\}/,
+  'Assignment result route should delegate reteach-priority cards with assignment-domain card views.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1518,8 +1566,8 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /pageView\.attemptReviewCardViews/,
-  'Assignment result route should render answer review cards from the assignment-domain page view-model.'
+  /AssignmentResultsAttemptReviewCard[\s\S]*attemptView=\{attemptView\}/,
+  'Assignment result route should delegate answer review cards with assignment-domain card views.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1530,6 +1578,76 @@ assert.doesNotMatch(
   assignmentResultRouteSource,
   /buildAssignmentAttemptReviewCardView|buildAssignmentAttemptAnswerReviewView|buildAssignmentItemAnalysisCardView/,
   'Assignment result route should not build reteach-priority or answer-review card state directly.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /function (?:ClassroomBriefCard|ResultStudentSearch|ResultEmptyState|StudentSummaryTable|ItemPerformanceSortControl|AttemptReviewFilterControl|ItemPerformanceTable|ItemAnalysisCard|AttemptReviewCard|ResultMetric)\(/,
+  'Assignment result route should not keep local result metric, control, table, brief, or review card components.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /NativeSelect|NativeSelectOption|TableBody|TableHead|TableRow|TableCell|Progress|IconSearch|IconListDetails|IconClipboardText/,
+  'Assignment result route should not own low-level result controls, tables, progress bars, or review icons.'
+);
+assert.match(
+  assignmentResultsMetricCardSource,
+  /resultMetricIconByKey/,
+  'Assignment result metric component should own result metric icon mapping.'
+);
+assert.match(
+  assignmentResultsHeaderCardSource,
+  /AssignmentSettingsSummary[\s\S]*CopyAssignmentShareLinkButton[\s\S]*resultActionIconByAction/,
+  'Assignment result header component should own delivery summary, share actions, and result action icons.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /focusItemViews[\s\S]*followUpStudentViews/,
+  'Assignment classroom brief component should render prepared focus item and follow-up student views.'
+);
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /view\.sortOptions[\s\S]*view\.summary/,
+  'Assignment result student search component should render prepared sort options and result summary.'
+);
+assert.match(
+  assignmentResultsAttemptReviewFilterSource,
+  /view\.options/,
+  'Assignment result attempt review filter component should render prepared filter options.'
+);
+assert.match(
+  assignmentResultsItemPerformanceSortSource,
+  /view\.options/,
+  'Assignment result item performance sort component should render prepared sort options.'
+);
+assert.match(
+  assignmentResultsItemPerformanceTableSource,
+  /assignmentResultTableHeaders\.itemPerformance[\s\S]*items\.map/,
+  'Assignment result item performance table component should render prepared item row views.'
+);
+assert.match(
+  assignmentResultsStudentSummaryTableSource,
+  /assignmentResultTableHeaders\.studentSummary[\s\S]*students\.map/,
+  'Assignment result student summary table component should render prepared student row views.'
+);
+assert.match(
+  assignmentResultsAttemptsTableSource,
+  /assignmentResultTableHeaders\.studentAttempts[\s\S]*attempts\.map/,
+  'Assignment result attempts table component should render prepared attempt row views.'
+);
+assert.match(
+  assignmentResultsItemAnalysisCardSource,
+  /correctRateProgressValue/,
+  'Assignment result item analysis card component should render prepared reteach-priority card progress.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /attemptView\.answerViews\.map/,
+  'Assignment result attempt review card component should render prepared answer review views.'
+);
+assert.match(
+  assignmentResultsEmptyStateSource,
+  /AssignmentResultEmptyState/,
+  'Assignment result empty-state component should consume the assignment-domain empty-state view.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -8790,9 +8908,9 @@ assert.match(
   'Printable worksheet route should link teachers back to assignment results.'
 );
 assert.match(
-  assignmentResultsRouteSource,
+  assignmentResultsHeaderCardSource,
   /to="\/print\/assignments\/\$assignmentId"/,
-  'Assignment results page should expose the printable worksheet teacher action.'
+  'Assignment results header should expose the printable worksheet teacher action.'
 );
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
 assert.match(
