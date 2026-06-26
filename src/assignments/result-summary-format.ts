@@ -18,34 +18,50 @@ export function formatAssignmentSummaryCorrectCount({
   correctCount: number;
   submittedCount: number;
 }) {
+  const normalizedCorrectCount = normalizeAssignmentSummaryCount(correctCount);
+  const normalizedSubmittedCount =
+    normalizeAssignmentSummaryCount(submittedCount);
+
   return m.assignment_result_summary_correct_count({
-    correctCount,
-    submittedCount,
+    correctCount: normalizedCorrectCount,
+    submittedCount: normalizedSubmittedCount,
   });
 }
 
 export function formatAssignmentSummaryReviewItemCount(count: number) {
-  if (count === 1) {
-    return m.assignment_result_summary_review_items_one({ count });
+  const normalizedCount = normalizeAssignmentSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_result_summary_review_items_one({
+      count: normalizedCount,
+    });
   }
 
-  return m.assignment_result_summary_review_items_many({ count });
+  return m.assignment_result_summary_review_items_many({
+    count: normalizedCount,
+  });
 }
 
 export function formatAssignmentSummaryReviewCount(count: number) {
-  if (count === 1) {
-    return m.assignment_result_review_count_one({ count });
+  const normalizedCount = normalizeAssignmentSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_result_review_count_one({ count: normalizedCount });
   }
 
-  return m.assignment_result_review_count_many({ count });
+  return m.assignment_result_review_count_many({ count: normalizedCount });
 }
 
 export function formatAssignmentSummaryAttemptCount(count: number) {
-  if (count === 1) {
-    return m.assignment_result_summary_attempts_one({ count });
+  const normalizedCount = normalizeAssignmentSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_result_summary_attempts_one({ count: normalizedCount });
   }
 
-  return m.assignment_result_summary_attempts_many({ count });
+  return m.assignment_result_summary_attempts_many({
+    count: normalizedCount,
+  });
 }
 
 export function formatAssignmentSummaryItemPerformance({
@@ -57,9 +73,18 @@ export function formatAssignmentSummaryItemPerformance({
   correctRate: number;
   submittedCount: number;
 }) {
+  const normalizedCorrectCount = normalizeAssignmentSummaryCount(correctCount);
+  const normalizedSubmittedCount =
+    normalizeAssignmentSummaryCount(submittedCount);
+
   return m.assignment_result_summary_item_performance({
-    correctCount,
+    correctCount: normalizedCorrectCount,
     correctRate: formatAssignmentSummaryCorrectRate(correctRate),
-    submittedCount,
+    submittedCount: normalizedSubmittedCount,
   });
+}
+
+function normalizeAssignmentSummaryCount(count: number) {
+  if (!Number.isFinite(count)) return 0;
+  return Math.max(0, Math.floor(count));
 }

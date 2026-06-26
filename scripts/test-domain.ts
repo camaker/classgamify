@@ -459,6 +459,7 @@ import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
   formatAssignmentSummaryItemPerformance,
+  formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
 import {
@@ -15590,6 +15591,20 @@ assert.equal(
   '2/3 correct'
 );
 assert.equal(
+  formatAssignmentSummaryCorrectCount({
+    correctCount: Number.NaN,
+    submittedCount: -3,
+  }),
+  '0/0 correct'
+);
+assert.equal(
+  formatAssignmentSummaryCorrectCount({
+    correctCount: 2.8,
+    submittedCount: 3.9,
+  }),
+  '2/3 correct'
+);
+assert.equal(
   formatAssignmentSummaryItemPerformance({
     correctCount: 2,
     correctRate: 67,
@@ -15597,10 +15612,28 @@ assert.equal(
   }),
   '67% correct, 2/3'
 );
+assert.equal(
+  formatAssignmentSummaryItemPerformance({
+    correctCount: Number.POSITIVE_INFINITY,
+    correctRate: Number.NaN,
+    submittedCount: -1,
+  }),
+  '- correct, 0/0'
+);
 assert.equal(formatAssignmentSummaryReviewItemCount(1), '1 item to review');
 assert.equal(formatAssignmentSummaryReviewItemCount(2), '2 items to review');
+assert.equal(formatAssignmentSummaryReviewItemCount(-2), '0 items to review');
+assert.equal(
+  formatAssignmentSummaryReviewItemCount(Number.NaN),
+  '0 items to review'
+);
+assert.equal(formatAssignmentSummaryReviewCount(1), '1 review');
+assert.equal(formatAssignmentSummaryReviewCount(-2), '0 reviews');
+assert.equal(formatAssignmentSummaryReviewCount(2.8), '2 reviews');
 assert.equal(formatAssignmentSummaryAttemptCount(1), '1 attempt');
 assert.equal(formatAssignmentSummaryAttemptCount(2), '2 attempts');
+assert.equal(formatAssignmentSummaryAttemptCount(-1), '0 attempts');
+assert.equal(formatAssignmentSummaryAttemptCount(2.8), '2 attempts');
 assert.deepEqual(summarizeAssignmentAttempts([]), {
   averageDurationSeconds: 0,
   averagePoints: 0,
