@@ -408,29 +408,17 @@ import {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
-  buildAssignmentResultControlRouteSearch,
-  buildAssignmentResultControlSearchState,
   buildAssignmentResultHeaderView,
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
-  buildAssignmentResultRouteSearch,
-  buildAssignmentResultSearchState,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentStudentSummaryRowViews,
   buildAssignmentResultEmptyState,
-  ATTEMPT_REVIEW_FILTER_VALUES,
   attemptReviewFilterOptions,
-  buildFilteredAttemptRows,
-  DEFAULT_ATTEMPT_REVIEW_FILTER,
-  DEFAULT_ITEM_PERFORMANCE_SORT,
-  DEFAULT_STUDENT_SUMMARY_SORT,
   buildResultSearchSummary,
-  filterAndSortStudentSummaries,
-  filterAssignmentResultCompletedAttemptRows,
-  filterAttemptReviews,
   formatAssignmentAttemptReviewBadge,
   formatAssignmentItemCorrectSummary,
   formatAssignmentResultFraction,
@@ -443,7 +431,23 @@ import {
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
+  studentSummarySortOptions,
+} from '@/assignments/result-view';
+import {
+  ATTEMPT_REVIEW_FILTER_VALUES,
+  DEFAULT_ATTEMPT_REVIEW_FILTER,
+  DEFAULT_ITEM_PERFORMANCE_SORT,
+  DEFAULT_STUDENT_SUMMARY_SORT,
   ITEM_PERFORMANCE_SORT_VALUES,
+  STUDENT_SUMMARY_SORT_VALUES,
+  buildAssignmentResultControlRouteSearch,
+  buildAssignmentResultControlSearchState,
+  buildAssignmentResultRouteSearch,
+  buildAssignmentResultSearchState,
+  buildFilteredAttemptRows,
+  filterAndSortStudentSummaries,
+  filterAssignmentResultCompletedAttemptRows,
+  filterAttemptReviews,
   matchesResultSearch,
   normalizeResultSearch,
   normalizeResultSearchQuery,
@@ -452,11 +456,9 @@ import {
   parseResultStudentSearch,
   parseStudentSummarySort,
   resolveAssignmentResultViewState,
-  STUDENT_SUMMARY_SORT_VALUES,
-  studentSummarySortOptions,
   sortItemPerformance,
   sortStudentSummaries,
-} from '@/assignments/result-view';
+} from '@/assignments/result-filters';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultValue,
@@ -1100,6 +1102,10 @@ const assignmentResultViewSource = readFileSync(
   'src/assignments/result-view.ts',
   'utf8'
 );
+const assignmentResultFiltersSource = readFileSync(
+  'src/assignments/result-filters.ts',
+  'utf8'
+);
 const assignmentAttemptStatsSource = readFileSync(
   'src/assignments/attempt-stats.ts',
   'utf8'
@@ -1136,6 +1142,31 @@ assert.match(
   assignmentListViewStatsSource,
   /buildAssignmentAttemptStatsView\(\{[\s\S]*averageScore,[\s\S]*completions,[\s\S]*\}\)/,
   'Assignment list cards should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function filterAndSortStudentSummaries/,
+  'Assignment result student search and sort rules should live in the assignment result filter domain helper.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function sortItemPerformance/,
+  'Assignment result item performance sort rules should live in the assignment result filter domain helper.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function filterAttemptReviews/,
+  'Assignment result answer-review filtering should live in the assignment result filter domain helper.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function buildAssignmentResultRouteSearch/,
+  'Assignment result route search parsing should live in the assignment result filter domain helper.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /export function (?:filterAndSortStudentSummaries|sortItemPerformance|filterAttemptReviews|buildAssignmentResultRouteSearch|buildAssignmentResultControlSearchState)/,
+  'Assignment result view should not define search, sort, filter, or URL search rules directly.'
 );
 assert.match(
   assignmentResultsSource,

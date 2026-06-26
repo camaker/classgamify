@@ -1,11 +1,13 @@
 import {
   type AssignmentResultActionButton,
   buildAssignmentResultActionPayload,
-  buildAssignmentResultControlRouteSearch,
-  buildAssignmentResultRouteSearch,
   buildAssignmentResultsPageViewModel,
   assignmentResultSectionCopy,
 } from '@/assignments/result-view';
+import {
+  buildAssignmentResultControlRouteSearch,
+  buildAssignmentResultRouteSearch,
+} from '@/assignments/result-filters';
 import { AssignmentResultsAttemptReviewCard } from '@/components/assignments/assignment-results-attempt-review-card';
 import { AssignmentResultsAttemptReviewFilterControl } from '@/components/assignments/assignment-results-attempt-review-filter-control';
 import { AssignmentResultsAttemptsTable } from '@/components/assignments/assignment-results-attempts-table';
