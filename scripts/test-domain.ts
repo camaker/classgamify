@@ -9262,6 +9262,11 @@ assert.match(
   /printable worksheet action[\s\S]*\/print\/assignments\/:assignmentId[\s\S]*answerKey=true/,
   'E2E catalog should cover the teacher printable worksheet journey and answer-key toggle.'
 );
+assert.match(
+  e2eTestCatalogText,
+  /student-name, date, and score lines/,
+  'E2E catalog should cover the printable worksheet student, date, and score fields.'
+);
 const activityTemplates = getActivityTemplates();
 assert.deepEqual(
   activityTemplates.map((template) => template.type),
