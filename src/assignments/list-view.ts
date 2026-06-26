@@ -65,6 +65,12 @@ type AssignmentListCardActionState = {
 };
 
 type AssignmentListCardActionView = {
+  printAction:
+    | {
+        assignmentId: string;
+        label: string;
+      }
+    | undefined;
   resultAction:
     | {
         assignmentId: string;
@@ -252,6 +258,9 @@ export const assignmentListActionCopy = {
   },
   get openShareLink() {
     return m.assignment_list_action_open_share_link();
+  },
+  get printWorksheet() {
+    return m.assignment_list_action_print_worksheet();
   },
   get viewResults() {
     return m.assignment_list_action_view_results();
@@ -616,6 +625,12 @@ export function buildAssignmentListCardActionView({
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
 
   return {
+    printAction: actionState.showResultsAction
+      ? {
+          assignmentId,
+          label: assignmentListActionCopy.printWorksheet,
+        }
+      : undefined,
     resultAction: actionState.showResultsAction
       ? {
           assignmentId,

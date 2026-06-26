@@ -18,6 +18,7 @@ import {
   IconLock,
   IconLockOpen,
   IconPlayerPlay,
+  IconPrinter,
   IconUsers,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -29,7 +30,8 @@ type AssignmentListCardProps = {
 
 export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
   const updateStatusMutation = useUpdateAssignmentStatus();
-  const { resultAction, shareAction, statusAction } = assignment.actionView;
+  const { printAction, resultAction, shareAction, statusAction } =
+    assignment.actionView;
 
   async function updateStatus() {
     if (!statusAction) return;
@@ -93,6 +95,19 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
             >
               <IconChartBar className="size-4" />
               {resultAction.label}
+            </Link>
+          ) : null}
+          {printAction ? (
+            <Link
+              to="/print/assignments/$assignmentId"
+              params={{ assignmentId: printAction.assignmentId }}
+              className={cn(
+                buttonVariants({ variant: 'outline' }),
+                'w-full bg-background lg:w-auto'
+              )}
+            >
+              <IconPrinter className="size-4" />
+              {printAction.label}
             </Link>
           ) : null}
           {statusAction ? (

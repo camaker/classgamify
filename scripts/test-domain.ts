@@ -8733,6 +8733,16 @@ assert.match(
   'Assignment list card component should own close and reopen interactions instead of the route.'
 );
 assert.match(
+  assignmentListCardComponentSource,
+  /to="\/print\/assignments\/\$assignmentId"/,
+  'Assignment list card component should link persisted assignments to the printable worksheet route.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /Print worksheet|打印练习纸/,
+  'Assignment list card component should render printable worksheet labels from the assignment-domain action view.'
+);
+assert.match(
   assignmentListSummaryCardComponentSource,
   /AssignmentListSummaryMetricId/,
   'Assignment list summary card component should map icons by the assignment-domain metric id.'
@@ -11388,6 +11398,10 @@ assert.deepEqual(
       },
     },
     actionView: {
+      printAction: {
+        assignmentId: 'persisted-assignment-1',
+        label: 'Print worksheet',
+      },
       resultAction: {
         assignmentId: 'persisted-assignment-1',
         label: 'View results',
@@ -11488,6 +11502,7 @@ assert.deepEqual(
       statusAction: undefined,
     },
     actionView: {
+      printAction: undefined,
       resultAction: undefined,
       shareAction: {
         label: 'Open share link',
@@ -11618,6 +11633,10 @@ assert.deepEqual(
     shareSlug: '　share １２３　',
   }),
   {
+    printAction: {
+      assignmentId: 'assignment-with-space',
+      label: 'Print worksheet',
+    },
     resultAction: {
       assignmentId: 'assignment-with-space',
       label: 'View results',
@@ -11642,6 +11661,7 @@ assert.deepEqual(
     shareSlug: 'draft-share',
   }),
   {
+    printAction: undefined,
     resultAction: undefined,
     shareAction: undefined,
     statusAction: undefined,
