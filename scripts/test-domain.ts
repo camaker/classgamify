@@ -4616,14 +4616,13 @@ assert.equal(
   'created-token'
 );
 assert.equal(anonymousTokenCreateCount, 1);
-assert.equal(
-  orderAssignmentRuntimeItems({
-    items: submissionRuntimeItems,
-    shareSlug: 'share-1',
-    shuffleItems: false,
-  }),
-  submissionRuntimeItems
-);
+const fixedOrderRuntimeItems = orderAssignmentRuntimeItems({
+  items: submissionRuntimeItems,
+  shareSlug: 'share-1',
+  shuffleItems: false,
+});
+assert.deepEqual(fixedOrderRuntimeItems, submissionRuntimeItems);
+assert.notEqual(fixedOrderRuntimeItems, submissionRuntimeItems);
 const shuffledOnce = orderAssignmentRuntimeItems({
   items: submissionRuntimeItems,
   shareSlug: 'share-1',

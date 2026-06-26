@@ -17,7 +17,7 @@ export function orderAssignmentRuntimeItems<
 }) {
   return shuffleItems
     ? stableShuffle(items, normalizeAssignmentShareSlug(shareSlug))
-    : items;
+    : [...items];
 }
 
 export function stableShuffle<TItem>(items: TItem[], seed: string) {
