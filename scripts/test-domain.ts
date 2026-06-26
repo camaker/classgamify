@@ -496,6 +496,7 @@ import {
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
 import {
+  ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS,
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
@@ -1109,6 +1110,25 @@ assert.doesNotMatch(
   assignmentResultsExportSource,
   /ASSIGNMENT_RESULTS_EXPORT_TITLE_MAX_LENGTH|slice\(0, 80\)/,
   'Assignment results export filenames should not keep local title length limits.'
+);
+const assignmentPublishSource = readFileSync(
+  'src/assignments/publish-input.ts',
+  'utf8'
+);
+assert.match(
+  assignmentPublishSource,
+  /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS[\s\S]*minLeadMinutes: 1[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60/,
+  'Assignment publish close-after helpers should expose named time-unit constants.'
+);
+assert.match(
+  assignmentPublishSource,
+  /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.minLeadMinutes[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.secondsPerMinute[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.millisecondsPerSecond/,
+  'Assignment publish close-after minimum should reuse the named time units.'
+);
+assert.doesNotMatch(
+  assignmentPublishSource,
+  /60 \* 1000|60000/,
+  'Assignment publish close-after helpers should not keep local millisecond constants.'
 );
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
@@ -4934,6 +4954,11 @@ assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 );
+assert.deepEqual(ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS, {
+  minLeadMinutes: 1,
+  millisecondsPerSecond: 1000,
+  secondsPerMinute: 60,
+});
 assert.equal(
   buildAssignmentPublishCloseAfterMinLocal(new Date(2026, 0, 10, 9, 30, 45)),
   '2026-01-10T09:31'

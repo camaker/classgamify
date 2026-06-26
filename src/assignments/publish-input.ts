@@ -7,13 +7,31 @@ import {
 } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
+export const ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS = {
+  minLeadMinutes: 1,
+  millisecondsPerSecond: 1000,
+  secondsPerMinute: 60,
+} as const;
+
 export function formatAssignmentDateTimeLocal(date: Date) {
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const localDate = new Date(
+    date.getTime() -
+      date.getTimezoneOffset() *
+        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
+        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
+  );
   return localDate.toISOString().slice(0, 16);
 }
 
 export function buildAssignmentPublishCloseAfterMinLocal(now = new Date()) {
-  return formatAssignmentDateTimeLocal(new Date(now.getTime() + 60 * 1000));
+  return formatAssignmentDateTimeLocal(
+    new Date(
+      now.getTime() +
+        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.minLeadMinutes *
+          ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
+          ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
+    )
+  );
 }
 
 export function parseAssignmentDateTimeLocal(value: string) {
