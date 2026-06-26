@@ -191,12 +191,26 @@ import {
   buildActivityCreatePageViewModel,
   buildActivityEditPageViewModel,
   activityContentToEditorInput,
+  ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
+  buildActivityEditorDraftGenerationGate,
+  buildActivityEditorDraftSourceState,
+  buildActivityEditorDraftSourceText,
+  buildActivityEditorDraftSuccessMessage,
   getActivityEditorDefaultInput,
   buildActivityEditorInitialValues,
+  buildActivityEditorModeView,
   buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
+  buildActivityEditorReadinessPanelSummary,
+  buildActivityEditorSaveGate,
+  buildActivityEditorSelectOptions,
+  buildActivityEditorSyncedDraftSourceText,
+  buildActivityEditorTemplateScaffoldApplication,
   buildActivityEditorTemplateSetupView,
   buildActivityEditorTemplateReadiness,
+  buildActivityEditorTemplateView,
+  formatActivityEditorDifficulty,
+  formatActivityEditorVisibility,
 } from '@/activities/editor';
 import {
   buildQuestionChoices,
@@ -1225,15 +1239,16 @@ const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
 );
+const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
-  activityEditorFormSource,
+  activityEditorSource,
   /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS[\s\S]*lockedOptions: 4/,
-  'Activity editor readiness panel should expose its locked-option display limit.'
+  'Activity editor domain should expose its locked-option display limit.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityEditorSource,
   /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS\.lockedOptions/,
-  'Activity editor readiness panel should reuse the named locked-option limit.'
+  'Activity editor domain should reuse the named locked-option limit.'
 );
 assert.match(
   activityEditorFormSource,
@@ -1249,6 +1264,31 @@ assert.doesNotMatch(
   activityEditorFormSource,
   /summary\.lockedOptions\.slice\(0, 4\)/,
   'Activity editor readiness panel should not keep a local locked-option display limit.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorTemplateView/,
+  'Activity editor form should consume the activity-domain template view.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorDraftGenerationGate/,
+  'Activity editor form should consume the activity-domain AI draft gate.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorTemplateScaffoldApplication/,
+  'Activity editor form should apply template scaffolds through the activity-domain helper.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorSaveGate/,
+  'Activity editor form should consume the activity-domain save gate.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility/,
+  'Activity editor form should not rebuild template, draft-source, readiness, scaffold, or option-label state locally.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -10996,6 +11036,204 @@ assert.equal(
     (option) => option.template.type === 'quiz'
   )?.diagnosis,
   'Quiz is selected and ready.'
+);
+assert.deepEqual(ACTIVITY_EDITOR_READINESS_PANEL_LIMITS, {
+  lockedOptions: 4,
+});
+assert.deepEqual(buildActivityEditorModeView('create'), {
+  footerHint:
+    'Saved activities appear in the teacher dashboard and can later be published as assignments.',
+  isEditMode: false,
+  saveLabel: 'Save activity',
+  saveSuccessMessage: 'Activity saved to your library.',
+  title: 'Create a reusable activity',
+});
+assert.deepEqual(buildActivityEditorModeView('edit'), {
+  footerHint:
+    'Changes update the reusable activity used by future assignments.',
+  isEditMode: true,
+  saveLabel: 'Save changes',
+  saveSuccessMessage: 'Activity updated.',
+  title: 'Edit reusable activity',
+});
+assert.deepEqual(
+  buildActivityEditorDraftGenerationGate({
+    hasUser: false,
+    sourceText: '  apples  ',
+  }),
+  {
+    canGenerate: false,
+    errorMessage: 'Sign in to generate AI activity drafts.',
+    sourceText: 'apples',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationGate({
+    hasUser: true,
+    sourceText: '  ',
+  }),
+  {
+    canGenerate: false,
+    errorMessage: 'Add a topic, vocabulary list, or source notes first.',
+    sourceText: '',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationGate({
+    hasUser: true,
+    sourceText: '  apple, milk  ',
+  }),
+  {
+    canGenerate: true,
+    sourceText: 'apple, milk',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveGate({
+    hasUser: false,
+    mode: 'create',
+  }),
+  {
+    canSave: false,
+    errorMessage: 'Sign in to save activities to your teacher library.',
+    mode: 'create',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveGate({
+    hasUser: true,
+    mode: 'edit',
+  }),
+  {
+    canSave: false,
+    errorMessage: 'Activity could not be identified for editing.',
+    mode: 'edit',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveGate({
+    activityId: 'activity-1',
+    hasUser: true,
+    mode: 'edit',
+  }),
+  {
+    activityId: 'activity-1',
+    canSave: true,
+    mode: 'edit',
+  }
+);
+assert.equal(
+  buildActivityEditorDraftSuccessMessage({}),
+  'AI activity draft generated.'
+);
+assert.equal(
+  buildActivityEditorDraftSuccessMessage({ notice: 'Local fallback.' }),
+  'Draft filled from the local generator.'
+);
+assert.equal(
+  buildActivityEditorDraftSourceText({
+    ...activityEditorDefaultInput,
+    vocabularyText: ' apple, milk ',
+  }).includes('apple, milk'),
+  true
+);
+assert.deepEqual(
+  buildActivityEditorDraftSourceState({
+    draftSourceText: 'No attached material notes yet.',
+    sourceMaterials: [],
+  }),
+  {
+    canSyncDraftSourceMaterials: false,
+    hasAttachedSourceMaterials: false,
+    hasDraftSourceMaterialNotes: false,
+  }
+);
+const syncedEditorDraftSource = buildActivityEditorSyncedDraftSourceText({
+  sourceMaterials: [
+    {
+      fileId: 'file-1',
+      kind: 'document',
+      originalName: 'unit-notes.pdf',
+    },
+  ],
+  sourceText: 'Classroom source notes.',
+});
+assert.match(syncedEditorDraftSource, /Classroom source notes\./);
+assert.match(syncedEditorDraftSource, /unit-notes\.pdf/);
+assert.deepEqual(
+  buildActivityEditorDraftSourceState({
+    draftSourceText: syncedEditorDraftSource,
+    sourceMaterials: [],
+  }),
+  {
+    canSyncDraftSourceMaterials: true,
+    hasAttachedSourceMaterials: false,
+    hasDraftSourceMaterialNotes: true,
+  }
+);
+const editorSelectOptions = buildActivityEditorSelectOptions();
+assert.deepEqual(
+  editorSelectOptions.difficultyOptions.map((option) => option.label),
+  ['Starter', 'Core', 'Challenge']
+);
+assert.deepEqual(
+  editorSelectOptions.visibilityOptions.map((option) => option.label),
+  ['Draft', 'Private', 'Public', 'Unlisted']
+);
+assert.equal(editorSelectOptions.templateOptions.length, 8);
+assert.equal(formatActivityEditorDifficulty('challenge'), 'Challenge');
+assert.equal(formatActivityEditorVisibility('unlisted'), 'Unlisted');
+const editorTemplateView = buildActivityEditorTemplateView({
+  input: {
+    ...activityEditorDefaultInput,
+    groupsText: '',
+    pairsText: '',
+    questionsText: 'Capital of France? | Paris | Paris, Rome',
+    templateType: 'quiz',
+  },
+  templateType: 'quiz',
+});
+assert.equal(editorTemplateView.template.name, 'Quiz');
+assert.equal(editorTemplateView.setupView.title, 'Quiz setup');
+assert.equal(editorTemplateView.templateOptions.length, 8);
+assert.equal(editorTemplateView.readinessSummary.readyCount, 4);
+assert.ok(
+  editorTemplateView.readinessSummary.lockedOptions.length <=
+    ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions
+);
+assert.deepEqual(
+  buildActivityEditorReadinessPanelSummary(
+    getTemplateRemixPlan({
+      content: buildActivityContent({
+        ...activityEditorDefaultInput,
+        groupsText: '',
+        pairsText: '',
+        questionsText: 'Capital of France? | Paris | Paris, Rome',
+      }),
+      currentTemplateType: 'quiz',
+    })
+  ).lockedOptions.map((option) => option.template),
+  ['match-up', 'line-match', 'group-sort', 'matching-pairs']
+);
+const groupSortScaffoldApplication =
+  buildActivityEditorTemplateScaffoldApplication({
+    current: {
+      ...activityEditorDefaultInput,
+      title: 'Keep current until scaffold loads',
+      visibility: 'private',
+    },
+    templateType: 'group-sort',
+  });
+assert.equal(groupSortScaffoldApplication.values.templateType, 'group-sort');
+assert.equal(groupSortScaffoldApplication.values.visibility, 'private');
+assert.equal(
+  groupSortScaffoldApplication.values.title,
+  'Sort food, drinks, and containers'
+);
+assert.match(groupSortScaffoldApplication.draftSourceText, /apple/);
+assert.equal(
+  groupSortScaffoldApplication.successMessage,
+  'Group sort example loaded.'
 );
 assert.equal(
   buildActivityEditorTemplateReadiness({

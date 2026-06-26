@@ -1,19 +1,35 @@
 import type {
   ActivityContent,
+  ActivityDifficulty,
   ActivitySeed,
+  ActivityTemplateDefinition,
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import {
+  ACTIVITY_CREATABLE_VISIBILITIES,
+  ACTIVITY_DIFFICULTIES,
+} from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { getActivityTemplates } from '@/activities/catalog';
 import {
   activityEditPageCopy,
   buildActivityEditAccessView,
 } from '@/activities/lifecycle';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
+import {
+  appendActivitySourceMaterialDraftNotes,
+  getActivityDraftSourceText,
+  hasActivitySourceMaterialDraftNotes,
+} from '@/activities/draft-source';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import {
+  buildActivityTemplateReadinessPanelSummary,
+  type ActivityTemplateReadinessPanelSummary,
+} from '@/activities/draft-meta';
 import {
   buildActivityContent,
   createActivityInputSchema,
@@ -25,6 +41,10 @@ import {
   formatTemplateRequirement,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
+
+export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
+  lockedOptions: 4,
+} as const;
 
 type ActivityEditorSource = {
   content: ActivityContent;
@@ -52,6 +72,75 @@ type ActivityEditorTemplateSetupView = {
   shortName: string;
   successMessage: string;
   title: string;
+};
+
+type ActivityEditorSelectOption<TValue extends string> = {
+  label: string;
+  value: TValue;
+};
+
+type ActivityEditorSelectOptionsView = {
+  difficultyOptions: ActivityEditorSelectOption<ActivityDifficulty>[];
+  templateOptions: ActivityTemplateDefinition[];
+  visibilityOptions: ActivityEditorSelectOption<
+    (typeof ACTIVITY_CREATABLE_VISIBILITIES)[number]
+  >[];
+};
+
+type ActivityEditorDraftSourceState = {
+  canSyncDraftSourceMaterials: boolean;
+  hasAttachedSourceMaterials: boolean;
+  hasDraftSourceMaterialNotes: boolean;
+};
+
+type ActivityEditorDraftGenerationGate =
+  | {
+      canGenerate: false;
+      errorMessage: string;
+      sourceText: string;
+    }
+  | {
+      canGenerate: true;
+      sourceText: string;
+    };
+
+type ActivityEditorMode = 'create' | 'edit';
+
+type ActivityEditorModeView = {
+  footerHint: string;
+  isEditMode: boolean;
+  saveLabel: string;
+  saveSuccessMessage: string;
+  title: string;
+};
+
+type ActivityEditorSaveGate =
+  | {
+      canSave: false;
+      errorMessage: string;
+      mode: ActivityEditorMode;
+    }
+  | {
+      canSave: true;
+      mode: 'create';
+    }
+  | {
+      activityId: string;
+      canSave: true;
+      mode: 'edit';
+    };
+
+type ActivityEditorTemplateScaffoldApplication = {
+  draftSourceText: string;
+  successMessage: string;
+  values: CreateActivityInput;
+};
+
+type ActivityEditorTemplateView = {
+  readinessSummary: ActivityTemplateReadinessPanelSummary;
+  setupView: ActivityEditorTemplateSetupView;
+  template: ActivityTemplateDefinition;
+  templateOptions: ActivityTemplateDefinition[];
 };
 
 type ActivityCreatePageInputShapeView = {
@@ -130,6 +219,187 @@ export function getActivityEditorDefaultInput(): CreateActivityInput {
     visibility: 'draft',
     vocabularyText: m.activity_editor_default_vocabulary_text(),
   };
+}
+
+export function buildActivityEditorDraftSourceText(
+  values: CreateActivityInput
+) {
+  return getActivityDraftSourceText(values);
+}
+
+export function buildActivityEditorDraftSourceState({
+  draftSourceText,
+  sourceMaterials,
+}: {
+  draftSourceText: string;
+  sourceMaterials: unknown;
+}): ActivityEditorDraftSourceState {
+  const hasAttachedSourceMaterials =
+    Array.isArray(sourceMaterials) && sourceMaterials.length > 0;
+  const hasDraftSourceMaterialNotes =
+    hasActivitySourceMaterialDraftNotes(draftSourceText);
+
+  return {
+    canSyncDraftSourceMaterials:
+      hasAttachedSourceMaterials || hasDraftSourceMaterialNotes,
+    hasAttachedSourceMaterials,
+    hasDraftSourceMaterialNotes,
+  };
+}
+
+export function buildActivityEditorSyncedDraftSourceText({
+  sourceMaterials,
+  sourceText,
+}: {
+  sourceMaterials: unknown;
+  sourceText: string;
+}) {
+  return appendActivitySourceMaterialDraftNotes({
+    sourceMaterials,
+    sourceText,
+  });
+}
+
+export function buildActivityEditorDraftGenerationGate({
+  hasUser,
+  sourceText,
+}: {
+  hasUser: boolean;
+  sourceText: string;
+}): ActivityEditorDraftGenerationGate {
+  const trimmedSourceText = sourceText.trim();
+
+  if (!hasUser) {
+    return {
+      canGenerate: false,
+      errorMessage: m.activity_form_toast_sign_in_generate_draft(),
+      sourceText: trimmedSourceText,
+    };
+  }
+
+  if (!trimmedSourceText) {
+    return {
+      canGenerate: false,
+      errorMessage: m.activity_form_toast_missing_draft_source(),
+      sourceText: trimmedSourceText,
+    };
+  }
+
+  return {
+    canGenerate: true,
+    sourceText: trimmedSourceText,
+  };
+}
+
+export function buildActivityEditorDraftSuccessMessage({
+  notice,
+}: {
+  notice?: string;
+}) {
+  return notice
+    ? m.activity_form_toast_local_draft_generated()
+    : m.activity_form_toast_ai_draft_generated();
+}
+
+export function buildActivityEditorModeView(
+  mode: ActivityEditorMode
+): ActivityEditorModeView {
+  if (mode === 'edit') {
+    return {
+      footerHint: m.activity_form_footer_edit_hint(),
+      isEditMode: true,
+      saveLabel: m.activity_form_save_changes(),
+      saveSuccessMessage: m.activity_form_toast_activity_updated(),
+      title: m.activity_form_title_edit(),
+    };
+  }
+
+  return {
+    footerHint: m.activity_form_footer_create_hint(),
+    isEditMode: false,
+    saveLabel: m.activity_form_save_activity(),
+    saveSuccessMessage: m.activity_form_toast_activity_saved(),
+    title: m.activity_form_title_create(),
+  };
+}
+
+export function buildActivityEditorSaveGate({
+  activityId,
+  hasUser,
+  mode,
+}: {
+  activityId?: string;
+  hasUser: boolean;
+  mode: ActivityEditorMode;
+}): ActivityEditorSaveGate {
+  if (!hasUser) {
+    return {
+      canSave: false,
+      errorMessage: m.activity_form_toast_sign_in_save(),
+      mode,
+    };
+  }
+
+  if (mode === 'edit') {
+    if (!activityId) {
+      return {
+        canSave: false,
+        errorMessage: m.activity_form_toast_edit_missing_activity(),
+        mode,
+      };
+    }
+
+    return {
+      activityId,
+      canSave: true,
+      mode,
+    };
+  }
+
+  return {
+    canSave: true,
+    mode,
+  };
+}
+
+export function buildActivityEditorSelectOptions(): ActivityEditorSelectOptionsView {
+  return {
+    difficultyOptions: ACTIVITY_DIFFICULTIES.map((value) => ({
+      label: formatActivityEditorDifficulty(value),
+      value,
+    })),
+    templateOptions: getActivityTemplates(),
+    visibilityOptions: ACTIVITY_CREATABLE_VISIBILITIES.map((value) => ({
+      label: formatActivityEditorVisibility(value),
+      value,
+    })),
+  };
+}
+
+export function formatActivityEditorDifficulty(difficulty: ActivityDifficulty) {
+  switch (difficulty) {
+    case 'challenge':
+      return m.activity_form_difficulty_challenge();
+    case 'core':
+      return m.activity_form_difficulty_core();
+    case 'starter':
+      return m.activity_form_difficulty_starter();
+  }
+}
+
+export function formatActivityEditorVisibility(
+  visibility: (typeof ACTIVITY_CREATABLE_VISIBILITIES)[number]
+) {
+  switch (visibility) {
+    case 'draft':
+      return m.activity_form_visibility_draft();
+    case 'private':
+      return m.activity_form_visibility_private();
+    case 'public':
+      return m.activity_form_visibility_public();
+    case 'unlisted':
+      return m.activity_form_visibility_unlisted();
+  }
 }
 
 export function buildActivityEditorInitialValues(
@@ -286,6 +556,63 @@ export function buildActivityEditorTemplateSetupView(
       template: template.name,
     }),
     title: m.activity_editor_setup_title({ template: template.name }),
+  };
+}
+
+export function buildActivityEditorTemplateView({
+  input,
+  templateType,
+}: {
+  input: unknown;
+  templateType: ActivityTemplateType;
+}): ActivityEditorTemplateView {
+  const templateOptions = getActivityTemplates();
+  const template =
+    templateOptions.find((option) => option.type === templateType) ??
+    getTemplateByType(templateType);
+  const templateReadiness = buildActivityEditorTemplateReadiness(input);
+
+  return {
+    readinessSummary:
+      buildActivityEditorReadinessPanelSummary(templateReadiness),
+    setupView: buildActivityEditorTemplateSetupView(templateType),
+    template,
+    templateOptions,
+  };
+}
+
+export function buildActivityEditorReadinessPanelSummary(
+  remixPlan: TemplateRemixPlan | null
+): ActivityTemplateReadinessPanelSummary {
+  const summary = buildActivityTemplateReadinessPanelSummary(remixPlan);
+
+  return {
+    ...summary,
+    lockedOptions: summary.lockedOptions.slice(
+      0,
+      ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions
+    ),
+  };
+}
+
+export function buildActivityEditorTemplateScaffoldApplication({
+  current,
+  templateType,
+}: {
+  current: CreateActivityInput;
+  templateType: ActivityTemplateType;
+}): ActivityEditorTemplateScaffoldApplication {
+  const nextValues = {
+    ...current,
+    ...getActivityTemplateScaffold(templateType),
+    templateType,
+  };
+
+  return {
+    draftSourceText: getActivityDraftSourceText(nextValues),
+    successMessage:
+      buildActivityEditorTemplateSetupView(templateType).successMessage,
+    values: nextValues,
   };
 }
 

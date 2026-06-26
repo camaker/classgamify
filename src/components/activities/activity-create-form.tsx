@@ -1,15 +1,16 @@
-import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import {
-  appendActivitySourceMaterialDraftNotes,
-  getActivityDraftSourceText,
-  hasActivitySourceMaterialDraftNotes,
-} from '@/activities/draft-source';
-import {
+  buildActivityEditorDraftGenerationGate,
+  buildActivityEditorDraftSourceState,
+  buildActivityEditorDraftSourceText,
+  buildActivityEditorDraftSuccessMessage,
+  buildActivityEditorModeView,
+  buildActivityEditorSaveGate,
+  buildActivityEditorSelectOptions,
+  buildActivityEditorSyncedDraftSourceText,
+  buildActivityEditorTemplateScaffoldApplication,
+  buildActivityEditorTemplateView,
   getActivityEditorDefaultInput,
-  buildActivityEditorTemplateSetupView,
-  buildActivityEditorTemplateReadiness,
 } from '@/activities/editor';
-import { getActivityTemplateScaffold } from '@/activities/scaffolds';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
@@ -18,13 +19,10 @@ import {
 } from '@/activities/ai-draft';
 import {
   buildActivityDraftMetaSummaryView,
-  buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
 import {
-  activityDifficultySchema,
-  activityVisibilitySchema,
   createActivityInputSchema,
   type CreateActivityInput,
 } from '@/activities/validation';
@@ -77,15 +75,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
-  lockedOptions: 4,
-} as const;
-
-const difficultyOptions = activityDifficultySchema.options;
-const visibilityOptions = activityVisibilitySchema.options;
-type ActivityFormDifficulty = (typeof difficultyOptions)[number];
-type ActivityFormVisibility = (typeof visibilityOptions)[number];
-
 type ActivityCreateFormProps = {
   activityId?: string;
   initialValues?: CreateActivityInput;
@@ -107,7 +96,7 @@ export function ActivityCreateForm({
     [initialValues]
   );
   const [draftSourceText, setDraftSourceText] = useState(
-    getActivityDraftSourceText(defaultValues)
+    buildActivityEditorDraftSourceText(defaultValues)
   );
   const [draftItemCount, setDraftItemCount] = useState(
     ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
@@ -118,47 +107,41 @@ export function ActivityCreateForm({
     resolver: zodResolver(createActivityInputSchema),
   });
   const selectedTemplate = form.watch('templateType');
-  const localizedTemplates = getActivityTemplates();
   const watchedValues = form.watch();
-  const hasAttachedSourceMaterials =
-    Array.isArray(watchedValues.sourceMaterials) &&
-    watchedValues.sourceMaterials.length > 0;
-  const hasDraftSourceMaterialNotes =
-    hasActivitySourceMaterialDraftNotes(draftSourceText);
-  const canSyncDraftSourceMaterials =
-    hasAttachedSourceMaterials || hasDraftSourceMaterialNotes;
-  const template = getTemplateByType(selectedTemplate);
-  const templateSetupView = useMemo(
-    () => buildActivityEditorTemplateSetupView(selectedTemplate),
-    [selectedTemplate]
-  );
-  const templateReadiness = useMemo(
-    () => buildActivityEditorTemplateReadiness(watchedValues),
-    [watchedValues]
+  const draftSourceState = buildActivityEditorDraftSourceState({
+    draftSourceText,
+    sourceMaterials: watchedValues.sourceMaterials,
+  });
+  const modeView = buildActivityEditorModeView(mode);
+  const selectOptionsView = buildActivityEditorSelectOptions();
+  const templateView = useMemo(
+    () =>
+      buildActivityEditorTemplateView({
+        input: watchedValues,
+        templateType: selectedTemplate,
+      }),
+    [selectedTemplate, watchedValues]
   );
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
     form.formState.isSubmitting;
   const isGeneratingDraft = draftMutation.isPending;
-  const isEditMode = mode === 'edit';
 
   useEffect(() => {
     if (!initialValues) return;
     form.reset(initialValues);
-    setDraftSourceText(getActivityDraftSourceText(initialValues));
+    setDraftSourceText(buildActivityEditorDraftSourceText(initialValues));
     setDraftResult(undefined);
   }, [form, initialValues]);
 
   async function onGenerateDraft() {
-    if (!session?.user) {
-      toast.error(m.activity_form_toast_sign_in_generate_draft());
-      return;
-    }
-
-    const sourceText = draftSourceText.trim();
-    if (!sourceText) {
-      toast.error(m.activity_form_toast_missing_draft_source());
+    const draftGate = buildActivityEditorDraftGenerationGate({
+      hasUser: Boolean(session?.user),
+      sourceText: draftSourceText,
+    });
+    if (!draftGate.canGenerate) {
+      toast.error(draftGate.errorMessage);
       return;
     }
 
@@ -168,7 +151,7 @@ export function ActivityCreateForm({
         buildGenerateActivityDraftInputFromEditor({
           current,
           itemCount: draftItemCount,
-          sourceText,
+          sourceText: draftGate.sourceText,
         })
       );
 
@@ -179,34 +162,28 @@ export function ActivityCreateForm({
       });
       setDraftResult(result);
 
-      if (result.notice) {
-        toast.success(m.activity_form_toast_local_draft_generated());
-        return;
-      }
-
-      toast.success(m.activity_form_toast_ai_draft_generated());
+      toast.success(
+        buildActivityEditorDraftSuccessMessage({ notice: result.notice })
+      );
     } catch {
       toast.error(m.activity_form_toast_draft_generation_failed());
     }
   }
 
   function applyTemplateScaffold() {
-    const current = form.getValues();
-    const scaffold = getActivityTemplateScaffold(selectedTemplate);
-    const nextValues = {
-      ...current,
-      ...scaffold,
+    const scaffoldApplication = buildActivityEditorTemplateScaffoldApplication({
+      current: form.getValues(),
       templateType: selectedTemplate,
-    };
-    form.reset(nextValues);
-    setDraftSourceText(getActivityDraftSourceText(nextValues));
+    });
+    form.reset(scaffoldApplication.values);
+    setDraftSourceText(scaffoldApplication.draftSourceText);
     setDraftResult(undefined);
-    toast.success(templateSetupView.successMessage);
+    toast.success(scaffoldApplication.successMessage);
   }
 
   function useAttachedMaterialsForDraft() {
     setDraftSourceText(
-      appendActivitySourceMaterialDraftNotes({
+      buildActivityEditorSyncedDraftSourceText({
         sourceMaterials: form.getValues('sourceMaterials'),
         sourceText: draftSourceText,
       })
@@ -215,29 +192,30 @@ export function ActivityCreateForm({
   }
 
   async function onSubmit(values: CreateActivityInput) {
-    if (!session?.user) {
-      toast.error(m.activity_form_toast_sign_in_save());
+    const saveGate = buildActivityEditorSaveGate({
+      activityId,
+      hasUser: Boolean(session?.user),
+      mode,
+    });
+
+    if (!saveGate.canSave) {
+      toast.error(saveGate.errorMessage);
       return;
     }
 
     try {
-      if (isEditMode) {
-        if (!activityId) {
-          toast.error(m.activity_form_toast_edit_missing_activity());
-          return;
-        }
-
+      if (saveGate.mode === 'edit') {
         await updateMutation.mutateAsync({
           ...values,
-          id: activityId,
+          id: saveGate.activityId,
         });
-        toast.success(m.activity_form_toast_activity_updated());
+        toast.success(modeView.saveSuccessMessage);
         form.reset(values);
         return;
       }
 
       const activity = await createMutation.mutateAsync(values);
-      toast.success(m.activity_form_toast_activity_saved());
+      toast.success(modeView.saveSuccessMessage);
       navigate({
         to: Routes.DashboardActivities,
         search: { created: activity.id },
@@ -256,15 +234,11 @@ export function ActivityCreateForm({
             {m.activity_form_editor_badge()}
           </Badge>
           <Badge variant="secondary" className="rounded-md">
-            {template.name}
+            {templateView.template.name}
           </Badge>
         </div>
         <CardTitle>
-          <h2 className="text-xl font-semibold">
-            {isEditMode
-              ? m.activity_form_title_edit()
-              : m.activity_form_title_create()}
-          </h2>
+          <h2 className="text-xl font-semibold">{modeView.title}</h2>
         </CardTitle>
       </CardHeader>
       <Form {...form}>
@@ -298,7 +272,7 @@ export function ActivityCreateForm({
                       size="sm"
                       className="bg-background"
                       onClick={useAttachedMaterialsForDraft}
-                      disabled={!canSyncDraftSourceMaterials}
+                      disabled={!draftSourceState.canSyncDraftSourceMaterials}
                     >
                       <IconPaperclip className="size-3.5" />
                       {m.activity_form_use_attached_materials()}
@@ -383,14 +357,16 @@ export function ActivityCreateForm({
                     </FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
-                        {localizedTemplates.map((item) => (
+                        {templateView.templateOptions.map((item) => (
                           <NativeSelectOption key={item.type} value={item.type}>
                             {item.name}
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
                     </FormControl>
-                    <FormDescription>{template.bestFor}</FormDescription>
+                    <FormDescription>
+                      {templateView.template.bestFor}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -402,25 +378,27 @@ export function ActivityCreateForm({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline" className="rounded-md">
-                      {templateSetupView.shortName}
+                      {templateView.setupView.shortName}
                     </Badge>
                     <span className="text-sm font-medium">
-                      {templateSetupView.title}
+                      {templateView.setupView.title}
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {templateSetupView.description}
+                    {templateView.setupView.description}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {templateSetupView.requirementBadges.map((requirement) => (
-                      <Badge
-                        key={requirement}
-                        variant="secondary"
-                        className="rounded-md"
-                      >
-                        {requirement}
-                      </Badge>
-                    ))}
+                    {templateView.setupView.requirementBadges.map(
+                      (requirement) => (
+                        <Badge
+                          key={requirement}
+                          variant="secondary"
+                          className="rounded-md"
+                        >
+                          {requirement}
+                        </Badge>
+                      )
+                    )}
                   </div>
                 </div>
                 <Button
@@ -430,15 +408,13 @@ export function ActivityCreateForm({
                   onClick={applyTemplateScaffold}
                 >
                   <IconSparkles className="size-4" />
-                  {templateSetupView.actionLabel}
+                  {templateView.setupView.actionLabel}
                 </Button>
               </div>
             </div>
 
             <ActivityTemplateReadinessPanel
-              summary={buildActivityTemplateReadinessPanelSummary(
-                templateReadiness
-              )}
+              summary={templateView.readinessSummary}
             />
 
             <FormField
@@ -490,9 +466,12 @@ export function ActivityCreateForm({
                     <FormLabel>{m.activity_form_field_difficulty()}</FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
-                        {difficultyOptions.map((value) => (
-                          <NativeSelectOption key={value} value={value}>
-                            {formatActivityDifficulty(value)}
+                        {selectOptionsView.difficultyOptions.map((option) => (
+                          <NativeSelectOption
+                            key={option.value}
+                            value={option.value}
+                          >
+                            {option.label}
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
@@ -509,9 +488,12 @@ export function ActivityCreateForm({
                     <FormLabel>{m.activity_form_field_visibility()}</FormLabel>
                     <FormControl>
                       <NativeSelect {...field} className="w-full">
-                        {visibilityOptions.map((value) => (
-                          <NativeSelectOption key={value} value={value}>
-                            {formatActivityVisibility(value)}
+                        {selectOptionsView.visibilityOptions.map((option) => (
+                          <NativeSelectOption
+                            key={option.value}
+                            value={option.value}
+                          >
+                            {option.label}
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
@@ -681,9 +663,7 @@ export function ActivityCreateForm({
           </CardContent>
           <CardFooter className="mt-6 flex flex-col gap-3 border-t bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              {isEditMode
-                ? m.activity_form_footer_edit_hint()
-                : m.activity_form_footer_create_hint()}
+              {modeView.footerHint}
             </p>
             {session?.user ? (
               <Button type="submit" disabled={isPending}>
@@ -692,9 +672,7 @@ export function ActivityCreateForm({
                 ) : (
                   <IconDeviceFloppy className="size-4" />
                 )}
-                {isEditMode
-                  ? m.activity_form_save_changes()
-                  : m.activity_form_save_activity()}
+                {modeView.saveLabel}
               </Button>
             ) : (
               <Link
@@ -820,30 +798,6 @@ function ActivityDraftMetaSummary({ result }: { result: ActivityDraftResult }) {
   );
 }
 
-function formatActivityDifficulty(difficulty: ActivityFormDifficulty) {
-  switch (difficulty) {
-    case 'challenge':
-      return m.activity_form_difficulty_challenge();
-    case 'core':
-      return m.activity_form_difficulty_core();
-    case 'starter':
-      return m.activity_form_difficulty_starter();
-  }
-}
-
-function formatActivityVisibility(visibility: ActivityFormVisibility) {
-  switch (visibility) {
-    case 'draft':
-      return m.activity_form_visibility_draft();
-    case 'private':
-      return m.activity_form_visibility_private();
-    case 'public':
-      return m.activity_form_visibility_public();
-    case 'unlisted':
-      return m.activity_form_visibility_unlisted();
-  }
-}
-
 function ActivityTemplateReadinessPanel({
   summary,
 }: {
@@ -884,16 +838,14 @@ function ActivityTemplateReadinessPanel({
       )}
       {summary.lockedOptions.length > 0 ? (
         <div className="mt-4 grid gap-1.5">
-          {summary.lockedOptions
-            .slice(0, ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions)
-            .map((option) => (
-              <p
-                key={option.template}
-                className="text-muted-foreground text-xs leading-5"
-              >
-                {option.diagnosis}
-              </p>
-            ))}
+          {summary.lockedOptions.map((option) => (
+            <p
+              key={option.template}
+              className="text-muted-foreground text-xs leading-5"
+            >
+              {option.diagnosis}
+            </p>
+          ))}
         </div>
       ) : null}
     </div>
