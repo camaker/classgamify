@@ -10,6 +10,7 @@ import {
   IconChartBar,
   IconCircleCheck,
   IconPlayerPlay,
+  IconPrinter,
   IconX,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -66,6 +67,21 @@ export function PublishedAssignmentPanel({
           >
             <IconChartBar className="size-4" />
             {assignmentListActionCopy.viewResults}
+          </Link>
+        ) : null}
+        {panelContext.printAction ? (
+          <Link
+            to="/print/assignments/$assignmentId"
+            params={{
+              assignmentId: panelContext.printAction.assignmentId,
+            }}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'w-full bg-background sm:w-auto'
+            )}
+          >
+            <IconPrinter className="size-4" />
+            {assignmentListActionCopy.printWorksheet}
           </Link>
         ) : null}
         {panelContext.showShareActions ? (

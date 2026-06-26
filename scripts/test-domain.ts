@@ -5615,6 +5615,9 @@ assert.deepEqual(
   {
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+    printAction: {
+      assignmentId: 'assignment-2',
+    },
     sharePath: '/play/share-2',
     showDismissAction: true,
     showMissingHint: false,
@@ -5632,6 +5635,7 @@ assert.deepEqual(
   }),
   {
     body: 'Loading the newly published assignment link and classroom actions.',
+    printAction: undefined,
     sharePath: '/play/share-2',
     showDismissAction: true,
     showMissingHint: false,
@@ -5649,6 +5653,7 @@ assert.deepEqual(
   }),
   {
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
+    printAction: undefined,
     sharePath: '/play/missing',
     showDismissAction: true,
     showMissingHint: true,
@@ -8752,6 +8757,16 @@ assert.match(
   /buildPublishedAssignmentPanelContext/,
   'Published assignment panel component should render share-panel state from the assignment-domain panel context.'
 );
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /to="\/print\/assignments\/\$assignmentId"/,
+  'Published assignment panel component should link newly published assignments to the printable worksheet route.'
+);
+assert.doesNotMatch(
+  publishedAssignmentPanelComponentSource,
+  /Print worksheet|打印练习纸/,
+  'Published assignment panel component should render printable worksheet labels from the assignment-domain action copy.'
+);
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
   /buildAssignmentListSearchPanelView|assignmentListSearchCopy|NativeSelect|NativeSelectOption|id="assignment-status-filter"/,
@@ -11307,6 +11322,9 @@ assert.deepEqual(
         title: 'Persisted assignment',
       },
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+      printAction: {
+        assignmentId: 'persisted-assignment-1',
+      },
       sharePath: '/play/share-1',
       showDismissAction: true,
       showMissingHint: false,

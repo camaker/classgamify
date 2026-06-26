@@ -56,6 +56,11 @@ export function resolvePublishedAssignmentPanelAssignment<
 type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
+  printAction:
+    | {
+        assignmentId: string;
+      }
+    | undefined;
   sharePath: string;
   showDismissAction: boolean;
   showMissingHint: boolean;
@@ -80,6 +85,9 @@ export function buildPublishedAssignmentPanelContext({
     return {
       assignment,
       body: m.assignment_published_panel_found_body(),
+      printAction: {
+        assignmentId: assignment.id,
+      },
       sharePath: buildAssignmentSharePath(normalizedShareSlug),
       showDismissAction: true,
       showMissingHint: false,
@@ -93,6 +101,7 @@ export function buildPublishedAssignmentPanelContext({
   if (isLoading) {
     return {
       body: m.assignment_published_panel_loading_body(),
+      printAction: undefined,
       sharePath: buildAssignmentSharePath(normalizedShareSlug),
       showDismissAction: true,
       showMissingHint: false,
@@ -105,6 +114,7 @@ export function buildPublishedAssignmentPanelContext({
 
   return {
     body: m.assignment_published_panel_missing_body(),
+    printAction: undefined,
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     showDismissAction: true,
     showMissingHint: true,
