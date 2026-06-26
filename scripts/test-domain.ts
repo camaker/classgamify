@@ -6452,6 +6452,38 @@ assert.deepEqual(printableSnapshotWorksheet.items[0], {
   responseMode: 'choice',
   sequenceNumber: 1,
 });
+const printableChoiceSourceItems = getRuntimeItems(
+  'quiz',
+  publicPayloadSnapshotContent
+);
+const printableChoiceWorksheet = buildPrintableAssignmentWorksheet({
+  activity: {
+    description: 'Choice copy source',
+    templateType: 'quiz',
+    title: 'Choice copy source',
+  },
+  assignment: {
+    expiresAt: null,
+    settingsJson: null,
+    shareSlug: 'printable-choice-copy',
+    title: 'Printable choice copy',
+  },
+  runtimeItems: printableChoiceSourceItems,
+  snapshot: null,
+});
+assert.deepEqual(
+  printableChoiceWorksheet.items[0]?.choices,
+  printableChoiceSourceItems[0]?.choices
+);
+assert.notEqual(
+  printableChoiceWorksheet.items[0]?.choices,
+  printableChoiceSourceItems[0]?.choices
+);
+printableChoiceWorksheet.items[0]?.choices.push('Print-only choice');
+assert.equal(
+  printableChoiceSourceItems[0]?.choices?.includes('Print-only choice'),
+  false
+);
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
