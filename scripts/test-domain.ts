@@ -9443,7 +9443,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     createFromTemplateLabel: 'Create from template',
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
-    openStudentDemoLabel: 'Open student demo',
+    openStudentDemoLabel: 'Open student preview',
     title: 'Pick a game format for the same lesson content.',
   },
 });
