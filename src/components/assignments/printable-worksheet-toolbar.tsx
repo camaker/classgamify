@@ -1,0 +1,57 @@
+import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
+import { IconArrowLeft, IconPrinter } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
+
+type PrintableWorksheetPageViewModel = ReturnType<
+  typeof buildPrintableWorksheetPageViewModel
+>;
+
+type PrintableWorksheetToolbarProps = {
+  assignmentId: string;
+  controlView: PrintableWorksheetPageViewModel['controlView'];
+  onAnswerKeyChange: (answerKey: boolean) => void;
+  onPrint: () => void;
+};
+
+export function PrintableWorksheetToolbar({
+  assignmentId,
+  controlView,
+  onAnswerKeyChange,
+  onPrint,
+}: PrintableWorksheetToolbarProps) {
+  return (
+    <div
+      data-print-hidden
+      className="flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <Link
+        to="/dashboard/assignments/$assignmentId"
+        params={{ assignmentId }}
+        className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
+      >
+        <IconArrowLeft className="size-4" />
+        {controlView.backToResultsLabel}
+      </Link>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label
+          htmlFor="printable-answer-key"
+          className="flex items-center gap-2 text-sm"
+        >
+          <Switch
+            id="printable-answer-key"
+            checked={controlView.answerKeyValue}
+            onCheckedChange={onAnswerKeyChange}
+          />
+          <span>{controlView.answerKeyLabel}</span>
+        </label>
+        <Button type="button" onClick={onPrint}>
+          <IconPrinter className="size-4" />
+          {controlView.printButtonLabel}
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -9004,6 +9004,30 @@ const printableAssignmentRouteSource = readFileSync(
   'src/routes/print/assignments/$assignmentId.tsx',
   'utf8'
 );
+const printableWorksheetToolbarSource = readFileSync(
+  'src/components/assignments/printable-worksheet-toolbar.tsx',
+  'utf8'
+);
+const printableWorksheetStatePanelSource = readFileSync(
+  'src/components/assignments/printable-worksheet-state-panel.tsx',
+  'utf8'
+);
+const printableWorksheetHeaderSource = readFileSync(
+  'src/components/assignments/printable-worksheet-header.tsx',
+  'utf8'
+);
+const printableWorksheetAssignmentFieldsSource = readFileSync(
+  'src/components/assignments/printable-worksheet-assignment-fields.tsx',
+  'utf8'
+);
+const printableWorksheetItemListSource = readFileSync(
+  'src/components/assignments/printable-worksheet-item-list.tsx',
+  'utf8'
+);
+const printableWorksheetAnswerKeySource = readFileSync(
+  'src/components/assignments/printable-worksheet-answer-key.tsx',
+  'utf8'
+);
 assert.match(
   printableAssignmentRouteSource,
   /middleware: \[authRouteMiddleware\]/,
@@ -9044,6 +9068,31 @@ assert.match(
   /buildPrintableWorksheetPageViewModel\(\{[\s\S]*answerKey,[\s\S]*worksheet: data/,
   'Printable worksheet route should consume the assignment-domain page view-model.'
 );
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetToolbar[\s\S]*controlView=\{controlView\}/,
+  'Printable worksheet route should delegate toolbar rendering with the printable control view.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetHeader[\s\S]*headerView=\{headerView\}/,
+  'Printable worksheet route should delegate worksheet header rendering.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetAssignmentFields[\s\S]*fieldViews=\{pageView\.assignmentFieldViews\}/,
+  'Printable worksheet route should delegate assignment field rendering.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetItemList[\s\S]*emptyState=\{pageView\.emptyState\}[\s\S]*itemViews=\{pageView\.itemViews\}/,
+  'Printable worksheet route should delegate printable item rendering.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetAnswerKey[\s\S]*view=\{pageView\.answerKeyView\}/,
+  'Printable worksheet route should delegate answer-key rendering.'
+);
 assert.doesNotMatch(
   printableAssignmentRouteSource,
   /buildPrintableWorksheetHeaderView|buildPrintableWorksheetItemView|buildPrintableWorksheetAnswerKeyItemView/,
@@ -9054,55 +9103,70 @@ assert.doesNotMatch(
   /printableWorksheetPageCopy/,
   'Printable worksheet route should render localized page copy through printable worksheet view models.'
 );
-assert.match(
+assert.doesNotMatch(
   printableAssignmentRouteSource,
-  /pageView\.assignmentFieldViews\.map/,
-  'Printable worksheet route should render assignment fields from the printable worksheet page view-model.'
+  /pageView\.assignmentFieldViews\.map|pageView\.answerKeyView\.show|pageView\.emptyState\.title|controlView\.printButtonLabel|data-print-choice-bank=\{itemView\.choiceBank\.presentation\}|itemView\.answerLines\.map|pageView\.answerKeyView\.itemViews\.map|<Switch|<Badge|<Card|<Spinner/,
+  'Printable worksheet route should not render low-level printable worksheet fields, items, answer keys, or controls directly.'
 );
 assert.match(
-  printableAssignmentRouteSource,
-  /pageView\.answerKeyView\.show/,
-  'Printable worksheet route should render answer-key visibility from the printable worksheet page view-model.'
+  printableWorksheetAssignmentFieldsSource,
+  /fieldViews\.map/,
+  'Printable worksheet assignment fields component should render assignment fields from the printable worksheet page view-model.'
 );
 assert.match(
-  printableAssignmentRouteSource,
-  /pageView\.emptyState\.title/,
-  'Printable worksheet route should render the empty printable state from the printable worksheet page view-model.'
+  printableWorksheetAnswerKeySource,
+  /view\.show/,
+  'Printable worksheet answer-key component should render answer-key visibility from the printable worksheet page view-model.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetItemListSource,
+  /emptyState\.title/,
+  'Printable worksheet item list component should render the empty printable state from the printable worksheet page view-model.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
   /controlView\.printButtonLabel/,
-  'Printable worksheet route should render toolbar copy from the printable worksheet control view.'
+  'Printable worksheet toolbar should render toolbar copy from the printable worksheet control view.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetItemListSource,
   /data-print-choice-bank=\{itemView\.choiceBank\.presentation\}/,
-  'Printable worksheet route should render choice-bank presentation metadata for print layout variants.'
+  'Printable worksheet item list should render choice-bank presentation metadata for print layout variants.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetItemListSource,
   /itemView\.choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
-  'Printable worksheet route should render group banks as a denser classification layout.'
+  'Printable worksheet item list should render group banks as a denser classification layout.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetItemListSource,
   /itemView\.choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
-  'Printable worksheet route should render lettered choice labels only when the choice-bank view asks for them.'
+  'Printable worksheet item list should render lettered choice labels only when the choice-bank view asks for them.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetItemListSource,
   /itemView\.answerLines\.map/,
-  'Printable worksheet route should render answer lines from the printable item view.'
+  'Printable worksheet item list should render answer lines from the printable item view.'
 );
 assert.match(
-  printableAssignmentRouteSource,
-  /pageView\.answerKeyView\.itemViews\.map/,
-  'Printable worksheet route should render answer-key items from the printable worksheet page view-model.'
+  printableWorksheetAnswerKeySource,
+  /view\.itemViews\.map/,
+  'Printable worksheet answer-key component should render answer-key items from the printable worksheet page view-model.'
 );
 assert.match(
-  printableAssignmentRouteSource,
+  printableWorksheetToolbarSource,
   /to="\/dashboard\/assignments\/\$assignmentId"/,
-  'Printable worksheet route should link teachers back to assignment results.'
+  'Printable worksheet toolbar should link teachers back to assignment results.'
+);
+assert.match(
+  printableWorksheetStatePanelSource,
+  /Spinner[\s\S]*view\.message[\s\S]*text-destructive/,
+  'Printable worksheet state panel should own loading and error shell rendering.'
+);
+assert.match(
+  printableWorksheetHeaderSource,
+  /headerView\.assignmentTitle[\s\S]*headerView\.sharePath/,
+  'Printable worksheet header should consume header view fields.'
 );
 assert.match(
   assignmentResultsHeaderCardSource,
