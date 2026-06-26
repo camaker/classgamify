@@ -12996,6 +12996,46 @@ const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',
 });
+const blankStructuredRemixPlan = getTemplateRemixPlan({
+  content: {
+    ...questionOnlyContent,
+    gradeBand: '   ',
+    groups: [{ id: 'g-blank', items: ['   '], label: '   ' }],
+    learningGoal: '   ',
+    pairs: [{ id: 'p-blank', left: '   ', right: '   ' }],
+    questions: [{ answer: '   ', id: 'q-blank', prompt: '   ' }],
+    sourceSummary: '   ',
+    teacherNotes: ['   '],
+    vocabulary: ['   '],
+  },
+  currentTemplateType: 'quiz',
+});
+assert.deepEqual(
+  blankStructuredRemixPlan.options
+    .filter((option) =>
+      ['group-sort', 'match-up', 'quiz'].includes(option.template.type)
+    )
+    .map((option) => [
+      option.template.type,
+      option.isReady,
+      option.missingRequirements,
+    ]),
+  [
+    ['quiz', false, ['questions']],
+    ['match-up', false, ['pairs']],
+    ['group-sort', false, ['groups']],
+  ]
+);
+assert.equal(
+  getTemplateRemixPlan({
+    content: {
+      ...questionOnlyContent,
+      groups: [{ id: 'g-valid', items: ['   ', 'mammal'], label: 'Animal' }],
+    },
+    currentTemplateType: 'quiz',
+  }).options.find((option) => option.template.type === 'group-sort')?.isReady,
+  true
+);
 const questionOnlyRemixSummary = buildTemplateRemixSummary(
   questionOnlyRemixPlan
 );

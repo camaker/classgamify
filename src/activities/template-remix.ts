@@ -139,10 +139,37 @@ function getMissingTemplateRequirements(
   template: ActivityTemplateDefinition,
   content: ActivityContent
 ) {
-  return template.contentRequirements.filter((requirement) => {
-    const value = content[requirement];
-    return Array.isArray(value) ? value.length === 0 : !value;
-  });
+  return template.contentRequirements.filter(
+    (requirement) => !hasTemplateRequirementContent(content, requirement)
+  );
+}
+
+function hasTemplateRequirementContent(
+  content: ActivityContent,
+  requirement: ActivityTemplateContentRequirement
+) {
+  switch (requirement) {
+    case 'groups':
+      return content.groups.some(
+        (group) => group.label.trim() && group.items.some((item) => item.trim())
+      );
+    case 'pairs':
+      return content.pairs.some(
+        (pair) => pair.left.trim() && pair.right.trim()
+      );
+    case 'questions':
+      return content.questions.some(
+        (question) => question.prompt.trim() && question.answer.trim()
+      );
+    case 'teacherNotes':
+      return content.teacherNotes.some((note) => note.trim());
+    case 'vocabulary':
+      return content.vocabulary.some((word) => word.trim());
+    case 'gradeBand':
+    case 'learningGoal':
+    case 'sourceSummary':
+      return Boolean(content[requirement].trim());
+  }
 }
 
 function buildTemplateRemixDiagnosis({
