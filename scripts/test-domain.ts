@@ -2671,6 +2671,22 @@ const publicAssignmentRulesComponentSource = readFileSync(
   'src/components/assignments/public-assignment-rules.tsx',
   'utf8'
 );
+const studentRunnerAttemptShellSource = readFileSync(
+  'src/components/assignments/student-runner-attempt-shell.tsx',
+  'utf8'
+);
+const studentRunnerHeaderCardSource = readFileSync(
+  'src/components/assignments/student-runner-header-card.tsx',
+  'utf8'
+);
+const studentRunnerLoadingPanelSource = readFileSync(
+  'src/components/assignments/student-runner-loading-panel.tsx',
+  'utf8'
+);
+const studentRunnerMissingPanelSource = readFileSync(
+  'src/components/assignments/student-runner-missing-panel.tsx',
+  'utf8'
+);
 const studentRunnerStateSource = readFileSync(
   'src/assignments/student-runner-state.ts',
   'utf8'
@@ -2718,8 +2734,18 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /runnerPageView\.loadingView|runnerPageView\.missingView|runnerPageView\.controlView|runnerPageView\.identityView|runnerPageView\.resultPanelView/,
-  'Student play route should consume route-facing student-runner view fields.'
+  /StudentRunnerLoadingPanel[\s\S]*runnerPageView\.loadingView[\s\S]*StudentRunnerMissingPanel[\s\S]*missingView/,
+  'Student play route should delegate loading and missing states with runner page view fields.'
+);
+assert.match(
+  playRouteSource,
+  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{headerView\}/,
+  'Student play route should delegate student assignment header rendering.'
+);
+assert.match(
+  playRouteSource,
+  /StudentRunnerAttemptShell[\s\S]*controlView=\{controlView\}[\s\S]*identityView=\{identityView\}[\s\S]*resultPanelView=\{resultPanelView\}/,
+  'Student play route should delegate attempt shell, identity, timer, and result presentation.'
 );
 assert.match(
   playRouteSource,
@@ -2727,9 +2753,34 @@ assert.match(
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
 );
 assert.match(
-  playRouteSource,
+  studentRunnerHeaderCardSource,
   /PublicAssignmentRules/,
-  'Student play route should delegate public rule summary rendering to the public assignment rules component.'
+  'Student runner header card should delegate public rule summary rendering to the public assignment rules component.'
+);
+assert.match(
+  studentRunnerLoadingPanelSource,
+  /view\.message/,
+  'Student runner loading panel should consume the loading view message.'
+);
+assert.match(
+  studentRunnerMissingPanelSource,
+  /view\.badgeLabel[\s\S]*view\.browseTemplatesLabel/,
+  'Student runner missing panel should consume the missing view call to action.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
+  /view\.instructions[\s\S]*view\.ruleItems[\s\S]*view\.teacherActionLabel/,
+  'Student runner header card should consume header instructions, rules, and teacher action view fields.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /controlView\.progressLabel[\s\S]*controlView\.timerBadge[\s\S]*identityView\.mode[\s\S]*StudentRunnerResultPanel/,
+  'Student runner attempt shell should own progress, timer, identity, and result-panel presentation.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label/,
+  'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,

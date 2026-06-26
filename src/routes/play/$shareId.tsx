@@ -26,24 +26,17 @@ import {
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { StudentRuntimeItemList } from '@/components/activities/student-runtime-item-list';
-import { PublicAssignmentRules } from '@/components/assignments/public-assignment-rules';
+import { StudentRunnerAttemptShell } from '@/components/assignments/student-runner-attempt-shell';
+import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
+import { StudentRunnerLoadingPanel } from '@/components/assignments/student-runner-loading-panel';
+import { StudentRunnerMissingPanel } from '@/components/assignments/student-runner-missing-panel';
 import Container from '@/components/layout/container';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { usePublicAssignment, useSubmitAttempt } from '@/hooks/use-assignments';
-import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
-import { cn } from '@/lib/utils';
-import {
-  IconCheck,
-  IconClipboardText,
-  IconDeviceGamepad2,
-  IconPlayerPlay,
-  IconRepeat,
-} from '@tabler/icons-react';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { IconCheck } from '@tabler/icons-react';
+import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -271,43 +264,14 @@ function PlayPage() {
   }
 
   if (pageState.status === 'loading') {
-    return (
-      <Container className="px-4 py-10 md:py-14">
-        <div className="mx-auto max-w-6xl rounded-lg border bg-card p-6">
-          <p className="text-sm text-muted-foreground">
-            {runnerPageView.loadingView.message}
-          </p>
-        </div>
-      </Container>
-    );
+    return <StudentRunnerLoadingPanel view={runnerPageView.loadingView} />;
   }
 
   if (pageState.status === 'missing') {
     const missingView = runnerPageView.missingView;
     if (!missingView) return null;
 
-    return (
-      <Container className="px-4 py-10 md:py-14">
-        <div className="mx-auto max-w-3xl rounded-lg border bg-card p-6">
-          <Badge variant="outline" className="rounded-md border-primary/30">
-            <IconDeviceGamepad2 className="size-3.5" />
-            {missingView.badgeLabel}
-          </Badge>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight">
-            {missingView.title}
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            {missingView.description}
-          </p>
-          <Link
-            to={Routes.Templates}
-            className={cn(buttonVariants(), 'mt-5 w-fit')}
-          >
-            {missingView.browseTemplatesLabel}
-          </Link>
-        </div>
-      </Container>
-    );
+    return <StudentRunnerMissingPanel view={missingView} />;
   }
 
   const headerView = runnerPageView.headerView;
@@ -316,125 +280,19 @@ function PlayPage() {
   return (
     <Container className="px-4 py-10 md:py-14">
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
-        <section className="grid gap-4 rounded-lg border bg-card p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-          <div className="min-w-0 space-y-3">
-            <Badge variant="outline" className="rounded-md border-primary/30">
-              <IconDeviceGamepad2 className="size-3.5" />
-              {runnerPageView.routeBadgeLabel}
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {headerView.title}
-            </h1>
-            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              {headerView.description}
-            </p>
-            {headerView.instructions ? (
-              <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
-                <div className="flex items-center gap-2 font-medium text-foreground">
-                  <IconClipboardText className="size-4 text-primary" />
-                  {headerView.instructions.label}
-                </div>
-                <p className="mt-2 text-muted-foreground">
-                  {headerView.instructions.value}
-                </p>
-              </div>
-            ) : null}
-            <PublicAssignmentRules rules={headerView.ruleItems} />
-          </div>
-          <Link
-            to={Routes.Create}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-fit bg-background'
-            )}
-          >
-            {headerView.teacherActionLabel}
-          </Link>
-        </section>
+        <StudentRunnerHeaderCard
+          badgeLabel={runnerPageView.routeBadgeLabel}
+          view={headerView}
+        />
 
-        <div className="rounded-lg border bg-muted/20 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <IconPlayerPlay className="size-4 text-primary" />
-              {controlView.runnerTitle}
-            </div>
-            <Badge variant="secondary" className="rounded-md">
-              {controlView.progressLabel}
-            </Badge>
-            {controlView.timerBadge.show ? (
-              <Badge variant="outline" className="rounded-md">
-                {controlView.timerBadge.label}
-              </Badge>
-            ) : null}
-          </div>
-
-          <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
-            {identityView.mode === 'student-name' ? (
-              <div>
-                <label
-                  htmlFor="student-name"
-                  className="text-sm font-medium text-foreground"
-                >
-                  {identityView.label}
-                </label>
-                <Input
-                  id="student-name"
-                  value={studentName}
-                  onChange={(event) => setStudentName(event.target.value)}
-                  placeholder={identityView.placeholder}
-                  className="mt-2"
-                />
-              </div>
-            ) : (
-              <div className="rounded-lg border bg-muted/20 p-3">
-                <p className="text-sm font-medium">{identityView.copy.title}</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {identityView.copy.description}
-                </p>
-              </div>
-            )}
-            {resultPanelView.show ? (
-              <div className="rounded-lg border bg-primary/5 p-3">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <IconCheck className="size-4 text-primary" />
-                  {resultPanelView.statusLabel}
-                </div>
-                <p className="mt-2 text-2xl font-semibold">
-                  {resultPanelView.scoreLabel}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {resultPanelView.accuracyLabel}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {resultPanelView.durationLabel}
-                </p>
-                {resultPanelView.attemptUsageLabel ? (
-                  <p className="text-xs text-muted-foreground">
-                    {resultPanelView.attemptUsageLabel}
-                  </p>
-                ) : null}
-                {resultPanelView.showStartAnotherAttempt ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="mt-3 w-full justify-start bg-background"
-                    onClick={startAnotherAttempt}
-                  >
-                    <IconRepeat className="size-4" />
-                    {resultPanelView.startAnotherAttemptLabel}
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-
-          {controlView.showTimeExpiredMessage ? (
-            <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
-              {controlView.timeExpiredMessage}
-            </div>
-          ) : null}
-
+        <StudentRunnerAttemptShell
+          controlView={controlView}
+          identityView={identityView}
+          onStartAnotherAttempt={startAnotherAttempt}
+          onStudentNameChange={setStudentName}
+          resultPanelView={resultPanelView}
+          studentName={studentName}
+        >
           <StudentRuntimeItemList
             answers={answers}
             disabled={controlView.runtimeItemsDisabled}
@@ -476,7 +334,7 @@ function PlayPage() {
               {controlView.readOnlyMessage}
             </p>
           ) : null}
-        </div>
+        </StudentRunnerAttemptShell>
 
         <ActivityPreview
           activity={activity}
