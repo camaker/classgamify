@@ -103,6 +103,32 @@ export function buildActivityLibraryPageRouteSearch({
   });
 }
 
+export function buildActivityLibraryFilterRouteSearch({
+  created,
+  current,
+  next,
+}: {
+  created?: string;
+  current: Omit<ActivityLibrarySearchState, 'created' | 'page'>;
+  next: Partial<Omit<ActivityLibrarySearchState, 'created' | 'page'>>;
+}): ActivityLibraryRouteSearch {
+  return buildActivityLibraryRouteSearch({
+    created,
+    q: next.q ?? current.q,
+    source: next.source ?? current.source,
+    status: next.status ?? current.status,
+    template: next.template ?? current.template,
+  });
+}
+
+export function buildActivityLibraryDismissCreatedRouteSearch({
+  current,
+}: {
+  current: Omit<ActivityLibrarySearchState, 'created'>;
+}): ActivityLibraryRouteSearch {
+  return buildActivityLibraryRouteSearch(current);
+}
+
 export function parseActivityLibraryStatus(
   value: unknown
 ): ActivityLibraryStatus | undefined {

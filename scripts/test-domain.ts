@@ -35,6 +35,7 @@ import {
   activityLibraryHeroCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
+  buildActivityLibraryCardActionView,
   buildActivityLibraryCardActionState,
   buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardStats,
@@ -45,7 +46,9 @@ import {
   buildActivityLibraryPageViewModel,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
+  buildActivityLibrarySearchPanelView,
   buildStarterActivityLibraryCardViewModel,
+  buildActivityLibraryTemplateFilterOptions,
   findCreatedActivityInList,
   formatActivityLibraryStatusLabel,
   resolveCreatedActivityPanelActivity,
@@ -55,6 +58,8 @@ import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
+  buildActivityLibraryDismissCreatedRouteSearch,
+  buildActivityLibraryFilterRouteSearch,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
@@ -7345,6 +7350,92 @@ assert.deepEqual(
     template: 'group-sort',
   }
 );
+assert.deepEqual(
+  buildActivityLibraryFilterRouteSearch({
+    created: 'activity-1',
+    current: {
+      q: 'old search',
+      source: 'audio',
+      status: 'archived',
+      template: 'quiz',
+    },
+    next: {
+      q: '  Ｎｅｗ   search  ',
+      source: 'worksheet',
+    },
+  }),
+  {
+    created: 'activity-1',
+    page: undefined,
+    q: 'New search',
+    source: 'worksheet',
+    status: 'archived',
+    template: 'quiz',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterRouteSearch({
+    created: 'activity-1',
+    current: {
+      q: 'old search',
+      source: 'audio',
+      status: 'archived',
+      template: 'quiz',
+    },
+    next: {
+      q: '',
+      source: 'all',
+      status: 'active',
+      template: 'all',
+    },
+  }),
+  {
+    created: 'activity-1',
+    page: undefined,
+    q: undefined,
+    source: undefined,
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryDismissCreatedRouteSearch({
+    current: {
+      page: 1,
+      q: '  word   match  ',
+      source: 'all',
+      status: 'active',
+      template: 'all',
+    },
+  }),
+  {
+    created: undefined,
+    page: undefined,
+    q: 'word match',
+    source: undefined,
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryDismissCreatedRouteSearch({
+    current: {
+      page: 3,
+      q: 'group',
+      source: 'spreadsheet',
+      status: 'archived',
+      template: 'group-sort',
+    },
+  }),
+  {
+    created: undefined,
+    page: 3,
+    q: 'group',
+    source: 'spreadsheet',
+    status: 'archived',
+    template: 'group-sort',
+  }
+);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
 assert.equal(parseActivitySourceMaterialFilter('extractable'), 'extractable');
@@ -7733,10 +7824,30 @@ assert.match(
   /buildActivityLibraryPageViewModel/,
   'Activity dashboard route should consume the activity-domain page view-model.'
 );
+assert.match(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibraryFilterRouteSearch/,
+  'Activity dashboard route should update filters through the activity-domain filter route helper.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibraryDismissCreatedRouteSearch/,
+  'Activity dashboard route should dismiss created-panel state through the activity-domain route helper.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibrarySearchPanelView/,
+  'Activity dashboard route should render filter summary and filter options from the activity-domain search panel view.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /cardDisplayView\.actionView\.(?:remix|duplicate|archive|restore)/,
+  'Activity dashboard route should use card action copy and gates from the activity-domain card display view.'
+);
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
-  /getActivityLibraryTotalPages|buildActivityLibrarySummaryMetrics|buildActivityLibraryEmptyStateView|resolveCreatedActivityPanelActivity/,
-  'Activity dashboard route should not rebuild pagination, summary, empty state, or created panel lookup directly.'
+  /getActivityTemplates|buildActivityLifecycleActionView|getActivityLifecycleActionCopy|buildActivityLibraryFilterSummary|normalizeActivityLibrarySearch|getActivityLibraryTotalPages|buildActivityLibrarySummaryMetrics|buildActivityLibraryEmptyStateView|resolveCreatedActivityPanelActivity/,
+  'Activity dashboard route should not rebuild template options, lifecycle action views, filter summaries, pagination, summary, empty state, or created panel lookup directly.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -9462,6 +9573,48 @@ assert.deepEqual(
   ['all', 'extractable', 'audio', 'spreadsheet', 'worksheet']
 );
 assert.deepEqual(
+  buildActivityLibraryTemplateFilterOptions().map((option) => option.value),
+  [
+    'all',
+    'quiz',
+    'match-up',
+    'line-match',
+    'group-sort',
+    'fill-blank',
+    'listening',
+    'matching-pairs',
+    'open-box',
+  ]
+);
+assert.deepEqual(
+  buildActivityLibrarySearchPanelView({
+    isLoading: false,
+    search: '  food  ',
+    source: 'worksheet',
+    status: 'active',
+    template: 'quiz',
+    total: 3,
+  }),
+  {
+    filterSummary: { hasFilters: true, text: '3 matches' },
+    hasSearchValue: true,
+    sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateOptions: buildActivityLibraryTemplateFilterOptions(),
+  }
+);
+assert.deepEqual(
+  buildActivityLibrarySearchPanelView({
+    isLoading: true,
+    search: '',
+    source: 'all',
+    status: 'active',
+    template: 'all',
+    total: 0,
+  }).filterSummary,
+  { hasFilters: false, text: 'Loading activities...' }
+);
+assert.deepEqual(
   buildActivityLibraryEmptyStateView({
     search: undefined,
     status: 'active',
@@ -9635,6 +9788,28 @@ assert.equal(
   }).statusLabel,
   'Preview'
 );
+assert.deepEqual(buildActivityLibraryCardActionView('archived').duplicate, {
+  failureMessage: 'Activity could not be duplicated.',
+  gate: {
+    action: 'duplicate',
+    message: archivedActivityDerivationError,
+    type: 'blocked',
+  },
+  successMessage: 'Activity duplicated.',
+});
+assert.deepEqual(buildActivityLibraryCardActionView('draft').remix, {
+  failureMessage: 'Activity could not be remixed.',
+  gate: { type: 'ready' },
+  successMessage: 'Template remix created.',
+});
+assert.deepEqual(buildActivityLibraryCardActionView('private').archive, {
+  failureMessage: 'Activity could not be archived.',
+  successMessage: 'Activity archived.',
+});
+assert.deepEqual(buildActivityLibraryCardActionView('archived').restore, {
+  failureMessage: 'Activity could not be restored.',
+  successMessage: 'Activity restored to drafts.',
+});
 assert.equal(
   starterActivityDisplayView.actionState.showPersistedActions,
   false

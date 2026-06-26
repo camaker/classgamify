@@ -1,4 +1,4 @@
-import { getTemplateByType } from '@/activities/catalog';
+import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
@@ -9,12 +9,16 @@ import {
 } from '@/activities/library-filters';
 import {
   canDeriveActivityWork,
+  buildActivityLifecycleActionView,
+  getActivityLifecycleActionCopy,
   isActivityArchived,
 } from '@/activities/lifecycle';
 import {
   buildActivityLibraryCardSummary,
+  buildActivityLibraryFilterSummary,
   buildActivityLibrarySummaryMetrics,
   type ActivityLibraryCardSummary,
+  type ActivityLibraryFilterSummary,
   type ActivityLibrarySummary,
   type ActivityLibrarySummaryMetric,
   type ActivityLibraryTemplateOption,
@@ -40,6 +44,11 @@ type ActivityLibraryStatusOption = {
 type ActivitySourceMaterialFilterOption = {
   label: string;
   value: ActivitySourceMaterialFilter;
+};
+
+type ActivityLibraryTemplateFilterOption = {
+  label: string;
+  value: ActivityTemplateFilter;
 };
 
 type ActivityLibraryEmptyStateView = {
@@ -110,6 +119,7 @@ type ActivityLibraryCardViewModel = {
 
 type ActivityLibraryCardDisplayView = {
   actionState: ActivityLibraryCardActionState;
+  actionView: ActivityLibraryCardActionView;
   compatibility: ActivityLibraryCompatibilityView;
   sourceMaterials: ActivitySourceMaterialSummaryView;
   stats: ActivityLibraryCardStat[];
@@ -160,6 +170,21 @@ type ActivityLibraryPageResolvedSearch = {
   searchQuery: string;
   sourceFilter: ActivitySourceMaterialFilter;
   templateFilter: ActivityTemplateFilter;
+};
+
+type ActivityLibrarySearchPanelView = {
+  filterSummary: ActivityLibraryFilterSummary;
+  hasSearchValue: boolean;
+  sourceOptions: ActivitySourceMaterialFilterOption[];
+  statusOptions: ActivityLibraryStatusOption[];
+  templateOptions: ActivityLibraryTemplateFilterOption[];
+};
+
+type ActivityLibraryCardActionView = {
+  archive: ReturnType<typeof getActivityLifecycleActionCopy>;
+  duplicate: ReturnType<typeof buildActivityLifecycleActionView>;
+  remix: ReturnType<typeof buildActivityLifecycleActionView>;
+  restore: ReturnType<typeof getActivityLifecycleActionCopy>;
 };
 
 type ActivityLibraryPageItem = PersistedActivityLibraryCardSource & {
@@ -448,6 +473,52 @@ export function buildActivityLibraryPageViewModel<
   };
 }
 
+export function buildActivityLibrarySearchPanelView({
+  isLoading,
+  search,
+  source,
+  status,
+  template,
+  total,
+}: {
+  isLoading: boolean;
+  search: string;
+  source: ActivitySourceMaterialFilter;
+  status: ActivityLibraryStatus;
+  template: ActivityTemplateFilter;
+  total: number;
+}): ActivityLibrarySearchPanelView {
+  const normalizedSearch = normalizeActivityLibrarySearch(search);
+
+  return {
+    filterSummary: buildActivityLibraryFilterSummary({
+      isLoading,
+      search: normalizedSearch,
+      source,
+      status,
+      template,
+      total,
+    }),
+    hasSearchValue: Boolean(search),
+    sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateOptions: buildActivityLibraryTemplateFilterOptions(),
+  };
+}
+
+export function buildActivityLibraryTemplateFilterOptions(): ActivityLibraryTemplateFilterOption[] {
+  return [
+    {
+      label: activityLibrarySearchCopy.templatePlaceholder,
+      value: 'all',
+    },
+    ...getActivityTemplates().map((template) => ({
+      label: template.name,
+      value: template.type,
+    })),
+  ];
+}
+
 export function resolveActivityLibraryPageSearch(
   search: ActivityLibraryPageSearchState
 ): ActivityLibraryPageResolvedSearch {
@@ -614,6 +685,7 @@ export function buildActivityLibraryCardDisplayView({
       readyRemixCount: summary.suggestedTemplateOptions.length,
       visibility: activity.status,
     }),
+    actionView: buildActivityLibraryCardActionView(activity.status),
     compatibility: buildActivityLibraryCompatibilityView({
       currentTemplateType: activity.templateType,
       summary,
@@ -629,6 +701,23 @@ export function buildActivityLibraryCardDisplayView({
     statusLabel: formatActivityLibraryCardStatusLabel(activity),
     templateName: template.name,
     templateType: template.type,
+  };
+}
+
+export function buildActivityLibraryCardActionView(
+  visibility: ActivityVisibility
+): ActivityLibraryCardActionView {
+  return {
+    archive: getActivityLifecycleActionCopy('archive'),
+    duplicate: buildActivityLifecycleActionView({
+      action: 'duplicate',
+      visibility,
+    }),
+    remix: buildActivityLifecycleActionView({
+      action: 'remix',
+      visibility,
+    }),
+    restore: getActivityLifecycleActionCopy('restore'),
   };
 }
 

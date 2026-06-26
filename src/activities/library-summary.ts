@@ -66,6 +66,11 @@ export type ActivityLibrarySummaryMetric = {
   value: string;
 };
 
+export type ActivityLibraryFilterSummary = {
+  hasFilters: boolean;
+  text: string;
+};
+
 export function buildActivityLibraryFilterSummary({
   isLoading,
   search,
@@ -80,7 +85,7 @@ export function buildActivityLibraryFilterSummary({
   status: ActivityLibraryStatus;
   template: ActivityTemplateFilter;
   total: number;
-}) {
+}): ActivityLibraryFilterSummary {
   const hasFilters = Boolean(search) || source !== 'all' || template !== 'all';
   if (hasFilters) {
     return {

@@ -1,25 +1,18 @@
-import {
-  getActivityTemplates,
-  getStarterActivities,
-} from '@/activities/catalog';
-import {
-  buildActivityLifecycleActionView,
-  getActivityLifecycleActionCopy,
-} from '@/activities/lifecycle';
+import { getStarterActivities } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
   type ActivitySourceMaterialFilter,
   type ActivityTemplateFilter,
+  buildActivityLibraryDismissCreatedRouteSearch,
+  buildActivityLibraryFilterRouteSearch,
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
-  normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
-import {
-  buildActivityLibraryFilterSummary,
-  type ActivityLibrarySummaryMetric,
-  type ActivityLibrarySummaryMetricId,
+import type {
+  ActivityLibrarySummaryMetric,
+  ActivityLibrarySummaryMetricId,
 } from '@/activities/library-summary';
 import {
   activityLibraryActionCopy,
@@ -30,6 +23,7 @@ import {
   buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardViewModel,
   buildActivityLibraryPageViewModel,
+  buildActivityLibrarySearchPanelView,
   buildCreatedActivityPanelContext,
   buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
@@ -112,7 +106,7 @@ function DashboardActivitiesPage() {
     search: pageView.resolvedSearch.normalizedSearchQuery,
     source: sourceFilter,
     status: libraryStatus,
-    template,
+    template: templateFilter === 'all' ? undefined : templateFilter,
   });
   const loadedPageView = useMemo(
     () =>
@@ -145,13 +139,20 @@ function DashboardActivitiesPage() {
 
     void navigate({
       replace: true,
-      search: buildActivityLibraryRouteSearch({
+      search: buildActivityLibraryFilterRouteSearch({
         created,
-        page: undefined,
-        q: nextQuery.trim() ? nextQuery : undefined,
-        source: nextSource,
-        status: nextStatus,
-        template: nextTemplate,
+        current: {
+          q: searchQuery,
+          source: sourceFilter,
+          status: libraryStatus,
+          template: templateFilter,
+        },
+        next: {
+          q: nextQuery,
+          source: nextSource,
+          status: nextStatus,
+          template: nextTemplate,
+        },
       }),
     });
   }
@@ -220,12 +221,14 @@ function DashboardActivitiesPage() {
             onDismiss={() =>
               void navigate({
                 replace: true,
-                search: buildActivityLibraryRouteSearch({
-                  page: currentPage === 1 ? undefined : currentPage,
-                  q: searchQuery.trim() ? searchQuery : undefined,
-                  source: sourceFilter,
-                  status: libraryStatus,
-                  template: templateFilter,
+                search: buildActivityLibraryDismissCreatedRouteSearch({
+                  current: {
+                    page: currentPage,
+                    q: searchQuery,
+                    source: sourceFilter,
+                    status: libraryStatus,
+                    template: templateFilter,
+                  },
                 }),
               })
             }
@@ -479,10 +482,9 @@ function ActivityLibrarySearch({
   total: number;
   value: string;
 }) {
-  const normalizedValue = normalizeActivityLibrarySearch(value);
-  const filterSummary = buildActivityLibraryFilterSummary({
+  const searchPanelView = buildActivityLibrarySearchPanelView({
     isLoading,
-    search: normalizedValue,
+    search: value,
     source,
     status,
     template,
@@ -507,7 +509,7 @@ function ActivityLibrarySearch({
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
-          {value ? (
+          {searchPanelView.hasSearchValue ? (
             <button
               type="button"
               aria-label={activityLibrarySearchCopy.clearSearchLabel}
@@ -535,12 +537,9 @@ function ActivityLibrarySearch({
             )
           }
         >
-          <NativeSelectOption value="all">
-            {activityLibrarySearchCopy.templatePlaceholder}
-          </NativeSelectOption>
-          {getActivityTemplates().map((option) => (
-            <NativeSelectOption key={option.type} value={option.type}>
-              {option.name}
+          {searchPanelView.templateOptions.map((option) => (
+            <NativeSelectOption key={option.value} value={option.value}>
+              {option.label}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -558,7 +557,7 @@ function ActivityLibrarySearch({
             )
           }
         >
-          {activityLibrarySearchCopy.sourceOptions.map((option) => (
+          {searchPanelView.sourceOptions.map((option) => (
             <NativeSelectOption key={option.value} value={option.value}>
               {option.label}
             </NativeSelectOption>
@@ -567,7 +566,7 @@ function ActivityLibrarySearch({
       </div>
       <div className="flex flex-col gap-3 lg:items-end">
         <div className="inline-flex rounded-lg border bg-background p-1">
-          {activityLibrarySearchCopy.statusOptions.map((option) => {
+          {searchPanelView.statusOptions.map((option) => {
             const Icon = option.value === 'active' ? IconFolder : IconFolderOff;
 
             return (
@@ -585,9 +584,9 @@ function ActivityLibrarySearch({
           })}
         </div>
         <p className="text-sm text-muted-foreground lg:text-right">
-          {filterSummary.text}
+          {searchPanelView.filterSummary.text}
         </p>
-        {filterSummary.hasFilters ? (
+        {searchPanelView.filterSummary.hasFilters ? (
           <Button
             type="button"
             variant="outline"
@@ -625,10 +624,7 @@ function ActivityCard({
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
   ) {
-    const actionView = buildActivityLifecycleActionView({
-      action: 'remix',
-      visibility: activity.status,
-    });
+    const actionView = cardDisplayView.actionView.remix;
     if (actionView.gate.type === 'blocked') {
       toast.error(actionView.gate.message);
       return;
@@ -649,10 +645,7 @@ function ActivityCard({
   }
 
   async function duplicateActivity() {
-    const actionView = buildActivityLifecycleActionView({
-      action: 'duplicate',
-      visibility: activity.status,
-    });
+    const actionView = cardDisplayView.actionView.duplicate;
     if (actionView.gate.type === 'blocked') {
       toast.error(actionView.gate.message);
       return;
@@ -672,7 +665,7 @@ function ActivityCard({
   }
 
   async function archiveActivity() {
-    const actionCopy = getActivityLifecycleActionCopy('archive');
+    const actionCopy = cardDisplayView.actionView.archive;
     try {
       await archiveMutation.mutateAsync({ activityId: activity.id });
       toast.success(actionCopy.successMessage);
@@ -682,7 +675,7 @@ function ActivityCard({
   }
 
   async function restoreActivity() {
-    const actionCopy = getActivityLifecycleActionCopy('restore');
+    const actionCopy = cardDisplayView.actionView.restore;
     try {
       await restoreMutation.mutateAsync({ activityId: activity.id });
       toast.success(actionCopy.successMessage);
