@@ -61,10 +61,16 @@ type ChoicePairingPromptItemView = ReturnType<
 type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
   groupViews: Array<{
     group: string;
-    placedItemViews: ReturnType<typeof buildStudentRunnerView>['itemViews'];
+    placedItemViews: GroupSortItemView[];
   }>;
   selectedItem?: PublicRuntimeItem;
-  unplacedItemViews: ReturnType<typeof buildStudentRunnerView>['itemViews'];
+  unplacedItemViews: GroupSortItemView[];
+};
+
+type GroupSortItemView = ReturnType<
+  typeof buildStudentRunnerView
+>['itemViews'][number] & {
+  selected: boolean;
 };
 
 type InlineBlankPromptView =
@@ -462,21 +468,23 @@ export function buildGroupSortRunnerView({
     progressVerb,
     reviewItems,
   });
+  const itemViews = runnerView.itemViews.map((itemView) => ({
+    ...itemView,
+    selected: selectedItemId === itemView.item.id,
+  }));
 
   return {
     ...runnerView,
     groupViews: runnerView.choices.map((group) => ({
       group,
-      placedItemViews: runnerView.itemViews.filter((itemView) =>
+      placedItemViews: itemViews.filter((itemView) =>
         isSameRuntimeChoice(itemView.answer, group)
       ),
     })),
     selectedItem: selectedItemId
-      ? runnerView.itemViewsById.get(selectedItemId)?.item
+      ? itemViews.find((itemView) => itemView.selected)?.item
       : undefined,
-    unplacedItemViews: runnerView.itemViews.filter(
-      (itemView) => !itemView.answered
-    ),
+    unplacedItemViews: itemViews.filter((itemView) => !itemView.answered),
   };
 }
 

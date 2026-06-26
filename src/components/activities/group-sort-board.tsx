@@ -97,14 +97,14 @@ export function GroupSortBoard({
           <div className="mt-3 grid gap-2">
             {runnerView.unplacedItemViews.length ? (
               runnerView.unplacedItemViews.map(
-                ({ item, reviewItem, status }) => (
+                ({ item, reviewItem, selected, status }) => (
                   <GroupSortItemButton
                     correctLabel={copy.correctAnswerLabel}
                     key={item.id}
                     item={item}
                     reviewItem={reviewItem}
                     revealAnswer={revealAnswer}
-                    selected={selectedItemId === item.id}
+                    selected={selected}
                     status={status}
                     onSelect={() =>
                       setSelectedItemId((current) =>
@@ -148,24 +148,26 @@ export function GroupSortBoard({
                 </button>
 
                 <div className="mt-3 grid gap-2">
-                  {placedItemViews.map(({ item, reviewItem, status }) => (
-                    <GroupSortItemButton
-                      key={item.id}
-                      correctLabel={copy.correctAnswerLabel}
-                      item={item}
-                      reviewItem={reviewItem}
-                      revealAnswer={revealAnswer}
-                      selected={selectedItemId === item.id}
-                      status={status}
-                      onSelect={() =>
-                        setSelectedItemId((current) =>
-                          current === item.id ? undefined : item.id
-                        )
-                      }
-                      disabled={disabled}
-                      compact
-                    />
-                  ))}
+                  {placedItemViews.map(
+                    ({ item, reviewItem, selected, status }) => (
+                      <GroupSortItemButton
+                        key={item.id}
+                        correctLabel={copy.correctAnswerLabel}
+                        item={item}
+                        reviewItem={reviewItem}
+                        revealAnswer={revealAnswer}
+                        selected={selected}
+                        status={status}
+                        onSelect={() =>
+                          setSelectedItemId((current) =>
+                            current === item.id ? undefined : item.id
+                          )
+                        }
+                        disabled={disabled}
+                        compact
+                      />
+                    )
+                  )}
                   {!placedItemViews.length ? (
                     <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
                   ) : null}

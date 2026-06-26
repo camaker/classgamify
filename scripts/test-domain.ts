@@ -1871,7 +1871,7 @@ assert.match(
 );
 assert.doesNotMatch(
   groupSortBoardSource,
-  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter/,
+  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id/,
   'Group-sort runner should not rebuild selected, unplaced, or grouped item views in the component.'
 );
 for (const filePath of [
@@ -7562,6 +7562,13 @@ assert.deepEqual(
   ['group-fruit-pear']
 );
 assert.deepEqual(
+  groupSortBoardView.unplacedItemViews.map((itemView) => [
+    itemView.item.id,
+    itemView.selected,
+  ]),
+  [['group-fruit-pear', true]]
+);
+assert.deepEqual(
   groupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
     group,
     placedItemViews.map((itemView) => itemView.item.id),
@@ -7569,6 +7576,16 @@ assert.deepEqual(
   [
     ['Fruit', ['group-fruit-apple']],
     ['Drink', ['group-drink-water']],
+  ]
+);
+assert.deepEqual(
+  groupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
+    group,
+    placedItemViews.map((itemView) => [itemView.item.id, itemView.selected]),
+  ]),
+  [
+    ['Fruit', [['group-fruit-apple', false]]],
+    ['Drink', [['group-drink-water', false]]],
   ]
 );
 assert.deepEqual(
