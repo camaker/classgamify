@@ -154,27 +154,31 @@ export function buildActivityDraftMetaSummaryView({
   notice?: string;
   provider: ActivityDraftProvider;
 }): ActivityDraftMetaSummaryView {
+  const readyTemplateCount = normalizeActivityDraftMetaCount(
+    meta.readyTemplateCount
+  );
+
   return {
     coverageStats: [
       {
         label: m.activity_draft_meta_coverage_questions(),
-        value: meta.coverage.questions,
+        value: normalizeActivityDraftMetaCount(meta.coverage.questions),
       },
       {
         label: m.activity_draft_meta_coverage_pairs(),
-        value: meta.coverage.pairs,
+        value: normalizeActivityDraftMetaCount(meta.coverage.pairs),
       },
       {
         label: m.activity_draft_meta_coverage_groups(),
-        value: meta.coverage.groups,
+        value: normalizeActivityDraftMetaCount(meta.coverage.groups),
       },
       {
         label: m.activity_draft_meta_coverage_vocab(),
-        value: meta.coverage.vocabulary,
+        value: normalizeActivityDraftMetaCount(meta.coverage.vocabulary),
       },
       {
         label: m.activity_draft_meta_coverage_notes(),
-        value: meta.coverage.teacherNotes,
+        value: normalizeActivityDraftMetaCount(meta.coverage.teacherNotes),
       },
     ],
     description: m.activity_draft_meta_description(),
@@ -191,12 +195,12 @@ export function buildActivityDraftMetaSummaryView({
         ? m.activity_draft_meta_provider_workers_ai()
         : m.activity_draft_meta_provider_fallback(),
     readyTemplateLabel:
-      meta.readyTemplateCount === 1
+      readyTemplateCount === 1
         ? m.activity_draft_meta_ready_template_label_one({
-            count: meta.readyTemplateCount,
+            count: readyTemplateCount,
           })
         : m.activity_draft_meta_ready_template_label_many({
-            count: meta.readyTemplateCount,
+            count: readyTemplateCount,
           }),
     reviewChecklist: meta.reviewChecklist,
     suggestedTemplateOptions: meta.suggestedTemplateOptions,
@@ -213,6 +217,11 @@ export function buildActivityDraftMetaSummaryView({
     })),
     title: m.activity_draft_meta_title(),
   };
+}
+
+function normalizeActivityDraftMetaCount(count: number) {
+  if (!Number.isFinite(count)) return 0;
+  return Math.max(0, Math.floor(count));
 }
 
 function buildActivityDraftProviderDescription({

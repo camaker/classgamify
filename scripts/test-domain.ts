@@ -14563,6 +14563,29 @@ assert.equal(
   }).readyTemplateLabel,
   '1 ready template'
 );
+const malformedDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  meta: {
+    ...fallbackDraftMeta,
+    coverage: {
+      groups: 2.9,
+      pairs: Number.NaN,
+      questions: Number.POSITIVE_INFINITY,
+      teacherNotes: -3,
+      vocabulary: 4.2,
+    },
+    readyTemplateCount: -1.8,
+  },
+  model: 'test-model',
+  provider: 'workers-ai',
+});
+assert.deepEqual(malformedDraftMetaSummary.coverageStats, [
+  { label: 'Questions', value: 0 },
+  { label: 'Pairs', value: 0 },
+  { label: 'Groups', value: 2 },
+  { label: 'Vocab', value: 4 },
+  { label: 'Notes', value: 0 },
+]);
+assert.equal(malformedDraftMetaSummary.readyTemplateLabel, '0 ready templates');
 assert.equal(
   buildActivityDraftMetaSummaryView({
     meta: fallbackDraftMeta,
