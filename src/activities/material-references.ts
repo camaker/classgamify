@@ -6,6 +6,10 @@ import {
 } from '@/storage/file-materials';
 
 export const ACTIVITY_SOURCE_MATERIALS_MAX_COUNT = 12;
+export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS = {
+  fileIdMaxLength: 120,
+  originalNameMaxLength: 200,
+} as const;
 
 type UserFileMaterialReferenceInput = {
   contentType?: string | null;
@@ -26,10 +30,13 @@ type ActivityMaterialReferenceDraft = Omit<
 export function buildActivityMaterialReferenceFromUserFile(
   file: UserFileMaterialReferenceInput
 ): ActivityMaterialReference | null {
-  const fileId = normalizeReferenceText(file.id, 120);
+  const fileId = normalizeReferenceText(
+    file.id,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
+  );
   const originalName = normalizeReferenceText(
     file.originalName ?? file.filename,
-    200
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength
   );
 
   if (!fileId || !originalName) return null;
@@ -66,8 +73,14 @@ function normalizeActivityMaterialReference(
 ): ActivityMaterialReference | null {
   if (!isRecord(value)) return null;
 
-  const fileId = normalizeReferenceText(value.fileId, 120);
-  const originalName = normalizeReferenceText(value.originalName, 200);
+  const fileId = normalizeReferenceText(
+    value.fileId,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
+  );
+  const originalName = normalizeReferenceText(
+    value.originalName,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength
+  );
 
   if (!fileId || !originalName) return null;
 

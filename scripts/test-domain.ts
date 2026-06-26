@@ -121,6 +121,7 @@ import {
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
 import {
+  ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
   normalizeActivityMaterialReferences,
@@ -2209,6 +2210,29 @@ assert.equal(userFileMaterialSummary.privateFiles, 3);
 assert.equal(userFileMaterialSummary.audioFiles, 1);
 assert.equal(userFileMaterialSummary.worksheetFiles, 2);
 assert.equal(userFileMaterialSummary.byKind.spreadsheet, 1);
+const activityMaterialReferencesSource = readFileSync(
+  'src/activities/material-references.ts',
+  'utf8'
+);
+assert.match(
+  activityMaterialReferencesSource,
+  /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS[\s\S]*fileIdMaxLength: 120[\s\S]*originalNameMaxLength: 200/,
+  'Activity source material references should expose named text limits.'
+);
+assert.match(
+  activityMaterialReferencesSource,
+  /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.fileIdMaxLength[\s\S]*ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.originalNameMaxLength/,
+  'Activity source material reference normalization should reuse named text limits.'
+);
+assert.doesNotMatch(
+  activityMaterialReferencesSource,
+  /normalizeReferenceText\([^,\n]+,\s*(?:120|200)\)/,
+  'Activity source material references should not keep local text length limits.'
+);
+assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS, {
+  fileIdMaxLength: 120,
+  originalNameMaxLength: 200,
+});
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
   contentType: 'audio/mpeg',
   id: 'file-listening-1',
@@ -2442,6 +2466,19 @@ assert.deepEqual(whitespaceMaterialReference, {
   originalName: 'Worksheet Scan 1.pdf',
   size: 1024,
 });
+const clippedMaterialReference = buildActivityMaterialReferenceFromUserFile({
+  contentType: 'audio/wav',
+  id: 'f'.repeat(ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength + 1),
+  originalName: `${'worksheet '.repeat(40)}.wav`,
+});
+assert.equal(
+  clippedMaterialReference?.fileId.length,
+  ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.fileIdMaxLength
+);
+assert.equal(
+  clippedMaterialReference?.originalName.length,
+  ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength
+);
 assert.equal(
   buildActivitySourceMaterialDraftNotes([whitespaceMaterialReference]),
   'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf'
