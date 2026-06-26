@@ -18673,6 +18673,29 @@ assert.deepEqual(
     text: classroomBrief.text,
   }
 );
+assert.throws(
+  () =>
+    buildAssignmentResultActionPayload({
+      actionButton: {
+        action: 'copy-brief',
+        disabled: true,
+        failureMessage: 'Classroom brief could not be copied.',
+        gate: {
+          message: 'Submit at least one attempt before copying a brief.',
+          type: 'blocked',
+        },
+        kind: 'copy-text',
+        label: 'Copy brief',
+        successMessage: 'Classroom brief copied.',
+      },
+      assignmentTitle: csvExportData.assignment.title,
+      classroomBriefText: classroomBrief.text,
+      exportData: csvExportData,
+      items: resultAnalysis.perItem,
+      students: resultAnalysis.students,
+    }),
+  /Submit at least one attempt before copying a brief\./
+);
 const downloadCsvPayload = buildAssignmentResultActionPayload({
   actionButton: {
     action: 'export-csv',
@@ -18697,6 +18720,29 @@ assert.equal(
 assert.equal(
   downloadCsvPayload.kind === 'download-csv' ? downloadCsvPayload.csv : '',
   csv
+);
+assert.throws(
+  () =>
+    buildAssignmentResultActionPayload({
+      actionButton: {
+        action: 'export-csv',
+        disabled: true,
+        failureMessage: 'Results CSV could not be downloaded.',
+        gate: {
+          message: 'Submit at least one attempt before exporting results.',
+          type: 'blocked',
+        },
+        kind: 'download-csv',
+        label: 'Download CSV',
+        successMessage: 'Results CSV downloaded.',
+      },
+      assignmentTitle: csvExportData.assignment.title,
+      classroomBriefText: classroomBrief.text,
+      exportData: csvExportData,
+      items: resultAnalysis.perItem,
+      students: resultAnalysis.students,
+    }),
+  /Submit at least one attempt before exporting results\./
 );
 
 console.log('Domain tests passed.');

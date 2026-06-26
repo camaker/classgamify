@@ -902,6 +902,10 @@ export function buildAssignmentResultActionPayload({
   items: AssignmentItemAnalysis[];
   students: AssignmentStudentSummary[];
 }): AssignmentResultActionPayload {
+  if (actionButton.gate.type === 'blocked') {
+    throw new Error(actionButton.gate.message);
+  }
+
   if (actionButton.kind === 'download-csv') {
     return {
       csv: buildAssignmentResultsCsv(exportData),
