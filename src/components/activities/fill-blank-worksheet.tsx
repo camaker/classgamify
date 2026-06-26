@@ -4,9 +4,8 @@ import type {
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
-  buildInlineBlankPromptView,
+  buildFillBlankWorksheetView,
   getStudentRunnerReviewStatusClassName,
-  buildStudentRunnerView,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +34,7 @@ export function FillBlankWorksheet({
   const copy = getActivityRunnerKindCopy('fill-blank');
   const runnerView = useMemo(
     () =>
-      buildStudentRunnerView({
+      buildFillBlankWorksheetView({
         answers,
         items,
         progressVerb: copy.progressVerb,
@@ -57,8 +56,8 @@ export function FillBlankWorksheet({
       </div>
 
       <div className="mt-3 grid gap-3">
-        {runnerView.itemViews.map((itemView, index) => {
-          const { answer, item, reviewItem, status } = itemView;
+        {runnerView.fillBlankItemViews.map((itemView) => {
+          const { answer, item, promptView, reviewItem, status } = itemView;
 
           return (
             <div
@@ -70,11 +69,11 @@ export function FillBlankWorksheet({
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <Badge variant="secondary" className="rounded-md">
-                  {index + 1}
+                  {itemView.sequenceLabel}
                 </Badge>
-                {item.choices?.length ? (
+                {itemView.wordBankText ? (
                   <p className="text-xs text-muted-foreground">
-                    {copy.wordBankLabel}: {item.choices.join(', ')}
+                    {copy.wordBankLabel}: {itemView.wordBankText}
                   </p>
                 ) : null}
               </div>
@@ -85,7 +84,7 @@ export function FillBlankWorksheet({
                   copy.inlineBlankPlaceholder ?? copy.inputPlaceholder
                 }
                 placeholder={copy.inputPlaceholder}
-                prompt={item.prompt}
+                promptView={promptView}
                 onAnswerChange={(answer) => onAnswerChange(item.id, answer)}
               />
               {revealAnswer && reviewItem ? (
@@ -108,17 +107,17 @@ function InlineBlankPrompt({
   onAnswerChange,
   inlinePlaceholder,
   placeholder,
-  prompt,
+  promptView,
 }: {
   answer: string;
   disabled: boolean;
   inlinePlaceholder: string;
   onAnswerChange: (answer: string) => void;
   placeholder: string;
-  prompt: string;
+  promptView: ReturnType<
+    typeof buildFillBlankWorksheetView
+  >['fillBlankItemViews'][number]['promptView'];
 }) {
-  const promptView = buildInlineBlankPromptView(prompt);
-
   if (promptView.mode === 'standalone') {
     return (
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-center">

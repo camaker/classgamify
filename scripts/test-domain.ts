@@ -247,6 +247,7 @@ import {
 import {
   buildChoicePairingRunnerView,
   buildDefaultRuntimeItemCardViews,
+  buildFillBlankWorksheetView,
   buildGroupSortRunnerView,
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
@@ -259,6 +260,7 @@ import {
   buildStudentRunnerView,
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
+  getSequentialRunnerItemIdByOffset,
   getStudentRunnerReviewStatusClassName,
   getUniqueRuntimeChoices,
   isSameRuntimeChoice,
@@ -1462,6 +1464,20 @@ const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
   'utf8'
 );
+const fillBlankWorksheetSource = readFileSync(
+  'src/components/activities/fill-blank-worksheet.tsx',
+  'utf8'
+);
+assert.match(
+  fillBlankWorksheetSource,
+  /buildFillBlankWorksheetView/,
+  'Fill-blank worksheet should consume the assignment-domain worksheet view helper.'
+);
+assert.doesNotMatch(
+  fillBlankWorksheetSource,
+  /buildInlineBlankPromptView|buildStudentRunnerView|item\.choices\.join|\{index \+ 1\}/,
+  'Fill-blank worksheet should not rebuild prompt parsing, word-bank text, or item labels in the component.'
+);
 assert.match(
   groupSortBoardSource,
   /buildGroupSortRunnerView/,
@@ -1492,6 +1508,51 @@ for (const filePath of [
     source,
     /buildSequentialRunnerView|buildStudentRunnerView/,
     `${filePath} should not manually compose generic runner and sequence views.`
+  );
+}
+const listeningRunnerSource = readFileSync(
+  'src/components/activities/listening-runner.tsx',
+  'utf8'
+);
+assert.match(
+  listeningRunnerSource,
+  /runnerView\.activeChoiceViews/,
+  'Listening runner should render choice state from the sequential runner view.'
+);
+assert.doesNotMatch(
+  listeningRunnerSource,
+  /isSameRuntimeChoice|activeItem\.choices|answers\[activeItem\.id\]/,
+  'Listening runner should not rebuild active choice or input value state directly.'
+);
+const openBoxRunnerSource = readFileSync(
+  'src/components/activities/open-box-runner.tsx',
+  'utf8'
+);
+assert.match(
+  openBoxRunnerSource,
+  /getSequentialRunnerItemIdByOffset/,
+  'Open-box runner should navigate active cards through the assignment-domain sequence helper.'
+);
+assert.doesNotMatch(
+  openBoxRunnerSource,
+  /activeIndex \+ offset|answers\[activeItem\.id\]/,
+  'Open-box runner should not hand-roll sequence wrapping or active answer state.'
+);
+for (const filePath of [
+  'src/components/activities/line-match-board.tsx',
+  'src/components/activities/matching-pairs-board.tsx',
+]) {
+  const source = readFileSync(filePath, 'utf8');
+
+  assert.match(
+    source,
+    /runnerView\.promptItemViews/,
+    `${filePath} should render prompt-card labels and selection from the choice-pairing view.`
+  );
+  assert.doesNotMatch(
+    source,
+    /runnerView\.itemViews\.map|\{index \+ 1\}\.|selectedItemId === item\.id/,
+    `${filePath} should not rebuild prompt-card labels or selection state directly.`
   );
 }
 const activityCreateFormSource = readFileSync(
@@ -3043,8 +3104,51 @@ const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
 });
 assert.equal(sequentialStudentRunnerView.progressLabel, '1/2 answered');
 assert.equal(sequentialStudentRunnerView.activeItem?.id, 'q-1');
+assert.equal(sequentialStudentRunnerView.activeAnswer, 'Paris');
 assert.equal(sequentialStudentRunnerView.activeReviewItem?.correct, true);
+assert.deepEqual(sequentialStudentRunnerView.activeChoiceViews, [
+  {
+    choice: 'Paris',
+    selected: true,
+  },
+  {
+    choice: 'Lyon',
+    selected: false,
+  },
+]);
 assert.equal(sequentialStudentRunnerView.sequenceView.activeLabel, 'Track 1');
+assert.equal(
+  getSequentialRunnerItemIdByOffset({
+    activeIndex: 0,
+    itemIds: ['q-1', 'q-2', 'q-3'],
+    offset: 1,
+  }),
+  'q-2'
+);
+assert.equal(
+  getSequentialRunnerItemIdByOffset({
+    activeIndex: 0,
+    itemIds: ['q-1', 'q-2', 'q-3'],
+    offset: -1,
+  }),
+  'q-3'
+);
+assert.equal(
+  getSequentialRunnerItemIdByOffset({
+    activeIndex: Number.POSITIVE_INFINITY,
+    itemIds: ['q-1', 'q-2'],
+    offset: Number.NaN,
+  }),
+  'q-1'
+);
+assert.equal(
+  getSequentialRunnerItemIdByOffset({
+    activeIndex: 0,
+    itemIds: [],
+    offset: 1,
+  }),
+  undefined
+);
 assert.deepEqual(buildInlineBlankPromptView('I eat ___ for breakfast.'), {
   after: ' for breakfast.',
   before: 'I eat ',
@@ -3064,6 +3168,51 @@ assert.deepEqual(buildInlineBlankPromptView('Type the missing word.'), {
   mode: 'standalone',
   prompt: 'Type the missing word.',
 });
+assert.deepEqual(
+  buildFillBlankWorksheetView({
+    answers: { 'blank-1': 'apple' },
+    items: [
+      {
+        choices: ['apple', 'banana'],
+        id: 'blank-1',
+        kind: 'question',
+        prompt: 'I eat ___ for breakfast.',
+      },
+      {
+        id: 'blank-2',
+        kind: 'question',
+        prompt: 'Type the missing word.',
+      },
+    ],
+    progressVerb: 'completed',
+  }).fillBlankItemViews.map((itemView) => ({
+    id: itemView.item.id,
+    promptView: itemView.promptView,
+    sequenceLabel: itemView.sequenceLabel,
+    wordBankText: itemView.wordBankText,
+  })),
+  [
+    {
+      id: 'blank-1',
+      promptView: {
+        after: ' for breakfast.',
+        before: 'I eat ',
+        mode: 'inline',
+      },
+      sequenceLabel: '1',
+      wordBankText: 'apple, banana',
+    },
+    {
+      id: 'blank-2',
+      promptView: {
+        mode: 'standalone',
+        prompt: 'Type the missing word.',
+      },
+      sequenceLabel: '2',
+      wordBankText: null,
+    },
+  ]
+);
 assert.deepEqual(
   buildPublicAnswerFeedbackView({
     correctAnswerLabel: 'Correct match',
@@ -6686,6 +6835,18 @@ const choicePairingRunnerView = buildChoicePairingRunnerView({
   selectedItemId: 'pair-2',
 });
 assert.equal(choicePairingRunnerView.progressLabel, '2/3 matched');
+assert.deepEqual(
+  choicePairingRunnerView.promptItemViews.map((itemView) => [
+    itemView.item.id,
+    itemView.promptLabel,
+    itemView.selected,
+  ]),
+  [
+    ['q-1', '1. Capital of France?', false],
+    ['pair-1', '2. Match "Hot" with its pair.', false],
+    ['pair-2', '3. Match "Up" with its pair.', true],
+  ]
+);
 assert.deepEqual(choicePairingRunnerView.choiceViews, [
   { choice: 'Paris', selected: false, usedByItemId: 'q-1' },
   { choice: 'Lyon', selected: false, usedByItemId: undefined },

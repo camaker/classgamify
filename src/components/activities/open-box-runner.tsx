@@ -5,6 +5,7 @@ import type {
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialStudentRunnerView,
+  getSequentialRunnerItemIdByOffset,
   getStudentRunnerReviewStatusClassName,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -59,14 +60,16 @@ export function OpenBoxRunner({
       reviewItems,
     ]
   );
-  const { activeItem, sequenceView } = runnerView;
+  const { activeItem, activeItemView, sequenceView } = runnerView;
 
   function moveActiveItem(offset: number) {
-    if (!items.length) return;
-    const nextIndex =
-      (runnerView.sequenceView.activeIndex + offset + items.length) %
-      items.length;
-    setActiveItemId(items[nextIndex]?.id);
+    setActiveItemId(
+      getSequentialRunnerItemIdByOffset({
+        activeIndex: sequenceView.activeIndex,
+        itemIds: sequenceView.itemViews.map((itemView) => itemView.item.id),
+        offset,
+      })
+    );
   }
 
   if (!activeItem) {
@@ -120,10 +123,8 @@ export function OpenBoxRunner({
           className={cn(
             'rounded-lg border bg-background p-4',
             revealAnswer &&
-              sequenceView.activeItemView &&
-              getStudentRunnerReviewStatusClassName(
-                sequenceView.activeItemView.status
-              )
+              activeItemView &&
+              getStudentRunnerReviewStatusClassName(activeItemView.status)
           )}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -159,7 +160,7 @@ export function OpenBoxRunner({
           </div>
 
           <Input
-            value={answers[activeItem.id] ?? ''}
+            value={runnerView.activeAnswer}
             disabled={disabled}
             onChange={(event) =>
               onAnswerChange(activeItem.id, event.target.value)

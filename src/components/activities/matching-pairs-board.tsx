@@ -72,9 +72,8 @@ export function MatchingPairsBoard({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="grid gap-2">
-          {runnerView.itemViews.map((itemView, index) => {
+          {runnerView.promptItemViews.map((itemView) => {
             const { answer, item, reviewItem, status } = itemView;
-            const selected = selectedItemId === item.id;
 
             return (
               <button
@@ -84,7 +83,7 @@ export function MatchingPairsBoard({
                 className={cn(
                   'min-h-20 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                  selected && 'border-primary bg-primary/10',
+                  itemView.selected && 'border-primary bg-primary/10',
                   revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
                 onClick={() =>
@@ -94,10 +93,8 @@ export function MatchingPairsBoard({
                 }
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium">
-                    {index + 1}. {item.prompt}
-                  </p>
-                  {selected ? (
+                  <p className="text-sm font-medium">{itemView.promptLabel}</p>
+                  {itemView.selected ? (
                     <IconCheck className="mt-0.5 size-4 text-primary" />
                   ) : (
                     <IconCircle className="mt-0.5 size-4 text-muted-foreground" />

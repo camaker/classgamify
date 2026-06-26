@@ -48,6 +48,14 @@ type DefaultRuntimeItemCardView = ReturnType<
 
 type ChoicePairingRunnerView = ReturnType<typeof buildStudentRunnerView> & {
   choiceViews: ReturnType<typeof buildRuntimeChoiceViews>;
+  promptItemViews: ChoicePairingPromptItemView[];
+};
+
+type ChoicePairingPromptItemView = ReturnType<
+  typeof buildStudentRunnerView
+>['itemViews'][number] & {
+  promptLabel: string;
+  selected: boolean;
 };
 
 type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
@@ -69,6 +77,18 @@ type InlineBlankPromptView =
       mode: 'standalone';
       prompt: string;
     };
+
+type FillBlankWorksheetItemView = ReturnType<
+  typeof buildStudentRunnerView
+>['itemViews'][number] & {
+  promptView: InlineBlankPromptView;
+  sequenceLabel: string;
+  wordBankText: string | null;
+};
+
+type FillBlankWorksheetView = ReturnType<typeof buildStudentRunnerView> & {
+  fillBlankItemViews: FillBlankWorksheetItemView[];
+};
 
 type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
@@ -240,13 +260,45 @@ export function buildSequentialStudentRunnerView({
     itemLabel,
     itemViews: runnerView.itemViews,
   });
+  const activeItemView = sequenceView.activeItemView;
 
   return {
     ...runnerView,
     activeItem: sequenceView.activeItem,
-    activeReviewItem: sequenceView.activeItemView?.reviewItem,
+    activeAnswer: activeItemView?.answer ?? '',
+    activeChoiceViews: buildRuntimeChoiceButtonViews({
+      answer: activeItemView?.answer ?? '',
+      choices: activeItemView?.item.choices ?? [],
+    }),
+    activeItemView,
+    activeReviewItem: activeItemView?.reviewItem,
     sequenceView,
   };
+}
+
+export function getSequentialRunnerItemIdByOffset({
+  activeIndex,
+  itemIds,
+  offset,
+}: {
+  activeIndex: number;
+  itemIds: string[];
+  offset: number;
+}) {
+  if (itemIds.length === 0) return undefined;
+
+  const resolvedActiveIndex = Number.isFinite(activeIndex)
+    ? Math.trunc(activeIndex)
+    : 0;
+  const resolvedOffset = Number.isFinite(offset) ? Math.trunc(offset) : 0;
+  const normalizedActiveIndex = Math.min(
+    itemIds.length - 1,
+    Math.max(0, resolvedActiveIndex)
+  );
+  const nextIndex =
+    (normalizedActiveIndex + resolvedOffset + itemIds.length) % itemIds.length;
+
+  return itemIds[nextIndex];
 }
 
 export function formatSequentialRunnerItemLabel(label: string, index: number) {
@@ -383,6 +435,11 @@ export function buildChoicePairingRunnerView({
       choices: runnerView.choices,
       selectedItemId,
     }),
+    promptItemViews: runnerView.itemViews.map((itemView) => ({
+      ...itemView,
+      promptLabel: itemView.positionLabel,
+      selected: selectedItemId === itemView.item.id,
+    })),
   };
 }
 
@@ -459,6 +516,37 @@ export function buildInlineBlankPromptView(
     after: prompt.slice(match.index + match[0].length),
     before: prompt.slice(0, match.index),
     mode: 'inline',
+  };
+}
+
+export function buildFillBlankWorksheetView({
+  answers,
+  items,
+  progressVerb,
+  reviewItems,
+}: {
+  answers: StudentAnswerMap;
+  items: PublicRuntimeItem[];
+  progressVerb?: string;
+  reviewItems?: PublicAttemptReviewItem[];
+}): FillBlankWorksheetView {
+  const runnerView = buildStudentRunnerView({
+    answers,
+    items,
+    progressVerb,
+    reviewItems,
+  });
+
+  return {
+    ...runnerView,
+    fillBlankItemViews: runnerView.itemViews.map((itemView, index) => ({
+      ...itemView,
+      promptView: buildInlineBlankPromptView(itemView.prompt),
+      sequenceLabel: `${Math.max(0, index) + 1}`,
+      wordBankText: itemView.item.choices?.length
+        ? itemView.item.choices.join(', ')
+        : null,
+    })),
   };
 }
 

@@ -6,7 +6,6 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialStudentRunnerView,
   getStudentRunnerReviewStatusClassName,
-  isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import { normalizeListeningSpeechLanguage } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -179,34 +178,32 @@ export function ListeningRunner({
             ) : null}
           </div>
 
-          {activeItem.choices?.length ? (
+          {runnerView.activeChoiceViews.length ? (
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {activeItem.choices.map((choice) => {
-                const selected = isSameRuntimeChoice(
-                  answers[activeItem.id],
-                  choice
-                );
-
+              {runnerView.activeChoiceViews.map((choiceView) => {
                 return (
                   <button
-                    key={choice}
+                    key={choiceView.choice}
                     type="button"
                     disabled={disabled}
                     className={cn(
                       'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
                       'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                      selected && 'border-primary bg-primary/10 text-primary'
+                      choiceView.selected &&
+                        'border-primary bg-primary/10 text-primary'
                     )}
-                    onClick={() => onAnswerChange(activeItem.id, choice)}
+                    onClick={() =>
+                      onAnswerChange(activeItem.id, choiceView.choice)
+                    }
                   >
-                    {choice}
+                    {choiceView.choice}
                   </button>
                 );
               })}
             </div>
           ) : (
             <Input
-              value={answers[activeItem.id] ?? ''}
+              value={runnerView.activeAnswer}
               disabled={disabled}
               onChange={(event) =>
                 onAnswerChange(activeItem.id, event.target.value)

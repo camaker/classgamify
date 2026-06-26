@@ -77,9 +77,8 @@ export function LineMatchBoard({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
-          {runnerView.itemViews.map((itemView, index) => {
+          {runnerView.promptItemViews.map((itemView) => {
             const { answer, item, reviewItem, status } = itemView;
-            const selected = selectedItemId === item.id;
 
             return (
               <button
@@ -89,14 +88,14 @@ export function LineMatchBoard({
                 className={cn(
                   'min-h-16 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-                  selected && 'border-primary bg-primary/10',
+                  itemView.selected && 'border-primary bg-primary/10',
                   revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
                 onClick={() => selectPrompt(item.id)}
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-sm font-medium">
-                    {index + 1}. {item.prompt}
+                    {itemView.promptLabel}
                   </span>
                   {answer ? (
                     <IconLink className="mt-0.5 size-4 text-primary" />
