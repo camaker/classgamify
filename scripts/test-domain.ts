@@ -1317,18 +1317,27 @@ const activityDashboardRouteSource = readFileSync(
   'src/routes/dashboard/activities.tsx',
   'utf8'
 );
+const activityDashboardCardSource = readFileSync(
+  'src/components/activities/activity-library-card.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   activityDashboardRouteSource,
   /error\.message|error instanceof Error/,
   'Activity dashboard actions should use localized action failure copy instead of raw server or network errors.'
 );
+assert.doesNotMatch(
+  activityDashboardCardSource,
+  /error\.message|error instanceof Error/,
+  'Activity dashboard card actions should use localized action failure copy instead of raw server or network errors.'
+);
 assert.match(
-  activityDashboardRouteSource,
+  activityDashboardCardSource,
   /toast\.error\(actionView\.failureMessage\)/,
   'Activity remix and duplicate failures should use localized derivative action failure copy.'
 );
 assert.match(
-  activityDashboardRouteSource,
+  activityDashboardCardSource,
   /toast\.error\(actionCopy\.failureMessage\)/,
   'Activity archive and restore failures should use localized lifecycle action failure copy.'
 );
@@ -1336,13 +1345,22 @@ const assignmentDashboardRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
   'utf8'
 );
+const assignmentDashboardCardSource = readFileSync(
+  'src/components/assignments/assignment-list-card.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentDashboardRouteSource,
   /error\.message|error instanceof Error/,
   'Assignment dashboard status actions should use localized action failure copy instead of raw server or network errors.'
 );
+assert.doesNotMatch(
+  assignmentDashboardCardSource,
+  /error\.message|error instanceof Error/,
+  'Assignment dashboard card status actions should use localized action failure copy instead of raw server or network errors.'
+);
 assert.match(
-  assignmentDashboardRouteSource,
+  assignmentDashboardCardSource,
   /toast\.error\(statusAction\.failureMessage\)/,
   'Assignment close and reopen failures should use localized status action failure copy.'
 );
@@ -8015,6 +8033,18 @@ const activityLibrarySearchComponentSource = readFileSync(
   'src/components/activities/activity-library-search.tsx',
   'utf8'
 );
+const activityLibraryCardComponentSource = readFileSync(
+  'src/components/activities/activity-library-card.tsx',
+  'utf8'
+);
+const activityLibrarySummaryCardComponentSource = readFileSync(
+  'src/components/activities/activity-library-summary-card.tsx',
+  'utf8'
+);
+const createdActivityPanelComponentSource = readFileSync(
+  'src/components/activities/created-activity-panel.tsx',
+  'utf8'
+);
 assert.match(
   dashboardActivitiesRouteSource,
   /const \{ created, page, q, source, status, template \} = Route\.useSearch\(\)/,
@@ -8056,19 +8086,59 @@ assert.match(
   'Activity dashboard route should delegate filter controls to the activity library search component.'
 );
 assert.match(
+  dashboardActivitiesRouteSource,
+  /ActivityLibraryCard/,
+  'Activity dashboard route should delegate activity card rendering to the activity library card component.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /ActivityLibrarySummaryCard/,
+  'Activity dashboard route should delegate summary metric rendering to the activity library summary card component.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /CreatedActivityPanel/,
+  'Activity dashboard route should delegate the saved-activity panel to a focused component.'
+);
+assert.match(
   activityLibrarySearchComponentSource,
   /buildActivityLibrarySearchPanelView/,
   'Activity library search component should render filter summary and filter options from the activity-domain search panel view.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /buildActivityLibraryCardDisplayView/,
+  'Activity library card component should render card display state from the activity-domain card display view.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /cardDisplayView\.actionView\.(?:remix|duplicate|archive|restore)/,
+  'Activity library card component should use card action copy and gates from the activity-domain card display view.'
+);
+assert.match(
+  activityLibrarySummaryCardComponentSource,
+  /ActivityLibrarySummaryMetricId/,
+  'Activity library summary card component should map icons by the activity-domain metric id.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /buildCreatedActivityPanelContext/,
+  'Created activity panel component should render saved-activity state from the activity-domain panel context.'
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
   /buildActivityLibrarySearchPanelView|activityLibrarySearchCopy|NativeSelect|NativeSelectOption|id="activity-source-filter"/,
   'Activity dashboard route should not own activity library search-control rendering details.'
 );
-assert.match(
+assert.doesNotMatch(
   dashboardActivitiesRouteSource,
-  /cardDisplayView\.actionView\.(?:remix|duplicate|archive|restore)/,
-  'Activity dashboard route should use card action copy and gates from the activity-domain card display view.'
+  /buildActivityLibraryCardDisplayView|buildCreatedActivityPanelContext|cardDisplayView|useArchiveActivity|useDuplicateActivity|useRemixActivityTemplate|useRestoreActivity/,
+  'Activity dashboard route should not own activity card actions or saved-panel rendering details.'
+);
+assert.doesNotMatch(
+  dashboardActivitiesRouteSource,
+  /function (?:ActivityCard|CreatedActivityPanel|ActivityStat|ActivitySummaryCard)\(/,
+  'Activity dashboard route should not keep local activity card, saved-panel, stat, or summary components.'
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
@@ -8092,6 +8162,18 @@ const dashboardAssignmentsRouteSource = readFileSync(
 );
 const assignmentListFiltersComponentSource = readFileSync(
   'src/components/assignments/assignment-list-filters.tsx',
+  'utf8'
+);
+const assignmentListCardComponentSource = readFileSync(
+  'src/components/assignments/assignment-list-card.tsx',
+  'utf8'
+);
+const assignmentListSummaryCardComponentSource = readFileSync(
+  'src/components/assignments/assignment-list-summary-card.tsx',
+  'utf8'
+);
+const publishedAssignmentPanelComponentSource = readFileSync(
+  'src/components/assignments/published-assignment-panel.tsx',
   'utf8'
 );
 const assignmentListViewSource = readFileSync(
@@ -8273,14 +8355,59 @@ assert.match(
   'Assignment dashboard route should delegate filter controls to the assignment list filters component.'
 );
 assert.match(
+  dashboardAssignmentsRouteSource,
+  /AssignmentListCard/,
+  'Assignment dashboard route should delegate assignment card rendering to the assignment list card component.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /AssignmentListSummaryCard/,
+  'Assignment dashboard route should delegate summary metric rendering to the assignment list summary card component.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /PublishedAssignmentPanel/,
+  'Assignment dashboard route should delegate the just-published share panel to a focused component.'
+);
+assert.match(
   assignmentListFiltersComponentSource,
   /buildAssignmentListSearchPanelView/,
   'Assignment list filters component should render filter summary and status options from the assignment-domain search panel view.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /buildAssignmentListCardViewModel/,
+  'Assignment list card component should receive assignment-domain card view models.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /useUpdateAssignmentStatus/,
+  'Assignment list card component should own close and reopen interactions instead of the route.'
+);
+assert.match(
+  assignmentListSummaryCardComponentSource,
+  /AssignmentListSummaryMetricId/,
+  'Assignment list summary card component should map icons by the assignment-domain metric id.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /buildPublishedAssignmentPanelContext/,
+  'Published assignment panel component should render share-panel state from the assignment-domain panel context.'
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
   /buildAssignmentListSearchPanelView|assignmentListSearchCopy|NativeSelect|NativeSelectOption|id="assignment-status-filter"/,
   'Assignment dashboard route should not own assignment list filter-control rendering details.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /buildPublishedAssignmentPanelContext|useUpdateAssignmentStatus|toast\.|statusAction|shareAction|resultAction|assignmentListCardStatIcons/,
+  'Assignment dashboard route should not own assignment card actions or published-panel rendering details.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /function (?:AssignmentCard|PublishedAssignmentPanel|SummaryCard|AssignmentStat)\(/,
+  'Assignment dashboard route should not keep local assignment card, published-panel, stat, or summary components.'
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
