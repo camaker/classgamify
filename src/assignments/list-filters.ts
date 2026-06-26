@@ -73,6 +73,30 @@ export function buildAssignmentListPageRouteSearch({
   });
 }
 
+export function buildAssignmentListFilterRouteSearch({
+  current,
+  next,
+  published,
+}: {
+  current: Omit<AssignmentListSearchState, 'page' | 'published'>;
+  next: Partial<Omit<AssignmentListSearchState, 'page' | 'published'>>;
+  published?: string;
+}): AssignmentListRouteSearch {
+  return buildAssignmentListRouteSearch({
+    published,
+    q: next.q ?? current.q,
+    status: next.status ?? current.status,
+  });
+}
+
+export function buildAssignmentListDismissPublishedRouteSearch({
+  current,
+}: {
+  current: Omit<AssignmentListSearchState, 'published'>;
+}): AssignmentListRouteSearch {
+  return buildAssignmentListRouteSearch(current);
+}
+
 export function parseAssignmentStatusFilter(
   value: unknown
 ): AssignmentLifecycleStatusFilter | undefined {

@@ -1,22 +1,23 @@
 import {
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentStatusFilter,
+  buildAssignmentListDismissPublishedRouteSearch,
+  buildAssignmentListFilterRouteSearch,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
 } from '@/assignments/list-filters';
-import {
-  buildAssignmentListFilterSummary,
-  type AssignmentListSummaryMetric,
-  type AssignmentListSummaryMetricId,
+import type {
+  AssignmentListSummaryMetric,
+  AssignmentListSummaryMetricId,
 } from '@/assignments/list-summary';
 import {
   assignmentListActionCopy,
   assignmentListPublishedPanelCopy,
   assignmentListSearchCopy,
-  assignmentStatusFilterOptions,
   buildAssignmentListCardViewModel,
   buildAssignmentListPageViewModel,
+  buildAssignmentListSearchPanelView,
   buildStarterAssignmentListCardViewModel,
 } from '@/assignments/list-view';
 import {
@@ -117,11 +118,16 @@ function DashboardAssignmentsPage() {
 
     void navigate({
       replace: true,
-      search: buildAssignmentListRouteSearch({
-        page: undefined,
+      search: buildAssignmentListFilterRouteSearch({
         published,
-        q: nextQuery.trim() ? nextQuery : undefined,
-        status: nextStatus,
+        current: {
+          q: searchQuery,
+          status: statusFilter,
+        },
+        next: {
+          q: nextQuery,
+          status: nextStatus,
+        },
       }),
     });
   }
@@ -166,10 +172,12 @@ function DashboardAssignmentsPage() {
             onDismiss={() =>
               void navigate({
                 replace: true,
-                search: buildAssignmentListRouteSearch({
-                  page: currentPage === 1 ? undefined : currentPage,
-                  q: searchQuery.trim() ? searchQuery : undefined,
-                  status: statusFilter,
+                search: buildAssignmentListDismissPublishedRouteSearch({
+                  current: {
+                    page: currentPage,
+                    q: searchQuery,
+                    status: statusFilter,
+                  },
                 }),
               })
             }
@@ -391,14 +399,12 @@ function AssignmentListFilters({
   status: AssignmentStatusFilter;
   total: number;
 }) {
-  const normalizedSearch = normalizeAssignmentListSearch(search);
-  const filterSummary = buildAssignmentListFilterSummary({
+  const searchPanelView = buildAssignmentListSearchPanelView({
     isLoading,
-    search: normalizedSearch,
+    search,
     status,
     total,
   });
-  const hasFilters = filterSummary.hasFilters;
 
   return (
     <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_13rem_auto] lg:items-end">
@@ -415,7 +421,7 @@ function AssignmentListFilters({
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
-          {search ? (
+          {searchPanelView.hasSearchValue ? (
             <button
               type="button"
               aria-label={assignmentListSearchCopy.clearSearchLabel}
@@ -441,7 +447,7 @@ function AssignmentListFilters({
             onStatusChange(event.currentTarget.value as AssignmentStatusFilter)
           }
         >
-          {assignmentStatusFilterOptions.map((option) => (
+          {searchPanelView.statusOptions.map((option) => (
             <NativeSelectOption key={option.value} value={option.value}>
               {option.label}
             </NativeSelectOption>
@@ -449,8 +455,10 @@ function AssignmentListFilters({
         </NativeSelect>
       </div>
       <div className="flex flex-col gap-2 lg:items-end">
-        <p className="text-sm text-muted-foreground">{filterSummary.text}</p>
-        {hasFilters ? (
+        <p className="text-sm text-muted-foreground">
+          {searchPanelView.filterSummary.text}
+        </p>
+        {searchPanelView.filterSummary.hasFilters ? (
           <Button
             type="button"
             variant="outline"

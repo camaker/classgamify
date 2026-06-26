@@ -324,6 +324,8 @@ import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
+  buildAssignmentListDismissPublishedRouteSearch,
+  buildAssignmentListFilterRouteSearch,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
@@ -347,6 +349,7 @@ import {
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
   buildAssignmentListPageViewModel,
+  buildAssignmentListSearchPanelView,
   buildStarterAssignmentListCardViewModel,
   getAssignmentListCardActionState,
   getAssignmentListEmptyState,
@@ -8027,10 +8030,25 @@ assert.match(
   /buildAssignmentListPageViewModel/,
   'Assignment dashboard route should consume the assignment-domain page view-model.'
 );
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /buildAssignmentListFilterRouteSearch/,
+  'Assignment dashboard route should update filters through the assignment-domain route helper.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /buildAssignmentListDismissPublishedRouteSearch/,
+  'Assignment dashboard route should dismiss published-panel state through the assignment-domain route helper.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /buildAssignmentListSearchPanelView/,
+  'Assignment dashboard route should render filter summary and status options from the assignment-domain search panel view.'
+);
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
-  /getAssignmentListTotalPages|buildAssignmentListSummaryMetrics|buildAssignmentListEmptyStateView|resolvePublishedAssignmentPanelAssignment/,
-  'Assignment dashboard route should not rebuild pagination, summary, empty state, or published panel context directly.'
+  /assignmentStatusFilterOptions|normalizeAssignmentListSearch|buildAssignmentListFilterSummary|getAssignmentListTotalPages|buildAssignmentListSummaryMetrics|buildAssignmentListEmptyStateView|resolvePublishedAssignmentPanelAssignment/,
+  'Assignment dashboard route should not rebuild status options, filter summaries, pagination, summary, empty state, or published panel context directly.'
 );
 assert.match(
   assignmentListViewSource,
@@ -10015,6 +10033,73 @@ assert.deepEqual(
     status: 'closed',
   }
 );
+assert.deepEqual(
+  buildAssignmentListFilterRouteSearch({
+    current: {
+      q: 'old search',
+      status: 'closed',
+    },
+    next: {
+      q: '  Ｎｅｗ   search  ',
+    },
+    published: 'share-1',
+  }),
+  {
+    page: undefined,
+    published: 'share-1',
+    q: 'New search',
+    status: 'closed',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListFilterRouteSearch({
+    current: {
+      q: 'old search',
+      status: 'closed',
+    },
+    next: {
+      q: '',
+      status: 'all',
+    },
+    published: 'share-1',
+  }),
+  {
+    page: undefined,
+    published: 'share-1',
+    q: undefined,
+    status: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListDismissPublishedRouteSearch({
+    current: {
+      page: 1,
+      q: '  share   123  ',
+      status: 'all',
+    },
+  }),
+  {
+    page: undefined,
+    published: undefined,
+    q: 'share 123',
+    status: undefined,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListDismissPublishedRouteSearch({
+    current: {
+      page: 5,
+      q: 'week',
+      status: 'expired',
+    },
+  }),
+  {
+    page: 5,
+    published: undefined,
+    q: 'week',
+    status: 'expired',
+  }
+);
 assert.equal(parseAssignmentStatusFilter('published'), 'open');
 assert.equal(parseAssignmentStatusFilter('open'), 'open');
 assert.equal(parseAssignmentStatusFilter('expired'), 'expired');
@@ -10045,6 +10130,35 @@ assert.deepEqual(
     total: 2,
   }),
   { hasFilters: true, text: '2 matches' }
+);
+assert.deepEqual(
+  buildAssignmentListSearchPanelView({
+    isLoading: false,
+    search: ' week ',
+    status: 'open',
+    total: 2,
+  }),
+  {
+    filterSummary: { hasFilters: true, text: '2 matches' },
+    hasSearchValue: true,
+    statusOptions: assignmentStatusFilterOptions,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListSearchPanelView({
+    isLoading: true,
+    search: '',
+    status: 'all',
+    total: 0,
+  }),
+  {
+    filterSummary: {
+      hasFilters: false,
+      text: 'Loading assignments...',
+    },
+    hasSearchValue: false,
+    statusOptions: assignmentStatusFilterOptions,
+  }
 );
 assert.deepEqual(
   buildAssignmentListSummary({

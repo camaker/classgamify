@@ -12,7 +12,9 @@ import {
   normalizeAssignmentListSearch,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListFilterSummary,
   buildAssignmentListSummaryMetrics,
+  type AssignmentListFilterSummary,
   type AssignmentListSummary,
   type AssignmentListSummaryMetric,
 } from '@/assignments/list-summary';
@@ -39,6 +41,12 @@ import { m } from '@/locale/paraglide/messages';
 type AssignmentListControlOption = {
   label: string;
   value: AssignmentStatusFilter;
+};
+
+type AssignmentListSearchPanelView = {
+  filterSummary: AssignmentListFilterSummary;
+  hasSearchValue: boolean;
+  statusOptions: AssignmentListControlOption[];
 };
 
 type AssignmentListCardStatKey = 'average' | 'completions';
@@ -310,6 +318,31 @@ export const assignmentStatusFilterOptions = [
     value: 'draft',
   },
 ] satisfies Array<AssignmentListControlOption>;
+
+export function buildAssignmentListSearchPanelView({
+  isLoading,
+  search,
+  status,
+  total,
+}: {
+  isLoading: boolean;
+  search: string;
+  status: AssignmentStatusFilter;
+  total: number;
+}): AssignmentListSearchPanelView {
+  const normalizedSearch = normalizeAssignmentListSearch(search);
+
+  return {
+    filterSummary: buildAssignmentListFilterSummary({
+      isLoading,
+      search: normalizedSearch,
+      status,
+      total,
+    }),
+    hasSearchValue: Boolean(search),
+    statusOptions: assignmentStatusFilterOptions,
+  };
+}
 
 export function getAssignmentListEmptyState({
   hasFilters,

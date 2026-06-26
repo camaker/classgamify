@@ -38,6 +38,11 @@ export type AssignmentListSummaryMetric = {
   value: string;
 };
 
+export type AssignmentListFilterSummary = {
+  hasFilters: boolean;
+  text: string;
+};
+
 export function buildAssignmentListSummary({
   attempts,
   assignments,
@@ -76,7 +81,7 @@ export function buildAssignmentListFilterSummary({
   search?: string;
   status: AssignmentStatusFilter;
   total: number;
-}) {
+}): AssignmentListFilterSummary {
   const hasFilters = Boolean(search) || status !== 'all';
 
   return {
