@@ -571,6 +571,7 @@
   "assignment_api_error_status_load_failed": "Assignment status was saved but could not be loaded.",
   "assignment_api_error_student_name_required": "Student name is required for this assignment.",
   "assignment_attempt_answers_error_duplicate_item": "Submitted answers include a duplicate item.",
+  "assignment_attempt_answers_error_duplicate_runtime_item": "Assignment runtime items include a duplicate item id.",
   "assignment_attempt_answers_error_too_many": "Submitted answers exceed assignment item count.",
   "assignment_attempt_answers_error_unknown_item": "Submitted answers include an unknown item.",
   "assignment_attempt_duration_readable_minutes": "{minutes}m {seconds}s",

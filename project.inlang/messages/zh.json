@@ -571,6 +571,7 @@
   "assignment_api_error_status_load_failed": "作业状态已保存，但无法重新加载。",
   "assignment_api_error_student_name_required": "这份作业需要填写学生姓名。",
   "assignment_attempt_answers_error_duplicate_item": "提交的答案包含重复题目。",
+  "assignment_attempt_answers_error_duplicate_runtime_item": "作业运行题目包含重复题目 ID。",
   "assignment_attempt_answers_error_too_many": "提交的答案超过了作业题目数。",
   "assignment_attempt_answers_error_unknown_item": "提交的答案包含未知题目。",
   "assignment_attempt_duration_readable_minutes": "{minutes} 分 {seconds} 秒",

@@ -44,7 +44,9 @@ function assertRuntimeItemIdsAreUnique(
 
   for (const item of runtimeItems) {
     if (runtimeItemIds.has(item.id)) {
-      throw new Error(m.assignment_attempt_answers_error_duplicate_item());
+      throw new Error(
+        m.assignment_attempt_answers_error_duplicate_runtime_item()
+      );
     }
 
     runtimeItemIds.add(item.id);

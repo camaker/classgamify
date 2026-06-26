@@ -15107,7 +15107,7 @@ assert.throws(
       answers: [{ itemId: 'item-1' }, { itemId: 'item-2' }],
       runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
     }),
-  /duplicate item/
+  /runtime items include a duplicate item id/
 );
 
 assert.equal(
