@@ -66,6 +66,10 @@ export type PrintableAssignmentWorksheet = {
   templateType: ActivityTemplateType;
 };
 
+export type PrintableAssignmentSearch = {
+  answerKey?: boolean;
+};
+
 type PrintableAssignmentWorksheetSource = {
   activity: {
     description: string | null;
@@ -86,6 +90,16 @@ type PrintableAssignmentWorksheetSource = {
     templateType: ActivityTemplateType;
   } | null;
 };
+
+export function parsePrintableAssignmentSearch(
+  search: Record<string, unknown>
+): PrintableAssignmentSearch {
+  return {
+    answerKey: isPrintableAnswerKeySearchEnabled(search.answerKey)
+      ? true
+      : undefined,
+  };
+}
 
 export function buildPrintableAssignmentWorksheet({
   activity,
@@ -139,6 +153,10 @@ export function buildPrintableAssignmentWorksheet({
     shareSlug,
     templateType,
   };
+}
+
+function isPrintableAnswerKeySearchEnabled(value: unknown) {
+  return value === true || value === 'true' || value === '1';
 }
 
 function toPrintableWorksheetItem({

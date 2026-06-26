@@ -263,7 +263,10 @@ import {
   resolveAssignmentRuntimeSource,
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
-import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
+import {
+  buildPrintableAssignmentWorksheet,
+  parsePrintableAssignmentSearch,
+} from '@/assignments/printable-worksheet';
 import {
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetItemView,
@@ -5089,6 +5092,21 @@ assert.equal(
 );
 assert.equal(printableSnapshotWorksheet.includeAnswerKey, false);
 assert.equal(printableSnapshotWorksheet.answerKey, undefined);
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: true }), {
+  answerKey: true,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'true' }), {
+  answerKey: true,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '1' }), {
+  answerKey: true,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'yes' }), {
+  answerKey: undefined,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({}), {
+  answerKey: undefined,
+});
 assert.equal(printableSnapshotWorksheet.instructions, 'Finish on paper.');
 assert.equal(printableSnapshotWorksheet.shareSlug, 'printable-1');
 assert.equal(printableSnapshotWorksheet.sharePath, '/play/printable-1');
@@ -7040,6 +7058,16 @@ assert.match(
   printableAssignmentRouteSource,
   /middleware: \[authRouteMiddleware\]/,
   'Printable worksheet route should require authenticated teacher access.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /parsePrintableAssignmentSearch/,
+  'Printable worksheet route should reuse the assignment-domain search parser.'
+);
+assert.doesNotMatch(
+  printableAssignmentRouteSource,
+  /answerKey === 'true'|answerKey === '1'/,
+  'Printable worksheet route should not keep local answer-key query parsing.'
 );
 assert.match(
   printableAssignmentRouteSource,

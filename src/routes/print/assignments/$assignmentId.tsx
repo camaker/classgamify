@@ -1,4 +1,8 @@
 import {
+  parsePrintableAssignmentSearch,
+  type PrintableAssignmentSearch,
+} from '@/assignments/printable-worksheet';
+import {
   buildPrintableWorksheetHeaderView,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetItemView,
@@ -22,10 +26,6 @@ import {
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
-
-type PrintableAssignmentSearch = {
-  answerKey?: boolean;
-};
 
 export const Route = createFileRoute('/print/assignments/$assignmentId')({
   validateSearch: parsePrintableAssignmentSearch,
@@ -346,17 +346,4 @@ function PrintableWorksheetItem({
       </div>
     </section>
   );
-}
-
-function parsePrintableAssignmentSearch(
-  search: Record<string, unknown>
-): PrintableAssignmentSearch {
-  return {
-    answerKey:
-      search.answerKey === true ||
-      search.answerKey === 'true' ||
-      search.answerKey === '1'
-        ? true
-        : undefined,
-  };
 }
