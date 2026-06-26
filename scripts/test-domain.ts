@@ -413,6 +413,7 @@ import {
   buildAssignmentItemPerformanceRowView,
   buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
@@ -421,6 +422,7 @@ import {
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
+  buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsPageViewModel,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentStudentSummaryRowViews,
@@ -1037,13 +1039,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /toast\.error\(actionButton\.failureMessage\)/,
+  /toast\.error\(executionPlan\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
 );
 assert.match(
   assignmentResultsRouteSource,
-  /buildAssignmentResultActionPayload\(\{\s*actionButton,\s*data,\s*\}\)/,
-  'Result route should let the assignment-domain payload helper build copy and CSV artifacts from page data.'
+  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data,[\s\S]*\}\)/,
+  'Result route should let the assignment-domain execution plan build copy and CSV download artifacts from page data.'
+);
+assert.doesNotMatch(
+  assignmentResultsRouteSource,
+  /buildAssignmentResultActionPayload\(|data:text\/csv|encodeURIComponent\(/,
+  'Result route should not build result action payloads or CSV data URLs locally.'
 );
 assert.doesNotMatch(
   assignmentResultsRouteSource,
@@ -20679,6 +20686,26 @@ assert.deepEqual(
     text: classroomBrief.text,
   }
 );
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: {
+      action: 'copy-brief',
+      disabled: false,
+      failureMessage: 'Classroom brief could not be copied.',
+      gate: { type: 'ready' },
+      kind: 'copy-text',
+      label: 'Copy brief',
+      successMessage: 'Classroom brief copied.',
+    },
+    data: csvExportData,
+  }),
+  {
+    failureMessage: 'Classroom brief could not be copied.',
+    successMessage: 'Classroom brief copied.',
+    text: classroomBrief.text,
+    type: 'copy-text',
+  }
+);
 assert.throws(
   () =>
     buildAssignmentResultActionPayload({
@@ -20719,6 +20746,31 @@ assert.equal(
   downloadCsvPayload.kind === 'download-csv' ? downloadCsvPayload.csv : '',
   csv
 );
+assert.equal(
+  buildAssignmentResultsCsvDataUrl(csv),
+  `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: {
+      action: 'export-csv',
+      disabled: false,
+      failureMessage: 'Results CSV could not be downloaded.',
+      gate: { type: 'ready' },
+      kind: 'download-csv',
+      label: 'Download CSV',
+      successMessage: 'Results CSV downloaded.',
+    },
+    data: csvExportData,
+  }),
+  {
+    failureMessage: 'Results CSV could not be downloaded.',
+    filename: buildAssignmentResultsCsvFilename(csvExportData),
+    successMessage: 'Results CSV downloaded.',
+    type: 'download-csv',
+    url: buildAssignmentResultsCsvDataUrl(csv),
+  }
+);
 assert.throws(
   () =>
     buildAssignmentResultActionPayload({
@@ -20737,6 +20789,47 @@ assert.throws(
       data: csvExportData,
     }),
   /Submit at least one attempt before exporting results\./
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: {
+      action: 'export-csv',
+      disabled: true,
+      failureMessage: 'Results CSV could not be downloaded.',
+      gate: {
+        message: 'Submit at least one attempt before exporting results.',
+        type: 'blocked',
+      },
+      kind: 'download-csv',
+      label: 'Download CSV',
+      successMessage: 'Results CSV downloaded.',
+    },
+    data: csvExportData,
+  }),
+  {
+    failureMessage: 'Results CSV could not be downloaded.',
+    message: 'Submit at least one attempt before exporting results.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: {
+      action: 'copy-brief',
+      disabled: false,
+      failureMessage: 'Classroom brief could not be copied.',
+      gate: { type: 'ready' },
+      kind: 'copy-text',
+      label: 'Copy brief',
+      successMessage: 'Classroom brief copied.',
+    },
+    data: null,
+  }),
+  {
+    failureMessage: 'Classroom brief could not be copied.',
+    message: 'Classroom brief could not be copied.',
+    type: 'blocked',
+  }
 );
 
 console.log('Domain tests passed.');

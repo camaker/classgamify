@@ -173,6 +173,26 @@ type AssignmentResultActionPayload =
       kind: 'download-csv';
     };
 
+type AssignmentResultActionExecutionPlan =
+  | {
+      failureMessage: string;
+      message: string;
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      successMessage: string;
+      text: string;
+      type: 'copy-text';
+    }
+  | {
+      failureMessage: string;
+      filename: string;
+      successMessage: string;
+      type: 'download-csv';
+      url: string;
+    };
+
 type AssignmentResultActionButtonBase = {
   disabled: boolean;
   failureMessage: string;
@@ -941,6 +961,56 @@ export function buildAssignmentResultActionPayload({
       data,
     }),
   };
+}
+
+export function buildAssignmentResultActionExecutionPlan({
+  actionButton,
+  data,
+}: {
+  actionButton: AssignmentResultActionButton;
+  data?: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput> | null;
+}): AssignmentResultActionExecutionPlan {
+  if (actionButton.gate.type === 'blocked') {
+    return {
+      failureMessage: actionButton.failureMessage,
+      message: actionButton.gate.message,
+      type: 'blocked',
+    };
+  }
+
+  if (!data) {
+    return {
+      failureMessage: actionButton.failureMessage,
+      message: actionButton.failureMessage,
+      type: 'blocked',
+    };
+  }
+
+  const payload = buildAssignmentResultActionPayload({
+    actionButton,
+    data,
+  });
+
+  if (payload.kind === 'download-csv') {
+    return {
+      failureMessage: actionButton.failureMessage,
+      filename: payload.filename,
+      successMessage: actionButton.successMessage,
+      type: 'download-csv',
+      url: buildAssignmentResultsCsvDataUrl(payload.csv),
+    };
+  }
+
+  return {
+    failureMessage: actionButton.failureMessage,
+    successMessage: actionButton.successMessage,
+    text: payload.text,
+    type: 'copy-text',
+  };
+}
+
+export function buildAssignmentResultsCsvDataUrl(csv: string) {
+  return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
 }
 
 export function buildAssignmentResultSectionState({

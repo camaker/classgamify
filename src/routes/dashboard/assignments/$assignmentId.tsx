@@ -1,6 +1,6 @@
 import {
   type AssignmentResultActionButton,
-  buildAssignmentResultActionPayload,
+  buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultsPageViewModel,
   assignmentResultSectionCopy,
 } from '@/assignments/result-view';
@@ -72,32 +72,25 @@ function AssignmentResultsPage() {
   async function handleResultAction(
     actionButton: AssignmentResultActionButton
   ) {
-    if (!data || actionButton.gate.type === 'blocked') {
-      toast.error(
-        actionButton.gate.type === 'blocked'
-          ? actionButton.gate.message
-          : actionButton.failureMessage
-      );
+    const executionPlan = buildAssignmentResultActionExecutionPlan({
+      actionButton,
+      data,
+    });
+
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
 
     try {
-      const payload = buildAssignmentResultActionPayload({
-        actionButton,
-        data,
-      });
-
-      if (payload.kind === 'download-csv') {
-        const csvUrl = `data:text/csv;charset=utf-8,${encodeURIComponent(
-          payload.csv
-        )}`;
-        await downloadFile(csvUrl, payload.filename);
+      if (executionPlan.type === 'download-csv') {
+        await downloadFile(executionPlan.url, executionPlan.filename);
       } else {
-        await copyTextToClipboard(payload.text);
+        await copyTextToClipboard(executionPlan.text);
       }
-      toast.success(actionButton.successMessage);
+      toast.success(executionPlan.successMessage);
     } catch {
-      toast.error(actionButton.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 
