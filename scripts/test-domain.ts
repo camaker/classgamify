@@ -18505,6 +18505,52 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Alpha review', 'More review']
 );
+const abnormalFollowUpPriorityStudents = [
+  {
+    ...followUpPriorityStudents[0]!,
+    latestAccuracy: Number.NaN,
+    needsReviewCount: 2.9,
+    studentLabel: 'Fractional review',
+  },
+  {
+    ...followUpPriorityStudents[1]!,
+    latestAccuracy: 10,
+    needsReviewCount: Number.POSITIVE_INFINITY,
+    studentLabel: 'Non-finite review',
+  },
+  {
+    ...followUpPriorityStudents[2]!,
+    latestAccuracy: 0,
+    needsReviewCount: -1,
+    studentLabel: 'Negative review',
+  },
+  {
+    ...followUpPriorityStudents[3]!,
+    latestAccuracy: 5,
+    needsReviewCount: 2,
+    studentLabel: 'Lower finite score',
+  },
+] satisfies typeof resultAnalysis.students;
+assert.deepEqual(
+  sortAssignmentStudentsByFollowUpPriority(
+    abnormalFollowUpPriorityStudents
+  ).map((student) => student.studentLabel),
+  [
+    'Fractional review',
+    'Lower finite score',
+    'Negative review',
+    'Non-finite review',
+  ]
+);
+assert.deepEqual(
+  getAssignmentStudentFollowUpPriorityStudents(
+    abnormalFollowUpPriorityStudents,
+    {
+      limit: 1.9,
+    }
+  ).map((student) => student.studentLabel),
+  ['Fractional review']
+);
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'accuracy').map(
     (item) => item.itemId
@@ -18632,6 +18678,44 @@ assert.deepEqual(
     limit: 2,
   }).map((item) => item.itemId),
   ['tie-more-submitted', 'tie-fewer-submitted']
+);
+const abnormalReviewPriorityItems = [
+  {
+    ...reviewPriorityItems[0]!,
+    correctRate: Number.NaN,
+    itemId: 'nan-unsubmitted',
+    submittedCount: Number.POSITIVE_INFINITY,
+  },
+  {
+    ...reviewPriorityItems[1]!,
+    correctRate: -10,
+    itemId: 'negative-rate',
+    submittedCount: 2.9,
+  },
+  {
+    ...reviewPriorityItems[2]!,
+    correctRate: 0,
+    itemId: 'zero-rate',
+    submittedCount: 2,
+  },
+  {
+    ...reviewPriorityItems[3]!,
+    correctRate: 50.5,
+    itemId: 'fractional-rate',
+    submittedCount: 5,
+  },
+] satisfies typeof resultAnalysis.perItem;
+assert.deepEqual(
+  sortAssignmentItemsByReviewPriority(abnormalReviewPriorityItems).map(
+    (item) => item.itemId
+  ),
+  ['zero-rate', 'negative-rate', 'nan-unsubmitted', 'fractional-rate']
+);
+assert.deepEqual(
+  getSubmittedAssignmentReviewPriorityItems(abnormalReviewPriorityItems, {
+    limit: 2.9,
+  }).map((item) => item.itemId),
+  ['zero-rate', 'negative-rate']
 );
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'submitted').map(

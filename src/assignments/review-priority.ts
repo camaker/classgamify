@@ -4,12 +4,18 @@ export function compareAssignmentItemsByReviewPriority(
   left: AssignmentItemAnalysis,
   right: AssignmentItemAnalysis
 ) {
-  if (left.correctRate !== right.correctRate) {
-    return left.correctRate - right.correctRate;
+  const leftCorrectRate = normalizeReviewPriorityNumber(left.correctRate);
+  const rightCorrectRate = normalizeReviewPriorityNumber(right.correctRate);
+  if (leftCorrectRate !== rightCorrectRate) {
+    return leftCorrectRate - rightCorrectRate;
   }
 
-  if (left.submittedCount !== right.submittedCount) {
-    return right.submittedCount - left.submittedCount;
+  const leftSubmittedCount = normalizeReviewPriorityCount(left.submittedCount);
+  const rightSubmittedCount = normalizeReviewPriorityCount(
+    right.submittedCount
+  );
+  if (leftSubmittedCount !== rightSubmittedCount) {
+    return rightSubmittedCount - leftSubmittedCount;
   }
 
   return compareAssignmentItemsByStableOrder(left, right);
@@ -48,10 +54,22 @@ export function getSubmittedAssignmentReviewPriorityItems(
   }
 ) {
   const sortedItems = sortAssignmentItemsByReviewPriority(
-    items.filter((item) => item.submittedCount > 0)
+    items.filter(
+      (item) => normalizeReviewPriorityCount(item.submittedCount) > 0
+    )
   );
+  const limit =
+    options?.limit === undefined
+      ? undefined
+      : normalizeReviewPriorityCount(options.limit);
 
-  return options?.limit === undefined
-    ? sortedItems
-    : sortedItems.slice(0, options.limit);
+  return limit === undefined ? sortedItems : sortedItems.slice(0, limit);
+}
+
+function normalizeReviewPriorityNumber(value: number) {
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
+function normalizeReviewPriorityCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
