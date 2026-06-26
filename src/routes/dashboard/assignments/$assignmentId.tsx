@@ -248,7 +248,7 @@ function LoadedAssignmentResultsPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {pageView.resultView.filteredStudents.length > 0 ? (
+            {pageView.contentState.hasStudentSummaryRows ? (
               <AssignmentResultsStudentSummaryTable
                 students={pageView.studentSummaryRowViews}
               />
@@ -273,7 +273,7 @@ function LoadedAssignmentResultsPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {pageView.resultView.filteredAttemptRows.length > 0 ? (
+          {pageView.contentState.hasAttemptRows ? (
             <AssignmentResultsAttemptsTable
               attempts={pageView.attemptRowViews}
             />
@@ -314,7 +314,7 @@ function LoadedAssignmentResultsPage({
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            {pageView.attemptReviewCardViews.length > 0 ? (
+            {pageView.contentState.hasAttemptReviewCards ? (
               pageView.attemptReviewCardViews.map((attemptView) => (
                 <AssignmentResultsAttemptReviewCard
                   key={attemptView.id}

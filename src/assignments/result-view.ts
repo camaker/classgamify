@@ -234,6 +234,12 @@ type AssignmentResultSectionState = {
   showStudentSummary: boolean;
 };
 
+type AssignmentResultContentState = {
+  hasAttemptReviewCards: boolean;
+  hasAttemptRows: boolean;
+  hasStudentSummaryRows: boolean;
+};
+
 type AssignmentResultPageBreadcrumb = {
   href?: string;
   isCurrentPage?: boolean;
@@ -342,6 +348,7 @@ type AssignmentResultsPageViewModel<
   completedAttemptCount: number;
   completedAttemptReviewCount: number;
   completedAttempts: TAttempt[];
+  contentState: AssignmentResultContentState;
   controlViews: AssignmentResultControlViews;
   description: string;
   headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
@@ -1658,6 +1665,11 @@ export function buildAssignmentResultsPageViewModel<
   const attemptReviewCardViews = buildAssignmentAttemptReviewCardViews(
     resultView.filteredAttemptReviews
   );
+  const contentState = buildAssignmentResultContentState({
+    attemptReviewCardCount: attemptReviewCardViews.length,
+    attemptRowCount: attemptRowViews.length,
+    studentSummaryRowCount: studentSummaryRowViews.length,
+  });
   const classroomBrief = data
     ? buildAssignmentClassroomBrief({
         assignmentTitle: data.assignment.title,
@@ -1700,6 +1712,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttemptCount,
     completedAttemptReviewCount,
     completedAttempts,
+    contentState,
     controlViews,
     description: assignmentResultPageCopy.description,
     headerView,
@@ -1726,6 +1739,22 @@ export function buildAssignmentResultsPageViewModel<
     studentSummaryRowViews,
     title,
     viewState,
+  };
+}
+
+export function buildAssignmentResultContentState({
+  attemptReviewCardCount,
+  attemptRowCount,
+  studentSummaryRowCount,
+}: {
+  attemptReviewCardCount: number;
+  attemptRowCount: number;
+  studentSummaryRowCount: number;
+}): AssignmentResultContentState {
+  return {
+    hasAttemptReviewCards: attemptReviewCardCount > 0,
+    hasAttemptRows: attemptRowCount > 0,
+    hasStudentSummaryRows: studentSummaryRowCount > 0,
   };
 }
 

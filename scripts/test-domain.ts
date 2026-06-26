@@ -418,6 +418,7 @@ import {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
+  buildAssignmentResultContentState,
   buildAssignmentResultHeaderView,
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
@@ -1829,6 +1830,26 @@ assert.match(
   assignmentResultRouteSource,
   /AssignmentResultsAttemptReviewFilterControl[\s\S]*view=\{pageView\.controlViews\.attemptReviewFilter\}/,
   'Assignment result route should delegate answer review controls with the assignment-domain control view.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.contentState\.hasStudentSummaryRows/,
+  'Assignment result route should render student-summary empty state from the assignment-domain content state.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.contentState\.hasAttemptRows/,
+  'Assignment result route should render attempt-row empty state from the assignment-domain content state.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.contentState\.hasAttemptReviewCards/,
+  'Assignment result route should render answer-review empty state from the assignment-domain content state.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /filteredStudents\.length|filteredAttemptRows\.length|attemptReviewCardViews\.length/,
+  'Assignment result route should not inspect filtered result array lengths directly.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -17631,6 +17652,7 @@ assert.deepEqual(
     actionCount: emptyResultsPageView.actionButtons.length,
     breadcrumbs: emptyResultsPageView.breadcrumbs,
     completedAttemptCount: emptyResultsPageView.completedAttemptCount,
+    contentState: emptyResultsPageView.contentState,
     headerView: emptyResultsPageView.headerView,
     metricItems: emptyResultsPageView.metricItems,
     sectionState: emptyResultsPageView.sectionState,
@@ -17645,6 +17667,11 @@ assert.deepEqual(
       { isCurrentPage: true, label: 'Assignment results' },
     ],
     completedAttemptCount: 0,
+    contentState: {
+      hasAttemptReviewCards: false,
+      hasAttemptRows: false,
+      hasStudentSummaryRows: false,
+    },
     headerView: null,
     metricItems: [],
     sectionState: {
@@ -17741,6 +17768,7 @@ assert.deepEqual(
     ),
     completedAttemptReviewCount:
       scoredResultsPageView.completedAttemptReviewCount,
+    contentState: scoredResultsPageView.contentState,
     classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
     controlViews: {
       attemptReviewFilter: [
@@ -17803,6 +17831,11 @@ assert.deepEqual(
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
+    contentState: {
+      hasAttemptReviewCards: false,
+      hasAttemptRows: true,
+      hasStudentSummaryRows: true,
+    },
     classroomBriefReady: true,
     controlViews: {
       attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
@@ -17849,6 +17882,18 @@ assert.deepEqual(
       studentSearch: 'Alice',
       studentSort: 'name',
     },
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultContentState({
+    attemptReviewCardCount: 1,
+    attemptRowCount: 0,
+    studentSummaryRowCount: 2,
+  }),
+  {
+    hasAttemptReviewCards: true,
+    hasAttemptRows: false,
+    hasStudentSummaryRows: true,
   }
 );
 
