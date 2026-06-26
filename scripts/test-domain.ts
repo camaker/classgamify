@@ -10770,6 +10770,17 @@ assert.deepEqual(
   }).filterSummary,
   { hasFilters: false, text: 'Loading activities...' }
 );
+assert.equal(
+  buildActivityLibrarySearchPanelView({
+    isLoading: false,
+    search: '   ',
+    source: 'all',
+    status: 'active',
+    template: 'all',
+    total: 0,
+  }).hasSearchValue,
+  false
+);
 assert.deepEqual(
   buildActivityLibraryEmptyStateView({
     search: undefined,
@@ -11297,6 +11308,15 @@ assert.deepEqual(
     hasSearchValue: false,
     statusOptions: assignmentStatusFilterOptions,
   }
+);
+assert.equal(
+  buildAssignmentListSearchPanelView({
+    isLoading: false,
+    search: '   ',
+    status: 'all',
+    total: 0,
+  }).hasSearchValue,
+  false
 );
 assert.deepEqual(
   buildAssignmentListSummary({
@@ -17544,6 +17564,20 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  resolveAssignmentResultViewState({
+    itemSort: 'invalid',
+    review: 'later',
+    sort: 'fastest',
+    student: '  Ava   Chen  ',
+  } as never),
+  {
+    attemptReviewFilter: 'all',
+    itemPerformanceSort: 'original',
+    studentSearch: 'Ava Chen',
+    studentSort: 'needs-review',
+  }
+);
+assert.deepEqual(
   buildAssignmentResultSearchState({
     current: {},
     next: {
@@ -17598,6 +17632,27 @@ assert.deepEqual(
     itemSort: 'submitted',
     review: undefined,
     sort: 'attempts',
+    student: 'Ava Chen',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSearchState({
+    current: {
+      itemSort: 'submitted',
+      review: 'needs-review',
+      sort: 'attempts',
+      student: 'Ava Chen',
+    },
+    next: {
+      itemSort: 'later',
+      review: 'wrong',
+      sort: 'fastest',
+    },
+  } as never),
+  {
+    itemSort: undefined,
+    review: undefined,
+    sort: undefined,
     student: 'Ava Chen',
   }
 );
@@ -18187,7 +18242,13 @@ assert.deepEqual(
   ),
   stableTieItemOrder
 );
-assert.equal(
+assert.deepEqual(
+  sortItemPerformance(resultAnalysis.perItem, 'original').map(
+    (item) => item.itemId
+  ),
+  resultAnalysis.perItem.map((item) => item.itemId)
+);
+assert.notEqual(
   sortItemPerformance(resultAnalysis.perItem, 'original'),
   resultAnalysis.perItem
 );

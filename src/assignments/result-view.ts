@@ -1661,7 +1661,7 @@ export function sortItemPerformance(
   items: AssignmentItemAnalysis[],
   sort: ItemPerformanceSort
 ) {
-  if (sort === 'original') return items;
+  if (sort === 'original') return [...items];
 
   return [...items].sort((left, right) => {
     if (sort === 'accuracy') {
@@ -1731,10 +1731,16 @@ export function resolveAssignmentResultViewState(
   search: AssignmentResultSearchState
 ): AssignmentResultResolvedViewState {
   return {
-    attemptReviewFilter: search.review ?? DEFAULT_ATTEMPT_REVIEW_FILTER,
-    itemPerformanceSort: search.itemSort ?? DEFAULT_ITEM_PERFORMANCE_SORT,
-    studentSearch: search.student ?? '',
-    studentSort: search.sort ?? DEFAULT_STUDENT_SUMMARY_SORT,
+    attemptReviewFilter: isAttemptReviewFilter(search.review)
+      ? search.review
+      : DEFAULT_ATTEMPT_REVIEW_FILTER,
+    itemPerformanceSort: isItemPerformanceSort(search.itemSort)
+      ? search.itemSort
+      : DEFAULT_ITEM_PERFORMANCE_SORT,
+    studentSearch: normalizeResultSearchQuery(search.student) ?? '',
+    studentSort: isStudentSummarySort(search.sort)
+      ? search.sort
+      : DEFAULT_STUDENT_SUMMARY_SORT,
   };
 }
 
@@ -1901,9 +1907,24 @@ export function buildAssignmentResultSearchState({
     student: string;
   }>;
 }): AssignmentResultSearchState {
-  const itemSort = next.itemSort ?? current.itemSort;
-  const review = next.review ?? current.review;
-  const sort = next.sort ?? current.sort;
+  const itemSort = resolveAssignmentResultSearchOption({
+    currentValue: current.itemSort,
+    defaultValue: DEFAULT_ITEM_PERFORMANCE_SORT,
+    isValue: isItemPerformanceSort,
+    nextValue: next.itemSort,
+  });
+  const review = resolveAssignmentResultSearchOption({
+    currentValue: current.review,
+    defaultValue: DEFAULT_ATTEMPT_REVIEW_FILTER,
+    isValue: isAttemptReviewFilter,
+    nextValue: next.review,
+  });
+  const sort = resolveAssignmentResultSearchOption({
+    currentValue: current.sort,
+    defaultValue: DEFAULT_STUDENT_SUMMARY_SORT,
+    isValue: isStudentSummarySort,
+    nextValue: next.sort,
+  });
   const student = next.student ?? current.student;
 
   return {
@@ -1997,6 +2018,24 @@ function isAttemptReviewFilter(value: unknown): value is AttemptReviewFilter {
     typeof value === 'string' &&
     ATTEMPT_REVIEW_FILTER_VALUES.includes(value as AttemptReviewFilter)
   );
+}
+
+function resolveAssignmentResultSearchOption<TValue extends string>({
+  currentValue,
+  defaultValue,
+  isValue,
+  nextValue,
+}: {
+  currentValue: TValue | undefined;
+  defaultValue: TValue;
+  isValue: (value: unknown) => value is TValue;
+  nextValue: TValue | undefined;
+}) {
+  if (nextValue !== undefined) {
+    return isValue(nextValue) ? nextValue : defaultValue;
+  }
+
+  return isValue(currentValue) ? currentValue : defaultValue;
 }
 
 function compareStudentsDescending(

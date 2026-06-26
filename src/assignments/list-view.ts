@@ -348,7 +348,7 @@ export function buildAssignmentListSearchPanelView({
       status,
       total,
     }),
-    hasSearchValue: Boolean(search),
+    hasSearchValue: Boolean(normalizedSearch),
     statusOptions: assignmentStatusFilterOptions,
   };
 }

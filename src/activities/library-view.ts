@@ -499,7 +499,7 @@ export function buildActivityLibrarySearchPanelView({
       template,
       total,
     }),
-    hasSearchValue: Boolean(search),
+    hasSearchValue: Boolean(normalizedSearch),
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
