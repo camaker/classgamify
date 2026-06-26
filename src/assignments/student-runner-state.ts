@@ -47,6 +47,15 @@ type StudentRunnerAttemptState = {
   runtimeItems: PublicRuntimeItem[];
 };
 
+export type StudentRunnerAttemptResetState = {
+  answers: StudentAnswerMap;
+  anonymousToken?: string;
+  attemptClock?: StudentRunnerAttemptClock;
+  confirmIncompleteSubmit: boolean;
+  studentName: string;
+  submittedAttemptCount: number;
+};
+
 export type StudentRunnerAttemptClock = {
   shareId: string;
   startedAt: number;
@@ -192,6 +201,17 @@ export function buildStudentRunnerAttemptClock({
   };
 }
 
+export function buildStudentRunnerAttemptResetState(): StudentRunnerAttemptResetState {
+  return {
+    answers: {},
+    anonymousToken: undefined,
+    attemptClock: undefined,
+    confirmIncompleteSubmit: false,
+    studentName: '',
+    submittedAttemptCount: 0,
+  };
+}
+
 export function getStudentRunnerAttemptStartedAt({
   activeShareId,
   attemptClock,
@@ -231,6 +251,18 @@ export function shouldStartStudentRunnerAttemptClock({
     normalizeAssignmentShareSlug(attemptClock?.shareId ?? '') !==
     normalizeAssignmentShareSlug(activeShareId)
   );
+}
+
+export function shouldResetStudentRunnerAttemptSession({
+  attemptSessionKey,
+  currentAttemptSessionKey,
+}: {
+  attemptSessionKey?: string;
+  currentAttemptSessionKey?: string;
+}) {
+  if (!currentAttemptSessionKey) return false;
+
+  return attemptSessionKey !== currentAttemptSessionKey;
 }
 
 function orderStudentRunnerRuntimeItems({

@@ -43,9 +43,11 @@ import {
 import {
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptState,
+  buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
   getStudentRunnerAttemptStartedAt,
   shouldStartStudentRunnerAttemptClock,
+  shouldResetStudentRunnerAttemptSession,
   type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
@@ -229,16 +231,23 @@ function PlayPage() {
   }, [result, timeLimitSeconds]);
 
   useEffect(() => {
-    if (!currentAttemptSessionKey) return;
-    if (attemptSessionKey === currentAttemptSessionKey) return;
+    if (
+      !shouldResetStudentRunnerAttemptSession({
+        attemptSessionKey,
+        currentAttemptSessionKey,
+      })
+    ) {
+      return;
+    }
 
-    setAnswers({});
+    const nextResetState = buildStudentRunnerAttemptResetState();
+    setAnswers(nextResetState.answers);
     setResult(undefined);
-    setConfirmIncompleteSubmit(false);
-    setStudentName('');
-    setAttemptClock(undefined);
-    setSubmittedAttemptCount(0);
-    setAnonymousToken(undefined);
+    setConfirmIncompleteSubmit(nextResetState.confirmIncompleteSubmit);
+    setStudentName(nextResetState.studentName);
+    setAttemptClock(nextResetState.attemptClock);
+    setSubmittedAttemptCount(nextResetState.submittedAttemptCount);
+    setAnonymousToken(nextResetState.anonymousToken);
     setAttemptSessionKey(currentAttemptSessionKey);
   }, [attemptSessionKey, currentAttemptSessionKey]);
 
@@ -333,11 +342,12 @@ function PlayPage() {
   }
 
   function startAnotherAttempt() {
+    const nextResetState = buildStudentRunnerAttemptResetState();
     const nextStartedAt = Date.now();
-    setAnswers({});
     setResult(undefined);
-    setConfirmIncompleteSubmit(false);
-    setAttemptClock(undefined);
+    setConfirmIncompleteSubmit(nextResetState.confirmIncompleteSubmit);
+    setAnswers(nextResetState.answers);
+    setAttemptClock(nextResetState.attemptClock);
     setNow(nextStartedAt);
   }
 

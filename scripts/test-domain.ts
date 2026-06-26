@@ -464,10 +464,12 @@ import {
 } from '@/assignments/attempt-identity-query';
 import {
   buildStudentRunnerAttemptClock,
+  buildStudentRunnerAttemptResetState,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
   buildStudentRunnerReadyState,
   getStudentRunnerAttemptStartedAt,
+  shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import {
@@ -2065,6 +2067,16 @@ assert.doesNotMatch(
   playRouteSource,
   /setAnswers\(\(current\) => \(\{[\s\S]*\.\.\.current,[\s\S]*\[itemId\]: answer/,
   'Student play route should not hand-build answer-map updates.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerAttemptResetState\(\)/,
+  'Student play route should use the shared attempt reset state helper.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /setAnswers\(\{\}\)[\s\S]*setConfirmIncompleteSubmit\(false\)[\s\S]*setStudentName\(''\)[\s\S]*setAttemptClock\(undefined\)[\s\S]*setSubmittedAttemptCount\(0\)[\s\S]*setAnonymousToken\(undefined\)/,
+  'Student play route should not hand-write the attempt reset bundle.'
 );
 const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
@@ -5891,6 +5903,35 @@ assert.equal(
     hasResult: false,
     itemCount: 2,
     ready: false,
+  }),
+  false
+);
+assert.deepEqual(buildStudentRunnerAttemptResetState(), {
+  answers: {},
+  anonymousToken: undefined,
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  studentName: '',
+  submittedAttemptCount: 0,
+});
+assert.equal(
+  shouldResetStudentRunnerAttemptSession({
+    attemptSessionKey: undefined,
+    currentAttemptSessionKey: 'session-1',
+  }),
+  true
+);
+assert.equal(
+  shouldResetStudentRunnerAttemptSession({
+    attemptSessionKey: 'session-1',
+    currentAttemptSessionKey: 'session-1',
+  }),
+  false
+);
+assert.equal(
+  shouldResetStudentRunnerAttemptSession({
+    attemptSessionKey: 'session-1',
+    currentAttemptSessionKey: undefined,
   }),
   false
 );
