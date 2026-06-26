@@ -3143,6 +3143,7 @@ assert.doesNotMatch(
 assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
 assert.equal(isStudentAnswerFilled(' answer '), true);
+assert.equal(isStudentAnswerFilled(' Ａ '), true);
 assert.equal(
   buildAnonymousAttemptTokenStorageKey('share/one'),
   'classgamify:attempt-token:share/one'
@@ -3422,6 +3423,14 @@ assert.deepEqual(
   {
     description:
       'This assignment does not collect student names. This browser will submit as Anonymous browser A1B2C3.',
+    title: 'Anonymous attempt',
+  }
+);
+assert.deepEqual(
+  buildAnonymousAttemptCopy({ browserLabel: ' Ａｎｏｎ   １ ' }),
+  {
+    description:
+      'This assignment does not collect student names. This browser will submit as Anon 1.',
     title: 'Anonymous attempt',
   }
 );
@@ -4019,6 +4028,43 @@ assert.deepEqual(
     unansweredItemCount: 2,
   }
 );
+const dirtySubmissionRuntimeItems = [
+  { id: ' item-１ ' },
+  { id: 'item-1' },
+  { id: '   ' },
+  { id: 'item-2' },
+  { id: 'item-２' },
+];
+const dirtySubmissionAnswers = {
+  ' item-１ ': ' Ａｐｐｌｅ ',
+  'item-1': '   ',
+  'item-2': '   ',
+  'item-２': ' ｂａｎａｎａ ',
+};
+assert.deepEqual(
+  getAttemptCompletionSummary({
+    answers: dirtySubmissionAnswers,
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  {
+    answeredItemCount: 2,
+    itemCount: 2,
+    unansweredItemCount: 0,
+  }
+);
+assert.deepEqual(
+  getAttemptCompletionSummary({
+    answers: {
+      ' item-１ ': ' Ａｐｐｌｅ ',
+    },
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  {
+    answeredItemCount: 1,
+    itemCount: 2,
+    unansweredItemCount: 1,
+  }
+);
 const incompleteCompletionSummary = getAttemptCompletionSummary({
   answers,
   runtimeItems: submissionRuntimeItems,
@@ -4210,11 +4256,48 @@ assert.equal(
   '1/3 answered'
 );
 assert.equal(
+  formatAttemptCompletionProgressLabel({
+    completionSummary: {
+      answeredItemCount: Number.NaN,
+      itemCount: -1,
+      unansweredItemCount: 9,
+    },
+    verb: ' ｍａｔｃｈｅｄ ',
+  }),
+  '0/0 matched'
+);
+assert.deepEqual(
+  buildAttemptCompletionCopy({
+    completionSummary: {
+      answeredItemCount: -1,
+      itemCount: Number.NaN,
+      unansweredItemCount: -2,
+    },
+    confirmIncompleteSubmit: true,
+    progressVerb: ' ｓｏｒｔｅｄ ',
+  }),
+  {
+    confirmIncompleteSubmit: 'All items are answered.',
+    progressLabel: '0/0 sorted',
+    submitButtonLabel: 'Submit answers',
+    unansweredLabel: undefined,
+  }
+);
+assert.equal(
   buildStudentAttemptSessionKey({
     runtimeItems: submissionRuntimeItems,
     shareSlug: ' share-one ',
   }),
   '["share-one",["item-1","item-2","item-3"]]'
+);
+assert.equal(
+  buildStudentAttemptSessionKey({
+    assignmentId: ' assignment-１ ',
+    runtimeItems: dirtySubmissionRuntimeItems,
+    shareSlug: ' share-one ',
+    templateType: ' ｑｕｉｚ ',
+  }),
+  '["share-one",{"assignmentId":"assignment-1","templateType":"quiz"},["item-1","item-2"]]'
 );
 assert.notEqual(
   buildStudentAttemptSessionKey({
@@ -4271,9 +4354,19 @@ assert.deepEqual(
     runtimeItems: submissionRuntimeItems,
   }),
   [
-    { answer: ' apple ', itemId: 'item-1' },
-    { answer: '   ', itemId: 'item-2' },
+    { answer: 'apple', itemId: 'item-1' },
+    { answer: '', itemId: 'item-2' },
     { answer: '', itemId: 'item-3' },
+  ]
+);
+assert.deepEqual(
+  buildAttemptSubmissionAnswers({
+    answers: dirtySubmissionAnswers,
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  [
+    { answer: 'Apple', itemId: 'item-1' },
+    { answer: 'banana', itemId: 'item-2' },
   ]
 );
 const changedAnswers = buildStudentAnswerChange({
@@ -4645,8 +4738,8 @@ assert.deepEqual(
   }),
   {
     answers: [
-      { answer: ' apple ', itemId: 'item-1' },
-      { answer: '   ', itemId: 'item-2' },
+      { answer: 'apple', itemId: 'item-1' },
+      { answer: '', itemId: 'item-2' },
       { answer: '', itemId: 'item-3' },
     ],
     durationSeconds: 89,
@@ -4665,8 +4758,8 @@ assert.deepEqual(
   }),
   {
     answers: [
-      { answer: ' apple ', itemId: 'item-1' },
-      { answer: '   ', itemId: 'item-2' },
+      { answer: 'apple', itemId: 'item-1' },
+      { answer: '', itemId: 'item-2' },
       { answer: '', itemId: 'item-3' },
     ],
     shareSlug: 'share-one',
@@ -4684,8 +4777,8 @@ assert.deepEqual(
   }),
   {
     answers: [
-      { answer: ' apple ', itemId: 'item-1' },
-      { answer: '   ', itemId: 'item-2' },
+      { answer: 'apple', itemId: 'item-1' },
+      { answer: '', itemId: 'item-2' },
       { answer: '', itemId: 'item-3' },
     ],
     durationSeconds: 5,
@@ -4705,8 +4798,8 @@ assert.deepEqual(
   {
     anonymousToken: 'anonymous-token-1',
     answers: [
-      { answer: ' apple ', itemId: 'item-1' },
-      { answer: '   ', itemId: 'item-2' },
+      { answer: 'apple', itemId: 'item-1' },
+      { answer: '', itemId: 'item-2' },
       { answer: '', itemId: 'item-3' },
     ],
     shareSlug: 'share-two',
@@ -5273,6 +5366,7 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
 assert.equal(parseOptionalWholeNumber(''), undefined);
 assert.equal(parseOptionalWholeNumber(' 12 '), 12);
 assert.equal(parseOptionalWholeNumber(' １２ '), 12);
+assert.equal(parseOptionalWholeNumber(' １ ２ '), 12);
 assert.equal(parseOptionalWholeNumber('1.5'), undefined);
 assert.equal(parseOptionalWholeNumber('1e1'), undefined);
 assert.equal(parseOptionalWholeNumber('0x10'), undefined);
@@ -5489,12 +5583,12 @@ assert.deepEqual(
     activityId: 'activity-1',
     collectStudentName: false,
     expiresAtLocal: '2026-01-10T09:30',
-    instructions: '  Finish before class.  ',
-    maxAttempts: '３',
+    instructions: ' Ｆｉｎｉｓｈ\tbefore   class. ',
+    maxAttempts: ' ３ ',
     showCorrectAnswers: false,
     shuffleItems: false,
-    timeLimitMinutes: '１５',
-    title: 'Week 1 review',
+    timeLimitMinutes: ' １ ５ ',
+    title: ' Ｗｅｅｋ   １ review ',
   }),
   {
     expiresAt: new Date('2026-01-10T09:30'),
@@ -5784,13 +5878,13 @@ assert.deepEqual(
     activityId: 'activity-1',
     collectStudentName: false,
     expiresAtLocal: '2026-01-10T09:30',
-    instructions: '  Finish before class.  ',
-    maxAttempts: '3',
+    instructions: ' Ｆｉｎｉｓｈ\tbefore   class. ',
+    maxAttempts: ' ３ ',
     now: new Date('2026-01-01T00:00:00.000Z'),
     showCorrectAnswers: false,
     shuffleItems: false,
-    timeLimitMinutes: '15',
-    title: '  Week 1 review  ',
+    timeLimitMinutes: ' １ ５ ',
+    title: '  Ｗｅｅｋ   １ review  ',
   }),
   {
     input: {

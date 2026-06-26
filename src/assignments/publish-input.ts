@@ -6,6 +6,7 @@ import {
   defaultAssignmentSettings,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
 export const ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS = {
@@ -36,7 +37,7 @@ export function buildAssignmentPublishCloseAfterMinLocal(now = new Date()) {
 }
 
 export function parseAssignmentDateTimeLocal(value: string) {
-  const trimmed = value.trim();
+  const trimmed = normalizePublishDraftText(value);
   if (!trimmed) return null;
 
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
@@ -66,7 +67,7 @@ export function parseAssignmentDateTimeLocal(value: string) {
 }
 
 export function parseOptionalWholeNumber(value: string) {
-  const trimmed = value.normalize('NFKC').trim();
+  const trimmed = normalizePublishDraftText(value).replace(/\s+/gu, '');
   if (!trimmed) return undefined;
   if (!/^\d+$/.test(trimmed)) return undefined;
 
@@ -329,7 +330,7 @@ export function buildAssignmentPublishPreviewFromDraft({
     : parseAssignmentPublishMaxAttempts(maxAttempts);
   const settings = resolveAssignmentSettings({
     collectStudentName,
-    instructions: instructions.trim() || undefined,
+    instructions: normalizePublishDraftText(instructions) || undefined,
     maxAttempts: previewMaxAttempts,
     showCorrectAnswers,
     shuffleItems,
@@ -352,7 +353,7 @@ export function validateAssignmentPublishDraft({
   timeLimitMinutes,
   title,
 }: AssignmentPublishDraft): AssignmentPublishDraftValidation {
-  const trimmedTitle = title.trim();
+  const trimmedTitle = normalizePublishDraftText(title);
   if (!trimmedTitle) {
     return {
       message: m.assignment_publish_validation_title_required(),
@@ -379,7 +380,7 @@ export function validateAssignmentPublishDraft({
   }
 
   if (
-    instructions.trim().length >
+    normalizePublishDraftText(instructions).length >
     ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength
   ) {
     return {
@@ -402,7 +403,7 @@ export function validateAssignmentPublishDraft({
 
   const timeLimit = parseOptionalWholeNumber(timeLimitMinutes);
   if (
-    timeLimitMinutes.trim() &&
+    normalizePublishDraftText(timeLimitMinutes) &&
     !isWholeNumberInRange(timeLimit, ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE)
   ) {
     return {
@@ -412,7 +413,7 @@ export function validateAssignmentPublishDraft({
   }
 
   const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
-  if (expiresAtLocal.trim() && !expiresAt) {
+  if (normalizePublishDraftText(expiresAtLocal) && !expiresAt) {
     return {
       message: m.assignment_publish_validation_close_time_valid(),
       ok: false,
@@ -468,7 +469,7 @@ export function buildAssignmentPublishInputFromDraft({
   });
   if (!validation.ok) return validation;
 
-  const trimmedTitle = title.trim();
+  const trimmedTitle = normalizePublishDraftText(title);
   const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
   if (
     !isAssignmentPublishMaxAttemptsBlank(maxAttempts) &&
@@ -482,7 +483,7 @@ export function buildAssignmentPublishInputFromDraft({
 
   const timeLimit = parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
   const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
-  const trimmedInstructions = instructions.trim();
+  const trimmedInstructions = normalizePublishDraftText(instructions);
 
   return {
     input: {
@@ -509,7 +510,7 @@ function parseAssignmentPublishMaxAttempts(value: string) {
 }
 
 function isAssignmentPublishMaxAttemptsBlank(value: string) {
-  return value.trim().length === 0;
+  return normalizePublishDraftText(value).length === 0;
 }
 
 function parseAssignmentPublishTimeLimitMinutes(value: string) {
@@ -534,4 +535,8 @@ function isWholeNumberInRange(
     value >= range.min &&
     value <= range.max
   );
+}
+
+function normalizePublishDraftText(value: string) {
+  return normalizeRuntimeDisplayText(value);
 }

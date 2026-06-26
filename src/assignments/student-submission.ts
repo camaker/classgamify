@@ -13,6 +13,10 @@ import {
   normalizeStudentName,
 } from '@/assignments/identity';
 import { formatAssignmentResultPercent } from '@/assignments/result-format';
+import {
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { m } from '@/locale/paraglide/messages';
 
@@ -271,7 +275,8 @@ export function buildAnonymousAttemptCopy({
 }: {
   browserLabel?: string;
 }): AnonymousAttemptCopy {
-  const label = browserLabel?.trim() || getAnonymousBrowserLabel();
+  const label =
+    normalizeRuntimeDisplayText(browserLabel) || getAnonymousBrowserLabel();
 
   return {
     description: m.student_runner_anonymous_attempt_description({ label }),
@@ -450,16 +455,106 @@ export function getAttemptCompletionSummary({
   answers: StudentAnswerMap;
   runtimeItems: StudentSubmissionRuntimeItem[];
 }): AttemptCompletionSummary {
-  const itemCount = runtimeItems.length;
-  const answeredItemCount = runtimeItems.filter((item) =>
-    isStudentAnswerFilled(answers[item.id])
-  ).length;
+  const itemEntries = getUniqueSubmissionRuntimeItemEntries(runtimeItems);
+  const itemCount = normalizeRuntimeDisplayCount(itemEntries.length);
+  const answeredItemCount = normalizeRuntimeDisplayCount(
+    itemEntries.filter((entry) => isSubmissionEntryAnswered(entry, answers))
+      .length
+  );
 
   return {
     answeredItemCount,
     itemCount,
     unansweredItemCount: Math.max(0, itemCount - answeredItemCount),
   };
+}
+
+type SubmissionRuntimeItemEntry = {
+  itemId: string;
+  originalIds: string[];
+};
+
+function getUniqueSubmissionRuntimeItemEntries(
+  runtimeItems: StudentSubmissionRuntimeItem[]
+) {
+  const entriesById = new Map<string, SubmissionRuntimeItemEntry>();
+
+  for (const item of runtimeItems) {
+    const itemId = normalizeSubmissionItemId(item.id);
+    if (!itemId) continue;
+
+    const entry = entriesById.get(itemId);
+    if (entry) {
+      entry.originalIds.push(item.id);
+      continue;
+    }
+
+    entriesById.set(itemId, {
+      itemId,
+      originalIds: [item.id],
+    });
+  }
+
+  return [...entriesById.values()];
+}
+
+function getUniqueSubmissionRuntimeItemIds(
+  runtimeItems: StudentSubmissionRuntimeItem[]
+) {
+  return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map(
+    (entry) => entry.itemId
+  );
+}
+
+function normalizeSubmissionItemId(value: string | undefined) {
+  return normalizeRuntimeDisplayText(value);
+}
+
+function normalizeSubmissionAnswer(value: string | undefined) {
+  return normalizeRuntimeDisplayText(value);
+}
+
+function isSubmissionEntryAnswered(
+  entry: SubmissionRuntimeItemEntry,
+  answers: StudentAnswerMap
+) {
+  return Boolean(getFilledSubmissionEntryAnswer(entry, answers));
+}
+
+function getSubmissionEntryAnswer(
+  entry: SubmissionRuntimeItemEntry,
+  answers: StudentAnswerMap
+) {
+  return (
+    getFilledSubmissionEntryAnswer(entry, answers) ??
+    getFirstSubmissionEntryAnswer(entry, answers) ??
+    ''
+  );
+}
+
+function getFilledSubmissionEntryAnswer(
+  entry: SubmissionRuntimeItemEntry,
+  answers: StudentAnswerMap
+) {
+  return getSubmissionEntryAnswerCandidates(entry, answers).find((answer) =>
+    isStudentAnswerFilled(answer)
+  );
+}
+
+function getFirstSubmissionEntryAnswer(
+  entry: SubmissionRuntimeItemEntry,
+  answers: StudentAnswerMap
+) {
+  return getSubmissionEntryAnswerCandidates(entry, answers).find(
+    (answer) => answer !== undefined
+  );
+}
+
+function getSubmissionEntryAnswerCandidates(
+  entry: SubmissionRuntimeItemEntry,
+  answers: StudentAnswerMap
+) {
+  return [...entry.originalIds, entry.itemId].map((itemId) => answers[itemId]);
 }
 
 export function formatAttemptCompletionProgressLabel({
@@ -469,9 +564,14 @@ export function formatAttemptCompletionProgressLabel({
   completionSummary: AttemptCompletionSummary;
   verb?: string;
 }): string {
-  const progressVerb = verb.trim() || m.student_attempt_progress_answered();
+  const progressVerb =
+    normalizeRuntimeDisplayText(verb) || m.student_attempt_progress_answered();
+  const answeredItemCount = normalizeRuntimeDisplayCount(
+    completionSummary.answeredItemCount
+  );
+  const itemCount = normalizeRuntimeDisplayCount(completionSummary.itemCount);
 
-  return `${completionSummary.answeredItemCount}/${completionSummary.itemCount} ${progressVerb}`;
+  return `${answeredItemCount}/${itemCount} ${progressVerb}`;
 }
 
 export function buildStudentAttemptSessionKey({
@@ -494,23 +594,17 @@ export function buildStudentAttemptSessionKey({
           templateType: normalizedTemplateType,
         }
       : undefined;
+  const itemIds = getUniqueSubmissionRuntimeItemIds(runtimeItems);
 
   return JSON.stringify(
     context
-      ? [
-          normalizeAssignmentShareSlug(shareSlug),
-          context,
-          runtimeItems.map((item) => item.id),
-        ]
-      : [
-          normalizeAssignmentShareSlug(shareSlug),
-          runtimeItems.map((item) => item.id),
-        ]
+      ? [normalizeAssignmentShareSlug(shareSlug), context, itemIds]
+      : [normalizeAssignmentShareSlug(shareSlug), itemIds]
   );
 }
 
 function normalizeSessionKeyPart(value: string | undefined) {
-  return value?.trim() || undefined;
+  return normalizeRuntimeDisplayText(value) || undefined;
 }
 
 export function buildAttemptCompletionCopy({
@@ -522,7 +616,9 @@ export function buildAttemptCompletionCopy({
   confirmIncompleteSubmit: boolean;
   progressVerb?: string;
 }): AttemptCompletionCopy {
-  const { unansweredItemCount } = completionSummary;
+  const unansweredItemCount = normalizeRuntimeDisplayCount(
+    completionSummary.unansweredItemCount
+  );
 
   return {
     confirmIncompleteSubmit:
@@ -563,9 +659,9 @@ export function buildAttemptSubmissionAnswers({
   answers: StudentAnswerMap;
   runtimeItems: StudentSubmissionRuntimeItem[];
 }): StudentSubmissionAnswer[] {
-  return runtimeItems.map((item) => ({
-    answer: answers[item.id] ?? '',
-    itemId: item.id,
+  return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map((entry) => ({
+    answer: normalizeSubmissionAnswer(getSubmissionEntryAnswer(entry, answers)),
+    itemId: entry.itemId,
   }));
 }
 
@@ -717,5 +813,5 @@ export function getAttemptSubmitDecision({
 }
 
 export function isStudentAnswerFilled(answer: string | undefined) {
-  return Boolean(answer?.trim());
+  return Boolean(normalizeSubmissionAnswer(answer));
 }
