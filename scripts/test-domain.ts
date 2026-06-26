@@ -1251,6 +1251,14 @@ const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
 );
+const activityDraftMetaSummarySource = readFileSync(
+  'src/components/activities/activity-draft-meta-summary.tsx',
+  'utf8'
+);
+const activityTemplateReadinessPanelSource = readFileSync(
+  'src/components/activities/activity-template-readiness-panel.tsx',
+  'utf8'
+);
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
   activityEditorSource,
@@ -1297,10 +1305,50 @@ assert.match(
   /buildActivityEditorSaveGate/,
   'Activity editor form should consume the activity-domain save gate.'
 );
+assert.match(
+  activityEditorFormSource,
+  /ActivityDraftMetaSummary[\s\S]*result=\{draftResult\}/,
+  'Activity editor form should delegate AI draft review summary rendering.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityTemplateReadinessPanel[\s\S]*summary=\{templateView\.readinessSummary\}/,
+  'Activity editor form should delegate template-readiness panel rendering.'
+);
 assert.doesNotMatch(
   activityEditorFormSource,
   /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility/,
   'Activity editor form should not rebuild template, draft-source, readiness, scaffold, or option-label state locally.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /function ActivityDraftMetaSummary|function ActivityTemplateReadinessPanel|function ActivityDraftCoverageStat|buildActivityDraftMetaSummaryView|ActivityTemplateReadinessPanelSummary/,
+  'Activity editor form should not own AI draft summary or readiness panel display components.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /buildActivityDraftMetaSummaryView/,
+  'AI draft summary component should consume the activity-domain draft summary view-model.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftResult/,
+  'AI draft summary component should accept the server draft result contract.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.templateReadinessOptions[\s\S]*summaryView\.reviewChecklist/,
+  'AI draft summary component should render reviewable readiness and checklist details.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /ActivityTemplateReadinessPanelSummary/,
+  'Template-readiness panel should consume the activity-domain readiness summary contract.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /summary\.readyOptions[\s\S]*summary\.lockedOptions/,
+  'Template-readiness panel should render ready and locked template diagnostics from the summary.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
