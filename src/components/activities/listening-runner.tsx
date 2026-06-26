@@ -3,10 +3,7 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import {
-  buildSequentialStudentRunnerView,
-  getStudentRunnerReviewStatusClassName,
-} from '@/assignments/student-runner-view';
+import { buildSequentialStudentRunnerView } from '@/assignments/student-runner-view';
 import { buildListeningPromptView } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +48,7 @@ export function ListeningRunner({
         itemLabel: copy.sequenceItemLabel ?? copy.title,
         items,
         progressVerb: copy.progressVerb,
+        revealAnswer,
         reviewItems,
       }),
     [
@@ -60,10 +58,11 @@ export function ListeningRunner({
       copy.sequenceItemLabel,
       copy.title,
       items,
+      revealAnswer,
       reviewItems,
     ]
   );
-  const { activeItem, sequenceView } = runnerView;
+  const { activeItem, navigationView, sequenceView } = runnerView;
   const activePromptView = useMemo(
     () =>
       activeItem
@@ -120,9 +119,14 @@ export function ListeningRunner({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
-          {sequenceView.itemViews.map((itemView) => {
-            const { answered, item, sequenceLabel, status } = itemView;
-            const selected = item.id === activeItem.id;
+          {navigationView.itemViews.map((itemView) => {
+            const {
+              answered,
+              item,
+              reviewStatusClassName,
+              selected,
+              sequenceLabel,
+            } = itemView;
 
             return (
               <button
@@ -132,7 +136,7 @@ export function ListeningRunner({
                   'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5',
                   selected && 'border-primary bg-primary/10',
-                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
+                  reviewStatusClassName
                 )}
                 onClick={() => setActiveItemId(item.id)}
               >
@@ -152,11 +156,7 @@ export function ListeningRunner({
         <div
           className={cn(
             'rounded-lg border bg-background p-4',
-            revealAnswer &&
-              sequenceView.activeItemView &&
-              getStudentRunnerReviewStatusClassName(
-                sequenceView.activeItemView.status
-              )
+            navigationView.activePanelStatusClassName
           )}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">

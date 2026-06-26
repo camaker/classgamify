@@ -286,6 +286,7 @@ import {
   buildPublicAnswerFeedbackView,
   buildRuntimeChoiceButtonViews,
   buildRuntimeChoiceViews,
+  buildSequentialStudentRunnerNavigationView,
   buildSequentialStudentRunnerView,
   buildSequentialRunnerView,
   buildStudentRunnerHeaderView,
@@ -2028,10 +2029,15 @@ for (const filePath of [
     /buildSequentialStudentRunnerView/,
     `${filePath} should consume the assignment-domain sequential runner view helper.`
   );
+  assert.match(
+    source,
+    /navigationView/,
+    `${filePath} should render sequence navigation state from the assignment-domain helper.`
+  );
   assert.doesNotMatch(
     source,
-    /buildSequentialRunnerView|buildStudentRunnerView/,
-    `${filePath} should not manually compose generic runner and sequence views.`
+    /buildSequentialRunnerView|buildStudentRunnerView|getStudentRunnerReviewStatusClassName/,
+    `${filePath} should not manually compose sequence views or review status classes.`
   );
 }
 const listeningRunnerSource = readFileSync(
@@ -2059,13 +2065,13 @@ const openBoxRunnerSource = readFileSync(
 );
 assert.match(
   openBoxRunnerSource,
-  /getSequentialRunnerItemIdByOffset/,
-  'Open-box runner should navigate active cards through the assignment-domain sequence helper.'
+  /navigationView\.previousItemId[\s\S]*navigationView\.nextItemId/,
+  'Open-box runner should navigate active cards through the assignment-domain navigation view.'
 );
 assert.doesNotMatch(
   openBoxRunnerSource,
-  /activeIndex \+ offset|answers\[activeItem\.id\]/,
-  'Open-box runner should not hand-roll sequence wrapping or active answer state.'
+  /activeIndex \+ offset|getSequentialRunnerItemIdByOffset|getStudentRunnerReviewStatusClassName|answers\[activeItem\.id\]/,
+  'Open-box runner should not hand-roll sequence wrapping, review styles, or active answer state.'
 );
 for (const filePath of [
   'src/components/activities/line-match-board.tsx',
@@ -4160,6 +4166,82 @@ assert.deepEqual(sequentialStudentRunnerView.activeChoiceViews, [
   },
 ]);
 assert.equal(sequentialStudentRunnerView.sequenceView.activeLabel, 'Track 1');
+assert.equal(sequentialStudentRunnerView.navigationView.canMove, true);
+assert.equal(sequentialStudentRunnerView.navigationView.nextItemId, 'pair-1');
+assert.equal(
+  sequentialStudentRunnerView.navigationView.previousItemId,
+  'pair-1'
+);
+assert.equal(
+  sequentialStudentRunnerView.navigationView.itemViews[0]?.selected,
+  true
+);
+assert.equal(
+  sequentialStudentRunnerView.navigationView.itemViews[1]?.selected,
+  false
+);
+assert.equal(
+  sequentialStudentRunnerView.navigationView.itemViews[0]
+    ?.reviewStatusClassName,
+  undefined
+);
+const revealedSequentialNavigationView =
+  buildSequentialStudentRunnerNavigationView({
+    activeIndex: 1,
+    itemViews: [
+      {
+        ...sequentialStudentRunnerView.sequenceView.itemViews[0]!,
+        status: 'correct',
+      },
+      {
+        ...sequentialStudentRunnerView.sequenceView.itemViews[1]!,
+        status: 'needs-review',
+      },
+    ],
+    revealAnswer: true,
+  });
+assert.equal(
+  revealedSequentialNavigationView.activePanelStatusClassName,
+  'border-destructive/30 bg-destructive/5'
+);
+assert.equal(revealedSequentialNavigationView.itemViews[0]?.selected, false);
+assert.equal(revealedSequentialNavigationView.itemViews[1]?.selected, true);
+assert.equal(
+  revealedSequentialNavigationView.itemViews[0]?.reviewStatusClassName,
+  'border-primary/35 bg-primary/5'
+);
+assert.equal(
+  revealedSequentialNavigationView.itemViews[1]?.reviewStatusClassName,
+  'border-destructive/30 bg-destructive/5'
+);
+assert.equal(revealedSequentialNavigationView.previousItemId, 'q-1');
+assert.equal(revealedSequentialNavigationView.nextItemId, 'q-1');
+assert.deepEqual(
+  buildSequentialStudentRunnerNavigationView({
+    activeIndex: 99,
+    itemViews: [
+      {
+        ...sequentialStudentRunnerView.sequenceView.itemViews[0]!,
+        status: 'idle',
+      },
+    ],
+    revealAnswer: true,
+  }),
+  {
+    activePanelStatusClassName: undefined,
+    canMove: false,
+    itemViews: [
+      {
+        ...sequentialStudentRunnerView.sequenceView.itemViews[0]!,
+        reviewStatusClassName: undefined,
+        selected: true,
+        status: 'idle',
+      },
+    ],
+    nextItemId: 'q-1',
+    previousItemId: 'q-1',
+  }
+);
 assert.equal(
   getSequentialRunnerItemIdByOffset({
     activeIndex: 0,

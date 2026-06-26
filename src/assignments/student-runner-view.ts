@@ -102,6 +102,26 @@ type FillBlankWorksheetView = ReturnType<typeof buildStudentRunnerView> & {
   fillBlankItemViews: FillBlankWorksheetItemView[];
 };
 
+type SequentialStudentRunnerItemView = ReturnType<
+  typeof buildStudentRunnerView
+>['itemViews'][number] & {
+  sequenceLabel: string;
+};
+
+type SequentialStudentRunnerNavigationItemView =
+  SequentialStudentRunnerItemView & {
+    reviewStatusClassName: string | undefined;
+    selected: boolean;
+  };
+
+type SequentialStudentRunnerNavigationView = {
+  activePanelStatusClassName: string | undefined;
+  canMove: boolean;
+  itemViews: SequentialStudentRunnerNavigationItemView[];
+  nextItemId: string | undefined;
+  previousItemId: string | undefined;
+};
+
 type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
   acceptedAnswersText: string | null;
@@ -252,6 +272,7 @@ export function buildSequentialStudentRunnerView({
   itemLabel,
   items,
   progressVerb,
+  revealAnswer = false,
   reviewItems,
 }: {
   activeItemId?: string;
@@ -259,6 +280,7 @@ export function buildSequentialStudentRunnerView({
   itemLabel: string;
   items: PublicRuntimeItem[];
   progressVerb?: string;
+  revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
 }) {
   const runnerView = buildStudentRunnerView({
@@ -273,6 +295,11 @@ export function buildSequentialStudentRunnerView({
     itemViews: runnerView.itemViews,
   });
   const activeItemView = sequenceView.activeItemView;
+  const navigationView = buildSequentialStudentRunnerNavigationView({
+    activeIndex: sequenceView.activeIndex,
+    itemViews: sequenceView.itemViews,
+    revealAnswer,
+  });
 
   return {
     ...runnerView,
@@ -284,7 +311,47 @@ export function buildSequentialStudentRunnerView({
     }),
     activeItemView,
     activeReviewItem: activeItemView?.reviewItem,
+    navigationView,
     sequenceView,
+  };
+}
+
+export function buildSequentialStudentRunnerNavigationView({
+  activeIndex,
+  itemViews,
+  revealAnswer,
+}: {
+  activeIndex: number;
+  itemViews: SequentialStudentRunnerItemView[];
+  revealAnswer: boolean;
+}): SequentialStudentRunnerNavigationView {
+  const itemIds = itemViews.map((itemView) => itemView.item.id);
+  const normalizedActiveIndex = itemViews[activeIndex] ? activeIndex : 0;
+  const activeItemView = itemViews[normalizedActiveIndex];
+
+  return {
+    activePanelStatusClassName:
+      revealAnswer && activeItemView
+        ? getStudentRunnerReviewStatusClassName(activeItemView.status)
+        : undefined,
+    canMove: itemViews.length > 1,
+    itemViews: itemViews.map((itemView, index) => ({
+      ...itemView,
+      reviewStatusClassName: revealAnswer
+        ? getStudentRunnerReviewStatusClassName(itemView.status)
+        : undefined,
+      selected: index === normalizedActiveIndex,
+    })),
+    nextItemId: getSequentialRunnerItemIdByOffset({
+      activeIndex,
+      itemIds,
+      offset: 1,
+    }),
+    previousItemId: getSequentialRunnerItemIdByOffset({
+      activeIndex,
+      itemIds,
+      offset: -1,
+    }),
   };
 }
 

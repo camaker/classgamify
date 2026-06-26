@@ -3,11 +3,7 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import {
-  buildSequentialStudentRunnerView,
-  getSequentialRunnerItemIdByOffset,
-  getStudentRunnerReviewStatusClassName,
-} from '@/assignments/student-runner-view';
+import { buildSequentialStudentRunnerView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,6 +44,7 @@ export function OpenBoxRunner({
         itemLabel: copy.sequenceItemLabel ?? copy.title,
         items,
         progressVerb: copy.progressVerb,
+        revealAnswer,
         reviewItems,
       }),
     [
@@ -57,20 +54,11 @@ export function OpenBoxRunner({
       copy.sequenceItemLabel,
       copy.title,
       items,
+      revealAnswer,
       reviewItems,
     ]
   );
-  const { activeItem, activeItemView, sequenceView } = runnerView;
-
-  function moveActiveItem(offset: number) {
-    setActiveItemId(
-      getSequentialRunnerItemIdByOffset({
-        activeIndex: sequenceView.activeIndex,
-        itemIds: sequenceView.itemViews.map((itemView) => itemView.item.id),
-        offset,
-      })
-    );
-  }
+  const { activeItem, navigationView, sequenceView } = runnerView;
 
   if (!activeItem) {
     return null;
@@ -90,9 +78,14 @@ export function OpenBoxRunner({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)]">
         <div className="grid content-start gap-2">
-          {sequenceView.itemViews.map((itemView) => {
-            const { answered, item, sequenceLabel, status } = itemView;
-            const selected = item.id === activeItem.id;
+          {navigationView.itemViews.map((itemView) => {
+            const {
+              answered,
+              item,
+              reviewStatusClassName,
+              selected,
+              sequenceLabel,
+            } = itemView;
 
             return (
               <button
@@ -102,7 +95,7 @@ export function OpenBoxRunner({
                   'min-h-14 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5',
                   selected && 'border-primary bg-primary/10',
-                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
+                  reviewStatusClassName
                 )}
                 onClick={() => setActiveItemId(item.id)}
               >
@@ -122,9 +115,7 @@ export function OpenBoxRunner({
         <div
           className={cn(
             'rounded-lg border bg-background p-4',
-            revealAnswer &&
-              activeItemView &&
-              getStudentRunnerReviewStatusClassName(activeItemView.status)
+            navigationView.activePanelStatusClassName
           )}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -136,8 +127,8 @@ export function OpenBoxRunner({
                 type="button"
                 variant="outline"
                 size="icon"
-                disabled={items.length <= 1}
-                onClick={() => moveActiveItem(-1)}
+                disabled={!navigationView.canMove}
+                onClick={() => setActiveItemId(navigationView.previousItemId)}
               >
                 <IconArrowLeft className="size-4" />
               </Button>
@@ -145,8 +136,8 @@ export function OpenBoxRunner({
                 type="button"
                 variant="outline"
                 size="icon"
-                disabled={items.length <= 1}
-                onClick={() => moveActiveItem(1)}
+                disabled={!navigationView.canMove}
+                onClick={() => setActiveItemId(navigationView.nextItemId)}
               >
                 <IconArrowRight className="size-4" />
               </Button>
