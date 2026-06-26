@@ -109,6 +109,18 @@ type AssignmentPublishDialogState = {
   publishDisabled: boolean;
 };
 
+type AssignmentPublishDraftValues = Partial<
+  Omit<AssignmentPublishDraft, 'activityId' | 'now'>
+>;
+
+type AssignmentPublishDialogViewModel = {
+  dialogState: AssignmentPublishDialogState;
+  draft: AssignmentPublishDraft;
+  preview: AssignmentPublishPreview;
+  toggleViews: AssignmentPublishToggleView[];
+  validation: AssignmentPublishDraftValidation;
+};
+
 type AssignmentPublishToggleKey =
   | 'collectStudentName'
   | 'showCorrectAnswers'
@@ -247,12 +259,38 @@ export function buildAssignmentPublishDraft({
   values,
 }: {
   defaults: AssignmentPublishDraft;
-  values: Partial<Omit<AssignmentPublishDraft, 'activityId' | 'now'>>;
+  values: AssignmentPublishDraftValues;
 }): AssignmentPublishDraft {
   return {
     ...defaults,
     ...values,
     activityId: defaults.activityId,
+  };
+}
+
+export function buildAssignmentPublishDialogViewModel({
+  defaults,
+  isPublishing = false,
+  now,
+  values,
+}: {
+  defaults: AssignmentPublishDraft;
+  isPublishing?: boolean;
+  now?: Date;
+  values: AssignmentPublishDraftValues;
+}): AssignmentPublishDialogViewModel {
+  const draft = buildAssignmentPublishDraft({ defaults, values });
+  const validation = validateAssignmentPublishDraft({ ...draft, now });
+
+  return {
+    dialogState: buildAssignmentPublishDialogState({
+      isPublishing,
+      validation,
+    }),
+    draft,
+    preview: buildAssignmentPublishPreviewFromDraft(draft),
+    toggleViews: buildAssignmentPublishToggleViews(draft),
+    validation,
   };
 }
 

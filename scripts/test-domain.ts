@@ -455,6 +455,7 @@ import {
   buildAssignmentPublishCloseAfterMinLocal,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
+  buildAssignmentPublishDialogViewModel,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   buildAssignmentPublishToggleViews,
@@ -1223,6 +1224,16 @@ assert.doesNotMatch(
   activityPublishDialogSource,
   /maxLength=\{500\}|min=\{1\}|max=\{10\}|max=\{180\}/,
   'Assignment publish dialog should not keep local field or numeric bounds.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /buildAssignmentPublishDialogViewModel/,
+  'Assignment publish dialog should consume the assignment-domain dialog view-model.'
+);
+assert.doesNotMatch(
+  activityPublishDialogSource,
+  /buildAssignmentPublishDraft\(|buildAssignmentPublishPreviewFromDraft|validateAssignmentPublishDraft|buildAssignmentPublishDialogState|buildAssignmentPublishToggleViews/,
+  'Assignment publish dialog should not rebuild draft, preview, validation, dialog state, or toggle views directly.'
 );
 const publicPlayRouteSource = readFileSync(
   'src/routes/play/$shareId.tsx',
@@ -4041,6 +4052,98 @@ assert.deepEqual(
     shuffleItems: true,
     timeLimitMinutes: '',
     title: 'Week 1 homework',
+  }
+);
+const assignmentPublishDialogViewModel = buildAssignmentPublishDialogViewModel({
+  defaults: buildAssignmentPublishDraftDefaults({
+    activityId: 'activity-1',
+    title: 'Food groups',
+  }),
+  now: new Date('2026-01-01T00:00:00.000Z'),
+  values: {
+    collectStudentName: false,
+    expiresAtLocal: '2026-01-10T09:30',
+    instructions: '  Finish before class.  ',
+    maxAttempts: '３',
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitMinutes: '１５',
+    title: 'Week 1 review',
+  },
+});
+assert.deepEqual(
+  {
+    dialogState: assignmentPublishDialogViewModel.dialogState,
+    draft: assignmentPublishDialogViewModel.draft,
+    preview: assignmentPublishDialogViewModel.preview,
+    toggleViews: assignmentPublishDialogViewModel.toggleViews,
+    validation: assignmentPublishDialogViewModel.validation,
+  },
+  {
+    dialogState: {
+      errorMessage: undefined,
+      publishDisabled: false,
+    },
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: false,
+      expiresAtLocal: '2026-01-10T09:30',
+      instructions: '  Finish before class.  ',
+      maxAttempts: '３',
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitMinutes: '１５',
+      title: 'Week 1 review',
+    },
+    preview: {
+      expiresAt: new Date('2026-01-10T09:30'),
+      settings: {
+        collectStudentName: false,
+        instructions: 'Finish before class.',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 900,
+      },
+    },
+    toggleViews: [
+      {
+        checked: false,
+        description: 'Ask learners to type their name before submitting.',
+        key: 'collectStudentName',
+        label: 'Collect student name',
+      },
+      {
+        checked: false,
+        description: 'Reveal correct answers after an attempt is submitted.',
+        key: 'showCorrectAnswers',
+        label: 'Show correct answers',
+      },
+      {
+        checked: false,
+        description: 'Prepare this assignment for randomized item order.',
+        key: 'shuffleItems',
+        label: 'Shuffle items',
+      },
+    ],
+    validation: { ok: true },
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishDialogViewModel({
+    defaults: buildAssignmentPublishDraftDefaults({
+      activityId: 'activity-1',
+      title: 'Food groups',
+    }),
+    isPublishing: true,
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    values: {
+      title: '  ',
+    },
+  }).dialogState,
+  {
+    errorMessage: 'Add an assignment title before publishing.',
+    publishDisabled: true,
   }
 );
 assert.deepEqual(

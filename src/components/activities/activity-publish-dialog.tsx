@@ -2,14 +2,10 @@ import type { ActivityVisibility } from '@/activities/types';
 import { buildActivityLifecycleActionView } from '@/activities/lifecycle';
 import {
   assignmentPublishDialogCopy,
-  buildAssignmentPublishDraft,
   buildAssignmentPublishCloseAfterMinLocal,
   buildAssignmentPublishDraftDefaults,
-  buildAssignmentPublishDialogState,
+  buildAssignmentPublishDialogViewModel,
   buildAssignmentPublishInputFromDraft,
-  buildAssignmentPublishPreviewFromDraft,
-  buildAssignmentPublishToggleViews,
-  validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
@@ -90,18 +86,14 @@ export function ActivityPublishDialog({
   const [expiresAtLocal, setExpiresAtLocal] = useState(
     publishDraftDefaults.expiresAtLocal
   );
-  const publishToggleViews = buildAssignmentPublishToggleViews({
-    collectStudentName,
-    showCorrectAnswers,
-    shuffleItems,
-  });
   const publishToggleSetters = {
     collectStudentName: setCollectStudentName,
     showCorrectAnswers: setShowCorrectAnswers,
     shuffleItems: setShuffleItems,
   };
-  const publishDraft = buildAssignmentPublishDraft({
+  const publishView = buildAssignmentPublishDialogViewModel({
     defaults: publishDraftDefaults,
+    isPublishing: publishMutation.isPending,
     values: {
       collectStudentName,
       expiresAtLocal,
@@ -112,12 +104,6 @@ export function ActivityPublishDialog({
       timeLimitMinutes,
       title: assignmentTitle,
     },
-  });
-  const publishPreview = buildAssignmentPublishPreviewFromDraft(publishDraft);
-  const publishValidation = validateAssignmentPublishDraft(publishDraft);
-  const publishDialogState = buildAssignmentPublishDialogState({
-    isPublishing: publishMutation.isPending,
-    validation: publishValidation,
   });
 
   useEffect(() => {
@@ -141,7 +127,7 @@ export function ActivityPublishDialog({
       return;
     }
 
-    const draftResult = buildAssignmentPublishInputFromDraft(publishDraft);
+    const draftResult = buildAssignmentPublishInputFromDraft(publishView.draft);
     if (!draftResult.ok) {
       toast.error(draftResult.message);
       return;
@@ -195,7 +181,7 @@ export function ActivityPublishDialog({
             />
           </div>
           <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
-            {publishToggleViews.map((option) => (
+            {publishView.toggleViews.map((option) => (
               <PublishSetting
                 key={option.key}
                 checked={option.checked}
@@ -261,12 +247,12 @@ export function ActivityPublishDialog({
               {assignmentPublishDialogCopy.previewLabel}
             </p>
             <AssignmentSettingsSummary
-              expiresAt={publishPreview.expiresAt}
-              settings={publishPreview.settings}
+              expiresAt={publishView.preview.expiresAt}
+              settings={publishView.preview.settings}
             />
-            {publishDialogState.errorMessage ? (
+            {publishView.dialogState.errorMessage ? (
               <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
-                {publishDialogState.errorMessage}
+                {publishView.dialogState.errorMessage}
               </p>
             ) : null}
           </div>
@@ -281,7 +267,7 @@ export function ActivityPublishDialog({
           </Button>
           <Button
             type="button"
-            disabled={publishDialogState.publishDisabled}
+            disabled={publishView.dialogState.publishDisabled}
             onClick={publishActivity}
           >
             <IconPlus className="size-4" />
