@@ -13472,6 +13472,42 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(
+  buildActivityLibrarySummaryMetrics({
+    hasFilters: true,
+    summary: {
+      archivedActivities: 0,
+      draftActivities: 0,
+      extractableSourceActivities: 0,
+      remixReadyActivities: 1.8,
+      sourceMaterialCapabilityCounts: {
+        'audio-extraction': 0,
+        'spreadsheet-import': 0,
+        'worksheet-extraction': 0,
+      },
+      templateCoverage: 2.9,
+      templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length + 0.9,
+      totalActivities: 3.7,
+      totalExtractableSourceMaterials: 4.2,
+      totalReadyTemplateOptions: 5.6,
+    },
+    totalActivities: 99,
+  }),
+  [
+    { id: 'total', label: 'Matching activities', value: '3' },
+    {
+      id: 'coverage',
+      label: 'Template coverage',
+      value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
+    },
+    { id: 'remix', label: 'Ready to remix', value: '1' },
+    {
+      id: 'sourceExtraction',
+      label: 'Source extraction',
+      value: '4',
+    },
+  ]
+);
 const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({
   data: null,
   isLoading: false,

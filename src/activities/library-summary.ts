@@ -275,7 +275,7 @@ function formatActivityLibraryMetricFraction(value: number, total: number) {
 
 function normalizeActivityLibraryMetricNumber(value: number) {
   if (!Number.isFinite(value)) return undefined;
-  return Math.max(0, value);
+  return Math.floor(Math.max(0, value));
 }
 
 function createEmptySourceMaterialCapabilityCounts() {
