@@ -18,6 +18,20 @@ export type AssignmentStatusAction = {
   successMessage: string;
 };
 
+export type AssignmentStatusActionExecutionPlan =
+  | {
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      input: {
+        assignmentId: string;
+        status: ManagedAssignmentStatus;
+      };
+      successMessage: string;
+      type: 'update-status';
+    };
+
 function getAssignmentTimestamp(value: AssignmentDate) {
   if (!value) return undefined;
 
@@ -194,6 +208,30 @@ export function buildAssignmentStatusAction({
     kind: nextStatus === 'closed' ? 'close-link' : 'reopen-link',
     nextStatus,
     ...getAssignmentStatusActionCopy(nextStatus),
+  };
+}
+
+export function buildAssignmentStatusActionExecutionPlan({
+  assignmentId,
+  statusAction,
+}: {
+  assignmentId: string;
+  statusAction?: AssignmentStatusAction;
+}): AssignmentStatusActionExecutionPlan {
+  if (!statusAction) {
+    return {
+      type: 'blocked',
+    };
+  }
+
+  return {
+    failureMessage: statusAction.failureMessage,
+    input: {
+      assignmentId,
+      status: statusAction.nextStatus,
+    },
+    successMessage: statusAction.successMessage,
+    type: 'update-status',
   };
 }
 

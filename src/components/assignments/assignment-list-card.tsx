@@ -1,4 +1,5 @@
 import type { buildAssignmentListCardViewModel } from '@/assignments/list-view';
+import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Badge } from '@/components/ui/badge';
@@ -34,16 +35,18 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
     assignment.actionView;
 
   async function updateStatus() {
-    if (!statusAction) return;
+    const plan = buildAssignmentStatusActionExecutionPlan({
+      assignmentId: assignment.id,
+      statusAction,
+    });
+
+    if (plan.type === 'blocked') return;
 
     try {
-      await updateStatusMutation.mutateAsync({
-        assignmentId: assignment.id,
-        status: statusAction.nextStatus,
-      });
-      toast.success(statusAction.successMessage);
+      await updateStatusMutation.mutateAsync(plan.input);
+      toast.success(plan.successMessage);
     } catch {
-      toast.error(statusAction.failureMessage);
+      toast.error(plan.failureMessage);
     }
   }
 

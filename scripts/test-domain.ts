@@ -382,6 +382,7 @@ import {
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
   buildAssignmentStatusAction,
+  buildAssignmentStatusActionExecutionPlan,
   getAssignmentLifecycleStatus,
   getAssignmentSubmissionErrorMessage,
   getAssignmentStatusActionCopy,
@@ -1597,7 +1598,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentDashboardCardSource,
-  /toast\.error\(statusAction\.failureMessage\)/,
+  /toast\.error\(plan\.failureMessage\)/,
   'Assignment close and reopen failures should use localized status action failure copy.'
 );
 const activityPublishDialogSource = readFileSync(
@@ -5613,6 +5614,53 @@ assert.equal(
     isPersisted: false,
   }),
   undefined
+);
+assert.deepEqual(
+  buildAssignmentStatusActionExecutionPlan({
+    assignmentId: 'assignment-close',
+    statusAction: buildAssignmentStatusAction({
+      currentStatus: 'published',
+      expiresAt: null,
+      isPersisted: true,
+    }),
+  }),
+  {
+    failureMessage: 'Assignment status could not be updated.',
+    input: {
+      assignmentId: 'assignment-close',
+      status: 'closed',
+    },
+    successMessage: 'Assignment link closed.',
+    type: 'update-status',
+  }
+);
+assert.deepEqual(
+  buildAssignmentStatusActionExecutionPlan({
+    assignmentId: 'assignment-reopen',
+    statusAction: buildAssignmentStatusAction({
+      currentStatus: 'closed',
+      expiresAt: null,
+      isPersisted: true,
+    }),
+  }),
+  {
+    failureMessage: 'Assignment status could not be updated.',
+    input: {
+      assignmentId: 'assignment-reopen',
+      status: 'published',
+    },
+    successMessage: 'Assignment link reopened.',
+    type: 'update-status',
+  }
+);
+assert.deepEqual(
+  buildAssignmentStatusActionExecutionPlan({
+    assignmentId: 'assignment-blocked',
+    statusAction: undefined,
+  }),
+  {
+    type: 'blocked',
+  }
 );
 assert.doesNotThrow(() =>
   assertAssignmentStatusTransition({
@@ -9998,6 +10046,16 @@ assert.match(
   assignmentListCardComponentSource,
   /useUpdateAssignmentStatus/,
   'Assignment list card component should own close and reopen interactions instead of the route.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /buildAssignmentStatusActionExecutionPlan/,
+  'Assignment list card component should execute status updates through the assignment-domain action plan.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /statusAction\.nextStatus/,
+  'Assignment list card component should not rebuild status mutation input from status action details.'
 );
 assert.match(
   assignmentListCardComponentSource,
