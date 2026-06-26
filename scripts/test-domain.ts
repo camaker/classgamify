@@ -42,6 +42,7 @@ import {
   buildActivityLibraryCompatibilityView,
   buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
+  buildActivityLibraryPageViewModel,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
   buildStarterActivityLibraryCardViewModel,
@@ -6907,8 +6908,18 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /buildActivityLibraryPageViewModel/,
+  'Activity dashboard route should consume the activity-domain page view-model.'
+);
+assert.doesNotMatch(
+  dashboardActivitiesRouteSource,
+  /getActivityLibraryTotalPages|buildActivityLibrarySummaryMetrics|buildActivityLibraryEmptyStateView|resolveCreatedActivityPanelActivity/,
+  'Activity dashboard route should not rebuild pagination, summary, empty state, or created panel lookup directly.'
+);
+assert.match(
+  activityLibraryViewSource,
   /getActivityLibraryTotalPages\(\{[\s\S]*pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,[\s\S]*total: totalActivities,[\s\S]*\}\)/,
-  'Activity dashboard route should calculate total pages through the activity-domain helper.'
+  'Activity library page view-model should calculate total pages through the activity-domain helper.'
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
@@ -10639,6 +10650,188 @@ assert.deepEqual(
       value: '-',
     },
   ]
+);
+const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({
+  data: null,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    activityIds: emptyActivityLibraryPageView.activities.map((item) => item.id),
+    breadcrumbs: emptyActivityLibraryPageView.breadcrumbs,
+    createdPanelContext: emptyActivityLibraryPageView.createdPanelContext,
+    emptyState: emptyActivityLibraryPageView.emptyState,
+    hasActivities: emptyActivityLibraryPageView.hasActivities,
+    resolvedSearch: emptyActivityLibraryPageView.resolvedSearch,
+    summaryMetrics: emptyActivityLibraryPageView.summaryMetrics,
+    title: emptyActivityLibraryPageView.title,
+    totalActivities: emptyActivityLibraryPageView.totalActivities,
+    totalPages: emptyActivityLibraryPageView.totalPages,
+  },
+  {
+    activityIds: [],
+    breadcrumbs: [
+      { href: '/dashboard', label: 'Dashboard' },
+      { isCurrentPage: true, label: 'Activities' },
+    ],
+    createdPanelContext: undefined,
+    emptyState: {
+      actionLabel: 'Create activity',
+      description:
+        'Create the first reusable classroom activity, then publish it as a student assignment link for your class.',
+      showStarterActivities: true,
+      title: 'No saved activities yet.',
+    },
+    hasActivities: false,
+    resolvedSearch: {
+      currentPage: 1,
+      hasFilters: false,
+      libraryStatus: 'active',
+      normalizedSearchQuery: undefined,
+      searchQuery: '',
+      sourceFilter: 'all',
+      templateFilter: 'all',
+    },
+    summaryMetrics: [
+      { id: 'total', label: 'Activities', value: '0' },
+      {
+        id: 'coverage',
+        label: 'Template coverage',
+        value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
+      },
+      { id: 'remix', label: 'Ready to remix', value: '0' },
+      {
+        id: 'sourceExtraction',
+        label: 'Source extraction',
+        value: '0',
+      },
+    ],
+    title: 'Activity library',
+    totalActivities: 0,
+    totalPages: 1,
+  }
+);
+const filteredActivityLibraryPageView = buildActivityLibraryPageViewModel({
+  data: {
+    createdActivity: {
+      id: 'persisted-activity-1',
+      templateType: 'quiz',
+      title: 'Persisted quiz',
+      visibility: 'draft',
+    },
+    items: [
+      {
+        contentJson: questionOnlyContent,
+        description: 'Short diagnostic quiz',
+        id: 'persisted-activity-1',
+        templateType: 'quiz',
+        title: 'Persisted quiz',
+        visibility: 'draft',
+      },
+    ],
+    summary: librarySummary,
+    total: 31,
+  },
+  isLoading: false,
+  search: {
+    created: 'persisted-activity-1',
+    page: 3,
+    q: '  Food   words ',
+    source: 'worksheet',
+    status: 'archived',
+    template: 'quiz',
+  },
+});
+assert.deepEqual(
+  {
+    activityIds: filteredActivityLibraryPageView.activities.map(
+      (item) => item.id
+    ),
+    createdPanelContext: filteredActivityLibraryPageView.createdPanelContext,
+    emptyState: filteredActivityLibraryPageView.emptyState,
+    hasActivities: filteredActivityLibraryPageView.hasActivities,
+    resolvedSearch: filteredActivityLibraryPageView.resolvedSearch,
+    summaryMetrics: filteredActivityLibraryPageView.summaryMetrics,
+    totalActivities: filteredActivityLibraryPageView.totalActivities,
+    totalPages: filteredActivityLibraryPageView.totalPages,
+  },
+  {
+    activityIds: ['persisted-activity-1'],
+    createdPanelContext: {
+      activity: {
+        id: 'persisted-activity-1',
+        templateType: 'quiz',
+        title: 'Persisted quiz',
+        visibility: 'draft',
+      },
+      body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
+      showCreateAction: true,
+      showDismissAction: true,
+      showEditAction: true,
+      showMissingHint: false,
+      showPublishAction: true,
+      status: 'found',
+      title: 'Persisted quiz',
+    },
+    emptyState: {
+      actionLabel: 'Clear filters',
+      description:
+        'Try another title, description, template keyword, or template family from your classroom activity library.',
+      showStarterActivities: false,
+      title: 'No matching activities.',
+    },
+    hasActivities: true,
+    resolvedSearch: {
+      currentPage: 3,
+      hasFilters: true,
+      libraryStatus: 'archived',
+      normalizedSearchQuery: 'Food words',
+      searchQuery: '  Food   words ',
+      sourceFilter: 'worksheet',
+      templateFilter: 'quiz',
+    },
+    summaryMetrics: [
+      { id: 'total', label: 'Matching activities', value: '2' },
+      {
+        id: 'coverage',
+        label: 'Template coverage',
+        value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
+      },
+      { id: 'remix', label: 'Ready to remix', value: '2' },
+      {
+        id: 'sourceExtraction',
+        label: 'Source extraction',
+        value: String(librarySummary.totalExtractableSourceMaterials),
+      },
+    ],
+    totalActivities: 31,
+    totalPages: 3,
+  }
+);
+assert.equal(
+  buildActivityLibraryPageViewModel({
+    data: {
+      createdActivity: null,
+      items: [],
+      total: 0,
+    },
+    isLoading: true,
+    search: { created: 'activity-loading' },
+  }).createdPanelContext?.status,
+  'loading'
+);
+assert.equal(
+  buildActivityLibraryPageViewModel({
+    data: {
+      createdActivity: null,
+      items: [],
+      total: 0,
+    },
+    isLoading: false,
+    search: { created: 'activity-missing' },
+  }).createdPanelContext?.status,
+  'missing'
 );
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const scaffold = getActivityTemplateScaffold(templateType);

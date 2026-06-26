@@ -38,7 +38,7 @@ type ActivityLibrarySummarySource = {
   visibility: string;
 };
 
-type ActivityLibrarySummary = {
+export type ActivityLibrarySummary = {
   archivedActivities: number;
   draftActivities: number;
   extractableSourceActivities: number;

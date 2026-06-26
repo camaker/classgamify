@@ -14,29 +14,24 @@ import {
   buildActivityLibraryPageRouteSearch,
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
-  getActivityLibraryTotalPages,
-  isActivityTemplateType,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
 import {
   buildActivityLibraryFilterSummary,
-  buildActivityLibrarySummaryMetrics,
   type ActivityLibrarySummaryMetric,
   type ActivityLibrarySummaryMetricId,
 } from '@/activities/library-summary';
 import {
   activityLibraryActionCopy,
   activityLibraryCreatedPanelCopy,
-  activityLibraryHeroCopy,
   activityLibraryCardCopy,
   activityLibraryPageCopy,
   activityLibrarySearchCopy,
   buildActivityLibraryCardDisplayView,
   buildActivityLibraryCardViewModel,
+  buildActivityLibraryPageViewModel,
   buildCreatedActivityPanelContext,
-  buildActivityLibraryEmptyStateView,
   buildStarterActivityLibraryCardViewModel,
-  resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -81,7 +76,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
@@ -94,61 +89,48 @@ export const Route = createFileRoute('/dashboard/activities')({
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
   const { created, page, q, source, status, template } = Route.useSearch();
-  const searchQuery = q ?? '';
-  const libraryStatus = status ?? 'active';
-  const sourceFilter: ActivitySourceMaterialFilter = source ?? 'all';
-  const templateFilter: ActivityTemplateFilter = template ?? 'all';
-  const currentPage = page ?? 1;
-  const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
+  const pageView = useMemo(
+    () =>
+      buildActivityLibraryPageViewModel({
+        data: undefined,
+        isLoading: true,
+        search: { created, page, q, source, status, template },
+      }),
+    [created, page, q, source, status, template]
+  );
+  const {
+    currentPage,
+    libraryStatus,
+    searchQuery,
+    sourceFilter,
+    templateFilter,
+  } = pageView.resolvedSearch;
   const { data, isError, isLoading } = useActivities({
     createdActivityId: created,
     pageIndex: currentPage - 1,
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
-    search: normalizedSearchQuery,
+    search: pageView.resolvedSearch.normalizedSearchQuery,
     source: sourceFilter,
     status: libraryStatus,
     template,
   });
-  const activities = data?.items ?? [];
-  const totalActivities = data?.total ?? 0;
-  const totalPages = getActivityLibraryTotalPages({
-    pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
-    total: totalActivities,
-  });
-  const hasActivities = activities.length > 0;
-  const createdPanelActivity = resolveCreatedActivityPanelActivity({
-    activity: data?.createdActivity,
-    activityId: created,
-    items: activities,
-  });
-  const createdPanelContext = created
-    ? buildCreatedActivityPanelContext({
-        activity: createdPanelActivity,
+  const loadedPageView = useMemo(
+    () =>
+      buildActivityLibraryPageViewModel({
+        data,
         isLoading,
-      })
-    : undefined;
-  const hasFilters =
-    Boolean(normalizedSearchQuery) ||
-    sourceFilter !== 'all' ||
-    templateFilter !== 'all' ||
-    libraryStatus !== 'active';
-  const emptyStateView = buildActivityLibraryEmptyStateView({
-    search: normalizedSearchQuery,
-    status: libraryStatus,
-    template: templateFilter,
-  });
-  const summaryMetrics = buildActivityLibrarySummaryMetrics({
-    hasFilters,
-    summary: data?.summary,
-    totalActivities,
-  });
+        search: { created, page, q, source, status, template },
+      }),
+    [data, isLoading, created, page, q, source, status, template]
+  );
+  const activePageView = data ? loadedPageView : pageView;
   const starterActivities = getStarterActivities();
 
   useEffect(() => {
-    if (!isLoading && currentPage > totalPages) {
-      navigateToActivityPage(totalPages, true);
+    if (!isLoading && currentPage > activePageView.totalPages) {
+      navigateToActivityPage(activePageView.totalPages, true);
     }
-  }, [currentPage, isLoading, totalActivities, totalPages]);
+  }, [activePageView.totalPages, currentPage, isLoading]);
 
   function updateLibraryFilters(next: {
     q?: string;
@@ -199,31 +181,22 @@ function DashboardActivitiesPage() {
 
   return (
     <DashboardLayout
-      breadcrumbs={[
-        {
-          label: activityLibraryPageCopy.breadcrumbDashboard,
-          href: Routes.Dashboard,
-        },
-        {
-          label: activityLibraryPageCopy.breadcrumbCurrent,
-          isCurrentPage: true,
-        },
-      ]}
-      title={activityLibraryPageCopy.title}
-      description={activityLibraryPageCopy.description}
+      breadcrumbs={activePageView.breadcrumbs}
+      title={activePageView.title}
+      description={activePageView.description}
     >
       <div className="grid gap-6">
         <section className="grid gap-4 rounded-lg border bg-card p-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconSparkles className="size-3.5" />
-              {activityLibraryHeroCopy.badgeLabel}
+              {activePageView.hero.badgeLabel}
             </Badge>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              {activityLibraryHeroCopy.title}
+              {activePageView.hero.title}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              {activityLibraryHeroCopy.description}
+              {activePageView.hero.description}
             </p>
           </div>
           <Link
@@ -236,14 +209,14 @@ function DashboardActivitiesPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-4">
-          {summaryMetrics.map((metric) => (
+          {activePageView.summaryMetrics.map((metric) => (
             <ActivitySummaryCard key={metric.id} metric={metric} />
           ))}
         </section>
 
         {created ? (
           <CreatedActivityPanel
-            context={createdPanelContext}
+            context={activePageView.createdPanelContext}
             onDismiss={() =>
               void navigate({
                 replace: true,
@@ -272,13 +245,13 @@ function DashboardActivitiesPage() {
           source={sourceFilter}
           status={libraryStatus}
           template={templateFilter}
-          total={totalActivities}
+          total={activePageView.totalActivities}
           value={searchQuery}
         />
 
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            {activityLibraryPageCopy.loadErrorMessage}
+            {activePageView.loadErrorMessage}
           </div>
         ) : null}
 
@@ -290,10 +263,10 @@ function DashboardActivitiesPage() {
           </section>
         ) : null}
 
-        {!isLoading && hasActivities ? (
+        {!isLoading && activePageView.hasActivities ? (
           <>
             <section className="grid gap-4 lg:grid-cols-2">
-              {activities.map((activity) => (
+              {activePageView.activities.map((activity) => (
                 <ActivityCard
                   key={activity.id}
                   activity={buildActivityLibraryCardViewModel(activity)}
@@ -307,17 +280,21 @@ function DashboardActivitiesPage() {
               itemKind="activities"
               onPageChange={(nextPage) => navigateToActivityPage(nextPage)}
               pageSize={ACTIVITY_LIBRARY_PAGE_SIZE}
-              total={totalActivities}
-              totalPages={totalPages}
+              total={activePageView.totalActivities}
+              totalPages={activePageView.totalPages}
             />
           </>
         ) : null}
 
-        {!isLoading && !hasActivities && hasFilters ? (
+        {!isLoading &&
+        !activePageView.hasActivities &&
+        activePageView.resolvedSearch.hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">{emptyStateView.title}</h2>
+            <h2 className="text-lg font-semibold">
+              {activePageView.emptyState.title}
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {emptyStateView.description}
+              {activePageView.emptyState.description}
             </p>
             <Button
               type="button"
@@ -326,27 +303,31 @@ function DashboardActivitiesPage() {
               onClick={clearLibraryFilters}
             >
               <IconX className="size-4" />
-              {emptyStateView.actionLabel}
+              {activePageView.emptyState.actionLabel}
             </Button>
           </div>
         ) : null}
 
-        {!isLoading && !hasActivities && !hasFilters ? (
+        {!isLoading &&
+        !activePageView.hasActivities &&
+        !activePageView.resolvedSearch.hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-              <h2 className="text-lg font-semibold">{emptyStateView.title}</h2>
+              <h2 className="text-lg font-semibold">
+                {activePageView.emptyState.title}
+              </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {emptyStateView.description}
+                {activePageView.emptyState.description}
               </p>
               <Link
                 to={Routes.Create}
                 className={cn(buttonVariants(), 'mt-4 w-fit')}
               >
                 <IconPlus className="size-4" />
-                {emptyStateView.actionLabel}
+                {activePageView.emptyState.actionLabel}
               </Link>
             </div>
-            {emptyStateView.showStarterActivities ? (
+            {activePageView.emptyState.showStarterActivities ? (
               <section className="grid gap-4 lg:grid-cols-2">
                 {starterActivities.map((activity) => (
                   <ActivityCard

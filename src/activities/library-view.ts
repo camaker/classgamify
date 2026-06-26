@@ -1,16 +1,22 @@
-import type {
-  ActivityLibraryStatus,
-  ActivitySourceMaterialFilter,
-  ActivityTemplateFilter,
-} from '@/activities/library-filters';
 import { getTemplateByType } from '@/activities/catalog';
+import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
+  type ActivityLibraryStatus,
+  type ActivitySourceMaterialFilter,
+  type ActivityTemplateFilter,
+  getActivityLibraryTotalPages,
+  normalizeActivityLibrarySearch,
+} from '@/activities/library-filters';
 import {
   canDeriveActivityWork,
   isActivityArchived,
 } from '@/activities/lifecycle';
 import {
   buildActivityLibraryCardSummary,
+  buildActivityLibrarySummaryMetrics,
   type ActivityLibraryCardSummary,
+  type ActivityLibrarySummary,
+  type ActivityLibrarySummaryMetric,
   type ActivityLibraryTemplateOption,
 } from '@/activities/library-summary';
 import {
@@ -23,6 +29,7 @@ import type {
   ActivityTemplateType,
   ActivityVisibility,
 } from '@/activities/types';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type ActivityLibraryStatusOption = {
@@ -128,6 +135,61 @@ type CreatedActivityPanelContext = {
   showPublishAction: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
+};
+
+type ActivityLibraryPageBreadcrumb = {
+  href?: string;
+  isCurrentPage?: boolean;
+  label: string;
+};
+
+type ActivityLibraryPageSearchState = {
+  created?: string;
+  page?: number;
+  q?: string;
+  source?: ActivitySourceMaterialFilter;
+  status?: ActivityLibraryStatus;
+  template?: ActivityTemplateFilter;
+};
+
+type ActivityLibraryPageResolvedSearch = {
+  currentPage: number;
+  hasFilters: boolean;
+  libraryStatus: ActivityLibraryStatus;
+  normalizedSearchQuery?: string;
+  searchQuery: string;
+  sourceFilter: ActivitySourceMaterialFilter;
+  templateFilter: ActivityTemplateFilter;
+};
+
+type ActivityLibraryPageItem = PersistedActivityLibraryCardSource & {
+  id: string;
+  templateType: ActivityTemplateType;
+  title: string;
+  visibility: ActivityVisibility;
+};
+
+type ActivityLibraryPageData<TItem extends ActivityLibraryPageItem> = {
+  createdActivity?: CreatedActivityListItem | null;
+  items: TItem[];
+  summary?: ActivityLibrarySummary;
+  total: number;
+};
+
+type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
+  activities: TItem[];
+  breadcrumbs: ActivityLibraryPageBreadcrumb[];
+  createdPanelContext?: CreatedActivityPanelContext;
+  description: string;
+  emptyState: ActivityLibraryEmptyStateView;
+  hasActivities: boolean;
+  hero: typeof activityLibraryHeroCopy;
+  loadErrorMessage: string;
+  resolvedSearch: ActivityLibraryPageResolvedSearch;
+  summaryMetrics: ActivityLibrarySummaryMetric[];
+  title: string;
+  totalActivities: number;
+  totalPages: number;
 };
 
 export const activityLibraryPageCopy = {
@@ -319,6 +381,95 @@ export function buildActivityLibraryEmptyStateView({
   return {
     ...activityLibraryEmptyStateCopy.emptyLibrary,
     showStarterActivities: true,
+  };
+}
+
+export function buildActivityLibraryPageViewModel<
+  TItem extends ActivityLibraryPageItem,
+>({
+  data,
+  isLoading,
+  search,
+}: {
+  data?: ActivityLibraryPageData<TItem> | null;
+  isLoading: boolean;
+  search: ActivityLibraryPageSearchState;
+}): ActivityLibraryPageViewModel<TItem> {
+  const resolvedSearch = resolveActivityLibraryPageSearch(search);
+  const activities = data?.items ?? [];
+  const totalActivities = data?.total ?? 0;
+  const totalPages = getActivityLibraryTotalPages({
+    pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
+    total: totalActivities,
+  });
+  const createdPanelActivity = resolveCreatedActivityPanelActivity({
+    activity: data?.createdActivity,
+    activityId: search.created,
+    items: activities,
+  });
+  const createdPanelContext = search.created
+    ? buildCreatedActivityPanelContext({
+        activity: createdPanelActivity,
+        isLoading,
+      })
+    : undefined;
+
+  return {
+    activities,
+    breadcrumbs: [
+      {
+        href: Routes.Dashboard,
+        label: activityLibraryPageCopy.breadcrumbDashboard,
+      },
+      {
+        isCurrentPage: true,
+        label: activityLibraryPageCopy.breadcrumbCurrent,
+      },
+    ],
+    createdPanelContext,
+    description: activityLibraryPageCopy.description,
+    emptyState: buildActivityLibraryEmptyStateView({
+      search: resolvedSearch.normalizedSearchQuery,
+      status: resolvedSearch.libraryStatus,
+      template: resolvedSearch.templateFilter,
+    }),
+    hasActivities: activities.length > 0,
+    hero: activityLibraryHeroCopy,
+    loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
+    resolvedSearch,
+    summaryMetrics: buildActivityLibrarySummaryMetrics({
+      hasFilters: resolvedSearch.hasFilters,
+      summary: data?.summary,
+      totalActivities,
+    }),
+    title: activityLibraryPageCopy.title,
+    totalActivities,
+    totalPages,
+  };
+}
+
+export function resolveActivityLibraryPageSearch(
+  search: ActivityLibraryPageSearchState
+): ActivityLibraryPageResolvedSearch {
+  const searchQuery = search.q ?? '';
+  const libraryStatus = search.status ?? 'active';
+  const sourceFilter = search.source ?? 'all';
+  const templateFilter = search.template ?? 'all';
+  const currentPage = search.page ?? 1;
+  const normalizedSearchQuery = normalizeActivityLibrarySearch(searchQuery);
+
+  return {
+    currentPage,
+    hasFilters:
+      Boolean(normalizedSearchQuery) ||
+      sourceFilter !== 'all' ||
+      templateFilter !== 'all' ||
+      libraryStatus !== 'active',
+    libraryStatus,
+    normalizedSearchQuery,
+    searchQuery,
+    sourceFilter,
+    templateFilter,
   };
 }
 
