@@ -251,7 +251,7 @@ export function buildStudentRunnerReadyState({
     assignment: normalizedAssignment,
     canSubmit: publicAssignment && runtimeItems.length > 0,
     hidePreviewAnswers: publicAssignment,
-    runtimeItems,
+    runtimeItems: cloneStudentRunnerRuntimeItems(runtimeItems),
     source,
     status: 'ready',
   };
@@ -607,4 +607,13 @@ function orderStudentRunnerRuntimeItems({
     shareSlug: assignment.shareId,
     shuffleItems: Boolean(assignment.settings.shuffleItems),
   });
+}
+
+function cloneStudentRunnerRuntimeItems(
+  items: PublicRuntimeItem[]
+): PublicRuntimeItem[] {
+  return items.map((item) => ({
+    ...item,
+    choices: item.choices ? [...item.choices] : undefined,
+  }));
 }

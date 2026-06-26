@@ -7086,6 +7086,29 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+const runnerReadyChoiceSource = [
+  {
+    choices: ['Paris', 'Rome'],
+    id: 'choice-runner',
+    kind: 'question' as const,
+    prompt: 'Capital?',
+  },
+];
+const runnerReadyChoiceState = buildStudentRunnerReadyState({
+  activity: publicRunnerState.activity,
+  assignment: publicRunnerState.assignment,
+  runtimeItems: runnerReadyChoiceSource,
+  source: 'public-assignment',
+});
+assert.notEqual(runnerReadyChoiceState.runtimeItems, runnerReadyChoiceSource);
+assert.deepEqual(
+  runnerReadyChoiceState.runtimeItems[0]?.choices,
+  runnerReadyChoiceSource[0]?.choices
+);
+assert.notEqual(
+  runnerReadyChoiceState.runtimeItems[0]?.choices,
+  runnerReadyChoiceSource[0]?.choices
+);
 assert.deepEqual(
   buildStudentRunnerReadyState({
     activity: runnerStateStarterActivity,
