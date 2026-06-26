@@ -8090,6 +8090,10 @@ const dashboardAssignmentsRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
   'utf8'
 );
+const assignmentListFiltersComponentSource = readFileSync(
+  'src/components/assignments/assignment-list-filters.tsx',
+  'utf8'
+);
 const assignmentListViewSource = readFileSync(
   'src/assignments/list-view.ts',
   'utf8'
@@ -8265,8 +8269,18 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
+  /AssignmentListFilters/,
+  'Assignment dashboard route should delegate filter controls to the assignment list filters component.'
+);
+assert.match(
+  assignmentListFiltersComponentSource,
   /buildAssignmentListSearchPanelView/,
-  'Assignment dashboard route should render filter summary and status options from the assignment-domain search panel view.'
+  'Assignment list filters component should render filter summary and status options from the assignment-domain search panel view.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /buildAssignmentListSearchPanelView|assignmentListSearchCopy|NativeSelect|NativeSelectOption|id="assignment-status-filter"/,
+  'Assignment dashboard route should not own assignment list filter-control rendering details.'
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
