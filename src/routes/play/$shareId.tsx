@@ -1,9 +1,5 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getRuntimeItems } from '@/activities/runtime';
-import type {
-  PublicAssignmentRuleSummaryId,
-  PublicAssignmentRuleSummaryItem,
-} from '@/assignments/delivery-summary';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { ASSIGNMENT_ATTEMPT_DURATION_UNITS } from '@/assignments/attempt-duration';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
@@ -30,6 +26,7 @@ import {
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { StudentRuntimeItemList } from '@/components/activities/student-runtime-item-list';
+import { PublicAssignmentRules } from '@/components/assignments/public-assignment-rules';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -41,15 +38,10 @@ import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
   IconCheck,
-  IconClock,
   IconClipboardText,
   IconDeviceGamepad2,
-  IconEye,
-  IconListCheck,
   IconPlayerPlay,
   IconRepeat,
-  IconUser,
-  IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -495,46 +487,6 @@ function PlayPage() {
       </div>
     </Container>
   );
-}
-
-function PublicAssignmentRules({
-  rules,
-}: {
-  rules: PublicAssignmentRuleSummaryItem[];
-}) {
-  return (
-    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-      {rules.map((rule) => (
-        <div
-          key={rule.label}
-          className="flex min-w-0 items-center gap-2 rounded-lg border bg-background px-3 py-2"
-        >
-          <PublicAssignmentRuleIcon id={rule.id} />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{rule.value}</p>
-            <p className="text-xs text-muted-foreground">{rule.label}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PublicAssignmentRuleIcon({
-  id,
-}: {
-  id: PublicAssignmentRuleSummaryId;
-}) {
-  const Icon = getPublicAssignmentRuleIcon(id);
-  return <Icon className="size-4 shrink-0 text-primary" />;
-}
-
-function getPublicAssignmentRuleIcon(id: PublicAssignmentRuleSummaryId) {
-  if (id === 'items') return IconListCheck;
-  if (id === 'attempts') return IconRepeat;
-  if (id === 'identity') return IconUser;
-  if (id === 'answerReveal') return IconEye;
-  return IconClock;
 }
 
 type AttemptSubmissionResult = {

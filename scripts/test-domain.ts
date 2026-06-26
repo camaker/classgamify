@@ -2545,6 +2545,10 @@ assert.equal(
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)
 );
 const playRouteSource = readFileSync('src/routes/play/$shareId.tsx', 'utf8');
+const publicAssignmentRulesComponentSource = readFileSync(
+  'src/components/assignments/public-assignment-rules.tsx',
+  'utf8'
+);
 const studentRunnerStateSource = readFileSync(
   'src/assignments/student-runner-state.ts',
   'utf8'
@@ -2600,10 +2604,30 @@ assert.match(
   /StudentRuntimeItemList/,
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
 );
+assert.match(
+  playRouteSource,
+  /PublicAssignmentRules/,
+  'Student play route should delegate public rule summary rendering to the public assignment rules component.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /PublicAssignmentRuleSummaryItem/,
+  'Public assignment rules component should consume assignment-domain public rule summary items.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /getPublicAssignmentRuleIcon[\s\S]*id === 'items'[\s\S]*id === 'attempts'[\s\S]*id === 'identity'[\s\S]*id === 'answerReveal'/,
+  'Public assignment rules component should own rule icon mapping for student-facing delivery policy.'
+);
 assert.doesNotMatch(
   playRouteSource,
   /buildDefaultRuntimeItemCardViews|getActivityTemplateRunnerKind|getActivityTemplateRunnerCopy|LineMatchBoard|MatchingPairsBoard|GroupSortBoard|FillBlankWorksheet|OpenBoxRunner|ListeningRunner|RuntimeItemList\(|RuntimeItemCard\(|ChoiceGrid\(/,
   'Student play route should not own template runner dispatch or default runtime-card rendering.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /PublicAssignmentRuleIcon|PublicAssignmentRuleSummaryItem|PublicAssignmentRuleSummaryId|getPublicAssignmentRuleIcon/,
+  'Student play route should not own public assignment rule card or icon rendering details.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -9867,6 +9891,18 @@ const dashboardOverviewRouteSource = readFileSync(
   'src/routes/dashboard/index.tsx',
   'utf8'
 );
+const dashboardOverviewActionCardSource = readFileSync(
+  'src/components/dashboard/dashboard-overview-action-card.tsx',
+  'utf8'
+);
+const dashboardOverviewMetricCardSource = readFileSync(
+  'src/components/dashboard/dashboard-overview-metric-card.tsx',
+  'utf8'
+);
+const dashboardOverviewReadinessRowSource = readFileSync(
+  'src/components/dashboard/dashboard-overview-readiness-row.tsx',
+  'utf8'
+);
 assert.match(
   dashboardOverviewRouteSource,
   /useActivities\(\{[\s\S]*pageIndex: 0,[\s\S]*pageSize: 1,[\s\S]*status: 'active'/,
@@ -9886,6 +9922,41 @@ assert.doesNotMatch(
   dashboardOverviewRouteSource,
   /buildDashboardOverviewMetrics|buildDashboardCoreLoopReadiness|getDashboardOverviewActionCards/,
   'Dashboard overview route should not directly rebuild metrics, readiness rows, or action cards.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /DashboardOverviewMetricCard/,
+  'Dashboard overview route should delegate metric card rendering to the dashboard overview metric component.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /DashboardOverviewReadinessRow/,
+  'Dashboard overview route should delegate readiness row rendering to the dashboard overview readiness component.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /DashboardOverviewActionCard/,
+  'Dashboard overview route should delegate action card rendering to the dashboard overview action component.'
+);
+assert.doesNotMatch(
+  dashboardOverviewRouteSource,
+  /function (?:MetricCard|ReadinessRow|ActionCard)\(|dashboardMetricIcons|dashboardActionIcons|dashboardActionHrefs|Progress/,
+  'Dashboard overview route should not own local metric, readiness, action-card, icon, href, or progress rendering details.'
+);
+assert.match(
+  dashboardOverviewMetricCardSource,
+  /dashboardMetricIcons/,
+  'Dashboard overview metric component should own metric icon mapping.'
+);
+assert.match(
+  dashboardOverviewReadinessRowSource,
+  /Progress/,
+  'Dashboard overview readiness component should own readiness progress rendering.'
+);
+assert.match(
+  dashboardOverviewActionCardSource,
+  /dashboardActionIcons[\s\S]*dashboardActionHrefs/,
+  'Dashboard overview action component should own action icon and route mapping.'
 );
 assert.match(
   dashboardOverviewRouteSource,

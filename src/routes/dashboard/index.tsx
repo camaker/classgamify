@@ -1,32 +1,24 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { ActivityPreview } from '@/components/activities/activity-preview';
+import { DashboardOverviewActionCard } from '@/components/dashboard/dashboard-overview-action-card';
+import { DashboardOverviewMetricCard } from '@/components/dashboard/dashboard-overview-metric-card';
+import { DashboardOverviewReadinessRow } from '@/components/dashboard/dashboard-overview-readiness-row';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { useActivities } from '@/hooks/use-activities';
 import { useAssignments } from '@/hooks/use-assignments';
 import {
   buildDashboardOverviewPageViewModel,
   dashboardOverviewPageCopy,
-  type DashboardOverviewActionCard,
-  type DashboardOverviewActionCardId,
-  type DashboardOverviewMetricId,
-  type DashboardCoreLoopReadinessRow,
 } from '@/dashboard/overview';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
-  IconChartBar,
-  IconClipboardList,
   IconDeviceGamepad2,
-  IconLayoutGrid,
-  IconListCheck,
-  IconPlayerPlay,
   IconPlus,
   IconSparkles,
-  type TablerIcon,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 
@@ -67,7 +59,7 @@ function DashboardPage() {
       <div className="grid gap-6">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {pageView.metrics.map((metric) => (
-            <MetricCard key={metric.id} metric={metric} />
+            <DashboardOverviewMetricCard key={metric.id} metric={metric} />
           ))}
         </section>
 
@@ -119,7 +111,7 @@ function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {pageView.readinessRows.map((row) => (
-                <ReadinessRow key={row.id} row={row} />
+                <DashboardOverviewReadinessRow key={row.id} row={row} />
               ))}
             </CardContent>
           </Card>
@@ -129,90 +121,10 @@ function DashboardPage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {pageView.actionCards.map((card) => (
-            <ActionCard key={card.id} card={card} />
+            <DashboardOverviewActionCard key={card.id} card={card} />
           ))}
         </section>
       </div>
     </DashboardLayout>
-  );
-}
-
-function MetricCard({
-  metric,
-}: {
-  metric: {
-    description: string;
-    id: DashboardOverviewMetricId;
-    label: string;
-    value: string;
-  };
-}) {
-  const Icon = dashboardMetricIcons[metric.id];
-
-  return (
-    <Card className="rounded-lg">
-      <CardContent className="p-4">
-        <Icon className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
-        <p className="text-sm font-medium">{metric.label}</p>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          {metric.description}
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-const dashboardMetricIcons: Record<DashboardOverviewMetricId, TablerIcon> = {
-  activities: IconDeviceGamepad2,
-  assignments: IconClipboardList,
-  results: IconChartBar,
-  templates: IconLayoutGrid,
-};
-
-const dashboardActionIcons: Record<DashboardOverviewActionCardId, TablerIcon> =
-  {
-    activities: IconDeviceGamepad2,
-    assignments: IconListCheck,
-    'student-preview': IconPlayerPlay,
-  };
-
-const dashboardActionHrefs: Record<DashboardOverviewActionCardId, string> = {
-  activities: Routes.DashboardActivities,
-  assignments: Routes.DashboardAssignments,
-  'student-preview': Routes.PlayDemo,
-};
-
-function ReadinessRow({ row }: { row: DashboardCoreLoopReadinessRow }) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <span>{row.label}</span>
-        <span className="text-muted-foreground">{row.value}%</span>
-      </div>
-      <Progress value={row.value} />
-    </div>
-  );
-}
-
-function ActionCard({ card }: { card: DashboardOverviewActionCard }) {
-  const Icon = dashboardActionIcons[card.id];
-
-  return (
-    <Link
-      to={dashboardActionHrefs[card.id]}
-      className="group rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-        <Icon className="size-4" />
-      </div>
-      <h2 className="mt-4 font-semibold">{card.title}</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        {card.description}
-      </p>
-      <span className="mt-4 inline-flex text-sm font-medium text-primary">
-        {card.cta}
-      </span>
-    </Link>
   );
 }
