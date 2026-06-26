@@ -1,4 +1,3 @@
-import { m } from '@/locale/paraglide/messages';
 import { CustomerPortalButton } from '@/components/pricing/customer-portal-button';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -16,6 +15,12 @@ import { formatDate } from '@/lib/formatter';
 import { cn } from '@/lib/utils';
 import { useCurrentPlan } from '@/hooks/use-payment';
 import { getPricePlans } from '@/lib/price-plan';
+import {
+  buildSettingsBillingCardViewModel,
+  type SettingsBillingCardActionKind,
+  type SettingsBillingCardBadge,
+  type SettingsBillingCardPeriodRow,
+} from '@/payment/billing-view';
 import { Link } from '@tanstack/react-router';
 import { Routes } from '@/lib/routes';
 import { IconCircleCheck, IconClock, IconRefresh } from '@tabler/icons-react';
@@ -41,35 +46,27 @@ export function BillingCard() {
   } = useCurrentPlan(!!currentUser?.id);
   const currentPlan = paymentData?.currentPlan ?? null;
   const subscription = paymentData?.subscription ?? null;
-  const isLifetimeMember = currentPlan?.isLifetime ?? false;
-  // Resolve display name from config (fallback to plan id or "Free")
   const plansRecord = getPricePlans();
   const plans = Object.values(plansRecord);
-  const currentPlanWithName = currentPlan
-    ? (plans.find((p) => p.id === currentPlan.id) ?? currentPlan)
-    : null;
-  const isFreePlan = currentPlanWithName?.isFree ?? false;
-  const currentPeriodStart = subscription?.currentPeriodStart
-    ? formatDate(subscription.currentPeriodStart)
-    : null;
-  const currentPeriodEnd = subscription?.currentPeriodEnd
-    ? formatDate(subscription.currentPeriodEnd)
-    : null;
-  const trialEndDate = subscription?.trialEndDate
-    ? formatDate(subscription.trialEndDate)
-    : null;
   const handleRetry = useCallback(() => refetchPayment(), [refetchPayment]);
-  // Loading: skeleton for header, content and footer (footer button area right-aligned)
-  if (isLoadingPayment || isLoadingSession) {
+  const view = buildSettingsBillingCardViewModel({
+    canManageBilling: Boolean(currentUser),
+    currentPlan,
+    formatDate,
+    hasLoadError: Boolean(loadPaymentError),
+    isLoading: isLoadingPayment || isLoadingSession,
+    plans,
+    subscription,
+  });
+
+  if (view.state === 'loading') {
     return (
       <Card className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            {m.settings_billing_card_current_plan()}
+            {view.header.title}
           </CardTitle>
-          <CardDescription>
-            {m.settings_billing_card_current_plan_description()}
-          </CardDescription>
+          <CardDescription>{view.header.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 flex-1">
           <div className="flex items-center justify-start space-x-4">
@@ -85,168 +82,152 @@ export function BillingCard() {
       </Card>
     );
   }
-  // Error: show message in content and retry button in footer (right-aligned)
-  if (loadPaymentError) {
+
+  if (view.state === 'error') {
     return (
       <Card className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            {m.settings_billing_card_current_plan()}
+            {view.header.title}
           </CardTitle>
-          <CardDescription>
-            {m.settings_billing_card_current_plan_description()}
-          </CardDescription>
+          <CardDescription>{view.header.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 flex-1">
-          <div className="text-destructive text-sm">
-            {m.settings_billing_card_load_error()}
-          </div>
+          <div className="text-destructive text-sm">{view.message}</div>
         </CardContent>
         <CardFooter className={footerClass}>
           <Button variant="outline" onClick={handleRetry}>
             <IconRefresh className="size-4 mr-1" />
-            {m.settings_billing_card_retry()}
+            {view.action?.label}
           </Button>
         </CardFooter>
       </Card>
     );
   }
-  // No plan: show noPlan message and upgrade CTA in footer (right-aligned)
-  if (!currentPlanWithName) {
+
+  if (view.state === 'no-plan') {
     return (
       <Card className={cardClass}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            {m.settings_billing_card_current_plan()}
+            {view.header.title}
           </CardTitle>
-          <CardDescription>
-            {m.settings_billing_card_current_plan_description()}
-          </CardDescription>
+          <CardDescription>{view.header.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground">
-            {m.settings_billing_card_no_plan()}
-          </div>
+          <div className="text-sm text-muted-foreground">{view.message}</div>
         </CardContent>
         <CardFooter className={footerClass}>
-          <Link
-            to={Routes.Pricing}
-            className={buttonVariants({ variant: 'default' })}
-          >
-            {m.settings_billing_card_upgrade_plan()}
-          </Link>
+          <BillingCardAction action={view.action} onRetry={handleRetry} />
         </CardFooter>
       </Card>
     );
   }
-  // Main state: plan name, status badge, period/trial info, single primary action in footer
+
   return (
     <Card className={cardClass}>
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
-          {m.settings_billing_card_current_plan()}
+          {view.header.title}
         </CardTitle>
-        <CardDescription>
-          {m.settings_billing_card_current_plan_description()}
-        </CardDescription>
+        <CardDescription>{view.header.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 flex-1">
-        {/* Plan name and status badge (trialing | active) */}
         <div className="flex items-center justify-start space-x-4">
-          <div className="text-3xl font-medium">
-            {currentPlanWithName?.name ??
-              currentPlan?.id ??
-              m.settings_billing_card_free()}
-          </div>
-          {subscription &&
-            (subscription.status === 'trialing' ||
-              subscription.status === 'active') && (
-              <Badge
-                variant="outline"
-                className={cn(
-                  'text-xs border-transparent',
-                  subscription.status === 'trialing'
-                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
-                    : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
-                )}
-              >
-                {subscription.status === 'trialing' ? (
-                  <span className="flex items-center space-x-2">
-                    <IconClock className="size-3 mr-1" />
-                    {m.settings_billing_card_status_trial()}
-                  </span>
-                ) : (
-                  <span className="flex items-center space-x-2">
-                    <IconCircleCheck className="size-3 mr-1" />
-                    {m.settings_billing_card_status_active()}
-                  </span>
-                )}
-              </Badge>
-            )}
+          <div className="text-3xl font-medium">{view.plan?.name}</div>
+          {view.statusBadge && <BillingStatusBadge badge={view.statusBadge} />}
         </div>
 
-        {/* Free plan hint */}
-        {isFreePlan && (
+        {view.plan?.message && (
           <div className="text-sm text-muted-foreground">
-            {m.settings_billing_card_free_plan_message()}
+            {view.plan.message}
           </div>
         )}
 
-        {/* Lifetime plan hint */}
-        {isLifetimeMember && (
-          <div className="text-sm text-muted-foreground">
-            {m.settings_billing_card_lifetime_message()}
-          </div>
-        )}
-
-        {/* Subscription period and trial dates */}
-        {subscription && (
+        {view.periodRows.length > 0 && (
           <div className="text-sm text-muted-foreground space-y-2">
-            {currentPeriodStart && (
-              <div className="text-muted-foreground">
-                {m.settings_billing_card_period_start()} {currentPeriodStart}
-              </div>
-            )}
-            {currentPeriodEnd && (
-              <div className="text-muted-foreground">
-                {m.settings_billing_card_period_ends()} {currentPeriodEnd}
-                {subscription.cancelAtPeriodEnd &&
-                  ` ${m.settings_billing_card_cancels_at_period_end()}`}
-              </div>
-            )}
-            {subscription.status === 'trialing' && trialEndDate && (
-              <div className="text-amber-600">
-                {m.settings_billing_card_trial_ends()} {trialEndDate}
-              </div>
-            )}
+            {view.periodRows.map((row) => (
+              <BillingPeriodRow key={row.id} row={row} />
+            ))}
           </div>
         )}
       </CardContent>
       <CardFooter className={footerClass}>
-        {/* Free: show upgrade button */}
-        {isFreePlan && (
-          <Link
-            to={Routes.Pricing}
-            className={buttonVariants({ variant: 'default' })}
-          >
-            {m.settings_billing_card_upgrade_plan()}
-          </Link>
-        )}
-
-        {/* Lifetime: show manage billing */}
-        {isLifetimeMember && currentUser && (
-          <CustomerPortalButton returnUrl={undefined}>
-            {m.settings_billing_card_manage_billing()}
-          </CustomerPortalButton>
-        )}
-
-        {/* Subscription: show manage subscription (only when not free and not lifetime) */}
-        {!isFreePlan && !isLifetimeMember && currentUser && (
-          <CustomerPortalButton returnUrl={undefined}>
-            {m.settings_billing_card_manage_subscription()}
-          </CustomerPortalButton>
-        )}
+        <BillingCardAction action={view.action} onRetry={handleRetry} />
       </CardFooter>
     </Card>
+  );
+}
+
+function BillingStatusBadge({ badge }: { badge: SettingsBillingCardBadge }) {
+  const Icon = badge.icon === 'clock' ? IconClock : IconCircleCheck;
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        'text-xs border-transparent',
+        badge.tone === 'trial'
+          ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
+          : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+      )}
+    >
+      <span className="flex items-center space-x-2">
+        <Icon className="size-3 mr-1" />
+        {badge.label}
+      </span>
+    </Badge>
+  );
+}
+
+function BillingPeriodRow({ row }: { row: SettingsBillingCardPeriodRow }) {
+  return (
+    <div
+      className={cn(
+        row.tone === 'warning' ? 'text-amber-600' : 'text-muted-foreground'
+      )}
+    >
+      {row.label} {row.value}
+      {row.suffix && ` ${row.suffix}`}
+    </div>
+  );
+}
+
+function BillingCardAction({
+  action,
+  onRetry,
+}: {
+  action?: {
+    kind: SettingsBillingCardActionKind;
+    label: string;
+  };
+  onRetry: () => void;
+}) {
+  if (!action) return null;
+
+  if (action.kind === 'retry') {
+    return (
+      <Button variant="outline" onClick={onRetry}>
+        <IconRefresh className="size-4 mr-1" />
+        {action.label}
+      </Button>
+    );
+  }
+
+  if (action.kind === 'upgrade') {
+    return (
+      <Link
+        to={Routes.Pricing}
+        className={buttonVariants({ variant: 'default' })}
+      >
+        {action.label}
+      </Link>
+    );
+  }
+
+  return (
+    <CustomerPortalButton returnUrl={undefined}>
+      {action.label}
+    </CustomerPortalButton>
   );
 }

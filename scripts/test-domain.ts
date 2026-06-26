@@ -251,6 +251,12 @@ import {
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
 } from '@/pages/public-page-view';
+import {
+  buildPaymentStatusView,
+  getInitialPaymentConfirmationStatus,
+} from '@/payment/payment-status-view';
+import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
+import type { PricePlan, Subscription } from '@/payment/types';
 import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
 import {
   buildAssignmentAttemptStatsView,
@@ -2128,16 +2134,213 @@ const billingCardSource = readFileSync(
   'src/components/settings/billing/billing-card.tsx',
   'utf8'
 );
+const billingViewSource = readFileSync('src/payment/billing-view.ts', 'utf8');
+const paymentCardSource = readFileSync(
+  'src/components/payment/payment-card.tsx',
+  'utf8'
+);
+const paymentStatusViewSource = readFileSync(
+  'src/payment/payment-status-view.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   billingCardSource,
   /loadPaymentError\?\.message|loadPaymentError\.message|err\.message|error\.message|err instanceof Error|error instanceof Error/,
   'Billing status failures should use localized billing copy instead of raw payment or network errors.'
 );
 assert.match(
-  billingCardSource,
+  billingViewSource,
   /m\.settings_billing_card_load_error\(\)/,
   'Billing status failures should show the localized billing load failure message.'
 );
+assert.match(
+  billingCardSource,
+  /buildSettingsBillingCardViewModel/,
+  'BillingCard should render the shared billing view model instead of rebuilding plan state locally.'
+);
+assert.doesNotMatch(
+  billingCardSource,
+  /getPricePlans\(\)[\s\S]*find\(\(p\) => p\.id === currentPlan\.id\)|subscription\.status === 'trialing'|subscription\.cancelAtPeriodEnd/,
+  'BillingCard should not keep plan resolution or subscription status rules in the component.'
+);
+assert.match(
+  paymentCardSource,
+  /buildPaymentStatusView/,
+  'PaymentCard should render the shared payment status view instead of owning localized status copy.'
+);
+assert.match(
+  paymentCardSource,
+  /getInitialPaymentConfirmationStatus/,
+  'PaymentCard should derive its initial status through the payment status helper.'
+);
+assert.doesNotMatch(
+  paymentCardSource,
+  /settings_payment_(?:processing|success|failed|timeout)_(?:title|description)/,
+  'PaymentCard should not keep payment status copy keys in the component.'
+);
+assert.match(
+  paymentStatusViewSource,
+  /settings_payment_processing_description[\s\S]*settings_payment_success_description[\s\S]*settings_payment_failed_description[\s\S]*settings_payment_timeout_description/,
+  'Payment status copy should stay centralized in the payment status view helper.'
+);
+overwriteGetLocale(() => 'en');
+const formatBillingTestDate = (date: Date) =>
+  `date:${date.toISOString().slice(0, 10)}`;
+const freeBillingPlan: PricePlan = {
+  id: 'free',
+  isFree: true,
+  isLifetime: false,
+  name: 'Imported Free',
+  prices: [],
+};
+const configuredFreeBillingPlan: PricePlan = {
+  ...freeBillingPlan,
+  name: 'Configured Free',
+};
+const proBillingPlan: PricePlan = {
+  id: 'pro',
+  isFree: false,
+  isLifetime: false,
+  name: 'Classroom Pro',
+  prices: [
+    {
+      amount: 699,
+      currency: 'USD',
+      interval: 'month',
+      priceId: 'price_pro_monthly',
+      type: 'subscription',
+    },
+  ],
+};
+const lifetimeBillingPlan: PricePlan = {
+  id: 'lifetime',
+  isFree: false,
+  isLifetime: true,
+  name: 'Lifetime Studio',
+  prices: [
+    {
+      amount: 7900,
+      currency: 'USD',
+      priceId: 'price_lifetime',
+      type: 'one_time',
+    },
+  ],
+};
+const trialBillingSubscription: Subscription = {
+  createdAt: new Date('2026-01-01T00:00:00Z'),
+  currentPeriodEnd: new Date('2026-02-01T00:00:00Z'),
+  currentPeriodStart: new Date('2026-01-01T00:00:00Z'),
+  customerId: 'cus_test',
+  id: 'sub_test',
+  interval: 'month',
+  priceId: 'price_pro_monthly',
+  status: 'trialing',
+  trialEndDate: new Date('2026-01-15T00:00:00Z'),
+  type: 'subscription',
+};
+const loadingBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: false,
+  currentPlan: null,
+  formatDate: formatBillingTestDate,
+  hasLoadError: false,
+  isLoading: true,
+  plans: [],
+  subscription: null,
+});
+assert.equal(loadingBillingView.state, 'loading');
+assert.equal(loadingBillingView.action, undefined);
+const errorBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: false,
+  currentPlan: null,
+  formatDate: formatBillingTestDate,
+  hasLoadError: true,
+  isLoading: false,
+  plans: [],
+  subscription: null,
+});
+assert.equal(errorBillingView.state, 'error');
+assert.equal(errorBillingView.action?.kind, 'retry');
+assert.equal(errorBillingView.message, 'Failed to load billing info');
+const noPlanBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: false,
+  currentPlan: null,
+  formatDate: formatBillingTestDate,
+  hasLoadError: false,
+  isLoading: false,
+  plans: [],
+  subscription: null,
+});
+assert.equal(noPlanBillingView.state, 'no-plan');
+assert.equal(noPlanBillingView.action?.kind, 'upgrade');
+const freeBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: true,
+  currentPlan: freeBillingPlan,
+  formatDate: formatBillingTestDate,
+  hasLoadError: false,
+  isLoading: false,
+  plans: [configuredFreeBillingPlan, proBillingPlan],
+  subscription: null,
+});
+assert.equal(freeBillingView.state, 'ready');
+assert.equal(freeBillingView.plan?.name, 'Configured Free');
+assert.equal(freeBillingView.plan?.isFree, true);
+assert.equal(freeBillingView.action?.kind, 'upgrade');
+assert.match(freeBillingView.plan?.message ?? '', /starter activity workflow/);
+const trialBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: true,
+  currentPlan: proBillingPlan,
+  formatDate: formatBillingTestDate,
+  hasLoadError: false,
+  isLoading: false,
+  plans: [configuredFreeBillingPlan, proBillingPlan],
+  subscription: {
+    ...trialBillingSubscription,
+    cancelAtPeriodEnd: true,
+  },
+});
+assert.equal(trialBillingView.statusBadge?.tone, 'trial');
+assert.equal(trialBillingView.statusBadge?.icon, 'clock');
+assert.equal(trialBillingView.action?.kind, 'manage-subscription');
+assert.deepEqual(
+  trialBillingView.periodRows.map((row) => [
+    row.id,
+    row.value,
+    row.suffix ?? '',
+  ]),
+  [
+    ['period-start', 'date:2026-01-01', ''],
+    ['period-end', 'date:2026-02-01', '(cancels at period end)'],
+    ['trial-end', 'date:2026-01-15', ''],
+  ]
+);
+const lifetimeBillingView = buildSettingsBillingCardViewModel({
+  canManageBilling: true,
+  currentPlan: lifetimeBillingPlan,
+  formatDate: formatBillingTestDate,
+  hasLoadError: false,
+  isLoading: false,
+  plans: [lifetimeBillingPlan],
+  subscription: null,
+});
+assert.equal(lifetimeBillingView.action?.kind, 'manage-billing');
+assert.match(lifetimeBillingView.plan?.message ?? '', /lifetime access/);
+assert.equal(getInitialPaymentConfirmationStatus(undefined), 'failed');
+assert.equal(getInitialPaymentConfirmationStatus('cs_test'), 'processing');
+assert.deepEqual(buildPaymentStatusView('processing'), {
+  description: 'Please wait while we verify your ClassGamify plan access.',
+  icon: 'loader',
+  title: 'Confirming your payment',
+  tone: 'working',
+});
+assert.equal(buildPaymentStatusView('success').tone, 'success');
+assert.match(
+  buildPaymentStatusView('success').description,
+  /ClassGamify workspace billing page/
+);
+assert.equal(buildPaymentStatusView('failed').icon, 'x');
+assert.match(buildPaymentStatusView('failed').description, /pricing page/);
+assert.equal(buildPaymentStatusView('timeout').tone, 'warning');
+assert.match(buildPaymentStatusView('timeout').description, /Billing/);
 const newsletterApiSource = readFileSync('src/api/newsletter.ts', 'utf8');
 assert.doesNotMatch(
   newsletterApiSource,

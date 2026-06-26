@@ -1,4 +1,3 @@
-import { m } from '@/locale/paraglide/messages';
 import { checkPaymentCompletion } from '@/api/payment';
 import {
   Card,
@@ -10,6 +9,13 @@ import {
   PAYMENT_MAX_POLL_TIME,
   PAYMENT_POLL_INTERVAL,
 } from '@/payment/constants';
+import {
+  buildPaymentStatusView,
+  getInitialPaymentConfirmationStatus,
+  type PaymentConfirmationStatus,
+  type PaymentStatusIconKey,
+  type PaymentStatusTone,
+} from '@/payment/payment-status-view';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
@@ -19,52 +25,32 @@ import {
   IconLoader2,
 } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
-type PaymentStatus = 'processing' | 'success' | 'failed' | 'timeout';
-function getStatusContent(status: PaymentStatus): {
-  title: string;
-  description: string;
-} {
-  switch (status) {
-    case 'processing':
-      return {
-        title: m.settings_payment_processing_title(),
-        description: m.settings_payment_processing_description(),
-      };
-    case 'success':
-      return {
-        title: m.settings_payment_success_title(),
-        description: m.settings_payment_success_description(),
-      };
-    case 'failed':
-      return {
-        title: m.settings_payment_failed_title(),
-        description: m.settings_payment_failed_description(),
-      };
-    case 'timeout':
-      return {
-        title: m.settings_payment_timeout_title(),
-        description: m.settings_payment_timeout_description(),
-      };
-    default:
-      return { title: '', description: '' };
-  }
-}
-function StatusIcon({ status }: { status: PaymentStatus }) {
-  switch (status) {
-    case 'processing':
-      return (
-        <IconLoader2 className="size-12 shrink-0 text-cyan-600 animate-spin" />
-      );
-    case 'success':
-      return <IconCircleCheck className="size-12 shrink-0 text-green-600" />;
-    case 'failed':
-      return <IconCircleX className="size-12 shrink-0 text-red-600" />;
-    case 'timeout':
-      return <IconAlertCircle className="size-12 shrink-0 text-yellow-600" />;
-    default:
-      return (
-        <IconLoader2 className="size-12 shrink-0 text-muted-foreground animate-spin" />
-      );
+
+const paymentStatusToneClass = {
+  danger: 'text-red-600',
+  success: 'text-green-600',
+  warning: 'text-yellow-600',
+  working: 'text-cyan-600',
+} satisfies Record<PaymentStatusTone, string>;
+
+function StatusIcon({
+  icon,
+  tone,
+}: {
+  icon: PaymentStatusIconKey;
+  tone: PaymentStatusTone;
+}) {
+  const iconClassName = `size-12 shrink-0 ${paymentStatusToneClass[tone]}`;
+
+  switch (icon) {
+    case 'loader':
+      return <IconLoader2 className={`${iconClassName} animate-spin`} />;
+    case 'check':
+      return <IconCircleCheck className={iconClassName} />;
+    case 'x':
+      return <IconCircleX className={iconClassName} />;
+    case 'alert':
+      return <IconAlertCircle className={iconClassName} />;
   }
 }
 type PaymentCardProps = {
@@ -80,8 +66,8 @@ export function PaymentCard({
 }: PaymentCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState<PaymentStatus>(() =>
-    sessionId ? 'processing' : 'failed'
+  const [status, setStatus] = useState<PaymentConfirmationStatus>(() =>
+    getInitialPaymentConfirmationStatus(sessionId)
   );
   const pollEndRef = useRef(false);
   const startRef = useRef<number>(0);
@@ -121,16 +107,16 @@ export function PaymentCard({
     };
     run();
   }, [status, callback, queryClient, navigate]);
-  const { title, description } = getStatusContent(status);
+  const statusView = buildPaymentStatusView(status);
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="py-4 text-center">
           <div className="mb-8 flex justify-center">
-            <StatusIcon status={status} />
+            <StatusIcon icon={statusView.icon} tone={statusView.tone} />
           </div>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardTitle>{statusView.title}</CardTitle>
+          <CardDescription>{statusView.description}</CardDescription>
         </CardHeader>
       </Card>
     </div>
