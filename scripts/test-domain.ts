@@ -8011,6 +8011,10 @@ const dashboardActivitiesRouteSource = readFileSync(
   'src/routes/dashboard/activities.tsx',
   'utf8'
 );
+const activityLibrarySearchComponentSource = readFileSync(
+  'src/components/activities/activity-library-search.tsx',
+  'utf8'
+);
 assert.match(
   dashboardActivitiesRouteSource,
   /const \{ created, page, q, source, status, template \} = Route\.useSearch\(\)/,
@@ -8022,9 +8026,9 @@ assert.match(
   'Activity library route should pass the source-material filter to list queries and preserve it in pagination.'
 );
 assert.match(
-  dashboardActivitiesRouteSource,
+  activityLibrarySearchComponentSource,
   /id="activity-source-filter"/,
-  'Activity library route should render a source-material filter control.'
+  'Activity library search component should render a source-material filter control.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -8048,8 +8052,18 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /ActivityLibrarySearch/,
+  'Activity dashboard route should delegate filter controls to the activity library search component.'
+);
+assert.match(
+  activityLibrarySearchComponentSource,
   /buildActivityLibrarySearchPanelView/,
-  'Activity dashboard route should render filter summary and filter options from the activity-domain search panel view.'
+  'Activity library search component should render filter summary and filter options from the activity-domain search panel view.'
+);
+assert.doesNotMatch(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibrarySearchPanelView|activityLibrarySearchCopy|NativeSelect|NativeSelectOption|id="activity-source-filter"/,
+  'Activity dashboard route should not own activity library search-control rendering details.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
