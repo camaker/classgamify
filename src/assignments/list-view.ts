@@ -442,7 +442,10 @@ export function resolveAssignmentListPageSearch(
 ): AssignmentListPageResolvedSearch {
   const searchQuery = search.q ?? '';
   const statusFilter = search.status ?? 'all';
-  const currentPage = search.page ?? 1;
+  const currentPage =
+    search.page && Number.isInteger(search.page) && search.page > 0
+      ? search.page
+      : 1;
   const normalizedSearchQuery = normalizeAssignmentListSearch(searchQuery);
   const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
 

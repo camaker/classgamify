@@ -11490,6 +11490,30 @@ assert.deepEqual(
     totalPages: 1,
   }
 );
+assert.equal(
+  buildAssignmentListPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: -2 },
+  }).resolvedSearch.currentPage,
+  1
+);
+assert.equal(
+  buildAssignmentListPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: 1.5 },
+  }).resolvedSearch.currentPage,
+  1
+);
+assert.equal(
+  buildAssignmentListPageViewModel({
+    data: null,
+    isLoading: false,
+    search: { page: 0 },
+  }).resolvedSearch.currentPage,
+  1
+);
 const filteredAssignmentListPageView = buildAssignmentListPageViewModel({
   data: {
     items: [
