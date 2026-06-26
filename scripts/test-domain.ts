@@ -2461,8 +2461,13 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /buildDefaultRuntimeItemCardViews/,
-  'Student play route should consume the assignment-domain default runtime-card view helper.'
+  /StudentRuntimeItemList/,
+  'Student play route should delegate template runtime item rendering to the student runtime item list component.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /buildDefaultRuntimeItemCardViews|getActivityTemplateRunnerKind|getActivityTemplateRunnerCopy|LineMatchBoard|MatchingPairsBoard|GroupSortBoard|FillBlankWorksheet|OpenBoxRunner|ListeningRunner|RuntimeItemList\(|RuntimeItemCard\(|ChoiceGrid\(/,
+  'Student play route should not own template runner dispatch or default runtime-card rendering.'
 );
 assert.doesNotMatch(
   playRouteSource,
