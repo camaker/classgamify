@@ -27,6 +27,7 @@ import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
   buildStudentAttemptControlState,
+  buildStudentAnswerChange,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmitGate,
@@ -522,10 +523,13 @@ function PlayPage() {
             templateType={activity.templateType}
             onAnswerChange={(itemId, answer) => {
               setConfirmIncompleteSubmit(false);
-              setAnswers((current) => ({
-                ...current,
-                [itemId]: answer,
-              }));
+              setAnswers((current) =>
+                buildStudentAnswerChange({
+                  answer,
+                  answers: current,
+                  itemId,
+                })
+              );
             }}
           />
 

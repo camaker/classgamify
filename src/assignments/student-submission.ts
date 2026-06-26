@@ -538,6 +538,21 @@ export function buildAttemptSubmissionAnswers({
   }));
 }
 
+export function buildStudentAnswerChange({
+  answer,
+  answers,
+  itemId,
+}: {
+  answer: string;
+  answers: StudentAnswerMap;
+  itemId: string;
+}): StudentAnswerMap {
+  return {
+    ...answers,
+    [itemId]: answer,
+  };
+}
+
 export function buildStudentAttemptSubmissionInput({
   anonymousToken,
   answers,

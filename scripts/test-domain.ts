@@ -475,6 +475,7 @@ import {
   buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
   buildStudentAttemptControlState,
+  buildStudentAnswerChange,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSessionKey,
@@ -2055,6 +2056,16 @@ assert.doesNotMatch(
   /durationSeconds:\s*buildAttemptTimerState\(/,
   'Student play route should not read timer-state internals when building the submission payload.'
 );
+assert.match(
+  playRouteSource,
+  /buildStudentAnswerChange\(/,
+  'Student play route should update browser answers through assignment-domain helpers.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /setAnswers\(\(current\) => \(\{[\s\S]*\.\.\.current,[\s\S]*\[itemId\]: answer/,
+  'Student play route should not hand-build answer-map updates.'
+);
 const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
   'utf8'
@@ -2985,6 +2996,19 @@ assert.deepEqual(
     { answer: '', itemId: 'item-3' },
   ]
 );
+const changedAnswers = buildStudentAnswerChange({
+  answer: 'banana',
+  answers,
+  itemId: 'item-2',
+});
+assert.deepEqual(changedAnswers, {
+  'item-1': ' apple ',
+  'item-2': 'banana',
+});
+assert.deepEqual(answers, {
+  'item-1': ' apple ',
+  'item-2': '   ',
+});
 assert.deepEqual(
   buildStudentAttemptResultDisplay({
     accuracy: 66.6,
