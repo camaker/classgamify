@@ -463,9 +463,12 @@ import {
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
 import {
+  buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
   buildStudentRunnerReadyState,
+  getStudentRunnerAttemptStartedAt,
+  shouldStartStudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import {
   buildAttemptCompletionCopy,
@@ -2025,6 +2028,21 @@ assert.doesNotMatch(
   playRouteSource,
   /window\.setInterval\([\s\S]*,\s*1000\)/,
   'Student play route timer refresh should not keep a local millisecond interval.'
+);
+assert.match(
+  playRouteSource,
+  /getStudentRunnerAttemptStartedAt\(/,
+  'Student play route should resolve attempt start times through assignment-domain helpers.'
+);
+assert.match(
+  playRouteSource,
+  /shouldStartStudentRunnerAttemptClock\(/,
+  'Student play route should start attempt clocks through assignment-domain helpers.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /attemptClock\?\.shareId === activeShareId\s*\?\s*attemptClock\.startedAt\s*:\s*now/,
+  'Student play route should not keep local attempt-clock share-id math.'
 );
 const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
@@ -5732,6 +5750,91 @@ assert.deepEqual(
     itemCount: 0,
     runtimeItems: [],
   }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptClock({
+    activeShareId: ' share-public ',
+    now: 12_345,
+  }),
+  {
+    shareId: 'share-public',
+    startedAt: 12_345,
+  }
+);
+assert.equal(
+  getStudentRunnerAttemptStartedAt({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: ' share-public ',
+      startedAt: 1_000,
+    },
+    fallbackStartedAt: 2_000,
+  }),
+  1_000
+);
+assert.equal(
+  getStudentRunnerAttemptStartedAt({
+    activeShareId: 'other-share',
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 1_000,
+    },
+    fallbackStartedAt: 2_000,
+  }),
+  2_000
+);
+assert.equal(
+  shouldStartStudentRunnerAttemptClock({
+    activeShareId: 'share-public',
+    attemptClock: undefined,
+    hasResult: false,
+    itemCount: 2,
+    ready: true,
+  }),
+  true
+);
+assert.equal(
+  shouldStartStudentRunnerAttemptClock({
+    activeShareId: ' share-public ',
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 1_000,
+    },
+    hasResult: false,
+    itemCount: 2,
+    ready: true,
+  }),
+  false
+);
+assert.equal(
+  shouldStartStudentRunnerAttemptClock({
+    activeShareId: 'share-public',
+    attemptClock: undefined,
+    hasResult: true,
+    itemCount: 2,
+    ready: true,
+  }),
+  false
+);
+assert.equal(
+  shouldStartStudentRunnerAttemptClock({
+    activeShareId: 'share-public',
+    attemptClock: undefined,
+    hasResult: false,
+    itemCount: 0,
+    ready: true,
+  }),
+  false
+);
+assert.equal(
+  shouldStartStudentRunnerAttemptClock({
+    activeShareId: 'share-public',
+    attemptClock: undefined,
+    hasResult: false,
+    itemCount: 2,
+    ready: false,
+  }),
+  false
 );
 assert.deepEqual(
   buildPublicAssignmentPreviewActivity(publicAssignmentPayload),

@@ -47,6 +47,11 @@ type StudentRunnerAttemptState = {
   runtimeItems: PublicRuntimeItem[];
 };
 
+export type StudentRunnerAttemptClock = {
+  shareId: string;
+  startedAt: number;
+};
+
 export function buildStudentRunnerPageState({
   data,
   isLoading,
@@ -172,6 +177,60 @@ export function buildStudentRunnerAttemptState({
     itemCount,
     runtimeItems,
   };
+}
+
+export function buildStudentRunnerAttemptClock({
+  activeShareId,
+  now,
+}: {
+  activeShareId: string;
+  now: number;
+}): StudentRunnerAttemptClock {
+  return {
+    shareId: normalizeAssignmentShareSlug(activeShareId),
+    startedAt: now,
+  };
+}
+
+export function getStudentRunnerAttemptStartedAt({
+  activeShareId,
+  attemptClock,
+  fallbackStartedAt,
+}: {
+  activeShareId: string;
+  attemptClock?: StudentRunnerAttemptClock;
+  fallbackStartedAt: number;
+}) {
+  if (
+    attemptClock &&
+    normalizeAssignmentShareSlug(attemptClock.shareId) ===
+      normalizeAssignmentShareSlug(activeShareId)
+  ) {
+    return attemptClock.startedAt;
+  }
+
+  return fallbackStartedAt;
+}
+
+export function shouldStartStudentRunnerAttemptClock({
+  activeShareId,
+  attemptClock,
+  hasResult,
+  itemCount,
+  ready,
+}: {
+  activeShareId: string;
+  attemptClock?: StudentRunnerAttemptClock;
+  hasResult: boolean;
+  itemCount: number;
+  ready: boolean;
+}) {
+  if (!ready || hasResult || itemCount <= 0) return false;
+
+  return (
+    normalizeAssignmentShareSlug(attemptClock?.shareId ?? '') !==
+    normalizeAssignmentShareSlug(activeShareId)
+  );
 }
 
 function orderStudentRunnerRuntimeItems({

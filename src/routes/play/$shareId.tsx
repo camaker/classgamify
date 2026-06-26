@@ -39,8 +39,12 @@ import {
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import {
+  buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
+  getStudentRunnerAttemptStartedAt,
+  shouldStartStudentRunnerAttemptClock,
+  type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
@@ -101,10 +105,7 @@ function PlayPage() {
   const submitAttemptMutation = useSubmitAttempt();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [studentName, setStudentName] = useState('');
-  const [attemptClock, setAttemptClock] = useState<{
-    shareId: string;
-    startedAt: number;
-  }>();
+  const [attemptClock, setAttemptClock] = useState<StudentRunnerAttemptClock>();
   const [result, setResult] = useState<AttemptSubmissionResult>();
   const [submittedAttemptCount, setSubmittedAttemptCount] = useState(0);
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
@@ -155,8 +156,11 @@ function PlayPage() {
   const itemCount = attemptState.itemCount;
   const canSubmit = attemptState.canSubmit;
   const activeShareId = attemptState.activeShareId;
-  const startedAt =
-    attemptClock?.shareId === activeShareId ? attemptClock.startedAt : now;
+  const startedAt = getStudentRunnerAttemptStartedAt({
+    activeShareId,
+    attemptClock,
+    fallbackStartedAt: now,
+  });
   const timeLimitSeconds = assignment?.settings.timeLimitSeconds;
   const attemptTimer = buildAttemptTimerState({
     now,
@@ -237,14 +241,25 @@ function PlayPage() {
   }, [attemptSessionKey, currentAttemptSessionKey]);
 
   useEffect(() => {
-    if (!assignment || itemCount === 0 || result) return;
-    if (attemptClock?.shareId === activeShareId) return;
+    if (
+      !shouldStartStudentRunnerAttemptClock({
+        activeShareId,
+        attemptClock,
+        hasResult: Boolean(result),
+        itemCount,
+        ready: Boolean(assignment),
+      })
+    ) {
+      return;
+    }
 
     const nextStartedAt = Date.now();
-    setAttemptClock({
-      shareId: activeShareId,
-      startedAt: nextStartedAt,
-    });
+    setAttemptClock(
+      buildStudentRunnerAttemptClock({
+        activeShareId,
+        now: nextStartedAt,
+      })
+    );
     setNow(nextStartedAt);
   }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
 
