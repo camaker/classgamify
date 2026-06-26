@@ -246,10 +246,12 @@ import {
 } from '@/assignments/attempt-limits';
 import {
   buildChoicePairingRunnerView,
+  buildDefaultRuntimeItemCardViews,
   buildGroupSortRunnerView,
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
   buildPublicAnswerFeedbackView,
+  buildRuntimeChoiceButtonViews,
   buildRuntimeChoiceViews,
   buildSequentialStudentRunnerView,
   buildSequentialRunnerView,
@@ -353,10 +355,13 @@ import {
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptAnswerReviewView,
+  buildAssignmentAttemptAnswerReviewViews,
   buildAssignmentAttemptReviewCardView,
+  buildAssignmentAttemptReviewCardViews,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentAttemptRowViews,
   buildAssignmentItemAnalysisCardView,
+  buildAssignmentItemAnalysisCardViews,
   buildAssignmentItemPerformanceRowView,
   buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
@@ -1400,6 +1405,31 @@ assert.match(
   'Assignment result page view-model should own formatted item performance row views.'
 );
 assert.match(
+  assignmentResultRouteSource,
+  /pageView\.itemAnalysisCardViews/,
+  'Assignment result route should render reteach-priority cards from the assignment-domain page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /itemAnalysisCardViews: buildAssignmentItemAnalysisCardViews|const itemAnalysisCardViews = data[\s\S]*buildAssignmentItemAnalysisCardViews/,
+  'Assignment result page view-model should own reteach-priority card views.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.attemptReviewCardViews/,
+  'Assignment result route should render answer review cards from the assignment-domain page view-model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /attemptReviewCardViews: buildAssignmentAttemptReviewCardViews|const attemptReviewCardViews = buildAssignmentAttemptReviewCardViews/,
+  'Assignment result page view-model should own answer review card views.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /buildAssignmentAttemptReviewCardView|buildAssignmentAttemptAnswerReviewView|buildAssignmentItemAnalysisCardView/,
+  'Assignment result route should not build reteach-priority or answer-review card state directly.'
+);
+assert.match(
   assignmentResultViewSource,
   /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
   'Assignment result actions should derive attempt availability from completed attempt stats.'
@@ -2272,6 +2302,16 @@ assert.doesNotMatch(
   'Student play route should not rebuild runner page, timer, completion, result, or header view state directly.'
 );
 assert.match(
+  playRouteSource,
+  /buildDefaultRuntimeItemCardViews/,
+  'Student play route should consume the assignment-domain default runtime-card view helper.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /isSameRuntimeChoice|buildStudentRunnerView/,
+  'Student play route should not rebuild default runtime card or choice selected state directly.'
+);
+assert.match(
   studentRunnerStateSource,
   /getStudentRunnerAttemptStartedAt\(/,
   'Student runner page view-model should resolve attempt start times through assignment-domain helpers.'
@@ -2822,6 +2862,85 @@ assert.deepEqual(
       choice: 'Rome',
       selected: true,
       usedByItemId: 'item-2',
+    },
+  ]
+);
+assert.deepEqual(
+  buildRuntimeChoiceButtonViews({
+    answer: ' Ｐａｒｉｓ ',
+    choices: ['Paris', 'Rome'],
+  }),
+  [
+    {
+      choice: 'Paris',
+      selected: true,
+    },
+    {
+      choice: 'Rome',
+      selected: false,
+    },
+  ]
+);
+assert.deepEqual(
+  buildDefaultRuntimeItemCardViews({
+    answers: { 'q-1': 'Ｐａｒｉｓ' },
+    correctAnswerLabel: 'Correct choice',
+    inputPlaceholder: 'Type an answer',
+    items: [
+      {
+        choices: ['Paris', 'Rome'],
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+      {
+        id: 'q-2',
+        kind: 'question',
+        prompt: 'Type the capital of Italy.',
+      },
+    ],
+    reviewItems: [
+      {
+        acceptedAnswers: ['Paris'],
+        correct: true,
+        correctAnswer: 'Paris',
+        itemId: 'q-1',
+        submitted: true,
+      },
+    ],
+  }).map((itemView) => ({
+    choiceViews: itemView.choiceViews,
+    correctAnswerLabel: itemView.correctAnswerLabel,
+    inputPlaceholder: itemView.inputPlaceholder,
+    positionLabel: itemView.positionLabel,
+    reviewSubmitted: itemView.reviewItem?.submitted,
+    showChoices: itemView.showChoices,
+  })),
+  [
+    {
+      choiceViews: [
+        {
+          choice: 'Paris',
+          selected: true,
+        },
+        {
+          choice: 'Rome',
+          selected: false,
+        },
+      ],
+      correctAnswerLabel: 'Correct choice',
+      inputPlaceholder: 'Type an answer',
+      positionLabel: '1. Capital of France?',
+      reviewSubmitted: true,
+      showChoices: true,
+    },
+    {
+      choiceViews: [],
+      correctAnswerLabel: 'Correct choice',
+      inputPlaceholder: 'Type an answer',
+      positionLabel: '2. Type the capital of Italy.',
+      reviewSubmitted: undefined,
+      showChoices: false,
     },
   ]
 );
@@ -14051,6 +14170,9 @@ assert.deepEqual(
       button.action,
       button.disabled,
     ]),
+    attemptReviewCardViews: scoredResultsPageView.attemptReviewCardViews.map(
+      (card) => [card.id, card.studentLabel, card.answerViews.length]
+    ),
     attemptRowViews: scoredResultsPageView.attemptRowViews.map((row) => [
       row.id,
       row.studentLabel,
@@ -14073,6 +14195,9 @@ assert.deepEqual(
     itemPerformanceRowViews: scoredResultsPageView.itemPerformanceRowViews.map(
       (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
     ),
+    itemAnalysisCardViews: scoredResultsPageView.itemAnalysisCardViews.map(
+      (item) => [item.id, item.correctRateLabel]
+    ),
     metricValues: scoredResultsPageView.metricItems.map((metric) => [
       metric.key,
       metric.value,
@@ -14092,6 +14217,7 @@ assert.deepEqual(
       ['copy-follow-up', false],
       ['export-csv', false],
     ],
+    attemptReviewCardViews: [],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
     completedAttemptIds: ['completed-attempt'],
@@ -14103,6 +14229,7 @@ assert.deepEqual(
       ['pair-1', '1.', '0%'],
       ['q-1', '2.', '100%'],
     ],
+    itemAnalysisCardViews: [['q-1', '100%']],
     metricValues: [
       ['completions', '1'],
       ['average-accuracy', '100%'],
@@ -14172,6 +14299,17 @@ assert.deepEqual(
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
   }
+);
+assert.deepEqual(
+  buildAssignmentItemAnalysisCardViews(resultAnalysis.perItem).map((item) => [
+    item.id,
+    item.kindLabel,
+    item.correctRateLabel,
+  ]),
+  [
+    ['q-1', 'Question', '67%'],
+    ['pair-1', 'Pair', '50%'],
+  ]
 );
 assert.equal(
   buildAssignmentItemAnalysisCardView({
@@ -14300,6 +14438,19 @@ assert.deepEqual(
     studentAnswerLabel: 'Student',
     studentAnswerText: 'Unanswered',
   }
+);
+assert.deepEqual(
+  buildAssignmentAttemptAnswerReviewViews(
+    resultAnalysis.attempts[0]!.answers
+  ).map((answerView) => [
+    answerView.id,
+    answerView.promptLabel,
+    answerView.statusLabel,
+  ]),
+  [
+    ['q-1', '1. Capital of France?', 'Correct'],
+    ['pair-1', '2. Match "Hot" with its pair.', 'Review'],
+  ]
 );
 assert.equal(resultAnalysis.attempts[0]?.studentLabel, 'Alice');
 assert.equal(resultAnalysis.attempts[1]?.studentLabel, 'Alice');
@@ -15016,12 +15167,40 @@ try {
 assert.deepEqual(
   buildAssignmentAttemptReviewCardView({
     accuracy: 67,
+    answers: [
+      {
+        acceptedAnswers: ['Paris'],
+        answer: 'Paris',
+        correct: true,
+        expectedAnswer: 'Paris',
+        itemId: 'q-1',
+        prompt: 'Capital?',
+        submitted: true,
+      },
+    ],
     completedAt: attemptRowCompletedAt,
+    id: 'attempt-1',
     score: 2,
     studentLabel: 'Alice',
   }),
   {
+    answerViews: [
+      {
+        acceptedAnswersLabel: 'Accepted answers',
+        acceptedAnswersText: null,
+        expectedAnswerLabel: 'Expected',
+        expectedAnswerText: 'Paris',
+        explanationText: null,
+        id: 'q-1',
+        promptLabel: '1. Capital?',
+        statusLabel: 'Correct',
+        statusTone: 'correct',
+        studentAnswerLabel: 'Student',
+        studentAnswerText: 'Paris',
+      },
+    ],
     badgeLabel: '2 pts · 67%',
+    id: 'attempt-1',
     studentLabel: 'Alice',
     submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
   }
@@ -15029,15 +15208,33 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentAttemptReviewCardView({
     accuracy: 0,
+    answers: [],
     completedAt: null,
+    id: 'attempt-empty',
     score: 0,
     studentLabel: 'Anonymous student',
   }),
   {
+    answerViews: [],
     badgeLabel: '0 pts · 0%',
+    id: 'attempt-empty',
     studentLabel: 'Anonymous student',
     submittedAtLabel: '-',
   }
+);
+assert.deepEqual(
+  buildAssignmentAttemptReviewCardViews(resultAnalysis.attempts).map(
+    (cardView) => [
+      cardView.id,
+      cardView.studentLabel,
+      cardView.answerViews.length,
+    ]
+  ),
+  [
+    ['attempt-1', 'Alice', 2],
+    ['attempt-2', 'Alice', 2],
+    ['attempt-3', 'Anonymous student 1', 2],
+  ]
 );
 assert.equal(
   formatAssignmentBriefStudentAccuracy({

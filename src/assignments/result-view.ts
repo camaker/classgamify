@@ -293,6 +293,9 @@ type AssignmentResultsPageViewModel<
 > = {
   actionButtons: AssignmentResultActionButton[];
   actionState: AssignmentResultActionState;
+  attemptReviewCardViews: ReturnType<
+    typeof buildAssignmentAttemptReviewCardViews
+  >;
   attemptRowViews: Array<ReturnType<typeof buildAssignmentAttemptRowDisplay>>;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: ReturnType<typeof buildAssignmentClassroomBrief> | null;
@@ -301,6 +304,9 @@ type AssignmentResultsPageViewModel<
   completedAttempts: TAttempt[];
   description: string;
   headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
+  itemAnalysisCardViews: ReturnType<
+    typeof buildAssignmentItemAnalysisCardViews
+  >;
   loadErrorMessage: string;
   itemPerformanceRowViews: ReturnType<
     typeof buildAssignmentItemPerformanceRowViews
@@ -1015,14 +1021,24 @@ export function formatAssignmentAttemptReviewBadge({
 export function buildAssignmentAttemptReviewCardView(
   attempt: Pick<
     AssignmentAttemptReview,
-    'accuracy' | 'completedAt' | 'score' | 'studentLabel'
+    'accuracy' | 'answers' | 'completedAt' | 'id' | 'score' | 'studentLabel'
   >
 ) {
   return {
+    answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
     badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
+    id: attempt.id,
     studentLabel: attempt.studentLabel,
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
+}
+
+export function buildAssignmentAttemptReviewCardViews(
+  attempts: AssignmentAttemptReview[]
+) {
+  return attempts.map((attempt) =>
+    buildAssignmentAttemptReviewCardView(attempt)
+  );
 }
 
 export function buildAssignmentStudentSummaryRowView(
@@ -1069,6 +1085,15 @@ export function buildAssignmentItemAnalysisCardView(
     kindLabel: item.kindLabel,
     prompt: item.prompt,
   };
+}
+
+export function buildAssignmentItemAnalysisCardViews(
+  items: AssignmentItemAnalysis[]
+) {
+  return items.map((item) => ({
+    id: item.itemId,
+    ...buildAssignmentItemAnalysisCardView(item),
+  }));
 }
 
 export function buildAssignmentItemPerformanceRowView({
@@ -1125,6 +1150,15 @@ export function buildAssignmentAttemptAnswerReviewView({
     studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
     studentAnswerText: formatAssignmentReviewStudentAnswer(answer),
   };
+}
+
+export function buildAssignmentAttemptAnswerReviewViews(
+  answers: AssignmentAttemptReview['answers']
+) {
+  return answers.map((answer, index) => ({
+    id: answer.itemId,
+    ...buildAssignmentAttemptAnswerReviewView({ answer, index }),
+  }));
 }
 
 function formatAssignmentReviewStudentAnswer(
@@ -1709,6 +1743,12 @@ export function buildAssignmentResultsPageViewModel<
   const itemPerformanceRowViews = buildAssignmentItemPerformanceRowViews(
     resultView.sortedPerformanceItems
   );
+  const itemAnalysisCardViews = data
+    ? buildAssignmentItemAnalysisCardViews(data.analysis.needsReview)
+    : [];
+  const attemptReviewCardViews = buildAssignmentAttemptReviewCardViews(
+    resultView.filteredAttemptReviews
+  );
   const classroomBrief = data
     ? buildAssignmentClassroomBrief({
         assignmentTitle: data.assignment.title,
@@ -1734,6 +1774,7 @@ export function buildAssignmentResultsPageViewModel<
   return {
     actionButtons: buildAssignmentResultActionButtons(actionState),
     actionState,
+    attemptReviewCardViews,
     attemptRowViews,
     breadcrumbs: [
       {
@@ -1752,6 +1793,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttempts,
     description: assignmentResultPageCopy.description,
     headerView,
+    itemAnalysisCardViews,
     itemPerformanceRowViews,
     loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
     metricItems: data

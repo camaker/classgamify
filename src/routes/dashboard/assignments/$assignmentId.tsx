@@ -13,9 +13,6 @@ import {
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
   attemptReviewFilterOptions,
-  buildAssignmentAttemptAnswerReviewView,
-  buildAssignmentAttemptReviewCardView,
-  buildAssignmentItemAnalysisCardView,
   itemPerformanceSortOptions,
   studentSummarySortOptions,
 } from '@/assignments/result-view';
@@ -378,9 +375,9 @@ function LoadedAssignmentResultsPage({
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-3">
-            {data.analysis.needsReview.length > 0 ? (
-              data.analysis.needsReview.map((item) => (
-                <ItemAnalysisCard key={item.itemId} item={item} />
+            {pageView.itemAnalysisCardViews.length > 0 ? (
+              pageView.itemAnalysisCardViews.map((itemView) => (
+                <ItemAnalysisCard key={itemView.id} itemView={itemView} />
               ))
             ) : (
               <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
@@ -507,9 +504,12 @@ function LoadedAssignmentResultsPage({
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            {pageView.resultView.filteredAttemptReviews.length > 0 ? (
-              pageView.resultView.filteredAttemptReviews.map((attempt) => (
-                <AttemptReviewCard key={attempt.id} attempt={attempt} />
+            {pageView.attemptReviewCardViews.length > 0 ? (
+              pageView.attemptReviewCardViews.map((attemptView) => (
+                <AttemptReviewCard
+                  key={attemptView.id}
+                  attemptView={attemptView}
+                />
               ))
             ) : (
               <ResultEmptyState
@@ -823,14 +823,12 @@ function ItemPerformanceTable({
 }
 
 function ItemAnalysisCard({
-  item,
+  itemView,
 }: {
-  item: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['perItem'][number];
+  itemView: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['itemAnalysisCardViews'][number];
 }) {
-  const itemView = buildAssignmentItemAnalysisCardView(item);
-
   return (
     <div className="rounded-lg border bg-background p-4">
       <div className="flex items-center justify-between gap-3">
@@ -865,81 +863,69 @@ function ItemAnalysisCard({
 }
 
 function AttemptReviewCard({
-  attempt,
+  attemptView,
 }: {
-  attempt: NonNullable<
-    ReturnType<typeof useAssignmentResults>['data']
-  >['analysis']['attempts'][number];
+  attemptView: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['attemptReviewCardViews'][number];
 }) {
-  const cardView = buildAssignmentAttemptReviewCardView(attempt);
-
   return (
     <div className="rounded-lg border bg-background p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <IconListDetails className="size-4 text-primary" />
-            <p className="font-medium text-sm">{cardView.studentLabel}</p>
+            <p className="font-medium text-sm">{attemptView.studentLabel}</p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {cardView.submittedAtLabel}
+            {attemptView.submittedAtLabel}
           </p>
         </div>
         <Badge variant="secondary" className="rounded-md">
-          {cardView.badgeLabel}
+          {attemptView.badgeLabel}
         </Badge>
       </div>
       <div className="mt-3 grid gap-2">
-        {attempt.answers.map((answer, index) => {
-          const answerView = buildAssignmentAttemptAnswerReviewView({
-            answer,
-            index,
-          });
-
-          return (
-            <div
-              key={`${attempt.id}-${answer.itemId}`}
-              className="rounded-lg border bg-muted/20 p-3"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="min-w-0 text-sm font-medium">
-                  {answerView.promptLabel}
-                </p>
-                <Badge
-                  variant={
-                    answerView.statusTone === 'correct'
-                      ? 'secondary'
-                      : 'outline'
-                  }
-                  className="rounded-md"
-                >
-                  {answerView.statusLabel}
-                </Badge>
-              </div>
-              <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-                <p>
-                  {answerView.studentAnswerLabel}:{' '}
-                  {answerView.studentAnswerText}
-                </p>
-                <p>
-                  {answerView.expectedAnswerLabel}:{' '}
-                  {answerView.expectedAnswerText}
-                </p>
-              </div>
-              {answerView.acceptedAnswersText ? (
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {answerView.acceptedAnswersLabel}:{' '}
-                  {answerView.acceptedAnswersText}
-                </p>
-              ) : null}
-              {answerView.explanationText ? (
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {answerView.explanationText}
-                </p>
-              ) : null}
+        {attemptView.answerViews.map((answerView) => (
+          <div
+            key={`${attemptView.id}-${answerView.id}`}
+            className="rounded-lg border bg-muted/20 p-3"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="min-w-0 text-sm font-medium">
+                {answerView.promptLabel}
+              </p>
+              <Badge
+                variant={
+                  answerView.statusTone === 'correct' ? 'secondary' : 'outline'
+                }
+                className="rounded-md"
+              >
+                {answerView.statusLabel}
+              </Badge>
             </div>
-          );
-        })}
+            <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+              <p>
+                {answerView.studentAnswerLabel}: {answerView.studentAnswerText}
+              </p>
+              <p>
+                {answerView.expectedAnswerLabel}:{' '}
+                {answerView.expectedAnswerText}
+              </p>
+            </div>
+            {answerView.acceptedAnswersText ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {answerView.acceptedAnswersLabel}:{' '}
+                {answerView.acceptedAnswersText}
+              </p>
+            ) : null}
+            {answerView.explanationText ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {answerView.explanationText}
+              </p>
+            ) : null}
+          </div>
+        ))}
       </div>
     </div>
   );

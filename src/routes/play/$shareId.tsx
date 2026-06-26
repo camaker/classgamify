@@ -37,10 +37,7 @@ import {
   type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import {
-  buildStudentRunnerView,
-  isSameRuntimeChoice,
-} from '@/assignments/student-runner-view';
+import { buildDefaultRuntimeItemCardViews } from '@/assignments/student-runner-view';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -584,8 +581,10 @@ function RuntimeItemList({
 }) {
   const runnerKind = getActivityTemplateRunnerKind(templateType);
   const runnerCopy = getActivityTemplateRunnerCopy(templateType);
-  const runnerView = buildStudentRunnerView({
+  const itemCardViews = buildDefaultRuntimeItemCardViews({
     answers,
+    correctAnswerLabel: runnerCopy.correctAnswerLabel,
+    inputPlaceholder: runnerCopy.inputPlaceholder,
     items,
     reviewItems,
   });
@@ -683,17 +682,19 @@ function RuntimeItemList({
 
   return (
     <div className="mt-4 grid gap-3">
-      {runnerView.itemViews.map((itemView) => (
+      {itemCardViews.map((itemView) => (
         <RuntimeItemCard
           key={itemView.item.id}
           answer={itemView.answer}
+          choiceViews={itemView.choiceViews}
+          correctAnswerLabel={itemView.correctAnswerLabel}
           disabled={disabled}
-          item={itemView.item}
+          inputPlaceholder={itemView.inputPlaceholder}
           kindLabel={itemView.kindLabel}
           positionLabel={itemView.positionLabel}
           reviewItem={itemView.reviewItem}
-          runnerCopy={runnerCopy}
           revealAnswer={revealAnswer}
+          showChoices={itemView.showChoices}
           onAnswerChange={(answer) => onAnswerChange(itemView.item.id, answer)}
         />
       ))}
@@ -703,24 +704,30 @@ function RuntimeItemList({
 
 function RuntimeItemCard({
   answer,
+  choiceViews,
+  correctAnswerLabel,
   disabled,
-  item,
+  inputPlaceholder,
   kindLabel,
   onAnswerChange,
   positionLabel,
   revealAnswer,
   reviewItem,
-  runnerCopy,
+  showChoices,
 }: {
   answer: string;
+  choiceViews: ReturnType<
+    typeof buildDefaultRuntimeItemCardViews
+  >[number]['choiceViews'];
+  correctAnswerLabel: string;
   disabled: boolean;
-  item: PublicRuntimeItem;
+  inputPlaceholder: string;
   kindLabel: string;
   onAnswerChange: (answer: string) => void;
   positionLabel: string;
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
-  runnerCopy: ReturnType<typeof getActivityTemplateRunnerCopy>;
+  showChoices: boolean;
 }) {
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -730,10 +737,9 @@ function RuntimeItemCard({
           {kindLabel}
         </Badge>
       </div>
-      {item.choices?.length ? (
+      {showChoices ? (
         <ChoiceGrid
-          answer={answer}
-          choices={item.choices}
+          choices={choiceViews}
           disabled={disabled}
           onAnswerChange={onAnswerChange}
         />
@@ -742,13 +748,13 @@ function RuntimeItemCard({
           value={answer}
           disabled={disabled}
           onChange={(event) => onAnswerChange(event.target.value)}
-          placeholder={runnerCopy.inputPlaceholder}
+          placeholder={inputPlaceholder}
           className="mt-3"
         />
       )}
       {revealAnswer && reviewItem ? (
         <PublicAnswerFeedback
-          correctLabel={runnerCopy.correctAnswerLabel}
+          correctLabel={correctAnswerLabel}
           reviewItem={reviewItem}
         />
       ) : null}
@@ -757,33 +763,32 @@ function RuntimeItemCard({
 }
 
 function ChoiceGrid({
-  answer,
   choices,
   disabled,
   onAnswerChange,
 }: {
-  answer: string;
-  choices: string[];
+  choices: ReturnType<
+    typeof buildDefaultRuntimeItemCardViews
+  >[number]['choiceViews'];
   disabled: boolean;
   onAnswerChange: (answer: string) => void;
 }) {
   return (
     <div className="mt-3 grid gap-2 sm:grid-cols-2">
-      {choices.map((choice) => {
-        const selected = isSameRuntimeChoice(answer, choice);
+      {choices.map((choiceView) => {
         return (
           <button
-            key={choice}
+            key={choiceView.choice}
             type="button"
             disabled={disabled}
             className={cn(
               'min-h-10 rounded-lg border bg-background px-3 py-2 text-left text-sm transition-colors',
               'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
-              selected && 'border-primary bg-primary/10 text-primary'
+              choiceView.selected && 'border-primary bg-primary/10 text-primary'
             )}
-            onClick={() => onAnswerChange(choice)}
+            onClick={() => onAnswerChange(choiceView.choice)}
           >
-            {choice}
+            {choiceView.choice}
           </button>
         );
       })}

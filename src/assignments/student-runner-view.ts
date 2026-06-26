@@ -32,6 +32,20 @@ type RuntimeChoiceAnswerChange = {
   itemId: string;
 };
 
+type RuntimeChoiceButtonView = {
+  choice: string;
+  selected: boolean;
+};
+
+type DefaultRuntimeItemCardView = ReturnType<
+  typeof buildStudentRunnerView
+>['itemViews'][number] & {
+  choiceViews: RuntimeChoiceButtonView[];
+  correctAnswerLabel: string;
+  inputPlaceholder: string;
+  showChoices: boolean;
+};
+
 type ChoicePairingRunnerView = ReturnType<typeof buildStudentRunnerView> & {
   choiceViews: ReturnType<typeof buildRuntimeChoiceViews>;
 };
@@ -294,6 +308,51 @@ export function buildRuntimeChoiceViews({
       ? isSameRuntimeChoice(answers[selectedItemId], choice)
       : false,
     usedByItemId: findChoiceOwner(answers, choice),
+  }));
+}
+
+export function buildRuntimeChoiceButtonViews({
+  answer,
+  choices,
+}: {
+  answer: string;
+  choices: string[];
+}): RuntimeChoiceButtonView[] {
+  return choices.map((choice) => ({
+    choice,
+    selected: isSameRuntimeChoice(answer, choice),
+  }));
+}
+
+export function buildDefaultRuntimeItemCardViews({
+  answers,
+  correctAnswerLabel,
+  inputPlaceholder,
+  items,
+  progressVerb,
+  reviewItems,
+}: {
+  answers: StudentAnswerMap;
+  correctAnswerLabel: string;
+  inputPlaceholder: string;
+  items: PublicRuntimeItem[];
+  progressVerb?: string;
+  reviewItems?: PublicAttemptReviewItem[];
+}): DefaultRuntimeItemCardView[] {
+  return buildStudentRunnerView({
+    answers,
+    items,
+    progressVerb,
+    reviewItems,
+  }).itemViews.map((itemView) => ({
+    ...itemView,
+    choiceViews: buildRuntimeChoiceButtonViews({
+      answer: itemView.answer,
+      choices: itemView.item.choices ?? [],
+    }),
+    correctAnswerLabel,
+    inputPlaceholder,
+    showChoices: Boolean(itemView.item.choices?.length),
   }));
 }
 
