@@ -313,6 +313,7 @@ import {
   buildAssignmentListCardStats,
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
+  buildAssignmentListPageViewModel,
   buildStarterAssignmentListCardViewModel,
   getAssignmentListCardActionState,
   getAssignmentListEmptyState,
@@ -6919,6 +6920,10 @@ const dashboardAssignmentsRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
   'utf8'
 );
+const assignmentListViewSource = readFileSync(
+  'src/assignments/list-view.ts',
+  'utf8'
+);
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -7075,8 +7080,18 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
+  /buildAssignmentListPageViewModel/,
+  'Assignment dashboard route should consume the assignment-domain page view-model.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /getAssignmentListTotalPages|buildAssignmentListSummaryMetrics|buildAssignmentListEmptyStateView|resolvePublishedAssignmentPanelAssignment/,
+  'Assignment dashboard route should not rebuild pagination, summary, empty state, or published panel context directly.'
+);
+assert.match(
+  assignmentListViewSource,
   /getAssignmentListTotalPages\(\{[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*total: totalAssignments,[\s\S]*\}\)/,
-  'Assignment dashboard route should calculate total pages through the assignment-domain helper.'
+  'Assignment list page view-model should calculate total pages through the assignment-domain helper.'
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
@@ -9107,6 +9122,158 @@ assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: false }), {
   showStarterAssignments: true,
   title: 'No published assignments yet.',
 });
+const emptyAssignmentListPageView = buildAssignmentListPageViewModel({
+  data: null,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    breadcrumbs: emptyAssignmentListPageView.breadcrumbs,
+    emptyState: emptyAssignmentListPageView.emptyState,
+    hasAssignments: emptyAssignmentListPageView.hasAssignments,
+    publishedPanelContext: emptyAssignmentListPageView.publishedPanelContext,
+    resolvedSearch: emptyAssignmentListPageView.resolvedSearch,
+    summaryMetrics: emptyAssignmentListPageView.summaryMetrics,
+    title: emptyAssignmentListPageView.title,
+    totalAssignments: emptyAssignmentListPageView.totalAssignments,
+    totalPages: emptyAssignmentListPageView.totalPages,
+  },
+  {
+    breadcrumbs: [
+      { href: '/dashboard', label: 'Dashboard' },
+      { isCurrentPage: true, label: 'Assignments' },
+    ],
+    emptyState: {
+      description:
+        'Open the activity library and publish a saved activity to create a student share link.',
+      showStarterAssignments: true,
+      title: 'No published assignments yet.',
+    },
+    hasAssignments: false,
+    publishedPanelContext: undefined,
+    resolvedSearch: {
+      currentPage: 1,
+      filteredStatus: undefined,
+      hasFilters: false,
+      normalizedSearchQuery: undefined,
+      searchQuery: '',
+      statusFilter: 'all',
+    },
+    summaryMetrics: [
+      { id: 'total', label: 'Assignments', value: '0' },
+      { id: 'open', label: 'Open links', value: '0' },
+      { id: 'completions', label: 'Completions', value: '0' },
+      { id: 'average', label: 'Average', value: '0%' },
+    ],
+    title: 'Assignments',
+    totalAssignments: 0,
+    totalPages: 1,
+  }
+);
+const filteredAssignmentListPageView = buildAssignmentListPageViewModel({
+  data: {
+    items: [
+      {
+        activity: {
+          description: 'Current activity description',
+          templateType: 'quiz',
+        },
+        assignment: {
+          expiresAt: null,
+          id: 'persisted-assignment-1',
+          settingsJson: {
+            collectStudentName: true,
+            showCorrectAnswers: true,
+            shuffleItems: false,
+          },
+          shareSlug: 'share-1',
+          status: 'published',
+          title: 'Persisted assignment',
+        },
+        snapshot: null,
+        stats: {
+          averageScore: 76,
+          completions: 9,
+        },
+      },
+    ],
+    publishedAssignment: {
+      id: 'persisted-assignment-1',
+      shareSlug: 'share-1',
+      title: 'Persisted assignment',
+    },
+    summary: {
+      averageScore: 76,
+      completions: 9,
+      openAssignments: 1,
+      totalAssignments: 1,
+    },
+    total: 31,
+  },
+  isLoading: false,
+  search: {
+    page: 3,
+    published: ' share-1 ',
+    q: '  Week   1 ',
+    status: 'open',
+  },
+});
+assert.deepEqual(
+  {
+    assignmentIds: filteredAssignmentListPageView.assignments.map(
+      (item) => item.assignment.id
+    ),
+    emptyState: filteredAssignmentListPageView.emptyState,
+    hasAssignments: filteredAssignmentListPageView.hasAssignments,
+    publishedPanelContext: filteredAssignmentListPageView.publishedPanelContext,
+    resolvedSearch: filteredAssignmentListPageView.resolvedSearch,
+    summaryMetrics: filteredAssignmentListPageView.summaryMetrics,
+    totalAssignments: filteredAssignmentListPageView.totalAssignments,
+    totalPages: filteredAssignmentListPageView.totalPages,
+  },
+  {
+    assignmentIds: ['persisted-assignment-1'],
+    emptyState: {
+      description:
+        'Try another assignment title, share id, activity name, or status.',
+      showStarterAssignments: false,
+      title: 'No matching assignments.',
+    },
+    hasAssignments: true,
+    publishedPanelContext: {
+      assignment: {
+        id: 'persisted-assignment-1',
+        shareSlug: 'share-1',
+        title: 'Persisted assignment',
+      },
+      body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+      sharePath: '/play/share-1',
+      showDismissAction: true,
+      showMissingHint: false,
+      showResultsAction: true,
+      showShareActions: true,
+      status: 'found',
+      title: 'Persisted assignment',
+    },
+    resolvedSearch: {
+      currentPage: 3,
+      filteredStatus: 'open',
+      hasFilters: true,
+      normalizedSearchQuery: 'Week 1',
+      searchQuery: '  Week   1 ',
+      statusFilter: 'open',
+    },
+    summaryMetrics: [
+      { id: 'total', label: 'Matching', value: '1' },
+      { id: 'open', label: 'Open links', value: '1' },
+      { id: 'completions', label: 'Completions', value: '9' },
+      { id: 'average', label: 'Average', value: '76%' },
+    ],
+    totalAssignments: 31,
+    totalPages: 3,
+  }
+);
 assert.deepEqual(
   buildAssignmentListCardStats({
     averageScore: 83,

@@ -1,36 +1,28 @@
 import {
-  getStarterActivity,
-  getStarterAssignments,
-} from '@/activities/catalog';
-import {
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentStatusFilter,
   buildAssignmentListPageRouteSearch,
   buildAssignmentListRouteSearch,
   buildAssignmentListValidatedSearch,
-  getAssignmentListTotalPages,
-  normalizeAssignmentListSearch,
 } from '@/assignments/list-filters';
 import {
   buildAssignmentListFilterSummary,
-  buildAssignmentListSummaryMetrics,
   type AssignmentListSummaryMetric,
   type AssignmentListSummaryMetricId,
 } from '@/assignments/list-summary';
 import {
   assignmentListActionCopy,
-  assignmentListPageCopy,
   assignmentListPublishedPanelCopy,
   assignmentListSearchCopy,
   assignmentStatusFilterOptions,
   buildAssignmentListCardViewModel,
-  buildAssignmentListEmptyStateView,
+  buildAssignmentListPageViewModel,
   buildStarterAssignmentListCardViewModel,
 } from '@/assignments/list-view';
 import {
-  buildPublishedAssignmentPanelContext,
-  resolvePublishedAssignmentPanelAssignment,
-} from '@/assignments/published-assignment';
+  getStarterActivity,
+  getStarterAssignments,
+} from '@/activities/catalog';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { DashboardPagination } from '@/components/dashboard/dashboard-pagination';
@@ -57,8 +49,8 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconChartBar,
-  IconFilter,
   IconCircleCheck,
+  IconFilter,
   IconListCheck,
   IconLock,
   IconLockOpen,
@@ -69,7 +61,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/dashboard/assignments')({
@@ -80,51 +72,41 @@ export const Route = createFileRoute('/dashboard/assignments')({
 function DashboardAssignmentsPage() {
   const navigate = useNavigate({ from: '/dashboard/assignments' });
   const { page, published, q, status } = Route.useSearch();
-  const searchQuery = q ?? '';
-  const statusFilter = status ?? 'all';
-  const currentPage = page ?? 1;
-  const normalizedSearchQuery = normalizeAssignmentListSearch(searchQuery);
-  const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
+  const pageView = useMemo(
+    () =>
+      buildAssignmentListPageViewModel({
+        data: undefined,
+        isLoading: true,
+        search: { page, published, q, status },
+      }),
+    [page, published, q, status]
+  );
+  const { currentPage, filteredStatus, searchQuery, statusFilter } =
+    pageView.resolvedSearch;
   const { data, isError, isLoading } = useAssignments({
     pageIndex: currentPage - 1,
     pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
     publishedShareSlug: published,
-    search: normalizedSearchQuery,
+    search: pageView.resolvedSearch.normalizedSearchQuery,
     status: filteredStatus,
   });
-  const assignments = data?.items ?? [];
-  const totalAssignments = data?.total ?? 0;
-  const totalPages = getAssignmentListTotalPages({
-    pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
-    total: totalAssignments,
-  });
-  const hasAssignments = assignments.length > 0;
-  const hasFilters = Boolean(normalizedSearchQuery) || Boolean(filteredStatus);
-  const emptyState = buildAssignmentListEmptyStateView({ hasFilters });
-  const publishedPanelAssignment = resolvePublishedAssignmentPanelAssignment({
-    assignment: data?.publishedAssignment,
-    items: assignments,
-    shareSlug: published,
-  });
-  const publishedPanelContext = published
-    ? buildPublishedAssignmentPanelContext({
-        assignment: publishedPanelAssignment,
+  const loadedPageView = useMemo(
+    () =>
+      buildAssignmentListPageViewModel({
+        data,
         isLoading,
-        shareSlug: published,
-      })
-    : undefined;
-  const summaryMetrics = buildAssignmentListSummaryMetrics({
-    hasFilters,
-    summary: data?.summary,
-    totalAssignments,
-  });
+        search: { page, published, q, status },
+      }),
+    [data, isLoading, page, published, q, status]
+  );
+  const activePageView = data ? loadedPageView : pageView;
   const starterAssignments = getStarterAssignments();
 
   useEffect(() => {
-    if (!isLoading && currentPage > totalPages) {
-      navigateToAssignmentPage(totalPages, true);
+    if (!isLoading && currentPage > activePageView.totalPages) {
+      navigateToAssignmentPage(activePageView.totalPages, true);
     }
-  }, [currentPage, isLoading, totalAssignments, totalPages]);
+  }, [activePageView.totalPages, currentPage, isLoading]);
 
   function updateFilters(next: {
     q?: string;
@@ -167,29 +149,20 @@ function DashboardAssignmentsPage() {
 
   return (
     <DashboardLayout
-      breadcrumbs={[
-        {
-          label: assignmentListPageCopy.breadcrumbDashboard,
-          href: Routes.Dashboard,
-        },
-        {
-          label: assignmentListPageCopy.breadcrumbCurrent,
-          isCurrentPage: true,
-        },
-      ]}
-      title={assignmentListPageCopy.title}
-      description={assignmentListPageCopy.description}
+      breadcrumbs={activePageView.breadcrumbs}
+      title={activePageView.title}
+      description={activePageView.description}
     >
       <div className="grid gap-6">
         <section className="grid gap-4 md:grid-cols-4">
-          {summaryMetrics.map((metric) => (
+          {activePageView.summaryMetrics.map((metric) => (
             <SummaryCard key={metric.id} metric={metric} />
           ))}
         </section>
 
         {published ? (
           <PublishedAssignmentPanel
-            context={publishedPanelContext}
+            context={activePageView.publishedPanelContext}
             onDismiss={() =>
               void navigate({
                 replace: true,
@@ -211,12 +184,12 @@ function DashboardAssignmentsPage() {
           onStatusChange={(value) => updateFilters({ status: value })}
           search={searchQuery}
           status={statusFilter}
-          total={totalAssignments}
+          total={activePageView.totalAssignments}
         />
 
         {isError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            {assignmentListPageCopy.loadErrorMessage}
+            {activePageView.loadErrorMessage}
           </div>
         ) : null}
 
@@ -228,10 +201,10 @@ function DashboardAssignmentsPage() {
           </section>
         ) : null}
 
-        {!isLoading && hasAssignments ? (
+        {!isLoading && activePageView.hasAssignments ? (
           <>
             <section className="grid gap-4">
-              {assignments.map((item) => (
+              {activePageView.assignments.map((item) => (
                 <AssignmentCard
                   key={item.assignment.id}
                   assignment={buildAssignmentListCardViewModel(item)}
@@ -244,17 +217,21 @@ function DashboardAssignmentsPage() {
               itemKind="assignments"
               onPageChange={(nextPage) => navigateToAssignmentPage(nextPage)}
               pageSize={ASSIGNMENT_LIST_PAGE_SIZE}
-              total={totalAssignments}
-              totalPages={totalPages}
+              total={activePageView.totalAssignments}
+              totalPages={activePageView.totalPages}
             />
           </>
         ) : null}
 
-        {!isLoading && !hasAssignments && hasFilters ? (
+        {!isLoading &&
+        !activePageView.hasAssignments &&
+        activePageView.resolvedSearch.hasFilters ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-            <h2 className="text-lg font-semibold">{emptyState.title}</h2>
+            <h2 className="text-lg font-semibold">
+              {activePageView.emptyState.title}
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {emptyState.description}
+              {activePageView.emptyState.description}
             </p>
             <Button
               type="button"
@@ -268,12 +245,16 @@ function DashboardAssignmentsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !hasAssignments && !hasFilters ? (
+        {!isLoading &&
+        !activePageView.hasAssignments &&
+        !activePageView.resolvedSearch.hasFilters ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
-              <h2 className="text-lg font-semibold">{emptyState.title}</h2>
+              <h2 className="text-lg font-semibold">
+                {activePageView.emptyState.title}
+              </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {emptyState.description}
+                {activePageView.emptyState.description}
               </p>
               <Link
                 to={Routes.DashboardActivities}
@@ -283,7 +264,7 @@ function DashboardAssignmentsPage() {
                 {assignmentListActionCopy.openActivityLibrary}
               </Link>
             </div>
-            {emptyState.showStarterAssignments ? (
+            {activePageView.emptyState.showStarterAssignments ? (
               <section className="grid gap-4">
                 {starterAssignments.map((assignment) => {
                   const activity = getStarterActivity(assignment.activityId);

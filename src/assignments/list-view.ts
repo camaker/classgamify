@@ -4,7 +4,18 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
-import type { AssignmentStatusFilter } from '@/assignments/list-filters';
+import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
+  type AssignmentLifecycleStatusFilter,
+  type AssignmentStatusFilter,
+  getAssignmentListTotalPages,
+  normalizeAssignmentListSearch,
+} from '@/assignments/list-filters';
+import {
+  buildAssignmentListSummaryMetrics,
+  type AssignmentListSummary,
+  type AssignmentListSummaryMetric,
+} from '@/assignments/list-summary';
 import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
@@ -12,12 +23,17 @@ import {
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import {
+  buildPublishedAssignmentPanelContext,
+  resolvePublishedAssignmentPanelAssignment,
+} from '@/assignments/published-assignment';
+import {
   formatAssignmentResultNumber,
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListControlOption = {
@@ -120,6 +136,64 @@ type AssignmentListEmptyStateView = {
   description: string;
   showStarterAssignments: boolean;
   title: string;
+};
+
+type AssignmentListPageBreadcrumb = {
+  href?: string;
+  isCurrentPage?: boolean;
+  label: string;
+};
+
+type AssignmentListPageSearchState = {
+  page?: number;
+  published?: string;
+  q?: string;
+  status?: AssignmentLifecycleStatusFilter;
+};
+
+type AssignmentListPageResolvedSearch = {
+  currentPage: number;
+  filteredStatus?: AssignmentLifecycleStatusFilter;
+  hasFilters: boolean;
+  normalizedSearchQuery?: string;
+  searchQuery: string;
+  statusFilter: AssignmentStatusFilter;
+};
+
+type AssignmentListPageItem = AssignmentListCardSource & {
+  assignment: AssignmentListCardSource['assignment'] & {
+    id: string;
+    shareSlug: string;
+    title: string;
+  };
+};
+
+type AssignmentListPageData<TItem extends AssignmentListPageItem> = {
+  items: TItem[];
+  publishedAssignment?: {
+    id: string;
+    shareSlug: string;
+    title: string;
+  } | null;
+  summary?: AssignmentListSummary;
+  total: number;
+};
+
+type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
+  assignments: TItem[];
+  breadcrumbs: AssignmentListPageBreadcrumb[];
+  description: string;
+  emptyState: AssignmentListEmptyStateView;
+  hasAssignments: boolean;
+  loadErrorMessage: string;
+  publishedPanelContext?: ReturnType<
+    typeof buildPublishedAssignmentPanelContext
+  >;
+  resolvedSearch: AssignmentListPageResolvedSearch;
+  summaryMetrics: AssignmentListSummaryMetric[];
+  title: string;
+  totalAssignments: number;
+  totalPages: number;
 };
 
 export const assignmentListPageCopy = {
@@ -255,6 +329,88 @@ export function buildAssignmentListEmptyStateView({
   return {
     ...getAssignmentListEmptyState({ hasFilters }),
     showStarterAssignments: !hasFilters,
+  };
+}
+
+export function buildAssignmentListPageViewModel<
+  TItem extends AssignmentListPageItem,
+>({
+  data,
+  isLoading,
+  search,
+}: {
+  data?: AssignmentListPageData<TItem> | null;
+  isLoading: boolean;
+  search: AssignmentListPageSearchState;
+}): AssignmentListPageViewModel<TItem> {
+  const resolvedSearch = resolveAssignmentListPageSearch(search);
+  const assignments = data?.items ?? [];
+  const totalAssignments = data?.total ?? 0;
+  const totalPages = getAssignmentListTotalPages({
+    pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
+    total: totalAssignments,
+  });
+  const emptyState = buildAssignmentListEmptyStateView({
+    hasFilters: resolvedSearch.hasFilters,
+  });
+  const publishedPanelAssignment = resolvePublishedAssignmentPanelAssignment({
+    assignment: data?.publishedAssignment,
+    items: assignments,
+    shareSlug: search.published,
+  });
+  const publishedPanelContext = search.published
+    ? buildPublishedAssignmentPanelContext({
+        assignment: publishedPanelAssignment,
+        isLoading,
+        shareSlug: search.published,
+      })
+    : undefined;
+
+  return {
+    assignments,
+    breadcrumbs: [
+      {
+        href: Routes.Dashboard,
+        label: assignmentListPageCopy.breadcrumbDashboard,
+      },
+      {
+        isCurrentPage: true,
+        label: assignmentListPageCopy.breadcrumbCurrent,
+      },
+    ],
+    description: assignmentListPageCopy.description,
+    emptyState,
+    hasAssignments: assignments.length > 0,
+    loadErrorMessage: assignmentListPageCopy.loadErrorMessage,
+    publishedPanelContext,
+    resolvedSearch,
+    summaryMetrics: buildAssignmentListSummaryMetrics({
+      hasFilters: resolvedSearch.hasFilters,
+      summary: data?.summary,
+      totalAssignments,
+    }),
+    title: assignmentListPageCopy.title,
+    totalAssignments,
+    totalPages,
+  };
+}
+
+export function resolveAssignmentListPageSearch(
+  search: AssignmentListPageSearchState
+): AssignmentListPageResolvedSearch {
+  const searchQuery = search.q ?? '';
+  const statusFilter = search.status ?? 'all';
+  const currentPage = search.page ?? 1;
+  const normalizedSearchQuery = normalizeAssignmentListSearch(searchQuery);
+  const filteredStatus = statusFilter === 'all' ? undefined : statusFilter;
+
+  return {
+    currentPage,
+    filteredStatus,
+    hasFilters: Boolean(normalizedSearchQuery) || Boolean(filteredStatus),
+    normalizedSearchQuery,
+    searchQuery,
+    statusFilter,
   };
 }
 

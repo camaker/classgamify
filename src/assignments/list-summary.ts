@@ -19,7 +19,7 @@ type AssignmentListSummaryAssignmentSource = {
   status: AssignmentStatus | string;
 };
 
-type AssignmentListSummary = {
+export type AssignmentListSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;
