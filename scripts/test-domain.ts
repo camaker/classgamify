@@ -6827,6 +6827,22 @@ const publicRuntimeOrderingItems = getRuntimeItems(
   'quiz',
   publicRuntimeOrderingContent
 );
+const publicRuntimeChoiceViews = stripRuntimeAnswers(
+  publicRuntimeOrderingItems
+);
+assert.deepEqual(
+  publicRuntimeChoiceViews[0]?.choices,
+  publicRuntimeOrderingItems[0]?.choices
+);
+assert.notEqual(
+  publicRuntimeChoiceViews[0]?.choices,
+  publicRuntimeOrderingItems[0]?.choices
+);
+publicRuntimeChoiceViews[0]?.choices?.push('Student-local choice');
+assert.equal(
+  publicRuntimeOrderingItems[0]?.choices?.includes('Student-local choice'),
+  false
+);
 const publicRuntimeOrderingSource = {
   activity: {
     contentJson: publicRuntimeOrderingContent,
