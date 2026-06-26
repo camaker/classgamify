@@ -1092,13 +1092,18 @@ const assignmentResultsExportSource = readFileSync(
 );
 assert.match(
   assignmentResultsExportSource,
-  /ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS[\s\S]*titleMaxLength: 80/,
-  'Assignment results export filename limits should be named.'
+  /ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS[\s\S]*shareSlugMaxLength: 48[\s\S]*titleMaxLength: 80/,
+  'Assignment results export filename limits should be named for title and share slug.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /slice\(0, ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.titleMaxLength\)/,
-  'Assignment results export filename truncation should reuse the named limit.'
+  /maxLength = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.titleMaxLength[\s\S]*slice\(0, maxLength\)/,
+  'Assignment results export filename truncation should reuse named limits through the shared slug helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /slugifyFilename\(\s*data\.assignment\.shareSlug,[\s\S]*ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.shareSlugMaxLength/,
+  'Assignment results export filenames should include a bounded share slug segment.'
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
@@ -18213,9 +18218,10 @@ assert.match(
 );
 assert.equal(
   buildAssignmentResultsCsvFilename(csvExportData),
-  'classgamify-capital-review-week-1-results.csv'
+  'classgamify-capital-review-week-1-share-123-results.csv'
 );
 assert.deepEqual(ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS, {
+  shareSlugMaxLength: 48,
   titleMaxLength: 80,
 });
 assert.equal(
@@ -18226,7 +18232,7 @@ assert.equal(
       title: '三年级｜听力复习 Ａ 班',
     },
   }),
-  'classgamify-三年级-听力复习-a-班-results.csv'
+  'classgamify-三年级-听力复习-a-班-share-123-results.csv'
 );
 assert.equal(
   buildAssignmentResultsCsvFilename({
@@ -18236,7 +18242,17 @@ assert.equal(
       title: 'A '.repeat(120),
     },
   }),
-  `classgamify-${`${'a-'.repeat(39)}a`}-results.csv`
+  `classgamify-${`${'a-'.repeat(39)}a`}-share-123-results.csv`
+);
+assert.equal(
+  buildAssignmentResultsCsvFilename({
+    ...csvExportData,
+    assignment: {
+      ...csvExportData.assignment,
+      shareSlug: ' Classroom Link/With Spaces '.repeat(4),
+    },
+  }),
+  'classgamify-capital-review-week-1-classroom-link-with-spaces-classroom-link-with-s-results.csv'
 );
 const partialSettingsCsv = buildAssignmentResultsCsv({
   ...csvExportData,

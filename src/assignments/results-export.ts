@@ -20,6 +20,7 @@ import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 export const ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS = {
+  shareSlugMaxLength: 48,
   titleMaxLength: 80,
 } as const;
 
@@ -160,7 +161,11 @@ export function buildAssignmentResultsCsvFilename(
   data: AssignmentResultsExportData
 ) {
   const title = slugifyFilename(data.assignment.title);
-  return m.assignment_results_export_filename({ title });
+  const shareSlug = slugifyFilename(
+    data.assignment.shareSlug,
+    ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.shareSlugMaxLength
+  );
+  return m.assignment_results_export_filename({ shareSlug, title });
 }
 
 function getAssignmentResultsExportColumns() {
@@ -261,7 +266,10 @@ function formatCsvCell(value: unknown) {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
-function slugifyFilename(value: string) {
+function slugifyFilename(
+  value: string,
+  maxLength = ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.titleMaxLength
+) {
   const slug = value
     .normalize('NFKC')
     .trim()
@@ -269,7 +277,7 @@ function slugifyFilename(value: string) {
     .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
   const truncatedSlug = [...slug]
-    .slice(0, ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.titleMaxLength)
+    .slice(0, maxLength)
     .join('')
     .replace(/-+$/g, '');
 

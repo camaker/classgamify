@@ -888,7 +888,7 @@
   "assignment_results_export_column_template_type": "模板类型",
   "assignment_results_export_column_time_limit_seconds": "时间限制秒数",
   "assignment_results_export_column_total_items": "题目总数",
-  "assignment_results_export_filename": "classgamify-{title}-结果.csv",
+  "assignment_results_export_filename": "classgamify-{title}-{shareSlug}-结果.csv",
   "assignment_results_export_filename_fallback_assignment": "assignment",
   "assignment_results_export_status_correct": "正确",
   "assignment_results_export_status_review": "需复盘",

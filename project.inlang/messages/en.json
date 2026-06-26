@@ -888,7 +888,7 @@
   "assignment_results_export_column_template_type": "template_type",
   "assignment_results_export_column_time_limit_seconds": "time_limit_seconds",
   "assignment_results_export_column_total_items": "total_items",
-  "assignment_results_export_filename": "classgamify-{title}-results.csv",
+  "assignment_results_export_filename": "classgamify-{title}-{shareSlug}-results.csv",
   "assignment_results_export_filename_fallback_assignment": "assignment",
   "assignment_results_export_status_correct": "correct",
   "assignment_results_export_status_review": "review",
