@@ -9,6 +9,12 @@ import type {
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
 import { formatAssignmentResultValue } from '@/assignments/result-format';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { getTemplateByType } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 
@@ -266,13 +272,15 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
     answerLines: getPrintableWorksheetAnswerLines(item),
     choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
-    choices: item.choices,
+    choices: normalizeRuntimeChoiceList(item.choices) ?? [],
     id: item.id,
     kindLabel: formatRuntimeItemKindLabel(item),
     prompt: formatRuntimeItemPrompt(item),
     responseHelp: getPrintableWorksheetResponseHelp(item.responseMode),
     sequenceLabel: m.assignment_printable_item_sequence({
-      sequenceNumber: item.sequenceNumber,
+      sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
+        min: 1,
+      }),
     }),
   };
 }
@@ -283,6 +291,7 @@ export function buildPrintableWorksheetAnswerKeyItemView(
   const acceptedAnswers = formatPrintableWorksheetAcceptedAnswers(
     item.acceptedAnswers
   );
+  const explanation = normalizeOptionalRuntimeDisplayText(item.explanation);
 
   return {
     acceptedAnswersLabel: acceptedAnswers
@@ -292,11 +301,13 @@ export function buildPrintableWorksheetAnswerKeyItemView(
       : undefined,
     answerLabel: m.assignment_printable_answer_key_item({
       answer: formatPrintableWorksheetValue(item.answer),
-      sequenceNumber: item.sequenceNumber,
+      sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
+        min: 1,
+      }),
     }),
-    explanationLabel: item.explanation
+    explanationLabel: explanation
       ? m.assignment_printable_answer_key_explanation({
-          explanation: item.explanation,
+          explanation,
         })
       : undefined,
     id: item.id,
@@ -305,8 +316,10 @@ export function buildPrintableWorksheetAnswerKeyItemView(
 }
 
 function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
+  const choices = normalizeRuntimeChoiceList(item.choices) ?? [];
+
   return {
-    choices: item.choices.map((choice, index) => ({
+    choices: choices.map((choice, index) => ({
       choice,
       indexLabel: formatPrintableWorksheetChoiceIndex(index),
       key: `${item.id}-choice-${index}`,
@@ -317,7 +330,12 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
 }
 
 export function getPrintableWorksheetAnswerLines(item: PrintableWorksheetItem) {
-  return Array.from({ length: item.answerSpaceLines }, (_, index) => ({
+  const answerSpaceLines = normalizeRuntimeDisplayCount(item.answerSpaceLines, {
+    max: 4,
+    min: 1,
+  });
+
+  return Array.from({ length: answerSpaceLines }, (_, index) => ({
     key: `${item.id}-answer-line-${index}`,
   }));
 }
@@ -336,7 +354,10 @@ export function formatPrintableWorksheetAnswerKeyPrompt({
   kind,
   prompt,
 }: Pick<PrintableWorksheetAnswerKeyItem, 'kind' | 'prompt'>) {
-  return formatRuntimeItemPrompt({ kind, prompt });
+  return formatRuntimeItemPrompt({
+    kind,
+    prompt: normalizeRuntimeDisplayText(prompt),
+  });
 }
 
 function getPrintableWorksheetResponseHelp(

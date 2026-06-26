@@ -15,6 +15,12 @@ import {
 } from '@/assignments/public';
 import { formatOptionalAcceptedAnswerAlternatives } from '@/assignments/result-format';
 import {
+  getRuntimeChoiceDisplayKey,
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
+import {
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getStudentRunnerCopy,
@@ -309,31 +315,23 @@ export function getSequentialRunnerItemIdByOffset({
 
 export function formatSequentialRunnerItemLabel(label: string, index: number) {
   const normalizedLabel =
-    label.trim() || m.student_runner_sequential_default_item_label();
+    normalizeRuntimeDisplayText(label) ||
+    m.student_runner_sequential_default_item_label();
   return m.student_runner_sequential_item_label({
-    index: Math.max(0, index) + 1,
+    index: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
     label: normalizedLabel,
   });
 }
 
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {
-  const choicesByKey = new Map<string, string>();
-
-  for (const item of items) {
-    for (const choice of item.choices ?? []) {
-      const normalizedChoice = normalizeRuntimeChoiceDisplayText(choice);
-      const choiceKey = getRuntimeChoiceKey(normalizedChoice);
-      if (!choiceKey || choicesByKey.has(choiceKey)) continue;
-
-      choicesByKey.set(choiceKey, normalizedChoice);
-    }
-  }
-
-  return [...choicesByKey.values()];
+  return (
+    normalizeRuntimeChoiceList(items.flatMap((item) => item.choices ?? [])) ??
+    []
+  );
 }
 
 export function findChoiceOwner(answers: StudentAnswerMap, choice: string) {
-  const choiceKey = getRuntimeChoiceKey(choice);
+  const choiceKey = getRuntimeChoiceDisplayKey(choice);
   if (!choiceKey) return undefined;
 
   return Object.entries(answers).find(([, answer]) =>
@@ -345,10 +343,10 @@ export function isSameRuntimeChoice(
   left: string | undefined,
   right: string | undefined
 ) {
-  const leftKey = getRuntimeChoiceKey(left);
+  const leftKey = getRuntimeChoiceDisplayKey(left);
   if (!leftKey) return false;
 
-  return leftKey === getRuntimeChoiceKey(right);
+  return leftKey === getRuntimeChoiceDisplayKey(right);
 }
 
 export function buildRuntimeChoiceViews({
@@ -550,7 +548,9 @@ export function buildFillBlankWorksheetView({
     fillBlankItemViews: runnerView.itemViews.map((itemView, index) => ({
       ...itemView,
       promptView: buildInlineBlankPromptView(itemView.prompt),
-      sequenceLabel: `${Math.max(0, index) + 1}`,
+      sequenceLabel: String(
+        normalizeRuntimeDisplayCount(index + 1, { min: 1 })
+      ),
       wordBankText: itemView.item.choices?.length
         ? itemView.item.choices.join(', ')
         : null,
@@ -603,12 +603,4 @@ function getStudentRunnerReviewStatus(
   if (!reviewItem) return 'idle';
   if (!reviewItem.submitted) return 'idle';
   return reviewItem.correct ? 'correct' : 'needs-review';
-}
-
-function normalizeRuntimeChoiceDisplayText(value: string) {
-  return value.normalize('NFKC').replace(/\s+/g, ' ').trim();
-}
-
-function getRuntimeChoiceKey(value?: string) {
-  return normalizeRuntimeChoiceDisplayText(value ?? '').toLocaleLowerCase();
 }

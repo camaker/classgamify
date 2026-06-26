@@ -15,6 +15,12 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PrintableWorksheetResponseMode =
@@ -183,12 +189,12 @@ function toPrintableWorksheetItem({
   return {
     answerSpaceLines: getPrintableWorksheetAnswerSpaceLines(responseMode),
     choicePresentation: getPrintableWorksheetChoicePresentation(responseMode),
-    choices: item.choices ? [...item.choices] : [],
+    choices: normalizeRuntimeChoiceList(item.choices) ?? [],
     id: item.id,
     kind: item.kind,
-    prompt: item.prompt,
+    prompt: normalizeRuntimeDisplayText(item.prompt),
     responseMode,
-    sequenceNumber,
+    sequenceNumber: normalizeRuntimeDisplayCount(sequenceNumber, { min: 1 }),
   };
 }
 
@@ -200,12 +206,12 @@ function toPrintableWorksheetAnswerKeyItem(
 
   return {
     acceptedAnswers,
-    answer: acceptedAnswers[0] ?? item.answer,
-    explanation: item.explanation,
+    answer: normalizeRuntimeDisplayText(acceptedAnswers[0] ?? item.answer),
+    explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
     id: item.id,
     kind: item.kind,
-    prompt: item.prompt,
-    sequenceNumber: index + 1,
+    prompt: normalizeRuntimeDisplayText(item.prompt),
+    sequenceNumber: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
   };
 }
 

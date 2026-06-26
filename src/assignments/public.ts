@@ -19,6 +19,13 @@ import {
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayList,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
@@ -202,9 +209,9 @@ export function buildPublicAssignmentPayload({
       : null,
     summary: {
       difficulty: content.difficulty,
-      estimatedMinutes: estimateAssignmentMinutes(runtimeItems.length),
+      estimatedMinutes: estimateAssignmentMinutes(orderedRuntimeItems.length),
       gradeBand: content.gradeBand,
-      itemCount: orderedRuntimeItems.length,
+      itemCount: normalizeRuntimeDisplayCount(orderedRuntimeItems.length),
       language: content.language,
       learningGoal: content.learningGoal,
       subject: content.subject,
@@ -219,11 +226,13 @@ export function stripRuntimeAnswers(
 }
 
 export function stripRuntimeAnswer(item: RuntimeItem): PublicRuntimeItem {
+  const choices = normalizeRuntimeChoiceList(item.choices);
+
   return {
-    choices: item.choices ? [...item.choices] : undefined,
+    choices,
     id: item.id,
     kind: item.kind,
-    prompt: item.prompt,
+    prompt: normalizeRuntimeDisplayText(item.prompt),
   };
 }
 
@@ -239,14 +248,18 @@ function buildAttemptReviewItems({
   );
 
   return runtimeItems.map((item) => {
-    const acceptedAnswers = getAcceptedAnswers(item.answer);
+    const acceptedAnswers =
+      normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
+      [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
     const answer = answerByItemId.get(item.id);
 
     return {
       acceptedAnswers,
       correct: Boolean(answer?.correct),
-      correctAnswer: acceptedAnswers[0] ?? item.answer,
-      explanation: item.explanation,
+      correctAnswer: normalizeRuntimeDisplayText(
+        acceptedAnswers[0] ?? item.answer
+      ),
+      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
       itemId: item.id,
       submitted: Boolean(answer?.answer.trim()),
     };
@@ -322,11 +335,13 @@ export function buildPublicAssignmentPreviewAssignment(
 }
 
 function estimateAssignmentMinutes(itemCount: number) {
+  const normalizedItemCount = normalizeRuntimeDisplayCount(itemCount);
+
   return Math.max(
     PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.min,
     Math.min(
       PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.max,
-      itemCount * PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.perItem
+      normalizedItemCount * PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.perItem
     )
   );
 }

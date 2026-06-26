@@ -310,6 +310,13 @@ import {
   stripRuntimeAnswers,
 } from '@/assignments/public';
 import {
+  getRuntimeChoiceDisplayKey,
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeChoiceList,
+  normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
+import {
   buildAssignmentSnapshotInsert,
   resolveAssignmentRuntimeSource,
   resolveAssignmentSnapshotSource,
@@ -1143,8 +1150,8 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /itemCount \* PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES\.perItem/,
-  'Public assignment estimated minutes should reuse the per-item estimate.'
+  /normalizeRuntimeDisplayCount\(itemCount\)[\s\S]*normalizedItemCount \* PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES\.perItem/,
+  'Public assignment estimated minutes should normalize item count and reuse the per-item estimate.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -3479,6 +3486,17 @@ assert.deepEqual(
     },
   ]),
   ['Paris', 'Rome', 'Berlin', 'New York']
+);
+assert.deepEqual(
+  getUniqueRuntimeChoices([
+    {
+      choices: [' Ｆｒｕｉｔ ', 'fruit', '  ', 'New   York'],
+      id: 'q-fullwidth',
+      kind: 'question',
+      prompt: 'Normalize choices?',
+    },
+  ]),
+  ['Fruit', 'New York']
 );
 assert.deepEqual(
   buildRuntimeChoiceViews({
@@ -6433,6 +6451,24 @@ assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
   min: 5,
   perItem: 2,
 });
+assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
+assert.equal(normalizeOptionalRuntimeDisplayText('   '), undefined);
+assert.equal(normalizeRuntimeDisplayCount(Number.NaN), 0);
+assert.equal(normalizeRuntimeDisplayCount(-2.4), 0);
+assert.equal(normalizeRuntimeDisplayCount(3.9), 3);
+assert.equal(normalizeRuntimeDisplayCount(12, { max: 4, min: 1 }), 4);
+assert.deepEqual(
+  normalizeRuntimeChoiceList([
+    ' Paris ',
+    '',
+    'ＰＡＲＩＳ',
+    'New   York',
+    'new york',
+    'Rome',
+  ]),
+  ['Paris', 'New York', 'Rome']
+);
+assert.equal(getRuntimeChoiceDisplayKey(' Ｐａｒｉｓ '), 'paris');
 assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
 assert.equal(
   publicAssignmentPayload.activity.description,
@@ -6458,6 +6494,40 @@ assert.equal(
     },
   }).summary.estimatedMinutes,
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES.max
+);
+assert.deepEqual(
+  stripRuntimeAnswers([
+    {
+      answer: ' Paris / Paris, France ',
+      choices: [' Paris ', 'ＰＡＲＩＳ', '', 'Rome'],
+      explanation: '  France capital.  ',
+      id: 'messy-q-1',
+      kind: 'question',
+      prompt: '  Capital   of   France?  ',
+    },
+    {
+      answer: ' Cold ',
+      choices: [' Cold ', 'cold', 'Warm'],
+      explanation: '   ',
+      id: 'messy-pair-1',
+      kind: 'pair',
+      prompt: ' Hot ',
+    },
+  ]),
+  [
+    {
+      choices: ['Paris', 'Rome'],
+      id: 'messy-q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+    {
+      choices: ['Cold', 'Warm'],
+      id: 'messy-pair-1',
+      kind: 'pair',
+      prompt: 'Hot',
+    },
+  ]
 );
 assert.equal('sourceMaterials' in publicAssignmentPayload.summary, false);
 assert.equal(
@@ -6617,6 +6687,50 @@ assert.equal(
   printableChoiceSourceItems[0]?.choices?.includes('Print-only choice'),
   false
 );
+const messyPrintableWorksheet = buildPrintableAssignmentWorksheet({
+  activity: {
+    description: 'Messy printable activity',
+    templateType: 'quiz',
+    title: 'Messy printable activity',
+  },
+  assignment: {
+    expiresAt: null,
+    settingsJson: null,
+    shareSlug: 'messy-printable',
+    title: 'Messy printable assignment',
+  },
+  includeAnswerKey: true,
+  runtimeItems: [
+    {
+      answer: ' Paris / Ｐａｒｉｓ / Paris, France ',
+      choices: [' Paris ', 'ＰＡＲＩＳ', '', 'Rome'],
+      explanation: '  France capital.  ',
+      id: 'messy-print-q',
+      kind: 'question',
+      prompt: '  Capital   of   France?  ',
+    },
+  ],
+  snapshot: null,
+});
+assert.deepEqual(messyPrintableWorksheet.items[0], {
+  answerSpaceLines: 1,
+  choicePresentation: 'choice-list',
+  choices: ['Paris', 'Rome'],
+  id: 'messy-print-q',
+  kind: 'question',
+  prompt: 'Capital of France?',
+  responseMode: 'choice',
+  sequenceNumber: 1,
+});
+assert.deepEqual(messyPrintableWorksheet.answerKey?.[0], {
+  acceptedAnswers: ['Paris', 'Paris, France'],
+  answer: 'Paris',
+  explanation: 'France capital.',
+  id: 'messy-print-q',
+  kind: 'question',
+  prompt: 'Capital of France?',
+  sequenceNumber: 1,
+});
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
@@ -6639,6 +6753,33 @@ assert.deepEqual(printableSnapshotItemView.choiceBank.choices, [
     choice: 'Other',
     indexLabel: 'C',
     key: 'q-frozen-prompt-choice-2',
+  },
+]);
+const messyPrintableItemView = buildPrintableWorksheetItemView({
+  answerSpaceLines: Number.POSITIVE_INFINITY,
+  choicePresentation: 'choice-list',
+  choices: [' Ｐａｒｉｓ ', 'Paris', '', 'Rome'],
+  id: 'messy-print-item',
+  kind: 'question',
+  prompt: '  Choose   the   capital.  ',
+  responseMode: 'choice',
+  sequenceNumber: Number.NaN,
+});
+assert.equal(messyPrintableItemView.sequenceLabel, 'Item 1');
+assert.deepEqual(messyPrintableItemView.answerLines, [
+  { key: 'messy-print-item-answer-line-0' },
+]);
+assert.deepEqual(messyPrintableItemView.choices, ['Paris', 'Rome']);
+assert.deepEqual(messyPrintableItemView.choiceBank.choices, [
+  {
+    choice: 'Paris',
+    indexLabel: 'A',
+    key: 'messy-print-item-choice-0',
+  },
+  {
+    choice: 'Rome',
+    indexLabel: 'B',
+    key: 'messy-print-item-choice-1',
   },
 ]);
 const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
@@ -6691,6 +6832,24 @@ assert.deepEqual(
     explanationLabel: 'Explanation: Frozen explanation',
     id: 'q-frozen-prompt',
     prompt: 'Frozen prompt?',
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetAnswerKeyItemView({
+    acceptedAnswers: [' Paris ', 'Paris, France'],
+    answer: ' Paris ',
+    explanation: '  France capital.  ',
+    id: 'messy-answer-key',
+    kind: 'question',
+    prompt: '  Capital   of   France?  ',
+    sequenceNumber: Number.POSITIVE_INFINITY,
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted alternatives: Paris, France',
+    answerLabel: '1. Paris',
+    explanationLabel: 'Explanation: France capital.',
+    id: 'messy-answer-key',
+    prompt: 'Capital of France?',
   }
 );
 const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
@@ -7920,6 +8079,31 @@ assert.deepEqual(
       correctAnswer: 'Paris',
       explanation: 'Paris is the capital of France.',
       itemId: 'q-1',
+      submitted: true,
+    },
+  ]
+);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
+    answers: [{ answer: 'paris', correct: true, itemId: 'messy-q-1' }],
+    runtimeItems: [
+      {
+        answer: ' Paris / Ｐａｒｉｓ / Paris, France ',
+        explanation: '  France capital.  ',
+        id: 'messy-q-1',
+        kind: 'question',
+        prompt: 'Capital?',
+      },
+    ],
+    showCorrectAnswers: true,
+  }),
+  [
+    {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      correct: true,
+      correctAnswer: 'Paris',
+      explanation: 'France capital.',
+      itemId: 'messy-q-1',
       submitted: true,
     },
   ]
