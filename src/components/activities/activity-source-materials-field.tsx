@@ -3,7 +3,9 @@ import {
   buildActivityMaterialReferenceFromUserFile,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
+import { buildActivitySourceMaterialSummaryView } from '@/activities/material-summary';
 import type { ActivityMaterialReference } from '@/activities/types';
+import { ActivitySourceMaterialsSummary } from '@/components/activities/activity-source-materials-summary';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { useUserFileMaterials } from '@/hooks/use-user-files';
@@ -52,6 +54,10 @@ export function ActivitySourceMaterialsField({
   );
   const selectedIds = useMemo(
     () => new Set(selectedMaterials.map((material) => material.fileId)),
+    [selectedMaterials]
+  );
+  const selectedSummary = useMemo(
+    () => buildActivitySourceMaterialSummaryView(selectedMaterials),
     [selectedMaterials]
   );
   const { data, isError, isLoading } = useUserFileMaterials(
@@ -121,28 +127,31 @@ export function ActivitySourceMaterialsField({
             </span>
           </div>
           {selectedMaterials.length > 0 ? (
-            <div className="grid gap-2 md:grid-cols-2">
-              {selectedMaterials.map((material) => (
-                <MaterialReferenceRow
-                  key={material.fileId}
-                  material={material}
-                  action={
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      aria-label={m.activity_form_source_materials_remove_label(
-                        { name: material.originalName }
-                      )}
-                      onClick={() => removeMaterial(material.fileId)}
-                    >
-                      <IconX className="size-4" />
-                      {m.activity_form_source_materials_remove()}
-                    </Button>
-                  }
-                />
-              ))}
-            </div>
+            <>
+              <ActivitySourceMaterialsSummary summary={selectedSummary} />
+              <div className="grid gap-2 md:grid-cols-2">
+                {selectedMaterials.map((material) => (
+                  <MaterialReferenceRow
+                    key={material.fileId}
+                    material={material}
+                    action={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        aria-label={m.activity_form_source_materials_remove_label(
+                          { name: material.originalName }
+                        )}
+                        onClick={() => removeMaterial(material.fileId)}
+                      >
+                        <IconX className="size-4" />
+                        {m.activity_form_source_materials_remove()}
+                      </Button>
+                    }
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <p className="rounded-lg border border-dashed bg-background p-3 text-muted-foreground text-sm">
               {m.activity_form_source_materials_empty_attached()}

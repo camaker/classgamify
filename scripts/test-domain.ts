@@ -1144,6 +1144,14 @@ const activityPreviewSource = readFileSync(
   'src/components/activities/activity-preview.tsx',
   'utf8'
 );
+const activitySourceMaterialsFieldSource = readFileSync(
+  'src/components/activities/activity-source-materials-field.tsx',
+  'utf8'
+);
+const activitySourceMaterialsSummarySource = readFileSync(
+  'src/components/activities/activity-source-materials-summary.tsx',
+  'utf8'
+);
 const activityPreviewViewSource = readFileSync(
   'src/activities/preview-view.ts',
   'utf8'
@@ -1246,6 +1254,31 @@ assert.doesNotMatch(
   activityPreviewSource,
   /ACTIVITY_PREVIEW_CONTENT_LIMITS|const visibleQuestions|const visiblePairs|const visibleGroups|buildDefaultActivityPreviewPanel/,
   'Activity preview component should not rebuild content slices or default panel state.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /buildActivitySourceMaterialSummaryView\(selectedMaterials\)/,
+  'Activity source-material picker should reuse the activity-domain material summary view.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /ActivitySourceMaterialsSummary[\s\S]*summary=\{selectedSummary\}/,
+  'Activity source-material picker should render attached material readiness through the summary component.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /ActivitySourceMaterialSummaryView/,
+  'Activity source-material summary component should consume the activity-domain summary view contract.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /summary\.kindBadges[\s\S]*summary\.extractionActions/,
+  'Activity source-material summary component should render material kinds and extraction readiness actions.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsFieldSource,
+  /hasAudio|hasSpreadsheet|hasWorksheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
+  'Activity source-material picker should not recalculate extraction readiness locally.'
 );
 const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
