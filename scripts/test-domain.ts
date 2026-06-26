@@ -6468,6 +6468,16 @@ assert.deepEqual(
         label: 'Student name',
       },
       {
+        id: 'date',
+        kind: 'blank-line',
+        label: 'Date',
+      },
+      {
+        id: 'score',
+        kind: 'blank-line',
+        label: 'Score',
+      },
+      {
         id: 'share-path',
         kind: 'text',
         label: 'Student link',

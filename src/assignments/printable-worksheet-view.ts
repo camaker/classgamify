@@ -26,7 +26,7 @@ type PrintableWorksheetAnswerKeyItemView = ReturnType<
 
 type PrintableWorksheetAssignmentFieldView =
   | {
-      id: 'student-name';
+      id: 'date' | 'score' | 'student-name';
       kind: 'blank-line';
       label: string;
     }
@@ -90,6 +90,9 @@ export const printableWorksheetPageCopy = {
   get deliveryPolicyLabel() {
     return m.assignment_printable_delivery_policy_label();
   },
+  get dateLabel() {
+    return m.assignment_printable_date_label();
+  },
   get emptyDescription() {
     return m.assignment_printable_empty_description();
   },
@@ -116,6 +119,9 @@ export const printableWorksheetPageCopy = {
   },
   get sharePathLabel() {
     return m.assignment_printable_share_path_label();
+  },
+  get scoreLabel() {
+    return m.assignment_printable_score_label();
   },
   get studentNameLabel() {
     return m.assignment_printable_student_name_label();
@@ -201,6 +207,16 @@ export function buildPrintableWorksheetAssignmentFieldViews(
       id: 'student-name',
       kind: 'blank-line',
       label: printableWorksheetPageCopy.studentNameLabel,
+    },
+    {
+      id: 'date',
+      kind: 'blank-line',
+      label: printableWorksheetPageCopy.dateLabel,
+    },
+    {
+      id: 'score',
+      kind: 'blank-line',
+      label: printableWorksheetPageCopy.scoreLabel,
     },
     {
       id: 'share-path',
