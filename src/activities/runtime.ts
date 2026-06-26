@@ -103,8 +103,9 @@ export function getRuntimeItems(
     case 'line-match':
     case 'match-up':
     case 'matching-pairs': {
-      const choices = content.pairs.map((pair) => pair.right);
-      return content.pairs.map((pair) => ({
+      const pairs = content.pairs.filter(hasRuntimePairContent);
+      const choices = pairs.map((pair) => pair.right);
+      return pairs.map((pair) => ({
         answer: pair.right,
         choices,
         id: pair.id,
@@ -118,24 +119,48 @@ export function getRuntimeItems(
     case 'fill-blank':
     case 'listening':
     case 'open-box':
-      return content.questions.map((question) => ({
-        answer: question.answer,
-        choices: question.options?.map((option) => option.text),
-        explanation: question.explanation,
-        id: question.id,
-        kind: 'question',
-        prompt: question.prompt,
-      }));
+      return content.questions
+        .filter(hasRuntimeQuestionContent)
+        .map((question) => ({
+          answer: question.answer,
+          choices: question.options?.map((option) => option.text),
+          explanation: question.explanation,
+          id: question.id,
+          kind: 'question',
+          prompt: question.prompt,
+        }));
     case 'quiz':
-      return content.questions.map((question) => ({
-        answer: question.answer,
-        choices: buildQuestionChoices({ content, question }),
-        explanation: question.explanation,
-        id: question.id,
-        kind: 'question',
-        prompt: question.prompt,
-      }));
+      return content.questions
+        .filter(hasRuntimeQuestionContent)
+        .map((question) => ({
+          answer: question.answer,
+          choices: buildQuestionChoices({ content, question }),
+          explanation: question.explanation,
+          id: question.id,
+          kind: 'question',
+          prompt: question.prompt,
+        }));
   }
+}
+
+function hasRuntimePairContent({
+  left,
+  right,
+}: {
+  left: string;
+  right: string;
+}) {
+  return Boolean(left.trim() && right.trim());
+}
+
+function hasRuntimeQuestionContent({
+  answer,
+  prompt,
+}: {
+  answer: string;
+  prompt: string;
+}) {
+  return Boolean(prompt.trim() && answer.trim());
 }
 
 export function evaluateRuntimeAnswers({
@@ -188,17 +213,20 @@ export function evaluateRuntimeAnswers({
 }
 
 function buildGroupSortRuntimeItems(content: ActivityContent): RuntimeItem[] {
-  const choices = content.groups.map((group) => group.label);
-  const candidates = content.groups.flatMap((group) =>
-    group.items.map((item) => ({
-      answer: group.label,
-      baseId: buildGroupItemRuntimeBaseId({
-        groupId: group.id,
+  const groups = content.groups.filter(hasRuntimeGroupContent);
+  const choices = groups.map((group) => group.label);
+  const candidates = groups.flatMap((group) =>
+    group.items
+      .filter((item) => item.trim())
+      .map((item) => ({
+        answer: group.label,
+        baseId: buildGroupItemRuntimeBaseId({
+          groupId: group.id,
+          item,
+        }),
+        choices,
         item,
-      }),
-      choices,
-      item,
-    }))
+      }))
   );
   const baseIdCounts = countCandidateBaseIds(candidates);
   const seenBaseIds = new Map<string, number>();
@@ -218,6 +246,16 @@ function buildGroupSortRuntimeItems(content: ActivityContent): RuntimeItem[] {
       prompt: candidate.item,
     };
   });
+}
+
+function hasRuntimeGroupContent({
+  items,
+  label,
+}: {
+  items: string[];
+  label: string;
+}) {
+  return Boolean(label.trim() && items.some((item) => item.trim()));
 }
 
 function buildGroupItemRuntimeBaseId({

@@ -13802,6 +13802,58 @@ assert.deepEqual(
     ['Choose the group for "Apple".', 'Group item'],
   ]
 );
+const dirtyRuntimeContent = {
+  ...questionOnlyContent,
+  groups: [
+    { id: 'g-blank', items: ['   '], label: 'Blank group' },
+    { id: 'g-valid', items: ['   ', 'Apple'], label: 'Fruit' },
+    { id: 'g-empty-label', items: ['Water'], label: '   ' },
+  ],
+  pairs: [
+    { id: 'p-blank-left', left: '   ', right: 'Definition' },
+    { id: 'p-blank-right', left: 'Term', right: '   ' },
+    { id: 'p-valid', left: 'Hot', right: 'Cold' },
+  ],
+  questions: [
+    { answer: '   ', id: 'q-blank-answer', prompt: 'Question?' },
+    { answer: 'Paris', id: 'q-blank-prompt', prompt: '   ' },
+    { answer: 'Paris', id: 'q-valid', prompt: 'Capital of France?' },
+  ],
+};
+assert.deepEqual(
+  getRuntimeItems('quiz', dirtyRuntimeContent).map((item) => item.id),
+  ['q-valid']
+);
+assert.deepEqual(
+  getRuntimeItems('match-up', dirtyRuntimeContent).map((item) => item.id),
+  ['p-valid']
+);
+assert.deepEqual(
+  getRuntimeItems('group-sort', dirtyRuntimeContent).map((item) => [
+    item.id,
+    item.choices,
+    item.prompt,
+  ]),
+  [['g-valid-apple', ['Fruit'], 'Apple']]
+);
+assert.deepEqual(
+  evaluateRuntimeAnswers({
+    answers: [
+      { answer: 'Paris', itemId: 'q-valid' },
+      { answer: 'Anything', itemId: 'q-blank-answer' },
+    ],
+    content: dirtyRuntimeContent,
+    templateType: 'quiz',
+  }).result,
+  {
+    accuracy: 100,
+    completedItemCount: 1,
+    correctItemCount: 1,
+    durationSeconds: undefined,
+    earnedPoints: 1,
+    totalPoints: 1,
+  }
+);
 assert.equal(
   buildDuplicatedActivityTitle('  Food words quick check  '),
   'Copy of Food words quick check'
