@@ -37,6 +37,7 @@ import {
   getStudentRunnerCopy,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
+  resolveStudentAttemptSubmissionDurationSeconds,
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptClock,
@@ -307,11 +308,11 @@ function PlayPage() {
         buildStudentAttemptSubmissionInput({
           answers,
           collectStudentName: Boolean(assignment?.settings.collectStudentName),
-          durationSeconds: buildAttemptTimerState({
+          durationSeconds: resolveStudentAttemptSubmissionDurationSeconds({
             now: Date.now(),
             startedAt,
             timeLimitSeconds,
-          }).durationSeconds,
+          }),
           runtimeItems,
           shareSlug: activeShareId,
           anonymousToken: nextAnonymousToken,

@@ -1,4 +1,7 @@
-import { formatAttemptDuration } from '@/assignments/attempt-duration';
+import {
+  buildAttemptTimerState,
+  formatAttemptDuration,
+} from '@/assignments/attempt-duration';
 import {
   canUseAnotherAssignmentAttempt,
   type AssignmentAttemptUsage,
@@ -391,6 +394,22 @@ export function buildStudentAttemptTimerBadge({
         }),
     show: true,
   };
+}
+
+export function resolveStudentAttemptSubmissionDurationSeconds({
+  now,
+  startedAt,
+  timeLimitSeconds,
+}: {
+  now: number;
+  startedAt: number;
+  timeLimitSeconds?: number;
+}) {
+  return buildAttemptTimerState({
+    now,
+    startedAt,
+    timeLimitSeconds,
+  }).durationSeconds;
 }
 
 export function getAttemptCompletionSummary({

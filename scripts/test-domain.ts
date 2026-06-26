@@ -490,6 +490,7 @@ import {
   isStudentAnswerFilled,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
+  resolveStudentAttemptSubmissionDurationSeconds,
 } from '@/assignments/student-submission';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
@@ -2044,6 +2045,16 @@ assert.doesNotMatch(
   /attemptClock\?\.shareId === activeShareId\s*\?\s*attemptClock\.startedAt\s*:\s*now/,
   'Student play route should not keep local attempt-clock share-id math.'
 );
+assert.match(
+  playRouteSource,
+  /resolveStudentAttemptSubmissionDurationSeconds\(/,
+  'Student play route should resolve submitted duration through assignment-domain helpers.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /durationSeconds:\s*buildAttemptTimerState\(/,
+  'Student play route should not read timer-state internals when building the submission payload.'
+);
 const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
   'utf8'
@@ -3273,6 +3284,29 @@ assert.deepEqual(
     ],
     shareSlug: 'share-two',
   }
+);
+assert.equal(
+  resolveStudentAttemptSubmissionDurationSeconds({
+    now: 6_500,
+    startedAt: 1_000,
+    timeLimitSeconds: 10,
+  }),
+  6
+);
+assert.equal(
+  resolveStudentAttemptSubmissionDurationSeconds({
+    now: 12_000,
+    startedAt: 1_000,
+    timeLimitSeconds: 10,
+  }),
+  11
+);
+assert.equal(
+  resolveStudentAttemptSubmissionDurationSeconds({
+    now: 1_000,
+    startedAt: 2_000,
+  }),
+  0
 );
 let anonymousTokenCreateCount = 0;
 assert.equal(
