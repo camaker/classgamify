@@ -746,7 +746,7 @@ function completeAiDraftList<T>({
   const items: T[] = [];
   const seen = new Set<string>();
   const addItem = (item: T) => {
-    const key = getKey(item);
+    const key = normalizeAiDraftCompletionKey(getKey(item));
     if (seen.has(key) || items.length >= max) return false;
     seen.add(key);
     items.push(item);
@@ -784,7 +784,10 @@ function completeAiDraftGroups({
 }) {
   const groups: NormalizedAiActivityDraft['groups'] = [];
   const addGroup = (group: NormalizedAiActivityDraft['groups'][number]) => {
-    const existingGroup = groups.find((item) => item.label === group.label);
+    const groupKey = normalizeAiDraftCompletionKey(group.label);
+    const existingGroup = groups.find(
+      (item) => normalizeAiDraftCompletionKey(item.label) === groupKey
+    );
     const targetGroup =
       existingGroup ??
       (groups.length < ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groups
@@ -798,10 +801,10 @@ function completeAiDraftGroups({
     if (!existingGroup) groups.push(targetGroup);
 
     const previousItemCount = targetGroup.items.length;
-    targetGroup.items = unique([...targetGroup.items, ...group.items]).slice(
-      0,
-      ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groupItems
-    );
+    targetGroup.items = uniqueAiDraftCompletionTexts([
+      ...targetGroup.items,
+      ...group.items,
+    ]).slice(0, ACTIVITY_AI_DRAFT_COMPLETION_LIMITS.groupItems);
 
     return targetGroup.items.length > previousItemCount || !existingGroup;
   };
@@ -1298,5 +1301,31 @@ function summarizeSource(sourceText: string) {
 }
 
 function unique(values: string[]) {
-  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+  return uniqueAiDraftCompletionTexts(values);
+}
+
+function uniqueAiDraftCompletionTexts(values: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    if (!trimmed) continue;
+
+    const key = normalizeAiDraftCompletionKey(trimmed);
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+}
+
+function normalizeAiDraftCompletionKey(value: string) {
+  return value
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase();
 }

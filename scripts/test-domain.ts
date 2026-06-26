@@ -14506,6 +14506,66 @@ assert.ok(completedPartialAiDraft.draft.groups.length >= 2);
 assert.ok(completedPartialAiDraft.draft.vocabulary.includes('cat'));
 assert.ok(completedPartialAiDraft.draft.vocabulary.length >= 4);
 assert.ok(completedPartialAiDraft.draft.teacherNotes.length >= 1);
+const duplicateCompletionAiDraft = normalizeAiActivityDraft({
+  draft: {
+    ...partialAiDraft,
+    groups: [
+      { label: ' Animals ', items: [' cat ', 'ｃａｔ', 'dog'] },
+      { label: 'animals', items: ['CAT', ' bird '] },
+    ],
+    pairs: [
+      { left: ' cat ', right: ' animal ' },
+      { left: 'ｃａｔ', right: 'Animal' },
+    ],
+    questions: [
+      partialAiDraft.questions[0]!,
+      {
+        answer: 'CAT',
+        explanation: 'A cat is an animal.',
+        options: ['CAT', 'tree', 'rain'],
+        prompt: ' Which   word is an animal? ',
+      },
+    ],
+    teacherNotes: ['Review answers.', ' review   answers. '],
+    vocabulary: [' cat ', 'ｃａｔ', 'CAT', 'dog'],
+  },
+  input: {
+    ...aiDraftInputBase,
+    itemCount: 4,
+    templateType: 'quiz',
+  },
+});
+assert.equal(duplicateCompletionAiDraft.usedLocalCompletion, true);
+assert.equal(
+  duplicateCompletionAiDraft.draft.questions.filter(
+    (question) =>
+      question.prompt === 'Which word is an animal?' &&
+      question.answer.toLocaleLowerCase() === 'cat'
+  ).length,
+  1
+);
+assert.equal(
+  duplicateCompletionAiDraft.draft.pairs.filter(
+    (pair) =>
+      pair.left.toLocaleLowerCase() === 'cat' &&
+      pair.right.toLocaleLowerCase() === 'animal'
+  ).length,
+  1
+);
+assert.deepEqual(duplicateCompletionAiDraft.draft.groups[0], {
+  items: ['cat', 'dog', 'bird'],
+  label: 'Animals',
+});
+assert.deepEqual(duplicateCompletionAiDraft.draft.vocabulary.slice(0, 2), [
+  'cat',
+  'dog',
+]);
+assert.equal(
+  duplicateCompletionAiDraft.draft.teacherNotes.filter((note) =>
+    note.toLocaleLowerCase().includes('review answers')
+  ).length,
+  1
+);
 const maxCountCompletedAiDraft = normalizeAiActivityDraft({
   draft: partialAiDraft,
   input: {
