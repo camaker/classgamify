@@ -51,12 +51,13 @@ export function buildAssignmentListRouteSearch({
   const normalizedSearch = normalizeAssignmentListSearch(q);
   const normalizedPage =
     page && Number.isInteger(page) && page > 1 ? page : undefined;
+  const normalizedStatus = resolveAssignmentStatusFilter(status);
 
   return {
     page: normalizedPage,
     published: normalizeAssignmentListPublishedSearch(published),
     q: normalizedSearch,
-    status: status === 'all' ? undefined : status,
+    status: normalizedStatus === 'all' ? undefined : normalizedStatus,
   };
 }
 
@@ -111,6 +112,11 @@ export function parseAssignmentStatusFilter(
   }
 
   return undefined;
+}
+
+function resolveAssignmentStatusFilter(value: unknown): AssignmentStatusFilter {
+  if (value === 'all') return 'all';
+  return parseAssignmentStatusFilter(value) ?? 'all';
 }
 
 export function buildAssignmentListValidatedSearch(

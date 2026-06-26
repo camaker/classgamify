@@ -79,14 +79,17 @@ export function buildActivityLibraryRouteSearch({
   const normalizedSearch = normalizeActivityLibrarySearch(q);
   const normalizedPage =
     page && Number.isInteger(page) && page > 1 ? page : undefined;
+  const normalizedSource = resolveActivitySourceMaterialFilter(source);
+  const normalizedStatus = resolveActivityLibraryStatus(status);
+  const normalizedTemplate = resolveActivityTemplateFilter(template);
 
   return {
     created: normalizeActivityLibraryCreatedSearch(created),
     page: normalizedPage,
     q: normalizedSearch,
-    source: source === 'all' ? undefined : source,
-    status: status === 'active' ? undefined : status,
-    template: template === 'all' ? undefined : template,
+    source: normalizedSource === 'all' ? undefined : normalizedSource,
+    status: normalizedStatus === 'active' ? undefined : normalizedStatus,
+    template: normalizedTemplate === 'all' ? undefined : normalizedTemplate,
   };
 }
 
@@ -199,6 +202,22 @@ function isActivityFilterableSourceMaterial(
       value as Exclude<ActivitySourceMaterialFilter, 'all'>
     )
   );
+}
+
+function resolveActivityLibraryStatus(value: unknown): ActivityLibraryStatus {
+  return isActivityLibraryStatus(value) ? value : 'active';
+}
+
+function resolveActivitySourceMaterialFilter(
+  value: unknown
+): ActivitySourceMaterialFilter {
+  if (value === 'all') return 'all';
+  return isActivityFilterableSourceMaterial(value) ? value : 'all';
+}
+
+function resolveActivityTemplateFilter(value: unknown): ActivityTemplateFilter {
+  if (value === 'all') return 'all';
+  return isActivityTemplateType(value) ? value : 'all';
 }
 
 export function matchesActivitySourceMaterialFilter({

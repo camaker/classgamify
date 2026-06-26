@@ -8073,6 +8073,24 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildActivityLibraryRouteSearch({
+    created: 'activity-1',
+    page: 2,
+    q: ' valid ',
+    source: 'video',
+    status: 'deleted',
+    template: 'flashcards',
+  } as never),
+  {
+    created: 'activity-1',
+    page: 2,
+    q: 'valid',
+    source: undefined,
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
   buildActivityLibraryPageRouteSearch({
     current: {
       created: 'activity-1',
@@ -11148,6 +11166,20 @@ assert.deepEqual(
     published: 'share-1',
     q: 'week',
     status: 'expired',
+  }
+);
+assert.deepEqual(
+  buildAssignmentListRouteSearch({
+    page: 2,
+    published: 'share-1',
+    q: ' valid ',
+    status: 'deleted',
+  } as never),
+  {
+    page: 2,
+    published: 'share-1',
+    q: 'valid',
+    status: undefined,
   }
 );
 assert.deepEqual(
