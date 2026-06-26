@@ -114,24 +114,38 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       settings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
-      data.stats.completions,
-      data.stats.averageScore,
-      data.stats.averagePoints,
-      data.stats.completions > 0 ? data.stats.averageDurationSeconds : '',
+      formatAssignmentExportNumber(data.stats.completions, { min: 0 }),
+      formatAssignmentExportNumber(data.stats.averageScore, { min: 0 }),
+      formatAssignmentExportNumber(data.stats.averagePoints, { min: 0 }),
+      data.stats.completions > 0
+        ? formatAssignmentExportNumber(data.stats.averageDurationSeconds, {
+            min: 0,
+            round: true,
+          })
+        : '',
       attempt.id,
       attempt.studentLabel,
       formatAssignmentResultCsvDate(attempt.completedAt),
-      storedAttempt?.score ?? attempt.score,
-      storedAttempt?.maxScore ?? '',
-      attempt.accuracy,
-      storedAttempt?.resultJson?.completedItemCount ?? '',
+      formatAssignmentExportNumber(storedAttempt?.score ?? attempt.score, {
+        min: 0,
+      }),
+      formatAssignmentExportNumber(storedAttempt?.maxScore, { min: 0 }),
+      formatAssignmentExportNumber(attempt.accuracy, { min: 0 }),
+      formatAssignmentExportNumber(
+        storedAttempt?.resultJson?.completedItemCount,
+        {
+          min: 0,
+        }
+      ),
       runtimeItemCount,
       attemptDurationSeconds ?? '',
-      studentSummary?.attempts ?? '',
-      studentSummary?.latestAccuracy ?? '',
-      studentSummary?.averageAccuracy ?? '',
-      studentSummary?.bestAccuracy ?? '',
-      studentSummary?.needsReviewCount ?? '',
+      formatAssignmentExportNumber(studentSummary?.attempts, { min: 0 }),
+      formatAssignmentExportNumber(studentSummary?.latestAccuracy, { min: 0 }),
+      formatAssignmentExportNumber(studentSummary?.averageAccuracy, { min: 0 }),
+      formatAssignmentExportNumber(studentSummary?.bestAccuracy, { min: 0 }),
+      formatAssignmentExportNumber(studentSummary?.needsReviewCount, {
+        min: 0,
+      }),
     ];
 
     if (attempt.answers.length === 0) {
@@ -255,6 +269,23 @@ function formatAssignmentExportStatusLabel({
 
 function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
   return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
+}
+
+function formatAssignmentExportNumber(
+  value: number | null | undefined,
+  options?: {
+    min?: number;
+    round?: boolean;
+  }
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return '';
+  }
+
+  const normalizedValue =
+    options?.min === undefined ? value : Math.max(options.min, value);
+
+  return options?.round ? Math.round(normalizedValue) : normalizedValue;
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {

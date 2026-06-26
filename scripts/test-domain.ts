@@ -18555,6 +18555,40 @@ assert.match(
   zeroAverageDurationCsv,
   /"Snapshot Capitals","Quiz","1","50","1","0","attempt-1"/
 );
+const invalidStatsCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  stats: {
+    averageDurationSeconds: Number.NaN,
+    averagePoints: Number.NEGATIVE_INFINITY,
+    averageScore: Number.POSITIVE_INFINITY,
+    completions: Number.NaN,
+  },
+});
+assert.doesNotMatch(invalidStatsCsv, /NaN|Infinity/);
+assert.match(
+  invalidStatsCsv,
+  /"Snapshot Capitals","Quiz","","","","","attempt-1"/
+);
+const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  attempts: [
+    {
+      ...csvExportData.attempts[0]!,
+      maxScore: Number.POSITIVE_INFINITY,
+      resultJson: {
+        ...csvExportData.attempts[0]!.resultJson!,
+        accuracy: Number.NaN,
+        completedItemCount: -3,
+      },
+      score: -3,
+    },
+  ],
+});
+assert.doesNotMatch(invalidStoredAttemptCsv, /NaN|Infinity/);
+assert.match(
+  invalidStoredAttemptCsv,
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","45"/
+);
 const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
   ...csvExportData,
   activity: {
