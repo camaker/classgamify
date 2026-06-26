@@ -9935,8 +9935,31 @@ assert.deepEqual(
     template: 'line-match',
   }
 );
+const worksheetsPageWithoutLineMatch = buildWorksheetsPageViewModel({
+  worksheetModeDefinitions: worksheetModeDefinitions.filter(
+    (mode) => mode.template !== 'line-match'
+  ),
+});
+assert.deepEqual(
+  worksheetsPageWithoutLineMatch.heroActions.map((action) => action.template),
+  [...WORKSHEET_MODE_TEMPLATES]
+);
+assert.deepEqual(worksheetsPageWithoutLineMatch.heroActions[1], {
+  isPrimary: false,
+  label: 'Create Lines',
+  search: { template: 'line-match' },
+  template: 'line-match',
+});
+assert.deepEqual(
+  worksheetsPageWithoutLineMatch.modeCards.map((card) => card.template),
+  ['fill-blank', 'listening', 'group-sort']
+);
 const templateEntrySource = readFileSync(
   'src/activities/template-entry.ts',
+  'utf8'
+);
+const entryPageViewSource = readFileSync(
+  'src/activities/entry-page-view.ts',
   'utf8'
 );
 const publicCopyMessages = {
@@ -9970,6 +9993,16 @@ assert.doesNotMatch(
   templateEntrySource,
   /worksheets_page_mode_fallback_action\(\{ template \}\)/,
   'Worksheet fallback actions should not render raw internal template ids.'
+);
+assert.match(
+  entryPageViewSource,
+  /buildWorksheetHeroActions\(worksheetModeDefinitions\)/,
+  'Worksheets page view-model should reuse the worksheet hero action helper.'
+);
+assert.doesNotMatch(
+  entryPageViewSource,
+  /const heroActions = worksheetModeDefinitions\.map/,
+  'Worksheets page view-model should not rebuild hero actions locally.'
 );
 overwriteGetLocale(() => 'zh');
 try {

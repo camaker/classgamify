@@ -2,14 +2,17 @@ import {
   formatActivityTemplateClassroomMode,
   getActivityTemplates,
 } from '@/activities/catalog';
-import { buildTemplateEntryAction } from '@/activities/template-entry';
+import {
+  buildTemplateEntryAction,
+  buildWorksheetHeroActions,
+  buildWorksheetModeEntryAction,
+} from '@/activities/template-entry';
 import { formatTemplateRequirement } from '@/activities/template-remix';
 import {
   getWorksheetModeDefinitions,
   type WorksheetModeDefinition,
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
-import { buildWorksheetModeEntryAction } from '@/activities/template-entry';
 import type { ActivityTemplateDefinition } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
@@ -126,11 +129,12 @@ export function buildWorksheetsPageViewModel({
 }: {
   worksheetModeDefinitions?: WorksheetModeDefinition[];
 } = {}): WorksheetsPageViewModel {
-  const heroActions = worksheetModeDefinitions.map((mode, index) => ({
-    ...buildWorksheetModeEntryAction(mode),
-    isPrimary: index === 0,
-    template: mode.template,
-  }));
+  const heroActions = buildWorksheetHeroActions(worksheetModeDefinitions).map(
+    (action, index) => ({
+      ...action,
+      isPrimary: index === 0,
+    })
+  );
 
   return {
     hero: {
