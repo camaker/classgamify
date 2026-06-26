@@ -1235,7 +1235,7 @@
   "dashboard_overview_action_assignments_cta": "Open assignments",
   "dashboard_overview_action_assignments_description": "Track published share links, assignment settings, completions, and average scores.",
   "dashboard_overview_action_assignments_title": "Assignments",
-  "dashboard_overview_action_student_preview_cta": "Preview play route",
+  "dashboard_overview_action_student_preview_cta": "Open student preview",
   "dashboard_overview_action_student_preview_description": "Open a playable student assignment route with progress, timing, scoring, and review behavior.",
   "dashboard_overview_action_student_preview_title": "Student preview",
   "dashboard_overview_breadcrumb": "Dashboard",

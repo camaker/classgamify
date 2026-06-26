@@ -10272,7 +10272,7 @@ assert.deepEqual(
   [
     ['activities', 'Activities', 'Open activities'],
     ['assignments', 'Assignments', 'Open assignments'],
-    ['student-preview', 'Student preview', 'Preview play route'],
+    ['student-preview', 'Student preview', 'Open student preview'],
   ]
 );
 assert.deepEqual(
