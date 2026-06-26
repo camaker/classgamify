@@ -1,4 +1,5 @@
 import Container from '@/components/layout/container';
+import { WorksheetModeCard } from '@/components/activities/worksheet-mode-card';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { buildWorksheetsPageViewModel } from '@/activities/entry-page-view';
@@ -9,17 +10,11 @@ import { seo } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
-  IconCategory2,
   IconDownload,
-  IconClipboardText,
-  IconHeadphones,
-  IconLayoutColumns,
   IconListDetails,
   IconPencilPlus,
-  type TablerIcon,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
-import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
 
 export const Route = createFileRoute('/worksheets')({
   head: () =>
@@ -109,10 +104,10 @@ function WorksheetsPage() {
               <IconDownload className="size-4" />
             </div>
             <h2 className="mt-4 text-xl font-semibold">
-              {m.worksheets_page_printable_title()}
+              {pageView.printable.title}
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              {m.worksheets_page_printable_description()}
+              {pageView.printable.description}
             </p>
           </div>
 
@@ -149,40 +144,3 @@ function WorksheetsPage() {
     </Container>
   );
 }
-
-function WorksheetModeCard({
-  mode,
-}: {
-  mode: ReturnType<typeof buildWorksheetsPageViewModel>['modeCards'][number];
-}) {
-  const Icon = worksheetModeIcons[mode.template];
-
-  return (
-    <div className="rounded-lg border bg-card p-5">
-      <div className="flex size-9 items-center justify-center rounded-lg border bg-background text-primary">
-        <Icon className="size-4" />
-      </div>
-      <h2 className="mt-4 font-semibold">{mode.title}</h2>
-      <p className="mt-2 min-h-24 text-sm leading-6 text-muted-foreground">
-        {mode.description}
-      </p>
-      <Link
-        to={Routes.Create}
-        search={mode.action.search}
-        className={cn(
-          buttonVariants({ variant: 'outline' }),
-          'mt-4 w-full bg-background'
-        )}
-      >
-        {mode.action.label}
-      </Link>
-    </div>
-  );
-}
-
-const worksheetModeIcons = {
-  'fill-blank': IconClipboardText,
-  'group-sort': IconCategory2,
-  'line-match': IconLayoutColumns,
-  listening: IconHeadphones,
-} satisfies Record<WorksheetModeTemplate, TablerIcon>;

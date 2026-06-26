@@ -1368,6 +1368,16 @@ const activityPublishDialogSource = readFileSync(
   'src/components/activities/activity-publish-dialog.tsx',
   'utf8'
 );
+const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
+const templateDirectoryCardSource = readFileSync(
+  'src/components/activities/template-directory-card.tsx',
+  'utf8'
+);
+const worksheetsRouteSource = readFileSync('src/routes/worksheets.tsx', 'utf8');
+const worksheetModeCardSource = readFileSync(
+  'src/components/activities/worksheet-mode-card.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   activityPublishDialogSource,
   /error\.message|error instanceof Error/,
@@ -1412,6 +1422,51 @@ assert.doesNotMatch(
   activityPublishDialogSource,
   /buildAssignmentPublishDraft\(|buildAssignmentPublishPreviewFromDraft|validateAssignmentPublishDraft|buildAssignmentPublishDialogState|buildAssignmentPublishToggleViews/,
   'Assignment publish dialog should not rebuild draft, preview, validation, dialog state, or toggle views directly.'
+);
+assert.match(
+  templatesRouteSource,
+  /TemplateDirectoryCard[\s\S]*template=\{template\}/,
+  'Templates route should delegate template card rendering to the activity component.'
+);
+assert.match(
+  templateDirectoryCardSource,
+  /TemplatesPageViewModel\['cards'\]\[number\]/,
+  'Template directory cards should consume the activity entry-page view-model card contract.'
+);
+assert.match(
+  templateDirectoryCardSource,
+  /template\.contentRequirements\.map[\s\S]*template\.action\.search/,
+  'Template directory cards should own card requirement badges and create actions.'
+);
+assert.doesNotMatch(
+  templatesRouteSource,
+  /IconDeviceGamepad2|CardHeader|CardContent|contentRequirements\.map|template\.bestForLabel|template\.classroomModeLabel/,
+  'Templates route should not rebuild low-level template card presentation locally.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /WorksheetModeCard[\s\S]*mode=\{mode\}/,
+  'Worksheets route should delegate worksheet mode card rendering to the activity component.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /pageView\.printable\.title[\s\S]*pageView\.printable\.description/,
+  'Worksheets route should render printable copy from the worksheet page view-model.'
+);
+assert.match(
+  worksheetModeCardSource,
+  /WorksheetsPageViewModel\['modeCards'\]\[number\]/,
+  'Worksheet mode cards should consume the worksheet page view-model card contract.'
+);
+assert.match(
+  worksheetModeCardSource,
+  /worksheetModeIcons[\s\S]*satisfies Record<WorksheetModeTemplate, TablerIcon>/,
+  'Worksheet mode card icon mapping should stay beside the reusable card presentation.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /function WorksheetModeCard|const worksheetModeIcons|WorksheetModeTemplate|type TablerIcon|IconClipboardText|IconCategory2|IconLayoutColumns|IconHeadphones|m\.worksheets_page_printable_title|m\.worksheets_page_printable_description/,
+  'Worksheets route should not rebuild worksheet card icons or printable copy locally.'
 );
 const publicPlayRouteSource = readFileSync(
   'src/routes/play/$shareId.tsx',
