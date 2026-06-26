@@ -182,6 +182,9 @@ import {
   createActivityInputSchema,
 } from '@/activities/validation';
 import {
+  buildActivityCreatePageEditorViewModel,
+  buildActivityCreatePageViewModel,
+  buildActivityEditPageViewModel,
   activityContentToEditorInput,
   getActivityEditorDefaultInput,
   buildActivityEditorInitialValues,
@@ -668,6 +671,31 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const createRouteSource = readFileSync('src/routes/create.tsx', 'utf8');
+assert.match(
+  createRouteSource,
+  /buildActivityCreatePageEditorViewModel/,
+  'The create route should consume the activity-domain page view-model instead of rebuilding editor page state in the route.'
+);
+assert.doesNotMatch(
+  createRouteSource,
+  /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)/,
+  'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel.'
+);
+const activityEditRouteSource = readFileSync(
+  'src/routes/dashboard/activities/$activityId.tsx',
+  'utf8'
+);
+assert.match(
+  activityEditRouteSource,
+  /buildActivityEditPageViewModel/,
+  'The activity edit route should consume the activity-domain page view-model.'
+);
+assert.doesNotMatch(
+  activityEditRouteSource,
+  /activityContentToEditorInput|buildActivityEditAccessView|activityEditPageCopy/,
+  'The activity edit route should not rebuild editor initial values, access state, or page copy directly.'
+);
 const localizedLegalPageRequirements = [
   {
     filePath: 'content/pages/terms.zh.md',
@@ -8460,6 +8488,28 @@ assert.deepEqual(activityEditPageCopy, {
   loadErrorMessage:
     'Activity could not be loaded. Refresh the page or return to the activity library.',
 });
+assert.deepEqual(buildActivityEditPageViewModel(undefined), {
+  archivedActivitiesAction: {
+    href: '/dashboard/activities',
+    search: { status: 'archived' },
+  },
+  backAction: {
+    href: '/dashboard/activities',
+    label: 'Back to library',
+  },
+  breadcrumbs: [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/dashboard/activities', label: 'Activities' },
+    { isCurrentPage: true, label: 'Edit activity' },
+  ],
+  description:
+    'Update reusable activity content before publishing or reusing it across templates.',
+  editAccessView: null,
+  editor: undefined,
+  loadErrorMessage:
+    'Activity could not be loaded. Refresh the page or return to the activity library.',
+  title: 'Edit activity',
+});
 assert.deepEqual(activityLibraryPageCopy, {
   breadcrumbCurrent: 'Activities',
   breadcrumbDashboard: 'Dashboard',
@@ -9697,6 +9747,60 @@ assert.equal(
   defaultSourceSummaryContent.sourceSummary,
   'Teacher-created activity from structured editor input.'
 );
+const editableActivityPageView = buildActivityEditPageViewModel({
+  contentJson: defaultSourceSummaryContent,
+  description: 'Default source summary',
+  id: 'activity-edit-1',
+  templateType: 'quiz',
+  title: 'Default source summary',
+  visibility: 'draft',
+});
+assert.deepEqual(
+  {
+    accessTitle: editableActivityPageView.editAccessView?.title,
+    backHref: editableActivityPageView.backAction.href,
+    breadcrumbLabels: editableActivityPageView.breadcrumbs.map(
+      (breadcrumb) => breadcrumb.label
+    ),
+    editorActivityId: editableActivityPageView.editor?.activityId,
+    editorMode: editableActivityPageView.editor?.mode,
+    editorTitle: editableActivityPageView.editor?.initialValues.title,
+    title: editableActivityPageView.title,
+  },
+  {
+    accessTitle: 'Edit reusable activity',
+    backHref: '/dashboard/activities',
+    breadcrumbLabels: ['Dashboard', 'Activities', 'Default source summary'],
+    editorActivityId: 'activity-edit-1',
+    editorMode: 'edit',
+    editorTitle: 'Default source summary',
+    title: 'Default source summary',
+  }
+);
+const archivedActivityPageView = buildActivityEditPageViewModel({
+  contentJson: defaultSourceSummaryContent,
+  description: 'Archived source summary',
+  id: 'activity-edit-archived',
+  templateType: 'quiz',
+  title: 'Archived source summary',
+  visibility: 'archived',
+});
+assert.deepEqual(
+  {
+    actionLabel: archivedActivityPageView.editAccessView?.actionLabel,
+    canEdit: archivedActivityPageView.editAccessView?.canEdit,
+    editor: archivedActivityPageView.editor,
+    restoreHref: archivedActivityPageView.archivedActivitiesAction.href,
+    restoreSearch: archivedActivityPageView.archivedActivitiesAction.search,
+  },
+  {
+    actionLabel: 'Open archived activities',
+    canEdit: false,
+    editor: undefined,
+    restoreHref: '/dashboard/activities',
+    restoreSearch: { status: 'archived' },
+  }
+);
 assert.doesNotThrow(() =>
   buildActivityContent(
     createActivityInputSchema.parse(activityEditorDefaultInput)
@@ -9753,6 +9857,24 @@ assert.throws(
     }),
   /Group line 1 needs "group \| item one, item two"\./
 );
+assert.deepEqual(buildActivityCreatePageViewModel(), {
+  hero: {
+    badgeLabel: 'Teacher activity builder',
+    description:
+      'Start with structured classroom content: questions, match pairs, categories, vocabulary, learning goal, and teacher notes. The same saved activity can later become a quiz, match game, group sort, worksheet, or assignment.',
+    title: 'Create once, teach through many templates.',
+  },
+  inputShape: {
+    items: [
+      '1. Questions: prompt | answer | options.',
+      '2. Match pairs: left | right.',
+      '3. Groups: label | item one, item two.',
+      '4. Notes and vocabulary as simple lists.',
+    ],
+    title: 'Supported input shapes',
+  },
+  previewLabel: 'Example rendering',
+});
 assert.equal(buildActivityEditorInitialValues(undefined), undefined);
 assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
   ...activityEditorDefaultInput,
@@ -9760,6 +9882,20 @@ assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
   templateType: 'group-sort',
   visibility: 'draft',
 });
+const lineMatchCreatePageView =
+  buildActivityCreatePageEditorViewModel('line-match');
+assert.deepEqual(
+  {
+    initialTemplate: lineMatchCreatePageView.initialValues?.templateType,
+    previewPanelTitle: lineMatchCreatePageView.previewPanel.title,
+    previewTemplate: lineMatchCreatePageView.previewActivity.templateType,
+  },
+  {
+    initialTemplate: 'line-match',
+    previewPanelTitle: 'Line match example preview',
+    previewTemplate: 'line-match',
+  }
+);
 const defaultEditorPreviewSeed = buildActivityEditorPreviewSeed();
 assert.deepEqual(
   {

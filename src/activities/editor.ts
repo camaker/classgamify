@@ -5,7 +5,12 @@ import type {
   ActivityVisibility,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import {
+  activityEditPageCopy,
+  buildActivityEditAccessView,
+} from '@/activities/lifecycle';
 import { m } from '@/locale/paraglide/messages';
+import { Routes } from '@/lib/routes';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { getActivityTemplateScaffold } from '@/activities/scaffolds';
@@ -49,6 +54,61 @@ type ActivityEditorTemplateSetupView = {
   title: string;
 };
 
+type ActivityCreatePageInputShapeView = {
+  items: string[];
+  title: string;
+};
+
+type ActivityCreatePageViewModel = {
+  hero: {
+    badgeLabel: string;
+    description: string;
+    title: string;
+  };
+  inputShape: ActivityCreatePageInputShapeView;
+  previewLabel: string;
+};
+
+type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
+  initialValues?: CreateActivityInput;
+  previewActivity: ActivitySeed;
+  previewPanel: ActivityEditorPreviewPanel;
+};
+
+type ActivityEditPageActivitySource = Omit<ActivityEditorSource, 'content'> & {
+  contentJson: ActivityContent;
+  id: string;
+};
+
+type ActivityEditorPageBreadcrumb = {
+  href?: string;
+  isCurrentPage?: boolean;
+  label: string;
+};
+
+type ActivityEditPageViewModel = {
+  archivedActivitiesAction: {
+    href: typeof Routes.DashboardActivities;
+    search: {
+      status: 'archived';
+    };
+  };
+  backAction: {
+    href: typeof Routes.DashboardActivities;
+    label: string;
+  };
+  breadcrumbs: ActivityEditorPageBreadcrumb[];
+  description: string;
+  editAccessView: ReturnType<typeof buildActivityEditAccessView> | null;
+  editor?: {
+    activityId: string;
+    initialValues: CreateActivityInput;
+    mode: 'edit';
+  };
+  loadErrorMessage: string;
+  title: string;
+};
+
 const activityEditorSectionId = 'activity-editor';
 
 export function getActivityEditorDefaultInput(): CreateActivityInput {
@@ -84,6 +144,90 @@ export function buildActivityEditorInitialValues(
     ...getActivityTemplateScaffold(templateType),
     templateType,
     visibility: defaultInput.visibility,
+  };
+}
+
+export function buildActivityCreatePageViewModel(): ActivityCreatePageViewModel {
+  return {
+    hero: {
+      badgeLabel: m.create_page_eyebrow(),
+      description: m.create_page_description(),
+      title: m.create_page_title(),
+    },
+    inputShape: {
+      items: [
+        m.create_page_input_shape_questions(),
+        m.create_page_input_shape_pairs(),
+        m.create_page_input_shape_groups(),
+        m.create_page_input_shape_notes(),
+      ],
+      title: m.create_page_input_shapes_title(),
+    },
+    previewLabel: m.create_page_preview_label(),
+  };
+}
+
+export function buildActivityCreatePageEditorViewModel(
+  templateType?: ActivityTemplateType
+): ActivityCreatePageEditorViewModel {
+  const initialValues = buildActivityEditorInitialValues(templateType);
+
+  return {
+    ...buildActivityCreatePageViewModel(),
+    initialValues,
+    previewActivity: buildActivityEditorPreviewSeed(initialValues),
+    previewPanel: buildActivityEditorPreviewPanel(initialValues),
+  };
+}
+
+export function buildActivityEditPageViewModel(
+  activity?: ActivityEditPageActivitySource | null
+): ActivityEditPageViewModel {
+  const title = activity?.title ?? activityEditPageCopy.fallbackTitle;
+  const editAccessView = activity
+    ? buildActivityEditAccessView(activity.visibility)
+    : null;
+  const editor =
+    activity && editAccessView?.canEdit
+      ? {
+          activityId: activity.id,
+          initialValues: activityContentToEditorInput({
+            content: activity.contentJson,
+            description: activity.description,
+            templateType: activity.templateType,
+            title: activity.title,
+            visibility: activity.visibility,
+          }),
+          mode: 'edit' as const,
+        }
+      : undefined;
+
+  return {
+    archivedActivitiesAction: {
+      href: Routes.DashboardActivities,
+      search: { status: 'archived' },
+    },
+    backAction: {
+      href: Routes.DashboardActivities,
+      label: activityEditPageCopy.backToLibraryLabel,
+    },
+    breadcrumbs: [
+      {
+        label: activityEditPageCopy.breadcrumbDashboard,
+        href: Routes.Dashboard,
+      },
+      {
+        label: activityEditPageCopy.breadcrumbActivities,
+        href: Routes.DashboardActivities,
+      },
+      { label: title, isCurrentPage: true },
+    ],
+    description:
+      editAccessView?.description ?? activityEditPageCopy.fallbackDescription,
+    editAccessView,
+    editor,
+    loadErrorMessage: activityEditPageCopy.loadErrorMessage,
+    title,
   };
 }
 
