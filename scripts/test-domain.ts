@@ -162,6 +162,10 @@ import {
   buildWorksheetModeEntryAction,
 } from '@/activities/template-entry';
 import {
+  buildTemplatesPageViewModel,
+  buildWorksheetsPageViewModel,
+} from '@/activities/entry-page-view';
+import {
   ACTIVITY_CREATABLE_VISIBILITIES,
   ACTIVITY_DIFFICULTIES,
   ACTIVITY_EDITOR_FIELD_LIMITS,
@@ -757,17 +761,6 @@ assert.doesNotMatch(
   readFileSync('src/components/blog/blog-post-visual.tsx', 'utf8'),
   />ClassGamify</,
   'Blog visual brand copy should come from locale messages.'
-);
-const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
-assert.match(
-  templatesRouteSource,
-  /formatTemplateRequirement\(requirement\)/,
-  'Templates page should reuse the activity-domain requirement formatter.'
-);
-assert.doesNotMatch(
-  templatesRouteSource,
-  /function formatContentRequirement|return requirement;/,
-  'Templates page should not render raw activity content requirement field names.'
 );
 const activeLocaleMessageText = [
   'project.inlang/messages/en.json',
@@ -7405,6 +7398,38 @@ assert.deepEqual(
     search: { template: template.type },
   }))
 );
+assert.deepEqual(buildTemplatesPageViewModel(), {
+  cards: activityTemplates.map((template) => ({
+    action: {
+      label: `Start ${template.shortName}`,
+      search: { template: template.type },
+    },
+    bestFor: template.bestFor,
+    bestForLabel: 'Best for',
+    classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
+    classroomModeLabel: 'Classroom mode',
+    contentRequirements: template.contentRequirements.map((requirement) =>
+      formatTemplateRequirement(requirement)
+    ),
+    description: template.description,
+    name: template.name,
+    template: template.type,
+  })),
+  footer: {
+    createActivityLabel: 'Create activity',
+    description:
+      'Open the editor, load an example for the selected game format, then publish it as a shareable student assignment link.',
+    title: 'Ready to draft one?',
+  },
+  hero: {
+    badgeLabel: 'Template library',
+    createFromTemplateLabel: 'Create from template',
+    description:
+      'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
+    openStudentDemoLabel: 'Open student demo',
+    title: 'Pick a game format for the same lesson content.',
+  },
+});
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const template = getTemplateByType(templateType);
 
@@ -7415,27 +7440,6 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
 assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) => mode.template),
   [...WORKSHEET_MODE_TEMPLATES]
-);
-const worksheetsRouteSource = readFileSync('src/routes/worksheets.tsx', 'utf8');
-assert.match(
-  worksheetsRouteSource,
-  /<WorksheetModeCard key=\{mode\.template\} mode=\{mode\} \/>/,
-  'Worksheet mode cards should use stable template keys, not localized titles.'
-);
-assert.doesNotMatch(
-  worksheetsRouteSource,
-  /key=\{mode\.title\}/,
-  'Worksheet mode cards should not key by locale-dependent titles.'
-);
-assert.match(
-  worksheetsRouteSource,
-  /heroActions\.map\(\(action, index\) =>/,
-  'Worksheet hero should render every worksheet mode entry action.'
-);
-assert.doesNotMatch(
-  worksheetsRouteSource,
-  /heroActions\[[01]\]/,
-  'Worksheet hero should not hard-code only the first two worksheet modes.'
 );
 assert.equal(
   getWorksheetModeDefinitions().every((mode) =>
@@ -7449,6 +7453,105 @@ assert.equal(
   ),
   true
 );
+assert.deepEqual(buildWorksheetsPageViewModel(), {
+  hero: {
+    badgeLabel: 'Liveworksheets-style modes',
+    description:
+      'ClassGamify treats fill-in practice, line matching, listening, and classification as playable assignment templates. Teachers create reusable content once, publish a student link, and review results without exposing answer keys before submission.',
+    title: 'Worksheet modes for the same activity content.',
+  },
+  heroActions: [
+    {
+      isPrimary: true,
+      label: 'Create fill blanks',
+      search: { template: 'fill-blank' },
+      template: 'fill-blank',
+    },
+    {
+      isPrimary: false,
+      label: 'Start line match',
+      search: { template: 'line-match' },
+      template: 'line-match',
+    },
+    {
+      isPrimary: false,
+      label: 'Create listening',
+      search: { template: 'listening' },
+      template: 'listening',
+    },
+    {
+      isPrimary: false,
+      label: 'Create sort',
+      search: { template: 'group-sort' },
+      template: 'group-sort',
+    },
+  ],
+  modeCards: [
+    {
+      action: {
+        label: 'Create fill blanks',
+        search: { template: 'fill-blank' },
+      },
+      description:
+        'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
+      template: 'fill-blank',
+      title: 'Fill blanks',
+    },
+    {
+      action: {
+        label: 'Start line match',
+        search: { template: 'line-match' },
+      },
+      description:
+        'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
+      template: 'line-match',
+      title: 'Line matching',
+    },
+    {
+      action: {
+        label: 'Create listening',
+        search: { template: 'listening' },
+      },
+      description:
+        'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
+      template: 'listening',
+      title: 'Listening prompts',
+    },
+    {
+      action: {
+        label: 'Create sort',
+        search: { template: 'group-sort' },
+      },
+      description:
+        'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
+      template: 'group-sort',
+      title: 'Drag sorting',
+    },
+  ],
+  printable: {
+    description:
+      'The first product pass focuses on interactive worksheets with scoring, attempts, accepted answers, and result exports. Printable practice and teacher-uploaded worksheet extraction should extend the same activity snapshot and results model instead of creating a separate worksheet product.',
+    title: 'Printable follow-up can build on the same assignment record.',
+  },
+  resultSignals: [
+    'Attempt summaries',
+    'Accepted answer alternatives',
+    'Reteach priorities',
+    'CSV export',
+  ],
+  templatesCta: {
+    description:
+      'Browse the full template library to switch the same structured content into quiz, matching games, box reveals, and group play.',
+    label: 'Browse templates',
+    title: 'Want a different game view for the same lesson?',
+  },
+  workflowSteps: [
+    'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
+    'Choose a worksheet-style template and review the example before saving.',
+    'Publish a student assignment link with attempts, timer, answer reveal, and close time.',
+    'Review submissions, accepted answers, reteach priorities, and CSV exports.',
+  ],
+});
 assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) =>
     buildWorksheetModeEntryAction(mode)

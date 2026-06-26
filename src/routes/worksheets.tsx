@@ -1,15 +1,7 @@
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import {
-  getWorksheetModeDefinitions,
-  type WorksheetModeDefinition,
-  type WorksheetModeTemplate,
-} from '@/activities/worksheet-modes';
-import {
-  buildWorksheetHeroActions,
-  buildWorksheetModeEntryAction,
-} from '@/activities/template-entry';
+import { buildWorksheetsPageViewModel } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -18,8 +10,8 @@ import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
   IconCategory2,
-  IconClipboardText,
   IconDownload,
+  IconClipboardText,
   IconHeadphones,
   IconLayoutColumns,
   IconListDetails,
@@ -27,6 +19,7 @@ import {
   type TablerIcon,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
 
 export const Route = createFileRoute('/worksheets')({
   head: () =>
@@ -38,21 +31,7 @@ export const Route = createFileRoute('/worksheets')({
 });
 
 function WorksheetsPage() {
-  const workflow = [
-    m.worksheets_page_workflow_step_1(),
-    m.worksheets_page_workflow_step_2(),
-    m.worksheets_page_workflow_step_3(),
-    m.worksheets_page_workflow_step_4(),
-  ];
-
-  const resultSignals = [
-    m.worksheets_page_result_signal_attempts(),
-    m.worksheets_page_result_signal_alternatives(),
-    m.worksheets_page_result_signal_reteach(),
-    m.worksheets_page_result_signal_csv(),
-  ];
-  const worksheetModeDefinitions = getWorksheetModeDefinitions();
-  const heroActions = buildWorksheetHeroActions(worksheetModeDefinitions);
+  const pageView = buildWorksheetsPageViewModel();
 
   return (
     <Container className="px-4 py-12 md:py-16">
@@ -61,18 +40,18 @@ function WorksheetsPage() {
           <div className="min-w-0 space-y-6">
             <Badge variant="outline" className="rounded-md border-primary/30">
               <IconListDetails className="size-3.5" />
-              {m.worksheets_page_eyebrow()}
+              {pageView.hero.badgeLabel}
             </Badge>
             <div className="space-y-4">
               <h1 className="max-w-4xl text-3xl font-bold tracking-tight text-balance md:text-5xl">
-                {m.worksheets_page_title()}
+                {pageView.hero.title}
               </h1>
               <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {m.worksheets_page_description()}
+                {pageView.hero.description}
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              {heroActions.map((action, index) => (
+              {pageView.heroActions.map((action) => (
                 <Link
                   key={action.template}
                   to={Routes.Create}
@@ -80,15 +59,19 @@ function WorksheetsPage() {
                   className={cn(
                     buttonVariants({
                       size: 'lg',
-                      variant: index === 0 ? 'default' : 'outline',
+                      variant: action.isPrimary ? 'default' : 'outline',
                     }),
                     'rounded-lg',
-                    index === 0 ? '' : 'bg-background'
+                    action.isPrimary ? '' : 'bg-background'
                   )}
                 >
-                  {index === 0 ? <IconPencilPlus className="size-4" /> : null}
+                  {action.isPrimary ? (
+                    <IconPencilPlus className="size-4" />
+                  ) : null}
                   {action.label}
-                  {index === 0 ? null : <IconArrowRight className="size-4" />}
+                  {action.isPrimary ? null : (
+                    <IconArrowRight className="size-4" />
+                  )}
                 </Link>
               ))}
             </div>
@@ -99,7 +82,7 @@ function WorksheetsPage() {
               {m.worksheets_page_delivery_loop_title()}
             </p>
             <ol className="mt-4 space-y-3">
-              {workflow.map((item, index) => (
+              {pageView.workflowSteps.map((item, index) => (
                 <li
                   key={item}
                   className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6"
@@ -115,7 +98,7 @@ function WorksheetsPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {worksheetModeDefinitions.map((mode) => (
+          {pageView.modeCards.map((mode) => (
             <WorksheetModeCard key={mode.template} mode={mode} />
           ))}
         </section>
@@ -134,7 +117,7 @@ function WorksheetsPage() {
           </div>
 
           <div className="grid gap-2">
-            {resultSignals.map((signal) => (
+            {pageView.resultSignals.map((signal) => (
               <div
                 key={signal}
                 className="rounded-lg border bg-background px-3 py-2 text-sm font-medium"
@@ -148,17 +131,17 @@ function WorksheetsPage() {
         <section className="flex flex-col gap-4 rounded-lg border bg-card p-5 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold">
-              {m.worksheets_page_templates_cta_title()}
+              {pageView.templatesCta.title}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {m.worksheets_page_templates_cta_description()}
+              {pageView.templatesCta.description}
             </p>
           </div>
           <Link
             to={Routes.Templates}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {m.worksheets_page_browse_templates()}
+            {pageView.templatesCta.label}
             <IconArrowRight className="size-4" />
           </Link>
         </section>
@@ -167,9 +150,12 @@ function WorksheetsPage() {
   );
 }
 
-function WorksheetModeCard({ mode }: { mode: WorksheetModeDefinition }) {
+function WorksheetModeCard({
+  mode,
+}: {
+  mode: ReturnType<typeof buildWorksheetsPageViewModel>['modeCards'][number];
+}) {
   const Icon = worksheetModeIcons[mode.template];
-  const action = buildWorksheetModeEntryAction(mode);
 
   return (
     <div className="rounded-lg border bg-card p-5">
@@ -182,13 +168,13 @@ function WorksheetModeCard({ mode }: { mode: WorksheetModeDefinition }) {
       </p>
       <Link
         to={Routes.Create}
-        search={action.search}
+        search={mode.action.search}
         className={cn(
           buttonVariants({ variant: 'outline' }),
           'mt-4 w-full bg-background'
         )}
       >
-        {action.label}
+        {mode.action.label}
       </Link>
     </div>
   );
