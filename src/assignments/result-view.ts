@@ -1,6 +1,7 @@
 import type {
   AssignmentAttemptReview,
   AssignmentAttemptReviewAnswerStatus,
+  AssignmentResultsAnalysis,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
@@ -229,6 +230,30 @@ type AssignmentResultControlOption<TValue extends string> = {
   value: TValue;
 };
 
+type AssignmentResultStudentSearchControlView = {
+  hasSearchValue: boolean;
+  sort: StudentSummarySort;
+  sortOptions: Array<AssignmentResultControlOption<StudentSummarySort>>;
+  summary: string;
+  value: string;
+};
+
+type AssignmentResultItemPerformanceSortControlView = {
+  options: Array<AssignmentResultControlOption<ItemPerformanceSort>>;
+  sort: ItemPerformanceSort;
+};
+
+type AssignmentResultAttemptReviewFilterControlView = {
+  filter: AttemptReviewFilter;
+  options: Array<AssignmentResultControlOption<AttemptReviewFilter>>;
+};
+
+type AssignmentResultControlViews = {
+  attemptReviewFilter: AssignmentResultAttemptReviewFilterControlView;
+  itemPerformanceSort: AssignmentResultItemPerformanceSortControlView;
+  studentSearch: AssignmentResultStudentSearchControlView;
+};
+
 type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
@@ -274,11 +299,7 @@ type AssignmentResultHeaderShareAction = {
 type AssignmentResultsPageData<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > = AssignmentResultHeaderSource & {
-  analysis: {
-    attempts: AssignmentAttemptReview[];
-    perItem: AssignmentItemAnalysis[];
-    students: AssignmentStudentSummary[];
-  };
+  analysis: AssignmentResultsAnalysis;
   attempts: TAttempt[];
   stats: {
     averageDurationSeconds: number | null | undefined;
@@ -302,6 +323,7 @@ type AssignmentResultsPageViewModel<
   completedAttemptCount: number;
   completedAttemptReviewCount: number;
   completedAttempts: TAttempt[];
+  controlViews: AssignmentResultControlViews;
   description: string;
   headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
   itemAnalysisCardViews: ReturnType<
@@ -933,6 +955,7 @@ export function buildAssignmentAttemptRowDisplay({
   });
 
   return {
+    id: attempt.id,
     accuracyLabel: formatAssignmentResultPercent(
       attempt.resultJson?.accuracy ?? 0
     ),
@@ -1731,6 +1754,10 @@ export function buildAssignmentResultsPageViewModel<
     studentSort: viewState.studentSort,
     students: data?.analysis.students ?? [],
   });
+  const controlViews = buildAssignmentResultControlViews({
+    resultSearchSummary: resultView.resultSearchSummary,
+    viewState,
+  });
   const attemptRowViews = data
     ? buildAssignmentAttemptRowViews({
         rows: resultView.filteredAttemptRows,
@@ -1753,7 +1780,12 @@ export function buildAssignmentResultsPageViewModel<
     ? buildAssignmentClassroomBrief({
         assignmentTitle: data.assignment.title,
         items: data.analysis.perItem,
-        stats: data.stats,
+        stats: {
+          averageDurationSeconds: data.stats.averageDurationSeconds ?? null,
+          averagePoints: data.stats.averagePoints,
+          averageScore: data.stats.averageScore,
+          completions: data.stats.completions,
+        },
         students: data.analysis.students,
       })
     : null;
@@ -1791,6 +1823,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttemptCount,
     completedAttemptReviewCount,
     completedAttempts,
+    controlViews,
     description: assignmentResultPageCopy.description,
     headerView,
     itemAnalysisCardViews,
@@ -1819,6 +1852,32 @@ export function buildAssignmentResultsPageViewModel<
   };
 }
 
+export function buildAssignmentResultControlViews({
+  resultSearchSummary,
+  viewState,
+}: {
+  resultSearchSummary: string;
+  viewState: AssignmentResultResolvedViewState;
+}): AssignmentResultControlViews {
+  return {
+    attemptReviewFilter: {
+      filter: viewState.attemptReviewFilter,
+      options: attemptReviewFilterOptions,
+    },
+    itemPerformanceSort: {
+      options: itemPerformanceSortOptions,
+      sort: viewState.itemPerformanceSort,
+    },
+    studentSearch: {
+      hasSearchValue: Boolean(viewState.studentSearch),
+      sort: viewState.studentSort,
+      sortOptions: studentSummarySortOptions,
+      summary: resultSearchSummary,
+      value: viewState.studentSearch,
+    },
+  };
+}
+
 export function buildAssignmentResultSearchState({
   current,
   next,
@@ -1842,6 +1901,19 @@ export function buildAssignmentResultSearchState({
     sort: sort === DEFAULT_STUDENT_SUMMARY_SORT ? undefined : sort,
     student: normalizeResultSearchQuery(student),
   };
+}
+
+export function buildAssignmentResultControlRouteSearch({
+  current,
+  update,
+}: {
+  current: AssignmentResultSearchState;
+  update: AssignmentResultControlSearchUpdate;
+}): AssignmentResultSearchState {
+  return buildAssignmentResultControlSearchState({
+    current,
+    update,
+  });
 }
 
 export function buildAssignmentResultControlSearchState({

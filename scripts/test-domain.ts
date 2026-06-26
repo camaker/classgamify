@@ -392,6 +392,7 @@ import {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyText,
+  buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultHeaderView,
   buildAssignmentResultHeaderShareAction,
@@ -1419,10 +1420,40 @@ assert.match(
   /buildAssignmentResultsPageViewModel/,
   'Assignment result route should consume the assignment-domain page view-model.'
 );
+assert.match(
+  assignmentResultRouteSource,
+  /buildAssignmentResultControlRouteSearch/,
+  'Assignment result route should update result controls through the assignment-domain route search helper.'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /getAssignmentResultCompletedAttemptCount|filterAssignmentResultCompletedAttemptRows|buildAssignmentResultActionState|buildAssignmentResultSectionState|buildAssignmentResultMetricItems|buildAssignmentAttemptRowDisplay|buildAssignmentStudentSummaryRowView|buildAssignmentItemPerformanceRowView/,
   'Assignment result route should not rebuild completed-attempt, metric, action, section, attempt-row, student-row, or item-row state directly.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /studentSummarySortOptions|itemPerformanceSortOptions|attemptReviewFilterOptions|buildAssignmentResultControlSearchState/,
+  'Assignment result route should render result controls from pageView.controlViews instead of importing low-level option or search helpers.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.controlViews\.studentSearch/,
+  'Assignment result route should render student search controls from the assignment-domain control view.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.controlViews\.itemPerformanceSort/,
+  'Assignment result route should render item performance controls from the assignment-domain control view.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /pageView\.controlViews\.attemptReviewFilter/,
+  'Assignment result route should render answer review controls from the assignment-domain control view.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /controlViews:\s*AssignmentResultControlViews/,
+  'Assignment result page view-model should expose route-ready control views.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -14875,6 +14906,31 @@ assert.deepEqual(
     completedAttemptReviewCount:
       scoredResultsPageView.completedAttemptReviewCount,
     classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
+    controlViews: {
+      attemptReviewFilter: [
+        scoredResultsPageView.controlViews.attemptReviewFilter.filter,
+        scoredResultsPageView.controlViews.attemptReviewFilter.options.map(
+          (option) => option.value
+        ),
+      ],
+      itemPerformanceSort: [
+        scoredResultsPageView.controlViews.itemPerformanceSort.sort,
+        scoredResultsPageView.controlViews.itemPerformanceSort.options.map(
+          (option) => option.value
+        ),
+      ],
+      studentSearch: {
+        hasSearchValue:
+          scoredResultsPageView.controlViews.studentSearch.hasSearchValue,
+        sort: scoredResultsPageView.controlViews.studentSearch.sort,
+        sortOptions:
+          scoredResultsPageView.controlViews.studentSearch.sortOptions.map(
+            (option) => option.value
+          ),
+        summary: scoredResultsPageView.controlViews.studentSearch.summary,
+        value: scoredResultsPageView.controlViews.studentSearch.value,
+      },
+    },
     filteredAttemptIds:
       scoredResultsPageView.resultView.filteredAttemptRows.map(
         ({ attempt }) => attempt.id
@@ -14911,6 +14967,20 @@ assert.deepEqual(
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
     classroomBriefReady: true,
+    controlViews: {
+      attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
+      itemPerformanceSort: [
+        'accuracy',
+        ['original', 'accuracy', 'submitted', 'type'],
+      ],
+      studentSearch: {
+        hasSearchValue: true,
+        sort: 'name',
+        sortOptions: ['needs-review', 'best', 'name', 'attempts'],
+        summary: '1 student · 1 attempt',
+        value: 'Alice',
+      },
+    },
     filteredAttemptIds: ['completed-attempt'],
     headerTitle: 'Week 1 results',
     itemPerformanceRowViews: [
@@ -15681,6 +15751,7 @@ assert.deepEqual(
     accuracyLabel: '75%',
     answeredLabel: '3/4',
     durationLabel: '1m 02s',
+    id: 'attempt-row',
     scoreLabel: '3/4',
     studentLabel: 'Alice',
     submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
@@ -15708,6 +15779,7 @@ assert.deepEqual(
     accuracyLabel: '75%',
     answeredLabel: '3/4',
     durationLabel: '1m 00s',
+    id: 'timed-attempt-row',
     scoreLabel: '3/4',
     studentLabel: 'Raw student',
     submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
@@ -15734,6 +15806,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '1/2',
     durationLabel: '40s',
+    id: 'attempt-3',
     scoreLabel: '0/2',
     studentLabel: 'Anonymous student 1',
     submittedAtLabel: formatAssignmentResultDate(
@@ -15757,6 +15830,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '0/0',
     durationLabel: '-',
+    id: 'anonymous-row',
     scoreLabel: '0/0',
     studentLabel: 'Anonymous student',
     submittedAtLabel: '-',
@@ -15778,6 +15852,7 @@ assert.deepEqual(
     accuracyLabel: '0%',
     answeredLabel: '0/0',
     durationLabel: '-',
+    id: 'normalized-name-row',
     scoreLabel: '0/0',
     studentLabel: 'Ava Chen',
     submittedAtLabel: '-',
@@ -16312,6 +16387,26 @@ assert.deepEqual(
     itemSort: 'type',
     review: 'needs-review',
     sort: 'best',
+    student: 'Mei Lin',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultControlRouteSearch({
+    current: {
+      itemSort: 'accuracy',
+      review: 'needs-review',
+      sort: 'attempts',
+      student: 'Ava Chen',
+    },
+    update: {
+      control: 'student-search',
+      value: '  Mei   Lin  ',
+    },
+  }),
+  {
+    itemSort: 'accuracy',
+    review: 'needs-review',
+    sort: 'attempts',
     student: 'Mei Lin',
   }
 );

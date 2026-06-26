@@ -5,16 +5,13 @@ import {
   type ItemPerformanceSort,
   type StudentSummarySort,
   buildAssignmentResultActionPayload,
-  buildAssignmentResultControlSearchState,
+  buildAssignmentResultControlRouteSearch,
   buildAssignmentResultRouteSearch,
   buildAssignmentResultsPageViewModel,
   assignmentResultPageCopy,
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
-  attemptReviewFilterOptions,
-  itemPerformanceSortOptions,
-  studentSummarySortOptions,
 } from '@/assignments/result-view';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -81,6 +78,10 @@ const resultActionIconByAction = {
   'export-csv': IconDownload,
 } as const;
 
+type AssignmentResultControlUpdate = Parameters<
+  typeof buildAssignmentResultControlRouteSearch
+>[0]['update'];
+
 export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
   validateSearch: buildAssignmentResultRouteSearch,
   component: AssignmentResultsPage,
@@ -89,7 +90,6 @@ export const Route = createFileRoute('/dashboard/assignments/$assignmentId')({
 function AssignmentResultsPage() {
   const { assignmentId } = Route.useParams();
   const search = Route.useSearch();
-  const { itemSort, review, sort, student } = search;
   const navigate = useNavigate({
     from: '/dashboard/assignments/$assignmentId',
   });
@@ -102,54 +102,12 @@ function AssignmentResultsPage() {
       }),
     [data, search]
   );
-  function updateItemPerformanceSort(nextSort: ItemPerformanceSort) {
+  function updateResultControl(update: AssignmentResultControlUpdate) {
     void navigate({
       replace: true,
-      search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort, student },
-        update: {
-          control: 'item-performance-sort',
-          value: nextSort,
-        },
-      }),
-    });
-  }
-
-  function updateStudentSort(nextSort: StudentSummarySort) {
-    void navigate({
-      replace: true,
-      search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort, student },
-        update: {
-          control: 'student-sort',
-          value: nextSort,
-        },
-      }),
-    });
-  }
-
-  function updateAttemptReviewFilter(nextFilter: AttemptReviewFilter) {
-    void navigate({
-      replace: true,
-      search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort, student },
-        update: {
-          control: 'attempt-review-filter',
-          value: nextFilter,
-        },
-      }),
-    });
-  }
-
-  function updateStudentSearch(nextSearch: string) {
-    void navigate({
-      replace: true,
-      search: buildAssignmentResultControlSearchState({
-        current: { itemSort, review, sort, student },
-        update: {
-          control: 'student-search',
-          value: nextSearch,
-        },
+      search: buildAssignmentResultControlRouteSearch({
+        current: search,
+        update,
       }),
     });
   }
@@ -207,12 +165,8 @@ function AssignmentResultsPage() {
           assignmentId={assignmentId}
           data={data}
           pageView={pageView}
-          onAttemptReviewFilterChange={updateAttemptReviewFilter}
-          onItemPerformanceSortChange={updateItemPerformanceSort}
+          onControlChange={updateResultControl}
           onResultAction={handleResultAction}
-          onStudentSearch={updateStudentSearch}
-          onStudentSearchClear={() => updateStudentSearch('')}
-          onStudentSortChange={updateStudentSort}
         />
       )}
     </DashboardLayout>
@@ -222,22 +176,14 @@ function AssignmentResultsPage() {
 function LoadedAssignmentResultsPage({
   assignmentId,
   data,
-  onAttemptReviewFilterChange,
-  onItemPerformanceSortChange,
+  onControlChange,
   onResultAction,
-  onStudentSearch,
-  onStudentSearchClear,
-  onStudentSortChange,
   pageView,
 }: {
   assignmentId: string;
   data: NonNullable<ReturnType<typeof useAssignmentResults>['data']>;
-  onAttemptReviewFilterChange: (filter: AttemptReviewFilter) => void;
-  onItemPerformanceSortChange: (sort: ItemPerformanceSort) => void;
+  onControlChange: (update: AssignmentResultControlUpdate) => void;
   onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
-  onStudentSearch: (value: string) => void;
-  onStudentSearchClear: () => void;
-  onStudentSortChange: (sort: StudentSummarySort) => void;
   pageView: ReturnType<typeof buildAssignmentResultsPageViewModel>;
 }) {
   const headerView = pageView.headerView;
@@ -352,12 +298,16 @@ function LoadedAssignmentResultsPage({
             <ClassroomBriefCard brief={pageView.classroomBrief} />
           ) : null}
           <ResultStudentSearch
-            summary={pageView.resultView.resultSearchSummary}
-            onClear={onStudentSearchClear}
-            onSearch={onStudentSearch}
-            onSortChange={onStudentSortChange}
-            sort={pageView.viewState.studentSort}
-            value={pageView.viewState.studentSearch}
+            onClear={() =>
+              onControlChange({ control: 'student-search', value: '' })
+            }
+            onSearch={(value) =>
+              onControlChange({ control: 'student-search', value })
+            }
+            onSortChange={(value) =>
+              onControlChange({ control: 'student-sort', value })
+            }
+            view={pageView.controlViews.studentSearch}
           />
         </>
       ) : null}
@@ -403,8 +353,13 @@ function LoadedAssignmentResultsPage({
           <CardContent>
             <div className="grid gap-4">
               <ItemPerformanceSortControl
-                onSortChange={onItemPerformanceSortChange}
-                sort={pageView.viewState.itemPerformanceSort}
+                onSortChange={(value) =>
+                  onControlChange({
+                    control: 'item-performance-sort',
+                    value,
+                  })
+                }
+                view={pageView.controlViews.itemPerformanceSort}
               />
               <ItemPerformanceTable items={pageView.itemPerformanceRowViews} />
             </div>
@@ -495,8 +450,13 @@ function LoadedAssignmentResultsPage({
                 </CardDescription>
               </div>
               <AttemptReviewFilterControl
-                filter={pageView.viewState.attemptReviewFilter}
-                onFilterChange={onAttemptReviewFilterChange}
+                onFilterChange={(value) =>
+                  onControlChange({
+                    control: 'attempt-review-filter',
+                    value,
+                  })
+                }
+                view={pageView.controlViews.attemptReviewFilter}
               />
             </div>
             <CardDescription>
@@ -526,7 +486,9 @@ function LoadedAssignmentResultsPage({
 function ClassroomBriefCard({
   brief,
 }: {
-  brief: NonNullable<ReturnType<typeof buildAssignmentClassroomBrief>>;
+  brief: NonNullable<
+    ReturnType<typeof buildAssignmentResultsPageViewModel>['classroomBrief']
+  >;
 }) {
   return (
     <Card className="rounded-lg">
@@ -612,16 +574,14 @@ function ResultStudentSearch({
   onClear,
   onSearch,
   onSortChange,
-  sort,
-  summary,
-  value,
+  view,
 }: {
   onClear: () => void;
   onSearch: (value: string) => void;
   onSortChange: (sort: StudentSummarySort) => void;
-  sort: StudentSummarySort;
-  summary: string;
-  value: string;
+  view: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['controlViews']['studentSearch'];
 }) {
   return (
     <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
@@ -636,12 +596,12 @@ function ResultStudentSearch({
           <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
           <Input
             id="assignment-result-search"
-            value={value}
+            value={view.value}
             placeholder={assignmentResultSearchCopy.placeholder}
             className="pl-9 pr-9"
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
-          {value ? (
+          {view.hasSearchValue ? (
             <button
               type="button"
               aria-label={assignmentResultSearchCopy.clearStudentSearchLabel}
@@ -659,19 +619,21 @@ function ResultStudentSearch({
         </label>
         <NativeSelect
           id="student-summary-sort"
-          value={sort}
+          value={view.sort}
           onChange={(event) =>
             onSortChange(event.currentTarget.value as StudentSummarySort)
           }
         >
-          {studentSummarySortOptions.map((option) => (
+          {view.sortOptions.map((option) => (
             <NativeSelectOption key={option.value} value={option.value}>
               {option.label}
             </NativeSelectOption>
           ))}
         </NativeSelect>
       </div>
-      <p className="text-sm text-muted-foreground md:text-right">{summary}</p>
+      <p className="text-sm text-muted-foreground md:text-right">
+        {view.summary}
+      </p>
     </section>
   );
 }
@@ -728,10 +690,12 @@ function StudentSummaryTable({
 
 function ItemPerformanceSortControl({
   onSortChange,
-  sort,
+  view,
 }: {
   onSortChange: (sort: ItemPerformanceSort) => void;
-  sort: ItemPerformanceSort;
+  view: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['controlViews']['itemPerformanceSort'];
 }) {
   return (
     <div className="flex flex-col gap-2 sm:w-52">
@@ -740,12 +704,12 @@ function ItemPerformanceSortControl({
       </label>
       <NativeSelect
         id="item-performance-sort"
-        value={sort}
+        value={view.sort}
         onChange={(event) =>
           onSortChange(event.currentTarget.value as ItemPerformanceSort)
         }
       >
-        {itemPerformanceSortOptions.map((option) => (
+        {view.options.map((option) => (
           <NativeSelectOption key={option.value} value={option.value}>
             {option.label}
           </NativeSelectOption>
@@ -756,11 +720,13 @@ function ItemPerformanceSortControl({
 }
 
 function AttemptReviewFilterControl({
-  filter,
   onFilterChange,
+  view,
 }: {
-  filter: AttemptReviewFilter;
   onFilterChange: (filter: AttemptReviewFilter) => void;
+  view: ReturnType<
+    typeof buildAssignmentResultsPageViewModel
+  >['controlViews']['attemptReviewFilter'];
 }) {
   return (
     <div className="flex flex-col gap-2 sm:w-48">
@@ -769,12 +735,12 @@ function AttemptReviewFilterControl({
       </label>
       <NativeSelect
         id="attempt-review-filter"
-        value={filter}
+        value={view.filter}
         onChange={(event) =>
           onFilterChange(event.currentTarget.value as AttemptReviewFilter)
         }
       >
-        {attemptReviewFilterOptions.map((option) => (
+        {view.options.map((option) => (
           <NativeSelectOption key={option.value} value={option.value}>
             {option.label}
           </NativeSelectOption>
