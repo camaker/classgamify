@@ -1,7 +1,6 @@
-import {
-  type AssignmentResultActionButton,
-  assignmentResultPageCopy,
-  type buildAssignmentResultsPageViewModel,
+import type {
+  AssignmentResultActionButton,
+  buildAssignmentResultsPageViewModel,
 } from '@/assignments/result-view';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -105,7 +104,7 @@ export function AssignmentResultsHeaderCard({
             )}
           >
             <IconPrinter className="size-4" />
-            {assignmentResultPageCopy.printWorksheetLabel}
+            {headerView.printAction.label}
           </Link>
           {headerView.shareAction.disabledReason ? (
             <p className="basis-full text-sm text-muted-foreground">

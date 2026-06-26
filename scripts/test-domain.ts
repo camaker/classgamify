@@ -1754,6 +1754,11 @@ assert.match(
   /AssignmentSettingsSummary[\s\S]*CopyAssignmentShareLinkButton[\s\S]*resultActionIconByAction/,
   'Assignment result header component should own delivery summary, share actions, and result action icons.'
 );
+assert.doesNotMatch(
+  assignmentResultsHeaderCardSource,
+  /assignmentResultPageCopy/,
+  'Assignment result header component should render page labels from prepared header and action views.'
+);
 assert.match(
   assignmentResultsClassroomBriefCardSource,
   /focusItemViews[\s\S]*followUpStudentViews/,
@@ -15810,6 +15815,7 @@ assert.deepEqual(
       scoredResultsPageView.resultView.filteredAttemptRows.map(
         ({ attempt }) => attempt.id
       ),
+    headerPrintLabel: scoredResultsPageView.headerView?.printAction.label,
     headerTitle: scoredResultsPageView.headerView?.assignmentTitle,
     itemPerformanceRowViews: scoredResultsPageView.itemPerformanceRowViews.map(
       (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
@@ -15857,6 +15863,7 @@ assert.deepEqual(
       },
     },
     filteredAttemptIds: ['completed-attempt'],
+    headerPrintLabel: 'Print worksheet',
     headerTitle: 'Week 1 results',
     itemPerformanceRowViews: [
       ['pair-1', '1.', '0%'],
@@ -16447,6 +16454,9 @@ assert.deepEqual(
     activityTitle: 'Snapshot title',
     assignmentSharePath: '/play/share%20123',
     assignmentTitle: 'Week 1 results',
+    printAction: {
+      label: 'Print worksheet',
+    },
     shareAction: {
       disabledReason: undefined,
       isAvailable: true,
@@ -16481,6 +16491,9 @@ assert.deepEqual(
     activityTitle: 'Current activity title',
     assignmentSharePath: '/play/closed-share',
     assignmentTitle: 'Expired results',
+    printAction: {
+      label: 'Print worksheet',
+    },
     shareAction: {
       disabledReason:
         'This assignment link has expired. Students cannot open it from the results page.',

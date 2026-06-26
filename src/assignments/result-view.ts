@@ -296,6 +296,10 @@ type AssignmentResultHeaderShareAction = {
   shareSlug: string;
 };
 
+type AssignmentResultHeaderPrintAction = {
+  label: string;
+};
+
 type AssignmentResultsPageData<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > = AssignmentResultHeaderSource & {
@@ -696,6 +700,9 @@ export function buildAssignmentResultHeaderView({
     activityTitle: resolvedSource.activityTitle,
     assignmentSharePath: shareAction.sharePath,
     assignmentTitle: assignment.title,
+    printAction: {
+      label: assignmentResultPageCopy.printWorksheetLabel,
+    } satisfies AssignmentResultHeaderPrintAction,
     shareAction,
     shareSlug: shareAction.shareSlug,
     statusLabel: getAssignmentStatusLabel(
