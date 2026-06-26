@@ -93,6 +93,19 @@ type ActivityEditorDraftSourceState = {
   hasDraftSourceMaterialNotes: boolean;
 };
 
+type ActivityEditorAiDraftPanelView = {
+  badgeLabel: string;
+  canGenerateDraft: boolean;
+  canSyncDraftSourceMaterials: boolean;
+  generateButtonLabel: string;
+  itemCountLabel: string;
+  reviewNote: string;
+  sourcePlaceholder: string;
+  sourceTextLabel: string;
+  syncMaterialsLabel: string;
+  syncSuccessMessage: string;
+};
+
 type ActivityEditorDraftGenerationGate =
   | {
       canGenerate: false;
@@ -244,6 +257,29 @@ export function buildActivityEditorDraftSourceState({
       hasAttachedSourceMaterials || hasDraftSourceMaterialNotes,
     hasAttachedSourceMaterials,
     hasDraftSourceMaterialNotes,
+  };
+}
+
+export function buildActivityEditorAiDraftPanelView({
+  hasUser,
+  isGeneratingDraft,
+  sourceState,
+}: {
+  hasUser: boolean;
+  isGeneratingDraft: boolean;
+  sourceState: ActivityEditorDraftSourceState;
+}): ActivityEditorAiDraftPanelView {
+  return {
+    badgeLabel: m.activity_form_ai_draft_badge(),
+    canGenerateDraft: hasUser && !isGeneratingDraft,
+    canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
+    generateButtonLabel: m.activity_form_generate_draft(),
+    itemCountLabel: m.activity_form_ai_item_count_label(),
+    reviewNote: m.activity_form_ai_draft_review_note(),
+    sourcePlaceholder: m.activity_form_ai_source_placeholder(),
+    sourceTextLabel: m.activity_form_ai_source_label(),
+    syncMaterialsLabel: m.activity_form_use_attached_materials(),
+    syncSuccessMessage: m.activity_form_toast_source_materials_synced(),
   };
 }
 

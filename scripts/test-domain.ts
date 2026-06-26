@@ -201,6 +201,7 @@ import {
   buildActivityEditPageViewModel,
   activityContentToEditorInput,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
+  buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationGate,
   buildActivityEditorDraftSourceState,
   buildActivityEditorDraftSourceText,
@@ -1470,6 +1471,11 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
+  /buildActivityEditorAiDraftPanelView/,
+  'Activity editor form should consume the activity-domain AI draft panel view.'
+);
+assert.match(
+  activityEditorFormSource,
   /buildActivityEditorTemplateScaffoldApplication/,
   'Activity editor form should apply template scaffolds through the activity-domain helper.'
 );
@@ -1490,8 +1496,8 @@ assert.match(
 );
 assert.doesNotMatch(
   activityEditorFormSource,
-  /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility/,
-  'Activity editor form should not rebuild template, draft-source, readiness, scaffold, or option-label state locally.'
+  /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility|activity_form_ai_draft_badge|activity_form_ai_draft_review_note|activity_form_ai_source_label|activity_form_ai_source_placeholder|activity_form_ai_item_count_label|activity_form_use_attached_materials|activity_form_generate_draft|activity_form_toast_source_materials_synced/,
+  'Activity editor form should not rebuild template, draft-source, readiness, scaffold, AI panel copy, or option-label state locally.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -13597,6 +13603,55 @@ assert.deepEqual(
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: true,
   }
+);
+const disabledAiDraftPanelView = buildActivityEditorAiDraftPanelView({
+  hasUser: false,
+  isGeneratingDraft: false,
+  sourceState: {
+    canSyncDraftSourceMaterials: false,
+    hasAttachedSourceMaterials: false,
+    hasDraftSourceMaterialNotes: false,
+  },
+});
+assert.deepEqual(disabledAiDraftPanelView, {
+  badgeLabel: 'AI draft',
+  canGenerateDraft: false,
+  canSyncDraftSourceMaterials: false,
+  generateButtonLabel: 'Generate draft',
+  itemCountLabel: 'Items',
+  reviewNote: 'Teacher reviews before saving',
+  sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
+  sourceTextLabel: 'Topic or source notes',
+  syncMaterialsLabel: 'Sync attached materials',
+  syncSuccessMessage: 'Attached materials synced to AI source notes.',
+});
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    hasUser: true,
+    isGeneratingDraft: false,
+    sourceState: {
+      canSyncDraftSourceMaterials: true,
+      hasAttachedSourceMaterials: true,
+      hasDraftSourceMaterialNotes: false,
+    },
+  }),
+  {
+    ...disabledAiDraftPanelView,
+    canGenerateDraft: true,
+    canSyncDraftSourceMaterials: true,
+  }
+);
+assert.equal(
+  buildActivityEditorAiDraftPanelView({
+    hasUser: true,
+    isGeneratingDraft: true,
+    sourceState: {
+      canSyncDraftSourceMaterials: true,
+      hasAttachedSourceMaterials: false,
+      hasDraftSourceMaterialNotes: true,
+    },
+  }).canGenerateDraft,
+  false
 );
 const editorSelectOptions = buildActivityEditorSelectOptions();
 assert.deepEqual(

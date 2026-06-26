@@ -1,4 +1,5 @@
 import {
+  buildActivityEditorAiDraftPanelView,
   buildActivityEditorDraftGenerationGate,
   buildActivityEditorDraftSourceState,
   buildActivityEditorDraftSourceText,
@@ -105,9 +106,15 @@ export function ActivityCreateForm({
   });
   const selectedTemplate = form.watch('templateType');
   const watchedValues = form.watch();
+  const isGeneratingDraft = draftMutation.isPending;
   const draftSourceState = buildActivityEditorDraftSourceState({
     draftSourceText,
     sourceMaterials: watchedValues.sourceMaterials,
+  });
+  const aiDraftPanelView = buildActivityEditorAiDraftPanelView({
+    hasUser: Boolean(session?.user),
+    isGeneratingDraft,
+    sourceState: draftSourceState,
   });
   const modeView = buildActivityEditorModeView(mode);
   const selectOptionsView = buildActivityEditorSelectOptions();
@@ -123,7 +130,6 @@ export function ActivityCreateForm({
     createMutation.isPending ||
     updateMutation.isPending ||
     form.formState.isSubmitting;
-  const isGeneratingDraft = draftMutation.isPending;
 
   useEffect(() => {
     if (!initialValues) return;
@@ -185,7 +191,7 @@ export function ActivityCreateForm({
         sourceText: draftSourceText,
       })
     );
-    toast.success(m.activity_form_toast_source_materials_synced());
+    toast.success(aiDraftPanelView.syncSuccessMessage);
   }
 
   async function onSubmit(values: CreateActivityInput) {
@@ -250,10 +256,10 @@ export function ActivityCreateForm({
                       className="rounded-md bg-background"
                     >
                       <IconSparkles className="size-3.5" />
-                      {m.activity_form_ai_draft_badge()}
+                      {aiDraftPanelView.badgeLabel}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      {m.activity_form_ai_draft_review_note()}
+                      {aiDraftPanelView.reviewNote}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -261,7 +267,7 @@ export function ActivityCreateForm({
                       htmlFor="activity-ai-source"
                       className="font-medium text-sm"
                     >
-                      {m.activity_form_ai_source_label()}
+                      {aiDraftPanelView.sourceTextLabel}
                     </label>
                     <Button
                       type="button"
@@ -269,10 +275,10 @@ export function ActivityCreateForm({
                       size="sm"
                       className="bg-background"
                       onClick={useAttachedMaterialsForDraft}
-                      disabled={!draftSourceState.canSyncDraftSourceMaterials}
+                      disabled={!aiDraftPanelView.canSyncDraftSourceMaterials}
                     >
                       <IconPaperclip className="size-3.5" />
-                      {m.activity_form_use_attached_materials()}
+                      {aiDraftPanelView.syncMaterialsLabel}
                     </Button>
                   </div>
                   <Textarea
@@ -282,7 +288,7 @@ export function ActivityCreateForm({
                       setDraftSourceText(event.currentTarget.value)
                     }
                     rows={3}
-                    placeholder={m.activity_form_ai_source_placeholder()}
+                    placeholder={aiDraftPanelView.sourcePlaceholder}
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-[8rem_auto] lg:w-auto lg:grid-cols-[8rem_auto]">
@@ -291,7 +297,7 @@ export function ActivityCreateForm({
                       htmlFor="activity-ai-item-count"
                       className="font-medium text-sm"
                     >
-                      {m.activity_form_ai_item_count_label()}
+                      {aiDraftPanelView.itemCountLabel}
                     </label>
                     <NativeSelect
                       id="activity-ai-item-count"
@@ -312,7 +318,7 @@ export function ActivityCreateForm({
                     type="button"
                     variant="secondary"
                     onClick={onGenerateDraft}
-                    disabled={isGeneratingDraft || !session?.user}
+                    disabled={!aiDraftPanelView.canGenerateDraft}
                     className="self-end"
                   >
                     {isGeneratingDraft ? (
@@ -320,7 +326,7 @@ export function ActivityCreateForm({
                     ) : (
                       <IconSparkles className="size-4" />
                     )}
-                    {m.activity_form_generate_draft()}
+                    {aiDraftPanelView.generateButtonLabel}
                   </Button>
                 </div>
               </div>
