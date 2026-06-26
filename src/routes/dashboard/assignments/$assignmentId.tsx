@@ -82,11 +82,7 @@ function AssignmentResultsPage() {
     try {
       const payload = buildAssignmentResultActionPayload({
         actionButton,
-        assignmentTitle: data.assignment.title,
-        classroomBriefText: pageView.classroomBrief?.text,
-        exportData: data,
-        items: data.analysis.perItem,
-        students: data.analysis.students,
+        data,
       });
 
       if (payload.kind === 'download-csv') {

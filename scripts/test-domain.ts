@@ -389,6 +389,7 @@ import {
   assignmentResultSearchCopy,
   assignmentResultSectionCopy,
   assignmentResultTableHeaders,
+  assignmentResultActionDescriptors,
   assignmentResultActionOrder,
   buildAttemptReviewSubmissionSummary,
   buildAssignmentAttemptAnswerReviewView,
@@ -1025,6 +1026,16 @@ assert.match(
   assignmentResultsRouteSource,
   /toast\.error\(actionButton\.failureMessage\)/,
   'Result copy/download failures should use the localized action failure copy.'
+);
+assert.match(
+  assignmentResultsRouteSource,
+  /buildAssignmentResultActionPayload\(\{\s*actionButton,\s*data,\s*\}\)/,
+  'Result route should let the assignment-domain payload helper build copy and CSV artifacts from page data.'
+);
+assert.doesNotMatch(
+  assignmentResultsRouteSource,
+  /classroomBriefText|items: data\.analysis\.perItem|students: data\.analysis\.students|assignmentTitle: data\.assignment\.title|exportData: data/,
+  'Result route should not hand-wire individual result artifact inputs.'
 );
 const assignmentClassroomBriefSource = readFileSync(
   'src/assignments/classroom-brief.ts',
@@ -18303,6 +18314,28 @@ assert.equal(getAssignmentResultCompletedAttemptCount(2.8), 2);
 assert.equal(getAssignmentResultCompletedAttemptCount(-1), 0);
 assert.equal(getAssignmentResultCompletedAttemptCount(Number.NaN), 0);
 assert.equal(getAssignmentResultCompletedAttemptCount(null), 0);
+assert.deepEqual(assignmentResultActionDescriptors, [
+  {
+    action: 'copy-brief',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-reteach-plan',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-item-review',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-follow-up',
+    kind: 'copy-text',
+  },
+  {
+    action: 'export-csv',
+    kind: 'download-csv',
+  },
+]);
 assert.deepEqual(assignmentResultActionOrder, [
   'copy-brief',
   'copy-reteach-plan',
@@ -19935,37 +19968,40 @@ assert.match(
 assert.equal(
   buildAssignmentResultCopyText({
     action: 'copy-brief',
-    assignmentTitle: csvExportData.assignment.title,
-    classroomBriefText: classroomBrief.text,
-    items: resultAnalysis.perItem,
-    students: resultAnalysis.students,
+    data: csvExportData,
   }),
   classroomBrief.text
 );
 assert.equal(
   buildAssignmentResultCopyText({
     action: 'copy-reteach-plan',
-    assignmentTitle: csvExportData.assignment.title,
-    items: resultAnalysis.perItem,
-    students: followUpPriorityStudents,
+    data: {
+      ...csvExportData,
+      analysis: {
+        ...csvExportData.analysis,
+        students: followUpPriorityStudents,
+      },
+    },
   }),
   reteachPlan
 );
 assert.equal(
   buildAssignmentResultCopyText({
     action: 'copy-item-review',
-    assignmentTitle: csvExportData.assignment.title,
-    items: resultAnalysis.perItem,
-    students: resultAnalysis.students,
+    data: csvExportData,
   }),
   itemReviewSummary
 );
 assert.equal(
   buildAssignmentResultCopyText({
     action: 'copy-follow-up',
-    assignmentTitle: csvExportData.assignment.title,
-    items: resultAnalysis.perItem,
-    students: followUpPriorityStudents,
+    data: {
+      ...csvExportData,
+      analysis: {
+        ...csvExportData.analysis,
+        students: followUpPriorityStudents,
+      },
+    },
   }),
   studentFollowUpSummary
 );
@@ -19980,11 +20016,7 @@ assert.deepEqual(
       label: 'Copy brief',
       successMessage: 'Classroom brief copied.',
     },
-    assignmentTitle: csvExportData.assignment.title,
-    classroomBriefText: classroomBrief.text,
-    exportData: csvExportData,
-    items: resultAnalysis.perItem,
-    students: resultAnalysis.students,
+    data: csvExportData,
   }),
   {
     kind: 'copy-text',
@@ -20006,11 +20038,7 @@ assert.throws(
         label: 'Copy brief',
         successMessage: 'Classroom brief copied.',
       },
-      assignmentTitle: csvExportData.assignment.title,
-      classroomBriefText: classroomBrief.text,
-      exportData: csvExportData,
-      items: resultAnalysis.perItem,
-      students: resultAnalysis.students,
+      data: csvExportData,
     }),
   /Submit at least one attempt before copying a brief\./
 );
@@ -20024,11 +20052,7 @@ const downloadCsvPayload = buildAssignmentResultActionPayload({
     label: 'Download CSV',
     successMessage: 'Results CSV downloaded.',
   },
-  assignmentTitle: csvExportData.assignment.title,
-  classroomBriefText: classroomBrief.text,
-  exportData: csvExportData,
-  items: resultAnalysis.perItem,
-  students: resultAnalysis.students,
+  data: csvExportData,
 });
 assert.equal(downloadCsvPayload.kind, 'download-csv');
 assert.equal(
@@ -20054,11 +20078,7 @@ assert.throws(
         label: 'Download CSV',
         successMessage: 'Results CSV downloaded.',
       },
-      assignmentTitle: csvExportData.assignment.title,
-      classroomBriefText: classroomBrief.text,
-      exportData: csvExportData,
-      items: resultAnalysis.perItem,
-      students: resultAnalysis.students,
+      data: csvExportData,
     }),
   /Submit at least one attempt before exporting results\./
 );

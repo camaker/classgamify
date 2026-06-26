@@ -130,6 +130,11 @@ type AssignmentResultAction =
   | 'copy-reteach-plan'
   | 'export-csv';
 
+export type AssignmentResultCopyAction = Exclude<
+  AssignmentResultAction,
+  'export-csv'
+>;
+
 export type AssignmentResultActionGate =
   | {
       type: 'ready';
@@ -145,10 +150,15 @@ type AssignmentResultActionCopy = {
   successMessage: string;
 };
 
-export type AssignmentResultCopyAction = Exclude<
-  AssignmentResultAction,
-  'export-csv'
->;
+type AssignmentResultActionDescriptor =
+  | {
+      action: AssignmentResultCopyAction;
+      kind: 'copy-text';
+    }
+  | {
+      action: 'export-csv';
+      kind: 'download-csv';
+    };
 
 export type AssignmentResultActionButton =
   | {
@@ -303,7 +313,7 @@ type AssignmentResultHeaderPrintAction = {
   label: string;
 };
 
-type AssignmentResultsPageData<
+export type AssignmentResultsPageData<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > = AssignmentResultHeaderSource & {
   analysis: AssignmentResultsAnalysis;
@@ -576,13 +586,31 @@ const assignmentResultMetricDescriptors = [
   },
 ] satisfies Array<AssignmentResultMetricDescriptor>;
 
-export const assignmentResultActionOrder = [
-  'copy-brief',
-  'copy-reteach-plan',
-  'copy-item-review',
-  'copy-follow-up',
-  'export-csv',
-] satisfies AssignmentResultAction[];
+export const assignmentResultActionDescriptors = [
+  {
+    action: 'copy-brief',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-reteach-plan',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-item-review',
+    kind: 'copy-text',
+  },
+  {
+    action: 'copy-follow-up',
+    kind: 'copy-text',
+  },
+  {
+    action: 'export-csv',
+    kind: 'download-csv',
+  },
+] satisfies AssignmentResultActionDescriptor[];
+
+export const assignmentResultActionOrder =
+  assignmentResultActionDescriptors.map((descriptor) => descriptor.action);
 
 export const studentSummarySortOptions = [
   {
@@ -803,15 +831,15 @@ export function buildAssignmentResultActionButtons({
   itemCount,
   studentCount,
 }: AssignmentResultActionState): AssignmentResultActionButton[] {
-  return assignmentResultActionOrder.map((action) => {
+  return assignmentResultActionDescriptors.map((descriptor) => {
     const gate = getAssignmentResultActionGate({
-      action,
+      action: descriptor.action,
       attemptCount,
       classroomBriefReady,
       itemCount,
       studentCount,
     });
-    const actionCopy = getAssignmentResultActionCopy(action);
+    const actionCopy = getAssignmentResultActionCopy(descriptor.action);
     const base = {
       disabled: gate.type === 'blocked',
       failureMessage: actionCopy.failureMessage,
@@ -820,17 +848,17 @@ export function buildAssignmentResultActionButtons({
       successMessage: actionCopy.successMessage,
     } satisfies AssignmentResultActionButtonBase;
 
-    if (action === 'export-csv') {
+    if (descriptor.kind === 'download-csv') {
       return {
         ...base,
-        action,
+        action: descriptor.action,
         kind: 'download-csv',
       };
     }
 
     return {
       ...base,
-      action,
+      action: descriptor.action,
       kind: 'copy-text',
     };
   });
@@ -854,19 +882,27 @@ export function getAssignmentResultActionGateFromState({
 
 export function buildAssignmentResultCopyText({
   action,
-  assignmentTitle,
-  classroomBriefText,
-  items,
-  students,
+  data,
 }: {
   action: AssignmentResultCopyAction;
-  assignmentTitle: string;
-  classroomBriefText?: string;
-  items: AssignmentItemAnalysis[];
-  students: AssignmentStudentSummary[];
+  data: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>;
 }) {
+  const assignmentTitle = data.assignment.title;
+  const items = data.analysis.perItem;
+  const students = data.analysis.students;
+
   if (action === 'copy-brief') {
-    return classroomBriefText ?? '';
+    return buildAssignmentClassroomBrief({
+      assignmentTitle,
+      items,
+      stats: {
+        averageDurationSeconds: data.stats.averageDurationSeconds ?? null,
+        averagePoints: data.stats.averagePoints,
+        averageScore: data.stats.averageScore,
+        completions: data.stats.completions,
+      },
+      students,
+    }).text;
   }
 
   if (action === 'copy-reteach-plan') {
@@ -892,18 +928,10 @@ export function buildAssignmentResultCopyText({
 
 export function buildAssignmentResultActionPayload({
   actionButton,
-  assignmentTitle,
-  classroomBriefText,
-  exportData,
-  items,
-  students,
+  data,
 }: {
   actionButton: AssignmentResultActionButton;
-  assignmentTitle: string;
-  classroomBriefText?: string;
-  exportData: Parameters<typeof buildAssignmentResultsCsv>[0];
-  items: AssignmentItemAnalysis[];
-  students: AssignmentStudentSummary[];
+  data: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>;
 }): AssignmentResultActionPayload {
   if (actionButton.gate.type === 'blocked') {
     throw new Error(actionButton.gate.message);
@@ -911,8 +939,8 @@ export function buildAssignmentResultActionPayload({
 
   if (actionButton.kind === 'download-csv') {
     return {
-      csv: buildAssignmentResultsCsv(exportData),
-      filename: buildAssignmentResultsCsvFilename(exportData),
+      csv: buildAssignmentResultsCsv(data),
+      filename: buildAssignmentResultsCsvFilename(data),
       kind: 'download-csv',
     };
   }
@@ -921,10 +949,7 @@ export function buildAssignmentResultActionPayload({
     kind: 'copy-text',
     text: buildAssignmentResultCopyText({
       action: actionButton.action,
-      assignmentTitle,
-      classroomBriefText,
-      items,
-      students,
+      data,
     }),
   };
 }
