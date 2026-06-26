@@ -385,22 +385,33 @@ export function buildStudentAttemptTimerBadge({
   timeExpired: boolean;
   timeLimitSeconds?: number;
 }): StudentAttemptTimerBadge {
-  if (!timeLimitSeconds) {
+  if (!isValidStudentTimerLimit(timeLimitSeconds)) {
     return {
       label: '',
       show: false,
     };
   }
 
+  if (timeExpired) {
+    return {
+      label: STUDENT_RUNNER_COPY.timeEndedLabel,
+      show: true,
+    };
+  }
+
+  const label = formatAttemptDuration(remainingSeconds, {
+    emptyValue: '',
+    style: 'timer',
+  });
+
   return {
-    label: timeExpired
-      ? STUDENT_RUNNER_COPY.timeEndedLabel
-      : formatAttemptDuration(remainingSeconds, {
-          emptyValue: '',
-          style: 'timer',
-        }),
-    show: true,
+    label,
+    show: Boolean(label),
   };
+}
+
+function isValidStudentTimerLimit(value: number | undefined) {
+  return value !== undefined && Number.isFinite(value) && value > 0;
 }
 
 export function resolveStudentAttemptSubmissionDurationSeconds({

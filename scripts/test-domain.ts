@@ -4397,6 +4397,28 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentAttemptTimerBadge({
+    remainingSeconds: 30,
+    timeExpired: false,
+    timeLimitSeconds: Number.NaN,
+  }),
+  {
+    label: '',
+    show: false,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
+    remainingSeconds: 30,
+    timeExpired: false,
+    timeLimitSeconds: -120,
+  }),
+  {
+    label: '',
+    show: false,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
     remainingSeconds: 65,
     timeExpired: false,
     timeLimitSeconds: 120,
@@ -4404,6 +4426,17 @@ assert.deepEqual(
   {
     label: '1:05',
     show: true,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptTimerBadge({
+    remainingSeconds: Number.NaN,
+    timeExpired: false,
+    timeLimitSeconds: 120,
+  }),
+  {
+    label: '',
+    show: false,
   }
 );
 assert.deepEqual(
