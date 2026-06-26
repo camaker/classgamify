@@ -4303,6 +4303,30 @@ assert.equal(
 );
 assert.equal(
   formatStudentAttemptUsageLabel({
+    maxAttempts: 3,
+    remainingAttempts: 2.9,
+    usedAttempts: 1,
+  }),
+  '2 attempts left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    maxAttempts: 2,
+    remainingAttempts: -1,
+    usedAttempts: 3,
+  }),
+  'No attempts left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
+    maxAttempts: 2,
+    remainingAttempts: Number.NaN,
+    usedAttempts: 1,
+  }),
+  'No attempts left'
+);
+assert.equal(
+  formatStudentAttemptUsageLabel({
     usedAttempts: 12,
   }),
   'Additional attempts allowed'

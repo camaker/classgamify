@@ -356,17 +356,24 @@ export function formatStudentAttemptUsageLabel({
     return m.student_runner_attempts_remaining_open();
   }
 
-  if (remainingAttempts <= 0) {
+  const normalizedRemainingAttempts =
+    normalizeStudentRemainingAttemptCount(remainingAttempts);
+
+  if (normalizedRemainingAttempts <= 0) {
     return m.student_runner_attempts_remaining_none();
   }
 
-  if (remainingAttempts === 1) {
+  if (normalizedRemainingAttempts === 1) {
     return m.student_runner_attempts_remaining_one();
   }
 
   return m.student_runner_attempts_remaining_many({
-    count: remainingAttempts,
+    count: normalizedRemainingAttempts,
   });
+}
+
+function normalizeStudentRemainingAttemptCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
 export function buildStudentAttemptTimerBadge({
