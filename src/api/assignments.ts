@@ -11,7 +11,13 @@ import {
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
-import { buildScoredAttemptWhere } from '@/assignments/attempt-query';
+import {
+  buildAssignmentAttemptsInWhere,
+  buildAttemptCompletedAtOrderBy,
+  buildScoredAnonymousAssignmentAttemptWhere,
+  buildScoredAssignmentAttemptWhere,
+  buildScoredAttemptWhere,
+} from '@/assignments/attempt-query';
 import {
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
@@ -32,6 +38,7 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListOrderBy,
   buildAssignmentListWhere,
   getAssignmentListOffset,
 } from '@/assignments/list-query';
@@ -82,7 +89,7 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { count, desc, eq, inArray } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -193,7 +200,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
       .where(where)
-      .orderBy(desc(assignment.updatedAt))
+      .orderBy(buildAssignmentListOrderBy())
       .limit(data.pageSize)
       .offset(
         getAssignmentListOffset({
@@ -214,7 +221,9 @@ export const listAssignments = createServerFn({ method: 'GET' })
             .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
             .where(
               buildScoredAttemptWhere(
-                inArray(attempt.assignmentId, itemAssignmentIds)
+                buildAssignmentAttemptsInWhere({
+                  assignmentIds: itemAssignmentIds,
+                })
               )
             )
         : [];
@@ -433,9 +442,11 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .select()
       .from(attempt)
       .where(
-        buildScoredAttemptWhere(eq(attempt.assignmentId, row.assignment.id))
+        buildScoredAssignmentAttemptWhere({
+          assignmentId: row.assignment.id,
+        })
       )
-      .orderBy(desc(attempt.completedAt));
+      .orderBy(buildAttemptCompletedAtOrderBy());
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const stats = summarizeAssignmentAttempts(attempts, {
       timeLimitSeconds: settings.timeLimitSeconds,
@@ -698,10 +709,10 @@ async function countPreviousIdentityAttempts({
       .select({ count: count() })
       .from(attempt)
       .where(
-        buildScoredAttemptWhere(
-          eq(attempt.assignmentId, assignmentId),
-          eq(attempt.anonymousToken, strategy.identity.anonymousToken)
-        )
+        buildScoredAnonymousAssignmentAttemptWhere({
+          anonymousToken: strategy.identity.anonymousToken,
+          assignmentId,
+        })
       );
 
     return row?.count ?? 0;
@@ -714,7 +725,7 @@ async function countPreviousIdentityAttempts({
         studentName: attempt.studentName,
       })
       .from(attempt)
-      .where(buildScoredAttemptWhere(eq(attempt.assignmentId, assignmentId)));
+      .where(buildScoredAssignmentAttemptWhere({ assignmentId }));
 
     return countMatchingStudentIdentityAttempts({
       attempts: previousAttempts,

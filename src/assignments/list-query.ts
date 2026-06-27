@@ -6,7 +6,7 @@ import {
 } from '@/assignments/list-filters';
 import { activity, assignment, assignmentSnapshot } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
-import { and, eq, or, type SQL } from 'drizzle-orm';
+import { and, desc, eq, or, type SQL } from 'drizzle-orm';
 
 export function buildAssignmentListWhere({
   now = new Date(),
@@ -68,4 +68,8 @@ export function getAssignmentListOffset({
       : ASSIGNMENT_LIST_PAGE_SIZE;
 
   return normalizedPageIndex * normalizedPageSize;
+}
+
+export function buildAssignmentListOrderBy() {
+  return desc(assignment.updatedAt);
 }
