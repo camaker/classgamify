@@ -6,7 +6,6 @@ import type { StudentAnswerChange } from '@/assignments/student-submission';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildChoicePairingRunnerView,
-  getStudentRunnerReviewStatusClassName,
   resolveChoicePairingRunnerAction,
   type ChoicePairingRunnerAction,
 } from '@/assignments/student-runner-view';
@@ -41,10 +40,18 @@ export function MatchingPairsBoard({
         answers,
         items,
         progressVerb: copy.progressVerb,
+        revealAnswer,
         reviewItems,
         selectedItemId,
       }),
-    [answers, copy.progressVerb, items, reviewItems, selectedItemId]
+    [
+      answers,
+      copy.progressVerb,
+      items,
+      revealAnswer,
+      reviewItems,
+      selectedItemId,
+    ]
   );
 
   function handleRunnerAction(action: ChoicePairingRunnerAction) {
@@ -76,7 +83,8 @@ export function MatchingPairsBoard({
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="grid gap-2">
           {runnerView.promptItemViews.map((itemView) => {
-            const { answer, item, reviewItem, status } = itemView;
+            const { answer, item, reviewItem, reviewStatusClassName } =
+              itemView;
 
             return (
               <button
@@ -87,7 +95,7 @@ export function MatchingPairsBoard({
                   'min-h-20 rounded-lg border bg-background p-3 text-left transition-colors',
                   'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
                   itemView.selected && 'border-primary bg-primary/10',
-                  revealAnswer && getStudentRunnerReviewStatusClassName(status)
+                  reviewStatusClassName
                 )}
                 onClick={() => handleRunnerAction(itemView.action)}
               >

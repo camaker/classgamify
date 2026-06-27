@@ -70,6 +70,7 @@ type ChoicePairingPromptItemView = ReturnType<
 >['itemViews'][number] & {
   action: ChoicePairingRunnerAction;
   promptLabel: string;
+  reviewStatusClassName: string | undefined;
   selected: boolean;
 };
 
@@ -88,6 +89,7 @@ type GroupSortItemView = ReturnType<
   typeof buildStudentRunnerView
 >['itemViews'][number] & {
   action: GroupSortRunnerAction;
+  reviewStatusClassName: string | undefined;
   selected: boolean;
 };
 
@@ -152,6 +154,7 @@ type FillBlankWorksheetItemView = ReturnType<
   typeof buildStudentRunnerView
 >['itemViews'][number] & {
   promptView: InlineBlankPromptView;
+  reviewStatusClassName: string | undefined;
   sequenceLabel: string;
   wordBankLineText: string | null;
   wordBankText: string | null;
@@ -654,12 +657,14 @@ export function buildChoicePairingRunnerView({
   answers,
   items,
   progressVerb,
+  revealAnswer = false,
   reviewItems,
   selectedItemId,
 }: {
   answers: StudentAnswerMap;
   items: PublicRuntimeItem[];
   progressVerb?: string;
+  revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
   selectedItemId?: string;
 }): ChoicePairingRunnerView {
@@ -681,6 +686,9 @@ export function buildChoicePairingRunnerView({
       ...itemView,
       action: buildChoicePairingPromptAction(itemView.item.id),
       promptLabel: itemView.positionLabel,
+      reviewStatusClassName: revealAnswer
+        ? getStudentRunnerReviewStatusClassName(itemView.status)
+        : undefined,
       selected: selectedItemId === itemView.item.id,
     })),
   };
@@ -690,12 +698,14 @@ export function buildGroupSortRunnerView({
   answers,
   items,
   progressVerb,
+  revealAnswer = false,
   reviewItems,
   selectedItemId,
 }: {
   answers: StudentAnswerMap;
   items: PublicRuntimeItem[];
   progressVerb?: string;
+  revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
   selectedItemId?: string;
 }): GroupSortRunnerView {
@@ -708,6 +718,9 @@ export function buildGroupSortRunnerView({
   const itemViews = runnerView.itemViews.map((itemView) => ({
     ...itemView,
     action: buildGroupSortItemAction(itemView.item.id),
+    reviewStatusClassName: revealAnswer
+      ? getStudentRunnerReviewStatusClassName(itemView.status)
+      : undefined,
     selected: selectedItemId === itemView.item.id,
   }));
 
@@ -865,12 +878,14 @@ export function buildFillBlankWorksheetView({
   answers,
   items,
   progressVerb,
+  revealAnswer = false,
   reviewItems,
   wordBankLabel = m.activity_runner_word_bank_label(),
 }: {
   answers: StudentAnswerMap;
   items: PublicRuntimeItem[];
   progressVerb?: string;
+  revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
   wordBankLabel?: string;
 }): FillBlankWorksheetView {
@@ -891,6 +906,9 @@ export function buildFillBlankWorksheetView({
       return {
         ...itemView,
         promptView: buildInlineBlankPromptView(itemView.prompt),
+        reviewStatusClassName: revealAnswer
+          ? getStudentRunnerReviewStatusClassName(itemView.status)
+          : undefined,
         sequenceLabel: String(
           normalizeRuntimeDisplayCount(index + 1, { min: 1 })
         ),

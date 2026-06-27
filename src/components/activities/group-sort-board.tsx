@@ -5,10 +5,8 @@ import type {
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildGroupSortRunnerView,
-  getStudentRunnerReviewStatusClassName,
   resolveGroupSortRunnerAction,
   type GroupSortRunnerAction,
-  type StudentRunnerReviewStatus,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -46,10 +44,18 @@ export function GroupSortBoard({
         answers,
         items,
         progressVerb: copy.progressVerb,
+        revealAnswer,
         reviewItems,
         selectedItemId,
       }),
-    [answers, copy.progressVerb, items, reviewItems, selectedItemId]
+    [
+      answers,
+      copy.progressVerb,
+      items,
+      revealAnswer,
+      reviewItems,
+      selectedItemId,
+    ]
   );
 
   function handleRunnerAction(action: GroupSortRunnerAction) {
@@ -103,7 +109,13 @@ export function GroupSortBoard({
           <div className="mt-3 grid gap-2">
             {runnerView.unplacedItemViews.length ? (
               runnerView.unplacedItemViews.map(
-                ({ action, item, reviewItem, selected, status }) => (
+                ({
+                  action,
+                  item,
+                  reviewItem,
+                  reviewStatusClassName,
+                  selected,
+                }) => (
                   <GroupSortItemButton
                     action={action}
                     correctLabel={copy.correctAnswerLabel}
@@ -111,8 +123,8 @@ export function GroupSortBoard({
                     item={item}
                     reviewItem={reviewItem}
                     revealAnswer={revealAnswer}
+                    reviewStatusClassName={reviewStatusClassName}
                     selected={selected}
-                    status={status}
                     onSelect={handleRunnerAction}
                     disabled={disabled}
                   />
@@ -152,7 +164,13 @@ export function GroupSortBoard({
 
                 <div className="mt-3 grid gap-2">
                   {placedItemViews.map(
-                    ({ action, item, reviewItem, selected, status }) => (
+                    ({
+                      action,
+                      item,
+                      reviewItem,
+                      reviewStatusClassName,
+                      selected,
+                    }) => (
                       <GroupSortItemButton
                         key={item.id}
                         correctLabel={copy.correctAnswerLabel}
@@ -160,8 +178,8 @@ export function GroupSortBoard({
                         item={item}
                         reviewItem={reviewItem}
                         revealAnswer={revealAnswer}
+                        reviewStatusClassName={reviewStatusClassName}
                         selected={selected}
-                        status={status}
                         onSelect={handleRunnerAction}
                         disabled={disabled}
                         compact
@@ -190,8 +208,8 @@ function GroupSortItemButton({
   onSelect,
   revealAnswer,
   reviewItem,
+  reviewStatusClassName,
   selected,
-  status,
 }: {
   action: GroupSortRunnerAction;
   compact?: boolean;
@@ -201,8 +219,8 @@ function GroupSortItemButton({
   onSelect: (action: GroupSortRunnerAction) => void;
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
+  reviewStatusClassName: string | undefined;
   selected: boolean;
-  status: StudentRunnerReviewStatus;
 }) {
   return (
     <button
@@ -212,7 +230,7 @@ function GroupSortItemButton({
         'w-full rounded-lg border bg-background p-3 text-left transition-colors',
         'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-100',
         selected && 'border-primary bg-primary/10',
-        revealAnswer && getStudentRunnerReviewStatusClassName(status),
+        reviewStatusClassName,
         compact && 'p-2'
       )}
       onClick={() => onSelect(action)}

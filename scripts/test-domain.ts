@@ -3076,8 +3076,8 @@ assert.match(
 );
 assert.doesNotMatch(
   fillBlankWorksheetSource,
-  /buildInlineBlankPromptView|buildStudentRunnerView|item\.choices\.join|\{index \+ 1\}|\{copy\.wordBankLabel\}:/,
-  'Fill-blank worksheet should not rebuild prompt parsing, word-bank text, visible word-bank separators, or item labels in the component.'
+  /buildInlineBlankPromptView|buildStudentRunnerView|item\.choices\.join|\{index \+ 1\}|\{copy\.wordBankLabel\}:|getStudentRunnerReviewStatusClassName/,
+  'Fill-blank worksheet should not rebuild prompt parsing, word-bank text, visible word-bank separators, item labels, or review status classes in the component.'
 );
 assert.match(
   groupSortBoardSource,
@@ -3096,8 +3096,8 @@ assert.match(
 );
 assert.doesNotMatch(
   groupSortBoardSource,
-  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|setSelectedItemId\(\(current\)|onAnswerChange\(selectedItemId/,
-  'Group-sort runner should not rebuild selected, unplaced, grouped, or placement action rules in the component.'
+  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|setSelectedItemId\(\(current\)|onAnswerChange\(selectedItemId|getStudentRunnerReviewStatusClassName/,
+  'Group-sort runner should not rebuild selected, unplaced, grouped, placement action, or review class rules in the component.'
 );
 for (const filePath of [
   'src/components/activities/listening-runner.tsx',
@@ -3182,8 +3182,8 @@ for (const filePath of [
   );
   assert.doesNotMatch(
     source,
-    /runnerView\.itemViews\.map|\{index \+ 1\}\.|selectedItemId === item\.id/,
-    `${filePath} should not rebuild prompt-card labels or selection state directly.`
+    /runnerView\.itemViews\.map|\{index \+ 1\}\.|selectedItemId === item\.id|getStudentRunnerReviewStatusClassName/,
+    `${filePath} should not rebuild prompt-card labels, selection state, or review class rules directly.`
   );
 }
 const activityCreateFormSource = readFileSync(
@@ -6230,6 +6230,7 @@ assert.deepEqual(
   }).fillBlankItemViews.map((itemView) => ({
     id: itemView.item.id,
     promptView: itemView.promptView,
+    reviewStatusClassName: itemView.reviewStatusClassName,
     sequenceLabel: itemView.sequenceLabel,
     wordBankLineText: itemView.wordBankLineText,
     wordBankText: itemView.wordBankText,
@@ -6242,6 +6243,7 @@ assert.deepEqual(
         before: 'I eat ',
         mode: 'inline',
       },
+      reviewStatusClassName: undefined,
       sequenceLabel: '1',
       wordBankLineText: 'Word bank: apple, banana',
       wordBankText: 'apple, banana',
@@ -6252,11 +6254,39 @@ assert.deepEqual(
         mode: 'standalone',
         prompt: 'Type the missing word.',
       },
+      reviewStatusClassName: undefined,
       sequenceLabel: '2',
       wordBankLineText: null,
       wordBankText: null,
     },
   ]
+);
+assert.deepEqual(
+  buildFillBlankWorksheetView({
+    answers: { 'blank-1': 'appl' },
+    items: [
+      {
+        choices: ['apple', 'banana'],
+        id: 'blank-1',
+        kind: 'question',
+        prompt: 'I eat ___ for breakfast.',
+      },
+    ],
+    revealAnswer: true,
+    reviewItems: [
+      {
+        acceptedAnswers: ['apple'],
+        correct: false,
+        correctAnswer: 'apple',
+        itemId: 'blank-1',
+        submitted: true,
+      },
+    ],
+  }).fillBlankItemViews.map((itemView) => [
+    itemView.item.id,
+    itemView.reviewStatusClassName,
+  ]),
+  [['blank-1', 'border-destructive/30 bg-destructive/5']]
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -11396,6 +11426,8 @@ const choicePairingRunnerView = buildChoicePairingRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
   items: studentRunnerView.itemViews.map((itemView) => itemView.item),
   progressVerb: 'matched',
+  revealAnswer: true,
+  reviewItems: [...publicReviewMap.values()],
   selectedItemId: 'pair-2',
 });
 assert.equal(choicePairingRunnerView.progressLabel, '2/3 matched');
@@ -11404,6 +11436,7 @@ assert.deepEqual(
     itemView.item.id,
     itemView.action,
     itemView.promptLabel,
+    itemView.reviewStatusClassName,
     itemView.selected,
   ]),
   [
@@ -11414,6 +11447,7 @@ assert.deepEqual(
         type: 'select-prompt',
       },
       '1. Capital of France?',
+      'border-primary/35 bg-primary/5',
       false,
     ],
     [
@@ -11423,6 +11457,7 @@ assert.deepEqual(
         type: 'select-prompt',
       },
       '2. Match "Hot" with its pair.',
+      'border-destructive/30 bg-destructive/5',
       false,
     ],
     [
@@ -11432,6 +11467,7 @@ assert.deepEqual(
         type: 'select-prompt',
       },
       '3. Match "Up" with its pair.',
+      undefined,
       true,
     ],
   ]
@@ -11536,6 +11572,7 @@ assert.deepEqual(
   groupSortBoardView.unplacedItemViews.map((itemView) => [
     itemView.item.id,
     itemView.action,
+    itemView.reviewStatusClassName,
     itemView.selected,
   ]),
   [
@@ -11545,6 +11582,7 @@ assert.deepEqual(
         itemId: 'group-fruit-pear',
         type: 'select-item',
       },
+      undefined,
       true,
     ],
   ]
@@ -11580,6 +11618,7 @@ assert.deepEqual(
     placedItemViews.map((itemView) => [
       itemView.item.id,
       itemView.action,
+      itemView.reviewStatusClassName,
       itemView.selected,
     ]),
   ]),
@@ -11593,6 +11632,7 @@ assert.deepEqual(
             itemId: 'group-fruit-apple',
             type: 'select-item',
           },
+          undefined,
           false,
         ],
       ],
@@ -11606,6 +11646,7 @@ assert.deepEqual(
             itemId: 'group-drink-water',
             type: 'select-item',
           },
+          undefined,
           false,
         ],
       ],
@@ -11693,6 +11734,47 @@ assert.deepEqual(
     selectedItemId: 'group-fruit-pear',
     type: 'select',
   }
+);
+const reviewedGroupSortBoardView = buildGroupSortRunnerView({
+  answers: {
+    'group-drink-water': 'drink',
+    'group-fruit-apple': ' Ｆｒｕｉｔ ',
+  },
+  items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+  revealAnswer: true,
+  reviewItems: [
+    {
+      acceptedAnswers: ['Fruit'],
+      correct: true,
+      correctAnswer: 'Fruit',
+      itemId: 'group-fruit-apple',
+      submitted: true,
+    },
+    {
+      acceptedAnswers: ['Drink'],
+      correct: false,
+      correctAnswer: 'Drink',
+      itemId: 'group-drink-water',
+      submitted: true,
+    },
+  ],
+  selectedItemId: 'group-fruit-pear',
+});
+assert.deepEqual(
+  reviewedGroupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
+    group,
+    placedItemViews.map((itemView) => [
+      itemView.item.id,
+      itemView.reviewStatusClassName,
+    ]),
+  ]),
+  [
+    ['Fruit', [['group-fruit-apple', 'border-primary/35 bg-primary/5']]],
+    [
+      'Drink',
+      [['group-drink-water', 'border-destructive/30 bg-destructive/5']],
+    ],
+  ]
 );
 assert.deepEqual(
   buildPublicAttemptReviewItems({

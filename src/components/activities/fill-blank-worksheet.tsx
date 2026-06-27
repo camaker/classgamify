@@ -3,10 +3,7 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import {
-  buildFillBlankWorksheetView,
-  getStudentRunnerReviewStatusClassName,
-} from '@/assignments/student-runner-view';
+import { buildFillBlankWorksheetView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -38,10 +35,18 @@ export function FillBlankWorksheet({
         answers,
         items,
         progressVerb: copy.progressVerb,
+        revealAnswer,
         reviewItems,
         wordBankLabel: copy.wordBankLabel,
       }),
-    [answers, copy.progressVerb, copy.wordBankLabel, items, reviewItems]
+    [
+      answers,
+      copy.progressVerb,
+      copy.wordBankLabel,
+      items,
+      revealAnswer,
+      reviewItems,
+    ]
   );
 
   return (
@@ -58,14 +63,14 @@ export function FillBlankWorksheet({
 
       <div className="mt-3 grid gap-3">
         {runnerView.fillBlankItemViews.map((itemView) => {
-          const { answer, item, promptView, reviewItem, status } = itemView;
+          const { answer, item, promptView, reviewItem } = itemView;
 
           return (
             <div
               key={item.id}
               className={cn(
                 'rounded-lg border bg-background p-3',
-                revealAnswer && getStudentRunnerReviewStatusClassName(status)
+                itemView.reviewStatusClassName
               )}
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
