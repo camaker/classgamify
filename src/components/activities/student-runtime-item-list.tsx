@@ -1,15 +1,13 @@
-import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
-import { getActivityTemplateRunnerKind } from '@/activities/runtime';
 import type { ActivityTemplateType } from '@/activities/types';
 import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { buildDefaultRuntimeItemCardViews } from '@/assignments/student-runner-view';
 import {
-  buildStudentAnswerChanges,
+  buildStudentRuntimeItemListView,
+  buildStudentRuntimeSingleAnswerChanges,
   type StudentAnswerChange,
-} from '@/assignments/student-submission';
+} from '@/assignments/student-runtime-item-list';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -42,17 +40,14 @@ export function StudentRuntimeItemList({
   reviewItems,
   templateType,
 }: StudentRuntimeItemListProps) {
-  const runnerKind = getActivityTemplateRunnerKind(templateType);
-  const runnerCopy = getActivityTemplateRunnerCopy(templateType);
-  const itemCardViews = buildDefaultRuntimeItemCardViews({
+  const listView = buildStudentRuntimeItemListView({
     answers,
-    correctAnswerLabel: runnerCopy.correctAnswerLabel,
-    inputPlaceholder: runnerCopy.inputPlaceholder,
     items,
     reviewItems,
+    templateType,
   });
 
-  if (runnerKind === 'line-match') {
+  if (listView.surface === 'line-match') {
     return (
       <div className="mt-4">
         <LineMatchBoard
@@ -67,7 +62,7 @@ export function StudentRuntimeItemList({
     );
   }
 
-  if (runnerKind === 'matching-pairs') {
+  if (listView.surface === 'matching-pairs') {
     return (
       <div className="mt-4">
         <MatchingPairsBoard
@@ -82,7 +77,7 @@ export function StudentRuntimeItemList({
     );
   }
 
-  if (runnerKind === 'group-sort') {
+  if (listView.surface === 'group-sort') {
     return (
       <div className="mt-4">
         <GroupSortBoard
@@ -92,14 +87,16 @@ export function StudentRuntimeItemList({
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
           onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+            onAnswerChanges(
+              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
+            )
           }
         />
       </div>
     );
   }
 
-  if (runnerKind === 'fill-blank') {
+  if (listView.surface === 'fill-blank') {
     return (
       <div className="mt-4">
         <FillBlankWorksheet
@@ -109,14 +106,16 @@ export function StudentRuntimeItemList({
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
           onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+            onAnswerChanges(
+              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
+            )
           }
         />
       </div>
     );
   }
 
-  if (runnerKind === 'open-box') {
+  if (listView.surface === 'open-box') {
     return (
       <div className="mt-4">
         <OpenBoxRunner
@@ -126,14 +125,16 @@ export function StudentRuntimeItemList({
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
           onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+            onAnswerChanges(
+              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
+            )
           }
         />
       </div>
     );
   }
 
-  if (runnerKind === 'listening') {
+  if (listView.surface === 'listening') {
     return (
       <div className="mt-4">
         <ListeningRunner
@@ -144,7 +145,9 @@ export function StudentRuntimeItemList({
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
           onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+            onAnswerChanges(
+              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
+            )
           }
         />
       </div>
@@ -153,7 +156,7 @@ export function StudentRuntimeItemList({
 
   return (
     <div className="mt-4 grid gap-3">
-      {itemCardViews.map((itemView) => (
+      {listView.defaultItemCardViews.map((itemView) => (
         <RuntimeItemCard
           key={itemView.item.id}
           answer={itemView.answer}
@@ -168,7 +171,7 @@ export function StudentRuntimeItemList({
           showChoices={itemView.showChoices}
           onAnswerChange={(answer) =>
             onAnswerChanges(
-              buildStudentAnswerChanges({
+              buildStudentRuntimeSingleAnswerChanges({
                 answer,
                 itemId: itemView.item.id,
               })
@@ -195,8 +198,8 @@ function RuntimeItemCard({
 }: {
   answer: string;
   choiceViews: ReturnType<
-    typeof buildDefaultRuntimeItemCardViews
-  >[number]['choiceViews'];
+    typeof buildStudentRuntimeItemListView
+  >['defaultItemCardViews'][number]['choiceViews'];
   correctAnswerLabel: string;
   disabled: boolean;
   inputPlaceholder: string;
@@ -246,8 +249,8 @@ function ChoiceGrid({
   onAnswerChange,
 }: {
   choices: ReturnType<
-    typeof buildDefaultRuntimeItemCardViews
-  >[number]['choiceViews'];
+    typeof buildStudentRuntimeItemListView
+  >['defaultItemCardViews'][number]['choiceViews'];
   disabled: boolean;
   onAnswerChange: (answer: string) => void;
 }) {

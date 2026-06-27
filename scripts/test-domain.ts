@@ -728,6 +728,10 @@ import {
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
 import {
+  buildStudentRuntimeItemListView,
+  buildStudentRuntimeSingleAnswerChanges,
+} from '@/assignments/student-runtime-item-list';
+import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
@@ -4602,6 +4606,10 @@ const studentRunnerSubmissionSource = readFileSync(
   'src/assignments/student-submission.ts',
   'utf8'
 );
+const studentRuntimeItemListDomainSource = readFileSync(
+  'src/assignments/student-runtime-item-list.ts',
+  'utf8'
+);
 const studentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
   'utf8'
@@ -4950,13 +4958,33 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
+  /buildStudentRuntimeItemListView\(\{[\s\S]*answers,[\s\S]*items,[\s\S]*reviewItems,[\s\S]*templateType/,
+  'Student runtime item list should consume the assignment-domain template dispatch view.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /getActivityTemplateRunnerKind\(templateType\)[\s\S]*getActivityTemplateRunnerCopy\(templateType\)[\s\S]*buildDefaultRuntimeItemCardViews/,
+  'Student runtime item-list domain should own template runner kind, copy, and default card view construction.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /buildStudentRuntimeSingleAnswerChanges[\s\S]*buildStudentAnswerChanges\(\{ answer, itemId \}\)/,
+  'Student runtime item-list domain should wrap single answer changes through the submission-domain answer-change contract.'
+);
+assert.doesNotMatch(
+  studentRuntimeItemListSource,
+  /getActivityTemplateRunnerKind|getActivityTemplateRunnerCopy|buildDefaultRuntimeItemCardViews|buildStudentAnswerChanges\(/,
+  'Student runtime item list component should not rebuild template dispatch, runner copy, default cards, or answer-change normalization.'
+);
+assert.match(
+  studentRuntimeItemListSource,
   /onAnswerChanges: \(changes: StudentAnswerChange\[\]\) => void/,
   'Student runtime item list should expose answer-change batches to the play route.'
 );
 assert.match(
   studentRuntimeItemListSource,
-  /buildStudentAnswerChanges\(\{ answer, itemId \}\)/,
-  'Student runtime item list should convert simple answer events through the shared answer-change builder.'
+  /buildStudentRuntimeSingleAnswerChanges\(\{ answer, itemId \}\)/,
+  'Student runtime item list should convert simple answer events through the assignment-domain runtime item-list helper.'
 );
 assert.match(
   lineMatchBoardSource,
@@ -5510,6 +5538,60 @@ assert.equal(
 assert.equal(
   getActivityTemplateRunnerCopy('matching-pairs').progressVerb,
   'matched'
+);
+const quizRuntimeListView = buildStudentRuntimeItemListView({
+  answers: { 'q-1': 'Paris' },
+  items: [
+    {
+      choices: ['Paris', 'Rome'],
+      id: 'q-1',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+  ],
+  templateType: 'quiz',
+});
+assert.equal(quizRuntimeListView.surface, 'choice-list');
+assert.equal(quizRuntimeListView.runnerCopy.title, 'Quiz');
+assert.deepEqual(
+  quizRuntimeListView.defaultItemCardViews.map((itemView) => ({
+    answer: itemView.answer,
+    choiceViews: itemView.choiceViews,
+    positionLabel: itemView.positionLabel,
+  })),
+  [
+    {
+      answer: 'Paris',
+      choiceViews: [
+        { choice: 'Paris', selected: true },
+        { choice: 'Rome', selected: false },
+      ],
+      positionLabel: '1. Capital of France?',
+    },
+  ]
+);
+assert.equal(
+  buildStudentRuntimeItemListView({
+    answers: {},
+    items: [],
+    templateType: 'line-match',
+  }).surface,
+  'line-match'
+);
+assert.equal(
+  buildStudentRuntimeItemListView({
+    answers: {},
+    items: [],
+    templateType: 'listening',
+  }).runnerCopy.sequenceItemLabel,
+  'Track'
+);
+assert.deepEqual(
+  buildStudentRuntimeSingleAnswerChanges({
+    answer: 'pear',
+    itemId: ' Ｑ－１ ',
+  }),
+  [{ answer: 'pear', itemId: 'Q-1' }]
 );
 assert.equal(
   findChoiceOwner({ 'item-1': 'Paris', 'item-2': 'Rome' }, 'Rome'),
