@@ -12177,10 +12177,20 @@ assert.match(
   /toPrintableWorksheetItem[\s\S]*const responsePolicy = getPrintableWorksheetResponsePolicy\(templateType\)[\s\S]*answerSpaceLines: responsePolicy\.answerSpaceLines[\s\S]*choicePresentation: responsePolicy\.choicePresentation[\s\S]*responseMode: responsePolicy\.responseMode/,
   'Printable worksheet item generation should consume the shared response policy.'
 );
+assert.match(
+  printableWorksheetSource,
+  /toPrintableWorksheetAnswerKeyItem[\s\S]*normalizeRuntimeDisplayList\(getAcceptedAnswers\(item\.answer\)\)[\s\S]*normalizeRuntimeDisplayText\(item\.answer\)/,
+  'Printable worksheet answer keys should normalize accepted alternatives through the shared runtime display-list helper.'
+);
 assert.doesNotMatch(
   printableWorksheetSource,
   /function getPrintableWorksheetResponseMode|function getPrintableWorksheetAnswerSpaceLines|function getPrintableWorksheetChoicePresentation/,
   'Printable worksheet item generation should not keep separate response-mode, answer-line, or choice-presentation switches.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /const acceptedAnswers = getAcceptedAnswers\(item\.answer\);/,
+  'Printable worksheet answer keys should not expose raw accepted-answer parser output directly.'
 );
 assert.match(
   printableWorksheetViewSource,

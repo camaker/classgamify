@@ -20,6 +20,7 @@ import {
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
+  normalizeRuntimeDisplayList,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { resolveAssignmentSettings } from '@/assignments/validation';
@@ -260,7 +261,9 @@ function toPrintableWorksheetAnswerKeyItem(
   item: RuntimeItem,
   index: number
 ): PrintableWorksheetAnswerKeyItem {
-  const acceptedAnswers = getAcceptedAnswers(item.answer);
+  const acceptedAnswers =
+    normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
+    [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
 
   return {
     acceptedAnswers,
