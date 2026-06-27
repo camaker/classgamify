@@ -11,7 +11,9 @@ import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result
 import {
   formatAssignmentResultCsvDate,
   formatAssignmentResultCsvNumber,
+  formatAssignmentResultValue,
 } from '@/assignments/result-format';
+import { formatAssignmentResultStudentLabel } from '@/assignments/result-display';
 import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
@@ -126,7 +128,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
           })
         : '',
       attempt.id,
-      attempt.studentLabel,
+      formatAssignmentResultStudentLabel(attempt.studentLabel),
       formatAssignmentResultCsvDate(attempt.completedAt),
       formatAssignmentResultCsvNumber(storedAttempt?.score ?? attempt.score, {
         min: 0,
@@ -168,7 +170,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         ...baseColumns,
         index + 1,
         answer.itemId,
-        answer.prompt,
+        formatAssignmentExportPrompt(answer.prompt),
         answerView.exportStudentAnswerText,
         answerView.expectedAnswerText,
         answerView.acceptedAlternativesText,
@@ -261,6 +263,10 @@ function formatAssignmentExportStatusLabel({
 
 function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
   return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
+}
+
+function formatAssignmentExportPrompt(value: string | null | undefined) {
+  return formatAssignmentResultValue(value, { emptyValue: '' });
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {

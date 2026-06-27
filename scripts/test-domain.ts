@@ -1493,6 +1493,16 @@ assert.match(
   /formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
   'Assignment CSV export should format numeric cells through the shared result-format CSV helper.'
 );
+assert.match(
+  assignmentResultsExportSource,
+  /formatAssignmentResultStudentLabel\(attempt\.studentLabel\)/,
+  'Assignment CSV export should format student labels through the shared result-display helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /formatAssignmentExportPrompt\(answer\.prompt\)/,
+  'Assignment CSV export should format prompt cells through a shared result-format helper.'
+);
 assert.doesNotMatch(
   assignmentResultsExportSource,
   /data\.stats\.completions > 0/,
@@ -1502,6 +1512,11 @@ assert.doesNotMatch(
   assignmentResultsExportSource,
   /function formatAssignmentExportNumber/,
   'Assignment CSV export should not keep local numeric cell formatting.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /\battempt\.studentLabel,|\banswer\.prompt,/,
+  'Assignment CSV export should not write raw student labels or prompts directly.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -23348,6 +23363,37 @@ assert.match(
   /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/
 );
 assert.equal(csv.includes('browser-token-1'), false);
+const normalizedDisplayCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  analysis: {
+    ...csvExportData.analysis,
+    attempts: csvExportData.analysis.attempts.map((attempt, attemptIndex) =>
+      attemptIndex === 0
+        ? {
+            ...attempt,
+            answers: attempt.answers.map((answer, answerIndex) =>
+              answerIndex === 0
+                ? {
+                    ...answer,
+                    prompt: ' Ｃａｐｉｔａｌ\u00A0　of   France? ',
+                  }
+                : answer
+            ),
+            studentLabel: ' Ａｖａ\u00A0　Chen ',
+          }
+        : attempt
+    ),
+  },
+});
+assert.match(
+  normalizedDisplayCsv,
+  /"attempt-1","Ava Chen","2026-01-01T10:00:00\.000Z"/
+);
+assert.match(
+  normalizedDisplayCsv,
+  /"q-1","Capital of France\?","Paris","Paris","Paris, France","correct"/
+);
+assert.doesNotMatch(normalizedDisplayCsv, /Ａｖａ|Ｃａｐｉｔａｌ|\u00A0/);
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: resultAnalysisWithUnscoredAttempt,
