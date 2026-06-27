@@ -1487,6 +1487,11 @@ assert.match(
   'Activity source-material summary component should render prepared source-material metric text.'
 );
 assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /action\.sourceCount|action\.sourceKindCounts/,
+  'Activity source-material summary component should not rebuild extraction source counts locally.'
+);
+assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
   /hasAudio|hasSpreadsheet|hasWorksheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
   'Activity source-material picker should not recalculate extraction readiness locally.'
@@ -2767,6 +2772,10 @@ const activityMaterialReferencesSource = readFileSync(
   'src/activities/material-references.ts',
   'utf8'
 );
+const activityMaterialSummarySource = readFileSync(
+  'src/activities/material-summary.ts',
+  'utf8'
+);
 assert.match(
   activityMaterialReferencesSource,
   /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS[\s\S]*fileIdMaxLength: 120[\s\S]*originalNameMaxLength: 200/,
@@ -2786,6 +2795,26 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS, {
   fileIdMaxLength: 120,
   originalNameMaxLength: 200,
 });
+assert.match(
+  activityMaterialSummarySource,
+  /sourceKindSummaryText:[\s\S]*formatActivitySourceMaterialKindCounts/,
+  'Activity source-material extraction action views should expose prepared source-kind summary text.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /summaryText: m\.activity_source_material_extraction_summary/,
+  'Activity source-material extraction action summaries should use localized summary formatting.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /join\(m\.activity_source_material_summary_list_separator\(\)\)/,
+  'Activity source-material source-kind summaries should use a localized list separator.'
+);
+assert.doesNotMatch(
+  activityMaterialSummarySource,
+  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)/,
+  'Activity source-material extraction summaries should not only show raw source counts or hard-code list separators.'
+);
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
   contentType: 'audio/mpeg',
   id: 'file-listening-1',
@@ -3040,7 +3069,8 @@ assert.deepEqual(
         label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
-        summaryText: 'Audio extraction · 1',
+        sourceKindSummaryText: 'Audio · 1',
+        summaryText: 'Audio extraction · Audio · 1',
       },
       {
         capability: 'worksheet-extraction',
@@ -3048,7 +3078,8 @@ assert.deepEqual(
         label: 'Worksheet extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
-        summaryText: 'Worksheet extraction · 1',
+        sourceKindSummaryText: 'Worksheet document · 1',
+        summaryText: 'Worksheet extraction · Worksheet document · 1',
       },
     ],
     extractionTitle: 'Ready for future AI extraction',
@@ -3077,6 +3108,72 @@ assert.deepEqual(
     title: 'Source materials',
   }
 );
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    {
+      contentType: 'application/pdf',
+      fileId: 'worksheet-doc',
+      kind: 'worksheet-document',
+      originalName: 'worksheet.pdf',
+    },
+    {
+      contentType: 'image/png',
+      fileId: 'worksheet-image',
+      kind: 'worksheet-image',
+      originalName: 'worksheet.png',
+    },
+  ]).extractionActions,
+  [
+    {
+      capability: 'worksheet-extraction',
+      id: 'extract-worksheet',
+      label: 'Worksheet extraction',
+      sourceCount: 2,
+      sourceKindCounts: [
+        { count: 1, kind: 'worksheet-document' },
+        { count: 1, kind: 'worksheet-image' },
+      ],
+      sourceKindSummaryText: 'Worksheet document · 1, Worksheet image · 1',
+      summaryText:
+        'Worksheet extraction · Worksheet document · 1, Worksheet image · 1',
+    },
+  ]
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildActivitySourceMaterialSummaryView([
+      {
+        contentType: 'application/pdf',
+        fileId: 'zh-worksheet-doc',
+        kind: 'worksheet-document',
+        originalName: '练习纸.pdf',
+      },
+      {
+        contentType: 'image/png',
+        fileId: 'zh-worksheet-image',
+        kind: 'worksheet-image',
+        originalName: '练习纸.png',
+      },
+    ]).extractionActions,
+    [
+      {
+        capability: 'worksheet-extraction',
+        id: 'extract-worksheet',
+        label: '可用于练习纸解析',
+        sourceCount: 2,
+        sourceKindCounts: [
+          { count: 1, kind: 'worksheet-document' },
+          { count: 1, kind: 'worksheet-image' },
+        ],
+        sourceKindSummaryText: '练习纸文档 · 1，练习纸图片 · 1',
+        summaryText: '可用于练习纸解析 · 练习纸文档 · 1，练习纸图片 · 1',
+      },
+    ]
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   countLabel: '0 files',
   extractionActions: [],
@@ -12557,7 +12654,8 @@ assert.deepEqual(
         label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
-        summaryText: 'Audio extraction · 1',
+        sourceKindSummaryText: 'Audio · 1',
+        summaryText: 'Audio extraction · Audio · 1',
       },
     ],
     extractionTitle: 'Ready for future AI extraction',

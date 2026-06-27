@@ -31,6 +31,7 @@ export type ActivitySourceMaterialExtractionAction = {
 export type ActivitySourceMaterialExtractionActionView =
   ActivitySourceMaterialExtractionAction & {
     label: string;
+    sourceKindSummaryText: string;
     summaryText: string;
   };
 
@@ -186,13 +187,17 @@ function toActivitySourceMaterialExtractionActionView(
   action: ActivitySourceMaterialExtractionAction
 ): ActivitySourceMaterialExtractionActionView {
   const label = formatActivitySourceMaterialExtractionAction(action.id);
+  const sourceKindSummaryText = formatActivitySourceMaterialKindCounts(
+    action.sourceKindCounts
+  );
 
   return {
     ...action,
     label,
-    summaryText: formatActivitySourceMaterialMetric({
-      count: action.sourceCount,
+    sourceKindSummaryText,
+    summaryText: m.activity_source_material_extraction_summary({
       label,
+      sources: sourceKindSummaryText,
     }),
   };
 }
@@ -205,6 +210,19 @@ function formatActivitySourceMaterialMetric({
   label: string;
 }) {
   return m.activity_source_material_summary_metric({ count, label });
+}
+
+function formatActivitySourceMaterialKindCounts(
+  sourceKindCounts: ActivitySourceMaterialKindSummary[]
+) {
+  return sourceKindCounts
+    .map((item) =>
+      formatActivitySourceMaterialMetric({
+        count: item.count,
+        label: formatUserFileMaterialKind(item.kind),
+      })
+    )
+    .join(m.activity_source_material_summary_list_separator());
 }
 
 function formatActivitySourceMaterialExtractionAction(
