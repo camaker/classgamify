@@ -16,8 +16,8 @@ import {
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
   matchesActivitySourceMaterialFilter,
-  normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
+import { buildActivityLibraryWhere } from '@/activities/library-query';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import {
   assertActivityCanDeriveWork,
@@ -29,11 +29,10 @@ import { getTemplateRemixOption } from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
-import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, ne, or } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -70,27 +69,12 @@ export const listActivities = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const search = normalizeActivityLibrarySearch(data.search);
-    const searchWhere = search
-      ? or(
-          sqlLikeContains(activity.title, search),
-          sqlLikeContains(activity.description, search),
-          sqlLikeContains(activity.templateType, search)
-        )
-      : undefined;
-    const statusWhere =
-      data.status === 'archived'
-        ? eq(activity.visibility, 'archived')
-        : ne(activity.visibility, 'archived');
-    const templateWhere = data.template
-      ? eq(activity.templateType, data.template)
-      : undefined;
-    const where = and(
-      eq(activity.ownerId, userId),
-      statusWhere,
-      templateWhere,
-      searchWhere
-    );
+    const where = buildActivityLibraryWhere({
+      search: data.search,
+      status: data.status,
+      template: data.template,
+      userId,
+    });
 
     const matchingRows = await db.select().from(activity).where(where);
     const matchingActivities =

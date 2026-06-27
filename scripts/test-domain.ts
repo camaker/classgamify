@@ -11647,10 +11647,14 @@ assert.doesNotMatch(
   'Activity stable id generation should not keep a local maximum length.'
 );
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
+const activityLibraryQuerySource = readFileSync(
+  'src/activities/library-query.ts',
+  'utf8'
+);
 assert.match(
-  activitiesApiSource,
-  /sqlLikeContains\(activity\.title, search\)/,
-  'Activity list search should escape SQL LIKE wildcard characters.'
+  activityLibraryQuerySource,
+  /sqlLikeContains\(activity\.title, normalizedSearch\)/,
+  'Activity list search should escape SQL LIKE wildcard characters in the activity query domain.'
 );
 assert.match(
   activitiesApiSource,
@@ -11676,6 +11680,16 @@ assert.doesNotMatch(
   activitiesApiSource,
   /const activityListSourceSchema = z\.enum\(\[/,
   'Activity list API should not maintain a separate hand-written source-material filter enum.'
+);
+assert.match(
+  activitiesApiSource,
+  /buildActivityLibraryWhere\(\{[\s\S]*search: data\.search,[\s\S]*status: data\.status,[\s\S]*template: data\.template,[\s\S]*userId/,
+  'Activity list API should delegate owner, status, template, and search where clauses to the activity domain.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /normalizeActivityLibrarySearch\(data\.search\)|sqlLikeContains\(activity\.title|const statusWhere|const templateWhere/,
+  'Activity list API should not keep local search, status, or template where logic.'
 );
 assert.match(
   activitiesApiSource,
@@ -11718,7 +11732,7 @@ assert.doesNotMatch(
   'Activity API should not keep local id or list input limits.'
 );
 assert.doesNotMatch(
-  activitiesApiSource,
+  activityLibraryQuerySource,
   /like\(activity\.title, `%\$\{search\}%`\)/,
   'Activity list search should not pass raw user text directly to LIKE.'
 );
