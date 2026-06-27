@@ -32,6 +32,7 @@ import {
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
 } from '@/assignments/lifecycle';
+import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-query';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildPublicAssignmentLookupResult,
@@ -74,11 +75,8 @@ import {
   count,
   desc,
   eq,
-  gt,
   inArray,
   isNotNull,
-  isNull,
-  lte,
   or,
   type SQL,
 } from 'drizzle-orm';
@@ -250,7 +248,12 @@ function buildAssignmentListWhere({
   const filters: SQL[] = [eq(assignment.ownerId, userId)];
 
   if (status) {
-    filters.push(buildAssignmentStatusFilter(status, now));
+    filters.push(
+      buildAssignmentLifecycleStatusFilter({
+        now,
+        status,
+      })
+    );
   }
 
   if (normalizedSearch) {
@@ -273,28 +276,6 @@ function buildAssignmentListWhere({
   }
 
   return and(...filters);
-}
-
-function buildAssignmentStatusFilter(
-  status: AssignmentLifecycleStatusFilter,
-  now: Date
-) {
-  if (status === 'open') {
-    return and(
-      eq(assignment.status, 'published'),
-      or(isNull(assignment.expiresAt), gt(assignment.expiresAt, now))
-    ) as SQL;
-  }
-
-  if (status === 'expired') {
-    return and(
-      eq(assignment.status, 'published'),
-      isNotNull(assignment.expiresAt),
-      lte(assignment.expiresAt, now)
-    ) as SQL;
-  }
-
-  return eq(assignment.status, status);
 }
 
 function withResolvedAssignmentSettings<

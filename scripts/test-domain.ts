@@ -414,6 +414,7 @@ import {
   isAssignmentOpen,
   matchesAssignmentLifecycleStatus,
 } from '@/assignments/lifecycle';
+import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-query';
 import {
   orderAssignmentRuntimeItems,
   stableShuffle,
@@ -6354,6 +6355,15 @@ assert.equal(
   }),
   false
 );
+for (const lifecycleStatus of ASSIGNMENT_LIFECYCLE_STATUS_FILTERS) {
+  const filter = buildAssignmentLifecycleStatusFilter({
+    now: new Date(assignmentLifecycleNow),
+    status: lifecycleStatus,
+  }) as { queryChunks?: unknown[] };
+
+  assert.equal(Array.isArray(filter.queryChunks), true);
+  assert.equal((filter.queryChunks?.length ?? 0) > 0, true);
+}
 assert.equal(
   getAssignmentSubmissionErrorMessage({
     expiresAt: new Date('2026-01-01T10:00:01.000Z'),
@@ -11158,6 +11168,30 @@ assert.match(
   assignmentsApiSource,
   /const itemAttempts =[\s\S]*\.where\(\s*and\(\s*inArray\(attempt\.assignmentId, itemAssignmentIds\),\s*isNotNull\(attempt\.resultJson\)\s*\)\s*\)/,
   'Assignment list card stats should only read completed attempts with scored results.'
+);
+const assignmentLifecycleQuerySource = readFileSync(
+  'src/assignments/lifecycle-query.ts',
+  'utf8'
+);
+assert.match(
+  assignmentsApiSource,
+  /buildAssignmentLifecycleStatusFilter\(\{[\s\S]*now,[\s\S]*status,[\s\S]*\}\)/,
+  'Assignment list API should delegate lifecycle SQL filtering to the assignment-domain query helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /function buildAssignmentStatusFilter|status === 'open'[\s\S]*gt\(assignment\.expiresAt|status === 'expired'[\s\S]*lte\(assignment\.expiresAt/,
+  'Assignment list API should not keep local lifecycle SQL filter rules.'
+);
+assert.match(
+  assignmentLifecycleQuerySource,
+  /export function buildAssignmentLifecycleStatusFilter[\s\S]*status === 'open'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNull\(assignment\.expiresAt\)[\s\S]*gt\(assignment\.expiresAt, now\)/,
+  'Assignment lifecycle query helper should encode the open-link SQL filter.'
+);
+assert.match(
+  assignmentLifecycleQuerySource,
+  /status === 'expired'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNotNull\(assignment\.expiresAt\)[\s\S]*lte\(assignment\.expiresAt, now\)/,
+  'Assignment lifecycle query helper should encode the expired-link SQL filter.'
 );
 assert.match(
   assignmentsApiSource,
