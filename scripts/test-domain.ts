@@ -3303,6 +3303,24 @@ assert.doesNotMatch(
   /pageSize: z\.number\(\)\.int\(\)\.min\(1\)\.max\(100\)/,
   'User file list APIs should not keep local page-size limits.'
 );
+assert.doesNotMatch(
+  userFilesApiSource,
+  /Buffer\.from|arrayBuffer\(\)/,
+  'User file upload API should pass the FormData File to storage without Node Buffer conversion.'
+);
+const storageIndexSource = readFileSync('src/storage/index.ts', 'utf8');
+const r2ProviderSource = readFileSync('src/storage/provider/r2.ts', 'utf8');
+for (const [filePath, fileText] of [
+  ['src/storage/index.ts', storageIndexSource],
+  ['src/storage/types.ts', storageTypesSource],
+  ['src/storage/provider/r2.ts', r2ProviderSource],
+]) {
+  assert.doesNotMatch(
+    fileText,
+    /\bBuffer\s*\||as Buffer|Uint8Array\(file as Buffer\)/,
+    `${filePath} should keep uploads on Cloudflare-native Blob/File types.`
+  );
+}
 overwriteGetLocale(() => 'en');
 assert.equal(
   formatUserFileUploadError(

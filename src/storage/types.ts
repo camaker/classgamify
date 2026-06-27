@@ -122,7 +122,7 @@ export class UploadError extends StorageError {
  * Params for upload operation
  */
 export interface UploadFileParams {
-  file: Buffer | Blob | File;
+  file: Blob | File;
   filename: string;
   contentType: string;
   folder?: string;

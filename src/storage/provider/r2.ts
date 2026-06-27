@@ -209,11 +209,7 @@ export class R2Provider implements StorageProvider {
     const fileForValidation =
       file instanceof File
         ? file
-        : new File(
-            [file instanceof Blob ? file : new Uint8Array(file as Buffer)],
-            filename,
-            { type: contentType }
-          );
+        : new File([file], filename, { type: contentType });
     const validation = this.validator.validateFile(fileForValidation, filename);
     if (!validation.success) {
       throw new UploadError(validation.code, validation.details);
@@ -245,8 +241,7 @@ export class R2Provider implements StorageProvider {
         : storedFilename;
     }
 
-    const body = file instanceof Blob ? file : new Uint8Array(file as Buffer);
-    await bucket.put(r2Key, body, {
+    await bucket.put(r2Key, file, {
       httpMetadata: { contentType },
     });
 
@@ -255,14 +250,13 @@ export class R2Provider implements StorageProvider {
     const result: UploadFileResult = { url, key: r2Key };
 
     if (userId !== undefined) {
-      const size = file instanceof Blob ? file.size : (file as Buffer).length;
       result.metadata = {
         id: fileId,
         userId,
         filename: storedFilename,
         originalName: filename,
         contentType,
-        size,
+        size: file.size,
         r2Key,
         uploadedAt: new Date(),
       };

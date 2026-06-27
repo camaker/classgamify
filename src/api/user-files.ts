@@ -143,18 +143,22 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     try {
-      const buffer = Buffer.from(await data.file.arrayBuffer());
       const requestOrigin = getBaseUrl();
       const publicFolder = isPublicFolder(data.folder);
 
       // Public folders (avatars, product logos/og-images) are shared resources:
       // no userId → stored directly under folder → no userFiles DB record.
       // Private files get userId scoping and are tracked in userFiles.
-      const result = await uploadFile(buffer, data.file.name, data.file.type, {
-        folder: data.folder,
-        userId: publicFolder ? undefined : (userId ?? undefined),
-        requestOrigin,
-      });
+      const result = await uploadFile(
+        data.file,
+        data.file.name,
+        data.file.type,
+        {
+          folder: data.folder,
+          userId: publicFolder ? undefined : (userId ?? undefined),
+          requestOrigin,
+        }
+      );
 
       // Only user-scoped uploads produce metadata; record them in DB
       if (!publicFolder && userId && result.metadata) {

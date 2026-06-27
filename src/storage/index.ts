@@ -34,7 +34,7 @@ export function getStorageProvider(): StorageProvider {
 }
 
 export const uploadFile = async (
-  file: Buffer | Blob | File,
+  file: Blob | File,
   filename: string,
   contentType: string,
   options?: { folder?: string; userId?: string; requestOrigin?: string }
