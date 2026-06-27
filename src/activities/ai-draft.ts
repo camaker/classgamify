@@ -21,8 +21,8 @@ import {
   normalizeQuestionOptionDisplayText,
 } from '@/activities/question-options';
 import {
-  formatTemplateRequirement,
   formatTemplateRequirementList,
+  formatTemplateRequirements,
   getActivityTemplateDraftGuidance,
 } from '@/activities/template-remix';
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
@@ -530,9 +530,7 @@ function buildActivityDraftPromptJsonExample() {
 
 function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
   const template = getTemplateByType(templateType);
-  const requirements = template.contentRequirements.map(
-    formatTemplateRequirement
-  );
+  const requirements = formatTemplateRequirements(template.contentRequirements);
 
   return formatTemplateRequirementList(requirements);
 }

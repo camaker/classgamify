@@ -16200,6 +16200,16 @@ const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
 assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
 assert.match(aiDraftSource, /buildActivityDraftPromptJsonExample\(\)/);
 assert.match(aiDraftSource, /m\.activity_ai_prompt_json_title\(\)/);
+assert.match(
+  aiDraftSource,
+  /formatTemplateRequirements\(template\.contentRequirements\)/,
+  'AI draft prompt template requirements should reuse the shared template requirement formatter.'
+);
+assert.doesNotMatch(
+  aiDraftSource,
+  /template\.contentRequirements\.map\([\s\S]*formatTemplateRequirement/,
+  'AI draft prompt should not map template requirement labels locally.'
+);
 assert.doesNotMatch(
   aiDraftSource,
   /Create a reusable ClassGamify classroom activity draft\./
