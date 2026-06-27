@@ -1072,6 +1072,22 @@ assert.match(
   /settings_security_user_accounts_fetch_error/,
   'Client auth hook account fetch errors should use localized security copy.'
 );
+const activityRuntimeSource = readFileSync('src/activities/runtime.ts', 'utf8');
+assert.match(
+  activityRuntimeSource,
+  /normalizeRuntimeDisplayText\(answer\.answer\)/,
+  'Runtime evaluation should normalize submitted answers through the shared runtime display helper.'
+);
+assert.match(
+  activityRuntimeSource,
+  /completedItemCount: countSubmittedRuntimeAnswers\(scoredAnswers\)/,
+  'Runtime evaluation should derive completed item count through the shared submitted-answer helper.'
+);
+assert.doesNotMatch(
+  activityRuntimeSource,
+  /answer\.answer\.trim\(\)|scoredAnswers\.filter\(\(answer\) => answer\.answer\)/,
+  'Runtime evaluation should not use ad hoc trim-only submitted-answer checks.'
+);
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
   'utf8'
@@ -16727,6 +16743,52 @@ assert.deepEqual(
     earnedPoints: 1,
     totalPoints: 1,
   }
+);
+assert.deepEqual(
+  evaluateRuntimeAnswers({
+    answers: [
+      { answer: '  Ｐａｒｉｓ\tFrance  ', itemId: 'q-capital-of-france' },
+    ],
+    content: buildActivityContent({
+      description: 'Messy answer normalization',
+      difficulty: 'starter',
+      gradeBand: 'Grade 4',
+      groupsText: '',
+      language: 'en',
+      learningGoal: 'Students answer with natural keyboard spacing.',
+      pairsText: '',
+      questionsText: 'Capital of France? | Paris France',
+      sourceSummary: 'Normalize fullwidth and whitespace answer input.',
+      subject: 'Geography',
+      teacherNotesText: '',
+      templateType: 'quiz',
+      title: 'Messy answer normalization',
+      visibility: 'draft',
+      vocabularyText: '',
+    }),
+    templateType: 'quiz',
+  }),
+  {
+    answers: [
+      { answer: 'Paris France', correct: true, itemId: 'q-capital-of-france' },
+    ],
+    result: {
+      accuracy: 100,
+      completedItemCount: 1,
+      correctItemCount: 1,
+      durationSeconds: undefined,
+      earnedPoints: 1,
+      totalPoints: 1,
+    },
+  }
+);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: [{ answer: '\u00A0　\t', itemId: 'q-valid' }],
+    content: dirtyRuntimeContent,
+    templateType: 'quiz',
+  }).result.completedItemCount,
+  0
 );
 assert.equal(
   buildDuplicatedActivityTitle('  Food words quick check  '),

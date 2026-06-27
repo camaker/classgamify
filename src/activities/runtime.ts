@@ -1,5 +1,9 @@
 import { matchAnswer } from '@/activities/answer-matching';
 import { buildQuestionChoices } from '@/activities/distractors';
+import {
+  hasRuntimeDisplayText,
+  normalizeRuntimeDisplayText,
+} from '@/activities/runtime-display';
 import { makeActivityStableId } from '@/activities/stable-id';
 import type {
   ActivityContent,
@@ -176,7 +180,10 @@ export function evaluateRuntimeAnswers({
 }): RuntimeEvaluation {
   const runtimeItems = getRuntimeItems(templateType, content);
   const answerMap = new Map(
-    answers.map((answer) => [answer.itemId, answer.answer.trim()])
+    answers.map((answer) => [
+      answer.itemId,
+      normalizeRuntimeDisplayText(answer.answer),
+    ])
   );
   const scoredAnswers = runtimeItems.map((item) => {
     const submitted = answerMap.get(item.id) ?? '';
@@ -202,14 +209,18 @@ export function evaluateRuntimeAnswers({
     answers: scoredAnswers,
     result: {
       accuracy,
-      completedItemCount: scoredAnswers.filter((answer) => answer.answer)
-        .length,
+      completedItemCount: countSubmittedRuntimeAnswers(scoredAnswers),
       correctItemCount,
       durationSeconds,
       earnedPoints,
       totalPoints,
     },
   };
+}
+
+function countSubmittedRuntimeAnswers(answers: AttemptAnswer[]) {
+  return answers.filter((answer) => hasRuntimeDisplayText(answer.answer))
+    .length;
 }
 
 function buildGroupSortRuntimeItems(content: ActivityContent): RuntimeItem[] {
