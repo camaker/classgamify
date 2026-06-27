@@ -49,6 +49,7 @@ import {
 } from '@/activities/library-summary';
 import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import {
+  buildCreatedActivityListItemSelect,
   filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
 } from '@/activities/library-query';
@@ -432,7 +433,11 @@ import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
-import { getAssignmentListOffset } from '@/assignments/list-query';
+import {
+  buildAssignmentListSummarySelect,
+  buildPublishedAssignmentListItemSelect,
+  getAssignmentListOffset,
+} from '@/assignments/list-query';
 import {
   buildAssignmentListFilterSummary,
   buildAssignmentListSummary,
@@ -12046,6 +12051,22 @@ assert.match(
   /filterActivityLibrarySourceItems[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source/,
   'Activity list source-material filtering should live in the activity query domain.'
 );
+assert.equal(typeof buildCreatedActivityListItemSelect, 'function');
+assert.match(
+  activityLibraryQuerySource,
+  /buildCreatedActivityListItemSelect[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
+  'Created-activity list panel select shape should live in the activity query domain.'
+);
+assert.match(
+  activitiesApiSource,
+  /createdActivity[\s\S]*\.select\(buildCreatedActivityListItemSelect\(\)\)/,
+  'Activity list API should reuse the created-activity panel select helper.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /createdActivity[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
+  'Activity list API should not hand-write created-activity panel select fields.'
+);
 assert.match(
   activitiesApiSource,
   /summary: summarizeActivityLibrary\(matchingActivities\)/,
@@ -12417,6 +12438,11 @@ const assignmentAttemptQuerySource = readFileSync(
 const assignmentAttemptIdentityQuerySource = readFileSync(
   'src/assignments/attempt-identity-query.ts',
   'utf8'
+);
+const assignmentListApiSource = getSourceSlice(
+  assignmentsApiSource,
+  'export const listAssignments',
+  'export const publishAssignment'
 );
 assert.match(
   assignmentsApiSource,
@@ -12891,6 +12917,28 @@ assert.match(
   assignmentsApiSource,
   /publishedAssignment[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId,[\s\S]*\}\)/,
   'Assignment list publish-success lookup should use the shared owner-scoped share-slug detail query helper.'
+);
+assert.equal(typeof buildAssignmentListSummarySelect, 'function');
+assert.equal(typeof buildPublishedAssignmentListItemSelect, 'function');
+assert.match(
+  assignmentListQuerySource,
+  /buildAssignmentListSummarySelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*buildPublishedAssignmentListItemSelect[\s\S]*id: assignment\.id[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
+  'Assignment list summary and publish-success select shapes should live in the assignment query domain.'
+);
+assert.match(
+  assignmentsApiSource,
+  /matchingAssignments = await db[\s\S]*\.select\(buildAssignmentListSummarySelect\(\)\)/,
+  'Assignment list API should reuse the summary select helper.'
+);
+assert.match(
+  assignmentsApiSource,
+  /publishedAssignment[\s\S]*\.select\(buildPublishedAssignmentListItemSelect\(\)\)/,
+  'Assignment list API should reuse the publish-success select helper.'
+);
+assert.doesNotMatch(
+  assignmentListApiSource,
+  /matchingAssignments[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*status: assignment\.status|publishedAssignment[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
+  'Assignment list API should not hand-write summary or publish-success select fields.'
 );
 assert.match(
   assignmentsApiSource,

@@ -8,6 +8,22 @@ import { activity, assignment, assignmentSnapshot } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { and, desc, eq, or, type SQL } from 'drizzle-orm';
 
+export function buildAssignmentListSummarySelect() {
+  return {
+    expiresAt: assignment.expiresAt,
+    id: assignment.id,
+    status: assignment.status,
+  };
+}
+
+export function buildPublishedAssignmentListItemSelect() {
+  return {
+    id: assignment.id,
+    shareSlug: assignment.shareSlug,
+    title: assignment.title,
+  };
+}
+
 export function buildAssignmentListWhere({
   now = new Date(),
   search,

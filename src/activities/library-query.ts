@@ -19,6 +19,15 @@ type ActivityLibraryPagedItem = {
   updatedAt: Date;
 };
 
+export function buildCreatedActivityListItemSelect() {
+  return {
+    id: activity.id,
+    templateType: activity.templateType,
+    title: activity.title,
+    visibility: activity.visibility,
+  };
+}
+
 export function buildActivityLibraryWhere({
   search,
   status = 'active',

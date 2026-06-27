@@ -19,6 +19,7 @@ import {
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
 } from '@/activities/library-filters';
 import {
+  buildCreatedActivityListItemSelect,
   buildActivityLibraryWhere,
   filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
@@ -88,12 +89,7 @@ export const listActivities = createServerFn({ method: 'GET' })
     const total = matchingActivities.length;
     const [createdActivity] = data.createdActivityId
       ? await db
-          .select({
-            id: activity.id,
-            templateType: activity.templateType,
-            title: activity.title,
-            visibility: activity.visibility,
-          })
+          .select(buildCreatedActivityListItemSelect())
           .from(activity)
           .where(
             buildActivityDetailOwnerWhere({

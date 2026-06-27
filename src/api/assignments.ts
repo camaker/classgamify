@@ -40,7 +40,9 @@ import {
 } from '@/assignments/list-filters';
 import {
   buildAssignmentListOrderBy,
+  buildAssignmentListSummarySelect,
   buildAssignmentListWhere,
+  buildPublishedAssignmentListItemSelect,
   getAssignmentListOffset,
 } from '@/assignments/list-query';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
@@ -148,11 +150,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where);
     const matchingAssignments = await db
-      .select({
-        expiresAt: assignment.expiresAt,
-        id: assignment.id,
-        status: assignment.status,
-      })
+      .select(buildAssignmentListSummarySelect())
       .from(assignment)
       .innerJoin(activity, buildAssignmentActivityJoin())
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
@@ -166,11 +164,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .where(buildScoredAttemptWhere(where));
     const [publishedAssignment] = data.publishedShareSlug
       ? await db
-          .select({
-            id: assignment.id,
-            shareSlug: assignment.shareSlug,
-            title: assignment.title,
-          })
+          .select(buildPublishedAssignmentListItemSelect())
           .from(assignment)
           .where(
             buildAssignmentDetailOwnerShareWhere({
