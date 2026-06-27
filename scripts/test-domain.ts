@@ -11,6 +11,10 @@ import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
 import { formatUserFileUploadError } from '@/api/user-file-errors';
 import {
+  getUserFileListOffset,
+  USER_FILE_LIST_INPUT_LIMITS,
+} from '@/storage/file-query';
+import {
   ASSIGNMENT_CLASSROOM_BRIEF_LIMITS,
   buildAssignmentClassroomBrief,
   buildAssignmentClassroomBriefFocusItemView,
@@ -3288,10 +3292,18 @@ assert.doesNotMatch(
   'Settings files table should not hard-code visible empty-value placeholders.'
 );
 const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
+const userFileQuerySource = readFileSync('src/storage/file-query.ts', 'utf8');
+assert.deepEqual(USER_FILE_LIST_INPUT_LIMITS, {
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+});
+assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 25 }), 50);
+assert.equal(getUserFileListOffset({ pageIndex: -1, pageSize: 25 }), 0);
+assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 0 }), 2);
 assert.match(
-  userFilesApiSource,
+  userFileQuerySource,
   /USER_FILE_LIST_INPUT_LIMITS[\s\S]*pageSizeMax: 100[\s\S]*pageSizeMin: 1/,
-  'User file list pagination should expose named API input limits.'
+  'User file list pagination should expose named storage-domain input limits.'
 );
 assert.match(
   userFilesApiSource,
@@ -3302,6 +3314,31 @@ assert.doesNotMatch(
   userFilesApiSource,
   /pageSize: z\.number\(\)\.int\(\)\.min\(1\)\.max\(100\)/,
   'User file list APIs should not keep local page-size limits.'
+);
+assert.match(
+  userFilesApiSource,
+  /buildUserFileOwnerWhere\(\{ userId \}\)/,
+  'User file list APIs should delegate owner scoping to the storage query domain.'
+);
+assert.match(
+  userFilesApiSource,
+  /orderBy\(buildUserFileListOrderBy\(\)\)/,
+  'User file list APIs should delegate created-at ordering to the storage query domain.'
+);
+assert.match(
+  userFilesApiSource,
+  /getUserFileListOffset\(\{[\s\S]*pageIndex: data\.pageIndex,[\s\S]*pageSize: data\.pageSize/,
+  'User file list APIs should delegate offset calculation to the storage query domain.'
+);
+assert.doesNotMatch(
+  userFilesApiSource,
+  /desc\(userFiles\.createdAt\)|data\.pageIndex \* data\.pageSize|const pageIndex = data\.pageIndex|const pageSize = data\.pageSize/,
+  'User file list APIs should not keep local order or offset list rules.'
+);
+assert.match(
+  userFilesApiSource,
+  /deleteUserFile[\s\S]*eq\(userFiles\.id, data\.id\), eq\(userFiles\.userId, userId\)/,
+  'User file deletion should keep explicit owner scoping for destructive file operations.'
 );
 assert.doesNotMatch(
   userFilesApiSource,

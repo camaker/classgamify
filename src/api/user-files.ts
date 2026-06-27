@@ -4,18 +4,19 @@ import { getBaseUrl } from '@/lib/urls';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
+import {
+  buildUserFileListOrderBy,
+  buildUserFileOwnerWhere,
+  getUserFileListOffset,
+  USER_FILE_LIST_INPUT_LIMITS,
+} from '@/storage/file-query';
 import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { StorageError, UploadError } from '@/storage/types';
 import { isPublicFolder } from '@/storage/utils';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq } from 'drizzle-orm';
+import { and, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { formatUserFileUploadError } from './user-file-errors';
-
-export const USER_FILE_LIST_INPUT_LIMITS = {
-  pageSizeMax: 100,
-  pageSizeMin: 1,
-} as const;
 
 const listSchema = z.object({
   pageIndex: z.number().int().min(0),
@@ -31,10 +32,8 @@ export const listUserFiles = createServerFn({ method: 'GET' })
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const pageIndex = data.pageIndex;
-    const pageSize = data.pageSize;
     const db = getDb();
-    const where = eq(userFiles.userId, userId);
+    const where = buildUserFileOwnerWhere({ userId });
 
     const [totalRow] = await db
       .select({ count: count() })
@@ -46,9 +45,14 @@ export const listUserFiles = createServerFn({ method: 'GET' })
       .select()
       .from(userFiles)
       .where(where)
-      .orderBy(desc(userFiles.createdAt))
-      .limit(pageSize)
-      .offset(pageIndex * pageSize);
+      .orderBy(buildUserFileListOrderBy())
+      .limit(data.pageSize)
+      .offset(
+        getUserFileListOffset({
+          pageIndex: data.pageIndex,
+          pageSize: data.pageSize,
+        })
+      );
 
     const summaryItems = await db
       .select({
@@ -84,10 +88,15 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
         size: userFiles.size,
       })
       .from(userFiles)
-      .where(eq(userFiles.userId, userId))
-      .orderBy(desc(userFiles.createdAt))
+      .where(buildUserFileOwnerWhere({ userId }))
+      .orderBy(buildUserFileListOrderBy())
       .limit(data.pageSize)
-      .offset(data.pageIndex * data.pageSize);
+      .offset(
+        getUserFileListOffset({
+          pageIndex: data.pageIndex,
+          pageSize: data.pageSize,
+        })
+      );
   });
 
 const deleteSchema = z.object({ id: z.string() });
