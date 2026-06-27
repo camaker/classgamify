@@ -321,6 +321,7 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
+import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptStartedAt,
@@ -9050,6 +9051,10 @@ const assignmentPersistenceSource = readFileSync(
   'src/assignments/persistence.ts',
   'utf8'
 );
+const assignmentAttemptPersistenceSource = readFileSync(
+  'src/assignments/attempt-persistence.ts',
+  'utf8'
+);
 assert.match(
   assignmentSnapshotSource,
   /resolveAssignmentSnapshotSource[\s\S]*normalizeOptionalRuntimeDisplayText\([\s\S]*activityDescription[\s\S]*normalizeRuntimeDisplayText\(activityTitle\)/,
@@ -9111,10 +9116,66 @@ assert.deepEqual(
     updatedAt: assignmentSnapshotCreatedAt,
   }
 );
+const scoredAttemptEvaluation = {
+  answers: [
+    {
+      answer: 'Frozen answer',
+      correct: true,
+      itemId: 'item-1',
+    },
+    {
+      answer: 'Other answer',
+      correct: false,
+      itemId: 'item-2',
+    },
+  ],
+  result: {
+    accuracy: 50,
+    completedItemCount: 2,
+    correctItemCount: 1,
+    durationSeconds: 75,
+    earnedPoints: 1,
+    totalPoints: 2,
+  },
+};
+assert.deepEqual(
+  buildScoredAttemptInsert({
+    assignmentId: 'assignment-published-1',
+    completedAt: assignmentSnapshotCreatedAt,
+    evaluation: scoredAttemptEvaluation,
+    id: 'attempt-scored-1',
+    identity: {
+      anonymousToken: null,
+      studentName: 'Ada Lovelace',
+    },
+    startedAt: new Date('2026-01-15T12:28:45.000Z'),
+    templateType: 'quiz',
+  }),
+  {
+    anonymousToken: null,
+    answersJson: {
+      answers: scoredAttemptEvaluation.answers,
+      templateType: 'quiz',
+    },
+    assignmentId: 'assignment-published-1',
+    completedAt: assignmentSnapshotCreatedAt,
+    id: 'attempt-scored-1',
+    maxScore: 2,
+    resultJson: scoredAttemptEvaluation.result,
+    score: 1,
+    startedAt: new Date('2026-01-15T12:28:45.000Z'),
+    studentName: 'Ada Lovelace',
+  }
+);
 assert.match(
   assignmentPersistenceSource,
   /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*status: 'published'[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert[\s\S]*buildAssignmentStatusUpdateSet[\s\S]*status: nextStatus[\s\S]*updatedAt/,
   'Assignment persistence should own published assignment, snapshot insert, and status update payload shapes.'
+);
+assert.match(
+  assignmentAttemptPersistenceSource,
+  /buildScoredAttemptInsert[\s\S]*answersJson: \{[\s\S]*answers: evaluation\.answers[\s\S]*templateType[\s\S]*maxScore: evaluation\.result\.totalPoints[\s\S]*resultJson: evaluation\.result[\s\S]*score: evaluation\.result\.earnedPoints/,
+  'Attempt persistence should own scored attempt insert payload shapes.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
@@ -12737,6 +12798,16 @@ assert.match(
   assignmentsApiSource,
   /export const submitAttempt[\s\S]*canUseAnotherAssignmentAttempt\(\{[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*usedAttempts: previousAttemptCount/,
   'Submit attempt API should enforce attempt limits through the shared assignment-domain helper.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const submitAttempt[\s\S]*const evaluation = evaluateRuntimeAnswers\(\{[\s\S]*const startedAt = buildAttemptStartedAt\(\{[\s\S]*await db\.insert\(attempt\)\.values\([\s\S]*buildScoredAttemptInsert\(\{[\s\S]*assignmentId: row\.assignment\.id[\s\S]*evaluation,[\s\S]*identity: submissionIdentity[\s\S]*templateType/,
+  'Submit attempt API should persist scored attempts through the attempt persistence helper after scoring and duration normalization.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /db\.insert\(attempt\)\.values\(\{[\s\S]*answersJson:[\s\S]*resultJson:[\s\S]*score:/,
+  'Submit attempt API should not hand-write scored attempt insert payloads.'
 );
 assert.match(
   assignmentsApiSource,

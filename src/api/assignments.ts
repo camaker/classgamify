@@ -24,6 +24,7 @@ import {
   summarizeAssignmentAttemptsByAssignmentId,
   withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
+import { buildScoredAttemptInsert } from '@/assignments/attempt-persistence';
 import {
   buildAttemptStartedAt,
   normalizeAttemptDurationSeconds,
@@ -581,21 +582,17 @@ export const submitAttempt = createServerFn({ method: 'POST' })
     });
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
 
-    await db.insert(attempt).values({
-      answersJson: {
-        answers: evaluation.answers,
+    await db.insert(attempt).values(
+      buildScoredAttemptInsert({
+        assignmentId: row.assignment.id,
+        completedAt: now,
+        evaluation,
+        id,
+        identity: submissionIdentity,
+        startedAt,
         templateType,
-      },
-      assignmentId: row.assignment.id,
-      completedAt: now,
-      id,
-      maxScore: evaluation.result.totalPoints,
-      resultJson: evaluation.result,
-      score: evaluation.result.earnedPoints,
-      startedAt,
-      anonymousToken: submissionIdentity.anonymousToken,
-      studentName: submissionIdentity.studentName,
-    });
+      })
+    );
 
     return {
       attemptUsage: buildAssignmentAttemptUsage({
