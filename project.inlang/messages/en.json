@@ -1094,6 +1094,7 @@
   "changelog_title": "Changelog",
   "common_breadcrumb": "Breadcrumb",
   "common_cancel": "Cancel",
+  "common_empty_value": "-",
   "common_go_back": "Go back",
   "common_home": "Home",
   "common_loading": "Loading...",

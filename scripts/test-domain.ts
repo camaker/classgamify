@@ -2845,6 +2845,10 @@ const filesPageContentSource = readFileSync(
   'src/components/settings/files/files-page-content.tsx',
   'utf8'
 );
+const filesTableSource = readFileSync(
+  'src/components/settings/files/files-table.tsx',
+  'utf8'
+);
 assert.doesNotMatch(
   filesPageContentSource,
   /err\.message|error\.message|err instanceof Error|error instanceof Error/,
@@ -2854,6 +2858,21 @@ assert.match(
   filesPageContentSource,
   /toast\.error\(m\.settings_files_upload_error\(\)\)/,
   'Classroom material upload failures should show the localized upload failure message.'
+);
+assert.match(
+  filesTableSource,
+  /originalName \?\? m\.common_empty_value\(\)/,
+  'Settings files table should render missing original names through localized empty-value copy.'
+);
+assert.match(
+  filesTableSource,
+  /formatDate\(d\) : m\.common_empty_value\(\)/,
+  'Settings files table should render missing uploaded dates through localized empty-value copy.'
+);
+assert.doesNotMatch(
+  filesTableSource,
+  /['"]—['"]/,
+  'Settings files table should not hard-code visible empty-value placeholders.'
 );
 const userFilesApiSource = readFileSync('src/api/user-files.ts', 'utf8');
 assert.match(

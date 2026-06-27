@@ -174,7 +174,7 @@ export function FilesTable({
         header: m.settings_files_columns_original_name(),
         cell: ({ row }) => (
           <span className="font-medium">
-            {row.original.originalName ?? '—'}
+            {row.original.originalName ?? m.common_empty_value()}
           </span>
         ),
         minSize: 140,
@@ -227,7 +227,7 @@ export function FilesTable({
         header: m.settings_files_columns_created_at(),
         cell: ({ row }) => {
           const d = toDate(row.original.createdAt ?? null);
-          return d ? formatDate(d) : '—';
+          return d ? formatDate(d) : m.common_empty_value();
         },
         minSize: 110,
         size: 120,

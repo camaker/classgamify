@@ -1094,6 +1094,7 @@
   "changelog_title": "更新日志",
   "common_breadcrumb": "面包屑",
   "common_cancel": "取消",
+  "common_empty_value": "-",
   "common_go_back": "返回",
   "common_home": "首页",
   "common_loading": "加载中...",
