@@ -51,6 +51,7 @@ import {
   buildActivityAssignmentSourceSelect,
   buildActivityDetailOwnerWhere,
   buildActivityDetailSelect,
+  buildActivityLifecycleGateSelect,
 } from '@/activities/detail-query';
 import {
   buildCreatedActivityListItemSelect,
@@ -12214,10 +12215,11 @@ assert.doesNotMatch(
 );
 assert.equal(typeof buildActivityDetailSelect, 'function');
 assert.equal(typeof buildActivityAssignmentSourceSelect, 'function');
+assert.equal(typeof buildActivityLifecycleGateSelect, 'function');
 assert.equal(typeof buildActivityDetailOwnerWhere, 'function');
 assert.match(
   activityDetailQuerySource,
-  /buildActivityDetailSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*ownerId: activity\.ownerId[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityAssignmentSourceSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityDetailOwnerWhere[\s\S]*eq\(activity\.id, activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
+  /buildActivityDetailSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*ownerId: activity\.ownerId[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityAssignmentSourceSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityLifecycleGateSelect[\s\S]*id: activity\.id[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityDetailOwnerWhere[\s\S]*eq\(activity\.id, activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
   'Activity detail owner filters and source/detail select shapes should live in the activity detail query domain.'
 );
 assert.match(
@@ -12283,8 +12285,8 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /updateActivity[\s\S]*\.select\(buildActivityDetailSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: data\.id, userId \}\)/,
-  'Update activity API should load owner-scoped activity details through the activity detail query helpers.'
+  /updateActivity[\s\S]*\.select\(buildActivityLifecycleGateSelect\(\)\)[\s\S]*assertActivityCanEdit\(existingActivity\.visibility\)[\s\S]*\.select\(buildActivityDetailSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: data\.id, userId \}\)/,
+  'Update activity API should use lifecycle gate and detail query helpers for owner-scoped edit flows.'
 );
 assert.match(
   activitiesApiSource,
@@ -12300,6 +12302,11 @@ assert.doesNotMatch(
   activitiesApiSource,
   /and\(eq\(activity\.id, (?:data\.id|data\.activityId|activityId)\), eq\(activity\.ownerId, (?:userId|ownerId)\)\)|\.where\(eq\(activity\.id, id\)\)/,
   'Activity API should not keep local owner-scoped detail lookup rules.'
+);
+assert.doesNotMatch(
+  updateActivityApiSource,
+  /select\(\{[\s\S]*id: activity\.id[\s\S]*visibility: activity\.visibility[\s\S]*\}\)/,
+  'Update activity API should not hand-write lifecycle gate select fields.'
 );
 assert.doesNotMatch(
   [

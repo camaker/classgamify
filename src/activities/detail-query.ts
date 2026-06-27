@@ -26,6 +26,13 @@ export function buildActivityAssignmentSourceSelect() {
   };
 }
 
+export function buildActivityLifecycleGateSelect() {
+  return {
+    id: activity.id,
+    visibility: activity.visibility,
+  };
+}
+
 export function buildActivityDetailOwnerWhere({
   activityId,
   userId,

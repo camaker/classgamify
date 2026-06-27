@@ -13,6 +13,7 @@ import {
 import {
   buildActivityDetailOwnerWhere,
   buildActivityDetailSelect,
+  buildActivityLifecycleGateSelect,
 } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
 import {
@@ -294,10 +295,7 @@ export const updateActivity = createServerFn({ method: 'POST' })
     const { userId } = context;
     const db = getDb();
     const [existingActivity] = await db
-      .select({
-        id: activity.id,
-        visibility: activity.visibility,
-      })
+      .select(buildActivityLifecycleGateSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
