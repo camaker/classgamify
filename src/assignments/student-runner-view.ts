@@ -114,15 +114,30 @@ type SequentialStudentRunnerNavigationItemView =
   SequentialStudentRunnerItemView & {
     reviewStatusClassName: string | undefined;
     selected: boolean;
+    selectAction: SequentialStudentRunnerNavigationAction;
   };
 
 type SequentialStudentRunnerNavigationView = {
   activePanelStatusClassName: string | undefined;
   canMove: boolean;
   itemViews: SequentialStudentRunnerNavigationItemView[];
+  nextAction: SequentialStudentRunnerNavigationAction;
   nextItemId: string | undefined;
+  previousAction: SequentialStudentRunnerNavigationAction;
   previousItemId: string | undefined;
 };
+
+export type SequentialStudentRunnerNavigationAction =
+  | {
+      type: 'next';
+    }
+  | {
+      type: 'previous';
+    }
+  | {
+      itemId: string;
+      type: 'select';
+    };
 
 type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
@@ -340,6 +355,16 @@ export function buildSequentialStudentRunnerNavigationView({
   const itemIds = itemViews.map((itemView) => itemView.item.id);
   const normalizedActiveIndex = itemViews[activeIndex] ? activeIndex : 0;
   const activeItemView = itemViews[normalizedActiveIndex];
+  const nextItemId = getSequentialRunnerItemIdByOffset({
+    activeIndex,
+    itemIds,
+    offset: 1,
+  });
+  const previousItemId = getSequentialRunnerItemIdByOffset({
+    activeIndex,
+    itemIds,
+    offset: -1,
+  });
 
   return {
     activePanelStatusClassName:
@@ -353,18 +378,47 @@ export function buildSequentialStudentRunnerNavigationView({
         ? getStudentRunnerReviewStatusClassName(itemView.status)
         : undefined,
       selected: index === normalizedActiveIndex,
+      selectAction: buildSequentialStudentRunnerSelectAction(itemView.item.id),
     })),
-    nextItemId: getSequentialRunnerItemIdByOffset({
-      activeIndex,
-      itemIds,
-      offset: 1,
-    }),
-    previousItemId: getSequentialRunnerItemIdByOffset({
-      activeIndex,
-      itemIds,
-      offset: -1,
-    }),
+    nextAction: { type: 'next' },
+    nextItemId,
+    previousAction: { type: 'previous' },
+    previousItemId,
   };
+}
+
+export function getInitialSequentialStudentRunnerActiveItemId(
+  items: PublicRuntimeItem[]
+) {
+  return items[0]?.id;
+}
+
+export function resolveSequentialStudentRunnerNavigationAction({
+  action,
+  fallbackItemId,
+  navigationView,
+}: {
+  action: SequentialStudentRunnerNavigationAction;
+  fallbackItemId?: string;
+  navigationView: SequentialStudentRunnerNavigationView;
+}) {
+  const activeItemId =
+    navigationView.itemViews.find((itemView) => itemView.selected)?.item.id ??
+    fallbackItemId;
+
+  if (action.type === 'next') {
+    return navigationView.nextItemId ?? activeItemId;
+  }
+
+  if (action.type === 'previous') {
+    return navigationView.previousItemId ?? activeItemId;
+  }
+
+  return (
+    navigationView.itemViews.find(
+      (itemView) => itemView.item.id === action.itemId
+    )?.item.id ?? activeItemId
+  );
 }
 
 export function getSequentialRunnerItemIdByOffset({
@@ -400,6 +454,15 @@ export function formatSequentialRunnerItemLabel(label: string, index: number) {
     index: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
     label: normalizedLabel,
   });
+}
+
+function buildSequentialStudentRunnerSelectAction(
+  itemId: string
+): SequentialStudentRunnerNavigationAction {
+  return {
+    itemId,
+    type: 'select',
+  };
 }
 
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {

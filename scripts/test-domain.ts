@@ -359,10 +359,12 @@ import {
   buildStudentRunnerView,
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
+  getInitialSequentialStudentRunnerActiveItemId,
   getSequentialRunnerItemIdByOffset,
   getStudentRunnerReviewStatusClassName,
   getUniqueRuntimeChoices,
   isSameRuntimeChoice,
+  resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
   formatAssignmentDisplayText,
@@ -3106,10 +3108,25 @@ for (const filePath of [
     /navigationView/,
     `${filePath} should render sequence navigation state from the assignment-domain helper.`
   );
+  assert.match(
+    source,
+    /getInitialSequentialStudentRunnerActiveItemId/,
+    `${filePath} should initialize the active item through the assignment-domain helper.`
+  );
+  assert.match(
+    source,
+    /resolveSequentialStudentRunnerNavigationAction/,
+    `${filePath} should resolve sequence actions through the assignment-domain helper.`
+  );
   assert.doesNotMatch(
     source,
     /buildSequentialRunnerView|buildStudentRunnerView|getStudentRunnerReviewStatusClassName/,
     `${filePath} should not manually compose sequence views or review status classes.`
+  );
+  assert.doesNotMatch(
+    source,
+    /items\[0\]\?\.id|setActiveItemId\(item\.id\)|setActiveItemId\(navigationView\.(?:previousItemId|nextItemId)\)/,
+    `${filePath} should not hand-roll initial active-item or navigation state transitions.`
   );
 }
 const listeningRunnerSource = readFileSync(
@@ -3137,8 +3154,8 @@ const openBoxRunnerSource = readFileSync(
 );
 assert.match(
   openBoxRunnerSource,
-  /navigationView\.previousItemId[\s\S]*navigationView\.nextItemId/,
-  'Open-box runner should navigate active cards through the assignment-domain navigation view.'
+  /navigationView\.previousAction[\s\S]*navigationView\.nextAction/,
+  'Open-box runner should navigate active cards through assignment-domain navigation actions.'
 );
 assert.doesNotMatch(
   openBoxRunnerSource,
@@ -5881,7 +5898,13 @@ assert.deepEqual(sequentialStudentRunnerView.activeChoiceViews, [
 ]);
 assert.equal(sequentialStudentRunnerView.sequenceView.activeLabel, 'Track 1');
 assert.equal(sequentialStudentRunnerView.navigationView.canMove, true);
+assert.deepEqual(sequentialStudentRunnerView.navigationView.nextAction, {
+  type: 'next',
+});
 assert.equal(sequentialStudentRunnerView.navigationView.nextItemId, 'pair-1');
+assert.deepEqual(sequentialStudentRunnerView.navigationView.previousAction, {
+  type: 'previous',
+});
 assert.equal(
   sequentialStudentRunnerView.navigationView.previousItemId,
   'pair-1'
@@ -5890,14 +5913,93 @@ assert.equal(
   sequentialStudentRunnerView.navigationView.itemViews[0]?.selected,
   true
 );
+assert.deepEqual(
+  sequentialStudentRunnerView.navigationView.itemViews[0]?.selectAction,
+  {
+    itemId: 'q-1',
+    type: 'select',
+  }
+);
 assert.equal(
   sequentialStudentRunnerView.navigationView.itemViews[1]?.selected,
   false
+);
+assert.deepEqual(
+  sequentialStudentRunnerView.navigationView.itemViews[1]?.selectAction,
+  {
+    itemId: 'pair-1',
+    type: 'select',
+  }
 );
 assert.equal(
   sequentialStudentRunnerView.navigationView.itemViews[0]
     ?.reviewStatusClassName,
   undefined
+);
+assert.equal(
+  getInitialSequentialStudentRunnerActiveItemId([
+    {
+      id: 'first-track',
+      kind: 'question',
+      prompt: 'First track',
+    },
+  ]),
+  'first-track'
+);
+assert.equal(getInitialSequentialStudentRunnerActiveItemId([]), undefined);
+assert.equal(
+  resolveSequentialStudentRunnerNavigationAction({
+    action: sequentialStudentRunnerView.navigationView.nextAction,
+    fallbackItemId: 'q-1',
+    navigationView: sequentialStudentRunnerView.navigationView,
+  }),
+  'pair-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerNavigationAction({
+    action: sequentialStudentRunnerView.navigationView.previousAction,
+    fallbackItemId: 'q-1',
+    navigationView: sequentialStudentRunnerView.navigationView,
+  }),
+  'pair-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerNavigationAction({
+    action: {
+      itemId: 'pair-1',
+      type: 'select',
+    },
+    fallbackItemId: 'q-1',
+    navigationView: sequentialStudentRunnerView.navigationView,
+  }),
+  'pair-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerNavigationAction({
+    action: {
+      itemId: 'missing-item',
+      type: 'select',
+    },
+    fallbackItemId: 'fallback-track',
+    navigationView: sequentialStudentRunnerView.navigationView,
+  }),
+  'q-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerNavigationAction({
+    action: { type: 'next' },
+    fallbackItemId: 'fallback-track',
+    navigationView: {
+      activePanelStatusClassName: undefined,
+      canMove: false,
+      itemViews: [],
+      nextAction: { type: 'next' },
+      nextItemId: undefined,
+      previousAction: { type: 'previous' },
+      previousItemId: undefined,
+    },
+  }),
+  'fallback-track'
 );
 const revealedSequentialNavigationView =
   buildSequentialStudentRunnerNavigationView({
@@ -5949,10 +6051,20 @@ assert.deepEqual(
         ...sequentialStudentRunnerView.sequenceView.itemViews[0]!,
         reviewStatusClassName: undefined,
         selected: true,
+        selectAction: {
+          itemId: 'q-1',
+          type: 'select',
+        },
         status: 'idle',
       },
     ],
+    nextAction: {
+      type: 'next',
+    },
     nextItemId: 'q-1',
+    previousAction: {
+      type: 'previous',
+    },
     previousItemId: 'q-1',
   }
 );

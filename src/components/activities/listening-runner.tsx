@@ -3,7 +3,12 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildSequentialStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildSequentialStudentRunnerView,
+  getInitialSequentialStudentRunnerActiveItemId,
+  resolveSequentialStudentRunnerNavigationAction,
+  type SequentialStudentRunnerNavigationAction,
+} from '@/assignments/student-runner-view';
 import { buildListeningPromptView } from '@/activities/listening-speech';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -38,7 +43,9 @@ export function ListeningRunner({
   reviewItems,
 }: ListeningRunnerProps) {
   const copy = getActivityRunnerKindCopy('listening');
-  const [activeItemId, setActiveItemId] = useState(items[0]?.id);
+  const [activeItemId, setActiveItemId] = useState(() =>
+    getInitialSequentialStudentRunnerActiveItemId(items)
+  );
   const [speechSupported, setSpeechSupported] = useState(false);
   const runnerView = useMemo(
     () =>
@@ -63,6 +70,19 @@ export function ListeningRunner({
     ]
   );
   const { activeItem, navigationView, sequenceView } = runnerView;
+
+  function handleNavigationAction(
+    action: SequentialStudentRunnerNavigationAction
+  ) {
+    setActiveItemId(
+      resolveSequentialStudentRunnerNavigationAction({
+        action,
+        fallbackItemId: activeItemId,
+        navigationView,
+      })
+    );
+  }
+
   const activePromptView = useMemo(
     () =>
       activeItem
@@ -138,7 +158,7 @@ export function ListeningRunner({
                   selected && 'border-primary bg-primary/10',
                   reviewStatusClassName
                 )}
-                onClick={() => setActiveItemId(item.id)}
+                onClick={() => handleNavigationAction(itemView.selectAction)}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">{sequenceLabel}</span>

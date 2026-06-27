@@ -3,7 +3,12 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildSequentialStudentRunnerView } from '@/assignments/student-runner-view';
+import {
+  buildSequentialStudentRunnerView,
+  getInitialSequentialStudentRunnerActiveItemId,
+  resolveSequentialStudentRunnerNavigationAction,
+  type SequentialStudentRunnerNavigationAction,
+} from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +40,9 @@ export function OpenBoxRunner({
   reviewItems,
 }: OpenBoxRunnerProps) {
   const copy = getActivityRunnerKindCopy('open-box');
-  const [activeItemId, setActiveItemId] = useState(items[0]?.id);
+  const [activeItemId, setActiveItemId] = useState(() =>
+    getInitialSequentialStudentRunnerActiveItemId(items)
+  );
   const runnerView = useMemo(
     () =>
       buildSequentialStudentRunnerView({
@@ -59,6 +66,18 @@ export function OpenBoxRunner({
     ]
   );
   const { activeItem, navigationView, sequenceView } = runnerView;
+
+  function handleNavigationAction(
+    action: SequentialStudentRunnerNavigationAction
+  ) {
+    setActiveItemId(
+      resolveSequentialStudentRunnerNavigationAction({
+        action,
+        fallbackItemId: activeItemId,
+        navigationView,
+      })
+    );
+  }
 
   if (!activeItem) {
     return null;
@@ -97,7 +116,7 @@ export function OpenBoxRunner({
                   selected && 'border-primary bg-primary/10',
                   reviewStatusClassName
                 )}
-                onClick={() => setActiveItemId(item.id)}
+                onClick={() => handleNavigationAction(itemView.selectAction)}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">{sequenceLabel}</span>
@@ -128,7 +147,9 @@ export function OpenBoxRunner({
                 variant="outline"
                 size="icon"
                 disabled={!navigationView.canMove}
-                onClick={() => setActiveItemId(navigationView.previousItemId)}
+                onClick={() =>
+                  handleNavigationAction(navigationView.previousAction)
+                }
               >
                 <IconArrowLeft className="size-4" />
               </Button>
@@ -137,7 +158,9 @@ export function OpenBoxRunner({
                 variant="outline"
                 size="icon"
                 disabled={!navigationView.canMove}
-                onClick={() => setActiveItemId(navigationView.nextItemId)}
+                onClick={() =>
+                  handleNavigationAction(navigationView.nextAction)
+                }
               >
                 <IconArrowRight className="size-4" />
               </Button>
