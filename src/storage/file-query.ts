@@ -1,5 +1,5 @@
 import { userFiles } from '@/db/app.schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 export const USER_FILE_LIST_INPUT_LIMITS = {
   pageSizeMax: 100,
@@ -11,6 +11,16 @@ export const USER_FILE_MATERIAL_PICKER_PAGE_SIZE =
 
 export function buildUserFileOwnerWhere({ userId }: { userId: string }) {
   return eq(userFiles.userId, userId);
+}
+
+export function buildUserFileDetailOwnerWhere({
+  fileId,
+  userId,
+}: {
+  fileId: string;
+  userId: string;
+}) {
+  return and(eq(userFiles.id, fileId), eq(userFiles.userId, userId));
 }
 
 export function buildUserFileListOrderBy() {

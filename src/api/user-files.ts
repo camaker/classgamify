@@ -5,6 +5,7 @@ import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
 import {
+  buildUserFileDetailOwnerWhere,
   buildUserFileListOrderBy,
   buildUserFileOwnerWhere,
   getUserFileListOffset,
@@ -14,7 +15,7 @@ import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { StorageError, UploadError } from '@/storage/types';
 import { isPublicFolder } from '@/storage/utils';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, eq } from 'drizzle-orm';
+import { count } from 'drizzle-orm';
 import { z } from 'zod';
 import { formatUserFileUploadError } from './user-file-errors';
 
@@ -117,18 +118,18 @@ export const deleteUserFile = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const [row] = await db
-      .select()
-      .from(userFiles)
-      .where(and(eq(userFiles.id, data.id), eq(userFiles.userId, userId)))
-      .limit(1);
+    const where = buildUserFileDetailOwnerWhere({
+      fileId: data.id,
+      userId,
+    });
+    const [row] = await db.select().from(userFiles).where(where).limit(1);
 
     if (!row) {
       throw new Error(m.user_files_api_error_file_not_found());
     }
 
     await deleteFile(row.r2Key);
-    await db.delete(userFiles).where(eq(userFiles.id, data.id));
+    await db.delete(userFiles).where(where);
   });
 
 const uploadSchema = z

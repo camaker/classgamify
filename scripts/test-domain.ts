@@ -17,6 +17,7 @@ import {
   normalizeAdminUserSortId,
 } from '@/admin/users-query';
 import {
+  buildUserFileDetailOwnerWhere,
   getUserFileListOffset,
   USER_FILE_LIST_INPUT_LIMITS,
   USER_FILE_MATERIAL_PICKER_PAGE_SIZE,
@@ -3410,6 +3411,9 @@ assert.equal(USER_FILE_MATERIAL_PICKER_PAGE_SIZE, 100);
 assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 25 }), 50);
 assert.equal(getUserFileListOffset({ pageIndex: -1, pageSize: 25 }), 0);
 assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 0 }), 2);
+assert.ok(
+  buildUserFileDetailOwnerWhere({ fileId: 'file-1', userId: 'user-1' })
+);
 assert.match(
   userFileQuerySource,
   /USER_FILE_LIST_INPUT_LIMITS[\s\S]*pageSizeMax: 100[\s\S]*pageSizeMin: 1/,
@@ -3436,6 +3440,11 @@ assert.match(
   'User file list APIs should delegate owner scoping to the storage query domain.'
 );
 assert.match(
+  userFileQuerySource,
+  /buildUserFileDetailOwnerWhere[\s\S]*eq\(userFiles\.id, fileId\)[\s\S]*eq\(userFiles\.userId, userId\)/,
+  'User file detail owner scoping should live in the storage query domain.'
+);
+assert.match(
   userFilesApiSource,
   /orderBy\(buildUserFileListOrderBy\(\)\)/,
   'User file list APIs should delegate created-at ordering to the storage query domain.'
@@ -3452,8 +3461,8 @@ assert.doesNotMatch(
 );
 assert.match(
   userFilesApiSource,
-  /deleteUserFile[\s\S]*eq\(userFiles\.id, data\.id\), eq\(userFiles\.userId, userId\)/,
-  'User file deletion should keep explicit owner scoping for destructive file operations.'
+  /deleteUserFile[\s\S]*const where = buildUserFileDetailOwnerWhere\(\{[\s\S]*fileId: data\.id,[\s\S]*userId,[\s\S]*\.where\(where\)[\s\S]*delete\(userFiles\)\.where\(where\)/,
+  'User file deletion should reuse owner-scoped detail rules for destructive file operations.'
 );
 assert.doesNotMatch(
   userFilesApiSource,
