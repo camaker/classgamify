@@ -12,6 +12,10 @@ import {
   buildActivityContent,
   type CreateActivityInput,
 } from '@/activities/validation';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplayText,
+} from '@/activities/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
 export type ActivityDraftMeta = {
@@ -160,7 +164,9 @@ export function buildActivityDraftMetaSummaryView({
     meta.readyTemplateCount
   );
   const modelLabel = m.activity_draft_meta_model_label();
-  const modelName = model.trim() || m.activity_draft_meta_unknown_model();
+  const modelName =
+    normalizeRuntimeDisplayText(model) || m.activity_draft_meta_unknown_model();
+  const normalizedNotice = normalizeOptionalRuntimeDisplayText(notice);
   const noticeLabel = m.activity_draft_meta_notice_label();
 
   return {
@@ -193,16 +199,16 @@ export function buildActivityDraftMetaSummaryView({
       value: modelName,
     }),
     modelName,
-    notice,
+    notice: normalizedNotice,
     noticeLabel,
-    noticeLineText: notice
+    noticeLineText: normalizedNotice
       ? m.activity_draft_meta_notice_line({
           label: noticeLabel,
-          value: notice,
+          value: normalizedNotice,
         })
       : undefined,
     providerDescription: buildActivityDraftProviderDescription({
-      notice,
+      notice: normalizedNotice,
       provider,
     }),
     providerLabel:

@@ -52,6 +52,7 @@ import {
   formatTemplateRequirements,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
+import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
 
 export const ACTIVITY_EDITOR_READINESS_PANEL_LIMITS = {
   lockedOptions: 4,
@@ -344,7 +345,7 @@ export function buildActivityEditorDraftSuccessMessage({
 }: {
   notice?: string;
 }) {
-  return notice
+  return normalizeOptionalRuntimeDisplayText(notice)
     ? m.activity_form_toast_local_draft_generated()
     : m.activity_form_toast_ai_draft_generated();
 }
