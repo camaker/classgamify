@@ -12413,9 +12413,14 @@ assert.match(
   /export const publishAssignment[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
   'Publish assignment API should load the source activity through the shared activity detail owner query helper.'
 );
+assert.match(
+  assignmentsApiSource,
+  /export const publishAssignment[\s\S]*buildAssignmentDetailOwnerWhere\(\{ assignmentId: id, userId \}\)/,
+  'Publish assignment API should reload newly published assignments through the assignment detail owner query helper.'
+);
 assert.doesNotMatch(
   assignmentsApiSource,
-  /publishAssignment[\s\S]*eq\(activity\.id, data\.activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
+  /publishAssignment[\s\S]*eq\(activity\.id, data\.activityId\)[\s\S]*eq\(activity\.ownerId, userId\)|publishAssignment[\s\S]*\.where\(eq\(assignment\.id, id\)\)/,
   'Publish assignment API should not keep local activity owner lookup rules.'
 );
 assert.match(

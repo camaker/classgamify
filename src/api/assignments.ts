@@ -322,7 +322,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(eq(assignment.id, id))
+      .where(buildAssignmentDetailOwnerWhere({ assignmentId: id, userId }))
       .limit(1);
 
     if (!row) {
