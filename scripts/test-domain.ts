@@ -595,6 +595,7 @@ import {
   createStudentIdentityResolver,
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
+  normalizeAnonymousToken,
 } from '@/assignments/identity';
 import {
   ASSIGNMENT_SUBMISSION_ANSWER_LIMITS,
@@ -4356,10 +4357,22 @@ assert.equal(
   ),
   'replacement-token'
 );
+assert.equal(normalizeAnonymousToken('  ａｎｏｎ－１２３  '), 'anon-123');
 assert.deepEqual(
   resolveAttemptIdentityCountStrategy({
     anonymousToken: ' anonymous-token-1 ',
     studentName: '   ',
+  }),
+  {
+    identity: {
+      anonymousToken: 'anonymous-token-1',
+    },
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptIdentityCountStrategy({
+    anonymousToken: ' ａｎｏｎｙｍｏｕｓ－ｔｏｋｅｎ－１ ',
   }),
   {
     identity: {
@@ -4415,6 +4428,18 @@ assert.deepEqual(
 );
 assert.deepEqual(
   resolveAttemptSubmissionIdentity({
+    anonymousToken: ' ａｎｏｎｙｍｏｕｓ－ｔｏｋｅｎ－１ ',
+    collectStudentName: false,
+    studentName: 'Stale Name',
+  }),
+  {
+    anonymousToken: 'anonymous-token-1',
+    studentName: null,
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
     collectStudentName: true,
     studentName: '   ',
   }),
@@ -4453,7 +4478,10 @@ assert.equal(
   countMatchingStudentIdentityAttempts({
     attempts: [
       { anonymousToken: ' anonymous-token-1 ', studentName: null },
-      { anonymousToken: 'anonymous-token-1', studentName: null },
+      {
+        anonymousToken: 'ａｎｏｎｙｍｏｕｓ－ｔｏｋｅｎ－１',
+        studentName: null,
+      },
       { anonymousToken: 'anonymous-token-2', studentName: null },
     ],
     identity: {
