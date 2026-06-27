@@ -11,6 +11,7 @@ import {
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
+import { buildScoredAttemptWhere } from '@/assignments/attempt-query';
 import {
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
@@ -81,7 +82,7 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
+import { count, desc, eq, inArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -162,7 +163,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(and(where, isNotNull(attempt.resultJson)));
+      .where(buildScoredAttemptWhere(where));
     const [publishedAssignment] = data.publishedShareSlug
       ? await db
           .select({
@@ -212,9 +213,8 @@ export const listAssignments = createServerFn({ method: 'GET' })
             .from(attempt)
             .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
             .where(
-              and(
-                inArray(attempt.assignmentId, itemAssignmentIds),
-                isNotNull(attempt.resultJson)
+              buildScoredAttemptWhere(
+                inArray(attempt.assignmentId, itemAssignmentIds)
               )
             )
         : [];
@@ -433,10 +433,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
       .select()
       .from(attempt)
       .where(
-        and(
-          eq(attempt.assignmentId, row.assignment.id),
-          isNotNull(attempt.resultJson)
-        )
+        buildScoredAttemptWhere(eq(attempt.assignmentId, row.assignment.id))
       )
       .orderBy(desc(attempt.completedAt));
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
@@ -701,10 +698,9 @@ async function countPreviousIdentityAttempts({
       .select({ count: count() })
       .from(attempt)
       .where(
-        and(
+        buildScoredAttemptWhere(
           eq(attempt.assignmentId, assignmentId),
-          eq(attempt.anonymousToken, strategy.identity.anonymousToken),
-          isNotNull(attempt.resultJson)
+          eq(attempt.anonymousToken, strategy.identity.anonymousToken)
         )
       );
 
@@ -718,12 +714,7 @@ async function countPreviousIdentityAttempts({
         studentName: attempt.studentName,
       })
       .from(attempt)
-      .where(
-        and(
-          eq(attempt.assignmentId, assignmentId),
-          isNotNull(attempt.resultJson)
-        )
-      );
+      .where(buildScoredAttemptWhere(eq(attempt.assignmentId, assignmentId)));
 
     return countMatchingStudentIdentityAttempts({
       attempts: previousAttempts,

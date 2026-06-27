@@ -647,6 +647,7 @@ import {
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
+import { buildScoredAttemptWhere } from '@/assignments/attempt-query';
 import {
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
@@ -12355,12 +12356,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /const summaryAttempts = await db[\s\S]*\.where\(and\(where, isNotNull\(attempt\.resultJson\)\)\)/,
+  /const summaryAttempts = await db[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)/,
   'Assignment list summaries should only read completed attempts with scored results.'
 );
 assert.match(
   assignmentsApiSource,
-  /const itemAttempts =[\s\S]*\.where\(\s*and\(\s*inArray\(attempt\.assignmentId, itemAssignmentIds\),\s*isNotNull\(attempt\.resultJson\)\s*\)\s*\)/,
+  /const itemAttempts =[\s\S]*buildScoredAttemptWhere\([\s\S]*inArray\(attempt\.assignmentId, itemAssignmentIds\)/,
   'Assignment list card stats should only read completed attempts with scored results.'
 );
 const assignmentLifecycleQuerySource = readFileSync(
@@ -12653,7 +12654,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getAssignmentResults[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*analyzeAssignmentResults/,
+  /export const getAssignmentResults[\s\S]*buildScoredAttemptWhere\(eq\(attempt\.assignmentId, row\.assignment\.id\)\)[\s\S]*analyzeAssignmentResults/,
   'Assignment results API should only return completed attempts with scored results.'
 );
 assert.match(
@@ -12722,6 +12723,17 @@ assert.doesNotMatch(
   assignmentsApiSource,
   /publishedAssignment[\s\S]*eq\(assignment\.ownerId, userId\)[\s\S]*eq\(assignment\.shareSlug, data\.publishedShareSlug\)|updateAssignmentStatus[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
   'Assignment API should not keep local detail owner/share lookup rules.'
+);
+assert.equal(typeof buildScoredAttemptWhere, 'function');
+assert.match(
+  readFileSync('src/assignments/attempt-query.ts', 'utf8'),
+  /buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)/,
+  'Assignment scored-attempt SQL filtering should live in an assignment-domain query helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /isNotNull\(attempt\.resultJson\)/,
+  'Assignment API should not hand-write scored-attempt result filters.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
 assert.match(
@@ -12883,7 +12895,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
+  /async function countPreviousIdentityAttempts[\s\S]*buildScoredAttemptWhere\([\s\S]*eq\(attempt\.assignmentId, assignmentId\)/,
   'Assignment attempt limits should only count completed attempts with scored results.'
 );
 const useAssignmentsHookSource = readFileSync(
