@@ -7,12 +7,8 @@ import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
-import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
-import {
-  formatAcceptedAnswerAlternatives,
-  formatAssignmentResultCsvDate,
-  formatPrimaryAcceptedAnswer,
-} from '@/assignments/result-format';
+import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
+import { formatAssignmentResultCsvDate } from '@/assignments/result-format';
 import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
@@ -155,22 +151,24 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       return [[...baseColumns, '', '', '', '', '', '', '', '']];
     }
 
-    return attempt.answers.map((answer, index) => [
-      ...baseColumns,
-      index + 1,
-      answer.itemId,
-      answer.prompt,
-      formatAssignmentExportStudentAnswer(answer),
-      formatPrimaryAcceptedAnswer(answer.acceptedAnswers, {
-        emptyValue: '',
-      }),
-      formatAcceptedAnswerAlternatives(answer.acceptedAnswers, {
-        emptyValue: '',
-        includePrimary: false,
-      }),
-      formatAssignmentExportAnswerStatus(answer),
-      answer.explanation ?? '',
-    ]);
+    return attempt.answers.map((answer, index) => {
+      const answerView = buildAssignmentResultAttemptAnswerTextView(answer, {
+        acceptedAnswerEmptyValue: '',
+        studentAnswerEmptyValue: '',
+      });
+
+      return [
+        ...baseColumns,
+        index + 1,
+        answer.itemId,
+        answer.prompt,
+        answerView.exportStudentAnswerText,
+        answerView.expectedAnswerText,
+        answerView.acceptedAlternativesText,
+        answerView.exportStatusLabel,
+        answer.explanation ?? '',
+      ];
+    });
   });
 
   return rowsToCsv([getAssignmentResultsExportColumns(), ...rows]);
@@ -240,28 +238,6 @@ function formatAssignmentExportTemplateLabel(
   templateType: ActivityTemplateType
 ) {
   return getTemplateByType(templateType).name;
-}
-
-function formatAssignmentExportStudentAnswer(
-  answer: AssignmentResultsAnalysis['attempts'][number]['answers'][number]
-) {
-  if (!answer.submitted) {
-    return m.assignment_results_export_status_unanswered();
-  }
-
-  return answer.answer;
-}
-
-function formatAssignmentExportAnswerStatus(
-  answer: AssignmentResultsAnalysis['attempts'][number]['answers'][number]
-) {
-  if (!answer.submitted) {
-    return m.assignment_results_export_status_unanswered();
-  }
-
-  return isAssignmentAttemptAnswerNeedsReview(answer)
-    ? m.assignment_results_export_status_review()
-    : m.assignment_results_export_status_correct();
 }
 
 function formatAssignmentExportStatusLabel({

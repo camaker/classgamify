@@ -506,6 +506,11 @@ import {
   formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import {
+  buildAssignmentResultAcceptedAnswerView,
+  buildAssignmentResultAnswerStatusView,
+  buildAssignmentResultAttemptAnswerTextView,
+} from '@/assignments/result-answer-view';
+import {
   formatAssignmentSummaryAccuracy,
   formatAssignmentSummaryAttemptCount,
   formatAssignmentSummaryCorrectCount,
@@ -2037,6 +2042,10 @@ const assignmentResultFormatSource = readFileSync(
   'src/assignments/result-format.ts',
   'utf8'
 );
+const assignmentResultAnswerViewSource = readFileSync(
+  'src/assignments/result-answer-view.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -2318,9 +2327,19 @@ assert.doesNotMatch(
   'Assignment result CSV export should not override accepted-answer formatting with a hard-coded separator.'
 );
 assert.match(
+  assignmentResultAnswerViewSource,
+  /buildAssignmentResultAcceptedAnswerView[\s\S]*formatAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer/,
+  'Assignment result answer view should split primary expected answers from accepted alternatives.'
+);
+assert.match(
+  assignmentResultAnswerViewSource,
+  /buildAssignmentResultAttemptAnswerTextView[\s\S]*exportStatusLabel[\s\S]*exportStudentAnswerText/,
+  'Assignment result answer view should prepare both teacher-review and CSV answer text.'
+);
+assert.match(
   assignmentResultsExportSource,
-  /formatPrimaryAcceptedAnswer\(answer\.acceptedAnswers[\s\S]*formatAcceptedAnswerAlternatives\(answer\.acceptedAnswers,[\s\S]*includePrimary: false/,
-  'Assignment result CSV export should split primary expected answers from accepted alternatives.'
+  /buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
+  'Assignment result CSV export should consume the shared answer text view.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -2329,18 +2348,26 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /buildAssignmentItemAnalysisCardView[\s\S]*formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
-  'Assignment result item analysis cards should split primary expected answers from accepted alternatives.'
+  /buildAssignmentItemAnalysisCardView[\s\S]*buildAssignmentResultAcceptedAnswerView\(/
 );
 assert.match(
   assignmentResultViewSource,
-  /buildAssignmentItemPerformanceRowView[\s\S]*formatAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
-  'Assignment result item performance rows should split primary expected answers from accepted alternatives.'
+  /buildAssignmentItemPerformanceRowView[\s\S]*buildAssignmentResultAcceptedAnswerView\(/
 );
 assert.match(
   assignmentResultViewSource,
-  /buildAssignmentAttemptAnswerReviewView[\s\S]*formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(\s*answer\.acceptedAnswers/,
-  'Assignment result attempt review cards should split primary expected answers from accepted alternatives.'
+  /buildAssignmentAttemptAnswerReviewView[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer\)/,
+  'Assignment result views should consume the shared answer text view.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /formatAssignmentReviewStudentAnswer|formatPrimaryAcceptedAnswer|formatAcceptedAnswerAlternatives|formatOptionalAcceptedAnswerAlternatives/,
+  'Assignment result view should not rebuild accepted-answer or student-answer text locally.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /formatAssignmentExportStudentAnswer|formatAssignmentExportAnswerStatus|isAssignmentAttemptAnswerNeedsReview|formatPrimaryAcceptedAnswer|formatAcceptedAnswerAlternatives/,
+  'Assignment result CSV export should not rebuild answer status or accepted-answer text locally.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -19597,6 +19624,68 @@ assert.deepEqual(resultAnalysis.perItem[0]?.acceptedAnswers, [
   'Paris, France',
 ]);
 assert.deepEqual(
+  buildAssignmentResultAcceptedAnswerView(['Paris', 'Paris, France']),
+  {
+    acceptedAlternativesText: 'Paris, France',
+    expectedAnswerText: 'Paris',
+    optionalAcceptedAlternativesText: 'Paris, France',
+  }
+);
+assert.deepEqual(buildAssignmentResultAcceptedAnswerView(['Cold']), {
+  acceptedAlternativesText: '-',
+  expectedAnswerText: 'Cold',
+  optionalAcceptedAlternativesText: null,
+});
+assert.deepEqual(
+  buildAssignmentResultAnswerStatusView(
+    resultAnalysis.attempts[0]!.answers[0]!
+  ),
+  {
+    exportLabel: 'correct',
+    label: 'Correct',
+    tone: 'correct',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultAttemptAnswerTextView(
+    resultAnalysis.attempts[0]!.answers[0]!
+  ),
+  {
+    acceptedAlternativesText: 'Paris, France',
+    expectedAnswerText: 'Paris',
+    exportStatusLabel: 'correct',
+    exportStudentAnswerText: 'paris france',
+    optionalAcceptedAlternativesText: 'Paris, France',
+    statusLabel: 'Correct',
+    statusTone: 'correct',
+    studentAnswerText: 'paris france',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultAttemptAnswerTextView(
+    {
+      ...resultAnalysis.attempts[0]!.answers[1]!,
+      acceptedAnswers: ['Cold'],
+      answer: '',
+      submitted: false,
+    },
+    {
+      acceptedAnswerEmptyValue: '',
+      studentAnswerEmptyValue: '',
+    }
+  ),
+  {
+    acceptedAlternativesText: '',
+    expectedAnswerText: 'Cold',
+    exportStatusLabel: 'unanswered',
+    exportStudentAnswerText: 'unanswered',
+    optionalAcceptedAlternativesText: null,
+    statusLabel: 'Unanswered',
+    statusTone: 'idle',
+    studentAnswerText: 'Unanswered',
+  }
+);
+assert.deepEqual(
   buildAssignmentItemAnalysisCardView(resultAnalysis.perItem[0]!),
   {
     acceptedAnswersLabel: 'Accepted',
@@ -20623,6 +20712,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: true, submitted: true }),
   {
+    exportLabel: 'correct',
     label: 'Correct',
     tone: 'correct',
   }
@@ -20630,6 +20720,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: false, submitted: true }),
   {
+    exportLabel: 'review',
     label: 'Review',
     tone: 'review',
   }
@@ -20637,6 +20728,7 @@ assert.deepEqual(
 assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: false, submitted: false }),
   {
+    exportLabel: 'unanswered',
     label: 'Unanswered',
     tone: 'idle',
   }

@@ -1,6 +1,5 @@
 import type {
   AssignmentAttemptReview,
-  AssignmentAttemptReviewAnswerStatus,
   AssignmentResultsAnalysis,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
@@ -26,14 +25,16 @@ import {
 import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
 import { normalizeStudentName } from '@/assignments/identity';
 import {
-  formatAcceptedAnswerAlternatives,
   formatAssignmentResultNumber,
   formatAssignmentResultPercent,
   formatAssignmentResultValue,
   formatAssignmentResultDate,
-  formatOptionalAcceptedAnswerAlternatives,
-  formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
+import {
+  buildAssignmentResultAcceptedAnswerView,
+  buildAssignmentResultAnswerStatusView,
+  buildAssignmentResultAttemptAnswerTextView,
+} from '@/assignments/result-answer-view';
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryReviewCount,
@@ -1125,21 +1126,9 @@ function getAssignmentAttemptStudentLabel({
 }
 
 export function getAssignmentAnswerReviewStatus(
-  answer: AssignmentAttemptReviewAnswerStatus
+  answer: Parameters<typeof buildAssignmentResultAnswerStatusView>[0]
 ) {
-  if (!answer.submitted) {
-    return {
-      label: assignmentResultReviewCopy.unansweredAnswerText,
-      tone: 'idle',
-    } as const;
-  }
-
-  return {
-    label: answer.correct
-      ? assignmentResultReviewCopy.correctAnswerLabel
-      : assignmentResultReviewCopy.reviewAnswerLabel,
-    tone: answer.correct ? 'correct' : 'review',
-  } as const;
+  return buildAssignmentResultAnswerStatusView(answer);
 }
 
 export function formatAssignmentAttemptReviewBadge({
@@ -1205,25 +1194,21 @@ export function buildAssignmentStudentSummaryRowViews(
 export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
 ) {
-  const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
-    item.acceptedAnswers,
-    {
-      includePrimary: false,
-    }
+  const answerView = buildAssignmentResultAcceptedAnswerView(
+    item.acceptedAnswers
   );
   const correctSummaryLabel = formatAssignmentItemCorrectSummary(item);
   const expectedAnswerLabel = assignmentResultReviewCopy.itemAnswerLabel;
-  const expectedAnswerText = formatPrimaryAcceptedAnswer(item.acceptedAnswers);
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedLabel,
-    acceptedAnswersLineText: acceptedAnswersText
+    acceptedAnswersLineText: answerView.optionalAcceptedAlternativesText
       ? m.assignment_result_review_accepted_answers_line({
           label: assignmentResultReviewCopy.acceptedLabel,
-          value: acceptedAnswersText,
+          value: answerView.optionalAcceptedAlternativesText,
         })
       : null,
-    acceptedAnswersText,
+    acceptedAnswersText: answerView.optionalAcceptedAlternativesText,
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
     correctRateProgressValue: clampProgressValue(item.correctRate),
     correctSummaryLabel,
@@ -1231,9 +1216,9 @@ export function buildAssignmentItemAnalysisCardView(
     expectedAnswerSummaryText: m.assignment_result_review_expected_summary({
       label: expectedAnswerLabel,
       summary: correctSummaryLabel,
-      value: expectedAnswerText,
+      value: answerView.expectedAnswerText,
     }),
-    expectedAnswerText,
+    expectedAnswerText: answerView.expectedAnswerText,
     explanationText: item.explanation || null,
     kindLabel: item.kindLabel,
     prompt: item.prompt,
@@ -1257,16 +1242,14 @@ export function buildAssignmentItemPerformanceRowView({
   item: AssignmentItemAnalysis;
 }) {
   const itemNumberLabel = formatAssignmentResultItemNumberLabel(index);
+  const answerView = buildAssignmentResultAcceptedAnswerView(
+    item.acceptedAnswers
+  );
 
   return {
-    acceptedAnswersText: formatAcceptedAnswerAlternatives(
-      item.acceptedAnswers,
-      {
-        includePrimary: false,
-      }
-    ),
+    acceptedAnswersText: answerView.acceptedAlternativesText,
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
-    expectedAnswerText: formatPrimaryAcceptedAnswer(item.acceptedAnswers),
+    expectedAnswerText: answerView.expectedAnswerText,
     explanationText: formatAssignmentResultValue(item.explanation),
     itemNumberLabel,
     kindLabel: item.kindLabel,
@@ -1298,46 +1281,36 @@ export function buildAssignmentAttemptAnswerReviewView({
   answer: AssignmentAttemptReview['answers'][number];
   index: number;
 }) {
-  const status = getAssignmentAnswerReviewStatus(answer);
-  const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
-    answer.acceptedAnswers,
-    {
-      includePrimary: false,
-    }
-  );
-  const expectedAnswerText = formatPrimaryAcceptedAnswer(
-    answer.acceptedAnswers
-  );
-  const studentAnswerText = formatAssignmentReviewStudentAnswer(answer);
+  const answerView = buildAssignmentResultAttemptAnswerTextView(answer);
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedAnswersLabel,
-    acceptedAnswersLineText: acceptedAnswersText
+    acceptedAnswersLineText: answerView.optionalAcceptedAlternativesText
       ? m.assignment_result_review_accepted_answers_line({
           label: assignmentResultReviewCopy.acceptedAnswersLabel,
-          value: acceptedAnswersText,
+          value: answerView.optionalAcceptedAlternativesText,
         })
       : null,
-    acceptedAnswersText,
+    acceptedAnswersText: answerView.optionalAcceptedAlternativesText,
     expectedAnswerLabel: assignmentResultReviewCopy.expectedAnswerLabel,
     expectedAnswerLineText: m.assignment_result_review_expected_line({
       label: assignmentResultReviewCopy.expectedAnswerLabel,
-      value: expectedAnswerText,
+      value: answerView.expectedAnswerText,
     }),
-    expectedAnswerText,
+    expectedAnswerText: answerView.expectedAnswerText,
     explanationText: answer.explanation || null,
     promptLabel: formatAssignmentResultPromptLabel({
       index,
       prompt: answer.prompt,
     }),
-    statusLabel: status.label,
-    statusTone: status.tone,
+    statusLabel: answerView.statusLabel,
+    statusTone: answerView.statusTone,
     studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
     studentAnswerLineText: m.assignment_result_review_student_answer_line({
       label: assignmentResultReviewCopy.studentAnswerLabel,
-      value: studentAnswerText,
+      value: answerView.studentAnswerText,
     }),
-    studentAnswerText,
+    studentAnswerText: answerView.studentAnswerText,
   };
 }
 
@@ -1348,16 +1321,6 @@ export function buildAssignmentAttemptAnswerReviewViews(
     id: answer.itemId,
     ...buildAssignmentAttemptAnswerReviewView({ answer, index }),
   }));
-}
-
-function formatAssignmentReviewStudentAnswer(
-  answer: AssignmentAttemptReview['answers'][number]
-) {
-  if (!answer.submitted) {
-    return assignmentResultReviewCopy.unansweredAnswerText;
-  }
-
-  return formatAssignmentResultValue(answer.answer);
 }
 
 export function formatAssignmentItemCorrectSummary({
