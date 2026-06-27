@@ -276,6 +276,7 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   });
 
   return {
+    answerAreaLabel: m.assignment_printable_answer_area_label(),
     answerLines: getPrintableWorksheetAnswerLines(item),
     choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
@@ -331,6 +332,10 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
       indexLabel: formatPrintableWorksheetChoiceIndex(index),
       key: `${item.id}-choice-${index}`,
     })),
+    label:
+      choices.length > 0
+        ? getPrintableWorksheetChoiceBankLabel(item.choicePresentation)
+        : null,
     presentation: item.choicePresentation,
     showIndexLabels: item.choicePresentation !== 'group-bank',
   };
@@ -384,8 +389,28 @@ function getPrintableWorksheetResponseHelp(
   }
 }
 
+function getPrintableWorksheetChoiceBankLabel(
+  presentation: PrintableWorksheetItem['choicePresentation']
+) {
+  switch (presentation) {
+    case 'answer-bank':
+      return m.assignment_printable_choice_bank_answer_label();
+    case 'choice-list':
+      return m.assignment_printable_choice_bank_choice_label();
+    case 'group-bank':
+      return m.assignment_printable_choice_bank_group_label();
+    case 'none':
+      return null;
+  }
+}
+
 function formatPrintableWorksheetChoiceIndex(index: number) {
-  return index >= 0 && index < 26
-    ? String.fromCharCode(65 + index)
-    : `${index + 1}`;
+  const normalizedIndex =
+    index >= 0 && index < 26
+      ? String.fromCharCode(65 + index)
+      : `${normalizeRuntimeDisplayCount(index + 1, { min: 1 })}`;
+
+  return m.assignment_printable_choice_index_label({
+    index: normalizedIndex,
+  });
 }

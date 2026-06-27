@@ -57,36 +57,46 @@ function PrintableWorksheetItem({
         </Badge>
       </div>
       {itemView.choiceBank.choices.length > 0 ? (
-        <div
-          data-print-choice-bank={itemView.choiceBank.presentation}
-          className={cn(
-            'mt-4 grid gap-2',
-            itemView.choiceBank.presentation === 'group-bank'
-              ? 'sm:grid-cols-3'
-              : 'sm:grid-cols-2'
-          )}
-        >
-          {itemView.choiceBank.choices.map(({ choice, indexLabel, key }) => (
-            <div
-              key={key}
-              className={cn(
-                'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
-                itemView.choiceBank.presentation === 'group-bank'
-                  ? 'justify-center bg-background font-medium'
-                  : 'bg-muted/20'
-              )}
-            >
-              {itemView.choiceBank.showIndexLabels ? (
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
-                  {indexLabel}
-                </span>
-              ) : null}
-              <span>{choice}</span>
-            </div>
-          ))}
+        <div className="mt-4 grid gap-2">
+          {itemView.choiceBank.label ? (
+            <p className="font-medium text-muted-foreground text-xs">
+              {itemView.choiceBank.label}
+            </p>
+          ) : null}
+          <div
+            data-print-choice-bank={itemView.choiceBank.presentation}
+            className={cn(
+              'grid gap-2',
+              itemView.choiceBank.presentation === 'group-bank'
+                ? 'sm:grid-cols-3'
+                : 'sm:grid-cols-2'
+            )}
+          >
+            {itemView.choiceBank.choices.map(({ choice, indexLabel, key }) => (
+              <div
+                key={key}
+                className={cn(
+                  'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
+                  itemView.choiceBank.presentation === 'group-bank'
+                    ? 'justify-center bg-background font-medium'
+                    : 'bg-muted/20'
+                )}
+              >
+                {itemView.choiceBank.showIndexLabels ? (
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
+                    {indexLabel}
+                  </span>
+                ) : null}
+                <span>{choice}</span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
       <div className="mt-4 grid gap-3">
+        <p className="font-medium text-muted-foreground text-xs">
+          {itemView.answerAreaLabel}
+        </p>
         {itemView.answerLines.map((line) => (
           <div key={line.key} className="h-8 border-b" />
         ))}

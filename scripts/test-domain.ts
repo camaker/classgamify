@@ -7860,6 +7860,8 @@ const printableSnapshotItemView = buildPrintableWorksheetItemView(
 );
 assert.equal(printableSnapshotItemView.id, 'q-frozen-prompt');
 assert.equal(printableSnapshotItemView.headingLabel, 'Item 1 · Question');
+assert.equal(printableSnapshotItemView.answerAreaLabel, 'Answer');
+assert.equal(printableSnapshotItemView.choiceBank.label, 'Choices');
 assert.deepEqual(printableSnapshotItemView.answerLines, [
   { key: 'q-frozen-prompt-answer-line-0' },
 ]);
@@ -7892,6 +7894,8 @@ const messyPrintableItemView = buildPrintableWorksheetItemView({
 });
 assert.equal(messyPrintableItemView.headingLabel, 'Item 1 · Question');
 assert.equal(messyPrintableItemView.sequenceLabel, 'Item 1');
+assert.equal(messyPrintableItemView.answerAreaLabel, 'Answer');
+assert.equal(messyPrintableItemView.choiceBank.label, 'Choices');
 assert.deepEqual(messyPrintableItemView.answerLines, [
   { key: 'messy-print-item-answer-line-0' },
 ]);
@@ -7908,6 +7912,76 @@ assert.deepEqual(messyPrintableItemView.choiceBank.choices, [
     key: 'messy-print-item-choice-1',
   },
 ]);
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    choices: ['left', 'right'],
+    id: 'printable-answer-bank',
+    kind: 'pair',
+    prompt: 'Match it.',
+    responseMode: 'line-match',
+    sequenceNumber: 2,
+  }).choiceBank.label,
+  'Answer bank'
+);
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 1,
+    choicePresentation: 'group-bank',
+    choices: ['Animals', 'Food'],
+    id: 'printable-group-bank',
+    kind: 'group-item',
+    prompt: 'Classify it.',
+    responseMode: 'group-choice',
+    sequenceNumber: 3,
+  }).choiceBank.label,
+  'Groups'
+);
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 1,
+    choicePresentation: 'none',
+    choices: [],
+    id: 'printable-no-bank',
+    kind: 'question',
+    prompt: 'Write it.',
+    responseMode: 'short-answer',
+    sequenceNumber: 4,
+  }).choiceBank.label,
+  null
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhPrintableItemView = buildPrintableWorksheetItemView({
+    answerSpaceLines: 2,
+    choicePresentation: 'choice-list',
+    choices: ['苹果', '香蕉'],
+    id: 'zh-printable-item',
+    kind: 'question',
+    prompt: '选择水果。',
+    responseMode: 'choice',
+    sequenceNumber: 2,
+  });
+
+  assert.equal(zhPrintableItemView.headingLabel, '第 2 题 · 题目');
+  assert.equal(zhPrintableItemView.answerAreaLabel, '作答区');
+  assert.equal(zhPrintableItemView.choiceBank.label, '选项');
+  assert.deepEqual(zhPrintableItemView.choiceBank.choices, [
+    {
+      choice: '苹果',
+      indexLabel: 'A',
+      key: 'zh-printable-item-choice-0',
+    },
+    {
+      choice: '香蕉',
+      indexLabel: 'B',
+      key: 'zh-printable-item-choice-1',
+    },
+  ]);
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
   {
     activity: {
@@ -10684,6 +10758,16 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /answerAreaLabel: m\.assignment_printable_answer_area_label\(\)/,
+  'Printable worksheet item views should localize answer-area labels in the view layer.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /label:[\s\S]*getPrintableWorksheetChoiceBankLabel\(item\.choicePresentation\)/,
+  'Printable worksheet choice-bank views should own localized choice-bank section labels.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /showIndexLabels: item\.choicePresentation !== 'group-bank'/,
   'Printable worksheet view should hide lettered choice labels for classification group banks.'
 );
@@ -10691,6 +10775,16 @@ assert.match(
   printableWorksheetViewSource,
   /key: `\$\{item\.id\}-choice-\$\{index\}`/,
   'Printable worksheet choice-bank views should expose stable per-choice keys.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function getPrintableWorksheetChoiceBankLabel[\s\S]*assignment_printable_choice_bank_answer_label[\s\S]*assignment_printable_choice_bank_choice_label[\s\S]*assignment_printable_choice_bank_group_label/,
+  'Printable worksheet choice-bank labels should come from localized messages for answer, choice, and group banks.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function formatPrintableWorksheetChoiceIndex[\s\S]*m\.assignment_printable_choice_index_label/,
+  'Printable worksheet choice indices should be formatted through localized messages.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -10879,6 +10973,21 @@ assert.match(
   printableWorksheetItemListSource,
   /itemView\.headingLabel/,
   'Printable worksheet item list component should render the prepared printable item heading.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /itemView\.choiceBank\.label[\s\S]*itemView\.choiceBank\.label/,
+  'Printable worksheet item list should render prepared choice-bank labels from the item view.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /itemView\.answerAreaLabel/,
+  'Printable worksheet item list should render the prepared answer-area label from the item view.'
+);
+assert.doesNotMatch(
+  printableWorksheetItemListSource,
+  /Choices|Answer bank|Groups|Answer|选项|答案库|分类|作答区/,
+  'Printable worksheet item list should not hard-code visible answer or choice-bank labels.'
 );
 assert.match(
   printableWorksheetToolbarSource,
