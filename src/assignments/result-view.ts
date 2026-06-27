@@ -632,74 +632,56 @@ export const assignmentResultActionDescriptors = [
 export const assignmentResultActionOrder =
   assignmentResultActionDescriptors.map((descriptor) => descriptor.action);
 
-export const studentSummarySortOptions = [
-  {
-    get label() {
-      return m.assignment_result_sort_needs_review();
-    },
-    value: DEFAULT_STUDENT_SUMMARY_SORT,
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_best_score();
-    },
-    value: STUDENT_SUMMARY_SORT_VALUES[1],
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_student_name();
-    },
-    value: STUDENT_SUMMARY_SORT_VALUES[2],
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_attempts();
-    },
-    value: STUDENT_SUMMARY_SORT_VALUES[3],
-  },
-] satisfies Array<AssignmentResultControlOption<StudentSummarySort>>;
+export const studentSummarySortOptions = buildAssignmentResultControlOptions(
+  STUDENT_SUMMARY_SORT_VALUES,
+  getStudentSummarySortOptionLabel
+);
 
-export const itemPerformanceSortOptions = [
-  {
-    get label() {
-      return m.assignment_result_sort_snapshot_order();
-    },
-    value: DEFAULT_ITEM_PERFORMANCE_SORT,
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_lowest_accuracy();
-    },
-    value: ITEM_PERFORMANCE_SORT_VALUES[1],
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_most_answered();
-    },
-    value: ITEM_PERFORMANCE_SORT_VALUES[2],
-  },
-  {
-    get label() {
-      return m.assignment_result_sort_item_type();
-    },
-    value: ITEM_PERFORMANCE_SORT_VALUES[3],
-  },
-] satisfies Array<AssignmentResultControlOption<ItemPerformanceSort>>;
+export const itemPerformanceSortOptions = buildAssignmentResultControlOptions(
+  ITEM_PERFORMANCE_SORT_VALUES,
+  getItemPerformanceSortOptionLabel
+);
 
-export const attemptReviewFilterOptions = [
-  {
+export const attemptReviewFilterOptions = buildAssignmentResultControlOptions(
+  ATTEMPT_REVIEW_FILTER_VALUES,
+  getAttemptReviewFilterOptionLabel
+);
+
+function buildAssignmentResultControlOptions<TValue extends string>(
+  values: readonly TValue[],
+  getLabel: (value: TValue) => string
+): Array<AssignmentResultControlOption<TValue>> {
+  return values.map((value) => ({
     get label() {
-      return m.assignment_result_filter_all_answers();
+      return getLabel(value);
     },
-    value: DEFAULT_ATTEMPT_REVIEW_FILTER,
-  },
-  {
-    get label() {
-      return m.assignment_result_filter_needs_review_only();
-    },
-    value: ATTEMPT_REVIEW_FILTER_VALUES[1],
-  },
-] satisfies Array<AssignmentResultControlOption<AttemptReviewFilter>>;
+    value,
+  }));
+}
+
+function getStudentSummarySortOptionLabel(value: StudentSummarySort) {
+  if (value === 'best') return m.assignment_result_sort_best_score();
+  if (value === 'name') return m.assignment_result_sort_student_name();
+  if (value === 'attempts') return m.assignment_result_sort_attempts();
+
+  return m.assignment_result_sort_needs_review();
+}
+
+function getItemPerformanceSortOptionLabel(value: ItemPerformanceSort) {
+  if (value === 'accuracy') return m.assignment_result_sort_lowest_accuracy();
+  if (value === 'submitted') return m.assignment_result_sort_most_answered();
+  if (value === 'type') return m.assignment_result_sort_item_type();
+
+  return m.assignment_result_sort_snapshot_order();
+}
+
+function getAttemptReviewFilterOptionLabel(value: AttemptReviewFilter) {
+  if (value === 'needs-review') {
+    return m.assignment_result_filter_needs_review_only();
+  }
+
+  return m.assignment_result_filter_all_answers();
+}
 
 export function buildAssignmentResultMetricItems({
   averageDurationSeconds,

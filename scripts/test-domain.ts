@@ -1251,6 +1251,16 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /buildAssignmentResultControlOptions\([\s\S]*values\.map\(\(value\)/,
+  'Assignment result control options should map directly from the domain enum values.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /(?:STUDENT_SUMMARY_SORT_VALUES|ITEM_PERFORMANCE_SORT_VALUES|ATTEMPT_REVIEW_FILTER_VALUES)\[\d+\]/,
+  'Assignment result control options should not bind labels to enum values by array index.'
+);
+assert.match(
+  assignmentResultViewSource,
   /buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
   'Assignment result action plans should use the result-export CSV data URL helper.'
 );
@@ -20344,12 +20354,37 @@ assert.deepEqual(
   ['needs-review', 'best', 'name', 'attempts']
 );
 assert.deepEqual(
+  studentSummarySortOptions.map((option) => [option.value, option.label]),
+  [
+    ['needs-review', 'Needs review'],
+    ['best', 'Best score'],
+    ['name', 'Student name'],
+    ['attempts', 'Attempts'],
+  ]
+);
+assert.deepEqual(
   itemPerformanceSortOptions.map((option) => option.value),
   ['original', 'accuracy', 'submitted', 'type']
 );
 assert.deepEqual(
+  itemPerformanceSortOptions.map((option) => [option.value, option.label]),
+  [
+    ['original', 'Snapshot order'],
+    ['accuracy', 'Lowest accuracy'],
+    ['submitted', 'Most answered'],
+    ['type', 'Item type'],
+  ]
+);
+assert.deepEqual(
   attemptReviewFilterOptions.map((option) => option.value),
   ['all', 'needs-review']
+);
+assert.deepEqual(
+  attemptReviewFilterOptions.map((option) => [option.value, option.label]),
+  [
+    ['all', 'All answers'],
+    ['needs-review', 'Needs review only'],
+  ]
 );
 assert.equal(
   assignmentResultPageCopy.description,
