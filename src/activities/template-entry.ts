@@ -34,9 +34,10 @@ export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
 export function buildWorksheetHeroActions(
   modes: readonly WorksheetModeDefinition[]
 ) {
-  return WORKSHEET_MODE_TEMPLATES.map((template) =>
-    buildWorksheetHeroAction(modes, template)
-  );
+  return WORKSHEET_MODE_TEMPLATES.map((template, index) => ({
+    ...buildWorksheetHeroAction(modes, template),
+    isPrimary: index === 0,
+  }));
 }
 
 function buildWorksheetHeroAction(

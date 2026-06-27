@@ -110,6 +110,7 @@
   "activity_draft_meta_ready_template_label_many": "{count} 个模板可用",
   "activity_draft_meta_ready_template_label_one": "{count} 个模板可用",
   "activity_draft_meta_selected_label": "当前选择",
+  "activity_draft_meta_template_list_separator": "、",
   "activity_draft_meta_title": "AI 草稿覆盖情况",
   "activity_draft_meta_unknown_model": "未知模型",
   "activity_draft_source_materials_heading": "已附加课堂来源素材：",

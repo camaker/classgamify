@@ -129,20 +129,13 @@ export function buildWorksheetsPageViewModel({
 }: {
   worksheetModeDefinitions?: WorksheetModeDefinition[];
 } = {}): WorksheetsPageViewModel {
-  const heroActions = buildWorksheetHeroActions(worksheetModeDefinitions).map(
-    (action, index) => ({
-      ...action,
-      isPrimary: index === 0,
-    })
-  );
-
   return {
     hero: {
       badgeLabel: m.worksheets_page_eyebrow(),
       description: m.worksheets_page_description(),
       title: m.worksheets_page_title(),
     },
-    heroActions,
+    heroActions: buildWorksheetHeroActions(worksheetModeDefinitions),
     modeCards: worksheetModeDefinitions.map((mode) => ({
       action: buildWorksheetModeEntryAction(mode),
       description: mode.description,

@@ -295,7 +295,7 @@ function buildDraftReviewChecklist({
   if (suggestedTemplates.length > 0) {
     checklist.push(
       m.activity_draft_meta_checklist_ready_to_remix({
-        templates: suggestedTemplates.join(', '),
+        templates: formatActivityDraftTemplateList(suggestedTemplates),
       })
     );
 
@@ -328,4 +328,8 @@ function buildQuestionReviewChecklistItem(content: ActivityContent) {
   }
 
   return m.activity_draft_meta_checklist_check_explanations();
+}
+
+function formatActivityDraftTemplateList(templates: string[]) {
+  return templates.join(m.activity_draft_meta_template_list_separator());
 }

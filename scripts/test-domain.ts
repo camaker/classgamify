@@ -1614,6 +1614,20 @@ assert.match(
   /summaryView\.modelLineText[\s\S]*summaryView\.noticeLineText/,
   'AI draft summary component should render prepared model and notice text lines.'
 );
+const activityDraftMetaSource = readFileSync(
+  'src/activities/draft-meta.ts',
+  'utf8'
+);
+assert.match(
+  activityDraftMetaSource,
+  /formatActivityDraftTemplateList[\s\S]*activity_draft_meta_template_list_separator/,
+  'AI draft meta should format suggested template lists through localized separators.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSource,
+  /suggestedTemplates\.join\(', '\)/,
+  'AI draft meta should not hard-code English separators in teacher-visible checklist copy.'
+);
 assert.match(
   activityTemplateReadinessPanelSource,
   /ActivityTemplateReadinessPanelSummary/,
@@ -11920,21 +11934,25 @@ assert.deepEqual(
 );
 assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   {
+    isPrimary: true,
     label: 'Create fill blanks',
     search: { template: 'fill-blank' },
     template: 'fill-blank',
   },
   {
+    isPrimary: false,
     label: 'Start line match',
     search: { template: 'line-match' },
     template: 'line-match',
   },
   {
+    isPrimary: false,
     label: 'Create listening',
     search: { template: 'listening' },
     template: 'listening',
   },
   {
+    isPrimary: false,
     label: 'Create sort',
     search: { template: 'group-sort' },
     template: 'group-sort',
@@ -11947,6 +11965,7 @@ assert.deepEqual(
     )
   )[1],
   {
+    isPrimary: false,
     label: 'Create Lines',
     search: { template: 'line-match' },
     template: 'line-match',
@@ -12030,6 +12049,7 @@ try {
       )
     )[1],
     {
+      isPrimary: false,
       label: '创建连线',
       search: { template: 'line-match' },
       template: 'line-match',
@@ -16448,8 +16468,12 @@ assert.equal(
 );
 try {
   overwriteGetLocale(() => 'zh');
+  const zhFallbackDraftMeta = buildActivityDraftMeta({
+    activity: fallbackDraft,
+    currentTemplateType: 'listening',
+  });
   const zhFallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
-    meta: fallbackDraftMeta,
+    meta: zhFallbackDraftMeta,
     model: 'test-model',
     provider: 'fallback',
   });
@@ -16459,6 +16483,11 @@ try {
   assert.equal(
     zhFallbackDraftMetaSummary.providerDescription,
     '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
+  );
+  assert.ok(
+    zhFallbackDraftMetaSummary.reviewChecklist.some((item) =>
+      /保存后可改编为：.+、.+。/.test(item)
+    )
   );
 } finally {
   overwriteGetLocale(() => 'en');

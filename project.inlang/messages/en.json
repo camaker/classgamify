@@ -110,6 +110,7 @@
   "activity_draft_meta_ready_template_label_many": "{count} ready templates",
   "activity_draft_meta_ready_template_label_one": "{count} ready template",
   "activity_draft_meta_selected_label": "selected",
+  "activity_draft_meta_template_list_separator": ", ",
   "activity_draft_meta_title": "AI draft coverage",
   "activity_draft_meta_unknown_model": "Unknown model",
   "activity_draft_source_materials_heading": "Attached classroom source materials:",
