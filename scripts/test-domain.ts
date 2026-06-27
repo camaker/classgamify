@@ -130,7 +130,10 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
+  buildActivityCreateInsert,
   buildDuplicatedActivityTitle,
+  buildDuplicatedActivityInsert,
+  buildRemixedActivityInsert,
   buildRemixedActivityTitle,
   cloneActivityContentForDerivative,
 } from '@/activities/duplicate';
@@ -725,6 +728,19 @@ import type {
   AttemptAnswer,
   AttemptResult,
 } from '@/activities/types';
+
+function getSourceSlice(
+  source: string,
+  startMarker: string,
+  endMarker: string
+) {
+  const start = source.indexOf(startMarker);
+  assert.notEqual(start, -1, `Missing source start marker: ${startMarker}`);
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  assert.notEqual(end, -1, `Missing source end marker: ${endMarker}`);
+
+  return source.slice(start, end);
+}
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
@@ -11926,6 +11942,21 @@ assert.doesNotMatch(
   'Activity stable id generation should not keep a local maximum length.'
 );
 const activitiesApiSource = readFileSync('src/api/activities.ts', 'utf8');
+const createActivityApiSource = getSourceSlice(
+  activitiesApiSource,
+  'export const createActivity',
+  'const duplicateActivityInputSchema'
+);
+const duplicateActivityApiSource = getSourceSlice(
+  activitiesApiSource,
+  'export const duplicateActivity',
+  'const remixActivityTemplateInputSchema'
+);
+const remixActivityApiSource = getSourceSlice(
+  activitiesApiSource,
+  'export const remixActivityTemplate',
+  'const updateActivityInputSchema'
+);
 const activityLibraryQuerySource = readFileSync(
   'src/activities/library-query.ts',
   'utf8'
@@ -12103,13 +12134,33 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /export const duplicateActivity[\s\S]*cloneActivityContentForDerivative\(\s*sourceActivity\.contentJson\s*\)/,
-  'Duplicate activity API should clone derivative activity content explicitly.'
+  /export const createActivity[\s\S]*buildActivityCreateInsert\(\{ id, input: data, now, userId \}\)/,
+  'Create activity API should build insert payloads through the activity domain helper.'
 );
 assert.match(
   activitiesApiSource,
-  /export const remixActivityTemplate[\s\S]*cloneActivityContentForDerivative\(\s*sourceActivity\.contentJson\s*\)/,
-  'Template remix API should clone derivative activity content explicitly.'
+  /export const duplicateActivity[\s\S]*buildDuplicatedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*userId/,
+  'Duplicate activity API should build derivative insert payloads through the activity domain helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /export const remixActivityTemplate[\s\S]*buildRemixedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*targetTemplate,[\s\S]*userId/,
+  'Template remix API should build derivative insert payloads through the activity domain helper.'
+);
+assert.doesNotMatch(
+  createActivityApiSource,
+  /description: data\.description\?\.trim\(\) \|\| null/,
+  'Create activity API should not hand-write activity create insert payloads.'
+);
+assert.doesNotMatch(
+  duplicateActivityApiSource,
+  /contentJson: cloneActivityContentForDerivative|title: buildDuplicatedActivityTitle/,
+  'Duplicate activity API should not hand-write derivative insert payloads.'
+);
+assert.doesNotMatch(
+  remixActivityApiSource,
+  /contentJson: cloneActivityContentForDerivative|title: buildRemixedActivityTitle/,
+  'Activity API should not hand-write activity create, duplicate, or remix insert payloads.'
 );
 assert.match(
   activitiesApiSource,
@@ -18255,6 +18306,99 @@ const derivativeSourceContent = buildActivityContent({
 const derivativeClonedContent = cloneActivityContentForDerivative(
   derivativeSourceContent
 );
+const activityInsertNow = new Date('2026-01-15T08:00:00.000Z');
+const baseActivityCreateInput = {
+  difficulty: 'core',
+  gradeBand: 'Grade 4',
+  groupsText: 'Foods | apple, bread',
+  language: 'en',
+  learningGoal: 'Students classify and answer food vocabulary prompts.',
+  pairsText: 'hot | cold',
+  questionsText: 'Favorite food? | apple | apple, bread | Choose the food.',
+  sourceSummary: 'Teacher source notes',
+  subject: 'English',
+  teacherNotesText: 'Use after vocabulary warmup.',
+  templateType: 'group-sort',
+  title: 'Food review',
+  vocabularyText: 'apple, bread',
+} as const;
+const activityCreateInsert = buildActivityCreateInsert({
+  id: 'activity-create-1',
+  input: {
+    ...baseActivityCreateInput,
+    description: '  A quick food review.  ',
+    visibility: 'private',
+  },
+  now: activityInsertNow,
+  userId: 'teacher-1',
+});
+assert.equal(activityCreateInsert.id, 'activity-create-1');
+assert.equal(activityCreateInsert.ownerId, 'teacher-1');
+assert.equal(activityCreateInsert.description, 'A quick food review.');
+assert.equal(activityCreateInsert.templateType, 'group-sort');
+assert.equal(activityCreateInsert.title, 'Food review');
+assert.equal(activityCreateInsert.visibility, 'private');
+assert.equal(activityCreateInsert.createdAt, activityInsertNow);
+assert.equal(activityCreateInsert.updatedAt, activityInsertNow);
+assert.equal(activityCreateInsert.contentJson.subject, 'English');
+assert.equal(activityCreateInsert.contentJson.groups[0]?.label, 'Foods');
+assert.equal(
+  buildActivityCreateInsert({
+    id: 'activity-create-blank-description',
+    input: {
+      ...baseActivityCreateInput,
+      description: '   ',
+      visibility: 'draft',
+    },
+    now: activityInsertNow,
+    userId: 'teacher-1',
+  }).description,
+  null
+);
+const duplicatedActivityInsert = buildDuplicatedActivityInsert({
+  id: 'activity-duplicate-1',
+  now: activityInsertNow,
+  sourceActivity: {
+    contentJson: derivativeSourceContent,
+    description: 'Source description',
+    templateType: 'group-sort',
+    title: '  Food words quick check  ',
+  },
+  userId: 'teacher-1',
+});
+assert.equal(duplicatedActivityInsert.id, 'activity-duplicate-1');
+assert.equal(duplicatedActivityInsert.ownerId, 'teacher-1');
+assert.equal(duplicatedActivityInsert.description, 'Source description');
+assert.equal(duplicatedActivityInsert.templateType, 'group-sort');
+assert.equal(duplicatedActivityInsert.title, 'Copy of Food words quick check');
+assert.equal(duplicatedActivityInsert.visibility, 'draft');
+assert.equal(duplicatedActivityInsert.createdAt, activityInsertNow);
+assert.equal(duplicatedActivityInsert.updatedAt, activityInsertNow);
+assert.deepEqual(duplicatedActivityInsert.contentJson, derivativeClonedContent);
+assert.notEqual(duplicatedActivityInsert.contentJson, derivativeSourceContent);
+const remixedActivityInsert = buildRemixedActivityInsert({
+  id: 'activity-remix-1',
+  now: activityInsertNow,
+  sourceActivity: {
+    contentJson: derivativeSourceContent,
+    description: null,
+    templateType: 'group-sort',
+    title: 'Food words quick check',
+  },
+  targetTemplate: {
+    shortName: 'Match',
+    type: 'match-up',
+  },
+  userId: 'teacher-1',
+});
+assert.equal(remixedActivityInsert.id, 'activity-remix-1');
+assert.equal(remixedActivityInsert.ownerId, 'teacher-1');
+assert.equal(remixedActivityInsert.description, null);
+assert.equal(remixedActivityInsert.templateType, 'match-up');
+assert.equal(remixedActivityInsert.title, 'Food words quick check (Match)');
+assert.equal(remixedActivityInsert.visibility, 'draft');
+assert.deepEqual(remixedActivityInsert.contentJson, derivativeClonedContent);
+assert.notEqual(remixedActivityInsert.contentJson, derivativeSourceContent);
 assert.deepEqual(derivativeClonedContent, {
   ...derivativeSourceContent,
   sourceMaterials: [

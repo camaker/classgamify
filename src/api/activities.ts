@@ -5,9 +5,9 @@ import {
   createActivityInputSchema,
 } from '@/activities/validation';
 import {
-  buildDuplicatedActivityTitle,
-  buildRemixedActivityTitle,
-  cloneActivityContentForDerivative,
+  buildActivityCreateInsert,
+  buildDuplicatedActivityInsert,
+  buildRemixedActivityInsert,
 } from '@/activities/duplicate';
 import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
@@ -147,19 +147,10 @@ export const createActivity = createServerFn({ method: 'POST' })
     const db = getDb();
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
-    const content = buildActivityContent(data);
 
-    await db.insert(activity).values({
-      contentJson: content,
-      createdAt: now,
-      description: data.description?.trim() || null,
-      id,
-      ownerId: userId,
-      templateType: data.templateType,
-      title: data.title,
-      updatedAt: now,
-      visibility: data.visibility,
-    });
+    await db
+      .insert(activity)
+      .values(buildActivityCreateInsert({ id, input: data, now, userId }));
 
     const [row] = await db
       .select()
@@ -202,19 +193,14 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
-    await db.insert(activity).values({
-      contentJson: cloneActivityContentForDerivative(
-        sourceActivity.contentJson
-      ),
-      createdAt: now,
-      description: sourceActivity.description,
-      id,
-      ownerId: userId,
-      templateType: sourceActivity.templateType,
-      title: buildDuplicatedActivityTitle(sourceActivity.title),
-      updatedAt: now,
-      visibility: 'draft',
-    });
+    await db.insert(activity).values(
+      buildDuplicatedActivityInsert({
+        id,
+        now,
+        sourceActivity,
+        userId,
+      })
+    );
 
     const [row] = await db
       .select()
@@ -274,22 +260,15 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
-    await db.insert(activity).values({
-      contentJson: cloneActivityContentForDerivative(
-        sourceActivity.contentJson
-      ),
-      createdAt: now,
-      description: sourceActivity.description,
-      id,
-      ownerId: userId,
-      templateType: targetTemplate.type,
-      title: buildRemixedActivityTitle({
-        sourceTitle: sourceActivity.title,
-        targetShortName: targetTemplate.shortName,
-      }),
-      updatedAt: now,
-      visibility: 'draft',
-    });
+    await db.insert(activity).values(
+      buildRemixedActivityInsert({
+        id,
+        now,
+        sourceActivity,
+        targetTemplate,
+        userId,
+      })
+    );
 
     const [row] = await db
       .select()
