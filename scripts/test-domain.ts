@@ -119,6 +119,7 @@ import {
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteViews,
   buildActivitySourceMaterialDraftNotes,
+  buildActivitySourceMaterialDraftSummary,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
@@ -3456,6 +3457,59 @@ assert.equal(
 assert.equal(
   buildActivitySourceMaterialDraftNotes([whitespaceMaterialReference]),
   'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf'
+);
+const activityDraftSourceMaterialSummary =
+  buildActivitySourceMaterialDraftSummary([
+    whitespaceMaterialReference,
+    listeningMaterialReference,
+    {
+      contentType: 'application/pdf',
+      fileId: 'secret-worksheet',
+      kind: 'worksheet-document',
+      originalName: 'Parent guide.pdf',
+      size: 4096,
+    },
+    {
+      fileId: '',
+      kind: 'audio',
+      originalName: 'ignored.mp3',
+    },
+  ]);
+assert.deepEqual(activityDraftSourceMaterialSummary, {
+  hasMaterials: true,
+  kindCounts: {
+    audio: 1,
+    'worksheet-document': 2,
+  },
+  noteViews: [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Worksheet Scan 1.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: '三年级听力.mp3',
+    },
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Parent guide.pdf',
+    },
+  ],
+  notesText:
+    'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf\n- Audio: 三年级听力.mp3\n- Worksheet document: Parent guide.pdf',
+  totalCount: 3,
+});
+assert.deepEqual(buildActivitySourceMaterialDraftSummary([]), {
+  hasMaterials: false,
+  kindCounts: {},
+  noteViews: [],
+  notesText: undefined,
+  totalCount: 0,
+});
+assert.doesNotMatch(
+  JSON.stringify(activityDraftSourceMaterialSummary),
+  /secret-worksheet|file-listening-1|contentType|size|permission|ownerId|storageKey|r2Key/i,
+  'AI draft source material summaries should expose only safe material kind labels and filenames.'
 );
 const storageModuleDocs = readFileSync('docs/storage.md', 'utf8');
 assert.match(storageModuleDocs, /teacher-managed classroom\s+materials/);
@@ -11343,6 +11397,35 @@ assert.doesNotMatch(
   activityAiApiSource,
   /getDb|db\.|insert\(activity\)|from\(activity\)|@\/db/,
   'AI draft server function should not write directly to the activity database.'
+);
+const activityDraftSourceSource = readFileSync(
+  'src/activities/draft-source.ts',
+  'utf8'
+);
+assert.match(
+  activityDraftSourceSource,
+  /export type ActivitySourceMaterialDraftSummary[\s\S]*hasMaterials[\s\S]*kindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*totalCount/,
+  'AI draft source materials should expose a structured safe provenance summary.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /buildActivitySourceMaterialDraftSummary[\s\S]*normalizeActivityMaterialReferences\(value\)[\s\S]*formatActivitySourceMaterialDraftNotes\(noteViews\)/,
+  'AI draft source material summaries should normalize references once and derive safe note text from note views.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /getActivityDraftSourceText[\s\S]*buildActivitySourceMaterialDraftSummary\([\s\S]*values\.sourceMaterials[\s\S]*sourceMaterialSummary\.notesText/,
+  'AI draft source text should append source-material notes from the shared safe summary.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /appendActivitySourceMaterialDraftNotes[\s\S]*buildActivitySourceMaterialDraftSummary\(sourceMaterials\)[\s\S]*sourceMaterialSummary\.notesText/,
+  'AI draft source note syncing should reuse the shared source-material summary.'
+);
+assert.doesNotMatch(
+  activityDraftSourceSource,
+  /fileId: material\.fileId|contentType: material\.contentType|size: material\.size/,
+  'AI draft source material summaries should not expose file ids, content types, or sizes.'
 );
 const assignmentValidationSource = readFileSync(
   'src/assignments/validation.ts',

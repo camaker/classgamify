@@ -13,6 +13,14 @@ export type ActivitySourceMaterialDraftNoteView = {
   name: string;
 };
 
+export type ActivitySourceMaterialDraftSummary = {
+  hasMaterials: boolean;
+  kindCounts: Partial<Record<ActivityMaterialReference['kind'], number>>;
+  noteViews: ActivitySourceMaterialDraftNoteView[];
+  notesText?: string;
+  totalCount: number;
+};
+
 const ACTIVITY_DRAFT_SOURCE_FIELDS = [
   'sourceSummary',
   'vocabularyText',
@@ -23,36 +31,41 @@ const ACTIVITY_DRAFT_SOURCE_FIELDS = [
 ] as const satisfies ReadonlyArray<keyof CreateActivityInput>;
 
 export function getActivityDraftSourceText(values: CreateActivityInput) {
+  const sourceMaterialSummary = buildActivitySourceMaterialDraftSummary(
+    values.sourceMaterials
+  );
   const sourceText = buildActivityDraftSourceText([
     ...ACTIVITY_DRAFT_SOURCE_FIELDS.map((field) => values[field]),
-    buildActivitySourceMaterialDraftNotes(values.sourceMaterials),
+    sourceMaterialSummary.notesText,
   ]);
 
   return sourceText || DEFAULT_ACTIVITY_DRAFT_SOURCE;
 }
 
+export function buildActivitySourceMaterialDraftSummary(
+  value: unknown
+): ActivitySourceMaterialDraftSummary {
+  const materials = normalizeActivityMaterialReferences(value);
+  const noteViews = materials.map(toActivitySourceMaterialDraftNoteView);
+  const notesText = formatActivitySourceMaterialDraftNotes(noteViews);
+
+  return {
+    hasMaterials: noteViews.length > 0,
+    kindCounts: countActivitySourceMaterialDraftKinds(materials),
+    noteViews,
+    notesText,
+    totalCount: noteViews.length,
+  };
+}
+
 export function buildActivitySourceMaterialDraftNoteViews(
   value: unknown
 ): ActivitySourceMaterialDraftNoteView[] {
-  return normalizeActivityMaterialReferences(value).map(
-    toActivitySourceMaterialDraftNoteView
-  );
+  return buildActivitySourceMaterialDraftSummary(value).noteViews;
 }
 
 export function buildActivitySourceMaterialDraftNotes(value: unknown) {
-  const safeNotes = buildActivitySourceMaterialDraftNoteViews(value);
-
-  if (safeNotes.length === 0) return undefined;
-
-  return [
-    m.activity_draft_source_materials_heading(),
-    ...safeNotes.map((note) =>
-      m.activity_draft_source_materials_item({
-        kind: note.kindLabel,
-        name: note.name,
-      })
-    ),
-  ].join('\n');
+  return buildActivitySourceMaterialDraftSummary(value).notesText;
 }
 
 export function appendActivitySourceMaterialDraftNotes({
@@ -62,13 +75,16 @@ export function appendActivitySourceMaterialDraftNotes({
   sourceMaterials: unknown;
   sourceText: string;
 }) {
-  const sourceMaterialNotes =
-    buildActivitySourceMaterialDraftNotes(sourceMaterials);
+  const sourceMaterialSummary =
+    buildActivitySourceMaterialDraftSummary(sourceMaterials);
   const cleanSourceText = removeActivitySourceMaterialDraftNotes(sourceText);
 
-  if (!sourceMaterialNotes) return cleanSourceText;
+  if (!sourceMaterialSummary.notesText) return cleanSourceText;
 
-  return buildActivityDraftSourceText([cleanSourceText, sourceMaterialNotes]);
+  return buildActivityDraftSourceText([
+    cleanSourceText,
+    sourceMaterialSummary.notesText,
+  ]);
 }
 
 export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
@@ -84,6 +100,34 @@ function toActivitySourceMaterialDraftNoteView(
     kindLabel: formatUserFileMaterialKind(material.kind),
     name: normalizeDraftSourceText(material.originalName),
   };
+}
+
+function countActivitySourceMaterialDraftKinds(
+  materials: ActivityMaterialReference[]
+): ActivitySourceMaterialDraftSummary['kindCounts'] {
+  const counts: ActivitySourceMaterialDraftSummary['kindCounts'] = {};
+
+  for (const material of materials) {
+    counts[material.kind] = (counts[material.kind] ?? 0) + 1;
+  }
+
+  return counts;
+}
+
+function formatActivitySourceMaterialDraftNotes(
+  safeNotes: ActivitySourceMaterialDraftNoteView[]
+) {
+  if (safeNotes.length === 0) return undefined;
+
+  return [
+    m.activity_draft_source_materials_heading(),
+    ...safeNotes.map((note) =>
+      m.activity_draft_source_materials_item({
+        kind: note.kindLabel,
+        name: note.name,
+      })
+    ),
+  ].join('\n');
 }
 
 function buildActivityDraftSourceText(values: Array<string | undefined>) {
