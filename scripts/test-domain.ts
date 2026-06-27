@@ -46,6 +46,7 @@ import {
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
+import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import {
   filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
@@ -11972,10 +11973,41 @@ assert.match(
   /nanoid\(APP_ENTITY_ID_LENGTH\.generated\)/,
   'Activity API generated ids should reuse the shared app entity id length.'
 );
+assert.equal(typeof buildActivityDetailOwnerWhere, 'function');
+assert.match(
+  activitiesApiSource,
+  /getActivity[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: data\.id, userId \}\)/,
+  'Get activity API should load owner-scoped activity details through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /duplicateActivity[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Duplicate activity API should load source activity through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /remixActivityTemplate[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Template remix API should load source activity through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /updateActivity[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: data\.id, userId \}\)/,
+  'Update activity API should load owner-scoped activity details through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /updateActivityVisibility[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId, userId: ownerId \}\)/,
+  'Archive and restore APIs should load owner-scoped activity details through the activity detail query helper.'
+);
 assert.doesNotMatch(
   activitiesApiSource,
   /nanoid\(16\)|pageSize:[\s\S]*\.max\(100\)|search:[\s\S]*\.max\(120\)/,
   'Activity API should not keep local id or list input limits.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /and\(eq\(activity\.id, (?:data\.id|data\.activityId|activityId)\), eq\(activity\.ownerId, (?:userId|ownerId)\)\)/,
+  'Activity API should not keep local owner-scoped detail lookup rules.'
 );
 assert.doesNotMatch(
   activityLibraryQuerySource,

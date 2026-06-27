@@ -9,6 +9,7 @@ import {
   buildRemixedActivityTitle,
   cloneActivityContentForDerivative,
 } from '@/activities/duplicate';
+import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
@@ -35,7 +36,7 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -95,10 +96,10 @@ export const listActivities = createServerFn({ method: 'GET' })
           })
           .from(activity)
           .where(
-            and(
-              eq(activity.id, data.createdActivityId),
-              eq(activity.ownerId, userId)
-            )
+            buildActivityDetailOwnerWhere({
+              activityId: data.createdActivityId,
+              userId,
+            })
           )
           .limit(1)
       : [];
@@ -129,7 +130,7 @@ export const getActivity = createServerFn({ method: 'GET' })
     const [row] = await db
       .select()
       .from(activity)
-      .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)))
+      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
 
     if (!row) {
@@ -184,7 +185,10 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
       .select()
       .from(activity)
       .where(
-        and(eq(activity.id, data.activityId), eq(activity.ownerId, userId))
+        buildActivityDetailOwnerWhere({
+          activityId: data.activityId,
+          userId,
+        })
       )
       .limit(1);
 
@@ -233,7 +237,10 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       .select()
       .from(activity)
       .where(
-        and(eq(activity.id, data.activityId), eq(activity.ownerId, userId))
+        buildActivityDetailOwnerWhere({
+          activityId: data.activityId,
+          userId,
+        })
       )
       .limit(1);
 
@@ -302,7 +309,7 @@ export const updateActivity = createServerFn({ method: 'POST' })
         visibility: activity.visibility,
       })
       .from(activity)
-      .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)))
+      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
 
     if (!existingActivity) {
@@ -323,12 +330,12 @@ export const updateActivity = createServerFn({ method: 'POST' })
         updatedAt: now,
         visibility: data.visibility,
       })
-      .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)));
+      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }));
 
     const [row] = await db
       .select()
       .from(activity)
-      .where(and(eq(activity.id, data.id), eq(activity.ownerId, userId)))
+      .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
 
     return row;
@@ -382,7 +389,7 @@ async function updateActivityVisibility({
   const [row] = await db
     .select()
     .from(activity)
-    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)))
+    .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);
 
   if (!row) {
@@ -402,12 +409,12 @@ async function updateActivityVisibility({
       updatedAt,
       visibility: nextVisibility,
     })
-    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)));
+    .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }));
 
   const [updatedRow] = await db
     .select()
     .from(activity)
-    .where(and(eq(activity.id, activityId), eq(activity.ownerId, ownerId)))
+    .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);
 
   if (!updatedRow) {
