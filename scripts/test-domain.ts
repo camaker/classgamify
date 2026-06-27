@@ -337,6 +337,7 @@ import {
   buildAssignmentSettingsSummaryView,
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
+  formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
   formatAssignmentExpiry,
   formatAssignmentItemCount,
@@ -1618,8 +1619,13 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAssignmentSettings[\s\S]*collectStudentName: settings\.collectStudentName,[\s\S]*instructions: settings\.instructions,[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*timeLimitSeconds: settings\.timeLimitSeconds/,
+  /function buildPublicAssignmentSettings[\s\S]*collectStudentName: settings\.collectStudentName,[\s\S]*instructions: formatAssignmentDeliveryInstructions\(settings\.instructions\),[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*timeLimitSeconds: settings\.timeLimitSeconds/,
   'Public assignment settings should explicitly pick the only delivery-rule fields allowed in student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /instructions: settings\.instructions/,
+  'Public assignment settings should not expose raw student instructions.'
 );
 assert.match(
   publicAssignmentSource,
@@ -8174,6 +8180,11 @@ assert.deepEqual(
     ['itemOrder', 'Shuffled'],
   ]
 );
+assert.equal(
+  formatAssignmentDeliveryInstructions(' Ｒｅｖｉｅｗ\u00A0　carefully. '),
+  'Review carefully.'
+);
+assert.equal(formatAssignmentDeliveryInstructions('   '), undefined);
 const assignmentSettingsSummaryView = buildAssignmentSettingsSummaryView({
   expiresAt: null,
   settings: {
@@ -8967,7 +8978,7 @@ const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
       ...publicAssignmentPayloadSource.assignment,
       settingsJson: {
         collectStudentName: false,
-        instructions: '  Finish quietly.  ',
+        instructions: ' Ｆｉｎｉｓｈ\u00A0　quietly. ',
         maxAttempts: 3,
         showCorrectAnswers: false,
         shuffleItems: false,
@@ -9037,7 +9048,7 @@ const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet({
     expiresAt: null,
     settingsJson: {
       collectStudentName: false,
-      instructions: '  Finish on paper.  ',
+      instructions: ' Ｆｉｎｉｓｈ\u00A0　on   paper. ',
       maxAttempts: 3,
       showCorrectAnswers: false,
       shuffleItems: false,
@@ -12466,6 +12477,16 @@ assert.match(
   printableWorksheetSource,
   /toPrintableWorksheetAnswerKeyItem[\s\S]*getRuntimeDisplayAcceptedAnswers\(item\.answer\)/,
   'Printable worksheet answer keys should normalize accepted alternatives through the shared runtime display-list helper.'
+);
+assert.match(
+  printableWorksheetSource,
+  /instructions: formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
+  'Printable worksheets should format student instructions through the shared delivery helper.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /instructions: settings\.instructions/,
+  'Printable worksheets should not expose raw student instructions.'
 );
 assert.doesNotMatch(
   printableWorksheetSource,

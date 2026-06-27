@@ -12,6 +12,7 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
+import { formatAssignmentDeliveryInstructions } from '@/assignments/delivery-summary';
 import {
   type AssignmentLifecycleStatus,
   getAssignmentLifecycleStatus,
@@ -269,7 +270,7 @@ function buildPublicAssignmentSettings(
 ): PublicAssignmentSettings {
   return {
     collectStudentName: settings.collectStudentName,
-    instructions: settings.instructions,
+    instructions: formatAssignmentDeliveryInstructions(settings.instructions),
     maxAttempts: settings.maxAttempts,
     showCorrectAnswers: settings.showCorrectAnswers,
     shuffleItems: settings.shuffleItems,

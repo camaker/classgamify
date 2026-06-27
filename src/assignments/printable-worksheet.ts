@@ -9,6 +9,7 @@ import type {
 } from '@/activities/types';
 import {
   buildAssignmentDeliverySummary,
+  formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
@@ -215,7 +216,7 @@ export function buildPrintableAssignmentWorksheet({
       timeLimitSeconds: settings.timeLimitSeconds,
     }),
     includeAnswerKey,
-    instructions: settings.instructions,
+    instructions: formatAssignmentDeliveryInstructions(settings.instructions),
     items: orderedRuntimeItems.map((item, index) =>
       toPrintableWorksheetItem({
         item,

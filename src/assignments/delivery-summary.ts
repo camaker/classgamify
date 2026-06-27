@@ -4,6 +4,7 @@ import {
   defaultAssignmentSettings,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
+import { normalizeOptionalRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDeliverySummaryId =
@@ -157,6 +158,12 @@ export function formatAssignmentDeliveryPolicyText({
     .join(m.assignment_delivery_policy_separator());
 }
 
+export function formatAssignmentDeliveryInstructions(
+  instructions: string | null | undefined
+) {
+  return normalizeOptionalRuntimeDisplayText(instructions);
+}
+
 function formatAssignmentDeliveryPolicyItem(
   item: Pick<AssignmentDeliverySummaryItem, 'label' | 'value'>
 ) {
@@ -271,12 +278,15 @@ function isPositiveWholeNumber(value?: number | null) {
 function buildAssignmentInstructionSummary(
   instructions: string | undefined
 ): AssignmentInstructionSummary {
+  const normalizedInstructions =
+    formatAssignmentDeliveryInstructions(instructions);
+
   return {
-    isEmpty: !instructions,
+    isEmpty: !normalizedInstructions,
     label: m.assignment_delivery_label_instructions(),
     value:
-      instructions && instructions.length > 0
-        ? instructions
+      normalizedInstructions && normalizedInstructions.length > 0
+        ? normalizedInstructions
         : m.assignment_delivery_instructions_none(),
   };
 }
