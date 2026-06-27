@@ -384,6 +384,7 @@ import {
   buildAssignmentDetailOwnerWhere,
   buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
+  buildAssignmentLifecycleGateSelect,
   buildAssignmentSnapshotJoin,
 } from '@/assignments/detail-query';
 import {
@@ -12814,6 +12815,11 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentsApiSource,
+  /updateAssignmentStatus[\s\S]*select\(\{[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*\}\)/,
+  'Update assignment status API should not hand-write lifecycle gate select fields.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
   /updateAssignmentStatus[\s\S]*\.set\(\{[\s\S]*status: data\.status[\s\S]*updatedAt: new Date\(\)/,
   'Update assignment status API should not hand-write assignment status update payloads.'
 );
@@ -13090,12 +13096,13 @@ assert.equal(typeof buildAssignmentDetailOwnerWhere, 'function');
 assert.equal(typeof buildAssignmentDetailOwnerShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailSelect, 'function');
+assert.equal(typeof buildAssignmentLifecycleGateSelect, 'function');
 assert.equal(typeof buildAssignmentActivityJoin, 'function');
 assert.equal(typeof buildAssignmentSnapshotJoin, 'function');
 assert.match(
   assignmentDetailQuerySource,
-  /buildAssignmentDetailSelect[\s\S]*activity,[\s\S]*assignment,[\s\S]*snapshot: assignmentSnapshot[\s\S]*buildAssignmentActivityJoin[\s\S]*eq\(assignment\.activityId, activity\.id\)[\s\S]*buildAssignmentSnapshotJoin[\s\S]*eq\(assignmentSnapshot\.assignmentId, assignment\.id\)/,
-  'Assignment detail select and join shape should live in the assignment detail query domain.'
+  /buildAssignmentDetailSelect[\s\S]*activity,[\s\S]*assignment,[\s\S]*snapshot: assignmentSnapshot[\s\S]*buildAssignmentLifecycleGateSelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*buildAssignmentActivityJoin[\s\S]*eq\(assignment\.activityId, activity\.id\)[\s\S]*buildAssignmentSnapshotJoin[\s\S]*eq\(assignmentSnapshot\.assignmentId, assignment\.id\)/,
+  'Assignment detail select, lifecycle gate select, and join shape should live in the assignment detail query domain.'
 );
 assert.match(
   assignmentsApiSource,
@@ -13109,8 +13116,8 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const updateAssignmentStatus[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*\.where\(where\)/,
-  'Assignment status reloads should reuse the shared assignment detail select and join shape.'
+  /export const updateAssignmentStatus[\s\S]*\.select\(buildAssignmentLifecycleGateSelect\(\)\)[\s\S]*assertAssignmentStatusTransition[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*\.where\(where\)/,
+  'Assignment status updates should use lifecycle gate and detail query helpers.'
 );
 assert.match(
   assignmentsApiSource,

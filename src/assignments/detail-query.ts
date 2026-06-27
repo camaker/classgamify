@@ -9,6 +9,14 @@ export function buildAssignmentDetailSelect() {
   };
 }
 
+export function buildAssignmentLifecycleGateSelect() {
+  return {
+    expiresAt: assignment.expiresAt,
+    id: assignment.id,
+    status: assignment.status,
+  };
+}
+
 export function buildAssignmentActivityJoin() {
   return eq(assignment.activityId, activity.id);
 }

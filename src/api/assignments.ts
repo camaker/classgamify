@@ -73,6 +73,7 @@ import {
   buildAssignmentDetailOwnerWhere,
   buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
+  buildAssignmentLifecycleGateSelect,
   buildAssignmentSnapshotJoin,
 } from '@/assignments/detail-query';
 import { analyzeAssignmentResults } from '@/assignments/results';
@@ -312,11 +313,7 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       userId,
     });
     const [existingAssignment] = await db
-      .select({
-        expiresAt: assignment.expiresAt,
-        id: assignment.id,
-        status: assignment.status,
-      })
+      .select(buildAssignmentLifecycleGateSelect())
       .from(assignment)
       .where(where)
       .limit(1);
