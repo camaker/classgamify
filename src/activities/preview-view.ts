@@ -22,14 +22,27 @@ export type ActivityPreviewPanel = {
   title: string;
 };
 
+type ActivityPreviewGroupView = ActivitySeed['content']['groups'][number] & {
+  summaryText: string;
+};
+
+type ActivityPreviewPairView = ActivitySeed['content']['pairs'][number] & {
+  summaryText: string;
+};
+
+type ActivityPreviewQuestionView =
+  ActivitySeed['content']['questions'][number] & {
+    summaryText: string;
+  };
+
 type ActivityPreviewViewModel = {
   content: {
     gradeBand: string;
     learningGoal: string;
     subject: string;
-    visibleGroups: ActivitySeed['content']['groups'];
-    visiblePairs: ActivitySeed['content']['pairs'];
-    visibleQuestions: ActivitySeed['content']['questions'];
+    visibleGroups: ActivityPreviewGroupView[];
+    visiblePairs: ActivityPreviewPairView[];
+    visibleQuestions: ActivityPreviewQuestionView[];
   };
   description: string;
   metrics: {
@@ -64,17 +77,10 @@ export function buildActivityPreviewViewModel({
       gradeBand: activity.content.gradeBand,
       learningGoal: activity.content.learningGoal,
       subject: activity.content.subject,
-      visibleGroups: activity.content.groups.slice(
-        0,
-        ACTIVITY_PREVIEW_CONTENT_LIMITS.groups
-      ),
-      visiblePairs: activity.content.pairs.slice(
-        0,
-        ACTIVITY_PREVIEW_CONTENT_LIMITS.pairs
-      ),
-      visibleQuestions: activity.content.questions.slice(
-        0,
-        ACTIVITY_PREVIEW_CONTENT_LIMITS.questions
+      visibleGroups: buildActivityPreviewGroupViews(activity.content.groups),
+      visiblePairs: buildActivityPreviewPairViews(activity.content.pairs),
+      visibleQuestions: buildActivityPreviewQuestionViews(
+        activity.content.questions
       ),
     },
     description: activity.description,
@@ -96,6 +102,43 @@ export function buildActivityPreviewViewModel({
     templateName: template.name,
     title: activity.title,
   };
+}
+
+function buildActivityPreviewQuestionViews(
+  questions: ActivitySeed['content']['questions']
+): ActivityPreviewQuestionView[] {
+  return questions
+    .slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.questions)
+    .map((question) => ({
+      ...question,
+      summaryText: question.prompt,
+    }));
+}
+
+function buildActivityPreviewPairViews(
+  pairs: ActivitySeed['content']['pairs']
+): ActivityPreviewPairView[] {
+  return pairs.slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.pairs).map((pair) => ({
+    ...pair,
+    summaryText: m.activity_preview_pair_line({
+      left: pair.left,
+      right: pair.right,
+    }),
+  }));
+}
+
+function buildActivityPreviewGroupViews(
+  groups: ActivitySeed['content']['groups']
+): ActivityPreviewGroupView[] {
+  return groups
+    .slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.groups)
+    .map((group) => ({
+      ...group,
+      summaryText: m.activity_preview_group_line({
+        items: group.items.join(', '),
+        label: group.label,
+      }),
+    }));
 }
 
 export function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {

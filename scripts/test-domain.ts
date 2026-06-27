@@ -1358,17 +1358,29 @@ assert.deepEqual(
     actionLabels: activityPreviewView.panel.actions?.map(
       (action) => action.label
     ),
+    groupSummaries: activityPreviewView.content.visibleGroups.map(
+      (group) => group.summaryText
+    ),
     groupCount: activityPreviewView.content.visibleGroups.length,
     pairCount: activityPreviewView.content.visiblePairs.length,
+    pairSummaries: activityPreviewView.content.visiblePairs.map(
+      (pair) => pair.summaryText
+    ),
     questionCount: activityPreviewView.content.visibleQuestions.length,
+    questionSummaries: activityPreviewView.content.visibleQuestions.map(
+      (question) => question.summaryText
+    ),
     metrics: activityPreviewView.metrics,
     templateName: activityPreviewView.templateName,
   },
   {
     actionLabels: ['Create activity', 'Open student preview'],
+    groupSummaries: ['Group A: one, two', 'Group B: three', 'Group C: four'],
     groupCount: 3,
     pairCount: 4,
+    pairSummaries: ['A -> 1', 'B -> 2', 'C -> 3', 'D -> 4'],
     questionCount: 3,
+    questionSummaries: ['Q1?', 'Q2?', 'Q3?'],
     metrics: {
       classroomMode: 'Individual',
       estimatedTime: '9 min',
@@ -1377,6 +1389,23 @@ assert.deepEqual(
     templateName: 'Quiz',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildActivityPreviewViewModel({
+      activity: activityPreviewFixture,
+    }).content.visibleGroups[0]?.summaryText,
+    'Group A：one, two'
+  );
+  assert.equal(
+    buildActivityPreviewViewModel({
+      activity: activityPreviewFixture,
+    }).content.visiblePairs[0]?.summaryText,
+    'A → 1'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildDefaultActivityPreviewPanel().actions?.map((action) => action.to),
   [Routes.Create, Routes.StudentPreview]
@@ -1405,8 +1434,13 @@ assert.match(
 );
 assert.doesNotMatch(
   activityPreviewSource,
-  /ACTIVITY_PREVIEW_CONTENT_LIMITS|const visibleQuestions|const visiblePairs|const visibleGroups|buildDefaultActivityPreviewPanel/,
-  'Activity preview component should not rebuild content slices or default panel state.'
+  /ACTIVITY_PREVIEW_CONTENT_LIMITS|const visibleQuestions|const visiblePairs|const visibleGroups|buildDefaultActivityPreviewPanel|question\.prompt|group\.label|group\.items\.join|pair\.left|pair\.right/,
+  'Activity preview component should not rebuild content slices, question, pair, or group summary text, or default panel state.'
+);
+assert.match(
+  activityPreviewSource,
+  /question\.summaryText[\s\S]*pair\.summaryText[\s\S]*group\.summaryText/,
+  'Activity preview component should render prepared question, pair, and group summary text.'
 );
 assert.match(
   activitySourceMaterialsFieldSource,
@@ -1427,6 +1461,16 @@ assert.match(
   activitySourceMaterialsSummarySource,
   /summary\.kindBadges[\s\S]*summary\.extractionActions/,
   'Activity source-material summary component should render material kinds and extraction readiness actions.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /\{(?:badge\.label|action\.label)\}\s*·\s*\{(?:badge\.count|action\.sourceCount)\}/,
+  'Activity source-material summary component should not hand-compose visible source-material count separators.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /badge\.summaryText[\s\S]*action\.summaryText/,
+  'Activity source-material summary component should render prepared source-material metric text.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
@@ -1530,6 +1574,26 @@ assert.match(
   activityDraftMetaSummarySource,
   /summaryView\.templateReadinessOptions[\s\S]*summaryView\.reviewChecklist/,
   'AI draft summary component should render reviewable readiness and checklist details.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftCoverageStat[\s\S]*stat=\{stat\}/,
+  'AI draft summary component should pass prepared coverage stat views into the coverage stat component.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /<ActivityDraftCoverageStat[\s\S]*label=\{stat\.label\}[\s\S]*value=\{stat\.value\}/,
+  'AI draft summary component should not split coverage stat view props in the list renderer.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /\{summaryView\.(?:modelLabel|noticeLabel)\}:/,
+  'AI draft summary component should not hand-compose visible model or notice separators.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.modelLineText[\s\S]*summaryView\.noticeLineText/,
+  'AI draft summary component should render prepared model and notice text lines.'
 );
 assert.match(
   activityTemplateReadinessPanelSource,
@@ -1977,10 +2041,30 @@ assert.match(
   /correctRateProgressValue/,
   'Assignment result item analysis card component should render prepared reteach-priority card progress.'
 );
+assert.doesNotMatch(
+  assignmentResultsItemAnalysisCardSource,
+  /\{itemView\.(?:acceptedAnswersLabel|expectedAnswerLabel)\}:/,
+  'Assignment result item analysis card component should not hand-compose visible answer label separators.'
+);
+assert.match(
+  assignmentResultsItemAnalysisCardSource,
+  /itemView\.expectedAnswerSummaryText[\s\S]*itemView\.acceptedAnswersLineText/,
+  'Assignment result item analysis card component should render prepared answer summary text lines.'
+);
 assert.match(
   assignmentResultsAttemptReviewCardSource,
   /attemptView\.answerViews\.map/,
   'Assignment result attempt review card component should render prepared answer review views.'
+);
+assert.doesNotMatch(
+  assignmentResultsAttemptReviewCardSource,
+  /\{answerView\.(?:studentAnswerLabel|expectedAnswerLabel|acceptedAnswersLabel)\}:/,
+  'Assignment result attempt review card component should not hand-compose visible answer label separators.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /answerView\.studentAnswerLineText[\s\S]*answerView\.expectedAnswerLineText[\s\S]*answerView\.acceptedAnswersLineText/,
+  'Assignment result attempt review card component should render prepared answer review text lines.'
 );
 assert.match(
   assignmentResultsEmptyStateSource,
@@ -2903,6 +2987,7 @@ assert.deepEqual(
         label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
+        summaryText: 'Audio extraction · 1',
       },
       {
         capability: 'worksheet-extraction',
@@ -2910,16 +2995,23 @@ assert.deepEqual(
         label: 'Worksheet extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
+        summaryText: 'Worksheet extraction · 1',
       },
     ],
     extractionTitle: 'Ready for future AI extraction',
     hasMaterials: true,
     kindBadges: [
-      { count: 1, kind: 'audio', label: 'Audio' },
+      {
+        count: 1,
+        kind: 'audio',
+        label: 'Audio',
+        summaryText: 'Audio · 1',
+      },
       {
         count: 1,
         kind: 'worksheet-document',
         label: 'Worksheet document',
+        summaryText: 'Worksheet document · 1',
       },
     ],
     readiness: {
@@ -6959,6 +7051,33 @@ assert.equal(
     'Item order: Fixed order',
   ].join('; ')
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatAssignmentDeliveryPolicyText({
+      expiresAt: null,
+      settings: {
+        collectStudentName: false,
+        instructions: '  安静复习。  ',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 120,
+      },
+    }),
+    [
+      '学生说明：安静复习。',
+      '作答次数：最多 3 次',
+      '计时：2 分钟',
+      '关闭时间：不设关闭时间',
+      '学生身份：匿名',
+      '答案显示：隐藏',
+      '题目顺序：固定顺序',
+    ].join('；')
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(formatAssignmentItemCount(1), '1 item');
 assert.equal(formatAssignmentItemCount(3), '3 items');
 assert.equal(formatAssignmentItemCount(3.9), '3 items');
@@ -7572,6 +7691,7 @@ const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
 assert.equal(printableSnapshotItemView.id, 'q-frozen-prompt');
+assert.equal(printableSnapshotItemView.headingLabel, 'Item 1 · Question');
 assert.deepEqual(printableSnapshotItemView.answerLines, [
   { key: 'q-frozen-prompt-answer-line-0' },
 ]);
@@ -7602,6 +7722,7 @@ const messyPrintableItemView = buildPrintableWorksheetItemView({
   responseMode: 'choice',
   sequenceNumber: Number.NaN,
 });
+assert.equal(messyPrintableItemView.headingLabel, 'Item 1 · Question');
 assert.equal(messyPrintableItemView.sequenceLabel, 'Item 1');
 assert.deepEqual(messyPrintableItemView.answerLines, [
   { key: 'messy-print-item-answer-line-0' },
@@ -9849,6 +9970,16 @@ assert.match(
   'Activity library card component should use card action copy and gates from the activity-domain card display view.'
 );
 assert.match(
+  activityLibraryCardComponentSource,
+  /cardDisplayView\.sourceMaterials\.kindBadges[\s\S]*badge\.summaryText[\s\S]*cardDisplayView\.sourceMaterials\.extractionActions[\s\S]*action\.summaryText/,
+  'Activity library card component should render prepared source-material badge and extraction summary text.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /\{(?:badge|action)\.label\}/,
+  'Activity library card component should not drop source-material counts by rendering raw source-material labels.'
+);
+assert.match(
   activityLibrarySummaryCardComponentSource,
   /ActivityLibrarySummaryMetricId/,
   'Activity library summary card component should map icons by the activity-domain metric id.'
@@ -10570,6 +10701,16 @@ assert.match(
   printableWorksheetItemListSource,
   /emptyState\.title/,
   'Printable worksheet item list component should render the empty printable state from the printable worksheet page view-model.'
+);
+assert.doesNotMatch(
+  printableWorksheetItemListSource,
+  /itemView\.sequenceLabel[\s\S]*·[\s\S]*itemView\.kindLabel/,
+  'Printable worksheet item list component should not hand-compose visible item heading separators.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /itemView\.headingLabel/,
+  'Printable worksheet item list component should render the prepared printable item heading.'
 );
 assert.match(
   printableWorksheetToolbarSource,
@@ -12139,11 +12280,19 @@ assert.deepEqual(
         label: 'Audio extraction',
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
+        summaryText: 'Audio extraction · 1',
       },
     ],
     extractionTitle: 'Ready for future AI extraction',
     hasMaterials: true,
-    kindBadges: [{ count: 1, kind: 'audio', label: 'Audio' }],
+    kindBadges: [
+      {
+        count: 1,
+        kind: 'audio',
+        label: 'Audio',
+        summaryText: 'Audio · 1',
+      },
+    ],
     readiness: {
       capabilities: ['audio-extraction'],
       extractableCount: 1,
@@ -15579,9 +15728,14 @@ assert.equal(
   'Review the generated content before saving it to the activity library.'
 );
 assert.equal(fallbackDraftMetaSummary.modelLabel, 'Model');
+assert.equal(fallbackDraftMetaSummary.modelLineText, 'Model: test-model');
 assert.equal(fallbackDraftMetaSummary.modelName, 'test-model');
 assert.equal(fallbackDraftMetaSummary.notice, 'Fallback used for testing.');
 assert.equal(fallbackDraftMetaSummary.noticeLabel, 'Generation note');
+assert.equal(
+  fallbackDraftMetaSummary.noticeLineText,
+  'Generation note: Fallback used for testing.'
+);
 assert.equal(
   fallbackDraftMetaSummary.providerDescription,
   'Generated locally from the source notes, so treat it like a scaffold before assigning.'
@@ -15707,6 +15861,7 @@ try {
   });
 
   assert.equal(zhFallbackDraftMetaSummary.noticeLabel, '生成说明');
+  assert.equal(zhFallbackDraftMetaSummary.modelLineText, '模型：test-model');
   assert.equal(
     zhFallbackDraftMetaSummary.providerDescription,
     '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
@@ -17959,11 +18114,13 @@ assert.deepEqual(
   buildAssignmentItemAnalysisCardView(resultAnalysis.perItem[0]!),
   {
     acceptedAnswersLabel: 'Accepted',
+    acceptedAnswersLineText: 'Accepted: Paris, Paris, France',
     acceptedAnswersText: 'Paris, Paris, France',
     correctRateLabel: '67%',
     correctRateProgressValue: 67,
     correctSummaryLabel: '2/3 correct',
     expectedAnswerLabel: 'answer',
+    expectedAnswerSummaryText: '2/3 correct · answer: Paris / Paris, France',
     expectedAnswerText: 'Paris / Paris, France',
     explanationText: 'Paris is the capital of France.',
     kindLabel: 'Question',
@@ -17979,11 +18136,13 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted',
+    acceptedAnswersLineText: null,
     acceptedAnswersText: null,
     correctRateLabel: '50%',
     correctRateProgressValue: 50,
     correctSummaryLabel: '1/2 correct',
     expectedAnswerLabel: 'answer',
+    expectedAnswerSummaryText: '1/2 correct · answer: -',
     expectedAnswerText: '-',
     explanationText: null,
     kindLabel: 'Pair',
@@ -18081,14 +18240,17 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersLineText: 'Accepted answers: Paris, Paris, France',
     acceptedAnswersText: 'Paris, Paris, France',
     expectedAnswerLabel: 'Expected',
+    expectedAnswerLineText: 'Expected: Paris / Paris, France',
     expectedAnswerText: 'Paris / Paris, France',
     explanationText: 'Paris is the capital of France.',
     promptLabel: '1. Capital of France?',
     statusLabel: 'Correct',
     statusTone: 'correct',
     studentAnswerLabel: 'Student',
+    studentAnswerLineText: 'Student: paris france',
     studentAnswerText: 'paris france',
   }
 );
@@ -18118,14 +18280,17 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersLineText: null,
     acceptedAnswersText: null,
     expectedAnswerLabel: 'Expected',
+    expectedAnswerLineText: 'Expected: -',
     expectedAnswerText: '-',
     explanationText: null,
     promptLabel: '1. Match "Hot" with its pair.',
     statusLabel: 'Unanswered',
     statusTone: 'idle',
     studentAnswerLabel: 'Student',
+    studentAnswerLineText: 'Student: Unanswered',
     studentAnswerText: 'Unanswered',
   }
 );
@@ -19023,8 +19188,10 @@ assert.deepEqual(
     answerViews: [
       {
         acceptedAnswersLabel: 'Accepted answers',
+        acceptedAnswersLineText: null,
         acceptedAnswersText: null,
         expectedAnswerLabel: 'Expected',
+        expectedAnswerLineText: 'Expected: Paris',
         expectedAnswerText: 'Paris',
         explanationText: null,
         id: 'q-1',
@@ -19032,6 +19199,7 @@ assert.deepEqual(
         statusLabel: 'Correct',
         statusTone: 'correct',
         studentAnswerLabel: 'Student',
+        studentAnswerLineText: 'Student: Paris',
         studentAnswerText: 'Paris',
       },
     ],

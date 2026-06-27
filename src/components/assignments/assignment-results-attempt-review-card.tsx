@@ -49,18 +49,12 @@ export function AssignmentResultsAttemptReviewCard({
               </Badge>
             </div>
             <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-              <p>
-                {answerView.studentAnswerLabel}: {answerView.studentAnswerText}
-              </p>
-              <p>
-                {answerView.expectedAnswerLabel}:{' '}
-                {answerView.expectedAnswerText}
-              </p>
+              <p>{answerView.studentAnswerLineText}</p>
+              <p>{answerView.expectedAnswerLineText}</p>
             </div>
-            {answerView.acceptedAnswersText ? (
+            {answerView.acceptedAnswersLineText ? (
               <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {answerView.acceptedAnswersLabel}:{' '}
-                {answerView.acceptedAnswersText}
+                {answerView.acceptedAnswersLineText}
               </p>
             ) : null}
             {answerView.explanationText ? (

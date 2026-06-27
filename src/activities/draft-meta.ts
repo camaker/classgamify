@@ -79,9 +79,11 @@ type ActivityDraftMetaSummaryView = {
   }>;
   description: string;
   modelLabel: string;
+  modelLineText: string;
   modelName: string;
   notice?: string;
   noticeLabel: string;
+  noticeLineText?: string;
   providerDescription: string;
   providerLabel: string;
   readyTemplateLabel: string;
@@ -157,6 +159,9 @@ export function buildActivityDraftMetaSummaryView({
   const readyTemplateCount = normalizeActivityDraftMetaCount(
     meta.readyTemplateCount
   );
+  const modelLabel = m.activity_draft_meta_model_label();
+  const modelName = model.trim() || m.activity_draft_meta_unknown_model();
+  const noticeLabel = m.activity_draft_meta_notice_label();
 
   return {
     coverageStats: [
@@ -182,10 +187,20 @@ export function buildActivityDraftMetaSummaryView({
       },
     ],
     description: m.activity_draft_meta_description(),
-    modelLabel: m.activity_draft_meta_model_label(),
-    modelName: model.trim() || m.activity_draft_meta_unknown_model(),
+    modelLabel,
+    modelLineText: m.activity_draft_meta_model_line({
+      label: modelLabel,
+      value: modelName,
+    }),
+    modelName,
     notice,
-    noticeLabel: m.activity_draft_meta_notice_label(),
+    noticeLabel,
+    noticeLineText: notice
+      ? m.activity_draft_meta_notice_line({
+          label: noticeLabel,
+          value: notice,
+        })
+      : undefined,
     providerDescription: buildActivityDraftProviderDescription({
       notice,
       provider,

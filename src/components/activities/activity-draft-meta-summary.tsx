@@ -36,25 +36,15 @@ export function ActivityDraftMetaSummary({
         </div>
       </div>
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
-        <p>
-          {summaryView.modelLabel}:{' '}
-          <span className="font-medium">{summaryView.modelName}</span>
-        </p>
+        <p className="font-medium">{summaryView.modelLineText}</p>
         <p className="mt-1">{summaryView.providerDescription}</p>
-        {summaryView.notice ? (
-          <p className="mt-1">
-            <span className="font-medium">{summaryView.noticeLabel}:</span>{' '}
-            {summaryView.notice}
-          </p>
+        {summaryView.noticeLineText ? (
+          <p className="mt-1 font-medium">{summaryView.noticeLineText}</p>
         ) : null}
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
         {summaryView.coverageStats.map((stat) => (
-          <ActivityDraftCoverageStat
-            key={stat.label}
-            label={stat.label}
-            value={stat.value}
-          />
+          <ActivityDraftCoverageStat key={stat.label} stat={stat} />
         ))}
       </div>
       {summaryView.suggestedTemplateOptions.length > 0 ? (
@@ -115,16 +105,16 @@ export function ActivityDraftMetaSummary({
 }
 
 function ActivityDraftCoverageStat({
-  label,
-  value,
+  stat,
 }: {
-  label: string;
-  value: number;
+  stat: ReturnType<
+    typeof buildActivityDraftMetaSummaryView
+  >['coverageStats'][number];
 }) {
   return (
     <div className="rounded-lg border bg-background p-3">
-      <p className="text-lg font-semibold">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-lg font-semibold">{stat.value}</p>
+      <p className="text-xs text-muted-foreground">{stat.label}</p>
     </div>
   );
 }

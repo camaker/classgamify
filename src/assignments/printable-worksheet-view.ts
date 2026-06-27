@@ -268,20 +268,27 @@ export function buildPrintableWorksheetAnswerKeyView({
 }
 
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
+  const kindLabel = formatRuntimeItemKindLabel(item);
+  const sequenceLabel = m.assignment_printable_item_sequence({
+    sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
+      min: 1,
+    }),
+  });
+
   return {
     answerLines: getPrintableWorksheetAnswerLines(item),
     choiceBank: buildPrintableWorksheetChoiceBankView(item),
     choicePresentation: item.choicePresentation,
     choices: normalizeRuntimeChoiceList(item.choices) ?? [],
+    headingLabel: m.assignment_printable_item_heading({
+      kindLabel,
+      sequenceLabel,
+    }),
     id: item.id,
-    kindLabel: formatRuntimeItemKindLabel(item),
+    kindLabel,
     prompt: formatRuntimeItemPrompt(item),
     responseHelp: getPrintableWorksheetResponseHelp(item.responseMode),
-    sequenceLabel: m.assignment_printable_item_sequence({
-      sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
-        min: 1,
-      }),
-    }),
+    sequenceLabel,
   };
 }
 

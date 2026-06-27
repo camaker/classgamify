@@ -48,7 +48,7 @@ function PrintableWorksheetItem({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-muted-foreground text-xs">
-            {itemView.sequenceLabel} · {itemView.kindLabel}
+            {itemView.headingLabel}
           </p>
           <h2 className="mt-2 font-semibold leading-6">{itemView.prompt}</h2>
         </div>

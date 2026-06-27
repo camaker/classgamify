@@ -151,8 +151,17 @@ export function formatAssignmentDeliveryPolicyText({
   });
 
   return [summaryView.instructions, ...summaryView.items]
-    .map((item) => `${item.label}: ${item.value}`)
-    .join('; ');
+    .map(formatAssignmentDeliveryPolicyItem)
+    .join(m.assignment_delivery_policy_separator());
+}
+
+function formatAssignmentDeliveryPolicyItem(
+  item: Pick<AssignmentDeliverySummaryItem, 'label' | 'value'>
+) {
+  return m.assignment_delivery_policy_item({
+    label: item.label,
+    value: item.value,
+  });
 }
 
 export function buildPublicAssignmentRuleSummary({

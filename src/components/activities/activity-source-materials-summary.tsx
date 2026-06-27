@@ -22,7 +22,7 @@ export function ActivitySourceMaterialsSummary({
         <div className="flex flex-wrap gap-1.5">
           {summary.kindBadges.map((badge) => (
             <Badge key={badge.kind} variant="secondary" className="rounded-md">
-              {badge.label} · {badge.count}
+              {badge.summaryText}
             </Badge>
           ))}
         </div>
@@ -35,7 +35,7 @@ export function ActivitySourceMaterialsSummary({
           <div className="mt-2 flex flex-wrap gap-1.5">
             {summary.extractionActions.map((action) => (
               <Badge key={action.id} variant="outline" className="rounded-md">
-                {action.label} · {action.sourceCount}
+                {action.summaryText}
               </Badge>
             ))}
           </div>

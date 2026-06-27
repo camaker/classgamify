@@ -29,12 +29,11 @@ export function AssignmentResultsItemAnalysisCard({
         className="mt-3 h-2"
       />
       <p className="mt-2 text-xs text-muted-foreground">
-        {itemView.correctSummaryLabel} · {itemView.expectedAnswerLabel}:{' '}
-        {itemView.expectedAnswerText}
+        {itemView.expectedAnswerSummaryText}
       </p>
-      {itemView.acceptedAnswersText ? (
+      {itemView.acceptedAnswersLineText ? (
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          {itemView.acceptedAnswersLabel}: {itemView.acceptedAnswersText}
+          {itemView.acceptedAnswersLineText}
         </p>
       ) : null}
       {itemView.explanationText ? (

@@ -168,7 +168,7 @@ export function ActivityLibraryCard({
                   variant="outline"
                   className="rounded-md"
                 >
-                  {badge.label}
+                  {badge.summaryText}
                 </Badge>
               ))}
             </div>
@@ -186,7 +186,7 @@ export function ActivityLibraryCard({
                         className="rounded-md bg-background"
                       >
                         <IconSparkles className="size-3" />
-                        {action.label}
+                        {action.summaryText}
                       </Badge>
                     )
                   )}

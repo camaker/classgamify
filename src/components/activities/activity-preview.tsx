@@ -99,7 +99,7 @@ export function ActivityPreview({
                 icon={IconListCheck}
               >
                 {previewView.content.visibleQuestions.map((question) => (
-                  <li key={question.id}>{question.prompt}</li>
+                  <li key={question.id}>{question.summaryText}</li>
                 ))}
               </PreviewPanel>
               <PreviewPanel
@@ -107,11 +107,7 @@ export function ActivityPreview({
                 icon={IconCards}
               >
                 {previewView.content.visiblePairs.map((pair) => (
-                  <li key={pair.id}>
-                    {pair.left}
-                    {' -> '}
-                    {pair.right}
-                  </li>
+                  <li key={pair.id}>{pair.summaryText}</li>
                 ))}
               </PreviewPanel>
               <PreviewPanel
@@ -119,9 +115,7 @@ export function ActivityPreview({
                 icon={IconSwitchHorizontal}
               >
                 {previewView.content.visibleGroups.map((group) => (
-                  <li key={group.id}>
-                    {group.label}: {group.items.join(', ')}
-                  </li>
+                  <li key={group.id}>{group.summaryText}</li>
                 ))}
               </PreviewPanel>
             </div>

@@ -31,6 +31,7 @@ export type ActivitySourceMaterialExtractionAction = {
 export type ActivitySourceMaterialExtractionActionView =
   ActivitySourceMaterialExtractionAction & {
     label: string;
+    summaryText: string;
   };
 
 export type ActivitySourceMaterialReadiness = {
@@ -58,6 +59,7 @@ export type ActivitySourceMaterialSummaryView = {
     count: number;
     kind: UserFileMaterialKind;
     label: string;
+    summaryText: string;
   }>;
   readiness: ActivitySourceMaterialReadiness;
   title: string;
@@ -107,10 +109,18 @@ export function buildActivitySourceMaterialSummaryView(
     ),
     extractionTitle: m.activity_source_material_extraction_title(),
     hasMaterials: summary.total > 0,
-    kindBadges: summary.kindSummaries.map((item) => ({
-      ...item,
-      label: formatUserFileMaterialKind(item.kind),
-    })),
+    kindBadges: summary.kindSummaries.map((item) => {
+      const label = formatUserFileMaterialKind(item.kind);
+
+      return {
+        ...item,
+        label,
+        summaryText: formatActivitySourceMaterialMetric({
+          count: item.count,
+          label,
+        }),
+      };
+    }),
     readiness: summary.readiness,
     title: m.activity_source_material_summary_title(),
   };
@@ -175,10 +185,26 @@ function buildActivitySourceMaterialExtractionActions(
 function toActivitySourceMaterialExtractionActionView(
   action: ActivitySourceMaterialExtractionAction
 ): ActivitySourceMaterialExtractionActionView {
+  const label = formatActivitySourceMaterialExtractionAction(action.id);
+
   return {
     ...action,
-    label: formatActivitySourceMaterialExtractionAction(action.id),
+    label,
+    summaryText: formatActivitySourceMaterialMetric({
+      count: action.sourceCount,
+      label,
+    }),
   };
+}
+
+function formatActivitySourceMaterialMetric({
+  count,
+  label,
+}: {
+  count: number;
+  label: string;
+}) {
+  return m.activity_source_material_summary_metric({ count, label });
 }
 
 function formatActivitySourceMaterialExtractionAction(
