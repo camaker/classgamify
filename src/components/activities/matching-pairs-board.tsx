@@ -6,8 +6,9 @@ import type { StudentAnswerChange } from '@/assignments/student-submission';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildChoicePairingRunnerView,
-  buildExclusiveChoiceAnswerChanges,
   getStudentRunnerReviewStatusClassName,
+  resolveChoicePairingRunnerAction,
+  type ChoicePairingRunnerAction,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
@@ -46,17 +47,18 @@ export function MatchingPairsBoard({
     [answers, copy.progressVerb, items, reviewItems, selectedItemId]
   );
 
-  function selectChoice(choice: string) {
-    if (!selectedItemId || disabled) return;
+  function handleRunnerAction(action: ChoicePairingRunnerAction) {
+    const result = resolveChoicePairingRunnerAction({
+      action,
+      answers,
+      disabled,
+      selectedItemId,
+    });
 
-    onAnswerChanges(
-      buildExclusiveChoiceAnswerChanges({
-        answers,
-        choice,
-        itemId: selectedItemId,
-      })
-    );
-    setSelectedItemId(undefined);
+    setSelectedItemId(result.selectedItemId);
+    if (result.type === 'answer') {
+      onAnswerChanges(result.answerChanges);
+    }
   }
 
   return (
@@ -87,11 +89,7 @@ export function MatchingPairsBoard({
                   itemView.selected && 'border-primary bg-primary/10',
                   revealAnswer && getStudentRunnerReviewStatusClassName(status)
                 )}
-                onClick={() =>
-                  setSelectedItemId((current) =>
-                    current === item.id ? undefined : item.id
-                  )
-                }
+                onClick={() => handleRunnerAction(itemView.action)}
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm font-medium">{itemView.promptLabel}</p>
@@ -118,27 +116,29 @@ export function MatchingPairsBoard({
         </div>
 
         <div className="grid content-start gap-2">
-          {runnerView.choiceViews.map(({ choice, selected, usedByItemId }) => (
-            <button
-              key={choice}
-              type="button"
-              disabled={!selectedItemId || disabled}
-              className={cn(
-                'min-h-14 rounded-lg border bg-background p-3 text-left text-sm transition-colors',
-                'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-70',
-                usedByItemId && 'bg-muted/30',
-                selected && 'border-primary bg-primary/10 text-primary'
-              )}
-              onClick={() => selectChoice(choice)}
-            >
-              <span className="font-medium">{choice}</span>
-              {usedByItemId ? (
-                <Badge variant="outline" className="ml-2 rounded-md">
-                  {copy.usedChoiceLabel}
-                </Badge>
-              ) : null}
-            </button>
-          ))}
+          {runnerView.choiceViews.map(
+            ({ action, choice, selected, usedByItemId }) => (
+              <button
+                key={choice}
+                type="button"
+                disabled={!selectedItemId || disabled}
+                className={cn(
+                  'min-h-14 rounded-lg border bg-background p-3 text-left text-sm transition-colors',
+                  'hover:border-primary/50 hover:bg-primary/5 disabled:cursor-default disabled:opacity-70',
+                  usedByItemId && 'bg-muted/30',
+                  selected && 'border-primary bg-primary/10 text-primary'
+                )}
+                onClick={() => handleRunnerAction(action)}
+              >
+                <span className="font-medium">{choice}</span>
+                {usedByItemId ? (
+                  <Badge variant="outline" className="ml-2 rounded-md">
+                    {copy.usedChoiceLabel}
+                  </Badge>
+                ) : null}
+              </button>
+            )
+          )}
         </div>
       </div>
     </div>

@@ -6,6 +6,8 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildGroupSortRunnerView,
   getStudentRunnerReviewStatusClassName,
+  resolveGroupSortRunnerAction,
+  type GroupSortRunnerAction,
   type StudentRunnerReviewStatus,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -17,7 +19,6 @@ import {
   IconCircle,
   IconLayoutColumns,
 } from '@tabler/icons-react';
-import type { MouseEventHandler } from 'react';
 import { useMemo, useState } from 'react';
 
 type GroupSortBoardProps = {
@@ -51,16 +52,17 @@ export function GroupSortBoard({
     [answers, copy.progressVerb, items, reviewItems, selectedItemId]
   );
 
-  function placeSelectedItem(group: string) {
-    if (!selectedItemId || disabled) return;
-    onAnswerChange(selectedItemId, group);
-    setSelectedItemId(undefined);
-  }
+  function handleRunnerAction(action: GroupSortRunnerAction) {
+    const result = resolveGroupSortRunnerAction({
+      action,
+      disabled,
+      selectedItemId,
+    });
 
-  function clearSelectedItem() {
-    if (!selectedItemId || disabled) return;
-    onAnswerChange(selectedItemId, '');
-    setSelectedItemId(undefined);
+    setSelectedItemId(result.selectedItemId);
+    if (result.type === 'answer') {
+      onAnswerChange(result.itemId, result.answer);
+    }
   }
 
   return (
@@ -87,7 +89,11 @@ export function GroupSortBoard({
                 type="button"
                 disabled={disabled}
                 className="rounded-md border bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:cursor-default disabled:opacity-60"
-                onClick={clearSelectedItem}
+                onClick={() =>
+                  runnerView.selectedClearAction
+                    ? handleRunnerAction(runnerView.selectedClearAction)
+                    : undefined
+                }
               >
                 {copy.clearSelectionLabel}
               </button>
@@ -97,8 +103,9 @@ export function GroupSortBoard({
           <div className="mt-3 grid gap-2">
             {runnerView.unplacedItemViews.length ? (
               runnerView.unplacedItemViews.map(
-                ({ item, reviewItem, selected, status }) => (
+                ({ action, item, reviewItem, selected, status }) => (
                   <GroupSortItemButton
+                    action={action}
                     correctLabel={copy.correctAnswerLabel}
                     key={item.id}
                     item={item}
@@ -106,11 +113,7 @@ export function GroupSortBoard({
                     revealAnswer={revealAnswer}
                     selected={selected}
                     status={status}
-                    onSelect={() =>
-                      setSelectedItemId((current) =>
-                        current === item.id ? undefined : item.id
-                      )
-                    }
+                    onSelect={handleRunnerAction}
                     disabled={disabled}
                   />
                 )
@@ -124,7 +127,7 @@ export function GroupSortBoard({
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {runnerView.groupViews.map(({ group, placedItemViews }) => {
+          {runnerView.groupViews.map(({ action, group, placedItemViews }) => {
             return (
               <div key={group} className="rounded-lg border bg-background p-3">
                 <button
@@ -137,7 +140,7 @@ export function GroupSortBoard({
                       !disabled &&
                       'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
                   )}
-                  onClick={() => placeSelectedItem(group)}
+                  onClick={() => handleRunnerAction(action)}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold">{group}</p>
@@ -149,20 +152,17 @@ export function GroupSortBoard({
 
                 <div className="mt-3 grid gap-2">
                   {placedItemViews.map(
-                    ({ item, reviewItem, selected, status }) => (
+                    ({ action, item, reviewItem, selected, status }) => (
                       <GroupSortItemButton
                         key={item.id}
                         correctLabel={copy.correctAnswerLabel}
+                        action={action}
                         item={item}
                         reviewItem={reviewItem}
                         revealAnswer={revealAnswer}
                         selected={selected}
                         status={status}
-                        onSelect={() =>
-                          setSelectedItemId((current) =>
-                            current === item.id ? undefined : item.id
-                          )
-                        }
+                        onSelect={handleRunnerAction}
                         disabled={disabled}
                         compact
                       />
@@ -182,6 +182,7 @@ export function GroupSortBoard({
 }
 
 function GroupSortItemButton({
+  action,
   compact = false,
   correctLabel,
   disabled,
@@ -192,11 +193,12 @@ function GroupSortItemButton({
   selected,
   status,
 }: {
+  action: GroupSortRunnerAction;
   compact?: boolean;
   correctLabel: string;
   disabled: boolean;
   item: PublicRuntimeItem;
-  onSelect: MouseEventHandler<HTMLButtonElement>;
+  onSelect: (action: GroupSortRunnerAction) => void;
   revealAnswer: boolean;
   reviewItem?: PublicAttemptReviewItem;
   selected: boolean;
@@ -213,7 +215,7 @@ function GroupSortItemButton({
         revealAnswer && getStudentRunnerReviewStatusClassName(status),
         compact && 'p-2'
       )}
-      onClick={onSelect}
+      onClick={() => onSelect(action)}
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium">{item.prompt}</p>

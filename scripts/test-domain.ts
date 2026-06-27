@@ -364,6 +364,8 @@ import {
   getStudentRunnerReviewStatusClassName,
   getUniqueRuntimeChoices,
   isSameRuntimeChoice,
+  resolveChoicePairingRunnerAction,
+  resolveGroupSortRunnerAction,
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
@@ -3084,13 +3086,18 @@ assert.match(
 );
 assert.match(
   groupSortBoardSource,
+  /resolveGroupSortRunnerAction[\s\S]*onAnswerChange\(result\.itemId, result\.answer\)/,
+  'Group-sort runner should resolve item selection, placement, and clearing through the assignment-domain action helper.'
+);
+assert.match(
+  groupSortBoardSource,
   /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
   'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
 );
 assert.doesNotMatch(
   groupSortBoardSource,
-  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id/,
-  'Group-sort runner should not rebuild selected, unplaced, or grouped item views in the component.'
+  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|setSelectedItemId\(\(current\)|onAnswerChange\(selectedItemId/,
+  'Group-sort runner should not rebuild selected, unplaced, grouped, or placement action rules in the component.'
 );
 for (const filePath of [
   'src/components/activities/listening-runner.tsx',
@@ -5005,23 +5012,23 @@ assert.match(
 );
 assert.match(
   lineMatchBoardSource,
-  /onAnswerChanges\([\s\S]*buildExclusiveChoiceAnswerChanges/,
-  'Line-match should submit exclusive choice changes as one answer-change batch.'
+  /resolveChoicePairingRunnerAction[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
+  'Line-match should resolve prompt and choice interactions through the assignment-domain pairing action helper.'
 );
 assert.doesNotMatch(
   lineMatchBoardSource,
-  /for \(const change of buildExclusiveChoiceAnswerChanges/,
-  'Line-match should not loop exclusive choice answer changes through repeated parent updates.'
+  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges|setSelectedItemId\(\(current\)/,
+  'Line-match should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
   matchingPairsBoardSource,
-  /onAnswerChanges\([\s\S]*buildExclusiveChoiceAnswerChanges/,
-  'Matching-pairs should submit exclusive choice changes as one answer-change batch.'
+  /resolveChoicePairingRunnerAction[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
+  'Matching-pairs should resolve prompt and choice interactions through the assignment-domain pairing action helper.'
 );
 assert.doesNotMatch(
   matchingPairsBoardSource,
-  /for \(const change of buildExclusiveChoiceAnswerChanges/,
-  'Matching-pairs should not loop exclusive choice answer changes through repeated parent updates.'
+  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges|setSelectedItemId\(\(current\)/,
+  'Matching-pairs should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
   playRouteSource,
@@ -5689,16 +5696,99 @@ assert.deepEqual(
   }),
   [
     {
+      action: {
+        choice: 'Paris',
+        type: 'choose-choice',
+      },
       choice: 'Paris',
       selected: false,
       usedByItemId: 'item-1',
     },
     {
+      action: {
+        choice: 'Rome',
+        type: 'choose-choice',
+      },
       choice: 'Rome',
       selected: true,
       usedByItemId: 'item-2',
     },
   ]
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      itemId: 'item-1',
+      type: 'select-prompt',
+    },
+    answers: {},
+    selectedItemId: undefined,
+  }),
+  {
+    selectedItemId: 'item-1',
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      itemId: 'item-1',
+      type: 'select-prompt',
+    },
+    answers: {},
+    selectedItemId: 'item-1',
+  }),
+  {
+    selectedItemId: undefined,
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      choice: 'Paris',
+      type: 'choose-choice',
+    },
+    answers: { 'item-1': 'Rome' },
+    selectedItemId: undefined,
+  }),
+  {
+    selectedItemId: undefined,
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      choice: 'Paris',
+      type: 'choose-choice',
+    },
+    answers: { 'item-1': ' Ｐａｒｉｓ ', 'item-2': 'Rome' },
+    selectedItemId: 'item-2',
+  }),
+  {
+    answerChanges: [
+      { answer: '', itemId: 'item-1' },
+      { answer: 'Paris', itemId: 'item-2' },
+    ],
+    selectedItemId: undefined,
+    type: 'answer',
+  }
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      itemId: 'item-2',
+      type: 'select-prompt',
+    },
+    answers: {},
+    disabled: true,
+    selectedItemId: 'item-1',
+  }),
+  {
+    selectedItemId: 'item-1',
+    type: 'select',
+  }
 );
 assert.deepEqual(
   buildRuntimeChoiceButtonViews({
@@ -11312,22 +11402,77 @@ assert.equal(choicePairingRunnerView.progressLabel, '2/3 matched');
 assert.deepEqual(
   choicePairingRunnerView.promptItemViews.map((itemView) => [
     itemView.item.id,
+    itemView.action,
     itemView.promptLabel,
     itemView.selected,
   ]),
   [
-    ['q-1', '1. Capital of France?', false],
-    ['pair-1', '2. Match "Hot" with its pair.', false],
-    ['pair-2', '3. Match "Up" with its pair.', true],
+    [
+      'q-1',
+      {
+        itemId: 'q-1',
+        type: 'select-prompt',
+      },
+      '1. Capital of France?',
+      false,
+    ],
+    [
+      'pair-1',
+      {
+        itemId: 'pair-1',
+        type: 'select-prompt',
+      },
+      '2. Match "Hot" with its pair.',
+      false,
+    ],
+    [
+      'pair-2',
+      {
+        itemId: 'pair-2',
+        type: 'select-prompt',
+      },
+      '3. Match "Up" with its pair.',
+      true,
+    ],
   ]
 );
 assert.deepEqual(choicePairingRunnerView.choiceViews, [
-  { choice: 'Paris', selected: false, usedByItemId: 'q-1' },
-  { choice: 'Lyon', selected: false, usedByItemId: undefined },
-  { choice: 'Cold', selected: false, usedByItemId: 'pair-1' },
-  { choice: 'Warm', selected: false, usedByItemId: undefined },
-  { choice: 'North', selected: false, usedByItemId: undefined },
-  { choice: 'South', selected: false, usedByItemId: undefined },
+  {
+    action: { choice: 'Paris', type: 'choose-choice' },
+    choice: 'Paris',
+    selected: false,
+    usedByItemId: 'q-1',
+  },
+  {
+    action: { choice: 'Lyon', type: 'choose-choice' },
+    choice: 'Lyon',
+    selected: false,
+    usedByItemId: undefined,
+  },
+  {
+    action: { choice: 'Cold', type: 'choose-choice' },
+    choice: 'Cold',
+    selected: false,
+    usedByItemId: 'pair-1',
+  },
+  {
+    action: { choice: 'Warm', type: 'choose-choice' },
+    choice: 'Warm',
+    selected: false,
+    usedByItemId: undefined,
+  },
+  {
+    action: { choice: 'North', type: 'choose-choice' },
+    choice: 'North',
+    selected: false,
+    usedByItemId: undefined,
+  },
+  {
+    action: { choice: 'South', type: 'choose-choice' },
+    choice: 'South',
+    selected: false,
+    usedByItemId: undefined,
+  },
 ]);
 const groupSortRunnerView = buildStudentRunnerView({
   answers: {
@@ -11380,6 +11525,9 @@ const groupSortBoardView = buildGroupSortRunnerView({
   selectedItemId: 'group-fruit-pear',
 });
 assert.equal(groupSortBoardView.selectedItem?.id, 'group-fruit-pear');
+assert.deepEqual(groupSortBoardView.selectedClearAction, {
+  type: 'clear-selected',
+});
 assert.deepEqual(
   groupSortBoardView.unplacedItemViews.map((itemView) => itemView.item.id),
   ['group-fruit-pear']
@@ -11387,29 +11535,164 @@ assert.deepEqual(
 assert.deepEqual(
   groupSortBoardView.unplacedItemViews.map((itemView) => [
     itemView.item.id,
+    itemView.action,
     itemView.selected,
   ]),
-  [['group-fruit-pear', true]]
+  [
+    [
+      'group-fruit-pear',
+      {
+        itemId: 'group-fruit-pear',
+        type: 'select-item',
+      },
+      true,
+    ],
+  ]
 );
 assert.deepEqual(
-  groupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
+  groupSortBoardView.groupViews.map(({ action, group, placedItemViews }) => [
+    action,
     group,
     placedItemViews.map((itemView) => itemView.item.id),
   ]),
   [
-    ['Fruit', ['group-fruit-apple']],
-    ['Drink', ['group-drink-water']],
+    [
+      {
+        group: 'Fruit',
+        type: 'place-selected',
+      },
+      'Fruit',
+      ['group-fruit-apple'],
+    ],
+    [
+      {
+        group: 'Drink',
+        type: 'place-selected',
+      },
+      'Drink',
+      ['group-drink-water'],
+    ],
   ]
 );
 assert.deepEqual(
   groupSortBoardView.groupViews.map(({ group, placedItemViews }) => [
     group,
-    placedItemViews.map((itemView) => [itemView.item.id, itemView.selected]),
+    placedItemViews.map((itemView) => [
+      itemView.item.id,
+      itemView.action,
+      itemView.selected,
+    ]),
   ]),
   [
-    ['Fruit', [['group-fruit-apple', false]]],
-    ['Drink', [['group-drink-water', false]]],
+    [
+      'Fruit',
+      [
+        [
+          'group-fruit-apple',
+          {
+            itemId: 'group-fruit-apple',
+            type: 'select-item',
+          },
+          false,
+        ],
+      ],
+    ],
+    [
+      'Drink',
+      [
+        [
+          'group-drink-water',
+          {
+            itemId: 'group-drink-water',
+            type: 'select-item',
+          },
+          false,
+        ],
+      ],
+    ],
   ]
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      itemId: 'group-fruit-pear',
+      type: 'select-item',
+    },
+    selectedItemId: undefined,
+  }),
+  {
+    selectedItemId: 'group-fruit-pear',
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      itemId: 'group-fruit-pear',
+      type: 'select-item',
+    },
+    selectedItemId: 'group-fruit-pear',
+  }),
+  {
+    selectedItemId: undefined,
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      group: 'Fruit',
+      type: 'place-selected',
+    },
+    selectedItemId: 'group-fruit-pear',
+  }),
+  {
+    answer: 'Fruit',
+    itemId: 'group-fruit-pear',
+    selectedItemId: undefined,
+    type: 'answer',
+  }
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      type: 'clear-selected',
+    },
+    selectedItemId: 'group-fruit-pear',
+  }),
+  {
+    answer: '',
+    itemId: 'group-fruit-pear',
+    selectedItemId: undefined,
+    type: 'answer',
+  }
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      group: 'Fruit',
+      type: 'place-selected',
+    },
+    selectedItemId: undefined,
+  }),
+  {
+    selectedItemId: undefined,
+    type: 'select',
+  }
+);
+assert.deepEqual(
+  resolveGroupSortRunnerAction({
+    action: {
+      group: 'Fruit',
+      type: 'place-selected',
+    },
+    disabled: true,
+    selectedItemId: 'group-fruit-pear',
+  }),
+  {
+    selectedItemId: 'group-fruit-pear',
+    type: 'select',
+  }
 );
 assert.deepEqual(
   buildPublicAttemptReviewItems({

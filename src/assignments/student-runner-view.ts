@@ -44,6 +44,13 @@ type RuntimeChoiceButtonView = {
   selected: boolean;
 };
 
+type RuntimeChoiceView = {
+  action: ChoicePairingRunnerAction;
+  choice: string;
+  selected: boolean;
+  usedByItemId: string | undefined;
+};
+
 type DefaultRuntimeItemCardView = ReturnType<
   typeof buildStudentRunnerView
 >['itemViews'][number] & {
@@ -54,22 +61,25 @@ type DefaultRuntimeItemCardView = ReturnType<
 };
 
 type ChoicePairingRunnerView = ReturnType<typeof buildStudentRunnerView> & {
-  choiceViews: ReturnType<typeof buildRuntimeChoiceViews>;
+  choiceViews: RuntimeChoiceView[];
   promptItemViews: ChoicePairingPromptItemView[];
 };
 
 type ChoicePairingPromptItemView = ReturnType<
   typeof buildStudentRunnerView
 >['itemViews'][number] & {
+  action: ChoicePairingRunnerAction;
   promptLabel: string;
   selected: boolean;
 };
 
 type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
   groupViews: Array<{
+    action: GroupSortRunnerAction;
     group: string;
     placedItemViews: GroupSortItemView[];
   }>;
+  selectedClearAction: GroupSortRunnerAction | undefined;
   selectedItem?: PublicRuntimeItem;
   unplacedItemViews: GroupSortItemView[];
 };
@@ -77,8 +87,55 @@ type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
 type GroupSortItemView = ReturnType<
   typeof buildStudentRunnerView
 >['itemViews'][number] & {
+  action: GroupSortRunnerAction;
   selected: boolean;
 };
+
+export type ChoicePairingRunnerAction =
+  | {
+      itemId: string;
+      type: 'select-prompt';
+    }
+  | {
+      choice: string;
+      type: 'choose-choice';
+    };
+
+export type ChoicePairingRunnerActionResult =
+  | {
+      answerChanges: RuntimeChoiceAnswerChange[];
+      selectedItemId: undefined;
+      type: 'answer';
+    }
+  | {
+      selectedItemId: string | undefined;
+      type: 'select';
+    };
+
+export type GroupSortRunnerAction =
+  | {
+      itemId: string;
+      type: 'select-item';
+    }
+  | {
+      group: string;
+      type: 'place-selected';
+    }
+  | {
+      type: 'clear-selected';
+    };
+
+export type GroupSortRunnerActionResult =
+  | {
+      answer: string;
+      itemId: string;
+      selectedItemId: undefined;
+      type: 'answer';
+    }
+  | {
+      selectedItemId: string | undefined;
+      type: 'select';
+    };
 
 type InlineBlankPromptView =
   | {
@@ -465,6 +522,44 @@ function buildSequentialStudentRunnerSelectAction(
   };
 }
 
+function buildChoicePairingPromptAction(
+  itemId: string
+): ChoicePairingRunnerAction {
+  return {
+    itemId,
+    type: 'select-prompt',
+  };
+}
+
+function buildChoicePairingChoiceAction(
+  choice: string
+): ChoicePairingRunnerAction {
+  return {
+    choice,
+    type: 'choose-choice',
+  };
+}
+
+function buildGroupSortItemAction(itemId: string): GroupSortRunnerAction {
+  return {
+    itemId,
+    type: 'select-item',
+  };
+}
+
+function buildGroupSortPlaceAction(group: string): GroupSortRunnerAction {
+  return {
+    group,
+    type: 'place-selected',
+  };
+}
+
+function buildGroupSortClearAction(): GroupSortRunnerAction {
+  return {
+    type: 'clear-selected',
+  };
+}
+
 export function getUniqueRuntimeChoices(items: PublicRuntimeItem[]) {
   return (
     normalizeRuntimeChoiceList(items.flatMap((item) => item.choices ?? [])) ??
@@ -499,8 +594,9 @@ export function buildRuntimeChoiceViews({
   answers: StudentAnswerMap;
   choices: string[];
   selectedItemId?: string;
-}) {
+}): RuntimeChoiceView[] {
   return choices.map((choice) => ({
+    action: buildChoicePairingChoiceAction(choice),
     choice,
     selected: selectedItemId
       ? isSameRuntimeChoice(answers[selectedItemId], choice)
@@ -583,6 +679,7 @@ export function buildChoicePairingRunnerView({
     }),
     promptItemViews: runnerView.itemViews.map((itemView) => ({
       ...itemView,
+      action: buildChoicePairingPromptAction(itemView.item.id),
       promptLabel: itemView.positionLabel,
       selected: selectedItemId === itemView.item.id,
     })),
@@ -610,17 +707,22 @@ export function buildGroupSortRunnerView({
   });
   const itemViews = runnerView.itemViews.map((itemView) => ({
     ...itemView,
+    action: buildGroupSortItemAction(itemView.item.id),
     selected: selectedItemId === itemView.item.id,
   }));
 
   return {
     ...runnerView,
     groupViews: runnerView.choices.map((group) => ({
+      action: buildGroupSortPlaceAction(group),
       group,
       placedItemViews: itemViews.filter((itemView) =>
         isSameRuntimeChoice(itemView.answer, group)
       ),
     })),
+    selectedClearAction: selectedItemId
+      ? buildGroupSortClearAction()
+      : undefined,
     selectedItem: selectedItemId
       ? itemViews.find((itemView) => itemView.selected)?.item
       : undefined,
@@ -647,6 +749,98 @@ export function buildExclusiveChoiceAnswerChanges({
   changes.push({ answer: choice, itemId });
 
   return changes;
+}
+
+export function resolveChoicePairingRunnerAction({
+  action,
+  answers,
+  disabled = false,
+  selectedItemId,
+}: {
+  action: ChoicePairingRunnerAction;
+  answers: StudentAnswerMap;
+  disabled?: boolean;
+  selectedItemId?: string;
+}): ChoicePairingRunnerActionResult {
+  if (disabled) {
+    return {
+      selectedItemId,
+      type: 'select',
+    };
+  }
+
+  if (action.type === 'select-prompt') {
+    return {
+      selectedItemId:
+        selectedItemId === action.itemId ? undefined : action.itemId,
+      type: 'select',
+    };
+  }
+
+  if (!selectedItemId) {
+    return {
+      selectedItemId,
+      type: 'select',
+    };
+  }
+
+  return {
+    answerChanges: buildExclusiveChoiceAnswerChanges({
+      answers,
+      choice: action.choice,
+      itemId: selectedItemId,
+    }),
+    selectedItemId: undefined,
+    type: 'answer',
+  };
+}
+
+export function resolveGroupSortRunnerAction({
+  action,
+  disabled = false,
+  selectedItemId,
+}: {
+  action: GroupSortRunnerAction;
+  disabled?: boolean;
+  selectedItemId?: string;
+}): GroupSortRunnerActionResult {
+  if (disabled) {
+    return {
+      selectedItemId,
+      type: 'select',
+    };
+  }
+
+  if (action.type === 'select-item') {
+    return {
+      selectedItemId:
+        selectedItemId === action.itemId ? undefined : action.itemId,
+      type: 'select',
+    };
+  }
+
+  if (!selectedItemId) {
+    return {
+      selectedItemId,
+      type: 'select',
+    };
+  }
+
+  if (action.type === 'clear-selected') {
+    return {
+      answer: '',
+      itemId: selectedItemId,
+      selectedItemId: undefined,
+      type: 'answer',
+    };
+  }
+
+  return {
+    answer: action.group,
+    itemId: selectedItemId,
+    selectedItemId: undefined,
+    type: 'answer',
+  };
 }
 
 export function buildInlineBlankPromptView(
