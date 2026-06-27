@@ -36,7 +36,6 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -162,7 +161,11 @@ export const createActivity = createServerFn({ method: 'POST' })
       visibility: data.visibility,
     });
 
-    const [row] = await db.select().from(activity).where(eq(activity.id, id));
+    const [row] = await db
+      .select()
+      .from(activity)
+      .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
+      .limit(1);
 
     if (!row) {
       throw new Error(m.activity_api_error_create_load_failed());
@@ -213,7 +216,11 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
       visibility: 'draft',
     });
 
-    const [row] = await db.select().from(activity).where(eq(activity.id, id));
+    const [row] = await db
+      .select()
+      .from(activity)
+      .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
+      .limit(1);
 
     if (!row) {
       throw new Error(m.activity_api_error_duplicate_load_failed());
@@ -284,7 +291,11 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       visibility: 'draft',
     });
 
-    const [row] = await db.select().from(activity).where(eq(activity.id, id));
+    const [row] = await db
+      .select()
+      .from(activity)
+      .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
+      .limit(1);
 
     if (!row) {
       throw new Error(m.activity_api_error_remix_load_failed());

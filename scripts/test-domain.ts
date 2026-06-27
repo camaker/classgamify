@@ -11992,13 +11992,28 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
+  /createActivity[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: id, userId \}\)/,
+  'Create activity API should reload the saved activity through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
   /duplicateActivity[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
   'Duplicate activity API should load source activity through the activity detail query helper.'
 );
 assert.match(
   activitiesApiSource,
+  /duplicateActivity[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: id, userId \}\)/,
+  'Duplicate activity API should reload derivative drafts through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
   /remixActivityTemplate[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
   'Template remix API should load source activity through the activity detail query helper.'
+);
+assert.match(
+  activitiesApiSource,
+  /remixActivityTemplate[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: id, userId \}\)/,
+  'Template remix API should reload remixed drafts through the activity detail query helper.'
 );
 assert.match(
   activitiesApiSource,
@@ -12017,7 +12032,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   activitiesApiSource,
-  /and\(eq\(activity\.id, (?:data\.id|data\.activityId|activityId)\), eq\(activity\.ownerId, (?:userId|ownerId)\)\)/,
+  /and\(eq\(activity\.id, (?:data\.id|data\.activityId|activityId)\), eq\(activity\.ownerId, (?:userId|ownerId)\)\)|\.where\(eq\(activity\.id, id\)\)/,
   'Activity API should not keep local owner-scoped detail lookup rules.'
 );
 assert.doesNotMatch(
