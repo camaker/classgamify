@@ -3343,9 +3343,14 @@ assert.match(
   /formatActivitySourceMaterialReferenceMeta[\s\S]*activity_source_material_summary_list_separator/,
   'Activity source-material reference meta should use the activity-domain localized list separator.'
 );
+assert.match(
+  activityMaterialSummarySource,
+  /formatActivitySourceMaterialReferenceMeta[\s\S]*normalizeOptionalRuntimeDisplayText/,
+  'Activity source-material reference meta should normalize visible meta parts through the shared display helper.'
+);
 assert.doesNotMatch(
   activityMaterialSummarySource,
-  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)/,
+  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)|part\?\.trim\(\)/,
   'Activity source-material extraction summaries should not only show raw source counts or hard-code list separators.'
 );
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
@@ -3366,6 +3371,16 @@ assert.equal(
     '2 KB',
   ]),
   'Audio, 2 KB, audio/mpeg'
+);
+assert.equal(
+  formatActivitySourceMaterialReferenceMeta(
+    {
+      ...listeningMaterialReference,
+      contentType: ' audio / mpeg ',
+    },
+    ['  ２　KB  ', '   ']
+  ),
+  'Audio, 2 KB, audio / mpeg'
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -12118,10 +12133,20 @@ assert.match(
   /appendActivitySourceMaterialDraftNotes[\s\S]*buildActivitySourceMaterialDraftSummary\(sourceMaterials\)[\s\S]*sourceMaterialSummary\.notesText/,
   'AI draft source note syncing should reuse the shared source-material summary.'
 );
+assert.match(
+  activityDraftSourceSource,
+  /isActivitySourceMaterialDraftNotesParagraph[\s\S]*normalizeRuntimeDisplayText/,
+  'AI draft source note syncing should identify existing material-note headings through shared display normalization.'
+);
 assert.doesNotMatch(
   activityDraftSourceSource,
   /fileId: material\.fileId|contentType: material\.contentType|size: material\.size/,
   'AI draft source material summaries should not expose file ids, content types, or sizes.'
+);
+assert.doesNotMatch(
+  activityDraftSourceSource,
+  /activity_draft_source_materials_heading\(\)\.trim\(\)|\?\.trim\(\) === heading/,
+  'AI draft source note syncing should not rely on trim-only heading checks.'
 );
 const assignmentValidationSource = readFileSync(
   'src/assignments/validation.ts',
@@ -18978,6 +19003,19 @@ assert.equal(
   [
     'Teacher source notes',
     'Attached classroom source materials:\n- Worksheet document: Updated worksheet.pdf',
+  ].join('\n\n')
+);
+assert.equal(
+  appendActivitySourceMaterialDraftNotes({
+    sourceMaterials: [listeningMaterialReference],
+    sourceText: [
+      'Teacher source notes',
+      '  Ａｔｔａｃｈｅｄ　classroom source materials:  \n- Worksheet document: stale.pdf',
+    ].join('\n\n'),
+  }),
+  [
+    'Teacher source notes',
+    'Attached classroom source materials:\n- Audio: 三年级听力.mp3',
   ].join('\n\n')
 );
 assert.equal(

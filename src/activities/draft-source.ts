@@ -1,5 +1,6 @@
 import type { CreateActivityInput } from '@/activities/validation';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
 import type { ActivityMaterialReference } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
@@ -177,9 +178,14 @@ function getActivityDraftSourceTextParagraphs(sourceText: string) {
 }
 
 function isActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
-  const heading = m.activity_draft_source_materials_heading().trim();
+  const heading = normalizeRuntimeDisplayText(
+    m.activity_draft_source_materials_heading()
+  );
+  const paragraphHeading = normalizeRuntimeDisplayText(
+    paragraph.split(/\r?\n/)[0]
+  );
 
-  return paragraph.split(/\r?\n/)[0]?.trim() === heading;
+  return paragraphHeading === heading;
 }
 
 function unique(values: string[]) {

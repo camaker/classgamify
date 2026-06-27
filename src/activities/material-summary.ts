@@ -6,6 +6,7 @@ import {
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
+import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
 
 export type ActivitySourceMaterialKindSummary = {
   count: number;
@@ -137,7 +138,7 @@ export function formatActivitySourceMaterialReferenceMeta(
     ...extraParts,
     material.contentType,
   ]
-    .map((part) => part?.trim())
+    .map(normalizeOptionalRuntimeDisplayText)
     .filter(Boolean)
     .join(m.activity_source_material_summary_list_separator());
 }
