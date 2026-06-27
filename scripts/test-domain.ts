@@ -670,7 +670,11 @@ import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
-import type { AttemptAnswer, AttemptResult } from '@/activities/types';
+import type {
+  AssignmentSettings,
+  AttemptAnswer,
+  AttemptResult,
+} from '@/activities/types';
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
@@ -1500,8 +1504,13 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAssignmentDeliverySummary[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*id: assignment\.id,[\s\S]*settingsJson: settings,[\s\S]*shareSlug,[\s\S]*status: assignment\.status,[\s\S]*title: assignment\.title/,
+  /function buildPublicAssignmentDeliverySummary[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*id: assignment\.id,[\s\S]*settingsJson: buildPublicAssignmentSettings\(settings\),[\s\S]*shareSlug,[\s\S]*status: assignment\.status,[\s\S]*title: assignment\.title/,
   'Public assignment metadata should explicitly pick the only assignment fields allowed in student payloads.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSettings[\s\S]*collectStudentName: settings\.collectStudentName,[\s\S]*instructions: settings\.instructions,[\s\S]*maxAttempts: settings\.maxAttempts,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*timeLimitSeconds: settings\.timeLimitSeconds/,
+  'Public assignment settings should explicitly pick the only delivery-rule fields allowed in student payloads.'
 );
 assert.match(
   publicAssignmentSource,
@@ -1542,6 +1551,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /function buildPublicAssignmentActivitySummary[\s\S]\.\.\.activity[\s\S]*function buildPublicAssignmentDeliverySummary|function buildPublicAssignmentDeliverySummary[\s\S]\.\.\.assignment[\s\S]*function buildPublicAssignmentSnapshotSummary/,
   'Public activity and assignment metadata should not spread source rows into student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSettings[\s\S]\.\.\.settings[\s\S]*function buildPublicAssignmentSnapshotSummary/,
+  'Public assignment settings should not spread resolved settings into student payloads.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -8691,6 +8705,54 @@ assert.equal(
 assert.equal(
   publicAssignmentPayload.assignment.settingsJson.showCorrectAnswers,
   true
+);
+const publicAssignmentPayloadWithPrivateSettings = buildPublicAssignmentPayload(
+  {
+    ...publicAssignmentPayloadSource,
+    assignment: {
+      ...publicAssignmentPayloadSource.assignment,
+      settingsJson: {
+        collectStudentName: false,
+        instructions: '  Finish quietly.  ',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        teacherOnlyNotes: 'Do not show this to students.',
+        timeLimitSeconds: 120,
+      } satisfies Partial<AssignmentSettings> & {
+        teacherOnlyNotes: string;
+      },
+    },
+  }
+);
+assert.deepEqual(
+  Object.keys(
+    publicAssignmentPayloadWithPrivateSettings.assignment.settingsJson
+  ).sort(),
+  [
+    'collectStudentName',
+    'instructions',
+    'maxAttempts',
+    'showCorrectAnswers',
+    'shuffleItems',
+    'timeLimitSeconds',
+  ]
+);
+assert.deepEqual(
+  publicAssignmentPayloadWithPrivateSettings.assignment.settingsJson,
+  {
+    collectStudentName: false,
+    instructions: 'Finish quietly.',
+    maxAttempts: 3,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 120,
+  }
+);
+assert.equal(
+  'teacherOnlyNotes' in
+    publicAssignmentPayloadWithPrivateSettings.assignment.settingsJson,
+  false
 );
 assert.deepEqual(publicAssignmentPayload.snapshot, {
   activityDescription: 'Frozen activity description',

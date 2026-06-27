@@ -55,6 +55,16 @@ export type PublicAttemptResult = {
   totalPoints: number;
 };
 
+export type PublicAssignmentSettings = Pick<
+  AssignmentSettings,
+  | 'collectStudentName'
+  | 'instructions'
+  | 'maxAttempts'
+  | 'showCorrectAnswers'
+  | 'shuffleItems'
+  | 'timeLimitSeconds'
+>;
+
 export type PublicAssignmentPayload = {
   activity: {
     description: string | null;
@@ -66,7 +76,7 @@ export type PublicAssignmentPayload = {
   assignment: {
     id: string;
     expiresAt: Date | null;
-    settingsJson: AssignmentSettings;
+    settingsJson: PublicAssignmentSettings;
     shareSlug: string;
     status: AssignmentStatus;
     title: string;
@@ -247,10 +257,23 @@ function buildPublicAssignmentDeliverySummary({
   return {
     expiresAt: assignment.expiresAt,
     id: assignment.id,
-    settingsJson: settings,
+    settingsJson: buildPublicAssignmentSettings(settings),
     shareSlug,
     status: assignment.status,
     title: assignment.title,
+  };
+}
+
+function buildPublicAssignmentSettings(
+  settings: AssignmentSettings
+): PublicAssignmentSettings {
+  return {
+    collectStudentName: settings.collectStudentName,
+    instructions: settings.instructions,
+    maxAttempts: settings.maxAttempts,
+    showCorrectAnswers: settings.showCorrectAnswers,
+    shuffleItems: settings.shuffleItems,
+    timeLimitSeconds: settings.timeLimitSeconds,
   };
 }
 
