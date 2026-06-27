@@ -1,5 +1,8 @@
 import { getUniqueAcceptedAnswers } from '@/activities/answer-matching';
-import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
+import {
+  normalizeRuntimeDisplayList,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
 type ResultDateValue = Date | string | null | undefined;
@@ -90,7 +93,7 @@ export function formatPrimaryAcceptedAnswer(
     emptyValue?: string;
   }
 ) {
-  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  const acceptedAnswers = getDisplayAcceptedAnswerValues(values);
   return formatAssignmentResultValue(acceptedAnswers[0], {
     emptyValue: options?.emptyValue,
   });
@@ -135,10 +138,14 @@ function getDisplayAcceptedAnswers(
     includePrimary?: boolean;
   }
 ) {
-  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  const acceptedAnswers = getDisplayAcceptedAnswerValues(values);
   if (acceptedAnswers.length <= 1) return [];
 
   return options?.includePrimary === false
     ? acceptedAnswers.slice(1)
     : acceptedAnswers;
+}
+
+function getDisplayAcceptedAnswerValues(values: string[]) {
+  return normalizeRuntimeDisplayList(getUniqueAcceptedAnswers(values)) ?? [];
 }

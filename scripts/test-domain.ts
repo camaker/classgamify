@@ -2517,6 +2517,11 @@ assert.match(
 );
 assert.match(
   assignmentResultFormatSource,
+  /function getDisplayAcceptedAnswerValues[\s\S]*normalizeRuntimeDisplayList\(getUniqueAcceptedAnswers\(values\)\)/,
+  'Assignment result accepted-answer formatting should normalize display values through the shared runtime display-list helper.'
+);
+assert.match(
+  assignmentResultFormatSource,
   /getAssignmentResultEmptyValue[\s\S]*assignment_result_empty_value/,
   'Assignment result formatting should use the localized empty-value placeholder by default.'
 );
@@ -19332,6 +19337,10 @@ assert.equal(
     'Paris, France',
   ]),
   'Paris, Paris, France'
+);
+assert.equal(
+  formatAcceptedAnswerAlternatives([' Ｐａｒｉｓ ', 'Paris\u00A0　France']),
+  'Paris, Paris France'
 );
 assert.equal(formatOptionalAcceptedAnswerAlternatives([]), null);
 assert.equal(formatOptionalAcceptedAnswerAlternatives(['Paris']), null);
