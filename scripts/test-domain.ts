@@ -539,6 +539,7 @@ import {
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
 import {
+  compareAssignmentStudentsByDisplayLabel,
   getAssignmentStudentFollowUpPriorityStudents,
   sortAssignmentStudentsByFollowUpPriority,
 } from '@/assignments/student-follow-up-priority';
@@ -1297,6 +1298,10 @@ const assignmentResultFiltersSource = readFileSync(
   'src/assignments/result-filters.ts',
   'utf8'
 );
+const assignmentStudentFollowUpPrioritySource = readFileSync(
+  'src/assignments/student-follow-up-priority.ts',
+  'utf8'
+);
 const assignmentAttemptStatsSource = readFileSync(
   'src/assignments/attempt-stats.ts',
   'utf8'
@@ -1368,6 +1373,21 @@ assert.match(
   assignmentResultFiltersSource,
   /export function filterAttemptReviews/,
   'Assignment result answer-review filtering should live in the assignment result filter domain helper.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /compareAssignmentStudentsByDisplayLabel/,
+  'Assignment result student sorting should reuse the shared normalized display-label comparator.'
+);
+assert.match(
+  assignmentStudentFollowUpPrioritySource,
+  /export function compareAssignmentStudentsByDisplayLabel[\s\S]*normalizeRuntimeDisplayText/,
+  'Assignment student follow-up ordering should expose a normalized display-label comparator.'
+);
+assert.doesNotMatch(
+  `${assignmentResultFiltersSource}\n${assignmentStudentFollowUpPrioritySource}`,
+  /studentLabel\.localeCompare/,
+  'Assignment result student ordering should not compare raw student labels directly.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -22482,6 +22502,47 @@ assert.deepEqual(
   ),
   ['Alice', 'Anonymous student 1']
 );
+assert.equal(
+  compareAssignmentStudentsByDisplayLabel(
+    { studentLabel: ' Ｂｅｔａ ' },
+    { studentLabel: 'alpha' }
+  ) > 0,
+  true
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        attempts: 2,
+        studentLabel: ' Ｂｅｔａ ',
+      },
+      {
+        ...resultAnalysis.students[1]!,
+        attempts: 2,
+        studentLabel: 'alpha',
+      },
+    ],
+    'attempts'
+  ).map((student) => student.studentLabel),
+  ['alpha', ' Ｂｅｔａ ']
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        studentLabel: ' Ｂｅｔａ ',
+      },
+      {
+        ...resultAnalysis.students[1]!,
+        studentLabel: 'alpha',
+      },
+    ],
+    'name'
+  ).map((student) => student.studentLabel),
+  ['alpha', ' Ｂｅｔａ ']
+);
 assert.deepEqual(
   filterAndSortStudentSummaries({
     search: ' ａｎｏｎｙｍｏｕｓ ',
@@ -22729,6 +22790,23 @@ assert.deepEqual(
     (student) => student.studentLabel
   ),
   ['Alpha review', 'More review', 'Lower score', 'No review']
+);
+assert.deepEqual(
+  sortAssignmentStudentsByFollowUpPriority([
+    {
+      ...followUpPriorityStudents[0]!,
+      latestAccuracy: 70,
+      needsReviewCount: 3,
+      studentLabel: ' Ｂｅｔａ review ',
+    },
+    {
+      ...followUpPriorityStudents[1]!,
+      latestAccuracy: 70,
+      needsReviewCount: 3,
+      studentLabel: 'alpha review',
+    },
+  ]).map((student) => student.studentLabel),
+  ['alpha review', ' Ｂｅｔａ review ']
 );
 assert.deepEqual(
   getAssignmentStudentFollowUpPriorityStudents(followUpPriorityStudents, {

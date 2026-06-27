@@ -1,4 +1,5 @@
 import type { AssignmentStudentSummary } from '@/assignments/results';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 
 export function compareAssignmentStudentsByFollowUpPriority(
   left: AssignmentStudentSummary,
@@ -24,7 +25,16 @@ export function compareAssignmentStudentsByFollowUpPriority(
     return leftLatestAccuracy - rightLatestAccuracy;
   }
 
-  return left.studentLabel.localeCompare(right.studentLabel);
+  return compareAssignmentStudentsByDisplayLabel(left, right);
+}
+
+export function compareAssignmentStudentsByDisplayLabel(
+  left: Pick<AssignmentStudentSummary, 'studentLabel'>,
+  right: Pick<AssignmentStudentSummary, 'studentLabel'>
+) {
+  return normalizeStudentDisplayLabel(left.studentLabel).localeCompare(
+    normalizeStudentDisplayLabel(right.studentLabel)
+  );
 }
 
 export function sortAssignmentStudentsByFollowUpPriority(
@@ -58,4 +68,8 @@ function normalizeFollowUpPriorityNumber(value: number) {
 
 function normalizeFollowUpPriorityCount(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+}
+
+function normalizeStudentDisplayLabel(value: string) {
+  return normalizeRuntimeDisplayText(value).toLocaleLowerCase();
 }

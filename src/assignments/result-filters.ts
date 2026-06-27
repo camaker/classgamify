@@ -10,7 +10,10 @@ import {
   compareAssignmentItemsByStableOrder,
   compareAssignmentItemsByType,
 } from '@/assignments/review-priority';
-import { compareAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
+import {
+  compareAssignmentStudentsByDisplayLabel,
+  compareAssignmentStudentsByFollowUpPriority,
+} from '@/assignments/student-follow-up-priority';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -199,7 +202,7 @@ export function sortStudentSummaries(
     }
 
     if (sort === 'name') {
-      return left.studentLabel.localeCompare(right.studentLabel);
+      return compareAssignmentStudentsByDisplayLabel(left, right);
     }
 
     if (sort === 'attempts') {
@@ -452,5 +455,5 @@ function compareStudentsDescending(
   rightStudent: AssignmentStudentSummary
 ) {
   if (leftValue !== rightValue) return rightValue - leftValue;
-  return leftStudent.studentLabel.localeCompare(rightStudent.studentLabel);
+  return compareAssignmentStudentsByDisplayLabel(leftStudent, rightStudent);
 }
