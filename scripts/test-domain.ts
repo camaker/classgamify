@@ -342,6 +342,7 @@ import {
   buildPublicAssignmentPayload,
   buildPublicAssignmentPreviewActivity,
   buildPublicAssignmentPreviewAssignment,
+  buildPublicAttemptResult,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
@@ -667,7 +668,7 @@ import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
-import type { AttemptAnswer } from '@/activities/types';
+import type { AttemptAnswer, AttemptResult } from '@/activities/types';
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
@@ -1477,6 +1478,11 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /export function buildPublicAttemptResult[\s\S]*accuracy: result\.accuracy,[\s\S]*completedItemCount: result\.completedItemCount,[\s\S]*correctItemCount: result\.correctItemCount,[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints,[\s\S]*totalPoints: result\.totalPoints/,
+  'Public attempt results should explicitly pick the only score fields allowed in student submission responses.'
+);
+assert.match(
+  publicAssignmentSource,
   /activity: buildPublicAssignmentActivitySummary\(\{[\s\S]*activity,[\s\S]*description: resolvedSource\.activityDescription,[\s\S]*templateType,[\s\S]*title: resolvedSource\.activityTitle/,
   'Public assignment payload should delegate activity metadata sanitization to the public activity summary helper.'
 );
@@ -1544,6 +1550,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /function buildPublicAttemptReviewItem[\s\S]*(?:\.\.\.item|\.\.\.answer)[\s\S]*function buildAttemptReviewItems/,
   'Public attempt review item sanitization should not spread runtime items or stored answers into student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAttemptResult[\s\S]\.\.\.result[\s\S]*export function buildPublicAssignmentPreviewActivity/,
+  'Public attempt result sanitization should not spread scorer results into student payloads.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -10148,6 +10159,37 @@ assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
 assert.equal(publicReviewMap.get('pair-1')?.correct, false);
 assert.equal(publicReviewMap.get('missing'), undefined);
 assert.equal(buildPublicAttemptReviewItemMap(undefined).size, 0);
+const publicAttemptResultWithPrivateFields = buildPublicAttemptResult({
+  accuracy: 50,
+  completedItemCount: 1,
+  correctItemCount: 1,
+  durationSeconds: 80,
+  earnedPoints: 1,
+  rawAnswers: [{ answer: 'Paris', itemId: 'q-1' }],
+  scorerTraceId: 'teacher-only-trace',
+  totalPoints: 2,
+} satisfies AttemptResult & {
+  rawAnswers: Array<{ answer: string; itemId: string }>;
+  scorerTraceId: string;
+});
+assert.deepEqual(Object.keys(publicAttemptResultWithPrivateFields).sort(), [
+  'accuracy',
+  'completedItemCount',
+  'correctItemCount',
+  'durationSeconds',
+  'earnedPoints',
+  'totalPoints',
+]);
+assert.deepEqual(publicAttemptResultWithPrivateFields, {
+  accuracy: 50,
+  completedItemCount: 1,
+  correctItemCount: 1,
+  durationSeconds: 80,
+  earnedPoints: 1,
+  totalPoints: 2,
+});
+assert.equal('rawAnswers' in publicAttemptResultWithPrivateFields, false);
+assert.equal('scorerTraceId' in publicAttemptResultWithPrivateFields, false);
 const studentRunnerView = buildStudentRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
   items: [
@@ -11781,6 +11823,16 @@ assert.match(
   assignmentsApiSource,
   /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
   'Submit attempt API should build student review payloads in the same stable delivery order.'
+);
+assert.match(
+  assignmentsApiSource,
+  /result: buildPublicAttemptResult\(evaluation\.result\)/,
+  'Submit attempt API should sanitize scorer results before returning them to the student runner.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /result: evaluation\.result/,
+  'Submit attempt API should not return raw scorer results directly.'
 );
 assert.match(
   assignmentsApiSource,

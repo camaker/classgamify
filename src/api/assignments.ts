@@ -37,6 +37,7 @@ import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-qu
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildPublicAssignmentLookupResult,
+  buildPublicAttemptResult,
   buildPublicAttemptReviewItems,
 } from '@/assignments/public';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
@@ -712,7 +713,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         runtimeItems: orderedRuntimeItems,
         showCorrectAnswers: settings.showCorrectAnswers,
       }),
-      result: evaluation.result,
+      result: buildPublicAttemptResult(evaluation.result),
     };
   });
 

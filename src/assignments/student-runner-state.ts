@@ -23,6 +23,7 @@ import {
   buildPublicAssignmentPreviewAssignment,
   stripRuntimeAnswers,
   type PublicAssignmentLookupResult,
+  type PublicAttemptResult,
   type PublicRuntimeItem,
 } from '@/assignments/public';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
@@ -62,12 +63,8 @@ type StudentRunnerAttemptState = {
 };
 
 type StudentRunnerAttemptResult = {
-  accuracy: number;
   attemptUsage: AssignmentAttemptUsage;
-  durationSeconds?: number;
-  earnedPoints: number;
-  totalPoints: number;
-};
+} & PublicAttemptResult;
 
 type StudentRunnerLoadingView = {
   message: string;

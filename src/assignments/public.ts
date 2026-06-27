@@ -10,6 +10,7 @@ import type {
   AssignmentSettings,
   AssignmentStatus,
   AttemptAnswer,
+  AttemptResult,
 } from '@/activities/types';
 import {
   type AssignmentLifecycleStatus,
@@ -43,6 +44,15 @@ export type PublicAttemptReviewItem = {
   explanation?: string;
   itemId: string;
   submitted: boolean;
+};
+
+export type PublicAttemptResult = {
+  accuracy: number;
+  completedItemCount: number;
+  correctItemCount: number;
+  durationSeconds?: number;
+  earnedPoints: number;
+  totalPoints: number;
 };
 
 export type PublicAssignmentPayload = {
@@ -356,6 +366,19 @@ export function buildPublicAttemptReviewItemMap(
   return new Map(
     reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
   );
+}
+
+export function buildPublicAttemptResult(
+  result: AttemptResult
+): PublicAttemptResult {
+  return {
+    accuracy: result.accuracy,
+    completedItemCount: result.completedItemCount,
+    correctItemCount: result.correctItemCount,
+    durationSeconds: result.durationSeconds,
+    earnedPoints: result.earnedPoints,
+    totalPoints: result.totalPoints,
+  };
 }
 
 export function buildPublicAssignmentPreviewActivity(
