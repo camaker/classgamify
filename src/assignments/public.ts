@@ -291,6 +291,29 @@ export function stripRuntimeAnswer(item: RuntimeItem): PublicRuntimeItem {
   };
 }
 
+function buildPublicAttemptReviewItem({
+  answer,
+  item,
+}: {
+  answer?: AttemptAnswer;
+  item: RuntimeItem;
+}): PublicAttemptReviewItem {
+  const acceptedAnswers =
+    normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
+    [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
+
+  return {
+    acceptedAnswers,
+    correct: Boolean(answer?.correct),
+    correctAnswer: normalizeRuntimeDisplayText(
+      acceptedAnswers[0] ?? item.answer
+    ),
+    explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
+    itemId: item.id,
+    submitted: hasRuntimeDisplayText(answer?.answer),
+  };
+}
+
 function buildAttemptReviewItems({
   answers,
   runtimeItems,
@@ -302,23 +325,12 @@ function buildAttemptReviewItems({
     answers.map((answer) => [answer.itemId, answer])
   );
 
-  return runtimeItems.map((item) => {
-    const acceptedAnswers =
-      normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
-      [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
-    const answer = answerByItemId.get(item.id);
-
-    return {
-      acceptedAnswers,
-      correct: Boolean(answer?.correct),
-      correctAnswer: normalizeRuntimeDisplayText(
-        acceptedAnswers[0] ?? item.answer
-      ),
-      explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
-      itemId: item.id,
-      submitted: hasRuntimeDisplayText(answer?.answer),
-    };
-  });
+  return runtimeItems.map((item) =>
+    buildPublicAttemptReviewItem({
+      answer: answerByItemId.get(item.id),
+      item,
+    })
+  );
 }
 
 export function buildPublicAttemptReviewItems({

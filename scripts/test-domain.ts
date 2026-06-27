@@ -667,6 +667,7 @@ import { buildUserFileMaterialSummary } from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
+import type { AttemptAnswer } from '@/activities/types';
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
@@ -1466,6 +1467,16 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /return runtimeItems\.map\(\(item\) =>[\s\S]*buildPublicAttemptReviewItem\(\{[\s\S]*answer: answerByItemId\.get\(item\.id\),[\s\S]*item,/,
+  'Public attempt review lists should delegate per-item sanitization to the public review item helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAttemptReviewItem[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
+  'Public attempt review items should explicitly pick the only fields allowed in post-submit student review payloads.'
+);
+assert.match(
+  publicAssignmentSource,
   /activity: buildPublicAssignmentActivitySummary\(\{[\s\S]*activity,[\s\S]*description: resolvedSource\.activityDescription,[\s\S]*templateType,[\s\S]*title: resolvedSource\.activityTitle/,
   'Public assignment payload should delegate activity metadata sanitization to the public activity summary helper.'
 );
@@ -1528,6 +1539,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /stripRuntimeAnswer[\s\S]*\.\.\.item/,
   'Public runtime sanitization should not spread runtime items into student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAttemptReviewItem[\s\S]*(?:\.\.\.item|\.\.\.answer)[\s\S]*function buildAttemptReviewItems/,
+  'Public attempt review item sanitization should not spread runtime items or stored answers into student payloads.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -10425,6 +10441,61 @@ assert.deepEqual(partialPublicReviewItems, [
     submitted: false,
   },
 ]);
+const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
+  answers: [
+    {
+      answer: 'Paris',
+      correct: true,
+      itemId: 'q-private-review',
+      reviewerNotes: 'teacher-only note',
+      storageKey: 'teacher-only/answer',
+    } satisfies AttemptAnswer & {
+      reviewerNotes: string;
+      storageKey: string;
+    },
+  ],
+  runtimeItems: [
+    {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      answer: 'Paris / Paris, France',
+      explanation: 'Paris is the capital of France.',
+      id: 'q-private-review',
+      kind: 'question',
+      prompt: 'Capital of France?',
+      sourceMaterials: [listeningMaterialReference],
+      storageKey: 'teacher-only/runtime',
+    } satisfies RuntimeItem & {
+      acceptedAnswers: string[];
+      sourceMaterials: unknown[];
+      storageKey: string;
+    },
+  ],
+  showCorrectAnswers: true,
+});
+assert.deepEqual(Object.keys(publicReviewItemsWithPrivateFields[0]!).sort(), [
+  'acceptedAnswers',
+  'correct',
+  'correctAnswer',
+  'explanation',
+  'itemId',
+  'submitted',
+]);
+assert.deepEqual(publicReviewItemsWithPrivateFields, [
+  {
+    acceptedAnswers: ['Paris', 'Paris, France'],
+    correct: true,
+    correctAnswer: 'Paris',
+    explanation: 'Paris is the capital of France.',
+    itemId: 'q-private-review',
+    submitted: true,
+  },
+]);
+assert.equal(
+  'sourceMaterials' in publicReviewItemsWithPrivateFields[0]!,
+  false
+);
+assert.equal('storageKey' in publicReviewItemsWithPrivateFields[0]!, false);
+assert.equal('reviewerNotes' in publicReviewItemsWithPrivateFields[0]!, false);
 assert.equal(
   buildStudentRunnerView({
     answers: { 'q-1': 'Paris' },
