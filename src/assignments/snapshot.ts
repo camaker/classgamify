@@ -1,5 +1,9 @@
 import { getRuntimeItems, type RuntimeItem } from '@/activities/runtime';
 import type { ActivityContent, ActivityTemplateType } from '@/activities/types';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplayText,
+} from '@/assignments/runtime-display';
 
 export type AssignmentSnapshotSourceActivity = {
   contentJson: ActivityContent;
@@ -71,11 +75,15 @@ export function resolveAssignmentSnapshotSource({
   activity: AssignmentSnapshotFallbackActivity;
   snapshot?: AssignmentSnapshotFallbackSnapshot;
 }): ResolvedAssignmentSnapshotSource {
+  const activityDescription = snapshot
+    ? snapshot.activityDescription
+    : activity.description;
+  const activityTitle = snapshot ? snapshot.activityTitle : activity.title;
+
   return {
-    activityDescription: snapshot
-      ? snapshot.activityDescription
-      : activity.description,
-    activityTitle: snapshot ? snapshot.activityTitle : activity.title,
+    activityDescription:
+      normalizeOptionalRuntimeDisplayText(activityDescription) ?? null,
+    activityTitle: normalizeRuntimeDisplayText(activityTitle),
     contentJson: snapshot?.contentJson ?? activity.contentJson,
     hasSnapshot: Boolean(snapshot),
     templateType: snapshot?.templateType ?? activity.templateType,

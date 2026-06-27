@@ -8721,6 +8721,15 @@ const assignmentSnapshotInsert = buildAssignmentSnapshotInsert({
   createdAt: assignmentSnapshotCreatedAt,
   sourceActivity: assignmentSnapshotSourceActivity,
 });
+const assignmentSnapshotSource = readFileSync(
+  'src/assignments/snapshot.ts',
+  'utf8'
+);
+assert.match(
+  assignmentSnapshotSource,
+  /resolveAssignmentSnapshotSource[\s\S]*normalizeOptionalRuntimeDisplayText\([\s\S]*activityDescription[\s\S]*normalizeRuntimeDisplayText\(activityTitle\)/,
+  'Assignment snapshot source resolution should normalize activity metadata for all display/export consumers.'
+);
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
 assignmentSnapshotSourceActivity.title = 'Edited source title';
@@ -8759,8 +8768,8 @@ assert.deepEqual(
       title: 'Current activity title',
     },
     snapshot: {
-      activityDescription: 'Frozen activity description',
-      activityTitle: 'Frozen activity title',
+      activityDescription: ' Ｆｒｏｚｅｎ\u00A0　activity   description ',
+      activityTitle: ' Ｆｒｏｚｅｎ\u00A0　activity   title ',
       contentJson: publicPayloadSnapshotContent,
       templateType: 'quiz',
     },
@@ -8777,9 +8786,9 @@ assert.deepEqual(
   resolveAssignmentSnapshotSource({
     activity: {
       contentJson: publicPayloadActivityContent,
-      description: 'Current activity description',
+      description: ' Ｃｕｒｒｅｎｔ\u00A0　activity   description ',
       templateType: 'match-up',
-      title: 'Current activity title',
+      title: ' Ｃｕｒｒｅｎｔ\u00A0　activity   title ',
     },
     snapshot: null,
   }),
@@ -8808,8 +8817,8 @@ const resolvedAssignmentRuntimeSource = resolveAssignmentRuntimeSource({
     title: 'Current activity title',
   },
   snapshot: {
-    activityDescription: 'Frozen activity description',
-    activityTitle: 'Frozen activity title',
+    activityDescription: ' Ｆｒｏｚｅｎ\u00A0　activity   description ',
+    activityTitle: ' Ｆｒｏｚｅｎ\u00A0　activity   title ',
     contentJson: publicPayloadSnapshotContent,
     templateType: 'quiz',
   },
@@ -21483,8 +21492,8 @@ assert.deepEqual(
     },
     now: new Date('2026-06-01T00:00:00.000Z').getTime(),
     snapshot: {
-      activityDescription: 'Snapshot description',
-      activityTitle: 'Snapshot title',
+      activityDescription: ' Ｓｎａｐｓｈｏｔ\u00A0　description ',
+      activityTitle: ' Ｓｎａｐｓｈｏｔ\u00A0　title ',
       templateType: 'line-match',
     },
   }),
