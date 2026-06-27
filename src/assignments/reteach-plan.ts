@@ -8,6 +8,7 @@ import {
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
 import { formatAssignmentResultPromptLabel } from '@/assignments/result-display';
+import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import { m } from '@/locale/paraglide/messages';
@@ -64,7 +65,7 @@ export function buildAssignmentReteachPlan({
     ...formatReviewStudents(studentViews),
   ];
 
-  return lines.join('\n');
+  return joinAssignmentResultCopyLines(lines);
 }
 
 export function buildAssignmentReteachPlanItemViews(

@@ -570,6 +570,11 @@ import {
   joinAssignmentResultSearchSummaryParts,
 } from '@/assignments/result-display';
 import {
+  ASSIGNMENT_RESULT_COPY_TEXT_FORMAT,
+  formatAssignmentResultCopyOrdinal,
+  joinAssignmentResultCopyLines,
+} from '@/assignments/result-copy-format';
+import {
   buildAnonymousAttemptTokenStorageKey,
   createStudentIdentityResolver,
   getAnonymousBrowserLabel,
@@ -1095,6 +1100,25 @@ const assignmentClassroomBriefSource = readFileSync(
   'src/assignments/classroom-brief.ts',
   'utf8'
 );
+const assignmentResultCopyFormatSource = readFileSync(
+  'src/assignments/result-copy-format.ts',
+  'utf8'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
+  /ASSIGNMENT_RESULT_COPY_TEXT_FORMAT[\s\S]*lineBreak: '\\n'/,
+  'Assignment result copy formatting should expose the shared line-break contract.'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
+  /joinAssignmentResultCopyLines[\s\S]*ASSIGNMENT_RESULT_COPY_TEXT_FORMAT\.lineBreak/,
+  'Assignment result copy formatting should expose a shared line joiner.'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
+  /formatAssignmentResultCopyOrdinal[\s\S]*Math\.floor\(Math\.max\(0, index\)\) \+ 1/,
+  'Assignment result copy formatting should expose a shared ordinal normalizer.'
+);
 assert.match(
   assignmentClassroomBriefSource,
   /buildAssignmentAttemptStatsView\(stats\)/,
@@ -1120,6 +1144,21 @@ assert.doesNotMatch(
   /limit: 3|limit: 6/,
   'Classroom brief selection should not maintain local numeric limits.'
 );
+assert.match(
+  assignmentClassroomBriefSource,
+  /joinAssignmentResultCopyLines\(lines\)/,
+  'Classroom brief should use the shared assignment-result copy line joiner.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /formatAssignmentResultCopyOrdinal\(index\)/,
+  'Classroom brief should use the shared assignment-result copy ordinal formatter.'
+);
+assert.doesNotMatch(
+  assignmentClassroomBriefSource,
+  /lines\.join\('\\n'\)|index \+ 1/,
+  'Classroom brief should not hand-compose copy line breaks or ordinals.'
+);
 const assignmentReteachPlanSource = readFileSync(
   'src/assignments/reteach-plan.ts',
   'utf8'
@@ -1143,6 +1182,16 @@ assert.doesNotMatch(
   assignmentReteachPlanSource,
   /limit: 5|limit: 8/,
   'Reteach plan selection should not maintain local numeric limits.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /joinAssignmentResultCopyLines\(lines\)/,
+  'Reteach plan should use the shared assignment-result copy line joiner.'
+);
+assert.doesNotMatch(
+  assignmentReteachPlanSource,
+  /lines\.join\('\\n'\)/,
+  'Reteach plan should not hand-compose copy line breaks.'
 );
 const assignmentResultsSource = readFileSync(
   'src/assignments/results.ts',
@@ -21937,6 +21986,19 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   studentLabel: 'Anonymous student 1',
   text: '- 1. Anonymous student 1: 0% latest, 1 item to review',
 });
+assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
+assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
+assert.equal(formatAssignmentResultCopyOrdinal(0), 1);
+assert.equal(formatAssignmentResultCopyOrdinal(2.9), 3);
+assert.equal(formatAssignmentResultCopyOrdinal(-3), 1);
+assert.equal(formatAssignmentResultCopyOrdinal(Number.NaN), 1);
+assert.equal(
+  buildAssignmentClassroomBriefFollowUpStudentView({
+    index: Number.NaN,
+    student: classroomBrief.followUpStudents[0]!,
+  }).text,
+  '- 1. Anonymous student 1: 0% latest, 1 item to review'
+);
 assert.match(
   classroomBrief.text,
   /ClassGamify classroom brief: Capital Review, Week 1/
@@ -22088,6 +22150,16 @@ const assignmentItemReviewSummarySource = readFileSync(
 );
 assert.match(
   assignmentItemReviewSummarySource,
+  /joinAssignmentResultCopyLines\(lines\)/,
+  'Assignment item review summaries should use the shared assignment-result copy line joiner.'
+);
+assert.doesNotMatch(
+  assignmentItemReviewSummarySource,
+  /lines\.join\('\\n'\)/,
+  'Assignment item review summaries should not hand-compose copy line breaks.'
+);
+assert.match(
+  assignmentItemReviewSummarySource,
   /formatOptionalAcceptedAnswerAlternatives\(item\.acceptedAnswers,[\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
   'Assignment item review summaries should split primary expected answers from accepted alternatives.'
 );
@@ -22128,6 +22200,25 @@ const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
   assignmentTitle: csvExportData.assignment.title,
   students: followUpPriorityStudents,
 });
+const assignmentStudentFollowUpSummarySource = readFileSync(
+  'src/assignments/student-follow-up-summary.ts',
+  'utf8'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /joinAssignmentResultCopyLines\(lines\)/,
+  'Assignment student follow-up summaries should use the shared assignment-result copy line joiner.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatAssignmentResultCopyOrdinal\(index\)/,
+  'Assignment student follow-up summaries should use the shared assignment-result copy ordinal formatter.'
+);
+assert.doesNotMatch(
+  assignmentStudentFollowUpSummarySource,
+  /lines\.join\('\\n'\)|index \+ 1/,
+  'Assignment student follow-up summaries should not hand-compose copy line breaks or ordinals.'
+);
 assert.deepEqual(
   buildAssignmentStudentFollowUpSummaryStudentView({
     index: 0,
@@ -22143,6 +22234,13 @@ assert.deepEqual(
     studentLabel: 'Alpha review',
     text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review',
   }
+);
+assert.equal(
+  buildAssignmentStudentFollowUpSummaryStudentView({
+    index: -5,
+    student: alphaReviewStudent,
+  }).text,
+  '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review'
 );
 assert.match(
   studentFollowUpSummary,

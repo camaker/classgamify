@@ -21,6 +21,10 @@ import {
 } from '@/assignments/result-summary-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
+import {
+  formatAssignmentResultCopyOrdinal,
+  joinAssignmentResultCopyLines,
+} from '@/assignments/result-copy-format';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentClassroomBriefStats = {
@@ -108,7 +112,7 @@ export function buildAssignmentClassroomBrief({
     followUpStudentViews,
     followUpStudents,
     statViews,
-    text: lines.join('\n'),
+    text: joinAssignmentResultCopyLines(lines),
   };
 }
 
@@ -221,7 +225,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     studentLabel: student.studentLabel,
     text: m.assignment_classroom_brief_follow_up_student({
       accuracy: latestAccuracyLabel,
-      index: index + 1,
+      index: formatAssignmentResultCopyOrdinal(index),
       reviewCount: reviewItemCountLabel,
       student: student.studentLabel,
     }),

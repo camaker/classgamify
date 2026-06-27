@@ -2,6 +2,7 @@ import {
   formatOptionalAcceptedAnswerAlternatives,
   formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
+import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
@@ -41,7 +42,7 @@ export function buildAssignmentItemReviewSummary({
     ...formatItems(itemViews),
   ];
 
-  return lines.join('\n');
+  return joinAssignmentResultCopyLines(lines);
 }
 
 export function buildAssignmentItemReviewSummaryItemViews(
