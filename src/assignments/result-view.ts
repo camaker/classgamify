@@ -32,6 +32,7 @@ import {
   formatAssignmentResultValue,
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
+  formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import {
   formatAssignmentSummaryCorrectCount,
@@ -1205,11 +1206,14 @@ export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
 ) {
   const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
-    item.acceptedAnswers
+    item.acceptedAnswers,
+    {
+      includePrimary: false,
+    }
   );
   const correctSummaryLabel = formatAssignmentItemCorrectSummary(item);
   const expectedAnswerLabel = assignmentResultReviewCopy.itemAnswerLabel;
-  const expectedAnswerText = formatAssignmentResultValue(item.expectedAnswer);
+  const expectedAnswerText = formatPrimaryAcceptedAnswer(item.acceptedAnswers);
 
   return {
     acceptedAnswersLabel: assignmentResultReviewCopy.acceptedLabel,
@@ -1255,9 +1259,14 @@ export function buildAssignmentItemPerformanceRowView({
   const itemNumberLabel = formatAssignmentResultItemNumberLabel(index);
 
   return {
-    acceptedAnswersText: formatAcceptedAnswerAlternatives(item.acceptedAnswers),
+    acceptedAnswersText: formatAcceptedAnswerAlternatives(
+      item.acceptedAnswers,
+      {
+        includePrimary: false,
+      }
+    ),
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
-    expectedAnswerText: formatAssignmentResultValue(item.expectedAnswer),
+    expectedAnswerText: formatPrimaryAcceptedAnswer(item.acceptedAnswers),
     explanationText: formatAssignmentResultValue(item.explanation),
     itemNumberLabel,
     kindLabel: item.kindLabel,
@@ -1291,9 +1300,14 @@ export function buildAssignmentAttemptAnswerReviewView({
 }) {
   const status = getAssignmentAnswerReviewStatus(answer);
   const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
+    answer.acceptedAnswers,
+    {
+      includePrimary: false,
+    }
+  );
+  const expectedAnswerText = formatPrimaryAcceptedAnswer(
     answer.acceptedAnswers
   );
-  const expectedAnswerText = formatAssignmentResultValue(answer.expectedAnswer);
   const studentAnswerText = formatAssignmentReviewStudentAnswer(answer);
 
   return {

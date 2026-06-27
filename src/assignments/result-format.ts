@@ -83,6 +83,18 @@ export function formatAcceptedAnswerAlternatives(
   );
 }
 
+export function formatPrimaryAcceptedAnswer(
+  values: string[],
+  options?: {
+    emptyValue?: string;
+  }
+) {
+  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  return formatAssignmentResultValue(acceptedAnswers[0], {
+    emptyValue: options?.emptyValue,
+  });
+}
+
 export function formatOptionalAcceptedAnswerAlternatives(
   values: string[],
   options?: {

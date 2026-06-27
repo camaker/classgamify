@@ -496,6 +496,7 @@ import {
   formatAssignmentResultValue,
   formatAssignmentResultDate,
   formatOptionalAcceptedAnswerAlternatives,
+  formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import {
   formatAssignmentSummaryAccuracy,
@@ -2240,6 +2241,11 @@ assert.match(
 );
 assert.match(
   assignmentResultFormatSource,
+  /formatPrimaryAcceptedAnswer[\s\S]*getUniqueAcceptedAnswers/,
+  'Assignment result formatting should expose a shared primary accepted-answer formatter.'
+);
+assert.match(
+  assignmentResultFormatSource,
   /getAssignmentResultEmptyValue[\s\S]*assignment_result_empty_value/,
   'Assignment result formatting should use the localized empty-value placeholder by default.'
 );
@@ -2254,9 +2260,29 @@ assert.doesNotMatch(
   'Assignment result CSV export should not override accepted-answer formatting with a hard-coded separator.'
 );
 assert.match(
+  assignmentResultsExportSource,
+  /formatPrimaryAcceptedAnswer\(answer\.acceptedAnswers[\s\S]*formatAcceptedAnswerAlternatives\(answer\.acceptedAnswers,[\s\S]*includePrimary: false/,
+  'Assignment result CSV export should split primary expected answers from accepted alternatives.'
+);
+assert.match(
   assignmentResultViewSource,
   /joinAssignmentResultSearchSummaryParts/,
   'Assignment result view should use the shared localized result-summary joiner.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentItemAnalysisCardView[\s\S]*formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
+  'Assignment result item analysis cards should split primary expected answers from accepted alternatives.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentItemPerformanceRowView[\s\S]*formatAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
+  'Assignment result item performance rows should split primary expected answers from accepted alternatives.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentAttemptAnswerReviewView[\s\S]*formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(\s*answer\.acceptedAnswers/,
+  'Assignment result attempt review cards should split primary expected answers from accepted alternatives.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -3747,6 +3773,11 @@ assert.match(
   /separator: m\.student_runner_choice_separator\(\)/,
   'Student answer feedback accepted alternatives should use the localized student runner choice separator.'
 );
+assert.match(
+  studentRunnerViewSource,
+  /formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*student_runner_choice_separator/,
+  'Student answer feedback should show accepted alternatives without repeating the primary correct answer.'
+);
 assert.doesNotMatch(
   studentRunnerViewSource,
   /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,
@@ -4935,7 +4966,7 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
-    acceptedAnswersText: 'Accepted answers: Paris | Paris, France',
+    acceptedAnswersText: 'Accepted answers: Paris, France',
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
     correctAnswerText: 'Correct match: Paris',
@@ -4958,7 +4989,7 @@ try {
         submitted: true,
       },
     })?.acceptedAnswersText,
-    '可接受答案：Paris | Paris, France'
+    '可接受答案：Paris, France'
   );
 } finally {
   overwriteGetLocale(() => 'en');
@@ -18217,6 +18248,11 @@ assert.equal(
   'Paris, France'
 );
 assert.equal(
+  formatPrimaryAcceptedAnswer([' Paris ', 'Paris, France']),
+  'Paris'
+);
+assert.equal(formatPrimaryAcceptedAnswer([]), '-');
+assert.equal(
   formatAcceptedAnswerAlternatives([
     ' Paris ',
     '',
@@ -19168,14 +19204,14 @@ assert.deepEqual(
   buildAssignmentItemAnalysisCardView(resultAnalysis.perItem[0]!),
   {
     acceptedAnswersLabel: 'Accepted',
-    acceptedAnswersLineText: 'Accepted: Paris, Paris, France',
-    acceptedAnswersText: 'Paris, Paris, France',
+    acceptedAnswersLineText: 'Accepted: Paris, France',
+    acceptedAnswersText: 'Paris, France',
     correctRateLabel: '67%',
     correctRateProgressValue: 67,
     correctSummaryLabel: '2/3 correct',
     expectedAnswerLabel: 'answer',
-    expectedAnswerSummaryText: '2/3 correct · answer: Paris / Paris, France',
-    expectedAnswerText: 'Paris / Paris, France',
+    expectedAnswerSummaryText: '2/3 correct · answer: Paris',
+    expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
     kindLabel: 'Question',
     prompt: 'Capital of France?',
@@ -19196,8 +19232,8 @@ assert.deepEqual(
     correctRateProgressValue: 50,
     correctSummaryLabel: '1/2 correct',
     expectedAnswerLabel: 'answer',
-    expectedAnswerSummaryText: '1/2 correct · answer: -',
-    expectedAnswerText: '-',
+    expectedAnswerSummaryText: '1/2 correct · answer: Cold',
+    expectedAnswerText: 'Cold',
     explanationText: null,
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
@@ -19241,9 +19277,9 @@ assert.deepEqual(
     item: resultAnalysis.perItem[0]!,
   }),
   {
-    acceptedAnswersText: 'Paris, Paris, France',
+    acceptedAnswersText: 'Paris, France',
     correctRateLabel: '67%',
-    expectedAnswerText: 'Paris / Paris, France',
+    expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
     itemNumberLabel: '1.',
     kindLabel: 'Question',
@@ -19265,7 +19301,7 @@ assert.deepEqual(
   {
     acceptedAnswersText: '-',
     correctRateLabel: '50%',
-    expectedAnswerText: '-',
+    expectedAnswerText: 'Cold',
     explanationText: '-',
     itemNumberLabel: '1.',
     kindLabel: 'Pair',
@@ -19297,11 +19333,11 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
-    acceptedAnswersLineText: 'Accepted answers: Paris, Paris, France',
-    acceptedAnswersText: 'Paris, Paris, France',
+    acceptedAnswersLineText: 'Accepted answers: Paris, France',
+    acceptedAnswersText: 'Paris, France',
     expectedAnswerLabel: 'Expected',
-    expectedAnswerLineText: 'Expected: Paris / Paris, France',
-    expectedAnswerText: 'Paris / Paris, France',
+    expectedAnswerLineText: 'Expected: Paris',
+    expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
     promptLabel: '1. Capital of France?',
     statusLabel: 'Correct',
@@ -19340,8 +19376,8 @@ assert.deepEqual(
     acceptedAnswersLineText: null,
     acceptedAnswersText: null,
     expectedAnswerLabel: 'Expected',
-    expectedAnswerLineText: 'Expected: -',
-    expectedAnswerText: '-',
+    expectedAnswerLineText: 'Expected: Cold',
+    expectedAnswerText: 'Cold',
     explanationText: null,
     promptLabel: '1. Match "Hot" with its pair.',
     statusLabel: 'Unanswered',
@@ -21593,7 +21629,7 @@ assert.match(
   csv,
   /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z"/
 );
-assert.match(csv, /"Paris, Paris, France","correct"/);
+assert.match(csv, /"Paris","Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
 assert.match(
   csv,
@@ -22046,21 +22082,30 @@ const itemReviewSummary = buildAssignmentItemReviewSummary({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
 });
+const assignmentItemReviewSummarySource = readFileSync(
+  'src/assignments/item-review-summary.ts',
+  'utf8'
+);
+assert.match(
+  assignmentItemReviewSummarySource,
+  /formatOptionalAcceptedAnswerAlternatives\(item\.acceptedAnswers,[\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
+  'Assignment item review summaries should split primary expected answers from accepted alternatives.'
+);
 assert.deepEqual(
   buildAssignmentItemReviewSummaryItemView({
     index: 0,
     item: resultAnalysis.perItem[0]!,
   }),
   {
-    acceptedAnswersText: 'Paris, Paris, France',
+    acceptedAnswersText: 'Paris, France',
     correctCountLabel: '2/3 correct',
     correctRateLabel: '67% correct',
-    expectedAnswerText: 'Paris / Paris, France',
+    expectedAnswerText: 'Paris',
     explanationText: 'Paris is the capital of France.',
     itemId: 'q-1',
     kindLabel: 'Question',
     promptLabel: '1. Capital of France?',
-    text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct. Expected: Paris / Paris, France. Accepted answers: Paris, Paris, France. Notes: Paris is the capital of France.',
+    text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct. Expected: Paris. Accepted answers: Paris, France. Notes: Paris is the capital of France.',
   }
 );
 assert.match(
@@ -22075,8 +22120,8 @@ assert.match(
   itemReviewSummary,
   /Match "Hot" with its pair\. \(Pair\) - 50% correct, 1\/2 correct/
 );
-assert.match(itemReviewSummary, /Expected: Paris \/ Paris, France\./);
-assert.match(itemReviewSummary, /Accepted answers: Paris, Paris, France\./);
+assert.match(itemReviewSummary, /Expected: Paris\./);
+assert.match(itemReviewSummary, /Accepted answers: Paris, France\./);
 assert.match(itemReviewSummary, /Notes: Paris is the capital of France\./);
 
 const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({

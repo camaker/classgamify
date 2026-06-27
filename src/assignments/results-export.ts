@@ -11,6 +11,7 @@ import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultCsvDate,
+  formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import {
   buildAssignmentDeliverySummary,
@@ -160,9 +161,12 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       answer.itemId,
       answer.prompt,
       formatAssignmentExportStudentAnswer(answer),
-      answer.expectedAnswer,
+      formatPrimaryAcceptedAnswer(answer.acceptedAnswers, {
+        emptyValue: '',
+      }),
       formatAcceptedAnswerAlternatives(answer.acceptedAnswers, {
         emptyValue: '',
+        includePrimary: false,
       }),
       formatAssignmentExportAnswerStatus(answer),
       answer.explanation ?? '',

@@ -661,6 +661,7 @@ export function buildPublicAnswerFeedbackView({
   const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
     reviewItem.acceptedAnswers,
     {
+      includePrimary: false,
       separator: m.student_runner_choice_separator(),
     }
   );

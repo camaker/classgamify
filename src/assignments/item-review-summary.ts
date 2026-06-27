@@ -1,6 +1,6 @@
 import {
-  formatAssignmentResultValue,
   formatOptionalAcceptedAnswerAlternatives,
+  formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import {
   formatAssignmentSummaryCorrectCount,
@@ -60,11 +60,13 @@ export function buildAssignmentItemReviewSummaryItemView({
   item: AssignmentItemAnalysis;
 }): AssignmentItemReviewSummaryItemView {
   const acceptedAnswersText =
-    formatOptionalAcceptedAnswerAlternatives(item.acceptedAnswers) ?? '';
+    formatOptionalAcceptedAnswerAlternatives(item.acceptedAnswers, {
+      includePrimary: false,
+    }) ?? '';
   const explanationText = item.explanation ?? '';
   const correctCountLabel = formatAssignmentSummaryCorrectCount(item);
   const correctRateLabel = formatAssignmentSummaryCorrectRate(item.correctRate);
-  const expectedAnswerText = formatAssignmentResultValue(item.expectedAnswer);
+  const expectedAnswerText = formatPrimaryAcceptedAnswer(item.acceptedAnswers);
   const promptLabel = formatAssignmentResultPromptLabel({
     index,
     prompt: item.prompt,
