@@ -16,6 +16,7 @@ import { formatBytes } from '@/lib/formatter';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { m } from '@/locale/paraglide/messages';
+import { USER_FILE_MATERIAL_PICKER_PAGE_SIZE } from '@/storage/file-query';
 import type { UserFileMaterialKind } from '@/storage/file-materials';
 import {
   IconFile,
@@ -32,8 +33,6 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useMemo, type ReactNode } from 'react';
-
-const SOURCE_MATERIAL_PICKER_PAGE_SIZE = 100;
 
 type ActivitySourceMaterialsFieldProps = {
   canLoadFiles: boolean;
@@ -64,7 +63,7 @@ export function ActivitySourceMaterialsField({
   );
   const { data, isError, isLoading } = useUserFileMaterials(
     0,
-    SOURCE_MATERIAL_PICKER_PAGE_SIZE,
+    USER_FILE_MATERIAL_PICKER_PAGE_SIZE,
     { enabled: canLoadFiles }
   );
   const availableOptions = useMemo(

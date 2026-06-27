@@ -6,6 +6,9 @@ export const USER_FILE_LIST_INPUT_LIMITS = {
   pageSizeMin: 1,
 } as const;
 
+export const USER_FILE_MATERIAL_PICKER_PAGE_SIZE =
+  USER_FILE_LIST_INPUT_LIMITS.pageSizeMax;
+
 export function buildUserFileOwnerWhere({ userId }: { userId: string }) {
   return eq(userFiles.userId, userId);
 }

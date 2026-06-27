@@ -13,6 +13,7 @@ import { formatUserFileUploadError } from '@/api/user-file-errors';
 import {
   getUserFileListOffset,
   USER_FILE_LIST_INPUT_LIMITS,
+  USER_FILE_MATERIAL_PICKER_PAGE_SIZE,
 } from '@/storage/file-query';
 import {
   ASSIGNMENT_CLASSROOM_BRIEF_LIMITS,
@@ -2011,6 +2012,16 @@ assert.match(
   /\(data\?\.items \?\? \[\]\)\.flatMap/,
   'Activity source-material picker should read available files from the material list response items.'
 );
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /USER_FILE_MATERIAL_PICKER_PAGE_SIZE/,
+  'Activity source-material picker should reuse the storage-domain material picker page size.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsFieldSource,
+  /SOURCE_MATERIAL_PICKER_PAGE_SIZE|pageSize:\s*100|,\s*100,\s*\{\s*enabled:\s*canLoadFiles/,
+  'Activity source-material picker should not keep local page-size rules.'
+);
 const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
@@ -3312,6 +3323,7 @@ assert.deepEqual(USER_FILE_LIST_INPUT_LIMITS, {
   pageSizeMax: 100,
   pageSizeMin: 1,
 });
+assert.equal(USER_FILE_MATERIAL_PICKER_PAGE_SIZE, 100);
 assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 25 }), 50);
 assert.equal(getUserFileListOffset({ pageIndex: -1, pageSize: 25 }), 0);
 assert.equal(getUserFileListOffset({ pageIndex: 2, pageSize: 0 }), 2);
@@ -3319,6 +3331,11 @@ assert.match(
   userFileQuerySource,
   /USER_FILE_LIST_INPUT_LIMITS[\s\S]*pageSizeMax: 100[\s\S]*pageSizeMin: 1/,
   'User file list pagination should expose named storage-domain input limits.'
+);
+assert.match(
+  userFileQuerySource,
+  /USER_FILE_MATERIAL_PICKER_PAGE_SIZE\s*=\s*USER_FILE_LIST_INPUT_LIMITS\.pageSizeMax/,
+  'Activity source-material picker page size should live in the storage query domain.'
 );
 assert.match(
   userFilesApiSource,
