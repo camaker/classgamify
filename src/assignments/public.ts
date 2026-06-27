@@ -208,15 +208,28 @@ export function buildPublicAssignmentPayload({
           templateType: snapshot.templateType,
         }
       : null,
-    summary: {
-      difficulty: content.difficulty,
-      estimatedMinutes: estimateAssignmentMinutes(orderedRuntimeItems.length),
-      gradeBand: content.gradeBand,
-      itemCount: normalizeRuntimeDisplayCount(orderedRuntimeItems.length),
-      language: content.language,
-      learningGoal: content.learningGoal,
-      subject: content.subject,
-    },
+    summary: buildPublicAssignmentSummary({
+      content,
+      itemCount: orderedRuntimeItems.length,
+    }),
+  };
+}
+
+function buildPublicAssignmentSummary({
+  content,
+  itemCount,
+}: {
+  content: ActivityContent;
+  itemCount: number;
+}): PublicAssignmentPayload['summary'] {
+  return {
+    difficulty: content.difficulty,
+    estimatedMinutes: estimateAssignmentMinutes(itemCount),
+    gradeBand: content.gradeBand,
+    itemCount: normalizeRuntimeDisplayCount(itemCount),
+    language: content.language,
+    learningGoal: content.learningGoal,
+    subject: content.subject,
   };
 }
 

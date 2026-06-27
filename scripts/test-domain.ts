@@ -1466,8 +1466,23 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /summary: buildPublicAssignmentSummary\(\{[\s\S]*content,[\s\S]*itemCount: orderedRuntimeItems\.length/,
+  'Public assignment payload should delegate summary sanitization to the public assignment summary helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSummary[\s\S]*difficulty: content\.difficulty,[\s\S]*estimatedMinutes: estimateAssignmentMinutes\(itemCount\),[\s\S]*gradeBand: content\.gradeBand,[\s\S]*itemCount: normalizeRuntimeDisplayCount\(itemCount\),[\s\S]*language: content\.language,[\s\S]*learningGoal: content\.learningGoal,[\s\S]*subject: content\.subject/,
+  'Public assignment summary should explicitly pick the only content fields allowed in student payloads.'
+);
+assert.match(
+  publicAssignmentSource,
   /return \{\s*choices,[\s\S]*id: item\.id,[\s\S]*kind: item\.kind,[\s\S]*prompt: normalizeRuntimeDisplayText\(item\.prompt\),[\s\S]*\};/,
   'Public runtime sanitization should explicitly pick the only fields allowed in student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSummary[\s\S]*sourceMaterials[\s\S]*export function stripRuntimeAnswers|summary: \{[\s\S]*sourceMaterials[\s\S]*runtimeItems: stripRuntimeAnswers/,
+  'Public assignment summary should not expose source material references.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
