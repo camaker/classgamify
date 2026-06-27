@@ -1399,6 +1399,11 @@ assert.match(
   'Assignment attempt review answers should derive submitted state through the shared runtime display-text helper.'
 );
 assert.match(
+  assignmentResultsSource,
+  /completedAttemptAnswerMaps = completedAttempts\.map\([\s\S]*buildAttemptAnswerMapByItemId\(attempt\.answersJson\.answers\)[\s\S]*completedAttemptAnswerMaps\.flatMap\([\s\S]*answerMap\.get\(item\.id\)/,
+  'Assignment result analysis should look up submitted answers through the shared item-id map helper.'
+);
+assert.match(
   activityRuntimeDisplaySource,
   /export function getRuntimeDisplayAcceptedAnswers[\s\S]*normalizeRuntimeDisplayList\(getAcceptedAnswers\(answer\)\)[\s\S]*normalizeRuntimeDisplayText\(answer\)/,
   'Runtime display accepted answers should share parser and display normalization in one activity-domain helper.'
@@ -1422,6 +1427,11 @@ assert.doesNotMatch(
   assignmentResultsSource,
   /answer(?:\?|\.)\.answer\.trim\(\)|submittedAnswer\.answer\.trim\(\)/,
   'Assignment result analysis should not use ad hoc trim-only submitted-answer checks.'
+);
+assert.doesNotMatch(
+  assignmentResultsSource,
+  /answers\.find\([\s\S]*itemId === item\.id|new Map\(\s*attempt\.answersJson\.answers\.map/,
+  'Assignment result analysis should not hand-roll submitted-answer item-id maps.'
 );
 const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
@@ -1499,6 +1509,11 @@ assert.match(
   publicAssignmentSource,
   /return runtimeItems\.map\(\(item\) =>[\s\S]*buildPublicAttemptReviewItem\(\{[\s\S]*answer: answerByItemId\.get\(item\.id\),[\s\S]*item,/,
   'Public attempt review lists should delegate per-item sanitization to the public review item helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /const answerByItemId = buildAttemptAnswerMapByItemId\(answers\)/,
+  'Public attempt review lists should look up submitted answers through the shared item-id map helper.'
 );
 assert.match(
   publicAssignmentSource,
@@ -1589,6 +1604,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /function buildPublicAttemptReviewItem[\s\S]*(?:\.\.\.item|\.\.\.answer)[\s\S]*function buildAttemptReviewItems/,
   'Public attempt review item sanitization should not spread runtime items or stored answers into student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /new Map\(\s*answers\.map\(\(answer\) => \[answer\.itemId, answer\]\)/,
+  'Public attempt review lists should not hand-roll submitted-answer item-id maps.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -10644,6 +10664,32 @@ assert.deepEqual(
       correct: true,
       correctAnswer: 'Paris',
       explanation: 'France capital.',
+      itemId: 'messy-q-1',
+      submitted: true,
+    },
+  ]
+);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
+    answers: [
+      { answer: 'paris', correct: true, itemId: ' ｍｅｓｓｙ－ｑ－１ ' },
+    ],
+    runtimeItems: [
+      {
+        answer: 'Paris',
+        id: 'messy-q-1',
+        kind: 'question',
+        prompt: 'Capital?',
+      },
+    ],
+    showCorrectAnswers: true,
+  }),
+  [
+    {
+      acceptedAnswers: ['Paris'],
+      correct: true,
+      correctAnswer: 'Paris',
+      explanation: undefined,
       itemId: 'messy-q-1',
       submitted: true,
     },
@@ -21018,7 +21064,7 @@ const normalizedResultDisplayAnalysis = analyzeAssignmentResults({
           {
             answer: '  Ｐａｒｉｓ\tFrance  ',
             correct: true,
-            itemId: 'messy-q',
+            itemId: ' ｍｅｓｓｙ－ｑ ',
           },
         ],
         templateType: 'quiz',

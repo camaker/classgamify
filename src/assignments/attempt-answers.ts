@@ -1,5 +1,6 @@
-import { m } from '@/locale/paraglide/messages';
+import type { AttemptAnswer } from '@/activities/types';
 import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
+import { m } from '@/locale/paraglide/messages';
 
 type SubmittedAttemptAnswer = {
   answer?: string;
@@ -50,6 +51,15 @@ export function normalizeSubmittedAttemptAnswers(
     ...answer,
     itemId: normalizeAttemptAnswerItemId(answer.itemId),
   }));
+}
+
+export function buildAttemptAnswerMapByItemId(answers: AttemptAnswer[]) {
+  return new Map(
+    answers.map((answer) => [
+      normalizeAttemptAnswerItemId(answer.itemId),
+      answer,
+    ])
+  );
 }
 
 function assertRuntimeItemIdsAreUnique(

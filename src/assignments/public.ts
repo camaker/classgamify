@@ -11,6 +11,7 @@ import type {
   AttemptAnswer,
   AttemptResult,
 } from '@/activities/types';
+import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
 import {
   type AssignmentLifecycleStatus,
   getAssignmentLifecycleStatus,
@@ -351,9 +352,7 @@ function buildAttemptReviewItems({
   answers: AttemptAnswer[];
   runtimeItems: RuntimeItem[];
 }): PublicAttemptReviewItem[] {
-  const answerByItemId = new Map(
-    answers.map((answer) => [answer.itemId, answer])
-  );
+  const answerByItemId = buildAttemptAnswerMapByItemId(answers);
 
   return runtimeItems.map((item) =>
     buildPublicAttemptReviewItem({

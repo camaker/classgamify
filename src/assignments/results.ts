@@ -4,6 +4,7 @@ import {
   type RuntimeItem,
 } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
+import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
@@ -93,13 +94,14 @@ export function analyzeAssignmentResults({
   runtimeItems: RuntimeItem[];
 }): AssignmentResultsAnalysis {
   const completedAttempts = attempts.filter(hasAttemptResult);
+  const completedAttemptAnswerMaps = completedAttempts.map((attempt) =>
+    buildAttemptAnswerMapByItemId(attempt.answersJson.answers)
+  );
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getResultAcceptedAnswers(item.answer);
-    const submittedAnswers = completedAttempts.flatMap((attempt) => {
-      const answer = attempt.answersJson.answers.find(
-        (attemptAnswer) => attemptAnswer.itemId === item.id
-      );
+    const submittedAnswers = completedAttemptAnswerMaps.flatMap((answerMap) => {
+      const answer = answerMap.get(item.id);
 
       return hasRuntimeDisplayText(answer?.answer) ? [answer] : [];
     });
@@ -160,8 +162,8 @@ function buildAttemptReviewAnswers({
   attempt: AttemptForAnalysis;
   runtimeItems: RuntimeItem[];
 }): AssignmentAttemptReviewAnswer[] {
-  const answerByItemId = new Map(
-    attempt.answersJson.answers.map((answer) => [answer.itemId, answer])
+  const answerByItemId = buildAttemptAnswerMapByItemId(
+    attempt.answersJson.answers
   );
 
   return runtimeItems.map((item) => {
