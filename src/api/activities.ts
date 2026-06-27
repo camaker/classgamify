@@ -15,10 +15,10 @@ import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
-  matchesActivitySourceMaterialFilter,
 } from '@/activities/library-filters';
 import {
   buildActivityLibraryWhere,
+  filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
 } from '@/activities/library-query';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
@@ -80,15 +80,10 @@ export const listActivities = createServerFn({ method: 'GET' })
     });
 
     const matchingRows = await db.select().from(activity).where(where);
-    const matchingActivities =
-      data.source === 'all'
-        ? matchingRows
-        : matchingRows.filter((item) =>
-            matchesActivitySourceMaterialFilter({
-              content: item.contentJson,
-              source: data.source,
-            })
-          );
+    const matchingActivities = filterActivityLibrarySourceItems({
+      items: matchingRows,
+      source: data.source,
+    });
     const total = matchingActivities.length;
     const [createdActivity] = data.createdActivityId
       ? await db

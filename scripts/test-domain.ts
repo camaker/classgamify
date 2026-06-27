@@ -35,7 +35,10 @@ import {
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
-import { getActivityLibraryPageItems } from '@/activities/library-query';
+import {
+  filterActivityLibrarySourceItems,
+  getActivityLibraryPageItems,
+} from '@/activities/library-query';
 import {
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS,
   activityLibraryCardCopy,
@@ -11565,6 +11568,24 @@ assert.equal(
   }),
   false
 );
+const activityLibrarySourceItems = [
+  { contentJson: sourceMaterialFilterContent, id: 'with-sources' },
+  { contentJson: sourceMaterialFilterBaseContent, id: 'without-sources' },
+];
+assert.deepEqual(
+  filterActivityLibrarySourceItems({
+    items: activityLibrarySourceItems,
+    source: 'worksheet',
+  }).map((item) => item.id),
+  ['with-sources']
+);
+assert.deepEqual(
+  filterActivityLibrarySourceItems({
+    items: activityLibrarySourceItems,
+    source: 'all',
+  }).map((item) => item.id),
+  ['with-sources', 'without-sources']
+);
 assert.equal(canArchiveActivity('draft'), true);
 assert.equal(canArchiveActivity('archived'), false);
 assert.equal(canRestoreActivity('archived'), true);
@@ -11717,6 +11738,11 @@ assert.match(
   /getActivityLibraryPageItems\(\{[\s\S]*items: matchingActivities,[\s\S]*pageIndex: data\.pageIndex,[\s\S]*pageSize: data\.pageSize/,
   'Activity list API should delegate sorting and pagination to the activity domain.'
 );
+assert.match(
+  activitiesApiSource,
+  /filterActivityLibrarySourceItems\(\{[\s\S]*items: matchingRows,[\s\S]*source: data\.source/,
+  'Activity list API should delegate source-material filtering to the activity domain.'
+);
 assert.doesNotMatch(
   activitiesApiSource,
   /normalizeActivityLibrarySearch\(data\.search\)|sqlLikeContains\(activity\.title|const statusWhere|const templateWhere/,
@@ -11724,13 +11750,18 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   activitiesApiSource,
+  /matchesActivitySourceMaterialFilter|matchingRows\.filter/,
+  'Activity list API should not keep local source-material filtering.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
   /\.sort\(\(a, b\) => b\.updatedAt\.getTime\(\) - a\.updatedAt\.getTime\(\)\)|\.slice\(\s*data\.pageIndex \* data\.pageSize/,
   'Activity list API should not keep local updated-at sorting or page slicing.'
 );
 assert.match(
-  activitiesApiSource,
-  /matchingRows\.filter\(\(item\) =>[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source: data\.source/,
-  'Activity list API should apply source-material filtering before pagination and summary.'
+  activityLibraryQuerySource,
+  /filterActivityLibrarySourceItems[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source/,
+  'Activity list source-material filtering should live in the activity query domain.'
 );
 assert.match(
   activitiesApiSource,

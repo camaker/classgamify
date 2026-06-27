@@ -1,12 +1,19 @@
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
+  type ActivitySourceMaterialFilter,
   type ActivityTemplateFilter,
+  matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
+import type { ActivityContent } from '@/activities/types';
 import { activity } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { and, eq, ne, or, type SQL } from 'drizzle-orm';
+
+type ActivityLibrarySourceItem = {
+  contentJson: ActivityContent;
+};
 
 type ActivityLibraryPagedItem = {
   updatedAt: Date;
@@ -46,6 +53,23 @@ export function buildActivityLibraryWhere({
   }
 
   return and(...filters);
+}
+
+export function filterActivityLibrarySourceItems<
+  TItem extends ActivityLibrarySourceItem,
+>({
+  items,
+  source = 'all',
+}: {
+  items: readonly TItem[];
+  source?: ActivitySourceMaterialFilter;
+}) {
+  return items.filter((item) =>
+    matchesActivitySourceMaterialFilter({
+      content: item.contentJson,
+      source,
+    })
+  );
 }
 
 export function getActivityLibraryPageItems<
