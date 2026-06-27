@@ -2235,6 +2235,11 @@ assert.match(
 );
 assert.match(
   assignmentResultFormatSource,
+  /includePrimary[\s\S]*getDisplayAcceptedAnswers/,
+  'Assignment result formatting should expose a shared option for formatting only accepted-answer alternatives.'
+);
+assert.match(
+  assignmentResultFormatSource,
   /getAssignmentResultEmptyValue[\s\S]*assignment_result_empty_value/,
   'Assignment result formatting should use the localized empty-value placeholder by default.'
 );
@@ -8537,6 +8542,52 @@ assert.deepEqual(
     prompt: 'Capital of France?',
   }
 );
+assert.deepEqual(
+  buildPrintableWorksheetAnswerKeyItemView({
+    acceptedAnswers: [
+      ' Paris ',
+      'paris',
+      'Ｐａｒｉｓ',
+      'Paris, France',
+      'La capitale',
+    ],
+    answer: ' Paris ',
+    explanation: '',
+    id: 'deduped-answer-key',
+    kind: 'question',
+    prompt: 'Capital?',
+    sequenceNumber: 2,
+  }),
+  {
+    acceptedAnswersLabel: 'Accepted alternatives: Paris, France, La capitale',
+    answerLabel: '2. Paris',
+    explanationLabel: undefined,
+    id: 'deduped-answer-key',
+    prompt: 'Capital?',
+  }
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildPrintableWorksheetAnswerKeyItemView({
+      acceptedAnswers: ['答案', '答案', '答案一', '答案二'],
+      answer: '答案',
+      id: 'zh-answer-key',
+      kind: 'question',
+      prompt: '题目？',
+      sequenceNumber: 1,
+    }),
+    {
+      acceptedAnswersLabel: '可接受变体：答案一，答案二',
+      answerLabel: '1. 答案',
+      explanationLabel: undefined,
+      id: 'zh-answer-key',
+      prompt: '题目?',
+    }
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
   answerKey: true,
   worksheet: printableSnapshotWorksheetWithAnswers,
@@ -11285,6 +11336,16 @@ assert.match(
   printableWorksheetViewSource,
   /buildPrintableWorksheetAnswerKeyItemView[\s\S]*assignment_printable_answer_key_item/,
   'Printable worksheet answer-key item views should localize answer labels in the view layer.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /formatPrintableWorksheetAcceptedAnswers[\s\S]*formatAcceptedAnswerAlternatives[\s\S]*includePrimary: false[\s\S]*assignment_printable_answer_separator/,
+  'Printable worksheet accepted alternatives should reuse shared result formatting while omitting the primary answer.'
+);
+assert.doesNotMatch(
+  printableWorksheetViewSource,
+  /values\.slice\(1\)\.join/,
+  'Printable worksheet answer keys should not locally slice and join accepted answers.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -18149,6 +18210,13 @@ assert.equal(
   'Paris | Paris, France'
 );
 assert.equal(
+  formatAcceptedAnswerAlternatives(['Paris', 'Paris, France'], {
+    emptyValue: '',
+    includePrimary: false,
+  }),
+  'Paris, France'
+);
+assert.equal(
   formatAcceptedAnswerAlternatives([
     ' Paris ',
     '',
@@ -18174,6 +18242,12 @@ assert.equal(
   }),
   'Paris | Paris, France'
 );
+assert.equal(
+  formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France'], {
+    includePrimary: false,
+  }),
+  'Paris, France'
+);
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(formatAssignmentResultDate(null), '-');
@@ -18188,6 +18262,12 @@ try {
   assert.equal(
     formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
     'Paris，Paris, France'
+  );
+  assert.equal(
+    formatAcceptedAnswerAlternatives(['Paris', 'Paris, France'], {
+      includePrimary: false,
+    }),
+    'Paris, France'
   );
 } finally {
   overwriteGetLocale(() => 'en');

@@ -8,7 +8,10 @@ import type {
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
-import { formatAssignmentResultValue } from '@/assignments/result-format';
+import {
+  formatAcceptedAnswerAlternatives,
+  formatAssignmentResultValue,
+} from '@/assignments/result-format';
 import {
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
@@ -353,9 +356,11 @@ export function getPrintableWorksheetAnswerLines(item: PrintableWorksheetItem) {
 }
 
 export function formatPrintableWorksheetAcceptedAnswers(values: string[]) {
-  return values.length > 1
-    ? values.slice(1).join(m.assignment_printable_answer_separator())
-    : '';
+  return formatAcceptedAnswerAlternatives(values, {
+    emptyValue: '',
+    includePrimary: false,
+    separator: m.assignment_printable_answer_separator(),
+  });
 }
 
 export function formatPrintableWorksheetValue(value: string | undefined) {

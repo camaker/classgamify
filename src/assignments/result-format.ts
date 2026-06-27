@@ -68,12 +68,15 @@ export function formatAcceptedAnswerAlternatives(
   values: string[],
   options?: {
     emptyValue?: string;
+    includePrimary?: boolean;
     separator?: string;
   }
 ) {
   const emptyValue = options?.emptyValue ?? getAssignmentResultEmptyValue();
-  const acceptedAnswers = getUniqueAcceptedAnswers(values);
-  if (acceptedAnswers.length <= 1) return emptyValue;
+  const acceptedAnswers = getDisplayAcceptedAnswers(values, {
+    includePrimary: options?.includePrimary,
+  });
+  if (acceptedAnswers.length === 0) return emptyValue;
 
   return acceptedAnswers.join(
     options?.separator ?? m.assignment_result_accepted_answer_separator()
@@ -83,11 +86,14 @@ export function formatAcceptedAnswerAlternatives(
 export function formatOptionalAcceptedAnswerAlternatives(
   values: string[],
   options?: {
+    includePrimary?: boolean;
     separator?: string;
   }
 ) {
-  const acceptedAnswers = getUniqueAcceptedAnswers(values);
-  if (acceptedAnswers.length <= 1) return null;
+  const acceptedAnswers = getDisplayAcceptedAnswers(values, {
+    includePrimary: options?.includePrimary,
+  });
+  if (acceptedAnswers.length === 0) return null;
 
   return acceptedAnswers.join(
     options?.separator ?? m.assignment_result_accepted_answer_separator()
@@ -108,4 +114,18 @@ export function formatAssignmentResultValue(
 
 function getAssignmentResultEmptyValue() {
   return m.assignment_result_empty_value();
+}
+
+function getDisplayAcceptedAnswers(
+  values: string[],
+  options?: {
+    includePrimary?: boolean;
+  }
+) {
+  const acceptedAnswers = getUniqueAcceptedAnswers(values);
+  if (acceptedAnswers.length <= 1) return [];
+
+  return options?.includePrimary === false
+    ? acceptedAnswers.slice(1)
+    : acceptedAnswers;
 }
