@@ -78,8 +78,13 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
+    const where = buildUserFileOwnerWhere({ userId });
 
-    return db
+    const [totalRow] = await db
+      .select({ count: count() })
+      .from(userFiles)
+      .where(where);
+    const items = await db
       .select({
         contentType: userFiles.contentType,
         filename: userFiles.filename,
@@ -88,7 +93,7 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
         size: userFiles.size,
       })
       .from(userFiles)
-      .where(buildUserFileOwnerWhere({ userId }))
+      .where(where)
       .orderBy(buildUserFileListOrderBy())
       .limit(data.pageSize)
       .offset(
@@ -97,6 +102,11 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
           pageSize: data.pageSize,
         })
       );
+
+    return {
+      items,
+      total: totalRow?.count ?? 0,
+    };
   });
 
 const deleteSchema = z.object({ id: z.string() });

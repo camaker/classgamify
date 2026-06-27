@@ -1996,6 +1996,20 @@ assert.doesNotMatch(
   /hasAudio|hasSpreadsheet|hasWorksheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
   'Activity source-material picker should not recalculate extraction readiness locally.'
 );
+const sourceMaterialsUserFilesApiSource = readFileSync(
+  'src/api/user-files.ts',
+  'utf8'
+);
+assert.match(
+  sourceMaterialsUserFilesApiSource,
+  /export const listUserFileMaterials[\s\S]*return \{[\s\S]*items,[\s\S]*total: totalRow\?\.count \?\? 0,[\s\S]*\}/,
+  'Activity source-material picker API should return an object with items and total, matching the hook/component contract.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /\(data\?\.items \?\? \[\]\)\.flatMap/,
+  'Activity source-material picker should read available files from the material list response items.'
+);
 const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
