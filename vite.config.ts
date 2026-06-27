@@ -13,55 +13,69 @@ import { paraglideVitePlugin } from '@inlang/paraglide-js';
  * Vite configuration
  * https://vite.dev/config/
  */
-const config = defineConfig({
-  server: {
-    allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
-  },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+const config = defineConfig(({ mode }) => {
+  const isProduction = mode === 'production';
+
+  return {
+    server: {
+      allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
     },
-  },
-  plugins: [
-    devtools({
-      eventBusConfig: {
-        port: 0,
-      },
-    }),
-    tailwindcss(),
-    contentCollections(),
-    paraglideVitePlugin({
-      project: './project.inlang',
-      outdir: './src/locale/paraglide',
-      strategy: ['url', 'cookie', 'baseLocale'],
-      routeStrategies: [
-        { match: '/api/:path(.*)?', exclude: true },
-        { match: '/robots.txt', exclude: true },
-        { match: '/sitemap.xml', exclude: true },
-        { match: '/manifest.json', exclude: true },
+    resolve: {
+      alias: [
+        {
+          find: /^@tabler\/icons-react$/,
+          replacement: fileURLToPath(
+            new URL('./src/lib/tabler-icons.ts', import.meta.url)
+          ),
+        },
+        {
+          find: '@',
+          replacement: fileURLToPath(new URL('./src', import.meta.url)),
+        },
       ],
-      emitTsDeclarations: true,
-      isServer: 'import.meta.env?.SSR === true',
-    }),
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    // https://tanstack.dev/start/latest/docs/framework/react/build-from-scratch
-    tanstackStart({
-      srcDirectory: 'src',
-      start: { entry: './start.tsx' },
-      server: { entry: './server.ts' },
-    }),
-    // react's vite plugin must come after start's vite plugin
-    viteReact(),
-    // https://developers.cloudflare.com/workers/vite-plugin/
-    cloudflare({
-      viteEnvironment: {
-        name: 'ssr',
-      },
-    }),
-  ],
+    },
+    plugins: [
+      !isProduction &&
+        devtools({
+          eventBusConfig: {
+            port: 0,
+          },
+        }),
+      tailwindcss(),
+      contentCollections(),
+      paraglideVitePlugin({
+        project: './project.inlang',
+        outdir: './src/locale/paraglide',
+        strategy: ['url', 'cookie', 'baseLocale'],
+        routeStrategies: [
+          { match: '/api/:path(.*)?', exclude: true },
+          { match: '/robots.txt', exclude: true },
+          { match: '/sitemap.xml', exclude: true },
+          { match: '/manifest.json', exclude: true },
+        ],
+        emitTsDeclarations: true,
+        isServer: 'import.meta.env?.SSR === true',
+      }),
+      // this is the plugin that enables path aliases
+      viteTsConfigPaths({
+        projects: ['./tsconfig.json'],
+      }),
+      // https://tanstack.dev/start/latest/docs/framework/react/build-from-scratch
+      tanstackStart({
+        srcDirectory: 'src',
+        start: { entry: './start.tsx' },
+        server: { entry: './server.ts' },
+      }),
+      // react's vite plugin must come after start's vite plugin
+      viteReact(),
+      // https://developers.cloudflare.com/workers/vite-plugin/
+      cloudflare({
+        viteEnvironment: {
+          name: 'ssr',
+        },
+      }),
+    ],
+  };
 });
 
 export default config;

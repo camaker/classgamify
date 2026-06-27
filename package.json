@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build",
+    "build": "node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build",
     "e2e": "playwright test",
     "e2e:install": "playwright install",
     "e2e:ui": "playwright test --ui",
+    "test:unit": "tsx --test \"scripts/**/*.test.ts\"",
     "knip": "knip",
     "check": "biome check",
     "test:domain": "tsx scripts/test-domain.ts",

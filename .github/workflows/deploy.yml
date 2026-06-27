@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      NODE_OPTIONS: '--max-old-space-size=4096'
+      NODE_OPTIONS: '--max-old-space-size=8192'
       # --- Cloudflare credentials (needed by cf-typegen in postinstall) ---
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
