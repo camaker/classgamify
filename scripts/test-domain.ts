@@ -15,12 +15,18 @@ import {
   buildAssignmentClassroomBrief,
   buildAssignmentClassroomBriefFocusItemView,
   buildAssignmentClassroomBriefFollowUpStudentView,
+  buildAssignmentClassroomBriefStatViews,
   formatAssignmentBriefStudentAccuracy,
 } from '@/assignments/classroom-brief';
-import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
+import {
+  buildAssignmentItemReviewSummary,
+  buildAssignmentItemReviewSummaryItemView,
+} from '@/assignments/item-review-summary';
 import {
   ASSIGNMENT_RETEACH_PLAN_LIMITS,
   buildAssignmentReteachPlan,
+  buildAssignmentReteachPlanItemView,
+  buildAssignmentReteachPlanStudentView,
 } from '@/assignments/reteach-plan';
 import { stripJsonComments } from './parse-wrangler';
 import {
@@ -538,7 +544,15 @@ import {
   parseOptionalWholeNumber,
   validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
-import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
+import {
+  buildAssignmentStudentFollowUpSummary,
+  buildAssignmentStudentFollowUpSummaryStudentView,
+} from '@/assignments/student-follow-up-summary';
+import {
+  formatAssignmentResultItemNumberLabel,
+  formatAssignmentResultPromptLabel,
+  joinAssignmentResultSearchSummaryParts,
+} from '@/assignments/result-display';
 import {
   buildAnonymousAttemptTokenStorageKey,
   createStudentIdentityResolver,
@@ -1856,6 +1870,10 @@ const assignmentResultsEmptyStateSource = readFileSync(
   'src/components/assignments/assignment-results-empty-state.tsx',
   'utf8'
 );
+const assignmentResultDisplaySource = readFileSync(
+  'src/assignments/result-display.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -2007,6 +2025,16 @@ assert.match(
   'Assignment classroom brief component should render prepared focus item and follow-up student views.'
 );
 assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /itemView\.promptLabel/,
+  'Assignment classroom brief component should render prepared focus item prompt labels.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /itemView\.itemNumberLabel[\s\S]*itemView\.prompt/,
+  'Assignment classroom brief component should not hand-compose focus item number and prompt text.'
+);
+assert.match(
   assignmentResultsStudentSearchSource,
   /view\.sortOptions[\s\S]*view\.summary/,
   'Assignment result student search component should render prepared sort options and result summary.'
@@ -2025,6 +2053,16 @@ assert.match(
   assignmentResultsItemPerformanceTableSource,
   /assignmentResultTableHeaders\.itemPerformance[\s\S]*items\.map/,
   'Assignment result item performance table component should render prepared item row views.'
+);
+assert.match(
+  assignmentResultsItemPerformanceTableSource,
+  /rowView\.promptLabel/,
+  'Assignment result item performance table should render prepared prompt labels.'
+);
+assert.doesNotMatch(
+  assignmentResultsItemPerformanceTableSource,
+  /rowView\.itemNumberLabel[\s\S]*rowView\.prompt/,
+  'Assignment result item performance table should not hand-compose item number and prompt text.'
 );
 assert.match(
   assignmentResultsStudentSummaryTableSource,
@@ -2075,6 +2113,21 @@ assert.match(
   assignmentResultViewSource,
   /getAssignmentResultCompletedAttemptCount\(\s*data\?\.stats\.completions\s*\)/,
   'Assignment result actions should derive attempt availability from completed attempt stats.'
+);
+assert.match(
+  assignmentResultDisplaySource,
+  /formatAssignmentResultPromptLabel[\s\S]*m\.assignment_result_prompt_label/,
+  'Assignment result display helper should own localized prompt-label formatting.'
+);
+assert.match(
+  assignmentResultDisplaySource,
+  /formatAssignmentResultFraction[\s\S]*m\.assignment_result_fraction/,
+  'Assignment result display helper should own localized fraction formatting.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /joinAssignmentResultSearchSummaryParts/,
+  'Assignment result view should use the shared localized result-summary joiner.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -18194,6 +18247,7 @@ assert.deepEqual(
     itemNumberLabel: '1.',
     kindLabel: 'Question',
     prompt: 'Capital of France?',
+    promptLabel: '1. Capital of France?',
     submittedLabel: '2/3',
   }
 );
@@ -18215,6 +18269,7 @@ assert.deepEqual(
     itemNumberLabel: '1.',
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
+    promptLabel: '1. Match "Hot" with its pair.',
     submittedLabel: '1/2',
   }
 );
@@ -18222,11 +18277,12 @@ assert.deepEqual(
   buildAssignmentItemPerformanceRowViews(resultAnalysis.perItem).map((row) => [
     row.id,
     row.itemNumberLabel,
+    row.promptLabel,
     row.correctRateLabel,
   ]),
   [
-    ['q-1', '1.', '67%'],
-    ['pair-1', '2.', '50%'],
+    ['q-1', '1.', '1. Capital of France?', '67%'],
+    ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
   ]
 );
 assert.equal(
@@ -19266,6 +19322,36 @@ assert.equal(formatAssignmentResultFraction(-1, 5), '0/5');
 assert.equal(formatAssignmentResultFraction(2.5, 5), '2/5');
 assert.equal(formatAssignmentResultFraction(Number.NaN, 5), '-');
 assert.equal(formatAssignmentResultFraction(2, Number.POSITIVE_INFINITY), '-');
+assert.equal(formatAssignmentResultItemNumberLabel(0), '1.');
+assert.equal(formatAssignmentResultItemNumberLabel(-1), '1.');
+assert.equal(formatAssignmentResultItemNumberLabel(2.9), '3.');
+assert.equal(
+  formatAssignmentResultPromptLabel({
+    index: 1,
+    prompt: 'Capital of France?',
+  }),
+  '2. Capital of France?'
+);
+assert.equal(
+  joinAssignmentResultSearchSummaryParts(['1 student', '2 attempts']),
+  '1 student · 2 attempts'
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatAssignmentResultPromptLabel({
+      index: 0,
+      prompt: 'Capital of France?',
+    }),
+    '1. Capital of France?'
+  );
+  assert.equal(
+    joinAssignmentResultSearchSummaryParts(['1 名学生', '2 次作答']),
+    '1 名学生 · 2 次作答'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(formatAssignmentResultNumber(2.5), '2');
 assert.equal(formatAssignmentResultNumber(Number.NaN), '-');
 assert.equal(formatAssignmentResultNumber(null), '-');
@@ -20752,6 +20838,18 @@ assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
   'Anonymous student 1'
 );
+assert.deepEqual(buildAssignmentClassroomBriefStatViews(csvExportData.stats), [
+  { key: 'completions', text: 'Completions: 1' },
+  { key: 'average-accuracy', text: 'Average accuracy: 50%' },
+  { key: 'average-points', text: 'Average points: 1' },
+  { key: 'average-time', text: 'Average time: 45s' },
+]);
+assert.deepEqual(classroomBrief.statViews, [
+  { key: 'completions', text: 'Completions: 1' },
+  { key: 'average-accuracy', text: 'Average accuracy: 50%' },
+  { key: 'average-points', text: 'Average points: 1' },
+  { key: 'average-time', text: 'Average time: 45s' },
+]);
 assert.deepEqual(
   buildAssignmentClassroomBriefFocusItemView({
     index: 0,
@@ -20762,7 +20860,10 @@ assert.deepEqual(
     correctSummaryLabel: '1/2 correct',
     itemId: 'pair-1',
     itemNumberLabel: '1.',
+    performanceLabel: '50% correct, 1/2',
     prompt: 'Match "Hot" with its pair.',
+    promptLabel: '1. Match "Hot" with its pair.',
+    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
   }
 );
 assert.deepEqual(classroomBrief.focusItemViews[0], {
@@ -20770,24 +20871,34 @@ assert.deepEqual(classroomBrief.focusItemViews[0], {
   correctSummaryLabel: '1/2 correct',
   itemId: 'pair-1',
   itemNumberLabel: '1.',
+  performanceLabel: '50% correct, 1/2',
   prompt: 'Match "Hot" with its pair.',
+  promptLabel: '1. Match "Hot" with its pair.',
+  text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
 });
 assert.deepEqual(
-  buildAssignmentClassroomBriefFollowUpStudentView(
-    classroomBrief.followUpStudents[0]!
-  ),
+  buildAssignmentClassroomBriefFollowUpStudentView({
+    index: 0,
+    student: classroomBrief.followUpStudents[0]!,
+  }),
   {
     accuracyLabel: 'Latest 0% · best 0%',
+    latestAccuracyLabel: '0%',
     needsReviewLabel: '1 review',
+    reviewItemCountLabel: '1 item to review',
     studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
+    text: '- 1. Anonymous student 1: 0% latest, 1 item to review',
   }
 );
 assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
+  latestAccuracyLabel: '0%',
   needsReviewLabel: '1 review',
+  reviewItemCountLabel: '1 item to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
+  text: '- 1. Anonymous student 1: 0% latest, 1 item to review',
 });
 assert.match(
   classroomBrief.text,
@@ -20849,6 +20960,28 @@ const reteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
   students: followUpPriorityStudents,
+});
+const alphaReviewStudent = followUpPriorityStudents.find(
+  (student) => student.studentKey === 'name:alpha-review'
+)!;
+assert.deepEqual(
+  buildAssignmentReteachPlanItemView({
+    index: 0,
+    item: resultAnalysis.perItem[1]!,
+  }),
+  {
+    itemId: 'pair-1',
+    performanceLabel: '50% correct, 1/2',
+    promptLabel: '1. Match "Hot" with its pair.',
+    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
+  }
+);
+assert.deepEqual(buildAssignmentReteachPlanStudentView(alphaReviewStudent), {
+  accuracyLabel: '70%',
+  reviewItemCountLabel: '3 items to review',
+  studentKey: 'name:alpha-review',
+  studentLabel: 'Alpha review',
+  text: '- Alpha review: 70% latest accuracy, 3 items to review',
 });
 assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
 assert.match(reteachPlan, /Review first:/);
@@ -20912,6 +21045,23 @@ const itemReviewSummary = buildAssignmentItemReviewSummary({
   assignmentTitle: csvExportData.assignment.title,
   items: resultAnalysis.perItem,
 });
+assert.deepEqual(
+  buildAssignmentItemReviewSummaryItemView({
+    index: 0,
+    item: resultAnalysis.perItem[0]!,
+  }),
+  {
+    acceptedAnswersText: 'Paris, Paris, France',
+    correctCountLabel: '2/3 correct',
+    correctRateLabel: '67% correct',
+    expectedAnswerText: 'Paris / Paris, France',
+    explanationText: 'Paris is the capital of France.',
+    itemId: 'q-1',
+    kindLabel: 'Question',
+    promptLabel: '1. Capital of France?',
+    text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct. Expected: Paris / Paris, France. Accepted answers: Paris, Paris, France. Notes: Paris is the capital of France.',
+  }
+);
 assert.match(
   itemReviewSummary,
   /ClassGamify item review: Capital Review, Week 1/
@@ -20932,6 +21082,22 @@ const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
   assignmentTitle: csvExportData.assignment.title,
   students: followUpPriorityStudents,
 });
+assert.deepEqual(
+  buildAssignmentStudentFollowUpSummaryStudentView({
+    index: 0,
+    student: alphaReviewStudent,
+  }),
+  {
+    attemptsLabel: '1 attempt',
+    averageAccuracyLabel: '70%',
+    bestAccuracyLabel: '70%',
+    latestAccuracyLabel: '70%',
+    reviewItemCountLabel: '3 items to review',
+    studentKey: 'name:alpha-review',
+    studentLabel: 'Alpha review',
+    text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review',
+  }
+);
 assert.match(
   studentFollowUpSummary,
   /ClassGamify student follow-up: Capital Review, Week 1/

@@ -34,10 +34,7 @@ export function AssignmentResultsItemPerformanceTable({
       <TableBody>
         {items.map((rowView) => (
           <TableRow key={rowView.id}>
-            <TableCell className="max-w-80">
-              <span className="font-medium">{rowView.itemNumberLabel}</span>{' '}
-              {rowView.prompt}
-            </TableCell>
+            <TableCell className="max-w-80">{rowView.promptLabel}</TableCell>
             <TableCell>{rowView.kindLabel}</TableCell>
             <TableCell>{rowView.correctRateLabel}</TableCell>
             <TableCell>{rowView.submittedLabel}</TableCell>

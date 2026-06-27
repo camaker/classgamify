@@ -37,6 +37,12 @@ import {
   formatAssignmentSummaryReviewCount,
 } from '@/assignments/result-summary-format';
 import {
+  formatAssignmentResultFraction,
+  formatAssignmentResultItemNumberLabel,
+  formatAssignmentResultPromptLabel,
+  joinAssignmentResultSearchSummaryParts,
+} from '@/assignments/result-display';
+import {
   ATTEMPT_REVIEW_FILTER_VALUES,
   DEFAULT_ATTEMPT_REVIEW_FILTER,
   DEFAULT_ITEM_PERFORMANCE_SORT,
@@ -544,7 +550,9 @@ export const assignmentResultReviewCopy = {
   get correctAnswerLabel() {
     return m.assignment_result_review_correct();
   },
-  emptyValue: '-',
+  get emptyValue() {
+    return m.assignment_result_empty_value();
+  },
   get expectedAnswerLabel() {
     return m.assignment_result_review_expected();
   },
@@ -1247,14 +1255,20 @@ export function buildAssignmentItemPerformanceRowView({
   index: number;
   item: AssignmentItemAnalysis;
 }) {
+  const itemNumberLabel = formatAssignmentResultItemNumberLabel(index);
+
   return {
     acceptedAnswersText: formatAcceptedAnswerAlternatives(item.acceptedAnswers),
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
     expectedAnswerText: formatAssignmentResultValue(item.expectedAnswer),
     explanationText: formatAssignmentResultValue(item.explanation),
-    itemNumberLabel: `${Math.max(0, index) + 1}.`,
+    itemNumberLabel,
     kindLabel: item.kindLabel,
     prompt: item.prompt,
+    promptLabel: formatAssignmentResultPromptLabel({
+      itemNumberLabel,
+      prompt: item.prompt,
+    }),
     submittedLabel: formatAssignmentResultFraction(
       item.correctCount,
       item.submittedCount
@@ -1301,7 +1315,10 @@ export function buildAssignmentAttemptAnswerReviewView({
     }),
     expectedAnswerText,
     explanationText: answer.explanation || null,
-    promptLabel: `${Math.max(0, index) + 1}. ${answer.prompt}`,
+    promptLabel: formatAssignmentResultPromptLabel({
+      index,
+      prompt: answer.prompt,
+    }),
     statusLabel: status.label,
     statusTone: status.tone,
     studentAnswerLabel: assignmentResultReviewCopy.studentAnswerLabel,
@@ -1342,18 +1359,11 @@ export function formatAssignmentItemCorrectSummary({
   });
 }
 
-export function formatAssignmentResultFraction(value: number, total: number) {
-  const normalizedValue = normalizeResultFractionNumber(value);
-  const normalizedTotal = normalizeResultFractionNumber(total);
-
-  if (normalizedValue === undefined || normalizedTotal === undefined) {
-    return assignmentResultReviewCopy.emptyValue;
-  }
-
-  return `${normalizedValue}/${normalizedTotal}`;
-}
-
-export { formatAssignmentResultNumber, formatAssignmentResultPercent };
+export {
+  formatAssignmentResultFraction,
+  formatAssignmentResultNumber,
+  formatAssignmentResultPercent,
+};
 
 export function formatAssignmentReviewCount(count: number) {
   return formatAssignmentSummaryReviewCount(count);
@@ -1362,11 +1372,6 @@ export function formatAssignmentReviewCount(count: number) {
 function clampProgressValue(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, value));
-}
-
-function normalizeResultFractionNumber(value: number) {
-  if (!Number.isFinite(value)) return undefined;
-  return Math.floor(Math.max(0, value));
 }
 
 type ResultSearchSummaryInput = {
@@ -1543,10 +1548,10 @@ export function buildResultSearchSummary({
     return m.assignment_result_search_summary_all_students();
   }
 
-  return [
+  return joinAssignmentResultSearchSummaryParts([
     formatResultStudentCount(matchedStudents),
     formatResultAttemptCount(matchedAttempts),
-  ].join(' · ');
+  ]);
 }
 
 export function buildAttemptReviewSubmissionSummary({

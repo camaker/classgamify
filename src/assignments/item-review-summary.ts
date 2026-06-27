@@ -6,6 +6,7 @@ import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
 } from '@/assignments/result-summary-format';
+import { formatAssignmentResultPromptLabel } from '@/assignments/result-display';
 import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
 import type { AssignmentItemAnalysis } from '@/assignments/results';
 import { m } from '@/locale/paraglide/messages';
@@ -15,48 +16,91 @@ type AssignmentItemReviewSummaryInput = {
   items: AssignmentItemAnalysis[];
 };
 
+export type AssignmentItemReviewSummaryItemView = {
+  acceptedAnswersText: string;
+  correctCountLabel: string;
+  correctRateLabel: string;
+  expectedAnswerText: string;
+  explanationText: string;
+  itemId: string;
+  kindLabel: string;
+  promptLabel: string;
+  text: string;
+};
+
 export function buildAssignmentItemReviewSummary({
   assignmentTitle,
   items,
 }: AssignmentItemReviewSummaryInput) {
   const sortedItems = sortAssignmentItemsByReviewPriority(items);
+  const itemViews = buildAssignmentItemReviewSummaryItemViews(sortedItems);
 
   const lines = [
     m.assignment_item_review_title({ title: assignmentTitle }),
     '',
-    ...formatItems(sortedItems),
+    ...formatItems(itemViews),
   ];
 
   return lines.join('\n');
 }
 
-function formatItems(items: AssignmentItemAnalysis[]) {
+export function buildAssignmentItemReviewSummaryItemViews(
+  items: AssignmentItemAnalysis[]
+): AssignmentItemReviewSummaryItemView[] {
+  return items.map((item, index) =>
+    buildAssignmentItemReviewSummaryItemView({ index, item })
+  );
+}
+
+export function buildAssignmentItemReviewSummaryItemView({
+  index,
+  item,
+}: {
+  index: number;
+  item: AssignmentItemAnalysis;
+}): AssignmentItemReviewSummaryItemView {
+  const acceptedAnswersText =
+    formatOptionalAcceptedAnswerAlternatives(item.acceptedAnswers) ?? '';
+  const explanationText = item.explanation ?? '';
+  const correctCountLabel = formatAssignmentSummaryCorrectCount(item);
+  const correctRateLabel = formatAssignmentSummaryCorrectRate(item.correctRate);
+  const expectedAnswerText = formatAssignmentResultValue(item.expectedAnswer);
+  const promptLabel = formatAssignmentResultPromptLabel({
+    index,
+    prompt: item.prompt,
+  });
+
+  return {
+    acceptedAnswersText,
+    correctCountLabel,
+    correctRateLabel,
+    expectedAnswerText,
+    explanationText,
+    itemId: item.itemId,
+    kindLabel: item.kindLabel,
+    promptLabel,
+    text: m.assignment_item_review_line({
+      acceptedAnswers: acceptedAnswersText
+        ? m.assignment_item_review_accepted_answers({
+            answers: acceptedAnswersText,
+          })
+        : '',
+      correctCount: correctCountLabel,
+      correctRate: correctRateLabel,
+      expected: expectedAnswerText,
+      kind: item.kindLabel,
+      notes: explanationText
+        ? m.assignment_item_review_notes({ notes: explanationText })
+        : '',
+      promptLabel,
+    }),
+  };
+}
+
+function formatItems(items: AssignmentItemReviewSummaryItemView[]) {
   if (items.length === 0) {
     return [m.assignment_item_review_empty()];
   }
 
-  return items.map((item, index) => {
-    const explanation = item.explanation
-      ? m.assignment_item_review_notes({ notes: item.explanation })
-      : '';
-    const acceptedAnswersText = formatOptionalAcceptedAnswerAlternatives(
-      item.acceptedAnswers
-    );
-    const acceptedAnswers = acceptedAnswersText
-      ? m.assignment_item_review_accepted_answers({
-          answers: acceptedAnswersText,
-        })
-      : '';
-
-    return m.assignment_item_review_line({
-      acceptedAnswers,
-      correctCount: formatAssignmentSummaryCorrectCount(item),
-      correctRate: formatAssignmentSummaryCorrectRate(item.correctRate),
-      expected: formatAssignmentResultValue(item.expectedAnswer),
-      index: index + 1,
-      kind: item.kindLabel,
-      notes: explanation,
-      prompt: item.prompt,
-    });
-  });
+  return items.map((item) => item.text);
 }

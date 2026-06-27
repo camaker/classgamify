@@ -12,37 +12,89 @@ type AssignmentStudentFollowUpSummaryInput = {
   students: AssignmentStudentSummary[];
 };
 
+export type AssignmentStudentFollowUpSummaryStudentView = {
+  attemptsLabel: string;
+  averageAccuracyLabel: string;
+  bestAccuracyLabel: string;
+  latestAccuracyLabel: string;
+  reviewItemCountLabel: string;
+  studentKey: string;
+  studentLabel: string;
+  text: string;
+};
+
 export function buildAssignmentStudentFollowUpSummary({
   assignmentTitle,
   students,
 }: AssignmentStudentFollowUpSummaryInput) {
   const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
+  const studentViews =
+    buildAssignmentStudentFollowUpSummaryStudentViews(sortedStudents);
 
   const lines = [
     m.assignment_student_follow_up_title({ title: assignmentTitle }),
     '',
-    ...formatStudents(sortedStudents),
+    ...formatStudents(studentViews),
   ];
 
   return lines.join('\n');
 }
 
-function formatStudents(students: AssignmentStudentSummary[]) {
+export function buildAssignmentStudentFollowUpSummaryStudentViews(
+  students: AssignmentStudentSummary[]
+): AssignmentStudentFollowUpSummaryStudentView[] {
+  return students.map((student, index) =>
+    buildAssignmentStudentFollowUpSummaryStudentView({ index, student })
+  );
+}
+
+export function buildAssignmentStudentFollowUpSummaryStudentView({
+  index,
+  student,
+}: {
+  index: number;
+  student: AssignmentStudentSummary;
+}): AssignmentStudentFollowUpSummaryStudentView {
+  const attemptsLabel = formatAssignmentSummaryAttemptCount(student.attempts);
+  const averageAccuracyLabel = formatAssignmentSummaryAccuracy(
+    student.averageAccuracy
+  );
+  const bestAccuracyLabel = formatAssignmentSummaryAccuracy(
+    student.bestAccuracy
+  );
+  const latestAccuracyLabel = formatAssignmentSummaryAccuracy(
+    student.latestAccuracy
+  );
+  const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
+    student.needsReviewCount
+  );
+
+  return {
+    attemptsLabel,
+    averageAccuracyLabel,
+    bestAccuracyLabel,
+    latestAccuracyLabel,
+    reviewItemCountLabel,
+    studentKey: student.studentKey,
+    studentLabel: student.studentLabel,
+    text: m.assignment_student_follow_up_line({
+      attempts: attemptsLabel,
+      average: averageAccuracyLabel,
+      best: bestAccuracyLabel,
+      index: index + 1,
+      latest: latestAccuracyLabel,
+      reviewCount: reviewItemCountLabel,
+      student: student.studentLabel,
+    }),
+  };
+}
+
+function formatStudents(
+  students: AssignmentStudentFollowUpSummaryStudentView[]
+) {
   if (students.length === 0) {
     return [m.assignment_student_follow_up_empty()];
   }
 
-  return students.map((student, index) =>
-    m.assignment_student_follow_up_line({
-      attempts: formatAssignmentSummaryAttemptCount(student.attempts),
-      average: formatAssignmentSummaryAccuracy(student.averageAccuracy),
-      best: formatAssignmentSummaryAccuracy(student.bestAccuracy),
-      index: index + 1,
-      latest: formatAssignmentSummaryAccuracy(student.latestAccuracy),
-      reviewCount: formatAssignmentSummaryReviewItemCount(
-        student.needsReviewCount
-      ),
-      student: student.studentLabel,
-    })
-  );
+  return students.map((student) => student.text);
 }

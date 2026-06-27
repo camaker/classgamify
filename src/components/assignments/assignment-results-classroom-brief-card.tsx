@@ -49,7 +49,7 @@ export function AssignmentResultsClassroomBriefCard({
                 <div key={itemView.itemId} className="grid gap-1 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <p className="min-w-0 font-medium">
-                      {itemView.itemNumberLabel} {itemView.prompt}
+                      {itemView.promptLabel}
                     </p>
                     <Badge variant="outline" className="rounded-md">
                       {itemView.correctRateLabel}
