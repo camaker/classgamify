@@ -4183,6 +4183,11 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /buildStudentRunnerInstructionView[\s\S]*normalizeRuntimeDisplayText\(instructions\)/,
+  'Student runner instructions should normalize whitespace and fullwidth text through the shared runtime display helper.'
+);
+assert.match(
+  studentRunnerViewSource,
   /formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*student_runner_choice_separator/,
   'Student answer feedback should show accepted alternatives without repeating the primary correct answer.'
 );
@@ -4190,6 +4195,11 @@ assert.doesNotMatch(
   studentRunnerViewSource,
   /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,
   'Student runner view should not hand-compose item position, word-bank, or accepted-answer separators.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource,
+  /instructions\?\.trim\(\)/,
+  'Student runner instructions should not use trim-only display normalization.'
 );
 assert.match(playRouteSource, /robots: 'noindex,follow'/);
 assert.match(
@@ -8388,6 +8398,25 @@ assert.deepEqual(studentRunnerHeaderView, {
 assert.equal(
   studentRunnerHeaderView.ruleItems[0]?.description,
   'These are the playable items in this assignment.'
+);
+assert.deepEqual(
+  buildStudentRunnerHeaderView({
+    assignment: {
+      expiresAt: null,
+      settings: {
+        collectStudentName: false,
+        instructions: '  Ｒｅｖｉｅｗ\u00A0　carefully.  ',
+        showCorrectAnswers: false,
+        shuffleItems: true,
+      },
+      title: 'Normalized instructions',
+    },
+    itemCount: 1,
+  }).instructions,
+  {
+    label: 'Student instructions',
+    value: 'Review carefully.',
+  }
 );
 assert.equal(
   buildStudentRunnerHeaderView({

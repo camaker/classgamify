@@ -180,7 +180,7 @@ export function buildStudentRunnerHeaderView({
 function buildStudentRunnerInstructionView(
   instructions: string | undefined
 ): StudentRunnerInstructionView | undefined {
-  const value = instructions?.trim();
+  const value = normalizeRuntimeDisplayText(instructions);
   if (!value) return undefined;
 
   return {
