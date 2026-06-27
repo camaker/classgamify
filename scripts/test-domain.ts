@@ -85,11 +85,14 @@ import {
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
+  ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS,
   buildActivityDraftPrompt,
+  buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
   createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
+  extractActivityDraftSourceTerms,
   generateActivityDraftInputSchema,
   normalizeAiActivityDraft,
   type AiActivityDraft,
@@ -11590,6 +11593,26 @@ assert.match(
   'AI draft group completion should reuse domain group limits.'
 );
 assert.match(
+  activityAiDraftSource,
+  /ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS[\s\S]*maxPhraseLength: 48[\s\S]*maxWordLength: 32[\s\S]*minPhraseLength: 2[\s\S]*minWordLength: 3/,
+  'AI draft source-term extraction should expose named source-term limits.'
+);
+assert.match(
+  activityAiDraftSource,
+  /export function buildFallbackActivityDraftTerms[\s\S]*extractActivityDraftSourceTerms\([\s\S]*slice\(0, input\.itemCount\)/,
+  'Fallback activity drafts should choose source terms through the shared source-term helper.'
+);
+assert.match(
+  activityAiDraftSource,
+  /export function extractActivityDraftSourceTerms[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.minPhraseLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.maxPhraseLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.minWordLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.maxWordLength/,
+  'AI draft source-term extraction should reuse named phrase and word limits.'
+);
+assert.doesNotMatch(
+  activityAiDraftSource,
+  /value\.length >= 2 && value\.length <= 48|value\.length >= 3 && value\.length <= 32/,
+  'AI draft source-term extraction should not keep local phrase or word length limits.'
+);
+assert.match(
   assignmentsApiSource,
   /async function countPreviousIdentityAttempts[\s\S]*isNotNull\(attempt\.resultJson\)/,
   'Assignment attempt limits should only count completed attempts with scored results.'
@@ -16750,6 +16773,12 @@ assert.deepEqual(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS, {
   teacherNotes: 5,
   vocabulary: 16,
 });
+assert.deepEqual(ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS, {
+  maxPhraseLength: 48,
+  maxWordLength: 32,
+  minPhraseLength: 2,
+  minWordLength: 3,
+});
 assert.deepEqual(ACTIVITY_AI_DRAFT_FIELD_LIMITS, {
   answer: {
     max: 120,
@@ -16913,6 +16942,41 @@ assert.throws(() =>
   generateActivityDraftInputSchema.parse({
     sourceText: 'A'.repeat(ACTIVITY_AI_DRAFT_FIELD_LIMITS.sourceText.max + 1),
   })
+);
+const sourceMaterialDraftNotesText = [
+  'weather, sunny, rainy, cloudy',
+  'Attached classroom source materials:',
+  '- Worksheet document: Weather worksheet.pdf',
+  '- Audio: Weather listening.mp3',
+].join('\n');
+assert.deepEqual(
+  extractActivityDraftSourceTerms({
+    sourceText: sourceMaterialDraftNotesText,
+    subject: 'Science',
+  }).slice(0, 6),
+  [
+    'weather',
+    'sunny',
+    'rainy',
+    'cloudy',
+    'Attached classroom source materials',
+    '- Worksheet document',
+  ]
+);
+assert.deepEqual(
+  buildFallbackActivityDraftTerms({
+    input: {
+      difficulty: 'starter',
+      gradeBand: 'Grade 2',
+      itemCount: 3,
+      language: 'en',
+      sourceText: sourceMaterialDraftNotesText,
+      subject: 'Science',
+      templateType: 'quiz',
+    },
+    locale: 'en',
+  }),
+  ['weather', 'sunny', 'rainy']
 );
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',

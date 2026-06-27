@@ -62,6 +62,13 @@ export const ACTIVITY_AI_DRAFT_COMPLETION_LIMITS = {
   vocabulary: 16,
 } as const;
 
+export const ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS = {
+  maxPhraseLength: 48,
+  maxWordLength: 32,
+  minPhraseLength: 2,
+  minWordLength: 3,
+} as const;
+
 export const ACTIVITY_AI_DRAFT_FIELD_LIMITS = {
   answer: {
     max: 120,
@@ -1007,14 +1014,7 @@ export function createFallbackActivityDraft(
   input: GenerateActivityDraftInput
 ): CreateActivityInput {
   const locale = getFallbackDraftLocale(input.language);
-  const terms = extractTerms(input.sourceText, input.subject).slice(
-    0,
-    input.itemCount
-  );
-  const normalizedTerms =
-    terms.length >= ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min
-      ? terms
-      : fallbackTerms(input, locale);
+  const normalizedTerms = buildFallbackActivityDraftTerms({ input, locale });
   const options = normalizedTerms.slice(
     0,
     Math.max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min, input.itemCount)
@@ -1229,15 +1229,46 @@ function buildFallbackPairs({
   });
 }
 
-function extractTerms(sourceText: string, subject: string) {
+export function buildFallbackActivityDraftTerms({
+  input,
+  locale,
+}: {
+  input: GenerateActivityDraftInput;
+  locale: Locale;
+}) {
+  const sourceTerms = extractActivityDraftSourceTerms({
+    sourceText: input.sourceText,
+    subject: input.subject,
+  }).slice(0, input.itemCount);
+
+  return sourceTerms.length >= ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min
+    ? sourceTerms
+    : fallbackTerms(input, locale);
+}
+
+export function extractActivityDraftSourceTerms({
+  sourceText,
+  subject,
+}: {
+  sourceText: string;
+  subject: string;
+}) {
   const phrases = sourceText
     .split(/[\n,;|，。；、:：!?！？()[\]{}]+/u)
     .map((value) => value.trim())
-    .filter((value) => value.length >= 2 && value.length <= 48);
+    .filter(
+      (value) =>
+        value.length >= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.minPhraseLength &&
+        value.length <= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.maxPhraseLength
+    );
   const words = sourceText
     .split(/\s+/u)
     .map((value) => value.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
-    .filter((value) => value.length >= 3 && value.length <= 32);
+    .filter(
+      (value) =>
+        value.length >= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.minWordLength &&
+        value.length <= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.maxWordLength
+    );
 
   return unique([...phrases, ...words, subject]).slice(
     0,
@@ -1247,7 +1278,10 @@ function extractTerms(sourceText: string, subject: string) {
 
 function fallbackTerms(input: GenerateActivityDraftInput, locale: Locale) {
   return unique([
-    ...extractTerms(input.sourceText, input.subject),
+    ...extractActivityDraftSourceTerms({
+      sourceText: input.sourceText,
+      subject: input.subject,
+    }),
     m.activity_ai_fallback_term_key_word({}, { locale }),
     m.activity_ai_fallback_term_example({}, { locale }),
     m.activity_ai_fallback_term_meaning({}, { locale }),
