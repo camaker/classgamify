@@ -7,7 +7,7 @@ import {
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
 } from '@/activities/template-entry';
-import { formatTemplateRequirement } from '@/activities/template-remix';
+import { formatTemplateRequirements } from '@/activities/template-remix';
 import {
   getWorksheetModeDefinitions,
   type WorksheetModeDefinition,
@@ -102,8 +102,8 @@ export function buildTemplatesPageViewModel({
         template.classroomMode
       ),
       classroomModeLabel: m.templates_page_classroom_mode_label(),
-      contentRequirements: template.contentRequirements.map((requirement) =>
-        formatTemplateRequirement(requirement)
+      contentRequirements: formatTemplateRequirements(
+        template.contentRequirements
       ),
       description: template.description,
       name: template.name,

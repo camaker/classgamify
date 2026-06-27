@@ -244,6 +244,14 @@ export function formatTemplateRequirement(
   }
 }
 
+export function formatTemplateRequirements(
+  requirements: readonly ActivityTemplateContentRequirement[]
+) {
+  return requirements.map((requirement) =>
+    formatTemplateRequirement(requirement)
+  );
+}
+
 export function getActivityTemplateDraftGuidance(
   templateType: ActivityTemplateType
 ) {

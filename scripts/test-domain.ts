@@ -173,6 +173,7 @@ import {
   buildTemplateRemixSummary,
   formatTemplateRequirementList,
   formatTemplateRequirement,
+  formatTemplateRequirements,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
 import {
@@ -1588,6 +1589,16 @@ assert.doesNotMatch(
   activityEditorFormSource,
   /function ActivityDraftMetaSummary|function ActivityTemplateReadinessPanel|function ActivityDraftCoverageStat|buildActivityDraftMetaSummaryView|ActivityTemplateReadinessPanelSummary/,
   'Activity editor form should not own AI draft summary or readiness panel display components.'
+);
+assert.match(
+  activityEditorSource,
+  /formatTemplateRequirements\([\s\S]*template\.contentRequirements/,
+  'Activity editor template setup should use the activity-domain requirement list formatter.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /template\.contentRequirements\.map\(\(requirement\) =>[\s\S]*formatTemplateRequirement\(requirement\)/,
+  'Activity editor template setup should not map template requirement labels locally.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -11597,8 +11608,8 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     bestForLabel: 'Best for',
     classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
     classroomModeLabel: 'Classroom mode',
-    contentRequirements: template.contentRequirements.map((requirement) =>
-      formatTemplateRequirement(requirement)
+    contentRequirements: formatTemplateRequirements(
+      template.contentRequirements
     ),
     description: template.description,
     name: template.name,
@@ -12069,10 +12080,20 @@ assert.match(
   /buildWorksheetHeroActions\(worksheetModeDefinitions\)/,
   'Worksheets page view-model should reuse the worksheet hero action helper.'
 );
+assert.match(
+  entryPageViewSource,
+  /formatTemplateRequirements\([\s\S]*template\.contentRequirements/,
+  'Template entry page view-model should use the activity-domain requirement list formatter.'
+);
 assert.doesNotMatch(
   entryPageViewSource,
   /const heroActions = worksheetModeDefinitions\.map/,
   'Worksheets page view-model should not rebuild hero actions locally.'
+);
+assert.doesNotMatch(
+  entryPageViewSource,
+  /template\.contentRequirements\.map\(\(requirement\) =>[\s\S]*formatTemplateRequirement\(requirement\)/,
+  'Template entry page view-model should not map requirement labels locally.'
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -15170,6 +15191,11 @@ assert.deepEqual(
     'vocabulary',
   ]
 );
+assert.deepEqual(formatTemplateRequirements(['questions', 'pairs', 'groups']), [
+  'questions',
+  'match pairs',
+  'groups',
+]);
 assert.equal(formatTemplateRequirementList(['questions']), 'questions');
 assert.equal(
   formatTemplateRequirementList(['questions', 'match pairs']),

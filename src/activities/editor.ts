@@ -38,7 +38,7 @@ import {
 } from '@/activities/validation';
 import {
   getTemplateRemixPlan,
-  formatTemplateRequirement,
+  formatTemplateRequirements,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
 
@@ -582,10 +582,10 @@ export function buildActivityEditorTemplateSetupView(
   return {
     actionLabel: m.activity_editor_load_scaffold(),
     description: template.description,
-    requirementBadges: template.contentRequirements.map((requirement) =>
-      m.activity_editor_requires_requirement({
-        requirement: formatTemplateRequirement(requirement),
-      })
+    requirementBadges: formatTemplateRequirements(
+      template.contentRequirements
+    ).map((requirement) =>
+      m.activity_editor_requires_requirement({ requirement })
     ),
     shortName: template.shortName,
     successMessage: m.activity_editor_scaffold_loaded({
