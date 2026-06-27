@@ -3,6 +3,7 @@ import type {
   AssignmentSettings,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
@@ -18,6 +19,7 @@ import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
@@ -74,6 +76,8 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
   const exportSettings = buildAssignmentExportSettings(settings);
   const resolvedSource = resolveAssignmentSnapshotSource(data);
+  const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
+  const shareSlug = normalizeAssignmentShareSlug(data.assignment.shareSlug);
   const statsView = buildAssignmentAttemptStatsView(data.stats);
   const deliverySummaryById = new Map(
     buildAssignmentDeliverySummary({
@@ -99,8 +103,8 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
     });
     const baseColumns = [
       data.assignment.id,
-      data.assignment.title,
-      data.assignment.shareSlug,
+      assignmentTitle,
+      shareSlug,
       formatAssignmentExportStatusLabel({
         expiresAt: data.assignment.expiresAt,
         now: data.now,
@@ -187,9 +191,11 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
 export function buildAssignmentResultsCsvFilename(
   data: AssignmentResultsExportData
 ) {
-  const title = slugifyFilename(data.assignment.title);
+  const title = slugifyFilename(
+    formatAssignmentDisplayTitle(data.assignment.title)
+  );
   const shareSlug = slugifyFilename(
-    data.assignment.shareSlug,
+    normalizeAssignmentShareSlug(data.assignment.shareSlug),
     ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS.shareSlugMaxLength
   );
   return m.assignment_results_export_filename({ shareSlug, title });

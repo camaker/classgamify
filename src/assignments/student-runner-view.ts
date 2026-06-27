@@ -1,4 +1,5 @@
 import type { AssignmentSettings } from '@/activities/types';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 import {
   buildPublicAssignmentRuleSummaryFromSettings,
@@ -173,7 +174,7 @@ export function buildStudentRunnerHeaderView({
       settings: assignment.settings,
     }),
     teacherActionLabel: getStudentRunnerCopy().teacherViewLabel,
-    title: assignment.title,
+    title: formatAssignmentDisplayTitle(assignment.title),
   };
 }
 

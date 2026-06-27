@@ -4,6 +4,7 @@ import type {
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import {
@@ -743,7 +744,7 @@ export function buildAssignmentResultHeaderView({
     activityDescription: resolvedSource.activityDescription ?? '',
     activityTitle: resolvedSource.activityTitle,
     assignmentSharePath: shareAction.sharePath,
-    assignmentTitle: assignment.title,
+    assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
     printAction: {
       label: assignmentResultPageCopy.printWorksheetLabel,
     } satisfies AssignmentResultHeaderPrintAction,
@@ -902,7 +903,7 @@ export function buildAssignmentResultCopyText({
   action: AssignmentResultCopyAction;
   data: AssignmentResultsPageData<AssignmentAttemptRowDisplayInput>;
 }) {
-  const assignmentTitle = data.assignment.title;
+  const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
   const items = data.analysis.perItem;
   const students = data.analysis.students;
 
@@ -1668,7 +1669,7 @@ export function buildAssignmentResultsPageViewModel<
   });
   const classroomBrief = data
     ? buildAssignmentClassroomBrief({
-        assignmentTitle: data.assignment.title,
+        assignmentTitle: formatAssignmentDisplayTitle(data.assignment.title),
         items: data.analysis.perItem,
         stats: getAssignmentResultClassroomBriefStats(data.stats),
         students: data.analysis.students,

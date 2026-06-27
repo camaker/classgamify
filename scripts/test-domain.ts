@@ -333,6 +333,10 @@ import {
   isSameRuntimeChoice,
 } from '@/assignments/student-runner-view';
 import {
+  formatAssignmentDisplayText,
+  formatAssignmentDisplayTitle,
+} from '@/assignments/assignment-display';
+import {
   buildAssignmentDeliverySummary,
   buildAssignmentSettingsSummaryView,
   buildPublicAssignmentRuleSummary,
@@ -1306,6 +1310,10 @@ const assignmentResultViewSource = readFileSync(
   'src/assignments/result-view.ts',
   'utf8'
 );
+const assignmentDisplaySource = readFileSync(
+  'src/assignments/assignment-display.ts',
+  'utf8'
+);
 const assignmentResultFiltersSource = readFileSync(
   'src/assignments/result-filters.ts',
   'utf8'
@@ -1339,6 +1347,21 @@ assert.match(
   assignmentAttemptStatsSource,
   /export function buildAssignmentAttemptStatsView/,
   'Assignment attempt stats should expose a shared display view helper.'
+);
+assert.match(
+  assignmentDisplaySource,
+  /formatAssignmentDisplayTitle[\s\S]*formatAssignmentDisplayText\(value\)[\s\S]*formatAssignmentDisplayText[\s\S]*normalizeRuntimeDisplayText\(value\)/,
+  'Assignment display helpers should normalize teacher/student visible assignment text through the shared runtime display helper.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /assignmentTitle: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)/,
+  'Assignment result views and copy artifacts should normalize assignment titles through the shared assignment display helper.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /assignmentTitle: data\.assignment\.title|assignmentTitle: assignment\.title/,
+  'Assignment result views should not expose raw assignment titles.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -1501,6 +1524,11 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
+  /const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\)[\s\S]*assignmentTitle,[\s\S]*shareSlug,/,
+  'Assignment CSV export should normalize assignment title and share slug before writing display columns.'
+);
+assert.match(
+  assignmentResultsExportSource,
   /const exportSettings = buildAssignmentExportSettings\(settings\)[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*settings: exportSettings[\s\S]*exportSettings\.instructions \?\? ''[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
   'Assignment CSV export should format delivery policy, instructions, prompt, and explanation cells through the shared text helper.'
 );
@@ -1516,8 +1544,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
-  /\battempt\.studentLabel,|\banswer\.prompt,|\bsettings\.instructions \?\?|\banswer\.explanation \?\?/,
-  'Assignment CSV export should not write raw student labels, prompts, instructions, or explanations directly.'
+  /\battempt\.studentLabel,|\banswer\.prompt,|\bsettings\.instructions \?\?|\banswer\.explanation \?\?|data\.assignment\.title,|data\.assignment\.shareSlug,/,
+  'Assignment CSV export should not write raw student labels, assignment titles, share slugs, prompts, instructions, or explanations directly.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -1531,7 +1559,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /slugifyFilename\(\s*data\.assignment\.shareSlug,[\s\S]*ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.shareSlugMaxLength/,
+  /slugifyFilename\(\s*normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\),[\s\S]*ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS\.shareSlugMaxLength/,
   'Assignment results export filenames should include a bounded share slug segment.'
 );
 assert.doesNotMatch(
@@ -1614,8 +1642,13 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAssignmentDeliverySummary[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*id: assignment\.id,[\s\S]*settingsJson: buildPublicAssignmentSettings\(settings\),[\s\S]*shareSlug,[\s\S]*status: assignment\.status,[\s\S]*title: assignment\.title/,
-  'Public assignment metadata should explicitly pick the only assignment fields allowed in student payloads.'
+  /function buildPublicAssignmentDeliverySummary[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*id: assignment\.id,[\s\S]*settingsJson: buildPublicAssignmentSettings\(settings\),[\s\S]*shareSlug,[\s\S]*status: assignment\.status,[\s\S]*title: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  'Public assignment metadata should explicitly pick the only assignment fields allowed in student payloads and normalize title display text.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /title: assignment\.title|title: data\.assignment\.title/,
+  'Public assignment payload and preview seeds should not expose raw assignment titles.'
 );
 assert.match(
   publicAssignmentSource,
@@ -4360,6 +4393,16 @@ assert.match(
   studentRunnerViewSource,
   /buildStudentAttemptAnswerStateByItemId\(\{[\s\S]*answers,[\s\S]*runtimeItems: items/,
   'Student runner view should derive answer display state from submission-domain runtime item parsing.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /title: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  'Student runner headers should normalize assignment titles through the shared assignment display helper.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource,
+  /title: assignment\.title/,
+  'Student runner headers should not expose raw assignment titles.'
 );
 assert.doesNotMatch(
   studentRunnerSubmissionSource,
@@ -7991,7 +8034,7 @@ const publishedAssignments = [
     assignment: {
       id: 'assignment-2',
       shareSlug: ' share-２ ',
-      title: 'Week 2',
+      title: ' Ｗｅｅｋ\u00A0　2 ',
     },
   },
 ];
@@ -8599,7 +8642,7 @@ const studentRunnerHeaderView = buildStudentRunnerHeaderView({
       shuffleItems: false,
       timeLimitSeconds: 120,
     },
-    title: 'Public assignment',
+    title: ' Ｐｕｂｌｉｃ\u00A0　assignment ',
   },
   itemCount: 2,
 });
@@ -8860,7 +8903,7 @@ const publicAssignmentPayloadSource = {
     settingsJson: { collectStudentName: false },
     shareSlug: ' share-public ',
     status: 'published',
-    title: 'Public assignment',
+    title: ' Ｐｕｂｌｉｃ\u00A0　assignment ',
   },
   snapshot: {
     activityDescription: 'Frozen activity description',
@@ -8884,6 +8927,14 @@ assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(hasRuntimeDisplayText('  Ｎｅｗ   York  '), true);
 assert.equal(hasRuntimeDisplayText('\u00A0　\t'), false);
 assert.equal(normalizeOptionalRuntimeDisplayText('   '), undefined);
+assert.equal(
+  formatAssignmentDisplayTitle(' Ｗｅｅｋ\u00A0　1   results '),
+  'Week 1 results'
+);
+assert.equal(
+  formatAssignmentDisplayText(' Ｓｔａｒｔｅｒ\u00A0　activity   description '),
+  'Starter activity description'
+);
 assert.deepEqual(
   getRuntimeDisplayAcceptedAnswers(
     ' Paris / Ｐａｒｉｓ / Paris\u00A0　France '
@@ -8907,6 +8958,7 @@ assert.deepEqual(
 );
 assert.equal(getRuntimeChoiceDisplayKey(' Ｐａｒｉｓ '), 'paris');
 assert.equal(publicAssignmentPayload.activity.title, 'Frozen activity title');
+assert.equal(publicAssignmentPayload.assignment.title, 'Public assignment');
 assert.equal(
   publicAssignmentPayload.activity.description,
   'Frozen activity description'
@@ -9064,7 +9116,7 @@ const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet({
       timeLimitSeconds: 120,
     },
     shareSlug: ' printable-１ ',
-    title: 'Printable assignment',
+    title: ' Ｐｒｉｎｔａｂｌｅ\u00A0　assignment ',
   },
   runtimeItems: getRuntimeItems('quiz', publicPayloadSnapshotContent),
   snapshot: {
@@ -9363,7 +9415,7 @@ const printableSnapshotWorksheetWithAnswers = buildPrintableAssignmentWorksheet(
         timeLimitSeconds: 120,
       },
       shareSlug: ' printable-１ ',
-      title: 'Printable assignment',
+      title: ' Ｐｒｉｎｔａｂｌｅ\u00A0　assignment ',
     },
     includeAnswerKey: true,
     runtimeItems: getRuntimeItems('quiz', publicPayloadSnapshotContent),
@@ -12203,6 +12255,21 @@ assert.match(
   /getAssignmentListTotalPages\(\{[\s\S]*pageSize: ASSIGNMENT_LIST_PAGE_SIZE,[\s\S]*total: totalAssignments,[\s\S]*\}\)/,
   'Assignment list page view-model should calculate total pages through the assignment-domain helper.'
 );
+assert.match(
+  assignmentListViewSource,
+  /title: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareId\)[\s\S]*title: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  'Assignment list card view-models should normalize persisted and starter assignment titles through the shared assignment display helper.'
+);
+assert.match(
+  assignmentListViewSource,
+  /const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareSlug\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareId\)/,
+  'Assignment list card view-models should normalize persisted and starter share IDs before exposing card fields.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /title: assignment\.title|shareSlug: assignment\.(?:shareSlug|shareId),/,
+  'Assignment list card view-models should not expose raw assignment titles or share IDs.'
+);
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
   /const ASSIGNMENT_LIST_PAGE_SIZE = 12/,
@@ -12492,10 +12559,15 @@ assert.match(
   /instructions: formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
   'Printable worksheets should format student instructions through the shared delivery helper.'
 );
+assert.match(
+  printableWorksheetSource,
+  /assignmentTitle: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  'Printable worksheets should normalize assignment titles through the shared assignment display helper.'
+);
 assert.doesNotMatch(
   printableWorksheetSource,
-  /instructions: settings\.instructions/,
-  'Printable worksheets should not expose raw student instructions.'
+  /instructions: settings\.instructions|assignmentTitle: assignment\.title/,
+  'Printable worksheets should not expose raw student instructions or assignment titles.'
 );
 assert.doesNotMatch(
   printableWorksheetSource,
@@ -15227,9 +15299,9 @@ assert.deepEqual(
         shuffleItems: true,
         timeLimitSeconds: 600,
       },
-      shareSlug: 'share-1',
+      shareSlug: '　share-１　',
       status: 'published',
-      title: 'Persisted assignment',
+      title: ' Ｐｅｒｓｉｓｔｅｄ\u00A0　assignment ',
     },
     snapshot: {
       activityDescription: 'Frozen activity description',
@@ -15333,7 +15405,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildStarterAssignmentListCardViewModel({
     activity: {
-      description: 'Starter activity description',
+      description: ' Ｓｔａｒｔｅｒ\u00A0　activity   description ',
       templateType: 'group-sort',
     },
     assignment: {
@@ -15346,9 +15418,9 @@ assert.deepEqual(
         showCorrectAnswers: true,
         shuffleItems: true,
       },
-      shareId: 'demo-food',
+      shareId: '　demo-food　',
       status: 'published',
-      title: 'Food words homework',
+      title: ' Ｆｏｏｄ\u00A0　words   homework ',
     },
   }),
   {
@@ -20518,7 +20590,7 @@ const scoredResultsPageView = buildAssignmentResultsPageViewModel({
       },
       shareSlug: 'result-share',
       status: 'published',
-      title: 'Week 1 results',
+      title: ' Ｗｅｅｋ\u00A0　1   results ',
     },
     attempts: [
       {
@@ -21488,7 +21560,7 @@ assert.deepEqual(
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
       shareSlug: '　share １２３　',
       status: 'published',
-      title: 'Week 1 results',
+      title: ' Ｗｅｅｋ\u00A0　1   results ',
     },
     now: new Date('2026-06-01T00:00:00.000Z').getTime(),
     snapshot: {
@@ -23417,12 +23489,18 @@ const normalizedDisplayCsv = buildAssignmentResultsCsv({
   },
   assignment: {
     ...csvExportData.assignment,
+    shareSlug: '　share-１２３　',
+    title: ' Ｃａｐｉｔａｌ\u00A0　Review,   Week 1 ',
     settingsJson: {
       ...csvExportData.assignment.settingsJson,
       instructions: ' Ｆｉｎｉｓｈ\u00A0　before   class. ',
     },
   },
 });
+assert.match(
+  normalizedDisplayCsv,
+  /"assignment-1","Capital Review, Week 1","share-123","Open"/
+);
 assert.match(normalizedDisplayCsv, /"Finish before class\."/);
 assert.match(
   normalizedDisplayCsv,
@@ -23435,7 +23513,7 @@ assert.match(
 assert.match(normalizedDisplayCsv, /"correct","France capital\."/);
 assert.doesNotMatch(
   normalizedDisplayCsv,
-  /Ａｖａ|Ｃａｐｉｔａｌ|Ｆｉｎｉｓｈ|Ｆｒａｎｃｅ|\u00A0/
+  /Ａｖａ|Ｃａｐｉｔａｌ|Ｆｉｎｉｓｈ|Ｆｒａｎｃｅ|１２３|\u00A0/
 );
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,

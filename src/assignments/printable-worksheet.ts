@@ -7,6 +7,7 @@ import type {
   ActivityTemplateType,
   AssignmentSettings,
 } from '@/activities/types';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryInstructions,
@@ -202,7 +203,7 @@ export function buildPrintableAssignmentWorksheet({
     answerKey: includeAnswerKey
       ? orderedRuntimeItems.map(toPrintableWorksheetAnswerKeyItem)
       : undefined,
-    assignmentTitle: assignment.title,
+    assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
     deliveryPolicyText: formatAssignmentDeliveryPolicyText({
       expiresAt: assignment.expiresAt,
       settings,

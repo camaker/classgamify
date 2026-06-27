@@ -12,6 +12,7 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { formatAssignmentDeliveryInstructions } from '@/assignments/delivery-summary';
 import {
   type AssignmentLifecycleStatus,
@@ -261,7 +262,7 @@ function buildPublicAssignmentDeliverySummary({
     settingsJson: buildPublicAssignmentSettings(settings),
     shareSlug,
     status: assignment.status,
-    title: assignment.title,
+    title: formatAssignmentDisplayTitle(assignment.title),
   };
 }
 
@@ -440,7 +441,7 @@ export function buildPublicAssignmentPreviewAssignment(
     settings: data.assignment.settingsJson,
     shareId: normalizeAssignmentShareSlug(data.assignment.shareSlug),
     status: data.assignment.status,
-    title: data.assignment.title,
+    title: formatAssignmentDisplayTitle(data.assignment.title),
   };
 }
 

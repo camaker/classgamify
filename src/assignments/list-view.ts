@@ -10,6 +10,10 @@ import {
   getStarterAssignments,
   getTemplateByType,
 } from '@/activities/catalog';
+import {
+  formatAssignmentDisplayText,
+  formatAssignmentDisplayTitle,
+} from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import {
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -529,6 +533,7 @@ export function buildAssignmentListCardViewModel({
     snapshot,
   });
   const templateType = resolvedSource.templateType;
+  const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
   const actionState = getAssignmentListCardActionState({
     expiresAt: assignment.expiresAt,
     now,
@@ -541,14 +546,14 @@ export function buildAssignmentListCardViewModel({
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
-      shareSlug: assignment.shareSlug,
+      shareSlug,
     }),
     activityDescription: resolvedSource.activityDescription ?? '',
     expiresAt: assignment.expiresAt,
     id: assignment.id,
     persisted,
     settings: assignment.settingsJson,
-    shareSlug: assignment.shareSlug,
+    shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
@@ -560,7 +565,7 @@ export function buildAssignmentListCardViewModel({
     }),
     templateLabel: getTemplateByType(templateType).name,
     templateType,
-    title: assignment.title,
+    title: formatAssignmentDisplayTitle(assignment.title),
   };
 }
 
@@ -574,6 +579,7 @@ export function buildStarterAssignmentListCardViewModel({
     averageScore: assignment.averageScore,
     completions: assignment.completions,
   };
+  const shareSlug = normalizeAssignmentShareSlug(assignment.shareId);
   const actionState = getAssignmentListCardActionState({
     expiresAt,
     persisted,
@@ -585,14 +591,14 @@ export function buildStarterAssignmentListCardViewModel({
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
-      shareSlug: assignment.shareId,
+      shareSlug,
     }),
-    activityDescription: activity.description,
+    activityDescription: formatAssignmentDisplayText(activity.description),
     expiresAt,
     id: assignment.id,
     persisted,
     settings: assignment.settings,
-    shareSlug: assignment.shareId,
+    shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
@@ -603,7 +609,7 @@ export function buildStarterAssignmentListCardViewModel({
     }),
     templateLabel: getTemplateByType(activity.templateType).name,
     templateType: activity.templateType,
-    title: assignment.title,
+    title: formatAssignmentDisplayTitle(assignment.title),
   };
 }
 

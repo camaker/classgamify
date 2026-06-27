@@ -1,3 +1,4 @@
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import {
   isSameAssignmentShareSlug,
@@ -94,7 +95,7 @@ export function buildPublishedAssignmentPanelContext({
       showResultsAction: true,
       showShareActions: true,
       status: 'found',
-      title: assignment.title,
+      title: formatAssignmentDisplayTitle(assignment.title),
     };
   }
 
