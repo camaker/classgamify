@@ -707,6 +707,7 @@ import {
   publishAssignmentInputSchema,
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
+  withResolvedAssignmentSettings,
 } from '@/assignments/validation';
 import {
   getUserFileExtension,
@@ -7455,6 +7456,33 @@ assert.deepEqual(
     timeLimitSeconds: undefined,
   }
 );
+assert.deepEqual(
+  withResolvedAssignmentSettings({
+    assignment: {
+      id: 'assignment-1',
+      settingsJson: {
+        collectStudentName: false,
+        maxAttempts: null,
+        showCorrectAnswers: false,
+      },
+    },
+    meta: 'kept',
+  }),
+  {
+    assignment: {
+      id: 'assignment-1',
+      settingsJson: {
+        collectStudentName: false,
+        instructions: undefined,
+        maxAttempts: null,
+        showCorrectAnswers: false,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+    },
+    meta: 'kept',
+  }
+);
 assert.deepEqual(ASSIGNMENT_MAX_ATTEMPTS_RANGE, { max: 10, min: 1 });
 assert.deepEqual(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE, {
   max: 10_800,
@@ -12913,6 +12941,21 @@ assert.match(
   assignmentValidationSource,
   /const assignmentInstructionsSchema[\s\S]*ASSIGNMENT_PUBLISH_FIELD_LIMITS\.instructionsMaxLength[\s\S]*instructions: assignmentInstructionsSchema/,
   'Assignment settings schema should reuse the assignment publish instructions limit.'
+);
+assert.match(
+  assignmentValidationSource,
+  /export function withResolvedAssignmentSettings[\s\S]*settingsJson: resolveAssignmentSettings\(item\.assignment\.settingsJson\)/,
+  'Assignment row settings resolution should live in the assignment validation domain.'
+);
+assert.match(
+  assignmentsApiSource,
+  /import \{[\s\S]*withResolvedAssignmentSettings,[\s\S]*\} from '@\/assignments\/validation'/,
+  'Assignment API should reuse the shared assignment settings row resolver.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /function withResolvedAssignmentSettings|settingsJson: resolveAssignmentSettings\(item\.assignment\.settingsJson\)/,
+  'Assignment API should not keep local persisted settings resolution logic.'
 );
 assert.match(
   assignmentValidationSource,

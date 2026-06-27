@@ -86,6 +86,22 @@ export function resolveAssignmentSettings(
   };
 }
 
+export function withResolvedAssignmentSettings<
+  TItem extends {
+    assignment: {
+      settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+    };
+  },
+>(item: TItem) {
+  return {
+    ...item,
+    assignment: {
+      ...item.assignment,
+      settingsJson: resolveAssignmentSettings(item.assignment.settingsJson),
+    },
+  };
+}
+
 const assignmentSettingsSchema = z.object({
   collectStudentName: z.boolean().default(true),
   instructions: assignmentInstructionsSchema,

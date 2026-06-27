@@ -75,6 +75,7 @@ import {
   publishAssignmentInputSchema,
   resolveAssignmentSettings,
   updateAssignmentStatusInputSchema,
+  withResolvedAssignmentSettings,
 } from '@/assignments/validation';
 import {
   ASSIGNMENT_SHARE_SLUG_LENGTH,
@@ -231,22 +232,6 @@ export const listAssignments = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
-
-function withResolvedAssignmentSettings<
-  TItem extends {
-    assignment: {
-      settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
-    };
-  },
->(item: TItem) {
-  return {
-    ...item,
-    assignment: {
-      ...item.assignment,
-      settingsJson: resolveAssignmentSettings(item.assignment.settingsJson),
-    },
-  };
-}
 
 export const publishAssignment = createServerFn({ method: 'POST' })
   .inputValidator(publishAssignmentInputSchema)
