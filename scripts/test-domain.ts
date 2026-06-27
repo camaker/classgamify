@@ -304,6 +304,8 @@ import {
 import {
   buildAssignmentAttemptUsage,
   canUseAnotherAssignmentAttempt,
+  normalizeAssignmentAttemptCount,
+  normalizeAssignmentRemainingAttempts,
 } from '@/assignments/attempt-limits';
 import {
   buildChoicePairingRunnerView,
@@ -4120,10 +4122,20 @@ assert.match(
   /resolveAttemptSubmissionDurationSeconds\(\{[\s\S]*now,[\s\S]*startedAt,[\s\S]*timeLimitSeconds/,
   'Student submission planning should resolve submitted duration through the assignment duration helper.'
 );
+assert.match(
+  studentRunnerSubmissionSource,
+  /normalizeAssignmentRemainingAttempts\(remainingAttempts\)/,
+  'Student attempt usage labels should normalize remaining attempts through the assignment attempt-limit domain.'
+);
 assert.doesNotMatch(
   studentRunnerSubmissionSource,
   /buildAttemptTimerState\(/,
   'Student submission planning should not rebuild attempt timer state directly.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /function normalizeStudentRemainingAttemptCount|Number\.isFinite\(remainingAttempts\)/,
+  'Student submission should not keep local remaining-attempt normalization logic.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -6058,6 +6070,12 @@ assert.deepEqual(
     usedAttempts: 4,
   }
 );
+assert.equal(normalizeAssignmentAttemptCount(2.9), 2);
+assert.equal(normalizeAssignmentAttemptCount(-1), 0);
+assert.equal(normalizeAssignmentAttemptCount(Number.NaN), 0);
+assert.equal(normalizeAssignmentRemainingAttempts(2.9), 2);
+assert.equal(normalizeAssignmentRemainingAttempts(-1), 0);
+assert.equal(normalizeAssignmentRemainingAttempts(Number.NaN), 0);
 assert.equal(
   canUseAnotherAssignmentAttempt({
     maxAttempts: 2,

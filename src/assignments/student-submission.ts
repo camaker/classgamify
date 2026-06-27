@@ -5,6 +5,7 @@ import {
 } from '@/assignments/attempt-duration';
 import {
   canUseAnotherAssignmentAttempt,
+  normalizeAssignmentRemainingAttempts,
   type AssignmentAttemptUsage,
 } from '@/assignments/attempt-limits';
 import {
@@ -406,7 +407,7 @@ export function formatStudentAttemptUsageLabel({
   }
 
   const normalizedRemainingAttempts =
-    normalizeStudentRemainingAttemptCount(remainingAttempts);
+    normalizeAssignmentRemainingAttempts(remainingAttempts);
 
   if (normalizedRemainingAttempts <= 0) {
     return m.student_runner_attempts_remaining_none();
@@ -419,10 +420,6 @@ export function formatStudentAttemptUsageLabel({
   return m.student_runner_attempts_remaining_many({
     count: normalizedRemainingAttempts,
   });
-}
-
-function normalizeStudentRemainingAttemptCount(value: number) {
-  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
 export function buildStudentAttemptTimerBadge({

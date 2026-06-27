@@ -25,6 +25,10 @@ export function buildAssignmentAttemptUsage({
   };
 }
 
+export function normalizeAssignmentRemainingAttempts(value: number) {
+  return normalizeAssignmentAttemptCount(value);
+}
+
 export function canUseAnotherAssignmentAttempt({
   maxAttempts,
   usedAttempts,
@@ -40,7 +44,7 @@ export function canUseAnotherAssignmentAttempt({
   );
 }
 
-function normalizeAssignmentAttemptCount(value: number) {
+export function normalizeAssignmentAttemptCount(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
