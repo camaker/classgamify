@@ -11947,6 +11947,10 @@ const assignmentListViewSource = readFileSync(
   'src/assignments/list-view.ts',
   'utf8'
 );
+const assignmentListQuerySource = readFileSync(
+  'src/assignments/list-query.ts',
+  'utf8'
+);
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -12008,24 +12012,34 @@ assert.doesNotMatch(
   'Assignment list API should not maintain a separate hand-written status filter enum.'
 );
 assert.match(
-  assignmentsApiSource,
+  assignmentListQuerySource,
   /sqlLikeContains\(assignment\.title, normalizedSearch\)/,
-  'Assignment list search should escape SQL LIKE wildcard characters.'
+  'Assignment list search should escape SQL LIKE wildcard characters in the assignment query domain.'
 );
 assert.match(
-  assignmentsApiSource,
+  assignmentListQuerySource,
   /sqlLikeContains\(activity\.contentJson, normalizedSearch\)/,
   'Assignment list search should include current source activity structured text.'
 );
 assert.match(
-  assignmentsApiSource,
+  assignmentListQuerySource,
   /sqlLikeContains\(assignmentSnapshot\.contentJson, normalizedSearch\)/,
   'Assignment list search should include frozen assignment snapshot structured text.'
 );
 assert.doesNotMatch(
-  assignmentsApiSource,
+  assignmentListQuerySource,
   /like\(assignment\.title, `%\$\{normalizedSearch\}%`\)/,
   'Assignment list search should not pass raw user text directly to LIKE.'
+);
+assert.match(
+  assignmentsApiSource,
+  /buildAssignmentListWhere\(\{[\s\S]*search: data\.search,[\s\S]*status: data\.status,[\s\S]*userId/,
+  'Assignment list API should delegate owner, status, and search filtering to the assignment query domain.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /function buildAssignmentListWhere|sqlLikeContains\(assignment\.title|normalizeAssignmentListSearch\(search\)/,
+  'Assignment list API should not keep local search/status where-clause logic.'
 );
 assert.match(
   assignmentsApiSource,
@@ -12042,9 +12056,9 @@ const assignmentLifecycleQuerySource = readFileSync(
   'utf8'
 );
 assert.match(
-  assignmentsApiSource,
+  assignmentListQuerySource,
   /buildAssignmentLifecycleStatusFilter\(\{[\s\S]*now,[\s\S]*status,[\s\S]*\}\)/,
-  'Assignment list API should delegate lifecycle SQL filtering to the assignment-domain query helper.'
+  'Assignment list query should delegate lifecycle SQL filtering to the assignment-domain lifecycle query helper.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,

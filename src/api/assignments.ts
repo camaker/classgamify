@@ -27,16 +27,14 @@ import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
   ASSIGNMENT_LIST_PAGE_SIZE,
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
-  type AssignmentLifecycleStatusFilter,
-  normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
+import { buildAssignmentListWhere } from '@/assignments/list-query';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
   assertAssignmentAcceptsSubmissions,
   assertAssignmentStatusTransition,
 } from '@/assignments/lifecycle';
-import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-query';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
   buildPublicAssignmentLookupResult,
@@ -71,20 +69,10 @@ import {
   attempt,
 } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
-import { sqlLikeContains } from '@/lib/sql-like';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import {
-  and,
-  count,
-  desc,
-  eq,
-  inArray,
-  isNotNull,
-  or,
-  type SQL,
-} from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -237,51 +225,6 @@ export const listAssignments = createServerFn({ method: 'GET' })
       total: totalRow?.count ?? 0,
     };
   });
-
-function buildAssignmentListWhere({
-  now = new Date(),
-  search,
-  status,
-  userId,
-}: {
-  now?: Date;
-  search?: string;
-  status?: AssignmentLifecycleStatusFilter;
-  userId: string;
-}) {
-  const normalizedSearch = normalizeAssignmentListSearch(search);
-  const filters: SQL[] = [eq(assignment.ownerId, userId)];
-
-  if (status) {
-    filters.push(
-      buildAssignmentLifecycleStatusFilter({
-        now,
-        status,
-      })
-    );
-  }
-
-  if (normalizedSearch) {
-    filters.push(
-      or(
-        sqlLikeContains(assignment.title, normalizedSearch),
-        sqlLikeContains(assignment.shareSlug, normalizedSearch),
-        sqlLikeContains(activity.title, normalizedSearch),
-        sqlLikeContains(activity.description, normalizedSearch),
-        sqlLikeContains(assignmentSnapshot.activityTitle, normalizedSearch),
-        sqlLikeContains(
-          assignmentSnapshot.activityDescription,
-          normalizedSearch
-        ),
-        sqlLikeContains(assignmentSnapshot.templateType, normalizedSearch),
-        sqlLikeContains(activity.contentJson, normalizedSearch),
-        sqlLikeContains(assignmentSnapshot.contentJson, normalizedSearch)
-      ) as SQL
-    );
-  }
-
-  return and(...filters);
-}
 
 function withResolvedAssignmentSettings<
   TItem extends {
