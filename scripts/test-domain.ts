@@ -1466,6 +1466,26 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /activity: buildPublicAssignmentActivitySummary\(\{[\s\S]*activity,[\s\S]*description: resolvedSource\.activityDescription,[\s\S]*templateType,[\s\S]*title: resolvedSource\.activityTitle/,
+  'Public assignment payload should delegate activity metadata sanitization to the public activity summary helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /assignment: buildPublicAssignmentDeliverySummary\(\{[\s\S]*assignment,[\s\S]*settings,[\s\S]*shareSlug/,
+  'Public assignment payload should delegate assignment metadata sanitization to the public delivery summary helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentActivitySummary[\s\S]*description,[\s\S]*id: activity\.id,[\s\S]*templateType,[\s\S]*title,[\s\S]*visibility: activity\.visibility/,
+  'Public activity metadata should explicitly pick the only activity fields allowed in student payloads.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentDeliverySummary[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*id: assignment\.id,[\s\S]*settingsJson: settings,[\s\S]*shareSlug,[\s\S]*status: assignment\.status,[\s\S]*title: assignment\.title/,
+  'Public assignment metadata should explicitly pick the only assignment fields allowed in student payloads.'
+);
+assert.match(
+  publicAssignmentSource,
   /summary: buildPublicAssignmentSummary\(\{[\s\S]*content,[\s\S]*itemCount: orderedRuntimeItems\.length/,
   'Public assignment payload should delegate summary sanitization to the public assignment summary helper.'
 );
@@ -1498,6 +1518,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /function buildPublicAssignmentSnapshotSummary[\s\S]*(?:contentJson|sourceMaterials|\.{3}snapshot)[\s\S]*function buildPublicAssignmentSummary/,
   'Public assignment snapshot should not expose frozen content or source material references.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAssignmentActivitySummary[\s\S]\.\.\.activity[\s\S]*function buildPublicAssignmentDeliverySummary|function buildPublicAssignmentDeliverySummary[\s\S]\.\.\.assignment[\s\S]*function buildPublicAssignmentSnapshotSummary/,
+  'Public activity and assignment metadata should not spread source rows into student payloads.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,

@@ -185,27 +185,62 @@ export function buildPublicAssignmentPayload({
   });
 
   return {
-    activity: {
+    activity: buildPublicAssignmentActivitySummary({
+      activity,
       description: resolvedSource.activityDescription,
-      id: activity.id,
       templateType,
       title: resolvedSource.activityTitle,
-      visibility: activity.visibility,
-    },
-    assignment: {
-      expiresAt: assignment.expiresAt,
-      id: assignment.id,
-      settingsJson: settings,
+    }),
+    assignment: buildPublicAssignmentDeliverySummary({
+      assignment,
+      settings,
       shareSlug,
-      status: assignment.status,
-      title: assignment.title,
-    },
+    }),
     runtimeItems: stripRuntimeAnswers(orderedRuntimeItems),
     snapshot: buildPublicAssignmentSnapshotSummary(snapshot),
     summary: buildPublicAssignmentSummary({
       content,
       itemCount: orderedRuntimeItems.length,
     }),
+  };
+}
+
+function buildPublicAssignmentActivitySummary({
+  activity,
+  description,
+  templateType,
+  title,
+}: {
+  activity: PublicAssignmentPayloadSource['activity'];
+  description: string | null;
+  templateType: ActivityTemplateType;
+  title: string;
+}): PublicAssignmentPayload['activity'] {
+  return {
+    description,
+    id: activity.id,
+    templateType,
+    title,
+    visibility: activity.visibility,
+  };
+}
+
+function buildPublicAssignmentDeliverySummary({
+  assignment,
+  settings,
+  shareSlug,
+}: {
+  assignment: PublicAssignmentPayloadSource['assignment'];
+  settings: AssignmentSettings;
+  shareSlug: string;
+}): PublicAssignmentPayload['assignment'] {
+  return {
+    expiresAt: assignment.expiresAt,
+    id: assignment.id,
+    settingsJson: settings,
+    shareSlug,
+    status: assignment.status,
+    title: assignment.title,
   };
 }
 
