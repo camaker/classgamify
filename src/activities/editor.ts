@@ -25,7 +25,12 @@ import {
 } from '@/activities/draft-source';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
-import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import {
+  buildActivityTemplateScaffoldInput,
+  buildActivityTemplateScaffoldReadinessSummary,
+  getActivityTemplateScaffold,
+  type ActivityTemplateScaffoldReadinessSummary,
+} from '@/activities/scaffolds';
 import {
   buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
@@ -69,6 +74,7 @@ type ActivityEditorTemplateSetupView = {
   actionLabel: string;
   description: string;
   requirementBadges: string[];
+  scaffoldSummary: ActivityTemplateScaffoldReadinessSummary;
   shortName: string;
   successMessage: string;
   title: string;
@@ -575,7 +581,8 @@ export function buildActivityEditorPreviewPanel(
 }
 
 export function buildActivityEditorTemplateSetupView(
-  templateType: ActivityTemplateType
+  templateType: ActivityTemplateType,
+  current: CreateActivityInput = getActivityEditorDefaultInput()
 ): ActivityEditorTemplateSetupView {
   const template = getTemplateByType(templateType);
 
@@ -587,6 +594,10 @@ export function buildActivityEditorTemplateSetupView(
     ).map((requirement) =>
       m.activity_editor_requires_requirement({ requirement })
     ),
+    scaffoldSummary: buildActivityTemplateScaffoldReadinessSummary({
+      current,
+      templateType,
+    }),
     shortName: template.shortName,
     successMessage: m.activity_editor_scaffold_loaded({
       template: template.name,
@@ -607,11 +618,18 @@ export function buildActivityEditorTemplateView({
     templateOptions.find((option) => option.type === templateType) ??
     getTemplateByType(templateType);
   const templateReadiness = buildActivityEditorTemplateReadiness(input);
+  const parsedCurrentInput = createActivityInputSchema.safeParse(input);
+  const scaffoldSummaryInput = parsedCurrentInput.success
+    ? parsedCurrentInput.data
+    : getActivityEditorDefaultInput();
 
   return {
     readinessSummary:
       buildActivityEditorReadinessPanelSummary(templateReadiness),
-    setupView: buildActivityEditorTemplateSetupView(templateType),
+    setupView: buildActivityEditorTemplateSetupView(
+      templateType,
+      scaffoldSummaryInput
+    ),
     template,
     templateOptions,
   };
@@ -638,11 +656,10 @@ export function buildActivityEditorTemplateScaffoldApplication({
   current: CreateActivityInput;
   templateType: ActivityTemplateType;
 }): ActivityEditorTemplateScaffoldApplication {
-  const nextValues = {
-    ...current,
-    ...getActivityTemplateScaffold(templateType),
+  const nextValues = buildActivityTemplateScaffoldInput({
+    current,
     templateType,
-  };
+  });
 
   return {
     draftSourceText: getActivityDraftSourceText(nextValues),

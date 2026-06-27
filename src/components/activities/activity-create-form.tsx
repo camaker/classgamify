@@ -126,6 +126,7 @@ export function ActivityCreateForm({
       }),
     [selectedTemplate, watchedValues]
   );
+  const scaffoldSummary = templateView.setupView.scaffoldSummary;
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -402,6 +403,41 @@ export function ActivityCreateForm({
                         </Badge>
                       )
                     )}
+                  </div>
+                  <div className="mt-4 space-y-3 border-t pt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-xs">
+                        {scaffoldSummary.title}
+                      </span>
+                      <Badge variant="secondary" className="rounded-md">
+                        {scaffoldSummary.runtimeItemLabel}
+                      </Badge>
+                      <Badge variant="outline" className="rounded-md">
+                        {scaffoldSummary.readyTemplateLabel}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {scaffoldSummary.coverageMetrics.map((metric) => (
+                        <Badge
+                          key={metric.id}
+                          variant="secondary"
+                          className="rounded-md bg-background"
+                        >
+                          {metric.label}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {scaffoldSummary.readyTemplateOptions.map((option) => (
+                        <Badge
+                          key={option.template}
+                          variant="outline"
+                          className="rounded-md bg-background"
+                        >
+                          {option.shortName}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <Button

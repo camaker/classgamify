@@ -234,7 +234,11 @@ import {
   DEFAULT_QUESTION_CHOICE_COUNT,
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
-import { getActivityTemplateScaffold } from '@/activities/scaffolds';
+import {
+  buildActivityTemplateScaffoldInput,
+  buildActivityTemplateScaffoldReadinessSummary,
+  getActivityTemplateScaffold,
+} from '@/activities/scaffolds';
 import {
   getWorksheetModeDefinitions,
   WORKSHEET_MODE_TEMPLATES,
@@ -1580,6 +1584,11 @@ assert.match(
   activityEditorFormSource,
   /ActivityTemplateReadinessPanel[\s\S]*summary=\{templateView\.readinessSummary\}/,
   'Activity editor form should delegate template-readiness panel rendering.'
+);
+assert.match(
+  activityEditorFormSource,
+  /const scaffoldSummary = templateView\.setupView\.scaffoldSummary[\s\S]*scaffoldSummary\.runtimeItemLabel[\s\S]*scaffoldSummary\.readyTemplateLabel[\s\S]*scaffoldSummary\.coverageMetrics\.map[\s\S]*scaffoldSummary\.readyTemplateOptions\.map/,
+  'Activity editor form should render scaffold coverage from the activity-domain setup view.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -14605,6 +14614,24 @@ assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   description:
     'Students drag items into teacher-defined groups and compare patterns.',
   requirementBadges: ['Requires groups'],
+  scaffoldSummary: {
+    coverageMetrics: [
+      { id: 'questions', label: '4 questions', value: 4 },
+      { id: 'pairs', label: '8 pairs', value: 8 },
+      { id: 'groups', label: '3 groups', value: 3 },
+      { id: 'vocabulary', label: '8 words', value: 8 },
+      { id: 'teacherNotes', label: '2 notes', value: 2 },
+    ],
+    readyTemplateCount: ACTIVITY_TEMPLATE_TYPES.length,
+    readyTemplateLabel: '8 modes ready',
+    readyTemplateOptions: ACTIVITY_TEMPLATE_TYPES.map((templateType) => ({
+      shortName: getTemplateByType(templateType).shortName,
+      template: templateType,
+    })),
+    runtimeItemCount: 8,
+    runtimeItemLabel: '8 playable items',
+    title: 'Example coverage',
+  },
   shortName: 'Sort',
   successMessage: 'Group sort example loaded.',
   title: 'Group sort setup',
@@ -14842,6 +14869,38 @@ assert.equal(editorTemplateView.template.name, 'Quiz');
 assert.equal(editorTemplateView.setupView.title, 'Quiz setup');
 assert.equal(editorTemplateView.templateOptions.length, 8);
 assert.equal(editorTemplateView.readinessSummary.readyCount, 4);
+assert.equal(
+  editorTemplateView.setupView.scaffoldSummary.title,
+  'Example coverage'
+);
+assert.equal(
+  editorTemplateView.setupView.scaffoldSummary.runtimeItemLabel,
+  '4 playable items'
+);
+assert.equal(
+  editorTemplateView.setupView.scaffoldSummary.readyTemplateLabel,
+  '8 modes ready'
+);
+assert.deepEqual(
+  editorTemplateView.setupView.scaffoldSummary.readyTemplateOptions.map(
+    (option) => option.template
+  ),
+  [...ACTIVITY_TEMPLATE_TYPES]
+);
+assert.deepEqual(
+  editorTemplateView.setupView.scaffoldSummary.coverageMetrics.map((metric) => [
+    metric.id,
+    metric.label,
+    metric.value,
+  ]),
+  [
+    ['questions', '4 questions', 4],
+    ['pairs', '8 pairs', 8],
+    ['groups', '3 groups', 3],
+    ['vocabulary', '8 words', 8],
+    ['teacherNotes', '2 notes', 2],
+  ]
+);
 assert.ok(
   editorTemplateView.readinessSummary.lockedOptions.length <=
     ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions
@@ -14879,6 +14938,41 @@ assert.match(groupSortScaffoldApplication.draftSourceText, /apple/);
 assert.equal(
   groupSortScaffoldApplication.successMessage,
   'Group sort example loaded.'
+);
+assert.deepEqual(
+  buildActivityTemplateScaffoldInput({
+    current: {
+      ...activityEditorDefaultInput,
+      title: 'Keep current until scaffold loads',
+      visibility: 'private',
+    },
+    templateType: 'group-sort',
+  }),
+  groupSortScaffoldApplication.values
+);
+assert.deepEqual(
+  buildActivityTemplateScaffoldReadinessSummary({
+    current: activityEditorDefaultInput,
+    templateType: 'group-sort',
+  }),
+  {
+    coverageMetrics: [
+      { id: 'questions', label: '4 questions', value: 4 },
+      { id: 'pairs', label: '8 pairs', value: 8 },
+      { id: 'groups', label: '3 groups', value: 3 },
+      { id: 'vocabulary', label: '8 words', value: 8 },
+      { id: 'teacherNotes', label: '2 notes', value: 2 },
+    ],
+    readyTemplateCount: ACTIVITY_TEMPLATE_TYPES.length,
+    readyTemplateLabel: '8 modes ready',
+    readyTemplateOptions: ACTIVITY_TEMPLATE_TYPES.map((templateType) => ({
+      shortName: getTemplateByType(templateType).shortName,
+      template: templateType,
+    })),
+    runtimeItemCount: 8,
+    runtimeItemLabel: '8 playable items',
+    title: 'Example coverage',
+  }
 );
 assert.equal(
   buildActivityEditorTemplateReadiness({

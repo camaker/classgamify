@@ -1,8 +1,17 @@
 import type { ActivityTemplateType } from '@/activities/types';
+import {
+  buildTemplateRemixSummary,
+  getTemplateRemixPlan,
+} from '@/activities/template-remix';
+import { getRuntimeItems } from '@/activities/runtime';
 import type { CreateActivityInput } from '@/activities/validation';
+import {
+  buildActivityContent,
+  createActivityInputSchema,
+} from '@/activities/validation';
 import { m } from '@/locale/paraglide/messages';
 
-type ActivityTemplateScaffold = Pick<
+export type ActivityTemplateScaffold = Pick<
   CreateActivityInput,
   | 'description'
   | 'groupsText'
@@ -15,6 +24,29 @@ type ActivityTemplateScaffold = Pick<
   | 'title'
   | 'vocabularyText'
 >;
+
+type ActivityTemplateScaffoldCoverageMetricId =
+  | 'groups'
+  | 'pairs'
+  | 'questions'
+  | 'teacherNotes'
+  | 'vocabulary';
+
+export type ActivityTemplateScaffoldReadinessSummary = {
+  coverageMetrics: Array<{
+    id: ActivityTemplateScaffoldCoverageMetricId;
+    label: string;
+    value: number;
+  }>;
+  readyTemplateCount: number;
+  readyTemplateLabel: string;
+  readyTemplateOptions: ReturnType<
+    typeof buildTemplateRemixSummary
+  >['readyTemplateOptions'];
+  runtimeItemCount: number;
+  runtimeItemLabel: string;
+  title: string;
+};
 
 function getFoodWordsScaffoldBase(): ActivityTemplateScaffold {
   return {
@@ -106,4 +138,90 @@ const activityTemplateScaffoldBuilders: Record<
 
 export function getActivityTemplateScaffold(type: ActivityTemplateType) {
   return activityTemplateScaffoldBuilders[type]();
+}
+
+export function buildActivityTemplateScaffoldInput({
+  current,
+  templateType,
+}: {
+  current: CreateActivityInput;
+  templateType: ActivityTemplateType;
+}) {
+  return {
+    ...current,
+    ...getActivityTemplateScaffold(templateType),
+    templateType,
+  };
+}
+
+export function buildActivityTemplateScaffoldReadinessSummary({
+  current,
+  templateType,
+}: {
+  current: CreateActivityInput;
+  templateType: ActivityTemplateType;
+}): ActivityTemplateScaffoldReadinessSummary {
+  const scaffoldInput = createActivityInputSchema.parse(
+    buildActivityTemplateScaffoldInput({
+      current,
+      templateType,
+    })
+  );
+  const content = buildActivityContent(scaffoldInput);
+  const remixPlan = getTemplateRemixPlan({
+    content,
+    currentTemplateType: templateType,
+  });
+  const remixSummary = buildTemplateRemixSummary(remixPlan);
+  const runtimeItemCount = getRuntimeItems(templateType, content).length;
+
+  return {
+    coverageMetrics: [
+      {
+        id: 'questions',
+        label: m.activity_template_scaffold_coverage_questions({
+          count: content.questions.length,
+        }),
+        value: content.questions.length,
+      },
+      {
+        id: 'pairs',
+        label: m.activity_template_scaffold_coverage_pairs({
+          count: content.pairs.length,
+        }),
+        value: content.pairs.length,
+      },
+      {
+        id: 'groups',
+        label: m.activity_template_scaffold_coverage_groups({
+          count: content.groups.length,
+        }),
+        value: content.groups.length,
+      },
+      {
+        id: 'vocabulary',
+        label: m.activity_template_scaffold_coverage_vocabulary({
+          count: content.vocabulary.length,
+        }),
+        value: content.vocabulary.length,
+      },
+      {
+        id: 'teacherNotes',
+        label: m.activity_template_scaffold_coverage_teacher_notes({
+          count: content.teacherNotes.length,
+        }),
+        value: content.teacherNotes.length,
+      },
+    ],
+    readyTemplateCount: remixSummary.readyTemplateOptions.length,
+    readyTemplateLabel: m.activity_template_scaffold_ready_label({
+      count: remixSummary.readyTemplateOptions.length,
+    }),
+    readyTemplateOptions: remixSummary.readyTemplateOptions,
+    runtimeItemCount,
+    runtimeItemLabel: m.activity_template_scaffold_runtime_item_label({
+      count: runtimeItemCount,
+    }),
+    title: m.activity_template_scaffold_summary_title(),
+  };
 }
