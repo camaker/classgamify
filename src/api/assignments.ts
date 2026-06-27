@@ -14,6 +14,7 @@ import {
   buildAssignmentAttemptStatsByAssignmentSelect,
   buildAssignmentAttemptStatsSelect,
   buildAssignmentAttemptsInWhere,
+  buildAssignmentResultsAttemptSelect,
   buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
   buildScoredAssignmentAttemptWhere,
@@ -383,7 +384,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     }
 
     const attempts = await db
-      .select()
+      .select(buildAssignmentResultsAttemptSelect())
       .from(attempt)
       .where(
         buildScoredAssignmentAttemptWhere({

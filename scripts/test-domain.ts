@@ -673,6 +673,7 @@ import {
   buildAssignmentAttemptStatsByAssignmentSelect,
   buildAssignmentAttemptStatsSelect,
   buildAssignmentAttemptsInWhere,
+  buildAssignmentResultsAttemptSelect,
   buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
   buildScoredAnonymousAssignmentAttemptWhere,
@@ -13020,8 +13021,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getAssignmentResults[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*analyzeAssignmentResults/,
-  'Assignment results API should only return completed attempts with scored results.'
+  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentResultsAttemptSelect\(\)\)[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*analyzeAssignmentResults/,
+  'Assignment results API should load explicit scored-attempt result fields through the assignment-domain query helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /export const getAssignmentResults[\s\S]*const attempts = await db[\s\S]*\.select\(\)[\s\S]*\.from\(attempt\)/,
+  'Assignment results API should not select whole attempt rows implicitly.'
 );
 assert.match(
   assignmentsApiSource,
@@ -13163,6 +13169,7 @@ assert.doesNotMatch(
 assert.equal(typeof buildScoredAttemptWhere, 'function');
 assert.equal(typeof buildAssignmentAttemptStatsSelect, 'function');
 assert.equal(typeof buildAssignmentAttemptStatsByAssignmentSelect, 'function');
+assert.equal(typeof buildAssignmentResultsAttemptSelect, 'function');
 assert.equal(typeof buildAttemptAssignmentJoin, 'function');
 assert.equal(typeof buildAssignmentAttemptsInWhere, 'function');
 assert.equal(typeof buildAttemptCompletedAtOrderBy, 'function');
@@ -13170,13 +13177,13 @@ assert.equal(typeof buildScoredAnonymousAssignmentAttemptWhere, 'function');
 assert.equal(typeof buildScoredAssignmentAttemptWhere, 'function');
 assert.match(
   assignmentAttemptQuerySource,
-  /buildAssignmentAttemptStatsSelect[\s\S]*resultJson: attempt\.resultJson[\s\S]*settingsJson: assignment\.settingsJson[\s\S]*buildAssignmentAttemptStatsByAssignmentSelect[\s\S]*assignmentId: attempt\.assignmentId[\s\S]*buildAttemptAssignmentJoin[\s\S]*eq\(attempt\.assignmentId, assignment\.id\)[\s\S]*buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)/,
-  'Assignment scored-attempt SQL filtering and stats select shape should live in assignment-domain query helpers.'
+  /buildAssignmentAttemptStatsSelect[\s\S]*resultJson: attempt\.resultJson[\s\S]*settingsJson: assignment\.settingsJson[\s\S]*buildAssignmentAttemptStatsByAssignmentSelect[\s\S]*assignmentId: attempt\.assignmentId[\s\S]*buildAssignmentResultsAttemptSelect[\s\S]*anonymousToken: attempt\.anonymousToken[\s\S]*answersJson: attempt\.answersJson[\s\S]*completedAt: attempt\.completedAt[\s\S]*maxScore: attempt\.maxScore[\s\S]*resultJson: attempt\.resultJson[\s\S]*score: attempt\.score[\s\S]*studentName: attempt\.studentName[\s\S]*buildAttemptAssignmentJoin[\s\S]*eq\(attempt\.assignmentId, assignment\.id\)[\s\S]*buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)/,
+  'Assignment scored-attempt SQL filtering, stats selects, and results select shape should live in assignment-domain query helpers.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /isNotNull\(attempt\.resultJson\)|desc\(assignment\.updatedAt\)|desc\(attempt\.completedAt\)|inArray\(attempt\.assignmentId, itemAssignmentIds\)|settingsJson: assignment\.settingsJson|resultJson: attempt\.resultJson|eq\(attempt\.assignmentId, assignment\.id\)/,
-  'Assignment API should not hand-write scored-attempt filters, ordering, stats selects, or attempt assignment joins.'
+  /isNotNull\(attempt\.resultJson\)|desc\(assignment\.updatedAt\)|desc\(attempt\.completedAt\)|inArray\(attempt\.assignmentId, itemAssignmentIds\)|settingsJson: assignment\.settingsJson|answersJson: attempt\.answersJson|resultJson: attempt\.resultJson|eq\(attempt\.assignmentId, assignment\.id\)/,
+  'Assignment API should not hand-write scored-attempt filters, ordering, stats/results selects, or attempt assignment joins.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
 assert.match(

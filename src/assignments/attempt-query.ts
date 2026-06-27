@@ -15,6 +15,21 @@ export function buildAssignmentAttemptStatsByAssignmentSelect() {
   };
 }
 
+export function buildAssignmentResultsAttemptSelect() {
+  return {
+    anonymousToken: attempt.anonymousToken,
+    answersJson: attempt.answersJson,
+    assignmentId: attempt.assignmentId,
+    completedAt: attempt.completedAt,
+    id: attempt.id,
+    maxScore: attempt.maxScore,
+    resultJson: attempt.resultJson,
+    score: attempt.score,
+    startedAt: attempt.startedAt,
+    studentName: attempt.studentName,
+  };
+}
+
 export function buildAttemptAssignmentJoin() {
   return eq(attempt.assignmentId, assignment.id);
 }
