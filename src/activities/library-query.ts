@@ -28,6 +28,18 @@ export function buildCreatedActivityListItemSelect() {
   };
 }
 
+export function buildActivityLibraryItemSelect() {
+  return {
+    contentJson: activity.contentJson,
+    description: activity.description,
+    id: activity.id,
+    templateType: activity.templateType,
+    title: activity.title,
+    updatedAt: activity.updatedAt,
+    visibility: activity.visibility,
+  };
+}
+
 export function buildActivityLibraryWhere({
   search,
   status = 'active',

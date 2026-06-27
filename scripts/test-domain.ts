@@ -55,6 +55,7 @@ import {
 } from '@/activities/detail-query';
 import {
   buildCreatedActivityListItemSelect,
+  buildActivityLibraryItemSelect,
   filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
 } from '@/activities/library-query';
@@ -12197,11 +12198,17 @@ assert.match(
   /filterActivityLibrarySourceItems[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source/,
   'Activity list source-material filtering should live in the activity query domain.'
 );
+assert.equal(typeof buildActivityLibraryItemSelect, 'function');
 assert.equal(typeof buildCreatedActivityListItemSelect, 'function');
 assert.match(
   activityLibraryQuerySource,
-  /buildCreatedActivityListItemSelect[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
-  'Created-activity list panel select shape should live in the activity query domain.'
+  /buildCreatedActivityListItemSelect[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityLibraryItemSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*description: activity\.description[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility/,
+  'Activity library item and created-panel select shapes should live in the activity query domain.'
+);
+assert.match(
+  activitiesApiSource,
+  /matchingRows = await db[\s\S]*\.select\(buildActivityLibraryItemSelect\(\)\)[\s\S]*\.from\(activity\)[\s\S]*\.where\(where\)/,
+  'Activity list API should reuse the activity-library item select helper.'
 );
 assert.match(
   activitiesApiSource,
@@ -12210,8 +12217,13 @@ assert.match(
 );
 assert.doesNotMatch(
   activitiesApiSource,
-  /createdActivity[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
-  'Activity list API should not hand-write created-activity panel select fields.'
+  /const matchingRows = await db\.select\(\)\.from\(activity\)\.where\(where\)/,
+  'Activity list API should not implicitly select whole activity rows.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /matchingRows[\s\S]*contentJson: activity\.contentJson[\s\S]*updatedAt: activity\.updatedAt|createdActivity[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
+  'Activity list API should not hand-write library item or created-activity panel select fields.'
 );
 assert.equal(typeof buildActivityDetailSelect, 'function');
 assert.equal(typeof buildActivityAssignmentSourceSelect, 'function');

@@ -24,6 +24,7 @@ import {
 } from '@/activities/library-filters';
 import {
   buildCreatedActivityListItemSelect,
+  buildActivityLibraryItemSelect,
   buildActivityLibraryWhere,
   filterActivityLibrarySourceItems,
   getActivityLibraryPageItems,
@@ -85,7 +86,10 @@ export const listActivities = createServerFn({ method: 'GET' })
       userId,
     });
 
-    const matchingRows = await db.select().from(activity).where(where);
+    const matchingRows = await db
+      .select(buildActivityLibraryItemSelect())
+      .from(activity)
+      .where(where);
     const matchingActivities = filterActivityLibrarySourceItems({
       items: matchingRows,
       source: data.source,
