@@ -86,6 +86,27 @@ export function buildAttemptTimerState({
   };
 }
 
+export function resolveAttemptSubmissionDurationSeconds({
+  now,
+  startedAt,
+  timeLimitSeconds,
+}: {
+  now: number;
+  startedAt: number;
+  timeLimitSeconds?: number;
+}) {
+  const timerState = buildAttemptTimerState({
+    now,
+    startedAt,
+    timeLimitSeconds,
+  });
+
+  return normalizeAttemptDurationSeconds({
+    durationSeconds: timerState.durationSeconds,
+    timeLimitSeconds,
+  });
+}
+
 export function formatAttemptDuration(
   seconds?: number | null,
   options?: {

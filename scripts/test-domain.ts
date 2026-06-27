@@ -298,6 +298,7 @@ import {
   buildAttemptTimerState,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
+  resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
   buildAssignmentAttemptUsage,
@@ -643,7 +644,6 @@ import {
   isStudentAnswerFilled,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
-  resolveStudentAttemptSubmissionDurationSeconds,
 } from '@/assignments/student-submission';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
@@ -3912,6 +3912,16 @@ assert.match(
   'Student submission domain should apply answer changes without mutating current browser answers.'
 );
 assert.match(
+  studentRunnerSubmissionSource,
+  /resolveAttemptSubmissionDurationSeconds\(\{[\s\S]*now,[\s\S]*startedAt,[\s\S]*timeLimitSeconds/,
+  'Student submission planning should resolve submitted duration through the assignment duration helper.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /buildAttemptTimerState\(/,
+  'Student submission planning should not rebuild attempt timer state directly.'
+);
+assert.match(
   studentRunnerViewSource,
   /buildStudentAttemptAnswerStateByItemId\(\{[\s\S]*answers,[\s\S]*runtimeItems: items/,
   'Student runner view should derive answer display state from submission-domain runtime item parsing.'
@@ -4204,6 +4214,11 @@ assert.match(
   attemptDurationSource,
   /ASSIGNMENT_ATTEMPT_DURATION_UNITS[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60[\s\S]*timerSecondPaddingLength: 2/,
   'Attempt duration helpers should expose named time-unit constants.'
+);
+assert.match(
+  attemptDurationSource,
+  /resolveAttemptSubmissionDurationSeconds[\s\S]*buildAttemptTimerState[\s\S]*normalizeAttemptDurationSeconds/,
+  'Attempt duration helpers should centralize submitted-duration timer derivation and clamping.'
 );
 assert.doesNotMatch(
   attemptDurationSource,
@@ -6175,7 +6190,7 @@ assert.deepEqual(
         { answer: '', itemId: 'item-2' },
         { answer: '', itemId: 'item-3' },
       ],
-      durationSeconds: 11,
+      durationSeconds: 10,
       shareSlug: 'share-three',
       studentName: 'Ava Chen',
     },
@@ -6184,7 +6199,7 @@ assert.deepEqual(
   }
 );
 assert.equal(
-  resolveStudentAttemptSubmissionDurationSeconds({
+  resolveAttemptSubmissionDurationSeconds({
     now: 6_500,
     startedAt: 1_000,
     timeLimitSeconds: 10,
@@ -6192,15 +6207,15 @@ assert.equal(
   6
 );
 assert.equal(
-  resolveStudentAttemptSubmissionDurationSeconds({
+  resolveAttemptSubmissionDurationSeconds({
     now: 12_000,
     startedAt: 1_000,
     timeLimitSeconds: 10,
   }),
-  11
+  10
 );
 assert.equal(
-  resolveStudentAttemptSubmissionDurationSeconds({
+  resolveAttemptSubmissionDurationSeconds({
     now: 1_000,
     startedAt: 2_000,
   }),

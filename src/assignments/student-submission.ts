@@ -1,7 +1,7 @@
 import {
-  buildAttemptTimerState,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
+  resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
   canUseAnotherAssignmentAttempt,
@@ -463,22 +463,6 @@ function isValidStudentTimerLimit(value: number | undefined) {
   return value !== undefined && Number.isFinite(value) && value > 0;
 }
 
-export function resolveStudentAttemptSubmissionDurationSeconds({
-  now,
-  startedAt,
-  timeLimitSeconds,
-}: {
-  now: number;
-  startedAt: number;
-  timeLimitSeconds?: number;
-}) {
-  return buildAttemptTimerState({
-    now,
-    startedAt,
-    timeLimitSeconds,
-  }).durationSeconds;
-}
-
 export function getAttemptCompletionSummary({
   answers,
   runtimeItems,
@@ -870,7 +854,7 @@ export function buildStudentAttemptSubmissionPlan({
     input: buildStudentAttemptSubmissionInput({
       answers,
       collectStudentName,
-      durationSeconds: resolveStudentAttemptSubmissionDurationSeconds({
+      durationSeconds: resolveAttemptSubmissionDurationSeconds({
         now,
         startedAt,
         timeLimitSeconds,
