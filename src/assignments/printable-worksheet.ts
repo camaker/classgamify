@@ -1,6 +1,7 @@
 import { getAcceptedAnswers } from '@/activities/answer-matching';
 import {
   getActivityTemplateRunnerKind,
+  type ActivityTemplateRunnerKind,
   type RuntimeItem,
 } from '@/activities/runtime';
 import type {
@@ -35,6 +36,12 @@ export type PrintableWorksheetChoicePresentation =
   | 'choice-list'
   | 'group-bank'
   | 'none';
+
+export type PrintableWorksheetResponsePolicy = {
+  answerSpaceLines: number;
+  choicePresentation: PrintableWorksheetChoicePresentation;
+  responseMode: PrintableWorksheetResponseMode;
+};
 
 export type PrintableWorksheetItem = {
   answerSpaceLines: number;
@@ -97,6 +104,47 @@ type PrintableAssignmentWorksheetSource = {
   } | null;
 };
 
+export const PRINTABLE_WORKSHEET_RESPONSE_POLICIES = {
+  'choice-list': {
+    answerSpaceLines: 1,
+    choicePresentation: 'choice-list',
+    responseMode: 'choice',
+  },
+  'fill-blank': {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+  'group-sort': {
+    answerSpaceLines: 1,
+    choicePresentation: 'group-bank',
+    responseMode: 'group-choice',
+  },
+  'line-match': {
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    responseMode: 'line-match',
+  },
+  listening: {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+  'matching-pairs': {
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    responseMode: 'matching-pairs',
+  },
+  'open-box': {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+} as const satisfies Record<
+  ActivityTemplateRunnerKind,
+  PrintableWorksheetResponsePolicy
+>;
+
 export function parsePrintableAssignmentSearch(
   search: Record<string, unknown>
 ): PrintableAssignmentSearch {
@@ -114,6 +162,16 @@ export function buildPrintableAssignmentSearch({
 }): PrintableAssignmentSearch {
   return {
     answerKey: answerKey ? true : undefined,
+  };
+}
+
+export function getPrintableWorksheetResponsePolicy(
+  templateType: ActivityTemplateType
+): PrintableWorksheetResponsePolicy {
+  return {
+    ...PRINTABLE_WORKSHEET_RESPONSE_POLICIES[
+      getActivityTemplateRunnerKind(templateType)
+    ],
   };
 }
 
@@ -184,16 +242,16 @@ function toPrintableWorksheetItem({
   sequenceNumber: number;
   templateType: ActivityTemplateType;
 }): PrintableWorksheetItem {
-  const responseMode = getPrintableWorksheetResponseMode(templateType);
+  const responsePolicy = getPrintableWorksheetResponsePolicy(templateType);
 
   return {
-    answerSpaceLines: getPrintableWorksheetAnswerSpaceLines(responseMode),
-    choicePresentation: getPrintableWorksheetChoicePresentation(responseMode),
+    answerSpaceLines: responsePolicy.answerSpaceLines,
+    choicePresentation: responsePolicy.choicePresentation,
     choices: normalizeRuntimeChoiceList(item.choices) ?? [],
     id: item.id,
     kind: item.kind,
     prompt: normalizeRuntimeDisplayText(item.prompt),
-    responseMode,
+    responseMode: responsePolicy.responseMode,
     sequenceNumber: normalizeRuntimeDisplayCount(sequenceNumber, { min: 1 }),
   };
 }
@@ -213,47 +271,4 @@ function toPrintableWorksheetAnswerKeyItem(
     prompt: normalizeRuntimeDisplayText(item.prompt),
     sequenceNumber: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
   };
-}
-
-function getPrintableWorksheetResponseMode(
-  templateType: ActivityTemplateType
-): PrintableWorksheetResponseMode {
-  const runnerKind = getActivityTemplateRunnerKind(templateType);
-
-  switch (runnerKind) {
-    case 'choice-list':
-      return 'choice';
-    case 'group-sort':
-      return 'group-choice';
-    case 'line-match':
-      return 'line-match';
-    case 'matching-pairs':
-      return 'matching-pairs';
-    case 'fill-blank':
-    case 'listening':
-    case 'open-box':
-      return 'short-answer';
-  }
-}
-
-function getPrintableWorksheetAnswerSpaceLines(
-  responseMode: PrintableWorksheetResponseMode
-) {
-  return responseMode === 'short-answer' ? 2 : 1;
-}
-
-function getPrintableWorksheetChoicePresentation(
-  responseMode: PrintableWorksheetResponseMode
-): PrintableWorksheetChoicePresentation {
-  switch (responseMode) {
-    case 'choice':
-      return 'choice-list';
-    case 'group-choice':
-      return 'group-bank';
-    case 'line-match':
-    case 'matching-pairs':
-      return 'answer-bank';
-    case 'short-answer':
-      return 'none';
-  }
 }

@@ -353,8 +353,10 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import {
+  PRINTABLE_WORKSHEET_RESPONSE_POLICIES,
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
+  getPrintableWorksheetResponsePolicy,
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
@@ -8947,26 +8949,43 @@ const publicRuntimeSanitizationInput = {
   visibility: 'draft' as const,
   vocabularyText: 'Paris, France, night, cat, tree, Cold, Down',
 };
-const printableResponseModeByTemplate = {
-  'fill-blank': 'short-answer',
-  'group-sort': 'group-choice',
-  'line-match': 'line-match',
-  'match-up': 'choice',
-  'matching-pairs': 'matching-pairs',
-  'open-box': 'short-answer',
-  listening: 'short-answer',
-  quiz: 'choice',
-} as const;
-const printableChoicePresentationByTemplate = {
-  'fill-blank': 'none',
-  'group-sort': 'group-bank',
-  'line-match': 'answer-bank',
-  'match-up': 'choice-list',
-  'matching-pairs': 'answer-bank',
-  'open-box': 'none',
-  listening: 'none',
-  quiz: 'choice-list',
-} as const;
+assert.deepEqual(PRINTABLE_WORKSHEET_RESPONSE_POLICIES, {
+  'choice-list': {
+    answerSpaceLines: 1,
+    choicePresentation: 'choice-list',
+    responseMode: 'choice',
+  },
+  'fill-blank': {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+  'group-sort': {
+    answerSpaceLines: 1,
+    choicePresentation: 'group-bank',
+    responseMode: 'group-choice',
+  },
+  'line-match': {
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    responseMode: 'line-match',
+  },
+  listening: {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+  'matching-pairs': {
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    responseMode: 'matching-pairs',
+  },
+  'open-box': {
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    responseMode: 'short-answer',
+  },
+});
 for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   const content = buildActivityContent({
     ...publicRuntimeSanitizationInput,
@@ -9020,19 +9039,23 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
     runtimeItems,
     snapshot: null,
   });
+  const responsePolicy = getPrintableWorksheetResponsePolicy(templateType);
   assert.equal(printableWorksheet.items.length, runtimeItems.length);
   assert.equal(
     printableWorksheet.items.every(
-      (item) =>
-        item.responseMode === printableResponseModeByTemplate[templateType]
+      (item) => item.answerSpaceLines === responsePolicy.answerSpaceLines
     ),
     true
   );
   assert.equal(
     printableWorksheet.items.every(
-      (item) =>
-        item.choicePresentation ===
-        printableChoicePresentationByTemplate[templateType]
+      (item) => item.choicePresentation === responsePolicy.choicePresentation
+    ),
+    true
+  );
+  assert.equal(
+    printableWorksheet.items.every(
+      (item) => item.responseMode === responsePolicy.responseMode
     ),
     true
   );
@@ -11436,6 +11459,30 @@ assert.match(
 const printableWorksheetViewSource = readFileSync(
   'src/assignments/printable-worksheet-view.ts',
   'utf8'
+);
+const printableWorksheetSource = readFileSync(
+  'src/assignments/printable-worksheet.ts',
+  'utf8'
+);
+assert.match(
+  printableWorksheetSource,
+  /PRINTABLE_WORKSHEET_RESPONSE_POLICIES[\s\S]*satisfies Record<[\s\S]*ActivityTemplateRunnerKind,[\s\S]*PrintableWorksheetResponsePolicy/,
+  'Printable worksheet response rules should be captured in one exhaustive runner-kind policy table.'
+);
+assert.match(
+  printableWorksheetSource,
+  /getPrintableWorksheetResponsePolicy[\s\S]*getActivityTemplateRunnerKind\(templateType\)/,
+  'Printable worksheet response policies should resolve from the shared activity runner kind.'
+);
+assert.match(
+  printableWorksheetSource,
+  /toPrintableWorksheetItem[\s\S]*const responsePolicy = getPrintableWorksheetResponsePolicy\(templateType\)[\s\S]*answerSpaceLines: responsePolicy\.answerSpaceLines[\s\S]*choicePresentation: responsePolicy\.choicePresentation[\s\S]*responseMode: responsePolicy\.responseMode/,
+  'Printable worksheet item generation should consume the shared response policy.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /function getPrintableWorksheetResponseMode|function getPrintableWorksheetAnswerSpaceLines|function getPrintableWorksheetChoicePresentation/,
+  'Printable worksheet item generation should not keep separate response-mode, answer-line, or choice-presentation switches.'
 );
 assert.match(
   printableWorksheetViewSource,
