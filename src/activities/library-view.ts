@@ -31,6 +31,7 @@ import {
   buildActivitySourceMaterialSummaryView,
   type ActivitySourceMaterialSummaryView,
 } from '@/activities/material-summary';
+import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
 import type {
   ActivityContent,
   ActivitySeed,
@@ -784,13 +785,13 @@ export function formatActivityLibraryTemplateShortNameList(
   shortNames: string[]
 ) {
   return shortNames
-    .map((shortName) => shortName.trim())
+    .map(normalizeRuntimeDisplayText)
     .filter(Boolean)
     .join(m.activity_library_template_list_separator());
 }
 
 export function buildActivityLibraryRemixActionLabel(shortName: string) {
-  const templateName = shortName.trim();
+  const templateName = normalizeRuntimeDisplayText(shortName);
 
   return m.activity_library_remix_action({
     template: templateName || m.activity_library_remix_action_fallback(),

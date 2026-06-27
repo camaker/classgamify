@@ -1626,10 +1626,25 @@ assert.match(
   /formatActivityLibraryTemplateShortNameList[\s\S]*activity_library_template_list_separator/,
   'Activity library remix hints should format template short-name lists through localized domain copy.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /formatActivityLibraryTemplateShortNameList[\s\S]*normalizeRuntimeDisplayText/,
+  'Activity library remix hints should normalize template short names through the shared display helper.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryRemixActionLabel[\s\S]*normalizeRuntimeDisplayText\(shortName\)/,
+  'Activity library remix action labels should normalize template short names through the shared display helper.'
+);
 assert.doesNotMatch(
   activityLibraryViewSource,
   /join\(', '\)/,
   'Activity library remix hints should not hard-code visible template list separators.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /shortName\.trim\(\)/,
+  'Activity library remix labels should not fall back to trim-only template short-name cleanup.'
 );
 const activityPreviewSource = readFileSync(
   'src/components/activities/activity-preview.tsx',
@@ -14235,6 +14250,14 @@ assert.equal(
   formatActivityLibraryTemplateShortNameList(['Quiz', ' Fill ', '']),
   'Quiz, Fill'
 );
+assert.equal(
+  formatActivityLibraryTemplateShortNameList([
+    '  Ｍａｔｃｈ   up  ',
+    ' Ｆｉｌｌ　blank ',
+    '',
+  ]),
+  'Match up, Fill blank'
+);
 overwriteGetLocale(() => 'zh');
 try {
   assert.equal(
@@ -14250,6 +14273,10 @@ try {
 }
 assert.equal(buildActivityLibraryRemixHint([]), undefined);
 assert.equal(buildActivityLibraryRemixActionLabel('Fill'), 'Copy as Fill');
+assert.equal(
+  buildActivityLibraryRemixActionLabel('  Ｆｉｌｌ　blank  '),
+  'Copy as Fill blank'
+);
 assert.equal(buildActivityLibraryRemixActionLabel('   '), 'Copy as template');
 assert.deepEqual(
   buildActivityLibraryCardActionState({
