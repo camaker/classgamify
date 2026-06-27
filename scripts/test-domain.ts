@@ -349,6 +349,7 @@ import {
 } from '@/assignments/public';
 import {
   getRuntimeChoiceDisplayKey,
+  hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
@@ -1315,10 +1316,25 @@ assert.match(
   /limit: ASSIGNMENT_RESULTS_ANALYSIS_LIMITS\.needsReviewItems/,
   'Assignment result analysis should reuse the named review-priority limit.'
 );
+assert.match(
+  assignmentResultsSource,
+  /hasRuntimeDisplayText\(answer\?\.answer\)/,
+  'Assignment item analysis should count submitted answers through the shared runtime display-text helper.'
+);
+assert.match(
+  assignmentResultsSource,
+  /submitted: hasRuntimeDisplayText\(submittedAnswer\?\.answer\)/,
+  'Assignment attempt review answers should derive submitted state through the shared runtime display-text helper.'
+);
 assert.doesNotMatch(
   assignmentResultsSource,
   /limit: 3/,
   'Assignment result analysis should not keep a local review-priority limit.'
+);
+assert.doesNotMatch(
+  assignmentResultsSource,
+  /answer(?:\?|\.)\.answer\.trim\(\)|submittedAnswer\.answer\.trim\(\)/,
+  'Assignment result analysis should not use ad hoc trim-only submitted-answer checks.'
 );
 const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
@@ -1387,10 +1403,20 @@ assert.match(
   /normalizeRuntimeDisplayCount\(itemCount\)[\s\S]*normalizedItemCount \* PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES\.perItem/,
   'Public assignment estimated minutes should normalize item count and reuse the per-item estimate.'
 );
+assert.match(
+  publicAssignmentSource,
+  /submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
+  'Public attempt review items should derive submitted state through the shared runtime display-text helper.'
+);
 assert.doesNotMatch(
   publicAssignmentSource,
   /Math\.max\(5, Math\.min\(20, itemCount \* 2\)\)/,
   'Public assignment estimated minutes should not keep local numeric limits.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /answer\?\.answer\.trim\(\)/,
+  'Public attempt review items should not use ad hoc trim-only submitted-answer checks.'
 );
 const activityLibraryViewSource = readFileSync(
   'src/activities/library-view.ts',
@@ -8407,6 +8433,8 @@ assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
   perItem: 2,
 });
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
+assert.equal(hasRuntimeDisplayText('  Ｎｅｗ   York  '), true);
+assert.equal(hasRuntimeDisplayText('\u00A0　\t'), false);
 assert.equal(normalizeOptionalRuntimeDisplayText('   '), undefined);
 assert.equal(normalizeRuntimeDisplayCount(Number.NaN), 0);
 assert.equal(normalizeRuntimeDisplayCount(-2.4), 0);
@@ -10209,6 +10237,30 @@ assert.deepEqual(
       explanation: 'France capital.',
       itemId: 'messy-q-1',
       submitted: true,
+    },
+  ]
+);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
+    answers: [{ answer: '\u00A0　\t', correct: false, itemId: 'q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris',
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+    ],
+    showCorrectAnswers: true,
+  }),
+  [
+    {
+      acceptedAnswers: ['Paris'],
+      correct: false,
+      correctAnswer: 'Paris',
+      explanation: undefined,
+      itemId: 'q-1',
+      submitted: false,
     },
   ]
 );

@@ -2,6 +2,10 @@ export function normalizeRuntimeDisplayText(value: string | null | undefined) {
   return (value ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim();
 }
 
+export function hasRuntimeDisplayText(value: string | null | undefined) {
+  return normalizeRuntimeDisplayText(value).length > 0;
+}
+
 export function normalizeOptionalRuntimeDisplayText(
   value: string | null | undefined
 ) {

@@ -20,6 +20,7 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
 import {
+  hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
@@ -261,7 +262,7 @@ function buildAttemptReviewItems({
       ),
       explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
       itemId: item.id,
-      submitted: Boolean(answer?.answer.trim()),
+      submitted: hasRuntimeDisplayText(answer?.answer),
     };
   });
 }

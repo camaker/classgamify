@@ -8,6 +8,7 @@ import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
+  hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayList,
@@ -101,7 +102,7 @@ export function analyzeAssignmentResults({
         (attemptAnswer) => attemptAnswer.itemId === item.id
       );
 
-      return answer?.answer.trim() ? [answer] : [];
+      return hasRuntimeDisplayText(answer?.answer) ? [answer] : [];
     });
     const correctCount = submittedAnswers.filter(
       (answer) => answer.correct
@@ -176,9 +177,7 @@ function buildAttemptReviewAnswers({
       explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
       itemId: item.id,
       prompt: normalizeRuntimeDisplayText(formatRuntimeItemPrompt(item)),
-      submitted:
-        submittedAnswer !== undefined &&
-        submittedAnswer.answer.trim().length > 0,
+      submitted: hasRuntimeDisplayText(submittedAnswer?.answer),
     };
   });
 }
