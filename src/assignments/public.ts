@@ -201,17 +201,23 @@ export function buildPublicAssignmentPayload({
       title: assignment.title,
     },
     runtimeItems: stripRuntimeAnswers(orderedRuntimeItems),
-    snapshot: snapshot
-      ? {
-          activityDescription: snapshot.activityDescription,
-          activityTitle: snapshot.activityTitle,
-          templateType: snapshot.templateType,
-        }
-      : null,
+    snapshot: buildPublicAssignmentSnapshotSummary(snapshot),
     summary: buildPublicAssignmentSummary({
       content,
       itemCount: orderedRuntimeItems.length,
     }),
+  };
+}
+
+function buildPublicAssignmentSnapshotSummary(
+  snapshot: PublicAssignmentPayloadSource['snapshot']
+): PublicAssignmentPayload['snapshot'] {
+  if (!snapshot) return null;
+
+  return {
+    activityDescription: snapshot.activityDescription,
+    activityTitle: snapshot.activityTitle,
+    templateType: snapshot.templateType,
   };
 }
 

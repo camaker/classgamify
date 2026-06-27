@@ -1471,6 +1471,16 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /snapshot: buildPublicAssignmentSnapshotSummary\(snapshot\)/,
+  'Public assignment payload should delegate snapshot sanitization to the public assignment snapshot helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSnapshotSummary[\s\S]*activityDescription: snapshot\.activityDescription,[\s\S]*activityTitle: snapshot\.activityTitle,[\s\S]*templateType: snapshot\.templateType/,
+  'Public assignment snapshot should explicitly pick the only snapshot fields allowed in student payloads.'
+);
+assert.match(
+  publicAssignmentSource,
   /function buildPublicAssignmentSummary[\s\S]*difficulty: content\.difficulty,[\s\S]*estimatedMinutes: estimateAssignmentMinutes\(itemCount\),[\s\S]*gradeBand: content\.gradeBand,[\s\S]*itemCount: normalizeRuntimeDisplayCount\(itemCount\),[\s\S]*language: content\.language,[\s\S]*learningGoal: content\.learningGoal,[\s\S]*subject: content\.subject/,
   'Public assignment summary should explicitly pick the only content fields allowed in student payloads.'
 );
@@ -1483,6 +1493,11 @@ assert.doesNotMatch(
   publicAssignmentSource,
   /function buildPublicAssignmentSummary[\s\S]*sourceMaterials[\s\S]*export function stripRuntimeAnswers|summary: \{[\s\S]*sourceMaterials[\s\S]*runtimeItems: stripRuntimeAnswers/,
   'Public assignment summary should not expose source material references.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /function buildPublicAssignmentSnapshotSummary[\s\S]*(?:contentJson|sourceMaterials|\.{3}snapshot)[\s\S]*function buildPublicAssignmentSummary/,
+  'Public assignment snapshot should not expose frozen content or source material references.'
 );
 assert.doesNotMatch(
   publicAssignmentSource,
@@ -8612,6 +8627,8 @@ assert.deepEqual(publicAssignmentPayload.snapshot, {
   activityTitle: 'Frozen activity title',
   templateType: 'quiz',
 });
+assert.equal('contentJson' in publicAssignmentPayload.snapshot!, false);
+assert.equal('sourceMaterials' in publicAssignmentPayload.snapshot!, false);
 assert.equal(publicAssignmentPayload.runtimeItems[0]?.prompt, 'Frozen prompt?');
 assert.equal('answer' in publicAssignmentPayload.runtimeItems[0]!, false);
 assert.equal('explanation' in publicAssignmentPayload.runtimeItems[0]!, false);
