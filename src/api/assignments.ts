@@ -44,6 +44,7 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListCountSelect,
   buildAssignmentListOrderBy,
   buildAssignmentListSummarySelect,
   buildAssignmentListWhere,
@@ -104,7 +105,6 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { count } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -152,7 +152,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
     });
 
     const [totalRow] = await db
-      .select({ count: count() })
+      .select(buildAssignmentListCountSelect())
       .from(assignment)
       .innerJoin(activity, buildAssignmentActivityJoin())
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())

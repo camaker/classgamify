@@ -447,6 +447,7 @@ import {
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
 import {
+  buildAssignmentListCountSelect,
   buildAssignmentListSummarySelect,
   buildPublishedAssignmentListItemSelect,
   getAssignmentListOffset,
@@ -13144,12 +13145,18 @@ assert.match(
   /publishedAssignment[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId,[\s\S]*\}\)/,
   'Assignment list publish-success lookup should use the shared owner-scoped share-slug detail query helper.'
 );
+assert.equal(typeof buildAssignmentListCountSelect, 'function');
 assert.equal(typeof buildAssignmentListSummarySelect, 'function');
 assert.equal(typeof buildPublishedAssignmentListItemSelect, 'function');
 assert.match(
   assignmentListQuerySource,
-  /buildAssignmentListSummarySelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*buildPublishedAssignmentListItemSelect[\s\S]*id: assignment\.id[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
-  'Assignment list summary and publish-success select shapes should live in the assignment query domain.'
+  /buildAssignmentListCountSelect[\s\S]*count: count\(\)[\s\S]*buildAssignmentListSummarySelect[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*id: assignment\.id[\s\S]*status: assignment\.status[\s\S]*buildPublishedAssignmentListItemSelect[\s\S]*id: assignment\.id[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
+  'Assignment list count, summary, and publish-success select shapes should live in the assignment query domain.'
+);
+assert.match(
+  assignmentsApiSource,
+  /totalRow[\s\S]*\.select\(buildAssignmentListCountSelect\(\)\)/,
+  'Assignment list API should reuse the count select helper.'
 );
 assert.match(
   assignmentsApiSource,
@@ -13163,8 +13170,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentListApiSource,
-  /matchingAssignments[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*status: assignment\.status|publishedAssignment[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
-  'Assignment list API should not hand-write summary or publish-success select fields.'
+  /select\(\{ count: count\(\) \}\)|from 'drizzle-orm'|matchingAssignments[\s\S]*expiresAt: assignment\.expiresAt[\s\S]*status: assignment\.status|publishedAssignment[\s\S]*shareSlug: assignment\.shareSlug[\s\S]*title: assignment\.title/,
+  'Assignment list API should not hand-write count, summary, or publish-success select fields.'
 );
 assert.match(
   assignmentsApiSource,

@@ -6,7 +6,13 @@ import {
 } from '@/assignments/list-filters';
 import { activity, assignment, assignmentSnapshot } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
-import { and, desc, eq, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, or, type SQL } from 'drizzle-orm';
+
+export function buildAssignmentListCountSelect() {
+  return {
+    count: count(),
+  };
+}
 
 export function buildAssignmentListSummarySelect() {
   return {
