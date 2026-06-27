@@ -407,6 +407,10 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import {
+  buildPublishedAssignmentInsert,
+  buildPublishedAssignmentSnapshotInsert,
+} from '@/assignments/persistence';
+import {
   PRINTABLE_WORKSHEET_RESPONSE_POLICIES,
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
@@ -9041,10 +9045,65 @@ const assignmentSnapshotSource = readFileSync(
   'src/assignments/snapshot.ts',
   'utf8'
 );
+const assignmentPersistenceSource = readFileSync(
+  'src/assignments/persistence.ts',
+  'utf8'
+);
 assert.match(
   assignmentSnapshotSource,
   /resolveAssignmentSnapshotSource[\s\S]*normalizeOptionalRuntimeDisplayText\([\s\S]*activityDescription[\s\S]*normalizeRuntimeDisplayText\(activityTitle\)/,
   'Assignment snapshot source resolution should normalize activity metadata for all display/export consumers.'
+);
+const publishedAssignmentInsert = buildPublishedAssignmentInsert({
+  expiresAt: new Date('2026-01-20T09:00:00.000Z'),
+  id: 'assignment-published-1',
+  now: assignmentSnapshotCreatedAt,
+  settings: {
+    collectStudentName: false,
+    instructions: 'Finish before class.',
+    maxAttempts: null,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 600,
+  },
+  shareSlug: 'share-published-1',
+  sourceActivity: {
+    id: 'activity-source-1',
+  },
+  title: 'Published homework link',
+  userId: 'teacher-1',
+});
+assert.deepEqual(publishedAssignmentInsert, {
+  activityId: 'activity-source-1',
+  createdAt: assignmentSnapshotCreatedAt,
+  expiresAt: new Date('2026-01-20T09:00:00.000Z'),
+  id: 'assignment-published-1',
+  ownerId: 'teacher-1',
+  settingsJson: {
+    collectStudentName: false,
+    instructions: 'Finish before class.',
+    maxAttempts: null,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 600,
+  },
+  shareSlug: 'share-published-1',
+  status: 'published',
+  title: 'Published homework link',
+  updatedAt: assignmentSnapshotCreatedAt,
+});
+assert.deepEqual(
+  buildPublishedAssignmentSnapshotInsert({
+    assignmentId: 'assignment-snapshot-1',
+    createdAt: assignmentSnapshotCreatedAt,
+    sourceActivity: assignmentSnapshotSourceActivity,
+  }),
+  assignmentSnapshotInsert
+);
+assert.match(
+  assignmentPersistenceSource,
+  /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*status: 'published'[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert/,
+  'Assignment persistence should own published assignment and snapshot insert payload shapes.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
@@ -12612,6 +12671,16 @@ assert.match(
   assignmentsApiSource,
   /export const publishAssignment[\s\S]*await db\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)/,
   'Publish assignment API should write the assignment and frozen snapshot atomically.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const publishAssignment[\s\S]*buildPublishedAssignmentInsert\(\{[\s\S]*sourceActivity,[\s\S]*title: data\.title,[\s\S]*userId,[\s\S]*\}\)[\s\S]*buildPublishedAssignmentSnapshotInsert\(\{[\s\S]*assignmentId: id,[\s\S]*sourceActivity/,
+  'Publish assignment API should build assignment and snapshot insert payloads through assignment persistence helpers.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /tx\.insert\(assignment\)\.values\(\{[\s\S]*activityId: sourceActivity\.id[\s\S]*status: 'published'|tx\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildAssignmentSnapshotInsert/,
+  'Publish assignment API should not hand-write published assignment or snapshot insert payloads.'
 );
 assert.match(
   assignmentsApiSource,

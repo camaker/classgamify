@@ -52,6 +52,10 @@ import {
 } from '@/assignments/lifecycle';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
+  buildPublishedAssignmentInsert,
+  buildPublishedAssignmentSnapshotInsert,
+} from '@/assignments/persistence';
+import {
   buildPublicAssignmentLookupResult,
   buildPublicAttemptResult,
   buildPublicAttemptReviewItems,
@@ -81,10 +85,7 @@ import {
   ASSIGNMENT_SHARE_SLUG_LENGTH,
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
-import {
-  buildAssignmentSnapshotInsert,
-  resolveAssignmentRuntimeSource,
-} from '@/assignments/snapshot';
+import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
 import { getDb } from '@/db';
 import {
   activity,
@@ -257,21 +258,21 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const settings = resolveAssignmentSettings(data.settings);
 
     await db.transaction(async (tx) => {
-      await tx.insert(assignment).values({
-        activityId: sourceActivity.id,
-        createdAt: now,
-        id,
-        ownerId: userId,
-        expiresAt,
-        settingsJson: settings,
-        shareSlug,
-        status: 'published',
-        title: data.title,
-        updatedAt: now,
-      });
+      await tx.insert(assignment).values(
+        buildPublishedAssignmentInsert({
+          expiresAt,
+          id,
+          now,
+          settings,
+          shareSlug,
+          sourceActivity,
+          title: data.title,
+          userId,
+        })
+      );
 
       await tx.insert(assignmentSnapshot).values(
-        buildAssignmentSnapshotInsert({
+        buildPublishedAssignmentSnapshotInsert({
           assignmentId: id,
           createdAt: now,
           sourceActivity,
