@@ -2152,6 +2152,16 @@ assert.match(
   /formatAcceptedAnswerAlternatives[\s\S]*assignment_result_accepted_answer_separator/,
   'Assignment result formatting should use the localized accepted-answer separator by default.'
 );
+assert.match(
+  assignmentResultFormatSource,
+  /getAssignmentResultEmptyValue[\s\S]*assignment_result_empty_value/,
+  'Assignment result formatting should use the localized empty-value placeholder by default.'
+);
+assert.doesNotMatch(
+  assignmentResultFormatSource,
+  /\?\? '-'/,
+  'Assignment result formatting should not hard-code the default empty-value placeholder.'
+);
 assert.doesNotMatch(
   assignmentResultsExportSource,
   /separator:\s*' \| '/,
@@ -17857,10 +17867,15 @@ assert.equal(
 );
 overwriteGetLocale(() => 'zh');
 try {
+  assert.equal(formatAssignmentResultDate(null), '-');
+  assert.equal(formatAssignmentResultNumber(Number.NaN), '-');
+  assert.equal(formatAssignmentResultPercent(Number.NaN), '-');
+  assert.equal(formatAssignmentResultValue(''), '-');
   assert.equal(
     formatAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
     'Paris，Paris, France'
   );
+  assert.equal(formatAcceptedAnswerAlternatives([]), '-');
   assert.equal(
     formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
     'Paris，Paris, France'

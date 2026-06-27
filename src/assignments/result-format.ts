@@ -11,7 +11,7 @@ export function formatAssignmentResultDate(
     timeZone?: string;
   }
 ) {
-  const emptyValue = options?.emptyValue ?? '-';
+  const emptyValue = options?.emptyValue ?? getAssignmentResultEmptyValue();
   if (!value) return emptyValue;
 
   const date = value instanceof Date ? value : new Date(value);
@@ -40,7 +40,7 @@ export function formatAssignmentResultPercent(
   }
 ) {
   if (value === null || value === undefined || !Number.isFinite(value)) {
-    return options?.emptyValue ?? '-';
+    return options?.emptyValue ?? getAssignmentResultEmptyValue();
   }
 
   return `${Math.round(value)}%`;
@@ -54,7 +54,7 @@ export function formatAssignmentResultNumber(
   }
 ) {
   if (value === null || value === undefined || !Number.isFinite(value)) {
-    return options?.emptyValue ?? '-';
+    return options?.emptyValue ?? getAssignmentResultEmptyValue();
   }
 
   const normalizedValue = Math.floor(
@@ -71,7 +71,7 @@ export function formatAcceptedAnswerAlternatives(
     separator?: string;
   }
 ) {
-  const emptyValue = options?.emptyValue ?? '-';
+  const emptyValue = options?.emptyValue ?? getAssignmentResultEmptyValue();
   const acceptedAnswers = getUniqueAcceptedAnswers(values);
   if (acceptedAnswers.length <= 1) return emptyValue;
 
@@ -101,5 +101,11 @@ export function formatAssignmentResultValue(
   }
 ) {
   const normalizedValue = value?.trim();
-  return normalizedValue || (options?.emptyValue ?? '-');
+  return (
+    normalizedValue || (options?.emptyValue ?? getAssignmentResultEmptyValue())
+  );
+}
+
+function getAssignmentResultEmptyValue() {
+  return m.assignment_result_empty_value();
 }
