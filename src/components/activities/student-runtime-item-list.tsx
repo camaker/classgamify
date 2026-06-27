@@ -6,6 +6,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { buildDefaultRuntimeItemCardViews } from '@/assignments/student-runner-view';
+import {
+  buildStudentAnswerChanges,
+  type StudentAnswerChange,
+} from '@/assignments/student-submission';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -22,7 +26,7 @@ type StudentRuntimeItemListProps = {
   disabled: boolean;
   items: PublicRuntimeItem[];
   language?: string;
-  onAnswerChange: (itemId: string, answer: string) => void;
+  onAnswerChanges: (changes: StudentAnswerChange[]) => void;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
   templateType: ActivityTemplateType;
@@ -33,7 +37,7 @@ export function StudentRuntimeItemList({
   disabled,
   items,
   language,
-  onAnswerChange,
+  onAnswerChanges,
   revealAnswer,
   reviewItems,
   templateType,
@@ -57,7 +61,7 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChanges={onAnswerChanges}
         />
       </div>
     );
@@ -72,7 +76,7 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChanges={onAnswerChanges}
         />
       </div>
     );
@@ -87,7 +91,9 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChange={(itemId, answer) =>
+            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+          }
         />
       </div>
     );
@@ -102,7 +108,9 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChange={(itemId, answer) =>
+            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+          }
         />
       </div>
     );
@@ -117,7 +125,9 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChange={(itemId, answer) =>
+            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+          }
         />
       </div>
     );
@@ -133,7 +143,9 @@ export function StudentRuntimeItemList({
           language={language}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={onAnswerChange}
+          onAnswerChange={(itemId, answer) =>
+            onAnswerChanges(buildStudentAnswerChanges({ answer, itemId }))
+          }
         />
       </div>
     );
@@ -154,7 +166,14 @@ export function StudentRuntimeItemList({
           reviewItem={itemView.reviewItem}
           revealAnswer={revealAnswer}
           showChoices={itemView.showChoices}
-          onAnswerChange={(answer) => onAnswerChange(itemView.item.id, answer)}
+          onAnswerChange={(answer) =>
+            onAnswerChanges(
+              buildStudentAnswerChanges({
+                answer,
+                itemId: itemView.item.id,
+              })
+            )
+          }
         />
       ))}
     </div>

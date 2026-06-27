@@ -6,9 +6,10 @@ import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import type { PublicAttemptReviewItem } from '@/assignments/public';
 import {
-  buildStudentAnswerChange,
+  applyStudentAnswerChanges,
   buildStudentAttemptSubmissionPlan,
   resolveStudentAttemptSubmissionFailureMessage,
+  type StudentAnswerChange,
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptClock,
@@ -254,6 +255,18 @@ function PlayPage() {
     setNow(restartPlan.startedAt);
   }
 
+  function updateAnswers(changes: StudentAnswerChange[]) {
+    if (changes.length === 0) return;
+
+    setConfirmIncompleteSubmit(false);
+    setAnswers((current) =>
+      applyStudentAnswerChanges({
+        answers: current,
+        changes,
+      })
+    );
+  }
+
   if (pageState.status === 'loading') {
     return <StudentRunnerLoadingPanel view={runnerPageView.loadingView} />;
   }
@@ -294,16 +307,7 @@ function PlayPage() {
             reviewItems={result?.reviewItems}
             language={activity.content.language}
             templateType={activity.templateType}
-            onAnswerChange={(itemId, answer) => {
-              setConfirmIncompleteSubmit(false);
-              setAnswers((current) =>
-                buildStudentAnswerChange({
-                  answer,
-                  answers: current,
-                  itemId,
-                })
-              );
-            }}
+            onAnswerChanges={updateAnswers}
           />
 
           <Button

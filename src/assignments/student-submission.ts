@@ -31,6 +31,8 @@ export type StudentSubmissionAnswer = {
   itemId: string;
 };
 
+export type StudentAnswerChange = StudentSubmissionAnswer;
+
 export type StudentAttemptAnswerState = {
   answer: string;
   answered: boolean;
@@ -735,10 +737,39 @@ export function buildStudentAnswerChange({
   answers: StudentAnswerMap;
   itemId: string;
 }): StudentAnswerMap {
-  return {
-    ...answers,
-    [itemId]: answer,
-  };
+  return applyStudentAnswerChanges({
+    answers,
+    changes: buildStudentAnswerChanges({ answer, itemId }),
+  });
+}
+
+export function applyStudentAnswerChanges({
+  answers,
+  changes,
+}: {
+  answers: StudentAnswerMap;
+  changes: StudentAnswerChange[];
+}): StudentAnswerMap {
+  const nextAnswers = { ...answers };
+
+  for (const change of changes) {
+    if (!change.itemId) continue;
+    nextAnswers[change.itemId] = change.answer;
+  }
+
+  return nextAnswers;
+}
+
+export function buildStudentAnswerChanges({
+  answer,
+  itemId,
+}: {
+  answer: string;
+  itemId: string;
+}): StudentAnswerChange[] {
+  if (!itemId) return [];
+
+  return [{ answer, itemId }];
 }
 
 export function buildStudentAttemptSubmissionInput({

@@ -605,11 +605,13 @@ import {
 } from '@/assignments/student-runner-state';
 import {
   buildAttemptCompletionCopy,
+  applyStudentAnswerChanges,
   buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
   buildStudentAttemptAnswerStateByItemId,
   buildStudentAttemptControlState,
   buildStudentAnswerChange,
+  buildStudentAnswerChanges,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmissionPlan,
@@ -3777,6 +3779,18 @@ const studentRunnerViewSource = readFileSync(
   'src/assignments/student-runner-view.ts',
   'utf8'
 );
+const studentRuntimeItemListSource = readFileSync(
+  'src/components/activities/student-runtime-item-list.tsx',
+  'utf8'
+);
+const lineMatchBoardSource = readFileSync(
+  'src/components/activities/line-match-board.tsx',
+  'utf8'
+);
+const matchingPairsBoardSource = readFileSync(
+  'src/components/activities/matching-pairs-board.tsx',
+  'utf8'
+);
 assert.match(
   studentRunnerSubmissionSource,
   /m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line[\s\S]*m\.student_runner_result_score_line/,
@@ -3791,6 +3805,21 @@ assert.match(
   studentRunnerSubmissionSource,
   /export function buildStudentAttemptAnswerStateByItemId/,
   'Student submission domain should expose runtime answer state for runner views.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /export type StudentAnswerChange/,
+  'Student submission domain should expose a shared answer-change contract.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildStudentAnswerChange[\s\S]*applyStudentAnswerChanges\(\{[\s\S]*buildStudentAnswerChanges/,
+  'Single answer updates should reuse the shared answer-change application contract.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /applyStudentAnswerChanges[\s\S]*const nextAnswers = \{ \.\.\.answers \}[\s\S]*nextAnswers\[change\.itemId\] = change\.answer/,
+  'Student submission domain should apply answer changes without mutating current browser answers.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -4019,13 +4048,53 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /buildStudentAnswerChange\(/,
-  'Student play route should update browser answers through assignment-domain helpers.'
+  /applyStudentAnswerChanges\(\{[\s\S]*answers: current,[\s\S]*changes/,
+  'Student play route should apply browser answer changes through assignment-domain helpers.'
 );
 assert.doesNotMatch(
   playRouteSource,
   /setAnswers\(\(current\) => \(\{[\s\S]*\.\.\.current,[\s\S]*\[itemId\]: answer/,
   'Student play route should not hand-build answer-map updates.'
+);
+assert.match(
+  playRouteSource,
+  /function updateAnswers\(changes: StudentAnswerChange\[\]\)[\s\S]*setConfirmIncompleteSubmit\(false\)[\s\S]*applyStudentAnswerChanges/,
+  'Student play route should reset incomplete-submit confirmation inside the shared answer-update path.'
+);
+assert.match(
+  playRouteSource,
+  /if \(changes\.length === 0\) return/,
+  'Student play route should ignore empty answer-change batches.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /onAnswerChanges: \(changes: StudentAnswerChange\[\]\) => void/,
+  'Student runtime item list should expose answer-change batches to the play route.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /buildStudentAnswerChanges\(\{ answer, itemId \}\)/,
+  'Student runtime item list should convert simple answer events through the shared answer-change builder.'
+);
+assert.match(
+  lineMatchBoardSource,
+  /onAnswerChanges\([\s\S]*buildExclusiveChoiceAnswerChanges/,
+  'Line-match should submit exclusive choice changes as one answer-change batch.'
+);
+assert.doesNotMatch(
+  lineMatchBoardSource,
+  /for \(const change of buildExclusiveChoiceAnswerChanges/,
+  'Line-match should not loop exclusive choice answer changes through repeated parent updates.'
+);
+assert.match(
+  matchingPairsBoardSource,
+  /onAnswerChanges\([\s\S]*buildExclusiveChoiceAnswerChanges/,
+  'Matching-pairs should submit exclusive choice changes as one answer-change batch.'
+);
+assert.doesNotMatch(
+  matchingPairsBoardSource,
+  /for \(const change of buildExclusiveChoiceAnswerChanges/,
+  'Matching-pairs should not loop exclusive choice answer changes through repeated parent updates.'
 );
 assert.match(
   playRouteSource,
@@ -5459,6 +5528,27 @@ const changedAnswers = buildStudentAnswerChange({
 assert.deepEqual(changedAnswers, {
   'item-1': ' apple ',
   'item-2': 'banana',
+});
+assert.deepEqual(answers, {
+  'item-1': ' apple ',
+  'item-2': '   ',
+});
+assert.deepEqual(buildStudentAnswerChanges({ answer: 'pear', itemId: 'q-1' }), [
+  { answer: 'pear', itemId: 'q-1' },
+]);
+assert.deepEqual(buildStudentAnswerChanges({ answer: 'pear', itemId: '' }), []);
+const batchChangedAnswers = applyStudentAnswerChanges({
+  answers,
+  changes: [
+    { answer: '', itemId: 'item-2' },
+    { answer: 'pear', itemId: 'item-3' },
+    { answer: 'ignored', itemId: '' },
+  ],
+});
+assert.deepEqual(batchChangedAnswers, {
+  'item-1': ' apple ',
+  'item-2': '',
+  'item-3': 'pear',
 });
 assert.deepEqual(answers, {
   'item-1': ' apple ',

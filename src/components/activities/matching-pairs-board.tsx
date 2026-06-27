@@ -2,6 +2,7 @@ import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
+import type { StudentAnswerChange } from '@/assignments/student-submission';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildChoicePairingRunnerView,
@@ -18,7 +19,7 @@ type MatchingPairsBoardProps = {
   answers: Record<string, string>;
   disabled: boolean;
   items: PublicRuntimeItem[];
-  onAnswerChange: (itemId: string, answer: string) => void;
+  onAnswerChanges: (changes: StudentAnswerChange[]) => void;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
 };
@@ -27,7 +28,7 @@ export function MatchingPairsBoard({
   answers,
   disabled,
   items,
-  onAnswerChange,
+  onAnswerChanges,
   revealAnswer,
   reviewItems,
 }: MatchingPairsBoardProps) {
@@ -48,13 +49,13 @@ export function MatchingPairsBoard({
   function selectChoice(choice: string) {
     if (!selectedItemId || disabled) return;
 
-    for (const change of buildExclusiveChoiceAnswerChanges({
-      answers,
-      choice,
-      itemId: selectedItemId,
-    })) {
-      onAnswerChange(change.itemId, change.answer);
-    }
+    onAnswerChanges(
+      buildExclusiveChoiceAnswerChanges({
+        answers,
+        choice,
+        itemId: selectedItemId,
+      })
+    );
     setSelectedItemId(undefined);
   }
 
