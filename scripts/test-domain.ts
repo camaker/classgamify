@@ -557,6 +557,7 @@ import {
 } from '@/assignments/attempt-identity-query';
 import {
   buildStudentRunnerAttemptClock,
+  buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
@@ -3346,6 +3347,21 @@ assert.match(
   playRouteSource,
   /StudentRuntimeItemList/,
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerAttemptRestartPlan/,
+  'Student play route should restart attempts through the assignment-domain restart plan.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /function startAnotherAttempt\(\)[\s\S]*buildStudentRunnerAttemptResetState/,
+  'Student play route should not rebuild the start-another-attempt reset details directly.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /function startAnotherAttempt\(\)[\s\S]*setSubmittedAttemptCount/,
+  'Starting another student attempt should not reset the tracked submitted-attempt count.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -8589,6 +8605,12 @@ assert.deepEqual(buildStudentRunnerAttemptResetState(), {
   confirmIncompleteSubmit: false,
   studentName: '',
   submittedAttemptCount: 0,
+});
+assert.deepEqual(buildStudentRunnerAttemptRestartPlan({ now: 98_765 }), {
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  startedAt: 98_765,
 });
 assert.equal(
   shouldResetStudentRunnerAttemptSession({

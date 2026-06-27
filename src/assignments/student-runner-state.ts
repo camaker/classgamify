@@ -161,6 +161,13 @@ export type StudentRunnerAttemptResetState = {
   submittedAttemptCount: number;
 };
 
+export type StudentRunnerAttemptRestartPlan = Pick<
+  StudentRunnerAttemptResetState,
+  'answers' | 'attemptClock' | 'confirmIncompleteSubmit'
+> & {
+  startedAt: number;
+};
+
 export type StudentRunnerAttemptClock = {
   shareId: string;
   startedAt: number;
@@ -539,6 +546,21 @@ export function buildStudentRunnerAttemptResetState(): StudentRunnerAttemptReset
     confirmIncompleteSubmit: false,
     studentName: '',
     submittedAttemptCount: 0,
+  };
+}
+
+export function buildStudentRunnerAttemptRestartPlan({
+  now,
+}: {
+  now: number;
+}): StudentRunnerAttemptRestartPlan {
+  const resetState = buildStudentRunnerAttemptResetState();
+
+  return {
+    answers: resetState.answers,
+    attemptClock: resetState.attemptClock,
+    confirmIncompleteSubmit: resetState.confirmIncompleteSubmit,
+    startedAt: now,
   };
 }
 

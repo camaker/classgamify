@@ -12,6 +12,7 @@ import {
 } from '@/assignments/student-submission';
 import {
   buildStudentRunnerAttemptClock,
+  buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
@@ -243,13 +244,14 @@ function PlayPage() {
   }
 
   function startAnotherAttempt() {
-    const nextResetState = buildStudentRunnerAttemptResetState();
-    const nextStartedAt = Date.now();
+    const restartPlan = buildStudentRunnerAttemptRestartPlan({
+      now: Date.now(),
+    });
     setResult(undefined);
-    setConfirmIncompleteSubmit(nextResetState.confirmIncompleteSubmit);
-    setAnswers(nextResetState.answers);
-    setAttemptClock(nextResetState.attemptClock);
-    setNow(nextStartedAt);
+    setConfirmIncompleteSubmit(restartPlan.confirmIncompleteSubmit);
+    setAnswers(restartPlan.answers);
+    setAttemptClock(restartPlan.attemptClock);
+    setNow(restartPlan.startedAt);
   }
 
   if (pageState.status === 'loading') {
