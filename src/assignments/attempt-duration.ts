@@ -114,7 +114,7 @@ export function formatAttemptDuration(
     style?: 'readable' | 'timer';
   }
 ) {
-  const emptyValue = options?.emptyValue ?? '-';
+  const emptyValue = options?.emptyValue ?? m.assignment_result_empty_value();
   if (seconds === undefined || seconds === null) return emptyValue;
   if (!Number.isFinite(seconds)) return emptyValue;
 

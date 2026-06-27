@@ -4884,6 +4884,11 @@ assert.match(
 );
 assert.match(
   attemptDurationSource,
+  /m\.assignment_result_empty_value\(\)/,
+  'Assignment attempt duration formatting should use localized result empty-value copy by default.'
+);
+assert.match(
+  attemptDurationSource,
   /resolveAttemptSubmissionDurationSeconds[\s\S]*buildAttemptTimerState[\s\S]*normalizeAttemptDurationSeconds/,
   'Attempt duration helpers should centralize submitted-duration timer derivation and clamping.'
 );
@@ -4891,6 +4896,11 @@ assert.doesNotMatch(
   attemptDurationSource,
   /\* 1000|\/ 1000|\/ 60|% 60|padStart\(2,/,
   'Attempt duration helpers should not keep local time-unit or timer-padding numbers.'
+);
+assert.doesNotMatch(
+  attemptDurationSource,
+  /emptyValue = options\?\.emptyValue \?\? '-'/,
+  'Assignment attempt duration formatting should not hard-code the default empty-value placeholder.'
 );
 const activityDistractorsSource = readFileSync(
   'src/activities/distractors.ts',
