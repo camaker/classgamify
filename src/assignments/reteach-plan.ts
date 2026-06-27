@@ -7,7 +7,10 @@ import {
   formatAssignmentSummaryItemPerformance,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
-import { formatAssignmentResultPromptLabel } from '@/assignments/result-display';
+import {
+  formatAssignmentResultPromptLabel,
+  formatAssignmentResultStudentLabel,
+} from '@/assignments/result-display';
 import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
@@ -109,6 +112,7 @@ export function buildAssignmentReteachPlanStudentViews(
 export function buildAssignmentReteachPlanStudentView(
   student: AssignmentStudentSummary
 ): AssignmentReteachPlanStudentView {
+  const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
   const accuracyLabel = formatAssignmentSummaryAccuracy(student.latestAccuracy);
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
     student.needsReviewCount
@@ -118,11 +122,11 @@ export function buildAssignmentReteachPlanStudentView(
     accuracyLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
-    studentLabel: student.studentLabel,
+    studentLabel,
     text: m.assignment_reteach_plan_student({
       accuracy: accuracyLabel,
       reviewCount: reviewItemCountLabel,
-      student: student.studentLabel,
+      student: studentLabel,
     }),
   };
 }

@@ -594,6 +594,7 @@ import {
 import {
   formatAssignmentResultItemNumberLabel,
   formatAssignmentResultPromptLabel,
+  formatAssignmentResultStudentLabel,
   joinAssignmentResultSearchSummaryParts,
 } from '@/assignments/result-display';
 import {
@@ -1243,10 +1244,15 @@ assert.match(
   /formatAssignmentResultCopyOrdinal\(index\)/,
   'Classroom brief should use the shared assignment-result copy ordinal formatter.'
 );
+assert.match(
+  assignmentClassroomBriefSource,
+  /formatAssignmentResultStudentLabel\(/,
+  'Classroom brief should format student labels through the shared result-display helper.'
+);
 assert.doesNotMatch(
   assignmentClassroomBriefSource,
-  /lines\.join\('\\n'\)|index \+ 1/,
-  'Classroom brief should not hand-compose copy line breaks or ordinals.'
+  /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel/,
+  'Classroom brief should not hand-compose copy line breaks, ordinals, or raw student labels.'
 );
 const assignmentReteachPlanSource = readFileSync(
   'src/assignments/reteach-plan.ts',
@@ -1277,10 +1283,15 @@ assert.match(
   /joinAssignmentResultCopyLines\(lines\)/,
   'Reteach plan should use the shared assignment-result copy line joiner.'
 );
+assert.match(
+  assignmentReteachPlanSource,
+  /formatAssignmentResultStudentLabel\(/,
+  'Reteach plan should format student labels through the shared result-display helper.'
+);
 assert.doesNotMatch(
   assignmentReteachPlanSource,
-  /lines\.join\('\\n'\)/,
-  'Reteach plan should not hand-compose copy line breaks.'
+  /lines\.join\('\\n'\)|student: student\.studentLabel/,
+  'Reteach plan should not hand-compose copy line breaks or raw student labels.'
 );
 const assignmentResultsSource = readFileSync(
   'src/assignments/results.ts',
@@ -2627,6 +2638,11 @@ assert.doesNotMatch(
   assignmentResultDisplaySource,
   /prompt\.trim\(\)/,
   'Assignment result prompt labels should not use ad hoc trim-only prompt cleanup.'
+);
+assert.match(
+  assignmentResultDisplaySource,
+  /export function formatAssignmentResultStudentLabel[\s\S]*normalizeRuntimeDisplayText\(value\)[\s\S]*student_identity_anonymous_student/,
+  'Assignment result student labels should share normalized display text with a localized anonymous fallback.'
 );
 assert.match(
   assignmentResultDisplaySource,
@@ -20956,7 +20972,7 @@ assert.deepEqual(
     latestAccuracy: 0,
     needsReviewCount: 0,
     studentKey: 'anonymous:empty',
-    studentLabel: 'Anonymous student 2',
+    studentLabel: ' Ａｎｏｎｙｍｏｕｓ\u00A0　student 2 ',
   }),
   {
     attemptsLabel: '0',
@@ -21636,6 +21652,33 @@ assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
       completedAt: attemptRowCompletedAt,
+      id: 'messy-review-label-row',
+      maxScore: 4,
+      resultJson: {
+        accuracy: 75,
+        completedItemCount: 3,
+        durationSeconds: 62,
+        totalPoints: 4,
+      },
+      score: 3,
+      studentName: ' Raw student ',
+    },
+    review: {
+      accuracy: 80,
+      answers: [],
+      completedAt: new Date('2026-01-01T00:00:00.000Z'),
+      id: 'messy-review-label-row',
+      score: 3,
+      studentKey: 'name:ava',
+      studentLabel: ' Ａｖａ\u00A0　Chen ',
+    },
+  }).studentLabel,
+  'Ava Chen'
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowDisplay({
+    attempt: {
+      completedAt: attemptRowCompletedAt,
       id: 'timed-attempt-row',
       maxScore: 4,
       resultJson: {
@@ -21751,7 +21794,7 @@ assert.deepEqual(
           studentName: ' Raw student ',
         },
         review: undefined,
-        studentLabel: 'Displayed student',
+        studentLabel: ' Ｄｉｓｐｌａｙｅｄ   student ',
       },
     ],
     timeLimitSeconds: 60,
@@ -21856,7 +21899,7 @@ assert.deepEqual(
     completedAt: null,
     id: 'attempt-empty',
     score: 0,
-    studentLabel: 'Anonymous student',
+    studentLabel: '   ',
   }),
   {
     answerViews: [],
@@ -21909,6 +21952,12 @@ assert.equal(formatAssignmentResultFraction(2, Number.POSITIVE_INFINITY), '-');
 assert.equal(formatAssignmentResultItemNumberLabel(0), '1.');
 assert.equal(formatAssignmentResultItemNumberLabel(-1), '1.');
 assert.equal(formatAssignmentResultItemNumberLabel(2.9), '3.');
+assert.equal(formatAssignmentResultStudentLabel(' Alice '), 'Alice');
+assert.equal(
+  formatAssignmentResultStudentLabel(' Ａｖａ\u00A0　Chen '),
+  'Ava Chen'
+);
+assert.equal(formatAssignmentResultStudentLabel('   '), 'Anonymous student');
 assert.equal(
   formatAssignmentResultPromptLabel({
     index: 1,
@@ -21940,6 +21989,7 @@ try {
     joinAssignmentResultSearchSummaryParts(['1 名学生', '2 次作答']),
     '1 名学生 · 2 次作答'
   );
+  assert.equal(formatAssignmentResultStudentLabel('   '), '匿名学生');
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -23612,6 +23662,16 @@ assert.equal(
   }).text,
   '- 1. Anonymous student 1: 0% latest, 1 item to review'
 );
+assert.deepEqual(
+  buildAssignmentClassroomBriefFollowUpStudentView({
+    index: 0,
+    student: {
+      ...classroomBrief.followUpStudents[0]!,
+      studentLabel: ' Ａｖａ\u00A0　Chen ',
+    },
+  }).studentLabel,
+  'Ava Chen'
+);
 assert.match(
   classroomBrief.text,
   /ClassGamify classroom brief: Capital Review, Week 1/
@@ -23695,6 +23755,13 @@ assert.deepEqual(buildAssignmentReteachPlanStudentView(alphaReviewStudent), {
   studentLabel: 'Alpha review',
   text: '- Alpha review: 70% latest accuracy, 3 items to review',
 });
+assert.deepEqual(
+  buildAssignmentReteachPlanStudentView({
+    ...alphaReviewStudent,
+    studentLabel: ' Ａｖａ\u00A0　Chen ',
+  }).studentLabel,
+  'Ava Chen'
+);
 assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
 assert.match(reteachPlan, /Review first:/);
 assert.match(reteachPlan, /Student follow-up:/);
@@ -23827,10 +23894,15 @@ assert.match(
   /formatAssignmentResultCopyOrdinal\(index\)/,
   'Assignment student follow-up summaries should use the shared assignment-result copy ordinal formatter.'
 );
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatAssignmentResultStudentLabel\(/,
+  'Assignment student follow-up summaries should format student labels through the shared result-display helper.'
+);
 assert.doesNotMatch(
   assignmentStudentFollowUpSummarySource,
-  /lines\.join\('\\n'\)|index \+ 1/,
-  'Assignment student follow-up summaries should not hand-compose copy line breaks or ordinals.'
+  /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel/,
+  'Assignment student follow-up summaries should not hand-compose copy line breaks, ordinals, or raw student labels.'
 );
 assert.deepEqual(
   buildAssignmentStudentFollowUpSummaryStudentView({
@@ -23854,6 +23926,16 @@ assert.equal(
     student: alphaReviewStudent,
   }).text,
   '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review'
+);
+assert.deepEqual(
+  buildAssignmentStudentFollowUpSummaryStudentView({
+    index: 0,
+    student: {
+      ...alphaReviewStudent,
+      studentLabel: ' Ａｖａ\u00A0　Chen ',
+    },
+  }).studentLabel,
+  'Ava Chen'
 );
 assert.match(
   studentFollowUpSummary,

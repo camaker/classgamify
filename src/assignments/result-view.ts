@@ -43,6 +43,7 @@ import {
   formatAssignmentResultFraction,
   formatAssignmentResultItemNumberLabel,
   formatAssignmentResultPromptLabel,
+  formatAssignmentResultStudentLabel,
   joinAssignmentResultSearchSummaryParts,
 } from '@/assignments/result-display';
 import {
@@ -1062,12 +1063,13 @@ export function buildAssignmentAttemptRowDisplay({
       attempt.score ?? 0,
       attempt.maxScore ?? 0
     ),
-    studentLabel:
+    studentLabel: formatAssignmentResultStudentLabel(
       studentLabel ??
-      getAssignmentAttemptStudentLabel({
-        reviewStudentLabel: review?.studentLabel,
-        studentName: attempt.studentName,
-      }),
+        getAssignmentAttemptStudentLabel({
+          reviewStudentLabel: review?.studentLabel,
+          studentName: attempt.studentName,
+        })
+    ),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
 }
@@ -1133,7 +1135,7 @@ export function buildAssignmentAttemptReviewCardView(
     answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
     badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
     id: attempt.id,
-    studentLabel: attempt.studentLabel,
+    studentLabel: formatAssignmentResultStudentLabel(attempt.studentLabel),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
 }
@@ -1160,7 +1162,7 @@ export function buildAssignmentStudentSummaryRowView(
     needsReviewLabel: formatAssignmentResultNumber(student.needsReviewCount, {
       min: 0,
     }),
-    studentLabel: student.studentLabel,
+    studentLabel: formatAssignmentResultStudentLabel(student.studentLabel),
   };
 }
 

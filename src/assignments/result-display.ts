@@ -27,6 +27,14 @@ export function formatAssignmentResultPromptLabel({
   });
 }
 
+export function formatAssignmentResultStudentLabel(
+  value: string | null | undefined
+) {
+  return (
+    normalizeRuntimeDisplayText(value) || m.student_identity_anonymous_student()
+  );
+}
+
 export function formatAssignmentResultFraction(value: number, total: number) {
   const normalizedValue = normalizeAssignmentResultFractionNumber(value);
   const normalizedTotal = normalizeAssignmentResultFractionNumber(total);

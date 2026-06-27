@@ -11,6 +11,7 @@ import {
 import {
   formatAssignmentResultItemNumberLabel,
   formatAssignmentResultPromptLabel,
+  formatAssignmentResultStudentLabel,
 } from '@/assignments/result-display';
 import {
   formatAssignmentSummaryAccuracy,
@@ -207,6 +208,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   index: number;
   student: AssignmentStudentSummary;
 }): AssignmentClassroomBriefFollowUpStudentView {
+  const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
   const latestAccuracyLabel = formatAssignmentSummaryAccuracy(
     student.latestAccuracy
   );
@@ -222,12 +224,12 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     ),
     reviewItemCountLabel,
     studentKey: student.studentKey,
-    studentLabel: student.studentLabel,
+    studentLabel,
     text: m.assignment_classroom_brief_follow_up_student({
       accuracy: latestAccuracyLabel,
       index: formatAssignmentResultCopyOrdinal(index),
       reviewCount: reviewItemCountLabel,
-      student: student.studentLabel,
+      student: studentLabel,
     }),
   };
 }

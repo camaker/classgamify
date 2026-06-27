@@ -7,6 +7,7 @@ import {
   formatAssignmentResultCopyOrdinal,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
+import { formatAssignmentResultStudentLabel } from '@/assignments/result-display';
 import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
 import type { AssignmentStudentSummary } from '@/assignments/results';
 import { m } from '@/locale/paraglide/messages';
@@ -59,6 +60,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   index: number;
   student: AssignmentStudentSummary;
 }): AssignmentStudentFollowUpSummaryStudentView {
+  const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
   const attemptsLabel = formatAssignmentSummaryAttemptCount(student.attempts);
   const averageAccuracyLabel = formatAssignmentSummaryAccuracy(
     student.averageAccuracy
@@ -80,7 +82,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     latestAccuracyLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
-    studentLabel: student.studentLabel,
+    studentLabel,
     text: m.assignment_student_follow_up_line({
       attempts: attemptsLabel,
       average: averageAccuracyLabel,
@@ -88,7 +90,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
       index: formatAssignmentResultCopyOrdinal(index),
       latest: latestAccuracyLabel,
       reviewCount: reviewItemCountLabel,
-      student: student.studentLabel,
+      student: studentLabel,
     }),
   };
 }
