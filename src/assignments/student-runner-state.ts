@@ -623,7 +623,7 @@ function orderStudentRunnerRuntimeItems({
 }) {
   return orderAssignmentRuntimeItems({
     items,
-    shareSlug: assignment.shareId,
+    shareSlug: normalizeAssignmentShareSlug(assignment.shareId),
     shuffleItems: Boolean(assignment.settings.shuffleItems),
   });
 }

@@ -4615,6 +4615,16 @@ assert.match(
   'Student runner page view-model should resolve attempt start times through assignment-domain helpers.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /orderStudentRunnerRuntimeItems[\s\S]*shareSlug: normalizeAssignmentShareSlug\(assignment\.shareId\)/,
+  'Student runner runtime ordering should normalize assignment share IDs before deriving shuffled item order.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /orderStudentRunnerRuntimeItems[\s\S]*shareSlug: assignment\.shareId/,
+  'Student runner runtime ordering should not pass raw assignment share IDs into item ordering.'
+);
+assert.match(
   playRouteSource,
   /shouldStartStudentRunnerAttemptClock\(/,
   'Student play route should start attempt clocks through assignment-domain helpers.'
