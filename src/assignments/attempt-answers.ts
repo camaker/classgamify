@@ -1,6 +1,8 @@
 import { m } from '@/locale/paraglide/messages';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 
 type SubmittedAttemptAnswer = {
+  answer?: string;
   itemId: string;
 };
 
@@ -21,20 +23,33 @@ export function assertSubmittedAnswersMatchRuntimeItems({
     throw new Error(m.assignment_attempt_answers_error_too_many());
   }
 
-  const runtimeItemIds = new Set(runtimeItems.map((item) => item.id));
+  const runtimeItemIds = new Set(
+    runtimeItems.map((item) => normalizeAttemptAnswerItemId(item.id))
+  );
   const submittedItemIds = new Set<string>();
 
   for (const answer of answers) {
-    if (!runtimeItemIds.has(answer.itemId)) {
+    const itemId = normalizeAttemptAnswerItemId(answer.itemId);
+
+    if (!runtimeItemIds.has(itemId)) {
       throw new Error(m.assignment_attempt_answers_error_unknown_item());
     }
 
-    if (submittedItemIds.has(answer.itemId)) {
+    if (submittedItemIds.has(itemId)) {
       throw new Error(m.assignment_attempt_answers_error_duplicate_item());
     }
 
-    submittedItemIds.add(answer.itemId);
+    submittedItemIds.add(itemId);
   }
+}
+
+export function normalizeSubmittedAttemptAnswers(
+  answers: Array<SubmittedAttemptAnswer & { answer: string }>
+) {
+  return answers.map((answer) => ({
+    ...answer,
+    itemId: normalizeAttemptAnswerItemId(answer.itemId),
+  }));
 }
 
 function assertRuntimeItemIdsAreUnique(
@@ -43,12 +58,17 @@ function assertRuntimeItemIdsAreUnique(
   const runtimeItemIds = new Set<string>();
 
   for (const item of runtimeItems) {
-    if (runtimeItemIds.has(item.id)) {
+    const itemId = normalizeAttemptAnswerItemId(item.id);
+    if (runtimeItemIds.has(itemId)) {
       throw new Error(
         m.assignment_attempt_answers_error_duplicate_runtime_item()
       );
     }
 
-    runtimeItemIds.add(item.id);
+    runtimeItemIds.add(itemId);
   }
+}
+
+function normalizeAttemptAnswerItemId(value: string) {
+  return normalizeRuntimeDisplayText(value);
 }

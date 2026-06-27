@@ -285,7 +285,10 @@ import {
 } from '@/payment/payment-status-view';
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
-import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
+import {
+  assertSubmittedAnswersMatchRuntimeItems,
+  normalizeSubmittedAttemptAnswers,
+} from '@/assignments/attempt-answers';
 import {
   buildAssignmentAttemptStatsView,
   normalizeAssignmentAttemptStats,
@@ -11702,6 +11705,10 @@ assert.doesNotMatch(
   'Activity dashboard route should not maintain a local page-size constant.'
 );
 const assignmentsApiSource = readFileSync('src/api/assignments.ts', 'utf8');
+const attemptAnswersSource = readFileSync(
+  'src/assignments/attempt-answers.ts',
+  'utf8'
+);
 const dashboardAssignmentsRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
   'utf8'
@@ -11854,6 +11861,26 @@ assert.match(
   assignmentsApiSource,
   /export const submitAttempt[\s\S]*const orderedRuntimeItems = orderAssignmentRuntimeItems\(\{[\s\S]*shareSlug: row\.assignment\.shareSlug,[\s\S]*shuffleItems: settings\.shuffleItems,[\s\S]*\}\)/,
   'Submit attempt API should apply the assignment delivery item order before validating submitted answers.'
+);
+assert.match(
+  assignmentsApiSource,
+  /const submittedAnswers = normalizeSubmittedAttemptAnswers\(data\.answers\)[\s\S]*answers: submittedAnswers,[\s\S]*evaluateRuntimeAnswers\(\{[\s\S]*answers: submittedAnswers/,
+  'Submit attempt API should normalize submitted item ids once before validation and scoring.'
+);
+assert.match(
+  attemptAnswersSource,
+  /normalizeSubmittedAttemptAnswers[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
+  'Attempt answer helpers should normalize submitted item ids before scoring uses them.'
+);
+assert.match(
+  attemptAnswersSource,
+  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*normalizeAttemptAnswerItemId\(item\.id\)[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
+  'Attempt answer validation should compare runtime and submitted item ids through the same normalization.'
+);
+assert.match(
+  attemptAnswersSource,
+  /function normalizeAttemptAnswerItemId[\s\S]*normalizeRuntimeDisplayText\(value\)/,
+  'Attempt answer item-id normalization should reuse the shared runtime display helper.'
 );
 assert.match(
   assignmentsApiSource,
@@ -19305,6 +19332,22 @@ assert.doesNotThrow(() =>
     runtimeItems: submissionRuntimeItems,
   })
 );
+assert.deepEqual(
+  normalizeSubmittedAttemptAnswers([
+    { answer: 'Paris', itemId: ' ｉｔｅｍ－１ ' },
+    { answer: 'Rome', itemId: 'item-3' },
+  ]),
+  [
+    { answer: 'Paris', itemId: 'item-1' },
+    { answer: 'Rome', itemId: 'item-3' },
+  ]
+);
+assert.doesNotThrow(() =>
+  assertSubmittedAnswersMatchRuntimeItems({
+    answers: [{ itemId: ' ｉｔｅｍ－１ ' }, { itemId: 'item-3' }],
+    runtimeItems: submissionRuntimeItems,
+  })
+);
 
 assert.throws(
   () =>
@@ -19341,8 +19384,26 @@ assert.throws(
 assert.throws(
   () =>
     assertSubmittedAnswersMatchRuntimeItems({
+      answers: [{ itemId: 'item-1' }, { itemId: ' ｉｔｅｍ－１ ' }],
+      runtimeItems: submissionRuntimeItems,
+    }),
+  /duplicate item/
+);
+
+assert.throws(
+  () =>
+    assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }, { itemId: 'item-2' }],
       runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
+    }),
+  /runtime items include a duplicate item id/
+);
+
+assert.throws(
+  () =>
+    assertSubmittedAnswersMatchRuntimeItems({
+      answers: [{ itemId: 'item-1' }],
+      runtimeItems: [{ id: 'item-1' }, { id: ' ｉｔｅｍ－１ ' }],
     }),
   /runtime items include a duplicate item id/
 );

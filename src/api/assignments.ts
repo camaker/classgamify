@@ -1,7 +1,10 @@
 import { evaluateRuntimeAnswers } from '@/activities/runtime';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
-import { assertSubmittedAnswersMatchRuntimeItems } from '@/assignments/attempt-answers';
+import {
+  assertSubmittedAnswersMatchRuntimeItems,
+  normalizeSubmittedAttemptAnswers,
+} from '@/assignments/attempt-answers';
 import {
   countMatchingStudentIdentityAttempts,
   resolveAttemptIdentityCountStrategy,
@@ -669,12 +672,13 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       shareSlug: row.assignment.shareSlug,
       shuffleItems: settings.shuffleItems,
     });
+    const submittedAnswers = normalizeSubmittedAttemptAnswers(data.answers);
     assertSubmittedAnswersMatchRuntimeItems({
-      answers: data.answers,
+      answers: submittedAnswers,
       runtimeItems: orderedRuntimeItems,
     });
     const evaluation = evaluateRuntimeAnswers({
-      answers: data.answers,
+      answers: submittedAnswers,
       content,
       durationSeconds,
       templateType,
