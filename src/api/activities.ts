@@ -10,7 +10,10 @@ import {
   buildActivityVisibilityUpdateSet,
   buildRemixedActivityInsert,
 } from '@/activities/persistence';
-import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
+import {
+  buildActivityDetailOwnerWhere,
+  buildActivityDetailSelect,
+} from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
@@ -124,7 +127,7 @@ export const getActivity = createServerFn({ method: 'GET' })
     const { userId } = context;
     const db = getDb();
     const [row] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
@@ -150,7 +153,7 @@ export const createActivity = createServerFn({ method: 'POST' })
       .values(buildActivityCreateInsert({ id, input: data, now, userId }));
 
     const [row] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
       .limit(1);
@@ -173,7 +176,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     const { userId } = context;
     const db = getDb();
     const [sourceActivity] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(
         buildActivityDetailOwnerWhere({
@@ -200,7 +203,7 @@ export const duplicateActivity = createServerFn({ method: 'POST' })
     );
 
     const [row] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
       .limit(1);
@@ -224,7 +227,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     const { userId } = context;
     const db = getDb();
     const [sourceActivity] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(
         buildActivityDetailOwnerWhere({
@@ -268,7 +271,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
     );
 
     const [row] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: id, userId }))
       .limit(1);
@@ -312,7 +315,7 @@ export const updateActivity = createServerFn({ method: 'POST' })
       .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }));
 
     const [row] = await db
-      .select()
+      .select(buildActivityDetailSelect())
       .from(activity)
       .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }))
       .limit(1);
@@ -366,7 +369,7 @@ async function updateActivityVisibility({
 }) {
   const db = getDb();
   const [row] = await db
-    .select()
+    .select(buildActivityDetailSelect())
     .from(activity)
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);
@@ -388,7 +391,7 @@ async function updateActivityVisibility({
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }));
 
   const [updatedRow] = await db
-    .select()
+    .select(buildActivityDetailSelect())
     .from(activity)
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);
