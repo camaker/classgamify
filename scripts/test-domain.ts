@@ -364,9 +364,12 @@ import {
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
+  buildAssignmentActivityJoin,
+  buildAssignmentDetailSelect,
   buildAssignmentDetailOwnerWhere,
   buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
+  buildAssignmentSnapshotJoin,
 } from '@/assignments/detail-query';
 import {
   buildOpenPublicAssignmentPayload,
@@ -12275,6 +12278,10 @@ const assignmentListQuerySource = readFileSync(
   'src/assignments/list-query.ts',
   'utf8'
 );
+const assignmentDetailQuerySource = readFileSync(
+  'src/assignments/detail-query.ts',
+  'utf8'
+);
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -12701,6 +12708,49 @@ assert.match(
 assert.equal(typeof buildAssignmentDetailOwnerWhere, 'function');
 assert.equal(typeof buildAssignmentDetailOwnerShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
+assert.equal(typeof buildAssignmentDetailSelect, 'function');
+assert.equal(typeof buildAssignmentActivityJoin, 'function');
+assert.equal(typeof buildAssignmentSnapshotJoin, 'function');
+assert.match(
+  assignmentDetailQuerySource,
+  /buildAssignmentDetailSelect[\s\S]*activity,[\s\S]*assignment,[\s\S]*snapshot: assignmentSnapshot[\s\S]*buildAssignmentActivityJoin[\s\S]*eq\(assignment\.activityId, activity\.id\)[\s\S]*buildAssignmentSnapshotJoin[\s\S]*eq\(assignmentSnapshot\.assignmentId, assignment\.id\)/,
+  'Assignment detail select and join shape should live in the assignment detail query domain.'
+);
+assert.match(
+  assignmentsApiSource,
+  /const items = await db[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)/,
+  'Assignment list item queries should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const publishAssignment[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*buildAssignmentDetailOwnerWhere\(\{ assignmentId: id, userId \}\)/,
+  'Publish assignment reloads should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const updateAssignmentStatus[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*\.where\(where\)/,
+  'Assignment status reloads should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*buildAssignmentDetailOwnerWhere/,
+  'Assignment results should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPrintableAssignmentWorksheet[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*buildAssignmentDetailOwnerWhere/,
+  'Printable worksheet lookups should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const getPublicAssignment[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*buildAssignmentDetailShareWhere/,
+  'Public assignment lookups should reuse the shared assignment detail select and join shape.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const submitAttempt[\s\S]*\.select\(buildAssignmentDetailSelect\(\)\)[\s\S]*\.innerJoin\(activity, buildAssignmentActivityJoin\(\)\)[\s\S]*\.leftJoin\(assignmentSnapshot, buildAssignmentSnapshotJoin\(\)\)[\s\S]*buildAssignmentDetailShareWhere/,
+  'Student attempt submissions should reuse the shared assignment detail select and join shape.'
+);
 assert.match(
   assignmentsApiSource,
   /publishedAssignment[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId,[\s\S]*\}\)/,
@@ -12759,6 +12809,11 @@ assert.doesNotMatch(
   assignmentsApiSource,
   /publishedAssignment[\s\S]*eq\(assignment\.ownerId, userId\)[\s\S]*eq\(assignment\.shareSlug, data\.publishedShareSlug\)|updateAssignmentStatus[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
   'Assignment API should not keep local detail owner/share lookup rules.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /eq\(assignment\.activityId, activity\.id\)|eq\(assignmentSnapshot\.assignmentId, assignment\.id\)|snapshot: assignmentSnapshot/,
+  'Assignment API should not hand-write assignment detail joins or detail select shape.'
 );
 assert.equal(typeof buildScoredAttemptWhere, 'function');
 assert.equal(typeof buildAssignmentAttemptsInWhere, 'function');

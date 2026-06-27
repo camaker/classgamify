@@ -55,9 +55,12 @@ import {
 } from '@/assignments/public';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
+  buildAssignmentActivityJoin,
+  buildAssignmentDetailSelect,
   buildAssignmentDetailOwnerWhere,
   buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
+  buildAssignmentSnapshotJoin,
 } from '@/assignments/detail-query';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
@@ -139,11 +142,8 @@ export const listAssignments = createServerFn({ method: 'GET' })
     const [totalRow] = await db
       .select({ count: count() })
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where);
     const matchingAssignments = await db
       .select({
@@ -152,11 +152,8 @@ export const listAssignments = createServerFn({ method: 'GET' })
         status: assignment.status,
       })
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where);
     const summaryAttempts = await db
       .select({
@@ -165,11 +162,8 @@ export const listAssignments = createServerFn({ method: 'GET' })
       })
       .from(attempt)
       .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(buildScoredAttemptWhere(where));
     const [publishedAssignment] = data.publishedShareSlug
       ? await db
@@ -188,17 +182,10 @@ export const listAssignments = createServerFn({ method: 'GET' })
           .limit(1)
       : [];
     const items = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where)
       .orderBy(buildAssignmentListOrderBy())
       .limit(data.pageSize)
@@ -320,17 +307,10 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     });
 
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(buildAssignmentDetailOwnerWhere({ assignmentId: id, userId }))
       .limit(1);
 
@@ -379,17 +359,10 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
       .where(where);
 
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where)
       .limit(1);
 
@@ -415,17 +388,10 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
     const { userId } = context;
     const db = getDb();
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(
         buildAssignmentDetailOwnerWhere({
           assignmentId: data.assignmentId,
@@ -473,17 +439,10 @@ export const getPrintableAssignmentWorksheet = createServerFn({
     const { userId } = context;
     const db = getDb();
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(
         buildAssignmentDetailOwnerWhere({
           assignmentId: data.assignmentId,
@@ -516,17 +475,10 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const db = getDb();
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(buildAssignmentDetailShareWhere({ shareSlug: data.shareSlug }))
       .limit(1);
 
@@ -576,17 +528,10 @@ export const submitAttempt = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const db = getDb();
     const [row] = await db
-      .select({
-        activity,
-        assignment,
-        snapshot: assignmentSnapshot,
-      })
+      .select(buildAssignmentDetailSelect())
       .from(assignment)
-      .innerJoin(activity, eq(assignment.activityId, activity.id))
-      .leftJoin(
-        assignmentSnapshot,
-        eq(assignmentSnapshot.assignmentId, assignment.id)
-      )
+      .innerJoin(activity, buildAssignmentActivityJoin())
+      .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(buildAssignmentDetailShareWhere({ shareSlug: data.shareSlug }))
       .limit(1);
 

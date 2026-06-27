@@ -1,5 +1,21 @@
-import { assignment } from '@/db/app.schema';
+import { activity, assignment, assignmentSnapshot } from '@/db/app.schema';
 import { and, eq } from 'drizzle-orm';
+
+export function buildAssignmentDetailSelect() {
+  return {
+    activity,
+    assignment,
+    snapshot: assignmentSnapshot,
+  };
+}
+
+export function buildAssignmentActivityJoin() {
+  return eq(assignment.activityId, activity.id);
+}
+
+export function buildAssignmentSnapshotJoin() {
+  return eq(assignmentSnapshot.assignmentId, assignment.id);
+}
 
 export function buildAssignmentDetailOwnerWhere({
   assignmentId,
