@@ -1500,8 +1500,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /formatAssignmentExportPrompt\(answer\.prompt\)/,
-  'Assignment CSV export should format prompt cells through a shared result-format helper.'
+  /const exportSettings = buildAssignmentExportSettings\(settings\)[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*settings: exportSettings[\s\S]*exportSettings\.instructions \?\? ''[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
+  'Assignment CSV export should format delivery policy, instructions, prompt, and explanation cells through the shared text helper.'
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
@@ -1515,8 +1515,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
-  /\battempt\.studentLabel,|\banswer\.prompt,/,
-  'Assignment CSV export should not write raw student labels or prompts directly.'
+  /\battempt\.studentLabel,|\banswer\.prompt,|\bsettings\.instructions \?\?|\banswer\.explanation \?\?/,
+  'Assignment CSV export should not write raw student labels, prompts, instructions, or explanations directly.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -23375,6 +23375,7 @@ const normalizedDisplayCsv = buildAssignmentResultsCsv({
               answerIndex === 0
                 ? {
                     ...answer,
+                    explanation: ' Ｆｒａｎｃｅ\u00A0　capital. ',
                     prompt: ' Ｃａｐｉｔａｌ\u00A0　of   France? ',
                   }
                 : answer
@@ -23384,7 +23385,15 @@ const normalizedDisplayCsv = buildAssignmentResultsCsv({
         : attempt
     ),
   },
+  assignment: {
+    ...csvExportData.assignment,
+    settingsJson: {
+      ...csvExportData.assignment.settingsJson,
+      instructions: ' Ｆｉｎｉｓｈ\u00A0　before   class. ',
+    },
+  },
 });
+assert.match(normalizedDisplayCsv, /"Finish before class\."/);
 assert.match(
   normalizedDisplayCsv,
   /"attempt-1","Ava Chen","2026-01-01T10:00:00\.000Z"/
@@ -23393,7 +23402,11 @@ assert.match(
   normalizedDisplayCsv,
   /"q-1","Capital of France\?","Paris","Paris","Paris, France","correct"/
 );
-assert.doesNotMatch(normalizedDisplayCsv, /Ａｖａ|Ｃａｐｉｔａｌ|\u00A0/);
+assert.match(normalizedDisplayCsv, /"correct","France capital\."/);
+assert.doesNotMatch(
+  normalizedDisplayCsv,
+  /Ａｖａ|Ｃａｐｉｔａｌ|Ｆｉｎｉｓｈ|Ｆｒａｎｃｅ|\u00A0/
+);
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,
   analysis: resultAnalysisWithUnscoredAttempt,

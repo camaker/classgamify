@@ -72,16 +72,17 @@ type AssignmentResultsExportData = {
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
+  const exportSettings = buildAssignmentExportSettings(settings);
   const resolvedSource = resolveAssignmentSnapshotSource(data);
   const statsView = buildAssignmentAttemptStatsView(data.stats);
   const deliverySummaryById = new Map(
     buildAssignmentDeliverySummary({
-      collectStudentName: settings.collectStudentName,
+      collectStudentName: exportSettings.collectStudentName,
       expiresAt: data.assignment.expiresAt,
-      maxAttempts: settings.maxAttempts,
-      showCorrectAnswers: settings.showCorrectAnswers,
-      shuffleItems: settings.shuffleItems,
-      timeLimitSeconds: settings.timeLimitSeconds,
+      maxAttempts: exportSettings.maxAttempts,
+      showCorrectAnswers: exportSettings.showCorrectAnswers,
+      shuffleItems: exportSettings.shuffleItems,
+      timeLimitSeconds: exportSettings.timeLimitSeconds,
     }).map((item) => [item.id, item.value])
   );
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
@@ -94,7 +95,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
     const studentSummary = studentsByKey.get(attempt.studentKey);
     const attemptDurationSeconds = normalizeAttemptDurationSeconds({
       durationSeconds: storedAttempt?.resultJson?.durationSeconds,
-      timeLimitSeconds: settings.timeLimitSeconds,
+      timeLimitSeconds: exportSettings.timeLimitSeconds,
     });
     const baseColumns = [
       data.assignment.id,
@@ -108,14 +109,14 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       formatAssignmentResultCsvDate(data.assignment.expiresAt),
       formatAssignmentDeliveryPolicyText({
         expiresAt: data.assignment.expiresAt,
-        settings,
+        settings: exportSettings,
       }),
-      settings.instructions ?? '',
+      exportSettings.instructions ?? '',
       deliverySummaryById.get('identity') ?? '',
       deliverySummaryById.get('answerReveal') ?? '',
       deliverySummaryById.get('itemOrder') ?? '',
-      formatAssignmentExportMaxAttempts(settings.maxAttempts),
-      settings.timeLimitSeconds ?? '',
+      formatAssignmentExportMaxAttempts(exportSettings.maxAttempts),
+      exportSettings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
       formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
@@ -170,12 +171,12 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         ...baseColumns,
         index + 1,
         answer.itemId,
-        formatAssignmentExportPrompt(answer.prompt),
+        formatAssignmentExportText(answer.prompt),
         answerView.exportStudentAnswerText,
         answerView.expectedAnswerText,
         answerView.acceptedAlternativesText,
         answerView.exportStatusLabel,
-        answer.explanation ?? '',
+        formatAssignmentExportText(answer.explanation),
       ];
     });
   });
@@ -265,7 +266,17 @@ function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
   return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
 }
 
-function formatAssignmentExportPrompt(value: string | null | undefined) {
+function buildAssignmentExportSettings(
+  settings: AssignmentSettings
+): AssignmentSettings {
+  return {
+    ...settings,
+    instructions:
+      formatAssignmentExportText(settings.instructions) || undefined,
+  };
+}
+
+function formatAssignmentExportText(value: string | null | undefined) {
   return formatAssignmentResultValue(value, { emptyValue: '' });
 }
 
