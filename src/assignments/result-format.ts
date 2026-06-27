@@ -1,4 +1,5 @@
 import { getUniqueAcceptedAnswers } from '@/activities/answer-matching';
+import { m } from '@/locale/paraglide/messages';
 
 type ResultDateValue = Date | string | null | undefined;
 
@@ -74,7 +75,9 @@ export function formatAcceptedAnswerAlternatives(
   const acceptedAnswers = getUniqueAcceptedAnswers(values);
   if (acceptedAnswers.length <= 1) return emptyValue;
 
-  return acceptedAnswers.join(options?.separator ?? ', ');
+  return acceptedAnswers.join(
+    options?.separator ?? m.assignment_result_accepted_answer_separator()
+  );
 }
 
 export function formatOptionalAcceptedAnswerAlternatives(
@@ -86,7 +89,9 @@ export function formatOptionalAcceptedAnswerAlternatives(
   const acceptedAnswers = getUniqueAcceptedAnswers(values);
   if (acceptedAnswers.length <= 1) return null;
 
-  return acceptedAnswers.join(options?.separator ?? ', ');
+  return acceptedAnswers.join(
+    options?.separator ?? m.assignment_result_accepted_answer_separator()
+  );
 }
 
 export function formatAssignmentResultValue(

@@ -163,7 +163,6 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       answer.expectedAnswer,
       formatAcceptedAnswerAlternatives(answer.acceptedAnswers, {
         emptyValue: '',
-        separator: ' | ',
       }),
       formatAssignmentExportAnswerStatus(answer),
       answer.explanation ?? '',

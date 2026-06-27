@@ -1893,6 +1893,10 @@ const assignmentResultDisplaySource = readFileSync(
   'src/assignments/result-display.ts',
   'utf8'
 );
+const assignmentResultFormatSource = readFileSync(
+  'src/assignments/result-format.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /attemptCount:\s*data\?\.attempts\.length/,
@@ -2142,6 +2146,16 @@ assert.match(
   assignmentResultDisplaySource,
   /formatAssignmentResultFraction[\s\S]*m\.assignment_result_fraction/,
   'Assignment result display helper should own localized fraction formatting.'
+);
+assert.match(
+  assignmentResultFormatSource,
+  /formatAcceptedAnswerAlternatives[\s\S]*assignment_result_accepted_answer_separator/,
+  'Assignment result formatting should use the localized accepted-answer separator by default.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /separator:\s*' \| '/,
+  'Assignment result CSV export should not override accepted-answer formatting with a hard-coded separator.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -17841,6 +17855,19 @@ assert.equal(
   }),
   'Paris | Paris, France'
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
+    'Paris，Paris, France'
+  );
+  assert.equal(
+    formatOptionalAcceptedAnswerAlternatives(['Paris', 'Paris, France']),
+    'Paris，Paris, France'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('   '), '-');
 assert.equal(formatAssignmentResultValue(' Paris '), 'Paris');
@@ -21162,7 +21189,7 @@ assert.match(
   csv,
   /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z"/
 );
-assert.match(csv, /"Paris \| Paris, France","correct"/);
+assert.match(csv, /"Paris, Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
 assert.match(
   csv,
