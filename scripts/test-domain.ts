@@ -2016,6 +2016,25 @@ for (const filePath of directRunnerFeedbackSources) {
     `${filePath} should use the template-specific correct-answer label in student review feedback.`
   );
 }
+const publicAnswerFeedbackSource = readFileSync(
+  'src/components/activities/public-answer-feedback.tsx',
+  'utf8'
+);
+assert.doesNotMatch(
+  publicAnswerFeedbackSource,
+  /@\/locale\/paraglide\/messages/,
+  'Public answer feedback component should render localized text prepared by the assignment-domain feedback view.'
+);
+assert.doesNotMatch(
+  publicAnswerFeedbackSource,
+  /\{feedback\.(?:correctAnswerLabel|acceptedAnswersLabel|explanationLabel)\}:/,
+  'Public answer feedback component should not hand-compose visible feedback label separators.'
+);
+assert.match(
+  publicAnswerFeedbackSource,
+  /feedback\.correctAnswerText[\s\S]*feedback\.acceptedAnswersText[\s\S]*feedback\.explanationText/,
+  'Public answer feedback component should render prepared feedback text lines.'
+);
 const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
   'utf8'
@@ -2031,8 +2050,8 @@ assert.match(
 );
 assert.doesNotMatch(
   fillBlankWorksheetSource,
-  /buildInlineBlankPromptView|buildStudentRunnerView|item\.choices\.join|\{index \+ 1\}/,
-  'Fill-blank worksheet should not rebuild prompt parsing, word-bank text, or item labels in the component.'
+  /buildInlineBlankPromptView|buildStudentRunnerView|item\.choices\.join|\{index \+ 1\}|\{copy\.wordBankLabel\}:/,
+  'Fill-blank worksheet should not rebuild prompt parsing, word-bank text, visible word-bank separators, or item labels in the component.'
 );
 assert.match(
   groupSortBoardSource,
@@ -4356,10 +4375,12 @@ assert.deepEqual(
       },
     ],
     progressVerb: 'completed',
+    wordBankLabel: 'Word bank',
   }).fillBlankItemViews.map((itemView) => ({
     id: itemView.item.id,
     promptView: itemView.promptView,
     sequenceLabel: itemView.sequenceLabel,
+    wordBankLineText: itemView.wordBankLineText,
     wordBankText: itemView.wordBankText,
   })),
   [
@@ -4371,6 +4392,7 @@ assert.deepEqual(
         mode: 'inline',
       },
       sequenceLabel: '1',
+      wordBankLineText: 'Word bank: apple, banana',
       wordBankText: 'apple, banana',
     },
     {
@@ -4380,6 +4402,7 @@ assert.deepEqual(
         prompt: 'Type the missing word.',
       },
       sequenceLabel: '2',
+      wordBankLineText: null,
       wordBankText: null,
     },
   ]
@@ -4398,11 +4421,13 @@ assert.deepEqual(
   }),
   {
     acceptedAnswersLabel: 'Accepted answers',
-    acceptedAnswersText: 'Paris | Paris, France',
+    acceptedAnswersText: 'Accepted answers: Paris | Paris, France',
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
+    correctAnswerText: 'Correct match: Paris',
     explanation: 'Paris is the capital of France.',
     explanationLabel: 'Why',
+    explanationText: 'Why: Paris is the capital of France.',
     status: 'needs-review',
     statusLabel: 'Needs review',
   }
@@ -4422,8 +4447,10 @@ assert.deepEqual(
     acceptedAnswersText: null,
     correctAnswer: 'Mitochondria',
     correctAnswerLabel: 'Correct answer',
+    correctAnswerText: 'Correct answer: Mitochondria',
     explanation: null,
     explanationLabel: 'Why',
+    explanationText: null,
     status: 'correct',
     statusLabel: 'Correct',
   }

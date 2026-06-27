@@ -95,6 +95,7 @@ type FillBlankWorksheetItemView = ReturnType<
 >['itemViews'][number] & {
   promptView: InlineBlankPromptView;
   sequenceLabel: string;
+  wordBankLineText: string | null;
   wordBankText: string | null;
 };
 
@@ -127,8 +128,10 @@ type PublicAnswerFeedbackView = {
   acceptedAnswersText: string | null;
   correctAnswer: string;
   correctAnswerLabel: string;
+  correctAnswerText: string;
   explanation: string | null;
   explanationLabel: string;
+  explanationText: string | null;
   status: 'correct' | 'needs-review';
   statusLabel: string;
 };
@@ -597,11 +600,13 @@ export function buildFillBlankWorksheetView({
   items,
   progressVerb,
   reviewItems,
+  wordBankLabel = m.activity_runner_word_bank_label(),
 }: {
   answers: StudentAnswerMap;
   items: PublicRuntimeItem[];
   progressVerb?: string;
   reviewItems?: PublicAttemptReviewItem[];
+  wordBankLabel?: string;
 }): FillBlankWorksheetView {
   const runnerView = buildStudentRunnerView({
     answers,
@@ -612,16 +617,26 @@ export function buildFillBlankWorksheetView({
 
   return {
     ...runnerView,
-    fillBlankItemViews: runnerView.itemViews.map((itemView, index) => ({
-      ...itemView,
-      promptView: buildInlineBlankPromptView(itemView.prompt),
-      sequenceLabel: String(
-        normalizeRuntimeDisplayCount(index + 1, { min: 1 })
-      ),
-      wordBankText: itemView.item.choices?.length
+    fillBlankItemViews: runnerView.itemViews.map((itemView, index) => {
+      const wordBankText = itemView.item.choices?.length
         ? itemView.item.choices.join(', ')
-        : null,
-    })),
+        : null;
+
+      return {
+        ...itemView,
+        promptView: buildInlineBlankPromptView(itemView.prompt),
+        sequenceLabel: String(
+          normalizeRuntimeDisplayCount(index + 1, { min: 1 })
+        ),
+        wordBankLineText: wordBankText
+          ? m.activity_runner_word_bank_line({
+              label: wordBankLabel,
+              value: wordBankText,
+            })
+          : null,
+        wordBankText,
+      };
+    }),
   };
 }
 
@@ -634,18 +649,38 @@ export function buildPublicAnswerFeedbackView({
 }): PublicAnswerFeedbackView | null {
   if (!reviewItem.submitted) return null;
 
+  const acceptedAnswersLabel = m.student_runner_feedback_accepted_answers();
+  const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
+    reviewItem.acceptedAnswers,
+    {
+      separator: ' | ',
+    }
+  );
+  const explanationLabel = m.student_runner_feedback_explanation();
+  const explanationValue = reviewItem.explanation ?? null;
+
   return {
-    acceptedAnswersLabel: m.student_runner_feedback_accepted_answers(),
-    acceptedAnswersText: formatOptionalAcceptedAnswerAlternatives(
-      reviewItem.acceptedAnswers,
-      {
-        separator: ' | ',
-      }
-    ),
+    acceptedAnswersLabel,
+    acceptedAnswersText: acceptedAnswersValue
+      ? m.student_runner_feedback_accepted_answers_line({
+          label: acceptedAnswersLabel,
+          value: acceptedAnswersValue,
+        })
+      : null,
     correctAnswer: reviewItem.correctAnswer,
     correctAnswerLabel,
-    explanation: reviewItem.explanation ?? null,
-    explanationLabel: m.student_runner_feedback_explanation(),
+    correctAnswerText: m.student_runner_feedback_correct_answer_line({
+      label: correctAnswerLabel,
+      value: reviewItem.correctAnswer,
+    }),
+    explanation: explanationValue,
+    explanationLabel,
+    explanationText: explanationValue
+      ? m.student_runner_feedback_explanation_line({
+          label: explanationLabel,
+          value: explanationValue,
+        })
+      : null,
     status: reviewItem.correct ? 'correct' : 'needs-review',
     statusLabel: reviewItem.correct
       ? m.student_runner_feedback_status_correct()

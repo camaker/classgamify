@@ -39,8 +39,9 @@ export function FillBlankWorksheet({
         items,
         progressVerb: copy.progressVerb,
         reviewItems,
+        wordBankLabel: copy.wordBankLabel,
       }),
-    [answers, copy.progressVerb, items, reviewItems]
+    [answers, copy.progressVerb, copy.wordBankLabel, items, reviewItems]
   );
 
   return (
@@ -71,9 +72,9 @@ export function FillBlankWorksheet({
                 <Badge variant="secondary" className="rounded-md">
                   {itemView.sequenceLabel}
                 </Badge>
-                {itemView.wordBankText ? (
+                {itemView.wordBankLineText ? (
                   <p className="text-xs text-muted-foreground">
-                    {copy.wordBankLabel}: {itemView.wordBankText}
+                    {itemView.wordBankLineText}
                   </p>
                 ) : null}
               </div>
