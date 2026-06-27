@@ -513,8 +513,9 @@ import {
 } from '@/assignments/result-filters';
 import {
   formatAcceptedAnswerAlternatives,
-  formatAssignmentResultValue,
+  formatAssignmentResultCsvNumber,
   formatAssignmentResultDate,
+  formatAssignmentResultValue,
   formatOptionalAcceptedAnswerAlternatives,
   formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
@@ -1442,10 +1443,20 @@ assert.match(
   /const statsView = buildAssignmentAttemptStatsView\(data\.stats\)/,
   'Assignment CSV export should format aggregate metrics through the shared attempt stats view.'
 );
+assert.match(
+  assignmentResultsExportSource,
+  /formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
+  'Assignment CSV export should format numeric cells through the shared result-format CSV helper.'
+);
 assert.doesNotMatch(
   assignmentResultsExportSource,
   /data\.stats\.completions > 0/,
   'Assignment CSV export should not use a local raw completion-count check for average duration.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /function formatAssignmentExportNumber/,
+  'Assignment CSV export should not keep local numeric cell formatting.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -19578,6 +19589,11 @@ assert.equal(formatAttemptDuration(65, { style: 'timer' }), '1:05');
 assert.equal(formatAttemptDuration(5, { style: 'timer' }), '5s');
 assert.equal(formatAssignmentResultDate(null), '-');
 assert.equal(formatAssignmentResultDate('not-a-date'), '-');
+assert.equal(formatAssignmentResultCsvNumber(null), '');
+assert.equal(formatAssignmentResultCsvNumber(Number.NaN), '');
+assert.equal(formatAssignmentResultCsvNumber(-3, { min: 0 }), 0);
+assert.equal(formatAssignmentResultCsvNumber(4.6), 4.6);
+assert.equal(formatAssignmentResultCsvNumber(4.6, { round: true }), 5);
 assert.match(
   formatAssignmentResultDate(new Date('2026-01-01T10:00:00.000Z'), {
     locale: 'en-US',

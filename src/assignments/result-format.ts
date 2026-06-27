@@ -68,6 +68,23 @@ export function formatAssignmentResultNumber(
   return String(normalizedValue);
 }
 
+export function formatAssignmentResultCsvNumber(
+  value: number | null | undefined,
+  options?: {
+    min?: number;
+    round?: boolean;
+  }
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return '';
+  }
+
+  const normalizedValue =
+    options?.min === undefined ? value : Math.max(options.min, value);
+
+  return options?.round ? Math.round(normalizedValue) : normalizedValue;
+}
+
 export function formatAcceptedAnswerAlternatives(
   values: string[],
   options?: {

@@ -8,7 +8,10 @@ import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration'
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
 import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
-import { formatAssignmentResultCsvDate } from '@/assignments/result-format';
+import {
+  formatAssignmentResultCsvDate,
+  formatAssignmentResultCsvNumber,
+} from '@/assignments/result-format';
 import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
@@ -113,11 +116,11 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       settings.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
-      formatAssignmentExportNumber(statsView.completions, { min: 0 }),
-      formatAssignmentExportNumber(statsView.averageScore, { min: 0 }),
-      formatAssignmentExportNumber(statsView.averagePoints, { min: 0 }),
+      formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
+      formatAssignmentResultCsvNumber(statsView.averageScore, { min: 0 }),
+      formatAssignmentResultCsvNumber(statsView.averagePoints, { min: 0 }),
       statsView.completed
-        ? formatAssignmentExportNumber(statsView.averageDurationSeconds, {
+        ? formatAssignmentResultCsvNumber(statsView.averageDurationSeconds, {
             min: 0,
             round: true,
           })
@@ -125,12 +128,12 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       attempt.id,
       attempt.studentLabel,
       formatAssignmentResultCsvDate(attempt.completedAt),
-      formatAssignmentExportNumber(storedAttempt?.score ?? attempt.score, {
+      formatAssignmentResultCsvNumber(storedAttempt?.score ?? attempt.score, {
         min: 0,
       }),
-      formatAssignmentExportNumber(storedAttempt?.maxScore, { min: 0 }),
-      formatAssignmentExportNumber(attempt.accuracy, { min: 0 }),
-      formatAssignmentExportNumber(
+      formatAssignmentResultCsvNumber(storedAttempt?.maxScore, { min: 0 }),
+      formatAssignmentResultCsvNumber(attempt.accuracy, { min: 0 }),
+      formatAssignmentResultCsvNumber(
         storedAttempt?.resultJson?.completedItemCount,
         {
           min: 0,
@@ -138,11 +141,15 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
       ),
       runtimeItemCount,
       attemptDurationSeconds ?? '',
-      formatAssignmentExportNumber(studentSummary?.attempts, { min: 0 }),
-      formatAssignmentExportNumber(studentSummary?.latestAccuracy, { min: 0 }),
-      formatAssignmentExportNumber(studentSummary?.averageAccuracy, { min: 0 }),
-      formatAssignmentExportNumber(studentSummary?.bestAccuracy, { min: 0 }),
-      formatAssignmentExportNumber(studentSummary?.needsReviewCount, {
+      formatAssignmentResultCsvNumber(studentSummary?.attempts, { min: 0 }),
+      formatAssignmentResultCsvNumber(studentSummary?.latestAccuracy, {
+        min: 0,
+      }),
+      formatAssignmentResultCsvNumber(studentSummary?.averageAccuracy, {
+        min: 0,
+      }),
+      formatAssignmentResultCsvNumber(studentSummary?.bestAccuracy, { min: 0 }),
+      formatAssignmentResultCsvNumber(studentSummary?.needsReviewCount, {
         min: 0,
       }),
     ];
@@ -254,23 +261,6 @@ function formatAssignmentExportStatusLabel({
 
 function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
   return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
-}
-
-function formatAssignmentExportNumber(
-  value: number | null | undefined,
-  options?: {
-    min?: number;
-    round?: boolean;
-  }
-) {
-  if (value === null || value === undefined || !Number.isFinite(value)) {
-    return '';
-  }
-
-  const normalizedValue =
-    options?.min === undefined ? value : Math.max(options.min, value);
-
-  return options?.round ? Math.round(normalizedValue) : normalizedValue;
 }
 
 function rowsToCsv(rows: readonly (readonly unknown[])[]) {
