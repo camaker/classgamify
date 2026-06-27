@@ -1,5 +1,8 @@
 import { evaluateRuntimeAnswers } from '@/activities/runtime';
-import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
+import {
+  buildActivityAssignmentSourceSelect,
+  buildActivityDetailOwnerWhere,
+} from '@/activities/detail-query';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
 import {
@@ -236,7 +239,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const { userId } = context;
     const db = getDb();
     const [sourceActivity] = await db
-      .select()
+      .select(buildActivityAssignmentSourceSelect())
       .from(activity)
       .where(
         buildActivityDetailOwnerWhere({

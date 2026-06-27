@@ -47,7 +47,11 @@ import {
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
-import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
+import {
+  buildActivityAssignmentSourceSelect,
+  buildActivityDetailOwnerWhere,
+  buildActivityDetailSelect,
+} from '@/activities/detail-query';
 import {
   buildCreatedActivityListItemSelect,
   filterActivityLibrarySourceItems,
@@ -12114,6 +12118,10 @@ const activityLibraryQuerySource = readFileSync(
   'src/activities/library-query.ts',
   'utf8'
 );
+const activityDetailQuerySource = readFileSync(
+  'src/activities/detail-query.ts',
+  'utf8'
+);
 const activityPersistenceSource = readFileSync(
   'src/activities/persistence.ts',
   'utf8'
@@ -12198,6 +12206,14 @@ assert.doesNotMatch(
   activitiesApiSource,
   /createdActivity[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*title: activity\.title[\s\S]*visibility: activity\.visibility/,
   'Activity list API should not hand-write created-activity panel select fields.'
+);
+assert.equal(typeof buildActivityDetailSelect, 'function');
+assert.equal(typeof buildActivityAssignmentSourceSelect, 'function');
+assert.equal(typeof buildActivityDetailOwnerWhere, 'function');
+assert.match(
+  activityDetailQuerySource,
+  /buildActivityDetailSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*ownerId: activity\.ownerId[\s\S]*updatedAt: activity\.updatedAt[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityAssignmentSourceSelect[\s\S]*contentJson: activity\.contentJson[\s\S]*id: activity\.id[\s\S]*templateType: activity\.templateType[\s\S]*visibility: activity\.visibility[\s\S]*buildActivityDetailOwnerWhere[\s\S]*eq\(activity\.id, activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
+  'Activity detail owner filters and source/detail select shapes should live in the activity detail query domain.'
 );
 assert.match(
   activitiesApiSource,
@@ -12727,8 +12743,8 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const publishAssignment[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
-  'Publish assignment API should load the source activity through the shared activity detail owner query helper.'
+  /export const publishAssignment[\s\S]*\.select\(buildActivityAssignmentSourceSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Publish assignment API should load the source activity through shared activity detail query helpers.'
 );
 assert.match(
   assignmentsApiSource,
@@ -12737,8 +12753,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /publishAssignment[\s\S]*eq\(activity\.id, data\.activityId\)[\s\S]*eq\(activity\.ownerId, userId\)|publishAssignment[\s\S]*\.where\(eq\(assignment\.id, id\)\)/,
-  'Publish assignment API should not keep local activity owner lookup rules.'
+  /publishAssignment[\s\S]*const \[sourceActivity\] = await db[\s\S]*\.select\(\)[\s\S]*\.from\(activity\)|publishAssignment[\s\S]*eq\(activity\.id, data\.activityId\)[\s\S]*eq\(activity\.ownerId, userId\)|publishAssignment[\s\S]*\.where\(eq\(assignment\.id, id\)\)/,
+  'Publish assignment API should not keep local activity source select or owner lookup rules.'
 );
 assert.match(
   assignmentsApiSource,
