@@ -651,7 +651,10 @@ import {
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
 import {
+  buildAssignmentAttemptStatsByAssignmentSelect,
+  buildAssignmentAttemptStatsSelect,
   buildAssignmentAttemptsInWhere,
+  buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
   buildScoredAnonymousAssignmentAttemptWhere,
   buildScoredAssignmentAttemptWhere,
@@ -12282,6 +12285,10 @@ const assignmentDetailQuerySource = readFileSync(
   'src/assignments/detail-query.ts',
   'utf8'
 );
+const assignmentAttemptQuerySource = readFileSync(
+  'src/assignments/attempt-query.ts',
+  'utf8'
+);
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -12394,12 +12401,12 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /const summaryAttempts = await db[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)/,
+  /const summaryAttempts = await db[\s\S]*\.select\(buildAssignmentAttemptStatsSelect\(\)\)[\s\S]*\.innerJoin\(assignment, buildAttemptAssignmentJoin\(\)\)[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)/,
   'Assignment list summaries should only read completed attempts with scored results.'
 );
 assert.match(
   assignmentsApiSource,
-  /const itemAttempts =[\s\S]*buildScoredAttemptWhere\([\s\S]*buildAssignmentAttemptsInWhere\(\{[\s\S]*assignmentIds: itemAssignmentIds/,
+  /const itemAttempts =[\s\S]*\.select\(buildAssignmentAttemptStatsByAssignmentSelect\(\)\)[\s\S]*\.innerJoin\(assignment, buildAttemptAssignmentJoin\(\)\)[\s\S]*buildScoredAttemptWhere\([\s\S]*buildAssignmentAttemptsInWhere\(\{[\s\S]*assignmentIds: itemAssignmentIds/,
   'Assignment list card stats should only read completed attempts with scored results.'
 );
 const assignmentLifecycleQuerySource = readFileSync(
@@ -12816,19 +12823,22 @@ assert.doesNotMatch(
   'Assignment API should not hand-write assignment detail joins or detail select shape.'
 );
 assert.equal(typeof buildScoredAttemptWhere, 'function');
+assert.equal(typeof buildAssignmentAttemptStatsSelect, 'function');
+assert.equal(typeof buildAssignmentAttemptStatsByAssignmentSelect, 'function');
+assert.equal(typeof buildAttemptAssignmentJoin, 'function');
 assert.equal(typeof buildAssignmentAttemptsInWhere, 'function');
 assert.equal(typeof buildAttemptCompletedAtOrderBy, 'function');
 assert.equal(typeof buildScoredAnonymousAssignmentAttemptWhere, 'function');
 assert.equal(typeof buildScoredAssignmentAttemptWhere, 'function');
 assert.match(
-  readFileSync('src/assignments/attempt-query.ts', 'utf8'),
-  /buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)/,
-  'Assignment scored-attempt SQL filtering should live in an assignment-domain query helper.'
+  assignmentAttemptQuerySource,
+  /buildAssignmentAttemptStatsSelect[\s\S]*resultJson: attempt\.resultJson[\s\S]*settingsJson: assignment\.settingsJson[\s\S]*buildAssignmentAttemptStatsByAssignmentSelect[\s\S]*assignmentId: attempt\.assignmentId[\s\S]*buildAttemptAssignmentJoin[\s\S]*eq\(attempt\.assignmentId, assignment\.id\)[\s\S]*buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)/,
+  'Assignment scored-attempt SQL filtering and stats select shape should live in assignment-domain query helpers.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /isNotNull\(attempt\.resultJson\)|desc\(assignment\.updatedAt\)|desc\(attempt\.completedAt\)|inArray\(attempt\.assignmentId, itemAssignmentIds\)/,
-  'Assignment API should not hand-write scored-attempt result filters or ordering.'
+  /isNotNull\(attempt\.resultJson\)|desc\(assignment\.updatedAt\)|desc\(attempt\.completedAt\)|inArray\(attempt\.assignmentId, itemAssignmentIds\)|settingsJson: assignment\.settingsJson|resultJson: attempt\.resultJson|eq\(attempt\.assignmentId, assignment\.id\)/,
+  'Assignment API should not hand-write scored-attempt filters, ordering, stats selects, or attempt assignment joins.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
 assert.match(

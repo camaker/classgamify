@@ -1,5 +1,23 @@
-import { attempt } from '@/db/app.schema';
+import { assignment, attempt } from '@/db/app.schema';
 import { and, desc, eq, inArray, isNotNull, type SQL } from 'drizzle-orm';
+
+export function buildAssignmentAttemptStatsSelect() {
+  return {
+    resultJson: attempt.resultJson,
+    settingsJson: assignment.settingsJson,
+  };
+}
+
+export function buildAssignmentAttemptStatsByAssignmentSelect() {
+  return {
+    assignmentId: attempt.assignmentId,
+    ...buildAssignmentAttemptStatsSelect(),
+  };
+}
+
+export function buildAttemptAssignmentJoin() {
+  return eq(attempt.assignmentId, assignment.id);
+}
 
 export function buildScoredAttemptWhere(...filters: SQL[]) {
   return and(...filters, isNotNull(attempt.resultJson));

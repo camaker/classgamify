@@ -12,7 +12,10 @@ import {
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
 import {
+  buildAssignmentAttemptStatsByAssignmentSelect,
+  buildAssignmentAttemptStatsSelect,
   buildAssignmentAttemptsInWhere,
+  buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
   buildScoredAnonymousAssignmentAttemptWhere,
   buildScoredAssignmentAttemptWhere,
@@ -92,7 +95,7 @@ import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
 import { m } from '@/locale/paraglide/messages';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { count, eq } from 'drizzle-orm';
+import { count } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
@@ -156,12 +159,9 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where);
     const summaryAttempts = await db
-      .select({
-        resultJson: attempt.resultJson,
-        settingsJson: assignment.settingsJson,
-      })
+      .select(buildAssignmentAttemptStatsSelect())
       .from(attempt)
-      .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
+      .innerJoin(assignment, buildAttemptAssignmentJoin())
       .innerJoin(activity, buildAssignmentActivityJoin())
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(buildScoredAttemptWhere(where));
@@ -199,13 +199,9 @@ export const listAssignments = createServerFn({ method: 'GET' })
     const itemAttempts =
       itemAssignmentIds.length > 0
         ? await db
-            .select({
-              assignmentId: attempt.assignmentId,
-              resultJson: attempt.resultJson,
-              settingsJson: assignment.settingsJson,
-            })
+            .select(buildAssignmentAttemptStatsByAssignmentSelect())
             .from(attempt)
-            .innerJoin(assignment, eq(attempt.assignmentId, assignment.id))
+            .innerJoin(assignment, buildAttemptAssignmentJoin())
             .where(
               buildScoredAttemptWhere(
                 buildAssignmentAttemptsInWhere({
