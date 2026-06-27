@@ -45,6 +45,10 @@ import {
   buildPublicAttemptReviewItems,
 } from '@/assignments/public';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
+import {
+  buildAssignmentDetailOwnerWhere,
+  buildAssignmentDetailShareWhere,
+} from '@/assignments/detail-query';
 import { analyzeAssignmentResults } from '@/assignments/results';
 import {
   ASSIGNMENT_SUBMISSION_ANSWER_LIMITS,
@@ -409,10 +413,10 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
       .where(
-        and(
-          eq(assignment.id, data.assignmentId),
-          eq(assignment.ownerId, userId)
-        )
+        buildAssignmentDetailOwnerWhere({
+          assignmentId: data.assignmentId,
+          userId,
+        })
       )
       .limit(1);
 
@@ -468,10 +472,10 @@ export const getPrintableAssignmentWorksheet = createServerFn({
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
       .where(
-        and(
-          eq(assignment.id, data.assignmentId),
-          eq(assignment.ownerId, userId)
-        )
+        buildAssignmentDetailOwnerWhere({
+          assignmentId: data.assignmentId,
+          userId,
+        })
       )
       .limit(1);
 
@@ -510,7 +514,7 @@ export const getPublicAssignment = createServerFn({ method: 'GET' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(eq(assignment.shareSlug, data.shareSlug))
+      .where(buildAssignmentDetailShareWhere({ shareSlug: data.shareSlug }))
       .limit(1);
 
     if (!row) return null;
@@ -570,7 +574,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         assignmentSnapshot,
         eq(assignmentSnapshot.assignmentId, assignment.id)
       )
-      .where(eq(assignment.shareSlug, data.shareSlug))
+      .where(buildAssignmentDetailShareWhere({ shareSlug: data.shareSlug }))
       .limit(1);
 
     if (!row) {

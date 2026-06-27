@@ -362,6 +362,10 @@ import {
   formatAssignmentItemCount,
 } from '@/assignments/delivery-summary';
 import {
+  buildAssignmentDetailOwnerWhere,
+  buildAssignmentDetailShareWhere,
+} from '@/assignments/detail-query';
+import {
   buildOpenPublicAssignmentPayload,
   buildPublicAssignmentLookupResult,
   buildPublicAssignmentPayload,
@@ -12605,6 +12609,13 @@ assert.match(
   /export const getAssignmentResults[\s\S]*const resolvedSource = resolveAssignmentRuntimeSource\(row\)[\s\S]*runtimeItems: resolvedSource\.runtimeItems/,
   'Assignment results API should analyze attempts against the shared frozen assignment runtime source.'
 );
+assert.equal(typeof buildAssignmentDetailOwnerWhere, 'function');
+assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
+assert.match(
+  assignmentsApiSource,
+  /getAssignmentResults[\s\S]*buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Assignment results API should load teacher-owned assignment details through the assignment detail query helper.'
+);
 assert.match(
   assignmentsApiSource,
   /export const getPrintableAssignmentWorksheet = createServerFn\(\{[\s\S]*method: 'GET'[\s\S]*\}\)[\s\S]*\.middleware\(\[authApiMiddleware\]\)/,
@@ -12612,8 +12623,8 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)/,
-  'Printable worksheet API should stay owner-scoped to the signed-in teacher.'
+  /getPrintableAssignmentWorksheet[\s\S]*buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Printable worksheet API should stay owner-scoped through the assignment detail query helper.'
 );
 assert.match(
   assignmentsApiSource,
@@ -12633,6 +12644,21 @@ assert.match(
   assignmentsPublicSource,
   /buildPublicAssignmentPayload[\s\S]*resolveAssignmentRuntimeSource\(\{[\s\S]*runtimeItems = resolvedSource\.runtimeItems/,
   'Public assignment payloads should build sanitized runtime items from the shared frozen assignment runtime source.'
+);
+assert.match(
+  assignmentsApiSource,
+  /getPublicAssignment[\s\S]*buildAssignmentDetailShareWhere\(\{ shareSlug: data\.shareSlug \}\)/,
+  'Public assignment lookup should load assignment details through the shared share-slug query helper.'
+);
+assert.match(
+  assignmentsApiSource,
+  /submitAttempt[\s\S]*buildAssignmentDetailShareWhere\(\{ shareSlug: data\.shareSlug \}\)/,
+  'Student attempt submission should load assignment details through the shared share-slug query helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
+  'Assignment API should not keep local detail owner/share lookup rules.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');
 assert.match(
