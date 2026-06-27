@@ -12393,6 +12393,16 @@ assert.match(
 );
 assert.match(
   assignmentsApiSource,
+  /export const publishAssignment[\s\S]*buildActivityDetailOwnerWhere\(\{[\s\S]*activityId: data\.activityId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Publish assignment API should load the source activity through the shared activity detail owner query helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /publishAssignment[\s\S]*eq\(activity\.id, data\.activityId\)[\s\S]*eq\(activity\.ownerId, userId\)/,
+  'Publish assignment API should not keep local activity owner lookup rules.'
+);
+assert.match(
+  assignmentsApiSource,
   /export const publishAssignment[\s\S]*await db\.transaction\(async \(tx\) => \{[\s\S]*await tx\.insert\(assignment\)[\s\S]*await tx\.insert\(assignmentSnapshot\)/,
   'Publish assignment API should write the assignment and frozen snapshot atomically.'
 );

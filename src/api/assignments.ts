@@ -1,4 +1,5 @@
 import { evaluateRuntimeAnswers } from '@/activities/runtime';
+import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import { assertActivityCanDeriveWork } from '@/activities/lifecycle';
 import type { AssignmentStatus } from '@/activities/types';
 import {
@@ -264,7 +265,10 @@ export const publishAssignment = createServerFn({ method: 'POST' })
       .select()
       .from(activity)
       .where(
-        and(eq(activity.id, data.activityId), eq(activity.ownerId, userId))
+        buildActivityDetailOwnerWhere({
+          activityId: data.activityId,
+          userId,
+        })
       )
       .limit(1);
 
