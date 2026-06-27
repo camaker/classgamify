@@ -1,4 +1,5 @@
 import { m } from '@/locale/paraglide/messages';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 
 type AssignmentResultPromptLabelInput = {
   index?: number;
@@ -17,10 +18,12 @@ export function formatAssignmentResultPromptLabel({
   itemNumberLabel,
   prompt,
 }: AssignmentResultPromptLabelInput) {
+  const promptText = normalizeRuntimeDisplayText(prompt);
+
   return m.assignment_result_prompt_label({
     itemNumberLabel:
       itemNumberLabel ?? formatAssignmentResultItemNumberLabel(index ?? 0),
-    prompt,
+    prompt: promptText,
   });
 }
 

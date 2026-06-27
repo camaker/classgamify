@@ -2620,6 +2620,16 @@ assert.match(
 );
 assert.match(
   assignmentResultDisplaySource,
+  /formatAssignmentResultPromptLabel[\s\S]*normalizeRuntimeDisplayText\(prompt\)/,
+  'Assignment result prompt labels should normalize prompt display text through the shared runtime helper.'
+);
+assert.doesNotMatch(
+  assignmentResultDisplaySource,
+  /prompt\.trim\(\)/,
+  'Assignment result prompt labels should not use ad hoc trim-only prompt cleanup.'
+);
+assert.match(
+  assignmentResultDisplaySource,
   /formatAssignmentResultFraction[\s\S]*m\.assignment_result_fraction/,
   'Assignment result display helper should own localized fraction formatting.'
 );
@@ -21903,6 +21913,13 @@ assert.equal(
   formatAssignmentResultPromptLabel({
     index: 1,
     prompt: 'Capital of France?',
+  }),
+  '2. Capital of France?'
+);
+assert.equal(
+  formatAssignmentResultPromptLabel({
+    index: 1,
+    prompt: ' Ｃａｐｉｔａｌ\u00A0　of   France? ',
   }),
   '2. Capital of France?'
 );
