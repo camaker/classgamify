@@ -647,6 +647,7 @@ import {
 } from '@/assignments/submission-limits';
 import {
   countMatchingStudentIdentityAttempts,
+  countPreviousIdentityAttempts,
   resolveAttemptIdentityCountStrategy,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
@@ -12317,6 +12318,10 @@ const assignmentAttemptQuerySource = readFileSync(
   'src/assignments/attempt-query.ts',
   'utf8'
 );
+const assignmentAttemptIdentityQuerySource = readFileSync(
+  'src/assignments/attempt-identity-query.ts',
+  'utf8'
+);
 assert.match(
   assignmentsApiSource,
   /default\(ASSIGNMENT_LIST_PAGE_SIZE\)/,
@@ -13042,9 +13047,20 @@ assert.doesNotMatch(
   'AI draft source-term extraction should not keep local phrase or word length limits.'
 );
 assert.match(
-  assignmentsApiSource,
-  /async function countPreviousIdentityAttempts[\s\S]*buildScoredAnonymousAssignmentAttemptWhere\(\{[\s\S]*assignmentId,[\s\S]*buildScoredAssignmentAttemptWhere\(\{ assignmentId \}\)/,
+  assignmentAttemptIdentityQuerySource,
+  /export async function countPreviousIdentityAttempts[\s\S]*db: AssignmentAttemptIdentityDb[\s\S]*buildScoredAnonymousAssignmentAttemptWhere\(\{[\s\S]*assignmentId,[\s\S]*buildScoredAssignmentAttemptWhere\(\{ assignmentId \}\)[\s\S]*countMatchingStudentIdentityAttempts/,
   'Assignment attempt limits should only count completed attempts with scored results.'
+);
+assert.equal(typeof countPreviousIdentityAttempts, 'function');
+assert.match(
+  assignmentsApiSource,
+  /previousAttemptCount = await countPreviousIdentityAttempts\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*db,[\s\S]*studentName: submissionIdentity\.studentName/,
+  'Assignment submission API should delegate previous identity attempt counting to the assignment identity query domain.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /async function countPreviousIdentityAttempts|resolveAttemptIdentityCountStrategy|countMatchingStudentIdentityAttempts/,
+  'Assignment API should not keep local attempt identity count strategy or matching rules.'
 );
 const useAssignmentsHookSource = readFileSync(
   'src/hooks/use-assignments.ts',

@@ -1,5 +1,12 @@
 import type { StudentIdentitySource } from '@/assignments/identity';
 import {
+  buildScoredAnonymousAssignmentAttemptWhere,
+  buildScoredAssignmentAttemptWhere,
+} from '@/assignments/attempt-query';
+import type { getDb } from '@/db';
+import { attempt } from '@/db/app.schema';
+import { count } from 'drizzle-orm';
+import {
   isSameStudentIdentity,
   normalizeAnonymousToken,
   normalizeStudentName,
@@ -21,6 +28,8 @@ type AttemptIdentityCountStrategy =
   | {
       type: 'unknown';
     };
+
+type AssignmentAttemptIdentityDb = ReturnType<typeof getDb>;
 
 export function resolveAttemptIdentityCountStrategy(
   source: StudentIdentitySource
@@ -85,4 +94,50 @@ export function countMatchingStudentIdentityAttempts({
 }) {
   return attempts.filter((attempt) => isSameStudentIdentity(attempt, identity))
     .length;
+}
+
+export async function countPreviousIdentityAttempts({
+  anonymousToken,
+  assignmentId,
+  db,
+  studentName,
+}: StudentIdentitySource & {
+  assignmentId: string;
+  db: AssignmentAttemptIdentityDb;
+}) {
+  const strategy = resolveAttemptIdentityCountStrategy({
+    anonymousToken,
+    studentName,
+  });
+
+  if (strategy.type === 'anonymous-token') {
+    const [row] = await db
+      .select({ count: count() })
+      .from(attempt)
+      .where(
+        buildScoredAnonymousAssignmentAttemptWhere({
+          anonymousToken: strategy.identity.anonymousToken,
+          assignmentId,
+        })
+      );
+
+    return row?.count ?? 0;
+  }
+
+  if (strategy.type === 'normalized-student-name') {
+    const previousAttempts = await db
+      .select({
+        anonymousToken: attempt.anonymousToken,
+        studentName: attempt.studentName,
+      })
+      .from(attempt)
+      .where(buildScoredAssignmentAttemptWhere({ assignmentId }));
+
+    return countMatchingStudentIdentityAttempts({
+      attempts: previousAttempts,
+      identity: strategy.identity,
+    });
+  }
+
+  return 0;
 }

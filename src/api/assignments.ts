@@ -7,8 +7,7 @@ import {
   normalizeSubmittedAttemptAnswers,
 } from '@/assignments/attempt-answers';
 import {
-  countMatchingStudentIdentityAttempts,
-  resolveAttemptIdentityCountStrategy,
+  countPreviousIdentityAttempts,
   resolveAttemptSubmissionIdentity,
 } from '@/assignments/attempt-identity-query';
 import {
@@ -17,7 +16,6 @@ import {
   buildAssignmentAttemptsInWhere,
   buildAttemptAssignmentJoin,
   buildAttemptCompletedAtOrderBy,
-  buildScoredAnonymousAssignmentAttemptWhere,
   buildScoredAssignmentAttemptWhere,
   buildScoredAttemptWhere,
 } from '@/assignments/attempt-query';
@@ -546,6 +544,7 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       previousAttemptCount = await countPreviousIdentityAttempts({
         anonymousToken: submissionIdentity.anonymousToken ?? '',
         assignmentId: row.assignment.id,
+        db,
         studentName: submissionIdentity.studentName ?? '',
       });
       if (
@@ -614,50 +613,3 @@ export const submitAttempt = createServerFn({ method: 'POST' })
       result: buildPublicAttemptResult(evaluation.result),
     };
   });
-
-async function countPreviousIdentityAttempts({
-  anonymousToken,
-  assignmentId,
-  studentName,
-}: {
-  anonymousToken: string;
-  assignmentId: string;
-  studentName: string;
-}) {
-  const db = getDb();
-  const strategy = resolveAttemptIdentityCountStrategy({
-    anonymousToken,
-    studentName,
-  });
-
-  if (strategy.type === 'anonymous-token') {
-    const [row] = await db
-      .select({ count: count() })
-      .from(attempt)
-      .where(
-        buildScoredAnonymousAssignmentAttemptWhere({
-          anonymousToken: strategy.identity.anonymousToken,
-          assignmentId,
-        })
-      );
-
-    return row?.count ?? 0;
-  }
-
-  if (strategy.type === 'normalized-student-name') {
-    const previousAttempts = await db
-      .select({
-        anonymousToken: attempt.anonymousToken,
-        studentName: attempt.studentName,
-      })
-      .from(attempt)
-      .where(buildScoredAssignmentAttemptWhere({ assignmentId }));
-
-    return countMatchingStudentIdentityAttempts({
-      attempts: previousAttempts,
-      identity: strategy.identity,
-    });
-  }
-
-  return 0;
-}
