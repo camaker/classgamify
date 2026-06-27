@@ -186,7 +186,7 @@ export function UserDetailViewer({ user }: UserDetailViewerProps) {
               <span>
                 {toDate(user.createdAt)
                   ? formatDate(toDate(user.createdAt)!)
-                  : '-'}
+                  : m.common_empty_value()}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export function UserDetailViewer({ user }: UserDetailViewerProps) {
               <span>
                 {toDate(user.updatedAt)
                   ? formatDate(toDate(user.updatedAt)!)
-                  : '-'}
+                  : m.common_empty_value()}
               </span>
             </div>
           </div>

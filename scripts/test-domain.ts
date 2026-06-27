@@ -1068,7 +1068,36 @@ const adminUserDetailViewerSource = readFileSync(
   'src/components/admin/users/user-detail-viewer.tsx',
   'utf8'
 );
+const adminUsersTableSource = readFileSync(
+  'src/components/admin/users/users-table.tsx',
+  'utf8'
+);
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
+assert.match(
+  adminUsersTableSource,
+  /banReason \?\? m\.common_empty_value\(\)/,
+  'Admin users table should render missing ban reasons through localized empty-value copy.'
+);
+assert.match(
+  adminUsersTableSource,
+  /formatDate\(new Date\(exp\)\) : m\.common_empty_value\(\)/,
+  'Admin users table should render missing ban expiry dates through localized empty-value copy.'
+);
+assert.match(
+  adminUserDetailViewerSource,
+  /formatDate\(toDate\(user\.createdAt\)!\)[\s\S]*: m\.common_empty_value\(\)/,
+  'Admin user details should render missing joined dates through localized empty-value copy.'
+);
+assert.match(
+  adminUserDetailViewerSource,
+  /formatDate\(toDate\(user\.updatedAt\)!\)[\s\S]*: m\.common_empty_value\(\)/,
+  'Admin user details should render missing updated dates through localized empty-value copy.'
+);
+assert.doesNotMatch(
+  `${adminUsersTableSource}\n${adminUserDetailViewerSource}`,
+  /\?\? '-'|: '-'|>\s*-\s*</,
+  'Admin user surfaces should not hard-code visible empty-value placeholders.'
+);
 assert.doesNotMatch(
   adminUserDetailViewerSource,
   /User ID is required/,

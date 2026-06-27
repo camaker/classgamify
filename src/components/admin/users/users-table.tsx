@@ -261,7 +261,7 @@ export function UsersTable({
         ),
         cell: ({ row }) => (
           <span className="text-muted-foreground">
-            {row.original.banReason ?? '-'}
+            {row.original.banReason ?? m.common_empty_value()}
           </span>
         ),
         meta: { label: m.admin_users_columns_ban_reason() },
@@ -283,7 +283,7 @@ export function UsersTable({
           const exp = row.original.banExpires;
           return (
             <span className="text-muted-foreground">
-              {exp ? formatDate(new Date(exp)) : '-'}
+              {exp ? formatDate(new Date(exp)) : m.common_empty_value()}
             </span>
           );
         },
