@@ -1,4 +1,5 @@
 import type { AssignmentItemAnalysis } from '@/assignments/results';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 
 export function compareAssignmentItemsByReviewPriority(
   left: AssignmentItemAnalysis,
@@ -32,13 +33,16 @@ export function compareAssignmentItemsByType(
   left: AssignmentItemAnalysis,
   right: AssignmentItemAnalysis
 ) {
-  const kindCompare = left.kind.localeCompare(right.kind);
+  const kindCompare = compareAssignmentItemSortText(left.kind, right.kind);
   if (kindCompare !== 0) return kindCompare;
 
-  const promptCompare = left.prompt.localeCompare(right.prompt);
+  const promptCompare = compareAssignmentItemSortText(
+    left.prompt,
+    right.prompt
+  );
   if (promptCompare !== 0) return promptCompare;
 
-  return left.itemId.localeCompare(right.itemId);
+  return compareAssignmentItemSortText(left.itemId, right.itemId);
 }
 
 export function sortAssignmentItemsByReviewPriority(
@@ -72,4 +76,10 @@ function normalizeReviewPriorityNumber(value: number) {
 
 function normalizeReviewPriorityCount(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+}
+
+function compareAssignmentItemSortText(left: string, right: string) {
+  return normalizeRuntimeDisplayText(left).localeCompare(
+    normalizeRuntimeDisplayText(right)
+  );
 }

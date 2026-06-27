@@ -1298,6 +1298,10 @@ const assignmentResultFiltersSource = readFileSync(
   'src/assignments/result-filters.ts',
   'utf8'
 );
+const assignmentReviewPrioritySource = readFileSync(
+  'src/assignments/review-priority.ts',
+  'utf8'
+);
 const assignmentStudentFollowUpPrioritySource = readFileSync(
   'src/assignments/student-follow-up-priority.ts',
   'utf8'
@@ -1384,10 +1388,20 @@ assert.match(
   /export function compareAssignmentStudentsByDisplayLabel[\s\S]*normalizeRuntimeDisplayText/,
   'Assignment student follow-up ordering should expose a normalized display-label comparator.'
 );
+assert.match(
+  assignmentReviewPrioritySource,
+  /export function compareAssignmentItemsByType[\s\S]*normalizeRuntimeDisplayText/,
+  'Assignment item review-priority ordering should compare normalized display text.'
+);
 assert.doesNotMatch(
   `${assignmentResultFiltersSource}\n${assignmentStudentFollowUpPrioritySource}`,
   /studentLabel\.localeCompare/,
   'Assignment result student ordering should not compare raw student labels directly.'
+);
+assert.doesNotMatch(
+  assignmentReviewPrioritySource,
+  /\b(?:kind|prompt|itemId)\.localeCompare/,
+  'Assignment item review-priority ordering should not compare raw item text directly.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -22982,6 +22996,44 @@ assert.deepEqual(
   ),
   stableTieItemOrder
 );
+const normalizedTieReviewPriorityItems = [
+  {
+    ...stableTieReviewPriorityItems[0]!,
+    itemId: 'zoo-id',
+    prompt: '　Zoo prompt',
+  },
+  {
+    ...stableTieReviewPriorityItems[1]!,
+    itemId: 'alpha-id',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'Alpha prompt',
+  },
+  {
+    ...stableTieReviewPriorityItems[2]!,
+    itemId: '　z-id',
+  },
+  {
+    ...stableTieReviewPriorityItems[3]!,
+    itemId: 'a-id',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'Same prompt',
+  },
+] satisfies typeof resultAnalysis.perItem;
+const normalizedTieItemOrder = ['alpha-id', 'a-id', '　z-id', 'zoo-id'];
+assert.deepEqual(
+  [...normalizedTieReviewPriorityItems]
+    .sort(compareAssignmentItemsByType)
+    .map((item) => item.itemId),
+  normalizedTieItemOrder
+);
+assert.deepEqual(
+  sortAssignmentItemsByReviewPriority(normalizedTieReviewPriorityItems).map(
+    (item) => item.itemId
+  ),
+  normalizedTieItemOrder
+);
 assert.deepEqual(
   getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {
     limit: 2,
@@ -23049,6 +23101,18 @@ assert.deepEqual(
     (item) => item.itemId
   ),
   stableTieItemOrder
+);
+assert.deepEqual(
+  sortItemPerformance(normalizedTieReviewPriorityItems, 'submitted').map(
+    (item) => item.itemId
+  ),
+  normalizedTieItemOrder
+);
+assert.deepEqual(
+  sortItemPerformance(normalizedTieReviewPriorityItems, 'type').map(
+    (item) => item.itemId
+  ),
+  normalizedTieItemOrder
 );
 assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'original').map(
