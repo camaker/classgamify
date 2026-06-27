@@ -1,4 +1,5 @@
 import { getUniqueAcceptedAnswers } from '@/activities/answer-matching';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
 
 type ResultDateValue = Date | string | null | undefined;
@@ -118,7 +119,7 @@ export function formatAssignmentResultValue(
     emptyValue?: string;
   }
 ) {
-  const normalizedValue = value?.trim();
+  const normalizedValue = normalizeRuntimeDisplayText(value);
   return (
     normalizedValue || (options?.emptyValue ?? getAssignmentResultEmptyValue())
   );

@@ -2520,10 +2520,20 @@ assert.match(
   /getAssignmentResultEmptyValue[\s\S]*assignment_result_empty_value/,
   'Assignment result formatting should use the localized empty-value placeholder by default.'
 );
+assert.match(
+  assignmentResultFormatSource,
+  /formatAssignmentResultValue[\s\S]*normalizeRuntimeDisplayText\(value\)/,
+  'Assignment result text values should normalize whitespace and fullwidth text through the shared runtime display helper.'
+);
 assert.doesNotMatch(
   assignmentResultFormatSource,
   /\?\? '-'/,
   'Assignment result formatting should not hard-code the default empty-value placeholder.'
+);
+assert.doesNotMatch(
+  assignmentResultFormatSource,
+  /value\?\.trim\(\)/,
+  'Assignment result text values should not use trim-only display normalization.'
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
@@ -19372,6 +19382,11 @@ try {
 assert.equal(formatAssignmentResultValue(''), '-');
 assert.equal(formatAssignmentResultValue('   '), '-');
 assert.equal(formatAssignmentResultValue(' Paris '), 'Paris');
+assert.equal(
+  formatAssignmentResultValue(' Ｐａｒｉｓ\u00A0　France '),
+  'Paris France'
+);
+assert.equal(formatAssignmentResultValue('\u00A0　\t'), '-');
 assert.equal(formatAssignmentResultValue(null, { emptyValue: '' }), '');
 assert.equal(formatAssignmentResultValue('', { emptyValue: 'none' }), 'none');
 assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
