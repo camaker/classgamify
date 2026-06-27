@@ -42,7 +42,7 @@ type ExportAttempt = {
   score: number | null;
 };
 
-type AssignmentResultsExportData = {
+export type AssignmentResultsExportData = {
   activity: {
     description: string | null;
     templateType: ActivityTemplateType;
@@ -64,7 +64,7 @@ type AssignmentResultsExportData = {
     templateType: ActivityTemplateType;
   } | null;
   stats: {
-    averageDurationSeconds: number;
+    averageDurationSeconds: number | null | undefined;
     averagePoints: number;
     averageScore: number;
     completions: number;

@@ -1318,6 +1318,14 @@ const assignmentResultsRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
   'utf8'
 );
+const assignmentResultViewActionBoundarySource = readFileSync(
+  'src/assignments/result-view.ts',
+  'utf8'
+);
+const assignmentResultActionsSource = readFileSync(
+  'src/assignments/result-actions.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   assignmentResultsRouteSource,
   /error\.message|error instanceof Error/,
@@ -1342,6 +1350,36 @@ assert.doesNotMatch(
   assignmentResultsRouteSource,
   /classroomBriefText|items: data\.analysis\.perItem|students: data\.analysis\.students|assignmentTitle: data\.assignment\.title|exportData: data/,
   'Result route should not hand-wire individual result artifact inputs.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /export type AssignmentResultActionData = AssignmentResultsExportData/,
+  'Assignment result actions should share the CSV export data contract.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultCopyText[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
+  'Assignment result actions should own teacher copy artifact construction.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionPayload[\s\S]*buildAssignmentResultsCsv\(data\)[\s\S]*buildAssignmentResultsCsvFilename\(data\)/,
+  'Assignment result actions should own CSV action payload construction.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionExecutionPlan[\s\S]*buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
+  'Assignment result actions should own CSV download execution plans.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /from '@\/assignments\/result-actions'/,
+  'Assignment result page view-model should consume result actions from the dedicated domain module.'
+);
+assert.doesNotMatch(
+  assignmentResultViewActionBoundarySource,
+  /buildAssignmentResultsCsv\(|buildAssignmentResultsCsvDataUrl\(|buildAssignmentResultsCsvFilename\(|buildAssignmentItemReviewSummary\(|buildAssignmentReteachPlan\(|buildAssignmentStudentFollowUpSummary\(/,
+  'Assignment result page view-model should not rebuild result action artifacts.'
 );
 const assignmentClassroomBriefSource = readFileSync(
   'src/assignments/classroom-brief.ts',
@@ -1507,8 +1545,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /assignmentTitle: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)/,
-  'Assignment result views and copy artifacts should normalize assignment titles through the shared assignment display helper.'
+  /assignmentTitle: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  'Assignment result views should normalize visible assignment titles through the shared assignment display helper.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)/,
+  'Assignment result action copy artifacts should normalize assignment titles through the shared assignment display helper.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -1531,7 +1574,7 @@ assert.doesNotMatch(
   'Assignment result control options should not bind labels to enum values by array index.'
 );
 assert.match(
-  assignmentResultViewSource,
+  assignmentResultActionsSource,
   /buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
   'Assignment result action plans should use the result-export CSV data URL helper.'
 );
@@ -21650,6 +21693,7 @@ const scoredResultsPageView = buildAssignmentResultsPageViewModel({
     analysis: resultAnalysisWithUnscoredAttempt,
     assignment: {
       expiresAt: null,
+      id: 'assignment-results-page',
       settingsJson: {
         timeLimitSeconds: 60,
       },
