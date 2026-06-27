@@ -12664,6 +12664,11 @@ assert.equal(typeof buildAssignmentDetailOwnerWhere, 'function');
 assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
 assert.match(
   assignmentsApiSource,
+  /updateAssignmentStatus[\s\S]*const where = buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
+  'Assignment status updates should load owner-scoped assignment details through the assignment detail query helper.'
+);
+assert.match(
+  assignmentsApiSource,
   /getAssignmentResults[\s\S]*buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
   'Assignment results API should load teacher-owned assignment details through the assignment detail query helper.'
 );
@@ -12708,7 +12713,7 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
+  /updateAssignmentStatus[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
   'Assignment API should not keep local detail owner/share lookup rules.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');

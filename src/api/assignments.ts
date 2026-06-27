@@ -337,10 +337,10 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const db = getDb();
-    const where = and(
-      eq(assignment.id, data.assignmentId),
-      eq(assignment.ownerId, userId)
-    );
+    const where = buildAssignmentDetailOwnerWhere({
+      assignmentId: data.assignmentId,
+      userId,
+    });
     const [existingAssignment] = await db
       .select({
         expiresAt: assignment.expiresAt,
