@@ -21,10 +21,10 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import {
+  buildStudentAttemptAnswerStateByItemId,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
   getStudentRunnerCopy,
-  isStudentAnswerFilled,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
 import { m } from '@/locale/paraglide/messages';
@@ -204,15 +204,20 @@ export function buildStudentRunnerView({
     answers,
     runtimeItems: items,
   });
+  const answerStateByItemId = buildStudentAttemptAnswerStateByItemId({
+    answers,
+    runtimeItems: items,
+  });
   const reviewByItemId = buildPublicAttemptReviewItemMap(reviewItems);
   const itemViews = items.map((item, index) => {
-    const answer = answers[item.id] ?? '';
+    const answerState = answerStateByItemId.get(item.id);
+    const answer = answerState?.answer ?? '';
     const reviewItem = reviewByItemId.get(item.id);
     const prompt = formatRuntimeItemPrompt(item);
 
     return {
       answer,
-      answered: isStudentAnswerFilled(answer),
+      answered: Boolean(answerState?.answered),
       item,
       kindLabel: formatRuntimeItemKindLabel(item),
       positionLabel: m.student_runner_item_position_label({

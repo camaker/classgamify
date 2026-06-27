@@ -587,6 +587,7 @@ import {
   buildAttemptCompletionCopy,
   buildAnonymousAttemptCopy,
   buildAttemptSubmissionAnswers,
+  buildStudentAttemptAnswerStateByItemId,
   buildStudentAttemptControlState,
   buildStudentAnswerChange,
   buildStudentAttemptResultDisplay,
@@ -3625,10 +3626,25 @@ assert.match(
   /m\.student_attempt_progress_label/,
   'Student attempt progress labels should come from localized message formatting.'
 );
+assert.match(
+  studentRunnerSubmissionSource,
+  /export function buildStudentAttemptAnswerStateByItemId/,
+  'Student submission domain should expose runtime answer state for runner views.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /buildStudentAttemptAnswerStateByItemId\(\{[\s\S]*answers,[\s\S]*runtimeItems: items/,
+  'Student runner view should derive answer display state from submission-domain runtime item parsing.'
+);
 assert.doesNotMatch(
   studentRunnerSubmissionSource,
   /`\$\{formatAssignmentResultPercent\(accuracy\)\}|\$\{normalizedEarnedPoints\}\/\$\{normalizedTotalPoints\}|`\$\{answeredItemCount\}\/\$\{itemCount\}/,
   'Student submission display should not hand-compose visible progress, score, or accuracy lines.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource,
+  /answers\[item\.id\][\s\S]*isStudentAnswerFilled\(answer\)/,
+  'Student runner view should not derive answered state directly from raw item ids.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -3893,6 +3909,19 @@ assert.equal(isStudentAnswerFilled(undefined), false);
 assert.equal(isStudentAnswerFilled('   '), false);
 assert.equal(isStudentAnswerFilled(' answer '), true);
 assert.equal(isStudentAnswerFilled(' Ａ '), true);
+const normalizedRuntimeAnswerState = buildStudentAttemptAnswerStateByItemId({
+  answers: { Ａ: '  fullwidth answer  ' },
+  runtimeItems: [{ id: 'A' }, { id: 'Ａ' }],
+});
+assert.deepEqual(normalizedRuntimeAnswerState.get('A'), {
+  answer: 'fullwidth answer',
+  answered: true,
+  itemId: 'A',
+});
+assert.equal(
+  normalizedRuntimeAnswerState.get('Ａ')?.answer,
+  'fullwidth answer'
+);
 assert.equal(
   buildAnonymousAttemptTokenStorageKey('share/one'),
   'classgamify:attempt-token:share/one'

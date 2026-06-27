@@ -31,6 +31,12 @@ export type StudentSubmissionAnswer = {
   itemId: string;
 };
 
+export type StudentAttemptAnswerState = {
+  answer: string;
+  answered: boolean;
+  itemId: string;
+};
+
 export type StudentAttemptSubmissionInput = {
   anonymousToken?: string;
   answers: StudentSubmissionAnswer[];
@@ -527,6 +533,34 @@ function getUniqueSubmissionRuntimeItemIds(
   return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map(
     (entry) => entry.itemId
   );
+}
+
+export function buildStudentAttemptAnswerStateByItemId({
+  answers,
+  runtimeItems,
+}: {
+  answers: StudentAnswerMap;
+  runtimeItems: StudentSubmissionRuntimeItem[];
+}) {
+  const stateByItemId = new Map<string, StudentAttemptAnswerState>();
+
+  for (const entry of getUniqueSubmissionRuntimeItemEntries(runtimeItems)) {
+    const answer = normalizeSubmissionAnswer(
+      getSubmissionEntryAnswer(entry, answers)
+    );
+    const state = {
+      answer,
+      answered: isStudentAnswerFilled(answer),
+      itemId: entry.itemId,
+    };
+
+    stateByItemId.set(entry.itemId, state);
+    for (const originalId of entry.originalIds) {
+      stateByItemId.set(originalId, state);
+    }
+  }
+
+  return stateByItemId;
 }
 
 function normalizeSubmissionItemId(value: string | undefined) {
