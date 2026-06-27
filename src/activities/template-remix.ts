@@ -1,4 +1,5 @@
 import { getActivityTemplates } from '@/activities/catalog';
+import { hasRuntimeDisplayText } from '@/activities/runtime-display';
 import type {
   ActivityContent,
   ActivityTemplateContentRequirement,
@@ -151,24 +152,29 @@ function hasTemplateRequirementContent(
   switch (requirement) {
     case 'groups':
       return content.groups.some(
-        (group) => group.label.trim() && group.items.some((item) => item.trim())
+        (group) =>
+          hasRuntimeDisplayText(group.label) &&
+          group.items.some(hasRuntimeDisplayText)
       );
     case 'pairs':
       return content.pairs.some(
-        (pair) => pair.left.trim() && pair.right.trim()
+        (pair) =>
+          hasRuntimeDisplayText(pair.left) && hasRuntimeDisplayText(pair.right)
       );
     case 'questions':
       return content.questions.some(
-        (question) => question.prompt.trim() && question.answer.trim()
+        (question) =>
+          hasRuntimeDisplayText(question.prompt) &&
+          hasRuntimeDisplayText(question.answer)
       );
     case 'teacherNotes':
-      return content.teacherNotes.some((note) => note.trim());
+      return content.teacherNotes.some(hasRuntimeDisplayText);
     case 'vocabulary':
-      return content.vocabulary.some((word) => word.trim());
+      return content.vocabulary.some(hasRuntimeDisplayText);
     case 'gradeBand':
     case 'learningGoal':
     case 'sourceSummary':
-      return Boolean(content[requirement].trim());
+      return hasRuntimeDisplayText(content[requirement]);
   }
 }
 

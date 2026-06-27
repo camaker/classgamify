@@ -1073,6 +1073,10 @@ assert.match(
   'Client auth hook account fetch errors should use localized security copy.'
 );
 const activityRuntimeSource = readFileSync('src/activities/runtime.ts', 'utf8');
+const activityTemplateRemixSource = readFileSync(
+  'src/activities/template-remix.ts',
+  'utf8'
+);
 assert.match(
   activityRuntimeSource,
   /normalizeRuntimeDisplayText\(answer\.answer\)/,
@@ -1102,6 +1106,26 @@ assert.doesNotMatch(
   activityRuntimeSource,
   /answer\.answer\.trim\(\)|scoredAnswers\.filter\(\(answer\) => answer\.answer\)|left\.trim\(\)|right\.trim\(\)|prompt\.trim\(\)|answer\.trim\(\)|item\.trim\(\)|label\.trim\(\)/,
   'Runtime evaluation and content filtering should not use ad hoc trim-only answer or runtime item checks.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /hasRuntimeDisplayText\(group\.label\)[\s\S]*group\.items\.some\(hasRuntimeDisplayText\)/,
+  'Template remix group readiness should use the shared runtime display-text helper.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /hasRuntimeDisplayText\(pair\.left\)[\s\S]*hasRuntimeDisplayText\(pair\.right\)/,
+  'Template remix pair readiness should use the shared runtime display-text helper.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /hasRuntimeDisplayText\(question\.prompt\)[\s\S]*hasRuntimeDisplayText\(question\.answer\)/,
+  'Template remix question readiness should use the shared runtime display-text helper.'
+);
+assert.doesNotMatch(
+  activityTemplateRemixSource,
+  /\.trim\(\)/,
+  'Template remix readiness should not use ad hoc trim-only content checks.'
 );
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
@@ -15840,14 +15864,14 @@ const questionOnlyRemixPlan = getTemplateRemixPlan({
 const blankStructuredRemixPlan = getTemplateRemixPlan({
   content: {
     ...questionOnlyContent,
-    gradeBand: '   ',
-    groups: [{ id: 'g-blank', items: ['   '], label: '   ' }],
-    learningGoal: '   ',
-    pairs: [{ id: 'p-blank', left: '   ', right: '   ' }],
-    questions: [{ answer: '   ', id: 'q-blank', prompt: '   ' }],
-    sourceSummary: '   ',
-    teacherNotes: ['   '],
-    vocabulary: ['   '],
+    gradeBand: '\u00A0　\t',
+    groups: [{ id: 'g-blank', items: ['\u00A0　\t'], label: '\u00A0　\t' }],
+    learningGoal: '\u00A0　\t',
+    pairs: [{ id: 'p-blank', left: '\u00A0　\t', right: '\u00A0　\t' }],
+    questions: [{ answer: '\u00A0　\t', id: 'q-blank', prompt: '\u00A0　\t' }],
+    sourceSummary: '\u00A0　\t',
+    teacherNotes: ['\u00A0　\t'],
+    vocabulary: ['\u00A0　\t'],
   },
   currentTemplateType: 'quiz',
 });
