@@ -183,6 +183,10 @@ export function buildAssignmentResultsCsvFilename(
   return m.assignment_results_export_filename({ shareSlug, title });
 }
 
+export function buildAssignmentResultsCsvDataUrl(csv: string) {
+  return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+}
+
 function getAssignmentResultsExportColumns() {
   return [
     m.assignment_results_export_column_assignment_id(),

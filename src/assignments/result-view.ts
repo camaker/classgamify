@@ -9,6 +9,7 @@ import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import {
   buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
@@ -1022,10 +1023,6 @@ export function buildAssignmentResultActionExecutionPlan({
     text: payload.text,
     type: 'copy-text',
   };
-}
-
-export function buildAssignmentResultsCsvDataUrl(csv: string) {
-  return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
 }
 
 export function buildAssignmentResultSectionState({

@@ -430,7 +430,6 @@ import {
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
-  buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsPageViewModel,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentStudentSummaryRowViews,
@@ -509,6 +508,7 @@ import {
 import {
   ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
   buildAssignmentResultsCsv,
+  buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsCsvFilename,
 } from '@/assignments/results-export';
 import {
@@ -1165,6 +1165,16 @@ assert.match(
   assignmentResultViewSource,
   /buildAssignmentAttemptStatsView\(\{[\s\S]*averageDurationSeconds[\s\S]*completions[\s\S]*\}\)/,
   'Assignment result metrics should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
+  'Assignment result action plans should use the result-export CSV data URL helper.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /data:text\/csv|encodeURIComponent\(/,
+  'Assignment result view should not hand-compose CSV data URLs.'
 );
 assert.match(
   assignmentListSummarySource,
