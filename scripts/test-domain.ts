@@ -4163,8 +4163,13 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /applyStudentAnswerChanges[\s\S]*const nextAnswers = \{ \.\.\.answers \}[\s\S]*nextAnswers\[change\.itemId\] = change\.answer/,
-  'Student submission domain should apply answer changes without mutating current browser answers.'
+  /applyStudentAnswerChanges[\s\S]*const nextAnswers = \{ \.\.\.answers \}[\s\S]*const itemId = normalizeSubmissionItemId\(change\.itemId\)[\s\S]*nextAnswers\[itemId\] = change\.answer/,
+  'Student submission domain should normalize changed item ids without mutating current browser answers.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildStudentAnswerChanges[\s\S]*const normalizedItemId = normalizeSubmissionItemId\(itemId\)[\s\S]*itemId: normalizedItemId/,
+  'Student answer-change creation should normalize item ids through the submission item-id helper.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -5943,7 +5948,15 @@ assert.deepEqual(answers, {
 assert.deepEqual(buildStudentAnswerChanges({ answer: 'pear', itemId: 'q-1' }), [
   { answer: 'pear', itemId: 'q-1' },
 ]);
+assert.deepEqual(
+  buildStudentAnswerChanges({ answer: 'pear', itemId: ' Ｑ－１ ' }),
+  [{ answer: 'pear', itemId: 'Q-1' }]
+);
 assert.deepEqual(buildStudentAnswerChanges({ answer: 'pear', itemId: '' }), []);
+assert.deepEqual(
+  buildStudentAnswerChanges({ answer: 'pear', itemId: '\u00A0　\t' }),
+  []
+);
 const batchChangedAnswers = applyStudentAnswerChanges({
   answers,
   changes: [
@@ -5961,6 +5974,18 @@ assert.deepEqual(answers, {
   'item-1': ' apple ',
   'item-2': '   ',
 });
+assert.deepEqual(
+  applyStudentAnswerChanges({
+    answers: {},
+    changes: [
+      { answer: 'apple', itemId: ' ｉｔｅｍ－１ ' },
+      { answer: 'ignored', itemId: '\u00A0　\t' },
+    ],
+  }),
+  {
+    'item-1': 'apple',
+  }
+);
 assert.deepEqual(
   buildStudentAttemptResultDisplay({
     accuracy: 66.6,

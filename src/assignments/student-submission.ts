@@ -734,8 +734,9 @@ export function applyStudentAnswerChanges({
   const nextAnswers = { ...answers };
 
   for (const change of changes) {
-    if (!change.itemId) continue;
-    nextAnswers[change.itemId] = change.answer;
+    const itemId = normalizeSubmissionItemId(change.itemId);
+    if (!itemId) continue;
+    nextAnswers[itemId] = change.answer;
   }
 
   return nextAnswers;
@@ -748,9 +749,10 @@ export function buildStudentAnswerChanges({
   answer: string;
   itemId: string;
 }): StudentAnswerChange[] {
-  if (!itemId) return [];
+  const normalizedItemId = normalizeSubmissionItemId(itemId);
+  if (!normalizedItemId) return [];
 
-  return [{ answer, itemId }];
+  return [{ answer, itemId: normalizedItemId }];
 }
 
 export function buildStudentAttemptSubmissionInput({
