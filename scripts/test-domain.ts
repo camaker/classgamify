@@ -11,6 +11,12 @@ import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
 import { formatUserFileUploadError } from '@/api/user-file-errors';
 import {
+  ADMIN_USER_LIST_INPUT_LIMITS,
+  ADMIN_USER_STATUS_FILTERS,
+  getAdminUserListOffset,
+  normalizeAdminUserSortId,
+} from '@/admin/users-query';
+import {
   getUserFileListOffset,
   USER_FILE_LIST_INPUT_LIMITS,
   USER_FILE_MATERIAL_PICKER_PAGE_SIZE,
@@ -1102,6 +1108,49 @@ assert.match(
   useAuthSource,
   /settings_security_user_accounts_fetch_error/,
   'Client auth hook account fetch errors should use localized security copy.'
+);
+const adminUsersApiSource = readFileSync('src/api/users.ts', 'utf8');
+const adminUsersQuerySource = readFileSync('src/admin/users-query.ts', 'utf8');
+assert.deepEqual(ADMIN_USER_LIST_INPUT_LIMITS, {
+  pageSizeMax: 100,
+  pageSizeMin: 1,
+});
+assert.deepEqual(ADMIN_USER_STATUS_FILTERS, ['active', 'inactive']);
+assert.equal(normalizeAdminUserSortId('name'), 'name');
+assert.equal(normalizeAdminUserSortId('EMAIL'), 'email');
+assert.equal(normalizeAdminUserSortId('updatedAt'), 'createdAt');
+assert.equal(getAdminUserListOffset({ pageIndex: 2, pageSize: 25 }), 50);
+assert.equal(getAdminUserListOffset({ pageIndex: -1, pageSize: 25 }), 0);
+assert.equal(getAdminUserListOffset({ pageIndex: 2, pageSize: 0 }), 2);
+assert.match(
+  adminUsersApiSource,
+  /ADMIN_USER_LIST_INPUT_LIMITS[\s\S]*ADMIN_USER_STATUS_FILTERS/,
+  'Admin users API should reuse admin-domain input limits and status filters.'
+);
+assert.match(
+  adminUsersApiSource,
+  /buildAdminUserListWhere\(\{ role, search, status \}\)/,
+  'Admin users API should delegate search, role, and status filtering to the admin query domain.'
+);
+assert.match(
+  adminUsersApiSource,
+  /orderBy\(buildAdminUserListOrderBy\(\{ sortDesc, sortId: data\.sortId \}\)\)/,
+  'Admin users API should delegate ordering to the admin query domain.'
+);
+assert.match(
+  adminUsersApiSource,
+  /offset\(getAdminUserListOffset\(\{ pageIndex, pageSize \}\)\)/,
+  'Admin users API should delegate pagination offset to the admin query domain.'
+);
+assert.doesNotMatch(
+  adminUsersApiSource,
+  /pageIndex \* pageSize|SORT_FIELD_MAP|normalizeSortId|replace\([^)]*%|lower\(\$\{user\.(?:name|email)\}\)|eq\(user\.banned|isNull\(user\.banned\)/,
+  'Admin users API should not keep local pagination, search, sort, or status query rules.'
+);
+assert.match(
+  adminUsersQuerySource,
+  /buildSqlLikeContainsPattern/,
+  'Admin users search filtering should reuse the shared SQL LIKE escaping helper.'
 );
 const activityRuntimeSource = readFileSync('src/activities/runtime.ts', 'utf8');
 const activityTemplateRemixSource = readFileSync(

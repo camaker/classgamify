@@ -1,44 +1,30 @@
 import { createServerFn } from '@tanstack/react-start';
+import {
+  ADMIN_USER_LIST_INPUT_LIMITS,
+  ADMIN_USER_STATUS_FILTERS,
+  buildAdminUserListOrderBy,
+  buildAdminUserListWhere,
+  getAdminUserListOffset,
+} from '@/admin/users-query';
 import type { User } from '@/db/types';
 import { adminApiMiddleware } from '@/middlewares/admin-middleware';
 import { getDb } from '@/db';
 import { user } from '@/db/auth.schema';
-import {
-  and,
-  asc,
-  count as countFn,
-  desc,
-  eq,
-  isNull,
-  or,
-  sql,
-} from 'drizzle-orm';
+import { count as countFn } from 'drizzle-orm';
 import { z } from 'zod';
-
-const SORT_FIELD_MAP: Record<
-  string,
-  typeof user.name | typeof user.email | typeof user.createdAt
-> = {
-  name: user.name,
-  email: user.email,
-  createdAt: user.createdAt,
-};
-
-function normalizeSortId(raw: string): 'name' | 'email' | 'createdAt' {
-  const s = (raw ?? 'createdAt').trim();
-  if (s.toLowerCase() === 'name') return 'name';
-  if (s.toLowerCase() === 'email') return 'email';
-  return 'createdAt';
-}
 
 const listUsersInputSchema = z.object({
   pageIndex: z.number().int().min(0),
-  pageSize: z.number().int().min(1).max(100),
+  pageSize: z
+    .number()
+    .int()
+    .min(ADMIN_USER_LIST_INPUT_LIMITS.pageSizeMin)
+    .max(ADMIN_USER_LIST_INPUT_LIMITS.pageSizeMax),
   search: z.string(),
   sortId: z.string(),
   sortDesc: z.boolean(),
   role: z.string().optional(),
-  status: z.enum(['active', 'inactive']).optional(),
+  status: z.enum(ADMIN_USER_STATUS_FILTERS).optional(),
 });
 
 export const listUsers = createServerFn({ method: 'GET' })
@@ -47,42 +33,15 @@ export const listUsers = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const db = getDb();
     const { pageIndex, pageSize, search, sortDesc, role, status } = data;
-    const offset = pageIndex * pageSize;
-    const sortId = normalizeSortId(data.sortId);
-
-    const conditions = [];
-    if (search.trim()) {
-      const escaped = search
-        .replace(/\\/g, '\\\\')
-        .replace(/%/g, '\\%')
-        .replace(/_/g, '\\_');
-      const pattern = `%${escaped}%`;
-      conditions.push(
-        or(
-          sql`lower(${user.name}) like lower(${pattern})`,
-          sql`lower(${user.email}) like lower(${pattern})`
-        )!
-      );
-    }
-    if (role?.trim()) {
-      conditions.push(eq(user.role, role.trim()));
-    }
-    if (status === 'active') {
-      conditions.push(or(eq(user.banned, false), isNull(user.banned))!);
-    } else if (status === 'inactive') {
-      conditions.push(eq(user.banned, true));
-    }
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
-    const sortField = SORT_FIELD_MAP[sortId] ?? user.createdAt;
-    const sortDirection = sortDesc ? desc : asc;
+    const where = buildAdminUserListWhere({ role, search, status });
 
     const selectQuery = db
       .select()
       .from(user)
       .where(where)
-      .orderBy(sortDirection(sortField))
+      .orderBy(buildAdminUserListOrderBy({ sortDesc, sortId: data.sortId }))
       .limit(pageSize)
-      .offset(offset);
+      .offset(getAdminUserListOffset({ pageIndex, pageSize }));
     const countQuery = db.select({ count: countFn() }).from(user).where(where);
 
     const [items, [{ count }]] = await Promise.all([selectQuery, countQuery]);
