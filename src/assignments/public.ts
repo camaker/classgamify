@@ -1,4 +1,3 @@
-import { getAcceptedAnswers } from '@/activities/answer-matching';
 import type { RuntimeItem } from '@/activities/runtime';
 import type {
   ActivityContent,
@@ -21,11 +20,11 @@ import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentRuntimeSource } from '@/assignments/snapshot';
 import {
+  getRuntimeDisplayAcceptedAnswers,
   hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
-  normalizeRuntimeDisplayList,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { resolveAssignmentSettings } from '@/assignments/validation';
@@ -331,9 +330,7 @@ function buildPublicAttemptReviewItem({
   answer?: AttemptAnswer;
   item: RuntimeItem;
 }): PublicAttemptReviewItem {
-  const acceptedAnswers =
-    normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
-    [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
+  const acceptedAnswers = getRuntimeDisplayAcceptedAnswers(item.answer);
 
   return {
     acceptedAnswers,

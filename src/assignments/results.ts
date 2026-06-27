@@ -1,4 +1,3 @@
-import { getAcceptedAnswers } from '@/activities/answer-matching';
 import {
   formatRuntimeItemKindLabel,
   formatRuntimeItemPrompt,
@@ -8,10 +7,10 @@ import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
+  getRuntimeDisplayAcceptedAnswers,
   hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeDisplayCount,
-  normalizeRuntimeDisplayList,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 
@@ -272,10 +271,7 @@ export function isAssignmentAttemptAnswerNeedsReview(
 }
 
 function getResultAcceptedAnswers(answer: string) {
-  return (
-    normalizeRuntimeDisplayList(getAcceptedAnswers(answer)) ??
-    [normalizeRuntimeDisplayText(answer)].filter(Boolean)
-  );
+  return getRuntimeDisplayAcceptedAnswers(answer);
 }
 
 function normalizeResultCount(value: number | undefined) {

@@ -352,6 +352,7 @@ import {
   stripRuntimeAnswers,
 } from '@/assignments/public';
 import {
+  getRuntimeDisplayAcceptedAnswers,
   getRuntimeChoiceDisplayKey,
   hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
@@ -1280,6 +1281,10 @@ const assignmentResultsSource = readFileSync(
   'src/assignments/results.ts',
   'utf8'
 );
+const activityRuntimeDisplaySource = readFileSync(
+  'src/activities/runtime-display.ts',
+  'utf8'
+);
 const assignmentResultViewSource = readFileSync(
   'src/assignments/result-view.ts',
   'utf8'
@@ -1390,10 +1395,25 @@ assert.match(
   /submitted: hasRuntimeDisplayText\(submittedAnswer\?\.answer\)/,
   'Assignment attempt review answers should derive submitted state through the shared runtime display-text helper.'
 );
+assert.match(
+  activityRuntimeDisplaySource,
+  /export function getRuntimeDisplayAcceptedAnswers[\s\S]*normalizeRuntimeDisplayList\(getAcceptedAnswers\(answer\)\)[\s\S]*normalizeRuntimeDisplayText\(answer\)/,
+  'Runtime display accepted answers should share parser and display normalization in one activity-domain helper.'
+);
+assert.match(
+  assignmentResultsSource,
+  /function getResultAcceptedAnswers\(answer: string\)[\s\S]*getRuntimeDisplayAcceptedAnswers\(answer\)/,
+  'Assignment result analysis should delegate accepted-answer display normalization to the shared runtime helper.'
+);
 assert.doesNotMatch(
   assignmentResultsSource,
   /limit: 3/,
   'Assignment result analysis should not keep a local review-priority limit.'
+);
+assert.doesNotMatch(
+  assignmentResultsSource,
+  /normalizeRuntimeDisplayList\(getAcceptedAnswers\(answer\)\)/,
+  'Assignment result analysis should not duplicate accepted-answer display normalization.'
 );
 assert.doesNotMatch(
   assignmentResultsSource,
@@ -1479,7 +1499,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAttemptReviewItem[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
+  /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
   'Public attempt review items should explicitly pick the only fields allowed in post-submit student review payloads.'
 );
 assert.match(
@@ -8660,6 +8680,12 @@ assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
 assert.equal(hasRuntimeDisplayText('  Ｎｅｗ   York  '), true);
 assert.equal(hasRuntimeDisplayText('\u00A0　\t'), false);
 assert.equal(normalizeOptionalRuntimeDisplayText('   '), undefined);
+assert.deepEqual(
+  getRuntimeDisplayAcceptedAnswers(
+    ' Paris / Ｐａｒｉｓ / Paris\u00A0　France '
+  ),
+  ['Paris', 'Paris France']
+);
 assert.equal(normalizeRuntimeDisplayCount(Number.NaN), 0);
 assert.equal(normalizeRuntimeDisplayCount(-2.4), 0);
 assert.equal(normalizeRuntimeDisplayCount(3.9), 3);
@@ -12194,7 +12220,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
-  /toPrintableWorksheetAnswerKeyItem[\s\S]*normalizeRuntimeDisplayList\(getAcceptedAnswers\(item\.answer\)\)[\s\S]*normalizeRuntimeDisplayText\(item\.answer\)/,
+  /toPrintableWorksheetAnswerKeyItem[\s\S]*getRuntimeDisplayAcceptedAnswers\(item\.answer\)/,
   'Printable worksheet answer keys should normalize accepted alternatives through the shared runtime display-list helper.'
 );
 assert.doesNotMatch(
@@ -12204,8 +12230,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   printableWorksheetSource,
-  /const acceptedAnswers = getAcceptedAnswers\(item\.answer\);/,
-  'Printable worksheet answer keys should not expose raw accepted-answer parser output directly.'
+  /getAcceptedAnswers\(item\.answer\)|normalizeRuntimeDisplayList\(getAcceptedAnswers/,
+  'Printable worksheet answer keys should not duplicate accepted-answer display normalization.'
 );
 assert.match(
   printableWorksheetViewSource,

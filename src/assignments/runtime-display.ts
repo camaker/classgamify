@@ -1,4 +1,5 @@
 export {
+  getRuntimeDisplayAcceptedAnswers,
   getRuntimeChoiceDisplayKey,
   hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,

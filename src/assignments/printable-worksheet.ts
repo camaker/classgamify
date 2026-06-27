@@ -1,4 +1,3 @@
-import { getAcceptedAnswers } from '@/activities/answer-matching';
 import {
   getActivityTemplateRunnerKind,
   type ActivityTemplateRunnerKind,
@@ -17,10 +16,10 @@ import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
+  getRuntimeDisplayAcceptedAnswers,
   normalizeOptionalRuntimeDisplayText,
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
-  normalizeRuntimeDisplayList,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { resolveAssignmentSettings } from '@/assignments/validation';
@@ -261,9 +260,7 @@ function toPrintableWorksheetAnswerKeyItem(
   item: RuntimeItem,
   index: number
 ): PrintableWorksheetAnswerKeyItem {
-  const acceptedAnswers =
-    normalizeRuntimeDisplayList(getAcceptedAnswers(item.answer)) ??
-    [normalizeRuntimeDisplayText(item.answer)].filter(Boolean);
+  const acceptedAnswers = getRuntimeDisplayAcceptedAnswers(item.answer);
 
   return {
     acceptedAnswers,

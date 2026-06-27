@@ -1,3 +1,5 @@
+import { getAcceptedAnswers } from '@/activities/answer-matching';
+
 export function normalizeRuntimeDisplayText(value: string | null | undefined) {
   return (value ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim();
 }
@@ -49,6 +51,13 @@ export function normalizeRuntimeDisplayList(
 
   const choices = [...choicesByKey.values()];
   return choices.length > 0 ? choices : undefined;
+}
+
+export function getRuntimeDisplayAcceptedAnswers(answer: string) {
+  return (
+    normalizeRuntimeDisplayList(getAcceptedAnswers(answer)) ??
+    [normalizeRuntimeDisplayText(answer)].filter(Boolean)
+  );
 }
 
 export function getRuntimeChoiceDisplayKey(value: string | undefined) {
