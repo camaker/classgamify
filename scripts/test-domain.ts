@@ -3704,8 +3704,37 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
+  /aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
+  'Public assignment rules component should render prepared rule accessibility labels and student-facing descriptions.'
+);
+assert.doesNotMatch(
+  publicAssignmentRulesComponentSource,
+  /timer starts|submitted attempts|student identity|答案|作答|计时|匿名/,
+  'Public assignment rules component should not hard-code student-facing rule explanations.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
   /getPublicAssignmentRuleIcon[\s\S]*id === 'items'[\s\S]*id === 'attempts'[\s\S]*id === 'identity'[\s\S]*id === 'answerReveal'/,
   'Public assignment rules component should own rule icon mapping for student-facing delivery policy.'
+);
+const assignmentDeliverySummarySource = readFileSync(
+  'src/assignments/delivery-summary.ts',
+  'utf8'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /toPublicAssignmentRuleSummaryItem[\s\S]*assignment_delivery_public_rule_aria/,
+  'Public assignment rule aria labels should be formatted in the assignment delivery domain.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_description[\s\S]*assignment_delivery_public_rule_timer_description[\s\S]*assignment_delivery_public_rule_closes_description[\s\S]*assignment_delivery_public_rule_identity_description[\s\S]*assignment_delivery_public_rule_review_description/,
+  'Public assignment rule descriptions should come from localized assignment delivery messages.'
+);
+assert.doesNotMatch(
+  assignmentDeliverySummarySource,
+  /playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|可作答项目|次数限制|计时才会开始/,
+  'Assignment delivery summary should not hard-code public rule descriptions.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -7358,12 +7387,53 @@ assert.deepEqual(
     timeLimitSeconds: 60,
   }),
   [
-    { id: 'items', label: 'Items', value: '1 item' },
-    { id: 'attempts', label: 'Attempts', value: '2 max' },
-    { id: 'timer', label: 'Timer', value: '1 min' },
-    { id: 'closes', label: 'Closes', value: 'No close time' },
-    { id: 'identity', label: 'Student identity', value: 'Anonymous' },
-    { id: 'answerReveal', label: 'Review', value: 'Hidden' },
+    {
+      ariaLabel:
+        'Items: 1 item. These are the playable items in this assignment.',
+      description: 'These are the playable items in this assignment.',
+      id: 'items',
+      label: 'Items',
+      value: '1 item',
+    },
+    {
+      ariaLabel:
+        'Attempts: 2 max. Your submitted attempts count toward this limit.',
+      description: 'Your submitted attempts count toward this limit.',
+      id: 'attempts',
+      label: 'Attempts',
+      value: '2 max',
+    },
+    {
+      ariaLabel: 'Timer: 1 min. The timer starts when the activity is ready.',
+      description: 'The timer starts when the activity is ready.',
+      id: 'timer',
+      label: 'Timer',
+      value: '1 min',
+    },
+    {
+      ariaLabel:
+        'Closes: No close time. The link stops accepting work after this time.',
+      description: 'The link stops accepting work after this time.',
+      id: 'closes',
+      label: 'Closes',
+      value: 'No close time',
+    },
+    {
+      ariaLabel:
+        'Student identity: Anonymous. This setting controls how your work is identified.',
+      description: 'This setting controls how your work is identified.',
+      id: 'identity',
+      label: 'Student identity',
+      value: 'Anonymous',
+    },
+    {
+      ariaLabel:
+        'Review: Hidden. This controls whether answers appear after submission.',
+      description: 'This controls whether answers appear after submission.',
+      id: 'answerReveal',
+      label: 'Review',
+      value: 'Hidden',
+    },
   ]
 );
 assert.equal(
@@ -7386,12 +7456,53 @@ assert.deepEqual(
     },
   }),
   [
-    { id: 'items', label: 'Items', value: '2 items' },
-    { id: 'attempts', label: 'Attempts', value: '3 max' },
-    { id: 'timer', label: 'Timer', value: '2 min' },
-    { id: 'closes', label: 'Closes', value: 'No close time' },
-    { id: 'identity', label: 'Student identity', value: 'Names' },
-    { id: 'answerReveal', label: 'Review', value: 'After submit' },
+    {
+      ariaLabel:
+        'Items: 2 items. These are the playable items in this assignment.',
+      description: 'These are the playable items in this assignment.',
+      id: 'items',
+      label: 'Items',
+      value: '2 items',
+    },
+    {
+      ariaLabel:
+        'Attempts: 3 max. Your submitted attempts count toward this limit.',
+      description: 'Your submitted attempts count toward this limit.',
+      id: 'attempts',
+      label: 'Attempts',
+      value: '3 max',
+    },
+    {
+      ariaLabel: 'Timer: 2 min. The timer starts when the activity is ready.',
+      description: 'The timer starts when the activity is ready.',
+      id: 'timer',
+      label: 'Timer',
+      value: '2 min',
+    },
+    {
+      ariaLabel:
+        'Closes: No close time. The link stops accepting work after this time.',
+      description: 'The link stops accepting work after this time.',
+      id: 'closes',
+      label: 'Closes',
+      value: 'No close time',
+    },
+    {
+      ariaLabel:
+        'Student identity: Names. This setting controls how your work is identified.',
+      description: 'This setting controls how your work is identified.',
+      id: 'identity',
+      label: 'Student identity',
+      value: 'Names',
+    },
+    {
+      ariaLabel:
+        'Review: After submit. This controls whether answers appear after submission.',
+      description: 'This controls whether answers appear after submission.',
+      id: 'answerReveal',
+      label: 'Review',
+      value: 'After submit',
+    },
   ]
 );
 assert.deepEqual(
@@ -7406,48 +7517,156 @@ assert.deepEqual(
     },
   }),
   [
-    { id: 'items', label: 'Items', value: '4 items' },
-    { id: 'attempts', label: 'Attempts', value: '2 max' },
-    { id: 'timer', label: 'Timer', value: 'No timer' },
-    { id: 'closes', label: 'Closes', value: 'No close time' },
-    { id: 'identity', label: 'Student identity', value: 'Anonymous' },
-    { id: 'answerReveal', label: 'Review', value: 'Hidden' },
+    {
+      ariaLabel:
+        'Items: 4 items. These are the playable items in this assignment.',
+      description: 'These are the playable items in this assignment.',
+      id: 'items',
+      label: 'Items',
+      value: '4 items',
+    },
+    {
+      ariaLabel:
+        'Attempts: 2 max. Your submitted attempts count toward this limit.',
+      description: 'Your submitted attempts count toward this limit.',
+      id: 'attempts',
+      label: 'Attempts',
+      value: '2 max',
+    },
+    {
+      ariaLabel:
+        'Timer: No timer. The timer starts when the activity is ready.',
+      description: 'The timer starts when the activity is ready.',
+      id: 'timer',
+      label: 'Timer',
+      value: 'No timer',
+    },
+    {
+      ariaLabel:
+        'Closes: No close time. The link stops accepting work after this time.',
+      description: 'The link stops accepting work after this time.',
+      id: 'closes',
+      label: 'Closes',
+      value: 'No close time',
+    },
+    {
+      ariaLabel:
+        'Student identity: Anonymous. This setting controls how your work is identified.',
+      description: 'This setting controls how your work is identified.',
+      id: 'identity',
+      label: 'Student identity',
+      value: 'Anonymous',
+    },
+    {
+      ariaLabel:
+        'Review: Hidden. This controls whether answers appear after submission.',
+      description: 'This controls whether answers appear after submission.',
+      id: 'answerReveal',
+      label: 'Review',
+      value: 'Hidden',
+    },
   ]
 );
-assert.deepEqual(
-  buildStudentRunnerHeaderView({
-    assignment: {
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildPublicAssignmentRuleSummary({
+      collectStudentName: false,
       expiresAt: null,
-      settings: {
-        collectStudentName: true,
-        instructions: '  Read each prompt carefully.  ',
-        maxAttempts: 3,
-        showCorrectAnswers: true,
-        shuffleItems: false,
-        timeLimitSeconds: 120,
+      itemCount: 2,
+      maxAttempts: 1,
+      showCorrectAnswers: true,
+      timeLimitSeconds: 120,
+    }),
+    [
+      {
+        ariaLabel: '题目：2 项。这是这份作业中的可作答项目。',
+        description: '这是这份作业中的可作答项目。',
+        id: 'items',
+        label: '题目',
+        value: '2 项',
       },
-      title: 'Public assignment',
+      {
+        ariaLabel: '作答次数：最多 1 次。已提交的作答会计入这个次数限制。',
+        description: '已提交的作答会计入这个次数限制。',
+        id: 'attempts',
+        label: '作答次数',
+        value: '最多 1 次',
+      },
+      {
+        ariaLabel: '计时：2 分钟。活动准备好后，计时才会开始。',
+        description: '活动准备好后，计时才会开始。',
+        id: 'timer',
+        label: '计时',
+        value: '2 分钟',
+      },
+      {
+        ariaLabel:
+          '关闭时间：不设关闭时间。超过这个时间后，链接将停止接收作答。',
+        description: '超过这个时间后，链接将停止接收作答。',
+        id: 'closes',
+        label: '关闭时间',
+        value: '不设关闭时间',
+      },
+      {
+        ariaLabel: '学生身份：匿名。这个设置决定你的作答如何被识别。',
+        description: '这个设置决定你的作答如何被识别。',
+        id: 'identity',
+        label: '学生身份',
+        value: '匿名',
+      },
+      {
+        ariaLabel: '回顾：提交后显示。这个设置决定提交后是否显示答案。',
+        description: '这个设置决定提交后是否显示答案。',
+        id: 'answerReveal',
+        label: '回顾',
+        value: '提交后显示',
+      },
+    ]
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
+const studentRunnerHeaderView = buildStudentRunnerHeaderView({
+  assignment: {
+    expiresAt: null,
+    settings: {
+      collectStudentName: true,
+      instructions: '  Read each prompt carefully.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
     },
-    itemCount: 2,
-  }),
-  {
-    description:
-      "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
-    instructions: {
-      label: 'Student instructions',
-      value: 'Read each prompt carefully.',
-    },
-    ruleItems: [
-      { id: 'items', label: 'Items', value: '2 items' },
-      { id: 'attempts', label: 'Attempts', value: '3 max' },
-      { id: 'timer', label: 'Timer', value: '2 min' },
-      { id: 'closes', label: 'Closes', value: 'No close time' },
-      { id: 'identity', label: 'Student identity', value: 'Names' },
-      { id: 'answerReveal', label: 'Review', value: 'After submit' },
-    ],
-    teacherActionLabel: 'Teacher view',
     title: 'Public assignment',
-  }
+  },
+  itemCount: 2,
+});
+assert.deepEqual(studentRunnerHeaderView, {
+  description:
+    "This public assignment loads from the teacher share link, collects answers, and scores against the teacher's frozen assignment snapshot.",
+  instructions: {
+    label: 'Student instructions',
+    value: 'Read each prompt carefully.',
+  },
+  ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
+    expiresAt: null,
+    itemCount: 2,
+    settings: {
+      collectStudentName: true,
+      instructions: '  Read each prompt carefully.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    },
+  }),
+  teacherActionLabel: 'Teacher view',
+  title: 'Public assignment',
+});
+assert.equal(
+  studentRunnerHeaderView.ruleItems[0]?.description,
+  'These are the playable items in this assignment.'
 );
 assert.equal(
   buildStudentRunnerHeaderView({

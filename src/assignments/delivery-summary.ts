@@ -25,6 +25,8 @@ export type PublicAssignmentRuleSummaryId =
   | 'items';
 
 export type PublicAssignmentRuleSummaryItem = {
+  ariaLabel: string;
+  description: string;
   id: PublicAssignmentRuleSummaryId;
   label: string;
   value: string;
@@ -170,7 +172,7 @@ export function buildPublicAssignmentRuleSummary({
 }: AssignmentDeliverySummaryInput & {
   itemCount: number;
 }): PublicAssignmentRuleSummaryItem[] {
-  return [
+  const ruleItems = [
     {
       id: 'items',
       label: m.assignment_delivery_label_items(),
@@ -185,7 +187,11 @@ export function buildPublicAssignmentRuleSummary({
             ? m.assignment_delivery_label_review()
             : rule.label,
       })),
-  ];
+  ] satisfies Array<
+    Pick<PublicAssignmentRuleSummaryItem, 'id' | 'label' | 'value'>
+  >;
+
+  return ruleItems.map(toPublicAssignmentRuleSummaryItem);
 }
 
 export function buildPublicAssignmentRuleSummaryFromSettings({
@@ -291,4 +297,44 @@ function formatShuffleItems(shuffleItems: boolean) {
   return shuffleItems
     ? m.assignment_delivery_item_order_shuffled()
     : m.assignment_delivery_item_order_fixed();
+}
+
+function toPublicAssignmentRuleSummaryItem(
+  item: Pick<PublicAssignmentRuleSummaryItem, 'id' | 'label' | 'value'>
+): PublicAssignmentRuleSummaryItem {
+  const description = getPublicAssignmentRuleDescription(item.id);
+
+  return {
+    ...item,
+    ariaLabel: m.assignment_delivery_public_rule_aria({
+      description,
+      label: item.label,
+      value: item.value,
+    }),
+    description,
+  };
+}
+
+function getPublicAssignmentRuleDescription(id: PublicAssignmentRuleSummaryId) {
+  if (id === 'items') {
+    return m.assignment_delivery_public_rule_items_description();
+  }
+
+  if (id === 'attempts') {
+    return m.assignment_delivery_public_rule_attempts_description();
+  }
+
+  if (id === 'timer') {
+    return m.assignment_delivery_public_rule_timer_description();
+  }
+
+  if (id === 'closes') {
+    return m.assignment_delivery_public_rule_closes_description();
+  }
+
+  if (id === 'identity') {
+    return m.assignment_delivery_public_rule_identity_description();
+  }
+
+  return m.assignment_delivery_public_rule_review_description();
 }
