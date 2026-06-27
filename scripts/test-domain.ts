@@ -130,13 +130,17 @@ import {
   getTemplateByType,
 } from '@/activities/catalog';
 import {
-  buildActivityCreateInsert,
   buildDuplicatedActivityTitle,
-  buildDuplicatedActivityInsert,
-  buildRemixedActivityInsert,
   buildRemixedActivityTitle,
   cloneActivityContentForDerivative,
 } from '@/activities/duplicate';
+import {
+  buildActivityCreateInsert,
+  buildActivityUpdateSet,
+  buildActivityVisibilityUpdateSet,
+  buildDuplicatedActivityInsert,
+  buildRemixedActivityInsert,
+} from '@/activities/persistence';
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
@@ -736,7 +740,9 @@ function getSourceSlice(
 ) {
   const start = source.indexOf(startMarker);
   assert.notEqual(start, -1, `Missing source start marker: ${startMarker}`);
-  const end = source.indexOf(endMarker, start + startMarker.length);
+  const end = endMarker
+    ? source.indexOf(endMarker, start + startMarker.length)
+    : source.length;
   assert.notEqual(end, -1, `Missing source end marker: ${endMarker}`);
 
   return source.slice(start, end);
@@ -11957,8 +11963,22 @@ const remixActivityApiSource = getSourceSlice(
   'export const remixActivityTemplate',
   'const updateActivityInputSchema'
 );
+const updateActivityApiSource = getSourceSlice(
+  activitiesApiSource,
+  'export const updateActivity',
+  'const updateActivityVisibilityInputSchema'
+);
+const updateActivityVisibilityApiSource = getSourceSlice(
+  activitiesApiSource,
+  'async function updateActivityVisibility',
+  ''
+);
 const activityLibraryQuerySource = readFileSync(
   'src/activities/library-query.ts',
+  'utf8'
+);
+const activityPersistenceSource = readFileSync(
+  'src/activities/persistence.ts',
   'utf8'
 );
 assert.match(
@@ -12147,6 +12167,21 @@ assert.match(
   /export const remixActivityTemplate[\s\S]*buildRemixedActivityInsert\(\{[\s\S]*sourceActivity,[\s\S]*targetTemplate,[\s\S]*userId/,
   'Template remix API should build derivative insert payloads through the activity domain helper.'
 );
+assert.match(
+  activitiesApiSource,
+  /export const updateActivity[\s\S]*buildActivityUpdateSet\(\{ input: data, now \}\)/,
+  'Update activity API should build update payloads through the activity persistence helper.'
+);
+assert.match(
+  updateActivityVisibilityApiSource,
+  /buildActivityVisibilityUpdateSet\(\{ nextVisibility, updatedAt \}\)/,
+  'Archive and restore APIs should build visibility update payloads through the activity persistence helper.'
+);
+assert.match(
+  activityPersistenceSource,
+  /buildActivityCreateInsert[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*description: normalizeActivityDescription\(input\.description\)[\s\S]*buildActivityUpdateSet[\s\S]*contentJson: buildActivityContent\(input\)[\s\S]*buildActivityVisibilityUpdateSet[\s\S]*visibility: nextVisibility[\s\S]*buildDuplicatedActivityInsert[\s\S]*cloneActivityContentForDerivative\(sourceActivity\.contentJson\)[\s\S]*buildRemixedActivityInsert[\s\S]*targetTemplate\.type/,
+  'Activity persistence helpers should own create, edit, visibility, duplicate, and remix payload shapes.'
+);
 assert.doesNotMatch(
   createActivityApiSource,
   /description: data\.description\?\.trim\(\) \|\| null/,
@@ -12161,6 +12196,16 @@ assert.doesNotMatch(
   remixActivityApiSource,
   /contentJson: cloneActivityContentForDerivative|title: buildRemixedActivityTitle/,
   'Activity API should not hand-write activity create, duplicate, or remix insert payloads.'
+);
+assert.doesNotMatch(
+  updateActivityApiSource,
+  /contentJson: content|description: data\.description\?\.trim\(\) \|\| null|templateType: data\.templateType|visibility: data\.visibility/,
+  'Update activity API should not hand-write activity edit update payloads.'
+);
+assert.doesNotMatch(
+  updateActivityVisibilityApiSource,
+  /\.set\(\{[\s\S]*visibility: nextVisibility/,
+  'Archive and restore APIs should not hand-write visibility update payloads.'
 );
 assert.match(
   activitiesApiSource,
@@ -18354,6 +18399,42 @@ assert.equal(
     userId: 'teacher-1',
   }).description,
   null
+);
+const activityUpdateSet = buildActivityUpdateSet({
+  input: {
+    ...baseActivityCreateInput,
+    description: '  Updated description.  ',
+    title: 'Updated food review',
+    visibility: 'unlisted',
+  },
+  now: activityInsertNow,
+});
+assert.equal(activityUpdateSet.description, 'Updated description.');
+assert.equal(activityUpdateSet.templateType, 'group-sort');
+assert.equal(activityUpdateSet.title, 'Updated food review');
+assert.equal(activityUpdateSet.updatedAt, activityInsertNow);
+assert.equal(activityUpdateSet.visibility, 'unlisted');
+assert.equal(activityUpdateSet.contentJson.subject, 'English');
+assert.equal(
+  buildActivityUpdateSet({
+    input: {
+      ...baseActivityCreateInput,
+      description: '   ',
+      visibility: 'draft',
+    },
+    now: activityInsertNow,
+  }).description,
+  null
+);
+assert.deepEqual(
+  buildActivityVisibilityUpdateSet({
+    nextVisibility: 'archived',
+    updatedAt: activityInsertNow,
+  }),
+  {
+    updatedAt: activityInsertNow,
+    visibility: 'archived',
+  }
 );
 const duplicatedActivityInsert = buildDuplicatedActivityInsert({
   id: 'activity-duplicate-1',

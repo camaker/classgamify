@@ -1,5 +1,4 @@
 import {
-  buildActivityContent,
   activityPersistedVisibilitySchema,
   activityTemplateTypeSchema,
   createActivityInputSchema,
@@ -7,8 +6,10 @@ import {
 import {
   buildActivityCreateInsert,
   buildDuplicatedActivityInsert,
+  buildActivityUpdateSet,
+  buildActivityVisibilityUpdateSet,
   buildRemixedActivityInsert,
-} from '@/activities/duplicate';
+} from '@/activities/persistence';
 import { buildActivityDetailOwnerWhere } from '@/activities/detail-query';
 import { getTemplateByType } from '@/activities/catalog';
 import {
@@ -308,18 +309,10 @@ export const updateActivity = createServerFn({ method: 'POST' })
     assertActivityCanEdit(existingActivity.visibility);
 
     const now = new Date();
-    const content = buildActivityContent(data);
 
     await db
       .update(activity)
-      .set({
-        contentJson: content,
-        description: data.description?.trim() || null,
-        templateType: data.templateType,
-        title: data.title,
-        updatedAt: now,
-        visibility: data.visibility,
-      })
+      .set(buildActivityUpdateSet({ input: data, now }))
       .where(buildActivityDetailOwnerWhere({ activityId: data.id, userId }));
 
     const [row] = await db
@@ -395,10 +388,7 @@ async function updateActivityVisibility({
   const updatedAt = new Date();
   await db
     .update(activity)
-    .set({
-      updatedAt,
-      visibility: nextVisibility,
-    })
+    .set(buildActivityVisibilityUpdateSet({ nextVisibility, updatedAt }))
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }));
 
   const [updatedRow] = await db
