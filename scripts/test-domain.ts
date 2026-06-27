@@ -23902,6 +23902,16 @@ assert.match(
   /formatOptionalAcceptedAnswerAlternatives\(item\.acceptedAnswers,[\s\S]*includePrimary: false[\s\S]*formatPrimaryAcceptedAnswer\(item\.acceptedAnswers\)/,
   'Assignment item review summaries should split primary expected answers from accepted alternatives.'
 );
+assert.match(
+  assignmentItemReviewSummarySource,
+  /formatAssignmentResultValue\(item\.explanation,[\s\S]*emptyValue: ''/,
+  'Assignment item review summaries should normalize explanation notes through the shared result-format helper.'
+);
+assert.doesNotMatch(
+  assignmentItemReviewSummarySource,
+  /item\.explanation \?\? ''/,
+  'Assignment item review summaries should not write raw explanation notes directly.'
+);
 assert.deepEqual(
   buildAssignmentItemReviewSummaryItemView({
     index: 0,
@@ -23918,6 +23928,16 @@ assert.deepEqual(
     promptLabel: '1. Capital of France?',
     text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct. Expected: Paris. Accepted answers: Paris, France. Notes: Paris is the capital of France.',
   }
+);
+assert.deepEqual(
+  buildAssignmentItemReviewSummaryItemView({
+    index: 0,
+    item: {
+      ...resultAnalysis.perItem[0]!,
+      explanation: ' Ｆｒａｎｃｅ\u00A0　capital. ',
+    },
+  }).explanationText,
+  'France capital.'
 );
 assert.match(
   itemReviewSummary,

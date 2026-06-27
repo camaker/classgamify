@@ -1,5 +1,6 @@
 import {
   formatOptionalAcceptedAnswerAlternatives,
+  formatAssignmentResultValue,
   formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
 import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
@@ -64,7 +65,9 @@ export function buildAssignmentItemReviewSummaryItemView({
     formatOptionalAcceptedAnswerAlternatives(item.acceptedAnswers, {
       includePrimary: false,
     }) ?? '';
-  const explanationText = item.explanation ?? '';
+  const explanationText = formatAssignmentResultValue(item.explanation, {
+    emptyValue: '',
+  });
   const correctCountLabel = formatAssignmentSummaryCorrectCount(item);
   const correctRateLabel = formatAssignmentSummaryCorrectRate(item.correctRate);
   const expectedAnswerText = formatPrimaryAcceptedAnswer(item.acceptedAnswers);
