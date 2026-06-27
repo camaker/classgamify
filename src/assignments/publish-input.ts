@@ -314,34 +314,12 @@ export function buildAssignmentPublishDialogViewModel({
   };
 }
 
-export function buildAssignmentPublishPreviewFromDraft({
-  collectStudentName,
-  expiresAtLocal,
-  instructions,
-  maxAttempts,
-  showCorrectAnswers,
-  shuffleItems,
-  timeLimitMinutes,
-}: AssignmentPublishDraft): AssignmentPublishPreview {
-  const previewTimeLimitMinutes =
-    parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
-  const previewMaxAttempts = isAssignmentPublishMaxAttemptsBlank(maxAttempts)
-    ? null
-    : parseAssignmentPublishMaxAttempts(maxAttempts);
-  const settings = resolveAssignmentSettings({
-    collectStudentName,
-    instructions: normalizePublishDraftText(instructions) || undefined,
-    maxAttempts: previewMaxAttempts,
-    showCorrectAnswers,
-    shuffleItems,
-    timeLimitSeconds: previewTimeLimitMinutes
-      ? previewTimeLimitMinutes * 60
-      : undefined,
-  });
-
+export function buildAssignmentPublishPreviewFromDraft(
+  draft: AssignmentPublishDraft
+): AssignmentPublishPreview {
   return {
-    expiresAt: parseAssignmentDateTimeLocal(expiresAtLocal),
-    settings,
+    expiresAt: parseAssignmentDateTimeLocal(draft.expiresAtLocal),
+    settings: buildAssignmentPublishSettingsFromDraft(draft),
   };
 }
 
@@ -470,37 +448,55 @@ export function buildAssignmentPublishInputFromDraft({
   if (!validation.ok) return validation;
 
   const trimmedTitle = normalizePublishDraftText(title);
-  const attempts = parseAssignmentPublishMaxAttempts(maxAttempts);
-  if (
-    !isAssignmentPublishMaxAttemptsBlank(maxAttempts) &&
-    attempts === undefined
-  ) {
-    return {
-      message: m.assignment_publish_validation_max_attempts(),
-      ok: false,
-    };
-  }
-
-  const timeLimit = parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
   const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
-  const trimmedInstructions = normalizePublishDraftText(instructions);
+  const settings = buildAssignmentPublishSettingsFromDraft({
+    activityId,
+    collectStudentName,
+    expiresAtLocal,
+    instructions,
+    maxAttempts,
+    now,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitMinutes,
+    title,
+  });
 
   return {
     input: {
       activityId,
       expiresAt: expiresAt?.toISOString(),
-      settings: {
-        collectStudentName,
-        instructions: trimmedInstructions || undefined,
-        maxAttempts: attempts ?? null,
-        showCorrectAnswers,
-        shuffleItems,
-        timeLimitSeconds: timeLimit ? timeLimit * 60 : undefined,
-      },
+      settings,
       title: trimmedTitle,
     },
     ok: true,
   };
+}
+
+function buildAssignmentPublishSettingsFromDraft({
+  collectStudentName,
+  instructions,
+  maxAttempts,
+  showCorrectAnswers,
+  shuffleItems,
+  timeLimitMinutes,
+}: AssignmentPublishDraft): AssignmentSettings {
+  const timeLimitMinutesValue =
+    parseAssignmentPublishTimeLimitMinutes(timeLimitMinutes);
+  const attempts = isAssignmentPublishMaxAttemptsBlank(maxAttempts)
+    ? null
+    : parseAssignmentPublishMaxAttempts(maxAttempts);
+
+  return resolveAssignmentSettings({
+    collectStudentName,
+    instructions: normalizePublishDraftText(instructions) || undefined,
+    maxAttempts: attempts,
+    showCorrectAnswers,
+    shuffleItems,
+    timeLimitSeconds: timeLimitMinutesValue
+      ? timeLimitMinutesValue * 60
+      : undefined,
+  });
 }
 
 function parseAssignmentPublishMaxAttempts(value: string) {

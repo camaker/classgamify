@@ -7955,6 +7955,21 @@ assert.doesNotMatch(
   /const PUBLISH_ATTEMPTS_RANGE|const PUBLISH_TIME_LIMIT_MINUTES_RANGE/,
   'Publish dialog input parsing should not maintain separate local delivery ranges.'
 );
+assert.match(
+  assignmentPublishInputSource,
+  /function buildAssignmentPublishPreviewFromDraft[\s\S]*settings: buildAssignmentPublishSettingsFromDraft\(draft\)/,
+  'Assignment publish preview should derive delivery settings through the shared draft settings helper.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /export function buildAssignmentPublishInputFromDraft[\s\S]*const settings = buildAssignmentPublishSettingsFromDraft/,
+  'Assignment publish input should derive delivery settings through the same shared draft settings helper as the preview.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /function buildAssignmentPublishSettingsFromDraft[\s\S]*resolveAssignmentSettings\(\{[\s\S]*instructions: normalizePublishDraftText\(instructions\) \|\| undefined,[\s\S]*maxAttempts: attempts,[\s\S]*timeLimitSeconds: timeLimitMinutesValue/,
+  'Assignment publish draft settings helper should own normalized instructions, attempt, and timer conversion.'
+);
 assert.deepEqual(ASSIGNMENT_SHARE_SLUG_LENGTH, {
   generated: 10,
   max: 80,
