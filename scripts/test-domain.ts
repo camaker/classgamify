@@ -365,6 +365,7 @@ import {
 } from '@/assignments/delivery-summary';
 import {
   buildAssignmentDetailOwnerWhere,
+  buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
 } from '@/assignments/detail-query';
 import {
@@ -12661,7 +12662,13 @@ assert.match(
   'Assignment results API should analyze attempts against the shared frozen assignment runtime source.'
 );
 assert.equal(typeof buildAssignmentDetailOwnerWhere, 'function');
+assert.equal(typeof buildAssignmentDetailOwnerShareWhere, 'function');
 assert.equal(typeof buildAssignmentDetailShareWhere, 'function');
+assert.match(
+  assignmentsApiSource,
+  /publishedAssignment[\s\S]*buildAssignmentDetailOwnerShareWhere\(\{[\s\S]*shareSlug: data\.publishedShareSlug,[\s\S]*userId,[\s\S]*\}\)/,
+  'Assignment list publish-success lookup should use the shared owner-scoped share-slug detail query helper.'
+);
 assert.match(
   assignmentsApiSource,
   /updateAssignmentStatus[\s\S]*const where = buildAssignmentDetailOwnerWhere\(\{[\s\S]*assignmentId: data\.assignmentId,[\s\S]*userId,[\s\S]*\}\)/,
@@ -12713,7 +12720,7 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentsApiSource,
-  /updateAssignmentStatus[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
+  /publishedAssignment[\s\S]*eq\(assignment\.ownerId, userId\)[\s\S]*eq\(assignment\.shareSlug, data\.publishedShareSlug\)|updateAssignmentStatus[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getAssignmentResults[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPrintableAssignmentWorksheet[\s\S]*eq\(assignment\.id, data\.assignmentId\)[\s\S]*eq\(assignment\.ownerId, userId\)|getPublicAssignment[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)|submitAttempt[\s\S]*eq\(assignment\.shareSlug, data\.shareSlug\)/,
   'Assignment API should not keep local detail owner/share lookup rules.'
 );
 const activityAiApiSource = readFileSync('src/api/activity-ai.ts', 'utf8');

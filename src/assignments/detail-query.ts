@@ -11,6 +11,19 @@ export function buildAssignmentDetailOwnerWhere({
   return and(eq(assignment.id, assignmentId), eq(assignment.ownerId, userId));
 }
 
+export function buildAssignmentDetailOwnerShareWhere({
+  shareSlug,
+  userId,
+}: {
+  shareSlug: string;
+  userId: string;
+}) {
+  return and(
+    eq(assignment.ownerId, userId),
+    eq(assignment.shareSlug, shareSlug)
+  );
+}
+
 export function buildAssignmentDetailShareWhere({
   shareSlug,
 }: {

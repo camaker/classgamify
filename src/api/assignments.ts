@@ -48,6 +48,7 @@ import {
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
   buildAssignmentDetailOwnerWhere,
+  buildAssignmentDetailOwnerShareWhere,
   buildAssignmentDetailShareWhere,
 } from '@/assignments/detail-query';
 import { analyzeAssignmentResults } from '@/assignments/results';
@@ -171,10 +172,10 @@ export const listAssignments = createServerFn({ method: 'GET' })
           })
           .from(assignment)
           .where(
-            and(
-              eq(assignment.ownerId, userId),
-              eq(assignment.shareSlug, data.publishedShareSlug)
-            )
+            buildAssignmentDetailOwnerShareWhere({
+              shareSlug: data.publishedShareSlug,
+              userId,
+            })
           )
           .limit(1)
       : [];
