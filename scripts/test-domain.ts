@@ -291,6 +291,7 @@ import {
   normalizeAssignmentAttemptStats,
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
+  withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
@@ -11601,6 +11602,21 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
+  /summaryAttempts\.map\(withAssignmentAttemptStatsSettings\)/,
+  'Assignment list API summary stats should attach timer settings through the assignment-domain stats helper.'
+);
+assert.match(
+  assignmentsApiSource,
+  /itemAttempts\.map\(withAssignmentAttemptStatsSettings\)/,
+  'Assignment list API card stats should attach timer settings through the assignment-domain stats helper.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /function withAttemptStatsSettings|const settings = resolveAssignmentSettings\(item\.settingsJson\)[\s\S]*timeLimitSeconds: settings\.timeLimitSeconds/,
+  'Assignment list API should not keep local attempt-stats timer-setting mapping logic.'
+);
+assert.match(
+  assignmentsApiSource,
   /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
   'Submit attempt API should build student review payloads in the same stable delivery order.'
 );
@@ -19113,6 +19129,36 @@ assert.deepEqual(buildAssignmentAttemptStatsView(undefined), {
   completed: false,
   completions: 0,
 });
+assert.deepEqual(
+  withAssignmentAttemptStatsSettings({
+    resultJson: null,
+    settingsJson: {
+      timeLimitSeconds: 120,
+    },
+  }),
+  {
+    resultJson: null,
+    settingsJson: {
+      timeLimitSeconds: 120,
+    },
+    timeLimitSeconds: 120,
+  }
+);
+assert.deepEqual(
+  withAssignmentAttemptStatsSettings({
+    resultJson: null,
+    settingsJson: {
+      timeLimitSeconds: Number.NaN,
+    },
+  }),
+  {
+    resultJson: null,
+    settingsJson: {
+      timeLimitSeconds: Number.NaN,
+    },
+    timeLimitSeconds: undefined,
+  }
+);
 assert.deepEqual(
   buildAssignmentAttemptStatsView({
     averageDurationSeconds: 0,

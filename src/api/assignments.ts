@@ -10,6 +10,7 @@ import {
 import {
   summarizeAssignmentAttempts,
   summarizeAssignmentAttemptsByAssignmentId,
+  withAssignmentAttemptStatsSettings,
 } from '@/assignments/attempt-stats';
 import {
   buildAttemptStartedAt,
@@ -212,7 +213,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
             )
         : [];
     const statsByAssignmentId = summarizeAssignmentAttemptsByAssignmentId(
-      itemAttempts.map(withAttemptStatsSettings)
+      itemAttempts.map(withAssignmentAttemptStatsSettings)
     );
     const emptyStats = summarizeAssignmentAttempts([]);
     const enriched = items.map((item) => ({
@@ -220,7 +221,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
       stats: statsByAssignmentId.get(item.assignment.id) ?? emptyStats,
     }));
     const summary = buildAssignmentListSummary({
-      attempts: summaryAttempts.map(withAttemptStatsSettings),
+      attempts: summaryAttempts.map(withAssignmentAttemptStatsSettings),
       assignments: matchingAssignments,
       totalAssignments: totalRow?.count ?? 0,
     });
@@ -291,19 +292,6 @@ function withResolvedAssignmentSettings<
       ...item.assignment,
       settingsJson: resolveAssignmentSettings(item.assignment.settingsJson),
     },
-  };
-}
-
-function withAttemptStatsSettings<
-  TItem extends {
-    settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
-  },
->(item: TItem) {
-  const settings = resolveAssignmentSettings(item.settingsJson);
-
-  return {
-    ...item,
-    timeLimitSeconds: settings.timeLimitSeconds,
   };
 }
 

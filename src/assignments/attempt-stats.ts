@@ -1,5 +1,6 @@
 import type { AttemptResult } from '@/activities/types';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
+import { resolveAssignmentSettings } from '@/assignments/validation';
 
 export type AssignmentAttemptStatsSource = {
   resultJson: AttemptResult | null;
@@ -26,6 +27,19 @@ export type AssignmentAttemptStatsView = {
   completed: boolean;
   completions: number | undefined;
 };
+
+export function withAssignmentAttemptStatsSettings<
+  TItem extends {
+    settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+  },
+>(item: TItem): TItem & { timeLimitSeconds?: number | null } {
+  const settings = resolveAssignmentSettings(item.settingsJson);
+
+  return {
+    ...item,
+    timeLimitSeconds: settings.timeLimitSeconds,
+  };
+}
 
 export function summarizeAssignmentAttempts(
   attempts: AssignmentAttemptStatsSource[],
