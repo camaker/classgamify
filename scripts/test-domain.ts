@@ -5007,8 +5007,13 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
-  /buildStudentRuntimeSingleAnswerChanges\(\{ answer, itemId \}\)/,
-  'Student runtime item list should convert simple answer events through the assignment-domain runtime item-list helper.'
+  /function handleSingleAnswerChange\(itemId: string, answer: string\)[\s\S]*buildStudentRuntimeSingleAnswerChanges\(\{[\s\S]*answer,[\s\S]*itemId,[\s\S]*\}\)/,
+  'Student runtime item list should convert simple answer events through one local batch handler backed by the assignment-domain helper.'
+);
+assert.doesNotMatch(
+  studentRuntimeItemListSource,
+  /onAnswerChange=\{\(itemId, answer\) =>[\s\S]*buildStudentRuntimeSingleAnswerChanges/,
+  'Student runtime item list should not repeat single-answer batch wrapping in each template branch.'
 );
 assert.match(
   lineMatchBoardSource,

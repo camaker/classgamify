@@ -47,6 +47,15 @@ export function StudentRuntimeItemList({
     templateType,
   });
 
+  function handleSingleAnswerChange(itemId: string, answer: string) {
+    onAnswerChanges(
+      buildStudentRuntimeSingleAnswerChanges({
+        answer,
+        itemId,
+      })
+    );
+  }
+
   if (listView.surface === 'line-match') {
     return (
       <div className="mt-4">
@@ -86,11 +95,7 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(
-              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
-            )
-          }
+          onAnswerChange={handleSingleAnswerChange}
         />
       </div>
     );
@@ -105,11 +110,7 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(
-              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
-            )
-          }
+          onAnswerChange={handleSingleAnswerChange}
         />
       </div>
     );
@@ -124,11 +125,7 @@ export function StudentRuntimeItemList({
           items={items}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(
-              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
-            )
-          }
+          onAnswerChange={handleSingleAnswerChange}
         />
       </div>
     );
@@ -144,11 +141,7 @@ export function StudentRuntimeItemList({
           language={language}
           revealAnswer={revealAnswer}
           reviewItems={reviewItems}
-          onAnswerChange={(itemId, answer) =>
-            onAnswerChanges(
-              buildStudentRuntimeSingleAnswerChanges({ answer, itemId })
-            )
-          }
+          onAnswerChange={handleSingleAnswerChange}
         />
       </div>
     );
@@ -170,12 +163,7 @@ export function StudentRuntimeItemList({
           revealAnswer={revealAnswer}
           showChoices={itemView.showChoices}
           onAnswerChange={(answer) =>
-            onAnswerChanges(
-              buildStudentRuntimeSingleAnswerChanges({
-                answer,
-                itemId: itemView.item.id,
-              })
-            )
+            handleSingleAnswerChange(itemView.item.id, answer)
           }
         />
       ))}
