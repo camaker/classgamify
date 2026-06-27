@@ -1083,10 +1083,25 @@ assert.match(
   /completedItemCount: countSubmittedRuntimeAnswers\(scoredAnswers\)/,
   'Runtime evaluation should derive completed item count through the shared submitted-answer helper.'
 );
+assert.match(
+  activityRuntimeSource,
+  /hasRuntimePairContent[\s\S]*return hasRuntimeDisplayText\(left\) && hasRuntimeDisplayText\(right\)/,
+  'Runtime pair filtering should use the shared runtime display-text helper.'
+);
+assert.match(
+  activityRuntimeSource,
+  /hasRuntimeQuestionContent[\s\S]*return hasRuntimeDisplayText\(prompt\) && hasRuntimeDisplayText\(answer\)/,
+  'Runtime question filtering should use the shared runtime display-text helper.'
+);
+assert.match(
+  activityRuntimeSource,
+  /\.filter\(hasRuntimeDisplayText\)/,
+  'Runtime group-sort item filtering should use the shared runtime display-text helper.'
+);
 assert.doesNotMatch(
   activityRuntimeSource,
-  /answer\.answer\.trim\(\)|scoredAnswers\.filter\(\(answer\) => answer\.answer\)/,
-  'Runtime evaluation should not use ad hoc trim-only submitted-answer checks.'
+  /answer\.answer\.trim\(\)|scoredAnswers\.filter\(\(answer\) => answer\.answer\)|left\.trim\(\)|right\.trim\(\)|prompt\.trim\(\)|answer\.trim\(\)|item\.trim\(\)|label\.trim\(\)/,
+  'Runtime evaluation and content filtering should not use ad hoc trim-only answer or runtime item checks.'
 );
 const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
@@ -16695,18 +16710,18 @@ assert.deepEqual(
 const dirtyRuntimeContent = {
   ...questionOnlyContent,
   groups: [
-    { id: 'g-blank', items: ['   '], label: 'Blank group' },
-    { id: 'g-valid', items: ['   ', 'Apple'], label: 'Fruit' },
-    { id: 'g-empty-label', items: ['Water'], label: '   ' },
+    { id: 'g-blank', items: ['   ', '\u00A0　\t'], label: 'Blank group' },
+    { id: 'g-valid', items: ['   ', '\u00A0　\t', 'Apple'], label: 'Fruit' },
+    { id: 'g-empty-label', items: ['Water'], label: '\u00A0　\t' },
   ],
   pairs: [
     { id: 'p-blank-left', left: '   ', right: 'Definition' },
-    { id: 'p-blank-right', left: 'Term', right: '   ' },
+    { id: 'p-blank-right', left: 'Term', right: '\u00A0　\t' },
     { id: 'p-valid', left: 'Hot', right: 'Cold' },
   ],
   questions: [
-    { answer: '   ', id: 'q-blank-answer', prompt: 'Question?' },
-    { answer: 'Paris', id: 'q-blank-prompt', prompt: '   ' },
+    { answer: '\u00A0　\t', id: 'q-blank-answer', prompt: 'Question?' },
+    { answer: 'Paris', id: 'q-blank-prompt', prompt: '\u00A0　\t' },
     { answer: 'Paris', id: 'q-valid', prompt: 'Capital of France?' },
   ],
 };

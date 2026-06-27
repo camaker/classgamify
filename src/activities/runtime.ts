@@ -154,7 +154,7 @@ function hasRuntimePairContent({
   left: string;
   right: string;
 }) {
-  return Boolean(left.trim() && right.trim());
+  return hasRuntimeDisplayText(left) && hasRuntimeDisplayText(right);
 }
 
 function hasRuntimeQuestionContent({
@@ -164,7 +164,7 @@ function hasRuntimeQuestionContent({
   answer: string;
   prompt: string;
 }) {
-  return Boolean(prompt.trim() && answer.trim());
+  return hasRuntimeDisplayText(prompt) && hasRuntimeDisplayText(answer);
 }
 
 export function evaluateRuntimeAnswers({
@@ -227,17 +227,15 @@ function buildGroupSortRuntimeItems(content: ActivityContent): RuntimeItem[] {
   const groups = content.groups.filter(hasRuntimeGroupContent);
   const choices = groups.map((group) => group.label);
   const candidates = groups.flatMap((group) =>
-    group.items
-      .filter((item) => item.trim())
-      .map((item) => ({
-        answer: group.label,
-        baseId: buildGroupItemRuntimeBaseId({
-          groupId: group.id,
-          item,
-        }),
-        choices,
+    group.items.filter(hasRuntimeDisplayText).map((item) => ({
+      answer: group.label,
+      baseId: buildGroupItemRuntimeBaseId({
+        groupId: group.id,
         item,
-      }))
+      }),
+      choices,
+      item,
+    }))
   );
   const baseIdCounts = countCandidateBaseIds(candidates);
   const seenBaseIds = new Map<string, number>();
@@ -266,7 +264,7 @@ function hasRuntimeGroupContent({
   items: string[];
   label: string;
 }) {
-  return Boolean(label.trim() && items.some((item) => item.trim()));
+  return hasRuntimeDisplayText(label) && items.some(hasRuntimeDisplayText);
 }
 
 function buildGroupItemRuntimeBaseId({
