@@ -17,7 +17,10 @@ import {
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
   matchesActivitySourceMaterialFilter,
 } from '@/activities/library-filters';
-import { buildActivityLibraryWhere } from '@/activities/library-query';
+import {
+  buildActivityLibraryWhere,
+  getActivityLibraryPageItems,
+} from '@/activities/library-query';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import {
   assertActivityCanDeriveWork,
@@ -104,12 +107,11 @@ export const listActivities = createServerFn({ method: 'GET' })
           )
           .limit(1)
       : [];
-    const items = matchingActivities
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-      .slice(
-        data.pageIndex * data.pageSize,
-        (data.pageIndex + 1) * data.pageSize
-      );
+    const items = getActivityLibraryPageItems({
+      items: matchingActivities,
+      pageIndex: data.pageIndex,
+      pageSize: data.pageSize,
+    });
 
     return {
       createdActivity,

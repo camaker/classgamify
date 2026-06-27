@@ -35,6 +35,7 @@ import {
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
+import { getActivityLibraryPageItems } from '@/activities/library-query';
 import {
   ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS,
   activityLibraryCardCopy,
@@ -11457,6 +11458,31 @@ assert.equal(getActivityLibraryTotalPages({ pageSize: 0, total: 31 }), 3);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 0 }), 1);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: -3 }), 1);
 assert.equal(getActivityLibraryTotalPages({ pageSize: 12, total: 12.9 }), 1);
+const activityLibraryPageItems = [
+  { id: 'oldest', updatedAt: new Date('2026-01-01T00:00:00.000Z') },
+  { id: 'newest', updatedAt: new Date('2026-01-03T00:00:00.000Z') },
+  { id: 'middle', updatedAt: new Date('2026-01-02T00:00:00.000Z') },
+];
+assert.deepEqual(
+  getActivityLibraryPageItems({
+    items: activityLibraryPageItems,
+    pageIndex: 0,
+    pageSize: 2,
+  }).map((item) => item.id),
+  ['newest', 'middle']
+);
+assert.deepEqual(
+  getActivityLibraryPageItems({
+    items: activityLibraryPageItems,
+    pageIndex: 1,
+    pageSize: 2,
+  }).map((item) => item.id),
+  ['oldest']
+);
+assert.deepEqual(
+  activityLibraryPageItems.map((item) => item.id),
+  ['oldest', 'newest', 'middle']
+);
 const sourceMaterialFilterBaseContent = buildActivityContent({
   description: 'Source filter fixture',
   difficulty: 'starter',
@@ -11686,10 +11712,20 @@ assert.match(
   /buildActivityLibraryWhere\(\{[\s\S]*search: data\.search,[\s\S]*status: data\.status,[\s\S]*template: data\.template,[\s\S]*userId/,
   'Activity list API should delegate owner, status, template, and search where clauses to the activity domain.'
 );
+assert.match(
+  activitiesApiSource,
+  /getActivityLibraryPageItems\(\{[\s\S]*items: matchingActivities,[\s\S]*pageIndex: data\.pageIndex,[\s\S]*pageSize: data\.pageSize/,
+  'Activity list API should delegate sorting and pagination to the activity domain.'
+);
 assert.doesNotMatch(
   activitiesApiSource,
   /normalizeActivityLibrarySearch\(data\.search\)|sqlLikeContains\(activity\.title|const statusWhere|const templateWhere/,
   'Activity list API should not keep local search, status, or template where logic.'
+);
+assert.doesNotMatch(
+  activitiesApiSource,
+  /\.sort\(\(a, b\) => b\.updatedAt\.getTime\(\) - a\.updatedAt\.getTime\(\)\)|\.slice\(\s*data\.pageIndex \* data\.pageSize/,
+  'Activity list API should not keep local updated-at sorting or page slicing.'
 );
 assert.match(
   activitiesApiSource,

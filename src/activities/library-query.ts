@@ -1,4 +1,5 @@
 import {
+  ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
   type ActivityTemplateFilter,
   normalizeActivityLibrarySearch,
@@ -6,6 +7,10 @@ import {
 import { activity } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
 import { and, eq, ne, or, type SQL } from 'drizzle-orm';
+
+type ActivityLibraryPagedItem = {
+  updatedAt: Date;
+};
 
 export function buildActivityLibraryWhere({
   search,
@@ -41,4 +46,28 @@ export function buildActivityLibraryWhere({
   }
 
   return and(...filters);
+}
+
+export function getActivityLibraryPageItems<
+  TItem extends ActivityLibraryPagedItem,
+>({
+  items,
+  pageIndex = 0,
+  pageSize = ACTIVITY_LIBRARY_PAGE_SIZE,
+}: {
+  items: readonly TItem[];
+  pageIndex?: number;
+  pageSize?: number;
+}) {
+  const normalizedPageIndex =
+    Number.isInteger(pageIndex) && pageIndex > 0 ? pageIndex : 0;
+  const normalizedPageSize =
+    Number.isInteger(pageSize) && pageSize > 0
+      ? pageSize
+      : ACTIVITY_LIBRARY_PAGE_SIZE;
+  const start = normalizedPageIndex * normalizedPageSize;
+
+  return [...items]
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .slice(start, start + normalizedPageSize);
 }
