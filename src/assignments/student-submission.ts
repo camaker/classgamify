@@ -325,17 +325,21 @@ export function buildStudentAttemptResultDisplay({
     });
 
   return {
-    accuracyLabel: `${formatAssignmentResultPercent(accuracy)} ${
-      STUDENT_RUNNER_COPY.resultAccuracyLabel
-    }`,
-    durationLabel: `${STUDENT_RUNNER_COPY.resultTimePrefix} ${formatAttemptDuration(
-      normalizedDurationSeconds,
-      {
+    accuracyLabel: m.student_runner_result_accuracy_line({
+      accuracy: formatAssignmentResultPercent(accuracy),
+      label: STUDENT_RUNNER_COPY.resultAccuracyLabel,
+    }),
+    durationLabel: m.student_runner_result_time_line({
+      label: STUDENT_RUNNER_COPY.resultTimePrefix,
+      time: formatAttemptDuration(normalizedDurationSeconds, {
         emptyValue: '',
         style: 'timer',
-      }
-    )}`,
-    scoreLabel: `${normalizedEarnedPoints}/${normalizedTotalPoints}`,
+      }),
+    }),
+    scoreLabel: m.student_runner_result_score_line({
+      earnedPoints: normalizedEarnedPoints,
+      totalPoints: normalizedTotalPoints,
+    }),
   };
 }
 
@@ -590,7 +594,11 @@ export function formatAttemptCompletionProgressLabel({
   );
   const itemCount = normalizeRuntimeDisplayCount(completionSummary.itemCount);
 
-  return `${answeredItemCount}/${itemCount} ${progressVerb}`;
+  return m.student_attempt_progress_label({
+    answeredCount: answeredItemCount,
+    itemCount,
+    verb: progressVerb,
+  });
 }
 
 export function buildStudentAttemptSessionKey({

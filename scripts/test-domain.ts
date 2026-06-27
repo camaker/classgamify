@@ -3451,6 +3451,49 @@ const studentRunnerStateSource = readFileSync(
   'src/assignments/student-runner-state.ts',
   'utf8'
 );
+const studentRunnerSubmissionSource = readFileSync(
+  'src/assignments/student-submission.ts',
+  'utf8'
+);
+const studentRunnerViewSource = readFileSync(
+  'src/assignments/student-runner-view.ts',
+  'utf8'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line[\s\S]*m\.student_runner_result_score_line/,
+  'Student submission display should format result accuracy, time, and score through localized message lines.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /m\.student_attempt_progress_label/,
+  'Student attempt progress labels should come from localized message formatting.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /`\$\{formatAssignmentResultPercent\(accuracy\)\}|\$\{normalizedEarnedPoints\}\/\$\{normalizedTotalPoints\}|`\$\{answeredItemCount\}\/\$\{itemCount\}/,
+  'Student submission display should not hand-compose visible progress, score, or accuracy lines.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /m\.student_runner_item_position_label/,
+  'Student runner view should format item position labels through localized messages.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /m\.activity_runner_word_bank_separator\(\)/,
+  'Fill-blank word-bank text should use the localized activity runner separator.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /separator: m\.student_runner_choice_separator\(\)/,
+  'Student answer feedback accepted alternatives should use the localized student runner choice separator.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource,
+  /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,
+  'Student runner view should not hand-compose item position, word-bank, or accepted-answer separators.'
+);
 assert.match(playRouteSource, /robots: 'noindex,follow'/);
 assert.match(
   playRouteSource,
@@ -4332,6 +4375,12 @@ assert.deepEqual(
   }
 );
 assert.equal(formatSequentialRunnerItemLabel(' ', -4), 'Item 1');
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(formatSequentialRunnerItemLabel('题目', 1), '题目 2');
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
   activeItemId: 'q-1',
   answers: { 'q-1': 'Paris' },
@@ -4552,6 +4601,26 @@ assert.deepEqual(
     },
   ]
 );
+overwriteGetLocale(() => 'zh');
+try {
+  const zhFillBlankView = buildFillBlankWorksheetView({
+    answers: {},
+    items: [
+      {
+        choices: ['apple', 'banana'],
+        id: 'blank-zh',
+        kind: 'question',
+        prompt: 'I eat ___ for breakfast.',
+      },
+    ],
+    wordBankLabel: '词库',
+  }).fillBlankItemViews[0];
+
+  assert.equal(zhFillBlankView?.wordBankText, 'apple、banana');
+  assert.equal(zhFillBlankView?.wordBankLineText, '词库：apple、banana');
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildPublicAnswerFeedbackView({
     correctAnswerLabel: 'Correct match',
@@ -4577,6 +4646,23 @@ assert.deepEqual(
     statusLabel: 'Needs review',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildPublicAnswerFeedbackView({
+      reviewItem: {
+        acceptedAnswers: ['Paris', 'Paris, France'],
+        correct: false,
+        correctAnswer: 'Paris',
+        itemId: 'item-zh',
+        submitted: true,
+      },
+    })?.acceptedAnswersText,
+    '可接受答案：Paris | Paris, France'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildPublicAnswerFeedbackView({
     reviewItem: {
@@ -4871,6 +4957,17 @@ assert.equal(
   }),
   '0/0 matched'
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatAttemptCompletionProgressLabel({
+      completionSummary: incompleteCompletionSummary,
+    }),
+    '1/3 已作答'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildAttemptCompletionCopy({
     completionSummary: {
@@ -5041,6 +5138,24 @@ assert.deepEqual(
     scoreLabel: '1/2',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildStudentAttemptResultDisplay({
+      accuracy: 50,
+      earnedPoints: 1,
+      fallbackDurationSeconds: 5,
+      totalPoints: 2,
+    }),
+    {
+      accuracyLabel: '50% 正确率',
+      durationLabel: '用时：5 秒',
+      scoreLabel: '1/2',
+    }
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildStudentAttemptControlState({
     canSubmit: true,

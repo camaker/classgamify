@@ -215,7 +215,10 @@ export function buildStudentRunnerView({
       answered: isStudentAnswerFilled(answer),
       item,
       kindLabel: formatRuntimeItemKindLabel(item),
-      positionLabel: `${index + 1}. ${prompt}`,
+      positionLabel: m.student_runner_item_position_label({
+        index: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
+        prompt,
+      }),
       prompt,
       reviewItem,
       status: getStudentRunnerReviewStatus(reviewItem),
@@ -619,7 +622,7 @@ export function buildFillBlankWorksheetView({
     ...runnerView,
     fillBlankItemViews: runnerView.itemViews.map((itemView, index) => {
       const wordBankText = itemView.item.choices?.length
-        ? itemView.item.choices.join(', ')
+        ? itemView.item.choices.join(m.activity_runner_word_bank_separator())
         : null;
 
       return {
@@ -653,7 +656,7 @@ export function buildPublicAnswerFeedbackView({
   const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
     reviewItem.acceptedAnswers,
     {
-      separator: ' | ',
+      separator: m.student_runner_choice_separator(),
     }
   );
   const explanationLabel = m.student_runner_feedback_explanation();
