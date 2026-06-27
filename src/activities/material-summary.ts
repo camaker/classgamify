@@ -1,4 +1,5 @@
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import type { ActivityMaterialReference } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import {
   USER_FILE_MATERIAL_KINDS,
@@ -125,6 +126,20 @@ export function buildActivitySourceMaterialSummaryView(
     readiness: summary.readiness,
     title: m.activity_source_material_summary_title(),
   };
+}
+
+export function formatActivitySourceMaterialReferenceMeta(
+  material: ActivityMaterialReference,
+  extraParts: Array<string | undefined> = []
+) {
+  return [
+    formatUserFileMaterialKind(material.kind),
+    ...extraParts,
+    material.contentType,
+  ]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(m.activity_source_material_summary_list_separator());
 }
 
 type ActivitySourceMaterialExtractionActionDefinition = {

@@ -267,6 +267,7 @@
   "activity_library_remix_action": "复制为{template}",
   "activity_library_remix_action_fallback": "模板",
   "activity_library_remix_hint": "可改编为：{templates}。",
+  "activity_library_template_list_separator": "、",
   "activity_library_stat_groups": "分组",
   "activity_library_stat_pairs": "配对",
   "activity_library_stat_questions": "题目",

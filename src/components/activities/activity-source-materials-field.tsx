@@ -3,7 +3,10 @@ import {
   buildActivityMaterialReferenceFromUserFile,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
-import { buildActivitySourceMaterialSummaryView } from '@/activities/material-summary';
+import {
+  buildActivitySourceMaterialSummaryView,
+  formatActivitySourceMaterialReferenceMeta,
+} from '@/activities/material-summary';
 import type { ActivityMaterialReference } from '@/activities/types';
 import { ActivitySourceMaterialsSummary } from '@/components/activities/activity-source-materials-summary';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +17,6 @@ import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { m } from '@/locale/paraglide/messages';
 import type { UserFileMaterialKind } from '@/storage/file-materials';
-import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 import {
   IconFile,
   IconFileMusic,
@@ -250,13 +252,9 @@ function MaterialReferenceRow({
   material: ActivityMaterialReference;
   selected?: boolean;
 }) {
-  const meta = [
-    formatUserFileMaterialKind(material.kind),
+  const meta = formatActivitySourceMaterialReferenceMeta(material, [
     typeof material.size === 'number' ? formatBytes(material.size) : undefined,
-    material.contentType,
-  ]
-    .filter(Boolean)
-    .join(' / ');
+  ]);
 
   return (
     <div

@@ -56,6 +56,7 @@ import {
   buildStarterActivityLibraryCardViewModel,
   buildActivityLibraryTemplateFilterOptions,
   findCreatedActivityInList,
+  formatActivityLibraryTemplateShortNameList,
   formatActivityLibraryStatusLabel,
   resolveCreatedActivityPanelActivity,
 } from '@/activities/library-view';
@@ -124,6 +125,7 @@ import {
 } from '@/activities/draft-meta';
 import {
   buildActivitySourceMaterialSummaryView,
+  formatActivitySourceMaterialReferenceMeta,
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
 import {
@@ -1323,6 +1325,16 @@ assert.doesNotMatch(
   /slice\(0, 2\)|slice\(0, 3\)/,
   'Activity library compatibility view should not keep local display limits.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /formatActivityLibraryTemplateShortNameList[\s\S]*activity_library_template_list_separator/,
+  'Activity library remix hints should format template short-name lists through localized domain copy.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /join\(', '\)/,
+  'Activity library remix hints should not hard-code visible template list separators.'
+);
 const activityPreviewSource = readFileSync(
   'src/components/activities/activity-preview.tsx',
   'utf8'
@@ -1481,6 +1493,16 @@ assert.match(
   activitySourceMaterialsFieldSource,
   /ActivitySourceMaterialsSummary[\s\S]*summary=\{selectedSummary\}/,
   'Activity source-material picker should render attached material readiness through the summary component.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /formatActivitySourceMaterialReferenceMeta/,
+  'Activity source-material picker should format material row metadata through the activity-domain helper.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsFieldSource,
+  /join\(' \/ '\)/,
+  'Activity source-material picker should not hard-code visible material metadata separators.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -2879,6 +2901,11 @@ assert.match(
   /join\(m\.activity_source_material_summary_list_separator\(\)\)/,
   'Activity source-material source-kind summaries should use a localized list separator.'
 );
+assert.match(
+  activityMaterialSummarySource,
+  /formatActivitySourceMaterialReferenceMeta[\s\S]*activity_source_material_summary_list_separator/,
+  'Activity source-material reference meta should use the activity-domain localized list separator.'
+);
 assert.doesNotMatch(
   activityMaterialSummarySource,
   /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)/,
@@ -2897,6 +2924,23 @@ assert.deepEqual(listeningMaterialReference, {
   originalName: '三年级听力.mp3',
   size: 2_048,
 });
+assert.equal(
+  formatActivitySourceMaterialReferenceMeta(listeningMaterialReference, [
+    '2 KB',
+  ]),
+  'Audio, 2 KB, audio/mpeg'
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatActivitySourceMaterialReferenceMeta(listeningMaterialReference, [
+      '2 KB',
+    ]),
+    '音频，2 KB，audio/mpeg'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(
   buildActivityMaterialReferenceFromUserFile({
     contentType: 'application/pdf',
@@ -13057,6 +13101,23 @@ assert.equal(
   buildActivityLibraryRemixHint(['Quiz', ' Fill ', '']),
   'Ready to remix into Quiz, Fill.'
 );
+assert.equal(
+  formatActivityLibraryTemplateShortNameList(['Quiz', ' Fill ', '']),
+  'Quiz, Fill'
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    formatActivityLibraryTemplateShortNameList(['测验', ' 填空 ', '']),
+    '测验、填空'
+  );
+  assert.equal(
+    buildActivityLibraryRemixHint(['测验', ' 填空 ', '']),
+    '可改编为：测验、填空。'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.equal(buildActivityLibraryRemixHint([]), undefined);
 assert.equal(buildActivityLibraryRemixActionLabel('Fill'), 'Copy as Fill');
 assert.equal(buildActivityLibraryRemixActionLabel('   '), 'Copy as template');

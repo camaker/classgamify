@@ -753,14 +753,20 @@ export function formatActivityLibraryStatusLabel(
 }
 
 export function buildActivityLibraryRemixHint(shortNames: string[]) {
-  const templateList = shortNames
-    .map((shortName) => shortName.trim())
-    .filter(Boolean)
-    .join(', ');
+  const templateList = formatActivityLibraryTemplateShortNameList(shortNames);
 
   return templateList
     ? m.activity_library_remix_hint({ templates: templateList })
     : undefined;
+}
+
+export function formatActivityLibraryTemplateShortNameList(
+  shortNames: string[]
+) {
+  return shortNames
+    .map((shortName) => shortName.trim())
+    .filter(Boolean)
+    .join(m.activity_library_template_list_separator());
 }
 
 export function buildActivityLibraryRemixActionLabel(shortName: string) {
