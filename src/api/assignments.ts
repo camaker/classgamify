@@ -52,6 +52,7 @@ import {
 } from '@/assignments/lifecycle';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import {
+  buildAssignmentStatusUpdateSet,
   buildPublishedAssignmentInsert,
   buildPublishedAssignmentSnapshotInsert,
 } from '@/assignments/persistence';
@@ -326,10 +327,12 @@ export const updateAssignmentStatus = createServerFn({ method: 'POST' })
 
     await db
       .update(assignment)
-      .set({
-        status: data.status,
-        updatedAt: new Date(),
-      })
+      .set(
+        buildAssignmentStatusUpdateSet({
+          nextStatus: data.status,
+          updatedAt: new Date(),
+        })
+      )
       .where(where);
 
     const [row] = await db

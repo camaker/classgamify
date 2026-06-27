@@ -18,6 +18,11 @@ type PublishedAssignmentInsert = {
   updatedAt: Date;
 };
 
+type AssignmentStatusUpdateSet = {
+  status: AssignmentStatus;
+  updatedAt: Date;
+};
+
 export function buildPublishedAssignmentInsert({
   expiresAt,
   id,
@@ -67,4 +72,17 @@ export function buildPublishedAssignmentSnapshotInsert({
     createdAt,
     sourceActivity,
   });
+}
+
+export function buildAssignmentStatusUpdateSet({
+  nextStatus,
+  updatedAt,
+}: {
+  nextStatus: AssignmentStatus;
+  updatedAt: Date;
+}): AssignmentStatusUpdateSet {
+  return {
+    status: nextStatus,
+    updatedAt,
+  };
 }

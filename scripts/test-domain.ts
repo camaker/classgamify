@@ -407,6 +407,7 @@ import {
   resolveAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
 import {
+  buildAssignmentStatusUpdateSet,
   buildPublishedAssignmentInsert,
   buildPublishedAssignmentSnapshotInsert,
 } from '@/assignments/persistence';
@@ -9100,10 +9101,20 @@ assert.deepEqual(
   }),
   assignmentSnapshotInsert
 );
+assert.deepEqual(
+  buildAssignmentStatusUpdateSet({
+    nextStatus: 'closed',
+    updatedAt: assignmentSnapshotCreatedAt,
+  }),
+  {
+    status: 'closed',
+    updatedAt: assignmentSnapshotCreatedAt,
+  }
+);
 assert.match(
   assignmentPersistenceSource,
-  /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*status: 'published'[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert/,
-  'Assignment persistence should own published assignment and snapshot insert payload shapes.'
+  /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*status: 'published'[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert[\s\S]*buildAssignmentStatusUpdateSet[\s\S]*status: nextStatus[\s\S]*updatedAt/,
+  'Assignment persistence should own published assignment, snapshot insert, and status update payload shapes.'
 );
 assignmentSnapshotSourceActivity.description = 'Edited after publish';
 assignmentSnapshotSourceActivity.templateType = 'match-up';
@@ -12681,6 +12692,16 @@ assert.doesNotMatch(
   assignmentsApiSource,
   /tx\.insert\(assignment\)\.values\(\{[\s\S]*activityId: sourceActivity\.id[\s\S]*status: 'published'|tx\.insert\(assignmentSnapshot\)\.values\([\s\S]*buildAssignmentSnapshotInsert/,
   'Publish assignment API should not hand-write published assignment or snapshot insert payloads.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const updateAssignmentStatus[\s\S]*assertAssignmentStatusTransition\(\{[\s\S]*currentStatus: existingAssignment\.status[\s\S]*nextStatus: data\.status[\s\S]*\.update\(assignment\)[\s\S]*buildAssignmentStatusUpdateSet\(\{[\s\S]*nextStatus: data\.status[\s\S]*updatedAt: new Date\(\)/,
+  'Update assignment status API should validate lifecycle transitions before using assignment persistence status payloads.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /updateAssignmentStatus[\s\S]*\.set\(\{[\s\S]*status: data\.status[\s\S]*updatedAt: new Date\(\)/,
+  'Update assignment status API should not hand-write assignment status update payloads.'
 );
 assert.match(
   assignmentsApiSource,
