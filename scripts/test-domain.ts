@@ -1464,6 +1464,16 @@ assert.match(
   /submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
   'Public attempt review items should derive submitted state through the shared runtime display-text helper.'
 );
+assert.match(
+  publicAssignmentSource,
+  /return \{\s*choices,[\s\S]*id: item\.id,[\s\S]*kind: item\.kind,[\s\S]*prompt: normalizeRuntimeDisplayText\(item\.prompt\),[\s\S]*\};/,
+  'Public runtime sanitization should explicitly pick the only fields allowed in student payloads.'
+);
+assert.doesNotMatch(
+  publicAssignmentSource,
+  /stripRuntimeAnswer[\s\S]*\.\.\.item/,
+  'Public runtime sanitization should not spread runtime items into student payloads.'
+);
 assert.doesNotMatch(
   publicAssignmentSource,
   /Math\.max\(5, Math\.min\(20, itemCount \* 2\)\)/,
@@ -10395,6 +10405,30 @@ assert.deepEqual(publicRuntimeItem, {
 });
 assert.equal('answer' in publicRuntimeItem, false);
 assert.equal('explanation' in publicRuntimeItem, false);
+const publicRuntimeItemWithPrivateFields = stripRuntimeAnswer({
+  acceptedAnswers: ['Paris', 'Paris, France'],
+  answer: 'Paris',
+  choices: ['Paris', 'Rome'],
+  explanation: 'Paris is the capital of France.',
+  id: 'q-private',
+  kind: 'question',
+  prompt: 'Capital of France?',
+  sourceMaterials: [listeningMaterialReference],
+  storageKey: 'teacher-only/key',
+} satisfies RuntimeItem & {
+  acceptedAnswers: string[];
+  sourceMaterials: unknown[];
+  storageKey: string;
+});
+assert.deepEqual(Object.keys(publicRuntimeItemWithPrivateFields).sort(), [
+  'choices',
+  'id',
+  'kind',
+  'prompt',
+]);
+assert.equal('acceptedAnswers' in publicRuntimeItemWithPrivateFields, false);
+assert.equal('sourceMaterials' in publicRuntimeItemWithPrivateFields, false);
+assert.equal('storageKey' in publicRuntimeItemWithPrivateFields, false);
 const runtimeChoiceSource = ['Paris', 'Rome'];
 const clonedPublicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
