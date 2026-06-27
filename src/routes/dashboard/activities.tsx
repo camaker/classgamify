@@ -1,4 +1,3 @@
-import { getStarterActivities } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
@@ -75,7 +74,6 @@ function DashboardActivitiesPage() {
     [data, isLoading, created, page, q, source, status, template]
   );
   const activePageView = data ? loadedPageView : pageView;
-  const starterActivities = getStarterActivities();
 
   useEffect(() => {
     if (!isLoading && currentPage > activePageView.totalPages) {
@@ -289,7 +287,7 @@ function DashboardActivitiesPage() {
             </div>
             {activePageView.emptyState.showStarterActivities ? (
               <section className="grid gap-4 lg:grid-cols-2">
-                {starterActivities.map((activity) => (
+                {activePageView.starterPreview.activities.map((activity) => (
                   <ActivityLibraryCard
                     key={activity.id}
                     activity={buildStarterActivityLibraryCardViewModel(

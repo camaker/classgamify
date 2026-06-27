@@ -1,4 +1,9 @@
-import { ACTIVITY_TEMPLATE_TYPES } from '@/activities/types';
+import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
+import {
+  ACTIVITY_TEMPLATE_TYPES,
+  type ActivitySeed,
+  type AssignmentSeed,
+} from '@/activities/types';
 import {
   formatAssignmentResultNumber,
   formatAssignmentResultPercent,
@@ -34,6 +39,7 @@ type DashboardOverviewMetric = {
 type DashboardOverviewPageViewModel = {
   actionCards: DashboardOverviewActionCard[];
   metrics: DashboardOverviewMetric[];
+  preview: DashboardOverviewPreview;
   readinessRows: DashboardCoreLoopReadinessRow[];
 };
 
@@ -59,6 +65,12 @@ export type DashboardCoreLoopReadinessRow = {
   id: DashboardCoreLoopReadinessId;
   label: string;
   value: number;
+};
+
+export type DashboardOverviewPreview = {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+  source: 'starter-preview';
 };
 
 export const dashboardOverviewPageCopy = {
@@ -121,10 +133,12 @@ export function buildDashboardOverviewPageViewModel({
   activitySummary,
   assignmentSummary,
   isLoading,
+  preview = buildDashboardOverviewStarterPreview(),
 }: {
   activitySummary?: DashboardActivitySummary;
   assignmentSummary?: DashboardAssignmentSummary;
   isLoading: boolean;
+  preview?: DashboardOverviewPreview;
 }): DashboardOverviewPageViewModel {
   return {
     actionCards: getDashboardOverviewActionCards(),
@@ -133,10 +147,21 @@ export function buildDashboardOverviewPageViewModel({
       assignmentSummary,
       isLoading,
     }),
+    preview,
     readinessRows: buildDashboardCoreLoopReadiness({
       activitySummary,
       assignmentSummary,
     }),
+  };
+}
+
+export function buildDashboardOverviewStarterPreview(): DashboardOverviewPreview {
+  const assignment = getStarterAssignment();
+
+  return {
+    activity: getStarterActivity(assignment.activityId),
+    assignment,
+    source: 'starter-preview',
   };
 }
 

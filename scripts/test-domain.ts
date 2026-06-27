@@ -54,6 +54,7 @@ import {
   buildActivityLibraryRemixHint,
   buildActivityLibrarySearchPanelView,
   buildStarterActivityLibraryCardViewModel,
+  buildActivityLibraryStarterPreview,
   buildActivityLibraryTemplateFilterOptions,
   findCreatedActivityInList,
   formatActivityLibraryTemplateShortNameList,
@@ -260,6 +261,7 @@ import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
   buildDashboardOverviewPageViewModel,
+  buildDashboardOverviewStarterPreview,
   dashboardOverviewPageCopy,
   formatDashboardMetricValue,
   formatDashboardTemplateCoverageValue,
@@ -397,6 +399,7 @@ import {
   buildAssignmentListEmptyStateView,
   buildAssignmentListPageViewModel,
   buildAssignmentListSearchPanelView,
+  buildAssignmentListStarterPreview,
   buildStarterAssignmentListCardViewModel,
   getAssignmentListCardActionState,
   getAssignmentListEmptyState,
@@ -10961,6 +10964,11 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /activePageView\.starterPreview\.activities/,
+  'Activity dashboard route should render starter cards from the activity-domain preview view-model.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
   /buildActivityLibraryFilterRouteSearch/,
   'Activity dashboard route should update filters through the activity-domain filter route helper.'
 );
@@ -11041,8 +11049,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
-  /getActivityTemplates|buildActivityLifecycleActionView|getActivityLifecycleActionCopy|buildActivityLibraryFilterSummary|normalizeActivityLibrarySearch|getActivityLibraryTotalPages|buildActivityLibrarySummaryMetrics|buildActivityLibraryEmptyStateView|resolveCreatedActivityPanelActivity/,
-  'Activity dashboard route should not rebuild template options, lifecycle action views, filter summaries, pagination, summary, empty state, or created panel lookup directly.'
+  /getStarterActivities|getStarterActivity|getActivityTemplates|buildActivityLifecycleActionView|getActivityLifecycleActionCopy|buildActivityLibraryFilterSummary|normalizeActivityLibrarySearch|getActivityLibraryTotalPages|buildActivityLibrarySummaryMetrics|buildActivityLibraryEmptyStateView|resolveCreatedActivityPanelActivity/,
+  'Activity dashboard route should not rebuild starter previews, template options, lifecycle action views, filter summaries, pagination, summary, empty state, or created panel lookup directly.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -11264,6 +11272,11 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
+  /activePageView\.starterPreview\.assignments/,
+  'Assignment dashboard route should render starter cards from the assignment-domain preview view-model.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
   /buildAssignmentListFilterRouteSearch/,
   'Assignment dashboard route should update filters through the assignment-domain route helper.'
 );
@@ -11364,8 +11377,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
-  /assignmentStatusFilterOptions|normalizeAssignmentListSearch|buildAssignmentListFilterSummary|getAssignmentListTotalPages|buildAssignmentListSummaryMetrics|buildAssignmentListEmptyStateView|resolvePublishedAssignmentPanelAssignment/,
-  'Assignment dashboard route should not rebuild status options, filter summaries, pagination, summary, empty state, or published panel context directly.'
+  /getStarterActivity|getStarterAssignment|getStarterAssignments|assignmentStatusFilterOptions|normalizeAssignmentListSearch|buildAssignmentListFilterSummary|getAssignmentListTotalPages|buildAssignmentListSummaryMetrics|buildAssignmentListEmptyStateView|resolvePublishedAssignmentPanelAssignment/,
+  'Assignment dashboard route should not rebuild starter previews, status options, filter summaries, pagination, summary, empty state, or published panel context directly.'
 );
 assert.match(
   assignmentListViewSource,
@@ -12748,6 +12761,31 @@ const dashboardOverviewPageView = buildDashboardOverviewPageViewModel({
   },
   isLoading: false,
 });
+const dashboardOverviewStarterPreview = buildDashboardOverviewStarterPreview();
+assert.deepEqual(
+  {
+    activityId: dashboardOverviewStarterPreview.activity.id,
+    assignmentActivityId: dashboardOverviewStarterPreview.assignment.activityId,
+    source: dashboardOverviewStarterPreview.source,
+  },
+  {
+    activityId: 'english-food-quiz',
+    assignmentActivityId: 'english-food-quiz',
+    source: 'starter-preview',
+  }
+);
+assert.deepEqual(
+  {
+    activityId: dashboardOverviewPageView.preview.activity.id,
+    assignmentId: dashboardOverviewPageView.preview.assignment.id,
+    source: dashboardOverviewPageView.preview.source,
+  },
+  {
+    activityId: 'english-food-quiz',
+    assignmentId: 'assignment-food-demo',
+    source: 'starter-preview',
+  }
+);
 assert.deepEqual(
   {
     actionCardIds: dashboardOverviewPageView.actionCards.map((card) => card.id),
@@ -13025,8 +13063,13 @@ assert.match(
 );
 assert.match(
   dashboardOverviewRouteSource,
-  /<ActivityPreview activity=\{activity\} assignment=\{assignment\} \/>/,
-  'Dashboard starter activity and assignment should remain limited to the preview surface.'
+  /<ActivityPreview[\s\S]*activity=\{pageView\.preview\.activity\}[\s\S]*assignment=\{pageView\.preview\.assignment\}[\s\S]*\/>/,
+  'Dashboard starter activity and assignment should render only through the dashboard preview view-model.'
+);
+assert.doesNotMatch(
+  dashboardOverviewRouteSource,
+  /getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
+  'Dashboard overview route should not pull starter catalog data directly into owner-scoped metric surfaces.'
 );
 assert.deepEqual(
   getDashboardOverviewActionCards().map((card) => [
@@ -14031,6 +14074,23 @@ const emptyAssignmentListPageView = buildAssignmentListPageViewModel({
   isLoading: false,
   search: {},
 });
+const assignmentListStarterPreview = buildAssignmentListStarterPreview();
+assert.deepEqual(
+  {
+    assignmentIds: assignmentListStarterPreview.assignments.map(
+      (item) => item.assignment.id
+    ),
+    activityIds: assignmentListStarterPreview.assignments.map(
+      (item) => item.activity.id
+    ),
+    source: assignmentListStarterPreview.source,
+  },
+  {
+    assignmentIds: ['assignment-food-demo'],
+    activityIds: ['english-food-quiz'],
+    source: 'starter-preview',
+  }
+);
 assert.deepEqual(
   {
     breadcrumbs: emptyAssignmentListPageView.breadcrumbs,
@@ -14038,6 +14098,12 @@ assert.deepEqual(
     hasAssignments: emptyAssignmentListPageView.hasAssignments,
     publishedPanelContext: emptyAssignmentListPageView.publishedPanelContext,
     resolvedSearch: emptyAssignmentListPageView.resolvedSearch,
+    starterPreview: {
+      assignmentIds: emptyAssignmentListPageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
+      source: emptyAssignmentListPageView.starterPreview.source,
+    },
     summaryMetrics: emptyAssignmentListPageView.summaryMetrics,
     title: emptyAssignmentListPageView.title,
     totalAssignments: emptyAssignmentListPageView.totalAssignments,
@@ -14063,6 +14129,10 @@ assert.deepEqual(
       normalizedSearchQuery: undefined,
       searchQuery: '',
       statusFilter: 'all',
+    },
+    starterPreview: {
+      assignmentIds: ['assignment-food-demo'],
+      source: 'starter-preview',
     },
     summaryMetrics: [
       { id: 'total', label: 'Assignments', value: '0' },
@@ -16075,6 +16145,19 @@ const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({
   isLoading: false,
   search: {},
 });
+const activityLibraryStarterPreview = buildActivityLibraryStarterPreview();
+assert.deepEqual(
+  {
+    activityIds: activityLibraryStarterPreview.activities.map(
+      (item) => item.id
+    ),
+    source: activityLibraryStarterPreview.source,
+  },
+  {
+    activityIds: ['english-food-quiz', 'science-materials-sort'],
+    source: 'starter-preview',
+  }
+);
 assert.deepEqual(
   {
     activityIds: emptyActivityLibraryPageView.activities.map((item) => item.id),
@@ -16083,6 +16166,12 @@ assert.deepEqual(
     emptyState: emptyActivityLibraryPageView.emptyState,
     hasActivities: emptyActivityLibraryPageView.hasActivities,
     resolvedSearch: emptyActivityLibraryPageView.resolvedSearch,
+    starterPreview: {
+      activityIds: emptyActivityLibraryPageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
+      source: emptyActivityLibraryPageView.starterPreview.source,
+    },
     summaryMetrics: emptyActivityLibraryPageView.summaryMetrics,
     title: emptyActivityLibraryPageView.title,
     totalActivities: emptyActivityLibraryPageView.totalActivities,
@@ -16111,6 +16200,10 @@ assert.deepEqual(
       searchQuery: '',
       sourceFilter: 'all',
       templateFilter: 'all',
+    },
+    starterPreview: {
+      activityIds: ['english-food-quiz', 'science-materials-sort'],
+      source: 'starter-preview',
     },
     summaryMetrics: [
       { id: 'total', label: 'Activities', value: '0' },

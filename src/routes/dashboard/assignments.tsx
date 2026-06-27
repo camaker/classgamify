@@ -13,10 +13,6 @@ import {
   buildAssignmentListPageViewModel,
   buildStarterAssignmentListCardViewModel,
 } from '@/assignments/list-view';
-import {
-  getStarterActivity,
-  getStarterAssignments,
-} from '@/activities/catalog';
 import { AssignmentListCard } from '@/components/assignments/assignment-list-card';
 import { AssignmentListFilters } from '@/components/assignments/assignment-list-filters';
 import { AssignmentListSummaryCard } from '@/components/assignments/assignment-list-summary-card';
@@ -68,7 +64,6 @@ function DashboardAssignmentsPage() {
     [data, isLoading, page, published, q, status]
   );
   const activePageView = data ? loadedPageView : pageView;
-  const starterAssignments = getStarterAssignments();
 
   useEffect(() => {
     if (!isLoading && currentPage > activePageView.totalPages) {
@@ -241,14 +236,13 @@ function DashboardAssignmentsPage() {
             </div>
             {activePageView.emptyState.showStarterAssignments ? (
               <section className="grid gap-4">
-                {starterAssignments.map((assignment) => {
-                  const activity = getStarterActivity(assignment.activityId);
+                {activePageView.starterPreview.assignments.map((preview) => {
                   return (
                     <AssignmentListCard
-                      key={assignment.id}
+                      key={preview.assignment.id}
                       assignment={buildStarterAssignmentListCardViewModel({
-                        activity,
-                        assignment,
+                        activity: preview.activity,
+                        assignment: preview.assignment,
                       })}
                     />
                   );

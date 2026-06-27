@@ -1,9 +1,15 @@
 import type {
+  ActivitySeed,
   ActivityTemplateType,
+  AssignmentSeed,
   AssignmentSettings,
   AssignmentStatus,
 } from '@/activities/types';
-import { getTemplateByType } from '@/activities/catalog';
+import {
+  getStarterActivity,
+  getStarterAssignments,
+  getTemplateByType,
+} from '@/activities/catalog';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import {
   ASSIGNMENT_LIST_PAGE_SIZE,
@@ -205,10 +211,21 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
     typeof buildPublishedAssignmentPanelContext
   >;
   resolvedSearch: AssignmentListPageResolvedSearch;
+  starterPreview: AssignmentListStarterPreview;
   summaryMetrics: AssignmentListSummaryMetric[];
   title: string;
   totalAssignments: number;
   totalPages: number;
+};
+
+export type AssignmentListStarterPreviewItem = {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+};
+
+export type AssignmentListStarterPreview = {
+  assignments: AssignmentListStarterPreviewItem[];
+  source: 'starter-preview';
 };
 
 export const assignmentListPageCopy = {
@@ -380,10 +397,12 @@ export function buildAssignmentListPageViewModel<
 >({
   data,
   isLoading,
+  starterPreview = buildAssignmentListStarterPreview(),
   search,
 }: {
   data?: AssignmentListPageData<TItem> | null;
   isLoading: boolean;
+  starterPreview?: AssignmentListStarterPreview;
   search: AssignmentListPageSearchState;
 }): AssignmentListPageViewModel<TItem> {
   const resolvedSearch = resolveAssignmentListPageSearch(search);
@@ -427,6 +446,7 @@ export function buildAssignmentListPageViewModel<
     loadErrorMessage: assignmentListPageCopy.loadErrorMessage,
     publishedPanelContext,
     resolvedSearch,
+    starterPreview,
     summaryMetrics: buildAssignmentListSummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
       summary: data?.summary,
@@ -435,6 +455,16 @@ export function buildAssignmentListPageViewModel<
     title: assignmentListPageCopy.title,
     totalAssignments,
     totalPages,
+  };
+}
+
+export function buildAssignmentListStarterPreview(): AssignmentListStarterPreview {
+  return {
+    assignments: getStarterAssignments().map((assignment) => ({
+      activity: getStarterActivity(assignment.activityId),
+      assignment,
+    })),
+    source: 'starter-preview',
   };
 }
 

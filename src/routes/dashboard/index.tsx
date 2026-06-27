@@ -1,4 +1,3 @@
-import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { ActivityPreview } from '@/components/activities/activity-preview';
 import { DashboardOverviewActionCard } from '@/components/dashboard/dashboard-overview-action-card';
 import { DashboardOverviewMetricCard } from '@/components/dashboard/dashboard-overview-metric-card';
@@ -27,8 +26,6 @@ export const Route = createFileRoute('/dashboard/')({
 });
 
 function DashboardPage() {
-  const activity = getStarterActivity();
-  const assignment = getStarterAssignment();
   const { data: activitiesData, isLoading: activitiesLoading } = useActivities({
     pageIndex: 0,
     pageSize: 1,
@@ -117,7 +114,10 @@ function DashboardPage() {
           </Card>
         </section>
 
-        <ActivityPreview activity={activity} assignment={assignment} />
+        <ActivityPreview
+          activity={pageView.preview.activity}
+          assignment={pageView.preview.assignment}
+        />
 
         <section className="grid gap-4 md:grid-cols-3">
           {pageView.actionCards.map((card) => (

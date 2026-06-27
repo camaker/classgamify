@@ -1,4 +1,8 @@
-import { getActivityTemplates, getTemplateByType } from '@/activities/catalog';
+import {
+  getActivityTemplates,
+  getStarterActivities,
+  getTemplateByType,
+} from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
   type ActivityLibraryStatus,
@@ -211,10 +215,16 @@ type ActivityLibraryPageViewModel<TItem extends ActivityLibraryPageItem> = {
   hero: typeof activityLibraryHeroCopy;
   loadErrorMessage: string;
   resolvedSearch: ActivityLibraryPageResolvedSearch;
+  starterPreview: ActivityLibraryStarterPreview;
   summaryMetrics: ActivityLibrarySummaryMetric[];
   title: string;
   totalActivities: number;
   totalPages: number;
+};
+
+export type ActivityLibraryStarterPreview = {
+  activities: ActivitySeed[];
+  source: 'starter-preview';
 };
 
 export const activityLibraryPageCopy = {
@@ -414,10 +424,12 @@ export function buildActivityLibraryPageViewModel<
 >({
   data,
   isLoading,
+  starterPreview = buildActivityLibraryStarterPreview(),
   search,
 }: {
   data?: ActivityLibraryPageData<TItem> | null;
   isLoading: boolean;
+  starterPreview?: ActivityLibraryStarterPreview;
   search: ActivityLibraryPageSearchState;
 }): ActivityLibraryPageViewModel<TItem> {
   const resolvedSearch = resolveActivityLibraryPageSearch(search);
@@ -462,6 +474,7 @@ export function buildActivityLibraryPageViewModel<
     hero: activityLibraryHeroCopy,
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
     resolvedSearch,
+    starterPreview,
     summaryMetrics: buildActivityLibrarySummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
       summary: data?.summary,
@@ -470,6 +483,13 @@ export function buildActivityLibraryPageViewModel<
     title: activityLibraryPageCopy.title,
     totalActivities,
     totalPages,
+  };
+}
+
+export function buildActivityLibraryStarterPreview(): ActivityLibraryStarterPreview {
+  return {
+    activities: getStarterActivities(),
+    source: 'starter-preview',
   };
 }
 
