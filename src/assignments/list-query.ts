@@ -1,5 +1,6 @@
 import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-query';
 import {
+  ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentLifecycleStatusFilter,
   normalizeAssignmentListSearch,
 } from '@/assignments/list-filters';
@@ -50,4 +51,21 @@ export function buildAssignmentListWhere({
   }
 
   return and(...filters);
+}
+
+export function getAssignmentListOffset({
+  pageIndex,
+  pageSize,
+}: {
+  pageIndex: number;
+  pageSize: number;
+}) {
+  const normalizedPageIndex =
+    Number.isInteger(pageIndex) && pageIndex > 0 ? pageIndex : 0;
+  const normalizedPageSize =
+    Number.isInteger(pageSize) && pageSize > 0
+      ? pageSize
+      : ASSIGNMENT_LIST_PAGE_SIZE;
+
+  return normalizedPageIndex * normalizedPageSize;
 }

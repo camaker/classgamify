@@ -29,7 +29,10 @@ import {
   ASSIGNMENT_LIFECYCLE_STATUS_FILTERS,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
-import { buildAssignmentListWhere } from '@/assignments/list-query';
+import {
+  buildAssignmentListWhere,
+  getAssignmentListOffset,
+} from '@/assignments/list-query';
 import { buildAssignmentListSummary } from '@/assignments/list-summary';
 import {
   assertAssignmentAcceptsSubmissions,
@@ -185,7 +188,12 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .where(where)
       .orderBy(desc(assignment.updatedAt))
       .limit(data.pageSize)
-      .offset(data.pageIndex * data.pageSize);
+      .offset(
+        getAssignmentListOffset({
+          pageIndex: data.pageIndex,
+          pageSize: data.pageSize,
+        })
+      );
     const itemAssignmentIds = items.map((item) => item.assignment.id);
     const itemAttempts =
       itemAssignmentIds.length > 0

@@ -408,6 +408,7 @@ import {
   normalizeAssignmentListSearch,
   parseAssignmentStatusFilter,
 } from '@/assignments/list-filters';
+import { getAssignmentListOffset } from '@/assignments/list-query';
 import {
   buildAssignmentListFilterSummary,
   buildAssignmentListSummary,
@@ -12186,10 +12187,20 @@ assert.match(
   /buildAssignmentListWhere\(\{[\s\S]*search: data\.search,[\s\S]*status: data\.status,[\s\S]*userId/,
   'Assignment list API should delegate owner, status, and search filtering to the assignment query domain.'
 );
+assert.match(
+  assignmentsApiSource,
+  /getAssignmentListOffset\(\{[\s\S]*pageIndex: data\.pageIndex,[\s\S]*pageSize: data\.pageSize/,
+  'Assignment list API should delegate pagination offset calculation to the assignment query domain.'
+);
 assert.doesNotMatch(
   assignmentsApiSource,
   /function buildAssignmentListWhere|sqlLikeContains\(assignment\.title|normalizeAssignmentListSearch\(search\)/,
   'Assignment list API should not keep local search/status where-clause logic.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /data\.pageIndex \* data\.pageSize/,
+  'Assignment list API should not keep local pagination offset math.'
 );
 assert.match(
   assignmentsApiSource,
@@ -14832,6 +14843,9 @@ assert.deepEqual(ASSIGNMENT_LIST_INPUT_LIMITS, {
   searchMaxLength: 120,
 });
 assert.equal(ASSIGNMENT_LIST_PAGE_SIZE, 12);
+assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 25 }), 50);
+assert.equal(getAssignmentListOffset({ pageIndex: -1, pageSize: 25 }), 0);
+assert.equal(getAssignmentListOffset({ pageIndex: 2, pageSize: 0 }), 24);
 assert.equal(getAssignmentListTotalPages({ total: 0 }), 1);
 assert.equal(getAssignmentListTotalPages({ pageSize: 12, total: 31 }), 3);
 assert.equal(getAssignmentListTotalPages({ pageSize: 0, total: 31 }), 3);
