@@ -135,10 +135,17 @@ function buildActivityPreviewGroupViews(
     .map((group) => ({
       ...group,
       summaryText: m.activity_preview_group_line({
-        items: group.items.join(', '),
+        items: formatActivityPreviewGroupItems(group.items),
         label: group.label,
       }),
     }));
+}
+
+function formatActivityPreviewGroupItems(items: string[]) {
+  return items
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(m.activity_preview_group_item_separator());
 }
 
 export function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {

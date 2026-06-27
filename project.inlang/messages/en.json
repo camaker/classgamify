@@ -301,6 +301,7 @@
   "activity_preview_default_result_value": "completion + score",
   "activity_preview_estimated_time_label": "Estimated time",
   "activity_preview_estimated_time_value": "{minutes} min",
+  "activity_preview_group_item_separator": ", ",
   "activity_preview_group_line": "{label}: {items}",
   "activity_preview_groups_title": "Groups",
   "activity_preview_open_student_preview": "Open student preview",

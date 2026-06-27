@@ -1437,7 +1437,7 @@ try {
     buildActivityPreviewViewModel({
       activity: activityPreviewFixture,
     }).content.visibleGroups[0]?.summaryText,
-    'Group A：one, two'
+    'Group A：one、two'
   );
   assert.equal(
     buildActivityPreviewViewModel({
@@ -1468,6 +1468,16 @@ assert.doesNotMatch(
   activityPreviewViewSource,
   /slice\(0, 3\)|slice\(0, 4\)/,
   'Activity preview should not keep local content slice limits.'
+);
+assert.match(
+  activityPreviewViewSource,
+  /formatActivityPreviewGroupItems[\s\S]*activity_preview_group_item_separator/,
+  'Activity preview group summaries should format item lists through localized domain copy.'
+);
+assert.doesNotMatch(
+  activityPreviewViewSource,
+  /group\.items\.join\(', '\)/,
+  'Activity preview group summaries should not hard-code visible item list separators.'
 );
 assert.match(
   activityPreviewSource,

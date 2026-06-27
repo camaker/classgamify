@@ -301,6 +301,7 @@
   "activity_preview_default_result_value": "完成情况 + 得分",
   "activity_preview_estimated_time_label": "预计用时",
   "activity_preview_estimated_time_value": "{minutes} 分钟",
+  "activity_preview_group_item_separator": "、",
   "activity_preview_group_line": "{label}：{items}",
   "activity_preview_groups_title": "分组",
   "activity_preview_open_student_preview": "打开学生预览",
