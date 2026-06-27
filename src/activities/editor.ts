@@ -23,7 +23,13 @@ import {
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
-import { buildQuestionOptionTexts } from '@/activities/question-options';
+import {
+  formatEditorGroupRows,
+  formatEditorInlineList,
+  formatEditorLineList,
+  formatEditorPairRows,
+  formatEditorQuestionRows,
+} from '@/activities/editor-serialization';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import {
   buildActivityTemplateScaffoldInput,
@@ -676,36 +682,21 @@ export function activityContentToEditorInput(
     description: source.description ?? '',
     difficulty: source.content.difficulty,
     gradeBand: source.content.gradeBand,
-    groupsText: source.content.groups
-      .map((group) => `${group.label} | ${group.items.join(', ')}`)
-      .join('\n'),
+    groupsText: formatEditorGroupRows(source.content.groups),
     language: source.content.language,
     learningGoal: source.content.learningGoal,
-    pairsText: source.content.pairs
-      .map((pair) => `${pair.left} | ${pair.right}`)
-      .join('\n'),
-    questionsText: source.content.questions
-      .map((question) => {
-        const options = buildQuestionOptionTexts({
-          answer: question.answer,
-          options: question.options?.map((option) => option.text),
-        });
-        const base = `${question.prompt} | ${question.answer} | ${options.join(', ')}`;
-        return question.explanation
-          ? `${base} | ${question.explanation}`
-          : base;
-      })
-      .join('\n'),
+    pairsText: formatEditorPairRows(source.content.pairs),
+    questionsText: formatEditorQuestionRows(source.content.questions),
     sourceSummary: source.content.sourceSummary,
     sourceMaterials: normalizeActivityMaterialReferences(
       source.content.sourceMaterials
     ),
     subject: source.content.subject,
-    teacherNotesText: source.content.teacherNotes.join('\n'),
+    teacherNotesText: formatEditorLineList(source.content.teacherNotes),
     templateType: source.templateType,
     title: source.title,
     visibility: source.visibility,
-    vocabularyText: source.content.vocabulary.join(', '),
+    vocabularyText: formatEditorInlineList(source.content.vocabulary),
   };
 }
 

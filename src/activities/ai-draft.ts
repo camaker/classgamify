@@ -21,6 +21,15 @@ import {
   normalizeQuestionOptionDisplayText,
 } from '@/activities/question-options';
 import {
+  formatEditorGroupRow,
+  formatEditorGroupRows,
+  formatEditorInlineList,
+  formatEditorLineList,
+  formatEditorPairRows,
+  formatEditorQuestionRow,
+  formatEditorQuestionRows,
+} from '@/activities/editor-serialization';
+import {
   formatTemplateRequirementList,
   formatTemplateRequirements,
   getActivityTemplateDraftGuidance,
@@ -578,41 +587,38 @@ export function createActivityInputFromAiDraft({
     description: shapedDraft.description,
     difficulty: input.difficulty,
     gradeBand: input.gradeBand,
-    groupsText: shapedDraft.groups
-      .map((group) => `${group.label} | ${group.items.join(', ')}`)
-      .join('\n'),
+    groupsText: formatEditorGroupRows(shapedDraft.groups),
     language: input.language,
     learningGoal: shapedDraft.learningGoal,
-    pairsText: shapedDraft.pairs
-      .map((pair) => `${pair.left} | ${pair.right}`)
-      .join('\n'),
-    questionsText: shapedDraft.questions
-      .map((question) => {
-        const answer = normalizeQuestionOptionDisplayText(question.answer);
-        const options = buildQuestionOptionTexts({
-          answer,
-          options: question.options ?? [],
-        });
-        return [
-          question.prompt,
-          answer,
-          options.join(', '),
-          question.explanation,
-        ]
-          .filter(Boolean)
-          .join(' | ');
-      })
-      .join('\n'),
+    pairsText: formatEditorPairRows(shapedDraft.pairs),
+    questionsText: formatEditorQuestionRows(
+      shapedDraft.questions.map(toEditorQuestionInput)
+    ),
     sourceSummary: shapedDraft.sourceSummary,
     subject: input.subject,
-    teacherNotesText: shapedDraft.teacherNotes.join('\n'),
+    teacherNotesText: formatEditorLineList(shapedDraft.teacherNotes),
     templateType: input.templateType,
     title: shapedDraft.title,
     visibility: 'draft',
-    vocabularyText: shapedDraft.vocabulary.join(', '),
+    vocabularyText: formatEditorInlineList(shapedDraft.vocabulary),
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+function toEditorQuestionInput(
+  question: NormalizedAiActivityDraft['questions'][number]
+) {
+  const answer = normalizeQuestionOptionDisplayText(question.answer);
+
+  return {
+    ...question,
+    answer,
+    options: buildQuestionOptionTexts({
+      answer,
+      options: question.options ?? [],
+    }).map((text) => ({ id: text, text })),
+  };
 }
 
 export function normalizeAiActivityDraft({
@@ -1048,21 +1054,21 @@ export function createFallbackActivityDraft(
       { subject: input.subject },
       { locale }
     ),
-    pairsText: pairs.join('\n'),
-    questionsText: questions.join('\n'),
+    pairsText: formatEditorLineList(pairs),
+    questionsText: formatEditorLineList(questions),
     sourceSummary,
     subject: input.subject,
-    teacherNotesText: [
+    teacherNotesText: formatEditorLineList([
       m.activity_ai_fallback_teacher_note_review(
         { gradeBand: input.gradeBand },
         { locale }
       ),
       m.activity_ai_fallback_teacher_note_remix({}, { locale }),
-    ].join('\n'),
+    ]),
     templateType: input.templateType,
     title: createFallbackTitle(input, normalizedTerms[0], locale),
     visibility: 'draft',
-    vocabularyText: normalizedTerms.join(', '),
+    vocabularyText: formatEditorInlineList(normalizedTerms),
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
@@ -1080,36 +1086,56 @@ function buildFallbackQuestions({
   terms: string[];
 }) {
   return terms.map((term, index) => {
-    const choices = buildQuestionOptionTexts({
-      answer: term,
-      options,
-    }).join(', ');
     const explanation = m.activity_ai_fallback_question_explanation(
       { term },
       { locale }
     );
+    const question = {
+      answer: term,
+      explanation,
+      options: buildQuestionOptionTexts({
+        answer: term,
+        options,
+      }).map((text) => ({ id: text, text })),
+      prompt: '',
+    };
 
     switch (input.templateType) {
       case 'fill-blank':
-        return `${buildFallbackFillBlankPrompt({ input, locale, term })} | ${term} | ${choices} | ${explanation}`;
+        return formatEditorQuestionRow({
+          ...question,
+          prompt: buildFallbackFillBlankPrompt({ input, locale, term }),
+        });
       case 'listening':
-        return `${m.activity_ai_fallback_listening_prompt(
-          { index: index + 1, subject: input.subject, term },
-          { locale }
-        )} | ${term} | ${choices} | ${m.activity_ai_fallback_listening_explanation(
-          { term },
-          { locale }
-        )}`;
+        return formatEditorQuestionRow({
+          ...question,
+          explanation: m.activity_ai_fallback_listening_explanation(
+            { term },
+            { locale }
+          ),
+          prompt: m.activity_ai_fallback_listening_prompt(
+            { index: index + 1, subject: input.subject, term },
+            { locale }
+          ),
+        });
       case 'open-box':
-        return `${m.activity_ai_fallback_open_box_prompt(
-          { subject: input.subject },
-          { locale }
-        )} | ${term} | | ${m.activity_ai_fallback_open_box_explanation(
-          { explanation, term },
-          { locale }
-        )}`;
+        return formatEditorQuestionRow({
+          ...question,
+          explanation: m.activity_ai_fallback_open_box_explanation(
+            { explanation, term },
+            { locale }
+          ),
+          options: [],
+          prompt: m.activity_ai_fallback_open_box_prompt(
+            { subject: input.subject },
+            { locale }
+          ),
+        });
       default:
-        return `${buildFallbackQuizPrompt({ input, locale, term })} | ${term} | ${choices} | ${explanation}`;
+        return formatEditorQuestionRow({
+          ...question,
+          prompt: buildFallbackQuizPrompt({ input, locale, term }),
+        });
     }
   });
 }
@@ -1250,10 +1276,13 @@ function buildFallbackGroups(
           m.activity_ai_fallback_group_review({}, { locale }),
         ];
 
-  return [
-    `${firstLabel} | ${first.join(', ')}`,
-    `${secondLabel} | ${(second.length > 0 ? second : [subject]).join(', ')}`,
-  ].join('\n');
+  return formatEditorLineList([
+    formatEditorGroupRow({ items: first, label: firstLabel }),
+    formatEditorGroupRow({
+      items: second.length > 0 ? second : [subject],
+      label: secondLabel,
+    }),
+  ]);
 }
 
 function buildFallbackGroupSortLabels(subject: string, locale: Locale) {

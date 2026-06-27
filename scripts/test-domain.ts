@@ -94,6 +94,14 @@ import {
   type AiActivityDraft,
 } from '@/activities/ai-draft';
 import {
+  formatEditorGroupRow,
+  formatEditorGroupRows,
+  formatEditorInlineList,
+  formatEditorLineList,
+  formatEditorPairRow,
+  formatEditorQuestionRow,
+} from '@/activities/editor-serialization';
+import {
   formatActivityTemplateClassroomMode,
   getActivityTemplates,
   getStarterActivities,
@@ -1566,6 +1574,16 @@ assert.match(
   activityEditorSource,
   /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS\.lockedOptions/,
   'Activity editor domain should reuse the named locked-option limit.'
+);
+assert.match(
+  activityEditorSource,
+  /formatEditorGroupRows[\s\S]*formatEditorQuestionRows[\s\S]*formatEditorInlineList/,
+  'Activity editor should serialize structured content back into form text through shared editor serialization helpers.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /group\.items\.join\(', '\)|options\.join\(', '\)|vocabulary\.join\(', '\)/,
+  'Activity editor should not hand-compose editor text list separators locally.'
 );
 assert.match(
   activityEditorFormSource,
@@ -14226,6 +14244,42 @@ assert.deepEqual(
   }),
   ['Cat', 'tree']
 );
+assert.equal(formatEditorInlineList([' cat ', '', ' tree ']), 'cat, tree');
+assert.equal(
+  formatEditorLineList([' note one ', '', ' note two ']),
+  ['note one', 'note two'].join('\n')
+);
+assert.equal(
+  formatEditorGroupRow({
+    items: [' cat ', '', ' dog '],
+    label: ' Animals ',
+  }),
+  'Animals | cat, dog'
+);
+assert.equal(
+  formatEditorGroupRows([
+    { items: [' cat ', ' dog '], label: ' Animals ' },
+    { items: [' tree '], label: ' Plants ' },
+  ]),
+  ['Animals | cat, dog', 'Plants | tree'].join('\n')
+);
+assert.equal(
+  formatEditorPairRow({ left: ' cat ', right: ' animal ' }),
+  'cat | animal'
+);
+assert.equal(
+  formatEditorQuestionRow({
+    answer: ' Ｃａｔ ',
+    explanation: ' A cat is an animal. ',
+    options: [
+      { id: 'cat', text: 'cat' },
+      { id: 'tree', text: ' tree ' },
+      { id: 'cat-duplicate', text: 'CAT' },
+    ],
+    prompt: ' Which word is an animal? ',
+  }),
+  'Which word is an animal? | Ｃａｔ | Cat, tree | A cat is an animal.'
+);
 const optionRoundTripContent = buildActivityContent({
   description: 'Question option normalization',
   difficulty: 'starter',
@@ -16399,10 +16453,25 @@ assert.match(
   /formatTemplateRequirements\(template\.contentRequirements\)/,
   'AI draft prompt template requirements should reuse the shared template requirement formatter.'
 );
+assert.match(
+  aiDraftSource,
+  /formatEditorGroupRows[\s\S]*formatEditorPairRows[\s\S]*formatEditorQuestionRows[\s\S]*formatEditorInlineList/,
+  'AI draft mapping should serialize generated classroom structure through shared editor serialization helpers.'
+);
+assert.match(
+  aiDraftSource,
+  /buildFallbackQuestions[\s\S]*formatEditorQuestionRow[\s\S]*buildFallbackGroups[\s\S]*formatEditorGroupRow/,
+  'AI draft fallback rows should reuse shared editor row serialization helpers.'
+);
 assert.doesNotMatch(
   aiDraftSource,
   /template\.contentRequirements\.map\([\s\S]*formatTemplateRequirement/,
   'AI draft prompt should not map template requirement labels locally.'
+);
+assert.doesNotMatch(
+  aiDraftSource,
+  /options\.join\(', '\)|normalizedTerms\.join\(', '\)|`\$\{firstLabel\} \| \$\{first\.join/,
+  'AI draft mapping should not hand-compose editor text list separators locally.'
 );
 assert.doesNotMatch(
   aiDraftSource,
