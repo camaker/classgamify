@@ -212,6 +212,7 @@ function DashboardActivitiesPage() {
           }
           source={sourceFilter}
           status={libraryStatus}
+          summary={data?.summary}
           template={templateFilter}
           total={activePageView.totalActivities}
           value={searchQuery}

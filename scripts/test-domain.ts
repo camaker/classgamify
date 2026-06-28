@@ -44,6 +44,7 @@ import { stripJsonComments } from './parse-wrangler';
 import {
   buildActivityLibraryCardSummary,
   buildActivityLibraryFilterSummary,
+  buildActivityLibrarySourceCapabilityMetrics,
   buildActivityLibrarySummaryMetrics,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
@@ -14957,6 +14958,11 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /<ActivityLibrarySearch[\s\S]*summary=\{data\?\.summary\}/,
+  'Activity library route should pass filtered source-material summary data into the search panel.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
   /buildActivityLibraryRouteState/,
   'Activity dashboard route should consume the activity-domain route state helper.'
 );
@@ -15019,6 +15025,21 @@ assert.match(
   activityLibrarySearchComponentSource,
   /buildActivityLibrarySearchPanelView/,
   'Activity library search component should render filter summary and filter options from the activity-domain search panel view.'
+);
+assert.match(
+  activityLibrarySearchComponentSource,
+  /searchPanelView\.sourceFilterLabel[\s\S]*searchPanelView\.sourceFilterDescription[\s\S]*searchPanelView\.sourceCapabilityMetrics\.map/,
+  'Activity library search component should explain the selected source-material filter and capability counts from the domain view.'
+);
+assert.doesNotMatch(
+  activityLibrarySearchComponentSource,
+  /audio-ready|worksheet-ready|spreadsheet-ready|future AI extraction|练习纸提取/,
+  'Activity library search component should not hardcode source-material explanatory copy.'
+);
+assert.match(
+  activityLibrarySummaryCardComponentSource,
+  /metric\.description[\s\S]*\{metric\.description\}/,
+  'Activity library summary cards should render optional domain-provided metric descriptions.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -18384,6 +18405,71 @@ assert.deepEqual(
   {
     filterSummary: { hasFilters: true, text: '3 matches' },
     hasSearchValue: true,
+    sourceCapabilityMetrics: [
+      { capability: 'audio-extraction', label: 'audio-ready', value: '0' },
+      {
+        capability: 'worksheet-extraction',
+        label: 'worksheet-ready',
+        value: '0',
+      },
+      {
+        capability: 'spreadsheet-import',
+        label: 'spreadsheet-ready',
+        value: '0',
+      },
+    ],
+    sourceFilterDescription:
+      'Show activities with worksheet images or documents ready for worksheet extraction.',
+    sourceFilterLabel: 'Worksheet',
+    sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateOptions: buildActivityLibraryTemplateFilterOptions(),
+  }
+);
+assert.deepEqual(
+  buildActivityLibrarySearchPanelView({
+    isLoading: false,
+    search: '',
+    source: 'extractable',
+    status: 'active',
+    summary: {
+      archivedActivities: 0,
+      draftActivities: 1,
+      extractableSourceActivities: 2,
+      remixReadyActivities: 1,
+      sourceMaterialCapabilityCounts: {
+        'audio-extraction': 1,
+        'spreadsheet-import': 1,
+        'worksheet-extraction': 1,
+      },
+      templateCoverage: 1,
+      templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+      totalActivities: 2,
+      totalExtractableSourceMaterials: 3,
+      totalReadyTemplateOptions: 2,
+    },
+    template: 'all',
+    total: 2,
+  }),
+  {
+    filterSummary: { hasFilters: true, text: '2 matches' },
+    hasSearchValue: false,
+    sourceCapabilityMetrics: [
+      { capability: 'audio-extraction', label: 'audio-ready', value: '1' },
+      {
+        capability: 'worksheet-extraction',
+        label: 'worksheet-ready',
+        value: '1',
+      },
+      {
+        capability: 'spreadsheet-import',
+        label: 'spreadsheet-ready',
+        value: '1',
+      },
+    ],
+    sourceFilterDescription:
+      'Show activities with audio, worksheet, or spreadsheet material ready for future AI extraction.',
+    sourceFilterLabel: 'Any extractable source',
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
@@ -18414,6 +18500,7 @@ assert.equal(
 assert.deepEqual(
   buildActivityLibraryEmptyStateView({
     search: undefined,
+    source: 'all',
     status: 'active',
     template: 'all',
   }),
@@ -18428,6 +18515,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryEmptyStateView({
     search: undefined,
+    source: 'all',
     status: 'archived',
     template: 'all',
   }),
@@ -18442,8 +18530,24 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryEmptyStateView({
     search: 'vocab',
+    source: 'all',
     status: 'active',
     template: 'quiz',
+  }),
+  {
+    actionLabel: 'Clear filters',
+    description:
+      'Try another title, description, template keyword, or template family from your classroom activity library.',
+    showStarterActivities: false,
+    title: 'No matching activities.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryEmptyStateView({
+    search: undefined,
+    source: 'worksheet',
+    status: 'active',
+    template: 'all',
   }),
   {
     actionLabel: 'Clear filters',
@@ -21741,6 +21845,7 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '0' },
     {
+      description: 'No attached source materials are ready for extraction yet.',
       id: 'sourceExtraction',
       label: 'Source extraction',
       value: '0',
@@ -21762,6 +21867,7 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '2' },
     {
+      description: '2 activities have extractable classroom material.',
       id: 'sourceExtraction',
       label: 'Source extraction',
       value: String(librarySummary.totalExtractableSourceMaterials),
@@ -21798,6 +21904,7 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '-' },
     {
+      description: undefined,
       id: 'sourceExtraction',
       label: 'Source extraction',
       value: '-',
@@ -21834,9 +21941,46 @@ assert.deepEqual(
     },
     { id: 'remix', label: 'Ready to remix', value: '1' },
     {
+      description: 'No attached source materials are ready for extraction yet.',
       id: 'sourceExtraction',
       label: 'Source extraction',
       value: '4',
+    },
+  ]
+);
+assert.deepEqual(buildActivityLibrarySourceCapabilityMetrics(librarySummary), [
+  { capability: 'audio-extraction', label: 'audio-ready', value: '1' },
+  {
+    capability: 'worksheet-extraction',
+    label: 'worksheet-ready',
+    value: '1',
+  },
+  {
+    capability: 'spreadsheet-import',
+    label: 'spreadsheet-ready',
+    value: '1',
+  },
+]);
+assert.deepEqual(
+  buildActivityLibrarySourceCapabilityMetrics({
+    ...librarySummary,
+    sourceMaterialCapabilityCounts: {
+      'audio-extraction': Number.NaN,
+      'spreadsheet-import': -1,
+      'worksheet-extraction': 2.8,
+    },
+  }),
+  [
+    { capability: 'audio-extraction', label: 'audio-ready', value: '-' },
+    {
+      capability: 'worksheet-extraction',
+      label: 'worksheet-ready',
+      value: '2',
+    },
+    {
+      capability: 'spreadsheet-import',
+      label: 'spreadsheet-ready',
+      value: '0',
     },
   ]
 );
@@ -21914,6 +22058,8 @@ assert.deepEqual(
       },
       { id: 'remix', label: 'Ready to remix', value: '0' },
       {
+        description:
+          'No attached source materials are ready for extraction yet.',
         id: 'sourceExtraction',
         label: 'Source extraction',
         value: '0',
@@ -22164,6 +22310,7 @@ assert.deepEqual(
       },
       { id: 'remix', label: 'Ready to remix', value: '2' },
       {
+        description: '2 activities have extractable classroom material.',
         id: 'sourceExtraction',
         label: 'Source extraction',
         value: String(librarySummary.totalExtractableSourceMaterials),

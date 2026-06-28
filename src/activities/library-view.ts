@@ -21,9 +21,11 @@ import {
 import {
   buildActivityLibraryCardSummary,
   buildActivityLibraryFilterSummary,
+  buildActivityLibrarySourceCapabilityMetrics,
   buildActivityLibrarySummaryMetrics,
   type ActivityLibraryCardSummary,
   type ActivityLibraryFilterSummary,
+  type ActivityLibrarySourceCapabilityMetric,
   type ActivityLibrarySummary,
   type ActivityLibrarySummaryMetric,
   type ActivityLibraryTemplateOption,
@@ -181,6 +183,9 @@ type ActivityLibraryPageResolvedSearch = {
 type ActivityLibrarySearchPanelView = {
   filterSummary: ActivityLibraryFilterSummary;
   hasSearchValue: boolean;
+  sourceCapabilityMetrics: ActivityLibrarySourceCapabilityMetric[];
+  sourceFilterDescription: string;
+  sourceFilterLabel: string;
   sourceOptions: ActivitySourceMaterialFilterOption[];
   statusOptions: ActivityLibraryStatusOption[];
   templateOptions: ActivityLibraryTemplateFilterOption[];
@@ -418,14 +423,18 @@ const activityLibraryEmptyStateCopy = {
 
 export function buildActivityLibraryEmptyStateView({
   search,
+  source,
   status,
   template,
 }: {
   search?: string;
+  source?: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
   template: ActivityTemplateFilter;
 }): ActivityLibraryEmptyStateView {
-  const hasContentFilters = Boolean(search) || template !== 'all';
+  const sourceFilter = source ?? 'all';
+  const hasContentFilters =
+    Boolean(search) || sourceFilter !== 'all' || template !== 'all';
   const hasFilters = hasContentFilters || status !== 'active';
 
   if (status === 'archived' && !hasContentFilters) {
@@ -496,6 +505,7 @@ export function buildActivityLibraryPageViewModel<
     description: activityLibraryPageCopy.description,
     emptyState: buildActivityLibraryEmptyStateView({
       search: resolvedSearch.normalizedSearchQuery,
+      source: resolvedSearch.sourceFilter,
       status: resolvedSearch.libraryStatus,
       template: resolvedSearch.templateFilter,
     }),
@@ -585,6 +595,7 @@ export function buildActivityLibrarySearchPanelView({
   search,
   source,
   status,
+  summary,
   template,
   total,
 }: {
@@ -592,10 +603,12 @@ export function buildActivityLibrarySearchPanelView({
   search: string;
   source: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
+  summary?: ActivityLibrarySummary;
   template: ActivityTemplateFilter;
   total: number;
 }): ActivityLibrarySearchPanelView {
   const normalizedSearch = normalizeActivityLibrarySearch(search);
+  const sourceFilterView = buildActivityLibrarySourceFilterView(source);
 
   return {
     filterSummary: buildActivityLibraryFilterSummary({
@@ -607,10 +620,46 @@ export function buildActivityLibrarySearchPanelView({
       total,
     }),
     hasSearchValue: Boolean(normalizedSearch),
+    sourceCapabilityMetrics:
+      buildActivityLibrarySourceCapabilityMetrics(summary),
+    sourceFilterDescription: sourceFilterView.description,
+    sourceFilterLabel: sourceFilterView.label,
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   };
+}
+
+function buildActivityLibrarySourceFilterView(
+  source: ActivitySourceMaterialFilter
+) {
+  switch (source) {
+    case 'audio':
+      return {
+        description: m.activity_library_filter_source_audio_description(),
+        label: m.activity_library_filter_source_audio(),
+      };
+    case 'extractable':
+      return {
+        description: m.activity_library_filter_source_extractable_description(),
+        label: m.activity_library_filter_source_extractable(),
+      };
+    case 'spreadsheet':
+      return {
+        description: m.activity_library_filter_source_spreadsheet_description(),
+        label: m.activity_library_filter_source_spreadsheet(),
+      };
+    case 'worksheet':
+      return {
+        description: m.activity_library_filter_source_worksheet_description(),
+        label: m.activity_library_filter_source_worksheet(),
+      };
+    case 'all':
+      return {
+        description: m.activity_library_filter_source_all_description(),
+        label: m.activity_library_filter_source_all(),
+      };
+  }
 }
 
 export function buildActivityLibraryTemplateFilterOptions(): ActivityLibraryTemplateFilterOption[] {

@@ -61,7 +61,14 @@ export type ActivityLibrarySummaryMetricId =
   | 'sourceExtraction';
 
 export type ActivityLibrarySummaryMetric = {
+  description?: string;
   id: ActivityLibrarySummaryMetricId;
+  label: string;
+  value: string;
+};
+
+export type ActivityLibrarySourceCapabilityMetric = {
+  capability: ActivitySourceMaterialReadinessCapability;
   label: string;
   value: string;
 };
@@ -250,11 +257,67 @@ export function buildActivityLibrarySummaryMetrics({
     {
       id: 'sourceExtraction',
       label: m.activity_library_summary_source_extraction(),
+      description:
+        formatActivityLibrarySourceExtractionDescription(resolvedSummary),
       value: formatActivityLibraryMetricNumber(
         resolvedSummary.totalExtractableSourceMaterials
       ),
     },
   ];
+}
+
+export function buildActivityLibrarySourceCapabilityMetrics(
+  summary?: ActivityLibrarySummary
+): ActivityLibrarySourceCapabilityMetric[] {
+  const capabilityCounts =
+    summary?.sourceMaterialCapabilityCounts ??
+    createEmptySourceMaterialCapabilityCounts();
+
+  return [
+    {
+      capability: 'audio-extraction',
+      label: m.activity_library_source_capability_audio(),
+      value: formatActivityLibraryMetricNumber(
+        capabilityCounts['audio-extraction']
+      ),
+    },
+    {
+      capability: 'worksheet-extraction',
+      label: m.activity_library_source_capability_worksheet(),
+      value: formatActivityLibraryMetricNumber(
+        capabilityCounts['worksheet-extraction']
+      ),
+    },
+    {
+      capability: 'spreadsheet-import',
+      label: m.activity_library_source_capability_spreadsheet(),
+      value: formatActivityLibraryMetricNumber(
+        capabilityCounts['spreadsheet-import']
+      ),
+    },
+  ];
+}
+
+function formatActivityLibrarySourceExtractionDescription(
+  summary: ActivityLibrarySummary
+) {
+  const extractableActivities = normalizeActivityLibraryMetricNumber(
+    summary.extractableSourceActivities
+  );
+
+  if (extractableActivities === undefined) return undefined;
+  if (extractableActivities === 0) {
+    return m.activity_library_summary_source_extraction_empty();
+  }
+  if (extractableActivities === 1) {
+    return m.activity_library_summary_source_extraction_one({
+      count: extractableActivities,
+    });
+  }
+
+  return m.activity_library_summary_source_extraction_many({
+    count: extractableActivities,
+  });
 }
 
 function formatActivityLibraryMetricNumber(value: number) {

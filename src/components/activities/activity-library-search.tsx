@@ -3,6 +3,7 @@ import type {
   ActivitySourceMaterialFilter,
   ActivityTemplateFilter,
 } from '@/activities/library-filters';
+import type { ActivityLibrarySummary } from '@/activities/library-summary';
 import {
   activityLibrarySearchCopy,
   buildActivityLibrarySearchPanelView,
@@ -30,6 +31,7 @@ type ActivityLibrarySearchProps = {
   onTemplateChange: (value: ActivityTemplateFilter) => void;
   source: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
+  summary?: ActivityLibrarySummary;
   template: ActivityTemplateFilter;
   total: number;
   value: string;
@@ -45,6 +47,7 @@ export function ActivityLibrarySearch({
   onTemplateChange,
   source,
   status,
+  summary,
   template,
   total,
   value,
@@ -54,6 +57,7 @@ export function ActivityLibrarySearch({
     search: value,
     source,
     status,
+    summary,
     template,
     total,
   });
@@ -130,6 +134,26 @@ export function ActivityLibrarySearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
+        <p className="text-xs leading-5 text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {searchPanelView.sourceFilterLabel}
+          </span>
+          {' - '}
+          {searchPanelView.sourceFilterDescription}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {searchPanelView.sourceCapabilityMetrics.map((metric) => (
+            <span
+              key={metric.capability}
+              className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
+            >
+              <span className="font-medium text-foreground">
+                {metric.value}
+              </span>{' '}
+              {metric.label}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="flex flex-col gap-3 lg:items-end">
         <div className="inline-flex rounded-lg border bg-background p-1">
