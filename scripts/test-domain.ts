@@ -5074,18 +5074,23 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /revealAnswer=\{runnerPageView\.revealAnswers\}/,
+  /revealAnswer=\{runtimeListView\.revealAnswer\}/,
   'Student play route should render answer reveal state from the runner page view-model.'
 );
 assert.match(
   playRouteSource,
-  /reviewItems=\{runnerPageView\.reviewItems\}/,
+  /reviewItems=\{runtimeListView\.reviewItems\}/,
   'Student play route should render attempt review items from the runner page view-model.'
+);
+assert.match(
+  playRouteSource,
+  /const runtimeListView = runnerPageView\.runtimeListView[\s\S]*items=\{runtimeListView\.items\}[\s\S]*revealAnswer=\{runtimeListView\.revealAnswer\}[\s\S]*templateType=\{runtimeListView\.templateType\}/,
+  'Student play route should render runtime item-list display props from the runner page view-model.'
 );
 assert.doesNotMatch(
   playRouteSource,
-  /assignment\.settings\.showCorrectAnswers|routeAssignment\.settings\.showCorrectAnswers|result\?\.reviewItems/,
-  'Student play route should not inspect assignment answer-reveal settings or submitted review items directly.'
+  /assignment\.settings\.showCorrectAnswers|routeAssignment\.settings\.showCorrectAnswers|result\?\.reviewItems|routeActivity\.content\.language|routeActivity\.templateType|items=\{runtimeItems\}|disabled=\{controlView\.runtimeItemsDisabled\}/,
+  'Student play route should not inspect assignment answer-reveal settings, activity runtime metadata, or submitted review items directly.'
 );
 assert.match(
   playRouteSource,
@@ -11281,6 +11286,7 @@ assert.deepEqual(
     resultPanelView: studentRunnerPageView.resultPanelView,
     reviewItems: studentRunnerPageView.reviewItems,
     routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
+    runtimeListView: studentRunnerPageView.runtimeListView,
     runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: studentRunnerPageView.showStartAnotherAttempt,
     startedAt: studentRunnerPageView.startedAt,
@@ -11366,6 +11372,14 @@ assert.deepEqual(
     },
     reviewItems: undefined,
     routeBadgeLabel: 'Student play route',
+    runtimeListView: {
+      disabled: true,
+      items: publicRunnerState.runtimeItems,
+      language: 'en',
+      revealAnswer: true,
+      reviewItems: undefined,
+      templateType: 'quiz',
+    },
     runtimeItemIds: publicRunnerState.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: true,
     startedAt: 1_000,

@@ -121,6 +121,15 @@ type StudentRunnerResultPanelView =
       statusLabel: string;
     };
 
+type StudentRunnerRuntimeListView = {
+  disabled: boolean;
+  items: PublicRuntimeItem[];
+  language?: string;
+  revealAnswer: boolean;
+  reviewItems?: PublicAttemptReviewItem[];
+  templateType: ActivitySeed['templateType'];
+};
+
 type StudentRunnerSeoView = {
   description: string;
   titlePrefix: string;
@@ -149,6 +158,7 @@ type StudentRunnerPageViewModel = {
   resultPanelView: StudentRunnerResultPanelView;
   reviewItems?: PublicAttemptReviewItem[];
   routeBadgeLabel: string;
+  runtimeListView: StudentRunnerRuntimeListView;
   runtimeItems: PublicRuntimeItem[];
   showStartAnotherAttempt: boolean;
   startedAt: number;
@@ -509,6 +519,14 @@ export function buildStudentRunnerPageViewModel({
     }),
     reviewItems: result?.reviewItems,
     routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
+    runtimeListView: {
+      disabled: attemptControlState.runtimeItemsDisabled,
+      items: attemptState.runtimeItems,
+      language: activity?.content.language,
+      revealAnswer: Boolean(result && assignment?.settings.showCorrectAnswers),
+      reviewItems: result?.reviewItems,
+      templateType: activity?.templateType ?? 'quiz',
+    },
     runtimeItems: attemptState.runtimeItems,
     showStartAnotherAttempt,
     startedAt,

@@ -121,11 +121,11 @@ function PlayPage() {
     ]
   );
   const { assignment } = runnerPageView;
-  const runtimeItems = runnerPageView.runtimeItems;
   const itemCount = runnerPageView.itemCount;
   const activeShareId = runnerPageView.activeShareId;
   const timeLimitSeconds = runnerPageView.timeLimitSeconds;
   const controlView = runnerPageView.controlView;
+  const runtimeListView = runnerPageView.runtimeListView;
   const resultPanelView = runnerPageView.resultPanelView;
   const currentAttemptSessionKey = runnerPageView.currentAttemptSessionKey;
   const runnerRouteState = useMemo(
@@ -301,12 +301,12 @@ function PlayPage() {
         >
           <StudentRuntimeItemList
             answers={answers}
-            disabled={controlView.runtimeItemsDisabled}
-            items={runtimeItems}
-            revealAnswer={runnerPageView.revealAnswers}
-            reviewItems={runnerPageView.reviewItems}
-            language={routeActivity.content.language}
-            templateType={routeActivity.templateType}
+            disabled={runtimeListView.disabled}
+            items={runtimeListView.items}
+            revealAnswer={runtimeListView.revealAnswer}
+            reviewItems={runtimeListView.reviewItems}
+            language={runtimeListView.language}
+            templateType={runtimeListView.templateType}
             onAnswerChanges={updateAnswers}
           />
 
