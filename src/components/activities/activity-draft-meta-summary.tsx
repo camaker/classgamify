@@ -1,10 +1,12 @@
 import type { ActivityDraftResult } from '@/activities/ai-draft';
+import type { ActivitySourceMaterialDraftNoteView } from '@/activities/draft-source';
 import { buildActivityDraftMetaSummaryView } from '@/activities/draft-meta';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 type ActivityDraftMetaSummaryProps = {
   result: ActivityDraftResult;
+  sourceMaterialNoteViews?: ActivitySourceMaterialDraftNoteView[];
 };
 
 type ActivityDraftMetaSummaryView = ReturnType<
@@ -13,6 +15,7 @@ type ActivityDraftMetaSummaryView = ReturnType<
 
 export function ActivityDraftMetaSummary({
   result,
+  sourceMaterialNoteViews,
 }: ActivityDraftMetaSummaryProps) {
   const summaryView = buildActivityDraftMetaSummaryView({
     draftFocus: result.draftFocus,
@@ -20,6 +23,7 @@ export function ActivityDraftMetaSummary({
     model: result.model,
     notice: result.notice,
     provider: result.provider,
+    sourceMaterialNoteViews,
   });
 
   return (
@@ -36,6 +40,9 @@ export function ActivityDraftMetaSummary({
             {summaryView.readyTemplateLabel}
           </Badge>
           <Badge variant="outline" className="rounded-md">
+            {summaryView.lockedTemplateLabel}
+          </Badge>
+          <Badge variant="outline" className="rounded-md">
             {summaryView.providerLabel}
           </Badge>
         </div>
@@ -49,32 +56,99 @@ export function ActivityDraftMetaSummary({
           <p className="mt-1 font-medium">{summaryView.noticeLineText}</p>
         ) : null}
       </div>
+      <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
+        <p className="font-medium text-foreground">
+          {summaryView.appliedLabel}
+        </p>
+        <p className="mt-1">{summaryView.appliedDescription}</p>
+        <p className="mt-2 font-medium text-foreground">
+          {summaryView.nextStepLabel}
+        </p>
+        <p className="mt-1">{summaryView.nextStepText}</p>
+      </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
         {summaryView.coverageStats.map((stat) => (
           <ActivityDraftCoverageStat key={stat.label} stat={stat} />
         ))}
       </div>
-      {summaryView.suggestedTemplateOptions.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {summaryView.suggestedTemplateOptions.map((option) => (
-            <Badge
-              key={option.template}
-              variant="outline"
-              className="rounded-md"
-            >
-              {option.shortName}
-            </Badge>
-          ))}
+      <div className="mt-4 rounded-lg border bg-background p-3">
+        <p className="font-medium text-sm">
+          {summaryView.suggestedTemplatesTitle}
+        </p>
+        {summaryView.suggestedTemplateOptions.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {summaryView.suggestedTemplateOptions.map((option) => (
+              <Badge
+                key={option.template}
+                variant="outline"
+                className="rounded-md"
+              >
+                {option.shortName}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-muted-foreground text-xs leading-5">
+            {summaryView.suggestedTemplatesEmptyText}
+          </p>
+        )}
+      </div>
+      {summaryView.sourceMaterialNoteViews.length > 0 ? (
+        <div className="mt-4 rounded-lg border bg-background p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-medium text-sm">
+              {summaryView.sourceMaterialTitle}
+            </p>
+            {summaryView.sourceMaterialCountLabel ? (
+              <Badge variant="outline" className="rounded-md">
+                {summaryView.sourceMaterialCountLabel}
+              </Badge>
+            ) : null}
+          </div>
+          <p className="mt-1 text-muted-foreground text-xs leading-5">
+            {summaryView.sourceMaterialDescription}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {summaryView.sourceMaterialNoteViews.map((noteView) => (
+              <Badge
+                key={noteView.displayText}
+                variant="outline"
+                className="max-w-full rounded-md"
+              >
+                <span className="truncate">{noteView.displayText}</span>
+              </Badge>
+            ))}
+          </div>
         </div>
       ) : null}
+      <p className="mt-4 font-medium text-sm">
+        {summaryView.readyTemplatesTitle}
+      </p>
       <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {summaryView.templateReadinessOptions.map((option) => (
-          <ActivityDraftTemplateReadinessOption
-            key={option.template}
-            option={option}
-          />
-        ))}
+        {summaryView.templateReadinessOptions
+          .filter((option) => option.isReady)
+          .map((option) => (
+            <ActivityDraftTemplateReadinessOption
+              key={option.template}
+              option={option}
+            />
+          ))}
       </div>
+      {summaryView.lockedTemplateOptions.length > 0 ? (
+        <>
+          <p className="mt-4 font-medium text-sm">
+            {summaryView.lockedTemplatesTitle}
+          </p>
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
+            {summaryView.lockedTemplateOptions.map((option) => (
+              <ActivityDraftTemplateReadinessOption
+                key={option.template}
+                option={option}
+              />
+            ))}
+          </div>
+        </>
+      ) : null}
       <div className="mt-4 grid gap-1.5">
         {summaryView.reviewChecklist.map((item) => (
           <p key={item} className="text-xs leading-5 text-muted-foreground">
@@ -126,6 +200,11 @@ function ActivityDraftTemplateReadinessOption({
         <span className="text-xs text-muted-foreground">
           {option.readinessLabel}
         </span>
+        {option.missingRequirementLabel ? (
+          <Badge variant="outline" className="rounded-md">
+            {option.missingRequirementLabel}
+          </Badge>
+        ) : null}
       </div>
       {option.diagnosis ? (
         <p className="mt-2 text-xs leading-5 text-muted-foreground">

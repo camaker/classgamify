@@ -97,6 +97,7 @@ export function ActivityCreateForm({
     sourceMaterials: watchedValues.sourceMaterials,
   });
   const aiDraftPanelView = buildActivityEditorAiDraftPanelView({
+    draftSourceText,
     hasUser: Boolean(session?.user),
     isGeneratingDraft,
     sourceState: draftSourceState,

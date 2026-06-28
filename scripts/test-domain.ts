@@ -159,6 +159,7 @@ import {
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteView,
   buildActivitySourceMaterialDraftNoteViews,
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftSummary,
   getActivityDraftSourceText,
@@ -2524,7 +2525,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /function ActivityAiDraftSourceControls[\s\S]*panelView\.badgeLabel[\s\S]*panelView\.reviewNote[\s\S]*panelView\.sourceTextLabel[\s\S]*panelView\.canSyncDraftSourceMaterials[\s\S]*panelView\.sourcePlaceholder/,
+  /function ActivityAiDraftSourceControls[\s\S]*panelView\.badgeLabel[\s\S]*panelView\.reviewNote[\s\S]*panelView\.safeSourceDescription[\s\S]*panelView\.sourceTextLabel[\s\S]*panelView\.canSyncDraftSourceMaterials[\s\S]*panelView\.syncMaterialsHelpText[\s\S]*panelView\.sourcePlaceholder[\s\S]*panelView\.sourceMaterialNoteViews/,
   'Activity AI draft source controls should render prepared labels and sync gate state.'
 );
 assert.match(
@@ -2539,7 +2540,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
-  /function ActivityAiDraftGenerateButton[\s\S]*panelView\.canGenerateDraft[\s\S]*panelView\.generateButtonLabel/,
+  /function ActivityAiDraftGenerateButton[\s\S]*panelView\.canGenerateDraft[\s\S]*panelView\.generateButtonLabel[\s\S]*panelView\.generationDisabledReason/,
   'Activity AI draft generate button should render prepared generation gate and label.'
 );
 assert.match(
@@ -2699,8 +2700,13 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.templateReadinessOptions\.map[\s\S]*ActivityDraftTemplateReadinessOption[\s\S]*option=\{option\}/,
-  'AI draft summary component should delegate reviewable template readiness details.'
+  /summaryView\.templateReadinessOptions[\s\S]*\.filter\(\(option\) => option\.isReady\)[\s\S]*\.map\(\(option\) => \([\s\S]*ActivityDraftTemplateReadinessOption[\s\S]*option=\{option\}/,
+  'AI draft summary component should delegate ready template readiness details.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.lockedTemplateOptions\.map\(\(option\) => \([\s\S]*ActivityDraftTemplateReadinessOption[\s\S]*option=\{option\}/,
+  'AI draft summary component should delegate locked template readiness details.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -2729,11 +2735,25 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.modelLineText[\s\S]*summaryView\.draftFocusLineText[\s\S]*summaryView\.draftFocusDescription[\s\S]*summaryView\.noticeLineText/,
+  /summaryView\.modelLineText[\s\S]*summaryView\.draftFocusLineText[\s\S]*summaryView\.draftFocusDescription[\s\S]*summaryView\.noticeLineText[\s\S]*summaryView\.appliedLabel[\s\S]*summaryView\.nextStepLabel/,
   'AI draft summary component should render prepared model, draft-focus, and notice text lines.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.sourceMaterialNoteViews\.map[\s\S]*noteView\.displayText/,
+  'AI draft summary component should render prepared source-material provenance display text.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.lockedTemplateLabel[\s\S]*summaryView\.lockedTemplateOptions/,
+  'AI draft summary component should render prepared ready and locked template metadata.'
 );
 const activityDraftMetaSource = readFileSync(
   'src/activities/draft-meta.ts',
+  'utf8'
+);
+const activityDraftSourceViewSource = readFileSync(
+  'src/activities/draft-source.ts',
   'utf8'
 );
 assert.match(
@@ -2750,6 +2770,16 @@ assert.match(
   activityDraftMetaSource,
   /normalizeRuntimeDisplayText\(model\)/,
   'AI draft meta should normalize provider model names with the shared runtime display helper.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /isSafeActivitySourceMaterialDraftKind\(kindLabel\)/,
+  'AI draft meta should re-check safe source-material kind labels before rendering provenance.'
+);
+assert.match(
+  activityDraftSourceViewSource,
+  /isSafeActivitySourceMaterialDraftKind[\s\S]*USER_FILE_MATERIAL_KINDS[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'en' \}\)[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'zh' \}\)/,
+  'AI draft source notes should only parse known localized material kind labels.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -20470,6 +20500,83 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    draftSourceText: [
+      'weather source notes',
+      'Attached classroom source materials:',
+      '- Worksheet document: Weather worksheet.pdf',
+      '- Audio: Weather listening.mp3',
+      '- storageKey: classroom/private/worksheet.pdf',
+    ].join('\n'),
+    hasUser: true,
+    isGeneratingDraft: false,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: [
+        'weather source notes',
+        'Attached classroom source materials:',
+        '- Worksheet document: Weather worksheet.pdf',
+        '- Audio: Weather listening.mp3',
+      ].join('\n'),
+      sourceMaterials: [],
+    }),
+  }),
+  {
+    badgeLabel: 'AI draft',
+    canGenerateDraft: true,
+    canSyncDraftSourceMaterials: true,
+    focusLabel: 'Focus',
+    focusOptions: buildActivityAiDraftFocusOptions(),
+    generateButtonLabel: 'Generate draft',
+    generationDisabledReason: undefined,
+    itemCountLabel: 'Items',
+    reviewNote: 'Teacher reviews before saving',
+    safeSourceDescription:
+      'AI drafting uses the text below plus safe source-material provenance only.',
+    sourceMaterialNoteViews: [
+      {
+        displayText: 'Worksheet document · Weather worksheet.pdf',
+        kindLabel: 'Worksheet document',
+        name: 'Weather worksheet.pdf',
+      },
+      {
+        displayText: 'Audio · Weather listening.mp3',
+        kindLabel: 'Audio',
+        name: 'Weather listening.mp3',
+      },
+    ],
+    sourceMaterialSummaryLabel: '2 safe source materials',
+    sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
+    sourceTextLabel: 'Topic or source notes',
+    syncMaterialsHelpText: 'Adds material kind and original filename only.',
+    syncMaterialsLabel: 'Sync attached materials',
+    syncSuccessMessage: 'Attached materials synced to AI source notes.',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    draftSourceText: '',
+    hasUser: false,
+    isGeneratingDraft: false,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: '',
+      sourceMaterials: [],
+    }),
+  }).generationDisabledReason,
+  'Sign in to generate an AI draft.'
+);
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    draftSourceText: '',
+    hasUser: true,
+    isGeneratingDraft: true,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: '',
+      sourceMaterials: [],
+    }),
+  }).generationDisabledReason,
+  'Draft generation is already running.'
+);
+assert.deepEqual(
   buildActivityEditorDraftGenerationExecutionPlan({
     current: getActivityEditorDefaultInput(),
     draftFocus: 'balanced',
@@ -20733,10 +20840,16 @@ assert.deepEqual(disabledAiDraftPanelView, {
     },
   ],
   generateButtonLabel: 'Generate draft',
+  generationDisabledReason: 'Sign in to generate an AI draft.',
   itemCountLabel: 'Items',
   reviewNote: 'Teacher reviews before saving',
+  safeSourceDescription:
+    'AI drafting uses the text below plus safe source-material provenance only.',
+  sourceMaterialNoteViews: [],
+  sourceMaterialSummaryLabel: undefined,
   sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
   sourceTextLabel: 'Topic or source notes',
+  syncMaterialsHelpText: 'Adds material kind and original filename only.',
   syncMaterialsLabel: 'Sync attached materials',
   syncSuccessMessage: 'Attached materials synced to AI source notes.',
 });
@@ -20754,6 +20867,7 @@ assert.deepEqual(
     ...disabledAiDraftPanelView,
     canGenerateDraft: true,
     canSyncDraftSourceMaterials: true,
+    generationDisabledReason: undefined,
   }
 );
 assert.equal(
@@ -22577,6 +22691,57 @@ const sourceMaterialDraftNotesText = [
   '- Audio: Weather listening.mp3',
 ].join('\n');
 assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    sourceMaterialDraftNotesText
+  ),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Weather worksheet.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: 'Weather listening.mp3',
+    },
+  ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    [
+      '天气词汇、晴天、雨天、阴天',
+      '已附加课堂来源素材：',
+      '- 练习纸文档：天气练习纸.pdf',
+      '- 音频：天气听力.mp3',
+    ].join('\n')
+  ),
+  [
+    {
+      kindLabel: '练习纸文档',
+      name: '天气练习纸.pdf',
+    },
+    {
+      kindLabel: '音频',
+      name: '天气听力.mp3',
+    },
+  ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    [
+      'Attached classroom source materials:',
+      '- Worksheet document: Weather worksheet.pdf',
+      '- storageKey: classroom/private/worksheet.pdf',
+      '- ownerId',
+    ].join('\n')
+  ),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Weather worksheet.pdf',
+    },
+  ]
+);
+assert.deepEqual(
   extractActivityDraftSourceTerms({
     sourceText: sourceMaterialDraftNotesText,
     subject: 'Science',
@@ -22907,6 +23072,20 @@ const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
   model: 'test-model',
   notice: 'Fallback used for testing.',
   provider: 'fallback',
+  sourceMaterialNoteViews: [
+    {
+      kindLabel: '  Worksheet document  ',
+      name: ' Weather worksheet.pdf ',
+    },
+    {
+      kindLabel: 'Ｗｏｒｋｓｈｅｅｔ　ｄｏｃｕｍｅｎｔ',
+      name: 'Weather worksheet.pdf',
+    },
+    {
+      kindLabel: 'storageKey',
+      name: 'private/worksheet.pdf',
+    },
+  ],
 });
 assert.deepEqual(fallbackDraftMetaSummary.coverageStats, [
   { label: 'Questions', value: 5 },
@@ -22919,6 +23098,16 @@ assert.equal(fallbackDraftMetaSummary.title, 'AI draft coverage');
 assert.equal(
   fallbackDraftMetaSummary.description,
   'Review the generated content before saving it to the activity library.'
+);
+assert.equal(fallbackDraftMetaSummary.appliedLabel, 'Applied to editor');
+assert.equal(
+  fallbackDraftMetaSummary.appliedDescription,
+  'The generated draft has already filled the editor fields. Nothing is saved or published until you review and save it.'
+);
+assert.equal(fallbackDraftMetaSummary.nextStepLabel, 'Next step');
+assert.equal(
+  fallbackDraftMetaSummary.nextStepText,
+  'Check the answers, explanations, and template readiness, then save the activity to publish or remix it later.'
 );
 assert.equal(fallbackDraftMetaSummary.draftFocusLabel, 'Focus');
 assert.equal(fallbackDraftMetaSummary.draftFocusName, 'Listening script');
@@ -22949,9 +23138,42 @@ assert.equal(
   `${fallbackDraftMeta.readyTemplateCount} ready templates`
 );
 assert.equal(
+  fallbackDraftMetaSummary.lockedTemplateLabel,
+  `${fallbackDraftMeta.templateReadiness.filter((option) => !option.isReady).length} locked templates`
+);
+assert.equal(fallbackDraftMetaSummary.readyTemplatesTitle, 'Ready templates');
+assert.equal(fallbackDraftMetaSummary.lockedTemplatesTitle, 'Locked templates');
+assert.equal(
+  fallbackDraftMetaSummary.suggestedTemplatesTitle,
+  'Suggested remixes'
+);
+assert.equal(
+  fallbackDraftMetaSummary.suggestedTemplatesEmptyText,
+  'No alternate template is ready yet. Add the locked missing fields before remixing.'
+);
+assert.equal(
   fallbackDraftMetaSummary.reviewChecklist,
   fallbackDraftMeta.reviewChecklist
 );
+assert.equal(
+  fallbackDraftMetaSummary.sourceMaterialTitle,
+  'Source material provenance'
+);
+assert.equal(
+  fallbackDraftMetaSummary.sourceMaterialDescription,
+  'Only safe provenance from the source notes is shown here: material kind and original filename.'
+);
+assert.equal(
+  fallbackDraftMetaSummary.sourceMaterialCountLabel,
+  '1 source material'
+);
+assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
+  {
+    displayText: 'Worksheet document · Weather worksheet.pdf',
+    kindLabel: 'Worksheet document',
+    name: 'Weather worksheet.pdf',
+  },
+]);
 assert.equal(
   fallbackDraftMetaSummary.suggestedTemplateOptions,
   fallbackDraftMeta.suggestedTemplateOptions
@@ -22964,6 +23186,8 @@ assert.deepEqual(
     diagnosis: 'Listen is selected and ready.',
     isCurrent: true,
     isReady: true,
+    missingRequirementCount: 0,
+    missingRequirementLabel: undefined,
     readinessLabel: 'Ready',
     selectedLabel: 'selected',
     shortName: 'Listen',
@@ -22998,6 +23222,8 @@ assert.ok(
     (option) =>
       option.template === 'line-match' &&
       !option.isReady &&
+      option.missingRequirementCount === 1 &&
+      option.missingRequirementLabel === '1 missing field' &&
       option.diagnosis?.includes('match pairs')
   )
 );
@@ -23121,6 +23347,13 @@ try {
     zhFallbackDraftMetaSummary.providerDescription,
     '已根据素材备注在本地生成，请把它当作脚手架检查后再发布。'
   );
+  assert.equal(zhFallbackDraftMetaSummary.appliedLabel, '已填入编辑器');
+  assert.equal(zhFallbackDraftMetaSummary.nextStepLabel, '下一步');
+  assert.equal(
+    zhFallbackDraftMetaSummary.sourceMaterialDescription,
+    '这里仅显示素材类型和原始文件名这类安全来源信息。'
+  );
+  assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
   assert.ok(
     zhFallbackDraftMetaSummary.reviewChecklist.some((item) =>
       /保存后可改编为：.+、.+。/.test(item)

@@ -7,6 +7,10 @@ import {
   formatActivityAiDraftFocusLabel,
   type ActivityAiDraftFocus,
 } from '@/activities/ai-draft-focus';
+import {
+  isSafeActivitySourceMaterialDraftKind,
+  type ActivitySourceMaterialDraftNoteView,
+} from '@/activities/draft-source';
 import type {
   TemplateRemixLockedOption,
   TemplateRemixPlan,
@@ -75,13 +79,22 @@ type ActivityDraftMetaSummaryReadinessOption = {
   diagnosis: string;
   isCurrent: boolean;
   isReady: boolean;
+  missingRequirementCount: number;
+  missingRequirementLabel?: string;
   readinessLabel: string;
   selectedLabel?: string;
   shortName: string;
   template: ActivityTemplateType;
 };
 
+type ActivityDraftMetaSummarySourceMaterialNoteView =
+  ActivitySourceMaterialDraftNoteView & {
+    displayText: string;
+  };
+
 type ActivityDraftMetaSummaryView = {
+  appliedDescription: string;
+  appliedLabel: string;
   coverageStats: Array<{
     label: string;
     value: number;
@@ -91,17 +104,29 @@ type ActivityDraftMetaSummaryView = {
   draftFocusLabel: string;
   draftFocusLineText: string;
   draftFocusName: string;
+  lockedTemplateLabel: string;
+  lockedTemplateOptions: ActivityDraftMetaSummaryReadinessOption[];
+  lockedTemplatesTitle: string;
   modelLabel: string;
   modelLineText: string;
   modelName: string;
+  nextStepLabel: string;
+  nextStepText: string;
   notice?: string;
   noticeLabel: string;
   noticeLineText?: string;
   providerDescription: string;
   providerLabel: string;
   readyTemplateLabel: string;
+  readyTemplatesTitle: string;
   reviewChecklist: string[];
+  sourceMaterialCountLabel?: string;
+  sourceMaterialDescription: string;
+  sourceMaterialNoteViews: ActivityDraftMetaSummarySourceMaterialNoteView[];
+  sourceMaterialTitle: string;
   suggestedTemplateOptions: ActivityDraftTemplateOption[];
+  suggestedTemplatesEmptyText: string;
+  suggestedTemplatesTitle: string;
   templateReadinessOptions: ActivityDraftMetaSummaryReadinessOption[];
   title: string;
 };
@@ -164,15 +189,24 @@ export function buildActivityDraftMetaSummaryView({
   model,
   notice,
   provider,
+  sourceMaterialNoteViews,
 }: {
   draftFocus?: ActivityAiDraftFocus;
   meta: ActivityDraftMeta;
   model: string;
   notice?: string;
   provider: ActivityDraftProvider;
+  sourceMaterialNoteViews?: ActivitySourceMaterialDraftNoteView[];
 }): ActivityDraftMetaSummaryView {
   const readyTemplateCount = normalizeActivityDraftMetaCount(
     meta.readyTemplateCount
+  );
+  const normalizedTemplateReadinessOptions = meta.templateReadiness.map(
+    (option) => buildActivityDraftMetaSummaryReadinessOption(option)
+  );
+  const lockedTemplateCount = normalizeActivityDraftMetaCount(
+    normalizedTemplateReadinessOptions.filter((option) => !option.isReady)
+      .length
   );
   const modelLabel = m.activity_draft_meta_model_label();
   const modelName =
@@ -182,8 +216,12 @@ export function buildActivityDraftMetaSummaryView({
   const normalizedDraftFocus = draftFocus ?? 'balanced';
   const draftFocusLabel = m.activity_draft_meta_focus_label();
   const draftFocusName = formatActivityAiDraftFocusLabel(normalizedDraftFocus);
+  const normalizedSourceMaterialNoteViews =
+    normalizeActivityDraftSourceMaterialNoteViews(sourceMaterialNoteViews);
 
   return {
+    appliedDescription: m.activity_draft_meta_applied_description(),
+    appliedLabel: m.activity_draft_meta_applied_label(),
     coverageStats: [
       {
         label: m.activity_draft_meta_coverage_questions(),
@@ -215,12 +253,26 @@ export function buildActivityDraftMetaSummaryView({
       value: draftFocusName,
     }),
     draftFocusName,
+    lockedTemplateLabel:
+      lockedTemplateCount === 1
+        ? m.activity_draft_meta_locked_template_label_one({
+            count: lockedTemplateCount,
+          })
+        : m.activity_draft_meta_locked_template_label_many({
+            count: lockedTemplateCount,
+          }),
+    lockedTemplateOptions: normalizedTemplateReadinessOptions.filter(
+      (option) => !option.isReady
+    ),
+    lockedTemplatesTitle: m.activity_draft_meta_locked_templates_title(),
     modelLabel,
     modelLineText: m.activity_draft_meta_model_line({
       label: modelLabel,
       value: modelName,
     }),
     modelName,
+    nextStepLabel: m.activity_draft_meta_next_step_label(),
+    nextStepText: m.activity_draft_meta_next_step_save(),
     notice: normalizedNotice,
     noticeLabel,
     noticeLineText: normalizedNotice
@@ -245,19 +297,23 @@ export function buildActivityDraftMetaSummaryView({
         : m.activity_draft_meta_ready_template_label_many({
             count: readyTemplateCount,
           }),
+    readyTemplatesTitle: m.activity_draft_meta_ready_templates_title(),
     reviewChecklist: meta.reviewChecklist,
-    suggestedTemplateOptions: meta.suggestedTemplateOptions,
-    templateReadinessOptions: meta.templateReadiness.map((option) => ({
-      diagnosis: option.diagnosis,
-      isCurrent: option.isCurrent,
-      isReady: option.isReady,
-      readinessLabel: option.readinessLabel,
-      selectedLabel: option.isCurrent
-        ? m.activity_draft_meta_selected_label()
+    sourceMaterialCountLabel:
+      normalizedSourceMaterialNoteViews.length > 0
+        ? buildActivityDraftSourceMaterialCountLabel(
+            normalizedSourceMaterialNoteViews.length
+          )
         : undefined,
-      shortName: option.shortName,
-      template: option.template,
-    })),
+    sourceMaterialDescription:
+      m.activity_draft_meta_source_materials_description(),
+    sourceMaterialNoteViews: normalizedSourceMaterialNoteViews,
+    sourceMaterialTitle: m.activity_draft_meta_source_materials_title(),
+    suggestedTemplateOptions: meta.suggestedTemplateOptions,
+    suggestedTemplatesEmptyText:
+      m.activity_draft_meta_suggested_templates_empty(),
+    suggestedTemplatesTitle: m.activity_draft_meta_suggested_templates_title(),
+    templateReadinessOptions: normalizedTemplateReadinessOptions,
     title: m.activity_draft_meta_title(),
   };
 }
@@ -283,6 +339,78 @@ function buildActivityDraftProviderDescription({
   }
 
   return m.activity_draft_meta_provider_description_workers_ai();
+}
+
+function buildActivityDraftMetaSummaryReadinessOption(
+  option: ActivityDraftTemplateReadiness
+): ActivityDraftMetaSummaryReadinessOption {
+  const missingRequirementCount = normalizeActivityDraftMetaCount(
+    option.missingRequirementCount
+  );
+
+  return {
+    diagnosis: option.diagnosis,
+    isCurrent: option.isCurrent,
+    isReady: option.isReady,
+    missingRequirementCount,
+    missingRequirementLabel:
+      missingRequirementCount > 0
+        ? buildActivityDraftMissingRequirementLabel(missingRequirementCount)
+        : undefined,
+    readinessLabel: option.readinessLabel,
+    selectedLabel: option.isCurrent
+      ? m.activity_draft_meta_selected_label()
+      : undefined,
+    shortName: option.shortName,
+    template: option.template,
+  };
+}
+
+function buildActivityDraftMissingRequirementLabel(count: number) {
+  return count === 1
+    ? m.activity_draft_meta_missing_requirement_label_one({ count })
+    : m.activity_draft_meta_missing_requirement_label_many({ count });
+}
+
+function buildActivityDraftSourceMaterialCountLabel(count: number) {
+  return count === 1
+    ? m.activity_draft_meta_source_materials_count_one({ count })
+    : m.activity_draft_meta_source_materials_count_many({ count });
+}
+
+function normalizeActivityDraftSourceMaterialNoteViews(
+  sourceMaterialNoteViews: ActivitySourceMaterialDraftNoteView[] | undefined
+) {
+  const normalizedNoteViews: ActivityDraftMetaSummarySourceMaterialNoteView[] =
+    [];
+  const seen = new Set<string>();
+
+  for (const noteView of sourceMaterialNoteViews ?? []) {
+    const kindLabel = normalizeRuntimeDisplayText(noteView.kindLabel);
+    const name = normalizeRuntimeDisplayText(noteView.name);
+    const key = `${kindLabel}\u0000${name}`.toLocaleLowerCase();
+
+    if (
+      !kindLabel ||
+      !name ||
+      !isSafeActivitySourceMaterialDraftKind(kindLabel) ||
+      seen.has(key)
+    ) {
+      continue;
+    }
+
+    seen.add(key);
+    normalizedNoteViews.push({
+      displayText: m.activity_draft_meta_source_material_item({
+        kind: kindLabel,
+        name,
+      }),
+      kindLabel,
+      name,
+    });
+  }
+
+  return normalizedNoteViews;
 }
 
 export function buildActivityTemplateReadinessPanelSummary(

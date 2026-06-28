@@ -75,7 +75,12 @@ export function ActivityAiDraftPanel({
         </div>
       </div>
 
-      {draftResult ? <ActivityDraftMetaSummary result={draftResult} /> : null}
+      {draftResult ? (
+        <ActivityDraftMetaSummary
+          result={draftResult}
+          sourceMaterialNoteViews={panelView.sourceMaterialNoteViews}
+        />
+      ) : null}
     </div>
   );
 }
@@ -102,21 +107,29 @@ function ActivityAiDraftSourceControls({
           {panelView.reviewNote}
         </span>
       </div>
+      <p className="text-xs leading-5 text-muted-foreground">
+        {panelView.safeSourceDescription}
+      </p>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <label htmlFor="activity-ai-source" className="font-medium text-sm">
           {panelView.sourceTextLabel}
         </label>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="bg-background"
-          onClick={onSyncSourceMaterials}
-          disabled={!panelView.canSyncDraftSourceMaterials}
-        >
-          <IconPaperclip className="size-3.5" />
-          {panelView.syncMaterialsLabel}
-        </Button>
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="bg-background"
+            onClick={onSyncSourceMaterials}
+            disabled={!panelView.canSyncDraftSourceMaterials}
+          >
+            <IconPaperclip className="size-3.5" />
+            {panelView.syncMaterialsLabel}
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            {panelView.syncMaterialsHelpText}
+          </span>
+        </div>
       </div>
       <Textarea
         id="activity-ai-source"
@@ -125,6 +138,26 @@ function ActivityAiDraftSourceControls({
         rows={3}
         placeholder={panelView.sourcePlaceholder}
       />
+      {panelView.sourceMaterialNoteViews.length > 0 ? (
+        <div className="space-y-2 rounded-md border bg-background p-3">
+          {panelView.sourceMaterialSummaryLabel ? (
+            <p className="font-medium text-xs">
+              {panelView.sourceMaterialSummaryLabel}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-1.5">
+            {panelView.sourceMaterialNoteViews.map((noteView) => (
+              <Badge
+                key={noteView.displayText}
+                variant="outline"
+                className="max-w-full rounded-md"
+              >
+                <span className="truncate">{noteView.displayText}</span>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -212,19 +245,26 @@ function ActivityAiDraftGenerateButton({
   panelView: ActivityAiDraftPanelView;
 }) {
   return (
-    <Button
-      type="button"
-      variant="secondary"
-      onClick={onGenerateDraft}
-      disabled={!panelView.canGenerateDraft}
-      className="self-end sm:col-span-2"
-    >
-      {isGeneratingDraft ? (
-        <IconLoader2 className="size-4 animate-spin" />
-      ) : (
-        <IconSparkles className="size-4" />
-      )}
-      {panelView.generateButtonLabel}
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={onGenerateDraft}
+        disabled={!panelView.canGenerateDraft}
+        className="self-end sm:col-span-2"
+      >
+        {isGeneratingDraft ? (
+          <IconLoader2 className="size-4 animate-spin" />
+        ) : (
+          <IconSparkles className="size-4" />
+        )}
+        {panelView.generateButtonLabel}
+      </Button>
+      {panelView.generationDisabledReason ? (
+        <p className="sm:col-span-2 text-xs text-muted-foreground">
+          {panelView.generationDisabledReason}
+        </p>
+      ) : null}
+    </>
   );
 }

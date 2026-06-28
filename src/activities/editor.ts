@@ -24,6 +24,7 @@ import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import {
   appendActivitySourceMaterialDraftNotes,
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
@@ -114,18 +115,29 @@ type ActivityEditorDraftSourceState = {
   hasDraftSourceMaterialNotes: boolean;
 };
 
+type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
+  typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText
+>[number] & {
+  displayText: string;
+};
+
 type ActivityEditorAiDraftPanelView = {
   badgeLabel: string;
   canGenerateDraft: boolean;
   canSyncDraftSourceMaterials: boolean;
+  generationDisabledReason?: string;
   focusLabel: string;
   focusOptions: ActivityAiDraftFocusOption[];
   generateButtonLabel: string;
   itemCountLabel: string;
   reviewNote: string;
+  safeSourceDescription: string;
+  sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
+  sourceMaterialSummaryLabel?: string;
   sourcePlaceholder: string;
   sourceTextLabel: string;
   syncMaterialsLabel: string;
+  syncMaterialsHelpText: string;
   syncSuccessMessage: string;
 };
 
@@ -341,28 +353,72 @@ export function buildActivityEditorDraftSourceState({
 }
 
 export function buildActivityEditorAiDraftPanelView({
+  draftSourceText = '',
   hasUser,
   isGeneratingDraft,
   sourceState,
 }: {
+  draftSourceText?: string;
   hasUser: boolean;
   isGeneratingDraft: boolean;
   sourceState: ActivityEditorDraftSourceState;
 }): ActivityEditorAiDraftPanelView {
+  const sourceMaterialNoteViews =
+    buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+      draftSourceText
+    ).map((noteView) => ({
+      ...noteView,
+      displayText: m.activity_form_ai_source_material_item({
+        kind: noteView.kindLabel,
+        name: noteView.name,
+      }),
+    }));
+
   return {
     badgeLabel: m.activity_form_ai_draft_badge(),
     canGenerateDraft: hasUser && !isGeneratingDraft,
     canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
+    generationDisabledReason: buildActivityEditorDraftGenerationDisabledReason({
+      hasUser,
+      isGeneratingDraft,
+    }),
     focusLabel: m.activity_form_ai_focus_label(),
     focusOptions: buildActivityAiDraftFocusOptions(),
     generateButtonLabel: m.activity_form_generate_draft(),
     itemCountLabel: m.activity_form_ai_item_count_label(),
     reviewNote: m.activity_form_ai_draft_review_note(),
+    safeSourceDescription: m.activity_form_ai_safe_source_description(),
+    sourceMaterialNoteViews,
+    sourceMaterialSummaryLabel:
+      sourceMaterialNoteViews.length > 0
+        ? buildActivityEditorSourceMaterialSummaryLabel(
+            sourceMaterialNoteViews.length
+          )
+        : undefined,
     sourcePlaceholder: m.activity_form_ai_source_placeholder(),
     sourceTextLabel: m.activity_form_ai_source_label(),
     syncMaterialsLabel: m.activity_form_use_attached_materials(),
+    syncMaterialsHelpText: m.activity_form_ai_sync_materials_help(),
     syncSuccessMessage: m.activity_form_toast_source_materials_synced(),
   };
+}
+
+function buildActivityEditorDraftGenerationDisabledReason({
+  hasUser,
+  isGeneratingDraft,
+}: {
+  hasUser: boolean;
+  isGeneratingDraft: boolean;
+}) {
+  if (!hasUser) return m.activity_form_ai_generation_sign_in_hint();
+  if (isGeneratingDraft) return m.activity_form_ai_generation_pending_hint();
+  return undefined;
+}
+
+function buildActivityEditorSourceMaterialSummaryLabel(count: number) {
+  return count === 1
+    ? m.activity_form_ai_source_material_count_one({ count })
+    : m.activity_form_ai_source_material_count_many({ count });
 }
 
 export function buildActivityEditorSyncedDraftSourceText({
