@@ -13835,6 +13835,10 @@ const assignmentListCardComponentSource = readFileSync(
   'src/components/assignments/assignment-list-card.tsx',
   'utf8'
 );
+const assignmentListStatsComponentSource = readFileSync(
+  'src/components/assignments/assignment-list-stats.tsx',
+  'utf8'
+);
 const assignmentListSummaryCardComponentSource = readFileSync(
   'src/components/assignments/assignment-list-summary-card.tsx',
   'utf8'
@@ -14230,6 +14234,26 @@ assert.match(
   assignmentListCardComponentSource,
   /AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}/,
   'Assignment list card component should render prepared delivery summary views.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentListStats[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card component should delegate prepared stat item rendering to a focused component.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /assignment\.statItems\.map|assignmentListCardStatIcons|function AssignmentStat/,
+  'Assignment list card component should not hand-compose stat cards.'
+);
+assert.match(
+  assignmentListStatsComponentSource,
+  /AssignmentListCardViewModel\['statItems'\]/,
+  'Assignment list stats component should consume the assignment-domain stat item contract.'
+);
+assert.match(
+  assignmentListStatsComponentSource,
+  /statItems\.map[\s\S]*assignmentListCardStatIcons\[stat\.key\][\s\S]*stat\.value/,
+  'Assignment list stats component should render prepared stat values with stat-key icons.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,

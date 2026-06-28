@@ -1,5 +1,6 @@
 import type { buildAssignmentListCardViewModel } from '@/assignments/list-view';
 import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
+import { AssignmentListStats } from '@/components/assignments/assignment-list-stats';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +21,6 @@ import {
   IconLockOpen,
   IconPlayerPlay,
   IconPrinter,
-  IconUsers,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
@@ -72,16 +72,7 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="grid gap-4">
           <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
-          <div className="grid gap-3 sm:grid-cols-2">
-            {assignment.statItems.map((stat) => (
-              <AssignmentStat
-                key={stat.key}
-                icon={assignmentListCardStatIcons[stat.key]}
-                label={stat.label}
-                value={stat.value}
-              />
-            ))}
-          </div>
+          <AssignmentListStats statItems={assignment.statItems} />
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
           {resultAction ? (
@@ -145,33 +136,5 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-const assignmentListCardStatIcons: Record<
-  ReturnType<
-    typeof buildAssignmentListCardViewModel
-  >['statItems'][number]['key'],
-  typeof IconUsers
-> = {
-  average: IconChartBar,
-  completions: IconUsers,
-};
-
-function AssignmentStat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof IconUsers;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-lg border bg-background p-3">
-      <Icon className="size-4 text-primary" />
-      <p className="mt-2 text-sm font-medium">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
   );
 }
