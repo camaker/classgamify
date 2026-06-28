@@ -214,6 +214,15 @@ export type StudentRunnerAnswerUpdatePlan =
       type: 'ignored';
     };
 
+export type StudentRunnerAnonymousTokenPlan =
+  | {
+      type: 'skip';
+    }
+  | {
+      shareId: string;
+      type: 'resolve';
+    };
+
 export type StudentRunnerSubmissionPlan = ReturnType<
   typeof buildStudentAttemptSubmissionPlan
 >;
@@ -695,6 +704,21 @@ export function buildStudentRunnerSubmissionPlan({
     studentName,
     timeLimitSeconds: pageView.timeLimitSeconds,
   });
+}
+
+export function buildStudentRunnerAnonymousTokenPlan({
+  pageView,
+}: {
+  pageView: StudentRunnerPageViewModel;
+}): StudentRunnerAnonymousTokenPlan {
+  if (!pageView.assignment || pageView.assignment.settings.collectStudentName) {
+    return { type: 'skip' };
+  }
+
+  return {
+    shareId: pageView.activeShareId,
+    type: 'resolve',
+  };
 }
 
 export function buildStudentRunnerAnswerUpdatePlan({

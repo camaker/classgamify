@@ -700,6 +700,7 @@ import {
   buildScoredAttemptWhere,
 } from '@/assignments/attempt-query';
 import {
+  buildStudentRunnerAnonymousTokenPlan,
   buildStudentRunnerAnswerUpdatePlan,
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
@@ -5022,6 +5023,16 @@ assert.match(
   'Student runner state domain should adapt runner page view state into the assignment-domain submission plan.'
 );
 assert.match(
+  playRouteSource,
+  /buildStudentRunnerAnonymousTokenPlan\(\{[\s\S]*pageView: runnerPageView/,
+  'Student play route should resolve anonymous browser tokens through the runner anonymous-token plan.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerAnonymousTokenPlan[\s\S]*pageView\.assignment\.settings\.collectStudentName[\s\S]*shareId: pageView\.activeShareId/,
+  'Student runner state domain should decide when anonymous assignment tokens need browser storage.'
+);
+assert.match(
   studentRunnerStateSource,
   /export function buildStudentRunnerSubmissionResultState/,
   'Student runner state domain should expose the submission response to result-state conversion.'
@@ -5053,7 +5064,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /buildStudentAttemptSubmissionPlan\(|buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(|buildStudentRunnerSubmissionPlan\(\{[\s\S]*(?:completionSummary|runtimeItems,|startedAt,|timeLimitSeconds,)/,
+  /buildStudentAttemptSubmissionPlan\(|buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(|assignment\.settings\.collectStudentName|buildStudentRunnerSubmissionPlan\(\{[\s\S]*(?:completionSummary|runtimeItems,|startedAt,|timeLimitSeconds,)/,
   'Student play route should not rebuild submit gates, anonymous identity, duration, runner completion, or submission input locally.'
 );
 assert.doesNotMatch(
@@ -11332,6 +11343,15 @@ assert.deepEqual(
     type: 'submit',
   }
 );
+assert.deepEqual(
+  buildStudentRunnerAnonymousTokenPlan({
+    pageView: submittableStudentRunnerPageView,
+  }),
+  {
+    shareId: 'share-public',
+    type: 'resolve',
+  }
+);
 const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
   buildStudentRunnerPageViewModel({
     answers: {},
@@ -11429,6 +11449,12 @@ assert.deepEqual(namedStudentRunnerPageView.identityView, {
   mode: 'student-name',
   placeholder: 'Type your name',
 });
+assert.deepEqual(
+  buildStudentRunnerAnonymousTokenPlan({
+    pageView: namedStudentRunnerPageView,
+  }),
+  { type: 'skip' }
+);
 assert.equal(namedStudentRunnerPageView.controlView.runnerTitle, 'Quiz');
 assert.deepEqual(namedStudentRunnerPageView.resultPanelView, {
   show: false,

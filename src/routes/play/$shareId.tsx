@@ -8,6 +8,7 @@ import {
   type StudentAnswerChange,
 } from '@/assignments/student-submission';
 import {
+  buildStudentRunnerAnonymousTokenPlan,
   buildStudentRunnerAnswerUpdatePlan,
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
@@ -187,14 +188,18 @@ function PlayPage() {
   }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
 
   useEffect(() => {
-    if (!assignment || assignment.settings.collectStudentName) return;
+    const anonymousTokenPlan = buildStudentRunnerAnonymousTokenPlan({
+      pageView: runnerPageView,
+    });
+    if (anonymousTokenPlan.type === 'skip') return;
+
     setAnonymousToken(
       getOrCreateAnonymousAttemptToken({
-        shareId: activeShareId,
+        shareId: anonymousTokenPlan.shareId,
         storage: window.localStorage,
       })
     );
-  }, [activeShareId, assignment]);
+  }, [runnerPageView]);
 
   async function submitAnswers() {
     const submissionPlan = buildStudentRunnerSubmissionPlan({
