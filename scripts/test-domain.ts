@@ -104,11 +104,15 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
+  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  ACTIVITY_AI_DRAFT_FOCUSES,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS,
+  buildActivityAiDraftFocusOptions,
+  buildActivityAiDraftFocusPromptLine,
   buildActivityDraftPrompt,
   buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
@@ -2362,6 +2366,11 @@ assert.match(
   /ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.default/,
   'Activity editor AI draft item-count default should come from the AI draft domain contract.'
 );
+assert.match(
+  activityEditorFormSource,
+  /ACTIVITY_AI_DRAFT_DEFAULT_FOCUS/,
+  'Activity editor AI draft focus default should come from the AI draft domain contract.'
+);
 assert.doesNotMatch(
   activityEditorFormSource,
   /summary\.lockedOptions\.slice\(0, 4\)/,
@@ -2411,6 +2420,11 @@ assert.match(
   activityAiDraftPanelSource,
   /function ActivityAiDraftItemCountSelect[\s\S]*panelView\.itemCountLabel[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS\.map/,
   'Activity AI draft item-count select should render prepared label and shared item-count options.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftFocusSelect[\s\S]*panelView\.focusLabel[\s\S]*panelView\.focusOptions\.map[\s\S]*selectedFocusOption\.description/,
+  'Activity AI draft focus select should render prepared labels, options, and descriptions.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -2519,7 +2533,7 @@ assert.match(
 );
 assert.doesNotMatch(
   activityEditorFormSource,
-  /id="activity-ai-source"|id="activity-ai-item-count"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|syncMaterialsLabel|generateButtonLabel)/,
+  /id="activity-ai-source"|id="activity-ai-item-count"|id="activity-ai-focus"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|focusLabel|focusOptions|syncMaterialsLabel|generateButtonLabel)/,
   'Activity editor form should not hand-render low-level AI draft controls.'
 );
 assert.doesNotMatch(
@@ -15471,6 +15485,11 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
+  /ACTIVITY_AI_DRAFT_FOCUSES[\s\S]*ACTIVITY_AI_DRAFT_DEFAULT_FOCUS[\s\S]*draftFocus: z[\s\S]*\.enum\(ACTIVITY_AI_DRAFT_FOCUSES\)[\s\S]*\.default\(ACTIVITY_AI_DRAFT_DEFAULT_FOCUS\)/,
+  'AI draft input schema should expose and reuse the domain draft-focus contract.'
+);
+assert.match(
+  activityAiDraftSource,
   /sourceText: z[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceText\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.sourceText\.max/,
   'AI draft source-text input schema should reuse the shared source-text field limit.'
 );
@@ -15511,7 +15530,7 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /export function buildFallbackActivityDraftTerms[\s\S]*extractActivityDraftSourceTerms\([\s\S]*slice\(0, input\.itemCount\)/,
+  /export function buildFallbackActivityDraftTerms[\s\S]*generateActivityDraftInputSchema\.parse\(input\)[\s\S]*extractActivityDraftSourceTerms\([\s\S]*slice\(0, data\.itemCount\)/,
   'Fallback activity drafts should choose source terms through the shared source-term helper.'
 );
 assert.match(
@@ -19717,6 +19736,33 @@ assert.deepEqual(disabledAiDraftPanelView, {
   badgeLabel: 'AI draft',
   canGenerateDraft: false,
   canSyncDraftSourceMaterials: false,
+  focusLabel: 'Focus',
+  focusOptions: [
+    {
+      description:
+        'Keeps questions, pairs, groups, vocabulary, and notes balanced for reuse.',
+      label: 'Balanced activity',
+      value: 'balanced',
+    },
+    {
+      description:
+        'Leans into blanks, matching lines, and classification structures for worksheet-style homework.',
+      label: 'Worksheet practice',
+      value: 'worksheet-practice',
+    },
+    {
+      description:
+        'Builds spoken prompts and review answers for listening practice.',
+      label: 'Listening script',
+      value: 'listening-script',
+    },
+    {
+      description:
+        'Prioritizes enough structure for switching the same activity into other game modes.',
+      label: 'Remix ready',
+      value: 'remix-ready',
+    },
+  ],
   generateButtonLabel: 'Generate draft',
   itemCountLabel: 'Items',
   reviewNote: 'Teacher reviews before saving',
@@ -21338,6 +21384,29 @@ assert.deepEqual(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE, {
   min: 3,
 });
 assert.deepEqual(ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS, [3, 5, 8, 10]);
+assert.deepEqual(ACTIVITY_AI_DRAFT_FOCUSES, [
+  'balanced',
+  'worksheet-practice',
+  'listening-script',
+  'remix-ready',
+]);
+assert.equal(ACTIVITY_AI_DRAFT_DEFAULT_FOCUS, 'balanced');
+assert.deepEqual(
+  buildActivityAiDraftFocusOptions().map((option) => ({
+    label: option.label,
+    value: option.value,
+  })),
+  [
+    { label: 'Balanced activity', value: 'balanced' },
+    { label: 'Worksheet practice', value: 'worksheet-practice' },
+    { label: 'Listening script', value: 'listening-script' },
+    { label: 'Remix ready', value: 'remix-ready' },
+  ]
+);
+assert.match(
+  buildActivityAiDraftFocusPromptLine('worksheet-practice'),
+  /Draft focus: Worksheet practice\. Favor worksheet-style prompts/
+);
 assert.deepEqual(ACTIVITY_AI_DRAFT_COMPLETION_LIMITS, {
   groups: 4,
   groupItems: 8,
@@ -21435,16 +21504,26 @@ assert.deepEqual(ACTIVITY_AI_DRAFT_FIELD_LIMITS, {
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({
     current: activityEditorDefaultInput,
+    draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
     itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default,
     sourceText: 'food, apple, bread, milk',
   }).itemCount,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
 );
-assert.equal(
+assert.deepEqual(
   generateActivityDraftInputSchema.parse({
     sourceText: 'food, apple, bread, milk',
-  }).itemCount,
-  ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
+  }),
+  {
+    difficulty: 'starter',
+    draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+    gradeBand: 'Primary',
+    itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default,
+    language: 'en',
+    sourceText: 'food, apple, bread, milk',
+    subject: 'English',
+    templateType: 'quiz',
+  }
 );
 assert.deepEqual(
   buildGenerateActivityDraftInputFromEditor({
@@ -21455,11 +21534,13 @@ assert.deepEqual(
       subject: '',
       templateType: 'line-match',
     },
+    draftFocus: 'worksheet-practice',
     itemCount: 5,
     sourceText: '  food, apple, bread, milk  ',
   }),
   {
     difficulty: activityEditorDefaultInput.difficulty,
+    draftFocus: 'worksheet-practice',
     gradeBand: 'Primary',
     itemCount: 5,
     language: 'en',
@@ -21478,11 +21559,13 @@ assert.deepEqual(
       subject: 'Science',
       templateType: 'group-sort',
     },
+    draftFocus: 'remix-ready',
     itemCount: 8,
     sourceText: 'states of matter, solid, liquid, gas',
   }),
   {
     difficulty: 'challenge',
+    draftFocus: 'remix-ready',
     gradeBand: 'Grade 5',
     itemCount: 8,
     language: 'zh',
@@ -21494,6 +21577,7 @@ assert.deepEqual(
 assert.throws(() =>
   buildGenerateActivityDraftInputFromEditor({
     current: activityEditorDefaultInput,
+    draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
     itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max + 1,
     sourceText: 'food, apple, bread, milk',
   })
@@ -21501,6 +21585,7 @@ assert.throws(() =>
 assert.throws(() =>
   buildGenerateActivityDraftInputFromEditor({
     current: activityEditorDefaultInput,
+    draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
     itemCount: ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min - 1,
     sourceText: 'food, apple, bread, milk',
   })
@@ -21540,6 +21625,7 @@ assert.deepEqual(
   buildFallbackActivityDraftTerms({
     input: {
       difficulty: 'starter',
+      draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
       gradeBand: 'Grade 2',
       itemCount: 3,
       language: 'en',
@@ -21551,8 +21637,16 @@ assert.deepEqual(
   }),
   ['weather', 'sunny', 'rainy']
 );
+const minimalFallbackDraft = createFallbackActivityDraft({
+  sourceText: 'food, apple, bread, milk',
+});
+assert.equal(minimalFallbackDraft.difficulty, 'starter');
+assert.equal(minimalFallbackDraft.subject, 'English');
+assert.equal(minimalFallbackDraft.templateType, 'quiz');
+assert.match(minimalFallbackDraft.description, /Balanced activity/);
 const fallbackDraft = createFallbackActivityDraft({
   difficulty: 'starter',
+  draftFocus: 'listening-script',
   gradeBand: 'Grade 2',
   itemCount: 5,
   language: 'en',
@@ -21563,6 +21657,7 @@ const fallbackDraft = createFallbackActivityDraft({
 });
 const fillBlankDraftPrompt = buildActivityDraftPrompt({
   difficulty: 'starter',
+  draftFocus: 'worksheet-practice',
   gradeBand: 'Grade 3',
   itemCount: 5,
   language: 'en',
@@ -21571,6 +21666,10 @@ const fillBlankDraftPrompt = buildActivityDraftPrompt({
   templateType: 'fill-blank',
 });
 assert.match(fillBlankDraftPrompt, /Template requirements: questions/);
+assert.match(
+  fillBlankDraftPrompt,
+  /Draft focus: Worksheet practice\. Favor worksheet-style prompts/
+);
 assert.match(fillBlankDraftPrompt, /worksheet sentence with ___/);
 const fillBlankPromptJsonExample = fillBlankDraftPrompt.match(
   /Return exactly this JSON object shape:\n([\s\S]*?)\n\nRules:/
@@ -21587,6 +21686,7 @@ assert.equal(
 );
 const groupSortDraftPrompt = buildActivityDraftPrompt({
   difficulty: 'starter',
+  draftFocus: 'remix-ready',
   gradeBand: 'Grade 3',
   itemCount: 5,
   language: 'en',
@@ -21595,6 +21695,10 @@ const groupSortDraftPrompt = buildActivityDraftPrompt({
   templateType: 'group-sort',
 });
 assert.match(groupSortDraftPrompt, /Template requirements: groups/);
+assert.match(
+  groupSortDraftPrompt,
+  /Draft focus: Remix ready\. Include extra reusable questions/
+);
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
 const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
 assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
@@ -21631,6 +21735,7 @@ assert.doesNotMatch(
 );
 const draftPromptInput = {
   difficulty: 'starter',
+  draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   gradeBand: 'Grade 3',
   itemCount: 4,
   language: 'en',
@@ -21659,6 +21764,7 @@ overwriteGetLocale(() => 'zh');
 try {
   const zhFillBlankDraftPrompt = buildActivityDraftPrompt({
     difficulty: 'starter',
+    draftFocus: 'worksheet-practice',
     gradeBand: 'Grade 3',
     itemCount: 5,
     language: 'en',
@@ -21668,6 +21774,7 @@ try {
   });
 
   assert.match(zhFillBlankDraftPrompt, /主题：Science/);
+  assert.match(zhFillBlankDraftPrompt, /生成目标：练习纸。/);
   assert.match(zhFillBlankDraftPrompt, /年级：Grade 3/);
   assert.match(zhFillBlankDraftPrompt, /模板要求：题目/);
   assert.match(zhFillBlankDraftPrompt, /请返回以下 JSON 对象结构：/);
@@ -21697,6 +21804,7 @@ assert.match(
 const fallbackDraftResult = createFallbackActivityDraftResult({
   input: {
     difficulty: 'starter',
+    draftFocus: 'listening-script',
     gradeBand: 'Grade 2',
     itemCount: 5,
     language: 'en',
@@ -21718,6 +21826,7 @@ const fallbackDraftMeta = buildActivityDraftMeta({
   currentTemplateType: fallbackDraft.templateType,
 });
 assert.equal(fallbackDraft.templateType, 'listening');
+assert.match(fallbackDraft.description, /Listening script/);
 assert.equal(fallbackDraftResult.provider, 'fallback');
 assert.equal(fallbackDraftResult.model, 'test-model');
 assert.equal(fallbackDraftResult.notice, 'Fallback used for testing.');
@@ -21756,6 +21865,7 @@ assert.ok(
 assert.ok(fallbackContent.groups.length >= 2);
 assert.ok(fallbackContent.vocabulary.includes('weather'));
 assert.ok(fallbackContent.teacherNotes.length >= 2);
+assert.ok(fallbackContent.teacherNotes[0]?.includes('Listening script'));
 assert.ok(
   fallbackContent.questions.every((question) =>
     question.options?.some((option) => option.text === question.answer)
@@ -22536,13 +22646,14 @@ const fallbackChineseQuizContent = buildActivityContent(
 );
 assert.equal(
   fallbackChineseQuizDraft.description,
-  '根据课堂素材生成的英语活动，老师可检查后使用。'
+  '根据课堂素材生成的英语活动，生成目标为均衡活动，老师可检查后使用。'
 );
 assert.equal(
   fallbackChineseQuizDraft.learningGoal,
   '学生能够识别并运用本课的英语重点内容。'
 );
 assert.equal(fallbackChineseQuizDraft.title, '苹果快速练习');
+assert.match(fallbackChineseQuizDraft.teacherNotesText, /生成目标：均衡活动。/);
 assert.match(
   fallbackChineseQuizDraft.teacherNotesText,
   /发布给小学三年级学生前，请先检查这份草稿。/

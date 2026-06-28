@@ -24,6 +24,10 @@ import {
   hasActivitySourceMaterialDraftNotes,
 } from '@/activities/draft-source';
 import {
+  buildActivityAiDraftFocusOptions,
+  type ActivityAiDraftFocusOption,
+} from '@/activities/ai-draft';
+import {
   formatEditorGroupRows,
   formatEditorInlineList,
   formatEditorLineList,
@@ -110,6 +114,8 @@ type ActivityEditorAiDraftPanelView = {
   badgeLabel: string;
   canGenerateDraft: boolean;
   canSyncDraftSourceMaterials: boolean;
+  focusLabel: string;
+  focusOptions: ActivityAiDraftFocusOption[];
   generateButtonLabel: string;
   itemCountLabel: string;
   reviewNote: string;
@@ -310,6 +316,8 @@ export function buildActivityEditorAiDraftPanelView({
     badgeLabel: m.activity_form_ai_draft_badge(),
     canGenerateDraft: hasUser && !isGeneratingDraft,
     canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
+    focusLabel: m.activity_form_ai_focus_label(),
+    focusOptions: buildActivityAiDraftFocusOptions(),
     generateButtonLabel: m.activity_form_generate_draft(),
     itemCountLabel: m.activity_form_ai_item_count_label(),
     reviewNote: m.activity_form_ai_draft_review_note(),

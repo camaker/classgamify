@@ -13,9 +13,11 @@ import {
   getActivityEditorDefaultInput,
 } from '@/activities/editor';
 import {
+  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildGenerateActivityDraftInputFromEditor,
   type ActivityDraftResult,
+  type ActivityAiDraftFocus,
 } from '@/activities/ai-draft';
 import { ActivityAiDraftPanel } from '@/components/activities/activity-ai-draft-panel';
 import {
@@ -78,6 +80,9 @@ export function ActivityCreateForm({
   const [draftItemCount, setDraftItemCount] = useState(
     ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.default
   );
+  const [draftFocus, setDraftFocus] = useState<ActivityAiDraftFocus>(
+    ACTIVITY_AI_DRAFT_DEFAULT_FOCUS
+  );
   const [draftResult, setDraftResult] = useState<ActivityDraftResult>();
   const form = useForm<CreateActivityInput>({
     defaultValues,
@@ -138,6 +143,7 @@ export function ActivityCreateForm({
       const result = await draftMutation.mutateAsync(
         buildGenerateActivityDraftInputFromEditor({
           current,
+          draftFocus,
           itemCount: draftItemCount,
           sourceText: draftGate.sourceText,
         })
@@ -223,10 +229,12 @@ export function ActivityCreateForm({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
             <ActivityAiDraftPanel
+              draftFocus={draftFocus}
               draftItemCount={draftItemCount}
               draftResult={draftResult}
               draftSourceText={draftSourceText}
               isGeneratingDraft={isGeneratingDraft}
+              onDraftFocusChange={setDraftFocus}
               onDraftItemCountChange={setDraftItemCount}
               onDraftSourceTextChange={setDraftSourceText}
               onGenerateDraft={onGenerateDraft}

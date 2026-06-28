@@ -1,5 +1,6 @@
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
+  type ActivityAiDraftFocus,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
 import type { buildActivityEditorAiDraftPanelView } from '@/activities/editor';
@@ -18,10 +19,12 @@ type ActivityAiDraftPanelView = ReturnType<
 >;
 
 type ActivityAiDraftPanelProps = {
+  draftFocus: ActivityAiDraftFocus;
   draftItemCount: number;
   draftResult?: ActivityDraftResult;
   draftSourceText: string;
   isGeneratingDraft: boolean;
+  onDraftFocusChange: (draftFocus: ActivityAiDraftFocus) => void;
   onDraftItemCountChange: (itemCount: number) => void;
   onDraftSourceTextChange: (sourceText: string) => void;
   onGenerateDraft: () => void;
@@ -30,10 +33,12 @@ type ActivityAiDraftPanelProps = {
 };
 
 export function ActivityAiDraftPanel({
+  draftFocus,
   draftItemCount,
   draftResult,
   draftSourceText,
   isGeneratingDraft,
+  onDraftFocusChange,
   onDraftItemCountChange,
   onDraftSourceTextChange,
   onGenerateDraft,
@@ -50,7 +55,12 @@ export function ActivityAiDraftPanel({
             onSyncSourceMaterials={onSyncSourceMaterials}
             panelView={panelView}
           />
-          <div className="grid gap-3 sm:grid-cols-[8rem_auto] lg:w-auto lg:grid-cols-[8rem_auto]">
+          <div className="grid gap-3 sm:grid-cols-[minmax(12rem,1fr)_8rem] lg:w-[28rem]">
+            <ActivityAiDraftFocusSelect
+              draftFocus={draftFocus}
+              onDraftFocusChange={onDraftFocusChange}
+              panelView={panelView}
+            />
             <ActivityAiDraftItemCountSelect
               draftItemCount={draftItemCount}
               onDraftItemCountChange={onDraftItemCountChange}
@@ -151,6 +161,47 @@ function ActivityAiDraftItemCountSelect({
   );
 }
 
+function ActivityAiDraftFocusSelect({
+  draftFocus,
+  onDraftFocusChange,
+  panelView,
+}: {
+  draftFocus: ActivityAiDraftFocus;
+  onDraftFocusChange: (draftFocus: ActivityAiDraftFocus) => void;
+  panelView: ActivityAiDraftPanelView;
+}) {
+  const selectedFocusOption =
+    panelView.focusOptions.find((option) => option.value === draftFocus) ??
+    panelView.focusOptions[0];
+
+  return (
+    <div className="space-y-2">
+      <label htmlFor="activity-ai-focus" className="font-medium text-sm">
+        {panelView.focusLabel}
+      </label>
+      <NativeSelect
+        id="activity-ai-focus"
+        value={draftFocus}
+        onChange={(event) =>
+          onDraftFocusChange(event.currentTarget.value as ActivityAiDraftFocus)
+        }
+        className="w-full"
+      >
+        {panelView.focusOptions.map((option) => (
+          <NativeSelectOption key={option.value} value={option.value}>
+            {option.label}
+          </NativeSelectOption>
+        ))}
+      </NativeSelect>
+      {selectedFocusOption ? (
+        <p className="text-xs text-muted-foreground">
+          {selectedFocusOption.description}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function ActivityAiDraftGenerateButton({
   isGeneratingDraft,
   onGenerateDraft,
@@ -166,7 +217,7 @@ function ActivityAiDraftGenerateButton({
       variant="secondary"
       onClick={onGenerateDraft}
       disabled={!panelView.canGenerateDraft}
-      className="self-end"
+      className="self-end sm:col-span-2"
     >
       {isGeneratingDraft ? (
         <IconLoader2 className="size-4 animate-spin" />

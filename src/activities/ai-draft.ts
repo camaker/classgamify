@@ -53,6 +53,24 @@ export const ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS = [
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max,
 ] as const;
 
+export const ACTIVITY_AI_DRAFT_FOCUSES = [
+  'balanced',
+  'worksheet-practice',
+  'listening-script',
+  'remix-ready',
+] as const;
+
+export type ActivityAiDraftFocus = (typeof ACTIVITY_AI_DRAFT_FOCUSES)[number];
+
+export const ACTIVITY_AI_DRAFT_DEFAULT_FOCUS =
+  'balanced' satisfies ActivityAiDraftFocus;
+
+export type ActivityAiDraftFocusOption = {
+  description: string;
+  label: string;
+  value: ActivityAiDraftFocus;
+};
+
 export const ACTIVITY_AI_DRAFT_COMPLETION_LIMITS = {
   groups: 4,
   groupItems: 8,
@@ -152,6 +170,9 @@ export const ACTIVITY_AI_DRAFT_FIELD_LIMITS = {
 
 export const generateActivityDraftInputSchema = z.object({
   difficulty: activityDifficultySchema.default('starter'),
+  draftFocus: z
+    .enum(ACTIVITY_AI_DRAFT_FOCUSES)
+    .default(ACTIVITY_AI_DRAFT_DEFAULT_FOCUS),
   gradeBand: z
     .string()
     .trim()
@@ -190,21 +211,28 @@ export const generateActivityDraftInputSchema = z.object({
   templateType: activityTemplateTypeSchema.default('quiz'),
 });
 
-export type GenerateActivityDraftInput = z.infer<
+export type GenerateActivityDraftInput = z.input<
+  typeof generateActivityDraftInputSchema
+>;
+
+type NormalizedGenerateActivityDraftInput = z.output<
   typeof generateActivityDraftInputSchema
 >;
 
 export function buildGenerateActivityDraftInputFromEditor({
   current,
+  draftFocus,
   itemCount,
   sourceText,
 }: {
   current: CreateActivityInput;
+  draftFocus: ActivityAiDraftFocus;
   itemCount: number;
   sourceText: string;
 }): GenerateActivityDraftInput {
   return generateActivityDraftInputSchema.parse({
     difficulty: current.difficulty,
+    draftFocus,
     gradeBand: current.gradeBand || 'Primary',
     itemCount,
     language: current.language || 'en',
@@ -212,6 +240,66 @@ export function buildGenerateActivityDraftInputFromEditor({
     subject: current.subject || 'English',
     templateType: current.templateType,
   });
+}
+
+export function buildActivityAiDraftFocusOptions(): ActivityAiDraftFocusOption[] {
+  return ACTIVITY_AI_DRAFT_FOCUSES.map((value) => ({
+    description: formatActivityAiDraftFocusDescription(value),
+    label: formatActivityAiDraftFocusLabel(value),
+    value,
+  }));
+}
+
+export function formatActivityAiDraftFocusLabel(
+  draftFocus: ActivityAiDraftFocus
+) {
+  switch (draftFocus) {
+    case 'balanced':
+      return m.activity_ai_focus_balanced_label();
+    case 'listening-script':
+      return m.activity_ai_focus_listening_script_label();
+    case 'remix-ready':
+      return m.activity_ai_focus_remix_ready_label();
+    case 'worksheet-practice':
+      return m.activity_ai_focus_worksheet_practice_label();
+  }
+}
+
+export function formatActivityAiDraftFocusDescription(
+  draftFocus: ActivityAiDraftFocus
+) {
+  switch (draftFocus) {
+    case 'balanced':
+      return m.activity_ai_focus_balanced_description();
+    case 'listening-script':
+      return m.activity_ai_focus_listening_script_description();
+    case 'remix-ready':
+      return m.activity_ai_focus_remix_ready_description();
+    case 'worksheet-practice':
+      return m.activity_ai_focus_worksheet_practice_description();
+  }
+}
+
+export function buildActivityAiDraftFocusPromptLine(
+  draftFocus: ActivityAiDraftFocus
+) {
+  return m.activity_ai_prompt_draft_focus({
+    focus: formatActivityAiDraftFocusLabel(draftFocus),
+    guidance: getActivityAiDraftFocusGuidance(draftFocus),
+  });
+}
+
+function getActivityAiDraftFocusGuidance(draftFocus: ActivityAiDraftFocus) {
+  switch (draftFocus) {
+    case 'balanced':
+      return m.activity_ai_focus_balanced_prompt();
+    case 'listening-script':
+      return m.activity_ai_focus_listening_script_prompt();
+    case 'remix-ready':
+      return m.activity_ai_focus_remix_ready_prompt();
+    case 'worksheet-practice':
+      return m.activity_ai_focus_worksheet_practice_prompt();
+  }
 }
 
 export type ActivityDraftResult = {
@@ -466,26 +554,28 @@ export async function generateActivityDraftFromAi(
 }
 
 export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
-  const template = getTemplateByType(input.templateType);
+  const data = generateActivityDraftInputSchema.parse(input);
+  const template = getTemplateByType(data.templateType);
   const templateContext = `${template.name}: ${template.bestFor}`;
 
   return [
     m.activity_ai_prompt_intro(),
-    m.activity_ai_prompt_subject({ subject: input.subject }),
-    m.activity_ai_prompt_grade_band({ gradeBand: input.gradeBand }),
-    m.activity_ai_prompt_language({ language: input.language }),
-    m.activity_ai_prompt_difficulty({ difficulty: input.difficulty }),
+    m.activity_ai_prompt_subject({ subject: data.subject }),
+    m.activity_ai_prompt_grade_band({ gradeBand: data.gradeBand }),
+    m.activity_ai_prompt_language({ language: data.language }),
+    m.activity_ai_prompt_difficulty({ difficulty: data.difficulty }),
+    buildActivityAiDraftFocusPromptLine(data.draftFocus),
     m.activity_ai_prompt_primary_template({ template: templateContext }),
     m.activity_ai_prompt_template_requirements({
-      requirements: buildTemplateRequirementSummary(input.templateType),
+      requirements: buildTemplateRequirementSummary(data.templateType),
     }),
     m.activity_ai_prompt_template_guidance({
-      guidance: getActivityTemplateDraftGuidance(input.templateType),
+      guidance: getActivityTemplateDraftGuidance(data.templateType),
     }),
     m.activity_ai_prompt_target_item_count({
-      itemCount: String(input.itemCount),
+      itemCount: String(data.itemCount),
     }),
-    m.activity_ai_prompt_source_notes({ sourceText: input.sourceText }),
+    m.activity_ai_prompt_source_notes({ sourceText: data.sourceText }),
     '',
     m.activity_ai_prompt_return_shape(),
     buildActivityDraftPromptJsonExample(),
@@ -553,7 +643,7 @@ function buildTemplateRequirementSummary(templateType: ActivityTemplateType) {
 
 function parseAiDraftResponse(
   response: string,
-  input: GenerateActivityDraftInput
+  input: NormalizedGenerateActivityDraftInput
 ) {
   const jsonText = extractJsonObject(response);
   const parsed = JSON.parse(jsonText) as unknown;
@@ -582,29 +672,30 @@ export function createActivityInputFromAiDraft({
   draft: unknown;
   input: GenerateActivityDraftInput;
 }): CreateActivityInput {
+  const data = generateActivityDraftInputSchema.parse(input);
   const { draft: normalizedDraft } = normalizeAiActivityDraft({
     draft,
-    input,
+    input: data,
   });
   const shapedDraft = shapeAiDraftForPrimaryTemplate({
     draft: normalizedDraft,
-    input,
+    input: data,
   });
   const activity = {
     description: shapedDraft.description,
-    difficulty: input.difficulty,
-    gradeBand: input.gradeBand,
+    difficulty: data.difficulty,
+    gradeBand: data.gradeBand,
     groupsText: formatEditorGroupRows(shapedDraft.groups),
-    language: input.language,
+    language: data.language,
     learningGoal: shapedDraft.learningGoal,
     pairsText: formatEditorPairRows(shapedDraft.pairs),
     questionsText: formatEditorQuestionRows(
       shapedDraft.questions.map(toEditorQuestionInput)
     ),
     sourceSummary: shapedDraft.sourceSummary,
-    subject: input.subject,
+    subject: data.subject,
     teacherNotesText: formatEditorLineList(shapedDraft.teacherNotes),
-    templateType: input.templateType,
+    templateType: data.templateType,
     title: shapedDraft.title,
     visibility: 'draft',
     vocabularyText: formatEditorInlineList(shapedDraft.vocabulary),
@@ -638,14 +729,15 @@ export function normalizeAiActivityDraft({
   draft: NormalizedAiActivityDraft;
   usedLocalCompletion: boolean;
 } {
-  const fallbackDraft = createFallbackAiActivityDraft(input);
+  const data = generateActivityDraftInputSchema.parse(input);
+  const fallbackDraft = createFallbackAiActivityDraft(data);
   const strictDraft = aiDraftSchema.safeParse(draft);
 
   if (strictDraft.success) {
     return completeAiActivityDraft({
       draft: strictDraft.data,
       fallbackDraft,
-      input,
+      input: data,
     });
   }
 
@@ -658,7 +750,7 @@ export function normalizeAiActivityDraft({
   const completedDraft = completeAiActivityDraft({
     draft: completionDraft.data,
     fallbackDraft,
-    input,
+    input: data,
   });
 
   return {
@@ -674,7 +766,7 @@ function completeAiActivityDraft({
 }: {
   draft: AiActivityDraftCompletion;
   fallbackDraft: NormalizedAiActivityDraft;
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
 }) {
   const targetItemCount = Math.max(
     ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min,
@@ -790,7 +882,7 @@ function completeAiDraftGroups({
   primary,
 }: {
   fallback: NormalizedAiActivityDraft['groups'];
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
   primary: AiActivityDraftCompletion['groups'];
 }) {
   const groups: NormalizedAiActivityDraft['groups'] = [];
@@ -864,7 +956,7 @@ function shapeAiDraftForPrimaryTemplate({
   input,
 }: {
   draft: AiActivityDraft;
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
 }): AiActivityDraft {
   if (usesQuestionRuntimeItems(input.templateType)) {
     return {
@@ -949,7 +1041,7 @@ function createActivityDraftResult({
   input,
 }: {
   activity: CreateActivityInput;
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
 }) {
   return {
     activity,
@@ -961,7 +1053,7 @@ function createActivityDraftResult({
 }
 
 function createFallbackAiActivityDraft(
-  input: GenerateActivityDraftInput
+  input: NormalizedGenerateActivityDraftInput
 ): NormalizedAiActivityDraft {
   const activity = createFallbackActivityDraft(input);
   const content = buildActivityContent(activity);
@@ -999,10 +1091,12 @@ export function createFallbackActivityDraftResult({
   model: string;
   notice: string;
 }): ActivityDraftResult {
+  const data = generateActivityDraftInputSchema.parse(input);
+
   return {
     ...createActivityDraftResult({
-      activity: createFallbackActivityDraft(input),
-      input,
+      activity: createFallbackActivityDraft(data),
+      input: data,
     }),
     model,
     notice,
@@ -1013,65 +1107,93 @@ export function createFallbackActivityDraftResult({
 export function createFallbackActivityDraft(
   input: GenerateActivityDraftInput
 ): CreateActivityInput {
-  const locale = getFallbackDraftLocale(input.language);
-  const normalizedTerms = buildFallbackActivityDraftTerms({ input, locale });
+  const data = generateActivityDraftInputSchema.parse(input);
+  const locale = getFallbackDraftLocale(data.language);
+  const normalizedTerms = buildFallbackActivityDraftTerms({
+    input: data,
+    locale,
+  });
   const options = normalizedTerms.slice(
     0,
-    Math.max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min, input.itemCount)
+    Math.max(ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min, data.itemCount)
   );
 
   const questions = buildFallbackQuestions({
-    input,
+    input: data,
     locale,
     options,
-    terms: normalizedTerms.slice(0, input.itemCount),
+    terms: normalizedTerms.slice(0, data.itemCount),
   });
 
   const pairs = buildFallbackPairs({
-    input,
+    input: data,
     locale,
-    terms: normalizedTerms.slice(0, input.itemCount),
+    terms: normalizedTerms.slice(0, data.itemCount),
   });
 
   const groups = buildFallbackGroups(
     normalizedTerms,
-    input.templateType,
-    input.subject,
+    data.templateType,
+    data.subject,
     locale
   );
 
-  const sourceSummary = summarizeSource(input.sourceText);
+  const sourceSummary = summarizeSource(data.sourceText);
+  const focusLabel = formatActivityAiDraftFocusLabelForLocale(
+    data.draftFocus,
+    locale
+  );
   const activity = {
     description: m.activity_ai_fallback_description(
-      { subject: input.subject },
+      { focus: focusLabel, subject: data.subject },
       { locale }
     ),
-    difficulty: input.difficulty,
-    gradeBand: input.gradeBand,
+    difficulty: data.difficulty,
+    gradeBand: data.gradeBand,
     groupsText: groups,
-    language: input.language,
+    language: data.language,
     learningGoal: m.activity_ai_fallback_learning_goal(
-      { subject: input.subject },
+      { subject: data.subject },
       { locale }
     ),
     pairsText: formatEditorLineList(pairs),
     questionsText: formatEditorLineList(questions),
     sourceSummary,
-    subject: input.subject,
+    subject: data.subject,
     teacherNotesText: formatEditorLineList([
+      m.activity_ai_fallback_teacher_note_focus(
+        { focus: focusLabel },
+        { locale }
+      ),
       m.activity_ai_fallback_teacher_note_review(
-        { gradeBand: input.gradeBand },
+        { gradeBand: data.gradeBand },
         { locale }
       ),
       m.activity_ai_fallback_teacher_note_remix({}, { locale }),
     ]),
-    templateType: input.templateType,
-    title: createFallbackTitle(input, normalizedTerms[0], locale),
+    templateType: data.templateType,
+    title: createFallbackTitle(data, normalizedTerms[0], locale),
     visibility: 'draft',
     vocabularyText: formatEditorInlineList(normalizedTerms),
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
+}
+
+function formatActivityAiDraftFocusLabelForLocale(
+  draftFocus: ActivityAiDraftFocus,
+  locale: Locale
+) {
+  switch (draftFocus) {
+    case 'balanced':
+      return m.activity_ai_focus_balanced_label({}, { locale });
+    case 'listening-script':
+      return m.activity_ai_focus_listening_script_label({}, { locale });
+    case 'remix-ready':
+      return m.activity_ai_focus_remix_ready_label({}, { locale });
+    case 'worksheet-practice':
+      return m.activity_ai_focus_worksheet_practice_label({}, { locale });
+  }
 }
 
 function buildFallbackQuestions({
@@ -1080,7 +1202,7 @@ function buildFallbackQuestions({
   options,
   terms,
 }: {
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
   locale: Locale;
   options: string[];
   terms: string[];
@@ -1145,7 +1267,7 @@ function buildFallbackQuizPrompt({
   locale,
   term,
 }: {
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
   locale: Locale;
   term: string;
 }) {
@@ -1163,7 +1285,7 @@ function buildFallbackFillBlankPrompt({
   locale,
   term,
 }: {
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
   locale: Locale;
   term: string;
 }) {
@@ -1211,7 +1333,7 @@ function buildFallbackPairs({
   locale,
   terms,
 }: {
-  input: GenerateActivityDraftInput;
+  input: NormalizedGenerateActivityDraftInput;
   locale: Locale;
   terms: string[];
 }) {
@@ -1236,14 +1358,15 @@ export function buildFallbackActivityDraftTerms({
   input: GenerateActivityDraftInput;
   locale: Locale;
 }) {
+  const data = generateActivityDraftInputSchema.parse(input);
   const sourceTerms = extractActivityDraftSourceTerms({
-    sourceText: input.sourceText,
-    subject: input.subject,
-  }).slice(0, input.itemCount);
+    sourceText: data.sourceText,
+    subject: data.subject,
+  }).slice(0, data.itemCount);
 
   return sourceTerms.length >= ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.min
     ? sourceTerms
-    : fallbackTerms(input, locale);
+    : fallbackTerms(data, locale);
 }
 
 export function extractActivityDraftSourceTerms({
@@ -1276,7 +1399,10 @@ export function extractActivityDraftSourceTerms({
   );
 }
 
-function fallbackTerms(input: GenerateActivityDraftInput, locale: Locale) {
+function fallbackTerms(
+  input: NormalizedGenerateActivityDraftInput,
+  locale: Locale
+) {
   return unique([
     ...extractActivityDraftSourceTerms({
       sourceText: input.sourceText,
@@ -1332,7 +1458,7 @@ function buildFallbackGroupSortLabels(subject: string, locale: Locale) {
 }
 
 function createFallbackTitle(
-  input: GenerateActivityDraftInput,
+  input: NormalizedGenerateActivityDraftInput,
   firstTerm: string | undefined,
   locale: Locale
 ) {
