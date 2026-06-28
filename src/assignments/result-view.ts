@@ -826,18 +826,8 @@ export function buildAssignmentAttemptRowDisplay({
 
   return {
     id: attempt.id,
-    accuracyLabel: formatAssignmentResultPercent(
-      attempt.resultJson?.accuracy ?? 0
-    ),
-    answeredLabel: formatAssignmentResultFraction(
-      attempt.resultJson?.completedItemCount ?? 0,
-      attempt.resultJson?.totalPoints ?? 0
-    ),
+    ...buildAssignmentAttemptRowMetricLabels(attempt),
     durationLabel: formatAttemptDuration(durationSeconds),
-    scoreLabel: formatAssignmentResultFraction(
-      attempt.score ?? 0,
-      attempt.maxScore ?? 0
-    ),
     studentLabel: formatAssignmentResultStudentLabel(
       studentLabel ??
         getAssignmentAttemptStudentLabel({
@@ -846,6 +836,27 @@ export function buildAssignmentAttemptRowDisplay({
         })
     ),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
+  };
+}
+
+export function buildAssignmentAttemptRowMetricLabels(
+  attempt: Pick<
+    AssignmentAttemptRowDisplayInput,
+    'maxScore' | 'resultJson' | 'score'
+  >
+) {
+  return {
+    accuracyLabel: formatAssignmentResultPercent(
+      attempt.resultJson?.accuracy ?? 0
+    ),
+    answeredLabel: formatAssignmentResultFraction(
+      attempt.resultJson?.completedItemCount ?? 0,
+      attempt.resultJson?.totalPoints ?? 0
+    ),
+    scoreLabel: formatAssignmentResultFraction(
+      attempt.score ?? 0,
+      attempt.maxScore ?? 0
+    ),
   };
 }
 

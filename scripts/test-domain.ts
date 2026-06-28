@@ -546,6 +546,7 @@ import {
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptReviewCardViews,
   buildAssignmentAttemptRowDisplay,
+  buildAssignmentAttemptRowMetricLabels,
   buildAssignmentAttemptRowViews,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemAnalysisCardViews,
@@ -3434,6 +3435,25 @@ assert.match(
   assignmentResultViewSource,
   /attemptRowViews: buildAssignmentAttemptRowViews|const attemptRowViews = data[\s\S]*buildAssignmentAttemptRowViews/,
   'Assignment result page view-model should own formatted attempt row views.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentAttemptRowMetricLabels[\s\S]*accuracyLabel: formatAssignmentResultPercent[\s\S]*answeredLabel: formatAssignmentResultFraction[\s\S]*scoreLabel: formatAssignmentResultFraction/,
+  'Assignment attempt row metric labels should be prepared through one result-domain helper.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentAttemptRowDisplay[\s\S]*buildAssignmentAttemptRowMetricLabels\(attempt\)/,
+  'Assignment attempt row displays should consume prepared metric labels.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    assignmentResultViewSource,
+    'export function buildAssignmentAttemptRowDisplay',
+    'export function buildAssignmentAttemptRowMetricLabels'
+  ),
+  /formatAssignmentResultPercent|formatAssignmentResultFraction/,
+  'Assignment attempt row displays should not format metric labels locally.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -28884,6 +28904,40 @@ assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
 ]);
 assert.equal(assignmentResultReviewCopy.emptyValue, '-');
 const attemptRowCompletedAt = new Date('2026-01-01T00:00:00.000Z');
+assert.deepEqual(
+  buildAssignmentAttemptRowMetricLabels({
+    maxScore: 4,
+    resultJson: {
+      accuracy: 75,
+      completedItemCount: 3,
+      durationSeconds: 62,
+      totalPoints: 4,
+    },
+    score: 3,
+  }),
+  {
+    accuracyLabel: '75%',
+    answeredLabel: '3/4',
+    scoreLabel: '3/4',
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowMetricLabels({
+    maxScore: Number.POSITIVE_INFINITY,
+    resultJson: {
+      accuracy: Number.NaN,
+      completedItemCount: -3,
+      durationSeconds: 62,
+      totalPoints: Number.POSITIVE_INFINITY,
+    },
+    score: Number.NaN,
+  }),
+  {
+    accuracyLabel: '-',
+    answeredLabel: '-',
+    scoreLabel: '-',
+  }
+);
 assert.deepEqual(
   buildAssignmentAttemptRowDisplay({
     attempt: {
