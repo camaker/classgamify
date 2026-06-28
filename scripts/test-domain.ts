@@ -2654,6 +2654,10 @@ const assignmentResultsMetricCardSource = readFileSync(
   'src/components/assignments/assignment-results-metric-card.tsx',
   'utf8'
 );
+const assignmentResultsHeaderActionsSource = readFileSync(
+  'src/components/assignments/assignment-results-header-actions.tsx',
+  'utf8'
+);
 const assignmentResultsHeaderCardSource = readFileSync(
   'src/components/assignments/assignment-results-header-card.tsx',
   'utf8'
@@ -2872,8 +2876,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderCardSource,
-  /AssignmentSettingsSummary[\s\S]*CopyAssignmentShareLinkButton[\s\S]*resultActionIconByAction/,
-  'Assignment result header component should own delivery summary, share actions, and result action icons.'
+  /AssignmentSettingsSummary[\s\S]*AssignmentResultsHeaderActions/,
+  'Assignment result header component should own delivery summary and delegate share/result actions to a focused component.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /CopyAssignmentShareLinkButton[\s\S]*to="\/print\/assignments\/\$assignmentId"[\s\S]*resultActionIconByAction/,
+  'Assignment result header actions component should own share actions, printable worksheet links, and result action icons.'
+);
+assert.doesNotMatch(
+  assignmentResultsHeaderCardSource,
+  /CopyAssignmentShareLinkButton|resultActionIconByAction|buttonVariants|IconPlayerPlay|IconPrinter|IconShare3/,
+  'Assignment result header component should not hand-compose share/result action controls.'
 );
 assert.match(
   assignmentResultsHeaderCardSource,
@@ -15192,9 +15206,9 @@ assert.match(
   'Printable worksheet header should consume header view fields.'
 );
 assert.match(
-  assignmentResultsHeaderCardSource,
+  assignmentResultsHeaderActionsSource,
   /to="\/print\/assignments\/\$assignmentId"/,
-  'Assignment results header should expose the printable worksheet teacher action.'
+  'Assignment results header actions should expose the printable worksheet teacher action.'
 );
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
 assert.match(
