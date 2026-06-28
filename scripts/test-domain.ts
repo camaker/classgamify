@@ -15313,8 +15313,23 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton/,
-  'Assignment list share actions should render prepared student-link actions.'
+  /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
+  'Assignment list share actions should render prepared student-link availability, copy-disabled state, and disabled reason text.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to="\/play\/\$shareId"[\s\S]*action\.shareSlug[\s\S]*action\.label/,
+  'Assignment list share preview action should render prepared share availability and label.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListShareDisabledReason[\s\S]*action\.disabledReason[\s\S]*id=\{disabledReasonId\}/,
+  'Assignment list share disabled reason should render prepared lifecycle copy.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /assignment_list_share_link_|assignment_list_action_share_link_unavailable|status ===|expiresAt|isAssignmentOpen|getAssignmentLifecycleStatus/,
+  'Assignment list card component should not rebuild share lifecycle copy or availability from raw assignment state.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -18942,6 +18957,7 @@ assert.deepEqual(
   {
     actionState: {
       isPersisted: true,
+      shareLabel: 'Open share link',
       showResultsAction: true,
       showShareActions: true,
       statusAction: {
@@ -18962,6 +18978,7 @@ assert.deepEqual(
         label: 'View results',
       },
       shareAction: {
+        isAvailable: true,
         label: 'Open share link',
         sharePath: '/play/share-1',
         shareSlug: 'share-1',
@@ -19054,6 +19071,7 @@ assert.deepEqual(
   {
     actionState: {
       isPersisted: false,
+      shareLabel: 'Open share link',
       showResultsAction: false,
       showShareActions: true,
       statusAction: undefined,
@@ -19062,6 +19080,7 @@ assert.deepEqual(
       printAction: undefined,
       resultAction: undefined,
       shareAction: {
+        isAvailable: true,
         label: 'Open share link',
         sharePath: '/play/demo-food',
         shareSlug: 'demo-food',
@@ -19104,6 +19123,7 @@ assert.deepEqual(
   }),
   {
     isPersisted: false,
+    shareLabel: 'Open share link',
     showResultsAction: false,
     showShareActions: true,
     statusAction: undefined,
@@ -19117,6 +19137,7 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    shareLabel: 'Open share link',
     showResultsAction: true,
     showShareActions: true,
     statusAction: {
@@ -19136,8 +19157,11 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    shareDisabledReason:
+      'This assignment is closed. Reopen it before sharing the student link.',
+    shareLabel: 'Share link unavailable',
     showResultsAction: true,
-    showShareActions: false,
+    showShareActions: true,
     statusAction: {
       failureMessage: 'Assignment status could not be updated.',
       kind: 'reopen-link',
@@ -19156,8 +19180,11 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    shareDisabledReason:
+      'This assignment link has expired. Students cannot open it from the assignment list.',
+    shareLabel: 'Share link unavailable',
     showResultsAction: true,
-    showShareActions: false,
+    showShareActions: true,
     statusAction: {
       failureMessage: 'Assignment status could not be updated.',
       kind: 'close-link',
@@ -19175,8 +19202,11 @@ assert.deepEqual(
   }),
   {
     isPersisted: true,
+    shareDisabledReason:
+      'Publish this assignment before sharing a student link.',
+    shareLabel: 'Share link unavailable',
     showResultsAction: false,
-    showShareActions: false,
+    showShareActions: true,
     statusAction: undefined,
   }
 );
@@ -19184,6 +19214,7 @@ assert.deepEqual(
   buildAssignmentListCardActionView({
     actionState: {
       isPersisted: true,
+      shareLabel: 'Open share link',
       showResultsAction: true,
       showShareActions: true,
       statusAction: undefined,
@@ -19201,6 +19232,7 @@ assert.deepEqual(
       label: 'View results',
     },
     shareAction: {
+      isAvailable: true,
       label: 'Open share link',
       sharePath: '/play/share%20123',
       shareSlug: 'share 123',
@@ -19212,8 +19244,11 @@ assert.deepEqual(
   buildAssignmentListCardActionView({
     actionState: {
       isPersisted: true,
+      shareDisabledReason:
+        'Publish this assignment before sharing a student link.',
+      shareLabel: 'Share link unavailable',
       showResultsAction: false,
-      showShareActions: false,
+      showShareActions: true,
       statusAction: undefined,
     },
     assignmentId: 'draft-assignment',
@@ -19222,7 +19257,13 @@ assert.deepEqual(
   {
     printAction: undefined,
     resultAction: undefined,
-    shareAction: undefined,
+    shareAction: {
+      disabledReason: 'Publish this assignment before sharing a student link.',
+      isAvailable: false,
+      label: 'Share link unavailable',
+      sharePath: '/play/draft-share',
+      shareSlug: 'draft-share',
+    },
     statusAction: undefined,
   }
 );

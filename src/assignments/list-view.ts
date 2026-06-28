@@ -36,6 +36,7 @@ import {
 import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
+  getAssignmentLifecycleStatus,
   getAssignmentStatusLabel,
   isAssignmentOpen,
 } from '@/assignments/lifecycle';
@@ -74,6 +75,8 @@ type AssignmentListCardStat = {
 
 type AssignmentListCardActionState = {
   isPersisted: boolean;
+  shareDisabledReason?: string;
+  shareLabel: string;
   showResultsAction: boolean;
   showShareActions: boolean;
   statusAction: AssignmentStatusAction | undefined;
@@ -94,6 +97,8 @@ type AssignmentListCardActionView = {
     | undefined;
   shareAction:
     | {
+        disabledReason?: string;
+        isAvailable: boolean;
         label: string;
         sharePath: string;
         shareSlug: string;
@@ -313,6 +318,9 @@ export const assignmentListActionCopy = {
   },
   get printWorksheet() {
     return m.assignment_list_action_print_worksheet();
+  },
+  get shareLinkUnavailable() {
+    return m.assignment_list_action_share_link_unavailable();
   },
   get viewResults() {
     return m.assignment_list_action_view_results();
@@ -736,11 +744,18 @@ export function getAssignmentListCardActionState({
 }): AssignmentListCardActionState {
   const hasPublishedSnapshot = status !== 'draft';
   const canShareStudentLink = isAssignmentOpen(status, expiresAt, now);
+  const shareDisabledReason = canShareStudentLink
+    ? undefined
+    : getAssignmentListShareDisabledReason({ expiresAt, now, status });
 
   return {
     isPersisted: persisted,
+    ...(shareDisabledReason ? { shareDisabledReason } : {}),
+    shareLabel: canShareStudentLink
+      ? assignmentListActionCopy.openShareLink
+      : assignmentListActionCopy.shareLinkUnavailable,
     showResultsAction: persisted && hasPublishedSnapshot,
-    showShareActions: canShareStudentLink,
+    showShareActions: persisted || canShareStudentLink,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
@@ -776,11 +791,41 @@ export function buildAssignmentListCardActionView({
       : undefined,
     shareAction: actionState.showShareActions
       ? {
-          label: assignmentListActionCopy.openShareLink,
+          ...(actionState.shareDisabledReason
+            ? { disabledReason: actionState.shareDisabledReason }
+            : {}),
+          isAvailable: !actionState.shareDisabledReason,
+          label: actionState.shareLabel,
           sharePath: buildAssignmentSharePath(normalizedShareSlug),
           shareSlug: normalizedShareSlug,
         }
       : undefined,
     statusAction: actionState.statusAction,
   };
+}
+
+function getAssignmentListShareDisabledReason({
+  expiresAt,
+  now,
+  status,
+}: {
+  expiresAt: Date | null;
+  now?: number;
+  status: AssignmentStatus;
+}) {
+  const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
+
+  if (lifecycleStatus === 'closed') {
+    return m.assignment_list_share_link_closed();
+  }
+
+  if (lifecycleStatus === 'expired') {
+    return m.assignment_list_share_link_expired();
+  }
+
+  if (lifecycleStatus === 'draft') {
+    return m.assignment_list_share_link_draft();
+  }
+
+  return undefined;
 }

@@ -220,20 +220,85 @@ function AssignmentListShareActions({
 }: {
   action: AssignmentListShareAction;
 }) {
+  const disabledReasonId = getAssignmentListShareDisabledReasonId(action);
+
   return (
-    <>
-      <Link
-        to="/play/$shareId"
-        params={{ shareId: action.shareSlug }}
-        className={cn(buttonVariants(), 'w-full lg:w-auto')}
-      >
-        <IconPlayerPlay className="size-4" />
-        {action.label}
-      </Link>
+    <div className="grid gap-2">
+      <AssignmentListSharePreviewAction
+        action={action}
+        disabledReasonId={disabledReasonId}
+      />
       <CopyAssignmentShareLinkButton
+        disabled={!action.isAvailable}
+        disabledMessage={action.disabledReason}
         shareSlug={action.shareSlug}
         className="w-full bg-background lg:w-auto"
       />
-    </>
+      <AssignmentListShareDisabledReason
+        action={action}
+        disabledReasonId={disabledReasonId}
+      />
+    </div>
   );
+}
+
+function AssignmentListSharePreviewAction({
+  action,
+  disabledReasonId,
+}: {
+  action: AssignmentListShareAction;
+  disabledReasonId: string | undefined;
+}) {
+  if (!action.isAvailable) {
+    return (
+      <Button
+        type="button"
+        className="w-full lg:w-auto"
+        disabled
+        aria-describedby={disabledReasonId}
+      >
+        <IconPlayerPlay className="size-4" />
+        {action.label}
+      </Button>
+    );
+  }
+
+  return (
+    <Link
+      to="/play/$shareId"
+      params={{ shareId: action.shareSlug }}
+      className={cn(buttonVariants(), 'w-full lg:w-auto')}
+    >
+      <IconPlayerPlay className="size-4" />
+      {action.label}
+    </Link>
+  );
+}
+
+function AssignmentListShareDisabledReason({
+  action,
+  disabledReasonId,
+}: {
+  action: AssignmentListShareAction;
+  disabledReasonId: string | undefined;
+}) {
+  if (!action.disabledReason) return null;
+
+  return (
+    <p
+      id={disabledReasonId}
+      className="max-w-56 text-muted-foreground text-xs leading-5"
+    >
+      {action.disabledReason}
+    </p>
+  );
+}
+
+function getAssignmentListShareDisabledReasonId({
+  disabledReason,
+  shareSlug,
+}: AssignmentListShareAction) {
+  return disabledReason
+    ? `assignment-list-share-${shareSlug}-disabled-reason`
+    : undefined;
 }
