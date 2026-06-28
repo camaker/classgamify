@@ -383,6 +383,9 @@ export const activityLibraryCardCopy = {
   get restoreRequiredMessage() {
     return m.activity_library_card_restore_required();
   },
+  get sourceMaterialEditActionLabel() {
+    return m.activity_library_card_source_material_edit_action();
+  },
 } as const;
 
 const activityLibraryEmptyStateCopy = {

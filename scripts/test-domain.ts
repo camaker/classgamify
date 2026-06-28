@@ -2470,6 +2470,16 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
+  /actionSlot\?: ReactNode[\s\S]*\{actionSlot\}/,
+  'Activity source-material summary component should accept an optional prepared action slot without owning route logic.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /@tanstack\/react-router|to="\/dashboard\/activities\/\$activityId"|activityId/,
+  'Activity source-material summary component should not know activity-library edit routes.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
   /<section[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText/,
   'Activity source-material summary component should render prepared compact and accessible summary text from the domain view.'
 );
@@ -16595,8 +16605,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivitySourceMaterialsSummary[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
-  'Activity library card component should render source-material summary through the shared summary component.'
+  /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
+  'Activity library card component should render source-material summary with an edit action only when the activity can be edited.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibrarySourceMaterialEditAction[\s\S]*to="\/dashboard\/activities\/\$activityId"[\s\S]*activityLibraryCardCopy\.sourceMaterialEditActionLabel/,
+  'Activity library source-material edit action should route to the activity editor with domain copy.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -20271,6 +20286,10 @@ assert.equal(
 assert.equal(
   activityLibraryCardCopy.restoreRequiredMessage,
   archivedActivityDerivationError
+);
+assert.equal(
+  activityLibraryCardCopy.sourceMaterialEditActionLabel,
+  'Review in editor'
 );
 assert.deepEqual(
   buildActivityLibraryCardStats({

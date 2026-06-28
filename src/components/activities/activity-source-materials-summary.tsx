@@ -2,13 +2,16 @@ import type { ActivitySourceMaterialSummaryView } from '@/activities/material-su
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconPaperclip, IconSparkles } from '@tabler/icons-react';
+import type { ReactNode } from 'react';
 
 type ActivitySourceMaterialsSummaryProps = {
+  actionSlot?: ReactNode;
   className?: string;
   summary: ActivitySourceMaterialSummaryView;
 };
 
 export function ActivitySourceMaterialsSummary({
+  actionSlot,
   className,
   summary,
 }: ActivitySourceMaterialsSummaryProps) {
@@ -29,10 +32,13 @@ export function ActivitySourceMaterialsSummary({
             {summary.compactSummaryText}
           </p>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {summary.kindBadges.map((badge) => (
-            <ActivitySourceMaterialKindBadge badge={badge} key={badge.kind} />
-          ))}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {actionSlot}
+          <div className="flex flex-wrap gap-1.5">
+            {summary.kindBadges.map((badge) => (
+              <ActivitySourceMaterialKindBadge badge={badge} key={badge.kind} />
+            ))}
+          </div>
         </div>
       </div>
       {summary.extractionActions.length ? (

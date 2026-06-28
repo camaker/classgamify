@@ -171,6 +171,14 @@ export function ActivityLibraryCard({
       <CardContent className="space-y-4">
         <ActivityLibraryStats stats={cardDisplayView.stats} />
         <ActivitySourceMaterialsSummary
+          actionSlot={
+            cardDisplayView.actionState.showEditAction &&
+            cardDisplayView.sourceMaterials.hasMaterials ? (
+              <ActivityLibrarySourceMaterialEditAction
+                activityId={activity.id}
+              />
+            ) : undefined
+          }
           className="bg-muted/30"
           summary={cardDisplayView.sourceMaterials}
         />
@@ -208,6 +216,25 @@ export function ActivityLibraryCard({
         }
       />
     </Card>
+  );
+}
+
+function ActivityLibrarySourceMaterialEditAction({
+  activityId,
+}: {
+  activityId: string;
+}) {
+  return (
+    <Link
+      to="/dashboard/activities/$activityId"
+      params={{ activityId }}
+      className={cn(
+        buttonVariants({ size: 'sm', variant: 'outline' }),
+        'h-7 rounded-md bg-background px-2 text-xs'
+      )}
+    >
+      {activityLibraryCardCopy.sourceMaterialEditActionLabel}
+    </Link>
   );
 }
 
