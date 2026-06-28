@@ -43,9 +43,12 @@ import {
 import { stripJsonComments } from './parse-wrangler';
 import {
   buildActivityLibraryCardSummary,
+  buildEmptyActivityLibrarySummary,
   buildActivityLibraryFilterSummary,
   buildActivityLibrarySourceCapabilityMetrics,
   buildActivityLibrarySummaryMetrics,
+  createEmptySourceMaterialCapabilityCounts,
+  normalizeActivityLibraryMetricNumber,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
 import {
@@ -174,12 +177,17 @@ import {
   buildActivityDraftMeta,
   buildActivityDraftMetaSummaryView,
   buildActivityTemplateReadinessPanelSummary,
+  getActivityTemplateQuizChoiceReadinessItemPosition,
+  normalizeActivityDraftMetaCount,
 } from '@/activities/draft-meta';
 import {
   addActivitySourceMaterialPickerItem,
+  buildActivitySourceMaterialKindSummaries,
   buildActivitySourceMaterialPickerView,
   buildActivitySourceMaterialSummaryView,
+  createEmptyActivitySourceMaterialKindCounts,
   formatActivitySourceMaterialReferenceMeta,
+  normalizeActivitySourceMaterialCount,
   removeActivitySourceMaterialPickerItem,
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
@@ -5158,6 +5166,32 @@ assert.deepEqual(normalizedSourceMaterialSummary.extractionActions, [
     sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
   },
 ]);
+assert.equal(normalizeActivitySourceMaterialCount(Number.NaN), 0);
+assert.equal(normalizeActivitySourceMaterialCount(-2.4), 0);
+assert.equal(normalizeActivitySourceMaterialCount(3.9), 3);
+assert.deepEqual(createEmptyActivitySourceMaterialKindCounts(), {
+  archive: 0,
+  audio: 0,
+  data: 0,
+  file: 0,
+  spreadsheet: 0,
+  video: 0,
+  'worksheet-document': 0,
+  'worksheet-image': 0,
+});
+assert.deepEqual(
+  buildActivitySourceMaterialKindSummaries({
+    ...createEmptyActivitySourceMaterialKindCounts(),
+    audio: 2.9,
+    file: Number.NaN,
+    spreadsheet: -1,
+    'worksheet-image': 1,
+  }),
+  [
+    { count: 2, kind: 'audio' },
+    { count: 1, kind: 'worksheet-image' },
+  ]
+);
 assert.deepEqual(
   buildActivitySourceMaterialSummaryView([
     listeningMaterialReference,
@@ -15653,6 +15687,50 @@ assert.match(
   /summary: summarizeActivityLibrary\(matchingActivities\)/,
   'Activity list summary should reflect source-material filtered activities.'
 );
+const activityLibrarySummaryDomainSource = readFileSync(
+  'src/activities/library-summary.ts',
+  'utf8'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildEmptyActivityLibrarySummary\(totalActivities\)/,
+  'Activity library summary metrics should reuse the empty-summary helper for fallback metrics.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /export function createEmptySourceMaterialCapabilityCounts/,
+  'Activity library capability count defaults should be exported as a reusable domain helper.'
+);
+assert.doesNotMatch(
+  activityLibrarySummaryDomainSource,
+  /const resolvedSummary = summary \?\? \{[\s\S]*totalActivities,[\s\S]*totalReadyTemplateOptions: 0,[\s\S]*\};/,
+  'Activity library summary metrics should not hand-write fallback summary objects inline.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /export function createEmptyActivitySourceMaterialKindCounts/,
+  'Activity source material kind counts should be a reusable domain helper.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /kindSummaries: buildActivitySourceMaterialKindSummaries\(byKind\)/,
+  'Activity source material summaries should delegate kind summary display rows to the domain helper.'
+);
+assert.doesNotMatch(
+  activityMaterialSummarySource,
+  /normalizeMaterialSummaryCount|createEmptyMaterialKindCounts|USER_FILE_MATERIAL_KINDS\.flatMap\(\(kind\) =>\s*normalize/,
+  'Activity source material summaries should not keep legacy inline count and kind-summary helpers.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /export function getActivityTemplateQuizChoiceReadinessItemPosition[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1,[\s\S]*min: 1/,
+  'Activity template quiz choice readiness positions should normalize indexes through one helper.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSource,
+  /activity_(?:draft_meta|template_readiness_panel)_quiz_choices_prompt\(\{[\s\S]*index: index \+ 1/,
+  'Activity draft and template readiness quiz labels should not hand-compose one-based indexes inline.'
+);
 assert.match(
   activitiesApiSource,
   /default\(ACTIVITY_LIBRARY_PAGE_SIZE\)/,
@@ -22939,6 +23017,10 @@ assert.equal(
     ?.statusLabel,
   'Needs candidates'
 );
+assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(0), 1);
+assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(2.9), 3);
+assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(-3), 1);
+assert.equal(getActivityTemplateQuizChoiceReadinessItemPosition(Number.NaN), 1);
 assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
   description:
     'The same structured content can become multiple Wordwall-style activity formats after saving.',
@@ -23170,6 +23252,35 @@ assert.deepEqual(
   }),
   { hasFilters: true, text: '0 matches' }
 );
+assert.equal(normalizeActivityLibraryMetricNumber(Number.NaN), undefined);
+assert.equal(
+  normalizeActivityLibraryMetricNumber(Number.POSITIVE_INFINITY),
+  undefined
+);
+assert.equal(normalizeActivityLibraryMetricNumber(-3.1), 0);
+assert.equal(normalizeActivityLibraryMetricNumber(4.9), 4);
+assert.deepEqual(createEmptySourceMaterialCapabilityCounts(), {
+  'audio-extraction': 0,
+  'spreadsheet-import': 0,
+  'worksheet-extraction': 0,
+});
+assert.deepEqual(buildEmptyActivityLibrarySummary(2.8), {
+  archivedActivities: 0,
+  draftActivities: 0,
+  extractableSourceActivities: 0,
+  remixReadyActivities: 0,
+  sourceMaterialCapabilityCounts: {
+    'audio-extraction': 0,
+    'spreadsheet-import': 0,
+    'worksheet-extraction': 0,
+  },
+  templateCoverage: 0,
+  templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+  totalActivities: 2,
+  totalExtractableSourceMaterials: 0,
+  totalReadyTemplateOptions: 0,
+});
+assert.equal(buildEmptyActivityLibrarySummary(Number.NaN).totalActivities, 0);
 assert.deepEqual(
   buildActivityLibrarySummaryMetrics({
     hasFilters: false,
@@ -25098,6 +25209,10 @@ const malformedDraftMetaSummary = buildActivityDraftMetaSummaryView({
   model: 'test-model',
   provider: 'workers-ai',
 });
+assert.equal(normalizeActivityDraftMetaCount(Number.NaN), 0);
+assert.equal(normalizeActivityDraftMetaCount(Number.POSITIVE_INFINITY), 0);
+assert.equal(normalizeActivityDraftMetaCount(-1.8), 0);
+assert.equal(normalizeActivityDraftMetaCount(6.7), 6);
 assert.deepEqual(malformedDraftMetaSummary.coverageStats, [
   { label: 'Questions', value: 0 },
   { label: 'Pairs', value: 0 },

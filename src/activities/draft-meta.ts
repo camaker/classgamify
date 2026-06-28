@@ -28,6 +28,7 @@ import {
 } from '@/activities/validation';
 import {
   normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayText,
 } from '@/activities/runtime-display';
 import { m } from '@/locale/paraglide/messages';
@@ -430,7 +431,7 @@ function buildActivityDraftMetaSummaryQuestionChoiceReadinessItemView({
     detail: buildActivityDraftMetaSummaryQuestionChoiceReadinessDetail(item),
     key: item.questionId,
     promptLabel: m.activity_draft_meta_quiz_choices_prompt({
-      index: index + 1,
+      index: getActivityTemplateQuizChoiceReadinessItemPosition(index),
       prompt: item.prompt,
     }),
     status: item.status,
@@ -474,7 +475,7 @@ function formatActivityDraftMetaSummaryQuestionChoiceReadinessStatus(
   }
 }
 
-function normalizeActivityDraftMetaCount(count: number) {
+export function normalizeActivityDraftMetaCount(count: number) {
   if (!Number.isFinite(count)) return 0;
   return Math.max(0, Math.floor(count));
 }
@@ -684,7 +685,7 @@ function buildActivityTemplateQuizChoiceReadinessItemView({
     detail: buildActivityTemplateQuizChoiceReadinessDetail(item),
     key: item.questionId,
     promptLabel: m.activity_template_readiness_panel_quiz_choices_prompt({
-      index: index + 1,
+      index: getActivityTemplateQuizChoiceReadinessItemPosition(index),
       prompt: item.prompt,
     }),
     sourceLabel: m.activity_template_readiness_panel_quiz_choices_sources({
@@ -720,6 +721,12 @@ function buildActivityTemplateQuizChoiceReadinessDetail(
         targetCount: item.targetCount,
       });
   }
+}
+
+export function getActivityTemplateQuizChoiceReadinessItemPosition(
+  index: number
+) {
+  return normalizeRuntimeDisplayCount(index + 1, { min: 1 });
 }
 
 function formatActivityTemplateQuizChoiceReadinessStatus(

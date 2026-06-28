@@ -115,10 +115,10 @@ export function summarizeActivitySourceMaterials(
   value: unknown
 ): ActivitySourceMaterialSummary {
   const materials = normalizeActivityMaterialReferences(value);
-  const byKind = createEmptyMaterialKindCounts();
+  const byKind = createEmptyActivitySourceMaterialKindCounts();
 
   for (const material of materials) {
-    byKind[material.kind] = normalizeMaterialSummaryCount(
+    byKind[material.kind] = normalizeActivitySourceMaterialCount(
       byKind[material.kind] + 1
     );
   }
@@ -126,13 +126,9 @@ export function summarizeActivitySourceMaterials(
   return {
     byKind,
     extractionActions: buildActivitySourceMaterialExtractionActions(byKind),
-    kindSummaries: USER_FILE_MATERIAL_KINDS.flatMap((kind) =>
-      normalizeMaterialSummaryCount(byKind[kind]) > 0
-        ? [{ count: normalizeMaterialSummaryCount(byKind[kind]), kind }]
-        : []
-    ),
+    kindSummaries: buildActivitySourceMaterialKindSummaries(byKind),
     readiness: buildActivitySourceMaterialReadiness(byKind),
-    total: normalizeMaterialSummaryCount(materials.length),
+    total: normalizeActivitySourceMaterialCount(materials.length),
   };
 }
 
@@ -362,10 +358,19 @@ const ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS = [
   },
 ] satisfies ActivitySourceMaterialExtractionActionDefinition[];
 
-function createEmptyMaterialKindCounts() {
+export function createEmptyActivitySourceMaterialKindCounts() {
   return Object.fromEntries(
     USER_FILE_MATERIAL_KINDS.map((kind) => [kind, 0])
   ) as Record<UserFileMaterialKind, number>;
+}
+
+export function buildActivitySourceMaterialKindSummaries(
+  byKind: Record<UserFileMaterialKind, number>
+): ActivitySourceMaterialKindSummary[] {
+  return USER_FILE_MATERIAL_KINDS.flatMap((kind) => {
+    const count = normalizeActivitySourceMaterialCount(byKind[kind]);
+    return count > 0 ? [{ count, kind }] : [];
+  });
 }
 
 function buildActivitySourceMaterialExtractionActions(
@@ -373,7 +378,7 @@ function buildActivitySourceMaterialExtractionActions(
 ): ActivitySourceMaterialExtractionAction[] {
   return ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.flatMap((action) => {
     const sourceKindCounts = action.sourceKinds.flatMap((kind) => {
-      const count = normalizeMaterialSummaryCount(byKind[kind]);
+      const count = normalizeActivitySourceMaterialCount(byKind[kind]);
       return count > 0 ? [{ count, kind }] : [];
     });
     const sourceCount = sourceKindCounts.reduce(
@@ -452,12 +457,14 @@ function formatActivitySourceMaterialExtractionAction(
 function buildActivitySourceMaterialReadiness(
   byKind: Record<UserFileMaterialKind, number>
 ): ActivitySourceMaterialReadiness {
-  const audioCount = normalizeMaterialSummaryCount(byKind.audio);
-  const spreadsheetCount = normalizeMaterialSummaryCount(byKind.spreadsheet);
-  const worksheetDocumentCount = normalizeMaterialSummaryCount(
+  const audioCount = normalizeActivitySourceMaterialCount(byKind.audio);
+  const spreadsheetCount = normalizeActivitySourceMaterialCount(
+    byKind.spreadsheet
+  );
+  const worksheetDocumentCount = normalizeActivitySourceMaterialCount(
     byKind['worksheet-document']
   );
-  const worksheetImageCount = normalizeMaterialSummaryCount(
+  const worksheetImageCount = normalizeActivitySourceMaterialCount(
     byKind['worksheet-image']
   );
   const hasAudio = audioCount > 0;
@@ -482,7 +489,7 @@ function buildActivitySourceMaterialReadiness(
   };
 }
 
-function normalizeMaterialSummaryCount(count: number) {
+export function normalizeActivitySourceMaterialCount(count: number) {
   if (!Number.isFinite(count)) return 0;
   return Math.max(0, Math.floor(count));
 }

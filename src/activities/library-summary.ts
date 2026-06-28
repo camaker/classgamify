@@ -218,18 +218,8 @@ export function buildActivityLibrarySummaryMetrics({
   summary?: ActivityLibrarySummary;
   totalActivities: number;
 }): ActivityLibrarySummaryMetric[] {
-  const resolvedSummary = summary ?? {
-    archivedActivities: 0,
-    draftActivities: 0,
-    extractableSourceActivities: 0,
-    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
-    remixReadyActivities: 0,
-    templateCoverage: 0,
-    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
-    totalActivities,
-    totalExtractableSourceMaterials: 0,
-    totalReadyTemplateOptions: 0,
-  };
+  const resolvedSummary =
+    summary ?? buildEmptyActivityLibrarySummary(totalActivities);
 
   return [
     {
@@ -336,12 +326,29 @@ function formatActivityLibraryMetricFraction(value: number, total: number) {
   return `${normalizedValue}/${normalizedTotal}`;
 }
 
-function normalizeActivityLibraryMetricNumber(value: number) {
+export function buildEmptyActivityLibrarySummary(
+  totalActivities = 0
+): ActivityLibrarySummary {
+  return {
+    archivedActivities: 0,
+    draftActivities: 0,
+    extractableSourceActivities: 0,
+    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
+    remixReadyActivities: 0,
+    templateCoverage: 0,
+    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+    totalActivities: normalizeActivityLibraryMetricNumber(totalActivities) ?? 0,
+    totalExtractableSourceMaterials: 0,
+    totalReadyTemplateOptions: 0,
+  };
+}
+
+export function normalizeActivityLibraryMetricNumber(value: number) {
   if (!Number.isFinite(value)) return undefined;
   return Math.floor(Math.max(0, value));
 }
 
-function createEmptySourceMaterialCapabilityCounts() {
+export function createEmptySourceMaterialCapabilityCounts() {
   return {
     'audio-extraction': 0,
     'spreadsheet-import': 0,
