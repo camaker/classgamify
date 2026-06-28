@@ -16,6 +16,8 @@ import {
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 
+type WorksheetsPageViewModel = ReturnType<typeof buildWorksheetsPageViewModel>;
+
 export const Route = createFileRoute('/worksheets')({
   head: () =>
     seo('/worksheets', {
@@ -47,27 +49,10 @@ function WorksheetsPage() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {pageView.heroActions.map((action) => (
-                <Link
+                <WorksheetHeroActionLink
+                  action={action}
                   key={action.template}
-                  to={Routes.Create}
-                  search={action.search}
-                  className={cn(
-                    buttonVariants({
-                      size: 'lg',
-                      variant: action.isPrimary ? 'default' : 'outline',
-                    }),
-                    'rounded-lg',
-                    action.isPrimary ? '' : 'bg-background'
-                  )}
-                >
-                  {action.isPrimary ? (
-                    <IconPencilPlus className="size-4" />
-                  ) : null}
-                  {action.label}
-                  {action.isPrimary ? null : (
-                    <IconArrowRight className="size-4" />
-                  )}
-                </Link>
+                />
               ))}
             </div>
           </div>
@@ -78,15 +63,7 @@ function WorksheetsPage() {
             </p>
             <ol className="mt-4 space-y-3">
               {pageView.workflowSteps.map((item, index) => (
-                <li
-                  key={item}
-                  className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6"
-                >
-                  <span className="flex size-7 items-center justify-center rounded-lg border bg-background text-xs font-semibold text-primary">
-                    {index + 1}
-                  </span>
-                  <span>{item}</span>
-                </li>
+                <WorksheetWorkflowStep index={index} item={item} key={item} />
               ))}
             </ol>
           </div>
@@ -113,12 +90,7 @@ function WorksheetsPage() {
 
           <div className="grid gap-2">
             {pageView.resultSignals.map((signal) => (
-              <div
-                key={signal}
-                className="rounded-lg border bg-background px-3 py-2 text-sm font-medium"
-              >
-                {signal}
-              </div>
+              <WorksheetResultSignal key={signal} signal={signal} />
             ))}
           </div>
         </section>
@@ -142,5 +114,55 @@ function WorksheetsPage() {
         </section>
       </div>
     </Container>
+  );
+}
+
+function WorksheetHeroActionLink({
+  action,
+}: {
+  action: WorksheetsPageViewModel['heroActions'][number];
+}) {
+  return (
+    <Link
+      to={Routes.Create}
+      search={action.search}
+      className={cn(
+        buttonVariants({
+          size: 'lg',
+          variant: action.isPrimary ? 'default' : 'outline',
+        }),
+        'rounded-lg',
+        action.isPrimary ? '' : 'bg-background'
+      )}
+    >
+      {action.isPrimary ? <IconPencilPlus className="size-4" /> : null}
+      {action.label}
+      {action.isPrimary ? null : <IconArrowRight className="size-4" />}
+    </Link>
+  );
+}
+
+function WorksheetWorkflowStep({
+  index,
+  item,
+}: {
+  index: number;
+  item: string;
+}) {
+  return (
+    <li className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6">
+      <span className="flex size-7 items-center justify-center rounded-lg border bg-background text-xs font-semibold text-primary">
+        {index + 1}
+      </span>
+      <span>{item}</span>
+    </li>
+  );
+}
+
+function WorksheetResultSignal({ signal }: { signal: string }) {
+  return (
+    <div className="rounded-lg border bg-background px-3 py-2 text-sm font-medium">
+      {signal}
+    </div>
   );
 }

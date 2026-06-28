@@ -2702,6 +2702,36 @@ assert.match(
   'Worksheets route should render printable copy from the worksheet page view-model.'
 );
 assert.match(
+  worksheetsRouteSource,
+  /pageView\.heroActions\.map[\s\S]*WorksheetHeroActionLink[\s\S]*action=\{action\}/,
+  'Worksheets route should delegate prepared hero actions to focused action links.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /pageView\.workflowSteps\.map[\s\S]*WorksheetWorkflowStep[\s\S]*item=\{item\}/,
+  'Worksheets route should delegate prepared workflow steps to focused rows.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /pageView\.resultSignals\.map[\s\S]*WorksheetResultSignal[\s\S]*signal=\{signal\}/,
+  'Worksheets route should delegate prepared result signals to focused chips.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /function WorksheetHeroActionLink[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
+  'Worksheet hero action links should render prepared create-entry actions.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /function WorksheetWorkflowStep[\s\S]*index \+ 1[\s\S]*item/,
+  'Worksheet workflow steps should render prepared workflow copy with ordered labels.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /function WorksheetResultSignal[\s\S]*signal/,
+  'Worksheet result signal chips should render prepared result signal copy.'
+);
+assert.match(
   worksheetModeCardSource,
   /WorksheetsPageViewModel\['modeCards'\]\[number\]/,
   'Worksheet mode cards should consume the worksheet page view-model card contract.'
