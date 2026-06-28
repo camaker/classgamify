@@ -21043,6 +21043,17 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityEditorDraftGenerationGate({
     hasUser: true,
+    sourceText: ` ${'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1)} `,
+  }),
+  {
+    canGenerate: false,
+    errorMessage: 'Source notes are too long. Keep them under 2000 characters.',
+    sourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationGate({
+    hasUser: true,
     sourceText: '  apple, milk  ',
   }),
   {
@@ -21135,6 +21146,27 @@ assert.deepEqual(
   }).generationDisabledReason,
   'Draft generation is already running.'
 );
+const overlongAiDraftPanelView = buildActivityEditorAiDraftPanelView({
+  draftSourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
+  hasUser: true,
+  isGeneratingDraft: false,
+  sourceState: buildActivityEditorDraftSourceState({
+    draftSourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
+    sourceMaterials: [],
+  }),
+});
+assert.equal(overlongAiDraftPanelView.canGenerateDraft, false);
+assert.equal(
+  overlongAiDraftPanelView.generationDisabledReason,
+  'Source notes are too long. Keep them under 2000 characters.'
+);
+assert.deepEqual(overlongAiDraftPanelView.sourceReadiness, {
+  characterCountLabel: '2001/2000 characters',
+  description: 'Source notes are too long. Keep them under 2000 characters.',
+  hasWarnings: true,
+  status: 'ready',
+  title: 'Source ready',
+});
 assert.deepEqual(
   buildActivityEditorDraftGenerationExecutionPlan({
     current: getActivityEditorDefaultInput(),
@@ -21160,6 +21192,20 @@ assert.deepEqual(
   {
     failureMessage: 'Activity draft could not be generated.',
     message: 'Add a topic, vocabulary list, or source notes first.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationExecutionPlan({
+    current: getActivityEditorDefaultInput(),
+    draftFocus: 'balanced',
+    hasUser: true,
+    itemCount: 5,
+    sourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
+  }),
+  {
+    failureMessage: 'Activity draft could not be generated.',
+    message: 'Source notes are too long. Keep them under 2000 characters.',
     type: 'blocked',
   }
 );
@@ -21335,6 +21381,7 @@ assert.deepEqual(
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: false,
     isDefaultSource: false,
+    isTooLong: false,
     safeSourceMaterialNoteCount: 0,
     sourceLength: 31,
   }
@@ -21350,6 +21397,7 @@ assert.deepEqual(
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: false,
     isDefaultSource: true,
+    isTooLong: false,
     safeSourceMaterialNoteCount: 0,
     sourceLength: 36,
   }
@@ -21377,6 +21425,7 @@ assert.deepEqual(
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: true,
     isDefaultSource: false,
+    isTooLong: false,
     safeSourceMaterialNoteCount: 1,
     sourceLength: syncedEditorDraftSource.length,
   }

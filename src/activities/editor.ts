@@ -119,6 +119,7 @@ type ActivityEditorDraftSourceState = {
   hasAttachedSourceMaterials: boolean;
   hasDraftSourceMaterialNotes: boolean;
   isDefaultSource: boolean;
+  isTooLong: boolean;
   safeSourceMaterialNoteCount: number;
   sourceLength: number;
 };
@@ -377,6 +378,7 @@ export function buildActivityEditorDraftSourceState({
     isDefaultSource:
       normalizedSourceText ===
       normalizeActivityDraftSourceText(DEFAULT_ACTIVITY_DRAFT_SOURCE),
+    isTooLong: normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
     safeSourceMaterialNoteCount,
     sourceLength: normalizedSourceText.length,
   };
@@ -406,11 +408,12 @@ export function buildActivityEditorAiDraftPanelView({
 
   return {
     badgeLabel: m.activity_form_ai_draft_badge(),
-    canGenerateDraft: hasUser && !isGeneratingDraft,
+    canGenerateDraft: hasUser && !isGeneratingDraft && !sourceState.isTooLong,
     canSyncDraftSourceMaterials: sourceState.canSyncDraftSourceMaterials,
     generationDisabledReason: buildActivityEditorDraftGenerationDisabledReason({
       hasUser,
       isGeneratingDraft,
+      sourceState,
     }),
     focusLabel: m.activity_form_ai_focus_label(),
     focusOptions: buildActivityAiDraftFocusOptions(),
@@ -441,6 +444,16 @@ function buildActivityEditorAiDraftSourceReadinessView(
     count: sourceState.sourceLength,
     max: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   });
+
+  if (sourceState.isTooLong) {
+    return {
+      characterCountLabel,
+      description: m.activity_ai_source_max_error(),
+      hasWarnings: true,
+      status: 'ready',
+      title: m.activity_form_ai_source_readiness_ready_title(),
+    };
+  }
 
   if (sourceState.hasDraftSourceMaterialNotes) {
     return {
@@ -489,12 +502,15 @@ function buildActivityEditorAiDraftSourceReadinessView(
 function buildActivityEditorDraftGenerationDisabledReason({
   hasUser,
   isGeneratingDraft,
+  sourceState,
 }: {
   hasUser: boolean;
   isGeneratingDraft: boolean;
+  sourceState: ActivityEditorDraftSourceState;
 }) {
   if (!hasUser) return m.activity_form_ai_generation_sign_in_hint();
   if (isGeneratingDraft) return m.activity_form_ai_generation_pending_hint();
+  if (sourceState.isTooLong) return m.activity_ai_source_max_error();
   return undefined;
 }
 
@@ -538,6 +554,14 @@ export function buildActivityEditorDraftGenerationGate({
     return {
       canGenerate: false,
       errorMessage: m.activity_form_toast_missing_draft_source(),
+      sourceText: trimmedSourceText,
+    };
+  }
+
+  if (trimmedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH) {
+    return {
+      canGenerate: false,
+      errorMessage: m.activity_ai_source_max_error(),
       sourceText: trimmedSourceText,
     };
   }
