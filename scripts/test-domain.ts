@@ -428,6 +428,7 @@ import {
 } from '@/assignments/persistence';
 import {
   PRINTABLE_WORKSHEET_RESPONSE_POLICIES,
+  buildPrintableAssignmentDeliveryView,
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
   getPrintableWorksheetResponsePolicy,
@@ -10101,7 +10102,7 @@ assert.deepEqual(publicAssignmentLookupAvailable, {
   payload: publicAssignmentPayload,
   status: 'available',
 });
-const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet({
+const printableSnapshotWorksheetSource = {
   activity: {
     description: 'Current activity description',
     templateType: 'quiz',
@@ -10126,7 +10127,10 @@ const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet({
     activityTitle: 'Frozen activity title',
     templateType: 'quiz',
   },
-});
+} satisfies Parameters<typeof buildPrintableAssignmentWorksheet>[0];
+const printableSnapshotWorksheet = buildPrintableAssignmentWorksheet(
+  printableSnapshotWorksheetSource
+);
 assert.equal(printableSnapshotWorksheet.activityTitle, 'Frozen activity title');
 assert.equal(
   printableSnapshotWorksheet.activityDescription,
@@ -10165,6 +10169,31 @@ assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'yes' }), {
 assert.deepEqual(parsePrintableAssignmentSearch({}), {
   answerKey: undefined,
 });
+const printableSnapshotDeliveryView = buildPrintableAssignmentDeliveryView({
+  expiresAt: printableSnapshotWorksheetSource.assignment.expiresAt,
+  settings: resolveAssignmentSettings(
+    printableSnapshotWorksheetSource.assignment.settingsJson
+  ),
+});
+assert.equal(printableSnapshotDeliveryView.instructions, 'Finish on paper.');
+assert.match(
+  printableSnapshotDeliveryView.deliveryPolicyText,
+  /Student instructions: Finish on paper\./
+);
+assert.deepEqual(
+  printableSnapshotDeliveryView.deliverySummary.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['attempts', '3 max'],
+    ['timer', '2 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'Hidden'],
+    ['itemOrder', 'Fixed order'],
+  ]
+);
 assert.equal(printableSnapshotWorksheet.instructions, 'Finish on paper.');
 assert.equal(printableSnapshotWorksheet.shareSlug, 'printable-1');
 assert.equal(printableSnapshotWorksheet.sharePath, '/play/printable-1');
@@ -14690,8 +14719,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
-  /instructions: formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
-  'Printable worksheets should format student instructions through the shared delivery helper.'
+  /export function buildPrintableAssignmentDeliveryView\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*buildAssignmentDeliverySummary\(\{[\s\S]*formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
+  'Printable worksheet delivery view should share assignment delivery-summary formatting.'
+);
+assert.match(
+  printableWorksheetSource,
+  /const deliveryView = buildPrintableAssignmentDeliveryView\(\{[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*settings,[\s\S]*deliveryPolicyText: deliveryView\.deliveryPolicyText,[\s\S]*deliverySummary: deliveryView\.deliverySummary,[\s\S]*instructions: deliveryView\.instructions/,
+  'Printable worksheets should prepare delivery policy, summary, and instructions through the printable delivery view.'
 );
 assert.match(
   printableWorksheetSource,
@@ -14702,6 +14736,11 @@ assert.doesNotMatch(
   printableWorksheetSource,
   /instructions: settings\.instructions|assignmentTitle: assignment\.title/,
   'Printable worksheets should not expose raw student instructions or assignment titles.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /export function buildPrintableAssignmentWorksheet\((?:(?!\nexport function buildPrintableAssignmentDeliveryView)[\s\S])*formatAssignmentDeliveryPolicyText\(|export function buildPrintableAssignmentWorksheet\((?:(?!\nexport function buildPrintableAssignmentDeliveryView)[\s\S])*buildAssignmentDeliverySummary\(/,
+  'Printable assignment worksheet builder should not rebuild delivery policy and summary inline.'
 );
 assert.doesNotMatch(
   printableWorksheetSource,

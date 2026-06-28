@@ -66,6 +66,12 @@ export type PrintableWorksheetAnswerKeyItem = {
   sequenceNumber: number;
 };
 
+export type PrintableAssignmentDeliveryView = {
+  deliveryPolicyText: string;
+  deliverySummary: ReturnType<typeof buildAssignmentDeliverySummary>;
+  instructions?: string;
+};
+
 export type PrintableAssignmentWorksheet = {
   activityDescription: string | null;
   activityTitle: string;
@@ -190,6 +196,10 @@ export function buildPrintableAssignmentWorksheet({
     activity,
     snapshot,
   });
+  const deliveryView = buildPrintableAssignmentDeliveryView({
+    expiresAt: assignment.expiresAt,
+    settings,
+  });
   const templateType = resolvedSource.templateType;
   const orderedRuntimeItems = orderAssignmentRuntimeItems({
     items: runtimeItems,
@@ -204,20 +214,10 @@ export function buildPrintableAssignmentWorksheet({
       ? orderedRuntimeItems.map(toPrintableWorksheetAnswerKeyItem)
       : undefined,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
-    deliveryPolicyText: formatAssignmentDeliveryPolicyText({
-      expiresAt: assignment.expiresAt,
-      settings,
-    }),
-    deliverySummary: buildAssignmentDeliverySummary({
-      collectStudentName: settings.collectStudentName,
-      expiresAt: assignment.expiresAt,
-      maxAttempts: settings.maxAttempts,
-      showCorrectAnswers: settings.showCorrectAnswers,
-      shuffleItems: settings.shuffleItems,
-      timeLimitSeconds: settings.timeLimitSeconds,
-    }),
+    deliveryPolicyText: deliveryView.deliveryPolicyText,
+    deliverySummary: deliveryView.deliverySummary,
     includeAnswerKey,
-    instructions: formatAssignmentDeliveryInstructions(settings.instructions),
+    instructions: deliveryView.instructions,
     items: orderedRuntimeItems.map((item, index) =>
       toPrintableWorksheetItem({
         item,
@@ -228,6 +228,30 @@ export function buildPrintableAssignmentWorksheet({
     sharePath: buildAssignmentSharePath(shareSlug),
     shareSlug,
     templateType,
+  };
+}
+
+export function buildPrintableAssignmentDeliveryView({
+  expiresAt,
+  settings,
+}: {
+  expiresAt: Date | string | null;
+  settings: AssignmentSettings;
+}): PrintableAssignmentDeliveryView {
+  return {
+    deliveryPolicyText: formatAssignmentDeliveryPolicyText({
+      expiresAt,
+      settings,
+    }),
+    deliverySummary: buildAssignmentDeliverySummary({
+      collectStudentName: settings.collectStudentName,
+      expiresAt,
+      maxAttempts: settings.maxAttempts,
+      showCorrectAnswers: settings.showCorrectAnswers,
+      shuffleItems: settings.shuffleItems,
+      timeLimitSeconds: settings.timeLimitSeconds,
+    }),
+    instructions: formatAssignmentDeliveryInstructions(settings.instructions),
   };
 }
 
