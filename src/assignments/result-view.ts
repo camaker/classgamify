@@ -46,6 +46,7 @@ import {
   DEFAULT_STUDENT_SUMMARY_SORT,
   ITEM_PERFORMANCE_SORT_VALUES,
   STUDENT_SUMMARY_SORT_VALUES,
+  buildAssignmentResultReviewScope,
   buildFilteredAttemptRows,
   filterAndSortStudentSummaries,
   filterAssignmentResultCompletedAttemptRows,
@@ -89,6 +90,7 @@ export {
   DEFAULT_STUDENT_SUMMARY_SORT,
   ITEM_PERFORMANCE_SORT_VALUES,
   STUDENT_SUMMARY_SORT_VALUES,
+  buildAssignmentResultReviewScope,
   buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultRouteSearch,
@@ -109,6 +111,7 @@ export {
   sortStudentSummaries,
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
+  type AssignmentResultReviewScope,
   type AssignmentResultControlSearchUpdate,
   type AssignmentResultResolvedViewState,
   type AssignmentResultSearchState,
@@ -1152,54 +1155,50 @@ export function buildAssignmentResultViewModel<
   studentSort: StudentSummarySort;
   students: AssignmentStudentSummary[];
 }) {
-  const filteredStudents = filterAndSortStudentSummaries({
-    search,
-    sort: studentSort,
-    students,
-  });
-  const filteredAttemptRows = buildFilteredAttemptRows({
+  const reviewScope = buildAssignmentResultReviewScope({
+    attemptReviewFilter,
     attempts,
+    itemPerformanceSort,
+    items,
     reviews,
     search,
-  });
-  const filteredAttemptReviews = filterAttemptReviews({
-    attempts: reviews,
-    filter: attemptReviewFilter,
-    search,
+    studentSort,
+    students,
   });
 
   return {
     attemptReviewSubmissionSummary: buildAttemptReviewSubmissionSummary({
-      shownAttempts: filteredAttemptReviews.length,
-      totalAttempts: reviews.length,
+      shownAttempts: reviewScope.counts.matchedAttemptReviews,
+      totalAttempts: reviewScope.counts.totalAttemptReviews,
     }),
     emptyStates: {
       attemptReview: buildAssignmentResultEmptyState({
         filter: attemptReviewFilter,
         search,
         surface: 'attempt-review',
-        totalAttemptReviews: reviews.length,
+        totalAttemptReviews: reviewScope.counts.totalAttemptReviews,
       }),
       attemptRows: buildAssignmentResultEmptyState({
         search,
         surface: 'attempt-rows',
-        totalAttempts: attempts.length,
+        totalAttempts: reviewScope.counts.totalAttemptRows,
       }),
       studentSummary: buildAssignmentResultEmptyState({
         search,
         surface: 'student-summary',
-        totalStudents: students.length,
+        totalStudents: reviewScope.counts.totalStudents,
       }),
     },
-    filteredAttemptReviews,
-    filteredAttemptRows,
-    filteredStudents,
+    filteredAttemptReviews: reviewScope.filteredAttemptReviews,
+    filteredAttemptRows: reviewScope.filteredAttemptRows,
+    filteredStudents: reviewScope.filteredStudents,
+    reviewScope,
     resultSearchSummary: buildResultSearchSummary({
-      matchedAttempts: filteredAttemptRows.length,
-      matchedStudents: filteredStudents.length,
+      matchedAttempts: reviewScope.counts.matchedAttemptRows,
+      matchedStudents: reviewScope.counts.matchedStudents,
       search,
     }),
-    sortedPerformanceItems: sortItemPerformance(items, itemPerformanceSort),
+    sortedPerformanceItems: reviewScope.sortedPerformanceItems,
   };
 }
 

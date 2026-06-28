@@ -100,6 +100,78 @@ export type AssignmentAttemptReviewRow<
   studentLabel: string;
 };
 
+export type AssignmentResultReviewScopeCounts = {
+  matchedAttemptReviews: number;
+  matchedAttemptRows: number;
+  matchedStudents: number;
+  totalAttemptReviews: number;
+  totalAttemptRows: number;
+  totalStudents: number;
+};
+
+export type AssignmentResultReviewScope<
+  TAttempt extends AssignmentAttemptRowInput,
+> = {
+  counts: AssignmentResultReviewScopeCounts;
+  filteredAttemptReviews: AssignmentAttemptReview[];
+  filteredAttemptRows: Array<AssignmentAttemptReviewRow<TAttempt>>;
+  filteredStudents: AssignmentStudentSummary[];
+  sortedPerformanceItems: AssignmentItemAnalysis[];
+};
+
+export function buildAssignmentResultReviewScope<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
+  attemptReviewFilter,
+  attempts,
+  itemPerformanceSort,
+  items,
+  reviews,
+  search,
+  studentSort,
+  students,
+}: {
+  attemptReviewFilter: AttemptReviewFilter;
+  attempts: TAttempt[];
+  itemPerformanceSort: ItemPerformanceSort;
+  items: AssignmentItemAnalysis[];
+  reviews: AssignmentAttemptReview[];
+  search: string;
+  studentSort: StudentSummarySort;
+  students: AssignmentStudentSummary[];
+}): AssignmentResultReviewScope<TAttempt> {
+  const filteredStudents = filterAndSortStudentSummaries({
+    search,
+    sort: studentSort,
+    students,
+  });
+  const filteredAttemptRows = buildFilteredAttemptRows({
+    attempts,
+    reviews,
+    search,
+  });
+  const filteredAttemptReviews = filterAttemptReviews({
+    attempts: reviews,
+    filter: attemptReviewFilter,
+    search,
+  });
+
+  return {
+    counts: {
+      matchedAttemptReviews: filteredAttemptReviews.length,
+      matchedAttemptRows: filteredAttemptRows.length,
+      matchedStudents: filteredStudents.length,
+      totalAttemptReviews: reviews.length,
+      totalAttemptRows: attempts.length,
+      totalStudents: students.length,
+    },
+    filteredAttemptReviews,
+    filteredAttemptRows,
+    filteredStudents,
+    sortedPerformanceItems: sortItemPerformance(items, itemPerformanceSort),
+  };
+}
+
 export function filterAssignmentResultCompletedAttemptRows<
   TAttempt extends AssignmentAttemptRowInput,
 >({

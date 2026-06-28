@@ -606,6 +606,7 @@ import {
   STUDENT_SUMMARY_SORT_VALUES,
   compareAssignmentAttemptReviewsByCompletedAt,
   compareAssignmentResultAttemptRowsByCompletedAt,
+  buildAssignmentResultReviewScope,
   buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultRouteSearch,
@@ -1822,6 +1823,16 @@ assert.match(
   assignmentResultFiltersSource,
   /export function filterAttemptReviews/,
   'Assignment result answer-review filtering should live in the assignment result filter domain helper.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function buildAssignmentResultReviewScope[\s\S]*filterAndSortStudentSummaries[\s\S]*buildFilteredAttemptRows[\s\S]*filterAttemptReviews[\s\S]*sortItemPerformance/,
+  'Assignment result review scope should centralize filtered students, attempt rows, answer reviews, and item sorting.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /const reviewScope = buildAssignmentResultReviewScope\([\s\S]*reviewScope\.counts\.matchedAttemptReviews[\s\S]*reviewScope\.filteredAttemptRows[\s\S]*reviewScope\.sortedPerformanceItems/,
+  'Assignment result view model should consume the shared result-review scope instead of recomputing filtered result sections.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -30276,6 +30287,65 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Anonymous student 1']
 );
+const assignmentResultReviewScope = buildAssignmentResultReviewScope({
+  attemptReviewFilter: 'needs-review',
+  attempts: [
+    {
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'attempt-1',
+      studentName: ' Alice ',
+    },
+    {
+      completedAt: new Date('2026-01-02T10:00:00.000Z'),
+      id: 'attempt-2',
+      studentName: 'Alice',
+    },
+    {
+      anonymousToken: 'browser-token-1',
+      completedAt: new Date('2026-01-03T10:00:00.000Z'),
+      id: 'attempt-3',
+      studentName: null,
+    },
+  ],
+  itemPerformanceSort: 'accuracy',
+  items: resultAnalysis.perItem,
+  reviews: resultAnalysis.attempts,
+  search: ' ａｎｏｎｙｍｏｕｓ ',
+  studentSort: 'needs-review',
+  students: resultAnalysis.students,
+});
+assert.deepEqual(assignmentResultReviewScope.counts, {
+  matchedAttemptReviews: 1,
+  matchedAttemptRows: 1,
+  matchedStudents: 1,
+  totalAttemptReviews: 3,
+  totalAttemptRows: 3,
+  totalStudents: 2,
+});
+assert.deepEqual(
+  assignmentResultReviewScope.filteredStudents.map(
+    (student) => student.studentLabel
+  ),
+  ['Anonymous student 1']
+);
+assert.deepEqual(
+  assignmentResultReviewScope.filteredAttemptRows.map((row) => [
+    row.attempt.id,
+    row.studentLabel,
+  ]),
+  [['attempt-3', 'Anonymous student 1']]
+);
+assert.deepEqual(
+  assignmentResultReviewScope.filteredAttemptReviews.map((attempt) => [
+    attempt.id,
+    attempt.studentLabel,
+  ]),
+  [['attempt-3', 'Anonymous student 1']]
+);
+assert.deepEqual(
+  assignmentResultReviewScope.sortedPerformanceItems.map((item) => item.itemId),
+  ['pair-1', 'q-1']
+);
 assert.equal(
   getAssignmentResultCompletedAtTimestamp('2026-01-04T10:00:00.000Z'),
   new Date('2026-01-04T10:00:00.000Z').getTime()
@@ -30517,6 +30587,14 @@ assert.deepEqual(
   assignmentResultViewModel.sortedPerformanceItems.map((item) => item.itemId),
   ['pair-1', 'q-1']
 );
+assert.deepEqual(assignmentResultViewModel.reviewScope.counts, {
+  matchedAttemptReviews: 1,
+  matchedAttemptRows: 1,
+  matchedStudents: 1,
+  totalAttemptReviews: 3,
+  totalAttemptRows: 3,
+  totalStudents: 2,
+});
 assert.equal(
   assignmentResultViewModel.resultSearchSummary,
   '1 student · 1 attempt'
