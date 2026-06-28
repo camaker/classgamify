@@ -59,6 +59,8 @@ type ActivitySourceMaterialSummary = {
 };
 
 export type ActivitySourceMaterialSummaryView = {
+  ariaLabel: string;
+  compactSummaryText: string;
   countLabel: string;
   extractionActions: ActivitySourceMaterialExtractionActionView[];
   extractionTitle: string;
@@ -136,16 +138,20 @@ export function buildActivitySourceMaterialSummaryView(
   value: unknown
 ): ActivitySourceMaterialSummaryView {
   const summary = summarizeActivitySourceMaterials(value);
+  const countLabel = formatActivitySourceMaterialCountLabel(summary.total);
+  const kindSummaryText = formatActivitySourceMaterialKindCounts(
+    summary.kindSummaries
+  );
+  const compactSummaryText = kindSummaryText || countLabel;
 
   return {
-    countLabel:
-      summary.total === 1
-        ? m.activity_source_material_summary_count_one({
-            count: summary.total,
-          })
-        : m.activity_source_material_summary_count_many({
-            count: summary.total,
-          }),
+    ariaLabel: formatActivitySourceMaterialSummaryAriaLabel({
+      countLabel,
+      kindSummaryText,
+      title: m.activity_source_material_summary_title(),
+    }),
+    compactSummaryText,
+    countLabel,
     extractionActions: summary.extractionActions.map(
       toActivitySourceMaterialExtractionActionView
     ),
@@ -166,6 +172,33 @@ export function buildActivitySourceMaterialSummaryView(
     readiness: summary.readiness,
     title: m.activity_source_material_summary_title(),
   };
+}
+
+export function formatActivitySourceMaterialCountLabel(count: number) {
+  const normalizedCount = normalizeActivitySourceMaterialCount(count);
+
+  return normalizedCount === 1
+    ? m.activity_source_material_summary_count_one({
+        count: normalizedCount,
+      })
+    : m.activity_source_material_summary_count_many({
+        count: normalizedCount,
+      });
+}
+
+export function formatActivitySourceMaterialSummaryAriaLabel({
+  countLabel,
+  kindSummaryText,
+  title,
+}: {
+  countLabel: string;
+  kindSummaryText?: string;
+  title: string;
+}) {
+  return [title, kindSummaryText || countLabel]
+    .map(normalizeOptionalRuntimeDisplayText)
+    .filter(Boolean)
+    .join(m.activity_source_material_summary_list_separator());
 }
 
 export function buildActivitySourceMaterialPickerView({
@@ -428,7 +461,7 @@ function formatActivitySourceMaterialMetric({
   return m.activity_source_material_summary_metric({ count, label });
 }
 
-function formatActivitySourceMaterialKindCounts(
+export function formatActivitySourceMaterialKindCounts(
   sourceKindCounts: ActivitySourceMaterialKindSummary[]
 ) {
   return sourceKindCounts

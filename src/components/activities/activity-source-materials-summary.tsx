@@ -15,7 +15,10 @@ export function ActivitySourceMaterialsSummary({
   if (!summary.hasMaterials) return null;
 
   return (
-    <div className={cn('rounded-lg border bg-background p-3', className)}>
+    <section
+      aria-label={summary.ariaLabel}
+      className={cn('rounded-lg border bg-background p-3', className)}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
@@ -23,7 +26,7 @@ export function ActivitySourceMaterialsSummary({
             <p className="font-medium text-sm">{summary.title}</p>
           </div>
           <p className="mt-1 text-muted-foreground text-xs">
-            {summary.countLabel}
+            {summary.compactSummaryText}
           </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -35,7 +38,7 @@ export function ActivitySourceMaterialsSummary({
       {summary.extractionActions.length ? (
         <ActivitySourceMaterialExtractionSummary summary={summary} />
       ) : null}
-    </div>
+    </section>
   );
 }
 

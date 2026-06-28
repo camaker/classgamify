@@ -188,7 +188,10 @@ import {
   buildActivitySourceMaterialPickerView,
   buildActivitySourceMaterialSummaryView,
   createEmptyActivitySourceMaterialKindCounts,
+  formatActivitySourceMaterialCountLabel,
+  formatActivitySourceMaterialKindCounts,
   formatActivitySourceMaterialReferenceMeta,
+  formatActivitySourceMaterialSummaryAriaLabel,
   normalizeActivitySourceMaterialCount,
   removeActivitySourceMaterialPickerItem,
   summarizeActivitySourceMaterials,
@@ -2457,6 +2460,11 @@ assert.match(
   activitySourceMaterialsSummarySource,
   /ActivitySourceMaterialSummaryView/,
   'Activity source-material summary component should consume the activity-domain summary view contract.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /<section[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText/,
+  'Activity source-material summary component should render prepared compact and accessible summary text from the domain view.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -5235,6 +5243,33 @@ assert.deepEqual(
     { count: 1, kind: 'worksheet-image' },
   ]
 );
+assert.equal(formatActivitySourceMaterialCountLabel(1), '1 file');
+assert.equal(formatActivitySourceMaterialCountLabel(2.9), '2 files');
+assert.equal(formatActivitySourceMaterialCountLabel(Number.NaN), '0 files');
+assert.equal(
+  formatActivitySourceMaterialKindCounts([
+    { count: 1, kind: 'audio' },
+    { count: 2, kind: 'worksheet-document' },
+  ]),
+  'Audio · 1, Worksheet document · 2'
+);
+assert.equal(formatActivitySourceMaterialKindCounts([]), '');
+assert.equal(
+  formatActivitySourceMaterialSummaryAriaLabel({
+    countLabel: '2 files',
+    kindSummaryText: 'Audio · 1, Worksheet document · 1',
+    title: 'Source materials',
+  }),
+  'Source materials, Audio · 1, Worksheet document · 1'
+);
+assert.equal(
+  formatActivitySourceMaterialSummaryAriaLabel({
+    countLabel: '0 files',
+    kindSummaryText: '',
+    title: 'Source materials',
+  }),
+  'Source materials, 0 files'
+);
 assert.deepEqual(
   buildActivitySourceMaterialSummaryView([
     listeningMaterialReference,
@@ -5247,6 +5282,8 @@ assert.deepEqual(
     },
   ]),
   {
+    ariaLabel: 'Source materials, Audio · 1, Worksheet document · 1',
+    compactSummaryText: 'Audio · 1, Worksheet document · 1',
     countLabel: '2 files',
     extractionActions: [
       {
@@ -5361,6 +5398,8 @@ try {
   overwriteGetLocale(() => 'en');
 }
 assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
+  ariaLabel: 'Source materials, 0 files',
+  compactSummaryText: '0 files',
   countLabel: '0 files',
   extractionActions: [],
   extractionTitle: 'Ready for future AI extraction',
@@ -19827,6 +19866,8 @@ assert.deepEqual(starterActivityDisplayView.stats, [
   { key: 'groups', label: 'Groups', value: 2 },
 ]);
 assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
+  ariaLabel: 'Source materials, 0 files',
+  compactSummaryText: '0 files',
   countLabel: '0 files',
   extractionActions: [],
   extractionTitle: 'Ready for future AI extraction',
@@ -19853,6 +19894,8 @@ assert.deepEqual(
     libraryStatus: 'active',
   }).sourceMaterials,
   {
+    ariaLabel: 'Source materials, Audio · 1',
+    compactSummaryText: 'Audio · 1',
     countLabel: '1 file',
     extractionActions: [
       {
