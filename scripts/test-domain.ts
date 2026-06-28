@@ -604,14 +604,19 @@ import {
   DEFAULT_STUDENT_SUMMARY_SORT,
   ITEM_PERFORMANCE_SORT_VALUES,
   STUDENT_SUMMARY_SORT_VALUES,
+  compareAssignmentAttemptReviewsByCompletedAt,
+  compareAssignmentResultAttemptRowsByCompletedAt,
   buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultRouteSearch,
   buildAssignmentResultSearchState,
   buildFilteredAttemptRows,
+  countAssignmentAttemptReviewNeededAnswers,
   filterAndSortStudentSummaries,
   filterAssignmentResultCompletedAttemptRows,
   filterAttemptReviews,
+  getAssignmentResultCompletedAtTimestamp,
+  isAssignmentAttemptReviewNeeded,
   matchesResultSearch,
   normalizeResultSearch,
   normalizeResultSearchQuery,
@@ -620,6 +625,9 @@ import {
   parseResultStudentSearch,
   parseStudentSummarySort,
   resolveAssignmentResultViewState,
+  sortAssignmentAttemptReviewsByCompletedAt,
+  sortAssignmentResultAttemptReviewRows,
+  sortAssignmentResultAttemptRowsByCompletedAt,
   sortItemPerformance,
   sortStudentSummaries,
 } from '@/assignments/result-filters';
@@ -30246,6 +30254,176 @@ assert.deepEqual(
   }).map((student) => student.studentLabel),
   ['Anonymous student 1']
 );
+assert.equal(
+  getAssignmentResultCompletedAtTimestamp('2026-01-04T10:00:00.000Z'),
+  new Date('2026-01-04T10:00:00.000Z').getTime()
+);
+assert.equal(
+  getAssignmentResultCompletedAtTimestamp('not-a-date'),
+  Number.NEGATIVE_INFINITY
+);
+assert.deepEqual(
+  sortAssignmentResultAttemptRowsByCompletedAt([
+    {
+      completedAt: 'not-a-date',
+      id: 'attempt-z',
+      studentName: 'Zed',
+    },
+    {
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-b',
+      studentName: 'Beta',
+    },
+    {
+      completedAt: '2026-01-04T10:00:00.000Z',
+      id: 'attempt-a',
+      studentName: 'Alpha',
+    },
+    {
+      completedAt: null,
+      id: 'attempt-null',
+      studentName: 'Null',
+    },
+  ]).map((attempt) => attempt.id),
+  ['attempt-a', 'attempt-b', 'attempt-null', 'attempt-z']
+);
+assert.equal(
+  compareAssignmentResultAttemptRowsByCompletedAt(
+    {
+      completedAt: '2026-01-04T10:00:00.000Z',
+      id: 'attempt-a',
+      studentName: 'Alpha',
+    },
+    {
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'attempt-b',
+      studentName: 'Beta',
+    }
+  ) < 0,
+  true
+);
+assert.deepEqual(
+  filterAssignmentResultCompletedAttemptRows({
+    attempts: [
+      {
+        completedAt: '2026-01-01T10:00:00.000Z',
+        id: 'attempt-old',
+        studentName: 'Old',
+      },
+      {
+        completedAt: '2026-01-05T10:00:00.000Z',
+        id: 'attempt-new',
+        studentName: 'New',
+      },
+      {
+        completedAt: '2026-01-06T10:00:00.000Z',
+        id: 'attempt-unscored',
+        studentName: 'Unscored',
+      },
+    ],
+    reviews: [
+      {
+        answers: [],
+        completedAt: '2026-01-05T10:00:00.000Z',
+        id: 'attempt-new',
+        maxScore: 1,
+        score: 1,
+        studentLabel: 'New',
+      },
+      {
+        answers: [],
+        completedAt: '2026-01-01T10:00:00.000Z',
+        id: 'attempt-old',
+        maxScore: 1,
+        score: 1,
+        studentLabel: 'Old',
+      },
+    ],
+  }).map((attempt) => attempt.id),
+  ['attempt-new', 'attempt-old']
+);
+const attemptReviewSortSamples = [
+  {
+    answers: [
+      { correct: false, submitted: true },
+      { correct: false, submitted: false },
+      { correct: true, submitted: true },
+    ],
+    completedAt: '2026-01-04T10:00:00.000Z',
+    id: 'review-b',
+    maxScore: 3,
+    score: 1,
+    studentLabel: 'Beta',
+  },
+  {
+    answers: [{ correct: true, submitted: true }],
+    completedAt: '2026-01-05T10:00:00.000Z',
+    id: 'review-a',
+    maxScore: 1,
+    score: 1,
+    studentLabel: 'Alpha',
+  },
+  {
+    answers: [{ correct: false, submitted: true }],
+    completedAt: '2026-01-04T10:00:00.000Z',
+    id: 'review-a',
+    maxScore: 1,
+    score: 0,
+    studentLabel: 'Alpha older',
+  },
+];
+assert.equal(
+  isAssignmentAttemptReviewNeeded(attemptReviewSortSamples[0]!),
+  true
+);
+assert.equal(
+  countAssignmentAttemptReviewNeededAnswers(attemptReviewSortSamples[0]!),
+  1
+);
+assert.deepEqual(
+  sortAssignmentAttemptReviewsByCompletedAt(attemptReviewSortSamples).map(
+    (attempt) => attempt.id
+  ),
+  ['review-a', 'review-a', 'review-b']
+);
+assert.equal(
+  compareAssignmentAttemptReviewsByCompletedAt(
+    attemptReviewSortSamples[2]!,
+    attemptReviewSortSamples[0]!
+  ) < 0,
+  true
+);
+assert.deepEqual(
+  filterAttemptReviews({
+    attempts: attemptReviewSortSamples,
+    filter: 'needs-review',
+    search: '',
+  }).map((attempt) => attempt.id),
+  ['review-a', 'review-b']
+);
+assert.deepEqual(
+  sortAssignmentResultAttemptReviewRows([
+    {
+      attempt: {
+        completedAt: '2026-01-01T10:00:00.000Z',
+        id: 'row-old',
+        studentName: 'Old',
+      },
+      review: undefined,
+      studentLabel: 'Old',
+    },
+    {
+      attempt: {
+        completedAt: '2026-01-05T10:00:00.000Z',
+        id: 'row-new',
+        studentName: 'New',
+      },
+      review: undefined,
+      studentLabel: 'New',
+    },
+  ]).map((row) => row.attempt.id),
+  ['row-new', 'row-old']
+);
 const assignmentResultViewModel = buildAssignmentResultViewModel({
   attemptReviewFilter: 'needs-review',
   attempts: [
@@ -30884,7 +31062,7 @@ assert.deepEqual(
     filter: 'needs-review',
     search: '',
   }).map((attempt) => attempt.id),
-  ['attempt-1', 'attempt-3']
+  ['attempt-3', 'attempt-1']
 );
 assert.deepEqual(
   filterAttemptReviews({
@@ -30920,7 +31098,7 @@ assert.deepEqual(
     filter: 'all',
     search: ' ａｌｉｃｅ ',
   }).map((attempt) => attempt.id),
-  ['attempt-1', 'attempt-2']
+  ['attempt-2', 'attempt-1']
 );
 
 const csvExportData = {

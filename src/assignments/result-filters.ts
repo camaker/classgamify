@@ -14,7 +14,10 @@ import {
   compareAssignmentStudentsByDisplayLabel,
   compareAssignmentStudentsByFollowUpPriority,
 } from '@/assignments/student-follow-up-priority';
-import { normalizeRuntimeDisplaySearchKey } from '@/assignments/runtime-display';
+import {
+  compareRuntimeDisplaySearchText,
+  normalizeRuntimeDisplaySearchKey,
+} from '@/assignments/runtime-display';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -108,7 +111,9 @@ export function filterAssignmentResultCompletedAttemptRows<
 }) {
   const completedAttemptIds = new Set(reviews.map((review) => review.id));
 
-  return attempts.filter((attempt) => completedAttemptIds.has(attempt.id));
+  return sortAssignmentResultAttemptRowsByCompletedAt(
+    attempts.filter((attempt) => completedAttemptIds.has(attempt.id))
+  );
 }
 
 export function filterAndSortStudentSummaries({
@@ -145,22 +150,24 @@ export function buildFilteredAttemptRows<
   const reviewById = new Map(reviews.map((item) => [item.id, item]));
   const fallbackIdentityResolver = createStudentIdentityResolver(attempts);
 
-  return attempts
-    .map((attempt) => {
-      const review = reviewById.get(attempt.id);
+  return sortAssignmentResultAttemptReviewRows(
+    attempts
+      .map((attempt) => {
+        const review = reviewById.get(attempt.id);
 
-      return {
-        attempt,
-        review,
-        studentLabel:
-          review?.studentLabel ??
-          fallbackIdentityResolver.resolve(attempt).label,
-      };
-    })
-    .filter((row) => {
-      if (!normalizedSearch) return true;
-      return matchesResultSearch(row.studentLabel, normalizedSearch);
-    });
+        return {
+          attempt,
+          review,
+          studentLabel:
+            review?.studentLabel ??
+            fallbackIdentityResolver.resolve(attempt).label,
+        };
+      })
+      .filter((row) => {
+        if (!normalizedSearch) return true;
+        return matchesResultSearch(row.studentLabel, normalizedSearch);
+      })
+  );
 }
 
 export function filterAttemptReviews({
@@ -174,18 +181,104 @@ export function filterAttemptReviews({
 }) {
   const normalizedSearch = normalizeResultSearch(search);
 
-  return attempts.filter((attempt) => {
-    const matchesStudent = normalizedSearch
-      ? matchesResultSearch(attempt.studentLabel, normalizedSearch)
-      : true;
-    if (!matchesStudent) return false;
+  return sortAssignmentAttemptReviewsByCompletedAt(
+    attempts.filter((attempt) => {
+      const matchesStudent = normalizedSearch
+        ? matchesResultSearch(attempt.studentLabel, normalizedSearch)
+        : true;
+      if (!matchesStudent) return false;
 
-    if (filter === 'needs-review') {
-      return attempt.answers.some(isAssignmentAttemptAnswerNeedsReview);
-    }
+      if (filter === 'needs-review') {
+        return isAssignmentAttemptReviewNeeded(attempt);
+      }
 
-    return true;
-  });
+      return true;
+    })
+  );
+}
+
+export function sortAssignmentResultAttemptReviewRows<
+  TAttempt extends AssignmentAttemptRowInput,
+>(rows: Array<AssignmentAttemptReviewRow<TAttempt>>) {
+  return [...rows].sort((left, right) =>
+    compareAssignmentResultAttemptRowsByCompletedAt(left.attempt, right.attempt)
+  );
+}
+
+export function sortAssignmentResultAttemptRowsByCompletedAt<
+  TAttempt extends AssignmentAttemptRowInput,
+>(attempts: TAttempt[]) {
+  return [...attempts].sort(compareAssignmentResultAttemptRowsByCompletedAt);
+}
+
+export function sortAssignmentAttemptReviewsByCompletedAt(
+  attempts: AssignmentAttemptReview[]
+) {
+  return [...attempts].sort(compareAssignmentAttemptReviewsByCompletedAt);
+}
+
+export function isAssignmentAttemptReviewNeeded(
+  attempt: AssignmentAttemptReview
+) {
+  return attempt.answers.some(isAssignmentAttemptAnswerNeedsReview);
+}
+
+export function countAssignmentAttemptReviewNeededAnswers(
+  attempt: AssignmentAttemptReview
+) {
+  return attempt.answers.filter(isAssignmentAttemptAnswerNeedsReview).length;
+}
+
+export function compareAssignmentAttemptReviewsByCompletedAt(
+  left: AssignmentAttemptReview,
+  right: AssignmentAttemptReview
+) {
+  const completedAtCompare = compareAssignmentResultCompletedAt(
+    left.completedAt,
+    right.completedAt
+  );
+  if (completedAtCompare !== 0) return completedAtCompare;
+
+  return compareRuntimeDisplaySearchText(left.id, right.id);
+}
+
+export function compareAssignmentResultAttemptRowsByCompletedAt(
+  left: AssignmentAttemptRowInput,
+  right: AssignmentAttemptRowInput
+) {
+  const completedAtCompare = compareAssignmentResultCompletedAt(
+    left.completedAt,
+    right.completedAt
+  );
+  if (completedAtCompare !== 0) return completedAtCompare;
+
+  return compareRuntimeDisplaySearchText(left.id, right.id);
+}
+
+export function getAssignmentResultCompletedAtTimestamp(
+  completedAt: AssignmentAttemptRowInput['completedAt']
+) {
+  const timestamp =
+    completedAt instanceof Date
+      ? completedAt.getTime()
+      : typeof completedAt === 'string'
+        ? Date.parse(completedAt)
+        : Number.NEGATIVE_INFINITY;
+
+  return Number.isFinite(timestamp) ? timestamp : Number.NEGATIVE_INFINITY;
+}
+
+function compareAssignmentResultCompletedAt(
+  left: AssignmentAttemptRowInput['completedAt'],
+  right: AssignmentAttemptRowInput['completedAt']
+) {
+  const leftTimestamp = getAssignmentResultCompletedAtTimestamp(left);
+  const rightTimestamp = getAssignmentResultCompletedAtTimestamp(right);
+  if (leftTimestamp !== rightTimestamp) {
+    return rightTimestamp - leftTimestamp;
+  }
+
+  return 0;
 }
 
 export function sortStudentSummaries(
