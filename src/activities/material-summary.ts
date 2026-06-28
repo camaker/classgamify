@@ -28,6 +28,30 @@ export type ActivitySourceMaterialReadinessCapability =
   | 'spreadsheet-import'
   | 'worksheet-extraction';
 
+export const ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES = [
+  'audio-extraction',
+  'worksheet-extraction',
+  'spreadsheet-import',
+] as const satisfies ActivitySourceMaterialReadinessCapability[];
+
+export type ActivitySourceMaterialCapabilityCounts = Record<
+  ActivitySourceMaterialReadinessCapability,
+  number
+>;
+
+export type ActivitySourceMaterialCapabilityCopyItem = {
+  description?: string;
+  label: string;
+};
+
+export type ActivitySourceMaterialCapabilityView<
+  TCopy extends
+    ActivitySourceMaterialCapabilityCopyItem = ActivitySourceMaterialCapabilityCopyItem,
+> = TCopy & {
+  capability: ActivitySourceMaterialReadinessCapability;
+  value: string;
+};
+
 export type ActivitySourceMaterialExtractionAction = {
   capability: ActivitySourceMaterialReadinessCapability;
   id: ActivitySourceMaterialExtractionActionId;
@@ -410,6 +434,92 @@ export function buildActivitySourceMaterialKindSummaries(
   });
 }
 
+export function createEmptyActivitySourceMaterialCapabilityCounts() {
+  return {
+    'audio-extraction': 0,
+    'spreadsheet-import': 0,
+    'worksheet-extraction': 0,
+  } satisfies ActivitySourceMaterialCapabilityCounts;
+}
+
+export function buildActivitySourceMaterialCapabilityCountsFromActions(
+  extractionActions: ReadonlyArray<{
+    capability: ActivitySourceMaterialReadinessCapability;
+    sourceCount: number;
+  }>
+) {
+  const counts = createEmptyActivitySourceMaterialCapabilityCounts();
+
+  for (const action of extractionActions) {
+    counts[action.capability] = normalizeActivitySourceMaterialCount(
+      counts[action.capability] + action.sourceCount
+    );
+  }
+
+  return counts;
+}
+
+export function buildActivitySourceMaterialCapabilityViews<
+  TCopy extends ActivitySourceMaterialCapabilityCopyItem,
+>({
+  capabilityCounts,
+  copy,
+  formatValue = formatActivitySourceMaterialCapabilityValue,
+  includeZero = false,
+}: {
+  capabilityCounts?: Partial<ActivitySourceMaterialCapabilityCounts>;
+  copy: Record<ActivitySourceMaterialReadinessCapability, TCopy>;
+  formatValue?: (
+    count: number,
+    capability: ActivitySourceMaterialReadinessCapability
+  ) => string | undefined;
+  includeZero?: boolean;
+}): Array<ActivitySourceMaterialCapabilityView<TCopy>> {
+  return ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES.flatMap(
+    (capability) => {
+      const count = capabilityCounts?.[capability] ?? 0;
+      const normalizedCount = normalizeActivitySourceMaterialCount(count);
+      const value = formatValue(count, capability);
+
+      if (!includeZero && normalizedCount === 0) return [];
+      if (!value) return [];
+
+      return [
+        {
+          ...copy[capability],
+          capability,
+          value,
+        },
+      ];
+    }
+  );
+}
+
+export function getActivitySourceMaterialReadinessCapabilityForKind(
+  kind: UserFileMaterialKind
+): ActivitySourceMaterialReadinessCapability | undefined {
+  switch (kind) {
+    case 'audio':
+      return 'audio-extraction';
+    case 'spreadsheet':
+      return 'spreadsheet-import';
+    case 'worksheet-document':
+    case 'worksheet-image':
+      return 'worksheet-extraction';
+    default:
+      return undefined;
+  }
+}
+
+export function getActivitySourceMaterialReadinessCapabilityForKindLabel(
+  kindLabel: string
+): ActivitySourceMaterialReadinessCapability | undefined {
+  const kind = getActivitySourceMaterialKindFromLabel(kindLabel);
+  return kind
+    ? getActivitySourceMaterialReadinessCapabilityForKind(kind)
+    : undefined;
+}
+
 function buildActivitySourceMaterialExtractionActions(
   byKind: Record<UserFileMaterialKind, number>
 ): ActivitySourceMaterialExtractionAction[] {
@@ -480,6 +590,10 @@ export function formatActivitySourceMaterialKindCounts(
     .join(m.activity_source_material_summary_list_separator());
 }
 
+function formatActivitySourceMaterialCapabilityValue(count: number) {
+  return String(normalizeActivitySourceMaterialCount(count));
+}
+
 function formatActivitySourceMaterialExtractionAction(
   id: ActivitySourceMaterialExtractionActionId
 ) {
@@ -517,6 +631,25 @@ function buildActivitySourceMaterialExtractionNextStep(
   }
 }
 
+function getActivitySourceMaterialKindFromLabel(
+  kindLabel: string
+): UserFileMaterialKind | undefined {
+  const normalizedKindLabel = normalizeOptionalRuntimeDisplayText(kindLabel);
+  if (!normalizedKindLabel) return undefined;
+
+  return USER_FILE_MATERIAL_KINDS.find((kind) =>
+    getActivitySourceMaterialKindLabels(kind).includes(normalizedKindLabel)
+  );
+}
+
+function getActivitySourceMaterialKindLabels(kind: UserFileMaterialKind) {
+  return [
+    formatUserFileMaterialKind(kind),
+    formatUserFileMaterialKind(kind, { locale: 'en' }),
+    formatUserFileMaterialKind(kind, { locale: 'zh' }),
+  ].map(normalizeOptionalRuntimeDisplayText);
+}
+
 function buildActivitySourceMaterialReadiness(
   byKind: Record<UserFileMaterialKind, number>
 ): ActivitySourceMaterialReadiness {
@@ -535,9 +668,18 @@ function buildActivitySourceMaterialReadiness(
   const hasWorksheet = worksheetDocumentCount > 0 || worksheetImageCount > 0;
   const capabilities: ActivitySourceMaterialReadinessCapability[] = [];
 
-  if (hasAudio) capabilities.push('audio-extraction');
-  if (hasSpreadsheet) capabilities.push('spreadsheet-import');
-  if (hasWorksheet) capabilities.push('worksheet-extraction');
+  if (hasAudio) {
+    addActivitySourceMaterialReadinessCapability(capabilities, 'audio');
+  }
+  if (hasSpreadsheet) {
+    addActivitySourceMaterialReadinessCapability(capabilities, 'spreadsheet');
+  }
+  if (hasWorksheet) {
+    addActivitySourceMaterialReadinessCapability(
+      capabilities,
+      'worksheet-document'
+    );
+  }
 
   return {
     capabilities,
@@ -550,6 +692,14 @@ function buildActivitySourceMaterialReadiness(
     hasSpreadsheet,
     hasWorksheet,
   };
+}
+
+function addActivitySourceMaterialReadinessCapability(
+  capabilities: ActivitySourceMaterialReadinessCapability[],
+  kind: UserFileMaterialKind
+) {
+  const capability = getActivitySourceMaterialReadinessCapabilityForKind(kind);
+  if (capability) capabilities.push(capability);
 }
 
 export function normalizeActivitySourceMaterialCount(count: number) {

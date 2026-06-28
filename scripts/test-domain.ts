@@ -183,15 +183,21 @@ import {
   normalizeActivityDraftMetaCount,
 } from '@/activities/draft-meta';
 import {
+  ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES,
   addActivitySourceMaterialPickerItem,
+  buildActivitySourceMaterialCapabilityCountsFromActions,
+  buildActivitySourceMaterialCapabilityViews,
   buildActivitySourceMaterialKindSummaries,
   buildActivitySourceMaterialPickerView,
   buildActivitySourceMaterialSummaryView,
+  createEmptyActivitySourceMaterialCapabilityCounts,
   createEmptyActivitySourceMaterialKindCounts,
   formatActivitySourceMaterialCountLabel,
   formatActivitySourceMaterialKindCounts,
   formatActivitySourceMaterialReferenceMeta,
   formatActivitySourceMaterialSummaryAriaLabel,
+  getActivitySourceMaterialReadinessCapabilityForKind,
+  getActivitySourceMaterialReadinessCapabilityForKindLabel,
   normalizeActivitySourceMaterialCount,
   removeActivitySourceMaterialPickerItem,
   summarizeActivitySourceMaterials,
@@ -2702,7 +2708,12 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /buildActivityEditorAiDraftSourceCapabilityViews[\s\S]*activity_form_ai_source_capability_audio_description[\s\S]*activity_form_ai_source_capability_audio_label[\s\S]*activity_form_ai_source_capability_worksheet_description[\s\S]*activity_form_ai_source_capability_worksheet_label[\s\S]*activity_form_ai_source_capability_spreadsheet_description[\s\S]*activity_form_ai_source_capability_spreadsheet_label/,
+  /buildActivityEditorAiDraftSourceCapabilityViews[\s\S]*buildActivitySourceMaterialCapabilityViews/,
+  'Activity editor AI draft source capability views should use the shared source-material capability helper.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityEditorAiDraftSourceCapabilityViews[\s\S]*activity_form_ai_source_capability_audio_description[\s\S]*activity_form_ai_source_capability_audio_label[\s\S]*activity_form_ai_source_capability_spreadsheet_description[\s\S]*activity_form_ai_source_capability_spreadsheet_label[\s\S]*activity_form_ai_source_capability_worksheet_description[\s\S]*activity_form_ai_source_capability_worksheet_label/,
   'Activity editor AI draft source capability copy should come from the activity-domain view model.'
 );
 assert.match(
@@ -4879,7 +4890,7 @@ assert.match(
 );
 assert.doesNotMatch(
   activityMaterialSummarySource,
-  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)|part\?\.trim\(\)|Audio extraction|Worksheet extraction|Spreadsheet import/,
+  /function toActivitySourceMaterialExtractionActionView[\s\S]*summaryText:\s*formatActivitySourceMaterialMetric|join\(', '\)|part\?\.trim\(\)|return 'Audio extraction'|return 'Worksheet extraction'|return 'Spreadsheet import'/,
   'Activity source-material extraction summaries should not only show raw source counts or hard-code list separators.'
 );
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
@@ -5326,6 +5337,115 @@ assert.deepEqual(createEmptyActivitySourceMaterialKindCounts(), {
   'worksheet-document': 0,
   'worksheet-image': 0,
 });
+assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES, [
+  'audio-extraction',
+  'worksheet-extraction',
+  'spreadsheet-import',
+]);
+assert.deepEqual(createEmptyActivitySourceMaterialCapabilityCounts(), {
+  'audio-extraction': 0,
+  'spreadsheet-import': 0,
+  'worksheet-extraction': 0,
+});
+assert.deepEqual(
+  buildActivitySourceMaterialCapabilityCountsFromActions([
+    {
+      capability: 'worksheet-extraction',
+      sourceCount: 2.8,
+    },
+    {
+      capability: 'audio-extraction',
+      sourceCount: Number.NaN,
+    },
+    {
+      capability: 'spreadsheet-import',
+      sourceCount: -1,
+    },
+  ]),
+  {
+    'audio-extraction': 0,
+    'spreadsheet-import': 0,
+    'worksheet-extraction': 2,
+  }
+);
+assert.deepEqual(
+  buildActivitySourceMaterialCapabilityViews({
+    capabilityCounts: {
+      'audio-extraction': 1,
+      'spreadsheet-import': 1,
+      'worksheet-extraction': 0,
+    },
+    copy: {
+      'audio-extraction': { label: 'Audio copy' },
+      'spreadsheet-import': { label: 'Sheet copy' },
+      'worksheet-extraction': { label: 'Worksheet copy' },
+    },
+  }),
+  [
+    { capability: 'audio-extraction', label: 'Audio copy', value: '1' },
+    { capability: 'spreadsheet-import', label: 'Sheet copy', value: '1' },
+  ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialCapabilityViews({
+    capabilityCounts: {
+      'audio-extraction': Number.NaN,
+      'spreadsheet-import': -1,
+      'worksheet-extraction': 2.8,
+    },
+    copy: {
+      'audio-extraction': { label: 'audio-ready' },
+      'spreadsheet-import': { label: 'spreadsheet-ready' },
+      'worksheet-extraction': { label: 'worksheet-ready' },
+    },
+    formatValue: (count) =>
+      Number.isFinite(count) ? String(Math.floor(Math.max(0, count))) : '-',
+    includeZero: true,
+  }),
+  [
+    { capability: 'audio-extraction', label: 'audio-ready', value: '-' },
+    {
+      capability: 'worksheet-extraction',
+      label: 'worksheet-ready',
+      value: '2',
+    },
+    {
+      capability: 'spreadsheet-import',
+      label: 'spreadsheet-ready',
+      value: '0',
+    },
+  ]
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKind('audio'),
+  'audio-extraction'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKind('spreadsheet'),
+  'spreadsheet-import'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKind('worksheet-image'),
+  'worksheet-extraction'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKind('video'),
+  undefined
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKindLabel(
+    'Ｗｏｒｋｓｈｅｅｔ　ｄｏｃｕｍｅｎｔ'
+  ),
+  'worksheet-extraction'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKindLabel('练习纸图片'),
+  'worksheet-extraction'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKindLabel('表格'),
+  'spreadsheet-import'
+);
 assert.deepEqual(
   buildActivitySourceMaterialKindSummaries({
     ...createEmptyActivitySourceMaterialKindCounts(),
@@ -15972,8 +16092,18 @@ assert.match(
 );
 assert.match(
   activityLibrarySummaryDomainSource,
-  /export function createEmptySourceMaterialCapabilityCounts/,
-  'Activity library capability count defaults should be exported as a reusable domain helper.'
+  /createEmptySourceMaterialCapabilityCounts =[\s\S]*createEmptyActivitySourceMaterialCapabilityCounts/,
+  'Activity library capability count defaults should reuse the activity source-material domain helper.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildActivityLibrarySourceCapabilityMetrics[\s\S]*buildActivitySourceMaterialCapabilityViews[\s\S]*formatValue: formatActivityLibraryMetricNumber[\s\S]*includeZero: true/,
+  'Activity library capability metrics should reuse shared source-material capability view building.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildActivityLibrarySourceCapabilityMetrics[\s\S]*activity_library_source_capability_audio[\s\S]*activity_library_source_capability_spreadsheet[\s\S]*activity_library_source_capability_worksheet/,
+  'Activity library capability metrics should reuse shared source-material capability view building.'
 );
 assert.doesNotMatch(
   activityLibrarySummaryDomainSource,
@@ -15989,6 +16119,21 @@ assert.match(
   activityMaterialSummarySource,
   /kindSummaries: buildActivitySourceMaterialKindSummaries\(byKind\)/,
   'Activity source material summaries should delegate kind summary display rows to the domain helper.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES[\s\S]*audio-extraction[\s\S]*worksheet-extraction[\s\S]*spreadsheet-import/,
+  'Activity source material capability display order should live in the source-material domain.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialCapabilityViews[\s\S]*ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES\.flatMap[\s\S]*includeZero[\s\S]*copy\[capability\]/,
+  'Activity source material capability views should be built by one shared domain helper.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /getActivitySourceMaterialReadinessCapabilityForKindLabel[\s\S]*getActivitySourceMaterialKindFromLabel[\s\S]*getActivitySourceMaterialReadinessCapabilityForKind/,
+  'Activity source material capability lookup should map safe localized kind labels through the source-material domain.'
 );
 assert.doesNotMatch(
   activityMaterialSummarySource,
@@ -17492,18 +17637,23 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
-  /buildActivityDraftMetaSourceMaterialCapabilityViews[\s\S]*activity_draft_meta_source_material_capability_audio_description[\s\S]*activity_draft_meta_source_material_capability_audio_label[\s\S]*activity_draft_meta_source_material_capability_worksheet_description[\s\S]*activity_draft_meta_source_material_capability_worksheet_label[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_description[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_label/,
+  /buildActivityDraftMetaSourceMaterialCapabilityViews[\s\S]*buildActivitySourceMaterialCapabilityViews/,
+  'AI draft meta should build capability rows through the shared source-material capability helper.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftMetaSourceMaterialCapabilityViews[\s\S]*activity_draft_meta_source_material_capability_audio_description[\s\S]*activity_draft_meta_source_material_capability_audio_label[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_description[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_label[\s\S]*activity_draft_meta_source_material_capability_worksheet_description[\s\S]*activity_draft_meta_source_material_capability_worksheet_label/,
   'AI draft meta should own source-material capability labels and descriptions.'
 );
 assert.match(
   activityDraftMetaSource,
-  /getActivityDraftMetaSourceMaterialKind[\s\S]*USER_FILE_MATERIAL_KINDS\.find[\s\S]*getActivityDraftMetaSourceMaterialKindLabels[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'en' \}\)[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'zh' \}\)/,
-  'AI draft meta should map localized safe material kind labels back to known source-material capabilities.'
+  /buildActivityDraftMetaSourceMaterialCapabilityCounts[\s\S]*createEmptyActivitySourceMaterialCapabilityCounts[\s\S]*getActivitySourceMaterialReadinessCapabilityForKindLabel\(/,
+  'AI draft meta should map safe material kind labels through the source-material capability helper.'
 );
-assert.match(
+assert.doesNotMatch(
   activityDraftMetaSource,
-  /getActivityDraftMetaSourceMaterialCapability[\s\S]*case 'audio'[\s\S]*audio-extraction[\s\S]*case 'spreadsheet'[\s\S]*spreadsheet-import[\s\S]*case 'worksheet-document'[\s\S]*case 'worksheet-image'[\s\S]*worksheet-extraction/,
-  'AI draft meta should derive source-material capability counts from known safe material kinds.'
+  /getActivityDraftMetaSourceMaterialCapability|getActivityDraftMetaSourceMaterialKind|USER_FILE_MATERIAL_KINDS\.find|formatUserFileMaterialKind\(kind, \{ locale: 'en' \}\)/,
+  'AI draft meta should not duplicate source-material kind-label capability mapping.'
 );
 assert.match(
   activityDraftSourceSource,

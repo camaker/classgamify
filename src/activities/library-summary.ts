@@ -9,6 +9,9 @@ import {
   type ActivityTemplateType,
 } from '@/activities/types';
 import {
+  buildActivitySourceMaterialCapabilityViews,
+  createEmptyActivitySourceMaterialCapabilityCounts,
+  type ActivitySourceMaterialCapabilityCounts,
   type ActivitySourceMaterialReadinessCapability,
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
@@ -42,10 +45,7 @@ export type ActivityLibrarySummary = {
   archivedActivities: number;
   draftActivities: number;
   extractableSourceActivities: number;
-  sourceMaterialCapabilityCounts: Record<
-    ActivitySourceMaterialReadinessCapability,
-    number
-  >;
+  sourceMaterialCapabilityCounts: ActivitySourceMaterialCapabilityCounts;
   remixReadyActivities: number;
   templateCoverage: number;
   templateCoverageTotal: number;
@@ -261,31 +261,24 @@ export function buildActivityLibrarySourceCapabilityMetrics(
 ): ActivityLibrarySourceCapabilityMetric[] {
   const capabilityCounts =
     summary?.sourceMaterialCapabilityCounts ??
-    createEmptySourceMaterialCapabilityCounts();
+    createEmptyActivitySourceMaterialCapabilityCounts();
 
-  return [
-    {
-      capability: 'audio-extraction',
-      label: m.activity_library_source_capability_audio(),
-      value: formatActivityLibraryMetricNumber(
-        capabilityCounts['audio-extraction']
-      ),
+  return buildActivitySourceMaterialCapabilityViews({
+    capabilityCounts,
+    copy: {
+      'audio-extraction': {
+        label: m.activity_library_source_capability_audio(),
+      },
+      'spreadsheet-import': {
+        label: m.activity_library_source_capability_spreadsheet(),
+      },
+      'worksheet-extraction': {
+        label: m.activity_library_source_capability_worksheet(),
+      },
     },
-    {
-      capability: 'worksheet-extraction',
-      label: m.activity_library_source_capability_worksheet(),
-      value: formatActivityLibraryMetricNumber(
-        capabilityCounts['worksheet-extraction']
-      ),
-    },
-    {
-      capability: 'spreadsheet-import',
-      label: m.activity_library_source_capability_spreadsheet(),
-      value: formatActivityLibraryMetricNumber(
-        capabilityCounts['spreadsheet-import']
-      ),
-    },
-  ];
+    formatValue: formatActivityLibraryMetricNumber,
+    includeZero: true,
+  });
 }
 
 function formatActivityLibrarySourceExtractionDescription(
@@ -333,7 +326,8 @@ export function buildEmptyActivityLibrarySummary(
     archivedActivities: 0,
     draftActivities: 0,
     extractableSourceActivities: 0,
-    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
+    sourceMaterialCapabilityCounts:
+      createEmptyActivitySourceMaterialCapabilityCounts(),
     remixReadyActivities: 0,
     templateCoverage: 0,
     templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
@@ -348,10 +342,5 @@ export function normalizeActivityLibraryMetricNumber(value: number) {
   return Math.floor(Math.max(0, value));
 }
 
-export function createEmptySourceMaterialCapabilityCounts() {
-  return {
-    'audio-extraction': 0,
-    'spreadsheet-import': 0,
-    'worksheet-extraction': 0,
-  } satisfies Record<ActivitySourceMaterialReadinessCapability, number>;
-}
+export const createEmptySourceMaterialCapabilityCounts =
+  createEmptyActivitySourceMaterialCapabilityCounts;

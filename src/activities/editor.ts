@@ -45,8 +45,11 @@ import {
 } from '@/activities/editor-serialization';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import {
+  buildActivitySourceMaterialCapabilityCountsFromActions,
+  buildActivitySourceMaterialCapabilityViews,
   buildActivitySourceMaterialSummaryView,
-  type ActivitySourceMaterialReadinessCapability,
+  type ActivitySourceMaterialCapabilityCounts,
+  type ActivitySourceMaterialCapabilityView,
 } from '@/activities/material-summary';
 import {
   buildActivityTemplateScaffoldInput,
@@ -125,19 +128,15 @@ type ActivityEditorDraftSourceState = {
   isDefaultSource: boolean;
   isTooLong: boolean;
   safeSourceMaterialNoteCount: number;
-  sourceMaterialCapabilityCounts: Record<
-    ActivitySourceMaterialReadinessCapability,
-    number
-  >;
+  sourceMaterialCapabilityCounts: ActivitySourceMaterialCapabilityCounts;
   sourceLength: number;
 };
 
-type ActivityEditorAiDraftSourceCapabilityView = {
-  capability: ActivitySourceMaterialReadinessCapability;
-  description: string;
-  label: string;
-  value: string;
-};
+type ActivityEditorAiDraftSourceCapabilityView =
+  ActivitySourceMaterialCapabilityView<{
+    description: string;
+    label: string;
+  }>;
 
 type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
   typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText
@@ -400,7 +399,7 @@ export function buildActivityEditorDraftSourceState({
     isTooLong: normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
     safeSourceMaterialNoteCount,
     sourceMaterialCapabilityCounts:
-      buildActivityEditorSourceMaterialCapabilityCounts(
+      buildActivitySourceMaterialCapabilityCountsFromActions(
         sourceMaterialSummaryView.extractionActions
       ),
     sourceLength: normalizedSourceText.length,
@@ -464,75 +463,28 @@ export function buildActivityEditorAiDraftPanelView({
   };
 }
 
-function buildActivityEditorSourceMaterialCapabilityCounts(
-  extractionActions: Array<{
-    capability: ActivitySourceMaterialReadinessCapability;
-    sourceCount: number;
-  }>
-) {
-  const counts = {
-    'audio-extraction': 0,
-    'spreadsheet-import': 0,
-    'worksheet-extraction': 0,
-  } satisfies Record<ActivitySourceMaterialReadinessCapability, number>;
-
-  for (const action of extractionActions) {
-    counts[action.capability] += action.sourceCount;
-  }
-
-  return {
-    'audio-extraction': Math.max(0, Math.floor(counts['audio-extraction'])),
-    'spreadsheet-import': Math.max(0, Math.floor(counts['spreadsheet-import'])),
-    'worksheet-extraction': Math.max(
-      0,
-      Math.floor(counts['worksheet-extraction'])
-    ),
-  };
-}
-
 function buildActivityEditorAiDraftSourceCapabilityViews(
-  capabilityCounts: Record<ActivitySourceMaterialReadinessCapability, number>
+  capabilityCounts: ActivitySourceMaterialCapabilityCounts
 ): ActivityEditorAiDraftSourceCapabilityView[] {
-  return [
-    buildActivityEditorAiDraftSourceCapabilityView({
-      capability: 'audio-extraction',
-      count: capabilityCounts['audio-extraction'],
-      description: m.activity_form_ai_source_capability_audio_description(),
-      label: m.activity_form_ai_source_capability_audio_label(),
-    }),
-    buildActivityEditorAiDraftSourceCapabilityView({
-      capability: 'worksheet-extraction',
-      count: capabilityCounts['worksheet-extraction'],
-      description: m.activity_form_ai_source_capability_worksheet_description(),
-      label: m.activity_form_ai_source_capability_worksheet_label(),
-    }),
-    buildActivityEditorAiDraftSourceCapabilityView({
-      capability: 'spreadsheet-import',
-      count: capabilityCounts['spreadsheet-import'],
-      description:
-        m.activity_form_ai_source_capability_spreadsheet_description(),
-      label: m.activity_form_ai_source_capability_spreadsheet_label(),
-    }),
-  ].filter((view) => view.value !== '0');
-}
-
-function buildActivityEditorAiDraftSourceCapabilityView({
-  capability,
-  count,
-  description,
-  label,
-}: {
-  capability: ActivitySourceMaterialReadinessCapability;
-  count: number;
-  description: string;
-  label: string;
-}): ActivityEditorAiDraftSourceCapabilityView {
-  return {
-    capability,
-    description,
-    label,
-    value: String(Math.max(0, Math.floor(count))),
-  };
+  return buildActivitySourceMaterialCapabilityViews({
+    capabilityCounts,
+    copy: {
+      'audio-extraction': {
+        description: m.activity_form_ai_source_capability_audio_description(),
+        label: m.activity_form_ai_source_capability_audio_label(),
+      },
+      'spreadsheet-import': {
+        description:
+          m.activity_form_ai_source_capability_spreadsheet_description(),
+        label: m.activity_form_ai_source_capability_spreadsheet_label(),
+      },
+      'worksheet-extraction': {
+        description:
+          m.activity_form_ai_source_capability_worksheet_description(),
+        label: m.activity_form_ai_source_capability_worksheet_label(),
+      },
+    },
+  });
 }
 
 function buildActivityEditorAiDraftSourceReadinessView(

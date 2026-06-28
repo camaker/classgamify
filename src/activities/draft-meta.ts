@@ -17,7 +17,12 @@ import {
   normalizeActivitySourceMaterialDraftNoteView,
   type ActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
-import type { ActivitySourceMaterialReadinessCapability } from '@/activities/material-summary';
+import {
+  buildActivitySourceMaterialCapabilityViews,
+  createEmptyActivitySourceMaterialCapabilityCounts,
+  getActivitySourceMaterialReadinessCapabilityForKindLabel,
+  type ActivitySourceMaterialCapabilityView,
+} from '@/activities/material-summary';
 import type {
   TemplateRemixLockedOption,
   TemplateRemixPlan,
@@ -34,11 +39,6 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/activities/runtime-display';
 import { m } from '@/locale/paraglide/messages';
-import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
-import {
-  USER_FILE_MATERIAL_KINDS,
-  type UserFileMaterialKind,
-} from '@/storage/file-materials';
 
 export type ActivityDraftMeta = {
   coverage: {
@@ -140,12 +140,11 @@ type ActivityDraftMetaSummarySourceMaterialNoteView =
     displayText: string;
   };
 
-type ActivityDraftMetaSummarySourceMaterialCapabilityView = {
-  capability: ActivitySourceMaterialReadinessCapability;
-  description: string;
-  label: string;
-  value: string;
-};
+type ActivityDraftMetaSummarySourceMaterialCapabilityView =
+  ActivitySourceMaterialCapabilityView<{
+    description: string;
+    label: string;
+  }>;
 
 type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
@@ -566,112 +565,48 @@ function buildActivityDraftMetaSourceMaterialCapabilityViews(
   const capabilityCounts =
     buildActivityDraftMetaSourceMaterialCapabilityCounts(noteViews);
 
-  return [
-    buildActivityDraftMetaSourceMaterialCapabilityView({
-      capability: 'audio-extraction',
-      count: capabilityCounts['audio-extraction'],
-      description:
-        m.activity_draft_meta_source_material_capability_audio_description(),
-      label: m.activity_draft_meta_source_material_capability_audio_label(),
-    }),
-    buildActivityDraftMetaSourceMaterialCapabilityView({
-      capability: 'worksheet-extraction',
-      count: capabilityCounts['worksheet-extraction'],
-      description:
-        m.activity_draft_meta_source_material_capability_worksheet_description(),
-      label: m.activity_draft_meta_source_material_capability_worksheet_label(),
-    }),
-    buildActivityDraftMetaSourceMaterialCapabilityView({
-      capability: 'spreadsheet-import',
-      count: capabilityCounts['spreadsheet-import'],
-      description:
-        m.activity_draft_meta_source_material_capability_spreadsheet_description(),
-      label:
-        m.activity_draft_meta_source_material_capability_spreadsheet_label(),
-    }),
-  ].filter((view) => view.value !== '0');
-}
-
-function buildActivityDraftMetaSourceMaterialCapabilityView({
-  capability,
-  count,
-  description,
-  label,
-}: {
-  capability: ActivitySourceMaterialReadinessCapability;
-  count: number;
-  description: string;
-  label: string;
-}): ActivityDraftMetaSummarySourceMaterialCapabilityView {
-  return {
-    capability,
-    description,
-    label,
-    value: String(normalizeActivityDraftMetaCount(count)),
-  };
+  return buildActivitySourceMaterialCapabilityViews({
+    capabilityCounts,
+    copy: {
+      'audio-extraction': {
+        description:
+          m.activity_draft_meta_source_material_capability_audio_description(),
+        label: m.activity_draft_meta_source_material_capability_audio_label(),
+      },
+      'spreadsheet-import': {
+        description:
+          m.activity_draft_meta_source_material_capability_spreadsheet_description(),
+        label:
+          m.activity_draft_meta_source_material_capability_spreadsheet_label(),
+      },
+      'worksheet-extraction': {
+        description:
+          m.activity_draft_meta_source_material_capability_worksheet_description(),
+        label:
+          m.activity_draft_meta_source_material_capability_worksheet_label(),
+      },
+    },
+  });
 }
 
 function buildActivityDraftMetaSourceMaterialCapabilityCounts(
   noteViews: ActivityDraftMetaSummarySourceMaterialNoteView[]
 ) {
-  const counts = {
-    'audio-extraction': 0,
-    'spreadsheet-import': 0,
-    'worksheet-extraction': 0,
-  } satisfies Record<ActivitySourceMaterialReadinessCapability, number>;
+  const counts = createEmptyActivitySourceMaterialCapabilityCounts();
 
   for (const noteView of noteViews) {
-    const materialKind = getActivityDraftMetaSourceMaterialKind(
+    const capability = getActivitySourceMaterialReadinessCapabilityForKindLabel(
       noteView.kindLabel
     );
-    const capability =
-      materialKind &&
-      getActivityDraftMetaSourceMaterialCapability(materialKind);
 
     if (!capability) continue;
 
-    counts[capability] += 1;
+    counts[capability] = normalizeActivityDraftMetaCount(
+      counts[capability] + 1
+    );
   }
 
   return counts;
-}
-
-function getActivityDraftMetaSourceMaterialCapability(
-  kind: UserFileMaterialKind
-): ActivitySourceMaterialReadinessCapability | undefined {
-  switch (kind) {
-    case 'audio':
-      return 'audio-extraction';
-    case 'spreadsheet':
-      return 'spreadsheet-import';
-    case 'worksheet-document':
-    case 'worksheet-image':
-      return 'worksheet-extraction';
-    default:
-      return undefined;
-  }
-}
-
-function getActivityDraftMetaSourceMaterialKind(
-  kindLabel: string
-): UserFileMaterialKind | undefined {
-  const normalizedKindLabel = normalizeRuntimeDisplayText(kindLabel);
-
-  return USER_FILE_MATERIAL_KINDS.find((kind) =>
-    getActivityDraftMetaSourceMaterialKindLabels(kind).includes(
-      normalizedKindLabel
-    )
-  );
-}
-
-function getActivityDraftMetaSourceMaterialKindLabels(
-  kind: UserFileMaterialKind
-) {
-  return [
-    formatUserFileMaterialKind(kind),
-    formatUserFileMaterialKind(kind, { locale: 'en' }),
-    formatUserFileMaterialKind(kind, { locale: 'zh' }),
-  ].map(normalizeRuntimeDisplayText);
 }
 
 function normalizeActivityDraftSourceMaterialNoteViews(
