@@ -776,6 +776,7 @@ import {
   getAttemptSubmitDecision,
   getStudentRunnerCopy,
   isStudentAnswerFilled,
+  normalizeAttemptUnansweredItemCount,
   normalizeStudentAnswersForRuntimeItems,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
@@ -5732,6 +5733,31 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /export function normalizeAttemptUnansweredItemCount[\s\S]*normalizeRuntimeDisplayCount\(completionSummary\.unansweredItemCount\)/,
+  'Student submission should expose one normalized unanswered-item count helper.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /buildAttemptCompletionCopy[\s\S]*normalizeAttemptUnansweredItemCount\(completionSummary\)/,
+  'Student completion copy should use the shared unanswered-item count helper.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /getAttemptSubmitDecision[\s\S]*normalizeAttemptUnansweredItemCount\(completionSummary\)/,
+  'Student submit decisions should use the shared unanswered-item count helper.'
+);
+const buildAttemptCompletionCopySource = getSourceSlice(
+  studentRunnerSubmissionSource,
+  'export function buildAttemptCompletionCopy',
+  'function formatStudentAttemptUnansweredLabel'
+);
+const getAttemptSubmitDecisionSource = getSourceSlice(
+  studentRunnerSubmissionSource,
+  'export function getAttemptSubmitDecision',
+  'export function normalizeAttemptUnansweredItemCount'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /normalizeAssignmentRemainingAttempts\(remainingAttempts\)/,
   'Student attempt usage labels should normalize remaining attempts through the assignment attempt-limit domain.'
 );
@@ -5744,6 +5770,16 @@ assert.doesNotMatch(
   studentRunnerSubmissionSource,
   /function normalizeStudentRemainingAttemptCount|Number\.isFinite\(remainingAttempts\)/,
   'Student submission should not keep local remaining-attempt normalization logic.'
+);
+assert.doesNotMatch(
+  buildAttemptCompletionCopySource,
+  /normalizeRuntimeDisplayCount\(\s*completionSummary\.unansweredItemCount/,
+  'Student completion copy should not normalize raw unanswered-item counts locally.'
+);
+assert.doesNotMatch(
+  getAttemptSubmitDecisionSource,
+  /completionSummary\.unansweredItemCount > 0|unansweredItemCount: completionSummary\.unansweredItemCount/,
+  'Student submit decisions should not branch on raw unanswered-item counts.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -7816,6 +7852,47 @@ assert.deepEqual(
       answeredItemCount: 3,
       itemCount: 3,
       unansweredItemCount: 0,
+    },
+    confirmIncompleteSubmit: false,
+  }),
+  {
+    reason: 'complete',
+    type: 'submit',
+  }
+);
+assert.equal(
+  normalizeAttemptUnansweredItemCount({ unansweredItemCount: 2.9 }),
+  2
+);
+assert.equal(
+  normalizeAttemptUnansweredItemCount({ unansweredItemCount: -1 }),
+  0
+);
+assert.equal(
+  normalizeAttemptUnansweredItemCount({ unansweredItemCount: Number.NaN }),
+  0
+);
+assert.deepEqual(
+  getAttemptSubmitDecision({
+    completionSummary: {
+      answeredItemCount: 0,
+      itemCount: 3,
+      unansweredItemCount: 2.9,
+    },
+    confirmIncompleteSubmit: false,
+  }),
+  {
+    reason: 'unanswered-items',
+    type: 'confirm-incomplete',
+    unansweredItemCount: 2,
+  }
+);
+assert.deepEqual(
+  getAttemptSubmitDecision({
+    completionSummary: {
+      answeredItemCount: 0,
+      itemCount: 3,
+      unansweredItemCount: Number.NaN,
     },
     confirmIncompleteSubmit: false,
   }),

@@ -675,9 +675,8 @@ export function buildAttemptCompletionCopy({
   confirmIncompleteSubmit: boolean;
   progressVerb?: string;
 }): AttemptCompletionCopy {
-  const unansweredItemCount = normalizeRuntimeDisplayCount(
-    completionSummary.unansweredItemCount
-  );
+  const unansweredItemCount =
+    normalizeAttemptUnansweredItemCount(completionSummary);
 
   return {
     confirmIncompleteSubmit:
@@ -955,21 +954,27 @@ export function getAttemptSubmitDecision({
   confirmIncompleteSubmit: boolean;
   completionSummary: AttemptCompletionSummary;
 }): AttemptSubmitDecision {
-  if (completionSummary.unansweredItemCount > 0 && !confirmIncompleteSubmit) {
+  const unansweredItemCount =
+    normalizeAttemptUnansweredItemCount(completionSummary);
+
+  if (unansweredItemCount > 0 && !confirmIncompleteSubmit) {
     return {
       reason: 'unanswered-items',
       type: 'confirm-incomplete',
-      unansweredItemCount: completionSummary.unansweredItemCount,
+      unansweredItemCount,
     };
   }
 
   return {
-    reason:
-      completionSummary.unansweredItemCount > 0
-        ? 'confirmed-incomplete'
-        : 'complete',
+    reason: unansweredItemCount > 0 ? 'confirmed-incomplete' : 'complete',
     type: 'submit',
   };
+}
+
+export function normalizeAttemptUnansweredItemCount(
+  completionSummary: Pick<AttemptCompletionSummary, 'unansweredItemCount'>
+) {
+  return normalizeRuntimeDisplayCount(completionSummary.unansweredItemCount);
 }
 
 export function isStudentAnswerFilled(answer: string | undefined) {
