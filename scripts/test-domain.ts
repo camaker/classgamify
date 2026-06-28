@@ -2307,6 +2307,10 @@ const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
 );
+const activityAiDraftPanelSource = readFileSync(
+  'src/components/activities/activity-ai-draft-panel.tsx',
+  'utf8'
+);
 const activityDraftMetaSummarySource = readFileSync(
   'src/components/activities/activity-draft-meta-summary.tsx',
   'utf8'
@@ -2337,9 +2341,9 @@ assert.doesNotMatch(
   'Activity editor should not hand-compose editor text list separators locally.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityAiDraftPanelSource,
   /ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS/,
-  'Activity editor AI draft item-count options should come from the AI draft domain contract.'
+  'Activity AI draft panel item-count options should come from the AI draft domain contract.'
 );
 assert.match(
   activityEditorFormSource,
@@ -2368,6 +2372,11 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
+  /ActivityAiDraftPanel[\s\S]*draftResult=\{draftResult\}[\s\S]*panelView=\{aiDraftPanelView\}/,
+  'Activity editor form should delegate AI draft panel and result rendering.'
+);
+assert.match(
+  activityEditorFormSource,
   /buildActivityEditorTemplateScaffoldApplication/,
   'Activity editor form should apply template scaffolds through the activity-domain helper.'
 );
@@ -2377,9 +2386,24 @@ assert.match(
   'Activity editor form should consume the activity-domain save gate.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityAiDraftPanelSource,
   /ActivityDraftMetaSummary[\s\S]*result=\{draftResult\}/,
-  'Activity editor form should delegate AI draft review summary rendering.'
+  'Activity AI draft panel should delegate AI draft review summary rendering.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceControls[\s\S]*panelView\.badgeLabel[\s\S]*panelView\.reviewNote[\s\S]*panelView\.sourceTextLabel[\s\S]*panelView\.canSyncDraftSourceMaterials[\s\S]*panelView\.sourcePlaceholder/,
+  'Activity AI draft source controls should render prepared labels and sync gate state.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftItemCountSelect[\s\S]*panelView\.itemCountLabel[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS\.map/,
+  'Activity AI draft item-count select should render prepared label and shared item-count options.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftGenerateButton[\s\S]*panelView\.canGenerateDraft[\s\S]*panelView\.generateButtonLabel/,
+  'Activity AI draft generate button should render prepared generation gate and label.'
 );
 assert.match(
   activityEditorFormSource,
@@ -2415,6 +2439,11 @@ assert.match(
   activityEditorFormSource,
   /function ActivityTemplateScaffoldReadyBadge[\s\S]*option\.shortName/,
   'Activity editor scaffold ready badge should render prepared ready-template labels.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /id="activity-ai-source"|id="activity-ai-item-count"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|syncMaterialsLabel|generateButtonLabel)/,
+  'Activity editor form should not hand-render low-level AI draft controls.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,

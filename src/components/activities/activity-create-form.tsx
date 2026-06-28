@@ -13,12 +13,11 @@ import {
   getActivityEditorDefaultInput,
 } from '@/activities/editor';
 import {
-  ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildGenerateActivityDraftInputFromEditor,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
-import { ActivityDraftMetaSummary } from '@/components/activities/activity-draft-meta-summary';
+import { ActivityAiDraftPanel } from '@/components/activities/activity-ai-draft-panel';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
 import { ActivityTemplateReadinessPanel } from '@/components/activities/activity-template-readiness-panel';
 import {
@@ -65,7 +64,6 @@ import {
   IconDeviceFloppy,
   IconLoader2,
   IconLogin2,
-  IconPaperclip,
   IconSparkles,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -188,7 +186,7 @@ export function ActivityCreateForm({
     toast.success(scaffoldApplication.successMessage);
   }
 
-  function useAttachedMaterialsForDraft() {
+  function syncAttachedMaterialsForDraft() {
     setDraftSourceText(
       buildActivityEditorSyncedDraftSourceText({
         sourceMaterials: form.getValues('sourceMaterials'),
@@ -251,94 +249,17 @@ export function ActivityCreateForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-                <div className="min-w-0 flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="rounded-md bg-background"
-                    >
-                      <IconSparkles className="size-3.5" />
-                      {aiDraftPanelView.badgeLabel}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {aiDraftPanelView.reviewNote}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <label
-                      htmlFor="activity-ai-source"
-                      className="font-medium text-sm"
-                    >
-                      {aiDraftPanelView.sourceTextLabel}
-                    </label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="bg-background"
-                      onClick={useAttachedMaterialsForDraft}
-                      disabled={!aiDraftPanelView.canSyncDraftSourceMaterials}
-                    >
-                      <IconPaperclip className="size-3.5" />
-                      {aiDraftPanelView.syncMaterialsLabel}
-                    </Button>
-                  </div>
-                  <Textarea
-                    id="activity-ai-source"
-                    value={draftSourceText}
-                    onChange={(event) =>
-                      setDraftSourceText(event.currentTarget.value)
-                    }
-                    rows={3}
-                    placeholder={aiDraftPanelView.sourcePlaceholder}
-                  />
-                </div>
-                <div className="grid gap-3 sm:grid-cols-[8rem_auto] lg:w-auto lg:grid-cols-[8rem_auto]">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="activity-ai-item-count"
-                      className="font-medium text-sm"
-                    >
-                      {aiDraftPanelView.itemCountLabel}
-                    </label>
-                    <NativeSelect
-                      id="activity-ai-item-count"
-                      value={String(draftItemCount)}
-                      onChange={(event) =>
-                        setDraftItemCount(Number(event.currentTarget.value))
-                      }
-                      className="w-full"
-                    >
-                      {ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS.map((count) => (
-                        <NativeSelectOption key={count} value={String(count)}>
-                          {count}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelect>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={onGenerateDraft}
-                    disabled={!aiDraftPanelView.canGenerateDraft}
-                    className="self-end"
-                  >
-                    {isGeneratingDraft ? (
-                      <IconLoader2 className="size-4 animate-spin" />
-                    ) : (
-                      <IconSparkles className="size-4" />
-                    )}
-                    {aiDraftPanelView.generateButtonLabel}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {draftResult ? (
-              <ActivityDraftMetaSummary result={draftResult} />
-            ) : null}
+            <ActivityAiDraftPanel
+              draftItemCount={draftItemCount}
+              draftResult={draftResult}
+              draftSourceText={draftSourceText}
+              isGeneratingDraft={isGeneratingDraft}
+              onDraftItemCountChange={setDraftItemCount}
+              onDraftSourceTextChange={setDraftSourceText}
+              onGenerateDraft={onGenerateDraft}
+              onSyncSourceMaterials={syncAttachedMaterialsForDraft}
+              panelView={aiDraftPanelView}
+            />
 
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
