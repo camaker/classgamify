@@ -28,6 +28,18 @@ export function AssignmentResultsItemAnalysisCard({
         value={itemView.correctRateProgressValue}
         className="mt-3 h-2"
       />
+      <AssignmentResultsItemAnalysisAnswerNotes itemView={itemView} />
+    </div>
+  );
+}
+
+function AssignmentResultsItemAnalysisAnswerNotes({
+  itemView,
+}: {
+  itemView: AssignmentResultsItemAnalysisView;
+}) {
+  return (
+    <>
       <p className="mt-2 text-xs text-muted-foreground">
         {itemView.expectedAnswerSummaryText}
       </p>
@@ -41,6 +53,6 @@ export function AssignmentResultsItemAnalysisCard({
           {itemView.explanationText}
         </p>
       ) : null}
-    </div>
+    </>
   );
 }

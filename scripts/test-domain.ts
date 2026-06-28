@@ -2985,6 +2985,16 @@ assert.match(
   'Assignment result item analysis card component should render prepared answer summary text lines.'
 );
 assert.match(
+  assignmentResultsItemAnalysisCardSource,
+  /AssignmentResultsItemAnalysisAnswerNotes[\s\S]*itemView=\{itemView\}/,
+  'Assignment result item analysis card component should delegate prepared answer notes to a focused item component.'
+);
+assert.match(
+  assignmentResultsItemAnalysisCardSource,
+  /function AssignmentResultsItemAnalysisAnswerNotes[\s\S]*itemView\.expectedAnswerSummaryText[\s\S]*itemView\.acceptedAnswersLineText[\s\S]*itemView\.explanationText/,
+  'Assignment result item analysis answer notes should render prepared expected answer, accepted answer, and explanation text.'
+);
+assert.match(
   assignmentResultsAttemptReviewCardSource,
   /attemptView\.answerViews\.map[\s\S]*AssignmentResultsAttemptAnswerReview[\s\S]*answerView=\{answerView\}/,
   'Assignment result attempt review card component should delegate prepared answer review views to a focused item component.'
