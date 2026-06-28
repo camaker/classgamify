@@ -5,6 +5,7 @@ import {
 import {
   buildQuestionChoiceReadinessSummary,
   type QuestionChoiceReadinessItem,
+  type QuestionChoiceReadinessSummary,
 } from '@/activities/distractors';
 import {
   formatActivityAiDraftFocusDescription,
@@ -39,6 +40,7 @@ export type ActivityDraftMeta = {
     teacherNotes: number;
     vocabulary: number;
   };
+  questionChoiceReadiness: QuestionChoiceReadinessSummary;
   readyTemplateCount: number;
   readyTemplateOptions: ActivityDraftTemplateOption[];
   readyTemplates: string[];
@@ -140,6 +142,7 @@ type ActivityDraftMetaSummaryView = {
   noticeLineText?: string;
   providerDescription: string;
   providerLabel: string;
+  questionChoiceReadiness?: ActivityDraftMetaSummaryQuestionChoiceReadinessView;
   readyTemplateLabel: string;
   readyTemplatesTitle: string;
   reviewChecklist: string[];
@@ -152,6 +155,21 @@ type ActivityDraftMetaSummaryView = {
   suggestedTemplatesTitle: string;
   templateReadinessOptions: ActivityDraftMetaSummaryReadinessOption[];
   title: string;
+};
+
+type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
+  description: string;
+  itemViews: ActivityDraftMetaSummaryQuestionChoiceReadinessItemView[];
+  summaryLabel: string;
+  title: string;
+};
+
+type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView = {
+  detail: string;
+  key: string;
+  promptLabel: string;
+  status: QuestionChoiceReadinessItem['status'];
+  statusLabel: string;
 };
 
 export function buildActivityDraftMeta({
@@ -182,6 +200,7 @@ export function buildActivityDraftMeta({
       teacherNotes: content.teacherNotes.length,
       vocabulary: content.vocabulary.length,
     },
+    questionChoiceReadiness: buildQuestionChoiceReadinessSummary({ content }),
     readyTemplateCount: remixPlan.readyOptions.length,
     readyTemplateOptions: remixSummary.readyTemplateOptions,
     readyTemplates,
@@ -312,6 +331,10 @@ export function buildActivityDraftMetaSummaryView({
       provider === 'workers-ai'
         ? m.activity_draft_meta_provider_workers_ai()
         : m.activity_draft_meta_provider_fallback(),
+    questionChoiceReadiness:
+      buildActivityDraftMetaSummaryQuestionChoiceReadinessView(
+        meta.questionChoiceReadiness
+      ),
     readyTemplateLabel:
       readyTemplateCount === 1
         ? m.activity_draft_meta_ready_template_label_one({
@@ -339,6 +362,90 @@ export function buildActivityDraftMetaSummaryView({
     templateReadinessOptions: normalizedTemplateReadinessOptions,
     title: m.activity_draft_meta_title(),
   };
+}
+
+function buildActivityDraftMetaSummaryQuestionChoiceReadinessView(
+  summary: QuestionChoiceReadinessSummary
+): ActivityDraftMetaSummaryQuestionChoiceReadinessView | undefined {
+  if (summary.itemCount === 0) return undefined;
+
+  return {
+    description: m.activity_draft_meta_quiz_choices_description({
+      targetCount: summary.targetCount,
+    }),
+    itemViews: summary.items.map((item, index) =>
+      buildActivityDraftMetaSummaryQuestionChoiceReadinessItemView({
+        index,
+        item,
+      })
+    ),
+    summaryLabel:
+      summary.itemCount === 1
+        ? m.activity_draft_meta_quiz_choices_summary_one({
+            readyCount: summary.readyCount,
+            totalCount: summary.itemCount,
+          })
+        : m.activity_draft_meta_quiz_choices_summary_many({
+            readyCount: summary.readyCount,
+            totalCount: summary.itemCount,
+          }),
+    title: m.activity_draft_meta_quiz_choices_title(),
+  };
+}
+
+function buildActivityDraftMetaSummaryQuestionChoiceReadinessItemView({
+  index,
+  item,
+}: {
+  index: number;
+  item: QuestionChoiceReadinessItem;
+}): ActivityDraftMetaSummaryQuestionChoiceReadinessItemView {
+  return {
+    detail: buildActivityDraftMetaSummaryQuestionChoiceReadinessDetail(item),
+    key: item.questionId,
+    promptLabel: m.activity_draft_meta_quiz_choices_prompt({
+      index: index + 1,
+      prompt: item.prompt,
+    }),
+    status: item.status,
+    statusLabel: formatActivityDraftMetaSummaryQuestionChoiceReadinessStatus(
+      item.status
+    ),
+  };
+}
+
+function buildActivityDraftMetaSummaryQuestionChoiceReadinessDetail(
+  item: QuestionChoiceReadinessItem
+) {
+  switch (item.status) {
+    case 'explicit-ready':
+      return m.activity_draft_meta_quiz_choices_explicit_detail({
+        choiceCount: item.explicitChoiceCount,
+        targetCount: item.targetCount,
+      });
+    case 'completed-locally':
+      return m.activity_draft_meta_quiz_choices_completed_detail({
+        deterministicCount: item.deterministicChoiceCount,
+        targetCount: item.targetCount,
+      });
+    case 'needs-candidates':
+      return m.activity_draft_meta_quiz_choices_needs_detail({
+        missingCount: item.missingChoiceCount,
+      });
+  }
+}
+
+function formatActivityDraftMetaSummaryQuestionChoiceReadinessStatus(
+  status: QuestionChoiceReadinessItem['status']
+) {
+  switch (status) {
+    case 'explicit-ready':
+      return m.activity_draft_meta_quiz_choices_status_explicit();
+    case 'completed-locally':
+      return m.activity_draft_meta_quiz_choices_status_completed();
+    case 'needs-candidates':
+      return m.activity_draft_meta_quiz_choices_status_needs();
+  }
 }
 
 function normalizeActivityDraftMetaCount(count: number) {

@@ -93,6 +93,11 @@ export function ActivityDraftMetaSummary({
           </p>
         )}
       </div>
+      {summaryView.questionChoiceReadiness ? (
+        <ActivityDraftQuestionChoiceReadiness
+          readiness={summaryView.questionChoiceReadiness}
+        />
+      ) : null}
       {summaryView.sourceMaterialNoteViews.length > 0 ? (
         <div className="mt-4 rounded-lg border bg-background p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -156,6 +161,69 @@ export function ActivityDraftMetaSummary({
           </p>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityDraftQuestionChoiceReadiness({
+  readiness,
+}: {
+  readiness: NonNullable<
+    ActivityDraftMetaSummaryView['questionChoiceReadiness']
+  >;
+}) {
+  return (
+    <div className="mt-4 rounded-lg border bg-background p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-sm">{readiness.title}</p>
+        <Badge variant="outline" className="rounded-md">
+          {readiness.summaryLabel}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {readiness.description}
+      </p>
+      <div className="mt-2 grid gap-2">
+        {readiness.itemViews.map((itemView) => (
+          <ActivityDraftQuestionChoiceReadinessItem
+            itemView={itemView}
+            key={itemView.key}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityDraftQuestionChoiceReadinessItem({
+  itemView,
+}: {
+  itemView: NonNullable<
+    ActivityDraftMetaSummaryView['questionChoiceReadiness']
+  >['itemViews'][number];
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <p className="font-medium text-xs leading-5">{itemView.promptLabel}</p>
+        <Badge
+          variant="outline"
+          className={cn(
+            'w-fit shrink-0 rounded-md',
+            itemView.status === 'explicit-ready' &&
+              'border-emerald-200 bg-emerald-50 text-emerald-700',
+            itemView.status === 'completed-locally' &&
+              'border-blue-200 bg-blue-50 text-blue-700',
+            itemView.status === 'needs-candidates' &&
+              'border-amber-200 bg-amber-50 text-amber-800'
+          )}
+        >
+          {itemView.statusLabel}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {itemView.detail}
+      </p>
     </div>
   );
 }

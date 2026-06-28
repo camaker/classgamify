@@ -2749,6 +2749,26 @@ assert.match(
   /summaryView\.lockedTemplateLabel[\s\S]*summaryView\.lockedTemplateOptions/,
   'AI draft summary component should render prepared ready and locked template metadata.'
 );
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.questionChoiceReadiness[\s\S]*ActivityDraftQuestionChoiceReadiness[\s\S]*readiness=\{summaryView\.questionChoiceReadiness\}/,
+  'AI draft summary component should delegate quiz choice readiness rendering.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftQuestionChoiceReadiness[\s\S]*readiness\.summaryLabel[\s\S]*readiness\.itemViews\.map[\s\S]*ActivityDraftQuestionChoiceReadinessItem/,
+  'AI draft quiz choice readiness component should render prepared summary and item views.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftQuestionChoiceReadinessItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.statusLabel[\s\S]*itemView\.detail/,
+  'AI draft quiz choice readiness item should render prepared prompt, status, and detail labels.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /Quiz choice review|Needs distractors|Completed locally|Explicit choices|测验选项检查|需要干扰项|本地可补齐|显式选项充足/,
+  'AI draft summary component should not hard-code visible quiz choice readiness labels.'
+);
 const activityDraftMetaSource = readFileSync(
   'src/activities/draft-meta.ts',
   'utf8'
@@ -23227,6 +23247,13 @@ assert.ok(
 );
 assert.ok(fallbackRemixPlan.suggestedOptions.length >= 3);
 assert.deepEqual(fallbackDraftMeta.coverage, fallbackDraftResult.meta.coverage);
+assert.equal(fallbackDraftMeta.questionChoiceReadiness.itemCount, 5);
+assert.equal(fallbackDraftMeta.questionChoiceReadiness.readyCount, 5);
+assert.equal(fallbackDraftMeta.questionChoiceReadiness.explicitReadyCount, 5);
+assert.equal(
+  fallbackDraftMeta.questionChoiceReadiness.completedLocallyCount,
+  0
+);
 assert.equal(
   fallbackDraftMeta.readyTemplateCount,
   fallbackDraftMeta.readyTemplates.length
@@ -23353,6 +23380,28 @@ assert.equal(
   'No alternate template is ready yet. Add the locked missing fields before remixing.'
 );
 assert.equal(
+  fallbackDraftMetaSummary.questionChoiceReadiness?.title,
+  'Quiz choice review'
+);
+assert.equal(
+  fallbackDraftMetaSummary.questionChoiceReadiness?.summaryLabel,
+  '5/5 questions ready'
+);
+assert.equal(
+  fallbackDraftMetaSummary.questionChoiceReadiness?.description,
+  'Review whether generated quiz questions already include 4 usable choices or still need teacher-approved distractors.'
+);
+assert.deepEqual(
+  fallbackDraftMetaSummary.questionChoiceReadiness?.itemViews[0],
+  {
+    detail: 'The draft already includes 4/4 explicit choices.',
+    key: fallbackDraftMeta.questionChoiceReadiness.items[0]?.questionId,
+    promptLabel: '1. Track 1: The Science listening word is weather.',
+    status: 'explicit-ready',
+    statusLabel: 'Explicit choices',
+  }
+);
+assert.equal(
   fallbackDraftMetaSummary.reviewChecklist,
   fallbackDraftMeta.reviewChecklist
 );
@@ -23402,7 +23451,8 @@ const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
       ...activityEditorDefaultInput,
       groupsText: '',
       pairsText: '',
-      questionsText: 'Question only? | Yes | Yes, No, Maybe',
+      questionsText: 'Question only? | Yes',
+      vocabularyText: '',
       templateType: 'quiz',
     },
     currentTemplateType: 'quiz',
@@ -23410,6 +23460,23 @@ const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
   model: 'test-model',
   provider: 'workers-ai',
 });
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.summaryLabel,
+  '0/1 question ready'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.status,
+  'needs-candidates'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
+    ?.statusLabel,
+  'Needs distractors'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.detail,
+  'Add 3 more choices or vocabulary terms before publishing this quiz.'
+);
 assert.equal(
   questionOnlyDraftMetaSummary.draftFocusLineText,
   'Focus: Remix ready'
@@ -23550,6 +23617,14 @@ try {
   );
   assert.equal(zhFallbackDraftMetaSummary.appliedLabel, '已填入编辑器');
   assert.equal(zhFallbackDraftMetaSummary.nextStepLabel, '下一步');
+  assert.equal(
+    zhFallbackDraftMetaSummary.questionChoiceReadiness?.title,
+    '测验选项检查'
+  );
+  assert.equal(
+    zhFallbackDraftMetaSummary.questionChoiceReadiness?.summaryLabel,
+    '5/5 道题已准备'
+  );
   assert.equal(
     zhFallbackDraftMetaSummary.sourceMaterialDescription,
     '这里仅显示素材类型和原始文件名这类安全来源信息。'
