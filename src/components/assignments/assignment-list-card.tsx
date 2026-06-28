@@ -67,28 +67,9 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
 
   return (
     <Card className="rounded-lg">
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="rounded-md">
-            {assignment.statusLabel}
-          </Badge>
-          <Badge variant="outline" className="rounded-md">
-            <IconListCheck className="size-3.5" />
-            {assignment.templateLabel}
-          </Badge>
-        </div>
-        <CardTitle>
-          <h2 className="text-lg font-semibold">{assignment.title}</h2>
-        </CardTitle>
-        <CardDescription>
-          <p>{assignment.activityDescription}</p>
-        </CardDescription>
-      </CardHeader>
+      <AssignmentListCardHeader assignment={assignment} />
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div className="grid gap-4">
-          <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
-          <AssignmentListStats statItems={assignment.statItems} />
-        </div>
+        <AssignmentListCardSummary assignment={assignment} />
         <AssignmentListCardActions
           actionView={assignment.actionView}
           statusPending={updateStatusMutation.isPending}
@@ -96,6 +77,45 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
         />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentListCardHeader({
+  assignment,
+}: {
+  assignment: AssignmentListCardView;
+}) {
+  return (
+    <CardHeader>
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant="secondary" className="rounded-md">
+          {assignment.statusLabel}
+        </Badge>
+        <Badge variant="outline" className="rounded-md">
+          <IconListCheck className="size-3.5" />
+          {assignment.templateLabel}
+        </Badge>
+      </div>
+      <CardTitle>
+        <h2 className="text-lg font-semibold">{assignment.title}</h2>
+      </CardTitle>
+      <CardDescription>
+        <p>{assignment.activityDescription}</p>
+      </CardDescription>
+    </CardHeader>
+  );
+}
+
+function AssignmentListCardSummary({
+  assignment,
+}: {
+  assignment: AssignmentListCardView;
+}) {
+  return (
+    <div className="grid gap-4">
+      <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
+      <AssignmentListStats statItems={assignment.statItems} />
+    </div>
   );
 }
 

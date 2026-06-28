@@ -14981,6 +14981,21 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
+  /AssignmentListCardHeader[\s\S]*assignment=\{assignment\}[\s\S]*AssignmentListCardSummary[\s\S]*assignment=\{assignment\}[\s\S]*AssignmentListCardActions/,
+  'Assignment list card component should delegate header, summary, and action sections.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListCardHeader[\s\S]*assignment\.statusLabel[\s\S]*assignment\.templateLabel[\s\S]*assignment\.title[\s\S]*assignment\.activityDescription/,
+  'Assignment list card header should render prepared status, template, title, and activity description.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListCardSummary[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card summary should render prepared settings summary and stats.'
+);
+assert.match(
+  assignmentListCardComponentSource,
   /function AssignmentListCardActions[\s\S]*actionView\.resultAction[\s\S]*AssignmentListResultActionLink[\s\S]*actionView\.printAction[\s\S]*AssignmentListPrintActionLink[\s\S]*actionView\.statusAction[\s\S]*AssignmentListStatusActionButton[\s\S]*actionView\.shareAction[\s\S]*AssignmentListShareActions/,
   'Assignment list card actions should split result, print, status, and share actions into focused components.'
 );
