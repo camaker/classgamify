@@ -162,6 +162,27 @@ type ActivityEditorSaveGate =
       mode: 'edit';
     };
 
+export type ActivityEditorSaveExecutionPlan =
+  | {
+      failureMessage: string;
+      message: string;
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      input: CreateActivityInput;
+      successMessage: string;
+      type: 'create';
+    }
+  | {
+      failureMessage: string;
+      input: CreateActivityInput & {
+        id: string;
+      };
+      successMessage: string;
+      type: 'edit';
+    };
+
 type ActivityEditorTemplateScaffoldApplication = {
   draftSourceText: string;
   successMessage: string;
@@ -440,6 +461,53 @@ export function buildActivityEditorSaveGate({
   return {
     canSave: true,
     mode,
+  };
+}
+
+export function buildActivityEditorSaveExecutionPlan({
+  activityId,
+  hasUser,
+  mode,
+  values,
+}: {
+  activityId?: string;
+  hasUser: boolean;
+  mode: ActivityEditorMode;
+  values: CreateActivityInput;
+}): ActivityEditorSaveExecutionPlan {
+  const saveGate = buildActivityEditorSaveGate({
+    activityId,
+    hasUser,
+    mode,
+  });
+  const modeView = buildActivityEditorModeView(mode);
+  const failureMessage = m.activity_form_toast_save_failed();
+
+  if (!saveGate.canSave) {
+    return {
+      failureMessage,
+      message: saveGate.errorMessage,
+      type: 'blocked',
+    };
+  }
+
+  if (saveGate.mode === 'edit') {
+    return {
+      failureMessage,
+      input: {
+        ...values,
+        id: saveGate.activityId,
+      },
+      successMessage: modeView.saveSuccessMessage,
+      type: 'edit',
+    };
+  }
+
+  return {
+    failureMessage,
+    input: values,
+    successMessage: modeView.saveSuccessMessage,
+    type: 'create',
   };
 }
 

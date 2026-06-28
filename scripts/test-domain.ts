@@ -279,6 +279,7 @@ import {
   buildActivityEditorPreviewPanel,
   buildActivityEditorPreviewSeed,
   buildActivityEditorReadinessPanelSummary,
+  buildActivityEditorSaveExecutionPlan,
   buildActivityEditorSaveGate,
   buildActivityEditorSelectOptions,
   buildActivityEditorSyncedDraftSourceText,
@@ -2452,8 +2453,23 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /buildActivityEditorSaveGate/,
-  'Activity editor form should consume the activity-domain save gate.'
+  /buildActivityEditorSaveExecutionPlan/,
+  'Activity editor form should consume the activity-domain save execution plan.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorSaveExecutionPlan\(\{[\s\S]*activityId,[\s\S]*hasUser: Boolean\(session\?\.user\),[\s\S]*mode,[\s\S]*values,[\s\S]*\}\)/,
+  'Activity editor form should build save execution plans from auth, mode, activity id, and form values.'
+);
+assert.match(
+  activityEditorFormSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*if \(executionPlan\.type === 'edit'\)[\s\S]*updateMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*createMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity editor form should execute prepared blocked, edit, and create save plans.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /buildActivityEditorSaveGate|id: saveGate\.activityId|toast\.error\(m\.activity_form_toast_save_failed\(\)\)/,
+  'Activity editor form should not rebuild save gates, edit payload ids, or save failure copy locally.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -3795,8 +3811,8 @@ assert.match(
 );
 assert.match(
   activityCreateFormSource,
-  /toast\.error\(m\.activity_form_toast_save_failed\(\)\)/,
-  'Activity save failures should use the localized save failure message.'
+  /toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity save failures should use the localized save execution-plan failure message.'
 );
 const contactFormCardSource = readFileSync(
   'src/components/contact/contact-form-card.tsx',
@@ -20360,6 +20376,78 @@ assert.deepEqual(
     activityId: 'activity-1',
     canSave: true,
     mode: 'edit',
+  }
+);
+const editorSavePlanValues = {
+  description: 'Saved description',
+  difficulty: 'core' as const,
+  gradeBand: 'Grade 4',
+  groupsText: 'Food | apple',
+  language: 'en',
+  learningGoal: 'Review food vocabulary',
+  pairsText: 'apple | 苹果',
+  questionsText: 'What is apple? | 苹果',
+  sourceSummary: 'Food lesson',
+  sourceMaterials: [],
+  subject: 'English',
+  teacherNotesText: 'Discuss examples.',
+  templateType: 'quiz' as const,
+  title: 'Food review',
+  visibility: 'draft' as const,
+  vocabularyText: 'apple',
+};
+assert.deepEqual(
+  buildActivityEditorSaveExecutionPlan({
+    hasUser: false,
+    mode: 'create',
+    values: editorSavePlanValues,
+  }),
+  {
+    failureMessage: 'Activity could not be saved.',
+    message: 'Sign in to save activities to your teacher library.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveExecutionPlan({
+    hasUser: true,
+    mode: 'edit',
+    values: editorSavePlanValues,
+  }),
+  {
+    failureMessage: 'Activity could not be saved.',
+    message: 'Activity could not be identified for editing.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveExecutionPlan({
+    hasUser: true,
+    mode: 'create',
+    values: editorSavePlanValues,
+  }),
+  {
+    failureMessage: 'Activity could not be saved.',
+    input: editorSavePlanValues,
+    successMessage: 'Activity saved to your library.',
+    type: 'create',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorSaveExecutionPlan({
+    activityId: 'activity-1',
+    hasUser: true,
+    mode: 'edit',
+    values: editorSavePlanValues,
+  }),
+  {
+    failureMessage: 'Activity could not be saved.',
+    input: {
+      ...editorSavePlanValues,
+      id: 'activity-1',
+    },
+    successMessage: 'Activity updated.',
+    type: 'edit',
   }
 );
 assert.equal(

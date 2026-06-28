@@ -5,7 +5,7 @@ import {
   buildActivityEditorDraftSourceText,
   buildActivityEditorDraftSuccessMessage,
   buildActivityEditorModeView,
-  buildActivityEditorSaveGate,
+  buildActivityEditorSaveExecutionPlan,
   buildActivityEditorSelectOptions,
   buildActivityEditorSyncedDraftSourceText,
   buildActivityEditorTemplateScaffoldApplication,
@@ -188,36 +188,34 @@ export function ActivityCreateForm({
   }
 
   async function onSubmit(values: CreateActivityInput) {
-    const saveGate = buildActivityEditorSaveGate({
+    const executionPlan = buildActivityEditorSaveExecutionPlan({
       activityId,
       hasUser: Boolean(session?.user),
       mode,
+      values,
     });
 
-    if (!saveGate.canSave) {
-      toast.error(saveGate.errorMessage);
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
 
     try {
-      if (saveGate.mode === 'edit') {
-        await updateMutation.mutateAsync({
-          ...values,
-          id: saveGate.activityId,
-        });
-        toast.success(modeView.saveSuccessMessage);
+      if (executionPlan.type === 'edit') {
+        await updateMutation.mutateAsync(executionPlan.input);
+        toast.success(executionPlan.successMessage);
         form.reset(values);
         return;
       }
 
-      const activity = await createMutation.mutateAsync(values);
-      toast.success(modeView.saveSuccessMessage);
+      const activity = await createMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
       navigate({
         to: Routes.DashboardActivities,
         search: { created: activity.id },
       });
     } catch {
-      toast.error(m.activity_form_toast_save_failed());
+      toast.error(executionPlan.failureMessage);
     }
   }
 
