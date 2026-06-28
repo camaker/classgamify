@@ -862,6 +862,20 @@ const sensitiveOauthPattern = new RegExp(
   ].join('|'),
   'i'
 );
+const githubIssueTemplateConfigSource = readFileSync(
+  '.github/ISSUE_TEMPLATE/config.yml',
+  'utf8'
+);
+assert.match(
+  githubIssueTemplateConfigSource,
+  /ClassGamify Product Direction[\s\S]*docs\/product\.md[\s\S]*ClassGamify Classroom Feedback/,
+  'GitHub issue template contact links should point contributors at ClassGamify product direction and classroom feedback.'
+);
+assert.doesNotMatch(
+  githubIssueTemplateConfigSource,
+  /TanStack Starter|tanstackstarter|mksaas\.link/,
+  'GitHub issue template contact links should not point contributors back to copied starter-template resources.'
+);
 const secretScanFileExtensions = ['.json', '.md', '.ts', '.tsx', '.txt'];
 
 function collectTextFiles(directoryPath: string): string[] {

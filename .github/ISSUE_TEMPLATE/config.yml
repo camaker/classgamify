@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: TanStack Starter Community Support
-    url: https://mksaas.link/discord
-    about: Please ask and answer questions here.
-  - name: TanStack Starter Documentation
-    url: https://docs.tanstackstarter.dev
-    about: Please check out the documentation here.
+  - name: ClassGamify Product Direction
+    url: https://github.com/javayhu/classgamify/blob/main/docs/product.md
+    about: Review the activity, assignment, attempt, and results product loop before filing broad roadmap requests.
+  - name: ClassGamify Classroom Feedback
+    url: https://github.com/javayhu/classgamify/issues/new/choose
+    about: Share teacher workflow feedback, assignment delivery issues, or result-review gaps through the project issue templates.
