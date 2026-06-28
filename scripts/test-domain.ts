@@ -2319,6 +2319,10 @@ const activityTemplateReadinessPanelSource = readFileSync(
   'src/components/activities/activity-template-readiness-panel.tsx',
   'utf8'
 );
+const activityTemplateScaffoldPanelSource = readFileSync(
+  'src/components/activities/activity-template-scaffold-panel.tsx',
+  'utf8'
+);
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
   activityEditorSource,
@@ -2416,27 +2420,27 @@ assert.match(
   'Activity editor form should delegate template scaffold setup rendering.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
   'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldSummary[\s\S]*summary\.runtimeItemLabel[\s\S]*summary\.readyTemplateLabel[\s\S]*summary\.coverageMetrics\.map[\s\S]*ActivityTemplateScaffoldMetricBadge[\s\S]*summary\.readyTemplateOptions\.map[\s\S]*ActivityTemplateScaffoldReadyBadge/,
   'Activity editor scaffold summary should render prepared runtime, coverage, and ready-template details.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityTemplateScaffoldPanelSource,
   /function ActivityTemplateRequirementBadge[\s\S]*requirement/,
   'Activity editor scaffold requirement badge should render prepared requirement labels.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldMetricBadge[\s\S]*metric\.label/,
   'Activity editor scaffold metric badge should render prepared coverage metric labels.'
 );
 assert.match(
-  activityEditorFormSource,
+  activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldReadyBadge[\s\S]*option\.shortName/,
   'Activity editor scaffold ready badge should render prepared ready-template labels.'
 );
@@ -2444,6 +2448,11 @@ assert.doesNotMatch(
   activityEditorFormSource,
   /id="activity-ai-source"|id="activity-ai-item-count"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|syncMaterialsLabel|generateButtonLabel)/,
   'Activity editor form should not hand-render low-level AI draft controls.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /function ActivityTemplateScaffoldPanel|function ActivityTemplateScaffoldSummary|function ActivityTemplateRequirementBadge|function ActivityTemplateScaffoldMetricBadge|function ActivityTemplateScaffoldReadyBadge/,
+  'Activity editor form should not own template scaffold display components.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
