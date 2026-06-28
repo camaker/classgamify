@@ -13627,6 +13627,10 @@ const activityLibrarySearchComponentSource = readFileSync(
   'src/components/activities/activity-library-search.tsx',
   'utf8'
 );
+const activityLibraryCompatibilityPanelSource = readFileSync(
+  'src/components/activities/activity-library-compatibility-panel.tsx',
+  'utf8'
+);
 const activityLibraryCardComponentSource = readFileSync(
   'src/components/activities/activity-library-card.tsx',
   'utf8'
@@ -13739,10 +13743,35 @@ assert.match(
   /ActivitySourceMaterialsSummary[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
   'Activity library card component should render source-material summary through the shared summary component.'
 );
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryCompatibilityPanel[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*compatibility=\{cardDisplayView\.compatibility\}[\s\S]*onRemix=\{remixActivity\}/,
+  'Activity library card component should delegate template compatibility rendering to a focused component.'
+);
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /sourceMaterials\.(?:kindBadges|extractionActions|countLabel|extractionTitle|title)/,
   'Activity library card component should not hand-compose source-material summary details.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /compatibility\.(?:readyTemplateOptions|remixActionOptions|lockedTemplateDiagnostics|remixHint)|compatibleTemplatesLabel/,
+  'Activity library card component should not hand-compose template compatibility summary details.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /compatibility\.readyTemplateOptions[\s\S]*option\.isCurrent[\s\S]*option\.shortName/,
+  'Activity library compatibility panel should render prepared ready-template options.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /actionState\.showRemixActions[\s\S]*compatibility\.remixActionOptions[\s\S]*option\.actionLabel/,
+  'Activity library compatibility panel should render prepared remix actions from the activity-domain view.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /compatibility\.lockedTemplateDiagnostics[\s\S]*diagnosis/,
+  'Activity library compatibility panel should render prepared locked-template diagnostics.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,

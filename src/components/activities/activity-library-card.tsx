@@ -4,6 +4,7 @@ import {
   buildActivityLibraryCardDisplayView,
   type buildActivityLibraryCardViewModel,
 } from '@/activities/library-view';
+import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { ActivitySourceMaterialsSummary } from '@/components/activities/activity-source-materials-summary';
 import { Badge } from '@/components/ui/badge';
@@ -28,10 +29,8 @@ import {
   IconDeviceGamepad2,
   IconEdit,
   IconFolderOff,
-  IconLayoutGrid,
   IconPlus,
   IconRotateClockwise,
-  IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -155,64 +154,12 @@ export function ActivityLibraryCard({
           className="bg-muted/30"
           summary={cardDisplayView.sourceMaterials}
         />
-        <div className="rounded-lg border bg-muted/30 p-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <IconLayoutGrid className="size-4 text-primary" />
-            {activityLibraryCardCopy.compatibleTemplatesLabel}
-          </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {cardDisplayView.compatibility.readyTemplateOptions.map(
-              (option) => (
-                <Badge
-                  key={option.template}
-                  variant={option.isCurrent ? 'secondary' : 'outline'}
-                  className="rounded-md"
-                >
-                  {option.shortName}
-                </Badge>
-              )
-            )}
-          </div>
-          {cardDisplayView.compatibility.remixHint ? (
-            <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              {cardDisplayView.compatibility.remixHint}
-            </p>
-          ) : null}
-          {cardDisplayView.actionState.showRemixActions ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {cardDisplayView.compatibility.remixActionOptions.map(
-                (option) => (
-                  <Button
-                    key={option.template}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="bg-background"
-                    disabled={remixMutation.isPending}
-                    onClick={() => remixActivity(option.template)}
-                  >
-                    <IconSwitchHorizontal className="size-4" />
-                    {option.actionLabel}
-                  </Button>
-                )
-              )}
-            </div>
-          ) : null}
-          {cardDisplayView.compatibility.lockedTemplateDiagnostics.length ? (
-            <div className="mt-3 grid gap-1.5">
-              {cardDisplayView.compatibility.lockedTemplateDiagnostics.map(
-                (diagnosis) => (
-                  <p
-                    key={diagnosis}
-                    className="text-xs leading-5 text-muted-foreground"
-                  >
-                    {diagnosis}
-                  </p>
-                )
-              )}
-            </div>
-          ) : null}
-        </div>
+        <ActivityLibraryCompatibilityPanel
+          actionState={cardDisplayView.actionState}
+          compatibility={cardDisplayView.compatibility}
+          isRemixing={remixMutation.isPending}
+          onRemix={remixActivity}
+        />
         {cardDisplayView.actionState.showPersistedActions ? (
           <div className="flex flex-col gap-2 sm:flex-row">
             {cardDisplayView.actionState.showEditAction ? (
