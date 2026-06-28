@@ -5064,8 +5064,23 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
+  /revealAnswers: Boolean\([\s\S]*result && assignment\?\.settings\.showCorrectAnswers/,
+  'Student runner page view-model should decide when submitted answers can reveal correct answers.'
+);
+assert.match(
+  studentRunnerStateSource,
   /export function buildStudentRunnerAnswerUpdatePlan/,
   'Student runner state domain should expose browser answer-change update plans.'
+);
+assert.match(
+  playRouteSource,
+  /revealAnswer=\{runnerPageView\.revealAnswers\}/,
+  'Student play route should render answer reveal state from the runner page view-model.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /assignment\.settings\.showCorrectAnswers|routeAssignment\.settings\.showCorrectAnswers/,
+  'Student play route should not inspect assignment answer-reveal settings directly.'
 );
 assert.match(
   playRouteSource,
@@ -11257,6 +11272,7 @@ assert.deepEqual(
     itemCount: studentRunnerPageView.itemCount,
     loadingView: studentRunnerPageView.loadingView,
     missingView: studentRunnerPageView.missingView,
+    revealAnswers: studentRunnerPageView.revealAnswers,
     resultPanelView: studentRunnerPageView.resultPanelView,
     routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
     runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
@@ -11331,6 +11347,7 @@ assert.deepEqual(
       message: 'Loading student activity...',
     },
     missingView: undefined,
+    revealAnswers: true,
     resultPanelView: {
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',

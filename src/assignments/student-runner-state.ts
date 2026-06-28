@@ -145,6 +145,7 @@ type StudentRunnerPageViewModel = {
   itemCount: number;
   loadingView: StudentRunnerLoadingView;
   missingView?: StudentRunnerMissingPageView;
+  revealAnswers: boolean;
   resultPanelView: StudentRunnerResultPanelView;
   routeBadgeLabel: string;
   runtimeItems: PublicRuntimeItem[];
@@ -499,6 +500,7 @@ export function buildStudentRunnerPageViewModel({
       pageState.status === 'missing'
         ? buildStudentRunnerMissingPageView(pageState.reason)
         : undefined,
+    revealAnswers: Boolean(result && assignment?.settings.showCorrectAnswers),
     resultPanelView: buildStudentRunnerResultPanelView({
       attemptResultDisplay,
       attemptUsageLabel,

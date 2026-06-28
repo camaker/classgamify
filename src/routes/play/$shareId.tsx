@@ -303,9 +303,7 @@ function PlayPage() {
             answers={answers}
             disabled={controlView.runtimeItemsDisabled}
             items={runtimeItems}
-            revealAnswer={Boolean(
-              result && routeAssignment.settings.showCorrectAnswers
-            )}
+            revealAnswer={runnerPageView.revealAnswers}
             reviewItems={result?.reviewItems}
             language={routeActivity.content.language}
             templateType={routeActivity.templateType}
