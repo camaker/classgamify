@@ -5611,6 +5611,16 @@ assert.match(
   /function PublicAssignmentRuleItem[\s\S]*aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
   'Public assignment rule item should render prepared rule accessibility labels and student-facing descriptions.'
 );
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /publicAssignmentRuleIcons[\s\S]*answerReveal: IconEye[\s\S]*attempts: IconRepeat[\s\S]*closes: IconClock[\s\S]*identity: IconUser[\s\S]*items: IconListCheck[\s\S]*timer: IconClock[\s\S]*satisfies Record<PublicAssignmentRuleSummaryId, Icon>/,
+  'Public assignment rules should map every rule id to a typed classroom policy icon.'
+);
+assert.doesNotMatch(
+  publicAssignmentRulesComponentSource,
+  /function getPublicAssignmentRuleIcon|id === 'items'|id === 'attempts'|id === 'identity'|id === 'answerReveal'/,
+  'Public assignment rules should not use ad hoc rule-id icon branching.'
+);
 assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
   /timer starts|submitted attempts|student identity|答案|作答|计时|匿名/,
@@ -5618,7 +5628,7 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /getPublicAssignmentRuleIcon[\s\S]*id === 'items'[\s\S]*id === 'attempts'[\s\S]*id === 'identity'[\s\S]*id === 'answerReveal'/,
+  /PublicAssignmentRuleIcon[\s\S]*publicAssignmentRuleIcons\[id\]/,
   'Public assignment rules component should own rule icon mapping for student-facing delivery policy.'
 );
 const assignmentDeliverySummarySource = readFileSync(
@@ -5647,7 +5657,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /PublicAssignmentRuleIcon|PublicAssignmentRuleSummaryItem|PublicAssignmentRuleSummaryId|getPublicAssignmentRuleIcon/,
+  /PublicAssignmentRuleIcon|PublicAssignmentRuleSummaryItem|PublicAssignmentRuleSummaryId|publicAssignmentRuleIcons/,
   'Student play route should not own public assignment rule card or icon rendering details.'
 );
 assert.doesNotMatch(

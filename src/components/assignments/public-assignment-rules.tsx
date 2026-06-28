@@ -8,6 +8,7 @@ import {
   IconListCheck,
   IconRepeat,
   IconUser,
+  type Icon,
 } from '@tabler/icons-react';
 
 type PublicAssignmentRulesProps = {
@@ -49,14 +50,15 @@ function PublicAssignmentRuleIcon({
 }: {
   id: PublicAssignmentRuleSummaryId;
 }) {
-  const Icon = getPublicAssignmentRuleIcon(id);
+  const Icon = publicAssignmentRuleIcons[id];
   return <Icon className="size-4 shrink-0 text-primary" />;
 }
 
-function getPublicAssignmentRuleIcon(id: PublicAssignmentRuleSummaryId) {
-  if (id === 'items') return IconListCheck;
-  if (id === 'attempts') return IconRepeat;
-  if (id === 'identity') return IconUser;
-  if (id === 'answerReveal') return IconEye;
-  return IconClock;
-}
+const publicAssignmentRuleIcons = {
+  answerReveal: IconEye,
+  attempts: IconRepeat,
+  closes: IconClock,
+  identity: IconUser,
+  items: IconListCheck,
+  timer: IconClock,
+} satisfies Record<PublicAssignmentRuleSummaryId, Icon>;
