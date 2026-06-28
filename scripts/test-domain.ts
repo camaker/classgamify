@@ -3036,6 +3036,31 @@ assert.match(
   /CopyAssignmentShareLinkButton[\s\S]*to="\/print\/assignments\/\$assignmentId"[\s\S]*resultActionIconByAction/,
   'Assignment result header actions component should own share actions, printable worksheet links, and result action icons.'
 );
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultsHeaderSharePreviewLink[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*AssignmentResultsHeaderPrintActionLink[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*AssignmentResultsHeaderResultActions/,
+  'Assignment result header actions should delegate preview, share path, copy, print, disabled reason, and result actions to focused components.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsHeaderSharePreviewLink[\s\S]*shareAction\.isAvailable[\s\S]*to="\/play\/\$shareId"[\s\S]*shareAction\.label/,
+  'Assignment result share preview action should render prepared share availability and label.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsHeaderCopyShareAction[\s\S]*disabled=\{!shareAction\.isAvailable\}[\s\S]*disabledMessage=\{shareAction\.disabledReason\}[\s\S]*shareSlug=\{shareAction\.shareSlug\}/,
+  'Assignment result copy-share action should render prepared disabled state and share slug.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsHeaderPrintActionLink[\s\S]*assignmentId[\s\S]*printAction\.label/,
+  'Assignment result print action should render prepared printable action labels.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*actionButton\.label/,
+  'Assignment result action buttons should render prepared result action state through focused button components.'
+);
 assert.doesNotMatch(
   assignmentResultsHeaderCardSource,
   /CopyAssignmentShareLinkButton|resultActionIconByAction|buttonVariants|IconPlayerPlay|IconPrinter|IconShare3/,
