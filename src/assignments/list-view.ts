@@ -116,7 +116,6 @@ type AssignmentListCardActionView = {
 };
 
 type AssignmentListCardViewModel = {
-  actionState: AssignmentListCardActionState;
   actionView: AssignmentListCardActionView;
   activityDescription: string;
   id: string;
@@ -674,7 +673,6 @@ export function buildAssignmentListCardViewModel({
   });
 
   return {
-    actionState,
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
@@ -721,7 +719,6 @@ export function buildStarterAssignmentListCardViewModel({
   });
 
   return {
-    actionState,
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,

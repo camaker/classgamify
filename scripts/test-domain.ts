@@ -16867,6 +16867,11 @@ assert.doesNotMatch(
   'Assignment list card view-models should expose prepared delivery summary views instead of raw delivery settings.'
 );
 assert.doesNotMatch(
+  assignmentListViewSource,
+  /type AssignmentListCardViewModel = \{(?:(?!\n};)[\s\S])*actionState:/,
+  'Assignment list card view-models should expose prepared action views instead of leaking intermediate action state to card components.'
+);
+assert.doesNotMatch(
   assignmentListCardComponentSource,
   /expiresAt=\{assignment\.expiresAt\}|settings=\{assignment\.settings\}/,
   'Assignment list card component should not pass raw delivery settings to the summary component.'
@@ -21112,19 +21117,6 @@ assert.deepEqual(
     now: new Date('2026-01-15T00:00:00.000Z').getTime(),
   }),
   {
-    actionState: {
-      isPersisted: true,
-      shareLabel: 'Open share link',
-      showResultsAction: true,
-      showShareActions: true,
-      statusAction: {
-        failureMessage: 'Assignment status could not be updated.',
-        kind: 'close-link',
-        label: 'Close link',
-        nextStatus: 'closed',
-        successMessage: 'Assignment link closed.',
-      },
-    },
     actionView: {
       printAction: {
         assignmentId: 'persisted-assignment-1',
@@ -21226,13 +21218,6 @@ assert.deepEqual(
     },
   }),
   {
-    actionState: {
-      isPersisted: false,
-      shareLabel: 'Open share link',
-      showResultsAction: false,
-      showShareActions: true,
-      statusAction: undefined,
-    },
     actionView: {
       printAction: undefined,
       resultAction: undefined,
