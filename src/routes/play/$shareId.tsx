@@ -17,7 +17,7 @@ import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
-  buildStudentRunnerSubmissionPlan,
+  buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionResultState,
   shouldStartStudentRunnerAttemptClock,
   shouldResetStudentRunnerAttemptSession,
@@ -201,7 +201,7 @@ function PlayPage() {
   }, [runnerPageView]);
 
   async function submitAnswers() {
-    const submissionPlan = buildStudentRunnerSubmissionPlan({
+    const executionPlan = buildStudentRunnerSubmissionExecutionPlan({
       anonymousToken,
       answers,
       confirmIncompleteSubmit,
@@ -215,25 +215,20 @@ function PlayPage() {
       studentName,
     });
 
-    if (submissionPlan.type === 'blocked') {
-      toast.error(submissionPlan.message);
-      return;
-    }
-
-    if (submissionPlan.type === 'confirm-incomplete') {
-      setConfirmIncompleteSubmit(true);
-      toast.error(submissionPlan.message);
+    if (executionPlan.type === 'message') {
+      setConfirmIncompleteSubmit(executionPlan.nextConfirmIncompleteSubmit);
+      toast.error(executionPlan.message);
       return;
     }
 
     try {
       const response = await submitAttemptMutation.mutateAsync(
-        submissionPlan.input
+        executionPlan.input
       );
-      setAnonymousToken(submissionPlan.anonymousToken);
+      setAnonymousToken(executionPlan.anonymousToken);
       setResult(buildStudentRunnerSubmissionResultState({ response }));
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
-      toast.success(runnerPageView.submissionSuccessMessage);
+      toast.success(executionPlan.successMessage);
     } catch (error) {
       toast.error(resolveStudentAttemptSubmissionFailureMessage(error));
     }

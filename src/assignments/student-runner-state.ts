@@ -244,6 +244,31 @@ export type StudentRunnerSubmissionPlan = ReturnType<
   typeof buildStudentAttemptSubmissionPlan
 >;
 
+type StudentRunnerSubmissionMessageReason = Extract<
+  StudentRunnerSubmissionPlan,
+  { type: 'blocked' | 'confirm-incomplete' }
+>['reason'];
+
+type StudentRunnerSubmissionSubmitPlan = Extract<
+  StudentRunnerSubmissionPlan,
+  { type: 'submit' }
+>;
+
+export type StudentRunnerSubmissionExecutionPlan =
+  | {
+      message: string;
+      nextConfirmIncompleteSubmit: boolean;
+      reason: StudentRunnerSubmissionMessageReason;
+      type: 'message';
+    }
+  | {
+      anonymousToken?: string;
+      input: StudentRunnerSubmissionSubmitPlan['input'];
+      reason: StudentRunnerSubmissionSubmitPlan['reason'];
+      successMessage: string;
+      type: 'submit';
+    };
+
 export function buildStudentRunnerSeoView(): StudentRunnerSeoView {
   const runnerCopy = getStudentRunnerCopy();
 
@@ -747,6 +772,51 @@ export function buildStudentRunnerSubmissionPlan({
     studentName,
     timeLimitSeconds: pageView.timeLimitSeconds,
   });
+}
+
+export function buildStudentRunnerSubmissionExecutionPlan({
+  anonymousToken,
+  answers,
+  confirmIncompleteSubmit,
+  createAnonymousToken,
+  now,
+  pageView,
+  studentName,
+}: {
+  anonymousToken?: string;
+  answers: StudentAnswerMap;
+  confirmIncompleteSubmit: boolean;
+  createAnonymousToken: () => string;
+  now: number;
+  pageView: StudentRunnerPageViewModel;
+  studentName: string;
+}): StudentRunnerSubmissionExecutionPlan {
+  const submissionPlan = buildStudentRunnerSubmissionPlan({
+    anonymousToken,
+    answers,
+    confirmIncompleteSubmit,
+    createAnonymousToken,
+    now,
+    pageView,
+    studentName,
+  });
+
+  if (submissionPlan.type !== 'submit') {
+    return {
+      message: submissionPlan.message,
+      nextConfirmIncompleteSubmit: submissionPlan.type === 'confirm-incomplete',
+      reason: submissionPlan.reason,
+      type: 'message',
+    };
+  }
+
+  return {
+    anonymousToken: submissionPlan.anonymousToken,
+    input: submissionPlan.input,
+    reason: submissionPlan.reason,
+    successMessage: pageView.submissionSuccessMessage,
+    type: 'submit',
+  };
 }
 
 export function buildStudentRunnerAnonymousTokenPlan({
