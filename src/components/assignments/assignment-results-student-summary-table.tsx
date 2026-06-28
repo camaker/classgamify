@@ -33,17 +33,30 @@ export function AssignmentResultsStudentSummaryTable({
       </TableHeader>
       <TableBody>
         {students.map((rowView) => (
-          <TableRow key={rowView.id}>
-            <TableCell>{rowView.studentLabel}</TableCell>
-            <TableCell>{rowView.attemptsLabel}</TableCell>
-            <TableCell>{rowView.latestAccuracyLabel}</TableCell>
-            <TableCell>{rowView.averageAccuracyLabel}</TableCell>
-            <TableCell>{rowView.bestAccuracyLabel}</TableCell>
-            <TableCell>{rowView.needsReviewLabel}</TableCell>
-            <TableCell>{rowView.lastSubmittedLabel}</TableCell>
-          </TableRow>
+          <AssignmentResultsStudentSummaryRow
+            key={rowView.id}
+            rowView={rowView}
+          />
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function AssignmentResultsStudentSummaryRow({
+  rowView,
+}: {
+  rowView: AssignmentResultsStudentSummaryRows[number];
+}) {
+  return (
+    <TableRow>
+      <TableCell>{rowView.studentLabel}</TableCell>
+      <TableCell>{rowView.attemptsLabel}</TableCell>
+      <TableCell>{rowView.latestAccuracyLabel}</TableCell>
+      <TableCell>{rowView.averageAccuracyLabel}</TableCell>
+      <TableCell>{rowView.bestAccuracyLabel}</TableCell>
+      <TableCell>{rowView.needsReviewLabel}</TableCell>
+      <TableCell>{rowView.lastSubmittedLabel}</TableCell>
+    </TableRow>
   );
 }

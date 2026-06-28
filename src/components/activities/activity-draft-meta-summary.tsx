@@ -7,6 +7,10 @@ type ActivityDraftMetaSummaryProps = {
   result: ActivityDraftResult;
 };
 
+type ActivityDraftMetaSummaryView = ReturnType<
+  typeof buildActivityDraftMetaSummaryView
+>;
+
 export function ActivityDraftMetaSummary({
   result,
 }: ActivityDraftMetaSummaryProps) {
@@ -62,35 +66,10 @@ export function ActivityDraftMetaSummary({
       ) : null}
       <div className="mt-4 grid gap-2 md:grid-cols-2">
         {summaryView.templateReadinessOptions.map((option) => (
-          <div
+          <ActivityDraftTemplateReadinessOption
             key={option.template}
-            className={cn(
-              'rounded-lg border bg-background p-3',
-              option.isReady && 'border-primary/25 bg-primary/5'
-            )}
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant={option.isReady ? 'secondary' : 'outline'}
-                className="rounded-md"
-              >
-                {option.shortName}
-              </Badge>
-              {option.selectedLabel ? (
-                <Badge variant="outline" className="rounded-md">
-                  {option.selectedLabel}
-                </Badge>
-              ) : null}
-              <span className="text-xs text-muted-foreground">
-                {option.readinessLabel}
-              </span>
-            </div>
-            {option.diagnosis ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {option.diagnosis}
-              </p>
-            ) : null}
-          </div>
+            option={option}
+          />
         ))}
       </div>
       <div className="mt-4 grid gap-1.5">
@@ -107,14 +86,49 @@ export function ActivityDraftMetaSummary({
 function ActivityDraftCoverageStat({
   stat,
 }: {
-  stat: ReturnType<
-    typeof buildActivityDraftMetaSummaryView
-  >['coverageStats'][number];
+  stat: ActivityDraftMetaSummaryView['coverageStats'][number];
 }) {
   return (
     <div className="rounded-lg border bg-background p-3">
       <p className="text-lg font-semibold">{stat.value}</p>
       <p className="text-xs text-muted-foreground">{stat.label}</p>
+    </div>
+  );
+}
+
+function ActivityDraftTemplateReadinessOption({
+  option,
+}: {
+  option: ActivityDraftMetaSummaryView['templateReadinessOptions'][number];
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-lg border bg-background p-3',
+        option.isReady && 'border-primary/25 bg-primary/5'
+      )}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant={option.isReady ? 'secondary' : 'outline'}
+          className="rounded-md"
+        >
+          {option.shortName}
+        </Badge>
+        {option.selectedLabel ? (
+          <Badge variant="outline" className="rounded-md">
+            {option.selectedLabel}
+          </Badge>
+        ) : null}
+        <span className="text-xs text-muted-foreground">
+          {option.readinessLabel}
+        </span>
+      </div>
+      {option.diagnosis ? (
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+          {option.diagnosis}
+        </p>
+      ) : null}
     </div>
   );
 }

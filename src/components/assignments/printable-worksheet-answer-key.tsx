@@ -25,25 +25,35 @@ export function PrintableWorksheetAnswerKey({
       </div>
       <div className="grid gap-2">
         {view.itemViews.map((itemView) => (
-          <div
+          <PrintableWorksheetAnswerKeyItem
             key={itemView.id}
-            className="rounded-lg border bg-muted/20 p-3 text-sm"
-          >
-            <p className="font-medium">{itemView.answerLabel}</p>
-            <p className="mt-1 text-muted-foreground">{itemView.prompt}</p>
-            {itemView.acceptedAnswersLabel ? (
-              <p className="mt-1 text-muted-foreground">
-                {itemView.acceptedAnswersLabel}
-              </p>
-            ) : null}
-            {itemView.explanationLabel ? (
-              <p className="mt-1 text-muted-foreground">
-                {itemView.explanationLabel}
-              </p>
-            ) : null}
-          </div>
+            itemView={itemView}
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+function PrintableWorksheetAnswerKeyItem({
+  itemView,
+}: {
+  itemView: PrintableWorksheetPageViewModel['answerKeyView']['itemViews'][number];
+}) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3 text-sm">
+      <p className="font-medium">{itemView.answerLabel}</p>
+      <p className="mt-1 text-muted-foreground">{itemView.prompt}</p>
+      {itemView.acceptedAnswersLabel ? (
+        <p className="mt-1 text-muted-foreground">
+          {itemView.acceptedAnswersLabel}
+        </p>
+      ) : null}
+      {itemView.explanationLabel ? (
+        <p className="mt-1 text-muted-foreground">
+          {itemView.explanationLabel}
+        </p>
+      ) : null}
+    </div>
   );
 }

@@ -33,16 +33,29 @@ export function AssignmentResultsAttemptsTable({
       </TableHeader>
       <TableBody>
         {attempts.map((rowDisplay) => (
-          <TableRow key={rowDisplay.id}>
-            <TableCell>{rowDisplay.studentLabel}</TableCell>
-            <TableCell>{rowDisplay.scoreLabel}</TableCell>
-            <TableCell>{rowDisplay.accuracyLabel}</TableCell>
-            <TableCell>{rowDisplay.answeredLabel}</TableCell>
-            <TableCell>{rowDisplay.durationLabel}</TableCell>
-            <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
-          </TableRow>
+          <AssignmentResultsAttemptRow
+            key={rowDisplay.id}
+            rowDisplay={rowDisplay}
+          />
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function AssignmentResultsAttemptRow({
+  rowDisplay,
+}: {
+  rowDisplay: AssignmentResultsAttemptRows[number];
+}) {
+  return (
+    <TableRow>
+      <TableCell>{rowDisplay.studentLabel}</TableCell>
+      <TableCell>{rowDisplay.scoreLabel}</TableCell>
+      <TableCell>{rowDisplay.accuracyLabel}</TableCell>
+      <TableCell>{rowDisplay.answeredLabel}</TableCell>
+      <TableCell>{rowDisplay.durationLabel}</TableCell>
+      <TableCell>{rowDisplay.submittedAtLabel}</TableCell>
+    </TableRow>
   );
 }

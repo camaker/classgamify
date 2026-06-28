@@ -6,6 +6,9 @@ type ActivityTemplateReadinessPanelProps = {
   summary: ActivityTemplateReadinessPanelSummary;
 };
 
+type ActivityTemplateReadinessOption =
+  ActivityTemplateReadinessPanelSummary['readyOptions'][number];
+
 export function ActivityTemplateReadinessPanel({
   summary,
 }: ActivityTemplateReadinessPanelProps) {
@@ -28,13 +31,10 @@ export function ActivityTemplateReadinessPanel({
       {summary.readyOptions.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
           {summary.readyOptions.map((option) => (
-            <Badge
+            <ActivityTemplateReadyOption
               key={option.template}
-              variant="outline"
-              className="rounded-md"
-            >
-              {option.shortName}
-            </Badge>
+              option={option}
+            />
           ))}
         </div>
       ) : (
@@ -45,15 +45,37 @@ export function ActivityTemplateReadinessPanel({
       {summary.lockedOptions.length > 0 ? (
         <div className="mt-4 grid gap-1.5">
           {summary.lockedOptions.map((option) => (
-            <p
+            <ActivityTemplateLockedOption
               key={option.template}
-              className="text-muted-foreground text-xs leading-5"
-            >
-              {option.diagnosis}
-            </p>
+              option={option}
+            />
           ))}
         </div>
       ) : null}
     </div>
+  );
+}
+
+function ActivityTemplateReadyOption({
+  option,
+}: {
+  option: ActivityTemplateReadinessOption;
+}) {
+  return (
+    <Badge variant="outline" className="rounded-md">
+      {option.shortName}
+    </Badge>
+  );
+}
+
+function ActivityTemplateLockedOption({
+  option,
+}: {
+  option: ActivityTemplateReadinessOption;
+}) {
+  return (
+    <p className="text-muted-foreground text-xs leading-5">
+      {option.diagnosis}
+    </p>
   );
 }

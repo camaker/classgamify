@@ -33,19 +33,30 @@ export function AssignmentResultsItemPerformanceTable({
       </TableHeader>
       <TableBody>
         {items.map((rowView) => (
-          <TableRow key={rowView.id}>
-            <TableCell className="max-w-80">{rowView.promptLabel}</TableCell>
-            <TableCell>{rowView.kindLabel}</TableCell>
-            <TableCell>{rowView.correctRateLabel}</TableCell>
-            <TableCell>{rowView.submittedLabel}</TableCell>
-            <TableCell>{rowView.expectedAnswerText}</TableCell>
-            <TableCell>{rowView.acceptedAnswersText}</TableCell>
-            <TableCell className="max-w-72">
-              {rowView.explanationText}
-            </TableCell>
-          </TableRow>
+          <AssignmentResultsItemPerformanceRow
+            key={rowView.id}
+            rowView={rowView}
+          />
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function AssignmentResultsItemPerformanceRow({
+  rowView,
+}: {
+  rowView: AssignmentResultsItemPerformanceRows[number];
+}) {
+  return (
+    <TableRow>
+      <TableCell className="max-w-80">{rowView.promptLabel}</TableCell>
+      <TableCell>{rowView.kindLabel}</TableCell>
+      <TableCell>{rowView.correctRateLabel}</TableCell>
+      <TableCell>{rowView.submittedLabel}</TableCell>
+      <TableCell>{rowView.expectedAnswerText}</TableCell>
+      <TableCell>{rowView.acceptedAnswersText}</TableCell>
+      <TableCell className="max-w-72">{rowView.explanationText}</TableCell>
+    </TableRow>
   );
 }

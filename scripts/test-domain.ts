@@ -2375,8 +2375,18 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.templateReadinessOptions[\s\S]*summaryView\.reviewChecklist/,
-  'AI draft summary component should render reviewable readiness and checklist details.'
+  /summaryView\.templateReadinessOptions\.map[\s\S]*ActivityDraftTemplateReadinessOption[\s\S]*option=\{option\}/,
+  'AI draft summary component should delegate reviewable template readiness details.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftTemplateReadinessOption[\s\S]*option\.shortName[\s\S]*option\.readinessLabel[\s\S]*option\.diagnosis/,
+  'AI draft template readiness option should render prepared readiness labels and diagnostics.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.reviewChecklist/,
+  'AI draft summary component should render prepared review checklist details.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -2439,8 +2449,23 @@ assert.match(
 );
 assert.match(
   activityTemplateReadinessPanelSource,
-  /summary\.readyOptions[\s\S]*summary\.lockedOptions/,
-  'Template-readiness panel should render ready and locked template diagnostics from the summary.'
+  /summary\.readyOptions\.map[\s\S]*ActivityTemplateReadyOption[\s\S]*option=\{option\}/,
+  'Template-readiness panel should delegate ready template option rendering.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /summary\.lockedOptions\.map[\s\S]*ActivityTemplateLockedOption[\s\S]*option=\{option\}/,
+  'Template-readiness panel should delegate locked template option diagnostics.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /function ActivityTemplateReadyOption[\s\S]*option\.shortName/,
+  'Template-readiness ready option should render prepared short names.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /function ActivityTemplateLockedOption[\s\S]*option\.diagnosis/,
+  'Template-readiness locked option should render prepared diagnostics.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -2946,13 +2971,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /assignmentResultTableHeaders\.itemPerformance[\s\S]*items\.map/,
-  'Assignment result item performance table component should render prepared item row views.'
+  /assignmentResultTableHeaders\.itemPerformance[\s\S]*items\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
+  'Assignment result item performance table component should delegate prepared item row views.'
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /rowView\.promptLabel/,
-  'Assignment result item performance table should render prepared prompt labels.'
+  /function AssignmentResultsItemPerformanceRow[\s\S]*rowView\.promptLabel/,
+  'Assignment result item performance row should render prepared prompt labels.'
 );
 assert.doesNotMatch(
   assignmentResultsItemPerformanceTableSource,
@@ -2961,13 +2986,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsStudentSummaryTableSource,
-  /assignmentResultTableHeaders\.studentSummary[\s\S]*students\.map/,
-  'Assignment result student summary table component should render prepared student row views.'
+  /assignmentResultTableHeaders\.studentSummary[\s\S]*students\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
+  'Assignment result student summary table component should delegate prepared student row views.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
-  /assignmentResultTableHeaders\.studentAttempts[\s\S]*attempts\.map/,
-  'Assignment result attempts table component should render prepared attempt row views.'
+  /assignmentResultTableHeaders\.studentAttempts[\s\S]*attempts\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
+  'Assignment result attempts table component should delegate prepared attempt row views.'
+);
+assert.match(
+  assignmentResultsAttemptsTableSource,
+  /function AssignmentResultsAttemptRow[\s\S]*rowDisplay\.studentLabel[\s\S]*rowDisplay\.submittedAtLabel/,
+  'Assignment result attempt row should render prepared attempt row labels.'
 );
 assert.match(
   assignmentResultsItemAnalysisCardSource,
@@ -5027,8 +5057,13 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
-  'Public assignment rules component should render prepared rule accessibility labels and student-facing descriptions.'
+  /rules\.map[\s\S]*PublicAssignmentRuleItem[\s\S]*rule=\{rule\}/,
+  'Public assignment rules component should delegate prepared rule summary item rendering.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
+  /function PublicAssignmentRuleItem[\s\S]*aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
+  'Public assignment rule item should render prepared rule accessibility labels and student-facing descriptions.'
 );
 assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
@@ -15217,8 +15252,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /view\.itemViews\.map/,
-  'Printable worksheet answer-key component should render answer-key items from the printable worksheet page view-model.'
+  /view\.itemViews\.map[\s\S]*PrintableWorksheetAnswerKeyItem[\s\S]*itemView=\{itemView\}/,
+  'Printable worksheet answer-key component should delegate answer-key items from the printable worksheet page view-model.'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /function PrintableWorksheetAnswerKeyItem[\s\S]*itemView\.answerLabel[\s\S]*itemView\.acceptedAnswersLabel[\s\S]*itemView\.explanationLabel/,
+  'Printable worksheet answer-key item component should render prepared answer, accepted-answer, and explanation labels.'
 );
 assert.match(
   printableWorksheetToolbarSource,
