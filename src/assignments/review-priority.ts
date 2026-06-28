@@ -1,5 +1,5 @@
 import type { AssignmentItemAnalysis } from '@/assignments/results';
-import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
+import { compareRuntimeDisplaySearchText } from '@/assignments/runtime-display';
 
 export function compareAssignmentItemsByReviewPriority(
   left: AssignmentItemAnalysis,
@@ -79,7 +79,5 @@ function normalizeReviewPriorityCount(value: number) {
 }
 
 function compareAssignmentItemSortText(left: string, right: string) {
-  return normalizeRuntimeDisplayText(left).localeCompare(
-    normalizeRuntimeDisplayText(right)
-  );
+  return compareRuntimeDisplaySearchText(left, right);
 }

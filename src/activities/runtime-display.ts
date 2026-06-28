@@ -4,6 +4,23 @@ export function normalizeRuntimeDisplayText(value: string | null | undefined) {
   return (value ?? '').normalize('NFKC').replace(/\s+/gu, ' ').trim();
 }
 
+export function normalizeRuntimeDisplaySearchKey(
+  value: string | null | undefined
+) {
+  return normalizeRuntimeDisplayText(value).toLowerCase();
+}
+
+export function compareRuntimeDisplaySearchText(
+  left: string | null | undefined,
+  right: string | null | undefined
+) {
+  const leftKey = normalizeRuntimeDisplaySearchKey(left);
+  const rightKey = normalizeRuntimeDisplaySearchKey(right);
+  if (leftKey < rightKey) return -1;
+  if (leftKey > rightKey) return 1;
+  return 0;
+}
+
 export function hasRuntimeDisplayText(value: string | null | undefined) {
   return normalizeRuntimeDisplayText(value).length > 0;
 }
@@ -61,5 +78,5 @@ export function getRuntimeDisplayAcceptedAnswers(answer: string) {
 }
 
 export function getRuntimeChoiceDisplayKey(value: string | undefined) {
-  return normalizeRuntimeDisplayText(value).toLocaleLowerCase();
+  return normalizeRuntimeDisplaySearchKey(value);
 }

@@ -426,6 +426,7 @@ import {
   stripRuntimeAnswers,
 } from '@/assignments/public';
 import {
+  compareRuntimeDisplaySearchText,
   getRuntimeDisplayAcceptedAnswers,
   getRuntimeChoiceDisplayKey,
   hasRuntimeDisplayText,
@@ -433,6 +434,7 @@ import {
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayText,
+  normalizeRuntimeDisplaySearchKey,
 } from '@/assignments/runtime-display';
 import {
   buildAssignmentSnapshotInsert,
@@ -1767,13 +1769,28 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpPrioritySource,
-  /export function compareAssignmentStudentsByDisplayLabel[\s\S]*normalizeRuntimeDisplayText/,
-  'Assignment student follow-up ordering should expose a normalized display-label comparator.'
+  /export function compareAssignmentStudentsByDisplayLabel[\s\S]*compareRuntimeDisplaySearchText/,
+  'Assignment student follow-up ordering should expose a stable display-label comparator.'
 );
 assert.match(
   assignmentReviewPrioritySource,
-  /export function compareAssignmentItemsByType[\s\S]*normalizeRuntimeDisplayText/,
-  'Assignment item review-priority ordering should compare normalized display text.'
+  /export function compareAssignmentItemsByType[\s\S]*compareRuntimeDisplaySearchText/,
+  'Assignment item review-priority ordering should compare stable display search keys.'
+);
+assert.match(
+  activityRuntimeDisplaySource,
+  /export function normalizeRuntimeDisplaySearchKey[\s\S]*normalizeRuntimeDisplayText\(value\)\.toLowerCase\(\)/,
+  'Runtime display search keys should use stable lower-casing after display normalization.'
+);
+assert.match(
+  activityRuntimeDisplaySource,
+  /export function compareRuntimeDisplaySearchText[\s\S]*normalizeRuntimeDisplaySearchKey\(left\)[\s\S]*normalizeRuntimeDisplaySearchKey\(right\)[\s\S]*leftKey < rightKey/,
+  'Runtime display search comparison should avoid locale-dependent sorting.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function normalizeResultSearch[\s\S]*normalizeRuntimeDisplaySearchKey\(value\)/,
+  'Assignment result search should reuse the stable runtime display search key.'
 );
 assert.doesNotMatch(
   `${assignmentResultFiltersSource}\n${assignmentStudentFollowUpPrioritySource}`,
@@ -1784,6 +1801,15 @@ assert.doesNotMatch(
   assignmentReviewPrioritySource,
   /\b(?:kind|prompt|itemId)\.localeCompare/,
   'Assignment item review-priority ordering should not compare raw item text directly.'
+);
+assert.doesNotMatch(
+  [
+    assignmentResultFiltersSource,
+    assignmentReviewPrioritySource,
+    assignmentStudentFollowUpPrioritySource,
+  ].join('\n'),
+  /toLocaleLowerCase\(/,
+  'Assignment result search and ordering should not depend on locale-sensitive lower-casing.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -11222,6 +11248,16 @@ assert.deepEqual(PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES, {
   perItem: 2,
 });
 assert.equal(normalizeRuntimeDisplayText('  Ｎｅｗ   York  '), 'New York');
+assert.equal(
+  normalizeRuntimeDisplaySearchKey('  Ｉｓｔａｎｂｕｌ   Student  '),
+  'istanbul student'
+);
+assert.equal(
+  normalizeRuntimeDisplaySearchKey('  İstanbul   Student  '),
+  'i̇stanbul student'
+);
+assert.equal(compareRuntimeDisplaySearchText(' Ｂｅｔａ ', 'alpha'), 1);
+assert.equal(compareRuntimeDisplaySearchText('ＡＬＰＨＡ', 'alpha'), 0);
 assert.equal(hasRuntimeDisplayText('  Ｎｅｗ   York  '), true);
 assert.equal(hasRuntimeDisplayText('\u00A0　\t'), false);
 assert.equal(normalizeOptionalRuntimeDisplayText('   '), undefined);
@@ -27938,8 +27974,13 @@ assert.equal(
   'anonymous student 1'
 );
 assert.equal(normalizeResultSearch('  Ａｖａ   Ｃｈｅｎ  '), 'ava chen');
+assert.equal(
+  normalizeResultSearch('  İstanbul   Student  '),
+  'i̇stanbul student'
+);
 assert.equal(matchesResultSearch('Anonymous student 1', 'student 1'), true);
 assert.equal(matchesResultSearch('Ava Chen', '  ａｖａ '), true);
+assert.equal(matchesResultSearch('İstanbul Student', ' i̇stanbul '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
 assert.equal(
   buildResultSearchSummary({
@@ -29498,6 +29539,13 @@ assert.equal(
   ) > 0,
   true
 );
+assert.equal(
+  compareAssignmentStudentsByDisplayLabel(
+    { studentLabel: ' İstanbul Student ' },
+    { studentLabel: 'izmir student' }
+  ) > 0,
+  true
+);
 assert.deepEqual(
   sortStudentSummaries(
     [
@@ -29531,6 +29579,22 @@ assert.deepEqual(
     'name'
   ).map((student) => student.studentLabel),
   ['alpha', ' Ｂｅｔａ ']
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        studentLabel: 'izmir student',
+      },
+      {
+        ...resultAnalysis.students[1]!,
+        studentLabel: ' İstanbul Student ',
+      },
+    ],
+    'name'
+  ).map((student) => student.studentLabel),
+  ['izmir student', ' İstanbul Student ']
 );
 assert.deepEqual(
   filterAndSortStudentSummaries({
@@ -30017,6 +30081,35 @@ assert.deepEqual(
     (item) => item.itemId
   ),
   normalizedTieItemOrder
+);
+const localeStableTieReviewPriorityItems = [
+  {
+    ...stableTieReviewPriorityItems[0]!,
+    itemId: 'izmir-id',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: 'izmir prompt',
+  },
+  {
+    ...stableTieReviewPriorityItems[1]!,
+    itemId: 'istanbul-id',
+    kind: 'question',
+    kindLabel: 'Question',
+    prompt: ' İstanbul prompt ',
+  },
+] satisfies typeof resultAnalysis.perItem;
+const localeStableTieItemOrder = ['izmir-id', 'istanbul-id'];
+assert.deepEqual(
+  [...localeStableTieReviewPriorityItems]
+    .sort(compareAssignmentItemsByType)
+    .map((item) => item.itemId),
+  localeStableTieItemOrder
+);
+assert.deepEqual(
+  sortItemPerformance(localeStableTieReviewPriorityItems, 'type').map(
+    (item) => item.itemId
+  ),
+  localeStableTieItemOrder
 );
 assert.deepEqual(
   getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {

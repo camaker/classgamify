@@ -1,4 +1,5 @@
 export {
+  compareRuntimeDisplaySearchText,
   getRuntimeDisplayAcceptedAnswers,
   getRuntimeChoiceDisplayKey,
   hasRuntimeDisplayText,
@@ -6,5 +7,6 @@ export {
   normalizeRuntimeChoiceList,
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayList,
+  normalizeRuntimeDisplaySearchKey,
   normalizeRuntimeDisplayText,
 } from '@/activities/runtime-display';

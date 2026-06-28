@@ -14,6 +14,7 @@ import {
   compareAssignmentStudentsByDisplayLabel,
   compareAssignmentStudentsByFollowUpPriority,
 } from '@/assignments/student-follow-up-priority';
+import { normalizeRuntimeDisplaySearchKey } from '@/assignments/runtime-display';
 
 export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
 export type ItemPerformanceSort =
@@ -398,7 +399,7 @@ export function normalizeResultSearchQuery(value: string | null | undefined) {
 }
 
 export function normalizeResultSearch(value: string | null | undefined) {
-  return normalizeResultSearchQuery(value)?.toLocaleLowerCase();
+  return normalizeRuntimeDisplaySearchKey(value) || undefined;
 }
 
 export function matchesResultSearch(
