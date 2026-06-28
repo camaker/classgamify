@@ -3672,6 +3672,21 @@ assert.match(
   'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, and copy-preview views to focused panels.'
 );
 assert.match(
+  assignmentClassroomBriefSource,
+  /export type AssignmentClassroomBrief = \{/,
+  'Assignment classroom brief should expose an explicit domain view contract.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /import type \{ AssignmentClassroomBrief \} from '@\/assignments\/classroom-brief'/,
+  'Assignment classroom brief card should import the explicit classroom brief contract.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
+  'Assignment classroom brief card should not infer its brief contract from the full result page view-model ReturnType.'
+);
+assert.match(
   assignmentResultsClassroomBriefCardSource,
   /function AssignmentResultsClassroomBriefStats[\s\S]*brief\.statSummaryLabel[\s\S]*brief\.statViews\.map[\s\S]*AssignmentResultsClassroomBriefStat/,
   'Assignment classroom brief stats panel should render prepared stat summary and stat views.'

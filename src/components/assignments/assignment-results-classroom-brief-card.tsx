@@ -1,7 +1,5 @@
-import {
-  assignmentResultSectionCopy,
-  type buildAssignmentResultsPageViewModel,
-} from '@/assignments/result-view';
+import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import { assignmentResultSectionCopy } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -12,12 +10,8 @@ import {
 } from '@/components/ui/card';
 import { IconClipboardText } from '@tabler/icons-react';
 
-type AssignmentResultsClassroomBrief = NonNullable<
-  ReturnType<typeof buildAssignmentResultsPageViewModel>['classroomBrief']
->;
-
 type AssignmentResultsClassroomBriefCardProps = {
-  brief: AssignmentResultsClassroomBrief;
+  brief: AssignmentClassroomBrief;
 };
 
 export function AssignmentResultsClassroomBriefCard({
@@ -57,7 +51,7 @@ export function AssignmentResultsClassroomBriefCard({
 function AssignmentResultsClassroomBriefStats({
   brief,
 }: {
-  brief: AssignmentResultsClassroomBrief;
+  brief: AssignmentClassroomBrief;
 }) {
   return (
     <section className="grid gap-3 rounded-lg border bg-muted/20 p-4">
@@ -77,7 +71,7 @@ function AssignmentResultsClassroomBriefStats({
 function AssignmentResultsClassroomBriefStat({
   statView,
 }: {
-  statView: AssignmentResultsClassroomBrief['statViews'][number];
+  statView: AssignmentClassroomBrief['statViews'][number];
 }) {
   return (
     <div className="rounded-md border bg-background p-3">
@@ -90,7 +84,7 @@ function AssignmentResultsClassroomBriefStat({
 function AssignmentResultsClassFocusPanel({
   focusItemViews,
 }: {
-  focusItemViews: AssignmentResultsClassroomBrief['focusItemViews'];
+  focusItemViews: AssignmentClassroomBrief['focusItemViews'];
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
@@ -118,7 +112,7 @@ function AssignmentResultsClassFocusPanel({
 function AssignmentResultsFollowUpPanel({
   followUpStudentViews,
 }: {
-  followUpStudentViews: AssignmentResultsClassroomBrief['followUpStudentViews'];
+  followUpStudentViews: AssignmentClassroomBrief['followUpStudentViews'];
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
@@ -146,7 +140,7 @@ function AssignmentResultsFollowUpPanel({
 function AssignmentResultsClassFocusItem({
   itemView,
 }: {
-  itemView: AssignmentResultsClassroomBrief['focusItemViews'][number];
+  itemView: AssignmentClassroomBrief['focusItemViews'][number];
 }) {
   return (
     <div className="grid gap-1 text-sm">
@@ -174,7 +168,7 @@ function AssignmentResultsClassFocusItem({
 function AssignmentResultsFollowUpStudent({
   studentView,
 }: {
-  studentView: AssignmentResultsClassroomBrief['followUpStudentViews'][number];
+  studentView: AssignmentClassroomBrief['followUpStudentViews'][number];
 }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
@@ -194,7 +188,7 @@ function AssignmentResultsFollowUpStudent({
 function AssignmentResultsClassroomBriefCopyPreview({
   brief,
 }: {
-  brief: AssignmentResultsClassroomBrief;
+  brief: AssignmentClassroomBrief;
 }) {
   return (
     <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">

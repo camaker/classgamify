@@ -43,7 +43,7 @@ type AssignmentClassroomBriefInput = {
   students: AssignmentStudentSummary[];
 };
 
-type AssignmentClassroomBrief = {
+export type AssignmentClassroomBrief = {
   copyPreview: AssignmentClassroomBriefCopyPreview;
   focusItemViews: AssignmentClassroomBriefFocusItemView[];
   focusItems: AssignmentItemAnalysis[];
