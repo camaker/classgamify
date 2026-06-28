@@ -2906,8 +2906,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /focusItemViews[\s\S]*followUpStudentViews/,
-  'Assignment classroom brief component should render prepared focus item and follow-up student views.'
+  /AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}/,
+  'Assignment classroom brief card should delegate prepared focus item and follow-up student views to focused panels.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassFocusPanel[\s\S]*focusItemViews\.map[\s\S]*itemView\.promptLabel/,
+  'Assignment classroom focus panel should render prepared focus item views.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews\.map[\s\S]*studentView\.studentLabel/,
+  'Assignment student follow-up panel should render prepared follow-up student views.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
