@@ -4,7 +4,6 @@ import { ASSIGNMENT_ATTEMPT_DURATION_UNITS } from '@/assignments/attempt-duratio
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import {
-  buildStudentAttemptSubmissionPlan,
   resolveStudentAttemptSubmissionFailureMessage,
   type StudentAnswerChange,
 } from '@/assignments/student-submission';
@@ -17,6 +16,7 @@ import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
   shouldStartStudentRunnerAttemptClock,
   shouldResetStudentRunnerAttemptSession,
@@ -119,12 +119,10 @@ function PlayPage() {
       submittedAttemptCount,
     ]
   );
-  const { activity, assignment } = runnerPageView;
+  const { assignment } = runnerPageView;
   const runtimeItems = runnerPageView.runtimeItems;
-  const completionSummary = runnerPageView.attemptState.completionSummary;
   const itemCount = runnerPageView.itemCount;
   const activeShareId = runnerPageView.activeShareId;
-  const startedAt = runnerPageView.startedAt;
   const timeLimitSeconds = runnerPageView.timeLimitSeconds;
   const controlView = runnerPageView.controlView;
   const resultPanelView = runnerPageView.resultPanelView;
@@ -199,12 +197,9 @@ function PlayPage() {
   }, [activeShareId, assignment]);
 
   async function submitAnswers() {
-    const submissionPlan = buildStudentAttemptSubmissionPlan({
+    const submissionPlan = buildStudentRunnerSubmissionPlan({
       anonymousToken,
       answers,
-      canSubmit: Boolean(activity) && runnerPageView.attemptState.canSubmit,
-      collectStudentName: Boolean(assignment?.settings.collectStudentName),
-      completionSummary,
       confirmIncompleteSubmit,
       createAnonymousToken: () =>
         getOrCreateAnonymousAttemptToken({
@@ -212,11 +207,8 @@ function PlayPage() {
           storage: window.localStorage,
         }),
       now: Date.now(),
-      runtimeItems,
-      shareSlug: activeShareId,
-      startedAt,
+      pageView: runnerPageView,
       studentName,
-      timeLimitSeconds,
     });
 
     if (submissionPlan.type === 'blocked') {

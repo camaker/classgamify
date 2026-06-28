@@ -6,6 +6,7 @@ import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import {
   buildAnonymousAttemptCopy,
   buildAttemptCompletionCopy,
+  buildStudentAttemptSubmissionPlan,
   buildStudentAttemptSessionKey,
   buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
@@ -212,6 +213,10 @@ export type StudentRunnerAnswerUpdatePlan =
   | {
       type: 'ignored';
     };
+
+export type StudentRunnerSubmissionPlan = ReturnType<
+  typeof buildStudentAttemptSubmissionPlan
+>;
 
 export function buildStudentRunnerSeoView(): StudentRunnerSeoView {
   const runnerCopy = getStudentRunnerCopy();
@@ -654,6 +659,42 @@ export function buildStudentRunnerSubmissionResultState({
     attemptUsage: response.attemptUsage,
     reviewItems: response.reviewItems,
   };
+}
+
+export function buildStudentRunnerSubmissionPlan({
+  anonymousToken,
+  answers,
+  confirmIncompleteSubmit,
+  createAnonymousToken,
+  now,
+  pageView,
+  studentName,
+}: {
+  anonymousToken?: string;
+  answers: StudentAnswerMap;
+  confirmIncompleteSubmit: boolean;
+  createAnonymousToken: () => string;
+  now: number;
+  pageView: StudentRunnerPageViewModel;
+  studentName: string;
+}): StudentRunnerSubmissionPlan {
+  return buildStudentAttemptSubmissionPlan({
+    anonymousToken,
+    answers,
+    canSubmit: Boolean(pageView.activity) && pageView.attemptState.canSubmit,
+    collectStudentName: Boolean(
+      pageView.assignment?.settings.collectStudentName
+    ),
+    completionSummary: pageView.attemptState.completionSummary,
+    confirmIncompleteSubmit,
+    createAnonymousToken,
+    now,
+    runtimeItems: pageView.runtimeItems,
+    shareSlug: pageView.activeShareId,
+    startedAt: pageView.startedAt,
+    studentName,
+    timeLimitSeconds: pageView.timeLimitSeconds,
+  });
 }
 
 export function buildStudentRunnerAnswerUpdatePlan({

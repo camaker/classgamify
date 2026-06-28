@@ -710,6 +710,7 @@ import {
   buildStudentRunnerReadyState,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
@@ -5012,8 +5013,13 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /buildStudentAttemptSubmissionPlan\(/,
-  'Student play route should build submission payloads through the assignment-domain submission plan.'
+  /buildStudentRunnerSubmissionPlan\(\{[\s\S]*pageView: runnerPageView/,
+  'Student play route should build submission payloads through the runner submission plan.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerSubmissionPlan[\s\S]*buildStudentAttemptSubmissionPlan\(\{[\s\S]*pageView\.attemptState\.completionSummary[\s\S]*pageView\.runtimeItems[\s\S]*pageView\.activeShareId[\s\S]*pageView\.startedAt[\s\S]*pageView\.timeLimitSeconds/,
+  'Student runner state domain should adapt runner page view state into the assignment-domain submission plan.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -5047,8 +5053,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(/,
-  'Student play route should not rebuild submit gates, anonymous identity, duration, or submission input locally.'
+  /buildStudentAttemptSubmissionPlan\(|buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(|buildStudentRunnerSubmissionPlan\(\{[\s\S]*(?:completionSummary|runtimeItems,|startedAt,|timeLimitSeconds,)/,
+  'Student play route should not rebuild submit gates, anonymous identity, duration, runner completion, or submission input locally.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -11277,6 +11283,53 @@ assert.deepEqual(
     headerTitle: 'Public assignment',
     identityMode: 'anonymous',
     status: 'ready',
+  }
+);
+const submittableStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: ' browser-token-1 ',
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 5_000,
+  isSubmitting: false,
+  pageState: publicRunnerState,
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  buildStudentRunnerSubmissionPlan({
+    anonymousToken: ' browser-token-1 ',
+    answers: {
+      [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    },
+    confirmIncompleteSubmit: false,
+    createAnonymousToken: () => {
+      throw new Error('Existing anonymous token should be reused.');
+    },
+    now: 31_400,
+    pageView: submittableStudentRunnerPageView,
+    studentName: '',
+  }),
+  {
+    anonymousToken: 'browser-token-1',
+    input: {
+      anonymousToken: 'browser-token-1',
+      answers: [
+        {
+          answer: 'Student answer',
+          itemId: publicRunnerState.runtimeItems[0]!.id,
+        },
+      ],
+      durationSeconds: 30,
+      shareSlug: 'share-public',
+    },
+    reason: 'complete',
+    type: 'submit',
   }
 );
 const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
