@@ -490,6 +490,7 @@ import {
 } from '@/assignments/list-query';
 import {
   buildAssignmentListFilterSummary,
+  buildEmptyAssignmentListSummary,
   buildAssignmentListSummary,
   buildAssignmentListStatusMetrics,
   buildAssignmentListSummaryMetrics,
@@ -1749,6 +1750,16 @@ assert.match(
   assignmentListSummarySource,
   /buildAssignmentAttemptStatsView\(resolvedSummary\)/,
   'Assignment list summary metrics should format values through the shared attempt stats view.'
+);
+assert.match(
+  assignmentListSummarySource,
+  /export function buildEmptyAssignmentListSummary[\s\S]*totalAssignments,[\s\S]*buildAssignmentListSummaryMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(totalAssignments\)[\s\S]*buildAssignmentListStatusMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(\)/,
+  'Assignment list summary surfaces should share one empty-summary fallback contract.'
+);
+assert.doesNotMatch(
+  assignmentListSummarySource,
+  /summary \?\? \{[\s\S]*averageScore: 0/,
+  'Assignment list summary surfaces should not duplicate empty summary object literals.'
 );
 assert.match(
   assignmentListViewStatsSource,
@@ -20199,6 +20210,24 @@ assert.deepEqual(
     totalAssignments: 4,
   }
 );
+assert.deepEqual(buildEmptyAssignmentListSummary(12), {
+  averageScore: 0,
+  closedAssignments: 0,
+  completions: 0,
+  draftAssignments: 0,
+  expiredAssignments: 0,
+  openAssignments: 0,
+  totalAssignments: 12,
+});
+assert.deepEqual(buildEmptyAssignmentListSummary(), {
+  averageScore: 0,
+  closedAssignments: 0,
+  completions: 0,
+  draftAssignments: 0,
+  expiredAssignments: 0,
+  openAssignments: 0,
+  totalAssignments: 0,
+});
 assert.deepEqual(
   buildAssignmentListSummaryMetrics({
     hasFilters: false,

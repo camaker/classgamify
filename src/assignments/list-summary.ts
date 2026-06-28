@@ -79,6 +79,20 @@ export function buildAssignmentListSummary({
   };
 }
 
+export function buildEmptyAssignmentListSummary(
+  totalAssignments = 0
+): AssignmentListSummary {
+  return {
+    averageScore: 0,
+    closedAssignments: 0,
+    completions: 0,
+    draftAssignments: 0,
+    expiredAssignments: 0,
+    openAssignments: 0,
+    totalAssignments,
+  };
+}
+
 export function buildAssignmentListFilterSummary({
   isLoading,
   search,
@@ -111,15 +125,8 @@ export function buildAssignmentListSummaryMetrics({
   summary?: AssignmentListSummary;
   totalAssignments: number;
 }): AssignmentListSummaryMetric[] {
-  const resolvedSummary = summary ?? {
-    averageScore: 0,
-    closedAssignments: 0,
-    completions: 0,
-    draftAssignments: 0,
-    expiredAssignments: 0,
-    openAssignments: 0,
-    totalAssignments,
-  };
+  const resolvedSummary =
+    summary ?? buildEmptyAssignmentListSummary(totalAssignments);
   const statsView = buildAssignmentAttemptStatsView(resolvedSummary);
 
   return [
@@ -160,15 +167,7 @@ export function buildAssignmentListSummaryMetrics({
 export function buildAssignmentListStatusMetrics(
   summary?: AssignmentListSummary
 ): AssignmentListStatusMetric[] {
-  const resolvedSummary = summary ?? {
-    averageScore: 0,
-    closedAssignments: 0,
-    completions: 0,
-    draftAssignments: 0,
-    expiredAssignments: 0,
-    openAssignments: 0,
-    totalAssignments: 0,
-  };
+  const resolvedSummary = summary ?? buildEmptyAssignmentListSummary();
 
   return [
     {
