@@ -3582,6 +3582,26 @@ assert.match(
   'Assignment result header component should own delivery summary and delegate share/result actions to a focused component.'
 );
 assert.match(
+  assignmentResultViewSource,
+  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*export type AssignmentResultHeaderView/,
+  'Assignment result header share, print, and header-view contracts should be explicit assignment-domain exports.'
+);
+assert.match(
+  assignmentResultsHeaderCardSource,
+  /AssignmentResultHeaderView/,
+  'Assignment result header card should import the explicit assignment-domain header-view contract.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction/,
+  'Assignment result header actions should import explicit assignment-domain print and share action contracts.'
+);
+assert.doesNotMatch(
+  `${assignmentResultsHeaderCardSource}\n${assignmentResultsHeaderActionsSource}`,
+  /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
+  'Assignment result header components should not infer header contracts from the full result page view-model ReturnType.'
+);
+assert.match(
   assignmentResultsHeaderActionsSource,
   /CopyAssignmentShareLinkButton[\s\S]*to="\/print\/assignments\/\$assignmentId"[\s\S]*resultActionIconByAction/,
   'Assignment result header actions component should own share actions, printable worksheet links, and result action icons.'

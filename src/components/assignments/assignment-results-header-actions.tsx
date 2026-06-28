@@ -1,6 +1,7 @@
 import type {
   AssignmentResultActionButton,
-  buildAssignmentResultsPageViewModel,
+  AssignmentResultHeaderPrintAction,
+  AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -15,21 +16,13 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
-type AssignmentResultsHeaderView = NonNullable<
-  ReturnType<typeof buildAssignmentResultsPageViewModel>['headerView']
->;
-
 type AssignmentResultsHeaderActionsProps = {
   assignmentId: string;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
-  printAction: AssignmentResultsHeaderView['printAction'];
+  printAction: AssignmentResultHeaderPrintAction;
   resultActions: AssignmentResultActionButton[];
-  shareAction: AssignmentResultsHeaderView['shareAction'];
+  shareAction: AssignmentResultHeaderShareAction;
 };
-type AssignmentResultsHeaderPrintAction =
-  AssignmentResultsHeaderView['printAction'];
-type AssignmentResultsHeaderShareAction =
-  AssignmentResultsHeaderView['shareAction'];
 
 export function AssignmentResultsHeaderActions({
   assignmentId,

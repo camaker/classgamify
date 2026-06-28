@@ -240,7 +240,7 @@ type AssignmentResultHeaderSource = {
   } | null;
 };
 
-type AssignmentResultHeaderShareAction = {
+export type AssignmentResultHeaderShareAction = {
   disabledReason: string | undefined;
   isAvailable: boolean;
   label: string;
@@ -248,8 +248,22 @@ type AssignmentResultHeaderShareAction = {
   shareSlug: string;
 };
 
-type AssignmentResultHeaderPrintAction = {
+export type AssignmentResultHeaderPrintAction = {
   label: string;
+};
+
+export type AssignmentResultHeaderView = {
+  activityDescription: string;
+  activityTitle: string;
+  assignmentSharePath: string;
+  assignmentTitle: string;
+  printAction: AssignmentResultHeaderPrintAction;
+  settingsSummaryView: AssignmentSettingsSummaryView;
+  shareAction: AssignmentResultHeaderShareAction;
+  shareSlug: string;
+  statusLabel: string;
+  templateLabel: string;
+  templateType: ActivityTemplateType;
 };
 
 export type AssignmentResultsPageData<
@@ -283,7 +297,7 @@ type AssignmentResultsPageViewModel<
   contentState: AssignmentResultContentState;
   controlViews: AssignmentResultControlViews;
   description: string;
-  headerView: ReturnType<typeof buildAssignmentResultHeaderView> | null;
+  headerView: AssignmentResultHeaderView | null;
   itemAnalysisCardViews: ReturnType<
     typeof buildAssignmentItemAnalysisCardViews
   >;
@@ -694,7 +708,9 @@ export function buildAssignmentResultHeaderView({
   assignment,
   now,
   snapshot,
-}: AssignmentResultHeaderSource & { now?: number }) {
+}: AssignmentResultHeaderSource & {
+  now?: number;
+}): AssignmentResultHeaderView {
   const resolvedSource = resolveAssignmentSnapshotSource({
     activity,
     snapshot,

@@ -1,6 +1,6 @@
 import type {
   AssignmentResultActionButton,
-  buildAssignmentResultsPageViewModel,
+  AssignmentResultHeaderView,
 } from '@/assignments/result-view';
 import { AssignmentResultsHeaderActions } from '@/components/assignments/assignment-results-header-actions';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -13,13 +13,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-type AssignmentResultsHeaderView = NonNullable<
-  ReturnType<typeof buildAssignmentResultsPageViewModel>['headerView']
->;
-
 type AssignmentResultsHeaderCardProps = {
   assignmentId: string;
-  headerView: AssignmentResultsHeaderView;
+  headerView: AssignmentResultHeaderView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   resultActions: AssignmentResultActionButton[];
 };
