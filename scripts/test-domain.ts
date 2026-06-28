@@ -16992,6 +16992,21 @@ assert.doesNotMatch(
   'Published assignment panel context should expose prepared actionView instead of legacy action booleans or duplicate print action fields.'
 );
 assert.match(
+  publishedAssignmentSource,
+  /export type PublishedAssignmentPanelActionView[\s\S]*export type PublishedAssignmentPanelContext/,
+  'Published assignment panel action and context contracts should be explicit domain exports.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /type PublishedAssignmentPanelActionView,[\s\S]*type PublishedAssignmentPanelContext,[\s\S]*buildPublishedAssignmentPanelContext/,
+  'Published assignment panel component should import the explicit assignment-domain panel contracts.'
+);
+assert.doesNotMatch(
+  publishedAssignmentPanelComponentSource,
+  /ReturnType<typeof buildPublishedAssignmentPanelContext>/,
+  'Published assignment panel component should not infer its public contract from buildPublishedAssignmentPanelContext ReturnType.'
+);
+assert.match(
   publishedAssignmentPanelComponentSource,
   /PublishedAssignmentPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*onDismiss=\{onDismiss\}/,
   'Published assignment panel should delegate prepared action rendering to a focused action component.'

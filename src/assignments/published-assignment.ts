@@ -17,7 +17,7 @@ type PublishedAssignmentListItem = {
 type PublishedAssignmentPanelAssignment =
   PublishedAssignmentListItem['assignment'];
 
-type PublishedAssignmentPanelActionView = {
+export type PublishedAssignmentPanelActionView = {
   dismissAction:
     | {
         label: string;
@@ -81,7 +81,7 @@ export function resolvePublishedAssignmentPanelAssignment<
   });
 }
 
-type PublishedAssignmentPanelContext = {
+export type PublishedAssignmentPanelContext = {
   actionView: PublishedAssignmentPanelActionView;
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;

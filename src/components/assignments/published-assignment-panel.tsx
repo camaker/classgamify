@@ -1,5 +1,9 @@
 import { assignmentListPublishedPanelCopy } from '@/assignments/list-view';
-import { buildPublishedAssignmentPanelContext } from '@/assignments/published-assignment';
+import {
+  type PublishedAssignmentPanelActionView,
+  type PublishedAssignmentPanelContext,
+  buildPublishedAssignmentPanelContext,
+} from '@/assignments/published-assignment';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,15 +17,10 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type PublishedAssignmentPanelProps = {
-  context: ReturnType<typeof buildPublishedAssignmentPanelContext> | undefined;
+  context: PublishedAssignmentPanelContext | undefined;
   onDismiss: () => void;
   shareSlug: string;
 };
-type PublishedAssignmentPanelContext = ReturnType<
-  typeof buildPublishedAssignmentPanelContext
->;
-type PublishedAssignmentPanelActionView =
-  PublishedAssignmentPanelContext['actionView'];
 type PublishedAssignmentPanelResultAction = NonNullable<
   PublishedAssignmentPanelActionView['resultAction']
 >;
