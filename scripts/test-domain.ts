@@ -15402,6 +15402,11 @@ assert.match(
 );
 assert.match(
   activityDraftSourceSource,
+  /export function removeActivitySourceMaterialDraftNotes/,
+  'AI draft source note cleanup should be exported for AI content extraction boundaries.'
+);
+assert.match(
+  activityDraftSourceSource,
   /isActivitySourceMaterialDraftNotesParagraph[\s\S]*normalizeRuntimeDisplayText/,
   'AI draft source note syncing should identify existing material-note headings through shared display normalization.'
 );
@@ -15537,6 +15542,11 @@ assert.match(
   activityAiDraftSource,
   /export function extractActivityDraftSourceTerms[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.minPhraseLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.maxPhraseLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.minWordLength[\s\S]*ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS\.maxWordLength/,
   'AI draft source-term extraction should reuse named phrase and word limits.'
+);
+assert.match(
+  activityAiDraftSource,
+  /extractActivityDraftSourceTerms[\s\S]*removeActivitySourceMaterialDraftNotes\(sourceText\)/,
+  'AI draft source-term extraction should exclude safe source-material provenance notes through the draft-source helper.'
 );
 assert.doesNotMatch(
   activityAiDraftSource,
@@ -21612,14 +21622,16 @@ assert.deepEqual(
     sourceText: sourceMaterialDraftNotesText,
     subject: 'Science',
   }).slice(0, 6),
-  [
-    'weather',
-    'sunny',
-    'rainy',
-    'cloudy',
-    'Attached classroom source materials',
-    '- Worksheet document',
-  ]
+  ['weather', 'sunny', 'rainy', 'cloudy', 'Science']
+);
+assert.equal(
+  extractActivityDraftSourceTerms({
+    sourceText: sourceMaterialDraftNotesText,
+    subject: 'Science',
+  }).some((term) =>
+    /Attached classroom source materials|Worksheet document/i.test(term)
+  ),
+  false
 );
 assert.deepEqual(
   buildFallbackActivityDraftTerms({
@@ -21636,6 +21648,17 @@ assert.deepEqual(
     locale: 'en',
   }),
   ['weather', 'sunny', 'rainy']
+);
+assert.deepEqual(
+  buildFallbackActivityDraftTerms({
+    input: {
+      sourceText:
+        'Attached classroom source materials:\n- Worksheet document: Weather worksheet.pdf\n- Audio: Weather listening.mp3',
+      subject: 'Science',
+    },
+    locale: 'en',
+  }).slice(0, 3),
+  ['Science', 'key word', 'example']
 );
 const minimalFallbackDraft = createFallbackActivityDraft({
   sourceText: 'food, apple, bread, milk',
@@ -22991,6 +23014,17 @@ assert.equal(
   appendActivitySourceMaterialDraftNotes({
     sourceMaterials: [],
     sourceText: refreshedMaterialDraftSourceText,
+  }),
+  'Teacher source notes'
+);
+assert.equal(
+  appendActivitySourceMaterialDraftNotes({
+    sourceMaterials: [],
+    sourceText: [
+      'Teacher source notes',
+      'Attached classroom source materials:',
+      '- Audio: stale.mp3',
+    ].join('\n'),
   }),
   'Teacher source notes'
 );

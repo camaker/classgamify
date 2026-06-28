@@ -3,7 +3,11 @@ import {
   buildActivityDraftMeta,
   type ActivityDraftMeta,
 } from '@/activities/draft-meta';
-import { ACTIVITY_DRAFT_SOURCE_MAX_LENGTH } from '@/activities/draft-source';
+import {
+  ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+  hasActivitySourceMaterialDraftNotes,
+  removeActivitySourceMaterialDraftNotes,
+} from '@/activities/draft-source';
 import {
   ACTIVITY_EDITOR_FIELD_LIMITS,
   ACTIVITY_TITLE_LENGTH,
@@ -1376,7 +1380,10 @@ export function extractActivityDraftSourceTerms({
   sourceText: string;
   subject: string;
 }) {
-  const phrases = sourceText
+  const contentSourceText = hasActivitySourceMaterialDraftNotes(sourceText)
+    ? removeActivitySourceMaterialDraftNotes(sourceText)
+    : sourceText;
+  const phrases = contentSourceText
     .split(/[\n,;|，。；、:：!?！？()[\]{}]+/u)
     .map((value) => value.trim())
     .filter(
@@ -1384,7 +1391,7 @@ export function extractActivityDraftSourceTerms({
         value.length >= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.minPhraseLength &&
         value.length <= ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS.maxPhraseLength
     );
-  const words = sourceText
+  const words = contentSourceText
     .split(/\s+/u)
     .map((value) => value.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
     .filter(

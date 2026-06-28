@@ -95,8 +95,15 @@ export function appendActivitySourceMaterialDraftNotes({
 
 export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
   return getActivityDraftSourceTextParagraphs(sourceText).some(
-    isActivitySourceMaterialDraftNotesParagraph
+    hasActivitySourceMaterialDraftNotesParagraph
   );
+}
+
+export function removeActivitySourceMaterialDraftNotes(sourceText: string) {
+  return getActivityDraftSourceTextParagraphs(sourceText)
+    .map(removeActivitySourceMaterialDraftNotesFromParagraph)
+    .filter(Boolean)
+    .join('\n\n');
 }
 
 export function buildActivitySourceMaterialDraftNoteView(
@@ -169,12 +176,6 @@ function limitActivityDraftSourceText(parts: string[]) {
   return sourceText;
 }
 
-function removeActivitySourceMaterialDraftNotes(sourceText: string) {
-  return getActivityDraftSourceTextParagraphs(sourceText)
-    .filter((part) => !isActivitySourceMaterialDraftNotesParagraph(part))
-    .join('\n\n');
-}
-
 function getActivityDraftSourceTextParagraphs(sourceText: string) {
   return sourceText
     .split(/\r?\n\s*\r?\n/)
@@ -191,6 +192,25 @@ function isActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
   );
 
   return paragraphHeading === heading;
+}
+
+function hasActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
+  return paragraph
+    .split(/\r?\n/)
+    .some((line) => isActivitySourceMaterialDraftNotesParagraph(line));
+}
+
+function removeActivitySourceMaterialDraftNotesFromParagraph(
+  paragraph: string
+) {
+  const lines = paragraph.split(/\r?\n/);
+  const noteStartIndex = lines.findIndex((line) =>
+    isActivitySourceMaterialDraftNotesParagraph(line)
+  );
+
+  if (noteStartIndex === -1) return paragraph;
+
+  return normalizeDraftSourceText(lines.slice(0, noteStartIndex).join('\n'));
 }
 
 function unique(values: string[]) {
