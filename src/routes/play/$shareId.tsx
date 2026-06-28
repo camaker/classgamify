@@ -280,8 +280,7 @@ function PlayPage() {
 
   if (runnerRouteState.status !== 'ready') return null;
 
-  const routeActivity = runnerRouteState.activity;
-  const routeAssignment = runnerRouteState.assignment;
+  const { previewView } = runnerRouteState;
 
   return (
     <Container className="px-4 py-10 md:py-14">
@@ -332,10 +331,10 @@ function PlayPage() {
         </StudentRunnerAttemptShell>
 
         <ActivityPreview
-          activity={routeActivity}
-          assignment={routeAssignment}
+          activity={previewView.activity}
+          assignment={previewView.assignment}
           compact
-          hideAnswers={pageState.hidePreviewAnswers}
+          hideAnswers={previewView.hideAnswers}
         />
       </div>
     </Container>

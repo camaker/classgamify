@@ -4922,6 +4922,16 @@ assert.match(
 );
 assert.match(
   playRouteSource,
+  /const \{ previewView \} = runnerRouteState[\s\S]*<ActivityPreview[\s\S]*activity=\{previewView\.activity\}[\s\S]*assignment=\{previewView\.assignment\}[\s\S]*hideAnswers=\{previewView\.hideAnswers\}/,
+  'Student play route should render activity preview from the prepared runner preview view.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /previewView:[\s\S]*hideAnswers: pageState\.hidePreviewAnswers/,
+  'Student runner page view-model should prepare activity-preview answer visibility.'
+);
+assert.match(
+  playRouteSource,
   /StudentRuntimeItemList/,
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
 );
@@ -4967,7 +4977,7 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
@@ -11327,6 +11337,7 @@ assert.deepEqual(
     itemCount: studentRunnerPageView.itemCount,
     loadingView: studentRunnerPageView.loadingView,
     missingView: studentRunnerPageView.missingView,
+    previewView: studentRunnerPageView.previewView,
     resultPanelView: studentRunnerPageView.resultPanelView,
     routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
     runtimeListView: studentRunnerPageView.runtimeListView,
@@ -11404,6 +11415,11 @@ assert.deepEqual(
       message: 'Loading student activity...',
     },
     missingView: undefined,
+    previewView: {
+      activity: publicRunnerState.activity,
+      assignment: publicRunnerState.assignment,
+      hideAnswers: true,
+    },
     resultPanelView: {
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',
@@ -11436,6 +11452,7 @@ assert.deepEqual(
     assignmentShareId: readyStudentRunnerRouteState.assignment.shareId,
     headerTitle: readyStudentRunnerRouteState.headerView.title,
     identityMode: readyStudentRunnerRouteState.identityView.mode,
+    previewHideAnswers: readyStudentRunnerRouteState.previewView.hideAnswers,
     status: readyStudentRunnerRouteState.status,
   },
   {
@@ -11443,6 +11460,7 @@ assert.deepEqual(
     assignmentShareId: 'share-public',
     headerTitle: 'Public assignment',
     identityMode: 'anonymous',
+    previewHideAnswers: true,
     status: 'ready',
   }
 );
@@ -11606,6 +11624,11 @@ assert.deepEqual(
   { type: 'skip' }
 );
 assert.equal(namedStudentRunnerPageView.controlView.runnerTitle, 'Quiz');
+assert.deepEqual(namedStudentRunnerPageView.previewView, {
+  activity: starterRunnerState.activity,
+  assignment: starterRunnerState.assignment,
+  hideAnswers: false,
+});
 assert.deepEqual(namedStudentRunnerPageView.resultPanelView, {
   show: false,
 });

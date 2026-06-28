@@ -121,6 +121,12 @@ type StudentRunnerResultPanelView =
       statusLabel: string;
     };
 
+type StudentRunnerActivityPreviewView = {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+  hideAnswers: boolean;
+};
+
 type StudentRunnerRuntimeListView = {
   disabled: boolean;
   items: PublicRuntimeItem[];
@@ -154,6 +160,7 @@ type StudentRunnerPageViewModel = {
   itemCount: number;
   loadingView: StudentRunnerLoadingView;
   missingView?: StudentRunnerMissingPageView;
+  previewView?: StudentRunnerActivityPreviewView;
   resultPanelView: StudentRunnerResultPanelView;
   routeBadgeLabel: string;
   runtimeListView: StudentRunnerRuntimeListView;
@@ -183,6 +190,7 @@ type StudentRunnerRouteState =
       headerView: NonNullable<StudentRunnerPageViewModel['headerView']>;
       identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
       pageView: StudentRunnerPageViewModel;
+      previewView: NonNullable<StudentRunnerPageViewModel['previewView']>;
       status: 'ready';
     };
 
@@ -511,6 +519,14 @@ export function buildStudentRunnerPageViewModel({
       pageState.status === 'missing'
         ? buildStudentRunnerMissingPageView(pageState.reason)
         : undefined,
+    previewView:
+      activity && assignment && pageState.status === 'ready'
+        ? {
+            activity,
+            assignment,
+            hideAnswers: pageState.hidePreviewAnswers,
+          }
+        : undefined,
     resultPanelView: buildStudentRunnerResultPanelView({
       attemptResultDisplay,
       attemptUsageLabel,
@@ -554,8 +570,15 @@ export function buildStudentRunnerRouteState(
   const assignment = pageView.assignment;
   const headerView = pageView.headerView;
   const identityView = pageView.identityView;
+  const previewView = pageView.previewView;
 
-  if (!activity || !assignment || !headerView || !identityView) {
+  if (
+    !activity ||
+    !assignment ||
+    !headerView ||
+    !identityView ||
+    !previewView
+  ) {
     return {
       pageView,
       status: 'unavailable',
@@ -568,6 +591,7 @@ export function buildStudentRunnerRouteState(
     headerView,
     identityView,
     pageView,
+    previewView,
     status: 'ready',
   };
 }
