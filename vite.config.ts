@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import { devtools } from '@tanstack/devtools-vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
-import viteTsConfigPaths from 'vite-tsconfig-paths';
 import { fileURLToPath, URL } from 'url';
 import tailwindcss from '@tailwindcss/vite';
 import { cloudflare } from '@cloudflare/vite-plugin';
@@ -21,6 +20,7 @@ const config = defineConfig(({ mode }) => {
       allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
     },
     resolve: {
+      tsconfigPaths: true,
       alias: [
         {
           find: /^@tabler\/icons-react$/,
@@ -56,9 +56,11 @@ const config = defineConfig(({ mode }) => {
         emitTsDeclarations: true,
         isServer: 'import.meta.env?.SSR === true',
       }),
-      // this is the plugin that enables path aliases
-      viteTsConfigPaths({
-        projects: ['./tsconfig.json'],
+      // https://developers.cloudflare.com/workers/vite-plugin/
+      cloudflare({
+        viteEnvironment: {
+          name: 'ssr',
+        },
       }),
       // https://tanstack.dev/start/latest/docs/framework/react/build-from-scratch
       tanstackStart({
@@ -68,12 +70,6 @@ const config = defineConfig(({ mode }) => {
       }),
       // react's vite plugin must come after start's vite plugin
       viteReact(),
-      // https://developers.cloudflare.com/workers/vite-plugin/
-      cloudflare({
-        viteEnvironment: {
-          name: 'ssr',
-        },
-      }),
     ],
   };
 });
