@@ -28,31 +28,58 @@ export function ActivitySourceMaterialsSummary({
         </div>
         <div className="flex flex-wrap gap-1.5">
           {summary.kindBadges.map((badge) => (
-            <Badge key={badge.kind} variant="secondary" className="rounded-md">
-              {badge.summaryText}
-            </Badge>
+            <ActivitySourceMaterialKindBadge badge={badge} key={badge.kind} />
           ))}
         </div>
       </div>
       {summary.extractionActions.length ? (
-        <div className="mt-3 border-t pt-3">
-          <p className="text-muted-foreground text-xs">
-            {summary.extractionTitle}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {summary.extractionActions.map((action) => (
-              <Badge
-                key={action.id}
-                variant="outline"
-                className="rounded-md bg-background"
-              >
-                <IconSparkles className="size-3" />
-                {action.summaryText}
-              </Badge>
-            ))}
-          </div>
-        </div>
+        <ActivitySourceMaterialExtractionSummary summary={summary} />
       ) : null}
     </div>
+  );
+}
+
+function ActivitySourceMaterialKindBadge({
+  badge,
+}: {
+  badge: ActivitySourceMaterialSummaryView['kindBadges'][number];
+}) {
+  return (
+    <Badge variant="secondary" className="rounded-md">
+      {badge.summaryText}
+    </Badge>
+  );
+}
+
+function ActivitySourceMaterialExtractionSummary({
+  summary,
+}: {
+  summary: ActivitySourceMaterialSummaryView;
+}) {
+  return (
+    <div className="mt-3 border-t pt-3">
+      <p className="text-muted-foreground text-xs">{summary.extractionTitle}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {summary.extractionActions.map((action) => (
+          <ActivitySourceMaterialExtractionBadge
+            action={action}
+            key={action.id}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivitySourceMaterialExtractionBadge({
+  action,
+}: {
+  action: ActivitySourceMaterialSummaryView['extractionActions'][number];
+}) {
+  return (
+    <Badge variant="outline" className="rounded-md bg-background">
+      <IconSparkles className="size-3" />
+      {action.summaryText}
+    </Badge>
   );
 }

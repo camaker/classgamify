@@ -63,17 +63,10 @@ function AssignmentResultsClassFocusPanel({
       <div className="mt-3 grid gap-3">
         {focusItemViews.length > 0 ? (
           focusItemViews.map((itemView) => (
-            <div key={itemView.itemId} className="grid gap-1 text-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="min-w-0 font-medium">{itemView.promptLabel}</p>
-                <Badge variant="outline" className="rounded-md">
-                  {itemView.correctRateLabel}
-                </Badge>
-              </div>
-              <p className="text-muted-foreground text-xs">
-                {itemView.correctSummaryLabel}
-              </p>
-            </div>
+            <AssignmentResultsClassFocusItem
+              itemView={itemView}
+              key={itemView.itemId}
+            />
           ))
         ) : (
           <p className="text-muted-foreground text-sm">
@@ -98,22 +91,10 @@ function AssignmentResultsFollowUpPanel({
       <div className="mt-3 grid gap-3">
         {followUpStudentViews.length > 0 ? (
           followUpStudentViews.map((studentView) => (
-            <div
+            <AssignmentResultsFollowUpStudent
               key={studentView.studentKey}
-              className="flex items-center justify-between gap-3 text-sm"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">
-                  {studentView.studentLabel}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  {studentView.accuracyLabel}
-                </p>
-              </div>
-              <Badge variant="secondary" className="rounded-md">
-                {studentView.needsReviewLabel}
-              </Badge>
-            </div>
+              studentView={studentView}
+            />
           ))
         ) : (
           <p className="text-muted-foreground text-sm">
@@ -121,6 +102,46 @@ function AssignmentResultsFollowUpPanel({
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+function AssignmentResultsClassFocusItem({
+  itemView,
+}: {
+  itemView: AssignmentResultsClassroomBrief['focusItemViews'][number];
+}) {
+  return (
+    <div className="grid gap-1 text-sm">
+      <div className="flex items-center justify-between gap-3">
+        <p className="min-w-0 font-medium">{itemView.promptLabel}</p>
+        <Badge variant="outline" className="rounded-md">
+          {itemView.correctRateLabel}
+        </Badge>
+      </div>
+      <p className="text-muted-foreground text-xs">
+        {itemView.correctSummaryLabel}
+      </p>
+    </div>
+  );
+}
+
+function AssignmentResultsFollowUpStudent({
+  studentView,
+}: {
+  studentView: AssignmentResultsClassroomBrief['followUpStudentViews'][number];
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-sm">
+      <div className="min-w-0">
+        <p className="truncate font-medium">{studentView.studentLabel}</p>
+        <p className="text-muted-foreground text-xs">
+          {studentView.accuracyLabel}
+        </p>
+      </div>
+      <Badge variant="secondary" className="rounded-md">
+        {studentView.needsReviewLabel}
+      </Badge>
     </div>
   );
 }

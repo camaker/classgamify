@@ -55,30 +55,13 @@ export function AssignmentSettingsSummary(
 
   return (
     <div className="grid gap-3">
-      <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6">
-        <div className="flex items-center gap-2 font-medium text-foreground">
-          <IconClipboardText className="size-4 text-primary" />
-          {summaryView.instructions.label}
-        </div>
-        <p
-          className={cn(
-            'mt-2 text-muted-foreground',
-            summaryView.instructions.isEmpty && 'italic'
-          )}
-        >
-          {summaryView.instructions.value}
-        </p>
-      </div>
+      <AssignmentInstructionsTile instructions={summaryView.instructions} />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {summaryView.items.map((item) => (
           <AssignmentSettingTile
-            icon={getAssignmentSettingIcon(
-              item.id,
-              summaryView.settings.collectStudentName
-            )}
+            collectStudentName={summaryView.settings.collectStudentName}
+            item={item}
             key={item.id}
-            label={item.label}
-            value={item.value}
           />
         ))}
       </div>
@@ -108,20 +91,43 @@ const assignmentSettingIcons = {
   typeof IconClock
 >;
 
-function AssignmentSettingTile({
-  icon: Icon,
-  label,
-  value,
+function AssignmentInstructionsTile({
+  instructions,
 }: {
-  icon: typeof IconClock;
-  label: string;
-  value: string;
+  instructions: AssignmentSettingsSummaryView['instructions'];
 }) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6">
+      <div className="flex items-center gap-2 font-medium text-foreground">
+        <IconClipboardText className="size-4 text-primary" />
+        {instructions.label}
+      </div>
+      <p
+        className={cn(
+          'mt-2 text-muted-foreground',
+          instructions.isEmpty && 'italic'
+        )}
+      >
+        {instructions.value}
+      </p>
+    </div>
+  );
+}
+
+function AssignmentSettingTile({
+  collectStudentName,
+  item,
+}: {
+  collectStudentName: boolean;
+  item: AssignmentSettingsSummaryView['items'][number];
+}) {
+  const Icon = getAssignmentSettingIcon(item.id, collectStudentName);
+
   return (
     <div className="rounded-lg border bg-background p-3">
       <Icon className="size-4 text-primary" />
-      <p className="mt-2 text-sm font-medium">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-2 text-sm font-medium">{item.value}</p>
+      <p className="text-xs text-muted-foreground">{item.label}</p>
     </div>
   );
 }

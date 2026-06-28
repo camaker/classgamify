@@ -2208,8 +2208,13 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /summary\.kindBadges[\s\S]*summary\.extractionActions/,
-  'Activity source-material summary component should render material kinds and extraction readiness actions.'
+  /summary\.kindBadges\.map[\s\S]*ActivitySourceMaterialKindBadge[\s\S]*badge=\{badge\}/,
+  'Activity source-material summary component should delegate prepared material-kind badges.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /ActivitySourceMaterialExtractionSummary[\s\S]*summary=\{summary\}/,
+  'Activity source-material summary component should delegate extraction readiness actions.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
@@ -2218,8 +2223,18 @@ assert.doesNotMatch(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /badge\.summaryText[\s\S]*action\.summaryText/,
-  'Activity source-material summary component should render prepared source-material metric text.'
+  /function ActivitySourceMaterialKindBadge[\s\S]*badge\.summaryText/,
+  'Activity source-material kind badge should render prepared source-material metric text.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /function ActivitySourceMaterialExtractionSummary[\s\S]*summary\.extractionTitle[\s\S]*summary\.extractionActions\.map[\s\S]*ActivitySourceMaterialExtractionBadge/,
+  'Activity source-material extraction summary should render prepared extraction title and actions.'
+);
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /function ActivitySourceMaterialExtractionBadge[\s\S]*action\.summaryText/,
+  'Activity source-material extraction badge should render prepared action metric text.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
@@ -2537,6 +2552,10 @@ const activityPublishSettingsFormSource = readFileSync(
   'src/components/activities/activity-publish-settings-form.tsx',
   'utf8'
 );
+const assignmentSettingsSummarySource = readFileSync(
+  'src/components/assignments/assignment-settings-summary.tsx',
+  'utf8'
+);
 const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
 const templateDirectoryCardSource = readFileSync(
   'src/components/activities/template-directory-card.tsx',
@@ -2601,6 +2620,26 @@ assert.match(
   activityPublishSettingsFormSource,
   /AssignmentSettingsSummary[\s\S]*view=\{view\.preview\.settingsSummaryView\}/,
   'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /AssignmentInstructionsTile[\s\S]*instructions=\{summaryView\.instructions\}/,
+  'Assignment settings summary should delegate prepared instruction text to a focused tile.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /summaryView\.items\.map[\s\S]*AssignmentSettingTile[\s\S]*item=\{item\}/,
+  'Assignment settings summary should delegate prepared setting item views to focused tiles.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /function AssignmentInstructionsTile[\s\S]*instructions\.label[\s\S]*instructions\.value/,
+  'Assignment instructions tile should render prepared instruction label and value.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
+  /function AssignmentSettingTile[\s\S]*getAssignmentSettingIcon\(item\.id, collectStudentName\)[\s\S]*item\.value[\s\S]*item\.label/,
+  'Assignment setting tile should render prepared setting item labels and values.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormSource,
@@ -2936,13 +2975,23 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassFocusPanel[\s\S]*focusItemViews\.map[\s\S]*itemView\.promptLabel/,
-  'Assignment classroom focus panel should render prepared focus item views.'
+  /function AssignmentResultsClassFocusPanel[\s\S]*focusItemViews\.map[\s\S]*AssignmentResultsClassFocusItem[\s\S]*itemView=\{itemView\}/,
+  'Assignment classroom focus panel should delegate prepared focus item views.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews\.map[\s\S]*studentView\.studentLabel/,
-  'Assignment student follow-up panel should render prepared follow-up student views.'
+  /function AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews\.map[\s\S]*AssignmentResultsFollowUpStudent[\s\S]*studentView=\{studentView\}/,
+  'Assignment student follow-up panel should delegate prepared follow-up student views.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassFocusItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.correctRateLabel[\s\S]*itemView\.correctSummaryLabel/,
+  'Assignment classroom focus item should render prepared focus labels.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsFollowUpStudent[\s\S]*studentView\.studentLabel[\s\S]*studentView\.accuracyLabel[\s\S]*studentView\.needsReviewLabel/,
+  'Assignment follow-up student item should render prepared follow-up labels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -13848,18 +13897,33 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /compatibility\.readyTemplateOptions[\s\S]*option\.isCurrent[\s\S]*option\.shortName/,
-  'Activity library compatibility panel should render prepared ready-template options.'
+  /compatibility\.readyTemplateOptions\.map[\s\S]*ActivityLibraryReadyTemplateBadge[\s\S]*option=\{option\}/,
+  'Activity library compatibility panel should delegate prepared ready-template options.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /actionState\.showRemixActions[\s\S]*compatibility\.remixActionOptions[\s\S]*option\.actionLabel/,
-  'Activity library compatibility panel should render prepared remix actions from the activity-domain view.'
+  /actionState\.showRemixActions[\s\S]*compatibility\.remixActionOptions\.map[\s\S]*ActivityLibraryRemixActionButton[\s\S]*option=\{option\}/,
+  'Activity library compatibility panel should delegate prepared remix actions from the activity-domain view.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /compatibility\.lockedTemplateDiagnostics[\s\S]*diagnosis/,
-  'Activity library compatibility panel should render prepared locked-template diagnostics.'
+  /compatibility\.lockedTemplateDiagnostics\.map[\s\S]*ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnosis=\{diagnosis\}/,
+  'Activity library compatibility panel should delegate prepared locked-template diagnostics.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /function ActivityLibraryReadyTemplateBadge[\s\S]*option\.isCurrent[\s\S]*option\.shortName/,
+  'Activity library ready template badge should render prepared option state.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /function ActivityLibraryRemixActionButton[\s\S]*option\.actionLabel/,
+  'Activity library remix action button should render prepared action labels.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /function ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnosis/,
+  'Activity library locked template diagnostic should render prepared diagnostics.'
 );
 assert.match(
   activityLibraryStatsComponentSource,

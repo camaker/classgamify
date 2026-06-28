@@ -33,13 +33,10 @@ export function ActivityLibraryCompatibilityPanel({
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {compatibility.readyTemplateOptions.map((option) => (
-          <Badge
+          <ActivityLibraryReadyTemplateBadge
             key={option.template}
-            variant={option.isCurrent ? 'secondary' : 'outline'}
-            className="rounded-md"
-          >
-            {option.shortName}
-          </Badge>
+            option={option}
+          />
         ))}
       </div>
       {compatibility.remixHint ? (
@@ -50,33 +47,72 @@ export function ActivityLibraryCompatibilityPanel({
       {actionState.showRemixActions ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {compatibility.remixActionOptions.map((option) => (
-            <Button
+            <ActivityLibraryRemixActionButton
               key={option.template}
-              type="button"
-              variant="outline"
-              size="sm"
-              className="bg-background"
               disabled={isRemixing}
+              option={option}
               onClick={() => onRemix(option.template)}
-            >
-              <IconSwitchHorizontal className="size-4" />
-              {option.actionLabel}
-            </Button>
+            />
           ))}
         </div>
       ) : null}
       {compatibility.lockedTemplateDiagnostics.length ? (
         <div className="mt-3 grid gap-1.5">
           {compatibility.lockedTemplateDiagnostics.map((diagnosis) => (
-            <p
+            <ActivityLibraryLockedTemplateDiagnostic
+              diagnosis={diagnosis}
               key={diagnosis}
-              className="text-xs leading-5 text-muted-foreground"
-            >
-              {diagnosis}
-            </p>
+            />
           ))}
         </div>
       ) : null}
     </div>
   );
+}
+
+function ActivityLibraryReadyTemplateBadge({
+  option,
+}: {
+  option: ActivityLibraryCardDisplayView['compatibility']['readyTemplateOptions'][number];
+}) {
+  return (
+    <Badge
+      variant={option.isCurrent ? 'secondary' : 'outline'}
+      className="rounded-md"
+    >
+      {option.shortName}
+    </Badge>
+  );
+}
+
+function ActivityLibraryRemixActionButton({
+  disabled,
+  onClick,
+  option,
+}: {
+  disabled: boolean;
+  onClick: () => void;
+  option: ActivityLibraryCardDisplayView['compatibility']['remixActionOptions'][number];
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="bg-background"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <IconSwitchHorizontal className="size-4" />
+      {option.actionLabel}
+    </Button>
+  );
+}
+
+function ActivityLibraryLockedTemplateDiagnostic({
+  diagnosis,
+}: {
+  diagnosis: string;
+}) {
+  return <p className="text-xs leading-5 text-muted-foreground">{diagnosis}</p>;
 }
