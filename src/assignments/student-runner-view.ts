@@ -498,18 +498,37 @@ export function getSequentialRunnerItemIdByOffset({
 }) {
   if (itemIds.length === 0) return undefined;
 
-  const resolvedActiveIndex = Number.isFinite(activeIndex)
-    ? Math.trunc(activeIndex)
-    : 0;
-  const resolvedOffset = Number.isFinite(offset) ? Math.trunc(offset) : 0;
-  const normalizedActiveIndex = Math.min(
-    itemIds.length - 1,
-    Math.max(0, resolvedActiveIndex)
-  );
+  const normalizedActiveIndex = normalizeSequentialRunnerActiveIndex({
+    activeIndex,
+    itemCount: itemIds.length,
+  });
+  const normalizedOffset = normalizeSequentialRunnerOffset(offset);
   const nextIndex =
-    (normalizedActiveIndex + resolvedOffset + itemIds.length) % itemIds.length;
+    (normalizedActiveIndex + normalizedOffset + itemIds.length) %
+    itemIds.length;
 
   return itemIds[nextIndex];
+}
+
+export function normalizeSequentialRunnerActiveIndex({
+  activeIndex,
+  itemCount,
+}: {
+  activeIndex: number;
+  itemCount: number;
+}) {
+  const normalizedItemCount = normalizeRuntimeDisplayCount(itemCount);
+  if (normalizedItemCount === 0) return 0;
+
+  const resolvedActiveIndex = normalizeRuntimeDisplayCount(activeIndex);
+
+  return Math.min(normalizedItemCount - 1, resolvedActiveIndex);
+}
+
+export function normalizeSequentialRunnerOffset(offset: number) {
+  if (!Number.isFinite(offset)) return 0;
+
+  return Math.trunc(offset);
 }
 
 export function formatSequentialRunnerItemLabel(label: string, index: number) {

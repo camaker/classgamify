@@ -386,6 +386,8 @@ import {
   getStudentRunnerReviewStatusClassName,
   getUniqueRuntimeChoices,
   isSameRuntimeChoice,
+  normalizeSequentialRunnerActiveIndex,
+  normalizeSequentialRunnerOffset,
   resolveChoicePairingRunnerAction,
   resolveGroupSortRunnerAction,
   resolveSequentialStudentRunnerNavigationAction,
@@ -5835,6 +5837,21 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /export function normalizeSequentialRunnerActiveIndex[\s\S]*normalizeRuntimeDisplayCount\(itemCount\)[\s\S]*normalizeRuntimeDisplayCount\(activeIndex\)/,
+  'Sequential runner active indexes should normalize through one helper.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export function normalizeSequentialRunnerOffset[\s\S]*Number\.isFinite\(offset\)[\s\S]*Math\.trunc\(offset\)/,
+  'Sequential runner navigation offsets should normalize through one helper.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /getSequentialRunnerItemIdByOffset[\s\S]*normalizeSequentialRunnerActiveIndex\(\{[\s\S]*normalizeSequentialRunnerOffset\(offset\)/,
+  'Sequential runner item lookup should use the shared index and offset normalizers.'
+);
+assert.match(
+  studentRunnerViewSource,
   /m\.activity_runner_word_bank_separator\(\)/,
   'Fill-blank word-bank text should use the localized activity runner separator.'
 );
@@ -5866,6 +5883,18 @@ assert.doesNotMatch(
   ),
   /student_runner_item_position_label\([\s\S]*normalizeRuntimeDisplayCount\(index \+ 1|formatSequentialRunnerItemLabel[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1|sequenceLabel: String\([\s\S]*normalizeRuntimeDisplayCount\(index \+ 1/,
   'Student runner view should not hand-compose item positions in each runner mode.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource.slice(
+    studentRunnerViewSource.indexOf(
+      'export function getSequentialRunnerItemIdByOffset'
+    ),
+    studentRunnerViewSource.indexOf(
+      'export function normalizeSequentialRunnerActiveIndex'
+    )
+  ),
+  /Number\.isFinite|Math\.trunc|Math\.min\(\s*itemIds\.length - 1/,
+  'Sequential runner item lookup should not locally normalize active indexes or offsets.'
 );
 assert.doesNotMatch(
   studentRunnerViewSource,
@@ -7562,6 +7591,44 @@ assert.equal(
   }),
   'q-1'
 );
+assert.equal(
+  normalizeSequentialRunnerActiveIndex({
+    activeIndex: 2.9,
+    itemCount: 5,
+  }),
+  2
+);
+assert.equal(
+  normalizeSequentialRunnerActiveIndex({
+    activeIndex: -2,
+    itemCount: 5,
+  }),
+  0
+);
+assert.equal(
+  normalizeSequentialRunnerActiveIndex({
+    activeIndex: 10,
+    itemCount: 3,
+  }),
+  2
+);
+assert.equal(
+  normalizeSequentialRunnerActiveIndex({
+    activeIndex: Number.NaN,
+    itemCount: 3,
+  }),
+  0
+);
+assert.equal(
+  normalizeSequentialRunnerActiveIndex({
+    activeIndex: 2,
+    itemCount: 0,
+  }),
+  0
+);
+assert.equal(normalizeSequentialRunnerOffset(2.9), 2);
+assert.equal(normalizeSequentialRunnerOffset(-1.9), -1);
+assert.equal(normalizeSequentialRunnerOffset(Number.NaN), 0);
 assert.equal(
   getSequentialRunnerItemIdByOffset({
     activeIndex: 0,
