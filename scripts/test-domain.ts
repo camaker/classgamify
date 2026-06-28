@@ -5110,6 +5110,10 @@ const studentRunnerHeaderCardSource = readFileSync(
   'src/components/assignments/student-runner-header-card.tsx',
   'utf8'
 );
+const studentRunnerSubmitControlsSource = readFileSync(
+  'src/components/assignments/student-runner-submit-controls.tsx',
+  'utf8'
+);
 const studentRunnerLoadingPanelSource = readFileSync(
   'src/components/assignments/student-runner-loading-panel.tsx',
   'utf8'
@@ -5354,6 +5358,21 @@ assert.match(
 );
 assert.match(
   playRouteSource,
+  /StudentRunnerSubmitControls[\s\S]*controlView=\{controlView\}[\s\S]*onSubmit=\{submitAnswers\}/,
+  'Student play route should delegate submit button and submit hints to the student runner submit controls component.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.readOnlyMessage/,
+  'Student runner submit controls should render prepared submit disabled state, label, and hint copy.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /function StudentRunnerSubmitHint[\s\S]*if \(!text\) return null[\s\S]*text/,
+  'Student runner submit controls should delegate optional hint rendering to a focused component.'
+);
+assert.match(
+  playRouteSource,
   /buildStudentRunnerAttemptRestartPlan/,
   'Student play route should restart attempts through the assignment-domain restart plan.'
 );
@@ -5414,7 +5433,7 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|pageState\.hidePreviewAnswers/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(

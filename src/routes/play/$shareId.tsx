@@ -30,12 +30,11 @@ import { StudentRunnerAttemptShell } from '@/components/assignments/student-runn
 import { StudentRunnerHeaderCard } from '@/components/assignments/student-runner-header-card';
 import { StudentRunnerLoadingPanel } from '@/components/assignments/student-runner-loading-panel';
 import { StudentRunnerMissingPanel } from '@/components/assignments/student-runner-missing-panel';
+import { StudentRunnerSubmitControls } from '@/components/assignments/student-runner-submit-controls';
 import Container from '@/components/layout/container';
-import { Button } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { usePublicAssignment, useSubmitAttempt } from '@/hooks/use-assignments';
 import { seo } from '@/lib/seo';
-import { IconCheck } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -309,25 +308,10 @@ function PlayPage() {
             onAnswerChanges={updateAnswers}
           />
 
-          <Button
-            type="button"
-            className="mt-4 w-full sm:w-fit"
-            disabled={controlView.submitDisabled}
-            onClick={submitAnswers}
-          >
-            <IconCheck className="size-4" />
-            {controlView.submitButtonLabel}
-          </Button>
-          {controlView.unansweredLabel ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {controlView.unansweredLabel}
-            </p>
-          ) : null}
-          {controlView.readOnlyMessage ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {controlView.readOnlyMessage}
-            </p>
-          ) : null}
+          <StudentRunnerSubmitControls
+            controlView={controlView}
+            onSubmit={submitAnswers}
+          />
         </StudentRunnerAttemptShell>
 
         <ActivityPreview
