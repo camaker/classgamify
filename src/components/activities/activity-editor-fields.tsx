@@ -4,6 +4,7 @@ import type {
 } from '@/activities/editor';
 import type { CreateActivityInput } from '@/activities/validation';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
+import { Button } from '@/components/ui/button';
 import {
   FormControl,
   FormDescription,
@@ -19,6 +20,8 @@ import {
 } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { m } from '@/locale/paraglide/messages';
+import { IconPaperclip } from '@tabler/icons-react';
+import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
 
 type ActivityEditorTemplateView = ReturnType<
@@ -311,9 +314,11 @@ export function ActivityEditorStructuredContentFields({
 }
 
 export function ActivityEditorSourceMaterialsFormField({
+  attachedSummaryActionSlot,
   canLoadFiles,
   control,
 }: ActivityEditorFieldsProps & {
+  attachedSummaryActionSlot?: ReactNode;
   canLoadFiles: boolean;
 }) {
   return (
@@ -324,6 +329,7 @@ export function ActivityEditorSourceMaterialsFormField({
         <FormItem>
           <FormControl>
             <ActivitySourceMaterialsField
+              attachedSummaryActionSlot={attachedSummaryActionSlot}
               canLoadFiles={canLoadFiles}
               value={field.value}
               onChange={field.onChange}
@@ -333,5 +339,29 @@ export function ActivityEditorSourceMaterialsFormField({
         </FormItem>
       )}
     />
+  );
+}
+
+export function ActivityEditorSyncSourceMaterialsAction({
+  disabled,
+  label,
+  onClick,
+}: {
+  disabled?: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="h-7 bg-background px-2 text-xs"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <IconPaperclip className="size-3.5" />
+      {label}
+    </Button>
   );
 }

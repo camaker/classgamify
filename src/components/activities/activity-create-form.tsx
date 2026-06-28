@@ -25,6 +25,7 @@ import {
   ActivityEditorDetailsFields,
   ActivityEditorPrimaryFields,
   ActivityEditorSourceMaterialsFormField,
+  ActivityEditorSyncSourceMaterialsAction,
   ActivityEditorStructuredContentFields,
 } from '@/components/activities/activity-editor-fields';
 import {
@@ -260,6 +261,13 @@ export function ActivityCreateForm({
             <ActivityEditorStructuredContentFields control={form.control} />
 
             <ActivityEditorSourceMaterialsFormField
+              attachedSummaryActionSlot={
+                <ActivityEditorSyncSourceMaterialsAction
+                  disabled={!aiDraftPanelView.canSyncDraftSourceMaterials}
+                  label={aiDraftPanelView.syncMaterialsLabel}
+                  onClick={syncAttachedMaterialsForDraft}
+                />
+              }
               canLoadFiles={Boolean(session?.user)}
               control={form.control}
             />

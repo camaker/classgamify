@@ -2445,6 +2445,11 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
+  /attachedSummaryActionSlot\?: ReactNode[\s\S]*ActivitySourceMaterialAttachedSection[\s\S]*actionSlot=\{attachedSummaryActionSlot\}[\s\S]*ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{actionSlot\}/,
+  'Activity source-material picker should pass a prepared attached-summary action slot without owning the action behavior.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
   /addActivitySourceMaterialPickerItem[\s\S]*removeActivitySourceMaterialPickerItem/,
   'Activity source-material picker should update attached references through activity-domain add/remove helpers.'
 );
@@ -2537,6 +2542,11 @@ assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
   /hasAudio|hasSpreadsheet|hasWorksheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
   'Activity source-material picker should not recalculate extraction readiness locally.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsFieldSource,
+  /syncAttachedMaterialsForDraft|syncMaterialsLabel|activity_form_use_attached_materials|activity_form_toast_source_materials_synced/,
+  'Activity source-material picker should not own AI draft source sync behavior or copy.'
 );
 const sourceMaterialsUserFilesApiSource = readFileSync(
   'src/api/user-files.ts',
@@ -2778,6 +2788,11 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
+  /ActivityEditorSourceMaterialsFormField[\s\S]*attachedSummaryActionSlot=\{[\s\S]*ActivityEditorSyncSourceMaterialsAction[\s\S]*disabled=\{!aiDraftPanelView\.canSyncDraftSourceMaterials\}[\s\S]*label=\{aiDraftPanelView\.syncMaterialsLabel\}[\s\S]*onClick=\{syncAttachedMaterialsForDraft\}/,
+  'Activity editor form should wire the attached source-material summary action to the existing AI draft material sync flow.'
+);
+assert.match(
+  activityEditorFormSource,
   /ActivityEditorHeader[\s\S]*modeView=\{modeView\}[\s\S]*template=\{templateView\.template\}/,
   'Activity editor form should delegate editor header rendering.'
 );
@@ -2805,6 +2820,16 @@ assert.match(
   activityEditorFieldsSource,
   /ActivityEditorSourceMaterialsFormField[\s\S]*name="sourceMaterials"[\s\S]*ActivitySourceMaterialsField[\s\S]*canLoadFiles=\{canLoadFiles\}/,
   'Activity editor source-material field should bind material references through the picker component.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /ActivityEditorSourceMaterialsFormField[\s\S]*attachedSummaryActionSlot\?: ReactNode[\s\S]*ActivitySourceMaterialsField[\s\S]*attachedSummaryActionSlot=\{attachedSummaryActionSlot\}/,
+  'Activity editor source-material field should pass prepared attached-summary actions into the picker.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /function ActivityEditorSyncSourceMaterialsAction[\s\S]*type="button"[\s\S]*IconPaperclip[\s\S]*\{label\}/,
+  'Activity editor source-material sync action should render the prepared label as a button action.'
 );
 assert.match(
   activityEditorShellSource,
@@ -2848,7 +2873,7 @@ assert.match(
 );
 assert.doesNotMatch(
   activityEditorFormSource,
-  /id="activity-ai-source"|id="activity-ai-item-count"|id="activity-ai-focus"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|focusLabel|focusOptions|syncMaterialsLabel|generateButtonLabel|sourceCapabilityViews)/,
+  /id="activity-ai-source"|id="activity-ai-item-count"|id="activity-ai-focus"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|focusLabel|focusOptions|generateButtonLabel|sourceCapabilityViews)/,
   'Activity editor form should not hand-render low-level AI draft controls.'
 );
 assert.doesNotMatch(

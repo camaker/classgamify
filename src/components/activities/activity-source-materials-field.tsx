@@ -33,12 +33,14 @@ import { Link } from '@tanstack/react-router';
 import { useMemo, type ReactNode } from 'react';
 
 type ActivitySourceMaterialsFieldProps = {
+  attachedSummaryActionSlot?: ReactNode;
   canLoadFiles: boolean;
   onChange: (value: ActivityMaterialReference[]) => void;
   value: unknown;
 };
 
 export function ActivitySourceMaterialsField({
+  attachedSummaryActionSlot,
   canLoadFiles,
   onChange,
   value,
@@ -101,6 +103,7 @@ export function ActivitySourceMaterialsField({
 
       <div className="mt-4 grid gap-4">
         <ActivitySourceMaterialAttachedSection
+          actionSlot={attachedSummaryActionSlot}
           pickerView={pickerView}
           onRemove={removeMaterial}
         />
@@ -126,9 +129,11 @@ function ActivitySourceMaterialCountBadge({
 }
 
 function ActivitySourceMaterialAttachedSection({
+  actionSlot,
   onRemove,
   pickerView,
 }: {
+  actionSlot?: ReactNode;
   onRemove: (fileId: string) => void;
   pickerView: ReturnType<typeof buildActivitySourceMaterialPickerView>;
 }) {
@@ -145,6 +150,7 @@ function ActivitySourceMaterialAttachedSection({
       {pickerView.hasAttachedItems ? (
         <>
           <ActivitySourceMaterialsSummary
+            actionSlot={actionSlot}
             summary={pickerView.attachedSummary}
           />
           <ActivitySourceMaterialReferenceGrid>
