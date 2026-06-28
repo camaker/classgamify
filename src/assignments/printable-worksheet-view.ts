@@ -558,12 +558,17 @@ function getPrintableWorksheetChoiceBankLabel(
 }
 
 function formatPrintableWorksheetChoiceIndex(index: number) {
-  const normalizedIndex =
-    index >= 0 && index < 26
-      ? String.fromCharCode(65 + index)
-      : `${normalizeRuntimeDisplayCount(index + 1, { min: 1 })}`;
-
   return m.assignment_printable_choice_index_label({
-    index: normalizedIndex,
+    index: getPrintableWorksheetChoiceIndexValue(index),
   });
+}
+
+export function getPrintableWorksheetChoiceIndexValue(index: number) {
+  if (Number.isFinite(index) && index >= 0 && index < 26) {
+    return String.fromCharCode(
+      65 + normalizeRuntimeDisplayCount(index, { min: 0 })
+    );
+  }
+
+  return `${normalizeRuntimeDisplayCount(index + 1, { min: 1 })}`;
 }

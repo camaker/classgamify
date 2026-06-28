@@ -464,6 +464,7 @@ import {
   buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
   buildPrintableWorksheetRouteState,
+  getPrintableWorksheetChoiceIndexValue,
 } from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
@@ -11860,6 +11861,12 @@ assert.deepEqual(messyPrintableItemView.choiceBank.choices, [
     key: 'messy-print-item-choice-1',
   },
 ]);
+assert.equal(getPrintableWorksheetChoiceIndexValue(0), 'A');
+assert.equal(getPrintableWorksheetChoiceIndexValue(25), 'Z');
+assert.equal(getPrintableWorksheetChoiceIndexValue(26), '27');
+assert.equal(getPrintableWorksheetChoiceIndexValue(2.9), 'C');
+assert.equal(getPrintableWorksheetChoiceIndexValue(-1), '1');
+assert.equal(getPrintableWorksheetChoiceIndexValue(Number.NaN), '1');
 assert.equal(
   buildPrintableWorksheetItemView({
     answerSpaceLines: 4,
@@ -17290,6 +17297,16 @@ assert.match(
   printableWorksheetViewSource,
   /function formatPrintableWorksheetChoiceIndex[\s\S]*m\.assignment_printable_choice_index_label/,
   'Printable worksheet choice indices should be formatted through localized messages.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function formatPrintableWorksheetChoiceIndex[\s\S]*getPrintableWorksheetChoiceIndexValue\(index\)/,
+  'Printable worksheet choice-index labels should use the shared choice-index value helper.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export function getPrintableWorksheetChoiceIndexValue[\s\S]*String\.fromCharCode[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1,[\s\S]*min: 1/,
+  'Printable worksheet choice-index values should keep the shared A-Z then numeric fallback rule.'
 );
 assert.match(
   printableWorksheetViewSource,
