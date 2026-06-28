@@ -59,6 +59,7 @@ export function MatchingPairsBoard({
       action,
       answers,
       disabled,
+      items,
       selectedItemId,
     });
 

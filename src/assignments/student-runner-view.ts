@@ -25,6 +25,7 @@ import {
   buildStudentAttemptAnswerStateByItemId,
   formatAttemptCompletionProgressLabel,
   getAttemptCompletionSummary,
+  normalizeStudentAnswersForRuntimeItems,
   getStudentRunnerCopy,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
@@ -276,12 +277,16 @@ export function buildStudentRunnerView({
   progressVerb?: string;
   reviewItems?: PublicAttemptReviewItem[];
 }) {
-  const completionSummary = getAttemptCompletionSummary({
+  const normalizedAnswers = normalizeStudentAnswersForRuntimeItems({
     answers,
     runtimeItems: items,
   });
+  const completionSummary = getAttemptCompletionSummary({
+    answers: normalizedAnswers,
+    runtimeItems: items,
+  });
   const answerStateByItemId = buildStudentAttemptAnswerStateByItemId({
-    answers,
+    answers: normalizedAnswers,
     runtimeItems: items,
   });
   const reviewByItemId = buildPublicAttemptReviewItemMap(reviewItems);
@@ -313,6 +318,7 @@ export function buildStudentRunnerView({
     itemViewsById: new Map(
       itemViews.map((itemView) => [itemView.item.id, itemView])
     ),
+    normalizedAnswers,
     progressLabel: formatAttemptCompletionProgressLabel({
       completionSummary,
       verb: progressVerb,
@@ -678,7 +684,7 @@ export function buildChoicePairingRunnerView({
   return {
     ...runnerView,
     choiceViews: buildRuntimeChoiceViews({
-      answers,
+      answers: runnerView.normalizedAnswers,
       choices: runnerView.choices,
       selectedItemId,
     }),
@@ -747,12 +753,20 @@ export function buildExclusiveChoiceAnswerChanges({
   answers,
   choice,
   itemId,
+  items,
 }: {
   answers: StudentAnswerMap;
   choice: string;
   itemId: string;
+  items?: PublicRuntimeItem[];
 }): RuntimeChoiceAnswerChange[] {
-  const usedByItemId = findChoiceOwner(answers, choice);
+  const answerState = items
+    ? normalizeStudentAnswersForRuntimeItems({
+        answers,
+        runtimeItems: items,
+      })
+    : answers;
+  const usedByItemId = findChoiceOwner(answerState, choice);
   const changes: RuntimeChoiceAnswerChange[] = [];
 
   if (usedByItemId && usedByItemId !== itemId) {
@@ -768,11 +782,13 @@ export function resolveChoicePairingRunnerAction({
   action,
   answers,
   disabled = false,
+  items,
   selectedItemId,
 }: {
   action: ChoicePairingRunnerAction;
   answers: StudentAnswerMap;
   disabled?: boolean;
+  items?: PublicRuntimeItem[];
   selectedItemId?: string;
 }): ChoicePairingRunnerActionResult {
   if (disabled) {
@@ -802,6 +818,7 @@ export function resolveChoicePairingRunnerAction({
       answers,
       choice: action.choice,
       itemId: selectedItemId,
+      items,
     }),
     selectedItemId: undefined,
     type: 'answer',

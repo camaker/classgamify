@@ -12,11 +12,11 @@ import {
   buildStudentAttemptResultDisplay,
   buildStudentAttemptTimerBadge,
   buildStudentRunnerMissingView,
-  buildStudentAnswerChanges,
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   getAttemptCompletionSummary,
   getStudentRunnerCopy,
+  normalizeStudentAnswersForRuntimeItems,
   applyStudentAnswerChanges,
   type StudentAnswerMap,
   type StudentAnswerChange,
@@ -860,16 +860,19 @@ export function buildStudentRunnerAnswerUpdatePlan({
     };
   }
 
-  const validChanges = filterStudentRunnerAnswerChanges({
-    changes,
+  const normalizedAnswers = normalizeStudentAnswersForRuntimeItems({
+    answers,
     runtimeItems,
   });
-  const nextAnswers = applyStudentAnswerChanges({
-    answers,
-    changes: validChanges,
+  const nextAnswers = normalizeStudentAnswersForRuntimeItems({
+    answers: applyStudentAnswerChanges({
+      answers: normalizedAnswers,
+      changes,
+    }),
+    runtimeItems,
   });
 
-  if (validChanges.length === 0 || nextAnswersEqual(answers, nextAnswers)) {
+  if (nextAnswersEqual(normalizedAnswers, nextAnswers)) {
     return {
       type: 'ignored',
     };
@@ -882,6 +885,19 @@ export function buildStudentRunnerAnswerUpdatePlan({
   };
 }
 
+export function buildStudentRunnerAnswerState({
+  answers,
+  runtimeItems,
+}: {
+  answers: StudentAnswerMap;
+  runtimeItems: PublicRuntimeItem[];
+}) {
+  return normalizeStudentAnswersForRuntimeItems({
+    answers,
+    runtimeItems,
+  });
+}
+
 function nextAnswersEqual(
   currentAnswers: StudentAnswerMap,
   nextAnswers: StudentAnswerMap
@@ -892,30 +908,6 @@ function nextAnswersEqual(
 
   return currentEntries.every(
     ([itemId, answer]) => nextAnswers[itemId] === answer
-  );
-}
-
-function filterStudentRunnerAnswerChanges({
-  changes,
-  runtimeItems,
-}: {
-  changes: StudentAnswerChange[];
-  runtimeItems: PublicRuntimeItem[];
-}) {
-  const validItemIds = new Set(
-    runtimeItems.flatMap((item) =>
-      buildStudentAnswerChanges({
-        answer: '',
-        itemId: item.id,
-      }).map((change) => change.itemId)
-    )
-  );
-
-  return changes.flatMap((change) =>
-    buildStudentAnswerChanges({
-      answer: change.answer,
-      itemId: change.itemId,
-    }).filter((normalizedChange) => validItemIds.has(normalizedChange.itemId))
   );
 }
 

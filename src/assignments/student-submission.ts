@@ -546,6 +546,21 @@ export function buildStudentAttemptAnswerStateByItemId({
   return stateByItemId;
 }
 
+export function normalizeStudentAnswersForRuntimeItems({
+  answers,
+  runtimeItems,
+}: {
+  answers: StudentAnswerMap;
+  runtimeItems: StudentSubmissionRuntimeItem[];
+}): StudentAnswerMap {
+  return Object.fromEntries(
+    getUniqueSubmissionRuntimeItemEntries(runtimeItems).map((entry) => [
+      entry.itemId,
+      normalizeSubmissionAnswer(getSubmissionEntryAnswer(entry, answers)),
+    ])
+  );
+}
+
 function normalizeSubmissionItemId(value: string | undefined) {
   return normalizeRuntimeDisplayText(value);
 }
@@ -703,8 +718,13 @@ export function buildAttemptSubmissionAnswers({
   answers: StudentAnswerMap;
   runtimeItems: StudentSubmissionRuntimeItem[];
 }): StudentSubmissionAnswer[] {
+  const normalizedAnswers = normalizeStudentAnswersForRuntimeItems({
+    answers,
+    runtimeItems,
+  });
+
   return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map((entry) => ({
-    answer: normalizeSubmissionAnswer(getSubmissionEntryAnswer(entry, answers)),
+    answer: normalizedAnswers[entry.itemId] ?? '',
     itemId: entry.itemId,
   }));
 }

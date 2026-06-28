@@ -59,6 +59,7 @@ export function LineMatchBoard({
       action,
       answers,
       disabled,
+      items,
       selectedItemId,
     });
 

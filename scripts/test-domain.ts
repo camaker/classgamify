@@ -732,6 +732,7 @@ import {
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
+  buildStudentRunnerAnswerState,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
@@ -768,6 +769,7 @@ import {
   getAttemptSubmitDecision,
   getStudentRunnerCopy,
   isStudentAnswerFilled,
+  normalizeStudentAnswersForRuntimeItems,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
@@ -5659,6 +5661,11 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /export function normalizeStudentAnswersForRuntimeItems[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)[\s\S]*normalizeSubmissionAnswer\(getSubmissionEntryAnswer\(entry, answers\)\)/,
+  'Student submission domain should expose runtime-scoped answer-map normalization for runner state, progress, and submission payloads.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /export type StudentAnswerChange/,
   'Student submission domain should expose a shared answer-change contract.'
 );
@@ -5699,8 +5706,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerViewSource,
-  /buildStudentAttemptAnswerStateByItemId\(\{[\s\S]*answers,[\s\S]*runtimeItems: items/,
-  'Student runner view should derive answer display state from submission-domain runtime item parsing.'
+  /normalizeStudentAnswersForRuntimeItems\(\{[\s\S]*answers,[\s\S]*runtimeItems: items[\s\S]*buildStudentAttemptAnswerStateByItemId\(\{[\s\S]*answers: normalizedAnswers/,
+  'Student runner view should normalize browser answers to current runtime items before deriving display state.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -6069,8 +6076,13 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerAnswerUpdatePlan[\s\S]*if \(disabled\)[\s\S]*filterStudentRunnerAnswerChanges[\s\S]*nextAnswersEqual[\s\S]*buildStudentAnswerChanges[\s\S]*validItemIds\.has/,
-  'Student runner state domain should ignore disabled, no-op, or invalid browser answer changes through current runtime item ids.'
+  /export function buildStudentRunnerAnswerUpdatePlan[\s\S]*if \(disabled\)[\s\S]*normalizeStudentAnswersForRuntimeItems\(\{[\s\S]*applyStudentAnswerChanges\(\{[\s\S]*changes,[\s\S]*normalizeStudentAnswersForRuntimeItems\(\{[\s\S]*nextAnswersEqual/,
+  'Student runner state domain should normalize browser answer changes through current runtime item ids before comparing updates.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /filterStudentRunnerAnswerChanges|validItemIds\.has/,
+  'Student runner state domain should not duplicate runtime-item filtering outside the student-submission domain.'
 );
 assert.match(
   playRouteSource,
@@ -6174,8 +6186,8 @@ assert.doesNotMatch(
 );
 assert.match(
   lineMatchBoardSource,
-  /resolveChoicePairingRunnerAction[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
-  'Line-match should resolve prompt and choice interactions through the assignment-domain pairing action helper.'
+  /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
+  'Line-match should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
 );
 assert.doesNotMatch(
   lineMatchBoardSource,
@@ -6184,8 +6196,8 @@ assert.doesNotMatch(
 );
 assert.match(
   matchingPairsBoardSource,
-  /resolveChoicePairingRunnerAction[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
-  'Matching-pairs should resolve prompt and choice interactions through the assignment-domain pairing action helper.'
+  /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
+  'Matching-pairs should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
 );
 assert.doesNotMatch(
   matchingPairsBoardSource,
@@ -6826,6 +6838,24 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildExclusiveChoiceAnswerChanges({
+    answers: {
+      'legacy-item': 'Paris',
+      'target-item': '',
+    },
+    choice: 'Paris',
+    itemId: 'target-item',
+    items: [
+      {
+        id: 'target-item',
+        kind: 'pair',
+        prompt: 'Capital of France',
+      },
+    ],
+  }),
+  [{ answer: 'Paris', itemId: 'target-item' }]
+);
+assert.deepEqual(
+  buildExclusiveChoiceAnswerChanges({
     answers: { 'item-1': 'Paris' },
     choice: 'Paris',
     itemId: 'item-1',
@@ -6943,6 +6973,31 @@ assert.deepEqual(
       { answer: '', itemId: 'item-1' },
       { answer: 'Paris', itemId: 'item-2' },
     ],
+    selectedItemId: undefined,
+    type: 'answer',
+  }
+);
+assert.deepEqual(
+  resolveChoicePairingRunnerAction({
+    action: {
+      choice: 'Paris',
+      type: 'choose-choice',
+    },
+    answers: {
+      'legacy-item': 'Paris',
+      'target-item': '',
+    },
+    items: [
+      {
+        id: 'target-item',
+        kind: 'pair',
+        prompt: 'Capital of France',
+      },
+    ],
+    selectedItemId: 'target-item',
+  }),
+  {
+    answerChanges: [{ answer: 'Paris', itemId: 'target-item' }],
     selectedItemId: undefined,
     type: 'answer',
   }
@@ -7929,6 +7984,35 @@ assert.deepEqual(
     { answer: 'Apple', itemId: 'item-1' },
     { answer: 'banana', itemId: 'item-2' },
   ]
+);
+assert.deepEqual(
+  normalizeStudentAnswersForRuntimeItems({
+    answers: {
+      ' item-１ ': ' Ａｐｐｌｅ ',
+      'item-1': '   ',
+      'item-2': '   ',
+      'item-２': ' ｂａｎａｎａ ',
+      'old-item': 'Should not leak',
+    },
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  {
+    'item-1': 'Apple',
+    'item-2': 'banana',
+  }
+);
+assert.deepEqual(
+  normalizeStudentAnswersForRuntimeItems({
+    answers: {
+      'item-1': '   ',
+      stale: 'Legacy answer',
+    },
+    runtimeItems: [{ id: 'item-1' }, { id: ' item-2 ' }],
+  }),
+  {
+    'item-1': '',
+    'item-2': '',
+  }
 );
 const changedAnswers = buildStudentAnswerChange({
   answer: 'banana',
@@ -13304,11 +13388,32 @@ assert.deepEqual(
   }),
   {
     answers: {
-      existing: 'Answer',
       target: 'New answer',
     },
     confirmIncompleteSubmit: false,
     type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerState({
+    answers: {
+      legacy: 'Should disappear',
+      target: '  Normalized answer  ',
+    },
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'target',
+      },
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'missing-target',
+      },
+    ],
+  }),
+  {
+    'missing-target': '',
+    target: 'Normalized answer',
   }
 );
 assert.deepEqual(
@@ -13616,6 +13721,20 @@ assert.equal(
 );
 assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
+const runtimeScopedStudentRunnerView = buildStudentRunnerView({
+  answers: {
+    'legacy-item': 'Paris',
+    'pair-1': '   ',
+  },
+  items: studentRunnerView.itemViews.map((itemView) => itemView.item),
+  progressVerb: 'matched',
+});
+assert.equal(runtimeScopedStudentRunnerView.progressLabel, '0/3 matched');
+assert.deepEqual(runtimeScopedStudentRunnerView.normalizedAnswers, {
+  'pair-1': '',
+  'pair-2': '',
+  'q-1': '',
+});
 const choicePairingRunnerView = buildChoicePairingRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
   items: studentRunnerView.itemViews.map((itemView) => itemView.item),
@@ -13704,6 +13823,18 @@ assert.deepEqual(choicePairingRunnerView.choiceViews, [
     usedByItemId: undefined,
   },
 ]);
+assert.equal(
+  buildChoicePairingRunnerView({
+    answers: {
+      'legacy-item': 'Paris',
+      'pair-1': '',
+    },
+    items: studentRunnerView.itemViews.map((itemView) => itemView.item),
+    selectedItemId: 'pair-1',
+  }).choiceViews.find((choiceView) => choiceView.choice === 'Paris')
+    ?.usedByItemId,
+  undefined
+);
 const groupSortRunnerView = buildStudentRunnerView({
   answers: {
     'group-drink-water': 'drink',
