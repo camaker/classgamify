@@ -138,6 +138,7 @@ function ActivityAiDraftSourceControls({
         rows={3}
         placeholder={panelView.sourcePlaceholder}
       />
+      <ActivityAiDraftSourceReadiness panelView={panelView} />
       {panelView.sourceMaterialNoteViews.length > 0 ? (
         <div className="space-y-2 rounded-md border bg-background p-3">
           {panelView.sourceMaterialSummaryLabel ? (
@@ -158,6 +159,31 @@ function ActivityAiDraftSourceControls({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ActivityAiDraftSourceReadiness({
+  panelView,
+}: {
+  panelView: ActivityAiDraftPanelView;
+}) {
+  return (
+    <div className="rounded-md border bg-background p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-xs">{panelView.sourceReadiness.title}</p>
+        <Badge
+          variant={
+            panelView.sourceReadiness.hasWarnings ? 'outline' : 'secondary'
+          }
+          className="rounded-md"
+        >
+          {panelView.sourceReadiness.characterCountLabel}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {panelView.sourceReadiness.description}
+      </p>
     </div>
   );
 }

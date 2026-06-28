@@ -2549,6 +2549,16 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceReadiness[\s\S]*panelView\.sourceReadiness\.title[\s\S]*panelView\.sourceReadiness\.characterCountLabel[\s\S]*panelView\.sourceReadiness\.description/,
+  'Activity AI draft source readiness should render the prepared source-readiness view.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityEditorAiDraftSourceReadinessView[\s\S]*activity_form_ai_source_readiness_synced_description[\s\S]*activity_form_ai_source_readiness_sync_available_description[\s\S]*activity_form_ai_source_readiness_default_description[\s\S]*activity_form_ai_source_readiness_ready_description/,
+  'Activity editor AI draft source readiness copy should come from the activity-domain view model.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /function ActivityAiDraftItemCountSelect[\s\S]*panelView\.itemCountLabel[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS\.map/,
   'Activity AI draft item-count select should render prepared label and shared item-count options.'
 );
@@ -21039,6 +21049,14 @@ assert.deepEqual(
     reviewNote: 'Teacher reviews before saving',
     safeSourceDescription:
       'AI drafting uses the text below plus safe source-material provenance only.',
+    sourceReadiness: {
+      characterCountLabel: '132/2000 characters',
+      description:
+        '2 safe material notes are included. File ids, storage keys, and permissions stay out of the prompt.',
+      hasWarnings: false,
+      status: 'synced-materials',
+      title: 'Safe materials included',
+    },
     sourceMaterialNoteViews: [
       {
         displayText: 'Worksheet document · Weather worksheet.pdf',
@@ -21278,9 +21296,28 @@ assert.deepEqual(
     sourceMaterials: [],
   }),
   {
+    attachedSourceMaterialCount: 0,
     canSyncDraftSourceMaterials: false,
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: false,
+    isDefaultSource: false,
+    safeSourceMaterialNoteCount: 0,
+    sourceLength: 31,
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftSourceState({
+    draftSourceText: 'apple, bread, milk, rice, water, egg',
+    sourceMaterials: [],
+  }),
+  {
+    attachedSourceMaterialCount: 0,
+    canSyncDraftSourceMaterials: false,
+    hasAttachedSourceMaterials: false,
+    hasDraftSourceMaterialNotes: false,
+    isDefaultSource: true,
+    safeSourceMaterialNoteCount: 0,
+    sourceLength: 36,
   }
 );
 const syncedEditorDraftSource = buildActivityEditorSyncedDraftSourceText({
@@ -21301,19 +21338,22 @@ assert.deepEqual(
     sourceMaterials: [],
   }),
   {
+    attachedSourceMaterialCount: 0,
     canSyncDraftSourceMaterials: true,
     hasAttachedSourceMaterials: false,
     hasDraftSourceMaterialNotes: true,
+    isDefaultSource: false,
+    safeSourceMaterialNoteCount: 1,
+    sourceLength: syncedEditorDraftSource.length,
   }
 );
 const disabledAiDraftPanelView = buildActivityEditorAiDraftPanelView({
   hasUser: false,
   isGeneratingDraft: false,
-  sourceState: {
-    canSyncDraftSourceMaterials: false,
-    hasAttachedSourceMaterials: false,
-    hasDraftSourceMaterialNotes: false,
-  },
+  sourceState: buildActivityEditorDraftSourceState({
+    draftSourceText: 'apple, bread, milk, rice, water, egg',
+    sourceMaterials: [],
+  }),
 });
 assert.deepEqual(disabledAiDraftPanelView, {
   badgeLabel: 'AI draft',
@@ -21352,6 +21392,14 @@ assert.deepEqual(disabledAiDraftPanelView, {
   reviewNote: 'Teacher reviews before saving',
   safeSourceDescription:
     'AI drafting uses the text below plus safe source-material provenance only.',
+  sourceReadiness: {
+    characterCountLabel: '36/2000 characters',
+    description:
+      'This is the starter example. Replace it with your lesson notes before trusting the generated draft.',
+    hasWarnings: true,
+    status: 'default-source',
+    title: 'Starter source',
+  },
   sourceMaterialNoteViews: [],
   sourceMaterialSummaryLabel: undefined,
   sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
@@ -21364,30 +21412,61 @@ assert.deepEqual(
   buildActivityEditorAiDraftPanelView({
     hasUser: true,
     isGeneratingDraft: false,
-    sourceState: {
-      canSyncDraftSourceMaterials: true,
-      hasAttachedSourceMaterials: true,
-      hasDraftSourceMaterialNotes: false,
-    },
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: 'Classroom source notes.',
+      sourceMaterials: [
+        {
+          fileId: 'file-1',
+          kind: 'document',
+          originalName: 'unit-notes.pdf',
+        },
+      ],
+    }),
   }),
   {
     ...disabledAiDraftPanelView,
     canGenerateDraft: true,
     canSyncDraftSourceMaterials: true,
     generationDisabledReason: undefined,
+    sourceReadiness: {
+      characterCountLabel: '23/2000 characters',
+      description:
+        'Attached classroom materials: 1. Sync them as safe provenance before generation.',
+      hasWarnings: true,
+      status: 'sync-available',
+      title: 'Material sync available',
+    },
   }
 );
 assert.equal(
   buildActivityEditorAiDraftPanelView({
     hasUser: true,
     isGeneratingDraft: true,
-    sourceState: {
-      canSyncDraftSourceMaterials: true,
-      hasAttachedSourceMaterials: false,
-      hasDraftSourceMaterialNotes: true,
-    },
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: syncedEditorDraftSource,
+      sourceMaterials: [],
+    }),
   }).canGenerateDraft,
   false
+);
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    draftSourceText: syncedEditorDraftSource,
+    hasUser: true,
+    isGeneratingDraft: false,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: syncedEditorDraftSource,
+      sourceMaterials: [],
+    }),
+  }).sourceReadiness,
+  {
+    characterCountLabel: `${syncedEditorDraftSource.length}/2000 characters`,
+    description:
+      '1 safe material notes are included. File ids, storage keys, and permissions stay out of the prompt.',
+    hasWarnings: false,
+    status: 'synced-materials',
+    title: 'Safe materials included',
+  }
 );
 const editorSelectOptions = buildActivityEditorSelectOptions();
 assert.deepEqual(

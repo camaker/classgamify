@@ -23,10 +23,14 @@ import {
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import {
+  ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+  DEFAULT_ACTIVITY_DRAFT_SOURCE,
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
+  buildActivitySourceMaterialDraftSummary,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
+  normalizeActivityDraftSourceText,
 } from '@/activities/draft-source';
 import {
   buildActivityAiDraftFocusOptions,
@@ -110,15 +114,27 @@ type ActivityEditorSelectOptionsView = {
 };
 
 type ActivityEditorDraftSourceState = {
+  attachedSourceMaterialCount: number;
   canSyncDraftSourceMaterials: boolean;
   hasAttachedSourceMaterials: boolean;
   hasDraftSourceMaterialNotes: boolean;
+  isDefaultSource: boolean;
+  safeSourceMaterialNoteCount: number;
+  sourceLength: number;
 };
 
 type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
   typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText
 >[number] & {
   displayText: string;
+};
+
+type ActivityEditorAiDraftSourceReadinessView = {
+  characterCountLabel: string;
+  description: string;
+  hasWarnings: boolean;
+  status: 'default-source' | 'ready' | 'sync-available' | 'synced-materials';
+  title: string;
 };
 
 type ActivityEditorAiDraftPanelView = {
@@ -132,6 +148,7 @@ type ActivityEditorAiDraftPanelView = {
   itemCountLabel: string;
   reviewNote: string;
   safeSourceDescription: string;
+  sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
   sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
   sourceMaterialSummaryLabel?: string;
   sourcePlaceholder: string;
@@ -339,16 +356,29 @@ export function buildActivityEditorDraftSourceState({
   draftSourceText: string;
   sourceMaterials: unknown;
 }): ActivityEditorDraftSourceState {
-  const hasAttachedSourceMaterials =
-    Array.isArray(sourceMaterials) && sourceMaterials.length > 0;
+  const normalizedSourceText =
+    normalizeActivityDraftSourceText(draftSourceText);
+  const sourceMaterialSummary =
+    buildActivitySourceMaterialDraftSummary(sourceMaterials);
+  const hasAttachedSourceMaterials = sourceMaterialSummary.totalCount > 0;
   const hasDraftSourceMaterialNotes =
-    hasActivitySourceMaterialDraftNotes(draftSourceText);
+    hasActivitySourceMaterialDraftNotes(normalizedSourceText);
+  const safeSourceMaterialNoteCount =
+    buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+      normalizedSourceText
+    ).length;
 
   return {
+    attachedSourceMaterialCount: sourceMaterialSummary.totalCount,
     canSyncDraftSourceMaterials:
       hasAttachedSourceMaterials || hasDraftSourceMaterialNotes,
     hasAttachedSourceMaterials,
     hasDraftSourceMaterialNotes,
+    isDefaultSource:
+      normalizedSourceText ===
+      normalizeActivityDraftSourceText(DEFAULT_ACTIVITY_DRAFT_SOURCE),
+    safeSourceMaterialNoteCount,
+    sourceLength: normalizedSourceText.length,
   };
 }
 
@@ -388,6 +418,7 @@ export function buildActivityEditorAiDraftPanelView({
     itemCountLabel: m.activity_form_ai_item_count_label(),
     reviewNote: m.activity_form_ai_draft_review_note(),
     safeSourceDescription: m.activity_form_ai_safe_source_description(),
+    sourceReadiness: buildActivityEditorAiDraftSourceReadinessView(sourceState),
     sourceMaterialNoteViews,
     sourceMaterialSummaryLabel:
       sourceMaterialNoteViews.length > 0
@@ -400,6 +431,58 @@ export function buildActivityEditorAiDraftPanelView({
     syncMaterialsLabel: m.activity_form_use_attached_materials(),
     syncMaterialsHelpText: m.activity_form_ai_sync_materials_help(),
     syncSuccessMessage: m.activity_form_toast_source_materials_synced(),
+  };
+}
+
+function buildActivityEditorAiDraftSourceReadinessView(
+  sourceState: ActivityEditorDraftSourceState
+): ActivityEditorAiDraftSourceReadinessView {
+  const characterCountLabel = m.activity_form_ai_source_character_count({
+    count: sourceState.sourceLength,
+    max: ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
+  });
+
+  if (sourceState.hasDraftSourceMaterialNotes) {
+    return {
+      characterCountLabel,
+      description: m.activity_form_ai_source_readiness_synced_description({
+        count: sourceState.safeSourceMaterialNoteCount,
+      }),
+      hasWarnings: false,
+      status: 'synced-materials',
+      title: m.activity_form_ai_source_readiness_synced_title(),
+    };
+  }
+
+  if (sourceState.hasAttachedSourceMaterials) {
+    return {
+      characterCountLabel,
+      description:
+        m.activity_form_ai_source_readiness_sync_available_description({
+          count: sourceState.attachedSourceMaterialCount,
+        }),
+      hasWarnings: true,
+      status: 'sync-available',
+      title: m.activity_form_ai_source_readiness_sync_available_title(),
+    };
+  }
+
+  if (sourceState.isDefaultSource) {
+    return {
+      characterCountLabel,
+      description: m.activity_form_ai_source_readiness_default_description(),
+      hasWarnings: true,
+      status: 'default-source',
+      title: m.activity_form_ai_source_readiness_default_title(),
+    };
+  }
+
+  return {
+    characterCountLabel,
+    description: m.activity_form_ai_source_readiness_ready_description(),
+    hasWarnings: false,
+    status: 'ready',
+    title: m.activity_form_ai_source_readiness_ready_title(),
   };
 }
 

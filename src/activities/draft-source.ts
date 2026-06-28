@@ -116,6 +116,10 @@ export function appendActivitySourceMaterialDraftNotes({
   ]);
 }
 
+export function normalizeActivityDraftSourceText(value: string | undefined) {
+  return normalizeDraftSourceText(value);
+}
+
 export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
   return getActivityDraftSourceTextParagraphs(sourceText).some(
     hasActivitySourceMaterialDraftNotesParagraph
