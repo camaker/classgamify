@@ -44,11 +44,7 @@ export function StudentRunnerAttemptShell({
         />
       </div>
 
-      {controlView.showTimeExpiredMessage ? (
-        <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
-          {controlView.timeExpiredMessage}
-        </div>
-      ) : null}
+      <StudentRunnerTimeExpiredNotice controlView={controlView} />
 
       {children}
     </div>
@@ -74,6 +70,20 @@ function StudentRunnerAttemptStatusBar({
           {controlView.timerBadge.label}
         </Badge>
       ) : null}
+    </div>
+  );
+}
+
+function StudentRunnerTimeExpiredNotice({
+  controlView,
+}: {
+  controlView: StudentRunnerPageViewModel['controlView'];
+}) {
+  if (!controlView.showTimeExpiredMessage) return null;
+
+  return (
+    <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
+      {controlView.timeExpiredMessage}
     </div>
   );
 }

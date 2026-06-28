@@ -5408,8 +5408,8 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerAttemptStatusBar[\s\S]*controlView=\{controlView\}[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel/,
-  'Student runner attempt shell should delegate status, identity, and result-panel presentation.'
+  /StudentRunnerAttemptStatusBar[\s\S]*controlView=\{controlView\}[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel[\s\S]*StudentRunnerTimeExpiredNotice/,
+  'Student runner attempt shell should delegate status, identity, result-panel, and time-expired presentation.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -5420,6 +5420,11 @@ assert.match(
   studentRunnerAttemptShellSource,
   /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*identityView\.copy\.description/,
   'Student runner identity panel should render prepared named-student and anonymous browser identity views.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerTimeExpiredNotice[\s\S]*controlView\.showTimeExpiredMessage[\s\S]*controlView\.timeExpiredMessage/,
+  'Student runner time-expired notice should render prepared timer-expired state.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
