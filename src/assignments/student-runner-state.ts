@@ -15,7 +15,9 @@ import {
   formatStudentAttemptUsageLabel,
   getAttemptCompletionSummary,
   getStudentRunnerCopy,
+  applyStudentAnswerChanges,
   type StudentAnswerMap,
+  type StudentAnswerChange,
   type StudentRunnerMissingReason,
 } from '@/assignments/student-submission';
 import {
@@ -23,6 +25,7 @@ import {
   buildPublicAssignmentPreviewAssignment,
   stripRuntimeAnswers,
   type PublicAssignmentLookupResult,
+  type PublicAttemptReviewItem,
   type PublicAttemptResult,
   type PublicRuntimeItem,
 } from '@/assignments/public';
@@ -62,9 +65,10 @@ type StudentRunnerAttemptState = {
   runtimeItems: PublicRuntimeItem[];
 };
 
-type StudentRunnerAttemptResult = {
+type StudentRunnerAttemptResult = PublicAttemptResult & {
   attemptUsage: AssignmentAttemptUsage;
-} & PublicAttemptResult;
+  reviewItems: PublicAttemptReviewItem[];
+};
 
 type StudentRunnerLoadingView = {
   message: string;
@@ -169,6 +173,22 @@ export type StudentRunnerAttemptClock = {
   shareId: string;
   startedAt: number;
 };
+
+export type StudentRunnerAttemptSubmissionResponse = {
+  attemptUsage: AssignmentAttemptUsage;
+  result: PublicAttemptResult;
+  reviewItems: PublicAttemptReviewItem[];
+};
+
+export type StudentRunnerAnswerUpdatePlan =
+  | {
+      answers: StudentAnswerMap;
+      confirmIncompleteSubmit: false;
+      type: 'updated';
+    }
+  | {
+      type: 'ignored';
+    };
 
 export function buildStudentRunnerSeoView(): StudentRunnerSeoView {
   const runnerCopy = getStudentRunnerCopy();
@@ -558,6 +578,41 @@ export function buildStudentRunnerAttemptRestartPlan({
     attemptClock: resetState.attemptClock,
     confirmIncompleteSubmit: resetState.confirmIncompleteSubmit,
     startedAt: now,
+  };
+}
+
+export function buildStudentRunnerSubmissionResultState({
+  response,
+}: {
+  response: StudentRunnerAttemptSubmissionResponse;
+}): StudentRunnerAttemptResult {
+  return {
+    ...response.result,
+    attemptUsage: response.attemptUsage,
+    reviewItems: response.reviewItems,
+  };
+}
+
+export function buildStudentRunnerAnswerUpdatePlan({
+  answers,
+  changes,
+}: {
+  answers: StudentAnswerMap;
+  changes: StudentAnswerChange[];
+}): StudentRunnerAnswerUpdatePlan {
+  if (changes.length === 0) {
+    return {
+      type: 'ignored',
+    };
+  }
+
+  return {
+    answers: applyStudentAnswerChanges({
+      answers,
+      changes,
+    }),
+    confirmIncompleteSubmit: false,
+    type: 'updated',
   };
 }
 

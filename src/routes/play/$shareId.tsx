@@ -1,23 +1,22 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getRuntimeItems } from '@/activities/runtime';
-import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import { ASSIGNMENT_ATTEMPT_DURATION_UNITS } from '@/assignments/attempt-duration';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
-import type { PublicAttemptReviewItem } from '@/assignments/public';
 import {
-  applyStudentAnswerChanges,
   buildStudentAttemptSubmissionPlan,
   resolveStudentAttemptSubmissionFailureMessage,
   type StudentAnswerChange,
 } from '@/assignments/student-submission';
 import {
+  buildStudentRunnerAnswerUpdatePlan,
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
   buildStudentRunnerSeoView,
+  buildStudentRunnerSubmissionResultState,
   shouldStartStudentRunnerAttemptClock,
   shouldResetStudentRunnerAttemptSession,
   type StudentRunnerAttemptClock,
@@ -232,11 +231,7 @@ function PlayPage() {
         submissionPlan.input
       );
       setAnonymousToken(submissionPlan.anonymousToken);
-      setResult({
-        ...response.result,
-        attemptUsage: response.attemptUsage,
-        reviewItems: response.reviewItems,
-      });
+      setResult(buildStudentRunnerSubmissionResultState({ response }));
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
       toast.success(runnerPageView.submissionSuccessMessage);
     } catch (error) {
@@ -256,15 +251,22 @@ function PlayPage() {
   }
 
   function updateAnswers(changes: StudentAnswerChange[]) {
-    if (changes.length === 0) return;
+    const updatePlan = buildStudentRunnerAnswerUpdatePlan({
+      answers,
+      changes,
+    });
+    if (updatePlan.type === 'ignored') return;
 
-    setConfirmIncompleteSubmit(false);
-    setAnswers((current) =>
-      applyStudentAnswerChanges({
+    setConfirmIncompleteSubmit(updatePlan.confirmIncompleteSubmit);
+    setAnswers((current) => {
+      const currentUpdatePlan = buildStudentRunnerAnswerUpdatePlan({
         answers: current,
         changes,
-      })
-    );
+      });
+      if (currentUpdatePlan.type === 'ignored') return current;
+
+      return currentUpdatePlan.answers;
+    });
   }
 
   if (pageState.status === 'loading') {
@@ -342,11 +344,6 @@ function PlayPage() {
   );
 }
 
-type AttemptSubmissionResult = {
-  accuracy: number;
-  attemptUsage: AssignmentAttemptUsage;
-  durationSeconds?: number;
-  earnedPoints: number;
-  reviewItems: PublicAttemptReviewItem[];
-  totalPoints: number;
-};
+type AttemptSubmissionResult = ReturnType<
+  typeof buildStudentRunnerSubmissionResultState
+>;

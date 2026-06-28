@@ -693,6 +693,7 @@ import {
   buildScoredAttemptWhere,
 } from '@/assignments/attempt-query';
 import {
+  buildStudentRunnerAnswerUpdatePlan,
   buildStudentRunnerAttemptClock,
   buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
@@ -701,6 +702,7 @@ import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerSubmissionResultState,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
@@ -4955,15 +4957,40 @@ assert.match(
   /buildStudentAttemptSubmissionPlan\(/,
   'Student play route should build submission payloads through the assignment-domain submission plan.'
 );
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerSubmissionResultState/,
+  'Student runner state domain should expose the submission response to result-state conversion.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerAnswerUpdatePlan/,
+  'Student runner state domain should expose browser answer-change update plans.'
+);
+assert.match(
+  playRouteSource,
+  /setResult\(buildStudentRunnerSubmissionResultState\(\{ response \}\)\)/,
+  'Student play route should convert submission responses through the runner state domain.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /setResult\(\{[\s\S]*response\.result[\s\S]*response\.attemptUsage[\s\S]*response\.reviewItems/,
+  'Student play route should not inline the submitted result-state shape.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerAnswerUpdatePlan\(\{[\s\S]*answers: current,[\s\S]*changes/,
+  'Student play route should plan browser answer changes through the runner state domain.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /applyStudentAnswerChanges\(/,
+  'Student play route should not directly apply answer-map changes.'
+);
 assert.doesNotMatch(
   playRouteSource,
   /buildStudentAttemptSubmissionInput\(|buildStudentAttemptSubmitGate\(|resolveStudentAttemptAnonymousToken\(|resolveStudentAttemptSubmissionDurationSeconds\(|durationSeconds:\s*buildAttemptTimerState\(/,
   'Student play route should not rebuild submit gates, anonymous identity, duration, or submission input locally.'
-);
-assert.match(
-  playRouteSource,
-  /applyStudentAnswerChanges\(\{[\s\S]*answers: current,[\s\S]*changes/,
-  'Student play route should apply browser answer changes through assignment-domain helpers.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -4972,13 +4999,13 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /function updateAnswers\(changes: StudentAnswerChange\[\]\)[\s\S]*setConfirmIncompleteSubmit\(false\)[\s\S]*applyStudentAnswerChanges/,
-  'Student play route should reset incomplete-submit confirmation inside the shared answer-update path.'
+  /function updateAnswers\(changes: StudentAnswerChange\[\]\)[\s\S]*setConfirmIncompleteSubmit\(updatePlan\.confirmIncompleteSubmit\)/,
+  'Student play route should reset incomplete-submit confirmation from the shared answer-update plan.'
 );
-assert.match(
+assert.doesNotMatch(
   playRouteSource,
   /if \(changes\.length === 0\) return/,
-  'Student play route should ignore empty answer-change batches.'
+  'Student play route should delegate empty answer-change handling to the runner state domain.'
 );
 assert.match(
   studentRuntimeItemListSource,
@@ -11274,6 +11301,93 @@ assert.deepEqual(buildStudentRunnerAttemptRestartPlan({ now: 98_765 }), {
   confirmIncompleteSubmit: false,
   startedAt: 98_765,
 });
+assert.deepEqual(
+  buildStudentRunnerSubmissionResultState({
+    response: {
+      attemptUsage: {
+        maxAttempts: 3,
+        remainingAttempts: 2,
+        usedAttempts: 1,
+      },
+      result: {
+        accuracy: 50,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        durationSeconds: 25,
+        earnedPoints: 1,
+        totalPoints: 2,
+      },
+      reviewItems: [
+        {
+          acceptedAnswers: ['Paris'],
+          correct: true,
+          correctAnswer: 'Paris',
+          explanation: 'Capital city',
+          itemId: 'capital-france',
+          submitted: true,
+        },
+      ],
+    },
+  }),
+  {
+    accuracy: 50,
+    attemptUsage: {
+      maxAttempts: 3,
+      remainingAttempts: 2,
+      usedAttempts: 1,
+    },
+    completedItemCount: 1,
+    correctItemCount: 1,
+    durationSeconds: 25,
+    earnedPoints: 1,
+    reviewItems: [
+      {
+        acceptedAnswers: ['Paris'],
+        correct: true,
+        correctAnswer: 'Paris',
+        explanation: 'Capital city',
+        itemId: 'capital-france',
+        submitted: true,
+      },
+    ],
+    totalPoints: 2,
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      existing: 'Answer',
+    },
+    changes: [],
+  }),
+  { type: 'ignored' }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      existing: 'Answer',
+      target: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'New answer',
+        itemId: ' target ',
+      },
+      {
+        answer: 'Blank id ignored',
+        itemId: ' ',
+      },
+    ],
+  }),
+  {
+    answers: {
+      existing: 'Answer',
+      target: 'New answer',
+    },
+    confirmIncompleteSubmit: false,
+    type: 'updated',
+  }
+);
 assert.equal(
   shouldResetStudentRunnerAttemptSession({
     attemptSessionKey: undefined,
