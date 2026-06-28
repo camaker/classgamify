@@ -22,6 +22,9 @@ type CreatedActivityPanelProps = {
   context: ReturnType<typeof buildCreatedActivityPanelContext> | undefined;
   onDismiss: () => void;
 };
+type CreatedActivityPanelContext = ReturnType<
+  typeof buildCreatedActivityPanelContext
+>;
 
 export function CreatedActivityPanel({
   context,
@@ -55,54 +58,12 @@ export function CreatedActivityPanel({
             </p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-          {panelContext.showPublishAction && activity ? (
-            <Button
-              type="button"
-              className="w-full sm:w-auto"
-              onClick={() => setPublishDialogOpen(true)}
-            >
-              <IconPlus className="size-4" />
-              {activityLibraryCardCopy.actionLabels.publish}
-            </Button>
-          ) : null}
-          {panelContext.showEditAction && activity ? (
-            <Link
-              to="/dashboard/activities/$activityId"
-              params={{ activityId: activity.id }}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background sm:w-auto'
-              )}
-            >
-              <IconEdit className="size-4" />
-              {activityLibraryCardCopy.actionLabels.edit}
-            </Link>
-          ) : null}
-          {panelContext.showCreateAction ? (
-            <Link
-              to={Routes.Create}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background sm:w-auto'
-              )}
-            >
-              <IconPlus className="size-4" />
-              {activityLibraryPageCopy.createActivityLabel}
-            </Link>
-          ) : null}
-          {panelContext.showDismissAction ? (
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full sm:w-auto"
-              onClick={onDismiss}
-            >
-              <IconX className="size-4" />
-              {activityLibraryActionCopy.dismiss}
-            </Button>
-          ) : null}
-        </div>
+        <CreatedActivityPanelActions
+          activity={activity}
+          context={panelContext}
+          onDismiss={onDismiss}
+          onPublish={() => setPublishDialogOpen(true)}
+        />
       </section>
       {activity ? (
         <ActivityPublishDialog
@@ -122,5 +83,94 @@ export function CreatedActivityPanel({
         />
       ) : null}
     </>
+  );
+}
+
+function CreatedActivityPanelActions({
+  activity,
+  context,
+  onDismiss,
+  onPublish,
+}: {
+  activity: CreatedActivityPanelContext['activity'];
+  context: CreatedActivityPanelContext;
+  onDismiss: () => void;
+  onPublish: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+      {context.showPublishAction && activity ? (
+        <CreatedActivityPublishActionButton onClick={onPublish} />
+      ) : null}
+      {context.showEditAction && activity ? (
+        <CreatedActivityEditActionLink activityId={activity.id} />
+      ) : null}
+      {context.showCreateAction ? <CreatedActivityNewActionLink /> : null}
+      {context.showDismissAction ? (
+        <CreatedActivityDismissActionButton onClick={onDismiss} />
+      ) : null}
+    </div>
+  );
+}
+
+function CreatedActivityPublishActionButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <Button type="button" className="w-full sm:w-auto" onClick={onClick}>
+      <IconPlus className="size-4" />
+      {activityLibraryCardCopy.actionLabels.publish}
+    </Button>
+  );
+}
+
+function CreatedActivityEditActionLink({ activityId }: { activityId: string }) {
+  return (
+    <Link
+      to="/dashboard/activities/$activityId"
+      params={{ activityId }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-auto'
+      )}
+    >
+      <IconEdit className="size-4" />
+      {activityLibraryCardCopy.actionLabels.edit}
+    </Link>
+  );
+}
+
+function CreatedActivityNewActionLink() {
+  return (
+    <Link
+      to={Routes.Create}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-auto'
+      )}
+    >
+      <IconPlus className="size-4" />
+      {activityLibraryPageCopy.createActivityLabel}
+    </Link>
+  );
+}
+
+function CreatedActivityDismissActionButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      className="w-full sm:w-auto"
+      onClick={onClick}
+    >
+      <IconX className="size-4" />
+      {activityLibraryActionCopy.dismiss}
+    </Button>
   );
 }

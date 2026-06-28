@@ -38,6 +38,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
+type ActivityLibraryCardDisplayView = ReturnType<
+  typeof buildActivityLibraryCardDisplayView
+>;
 
 type ActivityLibraryCardProps = {
   activity: ActivityCardData;
@@ -153,81 +156,17 @@ export function ActivityLibraryCard({
           isRemixing={remixMutation.isPending}
           onRemix={remixActivity}
         />
-        {cardDisplayView.actionState.showPersistedActions ? (
-          <div className="flex flex-col gap-2 sm:flex-row">
-            {cardDisplayView.actionState.showEditAction ? (
-              <Link
-                to="/dashboard/activities/$activityId"
-                params={{ activityId: activity.id }}
-                className={cn(
-                  buttonVariants({ variant: 'outline' }),
-                  'w-full bg-background sm:w-fit'
-                )}
-              >
-                <IconEdit className="size-4" />
-                {activityLibraryCardCopy.actionLabels.edit}
-              </Link>
-            ) : null}
-            {cardDisplayView.actionState.showDerivativeActions ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full bg-background sm:w-fit"
-                disabled={duplicateMutation.isPending}
-                onClick={duplicateActivity}
-              >
-                <IconCopy className="size-4" />
-                {activityLibraryCardCopy.actionLabels.duplicate}
-              </Button>
-            ) : null}
-            {cardDisplayView.actionState.showArchiveAction ||
-            cardDisplayView.actionState.showPublishAction ? (
-              <>
-                {cardDisplayView.actionState.showArchiveAction ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full bg-background sm:w-fit"
-                    disabled={archiveMutation.isPending}
-                    onClick={archiveActivity}
-                  >
-                    <IconFolderOff className="size-4" />
-                    {activityLibraryCardCopy.actionLabels.archive}
-                  </Button>
-                ) : null}
-                {cardDisplayView.actionState.showPublishAction ? (
-                  <Button
-                    type="button"
-                    className="w-full sm:w-fit"
-                    onClick={() => setPublishDialogOpen(true)}
-                  >
-                    <IconPlus className="size-4" />
-                    {activityLibraryCardCopy.actionLabels.publish}
-                  </Button>
-                ) : null}
-              </>
-            ) : (
-              <>
-                {cardDisplayView.actionState.showRestoreRequiredMessage ? (
-                  <p className="text-sm text-muted-foreground sm:mr-auto">
-                    {activityLibraryCardCopy.restoreRequiredMessage}
-                  </p>
-                ) : null}
-                {cardDisplayView.actionState.showRestoreAction ? (
-                  <Button
-                    type="button"
-                    className="w-full sm:w-fit"
-                    disabled={restoreMutation.isPending}
-                    onClick={restoreActivity}
-                  >
-                    <IconRotateClockwise className="size-4" />
-                    {activityLibraryCardCopy.actionLabels.restore}
-                  </Button>
-                ) : null}
-              </>
-            )}
-          </div>
-        ) : null}
+        <ActivityLibraryCardActions
+          actionState={cardDisplayView.actionState}
+          activityId={activity.id}
+          isArchiving={archiveMutation.isPending}
+          isDuplicating={duplicateMutation.isPending}
+          isRestoring={restoreMutation.isPending}
+          onArchive={archiveActivity}
+          onDuplicate={duplicateActivity}
+          onPublish={() => setPublishDialogOpen(true)}
+          onRestore={restoreActivity}
+        />
       </CardContent>
       <ActivityPublishDialog
         activity={{
@@ -245,5 +184,185 @@ export function ActivityLibraryCard({
         }
       />
     </Card>
+  );
+}
+
+function ActivityLibraryCardActions({
+  actionState,
+  activityId,
+  isArchiving,
+  isDuplicating,
+  isRestoring,
+  onArchive,
+  onDuplicate,
+  onPublish,
+  onRestore,
+}: {
+  actionState: ActivityLibraryCardDisplayView['actionState'];
+  activityId: string;
+  isArchiving: boolean;
+  isDuplicating: boolean;
+  isRestoring: boolean;
+  onArchive: () => void;
+  onDuplicate: () => void;
+  onPublish: () => void;
+  onRestore: () => void;
+}) {
+  if (!actionState.showPersistedActions) return null;
+
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row">
+      {actionState.showEditAction ? (
+        <ActivityLibraryEditActionLink activityId={activityId} />
+      ) : null}
+      {actionState.showDerivativeActions ? (
+        <ActivityLibraryDuplicateActionButton
+          disabled={isDuplicating}
+          onClick={onDuplicate}
+        />
+      ) : null}
+      {actionState.showArchiveAction || actionState.showPublishAction ? (
+        <>
+          {actionState.showArchiveAction ? (
+            <ActivityLibraryArchiveActionButton
+              disabled={isArchiving}
+              onClick={onArchive}
+            />
+          ) : null}
+          {actionState.showPublishAction ? (
+            <ActivityLibraryPublishActionButton onClick={onPublish} />
+          ) : null}
+        </>
+      ) : (
+        <ActivityLibraryRestoreAction
+          actionState={actionState}
+          disabled={isRestoring}
+          onRestore={onRestore}
+        />
+      )}
+    </div>
+  );
+}
+
+function ActivityLibraryEditActionLink({ activityId }: { activityId: string }) {
+  return (
+    <Link
+      to="/dashboard/activities/$activityId"
+      params={{ activityId }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-fit'
+      )}
+    >
+      <IconEdit className="size-4" />
+      {activityLibraryCardCopy.actionLabels.edit}
+    </Link>
+  );
+}
+
+function ActivityLibraryDuplicateActionButton({
+  disabled,
+  onClick,
+}: {
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full bg-background sm:w-fit"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <IconCopy className="size-4" />
+      {activityLibraryCardCopy.actionLabels.duplicate}
+    </Button>
+  );
+}
+
+function ActivityLibraryArchiveActionButton({
+  disabled,
+  onClick,
+}: {
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full bg-background sm:w-fit"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <IconFolderOff className="size-4" />
+      {activityLibraryCardCopy.actionLabels.archive}
+    </Button>
+  );
+}
+
+function ActivityLibraryPublishActionButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <Button type="button" className="w-full sm:w-fit" onClick={onClick}>
+      <IconPlus className="size-4" />
+      {activityLibraryCardCopy.actionLabels.publish}
+    </Button>
+  );
+}
+
+function ActivityLibraryRestoreAction({
+  actionState,
+  disabled,
+  onRestore,
+}: {
+  actionState: ActivityLibraryCardDisplayView['actionState'];
+  disabled: boolean;
+  onRestore: () => void;
+}) {
+  return (
+    <>
+      {actionState.showRestoreRequiredMessage ? (
+        <ActivityLibraryRestoreRequiredMessage />
+      ) : null}
+      {actionState.showRestoreAction ? (
+        <ActivityLibraryRestoreActionButton
+          disabled={disabled}
+          onClick={onRestore}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function ActivityLibraryRestoreRequiredMessage() {
+  return (
+    <p className="text-sm text-muted-foreground sm:mr-auto">
+      {activityLibraryCardCopy.restoreRequiredMessage}
+    </p>
+  );
+}
+
+function ActivityLibraryRestoreActionButton({
+  disabled,
+  onClick,
+}: {
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      className="w-full sm:w-fit"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <IconRotateClockwise className="size-4" />
+      {activityLibraryCardCopy.actionLabels.restore}
+    </Button>
   );
 }

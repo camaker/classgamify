@@ -13975,6 +13975,31 @@ assert.match(
   /ActivityLibraryCompatibilityPanel[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*compatibility=\{cardDisplayView\.compatibility\}[\s\S]*onRemix=\{remixActivity\}/,
   'Activity library card component should delegate template compatibility rendering to a focused component.'
 );
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*activityId=\{activity\.id\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
+  'Activity library card component should delegate persisted action rendering to a focused action component.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibraryCardActions[\s\S]*actionState\.showPersistedActions[\s\S]*ActivityLibraryEditActionLink[\s\S]*ActivityLibraryDuplicateActionButton[\s\S]*ActivityLibraryArchiveActionButton[\s\S]*ActivityLibraryPublishActionButton[\s\S]*ActivityLibraryRestoreAction/,
+  'Activity library card actions should split edit, duplicate, archive, publish, and restore rendering.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibraryEditActionLink[\s\S]*activityLibraryCardCopy\.actionLabels\.edit[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.duplicate[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.archive[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish/,
+  'Activity library action subcomponents should render localized action labels from activity library card copy.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibraryRestoreAction[\s\S]*actionState\.showRestoreRequiredMessage[\s\S]*ActivityLibraryRestoreRequiredMessage[\s\S]*actionState\.showRestoreAction[\s\S]*ActivityLibraryRestoreActionButton/,
+  'Activity library restore actions should render prepared restore gates from the card action state.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /function ActivityLibraryRestoreRequiredMessage[\s\S]*activityLibraryCardCopy\.restoreRequiredMessage[\s\S]*function ActivityLibraryRestoreActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.restore/,
+  'Activity library restore action components should use localized restore copy.'
+);
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /sourceMaterials\.(?:kindBadges|extractionActions|countLabel|extractionTitle|title)/,
@@ -14034,6 +14059,21 @@ assert.match(
   createdActivityPanelComponentSource,
   /buildCreatedActivityPanelContext/,
   'Created activity panel component should render saved-activity state from the activity-domain panel context.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /CreatedActivityPanelActions[\s\S]*activity=\{activity\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}/,
+  'Created activity panel should delegate saved-activity actions to a focused action component.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /function CreatedActivityPanelActions[\s\S]*context\.showPublishAction[\s\S]*CreatedActivityPublishActionButton[\s\S]*context\.showEditAction[\s\S]*CreatedActivityEditActionLink[\s\S]*context\.showCreateAction[\s\S]*CreatedActivityNewActionLink[\s\S]*context\.showDismissAction[\s\S]*CreatedActivityDismissActionButton/,
+  'Created activity panel actions should split publish, edit, create, and dismiss rendering.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /function CreatedActivityPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish[\s\S]*function CreatedActivityEditActionLink[\s\S]*activityLibraryCardCopy\.actionLabels\.edit[\s\S]*function CreatedActivityNewActionLink[\s\S]*activityLibraryPageCopy\.createActivityLabel[\s\S]*function CreatedActivityDismissActionButton[\s\S]*activityLibraryActionCopy\.dismiss/,
+  'Created activity panel action subcomponents should render localized action labels from activity-domain copy.'
 );
 assert.match(
   activityLibraryViewSource,
