@@ -1,12 +1,18 @@
-import type { ActivityVisibility } from '@/activities/types';
+import type {
+  ActivityTemplateType,
+  ActivityVisibility,
+} from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
 export function getArchivedActivityDerivationError() {
   return m.activity_lifecycle_derivation_blocked();
 }
 
-type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
-type ActivityLifecycleAction = ActivityDerivativeAction | 'archive' | 'restore';
+export type ActivityDerivativeAction = 'duplicate' | 'publish' | 'remix';
+export type ActivityLifecycleAction =
+  | ActivityDerivativeAction
+  | 'archive'
+  | 'restore';
 
 type ActivityLifecycleActionCopy = {
   failureMessage: string;
@@ -26,6 +32,51 @@ type ActivityDerivativeActionGate =
 type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
   gate: ActivityDerivativeActionGate;
 };
+
+type ActivityDerivativeBlockedExecutionPlan = {
+  failureMessage: string;
+  message: string;
+  type: 'blocked';
+};
+
+type ActivityDuplicateExecutionPlan = {
+  action: 'duplicate';
+  failureMessage: string;
+  input: {
+    activityId: string;
+  };
+  successMessage: string;
+  type: 'duplicate';
+};
+
+type ActivityRemixExecutionPlan = {
+  action: 'remix';
+  failureMessage: string;
+  input: {
+    activityId: string;
+    targetTemplateType: ActivityTemplateType;
+  };
+  successMessage: string;
+  type: 'remix';
+};
+
+export type ActivityDerivativeActionExecutionPlan =
+  | ActivityDerivativeBlockedExecutionPlan
+  | ActivityDuplicateExecutionPlan
+  | ActivityRemixExecutionPlan;
+
+type ActivityDerivativeActionExecutionPlanInput =
+  | {
+      action: 'duplicate';
+      activityId: string;
+      visibility: ActivityVisibility;
+    }
+  | {
+      action: 'remix';
+      activityId: string;
+      targetTemplateType: ActivityTemplateType;
+      visibility: ActivityVisibility;
+    };
 
 export const activityEditPageCopy = {
   get backToLibraryLabel() {
@@ -161,6 +212,46 @@ export function buildActivityLifecycleActionView({
       action,
       visibility,
     }),
+  };
+}
+
+export function buildActivityDerivativeActionExecutionPlan(
+  input: ActivityDerivativeActionExecutionPlanInput
+): ActivityDerivativeActionExecutionPlan {
+  const actionView = buildActivityLifecycleActionView({
+    action: input.action,
+    visibility: input.visibility,
+  });
+
+  if (actionView.gate.type === 'blocked') {
+    return {
+      failureMessage: actionView.failureMessage,
+      message: actionView.gate.message,
+      type: 'blocked',
+    };
+  }
+
+  if (input.action === 'duplicate') {
+    return {
+      action: 'duplicate',
+      failureMessage: actionView.failureMessage,
+      input: {
+        activityId: input.activityId,
+      },
+      successMessage: actionView.successMessage,
+      type: 'duplicate',
+    };
+  }
+
+  return {
+    action: 'remix',
+    failureMessage: actionView.failureMessage,
+    input: {
+      activityId: input.activityId,
+      targetTemplateType: input.targetTemplateType,
+    },
+    successMessage: actionView.successMessage,
+    type: 'remix',
   };
 }
 

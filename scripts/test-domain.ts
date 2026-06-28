@@ -193,6 +193,7 @@ import {
   assertActivityCanEdit,
   assertActivityCanDeriveWork,
   assertActivityCanRestore,
+  buildActivityDerivativeActionExecutionPlan,
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
   buildActivityLifecycleActionView,
@@ -2763,8 +2764,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDashboardCardSource,
-  /toast\.error\(actionView\.failureMessage\)/,
-  'Activity remix and duplicate failures should use localized derivative action failure copy.'
+  /toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity remix and duplicate failures should use localized derivative action execution-plan failure copy.'
 );
 assert.match(
   activityDashboardCardSource,
@@ -14818,8 +14819,33 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /cardDisplayView\.actionView\.(?:remix|duplicate|archive|restore)/,
-  'Activity library card component should use card action copy and gates from the activity-domain card display view.'
+  /buildActivityDerivativeActionExecutionPlan/,
+  'Activity library card component should build derivative mutation input through the activity-domain execution plan.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /buildActivityDerivativeActionExecutionPlan\(\{[\s\S]*action: 'remix'[\s\S]*activityId: activity\.id[\s\S]*targetTemplateType[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
+  'Activity library card component should build remix execution plans from the selected target template.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /buildActivityDerivativeActionExecutionPlan\(\{[\s\S]*action: 'duplicate'[\s\S]*activityId: activity\.id[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
+  'Activity library card component should build duplicate execution plans from the card activity.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity library card component should execute prepared derivative blocked and mutation plans.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /cardDisplayView\.actionView\.(?:archive|restore)/,
+  'Activity library card component should use prepared archive and restore action copy from the card display view.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /actionView\.gate|gate\.message/,
+  'Activity library card component should not inspect derivative gates directly.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -17842,6 +17868,65 @@ assert.deepEqual(
       type: 'blocked',
     },
     successMessage: 'Assignment link published.',
+  }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'duplicate',
+    activityId: 'activity-1',
+    visibility: 'draft',
+  }),
+  {
+    action: 'duplicate',
+    failureMessage: 'Activity could not be duplicated.',
+    input: {
+      activityId: 'activity-1',
+    },
+    successMessage: 'Activity duplicated.',
+    type: 'duplicate',
+  }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'remix',
+    activityId: 'activity-1',
+    targetTemplateType: 'group-sort',
+    visibility: 'public',
+  }),
+  {
+    action: 'remix',
+    failureMessage: 'Activity could not be remixed.',
+    input: {
+      activityId: 'activity-1',
+      targetTemplateType: 'group-sort',
+    },
+    successMessage: 'Template remix created.',
+    type: 'remix',
+  }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'duplicate',
+    activityId: 'activity-1',
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Activity could not be duplicated.',
+    message: archivedActivityDerivationError,
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'remix',
+    activityId: 'activity-1',
+    targetTemplateType: 'quiz',
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Activity could not be remixed.',
+    message: archivedActivityDerivationError,
+    type: 'blocked',
   }
 );
 assert.deepEqual(buildActivityEditAccessView('draft'), {

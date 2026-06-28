@@ -4,6 +4,7 @@ import {
   buildActivityLibraryCardDisplayView,
   type buildActivityLibraryCardViewModel,
 } from '@/activities/library-view';
+import { buildActivityDerivativeActionExecutionPlan } from '@/activities/lifecycle';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
 import { ActivityLibraryStats } from '@/components/activities/activity-library-stats';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
@@ -65,43 +66,47 @@ export function ActivityLibraryCard({
   async function remixActivity(
     targetTemplateType: ActivityCardData['templateType']
   ) {
-    const actionView = cardDisplayView.actionView.remix;
-    if (actionView.gate.type === 'blocked') {
-      toast.error(actionView.gate.message);
+    const executionPlan = buildActivityDerivativeActionExecutionPlan({
+      action: 'remix',
+      activityId: activity.id,
+      targetTemplateType,
+      visibility: activity.status,
+    });
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
     try {
-      const result = await remixMutation.mutateAsync({
-        activityId: activity.id,
-        targetTemplateType,
-      });
-      toast.success(actionView.successMessage);
+      const result = await remixMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch {
-      toast.error(actionView.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 
   async function duplicateActivity() {
-    const actionView = cardDisplayView.actionView.duplicate;
-    if (actionView.gate.type === 'blocked') {
-      toast.error(actionView.gate.message);
+    const executionPlan = buildActivityDerivativeActionExecutionPlan({
+      action: 'duplicate',
+      activityId: activity.id,
+      visibility: activity.status,
+    });
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
     try {
-      const result = await duplicateMutation.mutateAsync({
-        activityId: activity.id,
-      });
-      toast.success(actionView.successMessage);
+      const result = await duplicateMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
       navigate({
         to: '/dashboard/activities/$activityId',
         params: { activityId: result.id },
       });
     } catch {
-      toast.error(actionView.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 
