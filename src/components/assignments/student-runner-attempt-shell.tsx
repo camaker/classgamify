@@ -46,30 +46,11 @@ export function StudentRunnerAttemptShell({
       </div>
 
       <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
-        {identityView.mode === 'student-name' ? (
-          <div>
-            <label
-              htmlFor="student-name"
-              className="text-sm font-medium text-foreground"
-            >
-              {identityView.label}
-            </label>
-            <Input
-              id="student-name"
-              value={studentName}
-              onChange={(event) => onStudentNameChange(event.target.value)}
-              placeholder={identityView.placeholder}
-              className="mt-2"
-            />
-          </div>
-        ) : (
-          <div className="rounded-lg border bg-muted/20 p-3">
-            <p className="text-sm font-medium">{identityView.copy.title}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              {identityView.copy.description}
-            </p>
-          </div>
-        )}
+        <StudentRunnerIdentityPanel
+          identityView={identityView}
+          onStudentNameChange={onStudentNameChange}
+          studentName={studentName}
+        />
         <StudentRunnerResultPanel
           onStartAnotherAttempt={onStartAnotherAttempt}
           view={resultPanelView}
@@ -83,6 +64,45 @@ export function StudentRunnerAttemptShell({
       ) : null}
 
       {children}
+    </div>
+  );
+}
+
+function StudentRunnerIdentityPanel({
+  identityView,
+  onStudentNameChange,
+  studentName,
+}: {
+  identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
+  onStudentNameChange: (studentName: string) => void;
+  studentName: string;
+}) {
+  if (identityView.mode === 'student-name') {
+    return (
+      <div>
+        <label
+          htmlFor="student-name"
+          className="text-sm font-medium text-foreground"
+        >
+          {identityView.label}
+        </label>
+        <Input
+          id="student-name"
+          value={studentName}
+          onChange={(event) => onStudentNameChange(event.target.value)}
+          placeholder={identityView.placeholder}
+          className="mt-2"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3">
+      <p className="text-sm font-medium">{identityView.copy.title}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        {identityView.copy.description}
+      </p>
     </div>
   );
 }

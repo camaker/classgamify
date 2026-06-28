@@ -5007,8 +5007,13 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /controlView\.progressLabel[\s\S]*controlView\.timerBadge[\s\S]*identityView\.mode[\s\S]*StudentRunnerResultPanel/,
-  'Student runner attempt shell should own progress, timer, identity, and result-panel presentation.'
+  /controlView\.progressLabel[\s\S]*controlView\.timerBadge[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel/,
+  'Student runner attempt shell should own progress and timer presentation while delegating identity and result-panel presentation.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*identityView\.copy\.description/,
+  'Student runner identity panel should render prepared named-student and anonymous browser identity views.'
 );
 assert.doesNotMatch(
   playRouteSource,
