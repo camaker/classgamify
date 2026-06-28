@@ -54,6 +54,7 @@ type PrintableWorksheetAnswerKeyView = {
 };
 
 type PrintableWorksheetControlView = {
+  answerKeyDescription: string;
   answerKeyLabel: string;
   answerKeyValue: boolean;
   backToResultsLabel: string;
@@ -251,6 +252,7 @@ export function buildPrintableWorksheetControlView({
   answerKey: boolean;
 }): PrintableWorksheetControlView {
   return {
+    answerKeyDescription: printableWorksheetPageCopy.answerKeyDescription,
     answerKeyLabel: printableWorksheetPageCopy.answerKeyLabel,
     answerKeyValue: answerKey,
     backToResultsLabel: printableWorksheetPageCopy.backToResultsLabel,

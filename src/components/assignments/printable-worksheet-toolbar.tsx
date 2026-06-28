@@ -38,14 +38,19 @@ export function PrintableWorksheetToolbar({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label
           htmlFor="printable-answer-key"
-          className="flex items-center gap-2 text-sm"
+          className="flex items-start gap-2 text-sm"
         >
           <Switch
             id="printable-answer-key"
             checked={controlView.answerKeyValue}
             onCheckedChange={onAnswerKeyChange}
           />
-          <span>{controlView.answerKeyLabel}</span>
+          <span className="grid gap-1">
+            <span>{controlView.answerKeyLabel}</span>
+            <span className="max-w-64 text-muted-foreground text-xs leading-snug">
+              {controlView.answerKeyDescription}
+            </span>
+          </span>
         </label>
         <Button type="button" onClick={onPrint}>
           <IconPrinter className="size-4" />

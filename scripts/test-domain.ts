@@ -11672,6 +11672,8 @@ assert.deepEqual(
       },
     ],
     controlView: {
+      answerKeyDescription:
+        'Teacher-only answers from the frozen assignment snapshot.',
       answerKeyLabel: 'Include answer key',
       answerKeyValue: true,
       backToResultsLabel: 'Back to results',
@@ -16568,6 +16570,11 @@ assert.match(
   printableWorksheetToolbarSource,
   /controlView\.printButtonLabel/,
   'Printable worksheet toolbar should render toolbar copy from the printable worksheet control view.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
+  /controlView\.answerKeyDescription/,
+  'Printable worksheet toolbar should render the prepared answer-key description from the printable worksheet control view.'
 );
 assert.match(
   printableWorksheetItemListSource,
