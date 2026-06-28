@@ -1,12 +1,17 @@
-import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import {
+  ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+  buildActivityMaterialReferenceFromUserFile,
+  normalizeActivityMaterialReferences,
+} from '@/activities/material-references';
+import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
 import type { ActivityMaterialReference } from '@/activities/types';
+import { formatBytes } from '@/lib/formatter';
 import { m } from '@/locale/paraglide/messages';
 import {
   USER_FILE_MATERIAL_KINDS,
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
-import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
 
 export type ActivitySourceMaterialKindSummary = {
   count: number;
@@ -66,6 +71,44 @@ export type ActivitySourceMaterialSummaryView = {
   }>;
   readiness: ActivitySourceMaterialReadiness;
   title: string;
+};
+
+type ActivitySourceMaterialPickerAvailableFile = {
+  contentType?: string | null;
+  filename?: string | null;
+  id?: string | null;
+  originalName?: string | null;
+  size?: number | null;
+};
+
+export type ActivitySourceMaterialPickerItemView = {
+  actionLabel: string;
+  attachLabel: string;
+  disabled: boolean;
+  material: ActivityMaterialReference;
+  meta: string;
+  removeLabel: string;
+  selected: boolean;
+};
+
+export type ActivitySourceMaterialPickerStatus =
+  | 'available'
+  | 'empty'
+  | 'error'
+  | 'loading'
+  | 'signed-out';
+
+export type ActivitySourceMaterialPickerView = {
+  attachedItems: ActivitySourceMaterialPickerItemView[];
+  availableItems: ActivitySourceMaterialPickerItemView[];
+  attachedSummary: ActivitySourceMaterialSummaryView;
+  countLabel: string;
+  hasAttachedItems: boolean;
+  hasAvailableItems: boolean;
+  isAtLimit: boolean;
+  limitLabel: string;
+  status: ActivitySourceMaterialPickerStatus;
+  statusMessage?: string;
 };
 
 export function summarizeActivitySourceMaterials(
@@ -129,6 +172,94 @@ export function buildActivitySourceMaterialSummaryView(
   };
 }
 
+export function buildActivitySourceMaterialPickerView({
+  availableFiles,
+  canLoadFiles,
+  isError,
+  isLoading,
+  selectedMaterials,
+}: {
+  availableFiles: ActivitySourceMaterialPickerAvailableFile[];
+  canLoadFiles: boolean;
+  isError: boolean;
+  isLoading: boolean;
+  selectedMaterials: unknown;
+}): ActivitySourceMaterialPickerView {
+  const attachedMaterials =
+    normalizeActivityMaterialReferences(selectedMaterials);
+  const selectedIds = new Set(
+    attachedMaterials.map((material) => material.fileId)
+  );
+  const availableItems = availableFiles.flatMap((file) => {
+    const material = buildActivityMaterialReferenceFromUserFile(file);
+
+    return material
+      ? [
+          buildActivitySourceMaterialPickerItemView({
+            isAtLimit:
+              attachedMaterials.length >= ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+            material,
+            selected: selectedIds.has(material.fileId),
+          }),
+        ]
+      : [];
+  });
+  const status = resolveActivitySourceMaterialPickerStatus({
+    canLoadFiles,
+    hasAvailableItems: availableItems.length > 0,
+    isError,
+    isLoading,
+  });
+
+  return {
+    attachedItems: attachedMaterials.map((material) =>
+      buildActivitySourceMaterialPickerItemView({
+        isAtLimit: false,
+        material,
+        selected: true,
+      })
+    ),
+    attachedSummary: buildActivitySourceMaterialSummaryView(attachedMaterials),
+    availableItems,
+    countLabel: m.activity_form_source_materials_count({
+      count: attachedMaterials.length,
+    }),
+    hasAttachedItems: attachedMaterials.length > 0,
+    hasAvailableItems: availableItems.length > 0,
+    isAtLimit: attachedMaterials.length >= ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+    limitLabel: m.activity_form_source_materials_limit({
+      count: ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
+    }),
+    status,
+    statusMessage: getActivitySourceMaterialPickerStatusMessage(status),
+  };
+}
+
+export function addActivitySourceMaterialPickerItem({
+  current,
+  material,
+}: {
+  current: unknown;
+  material: ActivityMaterialReference;
+}) {
+  return normalizeActivityMaterialReferences([
+    ...normalizeActivityMaterialReferences(current),
+    material,
+  ]);
+}
+
+export function removeActivitySourceMaterialPickerItem({
+  current,
+  fileId,
+}: {
+  current: unknown;
+  fileId: string;
+}) {
+  return normalizeActivityMaterialReferences(current).filter(
+    (material) => material.fileId !== fileId
+  );
+}
+
 export function formatActivitySourceMaterialReferenceMeta(
   material: ActivityMaterialReference,
   extraParts: Array<string | undefined> = []
@@ -141,6 +272,70 @@ export function formatActivitySourceMaterialReferenceMeta(
     .map(normalizeOptionalRuntimeDisplayText)
     .filter(Boolean)
     .join(m.activity_source_material_summary_list_separator());
+}
+
+function buildActivitySourceMaterialPickerItemView({
+  isAtLimit,
+  material,
+  selected,
+}: {
+  isAtLimit: boolean;
+  material: ActivityMaterialReference;
+  selected: boolean;
+}): ActivitySourceMaterialPickerItemView {
+  return {
+    actionLabel: selected
+      ? m.activity_form_source_materials_attached()
+      : m.activity_form_source_materials_attach(),
+    attachLabel: m.activity_form_source_materials_attach_label({
+      name: material.originalName,
+    }),
+    disabled: selected || isAtLimit,
+    material,
+    meta: formatActivitySourceMaterialReferenceMeta(material, [
+      typeof material.size === 'number'
+        ? formatBytes(material.size)
+        : undefined,
+    ]),
+    removeLabel: m.activity_form_source_materials_remove_label({
+      name: material.originalName,
+    }),
+    selected,
+  };
+}
+
+function resolveActivitySourceMaterialPickerStatus({
+  canLoadFiles,
+  hasAvailableItems,
+  isError,
+  isLoading,
+}: {
+  canLoadFiles: boolean;
+  hasAvailableItems: boolean;
+  isError: boolean;
+  isLoading: boolean;
+}): ActivitySourceMaterialPickerStatus {
+  if (!canLoadFiles) return 'signed-out';
+  if (isLoading) return 'loading';
+  if (isError) return 'error';
+  return hasAvailableItems ? 'available' : 'empty';
+}
+
+function getActivitySourceMaterialPickerStatusMessage(
+  status: ActivitySourceMaterialPickerStatus
+) {
+  switch (status) {
+    case 'available':
+      return undefined;
+    case 'empty':
+      return m.activity_form_source_materials_empty_available();
+    case 'error':
+      return m.activity_form_source_materials_load_error();
+    case 'loading':
+      return m.activity_form_source_materials_loading();
+    case 'signed-out':
+      return m.activity_form_source_materials_sign_in_hint();
+  }
 }
 
 type ActivitySourceMaterialExtractionActionDefinition = {

@@ -168,8 +168,11 @@ import {
   buildActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
 import {
+  addActivitySourceMaterialPickerItem,
+  buildActivitySourceMaterialPickerView,
   buildActivitySourceMaterialSummaryView,
   formatActivitySourceMaterialReferenceMeta,
+  removeActivitySourceMaterialPickerItem,
   summarizeActivitySourceMaterials,
 } from '@/activities/material-summary';
 import {
@@ -2203,23 +2206,33 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /buildActivitySourceMaterialSummaryView\(selectedMaterials\)/,
-  'Activity source-material picker should reuse the activity-domain material summary view.'
+  /buildActivitySourceMaterialPickerView\(\{[\s\S]*availableFiles: data\?\.items \?\? \[\],[\s\S]*canLoadFiles,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*selectedMaterials/,
+  'Activity source-material picker should consume the activity-domain picker view.'
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /ActivitySourceMaterialsSummary[\s\S]*summary=\{selectedSummary\}/,
+  /ActivitySourceMaterialsSummary[\s\S]*summary=\{pickerView\.attachedSummary\}/,
   'Activity source-material picker should render attached material readiness through the summary component.'
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /formatActivitySourceMaterialReferenceMeta/,
-  'Activity source-material picker should format material row metadata through the activity-domain helper.'
+  /addActivitySourceMaterialPickerItem[\s\S]*removeActivitySourceMaterialPickerItem/,
+  'Activity source-material picker should update attached references through activity-domain add/remove helpers.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /ActivitySourceMaterialAttachedSection[\s\S]*ActivitySourceMaterialAvailableSection[\s\S]*ActivitySourceMaterialPickerStatusPanel[\s\S]*ActivitySourceMaterialReferenceGrid[\s\S]*ActivitySourceMaterialRemoveButton[\s\S]*ActivitySourceMaterialAttachButton/,
+  'Activity source-material picker should split attached, available, status, grid, remove, and attach rendering into focused components.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
+  /function MaterialReferenceRow[\s\S]*itemView\.material\.originalName[\s\S]*itemView\.meta/,
+  'Activity source-material picker rows should render prepared material names and metadata from item views.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
-  /join\(' \/ '\)/,
-  'Activity source-material picker should not hard-code visible material metadata separators.'
+  /buildActivitySourceMaterialSummaryView|buildActivityMaterialReferenceFromUserFile|formatActivitySourceMaterialReferenceMeta|formatBytes|selectedIds|isAtLimit|availableOptions|join\(' \/ '\)/,
+  'Activity source-material picker should not rebuild summary, available references, metadata, selected ids, or limit state locally.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -2277,7 +2290,7 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
-  /\(data\?\.items \?\? \[\]\)\.flatMap/,
+  /availableFiles: data\?\.items \?\? \[\]/,
   'Activity source-material picker should read available files from the material list response items.'
 );
 assert.match(
@@ -4076,6 +4089,26 @@ assert.match(
   /formatActivitySourceMaterialReferenceMeta[\s\S]*normalizeOptionalRuntimeDisplayText/,
   'Activity source-material reference meta should normalize visible meta parts through the shared display helper.'
 );
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialPickerView[\s\S]*normalizeActivityMaterialReferences\([\s\S]*selectedMaterials[\s\S]*buildActivityMaterialReferenceFromUserFile[\s\S]*resolveActivitySourceMaterialPickerStatus[\s\S]*getActivitySourceMaterialPickerStatusMessage/,
+  'Activity source-material picker view should normalize selected materials, build available file references, and resolve picker state in the activity domain.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialPickerItemView[\s\S]*actionLabel:[\s\S]*activity_form_source_materials_attached[\s\S]*activity_form_source_materials_attach[\s\S]*attachLabel:[\s\S]*activity_form_source_materials_attach_label[\s\S]*removeLabel:[\s\S]*activity_form_source_materials_remove_label/,
+  'Activity source-material picker item views should prepare localized attach/remove action labels.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialPickerItemView[\s\S]*disabled: selected \|\| isAtLimit[\s\S]*formatActivitySourceMaterialReferenceMeta[\s\S]*formatBytes/,
+  'Activity source-material picker item views should prepare disabled state and visible metadata.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /addActivitySourceMaterialPickerItem[\s\S]*normalizeActivityMaterialReferences\(\[[\s\S]*removeActivitySourceMaterialPickerItem[\s\S]*normalizeActivityMaterialReferences\(current\)\.filter/,
+  'Activity source-material picker add/remove helpers should normalize references through the shared material reference contract.'
+);
 assert.doesNotMatch(
   activityMaterialSummarySource,
   /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)|part\?\.trim\(\)/,
@@ -4121,6 +4154,176 @@ try {
 } finally {
   overwriteGetLocale(() => 'en');
 }
+const sourceMaterialPickerView = buildActivitySourceMaterialPickerView({
+  availableFiles: [
+    {
+      contentType: 'audio/mpeg',
+      id: 'audio-1',
+      originalName: ' 三年级听力.mp3 ',
+      size: 1536,
+    },
+    {
+      contentType: 'application/pdf',
+      id: 'worksheet-1',
+      originalName: 'Worksheet Scan.pdf',
+      size: 2048,
+    },
+    {
+      contentType: 'text/csv',
+      id: 'spreadsheet-1',
+      originalName: 'Words.csv',
+      size: 512,
+    },
+    {
+      contentType: 'audio/mpeg',
+      id: 'broken-file',
+      originalName: '   ',
+      size: 10,
+    },
+  ],
+  canLoadFiles: true,
+  isError: false,
+  isLoading: false,
+  selectedMaterials: [
+    {
+      contentType: 'audio/mpeg',
+      fileId: 'audio-1',
+      kind: 'audio',
+      originalName: '三年级听力.mp3',
+      size: 1536,
+    },
+  ],
+});
+assert.equal(sourceMaterialPickerView.status, 'available');
+assert.equal(sourceMaterialPickerView.statusMessage, undefined);
+assert.equal(sourceMaterialPickerView.countLabel, '1 attached');
+assert.equal(sourceMaterialPickerView.limitLabel, 'Up to 12 files');
+assert.equal(sourceMaterialPickerView.hasAttachedItems, true);
+assert.equal(sourceMaterialPickerView.hasAvailableItems, true);
+assert.equal(sourceMaterialPickerView.isAtLimit, false);
+assert.equal(
+  sourceMaterialPickerView.attachedItems[0]?.meta,
+  'Audio, 1.5 KB, audio/mpeg'
+);
+assert.equal(
+  sourceMaterialPickerView.attachedItems[0]?.removeLabel,
+  'Remove 三年级听力.mp3'
+);
+assert.equal(sourceMaterialPickerView.availableItems.length, 3);
+assert.deepEqual(
+  sourceMaterialPickerView.availableItems.map((item) => ({
+    actionLabel: item.actionLabel,
+    disabled: item.disabled,
+    fileId: item.material.fileId,
+    meta: item.meta,
+    selected: item.selected,
+  })),
+  [
+    {
+      actionLabel: 'Attached',
+      disabled: true,
+      fileId: 'audio-1',
+      meta: 'Audio, 1.5 KB, audio/mpeg',
+      selected: true,
+    },
+    {
+      actionLabel: 'Attach',
+      disabled: false,
+      fileId: 'worksheet-1',
+      meta: 'Worksheet document, 2.0 KB, application/pdf',
+      selected: false,
+    },
+    {
+      actionLabel: 'Attach',
+      disabled: false,
+      fileId: 'spreadsheet-1',
+      meta: 'Spreadsheet, 512 B, text/csv',
+      selected: false,
+    },
+  ]
+);
+assert.equal(
+  sourceMaterialPickerView.availableItems[1]?.attachLabel,
+  'Attach Worksheet Scan.pdf'
+);
+assert.equal(
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [],
+    canLoadFiles: false,
+    isError: false,
+    isLoading: false,
+    selectedMaterials: [],
+  }).statusMessage,
+  'Sign in to attach classroom files to saved activities.'
+);
+assert.equal(
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [],
+    canLoadFiles: true,
+    isError: false,
+    isLoading: true,
+    selectedMaterials: [],
+  }).status,
+  'loading'
+);
+assert.equal(
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [],
+    canLoadFiles: true,
+    isError: true,
+    isLoading: false,
+    selectedMaterials: [],
+  }).statusMessage,
+  'Classroom files could not be loaded.'
+);
+assert.equal(
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [],
+    canLoadFiles: true,
+    isError: false,
+    isLoading: false,
+    selectedMaterials: [],
+  }).statusMessage,
+  'No uploaded classroom files are available yet.'
+);
+assert.equal(
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [
+      {
+        contentType: 'text/csv',
+        id: 'overflow',
+        originalName: 'Overflow.csv',
+      },
+    ],
+    canLoadFiles: true,
+    isError: false,
+    isLoading: false,
+    selectedMaterials: Array.from({ length: 12 }).map((_, index) => ({
+      fileId: `material-${index}`,
+      kind: 'file',
+      originalName: `Material ${index}`,
+    })),
+  }).availableItems[0]?.disabled,
+  true
+);
+assert.deepEqual(
+  addActivitySourceMaterialPickerItem({
+    current: sourceMaterialPickerView.attachedItems.map(
+      (item) => item.material
+    ),
+    material: sourceMaterialPickerView.availableItems[1]!.material,
+  }).map((material) => material.fileId),
+  ['audio-1', 'worksheet-1']
+);
+assert.deepEqual(
+  removeActivitySourceMaterialPickerItem({
+    current: sourceMaterialPickerView.attachedItems.map(
+      (item) => item.material
+    ),
+    fileId: 'audio-1',
+  }),
+  []
+);
 assert.equal(
   buildActivityMaterialReferenceFromUserFile({
     contentType: 'application/pdf',
