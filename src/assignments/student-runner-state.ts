@@ -147,6 +147,7 @@ type StudentRunnerPageViewModel = {
   missingView?: StudentRunnerMissingPageView;
   revealAnswers: boolean;
   resultPanelView: StudentRunnerResultPanelView;
+  reviewItems?: PublicAttemptReviewItem[];
   routeBadgeLabel: string;
   runtimeItems: PublicRuntimeItem[];
   showStartAnotherAttempt: boolean;
@@ -506,6 +507,7 @@ export function buildStudentRunnerPageViewModel({
       attemptUsageLabel,
       showStartAnotherAttempt,
     }),
+    reviewItems: result?.reviewItems,
     routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
     runtimeItems: attemptState.runtimeItems,
     showStartAnotherAttempt,

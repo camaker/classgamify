@@ -304,7 +304,7 @@ function PlayPage() {
             disabled={controlView.runtimeItemsDisabled}
             items={runtimeItems}
             revealAnswer={runnerPageView.revealAnswers}
-            reviewItems={result?.reviewItems}
+            reviewItems={runnerPageView.reviewItems}
             language={routeActivity.content.language}
             templateType={routeActivity.templateType}
             onAnswerChanges={updateAnswers}

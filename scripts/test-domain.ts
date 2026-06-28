@@ -5077,10 +5077,15 @@ assert.match(
   /revealAnswer=\{runnerPageView\.revealAnswers\}/,
   'Student play route should render answer reveal state from the runner page view-model.'
 );
+assert.match(
+  playRouteSource,
+  /reviewItems=\{runnerPageView\.reviewItems\}/,
+  'Student play route should render attempt review items from the runner page view-model.'
+);
 assert.doesNotMatch(
   playRouteSource,
-  /assignment\.settings\.showCorrectAnswers|routeAssignment\.settings\.showCorrectAnswers/,
-  'Student play route should not inspect assignment answer-reveal settings directly.'
+  /assignment\.settings\.showCorrectAnswers|routeAssignment\.settings\.showCorrectAnswers|result\?\.reviewItems/,
+  'Student play route should not inspect assignment answer-reveal settings or submitted review items directly.'
 );
 assert.match(
   playRouteSource,
@@ -11274,6 +11279,7 @@ assert.deepEqual(
     missingView: studentRunnerPageView.missingView,
     revealAnswers: studentRunnerPageView.revealAnswers,
     resultPanelView: studentRunnerPageView.resultPanelView,
+    reviewItems: studentRunnerPageView.reviewItems,
     routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
     runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: studentRunnerPageView.showStartAnotherAttempt,
@@ -11358,6 +11364,7 @@ assert.deepEqual(
       startAnotherAttemptLabel: 'Start another attempt',
       statusLabel: 'Score submitted',
     },
+    reviewItems: undefined,
     routeBadgeLabel: 'Student play route',
     runtimeItemIds: publicRunnerState.runtimeItems.map((item) => item.id),
     showStartAnotherAttempt: true,
