@@ -14527,6 +14527,36 @@ assert.match(
   /buildAssignmentStatusActionExecutionPlan/,
   'Assignment list card component should execute status updates through the assignment-domain action plan.'
 );
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentListCardActions[\s\S]*actionView=\{assignment\.actionView\}[\s\S]*onUpdateStatus=\{updateStatus\}/,
+  'Assignment list card component should delegate prepared action rendering to a focused action group.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListCardActions[\s\S]*actionView\.resultAction[\s\S]*AssignmentListResultActionLink[\s\S]*actionView\.printAction[\s\S]*AssignmentListPrintActionLink[\s\S]*actionView\.statusAction[\s\S]*AssignmentListStatusActionButton[\s\S]*actionView\.shareAction[\s\S]*AssignmentListShareActions/,
+  'Assignment list card actions should split result, print, status, and share actions into focused components.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListResultActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  'Assignment list result action should render prepared result action links.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListPrintActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  'Assignment list print action should render prepared printable worksheet links.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListStatusActionButton[\s\S]*statusAction\.kind[\s\S]*statusAction\.label/,
+  'Assignment list status action button should render prepared lifecycle action labels.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton/,
+  'Assignment list share actions should render prepared student-link actions.'
+);
 assert.doesNotMatch(
   assignmentListCardComponentSource,
   /statusAction\.nextStatus/,

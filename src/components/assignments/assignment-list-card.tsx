@@ -29,15 +29,30 @@ type AssignmentListCardProps = {
   assignment: ReturnType<typeof buildAssignmentListCardViewModel>;
 };
 
+type AssignmentListCardView = ReturnType<
+  typeof buildAssignmentListCardViewModel
+>;
+type AssignmentListCardActionView = AssignmentListCardView['actionView'];
+type AssignmentListPrintAction = NonNullable<
+  AssignmentListCardActionView['printAction']
+>;
+type AssignmentListResultAction = NonNullable<
+  AssignmentListCardActionView['resultAction']
+>;
+type AssignmentListShareAction = NonNullable<
+  AssignmentListCardActionView['shareAction']
+>;
+type AssignmentListStatusAction = NonNullable<
+  AssignmentListCardActionView['statusAction']
+>;
+
 export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
   const updateStatusMutation = useUpdateAssignmentStatus();
-  const { printAction, resultAction, shareAction, statusAction } =
-    assignment.actionView;
 
   async function updateStatus() {
     const plan = buildAssignmentStatusActionExecutionPlan({
       assignmentId: assignment.id,
-      statusAction,
+      statusAction: assignment.actionView.statusAction,
     });
 
     if (plan.type === 'blocked') return;
@@ -74,67 +89,131 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
           <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
           <AssignmentListStats statItems={assignment.statItems} />
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-          {resultAction ? (
-            <Link
-              to="/dashboard/assignments/$assignmentId"
-              params={{ assignmentId: resultAction.assignmentId }}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background lg:w-auto'
-              )}
-            >
-              <IconChartBar className="size-4" />
-              {resultAction.label}
-            </Link>
-          ) : null}
-          {printAction ? (
-            <Link
-              to="/print/assignments/$assignmentId"
-              params={{ assignmentId: printAction.assignmentId }}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background lg:w-auto'
-              )}
-            >
-              <IconPrinter className="size-4" />
-              {printAction.label}
-            </Link>
-          ) : null}
-          {statusAction ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-background lg:w-auto"
-              disabled={updateStatusMutation.isPending}
-              onClick={updateStatus}
-            >
-              {statusAction.kind === 'close-link' ? (
-                <IconLock className="size-4" />
-              ) : (
-                <IconLockOpen className="size-4" />
-              )}
-              {statusAction.label}
-            </Button>
-          ) : null}
-          {shareAction ? (
-            <>
-              <Link
-                to="/play/$shareId"
-                params={{ shareId: shareAction.shareSlug }}
-                className={cn(buttonVariants(), 'w-full lg:w-auto')}
-              >
-                <IconPlayerPlay className="size-4" />
-                {shareAction.label}
-              </Link>
-              <CopyAssignmentShareLinkButton
-                shareSlug={shareAction.shareSlug}
-                className="w-full bg-background lg:w-auto"
-              />
-            </>
-          ) : null}
-        </div>
+        <AssignmentListCardActions
+          actionView={assignment.actionView}
+          statusPending={updateStatusMutation.isPending}
+          onUpdateStatus={updateStatus}
+        />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentListCardActions({
+  actionView,
+  onUpdateStatus,
+  statusPending,
+}: {
+  actionView: AssignmentListCardActionView;
+  onUpdateStatus: () => void;
+  statusPending: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+      {actionView.resultAction ? (
+        <AssignmentListResultActionLink action={actionView.resultAction} />
+      ) : null}
+      {actionView.printAction ? (
+        <AssignmentListPrintActionLink action={actionView.printAction} />
+      ) : null}
+      {actionView.statusAction ? (
+        <AssignmentListStatusActionButton
+          disabled={statusPending}
+          statusAction={actionView.statusAction}
+          onUpdateStatus={onUpdateStatus}
+        />
+      ) : null}
+      {actionView.shareAction ? (
+        <AssignmentListShareActions action={actionView.shareAction} />
+      ) : null}
+    </div>
+  );
+}
+
+function AssignmentListResultActionLink({
+  action,
+}: {
+  action: AssignmentListResultAction;
+}) {
+  return (
+    <Link
+      to="/dashboard/assignments/$assignmentId"
+      params={{ assignmentId: action.assignmentId }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background lg:w-auto'
+      )}
+    >
+      <IconChartBar className="size-4" />
+      {action.label}
+    </Link>
+  );
+}
+
+function AssignmentListPrintActionLink({
+  action,
+}: {
+  action: AssignmentListPrintAction;
+}) {
+  return (
+    <Link
+      to="/print/assignments/$assignmentId"
+      params={{ assignmentId: action.assignmentId }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background lg:w-auto'
+      )}
+    >
+      <IconPrinter className="size-4" />
+      {action.label}
+    </Link>
+  );
+}
+
+function AssignmentListStatusActionButton({
+  disabled,
+  onUpdateStatus,
+  statusAction,
+}: {
+  disabled: boolean;
+  onUpdateStatus: () => void;
+  statusAction: AssignmentListStatusAction;
+}) {
+  const Icon = statusAction.kind === 'close-link' ? IconLock : IconLockOpen;
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full bg-background lg:w-auto"
+      disabled={disabled}
+      onClick={onUpdateStatus}
+    >
+      <Icon className="size-4" />
+      {statusAction.label}
+    </Button>
+  );
+}
+
+function AssignmentListShareActions({
+  action,
+}: {
+  action: AssignmentListShareAction;
+}) {
+  return (
+    <>
+      <Link
+        to="/play/$shareId"
+        params={{ shareId: action.shareSlug }}
+        className={cn(buttonVariants(), 'w-full lg:w-auto')}
+      >
+        <IconPlayerPlay className="size-4" />
+        {action.label}
+      </Link>
+      <CopyAssignmentShareLinkButton
+        shareSlug={action.shareSlug}
+        className="w-full bg-background lg:w-auto"
+      />
+    </>
   );
 }
