@@ -2731,6 +2731,15 @@ const activityPublishSettingsFormSource = readFileSync(
   'src/components/activities/activity-publish-settings-form.tsx',
   'utf8'
 );
+const activityPublishSettingsFormRootSource =
+  activityPublishSettingsFormSource.slice(
+    activityPublishSettingsFormSource.indexOf(
+      'export function ActivityPublishSettingsForm'
+    ),
+    activityPublishSettingsFormSource.indexOf(
+      'function ActivityPublishIdentityFields'
+    )
+  );
 const assignmentSettingsSummarySource = readFileSync(
   'src/components/assignments/assignment-settings-summary.tsx',
   'utf8'
@@ -2801,6 +2810,26 @@ assert.match(
   'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
 );
 assert.match(
+  activityPublishSettingsFormSource,
+  /ActivityPublishSettingsForm[\s\S]*ActivityPublishIdentityFields[\s\S]*draft=\{draft\}[\s\S]*ActivityPublishToggleGroup[\s\S]*toggleViews=\{view\.toggleViews\}[\s\S]*ActivityPublishDeliveryLimitFields[\s\S]*ActivityPublishPreview[\s\S]*view=\{view\}/,
+  'Assignment publish settings form should delegate identity, toggles, delivery limits, and preview sections.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishIdentityFields[\s\S]*assignmentPublishDialogCopy\.titleLabel[\s\S]*name|function ActivityPublishIdentityFields[\s\S]*onDraftChange\('title'[\s\S]*assignmentPublishDialogCopy\.instructionsLabel[\s\S]*ASSIGNMENT_PUBLISH_FIELD_LIMITS\.instructionsMaxLength/,
+  'Assignment publish identity fields should own title and instructions bindings.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishDeliveryLimitFields[\s\S]*ASSIGNMENT_MAX_ATTEMPTS_RANGE\.min[\s\S]*ASSIGNMENT_MAX_ATTEMPTS_RANGE\.max[\s\S]*ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.min[\s\S]*ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE\.max[\s\S]*buildAssignmentPublishCloseAfterMinLocal\(\)/,
+  'Assignment publish delivery limit fields should own attempts, timer, and close-time bindings.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishToggleGroup[\s\S]*toggleViews\.map[\s\S]*PublishSetting[\s\S]*onDraftChange\(option\.key, checked\)/,
+  'Assignment publish toggle group should own prepared toggle binding.'
+);
+assert.match(
   assignmentSettingsSummarySource,
   /AssignmentInstructionsTile[\s\S]*instructions=\{summaryView\.instructions\}/,
   'Assignment settings summary should delegate prepared instruction text to a focused tile.'
@@ -2824,6 +2853,11 @@ assert.doesNotMatch(
   activityPublishSettingsFormSource,
   /expiresAt=\{view\.preview\.expiresAt\}|settings=\{view\.preview\.settings\}/,
   'Assignment publish settings form should not pass raw preview delivery settings to the summary component.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormRootSource,
+  /<Input[\s\S]*id=\{`assignment-title-|<Textarea|id=\{`max-attempts-|id=\{`time-limit-|id=\{`expires-at-/,
+  'Assignment publish settings form should not hand-render individual setting inputs.'
 );
 assert.doesNotMatch(
   activityPublishDialogSource,

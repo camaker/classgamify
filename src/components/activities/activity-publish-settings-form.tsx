@@ -37,6 +37,37 @@ export function ActivityPublishSettingsForm({
 }: ActivityPublishSettingsFormProps) {
   return (
     <div className="grid gap-4">
+      <ActivityPublishIdentityFields
+        activityId={activityId}
+        draft={draft}
+        onDraftChange={onDraftChange}
+      />
+      <ActivityPublishToggleGroup
+        activityId={activityId}
+        onDraftChange={onDraftChange}
+        toggleViews={view.toggleViews}
+      />
+      <ActivityPublishDeliveryLimitFields
+        activityId={activityId}
+        draft={draft}
+        onDraftChange={onDraftChange}
+      />
+      <ActivityPublishPreview view={view} />
+    </div>
+  );
+}
+
+function ActivityPublishIdentityFields({
+  activityId,
+  draft,
+  onDraftChange,
+}: {
+  activityId: string;
+  draft: AssignmentPublishDraft;
+  onDraftChange: ActivityPublishDraftFieldChange;
+}) {
+  return (
+    <>
       <div className="grid gap-2">
         <label htmlFor={`assignment-title-${activityId}`}>
           {assignmentPublishDialogCopy.titleLabel}
@@ -64,11 +95,46 @@ export function ActivityPublishSettingsForm({
           }
         />
       </div>
-      <ActivityPublishToggleGroup
-        activityId={activityId}
-        onDraftChange={onDraftChange}
-        toggleViews={view.toggleViews}
-      />
+    </>
+  );
+}
+
+function ActivityPublishToggleGroup({
+  activityId,
+  onDraftChange,
+  toggleViews,
+}: {
+  activityId: string;
+  onDraftChange: ActivityPublishDraftFieldChange;
+  toggleViews: AssignmentPublishDialogViewModel['toggleViews'];
+}) {
+  return (
+    <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+      {toggleViews.map((option) => (
+        <PublishSetting
+          key={option.key}
+          checked={option.checked}
+          description={option.description}
+          id={`${option.key}-${activityId}`}
+          label={option.label}
+          onCheckedChange={(checked) => onDraftChange(option.key, checked)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ActivityPublishDeliveryLimitFields({
+  activityId,
+  draft,
+  onDraftChange,
+}: {
+  activityId: string;
+  draft: AssignmentPublishDraft;
+  onDraftChange: ActivityPublishDraftFieldChange;
+}) {
+  return (
+    <>
       <div className="grid gap-2">
         <label htmlFor={`max-attempts-${activityId}`}>
           {assignmentPublishDialogCopy.maxAttemptsLabel}
@@ -123,33 +189,7 @@ export function ActivityPublishSettingsForm({
           {assignmentPublishDialogCopy.closeAfterHelp}
         </p>
       </div>
-      <ActivityPublishPreview view={view} />
-    </div>
-  );
-}
-
-function ActivityPublishToggleGroup({
-  activityId,
-  onDraftChange,
-  toggleViews,
-}: {
-  activityId: string;
-  onDraftChange: ActivityPublishDraftFieldChange;
-  toggleViews: AssignmentPublishDialogViewModel['toggleViews'];
-}) {
-  return (
-    <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">
-      {toggleViews.map((option) => (
-        <PublishSetting
-          key={option.key}
-          checked={option.checked}
-          description={option.description}
-          id={`${option.key}-${activityId}`}
-          label={option.label}
-          onCheckedChange={(checked) => onDraftChange(option.key, checked)}
-        />
-      ))}
-    </div>
+    </>
   );
 }
 
