@@ -80,6 +80,22 @@ type PrintableWorksheetPageViewModel = {
   showAnswerKey: boolean;
 };
 
+type PrintableWorksheetRouteState =
+  | {
+      statePanelView: PrintableWorksheetLoadStateView;
+      status: 'loading';
+    }
+  | {
+      statePanelView: PrintableWorksheetLoadStateView;
+      status: 'error';
+    }
+  | {
+      pageView: PrintableWorksheetPageViewModel;
+      status: 'ready';
+    };
+
+export const PRINTABLE_WORKSHEET_BODY_PRINT_MODE = 'worksheet';
+
 export const printableWorksheetPageCopy = {
   get answerKeyDescription() {
     return m.assignment_printable_answer_key_description();
@@ -180,6 +196,40 @@ export function buildPrintableWorksheetPageViewModel({
     headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
     showAnswerKey: answerKeyView.show,
+  };
+}
+
+export function buildPrintableWorksheetRouteState({
+  answerKey,
+  isError,
+  isLoading,
+  worksheet,
+}: {
+  answerKey: boolean;
+  isError: boolean;
+  isLoading: boolean;
+  worksheet?: PrintableAssignmentWorksheet | null;
+}): PrintableWorksheetRouteState {
+  if (isLoading) {
+    return {
+      statePanelView: buildPrintableWorksheetLoadingView(),
+      status: 'loading',
+    };
+  }
+
+  if (isError || !worksheet) {
+    return {
+      statePanelView: buildPrintableWorksheetErrorView(),
+      status: 'error',
+    };
+  }
+
+  return {
+    pageView: buildPrintableWorksheetPageViewModel({
+      answerKey,
+      worksheet,
+    }),
+    status: 'ready',
   };
 }
 

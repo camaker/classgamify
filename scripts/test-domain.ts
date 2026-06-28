@@ -431,11 +431,13 @@ import {
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
+  PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetErrorView,
   buildPrintableWorksheetItemView,
   buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
+  buildPrintableWorksheetRouteState,
 } from '@/assignments/printable-worksheet-view';
 import {
   ASSIGNMENT_LIST_INPUT_LIMITS,
@@ -10430,6 +10432,66 @@ assert.deepEqual(
   }).answerKeyView.show,
   false
 );
+assert.equal(PRINTABLE_WORKSHEET_BODY_PRINT_MODE, 'worksheet');
+assert.deepEqual(
+  buildPrintableWorksheetRouteState({
+    answerKey: true,
+    isError: false,
+    isLoading: true,
+    worksheet: printableSnapshotWorksheetWithAnswers,
+  }),
+  {
+    statePanelView: {
+      message: 'Loading printable worksheet',
+    },
+    status: 'loading',
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetRouteState({
+    answerKey: true,
+    isError: true,
+    isLoading: false,
+    worksheet: printableSnapshotWorksheetWithAnswers,
+  }),
+  {
+    statePanelView: {
+      message:
+        'Printable worksheet could not be loaded. Return to results and try again.',
+    },
+    status: 'error',
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetRouteState({
+    answerKey: false,
+    isError: false,
+    isLoading: false,
+    worksheet: null,
+  }),
+  {
+    statePanelView: {
+      message:
+        'Printable worksheet could not be loaded. Return to results and try again.',
+    },
+    status: 'error',
+  }
+);
+const printableWorksheetReadyRouteState = buildPrintableWorksheetRouteState({
+  answerKey: true,
+  isError: false,
+  isLoading: false,
+  worksheet: printableSnapshotWorksheetWithAnswers,
+});
+assert.equal(printableWorksheetReadyRouteState.status, 'ready');
+if (printableWorksheetReadyRouteState.status !== 'ready') {
+  throw new Error('Expected printable worksheet route state to be ready.');
+}
+assert.equal(printableWorksheetReadyRouteState.pageView.showAnswerKey, true);
+assert.deepEqual(
+  printableWorksheetReadyRouteState.pageView.itemViews.map((item) => item.id),
+  ['q-frozen-prompt']
+);
 assert.deepEqual(buildPrintableWorksheetLoadingView(), {
   message: 'Loading printable worksheet',
 });
@@ -14443,13 +14505,33 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /document\.body\.dataset\.printMode = 'worksheet'/,
-  'Printable worksheet route should activate print-mode page chrome hiding.'
+  /document\.body\.dataset\.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE/,
+  'Printable worksheet route should activate print-mode page chrome hiding through the printable worksheet view constant.'
 );
 assert.match(
   printableAssignmentRouteSource,
-  /buildPrintableWorksheetPageViewModel\(\{[\s\S]*answerKey,[\s\S]*worksheet: data/,
-  'Printable worksheet route should consume the assignment-domain page view-model.'
+  /buildPrintableWorksheetRouteState\(\{[\s\S]*answerKey,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*worksheet: data/,
+  'Printable worksheet route should consume the assignment-domain route state helper.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /routeState\.status === 'loading'[\s\S]*routeState\.statePanelView[\s\S]*routeState\.status === 'error'[\s\S]*routeState\.pageView/,
+  'Printable worksheet route should render loading, error, and ready states from the route state helper.'
+);
+assert.doesNotMatch(
+  printableAssignmentRouteSource,
+  /if \(isLoading\)|if \(isError \|\| !data\)/,
+  'Printable worksheet route should not branch directly on raw query loading or error flags.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export const PRINTABLE_WORKSHEET_BODY_PRINT_MODE = 'worksheet'/,
+  'Printable worksheet view domain should own the body print-mode marker.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetRouteState[\s\S]*buildPrintableWorksheetLoadingView\(\)[\s\S]*buildPrintableWorksheetErrorView\(\)[\s\S]*buildPrintableWorksheetPageViewModel/,
+  'Printable worksheet route state helper should own loading, error, and ready page view selection.'
 );
 assert.match(
   printableAssignmentRouteSource,
@@ -14478,8 +14560,8 @@ assert.match(
 );
 assert.doesNotMatch(
   printableAssignmentRouteSource,
-  /buildPrintableWorksheetHeaderView|buildPrintableWorksheetItemView|buildPrintableWorksheetAnswerKeyItemView/,
-  'Printable worksheet route should not directly rebuild header, item, or answer-key display state.'
+  /buildPrintableWorksheetHeaderView|buildPrintableWorksheetItemView|buildPrintableWorksheetAnswerKeyItemView|buildPrintableWorksheetPageViewModel|buildPrintableWorksheetLoadingView|buildPrintableWorksheetErrorView/,
+  'Printable worksheet route should not directly rebuild header, item, answer-key, loading, error, or ready page state.'
 );
 assert.doesNotMatch(
   printableAssignmentRouteSource,

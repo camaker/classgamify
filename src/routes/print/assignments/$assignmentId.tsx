@@ -3,9 +3,8 @@ import {
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
-  buildPrintableWorksheetPageViewModel,
-  buildPrintableWorksheetErrorView,
-  buildPrintableWorksheetLoadingView,
+  PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
+  buildPrintableWorksheetRouteState,
 } from '@/assignments/printable-worksheet-view';
 import { PrintableWorksheetAnswerKey } from '@/components/assignments/printable-worksheet-answer-key';
 import { PrintableWorksheetAssignmentFields } from '@/components/assignments/printable-worksheet-assignment-fields';
@@ -45,12 +44,20 @@ function PrintableAssignmentWorksheetPage() {
     assignmentId,
     includeAnswerKey: answerKey,
   });
+  const routeState = buildPrintableWorksheetRouteState({
+    answerKey,
+    isError,
+    isLoading,
+    worksheet: data,
+  });
 
   useEffect(() => {
-    document.body.dataset.printMode = 'worksheet';
+    document.body.dataset.printMode = PRINTABLE_WORKSHEET_BODY_PRINT_MODE;
 
     return () => {
-      if (document.body.dataset.printMode === 'worksheet') {
+      if (
+        document.body.dataset.printMode === PRINTABLE_WORKSHEET_BODY_PRINT_MODE
+      ) {
         delete document.body.dataset.printMode;
       }
     };
@@ -63,28 +70,25 @@ function PrintableAssignmentWorksheetPage() {
     });
   }
 
-  if (isLoading) {
+  if (routeState.status === 'loading') {
     return (
       <PrintableWorksheetStatePanel
         mode="loading"
-        view={buildPrintableWorksheetLoadingView()}
+        view={routeState.statePanelView}
       />
     );
   }
 
-  if (isError || !data) {
+  if (routeState.status === 'error') {
     return (
       <PrintableWorksheetStatePanel
         mode="error"
-        view={buildPrintableWorksheetErrorView()}
+        view={routeState.statePanelView}
       />
     );
   }
 
-  const pageView = buildPrintableWorksheetPageViewModel({
-    answerKey,
-    worksheet: data,
-  });
+  const pageView = routeState.pageView;
   const { controlView, headerView } = pageView;
 
   return (
