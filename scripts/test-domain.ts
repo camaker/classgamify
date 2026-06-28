@@ -5693,8 +5693,8 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.readOnlyMessage/,
-  'Student runner submit controls should render prepared submit disabled state, label, and hint copy.'
+  /controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.submitConfirmationMessage[\s\S]*controlView\.readOnlyMessage/,
+  'Student runner submit controls should render prepared submit disabled state, label, confirmation, and hint copy.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -5768,7 +5768,7 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
@@ -12442,6 +12442,7 @@ assert.deepEqual(
       runtimeItemsDisabled: true,
       showTimeExpiredMessage: false,
       submitButtonLabel: 'Submit answers',
+      submitConfirmationMessage: undefined,
       submitDisabled: true,
       timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
       timerBadge: {
@@ -12626,6 +12627,47 @@ assert.deepEqual(
     nextConfirmIncompleteSubmit: true,
     reason: 'unanswered-items',
     type: 'message',
+  }
+);
+const confirmIncompleteStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: ' browser-token-1 ',
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: true,
+  fallbackStartedAt: 5_000,
+  isSubmitting: false,
+  pageState: {
+    ...publicRunnerState,
+    runtimeItems: [
+      ...publicRunnerState.runtimeItems,
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'runner-unanswered-item',
+      },
+    ],
+  },
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  {
+    submitButtonLabel:
+      confirmIncompleteStudentRunnerPageView.controlView.submitButtonLabel,
+    submitConfirmationMessage:
+      confirmIncompleteStudentRunnerPageView.controlView
+        .submitConfirmationMessage,
+    unansweredLabel:
+      confirmIncompleteStudentRunnerPageView.controlView.unansweredLabel,
+  },
+  {
+    submitButtonLabel: 'Submit anyway',
+    submitConfirmationMessage: '1 question is still unanswered.',
+    unansweredLabel: '1 item left unanswered.',
   }
 );
 const namedSubmittableStudentRunnerPageView = buildStudentRunnerPageViewModel({

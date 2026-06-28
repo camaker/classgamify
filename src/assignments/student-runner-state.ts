@@ -100,6 +100,7 @@ type StudentRunnerControlView = {
   runtimeItemsDisabled: boolean;
   showTimeExpiredMessage: boolean;
   submitButtonLabel: string;
+  submitConfirmationMessage?: string;
   submitDisabled: boolean;
   timeExpiredMessage: string;
   timerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
@@ -517,6 +518,10 @@ export function buildStudentRunnerPageViewModel({
       runtimeItemsDisabled: attemptControlState.runtimeItemsDisabled,
       showTimeExpiredMessage: attemptControlState.showTimeExpiredMessage,
       submitButtonLabel: completionCopy.submitButtonLabel,
+      submitConfirmationMessage:
+        confirmIncompleteSubmit && attemptControlState.unansweredLabel
+          ? completionCopy.confirmIncompleteSubmit
+          : undefined,
       submitDisabled: attemptControlState.submitDisabled,
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
       timerBadge: attemptTimerBadge,

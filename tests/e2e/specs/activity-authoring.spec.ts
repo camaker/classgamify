@@ -97,6 +97,15 @@ test.describe('activity authoring', () => {
       .getByRole('button', { name: /^apple$/i })
       .first()
       .click();
+    await expect(page.getByText('1/2 answered')).toBeVisible();
+    await page.getByRole('button', { name: /^submit answers$/i }).click();
+    await expect(
+      page.getByText('1 question is still unanswered.')
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /^submit anyway$/i })
+    ).toBeVisible();
+
     await page
       .getByRole('button', { name: /^milk$/i })
       .first()

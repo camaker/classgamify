@@ -27,6 +27,7 @@ export function StudentRunnerSubmitControls({
         {controlView.submitButtonLabel}
       </Button>
       <StudentRunnerSubmitHint text={controlView.unansweredLabel} />
+      <StudentRunnerSubmitHint text={controlView.submitConfirmationMessage} />
       <StudentRunnerSubmitHint text={controlView.readOnlyMessage} />
     </div>
   );
