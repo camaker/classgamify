@@ -1,6 +1,6 @@
 import {
   assignmentShareLinkActionCopy,
-  buildAssignmentShareUrl,
+  buildAssignmentShareLinkCopyExecutionPlan,
 } from '@/assignments/share-link';
 import { Button } from '@/components/ui/button';
 import { copyTextToClipboard } from '@/lib/clipboard';
@@ -19,18 +19,21 @@ export function CopyAssignmentShareLinkButton({
   shareSlug: string;
 }) {
   async function copyShareLink() {
-    if (disabled) {
-      toast.error(
-        disabledMessage ?? assignmentShareLinkActionCopy.failureMessage
-      );
+    const executionPlan = buildAssignmentShareLinkCopyExecutionPlan({
+      disabled,
+      disabledMessage,
+      shareSlug,
+    });
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
 
     try {
-      await copyTextToClipboard(buildAssignmentShareUrl(shareSlug));
-      toast.success(assignmentShareLinkActionCopy.successMessage);
+      await copyTextToClipboard(executionPlan.url);
+      toast.success(executionPlan.successMessage);
     } catch {
-      toast.error(assignmentShareLinkActionCopy.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 

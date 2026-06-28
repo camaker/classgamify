@@ -647,6 +647,7 @@ import {
 import {
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkCopyExecutionPlan,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
@@ -1367,8 +1368,18 @@ assert.doesNotMatch(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
-  /assignmentShareLinkActionCopy\.failureMessage/,
-  'Share-link copy failures should keep using localized assignment failure copy.'
+  /buildAssignmentShareLinkCopyExecutionPlan/,
+  'Share-link copy button should build clipboard execution through the assignment-domain share-link plan.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  'Share-link copy button should execute prepared blocked and copy-link plans.'
+);
+assert.doesNotMatch(
+  copyAssignmentShareLinkButtonSource,
+  /buildAssignmentShareUrl|disabledMessage \?\? assignmentShareLinkActionCopy\.failureMessage/,
+  'Share-link copy button should not rebuild share URLs or disabled fallback messages locally.'
 );
 const assignmentResultsRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
@@ -9054,6 +9065,41 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
   failureMessage: 'Student link could not be copied.',
   successMessage: 'Student link copied.',
 });
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    baseUrl: 'https://classgamify.test',
+    shareSlug: 'abc 123',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    successMessage: 'Student link copied.',
+    type: 'copy-link',
+    url: 'https://classgamify.test/play/abc%20123',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    disabled: true,
+    disabledMessage: 'This assignment is closed.',
+    shareSlug: 'closed-share',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    message: 'This assignment is closed.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    disabled: true,
+    shareSlug: 'closed-share',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    message: 'Student link could not be copied.',
+    type: 'blocked',
+  }
+);
 assert.equal(parseOptionalWholeNumber(''), undefined);
 assert.equal(parseOptionalWholeNumber(' 12 '), 12);
 assert.equal(parseOptionalWholeNumber(' １２ '), 12);

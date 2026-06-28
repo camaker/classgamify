@@ -25,6 +25,19 @@ export const assignmentShareLinkActionCopy = {
   },
 } as const;
 
+export type AssignmentShareLinkCopyExecutionPlan =
+  | {
+      failureMessage: string;
+      message: string;
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      successMessage: string;
+      type: 'copy-link';
+      url: string;
+    };
+
 export function buildAssignmentSharePath(shareSlug: string) {
   return `/play/${encodeURIComponent(normalizeAssignmentShareSlug(shareSlug))}`;
 }
@@ -70,6 +83,33 @@ export function buildAssignmentShareLinkAvailability({
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
   const origin = normalizeShareBaseUrl(baseUrl ?? '') || getRuntimeBaseUrl();
   return `${origin}${buildAssignmentSharePath(shareSlug)}`;
+}
+
+export function buildAssignmentShareLinkCopyExecutionPlan({
+  baseUrl,
+  disabled,
+  disabledMessage,
+  shareSlug,
+}: {
+  baseUrl?: string;
+  disabled?: boolean;
+  disabledMessage?: string;
+  shareSlug: string;
+}): AssignmentShareLinkCopyExecutionPlan {
+  if (disabled) {
+    return {
+      failureMessage: assignmentShareLinkActionCopy.failureMessage,
+      message: disabledMessage ?? assignmentShareLinkActionCopy.failureMessage,
+      type: 'blocked',
+    };
+  }
+
+  return {
+    failureMessage: assignmentShareLinkActionCopy.failureMessage,
+    successMessage: assignmentShareLinkActionCopy.successMessage,
+    type: 'copy-link',
+    url: buildAssignmentShareUrl(shareSlug, baseUrl),
+  };
 }
 
 export function normalizeShareBaseUrl(baseUrl: string) {
