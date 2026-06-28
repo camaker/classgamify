@@ -12,6 +12,7 @@ import {
   normalizeActivityLibrarySearch,
 } from '@/activities/library-filters';
 import {
+  canEditActivity,
   canDeriveActivityWork,
   buildActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -601,6 +602,7 @@ export function buildCreatedActivityPanelContext({
   isLoading: boolean;
 }): CreatedActivityPanelContext {
   if (activity) {
+    const canEdit = canEditActivity(activity.visibility);
     const canPublish = canDeriveActivityWork(activity.visibility);
 
     return {
@@ -608,7 +610,7 @@ export function buildCreatedActivityPanelContext({
       body: m.activity_created_panel_found_body(),
       showCreateAction: true,
       showDismissAction: true,
-      showEditAction: true,
+      showEditAction: canEdit,
       showMissingHint: false,
       showPublishAction: canPublish,
       status: 'found',

@@ -12291,12 +12291,22 @@ assert.deepEqual(
     title: 'Material groups',
   }
 );
-assert.equal(
+assert.deepEqual(
   buildCreatedActivityPanelContext({
     activity: archivedCreatedActivity,
     isLoading: false,
-  }).showPublishAction,
-  false
+  }),
+  {
+    activity: archivedCreatedActivity,
+    body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
+    showCreateAction: true,
+    showDismissAction: true,
+    showEditAction: false,
+    showMissingHint: false,
+    showPublishAction: false,
+    status: 'found',
+    title: 'Archived words',
+  }
 );
 assert.deepEqual(
   buildCreatedActivityPanelContext({
@@ -13285,6 +13295,11 @@ assert.match(
   createdActivityPanelComponentSource,
   /buildCreatedActivityPanelContext/,
   'Created activity panel component should render saved-activity state from the activity-domain panel context.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildCreatedActivityPanelContext[\s\S]*canEditActivity\(activity\.visibility\)[\s\S]*canDeriveActivityWork\(activity\.visibility\)/,
+  'Created activity panel context should resolve edit and publish actions through activity lifecycle helpers.'
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
@@ -15773,10 +15788,10 @@ try {
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
 assert.equal(canDeriveActivityWork('draft'), true);
-assert.equal(canDeriveActivityWork('published'), true);
+assert.equal(canDeriveActivityWork('public'), true);
 assert.equal(canDeriveActivityWork('archived'), false);
 assert.equal(canEditActivity('draft'), true);
-assert.equal(canEditActivity('published'), true);
+assert.equal(canEditActivity('public'), true);
 assert.equal(canEditActivity('archived'), false);
 const archivedActivityDerivationError = getArchivedActivityDerivationError();
 assert.deepEqual(
@@ -15820,7 +15835,7 @@ assert.deepEqual(getActivityLifecycleActionCopy('restore'), {
 assert.deepEqual(
   buildActivityLifecycleActionView({
     action: 'remix',
-    visibility: 'published',
+    visibility: 'public',
   }),
   {
     failureMessage: 'Activity could not be remixed.',
@@ -16314,7 +16329,7 @@ assert.equal(
     libraryStatus: 'active',
     persisted: true,
     readyRemixCount: 0,
-    visibility: 'published',
+    visibility: 'public',
   }).showRemixActions,
   false
 );
