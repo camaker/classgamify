@@ -20,6 +20,8 @@ type StudentIdentity = {
   label: string;
 };
 
+const ANONYMOUS_UNKNOWN_IDENTITY_KEY = 'anonymous:unknown';
+
 export function normalizeStudentName(value?: string | null) {
   return (value ?? '').normalize('NFKC').replace(/\s+/g, ' ').trim();
 }
@@ -90,18 +92,26 @@ export function getOrCreateAnonymousAttemptToken({
   return token;
 }
 
-function getStudentIdentityGroupingKey(source: StudentIdentitySource) {
+export function buildStudentNameIdentityKey(studentName: string) {
+  return `name:${normalizeStudentName(studentName).toLowerCase()}`;
+}
+
+export function buildAnonymousIdentityKey(anonymousToken: string) {
+  return `anonymous:${normalizeAnonymousToken(anonymousToken)}`;
+}
+
+export function buildStudentIdentityGroupingKey(source: StudentIdentitySource) {
   const studentName = normalizeStudentName(source.studentName);
   if (studentName) {
-    return `name:${studentName.toLocaleLowerCase()}`;
+    return buildStudentNameIdentityKey(studentName);
   }
 
   const anonymousToken = normalizeAnonymousToken(source.anonymousToken);
   if (anonymousToken) {
-    return `anonymous:${anonymousToken}`;
+    return buildAnonymousIdentityKey(anonymousToken);
   }
 
-  return 'anonymous:unknown';
+  return ANONYMOUS_UNKNOWN_IDENTITY_KEY;
 }
 
 export function isSameStudentIdentity(
@@ -109,7 +119,8 @@ export function isSameStudentIdentity(
   right: StudentIdentitySource
 ) {
   return (
-    getStudentIdentityGroupingKey(left) === getStudentIdentityGroupingKey(right)
+    buildStudentIdentityGroupingKey(left) ===
+    buildStudentIdentityGroupingKey(right)
   );
 }
 
@@ -123,7 +134,7 @@ export function createStudentIdentityResolver(
   >();
 
   attempts.forEach((attempt, order) => {
-    const groupingKey = getStudentIdentityGroupingKey(attempt);
+    const groupingKey = buildStudentIdentityGroupingKey(attempt);
     const existing = firstSourcesByGroupingKey.get(groupingKey);
     if (
       existing &&
@@ -146,7 +157,7 @@ export function createStudentIdentityResolver(
     const studentName = normalizeStudentName(source.studentName);
     if (studentName) {
       identitiesByGroupingKey.set(groupingKey, {
-        key: `name:${studentName.toLocaleLowerCase()}`,
+        key: buildStudentNameIdentityKey(studentName),
         label: studentName,
       });
       continue;
@@ -158,7 +169,9 @@ export function createStudentIdentityResolver(
       : formatAnonymousStudentLabel();
 
     identitiesByGroupingKey.set(groupingKey, {
-      key: anonymousToken ? `anonymous:${anonymousIndex}` : 'anonymous:unknown',
+      key: anonymousToken
+        ? buildAnonymousStudentDisplayKey(anonymousIndex)
+        : ANONYMOUS_UNKNOWN_IDENTITY_KEY,
       label,
     });
 
@@ -169,20 +182,20 @@ export function createStudentIdentityResolver(
 
   return {
     resolve(source: StudentIdentitySource): StudentIdentity {
-      const groupingKey = getStudentIdentityGroupingKey(source);
+      const groupingKey = buildStudentIdentityGroupingKey(source);
       const identity = identitiesByGroupingKey.get(groupingKey);
       if (identity) return identity;
 
       const studentName = normalizeStudentName(source.studentName);
       if (studentName) {
         return {
-          key: `name:${studentName.toLocaleLowerCase()}`,
+          key: buildStudentNameIdentityKey(studentName),
           label: studentName,
         };
       }
 
       return {
-        key: 'anonymous:unknown',
+        key: ANONYMOUS_UNKNOWN_IDENTITY_KEY,
         label: formatAnonymousStudentLabel(),
       };
     },
@@ -218,4 +231,8 @@ function formatAnonymousStudentLabel(index?: number) {
   return index
     ? m.student_identity_anonymous_student_index({ index })
     : m.student_identity_anonymous_student();
+}
+
+function buildAnonymousStudentDisplayKey(index: number) {
+  return `anonymous:${index}`;
 }

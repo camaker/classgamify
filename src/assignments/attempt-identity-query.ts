@@ -7,7 +7,7 @@ import type { getDb } from '@/db';
 import { attempt } from '@/db/app.schema';
 import { count } from 'drizzle-orm';
 import {
-  isSameStudentIdentity,
+  buildStudentIdentityGroupingKey,
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
@@ -92,8 +92,11 @@ export function countMatchingStudentIdentityAttempts({
   attempts: StudentIdentitySource[];
   identity: StudentIdentitySource;
 }) {
-  return attempts.filter((attempt) => isSameStudentIdentity(attempt, identity))
-    .length;
+  const identityKey = buildStudentIdentityGroupingKey(identity);
+
+  return attempts.filter(
+    (attempt) => buildStudentIdentityGroupingKey(attempt) === identityKey
+  ).length;
 }
 
 export async function countPreviousIdentityAttempts({

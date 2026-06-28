@@ -699,6 +699,9 @@ import {
 } from '@/assignments/result-copy-format';
 import {
   buildAnonymousAttemptTokenStorageKey,
+  buildAnonymousIdentityKey,
+  buildStudentIdentityGroupingKey,
+  buildStudentNameIdentityKey,
   createStudentIdentityResolver,
   getAnonymousBrowserLabel,
   getOrCreateAnonymousAttemptToken,
@@ -6356,6 +6359,33 @@ assert.equal(
   'replacement-token'
 );
 assert.equal(normalizeAnonymousToken('  ａｎｏｎ－１２３  '), 'anon-123');
+assert.equal(buildStudentNameIdentityKey(' Ava   Chen '), 'name:ava chen');
+assert.equal(
+  buildStudentNameIdentityKey(' ＡＶＡ　ＣＨＥＮ '),
+  'name:ava chen'
+);
+assert.equal(
+  buildStudentNameIdentityKey('İstanbul Student'),
+  'name:i̇stanbul student'
+);
+assert.equal(
+  buildAnonymousIdentityKey(' ａｎｏｎｙｍｏｕｓ－ｔｏｋｅｎ－１ '),
+  'anonymous:anonymous-token-1'
+);
+assert.equal(
+  buildStudentIdentityGroupingKey({
+    anonymousToken: 'stale-token',
+    studentName: ' Ava Chen ',
+  }),
+  'name:ava chen'
+);
+assert.equal(
+  buildStudentIdentityGroupingKey({
+    anonymousToken: ' anonymous-token-1 ',
+  }),
+  'anonymous:anonymous-token-1'
+);
+assert.equal(buildStudentIdentityGroupingKey({}), 'anonymous:unknown');
 assert.deepEqual(
   resolveAttemptIdentityCountStrategy({
     anonymousToken: ' anonymous-token-1 ',
@@ -6484,6 +6514,20 @@ assert.equal(
     ],
     identity: {
       anonymousToken: 'anonymous-token-1',
+    },
+  }),
+  2
+);
+assert.equal(
+  countMatchingStudentIdentityAttempts({
+    attempts: [
+      { anonymousToken: 'shared-token', studentName: ' Maya ' },
+      { anonymousToken: 'shared-token', studentName: ' maya ' },
+      { anonymousToken: 'shared-token', studentName: null },
+    ],
+    identity: {
+      anonymousToken: 'shared-token',
+      studentName: 'MAYA',
     },
   }),
   2
@@ -15820,6 +15864,10 @@ const assignmentAttemptIdentityQuerySource = readFileSync(
   'src/assignments/attempt-identity-query.ts',
   'utf8'
 );
+const assignmentIdentitySource = readFileSync(
+  'src/assignments/identity.ts',
+  'utf8'
+);
 const assignmentListApiSource = getSourceSlice(
   assignmentsApiSource,
   'export const listAssignments',
@@ -16827,6 +16875,41 @@ assert.match(
   assignmentAttemptIdentityQuerySource,
   /export async function countPreviousIdentityAttempts[\s\S]*db: AssignmentAttemptIdentityDb[\s\S]*buildScoredAnonymousAssignmentAttemptWhere\(\{[\s\S]*assignmentId,[\s\S]*buildScoredAssignmentAttemptWhere\(\{ assignmentId \}\)[\s\S]*countMatchingStudentIdentityAttempts/,
   'Assignment attempt limits should only count completed attempts with scored results.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /export function buildStudentNameIdentityKey[\s\S]*normalizeStudentName\(studentName\)\.toLowerCase\(\)/,
+  'Assignment identity helpers should expose stable student-name identity keys without locale-sensitive casing.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /export function buildAnonymousIdentityKey[\s\S]*normalizeAnonymousToken\(anonymousToken\)/,
+  'Assignment identity helpers should expose normalized anonymous-token identity keys.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /export function buildStudentIdentityGroupingKey[\s\S]*buildStudentNameIdentityKey[\s\S]*buildAnonymousIdentityKey[\s\S]*ANONYMOUS_UNKNOWN_IDENTITY_KEY/,
+  'Assignment identity grouping should prioritize normalized student names, then anonymous tokens, through one shared helper.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /isSameStudentIdentity[\s\S]*buildStudentIdentityGroupingKey\(left\)[\s\S]*buildStudentIdentityGroupingKey\(right\)/,
+  'Assignment identity comparisons should use the shared grouping-key helper.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /createStudentIdentityResolver[\s\S]*buildStudentIdentityGroupingKey\(attempt\)[\s\S]*buildStudentNameIdentityKey\(studentName\)[\s\S]*buildAnonymousStudentDisplayKey/,
+  'Assignment result identity resolver should reuse stable identity-key helpers for names and anonymous display ids.'
+);
+assert.doesNotMatch(
+  assignmentIdentitySource,
+  /toLocaleLowerCase\(|`name:\$\{studentName|`anonymous:\$\{anonymousToken/,
+  'Assignment identity helpers should not use locale-sensitive casing or duplicate raw grouping-key templates.'
+);
+assert.match(
+  assignmentAttemptIdentityQuerySource,
+  /countMatchingStudentIdentityAttempts[\s\S]*const identityKey = buildStudentIdentityGroupingKey\(identity\)[\s\S]*buildStudentIdentityGroupingKey\(attempt\) === identityKey/,
+  'Attempt identity counting should compare attempts through the shared identity grouping key.'
 );
 assert.equal(typeof countPreviousIdentityAttempts, 'function');
 assert.match(
