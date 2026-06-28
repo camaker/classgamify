@@ -6039,8 +6039,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerSubmissionPlan[\s\S]*buildStudentAttemptSubmissionPlan\(\{[\s\S]*pageView\.attemptState\.completionSummary[\s\S]*pageView\.runtimeListView\.items[\s\S]*pageView\.activeShareId[\s\S]*pageView\.startedAt[\s\S]*pageView\.timeLimitSeconds/,
-  'Student runner state domain should adapt runner page view state into the assignment-domain submission plan.'
+  /export function buildStudentRunnerSubmissionPlan[\s\S]*buildStudentAttemptSubmissionPlan\(\{[\s\S]*!pageView\.attemptControlState\.submitDisabled[\s\S]*pageView\.attemptState\.completionSummary[\s\S]*pageView\.runtimeListView\.items[\s\S]*pageView\.activeShareId[\s\S]*pageView\.startedAt[\s\S]*pageView\.timeLimitSeconds/,
+  'Student runner state domain should adapt runner page view state and submit-disabled control state into the assignment-domain submission plan.'
 );
 assert.match(
   playRouteSource,
@@ -6069,8 +6069,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerAnswerUpdatePlan[\s\S]*filterStudentRunnerAnswerChanges[\s\S]*buildStudentAnswerChanges[\s\S]*validItemIds\.has/,
-  'Student runner state domain should filter browser answer changes through current runtime item ids.'
+  /export function buildStudentRunnerAnswerUpdatePlan[\s\S]*if \(disabled\)[\s\S]*filterStudentRunnerAnswerChanges[\s\S]*nextAnswersEqual[\s\S]*buildStudentAnswerChanges[\s\S]*validItemIds\.has/,
+  'Student runner state domain should ignore disabled, no-op, or invalid browser answer changes through current runtime item ids.'
 );
 assert.match(
   playRouteSource,
@@ -6104,8 +6104,8 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /buildStudentRunnerAnswerUpdatePlan\(\{[\s\S]*answers: current,[\s\S]*changes,[\s\S]*runtimeItems: runtimeListView\.items/,
-  'Student play route should plan browser answer changes against the current frozen runtime list through the runner state domain.'
+  /buildStudentRunnerAnswerUpdatePlan\(\{[\s\S]*answers: current,[\s\S]*changes,[\s\S]*disabled: runtimeListView\.disabled,[\s\S]*runtimeItems: runtimeListView\.items/,
+  'Student play route should plan browser answer changes against the current disabled state and frozen runtime list through the runner state domain.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -12775,6 +12775,70 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentRunnerSubmissionExecutionPlan({
+    anonymousToken: ' browser-token-1 ',
+    answers: {
+      [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    },
+    confirmIncompleteSubmit: false,
+    createAnonymousToken: () => {
+      throw new Error('Submit should be blocked while a result is shown.');
+    },
+    now: 31_400,
+    pageView: studentRunnerPageView,
+    studentName: '',
+  }),
+  {
+    message:
+      'Preview assignments are read-only until a teacher publishes a share link.',
+    nextConfirmIncompleteSubmit: false,
+    reason: 'read-only',
+    type: 'message',
+  }
+);
+const pendingSubmitStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: ' browser-token-1 ',
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 5_000,
+  isSubmitting: true,
+  pageState: publicRunnerState,
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.equal(
+  pendingSubmitStudentRunnerPageView.attemptControlState.submitDisabled,
+  true
+);
+assert.deepEqual(
+  buildStudentRunnerSubmissionExecutionPlan({
+    anonymousToken: ' browser-token-1 ',
+    answers: {
+      [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    },
+    confirmIncompleteSubmit: false,
+    createAnonymousToken: () => {
+      throw new Error('Submit should be blocked while pending.');
+    },
+    now: 31_400,
+    pageView: pendingSubmitStudentRunnerPageView,
+    studentName: '',
+  }),
+  {
+    message:
+      'Preview assignments are read-only until a teacher publishes a share link.',
+    nextConfirmIncompleteSubmit: false,
+    reason: 'read-only',
+    type: 'message',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerSubmissionExecutionPlan({
     answers: {
       [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
     },
@@ -13167,7 +13231,50 @@ assert.deepEqual(
       existing: 'Answer',
     },
     changes: [],
+    disabled: false,
     runtimeItems: publicRunnerState.runtimeItems,
+  }),
+  { type: 'ignored' }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      target: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'New answer',
+        itemId: 'target',
+      },
+    ],
+    disabled: true,
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'target',
+      },
+    ],
+  }),
+  { type: 'ignored' }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      target: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'Old answer',
+        itemId: 'target',
+      },
+    ],
+    disabled: false,
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'target',
+      },
+    ],
   }),
   { type: 'ignored' }
 );
@@ -13187,6 +13294,7 @@ assert.deepEqual(
         itemId: ' ',
       },
     ],
+    disabled: false,
     runtimeItems: [
       {
         ...publicRunnerState.runtimeItems[0]!,
@@ -13198,6 +13306,33 @@ assert.deepEqual(
     answers: {
       existing: 'Answer',
       target: 'New answer',
+    },
+    confirmIncompleteSubmit: false,
+    type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      target: 'Old answer',
+    },
+    changes: [
+      {
+        answer: '',
+        itemId: 'target',
+      },
+    ],
+    disabled: false,
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'target',
+      },
+    ],
+  }),
+  {
+    answers: {
+      target: '',
     },
     confirmIncompleteSubmit: false,
     type: 'updated',
@@ -13218,6 +13353,7 @@ assert.deepEqual(
         itemId: 'unknown-item',
       },
     ],
+    disabled: false,
     runtimeItems: [
       {
         ...publicRunnerState.runtimeItems[0]!,
@@ -13235,6 +13371,37 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      known: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'First answer',
+        itemId: 'known',
+      },
+      {
+        answer: 'Final answer',
+        itemId: ' known ',
+      },
+    ],
+    disabled: false,
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'known',
+      },
+    ],
+  }),
+  {
+    answers: {
+      known: 'Final answer',
+    },
+    confirmIncompleteSubmit: false,
+    type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
     answers: {},
     changes: [
       {
@@ -13242,6 +13409,7 @@ assert.deepEqual(
         itemId: ' item-1 ',
       },
     ],
+    disabled: false,
     runtimeItems: [
       {
         ...publicRunnerState.runtimeItems[0]!,
@@ -13268,6 +13436,7 @@ assert.deepEqual(
         itemId: 'unknown-item',
       },
     ],
+    disabled: false,
     runtimeItems: [
       {
         ...publicRunnerState.runtimeItems[0]!,

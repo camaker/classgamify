@@ -764,7 +764,10 @@ export function buildStudentRunnerSubmissionPlan({
   return buildStudentAttemptSubmissionPlan({
     anonymousToken,
     answers,
-    canSubmit: Boolean(pageView.activity) && pageView.attemptState.canSubmit,
+    canSubmit:
+      Boolean(pageView.activity) &&
+      pageView.attemptState.canSubmit &&
+      !pageView.attemptControlState.submitDisabled,
     collectStudentName: Boolean(
       pageView.assignment?.settings.collectStudentName
     ),
@@ -843,31 +846,53 @@ export function buildStudentRunnerAnonymousTokenPlan({
 export function buildStudentRunnerAnswerUpdatePlan({
   answers,
   changes,
+  disabled,
   runtimeItems,
 }: {
   answers: StudentAnswerMap;
   changes: StudentAnswerChange[];
+  disabled: boolean;
   runtimeItems: PublicRuntimeItem[];
 }): StudentRunnerAnswerUpdatePlan {
+  if (disabled) {
+    return {
+      type: 'ignored',
+    };
+  }
+
   const validChanges = filterStudentRunnerAnswerChanges({
     changes,
     runtimeItems,
   });
+  const nextAnswers = applyStudentAnswerChanges({
+    answers,
+    changes: validChanges,
+  });
 
-  if (validChanges.length === 0) {
+  if (validChanges.length === 0 || nextAnswersEqual(answers, nextAnswers)) {
     return {
       type: 'ignored',
     };
   }
 
   return {
-    answers: applyStudentAnswerChanges({
-      answers,
-      changes: validChanges,
-    }),
+    answers: nextAnswers,
     confirmIncompleteSubmit: false,
     type: 'updated',
   };
+}
+
+function nextAnswersEqual(
+  currentAnswers: StudentAnswerMap,
+  nextAnswers: StudentAnswerMap
+) {
+  const currentEntries = Object.entries(currentAnswers);
+  const nextEntries = Object.entries(nextAnswers);
+  if (currentEntries.length !== nextEntries.length) return false;
+
+  return currentEntries.every(
+    ([itemId, answer]) => nextAnswers[itemId] === answer
+  );
 }
 
 function filterStudentRunnerAnswerChanges({
