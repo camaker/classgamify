@@ -3404,12 +3404,17 @@ assert.match(
 );
 assert.match(
   worksheetModeCardSource,
+  /mode\.contentRequirements\.map[\s\S]*<Badge[\s\S]*\{requirement\}[\s\S]*mode\.action\.search/,
+  'Worksheet mode cards should render prepared content requirement badges before the create action.'
+);
+assert.match(
+  worksheetModeCardSource,
   /worksheetModeIcons[\s\S]*satisfies Record<WorksheetModeTemplate, TablerIcon>/,
   'Worksheet mode card icon mapping should stay beside the reusable card presentation.'
 );
 assert.doesNotMatch(
   worksheetsRouteSource,
-  /function WorksheetModeCard|const worksheetModeIcons|WorksheetModeTemplate|type TablerIcon|IconClipboardText|IconCategory2|IconLayoutColumns|IconHeadphones|m\.worksheets_page_printable_title|m\.worksheets_page_printable_description/,
+  /function WorksheetModeCard|const worksheetModeIcons|WorksheetModeTemplate|type TablerIcon|IconClipboardText|IconCategory2|IconLayoutColumns|IconHeadphones|contentRequirements\.map|m\.worksheets_page_printable_title|m\.worksheets_page_printable_description/,
   'Worksheets route should not rebuild worksheet card icons or printable copy locally.'
 );
 const publicPlayRouteSource = readFileSync(
@@ -19004,6 +19009,18 @@ assert.deepEqual(
   worksheetsPageView.modeCards.map((card) => card.template),
   [...WORKSHEET_MODE_TEMPLATES]
 );
+assert.deepEqual(
+  worksheetsPageView.modeCards.map((card) => [
+    card.template,
+    card.contentRequirements,
+  ]),
+  [
+    ['fill-blank', ['questions']],
+    ['line-match', ['match pairs']],
+    ['listening', ['questions']],
+    ['group-sort', ['groups']],
+  ]
+);
 assert.deepEqual(worksheetsPageView, {
   hero: {
     badgeLabel: 'Liveworksheets-style modes',
@@ -19043,6 +19060,7 @@ assert.deepEqual(worksheetsPageView, {
         label: 'Create fill blanks',
         search: { template: 'fill-blank' },
       },
+      contentRequirements: ['questions'],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
       template: 'fill-blank',
@@ -19053,6 +19071,7 @@ assert.deepEqual(worksheetsPageView, {
         label: 'Start line match',
         search: { template: 'line-match' },
       },
+      contentRequirements: ['match pairs'],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
       template: 'line-match',
@@ -19063,6 +19082,7 @@ assert.deepEqual(worksheetsPageView, {
         label: 'Create listening',
         search: { template: 'listening' },
       },
+      contentRequirements: ['questions'],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
       template: 'listening',
@@ -19073,6 +19093,7 @@ assert.deepEqual(worksheetsPageView, {
         label: 'Create sort',
         search: { template: 'group-sort' },
       },
+      contentRequirements: ['groups'],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       template: 'group-sort',
@@ -19170,6 +19191,15 @@ assert.deepEqual(
   worksheetsPageWithoutLineMatch.modeCards.map((card) => card.template),
   ['fill-blank', 'listening', 'group-sort']
 );
+assert.deepEqual(
+  buildWorksheetsPageViewModel({
+    activityTemplates: getActivityTemplates().filter(
+      (template) => template.type !== 'listening'
+    ),
+  }).modeCards.find((card) => card.template === 'listening')
+    ?.contentRequirements,
+  []
+);
 const templateEntrySource = readFileSync(
   'src/activities/template-entry.ts',
   'utf8'
@@ -19224,6 +19254,11 @@ assert.match(
   entryPageViewSource,
   /formatTemplateRequirements\([\s\S]*template\.contentRequirements/,
   'Template entry page view-model should use the activity-domain requirement list formatter.'
+);
+assert.match(
+  entryPageViewSource,
+  /buildWorksheetsPageViewModel[\s\S]*activityTemplates = getActivityTemplates\(\)[\s\S]*formatTemplateRequirements\(template\.contentRequirements\)/,
+  'Worksheets page view-model should derive mode card requirements from shared activity template definitions.'
 );
 assert.doesNotMatch(
   entryPageViewSource,

@@ -59,6 +59,7 @@ export type TemplatesPageViewModel = {
 
 export type WorksheetsPageModeCardView = {
   action: EntryAction;
+  contentRequirements: string[];
   description: string;
   template: WorksheetModeTemplate;
   title: string;
@@ -125,8 +126,10 @@ export function buildTemplatesPageViewModel({
 }
 
 export function buildWorksheetsPageViewModel({
+  activityTemplates = getActivityTemplates(),
   worksheetModeDefinitions = getWorksheetModeDefinitions(),
 }: {
+  activityTemplates?: ActivityTemplateDefinition[];
   worksheetModeDefinitions?: WorksheetModeDefinition[];
 } = {}): WorksheetsPageViewModel {
   return {
@@ -136,12 +139,21 @@ export function buildWorksheetsPageViewModel({
       title: m.worksheets_page_title(),
     },
     heroActions: buildWorksheetHeroActions(worksheetModeDefinitions),
-    modeCards: worksheetModeDefinitions.map((mode) => ({
-      action: buildWorksheetModeEntryAction(mode),
-      description: mode.description,
-      template: mode.template,
-      title: mode.title,
-    })),
+    modeCards: worksheetModeDefinitions.map((mode) => {
+      const template = activityTemplates.find(
+        (item) => item.type === mode.template
+      );
+
+      return {
+        action: buildWorksheetModeEntryAction(mode),
+        contentRequirements: template
+          ? formatTemplateRequirements(template.contentRequirements)
+          : [],
+        description: mode.description,
+        template: mode.template,
+        title: mode.title,
+      };
+    }),
     printable: {
       description: m.worksheets_page_printable_description(),
       title: m.worksheets_page_printable_title(),

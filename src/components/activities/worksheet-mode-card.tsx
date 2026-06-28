@@ -1,5 +1,6 @@
 import type { WorksheetsPageViewModel } from '@/activities/entry-page-view';
 import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
+import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,15 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
       <p className="mt-2 min-h-24 text-sm leading-6 text-muted-foreground">
         {mode.description}
       </p>
+      {mode.contentRequirements.length ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {mode.contentRequirements.map((requirement) => (
+            <Badge variant="secondary" className="rounded-md" key={requirement}>
+              {requirement}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
       <Link
         to={Routes.Create}
         search={mode.action.search}
