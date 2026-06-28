@@ -30,6 +30,7 @@ pnpm lint                   # Biome lint + format with auto-fix
 pnpm check                  # Biome lint (read-only, no auto-fix)
 pnpm format                 # Biome format only
 pnpm knip                   # Find unused exports/dependencies
+pnpm predeploy              # Locale, Biome, and production build gate
 
 pnpm db:generate            # Generate Drizzle migrations from schema
 pnpm db:migrate:local       # Apply migrations to local D1
@@ -128,23 +129,29 @@ Enforced by Biome (`biome.json`):
 ### Cloudflare Workers Constraint
 Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Node.js.
 
-## Deploy Configuration (configured by /setup-deploy)
-- Platform: GitHub Actions deploying to Cloudflare Workers
+## Deploy Configuration
+- Platform: Cloudflare Workers builds and deploys from the connected GitHub
+  repository.
 - Production URL: set `VITE_BASE_URL` to the ClassGamify domain
-- Deploy workflow: .github/workflows/deploy.yml
-- Deploy status command: GitHub Actions workflow status, then poll `VITE_BASE_URL`
+- Deploy trigger: Cloudflare Git integration on pushes to main; retry/manual
+  deploys happen in the Cloudflare dashboard.
+- GitHub Actions deploy workflow: intentionally absent. Do not reintroduce a
+  GitHub Actions build/deploy path unless deployment ownership is explicitly
+  moved back to GitHub.
+- Deploy status command: Cloudflare dashboard deployment status, then poll
+  `VITE_BASE_URL`
 - Merge method: push to main
 - Project type: web app
 - Post-deploy health check: the configured ClassGamify `VITE_BASE_URL`
 
 ### Custom deploy hooks
-- Pre-merge: pnpm locale:check && pnpm check && pnpm build
-- Deploy trigger: automatic on push to main or manual workflow_dispatch
-- Deploy status: GitHub Actions workflow status
+- Pre-push: pnpm predeploy
+- Manual deploy, when needed: pnpm deploy
+- Deploy status: Cloudflare dashboard deployment status
 - Health check: the configured ClassGamify `VITE_BASE_URL`
 
 ### Production secrets
-- GitHub Actions secrets: VITE_BASE_URL, CLOUDFLARE_ACCOUNT_ID,
-  CLOUDFLARE_API_TOKEN, CLOUDFLARE_DATABASE_ID
+- Cloudflare build variables: public build-time `VITE_*` values.
 - Cloudflare Worker secrets: BETTER_AUTH_SECRET and any enabled OAuth, mail,
-  newsletter, payment, notification, or AI provider keys
+  newsletter, payment, notification, or AI provider keys.
+- GitHub repository secrets are not required for the production deploy path.

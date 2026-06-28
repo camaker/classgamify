@@ -29,6 +29,7 @@ pnpm lint                   # Biome lint + format with auto-fix
 pnpm check                  # Biome lint (read-only, no auto-fix)
 pnpm format                 # Biome format only
 pnpm knip                   # Find unused exports/dependencies
+pnpm predeploy              # Locale, Biome, and production build gate
 
 pnpm db:generate            # Generate Drizzle migrations from schema
 pnpm db:migrate:local       # Apply migrations to local D1
@@ -127,16 +128,21 @@ Enforced by Biome (`biome.json`):
 Avoid Node.js-specific APIs — this runs on Cloudflare Workers runtime, not Node.js.
 
 ## Deploy Configuration
-- Platform: GitHub Actions deploying to Cloudflare Workers
+- Platform: Cloudflare Workers builds and deploys from the connected GitHub
+  repository.
 - Production URL: configure with `VITE_BASE_URL` for the ClassGamify domain
-- Deploy workflow: `.github/workflows/deploy.yml`
-- Deploy trigger: automatic on push to `main`, or manual `workflow_dispatch`
-- Pre-deploy checks: `pnpm locale:check`, `pnpm check`, `pnpm build`
-- Deploy command: `pnpm exec wrangler deploy`
+- Deploy trigger: Cloudflare Git integration on pushes to `main`; retry/manual
+  deploys happen in the Cloudflare dashboard.
+- GitHub Actions deploy workflow: intentionally absent. Do not reintroduce a
+  GitHub Actions build/deploy path unless deployment ownership is explicitly
+  moved back to GitHub.
+- Local pre-push gate: `pnpm predeploy` (`pnpm locale:check`, `pnpm check`,
+  `pnpm build`)
+- Manual deploy command, when needed: `pnpm deploy`
 - Health check: use the configured ClassGamify `VITE_BASE_URL`
 
-GitHub Actions needs these repository secrets: `VITE_BASE_URL`,
-`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, and
-`CLOUDFLARE_DATABASE_ID`. Runtime secrets such as `BETTER_AUTH_SECRET`, OAuth
-keys, mail keys, payment keys, webhook secrets, and AI provider keys belong in
-Cloudflare Worker secrets, not committed files.
+Cloudflare owns production build variables and Worker runtime secrets. Keep
+build-time `VITE_*` values in the Cloudflare project configuration, and keep
+runtime secrets such as `BETTER_AUTH_SECRET`, OAuth keys, mail keys, payment
+keys, webhook secrets, and AI provider keys in Cloudflare Worker secrets.
+GitHub repository secrets are not required for the production deploy path.
