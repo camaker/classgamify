@@ -16,6 +16,10 @@ import {
 } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import {
+  type AssignmentSettingsSummaryView,
+  buildAssignmentSettingsSummaryView,
+} from '@/assignments/delivery-summary';
+import {
   ASSIGNMENT_LIST_PAGE_SIZE,
   type AssignmentLifecycleStatusFilter,
   type AssignmentStatusFilter,
@@ -106,6 +110,7 @@ type AssignmentListCardViewModel = {
   id: string;
   persisted: boolean;
   settings: AssignmentSettings;
+  settingsSummaryView: AssignmentSettingsSummaryView;
   shareSlug: string;
   status: AssignmentStatus;
   templateLabel: string;
@@ -638,6 +643,10 @@ export function buildAssignmentListCardViewModel({
     id: assignment.id,
     persisted,
     settings: assignment.settingsJson,
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: assignment.expiresAt,
+      settings: assignment.settingsJson,
+    }),
     shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),
@@ -683,6 +692,10 @@ export function buildStarterAssignmentListCardViewModel({
     id: assignment.id,
     persisted,
     settings: assignment.settings,
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt,
+      settings: assignment.settings,
+    }),
     shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),

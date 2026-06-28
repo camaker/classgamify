@@ -1,5 +1,9 @@
 import type { AssignmentSettings } from '@/activities/types';
 import {
+  type AssignmentSettingsSummaryView,
+  buildAssignmentSettingsSummaryView,
+} from '@/assignments/delivery-summary';
+import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,
   ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE,
@@ -122,6 +126,7 @@ type AssignmentPublishDraftValidation =
 type AssignmentPublishPreview = {
   expiresAt: Date | null;
   settings: AssignmentSettings;
+  settingsSummaryView: AssignmentSettingsSummaryView;
 };
 
 type AssignmentPublishDialogState = {
@@ -317,9 +322,16 @@ export function buildAssignmentPublishDialogViewModel({
 export function buildAssignmentPublishPreviewFromDraft(
   draft: AssignmentPublishDraft
 ): AssignmentPublishPreview {
+  const expiresAt = parseAssignmentDateTimeLocal(draft.expiresAtLocal);
+  const settings = buildAssignmentPublishSettingsFromDraft(draft);
+
   return {
-    expiresAt: parseAssignmentDateTimeLocal(draft.expiresAtLocal),
-    settings: buildAssignmentPublishSettingsFromDraft(draft),
+    expiresAt,
+    settings,
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt,
+      settings,
+    }),
   };
 }
 

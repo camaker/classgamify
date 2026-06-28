@@ -2561,8 +2561,13 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
-  /AssignmentSettingsSummary[\s\S]*view\.preview\.settings/,
+  /AssignmentSettingsSummary[\s\S]*view=\{view\.preview\.settingsSummaryView\}/,
   'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /expiresAt=\{view\.preview\.expiresAt\}|settings=\{view\.preview\.settings\}/,
+  'Assignment publish settings form should not pass raw preview delivery settings to the summary component.'
 );
 assert.doesNotMatch(
   activityPublishDialogSource,
@@ -8079,7 +8084,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentPublishInputSource,
-  /function buildAssignmentPublishPreviewFromDraft[\s\S]*settings: buildAssignmentPublishSettingsFromDraft\(draft\)/,
+  /function buildAssignmentPublishPreviewFromDraft[\s\S]*const settings = buildAssignmentPublishSettingsFromDraft\(draft\)[\s\S]*settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt,[\s\S]*settings,/,
   'Assignment publish preview should derive delivery settings through the shared draft settings helper.'
 );
 assert.match(
@@ -8314,6 +8319,17 @@ assert.deepEqual(
         shuffleItems: false,
         timeLimitSeconds: 900,
       },
+      settingsSummaryView: buildAssignmentSettingsSummaryView({
+        expiresAt: new Date('2026-01-10T09:30'),
+        settings: {
+          collectStudentName: false,
+          instructions: 'Finish before class.',
+          maxAttempts: 3,
+          showCorrectAnswers: false,
+          shuffleItems: false,
+          timeLimitSeconds: 900,
+        },
+      }),
     },
     toggleViews: [
       {
@@ -8377,6 +8393,17 @@ assert.deepEqual(
       shuffleItems: false,
       timeLimitSeconds: 900,
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: new Date('2026-01-10T09:30'),
+      settings: {
+        collectStudentName: false,
+        instructions: 'Finish before class.',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 900,
+      },
+    }),
   }
 );
 assert.deepEqual(
@@ -8401,6 +8428,17 @@ assert.deepEqual(
       shuffleItems: true,
       timeLimitSeconds: undefined,
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: null,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+    }),
   }
 );
 assert.deepEqual(
@@ -8425,6 +8463,17 @@ assert.deepEqual(
       shuffleItems: true,
       timeLimitSeconds: undefined,
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: null,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+    }),
   }
 );
 assert.deepEqual(
@@ -14034,6 +14083,26 @@ assert.match(
   'Assignment list card component should receive assignment-domain card view models.'
 );
 assert.match(
+  assignmentListViewSource,
+  /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*settings: assignment\.settingsJson/,
+  'Assignment list card view-models should prepare persisted delivery summary views from assignment settings.'
+);
+assert.match(
+  assignmentListViewSource,
+  /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt,[\s\S]*settings: assignment\.settings/,
+  'Assignment list card view-models should prepare starter delivery summary views from assignment settings.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}/,
+  'Assignment list card component should render prepared delivery summary views.'
+);
+assert.doesNotMatch(
+  assignmentListCardComponentSource,
+  /expiresAt=\{assignment\.expiresAt\}|settings=\{assignment\.settings\}/,
+  'Assignment list card component should not pass raw delivery settings to the summary component.'
+);
+assert.match(
   assignmentListCardComponentSource,
   /useUpdateAssignmentStatus/,
   'Assignment list card component should own close and reopen interactions instead of the route.'
@@ -17589,6 +17658,17 @@ assert.deepEqual(
       shuffleItems: true,
       timeLimitSeconds: 600,
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: new Date('2026-02-01T00:00:00.000Z'),
+      settings: {
+        collectStudentName: false,
+        instructions: 'Finish before Friday.',
+        maxAttempts: 3,
+        showCorrectAnswers: false,
+        shuffleItems: true,
+        timeLimitSeconds: 600,
+      },
+    }),
     shareSlug: 'share-1',
     stats: {
       averageScore: 76,
@@ -17679,6 +17759,15 @@ assert.deepEqual(
       showCorrectAnswers: true,
       shuffleItems: true,
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: null,
+      settings: {
+        collectStudentName: true,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+      },
+    }),
     shareSlug: 'demo-food',
     stats: {
       averageScore: 84,

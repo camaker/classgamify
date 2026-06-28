@@ -163,10 +163,7 @@ function ActivityPublishPreview({
       <p className="font-medium text-sm">
         {assignmentPublishDialogCopy.previewLabel}
       </p>
-      <AssignmentSettingsSummary
-        expiresAt={view.preview.expiresAt}
-        settings={view.preview.settings}
-      />
+      <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
       {view.dialogState.errorMessage ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
           {view.dialogState.errorMessage}

@@ -71,10 +71,7 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="grid gap-4">
-          <AssignmentSettingsSummary
-            expiresAt={assignment.expiresAt}
-            settings={assignment.settings}
-          />
+          <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
           <div className="grid gap-3 sm:grid-cols-2">
             {assignment.statItems.map((stat) => (
               <AssignmentStat
