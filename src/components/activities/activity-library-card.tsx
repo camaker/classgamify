@@ -4,7 +4,10 @@ import {
   buildActivityLibraryCardDisplayView,
   type buildActivityLibraryCardViewModel,
 } from '@/activities/library-view';
-import { buildActivityDerivativeActionExecutionPlan } from '@/activities/lifecycle';
+import {
+  buildActivityDerivativeActionExecutionPlan,
+  buildActivityVisibilityActionExecutionPlan,
+} from '@/activities/lifecycle';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
 import { ActivityLibraryStats } from '@/components/activities/activity-library-stats';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
@@ -111,22 +114,38 @@ export function ActivityLibraryCard({
   }
 
   async function archiveActivity() {
-    const actionCopy = cardDisplayView.actionView.archive;
+    const executionPlan = buildActivityVisibilityActionExecutionPlan({
+      action: 'archive',
+      activityId: activity.id,
+      visibility: activity.status,
+    });
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
+      return;
+    }
     try {
-      await archiveMutation.mutateAsync({ activityId: activity.id });
-      toast.success(actionCopy.successMessage);
+      await archiveMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
     } catch {
-      toast.error(actionCopy.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 
   async function restoreActivity() {
-    const actionCopy = cardDisplayView.actionView.restore;
+    const executionPlan = buildActivityVisibilityActionExecutionPlan({
+      action: 'restore',
+      activityId: activity.id,
+      visibility: activity.status,
+    });
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
+      return;
+    }
     try {
-      await restoreMutation.mutateAsync({ activityId: activity.id });
-      toast.success(actionCopy.successMessage);
+      await restoreMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
     } catch {
-      toast.error(actionCopy.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 

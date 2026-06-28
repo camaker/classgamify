@@ -78,6 +78,31 @@ type ActivityDerivativeActionExecutionPlanInput =
       visibility: ActivityVisibility;
     };
 
+type ActivityVisibilityAction = Extract<
+  ActivityLifecycleAction,
+  'archive' | 'restore'
+>;
+
+type ActivityVisibilityBlockedExecutionPlan = {
+  failureMessage: string;
+  message: string;
+  type: 'blocked';
+};
+
+type ActivityVisibilityUpdateExecutionPlan = {
+  action: ActivityVisibilityAction;
+  failureMessage: string;
+  input: {
+    activityId: string;
+  };
+  successMessage: string;
+  type: 'update-visibility';
+};
+
+export type ActivityVisibilityActionExecutionPlan =
+  | ActivityVisibilityBlockedExecutionPlan
+  | ActivityVisibilityUpdateExecutionPlan;
+
 export const activityEditPageCopy = {
   get backToLibraryLabel() {
     return m.activity_edit_page_back_to_library();
@@ -255,6 +280,40 @@ export function buildActivityDerivativeActionExecutionPlan(
   };
 }
 
+export function buildActivityVisibilityActionExecutionPlan({
+  action,
+  activityId,
+  visibility,
+}: {
+  action: ActivityVisibilityAction;
+  activityId: string;
+  visibility: ActivityVisibility;
+}): ActivityVisibilityActionExecutionPlan {
+  const actionCopy = getActivityLifecycleActionCopy(action);
+  const message =
+    action === 'archive'
+      ? getActivityArchiveBlockedMessage(visibility)
+      : getActivityRestoreBlockedMessage(visibility);
+
+  if (message) {
+    return {
+      failureMessage: actionCopy.failureMessage,
+      message,
+      type: 'blocked',
+    };
+  }
+
+  return {
+    action,
+    failureMessage: actionCopy.failureMessage,
+    input: {
+      activityId,
+    },
+    successMessage: actionCopy.successMessage,
+    type: 'update-visibility',
+  };
+}
+
 export function buildActivityEditAccessView(visibility: ActivityVisibility) {
   if (!canEditActivity(visibility)) {
     return {
@@ -282,13 +341,29 @@ export function assertActivityCanEdit(visibility: ActivityVisibility) {
 }
 
 export function assertActivityCanArchive(visibility: ActivityVisibility) {
-  if (!canArchiveActivity(visibility)) {
-    throw new Error(m.activity_lifecycle_archive_blocked());
+  const message = getActivityArchiveBlockedMessage(visibility);
+
+  if (message) {
+    throw new Error(message);
   }
 }
 
 export function assertActivityCanRestore(visibility: ActivityVisibility) {
-  if (!canRestoreActivity(visibility)) {
-    throw new Error(m.activity_lifecycle_restore_blocked());
+  const message = getActivityRestoreBlockedMessage(visibility);
+
+  if (message) {
+    throw new Error(message);
   }
+}
+
+function getActivityArchiveBlockedMessage(visibility: ActivityVisibility) {
+  return canArchiveActivity(visibility)
+    ? undefined
+    : m.activity_lifecycle_archive_blocked();
+}
+
+function getActivityRestoreBlockedMessage(visibility: ActivityVisibility) {
+  return canRestoreActivity(visibility)
+    ? undefined
+    : m.activity_lifecycle_restore_blocked();
 }

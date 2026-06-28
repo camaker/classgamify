@@ -197,6 +197,7 @@ import {
   buildActivityDerivativeActionGate,
   buildActivityEditAccessView,
   buildActivityLifecycleActionView,
+  buildActivityVisibilityActionExecutionPlan,
   canArchiveActivity,
   canEditActivity,
   canDeriveActivityWork,
@@ -2765,12 +2766,7 @@ assert.doesNotMatch(
 assert.match(
   activityDashboardCardSource,
   /toast\.error\(executionPlan\.failureMessage\)/,
-  'Activity remix and duplicate failures should use localized derivative action execution-plan failure copy.'
-);
-assert.match(
-  activityDashboardCardSource,
-  /toast\.error\(actionCopy\.failureMessage\)/,
-  'Activity archive and restore failures should use localized lifecycle action failure copy.'
+  'Activity dashboard action failures should use localized action execution-plan failure copy.'
 );
 const assignmentDashboardRouteSource = readFileSync(
   'src/routes/dashboard/assignments.tsx',
@@ -14824,6 +14820,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /buildActivityVisibilityActionExecutionPlan/,
+  'Activity library card component should build archive and restore mutation input through the activity-domain execution plan.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /buildActivityDerivativeActionExecutionPlan\(\{[\s\S]*action: 'remix'[\s\S]*activityId: activity\.id[\s\S]*targetTemplateType[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
   'Activity library card component should build remix execution plans from the selected target template.'
 );
@@ -14834,18 +14835,28 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
-  'Activity library card component should execute prepared derivative blocked and mutation plans.'
+  /buildActivityVisibilityActionExecutionPlan\(\{[\s\S]*action: 'archive'[\s\S]*activityId: activity\.id[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
+  'Activity library card component should build archive execution plans from the card activity.'
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /cardDisplayView\.actionView\.(?:archive|restore)/,
-  'Activity library card component should use prepared archive and restore action copy from the card display view.'
+  /buildActivityVisibilityActionExecutionPlan\(\{[\s\S]*action: 'restore'[\s\S]*activityId: activity\.id[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
+  'Activity library card component should build restore execution plans from the card activity.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity library card component should execute prepared blocked and mutation plans.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /actionView\.gate|gate\.message/,
   'Activity library card component should not inspect derivative gates directly.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /(?:archiveMutation|restoreMutation)\.mutateAsync\(\{\s*activityId: activity\.id\s*\}\)/,
+  'Activity library card component should not hand-build archive or restore mutation input.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -17926,6 +17937,62 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be remixed.',
     message: archivedActivityDerivationError,
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityVisibilityActionExecutionPlan({
+    action: 'archive',
+    activityId: 'activity-1',
+    visibility: 'public',
+  }),
+  {
+    action: 'archive',
+    failureMessage: 'Activity could not be archived.',
+    input: {
+      activityId: 'activity-1',
+    },
+    successMessage: 'Activity archived.',
+    type: 'update-visibility',
+  }
+);
+assert.deepEqual(
+  buildActivityVisibilityActionExecutionPlan({
+    action: 'restore',
+    activityId: 'activity-1',
+    visibility: 'archived',
+  }),
+  {
+    action: 'restore',
+    failureMessage: 'Activity could not be restored.',
+    input: {
+      activityId: 'activity-1',
+    },
+    successMessage: 'Activity restored to drafts.',
+    type: 'update-visibility',
+  }
+);
+assert.deepEqual(
+  buildActivityVisibilityActionExecutionPlan({
+    action: 'archive',
+    activityId: 'activity-1',
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Activity could not be archived.',
+    message: 'This activity is already archived.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityVisibilityActionExecutionPlan({
+    action: 'restore',
+    activityId: 'activity-1',
+    visibility: 'draft',
+  }),
+  {
+    failureMessage: 'Activity could not be restored.',
+    message: 'Only archived activities can be restored.',
     type: 'blocked',
   }
 );
