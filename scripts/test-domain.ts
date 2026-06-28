@@ -1927,6 +1927,11 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAnswerRow[\s\S]*formatAssignmentResultCopyOrdinal\(index\)/,
+  'Assignment CSV export answer rows should normalize item numbers through the shared result ordinal helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
   /export function buildAssignmentResultsExportDeliveryView[\s\S]*buildAssignmentExportSettings\(settings\)[\s\S]*buildAssignmentDeliverySummary\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*settings: exportSettings/,
   'Assignment CSV export delivery view should share assignment delivery-summary formatting.'
 );
@@ -1944,6 +1949,11 @@ assert.doesNotMatch(
   assignmentResultsExportSource,
   /function formatAssignmentExportNumber/,
   'Assignment CSV export should not keep local numeric cell formatting.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /index \+ 1/,
+  'Assignment CSV export should not hand-compose item numbers.'
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
@@ -30377,6 +30387,10 @@ assert.match(
 );
 assert.match(csv, /"Paris","Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
+assert.match(
+  csv,
+  /"1","q-1","Capital of France\?","paris france","Paris","Paris, France","correct"/
+);
 assert.match(
   csv,
   /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/

@@ -19,6 +19,7 @@ import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
+import { formatAssignmentResultCopyOrdinal } from '@/assignments/result-copy-format';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
@@ -266,7 +267,7 @@ function buildAssignmentResultsExportAnswerRow({
 
   return [
     ...baseColumns,
-    index + 1,
+    formatAssignmentResultCopyOrdinal(index),
     answer.itemId,
     formatAssignmentExportText(answer.prompt),
     answerView.exportStudentAnswerText,
