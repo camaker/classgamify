@@ -15,6 +15,7 @@ import {
   buildStudentRunnerAttemptResetState,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
+  buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
   buildStudentRunnerSubmissionResultState,
   shouldStartStudentRunnerAttemptClock,
@@ -126,9 +127,12 @@ function PlayPage() {
   const startedAt = runnerPageView.startedAt;
   const timeLimitSeconds = runnerPageView.timeLimitSeconds;
   const controlView = runnerPageView.controlView;
-  const identityView = runnerPageView.identityView;
   const resultPanelView = runnerPageView.resultPanelView;
   const currentAttemptSessionKey = runnerPageView.currentAttemptSessionKey;
+  const runnerRouteState = useMemo(
+    () => buildStudentRunnerRouteState(runnerPageView),
+    [runnerPageView]
+  );
 
   useEffect(() => {
     if (result || !timeLimitSeconds) return;
@@ -269,31 +273,30 @@ function PlayPage() {
     });
   }
 
-  if (pageState.status === 'loading') {
+  if (runnerRouteState.status === 'loading') {
     return <StudentRunnerLoadingPanel view={runnerPageView.loadingView} />;
   }
 
-  if (pageState.status === 'missing') {
-    const missingView = runnerPageView.missingView;
-    if (!missingView) return null;
-
-    return <StudentRunnerMissingPanel view={missingView} />;
+  if (runnerRouteState.status === 'missing') {
+    return <StudentRunnerMissingPanel view={runnerRouteState.missingView} />;
   }
 
-  const headerView = runnerPageView.headerView;
-  if (!activity || !assignment || !headerView || !identityView) return null;
+  if (runnerRouteState.status !== 'ready') return null;
+
+  const routeActivity = runnerRouteState.activity;
+  const routeAssignment = runnerRouteState.assignment;
 
   return (
     <Container className="px-4 py-10 md:py-14">
       <div className="mx-auto max-w-6xl space-y-8 pb-16">
         <StudentRunnerHeaderCard
           badgeLabel={runnerPageView.routeBadgeLabel}
-          view={headerView}
+          view={runnerRouteState.headerView}
         />
 
         <StudentRunnerAttemptShell
           controlView={controlView}
-          identityView={identityView}
+          identityView={runnerRouteState.identityView}
           onStartAnotherAttempt={startAnotherAttempt}
           onStudentNameChange={setStudentName}
           resultPanelView={resultPanelView}
@@ -304,11 +307,11 @@ function PlayPage() {
             disabled={controlView.runtimeItemsDisabled}
             items={runtimeItems}
             revealAnswer={Boolean(
-              result && assignment.settings.showCorrectAnswers
+              result && routeAssignment.settings.showCorrectAnswers
             )}
             reviewItems={result?.reviewItems}
-            language={activity.content.language}
-            templateType={activity.templateType}
+            language={routeActivity.content.language}
+            templateType={routeActivity.templateType}
             onAnswerChanges={updateAnswers}
           />
 
@@ -334,8 +337,8 @@ function PlayPage() {
         </StudentRunnerAttemptShell>
 
         <ActivityPreview
-          activity={activity}
-          assignment={assignment}
+          activity={routeActivity}
+          assignment={routeAssignment}
           compact
           hideAnswers={pageState.hidePreviewAnswers}
         />

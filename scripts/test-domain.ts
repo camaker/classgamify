@@ -707,6 +707,7 @@ import {
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
   buildStudentRunnerReadyState,
+  buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
   buildStudentRunnerSubmissionResultState,
   getStudentRunnerAttemptStartedAt,
@@ -4826,6 +4827,26 @@ assert.match(
 );
 assert.match(
   playRouteSource,
+  /buildStudentRunnerRouteState/,
+  'Student play route should consume the assignment-domain runner route state.'
+);
+assert.match(
+  playRouteSource,
+  /runnerRouteState\.status === 'loading'[\s\S]*runnerRouteState\.status === 'missing'[\s\S]*runnerRouteState\.status !== 'ready'/,
+  'Student play route should render loading, missing, and ready states from the assignment-domain runner route state.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerRouteState[\s\S]*status: 'missing'[\s\S]*status: 'loading'[\s\S]*status: 'unavailable'[\s\S]*status: 'ready'/,
+  'Student runner state domain should own loading, missing, unavailable, and ready route-state selection.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /pageState\.status === 'loading'|pageState\.status === 'missing'|const missingView = runnerPageView\.missingView|!activity \|\| !assignment \|\| !headerView \|\| !identityView/,
+  'Student play route should not directly branch on page-state status or runner page missing fields.'
+);
+assert.match(
+  playRouteSource,
   /buildStudentRunnerSeoView/,
   'Student play route should consume assignment-domain SEO view state.'
 );
@@ -4846,12 +4867,12 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{headerView\}/,
+  /StudentRunnerHeaderCard[\s\S]*badgeLabel=\{runnerPageView\.routeBadgeLabel\}[\s\S]*view=\{runnerRouteState\.headerView\}/,
   'Student play route should delegate student assignment header rendering.'
 );
 assert.match(
   playRouteSource,
-  /StudentRunnerAttemptShell[\s\S]*controlView=\{controlView\}[\s\S]*identityView=\{identityView\}[\s\S]*resultPanelView=\{resultPanelView\}/,
+  /StudentRunnerAttemptShell[\s\S]*controlView=\{controlView\}[\s\S]*identityView=\{runnerRouteState\.identityView\}[\s\S]*resultPanelView=\{resultPanelView\}/,
   'Student play route should delegate attempt shell, identity, timer, and result presentation.'
 );
 assert.match(
@@ -11122,6 +11143,12 @@ const studentRunnerPageView = buildStudentRunnerPageViewModel({
   shareId: ' share-public ',
   submittedAttemptCount: 0,
 });
+const readyStudentRunnerRouteState = buildStudentRunnerRouteState(
+  studentRunnerPageView
+);
+if (readyStudentRunnerRouteState.status !== 'ready') {
+  throw new Error('Expected student runner route state to be ready.');
+}
 assert.deepEqual(
   {
     activeShareId: studentRunnerPageView.activeShareId,
@@ -11231,6 +11258,44 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  {
+    activityTitle: readyStudentRunnerRouteState.activity.title,
+    assignmentShareId: readyStudentRunnerRouteState.assignment.shareId,
+    headerTitle: readyStudentRunnerRouteState.headerView.title,
+    identityMode: readyStudentRunnerRouteState.identityView.mode,
+    status: readyStudentRunnerRouteState.status,
+  },
+  {
+    activityTitle: 'Frozen activity title',
+    assignmentShareId: 'share-public',
+    headerTitle: 'Public assignment',
+    identityMode: 'anonymous',
+    status: 'ready',
+  }
+);
+const loadingStudentRunnerRouteState = buildStudentRunnerRouteState(
+  buildStudentRunnerPageViewModel({
+    answers: {},
+    attemptClock: undefined,
+    confirmIncompleteSubmit: false,
+    fallbackStartedAt: 2_000,
+    isSubmitting: false,
+    pageState: { status: 'loading' },
+    shareId: 'share-public',
+    submittedAttemptCount: 0,
+  })
+);
+assert.deepEqual(
+  {
+    loadingMessage: loadingStudentRunnerRouteState.pageView.loadingView.message,
+    status: loadingStudentRunnerRouteState.status,
+  },
+  {
+    loadingMessage: 'Loading student activity...',
+    status: 'loading',
+  }
+);
+assert.deepEqual(
   buildStudentRunnerPageViewModel({
     answers: {},
     attemptClock: undefined,
@@ -11263,6 +11328,12 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
 assert.deepEqual(missingStudentRunnerPageView.loadingView, {
   message: 'Loading student activity...',
 });
+const missingStudentRunnerRouteState = buildStudentRunnerRouteState(
+  missingStudentRunnerPageView
+);
+if (missingStudentRunnerRouteState.status !== 'missing') {
+  throw new Error('Expected student runner route state to be missing.');
+}
 assert.deepEqual(missingStudentRunnerPageView.missingView, {
   badgeLabel: 'Student play route',
   browseTemplatesLabel: 'Browse templates',
@@ -11274,6 +11345,16 @@ assert.deepEqual(missingStudentRunnerPageView.resultPanelView, {
   show: false,
 });
 assert.equal(missingStudentRunnerPageView.identityView, undefined);
+assert.deepEqual(
+  {
+    missingTitle: missingStudentRunnerRouteState.missingView.title,
+    status: missingStudentRunnerRouteState.status,
+  },
+  {
+    missingTitle: 'Assignment closed',
+    status: 'missing',
+  }
+);
 const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -11293,6 +11374,13 @@ assert.equal(namedStudentRunnerPageView.controlView.runnerTitle, 'Quiz');
 assert.deepEqual(namedStudentRunnerPageView.resultPanelView, {
   show: false,
 });
+assert.equal(
+  buildStudentRunnerRouteState({
+    ...namedStudentRunnerPageView,
+    headerView: undefined,
+  }).status,
+  'unavailable'
+);
 assert.deepEqual(
   buildStudentRunnerAttemptClock({
     activeShareId: ' share-public ',

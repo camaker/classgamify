@@ -153,6 +153,29 @@ type StudentRunnerPageViewModel = {
   timeLimitSeconds?: number;
 };
 
+type StudentRunnerRouteState =
+  | {
+      pageView: StudentRunnerPageViewModel;
+      status: 'loading';
+    }
+  | {
+      missingView: StudentRunnerMissingPageView;
+      pageView: StudentRunnerPageViewModel;
+      status: 'missing';
+    }
+  | {
+      pageView: StudentRunnerPageViewModel;
+      status: 'unavailable';
+    }
+  | {
+      activity: ActivitySeed;
+      assignment: AssignmentSeed;
+      headerView: NonNullable<StudentRunnerPageViewModel['headerView']>;
+      identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
+      pageView: StudentRunnerPageViewModel;
+      status: 'ready';
+    };
+
 export type StudentRunnerAttemptResetState = {
   answers: StudentAnswerMap;
   anonymousToken?: string;
@@ -473,6 +496,46 @@ export function buildStudentRunnerPageViewModel({
     startedAt,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
+  };
+}
+
+export function buildStudentRunnerRouteState(
+  pageView: StudentRunnerPageViewModel
+): StudentRunnerRouteState {
+  if (pageView.missingView) {
+    return {
+      missingView: pageView.missingView,
+      pageView,
+      status: 'missing',
+    };
+  }
+
+  if (!pageView.activity && !pageView.assignment) {
+    return {
+      pageView,
+      status: 'loading',
+    };
+  }
+
+  const activity = pageView.activity;
+  const assignment = pageView.assignment;
+  const headerView = pageView.headerView;
+  const identityView = pageView.identityView;
+
+  if (!activity || !assignment || !headerView || !identityView) {
+    return {
+      pageView,
+      status: 'unavailable',
+    };
+  }
+
+  return {
+    activity,
+    assignment,
+    headerView,
+    identityView,
+    pageView,
+    status: 'ready',
   };
 }
 
