@@ -1,5 +1,5 @@
 import {
-  ACTIVITY_TEMPLATE_TYPES,
+  isActivityTemplateType,
   type ActivityContent,
   type ActivityTemplateType,
 } from '@/activities/types';
@@ -167,15 +167,6 @@ export function buildActivityLibraryValidatedSearch(
     status: parseActivityLibraryStatus(search.status),
     template: parseActivityTemplateFilter(search.template),
   };
-}
-
-export function isActivityTemplateType(
-  value: unknown
-): value is ActivityTemplateType {
-  return (
-    typeof value === 'string' &&
-    ACTIVITY_TEMPLATE_TYPES.includes(value as ActivityTemplateType)
-  );
 }
 
 function isActivityLibraryStatus(

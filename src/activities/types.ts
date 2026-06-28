@@ -13,6 +13,15 @@ export const ACTIVITY_TEMPLATE_TYPES = [
 
 export type ActivityTemplateType = (typeof ACTIVITY_TEMPLATE_TYPES)[number];
 
+export function isActivityTemplateType(
+  value: unknown
+): value is ActivityTemplateType {
+  return (
+    typeof value === 'string' &&
+    ACTIVITY_TEMPLATE_TYPES.includes(value as ActivityTemplateType)
+  );
+}
+
 export const ACTIVITY_DIFFICULTIES = ['starter', 'core', 'challenge'] as const;
 
 export const ACTIVITY_CREATABLE_VISIBILITIES = [

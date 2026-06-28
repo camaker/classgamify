@@ -97,7 +97,6 @@ import {
   buildActivityLibraryRouteSearch,
   buildActivityLibraryValidatedSearch,
   getActivityLibraryTotalPages,
-  isActivityTemplateType,
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
   parseActivityLibraryStatus,
@@ -240,6 +239,7 @@ import {
   ACTIVITY_PERSISTED_VISIBILITIES,
   ACTIVITY_TEMPLATE_TYPES,
   ACTIVITY_TITLE_LENGTH,
+  isActivityTemplateType,
   type ActivityTemplateType,
 } from '@/activities/types';
 import {
@@ -15486,6 +15486,11 @@ assert.doesNotMatch(
   templateEntrySource,
   /worksheets_page_mode_fallback_action\(\{ template \}\)/,
   'Worksheet fallback actions should not render raw internal template ids.'
+);
+assert.doesNotMatch(
+  templateEntrySource,
+  /@\/activities\/library-filters/,
+  'Template entry helpers should parse create-entry template search without depending on activity library filters.'
 );
 assert.match(
   entryPageViewSource,

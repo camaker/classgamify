@@ -1,7 +1,9 @@
 import { m } from '@/locale/paraglide/messages';
 import { getTemplateByType } from '@/activities/catalog';
-import { isActivityTemplateType } from '@/activities/library-filters';
-import type { ActivityTemplateDefinition } from '@/activities/types';
+import {
+  isActivityTemplateType,
+  type ActivityTemplateDefinition,
+} from '@/activities/types';
 import {
   WORKSHEET_MODE_TEMPLATES,
   type WorksheetModeDefinition,
