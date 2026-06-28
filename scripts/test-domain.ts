@@ -2812,6 +2812,11 @@ assert.match(
   /normalizeOptionalRuntimeDisplayText\(notice\)/,
   'AI draft meta should normalize optional generation notices with the shared runtime display helper.'
 );
+assert.match(
+  activityDraftMetaSource,
+  /buildQuestionReviewChecklistItem[\s\S]*buildQuestionChoiceReadinessSummary[\s\S]*activity_draft_meta_checklist_add_quiz_choices/,
+  'AI draft review checklist should use quiz choice readiness when suggesting next teacher edits.'
+);
 assert.doesNotMatch(
   activityDraftMetaSource,
   /model\.trim\(\)/,
@@ -16272,19 +16277,44 @@ const useAssignmentsHookSource = readFileSync(
   'src/hooks/use-assignments.ts',
   'utf8'
 );
+const printableAssignmentWorksheetHookSource = useAssignmentsHookSource.slice(
+  useAssignmentsHookSource.indexOf(
+    'export function usePrintableAssignmentWorksheet'
+  ),
+  useAssignmentsHookSource.indexOf('export function usePublishAssignment')
+);
 assert.match(
   useAssignmentsHookSource,
   /export function usePrintableAssignmentWorksheet/,
   'Assignments hook should expose a teacher-facing printable worksheet query.'
 );
 assert.match(
-  useAssignmentsHookSource,
+  printableAssignmentWorksheetHookSource,
   /queryFn: \(\) =>[\s\S]*getPrintableAssignmentWorksheet\(\{[\s\S]*data: \{ assignmentId, includeAnswerKey \}/,
   'Printable worksheet hook should call the owner-scoped printable worksheet server function.'
 );
-assert.match(
-  useAssignmentsHookSource,
-  /assignmentsKeys\.detail\(assignmentId\)[\s\S]*'printable'[\s\S]*includeAnswerKey/,
+const printableWorksheetQueryKeyIndex =
+  printableAssignmentWorksheetHookSource.indexOf('queryKey: [');
+const printableWorksheetDetailKeyIndex =
+  printableAssignmentWorksheetHookSource.indexOf(
+    'assignmentsKeys.detail(assignmentId)',
+    printableWorksheetQueryKeyIndex
+  );
+const printableWorksheetVariantKeyIndex =
+  printableAssignmentWorksheetHookSource.indexOf(
+    "'printable'",
+    printableWorksheetDetailKeyIndex
+  );
+const printableWorksheetAnswerKeyIndex =
+  printableAssignmentWorksheetHookSource.indexOf(
+    'includeAnswerKey',
+    printableWorksheetVariantKeyIndex
+  );
+assert.ok(
+  printableWorksheetQueryKeyIndex >= 0 &&
+    printableWorksheetDetailKeyIndex > printableWorksheetQueryKeyIndex &&
+    printableWorksheetVariantKeyIndex > printableWorksheetDetailKeyIndex &&
+    printableWorksheetAnswerKeyIndex > printableWorksheetVariantKeyIndex,
   'Printable worksheet hook should cache printable variants separately by answer-key visibility.'
 );
 const printableWorksheetViewSource = readFileSync(
@@ -23477,6 +23507,11 @@ assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.detail,
   'Add 3 more choices or vocabulary terms before publishing this quiz.'
 );
+assert.ok(
+  questionOnlyDraftMetaSummary.reviewChecklist.includes(
+    'Add distractor choices or vocabulary for 1 quiz question before publishing.'
+  )
+);
 assert.equal(
   questionOnlyDraftMetaSummary.draftFocusLineText,
   'Focus: Remix ready'
@@ -23633,6 +23668,26 @@ try {
   assert.ok(
     zhFallbackDraftMetaSummary.reviewChecklist.some((item) =>
       /保存后可改编为：.+、.+。/.test(item)
+    )
+  );
+  const zhSparseDraftMetaSummary = buildActivityDraftMetaSummaryView({
+    meta: buildActivityDraftMeta({
+      activity: {
+        ...activityEditorDefaultInput,
+        groupsText: '',
+        pairsText: '',
+        questionsText: '只有一道题？ | 是',
+        templateType: 'quiz',
+        vocabularyText: '',
+      },
+      currentTemplateType: 'quiz',
+    }),
+    model: 'test-model',
+    provider: 'workers-ai',
+  });
+  assert.ok(
+    zhSparseDraftMetaSummary.reviewChecklist.includes(
+      '发布前请为 1 道测验题补充干扰选项或词汇。'
     )
   );
 } finally {
@@ -24081,6 +24136,31 @@ assert.ok(
 );
 assert.ok(
   questionOnlyDraftMeta.reviewChecklist.includes(
+    'Add distractor choices or vocabulary for 1 quiz question before publishing.'
+  )
+);
+const choiceReadyMissingExplanationDraftMeta = buildActivityDraftMeta({
+  activity: {
+    description: 'Choice ready draft',
+    difficulty: 'starter',
+    gradeBand: 'Grade 3',
+    groupsText: '',
+    language: 'en',
+    learningGoal: 'Students answer quick review questions.',
+    pairsText: '',
+    questionsText: 'Capital of France? | Paris | Lyon, Rome, Berlin',
+    sourceSummary: 'Choice ready source',
+    subject: 'General',
+    teacherNotesText: '',
+    templateType: 'quiz',
+    title: 'Choice ready draft',
+    visibility: 'draft',
+    vocabularyText: '',
+  },
+  currentTemplateType: 'quiz',
+});
+assert.ok(
+  choiceReadyMissingExplanationDraftMeta.reviewChecklist.includes(
     'Add short explanations before students see answer feedback.'
   )
 );

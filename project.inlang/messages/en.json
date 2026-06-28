@@ -103,6 +103,8 @@
   "activity_draft_meta_checklist_add_explanations": "Add short explanations before students see answer feedback.",
   "activity_draft_meta_checklist_add_more_structure": "Add more structured pairs or groups to unlock more templates.",
   "activity_draft_meta_checklist_add_questions": "Add questions before publishing quiz-style work.",
+  "activity_draft_meta_checklist_add_quiz_choices_many": "Add distractor choices or vocabulary for {count} quiz questions before publishing.",
+  "activity_draft_meta_checklist_add_quiz_choices_one": "Add distractor choices or vocabulary for {count} quiz question before publishing.",
   "activity_draft_meta_checklist_adjust_level": "Adjust wording for your class level.",
   "activity_draft_meta_checklist_check_explanations": "Check explanations and distractor choices.",
   "activity_draft_meta_checklist_next_gap": "Next content gap: {diagnosis}",

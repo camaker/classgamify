@@ -103,6 +103,8 @@
   "activity_draft_meta_checklist_add_explanations": "学生看到答案反馈前，请先补充简短解析。",
   "activity_draft_meta_checklist_add_more_structure": "添加更多结构化配对或分组，以解锁更多模板。",
   "activity_draft_meta_checklist_add_questions": "发布测验类作业前请先添加题目。",
+  "activity_draft_meta_checklist_add_quiz_choices_many": "发布前请为 {count} 道测验题补充干扰选项或词汇。",
+  "activity_draft_meta_checklist_add_quiz_choices_one": "发布前请为 {count} 道测验题补充干扰选项或词汇。",
   "activity_draft_meta_checklist_adjust_level": "根据你的班级水平调整措辞。",
   "activity_draft_meta_checklist_check_explanations": "检查解析和干扰选项。",
   "activity_draft_meta_checklist_next_gap": "下一个内容缺口：{diagnosis}",

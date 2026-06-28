@@ -709,6 +709,20 @@ function buildQuestionReviewChecklistItem(content: ActivityContent) {
     return m.activity_draft_meta_checklist_add_questions();
   }
 
+  const questionChoiceReadiness = buildQuestionChoiceReadinessSummary({
+    content,
+  });
+
+  if (questionChoiceReadiness.needsCandidateCount > 0) {
+    return questionChoiceReadiness.needsCandidateCount === 1
+      ? m.activity_draft_meta_checklist_add_quiz_choices_one({
+          count: questionChoiceReadiness.needsCandidateCount,
+        })
+      : m.activity_draft_meta_checklist_add_quiz_choices_many({
+          count: questionChoiceReadiness.needsCandidateCount,
+        });
+  }
+
   if (content.questions.some((question) => !question.explanation)) {
     return m.activity_draft_meta_checklist_add_explanations();
   }
