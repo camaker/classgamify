@@ -220,8 +220,8 @@ export function buildPrintableAssignmentWorksheet({
     instructions: deliveryView.instructions,
     items: orderedRuntimeItems.map((item, index) =>
       toPrintableWorksheetItem({
+        index,
         item,
-        sequenceNumber: index + 1,
         templateType,
       })
     ),
@@ -260,12 +260,12 @@ function isPrintableAnswerKeySearchEnabled(value: unknown) {
 }
 
 function toPrintableWorksheetItem({
+  index,
   item,
-  sequenceNumber,
   templateType,
 }: {
+  index: number;
   item: RuntimeItem;
-  sequenceNumber: number;
   templateType: ActivityTemplateType;
 }): PrintableWorksheetItem {
   const responsePolicy = getPrintableWorksheetResponsePolicy(templateType);
@@ -281,8 +281,12 @@ function toPrintableWorksheetItem({
     kind: item.kind,
     prompt: normalizeRuntimeDisplayText(item.prompt),
     responseMode: responsePolicy.responseMode,
-    sequenceNumber: normalizeRuntimeDisplayCount(sequenceNumber, { min: 1 }),
+    sequenceNumber: getPrintableWorksheetSequenceNumber(index),
   };
+}
+
+export function getPrintableWorksheetSequenceNumber(index: number) {
+  return normalizeRuntimeDisplayCount(index + 1, { min: 1 });
 }
 
 function buildPrintableWorksheetItemChoices({
@@ -310,6 +314,6 @@ function toPrintableWorksheetAnswerKeyItem(
     id: item.id,
     kind: item.kind,
     prompt: normalizeRuntimeDisplayText(item.prompt),
-    sequenceNumber: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
+    sequenceNumber: getPrintableWorksheetSequenceNumber(index),
   };
 }

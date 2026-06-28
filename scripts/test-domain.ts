@@ -452,6 +452,7 @@ import {
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
   getPrintableWorksheetResponsePolicy,
+  getPrintableWorksheetSequenceNumber,
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
@@ -11566,6 +11567,10 @@ assert.deepEqual(printableSnapshotWorksheet.items[0], {
   responseMode: 'choice',
   sequenceNumber: 1,
 });
+assert.equal(getPrintableWorksheetSequenceNumber(0), 1);
+assert.equal(getPrintableWorksheetSequenceNumber(2.9), 3);
+assert.equal(getPrintableWorksheetSequenceNumber(-3), 1);
+assert.equal(getPrintableWorksheetSequenceNumber(Number.NaN), 1);
 const printableChoiceSourceItems = getRuntimeItems(
   'quiz',
   publicPayloadSnapshotContent
@@ -17047,6 +17052,21 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
+  /export function getPrintableWorksheetSequenceNumber[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1,[\s\S]*min: 1/,
+  'Printable worksheet sequence numbers should normalize zero-based indexes through one helper.'
+);
+assert.match(
+  printableWorksheetSource,
+  /toPrintableWorksheetItem[\s\S]*sequenceNumber: getPrintableWorksheetSequenceNumber\(index\)/,
+  'Printable worksheet items should use the shared sequence-number helper.'
+);
+assert.match(
+  printableWorksheetSource,
+  /toPrintableWorksheetAnswerKeyItem[\s\S]*sequenceNumber: getPrintableWorksheetSequenceNumber\(index\)/,
+  'Printable worksheet answer keys should use the shared sequence-number helper.'
+);
+assert.match(
+  printableWorksheetSource,
   /export function buildPrintableAssignmentDeliveryView\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*buildAssignmentDeliverySummary\(\{[\s\S]*formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
   'Printable worksheet delivery view should share assignment delivery-summary formatting.'
 );
@@ -17074,6 +17094,11 @@ assert.doesNotMatch(
   printableWorksheetSource,
   /function getPrintableWorksheetResponseMode|function getPrintableWorksheetAnswerSpaceLines|function getPrintableWorksheetChoicePresentation/,
   'Printable worksheet item generation should not keep separate response-mode, answer-line, or choice-presentation switches.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /sequenceNumber: index \+ 1|sequenceNumber: normalizeRuntimeDisplayCount\(index \+ 1/,
+  'Printable worksheet generation should not hand-compose item or answer-key sequence numbers.'
 );
 assert.doesNotMatch(
   printableWorksheetSource,
