@@ -289,6 +289,10 @@ export function getPrintableWorksheetSequenceNumber(index: number) {
   return normalizeRuntimeDisplayCount(index + 1, { min: 1 });
 }
 
+export function normalizePrintableWorksheetSequenceNumber(value: number) {
+  return normalizeRuntimeDisplayCount(value, { min: 1 });
+}
+
 function buildPrintableWorksheetItemChoices({
   item,
   responsePolicy,

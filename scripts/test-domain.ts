@@ -454,6 +454,7 @@ import {
   buildPrintableAssignmentWorksheet,
   getPrintableWorksheetResponsePolicy,
   getPrintableWorksheetSequenceNumber,
+  normalizePrintableWorksheetSequenceNumber,
   parsePrintableAssignmentSearch,
 } from '@/assignments/printable-worksheet';
 import {
@@ -11683,6 +11684,10 @@ assert.equal(getPrintableWorksheetSequenceNumber(0), 1);
 assert.equal(getPrintableWorksheetSequenceNumber(2.9), 3);
 assert.equal(getPrintableWorksheetSequenceNumber(-3), 1);
 assert.equal(getPrintableWorksheetSequenceNumber(Number.NaN), 1);
+assert.equal(normalizePrintableWorksheetSequenceNumber(1), 1);
+assert.equal(normalizePrintableWorksheetSequenceNumber(3.9), 3);
+assert.equal(normalizePrintableWorksheetSequenceNumber(-3), 1);
+assert.equal(normalizePrintableWorksheetSequenceNumber(Number.NaN), 1);
 const printableChoiceSourceItems = getRuntimeItems(
   'quiz',
   publicPayloadSnapshotContent
@@ -17175,6 +17180,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
+  /export function normalizePrintableWorksheetSequenceNumber[\s\S]*normalizeRuntimeDisplayCount\(value,[\s\S]*min: 1/,
+  'Printable worksheet sequence number display should share one persisted-value normalizer.'
+);
+assert.match(
+  printableWorksheetSource,
   /toPrintableWorksheetItem[\s\S]*sequenceNumber: getPrintableWorksheetSequenceNumber\(index\)/,
   'Printable worksheet items should use the shared sequence-number helper.'
 );
@@ -17247,6 +17257,21 @@ assert.match(
   printableWorksheetViewSource,
   /const answerLines = getPrintableWorksheetAnswerLines\(item\)[\s\S]*answerLines,/,
   'Printable worksheet item views should own printable answer-line display data.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /assignment_printable_item_sequence\(\{[\s\S]*normalizePrintableWorksheetSequenceNumber\(\s*item\.sequenceNumber\s*\)/,
+  'Printable worksheet item headings should normalize sequence numbers through the shared printable helper.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /assignment_printable_answer_key_item\(\{[\s\S]*normalizePrintableWorksheetSequenceNumber\(\s*item\.sequenceNumber\s*\)/,
+  'Printable worksheet answer keys should normalize sequence numbers through the shared printable helper.'
+);
+assert.doesNotMatch(
+  printableWorksheetViewSource,
+  /normalizeRuntimeDisplayCount\(\s*item\.sequenceNumber/,
+  'Printable worksheet views should not normalize persisted sequence numbers locally.'
 );
 assert.match(
   printableWorksheetViewSource,

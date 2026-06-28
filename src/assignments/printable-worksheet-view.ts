@@ -8,6 +8,7 @@ import type {
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
+import { normalizePrintableWorksheetSequenceNumber } from '@/assignments/printable-worksheet';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultValue,
@@ -325,9 +326,9 @@ export function buildPrintableWorksheetAnswerKeyView({
 export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
   const kindLabel = formatRuntimeItemKindLabel(item);
   const sequenceLabel = m.assignment_printable_item_sequence({
-    sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
-      min: 1,
-    }),
+    sequenceNumber: normalizePrintableWorksheetSequenceNumber(
+      item.sequenceNumber
+    ),
   });
   const answerLines = getPrintableWorksheetAnswerLines(item);
   const choiceBank = buildPrintableWorksheetChoiceBankView(item);
@@ -372,9 +373,9 @@ export function buildPrintableWorksheetAnswerKeyItemView(
       : undefined,
     answerLabel: m.assignment_printable_answer_key_item({
       answer: formatPrintableWorksheetValue(item.answer),
-      sequenceNumber: normalizeRuntimeDisplayCount(item.sequenceNumber, {
-        min: 1,
-      }),
+      sequenceNumber: normalizePrintableWorksheetSequenceNumber(
+        item.sequenceNumber
+      ),
     }),
     explanationLabel: explanation
       ? m.assignment_printable_answer_key_explanation({
