@@ -293,6 +293,7 @@ import {
   formatActivityEditorVisibility,
 } from '@/activities/editor';
 import {
+  buildQuestionChoiceReadinessSummary,
   buildQuestionChoices,
   DEFAULT_QUESTION_CHOICE_COUNT,
 } from '@/activities/distractors';
@@ -2825,6 +2826,16 @@ assert.match(
   activityTemplateReadinessPanelSource,
   /function ActivityTemplateLockedOption[\s\S]*option\.diagnosis/,
   'Template-readiness locked option should render prepared diagnostics.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /questionChoiceReadiness[\s\S]*summaryLabel[\s\S]*itemViews[\s\S]*statusLabel[\s\S]*sourceLabel/,
+  'Activity template readiness panel should render prepared quiz choice diagnostics from the view model.'
+);
+assert.doesNotMatch(
+  activityTemplateReadinessPanelSource,
+  /Quiz choice readiness|Needs candidates|Completed locally|Explicit choices|测验选项|需要候选项|本地已补齐|显式选项/,
+  'Activity template readiness panel should not hard-code visible quiz choice readiness labels.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -6131,6 +6142,16 @@ assert.doesNotMatch(
   activityDistractorsSource,
   /const DEFAULT_CHOICE_COUNT|targetCount = 4/,
   'Question choice completion should not keep a local unnamed default choice count.'
+);
+assert.match(
+  activityDistractorsSource,
+  /buildQuestionChoiceReadinessSummary[\s\S]*buildQuestionChoiceReadiness[\s\S]*QuestionChoiceReadinessStatus/,
+  'Question choice diagnostics should expose reusable readiness summaries for editor and AI distractor planning.'
+);
+assert.match(
+  activityDistractorsSource,
+  /siblingAnswerCandidateCount[\s\S]*vocabularyCandidateCount/,
+  'Question choice diagnostics should preserve candidate source counts for teacher-facing explanations.'
 );
 
 assert.equal(isStudentAnswerFilled(undefined), false);
@@ -19994,6 +20015,136 @@ assert.equal(
   new Set(completedQuestionChoices.map((choice) => choice.toLowerCase())).size,
   completedQuestionChoices.length
 );
+const choiceCompletionReadiness = buildQuestionChoiceReadinessSummary({
+  content: choiceCompletionContent,
+});
+assert.equal(choiceCompletionReadiness.targetCount, 4);
+assert.equal(choiceCompletionReadiness.itemCount, 3);
+assert.equal(choiceCompletionReadiness.completedLocallyCount, 3);
+assert.equal(choiceCompletionReadiness.explicitReadyCount, 0);
+assert.equal(choiceCompletionReadiness.needsCandidateCount, 0);
+assert.deepEqual(choiceCompletionReadiness.items[0], {
+  answerIncluded: true,
+  candidateChoiceCount: 3,
+  completedChoiceCount: 4,
+  deterministicChoiceCount: 2,
+  explicitAnswerIncluded: true,
+  explicitChoiceCount: 2,
+  missingChoiceCount: 0,
+  prompt: 'Capital of France?',
+  questionId: 'q-capital-of-france',
+  siblingAnswerCandidateCount: 1,
+  status: 'completed-locally',
+  targetCount: 4,
+  vocabularyCandidateCount: 2,
+});
+const explicitChoiceReadinessContent = buildActivityContent({
+  description: 'Explicit quiz choices',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer explicit quiz choices.',
+  pairsText: '',
+  questionsText: 'Animal sound? | bark | bark, meow, chirp, moo',
+  sourceSummary: 'Explicit options',
+  subject: 'Science',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Explicit options',
+  visibility: 'draft',
+  vocabularyText: 'roar',
+});
+const explicitChoiceReadiness = buildQuestionChoiceReadinessSummary({
+  content: explicitChoiceReadinessContent,
+});
+assert.equal(explicitChoiceReadiness.explicitReadyCount, 1);
+assert.equal(explicitChoiceReadiness.readyCount, 1);
+assert.equal(explicitChoiceReadiness.items[0]?.status, 'explicit-ready');
+assert.equal(explicitChoiceReadiness.items[0]?.deterministicChoiceCount, 0);
+assert.equal(explicitChoiceReadiness.items[0]?.candidateChoiceCount, 1);
+const sparseChoiceReadinessContent = buildActivityContent({
+  description: 'Sparse quiz choices',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer sparse quiz choices.',
+  pairsText: '',
+  questionsText: 'Animal? | cat',
+  sourceSummary: 'Sparse options',
+  subject: 'Science',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Sparse options',
+  visibility: 'draft',
+  vocabularyText: '',
+});
+const sparseChoiceReadiness = buildQuestionChoiceReadinessSummary({
+  content: sparseChoiceReadinessContent,
+});
+assert.equal(sparseChoiceReadiness.readyCount, 0);
+assert.equal(sparseChoiceReadiness.needsCandidateCount, 1);
+assert.deepEqual(sparseChoiceReadiness.items[0], {
+  answerIncluded: true,
+  candidateChoiceCount: 0,
+  completedChoiceCount: 1,
+  deterministicChoiceCount: 0,
+  explicitAnswerIncluded: true,
+  explicitChoiceCount: 1,
+  missingChoiceCount: 3,
+  prompt: 'Animal?',
+  questionId: 'q-animal',
+  siblingAnswerCandidateCount: 0,
+  status: 'needs-candidates',
+  targetCount: 4,
+  vocabularyCandidateCount: 0,
+});
+const normalizedChoiceReadinessContent = buildActivityContent({
+  description: 'Normalized quiz choices',
+  difficulty: 'starter',
+  gradeBand: 'Grade 3',
+  groupsText: '',
+  language: 'en',
+  learningGoal: 'Students answer normalized quiz choices.',
+  pairsText: '',
+  questionsText: [
+    'Which pet? | cat | ｃａｔ, CAT, dog',
+    'Which pet barks? | dog',
+  ].join('\n'),
+  sourceSummary: 'Normalized options',
+  subject: 'Science',
+  teacherNotesText: '',
+  templateType: 'quiz',
+  title: 'Normalized options',
+  visibility: 'draft',
+  vocabularyText: ' Dog, ＣＡＴ, bird ',
+});
+const normalizedChoiceReadiness = buildQuestionChoiceReadinessSummary({
+  content: normalizedChoiceReadinessContent,
+});
+assert.deepEqual(
+  buildQuestionChoices({
+    content: normalizedChoiceReadinessContent,
+    question: normalizedChoiceReadinessContent.questions[0]!,
+  }),
+  ['cat', 'dog', 'bird']
+);
+assert.deepEqual(normalizedChoiceReadiness.items[0], {
+  answerIncluded: true,
+  candidateChoiceCount: 1,
+  completedChoiceCount: 3,
+  deterministicChoiceCount: 1,
+  explicitAnswerIncluded: true,
+  explicitChoiceCount: 2,
+  missingChoiceCount: 1,
+  prompt: 'Which pet?',
+  questionId: 'q-which-pet',
+  siblingAnswerCandidateCount: 0,
+  status: 'needs-candidates',
+  targetCount: 4,
+  vocabularyCandidateCount: 1,
+});
 const tabSeparatedQuestionContent = buildActivityContent({
   description: 'Spreadsheet-pasted question rows',
   difficulty: 'starter',
@@ -21217,7 +21368,10 @@ assert.deepEqual(
   ['groups']
 );
 assert.deepEqual(
-  buildActivityTemplateReadinessPanelSummary(questionOnlyRemixPlan),
+  buildActivityTemplateReadinessPanelSummary(
+    questionOnlyRemixPlan,
+    questionOnlyContent
+  ),
   {
     description:
       'The same structured content can become multiple Wordwall-style activity formats after saving.',
@@ -21234,6 +21388,35 @@ assert.deepEqual(
         template: 'matching-pairs',
       },
     ],
+    questionChoiceReadiness: {
+      description:
+        'Each quiz question should have 4 playable choices. Missing distractors can be completed from sibling answers and vocabulary before AI distractor generation is connected.',
+      emptyText: 'Add quiz questions to inspect choice readiness.',
+      itemViews: [
+        {
+          detail:
+            '2/4 choices are playable; add 2 more explicit choices or lesson vocabulary.',
+          key: 'q-capital-of-france',
+          promptLabel: '1. Capital of France?',
+          sourceLabel:
+            'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
+          status: 'needs-candidates',
+          statusLabel: 'Needs candidates',
+        },
+        {
+          detail:
+            '2/4 choices are playable; add 2 more explicit choices or lesson vocabulary.',
+          key: 'q-2-2',
+          promptLabel: '2. 2 + 2?',
+          sourceLabel:
+            'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
+          status: 'needs-candidates',
+          statusLabel: 'Needs candidates',
+        },
+      ],
+      summaryLabel: '0/2 questions ready',
+      title: 'Quiz choice readiness',
+    },
     readyCount: 4,
     readyCountLabel: '4 ready',
     readyOptions: [
@@ -21244,6 +21427,24 @@ assert.deepEqual(
     ],
     title: 'Template readiness',
   }
+);
+const questionOnlyEditorReadinessSummary =
+  buildActivityEditorReadinessPanelSummary(
+    questionOnlyRemixPlan,
+    questionOnlyContent
+  );
+assert.equal(
+  questionOnlyEditorReadinessSummary.lockedOptions.length,
+  ACTIVITY_EDITOR_READINESS_PANEL_LIMITS.lockedOptions
+);
+assert.equal(
+  questionOnlyEditorReadinessSummary.questionChoiceReadiness?.summaryLabel,
+  '0/2 questions ready'
+);
+assert.equal(
+  questionOnlyEditorReadinessSummary.questionChoiceReadiness?.itemViews[0]
+    ?.statusLabel,
+  'Needs candidates'
 );
 assert.deepEqual(buildActivityTemplateReadinessPanelSummary(null), {
   description:

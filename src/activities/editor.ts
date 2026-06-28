@@ -888,13 +888,18 @@ export function buildActivityEditorTemplateView({
     getTemplateByType(templateType);
   const templateReadiness = buildActivityEditorTemplateReadiness(input);
   const parsedCurrentInput = createActivityInputSchema.safeParse(input);
+  const currentContent = parsedCurrentInput.success
+    ? buildActivityEditorParsedContent(parsedCurrentInput.data)
+    : null;
   const scaffoldSummaryInput = parsedCurrentInput.success
     ? parsedCurrentInput.data
     : getActivityEditorDefaultInput();
 
   return {
-    readinessSummary:
-      buildActivityEditorReadinessPanelSummary(templateReadiness),
+    readinessSummary: buildActivityEditorReadinessPanelSummary(
+      templateReadiness,
+      currentContent
+    ),
     setupView: buildActivityEditorTemplateSetupView(
       templateType,
       scaffoldSummaryInput
@@ -905,9 +910,13 @@ export function buildActivityEditorTemplateView({
 }
 
 export function buildActivityEditorReadinessPanelSummary(
-  remixPlan: TemplateRemixPlan | null
+  remixPlan: TemplateRemixPlan | null,
+  content?: ActivityContent | null
 ): ActivityTemplateReadinessPanelSummary {
-  const summary = buildActivityTemplateReadinessPanelSummary(remixPlan);
+  const summary = buildActivityTemplateReadinessPanelSummary(
+    remixPlan,
+    content
+  );
 
   return {
     ...summary,
@@ -970,11 +979,21 @@ export function buildActivityEditorTemplateReadiness(
   if (!parsed.success) return null;
 
   try {
-    const content = parseActivityContent(parsed.data);
+    const content = buildActivityEditorParsedContent(parsed.data);
+    if (!content) return null;
+
     return getTemplateRemixPlan({
       content,
       currentTemplateType: parsed.data.templateType,
     });
+  } catch {
+    return null;
+  }
+}
+
+function buildActivityEditorParsedContent(input: CreateActivityInput) {
+  try {
+    return parseActivityContent(input);
   } catch {
     return null;
   }

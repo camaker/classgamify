@@ -3,6 +3,10 @@ import {
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
 import {
+  buildQuestionChoiceReadinessSummary,
+  type QuestionChoiceReadinessItem,
+} from '@/activities/distractors';
+import {
   formatActivityAiDraftFocusDescription,
   formatActivityAiDraftFocusLabel,
   type ActivityAiDraftFocus,
@@ -67,10 +71,29 @@ export type ActivityTemplateReadinessPanelSummary = {
   description: string;
   emptyText: string;
   lockedOptions: ActivityTemplateReadinessPanelLockedOption[];
+  questionChoiceReadiness?: ActivityTemplateQuizChoiceReadinessView;
   readyCount: number;
   readyCountLabel: string;
   readyOptions: ActivityTemplateReadinessPanelOption[];
   title: string;
+};
+
+export type ActivityTemplateQuizChoiceReadinessView = {
+  description: string;
+  emptyText: string;
+  itemViews: ActivityTemplateQuizChoiceReadinessItemView[];
+  summaryLabel: string;
+  title: string;
+};
+
+export type ActivityTemplateQuizChoiceReadinessItemView = {
+  detail: string;
+  issueLabel?: string;
+  key: string;
+  promptLabel: string;
+  sourceLabel: string;
+  status: QuestionChoiceReadinessItem['status'];
+  statusLabel: string;
 };
 
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
@@ -414,16 +437,21 @@ function normalizeActivityDraftSourceMaterialNoteViews(
 }
 
 export function buildActivityTemplateReadinessPanelSummary(
-  remixPlan: TemplateRemixPlan | null
+  remixPlan: TemplateRemixPlan | null,
+  content?: ActivityContent | null
 ): ActivityTemplateReadinessPanelSummary {
   const remixSummary = remixPlan ? buildTemplateRemixSummary(remixPlan) : null;
   const readyOptions = remixSummary?.readyTemplateOptions ?? [];
   const lockedOptions = remixSummary?.lockedTemplateOptions ?? [];
+  const questionChoiceReadiness = content
+    ? buildActivityTemplateQuizChoiceReadinessView(content)
+    : null;
 
   return {
     description: m.activity_template_readiness_panel_description(),
     emptyText: m.activity_template_readiness_panel_empty(),
     lockedOptions,
+    ...(questionChoiceReadiness ? { questionChoiceReadiness } : {}),
     readyCount: readyOptions.length,
     readyCountLabel: m.activity_template_readiness_panel_ready_label({
       count: readyOptions.length,
@@ -431,6 +459,101 @@ export function buildActivityTemplateReadinessPanelSummary(
     readyOptions,
     title: m.activity_template_readiness_panel_title(),
   };
+}
+
+function buildActivityTemplateQuizChoiceReadinessView(
+  content: ActivityContent
+): ActivityTemplateQuizChoiceReadinessView | null {
+  const summary = buildQuestionChoiceReadinessSummary({ content });
+
+  if (summary.itemCount === 0) return null;
+
+  return {
+    description: m.activity_template_readiness_panel_quiz_choices_description({
+      targetCount: summary.targetCount,
+    }),
+    emptyText: m.activity_template_readiness_panel_quiz_choices_empty(),
+    itemViews: summary.items.map((item, index) =>
+      buildActivityTemplateQuizChoiceReadinessItemView({ index, item })
+    ),
+    summaryLabel:
+      summary.itemCount === 1
+        ? m.activity_template_readiness_panel_quiz_choices_summary_one({
+            readyCount: summary.readyCount,
+            totalCount: summary.itemCount,
+          })
+        : m.activity_template_readiness_panel_quiz_choices_summary_many({
+            readyCount: summary.readyCount,
+            totalCount: summary.itemCount,
+          }),
+    title: m.activity_template_readiness_panel_quiz_choices_title(),
+  };
+}
+
+function buildActivityTemplateQuizChoiceReadinessItemView({
+  index,
+  item,
+}: {
+  index: number;
+  item: QuestionChoiceReadinessItem;
+}): ActivityTemplateQuizChoiceReadinessItemView {
+  const issueLabel = item.answerIncluded
+    ? null
+    : m.activity_template_readiness_panel_quiz_choices_answer_missing();
+
+  return {
+    detail: buildActivityTemplateQuizChoiceReadinessDetail(item),
+    key: item.questionId,
+    promptLabel: m.activity_template_readiness_panel_quiz_choices_prompt({
+      index: index + 1,
+      prompt: item.prompt,
+    }),
+    sourceLabel: m.activity_template_readiness_panel_quiz_choices_sources({
+      siblingCount: item.siblingAnswerCandidateCount,
+      vocabularyCount: item.vocabularyCandidateCount,
+    }),
+    status: item.status,
+    statusLabel: formatActivityTemplateQuizChoiceReadinessStatus(item.status),
+    ...(issueLabel ? { issueLabel } : {}),
+  };
+}
+
+function buildActivityTemplateQuizChoiceReadinessDetail(
+  item: QuestionChoiceReadinessItem
+) {
+  switch (item.status) {
+    case 'explicit-ready':
+      return m.activity_template_readiness_panel_quiz_choices_explicit_detail({
+        choiceCount: item.explicitChoiceCount,
+        targetCount: item.targetCount,
+      });
+    case 'completed-locally':
+      return m.activity_template_readiness_panel_quiz_choices_completed_detail({
+        completedCount: item.completedChoiceCount,
+        deterministicCount: item.deterministicChoiceCount,
+        explicitCount: item.explicitChoiceCount,
+        targetCount: item.targetCount,
+      });
+    case 'needs-candidates':
+      return m.activity_template_readiness_panel_quiz_choices_needs_detail({
+        completedCount: item.completedChoiceCount,
+        missingCount: item.missingChoiceCount,
+        targetCount: item.targetCount,
+      });
+  }
+}
+
+function formatActivityTemplateQuizChoiceReadinessStatus(
+  status: QuestionChoiceReadinessItem['status']
+) {
+  switch (status) {
+    case 'explicit-ready':
+      return m.activity_template_readiness_panel_quiz_choices_status_explicit();
+    case 'completed-locally':
+      return m.activity_template_readiness_panel_quiz_choices_status_completed();
+    case 'needs-candidates':
+      return m.activity_template_readiness_panel_quiz_choices_status_needs();
+  }
 }
 
 function buildDraftReviewChecklist({
