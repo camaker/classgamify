@@ -154,13 +154,42 @@ export function ActivityDraftMetaSummary({
           </div>
         </>
       ) : null}
-      <div className="mt-4 grid gap-1.5">
-        {summaryView.reviewChecklist.map((item) => (
-          <p key={item} className="text-xs leading-5 text-muted-foreground">
-            {item}
-          </p>
+      <div className="mt-4 grid gap-2">
+        {summaryView.reviewChecklistItems.map((itemView) => (
+          <ActivityDraftReviewChecklistItem
+            itemView={itemView}
+            key={`${itemView.id}-${itemView.label}`}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityDraftReviewChecklistItem({
+  itemView,
+}: {
+  itemView: ActivityDraftMetaSummaryView['reviewChecklistItems'][number];
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-md border bg-background p-2.5',
+        itemView.priority === 'high' && 'border-primary/25 bg-primary/5'
+      )}
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <p className="font-medium text-xs leading-5">{itemView.label}</p>
+        <Badge
+          variant={itemView.status === 'ready' ? 'secondary' : 'outline'}
+          className="w-fit rounded-md"
+        >
+          {itemView.statusLabel}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {itemView.description}
+      </p>
     </div>
   );
 }

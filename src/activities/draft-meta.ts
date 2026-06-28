@@ -45,10 +45,25 @@ export type ActivityDraftMeta = {
   readyTemplateOptions: ActivityDraftTemplateOption[];
   readyTemplates: string[];
   reviewChecklist: string[];
+  reviewChecklistItems: ActivityDraftReviewChecklistItem[];
   suggestedTemplateCount: number;
   suggestedTemplateOptions: ActivityDraftTemplateOption[];
   suggestedTemplates: string[];
   templateReadiness: ActivityDraftTemplateReadiness[];
+};
+
+export type ActivityDraftReviewChecklistItem = {
+  description: string;
+  id:
+    | 'adjust-level'
+    | 'content-gap'
+    | 'next-gap'
+    | 'question-review'
+    | 'ready-remix'
+    | 'review-answers';
+  label: string;
+  priority: 'high' | 'normal';
+  status: 'action-needed' | 'ready' | 'review';
 };
 
 export type ActivityDraftTemplateOption = TemplateRemixTemplateOption;
@@ -146,6 +161,7 @@ type ActivityDraftMetaSummaryView = {
   readyTemplateLabel: string;
   readyTemplatesTitle: string;
   reviewChecklist: string[];
+  reviewChecklistItems: ActivityDraftReviewChecklistItemView[];
   sourceMaterialCountLabel?: string;
   sourceMaterialDescription: string;
   sourceMaterialNoteViews: ActivityDraftMetaSummarySourceMaterialNoteView[];
@@ -155,6 +171,10 @@ type ActivityDraftMetaSummaryView = {
   suggestedTemplatesTitle: string;
   templateReadinessOptions: ActivityDraftMetaSummaryReadinessOption[];
   title: string;
+};
+
+type ActivityDraftReviewChecklistItemView = ActivityDraftReviewChecklistItem & {
+  statusLabel: string;
 };
 
 type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
@@ -191,6 +211,11 @@ export function buildActivityDraftMeta({
   const readyTemplates = remixSummary.readyTemplateOptions.map(
     (option) => option.shortName
   );
+  const reviewChecklistItems = buildDraftReviewChecklistItems({
+    content,
+    lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
+    suggestedTemplates,
+  });
 
   return {
     coverage: {
@@ -204,11 +229,8 @@ export function buildActivityDraftMeta({
     readyTemplateCount: remixPlan.readyOptions.length,
     readyTemplateOptions: remixSummary.readyTemplateOptions,
     readyTemplates,
-    reviewChecklist: buildDraftReviewChecklist({
-      content,
-      lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
-      suggestedTemplates,
-    }),
+    reviewChecklist: reviewChecklistItems.map((item) => item.label),
+    reviewChecklistItems,
     suggestedTemplateCount: suggestedTemplates.length,
     suggestedTemplateOptions: remixSummary.suggestedTemplateOptions,
     suggestedTemplates,
@@ -345,6 +367,10 @@ export function buildActivityDraftMetaSummaryView({
           }),
     readyTemplatesTitle: m.activity_draft_meta_ready_templates_title(),
     reviewChecklist: meta.reviewChecklist,
+    reviewChecklistItems: buildActivityDraftReviewChecklistItemViews({
+      checklist: meta.reviewChecklist,
+      items: meta.reviewChecklistItems,
+    }),
     sourceMaterialCountLabel:
       normalizedSourceMaterialNoteViews.length > 0
         ? buildActivityDraftSourceMaterialCountLabel(
@@ -543,6 +569,52 @@ function normalizeActivityDraftSourceMaterialNoteViews(
   return normalizedNoteViews;
 }
 
+function buildActivityDraftReviewChecklistItemViews({
+  checklist,
+  items,
+}: {
+  checklist: string[];
+  items?: ActivityDraftReviewChecklistItem[];
+}): ActivityDraftReviewChecklistItemView[] {
+  const sourceItems =
+    items && items.length > 0
+      ? items
+      : checklist.map((label, index) =>
+          buildLegacyActivityDraftReviewChecklistItem(label, index)
+        );
+
+  return sourceItems.map((item) => ({
+    ...item,
+    statusLabel: formatActivityDraftReviewChecklistStatus(item.status),
+  }));
+}
+
+function buildLegacyActivityDraftReviewChecklistItem(
+  label: string,
+  index: number
+): ActivityDraftReviewChecklistItem {
+  return {
+    description: m.activity_draft_meta_checklist_legacy_description(),
+    id: 'content-gap',
+    label,
+    priority: index === 0 ? 'high' : 'normal',
+    status: 'review',
+  };
+}
+
+function formatActivityDraftReviewChecklistStatus(
+  status: ActivityDraftReviewChecklistItem['status']
+) {
+  switch (status) {
+    case 'action-needed':
+      return m.activity_draft_meta_checklist_status_action_needed();
+    case 'ready':
+      return m.activity_draft_meta_checklist_status_ready();
+    case 'review':
+      return m.activity_draft_meta_checklist_status_review();
+  }
+}
+
 export function buildActivityTemplateReadinessPanelSummary(
   remixPlan: TemplateRemixPlan | null,
   content?: ActivityContent | null
@@ -663,7 +735,7 @@ function formatActivityTemplateQuizChoiceReadinessStatus(
   }
 }
 
-function buildDraftReviewChecklist({
+function buildDraftReviewChecklistItems({
   content,
   lockedTemplateDiagnostics,
   suggestedTemplates,
@@ -671,42 +743,76 @@ function buildDraftReviewChecklist({
   content: ActivityContent;
   lockedTemplateDiagnostics: string[];
   suggestedTemplates: string[];
-}) {
-  const checklist = [
-    m.activity_draft_meta_checklist_review_answers(),
-    m.activity_draft_meta_checklist_adjust_level(),
+}): ActivityDraftReviewChecklistItem[] {
+  const checklist: ActivityDraftReviewChecklistItem[] = [
+    {
+      description: m.activity_draft_meta_checklist_review_answers_description(),
+      id: 'review-answers',
+      label: m.activity_draft_meta_checklist_review_answers(),
+      priority: 'high',
+      status: 'review',
+    },
+    {
+      description: m.activity_draft_meta_checklist_adjust_level_description(),
+      id: 'adjust-level',
+      label: m.activity_draft_meta_checklist_adjust_level(),
+      priority: 'normal',
+      status: 'review',
+    },
     buildQuestionReviewChecklistItem(content),
   ];
 
   if (suggestedTemplates.length > 0) {
-    checklist.push(
-      m.activity_draft_meta_checklist_ready_to_remix({
+    checklist.push({
+      description: m.activity_draft_meta_checklist_ready_to_remix_description(),
+      id: 'ready-remix',
+      label: m.activity_draft_meta_checklist_ready_to_remix({
         templates: formatActivityDraftTemplateList(suggestedTemplates),
-      })
-    );
+      }),
+      priority: 'normal',
+      status: 'ready',
+    });
 
     if (lockedTemplateDiagnostics[0]) {
-      checklist.push(
-        m.activity_draft_meta_checklist_next_gap({
+      checklist.push({
+        description: m.activity_draft_meta_checklist_next_gap_description(),
+        id: 'next-gap',
+        label: m.activity_draft_meta_checklist_next_gap({
           diagnosis: lockedTemplateDiagnostics[0],
-        })
-      );
+        }),
+        priority: 'normal',
+        status: 'action-needed',
+      });
     }
 
     return checklist;
   }
 
-  checklist.push(
-    lockedTemplateDiagnostics[0] ??
-      m.activity_draft_meta_checklist_add_more_structure()
-  );
+  checklist.push({
+    description:
+      m.activity_draft_meta_checklist_add_more_structure_description(),
+    id: 'content-gap',
+    label:
+      lockedTemplateDiagnostics[0] ??
+      m.activity_draft_meta_checklist_add_more_structure(),
+    priority: 'high',
+    status: 'action-needed',
+  });
 
   return checklist;
 }
 
-function buildQuestionReviewChecklistItem(content: ActivityContent) {
+function buildQuestionReviewChecklistItem(
+  content: ActivityContent
+): ActivityDraftReviewChecklistItem {
   if (content.questions.length === 0) {
-    return m.activity_draft_meta_checklist_add_questions();
+    return {
+      description: m.activity_draft_meta_checklist_add_questions_description(),
+      id: 'question-review',
+      label: m.activity_draft_meta_checklist_add_questions(),
+      priority: 'high',
+      status: 'action-needed',
+    };
   }
 
   const questionChoiceReadiness = buildQuestionChoiceReadinessSummary({
@@ -714,20 +820,44 @@ function buildQuestionReviewChecklistItem(content: ActivityContent) {
   });
 
   if (questionChoiceReadiness.needsCandidateCount > 0) {
-    return questionChoiceReadiness.needsCandidateCount === 1
-      ? m.activity_draft_meta_checklist_add_quiz_choices_one({
-          count: questionChoiceReadiness.needsCandidateCount,
-        })
-      : m.activity_draft_meta_checklist_add_quiz_choices_many({
-          count: questionChoiceReadiness.needsCandidateCount,
-        });
+    const label =
+      questionChoiceReadiness.needsCandidateCount === 1
+        ? m.activity_draft_meta_checklist_add_quiz_choices_one({
+            count: questionChoiceReadiness.needsCandidateCount,
+          })
+        : m.activity_draft_meta_checklist_add_quiz_choices_many({
+            count: questionChoiceReadiness.needsCandidateCount,
+          });
+
+    return {
+      description:
+        m.activity_draft_meta_checklist_add_quiz_choices_description(),
+      id: 'question-review',
+      label,
+      priority: 'high',
+      status: 'action-needed',
+    };
   }
 
   if (content.questions.some((question) => !question.explanation)) {
-    return m.activity_draft_meta_checklist_add_explanations();
+    return {
+      description:
+        m.activity_draft_meta_checklist_add_explanations_description(),
+      id: 'question-review',
+      label: m.activity_draft_meta_checklist_add_explanations(),
+      priority: 'normal',
+      status: 'action-needed',
+    };
   }
 
-  return m.activity_draft_meta_checklist_check_explanations();
+  return {
+    description:
+      m.activity_draft_meta_checklist_check_explanations_description(),
+    id: 'question-review',
+    label: m.activity_draft_meta_checklist_check_explanations(),
+    priority: 'normal',
+    status: 'review',
+  };
 }
 
 function formatActivityDraftTemplateList(templates: string[]) {

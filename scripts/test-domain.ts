@@ -2749,6 +2749,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /summaryView\.reviewChecklistItems\.map[\s\S]*ActivityDraftReviewChecklistItem[\s\S]*itemView\.label[\s\S]*itemView\.statusLabel[\s\S]*itemView\.description/,
+  'AI draft summary component should render structured review checklist items with labels, status, and descriptions.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /ActivityDraftCoverageStat[\s\S]*stat=\{stat\}/,
   'AI draft summary component should pass prepared coverage stat views into the coverage stat component.'
 );
@@ -2844,6 +2849,11 @@ assert.match(
   activityDraftMetaSource,
   /buildQuestionReviewChecklistItem[\s\S]*buildQuestionChoiceReadinessSummary[\s\S]*activity_draft_meta_checklist_add_quiz_choices/,
   'AI draft review checklist should use quiz choice readiness when suggesting next teacher edits.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /reviewChecklist: reviewChecklistItems\.map\(\(item\) => item\.label\)[\s\S]*reviewChecklistItems/,
+  'AI draft meta should derive legacy checklist labels from structured review checklist items.'
 );
 assert.doesNotMatch(
   activityDraftMetaSource,
@@ -23863,6 +23873,29 @@ assert.equal(
   fallbackDraftMetaSummary.reviewChecklist,
   fallbackDraftMeta.reviewChecklist
 );
+assert.deepEqual(
+  fallbackDraftMeta.reviewChecklist,
+  fallbackDraftMeta.reviewChecklistItems.map((item) => item.label)
+);
+assert.deepEqual(fallbackDraftMetaSummary.reviewChecklistItems[0], {
+  description:
+    'AI drafts stay teacher-reviewable; answer keys should be checked before any assignment link exists.',
+  id: 'review-answers',
+  label: 'Review every answer before saving.',
+  priority: 'high',
+  status: 'review',
+  statusLabel: 'Review',
+});
+assert.ok(
+  fallbackDraftMetaSummary.reviewChecklistItems.some(
+    (item) =>
+      item.id === 'ready-remix' &&
+      item.status === 'ready' &&
+      item.statusLabel === 'Ready' &&
+      item.description ===
+        'These modes can reuse the same structured content after the activity is saved.'
+  )
+);
 assert.equal(
   fallbackDraftMetaSummary.sourceMaterialTitle,
   'Source material provenance'
@@ -23939,6 +23972,21 @@ assert.ok(
   questionOnlyDraftMetaSummary.reviewChecklist.includes(
     'Add distractor choices or vocabulary for 1 quiz question before publishing.'
   )
+);
+assert.deepEqual(
+  questionOnlyDraftMetaSummary.reviewChecklistItems.find(
+    (item) => item.id === 'question-review'
+  ),
+  {
+    description:
+      'Teacher-approved choices keep quiz play fair and prevent weak generated distractors.',
+    id: 'question-review',
+    label:
+      'Add distractor choices or vocabulary for 1 quiz question before publishing.',
+    priority: 'high',
+    status: 'action-needed',
+    statusLabel: 'Action needed',
+  }
 );
 assert.equal(
   questionOnlyDraftMetaSummary.draftFocusLineText,
@@ -24098,6 +24146,14 @@ try {
       /保存后可改编为：.+、.+。/.test(item)
     )
   );
+  assert.deepEqual(zhFallbackDraftMetaSummary.reviewChecklistItems[0], {
+    description: 'AI 草稿必须由老师检查；生成作业链接前请先确认答案键。',
+    id: 'review-answers',
+    label: '保存前请检查每个答案。',
+    priority: 'high',
+    status: 'review',
+    statusLabel: '待检查',
+  });
   const zhSparseDraftMetaSummary = buildActivityDraftMetaSummaryView({
     meta: buildActivityDraftMeta({
       activity: {
@@ -24117,6 +24173,12 @@ try {
     zhSparseDraftMetaSummary.reviewChecklist.includes(
       '发布前请为 1 道测验题补充干扰选项或词汇。'
     )
+  );
+  assert.equal(
+    zhSparseDraftMetaSummary.reviewChecklistItems.find(
+      (item) => item.id === 'question-review'
+    )?.statusLabel,
+    '需要处理'
   );
 } finally {
   overwriteGetLocale(() => 'en');
