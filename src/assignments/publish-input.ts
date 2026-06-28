@@ -1,4 +1,8 @@
-import type { AssignmentSettings } from '@/activities/types';
+import { buildActivityLifecycleActionView } from '@/activities/lifecycle';
+import type {
+  ActivityVisibility,
+  AssignmentSettings,
+} from '@/activities/types';
 import {
   type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
@@ -112,6 +116,31 @@ type AssignmentPublishDraftResult =
   | {
       message: string;
       ok: false;
+    };
+
+export type AssignmentPublishExecutionPlan =
+  | {
+      failureMessage: string;
+      message: string;
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      input: {
+        activityId: string;
+        expiresAt?: string;
+        settings: {
+          collectStudentName: boolean;
+          instructions?: string;
+          maxAttempts?: number | null;
+          showCorrectAnswers: boolean;
+          shuffleItems: boolean;
+          timeLimitSeconds?: number;
+        };
+        title: string;
+      };
+      successMessage: string;
+      type: 'publish';
     };
 
 type AssignmentPublishDraftValidation =
@@ -482,6 +511,44 @@ export function buildAssignmentPublishInputFromDraft({
       title: trimmedTitle,
     },
     ok: true,
+  };
+}
+
+export function buildActivityPublishExecutionPlan({
+  draft,
+  visibility,
+}: {
+  draft: AssignmentPublishDraft;
+  visibility: ActivityVisibility;
+}): AssignmentPublishExecutionPlan {
+  const actionView = buildActivityLifecycleActionView({
+    action: 'publish',
+    visibility,
+  });
+
+  if (actionView.gate.type === 'blocked') {
+    return {
+      failureMessage: actionView.failureMessage,
+      message: actionView.gate.message,
+      type: 'blocked',
+    };
+  }
+
+  const draftResult = buildAssignmentPublishInputFromDraft(draft);
+
+  if (!draftResult.ok) {
+    return {
+      failureMessage: actionView.failureMessage,
+      message: draftResult.message,
+      type: 'blocked',
+    };
+  }
+
+  return {
+    failureMessage: actionView.failureMessage,
+    input: draftResult.input,
+    successMessage: actionView.successMessage,
+    type: 'publish',
   };
 }
 

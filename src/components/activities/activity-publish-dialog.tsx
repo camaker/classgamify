@@ -1,10 +1,9 @@
 import type { ActivityVisibility } from '@/activities/types';
-import { buildActivityLifecycleActionView } from '@/activities/lifecycle';
 import {
   assignmentPublishDialogCopy,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogViewModel,
-  buildAssignmentPublishInputFromDraft,
+  buildActivityPublishExecutionPlan,
   type AssignmentPublishDraftValues,
 } from '@/assignments/publish-input';
 import { ActivityPublishSettingsForm } from '@/components/activities/activity-publish-settings-form';
@@ -76,28 +75,22 @@ export function ActivityPublishDialog({
   }
 
   async function publishActivity() {
-    const actionView = buildActivityLifecycleActionView({
-      action: 'publish',
+    const executionPlan = buildActivityPublishExecutionPlan({
+      draft: publishView.draft,
       visibility: activity.visibility,
     });
-    if (actionView.gate.type === 'blocked') {
-      toast.error(actionView.gate.message);
-      return;
-    }
-
-    const draftResult = buildAssignmentPublishInputFromDraft(publishView.draft);
-    if (!draftResult.ok) {
-      toast.error(draftResult.message);
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
 
     try {
-      const result = await publishMutation.mutateAsync(draftResult.input);
-      toast.success(actionView.successMessage);
+      const result = await publishMutation.mutateAsync(executionPlan.input);
+      toast.success(executionPlan.successMessage);
       onOpenChange(false);
       onPublished?.(result);
     } catch {
-      toast.error(actionView.failureMessage);
+      toast.error(executionPlan.failureMessage);
     }
   }
 

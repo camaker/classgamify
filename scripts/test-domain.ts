@@ -662,6 +662,7 @@ import {
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishDialogViewModel,
+  buildActivityPublishExecutionPlan,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   buildAssignmentPublishToggleViews,
@@ -2831,8 +2832,23 @@ assert.doesNotMatch(
 );
 assert.match(
   activityPublishDialogSource,
-  /toast\.error\(actionView\.failureMessage\)/,
-  'Assignment publish failures should use localized publish failure copy.'
+  /toast\.error\(executionPlan\.failureMessage\)/,
+  'Assignment publish failures should use localized publish failure copy from the execution plan.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /buildActivityPublishExecutionPlan\(\{[\s\S]*draft: publishView\.draft,[\s\S]*visibility: activity\.visibility/,
+  'Assignment publish dialog should build publish mutation input through the assignment-domain execution plan.'
+);
+assert.match(
+  activityPublishDialogSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*publishMutation\.mutateAsync\(executionPlan\.input\)/,
+  'Assignment publish dialog should execute prepared blocked and publish plans.'
+);
+assert.doesNotMatch(
+  activityPublishDialogSource,
+  /buildActivityLifecycleActionView|buildAssignmentPublishInputFromDraft|actionView\.gate|draftResult/,
+  'Assignment publish dialog should not rebuild activity publish gates or draft input locally.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -8906,6 +8922,11 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
+  /buildActivityPublishExecutionPlan[\s\S]*buildActivityLifecycleActionView\(\{[\s\S]*action: 'publish'[\s\S]*buildAssignmentPublishInputFromDraft\(draft\)/,
+  'Assignment publish execution plans should combine activity lifecycle gates with publish draft input validation in the assignment domain.'
+);
+assert.match(
+  assignmentPublishInputSource,
   /function buildAssignmentPublishSettingsFromDraft[\s\S]*resolveAssignmentSettings\(\{[\s\S]*instructions: normalizePublishDraftText\(instructions\) \|\| undefined,[\s\S]*maxAttempts: attempts,[\s\S]*timeLimitSeconds: timeLimitMinutesValue/,
   'Assignment publish draft settings helper should own normalized instructions, attempt, and timer conversion.'
 );
@@ -9720,6 +9741,83 @@ assert.deepEqual(
   {
     message: 'Close time must be in the future.',
     ok: false,
+  }
+);
+assert.deepEqual(
+  buildActivityPublishExecutionPlan({
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '2',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '',
+      title: 'Week 1 review',
+    },
+    visibility: 'draft',
+  }),
+  {
+    failureMessage: 'Assignment could not be published.',
+    input: {
+      activityId: 'activity-1',
+      expiresAt: undefined,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+      title: 'Week 1 review',
+    },
+    successMessage: 'Assignment link published.',
+    type: 'publish',
+  }
+);
+assert.deepEqual(
+  buildActivityPublishExecutionPlan({
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '2',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '',
+      title: '  ',
+    },
+    visibility: 'draft',
+  }),
+  {
+    failureMessage: 'Assignment could not be published.',
+    message: 'Add an assignment title before publishing.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityPublishExecutionPlan({
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '2',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '',
+      title: 'Week 1 review',
+    },
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Assignment could not be published.',
+    message:
+      'Restore this activity before publishing, duplicating, or remixing it.',
+    type: 'blocked',
   }
 );
 const publishedAssignments = [
