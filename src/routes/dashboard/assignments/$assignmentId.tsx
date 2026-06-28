@@ -77,7 +77,7 @@ function AssignmentResultsPage() {
   ) {
     const executionPlan = buildAssignmentResultActionExecutionPlan({
       actionButton,
-      data,
+      data: pageView.actionData,
     });
 
     if (executionPlan.type === 'blocked') {

@@ -262,6 +262,7 @@ type AssignmentResultsPageViewModel<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > = {
   actionButtons: AssignmentResultActionButton[];
+  actionData: AssignmentResultsPageData<TAttempt> | null;
   actionState: AssignmentResultActionState;
   attemptReviewCardViews: ReturnType<
     typeof buildAssignmentAttemptReviewCardViews
@@ -1328,6 +1329,7 @@ export function buildAssignmentResultsPageViewModel<
 
   return {
     actionButtons: buildAssignmentResultActionButtons(actionState),
+    actionData: data ?? null,
     actionState,
     attemptReviewCardViews,
     attemptRowViews,

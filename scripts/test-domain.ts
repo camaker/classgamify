@@ -1375,8 +1375,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data,[\s\S]*\}\)/,
-  'Result route should let the assignment-domain execution plan build copy and CSV download artifacts from page data.'
+  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data: pageView\.actionData,[\s\S]*\}\)/,
+  'Result route should let the assignment-domain execution plan build copy and CSV download artifacts from prepared page action data.'
 );
 assert.doesNotMatch(
   assignmentResultsRouteSource,
@@ -1385,8 +1385,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentResultsRouteSource,
-  /classroomBriefText|items: data\.analysis\.perItem|students: data\.analysis\.students|assignmentTitle: data\.assignment\.title|exportData: data/,
-  'Result route should not hand-wire individual result artifact inputs.'
+  /classroomBriefText|items: data\.analysis\.perItem|students: data\.analysis\.students|assignmentTitle: data\.assignment\.title|exportData: data|data,\s*\n\s*\}\)/,
+  'Result route should not hand-wire individual result artifact inputs or pass raw query data into action plans.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -23430,12 +23430,22 @@ assert.equal(
   }).pageView.loadErrorMessage,
   'Assignment results could not be loaded. Refresh the page or return to assignments.'
 );
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: null,
+    isError: true,
+    isLoading: false,
+    search: {},
+  }).pageView.actionData,
+  null
+);
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
       button.action,
       button.disabled,
     ]),
+    actionDataAssignmentId: scoredResultsPageView.actionData?.assignment.id,
     attemptReviewCardViews: scoredResultsPageView.attemptReviewCardViews.map(
       (card) => [card.id, card.studentLabel, card.answerViews.length]
     ),
@@ -23516,6 +23526,7 @@ assert.deepEqual(
       ['copy-follow-up', false],
       ['export-csv', false],
     ],
+    actionDataAssignmentId: 'assignment-results-page',
     attemptReviewCardViews: [],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
