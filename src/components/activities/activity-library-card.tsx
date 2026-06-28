@@ -5,6 +5,7 @@ import {
   type buildActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
+import { ActivitySourceMaterialsSummary } from '@/components/activities/activity-source-materials-summary';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -28,10 +29,8 @@ import {
   IconEdit,
   IconFolderOff,
   IconLayoutGrid,
-  IconPaperclip,
   IconPlus,
   IconRotateClockwise,
-  IconSparkles,
   IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -152,49 +151,10 @@ export function ActivityLibraryCard({
             />
           ))}
         </div>
-        {cardDisplayView.sourceMaterials.hasMaterials ? (
-          <div className="rounded-lg border bg-muted/30 p-3">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <IconPaperclip className="size-4 text-primary" />
-              {cardDisplayView.sourceMaterials.title}
-            </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              <Badge variant="secondary" className="rounded-md">
-                {cardDisplayView.sourceMaterials.countLabel}
-              </Badge>
-              {cardDisplayView.sourceMaterials.kindBadges.map((badge) => (
-                <Badge
-                  key={badge.kind}
-                  variant="outline"
-                  className="rounded-md"
-                >
-                  {badge.summaryText}
-                </Badge>
-              ))}
-            </div>
-            {cardDisplayView.sourceMaterials.extractionActions.length ? (
-              <div className="mt-3 border-t pt-3">
-                <p className="text-xs font-medium text-muted-foreground">
-                  {cardDisplayView.sourceMaterials.extractionTitle}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {cardDisplayView.sourceMaterials.extractionActions.map(
-                    (action) => (
-                      <Badge
-                        key={action.id}
-                        variant="outline"
-                        className="rounded-md bg-background"
-                      >
-                        <IconSparkles className="size-3" />
-                        {action.summaryText}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+        <ActivitySourceMaterialsSummary
+          className="bg-muted/30"
+          summary={cardDisplayView.sourceMaterials}
+        />
         <div className="rounded-lg border bg-muted/30 p-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <IconLayoutGrid className="size-4 text-primary" />

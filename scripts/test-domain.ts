@@ -13736,13 +13736,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /cardDisplayView\.sourceMaterials\.kindBadges[\s\S]*badge\.summaryText[\s\S]*cardDisplayView\.sourceMaterials\.extractionActions[\s\S]*action\.summaryText/,
-  'Activity library card component should render prepared source-material badge and extraction summary text.'
+  /ActivitySourceMaterialsSummary[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
+  'Activity library card component should render source-material summary through the shared summary component.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
-  /\{(?:badge|action)\.label\}/,
-  'Activity library card component should not drop source-material counts by rendering raw source-material labels.'
+  /sourceMaterials\.(?:kindBadges|extractionActions|countLabel|extractionTitle|title)/,
+  'Activity library card component should not hand-compose source-material summary details.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
