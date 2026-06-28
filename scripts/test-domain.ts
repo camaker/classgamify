@@ -380,6 +380,7 @@ import {
   buildStudentRunnerView,
   findChoiceOwner,
   formatSequentialRunnerItemLabel,
+  getStudentRunnerItemPosition,
   getInitialSequentialStudentRunnerActiveItemId,
   getSequentialRunnerItemIdByOffset,
   getStudentRunnerReviewStatusClassName,
@@ -5776,6 +5777,26 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /export function getStudentRunnerItemPosition[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1,[\s\S]*min: 1/,
+  'Student runner item positions should normalize zero-based indexes through one helper.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /student_runner_item_position_label\(\{[\s\S]*index: getStudentRunnerItemPosition\(index\)/,
+  'Student runner item position labels should use the shared item-position helper.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /formatSequentialRunnerItemLabel[\s\S]*index: getStudentRunnerItemPosition\(index\)/,
+  'Sequential runner labels should use the shared item-position helper.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /buildFillBlankWorksheetView[\s\S]*sequenceLabel: String\(getStudentRunnerItemPosition\(index\)\)/,
+  'Fill-blank worksheet sequence labels should use the shared item-position helper.'
+);
+assert.match(
+  studentRunnerViewSource,
   /m\.activity_runner_word_bank_separator\(\)/,
   'Fill-blank word-bank text should use the localized activity runner separator.'
 );
@@ -5798,6 +5819,15 @@ assert.doesNotMatch(
   studentRunnerViewSource,
   /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,
   'Student runner view should not hand-compose item position, word-bank, or accepted-answer separators.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource.slice(
+    studentRunnerViewSource.indexOf(
+      'function buildSequentialStudentRunnerSelectAction'
+    )
+  ),
+  /student_runner_item_position_label\([\s\S]*normalizeRuntimeDisplayCount\(index \+ 1|formatSequentialRunnerItemLabel[\s\S]*normalizeRuntimeDisplayCount\(index \+ 1|sequenceLabel: String\([\s\S]*normalizeRuntimeDisplayCount\(index \+ 1/,
+  'Student runner view should not hand-compose item positions in each runner mode.'
 );
 assert.doesNotMatch(
   studentRunnerViewSource,
@@ -7244,6 +7274,10 @@ assert.deepEqual(
     ],
   }
 );
+assert.equal(getStudentRunnerItemPosition(0), 1);
+assert.equal(getStudentRunnerItemPosition(2.9), 3);
+assert.equal(getStudentRunnerItemPosition(-4), 1);
+assert.equal(getStudentRunnerItemPosition(Number.NaN), 1);
 assert.equal(formatSequentialRunnerItemLabel(' ', -4), 'Item 1');
 overwriteGetLocale(() => 'zh');
 try {

@@ -302,7 +302,7 @@ export function buildStudentRunnerView({
       item,
       kindLabel: formatRuntimeItemKindLabel(item),
       positionLabel: m.student_runner_item_position_label({
-        index: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
+        index: getStudentRunnerItemPosition(index),
         prompt,
       }),
       prompt,
@@ -517,9 +517,13 @@ export function formatSequentialRunnerItemLabel(label: string, index: number) {
     normalizeRuntimeDisplayText(label) ||
     m.student_runner_sequential_default_item_label();
   return m.student_runner_sequential_item_label({
-    index: normalizeRuntimeDisplayCount(index + 1, { min: 1 }),
+    index: getStudentRunnerItemPosition(index),
     label: normalizedLabel,
   });
+}
+
+export function getStudentRunnerItemPosition(index: number) {
+  return normalizeRuntimeDisplayCount(index + 1, { min: 1 });
 }
 
 function buildSequentialStudentRunnerSelectAction(
@@ -926,9 +930,7 @@ export function buildFillBlankWorksheetView({
         reviewStatusClassName: revealAnswer
           ? getStudentRunnerReviewStatusClassName(itemView.status)
           : undefined,
-        sequenceLabel: String(
-          normalizeRuntimeDisplayCount(index + 1, { min: 1 })
-        ),
+        sequenceLabel: String(getStudentRunnerItemPosition(index)),
         wordBankLineText: wordBankText
           ? m.activity_runner_word_bank_line({
               label: wordBankLabel,
