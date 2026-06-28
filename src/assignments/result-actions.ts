@@ -52,6 +52,7 @@ export type AssignmentResultActionButton =
   | {
       action: AssignmentResultCopyAction;
       disabled: boolean;
+      disabledReason?: string;
       failureMessage: string;
       gate: AssignmentResultActionGate;
       kind: 'copy-text';
@@ -61,6 +62,7 @@ export type AssignmentResultActionButton =
   | {
       action: 'export-csv';
       disabled: boolean;
+      disabledReason?: string;
       failureMessage: string;
       gate: AssignmentResultActionGate;
       kind: 'download-csv';
@@ -101,6 +103,7 @@ export type AssignmentResultActionExecutionPlan =
 
 type AssignmentResultActionButtonBase = {
   disabled: boolean;
+  disabledReason?: string;
   failureMessage: string;
   gate: AssignmentResultActionGate;
   label: string;
@@ -183,8 +186,10 @@ export function buildAssignmentResultActionButtons({
       studentCount,
     });
     const actionCopy = getAssignmentResultActionCopy(descriptor.action);
+    const disabledReason = getAssignmentResultActionDisabledReason(gate);
     const base = {
-      disabled: gate.type === 'blocked',
+      disabled: Boolean(disabledReason),
+      ...(disabledReason ? { disabledReason } : {}),
       failureMessage: actionCopy.failureMessage,
       gate,
       label: actionCopy.label,
@@ -221,6 +226,12 @@ export function getAssignmentResultActionGateFromState({
     itemCount: state.itemCount,
     studentCount: state.studentCount,
   });
+}
+
+export function getAssignmentResultActionDisabledReason(
+  gate: AssignmentResultActionGate
+) {
+  return gate.type === 'blocked' ? gate.message : undefined;
 }
 
 export function buildAssignmentResultCopyText({

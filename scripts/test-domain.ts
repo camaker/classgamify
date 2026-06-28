@@ -559,6 +559,7 @@ import {
   getAssignmentAnswerReviewStatus,
   getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
+  getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
@@ -1418,6 +1419,16 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultActionExecutionPlan[\s\S]*buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
   'Assignment result actions should own CSV download execution plans.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /getAssignmentResultActionDisabledReason\(gate\)/,
+  'Assignment result action buttons should derive disabled explanations inside the assignment-domain action model.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /disabledReason \? \{ disabledReason \} : \{\}/,
+  'Assignment result action buttons should expose prepared disabled reasons only when an action is blocked.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
@@ -3266,6 +3277,21 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*actionButton\.label/,
   'Assignment result action buttons should render prepared result action state through focused button components.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*actionButton\.disabledReason[\s\S]*disabledReason\.message[\s\S]*getResultActionDisabledReasonId/,
+  'Assignment result action controls should render prepared disabled reasons for blocked teacher result actions.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /aria-describedby=\{disabledReasonId\}[\s\S]*id=\{getResultActionDisabledReasonId/,
+  'Assignment result action disabled buttons should be associated with their prepared disabled reason text.'
+);
+assert.doesNotMatch(
+  assignmentResultsHeaderActionsSource,
+  /gate\.message/,
+  'Assignment result action controls should not read raw gate messages directly; disabled copy should come from prepared action-button fields.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderCardSource,
@@ -26359,6 +26385,7 @@ assert.deepEqual(
     {
       action: 'copy-brief',
       disabled: true,
+      disabledReason: 'Submit at least one attempt before copying a brief.',
       failureMessage: 'Classroom brief could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying a brief.',
@@ -26371,6 +26398,8 @@ assert.deepEqual(
     {
       action: 'copy-reteach-plan',
       disabled: true,
+      disabledReason:
+        'Submit at least one attempt before copying a reteach plan.',
       failureMessage: 'Reteach plan could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying a reteach plan.',
@@ -26383,6 +26412,7 @@ assert.deepEqual(
     {
       action: 'copy-item-review',
       disabled: true,
+      disabledReason: 'Add assignment items before copying item review.',
       failureMessage: 'Item review could not be copied.',
       gate: {
         message: 'Add assignment items before copying item review.',
@@ -26395,6 +26425,7 @@ assert.deepEqual(
     {
       action: 'copy-follow-up',
       disabled: true,
+      disabledReason: 'Submit at least one attempt before copying follow-up.',
       failureMessage: 'Student follow-up could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying follow-up.',
@@ -26407,6 +26438,7 @@ assert.deepEqual(
     {
       action: 'export-csv',
       disabled: true,
+      disabledReason: 'Submit at least one attempt before exporting results.',
       failureMessage: 'Results CSV could not be downloaded.',
       gate: {
         message: 'Submit at least one attempt before exporting results.',
@@ -26483,6 +26515,24 @@ assert.deepEqual(
     message: 'Submit at least one attempt before copying a brief.',
     type: 'blocked',
   }
+);
+assert.equal(
+  getAssignmentResultActionDisabledReason(
+    getAssignmentResultActionGateFromState({
+      action: 'copy-brief',
+      state: emptyAssignmentResultActionState,
+    })
+  ),
+  'Submit at least one attempt before copying a brief.'
+);
+assert.equal(
+  getAssignmentResultActionDisabledReason(
+    getAssignmentResultActionGateFromState({
+      action: 'export-csv',
+      state: readyAssignmentResultActionState,
+    })
+  ),
+  undefined
 );
 assert.deepEqual(
   getAssignmentResultActionGateFromState({

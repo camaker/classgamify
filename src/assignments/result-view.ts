@@ -127,6 +127,7 @@ export {
   buildAssignmentResultActionState,
   buildAssignmentResultClassroomBriefStats,
   buildAssignmentResultCopyText,
+  getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,

@@ -39,7 +39,7 @@ export function AssignmentResultsHeaderActions({
   shareAction,
 }: AssignmentResultsHeaderActionsProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <AssignmentResultsHeaderSharePreviewLink shareAction={shareAction} />
       <AssignmentResultsHeaderSharePath shareAction={shareAction} />
       <AssignmentResultsHeaderCopyShareAction shareAction={shareAction} />
@@ -155,20 +155,30 @@ function AssignmentResultsHeaderResultActions({
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   resultActions: AssignmentResultActionButton[];
 }) {
-  return resultActions.map((actionButton) => (
-    <AssignmentResultsHeaderResultActionButton
-      actionButton={actionButton}
-      key={actionButton.action}
-      onClick={() => onResultAction(actionButton)}
-    />
-  ));
+  return (
+    <div className="flex basis-full flex-col gap-2 sm:flex-row sm:flex-wrap">
+      {resultActions.map((actionButton) => (
+        <AssignmentResultsHeaderResultActionButton
+          actionButton={actionButton}
+          key={actionButton.action}
+          disabledReasonId={getResultActionDisabledReasonId(actionButton)}
+          onClick={() => onResultAction(actionButton)}
+        />
+      ))}
+      <AssignmentResultsHeaderResultActionDisabledReasons
+        resultActions={resultActions}
+      />
+    </div>
+  );
 }
 
 function AssignmentResultsHeaderResultActionButton({
   actionButton,
+  disabledReasonId,
   onClick,
 }: {
   actionButton: AssignmentResultActionButton;
+  disabledReasonId: string | undefined;
   onClick: () => void;
 }) {
   const Icon = resultActionIconByAction[actionButton.action];
@@ -180,11 +190,56 @@ function AssignmentResultsHeaderResultActionButton({
       className="w-full sm:w-auto"
       disabled={actionButton.disabled}
       onClick={onClick}
+      aria-describedby={disabledReasonId}
     >
       <Icon className="size-4" />
       {actionButton.label}
     </Button>
   );
+}
+
+function AssignmentResultsHeaderResultActionDisabledReasons({
+  resultActions,
+}: {
+  resultActions: AssignmentResultActionButton[];
+}) {
+  const disabledReasons = resultActions.flatMap((actionButton) =>
+    actionButton.disabledReason
+      ? [
+          {
+            action: actionButton.action,
+            message: actionButton.disabledReason,
+          },
+        ]
+      : []
+  );
+
+  if (disabledReasons.length === 0) return null;
+
+  return (
+    <div className="grid basis-full gap-1 text-sm text-muted-foreground">
+      {disabledReasons.map((disabledReason) => (
+        <p
+          id={getResultActionDisabledReasonId({
+            action: disabledReason.action,
+            disabledReason: disabledReason.message,
+          })}
+          key={disabledReason.action}
+        >
+          {disabledReason.message}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function getResultActionDisabledReasonId({
+  action,
+  disabledReason,
+}: Pick<AssignmentResultActionButton, 'action' | 'disabledReason'>) {
+  return disabledReason
+    ? `assignment-result-action-${action}-disabled-reason`
+    : undefined;
 }
 
 const resultActionIconByAction: Record<
