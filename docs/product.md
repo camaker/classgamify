@@ -342,9 +342,10 @@ can review generated content with the right level of trust. This helps teachers
 judge whether a draft is ready for Wordwall-style remixes before they publish
 anything.
 When teachers attach source materials to an activity draft, AI draft source
-notes may include only safe material provenance such as material kind and
-original filename. The AI draft flow must not read file bytes, storage keys, or
-permission metadata until a dedicated extraction pipeline is designed.
+notes may include only safe material provenance such as material kind and safe
+filename basenames. The AI draft flow must not read file bytes, storage keys,
+URLs, path segments, query tokens, or permission metadata until a dedicated
+extraction pipeline is designed.
 
 Current flow:
 

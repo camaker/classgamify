@@ -36,7 +36,8 @@ export function buildActivityMaterialReferenceFromUserFile(
   );
   const originalName = normalizeReferenceText(
     file.originalName ?? file.filename,
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
+    { filename: true }
   );
 
   if (!fileId || !originalName) return null;
@@ -80,7 +81,8 @@ function normalizeActivityMaterialReference(
   );
   const originalName = normalizeReferenceText(
     value.originalName,
-    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
+    { filename: true }
   );
 
   if (!fileId || !originalName) return null;
@@ -116,13 +118,38 @@ function compactActivityMaterialReference(
   };
 }
 
-function normalizeReferenceText(value: unknown, maxLength: number) {
+export function normalizeActivityMaterialReferenceFilename(value: unknown) {
+  return normalizeReferenceText(
+    value,
+    ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS.originalNameMaxLength,
+    { filename: true }
+  );
+}
+
+function normalizeReferenceText(
+  value: unknown,
+  maxLength: number,
+  options?: { filename?: boolean }
+) {
   if (typeof value !== 'string') return undefined;
 
   const normalized = value.normalize('NFKC').replace(/\s+/gu, ' ').trim();
+  const safeText = options?.filename
+    ? getSafeReferenceFilename(normalized)
+    : normalized;
+  if (!safeText) return undefined;
+
+  return safeText.slice(0, maxLength);
+}
+
+function getSafeReferenceFilename(value: string) {
+  const withoutUrlSuffix = value.split(/[?#]/u)[0]?.trim() ?? '';
+  const lastSegment =
+    withoutUrlSuffix.split(/[\\/]/u).at(-1)?.trim() ?? withoutUrlSuffix;
+  const normalized = lastSegment.replace(/[\r\n"<>]/gu, '').trim();
   if (!normalized) return undefined;
 
-  return normalized.slice(0, maxLength);
+  return normalized;
 }
 
 function normalizeReferenceKey(value: string | undefined) {

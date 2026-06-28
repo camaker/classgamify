@@ -187,6 +187,7 @@ import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
+  normalizeActivityMaterialReferenceFilename,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
 import {
@@ -4548,6 +4549,11 @@ assert.match(
   /ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.fileIdMaxLength[\s\S]*ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS\.originalNameMaxLength/,
   'Activity source material reference normalization should reuse named text limits.'
 );
+assert.match(
+  activityMaterialReferencesSource,
+  /export function normalizeActivityMaterialReferenceFilename[\s\S]*getSafeReferenceFilename[\s\S]*split\(\s*\/\[\?#\]\/u\s*\)[\s\S]*split\(\s*\/\[\\\\\/\]\/u\s*\)/,
+  'Activity source material filenames should be normalized through an exported safe basename helper.'
+);
 assert.doesNotMatch(
   activityMaterialReferencesSource,
   /normalizeReferenceText\([^,\n]+,\s*(?:120|200)\)/,
@@ -4557,6 +4563,24 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS, {
   fileIdMaxLength: 120,
   originalNameMaxLength: 200,
 });
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'https://files.example.test/classroom/private/unit.pdf?token=secret#page=2'
+  ),
+  'unit.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'C:\\class\\secret\\worksheet scan.pdf?signature=abc'
+  ),
+  'worksheet scan.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    '/teacher/owner/private/<listening>.mp3#frag'
+  ),
+  'listening.mp3'
+);
 assert.match(
   activityMaterialSummarySource,
   /sourceKindSummaryText:[\s\S]*formatActivitySourceMaterialKindCounts/,
@@ -21082,7 +21106,7 @@ assert.deepEqual(
     sourceMaterialSummaryLabel: '2 safe source materials',
     sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
     sourceTextLabel: 'Topic or source notes',
-    syncMaterialsHelpText: 'Adds material kind and original filename only.',
+    syncMaterialsHelpText: 'Adds material kind and safe filename only.',
     syncMaterialsLabel: 'Sync attached materials',
     syncSuccessMessage: 'Attached materials synced to AI source notes.',
   }
@@ -21414,7 +21438,7 @@ assert.deepEqual(disabledAiDraftPanelView, {
   sourceMaterialSummaryLabel: undefined,
   sourcePlaceholder: 'Paste vocabulary, a reading passage, or lesson notes.',
   sourceTextLabel: 'Topic or source notes',
-  syncMaterialsHelpText: 'Adds material kind and original filename only.',
+  syncMaterialsHelpText: 'Adds material kind and safe filename only.',
   syncMaterialsLabel: 'Sync attached materials',
   syncSuccessMessage: 'Attached materials synced to AI source notes.',
 });
@@ -23902,7 +23926,7 @@ assert.equal(
 );
 assert.equal(
   fallbackDraftMetaSummary.sourceMaterialDescription,
-  'Only safe provenance from the source notes is shown here: material kind and original filename.'
+  'Only safe provenance from the source notes is shown here: material kind and safe filename.'
 );
 assert.equal(
   fallbackDraftMetaSummary.sourceMaterialCountLabel,
@@ -24138,7 +24162,7 @@ try {
   );
   assert.equal(
     zhFallbackDraftMetaSummary.sourceMaterialDescription,
-    '这里仅显示素材类型和原始文件名这类安全来源信息。'
+    '这里仅显示素材类型和安全文件名这类安全来源信息。'
   );
   assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
   assert.ok(
@@ -24984,6 +25008,33 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViews([
+    {
+      contentType: 'application/pdf',
+      fileId: 'file-url-worksheet',
+      kind: 'worksheet-document',
+      originalName:
+        'https://files.example.test/private/Weather worksheet.pdf?token=secret#page=2',
+    },
+    {
+      contentType: 'audio/mpeg',
+      fileId: 'file-path-listening',
+      kind: 'audio',
+      originalName: 'C:\\teacher\\private\\Weather listening.mp3?sig=abc',
+    },
+  ]),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Weather worksheet.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: 'Weather listening.mp3',
+    },
+  ]
+);
 assert.deepEqual(Object.keys(sensitiveMaterialDraftNoteViews[0] ?? {}).sort(), [
   'kindLabel',
   'name',
@@ -25001,6 +25052,33 @@ assert.equal(
 assert.doesNotMatch(
   sensitiveMaterialDraftNotes ?? '',
   unsafeMaterialMetadataPattern
+);
+const unsafeMaterialFilenameSuffixPattern =
+  /https?:|files\.example|private|token|signature|sig=|#page|teacher\\/i;
+const safeBasenameMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
+  {
+    fileId: 'file-url-worksheet',
+    kind: 'worksheet-document',
+    originalName:
+      'https://files.example.test/private/Weather worksheet.pdf?token=secret#page=2',
+  },
+  {
+    fileId: 'file-path-listening',
+    kind: 'audio',
+    originalName: 'C:\\teacher\\private\\Weather listening.mp3?sig=abc',
+  },
+]);
+assert.equal(
+  safeBasenameMaterialDraftNotes,
+  [
+    'Attached classroom source materials:',
+    '- Worksheet document: Weather worksheet.pdf',
+    '- Audio: Weather listening.mp3',
+  ].join('\n')
+);
+assert.doesNotMatch(
+  safeBasenameMaterialDraftNotes ?? '',
+  unsafeMaterialFilenameSuffixPattern
 );
 const appendedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes({
   sourceMaterials: [listeningMaterialReference],

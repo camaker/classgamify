@@ -1,5 +1,8 @@
 import type { CreateActivityInput } from '@/activities/validation';
-import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import {
+  normalizeActivityMaterialReferenceFilename,
+  normalizeActivityMaterialReferences,
+} from '@/activities/material-references';
 import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
 import type { ActivityMaterialReference } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
@@ -138,7 +141,9 @@ export function buildActivitySourceMaterialDraftNoteView(
 ): ActivitySourceMaterialDraftNoteView {
   return {
     kindLabel: formatUserFileMaterialKind(material.kind),
-    name: normalizeDraftSourceText(material.originalName),
+    name:
+      normalizeActivityMaterialReferenceFilename(material.originalName) ??
+      normalizeDraftSourceText(material.originalName),
   };
 }
 
