@@ -74,6 +74,7 @@ import {
   buildCreatedActivityPanelContext,
   buildActivityLibraryEmptyStateView,
   buildActivityLibraryPageViewModel,
+  buildActivityLibraryRouteState,
   buildActivityLibraryRemixActionLabel,
   buildActivityLibraryRemixHint,
   buildActivityLibrarySearchPanelView,
@@ -13302,13 +13303,33 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
-  /buildActivityLibraryPageViewModel/,
-  'Activity dashboard route should consume the activity-domain page view-model.'
+  /buildActivityLibraryRouteState/,
+  'Activity dashboard route should consume the activity-domain route state helper.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'ready'[\s\S]*routeState\.status === 'empty-filtered'[\s\S]*routeState\.status === 'empty-starter'/,
+  'Activity dashboard route should render loading, ready, filtered-empty, and starter-empty states from the activity-domain route state.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /routeState\.showLoadError/,
+  'Activity dashboard route should show load errors from the activity-domain route state.'
+);
+assert.doesNotMatch(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibraryPageViewModel|activePageView = data \?|isError \?|isLoading \?|!isLoading &&/,
+  'Activity dashboard route should not directly build page views or branch on raw query state for library content.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
   /activePageView\.starterPreview\.activities/,
-  'Activity dashboard route should render starter cards from the activity-domain preview view-model.'
+  'Activity dashboard route should render starter cards from the activity-domain route state view-model.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryRouteState[\s\S]*buildActivityLibraryPageViewModel[\s\S]*showLoadError[\s\S]*status: 'loading'[\s\S]*status: 'error'[\s\S]*status: 'empty-filtered'[\s\S]*status: 'empty-starter'[\s\S]*status: 'ready'/,
+  'Activity library view domain should own activity-library loading, error, empty, and ready route-state selection.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -19148,37 +19169,165 @@ assert.equal(
   }).resolvedSearch.currentPage,
   1
 );
-const filteredActivityLibraryPageView = buildActivityLibraryPageViewModel({
-  data: {
-    createdActivity: {
+const filteredActivityLibraryPageData = {
+  createdActivity: {
+    id: 'persisted-activity-1',
+    templateType: 'quiz',
+    title: 'Persisted quiz',
+    visibility: 'draft',
+  },
+  items: [
+    {
+      contentJson: questionOnlyContent,
+      description: 'Short diagnostic quiz',
       id: 'persisted-activity-1',
       templateType: 'quiz',
       title: 'Persisted quiz',
       visibility: 'draft',
     },
-    items: [
-      {
-        contentJson: questionOnlyContent,
-        description: 'Short diagnostic quiz',
-        id: 'persisted-activity-1',
-        templateType: 'quiz',
-        title: 'Persisted quiz',
-        visibility: 'draft',
-      },
-    ],
-    summary: librarySummary,
-    total: 31,
-  },
+  ],
+  summary: librarySummary,
+  total: 31,
+} satisfies Parameters<typeof buildActivityLibraryPageViewModel>[0]['data'];
+const filteredActivityLibrarySearch = {
+  created: 'persisted-activity-1',
+  page: 3,
+  q: '  Food   words ',
+  source: 'worksheet',
+  status: 'archived',
+  template: 'quiz',
+} as const;
+const filteredActivityLibraryPageView = buildActivityLibraryPageViewModel({
+  data: filteredActivityLibraryPageData,
   isLoading: false,
-  search: {
-    created: 'persisted-activity-1',
-    page: 3,
-    q: '  Food   words ',
-    source: 'worksheet',
-    status: 'archived',
-    template: 'quiz',
-  },
+  search: filteredActivityLibrarySearch,
 });
+const loadingActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: null,
+  isError: false,
+  isLoading: true,
+  search: {},
+});
+assert.deepEqual(
+  {
+    pageTitle: loadingActivityLibraryRouteState.pageView.title,
+    showLoadError: loadingActivityLibraryRouteState.showLoadError,
+    status: loadingActivityLibraryRouteState.status,
+  },
+  {
+    pageTitle: 'Activity library',
+    showLoadError: false,
+    status: 'loading',
+  }
+);
+const errorActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: null,
+  isError: true,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    message: errorActivityLibraryRouteState.pageView.loadErrorMessage,
+    showLoadError: errorActivityLibraryRouteState.showLoadError,
+    status: errorActivityLibraryRouteState.status,
+  },
+  {
+    message:
+      'Activities could not be loaded. Refresh the page or sign in again.',
+    showLoadError: true,
+    status: 'error',
+  }
+);
+const filteredEmptyActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: { items: [], total: 0 },
+  isError: false,
+  isLoading: false,
+  search: { q: 'missing unit' },
+});
+assert.deepEqual(
+  {
+    showLoadError: filteredEmptyActivityLibraryRouteState.showLoadError,
+    showStarterActivities:
+      filteredEmptyActivityLibraryRouteState.pageView.emptyState
+        .showStarterActivities,
+    status: filteredEmptyActivityLibraryRouteState.status,
+  },
+  {
+    showLoadError: false,
+    showStarterActivities: false,
+    status: 'empty-filtered',
+  }
+);
+const archivedEmptyActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: { items: [], total: 0 },
+  isError: false,
+  isLoading: false,
+  search: { status: 'archived' },
+});
+assert.deepEqual(
+  {
+    emptyTitle:
+      archivedEmptyActivityLibraryRouteState.pageView.emptyState.title,
+    showStarterActivities:
+      archivedEmptyActivityLibraryRouteState.pageView.emptyState
+        .showStarterActivities,
+    status: archivedEmptyActivityLibraryRouteState.status,
+  },
+  {
+    emptyTitle: 'No archived activities.',
+    showStarterActivities: false,
+    status: 'empty-filtered',
+  }
+);
+const starterEmptyActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: { items: [], total: 0 },
+  isError: false,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    showLoadError: starterEmptyActivityLibraryRouteState.showLoadError,
+    showStarterActivities:
+      starterEmptyActivityLibraryRouteState.pageView.emptyState
+        .showStarterActivities,
+    status: starterEmptyActivityLibraryRouteState.status,
+  },
+  {
+    showLoadError: false,
+    showStarterActivities: true,
+    status: 'empty-starter',
+  }
+);
+const readyActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: filteredActivityLibraryPageData,
+  isError: false,
+  isLoading: false,
+  search: filteredActivityLibrarySearch,
+});
+const staleReadyActivityLibraryRouteState = buildActivityLibraryRouteState({
+  data: filteredActivityLibraryPageData,
+  isError: true,
+  isLoading: false,
+  search: filteredActivityLibrarySearch,
+});
+assert.deepEqual(
+  {
+    activityIds: readyActivityLibraryRouteState.pageView.activities.map(
+      (item) => item.id
+    ),
+    showLoadError: staleReadyActivityLibraryRouteState.showLoadError,
+    staleDataStatus: staleReadyActivityLibraryRouteState.status,
+    status: readyActivityLibraryRouteState.status,
+  },
+  {
+    activityIds: ['persisted-activity-1'],
+    showLoadError: true,
+    staleDataStatus: 'ready',
+    status: 'ready',
+  }
+);
 assert.deepEqual(
   {
     activityIds: filteredActivityLibraryPageView.activities.map(

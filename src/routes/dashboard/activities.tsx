@@ -12,7 +12,7 @@ import {
 import {
   activityLibraryPageCopy,
   buildActivityLibraryCardViewModel,
-  buildActivityLibraryPageViewModel,
+  buildActivityLibraryRouteState,
   buildStarterActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import { ActivityLibraryCard } from '@/components/activities/activity-library-card';
@@ -39,47 +39,57 @@ export const Route = createFileRoute('/dashboard/activities')({
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
   const { created, page, q, source, status, template } = Route.useSearch();
-  const pageView = useMemo(
-    () =>
-      buildActivityLibraryPageViewModel({
-        data: undefined,
-        isLoading: true,
-        search: { created, page, q, source, status, template },
-      }),
+  const search = useMemo(
+    () => ({ created, page, q, source, status, template }),
     [created, page, q, source, status, template]
+  );
+  const initialRouteState = useMemo(
+    () =>
+      buildActivityLibraryRouteState({
+        data: undefined,
+        isError: false,
+        isLoading: true,
+        search,
+      }),
+    [search]
   );
   const {
     currentPage,
     libraryStatus,
+    normalizedSearchQuery,
     searchQuery,
     sourceFilter,
     templateFilter,
-  } = pageView.resolvedSearch;
+  } = initialRouteState.pageView.resolvedSearch;
   const { data, isError, isLoading } = useActivities({
     createdActivityId: created,
     pageIndex: currentPage - 1,
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
-    search: pageView.resolvedSearch.normalizedSearchQuery,
+    search: normalizedSearchQuery,
     source: sourceFilter,
     status: libraryStatus,
     template: templateFilter === 'all' ? undefined : templateFilter,
   });
-  const loadedPageView = useMemo(
+  const routeState = useMemo(
     () =>
-      buildActivityLibraryPageViewModel({
+      buildActivityLibraryRouteState({
         data,
+        isError,
         isLoading,
-        search: { created, page, q, source, status, template },
+        search,
       }),
-    [data, isLoading, created, page, q, source, status, template]
+    [data, isError, isLoading, search]
   );
-  const activePageView = data ? loadedPageView : pageView;
+  const activePageView = routeState.pageView;
 
   useEffect(() => {
-    if (!isLoading && currentPage > activePageView.totalPages) {
+    if (
+      routeState.status !== 'loading' &&
+      currentPage > activePageView.totalPages
+    ) {
       navigateToActivityPage(activePageView.totalPages, true);
     }
-  }, [activePageView.totalPages, currentPage, isLoading]);
+  }, [activePageView.totalPages, currentPage, routeState.status]);
 
   function updateLibraryFilters(next: {
     q?: string;
@@ -207,13 +217,13 @@ function DashboardActivitiesPage() {
           value={searchQuery}
         />
 
-        {isError ? (
+        {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {activePageView.loadErrorMessage}
           </div>
         ) : null}
 
-        {isLoading ? (
+        {routeState.status === 'loading' ? (
           <section className="grid gap-4 lg:grid-cols-2">
             {Array.from({ length: 2 }).map((_, index) => (
               <Card key={index} className="min-h-56 rounded-lg" />
@@ -221,7 +231,7 @@ function DashboardActivitiesPage() {
           </section>
         ) : null}
 
-        {!isLoading && activePageView.hasActivities ? (
+        {routeState.status === 'ready' ? (
           <>
             <section className="grid gap-4 lg:grid-cols-2">
               {activePageView.activities.map((activity) => (
@@ -244,9 +254,7 @@ function DashboardActivitiesPage() {
           </>
         ) : null}
 
-        {!isLoading &&
-        !activePageView.hasActivities &&
-        activePageView.resolvedSearch.hasFilters ? (
+        {routeState.status === 'empty-filtered' ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
             <h2 className="text-lg font-semibold">
               {activePageView.emptyState.title}
@@ -266,9 +274,7 @@ function DashboardActivitiesPage() {
           </div>
         ) : null}
 
-        {!isLoading &&
-        !activePageView.hasActivities &&
-        !activePageView.resolvedSearch.hasFilters ? (
+        {routeState.status === 'empty-starter' ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">
