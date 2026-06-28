@@ -10,6 +10,10 @@ import {
   ACTIVITY_CREATABLE_VISIBILITIES,
   ACTIVITY_DIFFICULTIES,
 } from '@/activities/types';
+import {
+  buildGenerateActivityDraftInputFromEditor,
+  type GenerateActivityDraftInput,
+} from '@/activities/ai-draft';
 import { getTemplateByType } from '@/activities/catalog';
 import { getActivityTemplates } from '@/activities/catalog';
 import {
@@ -134,6 +138,18 @@ type ActivityEditorDraftGenerationGate =
   | {
       canGenerate: true;
       sourceText: string;
+    };
+
+export type ActivityEditorDraftGenerationExecutionPlan =
+  | {
+      failureMessage: string;
+      message: string;
+      type: 'blocked';
+    }
+  | {
+      failureMessage: string;
+      input: GenerateActivityDraftInput;
+      type: 'generate';
     };
 
 type ActivityEditorMode = 'create' | 'edit';
@@ -390,6 +406,45 @@ export function buildActivityEditorDraftGenerationGate({
   return {
     canGenerate: true,
     sourceText: trimmedSourceText,
+  };
+}
+
+export function buildActivityEditorDraftGenerationExecutionPlan({
+  current,
+  draftFocus,
+  hasUser,
+  itemCount,
+  sourceText,
+}: {
+  current: CreateActivityInput;
+  draftFocus: ActivityAiDraftFocus;
+  hasUser: boolean;
+  itemCount: number;
+  sourceText: string;
+}): ActivityEditorDraftGenerationExecutionPlan {
+  const draftGate = buildActivityEditorDraftGenerationGate({
+    hasUser,
+    sourceText,
+  });
+  const failureMessage = m.activity_form_toast_draft_generation_failed();
+
+  if (!draftGate.canGenerate) {
+    return {
+      failureMessage,
+      message: draftGate.errorMessage,
+      type: 'blocked',
+    };
+  }
+
+  return {
+    failureMessage,
+    input: buildGenerateActivityDraftInputFromEditor({
+      current,
+      draftFocus,
+      itemCount,
+      sourceText: draftGate.sourceText,
+    }),
+    type: 'generate',
   };
 }
 

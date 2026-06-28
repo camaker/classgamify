@@ -1,6 +1,6 @@
 import {
   buildActivityEditorAiDraftPanelView,
-  buildActivityEditorDraftGenerationGate,
+  buildActivityEditorDraftGenerationExecutionPlan,
   buildActivityEditorDraftSourceState,
   buildActivityEditorDraftSourceText,
   buildActivityEditorDraftSuccessMessage,
@@ -14,7 +14,6 @@ import {
 } from '@/activities/editor';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
-  buildGenerateActivityDraftInputFromEditor,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
 import {
@@ -131,25 +130,21 @@ export function ActivityCreateForm({
   }, [form, initialValues]);
 
   async function onGenerateDraft() {
-    const draftGate = buildActivityEditorDraftGenerationGate({
+    const current = form.getValues();
+    const executionPlan = buildActivityEditorDraftGenerationExecutionPlan({
+      current,
+      draftFocus,
       hasUser: Boolean(session?.user),
+      itemCount: draftItemCount,
       sourceText: draftSourceText,
     });
-    if (!draftGate.canGenerate) {
-      toast.error(draftGate.errorMessage);
+    if (executionPlan.type === 'blocked') {
+      toast.error(executionPlan.message);
       return;
     }
 
-    const current = form.getValues();
     try {
-      const result = await draftMutation.mutateAsync(
-        buildGenerateActivityDraftInputFromEditor({
-          current,
-          draftFocus,
-          itemCount: draftItemCount,
-          sourceText: draftGate.sourceText,
-        })
-      );
+      const result = await draftMutation.mutateAsync(executionPlan.input);
 
       form.reset({
         ...result.activity,
@@ -162,7 +157,7 @@ export function ActivityCreateForm({
         buildActivityEditorDraftSuccessMessage({ notice: result.notice })
       );
     } catch {
-      toast.error(m.activity_form_toast_draft_generation_failed());
+      toast.error(executionPlan.failureMessage);
     }
   }
 

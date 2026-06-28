@@ -269,6 +269,7 @@ import {
   activityContentToEditorInput,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
   buildActivityEditorAiDraftPanelView,
+  buildActivityEditorDraftGenerationExecutionPlan,
   buildActivityEditorDraftGenerationGate,
   buildActivityEditorDraftSourceState,
   buildActivityEditorDraftSourceText,
@@ -2433,8 +2434,23 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /buildActivityEditorDraftGenerationGate/,
-  'Activity editor form should consume the activity-domain AI draft gate.'
+  /buildActivityEditorDraftGenerationExecutionPlan/,
+  'Activity editor form should consume the activity-domain AI draft generation execution plan.'
+);
+assert.match(
+  activityEditorFormSource,
+  /buildActivityEditorDraftGenerationExecutionPlan\(\{[\s\S]*current,[\s\S]*draftFocus,[\s\S]*hasUser: Boolean\(session\?\.user\),[\s\S]*itemCount: draftItemCount,[\s\S]*sourceText: draftSourceText,[\s\S]*\}\)/,
+  'Activity editor form should build AI draft generation execution plans from auth, source text, focus, item count, and current values.'
+);
+assert.match(
+  activityEditorFormSource,
+  /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
+  'Activity editor form should execute prepared blocked and generate AI draft plans.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /buildActivityEditorDraftGenerationGate|buildGenerateActivityDraftInputFromEditor|draftGate\.sourceText|draftGate\.errorMessage/,
+  'Activity editor form should not rebuild AI draft gates or generation input locally.'
 );
 assert.match(
   activityEditorFormSource,
@@ -3806,13 +3822,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityCreateFormSource,
-  /toast\.error\(m\.activity_form_toast_draft_generation_failed\(\)\)/,
-  'Activity draft generation failures should use the localized draft failure message.'
-);
-assert.match(
-  activityCreateFormSource,
   /toast\.error\(executionPlan\.failureMessage\)/,
-  'Activity save failures should use the localized save execution-plan failure message.'
+  'Activity draft generation and save failures should use localized execution-plan failure messages.'
 );
 const contactFormCardSource = readFileSync(
   'src/components/contact/contact-form-card.tsx',
@@ -20342,6 +20353,64 @@ assert.deepEqual(
   {
     canGenerate: true,
     sourceText: 'apple, milk',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationExecutionPlan({
+    current: getActivityEditorDefaultInput(),
+    draftFocus: 'balanced',
+    hasUser: false,
+    itemCount: 5,
+    sourceText: '  apple  ',
+  }),
+  {
+    failureMessage: 'Activity draft could not be generated.',
+    message: 'Sign in to generate AI activity drafts.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationExecutionPlan({
+    current: getActivityEditorDefaultInput(),
+    draftFocus: 'balanced',
+    hasUser: true,
+    itemCount: 5,
+    sourceText: '  ',
+  }),
+  {
+    failureMessage: 'Activity draft could not be generated.',
+    message: 'Add a topic, vocabulary list, or source notes first.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildActivityEditorDraftGenerationExecutionPlan({
+    current: {
+      ...getActivityEditorDefaultInput(),
+      difficulty: 'challenge',
+      gradeBand: 'Grade 5',
+      language: 'zh',
+      subject: 'Science',
+      templateType: 'group-sort',
+    },
+    draftFocus: 'worksheet-practice',
+    hasUser: true,
+    itemCount: 8,
+    sourceText: '  solids liquids gases  ',
+  }),
+  {
+    failureMessage: 'Activity draft could not be generated.',
+    input: {
+      difficulty: 'challenge',
+      draftFocus: 'worksheet-practice',
+      gradeBand: 'Grade 5',
+      itemCount: 8,
+      language: 'zh',
+      sourceText: 'solids liquids gases',
+      subject: 'Science',
+      templateType: 'group-sort',
+    },
+    type: 'generate',
   }
 );
 assert.deepEqual(
