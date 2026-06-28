@@ -62,6 +62,14 @@ function ActivitySourceMaterialExtractionSummary({
   return (
     <div className="mt-3 border-t pt-3">
       <p className="text-muted-foreground text-xs">{summary.extractionTitle}</p>
+      {summary.primaryNextStep ? (
+        <div className="mt-2 rounded-md border bg-muted/30 p-2.5">
+          <p className="font-medium text-xs">{summary.primaryNextStep.label}</p>
+          <p className="mt-0.5 text-muted-foreground text-xs leading-5">
+            {summary.primaryNextStep.description}
+          </p>
+        </div>
+      ) : null}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {summary.extractionActions.map((action) => (
           <ActivitySourceMaterialExtractionBadge

@@ -99,6 +99,7 @@ export type ActivitySourceMaterialSummaryView = {
     label: string;
     summaryText: string;
   }>;
+  primaryNextStep?: ActivitySourceMaterialExtractionActionView['nextStep'];
   readiness: ActivitySourceMaterialReadiness;
   title: string;
 };
@@ -171,6 +172,9 @@ export function buildActivitySourceMaterialSummaryView(
     summary.kindSummaries
   );
   const compactSummaryText = kindSummaryText || countLabel;
+  const extractionActions = summary.extractionActions.map(
+    toActivitySourceMaterialExtractionActionView
+  );
 
   return {
     ariaLabel: formatActivitySourceMaterialSummaryAriaLabel({
@@ -180,9 +184,7 @@ export function buildActivitySourceMaterialSummaryView(
     }),
     compactSummaryText,
     countLabel,
-    extractionActions: summary.extractionActions.map(
-      toActivitySourceMaterialExtractionActionView
-    ),
+    extractionActions,
     extractionTitle: m.activity_source_material_extraction_title(),
     hasMaterials: summary.total > 0,
     kindBadges: summary.kindSummaries.map((item) => {
@@ -197,6 +199,7 @@ export function buildActivitySourceMaterialSummaryView(
         }),
       };
     }),
+    primaryNextStep: extractionActions[0]?.nextStep,
     readiness: summary.readiness,
     title: m.activity_source_material_summary_title(),
   };

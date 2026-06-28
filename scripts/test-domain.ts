@@ -2495,8 +2495,8 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /function ActivitySourceMaterialExtractionSummary[\s\S]*summary\.extractionTitle[\s\S]*summary\.extractionActions\.map[\s\S]*ActivitySourceMaterialExtractionBadge/,
-  'Activity source-material extraction summary should render prepared extraction title and actions.'
+  /function ActivitySourceMaterialExtractionSummary[\s\S]*summary\.extractionTitle[\s\S]*summary\.primaryNextStep[\s\S]*summary\.extractionActions\.map[\s\S]*ActivitySourceMaterialExtractionBadge/,
+  'Activity source-material extraction summary should render prepared extraction title, primary next step, and actions.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -2507,6 +2507,11 @@ assert.match(
   activitySourceMaterialsSummarySource,
   /function ActivitySourceMaterialExtractionBadge[\s\S]*action\.nextStep\.label[\s\S]*action\.nextStep\.description/,
   'Activity source-material extraction badge should render prepared next-step guidance.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /summary\.extractionActions\[0\]|find\(\(action\)|filter\(\(action\)|hasAudio|hasSpreadsheet|hasWorksheet/,
+  'Activity source-material summary component should not choose the primary extraction next step locally.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
@@ -5547,6 +5552,11 @@ assert.deepEqual(
         summaryText: 'Worksheet document · 1',
       },
     ],
+    primaryNextStep: {
+      description:
+        'Use these files later to draft listening prompts or transcripts while keeping the original file private.',
+      label: 'Listening draft input',
+    },
     readiness: {
       capabilities: ['audio-extraction', 'worksheet-extraction'],
       extractableCount: 2,
@@ -5596,6 +5606,21 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivitySourceMaterialSummaryView([
     {
+      contentType: 'application/pdf',
+      fileId: 'worksheet-doc',
+      kind: 'worksheet-document',
+      originalName: 'worksheet.pdf',
+    },
+  ]).primaryNextStep,
+  {
+    description:
+      'Use these pages later to extract prompts, accepted answers, and printable follow-up items into the same activity model.',
+    label: 'Worksheet extraction input',
+  }
+);
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    {
       contentType: 'text/csv',
       fileId: 'spreadsheet-csv',
       kind: 'spreadsheet',
@@ -5618,6 +5643,21 @@ assert.deepEqual(
       summaryText: 'Spreadsheet import · Spreadsheet · 1',
     },
   ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    {
+      contentType: 'text/csv',
+      fileId: 'spreadsheet-csv',
+      kind: 'spreadsheet',
+      originalName: 'word-bank.csv',
+    },
+  ]).primaryNextStep,
+  {
+    description:
+      'Use these rows later to import vocabulary, pairs, groups, or answer choices into the activity editor.',
+    label: 'Structured import input',
+  }
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -5656,6 +5696,21 @@ try {
       },
     ]
   );
+  assert.deepEqual(
+    buildActivitySourceMaterialSummaryView([
+      {
+        contentType: 'application/pdf',
+        fileId: 'zh-worksheet-doc',
+        kind: 'worksheet-document',
+        originalName: '练习纸.pdf',
+      },
+    ]).primaryNextStep,
+    {
+      description:
+        '后续可从这些页面提取题目、可接受答案和可打印跟进项，并仍然写入同一套活动模型。',
+      label: '练习纸提取输入',
+    }
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -5667,6 +5722,7 @@ assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
   extractionTitle: 'Ready for future AI extraction',
   hasMaterials: false,
   kindBadges: [],
+  primaryNextStep: undefined,
   readiness: {
     capabilities: [],
     extractableCount: 0,
@@ -20279,6 +20335,7 @@ assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
   extractionTitle: 'Ready for future AI extraction',
   hasMaterials: false,
   kindBadges: [],
+  primaryNextStep: undefined,
   readiness: {
     capabilities: [],
     extractableCount: 0,
@@ -20329,6 +20386,11 @@ assert.deepEqual(
         summaryText: 'Audio · 1',
       },
     ],
+    primaryNextStep: {
+      description:
+        'Use these files later to draft listening prompts or transcripts while keeping the original file private.',
+      label: 'Listening draft input',
+    },
     readiness: {
       capabilities: ['audio-extraction'],
       extractableCount: 1,
