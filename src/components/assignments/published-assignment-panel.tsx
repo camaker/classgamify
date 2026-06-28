@@ -20,6 +20,15 @@ type PublishedAssignmentPanelProps = {
   onDismiss: () => void;
   shareSlug: string;
 };
+type PublishedAssignmentPanelContext = ReturnType<
+  typeof buildPublishedAssignmentPanelContext
+>;
+type PublishedAssignmentPanelAssignment = NonNullable<
+  PublishedAssignmentPanelContext['assignment']
+>;
+type PublishedAssignmentPanelPrintAction = NonNullable<
+  PublishedAssignmentPanelContext['printAction']
+>;
 
 export function PublishedAssignmentPanel({
   context,
@@ -55,66 +64,123 @@ export function PublishedAssignmentPanel({
           </p>
         ) : null}
       </div>
-      <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-        {panelContext.showResultsAction && assignment ? (
-          <Link
-            to="/dashboard/assignments/$assignmentId"
-            params={{ assignmentId: assignment.id }}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-full bg-background sm:w-auto'
-            )}
-          >
-            <IconChartBar className="size-4" />
-            {assignmentListActionCopy.viewResults}
-          </Link>
-        ) : null}
-        {panelContext.printAction ? (
-          <Link
-            to="/print/assignments/$assignmentId"
-            params={{
-              assignmentId: panelContext.printAction.assignmentId,
-            }}
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'w-full bg-background sm:w-auto'
-            )}
-          >
-            <IconPrinter className="size-4" />
-            {assignmentListActionCopy.printWorksheet}
-          </Link>
-        ) : null}
-        {panelContext.showShareActions ? (
-          <>
-            <Link
-              to="/play/$shareId"
-              params={{ shareId: shareSlug }}
-              className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-full bg-background sm:w-auto'
-              )}
-            >
-              <IconPlayerPlay className="size-4" />
-              {assignmentListActionCopy.openPublishedLink}
-            </Link>
-            <CopyAssignmentShareLinkButton
-              shareSlug={shareSlug}
-              className="w-full bg-background sm:w-auto"
-            />
-          </>
-        ) : null}
-        {panelContext.showDismissAction ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full sm:w-auto"
-            onClick={onDismiss}
-          >
-            <IconX className="size-4" />
-            {assignmentListActionCopy.dismiss}
-          </Button>
-        ) : null}
-      </div>
+      <PublishedAssignmentPanelActions
+        assignment={assignment}
+        context={panelContext}
+        onDismiss={onDismiss}
+        shareSlug={shareSlug}
+      />
     </section>
+  );
+}
+
+function PublishedAssignmentPanelActions({
+  assignment,
+  context,
+  onDismiss,
+  shareSlug,
+}: {
+  assignment: PublishedAssignmentPanelContext['assignment'];
+  context: PublishedAssignmentPanelContext;
+  onDismiss: () => void;
+  shareSlug: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+      {context.showResultsAction && assignment ? (
+        <PublishedAssignmentResultsActionLink assignment={assignment} />
+      ) : null}
+      {context.printAction ? (
+        <PublishedAssignmentPrintActionLink action={context.printAction} />
+      ) : null}
+      {context.showShareActions ? (
+        <PublishedAssignmentShareActions shareSlug={shareSlug} />
+      ) : null}
+      {context.showDismissAction ? (
+        <PublishedAssignmentDismissActionButton onClick={onDismiss} />
+      ) : null}
+    </div>
+  );
+}
+
+function PublishedAssignmentResultsActionLink({
+  assignment,
+}: {
+  assignment: PublishedAssignmentPanelAssignment;
+}) {
+  return (
+    <Link
+      to="/dashboard/assignments/$assignmentId"
+      params={{ assignmentId: assignment.id }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-auto'
+      )}
+    >
+      <IconChartBar className="size-4" />
+      {assignmentListActionCopy.viewResults}
+    </Link>
+  );
+}
+
+function PublishedAssignmentPrintActionLink({
+  action,
+}: {
+  action: PublishedAssignmentPanelPrintAction;
+}) {
+  return (
+    <Link
+      to="/print/assignments/$assignmentId"
+      params={{
+        assignmentId: action.assignmentId,
+      }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-auto'
+      )}
+    >
+      <IconPrinter className="size-4" />
+      {assignmentListActionCopy.printWorksheet}
+    </Link>
+  );
+}
+
+function PublishedAssignmentShareActions({ shareSlug }: { shareSlug: string }) {
+  return (
+    <>
+      <Link
+        to="/play/$shareId"
+        params={{ shareId: shareSlug }}
+        className={cn(
+          buttonVariants({ variant: 'outline' }),
+          'w-full bg-background sm:w-auto'
+        )}
+      >
+        <IconPlayerPlay className="size-4" />
+        {assignmentListActionCopy.openPublishedLink}
+      </Link>
+      <CopyAssignmentShareLinkButton
+        shareSlug={shareSlug}
+        className="w-full bg-background sm:w-auto"
+      />
+    </>
+  );
+}
+
+function PublishedAssignmentDismissActionButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      className="w-full sm:w-auto"
+      onClick={onClick}
+    >
+      <IconX className="size-4" />
+      {assignmentListActionCopy.dismiss}
+    </Button>
   );
 }

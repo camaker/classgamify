@@ -14827,6 +14827,26 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
+  /PublishedAssignmentPanelActions[\s\S]*assignment=\{assignment\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*shareSlug=\{shareSlug\}/,
+  'Published assignment panel should delegate action rendering to a focused action component.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentPanelActions[\s\S]*context\.showResultsAction[\s\S]*PublishedAssignmentResultsActionLink[\s\S]*context\.printAction[\s\S]*PublishedAssignmentPrintActionLink[\s\S]*context\.showShareActions[\s\S]*PublishedAssignmentShareActions[\s\S]*context\.showDismissAction[\s\S]*PublishedAssignmentDismissActionButton/,
+  'Published assignment panel actions should split results, print, share, and dismiss rendering.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentResultsActionLink[\s\S]*assignment\.id[\s\S]*assignmentListActionCopy\.viewResults[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*action\.assignmentId[\s\S]*assignmentListActionCopy\.printWorksheet/,
+  'Published assignment result and print actions should render prepared assignment ids and localized action labels.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentShareActions[\s\S]*shareSlug[\s\S]*assignmentListActionCopy\.openPublishedLink[\s\S]*CopyAssignmentShareLinkButton[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*assignmentListActionCopy\.dismiss/,
+  'Published assignment share and dismiss actions should render localized action labels and copy-link behavior.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
   /to="\/print\/assignments\/\$assignmentId"/,
   'Published assignment panel component should link newly published assignments to the printable worksheet route.'
 );
