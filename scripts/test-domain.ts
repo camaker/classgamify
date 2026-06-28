@@ -10738,6 +10738,24 @@ assert.deepEqual(
     shareSlug: ' share-2 ',
   }),
   {
+    actionView: {
+      dismissAction: {
+        label: 'Dismiss',
+      },
+      printAction: {
+        assignmentId: 'assignment-2',
+        label: 'Print worksheet',
+      },
+      resultAction: {
+        assignmentId: 'assignment-2',
+        label: 'View results',
+      },
+      shareAction: {
+        label: 'Open link',
+        sharePath: '/play/share-2',
+        shareSlug: 'share-2',
+      },
+    },
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
     printAction: {
@@ -10759,6 +10777,18 @@ assert.deepEqual(
     shareSlug: 'share-2',
   }),
   {
+    actionView: {
+      dismissAction: {
+        label: 'Dismiss',
+      },
+      printAction: undefined,
+      resultAction: undefined,
+      shareAction: {
+        label: 'Open link',
+        sharePath: '/play/share-2',
+        shareSlug: 'share-2',
+      },
+    },
     body: 'Loading the newly published assignment link and classroom actions.',
     printAction: undefined,
     sharePath: '/play/share-2',
@@ -10777,6 +10807,18 @@ assert.deepEqual(
     shareSlug: 'missing',
   }),
   {
+    actionView: {
+      dismissAction: {
+        label: 'Dismiss',
+      },
+      printAction: undefined,
+      resultAction: undefined,
+      shareAction: {
+        label: 'Open link',
+        sharePath: '/play/missing',
+        shareSlug: 'missing',
+      },
+    },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
     printAction: undefined,
     sharePath: '/play/missing',
@@ -16951,23 +16993,28 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /PublishedAssignmentPanelActions[\s\S]*assignment=\{assignment\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*shareSlug=\{shareSlug\}/,
-  'Published assignment panel should delegate action rendering to a focused action component.'
+  /PublishedAssignmentPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*onDismiss=\{onDismiss\}/,
+  'Published assignment panel should delegate prepared action rendering to a focused action component.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentPanelActions[\s\S]*context\.showResultsAction[\s\S]*PublishedAssignmentResultsActionLink[\s\S]*context\.printAction[\s\S]*PublishedAssignmentPrintActionLink[\s\S]*context\.showShareActions[\s\S]*PublishedAssignmentShareActions[\s\S]*context\.showDismissAction[\s\S]*PublishedAssignmentDismissActionButton/,
-  'Published assignment panel actions should split results, print, share, and dismiss rendering.'
+  /function PublishedAssignmentPanelActions[\s\S]*actionView\.resultAction[\s\S]*PublishedAssignmentResultsActionLink[\s\S]*actionView\.printAction[\s\S]*PublishedAssignmentPrintActionLink[\s\S]*actionView\.shareAction[\s\S]*PublishedAssignmentShareActions[\s\S]*actionView\.dismissAction[\s\S]*PublishedAssignmentDismissActionButton/,
+  'Published assignment panel actions should split prepared result, print, share, and dismiss actions into focused components.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentResultsActionLink[\s\S]*assignment\.id[\s\S]*assignmentListActionCopy\.viewResults[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*action\.assignmentId[\s\S]*assignmentListActionCopy\.printWorksheet/,
-  'Published assignment result and print actions should render prepared assignment ids and localized action labels.'
+  /function PublishedAssignmentResultsActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  'Published assignment result and print actions should render prepared assignment ids and action labels.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*shareSlug[\s\S]*assignmentListActionCopy\.openPublishedLink[\s\S]*CopyAssignmentShareLinkButton[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*assignmentListActionCopy\.dismiss/,
-  'Published assignment share and dismiss actions should render localized action labels and copy-link behavior.'
+  /function PublishedAssignmentShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
+  'Published assignment share and dismiss actions should render prepared share data, action labels, and copy-link behavior.'
+);
+assert.doesNotMatch(
+  publishedAssignmentPanelComponentSource,
+  /assignmentListActionCopy|assignment\.id|shareSlug=\{shareSlug\}|context\.showResultsAction|context\.showShareActions|context\.showDismissAction/,
+  'Published assignment panel component should not rebuild action labels, link ids, or visibility from raw panel state.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
@@ -20946,6 +20993,24 @@ assert.deepEqual(
     },
     hasAssignments: true,
     publishedPanelContext: {
+      actionView: {
+        dismissAction: {
+          label: 'Dismiss',
+        },
+        printAction: {
+          assignmentId: 'persisted-assignment-1',
+          label: 'Print worksheet',
+        },
+        resultAction: {
+          assignmentId: 'persisted-assignment-1',
+          label: 'View results',
+        },
+        shareAction: {
+          label: 'Open link',
+          sharePath: '/play/share-1',
+          shareSlug: 'share-1',
+        },
+      },
       assignment: {
         id: 'persisted-assignment-1',
         shareSlug: 'share-1',

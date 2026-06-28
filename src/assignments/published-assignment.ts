@@ -17,6 +17,33 @@ type PublishedAssignmentListItem = {
 type PublishedAssignmentPanelAssignment =
   PublishedAssignmentListItem['assignment'];
 
+type PublishedAssignmentPanelActionView = {
+  dismissAction:
+    | {
+        label: string;
+      }
+    | undefined;
+  printAction:
+    | {
+        assignmentId: string;
+        label: string;
+      }
+    | undefined;
+  resultAction:
+    | {
+        assignmentId: string;
+        label: string;
+      }
+    | undefined;
+  shareAction:
+    | {
+        label: string;
+        sharePath: string;
+        shareSlug: string;
+      }
+    | undefined;
+};
+
 export function findPublishedAssignmentInList<
   TItem extends PublishedAssignmentListItem,
 >({ items, shareSlug }: { items: TItem[]; shareSlug?: string }) {
@@ -55,6 +82,7 @@ export function resolvePublishedAssignmentPanelAssignment<
 }
 
 type PublishedAssignmentPanelContext = {
+  actionView: PublishedAssignmentPanelActionView;
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
   printAction:
@@ -81,15 +109,22 @@ export function buildPublishedAssignmentPanelContext({
   shareSlug: string;
 }): PublishedAssignmentPanelContext {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+  const sharePath = buildAssignmentSharePath(normalizedShareSlug);
 
   if (assignment) {
     return {
+      actionView: buildPublishedAssignmentPanelActionView({
+        assignment,
+        sharePath,
+        shareSlug: normalizedShareSlug,
+        status: 'found',
+      }),
       assignment,
       body: m.assignment_published_panel_found_body(),
       printAction: {
         assignmentId: assignment.id,
       },
-      sharePath: buildAssignmentSharePath(normalizedShareSlug),
+      sharePath,
       showDismissAction: true,
       showMissingHint: false,
       showResultsAction: true,
@@ -101,9 +136,15 @@ export function buildPublishedAssignmentPanelContext({
 
   if (isLoading) {
     return {
+      actionView: buildPublishedAssignmentPanelActionView({
+        assignment,
+        sharePath,
+        shareSlug: normalizedShareSlug,
+        status: 'loading',
+      }),
       body: m.assignment_published_panel_loading_body(),
       printAction: undefined,
-      sharePath: buildAssignmentSharePath(normalizedShareSlug),
+      sharePath,
       showDismissAction: true,
       showMissingHint: false,
       showResultsAction: false,
@@ -114,15 +155,58 @@ export function buildPublishedAssignmentPanelContext({
   }
 
   return {
+    actionView: buildPublishedAssignmentPanelActionView({
+      assignment,
+      sharePath,
+      shareSlug: normalizedShareSlug,
+      status: 'missing',
+    }),
     body: m.assignment_published_panel_missing_body(),
     printAction: undefined,
-    sharePath: buildAssignmentSharePath(normalizedShareSlug),
+    sharePath,
     showDismissAction: true,
     showMissingHint: true,
     showResultsAction: false,
     showShareActions: true,
     status: 'missing',
     title: m.assignment_published_panel_missing_title(),
+  };
+}
+
+function buildPublishedAssignmentPanelActionView({
+  assignment,
+  sharePath,
+  shareSlug,
+  status,
+}: {
+  assignment?: PublishedAssignmentPanelAssignment;
+  sharePath: string;
+  shareSlug: string;
+  status: PublishedAssignmentPanelContext['status'];
+}): PublishedAssignmentPanelActionView {
+  const hasAssignment = status === 'found' && assignment;
+
+  return {
+    dismissAction: {
+      label: m.assignment_list_action_dismiss(),
+    },
+    printAction: hasAssignment
+      ? {
+          assignmentId: assignment.id,
+          label: m.assignment_list_action_print_worksheet(),
+        }
+      : undefined,
+    resultAction: hasAssignment
+      ? {
+          assignmentId: assignment.id,
+          label: m.assignment_list_action_view_results(),
+        }
+      : undefined,
+    shareAction: {
+      label: m.assignment_list_action_open_published_link(),
+      sharePath,
+      shareSlug,
+    },
   };
 }
 
