@@ -43,6 +43,14 @@ type DashboardOverviewPageViewModel = {
   readinessRows: DashboardCoreLoopReadinessRow[];
 };
 
+type DashboardOverviewActivityData = {
+  summary?: DashboardActivitySummary;
+};
+
+type DashboardOverviewAssignmentData = {
+  summary?: DashboardAssignmentSummary;
+};
+
 export type DashboardOverviewActionCardId =
   | 'activities'
   | 'assignments'
@@ -153,6 +161,27 @@ export function buildDashboardOverviewPageViewModel({
       assignmentSummary,
     }),
   };
+}
+
+export function buildDashboardOverviewRouteViewModel({
+  activitiesData,
+  activitiesLoading,
+  assignmentsData,
+  assignmentsLoading,
+  preview,
+}: {
+  activitiesData?: DashboardOverviewActivityData | null;
+  activitiesLoading: boolean;
+  assignmentsData?: DashboardOverviewAssignmentData | null;
+  assignmentsLoading: boolean;
+  preview?: DashboardOverviewPreview;
+}): DashboardOverviewPageViewModel {
+  return buildDashboardOverviewPageViewModel({
+    activitySummary: activitiesData?.summary,
+    assignmentSummary: assignmentsData?.summary,
+    isLoading: activitiesLoading || assignmentsLoading,
+    preview,
+  });
 }
 
 export function buildDashboardOverviewStarterPreview(): DashboardOverviewPreview {

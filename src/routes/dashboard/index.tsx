@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useActivities } from '@/hooks/use-activities';
 import { useAssignments } from '@/hooks/use-assignments';
 import {
-  buildDashboardOverviewPageViewModel,
+  buildDashboardOverviewRouteViewModel,
   dashboardOverviewPageCopy,
 } from '@/dashboard/overview';
 import { Routes } from '@/lib/routes';
@@ -36,10 +36,11 @@ function DashboardPage() {
       pageIndex: 0,
       pageSize: 1,
     });
-  const pageView = buildDashboardOverviewPageViewModel({
-    activitySummary: activitiesData?.summary,
-    assignmentSummary: assignmentsData?.summary,
-    isLoading: activitiesLoading || assignmentsLoading,
+  const pageView = buildDashboardOverviewRouteViewModel({
+    activitiesData,
+    activitiesLoading,
+    assignmentsData,
+    assignmentsLoading,
   });
 
   return (

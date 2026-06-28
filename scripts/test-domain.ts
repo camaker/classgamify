@@ -297,6 +297,7 @@ import {
   buildDashboardCoreLoopReadiness,
   buildDashboardOverviewMetrics,
   buildDashboardOverviewPageViewModel,
+  buildDashboardOverviewRouteViewModel,
   buildDashboardOverviewStarterPreview,
   dashboardOverviewPageCopy,
   formatDashboardMetricValue,
@@ -15649,6 +15650,31 @@ const dashboardOverviewPageView = buildDashboardOverviewPageViewModel({
   },
   isLoading: false,
 });
+const dashboardOverviewRouteView = buildDashboardOverviewRouteViewModel({
+  activitiesData: {
+    summary: {
+      draftActivities: 2,
+      templateCoverage: 5,
+      totalActivities: 9,
+    },
+  },
+  activitiesLoading: false,
+  assignmentsData: {
+    summary: {
+      averageScore: 82.6,
+      completions: 14,
+      openAssignments: 3,
+      totalAssignments: 6,
+    },
+  },
+  assignmentsLoading: false,
+});
+const loadingDashboardOverviewRouteView = buildDashboardOverviewRouteViewModel({
+  activitiesData: null,
+  activitiesLoading: true,
+  assignmentsData: null,
+  assignmentsLoading: false,
+});
 const dashboardOverviewStarterPreview = buildDashboardOverviewStarterPreview();
 assert.deepEqual(
   {
@@ -15672,6 +15698,29 @@ assert.deepEqual(
     activityId: 'english-food-quiz',
     assignmentId: 'assignment-food-demo',
     source: 'starter-preview',
+  }
+);
+assert.deepEqual(
+  {
+    loadingDescription:
+      loadingDashboardOverviewRouteView.metrics[0]?.description,
+    metricIds: dashboardOverviewRouteView.metrics.map((metric) => metric.id),
+    readinessValues: dashboardOverviewRouteView.readinessRows.map((row) => [
+      row.id,
+      row.value,
+    ]),
+    resultMetric: dashboardOverviewRouteView.metrics[3]?.value,
+  },
+  {
+    loadingDescription: 'Loading your library...',
+    metricIds: ['activities', 'templates', 'assignments', 'results'],
+    readinessValues: [
+      ['activity-authoring', 100],
+      ['assignment-links', 100],
+      ['student-runner', 100],
+      ['teacher-results', 100],
+    ],
+    resultMetric: '83%',
   }
 );
 assert.deepEqual(
@@ -15906,8 +15955,13 @@ assert.match(
 );
 assert.match(
   dashboardOverviewRouteSource,
-  /buildDashboardOverviewPageViewModel\(\{[\s\S]*activitySummary: activitiesData\?\.summary,[\s\S]*assignmentSummary: assignmentsData\?\.summary,[\s\S]*isLoading: activitiesLoading \|\| assignmentsLoading/,
-  'Dashboard overview route should pass owner-scoped API summaries into the page view-model.'
+  /buildDashboardOverviewRouteViewModel\(\{[\s\S]*activitiesData,[\s\S]*activitiesLoading,[\s\S]*assignmentsData,[\s\S]*assignmentsLoading/,
+  'Dashboard overview route should pass owner-scoped API query results into the dashboard-domain route view-model.'
+);
+assert.doesNotMatch(
+  dashboardOverviewRouteSource,
+  /buildDashboardOverviewPageViewModel|activitiesData\?\.summary|assignmentsData\?\.summary|activitiesLoading \|\| assignmentsLoading/,
+  'Dashboard overview route should not directly derive summaries or loading state for the page view-model.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
