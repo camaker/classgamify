@@ -253,6 +253,7 @@ import {
   buildActivityCreatePageEditorViewModel,
   buildActivityCreatePageViewModel,
   buildActivityEditPageViewModel,
+  buildActivityEditRouteState,
   activityContentToEditorInput,
   ACTIVITY_EDITOR_READINESS_PANEL_LIMITS,
   buildActivityEditorAiDraftPanelView,
@@ -942,8 +943,18 @@ const activityEditRouteSource = readFileSync(
 );
 assert.match(
   activityEditRouteSource,
-  /buildActivityEditPageViewModel/,
-  'The activity edit route should consume the activity-domain page view-model.'
+  /buildActivityEditRouteState/,
+  'The activity edit route should consume the activity-domain route state helper.'
+);
+assert.match(
+  activityEditRouteSource,
+  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*routeState\.status === 'blocked'[\s\S]*routeState\.status === 'ready'/,
+  'The activity edit route should render loading, error, blocked, and ready states from the activity-domain route state.'
+);
+assert.doesNotMatch(
+  activityEditRouteSource,
+  /buildActivityEditPageViewModel|isLoading \?|isError \|\| !activity|editAccessView && !pageView\.editAccessView\.canEdit|pageView\.editor \?/,
+  'The activity edit route should not directly build page views or branch on raw query and edit-access state.'
 );
 assert.doesNotMatch(
   activityEditRouteSource,
@@ -16056,6 +16067,39 @@ assert.deepEqual(buildActivityEditPageViewModel(undefined), {
     'Activity could not be loaded. Refresh the page or return to the activity library.',
   title: 'Edit activity',
 });
+const activityEditLoadingRouteState = buildActivityEditRouteState({
+  activity: undefined,
+  isError: false,
+  isLoading: true,
+});
+assert.deepEqual(
+  {
+    backHref: activityEditLoadingRouteState.pageView.backAction.href,
+    status: activityEditLoadingRouteState.status,
+    title: activityEditLoadingRouteState.pageView.title,
+  },
+  {
+    backHref: '/dashboard/activities',
+    status: 'loading',
+    title: 'Edit activity',
+  }
+);
+const activityEditErrorRouteState = buildActivityEditRouteState({
+  activity: null,
+  isError: true,
+  isLoading: false,
+});
+assert.deepEqual(
+  {
+    message: activityEditErrorRouteState.pageView.loadErrorMessage,
+    status: activityEditErrorRouteState.status,
+  },
+  {
+    message:
+      'Activity could not be loaded. Refresh the page or return to the activity library.',
+    status: 'error',
+  }
+);
 assert.deepEqual(activityLibraryPageCopy, {
   breadcrumbCurrent: 'Activities',
   breadcrumbDashboard: 'Dashboard',
@@ -17935,6 +17979,18 @@ const editableActivityPageView = buildActivityEditPageViewModel({
   title: 'Default source summary',
   visibility: 'draft',
 });
+const editableActivityRouteState = buildActivityEditRouteState({
+  activity: {
+    contentJson: defaultSourceSummaryContent,
+    description: 'Default source summary',
+    id: 'activity-edit-1',
+    templateType: 'quiz',
+    title: 'Default source summary',
+    visibility: 'draft',
+  },
+  isError: false,
+  isLoading: false,
+});
 assert.deepEqual(
   {
     accessTitle: editableActivityPageView.editAccessView?.title,
@@ -17957,6 +18013,19 @@ assert.deepEqual(
     title: 'Default source summary',
   }
 );
+assert.deepEqual(
+  {
+    editorActivityId:
+      editableActivityRouteState.status === 'ready'
+        ? editableActivityRouteState.pageView.editor.activityId
+        : undefined,
+    status: editableActivityRouteState.status,
+  },
+  {
+    editorActivityId: 'activity-edit-1',
+    status: 'ready',
+  }
+);
 const archivedActivityPageView = buildActivityEditPageViewModel({
   contentJson: defaultSourceSummaryContent,
   description: 'Archived source summary',
@@ -17964,6 +18033,18 @@ const archivedActivityPageView = buildActivityEditPageViewModel({
   templateType: 'quiz',
   title: 'Archived source summary',
   visibility: 'archived',
+});
+const archivedActivityRouteState = buildActivityEditRouteState({
+  activity: {
+    contentJson: defaultSourceSummaryContent,
+    description: 'Archived source summary',
+    id: 'activity-edit-archived',
+    templateType: 'quiz',
+    title: 'Archived source summary',
+    visibility: 'archived',
+  },
+  isError: false,
+  isLoading: false,
 });
 assert.deepEqual(
   {
@@ -17979,6 +18060,24 @@ assert.deepEqual(
     editor: undefined,
     restoreHref: '/dashboard/activities',
     restoreSearch: { status: 'archived' },
+  }
+);
+assert.deepEqual(
+  {
+    actionLabel:
+      archivedActivityRouteState.status === 'blocked'
+        ? archivedActivityRouteState.pageView.editAccessView.actionLabel
+        : undefined,
+    canEdit:
+      archivedActivityRouteState.status === 'blocked'
+        ? archivedActivityRouteState.pageView.editAccessView.canEdit
+        : undefined,
+    status: archivedActivityRouteState.status,
+  },
+  {
+    actionLabel: 'Open archived activities',
+    canEdit: false,
+    status: 'blocked',
   }
 );
 assert.doesNotThrow(() =>

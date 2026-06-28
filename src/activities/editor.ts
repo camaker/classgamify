@@ -224,6 +224,30 @@ type ActivityEditPageViewModel = {
   title: string;
 };
 
+type ActivityEditRouteState =
+  | {
+      pageView: ActivityEditPageViewModel;
+      status: 'loading';
+    }
+  | {
+      pageView: ActivityEditPageViewModel;
+      status: 'error';
+    }
+  | {
+      pageView: ActivityEditPageViewModel & {
+        editAccessView: NonNullable<
+          ActivityEditPageViewModel['editAccessView']
+        >;
+      };
+      status: 'blocked';
+    }
+  | {
+      pageView: ActivityEditPageViewModel & {
+        editor: NonNullable<ActivityEditPageViewModel['editor']>;
+      };
+      status: 'ready';
+    };
+
 const activityEditorSectionId = 'activity-editor';
 
 export function getActivityEditorDefaultInput(): CreateActivityInput {
@@ -547,6 +571,57 @@ export function buildActivityEditPageViewModel(
     editor,
     loadErrorMessage: activityEditPageCopy.loadErrorMessage,
     title,
+  };
+}
+
+export function buildActivityEditRouteState({
+  activity,
+  isError,
+  isLoading,
+}: {
+  activity?: ActivityEditPageActivitySource | null;
+  isError: boolean;
+  isLoading: boolean;
+}): ActivityEditRouteState {
+  const pageView = buildActivityEditPageViewModel(activity);
+
+  if (isLoading) {
+    return {
+      pageView,
+      status: 'loading',
+    };
+  }
+
+  if (isError || !activity) {
+    return {
+      pageView,
+      status: 'error',
+    };
+  }
+
+  if (pageView.editAccessView && !pageView.editAccessView.canEdit) {
+    return {
+      pageView: {
+        ...pageView,
+        editAccessView: pageView.editAccessView,
+      },
+      status: 'blocked',
+    };
+  }
+
+  if (!pageView.editor) {
+    return {
+      pageView,
+      status: 'error',
+    };
+  }
+
+  return {
+    pageView: {
+      ...pageView,
+      editor: pageView.editor,
+    },
+    status: 'ready',
   };
 }
 

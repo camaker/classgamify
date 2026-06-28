@@ -1,4 +1,4 @@
-import { buildActivityEditPageViewModel } from '@/activities/editor';
+import { buildActivityEditRouteState } from '@/activities/editor';
 import { ActivityCreateForm } from '@/components/activities/activity-create-form';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -16,10 +16,16 @@ export const Route = createFileRoute('/dashboard/activities/$activityId')({
 function ActivityEditPage() {
   const { activityId } = Route.useParams();
   const { data: activity, isError, isLoading } = useActivity(activityId);
-  const pageView = useMemo(
-    () => buildActivityEditPageViewModel(activity),
-    [activity]
+  const routeState = useMemo(
+    () =>
+      buildActivityEditRouteState({
+        activity,
+        isError,
+        isLoading,
+      }),
+    [activity, isError, isLoading]
   );
+  const pageView = routeState.pageView;
 
   return (
     <DashboardLayout
@@ -39,13 +45,13 @@ function ActivityEditPage() {
           {pageView.backAction.label}
         </Link>
 
-        {isLoading ? (
+        {routeState.status === 'loading' ? (
           <Card className="min-h-96 rounded-lg" />
-        ) : isError || !activity ? (
+        ) : routeState.status === 'error' ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {pageView.loadErrorMessage}
           </div>
-        ) : pageView.editAccessView && !pageView.editAccessView.canEdit ? (
+        ) : routeState.status === 'blocked' ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
             <h2 className="text-lg font-semibold">
               {pageView.editAccessView.title}
@@ -62,14 +68,16 @@ function ActivityEditPage() {
               </Link>
             </Button>
           </div>
-        ) : pageView.editor ? (
+        ) : routeState.status === 'ready' ? (
           <ActivityCreateForm
             activityId={pageView.editor.activityId}
             initialValues={pageView.editor.initialValues}
             mode={pageView.editor.mode}
           />
         ) : (
-          <Card className="min-h-96 rounded-lg" />
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+            {pageView.loadErrorMessage}
+          </div>
         )}
       </div>
     </DashboardLayout>
