@@ -980,7 +980,9 @@ export function buildAssignmentItemAnalysisCardView(
       : null,
     acceptedAnswersText: answerView.optionalAcceptedAlternativesText,
     correctRateLabel: formatAssignmentResultPercent(item.correctRate),
-    correctRateProgressValue: clampProgressValue(item.correctRate),
+    correctRateProgressValue: normalizeAssignmentResultProgressValue(
+      item.correctRate
+    ),
     correctSummaryLabel,
     expectedAnswerLabel,
     expectedAnswerSummaryText: m.assignment_result_review_expected_summary({
@@ -1113,7 +1115,7 @@ export function formatAssignmentReviewCount(count: number) {
   return formatAssignmentSummaryReviewCount(count);
 }
 
-function clampProgressValue(value: number) {
+export function normalizeAssignmentResultProgressValue(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(100, Math.max(0, value));
 }

@@ -580,6 +580,7 @@ import {
   getAssignmentAnswerReviewStatus,
   getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
+  normalizeAssignmentResultProgressValue,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -3858,6 +3859,21 @@ assert.match(
 assert.match(
   assignmentResultViewSource,
   /buildAssignmentItemAnalysisCardView[\s\S]*buildAssignmentResultAcceptedAnswerView\(/
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function normalizeAssignmentResultProgressValue[\s\S]*Math\.min\(100,[\s\S]*Math\.max\(0, value\)/,
+  'Assignment result progress values should normalize through one exported helper.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /correctRateProgressValue: normalizeAssignmentResultProgressValue\(\s*item\.correctRate\s*\)/,
+  'Assignment item analysis cards should use the shared progress-value normalizer.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /clampProgressValue/,
+  'Assignment result view should not keep a private generic progress clamp helper.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -27913,6 +27929,10 @@ assert.equal(
   }).correctRateProgressValue,
   0
 );
+assert.equal(normalizeAssignmentResultProgressValue(67), 67);
+assert.equal(normalizeAssignmentResultProgressValue(120), 100);
+assert.equal(normalizeAssignmentResultProgressValue(-20), 0);
+assert.equal(normalizeAssignmentResultProgressValue(Number.NaN), 0);
 assert.deepEqual(
   buildAssignmentItemPerformanceRowView({
     index: 0,
