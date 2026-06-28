@@ -1445,6 +1445,11 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /description: m\.assignment_result_action_copy_brief_description\(\)[\s\S]*description: m\.assignment_result_action_copy_follow_up_description\(\)[\s\S]*description: m\.assignment_result_action_copy_item_review_description\(\)[\s\S]*description: m\.assignment_result_action_copy_reteach_plan_description\(\)[\s\S]*description: m\.assignment_result_action_export_csv_description\(\)/,
+  'Assignment result action descriptions should come from localized assignment-domain action copy.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /disabledReason \? \{ disabledReason \} : \{\}/,
   'Assignment result action buttons should expose prepared disabled reasons only when an action is blocked.'
 );
@@ -3343,8 +3348,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*actionButton\.label/,
-  'Assignment result action buttons should render prepared result action state through focused button components.'
+  /function AssignmentResultsHeaderResultActions[\s\S]*resultActions\.map[\s\S]*AssignmentResultsHeaderResultActionButton[\s\S]*function AssignmentResultsHeaderResultActionButton[\s\S]*resultActionIconByAction\[actionButton\.action\][\s\S]*actionButton\.disabled[\s\S]*actionButton\.label[\s\S]*actionButton\.description/,
+  'Assignment result action buttons should render prepared result action state and descriptions through focused button components.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -26959,6 +26964,8 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: true,
       disabledReason: 'Submit at least one attempt before copying a brief.',
       failureMessage: 'Classroom brief could not be copied.',
@@ -26972,6 +26979,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-reteach-plan',
+      description:
+        'Copy a lesson-ready script for the weakest items and priority students.',
       disabled: true,
       disabledReason:
         'Submit at least one attempt before copying a reteach plan.',
@@ -26986,6 +26995,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-item-review',
+      description:
+        'Copy prompt-level performance with expected answers, alternatives, and notes.',
       disabled: true,
       disabledReason: 'Add assignment items before copying item review.',
       failureMessage: 'Item review could not be copied.',
@@ -26999,6 +27010,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-follow-up',
+      description:
+        'Copy a student-by-student support list sorted by review need.',
       disabled: true,
       disabledReason: 'Submit at least one attempt before copying follow-up.',
       failureMessage: 'Student follow-up could not be copied.',
@@ -27012,6 +27025,8 @@ assert.deepEqual(
     },
     {
       action: 'export-csv',
+      description:
+        'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: true,
       disabledReason: 'Submit at least one attempt before exporting results.',
       failureMessage: 'Results CSV could not be downloaded.',
@@ -27036,6 +27051,8 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
@@ -27045,6 +27062,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-reteach-plan',
+      description:
+        'Copy a lesson-ready script for the weakest items and priority students.',
       disabled: false,
       failureMessage: 'Reteach plan could not be copied.',
       gate: { type: 'ready' },
@@ -27054,6 +27073,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-item-review',
+      description:
+        'Copy prompt-level performance with expected answers, alternatives, and notes.',
       disabled: false,
       failureMessage: 'Item review could not be copied.',
       gate: { type: 'ready' },
@@ -27063,6 +27084,8 @@ assert.deepEqual(
     },
     {
       action: 'copy-follow-up',
+      description:
+        'Copy a student-by-student support list sorted by review need.',
       disabled: false,
       failureMessage: 'Student follow-up could not be copied.',
       gate: { type: 'ready' },
@@ -27072,6 +27095,8 @@ assert.deepEqual(
     },
     {
       action: 'export-csv',
+      description:
+        'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: false,
       failureMessage: 'Results CSV could not be downloaded.',
       gate: { type: 'ready' },
@@ -27729,26 +27754,35 @@ assert.deepEqual(
   { type: 'ready' }
 );
 assert.deepEqual(getAssignmentResultActionCopy('copy-brief'), {
+  description:
+    'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
   failureMessage: 'Classroom brief could not be copied.',
   label: 'Copy brief',
   successMessage: 'Classroom brief copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-follow-up'), {
+  description: 'Copy a student-by-student support list sorted by review need.',
   failureMessage: 'Student follow-up could not be copied.',
   label: 'Copy follow-up',
   successMessage: 'Student follow-up copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-item-review'), {
+  description:
+    'Copy prompt-level performance with expected answers, alternatives, and notes.',
   failureMessage: 'Item review could not be copied.',
   label: 'Copy item review',
   successMessage: 'Item review copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('copy-reteach-plan'), {
+  description:
+    'Copy a lesson-ready script for the weakest items and priority students.',
   failureMessage: 'Reteach plan could not be copied.',
   label: 'Copy reteach plan',
   successMessage: 'Reteach plan copied.',
 });
 assert.deepEqual(getAssignmentResultActionCopy('export-csv'), {
+  description:
+    'Download gradebook-ready results with delivery policy and item-level answers.',
   failureMessage: 'Results CSV could not be downloaded.',
   label: 'Download CSV',
   successMessage: 'Results CSV downloaded.',
@@ -29071,6 +29105,8 @@ assert.deepEqual(
   buildAssignmentResultActionPayload({
     actionButton: {
       action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
@@ -29089,6 +29125,8 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
@@ -29110,6 +29148,8 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'copy-brief',
+        description:
+          'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
         disabled: true,
         failureMessage: 'Classroom brief could not be copied.',
         gate: {
@@ -29127,6 +29167,8 @@ assert.throws(
 const downloadCsvPayload = buildAssignmentResultActionPayload({
   actionButton: {
     action: 'export-csv',
+    description:
+      'Download gradebook-ready results with delivery policy and item-level answers.',
     disabled: false,
     failureMessage: 'Results CSV could not be downloaded.',
     gate: { type: 'ready' },
@@ -29153,6 +29195,8 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'export-csv',
+      description:
+        'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: false,
       failureMessage: 'Results CSV could not be downloaded.',
       gate: { type: 'ready' },
@@ -29175,6 +29219,8 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'export-csv',
+        description:
+          'Download gradebook-ready results with delivery policy and item-level answers.',
         disabled: true,
         failureMessage: 'Results CSV could not be downloaded.',
         gate: {
@@ -29193,6 +29239,8 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'export-csv',
+      description:
+        'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: true,
       failureMessage: 'Results CSV could not be downloaded.',
       gate: {
@@ -29215,6 +29263,8 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },

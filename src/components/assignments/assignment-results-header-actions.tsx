@@ -156,7 +156,7 @@ function AssignmentResultsHeaderResultActions({
   resultActions: AssignmentResultActionButton[];
 }) {
   return (
-    <div className="flex basis-full flex-col gap-2 sm:flex-row sm:flex-wrap">
+    <div className="grid basis-full gap-2 md:grid-cols-2 xl:grid-cols-5">
       {resultActions.map((actionButton) => (
         <AssignmentResultsHeaderResultActionButton
           actionButton={actionButton}
@@ -184,17 +184,22 @@ function AssignmentResultsHeaderResultActionButton({
   const Icon = resultActionIconByAction[actionButton.action];
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className="w-full sm:w-auto"
-      disabled={actionButton.disabled}
-      onClick={onClick}
-      aria-describedby={disabledReasonId}
-    >
-      <Icon className="size-4" />
-      {actionButton.label}
-    </Button>
+    <div className="grid min-w-0 gap-1">
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full justify-start bg-background"
+        disabled={actionButton.disabled}
+        onClick={onClick}
+        aria-describedby={disabledReasonId}
+      >
+        <Icon className="size-4" />
+        {actionButton.label}
+      </Button>
+      <p className="text-muted-foreground text-xs leading-snug">
+        {actionButton.description}
+      </p>
+    </div>
   );
 }
 
@@ -217,7 +222,7 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
   if (disabledReasons.length === 0) return null;
 
   return (
-    <div className="grid basis-full gap-1 text-sm text-muted-foreground">
+    <div className="grid gap-1 text-sm text-muted-foreground md:col-span-2 xl:col-span-5">
       {disabledReasons.map((disabledReason) => (
         <p
           id={getResultActionDisabledReasonId({

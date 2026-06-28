@@ -33,6 +33,7 @@ export type AssignmentResultActionGate =
     };
 
 type AssignmentResultActionCopy = {
+  description: string;
   failureMessage: string;
   label: string;
   successMessage: string;
@@ -51,6 +52,7 @@ export type AssignmentResultActionDescriptor =
 export type AssignmentResultActionButton =
   | {
       action: AssignmentResultCopyAction;
+      description: string;
       disabled: boolean;
       disabledReason?: string;
       failureMessage: string;
@@ -61,6 +63,7 @@ export type AssignmentResultActionButton =
     }
   | {
       action: 'export-csv';
+      description: string;
       disabled: boolean;
       disabledReason?: string;
       failureMessage: string;
@@ -102,6 +105,7 @@ export type AssignmentResultActionExecutionPlan =
     };
 
 type AssignmentResultActionButtonBase = {
+  description: string;
   disabled: boolean;
   disabledReason?: string;
   failureMessage: string;
@@ -188,6 +192,7 @@ export function buildAssignmentResultActionButtons({
     const actionCopy = getAssignmentResultActionCopy(descriptor.action);
     const disabledReason = getAssignmentResultActionDisabledReason(gate);
     const base = {
+      description: actionCopy.description,
       disabled: Boolean(disabledReason),
       ...(disabledReason ? { disabledReason } : {}),
       failureMessage: actionCopy.failureMessage,
@@ -401,30 +406,35 @@ export function getAssignmentResultActionCopy(
   switch (action) {
     case 'copy-brief':
       return {
+        description: m.assignment_result_action_copy_brief_description(),
         failureMessage: m.assignment_result_action_copy_brief_failure(),
         label: m.assignment_result_action_copy_brief_label(),
         successMessage: m.assignment_result_action_copy_brief_success(),
       };
     case 'copy-follow-up':
       return {
+        description: m.assignment_result_action_copy_follow_up_description(),
         failureMessage: m.assignment_result_action_copy_follow_up_failure(),
         label: m.assignment_result_action_copy_follow_up_label(),
         successMessage: m.assignment_result_action_copy_follow_up_success(),
       };
     case 'copy-item-review':
       return {
+        description: m.assignment_result_action_copy_item_review_description(),
         failureMessage: m.assignment_result_action_copy_item_review_failure(),
         label: m.assignment_result_action_copy_item_review_label(),
         successMessage: m.assignment_result_action_copy_item_review_success(),
       };
     case 'copy-reteach-plan':
       return {
+        description: m.assignment_result_action_copy_reteach_plan_description(),
         failureMessage: m.assignment_result_action_copy_reteach_plan_failure(),
         label: m.assignment_result_action_copy_reteach_plan_label(),
         successMessage: m.assignment_result_action_copy_reteach_plan_success(),
       };
     case 'export-csv':
       return {
+        description: m.assignment_result_action_export_csv_description(),
         failureMessage: m.assignment_result_action_export_csv_failure(),
         label: m.assignment_result_action_export_csv_label(),
         successMessage: m.assignment_result_action_export_csv_success(),

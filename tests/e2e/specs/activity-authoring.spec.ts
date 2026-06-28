@@ -116,6 +116,42 @@ test.describe('activity authoring', () => {
     await expect(page.getByText('Score submitted')).not.toBeVisible();
     await expect(page.getByText('0/2 answered')).toBeVisible();
     await expect(page.getByLabel('Student name')).toHaveValue('E2E Student');
+
+    await page.goto('/dashboard/assignments');
+    await page
+      .getByRole('link', { name: /^view results$/i })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/dashboard\/assignments\/[^/]+$/);
+    await expect(
+      page.getByRole('heading', { name: assignmentTitle })
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.'
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        'Copy a lesson-ready script for the weakest items and priority students.'
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        'Copy prompt-level performance with expected answers, alternatives, and notes.'
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        'Copy a student-by-student support list sorted by review need.'
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        'Download gradebook-ready results with delivery policy and item-level answers.'
+      )
+    ).toBeVisible();
+
     await expectNoBrowserErrors(monitor, 'publish assignment from saved panel');
   });
 
