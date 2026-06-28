@@ -5,6 +5,7 @@ import {
   type buildActivityLibraryCardViewModel,
 } from '@/activities/library-view';
 import { ActivityLibraryCompatibilityPanel } from '@/components/activities/activity-library-compatibility-panel';
+import { ActivityLibraryStats } from '@/components/activities/activity-library-stats';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { ActivitySourceMaterialsSummary } from '@/components/activities/activity-source-materials-summary';
 import { Badge } from '@/components/ui/badge';
@@ -141,15 +142,7 @@ export function ActivityLibraryCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          {cardDisplayView.stats.map((stat) => (
-            <ActivityStat
-              key={stat.key}
-              label={stat.label}
-              value={stat.value}
-            />
-          ))}
-        </div>
+        <ActivityLibraryStats stats={cardDisplayView.stats} />
         <ActivitySourceMaterialsSummary
           className="bg-muted/30"
           summary={cardDisplayView.sourceMaterials}
@@ -252,14 +245,5 @@ export function ActivityLibraryCard({
         }
       />
     </Card>
-  );
-}
-
-function ActivityStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border bg-background p-3">
-      <p className="text-xl font-semibold">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
   );
 }

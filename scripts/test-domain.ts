@@ -13631,6 +13631,10 @@ const activityLibraryCompatibilityPanelSource = readFileSync(
   'src/components/activities/activity-library-compatibility-panel.tsx',
   'utf8'
 );
+const activityLibraryStatsComponentSource = readFileSync(
+  'src/components/activities/activity-library-stats.tsx',
+  'utf8'
+);
 const activityLibraryCardComponentSource = readFileSync(
   'src/components/activities/activity-library-card.tsx',
   'utf8'
@@ -13740,6 +13744,16 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /ActivityLibraryStats[\s\S]*stats=\{cardDisplayView\.stats\}/,
+  'Activity library card component should delegate prepared stat rendering to a focused component.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /cardDisplayView\.stats\.map|function ActivityStat/,
+  'Activity library card component should not hand-compose stat cards.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /ActivitySourceMaterialsSummary[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
   'Activity library card component should render source-material summary through the shared summary component.'
 );
@@ -13772,6 +13786,16 @@ assert.match(
   activityLibraryCompatibilityPanelSource,
   /compatibility\.lockedTemplateDiagnostics[\s\S]*diagnosis/,
   'Activity library compatibility panel should render prepared locked-template diagnostics.'
+);
+assert.match(
+  activityLibraryStatsComponentSource,
+  /ActivityLibraryCardDisplayView\['stats'\]/,
+  'Activity library stats component should consume the activity-domain stat item contract.'
+);
+assert.match(
+  activityLibraryStatsComponentSource,
+  /stats\.map[\s\S]*stat\.label[\s\S]*stat\.value/,
+  'Activity library stats component should render prepared stat labels and values.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
