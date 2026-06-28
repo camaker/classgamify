@@ -139,12 +139,10 @@ export function removeActivitySourceMaterialDraftNotes(sourceText: string) {
 export function buildActivitySourceMaterialDraftNoteView(
   material: ActivitySourceMaterialDraftNoteSource
 ): ActivitySourceMaterialDraftNoteView {
-  return {
+  return normalizeActivitySourceMaterialDraftNoteView({
     kindLabel: formatUserFileMaterialKind(material.kind),
-    name:
-      normalizeActivityMaterialReferenceFilename(material.originalName) ??
-      normalizeDraftSourceText(material.originalName),
-  };
+    name: material.originalName,
+  });
 }
 
 export function isSafeActivitySourceMaterialDraftKind(kindLabel: string) {
@@ -156,6 +154,31 @@ export function isSafeActivitySourceMaterialDraftKind(kindLabel: string) {
   ]).map(normalizeRuntimeDisplayText);
 
   return supportedKindLabels.includes(normalizedKindLabel);
+}
+
+export function normalizeActivitySourceMaterialDraftNoteView(
+  noteView: ActivitySourceMaterialDraftNoteView
+): ActivitySourceMaterialDraftNoteView {
+  const kindLabel = normalizeRuntimeDisplayText(noteView.kindLabel);
+  const name = normalizeActivityMaterialReferenceFilename(noteView.name) ?? '';
+
+  return {
+    kindLabel,
+    name,
+  };
+}
+
+export function isSafeActivitySourceMaterialDraftNoteView(
+  noteView: ActivitySourceMaterialDraftNoteView
+) {
+  const normalizedNoteView =
+    normalizeActivitySourceMaterialDraftNoteView(noteView);
+
+  return (
+    Boolean(normalizedNoteView.kindLabel) &&
+    Boolean(normalizedNoteView.name) &&
+    isSafeActivitySourceMaterialDraftKind(normalizedNoteView.kindLabel)
+  );
 }
 
 function countActivitySourceMaterialDraftKinds(
@@ -264,21 +287,16 @@ function parseActivitySourceMaterialDraftNoteLine(
   const match = line.match(
     /^-\s*(?<kindLabel>[^:：]+)\s*[:：]\s*(?<name>.+)$/u
   );
-  const kindLabel = normalizeDraftSourceText(match?.groups?.kindLabel);
-  const name = normalizeDraftSourceText(match?.groups?.name);
+  const noteView = normalizeActivitySourceMaterialDraftNoteView({
+    kindLabel: match?.groups?.kindLabel ?? '',
+    name: match?.groups?.name ?? '',
+  });
 
-  if (
-    !kindLabel ||
-    !name ||
-    !isSafeActivitySourceMaterialDraftKind(kindLabel)
-  ) {
+  if (!isSafeActivitySourceMaterialDraftNoteView(noteView)) {
     return null;
   }
 
-  return {
-    kindLabel,
-    name,
-  };
+  return noteView;
 }
 
 function unique(values: string[]) {

@@ -14,6 +14,7 @@ import {
 } from '@/activities/ai-draft-focus';
 import {
   isSafeActivitySourceMaterialDraftKind,
+  normalizeActivitySourceMaterialDraftNoteView,
   type ActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
 import type {
@@ -543,8 +544,10 @@ function normalizeActivityDraftSourceMaterialNoteViews(
   const seen = new Set<string>();
 
   for (const noteView of sourceMaterialNoteViews ?? []) {
-    const kindLabel = normalizeRuntimeDisplayText(noteView.kindLabel);
-    const name = normalizeRuntimeDisplayText(noteView.name);
+    const normalizedNoteView =
+      normalizeActivitySourceMaterialDraftNoteView(noteView);
+    const kindLabel = normalizedNoteView.kindLabel;
+    const name = normalizedNoteView.name;
     const key = `${kindLabel}\u0000${name}`.toLocaleLowerCase();
 
     if (

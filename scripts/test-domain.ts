@@ -168,6 +168,8 @@ import {
   buildActivitySourceMaterialDraftSummary,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
+  isSafeActivitySourceMaterialDraftNoteView,
+  normalizeActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
 import {
   buildActivityPreviewViewModel,
@@ -17149,6 +17151,26 @@ assert.match(
 );
 assert.match(
   activityDraftSourceSource,
+  /buildActivitySourceMaterialDraftNoteView[\s\S]*normalizeActivitySourceMaterialDraftNoteView\(\{[\s\S]*formatUserFileMaterialKind\(material\.kind\)[\s\S]*name: material\.originalName/,
+  'AI draft source material note views should normalize kind labels and filenames through the shared safe note helper.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /parseActivitySourceMaterialDraftNoteLine[\s\S]*normalizeActivitySourceMaterialDraftNoteView[\s\S]*isSafeActivitySourceMaterialDraftNoteView/,
+  'AI draft source-text note parsing should sanitize parsed notes before accepting them.'
+);
+assert.doesNotMatch(
+  activityDraftSourceSource,
+  /normalizeDraftSourceText\(match\?\.groups\?\.name\)|normalizeActivityMaterialReferenceFilename\(material\.originalName\) \?\?/,
+  'AI draft source material notes should not fall back to raw parsed names after filename sanitization fails.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /normalizeActivitySourceMaterialDraftNoteView[\s\S]*sourceMaterialNoteViews \?\? \[\][\s\S]*normalizeActivitySourceMaterialDraftNoteView\(noteView\)/,
+  'AI draft meta source material note views should reuse draft-source filename sanitization.'
+);
+assert.match(
+  activityDraftSourceSource,
   /getActivityDraftSourceText[\s\S]*buildActivitySourceMaterialDraftSummary\([\s\S]*values\.sourceMaterials[\s\S]*sourceMaterialSummary\.notesText/,
   'AI draft source text should append source-material notes from the shared safe summary.'
 );
@@ -24930,11 +24952,15 @@ const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
   sourceMaterialNoteViews: [
     {
       kindLabel: '  Worksheet document  ',
-      name: ' Weather worksheet.pdf ',
+      name: 'https://files.example.test/private/Weather worksheet.pdf?token=secret',
     },
     {
       kindLabel: 'Ｗｏｒｋｓｈｅｅｔ　ｄｏｃｕｍｅｎｔ',
       name: 'Weather worksheet.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: 'C:\\teacher\\private\\Weather listening.mp3?signature=abc',
     },
     {
       kindLabel: 'storageKey',
@@ -25065,7 +25091,7 @@ assert.equal(
 );
 assert.equal(
   fallbackDraftMetaSummary.sourceMaterialCountLabel,
-  '1 source material'
+  '2 source materials'
 );
 assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
   {
@@ -25073,7 +25099,16 @@ assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
     kindLabel: 'Worksheet document',
     name: 'Weather worksheet.pdf',
   },
+  {
+    displayText: 'Audio · Weather listening.mp3',
+    kindLabel: 'Audio',
+    name: 'Weather listening.mp3',
+  },
 ]);
+assert.doesNotMatch(
+  JSON.stringify(fallbackDraftMetaSummary.sourceMaterialNoteViews),
+  /https?:|files\.example|private|token|signature|storageKey|teacher\\/i
+);
 assert.equal(
   fallbackDraftMetaSummary.suggestedTemplateOptions,
   fallbackDraftMeta.suggestedTemplateOptions
@@ -26174,6 +26209,37 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(
+  normalizeActivitySourceMaterialDraftNoteView({
+    kindLabel: '  Ｗｏｒｋｓｈｅｅｔ　document ',
+    name: 'https://files.example.test/private/Unit 1.pdf?token=secret#page=2',
+  }),
+  {
+    kindLabel: 'Worksheet document',
+    name: 'Unit 1.pdf',
+  }
+);
+assert.equal(
+  isSafeActivitySourceMaterialDraftNoteView({
+    kindLabel: 'Worksheet document',
+    name: 'https://files.example.test/private/Unit 1.pdf?token=secret',
+  }),
+  true
+);
+assert.equal(
+  isSafeActivitySourceMaterialDraftNoteView({
+    kindLabel: 'storageKey',
+    name: 'userfiles/teacher/private.pdf',
+  }),
+  false
+);
+assert.equal(
+  isSafeActivitySourceMaterialDraftNoteView({
+    kindLabel: 'Worksheet document',
+    name: '   ',
+  }),
+  false
+);
 assert.deepEqual(Object.keys(sensitiveMaterialDraftNoteViews[0] ?? {}).sort(), [
   'kindLabel',
   'name',
@@ -26218,6 +26284,27 @@ assert.equal(
 assert.doesNotMatch(
   safeBasenameMaterialDraftNotes ?? '',
   unsafeMaterialFilenameSuffixPattern
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    [
+      'Attached classroom source materials:',
+      '- Worksheet document: https://files.example.test/private/Unit 1.pdf?token=secret#page=2',
+      '- Audio: C:\\teacher\\private\\Unit 1 listening.mp3?signature=abc',
+      '- storageKey: userfiles/teacher/private.pdf',
+      '- Worksheet document: <>',
+    ].join('\n')
+  ),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Unit 1.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: 'Unit 1 listening.mp3',
+    },
+  ]
 );
 const appendedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes({
   sourceMaterials: [listeningMaterialReference],
