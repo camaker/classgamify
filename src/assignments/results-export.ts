@@ -74,21 +74,14 @@ export type AssignmentResultsExportData = {
 
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
-  const exportSettings = buildAssignmentExportSettings(settings);
+  const deliveryView = buildAssignmentResultsExportDeliveryView({
+    expiresAt: data.assignment.expiresAt,
+    settings,
+  });
   const resolvedSource = resolveAssignmentSnapshotSource(data);
   const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
   const shareSlug = normalizeAssignmentShareSlug(data.assignment.shareSlug);
   const statsView = buildAssignmentAttemptStatsView(data.stats);
-  const deliverySummaryById = new Map(
-    buildAssignmentDeliverySummary({
-      collectStudentName: exportSettings.collectStudentName,
-      expiresAt: data.assignment.expiresAt,
-      maxAttempts: exportSettings.maxAttempts,
-      showCorrectAnswers: exportSettings.showCorrectAnswers,
-      shuffleItems: exportSettings.shuffleItems,
-      timeLimitSeconds: exportSettings.timeLimitSeconds,
-    }).map((item) => [item.id, item.value])
-  );
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
@@ -99,7 +92,7 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
     const studentSummary = studentsByKey.get(attempt.studentKey);
     const attemptDurationSeconds = normalizeAttemptDurationSeconds({
       durationSeconds: storedAttempt?.resultJson?.durationSeconds,
-      timeLimitSeconds: exportSettings.timeLimitSeconds,
+      timeLimitSeconds: deliveryView.timeLimitSeconds,
     });
     const baseColumns = [
       data.assignment.id,
@@ -111,16 +104,13 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
         status: data.assignment.status,
       }),
       formatAssignmentResultCsvDate(data.assignment.expiresAt),
-      formatAssignmentDeliveryPolicyText({
-        expiresAt: data.assignment.expiresAt,
-        settings: exportSettings,
-      }),
-      exportSettings.instructions ?? '',
-      deliverySummaryById.get('identity') ?? '',
-      deliverySummaryById.get('answerReveal') ?? '',
-      deliverySummaryById.get('itemOrder') ?? '',
-      formatAssignmentExportMaxAttempts(exportSettings.maxAttempts),
-      exportSettings.timeLimitSeconds ?? '',
+      deliveryView.policyText,
+      deliveryView.instructions,
+      deliveryView.identityMode,
+      deliveryView.answerReveal,
+      deliveryView.itemOrder,
+      deliveryView.maxAttempts,
+      deliveryView.timeLimitSeconds ?? '',
       resolvedSource.activityTitle,
       formatAssignmentExportTemplateLabel(resolvedSource.templateType),
       formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
@@ -203,6 +193,40 @@ export function buildAssignmentResultsCsvFilename(
 
 export function buildAssignmentResultsCsvDataUrl(csv: string) {
   return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+}
+
+export function buildAssignmentResultsExportDeliveryView({
+  expiresAt,
+  settings,
+}: {
+  expiresAt: Date | string | null;
+  settings: AssignmentSettings;
+}) {
+  const exportSettings = buildAssignmentExportSettings(settings);
+  const deliverySummaryById = new Map(
+    buildAssignmentDeliverySummary({
+      collectStudentName: exportSettings.collectStudentName,
+      expiresAt,
+      maxAttempts: exportSettings.maxAttempts,
+      showCorrectAnswers: exportSettings.showCorrectAnswers,
+      shuffleItems: exportSettings.shuffleItems,
+      timeLimitSeconds: exportSettings.timeLimitSeconds,
+    }).map((item) => [item.id, item.value])
+  );
+
+  return {
+    answerReveal: deliverySummaryById.get('answerReveal') ?? '',
+    identityMode: deliverySummaryById.get('identity') ?? '',
+    instructions: exportSettings.instructions ?? '',
+    itemOrder: deliverySummaryById.get('itemOrder') ?? '',
+    maxAttempts: formatAssignmentExportMaxAttempts(exportSettings.maxAttempts),
+    policyText: formatAssignmentDeliveryPolicyText({
+      expiresAt,
+      settings: exportSettings,
+    }),
+    settings: exportSettings,
+    timeLimitSeconds: exportSettings.timeLimitSeconds,
+  };
 }
 
 function getAssignmentResultsExportColumns() {

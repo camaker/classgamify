@@ -618,6 +618,7 @@ import {
 } from '@/assignments/results';
 import {
   ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
+  buildAssignmentResultsExportDeliveryView,
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsCsvFilename,
@@ -1759,8 +1760,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /const exportSettings = buildAssignmentExportSettings\(settings\)[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*settings: exportSettings[\s\S]*exportSettings\.instructions \?\? ''[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
+  /const deliveryView = buildAssignmentResultsExportDeliveryView\(\{[\s\S]*expiresAt: data\.assignment\.expiresAt,[\s\S]*settings,[\s\S]*deliveryView\.policyText[\s\S]*deliveryView\.instructions[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
   'Assignment CSV export should format delivery policy, instructions, prompt, and explanation cells through the shared text helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /export function buildAssignmentResultsExportDeliveryView[\s\S]*buildAssignmentExportSettings\(settings\)[\s\S]*buildAssignmentDeliverySummary\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*settings: exportSettings/,
+  'Assignment CSV export delivery view should share assignment delivery-summary formatting.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /export function buildAssignmentResultsCsv\((?:(?!\nexport function buildAssignmentResultsCsvFilename)[\s\S])*const deliverySummaryById = new Map/,
+  'Assignment CSV export should not rebuild delivery summary maps inside the row builder.'
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
@@ -26205,6 +26216,30 @@ const csvExportData = {
 } satisfies Parameters<typeof buildAssignmentResultsCsv>[0];
 
 const csv = buildAssignmentResultsCsv(csvExportData);
+assert.deepEqual(
+  buildAssignmentResultsExportDeliveryView({
+    expiresAt: csvExportData.assignment.expiresAt,
+    settings: resolveAssignmentSettings(csvExportData.assignment.settingsJson),
+  }),
+  {
+    answerReveal: 'After submit',
+    identityMode: 'Names',
+    instructions: 'Use "complete sentences", then submit.',
+    itemOrder: 'Fixed order',
+    maxAttempts: 2,
+    policyText:
+      'Student instructions: Use "complete sentences", then submit.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order',
+    settings: {
+      collectStudentName: true,
+      instructions: 'Use "complete sentences", then submit.',
+      maxAttempts: 2,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 60,
+    },
+    timeLimitSeconds: 60,
+  }
+);
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
 assert.match(csv, /"expires_at","delivery_policy","instructions"/);
 assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123","Open"/);
