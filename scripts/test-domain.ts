@@ -5044,7 +5044,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerSubmissionPlan[\s\S]*buildStudentAttemptSubmissionPlan\(\{[\s\S]*pageView\.attemptState\.completionSummary[\s\S]*pageView\.runtimeItems[\s\S]*pageView\.activeShareId[\s\S]*pageView\.startedAt[\s\S]*pageView\.timeLimitSeconds/,
+  /export function buildStudentRunnerSubmissionPlan[\s\S]*buildStudentAttemptSubmissionPlan\(\{[\s\S]*pageView\.attemptState\.completionSummary[\s\S]*pageView\.runtimeListView\.items[\s\S]*pageView\.activeShareId[\s\S]*pageView\.startedAt[\s\S]*pageView\.timeLimitSeconds/,
   'Student runner state domain should adapt runner page view state into the assignment-domain submission plan.'
 );
 assert.match(
@@ -5064,8 +5064,13 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /revealAnswers: Boolean\([\s\S]*result && assignment\?\.settings\.showCorrectAnswers/,
+  /const revealAnswers = Boolean\([\s\S]*result && assignment\?\.settings\.showCorrectAnswers[\s\S]*runtimeListView: \{[\s\S]*revealAnswer: revealAnswers/,
   'Student runner page view-model should decide when submitted answers can reveal correct answers.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /type StudentRunnerPageViewModel = \{(?:(?!\n};)[\s\S])*(?:revealAnswers|reviewItems\?: PublicAttemptReviewItem|runtimeItems: PublicRuntimeItem)/,
+  'Student runner page view-model should expose runtime-list display state through runtimeListView instead of redundant top-level runtime fields.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -11282,12 +11287,12 @@ assert.deepEqual(
     itemCount: studentRunnerPageView.itemCount,
     loadingView: studentRunnerPageView.loadingView,
     missingView: studentRunnerPageView.missingView,
-    revealAnswers: studentRunnerPageView.revealAnswers,
     resultPanelView: studentRunnerPageView.resultPanelView,
-    reviewItems: studentRunnerPageView.reviewItems,
     routeBadgeLabel: studentRunnerPageView.routeBadgeLabel,
     runtimeListView: studentRunnerPageView.runtimeListView,
-    runtimeItemIds: studentRunnerPageView.runtimeItems.map((item) => item.id),
+    runtimeItemIds: studentRunnerPageView.runtimeListView.items.map(
+      (item) => item.id
+    ),
     showStartAnotherAttempt: studentRunnerPageView.showStartAnotherAttempt,
     startedAt: studentRunnerPageView.startedAt,
     submissionSuccessMessage: studentRunnerPageView.submissionSuccessMessage,
@@ -11359,7 +11364,6 @@ assert.deepEqual(
       message: 'Loading student activity...',
     },
     missingView: undefined,
-    revealAnswers: true,
     resultPanelView: {
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',
@@ -11370,7 +11374,6 @@ assert.deepEqual(
       startAnotherAttemptLabel: 'Start another attempt',
       statusLabel: 'Score submitted',
     },
-    reviewItems: undefined,
     routeBadgeLabel: 'Student play route',
     runtimeListView: {
       disabled: true,

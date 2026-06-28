@@ -154,12 +154,9 @@ type StudentRunnerPageViewModel = {
   itemCount: number;
   loadingView: StudentRunnerLoadingView;
   missingView?: StudentRunnerMissingPageView;
-  revealAnswers: boolean;
   resultPanelView: StudentRunnerResultPanelView;
-  reviewItems?: PublicAttemptReviewItem[];
   routeBadgeLabel: string;
   runtimeListView: StudentRunnerRuntimeListView;
-  runtimeItems: PublicRuntimeItem[];
   showStartAnotherAttempt: boolean;
   startedAt: number;
   submissionSuccessMessage: string;
@@ -452,6 +449,9 @@ export function buildStudentRunnerPageViewModel({
   const attemptUsageLabel = result
     ? formatStudentAttemptUsageLabel(result.attemptUsage)
     : undefined;
+  const revealAnswers = Boolean(
+    result && assignment?.settings.showCorrectAnswers
+  );
   const showStartAnotherAttempt = canStartAnotherStudentAttempt({
     canSubmit: attemptState.canSubmit,
     hasResult: Boolean(result),
@@ -511,23 +511,20 @@ export function buildStudentRunnerPageViewModel({
       pageState.status === 'missing'
         ? buildStudentRunnerMissingPageView(pageState.reason)
         : undefined,
-    revealAnswers: Boolean(result && assignment?.settings.showCorrectAnswers),
     resultPanelView: buildStudentRunnerResultPanelView({
       attemptResultDisplay,
       attemptUsageLabel,
       showStartAnotherAttempt,
     }),
-    reviewItems: result?.reviewItems,
     routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
     runtimeListView: {
       disabled: attemptControlState.runtimeItemsDisabled,
       items: attemptState.runtimeItems,
       language: activity?.content.language,
-      revealAnswer: Boolean(result && assignment?.settings.showCorrectAnswers),
+      revealAnswer: revealAnswers,
       reviewItems: result?.reviewItems,
       templateType: activity?.templateType ?? 'quiz',
     },
-    runtimeItems: attemptState.runtimeItems,
     showStartAnotherAttempt,
     startedAt,
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
@@ -720,7 +717,7 @@ export function buildStudentRunnerSubmissionPlan({
     confirmIncompleteSubmit,
     createAnonymousToken,
     now,
-    runtimeItems: pageView.runtimeItems,
+    runtimeItems: pageView.runtimeListView.items,
     shareSlug: pageView.activeShareId,
     startedAt: pageView.startedAt,
     studentName,
