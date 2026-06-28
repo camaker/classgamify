@@ -56,43 +56,7 @@ function PrintableWorksheetItem({
           {itemView.responseHelp}
         </Badge>
       </div>
-      {itemView.choiceBank.choices.length > 0 ? (
-        <div className="mt-4 grid gap-2">
-          {itemView.choiceBank.label ? (
-            <p className="font-medium text-muted-foreground text-xs">
-              {itemView.choiceBank.label}
-            </p>
-          ) : null}
-          <div
-            data-print-choice-bank={itemView.choiceBank.presentation}
-            className={cn(
-              'grid gap-2',
-              itemView.choiceBank.presentation === 'group-bank'
-                ? 'sm:grid-cols-3'
-                : 'sm:grid-cols-2'
-            )}
-          >
-            {itemView.choiceBank.choices.map(({ choice, indexLabel, key }) => (
-              <div
-                key={key}
-                className={cn(
-                  'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
-                  itemView.choiceBank.presentation === 'group-bank'
-                    ? 'justify-center bg-background font-medium'
-                    : 'bg-muted/20'
-                )}
-              >
-                {itemView.choiceBank.showIndexLabels ? (
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
-                    {indexLabel}
-                  </span>
-                ) : null}
-                <span>{choice}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
       <div className="mt-4 grid gap-3">
         <p className="font-medium text-muted-foreground text-xs">
           {itemView.answerAreaLabel}
@@ -102,5 +66,51 @@ function PrintableWorksheetItem({
         ))}
       </div>
     </section>
+  );
+}
+
+function PrintableWorksheetChoiceBank({
+  choiceBank,
+}: {
+  choiceBank: PrintableWorksheetPageViewModel['itemViews'][number]['choiceBank'];
+}) {
+  if (choiceBank.choices.length === 0) return null;
+
+  return (
+    <div className="mt-4 grid gap-2">
+      {choiceBank.label ? (
+        <p className="font-medium text-muted-foreground text-xs">
+          {choiceBank.label}
+        </p>
+      ) : null}
+      <div
+        data-print-choice-bank={choiceBank.presentation}
+        className={cn(
+          'grid gap-2',
+          choiceBank.presentation === 'group-bank'
+            ? 'sm:grid-cols-3'
+            : 'sm:grid-cols-2'
+        )}
+      >
+        {choiceBank.choices.map(({ choice, indexLabel, key }) => (
+          <div
+            key={key}
+            className={cn(
+              'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
+              choiceBank.presentation === 'group-bank'
+                ? 'justify-center bg-background font-medium'
+                : 'bg-muted/20'
+            )}
+          >
+            {choiceBank.showIndexLabels ? (
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
+                {indexLabel}
+              </span>
+            ) : null}
+            <span>{choice}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

@@ -15167,8 +15167,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /itemView\.choiceBank\.label[\s\S]*itemView\.choiceBank\.label/,
-  'Printable worksheet item list should render prepared choice-bank labels from the item view.'
+  /PrintableWorksheetChoiceBank[\s\S]*choiceBank=\{itemView\.choiceBank\}/,
+  'Printable worksheet item list should delegate prepared choice-bank rendering to a focused component.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function PrintableWorksheetChoiceBank[\s\S]*choiceBank\.label[\s\S]*choiceBank\.label/,
+  'Printable worksheet choice-bank component should render prepared choice-bank labels from the item view.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -15187,18 +15192,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /data-print-choice-bank=\{itemView\.choiceBank\.presentation\}/,
-  'Printable worksheet item list should render choice-bank presentation metadata for print layout variants.'
+  /data-print-choice-bank=\{choiceBank\.presentation\}/,
+  'Printable worksheet choice-bank component should render choice-bank presentation metadata for print layout variants.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /itemView\.choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
-  'Printable worksheet item list should render group banks as a denser classification layout.'
+  /choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
+  'Printable worksheet choice-bank component should render group banks as a denser classification layout.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /itemView\.choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
-  'Printable worksheet item list should render lettered choice labels only when the choice-bank view asks for them.'
+  /choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
+  'Printable worksheet choice-bank component should render lettered choice labels only when the choice-bank view asks for them.'
 );
 assert.match(
   printableWorksheetItemListSource,
