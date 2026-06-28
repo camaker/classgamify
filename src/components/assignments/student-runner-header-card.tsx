@@ -32,15 +32,7 @@ export function StudentRunnerHeaderCard({
           {view.description}
         </p>
         {view.instructions ? (
-          <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <IconClipboardText className="size-4 text-primary" />
-              {view.instructions.label}
-            </div>
-            <p className="mt-2 text-muted-foreground">
-              {view.instructions.value}
-            </p>
-          </div>
+          <StudentRunnerInstructionsCard instructions={view.instructions} />
         ) : null}
         <PublicAssignmentRules rules={view.ruleItems} />
       </div>
@@ -54,5 +46,25 @@ export function StudentRunnerHeaderCard({
         {view.teacherActionLabel}
       </Link>
     </section>
+  );
+}
+
+function StudentRunnerInstructionsCard({
+  instructions,
+}: {
+  instructions: NonNullable<
+    StudentRunnerPageViewModel['headerView']
+  >['instructions'];
+}) {
+  if (!instructions) return null;
+
+  return (
+    <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
+      <div className="flex items-center gap-2 font-medium text-foreground">
+        <IconClipboardText className="size-4 text-primary" />
+        {instructions.label}
+      </div>
+      <p className="mt-2 text-muted-foreground">{instructions.value}</p>
+    </div>
   );
 }

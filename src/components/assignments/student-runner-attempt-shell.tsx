@@ -30,20 +30,7 @@ export function StudentRunnerAttemptShell({
 }: StudentRunnerAttemptShellProps) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <IconPlayerPlay className="size-4 text-primary" />
-          {controlView.runnerTitle}
-        </div>
-        <Badge variant="secondary" className="rounded-md">
-          {controlView.progressLabel}
-        </Badge>
-        {controlView.timerBadge.show ? (
-          <Badge variant="outline" className="rounded-md">
-            {controlView.timerBadge.label}
-          </Badge>
-        ) : null}
-      </div>
+      <StudentRunnerAttemptStatusBar controlView={controlView} />
 
       <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
         <StudentRunnerIdentityPanel
@@ -64,6 +51,29 @@ export function StudentRunnerAttemptShell({
       ) : null}
 
       {children}
+    </div>
+  );
+}
+
+function StudentRunnerAttemptStatusBar({
+  controlView,
+}: {
+  controlView: StudentRunnerPageViewModel['controlView'];
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <IconPlayerPlay className="size-4 text-primary" />
+        {controlView.runnerTitle}
+      </div>
+      <Badge variant="secondary" className="rounded-md">
+        {controlView.progressLabel}
+      </Badge>
+      {controlView.timerBadge.show ? (
+        <Badge variant="outline" className="rounded-md">
+          {controlView.timerBadge.label}
+        </Badge>
+      ) : null}
     </div>
   );
 }

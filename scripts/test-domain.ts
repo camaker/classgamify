@@ -5106,13 +5106,28 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /controlView\.progressLabel[\s\S]*controlView\.timerBadge[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel/,
-  'Student runner attempt shell should own progress and timer presentation while delegating identity and result-panel presentation.'
+  /StudentRunnerAttemptStatusBar[\s\S]*controlView=\{controlView\}[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel/,
+  'Student runner attempt shell should delegate status, identity, and result-panel presentation.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerAttemptStatusBar[\s\S]*controlView\.runnerTitle[\s\S]*controlView\.progressLabel[\s\S]*controlView\.timerBadge/,
+  'Student runner attempt status bar should render prepared runner, progress, and timer labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
   /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*identityView\.copy\.description/,
   'Student runner identity panel should render prepared named-student and anonymous browser identity views.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
+  /StudentRunnerInstructionsCard[\s\S]*instructions=\{view\.instructions\}/,
+  'Student runner header card should delegate prepared instructions to a focused card.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
+  /function StudentRunnerInstructionsCard[\s\S]*instructions\.label[\s\S]*instructions\.value/,
+  'Student runner instructions card should render prepared instruction labels and values.'
 );
 assert.doesNotMatch(
   playRouteSource,
