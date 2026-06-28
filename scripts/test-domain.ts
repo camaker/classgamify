@@ -1742,28 +1742,48 @@ const assignmentResultsExportSource = readFileSync(
 );
 assert.match(
   assignmentResultsExportSource,
-  /const statsView = buildAssignmentAttemptStatsView\(data\.stats\)/,
-  'Assignment CSV export should format aggregate metrics through the shared attempt stats view.'
+  /function buildAssignmentResultsExportContext[\s\S]*const statsView = buildAssignmentAttemptStatsView\(data\.stats\)/,
+  'Assignment CSV export context should format aggregate metrics through the shared attempt stats view.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
-  'Assignment CSV export should format numeric cells through the shared result-format CSV helper.'
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
+  'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /formatAssignmentResultStudentLabel\(attempt\.studentLabel\)/,
-  'Assignment CSV export should format student labels through the shared result-display helper.'
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultStudentLabel\(attempt\.studentLabel\)/,
+  'Assignment CSV export attempt base columns should format student labels through the shared result-display helper.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\)[\s\S]*assignmentTitle,[\s\S]*shareSlug,/,
-  'Assignment CSV export should normalize assignment title and share slug before writing display columns.'
+  /function buildAssignmentResultsExportContext[\s\S]*const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\)[\s\S]*assignmentTitle,[\s\S]*shareSlug,/,
+  'Assignment CSV export context should normalize assignment title and share slug before writing display columns.'
 );
 assert.match(
   assignmentResultsExportSource,
-  /const deliveryView = buildAssignmentResultsExportDeliveryView\(\{[\s\S]*expiresAt: data\.assignment\.expiresAt,[\s\S]*settings,[\s\S]*deliveryView\.policyText[\s\S]*deliveryView\.instructions[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
-  'Assignment CSV export should format delivery policy, instructions, prompt, and explanation cells through the shared text helper.'
+  /function buildAssignmentResultsExportContext[\s\S]*const deliveryView = buildAssignmentResultsExportDeliveryView\(\{[\s\S]*expiresAt: data\.assignment\.expiresAt,[\s\S]*settings,[\s\S]*function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*deliveryView\.policyText[\s\S]*deliveryView\.instructions[\s\S]*function buildAssignmentResultsExportAnswerRow[\s\S]*formatAssignmentExportText\(answer\.prompt\)[\s\S]*formatAssignmentExportText\(answer\.explanation\)/,
+  'Assignment CSV export should format delivery policy, instructions, prompt, and explanation cells through shared helpers.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /export function buildAssignmentResultsCsv[\s\S]*buildAssignmentResultsExportContext\(data\)[\s\S]*buildAssignmentResultsExportRows\(\{[\s\S]*exportContext/,
+  'Assignment CSV export entrypoint should delegate context and row construction to focused helpers.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportRows[\s\S]*data\.analysis\.attempts\.flatMap[\s\S]*buildAssignmentResultsExportAttemptRows/,
+  'Assignment CSV export rows helper should delegate each attempt review row set.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAttemptRows[\s\S]*buildAssignmentResultsExportAttemptBaseColumns[\s\S]*buildAssignmentResultsExportEmptyAnswerRow[\s\S]*buildAssignmentResultsExportAnswerRow/,
+  'Assignment CSV export attempt rows should split base columns, empty-answer rows, and answer rows.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAnswerRow[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
+  'Assignment CSV export answer rows should consume the shared answer text view.'
 );
 assert.match(
   assignmentResultsExportSource,

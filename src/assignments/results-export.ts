@@ -72,7 +72,39 @@ export type AssignmentResultsExportData = {
   now?: number;
 };
 
+type AssignmentResultsExportAttemptReview =
+  AssignmentResultsExportData['analysis']['attempts'][number];
+
+type AssignmentResultsExportAttemptAnswer =
+  AssignmentResultsExportAttemptReview['answers'][number];
+
+type AssignmentResultsExportStudentSummary =
+  AssignmentResultsExportData['analysis']['students'][number];
+
+type AssignmentResultsExportContext = {
+  assignmentTitle: string;
+  attemptsById: Map<string, ExportAttempt>;
+  deliveryView: ReturnType<typeof buildAssignmentResultsExportDeliveryView>;
+  resolvedSource: ReturnType<typeof resolveAssignmentSnapshotSource>;
+  runtimeItemCount: number;
+  shareSlug: string;
+  statsView: ReturnType<typeof buildAssignmentAttemptStatsView>;
+  studentsByKey: Map<string, AssignmentResultsExportStudentSummary>;
+};
+
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
+  const exportContext = buildAssignmentResultsExportContext(data);
+  const rows = buildAssignmentResultsExportRows({
+    data,
+    exportContext,
+  });
+
+  return rowsToCsv([getAssignmentResultsExportColumns(), ...rows]);
+}
+
+function buildAssignmentResultsExportContext(
+  data: AssignmentResultsExportData
+): AssignmentResultsExportContext {
   const settings = resolveAssignmentSettings(data.assignment.settingsJson);
   const deliveryView = buildAssignmentResultsExportDeliveryView({
     expiresAt: data.assignment.expiresAt,
@@ -86,96 +118,167 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
   );
-  const runtimeItemCount = data.analysis.perItem.length;
-  const rows = data.analysis.attempts.flatMap((attempt) => {
-    const storedAttempt = attemptsById.get(attempt.id);
-    const studentSummary = studentsByKey.get(attempt.studentKey);
-    const attemptDurationSeconds = normalizeAttemptDurationSeconds({
-      durationSeconds: storedAttempt?.resultJson?.durationSeconds,
-      timeLimitSeconds: deliveryView.timeLimitSeconds,
-    });
-    const baseColumns = [
-      data.assignment.id,
-      assignmentTitle,
-      shareSlug,
-      formatAssignmentExportStatusLabel({
-        expiresAt: data.assignment.expiresAt,
-        now: data.now,
-        status: data.assignment.status,
-      }),
-      formatAssignmentResultCsvDate(data.assignment.expiresAt),
-      deliveryView.policyText,
-      deliveryView.instructions,
-      deliveryView.identityMode,
-      deliveryView.answerReveal,
-      deliveryView.itemOrder,
-      deliveryView.maxAttempts,
-      deliveryView.timeLimitSeconds ?? '',
-      resolvedSource.activityTitle,
-      formatAssignmentExportTemplateLabel(resolvedSource.templateType),
-      formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
-      formatAssignmentResultCsvNumber(statsView.averageScore, { min: 0 }),
-      formatAssignmentResultCsvNumber(statsView.averagePoints, { min: 0 }),
-      statsView.completed
-        ? formatAssignmentResultCsvNumber(statsView.averageDurationSeconds, {
-            min: 0,
-            round: true,
-          })
-        : '',
-      attempt.id,
-      formatAssignmentResultStudentLabel(attempt.studentLabel),
-      formatAssignmentResultCsvDate(attempt.completedAt),
-      formatAssignmentResultCsvNumber(storedAttempt?.score ?? attempt.score, {
-        min: 0,
-      }),
-      formatAssignmentResultCsvNumber(storedAttempt?.maxScore, { min: 0 }),
-      formatAssignmentResultCsvNumber(attempt.accuracy, { min: 0 }),
-      formatAssignmentResultCsvNumber(
-        storedAttempt?.resultJson?.completedItemCount,
-        {
-          min: 0,
-        }
-      ),
-      runtimeItemCount,
-      attemptDurationSeconds ?? '',
-      formatAssignmentResultCsvNumber(studentSummary?.attempts, { min: 0 }),
-      formatAssignmentResultCsvNumber(studentSummary?.latestAccuracy, {
-        min: 0,
-      }),
-      formatAssignmentResultCsvNumber(studentSummary?.averageAccuracy, {
-        min: 0,
-      }),
-      formatAssignmentResultCsvNumber(studentSummary?.bestAccuracy, { min: 0 }),
-      formatAssignmentResultCsvNumber(studentSummary?.needsReviewCount, {
-        min: 0,
-      }),
-    ];
 
-    if (attempt.answers.length === 0) {
-      return [[...baseColumns, '', '', '', '', '', '', '', '']];
-    }
+  return {
+    assignmentTitle,
+    attemptsById,
+    deliveryView,
+    resolvedSource,
+    runtimeItemCount: data.analysis.perItem.length,
+    shareSlug,
+    statsView,
+    studentsByKey,
+  };
+}
 
-    return attempt.answers.map((answer, index) => {
-      const answerView = buildAssignmentResultAttemptAnswerTextView(answer, {
-        acceptedAnswerEmptyValue: '',
-        studentAnswerEmptyValue: '',
-      });
+function buildAssignmentResultsExportRows({
+  data,
+  exportContext,
+}: {
+  data: AssignmentResultsExportData;
+  exportContext: AssignmentResultsExportContext;
+}) {
+  return data.analysis.attempts.flatMap((attempt) =>
+    buildAssignmentResultsExportAttemptRows({
+      attempt,
+      data,
+      exportContext,
+    })
+  );
+}
 
-      return [
-        ...baseColumns,
-        index + 1,
-        answer.itemId,
-        formatAssignmentExportText(answer.prompt),
-        answerView.exportStudentAnswerText,
-        answerView.expectedAnswerText,
-        answerView.acceptedAlternativesText,
-        answerView.exportStatusLabel,
-        formatAssignmentExportText(answer.explanation),
-      ];
-    });
+function buildAssignmentResultsExportAttemptRows({
+  attempt,
+  data,
+  exportContext,
+}: {
+  attempt: AssignmentResultsExportAttemptReview;
+  data: AssignmentResultsExportData;
+  exportContext: AssignmentResultsExportContext;
+}) {
+  const baseColumns = buildAssignmentResultsExportAttemptBaseColumns({
+    attempt,
+    data,
+    exportContext,
   });
 
-  return rowsToCsv([getAssignmentResultsExportColumns(), ...rows]);
+  if (attempt.answers.length === 0) {
+    return [buildAssignmentResultsExportEmptyAnswerRow(baseColumns)];
+  }
+
+  return attempt.answers.map((answer, index) =>
+    buildAssignmentResultsExportAnswerRow({
+      answer,
+      baseColumns,
+      index,
+    })
+  );
+}
+
+function buildAssignmentResultsExportAttemptBaseColumns({
+  attempt,
+  data,
+  exportContext,
+}: {
+  attempt: AssignmentResultsExportAttemptReview;
+  data: AssignmentResultsExportData;
+  exportContext: AssignmentResultsExportContext;
+}) {
+  const { deliveryView, resolvedSource, statsView } = exportContext;
+  const storedAttempt = exportContext.attemptsById.get(attempt.id);
+  const studentSummary = exportContext.studentsByKey.get(attempt.studentKey);
+  const attemptDurationSeconds = normalizeAttemptDurationSeconds({
+    durationSeconds: storedAttempt?.resultJson?.durationSeconds,
+    timeLimitSeconds: deliveryView.timeLimitSeconds,
+  });
+
+  return [
+    data.assignment.id,
+    exportContext.assignmentTitle,
+    exportContext.shareSlug,
+    formatAssignmentExportStatusLabel({
+      expiresAt: data.assignment.expiresAt,
+      now: data.now,
+      status: data.assignment.status,
+    }),
+    formatAssignmentResultCsvDate(data.assignment.expiresAt),
+    deliveryView.policyText,
+    deliveryView.instructions,
+    deliveryView.identityMode,
+    deliveryView.answerReveal,
+    deliveryView.itemOrder,
+    deliveryView.maxAttempts,
+    deliveryView.timeLimitSeconds ?? '',
+    resolvedSource.activityTitle,
+    formatAssignmentExportTemplateLabel(resolvedSource.templateType),
+    formatAssignmentResultCsvNumber(statsView.completions, { min: 0 }),
+    formatAssignmentResultCsvNumber(statsView.averageScore, { min: 0 }),
+    formatAssignmentResultCsvNumber(statsView.averagePoints, { min: 0 }),
+    statsView.completed
+      ? formatAssignmentResultCsvNumber(statsView.averageDurationSeconds, {
+          min: 0,
+          round: true,
+        })
+      : '',
+    attempt.id,
+    formatAssignmentResultStudentLabel(attempt.studentLabel),
+    formatAssignmentResultCsvDate(attempt.completedAt),
+    formatAssignmentResultCsvNumber(storedAttempt?.score ?? attempt.score, {
+      min: 0,
+    }),
+    formatAssignmentResultCsvNumber(storedAttempt?.maxScore, { min: 0 }),
+    formatAssignmentResultCsvNumber(attempt.accuracy, { min: 0 }),
+    formatAssignmentResultCsvNumber(
+      storedAttempt?.resultJson?.completedItemCount,
+      {
+        min: 0,
+      }
+    ),
+    exportContext.runtimeItemCount,
+    attemptDurationSeconds ?? '',
+    formatAssignmentResultCsvNumber(studentSummary?.attempts, { min: 0 }),
+    formatAssignmentResultCsvNumber(studentSummary?.latestAccuracy, {
+      min: 0,
+    }),
+    formatAssignmentResultCsvNumber(studentSummary?.averageAccuracy, {
+      min: 0,
+    }),
+    formatAssignmentResultCsvNumber(studentSummary?.bestAccuracy, { min: 0 }),
+    formatAssignmentResultCsvNumber(studentSummary?.needsReviewCount, {
+      min: 0,
+    }),
+  ];
+}
+
+function buildAssignmentResultsExportAnswerRow({
+  answer,
+  baseColumns,
+  index,
+}: {
+  answer: AssignmentResultsExportAttemptAnswer;
+  baseColumns: unknown[];
+  index: number;
+}) {
+  const answerView = buildAssignmentResultAttemptAnswerTextView(answer, {
+    acceptedAnswerEmptyValue: '',
+    studentAnswerEmptyValue: '',
+  });
+
+  return [
+    ...baseColumns,
+    index + 1,
+    answer.itemId,
+    formatAssignmentExportText(answer.prompt),
+    answerView.exportStudentAnswerText,
+    answerView.expectedAnswerText,
+    answerView.acceptedAlternativesText,
+    answerView.exportStatusLabel,
+    formatAssignmentExportText(answer.explanation),
+  ];
+}
+
+function buildAssignmentResultsExportEmptyAnswerRow(baseColumns: unknown[]) {
+  return [...baseColumns, '', '', '', '', '', '', '', ''];
 }
 
 export function buildAssignmentResultsCsvFilename(
