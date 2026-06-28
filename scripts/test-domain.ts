@@ -529,6 +529,7 @@ import {
   buildAssignmentResultSectionState,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
+  buildAssignmentResultsRouteState,
   buildAssignmentStudentSummaryRowView,
   buildAssignmentStudentSummaryRowViews,
   buildAssignmentResultEmptyState,
@@ -2676,8 +2677,23 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /buildAssignmentResultsPageViewModel/,
-  'Assignment result route should consume the assignment-domain page view-model.'
+  /buildAssignmentResultsRouteState/,
+  'Assignment result route should consume the assignment-domain route state helper.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*routeState\.data[\s\S]*pageView/,
+  'Assignment result route should render loading, error, and ready states from the assignment-domain route state.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /buildAssignmentResultsPageViewModel|if \(isLoading\)|isError \|\| !data/,
+  'Assignment result route should not directly build page views or branch on raw query loading/error flags.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultsRouteState[\s\S]*buildAssignmentResultsPageViewModel[\s\S]*status: 'loading'[\s\S]*status: 'error'[\s\S]*status: 'ready'/,
+  'Assignment result view domain should own loading, error, and ready route-state selection.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -22473,62 +22489,128 @@ assert.deepEqual(
     },
   }
 );
+const scoredResultsPageData = {
+  activity: {
+    description: 'Current activity description',
+    templateType: 'quiz',
+    title: 'Current activity title',
+  },
+  analysis: resultAnalysisWithUnscoredAttempt,
+  assignment: {
+    expiresAt: null,
+    id: 'assignment-results-page',
+    settingsJson: {
+      timeLimitSeconds: 60,
+    },
+    shareSlug: 'result-share',
+    status: 'published',
+    title: ' Ｗｅｅｋ\u00A0　1   results ',
+  },
+  attempts: [
+    {
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'completed-attempt',
+      maxScore: 1,
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        durationSeconds: 30,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'Alice',
+    },
+    {
+      completedAt: null,
+      id: 'unscored-attempt',
+      maxScore: null,
+      resultJson: null,
+      score: null,
+      studentName: 'Bob',
+    },
+  ],
+  snapshot: null,
+  stats: {
+    averageDurationSeconds: 30,
+    averagePoints: 1,
+    averageScore: 100,
+    completions: 1,
+  },
+} satisfies Parameters<typeof buildAssignmentResultsPageViewModel>[0]['data'];
+const scoredResultsPageSearch = {
+  itemSort: 'accuracy',
+  review: 'needs-review',
+  sort: 'name',
+  student: 'Alice',
+} as const;
 const scoredResultsPageView = buildAssignmentResultsPageViewModel({
-  data: {
-    activity: {
-      description: 'Current activity description',
-      templateType: 'quiz',
-      title: 'Current activity title',
-    },
-    analysis: resultAnalysisWithUnscoredAttempt,
-    assignment: {
-      expiresAt: null,
-      id: 'assignment-results-page',
-      settingsJson: {
-        timeLimitSeconds: 60,
-      },
-      shareSlug: 'result-share',
-      status: 'published',
-      title: ' Ｗｅｅｋ\u00A0　1   results ',
-    },
-    attempts: [
-      {
-        completedAt: new Date('2026-01-01T10:00:00.000Z'),
-        id: 'completed-attempt',
-        maxScore: 1,
-        resultJson: {
-          accuracy: 100,
-          completedItemCount: 1,
-          durationSeconds: 30,
-          totalPoints: 1,
-        },
-        score: 1,
-        studentName: 'Alice',
-      },
-      {
-        completedAt: null,
-        id: 'unscored-attempt',
-        maxScore: null,
-        resultJson: null,
-        score: null,
-        studentName: 'Bob',
-      },
-    ],
-    snapshot: null,
-    stats: {
-      averageDurationSeconds: 30,
-      averagePoints: 1,
-      averageScore: 100,
-      completions: 1,
-    },
-  },
-  search: {
-    itemSort: 'accuracy',
-    review: 'needs-review',
-    sort: 'name',
-    student: 'Alice',
-  },
+  data: scoredResultsPageData,
+  search: scoredResultsPageSearch,
 });
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: scoredResultsPageData,
+    isError: false,
+    isLoading: true,
+    search: scoredResultsPageSearch,
+  }).status,
+  'loading'
+);
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: scoredResultsPageData,
+    isError: true,
+    isLoading: false,
+    search: scoredResultsPageSearch,
+  }).status,
+  'error'
+);
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: null,
+    isError: false,
+    isLoading: false,
+    search: scoredResultsPageSearch,
+  }).status,
+  'error'
+);
+const scoredResultsRouteState = buildAssignmentResultsRouteState({
+  data: scoredResultsPageData,
+  isError: false,
+  isLoading: false,
+  search: scoredResultsPageSearch,
+});
+assert.equal(scoredResultsRouteState.status, 'ready');
+if (scoredResultsRouteState.status !== 'ready') {
+  throw new Error('Expected assignment results route state to be ready.');
+}
+assert.equal(
+  scoredResultsRouteState.data.assignment.id,
+  'assignment-results-page'
+);
+assert.equal(scoredResultsRouteState.pageView.title, 'Week 1 results');
+assert.deepEqual(
+  scoredResultsRouteState.pageView.attemptRowViews.map((row) => row.id),
+  ['completed-attempt']
+);
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: null,
+    isError: false,
+    isLoading: true,
+    search: {},
+  }).pageView.title,
+  'Assignment results'
+);
+assert.equal(
+  buildAssignmentResultsRouteState({
+    data: null,
+    isError: true,
+    isLoading: false,
+    search: {},
+  }).pageView.loadErrorMessage,
+  'Assignment results could not be loaded. Refresh the page or return to assignments.'
+);
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [

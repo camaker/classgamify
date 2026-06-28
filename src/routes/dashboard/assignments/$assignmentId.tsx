@@ -1,7 +1,7 @@
 import {
   type AssignmentResultActionButton,
   buildAssignmentResultActionExecutionPlan,
-  buildAssignmentResultsPageViewModel,
+  buildAssignmentResultsRouteState,
   assignmentResultSectionCopy,
 } from '@/assignments/result-view';
 import {
@@ -51,14 +51,17 @@ function AssignmentResultsPage() {
     from: '/dashboard/assignments/$assignmentId',
   });
   const { data, isError, isLoading } = useAssignmentResults(assignmentId);
-  const pageView = useMemo(
+  const routeState = useMemo(
     () =>
-      buildAssignmentResultsPageViewModel({
+      buildAssignmentResultsRouteState({
         data,
+        isError,
+        isLoading,
         search,
       }),
-    [data, search]
+    [data, isError, isLoading, search]
   );
+  const pageView = routeState.pageView;
   function updateResultControl(update: AssignmentResultControlUpdate) {
     void navigate({
       replace: true,
@@ -100,16 +103,16 @@ function AssignmentResultsPage() {
       title={pageView.title}
       description={pageView.description}
     >
-      {isLoading ? (
+      {routeState.status === 'loading' ? (
         <Card className="min-h-56 rounded-lg" />
-      ) : isError || !data ? (
+      ) : routeState.status === 'error' ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
           {pageView.loadErrorMessage}
         </div>
       ) : (
         <LoadedAssignmentResultsPage
           assignmentId={assignmentId}
-          data={data}
+          data={routeState.data}
           pageView={pageView}
           onControlChange={updateResultControl}
           onResultAction={handleResultAction}
@@ -130,7 +133,7 @@ function LoadedAssignmentResultsPage({
   data: NonNullable<ReturnType<typeof useAssignmentResults>['data']>;
   onControlChange: (update: AssignmentResultControlUpdate) => void;
   onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
-  pageView: ReturnType<typeof buildAssignmentResultsPageViewModel>;
+  pageView: ReturnType<typeof buildAssignmentResultsRouteState>['pageView'];
 }) {
   const headerView = pageView.headerView;
   if (!headerView) return null;

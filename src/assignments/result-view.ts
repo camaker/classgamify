@@ -291,6 +291,23 @@ type AssignmentResultsPageViewModel<
   viewState: AssignmentResultResolvedViewState;
 };
 
+type AssignmentResultsRouteState<
+  TAttempt extends AssignmentAttemptRowDisplayInput,
+> =
+  | {
+      pageView: AssignmentResultsPageViewModel<TAttempt>;
+      status: 'loading';
+    }
+  | {
+      pageView: AssignmentResultsPageViewModel<TAttempt>;
+      status: 'error';
+    }
+  | {
+      data: AssignmentResultsPageData<TAttempt>;
+      pageView: AssignmentResultsPageViewModel<TAttempt>;
+      status: 'ready';
+    };
+
 export const assignmentResultPageCopy = {
   get breadcrumbAssignments() {
     return m.assignment_result_page_breadcrumb_assignments();
@@ -1349,6 +1366,45 @@ export function buildAssignmentResultsPageViewModel<
     studentSummaryRowViews,
     title,
     viewState,
+  };
+}
+
+export function buildAssignmentResultsRouteState<
+  TAttempt extends AssignmentAttemptRowDisplayInput,
+>({
+  data,
+  isError,
+  isLoading,
+  search,
+}: {
+  data?: AssignmentResultsPageData<TAttempt> | null;
+  isError: boolean;
+  isLoading: boolean;
+  search: AssignmentResultSearchState;
+}): AssignmentResultsRouteState<TAttempt> {
+  const pageView = buildAssignmentResultsPageViewModel({
+    data,
+    search,
+  });
+
+  if (isLoading) {
+    return {
+      pageView,
+      status: 'loading',
+    };
+  }
+
+  if (isError || !data) {
+    return {
+      pageView,
+      status: 'error',
+    };
+  }
+
+  return {
+    data,
+    pageView,
+    status: 'ready',
   };
 }
 
