@@ -2,14 +2,8 @@ import {
   assignmentResultTableHeaders,
   type buildAssignmentResultsPageViewModel,
 } from '@/assignments/result-view';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 type AssignmentResultsItemPerformanceRows = ReturnType<
   typeof buildAssignmentResultsPageViewModel
@@ -24,13 +18,9 @@ export function AssignmentResultsItemPerformanceTable({
 }: AssignmentResultsItemPerformanceTableProps) {
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          {assignmentResultTableHeaders.itemPerformance.map((header) => (
-            <TableHead key={header}>{header}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
+      <AssignmentResultsTableHeader
+        headers={assignmentResultTableHeaders.itemPerformance}
+      />
       <TableBody>
         {items.map((rowView) => (
           <AssignmentResultsItemPerformanceRow

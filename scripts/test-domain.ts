@@ -2989,6 +2989,10 @@ const assignmentResultsItemPerformanceTableSource = readFileSync(
   'src/components/assignments/assignment-results-item-performance-table.tsx',
   'utf8'
 );
+const assignmentResultsTableHeaderSource = readFileSync(
+  'src/components/assignments/assignment-results-table-header.tsx',
+  'utf8'
+);
 const assignmentResultsStudentSummaryTableSource = readFileSync(
   'src/components/assignments/assignment-results-student-summary-table.tsx',
   'utf8'
@@ -3288,8 +3292,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /assignmentResultTableHeaders\.itemPerformance[\s\S]*items\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
+  /AssignmentResultsTableHeader[\s\S]*headers=\{assignmentResultTableHeaders\.itemPerformance\}[\s\S]*items\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
   'Assignment result item performance table component should delegate prepared item row views.'
+);
+assert.match(
+  assignmentResultsTableHeaderSource,
+  /headers\.map[\s\S]*TableHead[\s\S]*key=\{header\}/,
+  'Assignment result table header should render prepared result-table headers.'
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
@@ -3303,8 +3312,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsStudentSummaryTableSource,
-  /assignmentResultTableHeaders\.studentSummary[\s\S]*students\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
+  /AssignmentResultsTableHeader[\s\S]*headers=\{assignmentResultTableHeaders\.studentSummary\}[\s\S]*students\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
   'Assignment result student summary table component should delegate prepared student row views.'
+);
+assert.doesNotMatch(
+  `${assignmentResultsItemPerformanceTableSource}\n${assignmentResultsStudentSummaryTableSource}`,
+  /TableHeader[\s\S]*assignmentResultTableHeaders\.(?:itemPerformance|studentSummary)\.map/,
+  'Assignment result tables should share the common prepared-header renderer.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
