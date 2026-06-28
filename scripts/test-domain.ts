@@ -2497,10 +2497,20 @@ assert.match(
   /function ActivitySourceMaterialExtractionBadge[\s\S]*action\.summaryText/,
   'Activity source-material extraction badge should render prepared action metric text.'
 );
+assert.match(
+  activitySourceMaterialsSummarySource,
+  /function ActivitySourceMaterialExtractionBadge[\s\S]*action\.nextStep\.label[\s\S]*action\.nextStep\.description/,
+  'Activity source-material extraction badge should render prepared next-step guidance.'
+);
 assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
   /action\.sourceCount|action\.sourceKindCounts/,
   'Activity source-material summary component should not rebuild extraction source counts locally.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /Listening draft input|Worksheet extraction input|Structured import input|activity_source_material_next_step_/,
+  'Activity source-material summary component should not hard-code or fetch extraction next-step copy locally.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsFieldSource,
@@ -4784,6 +4794,16 @@ assert.match(
 );
 assert.match(
   activityMaterialSummarySource,
+  /nextStep:[\s\S]*buildActivitySourceMaterialExtractionNextStep/,
+  'Activity source-material extraction action views should expose prepared next-step guidance.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /activity_source_material_next_step_audio_description[\s\S]*activity_source_material_next_step_audio_label[\s\S]*activity_source_material_next_step_worksheet_description[\s\S]*activity_source_material_next_step_worksheet_label[\s\S]*activity_source_material_next_step_spreadsheet_description[\s\S]*activity_source_material_next_step_spreadsheet_label/,
+  'Activity source-material extraction next steps should come from localized activity-domain copy.'
+);
+assert.match(
+  activityMaterialSummarySource,
   /join\(m\.activity_source_material_summary_list_separator\(\)\)/,
   'Activity source-material source-kind summaries should use a localized list separator.'
 );
@@ -4819,7 +4839,7 @@ assert.match(
 );
 assert.doesNotMatch(
   activityMaterialSummarySource,
-  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)|part\?\.trim\(\)/,
+  /summaryText: formatActivitySourceMaterialMetric\(\{[\s\S]*action\.sourceCount|join\(', '\)|part\?\.trim\(\)|Audio extraction|Worksheet extraction|Spreadsheet import/,
   'Activity source-material extraction summaries should not only show raw source counts or hard-code list separators.'
 );
 const listeningMaterialReference = buildActivityMaterialReferenceFromUserFile({
@@ -5326,6 +5346,11 @@ assert.deepEqual(
         capability: 'audio-extraction',
         id: 'extract-audio',
         label: 'Audio extraction',
+        nextStep: {
+          description:
+            'Use these files later to draft listening prompts or transcripts while keeping the original file private.',
+          label: 'Listening draft input',
+        },
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
         sourceKindSummaryText: 'Audio · 1',
@@ -5335,6 +5360,11 @@ assert.deepEqual(
         capability: 'worksheet-extraction',
         id: 'extract-worksheet',
         label: 'Worksheet extraction',
+        nextStep: {
+          description:
+            'Use these pages later to extract prompts, accepted answers, and printable follow-up items into the same activity model.',
+          label: 'Worksheet extraction input',
+        },
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
         sourceKindSummaryText: 'Worksheet document · 1',
@@ -5387,6 +5417,11 @@ assert.deepEqual(
       capability: 'worksheet-extraction',
       id: 'extract-worksheet',
       label: 'Worksheet extraction',
+      nextStep: {
+        description:
+          'Use these pages later to extract prompts, accepted answers, and printable follow-up items into the same activity model.',
+        label: 'Worksheet extraction input',
+      },
       sourceCount: 2,
       sourceKindCounts: [
         { count: 1, kind: 'worksheet-document' },
@@ -5395,6 +5430,32 @@ assert.deepEqual(
       sourceKindSummaryText: 'Worksheet document · 1, Worksheet image · 1',
       summaryText:
         'Worksheet extraction · Worksheet document · 1, Worksheet image · 1',
+    },
+  ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    {
+      contentType: 'text/csv',
+      fileId: 'spreadsheet-csv',
+      kind: 'spreadsheet',
+      originalName: 'word-bank.csv',
+    },
+  ]).extractionActions,
+  [
+    {
+      capability: 'spreadsheet-import',
+      id: 'import-spreadsheet',
+      label: 'Spreadsheet import',
+      nextStep: {
+        description:
+          'Use these rows later to import vocabulary, pairs, groups, or answer choices into the activity editor.',
+        label: 'Structured import input',
+      },
+      sourceCount: 1,
+      sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
+      sourceKindSummaryText: 'Spreadsheet · 1',
+      summaryText: 'Spreadsheet import · Spreadsheet · 1',
     },
   ]
 );
@@ -5420,6 +5481,11 @@ try {
         capability: 'worksheet-extraction',
         id: 'extract-worksheet',
         label: '可用于练习纸解析',
+        nextStep: {
+          description:
+            '后续可从这些页面提取题目、可接受答案和可打印跟进项，并仍然写入同一套活动模型。',
+          label: '练习纸提取输入',
+        },
         sourceCount: 2,
         sourceKindCounts: [
           { count: 1, kind: 'worksheet-document' },
@@ -20037,6 +20103,11 @@ assert.deepEqual(
         capability: 'audio-extraction',
         id: 'extract-audio',
         label: 'Audio extraction',
+        nextStep: {
+          description:
+            'Use these files later to draft listening prompts or transcripts while keeping the original file private.',
+          label: 'Listening draft input',
+        },
         sourceCount: 1,
         sourceKindCounts: [{ count: 1, kind: 'audio' }],
         sourceKindSummaryText: 'Audio · 1',

@@ -80,9 +80,15 @@ function ActivitySourceMaterialExtractionBadge({
   action: ActivitySourceMaterialSummaryView['extractionActions'][number];
 }) {
   return (
-    <Badge variant="outline" className="rounded-md bg-background">
-      <IconSparkles className="size-3" />
-      {action.summaryText}
-    </Badge>
+    <div className="rounded-md border bg-background px-2.5 py-2">
+      <Badge variant="outline" className="rounded-md bg-background">
+        <IconSparkles className="size-3" />
+        {action.summaryText}
+      </Badge>
+      <p className="mt-1 font-medium text-xs">{action.nextStep.label}</p>
+      <p className="mt-0.5 text-muted-foreground text-xs leading-5">
+        {action.nextStep.description}
+      </p>
+    </div>
   );
 }

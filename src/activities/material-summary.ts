@@ -38,6 +38,10 @@ export type ActivitySourceMaterialExtractionAction = {
 export type ActivitySourceMaterialExtractionActionView =
   ActivitySourceMaterialExtractionAction & {
     label: string;
+    nextStep: {
+      description: string;
+      label: string;
+    };
     sourceKindSummaryText: string;
     summaryText: string;
   };
@@ -436,6 +440,7 @@ function toActivitySourceMaterialExtractionActionView(
   action: ActivitySourceMaterialExtractionAction
 ): ActivitySourceMaterialExtractionActionView {
   const label = formatActivitySourceMaterialExtractionAction(action.id);
+  const nextStep = buildActivitySourceMaterialExtractionNextStep(action.id);
   const sourceKindSummaryText = formatActivitySourceMaterialKindCounts(
     action.sourceKindCounts
   );
@@ -443,6 +448,7 @@ function toActivitySourceMaterialExtractionActionView(
   return {
     ...action,
     label,
+    nextStep,
     sourceKindSummaryText,
     summaryText: m.activity_source_material_extraction_summary({
       label,
@@ -484,6 +490,30 @@ function formatActivitySourceMaterialExtractionAction(
       return m.activity_source_material_extraction_worksheet();
     case 'import-spreadsheet':
       return m.activity_source_material_extraction_spreadsheet();
+  }
+}
+
+function buildActivitySourceMaterialExtractionNextStep(
+  id: ActivitySourceMaterialExtractionActionId
+) {
+  switch (id) {
+    case 'extract-audio':
+      return {
+        description: m.activity_source_material_next_step_audio_description(),
+        label: m.activity_source_material_next_step_audio_label(),
+      };
+    case 'extract-worksheet':
+      return {
+        description:
+          m.activity_source_material_next_step_worksheet_description(),
+        label: m.activity_source_material_next_step_worksheet_label(),
+      };
+    case 'import-spreadsheet':
+      return {
+        description:
+          m.activity_source_material_next_step_spreadsheet_description(),
+        label: m.activity_source_material_next_step_spreadsheet_label(),
+      };
   }
 }
 
