@@ -273,13 +273,28 @@ function toPrintableWorksheetItem({
   return {
     answerSpaceLines: responsePolicy.answerSpaceLines,
     choicePresentation: responsePolicy.choicePresentation,
-    choices: normalizeRuntimeChoiceList(item.choices) ?? [],
+    choices: buildPrintableWorksheetItemChoices({
+      item,
+      responsePolicy,
+    }),
     id: item.id,
     kind: item.kind,
     prompt: normalizeRuntimeDisplayText(item.prompt),
     responseMode: responsePolicy.responseMode,
     sequenceNumber: normalizeRuntimeDisplayCount(sequenceNumber, { min: 1 }),
   };
+}
+
+function buildPrintableWorksheetItemChoices({
+  item,
+  responsePolicy,
+}: {
+  item: RuntimeItem;
+  responsePolicy: PrintableWorksheetResponsePolicy;
+}) {
+  if (responsePolicy.choicePresentation === 'none') return [];
+
+  return normalizeRuntimeChoiceList(item.choices) ?? [];
 }
 
 function toPrintableWorksheetAnswerKeyItem(

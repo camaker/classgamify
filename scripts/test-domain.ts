@@ -11552,6 +11552,40 @@ assert.deepEqual(messyPrintableWorksheet.answerKey?.[0], {
   prompt: 'Capital of France?',
   sequenceNumber: 1,
 });
+const printableShortAnswerWorksheet = buildPrintableAssignmentWorksheet({
+  activity: {
+    description: 'Short answer printable activity',
+    templateType: 'open-box',
+    title: 'Short answer printable activity',
+  },
+  assignment: {
+    expiresAt: null,
+    settingsJson: null,
+    shareSlug: 'short-answer-printable',
+    title: 'Short answer printable assignment',
+  },
+  runtimeItems: [
+    {
+      answer: 'Paris',
+      choices: ['Paris', 'Rome'],
+      explanation: 'Capital city.',
+      id: 'open-box-print-q',
+      kind: 'question',
+      prompt: 'Name the capital of France.',
+    },
+  ],
+  snapshot: null,
+});
+assert.deepEqual(printableShortAnswerWorksheet.items[0], {
+  answerSpaceLines: 2,
+  choicePresentation: 'none',
+  choices: [],
+  id: 'open-box-print-q',
+  kind: 'question',
+  prompt: 'Name the capital of France.',
+  responseMode: 'short-answer',
+  sequenceNumber: 1,
+});
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
@@ -11562,6 +11596,7 @@ assert.equal(printableSnapshotItemView.answerLineSummary, '1 answer line');
 assert.equal(printableSnapshotItemView.choiceBank.label, 'Choices');
 assert.equal(printableSnapshotItemView.choiceBank.summary, '3 choices');
 assert.equal(printableSnapshotItemView.choiceBank.emptySummary, null);
+assert.equal(printableSnapshotItemView.choiceBank.show, true);
 assert.equal(
   printableSnapshotItemView.responseModeLabel,
   'Response mode: multiple choice'
@@ -11602,6 +11637,7 @@ assert.equal(messyPrintableItemView.answerAreaLabel, 'Answer');
 assert.equal(messyPrintableItemView.answerLineSummary, '1 answer line');
 assert.equal(messyPrintableItemView.choiceBank.label, 'Choices');
 assert.equal(messyPrintableItemView.choiceBank.summary, '2 choices');
+assert.equal(messyPrintableItemView.choiceBank.show, true);
 assert.deepEqual(messyPrintableItemView.answerLines, [
   { key: 'messy-print-item-answer-line-0' },
 ]);
@@ -11696,6 +11732,32 @@ assert.equal(
   }).choiceBank.label,
   null
 );
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    choices: ['Hidden option', 'Hidden distractor'],
+    id: 'printable-hidden-bank',
+    kind: 'question',
+    prompt: 'Write it.',
+    responseMode: 'short-answer',
+    sequenceNumber: 4,
+  }).choiceBank.show,
+  false
+);
+assert.deepEqual(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 2,
+    choicePresentation: 'none',
+    choices: ['Hidden option', 'Hidden distractor'],
+    id: 'printable-hidden-bank-choices',
+    kind: 'question',
+    prompt: 'Write it.',
+    responseMode: 'short-answer',
+    sequenceNumber: 4,
+  }).choiceBank.choices,
+  []
+);
 const printableNoBankItemView = buildPrintableWorksheetItemView({
   answerSpaceLines: 1,
   choicePresentation: 'none',
@@ -11706,11 +11768,9 @@ const printableNoBankItemView = buildPrintableWorksheetItemView({
   responseMode: 'short-answer',
   sequenceNumber: 4,
 });
-assert.equal(printableNoBankItemView.choiceBank.summary, 'No choices');
-assert.equal(
-  printableNoBankItemView.choiceBank.emptySummary,
-  'No choice bank for this prompt.'
-);
+assert.equal(printableNoBankItemView.choiceBank.summary, null);
+assert.equal(printableNoBankItemView.choiceBank.emptySummary, null);
+assert.equal(printableNoBankItemView.choiceBank.show, false);
 assert.equal(
   printableNoBankItemView.responseModeLabel,
   'Response mode: written answer'
@@ -11733,6 +11793,7 @@ try {
   assert.equal(zhPrintableItemView.answerLineSummary, '2 条作答线');
   assert.equal(zhPrintableItemView.choiceBank.label, '选项');
   assert.equal(zhPrintableItemView.choiceBank.summary, '2 个选项');
+  assert.equal(zhPrintableItemView.choiceBank.show, true);
   assert.equal(zhPrintableItemView.responseModeLabel, '作答方式：选择题');
   assert.deepEqual(zhPrintableItemView.choiceBank.choices, [
     {
@@ -16847,6 +16908,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
+  /function buildPrintableWorksheetItemChoices[\s\S]*responsePolicy\.choicePresentation === 'none'[\s\S]*return \[\][\s\S]*normalizeRuntimeChoiceList\(item\.choices\)/,
+  'Printable worksheet item generation should suppress choice banks for response policies that do not present choices.'
+);
+assert.match(
+  printableWorksheetSource,
   /toPrintableWorksheetAnswerKeyItem[\s\S]*getRuntimeDisplayAcceptedAnswers\(item\.answer\)/,
   'Printable worksheet answer keys should normalize accepted alternatives through the shared runtime display-list helper.'
 );
@@ -16927,23 +16993,23 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /label:[\s\S]*getPrintableWorksheetChoiceBankLabel\(item\.choicePresentation\)/,
-  'Printable worksheet choice-bank views should own localized choice-bank section labels.'
+  /showChoiceBank && choices\.length > 0[\s\S]*getPrintableWorksheetChoiceBankLabel\(item\.choicePresentation\)/,
+  'Printable worksheet choice-bank views should own localized section labels only when the item policy shows a choice bank.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /summary: formatPrintableWorksheetChoiceBankSummary/,
-  'Printable worksheet choice-bank views should expose localized choice-bank summaries.'
+  /show: showChoiceBank[\s\S]*summary: formatPrintableWorksheetChoiceBankSummary/,
+  'Printable worksheet choice-bank views should expose prepared visibility and localized choice-bank summaries.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /emptySummary:[\s\S]*assignment_printable_choice_bank_empty/,
-  'Printable worksheet choice-bank views should expose localized empty choice-bank summaries.'
+  /showChoiceBank && choices\.length === 0[\s\S]*assignment_printable_choice_bank_empty/,
+  'Printable worksheet choice-bank views should expose localized empty choice-bank summaries only for visible choice banks.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /showIndexLabels: item\.choicePresentation !== 'group-bank'/,
-  'Printable worksheet view should hide lettered choice labels for classification group banks.'
+  /showIndexLabels: showChoiceBank && item\.choicePresentation !== 'group-bank'/,
+  'Printable worksheet view should hide lettered choice labels for hidden banks and classification group banks.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -17202,6 +17268,11 @@ assert.match(
   printableWorksheetItemListSource,
   /function PrintableWorksheetChoiceBank[\s\S]*choiceBank\.label[\s\S]*choiceBank\.label/,
   'Printable worksheet choice-bank component should render prepared choice-bank labels from the item view.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function PrintableWorksheetChoiceBank[\s\S]*if \(!choiceBank\.show\) return null/,
+  'Printable worksheet choice-bank component should respect prepared visibility from the item view.'
 );
 assert.match(
   printableWorksheetItemListSource,

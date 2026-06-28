@@ -387,7 +387,10 @@ export function buildPrintableWorksheetAnswerKeyItemView(
 }
 
 function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
-  const choices = normalizeRuntimeChoiceList(item.choices) ?? [];
+  const showChoiceBank = shouldShowPrintableWorksheetChoiceBank(item);
+  const choices = showChoiceBank
+    ? (normalizeRuntimeChoiceList(item.choices) ?? [])
+    : [];
 
   return {
     choices: choices.map((choice, index) => ({
@@ -396,18 +399,26 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
       key: `${item.id}-choice-${index}`,
     })),
     emptySummary:
-      choices.length === 0 ? m.assignment_printable_choice_bank_empty() : null,
+      showChoiceBank && choices.length === 0
+        ? m.assignment_printable_choice_bank_empty()
+        : null,
     label:
-      choices.length > 0
+      showChoiceBank && choices.length > 0
         ? getPrintableWorksheetChoiceBankLabel(item.choicePresentation)
         : null,
     presentation: item.choicePresentation,
-    showIndexLabels: item.choicePresentation !== 'group-bank',
+    show: showChoiceBank,
+    showIndexLabels: showChoiceBank && item.choicePresentation !== 'group-bank',
     summary: formatPrintableWorksheetChoiceBankSummary({
       count: choices.length,
       presentation: item.choicePresentation,
+      showChoiceBank,
     }),
   };
+}
+
+function shouldShowPrintableWorksheetChoiceBank(item: PrintableWorksheetItem) {
+  return item.choicePresentation !== 'none';
 }
 
 export function getPrintableWorksheetAnswerLines(item: PrintableWorksheetItem) {
@@ -496,10 +507,16 @@ function formatPrintableWorksheetAnswerLineSummary(count: number) {
 function formatPrintableWorksheetChoiceBankSummary({
   count,
   presentation,
+  showChoiceBank,
 }: {
   count: number;
   presentation: PrintableWorksheetItem['choicePresentation'];
+  showChoiceBank: boolean;
 }) {
+  if (!showChoiceBank) {
+    return null;
+  }
+
   const normalizedCount = normalizeRuntimeDisplayCount(count, {
     min: 0,
   });

@@ -82,6 +82,8 @@ function PrintableWorksheetChoiceBank({
 }: {
   choiceBank: PrintableWorksheetPageViewModel['itemViews'][number]['choiceBank'];
 }) {
+  if (!choiceBank.show) return null;
+
   if (choiceBank.choices.length === 0) {
     return choiceBank.emptySummary ? (
       <p className="mt-4 text-muted-foreground text-xs">
