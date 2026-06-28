@@ -126,6 +126,13 @@ export function ActivityDraftMetaSummary({
           </div>
         </div>
       ) : null}
+      {summaryView.sourceMaterialCapabilityViews.length > 0 ? (
+        <ActivityDraftSourceMaterialCapabilities
+          capabilities={summaryView.sourceMaterialCapabilityViews}
+          description={summaryView.sourceMaterialCapabilityDescription}
+          title={summaryView.sourceMaterialCapabilityTitle}
+        />
+      ) : null}
       <p className="mt-4 font-medium text-sm">
         {summaryView.readyTemplatesTitle}
       </p>
@@ -162,6 +169,53 @@ export function ActivityDraftMetaSummary({
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+function ActivityDraftSourceMaterialCapabilities({
+  capabilities,
+  description,
+  title,
+}: {
+  capabilities: ActivityDraftMetaSummaryView['sourceMaterialCapabilityViews'];
+  description: string;
+  title: string;
+}) {
+  return (
+    <div className="mt-4 rounded-lg border bg-background p-3">
+      <p className="font-medium text-sm">{title}</p>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {description}
+      </p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        {capabilities.map((capability) => (
+          <ActivityDraftSourceMaterialCapabilityBadge
+            capability={capability}
+            key={capability.capability}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityDraftSourceMaterialCapabilityBadge({
+  capability,
+}: {
+  capability: ActivityDraftMetaSummaryView['sourceMaterialCapabilityViews'][number];
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-medium text-xs leading-5">{capability.label}</p>
+        <Badge variant="outline" className="rounded-md">
+          {capability.value}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {capability.description}
+      </p>
     </div>
   );
 }

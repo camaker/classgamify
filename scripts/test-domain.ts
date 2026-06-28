@@ -2932,6 +2932,26 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /summaryView\.sourceMaterialCapabilityViews\.length[\s\S]*ActivityDraftSourceMaterialCapabilities[\s\S]*capabilities=\{summaryView\.sourceMaterialCapabilityViews\}/,
+  'AI draft summary component should delegate source-material capability rendering.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftSourceMaterialCapabilities[\s\S]*capabilities\.map[\s\S]*ActivityDraftSourceMaterialCapabilityBadge/,
+  'AI draft source-material capabilities should render through a dedicated child component.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /function ActivityDraftSourceMaterialCapabilityBadge[\s\S]*capability\.label[\s\S]*capability\.value[\s\S]*capability\.description/,
+  'AI draft source-material capability badges should render prepared label, value, and description.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /audio-extraction|worksheet-extraction|spreadsheet-import|activity_draft_meta_source_material_capability/,
+  'AI draft summary component should not hard-code source-material capability ids or copy.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /summaryView\.lockedTemplateLabel[\s\S]*summaryView\.lockedTemplateOptions/,
   'AI draft summary component should render prepared ready and locked template metadata.'
 );
@@ -17471,6 +17491,21 @@ assert.match(
   'AI draft meta source material note views should reuse draft-source filename sanitization.'
 );
 assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftMetaSourceMaterialCapabilityViews[\s\S]*activity_draft_meta_source_material_capability_audio_description[\s\S]*activity_draft_meta_source_material_capability_audio_label[\s\S]*activity_draft_meta_source_material_capability_worksheet_description[\s\S]*activity_draft_meta_source_material_capability_worksheet_label[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_description[\s\S]*activity_draft_meta_source_material_capability_spreadsheet_label/,
+  'AI draft meta should own source-material capability labels and descriptions.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /getActivityDraftMetaSourceMaterialKind[\s\S]*USER_FILE_MATERIAL_KINDS\.find[\s\S]*getActivityDraftMetaSourceMaterialKindLabels[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'en' \}\)[\s\S]*formatUserFileMaterialKind\(kind, \{ locale: 'zh' \}\)/,
+  'AI draft meta should map localized safe material kind labels back to known source-material capabilities.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /getActivityDraftMetaSourceMaterialCapability[\s\S]*case 'audio'[\s\S]*audio-extraction[\s\S]*case 'spreadsheet'[\s\S]*spreadsheet-import[\s\S]*case 'worksheet-document'[\s\S]*case 'worksheet-image'[\s\S]*worksheet-extraction/,
+  'AI draft meta should derive source-material capability counts from known safe material kinds.'
+);
+assert.match(
   activityDraftSourceSource,
   /getActivityDraftSourceText[\s\S]*buildActivitySourceMaterialDraftSummary\([\s\S]*values\.sourceMaterials[\s\S]*sourceMaterialSummary\.notesText/,
   'AI draft source text should append source-material notes from the shared safe summary.'
@@ -25492,9 +25527,92 @@ assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
     name: 'Weather listening.mp3',
   },
 ]);
+assert.equal(
+  fallbackDraftMetaSummary.sourceMaterialCapabilityTitle,
+  'Source material AI readiness'
+);
+assert.equal(
+  fallbackDraftMetaSummary.sourceMaterialCapabilityDescription,
+  'These future AI-assisted paths are inferred from safe material provenance only; extraction still requires teacher review.'
+);
+assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialCapabilityViews, [
+  {
+    capability: 'audio-extraction',
+    description:
+      'Can support future listening prompts or transcript drafting after teacher review.',
+    label: 'Audio',
+    value: '1',
+  },
+  {
+    capability: 'worksheet-extraction',
+    description:
+      'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
+    label: 'Worksheet',
+    value: '1',
+  },
+]);
 assert.doesNotMatch(
-  JSON.stringify(fallbackDraftMetaSummary.sourceMaterialNoteViews),
+  JSON.stringify({
+    noteViews: fallbackDraftMetaSummary.sourceMaterialNoteViews,
+    capabilityViews: fallbackDraftMetaSummary.sourceMaterialCapabilityViews,
+  }),
   /https?:|files\.example|private|token|signature|storageKey|teacher\\/i
+);
+const allMaterialCapabilityDraftMetaSummary =
+  buildActivityDraftMetaSummaryView({
+    meta: fallbackDraftMeta,
+    model: 'test-model',
+    provider: 'workers-ai',
+    sourceMaterialNoteViews: [
+      {
+        kindLabel: '音频',
+        name: 'unit-a.mp3',
+      },
+      {
+        kindLabel: '练习纸图片',
+        name: 'worksheet.png',
+      },
+      {
+        kindLabel: '表格',
+        name: 'word-bank.csv',
+      },
+      {
+        kindLabel: 'Video',
+        name: 'class-demo.mp4',
+      },
+    ],
+  });
+assert.deepEqual(
+  allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
+  [
+    {
+      capability: 'audio-extraction',
+      description:
+        'Can support future listening prompts or transcript drafting after teacher review.',
+      label: 'Audio',
+      value: '1',
+    },
+    {
+      capability: 'worksheet-extraction',
+      description:
+        'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
+      label: 'Worksheet',
+      value: '1',
+    },
+    {
+      capability: 'spreadsheet-import',
+      description:
+        'Can support future structured question and vocabulary import after teacher review.',
+      label: 'Spreadsheet',
+      value: '1',
+    },
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(
+    allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews
+  ),
+  /class-demo|video|storageKey|fileId|contentType|owner|permission/i
 );
 assert.equal(
   fallbackDraftMetaSummary.suggestedTemplateOptions,
@@ -25724,6 +25842,57 @@ try {
   assert.equal(
     zhFallbackDraftMetaSummary.sourceMaterialDescription,
     '这里仅显示素材类型和安全文件名这类安全来源信息。'
+  );
+  const zhMaterialCapabilityDraftMetaSummary =
+    buildActivityDraftMetaSummaryView({
+      meta: zhFallbackDraftMeta,
+      model: 'test-model',
+      provider: 'fallback',
+      sourceMaterialNoteViews: [
+        {
+          kindLabel: 'Audio',
+          name: 'listening.mp3',
+        },
+        {
+          kindLabel: 'Worksheet image',
+          name: 'worksheet.png',
+        },
+        {
+          kindLabel: 'Spreadsheet',
+          name: 'word-bank.csv',
+        },
+      ],
+    });
+  assert.equal(
+    zhMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityTitle,
+    '来源素材 AI 准备度'
+  );
+  assert.equal(
+    zhMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityDescription,
+    '这些后续 AI 辅助路径只根据安全素材来源信息推断；真正提取前仍需要老师检查。'
+  );
+  assert.deepEqual(
+    zhMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
+    [
+      {
+        capability: 'audio-extraction',
+        description: '老师检查后，可支持后续听力题提示或听力文本草稿。',
+        label: '音频',
+        value: '1',
+      },
+      {
+        capability: 'worksheet-extraction',
+        description: '老师检查后，可支持后续练习纸题干和可接受答案提取。',
+        label: '练习纸',
+        value: '1',
+      },
+      {
+        capability: 'spreadsheet-import',
+        description: '老师检查后，可支持后续结构化题目和词汇导入。',
+        label: '表格',
+        value: '1',
+      },
+    ]
   );
   assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
   assert.ok(
