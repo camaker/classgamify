@@ -7,11 +7,7 @@ import type {
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import {
-  getAssignmentStatusLabel,
-  isAssignmentExpired,
-  isAssignmentOpen,
-} from '@/assignments/lifecycle';
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
@@ -65,8 +61,10 @@ import {
   type ItemPerformanceSort,
   type StudentSummarySort,
 } from '@/assignments/result-filters';
-import { buildAssignmentSharePath } from '@/assignments/share-link';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  buildAssignmentShareLinkAvailability,
+  type AssignmentShareLinkAvailability,
+} from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
   buildAssignmentResultActionButtons,
@@ -681,41 +679,36 @@ export function buildAssignmentResultHeaderShareAction({
   shareSlug: string;
   status: AssignmentStatus | string;
 }): AssignmentResultHeaderShareAction {
-  const resolvedNow = now ?? Date.now();
-  const isAvailable = isAssignmentOpen(status, expiresAt, resolvedNow);
-  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+  const shareAvailability = buildAssignmentShareLinkAvailability({
+    expiresAt,
+    now: now ?? Date.now(),
+    shareSlug,
+    status,
+  });
 
   return {
-    disabledReason: isAvailable
+    disabledReason: shareAvailability.isAvailable
       ? undefined
-      : getAssignmentResultHeaderShareDisabledReason({
-          expiresAt,
-          now: resolvedNow,
-          status,
-        }),
-    isAvailable,
-    label: isAvailable
+      : getAssignmentResultHeaderShareDisabledReason(
+          shareAvailability.lifecycleStatus
+        ),
+    isAvailable: shareAvailability.isAvailable,
+    label: shareAvailability.isAvailable
       ? assignmentResultPageCopy.openStudentLinkLabel
       : assignmentResultPageCopy.studentLinkUnavailableLabel,
-    sharePath: buildAssignmentSharePath(normalizedShareSlug),
-    shareSlug: normalizedShareSlug,
+    sharePath: shareAvailability.sharePath,
+    shareSlug: shareAvailability.shareSlug,
   };
 }
 
-function getAssignmentResultHeaderShareDisabledReason({
-  expiresAt,
-  now,
-  status,
-}: {
-  expiresAt: Date | string | null | undefined;
-  now: number;
-  status: AssignmentStatus | string;
-}) {
-  if (status === 'published' && isAssignmentExpired(expiresAt, now)) {
+function getAssignmentResultHeaderShareDisabledReason(
+  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
+) {
+  if (lifecycleStatus === 'expired') {
     return assignmentResultPageCopy.studentLinkExpiredMessage;
   }
 
-  if (status === 'closed') {
+  if (lifecycleStatus === 'closed') {
     return assignmentResultPageCopy.studentLinkClosedMessage;
   }
 

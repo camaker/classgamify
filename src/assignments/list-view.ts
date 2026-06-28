@@ -36,9 +36,7 @@ import {
 import {
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
-  getAssignmentLifecycleStatus,
   getAssignmentStatusLabel,
-  isAssignmentOpen,
 } from '@/assignments/lifecycle';
 import {
   buildPublishedAssignmentPanelContext,
@@ -48,7 +46,11 @@ import {
   formatAssignmentResultNumber,
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
-import { buildAssignmentSharePath } from '@/assignments/share-link';
+import {
+  buildAssignmentShareLinkAvailability,
+  buildAssignmentSharePath,
+  type AssignmentShareLinkAvailability,
+} from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { Routes } from '@/lib/routes';
@@ -743,19 +745,24 @@ export function getAssignmentListCardActionState({
   status: AssignmentStatus;
 }): AssignmentListCardActionState {
   const hasPublishedSnapshot = status !== 'draft';
-  const canShareStudentLink = isAssignmentOpen(status, expiresAt, now);
-  const shareDisabledReason = canShareStudentLink
+  const shareAvailability = buildAssignmentShareLinkAvailability({
+    expiresAt,
+    now,
+    shareSlug: '',
+    status,
+  });
+  const shareDisabledReason = shareAvailability.isAvailable
     ? undefined
-    : getAssignmentListShareDisabledReason({ expiresAt, now, status });
+    : getAssignmentListShareDisabledReason(shareAvailability.lifecycleStatus);
 
   return {
     isPersisted: persisted,
     ...(shareDisabledReason ? { shareDisabledReason } : {}),
-    shareLabel: canShareStudentLink
+    shareLabel: shareAvailability.isAvailable
       ? assignmentListActionCopy.openShareLink
       : assignmentListActionCopy.shareLinkUnavailable,
     showResultsAction: persisted && hasPublishedSnapshot,
-    showShareActions: persisted || canShareStudentLink,
+    showShareActions: persisted || shareAvailability.isAvailable,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
@@ -804,17 +811,9 @@ export function buildAssignmentListCardActionView({
   };
 }
 
-function getAssignmentListShareDisabledReason({
-  expiresAt,
-  now,
-  status,
-}: {
-  expiresAt: Date | null;
-  now?: number;
-  status: AssignmentStatus;
-}) {
-  const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
-
+function getAssignmentListShareDisabledReason(
+  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
+) {
   if (lifecycleStatus === 'closed') {
     return m.assignment_list_share_link_closed();
   }

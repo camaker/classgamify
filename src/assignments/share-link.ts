@@ -1,5 +1,17 @@
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import {
+  type AssignmentDate,
+  type AssignmentLifecycleStatus,
+  getAssignmentLifecycleStatus,
+} from '@/assignments/lifecycle';
 import { m } from '@/locale/paraglide/messages';
+
+export type AssignmentShareLinkAvailability = {
+  isAvailable: boolean;
+  lifecycleStatus: AssignmentLifecycleStatus;
+  sharePath: string;
+  shareSlug: string;
+};
 
 export const assignmentShareLinkActionCopy = {
   get copyLabel() {
@@ -15,6 +27,44 @@ export const assignmentShareLinkActionCopy = {
 
 export function buildAssignmentSharePath(shareSlug: string) {
   return `/play/${encodeURIComponent(normalizeAssignmentShareSlug(shareSlug))}`;
+}
+
+export function resolveAssignmentShareLinkLifecycle({
+  expiresAt,
+  now,
+  status,
+}: {
+  expiresAt: AssignmentDate;
+  now?: number;
+  status: string;
+}) {
+  return getAssignmentLifecycleStatus(status, expiresAt, now);
+}
+
+export function buildAssignmentShareLinkAvailability({
+  expiresAt,
+  now,
+  shareSlug,
+  status,
+}: {
+  expiresAt: AssignmentDate;
+  now?: number;
+  shareSlug: string;
+  status: string;
+}): AssignmentShareLinkAvailability {
+  const lifecycleStatus = resolveAssignmentShareLinkLifecycle({
+    expiresAt,
+    now,
+    status,
+  });
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+
+  return {
+    isAvailable: lifecycleStatus === 'open',
+    lifecycleStatus,
+    sharePath: buildAssignmentSharePath(normalizedShareSlug),
+    shareSlug: normalizedShareSlug,
+  };
 }
 
 export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {

@@ -642,9 +642,11 @@ import {
 } from '@/assignments/published-assignment';
 import {
   assignmentShareLinkActionCopy,
+  buildAssignmentShareLinkAvailability,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
   normalizeShareBaseUrl,
+  resolveAssignmentShareLinkLifecycle,
 } from '@/assignments/share-link';
 import {
   ASSIGNMENT_SHARE_SLUG_LENGTH,
@@ -1439,6 +1441,16 @@ assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
   /buildAssignmentResultsCsv\(|buildAssignmentResultsCsvDataUrl\(|buildAssignmentResultsCsvFilename\(|buildAssignmentItemReviewSummary\(|buildAssignmentReteachPlan\(|buildAssignmentStudentFollowUpSummary\(/,
   'Assignment result page view-model should not rebuild result action artifacts.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /buildAssignmentResultHeaderShareAction[\s\S]*buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
+  'Assignment result header share action should resolve availability through the shared assignment share helper.'
+);
+assert.doesNotMatch(
+  assignmentResultViewActionBoundarySource,
+  /isAssignmentOpen\(|isAssignmentExpired\(|normalizeAssignmentShareSlug\(|buildAssignmentSharePath\(/,
+  'Assignment result page view-model should not rebuild share-link lifecycle or path state locally.'
 );
 const assignmentClassroomBriefSource = readFileSync(
   'src/assignments/classroom-brief.ts',
@@ -8914,6 +8926,58 @@ assert.equal(normalizeAssignmentShareSlug('　share-１２３　'), 'share-123')
 assert.equal(isSameAssignmentShareSlug(' share-１２３ ', 'share-123'), true);
 assert.equal(isSameAssignmentShareSlug('share-123', 'share-124'), false);
 assert.equal(
+  resolveAssignmentShareLinkLifecycle({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    status: 'published',
+  }),
+  'open'
+);
+assert.equal(
+  resolveAssignmentShareLinkLifecycle({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    status: 'closed',
+  }),
+  'closed'
+);
+assert.equal(
+  resolveAssignmentShareLinkLifecycle({
+    expiresAt: new Date('2025-12-31T00:00:00.000Z'),
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    status: 'published',
+  }),
+  'expired'
+);
+assert.deepEqual(
+  buildAssignmentShareLinkAvailability({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    shareSlug: '　class １２３　',
+    status: 'published',
+  }),
+  {
+    isAvailable: true,
+    lifecycleStatus: 'open',
+    sharePath: '/play/class%20123',
+    shareSlug: 'class 123',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkAvailability({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    shareSlug: 'draft-share',
+    status: 'draft',
+  }),
+  {
+    isAvailable: false,
+    lifecycleStatus: 'draft',
+    sharePath: '/play/draft-share',
+    shareSlug: 'draft-share',
+  }
+);
+assert.equal(
   normalizeShareBaseUrl('  https://classgamify.test///  '),
   'https://classgamify.test'
 );
@@ -15330,6 +15394,16 @@ assert.doesNotMatch(
   assignmentListCardComponentSource,
   /assignment_list_share_link_|assignment_list_action_share_link_unavailable|status ===|expiresAt|isAssignmentOpen|getAssignmentLifecycleStatus/,
   'Assignment list card component should not rebuild share lifecycle copy or availability from raw assignment state.'
+);
+assert.match(
+  assignmentListViewSource,
+  /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*status,[\s\S]*\}\)/,
+  'Assignment list card action state should resolve share-link availability through the shared assignment share helper.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /isAssignmentOpen\(|getAssignmentLifecycleStatus\(/,
+  'Assignment list view-model should not rebuild share-link lifecycle state locally.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
