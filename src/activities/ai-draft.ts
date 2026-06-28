@@ -38,6 +38,13 @@ import {
   formatTemplateRequirements,
   getActivityTemplateDraftGuidance,
 } from '@/activities/template-remix';
+import {
+  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  ACTIVITY_AI_DRAFT_FOCUSES,
+  buildActivityAiDraftFocusPromptLine,
+  formatActivityAiDraftFocusLabel,
+  type ActivityAiDraftFocus,
+} from '@/activities/ai-draft-focus';
 import { hasWorkersAiCredentials, runWorkersAi } from '@/ai/workers';
 import { WORKERS_AI_MODELS } from '@/config/ai-models';
 import { m } from '@/locale/paraglide/messages';
@@ -56,24 +63,6 @@ export const ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS = [
   8,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE.max,
 ] as const;
-
-export const ACTIVITY_AI_DRAFT_FOCUSES = [
-  'balanced',
-  'worksheet-practice',
-  'listening-script',
-  'remix-ready',
-] as const;
-
-export type ActivityAiDraftFocus = (typeof ACTIVITY_AI_DRAFT_FOCUSES)[number];
-
-export const ACTIVITY_AI_DRAFT_DEFAULT_FOCUS =
-  'balanced' satisfies ActivityAiDraftFocus;
-
-export type ActivityAiDraftFocusOption = {
-  description: string;
-  label: string;
-  value: ActivityAiDraftFocus;
-};
 
 export const ACTIVITY_AI_DRAFT_COMPLETION_LIMITS = {
   groups: 4,
@@ -246,68 +235,9 @@ export function buildGenerateActivityDraftInputFromEditor({
   });
 }
 
-export function buildActivityAiDraftFocusOptions(): ActivityAiDraftFocusOption[] {
-  return ACTIVITY_AI_DRAFT_FOCUSES.map((value) => ({
-    description: formatActivityAiDraftFocusDescription(value),
-    label: formatActivityAiDraftFocusLabel(value),
-    value,
-  }));
-}
-
-export function formatActivityAiDraftFocusLabel(
-  draftFocus: ActivityAiDraftFocus
-) {
-  switch (draftFocus) {
-    case 'balanced':
-      return m.activity_ai_focus_balanced_label();
-    case 'listening-script':
-      return m.activity_ai_focus_listening_script_label();
-    case 'remix-ready':
-      return m.activity_ai_focus_remix_ready_label();
-    case 'worksheet-practice':
-      return m.activity_ai_focus_worksheet_practice_label();
-  }
-}
-
-export function formatActivityAiDraftFocusDescription(
-  draftFocus: ActivityAiDraftFocus
-) {
-  switch (draftFocus) {
-    case 'balanced':
-      return m.activity_ai_focus_balanced_description();
-    case 'listening-script':
-      return m.activity_ai_focus_listening_script_description();
-    case 'remix-ready':
-      return m.activity_ai_focus_remix_ready_description();
-    case 'worksheet-practice':
-      return m.activity_ai_focus_worksheet_practice_description();
-  }
-}
-
-export function buildActivityAiDraftFocusPromptLine(
-  draftFocus: ActivityAiDraftFocus
-) {
-  return m.activity_ai_prompt_draft_focus({
-    focus: formatActivityAiDraftFocusLabel(draftFocus),
-    guidance: getActivityAiDraftFocusGuidance(draftFocus),
-  });
-}
-
-function getActivityAiDraftFocusGuidance(draftFocus: ActivityAiDraftFocus) {
-  switch (draftFocus) {
-    case 'balanced':
-      return m.activity_ai_focus_balanced_prompt();
-    case 'listening-script':
-      return m.activity_ai_focus_listening_script_prompt();
-    case 'remix-ready':
-      return m.activity_ai_focus_remix_ready_prompt();
-    case 'worksheet-practice':
-      return m.activity_ai_focus_worksheet_practice_prompt();
-  }
-}
-
 export type ActivityDraftResult = {
   activity: CreateActivityInput;
+  draftFocus: ActivityAiDraftFocus;
   meta: ActivityDraftMeta;
   model: string;
   notice?: string;
@@ -549,6 +479,7 @@ export async function generateActivityDraftFromAi(
       }),
       input: data,
     }),
+    draftFocus: data.draftFocus,
     model,
     notice: parsedDraft.usedLocalCompletion
       ? m.activity_ai_notice_completed_draft()
@@ -1102,6 +1033,7 @@ export function createFallbackActivityDraftResult({
       activity: createFallbackActivityDraft(data),
       input: data,
     }),
+    draftFocus: data.draftFocus,
     model,
     notice,
     provider: 'fallback',
@@ -1143,10 +1075,7 @@ export function createFallbackActivityDraft(
   );
 
   const sourceSummary = summarizeSource(data.sourceText);
-  const focusLabel = formatActivityAiDraftFocusLabelForLocale(
-    data.draftFocus,
-    locale
-  );
+  const focusLabel = formatActivityAiDraftFocusLabel(data.draftFocus, locale);
   const activity = {
     description: m.activity_ai_fallback_description(
       { focus: focusLabel, subject: data.subject },
@@ -1182,22 +1111,6 @@ export function createFallbackActivityDraft(
   } satisfies CreateActivityInput;
 
   return createActivityInputSchema.parse(activity);
-}
-
-function formatActivityAiDraftFocusLabelForLocale(
-  draftFocus: ActivityAiDraftFocus,
-  locale: Locale
-) {
-  switch (draftFocus) {
-    case 'balanced':
-      return m.activity_ai_focus_balanced_label({}, { locale });
-    case 'listening-script':
-      return m.activity_ai_focus_listening_script_label({}, { locale });
-    case 'remix-ready':
-      return m.activity_ai_focus_remix_ready_label({}, { locale });
-    case 'worksheet-practice':
-      return m.activity_ai_focus_worksheet_practice_label({}, { locale });
-  }
 }
 
 function buildFallbackQuestions({

@@ -104,15 +104,11 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
-  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
-  ACTIVITY_AI_DRAFT_FOCUSES,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS,
-  buildActivityAiDraftFocusOptions,
-  buildActivityAiDraftFocusPromptLine,
   buildActivityDraftPrompt,
   buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
@@ -124,6 +120,12 @@ import {
   normalizeAiActivityDraft,
   type AiActivityDraft,
 } from '@/activities/ai-draft';
+import {
+  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  ACTIVITY_AI_DRAFT_FOCUSES,
+  buildActivityAiDraftFocusOptions,
+  buildActivityAiDraftFocusPromptLine,
+} from '@/activities/ai-draft-focus';
 import {
   formatEditorGroupRow,
   formatEditorGroupRows,
@@ -2578,6 +2580,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /draftFocus: result\.draftFocus/,
+  'AI draft summary component should pass the server draft focus into the summary view-model.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /ActivityDraftResult/,
   'AI draft summary component should accept the server draft result contract.'
 );
@@ -2613,8 +2620,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.modelLineText[\s\S]*summaryView\.noticeLineText/,
-  'AI draft summary component should render prepared model and notice text lines.'
+  /summaryView\.modelLineText[\s\S]*summaryView\.draftFocusLineText[\s\S]*summaryView\.draftFocusDescription[\s\S]*summaryView\.noticeLineText/,
+  'AI draft summary component should render prepared model, draft-focus, and notice text lines.'
 );
 const activityDraftMetaSource = readFileSync(
   'src/activities/draft-meta.ts',
@@ -2634,6 +2641,11 @@ assert.match(
   activityDraftMetaSource,
   /normalizeRuntimeDisplayText\(model\)/,
   'AI draft meta should normalize provider model names with the shared runtime display helper.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /formatActivityAiDraftFocusLabel[\s\S]*formatActivityAiDraftFocusDescription/,
+  'AI draft meta should format draft-focus provenance through the shared focus domain.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -15473,6 +15485,10 @@ const activityAiDraftSource = readFileSync(
   'src/activities/ai-draft.ts',
   'utf8'
 );
+const activityAiDraftFocusSource = readFileSync(
+  'src/activities/ai-draft-focus.ts',
+  'utf8'
+);
 assert.match(
   activityAiDraftSource,
   /function createActivityDraftResult[\s\S]*activity,[\s\S]*meta: buildActivityDraftMeta\(\{[\s\S]*currentTemplateType: input\.templateType/,
@@ -15480,8 +15496,8 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
-  /type ActivityDraftResult = \{[\s\S]*activity: CreateActivityInput;[\s\S]*meta: ActivityDraftMeta;[\s\S]*provider: 'fallback' \| 'workers-ai';/,
-  'AI draft result contract should expose editor input, meta, provider, and model provenance.'
+  /type ActivityDraftResult = \{[\s\S]*activity: CreateActivityInput;[\s\S]*draftFocus: ActivityAiDraftFocus;[\s\S]*meta: ActivityDraftMeta;[\s\S]*provider: 'fallback' \| 'workers-ai';/,
+  'AI draft result contract should expose editor input, draft focus, meta, provider, and model provenance.'
 );
 assert.match(
   activityAiDraftSource,
@@ -15489,8 +15505,13 @@ assert.match(
   'AI draft input schema should reuse the domain item-count range.'
 );
 assert.match(
+  activityAiDraftFocusSource,
+  /ACTIVITY_AI_DRAFT_FOCUSES[\s\S]*ACTIVITY_AI_DRAFT_DEFAULT_FOCUS/,
+  'AI draft focus constants should live in the shared focus domain.'
+);
+assert.match(
   activityAiDraftSource,
-  /ACTIVITY_AI_DRAFT_FOCUSES[\s\S]*ACTIVITY_AI_DRAFT_DEFAULT_FOCUS[\s\S]*draftFocus: z[\s\S]*\.enum\(ACTIVITY_AI_DRAFT_FOCUSES\)[\s\S]*\.default\(ACTIVITY_AI_DRAFT_DEFAULT_FOCUS\)/,
+  /draftFocus: z[\s\S]*\.enum\(ACTIVITY_AI_DRAFT_FOCUSES\)[\s\S]*\.default\(ACTIVITY_AI_DRAFT_DEFAULT_FOCUS\)/,
   'AI draft input schema should expose and reuse the domain draft-focus contract.'
 );
 assert.match(
@@ -21851,6 +21872,7 @@ const fallbackDraftMeta = buildActivityDraftMeta({
 assert.equal(fallbackDraft.templateType, 'listening');
 assert.match(fallbackDraft.description, /Listening script/);
 assert.equal(fallbackDraftResult.provider, 'fallback');
+assert.equal(fallbackDraftResult.draftFocus, 'listening-script');
 assert.equal(fallbackDraftResult.model, 'test-model');
 assert.equal(fallbackDraftResult.notice, 'Fallback used for testing.');
 assert.equal(fallbackDraftResult.activity.templateType, 'listening');
@@ -21942,6 +21964,7 @@ assert.ok(
   )
 );
 const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  draftFocus: fallbackDraftResult.draftFocus,
   meta: fallbackDraftMeta,
   model: 'test-model',
   notice: 'Fallback used for testing.',
@@ -21958,6 +21981,16 @@ assert.equal(fallbackDraftMetaSummary.title, 'AI draft coverage');
 assert.equal(
   fallbackDraftMetaSummary.description,
   'Review the generated content before saving it to the activity library.'
+);
+assert.equal(fallbackDraftMetaSummary.draftFocusLabel, 'Focus');
+assert.equal(fallbackDraftMetaSummary.draftFocusName, 'Listening script');
+assert.equal(
+  fallbackDraftMetaSummary.draftFocusLineText,
+  'Focus: Listening script'
+);
+assert.equal(
+  fallbackDraftMetaSummary.draftFocusDescription,
+  'Builds spoken prompts and review answers for listening practice.'
 );
 assert.equal(fallbackDraftMetaSummary.modelLabel, 'Model');
 assert.equal(fallbackDraftMetaSummary.modelLineText, 'Model: test-model');
@@ -22000,6 +22033,7 @@ assert.deepEqual(
   }
 );
 const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  draftFocus: 'remix-ready',
   meta: buildActivityDraftMeta({
     activity: {
       ...activityEditorDefaultInput,
@@ -22014,6 +22048,10 @@ const questionOnlyDraftMetaSummary = buildActivityDraftMetaSummaryView({
   provider: 'workers-ai',
 });
 assert.equal(
+  questionOnlyDraftMetaSummary.draftFocusLineText,
+  'Focus: Remix ready'
+);
+assert.equal(
   questionOnlyDraftMetaSummary.providerDescription,
   'Generated by Workers AI and converted into the teacher-reviewable activity editor contract.'
 );
@@ -22027,6 +22065,7 @@ assert.ok(
 );
 assert.equal(
   buildActivityDraftMetaSummaryView({
+    draftFocus: 'worksheet-practice',
     meta: fallbackDraftMeta,
     model: 'test-model',
     notice: 'Workers AI returned a partial draft for testing.',
@@ -22044,6 +22083,14 @@ assert.equal(
     provider: 'workers-ai',
   }).readyTemplateLabel,
   '1 ready template'
+);
+assert.equal(
+  buildActivityDraftMetaSummaryView({
+    meta: fallbackDraftMeta,
+    model: 'test-model',
+    provider: 'workers-ai',
+  }).draftFocusLineText,
+  'Focus: Balanced activity'
 );
 const malformedDraftMetaSummary = buildActivityDraftMetaSummaryView({
   meta: {
@@ -22120,12 +22167,17 @@ try {
     currentTemplateType: 'listening',
   });
   const zhFallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
+    draftFocus: 'listening-script',
     meta: zhFallbackDraftMeta,
     model: 'test-model',
     provider: 'fallback',
   });
 
   assert.equal(zhFallbackDraftMetaSummary.noticeLabel, '生成说明');
+  assert.equal(
+    zhFallbackDraftMetaSummary.draftFocusLineText,
+    '生成目标：听力脚本'
+  );
   assert.equal(zhFallbackDraftMetaSummary.modelLineText, '模型：test-model');
   assert.equal(
     zhFallbackDraftMetaSummary.providerDescription,

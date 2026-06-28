@@ -1,8 +1,8 @@
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
-  type ActivityAiDraftFocus,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
+import type { ActivityAiDraftFocus } from '@/activities/ai-draft-focus';
 import type { buildActivityEditorAiDraftPanelView } from '@/activities/editor';
 import { ActivityDraftMetaSummary } from '@/components/activities/activity-draft-meta-summary';
 import { Badge } from '@/components/ui/badge';

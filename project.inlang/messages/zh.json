@@ -112,6 +112,8 @@
   "activity_draft_meta_coverage_questions": "题目",
   "activity_draft_meta_coverage_vocab": "词汇",
   "activity_draft_meta_description": "保存到活动库前，请先检查生成的内容。",
+  "activity_draft_meta_focus_label": "生成目标",
+  "activity_draft_meta_focus_line": "{label}：{value}",
   "activity_draft_meta_model_label": "模型",
   "activity_draft_meta_model_line": "{label}：{value}",
   "activity_draft_meta_notice_label": "生成说明",

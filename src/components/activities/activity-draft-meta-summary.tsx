@@ -15,6 +15,7 @@ export function ActivityDraftMetaSummary({
   result,
 }: ActivityDraftMetaSummaryProps) {
   const summaryView = buildActivityDraftMetaSummaryView({
+    draftFocus: result.draftFocus,
     meta: result.meta,
     model: result.model,
     notice: result.notice,
@@ -41,6 +42,8 @@ export function ActivityDraftMetaSummary({
       </div>
       <div className="mt-3 rounded-lg border bg-background p-3 text-xs leading-5 text-muted-foreground">
         <p className="font-medium">{summaryView.modelLineText}</p>
+        <p className="mt-1 font-medium">{summaryView.draftFocusLineText}</p>
+        <p className="mt-1">{summaryView.draftFocusDescription}</p>
         <p className="mt-1">{summaryView.providerDescription}</p>
         {summaryView.noticeLineText ? (
           <p className="mt-1 font-medium">{summaryView.noticeLineText}</p>

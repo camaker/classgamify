@@ -13,12 +13,14 @@ import {
   getActivityEditorDefaultInput,
 } from '@/activities/editor';
 import {
-  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   buildGenerateActivityDraftInputFromEditor,
   type ActivityDraftResult,
-  type ActivityAiDraftFocus,
 } from '@/activities/ai-draft';
+import {
+  ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  type ActivityAiDraftFocus,
+} from '@/activities/ai-draft-focus';
 import { ActivityAiDraftPanel } from '@/components/activities/activity-ai-draft-panel';
 import {
   ActivityEditorDetailsFields,

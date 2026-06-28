@@ -26,7 +26,7 @@ import {
 import {
   buildActivityAiDraftFocusOptions,
   type ActivityAiDraftFocusOption,
-} from '@/activities/ai-draft';
+} from '@/activities/ai-draft-focus';
 import {
   formatEditorGroupRows,
   formatEditorInlineList,

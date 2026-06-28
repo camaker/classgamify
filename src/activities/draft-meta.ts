@@ -2,6 +2,11 @@ import {
   buildTemplateRemixSummary,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
+import {
+  formatActivityAiDraftFocusDescription,
+  formatActivityAiDraftFocusLabel,
+  type ActivityAiDraftFocus,
+} from '@/activities/ai-draft-focus';
 import type {
   TemplateRemixLockedOption,
   TemplateRemixPlan,
@@ -82,6 +87,10 @@ type ActivityDraftMetaSummaryView = {
     value: number;
   }>;
   description: string;
+  draftFocusDescription: string;
+  draftFocusLabel: string;
+  draftFocusLineText: string;
+  draftFocusName: string;
   modelLabel: string;
   modelLineText: string;
   modelName: string;
@@ -150,11 +159,13 @@ export function buildActivityDraftMeta({
 }
 
 export function buildActivityDraftMetaSummaryView({
+  draftFocus,
   meta,
   model,
   notice,
   provider,
 }: {
+  draftFocus?: ActivityAiDraftFocus;
   meta: ActivityDraftMeta;
   model: string;
   notice?: string;
@@ -168,6 +179,9 @@ export function buildActivityDraftMetaSummaryView({
     normalizeRuntimeDisplayText(model) || m.activity_draft_meta_unknown_model();
   const normalizedNotice = normalizeOptionalRuntimeDisplayText(notice);
   const noticeLabel = m.activity_draft_meta_notice_label();
+  const normalizedDraftFocus = draftFocus ?? 'balanced';
+  const draftFocusLabel = m.activity_draft_meta_focus_label();
+  const draftFocusName = formatActivityAiDraftFocusLabel(normalizedDraftFocus);
 
   return {
     coverageStats: [
@@ -193,6 +207,14 @@ export function buildActivityDraftMetaSummaryView({
       },
     ],
     description: m.activity_draft_meta_description(),
+    draftFocusDescription:
+      formatActivityAiDraftFocusDescription(normalizedDraftFocus),
+    draftFocusLabel,
+    draftFocusLineText: m.activity_draft_meta_focus_line({
+      label: draftFocusLabel,
+      value: draftFocusName,
+    }),
+    draftFocusName,
     modelLabel,
     modelLineText: m.activity_draft_meta_model_line({
       label: modelLabel,

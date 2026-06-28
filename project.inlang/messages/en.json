@@ -112,6 +112,8 @@
   "activity_draft_meta_coverage_questions": "Questions",
   "activity_draft_meta_coverage_vocab": "Vocab",
   "activity_draft_meta_description": "Review the generated content before saving it to the activity library.",
+  "activity_draft_meta_focus_label": "Focus",
+  "activity_draft_meta_focus_line": "{label}: {value}",
   "activity_draft_meta_model_label": "Model",
   "activity_draft_meta_model_line": "{label}: {value}",
   "activity_draft_meta_notice_label": "Generation note",
