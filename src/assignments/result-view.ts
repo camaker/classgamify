@@ -145,6 +145,7 @@ type AssignmentResultMetricKey =
   | 'completions';
 
 type AssignmentResultMetricDescriptor = {
+  description: string;
   key: AssignmentResultMetricKey;
   label: string;
 };
@@ -171,6 +172,7 @@ type AssignmentResultPageBreadcrumb = {
 };
 
 type AssignmentResultControlOption<TValue extends string> = {
+  description: string;
   label: string;
   value: TValue;
 };
@@ -178,6 +180,7 @@ type AssignmentResultControlOption<TValue extends string> = {
 type AssignmentResultStudentSearchControlView = {
   hasSearchValue: boolean;
   sort: StudentSummarySort;
+  selectedSortOption: AssignmentResultControlOption<StudentSummarySort>;
   sortOptions: Array<AssignmentResultControlOption<StudentSummarySort>>;
   summary: string;
   value: string;
@@ -185,12 +188,14 @@ type AssignmentResultStudentSearchControlView = {
 
 type AssignmentResultItemPerformanceSortControlView = {
   options: Array<AssignmentResultControlOption<ItemPerformanceSort>>;
+  selectedSortOption: AssignmentResultControlOption<ItemPerformanceSort>;
   sort: ItemPerformanceSort;
 };
 
 type AssignmentResultAttemptReviewFilterControlView = {
   filter: AttemptReviewFilter;
   options: Array<AssignmentResultControlOption<AttemptReviewFilter>>;
+  selectedFilterOption: AssignmentResultControlOption<AttemptReviewFilter>;
 };
 
 type AssignmentResultControlViews = {
@@ -508,30 +513,45 @@ export const assignmentResultReviewCopy = {
 const assignmentResultMetricDescriptors = [
   {
     key: 'completions',
+    get description() {
+      return m.assignment_result_metric_completions_description();
+    },
     get label() {
       return m.assignment_result_metric_completions();
     },
   },
   {
     key: 'average-accuracy',
+    get description() {
+      return m.assignment_result_metric_average_accuracy_description();
+    },
     get label() {
       return m.assignment_result_metric_average_accuracy();
     },
   },
   {
     key: 'average-points',
+    get description() {
+      return m.assignment_result_metric_average_points_description();
+    },
     get label() {
       return m.assignment_result_metric_average_points();
     },
   },
   {
     key: 'average-time',
+    get description() {
+      return m.assignment_result_metric_average_time_description();
+    },
     get label() {
       return m.assignment_result_metric_average_time();
     },
   },
   {
     key: 'closes',
+    get description() {
+      return m.assignment_result_metric_closes_description();
+    },
     get label() {
       return m.assignment_result_metric_closes();
     },
@@ -540,24 +560,31 @@ const assignmentResultMetricDescriptors = [
 
 export const studentSummarySortOptions = buildAssignmentResultControlOptions(
   STUDENT_SUMMARY_SORT_VALUES,
-  getStudentSummarySortOptionLabel
+  getStudentSummarySortOptionLabel,
+  getStudentSummarySortOptionDescription
 );
 
 export const itemPerformanceSortOptions = buildAssignmentResultControlOptions(
   ITEM_PERFORMANCE_SORT_VALUES,
-  getItemPerformanceSortOptionLabel
+  getItemPerformanceSortOptionLabel,
+  getItemPerformanceSortOptionDescription
 );
 
 export const attemptReviewFilterOptions = buildAssignmentResultControlOptions(
   ATTEMPT_REVIEW_FILTER_VALUES,
-  getAttemptReviewFilterOptionLabel
+  getAttemptReviewFilterOptionLabel,
+  getAttemptReviewFilterOptionDescription
 );
 
 function buildAssignmentResultControlOptions<TValue extends string>(
   values: readonly TValue[],
-  getLabel: (value: TValue) => string
+  getLabel: (value: TValue) => string,
+  getDescription: (value: TValue) => string
 ): Array<AssignmentResultControlOption<TValue>> {
   return values.map((value) => ({
+    get description() {
+      return getDescription(value);
+    },
     get label() {
       return getLabel(value);
     },
@@ -573,6 +600,19 @@ function getStudentSummarySortOptionLabel(value: StudentSummarySort) {
   return m.assignment_result_sort_needs_review();
 }
 
+function getStudentSummarySortOptionDescription(value: StudentSummarySort) {
+  if (value === 'best')
+    return m.assignment_result_sort_best_score_description();
+  if (value === 'name') {
+    return m.assignment_result_sort_student_name_description();
+  }
+  if (value === 'attempts') {
+    return m.assignment_result_sort_attempts_description();
+  }
+
+  return m.assignment_result_sort_needs_review_description();
+}
+
 function getItemPerformanceSortOptionLabel(value: ItemPerformanceSort) {
   if (value === 'accuracy') return m.assignment_result_sort_lowest_accuracy();
   if (value === 'submitted') return m.assignment_result_sort_most_answered();
@@ -581,12 +621,32 @@ function getItemPerformanceSortOptionLabel(value: ItemPerformanceSort) {
   return m.assignment_result_sort_snapshot_order();
 }
 
+function getItemPerformanceSortOptionDescription(value: ItemPerformanceSort) {
+  if (value === 'accuracy') {
+    return m.assignment_result_sort_lowest_accuracy_description();
+  }
+  if (value === 'submitted') {
+    return m.assignment_result_sort_most_answered_description();
+  }
+  if (value === 'type') return m.assignment_result_sort_item_type_description();
+
+  return m.assignment_result_sort_snapshot_order_description();
+}
+
 function getAttemptReviewFilterOptionLabel(value: AttemptReviewFilter) {
   if (value === 'needs-review') {
     return m.assignment_result_filter_needs_review_only();
   }
 
   return m.assignment_result_filter_all_answers();
+}
+
+function getAttemptReviewFilterOptionDescription(value: AttemptReviewFilter) {
+  if (value === 'needs-review') {
+    return m.assignment_result_filter_needs_review_only_description();
+  }
+
+  return m.assignment_result_filter_all_answers_description();
 }
 
 export function buildAssignmentResultMetricItems({
@@ -1434,23 +1494,54 @@ export function buildAssignmentResultControlViews({
   resultSearchSummary: string;
   viewState: AssignmentResultResolvedViewState;
 }): AssignmentResultControlViews {
+  const selectedAttemptReviewFilterOption =
+    resolveAssignmentResultControlOption(
+      attemptReviewFilterOptions,
+      viewState.attemptReviewFilter
+    );
+  const selectedItemPerformanceSortOption =
+    resolveAssignmentResultControlOption(
+      itemPerformanceSortOptions,
+      viewState.itemPerformanceSort
+    );
+  const selectedStudentSortOption = resolveAssignmentResultControlOption(
+    studentSummarySortOptions,
+    viewState.studentSort
+  );
+
   return {
     attemptReviewFilter: {
       filter: viewState.attemptReviewFilter,
       options: attemptReviewFilterOptions,
+      selectedFilterOption: selectedAttemptReviewFilterOption,
     },
     itemPerformanceSort: {
       options: itemPerformanceSortOptions,
+      selectedSortOption: selectedItemPerformanceSortOption,
       sort: viewState.itemPerformanceSort,
     },
     studentSearch: {
       hasSearchValue: Boolean(viewState.studentSearch),
+      selectedSortOption: selectedStudentSortOption,
       sort: viewState.studentSort,
       sortOptions: studentSummarySortOptions,
       summary: resultSearchSummary,
       value: viewState.studentSearch,
     },
   };
+}
+
+function resolveAssignmentResultControlOption<TValue extends string>(
+  options: Array<AssignmentResultControlOption<TValue>>,
+  value: TValue
+): AssignmentResultControlOption<TValue> {
+  const selectedOption = options.find((option) => option.value === value);
+  if (selectedOption) return selectedOption;
+
+  const fallbackOption = options[0];
+  if (fallbackOption) return fallbackOption;
+
+  throw new Error('Assignment result control options cannot be empty.');
 }
 
 function formatResultStudentCount(count: number) {

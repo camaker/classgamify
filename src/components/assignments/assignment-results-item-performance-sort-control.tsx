@@ -39,6 +39,9 @@ export function AssignmentResultsItemPerformanceSortControl({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {view.selectedSortOption.description}
+      </p>
     </div>
   );
 }

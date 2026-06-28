@@ -550,6 +550,7 @@ import {
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
+  buildAssignmentResultControlViews,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
   buildAssignmentResultsRouteState,
@@ -1697,6 +1698,21 @@ assert.match(
   assignmentResultViewSource,
   /buildAssignmentResultControlOptions\([\s\S]*values\.map\(\(value\)/,
   'Assignment result control options should map directly from the domain enum values.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /function buildAssignmentResultControlOptions[\s\S]*getDescription[\s\S]*get description\(\)[\s\S]*return getDescription\(value\)/,
+  'Assignment result control option descriptions should be prepared in the assignment-domain view model.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /selectedFilterOption: selectedAttemptReviewFilterOption[\s\S]*selectedSortOption: selectedItemPerformanceSortOption[\s\S]*selectedSortOption: selectedStudentSortOption/,
+  'Assignment result control views should expose the selected filter and sort descriptions to UI controls.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /assignmentResultMetricDescriptors[\s\S]*assignment_result_metric_completions_description[\s\S]*assignment_result_metric_average_accuracy_description[\s\S]*assignment_result_metric_average_points_description[\s\S]*assignment_result_metric_average_time_description[\s\S]*assignment_result_metric_closes_description/,
+  'Assignment result metric descriptions should come from localized assignment-domain copy.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -3529,14 +3545,34 @@ assert.match(
   'Assignment result student search component should render prepared sort options and result summary.'
 );
 assert.match(
+  assignmentResultsStudentSearchSource,
+  /view\.selectedSortOption\.description/,
+  'Assignment result student search component should render the selected sort description from the domain control view.'
+);
+assert.match(
   assignmentResultsAttemptReviewFilterSource,
   /view\.options/,
   'Assignment result attempt review filter component should render prepared filter options.'
 );
 assert.match(
+  assignmentResultsAttemptReviewFilterSource,
+  /view\.selectedFilterOption\.description/,
+  'Assignment result attempt review filter component should render the selected filter description from the domain control view.'
+);
+assert.match(
   assignmentResultsItemPerformanceSortSource,
   /view\.options/,
   'Assignment result item performance sort component should render prepared sort options.'
+);
+assert.match(
+  assignmentResultsItemPerformanceSortSource,
+  /view\.selectedSortOption\.description/,
+  'Assignment result item performance sort component should render the selected sort description from the domain control view.'
+);
+assert.match(
+  assignmentResultsMetricCardSource,
+  /\{metric\.description\}/,
+  'Assignment result metric cards should render domain-provided metric descriptions.'
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
@@ -27159,12 +27195,32 @@ assert.deepEqual(
   ['needs-review', 'best', 'name', 'attempts']
 );
 assert.deepEqual(
-  studentSummarySortOptions.map((option) => [option.value, option.label]),
+  studentSummarySortOptions.map((option) => [
+    option.value,
+    option.label,
+    option.description,
+  ]),
   [
-    ['needs-review', 'Needs review'],
-    ['best', 'Best score'],
-    ['name', 'Student name'],
-    ['attempts', 'Attempts'],
+    [
+      'needs-review',
+      'Needs review',
+      'Prioritize students with missed items or lower follow-up scores.',
+    ],
+    [
+      'best',
+      'Best score',
+      'Scan strongest performances before opening individual attempts.',
+    ],
+    [
+      'name',
+      'Student name',
+      'Use alphabetical order for grading or roster checks.',
+    ],
+    [
+      'attempts',
+      'Attempts',
+      'Put students with the most submitted attempts first.',
+    ],
   ]
 );
 assert.deepEqual(
@@ -27172,12 +27228,32 @@ assert.deepEqual(
   ['original', 'accuracy', 'submitted', 'type']
 );
 assert.deepEqual(
-  itemPerformanceSortOptions.map((option) => [option.value, option.label]),
+  itemPerformanceSortOptions.map((option) => [
+    option.value,
+    option.label,
+    option.description,
+  ]),
   [
-    ['original', 'Snapshot order'],
-    ['accuracy', 'Lowest accuracy'],
-    ['submitted', 'Most answered'],
-    ['type', 'Item type'],
+    [
+      'original',
+      'Snapshot order',
+      'Keep the frozen assignment order students saw while working.',
+    ],
+    [
+      'accuracy',
+      'Lowest accuracy',
+      'Surface the prompts with the lowest correct rate first.',
+    ],
+    [
+      'submitted',
+      'Most answered',
+      'Review the prompts with the highest submission volume first.',
+    ],
+    [
+      'type',
+      'Item type',
+      'Group prompts by runtime item type for template-specific review.',
+    ],
   ]
 );
 assert.deepEqual(
@@ -27185,11 +27261,54 @@ assert.deepEqual(
   ['all', 'needs-review']
 );
 assert.deepEqual(
-  attemptReviewFilterOptions.map((option) => [option.value, option.label]),
+  attemptReviewFilterOptions.map((option) => [
+    option.value,
+    option.label,
+    option.description,
+  ]),
   [
-    ['all', 'All answers'],
-    ['needs-review', 'Needs review only'],
+    [
+      'all',
+      'All answers',
+      'Show every submitted answer card for the current student search.',
+    ],
+    [
+      'needs-review',
+      'Needs review only',
+      'Focus the answer review on submissions with at least one missed item.',
+    ],
   ]
+);
+assert.deepEqual(
+  buildAssignmentResultControlViews({
+    resultSearchSummary: '1 student · 2 attempts',
+    viewState: {
+      attemptReviewFilter: 'needs-review',
+      itemPerformanceSort: 'accuracy',
+      studentSearch: 'alice',
+      studentSort: 'best',
+    },
+  }),
+  {
+    attemptReviewFilter: {
+      filter: 'needs-review',
+      options: attemptReviewFilterOptions,
+      selectedFilterOption: attemptReviewFilterOptions[1],
+    },
+    itemPerformanceSort: {
+      options: itemPerformanceSortOptions,
+      selectedSortOption: itemPerformanceSortOptions[1],
+      sort: 'accuracy',
+    },
+    studentSearch: {
+      hasSearchValue: true,
+      selectedSortOption: studentSummarySortOptions[1],
+      sort: 'best',
+      sortOptions: studentSummarySortOptions,
+      summary: '1 student · 2 attempts',
+      value: 'alice',
+    },
+  }
 );
 assert.equal(
   assignmentResultPageCopy.description,
@@ -27225,11 +27344,35 @@ assert.deepEqual(
     expiresAt: '2026-06-30T12:00:00.000Z',
   }),
   [
-    { key: 'completions', label: 'Completions', value: '12' },
-    { key: 'average-accuracy', label: 'Average accuracy', value: '83%' },
-    { key: 'average-points', label: 'Average points', value: '7' },
-    { key: 'average-time', label: 'Average time', value: '2m 30s' },
     {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '12',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '83%',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '7',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '2m 30s',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
       key: 'closes',
       label: 'Closes',
       value: formatAssignmentExpiry('2026-06-30T12:00:00.000Z'),
@@ -27245,11 +27388,35 @@ assert.deepEqual(
     expiresAt: 'not-a-date',
   }),
   [
-    { key: 'completions', label: 'Completions', value: '-' },
-    { key: 'average-accuracy', label: 'Average accuracy', value: '-' },
-    { key: 'average-points', label: 'Average points', value: '-' },
-    { key: 'average-time', label: 'Average time', value: '-' },
     {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '-',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '-',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '-',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '-',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
       key: 'closes',
       label: 'Closes',
       value: formatAssignmentExpiry('not-a-date'),
@@ -27265,11 +27432,35 @@ assert.deepEqual(
     expiresAt: null,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
-    { key: 'average-accuracy', label: 'Average accuracy', value: '-' },
-    { key: 'average-points', label: 'Average points', value: '-' },
-    { key: 'average-time', label: 'Average time', value: '-' },
     {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '-',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '-',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '-',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
       key: 'closes',
       label: 'Closes',
       value: formatAssignmentExpiry(null),

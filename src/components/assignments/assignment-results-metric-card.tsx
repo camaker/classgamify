@@ -26,6 +26,9 @@ export function AssignmentResultsMetricCard({
         <Icon className="size-5 text-primary" />
         <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
         <p className="text-sm text-muted-foreground">{metric.label}</p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          {metric.description}
+        </p>
       </CardContent>
     </Card>
   );

@@ -39,6 +39,9 @@ export function AssignmentResultsAttemptReviewFilterControl({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {view.selectedFilterOption.description}
+      </p>
     </div>
   );
 }

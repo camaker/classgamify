@@ -28,7 +28,7 @@ export function AssignmentResultsStudentSearch({
   view,
 }: AssignmentResultsStudentSearchProps) {
   return (
-    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
+    <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-start">
       <div className="grid gap-2">
         <label
           htmlFor="assignment-result-search"
@@ -74,8 +74,11 @@ export function AssignmentResultsStudentSearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          {view.selectedSortOption.description}
+        </p>
       </div>
-      <p className="text-sm text-muted-foreground md:text-right">
+      <p className="text-sm text-muted-foreground md:pt-7 md:text-right">
         {view.summary}
       </p>
     </section>
