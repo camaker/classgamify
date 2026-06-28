@@ -10758,14 +10758,8 @@ assert.deepEqual(
     },
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-    printAction: {
-      assignmentId: 'assignment-2',
-    },
     sharePath: '/play/share-2',
-    showDismissAction: true,
     showMissingHint: false,
-    showResultsAction: true,
-    showShareActions: true,
     status: 'found',
     title: 'Week 2',
   }
@@ -10790,12 +10784,8 @@ assert.deepEqual(
       },
     },
     body: 'Loading the newly published assignment link and classroom actions.',
-    printAction: undefined,
     sharePath: '/play/share-2',
-    showDismissAction: true,
     showMissingHint: false,
-    showResultsAction: false,
-    showShareActions: true,
     status: 'loading',
     title: 'Student share link is being prepared.',
   }
@@ -10820,12 +10810,8 @@ assert.deepEqual(
       },
     },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
-    printAction: undefined,
     sharePath: '/play/missing',
-    showDismissAction: true,
     showMissingHint: true,
-    showResultsAction: false,
-    showShareActions: true,
     status: 'missing',
     title: 'Student share link is ready.',
   }
@@ -16439,6 +16425,10 @@ const publishedAssignmentPanelComponentSource = readFileSync(
   'src/components/assignments/published-assignment-panel.tsx',
   'utf8'
 );
+const publishedAssignmentSource = readFileSync(
+  'src/assignments/published-assignment.ts',
+  'utf8'
+);
 const assignmentListViewSource = readFileSync(
   'src/assignments/list-view.ts',
   'utf8'
@@ -16990,6 +16980,11 @@ assert.match(
   publishedAssignmentPanelComponentSource,
   /buildPublishedAssignmentPanelContext/,
   'Published assignment panel component should render share-panel state from the assignment-domain panel context.'
+);
+assert.doesNotMatch(
+  publishedAssignmentSource,
+  /type PublishedAssignmentPanelContext = \{(?:(?!\n};)[\s\S])*(?:showResultsAction|showShareActions|showDismissAction|printAction:)/,
+  'Published assignment panel context should expose prepared actionView instead of legacy action booleans or duplicate print action fields.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
@@ -21017,14 +21012,8 @@ assert.deepEqual(
         title: 'Persisted assignment',
       },
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-      printAction: {
-        assignmentId: 'persisted-assignment-1',
-      },
       sharePath: '/play/share-1',
-      showDismissAction: true,
       showMissingHint: false,
-      showResultsAction: true,
-      showShareActions: true,
       status: 'found',
       title: 'Persisted assignment',
     },

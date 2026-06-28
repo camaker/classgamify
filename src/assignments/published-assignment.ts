@@ -85,16 +85,8 @@ type PublishedAssignmentPanelContext = {
   actionView: PublishedAssignmentPanelActionView;
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
-  printAction:
-    | {
-        assignmentId: string;
-      }
-    | undefined;
   sharePath: string;
-  showDismissAction: boolean;
   showMissingHint: boolean;
-  showResultsAction: boolean;
-  showShareActions: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
 };
@@ -121,14 +113,8 @@ export function buildPublishedAssignmentPanelContext({
       }),
       assignment,
       body: m.assignment_published_panel_found_body(),
-      printAction: {
-        assignmentId: assignment.id,
-      },
       sharePath,
-      showDismissAction: true,
       showMissingHint: false,
-      showResultsAction: true,
-      showShareActions: true,
       status: 'found',
       title: formatAssignmentDisplayTitle(assignment.title),
     };
@@ -143,12 +129,8 @@ export function buildPublishedAssignmentPanelContext({
         status: 'loading',
       }),
       body: m.assignment_published_panel_loading_body(),
-      printAction: undefined,
       sharePath,
-      showDismissAction: true,
       showMissingHint: false,
-      showResultsAction: false,
-      showShareActions: true,
       status: 'loading',
       title: m.assignment_published_panel_loading_title(),
     };
@@ -162,12 +144,8 @@ export function buildPublishedAssignmentPanelContext({
       status: 'missing',
     }),
     body: m.assignment_published_panel_missing_body(),
-    printAction: undefined,
     sharePath,
-    showDismissAction: true,
     showMissingHint: true,
-    showResultsAction: false,
-    showShareActions: true,
     status: 'missing',
     title: m.assignment_published_panel_missing_title(),
   };
