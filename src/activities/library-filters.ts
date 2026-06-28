@@ -150,12 +150,6 @@ export function parseActivityTemplateFilter(
   return isActivityTemplateType(value) ? value : undefined;
 }
 
-export function parseCreateActivityTemplateSearch(
-  value: unknown
-): ActivityTemplateType | undefined {
-  return isActivityTemplateType(value) ? value : undefined;
-}
-
 export function buildActivityLibraryValidatedSearch(
   search: Record<string, unknown>
 ): ActivityLibraryRouteSearch {

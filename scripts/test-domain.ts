@@ -103,7 +103,6 @@ import {
   parseActivityLibraryStatus,
   parseActivitySourceMaterialFilter,
   parseActivityTemplateFilter,
-  parseCreateActivityTemplateSearch,
 } from '@/activities/library-filters';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
@@ -228,6 +227,7 @@ import {
   buildTemplateEntryAction,
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
+  parseCreateActivityTemplateSearch,
 } from '@/activities/template-entry';
 import {
   buildTemplatesPageViewModel,
@@ -934,10 +934,15 @@ assert.match(
   /buildActivityCreatePageEditorViewModel/,
   'The create route should consume the activity-domain page view-model instead of rebuilding editor page state in the route.'
 );
+assert.match(
+  createRouteSource,
+  /from '@\/activities\/template-entry'/,
+  'The create route should parse template-entry search state through the activity template entry domain.'
+);
 assert.doesNotMatch(
   createRouteSource,
-  /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)/,
-  'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel.'
+  /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)|from '@\/activities\/library-filters'/,
+  'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel and avoid library-filter search parsing.'
 );
 const activityEditRouteSource = readFileSync(
   'src/routes/dashboard/activities/$activityId.tsx',

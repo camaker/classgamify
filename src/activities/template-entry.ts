@@ -1,5 +1,6 @@
 import { m } from '@/locale/paraglide/messages';
 import { getTemplateByType } from '@/activities/catalog';
+import { isActivityTemplateType } from '@/activities/library-filters';
 import type { ActivityTemplateDefinition } from '@/activities/types';
 import {
   WORKSHEET_MODE_TEMPLATES,
@@ -15,6 +16,12 @@ export function buildTemplateCreateSearch(
   template: ActivityTemplateDefinition['type']
 ): CreateActivityTemplateSearch {
   return { template };
+}
+
+export function parseCreateActivityTemplateSearch(
+  value: unknown
+): ActivityTemplateDefinition['type'] | undefined {
+  return isActivityTemplateType(value) ? value : undefined;
 }
 
 export function buildTemplateEntryAction(template: ActivityTemplateDefinition) {

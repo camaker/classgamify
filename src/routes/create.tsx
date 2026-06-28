@@ -3,7 +3,7 @@ import { ActivityCreateForm } from '@/components/activities/activity-create-form
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buildActivityCreatePageEditorViewModel } from '@/activities/editor';
-import { parseCreateActivityTemplateSearch } from '@/activities/library-filters';
+import { parseCreateActivityTemplateSearch } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
