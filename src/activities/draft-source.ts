@@ -14,6 +14,11 @@ export type ActivitySourceMaterialDraftNoteView = {
   name: string;
 };
 
+type ActivitySourceMaterialDraftNoteSource = Pick<
+  ActivityMaterialReference,
+  'kind' | 'originalName'
+>;
+
 export type ActivitySourceMaterialDraftSummary = {
   hasMaterials: boolean;
   kindCounts: Partial<Record<ActivityMaterialReference['kind'], number>>;
@@ -47,7 +52,7 @@ export function buildActivitySourceMaterialDraftSummary(
   value: unknown
 ): ActivitySourceMaterialDraftSummary {
   const materials = normalizeActivityMaterialReferences(value);
-  const noteViews = materials.map(toActivitySourceMaterialDraftNoteView);
+  const noteViews = materials.map(buildActivitySourceMaterialDraftNoteView);
   const notesText = formatActivitySourceMaterialDraftNotes(noteViews);
 
   return {
@@ -94,8 +99,8 @@ export function hasActivitySourceMaterialDraftNotes(sourceText: string) {
   );
 }
 
-function toActivitySourceMaterialDraftNoteView(
-  material: ActivityMaterialReference
+export function buildActivitySourceMaterialDraftNoteView(
+  material: ActivitySourceMaterialDraftNoteSource
 ): ActivitySourceMaterialDraftNoteView {
   return {
     kindLabel: formatUserFileMaterialKind(material.kind),

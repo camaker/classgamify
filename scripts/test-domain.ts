@@ -151,6 +151,7 @@ import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   DEFAULT_ACTIVITY_DRAFT_SOURCE,
   appendActivitySourceMaterialDraftNotes,
+  buildActivitySourceMaterialDraftNoteView,
   buildActivitySourceMaterialDraftNoteViews,
   buildActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftSummary,
@@ -14526,8 +14527,13 @@ assert.match(
 );
 assert.match(
   activityDraftSourceSource,
-  /buildActivitySourceMaterialDraftSummary[\s\S]*normalizeActivityMaterialReferences\(value\)[\s\S]*formatActivitySourceMaterialDraftNotes\(noteViews\)/,
+  /buildActivitySourceMaterialDraftSummary[\s\S]*normalizeActivityMaterialReferences\(value\)[\s\S]*materials\.map\(buildActivitySourceMaterialDraftNoteView\)[\s\S]*formatActivitySourceMaterialDraftNotes\(noteViews\)/,
   'AI draft source material summaries should normalize references once and derive safe note text from note views.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /type ActivitySourceMaterialDraftNoteSource = Pick<[\s\S]*ActivityMaterialReference,[\s\S]*'kind' \| 'originalName'[\s\S]*export function buildActivitySourceMaterialDraftNoteView/,
+  'AI draft source material note views should accept only safe material provenance fields.'
 );
 assert.match(
   activityDraftSourceSource,
@@ -21895,6 +21901,13 @@ const sensitiveMaterialReferences = [
 ] as const;
 const sensitiveMaterialDraftNoteViews =
   buildActivitySourceMaterialDraftNoteViews(sensitiveMaterialReferences);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteView(sensitiveMaterialReferences[0]),
+  {
+    kindLabel: 'Worksheet document',
+    name: 'safe worksheet.pdf',
+  }
+);
 assert.deepEqual(sensitiveMaterialDraftNoteViews, [
   {
     kindLabel: 'Worksheet document',
