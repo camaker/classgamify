@@ -45,6 +45,10 @@ import {
 } from '@/activities/editor-serialization';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import {
+  buildActivitySourceMaterialSummaryView,
+  type ActivitySourceMaterialReadinessCapability,
+} from '@/activities/material-summary';
+import {
   buildActivityTemplateScaffoldInput,
   buildActivityTemplateScaffoldReadinessSummary,
   getActivityTemplateScaffold,
@@ -121,7 +125,18 @@ type ActivityEditorDraftSourceState = {
   isDefaultSource: boolean;
   isTooLong: boolean;
   safeSourceMaterialNoteCount: number;
+  sourceMaterialCapabilityCounts: Record<
+    ActivitySourceMaterialReadinessCapability,
+    number
+  >;
   sourceLength: number;
+};
+
+type ActivityEditorAiDraftSourceCapabilityView = {
+  capability: ActivitySourceMaterialReadinessCapability;
+  description: string;
+  label: string;
+  value: string;
 };
 
 type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
@@ -149,6 +164,8 @@ type ActivityEditorAiDraftPanelView = {
   itemCountLabel: string;
   reviewNote: string;
   safeSourceDescription: string;
+  sourceCapabilityTitle: string;
+  sourceCapabilityViews: ActivityEditorAiDraftSourceCapabilityView[];
   sourceReadiness: ActivityEditorAiDraftSourceReadinessView;
   sourceMaterialNoteViews: ActivityEditorSourceMaterialDraftNoteView[];
   sourceMaterialSummaryLabel?: string;
@@ -361,6 +378,8 @@ export function buildActivityEditorDraftSourceState({
     normalizeActivityDraftSourceText(draftSourceText);
   const sourceMaterialSummary =
     buildActivitySourceMaterialDraftSummary(sourceMaterials);
+  const sourceMaterialSummaryView =
+    buildActivitySourceMaterialSummaryView(sourceMaterials);
   const hasAttachedSourceMaterials = sourceMaterialSummary.totalCount > 0;
   const hasDraftSourceMaterialNotes =
     hasActivitySourceMaterialDraftNotes(normalizedSourceText);
@@ -380,6 +399,10 @@ export function buildActivityEditorDraftSourceState({
       normalizeActivityDraftSourceText(DEFAULT_ACTIVITY_DRAFT_SOURCE),
     isTooLong: normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
     safeSourceMaterialNoteCount,
+    sourceMaterialCapabilityCounts:
+      buildActivityEditorSourceMaterialCapabilityCounts(
+        sourceMaterialSummaryView.extractionActions
+      ),
     sourceLength: normalizedSourceText.length,
   };
 }
@@ -421,6 +444,10 @@ export function buildActivityEditorAiDraftPanelView({
     itemCountLabel: m.activity_form_ai_item_count_label(),
     reviewNote: m.activity_form_ai_draft_review_note(),
     safeSourceDescription: m.activity_form_ai_safe_source_description(),
+    sourceCapabilityTitle: m.activity_form_ai_source_capabilities_title(),
+    sourceCapabilityViews: buildActivityEditorAiDraftSourceCapabilityViews(
+      sourceState.sourceMaterialCapabilityCounts
+    ),
     sourceReadiness: buildActivityEditorAiDraftSourceReadinessView(sourceState),
     sourceMaterialNoteViews,
     sourceMaterialSummaryLabel:
@@ -434,6 +461,77 @@ export function buildActivityEditorAiDraftPanelView({
     syncMaterialsLabel: m.activity_form_use_attached_materials(),
     syncMaterialsHelpText: m.activity_form_ai_sync_materials_help(),
     syncSuccessMessage: m.activity_form_toast_source_materials_synced(),
+  };
+}
+
+function buildActivityEditorSourceMaterialCapabilityCounts(
+  extractionActions: Array<{
+    capability: ActivitySourceMaterialReadinessCapability;
+    sourceCount: number;
+  }>
+) {
+  const counts = {
+    'audio-extraction': 0,
+    'spreadsheet-import': 0,
+    'worksheet-extraction': 0,
+  } satisfies Record<ActivitySourceMaterialReadinessCapability, number>;
+
+  for (const action of extractionActions) {
+    counts[action.capability] += action.sourceCount;
+  }
+
+  return {
+    'audio-extraction': Math.max(0, Math.floor(counts['audio-extraction'])),
+    'spreadsheet-import': Math.max(0, Math.floor(counts['spreadsheet-import'])),
+    'worksheet-extraction': Math.max(
+      0,
+      Math.floor(counts['worksheet-extraction'])
+    ),
+  };
+}
+
+function buildActivityEditorAiDraftSourceCapabilityViews(
+  capabilityCounts: Record<ActivitySourceMaterialReadinessCapability, number>
+): ActivityEditorAiDraftSourceCapabilityView[] {
+  return [
+    buildActivityEditorAiDraftSourceCapabilityView({
+      capability: 'audio-extraction',
+      count: capabilityCounts['audio-extraction'],
+      description: m.activity_form_ai_source_capability_audio_description(),
+      label: m.activity_form_ai_source_capability_audio_label(),
+    }),
+    buildActivityEditorAiDraftSourceCapabilityView({
+      capability: 'worksheet-extraction',
+      count: capabilityCounts['worksheet-extraction'],
+      description: m.activity_form_ai_source_capability_worksheet_description(),
+      label: m.activity_form_ai_source_capability_worksheet_label(),
+    }),
+    buildActivityEditorAiDraftSourceCapabilityView({
+      capability: 'spreadsheet-import',
+      count: capabilityCounts['spreadsheet-import'],
+      description:
+        m.activity_form_ai_source_capability_spreadsheet_description(),
+      label: m.activity_form_ai_source_capability_spreadsheet_label(),
+    }),
+  ].filter((view) => view.value !== '0');
+}
+
+function buildActivityEditorAiDraftSourceCapabilityView({
+  capability,
+  count,
+  description,
+  label,
+}: {
+  capability: ActivitySourceMaterialReadinessCapability;
+  count: number;
+  description: string;
+  label: string;
+}): ActivityEditorAiDraftSourceCapabilityView {
+  return {
+    capability,
+    description,
+    label,
+    value: String(Math.max(0, Math.floor(count))),
   };
 }
 

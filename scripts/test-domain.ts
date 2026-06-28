@@ -2686,9 +2686,24 @@ assert.match(
   'Activity AI draft source readiness should render the prepared source-readiness view.'
 );
 assert.match(
+  activityAiDraftPanelSource,
+  /ActivityAiDraftSourceCapabilities[\s\S]*panelView\.sourceCapabilityTitle[\s\S]*panelView\.sourceCapabilityViews\.map[\s\S]*ActivityAiDraftSourceCapabilityBadge/,
+  'Activity AI draft source controls should delegate attached-material capability rendering.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /function ActivityAiDraftSourceCapabilityBadge[\s\S]*capability\.label[\s\S]*capability\.value[\s\S]*capability\.description/,
+  'Activity AI draft source capability badges should render prepared label, value, and description.'
+);
+assert.match(
   activityEditorSource,
   /buildActivityEditorAiDraftSourceReadinessView[\s\S]*activity_form_ai_source_readiness_synced_description[\s\S]*activity_form_ai_source_readiness_sync_available_description[\s\S]*activity_form_ai_source_readiness_default_description[\s\S]*activity_form_ai_source_readiness_ready_description/,
   'Activity editor AI draft source readiness copy should come from the activity-domain view model.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityEditorAiDraftSourceCapabilityViews[\s\S]*activity_form_ai_source_capability_audio_description[\s\S]*activity_form_ai_source_capability_audio_label[\s\S]*activity_form_ai_source_capability_worksheet_description[\s\S]*activity_form_ai_source_capability_worksheet_label[\s\S]*activity_form_ai_source_capability_spreadsheet_description[\s\S]*activity_form_ai_source_capability_spreadsheet_label/,
+  'Activity editor AI draft source capability copy should come from the activity-domain view model.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -2807,7 +2822,7 @@ assert.match(
 );
 assert.doesNotMatch(
   activityEditorFormSource,
-  /id="activity-ai-source"|id="activity-ai-item-count"|id="activity-ai-focus"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|focusLabel|focusOptions|syncMaterialsLabel|generateButtonLabel)/,
+  /id="activity-ai-source"|id="activity-ai-item-count"|id="activity-ai-focus"|aiDraftPanelView\.(?:badgeLabel|reviewNote|sourceTextLabel|sourcePlaceholder|itemCountLabel|focusLabel|focusOptions|syncMaterialsLabel|generateButtonLabel|sourceCapabilityViews)/,
   'Activity editor form should not hand-render low-level AI draft controls.'
 );
 assert.doesNotMatch(
@@ -2827,8 +2842,13 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   activityEditorFormSource,
-  /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility|activity_form_ai_draft_badge|activity_form_ai_draft_review_note|activity_form_ai_source_label|activity_form_ai_source_placeholder|activity_form_ai_item_count_label|activity_form_use_attached_materials|activity_form_generate_draft|activity_form_toast_source_materials_synced/,
+  /getActivityTemplates|getTemplateByType|getActivityDraftSourceText|hasActivitySourceMaterialDraftNotes|appendActivitySourceMaterialDraftNotes|getActivityTemplateScaffold|buildActivityEditorTemplateSetupView|buildActivityEditorTemplateReadiness|buildActivityTemplateReadinessPanelSummary|activityDifficultySchema|activityVisibilitySchema|formatActivityDifficulty|formatActivityVisibility|activity_form_ai_draft_badge|activity_form_ai_draft_review_note|activity_form_ai_source_label|activity_form_ai_source_placeholder|activity_form_ai_item_count_label|activity_form_use_attached_materials|activity_form_generate_draft|activity_form_toast_source_materials_synced|activity_form_ai_source_capability_/,
   'Activity editor form should not rebuild template, draft-source, readiness, scaffold, AI panel copy, or option-label state locally.'
+);
+assert.doesNotMatch(
+  activityAiDraftPanelSource,
+  /activity_form_ai_source_capability_|hasAudio|hasWorksheet|hasSpreadsheet|worksheet-extraction|audio-extraction|spreadsheet-import/,
+  'Activity AI draft panel component should not rebuild source-material capability labels or detection locally.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
@@ -22451,6 +22471,8 @@ assert.deepEqual(
     reviewNote: 'Teacher reviews before saving',
     safeSourceDescription:
       'AI drafting uses the text below plus safe source-material provenance only.',
+    sourceCapabilityTitle: 'Attached material AI readiness',
+    sourceCapabilityViews: [],
     sourceReadiness: {
       characterCountLabel: '132/2000 characters',
       description:
@@ -22740,6 +22762,11 @@ assert.deepEqual(
     isDefaultSource: false,
     isTooLong: false,
     safeSourceMaterialNoteCount: 0,
+    sourceMaterialCapabilityCounts: {
+      'audio-extraction': 0,
+      'spreadsheet-import': 0,
+      'worksheet-extraction': 0,
+    },
     sourceLength: 31,
   }
 );
@@ -22756,6 +22783,11 @@ assert.deepEqual(
     isDefaultSource: true,
     isTooLong: false,
     safeSourceMaterialNoteCount: 0,
+    sourceMaterialCapabilityCounts: {
+      'audio-extraction': 0,
+      'spreadsheet-import': 0,
+      'worksheet-extraction': 0,
+    },
     sourceLength: 36,
   }
 );
@@ -22784,6 +22816,11 @@ assert.deepEqual(
     isDefaultSource: false,
     isTooLong: false,
     safeSourceMaterialNoteCount: 1,
+    sourceMaterialCapabilityCounts: {
+      'audio-extraction': 0,
+      'spreadsheet-import': 0,
+      'worksheet-extraction': 0,
+    },
     sourceLength: syncedEditorDraftSource.length,
   }
 );
@@ -22832,6 +22869,8 @@ assert.deepEqual(disabledAiDraftPanelView, {
   reviewNote: 'Teacher reviews before saving',
   safeSourceDescription:
     'AI drafting uses the text below plus safe source-material provenance only.',
+  sourceCapabilityTitle: 'Attached material AI readiness',
+  sourceCapabilityViews: [],
   sourceReadiness: {
     characterCountLabel: '36/2000 characters',
     description:
@@ -22857,7 +22896,7 @@ assert.deepEqual(
       sourceMaterials: [
         {
           fileId: 'file-1',
-          kind: 'document',
+          kind: 'worksheet-document',
           originalName: 'unit-notes.pdf',
         },
       ],
@@ -22876,7 +22915,73 @@ assert.deepEqual(
       status: 'sync-available',
       title: 'Material sync available',
     },
+    sourceCapabilityViews: [
+      {
+        capability: 'worksheet-extraction',
+        description:
+          'Ready for future worksheet prompt and accepted-answer extraction.',
+        label: 'Worksheet',
+        value: '1',
+      },
+    ],
   }
+);
+assert.deepEqual(
+  buildActivityEditorAiDraftPanelView({
+    hasUser: true,
+    isGeneratingDraft: false,
+    sourceState: buildActivityEditorDraftSourceState({
+      draftSourceText: 'Classroom source notes.',
+      sourceMaterials: [
+        {
+          contentType: 'audio/mpeg',
+          fileId: 'audio-1',
+          kind: 'audio',
+          originalName: 'listening.mp3',
+        },
+        {
+          contentType: 'application/pdf',
+          fileId: 'worksheet-1',
+          kind: 'worksheet-document',
+          originalName: 'worksheet.pdf',
+        },
+        {
+          contentType: 'image/png',
+          fileId: 'worksheet-2',
+          kind: 'worksheet-image',
+          originalName: 'worksheet.png',
+        },
+        {
+          contentType: 'text/csv',
+          fileId: 'spreadsheet-1',
+          kind: 'spreadsheet',
+          originalName: 'words.csv',
+        },
+      ],
+    }),
+  }).sourceCapabilityViews,
+  [
+    {
+      capability: 'audio-extraction',
+      description: 'Ready for future listening prompts or transcript drafting.',
+      label: 'Audio',
+      value: '1',
+    },
+    {
+      capability: 'worksheet-extraction',
+      description:
+        'Ready for future worksheet prompt and accepted-answer extraction.',
+      label: 'Worksheet',
+      value: '2',
+    },
+    {
+      capability: 'spreadsheet-import',
+      description:
+        'Ready for future vocabulary, pair, group, or choice import.',
+      label: 'Spreadsheet',
+      value: '1',
+    },
+  ]
 );
 assert.equal(
   buildActivityEditorAiDraftPanelView({

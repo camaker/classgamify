@@ -139,6 +139,9 @@ function ActivityAiDraftSourceControls({
         placeholder={panelView.sourcePlaceholder}
       />
       <ActivityAiDraftSourceReadiness panelView={panelView} />
+      {panelView.sourceCapabilityViews.length > 0 ? (
+        <ActivityAiDraftSourceCapabilities panelView={panelView} />
+      ) : null}
       {panelView.sourceMaterialNoteViews.length > 0 ? (
         <div className="space-y-2 rounded-md border bg-background p-3">
           {panelView.sourceMaterialSummaryLabel ? (
@@ -159,6 +162,46 @@ function ActivityAiDraftSourceControls({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ActivityAiDraftSourceCapabilities({
+  panelView,
+}: {
+  panelView: ActivityAiDraftPanelView;
+}) {
+  return (
+    <div className="rounded-md border bg-background p-3">
+      <p className="font-medium text-xs">{panelView.sourceCapabilityTitle}</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        {panelView.sourceCapabilityViews.map((capability) => (
+          <ActivityAiDraftSourceCapabilityBadge
+            capability={capability}
+            key={capability.capability}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityAiDraftSourceCapabilityBadge({
+  capability,
+}: {
+  capability: ActivityAiDraftPanelView['sourceCapabilityViews'][number];
+}) {
+  return (
+    <div className="rounded-md border bg-muted/20 p-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-medium text-xs">{capability.label}</span>
+        <Badge variant="outline" className="rounded-md">
+          {capability.value}
+        </Badge>
+      </div>
+      <p className="mt-1 text-muted-foreground text-xs leading-5">
+        {capability.description}
+      </p>
     </div>
   );
 }
