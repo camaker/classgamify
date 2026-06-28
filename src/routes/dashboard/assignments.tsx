@@ -10,7 +10,7 @@ import {
 import {
   assignmentListActionCopy,
   buildAssignmentListCardViewModel,
-  buildAssignmentListPageViewModel,
+  buildAssignmentListRouteState,
   buildStarterAssignmentListCardViewModel,
 } from '@/assignments/list-view';
 import { AssignmentListCard } from '@/components/assignments/assignment-list-card';
@@ -36,40 +36,54 @@ export const Route = createFileRoute('/dashboard/assignments')({
 function DashboardAssignmentsPage() {
   const navigate = useNavigate({ from: '/dashboard/assignments' });
   const { page, published, q, status } = Route.useSearch();
-  const pageView = useMemo(
-    () =>
-      buildAssignmentListPageViewModel({
-        data: undefined,
-        isLoading: true,
-        search: { page, published, q, status },
-      }),
+  const search = useMemo(
+    () => ({ page, published, q, status }),
     [page, published, q, status]
   );
-  const { currentPage, filteredStatus, searchQuery, statusFilter } =
-    pageView.resolvedSearch;
+  const initialRouteState = useMemo(
+    () =>
+      buildAssignmentListRouteState({
+        data: undefined,
+        isError: false,
+        isLoading: true,
+        search,
+      }),
+    [search]
+  );
+  const {
+    currentPage,
+    filteredStatus,
+    normalizedSearchQuery,
+    searchQuery,
+    statusFilter,
+  } = initialRouteState.pageView.resolvedSearch;
   const { data, isError, isLoading } = useAssignments({
     pageIndex: currentPage - 1,
     pageSize: ASSIGNMENT_LIST_PAGE_SIZE,
     publishedShareSlug: published,
-    search: pageView.resolvedSearch.normalizedSearchQuery,
+    search: normalizedSearchQuery,
     status: filteredStatus,
   });
-  const loadedPageView = useMemo(
+  const routeState = useMemo(
     () =>
-      buildAssignmentListPageViewModel({
+      buildAssignmentListRouteState({
         data,
+        isError,
         isLoading,
-        search: { page, published, q, status },
+        search,
       }),
-    [data, isLoading, page, published, q, status]
+    [data, isError, isLoading, search]
   );
-  const activePageView = data ? loadedPageView : pageView;
+  const activePageView = routeState.pageView;
 
   useEffect(() => {
-    if (!isLoading && currentPage > activePageView.totalPages) {
+    if (
+      routeState.status !== 'loading' &&
+      currentPage > activePageView.totalPages
+    ) {
       navigateToAssignmentPage(activePageView.totalPages, true);
     }
-  }, [activePageView.totalPages, currentPage, isLoading]);
+  }, [activePageView.totalPages, currentPage, routeState.status]);
 
   function updateFilters(next: {
     q?: string;
@@ -157,13 +171,13 @@ function DashboardAssignmentsPage() {
           total={activePageView.totalAssignments}
         />
 
-        {isError ? (
+        {routeState.showLoadError ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {activePageView.loadErrorMessage}
           </div>
         ) : null}
 
-        {isLoading ? (
+        {routeState.status === 'loading' ? (
           <section className="grid gap-4">
             {Array.from({ length: 2 }).map((_, index) => (
               <Card key={index} className="min-h-48 rounded-lg" />
@@ -171,7 +185,7 @@ function DashboardAssignmentsPage() {
           </section>
         ) : null}
 
-        {!isLoading && activePageView.hasAssignments ? (
+        {routeState.status === 'ready' ? (
           <>
             <section className="grid gap-4">
               {activePageView.assignments.map((item) => (
@@ -193,9 +207,7 @@ function DashboardAssignmentsPage() {
           </>
         ) : null}
 
-        {!isLoading &&
-        !activePageView.hasAssignments &&
-        activePageView.resolvedSearch.hasFilters ? (
+        {routeState.status === 'empty-filtered' ? (
           <div className="rounded-lg border border-dashed bg-muted/20 p-6">
             <h2 className="text-lg font-semibold">
               {activePageView.emptyState.title}
@@ -215,9 +227,7 @@ function DashboardAssignmentsPage() {
           </div>
         ) : null}
 
-        {!isLoading &&
-        !activePageView.hasAssignments &&
-        !activePageView.resolvedSearch.hasFilters ? (
+        {routeState.status === 'empty-starter' ? (
           <div className="grid gap-4">
             <div className="rounded-lg border border-dashed bg-muted/20 p-6">
               <h2 className="text-lg font-semibold">

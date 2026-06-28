@@ -474,6 +474,7 @@ import {
   buildAssignmentListCardViewModel,
   buildAssignmentListEmptyStateView,
   buildAssignmentListPageViewModel,
+  buildAssignmentListRouteState,
   buildAssignmentListSearchPanelView,
   buildAssignmentListStarterPreview,
   buildStarterAssignmentListCardViewModel,
@@ -13739,13 +13740,33 @@ assert.match(
 );
 assert.match(
   dashboardAssignmentsRouteSource,
-  /buildAssignmentListPageViewModel/,
-  'Assignment dashboard route should consume the assignment-domain page view-model.'
+  /buildAssignmentListRouteState/,
+  'Assignment dashboard route should consume the assignment-domain route state helper.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'ready'[\s\S]*routeState\.status === 'empty-filtered'[\s\S]*routeState\.status === 'empty-starter'/,
+  'Assignment dashboard route should render loading, ready, filtered-empty, and starter-empty states from the assignment-domain route state.'
+);
+assert.match(
+  dashboardAssignmentsRouteSource,
+  /routeState\.showLoadError/,
+  'Assignment dashboard route should show load errors from the assignment-domain route state.'
+);
+assert.doesNotMatch(
+  dashboardAssignmentsRouteSource,
+  /buildAssignmentListPageViewModel|activePageView = data \?|isError \?|isLoading \?|!isLoading &&/,
+  'Assignment dashboard route should not directly build page views or branch on raw query state for list content.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
   /activePageView\.starterPreview\.assignments/,
-  'Assignment dashboard route should render starter cards from the assignment-domain preview view-model.'
+  'Assignment dashboard route should render starter cards from the assignment-domain route state view-model.'
+);
+assert.match(
+  assignmentListViewSource,
+  /buildAssignmentListRouteState[\s\S]*buildAssignmentListPageViewModel[\s\S]*showLoadError[\s\S]*status: 'loading'[\s\S]*status: 'error'[\s\S]*status: 'empty-filtered'[\s\S]*status: 'empty-starter'[\s\S]*status: 'ready'/,
+  'Assignment list view domain should own assignment-list loading, error, empty, and ready route-state selection.'
 );
 assert.match(
   dashboardAssignmentsRouteSource,
@@ -16931,54 +16952,161 @@ assert.equal(
   }).resolvedSearch.currentPage,
   1
 );
-const filteredAssignmentListPageView = buildAssignmentListPageViewModel({
-  data: {
-    items: [
-      {
-        activity: {
-          description: 'Current activity description',
-          templateType: 'quiz',
-        },
-        assignment: {
-          expiresAt: null,
-          id: 'persisted-assignment-1',
-          settingsJson: {
-            collectStudentName: true,
-            showCorrectAnswers: true,
-            shuffleItems: false,
-          },
-          shareSlug: 'share-1',
-          status: 'published',
-          title: 'Persisted assignment',
-        },
-        snapshot: null,
-        stats: {
-          averageScore: 76,
-          completions: 9,
-        },
+const filteredAssignmentListPageData = {
+  items: [
+    {
+      activity: {
+        description: 'Current activity description',
+        templateType: 'quiz',
       },
-    ],
-    publishedAssignment: {
-      id: 'persisted-assignment-1',
-      shareSlug: 'share-1',
-      title: 'Persisted assignment',
+      assignment: {
+        expiresAt: null,
+        id: 'persisted-assignment-1',
+        settingsJson: {
+          collectStudentName: true,
+          showCorrectAnswers: true,
+          shuffleItems: false,
+        },
+        shareSlug: 'share-1',
+        status: 'published',
+        title: 'Persisted assignment',
+      },
+      snapshot: null,
+      stats: {
+        averageScore: 76,
+        completions: 9,
+      },
     },
-    summary: {
-      averageScore: 76,
-      completions: 9,
-      openAssignments: 1,
-      totalAssignments: 1,
-    },
-    total: 31,
+  ],
+  publishedAssignment: {
+    id: 'persisted-assignment-1',
+    shareSlug: 'share-1',
+    title: 'Persisted assignment',
   },
+  summary: {
+    averageScore: 76,
+    completions: 9,
+    openAssignments: 1,
+    totalAssignments: 1,
+  },
+  total: 31,
+} satisfies Parameters<typeof buildAssignmentListPageViewModel>[0]['data'];
+const filteredAssignmentListSearch = {
+  page: 3,
+  published: ' share-1 ',
+  q: '  Week   1 ',
+  status: 'open',
+} as const;
+const filteredAssignmentListPageView = buildAssignmentListPageViewModel({
+  data: filteredAssignmentListPageData,
   isLoading: false,
-  search: {
-    page: 3,
-    published: ' share-1 ',
-    q: '  Week   1 ',
-    status: 'open',
-  },
+  search: filteredAssignmentListSearch,
 });
+const loadingAssignmentListRouteState = buildAssignmentListRouteState({
+  data: null,
+  isError: false,
+  isLoading: true,
+  search: {},
+});
+assert.deepEqual(
+  {
+    pageTitle: loadingAssignmentListRouteState.pageView.title,
+    showLoadError: loadingAssignmentListRouteState.showLoadError,
+    status: loadingAssignmentListRouteState.status,
+  },
+  {
+    pageTitle: 'Assignments',
+    showLoadError: false,
+    status: 'loading',
+  }
+);
+const errorAssignmentListRouteState = buildAssignmentListRouteState({
+  data: null,
+  isError: true,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    message: errorAssignmentListRouteState.pageView.loadErrorMessage,
+    showLoadError: errorAssignmentListRouteState.showLoadError,
+    status: errorAssignmentListRouteState.status,
+  },
+  {
+    message:
+      'Assignments could not be loaded. Refresh the page or sign in again.',
+    showLoadError: true,
+    status: 'error',
+  }
+);
+const filteredEmptyAssignmentListRouteState = buildAssignmentListRouteState({
+  data: { items: [], total: 0 },
+  isError: false,
+  isLoading: false,
+  search: { q: 'missing unit' },
+});
+assert.deepEqual(
+  {
+    showLoadError: filteredEmptyAssignmentListRouteState.showLoadError,
+    showStarterAssignments:
+      filteredEmptyAssignmentListRouteState.pageView.emptyState
+        .showStarterAssignments,
+    status: filteredEmptyAssignmentListRouteState.status,
+  },
+  {
+    showLoadError: false,
+    showStarterAssignments: false,
+    status: 'empty-filtered',
+  }
+);
+const starterEmptyAssignmentListRouteState = buildAssignmentListRouteState({
+  data: { items: [], total: 0 },
+  isError: false,
+  isLoading: false,
+  search: {},
+});
+assert.deepEqual(
+  {
+    showLoadError: starterEmptyAssignmentListRouteState.showLoadError,
+    showStarterAssignments:
+      starterEmptyAssignmentListRouteState.pageView.emptyState
+        .showStarterAssignments,
+    status: starterEmptyAssignmentListRouteState.status,
+  },
+  {
+    showLoadError: false,
+    showStarterAssignments: true,
+    status: 'empty-starter',
+  }
+);
+const readyAssignmentListRouteState = buildAssignmentListRouteState({
+  data: filteredAssignmentListPageData,
+  isError: false,
+  isLoading: false,
+  search: filteredAssignmentListSearch,
+});
+const staleReadyAssignmentListRouteState = buildAssignmentListRouteState({
+  data: filteredAssignmentListPageData,
+  isError: true,
+  isLoading: false,
+  search: filteredAssignmentListSearch,
+});
+assert.deepEqual(
+  {
+    assignmentIds: readyAssignmentListRouteState.pageView.assignments.map(
+      (item) => item.assignment.id
+    ),
+    showLoadError: staleReadyAssignmentListRouteState.showLoadError,
+    staleDataStatus: staleReadyAssignmentListRouteState.status,
+    status: readyAssignmentListRouteState.status,
+  },
+  {
+    assignmentIds: ['persisted-assignment-1'],
+    showLoadError: true,
+    staleDataStatus: 'ready',
+    status: 'ready',
+  }
+);
 assert.deepEqual(
   {
     assignmentIds: filteredAssignmentListPageView.assignments.map(

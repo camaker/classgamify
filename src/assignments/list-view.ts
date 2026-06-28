@@ -222,6 +222,33 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
   totalPages: number;
 };
 
+type AssignmentListRouteState<TItem extends AssignmentListPageItem> =
+  | {
+      pageView: AssignmentListPageViewModel<TItem>;
+      showLoadError: false;
+      status: 'loading';
+    }
+  | {
+      pageView: AssignmentListPageViewModel<TItem>;
+      showLoadError: true;
+      status: 'error';
+    }
+  | {
+      pageView: AssignmentListPageViewModel<TItem>;
+      showLoadError: boolean;
+      status: 'empty-filtered';
+    }
+  | {
+      pageView: AssignmentListPageViewModel<TItem>;
+      showLoadError: boolean;
+      status: 'empty-starter';
+    }
+  | {
+      pageView: AssignmentListPageViewModel<TItem>;
+      showLoadError: boolean;
+      status: 'ready';
+    };
+
 export type AssignmentListStarterPreviewItem = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
@@ -459,6 +486,64 @@ export function buildAssignmentListPageViewModel<
     title: assignmentListPageCopy.title,
     totalAssignments,
     totalPages,
+  };
+}
+
+export function buildAssignmentListRouteState<
+  TItem extends AssignmentListPageItem,
+>({
+  data,
+  isError,
+  isLoading,
+  search,
+}: {
+  data?: AssignmentListPageData<TItem> | null;
+  isError: boolean;
+  isLoading: boolean;
+  search: AssignmentListPageSearchState;
+}): AssignmentListRouteState<TItem> {
+  const pageView = buildAssignmentListPageViewModel({
+    data,
+    isLoading,
+    search,
+  });
+
+  if (isLoading) {
+    return {
+      pageView,
+      showLoadError: false,
+      status: 'loading',
+    };
+  }
+
+  if (isError && !data) {
+    return {
+      pageView,
+      showLoadError: true,
+      status: 'error',
+    };
+  }
+
+  if (!pageView.hasAssignments && pageView.resolvedSearch.hasFilters) {
+    return {
+      pageView,
+      showLoadError: isError,
+      status: 'empty-filtered',
+    };
+  }
+
+  if (!pageView.hasAssignments) {
+    return {
+      pageView,
+      showLoadError: isError,
+      status: 'empty-starter',
+    };
+  }
+
+  return {
+    pageView,
+    showLoadError: isError,
+    status: 'ready',
   };
 }
 
