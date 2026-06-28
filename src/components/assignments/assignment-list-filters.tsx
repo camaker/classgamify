@@ -1,4 +1,5 @@
 import type { AssignmentStatusFilter } from '@/assignments/list-filters';
+import type { AssignmentListSummary } from '@/assignments/list-summary';
 import {
   assignmentListActionCopy,
   assignmentListSearchCopy,
@@ -19,6 +20,7 @@ type AssignmentListFiltersProps = {
   onStatusChange: (value: AssignmentStatusFilter) => void;
   search: string;
   status: AssignmentStatusFilter;
+  summary?: AssignmentListSummary;
   total: number;
 };
 
@@ -29,12 +31,14 @@ export function AssignmentListFilters({
   onStatusChange,
   search,
   status,
+  summary,
   total,
 }: AssignmentListFiltersProps) {
   const searchPanelView = buildAssignmentListSearchPanelView({
     isLoading,
     search,
     status,
+    summary,
     total,
   });
 
@@ -85,6 +89,26 @@ export function AssignmentListFilters({
             </NativeSelectOption>
           ))}
         </NativeSelect>
+        <p className="text-xs leading-5 text-muted-foreground">
+          <span className="font-medium text-foreground">
+            {searchPanelView.statusLabel}
+          </span>
+          {' - '}
+          {searchPanelView.statusDescription}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {searchPanelView.statusMetrics.map((metric) => (
+            <span
+              key={metric.status}
+              className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
+            >
+              <span className="font-medium text-foreground">
+                {metric.value}
+              </span>{' '}
+              {metric.label}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="flex flex-col gap-2 lg:items-end">
         <p className="text-sm text-muted-foreground">

@@ -25,6 +25,11 @@ export function AssignmentListSummaryCard({
         <Icon className="size-5 text-primary" />
         <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
         <p className="text-sm text-muted-foreground">{metric.label}</p>
+        {metric.description ? (
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {metric.description}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );

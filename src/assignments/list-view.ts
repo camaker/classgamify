@@ -28,10 +28,12 @@ import {
 } from '@/assignments/list-filters';
 import {
   buildAssignmentListFilterSummary,
+  buildAssignmentListStatusMetrics,
   buildAssignmentListSummaryMetrics,
   type AssignmentListFilterSummary,
   type AssignmentListSummary,
   type AssignmentListSummaryMetric,
+  type AssignmentListStatusMetric,
 } from '@/assignments/list-summary';
 import {
   type AssignmentStatusAction,
@@ -57,6 +59,7 @@ import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentListControlOption = {
+  description: string;
   label: string;
   value: AssignmentStatusFilter;
 };
@@ -64,6 +67,9 @@ type AssignmentListControlOption = {
 type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
   hasSearchValue: boolean;
+  statusDescription: string;
+  statusLabel: string;
+  statusMetrics: AssignmentListStatusMetric[];
   statusOptions: AssignmentListControlOption[];
 };
 
@@ -362,11 +368,17 @@ export const assignmentStatusFilterOptions = [
     get label() {
       return m.assignment_list_status_filter_all();
     },
+    get description() {
+      return m.assignment_list_status_filter_all_description();
+    },
     value: 'all',
   },
   {
     get label() {
       return m.assignment_list_status_filter_published();
+    },
+    get description() {
+      return m.assignment_list_status_filter_published_description();
     },
     value: 'open',
   },
@@ -374,17 +386,26 @@ export const assignmentStatusFilterOptions = [
     get label() {
       return m.assignment_list_status_filter_expired();
     },
+    get description() {
+      return m.assignment_list_status_filter_expired_description();
+    },
     value: 'expired',
   },
   {
     get label() {
       return m.assignment_list_status_filter_closed();
     },
+    get description() {
+      return m.assignment_list_status_filter_closed_description();
+    },
     value: 'closed',
   },
   {
     get label() {
       return m.assignment_list_status_filter_draft();
+    },
+    get description() {
+      return m.assignment_list_status_filter_draft_description();
     },
     value: 'draft',
   },
@@ -394,14 +415,17 @@ export function buildAssignmentListSearchPanelView({
   isLoading,
   search,
   status,
+  summary,
   total,
 }: {
   isLoading: boolean;
   search: string;
   status: AssignmentStatusFilter;
+  summary?: AssignmentListSummary;
   total: number;
 }): AssignmentListSearchPanelView {
   const normalizedSearch = normalizeAssignmentListSearch(search);
+  const statusView = getAssignmentListStatusFilterView(status);
 
   return {
     filterSummary: buildAssignmentListFilterSummary({
@@ -411,8 +435,18 @@ export function buildAssignmentListSearchPanelView({
       total,
     }),
     hasSearchValue: Boolean(normalizedSearch),
+    statusDescription: statusView.description,
+    statusLabel: statusView.label,
+    statusMetrics: buildAssignmentListStatusMetrics(summary),
     statusOptions: assignmentStatusFilterOptions,
   };
+}
+
+function getAssignmentListStatusFilterView(status: AssignmentStatusFilter) {
+  return (
+    assignmentStatusFilterOptions.find((option) => option.value === status) ??
+    assignmentStatusFilterOptions[0]
+  );
 }
 
 export function getAssignmentListEmptyState({

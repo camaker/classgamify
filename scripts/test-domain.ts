@@ -482,6 +482,7 @@ import {
 import {
   buildAssignmentListFilterSummary,
   buildAssignmentListSummary,
+  buildAssignmentListStatusMetrics,
   buildAssignmentListSummaryMetrics,
 } from '@/assignments/list-summary';
 import {
@@ -15644,6 +15645,26 @@ assert.match(
   'Assignment list filters component should render filter summary and status options from the assignment-domain search panel view.'
 );
 assert.match(
+  dashboardAssignmentsRouteSource,
+  /<AssignmentListFilters[\s\S]*summary=\{data\?\.summary\}/,
+  'Assignment dashboard route should pass filtered assignment summary data into the filters panel.'
+);
+assert.match(
+  assignmentListFiltersComponentSource,
+  /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
+  'Assignment list filters component should explain the selected status filter and status counts from the domain view.'
+);
+assert.doesNotMatch(
+  assignmentListFiltersComponentSource,
+  /student work|homework windows|已过期作业|开放链接/,
+  'Assignment list filters component should not hardcode status-filter explanatory copy.'
+);
+assert.match(
+  assignmentListSummaryCardComponentSource,
+  /metric\.description[\s\S]*\{metric\.description\}/,
+  'Assignment list summary cards should render optional domain-provided metric descriptions.'
+);
+assert.match(
   assignmentListCardComponentSource,
   /buildAssignmentListCardViewModel/,
   'Assignment list card component should receive assignment-domain card view models.'
@@ -19074,11 +19095,29 @@ assert.deepEqual(
     isLoading: false,
     search: ' week ',
     status: 'open',
+    summary: {
+      averageScore: 80,
+      closedAssignments: 1,
+      completions: 4,
+      draftAssignments: 1,
+      expiredAssignments: 2,
+      openAssignments: 2,
+      totalAssignments: 6,
+    },
     total: 2,
   }),
   {
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: true,
+    statusDescription:
+      'Show published links that students can still open and submit.',
+    statusLabel: 'Open',
+    statusMetrics: [
+      { label: 'Open', status: 'open', value: '2' },
+      { label: 'Closed', status: 'closed', value: '1' },
+      { label: 'Expired', status: 'expired', value: '2' },
+      { label: 'Draft', status: 'draft', value: '1' },
+    ],
     statusOptions: assignmentStatusFilterOptions,
   }
 );
@@ -19095,6 +19134,15 @@ assert.deepEqual(
       text: 'Loading assignments...',
     },
     hasSearchValue: false,
+    statusDescription:
+      'Show every assignment link, including drafts, open links, closed links, and expired homework windows.',
+    statusLabel: 'All statuses',
+    statusMetrics: [
+      { label: 'Open', status: 'open', value: '0' },
+      { label: 'Closed', status: 'closed', value: '0' },
+      { label: 'Expired', status: 'expired', value: '0' },
+      { label: 'Draft', status: 'draft', value: '0' },
+    ],
     statusOptions: assignmentStatusFilterOptions,
   }
 );
@@ -19121,6 +19169,10 @@ assert.deepEqual(
       {
         expiresAt: null,
         status: 'closed',
+      },
+      {
+        expiresAt: null,
+        status: 'draft',
       },
     ],
     attempts: [
@@ -19149,9 +19201,12 @@ assert.deepEqual(
   }),
   {
     averageScore: 75,
+    closedAssignments: 1,
     completions: 2,
+    draftAssignments: 1,
+    expiredAssignments: 1,
     openAssignments: 1,
-    totalAssignments: 3,
+    totalAssignments: 4,
   }
 );
 assert.deepEqual(
@@ -19161,9 +19216,24 @@ assert.deepEqual(
   }),
   [
     { id: 'total', label: 'Assignments', value: '0' },
-    { id: 'open', label: 'Open links', value: '0' },
-    { id: 'completions', label: 'Completions', value: '0' },
-    { id: 'average', label: 'Average', value: '-' },
+    {
+      description: '0 links are currently available to students.',
+      id: 'open',
+      label: 'Open links',
+      value: '0',
+    },
+    {
+      description: '0 submitted attempts in this view.',
+      id: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      description: 'No scored attempts yet.',
+      id: 'average',
+      label: 'Average',
+      value: '-',
+    },
   ]
 );
 assert.deepEqual(
@@ -19171,7 +19241,10 @@ assert.deepEqual(
     hasFilters: true,
     summary: {
       averageScore: 76.6,
+      closedAssignments: 1,
       completions: 11,
+      draftAssignments: 0,
+      expiredAssignments: 2,
       openAssignments: 2,
       totalAssignments: 5,
     },
@@ -19179,9 +19252,24 @@ assert.deepEqual(
   }),
   [
     { id: 'total', label: 'Matching', value: '5' },
-    { id: 'open', label: 'Open links', value: '2' },
-    { id: 'completions', label: 'Completions', value: '11' },
-    { id: 'average', label: 'Average', value: '77%' },
+    {
+      description: '2 links are currently available to students.',
+      id: 'open',
+      label: 'Open links',
+      value: '2',
+    },
+    {
+      description: '11 submitted attempts in this view.',
+      id: 'completions',
+      label: 'Completions',
+      value: '11',
+    },
+    {
+      description: 'Calculated from scored student attempts.',
+      id: 'average',
+      label: 'Average',
+      value: '77%',
+    },
   ]
 );
 assert.deepEqual(
@@ -19189,7 +19277,10 @@ assert.deepEqual(
     hasFilters: true,
     summary: {
       averageScore: Number.NaN,
+      closedAssignments: Number.NaN,
       completions: Number.NaN,
+      draftAssignments: Number.NaN,
+      expiredAssignments: Number.NaN,
       openAssignments: -2,
       totalAssignments: Number.POSITIVE_INFINITY,
     },
@@ -19197,9 +19288,41 @@ assert.deepEqual(
   }),
   [
     { id: 'total', label: 'Matching', value: '-' },
-    { id: 'open', label: 'Open links', value: '0' },
-    { id: 'completions', label: 'Completions', value: '-' },
-    { id: 'average', label: 'Average', value: '-' },
+    {
+      description: '0 links are currently available to students.',
+      id: 'open',
+      label: 'Open links',
+      value: '0',
+    },
+    {
+      description: '0 submitted attempts in this view.',
+      id: 'completions',
+      label: 'Completions',
+      value: '-',
+    },
+    {
+      description: 'No scored attempts yet.',
+      id: 'average',
+      label: 'Average',
+      value: '-',
+    },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListStatusMetrics({
+    averageScore: 80,
+    closedAssignments: 1,
+    completions: 4,
+    draftAssignments: 3,
+    expiredAssignments: 2,
+    openAssignments: 5,
+    totalAssignments: 11,
+  }),
+  [
+    { label: 'Open', status: 'open', value: '5' },
+    { label: 'Closed', status: 'closed', value: '1' },
+    { label: 'Expired', status: 'expired', value: '2' },
+    { label: 'Draft', status: 'draft', value: '3' },
   ]
 );
 assert.deepEqual(
@@ -19209,6 +19332,16 @@ assert.deepEqual(
 assert.deepEqual(
   assignmentStatusFilterOptions.map((option) => option.label),
   ['All statuses', 'Open', 'Expired', 'Closed', 'Draft']
+);
+assert.deepEqual(
+  assignmentStatusFilterOptions.map((option) => option.description),
+  [
+    'Show every assignment link, including drafts, open links, closed links, and expired homework windows.',
+    'Show published links that students can still open and submit.',
+    'Show links whose close-after window has passed and no longer accepts student work.',
+    'Show links the teacher intentionally closed while keeping results available.',
+    'Show assignments that have not gone through the publish-and-snapshot flow yet.',
+  ]
 );
 assert.deepEqual(assignmentListPageCopy, {
   breadcrumbCurrent: 'Assignments',
@@ -19317,9 +19450,24 @@ assert.deepEqual(
     },
     summaryMetrics: [
       { id: 'total', label: 'Assignments', value: '0' },
-      { id: 'open', label: 'Open links', value: '0' },
-      { id: 'completions', label: 'Completions', value: '0' },
-      { id: 'average', label: 'Average', value: '-' },
+      {
+        description: '0 links are currently available to students.',
+        id: 'open',
+        label: 'Open links',
+        value: '0',
+      },
+      {
+        description: '0 submitted attempts in this view.',
+        id: 'completions',
+        label: 'Completions',
+        value: '0',
+      },
+      {
+        description: 'No scored attempts yet.',
+        id: 'average',
+        label: 'Average',
+        value: '-',
+      },
     ],
     title: 'Assignments',
     totalAssignments: 0,
@@ -19383,7 +19531,10 @@ const filteredAssignmentListPageData = {
   },
   summary: {
     averageScore: 76,
+    closedAssignments: 0,
     completions: 9,
+    draftAssignments: 0,
+    expiredAssignments: 0,
     openAssignments: 1,
     totalAssignments: 1,
   },
@@ -19555,9 +19706,24 @@ assert.deepEqual(
     },
     summaryMetrics: [
       { id: 'total', label: 'Matching', value: '1' },
-      { id: 'open', label: 'Open links', value: '1' },
-      { id: 'completions', label: 'Completions', value: '9' },
-      { id: 'average', label: 'Average', value: '76%' },
+      {
+        description: '1 link is currently available to students.',
+        id: 'open',
+        label: 'Open links',
+        value: '1',
+      },
+      {
+        description: '9 submitted attempts in this view.',
+        id: 'completions',
+        label: 'Completions',
+        value: '9',
+      },
+      {
+        description: 'Calculated from scored student attempts.',
+        id: 'average',
+        label: 'Average',
+        value: '76%',
+      },
     ],
     totalAssignments: 31,
     totalPages: 3,

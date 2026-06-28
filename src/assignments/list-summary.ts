@@ -22,7 +22,10 @@ type AssignmentListSummaryAssignmentSource = {
 
 export type AssignmentListSummary = {
   averageScore: number;
+  closedAssignments: number;
   completions: number;
+  draftAssignments: number;
+  expiredAssignments: number;
   openAssignments: number;
   totalAssignments: number;
 };
@@ -34,6 +37,7 @@ export type AssignmentListSummaryMetricId =
   | 'average';
 
 export type AssignmentListSummaryMetric = {
+  description?: string;
   id: AssignmentListSummaryMetricId;
   label: string;
   value: string;
@@ -42,6 +46,12 @@ export type AssignmentListSummaryMetric = {
 export type AssignmentListFilterSummary = {
   hasFilters: boolean;
   text: string;
+};
+
+export type AssignmentListStatusMetric = {
+  label: string;
+  status: AssignmentStatusFilter;
+  value: string;
 };
 
 export function buildAssignmentListSummary({
@@ -56,18 +66,15 @@ export function buildAssignmentListSummary({
   totalAssignments?: number;
 }): AssignmentListSummary {
   const stats = summarizeAssignmentAttempts(attempts);
+  const statusCounts = buildAssignmentListStatusCounts({ assignments, now });
 
   return {
     averageScore: stats.averageScore,
+    closedAssignments: statusCounts.closed,
     completions: stats.completions,
-    openAssignments: assignments.filter((item) =>
-      matchesAssignmentLifecycleStatus({
-        expiresAt: item.expiresAt,
-        filter: 'open',
-        now,
-        status: item.status,
-      })
-    ).length,
+    draftAssignments: statusCounts.draft,
+    expiredAssignments: statusCounts.expired,
+    openAssignments: statusCounts.open,
     totalAssignments,
   };
 }
@@ -106,7 +113,10 @@ export function buildAssignmentListSummaryMetrics({
 }): AssignmentListSummaryMetric[] {
   const resolvedSummary = summary ?? {
     averageScore: 0,
+    closedAssignments: 0,
     completions: 0,
+    draftAssignments: 0,
+    expiredAssignments: 0,
     openAssignments: 0,
     totalAssignments,
   };
@@ -123,6 +133,7 @@ export function buildAssignmentListSummaryMetrics({
       }),
     },
     {
+      description: formatAssignmentOpenLinksDescription(resolvedSummary),
       id: 'open',
       label: m.assignment_list_summary_open_links(),
       value: formatAssignmentResultNumber(resolvedSummary.openAssignments, {
@@ -130,6 +141,7 @@ export function buildAssignmentListSummaryMetrics({
       }),
     },
     {
+      description: formatAssignmentCompletionsDescription(resolvedSummary),
       id: 'completions',
       label: m.assignment_list_summary_completions(),
       value: formatAssignmentResultNumber(statsView.completions, {
@@ -137,11 +149,147 @@ export function buildAssignmentListSummaryMetrics({
       }),
     },
     {
+      description: formatAssignmentAverageDescription(resolvedSummary),
       id: 'average',
       label: m.assignment_list_summary_average(),
       value: formatAssignmentResultPercent(statsView.averageScore),
     },
   ];
+}
+
+export function buildAssignmentListStatusMetrics(
+  summary?: AssignmentListSummary
+): AssignmentListStatusMetric[] {
+  const resolvedSummary = summary ?? {
+    averageScore: 0,
+    closedAssignments: 0,
+    completions: 0,
+    draftAssignments: 0,
+    expiredAssignments: 0,
+    openAssignments: 0,
+    totalAssignments: 0,
+  };
+
+  return [
+    {
+      label: m.assignment_list_status_filter_published(),
+      status: 'open',
+      value: formatAssignmentResultNumber(resolvedSummary.openAssignments, {
+        min: 0,
+      }),
+    },
+    {
+      label: m.assignment_list_status_filter_closed(),
+      status: 'closed',
+      value: formatAssignmentResultNumber(resolvedSummary.closedAssignments, {
+        min: 0,
+      }),
+    },
+    {
+      label: m.assignment_list_status_filter_expired(),
+      status: 'expired',
+      value: formatAssignmentResultNumber(resolvedSummary.expiredAssignments, {
+        min: 0,
+      }),
+    },
+    {
+      label: m.assignment_list_status_filter_draft(),
+      status: 'draft',
+      value: formatAssignmentResultNumber(resolvedSummary.draftAssignments, {
+        min: 0,
+      }),
+    },
+  ];
+}
+
+function buildAssignmentListStatusCounts({
+  assignments,
+  now,
+}: {
+  assignments: AssignmentListSummaryAssignmentSource[];
+  now: number;
+}) {
+  return {
+    closed: countAssignmentsMatchingStatus({
+      assignments,
+      now,
+      status: 'closed',
+    }),
+    draft: countAssignmentsMatchingStatus({
+      assignments,
+      now,
+      status: 'draft',
+    }),
+    expired: countAssignmentsMatchingStatus({
+      assignments,
+      now,
+      status: 'expired',
+    }),
+    open: countAssignmentsMatchingStatus({
+      assignments,
+      now,
+      status: 'open',
+    }),
+  };
+}
+
+function countAssignmentsMatchingStatus({
+  assignments,
+  now,
+  status,
+}: {
+  assignments: AssignmentListSummaryAssignmentSource[];
+  now: number;
+  status: Exclude<AssignmentStatusFilter, 'all'>;
+}) {
+  return assignments.filter((item) =>
+    matchesAssignmentLifecycleStatus({
+      expiresAt: item.expiresAt,
+      filter: status,
+      now,
+      status: item.status,
+    })
+  ).length;
+}
+
+function formatAssignmentOpenLinksDescription(summary: AssignmentListSummary) {
+  const openAssignments = formatAssignmentListDescriptionCount(
+    summary.openAssignments
+  );
+
+  return openAssignments === '1'
+    ? m.assignment_list_summary_open_links_one({
+        count: openAssignments,
+      })
+    : m.assignment_list_summary_open_links_many({
+        count: openAssignments,
+      });
+}
+
+function formatAssignmentCompletionsDescription(
+  summary: AssignmentListSummary
+) {
+  const completions = formatAssignmentListDescriptionCount(summary.completions);
+
+  return completions === '1'
+    ? m.assignment_list_summary_completions_one({
+        count: completions,
+      })
+    : m.assignment_list_summary_completions_many({
+        count: completions,
+      });
+}
+
+function formatAssignmentAverageDescription(summary: AssignmentListSummary) {
+  return summary.completions > 0
+    ? m.assignment_list_summary_average_with_attempts()
+    : m.assignment_list_summary_average_empty();
+}
+
+function formatAssignmentListDescriptionCount(value: number) {
+  return formatAssignmentResultNumber(Number.isFinite(value) ? value : 0, {
+    min: 0,
+  });
 }
 
 function formatAssignmentListMatches(count: number) {

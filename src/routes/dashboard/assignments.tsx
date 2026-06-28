@@ -168,6 +168,7 @@ function DashboardAssignmentsPage() {
           onStatusChange={(value) => updateFilters({ status: value })}
           search={searchQuery}
           status={statusFilter}
+          summary={data?.summary}
           total={activePageView.totalAssignments}
         />
 
