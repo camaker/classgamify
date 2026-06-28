@@ -49,6 +49,7 @@ import {
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import {
+  assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailabilityState,
   buildAssignmentSharePath,
   type AssignmentShareLinkAvailabilityState,
@@ -105,10 +106,12 @@ type AssignmentListCardActionView = {
     | undefined;
   shareAction:
     | {
+        copyLabel: string;
         disabledReason?: string;
         isAvailable: boolean;
         label: string;
         sharePath: string;
+        sharePathLabel: string;
         shareSlug: string;
       }
     | undefined;
@@ -830,12 +833,14 @@ export function buildAssignmentListCardActionView({
       : undefined,
     shareAction: actionState.showShareActions
       ? {
+          copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
           ...(actionState.shareDisabledReason
             ? { disabledReason: actionState.shareDisabledReason }
             : {}),
           isAvailable: !actionState.shareDisabledReason,
           label: actionState.shareLabel,
           sharePath: buildAssignmentSharePath(normalizedShareSlug),
+          sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
           shareSlug: normalizedShareSlug,
         }
       : undefined,

@@ -58,9 +58,20 @@ export function PublishedAssignmentPanel({
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
           {panelContext.body}
         </p>
-        <p className="mt-2 w-fit rounded-md border bg-background px-2 py-1 font-mono text-xs text-muted-foreground">
-          {panelContext.sharePath}
-        </p>
+        <div className="mt-2 w-fit rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
+          <span className="font-medium">{panelContext.sharePathLabel}</span>
+          <span className="ml-2 font-mono">{panelContext.sharePath}</span>
+        </div>
+        {panelContext.nextSteps.length ? (
+          <ul className="mt-3 grid gap-1 text-muted-foreground text-xs leading-5">
+            {panelContext.nextSteps.map((step) => (
+              <li className="flex gap-2" key={step}>
+                <span aria-hidden="true">-</span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {panelContext.showMissingHint ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {assignmentListPublishedPanelCopy.missingHint}
@@ -166,6 +177,7 @@ function PublishedAssignmentShareActions({
         {action.label}
       </Link>
       <CopyAssignmentShareLinkButton
+        label={action.copyLabel}
         shareSlug={action.shareSlug}
         className="w-full bg-background sm:w-auto"
       />

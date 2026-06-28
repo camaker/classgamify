@@ -11,11 +11,13 @@ export function CopyAssignmentShareLinkButton({
   className,
   disabled,
   disabledMessage,
+  label = assignmentShareLinkActionCopy.copyLabel,
   shareSlug,
 }: {
   className?: string;
   disabled?: boolean;
   disabledMessage?: string;
+  label?: string;
   shareSlug: string;
 }) {
   async function copyShareLink() {
@@ -46,7 +48,7 @@ export function CopyAssignmentShareLinkButton({
       onClick={copyShareLink}
     >
       <IconCopy className="size-4" />
-      {assignmentShareLinkActionCopy.copyLabel}
+      {label}
     </Button>
   );
 }

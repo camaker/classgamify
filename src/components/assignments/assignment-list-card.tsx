@@ -222,6 +222,7 @@ function AssignmentListShareActions({
 
   return (
     <div className="grid gap-2">
+      <AssignmentListSharePath action={action} />
       <AssignmentListSharePreviewAction
         action={action}
         disabledReasonId={disabledReasonId}
@@ -229,6 +230,7 @@ function AssignmentListShareActions({
       <CopyAssignmentShareLinkButton
         disabled={!action.isAvailable}
         disabledMessage={action.disabledReason}
+        label={action.copyLabel}
         shareSlug={action.shareSlug}
         className="w-full bg-background lg:w-auto"
       />
@@ -236,6 +238,19 @@ function AssignmentListShareActions({
         action={action}
         disabledReasonId={disabledReasonId}
       />
+    </div>
+  );
+}
+
+function AssignmentListSharePath({
+  action,
+}: {
+  action: AssignmentListShareAction;
+}) {
+  return (
+    <div className="max-w-56 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5">
+      <span className="font-medium">{action.sharePathLabel}</span>
+      <span className="mt-1 block truncate font-mono">{action.sharePath}</span>
     </div>
   );
 }

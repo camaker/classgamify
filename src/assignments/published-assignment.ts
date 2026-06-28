@@ -1,5 +1,8 @@
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
-import { buildAssignmentSharePath } from '@/assignments/share-link';
+import {
+  assignmentShareLinkActionCopy,
+  buildAssignmentSharePath,
+} from '@/assignments/share-link';
 import {
   isSameAssignmentShareSlug,
   normalizeAssignmentShareSlug,
@@ -37,8 +40,10 @@ export type PublishedAssignmentPanelActionView = {
     | undefined;
   shareAction:
     | {
+        copyLabel: string;
         label: string;
         sharePath: string;
+        sharePathLabel: string;
         shareSlug: string;
       }
     | undefined;
@@ -85,7 +90,9 @@ export type PublishedAssignmentPanelContext = {
   actionView: PublishedAssignmentPanelActionView;
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
+  nextSteps: string[];
   sharePath: string;
+  sharePathLabel: string;
   showMissingHint: boolean;
   status: 'found' | 'loading' | 'missing';
   title: string;
@@ -113,7 +120,9 @@ export function buildPublishedAssignmentPanelContext({
       }),
       assignment,
       body: m.assignment_published_panel_found_body(),
+      nextSteps: buildPublishedAssignmentPanelNextSteps('found'),
       sharePath,
+      sharePathLabel: m.assignment_published_panel_share_path_label(),
       showMissingHint: false,
       status: 'found',
       title: formatAssignmentDisplayTitle(assignment.title),
@@ -129,7 +138,9 @@ export function buildPublishedAssignmentPanelContext({
         status: 'loading',
       }),
       body: m.assignment_published_panel_loading_body(),
+      nextSteps: buildPublishedAssignmentPanelNextSteps('loading'),
       sharePath,
+      sharePathLabel: m.assignment_published_panel_share_path_label(),
       showMissingHint: false,
       status: 'loading',
       title: m.assignment_published_panel_loading_title(),
@@ -144,7 +155,9 @@ export function buildPublishedAssignmentPanelContext({
       status: 'missing',
     }),
     body: m.assignment_published_panel_missing_body(),
+    nextSteps: buildPublishedAssignmentPanelNextSteps('missing'),
     sharePath,
+    sharePathLabel: m.assignment_published_panel_share_path_label(),
     showMissingHint: true,
     status: 'missing',
     title: m.assignment_published_panel_missing_title(),
@@ -181,11 +194,26 @@ function buildPublishedAssignmentPanelActionView({
         }
       : undefined,
     shareAction: {
+      copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
       label: m.assignment_list_action_open_published_link(),
       sharePath,
+      sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
       shareSlug,
     },
   };
+}
+
+function buildPublishedAssignmentPanelNextSteps(
+  status: PublishedAssignmentPanelContext['status']
+) {
+  const baseSteps = [
+    m.assignment_published_panel_next_step_copy_link(),
+    m.assignment_published_panel_next_step_preview_link(),
+  ];
+
+  return status === 'found'
+    ? [...baseSteps, m.assignment_published_panel_next_step_review_results()]
+    : baseSteps;
 }
 
 function normalizeOptionalAssignmentShareSlug(shareSlug?: string) {

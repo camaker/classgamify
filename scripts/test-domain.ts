@@ -1442,6 +1442,11 @@ assert.match(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
+  /label = assignmentShareLinkActionCopy\.copyLabel[\s\S]*label\?: string[\s\S]*\{label\}/,
+  'Share-link copy button should accept prepared copy labels while keeping the shared fallback copy.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
   /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*copyTextToClipboard\(executionPlan\.url\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
   'Share-link copy button should execute prepared blocked and copy-link plans.'
 );
@@ -1536,6 +1541,11 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /buildAssignmentResultHeaderShareAction[\s\S]*buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
   'Assignment result header share action should resolve availability through the shared assignment share helper.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /buildAssignmentResultHeaderShareAction[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
+  'Assignment result header share action should prepare the shared student-link copy label and path label for the component.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -3726,6 +3736,11 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /function AssignmentResultsHeaderCopyShareAction[\s\S]*disabled=\{!shareAction\.isAvailable\}[\s\S]*disabledMessage=\{shareAction\.disabledReason\}[\s\S]*shareSlug=\{shareAction\.shareSlug\}/,
   'Assignment result copy-share action should render prepared disabled state and share slug.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsHeaderSharePath[\s\S]*shareAction\.sharePathLabel[\s\S]*shareAction\.sharePath[\s\S]*function AssignmentResultsHeaderCopyShareAction[\s\S]*label=\{shareAction\.copyLabel\}/,
+  'Assignment result header share controls should render prepared student-link path labels and copy labels.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -10209,7 +10224,9 @@ assert.equal(
 );
 assert.deepEqual(assignmentShareLinkActionCopy, {
   copyLabel: 'Copy link',
+  copyStudentLabel: 'Copy student link',
   failureMessage: 'Student link could not be copied.',
+  pathLabel: 'Student link',
   successMessage: 'Student link copied.',
 });
 assert.deepEqual(
@@ -11108,14 +11125,22 @@ assert.deepEqual(
         label: 'View results',
       },
       shareAction: {
+        copyLabel: 'Copy student link',
         label: 'Open link',
         sharePath: '/play/share-2',
+        sharePathLabel: 'Student link',
         shareSlug: 'share-2',
       },
     },
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+    nextSteps: [
+      'Copy the student link into your class chat or LMS.',
+      'Open the link once as a student before sending it.',
+      'Keep the results page ready for submissions and follow-up.',
+    ],
     sharePath: '/play/share-2',
+    sharePathLabel: 'Student link',
     showMissingHint: false,
     status: 'found',
     title: 'Week 2',
@@ -11135,13 +11160,20 @@ assert.deepEqual(
       printAction: undefined,
       resultAction: undefined,
       shareAction: {
+        copyLabel: 'Copy student link',
         label: 'Open link',
         sharePath: '/play/share-2',
+        sharePathLabel: 'Student link',
         shareSlug: 'share-2',
       },
     },
     body: 'Loading the newly published assignment link and classroom actions.',
+    nextSteps: [
+      'Copy the student link into your class chat or LMS.',
+      'Open the link once as a student before sending it.',
+    ],
     sharePath: '/play/share-2',
+    sharePathLabel: 'Student link',
     showMissingHint: false,
     status: 'loading',
     title: 'Student share link is being prepared.',
@@ -11161,13 +11193,20 @@ assert.deepEqual(
       printAction: undefined,
       resultAction: undefined,
       shareAction: {
+        copyLabel: 'Copy student link',
         label: 'Open link',
         sharePath: '/play/missing',
+        sharePathLabel: 'Student link',
         shareSlug: 'missing',
       },
     },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
+    nextSteps: [
+      'Copy the student link into your class chat or LMS.',
+      'Open the link once as a student before sending it.',
+    ],
     sharePath: '/play/missing',
+    sharePathLabel: 'Student link',
     showMissingHint: true,
     status: 'missing',
     title: 'Student share link is ready.',
@@ -17330,6 +17369,16 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
+  /function AssignmentListShareActions[\s\S]*AssignmentListSharePath[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*label=\{action\.copyLabel\}/,
+  'Assignment list share actions should render the prepared student-link path before preview and copy actions.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /function AssignmentListSharePath[\s\S]*action\.sharePathLabel[\s\S]*action\.sharePath/,
+  'Assignment list share path should render the prepared student-link label and path from the action view.'
+);
+assert.match(
+  assignmentListCardComponentSource,
   /function AssignmentListSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to="\/play\/\$shareId"[\s\S]*action\.shareSlug[\s\S]*action\.label/,
   'Assignment list share preview action should render prepared share availability and label.'
 );
@@ -17347,6 +17396,11 @@ assert.match(
   assignmentListViewSource,
   /buildAssignmentShareLinkAvailabilityState\(\{[\s\S]*expiresAt,[\s\S]*status,[\s\S]*\}\)/,
   'Assignment list card action state should resolve share-link state through the shared assignment share helper without constructing a URL.'
+);
+assert.match(
+  assignmentListViewSource,
+  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
+  'Assignment list card action view should prepare shared student-link copy and path labels in the domain layer.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -17394,6 +17448,16 @@ assert.match(
   'Published assignment panel action and context contracts should be explicit domain exports.'
 );
 assert.match(
+  publishedAssignmentSource,
+  /function buildPublishedAssignmentPanelNextSteps[\s\S]*assignment_published_panel_next_step_copy_link[\s\S]*assignment_published_panel_next_step_preview_link[\s\S]*assignment_published_panel_next_step_review_results/,
+  'Published assignment panel domain should prepare localized post-publish next steps.'
+);
+assert.match(
+  publishedAssignmentSource,
+  /copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
+  'Published assignment panel action view should prepare shared student-link copy and path labels.'
+);
+assert.match(
   publishedAssignmentPanelComponentSource,
   /type PublishedAssignmentPanelActionView,[\s\S]*type PublishedAssignmentPanelContext,[\s\S]*buildPublishedAssignmentPanelContext/,
   'Published assignment panel component should import the explicit assignment-domain panel contracts.'
@@ -17410,6 +17474,11 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
+  /panelContext\.sharePathLabel[\s\S]*panelContext\.sharePath[\s\S]*panelContext\.nextSteps\.map/,
+  'Published assignment panel should render prepared student-link path labels and localized next steps from the panel context.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
   /function PublishedAssignmentPanelActions[\s\S]*actionView\.resultAction[\s\S]*PublishedAssignmentResultsActionLink[\s\S]*actionView\.printAction[\s\S]*PublishedAssignmentPrintActionLink[\s\S]*actionView\.shareAction[\s\S]*PublishedAssignmentShareActions[\s\S]*actionView\.dismissAction[\s\S]*PublishedAssignmentDismissActionButton/,
   'Published assignment panel actions should split prepared result, print, share, and dismiss actions into focused components.'
 );
@@ -17420,8 +17489,8 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
-  'Published assignment share and dismiss actions should render prepared share data, action labels, and copy-link behavior.'
+  /function PublishedAssignmentShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton[\s\S]*label=\{action\.copyLabel\}[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
+  'Published assignment share and dismiss actions should render prepared share data, action labels, copy labels, and copy-link behavior.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
@@ -21483,8 +21552,10 @@ assert.deepEqual(
           label: 'View results',
         },
         shareAction: {
+          copyLabel: 'Copy student link',
           label: 'Open link',
           sharePath: '/play/share-1',
+          sharePathLabel: 'Student link',
           shareSlug: 'share-1',
         },
       },
@@ -21494,7 +21565,13 @@ assert.deepEqual(
         title: 'Persisted assignment',
       },
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
+      nextSteps: [
+        'Copy the student link into your class chat or LMS.',
+        'Open the link once as a student before sending it.',
+        'Keep the results page ready for submissions and follow-up.',
+      ],
       sharePath: '/play/share-1',
+      sharePathLabel: 'Student link',
       showMissingHint: false,
       status: 'found',
       title: 'Persisted assignment',
@@ -21604,9 +21681,11 @@ assert.deepEqual(
         label: 'View results',
       },
       shareAction: {
+        copyLabel: 'Copy student link',
         isAvailable: true,
         label: 'Open share link',
         sharePath: '/play/share-1',
+        sharePathLabel: 'Student link',
         shareSlug: 'share-1',
       },
       statusAction: {
@@ -21699,9 +21778,11 @@ assert.deepEqual(
       printAction: undefined,
       resultAction: undefined,
       shareAction: {
+        copyLabel: 'Copy student link',
         isAvailable: true,
         label: 'Open share link',
         sharePath: '/play/demo-food',
+        sharePathLabel: 'Student link',
         shareSlug: 'demo-food',
       },
       statusAction: undefined,
@@ -21851,9 +21932,11 @@ assert.deepEqual(
       label: 'View results',
     },
     shareAction: {
+      copyLabel: 'Copy student link',
       isAvailable: true,
       label: 'Open share link',
       sharePath: '/play/share%20123',
+      sharePathLabel: 'Student link',
       shareSlug: 'share 123',
     },
     statusAction: undefined,
@@ -21877,10 +21960,12 @@ assert.deepEqual(
     printAction: undefined,
     resultAction: undefined,
     shareAction: {
+      copyLabel: 'Copy student link',
       disabledReason: 'Publish this assignment before sharing a student link.',
       isAvailable: false,
       label: 'Share link unavailable',
       sharePath: '/play/draft-share',
+      sharePathLabel: 'Student link',
       shareSlug: 'draft-share',
     },
     statusAction: undefined,
@@ -29816,10 +29901,12 @@ assert.deepEqual(
       },
     }),
     shareAction: {
+      copyLabel: 'Copy student link',
       disabledReason: undefined,
       isAvailable: true,
       label: 'Open student link',
       sharePath: '/play/share%20123',
+      sharePathLabel: 'Student link',
       shareSlug: 'share 123',
     },
     shareSlug: 'share 123',
@@ -29858,11 +29945,13 @@ assert.deepEqual(
       settings: null,
     }),
     shareAction: {
+      copyLabel: 'Copy student link',
       disabledReason:
         'This assignment link has expired. Students cannot open it from the results page.',
       isAvailable: false,
       label: 'Student link unavailable',
       sharePath: '/play/closed-share',
+      sharePathLabel: 'Student link',
       shareSlug: 'closed-share',
     },
     shareSlug: 'closed-share',
@@ -29879,10 +29968,12 @@ assert.deepEqual(
     status: 'published',
   }),
   {
+    copyLabel: 'Copy student link',
     disabledReason: undefined,
     isAvailable: true,
     label: 'Open student link',
     sharePath: '/play/share%20two',
+    sharePathLabel: 'Student link',
     shareSlug: 'share two',
   }
 );
@@ -29894,11 +29985,13 @@ assert.deepEqual(
     status: 'closed',
   }),
   {
+    copyLabel: 'Copy student link',
     disabledReason:
       'This assignment is closed. Reopen it before sharing the student link.',
     isAvailable: false,
     label: 'Student link unavailable',
     sharePath: '/play/closed-share',
+    sharePathLabel: 'Student link',
     shareSlug: 'closed-share',
   }
 );
@@ -29910,10 +30003,12 @@ assert.deepEqual(
     status: 'draft',
   }),
   {
+    copyLabel: 'Copy student link',
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',
     sharePath: '/play/draft-share',
+    sharePathLabel: 'Student link',
     shareSlug: 'draft-share',
   }
 );
@@ -29925,11 +30020,13 @@ assert.deepEqual(
     status: 'published',
   }),
   {
+    copyLabel: 'Copy student link',
     disabledReason:
       'This assignment link has expired. Students cannot open it from the results page.',
     isAvailable: false,
     label: 'Student link unavailable',
     sharePath: '/play/expired-share',
+    sharePathLabel: 'Student link',
     shareSlug: 'expired-share',
   }
 );

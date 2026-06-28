@@ -63,6 +63,7 @@ import {
   type StudentSummarySort,
 } from '@/assignments/result-filters';
 import {
+  assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
   type AssignmentShareLinkAvailability,
 } from '@/assignments/share-link';
@@ -241,10 +242,12 @@ type AssignmentResultHeaderSource = {
 };
 
 export type AssignmentResultHeaderShareAction = {
+  copyLabel: string;
   disabledReason: string | undefined;
   isAvailable: boolean;
   label: string;
   sharePath: string;
+  sharePathLabel: string;
   shareSlug: string;
 };
 
@@ -766,6 +769,7 @@ export function buildAssignmentResultHeaderShareAction({
   });
 
   return {
+    copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
     disabledReason: shareAvailability.isAvailable
       ? undefined
       : getAssignmentResultHeaderShareDisabledReason(
@@ -776,6 +780,7 @@ export function buildAssignmentResultHeaderShareAction({
       ? assignmentResultPageCopy.openStudentLinkLabel
       : assignmentResultPageCopy.studentLinkUnavailableLabel,
     sharePath: shareAvailability.sharePath,
+    sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
     shareSlug: shareAvailability.shareSlug,
   };
 }

@@ -85,7 +85,8 @@ function AssignmentResultsHeaderSharePath({
   return (
     <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
       <IconShare3 className="size-4" />
-      {shareAction.sharePath}
+      <span className="font-medium">{shareAction.sharePathLabel}</span>
+      <span className="font-mono text-xs">{shareAction.sharePath}</span>
     </div>
   );
 }
@@ -99,6 +100,7 @@ function AssignmentResultsHeaderCopyShareAction({
     <CopyAssignmentShareLinkButton
       disabled={!shareAction.isAvailable}
       disabledMessage={shareAction.disabledReason}
+      label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
       className="w-full bg-background sm:w-auto"
     />

@@ -22,8 +22,14 @@ export const assignmentShareLinkActionCopy = {
   get copyLabel() {
     return m.assignment_share_link_copy_label();
   },
+  get copyStudentLabel() {
+    return m.assignment_share_link_copy_student_label();
+  },
   get failureMessage() {
     return m.assignment_share_link_copy_failure();
+  },
+  get pathLabel() {
+    return m.assignment_share_link_path_label();
   },
   get successMessage() {
     return m.assignment_share_link_copy_success();
