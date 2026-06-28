@@ -106,10 +106,8 @@ type AssignmentListCardViewModel = {
   actionState: AssignmentListCardActionState;
   actionView: AssignmentListCardActionView;
   activityDescription: string;
-  expiresAt: Date | null;
   id: string;
   persisted: boolean;
-  settings: AssignmentSettings;
   settingsSummaryView: AssignmentSettingsSummaryView;
   shareSlug: string;
   status: AssignmentStatus;
@@ -639,10 +637,8 @@ export function buildAssignmentListCardViewModel({
       shareSlug,
     }),
     activityDescription: resolvedSource.activityDescription ?? '',
-    expiresAt: assignment.expiresAt,
     id: assignment.id,
     persisted,
-    settings: assignment.settingsJson,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: assignment.expiresAt,
       settings: assignment.settingsJson,
@@ -688,10 +684,8 @@ export function buildStarterAssignmentListCardViewModel({
       shareSlug,
     }),
     activityDescription: formatAssignmentDisplayText(activity.description),
-    expiresAt,
     id: assignment.id,
     persisted,
-    settings: assignment.settings,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt,
       settings: assignment.settings,

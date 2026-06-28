@@ -14098,6 +14098,11 @@ assert.match(
   'Assignment list card component should render prepared delivery summary views.'
 );
 assert.doesNotMatch(
+  assignmentListViewSource,
+  /type AssignmentListCardViewModel = \{(?:(?!\n};)[\s\S])*(?:expiresAt: Date|settings: AssignmentSettings)/,
+  'Assignment list card view-models should expose prepared delivery summary views instead of raw delivery settings.'
+);
+assert.doesNotMatch(
   assignmentListCardComponentSource,
   /expiresAt=\{assignment\.expiresAt\}|settings=\{assignment\.settings\}/,
   'Assignment list card component should not pass raw delivery settings to the summary component.'
@@ -17647,17 +17652,8 @@ assert.deepEqual(
       },
     },
     activityDescription: 'Frozen activity description',
-    expiresAt: new Date('2026-02-01T00:00:00.000Z'),
     id: 'persisted-assignment-1',
     persisted: true,
-    settings: {
-      collectStudentName: false,
-      instructions: 'Finish before Friday.',
-      maxAttempts: 3,
-      showCorrectAnswers: false,
-      shuffleItems: true,
-      timeLimitSeconds: 600,
-    },
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-02-01T00:00:00.000Z'),
       settings: {
@@ -17750,15 +17746,8 @@ assert.deepEqual(
       statusAction: undefined,
     },
     activityDescription: 'Starter activity description',
-    expiresAt: null,
     id: 'assignment-food-demo',
     persisted: false,
-    settings: {
-      collectStudentName: true,
-      maxAttempts: 2,
-      showCorrectAnswers: true,
-      shuffleItems: true,
-    },
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: null,
       settings: {
