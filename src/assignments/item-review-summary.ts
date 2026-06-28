@@ -3,7 +3,10 @@ import {
   formatAssignmentResultValue,
   formatPrimaryAcceptedAnswer,
 } from '@/assignments/result-format';
-import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
+import {
+  formatAssignmentResultCopyTitle,
+  joinAssignmentResultCopyLines,
+} from '@/assignments/result-copy-format';
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
@@ -36,9 +39,10 @@ export function buildAssignmentItemReviewSummary({
 }: AssignmentItemReviewSummaryInput) {
   const sortedItems = sortAssignmentItemsByReviewPriority(items);
   const itemViews = buildAssignmentItemReviewSummaryItemViews(sortedItems);
+  const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
 
   const lines = [
-    m.assignment_item_review_title({ title: assignmentTitle }),
+    m.assignment_item_review_title({ title: copyTitle }),
     '',
     ...formatItems(itemViews),
   ];

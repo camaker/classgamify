@@ -4,6 +4,7 @@ import {
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
 import {
+  formatAssignmentResultCopyTitle,
   formatAssignmentResultCopyOrdinal,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
@@ -35,9 +36,10 @@ export function buildAssignmentStudentFollowUpSummary({
   const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
   const studentViews =
     buildAssignmentStudentFollowUpSummaryStudentViews(sortedStudents);
+  const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
 
   const lines = [
-    m.assignment_student_follow_up_title({ title: assignmentTitle }),
+    m.assignment_student_follow_up_title({ title: copyTitle }),
     '',
     ...formatStudents(studentViews),
   ];

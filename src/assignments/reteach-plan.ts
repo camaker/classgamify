@@ -11,7 +11,10 @@ import {
   formatAssignmentResultPromptLabel,
   formatAssignmentResultStudentLabel,
 } from '@/assignments/result-display';
-import { joinAssignmentResultCopyLines } from '@/assignments/result-copy-format';
+import {
+  formatAssignmentResultCopyTitle,
+  joinAssignmentResultCopyLines,
+} from '@/assignments/result-copy-format';
 import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import { m } from '@/locale/paraglide/messages';
@@ -58,8 +61,9 @@ export function buildAssignmentReteachPlan({
   );
   const itemViews = buildAssignmentReteachPlanItemViews(reviewItems);
   const studentViews = buildAssignmentReteachPlanStudentViews(reviewStudents);
+  const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const lines = [
-    m.assignment_reteach_plan_title({ title: assignmentTitle }),
+    m.assignment_reteach_plan_title({ title: copyTitle }),
     '',
     m.assignment_reteach_plan_review_first(),
     ...formatReviewItems(itemViews),

@@ -724,7 +724,9 @@ import {
 } from '@/assignments/result-display';
 import {
   ASSIGNMENT_RESULT_COPY_TEXT_FORMAT,
+  formatAssignmentResultCopyLine,
   formatAssignmentResultCopyOrdinal,
+  formatAssignmentResultCopyTitle,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
 import {
@@ -1549,6 +1551,16 @@ assert.match(
 );
 assert.match(
   assignmentResultCopyFormatSource,
+  /formatAssignmentResultCopyLine[\s\S]*normalize\('NFKC'\)[\s\S]*replace\([\s\S]*\.trim\(\)/,
+  'Assignment result copy formatting should normalize copied text lines without collapsing intentional paragraph breaks.'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
+  /formatAssignmentResultCopyTitle[\s\S]*formatAssignmentResultCopyLine\(value\)/,
+  'Assignment result copy formatting should expose shared copied-title cleanup.'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
   /formatAssignmentResultCopyOrdinal[\s\S]*Math\.floor\(Math\.max\(0, index\)\) \+ 1/,
   'Assignment result copy formatting should expose a shared ordinal normalizer.'
 );
@@ -1599,6 +1611,11 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_classroom_brief_title\(\{ title: copyTitle \}\)/,
+  'Classroom brief copied titles should use the shared result-copy title normalizer.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /formatAssignmentResultCopyOrdinal\(index\)/,
   'Classroom brief should use the shared assignment-result copy ordinal formatter.'
 );
@@ -1645,6 +1662,11 @@ assert.match(
   assignmentReteachPlanSource,
   /joinAssignmentResultCopyLines\(lines\)/,
   'Reteach plan should use the shared assignment-result copy line joiner.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_reteach_plan_title\(\{ title: copyTitle \}\)/,
+  'Reteach plan copied titles should use the shared result-copy title normalizer.'
 );
 assert.match(
   assignmentReteachPlanSource,
@@ -31602,6 +31624,27 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
 });
 assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
 assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
+assert.equal(
+  joinAssignmentResultCopyLines([
+    undefined,
+    '',
+    '  Ｏｎｅ\t line  ',
+    '',
+    '',
+    null,
+    'Ｔｗｏ\u00A0　line',
+    '',
+  ]),
+  'One line\n\nTwo line'
+);
+assert.equal(
+  formatAssignmentResultCopyLine('  Ｃｌａｓｓ\t result\u00A0　line  '),
+  'Class result line'
+);
+assert.equal(
+  formatAssignmentResultCopyTitle('  Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 '),
+  'Capital Review, Week 1'
+);
 assert.equal(formatAssignmentResultCopyOrdinal(0), 1);
 assert.equal(formatAssignmentResultCopyOrdinal(2.9), 3);
 assert.equal(formatAssignmentResultCopyOrdinal(-3), 1);
@@ -31626,6 +31669,20 @@ assert.deepEqual(
 assert.match(
   classroomBrief.text,
   /ClassGamify classroom brief: Capital Review, Week 1/
+);
+assert.match(
+  buildAssignmentClassroomBrief({
+    assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
+    items: [],
+    stats: {
+      averageDurationSeconds: undefined,
+      averagePoints: 0,
+      averageScore: 0,
+      completions: 0,
+    },
+    students: [],
+  }).text,
+  /^ClassGamify classroom brief: Capital Review, Week 1\n/
 );
 assert.deepEqual(classroomBrief.copyPreview, {
   label: 'Copy preview',
@@ -31722,6 +31779,14 @@ assert.deepEqual(
   'Ava Chen'
 );
 assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
+assert.match(
+  buildAssignmentReteachPlan({
+    assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
+    items: [],
+    students: [],
+  }),
+  /^ClassGamify reteach plan: Capital Review, Week 1\n/
+);
 assert.match(reteachPlan, /Review first:/);
 assert.match(reteachPlan, /Student follow-up:/);
 assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
@@ -31792,6 +31857,11 @@ assert.match(
   /joinAssignmentResultCopyLines\(lines\)/,
   'Assignment item review summaries should use the shared assignment-result copy line joiner.'
 );
+assert.match(
+  assignmentItemReviewSummarySource,
+  /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_item_review_title\(\{ title: copyTitle \}\)/,
+  'Assignment item review copied titles should use the shared result-copy title normalizer.'
+);
 assert.doesNotMatch(
   assignmentItemReviewSummarySource,
   /lines\.join\('\\n'\)/,
@@ -31844,6 +31914,13 @@ assert.match(
   /ClassGamify item review: Capital Review, Week 1/
 );
 assert.match(
+  buildAssignmentItemReviewSummary({
+    assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
+    items: [],
+  }),
+  /^ClassGamify item review: Capital Review, Week 1\n\n- No item performance data yet\./
+);
+assert.match(
   itemReviewSummary,
   /Capital of France\? \(Question\) - 67% correct, 2\/3 correct/
 );
@@ -31867,6 +31944,11 @@ assert.match(
   assignmentStudentFollowUpSummarySource,
   /joinAssignmentResultCopyLines\(lines\)/,
   'Assignment student follow-up summaries should use the shared assignment-result copy line joiner.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_student_follow_up_title\(\{ title: copyTitle \}\)/,
+  'Assignment student follow-up copied titles should use the shared result-copy title normalizer.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -31919,6 +32001,13 @@ assert.deepEqual(
 assert.match(
   studentFollowUpSummary,
   /ClassGamify student follow-up: Capital Review, Week 1/
+);
+assert.match(
+  buildAssignmentStudentFollowUpSummary({
+    assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
+    students: [],
+  }),
+  /^ClassGamify student follow-up: Capital Review, Week 1\n\n- No student attempts yet\./
 );
 assert.match(
   studentFollowUpSummary,

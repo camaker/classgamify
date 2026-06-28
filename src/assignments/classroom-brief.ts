@@ -24,6 +24,7 @@ import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
   formatAssignmentResultCopyOrdinal,
+  formatAssignmentResultCopyTitle,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
 import { m } from '@/locale/paraglide/messages';
@@ -105,8 +106,9 @@ export function buildAssignmentClassroomBrief({
     buildAssignmentClassroomBriefFocusItemViews(focusItems);
   const followUpStudentViews =
     buildAssignmentClassroomBriefFollowUpStudentViews(followUpStudents);
+  const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const lines = [
-    m.assignment_classroom_brief_title({ title: assignmentTitle }),
+    m.assignment_classroom_brief_title({ title: copyTitle }),
     '',
     ...statViews.map((statView) => statView.text),
     '',
