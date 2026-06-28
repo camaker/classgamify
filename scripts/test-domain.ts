@@ -522,6 +522,7 @@ import {
   getAssignmentSubmissionErrorMessage,
   getAssignmentStatusActionCopy,
   getAssignmentStatusLabel,
+  getAssignmentStatusTransitionError,
   isAssignmentOpen,
   matchesAssignmentLifecycleStatus,
 } from '@/assignments/lifecycle';
@@ -9045,6 +9046,30 @@ assert.equal(
   ),
   'Expired'
 );
+const assignmentLifecycleSource = readFileSync(
+  'src/assignments/lifecycle.ts',
+  'utf8'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /export function getAssignmentStatusTransitionError[\s\S]*currentStatus === nextStatus[\s\S]*nextStatus === 'closed'[\s\S]*nextStatus === 'published'/,
+  'Assignment lifecycle should expose one shared status-transition error helper.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /buildAssignmentStatusAction[\s\S]*getAssignmentStatusTransitionError\(\{[\s\S]*currentStatus,[\s\S]*expiresAt,[\s\S]*nextStatus,[\s\S]*now,[\s\S]*\}/,
+  'Assignment status actions should use the shared transition error helper.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /assertAssignmentStatusTransition[\s\S]*const errorMessage = getAssignmentStatusTransitionError\(input\)[\s\S]*if \(!errorMessage\) return[\s\S]*throw new Error\(errorMessage\)/,
+  'Assignment status assertions should throw the shared transition error message.'
+);
+assert.doesNotMatch(
+  assignmentLifecycleSource,
+  /function canUpdateAssignmentStatus/,
+  'Assignment lifecycle should not keep a parallel status-transition boolean helper.'
+);
 assert.equal(
   isAssignmentOpen(
     'published',
@@ -9245,6 +9270,63 @@ assert.deepEqual(
   {
     type: 'blocked',
   }
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'published',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  undefined
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'closed',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  undefined
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'published',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  'Assignment link is already open.'
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'closed',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  'Assignment link is already closed.'
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'draft',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  'Only published assignment links can be closed.'
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'draft',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  'Only closed assignment links can be reopened.'
+);
+assert.equal(
+  getAssignmentStatusTransitionError({
+    currentStatus: 'closed',
+    expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+    nextStatus: 'published',
+    now: new Date('2026-01-01T10:00:00.000Z').getTime(),
+  }),
+  'Expired assignments cannot be reopened.'
 );
 assert.doesNotThrow(() =>
   assertAssignmentStatusTransition({
