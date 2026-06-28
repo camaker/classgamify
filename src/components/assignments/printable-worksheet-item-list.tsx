@@ -56,11 +56,19 @@ function PrintableWorksheetItem({
           {itemView.responseHelp}
         </Badge>
       </div>
+      <p className="mt-3 text-muted-foreground text-xs">
+        {itemView.responseModeLabel}
+      </p>
       <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
       <div className="mt-4 grid gap-3">
-        <p className="font-medium text-muted-foreground text-xs">
-          {itemView.answerAreaLabel}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-medium text-muted-foreground text-xs">
+            {itemView.answerAreaLabel}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {itemView.answerLineSummary}
+          </p>
+        </div>
         {itemView.answerLines.map((line) => (
           <div key={line.key} className="h-8 border-b" />
         ))}
@@ -74,15 +82,24 @@ function PrintableWorksheetChoiceBank({
 }: {
   choiceBank: PrintableWorksheetPageViewModel['itemViews'][number]['choiceBank'];
 }) {
-  if (choiceBank.choices.length === 0) return null;
+  if (choiceBank.choices.length === 0) {
+    return choiceBank.emptySummary ? (
+      <p className="mt-4 text-muted-foreground text-xs">
+        {choiceBank.emptySummary}
+      </p>
+    ) : null;
+  }
 
   return (
     <div className="mt-4 grid gap-2">
-      {choiceBank.label ? (
-        <p className="font-medium text-muted-foreground text-xs">
-          {choiceBank.label}
-        </p>
-      ) : null}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {choiceBank.label ? (
+          <p className="font-medium text-muted-foreground text-xs">
+            {choiceBank.label}
+          </p>
+        ) : null}
+        <p className="text-muted-foreground text-xs">{choiceBank.summary}</p>
+      </div>
       <div
         data-print-choice-bank={choiceBank.presentation}
         className={cn(

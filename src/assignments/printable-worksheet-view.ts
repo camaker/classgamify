@@ -327,11 +327,16 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
       min: 1,
     }),
   });
+  const answerLines = getPrintableWorksheetAnswerLines(item);
+  const choiceBank = buildPrintableWorksheetChoiceBankView(item);
 
   return {
     answerAreaLabel: m.assignment_printable_answer_area_label(),
-    answerLines: getPrintableWorksheetAnswerLines(item),
-    choiceBank: buildPrintableWorksheetChoiceBankView(item),
+    answerLineSummary: formatPrintableWorksheetAnswerLineSummary(
+      answerLines.length
+    ),
+    answerLines,
+    choiceBank,
     choicePresentation: item.choicePresentation,
     choices: normalizeRuntimeChoiceList(item.choices) ?? [],
     headingLabel: m.assignment_printable_item_heading({
@@ -342,6 +347,9 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
     kindLabel,
     prompt: formatRuntimeItemPrompt(item),
     responseHelp: getPrintableWorksheetResponseHelp(item.responseMode),
+    responseModeLabel: formatPrintableWorksheetResponseModeLabel(
+      item.responseMode
+    ),
     sequenceLabel,
   };
 }
@@ -385,12 +393,18 @@ function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
       indexLabel: formatPrintableWorksheetChoiceIndex(index),
       key: `${item.id}-choice-${index}`,
     })),
+    emptySummary:
+      choices.length === 0 ? m.assignment_printable_choice_bank_empty() : null,
     label:
       choices.length > 0
         ? getPrintableWorksheetChoiceBankLabel(item.choicePresentation)
         : null,
     presentation: item.choicePresentation,
     showIndexLabels: item.choicePresentation !== 'group-bank',
+    summary: formatPrintableWorksheetChoiceBankSummary({
+      count: choices.length,
+      presentation: item.choicePresentation,
+    }),
   };
 }
 
@@ -442,6 +456,71 @@ function getPrintableWorksheetResponseHelp(
     case 'short-answer':
       return m.assignment_printable_response_short_answer();
   }
+}
+
+function formatPrintableWorksheetResponseModeLabel(
+  responseMode: PrintableWorksheetResponseMode
+) {
+  switch (responseMode) {
+    case 'choice':
+      return m.assignment_printable_response_mode_choice();
+    case 'group-choice':
+      return m.assignment_printable_response_mode_group_choice();
+    case 'line-match':
+      return m.assignment_printable_response_mode_line_match();
+    case 'matching-pairs':
+      return m.assignment_printable_response_mode_matching_pairs();
+    case 'short-answer':
+      return m.assignment_printable_response_mode_short_answer();
+  }
+}
+
+function formatPrintableWorksheetAnswerLineSummary(count: number) {
+  const normalizedCount = normalizeRuntimeDisplayCount(count, {
+    min: 0,
+  });
+
+  if (normalizedCount === 1) {
+    return m.assignment_printable_answer_line_summary_one({
+      count: normalizedCount,
+    });
+  }
+
+  return m.assignment_printable_answer_line_summary_many({
+    count: normalizedCount,
+  });
+}
+
+function formatPrintableWorksheetChoiceBankSummary({
+  count,
+  presentation,
+}: {
+  count: number;
+  presentation: PrintableWorksheetItem['choicePresentation'];
+}) {
+  const normalizedCount = normalizeRuntimeDisplayCount(count, {
+    min: 0,
+  });
+
+  if (normalizedCount === 0) {
+    return m.assignment_printable_choice_bank_summary_none();
+  }
+
+  if (presentation === 'group-bank') {
+    return m.assignment_printable_choice_bank_summary_groups({
+      count: normalizedCount,
+    });
+  }
+
+  if (normalizedCount === 1) {
+    return m.assignment_printable_choice_bank_summary_one({
+      count: normalizedCount,
+    });
+  }
+
+  return m.assignment_printable_choice_bank_summary_many({
+    count: normalizedCount,
+  });
 }
 
 function getPrintableWorksheetChoiceBankLabel(

@@ -11039,7 +11039,14 @@ const printableSnapshotItemView = buildPrintableWorksheetItemView(
 assert.equal(printableSnapshotItemView.id, 'q-frozen-prompt');
 assert.equal(printableSnapshotItemView.headingLabel, 'Item 1 · Question');
 assert.equal(printableSnapshotItemView.answerAreaLabel, 'Answer');
+assert.equal(printableSnapshotItemView.answerLineSummary, '1 answer line');
 assert.equal(printableSnapshotItemView.choiceBank.label, 'Choices');
+assert.equal(printableSnapshotItemView.choiceBank.summary, '3 choices');
+assert.equal(printableSnapshotItemView.choiceBank.emptySummary, null);
+assert.equal(
+  printableSnapshotItemView.responseModeLabel,
+  'Response mode: multiple choice'
+);
 assert.deepEqual(printableSnapshotItemView.answerLines, [
   { key: 'q-frozen-prompt-answer-line-0' },
 ]);
@@ -11073,7 +11080,9 @@ const messyPrintableItemView = buildPrintableWorksheetItemView({
 assert.equal(messyPrintableItemView.headingLabel, 'Item 1 · Question');
 assert.equal(messyPrintableItemView.sequenceLabel, 'Item 1');
 assert.equal(messyPrintableItemView.answerAreaLabel, 'Answer');
+assert.equal(messyPrintableItemView.answerLineSummary, '1 answer line');
 assert.equal(messyPrintableItemView.choiceBank.label, 'Choices');
+assert.equal(messyPrintableItemView.choiceBank.summary, '2 choices');
 assert.deepEqual(messyPrintableItemView.answerLines, [
   { key: 'messy-print-item-answer-line-0' },
 ]);
@@ -11092,6 +11101,19 @@ assert.deepEqual(messyPrintableItemView.choiceBank.choices, [
 ]);
 assert.equal(
   buildPrintableWorksheetItemView({
+    answerSpaceLines: 4,
+    choicePresentation: 'none',
+    choices: [],
+    id: 'printable-four-lines',
+    kind: 'question',
+    prompt: 'Explain it.',
+    responseMode: 'short-answer',
+    sequenceNumber: 1,
+  }).answerLineSummary,
+  '4 answer lines'
+);
+assert.equal(
+  buildPrintableWorksheetItemView({
     answerSpaceLines: 1,
     choicePresentation: 'answer-bank',
     choices: ['left', 'right'],
@@ -11102,6 +11124,19 @@ assert.equal(
     sequenceNumber: 2,
   }).choiceBank.label,
   'Answer bank'
+);
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 1,
+    choicePresentation: 'answer-bank',
+    choices: ['left', 'right'],
+    id: 'printable-answer-bank-summary',
+    kind: 'pair',
+    prompt: 'Match it.',
+    responseMode: 'line-match',
+    sequenceNumber: 2,
+  }).responseModeLabel,
+  'Response mode: line matching'
 );
 assert.equal(
   buildPrintableWorksheetItemView({
@@ -11119,6 +11154,19 @@ assert.equal(
 assert.equal(
   buildPrintableWorksheetItemView({
     answerSpaceLines: 1,
+    choicePresentation: 'group-bank',
+    choices: ['Animals', 'Food'],
+    id: 'printable-group-bank-summary',
+    kind: 'group-item',
+    prompt: 'Classify it.',
+    responseMode: 'group-choice',
+    sequenceNumber: 3,
+  }).choiceBank.summary,
+  '2 groups'
+);
+assert.equal(
+  buildPrintableWorksheetItemView({
+    answerSpaceLines: 1,
     choicePresentation: 'none',
     choices: [],
     id: 'printable-no-bank',
@@ -11128,6 +11176,25 @@ assert.equal(
     sequenceNumber: 4,
   }).choiceBank.label,
   null
+);
+const printableNoBankItemView = buildPrintableWorksheetItemView({
+  answerSpaceLines: 1,
+  choicePresentation: 'none',
+  choices: [],
+  id: 'printable-no-bank-summary',
+  kind: 'question',
+  prompt: 'Write it.',
+  responseMode: 'short-answer',
+  sequenceNumber: 4,
+});
+assert.equal(printableNoBankItemView.choiceBank.summary, 'No choices');
+assert.equal(
+  printableNoBankItemView.choiceBank.emptySummary,
+  'No choice bank for this prompt.'
+);
+assert.equal(
+  printableNoBankItemView.responseModeLabel,
+  'Response mode: written answer'
 );
 overwriteGetLocale(() => 'zh');
 try {
@@ -11144,7 +11211,10 @@ try {
 
   assert.equal(zhPrintableItemView.headingLabel, '第 2 题 · 题目');
   assert.equal(zhPrintableItemView.answerAreaLabel, '作答区');
+  assert.equal(zhPrintableItemView.answerLineSummary, '2 条作答线');
   assert.equal(zhPrintableItemView.choiceBank.label, '选项');
+  assert.equal(zhPrintableItemView.choiceBank.summary, '2 个选项');
+  assert.equal(zhPrintableItemView.responseModeLabel, '作答方式：选择题');
   assert.deepEqual(zhPrintableItemView.choiceBank.choices, [
     {
       choice: '苹果',
@@ -15840,13 +15910,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /choiceBank: buildPrintableWorksheetChoiceBankView\(item\)/,
+  /const choiceBank = buildPrintableWorksheetChoiceBankView\(item\)[\s\S]*choiceBank,/,
   'Printable worksheet view should normalize printable choice-bank display data.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /answerLines: getPrintableWorksheetAnswerLines\(item\)/,
+  /const answerLines = getPrintableWorksheetAnswerLines\(item\)[\s\S]*answerLines,/,
   'Printable worksheet item views should own printable answer-line display data.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /answerLineSummary: formatPrintableWorksheetAnswerLineSummary/,
+  'Printable worksheet item views should own localized answer-line summaries.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -15855,8 +15930,23 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /responseModeLabel: formatPrintableWorksheetResponseModeLabel/,
+  'Printable worksheet item views should expose localized response-mode labels for teacher scanning.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /label:[\s\S]*getPrintableWorksheetChoiceBankLabel\(item\.choicePresentation\)/,
   'Printable worksheet choice-bank views should own localized choice-bank section labels.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /summary: formatPrintableWorksheetChoiceBankSummary/,
+  'Printable worksheet choice-bank views should expose localized choice-bank summaries.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /emptySummary:[\s\S]*assignment_printable_choice_bank_empty/,
+  'Printable worksheet choice-bank views should expose localized empty choice-bank summaries.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -15907,6 +15997,21 @@ assert.match(
   printableWorksheetViewSource,
   /m\.assignment_printable_response_line_match/,
   'Printable worksheet view should localize response-mode helper text.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function formatPrintableWorksheetResponseModeLabel[\s\S]*assignment_printable_response_mode_choice[\s\S]*assignment_printable_response_mode_group_choice[\s\S]*assignment_printable_response_mode_line_match[\s\S]*assignment_printable_response_mode_matching_pairs[\s\S]*assignment_printable_response_mode_short_answer/,
+  'Printable worksheet response-mode labels should come from localized messages.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function formatPrintableWorksheetAnswerLineSummary[\s\S]*assignment_printable_answer_line_summary_one[\s\S]*assignment_printable_answer_line_summary_many/,
+  'Printable worksheet answer-line summaries should use localized singular and plural messages.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /function formatPrintableWorksheetChoiceBankSummary[\s\S]*assignment_printable_choice_bank_summary_none[\s\S]*assignment_printable_choice_bank_summary_groups[\s\S]*assignment_printable_choice_bank_summary_one[\s\S]*assignment_printable_choice_bank_summary_many/,
+  'Printable worksheet choice-bank summaries should use localized count messages.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -16108,12 +16213,32 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
+  /itemView\.responseModeLabel/,
+  'Printable worksheet item list should render prepared response-mode labels from the item view.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /itemView\.answerLineSummary/,
+  'Printable worksheet item list should render prepared answer-line summaries from the item view.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /choiceBank\.summary/,
+  'Printable worksheet choice-bank component should render prepared choice-bank summaries.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /choiceBank\.emptySummary/,
+  'Printable worksheet choice-bank component should render prepared empty choice-bank summaries.'
+);
+assert.match(
+  printableWorksheetItemListSource,
   /itemView\.answerAreaLabel/,
   'Printable worksheet item list should render the prepared answer-area label from the item view.'
 );
 assert.doesNotMatch(
   printableWorksheetItemListSource,
-  /Choices|Answer bank|Groups|Answer|选项|答案库|分类|作答区/,
+  /Choices|Answer bank|Groups|Answer|Response mode|answer lines|No choice bank|选项|答案库|分类|作答区|作答方式|作答线|选项库/,
   'Printable worksheet item list should not hard-code visible answer or choice-bank labels.'
 );
 assert.match(
