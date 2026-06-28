@@ -2311,6 +2311,10 @@ const activityEditorFieldsSource = readFileSync(
   'src/components/activities/activity-editor-fields.tsx',
   'utf8'
 );
+const activityEditorShellSource = readFileSync(
+  'src/components/activities/activity-editor-shell.tsx',
+  'utf8'
+);
 const activityAiDraftPanelSource = readFileSync(
   'src/components/activities/activity-ai-draft-panel.tsx',
   'utf8'
@@ -2444,6 +2448,16 @@ assert.match(
   'Activity editor form should delegate source-material form binding.'
 );
 assert.match(
+  activityEditorFormSource,
+  /ActivityEditorHeader[\s\S]*modeView=\{modeView\}[\s\S]*template=\{templateView\.template\}/,
+  'Activity editor form should delegate editor header rendering.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityEditorFooter[\s\S]*isPending=\{isPending\}[\s\S]*loginAction=\{loginAction\}[\s\S]*modeView=\{modeView\}[\s\S]*showSaveAction=\{Boolean\(session\?\.user\)\}/,
+  'Activity editor form should delegate editor footer actions.'
+);
+assert.match(
   activityEditorFieldsSource,
   /ActivityEditorPrimaryFields[\s\S]*name="title"[\s\S]*activity_form_field_title[\s\S]*name="templateType"[\s\S]*activity_form_field_primary_template[\s\S]*templateView\.templateOptions\.map/,
   'Activity editor primary fields should own title and template form bindings.'
@@ -2462,6 +2476,21 @@ assert.match(
   activityEditorFieldsSource,
   /ActivityEditorSourceMaterialsFormField[\s\S]*name="sourceMaterials"[\s\S]*ActivitySourceMaterialsField[\s\S]*canLoadFiles=\{canLoadFiles\}/,
   'Activity editor source-material field should bind material references through the picker component.'
+);
+assert.match(
+  activityEditorShellSource,
+  /ActivityEditorHeader[\s\S]*activity_form_editor_badge[\s\S]*template\.name[\s\S]*modeView\.title/,
+  'Activity editor header should render prepared mode title and template name.'
+);
+assert.match(
+  activityEditorShellSource,
+  /ActivityEditorFooter[\s\S]*modeView\.footerHint[\s\S]*showSaveAction[\s\S]*modeView\.saveLabel[\s\S]*activity_form_sign_in_to_save/,
+  'Activity editor footer should render prepared save state and sign-in action copy.'
+);
+assert.match(
+  activityEditorShellSource,
+  /loginAction\.search[\s\S]*buttonVariants\(\)/,
+  'Activity editor footer should own login link styling and callback search payload.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
@@ -2502,6 +2531,11 @@ assert.doesNotMatch(
   activityEditorFormSource,
   /name="(?:title|templateType|description|subject|gradeBand|difficulty|visibility|learningGoal|vocabularyText|questionsText|pairsText|groupsText|sourceSummary|teacherNotesText|sourceMaterials)"/,
   'Activity editor form should not hand-bind individual editor fields.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /CardHeader|CardFooter|buttonVariants|IconDeviceFloppy|IconLogin2|activity_form_editor_badge|activity_form_sign_in_to_save/,
+  'Activity editor form should not hand-render editor shell chrome or footer actions.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,

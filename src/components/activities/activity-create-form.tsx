@@ -24,6 +24,10 @@ import {
   ActivityEditorSourceMaterialsFormField,
   ActivityEditorStructuredContentFields,
 } from '@/components/activities/activity-editor-fields';
+import {
+  ActivityEditorFooter,
+  ActivityEditorHeader,
+} from '@/components/activities/activity-editor-shell';
 import { ActivityTemplateReadinessPanel } from '@/components/activities/activity-template-readiness-panel';
 import { ActivityTemplateScaffoldPanel } from '@/components/activities/activity-template-scaffold-panel';
 import {
@@ -32,15 +36,7 @@ import {
 } from '@/activities/validation';
 import { authClient } from '@/auth/client';
 import { FormError } from '@/components/shared/form-error';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import {
   useCreateActivity,
@@ -49,16 +45,9 @@ import {
 } from '@/hooks/use-activities';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
-import { cn } from '@/lib/utils';
 import { getPathWithLocale } from '@/lib/urls';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  IconDeviceFloppy,
-  IconLoader2,
-  IconLogin2,
-  IconSparkles,
-} from '@tabler/icons-react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -120,6 +109,12 @@ export function ActivityCreateForm({
     createMutation.isPending ||
     updateMutation.isPending ||
     form.formState.isSubmitting;
+  const loginAction = {
+    to: Routes.Login,
+    search: {
+      callbackUrl: getPathWithLocale(Routes.Create),
+    },
+  };
 
   useEffect(() => {
     if (!initialValues) return;
@@ -220,20 +215,10 @@ export function ActivityCreateForm({
 
   return (
     <Card className="rounded-lg">
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="rounded-md border-primary/30">
-            <IconSparkles className="size-3.5" />
-            {m.activity_form_editor_badge()}
-          </Badge>
-          <Badge variant="secondary" className="rounded-md">
-            {templateView.template.name}
-          </Badge>
-        </div>
-        <CardTitle>
-          <h2 className="text-xl font-semibold">{modeView.title}</h2>
-        </CardTitle>
-      </CardHeader>
+      <ActivityEditorHeader
+        modeView={modeView}
+        template={templateView.template}
+      />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
@@ -279,32 +264,12 @@ export function ActivityCreateForm({
               <FormError message={m.activity_form_sign_in_required_message()} />
             ) : null}
           </CardContent>
-          <CardFooter className="mt-6 flex flex-col gap-3 border-t bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-muted-foreground">
-              {modeView.footerHint}
-            </p>
-            {session?.user ? (
-              <Button type="submit" disabled={isPending}>
-                {isPending ? (
-                  <IconLoader2 className="size-4 animate-spin" />
-                ) : (
-                  <IconDeviceFloppy className="size-4" />
-                )}
-                {modeView.saveLabel}
-              </Button>
-            ) : (
-              <Link
-                to={Routes.Login}
-                search={{
-                  callbackUrl: getPathWithLocale(Routes.Create),
-                }}
-                className={cn(buttonVariants(), 'w-full sm:w-auto')}
-              >
-                <IconLogin2 className="size-4" />
-                {m.activity_form_sign_in_to_save()}
-              </Link>
-            )}
-          </CardFooter>
+          <ActivityEditorFooter
+            isPending={isPending}
+            loginAction={loginAction}
+            modeView={modeView}
+            showSaveAction={Boolean(session?.user)}
+          />
         </form>
       </Form>
     </Card>
