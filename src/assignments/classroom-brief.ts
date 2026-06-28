@@ -43,16 +43,25 @@ type AssignmentClassroomBriefInput = {
 };
 
 type AssignmentClassroomBrief = {
+  copyPreview: AssignmentClassroomBriefCopyPreview;
   focusItemViews: AssignmentClassroomBriefFocusItemView[];
   focusItems: AssignmentItemAnalysis[];
   followUpStudentViews: AssignmentClassroomBriefFollowUpStudentView[];
   followUpStudents: AssignmentStudentSummary[];
+  statSummaryLabel: string;
   statViews: AssignmentClassroomBriefStatView[];
   text: string;
 };
 
 export type AssignmentClassroomBriefStatView = {
   key: 'average-accuracy' | 'average-points' | 'average-time' | 'completions';
+  label: string;
+  text: string;
+  value: string;
+};
+
+type AssignmentClassroomBriefCopyPreview = {
+  label: string;
   text: string;
 };
 
@@ -61,6 +70,7 @@ export type AssignmentClassroomBriefFocusItemView = {
   correctSummaryLabel: string;
   itemId: string;
   itemNumberLabel: string;
+  kindLabel: string;
   performanceLabel: string;
   prompt: string;
   promptLabel: string;
@@ -106,14 +116,20 @@ export function buildAssignmentClassroomBrief({
     m.assignment_classroom_brief_follow_up_heading(),
     ...formatFollowUpStudents(followUpStudentViews),
   ];
+  const text = joinAssignmentResultCopyLines(lines);
 
   return {
+    copyPreview: {
+      label: m.assignment_classroom_brief_copy_preview_label(),
+      text,
+    },
     focusItemViews,
     focusItems,
     followUpStudentViews,
     followUpStudents,
+    statSummaryLabel: m.assignment_classroom_brief_stats_label(),
     statViews,
-    text: joinAssignmentResultCopyLines(lines),
+    text,
   };
 }
 
@@ -125,27 +141,37 @@ export function buildAssignmentClassroomBriefStatViews(
   return [
     {
       key: 'completions',
+      label: m.assignment_result_metric_completions(),
       text: m.assignment_classroom_brief_completions({
         count: statsView.completions ?? 0,
+      }),
+      value: formatAssignmentResultNumber(statsView.completions ?? 0, {
+        min: 0,
       }),
     },
     {
       key: 'average-accuracy',
+      label: m.assignment_result_metric_average_accuracy(),
       text: m.assignment_classroom_brief_average_accuracy({
         accuracy: formatAssignmentSummaryAccuracy(statsView.averageScore),
       }),
+      value: formatAssignmentSummaryAccuracy(statsView.averageScore),
     },
     {
       key: 'average-points',
+      label: m.assignment_result_metric_average_points(),
       text: m.assignment_classroom_brief_average_points({
         points: formatAssignmentResultNumber(statsView.averagePoints),
       }),
+      value: formatAssignmentResultNumber(statsView.averagePoints),
     },
     {
       key: 'average-time',
+      label: m.assignment_result_metric_average_time(),
       text: m.assignment_classroom_brief_average_time({
         time: formatAttemptDuration(statsView.averageDurationSeconds),
       }),
+      value: formatAttemptDuration(statsView.averageDurationSeconds),
     },
   ];
 }
@@ -191,6 +217,7 @@ export function buildAssignmentClassroomBriefFocusItemView({
     correctSummaryLabel: formatAssignmentSummaryCorrectCount(item),
     itemId: item.itemId,
     itemNumberLabel,
+    kindLabel: item.kindLabel,
     performanceLabel,
     prompt: item.prompt,
     promptLabel,

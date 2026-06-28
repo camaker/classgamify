@@ -1459,6 +1459,21 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /statSummaryLabel: m\.assignment_classroom_brief_stats_label\(\)/,
+  'Classroom brief should expose localized stat summary labels for the result-page visual panel.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /copyPreview:[\s\S]*label: m\.assignment_classroom_brief_copy_preview_label\(\)[\s\S]*text/,
+  'Classroom brief should expose a localized copy-preview view instead of making components rebuild copied text.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /label: m\.assignment_result_metric_completions\(\)[\s\S]*value: formatAssignmentResultNumber/,
+  'Classroom brief stat views should expose metric labels and values for visual result-page cards.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /ASSIGNMENT_CLASSROOM_BRIEF_LIMITS[\s\S]*focusItems: 3[\s\S]*followUpStudents: 6/,
   'Classroom brief focus and follow-up limits should be named assignment-domain constants.'
 );
@@ -1491,6 +1506,11 @@ assert.match(
   assignmentClassroomBriefSource,
   /formatAssignmentResultStudentLabel\(/,
   'Classroom brief should format student labels through the shared result-display helper.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /kindLabel: item\.kindLabel/,
+  'Classroom brief focus item views should expose prepared item type labels for teacher scanning.'
 );
 assert.doesNotMatch(
   assignmentClassroomBriefSource,
@@ -3269,8 +3289,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}/,
-  'Assignment classroom brief card should delegate prepared focus item and follow-up student views to focused panels.'
+  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief=\{brief\}/,
+  'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, and copy-preview views to focused panels.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassroomBriefStats[\s\S]*brief\.statSummaryLabel[\s\S]*brief\.statViews\.map[\s\S]*AssignmentResultsClassroomBriefStat/,
+  'Assignment classroom brief stats panel should render prepared stat summary and stat views.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassroomBriefStat[\s\S]*statView\.label[\s\S]*statView\.value/,
+  'Assignment classroom brief stat cards should render prepared stat labels and values.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -3284,8 +3314,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassFocusItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.correctRateLabel[\s\S]*itemView\.correctSummaryLabel/,
-  'Assignment classroom focus item should render prepared focus labels.'
+  /function AssignmentResultsClassFocusItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.correctRateLabel[\s\S]*itemView\.kindLabel[\s\S]*itemView\.performanceLabel[\s\S]*itemView\.correctSummaryLabel/,
+  'Assignment classroom focus item should render prepared focus labels, item type, and performance summary.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -3301,6 +3331,16 @@ assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /itemView\.itemNumberLabel[\s\S]*itemView\.prompt/,
   'Assignment classroom brief component should not hand-compose focus item number and prompt text.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*brief\.copyPreview\.text/,
+  'Assignment classroom brief copy preview should render the prepared copied-text preview.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /assignment_classroom_brief_|assignment_result_metric_|brief\.text/,
+  'Assignment classroom brief component should not call locale messages or raw copied-text fields directly.'
 );
 assert.match(
   assignmentResultsStudentSearchSource,
@@ -27801,17 +27841,58 @@ assert.equal(
   'Anonymous student 1'
 );
 assert.deepEqual(buildAssignmentClassroomBriefStatViews(csvExportData.stats), [
-  { key: 'completions', text: 'Completions: 1' },
-  { key: 'average-accuracy', text: 'Average accuracy: 50%' },
-  { key: 'average-points', text: 'Average points: 1' },
-  { key: 'average-time', text: 'Average time: 45s' },
+  {
+    key: 'completions',
+    label: 'Completions',
+    text: 'Completions: 1',
+    value: '1',
+  },
+  {
+    key: 'average-accuracy',
+    label: 'Average accuracy',
+    text: 'Average accuracy: 50%',
+    value: '50%',
+  },
+  {
+    key: 'average-points',
+    label: 'Average points',
+    text: 'Average points: 1',
+    value: '1',
+  },
+  {
+    key: 'average-time',
+    label: 'Average time',
+    text: 'Average time: 45s',
+    value: '45s',
+  },
 ]);
 assert.deepEqual(classroomBrief.statViews, [
-  { key: 'completions', text: 'Completions: 1' },
-  { key: 'average-accuracy', text: 'Average accuracy: 50%' },
-  { key: 'average-points', text: 'Average points: 1' },
-  { key: 'average-time', text: 'Average time: 45s' },
+  {
+    key: 'completions',
+    label: 'Completions',
+    text: 'Completions: 1',
+    value: '1',
+  },
+  {
+    key: 'average-accuracy',
+    label: 'Average accuracy',
+    text: 'Average accuracy: 50%',
+    value: '50%',
+  },
+  {
+    key: 'average-points',
+    label: 'Average points',
+    text: 'Average points: 1',
+    value: '1',
+  },
+  {
+    key: 'average-time',
+    label: 'Average time',
+    text: 'Average time: 45s',
+    value: '45s',
+  },
 ]);
+assert.equal(classroomBrief.statSummaryLabel, 'Class snapshot');
 assert.deepEqual(
   buildAssignmentClassroomBriefFocusItemView({
     index: 0,
@@ -27822,6 +27903,7 @@ assert.deepEqual(
     correctSummaryLabel: '1/2 correct',
     itemId: 'pair-1',
     itemNumberLabel: '1.',
+    kindLabel: 'Pair',
     performanceLabel: '50% correct, 1/2',
     prompt: 'Match "Hot" with its pair.',
     promptLabel: '1. Match "Hot" with its pair.',
@@ -27833,6 +27915,7 @@ assert.deepEqual(classroomBrief.focusItemViews[0], {
   correctSummaryLabel: '1/2 correct',
   itemId: 'pair-1',
   itemNumberLabel: '1.',
+  kindLabel: 'Pair',
   performanceLabel: '50% correct, 1/2',
   prompt: 'Match "Hot" with its pair.',
   promptLabel: '1. Match "Hot" with its pair.',
@@ -27889,6 +27972,10 @@ assert.match(
   classroomBrief.text,
   /ClassGamify classroom brief: Capital Review, Week 1/
 );
+assert.deepEqual(classroomBrief.copyPreview, {
+  label: 'Copy preview',
+  text: classroomBrief.text,
+});
 assert.match(classroomBrief.text, /Completions: 1/);
 assert.match(classroomBrief.text, /Average accuracy: 50%/);
 assert.match(classroomBrief.text, /Average time: 45s/);
@@ -27915,6 +28002,10 @@ assert.match(invalidStatsClassroomBrief.text, /Completions: 0/);
 assert.match(invalidStatsClassroomBrief.text, /Average accuracy: -/);
 assert.match(invalidStatsClassroomBrief.text, /Average points: -/);
 assert.match(invalidStatsClassroomBrief.text, /Average time: -/);
+assert.deepEqual(
+  invalidStatsClassroomBrief.statViews.map((statView) => statView.value),
+  ['0', '-', '-', '-']
+);
 const expandedClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
   items: reviewPriorityItems,

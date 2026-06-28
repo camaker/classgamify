@@ -38,15 +38,52 @@ export function AssignmentResultsClassroomBriefCard({
           <p>{assignmentResultSectionCopy.classroomBrief.description}</p>
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 lg:grid-cols-2">
-        <AssignmentResultsClassFocusPanel
-          focusItemViews={brief.focusItemViews}
-        />
-        <AssignmentResultsFollowUpPanel
-          followUpStudentViews={brief.followUpStudentViews}
-        />
+      <CardContent className="grid gap-4">
+        <AssignmentResultsClassroomBriefStats brief={brief} />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AssignmentResultsClassFocusPanel
+            focusItemViews={brief.focusItemViews}
+          />
+          <AssignmentResultsFollowUpPanel
+            followUpStudentViews={brief.followUpStudentViews}
+          />
+        </div>
+        <AssignmentResultsClassroomBriefCopyPreview brief={brief} />
       </CardContent>
     </Card>
+  );
+}
+
+function AssignmentResultsClassroomBriefStats({
+  brief,
+}: {
+  brief: AssignmentResultsClassroomBrief;
+}) {
+  return (
+    <section className="grid gap-3 rounded-lg border bg-muted/20 p-4">
+      <h3 className="font-medium text-sm">{brief.statSummaryLabel}</h3>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {brief.statViews.map((statView) => (
+          <AssignmentResultsClassroomBriefStat
+            key={statView.key}
+            statView={statView}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AssignmentResultsClassroomBriefStat({
+  statView,
+}: {
+  statView: AssignmentResultsClassroomBrief['statViews'][number];
+}) {
+  return (
+    <div className="rounded-md border bg-background p-3">
+      <p className="text-muted-foreground text-xs">{statView.label}</p>
+      <p className="mt-1 font-semibold text-lg">{statView.value}</p>
+    </div>
   );
 }
 
@@ -119,6 +156,14 @@ function AssignmentResultsClassFocusItem({
           {itemView.correctRateLabel}
         </Badge>
       </div>
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="secondary" className="rounded-md">
+          {itemView.kindLabel}
+        </Badge>
+        <p className="text-muted-foreground text-xs">
+          {itemView.performanceLabel}
+        </p>
+      </div>
       <p className="text-muted-foreground text-xs">
         {itemView.correctSummaryLabel}
       </p>
@@ -143,5 +188,20 @@ function AssignmentResultsFollowUpStudent({
         {studentView.needsReviewLabel}
       </Badge>
     </div>
+  );
+}
+
+function AssignmentResultsClassroomBriefCopyPreview({
+  brief,
+}: {
+  brief: AssignmentResultsClassroomBrief;
+}) {
+  return (
+    <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">
+      <h3 className="font-medium text-sm">{brief.copyPreview.label}</h3>
+      <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-md bg-background p-3 text-muted-foreground text-xs">
+        {brief.copyPreview.text}
+      </pre>
+    </section>
   );
 }
