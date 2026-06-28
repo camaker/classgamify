@@ -2375,8 +2375,33 @@ assert.match(
 );
 assert.match(
   activityEditorFormSource,
-  /const scaffoldSummary = templateView\.setupView\.scaffoldSummary[\s\S]*scaffoldSummary\.runtimeItemLabel[\s\S]*scaffoldSummary\.readyTemplateLabel[\s\S]*scaffoldSummary\.coverageMetrics\.map[\s\S]*scaffoldSummary\.readyTemplateOptions\.map/,
-  'Activity editor form should render scaffold coverage from the activity-domain setup view.'
+  /ActivityTemplateScaffoldPanel[\s\S]*setupView=\{templateView\.setupView\}[\s\S]*onApplyScaffold=\{applyTemplateScaffold\}/,
+  'Activity editor form should delegate template scaffold setup rendering.'
+);
+assert.match(
+  activityEditorFormSource,
+  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
+  'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
+);
+assert.match(
+  activityEditorFormSource,
+  /function ActivityTemplateScaffoldSummary[\s\S]*summary\.runtimeItemLabel[\s\S]*summary\.readyTemplateLabel[\s\S]*summary\.coverageMetrics\.map[\s\S]*ActivityTemplateScaffoldMetricBadge[\s\S]*summary\.readyTemplateOptions\.map[\s\S]*ActivityTemplateScaffoldReadyBadge/,
+  'Activity editor scaffold summary should render prepared runtime, coverage, and ready-template details.'
+);
+assert.match(
+  activityEditorFormSource,
+  /function ActivityTemplateRequirementBadge[\s\S]*requirement/,
+  'Activity editor scaffold requirement badge should render prepared requirement labels.'
+);
+assert.match(
+  activityEditorFormSource,
+  /function ActivityTemplateScaffoldMetricBadge[\s\S]*metric\.label/,
+  'Activity editor scaffold metric badge should render prepared coverage metric labels.'
+);
+assert.match(
+  activityEditorFormSource,
+  /function ActivityTemplateScaffoldReadyBadge[\s\S]*option\.shortName/,
+  'Activity editor scaffold ready badge should render prepared ready-template labels.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,

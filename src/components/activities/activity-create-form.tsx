@@ -79,6 +79,10 @@ type ActivityCreateFormProps = {
   mode?: 'create' | 'edit';
 };
 
+type ActivityEditorTemplateView = ReturnType<
+  typeof buildActivityEditorTemplateView
+>;
+
 export function ActivityCreateForm({
   activityId,
   initialValues,
@@ -126,7 +130,6 @@ export function ActivityCreateForm({
       }),
     [selectedTemplate, watchedValues]
   );
-  const scaffoldSummary = templateView.setupView.scaffoldSummary;
   const isPending =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -377,80 +380,10 @@ export function ActivityCreateForm({
               />
             </div>
 
-            <div className="rounded-lg border bg-muted/20 p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="rounded-md">
-                      {templateView.setupView.shortName}
-                    </Badge>
-                    <span className="text-sm font-medium">
-                      {templateView.setupView.title}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {templateView.setupView.description}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {templateView.setupView.requirementBadges.map(
-                      (requirement) => (
-                        <Badge
-                          key={requirement}
-                          variant="secondary"
-                          className="rounded-md"
-                        >
-                          {requirement}
-                        </Badge>
-                      )
-                    )}
-                  </div>
-                  <div className="mt-4 space-y-3 border-t pt-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-xs">
-                        {scaffoldSummary.title}
-                      </span>
-                      <Badge variant="secondary" className="rounded-md">
-                        {scaffoldSummary.runtimeItemLabel}
-                      </Badge>
-                      <Badge variant="outline" className="rounded-md">
-                        {scaffoldSummary.readyTemplateLabel}
-                      </Badge>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {scaffoldSummary.coverageMetrics.map((metric) => (
-                        <Badge
-                          key={metric.id}
-                          variant="secondary"
-                          className="rounded-md bg-background"
-                        >
-                          {metric.label}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {scaffoldSummary.readyTemplateOptions.map((option) => (
-                        <Badge
-                          key={option.template}
-                          variant="outline"
-                          className="rounded-md bg-background"
-                        >
-                          {option.shortName}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full bg-background sm:w-fit"
-                  onClick={applyTemplateScaffold}
-                >
-                  <IconSparkles className="size-4" />
-                  {templateView.setupView.actionLabel}
-                </Button>
-              </div>
-            </div>
+            <ActivityTemplateScaffoldPanel
+              setupView={templateView.setupView}
+              onApplyScaffold={applyTemplateScaffold}
+            />
 
             <ActivityTemplateReadinessPanel
               summary={templateView.readinessSummary}
@@ -729,5 +662,123 @@ export function ActivityCreateForm({
         </form>
       </Form>
     </Card>
+  );
+}
+
+function ActivityTemplateScaffoldPanel({
+  onApplyScaffold,
+  setupView,
+}: {
+  onApplyScaffold: () => void;
+  setupView: ActivityEditorTemplateView['setupView'];
+}) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="rounded-md">
+              {setupView.shortName}
+            </Badge>
+            <span className="text-sm font-medium">{setupView.title}</span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {setupView.description}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {setupView.requirementBadges.map((requirement) => (
+              <ActivityTemplateRequirementBadge
+                key={requirement}
+                requirement={requirement}
+              />
+            ))}
+          </div>
+          <ActivityTemplateScaffoldSummary
+            summary={setupView.scaffoldSummary}
+          />
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full bg-background sm:w-fit"
+          onClick={onApplyScaffold}
+        >
+          <IconSparkles className="size-4" />
+          {setupView.actionLabel}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ActivityTemplateRequirementBadge({
+  requirement,
+}: {
+  requirement: string;
+}) {
+  return (
+    <Badge variant="secondary" className="rounded-md">
+      {requirement}
+    </Badge>
+  );
+}
+
+function ActivityTemplateScaffoldSummary({
+  summary,
+}: {
+  summary: ActivityEditorTemplateView['setupView']['scaffoldSummary'];
+}) {
+  return (
+    <div className="mt-4 space-y-3 border-t pt-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-medium text-xs">{summary.title}</span>
+        <Badge variant="secondary" className="rounded-md">
+          {summary.runtimeItemLabel}
+        </Badge>
+        <Badge variant="outline" className="rounded-md">
+          {summary.readyTemplateLabel}
+        </Badge>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {summary.coverageMetrics.map((metric) => (
+          <ActivityTemplateScaffoldMetricBadge
+            key={metric.id}
+            metric={metric}
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {summary.readyTemplateOptions.map((option) => (
+          <ActivityTemplateScaffoldReadyBadge
+            key={option.template}
+            option={option}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityTemplateScaffoldMetricBadge({
+  metric,
+}: {
+  metric: ActivityEditorTemplateView['setupView']['scaffoldSummary']['coverageMetrics'][number];
+}) {
+  return (
+    <Badge variant="secondary" className="rounded-md bg-background">
+      {metric.label}
+    </Badge>
+  );
+}
+
+function ActivityTemplateScaffoldReadyBadge({
+  option,
+}: {
+  option: ActivityEditorTemplateView['setupView']['scaffoldSummary']['readyTemplateOptions'][number];
+}) {
+  return (
+    <Badge variant="outline" className="rounded-md bg-background">
+      {option.shortName}
+    </Badge>
   );
 }
