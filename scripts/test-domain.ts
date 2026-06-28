@@ -2704,7 +2704,7 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*routeState\.data[\s\S]*pageView/,
+  /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*LoadedAssignmentResultsPage[\s\S]*pageView=\{pageView\}/,
   'Assignment result route should render loading, error, and ready states from the assignment-domain route state.'
 );
 assert.doesNotMatch(
@@ -2718,9 +2718,19 @@ assert.match(
   'Assignment result view domain should own loading, error, and ready route-state selection.'
 );
 assert.match(
+  assignmentResultViewSource,
+  /settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*settings: assignment\.settingsJson/,
+  'Assignment result header view should prepare delivery summary from assignment settings.'
+);
+assert.match(
   assignmentResultRouteSource,
   /buildAssignmentResultControlRouteSearch/,
   'Assignment result route should update result controls through the assignment-domain route search helper.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /expiresAt=\{data\.assignment\.expiresAt\}|settings=\{data\.assignment\.settingsJson\}|data=\{routeState\.data\}/,
+  'Assignment result route should not pass raw assignment delivery fields once pageView owns header delivery summary.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -2846,6 +2856,16 @@ assert.match(
   assignmentResultsHeaderCardSource,
   /AssignmentSettingsSummary[\s\S]*CopyAssignmentShareLinkButton[\s\S]*resultActionIconByAction/,
   'Assignment result header component should own delivery summary, share actions, and result action icons.'
+);
+assert.match(
+  assignmentResultsHeaderCardSource,
+  /AssignmentSettingsSummary[\s\S]*view=\{headerView\.settingsSummaryView\}/,
+  'Assignment result header component should render prepared delivery summary view from the assignment result header view.'
+);
+assert.doesNotMatch(
+  assignmentResultsHeaderCardSource,
+  /expiresAt=|settings=/,
+  'Assignment result header component should not receive raw delivery settings for result pages.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderCardSource,
@@ -23271,6 +23291,12 @@ assert.deepEqual(
       scoredResultsPageView.resultView.filteredAttemptRows.map(
         ({ attempt }) => attempt.id
       ),
+    headerDeliveryItems:
+      scoredResultsPageView.headerView?.settingsSummaryView.items.map(
+        (item) => [item.id, item.value]
+      ),
+    headerInstructions:
+      scoredResultsPageView.headerView?.settingsSummaryView.instructions.value,
     headerPrintLabel: scoredResultsPageView.headerView?.printAction.label,
     headerTitle: scoredResultsPageView.headerView?.assignmentTitle,
     itemPerformanceRowViews: scoredResultsPageView.itemPerformanceRowViews.map(
@@ -23324,6 +23350,15 @@ assert.deepEqual(
       },
     },
     filteredAttemptIds: ['completed-attempt'],
+    headerDeliveryItems: [
+      ['attempts', '2 max'],
+      ['timer', '1 min'],
+      ['closes', 'No close time'],
+      ['identity', 'Names'],
+      ['answerReveal', 'After submit'],
+      ['itemOrder', 'Shuffled'],
+    ],
+    headerInstructions: 'No student instructions',
     headerPrintLabel: 'Print worksheet',
     headerTitle: 'Week 1 results',
     itemPerformanceRowViews: [
@@ -24146,6 +24181,14 @@ assert.deepEqual(
     },
     assignment: {
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
+      settingsJson: {
+        collectStudentName: false,
+        instructions: ' Review the line match quietly. ',
+        maxAttempts: 2,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 120,
+      },
       shareSlug: '　share １２３　',
       status: 'published',
       title: ' Ｗｅｅｋ\u00A0　1   results ',
@@ -24165,6 +24208,17 @@ assert.deepEqual(
     printAction: {
       label: 'Print worksheet',
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: new Date('2026-07-01T00:00:00.000Z'),
+      settings: {
+        collectStudentName: false,
+        instructions: ' Review the line match quietly. ',
+        maxAttempts: 2,
+        showCorrectAnswers: false,
+        shuffleItems: false,
+        timeLimitSeconds: 120,
+      },
+    }),
     shareAction: {
       disabledReason: undefined,
       isAvailable: true,
@@ -24187,6 +24241,7 @@ assert.deepEqual(
     },
     assignment: {
       expiresAt: new Date('2026-05-01T00:00:00.000Z'),
+      settingsJson: null,
       shareSlug: 'closed-share',
       status: 'published',
       title: 'Expired results',
@@ -24202,6 +24257,10 @@ assert.deepEqual(
     printAction: {
       label: 'Print worksheet',
     },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: new Date('2026-05-01T00:00:00.000Z'),
+      settings: null,
+    }),
     shareAction: {
       disabledReason:
         'This assignment link has expired. Students cannot open it from the results page.',

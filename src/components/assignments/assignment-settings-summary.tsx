@@ -1,5 +1,6 @@
 import {
   type AssignmentDeliverySummaryId,
+  type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
 import type { AssignmentSettings } from '@/activities/types';
@@ -16,7 +17,11 @@ import {
   IconUserOff,
 } from '@tabler/icons-react';
 
-type AssignmentSettingsSummaryProps = {
+type AssignmentSettingsSummaryPreparedProps = {
+  view: AssignmentSettingsSummaryView;
+};
+
+type AssignmentSettingsSummaryRawProps = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
   instructions?: string;
@@ -27,26 +32,26 @@ type AssignmentSettingsSummaryProps = {
   timeLimitSeconds?: number;
 };
 
-export function AssignmentSettingsSummary({
-  collectStudentName = true,
-  expiresAt,
-  instructions,
-  maxAttempts,
-  settings,
-  showCorrectAnswers = true,
-  shuffleItems = true,
-  timeLimitSeconds,
-}: AssignmentSettingsSummaryProps) {
-  const summaryView = buildAssignmentSettingsSummaryView({
-    collectStudentName,
-    expiresAt,
-    instructions,
-    maxAttempts,
-    settings,
-    showCorrectAnswers,
-    shuffleItems,
-    timeLimitSeconds,
-  });
+type AssignmentSettingsSummaryProps =
+  | AssignmentSettingsSummaryPreparedProps
+  | AssignmentSettingsSummaryRawProps;
+
+export function AssignmentSettingsSummary(
+  props: AssignmentSettingsSummaryProps
+) {
+  const summaryView =
+    'view' in props
+      ? props.view
+      : buildAssignmentSettingsSummaryView({
+          collectStudentName: props.collectStudentName,
+          expiresAt: props.expiresAt,
+          instructions: props.instructions,
+          maxAttempts: props.maxAttempts,
+          settings: props.settings,
+          showCorrectAnswers: props.showCorrectAnswers,
+          shuffleItems: props.shuffleItems,
+          timeLimitSeconds: props.timeLimitSeconds,
+        });
 
   return (
     <div className="grid gap-3">

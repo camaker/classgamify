@@ -2,9 +2,7 @@ import type {
   AssignmentResultActionButton,
   buildAssignmentResultsPageViewModel,
 } from '@/assignments/result-view';
-import type { AssignmentDate } from '@/assignments/lifecycle';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
-import type { AssignmentSettings } from '@/activities/types';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -32,20 +30,16 @@ type AssignmentResultsHeaderView = NonNullable<
 
 type AssignmentResultsHeaderCardProps = {
   assignmentId: string;
-  expiresAt: AssignmentDate;
   headerView: AssignmentResultsHeaderView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   resultActions: AssignmentResultActionButton[];
-  settings: Partial<AssignmentSettings> | null | undefined;
 };
 
 export function AssignmentResultsHeaderCard({
   assignmentId,
-  expiresAt,
   headerView,
   onResultAction,
   resultActions,
-  settings,
 }: AssignmentResultsHeaderCardProps) {
   return (
     <Card className="rounded-lg">
@@ -66,7 +60,7 @@ export function AssignmentResultsHeaderCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <AssignmentSettingsSummary expiresAt={expiresAt} settings={settings} />
+        <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
         <div className="flex flex-col gap-3 sm:flex-row">
           {headerView.shareAction.isAvailable ? (
             <Link

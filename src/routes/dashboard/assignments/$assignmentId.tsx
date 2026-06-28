@@ -112,7 +112,6 @@ function AssignmentResultsPage() {
       ) : (
         <LoadedAssignmentResultsPage
           assignmentId={assignmentId}
-          data={routeState.data}
           pageView={pageView}
           onControlChange={updateResultControl}
           onResultAction={handleResultAction}
@@ -124,13 +123,11 @@ function AssignmentResultsPage() {
 
 function LoadedAssignmentResultsPage({
   assignmentId,
-  data,
   onControlChange,
   onResultAction,
   pageView,
 }: {
   assignmentId: string;
-  data: NonNullable<ReturnType<typeof useAssignmentResults>['data']>;
   onControlChange: (update: AssignmentResultControlUpdate) => void;
   onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
   pageView: ReturnType<typeof buildAssignmentResultsRouteState>['pageView'];
@@ -148,11 +145,9 @@ function LoadedAssignmentResultsPage({
 
       <AssignmentResultsHeaderCard
         assignmentId={assignmentId}
-        expiresAt={data.assignment.expiresAt}
         headerView={headerView}
         onResultAction={(actionButton) => void onResultAction(actionButton)}
         resultActions={pageView.actionButtons}
-        settings={data.assignment.settingsJson}
       />
 
       {pageView.sectionState.showStudentSearch ? (

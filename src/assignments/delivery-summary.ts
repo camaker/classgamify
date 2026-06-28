@@ -53,7 +53,7 @@ type AssignmentInstructionSummary = {
   value: string;
 };
 
-type AssignmentSettingsSummaryView = {
+export type AssignmentSettingsSummaryView = {
   instructions: AssignmentInstructionSummary;
   items: AssignmentDeliverySummaryItem[];
   settings: AssignmentSettings;

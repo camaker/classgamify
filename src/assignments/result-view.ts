@@ -16,7 +16,10 @@ import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
 } from '@/assignments/attempt-duration';
-import { formatAssignmentExpiry } from '@/assignments/delivery-summary';
+import {
+  buildAssignmentSettingsSummaryView,
+  formatAssignmentExpiry,
+} from '@/assignments/delivery-summary';
 import { normalizeStudentName } from '@/assignments/identity';
 import {
   formatAssignmentResultNumber,
@@ -74,6 +77,7 @@ import {
 } from '@/assignments/result-actions';
 import type {
   ActivityTemplateType,
+  AssignmentSettings,
   AssignmentStatus,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
@@ -217,11 +221,9 @@ type AssignmentResultHeaderSource = {
   assignment: {
     expiresAt: Date | string | null;
     id: string;
-    settingsJson: {
-      timeLimitSeconds?: number;
-    };
     shareSlug: string;
     status: AssignmentStatus | string;
+    settingsJson: Partial<AssignmentSettings> | null;
     title: string;
   };
   snapshot: {
@@ -650,6 +652,10 @@ export function buildAssignmentResultHeaderView({
     printAction: {
       label: assignmentResultPageCopy.printWorksheetLabel,
     } satisfies AssignmentResultHeaderPrintAction,
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: assignment.expiresAt,
+      settings: assignment.settingsJson,
+    }),
     shareAction,
     shareSlug: shareAction.shareSlug,
     statusLabel: getAssignmentStatusLabel(
@@ -1277,7 +1283,8 @@ export function buildAssignmentResultsPageViewModel<
   const attemptRowViews = data
     ? buildAssignmentAttemptRowViews({
         rows: resultView.filteredAttemptRows,
-        timeLimitSeconds: data.assignment.settingsJson.timeLimitSeconds,
+        timeLimitSeconds:
+          headerView?.settingsSummaryView.settings.timeLimitSeconds,
       })
     : [];
   const studentSummaryRowViews = buildAssignmentStudentSummaryRowViews(
