@@ -6069,8 +6069,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerAnswerUpdatePlan/,
-  'Student runner state domain should expose browser answer-change update plans.'
+  /export function buildStudentRunnerAnswerUpdatePlan[\s\S]*filterStudentRunnerAnswerChanges[\s\S]*buildStudentAnswerChanges[\s\S]*validItemIds\.has/,
+  'Student runner state domain should filter browser answer changes through current runtime item ids.'
 );
 assert.match(
   playRouteSource,
@@ -6104,8 +6104,8 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /buildStudentRunnerAnswerUpdatePlan\(\{[\s\S]*answers: current,[\s\S]*changes/,
-  'Student play route should plan browser answer changes through the runner state domain.'
+  /buildStudentRunnerAnswerUpdatePlan\(\{[\s\S]*answers: current,[\s\S]*changes,[\s\S]*runtimeItems: runtimeListView\.items/,
+  'Student play route should plan browser answer changes against the current frozen runtime list through the runner state domain.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -13167,6 +13167,7 @@ assert.deepEqual(
       existing: 'Answer',
     },
     changes: [],
+    runtimeItems: publicRunnerState.runtimeItems,
   }),
   { type: 'ignored' }
 );
@@ -13186,6 +13187,12 @@ assert.deepEqual(
         itemId: ' ',
       },
     ],
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'target',
+      },
+    ],
   }),
   {
     answers: {
@@ -13194,6 +13201,82 @@ assert.deepEqual(
     },
     confirmIncompleteSubmit: false,
     type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      known: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'Updated answer',
+        itemId: ' known ',
+      },
+      {
+        answer: 'Unknown answer',
+        itemId: 'unknown-item',
+      },
+    ],
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'known',
+      },
+    ],
+  }),
+  {
+    answers: {
+      known: 'Updated answer',
+    },
+    confirmIncompleteSubmit: false,
+    type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {},
+    changes: [
+      {
+        answer: 'Fullwidth item answer',
+        itemId: ' item-1 ',
+      },
+    ],
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: ' ｉｔｅｍ－１ ',
+      },
+    ],
+  }),
+  {
+    answers: {
+      'item-1': 'Fullwidth item answer',
+    },
+    confirmIncompleteSubmit: false,
+    type: 'updated',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAnswerUpdatePlan({
+    answers: {
+      known: 'Old answer',
+    },
+    changes: [
+      {
+        answer: 'Unknown answer',
+        itemId: 'unknown-item',
+      },
+    ],
+    runtimeItems: [
+      {
+        ...publicRunnerState.runtimeItems[0]!,
+        id: 'known',
+      },
+    ],
+  }),
+  {
+    type: 'ignored',
   }
 );
 assert.equal(

@@ -249,6 +249,7 @@ function PlayPage() {
     const updatePlan = buildStudentRunnerAnswerUpdatePlan({
       answers,
       changes,
+      runtimeItems: runtimeListView.items,
     });
     if (updatePlan.type === 'ignored') return;
 
@@ -257,6 +258,7 @@ function PlayPage() {
       const currentUpdatePlan = buildStudentRunnerAnswerUpdatePlan({
         answers: current,
         changes,
+        runtimeItems: runtimeListView.items,
       });
       if (currentUpdatePlan.type === 'ignored') return current;
 

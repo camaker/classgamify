@@ -12,6 +12,7 @@ import {
   buildStudentAttemptResultDisplay,
   buildStudentAttemptTimerBadge,
   buildStudentRunnerMissingView,
+  buildStudentAnswerChanges,
   canStartAnotherStudentAttempt,
   formatStudentAttemptUsageLabel,
   getAttemptCompletionSummary,
@@ -842,11 +843,18 @@ export function buildStudentRunnerAnonymousTokenPlan({
 export function buildStudentRunnerAnswerUpdatePlan({
   answers,
   changes,
+  runtimeItems,
 }: {
   answers: StudentAnswerMap;
   changes: StudentAnswerChange[];
+  runtimeItems: PublicRuntimeItem[];
 }): StudentRunnerAnswerUpdatePlan {
-  if (changes.length === 0) {
+  const validChanges = filterStudentRunnerAnswerChanges({
+    changes,
+    runtimeItems,
+  });
+
+  if (validChanges.length === 0) {
     return {
       type: 'ignored',
     };
@@ -855,11 +863,35 @@ export function buildStudentRunnerAnswerUpdatePlan({
   return {
     answers: applyStudentAnswerChanges({
       answers,
-      changes,
+      changes: validChanges,
     }),
     confirmIncompleteSubmit: false,
     type: 'updated',
   };
+}
+
+function filterStudentRunnerAnswerChanges({
+  changes,
+  runtimeItems,
+}: {
+  changes: StudentAnswerChange[];
+  runtimeItems: PublicRuntimeItem[];
+}) {
+  const validItemIds = new Set(
+    runtimeItems.flatMap((item) =>
+      buildStudentAnswerChanges({
+        answer: '',
+        itemId: item.id,
+      }).map((change) => change.itemId)
+    )
+  );
+
+  return changes.flatMap((change) =>
+    buildStudentAnswerChanges({
+      answer: change.answer,
+      itemId: change.itemId,
+    }).filter((normalizedChange) => validItemIds.has(normalizedChange.itemId))
+  );
 }
 
 export function getStudentRunnerAttemptStartedAt({
