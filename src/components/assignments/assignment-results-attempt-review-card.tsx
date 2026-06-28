@@ -31,40 +31,48 @@ export function AssignmentResultsAttemptReviewCard({
       </div>
       <div className="mt-3 grid gap-2">
         {attemptView.answerViews.map((answerView) => (
-          <div
+          <AssignmentResultsAttemptAnswerReview
             key={`${attemptView.id}-${answerView.id}`}
-            className="rounded-lg border bg-muted/20 p-3"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="min-w-0 text-sm font-medium">
-                {answerView.promptLabel}
-              </p>
-              <Badge
-                variant={
-                  answerView.statusTone === 'correct' ? 'secondary' : 'outline'
-                }
-                className="rounded-md"
-              >
-                {answerView.statusLabel}
-              </Badge>
-            </div>
-            <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-              <p>{answerView.studentAnswerLineText}</p>
-              <p>{answerView.expectedAnswerLineText}</p>
-            </div>
-            {answerView.acceptedAnswersLineText ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {answerView.acceptedAnswersLineText}
-              </p>
-            ) : null}
-            {answerView.explanationText ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {answerView.explanationText}
-              </p>
-            ) : null}
-          </div>
+            answerView={answerView}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+function AssignmentResultsAttemptAnswerReview({
+  answerView,
+}: {
+  answerView: AssignmentResultsAttemptReviewView['answerViews'][number];
+}) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="min-w-0 text-sm font-medium">{answerView.promptLabel}</p>
+        <Badge
+          variant={
+            answerView.statusTone === 'correct' ? 'secondary' : 'outline'
+          }
+          className="rounded-md"
+        >
+          {answerView.statusLabel}
+        </Badge>
+      </div>
+      <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+        <p>{answerView.studentAnswerLineText}</p>
+        <p>{answerView.expectedAnswerLineText}</p>
+      </div>
+      {answerView.acceptedAnswersLineText ? (
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+          {answerView.acceptedAnswersLineText}
+        </p>
+      ) : null}
+      {answerView.explanationText ? (
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">
+          {answerView.explanationText}
+        </p>
+      ) : null}
     </div>
   );
 }
