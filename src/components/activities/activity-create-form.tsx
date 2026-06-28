@@ -18,7 +18,12 @@ import {
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
 import { ActivityAiDraftPanel } from '@/components/activities/activity-ai-draft-panel';
-import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
+import {
+  ActivityEditorDetailsFields,
+  ActivityEditorPrimaryFields,
+  ActivityEditorSourceMaterialsFormField,
+  ActivityEditorStructuredContentFields,
+} from '@/components/activities/activity-editor-fields';
 import { ActivityTemplateReadinessPanel } from '@/components/activities/activity-template-readiness-panel';
 import { ActivityTemplateScaffoldPanel } from '@/components/activities/activity-template-scaffold-panel';
 import {
@@ -36,21 +41,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select';
-import { Textarea } from '@/components/ui/textarea';
+import { Form } from '@/components/ui/form';
 import {
   useCreateActivity,
   useGenerateActivityDraft,
@@ -258,45 +249,10 @@ export function ActivityCreateForm({
               panelView={aiDraftPanelView}
             />
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_title()}</FormLabel>
-                    <FormControl>
-                      <Input {...field} autoComplete="off" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="templateType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {m.activity_form_field_primary_template()}
-                    </FormLabel>
-                    <FormControl>
-                      <NativeSelect {...field} className="w-full">
-                        {templateView.templateOptions.map((item) => (
-                          <NativeSelectOption key={item.type} value={item.type}>
-                            {item.name}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    </FormControl>
-                    <FormDescription>
-                      {templateView.template.bestFor}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <ActivityEditorPrimaryFields
+              control={form.control}
+              templateView={templateView}
+            />
 
             <ActivityTemplateScaffoldPanel
               setupView={templateView.setupView}
@@ -307,244 +263,16 @@ export function ActivityCreateForm({
               summary={templateView.readinessSummary}
             />
 
-            <FormField
+            <ActivityEditorDetailsFields
               control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{m.activity_form_field_description()}</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={2} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              selectOptionsView={selectOptionsView}
             />
 
-            <div className="grid gap-4 md:grid-cols-4">
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_subject()}</FormLabel>
-                    <FormControl>
-                      <Input {...field} autoComplete="off" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gradeBand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_grade_band()}</FormLabel>
-                    <FormControl>
-                      <Input {...field} autoComplete="off" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="difficulty"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_difficulty()}</FormLabel>
-                    <FormControl>
-                      <NativeSelect {...field} className="w-full">
-                        {selectOptionsView.difficultyOptions.map((option) => (
-                          <NativeSelectOption
-                            key={option.value}
-                            value={option.value}
-                          >
-                            {option.label}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="visibility"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_visibility()}</FormLabel>
-                    <FormControl>
-                      <NativeSelect {...field} className="w-full">
-                        {selectOptionsView.visibilityOptions.map((option) => (
-                          <NativeSelectOption
-                            key={option.value}
-                            value={option.value}
-                          >
-                            {option.label}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <ActivityEditorStructuredContentFields control={form.control} />
 
-            <FormField
+            <ActivityEditorSourceMaterialsFormField
+              canLoadFiles={Boolean(session?.user)}
               control={form.control}
-              name="learningGoal"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{m.activity_form_field_learning_goal()}</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={2} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="vocabularyText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_vocabulary()}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        placeholder={m.activity_form_vocabulary_placeholder()}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {m.activity_form_vocabulary_description()}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="questionsText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_questions()}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        placeholder={m.activity_form_questions_placeholder()}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {m.activity_form_questions_description()}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="pairsText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_pairs()}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        placeholder={m.activity_form_pairs_placeholder()}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {m.activity_form_pairs_description()}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="groupsText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{m.activity_form_field_groups()}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        placeholder={m.activity_form_groups_placeholder()}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {m.activity_form_groups_description()}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="sourceSummary"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {m.activity_form_field_source_summary()}
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="teacherNotesText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {m.activity_form_field_teacher_notes()}
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} />
-                    </FormControl>
-                    <FormDescription>
-                      {m.activity_form_teacher_notes_description()}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="sourceMaterials"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <ActivitySourceMaterialsField
-                      canLoadFiles={Boolean(session?.user)}
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
             />
 
             {!session?.user && !sessionPending ? (

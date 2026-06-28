@@ -2307,6 +2307,10 @@ const activityEditorFormSource = readFileSync(
   'src/components/activities/activity-create-form.tsx',
   'utf8'
 );
+const activityEditorFieldsSource = readFileSync(
+  'src/components/activities/activity-editor-fields.tsx',
+  'utf8'
+);
 const activityAiDraftPanelSource = readFileSync(
   'src/components/activities/activity-ai-draft-panel.tsx',
   'utf8'
@@ -2420,6 +2424,46 @@ assert.match(
   'Activity editor form should delegate template scaffold setup rendering.'
 );
 assert.match(
+  activityEditorFormSource,
+  /ActivityEditorPrimaryFields[\s\S]*control=\{form\.control\}[\s\S]*templateView=\{templateView\}/,
+  'Activity editor form should delegate primary identity fields.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityEditorDetailsFields[\s\S]*control=\{form\.control\}[\s\S]*selectOptionsView=\{selectOptionsView\}/,
+  'Activity editor form should delegate descriptive and select fields.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityEditorStructuredContentFields[\s\S]*control=\{form\.control\}/,
+  'Activity editor form should delegate structured classroom content fields.'
+);
+assert.match(
+  activityEditorFormSource,
+  /ActivityEditorSourceMaterialsFormField[\s\S]*canLoadFiles=\{Boolean\(session\?\.user\)\}[\s\S]*control=\{form\.control\}/,
+  'Activity editor form should delegate source-material form binding.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /ActivityEditorPrimaryFields[\s\S]*name="title"[\s\S]*activity_form_field_title[\s\S]*name="templateType"[\s\S]*activity_form_field_primary_template[\s\S]*templateView\.templateOptions\.map/,
+  'Activity editor primary fields should own title and template form bindings.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /ActivityEditorDetailsFields[\s\S]*name="description"[\s\S]*name="subject"[\s\S]*name="gradeBand"[\s\S]*selectOptionsView\.difficultyOptions\.map[\s\S]*selectOptionsView\.visibilityOptions\.map[\s\S]*name="learningGoal"/,
+  'Activity editor details fields should own description, classification, and learning-goal bindings.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /ActivityEditorStructuredContentFields[\s\S]*name="vocabularyText"[\s\S]*name="questionsText"[\s\S]*name="pairsText"[\s\S]*name="groupsText"[\s\S]*name="sourceSummary"[\s\S]*name="teacherNotesText"/,
+  'Activity editor structured content fields should own reusable classroom content bindings.'
+);
+assert.match(
+  activityEditorFieldsSource,
+  /ActivityEditorSourceMaterialsFormField[\s\S]*name="sourceMaterials"[\s\S]*ActivitySourceMaterialsField[\s\S]*canLoadFiles=\{canLoadFiles\}/,
+  'Activity editor source-material field should bind material references through the picker component.'
+);
+assert.match(
   activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
   'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
@@ -2453,6 +2497,11 @@ assert.doesNotMatch(
   activityEditorFormSource,
   /function ActivityTemplateScaffoldPanel|function ActivityTemplateScaffoldSummary|function ActivityTemplateRequirementBadge|function ActivityTemplateScaffoldMetricBadge|function ActivityTemplateScaffoldReadyBadge/,
   'Activity editor form should not own template scaffold display components.'
+);
+assert.doesNotMatch(
+  activityEditorFormSource,
+  /name="(?:title|templateType|description|subject|gradeBand|difficulty|visibility|learningGoal|vocabularyText|questionsText|pairsText|groupsText|sourceSummary|teacherNotesText|sourceMaterials)"/,
+  'Activity editor form should not hand-bind individual editor fields.'
 );
 assert.doesNotMatch(
   activityEditorFormSource,
