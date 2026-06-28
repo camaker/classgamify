@@ -49,9 +49,9 @@ import {
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import {
-  buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkAvailabilityState,
   buildAssignmentSharePath,
-  type AssignmentShareLinkAvailability,
+  type AssignmentShareLinkAvailabilityState,
 } from '@/assignments/share-link';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
@@ -779,24 +779,25 @@ export function getAssignmentListCardActionState({
   status: AssignmentStatus;
 }): AssignmentListCardActionState {
   const hasPublishedSnapshot = status !== 'draft';
-  const shareAvailability = buildAssignmentShareLinkAvailability({
+  const shareAvailabilityState = buildAssignmentShareLinkAvailabilityState({
     expiresAt,
     now,
-    shareSlug: '',
     status,
   });
-  const shareDisabledReason = shareAvailability.isAvailable
+  const shareDisabledReason = shareAvailabilityState.isAvailable
     ? undefined
-    : getAssignmentListShareDisabledReason(shareAvailability.lifecycleStatus);
+    : getAssignmentListShareDisabledReason(
+        shareAvailabilityState.lifecycleStatus
+      );
 
   return {
     isPersisted: persisted,
     ...(shareDisabledReason ? { shareDisabledReason } : {}),
-    shareLabel: shareAvailability.isAvailable
+    shareLabel: shareAvailabilityState.isAvailable
       ? assignmentListActionCopy.openShareLink
       : assignmentListActionCopy.shareLinkUnavailable,
     showResultsAction: persisted && hasPublishedSnapshot,
-    showShareActions: persisted || shareAvailability.isAvailable,
+    showShareActions: persisted || shareAvailabilityState.isAvailable,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
@@ -846,7 +847,7 @@ export function buildAssignmentListCardActionView({
 }
 
 function getAssignmentListShareDisabledReason(
-  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
+  lifecycleStatus: AssignmentShareLinkAvailabilityState['lifecycleStatus']
 ) {
   if (lifecycleStatus === 'closed') {
     return m.assignment_list_share_link_closed();

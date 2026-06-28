@@ -687,6 +687,7 @@ import {
 import {
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkAvailabilityState,
   buildAssignmentShareLinkCopyExecutionPlan,
   buildAssignmentSharePath,
   buildAssignmentShareUrl,
@@ -9773,6 +9774,28 @@ assert.equal(
   'expired'
 );
 assert.deepEqual(
+  buildAssignmentShareLinkAvailabilityState({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    status: 'published',
+  }),
+  {
+    isAvailable: true,
+    lifecycleStatus: 'open',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkAvailabilityState({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    status: 'draft',
+  }),
+  {
+    isAvailable: false,
+    lifecycleStatus: 'draft',
+  }
+);
+assert.deepEqual(
   buildAssignmentShareLinkAvailability({
     expiresAt: null,
     now: new Date('2026-01-01T00:00:00.000Z').getTime(),
@@ -16888,8 +16911,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*status,[\s\S]*\}\)/,
-  'Assignment list card action state should resolve share-link availability through the shared assignment share helper.'
+  /buildAssignmentShareLinkAvailabilityState\(\{[\s\S]*expiresAt,[\s\S]*status,[\s\S]*\}\)/,
+  'Assignment list card action state should resolve share-link state through the shared assignment share helper without constructing a URL.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /buildAssignmentShareLinkAvailability\(\{[\s\S]*shareSlug: ''/,
+  'Assignment list card action state should not pass a fake share slug just to resolve share-link lifecycle state.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,

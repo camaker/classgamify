@@ -13,6 +13,11 @@ export type AssignmentShareLinkAvailability = {
   shareSlug: string;
 };
 
+export type AssignmentShareLinkAvailabilityState = Pick<
+  AssignmentShareLinkAvailability,
+  'isAvailable' | 'lifecycleStatus'
+>;
+
 export const assignmentShareLinkActionCopy = {
   get copyLabel() {
     return m.assignment_share_link_copy_label();
@@ -54,6 +59,27 @@ export function resolveAssignmentShareLinkLifecycle({
   return getAssignmentLifecycleStatus(status, expiresAt, now);
 }
 
+export function buildAssignmentShareLinkAvailabilityState({
+  expiresAt,
+  now,
+  status,
+}: {
+  expiresAt: AssignmentDate;
+  now?: number;
+  status: string;
+}): AssignmentShareLinkAvailabilityState {
+  const lifecycleStatus = resolveAssignmentShareLinkLifecycle({
+    expiresAt,
+    now,
+    status,
+  });
+
+  return {
+    isAvailable: lifecycleStatus === 'open',
+    lifecycleStatus,
+  };
+}
+
 export function buildAssignmentShareLinkAvailability({
   expiresAt,
   now,
@@ -65,7 +91,7 @@ export function buildAssignmentShareLinkAvailability({
   shareSlug: string;
   status: string;
 }): AssignmentShareLinkAvailability {
-  const lifecycleStatus = resolveAssignmentShareLinkLifecycle({
+  const availabilityState = buildAssignmentShareLinkAvailabilityState({
     expiresAt,
     now,
     status,
@@ -73,8 +99,7 @@ export function buildAssignmentShareLinkAvailability({
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
 
   return {
-    isAvailable: lifecycleStatus === 'open',
-    lifecycleStatus,
+    ...availabilityState,
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     shareSlug: normalizedShareSlug,
   };
