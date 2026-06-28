@@ -1,4 +1,4 @@
-import type { buildAssignmentListCardViewModel } from '@/assignments/list-view';
+import type { AssignmentListCardViewModel } from '@/assignments/list-view';
 import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
 import { AssignmentListStats } from '@/components/assignments/assignment-list-stats';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -26,12 +26,10 @@ import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 type AssignmentListCardProps = {
-  assignment: ReturnType<typeof buildAssignmentListCardViewModel>;
+  assignment: AssignmentListCardViewModel;
 };
 
-type AssignmentListCardView = ReturnType<
-  typeof buildAssignmentListCardViewModel
->;
+type AssignmentListCardView = AssignmentListCardViewModel;
 type AssignmentListCardActionView = AssignmentListCardView['actionView'];
 type AssignmentListPrintAction = NonNullable<
   AssignmentListCardActionView['printAction']

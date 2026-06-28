@@ -1,9 +1,5 @@
-import type { buildAssignmentListCardViewModel } from '@/assignments/list-view';
+import type { AssignmentListCardViewModel } from '@/assignments/list-view';
 import { IconChartBar, IconUsers } from '@tabler/icons-react';
-
-type AssignmentListCardViewModel = ReturnType<
-  typeof buildAssignmentListCardViewModel
->;
 
 type AssignmentListStatsProps = {
   statItems: AssignmentListCardViewModel['statItems'];

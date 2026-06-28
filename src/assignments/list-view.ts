@@ -115,7 +115,7 @@ type AssignmentListCardActionView = {
   statusAction: AssignmentStatusAction | undefined;
 };
 
-type AssignmentListCardViewModel = {
+export type AssignmentListCardViewModel = {
   actionView: AssignmentListCardActionView;
   activityDescription: string;
   id: string;

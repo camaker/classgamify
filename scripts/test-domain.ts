@@ -16858,8 +16858,18 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /buildAssignmentListCardViewModel/,
-  'Assignment list card component should receive assignment-domain card view models.'
+  /AssignmentListCardViewModel/,
+  'Assignment list card component should receive the explicit assignment-domain card view-model contract.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListCardViewModel = \{/,
+  'Assignment list card view-model contract should be an explicit domain export.'
+);
+assert.doesNotMatch(
+  `${assignmentListCardComponentSource}\n${assignmentListStatsComponentSource}`,
+  /ReturnType<typeof buildAssignmentListCardViewModel>/,
+  'Assignment list card components should not infer their contracts from buildAssignmentListCardViewModel ReturnType.'
 );
 assert.match(
   assignmentListViewSource,
@@ -16889,7 +16899,7 @@ assert.doesNotMatch(
 assert.match(
   assignmentListStatsComponentSource,
   /AssignmentListCardViewModel\['statItems'\]/,
-  'Assignment list stats component should consume the assignment-domain stat item contract.'
+  'Assignment list stats component should consume the explicit assignment-domain stat item contract.'
 );
 assert.match(
   assignmentListStatsComponentSource,
