@@ -10,30 +10,30 @@ type PrintableWorksheetPageViewModel = ReturnType<
 >;
 
 type PrintableWorksheetToolbarProps = {
-  assignmentId: string;
   controlView: PrintableWorksheetPageViewModel['controlView'];
   onAnswerKeyChange: (answerKey: boolean) => void;
   onPrint: () => void;
 };
 
 export function PrintableWorksheetToolbar({
-  assignmentId,
   controlView,
   onAnswerKeyChange,
   onPrint,
 }: PrintableWorksheetToolbarProps) {
+  const { backToResultsAction } = controlView;
+
   return (
     <div
       data-print-hidden
       className="flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <Link
-        to="/dashboard/assignments/$assignmentId"
-        params={{ assignmentId }}
+        to={backToResultsAction.to}
+        params={{ assignmentId: backToResultsAction.assignmentId }}
         className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
       >
         <IconArrowLeft className="size-4" />
-        {controlView.backToResultsLabel}
+        {backToResultsAction.label}
       </Link>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label

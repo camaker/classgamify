@@ -13339,6 +13339,7 @@ try {
 }
 const printableWorksheetPageView = buildPrintableWorksheetPageViewModel({
   answerKey: true,
+  assignmentId: 'assignment-printable-1',
   worksheet: printableSnapshotWorksheetWithAnswers,
 });
 assert.deepEqual(
@@ -13422,7 +13423,11 @@ assert.deepEqual(
         'Teacher-only answers from the frozen assignment snapshot.',
       answerKeyLabel: 'Include answer key',
       answerKeyValue: true,
-      backToResultsLabel: 'Back to results',
+      backToResultsAction: {
+        assignmentId: 'assignment-printable-1',
+        label: 'Back to results',
+        to: Routes.DashboardAssignmentResults,
+      },
       printButtonLabel: 'Print',
     },
     emptyState: {
@@ -13465,6 +13470,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildPrintableWorksheetPageViewModel({
     answerKey: false,
+    assignmentId: 'assignment-printable-1',
     worksheet: printableSnapshotWorksheetWithAnswers,
   }).answerKeyView.show,
   false
@@ -13473,6 +13479,7 @@ assert.equal(PRINTABLE_WORKSHEET_BODY_PRINT_MODE, 'worksheet');
 assert.deepEqual(
   buildPrintableWorksheetRouteState({
     answerKey: true,
+    assignmentId: 'assignment-printable-1',
     isError: false,
     isLoading: true,
     worksheet: printableSnapshotWorksheetWithAnswers,
@@ -13487,6 +13494,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildPrintableWorksheetRouteState({
     answerKey: true,
+    assignmentId: 'assignment-printable-1',
     isError: true,
     isLoading: false,
     worksheet: printableSnapshotWorksheetWithAnswers,
@@ -13502,6 +13510,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildPrintableWorksheetRouteState({
     answerKey: false,
+    assignmentId: 'assignment-printable-1',
     isError: false,
     isLoading: false,
     worksheet: null,
@@ -13516,6 +13525,7 @@ assert.deepEqual(
 );
 const printableWorksheetReadyRouteState = buildPrintableWorksheetRouteState({
   answerKey: true,
+  assignmentId: 'assignment-printable-1',
   isError: false,
   isLoading: false,
   worksheet: printableSnapshotWorksheetWithAnswers,
@@ -19113,8 +19123,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /controlView: buildPrintableWorksheetControlView\(\{ answerKey \}\)/,
+  /controlView: buildPrintableWorksheetControlView\(\{[\s\S]*answerKey,[\s\S]*assignmentId,[\s\S]*\}\)/,
   'Printable worksheet page view-model should own printable toolbar state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /backToResultsAction: \{[\s\S]*assignmentId,[\s\S]*label: printableWorksheetPageCopy\.backToResultsLabel,[\s\S]*to: Routes\.DashboardAssignmentResults/,
+  'Printable worksheet control view should prepare the back-to-results route target.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -19221,7 +19236,7 @@ assert.match(
 );
 assert.match(
   printableAssignmentRouteSource,
-  /buildPrintableWorksheetRouteState\(\{[\s\S]*answerKey,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*worksheet: data/,
+  /buildPrintableWorksheetRouteState\(\{[\s\S]*answerKey,[\s\S]*assignmentId,[\s\S]*isError,[\s\S]*isLoading,[\s\S]*worksheet: data/,
   'Printable worksheet route should consume the assignment-domain route state helper.'
 );
 assert.match(
@@ -19248,6 +19263,11 @@ assert.match(
   printableAssignmentRouteSource,
   /PrintableWorksheetToolbar[\s\S]*controlView=\{controlView\}/,
   'Printable worksheet route should delegate toolbar rendering with the printable control view.'
+);
+assert.doesNotMatch(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetToolbar[\s\S]*assignmentId=\{assignmentId\}/,
+  'Printable worksheet route should not pass raw assignment ids into toolbar rendering.'
 );
 assert.match(
   printableAssignmentRouteSource,
@@ -19361,8 +19381,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
+  /const \{ backToResultsAction \} = controlView[\s\S]*to=\{backToResultsAction\.to\}[\s\S]*assignmentId: backToResultsAction\.assignmentId[\s\S]*backToResultsAction\.label/,
+  'Printable worksheet toolbar should render the prepared back-to-results action target and label.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
   /controlView\.answerKeyDescription/,
   'Printable worksheet toolbar should render the prepared answer-key description from the printable worksheet control view.'
+);
+assert.doesNotMatch(
+  printableWorksheetToolbarSource,
+  /to="\/dashboard\/assignments\/\$assignmentId"|assignmentId: string|backToResultsLabel/,
+  'Printable worksheet toolbar should not hand-build the results route or back label.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -19396,8 +19426,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /to="\/dashboard\/assignments\/\$assignmentId"/,
-  'Printable worksheet toolbar should link teachers back to assignment results.'
+  /to=\{backToResultsAction\.to\}[\s\S]*assignmentId: backToResultsAction\.assignmentId/,
+  'Printable worksheet toolbar should link teachers back to assignment results through the prepared action.'
 );
 assert.match(
   printableWorksheetStatePanelSource,

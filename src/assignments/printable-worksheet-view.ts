@@ -20,6 +20,7 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
 import { getTemplateByType } from '@/activities/catalog';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type PrintableWorksheetHeaderView = ReturnType<
@@ -68,7 +69,11 @@ type PrintableWorksheetControlView = {
   answerKeyDescription: string;
   answerKeyLabel: string;
   answerKeyValue: boolean;
-  backToResultsLabel: string;
+  backToResultsAction: {
+    assignmentId: string;
+    label: string;
+    to: typeof Routes.DashboardAssignmentResults;
+  };
   printButtonLabel: string;
 };
 
@@ -213,9 +218,11 @@ export function buildPrintableWorksheetHeaderOverviewItems(
 
 export function buildPrintableWorksheetPageViewModel({
   answerKey,
+  assignmentId,
   worksheet,
 }: {
   answerKey: boolean;
+  assignmentId: string;
   worksheet: PrintableAssignmentWorksheet;
 }): PrintableWorksheetPageViewModel {
   const answerKeyItemViews = worksheet.answerKey?.map(
@@ -232,7 +239,10 @@ export function buildPrintableWorksheetPageViewModel({
     answerKeyItemViews: answerKeyItemViews ?? [],
     assignmentFieldViews:
       buildPrintableWorksheetAssignmentFieldViews(headerView),
-    controlView: buildPrintableWorksheetControlView({ answerKey }),
+    controlView: buildPrintableWorksheetControlView({
+      answerKey,
+      assignmentId,
+    }),
     emptyState: buildPrintableWorksheetEmptyState(),
     headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
@@ -242,11 +252,13 @@ export function buildPrintableWorksheetPageViewModel({
 
 export function buildPrintableWorksheetRouteState({
   answerKey,
+  assignmentId,
   isError,
   isLoading,
   worksheet,
 }: {
   answerKey: boolean;
+  assignmentId: string;
   isError: boolean;
   isLoading: boolean;
   worksheet?: PrintableAssignmentWorksheet | null;
@@ -268,6 +280,7 @@ export function buildPrintableWorksheetRouteState({
   return {
     pageView: buildPrintableWorksheetPageViewModel({
       answerKey,
+      assignmentId,
       worksheet,
     }),
     status: 'ready',
@@ -288,14 +301,20 @@ export function buildPrintableWorksheetErrorView(): PrintableWorksheetLoadStateV
 
 export function buildPrintableWorksheetControlView({
   answerKey,
+  assignmentId,
 }: {
   answerKey: boolean;
+  assignmentId: string;
 }): PrintableWorksheetControlView {
   return {
     answerKeyDescription: printableWorksheetPageCopy.answerKeyDescription,
     answerKeyLabel: printableWorksheetPageCopy.answerKeyLabel,
     answerKeyValue: answerKey,
-    backToResultsLabel: printableWorksheetPageCopy.backToResultsLabel,
+    backToResultsAction: {
+      assignmentId,
+      label: printableWorksheetPageCopy.backToResultsLabel,
+      to: Routes.DashboardAssignmentResults,
+    },
     printButtonLabel: printableWorksheetPageCopy.printButtonLabel,
   };
 }

@@ -46,6 +46,7 @@ function PrintableAssignmentWorksheetPage() {
   });
   const routeState = buildPrintableWorksheetRouteState({
     answerKey,
+    assignmentId,
     isError,
     isLoading,
     worksheet: data,
@@ -101,7 +102,6 @@ function PrintableAssignmentWorksheetPage() {
         className="mx-auto grid max-w-5xl gap-4 rounded-lg border bg-background p-4 shadow-sm sm:p-6 print:shadow-none"
       >
         <PrintableWorksheetToolbar
-          assignmentId={assignmentId}
           controlView={controlView}
           onAnswerKeyChange={updateAnswerKey}
           onPrint={() => window.print()}
