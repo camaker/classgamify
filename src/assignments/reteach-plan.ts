@@ -45,11 +45,22 @@ export type AssignmentReteachPlanStudentView = {
   text: string;
 };
 
+export type AssignmentReteachPlan = {
+  followUpHeading: string;
+  itemViews: AssignmentReteachPlanItemView[];
+  reviewHeading: string;
+  reviewItems: AssignmentItemAnalysis[];
+  reviewStudents: AssignmentStudentSummary[];
+  studentViews: AssignmentReteachPlanStudentView[];
+  text: string;
+  title: string;
+};
+
 export function buildAssignmentReteachPlan({
   assignmentTitle,
   items,
   students,
-}: AssignmentReteachPlanInput) {
+}: AssignmentReteachPlanInput): AssignmentReteachPlan {
   const reviewItems = getAssignmentReviewPriorityItems(items, {
     limit: ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems,
   });
@@ -62,17 +73,29 @@ export function buildAssignmentReteachPlan({
   const itemViews = buildAssignmentReteachPlanItemViews(reviewItems);
   const studentViews = buildAssignmentReteachPlanStudentViews(reviewStudents);
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
+  const title = m.assignment_reteach_plan_title({ title: copyTitle });
+  const reviewHeading = m.assignment_reteach_plan_review_first();
+  const followUpHeading = m.assignment_reteach_plan_follow_up();
   const lines = [
-    m.assignment_reteach_plan_title({ title: copyTitle }),
+    title,
     '',
-    m.assignment_reteach_plan_review_first(),
+    reviewHeading,
     ...formatReviewItems(itemViews),
     '',
-    m.assignment_reteach_plan_follow_up(),
+    followUpHeading,
     ...formatReviewStudents(studentViews),
   ];
 
-  return joinAssignmentResultCopyLines(lines);
+  return {
+    followUpHeading,
+    itemViews,
+    reviewHeading,
+    reviewItems,
+    reviewStudents,
+    studentViews,
+    text: joinAssignmentResultCopyLines(lines),
+    title,
+  };
 }
 
 export function buildAssignmentReteachPlanItemViews(

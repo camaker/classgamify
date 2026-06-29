@@ -1690,6 +1690,11 @@ assert.match(
 );
 assert.match(
   assignmentReteachPlanSource,
+  /export type AssignmentReteachPlan[\s\S]*reviewItems: AssignmentItemAnalysis\[\][\s\S]*reviewStudents: AssignmentStudentSummary\[\][\s\S]*text: string/,
+  'Reteach plan should expose a structured teacher-review object alongside the copied text.'
+);
+assert.match(
+  assignmentReteachPlanSource,
   /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_reteach_plan_title\(\{ title: copyTitle \}\)/,
   'Reteach plan copied titles should use the shared result-copy title normalizer.'
 );
@@ -33259,23 +33264,58 @@ assert.deepEqual(
   }).studentLabel,
   'Ava Chen'
 );
-assert.match(reteachPlan, /ClassGamify reteach plan: Capital Review, Week 1/);
+assert.deepEqual(
+  {
+    followUpHeading: reteachPlan.followUpHeading,
+    itemViewCount: reteachPlan.itemViews.length,
+    reviewHeading: reteachPlan.reviewHeading,
+    reviewItemIds: reteachPlan.reviewItems.map((item) => item.itemId),
+    reviewStudentKeys: reteachPlan.reviewStudents.map(
+      (student) => student.studentKey
+    ),
+    studentViewKeys: reteachPlan.studentViews.map(
+      (studentView) => studentView.studentKey
+    ),
+    title: reteachPlan.title,
+  },
+  {
+    followUpHeading: 'Student follow-up:',
+    itemViewCount: 2,
+    reviewHeading: 'Review first:',
+    reviewItemIds: ['pair-1', 'q-1'],
+    reviewStudentKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+    ],
+    studentViewKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+    ],
+    title: 'ClassGamify reteach plan: Capital Review, Week 1',
+  }
+);
+assert.match(
+  reteachPlan.text,
+  /ClassGamify reteach plan: Capital Review, Week 1/
+);
 assert.match(
   buildAssignmentReteachPlan({
     assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
     items: [],
     students: [],
-  }),
+  }).text,
   /^ClassGamify reteach plan: Capital Review, Week 1\n/
 );
-assert.match(reteachPlan, /Review first:/);
-assert.match(reteachPlan, /Student follow-up:/);
+assert.match(reteachPlan.text, /Review first:/);
+assert.match(reteachPlan.text, /Student follow-up:/);
 assert.match(
-  reteachPlan,
+  reteachPlan.text,
   /Match "Hot" with its pair\. \(50% correct, 1\/2; 1 unanswered\)/
 );
 assert.match(
-  reteachPlan,
+  reteachPlan.text,
   /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
 );
 const expandedReteachPlan = buildAssignmentReteachPlan({
@@ -33322,11 +33362,27 @@ const expandedReteachPlan = buildAssignmentReteachPlan({
   ],
 });
 assert.equal(
-  (expandedReteachPlan.match(/^- \d+\. /gm) ?? []).length,
+  expandedReteachPlan.reviewItems.length,
   ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems
 );
 assert.equal(
-  (expandedReteachPlan.match(/^- .*latest accuracy/gm) ?? []).length,
+  expandedReteachPlan.reviewStudents.length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents
+);
+assert.equal(
+  expandedReteachPlan.itemViews.length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems
+);
+assert.equal(
+  expandedReteachPlan.studentViews.length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents
+);
+assert.equal(
+  (expandedReteachPlan.text.match(/^- \d+\. /gm) ?? []).length,
+  ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems
+);
+assert.equal(
+  (expandedReteachPlan.text.match(/^- .*latest accuracy/gm) ?? []).length,
   ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewStudents
 );
 
@@ -33526,7 +33582,7 @@ assert.equal(
       },
     },
   }),
-  reteachPlan
+  reteachPlan.text
 );
 assert.equal(
   buildAssignmentResultCopyText({

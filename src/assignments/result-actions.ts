@@ -264,7 +264,7 @@ export function buildAssignmentResultCopyText({
       assignmentTitle,
       items,
       students,
-    });
+    }).text;
   }
 
   if (action === 'copy-item-review') {
