@@ -453,21 +453,36 @@ function getAssignmentListStatusFilterView(status: AssignmentStatusFilter) {
 
 export function getAssignmentListEmptyState({
   hasFilters,
+  status = 'all',
 }: {
   hasFilters: boolean;
+  status?: AssignmentStatusFilter;
 }) {
-  return hasFilters
-    ? assignmentListEmptyStateCopy.filtered
-    : assignmentListEmptyStateCopy.emptyLibrary;
+  if (!hasFilters) return assignmentListEmptyStateCopy.emptyLibrary;
+
+  if (status !== 'all') {
+    const statusView = getAssignmentListStatusFilterView(status);
+
+    return {
+      ...assignmentListEmptyStateCopy.filtered,
+      description: m.assignment_list_empty_status_filtered_description({
+        status: statusView.label,
+      }),
+    };
+  }
+
+  return assignmentListEmptyStateCopy.filtered;
 }
 
 export function buildAssignmentListEmptyStateView({
   hasFilters,
+  status = 'all',
 }: {
   hasFilters: boolean;
+  status?: AssignmentStatusFilter;
 }): AssignmentListEmptyStateView {
   return {
-    ...getAssignmentListEmptyState({ hasFilters }),
+    ...getAssignmentListEmptyState({ hasFilters, status }),
     showStarterAssignments: !hasFilters,
   };
 }
@@ -494,6 +509,7 @@ export function buildAssignmentListPageViewModel<
   });
   const emptyState = buildAssignmentListEmptyStateView({
     hasFilters: resolvedSearch.hasFilters,
+    status: resolvedSearch.statusFilter,
   });
   const publishedPanelAssignment = resolvePublishedAssignmentPanelAssignment({
     assignment: data?.publishedAssignment,

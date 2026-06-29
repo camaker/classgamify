@@ -21571,6 +21571,14 @@ assert.deepEqual(getAssignmentListEmptyState({ hasFilters: true }), {
     'Try another assignment title, share id, activity name, or status.',
   title: 'No matching assignments.',
 });
+assert.deepEqual(
+  getAssignmentListEmptyState({ hasFilters: true, status: 'expired' }),
+  {
+    description:
+      'No assignments match the Expired status filter yet. Clear filters or switch status to review other classroom links.',
+    title: 'No matching assignments.',
+  }
+);
 assert.deepEqual(getAssignmentListEmptyState({ hasFilters: false }), {
   description:
     'Open the activity library and publish a saved activity to create a student share link.',
@@ -21582,6 +21590,18 @@ assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: true }), {
   showStarterAssignments: false,
   title: 'No matching assignments.',
 });
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildAssignmentListEmptyStateView({
+      hasFilters: true,
+      status: 'draft',
+    }).description,
+    '当前没有匹配“草稿”状态筛选的作业。可以清除筛选，或切换状态查看其他课堂链接。'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(buildAssignmentListEmptyStateView({ hasFilters: false }), {
   description:
     'Open the activity library and publish a saved activity to create a student share link.',
@@ -21878,7 +21898,7 @@ assert.deepEqual(
     assignmentIds: ['persisted-assignment-1'],
     emptyState: {
       description:
-        'Try another assignment title, share id, activity name, or status.',
+        'No assignments match the Open status filter yet. Clear filters or switch status to review other classroom links.',
       showStarterAssignments: false,
       title: 'No matching assignments.',
     },

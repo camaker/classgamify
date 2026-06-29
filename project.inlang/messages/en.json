@@ -786,6 +786,7 @@
   "assignment_list_empty_filtered_title": "No matching assignments.",
   "assignment_list_empty_library_description": "Open the activity library and publish a saved activity to create a student share link.",
   "assignment_list_empty_library_title": "No published assignments yet.",
+  "assignment_list_empty_status_filtered_description": "No assignments match the {status} status filter yet. Clear filters or switch status to review other classroom links.",
   "assignment_list_filter_summary_loading": "Loading assignments...",
   "assignment_list_filter_summary_matches_many": "{count} matches",
   "assignment_list_filter_summary_matches_one": "{count} match",

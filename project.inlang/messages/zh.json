@@ -786,6 +786,7 @@
   "assignment_list_empty_filtered_title": "没有匹配的作业。",
   "assignment_list_empty_library_description": "打开活动库，发布一份已保存活动，即可创建学生分享链接。",
   "assignment_list_empty_library_title": "还没有发布作业。",
+  "assignment_list_empty_status_filtered_description": "当前没有匹配“{status}”状态筛选的作业。可以清除筛选，或切换状态查看其他课堂链接。",
   "assignment_list_filter_summary_loading": "正在加载作业...",
   "assignment_list_filter_summary_matches_many": "{count} 个匹配结果",
   "assignment_list_filter_summary_matches_one": "{count} 个匹配结果",
