@@ -4,6 +4,9 @@ import {
   activityLibraryCreatedPanelCopy,
   activityLibraryPageCopy,
   buildCreatedActivityPanelContext,
+  type CreatedActivityPanelActivity,
+  type CreatedActivityPanelContext,
+  type CreatedActivityPanelEditAction,
 } from '@/activities/library-view';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
@@ -20,12 +23,9 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
 type CreatedActivityPanelProps = {
-  context: ReturnType<typeof buildCreatedActivityPanelContext> | undefined;
+  context: CreatedActivityPanelContext | undefined;
   onDismiss: () => void;
 };
-type CreatedActivityPanelContext = ReturnType<
-  typeof buildCreatedActivityPanelContext
->;
 
 export function CreatedActivityPanel({
   context,
@@ -95,7 +95,7 @@ function CreatedActivityPanelActions({
   onDismiss,
   onPublish,
 }: {
-  activity: CreatedActivityPanelContext['activity'];
+  activity: CreatedActivityPanelActivity;
   context: CreatedActivityPanelContext;
   onDismiss: () => void;
   onPublish: () => void;
@@ -132,7 +132,7 @@ function CreatedActivityPublishActionButton({
 function CreatedActivityEditActionLink({
   action,
 }: {
-  action: NonNullable<CreatedActivityPanelContext['editAction']>;
+  action: CreatedActivityPanelEditAction;
 }) {
   return (
     <Link

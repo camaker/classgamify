@@ -18102,6 +18102,21 @@ assert.match(
   'Created activity panel component should render saved-activity state from the activity-domain panel context.'
 );
 assert.match(
+  activityLibraryViewSource,
+  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*export type CreatedActivityPanelActivity[\s\S]*export type CreatedActivityPanelEditAction/,
+  'Activity library domain should expose explicit created-activity panel contracts.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /CreatedActivityPanelContext[\s\S]*CreatedActivityPanelActivity[\s\S]*CreatedActivityPanelEditAction/,
+  'Created activity panel component should import explicit created-panel contracts.'
+);
+assert.doesNotMatch(
+  createdActivityPanelComponentSource,
+  /ReturnType<typeof buildCreatedActivityPanelContext>/,
+  'Created activity panel should not infer props from the created-panel context builder.'
+);
+assert.match(
   createdActivityPanelComponentSource,
   /buildAssignmentListRouteSearch/,
   'Created activity panel should route newly published assignments through the assignment-domain route search helper.'
