@@ -2851,8 +2851,13 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView/,
+  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /ActivityEditorAiDraftPanelView\['sourceCapabilityViews'\]\[number\]/,
+  'Activity editor AI draft source capability card contract should not derive from the aggregate panel view index.'
 );
 assert.match(
   activityEditorFormSource,

@@ -186,7 +186,7 @@ export type ActivityEditorAiDraftPanelView = {
 };
 
 export type ActivityEditorAiDraftSourceCapabilityCardView =
-  ActivityEditorAiDraftPanelView['sourceCapabilityViews'][number];
+  ActivityEditorAiDraftSourceCapabilityView;
 
 type ActivityEditorDraftGenerationGate =
   | {
