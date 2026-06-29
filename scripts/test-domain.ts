@@ -361,6 +361,9 @@ import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
   assertSubmittedAnswersMatchRuntimeItems,
+  getAttemptAnswerRuntimeItemEntries,
+  getAttemptAnswerRuntimeItemIds,
+  normalizeAttemptAnswerItemId,
   normalizeSubmittedAttemptAnswers,
 } from '@/assignments/attempt-answers';
 import {
@@ -7083,8 +7086,33 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export function normalizeStudentAnswersForRuntimeItems[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)[\s\S]*normalizeSubmissionAnswer\(getSubmissionEntryAnswer\(entry, answers\)\)/,
+  /getAttemptAnswerRuntimeItemEntries[\s\S]*getAttemptAnswerRuntimeItemIds[\s\S]*normalizeAttemptAnswerItemId[\s\S]*export function normalizeStudentAnswersForRuntimeItems[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)[\s\S]*normalizeSubmissionAnswer\(getSubmissionEntryAnswer\(entry, answers\)\)/,
   'Student submission domain should expose runtime-scoped answer-map normalization for runner state, progress, and submission payloads.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /type StudentSubmissionRuntimeItem = AttemptAnswerRuntimeItem/,
+  'Student submission runtime items should reuse the attempt-answer runtime item contract.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /function getUniqueSubmissionRuntimeItemEntries[\s\S]*return getAttemptAnswerRuntimeItemEntries\(\{ runtimeItems \}\)/,
+  'Student submission should derive browser progress and payload runtime entries from attempt-answer helpers.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /function getUniqueSubmissionRuntimeItemIds[\s\S]*return getAttemptAnswerRuntimeItemIds\(\{ runtimeItems \}\)/,
+  'Student submission session keys should derive runtime ids from attempt-answer helpers.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /function normalizeSubmissionItemId[\s\S]*return normalizeAttemptAnswerItemId\(value\)/,
+  'Student answer changes should normalize item ids through the attempt-answer helper.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /new Map<string, SubmissionRuntimeItemEntry>|entriesById\.set|normalizeRuntimeDisplayText\(item\.id\)/,
+  'Student submission should not keep local runtime item id grouping rules.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -9930,6 +9958,30 @@ assert.deepEqual(
     'item-2': '',
   }
 );
+assert.deepEqual(
+  getAttemptAnswerRuntimeItemEntries({
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  [
+    { itemId: 'item-1', originalIds: [' item-１ ', 'item-1'] },
+    { itemId: 'item-2', originalIds: ['item-2', 'item-２'] },
+  ]
+);
+assert.deepEqual(
+  getAttemptAnswerRuntimeItemIds({
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  ['item-1', 'item-2']
+);
+assert.deepEqual(
+  getAttemptAnswerRuntimeItemIds({
+    includeEmpty: true,
+    runtimeItems: dirtySubmissionRuntimeItems,
+  }),
+  ['item-1', '', 'item-2']
+);
+assert.equal(normalizeAttemptAnswerItemId(' Ｉｔｅｍ－１ '), 'Item-1');
+assert.equal(normalizeAttemptAnswerItemId('\u00A0　\t'), '');
 const changedAnswers = buildStudentAnswerChange({
   answer: 'banana',
   answers,
@@ -19044,13 +19096,33 @@ assert.match(
 );
 assert.match(
   attemptAnswersSource,
-  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*normalizeAttemptAnswerItemId\(item\.id\)[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
-  'Attempt answer validation should compare runtime and submitted item ids through the same normalization.'
+  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*getAttemptAnswerRuntimeItemIds\(\{[\s\S]*includeEmpty: true,[\s\S]*runtimeItems,[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
+  'Attempt answer validation should compare shared normalized runtime ids with normalized submitted item ids.'
 );
 assert.match(
   attemptAnswersSource,
   /function normalizeAttemptAnswerItemId[\s\S]*normalizeRuntimeDisplayText\(value\)/,
   'Attempt answer item-id normalization should reuse the shared runtime display helper.'
+);
+assert.match(
+  attemptAnswersSource,
+  /export type SubmittedAttemptAnswer[\s\S]*export type AttemptAnswerRuntimeItem[\s\S]*export type AttemptAnswerRuntimeItemEntry/,
+  'Attempt answer helpers should expose explicit submitted-answer and runtime-item contracts.'
+);
+assert.match(
+  attemptAnswersSource,
+  /export function getAttemptAnswerRuntimeItemEntries[\s\S]*includeEmpty = false[\s\S]*normalizeAttemptAnswerItemId\(item\.id\)[\s\S]*originalIds/,
+  'Attempt answer helpers should own normalized runtime item entry grouping.'
+);
+assert.match(
+  attemptAnswersSource,
+  /export function getAttemptAnswerRuntimeItemIds[\s\S]*getAttemptAnswerRuntimeItemEntries/,
+  'Attempt answer helpers should expose normalized runtime item ids for browser submission and session keys.'
+);
+assert.match(
+  attemptAnswersSource,
+  /function assertRuntimeItemIdsAreUnique[\s\S]*getAttemptAnswerRuntimeItemEntries\(\{[\s\S]*includeEmpty: true,[\s\S]*runtimeItems,[\s\S]*entry\.originalIds\.length > 1/,
+  'Attempt answer runtime item uniqueness should use the shared normalized runtime entry helper.'
 );
 assert.match(
   assignmentsApiSource,

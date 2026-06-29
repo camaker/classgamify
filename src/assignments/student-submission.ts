@@ -9,6 +9,13 @@ import {
   type AssignmentAttemptUsage,
 } from '@/assignments/attempt-limits';
 import {
+  getAttemptAnswerRuntimeItemEntries,
+  getAttemptAnswerRuntimeItemIds,
+  normalizeAttemptAnswerItemId,
+  type AttemptAnswerRuntimeItem,
+  type AttemptAnswerRuntimeItemEntry,
+} from '@/assignments/attempt-answers';
+import {
   getAnonymousBrowserLabel,
   normalizeAnonymousToken,
   normalizeStudentName,
@@ -23,9 +30,7 @@ import { m } from '@/locale/paraglide/messages';
 
 export type StudentAnswerMap = Record<string, string>;
 
-type StudentSubmissionRuntimeItem = {
-  id: string;
-};
+type StudentSubmissionRuntimeItem = AttemptAnswerRuntimeItem;
 
 export type StudentSubmissionAnswer = {
   answer: string;
@@ -566,41 +571,18 @@ export function getAttemptCompletionSummary({
   };
 }
 
-type SubmissionRuntimeItemEntry = {
-  itemId: string;
-  originalIds: string[];
-};
+type SubmissionRuntimeItemEntry = AttemptAnswerRuntimeItemEntry;
 
 function getUniqueSubmissionRuntimeItemEntries(
   runtimeItems: StudentSubmissionRuntimeItem[]
 ) {
-  const entriesById = new Map<string, SubmissionRuntimeItemEntry>();
-
-  for (const item of runtimeItems) {
-    const itemId = normalizeSubmissionItemId(item.id);
-    if (!itemId) continue;
-
-    const entry = entriesById.get(itemId);
-    if (entry) {
-      entry.originalIds.push(item.id);
-      continue;
-    }
-
-    entriesById.set(itemId, {
-      itemId,
-      originalIds: [item.id],
-    });
-  }
-
-  return [...entriesById.values()];
+  return getAttemptAnswerRuntimeItemEntries({ runtimeItems });
 }
 
 function getUniqueSubmissionRuntimeItemIds(
   runtimeItems: StudentSubmissionRuntimeItem[]
 ) {
-  return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map(
-    (entry) => entry.itemId
-  );
+  return getAttemptAnswerRuntimeItemIds({ runtimeItems });
 }
 
 export function buildStudentAttemptAnswerStateByItemId({
@@ -647,7 +629,7 @@ export function normalizeStudentAnswersForRuntimeItems({
 }
 
 function normalizeSubmissionItemId(value: string | undefined) {
-  return normalizeRuntimeDisplayText(value);
+  return normalizeAttemptAnswerItemId(value);
 }
 
 function normalizeSubmissionAnswer(value: string | undefined) {
