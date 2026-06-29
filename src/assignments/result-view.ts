@@ -1,5 +1,6 @@
 import type {
   AssignmentAttemptReviewAnswer,
+  AssignmentAttemptReviewAnswerStatus,
   AssignmentAttemptReview,
   AssignmentResultsAnalysis,
   AssignmentItemAnalysis,
@@ -1202,7 +1203,7 @@ function getAssignmentAttemptStudentLabel({
 }
 
 export function getAssignmentAnswerReviewStatus(
-  answer: Parameters<typeof buildAssignmentResultAnswerStatusView>[0]
+  answer: AssignmentAttemptReviewAnswerStatus
 ) {
   return buildAssignmentResultAnswerStatusView(answer);
 }

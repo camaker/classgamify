@@ -57,8 +57,10 @@ const assignmentTimeLimitSecondsSchema = z
   .max(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.max)
   .optional();
 
+export type AssignmentSettingsInput = Partial<AssignmentSettings> | null;
+
 export function resolveAssignmentSettings(
-  settings?: Partial<AssignmentSettings> | null
+  settings?: AssignmentSettingsInput
 ): AssignmentSettings {
   const source: Partial<AssignmentSettings> =
     settings && typeof settings === 'object' ? settings : {};
@@ -89,7 +91,7 @@ export function resolveAssignmentSettings(
 export function withResolvedAssignmentSettings<
   TItem extends {
     assignment: {
-      settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+      settingsJson: AssignmentSettingsInput;
     };
   },
 >(item: TItem) {

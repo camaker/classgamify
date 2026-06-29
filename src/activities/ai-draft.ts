@@ -304,6 +304,11 @@ const aiGroupSchema = z.object({
     .max(ACTIVITY_AI_DRAFT_FIELD_LIMITS.groupLabel.max),
 });
 
+export type AiActivityDraftQuestion = z.output<typeof aiQuestionSchema>;
+export type AiActivityDraftPair = z.output<typeof aiPairSchema>;
+export type AiActivityDraftGroup = z.output<typeof aiGroupSchema>;
+export type AiActivityDraftGroupList = AiActivityDraftGroup[];
+
 const aiDraftSchema = z.object({
   description: z
     .string()
@@ -420,8 +425,10 @@ const aiDraftCompletionSchema = z.object({
     .optional(),
 });
 
-type AiActivityDraftCompletion = z.output<typeof aiDraftCompletionSchema>;
-type NormalizedAiActivityDraft = z.output<typeof aiDraftSchema>;
+export type AiActivityDraftCompletion = z.output<
+  typeof aiDraftCompletionSchema
+>;
+export type NormalizedAiActivityDraft = z.output<typeof aiDraftSchema>;
 
 export async function generateActivityDraftFromAi(
   input: GenerateActivityDraftInput
@@ -639,9 +646,7 @@ export function createActivityInputFromAiDraft({
   return createActivityInputSchema.parse(activity);
 }
 
-function toEditorQuestionInput(
-  question: NormalizedAiActivityDraft['questions'][number]
-) {
+function toEditorQuestionInput(question: AiActivityDraftQuestion) {
   const answer = normalizeQuestionOptionDisplayText(question.answer);
 
   return {
@@ -816,12 +821,12 @@ function completeAiDraftGroups({
   input,
   primary,
 }: {
-  fallback: NormalizedAiActivityDraft['groups'];
+  fallback: AiActivityDraftGroupList;
   input: NormalizedGenerateActivityDraftInput;
-  primary: AiActivityDraftCompletion['groups'];
+  primary: AiActivityDraftGroupList | undefined;
 }) {
-  const groups: NormalizedAiActivityDraft['groups'] = [];
-  const addGroup = (group: NormalizedAiActivityDraft['groups'][number]) => {
+  const groups: AiActivityDraftGroupList = [];
+  const addGroup = (group: AiActivityDraftGroup) => {
     const groupKey = normalizeAiDraftCompletionKey(group.label);
     const existingGroup = groups.find(
       (item) => normalizeAiDraftCompletionKey(item.label) === groupKey
@@ -882,7 +887,7 @@ function completeAiDraftGroups({
   };
 }
 
-function countAiDraftGroupItems(groups: NormalizedAiActivityDraft['groups']) {
+function countAiDraftGroupItems(groups: AiActivityDraftGroupList) {
   return groups.reduce((total, group) => total + group.items.length, 0);
 }
 
@@ -931,7 +936,7 @@ function usesPairRuntimeItems(templateType: ActivityTemplateType) {
 }
 
 function limitAiDraftGroupsToItemCount(
-  groups: AiActivityDraft['groups'],
+  groups: AiActivityDraftGroupList,
   itemCount: number
 ) {
   const selectedGroups = groups.slice(0, Math.min(groups.length, itemCount));

@@ -1,6 +1,9 @@
 import type { AttemptResult } from '@/activities/types';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  resolveAssignmentSettings,
+  type AssignmentSettingsInput,
+} from '@/assignments/validation';
 
 export type AssignmentAttemptStatsSource = {
   resultJson: AttemptResult | null;
@@ -30,7 +33,7 @@ export type AssignmentAttemptStatsView = {
 
 export function withAssignmentAttemptStatsSettings<
   TItem extends {
-    settingsJson: Parameters<typeof resolveAssignmentSettings>[0];
+    settingsJson: AssignmentSettingsInput;
   },
 >(item: TItem): TItem & { timeLimitSeconds?: number | null } {
   const settings = resolveAssignmentSettings(item.settingsJson);

@@ -1884,6 +1884,16 @@ assert.match(
   'Assignment attempt stats should expose a shared display view helper.'
 );
 assert.match(
+  assignmentAttemptStatsSource,
+  /AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;[\s\S]*resolveAssignmentSettings\(item\.settingsJson\)/,
+  'Assignment attempt stats should consume the explicit assignment settings input contract.'
+);
+assert.doesNotMatch(
+  assignmentAttemptStatsSource,
+  /Parameters<typeof resolveAssignmentSettings>/,
+  'Assignment attempt stats should not infer settings input from the resolver parameters.'
+);
+assert.match(
   assignmentDisplaySource,
   /formatAssignmentDisplayTitle[\s\S]*formatAssignmentDisplayText\(value\)[\s\S]*formatAssignmentDisplayText[\s\S]*normalizeRuntimeDisplayText\(value\)/,
   'Assignment display helpers should normalize teacher/student visible assignment text through the shared runtime display helper.'
@@ -1892,6 +1902,16 @@ assert.match(
   assignmentResultViewSource,
   /assignmentTitle: formatAssignmentDisplayTitle\(assignment\.title\)/,
   'Assignment result views should normalize visible assignment titles through the shared assignment display helper.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /AssignmentAttemptReviewAnswerStatus[\s\S]*getAssignmentAnswerReviewStatus\(\s*answer: AssignmentAttemptReviewAnswerStatus/,
+  'Assignment result views should consume the explicit answer status contract.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /Parameters<typeof buildAssignmentResultAnswerStatusView>/,
+  'Assignment result views should not infer answer status from result-answer builder parameters.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -11142,6 +11162,20 @@ assert.deepEqual(
     meta: 'kept',
   }
 );
+const assignmentValidationContractSource = readFileSync(
+  'src/assignments/validation.ts',
+  'utf8'
+);
+assert.match(
+  assignmentValidationContractSource,
+  /export type AssignmentSettingsInput = Partial<AssignmentSettings> \| null;[\s\S]*resolveAssignmentSettings\(\s*settings\?: AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;/,
+  'Assignment settings resolution should expose an explicit settings input contract.'
+);
+assert.doesNotMatch(
+  assignmentValidationContractSource,
+  /Parameters<typeof resolveAssignmentSettings>/,
+  'Assignment validation should not infer persisted settings input from resolver parameters.'
+);
 assert.deepEqual(ASSIGNMENT_MAX_ATTEMPTS_RANGE, { max: 10, min: 1 });
 assert.deepEqual(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE, {
   max: 10_800,
@@ -19815,6 +19849,21 @@ assert.match(
   activityAiDraftSource,
   /const aiQuestionSchema[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.answer\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.answer\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.option\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.option\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.options\.max[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.prompt\.min[\s\S]*ACTIVITY_AI_DRAFT_FIELD_LIMITS\.prompt\.max/,
   'AI draft question schema should reuse named AI draft field limits.'
+);
+assert.match(
+  activityAiDraftSource,
+  /export type AiActivityDraftQuestion = z\.output<typeof aiQuestionSchema>;[\s\S]*export type AiActivityDraftPair = z\.output<typeof aiPairSchema>;[\s\S]*export type AiActivityDraftGroup = z\.output<typeof aiGroupSchema>;[\s\S]*export type AiActivityDraftGroupList = AiActivityDraftGroup\[\];[\s\S]*export type AiActivityDraftCompletion = z\.output<[\s\S]*export type NormalizedAiActivityDraft = z\.output<typeof aiDraftSchema>;/,
+  'AI draft domain should expose explicit normalized draft child contracts.'
+);
+assert.match(
+  activityAiDraftSource,
+  /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*fallback: AiActivityDraftGroupList;[\s\S]*primary: AiActivityDraftGroupList \| undefined;[\s\S]*const groups: AiActivityDraftGroupList = \[\];[\s\S]*addGroup = \(group: AiActivityDraftGroup\)[\s\S]*countAiDraftGroupItems\(groups: AiActivityDraftGroupList\)[\s\S]*limitAiDraftGroupsToItemCount\(\s*groups: AiActivityDraftGroupList,/,
+  'AI draft editor shaping, group completion, counting, and template limiting should compose explicit child contracts.'
+);
+assert.doesNotMatch(
+  activityAiDraftSource,
+  /NormalizedAiActivityDraft\['(?:questions|groups)'\]|AiActivityDraftCompletion\['groups'\]|AiActivityDraft\['groups'\]/,
+  'AI draft domain should not infer child contracts from normalized or completion aggregate indexes.'
 );
 assert.match(
   activityAiDraftSource,
