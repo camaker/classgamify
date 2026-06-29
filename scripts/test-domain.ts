@@ -17240,6 +17240,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /buildActivityLibraryRouteSearch/,
+  'Activity library card component should route derivative drafts through the activity-domain route search helper.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /buildActivityVisibilityActionExecutionPlan/,
   'Activity library card component should build archive and restore mutation input through the activity-domain execution plan.'
 );
@@ -17267,6 +17272,16 @@ assert.match(
   activityLibraryCardComponentSource,
   /executionPlan\.type === 'blocked'[\s\S]*toast\.error\(executionPlan\.message\)[\s\S]*mutateAsync\(executionPlan\.input\)[\s\S]*toast\.success\(executionPlan\.successMessage\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)/,
   'Activity library card component should execute prepared blocked and mutation plans.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /remixActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{ created: result\.id \}\)/,
+  'Activity library card remix action should return to the library created panel with the new draft id.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /duplicateActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{ created: result\.id \}\)/,
+  'Activity library card duplicate action should return to the library created panel with the new draft id.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,

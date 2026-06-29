@@ -1,4 +1,5 @@
 import type { ActivityLibraryStatus } from '@/activities/library-filters';
+import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
   activityLibraryCardCopy,
   buildActivityLibraryCardDisplayView,
@@ -83,8 +84,8 @@ export function ActivityLibraryCard({
       const result = await remixMutation.mutateAsync(executionPlan.input);
       toast.success(executionPlan.successMessage);
       navigate({
-        to: '/dashboard/activities/$activityId',
-        params: { activityId: result.id },
+        to: Routes.DashboardActivities,
+        search: buildActivityLibraryRouteSearch({ created: result.id }),
       });
     } catch {
       toast.error(executionPlan.failureMessage);
@@ -105,8 +106,8 @@ export function ActivityLibraryCard({
       const result = await duplicateMutation.mutateAsync(executionPlan.input);
       toast.success(executionPlan.successMessage);
       navigate({
-        to: '/dashboard/activities/$activityId',
-        params: { activityId: result.id },
+        to: Routes.DashboardActivities,
+        search: buildActivityLibraryRouteSearch({ created: result.id }),
       });
     } catch {
       toast.error(executionPlan.failureMessage);
