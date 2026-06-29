@@ -1,7 +1,6 @@
-import {
-  type ItemPerformanceSort,
-  assignmentResultSearchCopy,
-  type buildAssignmentResultsPageViewModel,
+import type {
+  ItemPerformanceSort,
+  buildAssignmentResultsPageViewModel,
 } from '@/assignments/result-view';
 import {
   NativeSelect,
@@ -24,7 +23,7 @@ export function AssignmentResultsItemPerformanceSortControl({
   return (
     <div className="flex flex-col gap-2 sm:w-52">
       <label htmlFor="item-performance-sort" className="font-medium text-sm">
-        {assignmentResultSearchCopy.sortItemsLabel}
+        {view.label}
       </label>
       <NativeSelect
         id="item-performance-sort"

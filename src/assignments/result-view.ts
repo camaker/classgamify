@@ -228,8 +228,12 @@ type AssignmentResultControlOption<TValue extends string> = {
 };
 
 type AssignmentResultStudentSearchControlView = {
+  clearLabel: string;
+  label: string;
   hasSearchValue: boolean;
+  placeholder: string;
   sort: StudentSummarySort;
+  sortLabel: string;
   selectedSortOption: AssignmentResultControlOption<StudentSummarySort>;
   sortOptions: Array<AssignmentResultControlOption<StudentSummarySort>>;
   summary: string;
@@ -237,6 +241,7 @@ type AssignmentResultStudentSearchControlView = {
 };
 
 type AssignmentResultItemPerformanceSortControlView = {
+  label: string;
   options: Array<AssignmentResultControlOption<ItemPerformanceSort>>;
   selectedSortOption: AssignmentResultControlOption<ItemPerformanceSort>;
   sort: ItemPerformanceSort;
@@ -244,6 +249,7 @@ type AssignmentResultItemPerformanceSortControlView = {
 
 type AssignmentResultAttemptReviewFilterControlView = {
   filter: AttemptReviewFilter;
+  label: string;
   options: Array<AssignmentResultControlOption<AttemptReviewFilter>>;
   selectedFilterOption: AssignmentResultControlOption<AttemptReviewFilter>;
 };
@@ -1785,18 +1791,24 @@ export function buildAssignmentResultControlViews({
   return {
     attemptReviewFilter: {
       filter: viewState.attemptReviewFilter,
+      label: assignmentResultSearchCopy.reviewViewLabel,
       options: attemptReviewFilterOptions,
       selectedFilterOption: selectedAttemptReviewFilterOption,
     },
     itemPerformanceSort: {
+      label: assignmentResultSearchCopy.sortItemsLabel,
       options: itemPerformanceSortOptions,
       selectedSortOption: selectedItemPerformanceSortOption,
       sort: viewState.itemPerformanceSort,
     },
     studentSearch: {
+      clearLabel: assignmentResultSearchCopy.clearStudentSearchLabel,
       hasSearchValue: Boolean(viewState.studentSearch),
+      label: assignmentResultSearchCopy.findStudentLabel,
+      placeholder: assignmentResultSearchCopy.placeholder,
       selectedSortOption: selectedStudentSortOption,
       sort: viewState.studentSort,
+      sortLabel: assignmentResultSearchCopy.sortStudentsLabel,
       sortOptions: studentSummarySortOptions,
       summary: resultSearchSummary,
       value: viewState.studentSearch,

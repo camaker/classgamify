@@ -3850,8 +3850,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultViewSource,
-  /controlViews:\s*AssignmentResultControlViews/,
-  'Assignment result page view-model should expose route-ready control views.'
+  /controlViews:\s*AssignmentResultControlViews[\s\S]*label: assignmentResultSearchCopy\.reviewViewLabel[\s\S]*label: assignmentResultSearchCopy\.sortItemsLabel[\s\S]*clearLabel: assignmentResultSearchCopy\.clearStudentSearchLabel[\s\S]*label: assignmentResultSearchCopy\.findStudentLabel[\s\S]*placeholder: assignmentResultSearchCopy\.placeholder[\s\S]*sortLabel: assignmentResultSearchCopy\.sortStudentsLabel/,
+  'Assignment result page view-model should expose route-ready control views with prepared localized control copy.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -4184,18 +4184,23 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsStudentSearchSource,
-  /view\.sortOptions[\s\S]*view\.summary/,
-  'Assignment result student search component should render prepared sort options and result summary.'
+  /view\.label[\s\S]*view\.placeholder[\s\S]*view\.clearLabel[\s\S]*view\.sortLabel[\s\S]*view\.sortOptions[\s\S]*view\.summary/,
+  'Assignment result student search component should render prepared labels, placeholder, sort options, and result summary.'
 );
 assert.match(
   assignmentResultsStudentSearchSource,
   /view\.selectedSortOption\.description/,
   'Assignment result student search component should render the selected sort description from the domain control view.'
 );
+assert.doesNotMatch(
+  `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
+  /assignmentResultSearchCopy/,
+  'Assignment result control components should receive prepared localized copy instead of importing assignment result search copy.'
+);
 assert.match(
   assignmentResultsAttemptReviewFilterSource,
-  /view\.options/,
-  'Assignment result attempt review filter component should render prepared filter options.'
+  /view\.label[\s\S]*view\.options/,
+  'Assignment result attempt review filter component should render prepared label and filter options.'
 );
 assert.match(
   assignmentResultsAttemptReviewFilterSource,
@@ -4204,8 +4209,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceSortSource,
-  /view\.options/,
-  'Assignment result item performance sort component should render prepared sort options.'
+  /view\.label[\s\S]*view\.options/,
+  'Assignment result item performance sort component should render prepared label and sort options.'
 );
 assert.match(
   assignmentResultsItemPerformanceSortSource,
@@ -30324,20 +30329,27 @@ assert.deepEqual(
     controlViews: {
       attemptReviewFilter: [
         scoredResultsPageView.controlViews.attemptReviewFilter.filter,
+        scoredResultsPageView.controlViews.attemptReviewFilter.label,
         scoredResultsPageView.controlViews.attemptReviewFilter.options.map(
           (option) => option.value
         ),
       ],
       itemPerformanceSort: [
         scoredResultsPageView.controlViews.itemPerformanceSort.sort,
+        scoredResultsPageView.controlViews.itemPerformanceSort.label,
         scoredResultsPageView.controlViews.itemPerformanceSort.options.map(
           (option) => option.value
         ),
       ],
       studentSearch: {
+        clearLabel: scoredResultsPageView.controlViews.studentSearch.clearLabel,
         hasSearchValue:
           scoredResultsPageView.controlViews.studentSearch.hasSearchValue,
+        label: scoredResultsPageView.controlViews.studentSearch.label,
+        placeholder:
+          scoredResultsPageView.controlViews.studentSearch.placeholder,
         sort: scoredResultsPageView.controlViews.studentSearch.sort,
+        sortLabel: scoredResultsPageView.controlViews.studentSearch.sortLabel,
         sortOptions:
           scoredResultsPageView.controlViews.studentSearch.sortOptions.map(
             (option) => option.value
@@ -30562,14 +30574,23 @@ assert.deepEqual(
       title: 'Copy scope',
     },
     controlViews: {
-      attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
+      attemptReviewFilter: [
+        'needs-review',
+        'Review view',
+        ['all', 'needs-review'],
+      ],
       itemPerformanceSort: [
         'accuracy',
+        'Sort items',
         ['original', 'accuracy', 'submitted', 'type'],
       ],
       studentSearch: {
+        clearLabel: 'Clear student search',
         hasSearchValue: true,
+        label: 'Find student',
+        placeholder: 'Search by student name',
         sort: 'name',
+        sortLabel: 'Sort students',
         sortOptions: ['needs-review', 'best', 'name', 'attempts'],
         summary: '1 student · 1 attempt',
         value: 'Alice',
@@ -31531,18 +31552,24 @@ assert.deepEqual(
   {
     attemptReviewFilter: {
       filter: 'needs-review',
+      label: 'Review view',
       options: attemptReviewFilterOptions,
       selectedFilterOption: attemptReviewFilterOptions[1],
     },
     itemPerformanceSort: {
+      label: 'Sort items',
       options: itemPerformanceSortOptions,
       selectedSortOption: itemPerformanceSortOptions[1],
       sort: 'accuracy',
     },
     studentSearch: {
+      clearLabel: 'Clear student search',
       hasSearchValue: true,
+      label: 'Find student',
+      placeholder: 'Search by student name',
       selectedSortOption: studentSummarySortOptions[1],
       sort: 'best',
+      sortLabel: 'Sort students',
       sortOptions: studentSummarySortOptions,
       summary: '1 student · 2 attempts',
       value: 'alice',

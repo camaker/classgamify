@@ -1,7 +1,6 @@
-import {
-  type AttemptReviewFilter,
-  assignmentResultSearchCopy,
-  type buildAssignmentResultsPageViewModel,
+import type {
+  AttemptReviewFilter,
+  buildAssignmentResultsPageViewModel,
 } from '@/assignments/result-view';
 import {
   NativeSelect,
@@ -24,7 +23,7 @@ export function AssignmentResultsAttemptReviewFilterControl({
   return (
     <div className="flex flex-col gap-2 sm:w-48">
       <label htmlFor="attempt-review-filter" className="font-medium text-sm">
-        {assignmentResultSearchCopy.reviewViewLabel}
+        {view.label}
       </label>
       <NativeSelect
         id="attempt-review-filter"
