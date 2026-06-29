@@ -4,6 +4,7 @@ import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
   buildAttemptTimerState,
+  type AttemptTimerState,
 } from '@/assignments/attempt-duration';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import {
@@ -22,7 +23,13 @@ import {
   getStudentRunnerCopy,
   normalizeStudentAnswersForRuntimeItems,
   applyStudentAnswerChanges,
+  type AnonymousAttemptCopy,
+  type AttemptCompletionCopy,
+  type AttemptCompletionSummary,
+  type StudentAttemptControlState,
+  type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
+  type StudentAttemptTimerBadge,
   type StudentAnswerMap,
   type StudentAnswerChange,
   type StudentRunnerMissingReason,
@@ -69,7 +76,7 @@ type StudentRunnerPageState =
 type StudentRunnerAttemptState = {
   activeShareId: string;
   canSubmit: boolean;
-  completionSummary: ReturnType<typeof getAttemptCompletionSummary>;
+  completionSummary: AttemptCompletionSummary;
   currentAttemptSessionKey?: string;
   itemCount: number;
   runtimeItems: PublicRuntimeItem[];
@@ -99,7 +106,7 @@ export type StudentRunnerIdentityView =
       placeholder: string;
     }
   | {
-      copy: ReturnType<typeof buildAnonymousAttemptCopy>;
+      copy: AnonymousAttemptCopy;
       mode: 'anonymous';
     };
 
@@ -113,7 +120,7 @@ export type StudentRunnerControlView = {
   submitConfirmationMessage?: string;
   submitDisabled: boolean;
   timeExpiredMessage: string;
-  timerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
+  timerBadge: StudentAttemptTimerBadge;
   unansweredLabel?: string;
 };
 
@@ -156,15 +163,15 @@ export type StudentRunnerSeoView = {
 export type StudentRunnerPageViewModel = {
   activeShareId: string;
   activity: ActivitySeed | undefined;
-  anonymousAttemptCopy: ReturnType<typeof buildAnonymousAttemptCopy>;
+  anonymousAttemptCopy: AnonymousAttemptCopy;
   assignment: AssignmentSeed | undefined;
-  attemptControlState: ReturnType<typeof buildStudentAttemptControlState>;
-  attemptResultDisplay?: ReturnType<typeof buildStudentAttemptResultDisplay>;
+  attemptControlState: StudentAttemptControlState;
+  attemptResultDisplay?: StudentAttemptResultDisplay;
   attemptState: StudentRunnerAttemptState;
-  attemptTimer: ReturnType<typeof buildAttemptTimerState>;
-  attemptTimerBadge: ReturnType<typeof buildStudentAttemptTimerBadge>;
+  attemptTimer: AttemptTimerState;
+  attemptTimerBadge: StudentAttemptTimerBadge;
   attemptUsageLabel?: string;
-  completionCopy: ReturnType<typeof buildAttemptCompletionCopy>;
+  completionCopy: AttemptCompletionCopy;
   controlView: StudentRunnerControlView;
   currentAttemptSessionKey?: string;
   headerView?: StudentRunnerHeaderView;
@@ -743,7 +750,7 @@ function buildStudentRunnerResultPanelView({
   showStartAnotherAttempt,
 }: {
   assignment?: AssignmentSeed;
-  attemptResultDisplay?: ReturnType<typeof buildStudentAttemptResultDisplay>;
+  attemptResultDisplay?: StudentAttemptResultDisplay;
   attemptUsageLabel?: string;
   showStartAnotherAttempt: boolean;
 }): StudentRunnerResultPanelView {

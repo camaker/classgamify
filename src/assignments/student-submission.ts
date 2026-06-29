@@ -101,7 +101,7 @@ type StudentAttemptSubmissionPlan =
       type: 'submit';
     };
 
-type AttemptCompletionCopy = {
+export type AttemptCompletionCopy = {
   confirmIncompleteSubmit: string;
   progressLabel: string;
   submitButtonLabel: string;
@@ -140,7 +140,7 @@ type StudentRunnerCopy = {
   timeEndedLabel: string;
 };
 
-type AnonymousAttemptCopy = {
+export type AnonymousAttemptCopy = {
   description: string;
   title: string;
 };
@@ -151,7 +151,7 @@ type StudentAttemptAnonymousTokenResolver = {
   currentAnonymousToken?: string;
 };
 
-type StudentAttemptResultDisplay = {
+export type StudentAttemptResultDisplay = {
   accuracyLabel: string;
   durationLabel: string;
   scoreLabel: string;
@@ -162,7 +162,7 @@ export type StudentAttemptResultNextStepsView = {
   title: string;
 };
 
-type StudentAttemptControlState = {
+export type StudentAttemptControlState = {
   readOnlyMessage?: string;
   runtimeItemsDisabled: boolean;
   showTimeExpiredMessage: boolean;
@@ -171,7 +171,7 @@ type StudentAttemptControlState = {
   unansweredLabel?: string;
 };
 
-type StudentAttemptTimerBadge = {
+export type StudentAttemptTimerBadge = {
   label: string;
   show: boolean;
 };

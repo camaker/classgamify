@@ -6813,6 +6813,10 @@ const studentRunnerSubmissionSource = readFileSync(
   'src/assignments/student-submission.ts',
   'utf8'
 );
+const attemptDurationSource = readFileSync(
+  'src/assignments/attempt-duration.ts',
+  'utf8'
+);
 const studentRuntimeItemListDomainSource = readFileSync(
   'src/assignments/student-runtime-item-list.ts',
   'utf8'
@@ -7199,6 +7203,26 @@ assert.match(
   studentRunnerStateSource,
   /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*export type StudentRunnerIdentityView =[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /export type AnonymousAttemptCopy = \{[\s\S]*export type StudentAttemptResultDisplay = \{[\s\S]*export type StudentAttemptControlState = \{[\s\S]*export type StudentAttemptTimerBadge = \{/,
+  'Student submission domain should expose explicit anonymous copy, control, result, and timer badge contracts.'
+);
+assert.match(
+  attemptDurationSource,
+  /export type AttemptTimerState = \{[\s\S]*durationSeconds: number;[\s\S]*timeExpired: boolean;/,
+  'Assignment attempt duration domain should expose an explicit timer state contract.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /completionSummary: AttemptCompletionSummary;[\s\S]*copy: AnonymousAttemptCopy;[\s\S]*timerBadge: StudentAttemptTimerBadge;[\s\S]*anonymousAttemptCopy: AnonymousAttemptCopy;[\s\S]*attemptControlState: StudentAttemptControlState;[\s\S]*attemptResultDisplay\?: StudentAttemptResultDisplay;[\s\S]*attemptTimer: AttemptTimerState;[\s\S]*completionCopy: AttemptCompletionCopy;/,
+  'Student runner page view-model should compose explicit submission and timer contracts.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /ReturnType<typeof (?:getAttemptCompletionSummary|buildAnonymousAttemptCopy|buildStudentAttemptControlState|buildStudentAttemptResultDisplay|buildAttemptTimerState|buildStudentAttemptTimerBadge|buildAttemptCompletionCopy)>/,
+  'Student runner state should not infer submission or timer contracts from builder return types.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -7633,10 +7657,6 @@ assert.doesNotMatch(
   playRouteSource,
   /setAnswers\(\{\}\)[\s\S]*setConfirmIncompleteSubmit\(false\)[\s\S]*setStudentName\(''\)[\s\S]*setAttemptClock\(undefined\)[\s\S]*setSubmittedAttemptCount\(0\)[\s\S]*setAnonymousToken\(undefined\)/,
   'Student play route should not hand-write the attempt reset bundle.'
-);
-const attemptDurationSource = readFileSync(
-  'src/assignments/attempt-duration.ts',
-  'utf8'
 );
 assert.match(
   attemptDurationSource,

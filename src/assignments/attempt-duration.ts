@@ -49,6 +49,13 @@ export function buildAttemptStartedAt({
   );
 }
 
+export type AttemptTimerState = {
+  durationSeconds: number;
+  elapsedSeconds: number;
+  remainingSeconds: number | undefined;
+  timeExpired: boolean;
+};
+
 export function buildAttemptTimerState({
   now,
   startedAt,
@@ -57,7 +64,7 @@ export function buildAttemptTimerState({
   now: number;
   startedAt: number;
   timeLimitSeconds?: number;
-}) {
+}): AttemptTimerState {
   const elapsedMilliseconds = now - startedAt;
   const durationSeconds = Number.isFinite(elapsedMilliseconds)
     ? Math.max(
