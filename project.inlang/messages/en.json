@@ -1,11 +1,4 @@
 {
-  "about_avatar": "Avatar",
-  "about_bio": "Game-based classroom activity platform",
-  "about_contact_us": "Contact us",
-  "about_description": "Learn how ClassGamify helps teachers create reusable activities, publish assignment links, and review student results.",
-  "about_follow_us": "Follow us on X",
-  "about_introduction": "ClassGamify is a teacher-facing workspace for turning lesson material into game-based activities and worksheet-style assignments. Create reusable questions, pairs, groups, vocabulary, and notes once, publish student links, then review attempts and results.",
-  "about_title": "About ClassGamify",
   "activity_ai_error_empty_response": "Activity draft generation returned an empty response.",
   "activity_ai_error_parse_response": "Could not parse JSON from the activity draft response.",
   "activity_ai_fallback_character_count_many": "{count} characters",

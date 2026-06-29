@@ -1207,6 +1207,7 @@ const activeLocaleMessageText = [
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
 assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
+assert.doesNotMatch(activeLocaleMessageText, /"about_/);
 assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
 assert.doesNotMatch(activeLocaleMessageText, /"legacy_/);
 const storageTypesSource = readFileSync('src/storage/types.ts', 'utf8');

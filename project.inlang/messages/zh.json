@@ -1,11 +1,4 @@
 {
-  "about_avatar": "头像",
-  "about_bio": "游戏化课堂活动平台",
-  "about_contact_us": "联系我们",
-  "about_description": "了解 ClassGamify 如何帮助老师创建可复用活动、发布作业链接并查看学生结果。",
-  "about_follow_us": "关注我们",
-  "about_introduction": "ClassGamify 是面向老师的课堂活动工作台，可以把教学材料变成游戏化活动和练习纸式作业。老师只需创建一次题目、配对、分组、词汇和备注，发布学生链接，然后查看作答与结果。",
-  "about_title": "关于 ClassGamify",
   "activity_ai_error_empty_response": "活动草稿生成返回了空响应。",
   "activity_ai_error_parse_response": "无法从活动草稿响应中解析 JSON。",
   "activity_ai_fallback_character_count_many": "{count} 个字符",
