@@ -54,12 +54,12 @@ export function PublishedAssignmentPanel({
           <span className="font-medium">{panelContext.sharePathLabel}</span>
           <span className="ml-2 font-mono">{panelContext.sharePath}</span>
         </div>
-        {panelContext.nextSteps.length ? (
+        {panelContext.nextStepViews.length ? (
           <ul className="mt-3 grid gap-1 text-muted-foreground text-xs leading-5">
-            {panelContext.nextSteps.map((step) => (
-              <li className="flex gap-2" key={step}>
+            {panelContext.nextStepViews.map((step) => (
+              <li className="flex gap-2" key={step.id}>
                 <span aria-hidden="true">-</span>
-                <span>{step}</span>
+                <span>{step.label}</span>
               </li>
             ))}
           </ul>

@@ -58,6 +58,16 @@ export type PublishedAssignmentPanelActionView = {
 
 export type PublishedAssignmentPanelStatus = 'found' | 'loading' | 'missing';
 
+export type PublishedAssignmentPanelNextStepId =
+  | 'copy-link'
+  | 'preview-link'
+  | 'review-results';
+
+export type PublishedAssignmentPanelNextStepView = {
+  id: PublishedAssignmentPanelNextStepId;
+  label: string;
+};
+
 export function findPublishedAssignmentInList<
   TItem extends PublishedAssignmentListItem,
 >({ items, shareSlug }: { items: TItem[]; shareSlug?: string }) {
@@ -100,6 +110,7 @@ export type PublishedAssignmentPanelContext = {
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
   nextSteps: string[];
+  nextStepViews: PublishedAssignmentPanelNextStepView[];
   sharePath: string;
   sharePathLabel: string;
   showMissingHint: boolean;
@@ -118,6 +129,12 @@ export function buildPublishedAssignmentPanelContext({
 }): PublishedAssignmentPanelContext {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
   const sharePath = buildAssignmentSharePath(normalizedShareSlug);
+  const foundNextStepViews =
+    buildPublishedAssignmentPanelNextStepViews('found');
+  const loadingNextStepViews =
+    buildPublishedAssignmentPanelNextStepViews('loading');
+  const missingNextStepViews =
+    buildPublishedAssignmentPanelNextStepViews('missing');
 
   if (assignment) {
     return {
@@ -129,7 +146,8 @@ export function buildPublishedAssignmentPanelContext({
       }),
       assignment,
       body: m.assignment_published_panel_found_body(),
-      nextSteps: buildPublishedAssignmentPanelNextSteps('found'),
+      nextSteps: getPublishedAssignmentPanelNextStepLabels(foundNextStepViews),
+      nextStepViews: foundNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
       showMissingHint: false,
@@ -147,7 +165,9 @@ export function buildPublishedAssignmentPanelContext({
         status: 'loading',
       }),
       body: m.assignment_published_panel_loading_body(),
-      nextSteps: buildPublishedAssignmentPanelNextSteps('loading'),
+      nextSteps:
+        getPublishedAssignmentPanelNextStepLabels(loadingNextStepViews),
+      nextStepViews: loadingNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
       showMissingHint: false,
@@ -164,7 +184,8 @@ export function buildPublishedAssignmentPanelContext({
       status: 'missing',
     }),
     body: m.assignment_published_panel_missing_body(),
-    nextSteps: buildPublishedAssignmentPanelNextSteps('missing'),
+    nextSteps: getPublishedAssignmentPanelNextStepLabels(missingNextStepViews),
+    nextStepViews: missingNextStepViews,
     sharePath,
     sharePathLabel: m.assignment_published_panel_share_path_label(),
     showMissingHint: true,
@@ -215,17 +236,35 @@ function buildPublishedAssignmentPanelActionView({
   };
 }
 
-function buildPublishedAssignmentPanelNextSteps(
+export function buildPublishedAssignmentPanelNextStepViews(
   status: PublishedAssignmentPanelStatus
 ) {
   const baseSteps = [
-    m.assignment_published_panel_next_step_copy_link(),
-    m.assignment_published_panel_next_step_preview_link(),
-  ];
+    {
+      id: 'copy-link',
+      label: m.assignment_published_panel_next_step_copy_link(),
+    },
+    {
+      id: 'preview-link',
+      label: m.assignment_published_panel_next_step_preview_link(),
+    },
+  ] satisfies PublishedAssignmentPanelNextStepView[];
 
   return status === 'found'
-    ? [...baseSteps, m.assignment_published_panel_next_step_review_results()]
+    ? [
+        ...baseSteps,
+        {
+          id: 'review-results',
+          label: m.assignment_published_panel_next_step_review_results(),
+        },
+      ]
     : baseSteps;
+}
+
+function getPublishedAssignmentPanelNextStepLabels(
+  nextSteps: PublishedAssignmentPanelNextStepView[]
+) {
+  return nextSteps.map((step) => step.label);
 }
 
 function normalizeOptionalAssignmentShareSlug(shareSlug?: string) {
