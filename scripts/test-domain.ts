@@ -29021,13 +29021,13 @@ assert.deepEqual(
       ['export-csv', false],
     ],
     actionDataAssignmentId: 'assignment-results-page',
-    attemptReviewCardViews: [],
+    attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
     contentState: {
-      hasAttemptReviewCards: false,
+      hasAttemptReviewCards: true,
       hasAttemptRows: true,
       hasStudentSummaryRows: true,
     },
@@ -29078,7 +29078,7 @@ assert.deepEqual(
       showStudentSearch: true,
       showStudentSummary: true,
     },
-    studentSummaryRowViews: [['Alice', '0']],
+    studentSummaryRowViews: [['Alice', '1']],
     title: 'Week 1 results',
     viewState: {
       attemptReviewFilter: 'needs-review',
@@ -29329,7 +29329,11 @@ assert.equal(
 );
 assert.equal(
   isAssignmentAttemptAnswerNeedsReview({ correct: false, submitted: false }),
-  false
+  true
+);
+assert.equal(
+  isAssignmentAttemptAnswerNeedsReview({ correct: true, submitted: false }),
+  true
 );
 assert.equal(
   isAssignmentAttemptAnswerNeedsReview({ correct: true, submitted: true }),
@@ -29383,6 +29387,7 @@ assert.equal(resultAnalysis.attempts[2]?.studentLabel, 'Anonymous student 1');
 assert.equal(resultAnalysis.students[0]?.studentKey, 'anonymous:1');
 assert.equal(resultAnalysis.students[0]?.studentLabel, 'Anonymous student 1');
 assert.equal(resultAnalysis.students[0]?.latestAccuracy, 0);
+assert.equal(resultAnalysis.students[0]?.needsReviewCount, 2);
 assert.equal(resultAnalysis.students[1]?.studentKey, 'name:alice');
 assert.equal(resultAnalysis.students[1]?.attempts, 2);
 assert.equal(resultAnalysis.students[1]?.averageAccuracy, 75);
@@ -29682,7 +29687,7 @@ assert.deepEqual(normalizedResultDisplayAnalysis.students, [
     bestAccuracy: 100,
     lastCompletedAt: new Date('2026-01-07T10:00:00.000Z'),
     latestAccuracy: 0,
-    needsReviewCount: 0,
+    needsReviewCount: 1,
     studentKey: 'name:messy student',
     studentLabel: 'Messy Student',
   },
@@ -29770,7 +29775,7 @@ assert.deepEqual(
     [
       'needs-review',
       'Needs review',
-      'Prioritize students with missed items or lower follow-up scores.',
+      'Prioritize students with missed or unanswered items, then lower follow-up scores.',
     ],
     [
       'best',
@@ -29841,7 +29846,7 @@ assert.deepEqual(
     [
       'needs-review',
       'Needs review only',
-      'Focus the answer review on submissions with at least one missed item.',
+      'Focus the answer review on submissions with at least one missed or unanswered item.',
     ],
   ]
 );
@@ -31553,7 +31558,7 @@ assert.equal(
 );
 assert.equal(
   countAssignmentAttemptReviewNeededAnswers(attemptReviewSortSamples[0]!),
-  1
+  2
 );
 assert.deepEqual(
   sortAssignmentAttemptReviewsByCompletedAt(attemptReviewSortSamples).map(
@@ -32273,7 +32278,7 @@ assert.deepEqual(
     filter: 'needs-review',
     search: '',
   }).map((attempt) => attempt.id),
-  []
+  ['only-unanswered']
 );
 assert.deepEqual(
   filterAttemptReviews({
@@ -32767,21 +32772,21 @@ assert.deepEqual(
   {
     accuracyLabel: 'Latest 0% · best 0%',
     latestAccuracyLabel: '0%',
-    needsReviewLabel: '1 review',
-    reviewItemCountLabel: '1 item to review',
+    needsReviewLabel: '2 reviews',
+    reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
-    text: '- 1. Anonymous student 1: 0% latest, 1 item to review',
+    text: '- 1. Anonymous student 1: 0% latest, 2 items to review',
   }
 );
 assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
   latestAccuracyLabel: '0%',
-  needsReviewLabel: '1 review',
-  reviewItemCountLabel: '1 item to review',
+  needsReviewLabel: '2 reviews',
+  reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
-  text: '- 1. Anonymous student 1: 0% latest, 1 item to review',
+  text: '- 1. Anonymous student 1: 0% latest, 2 items to review',
 });
 assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
 assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
@@ -32815,7 +32820,7 @@ assert.equal(
     index: Number.NaN,
     student: classroomBrief.followUpStudents[0]!,
   }).text,
-  '- 1. Anonymous student 1: 0% latest, 1 item to review'
+  '- 1. Anonymous student 1: 0% latest, 2 items to review'
 );
 assert.deepEqual(
   buildAssignmentClassroomBriefFollowUpStudentView({
@@ -32858,7 +32863,7 @@ assert.match(
 );
 assert.match(
   classroomBrief.text,
-  /- 1\. Anonymous student 1: 0% latest, 1 item to review/
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review/
 );
 const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,

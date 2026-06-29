@@ -269,7 +269,7 @@ function getDateTimestamp(value: Date | null) {
 export function isAssignmentAttemptAnswerNeedsReview(
   answer: AssignmentAttemptReviewAnswerStatus
 ) {
-  return answer.submitted && !answer.correct;
+  return !answer.submitted || !answer.correct;
 }
 
 function getResultAcceptedAnswers(answer: string) {
