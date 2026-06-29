@@ -1,12 +1,8 @@
-import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runner-state';
+import type { StudentRunnerLoadingView } from '@/assignments/student-runner-state';
 import Container from '@/components/layout/container';
 
-type StudentRunnerPageViewModel = ReturnType<
-  typeof buildStudentRunnerPageViewModel
->;
-
 type StudentRunnerLoadingPanelProps = {
-  view: StudentRunnerPageViewModel['loadingView'];
+  view: StudentRunnerLoadingView;
 };
 
 export function StudentRunnerLoadingPanel({

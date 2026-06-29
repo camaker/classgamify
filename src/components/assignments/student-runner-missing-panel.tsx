@@ -1,4 +1,4 @@
-import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runner-state';
+import type { StudentRunnerMissingPageView } from '@/assignments/student-runner-state';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -7,12 +7,8 @@ import { cn } from '@/lib/utils';
 import { IconDeviceGamepad2 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
-type StudentRunnerPageViewModel = ReturnType<
-  typeof buildStudentRunnerPageViewModel
->;
-
 type StudentRunnerMissingPanelProps = {
-  view: NonNullable<StudentRunnerPageViewModel['missingView']>;
+  view: StudentRunnerMissingPageView;
 };
 
 export function StudentRunnerMissingPanel({

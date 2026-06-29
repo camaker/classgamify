@@ -7053,6 +7053,36 @@ assert.match(
   'Student play route should delegate submit button and submit hints to the student runner submit controls component.'
 );
 assert.match(
+  studentRunnerViewSource,
+  /export type StudentRunnerInstructionView = \{[\s\S]*export type StudentRunnerTeacherAction =[\s\S]*export type StudentRunnerHeaderView = \{[\s\S]*teacherAction: StudentRunnerTeacherAction;[\s\S]*export type StudentRunnerPrepareView = \{/,
+  'Student runner header domain should export focused header, instruction, prepare, and teacher action view contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*export type StudentRunnerIdentityView =[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  'Student runner state domain should export focused route-facing page and sub-view contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /headerView\?: StudentRunnerHeaderView;[\s\S]*identityView\?: StudentRunnerIdentityView;[\s\S]*loadingView: StudentRunnerLoadingView;[\s\S]*missingView\?: StudentRunnerMissingPageView;[\s\S]*previewView\?: StudentRunnerActivityPreviewView;[\s\S]*resultPanelView: StudentRunnerResultPanelView;[\s\S]*runtimeListView: StudentRunnerRuntimeListView;/,
+  'Student runner page view-model should compose explicit focused sub-view contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerRouteState =[\s\S]*headerView: StudentRunnerHeaderView;[\s\S]*identityView: StudentRunnerIdentityView;[\s\S]*previewView: StudentRunnerActivityPreviewView;/,
+  'Student runner route state should expose ready-state views through explicit focused contracts.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /StudentRunnerControlView/,
+  'Student runner submit controls should consume the explicit runner control view contract.'
+);
+assert.doesNotMatch(
+  `${studentRunnerAttemptShellSource}\n${studentRunnerHeaderCardSource}\n${studentRunnerSubmitControlsSource}\n${studentRunnerLoadingPanelSource}\n${studentRunnerMissingPanelSource}`,
+  /buildStudentRunnerPageViewModel|ReturnType<\s*typeof buildStudentRunnerPageViewModel|StudentRunnerPageViewModel\[/,
+  'Student runner page components should import focused view contracts instead of deriving them from the page view-model builder.'
+);
+assert.match(
   studentRunnerSubmitControlsSource,
   /controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.submitConfirmationMessage[\s\S]*controlView\.readOnlyMessage/,
   'Student runner submit controls should render prepared submit disabled state, label, confirmation, and hint copy.'
@@ -7099,6 +7129,11 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerHeaderCardSource,
+  /StudentRunnerHeaderView[\s\S]*StudentRunnerTeacherAction[\s\S]*StudentRunnerPrepareView[\s\S]*StudentRunnerInstructionView/,
+  'Student runner header card should consume explicit assignment-domain header sub-view contracts.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
   /PublicAssignmentRules/,
   'Student runner header card should delegate public rule summary rendering to the public assignment rules component.'
 );
@@ -7131,6 +7166,11 @@ assert.match(
   studentRunnerHeaderCardSource,
   /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.steps\.map/,
   'Student runner header card should render prepared before-start guidance from the header view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /StudentRunnerControlView[\s\S]*StudentRunnerIdentityView[\s\S]*StudentRunnerResultPanelView[\s\S]*StudentAttemptResultNextStepsView/,
+  'Student runner attempt shell should consume explicit runner control, identity, result, and next-step view contracts.'
 );
 assert.match(
   studentRunnerAttemptShellSource,

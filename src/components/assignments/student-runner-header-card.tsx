@@ -1,4 +1,9 @@
-import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runner-state';
+import type {
+  StudentRunnerHeaderView,
+  StudentRunnerInstructionView,
+  StudentRunnerPrepareView,
+  StudentRunnerTeacherAction,
+} from '@/assignments/student-runner-view';
 import { PublicAssignmentRules } from '@/components/assignments/public-assignment-rules';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -6,13 +11,9 @@ import { cn } from '@/lib/utils';
 import { IconClipboardText, IconDeviceGamepad2 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
-type StudentRunnerPageViewModel = ReturnType<
-  typeof buildStudentRunnerPageViewModel
->;
-
 type StudentRunnerHeaderCardProps = {
   badgeLabel: string;
-  view: NonNullable<StudentRunnerPageViewModel['headerView']>;
+  view: StudentRunnerHeaderView;
 };
 
 export function StudentRunnerHeaderCard({
@@ -44,9 +45,7 @@ export function StudentRunnerHeaderCard({
 function StudentRunnerTeacherActionLink({
   action,
 }: {
-  action: NonNullable<
-    StudentRunnerPageViewModel['headerView']
-  >['teacherAction'];
+  action: StudentRunnerTeacherAction;
 }) {
   const className = cn(
     buttonVariants({ variant: 'outline' }),
@@ -75,9 +74,7 @@ function StudentRunnerTeacherActionLink({
 function StudentRunnerPrepareCard({
   prepareView,
 }: {
-  prepareView: NonNullable<
-    StudentRunnerPageViewModel['headerView']
-  >['prepareView'];
+  prepareView: StudentRunnerPrepareView;
 }) {
   return (
     <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
@@ -97,9 +94,7 @@ function StudentRunnerPrepareCard({
 function StudentRunnerInstructionsCard({
   instructions,
 }: {
-  instructions: NonNullable<
-    StudentRunnerPageViewModel['headerView']
-  >['instructions'];
+  instructions: StudentRunnerInstructionView | undefined;
 }) {
   if (!instructions) return null;
 

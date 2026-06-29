@@ -1,21 +1,22 @@
-import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runner-state';
+import type {
+  StudentRunnerControlView,
+  StudentRunnerIdentityView,
+  StudentRunnerResultPanelView,
+} from '@/assignments/student-runner-state';
+import type { StudentAttemptResultNextStepsView } from '@/assignments/student-submission';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { IconCheck, IconPlayerPlay, IconRepeat } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
-type StudentRunnerPageViewModel = ReturnType<
-  typeof buildStudentRunnerPageViewModel
->;
-
 type StudentRunnerAttemptShellProps = {
   children: ReactNode;
-  controlView: StudentRunnerPageViewModel['controlView'];
-  identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
+  controlView: StudentRunnerControlView;
+  identityView: StudentRunnerIdentityView;
   onStartAnotherAttempt: () => void;
   onStudentNameChange: (studentName: string) => void;
-  resultPanelView: StudentRunnerPageViewModel['resultPanelView'];
+  resultPanelView: StudentRunnerResultPanelView;
   studentName: string;
 };
 
@@ -54,7 +55,7 @@ export function StudentRunnerAttemptShell({
 function StudentRunnerAttemptStatusBar({
   controlView,
 }: {
-  controlView: StudentRunnerPageViewModel['controlView'];
+  controlView: StudentRunnerControlView;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -77,7 +78,7 @@ function StudentRunnerAttemptStatusBar({
 function StudentRunnerTimeExpiredNotice({
   controlView,
 }: {
-  controlView: StudentRunnerPageViewModel['controlView'];
+  controlView: StudentRunnerControlView;
 }) {
   if (!controlView.showTimeExpiredMessage) return null;
 
@@ -93,7 +94,7 @@ function StudentRunnerIdentityPanel({
   onStudentNameChange,
   studentName,
 }: {
-  identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
+  identityView: StudentRunnerIdentityView;
   onStudentNameChange: (studentName: string) => void;
   studentName: string;
 }) {
@@ -133,7 +134,7 @@ function StudentRunnerResultPanel({
   view,
 }: {
   onStartAnotherAttempt: () => void;
-  view: StudentRunnerPageViewModel['resultPanelView'];
+  view: StudentRunnerResultPanelView;
 }) {
   if (!view.show) return null;
 
@@ -171,9 +172,7 @@ function StudentRunnerResultPanel({
 function StudentRunnerResultNextSteps({
   view,
 }: {
-  view: NonNullable<
-    StudentRunnerPageViewModel['resultPanelView'] & { show: true }
-  >['nextStepsView'];
+  view: StudentAttemptResultNextStepsView;
 }) {
   return (
     <div className="mt-3 rounded-md border bg-background/80 p-2">

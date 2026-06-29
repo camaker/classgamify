@@ -22,6 +22,7 @@ import {
   getStudentRunnerCopy,
   normalizeStudentAnswersForRuntimeItems,
   applyStudentAnswerChanges,
+  type StudentAttemptResultNextStepsView,
   type StudentAnswerMap,
   type StudentAnswerChange,
   type StudentRunnerMissingReason,
@@ -38,7 +39,10 @@ import {
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { buildStudentRunnerHeaderView } from '@/assignments/student-runner-view';
+import {
+  buildStudentRunnerHeaderView,
+  type StudentRunnerHeaderView,
+} from '@/assignments/student-runner-view';
 
 type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
 
@@ -76,18 +80,18 @@ export type StudentRunnerAttemptResult = PublicAttemptResult & {
   reviewItems: PublicAttemptReviewItem[];
 };
 
-type StudentRunnerLoadingView = {
+export type StudentRunnerLoadingView = {
   message: string;
 };
 
-type StudentRunnerMissingPageView = {
+export type StudentRunnerMissingPageView = {
   badgeLabel: string;
   browseTemplatesLabel: string;
   description: string;
   title: string;
 };
 
-type StudentRunnerIdentityView =
+export type StudentRunnerIdentityView =
   | {
       disabled: boolean;
       label: string;
@@ -99,7 +103,7 @@ type StudentRunnerIdentityView =
       mode: 'anonymous';
     };
 
-type StudentRunnerControlView = {
+export type StudentRunnerControlView = {
   progressLabel: string;
   readOnlyMessage?: string;
   runnerTitle: string;
@@ -113,7 +117,7 @@ type StudentRunnerControlView = {
   unansweredLabel?: string;
 };
 
-type StudentRunnerResultPanelView =
+export type StudentRunnerResultPanelView =
   | {
       show: false;
     }
@@ -121,7 +125,7 @@ type StudentRunnerResultPanelView =
       accuracyLabel: string;
       attemptUsageLabel?: string;
       durationLabel: string;
-      nextStepsView: ReturnType<typeof buildStudentAttemptResultNextStepsView>;
+      nextStepsView: StudentAttemptResultNextStepsView;
       scoreLabel: string;
       show: true;
       showStartAnotherAttempt: boolean;
@@ -129,13 +133,13 @@ type StudentRunnerResultPanelView =
       statusLabel: string;
     };
 
-type StudentRunnerActivityPreviewView = {
+export type StudentRunnerActivityPreviewView = {
   activity: ActivitySeed;
   assignment: AssignmentSeed;
   hideAnswers: boolean;
 };
 
-type StudentRunnerRuntimeListView = {
+export type StudentRunnerRuntimeListView = {
   disabled: boolean;
   items: PublicRuntimeItem[];
   language?: string;
@@ -144,12 +148,12 @@ type StudentRunnerRuntimeListView = {
   templateType: ActivitySeed['templateType'];
 };
 
-type StudentRunnerSeoView = {
+export type StudentRunnerSeoView = {
   description: string;
   titlePrefix: string;
 };
 
-type StudentRunnerPageViewModel = {
+export type StudentRunnerPageViewModel = {
   activeShareId: string;
   activity: ActivitySeed | undefined;
   anonymousAttemptCopy: ReturnType<typeof buildAnonymousAttemptCopy>;
@@ -163,7 +167,7 @@ type StudentRunnerPageViewModel = {
   completionCopy: ReturnType<typeof buildAttemptCompletionCopy>;
   controlView: StudentRunnerControlView;
   currentAttemptSessionKey?: string;
-  headerView?: ReturnType<typeof buildStudentRunnerHeaderView>;
+  headerView?: StudentRunnerHeaderView;
   identityView?: StudentRunnerIdentityView;
   itemCount: number;
   loadingView: StudentRunnerLoadingView;
@@ -178,7 +182,7 @@ type StudentRunnerPageViewModel = {
   timeLimitSeconds?: number;
 };
 
-type StudentRunnerRouteState =
+export type StudentRunnerRouteState =
   | {
       pageView: StudentRunnerPageViewModel;
       status: 'loading';
@@ -195,10 +199,10 @@ type StudentRunnerRouteState =
   | {
       activity: ActivitySeed;
       assignment: AssignmentSeed;
-      headerView: NonNullable<StudentRunnerPageViewModel['headerView']>;
-      identityView: NonNullable<StudentRunnerPageViewModel['identityView']>;
+      headerView: StudentRunnerHeaderView;
+      identityView: StudentRunnerIdentityView;
       pageView: StudentRunnerPageViewModel;
-      previewView: NonNullable<StudentRunnerPageViewModel['previewView']>;
+      previewView: StudentRunnerActivityPreviewView;
       status: 'ready';
     };
 

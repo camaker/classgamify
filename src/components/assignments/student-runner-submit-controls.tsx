@@ -1,13 +1,9 @@
-import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runner-state';
+import type { StudentRunnerControlView } from '@/assignments/student-runner-state';
 import { Button } from '@/components/ui/button';
 import { IconCheck } from '@tabler/icons-react';
 
-type StudentRunnerPageViewModel = ReturnType<
-  typeof buildStudentRunnerPageViewModel
->;
-
 type StudentRunnerSubmitControlsProps = {
-  controlView: StudentRunnerPageViewModel['controlView'];
+  controlView: StudentRunnerControlView;
   onSubmit: () => void;
 };
 

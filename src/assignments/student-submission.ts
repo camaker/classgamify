@@ -157,7 +157,7 @@ type StudentAttemptResultDisplay = {
   scoreLabel: string;
 };
 
-type StudentAttemptResultNextStepsView = {
+export type StudentAttemptResultNextStepsView = {
   steps: string[];
   title: string;
 };

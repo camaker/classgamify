@@ -231,12 +231,12 @@ type PublicAnswerFeedbackDetailLine = {
   text: string;
 };
 
-type StudentRunnerInstructionView = {
+export type StudentRunnerInstructionView = {
   label: string;
   value: string;
 };
 
-type StudentRunnerTeacherAction =
+export type StudentRunnerTeacherAction =
   | {
       label: string;
       to: typeof Routes.Create;
@@ -249,7 +249,7 @@ type StudentRunnerTeacherAction =
       type: 'view-results';
     };
 
-type StudentRunnerHeaderView = {
+export type StudentRunnerHeaderView = {
   description: string;
   instructions?: StudentRunnerInstructionView;
   prepareView: StudentRunnerPrepareView;
@@ -258,7 +258,7 @@ type StudentRunnerHeaderView = {
   title: string;
 };
 
-type StudentRunnerPrepareView = {
+export type StudentRunnerPrepareView = {
   steps: string[];
   title: string;
 };
