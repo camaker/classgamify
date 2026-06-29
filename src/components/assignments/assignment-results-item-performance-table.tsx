@@ -1,4 +1,7 @@
-import type { AssignmentResultItemPerformanceTableView } from '@/assignments/result-view';
+import type {
+  AssignmentResultItemPerformanceRowView,
+  AssignmentResultItemPerformanceTableView,
+} from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
@@ -27,7 +30,7 @@ export function AssignmentResultsItemPerformanceTable({
 function AssignmentResultsItemPerformanceRow({
   rowView,
 }: {
-  rowView: AssignmentResultItemPerformanceTableView['rows'][number];
+  rowView: AssignmentResultItemPerformanceRowView;
 }) {
   return (
     <TableRow>

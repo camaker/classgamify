@@ -1,4 +1,7 @@
-import type { AssignmentResultMetricItem } from '@/assignments/result-view';
+import type {
+  AssignmentResultMetricItem,
+  AssignmentResultMetricKey,
+} from '@/assignments/result-view';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   IconCalendarTime,
@@ -31,7 +34,7 @@ export function AssignmentResultsMetricCard({
 }
 
 const resultMetricIconByKey: Record<
-  AssignmentResultMetricItem['key'],
+  AssignmentResultMetricKey,
   typeof IconUsers
 > = {
   'average-accuracy': IconChartBar,

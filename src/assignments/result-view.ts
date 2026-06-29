@@ -26,6 +26,7 @@ import {
   buildAssignmentResultAcceptedAnswerView,
   buildAssignmentResultAnswerStatusView,
   buildAssignmentResultAttemptAnswerTextView,
+  type AssignmentResultAnswerStatusTone,
 } from '@/assignments/result-answer-view';
 import {
   formatAssignmentSummaryCorrectCount,
@@ -158,7 +159,7 @@ export type AssignmentResultEmptyState = {
   title: string;
 };
 
-type AssignmentResultMetricKey =
+export type AssignmentResultMetricKey =
   | 'average-accuracy'
   | 'average-points'
   | 'average-time'
@@ -216,35 +217,112 @@ type AssignmentResultTableView<TRow> = {
   rows: TRow[];
 };
 
-export type AssignmentResultMetricItem = ReturnType<
-  typeof buildAssignmentResultMetricItems
->[number];
+export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & {
+  value: string;
+};
 
-export type AssignmentResultAttemptRowView = ReturnType<
-  typeof buildAssignmentAttemptRowViews
->[number];
+export type AssignmentResultAttemptRowMetricLabels = {
+  accuracyLabel: string;
+  answeredLabel: string;
+  scoreLabel: string;
+};
+
+export type AssignmentResultAttemptRowView =
+  AssignmentResultAttemptRowMetricLabels & {
+    durationLabel: string;
+    id: string;
+    studentLabel: string;
+    submittedAtLabel: string;
+  };
 
 export type AssignmentResultAttemptTableView =
   AssignmentResultTableView<AssignmentResultAttemptRowView>;
 
-export type AssignmentResultAttemptReviewCardView = ReturnType<
-  typeof buildAssignmentAttemptReviewCardViews
->[number];
+export type AssignmentResultAttemptAnswerReviewDisplayView = {
+  acceptedAnswersLabel: string;
+  acceptedAnswersLineText: string | null;
+  acceptedAnswersText: string | null;
+  expectedAnswerLabel: string;
+  expectedAnswerLineText: string;
+  expectedAnswerText: string;
+  explanationText: string | null;
+  promptLabel: string;
+  statusLabel: string;
+  statusTone: AssignmentResultAnswerStatusTone;
+  studentAnswerLabel: string;
+  studentAnswerLineText: string;
+  studentAnswerText: string;
+};
 
-export type AssignmentResultStudentSummaryRowView = ReturnType<
-  typeof buildAssignmentStudentSummaryRowViews
->[number];
+export type AssignmentResultAttemptAnswerReviewView =
+  AssignmentResultAttemptAnswerReviewDisplayView & {
+    id: string;
+  };
+
+export type AssignmentResultAttemptReviewCardView = {
+  answerViews: AssignmentResultAttemptAnswerReviewView[];
+  badgeLabel: string;
+  id: string;
+  studentLabel: string;
+  submittedAtLabel: string;
+};
+
+export type AssignmentResultStudentSummaryRowDisplayView = {
+  attemptsLabel: string;
+  averageAccuracyLabel: string;
+  bestAccuracyLabel: string;
+  lastSubmittedLabel: string;
+  latestAccuracyLabel: string;
+  needsReviewLabel: string;
+  studentLabel: string;
+};
+
+export type AssignmentResultStudentSummaryRowView =
+  AssignmentResultStudentSummaryRowDisplayView & {
+    id: string;
+  };
 
 export type AssignmentResultStudentSummaryTableView =
   AssignmentResultTableView<AssignmentResultStudentSummaryRowView>;
 
-export type AssignmentResultItemAnalysisCardView = ReturnType<
-  typeof buildAssignmentItemAnalysisCardViews
->[number];
+export type AssignmentResultItemAnalysisCardDisplayView = {
+  acceptedAnswersLabel: string;
+  acceptedAnswersLineText: string | null;
+  acceptedAnswersText: string | null;
+  correctRateLabel: string;
+  correctRateProgressValue: number;
+  correctSummaryLabel: string;
+  expectedAnswerLabel: string;
+  expectedAnswerSummaryText: string;
+  expectedAnswerText: string;
+  explanationText: string | null;
+  kindLabel: string;
+  prompt: string;
+  unansweredLabel: string;
+};
 
-export type AssignmentResultItemPerformanceRowView = ReturnType<
-  typeof buildAssignmentItemPerformanceRowViews
->[number];
+export type AssignmentResultItemAnalysisCardView =
+  AssignmentResultItemAnalysisCardDisplayView & {
+    id: string;
+  };
+
+export type AssignmentResultItemPerformanceRowDisplayView = {
+  acceptedAnswersText: string;
+  correctRateLabel: string;
+  expectedAnswerText: string;
+  explanationText: string;
+  itemNumberLabel: string;
+  kindLabel: string;
+  prompt: string;
+  promptLabel: string;
+  submittedLabel: string;
+  unansweredLabel: string;
+};
+
+export type AssignmentResultItemPerformanceRowView =
+  AssignmentResultItemPerformanceRowDisplayView & {
+    id: string;
+  };
 
 export type AssignmentResultItemPerformanceTableView =
   AssignmentResultTableView<AssignmentResultItemPerformanceRowView>;
@@ -808,7 +886,7 @@ export function buildAssignmentResultMetricItems({
   averageScore: number;
   completions: number;
   expiresAt: Date | string | null | undefined;
-}) {
+}): AssignmentResultMetricItem[] {
   const statsView = buildAssignmentAttemptStatsView({
     averageDurationSeconds,
     averagePoints,
@@ -1030,7 +1108,7 @@ export function buildAssignmentAttemptRowDisplay({
   review: AssignmentAttemptReview | undefined;
   studentLabel?: string;
   timeLimitSeconds?: number | null;
-}) {
+}): AssignmentResultAttemptRowView {
   const durationSeconds = normalizeAttemptDurationSeconds({
     durationSeconds: attempt.resultJson?.durationSeconds,
     timeLimitSeconds: timeLimitSeconds ?? undefined,
@@ -1056,7 +1134,7 @@ export function buildAssignmentAttemptRowMetricLabels(
     AssignmentAttemptRowDisplayInput,
     'maxScore' | 'resultJson' | 'score'
   >
-) {
+): AssignmentResultAttemptRowMetricLabels {
   return {
     accuracyLabel: formatAssignmentResultPercent(
       attempt.resultJson?.accuracy ?? 0
@@ -1080,7 +1158,7 @@ export function buildAssignmentAttemptRowViews<
 }: {
   rows: Array<AssignmentAttemptReviewRow<TAttempt>>;
   timeLimitSeconds?: number | null;
-}) {
+}): AssignmentResultAttemptRowView[] {
   return rows.map(({ attempt, review, studentLabel }) => ({
     id: attempt.id,
     ...buildAssignmentAttemptRowDisplay({
@@ -1094,7 +1172,10 @@ export function buildAssignmentAttemptRowViews<
 
 export function buildAssignmentAttemptTableView<
   TAttempt extends AssignmentAttemptRowDisplayInput,
->(input: Parameters<typeof buildAssignmentAttemptRowViews<TAttempt>>[0]) {
+>(input: {
+  rows: Array<AssignmentAttemptReviewRow<TAttempt>>;
+  timeLimitSeconds?: number | null;
+}): AssignmentResultAttemptTableView {
   return {
     headers: assignmentResultTableHeaders.studentAttempts,
     rows: buildAssignmentAttemptRowViews(input),
@@ -1137,7 +1218,7 @@ export function buildAssignmentAttemptReviewCardView(
     AssignmentAttemptReview,
     'accuracy' | 'answers' | 'completedAt' | 'id' | 'score' | 'studentLabel'
   >
-) {
+): AssignmentResultAttemptReviewCardView {
   return {
     answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
     badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
@@ -1149,7 +1230,7 @@ export function buildAssignmentAttemptReviewCardView(
 
 export function buildAssignmentAttemptReviewCardViews(
   attempts: AssignmentAttemptReview[]
-) {
+): AssignmentResultAttemptReviewCardView[] {
   return attempts.map((attempt) =>
     buildAssignmentAttemptReviewCardView(attempt)
   );
@@ -1157,7 +1238,7 @@ export function buildAssignmentAttemptReviewCardViews(
 
 export function buildAssignmentStudentSummaryRowView(
   student: AssignmentStudentSummary
-) {
+): AssignmentResultStudentSummaryRowDisplayView {
   return {
     attemptsLabel: formatAssignmentResultNumber(student.attempts, { min: 0 }),
     averageAccuracyLabel: formatAssignmentResultPercent(
@@ -1175,7 +1256,7 @@ export function buildAssignmentStudentSummaryRowView(
 
 export function buildAssignmentStudentSummaryRowViews(
   students: AssignmentStudentSummary[]
-) {
+): AssignmentResultStudentSummaryRowView[] {
   return students.map((student) => ({
     id: student.studentKey,
     ...buildAssignmentStudentSummaryRowView(student),
@@ -1184,7 +1265,7 @@ export function buildAssignmentStudentSummaryRowViews(
 
 export function buildAssignmentStudentSummaryTableView(
   students: AssignmentStudentSummary[]
-) {
+): AssignmentResultStudentSummaryTableView {
   return {
     headers: assignmentResultTableHeaders.studentSummary,
     rows: buildAssignmentStudentSummaryRowViews(students),
@@ -1193,7 +1274,7 @@ export function buildAssignmentStudentSummaryTableView(
 
 export function buildAssignmentItemAnalysisCardView(
   item: AssignmentItemAnalysis
-) {
+): AssignmentResultItemAnalysisCardDisplayView {
   const answerView = buildAssignmentResultAcceptedAnswerView(
     item.acceptedAnswers
   );
@@ -1232,7 +1313,7 @@ export function buildAssignmentItemAnalysisCardView(
 
 export function buildAssignmentItemAnalysisCardViews(
   items: AssignmentItemAnalysis[]
-) {
+): AssignmentResultItemAnalysisCardView[] {
   return items.map((item) => ({
     id: item.itemId,
     ...buildAssignmentItemAnalysisCardView(item),
@@ -1245,7 +1326,7 @@ export function buildAssignmentItemPerformanceRowView({
 }: {
   index: number;
   item: AssignmentItemAnalysis;
-}) {
+}): AssignmentResultItemPerformanceRowDisplayView {
   const itemNumberLabel = formatAssignmentResultItemNumberLabel(index);
   const answerView = buildAssignmentResultAcceptedAnswerView(
     item.acceptedAnswers
@@ -1275,7 +1356,7 @@ export function buildAssignmentItemPerformanceRowView({
 
 export function buildAssignmentItemPerformanceRowViews(
   items: AssignmentItemAnalysis[]
-) {
+): AssignmentResultItemPerformanceRowView[] {
   return items.map((item, index) => ({
     id: item.itemId,
     ...buildAssignmentItemPerformanceRowView({ index, item }),
@@ -1284,7 +1365,7 @@ export function buildAssignmentItemPerformanceRowViews(
 
 export function buildAssignmentItemPerformanceTableView(
   items: AssignmentItemAnalysis[]
-) {
+): AssignmentResultItemPerformanceTableView {
   return {
     headers: assignmentResultTableHeaders.itemPerformance,
     rows: buildAssignmentItemPerformanceRowViews(items),
@@ -1297,7 +1378,7 @@ export function buildAssignmentAttemptAnswerReviewView({
 }: {
   answer: AssignmentAttemptReview['answers'][number];
   index: number;
-}) {
+}): AssignmentResultAttemptAnswerReviewDisplayView {
   const answerView = buildAssignmentResultAttemptAnswerTextView(answer);
 
   return {
@@ -1333,7 +1414,7 @@ export function buildAssignmentAttemptAnswerReviewView({
 
 export function buildAssignmentAttemptAnswerReviewViews(
   answers: AssignmentAttemptReview['answers']
-) {
+): AssignmentResultAttemptAnswerReviewView[] {
   return answers.map((answer, index) => ({
     id: answer.itemId,
     ...buildAssignmentAttemptAnswerReviewView({ answer, index }),

@@ -1,4 +1,7 @@
-import type { AssignmentResultAttemptReviewCardView } from '@/assignments/result-view';
+import type {
+  AssignmentResultAttemptAnswerReviewView,
+  AssignmentResultAttemptReviewCardView,
+} from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { IconListDetails } from '@tabler/icons-react';
 
@@ -40,7 +43,7 @@ export function AssignmentResultsAttemptReviewCard({
 function AssignmentResultsAttemptAnswerReview({
   answerView,
 }: {
-  answerView: AssignmentResultAttemptReviewCardView['answerViews'][number];
+  answerView: AssignmentResultAttemptAnswerReviewView;
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3">

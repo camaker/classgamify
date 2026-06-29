@@ -1,4 +1,7 @@
-import type { AssignmentResultStudentSummaryTableView } from '@/assignments/result-view';
+import type {
+  AssignmentResultStudentSummaryRowView,
+  AssignmentResultStudentSummaryTableView,
+} from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
@@ -27,7 +30,7 @@ export function AssignmentResultsStudentSummaryTable({
 function AssignmentResultsStudentSummaryRow({
   rowView,
 }: {
-  rowView: AssignmentResultStudentSummaryTableView['rows'][number];
+  rowView: AssignmentResultStudentSummaryRowView;
 }) {
   return (
     <TableRow>
