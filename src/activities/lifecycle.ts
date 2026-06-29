@@ -14,12 +14,12 @@ export type ActivityLifecycleAction =
   | 'archive'
   | 'restore';
 
-type ActivityLifecycleActionCopy = {
+export type ActivityLifecycleActionCopy = {
   failureMessage: string;
   successMessage: string;
 };
 
-type ActivityDerivativeActionGate =
+export type ActivityDerivativeActionGate =
   | {
       type: 'ready';
     }
@@ -29,7 +29,7 @@ type ActivityDerivativeActionGate =
       type: 'blocked';
     };
 
-type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
+export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
   gate: ActivityDerivativeActionGate;
 };
 

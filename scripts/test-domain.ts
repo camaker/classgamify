@@ -2731,6 +2731,21 @@ const activityLifecycleSource = readFileSync(
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
   activityLifecycleSource,
+  /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
+  'Activity lifecycle domain should expose explicit lifecycle action copy, gate, and view contracts.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLifecycleActionCopy;[\s\S]*duplicate: ActivityLifecycleActionView;[\s\S]*remix: ActivityLifecycleActionView;[\s\S]*restore: ActivityLifecycleActionCopy;/,
+  'Activity library card actions should compose explicit lifecycle action view contracts.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /ReturnType<typeof (?:getActivityLifecycleActionCopy|buildActivityLifecycleActionView)>/,
+  'Activity library card actions should not infer lifecycle action contracts from lifecycle helper return types.'
+);
+assert.match(
+  activityLifecycleSource,
   /export type ActivityEditAccessView = \{[\s\S]*canEdit: boolean;[\s\S]*export function buildActivityEditAccessView\([\s\S]*\): ActivityEditAccessView/,
   'Activity lifecycle domain should expose an explicit activity edit access view contract.'
 );

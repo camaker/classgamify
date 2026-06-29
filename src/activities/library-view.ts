@@ -16,6 +16,8 @@ import {
   canEditActivity,
   canDeriveActivityWork,
   buildActivityLifecycleActionView,
+  type ActivityLifecycleActionCopy,
+  type ActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
   isActivityArchived,
 } from '@/activities/lifecycle';
@@ -213,10 +215,10 @@ type ActivityLibrarySearchPanelView = {
 };
 
 type ActivityLibraryCardActionView = {
-  archive: ReturnType<typeof getActivityLifecycleActionCopy>;
-  duplicate: ReturnType<typeof buildActivityLifecycleActionView>;
-  remix: ReturnType<typeof buildActivityLifecycleActionView>;
-  restore: ReturnType<typeof getActivityLifecycleActionCopy>;
+  archive: ActivityLifecycleActionCopy;
+  duplicate: ActivityLifecycleActionView;
+  remix: ActivityLifecycleActionView;
+  restore: ActivityLifecycleActionCopy;
 };
 
 export type ActivityLibraryEditorActionView = {
