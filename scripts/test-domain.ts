@@ -7934,13 +7934,18 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /setResult\(successState\.result\)/,
-  'Student play route should apply submitted result state from the runner success-state plan.'
+  /setResult\(successState\.result\)[\s\S]*setConfirmIncompleteSubmit\(successState\.confirmIncompleteSubmit\)[\s\S]*setSubmittedAttemptCount\(successState\.submittedAttemptCount\)/,
+  'Student play route should apply submitted result, incomplete-confirm reset, and attempt count from the runner success-state plan.'
 );
 assert.doesNotMatch(
   playRouteSource,
-  /setResult\(\{[\s\S]*response\.result[\s\S]*response\.attemptUsage[\s\S]*response\.reviewItems|buildStudentRunnerSubmissionResultState\(\{ response \}\)|response\.attemptUsage\.usedAttempts|executionPlan\.successMessage/,
-  'Student play route should not inline submitted result-state, attempt-count, or success-message details.'
+  /setResult\(\{[\s\S]*response\.result[\s\S]*response\.attemptUsage[\s\S]*response\.reviewItems|buildStudentRunnerSubmissionResultState\(\{ response \}\)|response\.attemptUsage\.usedAttempts|executionPlan\.successMessage|setConfirmIncompleteSubmit\(false\)/,
+  'Student play route should not inline submitted result-state, incomplete-confirm reset, attempt-count, or success-message details.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmissionSuccessState = \{[\s\S]*confirmIncompleteSubmit: false;[\s\S]*export function buildStudentRunnerSubmissionSuccessState[\s\S]*confirmIncompleteSubmit: false/,
+  'Student runner success-state plans should reset incomplete-submit confirmation after a successful submission.'
 );
 assert.match(
   playRouteSource,
@@ -16548,6 +16553,7 @@ assert.deepEqual(
   }),
   {
     anonymousToken: 'browser-token-1',
+    confirmIncompleteSubmit: false,
     result: buildStudentRunnerSubmissionResultState({
       response: studentRunnerSubmissionResponse,
     }),

@@ -326,6 +326,7 @@ export type StudentRunnerSubmissionExecutionPlan =
 
 export type StudentRunnerSubmissionSuccessState = {
   anonymousToken: string | undefined;
+  confirmIncompleteSubmit: false;
   result: StudentRunnerAttemptResult;
   submittedAttemptCount: number;
   submittedStudentName?: string;
@@ -931,6 +932,7 @@ export function buildStudentRunnerSubmissionSuccessState({
 }): StudentRunnerSubmissionSuccessState {
   return {
     anonymousToken: executionPlan.anonymousToken,
+    confirmIncompleteSubmit: false,
     result: buildStudentRunnerSubmissionResultState({ response }),
     submittedAttemptCount: response.attemptUsage.usedAttempts,
     ...(executionPlan.submittedStudentName

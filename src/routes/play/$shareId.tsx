@@ -236,6 +236,7 @@ function PlayPage() {
         setStudentName(successState.submittedStudentName);
       }
       setResult(successState.result);
+      setConfirmIncompleteSubmit(successState.confirmIncompleteSubmit);
       setSubmittedAttemptCount(successState.submittedAttemptCount);
       toast.success(successState.successMessage);
     } catch (error) {
