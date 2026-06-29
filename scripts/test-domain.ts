@@ -586,6 +586,7 @@ import {
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
   buildAssignmentResultControlViews,
+  buildAssignmentResultCopyScopeView,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
   buildAssignmentResultsRouteState,
@@ -1579,6 +1580,16 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(copyArtifacts\)[\s\S]*copyArtifactPreviews,/,
   'Assignment result page view-model should expose prepared copy artifact previews from the current review-view artifact bundle.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /const controlViews = buildAssignmentResultControlViews\([\s\S]*const copyScopeView = buildAssignmentResultCopyScopeView\(controlViews\)[\s\S]*copyScopeView,/,
+  'Assignment result page view-model should derive copy-scope previews from the prepared result control views.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /export function buildAssignmentResultCopyScopeView[\s\S]*controlViews\.studentSearch\.summary[\s\S]*controlViews\.itemPerformanceSort\.selectedSortOption\.label[\s\S]*controlViews\.attemptReviewFilter\.selectedFilterOption\.label/,
+  'Assignment result copy scope should describe student, item, and review scope from prepared control views.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -3742,8 +3753,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*\}/,
-  'Assignment result route should pass prepared copy artifact previews and the result action handler into the classroom brief card.'
+  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*\}/,
+  'Assignment result route should pass prepared copy artifact previews, copy scope, and the result action handler into the classroom brief card.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -3852,8 +3863,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, and copy-preview views to focused panels.'
+  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, copy-scope, and copy-preview views to focused panels.'
 );
 assert.match(
   assignmentClassroomBriefSource,
@@ -3912,8 +3923,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
-  'Assignment classroom brief copy preview should render prepared copy artifact previews with the prepared result action handler.'
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief copy preview should render prepared copy scope and copy artifact previews with the prepared result action handler.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsCopyScopeView[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.description[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
+  'Assignment classroom brief copy-scope view should render prepared scope title, description, labels, values, and descriptions.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -29315,6 +29331,18 @@ assert.deepEqual(
         preview.text.length > 0,
       ]
     ),
+    copyScopeView: {
+      description: scoredResultsPageView.copyScopeView.description,
+      itemViews: scoredResultsPageView.copyScopeView.itemViews.map(
+        (itemView) => [
+          itemView.id,
+          itemView.label,
+          itemView.value,
+          itemView.description,
+        ]
+      ),
+      title: scoredResultsPageView.copyScopeView.title,
+    },
     controlViews: {
       attemptReviewFilter: [
         scoredResultsPageView.controlViews.attemptReviewFilter.filter,
@@ -29445,6 +29473,31 @@ assert.deepEqual(
         true,
       ],
     ],
+    copyScopeView: {
+      description:
+        'Copied materials follow the current student search, item sort, and review view.',
+      itemViews: [
+        [
+          'students',
+          'Students',
+          '1 student · 1 attempt',
+          'Use alphabetical order for grading or roster checks.',
+        ],
+        [
+          'items',
+          'Items',
+          'Lowest accuracy',
+          'Surface the prompts with the lowest correct rate first.',
+        ],
+        [
+          'review',
+          'Review',
+          'Needs review only',
+          'Focus the answer review on submissions with at least one missed or unanswered item.',
+        ],
+      ],
+      title: 'Copy scope',
+    },
     controlViews: {
       attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
       itemPerformanceSort: [
@@ -30303,6 +30356,46 @@ assert.deepEqual(
       summary: '1 student · 2 attempts',
       value: 'alice',
     },
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultCopyScopeView(
+    buildAssignmentResultControlViews({
+      resultSearchSummary: '1 student · 2 attempts',
+      viewState: {
+        attemptReviewFilter: 'needs-review',
+        itemPerformanceSort: 'accuracy',
+        studentSearch: 'alice',
+        studentSort: 'best',
+      },
+    })
+  ),
+  {
+    description:
+      'Copied materials follow the current student search, item sort, and review view.',
+    itemViews: [
+      {
+        description:
+          'Scan strongest performances before opening individual attempts.',
+        id: 'students',
+        label: 'Students',
+        value: '1 student · 2 attempts',
+      },
+      {
+        description: 'Surface the prompts with the lowest correct rate first.',
+        id: 'items',
+        label: 'Items',
+        value: 'Lowest accuracy',
+      },
+      {
+        description:
+          'Focus the answer review on submissions with at least one missed or unanswered item.',
+        id: 'review',
+        label: 'Review',
+        value: 'Needs review only',
+      },
+    ],
+    title: 'Copy scope',
   }
 );
 assert.equal(

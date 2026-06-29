@@ -219,6 +219,21 @@ type AssignmentResultControlViews = {
   studentSearch: AssignmentResultStudentSearchControlView;
 };
 
+type AssignmentResultCopyScopeItemId = 'items' | 'review' | 'students';
+
+export type AssignmentResultCopyScopeItemView = {
+  description: string;
+  id: AssignmentResultCopyScopeItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentResultCopyScopeView = {
+  description: string;
+  itemViews: AssignmentResultCopyScopeItemView[];
+  title: string;
+};
+
 type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
@@ -316,6 +331,7 @@ type AssignmentResultsPageViewModel<
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyScopeView: AssignmentResultCopyScopeView;
   description: string;
   headerView: AssignmentResultHeaderView | null;
   itemAnalysisCardViews: ReturnType<
@@ -406,6 +422,24 @@ export const assignmentResultSearchCopy = {
   },
   get sortStudentsLabel() {
     return m.assignment_result_search_sort_students();
+  },
+} as const;
+
+export const assignmentResultCopyScopeCopy = {
+  get description() {
+    return m.assignment_result_copy_scope_description();
+  },
+  get itemLabel() {
+    return m.assignment_result_copy_scope_item_label();
+  },
+  get reviewLabel() {
+    return m.assignment_result_copy_scope_review_label();
+  },
+  get studentLabel() {
+    return m.assignment_result_copy_scope_student_label();
+  },
+  get title() {
+    return m.assignment_result_copy_scope_title();
   },
 } as const;
 
@@ -1392,6 +1426,7 @@ export function buildAssignmentResultsPageViewModel<
     resultSearchSummary: resultView.resultSearchSummary,
     viewState,
   });
+  const copyScopeView = buildAssignmentResultCopyScopeView(controlViews);
   const attemptRowViews = data
     ? buildAssignmentAttemptRowViews({
         rows: resultView.filteredAttemptRows,
@@ -1485,6 +1520,7 @@ export function buildAssignmentResultsPageViewModel<
     controlViews,
     copyActionData,
     copyArtifactPreviews,
+    copyScopeView,
     description: assignmentResultPageCopy.description,
     headerView,
     itemAnalysisCardViews,
@@ -1609,6 +1645,37 @@ export function buildAssignmentResultControlViews({
       summary: resultSearchSummary,
       value: viewState.studentSearch,
     },
+  };
+}
+
+export function buildAssignmentResultCopyScopeView(
+  controlViews: AssignmentResultControlViews
+): AssignmentResultCopyScopeView {
+  return {
+    description: assignmentResultCopyScopeCopy.description,
+    itemViews: [
+      {
+        description: controlViews.studentSearch.selectedSortOption.description,
+        id: 'students',
+        label: assignmentResultCopyScopeCopy.studentLabel,
+        value: controlViews.studentSearch.summary,
+      },
+      {
+        description:
+          controlViews.itemPerformanceSort.selectedSortOption.description,
+        id: 'items',
+        label: assignmentResultCopyScopeCopy.itemLabel,
+        value: controlViews.itemPerformanceSort.selectedSortOption.label,
+      },
+      {
+        description:
+          controlViews.attemptReviewFilter.selectedFilterOption.description,
+        id: 'review',
+        label: assignmentResultCopyScopeCopy.reviewLabel,
+        value: controlViews.attemptReviewFilter.selectedFilterOption.label,
+      },
+    ],
+    title: assignmentResultCopyScopeCopy.title,
   };
 }
 

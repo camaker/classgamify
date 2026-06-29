@@ -3,6 +3,7 @@ import {
   assignmentResultSectionCopy,
   type AssignmentResultActionButton,
   type AssignmentResultCopyArtifactPreview,
+  type AssignmentResultCopyScopeView,
 } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,12 +23,14 @@ type AssignmentResultsClassroomBriefCardProps = {
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyScopeView: AssignmentResultCopyScopeView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
 };
 
 export function AssignmentResultsClassroomBriefCard({
   brief,
   copyArtifactPreviews,
+  copyScopeView,
   onResultAction,
 }: AssignmentResultsClassroomBriefCardProps) {
   return (
@@ -58,6 +61,7 @@ export function AssignmentResultsClassroomBriefCard({
         <AssignmentResultsClassroomBriefCopyPreview
           brief={brief}
           copyArtifactPreviews={copyArtifactPreviews}
+          copyScopeView={copyScopeView}
           onResultAction={onResultAction}
         />
       </CardContent>
@@ -205,6 +209,7 @@ function AssignmentResultsFollowUpStudent({
 function AssignmentResultsClassroomBriefCopyPreview({
   brief,
   copyArtifactPreviews,
+  copyScopeView,
   onResultAction,
 }: {
   brief: AssignmentClassroomBrief;
@@ -213,11 +218,13 @@ function AssignmentResultsClassroomBriefCopyPreview({
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyScopeView: AssignmentResultCopyScopeView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
 }) {
   return (
     <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">
       <h3 className="font-medium text-sm">{brief.copyPreview.label}</h3>
+      <AssignmentResultsCopyScopeView copyScopeView={copyScopeView} />
       <div className="grid gap-3 lg:grid-cols-2">
         {copyArtifactPreviews.map((preview) => (
           <AssignmentResultsCopyArtifactPreview
@@ -228,6 +235,36 @@ function AssignmentResultsClassroomBriefCopyPreview({
         ))}
       </div>
     </section>
+  );
+}
+
+function AssignmentResultsCopyScopeView({
+  copyScopeView,
+}: {
+  copyScopeView: AssignmentResultCopyScopeView;
+}) {
+  return (
+    <div className="grid gap-3 rounded-md border bg-background p-3">
+      <div className="grid gap-1">
+        <h4 className="font-medium text-sm">{copyScopeView.title}</h4>
+        <p className="text-muted-foreground text-xs">
+          {copyScopeView.description}
+        </p>
+      </div>
+      <div className="grid gap-2 md:grid-cols-3">
+        {copyScopeView.itemViews.map((itemView) => (
+          <div className="grid gap-1 text-xs" key={itemView.id}>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="rounded-md bg-background">
+                {itemView.label}
+              </Badge>
+              <span className="font-medium">{itemView.value}</span>
+            </div>
+            <p className="text-muted-foreground">{itemView.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
