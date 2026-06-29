@@ -41,7 +41,7 @@ type PrintableWorksheetAssignmentFieldView =
       label: string;
     }
   | {
-      id: 'delivery-policy' | 'instructions' | 'share-path';
+      id: 'delivery-policy' | 'instructions' | 'share-path' | 'snapshot-source';
       kind: 'text';
       label: string;
       value: string;
@@ -146,6 +146,9 @@ export const printableWorksheetPageCopy = {
   },
   get sharePathLabel() {
     return m.assignment_printable_share_path_label();
+  },
+  get snapshotSourceLabel() {
+    return m.assignment_printable_snapshot_source_label();
   },
   get scoreLabel() {
     return m.assignment_printable_score_label();
@@ -286,6 +289,7 @@ export function buildPrintableWorksheetAssignmentFieldViews(
       label: printableWorksheetPageCopy.sharePathLabel,
       value: headerView.sharePath,
     },
+    buildPrintableWorksheetSnapshotSourceFieldView(headerView),
     {
       id: 'instructions',
       kind: 'text',
@@ -299,6 +303,20 @@ export function buildPrintableWorksheetAssignmentFieldViews(
       value: headerView.deliveryPolicy,
     },
   ];
+}
+
+export function buildPrintableWorksheetSnapshotSourceFieldView(
+  headerView: PrintableWorksheetHeaderView
+): PrintableWorksheetAssignmentFieldView {
+  return {
+    id: 'snapshot-source',
+    kind: 'text',
+    label: printableWorksheetPageCopy.snapshotSourceLabel,
+    value: m.assignment_printable_snapshot_source_value({
+      activityTitle: headerView.activityTitle,
+      sharePath: headerView.sharePath,
+    }),
+  };
 }
 
 export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyState {

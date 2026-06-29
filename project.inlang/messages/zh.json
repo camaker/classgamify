@@ -874,6 +874,8 @@
   "assignment_printable_seo_description": "基于 ClassGamify 作业快照生成的教师端可打印练习纸。",
   "assignment_printable_seo_title": "可打印练习纸",
   "assignment_printable_share_path_label": "学生链接",
+  "assignment_printable_snapshot_source_label": "快照来源",
+  "assignment_printable_snapshot_source_value": "来自 {activityTitle} 为 {sharePath} 冻结的作业快照",
   "assignment_printable_student_name_label": "学生姓名",
   "assignment_publish_dialog_cancel": "取消",
   "assignment_publish_dialog_close_after_help": "可选。留空则链接保持开放，直到手动关闭。",

@@ -486,6 +486,7 @@ import {
   buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
   buildPrintableWorksheetRouteState,
+  buildPrintableWorksheetSnapshotSourceFieldView,
   getPrintableWorksheetChoiceIndexValue,
 } from '@/assignments/printable-worksheet-view';
 import {
@@ -13102,6 +13103,13 @@ assert.deepEqual(
         value: '/play/printable-1',
       },
       {
+        id: 'snapshot-source',
+        kind: 'text',
+        label: 'Snapshot source',
+        value:
+          'Frozen from Frozen activity title for /play/printable-1',
+      },
+      {
         id: 'instructions',
         kind: 'text',
         label: 'Instructions',
@@ -13140,6 +13148,17 @@ assert.deepEqual(
     },
     itemIds: ['q-frozen-prompt'],
     showAnswerKey: true,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetSnapshotSourceFieldView(
+    printableWorksheetPageView.headerView
+  ),
+  {
+    id: 'snapshot-source',
+    kind: 'text',
+    label: 'Snapshot source',
+    value: 'Frozen from Frozen activity title for /play/printable-1',
   }
 );
 assert.deepEqual(
@@ -18541,6 +18560,11 @@ assert.match(
   printableWorksheetViewSource,
   /assignmentFieldViews:[\s\S]*buildPrintableWorksheetAssignmentFieldViews/,
   'Printable worksheet page view-model should own printable assignment field rows.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /get snapshotSourceLabel\(\)[\s\S]*assignment_printable_snapshot_source_label[\s\S]*buildPrintableWorksheetAssignmentFieldViews[\s\S]*buildPrintableWorksheetSnapshotSourceFieldView\(headerView\)[\s\S]*export function buildPrintableWorksheetSnapshotSourceFieldView[\s\S]*snapshotSourceLabel[\s\S]*assignment_printable_snapshot_source_value/,
+  'Printable worksheet assignment fields should expose a localized frozen-snapshot source row from the domain view model.'
 );
 assert.match(
   printableWorksheetViewSource,

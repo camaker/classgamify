@@ -874,6 +874,8 @@
   "assignment_printable_seo_description": "Teacher-only printable worksheet generated from a ClassGamify assignment snapshot.",
   "assignment_printable_seo_title": "Printable worksheet",
   "assignment_printable_share_path_label": "Student link",
+  "assignment_printable_snapshot_source_label": "Snapshot source",
+  "assignment_printable_snapshot_source_value": "Frozen from {activityTitle} for {sharePath}",
   "assignment_printable_student_name_label": "Student name",
   "assignment_publish_dialog_cancel": "Cancel",
   "assignment_publish_dialog_close_after_help": "Optional. Leave blank to keep the link open until it is closed manually.",
