@@ -4725,7 +4725,12 @@ assert.equal(freeBillingView.state, 'ready');
 assert.equal(freeBillingView.plan?.name, 'Configured Free');
 assert.equal(freeBillingView.plan?.isFree, true);
 assert.equal(freeBillingView.action?.kind, 'upgrade');
-assert.match(freeBillingView.plan?.message ?? '', /starter activity workflow/);
+assert.match(freeBillingView.plan?.message ?? '', /classroom activity workflow/);
+assert.doesNotMatch(
+  freeBillingView.plan?.message ?? '',
+  /starter activity workflow/i,
+  'Billing free-plan copy should avoid copied-starter wording.'
+);
 const trialBillingView = buildSettingsBillingCardViewModel({
   canManageBilling: true,
   currentPlan: proBillingPlan,
@@ -6296,6 +6301,22 @@ const pricingMessageText = [
       .join('\n');
   })
   .join('\n');
+const contactMessageText = [
+  'project.inlang/messages/en.json',
+  'project.inlang/messages/zh.json',
+]
+  .map((filePath) => {
+    const messages = JSON.parse(readFileSync(filePath, 'utf8')) as Record<
+      string,
+      string
+    >;
+
+    return Object.entries(messages)
+      .filter(([key]) => key.startsWith('contact_'))
+      .map(([, value]) => value)
+      .join('\n');
+  })
+  .join('\n');
 const excludedPageRouteFiles = readdirSync('src/routes/(pages)');
 assert.doesNotMatch(
   retiredRouteDocumentationText,
@@ -6314,12 +6335,29 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   pricingMessageText,
-  /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|saved character|skeleton|shell|脚手架|骨架|汉字|中文分级/,
+  /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|saved character|skeleton|shell|starter templates|starter activity workflow|脚手架|骨架|汉字|中文分级/,
   'Pricing and billing copy should describe ClassGamify plans, not copied learning or unfinished scaffold language.'
+);
+assert.doesNotMatch(
+  contactMessageText,
+  /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|Chinese-level|language-scope|saved character|中文分级|汉字/,
+  'Contact copy should describe ClassGamify classroom workflows, not copied learning-site support language.'
 );
 overwriteGetLocale(() => 'en');
 const pricePlans = getPricePlans();
 assert.deepEqual(Object.keys(pricePlans), ['free', 'pro', 'lifetime']);
+assert.ok(
+  pricePlans.free?.features?.some((feature) =>
+    feature.toLowerCase().includes('intro classroom templates')
+  ),
+  'The free plan should describe intro classroom templates instead of copied starter templates.'
+);
+assert.ok(
+  pricePlans.free?.features?.every(
+    (feature) => !feature.toLowerCase().includes('starter templates')
+  ),
+  'The free plan should not describe copied starter-template access.'
+);
 assert.ok(
   pricePlans.free?.features?.some((feature) =>
     feature.toLowerCase().includes('assignment link')
