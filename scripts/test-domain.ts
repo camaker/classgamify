@@ -7533,7 +7533,7 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /buildStudentRunnerTimerTickPlan\(\{[\s\S]*hasResult: Boolean\(result\),[\s\S]*timeLimitSeconds/,
+  /buildStudentRunnerTimerTickPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*canSubmit: runnerPageView\.attemptState\.canSubmit,[\s\S]*hasResult: Boolean\(result\),[\s\S]*timeLimitSeconds/,
   'Student play route should resolve timed-attempt ticking through the runner timer tick plan.'
 );
 assert.match(
@@ -16002,6 +16002,12 @@ assert.equal(
 );
 assert.deepEqual(
   buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: ' share-public ',
+      startedAt: 1_000,
+    },
+    canSubmit: true,
     hasResult: false,
     timeLimitSeconds: 90,
   }),
@@ -16012,6 +16018,12 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 1_000,
+    },
+    canSubmit: true,
     hasResult: true,
     timeLimitSeconds: 90,
   }),
@@ -16019,8 +16031,47 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 1_000,
+    },
+    canSubmit: true,
     hasResult: false,
     timeLimitSeconds: undefined,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    activeShareId: 'starter-preview',
+    attemptClock: undefined,
+    canSubmit: false,
+    hasResult: false,
+    timeLimitSeconds: 90,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: undefined,
+    canSubmit: true,
+    hasResult: false,
+    timeLimitSeconds: 90,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: 'other-share',
+      startedAt: 1_000,
+    },
+    canSubmit: true,
+    hasResult: false,
+    timeLimitSeconds: 90,
   }),
   { type: 'skip' }
 );

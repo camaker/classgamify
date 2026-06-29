@@ -792,13 +792,27 @@ export function buildStudentRunnerAttemptClock({
 }
 
 export function buildStudentRunnerTimerTickPlan({
+  activeShareId,
+  attemptClock,
+  canSubmit,
   hasResult,
   timeLimitSeconds,
 }: {
+  activeShareId: string;
+  attemptClock?: StudentRunnerAttemptClock;
+  canSubmit: boolean;
   hasResult: boolean;
   timeLimitSeconds?: number;
 }): StudentRunnerTimerTickPlan {
-  if (hasResult || !timeLimitSeconds) return { type: 'skip' };
+  if (
+    hasResult ||
+    !timeLimitSeconds ||
+    !canSubmit ||
+    normalizeAssignmentShareSlug(attemptClock?.shareId ?? '') !==
+      normalizeAssignmentShareSlug(activeShareId)
+  ) {
+    return { type: 'skip' };
+  }
 
   return {
     intervalMs: ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond,

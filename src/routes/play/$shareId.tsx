@@ -131,6 +131,9 @@ function PlayPage() {
 
   useEffect(() => {
     const tickPlan = buildStudentRunnerTimerTickPlan({
+      activeShareId,
+      attemptClock,
+      canSubmit: runnerPageView.attemptState.canSubmit,
       hasResult: Boolean(result),
       timeLimitSeconds,
     });
@@ -141,7 +144,13 @@ function PlayPage() {
     }, tickPlan.intervalMs);
 
     return () => window.clearInterval(timer);
-  }, [result, timeLimitSeconds]);
+  }, [
+    activeShareId,
+    attemptClock?.shareId,
+    result,
+    runnerPageView.attemptState.canSubmit,
+    timeLimitSeconds,
+  ]);
 
   useEffect(() => {
     const resetPlan = buildStudentRunnerAttemptSessionResetPlan({
