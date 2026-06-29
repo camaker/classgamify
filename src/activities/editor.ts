@@ -121,7 +121,7 @@ type ActivityEditorSelectOption<TValue extends string> = {
   value: TValue;
 };
 
-type ActivityEditorSelectOptionsView = {
+export type ActivityEditorSelectOptionsView = {
   difficultyOptions: ActivityEditorSelectOption<ActivityDifficulty>[];
   templateOptions: ActivityTemplateDefinition[];
   visibilityOptions: ActivityEditorSelectOption<
@@ -212,7 +212,7 @@ export type ActivityEditorDraftGenerationExecutionPlan =
 
 type ActivityEditorMode = 'create' | 'edit';
 
-type ActivityEditorModeView = {
+export type ActivityEditorModeView = {
   footerHint: string;
   isEditMode: boolean;
   saveLabel: string;
@@ -263,12 +263,15 @@ type ActivityEditorTemplateScaffoldApplication = {
   values: CreateActivityInput;
 };
 
-type ActivityEditorTemplateView = {
+export type ActivityEditorTemplateView = {
   readinessSummary: ActivityTemplateReadinessPanelSummary;
   setupView: ActivityEditorTemplateSetupView;
   template: ActivityTemplateDefinition;
   templateOptions: ActivityTemplateDefinition[];
 };
+
+export type ActivityEditorSelectedTemplateView =
+  ActivityEditorTemplateView['template'];
 
 type ActivityCreatePageInputShapeView = {
   items: string[];

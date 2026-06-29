@@ -2916,6 +2916,11 @@ assert.match(
   'Activity editor form should delegate primary identity fields.'
 );
 assert.match(
+  activityEditorSource,
+  /export type ActivityEditorSelectOptionsView[\s\S]*export type ActivityEditorModeView[\s\S]*export type ActivityEditorTemplateView[\s\S]*export type ActivityEditorSelectedTemplateView/,
+  'Activity editor domain should expose explicit editor shell and field view contracts.'
+);
+assert.match(
   activityEditorFormSource,
   /ActivityEditorDetailsFields[\s\S]*control=\{form\.control\}[\s\S]*selectOptionsView=\{selectOptionsView\}/,
   'Activity editor form should delegate descriptive and select fields.'
@@ -2952,6 +2957,16 @@ assert.match(
 );
 assert.match(
   activityEditorFieldsSource,
+  /ActivityEditorTemplateView[\s\S]*ActivityEditorSelectOptionsView/,
+  'Activity editor fields should import explicit template and select-option view contracts.'
+);
+assert.doesNotMatch(
+  activityEditorFieldsSource,
+  /ReturnType<typeof buildActivityEditor(?:TemplateView|SelectOptions)>|buildActivityEditor(?:TemplateView|SelectOptions)/,
+  'Activity editor fields should not infer props from editor view builders.'
+);
+assert.match(
+  activityEditorFieldsSource,
   /ActivityEditorDetailsFields[\s\S]*name="description"[\s\S]*name="subject"[\s\S]*name="gradeBand"[\s\S]*selectOptionsView\.difficultyOptions\.map[\s\S]*selectOptionsView\.visibilityOptions\.map[\s\S]*name="learningGoal"/,
   'Activity editor details fields should own description, classification, and learning-goal bindings.'
 );
@@ -2979,6 +2994,16 @@ assert.match(
   activityEditorShellSource,
   /ActivityEditorHeader[\s\S]*activity_form_editor_badge[\s\S]*template\.name[\s\S]*modeView\.title/,
   'Activity editor header should render prepared mode title and template name.'
+);
+assert.match(
+  activityEditorShellSource,
+  /ActivityEditorModeView[\s\S]*ActivityEditorSelectedTemplateView/,
+  'Activity editor shell should import explicit mode and selected-template view contracts.'
+);
+assert.doesNotMatch(
+  activityEditorShellSource,
+  /ReturnType<typeof buildActivityEditor(?:ModeView|TemplateView)>|buildActivityEditor(?:ModeView|TemplateView)/,
+  'Activity editor shell should not infer props from editor view builders.'
 );
 assert.match(
   activityEditorShellSource,

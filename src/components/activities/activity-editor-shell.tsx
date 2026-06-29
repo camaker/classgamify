@@ -1,6 +1,6 @@
 import type {
-  buildActivityEditorModeView,
-  buildActivityEditorTemplateView,
+  ActivityEditorModeView,
+  ActivityEditorSelectedTemplateView,
 } from '@/activities/editor';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -15,15 +15,9 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
-type ActivityEditorModeView = ReturnType<typeof buildActivityEditorModeView>;
-
-type ActivityEditorTemplateView = ReturnType<
-  typeof buildActivityEditorTemplateView
->;
-
 type ActivityEditorHeaderProps = {
   modeView: ActivityEditorModeView;
-  template: ActivityEditorTemplateView['template'];
+  template: ActivityEditorSelectedTemplateView;
 };
 
 type ActivityEditorFooterProps = {

@@ -1,6 +1,6 @@
 import type {
-  buildActivityEditorSelectOptions,
-  buildActivityEditorTemplateView,
+  ActivityEditorSelectOptionsView,
+  ActivityEditorTemplateView,
 } from '@/activities/editor';
 import type { CreateActivityInput } from '@/activities/validation';
 import { ActivitySourceMaterialsField } from '@/components/activities/activity-source-materials-field';
@@ -23,14 +23,6 @@ import { m } from '@/locale/paraglide/messages';
 import { IconPaperclip } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import type { Control } from 'react-hook-form';
-
-type ActivityEditorTemplateView = ReturnType<
-  typeof buildActivityEditorTemplateView
->;
-
-type ActivityEditorSelectOptionsView = ReturnType<
-  typeof buildActivityEditorSelectOptions
->;
 
 type ActivityEditorFieldsProps = {
   control: Control<CreateActivityInput>;
