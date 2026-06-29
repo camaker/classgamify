@@ -29,22 +29,31 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   text: string;
 };
 
+export type AssignmentStudentFollowUpSummary = {
+  studentViews: AssignmentStudentFollowUpSummaryStudentView[];
+  students: AssignmentStudentSummary[];
+  text: string;
+  title: string;
+};
+
 export function buildAssignmentStudentFollowUpSummary({
   assignmentTitle,
   students,
-}: AssignmentStudentFollowUpSummaryInput) {
+}: AssignmentStudentFollowUpSummaryInput): AssignmentStudentFollowUpSummary {
   const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
   const studentViews =
     buildAssignmentStudentFollowUpSummaryStudentViews(sortedStudents);
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
+  const title = m.assignment_student_follow_up_title({ title: copyTitle });
 
-  const lines = [
-    m.assignment_student_follow_up_title({ title: copyTitle }),
-    '',
-    ...formatStudents(studentViews),
-  ];
+  const lines = [title, '', ...formatStudents(studentViews)];
 
-  return joinAssignmentResultCopyLines(lines);
+  return {
+    studentViews,
+    students: sortedStudents,
+    text: joinAssignmentResultCopyLines(lines),
+    title,
+  };
 }
 
 export function buildAssignmentStudentFollowUpSummaryStudentViews(

@@ -33490,6 +33490,11 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
+  /export type AssignmentStudentFollowUpSummary[\s\S]*studentViews: AssignmentStudentFollowUpSummaryStudentView\[\][\s\S]*students: AssignmentStudentSummary\[\][\s\S]*text: string/,
+  'Assignment student follow-up summaries should expose a structured teacher-review object alongside the copied text.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
   /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_student_follow_up_title\(\{ title: copyTitle \}\)/,
   'Assignment student follow-up copied titles should use the shared result-copy title normalizer.'
 );
@@ -33541,27 +33546,55 @@ assert.deepEqual(
   }).studentLabel,
   'Ava Chen'
 );
+assert.deepEqual(
+  {
+    studentKeys: studentFollowUpSummary.students.map(
+      (student) => student.studentKey
+    ),
+    studentViewKeys: studentFollowUpSummary.studentViews.map(
+      (studentView) => studentView.studentKey
+    ),
+    title: studentFollowUpSummary.title,
+    viewCount: studentFollowUpSummary.studentViews.length,
+  },
+  {
+    studentKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+      'name:no-review',
+    ],
+    studentViewKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+      'name:no-review',
+    ],
+    title: 'ClassGamify student follow-up: Capital Review, Week 1',
+    viewCount: 4,
+  }
+);
 assert.match(
-  studentFollowUpSummary,
+  studentFollowUpSummary.text,
   /ClassGamify student follow-up: Capital Review, Week 1/
 );
 assert.match(
   buildAssignmentStudentFollowUpSummary({
     assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
     students: [],
-  }),
+  }).text,
   /^ClassGamify student follow-up: Capital Review, Week 1\n\n- No student attempts yet\./
 );
 assert.match(
-  studentFollowUpSummary,
+  studentFollowUpSummary.text,
   /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
 );
 assert.match(
-  studentFollowUpSummary,
+  studentFollowUpSummary.text,
   /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
 );
 assert.match(
-  studentFollowUpSummary,
+  studentFollowUpSummary.text,
   /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review/
 );
 assert.equal(
@@ -33602,7 +33635,7 @@ assert.equal(
       },
     },
   }),
-  studentFollowUpSummary
+  studentFollowUpSummary.text
 );
 assert.deepEqual(
   buildAssignmentResultActionPayload({

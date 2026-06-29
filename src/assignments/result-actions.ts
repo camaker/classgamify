@@ -277,7 +277,7 @@ export function buildAssignmentResultCopyText({
   return buildAssignmentStudentFollowUpSummary({
     assignmentTitle,
     students,
-  });
+  }).text;
 }
 
 export function buildAssignmentResultActionPayload({
