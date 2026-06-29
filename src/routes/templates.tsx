@@ -39,7 +39,7 @@ function TemplatesPage() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
-              to={Routes.Create}
+              to={pageView.hero.createAction.to}
               search={pageView.hero.createAction.search}
               className={cn(buttonVariants(), 'w-fit')}
             >

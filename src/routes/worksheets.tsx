@@ -124,7 +124,7 @@ function WorksheetHeroActionLink({
 }) {
   return (
     <Link
-      to={Routes.Create}
+      to={action.to}
       search={action.search}
       className={cn(
         buttonVariants({

@@ -3457,7 +3457,7 @@ assert.match(
 );
 assert.match(
   templatesRouteSource,
-  /pageView\.hero\.createAction\.search[\s\S]*pageView\.hero\.createAction\.label/,
+  /pageView\.hero\.createAction\.to[\s\S]*pageView\.hero\.createAction\.search[\s\S]*pageView\.hero\.createAction\.label/,
   'Templates route hero should use the prepared template create action.'
 );
 assert.match(
@@ -3507,7 +3507,7 @@ assert.match(
 );
 assert.match(
   worksheetsRouteSource,
-  /function WorksheetHeroActionLink[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
+  /function WorksheetHeroActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
   'Worksheet hero action links should render prepared create-entry actions.'
 );
 assert.match(
