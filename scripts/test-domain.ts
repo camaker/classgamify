@@ -7543,8 +7543,8 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /buildStudentRunnerAttemptClockStartPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*hasResult: Boolean\(result\),[\s\S]*itemCount,[\s\S]*ready: Boolean\(assignment\)/,
-  'Student play route should resolve attempt-clock starts through a route-ready runner clock start plan.'
+  /buildStudentRunnerAttemptClockStartPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*canSubmit: runnerPageView\.attemptState\.canSubmit,[\s\S]*hasResult: Boolean\(result\)/,
+  'Student play route should resolve attempt-clock starts through the runner attempt submit-readiness state.'
 );
 assert.match(
   playRouteSource,
@@ -15965,9 +15965,8 @@ assert.equal(
   shouldStartStudentRunnerAttemptClock({
     activeShareId: 'share-public',
     attemptClock: undefined,
+    canSubmit: true,
     hasResult: false,
-    itemCount: 2,
-    ready: true,
   }),
   true
 );
@@ -15978,9 +15977,8 @@ assert.equal(
       shareId: 'share-public',
       startedAt: 1_000,
     },
+    canSubmit: true,
     hasResult: false,
-    itemCount: 2,
-    ready: true,
   }),
   false
 );
@@ -15988,9 +15986,8 @@ assert.equal(
   shouldStartStudentRunnerAttemptClock({
     activeShareId: 'share-public',
     attemptClock: undefined,
+    canSubmit: true,
     hasResult: true,
-    itemCount: 2,
-    ready: true,
   }),
   false
 );
@@ -15998,19 +15995,8 @@ assert.equal(
   shouldStartStudentRunnerAttemptClock({
     activeShareId: 'share-public',
     attemptClock: undefined,
+    canSubmit: false,
     hasResult: false,
-    itemCount: 0,
-    ready: true,
-  }),
-  false
-);
-assert.equal(
-  shouldStartStudentRunnerAttemptClock({
-    activeShareId: 'share-public',
-    attemptClock: undefined,
-    hasResult: false,
-    itemCount: 2,
-    ready: false,
   }),
   false
 );
@@ -16074,10 +16060,9 @@ assert.deepEqual(
   buildStudentRunnerAttemptClockStartPlan({
     activeShareId: ' share-public ',
     attemptClock: undefined,
+    canSubmit: true,
     hasResult: false,
-    itemCount: 2,
     now: 54_321,
-    ready: true,
   }),
   {
     attemptClock: {
@@ -16095,10 +16080,19 @@ assert.deepEqual(
       shareId: ' share-public ',
       startedAt: 1_000,
     },
+    canSubmit: true,
     hasResult: false,
-    itemCount: 2,
     now: 54_321,
-    ready: true,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptClockStartPlan({
+    activeShareId: 'starter-preview',
+    attemptClock: undefined,
+    canSubmit: false,
+    hasResult: false,
+    now: 54_321,
   }),
   { type: 'skip' }
 );

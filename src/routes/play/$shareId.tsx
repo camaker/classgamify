@@ -118,8 +118,6 @@ function PlayPage() {
       submittedAttemptCount,
     ]
   );
-  const { assignment } = runnerPageView;
-  const itemCount = runnerPageView.itemCount;
   const activeShareId = runnerPageView.activeShareId;
   const timeLimitSeconds = runnerPageView.timeLimitSeconds;
   const controlView = runnerPageView.controlView;
@@ -166,16 +164,20 @@ function PlayPage() {
     const startPlan = buildStudentRunnerAttemptClockStartPlan({
       activeShareId,
       attemptClock,
+      canSubmit: runnerPageView.attemptState.canSubmit,
       hasResult: Boolean(result),
-      itemCount,
       now: Date.now(),
-      ready: Boolean(assignment),
     });
     if (startPlan.type === 'skip') return;
 
     setAttemptClock(startPlan.attemptClock);
     setNow(startPlan.now);
-  }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
+  }, [
+    activeShareId,
+    attemptClock?.shareId,
+    result,
+    runnerPageView.attemptState.canSubmit,
+  ]);
 
   useEffect(() => {
     const anonymousTokenPlan = buildStudentRunnerAnonymousTokenPlan({

@@ -862,25 +862,22 @@ export function buildStudentRunnerAttemptRestartPlan({
 export function buildStudentRunnerAttemptClockStartPlan({
   activeShareId,
   attemptClock,
+  canSubmit,
   hasResult,
-  itemCount,
   now,
-  ready,
 }: {
   activeShareId: string;
   attemptClock?: StudentRunnerAttemptClock;
+  canSubmit: boolean;
   hasResult: boolean;
-  itemCount: number;
   now: number;
-  ready: boolean;
 }): StudentRunnerAttemptClockStartPlan {
   if (
     !shouldStartStudentRunnerAttemptClock({
       activeShareId,
       attemptClock,
+      canSubmit,
       hasResult,
-      itemCount,
-      ready,
     })
   ) {
     return { type: 'skip' };
@@ -1131,17 +1128,15 @@ export function getStudentRunnerAttemptStartedAt({
 export function shouldStartStudentRunnerAttemptClock({
   activeShareId,
   attemptClock,
+  canSubmit,
   hasResult,
-  itemCount,
-  ready,
 }: {
   activeShareId: string;
   attemptClock?: StudentRunnerAttemptClock;
+  canSubmit: boolean;
   hasResult: boolean;
-  itemCount: number;
-  ready: boolean;
 }) {
-  if (!ready || hasResult || itemCount <= 0) return false;
+  if (!canSubmit || hasResult) return false;
 
   return (
     normalizeAssignmentShareSlug(attemptClock?.shareId ?? '') !==
