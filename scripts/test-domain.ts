@@ -323,6 +323,7 @@ import {
 } from '@/activities/distractors';
 import { buildQuestionOptionTexts } from '@/activities/question-options';
 import {
+  ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS,
   buildActivityTemplateScaffoldInput,
   buildActivityTemplateScaffoldReadinessSummary,
   getActivityTemplateScaffold,
@@ -2948,8 +2949,13 @@ assert.match(
 );
 assert.match(
   activityScaffoldsSource,
-  /export type ActivityTemplateScaffoldCoverageMetricView = \{[\s\S]*id: ActivityTemplateScaffoldCoverageMetricId;[\s\S]*value: number;[\s\S]*export type ActivityTemplateScaffoldReadyOptionView =\s*TemplateRemixTemplateOption;[\s\S]*coverageMetrics: ActivityTemplateScaffoldCoverageMetricView\[\];[\s\S]*readyTemplateOptions: ActivityTemplateScaffoldReadyOptionView\[\];/,
+  /ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS[\s\S]*export type ActivityTemplateScaffoldCoverageMetricView = \{[\s\S]*id: ActivityTemplateScaffoldCoverageMetricId;[\s\S]*meetsTarget: boolean;[\s\S]*target: number;[\s\S]*value: number;[\s\S]*export type ActivityTemplateScaffoldReadyOptionView =\s*TemplateRemixTemplateOption;[\s\S]*coverageMetrics: ActivityTemplateScaffoldCoverageMetricView\[\];[\s\S]*isReusableAcrossTemplates: boolean;[\s\S]*readyTemplateOptions: ActivityTemplateScaffoldReadyOptionView\[\];[\s\S]*readyTemplateTarget: number;/,
   'Activity scaffolds domain should expose explicit scaffold coverage and ready-option contracts.'
+);
+assert.match(
+  activityScaffoldsSource,
+  /buildActivityTemplateScaffoldReadinessSummary[\s\S]*buildActivityTemplateScaffoldCoverageMetric[\s\S]*meetsCoverageTarget[\s\S]*meetsReadyTemplateTarget[\s\S]*isReusableAcrossTemplates/,
+  'Activity scaffold readiness summaries should expose reusable multi-template quality gates.'
 );
 assert.doesNotMatch(
   `${activityEditorSource}\n${activityScaffoldsSource}`,
@@ -25343,18 +25349,52 @@ assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   requirementBadges: ['Requires groups'],
   scaffoldSummary: {
     coverageMetrics: [
-      { id: 'questions', label: '4 questions', value: 4 },
-      { id: 'pairs', label: '8 pairs', value: 8 },
-      { id: 'groups', label: '3 groups', value: 3 },
-      { id: 'vocabulary', label: '8 words', value: 8 },
-      { id: 'teacherNotes', label: '2 notes', value: 2 },
+      {
+        id: 'questions',
+        label: '4 questions',
+        meetsTarget: true,
+        target: 1,
+        value: 4,
+      },
+      {
+        id: 'pairs',
+        label: '8 pairs',
+        meetsTarget: true,
+        target: 1,
+        value: 8,
+      },
+      {
+        id: 'groups',
+        label: '3 groups',
+        meetsTarget: true,
+        target: 1,
+        value: 3,
+      },
+      {
+        id: 'vocabulary',
+        label: '8 words',
+        meetsTarget: true,
+        target: 1,
+        value: 8,
+      },
+      {
+        id: 'teacherNotes',
+        label: '2 notes',
+        meetsTarget: true,
+        target: 1,
+        value: 2,
+      },
     ],
+    isReusableAcrossTemplates: true,
+    meetsCoverageTarget: true,
+    meetsReadyTemplateTarget: true,
     readyTemplateCount: ACTIVITY_TEMPLATE_TYPES.length,
     readyTemplateLabel: '8 modes ready',
     readyTemplateOptions: ACTIVITY_TEMPLATE_TYPES.map((templateType) => ({
       shortName: getTemplateByType(templateType).shortName,
       template: templateType,
     })),
+    readyTemplateTarget: ACTIVITY_TEMPLATE_TYPES.length,
     runtimeItemCount: 8,
     runtimeItemLabel: '8 playable items',
     title: 'Example coverage',
@@ -26138,23 +26178,101 @@ assert.deepEqual(
   }),
   {
     coverageMetrics: [
-      { id: 'questions', label: '4 questions', value: 4 },
-      { id: 'pairs', label: '8 pairs', value: 8 },
-      { id: 'groups', label: '3 groups', value: 3 },
-      { id: 'vocabulary', label: '8 words', value: 8 },
-      { id: 'teacherNotes', label: '2 notes', value: 2 },
+      {
+        id: 'questions',
+        label: '4 questions',
+        meetsTarget: true,
+        target: 1,
+        value: 4,
+      },
+      {
+        id: 'pairs',
+        label: '8 pairs',
+        meetsTarget: true,
+        target: 1,
+        value: 8,
+      },
+      {
+        id: 'groups',
+        label: '3 groups',
+        meetsTarget: true,
+        target: 1,
+        value: 3,
+      },
+      {
+        id: 'vocabulary',
+        label: '8 words',
+        meetsTarget: true,
+        target: 1,
+        value: 8,
+      },
+      {
+        id: 'teacherNotes',
+        label: '2 notes',
+        meetsTarget: true,
+        target: 1,
+        value: 2,
+      },
     ],
+    isReusableAcrossTemplates: true,
+    meetsCoverageTarget: true,
+    meetsReadyTemplateTarget: true,
     readyTemplateCount: ACTIVITY_TEMPLATE_TYPES.length,
     readyTemplateLabel: '8 modes ready',
     readyTemplateOptions: ACTIVITY_TEMPLATE_TYPES.map((templateType) => ({
       shortName: getTemplateByType(templateType).shortName,
       template: templateType,
     })),
+    readyTemplateTarget: ACTIVITY_TEMPLATE_TYPES.length,
     runtimeItemCount: 8,
     runtimeItemLabel: '8 playable items',
     title: 'Example coverage',
   }
 );
+for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
+  const scaffoldSummary = buildActivityTemplateScaffoldReadinessSummary({
+    current: activityEditorDefaultInput,
+    templateType,
+  });
+
+  assert.equal(
+    scaffoldSummary.isReusableAcrossTemplates,
+    true,
+    `${templateType} scaffold should demonstrate the one-activity-many-modes model.`
+  );
+  assert.equal(scaffoldSummary.meetsCoverageTarget, true);
+  assert.equal(scaffoldSummary.meetsReadyTemplateTarget, true);
+  assert.equal(
+    scaffoldSummary.readyTemplateTarget,
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS.readyTemplates
+  );
+  assert.equal(
+    scaffoldSummary.readyTemplateCount,
+    ACTIVITY_TEMPLATE_TYPES.length
+  );
+  assert.deepEqual(
+    Object.fromEntries(
+      scaffoldSummary.coverageMetrics.map((metric) => [
+        metric.id,
+        {
+          meetsTarget: metric.meetsTarget,
+          target: metric.target,
+        },
+      ])
+    ),
+    Object.fromEntries(
+      Object.entries(ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS.coverage).map(
+        ([id, target]) => [
+          id,
+          {
+            meetsTarget: true,
+            target,
+          },
+        ]
+      )
+    )
+  );
+}
 assert.equal(
   buildActivityEditorTemplateReadiness({
     ...createActivityInputSchema.parse({

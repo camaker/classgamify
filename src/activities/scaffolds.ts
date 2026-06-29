@@ -1,4 +1,7 @@
-import type { ActivityTemplateType } from '@/activities/types';
+import {
+  ACTIVITY_TEMPLATE_TYPES,
+  type ActivityTemplateType,
+} from '@/activities/types';
 import {
   buildTemplateRemixSummary,
   getTemplateRemixPlan,
@@ -33,9 +36,30 @@ type ActivityTemplateScaffoldCoverageMetricId =
   | 'teacherNotes'
   | 'vocabulary';
 
+export type ActivityTemplateScaffoldCoverageTargetMap = Record<
+  ActivityTemplateScaffoldCoverageMetricId,
+  number
+>;
+
+export const ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS = {
+  coverage: {
+    groups: 1,
+    pairs: 1,
+    questions: 1,
+    teacherNotes: 1,
+    vocabulary: 1,
+  },
+  readyTemplates: ACTIVITY_TEMPLATE_TYPES.length,
+} as const satisfies {
+  coverage: ActivityTemplateScaffoldCoverageTargetMap;
+  readyTemplates: number;
+};
+
 export type ActivityTemplateScaffoldCoverageMetricView = {
   id: ActivityTemplateScaffoldCoverageMetricId;
   label: string;
+  meetsTarget: boolean;
+  target: number;
   value: number;
 };
 
@@ -44,9 +68,13 @@ export type ActivityTemplateScaffoldReadyOptionView =
 
 export type ActivityTemplateScaffoldReadinessSummary = {
   coverageMetrics: ActivityTemplateScaffoldCoverageMetricView[];
+  isReusableAcrossTemplates: boolean;
+  meetsCoverageTarget: boolean;
+  meetsReadyTemplateTarget: boolean;
   readyTemplateCount: number;
   readyTemplateLabel: string;
   readyTemplateOptions: ActivityTemplateScaffoldReadyOptionView[];
+  readyTemplateTarget: number;
   runtimeItemCount: number;
   runtimeItemLabel: string;
   title: string;
@@ -178,54 +206,87 @@ export function buildActivityTemplateScaffoldReadinessSummary({
   });
   const remixSummary = buildTemplateRemixSummary(remixPlan);
   const runtimeItemCount = getRuntimeItems(templateType, content).length;
+  const coverageMetrics = [
+    buildActivityTemplateScaffoldCoverageMetric({
+      id: 'questions',
+      label: m.activity_template_scaffold_coverage_questions({
+        count: content.questions.length,
+      }),
+      value: content.questions.length,
+    }),
+    buildActivityTemplateScaffoldCoverageMetric({
+      id: 'pairs',
+      label: m.activity_template_scaffold_coverage_pairs({
+        count: content.pairs.length,
+      }),
+      value: content.pairs.length,
+    }),
+    buildActivityTemplateScaffoldCoverageMetric({
+      id: 'groups',
+      label: m.activity_template_scaffold_coverage_groups({
+        count: content.groups.length,
+      }),
+      value: content.groups.length,
+    }),
+    buildActivityTemplateScaffoldCoverageMetric({
+      id: 'vocabulary',
+      label: m.activity_template_scaffold_coverage_vocabulary({
+        count: content.vocabulary.length,
+      }),
+      value: content.vocabulary.length,
+    }),
+    buildActivityTemplateScaffoldCoverageMetric({
+      id: 'teacherNotes',
+      label: m.activity_template_scaffold_coverage_teacher_notes({
+        count: content.teacherNotes.length,
+      }),
+      value: content.teacherNotes.length,
+    }),
+  ];
+  const meetsCoverageTarget = coverageMetrics.every(
+    (metric) => metric.meetsTarget
+  );
+  const readyTemplateCount = remixSummary.readyTemplateOptions.length;
+  const meetsReadyTemplateTarget =
+    readyTemplateCount >=
+    ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS.readyTemplates;
 
   return {
-    coverageMetrics: [
-      {
-        id: 'questions',
-        label: m.activity_template_scaffold_coverage_questions({
-          count: content.questions.length,
-        }),
-        value: content.questions.length,
-      },
-      {
-        id: 'pairs',
-        label: m.activity_template_scaffold_coverage_pairs({
-          count: content.pairs.length,
-        }),
-        value: content.pairs.length,
-      },
-      {
-        id: 'groups',
-        label: m.activity_template_scaffold_coverage_groups({
-          count: content.groups.length,
-        }),
-        value: content.groups.length,
-      },
-      {
-        id: 'vocabulary',
-        label: m.activity_template_scaffold_coverage_vocabulary({
-          count: content.vocabulary.length,
-        }),
-        value: content.vocabulary.length,
-      },
-      {
-        id: 'teacherNotes',
-        label: m.activity_template_scaffold_coverage_teacher_notes({
-          count: content.teacherNotes.length,
-        }),
-        value: content.teacherNotes.length,
-      },
-    ],
-    readyTemplateCount: remixSummary.readyTemplateOptions.length,
+    coverageMetrics,
+    isReusableAcrossTemplates: meetsCoverageTarget && meetsReadyTemplateTarget,
+    meetsCoverageTarget,
+    meetsReadyTemplateTarget,
+    readyTemplateCount,
     readyTemplateLabel: m.activity_template_scaffold_ready_label({
-      count: remixSummary.readyTemplateOptions.length,
+      count: readyTemplateCount,
     }),
     readyTemplateOptions: remixSummary.readyTemplateOptions,
+    readyTemplateTarget:
+      ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS.readyTemplates,
     runtimeItemCount,
     runtimeItemLabel: m.activity_template_scaffold_runtime_item_label({
       count: runtimeItemCount,
     }),
     title: m.activity_template_scaffold_summary_title(),
+  };
+}
+
+function buildActivityTemplateScaffoldCoverageMetric({
+  id,
+  label,
+  value,
+}: {
+  id: ActivityTemplateScaffoldCoverageMetricId;
+  label: string;
+  value: number;
+}): ActivityTemplateScaffoldCoverageMetricView {
+  const target = ACTIVITY_TEMPLATE_SCAFFOLD_QUALITY_TARGETS.coverage[id];
+
+  return {
+    id,
+    label,
+    meetsTarget: value >= target,
+    target,
+    value,
   };
 }
