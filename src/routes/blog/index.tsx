@@ -1,19 +1,13 @@
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
+import { BlogCtaActionLink } from '@/components/blog/blog-cta-action-link';
 import Container from '@/components/layout/container';
-import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { getPaginatedPosts } from '@/lib/blog';
 import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
-import { cn } from '@/lib/utils';
-import {
-  IconDeviceGamepad2,
-  IconLayoutGrid,
-  IconPlus,
-} from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
+import { getBlogCtaActions } from '@/pages/blog-page-view';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/')({
@@ -33,6 +27,8 @@ export const Route = createFileRoute('/blog/')({
 
 function BlogListPage() {
   const { currentPage, posts, totalPages } = Route.useLoaderData();
+  const ctaActions = getBlogCtaActions();
+
   return (
     <Container className="px-4 py-16">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -46,24 +42,9 @@ function BlogListPage() {
           <p className="text-muted-foreground">{m.blog_page_description()}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2 rounded-lg border bg-muted/20 p-3">
-          <Link to={Routes.Create} className={buttonVariants()}>
-            <IconPlus className="size-4" />
-            {m.blog_page_create_activity()}
-          </Link>
-          <Link
-            to={Routes.Templates}
-            className={cn(buttonVariants({ variant: 'outline' }))}
-          >
-            <IconLayoutGrid className="size-4" />
-            {m.blog_page_browse_templates()}
-          </Link>
-          <Link
-            to={Routes.StudentPreview}
-            className={cn(buttonVariants({ variant: 'outline' }))}
-          >
-            <IconDeviceGamepad2 className="size-4" />
-            {m.blog_page_student_preview()}
-          </Link>
+          {ctaActions.map((action) => (
+            <BlogCtaActionLink action={action} key={action.to} />
+          ))}
         </div>
         <BlogGrid posts={posts} />
         <BlogPagination currentPage={currentPage} totalPages={totalPages} />

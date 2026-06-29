@@ -1,5 +1,6 @@
 import { Markdown } from '@/components/markdown/markdown';
 import { BlogPostVisual } from '@/components/blog/blog-post-visual';
+import { BlogCtaActionLink } from '@/components/blog/blog-cta-action-link';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -17,12 +18,8 @@ import {
   organizationJsonLd,
 } from '@/lib/structured-data';
 import { cn } from '@/lib/utils';
-import {
-  IconArrowLeft,
-  IconDeviceGamepad2,
-  IconLayoutGrid,
-  IconPlus,
-} from '@tabler/icons-react';
+import { getBlogCtaActions } from '@/pages/blog-page-view';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/blog/$slug')({
@@ -69,6 +66,7 @@ export const Route = createFileRoute('/blog/$slug')({
 function BlogPostPage() {
   const { post } = Route.useLoaderData();
   if (!post) throw notFound();
+  const ctaActions = getBlogCtaActions();
 
   return (
     <Container className="px-4 py-16">
@@ -116,24 +114,9 @@ function BlogPostPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2 sm:justify-end">
-              <Link to={Routes.Create} className={buttonVariants()}>
-                <IconPlus className="size-4" />
-                {m.blog_page_create_activity()}
-              </Link>
-              <Link
-                to={Routes.Templates}
-                className={cn(buttonVariants({ variant: 'outline' }))}
-              >
-                <IconLayoutGrid className="size-4" />
-                {m.blog_page_browse_templates()}
-              </Link>
-              <Link
-                to={Routes.StudentPreview}
-                className={cn(buttonVariants({ variant: 'outline' }))}
-              >
-                <IconDeviceGamepad2 className="size-4" />
-                {m.blog_page_student_preview()}
-              </Link>
+              {ctaActions.map((action) => (
+                <BlogCtaActionLink action={action} key={action.to} />
+              ))}
             </div>
           </div>
         </aside>

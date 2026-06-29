@@ -30,7 +30,7 @@ type EntryAction = {
 
 type LinkAction = {
   label: string;
-  to: typeof Routes.Templates;
+  to: typeof Routes.StudentPreview | typeof Routes.Templates;
 };
 
 export type TemplatesPageCardView = {
@@ -60,7 +60,7 @@ export type TemplatesPageViewModel = {
     badgeLabel: string;
     createAction: EntryAction;
     description: string;
-    openStudentPreviewLabel: string;
+    studentPreviewAction: LinkAction;
     title: string;
   };
 };
@@ -138,7 +138,10 @@ export function buildTemplatesPageViewModel({
         label: m.templates_page_create_from_template(),
       },
       description: m.templates_page_description(),
-      openStudentPreviewLabel: m.templates_page_open_student_preview(),
+      studentPreviewAction: {
+        label: m.templates_page_open_student_preview(),
+        to: Routes.StudentPreview,
+      },
       title: m.templates_page_title(),
     },
   };

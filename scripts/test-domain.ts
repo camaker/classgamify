@@ -352,6 +352,7 @@ import {
   buildRoadmapPageViewModel,
   buildTeachersPageViewModel,
 } from '@/pages/public-page-view';
+import { getBlogCtaActions } from '@/pages/blog-page-view';
 import {
   buildPaymentStatusView,
   getInitialPaymentConfirmationStatus,
@@ -3316,6 +3317,22 @@ const assignmentSettingsSummarySource = readFileSync(
   'utf8'
 );
 const templatesRouteSource = readFileSync('src/routes/templates.tsx', 'utf8');
+const homeRouteSource = readFileSync('src/routes/index.tsx', 'utf8');
+const teachersRouteSource = readFileSync(
+  'src/routes/(pages)/teachers.tsx',
+  'utf8'
+);
+const roadmapRouteSource = readFileSync(
+  'src/routes/(pages)/roadmap.tsx',
+  'utf8'
+);
+const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
+const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
+const blogCtaActionLinkSource = readFileSync(
+  'src/components/blog/blog-cta-action-link.tsx',
+  'utf8'
+);
+const blogPageViewSource = readFileSync('src/pages/blog-page-view.ts', 'utf8');
 const templateDirectoryCardSource = readFileSync(
   'src/components/activities/template-directory-card.tsx',
   'utf8'
@@ -3462,6 +3479,11 @@ assert.match(
 );
 assert.match(
   templatesRouteSource,
+  /pageView\.hero\.studentPreviewAction\.to[\s\S]*pageView\.hero\.studentPreviewAction\.label/,
+  'Templates route student preview CTA should use the prepared template preview action.'
+);
+assert.match(
+  templatesRouteSource,
   /pageView\.footer\.createAction\.to[\s\S]*pageView\.footer\.createAction\.label/,
   'Templates route footer should use the prepared template footer create action.'
 );
@@ -3469,6 +3491,66 @@ assert.doesNotMatch(
   templatesRouteSource,
   /Routes\.Create/,
   'Templates route should not hardcode create route targets.'
+);
+assert.doesNotMatch(
+  templatesRouteSource,
+  /Routes\.StudentPreview/,
+  'Templates route should not hardcode student preview route targets.'
+);
+assert.match(
+  homeRouteSource,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.browseTemplatesAction\.to[\s\S]*pageView\.hero\.browseTemplatesAction\.label/,
+  'Home route should render prepared hero CTA actions.'
+);
+assert.doesNotMatch(
+  homeRouteSource,
+  /Routes\.(Create|Templates)/,
+  'Home route should not hardcode hero CTA route targets.'
+);
+assert.match(
+  teachersRouteSource,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.schoolCta\.action\.to[\s\S]*pageView\.schoolCta\.action\.label/,
+  'Teachers route should render prepared hero and school CTA actions.'
+);
+assert.doesNotMatch(
+  teachersRouteSource,
+  /Routes\.(Create|ContactClassroom)/,
+  'Teachers route should not hardcode CTA route targets.'
+);
+assert.match(
+  roadmapRouteSource,
+  /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.validation\.action\.to[\s\S]*pageView\.validation\.action\.label/,
+  'Roadmap route should render prepared hero and validation CTA actions.'
+);
+assert.doesNotMatch(
+  roadmapRouteSource,
+  /Routes\.(Create|Templates|ContactClassroom)/,
+  'Roadmap route should not hardcode CTA route targets.'
+);
+assert.match(
+  blogListRouteSource,
+  /getBlogCtaActions\(\)[\s\S]*BlogCtaActionLink[\s\S]*action=\{action\}/,
+  'Blog list route should render prepared blog CTA actions through the shared component.'
+);
+assert.match(
+  blogPostRouteSource,
+  /getBlogCtaActions\(\)[\s\S]*BlogCtaActionLink[\s\S]*action=\{action\}/,
+  'Blog post route should render prepared blog CTA actions through the shared component.'
+);
+assert.doesNotMatch(
+  `${blogListRouteSource}\n${blogPostRouteSource}`,
+  /Routes\.(Create|Templates|StudentPreview)|blog_page_create_activity|blog_page_browse_templates|blog_page_student_preview/,
+  'Blog routes should not hardcode product CTA route targets or labels.'
+);
+assert.match(
+  blogCtaActionLinkSource,
+  /blogCtaActionIcons[\s\S]*satisfies Record<BlogCtaActionIcon, TablerIcon>/,
+  'Blog CTA action component should own the icon mapping for prepared CTA actions.'
+);
+assert.match(
+  blogPageViewSource,
+  /getBlogCtaActions[\s\S]*to: Routes\.Create[\s\S]*to: Routes\.Templates[\s\S]*to: Routes\.StudentPreview/,
+  'Blog page view should prepare the blog product CTA route targets.'
 );
 assert.match(
   templateDirectoryCardSource,
@@ -19600,10 +19682,16 @@ assert.deepEqual(buildHomePageViewModel(), {
   ],
   hero: {
     badgeLabel: 'Wordwall-style classroom activities',
-    browseTemplatesLabel: 'Browse templates',
+    browseTemplatesAction: {
+      label: 'Browse templates',
+      to: Routes.Templates,
+    },
     description:
       'Create game-based classroom activities, publish assignment links, and review student attempts from the same structured content.',
-    primaryActionLabel: 'Create activity',
+    primaryAction: {
+      label: 'Create activity',
+      to: Routes.Create,
+    },
     title: 'Make classroom practice feel like a game',
   },
   signals: [
@@ -19684,6 +19772,25 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(buildPricingPageViewModel().faq.items, buildPricingFaqItems());
+assert.deepEqual(getBlogCtaActions(), [
+  {
+    icon: 'create',
+    label: 'Create activity',
+    to: Routes.Create,
+  },
+  {
+    icon: 'templates',
+    label: 'Browse templates',
+    to: Routes.Templates,
+    variant: 'outline',
+  },
+  {
+    icon: 'preview',
+    label: 'Student preview',
+    to: Routes.StudentPreview,
+    variant: 'outline',
+  },
+]);
 assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
@@ -19720,7 +19827,10 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     },
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
-    openStudentPreviewLabel: 'Open student preview',
+    studentPreviewAction: {
+      label: 'Open student preview',
+      to: Routes.StudentPreview,
+    },
     title: 'Pick a game format for the same lesson content.',
   },
 });
@@ -19801,8 +19911,14 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
     badgeLabel: 'Product direction',
     description:
       'A practical view of what is already usable, what is being tightened now, and where AI-assisted classroom activity creation comes next.',
-    primaryActionLabel: 'Create activity',
-    secondaryActionLabel: 'Browse templates',
+    primaryAction: {
+      label: 'Create activity',
+      to: Routes.Create,
+    },
+    secondaryAction: {
+      label: 'Browse templates',
+      to: Routes.Templates,
+    },
     title: 'ClassGamify product roadmap',
   },
   principles: [
@@ -19846,7 +19962,10 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
     },
   ],
   validation: {
-    ctaLabel: 'Share classroom feedback',
+    action: {
+      label: 'Share classroom feedback',
+      to: Routes.ContactClassroom,
+    },
     description:
       'We prioritize work that can be tested in the teacher flow, improves assignment delivery or review, and strengthens the data model instead of creating one-off demos.',
     eyebrowLabel: 'How we decide',
@@ -19858,15 +19977,24 @@ assert.deepEqual(buildTeachersPageViewModel(), {
     badgeLabel: 'Teachers and learning teams',
     description:
       'ClassGamify supports the real Wordwall-style loop: create an activity, switch templates, publish a share link, and review student results.',
-    primaryActionLabel: 'Create activity',
-    secondaryActionLabel: 'Talk to us',
+    primaryAction: {
+      label: 'Create activity',
+      to: Routes.Create,
+    },
+    secondaryAction: {
+      label: 'Talk to us',
+      to: Routes.ContactClassroom,
+    },
     title:
       'Build repeatable game-based assignments from the lessons you already teach.',
   },
   schoolCta: {
+    action: {
+      label: 'Contact us',
+      to: Routes.ContactClassroom,
+    },
     description:
       'Multi-teacher use needs thoughtful decisions about student names, result retention, template sharing, and classroom permissions.',
-    label: 'Contact us',
     title: 'Need a school or learning-center workflow?',
   },
   templatePanel: {

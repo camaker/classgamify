@@ -5,7 +5,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { getLocale, localeConfig } from '@/lib/locale';
-import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import {
   buildHomePageViewModel,
@@ -78,21 +77,21 @@ function HomePage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                to={Routes.Create}
+                to={pageView.hero.primaryAction.to}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
                 <IconPlus className="size-4" />
-                {pageView.hero.primaryActionLabel}
+                {pageView.hero.primaryAction.label}
               </Link>
               <Link
-                to={Routes.Templates}
+                to={pageView.hero.browseTemplatesAction.to}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
                 )}
               >
                 <IconLayoutGrid className="size-4" />
-                {pageView.hero.browseTemplatesLabel}
+                {pageView.hero.browseTemplatesAction.label}
               </Link>
             </div>
           </div>

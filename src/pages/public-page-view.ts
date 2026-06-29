@@ -3,7 +3,17 @@ import {
   getActivityTemplates,
 } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
+import { Routes } from '@/lib/routes';
 import type { ActivityTemplateType } from '@/activities/types';
+
+type PublicPageRouteAction = {
+  label: string;
+  to:
+    | typeof Routes.ContactClassroom
+    | typeof Routes.Create
+    | typeof Routes.StudentPreview
+    | typeof Routes.Templates;
+};
 
 export type HomePageViewModel = {
   features: HomePageFeature[];
@@ -25,9 +35,9 @@ type HomePageFeature = {
 
 type HomePageHeroView = {
   badgeLabel: string;
-  browseTemplatesLabel: string;
+  browseTemplatesAction: PublicPageRouteAction;
   description: string;
-  primaryActionLabel: string;
+  primaryAction: PublicPageRouteAction;
   title: string;
 };
 
@@ -60,8 +70,8 @@ type RoadmapColumnView = {
 type RoadmapHeroView = {
   badgeLabel: string;
   description: string;
-  primaryActionLabel: string;
-  secondaryActionLabel: string;
+  primaryAction: PublicPageRouteAction;
+  secondaryAction: PublicPageRouteAction;
   title: string;
 };
 
@@ -87,7 +97,7 @@ type RoadmapTaskView = {
 };
 
 type RoadmapValidationView = {
-  ctaLabel: string;
+  action: PublicPageRouteAction;
   description: string;
   eyebrowLabel: string;
   title: string;
@@ -195,14 +205,14 @@ type TeachersPageItemView<Id extends string> = {
 type TeachersHeroView = {
   badgeLabel: string;
   description: string;
-  primaryActionLabel: string;
-  secondaryActionLabel: string;
+  primaryAction: PublicPageRouteAction;
+  secondaryAction: PublicPageRouteAction;
   title: string;
 };
 
 type TeachersSchoolCtaView = {
+  action: PublicPageRouteAction;
   description: string;
-  label: string;
   title: string;
 };
 
@@ -243,9 +253,15 @@ export function buildHomePageViewModel(): HomePageViewModel {
     ],
     hero: {
       badgeLabel: m.home_hero_introduction(),
-      browseTemplatesLabel: m.home_hero_browse_templates(),
+      browseTemplatesAction: {
+        label: m.home_hero_browse_templates(),
+        to: Routes.Templates,
+      },
       description: m.home_hero_description(),
-      primaryActionLabel: m.home_hero_primary(),
+      primaryAction: {
+        label: m.home_hero_primary(),
+        to: Routes.Create,
+      },
       title: m.home_hero_title(),
     },
     signals: [
@@ -327,8 +343,14 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
     hero: {
       badgeLabel: m.roadmap_eyebrow(),
       description: m.roadmap_subtitle(),
-      primaryActionLabel: m.roadmap_primary_cta(),
-      secondaryActionLabel: m.roadmap_secondary_cta(),
+      primaryAction: {
+        label: m.roadmap_primary_cta(),
+        to: Routes.Create,
+      },
+      secondaryAction: {
+        label: m.roadmap_secondary_cta(),
+        to: Routes.Templates,
+      },
       title: m.roadmap_title(),
     },
     principles: [
@@ -366,7 +388,10 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
       },
     ],
     validation: {
-      ctaLabel: m.roadmap_feedback_cta(),
+      action: {
+        label: m.roadmap_feedback_cta(),
+        to: Routes.ContactClassroom,
+      },
       description: m.roadmap_validation_description(),
       eyebrowLabel: m.roadmap_validation_eyebrow(),
       title: m.roadmap_validation_title(),
@@ -385,13 +410,22 @@ export function buildTeachersPageViewModel(): TeachersPageViewModel {
     hero: {
       badgeLabel: m.teachers_page_eyebrow(),
       description: m.teachers_page_description(),
-      primaryActionLabel: m.teachers_page_primary_cta(),
-      secondaryActionLabel: m.teachers_page_secondary_cta(),
+      primaryAction: {
+        label: m.teachers_page_primary_cta(),
+        to: Routes.Create,
+      },
+      secondaryAction: {
+        label: m.teachers_page_secondary_cta(),
+        to: Routes.ContactClassroom,
+      },
       title: m.teachers_page_title(),
     },
     schoolCta: {
+      action: {
+        label: m.teachers_page_school_cta(),
+        to: Routes.ContactClassroom,
+      },
       description: m.teachers_page_school_cta_description(),
-      label: m.teachers_page_school_cta(),
       title: m.teachers_page_school_cta_title(),
     },
     templatePanel: {

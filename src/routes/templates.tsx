@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { buildTemplatesPageViewModel } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
-import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -47,14 +46,14 @@ function TemplatesPage() {
               {pageView.hero.createAction.label}
             </Link>
             <Link
-              to={Routes.StudentPreview}
+              to={pageView.hero.studentPreviewAction.to}
               className={cn(
                 buttonVariants({ variant: 'outline' }),
                 'w-fit bg-background'
               )}
             >
               <IconPlayerPlay className="size-4" />
-              {pageView.hero.openStudentPreviewLabel}
+              {pageView.hero.studentPreviewAction.label}
             </Link>
           </div>
         </div>

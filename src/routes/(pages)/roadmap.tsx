@@ -54,20 +54,20 @@ function RoadmapPage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                to={Routes.Create}
+                to={pageView.hero.primaryAction.to}
                 className={cn(buttonVariants({ size: 'lg' }), 'rounded-lg')}
               >
-                {pageView.hero.primaryActionLabel}
+                {pageView.hero.primaryAction.label}
                 <IconArrowRight className="size-4" />
               </Link>
               <Link
-                to={Routes.Templates}
+                to={pageView.hero.secondaryAction.to}
                 className={cn(
                   buttonVariants({ variant: 'outline', size: 'lg' }),
                   'rounded-lg bg-background'
                 )}
               >
-                {pageView.hero.secondaryActionLabel}
+                {pageView.hero.secondaryAction.label}
               </Link>
             </div>
           </div>
@@ -116,10 +116,10 @@ function RoadmapPage() {
             </p>
           </div>
           <Link
-            to={Routes.ContactClassroom}
+            to={pageView.validation.action.to}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {pageView.validation.ctaLabel}
+            {pageView.validation.action.label}
           </Link>
         </section>
       </div>
