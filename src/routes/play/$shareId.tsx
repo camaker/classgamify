@@ -217,7 +217,7 @@ function PlayPage() {
 
     if (executionPlan.type === 'message') {
       setConfirmIncompleteSubmit(executionPlan.nextConfirmIncompleteSubmit);
-      toast.error(executionPlan.message);
+      toast[executionPlan.messageTone](executionPlan.message);
       return;
     }
 

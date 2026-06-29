@@ -254,6 +254,8 @@ type StudentRunnerSubmissionMessageReason = Extract<
   { type: 'blocked' | 'confirm-incomplete' }
 >['reason'];
 
+type StudentRunnerSubmissionMessageTone = 'error' | 'warning';
+
 type StudentRunnerSubmissionSubmitPlan = Extract<
   StudentRunnerSubmissionPlan,
   { type: 'submit' }
@@ -262,6 +264,7 @@ type StudentRunnerSubmissionSubmitPlan = Extract<
 export type StudentRunnerSubmissionExecutionPlan =
   | {
       message: string;
+      messageTone: StudentRunnerSubmissionMessageTone;
       nextConfirmIncompleteSubmit: boolean;
       reason: StudentRunnerSubmissionMessageReason;
       type: 'message';
@@ -841,6 +844,7 @@ export function buildStudentRunnerSubmissionExecutionPlan({
   if (submissionPlan.type !== 'submit') {
     return {
       message: submissionPlan.message,
+      messageTone: getStudentRunnerSubmissionMessageTone(submissionPlan.type),
       nextConfirmIncompleteSubmit: submissionPlan.type === 'confirm-incomplete',
       reason: submissionPlan.reason,
       type: 'message',
@@ -859,6 +863,12 @@ export function buildStudentRunnerSubmissionExecutionPlan({
     successMessage: pageView.submissionSuccessMessage,
     type: 'submit',
   };
+}
+
+function getStudentRunnerSubmissionMessageTone(
+  type: Exclude<StudentRunnerSubmissionPlan['type'], 'submit'>
+): StudentRunnerSubmissionMessageTone {
+  return type === 'confirm-incomplete' ? 'warning' : 'error';
 }
 
 export function buildStudentRunnerAnonymousTokenPlan({

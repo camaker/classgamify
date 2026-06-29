@@ -7038,8 +7038,13 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export function buildStudentRunnerSubmissionExecutionPlan[\s\S]*buildStudentRunnerSubmissionPlan\(\{[\s\S]*pageView,[\s\S]*if \(submissionPlan\.type !== 'submit'\)[\s\S]*nextConfirmIncompleteSubmit:[\s\S]*submissionPlan\.type === 'confirm-incomplete'[\s\S]*successMessage: pageView\.submissionSuccessMessage/,
+  /export function buildStudentRunnerSubmissionExecutionPlan[\s\S]*buildStudentRunnerSubmissionPlan\(\{[\s\S]*pageView,[\s\S]*if \(submissionPlan\.type !== 'submit'\)[\s\S]*messageTone: getStudentRunnerSubmissionMessageTone\(submissionPlan\.type\)[\s\S]*nextConfirmIncompleteSubmit:[\s\S]*submissionPlan\.type === 'confirm-incomplete'[\s\S]*successMessage: pageView\.submissionSuccessMessage/,
   'Student runner state domain should turn submit gates into route-ready submission execution plans.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /function getStudentRunnerSubmissionMessageTone[\s\S]*confirm-incomplete[\s\S]*warning[\s\S]*error/,
+  'Student runner state domain should classify incomplete-submit confirmation as a warning, not a submission error.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -7128,8 +7133,8 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /if \(executionPlan\.type === 'message'\)[\s\S]*setConfirmIncompleteSubmit\(executionPlan\.nextConfirmIncompleteSubmit\)[\s\S]*toast\.error\(executionPlan\.message\)/,
-  'Student play route should apply prepared submission message plans without branching on raw submit-gate reasons.'
+  /if \(executionPlan\.type === 'message'\)[\s\S]*setConfirmIncompleteSubmit\(executionPlan\.nextConfirmIncompleteSubmit\)[\s\S]*toast\[executionPlan\.messageTone\]\(executionPlan\.message\)/,
+  'Student play route should apply prepared submission message plans and message tone without branching on raw submit-gate reasons.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -14550,6 +14555,7 @@ assert.deepEqual(
   {
     message:
       'Preview assignments are read-only until a teacher publishes a share link.',
+    messageTone: 'error',
     nextConfirmIncompleteSubmit: false,
     reason: 'read-only',
     type: 'message',
@@ -14597,6 +14603,7 @@ assert.deepEqual(
   {
     message:
       'Preview assignments are read-only until a teacher publishes a share link.',
+    messageTone: 'error',
     nextConfirmIncompleteSubmit: false,
     reason: 'read-only',
     type: 'message',
@@ -14625,6 +14632,7 @@ assert.deepEqual(
   }),
   {
     message: '1 question is still unanswered.',
+    messageTone: 'warning',
     nextConfirmIncompleteSubmit: true,
     reason: 'unanswered-items',
     type: 'message',
@@ -14706,6 +14714,7 @@ assert.deepEqual(
   }),
   {
     message: 'Type your name before submitting.',
+    messageTone: 'error',
     nextConfirmIncompleteSubmit: false,
     reason: 'missing-student-name',
     type: 'message',
