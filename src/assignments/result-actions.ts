@@ -471,6 +471,11 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         value: artifacts.classroomBrief.followUpStudents.length,
       }),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'next-steps',
+        label: m.assignment_result_copy_preview_meta_next_steps(),
+        value: artifacts.classroomBrief.followUpStudentViews.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
         value: lineCount,

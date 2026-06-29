@@ -29481,6 +29481,7 @@ assert.deepEqual(
         [
           ['focus-items', 'Focus items', '2'],
           ['follow-up-students', 'Follow-up students', '1'],
+          ['next-steps', 'Next steps', '1'],
           ['lines', 'Lines', '10'],
         ],
         true,
@@ -34107,6 +34108,7 @@ assert.deepEqual(
       [
         ['focus-items', 'Focus items', '2'],
         ['follow-up-students', 'Follow-up students', '3'],
+        ['next-steps', 'Next steps', '3'],
         ['lines', 'Lines', '12'],
       ],
       resultCopyArtifacts.classroomBrief.text,
