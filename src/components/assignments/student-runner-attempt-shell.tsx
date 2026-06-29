@@ -3,7 +3,10 @@ import type {
   StudentRunnerIdentityView,
   StudentRunnerResultPanelView,
 } from '@/assignments/student-runner-state';
-import type { StudentAttemptResultNextStepsView } from '@/assignments/student-submission';
+import type {
+  StudentAttemptReviewSummaryView,
+  StudentAttemptResultNextStepsView,
+} from '@/assignments/student-submission';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -152,6 +155,7 @@ function StudentRunnerResultPanel({
           {view.attemptUsageLabel}
         </p>
       ) : null}
+      <StudentRunnerReviewSummary view={view.reviewSummaryView} />
       <StudentRunnerResultNextSteps view={view.nextStepsView} />
       {view.showStartAnotherAttempt ? (
         <Button
@@ -165,6 +169,34 @@ function StudentRunnerResultPanel({
           {view.startAnotherAttemptLabel}
         </Button>
       ) : null}
+    </div>
+  );
+}
+
+function StudentRunnerReviewSummary({
+  view,
+}: {
+  view: StudentAttemptReviewSummaryView;
+}) {
+  return (
+    <div className="mt-3 rounded-md border bg-background/80 p-2">
+      <p className="text-xs font-medium">{view.title}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        {view.description}
+      </p>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        {view.metrics.map((metric) => (
+          <div
+            key={metric.key}
+            className="rounded-md border bg-muted/20 px-2 py-1.5"
+          >
+            <p className="text-sm font-semibold">{metric.value}</p>
+            <p className="text-[11px] leading-4 text-muted-foreground">
+              {metric.label}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

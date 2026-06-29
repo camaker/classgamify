@@ -17,6 +17,7 @@ import {
   buildStudentAttemptSubmissionPlan,
   buildStudentAttemptSessionKey,
   buildStudentAttemptControlState,
+  buildStudentAttemptReviewSummaryView,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptResultNextStepsView,
   buildStudentAttemptTimerBadge,
@@ -31,6 +32,7 @@ import {
   type AttemptCompletionCopy,
   type AttemptCompletionSummary,
   type StudentAttemptControlState,
+  type StudentAttemptReviewSummaryView,
   type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
   type StudentAttemptSubmissionBlockedReason,
@@ -146,6 +148,7 @@ export type StudentRunnerResultPanelView =
       attemptUsageLabel?: string;
       durationLabel: string;
       nextStepsView: StudentAttemptResultNextStepsView;
+      reviewSummaryView: StudentAttemptReviewSummaryView;
       scoreLabel: string;
       show: true;
       showStartAnotherAttempt: boolean;
@@ -634,6 +637,7 @@ export function buildStudentRunnerPageViewModel({
       assignment,
       attemptResultDisplay,
       attemptUsageLabel,
+      reviewSummary: result?.reviewSummary,
       showStartAnotherAttempt,
     }),
     routeBadgeLabel: runnerCopy.publicRouteBadgeLabel,
@@ -754,14 +758,16 @@ function buildStudentRunnerResultPanelView({
   assignment,
   attemptResultDisplay,
   attemptUsageLabel,
+  reviewSummary,
   showStartAnotherAttempt,
 }: {
   assignment?: AssignmentSeed;
   attemptResultDisplay?: StudentAttemptResultDisplay;
   attemptUsageLabel?: string;
+  reviewSummary?: PublicAttemptReviewSummary;
   showStartAnotherAttempt: boolean;
 }): StudentRunnerResultPanelView {
-  if (!attemptResultDisplay) {
+  if (!attemptResultDisplay || !reviewSummary) {
     return { show: false };
   }
 
@@ -774,6 +780,9 @@ function buildStudentRunnerResultPanelView({
     nextStepsView: buildStudentAttemptResultNextStepsView({
       canStartAnotherAttempt: showStartAnotherAttempt,
       showCorrectAnswers: Boolean(assignment?.settings.showCorrectAnswers),
+    }),
+    reviewSummaryView: buildStudentAttemptReviewSummaryView({
+      summary: reviewSummary,
     }),
     scoreLabel: attemptResultDisplay.scoreLabel,
     show: true,

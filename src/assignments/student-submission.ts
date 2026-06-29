@@ -20,6 +20,7 @@ import {
   normalizeAnonymousToken,
   normalizeStudentName,
 } from '@/assignments/identity';
+import type { PublicAttemptReviewSummary } from '@/assignments/public';
 import { formatAssignmentResultPercent } from '@/assignments/result-format';
 import {
   normalizeRuntimeDisplayCount,
@@ -152,6 +153,16 @@ type StudentRunnerCopy = {
   resultNextStepsTitle: string;
   resultSubmittedLabel: string;
   resultTimePrefix: string;
+  reviewSummaryCorrectLabel: string;
+  reviewSummaryHiddenDescription: string;
+  reviewSummaryItemCountLabel: string;
+  reviewSummaryNeedsReviewLabel: string;
+  reviewSummaryReviewHiddenValue: string;
+  reviewSummaryReviewVisibilityLabel: string;
+  reviewSummarySubmittedLabel: string;
+  reviewSummaryTitle: string;
+  reviewSummaryUnansweredLabel: string;
+  reviewSummaryVisibleDescription: string;
   seoDescription: string;
   seoTitlePrefix: string;
   startAnotherAttemptLabel: string;
@@ -185,6 +196,27 @@ export type StudentAttemptResultDisplay = {
 
 export type StudentAttemptResultNextStepsView = {
   steps: string[];
+  title: string;
+};
+
+export type StudentAttemptReviewSummaryMetricKey =
+  | 'correct'
+  | 'items'
+  | 'needs-review'
+  | 'review'
+  | 'submitted'
+  | 'unanswered';
+
+export type StudentAttemptReviewSummaryMetricView = {
+  key: StudentAttemptReviewSummaryMetricKey;
+  label: string;
+  value: string;
+};
+
+export type StudentAttemptReviewSummaryView = {
+  description: string;
+  hiddenBySettings: boolean;
+  metrics: StudentAttemptReviewSummaryMetricView[];
   title: string;
 };
 
@@ -264,6 +296,36 @@ const STUDENT_RUNNER_COPY = {
   },
   get resultTimePrefix() {
     return m.student_runner_result_time_prefix();
+  },
+  get reviewSummaryCorrectLabel() {
+    return m.student_runner_review_summary_correct_label();
+  },
+  get reviewSummaryHiddenDescription() {
+    return m.student_runner_review_summary_hidden_description();
+  },
+  get reviewSummaryItemCountLabel() {
+    return m.student_runner_review_summary_item_count_label();
+  },
+  get reviewSummaryNeedsReviewLabel() {
+    return m.student_runner_review_summary_needs_review_label();
+  },
+  get reviewSummaryReviewHiddenValue() {
+    return m.student_runner_review_summary_review_hidden_value();
+  },
+  get reviewSummaryReviewVisibilityLabel() {
+    return m.student_runner_review_summary_review_visibility_label();
+  },
+  get reviewSummarySubmittedLabel() {
+    return m.student_runner_review_summary_submitted_label();
+  },
+  get reviewSummaryTitle() {
+    return m.student_runner_review_summary_title();
+  },
+  get reviewSummaryUnansweredLabel() {
+    return m.student_runner_review_summary_unanswered_label();
+  },
+  get reviewSummaryVisibleDescription() {
+    return m.student_runner_review_summary_visible_description();
   },
   get seoDescription() {
     return m.student_runner_seo_description();
@@ -437,8 +499,69 @@ export function buildStudentAttemptResultNextStepsView({
   };
 }
 
+export function buildStudentAttemptReviewSummaryView({
+  summary,
+}: {
+  summary: PublicAttemptReviewSummary;
+}): StudentAttemptReviewSummaryView {
+  const hiddenBySettings =
+    summary.hiddenBySettings || !summary.showCorrectAnswers;
+
+  if (hiddenBySettings) {
+    return {
+      description: STUDENT_RUNNER_COPY.reviewSummaryHiddenDescription,
+      hiddenBySettings,
+      metrics: [
+        {
+          key: 'items',
+          label: STUDENT_RUNNER_COPY.reviewSummaryItemCountLabel,
+          value: formatStudentReviewSummaryCount(summary.totalItemCount),
+        },
+        {
+          key: 'review',
+          label: STUDENT_RUNNER_COPY.reviewSummaryReviewVisibilityLabel,
+          value: STUDENT_RUNNER_COPY.reviewSummaryReviewHiddenValue,
+        },
+      ],
+      title: STUDENT_RUNNER_COPY.reviewSummaryTitle,
+    };
+  }
+
+  return {
+    description: STUDENT_RUNNER_COPY.reviewSummaryVisibleDescription,
+    hiddenBySettings,
+    metrics: [
+      {
+        key: 'submitted',
+        label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
+        value: formatStudentReviewSummaryCount(summary.submittedItemCount),
+      },
+      {
+        key: 'correct',
+        label: STUDENT_RUNNER_COPY.reviewSummaryCorrectLabel,
+        value: formatStudentReviewSummaryCount(summary.correctItemCount),
+      },
+      {
+        key: 'needs-review',
+        label: STUDENT_RUNNER_COPY.reviewSummaryNeedsReviewLabel,
+        value: formatStudentReviewSummaryCount(summary.needsReviewItemCount),
+      },
+      {
+        key: 'unanswered',
+        label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
+        value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
+      },
+    ],
+    title: STUDENT_RUNNER_COPY.reviewSummaryTitle,
+  };
+}
+
 function normalizeStudentResultScore(value: number) {
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+}
+
+function formatStudentReviewSummaryCount(value: number) {
+  return String(normalizeRuntimeDisplayCount(value));
 }
 
 export function buildStudentAttemptControlState({

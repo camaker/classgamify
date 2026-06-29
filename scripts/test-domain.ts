@@ -848,6 +848,7 @@ import {
   buildStudentAttemptControlState,
   buildStudentAnswerChange,
   buildStudentAnswerChanges,
+  buildStudentAttemptReviewSummaryView,
   buildStudentAttemptResultNextStepsView,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
@@ -6936,6 +6937,12 @@ const localeMessageText = [
 ]
   .map((filePath) => readFileSync(filePath, 'utf8'))
   .join('\n');
+const enLocaleMessages = JSON.parse(
+  readFileSync('project.inlang/messages/en.json', 'utf8')
+) as Record<string, string>;
+const zhLocaleMessages = JSON.parse(
+  readFileSync('project.inlang/messages/zh.json', 'utf8')
+) as Record<string, string>;
 const pricingMessageText = [
   'project.inlang/messages/en.json',
   'project.inlang/messages/zh.json',
@@ -6987,6 +6994,21 @@ assert.doesNotMatch(
   /settings_api_keys_|latest news and updates|Join the community|Manage your account information|Manage your security settings|Manage your notification preferences|管理您的账户信息|管理您的安全设置|管理您的通知偏好|加入我们的社区|最新资讯与更新/,
   'Visible settings copy should use ClassGamify teacher-workspace language.'
 );
+for (const key of [
+  'student_runner_review_summary_correct_label',
+  'student_runner_review_summary_hidden_description',
+  'student_runner_review_summary_item_count_label',
+  'student_runner_review_summary_needs_review_label',
+  'student_runner_review_summary_review_hidden_value',
+  'student_runner_review_summary_review_visibility_label',
+  'student_runner_review_summary_submitted_label',
+  'student_runner_review_summary_title',
+  'student_runner_review_summary_unanswered_label',
+  'student_runner_review_summary_visible_description',
+]) {
+  assert.ok(enLocaleMessages[key], `Missing English locale key: ${key}`);
+  assert.ok(zhLocaleMessages[key], `Missing Chinese locale key: ${key}`);
+}
 assert.doesNotMatch(
   pricingMessageText,
   /HSK|Hanzi|Lang Study|getlangstudy|Chinese character|saved character|skeleton|shell|starter templates|starter activity workflow|脚手架|骨架|汉字|中文分级/,
@@ -7181,6 +7203,26 @@ assert.match(
   studentRunnerSubmissionSource,
   /student_runner_result_next_step_done[\s\S]*student_runner_result_next_step_feedback[\s\S]*student_runner_result_next_step_review_score[\s\S]*student_runner_result_next_step_start_another[\s\S]*student_runner_result_next_step_teacher_review[\s\S]*student_runner_result_next_steps_title[\s\S]*buildStudentAttemptResultNextStepsView[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepReviewScore[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepFeedback[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepTeacherReview[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepStartAnother[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepDone/,
   'Student result next-step copy should be prepared from localized assignment-domain messages.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
+  'Student submission domain should expose an explicit post-submit review summary view contract.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /student_runner_review_summary_correct_label[\s\S]*student_runner_review_summary_hidden_description[\s\S]*student_runner_review_summary_item_count_label[\s\S]*student_runner_review_summary_needs_review_label[\s\S]*student_runner_review_summary_review_hidden_value[\s\S]*student_runner_review_summary_review_visibility_label[\s\S]*student_runner_review_summary_submitted_label[\s\S]*student_runner_review_summary_title[\s\S]*student_runner_review_summary_unanswered_label[\s\S]*student_runner_review_summary_visible_description/,
+  'Student review summary copy should come from localized student-runner messages.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /export function buildStudentAttemptReviewSummaryView[\s\S]*summary: PublicAttemptReviewSummary[\s\S]*hiddenBySettings[\s\S]*reviewSummaryHiddenDescription[\s\S]*reviewSummaryVisibleDescription[\s\S]*reviewSummarySubmittedLabel[\s\S]*reviewSummaryCorrectLabel[\s\S]*reviewSummaryNeedsReviewLabel[\s\S]*reviewSummaryUnansweredLabel/,
+  'Student submission domain should prepare visible and hidden post-submit review summary views from the public review summary.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /Submission review|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|需复核|老师复核|可接受答案/,
+  'Student submission domain should not hard-code visible review summary copy.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -7555,6 +7597,20 @@ assert.match(
   'Student runner result panel should prepare post-submit next steps from assignment settings and attempt availability.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerResultPanelView\(\{[\s\S]*attemptResultDisplay,[\s\S]*reviewSummary: result\?\.reviewSummary,[\s\S]*showStartAnotherAttempt[\s\S]*reviewSummaryView: buildStudentAttemptReviewSummaryView\(\{[\s\S]*summary: reviewSummary/,
+  'Student runner result panel should prepare post-submit review summary views from the submitted result summary.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    studentRunnerStateSource,
+    'function buildStudentRunnerResultPanelView',
+    'export function buildStudentRunnerAttemptClock'
+  ),
+  /reviewItems\.filter|submittedItemCount|correctItemCount|unansweredItemCount/,
+  'Student runner result panel state should consume the public review summary instead of recalculating review counts.'
+);
+assert.match(
   playRouteSource,
   /StudentRuntimeItemList/,
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
@@ -7701,8 +7757,8 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerControlView[\s\S]*StudentRunnerIdentityView[\s\S]*StudentRunnerResultPanelView[\s\S]*StudentAttemptResultNextStepsView/,
-  'Student runner attempt shell should consume explicit runner control, identity, result, and next-step view contracts.'
+  /StudentRunnerControlView[\s\S]*StudentRunnerIdentityView[\s\S]*StudentRunnerResultPanelView[\s\S]*StudentAttemptReviewSummaryView[\s\S]*StudentAttemptResultNextStepsView/,
+  'Student runner attempt shell should consume explicit runner control, identity, result, review-summary, and next-step view contracts.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -7728,6 +7784,16 @@ assert.match(
   studentRunnerAttemptShellSource,
   /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*view\.steps\.map/,
   'Student runner result panel should render prepared post-submit next steps from the result panel view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.metrics\.map[\s\S]*metric\.value[\s\S]*metric\.label/,
+  'Student runner result panel should render prepared post-submit review summary metrics from the result panel view.'
+);
+assert.doesNotMatch(
+  studentRunnerAttemptShellSource,
+  /Submission review|Needs review|Teacher review|Correct answers are not shown|Alternatives and explanations appear|提交回顾|需复核|老师复核|可接受答案/,
+  'Student runner attempt shell should not hard-code visible review summary copy.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -8536,6 +8602,18 @@ assert.deepEqual(getStudentRunnerCopy(), {
   resultNextStepsTitle: 'Next steps',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
+  reviewSummaryCorrectLabel: 'Correct',
+  reviewSummaryHiddenDescription:
+    'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
+  reviewSummaryItemCountLabel: 'Items',
+  reviewSummaryNeedsReviewLabel: 'Needs review',
+  reviewSummaryReviewHiddenValue: 'Teacher review',
+  reviewSummaryReviewVisibilityLabel: 'Answer review',
+  reviewSummarySubmittedLabel: 'Submitted',
+  reviewSummaryTitle: 'Submission review',
+  reviewSummaryUnansweredLabel: 'Unanswered',
+  reviewSummaryVisibleDescription:
+    'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
   seoDescription:
     'Open a public student activity runner from a teacher assignment link.',
   seoTitlePrefix: 'Student activity',
@@ -10476,6 +10554,60 @@ assert.deepEqual(
       'You are done for this assignment.',
     ],
     title: 'Next steps',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptReviewSummaryView({
+    summary: {
+      correctItemCount: 1,
+      hiddenBySettings: false,
+      needsReviewItemCount: 2,
+      reviewItemCount: 4,
+      showCorrectAnswers: true,
+      submittedItemCount: 3,
+      totalItemCount: 5,
+      unansweredItemCount: 2,
+    },
+  }),
+  {
+    description:
+      'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
+    hiddenBySettings: false,
+    metrics: [
+      { key: 'submitted', label: 'Submitted', value: '3' },
+      { key: 'correct', label: 'Correct', value: '1' },
+      { key: 'needs-review', label: 'Needs review', value: '2' },
+      { key: 'unanswered', label: 'Unanswered', value: '2' },
+    ],
+    title: 'Submission review',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptReviewSummaryView({
+    summary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
+      showCorrectAnswers: false,
+      submittedItemCount: 0,
+      totalItemCount: 6,
+      unansweredItemCount: 6,
+    },
+  }),
+  {
+    description:
+      'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
+    hiddenBySettings: true,
+    metrics: [
+      { key: 'items', label: 'Items', value: '6' },
+      {
+        key: 'review',
+        label: 'Answer review',
+        value: 'Teacher review',
+      },
+    ],
+    title: 'Submission review',
   }
 );
 assert.equal(
@@ -15595,6 +15727,26 @@ const studentRunnerPageView = buildStudentRunnerPageViewModel({
     },
     durationSeconds: 80,
     earnedPoints: 1,
+    reviewItems: [
+      {
+        acceptedAnswers: ['Student answer'],
+        correct: true,
+        correctAnswer: 'Student answer',
+        itemId: publicRunnerState.runtimeItems[0]!.id,
+        submitted: true,
+        submittedAnswer: 'Student answer',
+      },
+    ],
+    reviewSummary: {
+      correctItemCount: 1,
+      hiddenBySettings: false,
+      needsReviewItemCount: 0,
+      reviewItemCount: 1,
+      showCorrectAnswers: true,
+      submittedItemCount: 1,
+      totalItemCount: 1,
+      unansweredItemCount: 0,
+    },
     totalPoints: 2,
   },
   shareId: ' share-public ',
@@ -15719,6 +15871,18 @@ assert.deepEqual(
         ],
         title: 'Next steps',
       },
+      reviewSummaryView: {
+        description:
+          'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
+        hiddenBySettings: false,
+        metrics: [
+          { key: 'submitted', label: 'Submitted', value: '1' },
+          { key: 'correct', label: 'Correct', value: '1' },
+          { key: 'needs-review', label: 'Needs review', value: '0' },
+          { key: 'unanswered', label: 'Unanswered', value: '0' },
+        ],
+        title: 'Submission review',
+      },
       scoreLabel: '1/2',
       show: true,
       showStartAnotherAttempt: true,
@@ -15731,7 +15895,16 @@ assert.deepEqual(
       items: publicRunnerState.runtimeItems,
       language: 'en',
       revealAnswer: true,
-      reviewItems: undefined,
+      reviewItems: [
+        {
+          acceptedAnswers: ['Student answer'],
+          correct: true,
+          correctAnswer: 'Student answer',
+          itemId: publicRunnerState.runtimeItems[0]!.id,
+          submitted: true,
+          submittedAnswer: 'Student answer',
+        },
+      ],
       templateType: 'quiz',
     },
     runtimeItemIds: publicRunnerState.runtimeItems.map((item) => item.id),
@@ -16200,6 +16373,16 @@ const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
     correctItemCount: 1,
     earnedPoints: 1,
     reviewItems: [],
+    reviewSummary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
+      showCorrectAnswers: false,
+      submittedItemCount: 0,
+      totalItemCount: 1,
+      unansweredItemCount: 1,
+    },
     totalPoints: 1,
   },
   shareId: 'demo-runner',
