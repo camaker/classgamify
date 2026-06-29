@@ -1210,6 +1210,7 @@ assert.doesNotMatch(activeLocaleMessageText, /"waitlist_/);
 assert.doesNotMatch(activeLocaleMessageText, /"about_/);
 assert.doesNotMatch(activeLocaleMessageText, /"ai_page_/);
 assert.doesNotMatch(activeLocaleMessageText, /"legacy_/);
+assert.doesNotMatch(activeLocaleMessageText, /"dashboard_sidebar_api_keys"/);
 const storageTypesSource = readFileSync('src/storage/types.ts', 'utf8');
 assert.doesNotMatch(
   storageTypesSource,

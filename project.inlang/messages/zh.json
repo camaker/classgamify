@@ -1541,7 +1541,6 @@
   "dashboard_pagination_previous": "上一页",
   "dashboard_pagination_summary": "显示第 {firstItem}-{lastItem} 项，共 {total} {itemLabel}",
   "dashboard_sidebar_activities": "活动库",
-  "dashboard_sidebar_api_keys": "API 密钥",
   "dashboard_sidebar_assignments": "作业",
   "dashboard_sidebar_billing": "账单",
   "dashboard_sidebar_dashboard": "工作台",

@@ -1541,7 +1541,6 @@
   "dashboard_pagination_previous": "Previous",
   "dashboard_pagination_summary": "Showing {firstItem}-{lastItem} of {total} {itemLabel}",
   "dashboard_sidebar_activities": "Activities",
-  "dashboard_sidebar_api_keys": "API Keys",
   "dashboard_sidebar_assignments": "Assignments",
   "dashboard_sidebar_billing": "Billing",
   "dashboard_sidebar_dashboard": "Dashboard",
