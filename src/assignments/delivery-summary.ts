@@ -47,7 +47,7 @@ type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
   settings?: Partial<AssignmentSettings> | null;
 };
 
-type AssignmentInstructionSummary = {
+export type AssignmentInstructionSummary = {
   isEmpty: boolean;
   label: string;
   value: string;

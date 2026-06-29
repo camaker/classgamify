@@ -1,5 +1,7 @@
 import {
+  type AssignmentDeliverySummaryItem,
   type AssignmentDeliverySummaryId,
+  type AssignmentInstructionSummary,
   type AssignmentSettingsSummaryView,
   buildAssignmentSettingsSummaryView,
 } from '@/assignments/delivery-summary';
@@ -94,7 +96,7 @@ const assignmentSettingIcons = {
 function AssignmentInstructionsTile({
   instructions,
 }: {
-  instructions: AssignmentSettingsSummaryView['instructions'];
+  instructions: AssignmentInstructionSummary;
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3 text-sm leading-6">
@@ -119,7 +121,7 @@ function AssignmentSettingTile({
   item,
 }: {
   collectStudentName: boolean;
-  item: AssignmentSettingsSummaryView['items'][number];
+  item: AssignmentDeliverySummaryItem;
 }) {
   const Icon = getAssignmentSettingIcon(item.id, collectStudentName);
 

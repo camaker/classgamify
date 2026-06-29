@@ -3637,6 +3637,11 @@ assert.match(
 );
 assert.match(
   assignmentSettingsSummarySource,
+  /AssignmentDeliverySummaryItem[\s\S]*AssignmentInstructionSummary[\s\S]*AssignmentSettingsSummaryView/,
+  'Assignment settings summary component should import explicit delivery item and instruction child contracts.'
+);
+assert.match(
+  assignmentSettingsSummarySource,
   /summaryView\.items\.map[\s\S]*AssignmentSettingTile[\s\S]*item=\{item\}/,
   'Assignment settings summary should delegate prepared setting item views to focused tiles.'
 );
@@ -3649,6 +3654,11 @@ assert.match(
   assignmentSettingsSummarySource,
   /function AssignmentSettingTile[\s\S]*getAssignmentSettingIcon\(item\.id, collectStudentName\)[\s\S]*item\.value[\s\S]*item\.label/,
   'Assignment setting tile should render prepared setting item labels and values.'
+);
+assert.doesNotMatch(
+  assignmentSettingsSummarySource,
+  /AssignmentSettingsSummaryView\['(?:instructions|items)'\](?:\[number\])?/,
+  'Assignment settings summary tiles should not infer child props from aggregate summary indexes.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormSource,
