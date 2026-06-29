@@ -543,6 +543,7 @@ export function buildStudentRunnerPageViewModel({
       ? buildStudentRunnerIdentityView({
           anonymousToken,
           collectStudentName: assignment.settings.collectStudentName,
+          isSubmitting,
           submittedAttemptCount:
             result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
         })
@@ -650,10 +651,12 @@ function buildStudentRunnerMissingPageView(
 function buildStudentRunnerIdentityView({
   anonymousToken,
   collectStudentName,
+  isSubmitting,
   submittedAttemptCount,
 }: {
   anonymousToken?: string;
   collectStudentName: boolean;
+  isSubmitting: boolean;
   submittedAttemptCount: number;
 }): StudentRunnerIdentityView {
   if (collectStudentName) {
@@ -661,6 +664,7 @@ function buildStudentRunnerIdentityView({
 
     return {
       disabled:
+        isSubmitting ||
         normalizeStudentRunnerSubmittedAttemptCount(submittedAttemptCount) > 0,
       label: runnerCopy.studentNameLabel,
       mode: 'student-name',

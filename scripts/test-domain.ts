@@ -14394,6 +14394,22 @@ assert.equal(
     : undefined,
   true
 );
+const submittingNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 2_000,
+  isSubmitting: true,
+  pageState: starterRunnerState,
+  shareId: 'demo-runner',
+  submittedAttemptCount: 0,
+});
+assert.equal(
+  submittingNamedStudentRunnerPageView.identityView?.mode === 'student-name'
+    ? submittingNamedStudentRunnerPageView.identityView.disabled
+    : undefined,
+  true
+);
 assert.deepEqual(
   buildStudentRunnerAnonymousTokenPlan({
     pageView: namedStudentRunnerPageView,
