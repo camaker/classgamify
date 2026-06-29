@@ -35,21 +35,30 @@ export type AssignmentItemReviewSummaryItemView = {
   unansweredLabel: string;
 };
 
+export type AssignmentItemReviewSummary = {
+  itemViews: AssignmentItemReviewSummaryItemView[];
+  items: AssignmentItemAnalysis[];
+  text: string;
+  title: string;
+};
+
 export function buildAssignmentItemReviewSummary({
   assignmentTitle,
   items,
-}: AssignmentItemReviewSummaryInput) {
+}: AssignmentItemReviewSummaryInput): AssignmentItemReviewSummary {
   const sortedItems = sortAssignmentItemsByReviewPriority(items);
   const itemViews = buildAssignmentItemReviewSummaryItemViews(sortedItems);
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
+  const title = m.assignment_item_review_title({ title: copyTitle });
 
-  const lines = [
-    m.assignment_item_review_title({ title: copyTitle }),
-    '',
-    ...formatItems(itemViews),
-  ];
+  const lines = [title, '', ...formatItems(itemViews)];
 
-  return joinAssignmentResultCopyLines(lines);
+  return {
+    itemViews,
+    items: sortedItems,
+    text: joinAssignmentResultCopyLines(lines),
+    title,
+  };
 }
 
 export function buildAssignmentItemReviewSummaryItemViews(

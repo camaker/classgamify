@@ -271,7 +271,7 @@ export function buildAssignmentResultCopyText({
     return buildAssignmentItemReviewSummary({
       assignmentTitle,
       items,
-    });
+    }).text;
   }
 
   return buildAssignmentStudentFollowUpSummary({

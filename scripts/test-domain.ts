@@ -33401,6 +33401,11 @@ assert.match(
 );
 assert.match(
   assignmentItemReviewSummarySource,
+  /export type AssignmentItemReviewSummary[\s\S]*itemViews: AssignmentItemReviewSummaryItemView\[\][\s\S]*items: AssignmentItemAnalysis\[\][\s\S]*text: string/,
+  'Assignment item review summaries should expose a structured teacher-review object alongside the copied text.'
+);
+assert.match(
+  assignmentItemReviewSummarySource,
   /const copyTitle = formatAssignmentResultCopyTitle\(assignmentTitle\)[\s\S]*assignment_item_review_title\(\{ title: copyTitle \}\)/,
   'Assignment item review copied titles should use the shared result-copy title normalizer.'
 );
@@ -33452,28 +33457,42 @@ assert.deepEqual(
   }).explanationText,
   'France capital.'
 );
+assert.deepEqual(
+  {
+    itemIds: itemReviewSummary.items.map((item) => item.itemId),
+    itemViewIds: itemReviewSummary.itemViews.map((itemView) => itemView.itemId),
+    title: itemReviewSummary.title,
+    viewCount: itemReviewSummary.itemViews.length,
+  },
+  {
+    itemIds: ['pair-1', 'q-1'],
+    itemViewIds: ['pair-1', 'q-1'],
+    title: 'ClassGamify item review: Capital Review, Week 1',
+    viewCount: 2,
+  }
+);
 assert.match(
-  itemReviewSummary,
+  itemReviewSummary.text,
   /ClassGamify item review: Capital Review, Week 1/
 );
 assert.match(
   buildAssignmentItemReviewSummary({
     assignmentTitle: ' Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 ',
     items: [],
-  }),
+  }).text,
   /^ClassGamify item review: Capital Review, Week 1\n\n- No item performance data yet\./
 );
 assert.match(
-  itemReviewSummary,
+  itemReviewSummary.text,
   /Capital of France\? \(Question\) - 67% correct, 2\/3 correct/
 );
 assert.match(
-  itemReviewSummary,
+  itemReviewSummary.text,
   /Match "Hot" with its pair\. \(Pair\) - 50% correct, 1\/2 correct/
 );
-assert.match(itemReviewSummary, /Expected: Paris\./);
-assert.match(itemReviewSummary, /Accepted answers: Paris, France\./);
-assert.match(itemReviewSummary, /Notes: Paris is the capital of France\./);
+assert.match(itemReviewSummary.text, /Expected: Paris\./);
+assert.match(itemReviewSummary.text, /Accepted answers: Paris, France\./);
+assert.match(itemReviewSummary.text, /Notes: Paris is the capital of France\./);
 
 const studentFollowUpSummary = buildAssignmentStudentFollowUpSummary({
   assignmentTitle: csvExportData.assignment.title,
@@ -33622,7 +33641,7 @@ assert.equal(
     action: 'copy-item-review',
     data: csvExportData,
   }),
-  itemReviewSummary
+  itemReviewSummary.text
 );
 assert.equal(
   buildAssignmentResultCopyText({
