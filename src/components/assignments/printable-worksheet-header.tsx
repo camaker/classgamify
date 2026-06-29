@@ -1,13 +1,9 @@
-import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import type { PrintableWorksheetHeaderView } from '@/assignments/printable-worksheet-view';
 import { Badge } from '@/components/ui/badge';
 import { IconSchool } from '@tabler/icons-react';
 
-type PrintableWorksheetPageViewModel = ReturnType<
-  typeof buildPrintableWorksheetPageViewModel
->;
-
 type PrintableWorksheetHeaderProps = {
-  headerView: PrintableWorksheetPageViewModel['headerView'];
+  headerView: PrintableWorksheetHeaderView;
 };
 
 export function PrintableWorksheetHeader({

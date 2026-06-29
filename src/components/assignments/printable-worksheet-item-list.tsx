@@ -1,14 +1,14 @@
-import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import type {
+  PrintableWorksheetChoiceBankView,
+  PrintableWorksheetEmptyState,
+  PrintableWorksheetItemView,
+} from '@/assignments/printable-worksheet-view';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-type PrintableWorksheetPageViewModel = ReturnType<
-  typeof buildPrintableWorksheetPageViewModel
->;
-
 type PrintableWorksheetItemListProps = {
-  emptyState: PrintableWorksheetPageViewModel['emptyState'];
-  itemViews: PrintableWorksheetPageViewModel['itemViews'];
+  emptyState: PrintableWorksheetEmptyState;
+  itemViews: PrintableWorksheetItemView[];
 };
 
 export function PrintableWorksheetItemList({
@@ -38,7 +38,7 @@ export function PrintableWorksheetItemList({
 function PrintableWorksheetItem({
   itemView,
 }: {
-  itemView: PrintableWorksheetPageViewModel['itemViews'][number];
+  itemView: PrintableWorksheetItemView;
 }) {
   return (
     <section
@@ -80,7 +80,7 @@ function PrintableWorksheetItem({
 function PrintableWorksheetChoiceBank({
   choiceBank,
 }: {
-  choiceBank: PrintableWorksheetPageViewModel['itemViews'][number]['choiceBank'];
+  choiceBank: PrintableWorksheetChoiceBankView;
 }) {
   if (!choiceBank.show) return null;
 

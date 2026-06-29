@@ -1,12 +1,11 @@
-import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import type {
+  PrintableWorksheetAnswerKeyItemView,
+  PrintableWorksheetAnswerKeyView,
+} from '@/assignments/printable-worksheet-view';
 import { IconKey } from '@tabler/icons-react';
 
-type PrintableWorksheetPageViewModel = ReturnType<
-  typeof buildPrintableWorksheetPageViewModel
->;
-
 type PrintableWorksheetAnswerKeyProps = {
-  view: PrintableWorksheetPageViewModel['answerKeyView'];
+  view: PrintableWorksheetAnswerKeyView;
 };
 
 export function PrintableWorksheetAnswerKey({
@@ -38,7 +37,7 @@ export function PrintableWorksheetAnswerKey({
 function PrintableWorksheetAnswerKeyItem({
   itemView,
 }: {
-  itemView: PrintableWorksheetPageViewModel['answerKeyView']['itemViews'][number];
+  itemView: PrintableWorksheetAnswerKeyItemView;
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3 text-sm">

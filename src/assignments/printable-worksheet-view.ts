@@ -23,24 +23,71 @@ import { getTemplateByType } from '@/activities/catalog';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
-type PrintableWorksheetHeaderView = ReturnType<
-  typeof buildPrintableWorksheetHeaderView
->;
-
-type PrintableWorksheetHeaderOverviewItem = {
+export type PrintableWorksheetHeaderOverviewItem = {
   id: 'answer-key' | 'items' | 'response-modes';
   label: string;
 };
 
-type PrintableWorksheetItemView = ReturnType<
-  typeof buildPrintableWorksheetItemView
->;
+export type PrintableWorksheetHeaderView = {
+  activityDescription: string | null;
+  activityTitle: string;
+  assignmentTitle: string;
+  brandLabel: string;
+  deliveryPolicy: string;
+  instructions: string;
+  overviewItems: PrintableWorksheetHeaderOverviewItem[];
+  printModeLabel: string;
+  sharePath: string;
+  sharePathLabel: string;
+  templateLabel: string;
+};
 
-type PrintableWorksheetAnswerKeyItemView = ReturnType<
-  typeof buildPrintableWorksheetAnswerKeyItemView
->;
+export type PrintableWorksheetAnswerLineView = {
+  key: string;
+};
 
-type PrintableWorksheetAssignmentFieldView =
+export type PrintableWorksheetChoiceBankChoiceView = {
+  choice: string;
+  indexLabel: string;
+  key: string;
+};
+
+export type PrintableWorksheetChoiceBankView = {
+  choices: PrintableWorksheetChoiceBankChoiceView[];
+  emptySummary: string | null;
+  label: string | null;
+  presentation: PrintableWorksheetItem['choicePresentation'];
+  show: boolean;
+  showIndexLabels: boolean;
+  summary: string | null;
+};
+
+export type PrintableWorksheetItemView = {
+  answerAreaLabel: string;
+  answerLineSummary: string;
+  answerLines: PrintableWorksheetAnswerLineView[];
+  choiceBank: PrintableWorksheetChoiceBankView;
+  choicePresentation: PrintableWorksheetItem['choicePresentation'];
+  choices: string[];
+  headingLabel: string;
+  id: string;
+  kindLabel: string;
+  prompt: string;
+  responseHelp: string;
+  responseModeLabel: string;
+  sequenceLabel: string;
+};
+
+export type PrintableWorksheetAnswerKeyItemView = {
+  acceptedAnswersLabel?: string;
+  answerLabel: string;
+  explanationLabel?: string;
+  headingLabel: string;
+  id: string;
+  prompt: string;
+};
+
+export type PrintableWorksheetAssignmentFieldView =
   | {
       id: 'date' | 'score' | 'student-name';
       kind: 'blank-line';
@@ -58,14 +105,14 @@ type PrintableWorksheetAssignmentFieldView =
       value: string;
     };
 
-type PrintableWorksheetAnswerKeyView = {
+export type PrintableWorksheetAnswerKeyView = {
   description: string;
   itemViews: PrintableWorksheetAnswerKeyItemView[];
   show: boolean;
   title: string;
 };
 
-type PrintableWorksheetControlView = {
+export type PrintableWorksheetControlView = {
   answerKeyDescription: string;
   answerKeyLabel: string;
   answerKeyValue: boolean;
@@ -77,16 +124,16 @@ type PrintableWorksheetControlView = {
   printButtonLabel: string;
 };
 
-type PrintableWorksheetEmptyState = {
+export type PrintableWorksheetEmptyState = {
   description: string;
   title: string;
 };
 
-type PrintableWorksheetLoadStateView = {
+export type PrintableWorksheetLoadStateView = {
   message: string;
 };
 
-type PrintableWorksheetPageViewModel = {
+export type PrintableWorksheetPageViewModel = {
   answerKeyView: PrintableWorksheetAnswerKeyView;
   answerKeyItemViews: PrintableWorksheetAnswerKeyItemView[];
   assignmentFieldViews: PrintableWorksheetAssignmentFieldView[];
@@ -97,7 +144,7 @@ type PrintableWorksheetPageViewModel = {
   showAnswerKey: boolean;
 };
 
-type PrintableWorksheetRouteState =
+export type PrintableWorksheetRouteState =
   | {
       statePanelView: PrintableWorksheetLoadStateView;
       status: 'loading';
@@ -178,7 +225,7 @@ export const printableWorksheetPageCopy = {
 
 export function buildPrintableWorksheetHeaderView(
   worksheet: PrintableAssignmentWorksheet
-) {
+): PrintableWorksheetHeaderView {
   return {
     activityDescription: worksheet.activityDescription,
     activityTitle: worksheet.activityTitle,
@@ -402,7 +449,9 @@ export function buildPrintableWorksheetAnswerKeyView({
   };
 }
 
-export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
+export function buildPrintableWorksheetItemView(
+  item: PrintableWorksheetItem
+): PrintableWorksheetItemView {
   const kindLabel = formatRuntimeItemKindLabel(item);
   const sequenceLabel = m.assignment_printable_item_sequence({
     sequenceNumber: normalizePrintableWorksheetSequenceNumber(
@@ -438,7 +487,7 @@ export function buildPrintableWorksheetItemView(item: PrintableWorksheetItem) {
 
 export function buildPrintableWorksheetAnswerKeyItemView(
   item: PrintableWorksheetAnswerKeyItem
-) {
+): PrintableWorksheetAnswerKeyItemView {
   const acceptedAnswers = formatPrintableWorksheetAcceptedAnswers(
     item.acceptedAnswers
   );
@@ -475,7 +524,9 @@ export function buildPrintableWorksheetAnswerKeyItemView(
   };
 }
 
-function buildPrintableWorksheetChoiceBankView(item: PrintableWorksheetItem) {
+function buildPrintableWorksheetChoiceBankView(
+  item: PrintableWorksheetItem
+): PrintableWorksheetChoiceBankView {
   const showChoiceBank = shouldShowPrintableWorksheetChoiceBank(item);
   const choices = showChoiceBank
     ? (normalizeRuntimeChoiceList(item.choices) ?? [])
@@ -510,7 +561,9 @@ function shouldShowPrintableWorksheetChoiceBank(item: PrintableWorksheetItem) {
   return item.choicePresentation !== 'none';
 }
 
-export function getPrintableWorksheetAnswerLines(item: PrintableWorksheetItem) {
+export function getPrintableWorksheetAnswerLines(
+  item: PrintableWorksheetItem
+): PrintableWorksheetAnswerLineView[] {
   const answerSpaceLines = normalizeRuntimeDisplayCount(item.answerSpaceLines, {
     max: 4,
     min: 1,

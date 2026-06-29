@@ -1,18 +1,15 @@
-import type {
-  buildPrintableWorksheetErrorView,
-  buildPrintableWorksheetLoadingView,
-} from '@/assignments/printable-worksheet-view';
+import type { PrintableWorksheetLoadStateView } from '@/assignments/printable-worksheet-view';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 
 type PrintableWorksheetStatePanelProps =
   | {
       mode: 'loading';
-      view: ReturnType<typeof buildPrintableWorksheetLoadingView>;
+      view: PrintableWorksheetLoadStateView;
     }
   | {
       mode: 'error';
-      view: ReturnType<typeof buildPrintableWorksheetErrorView>;
+      view: PrintableWorksheetLoadStateView;
     };
 
 export function PrintableWorksheetStatePanel({

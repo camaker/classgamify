@@ -19874,6 +19874,56 @@ assert.match(
   /headerView\.overviewItems\.map[\s\S]*overviewItem\.label/,
   'Printable worksheet header component should render prepared overview labels from the domain view.'
 );
+assert.match(
+  printableWorksheetViewSource,
+  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{/,
+  'Printable worksheet view domain should export focused header, item, choice-bank, answer-line, and answer-key item contracts.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export function buildPrintableWorksheetHeaderView\([\s\S]*\): PrintableWorksheetHeaderView[\s\S]*export function buildPrintableWorksheetItemView\([\s\S]*\): PrintableWorksheetItemView[\s\S]*export function buildPrintableWorksheetAnswerKeyItemView\([\s\S]*\): PrintableWorksheetAnswerKeyItemView[\s\S]*getPrintableWorksheetAnswerLines\([\s\S]*\): PrintableWorksheetAnswerLineView\[\]/,
+  'Printable worksheet builders should return explicit printable view contracts.'
+);
+assert.doesNotMatch(
+  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}`,
+  /buildPrintableWorksheetPageViewModel|PrintableWorksheetPageViewModel\[|ReturnType<\s*typeof buildPrintableWorksheet(?:LoadingView|ErrorView|PageViewModel)/,
+  'Printable worksheet components should import focused view contracts instead of deriving them from printable page builders.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
+  /PrintableWorksheetControlView/,
+  'Printable worksheet toolbar should consume the explicit printable control view contract.'
+);
+assert.match(
+  printableWorksheetStatePanelSource,
+  /PrintableWorksheetLoadStateView/,
+  'Printable worksheet state panel should consume the explicit load-state view contract.'
+);
+assert.match(
+  printableWorksheetHeaderSource,
+  /PrintableWorksheetHeaderView/,
+  'Printable worksheet header should consume the explicit header view contract.'
+);
+assert.match(
+  printableWorksheetAssignmentFieldsSource,
+  /PrintableWorksheetAssignmentFieldView/,
+  'Printable worksheet assignment fields should consume the explicit assignment field view contract.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /PrintableWorksheetEmptyState[\s\S]*PrintableWorksheetItemView[\s\S]*PrintableWorksheetChoiceBankView/,
+  'Printable worksheet item list should consume explicit empty-state, item, and choice-bank view contracts.'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /PrintableWorksheetAnswerKeyView[\s\S]*PrintableWorksheetAnswerKeyItemView/,
+  'Printable worksheet answer key should consume explicit answer-key section and item view contracts.'
+);
 assert.doesNotMatch(
   printableWorksheetHeaderSource,
   /items\.length|answerKey|responseMode/,

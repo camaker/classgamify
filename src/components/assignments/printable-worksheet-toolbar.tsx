@@ -1,16 +1,12 @@
-import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
+import type { PrintableWorksheetControlView } from '@/assignments/printable-worksheet-view';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { IconArrowLeft, IconPrinter } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
-type PrintableWorksheetPageViewModel = ReturnType<
-  typeof buildPrintableWorksheetPageViewModel
->;
-
 type PrintableWorksheetToolbarProps = {
-  controlView: PrintableWorksheetPageViewModel['controlView'];
+  controlView: PrintableWorksheetControlView;
   onAnswerKeyChange: (answerKey: boolean) => void;
   onPrint: () => void;
 };

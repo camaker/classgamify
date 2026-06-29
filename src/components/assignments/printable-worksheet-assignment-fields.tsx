@@ -1,11 +1,7 @@
-import type { buildPrintableWorksheetPageViewModel } from '@/assignments/printable-worksheet-view';
-
-type PrintableWorksheetPageViewModel = ReturnType<
-  typeof buildPrintableWorksheetPageViewModel
->;
+import type { PrintableWorksheetAssignmentFieldView } from '@/assignments/printable-worksheet-view';
 
 type PrintableWorksheetAssignmentFieldsProps = {
-  fieldViews: PrintableWorksheetPageViewModel['assignmentFieldViews'];
+  fieldViews: PrintableWorksheetAssignmentFieldView[];
 };
 
 export function PrintableWorksheetAssignmentFields({
@@ -29,7 +25,7 @@ export function PrintableWorksheetAssignmentFields({
 function PrintableWorksheetAssignmentField({
   fieldView,
 }: {
-  fieldView: PrintableWorksheetPageViewModel['assignmentFieldViews'][number];
+  fieldView: PrintableWorksheetAssignmentFieldView;
 }) {
   return (
     <div>
