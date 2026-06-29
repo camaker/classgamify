@@ -6983,8 +6983,8 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_description[\s\S]*assignment_delivery_public_rule_timer_description[\s\S]*assignment_delivery_public_rule_closes_description[\s\S]*assignment_delivery_public_rule_identity_description[\s\S]*assignment_delivery_public_rule_review_description/,
-  'Public assignment rule descriptions should come from localized assignment delivery messages.'
+  /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_open_description[\s\S]*assignment_delivery_public_rule_attempts_limited_description[\s\S]*assignment_delivery_public_rule_timer_none_description[\s\S]*assignment_delivery_public_rule_timer_limited_description[\s\S]*assignment_delivery_public_rule_closes_none_description[\s\S]*assignment_delivery_public_rule_closes_scheduled_description[\s\S]*assignment_delivery_public_rule_identity_anonymous_description[\s\S]*assignment_delivery_public_rule_identity_names_description[\s\S]*assignment_delivery_public_rule_review_visible_description[\s\S]*assignment_delivery_public_rule_review_hidden_description/,
+  'Public assignment rule descriptions should come from localized assignment delivery messages and account for the resolved delivery setting values.'
 );
 assert.doesNotMatch(
   assignmentDeliverySummarySource,
@@ -11964,39 +11964,39 @@ assert.deepEqual(
     },
     {
       ariaLabel:
-        'Attempts: 2 max. Your submitted attempts count toward this limit.',
-      description: 'Your submitted attempts count toward this limit.',
+        'Attempts: 2 max. Each submitted attempt counts toward this limit.',
+      description: 'Each submitted attempt counts toward this limit.',
       id: 'attempts',
       label: 'Attempts',
       value: '2 max',
     },
     {
-      ariaLabel: 'Timer: 1 min. The timer starts when the activity is ready.',
-      description: 'The timer starts when the activity is ready.',
+      ariaLabel:
+        'Timer: 1 min. The timer starts once the activity is ready, then your submitted time is saved.',
+      description:
+        'The timer starts once the activity is ready, then your submitted time is saved.',
       id: 'timer',
       label: 'Timer',
       value: '1 min',
     },
     {
-      ariaLabel:
-        'Closes: No close time. The link stops accepting work after this time.',
-      description: 'The link stops accepting work after this time.',
+      ariaLabel: 'Closes: No close time. There is no close time right now.',
+      description: 'There is no close time right now.',
       id: 'closes',
       label: 'Closes',
       value: 'No close time',
     },
     {
       ariaLabel:
-        'Student identity: Anonymous. This setting controls how your work is identified.',
-      description: 'This setting controls how your work is identified.',
+        'Student identity: Anonymous. This browser is used as your anonymous student identity.',
+      description: 'This browser is used as your anonymous student identity.',
       id: 'identity',
       label: 'Student identity',
       value: 'Anonymous',
     },
     {
-      ariaLabel:
-        'Review: Hidden. This controls whether answers appear after submission.',
-      description: 'This controls whether answers appear after submission.',
+      ariaLabel: 'Review: Hidden. Answers stay hidden after submission.',
+      description: 'Answers stay hidden after submission.',
       id: 'answerReveal',
       label: 'Review',
       value: 'Hidden',
@@ -12009,6 +12009,41 @@ assert.equal(
     itemCount: Number.POSITIVE_INFINITY,
   })[0]?.value,
   '0 items'
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummary({
+    collectStudentName: true,
+    expiresAt: null,
+    itemCount: 1,
+    maxAttempts: null,
+    showCorrectAnswers: true,
+  })
+    .filter((rule) =>
+      ['answerReveal', 'attempts', 'identity', 'timer'].includes(rule.id)
+    )
+    .map((rule) => [rule.id, rule.value, rule.description]),
+  [
+    [
+      'attempts',
+      'Open',
+      'You can submit again while the link remains open.',
+    ],
+    [
+      'timer',
+      'No timer',
+      'There is no timer, so submit when your answers are ready.',
+    ],
+    [
+      'identity',
+      'Names',
+      'Type your name so your teacher can find your work.',
+    ],
+    [
+      'answerReveal',
+      'After submit',
+      'Allowed answers appear after you submit.',
+    ],
+  ]
 );
 assert.deepEqual(
   buildPublicAssignmentRuleSummaryFromSettings({
@@ -12033,39 +12068,40 @@ assert.deepEqual(
     },
     {
       ariaLabel:
-        'Attempts: 3 max. Your submitted attempts count toward this limit.',
-      description: 'Your submitted attempts count toward this limit.',
+        'Attempts: 3 max. Each submitted attempt counts toward this limit.',
+      description: 'Each submitted attempt counts toward this limit.',
       id: 'attempts',
       label: 'Attempts',
       value: '3 max',
     },
     {
-      ariaLabel: 'Timer: 2 min. The timer starts when the activity is ready.',
-      description: 'The timer starts when the activity is ready.',
+      ariaLabel:
+        'Timer: 2 min. The timer starts once the activity is ready, then your submitted time is saved.',
+      description:
+        'The timer starts once the activity is ready, then your submitted time is saved.',
       id: 'timer',
       label: 'Timer',
       value: '2 min',
     },
     {
-      ariaLabel:
-        'Closes: No close time. The link stops accepting work after this time.',
-      description: 'The link stops accepting work after this time.',
+      ariaLabel: 'Closes: No close time. There is no close time right now.',
+      description: 'There is no close time right now.',
       id: 'closes',
       label: 'Closes',
       value: 'No close time',
     },
     {
       ariaLabel:
-        'Student identity: Names. This setting controls how your work is identified.',
-      description: 'This setting controls how your work is identified.',
+        'Student identity: Names. Type your name so your teacher can find your work.',
+      description: 'Type your name so your teacher can find your work.',
       id: 'identity',
       label: 'Student identity',
       value: 'Names',
     },
     {
       ariaLabel:
-        'Review: After submit. This controls whether answers appear after submission.',
-      description: 'This controls whether answers appear after submission.',
+        'Review: After submit. Allowed answers appear after you submit.',
+      description: 'Allowed answers appear after you submit.',
       id: 'answerReveal',
       label: 'Review',
       value: 'After submit',
@@ -12094,40 +12130,38 @@ assert.deepEqual(
     },
     {
       ariaLabel:
-        'Attempts: 2 max. Your submitted attempts count toward this limit.',
-      description: 'Your submitted attempts count toward this limit.',
+        'Attempts: 2 max. Each submitted attempt counts toward this limit.',
+      description: 'Each submitted attempt counts toward this limit.',
       id: 'attempts',
       label: 'Attempts',
       value: '2 max',
     },
     {
       ariaLabel:
-        'Timer: No timer. The timer starts when the activity is ready.',
-      description: 'The timer starts when the activity is ready.',
+        'Timer: No timer. There is no timer, so submit when your answers are ready.',
+      description: 'There is no timer, so submit when your answers are ready.',
       id: 'timer',
       label: 'Timer',
       value: 'No timer',
     },
     {
-      ariaLabel:
-        'Closes: No close time. The link stops accepting work after this time.',
-      description: 'The link stops accepting work after this time.',
+      ariaLabel: 'Closes: No close time. There is no close time right now.',
+      description: 'There is no close time right now.',
       id: 'closes',
       label: 'Closes',
       value: 'No close time',
     },
     {
       ariaLabel:
-        'Student identity: Anonymous. This setting controls how your work is identified.',
-      description: 'This setting controls how your work is identified.',
+        'Student identity: Anonymous. This browser is used as your anonymous student identity.',
+      description: 'This browser is used as your anonymous student identity.',
       id: 'identity',
       label: 'Student identity',
       value: 'Anonymous',
     },
     {
-      ariaLabel:
-        'Review: Hidden. This controls whether answers appear after submission.',
-      description: 'This controls whether answers appear after submission.',
+      ariaLabel: 'Review: Hidden. Answers stay hidden after submission.',
+      description: 'Answers stay hidden after submission.',
       id: 'answerReveal',
       label: 'Review',
       value: 'Hidden',
@@ -12154,37 +12188,36 @@ try {
         value: '2 项',
       },
       {
-        ariaLabel: '作答次数：最多 1 次。已提交的作答会计入这个次数限制。',
-        description: '已提交的作答会计入这个次数限制。',
+        ariaLabel: '作答次数：最多 1 次。每次提交都会计入这个次数限制。',
+        description: '每次提交都会计入这个次数限制。',
         id: 'attempts',
         label: '作答次数',
         value: '最多 1 次',
       },
       {
-        ariaLabel: '计时：2 分钟。活动准备好后，计时才会开始。',
-        description: '活动准备好后，计时才会开始。',
+        ariaLabel: '计时：2 分钟。活动准备好后开始计时，提交时会保存用时。',
+        description: '活动准备好后开始计时，提交时会保存用时。',
         id: 'timer',
         label: '计时',
         value: '2 分钟',
       },
       {
-        ariaLabel:
-          '关闭时间：不设关闭时间。超过这个时间后，链接将停止接收作答。',
-        description: '超过这个时间后，链接将停止接收作答。',
+        ariaLabel: '关闭时间：不设关闭时间。当前没有设置关闭时间。',
+        description: '当前没有设置关闭时间。',
         id: 'closes',
         label: '关闭时间',
         value: '不设关闭时间',
       },
       {
-        ariaLabel: '学生身份：匿名。这个设置决定你的作答如何被识别。',
-        description: '这个设置决定你的作答如何被识别。',
+        ariaLabel: '学生身份：匿名。这个浏览器会作为你的匿名学生身份。',
+        description: '这个浏览器会作为你的匿名学生身份。',
         id: 'identity',
         label: '学生身份',
         value: '匿名',
       },
       {
-        ariaLabel: '回顾：提交后显示。这个设置决定提交后是否显示答案。',
-        description: '这个设置决定提交后是否显示答案。',
+        ariaLabel: '回顾：提交后显示。提交后会显示老师允许查看的答案。',
+        description: '提交后会显示老师允许查看的答案。',
         id: 'answerReveal',
         label: '回顾',
         value: '提交后显示',

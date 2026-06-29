@@ -312,7 +312,7 @@ function formatShuffleItems(shuffleItems: boolean) {
 function toPublicAssignmentRuleSummaryItem(
   item: Pick<PublicAssignmentRuleSummaryItem, 'id' | 'label' | 'value'>
 ): PublicAssignmentRuleSummaryItem {
-  const description = getPublicAssignmentRuleDescription(item.id);
+  const description = getPublicAssignmentRuleDescription(item);
 
   return {
     ...item,
@@ -325,26 +325,39 @@ function toPublicAssignmentRuleSummaryItem(
   };
 }
 
-function getPublicAssignmentRuleDescription(id: PublicAssignmentRuleSummaryId) {
+function getPublicAssignmentRuleDescription({
+  id,
+  value,
+}: Pick<PublicAssignmentRuleSummaryItem, 'id' | 'value'>) {
   if (id === 'items') {
     return m.assignment_delivery_public_rule_items_description();
   }
 
   if (id === 'attempts') {
-    return m.assignment_delivery_public_rule_attempts_description();
+    return value === m.assignment_delivery_attempts_open()
+      ? m.assignment_delivery_public_rule_attempts_open_description()
+      : m.assignment_delivery_public_rule_attempts_limited_description();
   }
 
   if (id === 'timer') {
-    return m.assignment_delivery_public_rule_timer_description();
+    return value === m.assignment_delivery_timer_none()
+      ? m.assignment_delivery_public_rule_timer_none_description()
+      : m.assignment_delivery_public_rule_timer_limited_description();
   }
 
   if (id === 'closes') {
-    return m.assignment_delivery_public_rule_closes_description();
+    return value === m.assignment_delivery_expiry_none()
+      ? m.assignment_delivery_public_rule_closes_none_description()
+      : m.assignment_delivery_public_rule_closes_scheduled_description();
   }
 
   if (id === 'identity') {
-    return m.assignment_delivery_public_rule_identity_description();
+    return value === m.assignment_delivery_identity_anonymous()
+      ? m.assignment_delivery_public_rule_identity_anonymous_description()
+      : m.assignment_delivery_public_rule_identity_names_description();
   }
 
-  return m.assignment_delivery_public_rule_review_description();
+  return value === m.assignment_delivery_answer_reveal_after_submit()
+    ? m.assignment_delivery_public_rule_review_visible_description()
+    : m.assignment_delivery_public_rule_review_hidden_description();
 }
