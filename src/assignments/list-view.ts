@@ -50,11 +50,9 @@ import {
 } from '@/assignments/result-format';
 import {
   assignmentShareLinkActionCopy,
-  buildAssignmentShareLinkAvailabilityState,
-  buildAssignmentSharePath,
-  type AssignmentShareLinkAvailabilityState,
+  buildAssignmentShareLinkAvailability,
+  type AssignmentShareLinkAvailability,
 } from '@/assignments/share-link';
-import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
@@ -84,6 +82,7 @@ type AssignmentListCardStat = {
 
 type AssignmentListCardActionState = {
   isPersisted: boolean;
+  shareAvailability: AssignmentShareLinkAvailability;
   shareDisabledReason?: string;
   shareLabel: string;
   showResultsAction: boolean;
@@ -686,11 +685,11 @@ export function buildAssignmentListCardViewModel({
     snapshot,
   });
   const templateType = resolvedSource.templateType;
-  const shareSlug = normalizeAssignmentShareSlug(assignment.shareSlug);
   const actionState = getAssignmentListCardActionState({
     expiresAt: assignment.expiresAt,
     now,
     persisted,
+    shareSlug: assignment.shareSlug,
     status: assignment.status,
   });
 
@@ -698,7 +697,6 @@ export function buildAssignmentListCardViewModel({
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
-      shareSlug,
     }),
     activityDescription: resolvedSource.activityDescription ?? '',
     id: assignment.id,
@@ -707,7 +705,7 @@ export function buildAssignmentListCardViewModel({
       expiresAt: assignment.expiresAt,
       settings: assignment.settingsJson,
     }),
-    shareSlug,
+    shareSlug: actionState.shareAvailability.shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
@@ -733,10 +731,10 @@ export function buildStarterAssignmentListCardViewModel({
     averageScore: assignment.averageScore,
     completions: assignment.completions,
   };
-  const shareSlug = normalizeAssignmentShareSlug(assignment.shareId);
   const actionState = getAssignmentListCardActionState({
     expiresAt,
     persisted,
+    shareSlug: assignment.shareId,
     status: assignment.status,
   });
 
@@ -744,7 +742,6 @@ export function buildStarterAssignmentListCardViewModel({
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
-      shareSlug,
     }),
     activityDescription: formatAssignmentDisplayText(activity.description),
     id: assignment.id,
@@ -753,7 +750,7 @@ export function buildStarterAssignmentListCardViewModel({
       expiresAt,
       settings: assignment.settings,
     }),
-    shareSlug,
+    shareSlug: actionState.shareAvailability.shareSlug,
     stats,
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
@@ -790,33 +787,35 @@ export function getAssignmentListCardActionState({
   expiresAt,
   now,
   persisted,
+  shareSlug,
   status,
 }: {
   expiresAt: Date | null;
   now?: number;
   persisted: boolean;
+  shareSlug: string;
   status: AssignmentStatus;
 }): AssignmentListCardActionState {
   const hasPublishedSnapshot = status !== 'draft';
-  const shareAvailabilityState = buildAssignmentShareLinkAvailabilityState({
+  const shareAvailability = buildAssignmentShareLinkAvailability({
     expiresAt,
     now,
+    shareSlug,
     status,
   });
-  const shareDisabledReason = shareAvailabilityState.isAvailable
+  const shareDisabledReason = shareAvailability.isAvailable
     ? undefined
-    : getAssignmentListShareDisabledReason(
-        shareAvailabilityState.lifecycleStatus
-      );
+    : getAssignmentListShareDisabledReason(shareAvailability.lifecycleStatus);
 
   return {
     isPersisted: persisted,
+    shareAvailability,
     ...(shareDisabledReason ? { shareDisabledReason } : {}),
-    shareLabel: shareAvailabilityState.isAvailable
+    shareLabel: shareAvailability.isAvailable
       ? assignmentListActionCopy.openShareLink
       : assignmentListActionCopy.shareLinkUnavailable,
     showResultsAction: persisted && hasPublishedSnapshot,
-    showShareActions: persisted || shareAvailabilityState.isAvailable,
+    showShareActions: persisted || shareAvailability.isAvailable,
     statusAction: buildAssignmentStatusAction({
       currentStatus: status,
       expiresAt,
@@ -829,14 +828,10 @@ export function getAssignmentListCardActionState({
 export function buildAssignmentListCardActionView({
   actionState,
   assignmentId,
-  shareSlug,
 }: {
   actionState: AssignmentListCardActionState;
   assignmentId: string;
-  shareSlug: string;
 }): AssignmentListCardActionView {
-  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
-
   return {
     printAction: actionState.showResultsAction
       ? {
@@ -860,9 +855,9 @@ export function buildAssignmentListCardActionView({
             : {}),
           isAvailable: !actionState.shareDisabledReason,
           label: actionState.shareLabel,
-          sharePath: buildAssignmentSharePath(normalizedShareSlug),
+          sharePath: actionState.shareAvailability.sharePath,
           sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
-          shareSlug: normalizedShareSlug,
+          shareSlug: actionState.shareAvailability.shareSlug,
           to: Routes.Play,
         }
       : undefined,
@@ -871,7 +866,7 @@ export function buildAssignmentListCardActionView({
 }
 
 function getAssignmentListShareDisabledReason(
-  lifecycleStatus: AssignmentShareLinkAvailabilityState['lifecycleStatus']
+  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
 ) {
   if (lifecycleStatus === 'closed') {
     return m.assignment_list_share_link_closed();

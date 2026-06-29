@@ -18362,13 +18362,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentShareLinkAvailabilityState\(\{[\s\S]*expiresAt,[\s\S]*status,[\s\S]*\}\)/,
-  'Assignment list card action state should resolve share-link state through the shared assignment share helper without constructing a URL.'
+  /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
+  'Assignment list card action state should resolve share-link state and path through the shared assignment share helper.'
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*to: Routes\.Play/,
-  'Assignment list card action view should prepare shared student-link copy, path labels, and route targets in the domain layer.'
+  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePath: actionState\.shareAvailability\.sharePath[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*to: Routes\.Play/,
+  'Assignment list card action view should render shared student-link copy, path labels, prepared paths, normalized slugs, and route targets from the domain layer.'
 );
 assert.match(
   assignmentListViewSource,
@@ -18376,9 +18376,11 @@ assert.match(
   'Assignment list card action view should prepare printable worksheet and result route targets.'
 );
 assert.doesNotMatch(
-  assignmentListViewSource,
-  /buildAssignmentShareLinkAvailability\(\{[\s\S]*shareSlug: ''/,
-  'Assignment list card action state should not pass a fake share slug just to resolve share-link lifecycle state.'
+  assignmentListViewSource.match(
+    /export function buildAssignmentListCardActionView[\s\S]*?^}/m
+  )?.[0] ?? '',
+  /shareSlug:|buildAssignmentSharePath\(|normalizeAssignmentShareSlug\(/,
+  'Assignment list card action view should not accept raw share slugs or rebuild share paths locally.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -18512,18 +18514,18 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /title: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareId\)[\s\S]*title: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  /title: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*title: formatAssignmentDisplayTitle\(assignment\.title\)/,
   'Assignment list card view-models should normalize persisted and starter assignment titles through the shared assignment display helper.'
 );
 assert.match(
   assignmentListViewSource,
-  /const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareSlug\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(assignment\.shareId\)/,
-  'Assignment list card view-models should normalize persisted and starter share IDs before exposing card fields.'
+  /shareSlug: assignment\.shareSlug[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*shareSlug: assignment\.shareId[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
+  'Assignment list card view-models should normalize persisted and starter share IDs through prepared share availability before exposing card fields.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
-  /title: assignment\.title|shareSlug: assignment\.(?:shareSlug|shareId),/,
-  'Assignment list card view-models should not expose raw assignment titles or share IDs.'
+  /title: assignment\.title/,
+  'Assignment list card view-models should not expose raw assignment titles.'
 );
 assert.doesNotMatch(
   dashboardAssignmentsRouteSource,
@@ -22980,10 +22982,17 @@ assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
     persisted: false,
+    shareSlug: '　demo food　',
     status: 'published',
   }),
   {
     isPersisted: false,
+    shareAvailability: {
+      isAvailable: true,
+      lifecycleStatus: 'open',
+      sharePath: '/play/demo%20food',
+      shareSlug: 'demo food',
+    },
     shareLabel: 'Open share link',
     showResultsAction: false,
     showShareActions: true,
@@ -22994,10 +23003,17 @@ assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
     persisted: true,
+    shareSlug: '　share-１　',
     status: 'published',
   }),
   {
     isPersisted: true,
+    shareAvailability: {
+      isAvailable: true,
+      lifecycleStatus: 'open',
+      sharePath: '/play/share-1',
+      shareSlug: 'share-1',
+    },
     shareLabel: 'Open share link',
     showResultsAction: true,
     showShareActions: true,
@@ -23014,10 +23030,17 @@ assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
     persisted: true,
+    shareSlug: 'closed-share',
     status: 'closed',
   }),
   {
     isPersisted: true,
+    shareAvailability: {
+      isAvailable: false,
+      lifecycleStatus: 'closed',
+      sharePath: '/play/closed-share',
+      shareSlug: 'closed-share',
+    },
     shareDisabledReason:
       'This assignment is closed. Reopen it before sharing the student link.',
     shareLabel: 'Share link unavailable',
@@ -23037,10 +23060,17 @@ assert.deepEqual(
     expiresAt: new Date('2026-01-01T09:00:00.000Z'),
     now: new Date('2026-01-01T10:00:00.000Z').getTime(),
     persisted: true,
+    shareSlug: 'expired-share',
     status: 'published',
   }),
   {
     isPersisted: true,
+    shareAvailability: {
+      isAvailable: false,
+      lifecycleStatus: 'expired',
+      sharePath: '/play/expired-share',
+      shareSlug: 'expired-share',
+    },
     shareDisabledReason:
       'This assignment link has expired. Students cannot open it from the assignment list.',
     shareLabel: 'Share link unavailable',
@@ -23059,10 +23089,17 @@ assert.deepEqual(
   getAssignmentListCardActionState({
     expiresAt: null,
     persisted: true,
+    shareSlug: 'draft-share',
     status: 'draft',
   }),
   {
     isPersisted: true,
+    shareAvailability: {
+      isAvailable: false,
+      lifecycleStatus: 'draft',
+      sharePath: '/play/draft-share',
+      shareSlug: 'draft-share',
+    },
     shareDisabledReason:
       'Publish this assignment before sharing a student link.',
     shareLabel: 'Share link unavailable',
@@ -23075,13 +23112,18 @@ assert.deepEqual(
   buildAssignmentListCardActionView({
     actionState: {
       isPersisted: true,
+      shareAvailability: {
+        isAvailable: true,
+        lifecycleStatus: 'open',
+        sharePath: '/play/share%20123',
+        shareSlug: 'share 123',
+      },
       shareLabel: 'Open share link',
       showResultsAction: true,
       showShareActions: true,
       statusAction: undefined,
     },
     assignmentId: 'assignment-with-space',
-    shareSlug: '　share １２３　',
   }),
   {
     printAction: {
@@ -23110,6 +23152,12 @@ assert.deepEqual(
   buildAssignmentListCardActionView({
     actionState: {
       isPersisted: true,
+      shareAvailability: {
+        isAvailable: false,
+        lifecycleStatus: 'draft',
+        sharePath: '/play/draft-share',
+        shareSlug: 'draft-share',
+      },
       shareDisabledReason:
         'Publish this assignment before sharing a student link.',
       shareLabel: 'Share link unavailable',
@@ -23118,7 +23166,6 @@ assert.deepEqual(
       statusAction: undefined,
     },
     assignmentId: 'draft-assignment',
-    shareSlug: 'draft-share',
   }),
   {
     printAction: undefined,
