@@ -181,7 +181,7 @@ type AssignmentResultSectionState = {
   showStudentSummary: boolean;
 };
 
-type AssignmentResultSectionView = {
+export type AssignmentResultSectionView = {
   description?: string;
   emptyMessage?: string;
   emptyState?: AssignmentResultEmptyState;
@@ -190,7 +190,7 @@ type AssignmentResultSectionView = {
   title: string;
 };
 
-type AssignmentResultSectionViews = {
+export type AssignmentResultSectionViews = {
   answerReview: AssignmentResultSectionView;
   classroomBrief: AssignmentResultSectionView;
   classReviewFocus: AssignmentResultSectionView;

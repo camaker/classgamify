@@ -4058,8 +4058,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultClassroomBriefSectionViews = Pick<[\s\S]*'classroomBrief' \| 'classReviewFocus' \| 'studentFollowUp'/,
-  'Assignment result view domain should expose a focused classroom-brief section-view contract.'
+  /export type AssignmentResultSectionView = \{[\s\S]*export type AssignmentResultSectionViews = \{[\s\S]*export type AssignmentResultClassroomBriefSectionViews = Pick<[\s\S]*'classroomBrief' \| 'classReviewFocus' \| 'studentFollowUp'/,
+  'Assignment result view domain should expose explicit section-view and focused classroom-brief section-view contracts.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -4347,18 +4347,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /export type AssignmentClassroomBrief = \{/,
-  'Assignment classroom brief should expose an explicit domain view contract.'
+  /export type AssignmentClassroomBrief = \{[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
+  'Assignment classroom brief should expose explicit aggregate, stat, copy-preview, focus-item, and follow-up student view contracts.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /import type \{ AssignmentClassroomBrief \} from '@\/assignments\/classroom-brief'/,
-  'Assignment classroom brief card should import the explicit classroom brief contract.'
+  /AssignmentClassroomBrief,[\s\S]*AssignmentClassroomBriefCopyPreview,[\s\S]*AssignmentClassroomBriefFocusItemView,[\s\S]*AssignmentClassroomBriefFollowUpStudentView,[\s\S]*AssignmentClassroomBriefStatView/,
+  'Assignment classroom brief card should import explicit classroom brief aggregate and child view contracts.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultClassroomBriefSectionViews/,
-  'Assignment classroom brief card should consume the focused classroom-brief section-view contract.'
+  /AssignmentResultClassroomBriefSectionViews[\s\S]*AssignmentResultSectionView/,
+  'Assignment classroom brief card should consume focused classroom-brief and child section-view contracts.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -4412,8 +4412,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
   'Assignment classroom brief copy preview should render prepared copy scope and copy artifact previews with the prepared result action handler.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /AssignmentClassroomBrief\['(?:statViews|focusItemViews|followUpStudentViews)'\]|AssignmentResultsClassroomBriefCardProps\['sectionViews'\]/,
+  'Assignment classroom brief card child components should not infer props from aggregate classroom brief or card prop indexes.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,

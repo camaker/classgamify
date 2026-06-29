@@ -1,9 +1,16 @@
-import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
+import type {
+  AssignmentClassroomBrief,
+  AssignmentClassroomBriefCopyPreview,
+  AssignmentClassroomBriefFocusItemView,
+  AssignmentClassroomBriefFollowUpStudentView,
+  AssignmentClassroomBriefStatView,
+} from '@/assignments/classroom-brief';
 import type {
   AssignmentResultActionButton,
   AssignmentResultClassroomBriefSectionViews,
   AssignmentResultCopyArtifactPreview,
   AssignmentResultCopyScopeView,
+  AssignmentResultSectionView,
 } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,8 +72,8 @@ export function AssignmentResultsClassroomBriefCard({
           />
         </div>
         <AssignmentResultsClassroomBriefCopyPreview
-          brief={brief}
           copyArtifactPreviews={copyArtifactPreviews}
+          copyPreview={brief.copyPreview}
           copyScopeView={copyScopeView}
           onResultAction={onResultAction}
         />
@@ -98,7 +105,7 @@ function AssignmentResultsClassroomBriefStats({
 function AssignmentResultsClassroomBriefStat({
   statView,
 }: {
-  statView: AssignmentClassroomBrief['statViews'][number];
+  statView: AssignmentClassroomBriefStatView;
 }) {
   return (
     <div className="rounded-md border bg-background p-3">
@@ -112,8 +119,8 @@ function AssignmentResultsClassFocusPanel({
   focusItemViews,
   sectionView,
 }: {
-  focusItemViews: AssignmentClassroomBrief['focusItemViews'];
-  sectionView: AssignmentResultsClassroomBriefCardProps['sectionViews']['classReviewFocus'];
+  focusItemViews: AssignmentClassroomBriefFocusItemView[];
+  sectionView: AssignmentResultSectionView;
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
@@ -140,8 +147,8 @@ function AssignmentResultsFollowUpPanel({
   followUpStudentViews,
   sectionView,
 }: {
-  followUpStudentViews: AssignmentClassroomBrief['followUpStudentViews'];
-  sectionView: AssignmentResultsClassroomBriefCardProps['sectionViews']['studentFollowUp'];
+  followUpStudentViews: AssignmentClassroomBriefFollowUpStudentView[];
+  sectionView: AssignmentResultSectionView;
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
@@ -167,7 +174,7 @@ function AssignmentResultsFollowUpPanel({
 function AssignmentResultsClassFocusItem({
   itemView,
 }: {
-  itemView: AssignmentClassroomBrief['focusItemViews'][number];
+  itemView: AssignmentClassroomBriefFocusItemView;
 }) {
   return (
     <div className="grid gap-1 text-sm">
@@ -195,7 +202,7 @@ function AssignmentResultsClassFocusItem({
 function AssignmentResultsFollowUpStudent({
   studentView,
 }: {
-  studentView: AssignmentClassroomBrief['followUpStudentViews'][number];
+  studentView: AssignmentClassroomBriefFollowUpStudentView;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
@@ -216,23 +223,23 @@ function AssignmentResultsFollowUpStudent({
 }
 
 function AssignmentResultsClassroomBriefCopyPreview({
-  brief,
   copyArtifactPreviews,
+  copyPreview,
   copyScopeView,
   onResultAction,
 }: {
-  brief: AssignmentClassroomBrief;
   copyArtifactPreviews: Array<
     AssignmentResultCopyArtifactPreview & {
       actionButton: AssignmentResultActionButton;
     }
   >;
+  copyPreview: AssignmentClassroomBriefCopyPreview;
   copyScopeView: AssignmentResultCopyScopeView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
 }) {
   return (
     <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">
-      <h3 className="font-medium text-sm">{brief.copyPreview.label}</h3>
+      <h3 className="font-medium text-sm">{copyPreview.label}</h3>
       <AssignmentResultsCopyScopeView copyScopeView={copyScopeView} />
       <div className="grid gap-3 lg:grid-cols-2">
         {copyArtifactPreviews.map((preview) => (

@@ -62,7 +62,7 @@ export type AssignmentClassroomBriefStatView = {
   value: string;
 };
 
-type AssignmentClassroomBriefCopyPreview = {
+export type AssignmentClassroomBriefCopyPreview = {
   label: string;
   text: string;
 };
