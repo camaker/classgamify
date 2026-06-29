@@ -15,7 +15,7 @@ export type AssignmentDeliverySummaryId =
   | 'itemOrder'
   | 'timer';
 
-type AssignmentDeliverySummaryItem = {
+export type AssignmentDeliverySummaryItem = {
   id: AssignmentDeliverySummaryId;
   label: string;
   value: string;

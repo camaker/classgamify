@@ -19800,6 +19800,21 @@ assert.match(
   'Printable worksheet delivery view should share assignment delivery-summary formatting.'
 );
 assert.match(
+  assignmentDeliverySummarySource,
+  /export type AssignmentDeliverySummaryItem = \{[\s\S]*id: AssignmentDeliverySummaryId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Assignment delivery summary domain should expose an explicit delivery summary item contract.'
+);
+assert.match(
+  printableWorksheetSource,
+  /type AssignmentDeliverySummaryItem[\s\S]*export type PrintableAssignmentDeliveryView = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];[\s\S]*export type PrintableAssignmentWorksheet = \{[\s\S]*deliverySummary: AssignmentDeliverySummaryItem\[\];/,
+  'Printable worksheet delivery contracts should use the explicit assignment delivery summary item type.'
+);
+assert.doesNotMatch(
+  printableWorksheetSource,
+  /ReturnType<typeof buildAssignmentDeliverySummary>/,
+  'Printable worksheet contracts should not infer delivery summary shape from the delivery-summary helper return type.'
+);
+assert.match(
   printableWorksheetSource,
   /const deliveryView = buildPrintableAssignmentDeliveryView\(\{[\s\S]*expiresAt: assignment\.expiresAt,[\s\S]*settings,[\s\S]*deliveryPolicyText: deliveryView\.deliveryPolicyText,[\s\S]*deliverySummary: deliveryView\.deliverySummary,[\s\S]*instructions: deliveryView\.instructions/,
   'Printable worksheets should prepare delivery policy, summary, and instructions through the printable delivery view.'

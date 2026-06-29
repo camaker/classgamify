@@ -12,6 +12,7 @@ import {
   buildAssignmentDeliverySummary,
   formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
+  type AssignmentDeliverySummaryItem,
 } from '@/assignments/delivery-summary';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
@@ -68,7 +69,7 @@ export type PrintableWorksheetAnswerKeyItem = {
 
 export type PrintableAssignmentDeliveryView = {
   deliveryPolicyText: string;
-  deliverySummary: ReturnType<typeof buildAssignmentDeliverySummary>;
+  deliverySummary: AssignmentDeliverySummaryItem[];
   instructions?: string;
 };
 
@@ -78,7 +79,7 @@ export type PrintableAssignmentWorksheet = {
   answerKey?: PrintableWorksheetAnswerKeyItem[];
   assignmentTitle: string;
   deliveryPolicyText: string;
-  deliverySummary: ReturnType<typeof buildAssignmentDeliverySummary>;
+  deliverySummary: AssignmentDeliverySummaryItem[];
   includeAnswerKey: boolean;
   instructions?: string;
   items: PrintableWorksheetItem[];
