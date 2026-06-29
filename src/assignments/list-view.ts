@@ -43,6 +43,7 @@ import {
 import {
   buildPublishedAssignmentPanelContext,
   resolvePublishedAssignmentPanelAssignment,
+  type PublishedAssignmentPanelAssignment,
   type PublishedAssignmentPanelContext,
 } from '@/assignments/published-assignment';
 import {
@@ -125,6 +126,11 @@ export type AssignmentListCardActionView = {
 
 export type AssignmentListCardStatItems = AssignmentListCardStat[];
 
+export type AssignmentListCardStats = {
+  averageScore: number;
+  completions: number;
+};
+
 export type AssignmentListCardViewModel = {
   actionView: AssignmentListCardActionView;
   activityDescription: string;
@@ -136,32 +142,35 @@ export type AssignmentListCardViewModel = {
   templateLabel: string;
   templateType: ActivityTemplateType;
   title: string;
-  stats: {
-    averageScore: number;
-    completions: number;
-  };
+  stats: AssignmentListCardStats;
   statItems: AssignmentListCardStatItems;
   statusLabel: string;
 };
 
-type AssignmentListCardSource = {
-  activity: {
-    description: string | null;
-    templateType: ActivityTemplateType;
-  };
-  assignment: {
-    expiresAt: Date | null;
-    id: string;
-    settingsJson: AssignmentSettings;
-    shareSlug: string;
-    status: AssignmentStatus;
-    title: string;
-  };
-  snapshot?: {
-    activityDescription: string | null;
-    templateType: ActivityTemplateType;
-  } | null;
-  stats: AssignmentListCardViewModel['stats'];
+export type AssignmentListCardActivitySource = {
+  description: string | null;
+  templateType: ActivityTemplateType;
+};
+
+export type AssignmentListCardAssignmentSource = {
+  expiresAt: Date | null;
+  id: string;
+  settingsJson: AssignmentSettings;
+  shareSlug: string;
+  status: AssignmentStatus;
+  title: string;
+};
+
+export type AssignmentListCardSnapshotSource = {
+  activityDescription: string | null;
+  templateType: ActivityTemplateType;
+};
+
+export type AssignmentListCardSource = {
+  activity: AssignmentListCardActivitySource;
+  assignment: AssignmentListCardAssignmentSource;
+  snapshot?: AssignmentListCardSnapshotSource | null;
+  stats: AssignmentListCardStats;
   now?: number;
 };
 
@@ -210,21 +219,11 @@ type AssignmentListPageResolvedSearch = {
   statusFilter: AssignmentStatusFilter;
 };
 
-type AssignmentListPageItem = AssignmentListCardSource & {
-  assignment: AssignmentListCardSource['assignment'] & {
-    id: string;
-    shareSlug: string;
-    title: string;
-  };
-};
+type AssignmentListPageItem = AssignmentListCardSource;
 
 type AssignmentListPageData<TItem extends AssignmentListPageItem> = {
   items: TItem[];
-  publishedAssignment?: {
-    id: string;
-    shareSlug: string;
-    title: string;
-  } | null;
+  publishedAssignment?: PublishedAssignmentPanelAssignment | null;
   summary?: AssignmentListSummary;
   total: number;
 };
@@ -652,10 +651,7 @@ export function resolveAssignmentListPageSearch(
 export function buildAssignmentListCardStats({
   averageScore,
   completions,
-}: {
-  averageScore: number;
-  completions: number;
-}): AssignmentListCardStat[] {
+}: AssignmentListCardStats): AssignmentListCardStat[] {
   const statsView = buildAssignmentAttemptStatsView({
     averageScore,
     completions,

@@ -18926,8 +18926,18 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
+  /export type AssignmentListCardStats = \{[\s\S]*averageScore: number;[\s\S]*completions: number;[\s\S]*export type AssignmentListCardActivitySource = \{[\s\S]*export type AssignmentListCardAssignmentSource = \{[\s\S]*export type AssignmentListCardSnapshotSource = \{[\s\S]*export type AssignmentListCardSource = \{/,
+  'Assignment list card inputs should expose explicit stats, activity, assignment, snapshot, and source contracts.'
+);
+assert.match(
+  assignmentListViewSource,
   /export type AssignmentListPrintAction = \{[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = \{[\s\S]*to: typeof Routes\.Play;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
   'Assignment list card actions should be exported as focused domain contracts.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /AssignmentListCardViewModel\['stats'\]|AssignmentListCardSource\['assignment'\]/,
+  'Assignment list card source types should not infer inputs from aggregate card view-model contracts.'
 );
 assert.doesNotMatch(
   `${assignmentListCardComponentSource}\n${assignmentListStatsComponentSource}`,
