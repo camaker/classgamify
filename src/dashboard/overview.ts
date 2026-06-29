@@ -10,13 +10,13 @@ import {
 } from '@/assignments/result-format';
 import { m } from '@/locale/paraglide/messages';
 
-type DashboardActivitySummary = {
+export type DashboardOverviewOwnerActivitySummary = {
   draftActivities: number;
   templateCoverage: number;
   totalActivities: number;
 };
 
-type DashboardAssignmentSummary = {
+export type DashboardOverviewOwnerAssignmentSummary = {
   averageScore: number;
   completions: number;
   openAssignments: number;
@@ -29,7 +29,7 @@ export type DashboardOverviewMetricId =
   | 'assignments'
   | 'results';
 
-type DashboardOverviewMetric = {
+export type DashboardOverviewMetric = {
   description: string;
   id: DashboardOverviewMetricId;
   label: string;
@@ -43,12 +43,12 @@ type DashboardOverviewPageViewModel = {
   readinessRows: DashboardCoreLoopReadinessRow[];
 };
 
-type DashboardOverviewActivityData = {
-  summary?: DashboardActivitySummary;
+type DashboardOverviewOwnerActivityData = {
+  summary?: DashboardOverviewOwnerActivitySummary;
 };
 
-type DashboardOverviewAssignmentData = {
-  summary?: DashboardAssignmentSummary;
+type DashboardOverviewOwnerAssignmentData = {
+  summary?: DashboardOverviewOwnerAssignmentSummary;
 };
 
 export type DashboardOverviewActionCardId =
@@ -143,8 +143,8 @@ export function buildDashboardOverviewPageViewModel({
   isLoading,
   preview = buildDashboardOverviewStarterPreview(),
 }: {
-  activitySummary?: DashboardActivitySummary;
-  assignmentSummary?: DashboardAssignmentSummary;
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
   isLoading: boolean;
   preview?: DashboardOverviewPreview;
 }): DashboardOverviewPageViewModel {
@@ -170,9 +170,9 @@ export function buildDashboardOverviewRouteViewModel({
   assignmentsLoading,
   preview,
 }: {
-  activitiesData?: DashboardOverviewActivityData | null;
+  activitiesData?: DashboardOverviewOwnerActivityData | null;
   activitiesLoading: boolean;
-  assignmentsData?: DashboardOverviewAssignmentData | null;
+  assignmentsData?: DashboardOverviewOwnerAssignmentData | null;
   assignmentsLoading: boolean;
   preview?: DashboardOverviewPreview;
 }): DashboardOverviewPageViewModel {
@@ -199,8 +199,8 @@ export function buildDashboardOverviewMetrics({
   assignmentSummary,
   isLoading,
 }: {
-  activitySummary?: DashboardActivitySummary;
-  assignmentSummary?: DashboardAssignmentSummary;
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
   isLoading: boolean;
 }): DashboardOverviewMetric[] {
   return [
@@ -245,8 +245,8 @@ export function buildDashboardCoreLoopReadiness({
   activitySummary,
   assignmentSummary,
 }: {
-  activitySummary?: DashboardActivitySummary;
-  assignmentSummary?: DashboardAssignmentSummary;
+  activitySummary?: DashboardOverviewOwnerActivitySummary;
+  assignmentSummary?: DashboardOverviewOwnerAssignmentSummary;
 } = {}): DashboardCoreLoopReadinessRow[] {
   const totalActivities = normalizeDashboardSummaryCount(
     activitySummary?.totalActivities

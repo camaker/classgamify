@@ -17917,6 +17917,11 @@ assert.match(
   /summary: summarizeActivityLibrary\(matchingActivities\)/,
   'Activity list summary should reflect source-material filtered activities.'
 );
+assert.match(
+  activitiesApiSource,
+  /const where = buildActivityLibraryWhere\(\{[\s\S]*userId,[\s\S]*\}\);[\s\S]*const matchingRows = await db[\s\S]*\.where\(where\)[\s\S]*const matchingActivities = filterActivityLibrarySourceItems[\s\S]*summary: summarizeActivityLibrary\(matchingActivities\)/,
+  'Activity list summary should be derived from owner-scoped filtered activity rows, not starter preview content.'
+);
 const activityLibrarySummaryDomainSource = readFileSync(
   'src/activities/library-summary.ts',
   'utf8'
@@ -18262,6 +18267,20 @@ assert.match(
   activityLibraryViewSource,
   /buildActivityLibraryRouteState[\s\S]*buildActivityLibraryPageViewModel[\s\S]*showLoadError[\s\S]*status: 'loading'[\s\S]*status: 'error'[\s\S]*status: 'empty-filtered'[\s\S]*status: 'empty-starter'[\s\S]*status: 'ready'/,
   'Activity library view domain should own activity-library loading, error, empty, and ready route-state selection.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /summaryMetrics: buildActivityLibrarySummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalActivities,[\s\S]*\}\)/,
+  'Activity library summary metrics should come from real list data and totals.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    activityLibraryViewSource,
+    'summaryMetrics: buildActivityLibrarySummaryMetrics',
+    'title: activityLibraryPageCopy.title'
+  ),
+  /starterPreview|getStarterActivities|getStarterActivity/,
+  'Activity library summary metrics should not count starter-preview activities.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -19014,6 +19033,20 @@ assert.match(
   'Assignment list view domain should own assignment-list loading, error, empty, and ready route-state selection.'
 );
 assert.match(
+  assignmentListViewSource,
+  /summaryMetrics: buildAssignmentListSummaryMetrics\(\{[\s\S]*summary: data\?\.summary,[\s\S]*totalAssignments,[\s\S]*\}\)/,
+  'Assignment list summary metrics should come from real list data and totals.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    assignmentListViewSource,
+    'summaryMetrics: buildAssignmentListSummaryMetrics',
+    'title: assignmentListPageCopy.title'
+  ),
+  /starterPreview|getStarterAssignments|getStarterAssignment|getStarterActivity/,
+  'Assignment list summary metrics should not count starter-preview assignments.'
+);
+assert.match(
   dashboardAssignmentsRouteSource,
   /buildAssignmentListFilterRouteSearch/,
   'Assignment dashboard route should update filters through the assignment-domain route helper.'
@@ -19564,6 +19597,11 @@ assert.match(
   assignmentsApiSource,
   /matchingAssignments = await db[\s\S]*\.select\(buildAssignmentListSummarySelect\(\)\)/,
   'Assignment list API should reuse the summary select helper.'
+);
+assert.match(
+  assignmentsApiSource,
+  /const where = buildAssignmentListWhere\(\{[\s\S]*userId,[\s\S]*\}\);[\s\S]*const \[totalRow\] = await db[\s\S]*\.where\(where\)[\s\S]*const matchingAssignments = await db[\s\S]*\.where\(where\)[\s\S]*const summaryAttempts = await db[\s\S]*\.where\(buildScoredAttemptWhere\(where\)\)[\s\S]*const summary = buildAssignmentListSummary\(\{[\s\S]*attempts: summaryAttempts\.map\(withAssignmentAttemptStatsSettings\),[\s\S]*assignments: matchingAssignments,[\s\S]*totalAssignments: totalRow\?\.count \?\? 0/,
+  'Assignment list summary should be derived from owner-scoped assignments and scored attempts, not starter preview content.'
 );
 assert.match(
   assignmentsApiSource,
@@ -21721,16 +21759,59 @@ const loadingDashboardOverviewRouteView = buildDashboardOverviewRouteViewModel({
   assignmentsLoading: false,
 });
 const dashboardOverviewStarterPreview = buildDashboardOverviewStarterPreview();
+const dashboardStarterPreviewOnlyPageView = buildDashboardOverviewPageViewModel(
+  {
+    isLoading: false,
+    preview: dashboardOverviewStarterPreview,
+  }
+);
 assert.deepEqual(
   {
     activityId: dashboardOverviewStarterPreview.activity.id,
     assignmentActivityId: dashboardOverviewStarterPreview.assignment.activityId,
+    previewAverageScore: dashboardOverviewStarterPreview.assignment.averageScore,
+    previewCompletions: dashboardOverviewStarterPreview.assignment.completions,
     source: dashboardOverviewStarterPreview.source,
   },
   {
     activityId: 'english-food-quiz',
     assignmentActivityId: 'english-food-quiz',
+    previewAverageScore: 84,
+    previewCompletions: 18,
     source: 'starter-preview',
+  }
+);
+assert.deepEqual(
+  {
+    metricValues: dashboardStarterPreviewOnlyPageView.metrics.map((metric) => [
+      metric.id,
+      metric.value,
+      metric.description,
+    ]),
+    previewAssignmentId:
+      dashboardStarterPreviewOnlyPageView.preview.assignment.id,
+    readinessValues: dashboardStarterPreviewOnlyPageView.readinessRows.map(
+      (row) => [row.id, row.value]
+    ),
+  },
+  {
+    metricValues: [
+      ['activities', '-', '0 drafts in your active library'],
+      [
+        'templates',
+        `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
+        'Template families represented by your active activities',
+      ],
+      ['assignments', '-', 'Open classroom share links'],
+      ['results', '0%', '0 submitted attempts logged'],
+    ],
+    previewAssignmentId: 'assignment-food-demo',
+    readinessValues: [
+      ['activity-authoring', 0],
+      ['assignment-links', 0],
+      ['student-runner', 0],
+      ['teacher-results', 0],
+    ],
   }
 );
 assert.deepEqual(
@@ -22052,6 +22133,40 @@ assert.match(
   dashboardOverviewRouteSource,
   /<ActivityPreview[\s\S]*activity=\{pageView\.preview\.activity\}[\s\S]*assignment=\{pageView\.preview\.assignment\}[\s\S]*\/>/,
   'Dashboard starter activity and assignment should render only through the dashboard preview view-model.'
+);
+const dashboardOverviewDomainSource = readFileSync(
+  'src/dashboard/overview.ts',
+  'utf8'
+);
+const dashboardOverviewStarterPreviewSource = getSourceSlice(
+  dashboardOverviewDomainSource,
+  'export function buildDashboardOverviewStarterPreview',
+  'export function buildDashboardOverviewMetrics'
+);
+const dashboardOverviewMetricsSource = getSourceSlice(
+  dashboardOverviewDomainSource,
+  'export function buildDashboardOverviewMetrics',
+  'export function buildDashboardCoreLoopReadiness'
+);
+const dashboardOverviewReadinessSource = getSourceSlice(
+  dashboardOverviewDomainSource,
+  'export function buildDashboardCoreLoopReadiness',
+  'export function formatDashboardMetricValue'
+);
+assert.match(
+  dashboardOverviewDomainSource,
+  /export type DashboardOverviewOwnerActivitySummary[\s\S]*export type DashboardOverviewOwnerAssignmentSummary/,
+  'Dashboard overview should name owner-scoped real-data summary contracts explicitly.'
+);
+assert.match(
+  dashboardOverviewStarterPreviewSource,
+  /getStarterAssignment\(\)[\s\S]*getStarterActivity\(assignment\.activityId\)[\s\S]*source: 'starter-preview'/,
+  'Dashboard overview should isolate starter catalog reads inside the preview builder.'
+);
+assert.doesNotMatch(
+  `${dashboardOverviewMetricsSource}\n${dashboardOverviewReadinessSource}`,
+  /preview|starter|getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
+  'Dashboard metrics and readiness should not consume starter-preview data.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
