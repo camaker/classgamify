@@ -1,4 +1,5 @@
 import type {
+  AssignmentAttemptReview,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
@@ -20,7 +21,11 @@ import {
   formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
-import { formatStudentFollowUpRecommendation } from '@/assignments/student-follow-up-summary';
+import {
+  buildLatestAttemptReviewByStudentKey,
+  formatStudentFollowUpLatestAttemptSummary,
+  formatStudentFollowUpRecommendation,
+} from '@/assignments/student-follow-up-summary';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
@@ -39,6 +44,7 @@ type AssignmentClassroomBriefStats = {
 
 type AssignmentClassroomBriefInput = {
   assignmentTitle: string;
+  attempts?: AssignmentAttemptReview[];
   items: AssignmentItemAnalysis[];
   stats: AssignmentClassroomBriefStats;
   students: AssignmentStudentSummary[];
@@ -83,6 +89,7 @@ export type AssignmentClassroomBriefFollowUpStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
   latestAccuracyLabel: string;
+  latestAttemptSummaryLabel: string | null;
   needsReviewLabel: string;
   reviewItemCountLabel: string;
   studentKey: string;
@@ -97,6 +104,7 @@ export const ASSIGNMENT_CLASSROOM_BRIEF_LIMITS = {
 
 export function buildAssignmentClassroomBrief({
   assignmentTitle,
+  attempts = [],
   items,
   stats,
   students,
@@ -107,7 +115,9 @@ export function buildAssignmentClassroomBrief({
   const focusItemViews =
     buildAssignmentClassroomBriefFocusItemViews(focusItems);
   const followUpStudentViews =
-    buildAssignmentClassroomBriefFollowUpStudentViews(followUpStudents);
+    buildAssignmentClassroomBriefFollowUpStudentViews(followUpStudents, {
+      attempts,
+    });
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const lines = [
     m.assignment_classroom_brief_title({ title: copyTitle }),
@@ -192,11 +202,19 @@ export function buildAssignmentClassroomBriefFocusItemViews(
 }
 
 export function buildAssignmentClassroomBriefFollowUpStudentViews(
-  students: AssignmentStudentSummary[]
+  students: AssignmentStudentSummary[],
+  options?: {
+    attempts?: AssignmentAttemptReview[];
+  }
 ) {
+  const latestAttemptByStudentKey = buildLatestAttemptReviewByStudentKey(
+    options?.attempts ?? []
+  );
+
   return students.map((student, index) =>
     buildAssignmentClassroomBriefFollowUpStudentView({
       index,
+      latestAttempt: latestAttemptByStudentKey.get(student.studentKey),
       student,
     })
   );
@@ -234,9 +252,11 @@ export function buildAssignmentClassroomBriefFocusItemView({
 
 export function buildAssignmentClassroomBriefFollowUpStudentView({
   index,
+  latestAttempt,
   student,
 }: {
   index: number;
+  latestAttempt?: AssignmentAttemptReview;
   student: AssignmentStudentSummary;
 }): AssignmentClassroomBriefFollowUpStudentView {
   const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
@@ -249,24 +269,34 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptSummaryLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    : null;
+  const lineInput = {
+    accuracy: latestAccuracyLabel,
+    index: formatAssignmentResultCopyOrdinal(index),
+    recommendation: followUpRecommendation,
+    reviewCount: reviewItemCountLabel,
+    student: studentLabel,
+  };
 
   return {
     accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
     followUpRecommendation,
     latestAccuracyLabel,
+    latestAttemptSummaryLabel,
     needsReviewLabel: formatAssignmentSummaryReviewCount(
       student.needsReviewCount
     ),
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
-    text: m.assignment_classroom_brief_follow_up_student({
-      accuracy: latestAccuracyLabel,
-      index: formatAssignmentResultCopyOrdinal(index),
-      recommendation: followUpRecommendation,
-      reviewCount: reviewItemCountLabel,
-      student: studentLabel,
-    }),
+    text: latestAttemptSummaryLabel
+      ? m.assignment_classroom_brief_follow_up_student_with_latest_attempt({
+          ...lineInput,
+          latestAttemptSummary: latestAttemptSummaryLabel,
+        })
+      : m.assignment_classroom_brief_follow_up_student(lineInput),
   };
 }
 

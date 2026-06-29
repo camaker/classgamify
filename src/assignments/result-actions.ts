@@ -323,6 +323,7 @@ export function buildAssignmentResultCopyArtifacts(
   return {
     classroomBrief: buildAssignmentClassroomBrief({
       assignmentTitle,
+      attempts: data.analysis.attempts,
       items,
       stats: buildAssignmentResultClassroomBriefStats(data.stats),
       students,

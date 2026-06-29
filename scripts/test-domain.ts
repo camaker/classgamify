@@ -1579,8 +1579,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
-  'Assignment result actions should own unified teacher copy artifact construction.'
+  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
+  'Assignment result actions should own unified teacher copy artifact construction with attempt-review context.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1814,6 +1814,16 @@ assert.match(
   assignmentClassroomBriefSource,
   /formatStudentFollowUpRecommendation[\s\S]*recommendation: followUpRecommendation/,
   'Classroom brief student follow-up rows should reuse shared student next-step recommendations.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /buildAssignmentClassroomBriefFollowUpStudentViews[\s\S]*buildLatestAttemptReviewByStudentKey[\s\S]*latestAttempt: latestAttemptByStudentKey\.get\(student\.studentKey\)/,
+  'Classroom brief student follow-up rows should resolve latest attempts through the shared follow-up helper.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /formatStudentFollowUpLatestAttemptSummary\(latestAttempt\)[\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt/,
+  'Classroom brief student follow-up rows should reuse the shared latest-attempt summary label.'
 );
 assert.match(
   assignmentClassroomBriefSource,
@@ -37177,6 +37187,13 @@ const classroomBrief = buildAssignmentClassroomBrief({
   stats: csvExportData.stats,
   students: resultAnalysis.students,
 });
+const classroomBriefWithAttempts = buildAssignmentClassroomBrief({
+  assignmentTitle: csvExportData.assignment.title,
+  attempts: resultAnalysis.attempts,
+  items: resultAnalysis.perItem,
+  stats: csvExportData.stats,
+  students: resultAnalysis.students,
+});
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -37273,6 +37290,7 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '0%',
+    latestAttemptSummaryLabel: null,
     needsReviewLabel: '2 reviews',
     reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
@@ -37285,11 +37303,25 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
   latestAccuracyLabel: '0%',
+  latestAttemptSummaryLabel: null,
   needsReviewLabel: '2 reviews',
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
   text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+});
+assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
+  accuracyLabel: 'Latest 0% · best 0%',
+  followUpRecommendation:
+    'review missed or unanswered items, then assign one short retry',
+  latestAccuracyLabel: '0%',
+  latestAttemptSummaryLabel:
+    'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+  needsReviewLabel: '2 reviews',
+  reviewItemCountLabel: '2 items to review',
+  studentKey: 'anonymous:1',
+  studentLabel: 'Anonymous student 1',
+  text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
 });
 assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
 assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
@@ -37373,6 +37405,10 @@ assert.match(
 assert.match(
   classroomBrief.text,
   /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
+);
+assert.match(
+  classroomBriefWithAttempts.text,
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Latest attempt: submitted 1\/2, correct 0\/2, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
@@ -38114,7 +38150,7 @@ assert.equal(
     action: 'copy-brief',
     data: csvExportData,
   }),
-  classroomBrief.text
+  classroomBriefWithAttempts.text
 );
 assert.equal(
   buildAssignmentResultCopyText({
@@ -38199,7 +38235,7 @@ assert.deepEqual(
   }),
   {
     kind: 'copy-text',
-    text: classroomBrief.text,
+    text: classroomBriefWithAttempts.text,
   }
 );
 assert.deepEqual(
@@ -38210,7 +38246,7 @@ assert.deepEqual(
   {
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
-    text: classroomBrief.text,
+    text: classroomBriefWithAttempts.text,
     type: 'copy-text',
   }
 );

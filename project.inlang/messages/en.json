@@ -731,6 +731,7 @@
   "assignment_classroom_brief_focus_item": "- {promptLabel} ({performance})",
   "assignment_classroom_brief_follow_up_heading": "Student follow-up:",
   "assignment_classroom_brief_follow_up_student": "- {index}. {student}: {accuracy} latest, {reviewCount}. Next: {recommendation}",
+  "assignment_classroom_brief_follow_up_student_with_latest_attempt": "- {index}. {student}: {accuracy} latest, {reviewCount}. {latestAttemptSummary} Next: {recommendation}",
   "assignment_classroom_brief_stats_label": "Class snapshot",
   "assignment_classroom_brief_title": "ClassGamify classroom brief: {title}",
   "assignment_delivery_answer_reveal_after_submit": "After submit",
