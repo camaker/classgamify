@@ -33,6 +33,22 @@ export type PublicAssignmentRuleSummaryItem = {
   value: string;
 };
 
+export type PublicAssignmentRuleSummaryStats = {
+  collectsStudentName: boolean;
+  hasAttemptLimit: boolean;
+  hasCloseTime: boolean;
+  hasTimer: boolean;
+  itemCount: number;
+  ruleCount: number;
+  ruleIds: PublicAssignmentRuleSummaryId[];
+  showsCorrectAnswers: boolean;
+};
+
+export type PublicAssignmentRuleSummaryView = {
+  items: PublicAssignmentRuleSummaryItem[];
+  summary: PublicAssignmentRuleSummaryStats;
+};
+
 type AssignmentDeliverySummaryInput = {
   collectStudentName?: boolean;
   expiresAt: AssignmentDate;
@@ -179,6 +195,18 @@ export function buildPublicAssignmentRuleSummary({
 }: AssignmentDeliverySummaryInput & {
   itemCount: number;
 }): PublicAssignmentRuleSummaryItem[] {
+  return buildPublicAssignmentRuleSummaryView({
+    itemCount,
+    ...input,
+  }).items;
+}
+
+export function buildPublicAssignmentRuleSummaryView({
+  itemCount,
+  ...input
+}: AssignmentDeliverySummaryInput & {
+  itemCount: number;
+}): PublicAssignmentRuleSummaryView {
   const ruleItems = [
     {
       id: 'items',
@@ -197,8 +225,16 @@ export function buildPublicAssignmentRuleSummary({
   ] satisfies Array<
     Pick<PublicAssignmentRuleSummaryItem, 'id' | 'label' | 'value'>
   >;
+  const items = ruleItems.map(toPublicAssignmentRuleSummaryItem);
 
-  return ruleItems.map(toPublicAssignmentRuleSummaryItem);
+  return {
+    items,
+    summary: buildPublicAssignmentRuleSummaryStats({
+      ...input,
+      itemCount,
+      ruleIds: items.map((item) => item.id),
+    }),
+  };
 }
 
 export function buildPublicAssignmentRuleSummaryFromSettings({
@@ -210,9 +246,25 @@ export function buildPublicAssignmentRuleSummaryFromSettings({
   itemCount: number;
   settings?: Partial<AssignmentSettings> | null;
 }): PublicAssignmentRuleSummaryItem[] {
+  return buildPublicAssignmentRuleSummaryViewFromSettings({
+    expiresAt,
+    itemCount,
+    settings,
+  }).items;
+}
+
+export function buildPublicAssignmentRuleSummaryViewFromSettings({
+  expiresAt,
+  itemCount,
+  settings,
+}: {
+  expiresAt: AssignmentDate;
+  itemCount: number;
+  settings?: Partial<AssignmentSettings> | null;
+}): PublicAssignmentRuleSummaryView {
   const resolvedSettings = resolveAssignmentSettings(settings);
 
-  return buildPublicAssignmentRuleSummary({
+  return buildPublicAssignmentRuleSummaryView({
     collectStudentName: resolvedSettings.collectStudentName,
     expiresAt,
     itemCount,
@@ -236,6 +288,37 @@ export function formatAssignmentItemCount(itemCount: number) {
 
 function normalizeAssignmentItemCount(itemCount: number) {
   return Number.isFinite(itemCount) ? Math.max(0, Math.floor(itemCount)) : 0;
+}
+
+function buildPublicAssignmentRuleSummaryStats({
+  collectStudentName = true,
+  expiresAt,
+  itemCount,
+  maxAttempts = defaultAssignmentSettings.maxAttempts,
+  ruleIds,
+  showCorrectAnswers = true,
+  timeLimitSeconds,
+}: AssignmentDeliverySummaryInput & {
+  itemCount: number;
+  ruleIds: PublicAssignmentRuleSummaryId[];
+}): PublicAssignmentRuleSummaryStats {
+  return {
+    collectsStudentName: collectStudentName,
+    hasAttemptLimit: isPositiveWholeNumber(maxAttempts),
+    hasCloseTime: hasAssignmentCloseTime(expiresAt),
+    hasTimer: isPositiveWholeNumber(timeLimitSeconds),
+    itemCount: normalizeAssignmentItemCount(itemCount),
+    ruleCount: ruleIds.length,
+    ruleIds,
+    showsCorrectAnswers: showCorrectAnswers,
+  };
+}
+
+function hasAssignmentCloseTime(expiresAt: AssignmentDate) {
+  if (!expiresAt) return false;
+
+  const date = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
+  return Number.isFinite(date.getTime());
 }
 
 export function formatAssignmentAttempts(maxAttempts?: number | null) {

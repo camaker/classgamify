@@ -2,8 +2,9 @@ import type { AssignmentSettings } from '@/activities/types';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import type { AssignmentDate } from '@/assignments/lifecycle';
 import {
-  buildPublicAssignmentRuleSummaryFromSettings,
+  buildPublicAssignmentRuleSummaryViewFromSettings,
   type PublicAssignmentRuleSummaryItem,
+  type PublicAssignmentRuleSummaryView,
 } from '@/assignments/delivery-summary';
 import {
   formatRuntimeItemKindLabel,
@@ -269,6 +270,7 @@ export type StudentRunnerHeaderView = {
   instructions?: StudentRunnerInstructionView;
   prepareView: StudentRunnerPrepareView;
   ruleItems: PublicAssignmentRuleSummaryItem[];
+  ruleSummaryView: PublicAssignmentRuleSummaryView;
   teacherAction: StudentRunnerTeacherAction;
   title: string;
 };
@@ -294,17 +296,20 @@ export function buildStudentRunnerHeaderView({
   itemCount: number;
   source?: 'public-assignment' | 'starter-preview';
 }): StudentRunnerHeaderView {
+  const ruleSummaryView = buildPublicAssignmentRuleSummaryViewFromSettings({
+    expiresAt: assignment.expiresAt ?? null,
+    itemCount,
+    settings: assignment.settings,
+  });
+
   return {
     description: getStudentRunnerCopy().publicAssignmentDescription,
     instructions: buildStudentRunnerInstructionView(
       assignment.settings.instructions
     ),
     prepareView: buildStudentRunnerPrepareView(assignment.settings),
-    ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
-      expiresAt: assignment.expiresAt ?? null,
-      itemCount,
-      settings: assignment.settings,
-    }),
+    ruleItems: ruleSummaryView.items,
+    ruleSummaryView,
     teacherAction: buildStudentRunnerTeacherAction({ assignment, source }),
     title: formatAssignmentDisplayTitle(assignment.title),
   };

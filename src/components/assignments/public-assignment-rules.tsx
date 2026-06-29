@@ -1,6 +1,7 @@
 import type {
   PublicAssignmentRuleSummaryId,
   PublicAssignmentRuleSummaryItem,
+  PublicAssignmentRuleSummaryView,
 } from '@/assignments/delivery-summary';
 import {
   IconClock,
@@ -12,13 +13,15 @@ import {
 } from '@tabler/icons-react';
 
 type PublicAssignmentRulesProps = {
-  rules: PublicAssignmentRuleSummaryItem[];
+  summaryView: PublicAssignmentRuleSummaryView;
 };
 
-export function PublicAssignmentRules({ rules }: PublicAssignmentRulesProps) {
+export function PublicAssignmentRules({
+  summaryView,
+}: PublicAssignmentRulesProps) {
   return (
     <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-      {rules.map((rule) => (
+      {summaryView.items.map((rule) => (
         <PublicAssignmentRuleItem key={rule.label} rule={rule} />
       ))}
     </div>

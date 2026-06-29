@@ -430,6 +430,8 @@ import {
   buildAssignmentSettingsSummaryView,
   buildPublicAssignmentRuleSummary,
   buildPublicAssignmentRuleSummaryFromSettings,
+  buildPublicAssignmentRuleSummaryView,
+  buildPublicAssignmentRuleSummaryViewFromSettings,
   formatAssignmentDeliveryInstructions,
   formatAssignmentDeliveryPolicyText,
   formatAssignmentExpiry,
@@ -7553,8 +7555,8 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type StudentRunnerInstructionView = \{[\s\S]*export type StudentRunnerTeacherAction =[\s\S]*export type StudentRunnerHeaderView = \{[\s\S]*teacherAction: StudentRunnerTeacherAction;[\s\S]*export type StudentRunnerPrepareView = \{/,
-  'Student runner header domain should export focused header, instruction, prepare, and teacher action view contracts.'
+  /export type StudentRunnerInstructionView = \{[\s\S]*export type StudentRunnerTeacherAction =[\s\S]*export type StudentRunnerHeaderView = \{[\s\S]*ruleSummaryView: PublicAssignmentRuleSummaryView;[\s\S]*teacherAction: StudentRunnerTeacherAction;[\s\S]*export type StudentRunnerPrepareView = \{/,
+  'Student runner header domain should export focused header, public rule summary, instruction, prepare, and teacher action view contracts.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -7668,8 +7670,8 @@ assert.match(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /view\.instructions[\s\S]*view\.ruleItems[\s\S]*StudentRunnerTeacherActionLink[\s\S]*action=\{view\.teacherAction\}/,
-  'Student runner header card should consume header instructions, rules, and teacher action view fields.'
+  /view\.instructions[\s\S]*summaryView=\{view\.ruleSummaryView\}[\s\S]*StudentRunnerTeacherActionLink[\s\S]*action=\{view\.teacherAction\}/,
+  'Student runner header card should consume header instructions, prepared public rule summary, and teacher action view fields.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -7728,18 +7730,18 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|headerView\.ruleSummaryView|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /PublicAssignmentRuleSummaryItem/,
-  'Public assignment rules component should consume assignment-domain public rule summary items.'
+  /PublicAssignmentRuleSummaryView/,
+  'Public assignment rules component should consume the assignment-domain public rule summary view.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
-  /rules\.map[\s\S]*PublicAssignmentRuleItem[\s\S]*rule=\{rule\}/,
-  'Public assignment rules component should delegate prepared rule summary item rendering.'
+  /summaryView\.items\.map[\s\S]*PublicAssignmentRuleItem[\s\S]*rule=\{rule\}/,
+  'Public assignment rules component should delegate prepared rule summary item rendering from the summary view.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
@@ -7774,6 +7776,21 @@ assert.match(
   assignmentDeliverySummarySource,
   /toPublicAssignmentRuleSummaryItem[\s\S]*assignment_delivery_public_rule_aria/,
   'Public assignment rule aria labels should be formatted in the assignment delivery domain.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export type PublicAssignmentRuleSummaryView = \{[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*summary: PublicAssignmentRuleSummaryStats;/,
+  'Assignment delivery summary should expose a structured public rule summary view contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /export function buildPublicAssignmentRuleSummaryView[\s\S]*items,[\s\S]*summary: buildPublicAssignmentRuleSummaryStats/,
+  'Public assignment rule summary views should centralize rule items and rule summary metadata.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /const ruleSummaryView = buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*expiresAt: assignment\.expiresAt \?\? null,[\s\S]*itemCount,[\s\S]*settings: assignment\.settings,[\s\S]*\}\)[\s\S]*ruleItems: ruleSummaryView\.items,[\s\S]*ruleSummaryView,/,
+  'Student runner headers should prepare public assignment rules through the shared rule summary view.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -13026,6 +13043,33 @@ assert.deepEqual(
     },
   ]
 );
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    collectStudentName: false,
+    expiresAt: new Date('2026-02-01T10:00:00.000Z'),
+    itemCount: 1.9,
+    maxAttempts: 2,
+    showCorrectAnswers: false,
+    timeLimitSeconds: 60,
+  }).summary,
+  {
+    collectsStudentName: false,
+    hasAttemptLimit: true,
+    hasCloseTime: true,
+    hasTimer: true,
+    itemCount: 1,
+    ruleCount: 6,
+    ruleIds: [
+      'items',
+      'attempts',
+      'timer',
+      'closes',
+      'identity',
+      'answerReveal',
+    ],
+    showsCorrectAnswers: false,
+  }
+);
 assert.equal(
   buildPublicAssignmentRuleSummary({
     expiresAt: null,
@@ -13130,6 +13174,35 @@ assert.deepEqual(
       value: 'After submit',
     },
   ]
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryViewFromSettings({
+    expiresAt: 'not-a-date',
+    itemCount: Number.POSITIVE_INFINITY,
+    settings: {
+      collectStudentName: true,
+      maxAttempts: null,
+      showCorrectAnswers: true,
+      timeLimitSeconds: 0,
+    },
+  }).summary,
+  {
+    collectsStudentName: true,
+    hasAttemptLimit: false,
+    hasCloseTime: false,
+    hasTimer: false,
+    itemCount: 0,
+    ruleCount: 6,
+    ruleIds: [
+      'items',
+      'attempts',
+      'timer',
+      'closes',
+      'identity',
+      'answerReveal',
+    ],
+    showsCorrectAnswers: true,
+  }
 );
 assert.deepEqual(
   buildPublicAssignmentRuleSummaryFromSettings({
@@ -13284,6 +13357,18 @@ assert.deepEqual(studentRunnerHeaderView, {
     title: 'Before you start',
   },
   ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
+    expiresAt: null,
+    itemCount: 2,
+    settings: {
+      collectStudentName: true,
+      instructions: '  Read each prompt carefully.  ',
+      maxAttempts: 3,
+      showCorrectAnswers: true,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    },
+  }),
+  ruleSummaryView: buildPublicAssignmentRuleSummaryViewFromSettings({
     expiresAt: null,
     itemCount: 2,
     settings: {

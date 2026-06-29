@@ -35,7 +35,7 @@ export function StudentRunnerHeaderCard({
           <StudentRunnerInstructionsCard instructions={view.instructions} />
         ) : null}
         <StudentRunnerPrepareCard prepareView={view.prepareView} />
-        <PublicAssignmentRules rules={view.ruleItems} />
+        <PublicAssignmentRules summaryView={view.ruleSummaryView} />
       </div>
       <StudentRunnerTeacherActionLink action={view.teacherAction} />
     </section>
