@@ -1,8 +1,11 @@
-import type { AssignmentListCardViewModel } from '@/assignments/list-view';
+import type {
+  AssignmentListCardStatItems,
+  AssignmentListCardStatKey,
+} from '@/assignments/list-view';
 import { IconChartBar, IconUsers } from '@tabler/icons-react';
 
 type AssignmentListStatsProps = {
-  statItems: AssignmentListCardViewModel['statItems'];
+  statItems: AssignmentListCardStatItems;
 };
 
 export function AssignmentListStats({ statItems }: AssignmentListStatsProps) {
@@ -21,7 +24,7 @@ export function AssignmentListStats({ statItems }: AssignmentListStatsProps) {
 }
 
 const assignmentListCardStatIcons: Record<
-  AssignmentListCardViewModel['statItems'][number]['key'],
+  AssignmentListCardStatKey,
   typeof IconUsers
 > = {
   average: IconChartBar,

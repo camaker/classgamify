@@ -1,4 +1,11 @@
-import type { AssignmentListCardViewModel } from '@/assignments/list-view';
+import type {
+  AssignmentListCardActionView,
+  AssignmentListCardViewModel,
+  AssignmentListPrintAction,
+  AssignmentListResultAction,
+  AssignmentListShareAction,
+  AssignmentListStatusAction,
+} from '@/assignments/list-view';
 import { buildAssignmentStatusActionExecutionPlan } from '@/assignments/lifecycle';
 import { AssignmentListStats } from '@/components/assignments/assignment-list-stats';
 import { AssignmentSettingsSummary } from '@/components/assignments/assignment-settings-summary';
@@ -28,21 +35,6 @@ import { toast } from 'sonner';
 type AssignmentListCardProps = {
   assignment: AssignmentListCardViewModel;
 };
-
-type AssignmentListCardView = AssignmentListCardViewModel;
-type AssignmentListCardActionView = AssignmentListCardView['actionView'];
-type AssignmentListPrintAction = NonNullable<
-  AssignmentListCardActionView['printAction']
->;
-type AssignmentListResultAction = NonNullable<
-  AssignmentListCardActionView['resultAction']
->;
-type AssignmentListShareAction = NonNullable<
-  AssignmentListCardActionView['shareAction']
->;
-type AssignmentListStatusAction = NonNullable<
-  AssignmentListCardActionView['statusAction']
->;
 
 export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
   const updateStatusMutation = useUpdateAssignmentStatus();
@@ -81,7 +73,7 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
 function AssignmentListCardHeader({
   assignment,
 }: {
-  assignment: AssignmentListCardView;
+  assignment: AssignmentListCardViewModel;
 }) {
   return (
     <CardHeader>
@@ -107,7 +99,7 @@ function AssignmentListCardHeader({
 function AssignmentListCardSummary({
   assignment,
 }: {
-  assignment: AssignmentListCardView;
+  assignment: AssignmentListCardViewModel;
 }) {
   return (
     <div className="grid gap-4">

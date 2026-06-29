@@ -18626,10 +18626,25 @@ assert.match(
   /export type AssignmentListCardViewModel = \{/,
   'Assignment list card view-model contract should be an explicit domain export.'
 );
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListCardStatKey = 'average' \| 'completions';[\s\S]*export type AssignmentListCardStat = \{[\s\S]*key: AssignmentListCardStatKey;[\s\S]*export type AssignmentListCardStatItems = AssignmentListCardStat\[\];/,
+  'Assignment list stat items should be exported as focused domain contracts.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListPrintAction = \{[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = \{[\s\S]*to: typeof Routes\.Play;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
+  'Assignment list card actions should be exported as focused domain contracts.'
+);
 assert.doesNotMatch(
   `${assignmentListCardComponentSource}\n${assignmentListStatsComponentSource}`,
   /ReturnType<typeof buildAssignmentListCardViewModel>/,
   'Assignment list card components should not infer their contracts from buildAssignmentListCardViewModel ReturnType.'
+);
+assert.doesNotMatch(
+  `${assignmentListCardComponentSource}\n${assignmentListStatsComponentSource}`,
+  /AssignmentListCardViewModel\[['"](?:actionView|statItems)['"]\]|NonNullable</,
+  'Assignment list card components should import focused sub-view contracts instead of deriving them locally.'
 );
 assert.match(
   assignmentListViewSource,
@@ -18658,8 +18673,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListStatsComponentSource,
-  /AssignmentListCardViewModel\['statItems'\]/,
+  /AssignmentListCardStatItems/,
   'Assignment list stats component should consume the explicit assignment-domain stat item contract.'
+);
+assert.match(
+  assignmentListStatsComponentSource,
+  /AssignmentListCardStatKey[\s\S]*Record<[\s\S]*AssignmentListCardStatKey[\s\S]*typeof IconUsers/,
+  'Assignment list stats component should type stat icons with the explicit assignment-domain stat key contract.'
 );
 assert.match(
   assignmentListStatsComponentSource,

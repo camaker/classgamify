@@ -63,7 +63,7 @@ type AssignmentListControlOption = {
   value: AssignmentStatusFilter;
 };
 
-type AssignmentListSearchPanelView = {
+export type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
   hasSearchValue: boolean;
   statusDescription: string;
@@ -72,15 +72,15 @@ type AssignmentListSearchPanelView = {
   statusOptions: AssignmentListControlOption[];
 };
 
-type AssignmentListCardStatKey = 'average' | 'completions';
+export type AssignmentListCardStatKey = 'average' | 'completions';
 
-type AssignmentListCardStat = {
+export type AssignmentListCardStat = {
   key: AssignmentListCardStatKey;
   label: string;
   value: string;
 };
 
-type AssignmentListCardActionState = {
+export type AssignmentListCardActionState = {
   isPersisted: boolean;
   shareAvailability: AssignmentShareLinkAvailability;
   shareDisabledReason?: string;
@@ -90,35 +90,39 @@ type AssignmentListCardActionState = {
   statusAction: AssignmentStatusAction | undefined;
 };
 
-type AssignmentListCardActionView = {
-  printAction:
-    | {
-        assignmentId: string;
-        label: string;
-        to: typeof Routes.PrintAssignmentWorksheet;
-      }
-    | undefined;
-  resultAction:
-    | {
-        assignmentId: string;
-        label: string;
-        to: typeof Routes.DashboardAssignmentResults;
-      }
-    | undefined;
-  shareAction:
-    | {
-        copyLabel: string;
-        disabledReason?: string;
-        isAvailable: boolean;
-        label: string;
-        sharePath: string;
-        sharePathLabel: string;
-        shareSlug: string;
-        to: typeof Routes.Play;
-      }
-    | undefined;
-  statusAction: AssignmentStatusAction | undefined;
+export type AssignmentListPrintAction = {
+  assignmentId: string;
+  label: string;
+  to: typeof Routes.PrintAssignmentWorksheet;
 };
+
+export type AssignmentListResultAction = {
+  assignmentId: string;
+  label: string;
+  to: typeof Routes.DashboardAssignmentResults;
+};
+
+export type AssignmentListShareAction = {
+  copyLabel: string;
+  disabledReason?: string;
+  isAvailable: boolean;
+  label: string;
+  sharePath: string;
+  sharePathLabel: string;
+  shareSlug: string;
+  to: typeof Routes.Play;
+};
+
+export type AssignmentListStatusAction = AssignmentStatusAction;
+
+export type AssignmentListCardActionView = {
+  printAction: AssignmentListPrintAction | undefined;
+  resultAction: AssignmentListResultAction | undefined;
+  shareAction: AssignmentListShareAction | undefined;
+  statusAction: AssignmentListStatusAction | undefined;
+};
+
+export type AssignmentListCardStatItems = AssignmentListCardStat[];
 
 export type AssignmentListCardViewModel = {
   actionView: AssignmentListCardActionView;
@@ -135,7 +139,7 @@ export type AssignmentListCardViewModel = {
     averageScore: number;
     completions: number;
   };
-  statItems: AssignmentListCardStat[];
+  statItems: AssignmentListCardStatItems;
   statusLabel: string;
 };
 
