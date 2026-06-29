@@ -60,7 +60,7 @@ function AssignmentResultsHeaderSharePreviewLink({
 
   return (
     <Link
-      to="/play/$shareId"
+      to={shareAction.to}
       params={{
         shareId: shareAction.shareSlug,
       }}

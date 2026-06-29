@@ -275,6 +275,7 @@ export type AssignmentResultHeaderShareAction = {
   sharePath: string;
   sharePathLabel: string;
   shareSlug: string;
+  to: typeof Routes.Play;
 };
 
 export type AssignmentResultHeaderPrintAction = {
@@ -838,6 +839,7 @@ export function buildAssignmentResultHeaderShareAction({
     sharePath: shareAvailability.sharePath,
     sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
     shareSlug: shareAvailability.shareSlug,
+    to: Routes.Play,
   };
 }
 

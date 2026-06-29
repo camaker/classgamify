@@ -3842,8 +3842,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderSharePreviewLink[\s\S]*shareAction\.isAvailable[\s\S]*to="\/play\/\$shareId"[\s\S]*shareAction\.label/,
+  /function AssignmentResultsHeaderSharePreviewLink[\s\S]*shareAction\.isAvailable[\s\S]*to=\{shareAction\.to\}[\s\S]*shareAction\.label/,
   'Assignment result share preview action should render prepared share availability and label.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentResultHeaderShareAction[\s\S]*sharePath: shareAvailability\.sharePath[\s\S]*to: Routes\.Play/,
+  'Assignment result header share action should prepare the student-link route target.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -30942,6 +30947,7 @@ assert.deepEqual(
       sharePath: '/play/share%20123',
       sharePathLabel: 'Student link',
       shareSlug: 'share 123',
+      to: Routes.Play,
     },
     shareSlug: 'share 123',
     statusLabel: 'Open',
@@ -30990,6 +30996,7 @@ assert.deepEqual(
       sharePath: '/play/closed-share',
       sharePathLabel: 'Student link',
       shareSlug: 'closed-share',
+      to: Routes.Play,
     },
     shareSlug: 'closed-share',
     statusLabel: 'Expired',
@@ -31012,6 +31019,7 @@ assert.deepEqual(
     sharePath: '/play/share%20two',
     sharePathLabel: 'Student link',
     shareSlug: 'share two',
+    to: Routes.Play,
   }
 );
 assert.deepEqual(
@@ -31030,6 +31038,7 @@ assert.deepEqual(
     sharePath: '/play/closed-share',
     sharePathLabel: 'Student link',
     shareSlug: 'closed-share',
+    to: Routes.Play,
   }
 );
 assert.deepEqual(
@@ -31047,6 +31056,7 @@ assert.deepEqual(
     sharePath: '/play/draft-share',
     sharePathLabel: 'Student link',
     shareSlug: 'draft-share',
+    to: Routes.Play,
   }
 );
 assert.deepEqual(
@@ -31065,6 +31075,7 @@ assert.deepEqual(
     sharePath: '/play/expired-share',
     sharePathLabel: 'Student link',
     shareSlug: 'expired-share',
+    to: Routes.Play,
   }
 );
 assert.equal(
