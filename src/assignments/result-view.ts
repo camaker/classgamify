@@ -227,7 +227,7 @@ type AssignmentResultControlOption<TValue extends string> = {
   value: TValue;
 };
 
-type AssignmentResultStudentSearchControlView = {
+export type AssignmentResultStudentSearchControlView = {
   clearLabel: string;
   label: string;
   hasSearchValue: boolean;
@@ -240,21 +240,21 @@ type AssignmentResultStudentSearchControlView = {
   value: string;
 };
 
-type AssignmentResultItemPerformanceSortControlView = {
+export type AssignmentResultItemPerformanceSortControlView = {
   label: string;
   options: Array<AssignmentResultControlOption<ItemPerformanceSort>>;
   selectedSortOption: AssignmentResultControlOption<ItemPerformanceSort>;
   sort: ItemPerformanceSort;
 };
 
-type AssignmentResultAttemptReviewFilterControlView = {
+export type AssignmentResultAttemptReviewFilterControlView = {
   filter: AttemptReviewFilter;
   label: string;
   options: Array<AssignmentResultControlOption<AttemptReviewFilter>>;
   selectedFilterOption: AssignmentResultControlOption<AttemptReviewFilter>;
 };
 
-type AssignmentResultControlViews = {
+export type AssignmentResultControlViews = {
   attemptReviewFilter: AssignmentResultAttemptReviewFilterControlView;
   itemPerformanceSort: AssignmentResultItemPerformanceSortControlView;
   studentSearch: AssignmentResultStudentSearchControlView;

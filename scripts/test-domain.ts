@@ -3855,6 +3855,11 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /export type AssignmentResultStudentSearchControlView[\s\S]*export type AssignmentResultItemPerformanceSortControlView[\s\S]*export type AssignmentResultAttemptReviewFilterControlView[\s\S]*export type AssignmentResultControlViews/,
+  'Assignment result view domain should expose explicit focused control-view contracts.'
+);
+assert.match(
+  assignmentResultViewSource,
   /sectionViews:\s*AssignmentResultSectionViews/,
   'Assignment result page view-model should expose route-ready section views.'
 );
@@ -4196,6 +4201,26 @@ assert.doesNotMatch(
   `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
   /assignmentResultSearchCopy/,
   'Assignment result control components should receive prepared localized copy instead of importing assignment result search copy.'
+);
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /AssignmentResultStudentSearchControlView/,
+  'Assignment result student search component should import the explicit student-search control view contract.'
+);
+assert.match(
+  assignmentResultsAttemptReviewFilterSource,
+  /AssignmentResultAttemptReviewFilterControlView/,
+  'Assignment result attempt review filter component should import the explicit attempt-review control view contract.'
+);
+assert.match(
+  assignmentResultsItemPerformanceSortSource,
+  /AssignmentResultItemPerformanceSortControlView/,
+  'Assignment result item performance sort component should import the explicit item-performance control view contract.'
+);
+assert.doesNotMatch(
+  `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
+  /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
+  'Assignment result control components should not infer focused props from the full result page view-model.'
 );
 assert.match(
   assignmentResultsAttemptReviewFilterSource,

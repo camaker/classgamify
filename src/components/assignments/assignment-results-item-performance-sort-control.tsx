@@ -1,19 +1,15 @@
 import type {
   ItemPerformanceSort,
-  buildAssignmentResultsPageViewModel,
+  AssignmentResultItemPerformanceSortControlView,
 } from '@/assignments/result-view';
 import {
   NativeSelect,
   NativeSelectOption,
 } from '@/components/ui/native-select';
 
-type AssignmentResultsItemPerformanceSortView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['controlViews']['itemPerformanceSort'];
-
 type AssignmentResultsItemPerformanceSortControlProps = {
   onSortChange: (sort: ItemPerformanceSort) => void;
-  view: AssignmentResultsItemPerformanceSortView;
+  view: AssignmentResultItemPerformanceSortControlView;
 };
 
 export function AssignmentResultsItemPerformanceSortControl({

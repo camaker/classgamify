@@ -1,6 +1,6 @@
 import type {
   StudentSummarySort,
-  buildAssignmentResultsPageViewModel,
+  AssignmentResultStudentSearchControlView,
 } from '@/assignments/result-view';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,15 +9,11 @@ import {
 } from '@/components/ui/native-select';
 import { IconSearch, IconX } from '@tabler/icons-react';
 
-type AssignmentResultsStudentSearchView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['controlViews']['studentSearch'];
-
 type AssignmentResultsStudentSearchProps = {
   onClear: () => void;
   onSearch: (value: string) => void;
   onSortChange: (sort: StudentSummarySort) => void;
-  view: AssignmentResultsStudentSearchView;
+  view: AssignmentResultStudentSearchControlView;
 };
 
 export function AssignmentResultsStudentSearch({

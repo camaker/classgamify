@@ -1,19 +1,15 @@
 import type {
   AttemptReviewFilter,
-  buildAssignmentResultsPageViewModel,
+  AssignmentResultAttemptReviewFilterControlView,
 } from '@/assignments/result-view';
 import {
   NativeSelect,
   NativeSelectOption,
 } from '@/components/ui/native-select';
 
-type AssignmentResultsAttemptReviewFilterView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['controlViews']['attemptReviewFilter'];
-
 type AssignmentResultsAttemptReviewFilterControlProps = {
   onFilterChange: (filter: AttemptReviewFilter) => void;
-  view: AssignmentResultsAttemptReviewFilterView;
+  view: AssignmentResultAttemptReviewFilterControlView;
 };
 
 export function AssignmentResultsAttemptReviewFilterControl({
