@@ -382,6 +382,11 @@ export function buildPrintableWorksheetAnswerKeyItemView(
     item.acceptedAnswers
   );
   const explanation = normalizeOptionalRuntimeDisplayText(item.explanation);
+  const sequenceLabel = m.assignment_printable_item_sequence({
+    sequenceNumber: normalizePrintableWorksheetSequenceNumber(
+      item.sequenceNumber
+    ),
+  });
 
   return {
     acceptedAnswersLabel: acceptedAnswers
@@ -400,6 +405,10 @@ export function buildPrintableWorksheetAnswerKeyItemView(
           explanation,
         })
       : undefined,
+    headingLabel: m.assignment_printable_item_heading({
+      kindLabel: formatRuntimeItemKindLabel(item),
+      sequenceLabel,
+    }),
     id: item.id,
     prompt: formatPrintableWorksheetAnswerKeyPrompt(item),
   };

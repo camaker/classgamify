@@ -42,7 +42,8 @@ function PrintableWorksheetAnswerKeyItem({
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3 text-sm">
-      <p className="font-medium">{itemView.answerLabel}</p>
+      <p className="text-muted-foreground text-xs">{itemView.headingLabel}</p>
+      <p className="mt-1 font-medium">{itemView.answerLabel}</p>
       <p className="mt-1 text-muted-foreground">{itemView.prompt}</p>
       {itemView.acceptedAnswersLabel ? (
         <p className="mt-1 text-muted-foreground">

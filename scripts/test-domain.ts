@@ -12980,6 +12980,7 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted alternatives: Frozen accepted',
     answerLabel: '1. Frozen answer',
     explanationLabel: 'Explanation: Frozen explanation',
+    headingLabel: 'Item 1 · Question',
     id: 'q-frozen-prompt',
     prompt: 'Frozen prompt?',
   }
@@ -12998,6 +12999,7 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted alternatives: Paris, France',
     answerLabel: '1. Paris',
     explanationLabel: 'Explanation: France capital.',
+    headingLabel: 'Item 1 · Question',
     id: 'messy-answer-key',
     prompt: 'Capital of France?',
   }
@@ -13022,6 +13024,7 @@ assert.deepEqual(
     acceptedAnswersLabel: 'Accepted alternatives: Paris, France, La capitale',
     answerLabel: '2. Paris',
     explanationLabel: undefined,
+    headingLabel: 'Item 2 · Question',
     id: 'deduped-answer-key',
     prompt: 'Capital?',
   }
@@ -13041,6 +13044,7 @@ try {
       acceptedAnswersLabel: '可接受变体：答案一，答案二',
       answerLabel: '1. 答案',
       explanationLabel: undefined,
+      headingLabel: '第 1 题 · 题目',
       id: 'zh-answer-key',
       prompt: '题目?',
     }
@@ -18628,6 +18632,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /buildPrintableWorksheetAnswerKeyItemView[\s\S]*assignment_printable_item_sequence[\s\S]*assignment_printable_item_heading/,
+  'Printable worksheet answer-key item views should expose localized item headings for teacher answer-key scanning.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /formatPrintableWorksheetAcceptedAnswers[\s\S]*formatAcceptedAnswerAlternatives[\s\S]*includePrimary: false[\s\S]*assignment_printable_answer_separator/,
   'Printable worksheet accepted alternatives should reuse shared result formatting while omitting the primary answer.'
 );
@@ -18723,6 +18732,11 @@ const printableWorksheetItemListSource = readFileSync(
 const printableWorksheetAnswerKeySource = readFileSync(
   'src/components/assignments/printable-worksheet-answer-key.tsx',
   'utf8'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /itemView\.headingLabel/,
+  'Printable worksheet answer-key component should render the prepared item heading from the domain view.'
 );
 assert.match(
   printableAssignmentRouteSource,
