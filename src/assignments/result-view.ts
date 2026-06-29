@@ -71,8 +71,10 @@ import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultCopyArtifacts,
+  buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultActionState,
   type AssignmentResultActionButton,
+  type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifacts,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
@@ -129,6 +131,7 @@ export {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyArtifacts,
+  buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultClassroomBriefStats,
   buildAssignmentResultCopyText,
   getAssignmentResultCopyArtifactText,
@@ -302,6 +305,7 @@ type AssignmentResultsPageViewModel<
   completedAttempts: TAttempt[];
   contentState: AssignmentResultContentState;
   controlViews: AssignmentResultControlViews;
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
   description: string;
   headerView: AssignmentResultHeaderView | null;
   itemAnalysisCardViews: ReturnType<
@@ -1404,6 +1408,9 @@ export function buildAssignmentResultsPageViewModel<
   });
   const copyArtifacts = data ? buildAssignmentResultCopyArtifacts(data) : null;
   const classroomBrief = copyArtifacts?.classroomBrief ?? null;
+  const copyArtifactPreviews = copyArtifacts
+    ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts)
+    : [];
   const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
     data?.stats.completions
   );
@@ -1441,6 +1448,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttempts,
     contentState,
     controlViews,
+    copyArtifactPreviews,
     description: assignmentResultPageCopy.description,
     headerView,
     itemAnalysisCardViews,

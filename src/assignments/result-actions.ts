@@ -160,6 +160,13 @@ export type AssignmentResultCopyArtifacts = {
   studentFollowUpSummary: AssignmentStudentFollowUpSummary;
 };
 
+export type AssignmentResultCopyArtifactPreview = {
+  action: AssignmentResultCopyAction;
+  description: string;
+  label: string;
+  text: string;
+};
+
 export const assignmentResultActionDescriptors = [
   {
     action: 'copy-brief',
@@ -319,6 +326,28 @@ export function getAssignmentResultCopyArtifactText({
   }
 
   return artifacts.studentFollowUpSummary.text;
+}
+
+export function buildAssignmentResultCopyArtifactPreviews(
+  artifacts: AssignmentResultCopyArtifacts
+): AssignmentResultCopyArtifactPreview[] {
+  return assignmentResultActionDescriptors.flatMap((descriptor) => {
+    if (descriptor.kind !== 'copy-text') return [];
+
+    const actionCopy = getAssignmentResultActionCopy(descriptor.action);
+
+    return [
+      {
+        action: descriptor.action,
+        description: actionCopy.description,
+        label: actionCopy.label,
+        text: getAssignmentResultCopyArtifactText({
+          action: descriptor.action,
+          artifacts,
+        }),
+      },
+    ];
+  });
 }
 
 export function buildAssignmentResultCopyText({

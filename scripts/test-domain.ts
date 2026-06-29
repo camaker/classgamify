@@ -577,6 +577,7 @@ import {
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
   buildAssignmentResultCopyArtifacts,
+  buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultCopyText,
   buildAssignmentResultContentState,
   buildAssignmentResultHeaderView,
@@ -1520,6 +1521,11 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /buildAssignmentResultCopyArtifactPreviews[\s\S]*assignmentResultActionDescriptors\.flatMap[\s\S]*getAssignmentResultActionCopy\(descriptor\.action\)[\s\S]*getAssignmentResultCopyArtifactText/,
+  'Assignment result copy artifact previews should derive labels, descriptions, and text from action descriptors and prepared artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /buildAssignmentResultActionPayload[\s\S]*buildAssignmentResultsCsv\(data\)[\s\S]*buildAssignmentResultsCsvFilename\(data\)/,
   'Assignment result actions should own CSV action payload construction.'
 );
@@ -1552,6 +1558,11 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifacts = data \? buildAssignmentResultCopyArtifacts\(data\) : null[\s\S]*const classroomBrief = copyArtifacts\?\.classroomBrief \?\? null/,
   'Assignment result page view-model should derive classroom brief previews from unified result copy artifacts.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(copyArtifacts\)[\s\S]*copyArtifactPreviews,/,
+  'Assignment result page view-model should expose prepared copy artifact previews from the unified artifact bundle.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -29248,6 +29259,9 @@ assert.deepEqual(
       scoredResultsPageView.completedAttemptReviewCount,
     contentState: scoredResultsPageView.contentState,
     classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
+    copyArtifactPreviews: scoredResultsPageView.copyArtifactPreviews.map(
+      (preview) => [preview.action, preview.label, preview.text.length > 0]
+    ),
     controlViews: {
       attemptReviewFilter: [
         scoredResultsPageView.controlViews.attemptReviewFilter.filter,
@@ -29322,6 +29336,12 @@ assert.deepEqual(
       hasStudentSummaryRows: true,
     },
     classroomBriefReady: true,
+    copyArtifactPreviews: [
+      ['copy-brief', 'Copy brief', true],
+      ['copy-reteach-plan', 'Copy reteach plan', true],
+      ['copy-item-review', 'Copy item review', true],
+      ['copy-follow-up', 'Copy follow-up', true],
+    ],
     controlViews: {
       attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
       itemPerformanceSort: [
@@ -33703,6 +33723,42 @@ assert.equal(
     artifacts: resultCopyArtifacts,
   }),
   resultCopyArtifacts.studentFollowUpSummary.text
+);
+assert.deepEqual(
+  buildAssignmentResultCopyArtifactPreviews(resultCopyArtifacts).map(
+    (preview) => [
+      preview.action,
+      preview.label,
+      preview.description,
+      preview.text,
+    ]
+  ),
+  [
+    [
+      'copy-brief',
+      'Copy brief',
+      'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      resultCopyArtifacts.classroomBrief.text,
+    ],
+    [
+      'copy-reteach-plan',
+      'Copy reteach plan',
+      'Copy a lesson-ready script for the weakest items and priority students.',
+      resultCopyArtifacts.reteachPlan.text,
+    ],
+    [
+      'copy-item-review',
+      'Copy item review',
+      'Copy prompt-level performance with expected answers, alternatives, and notes.',
+      resultCopyArtifacts.itemReviewSummary.text,
+    ],
+    [
+      'copy-follow-up',
+      'Copy follow-up',
+      'Copy a student-by-student support list sorted by review need.',
+      resultCopyArtifacts.studentFollowUpSummary.text,
+    ],
+  ]
 );
 assert.equal(
   buildAssignmentResultCopyText({
