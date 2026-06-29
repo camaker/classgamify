@@ -10,7 +10,13 @@ import {
 } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
-import type { AssignmentResultsAnalysis } from '@/assignments/results';
+import type {
+  AssignmentAttemptReview,
+  AssignmentAttemptReviewAnswer,
+  AssignmentItemAnalysis,
+  AssignmentResultsAnalysis,
+  AssignmentStudentSummary,
+} from '@/assignments/results';
 import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
 import {
   formatAssignmentResultCsvDate,
@@ -80,17 +86,13 @@ export type AssignmentResultsExportData = {
   now?: number;
 };
 
-type AssignmentResultsExportAttemptReview =
-  AssignmentResultsExportData['analysis']['attempts'][number];
+type AssignmentResultsExportAttemptReview = AssignmentAttemptReview;
 
-type AssignmentResultsExportAttemptAnswer =
-  AssignmentResultsExportAttemptReview['answers'][number];
+type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;
 
-type AssignmentResultsExportItemAnalysis =
-  AssignmentResultsExportData['analysis']['perItem'][number];
+type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;
 
-type AssignmentResultsExportStudentSummary =
-  AssignmentResultsExportData['analysis']['students'][number];
+type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;
 
 type AssignmentResultsExportContext = {
   assignmentTitle: string;

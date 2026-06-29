@@ -40,26 +40,26 @@ export type AssignmentItemAnalysis = {
   unansweredCount: number;
 };
 
+export type AssignmentAttemptReviewAnswer = {
+  acceptedAnswers: string[];
+  answer: string;
+  correct: boolean;
+  expectedAnswer: string;
+  explanation?: string;
+  itemId: string;
+  prompt: string;
+  submitted: boolean;
+};
+
 export type AssignmentAttemptReview = {
   accuracy: number;
-  answers: Array<{
-    acceptedAnswers: string[];
-    answer: string;
-    correct: boolean;
-    expectedAnswer: string;
-    explanation?: string;
-    itemId: string;
-    prompt: string;
-    submitted: boolean;
-  }>;
+  answers: AssignmentAttemptReviewAnswer[];
   completedAt: Date | null;
   id: string;
   score: number;
   studentKey: string;
   studentLabel: string;
 };
-
-type AssignmentAttemptReviewAnswer = AssignmentAttemptReview['answers'][number];
 
 export type AssignmentAttemptReviewAnswerStatus = Pick<
   AssignmentAttemptReviewAnswer,

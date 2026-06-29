@@ -1528,6 +1528,21 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /AssignmentItemAnalysis[\s\S]*AssignmentResultsAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*export type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & \{[\s\S]*perItem: AssignmentItemAnalysis\[\];[\s\S]*students: AssignmentStudentSummary\[\];[\s\S]*analysis: AssignmentResultCopyActionAnalysis;/,
+  'Assignment result copy actions should expose explicit analysis child contracts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'students';/,
+  'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
+);
+assert.doesNotMatch(
+  assignmentResultActionsSource,
+  /AssignmentResultActionData\['analysis'\]|AssignmentResultCopyArtifactData\['analysis'\]|AssignmentResultCopyArtifactPreviewMetaItem\['key'\]|AssignmentResultsExportData\['analysis'\]/,
+  'Assignment result actions should not infer copy analysis or meta-key contracts from aggregate indexes.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
   'Assignment result actions should own unified teacher copy artifact construction.'
 );
@@ -2087,9 +2102,29 @@ assert.doesNotMatch(
   /answers\.find\([\s\S]*itemId === item\.id|new Map\(\s*attempt\.answersJson\.answers\.map/,
   'Assignment result analysis should not hand-roll submitted-answer item-id maps.'
 );
+assert.match(
+  assignmentResultsSource,
+  /export type AssignmentAttemptReviewAnswer = \{[\s\S]*acceptedAnswers: string\[\];[\s\S]*submitted: boolean;[\s\S]*export type AssignmentAttemptReview = \{[\s\S]*answers: AssignmentAttemptReviewAnswer\[\];/,
+  'Assignment result analysis should expose an explicit attempt review answer contract.'
+);
+assert.doesNotMatch(
+  assignmentResultsSource,
+  /type AssignmentAttemptReviewAnswer = AssignmentAttemptReview\['answers'\]\[number\]/,
+  'Assignment result analysis should not derive attempt review answer contracts from aggregate review indexes.'
+);
 const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /AssignmentAttemptReview[\s\S]*AssignmentAttemptReviewAnswer[\s\S]*AssignmentItemAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*type AssignmentResultsExportAttemptReview = AssignmentAttemptReview;[\s\S]*type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;[\s\S]*type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;[\s\S]*type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;/,
+  'Assignment CSV export should compose explicit result-analysis child contracts.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /AssignmentResultsExportData\['analysis'\]\['(?:attempts|perItem|students)'\]|AssignmentResultsExportAttemptReview\['answers'\]\[number\]/,
+  'Assignment CSV export should not infer attempt, answer, item, or student contracts from nested export-data indexes.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -2908,10 +2943,15 @@ assert.match(
   /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView =\s*ActivityEditorAiDraftSourceCapabilityView;/,
   'Activity editor domain should expose explicit AI draft panel view contracts.'
 );
+assert.match(
+  activityEditorSource,
+  /ActivitySourceMaterialDraftNoteView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView =\s*ActivitySourceMaterialDraftNoteView & \{[\s\S]*displayText: string;/,
+  'Activity editor AI draft source notes should compose the explicit draft-source note contract.'
+);
 assert.doesNotMatch(
   activityEditorSource,
-  /ActivityEditorAiDraftPanelView\['sourceCapabilityViews'\]\[number\]/,
-  'Activity editor AI draft source capability card contract should not derive from the aggregate panel view index.'
+  /ActivityEditorAiDraftPanelView\['sourceCapabilityViews'\]\[number\]|ReturnType<\s*typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText/,
+  'Activity editor AI draft source contracts should not derive from aggregate panel indexes or draft-source builder return types.'
 );
 assert.match(
   activityEditorFormSource,
@@ -3027,6 +3067,16 @@ assert.match(
   activityEditorSource,
   /export type ActivityEditorSelectOptionsView[\s\S]*export type ActivityEditorModeView[\s\S]*export type ActivityEditorTemplateView[\s\S]*export type ActivityEditorSelectedTemplateView/,
   'Activity editor domain should expose explicit editor shell and field view contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /ActivityCreatableVisibility[\s\S]*visibilityOptions: ActivityEditorSelectOption<ActivityCreatableVisibility>\[\];[\s\S]*formatActivityEditorVisibility\(\s*visibility: ActivityCreatableVisibility/,
+  'Activity editor visibility options should consume the explicit creatable visibility contract.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /\(typeof ACTIVITY_CREATABLE_VISIBILITIES\)\[number\]/,
+  'Activity editor should not infer creatable visibility from the raw visibility tuple.'
 );
 assert.match(
   activityEditorFormSource,
@@ -3226,6 +3276,16 @@ assert.match(
   activityDraftMetaSource,
   /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*export type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*export type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
   'AI draft meta domain should expose explicit summary, checklist, source-material, readiness, and quiz-choice view contracts.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /QuestionChoiceReadinessStatus[\s\S]*export type ActivityDraftReviewChecklistStatus =[\s\S]*status: ActivityDraftReviewChecklistStatus;[\s\S]*status: QuestionChoiceReadinessStatus;/,
+  'AI draft meta domain should use explicit checklist and quiz-choice status contracts.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSource,
+  /QuestionChoiceReadinessItem\['status'\]|ActivityDraftReviewChecklistItem\['status'\]/,
+  'AI draft meta domain should not infer status contracts from aggregate item indexes.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -4254,6 +4314,16 @@ assert.doesNotMatch(
   assignmentResultViewSource,
   /ReturnType<typeof buildAssignment(?:ResultMetricItems|AttemptRowViews|AttemptReviewCardViews|StudentSummaryRowViews|ItemAnalysisCardViews|ItemPerformanceRowViews)>/,
   'Assignment result view contracts should not infer result display subviews from builder return types.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /AssignmentAttemptReviewAnswer[\s\S]*AssignmentClassroomBrief[\s\S]*classroomBrief: AssignmentClassroomBrief \| null;[\s\S]*answer: AssignmentAttemptReviewAnswer;[\s\S]*answers: AssignmentAttemptReviewAnswer\[\]/,
+  'Assignment result page view-model should compose explicit classroom brief and attempt answer contracts.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /AssignmentResultCopyArtifacts\['classroomBrief'\]|AssignmentAttemptReview\['answers'\]\[number\]|AssignmentAttemptReview\['answers'\]/,
+  'Assignment result page view-model should not infer classroom brief or answer-review contracts from aggregate indexes.'
 );
 assert.match(
   assignmentResultsHeaderCardSource,
@@ -20041,6 +20111,16 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /PrintableWorksheetChoicePresentation[\s\S]*presentation: PrintableWorksheetChoicePresentation;[\s\S]*choicePresentation: PrintableWorksheetChoicePresentation;[\s\S]*presentation: PrintableWorksheetChoicePresentation/,
+  'Printable worksheet view should compose the explicit printable choice-presentation contract.'
+);
+assert.doesNotMatch(
+  printableWorksheetViewSource,
+  /PrintableWorksheetItem\['choicePresentation'\]/,
+  'Printable worksheet view should not infer choice-presentation contracts from aggregate worksheet item indexes.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /const choiceBank = buildPrintableWorksheetChoiceBankView\(item\)[\s\S]*choiceBank,/,
   'Printable worksheet view should normalize printable choice-bank display data.'
 );
@@ -20594,11 +20674,34 @@ assert.match(
   'E2E catalog should cover the printable worksheet student, date, and score fields.'
 );
 const activityTemplates = getActivityTemplates();
+const activityTypesSource = readFileSync('src/activities/types.ts', 'utf8');
+const activityCatalogSource = readFileSync('src/activities/catalog.ts', 'utf8');
 assert.deepEqual(
   activityTemplates.map((template) => template.type),
   ACTIVITY_TEMPLATE_TYPES
 );
 assert.equal(activityTemplates.length, ACTIVITY_TEMPLATE_TYPES.length);
+assert.deepEqual(ACTIVITY_CREATABLE_VISIBILITIES, [
+  'draft',
+  'private',
+  'public',
+  'unlisted',
+]);
+assert.match(
+  activityTypesSource,
+  /export type ActivityCreatableVisibility =[\s\S]*ACTIVITY_CREATABLE_VISIBILITIES\)\[number\];[\s\S]*export type ActivityTemplateClassroomMode =[\s\S]*'individual'[\s\S]*'small-group'[\s\S]*'whole-class';[\s\S]*classroomMode: ActivityTemplateClassroomMode;/,
+  'Activity types should expose explicit creatable visibility and classroom-mode contracts.'
+);
+assert.match(
+  activityCatalogSource,
+  /ActivityTemplateClassroomMode[\s\S]*formatActivityTemplateClassroomMode\(\s*classroomMode: ActivityTemplateClassroomMode/,
+  'Activity catalog classroom-mode formatting should consume the explicit classroom-mode contract.'
+);
+assert.doesNotMatch(
+  activityCatalogSource,
+  /ActivityTemplateDefinition\['classroomMode'\]/,
+  'Activity catalog should not infer classroom-mode contracts from the aggregate template definition.'
+);
 assert.deepEqual(
   ACTIVITY_TEMPLATE_TYPES.map(
     (templateType) => getTemplateByType(templateType).type

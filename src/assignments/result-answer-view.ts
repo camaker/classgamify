@@ -1,5 +1,5 @@
 import type {
-  AssignmentAttemptReview,
+  AssignmentAttemptReviewAnswer,
   AssignmentAttemptReviewAnswerStatus,
 } from '@/assignments/results';
 import {
@@ -32,9 +32,6 @@ export type AssignmentResultAttemptAnswerTextView =
     statusTone: AssignmentResultAnswerStatusTone;
     studentAnswerText: string;
   };
-
-type AssignmentResultAttemptAnswerSource =
-  AssignmentAttemptReview['answers'][number];
 
 export function buildAssignmentResultAcceptedAnswerView(
   acceptedAnswers: string[],
@@ -89,7 +86,7 @@ export function buildAssignmentResultAnswerStatusView(
 }
 
 export function buildAssignmentResultAttemptAnswerTextView(
-  answer: AssignmentResultAttemptAnswerSource,
+  answer: AssignmentAttemptReviewAnswer,
   options?: {
     acceptedAnswerEmptyValue?: string;
     studentAnswerEmptyValue?: string;

@@ -1,5 +1,6 @@
 import type {
   ActivityContent,
+  ActivityCreatableVisibility,
   ActivityDifficulty,
   ActivitySeed,
   ActivityTemplateDefinition,
@@ -32,6 +33,7 @@ import {
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
   normalizeActivityDraftSourceText,
+  type ActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
 import {
   buildActivityAiDraftFocusOptions,
@@ -127,9 +129,7 @@ type ActivityEditorSelectOption<TValue extends string> = {
 export type ActivityEditorSelectOptionsView = {
   difficultyOptions: ActivityEditorSelectOption<ActivityDifficulty>[];
   templateOptions: ActivityTemplateDefinition[];
-  visibilityOptions: ActivityEditorSelectOption<
-    (typeof ACTIVITY_CREATABLE_VISIBILITIES)[number]
-  >[];
+  visibilityOptions: ActivityEditorSelectOption<ActivityCreatableVisibility>[];
 };
 
 type ActivityEditorDraftSourceState = {
@@ -150,11 +150,10 @@ export type ActivityEditorAiDraftSourceCapabilityView =
     label: string;
   }>;
 
-export type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
-  typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText
->[number] & {
-  displayText: string;
-};
+export type ActivityEditorSourceMaterialDraftNoteView =
+  ActivitySourceMaterialDraftNoteView & {
+    displayText: string;
+  };
 
 export type ActivityEditorAiDraftSourceReadinessView = {
   characterCountLabel: string;
@@ -826,7 +825,7 @@ export function formatActivityEditorDifficulty(difficulty: ActivityDifficulty) {
 }
 
 export function formatActivityEditorVisibility(
-  visibility: (typeof ACTIVITY_CREATABLE_VISIBILITIES)[number]
+  visibility: ActivityCreatableVisibility
 ) {
   switch (visibility) {
     case 'draft':

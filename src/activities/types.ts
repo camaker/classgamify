@@ -31,6 +31,9 @@ export const ACTIVITY_CREATABLE_VISIBILITIES = [
   'unlisted',
 ] as const;
 
+export type ActivityCreatableVisibility =
+  (typeof ACTIVITY_CREATABLE_VISIBILITIES)[number];
+
 export const ACTIVITY_PERSISTED_VISIBILITIES = [
   'archived',
   ...ACTIVITY_CREATABLE_VISIBILITIES,
@@ -65,6 +68,11 @@ export type ActivityVisibility =
 export type AssignmentStatus = 'draft' | 'published' | 'closed';
 
 export type ActivityDifficulty = (typeof ACTIVITY_DIFFICULTIES)[number];
+
+export type ActivityTemplateClassroomMode =
+  | 'individual'
+  | 'small-group'
+  | 'whole-class';
 
 export type ActivityQuestionOption = {
   id: string;
@@ -161,7 +169,7 @@ export type ActivityTemplateDefinition = {
   description: string;
   bestFor: string;
   contentRequirements: ActivityTemplateContentRequirement[];
-  classroomMode: 'individual' | 'small-group' | 'whole-class';
+  classroomMode: ActivityTemplateClassroomMode;
 };
 
 export type ActivitySeed = {

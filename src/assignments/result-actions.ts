@@ -17,6 +17,11 @@ import {
   buildAssignmentResultsCsvFilename,
   type AssignmentResultsExportData,
 } from '@/assignments/results-export';
+import type {
+  AssignmentItemAnalysis,
+  AssignmentResultsAnalysis,
+  AssignmentStudentSummary,
+} from '@/assignments/results';
 import { formatAssignmentResultNumber } from '@/assignments/result-format';
 import {
   buildAssignmentStudentFollowUpSummary,
@@ -142,11 +147,14 @@ type AssignmentResultActionStats = {
 };
 
 export type AssignmentResultActionData = AssignmentResultsExportData;
+
+export type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & {
+  perItem: AssignmentItemAnalysis[];
+  students: AssignmentStudentSummary[];
+};
+
 export type AssignmentResultCopyActionData = AssignmentResultActionData & {
-  analysis: AssignmentResultActionData['analysis'] & {
-    perItem: AssignmentResultActionData['analysis']['perItem'];
-    students: AssignmentResultActionData['analysis']['students'];
-  };
+  analysis: AssignmentResultCopyActionAnalysis;
 };
 
 export type AssignmentResultActionDataSet = {
@@ -155,10 +163,7 @@ export type AssignmentResultActionDataSet = {
 };
 
 type AssignmentResultCopyArtifactData = {
-  analysis: Pick<
-    AssignmentResultsExportData['analysis'],
-    'perItem' | 'students'
-  >;
+  analysis: Pick<AssignmentResultsAnalysis, 'perItem' | 'students'>;
   assignment: {
     title: string;
   };
@@ -182,16 +187,18 @@ export type AssignmentResultCopyArtifactPreview = {
 };
 
 export type AssignmentResultCopyArtifactPreviewMetaItem = {
-  key:
-    | 'focus-items'
-    | 'follow-up-students'
-    | 'lines'
-    | 'next-steps'
-    | 'review-items'
-    | 'students';
+  key: AssignmentResultCopyArtifactPreviewMetaKey;
   label: string;
   value: string;
 };
+
+export type AssignmentResultCopyArtifactPreviewMetaKey =
+  | 'focus-items'
+  | 'follow-up-students'
+  | 'lines'
+  | 'next-steps'
+  | 'review-items'
+  | 'students';
 
 export const assignmentResultActionDescriptors = [
   {
@@ -338,8 +345,8 @@ export function buildAssignmentResultCopyActionData({
   students,
 }: {
   data: AssignmentResultActionData;
-  items: AssignmentResultCopyArtifactData['analysis']['perItem'];
-  students: AssignmentResultCopyArtifactData['analysis']['students'];
+  items: AssignmentItemAnalysis[];
+  students: AssignmentStudentSummary[];
 }): AssignmentResultCopyActionData {
   return {
     ...data,
@@ -576,7 +583,7 @@ function buildAssignmentResultCopyArtifactPreviewMetaItem({
   label,
   value,
 }: {
-  key: AssignmentResultCopyArtifactPreviewMetaItem['key'];
+  key: AssignmentResultCopyArtifactPreviewMetaKey;
   label: string;
   value: number;
 }): AssignmentResultCopyArtifactPreviewMetaItem {

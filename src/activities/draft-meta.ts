@@ -5,6 +5,7 @@ import {
 import {
   buildQuestionChoiceReadinessSummary,
   type QuestionChoiceReadinessItem,
+  type QuestionChoiceReadinessStatus,
   type QuestionChoiceReadinessSummary,
 } from '@/activities/distractors';
 import {
@@ -60,6 +61,11 @@ export type ActivityDraftMeta = {
   templateReadiness: ActivityDraftTemplateReadiness[];
 };
 
+export type ActivityDraftReviewChecklistStatus =
+  | 'action-needed'
+  | 'ready'
+  | 'review';
+
 export type ActivityDraftReviewChecklistItem = {
   description: string;
   id:
@@ -71,7 +77,7 @@ export type ActivityDraftReviewChecklistItem = {
     | 'review-answers';
   label: string;
   priority: 'high' | 'normal';
-  status: 'action-needed' | 'ready' | 'review';
+  status: ActivityDraftReviewChecklistStatus;
 };
 
 export type ActivityDraftTemplateOption = TemplateRemixTemplateOption;
@@ -117,7 +123,7 @@ export type ActivityTemplateQuizChoiceReadinessItemView = {
   key: string;
   promptLabel: string;
   sourceLabel: string;
-  status: QuestionChoiceReadinessItem['status'];
+  status: QuestionChoiceReadinessStatus;
   statusLabel: string;
 };
 
@@ -199,7 +205,7 @@ export type ActivityDraftReviewChecklistItemView =
   };
 
 export type ActivityDraftReviewChecklistStatusView = {
-  id: ActivityDraftReviewChecklistItem['status'];
+  id: ActivityDraftReviewChecklistStatus;
   label: string;
 };
 
@@ -214,7 +220,7 @@ export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView = {
   detail: string;
   key: string;
   promptLabel: string;
-  status: QuestionChoiceReadinessItem['status'];
+  status: QuestionChoiceReadinessStatus;
   statusLabel: string;
 };
 
@@ -499,7 +505,7 @@ function buildActivityDraftMetaSummaryQuestionChoiceReadinessDetail(
 }
 
 function formatActivityDraftMetaSummaryQuestionChoiceReadinessStatus(
-  status: QuestionChoiceReadinessItem['status']
+  status: QuestionChoiceReadinessStatus
 ) {
   switch (status) {
     case 'explicit-ready':
@@ -705,7 +711,7 @@ function buildActivityDraftReviewChecklistStatusViews(
 
 function countActivityDraftReviewChecklistStatus(
   items: ActivityDraftReviewChecklistItemView[],
-  status: ActivityDraftReviewChecklistItem['status']
+  status: ActivityDraftReviewChecklistStatus
 ) {
   return normalizeActivityDraftMetaCount(
     items.filter((item) => item.status === status).length
@@ -726,7 +732,7 @@ function buildLegacyActivityDraftReviewChecklistItem(
 }
 
 function formatActivityDraftReviewChecklistStatus(
-  status: ActivityDraftReviewChecklistItem['status']
+  status: ActivityDraftReviewChecklistStatus
 ) {
   switch (status) {
     case 'action-needed':
@@ -852,7 +858,7 @@ export function getActivityTemplateQuizChoiceReadinessItemPosition(
 }
 
 function formatActivityTemplateQuizChoiceReadinessStatus(
-  status: QuestionChoiceReadinessItem['status']
+  status: QuestionChoiceReadinessStatus
 ) {
   switch (status) {
     case 'explicit-ready':

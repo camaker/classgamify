@@ -3,6 +3,7 @@ import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
 import type {
   ActivityTemplateType,
   ActivitySeed,
+  ActivityTemplateClassroomMode,
   ActivityTemplateDefinition,
   AssignmentSeed,
 } from './types';
@@ -323,7 +324,7 @@ export function getTemplateByType(type: string) {
 }
 
 export function formatActivityTemplateClassroomMode(
-  classroomMode: ActivityTemplateDefinition['classroomMode']
+  classroomMode: ActivityTemplateClassroomMode
 ) {
   switch (classroomMode) {
     case 'individual':

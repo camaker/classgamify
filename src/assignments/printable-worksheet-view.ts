@@ -5,6 +5,7 @@ import {
 import type {
   PrintableAssignmentWorksheet,
   PrintableWorksheetAnswerKeyItem,
+  PrintableWorksheetChoicePresentation,
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
@@ -56,7 +57,7 @@ export type PrintableWorksheetChoiceBankView = {
   choices: PrintableWorksheetChoiceBankChoiceView[];
   emptySummary: string | null;
   label: string | null;
-  presentation: PrintableWorksheetItem['choicePresentation'];
+  presentation: PrintableWorksheetChoicePresentation;
   show: boolean;
   showIndexLabels: boolean;
   summary: string | null;
@@ -67,7 +68,7 @@ export type PrintableWorksheetItemView = {
   answerLineSummary: string;
   answerLines: PrintableWorksheetAnswerLineView[];
   choiceBank: PrintableWorksheetChoiceBankView;
-  choicePresentation: PrintableWorksheetItem['choicePresentation'];
+  choicePresentation: PrintableWorksheetChoicePresentation;
   choices: string[];
   headingLabel: string;
   id: string;
@@ -703,7 +704,7 @@ function formatPrintableWorksheetChoiceBankSummary({
   showChoiceBank,
 }: {
   count: number;
-  presentation: PrintableWorksheetItem['choicePresentation'];
+  presentation: PrintableWorksheetChoicePresentation;
   showChoiceBank: boolean;
 }) {
   if (!showChoiceBank) {
@@ -736,7 +737,7 @@ function formatPrintableWorksheetChoiceBankSummary({
 }
 
 function getPrintableWorksheetChoiceBankLabel(
-  presentation: PrintableWorksheetItem['choicePresentation']
+  presentation: PrintableWorksheetChoicePresentation
 ) {
   switch (presentation) {
     case 'answer-bank':

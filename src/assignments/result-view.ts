@@ -1,4 +1,5 @@
 import type {
+  AssignmentAttemptReviewAnswer,
   AssignmentAttemptReview,
   AssignmentResultsAnalysis,
   AssignmentItemAnalysis,
@@ -86,6 +87,7 @@ import {
   type AssignmentResultCopyArtifacts,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
+import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import type {
   ActivityTemplateType,
   AssignmentSettings,
@@ -477,7 +479,7 @@ export type AssignmentResultsPageViewModel<
   attemptRowViews: AssignmentResultAttemptRowView[];
   attemptTableView: AssignmentResultAttemptTableView;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
-  classroomBrief: AssignmentResultCopyArtifacts['classroomBrief'] | null;
+  classroomBrief: AssignmentClassroomBrief | null;
   completedAttemptCount: number;
   completedAttemptReviewCount: number;
   completedAttempts: TAttempt[];
@@ -1378,7 +1380,7 @@ export function buildAssignmentAttemptAnswerReviewView({
   answer,
   index,
 }: {
-  answer: AssignmentAttemptReview['answers'][number];
+  answer: AssignmentAttemptReviewAnswer;
   index: number;
 }): AssignmentResultAttemptAnswerReviewDisplayView {
   const answerView = buildAssignmentResultAttemptAnswerTextView(answer);
@@ -1415,7 +1417,7 @@ export function buildAssignmentAttemptAnswerReviewView({
 }
 
 export function buildAssignmentAttemptAnswerReviewViews(
-  answers: AssignmentAttemptReview['answers']
+  answers: AssignmentAttemptReviewAnswer[]
 ): AssignmentResultAttemptAnswerReviewView[] {
   return answers.map((answer, index) => ({
     id: answer.itemId,
