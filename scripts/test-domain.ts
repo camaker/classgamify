@@ -168,6 +168,7 @@ import {
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftSummary,
+  getActivitySourceMaterialDraftNoteIdentityKey,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
   isSafeActivitySourceMaterialDraftNoteView,
@@ -186,6 +187,7 @@ import {
   normalizeActivityDraftMetaCount,
 } from '@/activities/draft-meta';
 import {
+  ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS,
   ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES,
   addActivitySourceMaterialPickerItem,
   buildActivitySourceMaterialCapabilityCountsFromActions,
@@ -6128,7 +6130,7 @@ const mixedSourceMaterialSummary = summarizeActivitySourceMaterials([
   },
 ]);
 assert.deepEqual(mixedSourceMaterialSummary.readiness, {
-  capabilities: ['spreadsheet-import', 'worksheet-extraction'],
+  capabilities: ['worksheet-extraction', 'spreadsheet-import'],
   extractableCount: 2,
   hasAudio: false,
   hasSpreadsheet: true,
@@ -6136,16 +6138,16 @@ assert.deepEqual(mixedSourceMaterialSummary.readiness, {
 });
 assert.deepEqual(mixedSourceMaterialSummary.extractionActions, [
   {
-    capability: 'spreadsheet-import',
-    id: 'import-spreadsheet',
-    sourceCount: 1,
-    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
-  },
-  {
     capability: 'worksheet-extraction',
     id: 'extract-worksheet',
     sourceCount: 1,
     sourceKindCounts: [{ count: 1, kind: 'worksheet-image' }],
+  },
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
   },
 ]);
 const normalizedSourceMaterialSummary = summarizeActivitySourceMaterials([
@@ -6184,8 +6186,8 @@ assert.deepEqual(normalizedSourceMaterialSummary.kindSummaries, [
 assert.deepEqual(normalizedSourceMaterialSummary.readiness, {
   capabilities: [
     'audio-extraction',
-    'spreadsheet-import',
     'worksheet-extraction',
+    'spreadsheet-import',
   ],
   extractableCount: 3,
   hasAudio: true,
@@ -6200,16 +6202,16 @@ assert.deepEqual(normalizedSourceMaterialSummary.extractionActions, [
     sourceKindCounts: [{ count: 1, kind: 'audio' }],
   },
   {
-    capability: 'spreadsheet-import',
-    id: 'import-spreadsheet',
-    sourceCount: 1,
-    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
-  },
-  {
     capability: 'worksheet-extraction',
     id: 'extract-worksheet',
     sourceCount: 1,
     sourceKindCounts: [{ count: 1, kind: 'worksheet-document' }],
+  },
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceCount: 1,
+    sourceKindCounts: [{ count: 1, kind: 'spreadsheet' }],
   },
 ]);
 assert.equal(normalizeActivitySourceMaterialCount(Number.NaN), 0);
@@ -6230,6 +6232,36 @@ assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES, [
   'worksheet-extraction',
   'spreadsheet-import',
 ]);
+assert.deepEqual(
+  ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.map((action) => ({
+    capability: action.capability,
+    id: action.id,
+    sourceKinds: [...action.sourceKinds],
+  })),
+  [
+    {
+      capability: 'audio-extraction',
+      id: 'extract-audio',
+      sourceKinds: ['audio'],
+    },
+    {
+      capability: 'worksheet-extraction',
+      id: 'extract-worksheet',
+      sourceKinds: ['worksheet-document', 'worksheet-image'],
+    },
+    {
+      capability: 'spreadsheet-import',
+      id: 'import-spreadsheet',
+      sourceKinds: ['spreadsheet'],
+    },
+  ]
+);
+assert.deepEqual(
+  ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.map(
+    (action) => action.capability
+  ),
+  ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES
+);
 assert.deepEqual(createEmptyActivitySourceMaterialCapabilityCounts(), {
   'audio-extraction': 0,
   'spreadsheet-import': 0,
@@ -6323,6 +6355,12 @@ assert.equal(
 assert.equal(
   getActivitySourceMaterialReadinessCapabilityForKindLabel(
     'Ｗｏｒｋｓｈｅｅｔ　ｄｏｃｕｍｅｎｔ'
+  ),
+  'worksheet-extraction'
+);
+assert.equal(
+  getActivitySourceMaterialReadinessCapabilityForKindLabel(
+    'worksheet document'
   ),
   'worksheet-extraction'
 );
@@ -18303,6 +18341,21 @@ assert.match(
 );
 assert.match(
   activityMaterialSummarySource,
+  /export const ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS[\s\S]*audio-extraction[\s\S]*worksheet-extraction[\s\S]*spreadsheet-import/,
+  'Activity source material extraction action order should live in the source-material domain.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES =[\s\S]*ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS\.map[\s\S]*action\.capability/,
+  'Activity source material readiness order should be derived from the extraction action order.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialReadinessCapabilities[\s\S]*ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES\.filter/,
+  'Activity source material readiness should filter the shared capability order instead of rebuilding one locally.'
+);
+assert.match(
+  activityMaterialSummarySource,
   /buildActivitySourceMaterialCapabilityViews[\s\S]*ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES\.flatMap[\s\S]*includeZero[\s\S]*copy\[capability\]/,
   'Activity source material capability views should be built by one shared domain helper.'
 );
@@ -20116,6 +20169,21 @@ assert.match(
   /parseActivitySourceMaterialDraftNoteLine[\s\S]*normalizeActivitySourceMaterialDraftNoteView[\s\S]*isSafeActivitySourceMaterialDraftNoteView/,
   'AI draft source-text note parsing should sanitize parsed notes before accepting them.'
 );
+assert.match(
+  activityDraftSourceSource,
+  /export function getActivitySourceMaterialDraftNoteIdentityKey[\s\S]*normalizeRuntimeDisplaySearchKey/,
+  'AI draft source material notes should expose a stable identity key for deduping safe provenance.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /getActivitySourceMaterialDraftKindIdentityKey[\s\S]*getSafeActivitySourceMaterialDraftKind/,
+  'AI draft source material note identity should map localized kind labels to stable material kinds.'
+);
+assert.match(
+  activityDraftSourceSource,
+  /formatActivitySourceMaterialDraftNotes[\s\S]*uniqueActivitySourceMaterialDraftNoteViews/,
+  'AI draft source material note formatting should dedupe safe provenance before prompt construction.'
+);
 assert.doesNotMatch(
   activityDraftSourceSource,
   /normalizeDraftSourceText\(match\?\.groups\?\.name\)|normalizeActivityMaterialReferenceFilename\(material\.originalName\) \?\?/,
@@ -20125,6 +20193,11 @@ assert.match(
   activityDraftMetaSource,
   /normalizeActivitySourceMaterialDraftNoteView[\s\S]*sourceMaterialNoteViews \?\? \[\][\s\S]*normalizeActivitySourceMaterialDraftNoteView\(noteView\)/,
   'AI draft meta source material note views should reuse draft-source filename sanitization.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /getActivitySourceMaterialDraftNoteIdentityKey[\s\S]*seen\.has\(key\)/,
+  'AI draft meta source material note views should reuse the stable draft-source note identity key.'
 );
 assert.match(
   activityDraftMetaSource,
@@ -20180,6 +20253,16 @@ assert.doesNotMatch(
   activityDraftSourceSource,
   /activity_draft_source_materials_heading\(\)\.trim\(\)|\?\.trim\(\) === heading/,
   'AI draft source note syncing should not rely on trim-only heading checks.'
+);
+assert.doesNotMatch(
+  activityDraftSourceSource,
+  /toLocaleLowerCase\(/,
+  'AI draft source note and source text dedupe should not depend on locale-sensitive lower-casing.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSource,
+  /toLocaleLowerCase\(/,
+  'AI draft meta source material dedupe should not depend on locale-sensitive lower-casing.'
 );
 const assignmentValidationSource = readFileSync(
   'src/assignments/validation.ts',
@@ -28941,6 +29024,48 @@ const allMaterialCapabilityDraftMetaSummary =
       },
     ],
   });
+const dedupedMaterialDraftMetaSummary = buildActivityDraftMetaSummaryView({
+  meta: fallbackDraftMeta,
+  model: 'test-model',
+  provider: 'workers-ai',
+  sourceMaterialNoteViews: [
+    {
+      kindLabel: '  Ｗｏｒｋｓｈｅｅｔ　document ',
+      name: 'https://files.example.test/private/Ｕｎｉｔ １.pdf?token=secret',
+    },
+    {
+      kindLabel: 'worksheet document',
+      name: 'C:\\teacher\\private\\unit 1.pdf?signature=abc',
+    },
+    {
+      kindLabel: 'storageKey',
+      name: 'userfiles/teacher/private.pdf',
+    },
+  ],
+});
+assert.deepEqual(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews, [
+  {
+    displayText: 'Worksheet document · Unit 1.pdf',
+    kindLabel: 'Worksheet document',
+    name: 'Unit 1.pdf',
+  },
+]);
+assert.deepEqual(
+  dedupedMaterialDraftMetaSummary.sourceMaterialCapabilityViews,
+  [
+    {
+      capability: 'worksheet-extraction',
+      description:
+        'Can support future worksheet prompt and accepted-answer extraction after teacher review.',
+      label: 'Worksheet',
+      value: '1',
+    },
+  ]
+);
+assert.doesNotMatch(
+  JSON.stringify(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews),
+  /https?:|files\.example|private|token|signature|sig=|#page|teacher\\/i
+);
 assert.deepEqual(
   allMaterialCapabilityDraftMetaSummary.sourceMaterialCapabilityViews,
   [
@@ -30145,6 +30270,26 @@ assert.deepEqual(
   }
 );
 assert.equal(
+  getActivitySourceMaterialDraftNoteIdentityKey({
+    kindLabel: '  Ｗｏｒｋｓｈｅｅｔ　document ',
+    name: 'https://files.example.test/private/Ｕｎｉｔ １.pdf?token=secret',
+  }),
+  getActivitySourceMaterialDraftNoteIdentityKey({
+    kindLabel: 'worksheet document',
+    name: 'unit 1.pdf',
+  })
+);
+assert.equal(
+  getActivitySourceMaterialDraftNoteIdentityKey({
+    kindLabel: '音频',
+    name: 'Ｕｎｉｔ １ listening.mp3',
+  }),
+  getActivitySourceMaterialDraftNoteIdentityKey({
+    kindLabel: 'Audio',
+    name: 'unit 1 listening.mp3',
+  })
+);
+assert.equal(
   isSafeActivitySourceMaterialDraftNoteView({
     kindLabel: 'Worksheet document',
     name: 'https://files.example.test/private/Unit 1.pdf?token=secret',
@@ -30210,6 +30355,25 @@ assert.doesNotMatch(
   safeBasenameMaterialDraftNotes ?? '',
   unsafeMaterialFilenameSuffixPattern
 );
+assert.equal(
+  buildActivitySourceMaterialDraftNotes([
+    {
+      fileId: 'file-url-worksheet-a',
+      kind: 'worksheet-document',
+      originalName:
+        'https://files.example.test/private/Ｕｎｉｔ １.pdf?token=secret',
+    },
+    {
+      fileId: 'file-url-worksheet-b',
+      kind: 'worksheet-document',
+      originalName: 'C:\\teacher\\private\\unit 1.pdf?signature=abc',
+    },
+  ]),
+  [
+    'Attached classroom source materials:',
+    '- Worksheet document: Unit 1.pdf',
+  ].join('\n')
+);
 assert.deepEqual(
   buildActivitySourceMaterialDraftNoteViewsFromSourceText(
     [
@@ -30227,6 +30391,27 @@ assert.deepEqual(
     },
     {
       kindLabel: 'Audio',
+      name: 'Unit 1 listening.mp3',
+    },
+  ]
+);
+assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    [
+      'Attached classroom source materials:',
+      '- Ｗｏｒｋｓｈｅｅｔ　document: https://files.example.test/private/Ｕｎｉｔ １.pdf?token=secret#page=2',
+      '- worksheet document: C:\\teacher\\private\\unit 1.pdf?signature=abc',
+      '- 音频: Unit 1 listening.mp3',
+      '- Audio: unit 1 listening.mp3',
+    ].join('\n')
+  ),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Unit 1.pdf',
+    },
+    {
+      kindLabel: '音频',
       name: 'Unit 1 listening.mp3',
     },
   ]

@@ -3,7 +3,10 @@ import {
   buildActivityMaterialReferenceFromUserFile,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
-import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
+import {
+  normalizeOptionalRuntimeDisplayText,
+  normalizeRuntimeDisplaySearchKey,
+} from '@/activities/runtime-display';
 import type { ActivityMaterialReference } from '@/activities/types';
 import { formatBytes } from '@/lib/formatter';
 import { m } from '@/locale/paraglide/messages';
@@ -27,12 +30,6 @@ export type ActivitySourceMaterialReadinessCapability =
   | 'audio-extraction'
   | 'spreadsheet-import'
   | 'worksheet-extraction';
-
-export const ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES = [
-  'audio-extraction',
-  'worksheet-extraction',
-  'spreadsheet-import',
-] as const satisfies ActivitySourceMaterialReadinessCapability[];
 
 export type ActivitySourceMaterialCapabilityCounts = Record<
   ActivitySourceMaterialReadinessCapability,
@@ -58,6 +55,35 @@ export type ActivitySourceMaterialExtractionAction = {
   sourceCount: number;
   sourceKindCounts: ActivitySourceMaterialKindSummary[];
 };
+
+type ActivitySourceMaterialExtractionActionDefinition = {
+  capability: ActivitySourceMaterialReadinessCapability;
+  id: ActivitySourceMaterialExtractionActionId;
+  sourceKinds: ReadonlyArray<UserFileMaterialKind>;
+};
+
+export const ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS = [
+  {
+    capability: 'audio-extraction',
+    id: 'extract-audio',
+    sourceKinds: ['audio'],
+  },
+  {
+    capability: 'worksheet-extraction',
+    id: 'extract-worksheet',
+    sourceKinds: ['worksheet-document', 'worksheet-image'],
+  },
+  {
+    capability: 'spreadsheet-import',
+    id: 'import-spreadsheet',
+    sourceKinds: ['spreadsheet'],
+  },
+] as const satisfies ReadonlyArray<ActivitySourceMaterialExtractionActionDefinition>;
+
+export const ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES =
+  ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS.map(
+    (action) => action.capability
+  ) satisfies ActivitySourceMaterialReadinessCapability[];
 
 export type ActivitySourceMaterialExtractionActionView =
   ActivitySourceMaterialExtractionAction & {
@@ -402,30 +428,6 @@ function getActivitySourceMaterialPickerStatusMessage(
   }
 }
 
-type ActivitySourceMaterialExtractionActionDefinition = {
-  capability: ActivitySourceMaterialReadinessCapability;
-  id: ActivitySourceMaterialExtractionActionId;
-  sourceKinds: UserFileMaterialKind[];
-};
-
-const ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS = [
-  {
-    capability: 'audio-extraction',
-    id: 'extract-audio',
-    sourceKinds: ['audio'],
-  },
-  {
-    capability: 'spreadsheet-import',
-    id: 'import-spreadsheet',
-    sourceKinds: ['spreadsheet'],
-  },
-  {
-    capability: 'worksheet-extraction',
-    id: 'extract-worksheet',
-    sourceKinds: ['worksheet-document', 'worksheet-image'],
-  },
-] satisfies ActivitySourceMaterialExtractionActionDefinition[];
-
 export function createEmptyActivitySourceMaterialKindCounts() {
   return Object.fromEntries(
     USER_FILE_MATERIAL_KINDS.map((kind) => [kind, 0])
@@ -641,7 +643,7 @@ function buildActivitySourceMaterialExtractionNextStep(
 function getActivitySourceMaterialKindFromLabel(
   kindLabel: string
 ): UserFileMaterialKind | undefined {
-  const normalizedKindLabel = normalizeOptionalRuntimeDisplayText(kindLabel);
+  const normalizedKindLabel = normalizeRuntimeDisplaySearchKey(kindLabel);
   if (!normalizedKindLabel) return undefined;
 
   return USER_FILE_MATERIAL_KINDS.find((kind) =>
@@ -654,7 +656,7 @@ function getActivitySourceMaterialKindLabels(kind: UserFileMaterialKind) {
     formatUserFileMaterialKind(kind),
     formatUserFileMaterialKind(kind, { locale: 'en' }),
     formatUserFileMaterialKind(kind, { locale: 'zh' }),
-  ].map(normalizeOptionalRuntimeDisplayText);
+  ].map(normalizeRuntimeDisplaySearchKey);
 }
 
 function buildActivitySourceMaterialReadiness(
@@ -673,23 +675,13 @@ function buildActivitySourceMaterialReadiness(
   const hasAudio = audioCount > 0;
   const hasSpreadsheet = spreadsheetCount > 0;
   const hasWorksheet = worksheetDocumentCount > 0 || worksheetImageCount > 0;
-  const capabilities: ActivitySourceMaterialReadinessCapability[] = [];
-
-  if (hasAudio) {
-    addActivitySourceMaterialReadinessCapability(capabilities, 'audio');
-  }
-  if (hasSpreadsheet) {
-    addActivitySourceMaterialReadinessCapability(capabilities, 'spreadsheet');
-  }
-  if (hasWorksheet) {
-    addActivitySourceMaterialReadinessCapability(
-      capabilities,
-      'worksheet-document'
-    );
-  }
 
   return {
-    capabilities,
+    capabilities: buildActivitySourceMaterialReadinessCapabilities({
+      hasAudio,
+      hasSpreadsheet,
+      hasWorksheet,
+    }),
     extractableCount:
       audioCount +
       spreadsheetCount +
@@ -701,12 +693,29 @@ function buildActivitySourceMaterialReadiness(
   };
 }
 
-function addActivitySourceMaterialReadinessCapability(
-  capabilities: ActivitySourceMaterialReadinessCapability[],
-  kind: UserFileMaterialKind
-) {
-  const capability = getActivitySourceMaterialReadinessCapabilityForKind(kind);
-  if (capability) capabilities.push(capability);
+function buildActivitySourceMaterialReadinessCapabilities({
+  hasAudio,
+  hasSpreadsheet,
+  hasWorksheet,
+}: {
+  hasAudio: boolean;
+  hasSpreadsheet: boolean;
+  hasWorksheet: boolean;
+}) {
+  return ACTIVITY_SOURCE_MATERIAL_READINESS_CAPABILITIES.filter(
+    (capability) => {
+      switch (capability) {
+        case 'audio-extraction':
+          return hasAudio;
+        case 'spreadsheet-import':
+          return hasSpreadsheet;
+        case 'worksheet-extraction':
+          return hasWorksheet;
+      }
+
+      return false;
+    }
+  );
 }
 
 export function normalizeActivitySourceMaterialCount(count: number) {

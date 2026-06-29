@@ -3,11 +3,17 @@ import {
   normalizeActivityMaterialReferenceFilename,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
-import { normalizeRuntimeDisplayText } from '@/activities/runtime-display';
+import {
+  normalizeRuntimeDisplaySearchKey,
+  normalizeRuntimeDisplayText,
+} from '@/activities/runtime-display';
 import type { ActivityMaterialReference } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
-import { USER_FILE_MATERIAL_KINDS } from '@/storage/file-materials';
+import {
+  USER_FILE_MATERIAL_KINDS,
+  type UserFileMaterialKind,
+} from '@/storage/file-materials';
 
 export const DEFAULT_ACTIVITY_DRAFT_SOURCE =
   'apple, bread, milk, rice, water, egg';
@@ -94,10 +100,12 @@ export function buildActivitySourceMaterialDraftNoteViewsFromSourceText(
 
   if (noteStartIndex === -1) return [];
 
-  return lines
-    .slice(noteStartIndex + 1)
-    .map(parseActivitySourceMaterialDraftNoteLine)
-    .filter((noteView) => noteView !== null);
+  return uniqueActivitySourceMaterialDraftNoteViews(
+    lines
+      .slice(noteStartIndex + 1)
+      .map(parseActivitySourceMaterialDraftNoteLine)
+      .filter((noteView) => noteView !== null)
+  );
 }
 
 export function buildActivitySourceMaterialDraftNotes(value: unknown) {
@@ -161,14 +169,7 @@ export function buildActivitySourceMaterialDraftNoteView(
 }
 
 export function isSafeActivitySourceMaterialDraftKind(kindLabel: string) {
-  const normalizedKindLabel = normalizeRuntimeDisplayText(kindLabel);
-  const supportedKindLabels = USER_FILE_MATERIAL_KINDS.flatMap((kind) => [
-    formatUserFileMaterialKind(kind),
-    formatUserFileMaterialKind(kind, { locale: 'en' }),
-    formatUserFileMaterialKind(kind, { locale: 'zh' }),
-  ]).map(normalizeRuntimeDisplayText);
-
-  return supportedKindLabels.includes(normalizedKindLabel);
+  return Boolean(getSafeActivitySourceMaterialDraftKind(kindLabel));
 }
 
 export function normalizeActivitySourceMaterialDraftNoteView(
@@ -181,6 +182,19 @@ export function normalizeActivitySourceMaterialDraftNoteView(
     kindLabel,
     name,
   };
+}
+
+export function getActivitySourceMaterialDraftNoteIdentityKey(
+  noteView: ActivitySourceMaterialDraftNoteView
+) {
+  const normalizedNoteView =
+    normalizeActivitySourceMaterialDraftNoteView(noteView);
+  const kindKey = getActivitySourceMaterialDraftKindIdentityKey(
+    normalizedNoteView.kindLabel
+  );
+  const nameKey = normalizeRuntimeDisplaySearchKey(normalizedNoteView.name);
+
+  return kindKey && nameKey ? `${kindKey}\u0000${nameKey}` : undefined;
 }
 
 export function isSafeActivitySourceMaterialDraftNoteView(
@@ -208,20 +222,76 @@ function countActivitySourceMaterialDraftKinds(
   return counts;
 }
 
+function getSafeActivitySourceMaterialDraftKind(
+  kindLabel: string
+): UserFileMaterialKind | undefined {
+  const kindKey = normalizeRuntimeDisplaySearchKey(kindLabel);
+  if (!kindKey) return undefined;
+
+  return USER_FILE_MATERIAL_KINDS.find((kind) =>
+    getActivitySourceMaterialDraftKindLabelKeys(kind).includes(kindKey)
+  );
+}
+
+function getActivitySourceMaterialDraftKindIdentityKey(kindLabel: string) {
+  return (
+    getSafeActivitySourceMaterialDraftKind(kindLabel) ??
+    normalizeRuntimeDisplaySearchKey(kindLabel)
+  );
+}
+
+function getActivitySourceMaterialDraftKindLabelKeys(
+  kind: UserFileMaterialKind
+) {
+  return [
+    formatUserFileMaterialKind(kind),
+    formatUserFileMaterialKind(kind, { locale: 'en' }),
+    formatUserFileMaterialKind(kind, { locale: 'zh' }),
+  ].map(normalizeRuntimeDisplaySearchKey);
+}
+
 function formatActivitySourceMaterialDraftNotes(
   safeNotes: ActivitySourceMaterialDraftNoteView[]
 ) {
-  if (safeNotes.length === 0) return undefined;
+  const uniqueNotes = uniqueActivitySourceMaterialDraftNoteViews(safeNotes);
+  if (uniqueNotes.length === 0) return undefined;
 
   return [
     m.activity_draft_source_materials_heading(),
-    ...safeNotes.map((note) =>
+    ...uniqueNotes.map((note) =>
       m.activity_draft_source_materials_item({
         kind: note.kindLabel,
         name: note.name,
       })
     ),
   ].join('\n');
+}
+
+function uniqueActivitySourceMaterialDraftNoteViews(
+  noteViews: ActivitySourceMaterialDraftNoteView[]
+) {
+  const seen = new Set<string>();
+  const result: ActivitySourceMaterialDraftNoteView[] = [];
+
+  for (const noteView of noteViews) {
+    const normalizedNoteView =
+      normalizeActivitySourceMaterialDraftNoteView(noteView);
+    const key =
+      getActivitySourceMaterialDraftNoteIdentityKey(normalizedNoteView);
+
+    if (
+      !key ||
+      !isSafeActivitySourceMaterialDraftNoteView(normalizedNoteView) ||
+      seen.has(key)
+    ) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(normalizedNoteView);
+  }
+
+  return result;
 }
 
 function buildActivityDraftSourceText(values: Array<string | undefined>) {
@@ -330,7 +400,7 @@ function unique(values: string[]) {
 }
 
 function normalizeDraftSourceTextKey(value: string) {
-  return normalizeDraftSourceText(value).toLocaleLowerCase();
+  return normalizeRuntimeDisplaySearchKey(normalizeDraftSourceText(value));
 }
 
 function normalizeDraftSourceText(value: string | undefined) {
