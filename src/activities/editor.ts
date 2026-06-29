@@ -141,19 +141,19 @@ type ActivityEditorDraftSourceState = {
   sourceLength: number;
 };
 
-type ActivityEditorAiDraftSourceCapabilityView =
+export type ActivityEditorAiDraftSourceCapabilityView =
   ActivitySourceMaterialCapabilityView<{
     description: string;
     label: string;
   }>;
 
-type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
+export type ActivityEditorSourceMaterialDraftNoteView = ReturnType<
   typeof buildActivitySourceMaterialDraftNoteViewsFromSourceText
 >[number] & {
   displayText: string;
 };
 
-type ActivityEditorAiDraftSourceReadinessView = {
+export type ActivityEditorAiDraftSourceReadinessView = {
   characterCountLabel: string;
   description: string;
   hasWarnings: boolean;
@@ -161,7 +161,7 @@ type ActivityEditorAiDraftSourceReadinessView = {
   title: string;
 };
 
-type ActivityEditorAiDraftPanelView = {
+export type ActivityEditorAiDraftPanelView = {
   badgeLabel: string;
   canGenerateDraft: boolean;
   canSyncDraftSourceMaterials: boolean;
@@ -183,6 +183,9 @@ type ActivityEditorAiDraftPanelView = {
   syncMaterialsHelpText: string;
   syncSuccessMessage: string;
 };
+
+export type ActivityEditorAiDraftSourceCapabilityCardView =
+  ActivityEditorAiDraftPanelView['sourceCapabilityViews'][number];
 
 type ActivityEditorDraftGenerationGate =
   | {

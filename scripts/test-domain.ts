@@ -2801,6 +2801,11 @@ assert.match(
   'Activity editor form should consume the activity-domain AI draft panel view.'
 );
 assert.match(
+  activityEditorSource,
+  /export type ActivityEditorAiDraftSourceCapabilityView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView[\s\S]*export type ActivityEditorAiDraftSourceReadinessView[\s\S]*export type ActivityEditorAiDraftPanelView[\s\S]*export type ActivityEditorAiDraftSourceCapabilityCardView/,
+  'Activity editor domain should expose explicit AI draft panel view contracts.'
+);
+assert.match(
   activityEditorFormSource,
   /ActivityAiDraftPanel[\s\S]*draftResult=\{draftResult\}[\s\S]*panelView=\{aiDraftPanelView\}/,
   'Activity editor form should delegate AI draft panel and result rendering.'
@@ -2834,6 +2839,16 @@ assert.match(
   activityAiDraftPanelSource,
   /ActivityDraftMetaSummary[\s\S]*result=\{draftResult\}/,
   'Activity AI draft panel should delegate AI draft review summary rendering.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /ActivityEditorAiDraftPanelView[\s\S]*ActivityEditorAiDraftSourceCapabilityCardView/,
+  'Activity AI draft panel should import explicit AI draft panel view contracts.'
+);
+assert.doesNotMatch(
+  activityAiDraftPanelSource,
+  /ReturnType<typeof buildActivityEditorAiDraftPanelView>|buildActivityEditorAiDraftPanelView/,
+  'Activity AI draft panel should not infer props from the AI draft panel builder.'
 );
 assert.match(
   activityAiDraftPanelSource,

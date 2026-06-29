@@ -3,7 +3,10 @@ import {
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
 import type { ActivityAiDraftFocus } from '@/activities/ai-draft-focus';
-import type { buildActivityEditorAiDraftPanelView } from '@/activities/editor';
+import type {
+  ActivityEditorAiDraftPanelView,
+  ActivityEditorAiDraftSourceCapabilityCardView,
+} from '@/activities/editor';
 import { ActivityDraftMetaSummary } from '@/components/activities/activity-draft-meta-summary';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,10 +16,6 @@ import {
 } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { IconLoader2, IconPaperclip, IconSparkles } from '@tabler/icons-react';
-
-type ActivityAiDraftPanelView = ReturnType<
-  typeof buildActivityEditorAiDraftPanelView
->;
 
 type ActivityAiDraftPanelProps = {
   draftFocus: ActivityAiDraftFocus;
@@ -29,7 +28,7 @@ type ActivityAiDraftPanelProps = {
   onDraftSourceTextChange: (sourceText: string) => void;
   onGenerateDraft: () => void;
   onSyncSourceMaterials: () => void;
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 };
 
 export function ActivityAiDraftPanel({
@@ -94,7 +93,7 @@ function ActivityAiDraftSourceControls({
   draftSourceText: string;
   onDraftSourceTextChange: (sourceText: string) => void;
   onSyncSourceMaterials: () => void;
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   return (
     <div className="min-w-0 flex-1 space-y-2">
@@ -169,7 +168,7 @@ function ActivityAiDraftSourceControls({
 function ActivityAiDraftSourceCapabilities({
   panelView,
 }: {
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   return (
     <div className="rounded-md border bg-background p-3">
@@ -189,7 +188,7 @@ function ActivityAiDraftSourceCapabilities({
 function ActivityAiDraftSourceCapabilityBadge({
   capability,
 }: {
-  capability: ActivityAiDraftPanelView['sourceCapabilityViews'][number];
+  capability: ActivityEditorAiDraftSourceCapabilityCardView;
 }) {
   return (
     <div className="rounded-md border bg-muted/20 p-2">
@@ -209,7 +208,7 @@ function ActivityAiDraftSourceCapabilityBadge({
 function ActivityAiDraftSourceReadiness({
   panelView,
 }: {
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   return (
     <div className="rounded-md border bg-background p-3">
@@ -238,7 +237,7 @@ function ActivityAiDraftItemCountSelect({
 }: {
   draftItemCount: number;
   onDraftItemCountChange: (itemCount: number) => void;
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   return (
     <div className="space-y-2">
@@ -270,7 +269,7 @@ function ActivityAiDraftFocusSelect({
 }: {
   draftFocus: ActivityAiDraftFocus;
   onDraftFocusChange: (draftFocus: ActivityAiDraftFocus) => void;
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   const selectedFocusOption =
     panelView.focusOptions.find((option) => option.value === draftFocus) ??
@@ -311,7 +310,7 @@ function ActivityAiDraftGenerateButton({
 }: {
   isGeneratingDraft: boolean;
   onGenerateDraft: () => void;
-  panelView: ActivityAiDraftPanelView;
+  panelView: ActivityEditorAiDraftPanelView;
 }) {
   return (
     <>
