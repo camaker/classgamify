@@ -79,6 +79,9 @@ type AssignmentResultsExportAttemptReview =
 type AssignmentResultsExportAttemptAnswer =
   AssignmentResultsExportAttemptReview['answers'][number];
 
+type AssignmentResultsExportItemAnalysis =
+  AssignmentResultsExportData['analysis']['perItem'][number];
+
 type AssignmentResultsExportStudentSummary =
   AssignmentResultsExportData['analysis']['students'][number];
 
@@ -86,6 +89,7 @@ type AssignmentResultsExportContext = {
   assignmentTitle: string;
   attemptsById: Map<string, ExportAttempt>;
   deliveryView: ReturnType<typeof buildAssignmentResultsExportDeliveryView>;
+  itemAnalysisById: Map<string, AssignmentResultsExportItemAnalysis>;
   resolvedSource: ReturnType<typeof resolveAssignmentSnapshotSource>;
   runtimeItemCount: number;
   shareSlug: string;
@@ -116,6 +120,9 @@ function buildAssignmentResultsExportContext(
   const shareSlug = normalizeAssignmentShareSlug(data.assignment.shareSlug);
   const statsView = buildAssignmentAttemptStatsView(data.stats);
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
+  const itemAnalysisById = new Map(
+    data.analysis.perItem.map((item) => [item.itemId, item])
+  );
   const studentsByKey = new Map(
     data.analysis.students.map((student) => [student.studentKey, student])
   );
@@ -124,6 +131,7 @@ function buildAssignmentResultsExportContext(
     assignmentTitle,
     attemptsById,
     deliveryView,
+    itemAnalysisById,
     resolvedSource,
     runtimeItemCount: data.analysis.perItem.length,
     shareSlug,
@@ -171,6 +179,7 @@ function buildAssignmentResultsExportAttemptRows({
     buildAssignmentResultsExportAnswerRow({
       answer,
       baseColumns,
+      exportContext,
       index,
     })
   );
@@ -254,10 +263,12 @@ function buildAssignmentResultsExportAttemptBaseColumns({
 function buildAssignmentResultsExportAnswerRow({
   answer,
   baseColumns,
+  exportContext,
   index,
 }: {
   answer: AssignmentResultsExportAttemptAnswer;
   baseColumns: unknown[];
+  exportContext: AssignmentResultsExportContext;
   index: number;
 }) {
   const answerView = buildAssignmentResultAttemptAnswerTextView(answer, {
@@ -269,6 +280,10 @@ function buildAssignmentResultsExportAnswerRow({
     ...baseColumns,
     formatAssignmentResultCopyOrdinal(index),
     answer.itemId,
+    ...buildAssignmentResultsExportItemPerformanceColumns({
+      answer,
+      exportContext,
+    }),
     formatAssignmentExportText(answer.prompt),
     answerView.exportStudentAnswerText,
     answerView.expectedAnswerText,
@@ -279,7 +294,25 @@ function buildAssignmentResultsExportAnswerRow({
 }
 
 function buildAssignmentResultsExportEmptyAnswerRow(baseColumns: unknown[]) {
-  return [...baseColumns, '', '', '', '', '', '', '', ''];
+  return [...baseColumns, '', '', '', '', '', '', '', '', '', '', '', ''];
+}
+
+function buildAssignmentResultsExportItemPerformanceColumns({
+  answer,
+  exportContext,
+}: {
+  answer: AssignmentResultsExportAttemptAnswer;
+  exportContext: AssignmentResultsExportContext;
+}) {
+  const itemAnalysis = exportContext.itemAnalysisById.get(answer.itemId);
+  if (!itemAnalysis) return ['', '', '', ''];
+
+  return [
+    formatAssignmentResultCsvNumber(itemAnalysis.correctRate, { min: 0 }),
+    formatAssignmentResultCsvNumber(itemAnalysis.correctCount, { min: 0 }),
+    formatAssignmentResultCsvNumber(itemAnalysis.submittedCount, { min: 0 }),
+    formatAssignmentResultCsvNumber(itemAnalysis.unansweredCount, { min: 0 }),
+  ];
 }
 
 export function buildAssignmentResultsCsvFilename(
@@ -369,6 +402,10 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_student_needs_review_count(),
     m.assignment_results_export_column_item_number(),
     m.assignment_results_export_column_item_id(),
+    m.assignment_results_export_column_item_correct_rate(),
+    m.assignment_results_export_column_item_correct_count(),
+    m.assignment_results_export_column_item_submitted_count(),
+    m.assignment_results_export_column_item_unanswered_count(),
     m.assignment_results_export_column_prompt(),
     m.assignment_results_export_column_student_answer(),
     m.assignment_results_export_column_expected_answer(),

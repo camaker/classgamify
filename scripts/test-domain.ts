@@ -1992,7 +1992,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportContext[\s\S]*const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\)[\s\S]*assignmentTitle,[\s\S]*shareSlug,/,
+  /function buildAssignmentResultsExportContext[\s\S]*const assignmentTitle = formatAssignmentDisplayTitle\(data\.assignment\.title\)[\s\S]*const shareSlug = normalizeAssignmentShareSlug\(data\.assignment\.shareSlug\)[\s\S]*const itemAnalysisById = new Map[\s\S]*assignmentTitle,[\s\S]*itemAnalysisById,[\s\S]*shareSlug,/,
   'Assignment CSV export context should normalize assignment title and share slug before writing display columns.'
 );
 assert.match(
@@ -2017,8 +2017,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportAnswerRow[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
-  'Assignment CSV export answer rows should consume the shared answer text view.'
+  /function buildAssignmentResultsExportAnswerRow[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*buildAssignmentResultsExportItemPerformanceColumns[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
+  'Assignment CSV export answer rows should consume the shared answer text view and item performance context.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportItemPerformanceColumns[\s\S]*itemAnalysisById\.get\(answer\.itemId\)[\s\S]*itemAnalysis\.correctRate[\s\S]*itemAnalysis\.correctCount[\s\S]*itemAnalysis\.submittedCount[\s\S]*itemAnalysis\.unansweredCount/,
+  'Assignment CSV export should include item-level result analysis columns for offline review.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -32424,6 +32429,10 @@ assert.deepEqual(
 );
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
 assert.match(csv, /"expires_at","delivery_policy","instructions"/);
+assert.match(
+  csv,
+  /"item_number","item_id","item_correct_rate","item_correct_count","item_submitted_count","item_unanswered_count","prompt"/
+);
 assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123","Open"/);
 assert.match(
   csv,
@@ -32445,11 +32454,11 @@ assert.match(csv, /"Paris","Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
 assert.match(
   csv,
-  /"1","q-1","Capital of France\?","paris france","Paris","Paris, France","correct"/
+  /"1","q-1","67","2","3","0","Capital of France\?","paris france","Paris","Paris, France","correct"/
 );
 assert.match(
   csv,
-  /"pair-1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/
+  /"pair-1","50","1","2","1","Match ""Hot"" with its pair\.","unanswered","Cold","","unanswered"/
 );
 assert.equal(csv.includes('browser-token-1'), false);
 const normalizedDisplayCsv = buildAssignmentResultsCsv({
@@ -32495,7 +32504,7 @@ assert.match(
 );
 assert.match(
   normalizedDisplayCsv,
-  /"q-1","Capital of France\?","Paris","Paris","Paris, France","correct"/
+  /"q-1","67","2","3","0","Capital of France\?","Paris","Paris","Paris, France","correct"/
 );
 assert.match(normalizedDisplayCsv, /"correct","France capital\."/);
 assert.doesNotMatch(
