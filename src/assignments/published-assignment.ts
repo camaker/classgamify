@@ -21,36 +21,36 @@ type PublishedAssignmentListItem = {
 type PublishedAssignmentPanelAssignment =
   PublishedAssignmentListItem['assignment'];
 
+export type PublishedAssignmentPanelDismissAction = {
+  label: string;
+};
+
+export type PublishedAssignmentPanelPrintAction = {
+  assignmentId: string;
+  label: string;
+  to: typeof Routes.PrintAssignmentWorksheet;
+};
+
+export type PublishedAssignmentPanelResultAction = {
+  assignmentId: string;
+  label: string;
+  to: typeof Routes.DashboardAssignmentResults;
+};
+
+export type PublishedAssignmentPanelShareAction = {
+  copyLabel: string;
+  label: string;
+  sharePath: string;
+  sharePathLabel: string;
+  shareSlug: string;
+  to: typeof Routes.Play;
+};
+
 export type PublishedAssignmentPanelActionView = {
-  dismissAction:
-    | {
-        label: string;
-      }
-    | undefined;
-  printAction:
-    | {
-        assignmentId: string;
-        label: string;
-        to: typeof Routes.PrintAssignmentWorksheet;
-      }
-    | undefined;
-  resultAction:
-    | {
-        assignmentId: string;
-        label: string;
-        to: typeof Routes.DashboardAssignmentResults;
-      }
-    | undefined;
-  shareAction:
-    | {
-        copyLabel: string;
-        label: string;
-        sharePath: string;
-        sharePathLabel: string;
-        shareSlug: string;
-        to: typeof Routes.Play;
-      }
-    | undefined;
+  dismissAction: PublishedAssignmentPanelDismissAction | undefined;
+  printAction: PublishedAssignmentPanelPrintAction | undefined;
+  resultAction: PublishedAssignmentPanelResultAction | undefined;
+  shareAction: PublishedAssignmentPanelShareAction | undefined;
 };
 
 export function findPublishedAssignmentInList<

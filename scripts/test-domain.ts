@@ -18994,7 +18994,7 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelActionView[\s\S]*export type PublishedAssignmentPanelContext/,
+  /export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelContext/,
   'Published assignment panel action and context contracts should be explicit domain exports.'
 );
 assert.match(
@@ -19014,13 +19014,18 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /type PublishedAssignmentPanelActionView,[\s\S]*type PublishedAssignmentPanelContext,[\s\S]*buildPublishedAssignmentPanelContext/,
+  /type PublishedAssignmentPanelActionView,[\s\S]*type PublishedAssignmentPanelContext,[\s\S]*type PublishedAssignmentPanelDismissAction,[\s\S]*type PublishedAssignmentPanelPrintAction,[\s\S]*type PublishedAssignmentPanelResultAction,[\s\S]*type PublishedAssignmentPanelShareAction,[\s\S]*buildPublishedAssignmentPanelContext/,
   'Published assignment panel component should import the explicit assignment-domain panel contracts.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
   /ReturnType<typeof buildPublishedAssignmentPanelContext>/,
   'Published assignment panel component should not infer its public contract from buildPublishedAssignmentPanelContext ReturnType.'
+);
+assert.doesNotMatch(
+  publishedAssignmentPanelComponentSource,
+  /NonNullable<\s*PublishedAssignmentPanelActionView\[/,
+  'Published assignment panel action components should consume explicit focused action contracts instead of deriving them from the aggregate action view.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,

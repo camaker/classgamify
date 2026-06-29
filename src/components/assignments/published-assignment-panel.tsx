@@ -2,6 +2,10 @@ import { assignmentListPublishedPanelCopy } from '@/assignments/list-view';
 import {
   type PublishedAssignmentPanelActionView,
   type PublishedAssignmentPanelContext,
+  type PublishedAssignmentPanelDismissAction,
+  type PublishedAssignmentPanelPrintAction,
+  type PublishedAssignmentPanelResultAction,
+  type PublishedAssignmentPanelShareAction,
   buildPublishedAssignmentPanelContext,
 } from '@/assignments/published-assignment';
 import { CopyAssignmentShareLinkButton } from '@/components/assignments/copy-assignment-share-link-button';
@@ -21,18 +25,6 @@ type PublishedAssignmentPanelProps = {
   onDismiss: () => void;
   shareSlug: string;
 };
-type PublishedAssignmentPanelResultAction = NonNullable<
-  PublishedAssignmentPanelActionView['resultAction']
->;
-type PublishedAssignmentPanelPrintAction = NonNullable<
-  PublishedAssignmentPanelActionView['printAction']
->;
-type PublishedAssignmentPanelShareAction = NonNullable<
-  PublishedAssignmentPanelActionView['shareAction']
->;
-type PublishedAssignmentPanelDismissAction = NonNullable<
-  PublishedAssignmentPanelActionView['dismissAction']
->;
 
 export function PublishedAssignmentPanel({
   context,
