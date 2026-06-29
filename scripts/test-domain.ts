@@ -3724,6 +3724,11 @@ assert.doesNotMatch(
   /function (?:ClassroomBriefCard|ResultStudentSearch|ResultEmptyState|StudentSummaryTable|ItemPerformanceSortControl|AttemptReviewFilterControl|ItemPerformanceTable|ItemAnalysisCard|AttemptReviewCard|ResultMetric)\(/,
   'Assignment result route should not keep local result metric, control, table, brief, or review card components.'
 );
+assert.match(
+  assignmentResultRouteSource,
+  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}/,
+  'Assignment result route should pass prepared copy artifact previews into the classroom brief card.'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
   /NativeSelect|NativeSelectOption|TableBody|TableHead|TableRow|TableCell|Progress|IconSearch|IconListDetails|IconClipboardText/,
@@ -3831,7 +3836,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief=\{brief\}/,
+  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}/,
   'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, and copy-preview views to focused panels.'
 );
 assert.match(
@@ -3891,12 +3896,17 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*brief\.copyPreview\.text/,
-  'Assignment classroom brief copy preview should render the prepared copied-text preview.'
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview/,
+  'Assignment classroom brief copy preview should render prepared copy artifact previews.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.text/,
+  'Assignment classroom brief copy artifact preview cards should render prepared label, description, and copied text.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
-  /assignment_classroom_brief_|assignment_result_metric_|brief\.text/,
+  /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|brief\.text/,
   'Assignment classroom brief component should not call locale messages or raw copied-text fields directly.'
 );
 assert.match(

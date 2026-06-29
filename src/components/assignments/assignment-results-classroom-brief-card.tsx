@@ -1,5 +1,8 @@
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import { assignmentResultSectionCopy } from '@/assignments/result-view';
+import {
+  assignmentResultSectionCopy,
+  type AssignmentResultCopyArtifactPreview,
+} from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -12,10 +15,12 @@ import { IconClipboardText } from '@tabler/icons-react';
 
 type AssignmentResultsClassroomBriefCardProps = {
   brief: AssignmentClassroomBrief;
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
 };
 
 export function AssignmentResultsClassroomBriefCard({
   brief,
+  copyArtifactPreviews,
 }: AssignmentResultsClassroomBriefCardProps) {
   return (
     <Card className="rounded-lg">
@@ -42,7 +47,10 @@ export function AssignmentResultsClassroomBriefCard({
             followUpStudentViews={brief.followUpStudentViews}
           />
         </div>
-        <AssignmentResultsClassroomBriefCopyPreview brief={brief} />
+        <AssignmentResultsClassroomBriefCopyPreview
+          brief={brief}
+          copyArtifactPreviews={copyArtifactPreviews}
+        />
       </CardContent>
     </Card>
   );
@@ -187,15 +195,40 @@ function AssignmentResultsFollowUpStudent({
 
 function AssignmentResultsClassroomBriefCopyPreview({
   brief,
+  copyArtifactPreviews,
 }: {
   brief: AssignmentClassroomBrief;
+  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
 }) {
   return (
     <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">
       <h3 className="font-medium text-sm">{brief.copyPreview.label}</h3>
-      <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-md bg-background p-3 text-muted-foreground text-xs">
-        {brief.copyPreview.text}
-      </pre>
+      <div className="grid gap-3 lg:grid-cols-2">
+        {copyArtifactPreviews.map((preview) => (
+          <AssignmentResultsCopyArtifactPreview
+            key={preview.action}
+            preview={preview}
+          />
+        ))}
+      </div>
     </section>
+  );
+}
+
+function AssignmentResultsCopyArtifactPreview({
+  preview,
+}: {
+  preview: AssignmentResultCopyArtifactPreview;
+}) {
+  return (
+    <article className="grid gap-2 rounded-md border bg-background p-3">
+      <div className="grid gap-1">
+        <h4 className="font-medium text-sm">{preview.label}</h4>
+        <p className="text-muted-foreground text-xs">{preview.description}</p>
+      </div>
+      <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-muted-foreground text-xs">
+        {preview.text}
+      </pre>
+    </article>
   );
 }

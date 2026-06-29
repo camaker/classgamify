@@ -156,6 +156,7 @@ function LoadedAssignmentResultsPage({
           pageView.classroomBrief ? (
             <AssignmentResultsClassroomBriefCard
               brief={pageView.classroomBrief}
+              copyArtifactPreviews={pageView.copyArtifactPreviews}
             />
           ) : null}
           <AssignmentResultsStudentSearch
