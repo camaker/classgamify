@@ -56,6 +56,8 @@ import {
   buildActivityTemplateScaffoldInput,
   buildActivityTemplateScaffoldReadinessSummary,
   getActivityTemplateScaffold,
+  type ActivityTemplateScaffoldCoverageMetricView,
+  type ActivityTemplateScaffoldReadyOptionView,
   type ActivityTemplateScaffoldReadinessSummary,
 } from '@/activities/scaffolds';
 import {
@@ -109,13 +111,13 @@ export type ActivityEditorTemplateSetupView = {
 };
 
 export type ActivityEditorTemplateScaffoldSummaryView =
-  ActivityEditorTemplateSetupView['scaffoldSummary'];
+  ActivityTemplateScaffoldReadinessSummary;
 
 export type ActivityEditorTemplateScaffoldCoverageMetricView =
-  ActivityEditorTemplateScaffoldSummaryView['coverageMetrics'][number];
+  ActivityTemplateScaffoldCoverageMetricView;
 
 export type ActivityEditorTemplateScaffoldReadyOptionView =
-  ActivityEditorTemplateScaffoldSummaryView['readyTemplateOptions'][number];
+  ActivityTemplateScaffoldReadyOptionView;
 
 type ActivityEditorSelectOption<TValue extends string> = {
   label: string;

@@ -36,7 +36,7 @@ export type TemplateRemixPlan = {
   suggestedOptions: TemplateRemixOption[];
 };
 
-type TemplateRemixSummary = {
+export type TemplateRemixSummary = {
   lockedTemplateDiagnostics: string[];
   lockedTemplateOptions: TemplateRemixLockedOption[];
   readyTemplateOptions: TemplateRemixTemplateOption[];

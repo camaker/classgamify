@@ -2743,6 +2743,10 @@ const activityLifecycleSource = readFileSync(
   'src/activities/lifecycle.ts',
   'utf8'
 );
+const activityScaffoldsSource = readFileSync(
+  'src/activities/scaffolds.ts',
+  'utf8'
+);
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
   activityLifecycleSource,
@@ -2821,8 +2825,23 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorTemplateSetupView[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView/,
+  /export type ActivityEditorTemplateSetupView[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /export type TemplateRemixSummary = \{[\s\S]*readyTemplateOptions: TemplateRemixTemplateOption\[\];/,
+  'Template remix domain should expose an explicit remix summary contract for scaffold readiness.'
+);
+assert.match(
+  activityScaffoldsSource,
+  /export type ActivityTemplateScaffoldCoverageMetricView = \{[\s\S]*id: ActivityTemplateScaffoldCoverageMetricId;[\s\S]*value: number;[\s\S]*export type ActivityTemplateScaffoldReadyOptionView =\s*TemplateRemixTemplateOption;[\s\S]*coverageMetrics: ActivityTemplateScaffoldCoverageMetricView\[\];[\s\S]*readyTemplateOptions: ActivityTemplateScaffoldReadyOptionView\[\];/,
+  'Activity scaffolds domain should expose explicit scaffold coverage and ready-option contracts.'
+);
+assert.doesNotMatch(
+  `${activityEditorSource}\n${activityScaffoldsSource}`,
+  /ActivityEditorTemplateSetupView\['scaffoldSummary'\]|ActivityEditorTemplateScaffoldSummaryView\['(?:coverageMetrics|readyTemplateOptions)'\]\[number\]|ReturnType<typeof buildTemplateRemixSummary>/,
+  'Activity editor and scaffold readiness contracts should not derive scaffold subviews from aggregate view indexes or builder return types.'
 );
 assert.match(
   activityEditorFormSource,

@@ -2,6 +2,7 @@ import type { ActivityTemplateType } from '@/activities/types';
 import {
   buildTemplateRemixSummary,
   getTemplateRemixPlan,
+  type TemplateRemixTemplateOption,
 } from '@/activities/template-remix';
 import { getRuntimeItems } from '@/activities/runtime';
 import type { CreateActivityInput } from '@/activities/validation';
@@ -32,17 +33,20 @@ type ActivityTemplateScaffoldCoverageMetricId =
   | 'teacherNotes'
   | 'vocabulary';
 
+export type ActivityTemplateScaffoldCoverageMetricView = {
+  id: ActivityTemplateScaffoldCoverageMetricId;
+  label: string;
+  value: number;
+};
+
+export type ActivityTemplateScaffoldReadyOptionView =
+  TemplateRemixTemplateOption;
+
 export type ActivityTemplateScaffoldReadinessSummary = {
-  coverageMetrics: Array<{
-    id: ActivityTemplateScaffoldCoverageMetricId;
-    label: string;
-    value: number;
-  }>;
+  coverageMetrics: ActivityTemplateScaffoldCoverageMetricView[];
   readyTemplateCount: number;
   readyTemplateLabel: string;
-  readyTemplateOptions: ReturnType<
-    typeof buildTemplateRemixSummary
-  >['readyTemplateOptions'];
+  readyTemplateOptions: ActivityTemplateScaffoldReadyOptionView[];
   runtimeItemCount: number;
   runtimeItemLabel: string;
   title: string;
