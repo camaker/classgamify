@@ -77,26 +77,22 @@ export type ActivityLibraryCardStat = {
   value: number;
 };
 
-export type ActivityLibraryCompatibilityView = {
-  lockedTemplateDiagnostics: string[];
-  readyTemplateOptions: Array<
-    ActivityLibraryTemplateOption & {
-      isCurrent: boolean;
-    }
-  >;
-  remixActionOptions: Array<
-    ActivityLibraryTemplateOption & {
-      actionLabel: string;
-    }
-  >;
-  remixHint?: string;
-};
-
 export type ActivityLibraryReadyTemplateOptionView =
-  ActivityLibraryCompatibilityView['readyTemplateOptions'][number];
+  ActivityLibraryTemplateOption & {
+    isCurrent: boolean;
+  };
 
 export type ActivityLibraryRemixActionOptionView =
-  ActivityLibraryCompatibilityView['remixActionOptions'][number];
+  ActivityLibraryTemplateOption & {
+    actionLabel: string;
+  };
+
+export type ActivityLibraryCompatibilityView = {
+  lockedTemplateDiagnostics: string[];
+  readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
+  remixActionOptions: ActivityLibraryRemixActionOptionView[];
+  remixHint?: string;
+};
 
 export const ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS = {
   lockedTemplateDiagnostics: 2,

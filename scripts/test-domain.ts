@@ -18141,8 +18141,13 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /ActivityLibraryCompatibilityView\['(?:readyTemplateOptions|remixActionOptions)'\]\[number\]/,
+  'Activity library compatibility subviews should not derive from aggregate compatibility view indexes.'
 );
 assert.match(
   activityLibraryCardComponentSource,
