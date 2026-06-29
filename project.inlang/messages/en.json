@@ -108,7 +108,7 @@
   "activity_draft_meta_checklist_adjust_level_description": "Tune vocabulary, reading load, and examples before saving this reusable activity.",
   "activity_draft_meta_checklist_check_explanations": "Check explanations and distractor choices.",
   "activity_draft_meta_checklist_check_explanations_description": "A final teacher pass catches misleading explanations or answer choices before publishing.",
-  "activity_draft_meta_checklist_legacy_description": "Review this generated item before saving the activity.",
+  "activity_draft_meta_checklist_review_description": "Review this generated item before saving the activity.",
   "activity_draft_meta_checklist_next_gap": "Next content gap: {diagnosis}",
   "activity_draft_meta_checklist_next_gap_description": "This is the fastest missing structure to add when you want more playable templates.",
   "activity_draft_meta_checklist_ready_to_remix": "Ready to remix after saving: {templates}.",

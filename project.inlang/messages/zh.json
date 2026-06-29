@@ -108,7 +108,7 @@
   "activity_draft_meta_checklist_adjust_level_description": "保存为可复用活动前，请调整词汇、阅读负担和例子。",
   "activity_draft_meta_checklist_check_explanations": "检查解析和干扰选项。",
   "activity_draft_meta_checklist_check_explanations_description": "老师最后过一遍，可以避免发布前留下误导性的解析或选项。",
-  "activity_draft_meta_checklist_legacy_description": "保存活动前，请检查这条生成内容。",
+  "activity_draft_meta_checklist_review_description": "保存活动前，请检查这条生成内容。",
   "activity_draft_meta_checklist_next_gap": "下一个内容缺口：{diagnosis}",
   "activity_draft_meta_checklist_next_gap_description": "如果想解锁更多可玩模板，这是最快可以补齐的结构。",
   "activity_draft_meta_checklist_ready_to_remix": "保存后可改编为：{templates}。",

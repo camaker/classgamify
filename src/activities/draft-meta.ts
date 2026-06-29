@@ -675,7 +675,7 @@ function buildActivityDraftReviewChecklistItemViews({
     items && items.length > 0
       ? items
       : checklist.map((label, index) =>
-          buildLegacyActivityDraftReviewChecklistItem(label, index)
+          buildFallbackActivityDraftReviewChecklistItem(label, index)
         );
 
   return sourceItems.map((item) => ({
@@ -718,12 +718,12 @@ function countActivityDraftReviewChecklistStatus(
   );
 }
 
-function buildLegacyActivityDraftReviewChecklistItem(
+function buildFallbackActivityDraftReviewChecklistItem(
   label: string,
   index: number
 ): ActivityDraftReviewChecklistItem {
   return {
-    description: m.activity_draft_meta_checklist_legacy_description(),
+    description: m.activity_draft_meta_checklist_review_description(),
     id: 'content-gap',
     label,
     priority: index === 0 ? 'high' : 'normal',

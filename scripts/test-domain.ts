@@ -3503,7 +3503,12 @@ assert.match(
 assert.match(
   activityDraftMetaSource,
   /reviewChecklist: reviewChecklistItems\.map\(\(item\) => item\.label\)[\s\S]*reviewChecklistItems/,
-  'AI draft meta should derive legacy checklist labels from structured review checklist items.'
+  'AI draft meta should derive compatibility checklist labels from structured review checklist items.'
+);
+assert.doesNotMatch(
+  activeLocaleMessageText,
+  /activity_draft_meta_checklist_legacy_description/,
+  'Active locale messages should not keep the retired AI draft checklist legacy description key.'
 );
 assert.match(
   activityDraftMetaSource,
