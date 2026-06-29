@@ -3,6 +3,7 @@ import {
   getActivityTemplates,
 } from '@/activities/catalog';
 import {
+  buildTemplateCreateSearch,
   buildTemplateEntryAction,
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
@@ -50,6 +51,7 @@ export type TemplatesPageViewModel = {
   };
   hero: {
     badgeLabel: string;
+    createAction: EntryAction;
     createFromTemplateLabel: string;
     description: string;
     openStudentPreviewLabel: string;
@@ -94,22 +96,26 @@ export type WorksheetsPageViewModel = {
 export function buildTemplatesPageViewModel({
   activityTemplates = getActivityTemplates(),
 }: TemplatesPageViewModelInput = {}): TemplatesPageViewModel {
+  const cards = activityTemplates.map((template) => ({
+    action: buildTemplateEntryAction(template),
+    bestFor: template.bestFor,
+    bestForLabel: m.templates_page_best_for_label(),
+    classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
+    classroomModeLabel: m.templates_page_classroom_mode_label(),
+    contentRequirements: formatTemplateRequirements(
+      template.contentRequirements
+    ),
+    description: template.description,
+    name: template.name,
+    template: template.type,
+  }));
+  const defaultCreateAction = cards[0]?.action ?? {
+    label: m.templates_page_create_from_template(),
+    search: buildTemplateCreateSearch('quiz'),
+  };
+
   return {
-    cards: activityTemplates.map((template) => ({
-      action: buildTemplateEntryAction(template),
-      bestFor: template.bestFor,
-      bestForLabel: m.templates_page_best_for_label(),
-      classroomMode: formatActivityTemplateClassroomMode(
-        template.classroomMode
-      ),
-      classroomModeLabel: m.templates_page_classroom_mode_label(),
-      contentRequirements: formatTemplateRequirements(
-        template.contentRequirements
-      ),
-      description: template.description,
-      name: template.name,
-      template: template.type,
-    })),
+    cards,
     footer: {
       createActivityLabel: m.templates_page_create_activity(),
       description: m.templates_page_bottom_description(),
@@ -117,6 +123,10 @@ export function buildTemplatesPageViewModel({
     },
     hero: {
       badgeLabel: m.templates_page_eyebrow(),
+      createAction: {
+        ...defaultCreateAction,
+        label: m.templates_page_create_from_template(),
+      },
       createFromTemplateLabel: m.templates_page_create_from_template(),
       description: m.templates_page_description(),
       openStudentPreviewLabel: m.templates_page_open_student_preview(),

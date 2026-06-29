@@ -3454,6 +3454,11 @@ assert.match(
   'Templates route should delegate template card rendering to the activity component.'
 );
 assert.match(
+  templatesRouteSource,
+  /pageView\.hero\.createAction\.search[\s\S]*pageView\.hero\.createAction\.label/,
+  'Templates route hero should use the prepared template create action.'
+);
+assert.match(
   templateDirectoryCardSource,
   /TemplatesPageViewModel\['cards'\]\[number\]/,
   'Template directory cards should consume the activity entry-page view-model card contract.'
@@ -19483,6 +19488,10 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
   },
   hero: {
     badgeLabel: 'Template library',
+    createAction: {
+      label: 'Create from template',
+      search: { template: 'quiz' },
+    },
     createFromTemplateLabel: 'Create from template',
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
@@ -19490,6 +19499,13 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     title: 'Pick a game format for the same lesson content.',
   },
 });
+assert.deepEqual(
+  buildTemplatesPageViewModel({ activityTemplates: [] }).hero.createAction,
+  {
+    label: 'Create from template',
+    search: { template: 'quiz' },
+  }
+);
 assert.deepEqual(buildRoadmapPageViewModel(), {
   columns: [
     {

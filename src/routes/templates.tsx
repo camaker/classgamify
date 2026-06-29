@@ -38,9 +38,13 @@ function TemplatesPage() {
             {pageView.hero.description}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link to={Routes.Create} className={cn(buttonVariants(), 'w-fit')}>
+            <Link
+              to={Routes.Create}
+              search={pageView.hero.createAction.search}
+              className={cn(buttonVariants(), 'w-fit')}
+            >
               <IconPlus className="size-4" />
-              {pageView.hero.createFromTemplateLabel}
+              {pageView.hero.createAction.label}
             </Link>
             <Link
               to={Routes.StudentPreview}
