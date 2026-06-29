@@ -3183,6 +3183,25 @@ assert.match(
   /ActivityDraftResult/,
   'AI draft summary component should accept the server draft result contract.'
 );
+const activityDraftMetaSource = readFileSync(
+  'src/activities/draft-meta.ts',
+  'utf8'
+);
+assert.match(
+  activityDraftMetaSource,
+  /export type ActivityDraftMetaSummaryCoverageStatView[\s\S]*export type ActivityDraftMetaSummaryReadinessOption[\s\S]*export type ActivityDraftMetaSummarySourceMaterialNoteView[\s\S]*export type ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*export type ActivityDraftMetaSummaryView[\s\S]*export type ActivityDraftReviewChecklistItemView[\s\S]*export type ActivityDraftReviewChecklistStatusView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
+  'AI draft meta domain should expose explicit summary, checklist, source-material, readiness, and quiz-choice view contracts.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /ActivityDraftMetaSummaryView[\s\S]*ActivityDraftMetaSummaryCoverageStatView[\s\S]*ActivityDraftMetaSummaryReadinessOption[\s\S]*ActivityDraftMetaSummarySourceMaterialCapabilityView[\s\S]*ActivityDraftReviewChecklistItemView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessView[\s\S]*ActivityDraftMetaSummaryQuestionChoiceReadinessItemView/,
+  'AI draft summary component should import explicit draft-meta subview contracts.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /ReturnType<typeof buildActivityDraftMetaSummaryView>|ActivityDraftMetaSummaryView\['(?:sourceMaterialCapabilityViews|reviewChecklistItems|questionChoiceReadiness|coverageStats|templateReadinessOptions)'\]|NonNullable</,
+  'AI draft summary component should not infer child prop contracts from builder return types, aggregate view indexes, or NonNullable.'
+);
 assert.match(
   activityDraftMetaSummarySource,
   /summaryView\.templateReadinessOptions[\s\S]*\.filter\(\(option\) => option\.isReady\)[\s\S]*\.map\(\(option\) => \([\s\S]*ActivityDraftTemplateReadinessOption[\s\S]*option=\{option\}/,
@@ -3288,10 +3307,6 @@ assert.doesNotMatch(
   /Quiz choice review|Needs distractors|Completed locally|Explicit choices|测验选项检查|需要干扰项|本地可补齐|显式选项充足/,
   'AI draft summary component should not hard-code visible quiz choice readiness labels.'
 );
-const activityDraftMetaSource = readFileSync(
-  'src/activities/draft-meta.ts',
-  'utf8'
-);
 const activityDraftSourceViewSource = readFileSync(
   'src/activities/draft-source.ts',
   'utf8'
@@ -3365,6 +3380,16 @@ assert.match(
   activityTemplateReadinessPanelSource,
   /ActivityTemplateReadinessPanelSummary/,
   'Template-readiness panel should consume the activity-domain readiness summary contract.'
+);
+assert.match(
+  activityTemplateReadinessPanelSource,
+  /ActivityTemplateReadinessPanelSummary[\s\S]*ActivityTemplateReadinessPanelOption[\s\S]*ActivityTemplateReadinessPanelLockedOption[\s\S]*ActivityTemplateQuizChoiceReadinessView[\s\S]*ActivityTemplateQuizChoiceReadinessItemView/,
+  'Template-readiness panel should import explicit summary, option, locked-option, and quiz-choice child contracts.'
+);
+assert.doesNotMatch(
+  activityTemplateReadinessPanelSource,
+  /ActivityTemplateReadinessPanelSummary\['readyOptions'\]\[number\]|NonNullable<\s*ActivityTemplateReadinessPanelSummary\['questionChoiceReadiness'\]|ActivityTemplateQuizChoiceReadiness\['itemViews'\]\[number\]/,
+  'Template-readiness panel should not infer child props from aggregate summary indexes or NonNullable.'
 );
 assert.match(
   activityTemplateReadinessPanelSource,

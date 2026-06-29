@@ -123,7 +123,12 @@ export type ActivityTemplateQuizChoiceReadinessItemView = {
 
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
 
-type ActivityDraftMetaSummaryReadinessOption = {
+export type ActivityDraftMetaSummaryCoverageStatView = {
+  label: string;
+  value: number;
+};
+
+export type ActivityDraftMetaSummaryReadinessOption = {
   diagnosis: string;
   isCurrent: boolean;
   isReady: boolean;
@@ -135,24 +140,21 @@ type ActivityDraftMetaSummaryReadinessOption = {
   template: ActivityTemplateType;
 };
 
-type ActivityDraftMetaSummarySourceMaterialNoteView =
+export type ActivityDraftMetaSummarySourceMaterialNoteView =
   ActivitySourceMaterialDraftNoteView & {
     displayText: string;
   };
 
-type ActivityDraftMetaSummarySourceMaterialCapabilityView =
+export type ActivityDraftMetaSummarySourceMaterialCapabilityView =
   ActivitySourceMaterialCapabilityView<{
     description: string;
     label: string;
   }>;
 
-type ActivityDraftMetaSummaryView = {
+export type ActivityDraftMetaSummaryView = {
   appliedDescription: string;
   appliedLabel: string;
-  coverageStats: Array<{
-    label: string;
-    value: number;
-  }>;
+  coverageStats: ActivityDraftMetaSummaryCoverageStatView[];
   description: string;
   draftFocusDescription: string;
   draftFocusLabel: string;
@@ -191,23 +193,24 @@ type ActivityDraftMetaSummaryView = {
   title: string;
 };
 
-type ActivityDraftReviewChecklistItemView = ActivityDraftReviewChecklistItem & {
-  statusLabel: string;
-};
+export type ActivityDraftReviewChecklistItemView =
+  ActivityDraftReviewChecklistItem & {
+    statusLabel: string;
+  };
 
-type ActivityDraftReviewChecklistStatusView = {
+export type ActivityDraftReviewChecklistStatusView = {
   id: ActivityDraftReviewChecklistItem['status'];
   label: string;
 };
 
-type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
+export type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
   description: string;
   itemViews: ActivityDraftMetaSummaryQuestionChoiceReadinessItemView[];
   summaryLabel: string;
   title: string;
 };
 
-type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView = {
+export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView = {
   detail: string;
   key: string;
   promptLabel: string;

@@ -1,4 +1,10 @@
-import type { ActivityTemplateReadinessPanelSummary } from '@/activities/draft-meta';
+import type {
+  ActivityTemplateQuizChoiceReadinessItemView,
+  ActivityTemplateQuizChoiceReadinessView,
+  ActivityTemplateReadinessPanelLockedOption,
+  ActivityTemplateReadinessPanelOption,
+  ActivityTemplateReadinessPanelSummary,
+} from '@/activities/draft-meta';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconLayoutGrid, IconSparkles } from '@tabler/icons-react';
@@ -6,16 +12,6 @@ import { IconLayoutGrid, IconSparkles } from '@tabler/icons-react';
 type ActivityTemplateReadinessPanelProps = {
   summary: ActivityTemplateReadinessPanelSummary;
 };
-
-type ActivityTemplateReadinessOption =
-  ActivityTemplateReadinessPanelSummary['readyOptions'][number];
-
-type ActivityTemplateQuizChoiceReadiness = NonNullable<
-  ActivityTemplateReadinessPanelSummary['questionChoiceReadiness']
->;
-
-type ActivityTemplateQuizChoiceReadinessItem =
-  ActivityTemplateQuizChoiceReadiness['itemViews'][number];
 
 export function ActivityTemplateReadinessPanel({
   summary,
@@ -72,7 +68,7 @@ export function ActivityTemplateReadinessPanel({
 function ActivityTemplateReadyOption({
   option,
 }: {
-  option: ActivityTemplateReadinessOption;
+  option: ActivityTemplateReadinessPanelOption;
 }) {
   return (
     <Badge variant="outline" className="rounded-md">
@@ -84,7 +80,7 @@ function ActivityTemplateReadyOption({
 function ActivityTemplateLockedOption({
   option,
 }: {
-  option: ActivityTemplateReadinessOption;
+  option: ActivityTemplateReadinessPanelLockedOption;
 }) {
   return (
     <p className="text-muted-foreground text-xs leading-5">
@@ -96,7 +92,7 @@ function ActivityTemplateLockedOption({
 function ActivityTemplateQuizChoiceReadinessPanel({
   readiness,
 }: {
-  readiness: ActivityTemplateQuizChoiceReadiness;
+  readiness: ActivityTemplateQuizChoiceReadinessView;
 }) {
   return (
     <div className="mt-5 border-t pt-4">
@@ -135,7 +131,7 @@ function ActivityTemplateQuizChoiceReadinessPanel({
 function ActivityTemplateQuizChoiceReadinessItem({
   itemView,
 }: {
-  itemView: ActivityTemplateQuizChoiceReadinessItem;
+  itemView: ActivityTemplateQuizChoiceReadinessItemView;
 }) {
   return (
     <div className="rounded-md border bg-background/70 p-3">

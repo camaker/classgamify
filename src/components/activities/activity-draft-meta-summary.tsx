@@ -1,6 +1,15 @@
 import type { ActivityDraftResult } from '@/activities/ai-draft';
 import type { ActivitySourceMaterialDraftNoteView } from '@/activities/draft-source';
-import { buildActivityDraftMetaSummaryView } from '@/activities/draft-meta';
+import {
+  buildActivityDraftMetaSummaryView,
+  type ActivityDraftMetaSummaryCoverageStatView,
+  type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView,
+  type ActivityDraftMetaSummaryQuestionChoiceReadinessView,
+  type ActivityDraftMetaSummaryReadinessOption,
+  type ActivityDraftMetaSummarySourceMaterialCapabilityView,
+  type ActivityDraftMetaSummaryView,
+  type ActivityDraftReviewChecklistItemView,
+} from '@/activities/draft-meta';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -8,10 +17,6 @@ type ActivityDraftMetaSummaryProps = {
   result: ActivityDraftResult;
   sourceMaterialNoteViews?: ActivitySourceMaterialDraftNoteView[];
 };
-
-type ActivityDraftMetaSummaryView = ReturnType<
-  typeof buildActivityDraftMetaSummaryView
->;
 
 export function ActivityDraftMetaSummary({
   result,
@@ -189,7 +194,7 @@ function ActivityDraftSourceMaterialCapabilities({
   description,
   title,
 }: {
-  capabilities: ActivityDraftMetaSummaryView['sourceMaterialCapabilityViews'];
+  capabilities: ActivityDraftMetaSummarySourceMaterialCapabilityView[];
   description: string;
   title: string;
 }) {
@@ -214,7 +219,7 @@ function ActivityDraftSourceMaterialCapabilities({
 function ActivityDraftSourceMaterialCapabilityBadge({
   capability,
 }: {
-  capability: ActivityDraftMetaSummaryView['sourceMaterialCapabilityViews'][number];
+  capability: ActivityDraftMetaSummarySourceMaterialCapabilityView;
 }) {
   return (
     <div className="rounded-md border bg-muted/20 p-2.5">
@@ -234,7 +239,7 @@ function ActivityDraftSourceMaterialCapabilityBadge({
 function ActivityDraftReviewChecklistItem({
   itemView,
 }: {
-  itemView: ActivityDraftMetaSummaryView['reviewChecklistItems'][number];
+  itemView: ActivityDraftReviewChecklistItemView;
 }) {
   return (
     <div
@@ -262,9 +267,7 @@ function ActivityDraftReviewChecklistItem({
 function ActivityDraftQuestionChoiceReadiness({
   readiness,
 }: {
-  readiness: NonNullable<
-    ActivityDraftMetaSummaryView['questionChoiceReadiness']
-  >;
+  readiness: ActivityDraftMetaSummaryQuestionChoiceReadinessView;
 }) {
   return (
     <div className="mt-4 rounded-lg border bg-background p-3">
@@ -292,9 +295,7 @@ function ActivityDraftQuestionChoiceReadiness({
 function ActivityDraftQuestionChoiceReadinessItem({
   itemView,
 }: {
-  itemView: NonNullable<
-    ActivityDraftMetaSummaryView['questionChoiceReadiness']
-  >['itemViews'][number];
+  itemView: ActivityDraftMetaSummaryQuestionChoiceReadinessItemView;
 }) {
   return (
     <div className="rounded-md border bg-muted/20 p-2.5">
@@ -325,7 +326,7 @@ function ActivityDraftQuestionChoiceReadinessItem({
 function ActivityDraftCoverageStat({
   stat,
 }: {
-  stat: ActivityDraftMetaSummaryView['coverageStats'][number];
+  stat: ActivityDraftMetaSummaryCoverageStatView;
 }) {
   return (
     <div className="rounded-lg border bg-background p-3">
@@ -338,7 +339,7 @@ function ActivityDraftCoverageStat({
 function ActivityDraftTemplateReadinessOption({
   option,
 }: {
-  option: ActivityDraftMetaSummaryView['templateReadinessOptions'][number];
+  option: ActivityDraftMetaSummaryReadinessOption;
 }) {
   return (
     <div
