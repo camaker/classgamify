@@ -3857,7 +3857,12 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export function buildAssignmentResultSectionViews[\s\S]*assignmentResultSectionCopy\.reteachPriorities\.title[\s\S]*assignmentResultSectionCopy\.studentAttempts\.title[\s\S]*assignmentResultSectionCopy\.studentSummary\.title/,
+  /export type AssignmentResultClassroomBriefSectionViews = Pick<[\s\S]*'classroomBrief' \| 'classReviewFocus' \| 'studentFollowUp'/,
+  'Assignment result view domain should expose a focused classroom-brief section-view contract.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultSectionViews[\s\S]*assignmentResultSectionCopy\.classroomBrief\.title[\s\S]*assignmentResultSectionCopy\.classReviewFocus\.title[\s\S]*assignmentResultSectionCopy\.studentFollowUp\.title[\s\S]*assignmentResultSectionCopy\.studentSummary\.title/,
   'Assignment result section views should prepare localized titles, empty states, and answer-review summaries in the assignment domain.'
 );
 assert.match(
@@ -3877,7 +3882,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
+  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews=\{sectionViews\}[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
   'Assignment result route should render section visibility, headings, empty states, and answer-review summaries from pageView.sectionViews.'
 );
 assert.match(
@@ -3961,8 +3966,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*\}/,
-  'Assignment result route should pass prepared copy artifact previews, copy scope, and the result action handler into the classroom brief card.'
+  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*copyScopeView=\{pageView\.copyScopeView\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*sectionViews=\{sectionViews\}/,
+  'Assignment result route should pass prepared copy artifact previews, copy scope, section views, and the result action handler into the classroom brief card.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -4076,8 +4081,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
+  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*sectionView=\{sectionViews\.classReviewFocus\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*sectionView=\{sectionViews\.studentFollowUp\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*onResultAction=\{onResultAction\}/,
   'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, copy-scope, and copy-preview views to focused panels.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /sectionViews\.classroomBrief\.title[\s\S]*sectionViews\.classroomBrief\.description/,
+  'Assignment classroom brief card should render its heading from prepared classroom-brief section views.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /assignmentResultSectionCopy/,
+  'Assignment classroom brief card should not read assignment result section copy directly.'
 );
 assert.match(
   assignmentClassroomBriefSource,
@@ -4088,6 +4103,11 @@ assert.match(
   assignmentResultsClassroomBriefCardSource,
   /import type \{ AssignmentClassroomBrief \} from '@\/assignments\/classroom-brief'/,
   'Assignment classroom brief card should import the explicit classroom brief contract.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /AssignmentResultClassroomBriefSectionViews/,
+  'Assignment classroom brief card should consume the focused classroom-brief section-view contract.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -4106,8 +4126,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassFocusPanel[\s\S]*focusItemViews\.map[\s\S]*AssignmentResultsClassFocusItem[\s\S]*itemView=\{itemView\}/,
-  'Assignment classroom focus panel should delegate prepared focus item views.'
+  /function AssignmentResultsClassFocusPanel[\s\S]*sectionView\.title[\s\S]*focusItemViews\.map[\s\S]*AssignmentResultsClassFocusItem[\s\S]*itemView=\{itemView\}[\s\S]*sectionView\.emptyMessage/,
+  'Assignment classroom focus panel should delegate prepared focus item views and render prepared section labels.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsFollowUpPanel[\s\S]*sectionView\.title[\s\S]*followUpStudentViews\.map[\s\S]*AssignmentResultsFollowUpStudent[\s\S]*sectionView\.emptyMessage/,
+  'Assignment classroom follow-up panel should delegate prepared student views and render prepared section labels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -30343,6 +30368,18 @@ assert.deepEqual(
           scoredResultsPageView.sectionViews.answerReview.submissionSummary,
         title: scoredResultsPageView.sectionViews.answerReview.title,
       },
+      classroomBrief: {
+        description:
+          scoredResultsPageView.sectionViews.classroomBrief.description,
+        isVisible: scoredResultsPageView.sectionViews.classroomBrief.isVisible,
+        title: scoredResultsPageView.sectionViews.classroomBrief.title,
+      },
+      classReviewFocus: {
+        emptyMessage:
+          scoredResultsPageView.sectionViews.classReviewFocus.emptyMessage,
+        isVisible: scoredResultsPageView.sectionViews.classReviewFocus.isVisible,
+        title: scoredResultsPageView.sectionViews.classReviewFocus.title,
+      },
       itemPerformance: {
         description:
           scoredResultsPageView.sectionViews.itemPerformance.description,
@@ -30365,6 +30402,12 @@ assert.deepEqual(
           scoredResultsPageView.sectionViews.studentAttempts.emptyState?.title,
         isVisible: scoredResultsPageView.sectionViews.studentAttempts.isVisible,
         title: scoredResultsPageView.sectionViews.studentAttempts.title,
+      },
+      studentFollowUp: {
+        emptyMessage:
+          scoredResultsPageView.sectionViews.studentFollowUp.emptyMessage,
+        isVisible: scoredResultsPageView.sectionViews.studentFollowUp.isVisible,
+        title: scoredResultsPageView.sectionViews.studentFollowUp.title,
       },
       studentSummary: {
         description:
@@ -30546,6 +30589,17 @@ assert.deepEqual(
         submissionSummary: 'Showing 1 of 1 submission.',
         title: 'Answer review',
       },
+      classroomBrief: {
+        description:
+          'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
+        isVisible: true,
+        title: 'Classroom brief',
+      },
+      classReviewFocus: {
+        emptyMessage: 'No submitted item data yet.',
+        isVisible: true,
+        title: 'Class review focus',
+      },
       itemPerformance: {
         description:
           'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
@@ -30566,6 +30620,11 @@ assert.deepEqual(
         emptyStateTitle: 'No matching attempts.',
         isVisible: true,
         title: 'Student attempts',
+      },
+      studentFollowUp: {
+        emptyMessage: 'No student-specific review needs yet.',
+        isVisible: true,
+        title: 'Student follow-up',
       },
       studentSummary: {
         description:
@@ -32528,6 +32587,18 @@ assert.deepEqual(
         directAssignmentResultSectionViews.answerReview.submissionSummary,
       title: directAssignmentResultSectionViews.answerReview.title,
     },
+    classroomBrief: {
+      description:
+        directAssignmentResultSectionViews.classroomBrief.description,
+      isVisible: directAssignmentResultSectionViews.classroomBrief.isVisible,
+      title: directAssignmentResultSectionViews.classroomBrief.title,
+    },
+    classReviewFocus: {
+      emptyMessage:
+        directAssignmentResultSectionViews.classReviewFocus.emptyMessage,
+      isVisible: directAssignmentResultSectionViews.classReviewFocus.isVisible,
+      title: directAssignmentResultSectionViews.classReviewFocus.title,
+    },
     itemPerformance: {
       description:
         directAssignmentResultSectionViews.itemPerformance.description,
@@ -32546,6 +32617,12 @@ assert.deepEqual(
       isVisible: directAssignmentResultSectionViews.studentAttempts.isVisible,
       title: directAssignmentResultSectionViews.studentAttempts.title,
     },
+    studentFollowUp: {
+      emptyMessage:
+        directAssignmentResultSectionViews.studentFollowUp.emptyMessage,
+      isVisible: directAssignmentResultSectionViews.studentFollowUp.isVisible,
+      title: directAssignmentResultSectionViews.studentFollowUp.title,
+    },
     studentSummary: {
       emptyState: directAssignmentResultSectionViews.studentSummary.emptyState,
       isVisible: directAssignmentResultSectionViews.studentSummary.isVisible,
@@ -32557,6 +32634,17 @@ assert.deepEqual(
       isVisible: true,
       submissionSummary: 'Showing 1 of 1 submission.',
       title: 'Answer review',
+    },
+    classroomBrief: {
+      description:
+        'A compact class-ready summary built from the frozen assignment snapshot and submitted attempts.',
+      isVisible: true,
+      title: 'Classroom brief',
+    },
+    classReviewFocus: {
+      emptyMessage: 'No submitted item data yet.',
+      isVisible: true,
+      title: 'Class review focus',
     },
     itemPerformance: {
       description:
@@ -32578,6 +32666,11 @@ assert.deepEqual(
       },
       isVisible: true,
       title: 'Student attempts',
+    },
+    studentFollowUp: {
+      emptyMessage: 'No student-specific review needs yet.',
+      isVisible: true,
+      title: 'Student follow-up',
     },
     studentSummary: {
       emptyState: {

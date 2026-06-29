@@ -157,6 +157,7 @@ function LoadedAssignmentResultsPage({
               onResultAction={(actionButton) =>
                 void onResultAction(actionButton)
               }
+              sectionViews={sectionViews}
             />
           ) : null}
           <AssignmentResultsStudentSearch

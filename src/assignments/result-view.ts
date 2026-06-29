@@ -190,11 +190,19 @@ type AssignmentResultSectionView = {
 
 type AssignmentResultSectionViews = {
   answerReview: AssignmentResultSectionView;
+  classroomBrief: AssignmentResultSectionView;
+  classReviewFocus: AssignmentResultSectionView;
   itemPerformance: AssignmentResultSectionView;
   reteachPriorities: AssignmentResultSectionView;
   studentAttempts: AssignmentResultSectionView;
+  studentFollowUp: AssignmentResultSectionView;
   studentSummary: AssignmentResultSectionView;
 };
+
+export type AssignmentResultClassroomBriefSectionViews = Pick<
+  AssignmentResultSectionViews,
+  'classroomBrief' | 'classReviewFocus' | 'studentFollowUp'
+>;
 
 type AssignmentResultContentState = {
   hasAttemptReviewCards: boolean;
@@ -929,6 +937,16 @@ export function buildAssignmentResultSectionViews({
       submissionSummary: resultView.attemptReviewSubmissionSummary,
       title: assignmentResultSectionCopy.answerReview.title,
     },
+    classroomBrief: {
+      description: assignmentResultSectionCopy.classroomBrief.description,
+      isVisible: sectionState.showClassroomBrief,
+      title: assignmentResultSectionCopy.classroomBrief.title,
+    },
+    classReviewFocus: {
+      emptyMessage: assignmentResultSectionCopy.classReviewFocus.emptyMessage,
+      isVisible: sectionState.showClassroomBrief,
+      title: assignmentResultSectionCopy.classReviewFocus.title,
+    },
     itemPerformance: {
       description: assignmentResultSectionCopy.itemPerformance.description,
       isVisible: sectionState.showItemPerformance,
@@ -945,6 +963,11 @@ export function buildAssignmentResultSectionViews({
       emptyState: resultView.emptyStates.attemptRows,
       isVisible: true,
       title: assignmentResultSectionCopy.studentAttempts.title,
+    },
+    studentFollowUp: {
+      emptyMessage: assignmentResultSectionCopy.studentFollowUp.emptyMessage,
+      isVisible: sectionState.showClassroomBrief,
+      title: assignmentResultSectionCopy.studentFollowUp.title,
     },
     studentSummary: {
       description: assignmentResultSectionCopy.studentSummary.description,

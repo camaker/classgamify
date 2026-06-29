@@ -1,9 +1,9 @@
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import {
-  assignmentResultSectionCopy,
-  type AssignmentResultActionButton,
-  type AssignmentResultCopyArtifactPreview,
-  type AssignmentResultCopyScopeView,
+import type {
+  AssignmentResultActionButton,
+  AssignmentResultClassroomBriefSectionViews,
+  AssignmentResultCopyArtifactPreview,
+  AssignmentResultCopyScopeView,
 } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ type AssignmentResultsClassroomBriefCardProps = {
   >;
   copyScopeView: AssignmentResultCopyScopeView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
+  sectionViews: AssignmentResultClassroomBriefSectionViews;
 };
 
 export function AssignmentResultsClassroomBriefCard({
@@ -32,6 +33,7 @@ export function AssignmentResultsClassroomBriefCard({
   copyArtifactPreviews,
   copyScopeView,
   onResultAction,
+  sectionViews,
 }: AssignmentResultsClassroomBriefCardProps) {
   return (
     <Card className="rounded-lg">
@@ -40,22 +42,26 @@ export function AssignmentResultsClassroomBriefCard({
           <IconClipboardText className="size-5 text-primary" />
           <CardTitle>
             <h2 className="text-lg font-semibold">
-              {assignmentResultSectionCopy.classroomBrief.title}
+              {sectionViews.classroomBrief.title}
             </h2>
           </CardTitle>
         </div>
-        <CardDescription>
-          <p>{assignmentResultSectionCopy.classroomBrief.description}</p>
-        </CardDescription>
+        {sectionViews.classroomBrief.description ? (
+          <CardDescription>
+            <p>{sectionViews.classroomBrief.description}</p>
+          </CardDescription>
+        ) : null}
       </CardHeader>
       <CardContent className="grid gap-4">
         <AssignmentResultsClassroomBriefStats brief={brief} />
         <div className="grid gap-4 lg:grid-cols-2">
           <AssignmentResultsClassFocusPanel
             focusItemViews={brief.focusItemViews}
+            sectionView={sectionViews.classReviewFocus}
           />
           <AssignmentResultsFollowUpPanel
             followUpStudentViews={brief.followUpStudentViews}
+            sectionView={sectionViews.studentFollowUp}
           />
         </div>
         <AssignmentResultsClassroomBriefCopyPreview
@@ -104,14 +110,14 @@ function AssignmentResultsClassroomBriefStat({
 
 function AssignmentResultsClassFocusPanel({
   focusItemViews,
+  sectionView,
 }: {
   focusItemViews: AssignmentClassroomBrief['focusItemViews'];
+  sectionView: AssignmentResultsClassroomBriefCardProps['sectionViews']['classReviewFocus'];
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
-      <h3 className="font-medium text-sm">
-        {assignmentResultSectionCopy.classReviewFocus.title}
-      </h3>
+      <h3 className="font-medium text-sm">{sectionView.title}</h3>
       <div className="mt-3 grid gap-3">
         {focusItemViews.length > 0 ? (
           focusItemViews.map((itemView) => (
@@ -122,7 +128,7 @@ function AssignmentResultsClassFocusPanel({
           ))
         ) : (
           <p className="text-muted-foreground text-sm">
-            {assignmentResultSectionCopy.classReviewFocus.emptyMessage}
+            {sectionView.emptyMessage}
           </p>
         )}
       </div>
@@ -132,14 +138,14 @@ function AssignmentResultsClassFocusPanel({
 
 function AssignmentResultsFollowUpPanel({
   followUpStudentViews,
+  sectionView,
 }: {
   followUpStudentViews: AssignmentClassroomBrief['followUpStudentViews'];
+  sectionView: AssignmentResultsClassroomBriefCardProps['sectionViews']['studentFollowUp'];
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4">
-      <h3 className="font-medium text-sm">
-        {assignmentResultSectionCopy.studentFollowUp.title}
-      </h3>
+      <h3 className="font-medium text-sm">{sectionView.title}</h3>
       <div className="mt-3 grid gap-3">
         {followUpStudentViews.length > 0 ? (
           followUpStudentViews.map((studentView) => (
@@ -150,7 +156,7 @@ function AssignmentResultsFollowUpPanel({
           ))
         ) : (
           <p className="text-muted-foreground text-sm">
-            {assignmentResultSectionCopy.studentFollowUp.emptyMessage}
+            {sectionView.emptyMessage}
           </p>
         )}
       </div>
