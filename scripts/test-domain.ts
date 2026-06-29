@@ -2181,7 +2181,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationSeconds,[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
   'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
 );
 assert.match(

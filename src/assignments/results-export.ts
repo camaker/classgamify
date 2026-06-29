@@ -255,7 +255,10 @@ function buildAssignmentResultsExportAttemptBaseColumns({
       }
     ),
     exportContext.runtimeItemCount,
-    attemptDurationSeconds ?? '',
+    formatAssignmentResultCsvNumber(attemptDurationSeconds, {
+      min: 0,
+      round: true,
+    }),
     formatAssignmentResultCsvNumber(studentSummary?.attempts, { min: 0 }),
     formatAssignmentResultCsvNumber(studentSummary?.latestAccuracy, {
       min: 0,
