@@ -3964,6 +3964,26 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /export type AssignmentResultViewModel<[\s\S]*attemptReviewSubmissionSummary: string;[\s\S]*filteredAttemptReviews: AssignmentAttemptReview\[\];[\s\S]*filteredAttemptRows: Array<AssignmentAttemptReviewRow<TAttempt>>;[\s\S]*reviewScope: AssignmentResultReviewScope<TAttempt>;[\s\S]*sortedPerformanceItems: AssignmentItemAnalysis\[\];/,
+  'Assignment result view domain should expose an explicit core result view-model contract.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /resultView:\s*AssignmentResultViewModel<TAttempt>;/,
+  'Assignment result page view-model should compose the explicit core result view-model contract.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultSectionViews<[\s\S]*resultView: AssignmentResultViewModel<TAttempt>;/,
+  'Assignment result section views should consume the explicit core result view-model contract.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /ReturnType<typeof buildAssignmentResultViewModel/,
+  'Assignment result page and section views should not infer the core result view-model from the builder return type.'
+);
+assert.match(
+  assignmentResultViewSource,
   /export type AssignmentResultStudentSearchControlView[\s\S]*export type AssignmentResultItemPerformanceSortControlView[\s\S]*export type AssignmentResultAttemptReviewFilterControlView[\s\S]*export type AssignmentResultControlViews/,
   'Assignment result view domain should expose explicit focused control-view contracts.'
 );

@@ -56,6 +56,7 @@ import {
   sortItemPerformance,
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
+  type AssignmentResultReviewScope,
   type AssignmentResultResolvedViewState,
   type AssignmentResultSearchState,
   type AttemptReviewFilter,
@@ -416,7 +417,7 @@ export type AssignmentResultsPageViewModel<
   itemPerformanceRowViews: AssignmentResultItemPerformanceRowView[];
   itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
   metricItems: AssignmentResultMetricItem[];
-  resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
+  resultView: AssignmentResultViewModel<TAttempt>;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
   studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
@@ -961,11 +962,13 @@ export function buildAssignmentResultSectionState({
   };
 }
 
-export function buildAssignmentResultSectionViews({
+export function buildAssignmentResultSectionViews<
+  TAttempt extends AssignmentAttemptRowInput,
+>({
   resultView,
   sectionState,
 }: {
-  resultView: ReturnType<typeof buildAssignmentResultViewModel>;
+  resultView: AssignmentResultViewModel<TAttempt>;
   sectionState: AssignmentResultSectionState;
 }): AssignmentResultSectionViews {
   return {
@@ -1373,6 +1376,23 @@ type AttemptReviewSubmissionSummaryInput = {
   totalAttempts: number;
 };
 
+export type AssignmentResultViewModel<
+  TAttempt extends AssignmentAttemptRowInput,
+> = {
+  attemptReviewSubmissionSummary: string;
+  emptyStates: {
+    attemptReview: AssignmentResultEmptyState | undefined;
+    attemptRows: AssignmentResultEmptyState | undefined;
+    studentSummary: AssignmentResultEmptyState | undefined;
+  };
+  filteredAttemptReviews: AssignmentAttemptReview[];
+  filteredAttemptRows: Array<AssignmentAttemptReviewRow<TAttempt>>;
+  filteredStudents: AssignmentStudentSummary[];
+  resultSearchSummary: string;
+  reviewScope: AssignmentResultReviewScope<TAttempt>;
+  sortedPerformanceItems: AssignmentItemAnalysis[];
+};
+
 export function buildAssignmentResultViewModel<
   TAttempt extends AssignmentAttemptRowInput,
 >({
@@ -1393,7 +1413,7 @@ export function buildAssignmentResultViewModel<
   search: string;
   studentSort: StudentSummarySort;
   students: AssignmentStudentSummary[];
-}) {
+}): AssignmentResultViewModel<TAttempt> {
   const reviewScope = buildAssignmentResultReviewScope({
     attemptReviewFilter,
     attempts,
