@@ -29,6 +29,10 @@ import {
   type StudentAttemptControlState,
   type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
+  type StudentAttemptSubmissionBlockedPlan,
+  type StudentAttemptSubmissionConfirmIncompletePlan,
+  type StudentAttemptSubmissionPlan,
+  type StudentAttemptSubmissionSubmitPlan,
   type StudentAttemptTimerBadge,
   type StudentAnswerMap,
   type StudentAnswerChange,
@@ -289,21 +293,13 @@ export type StudentRunnerAnonymousTokenPlan =
       type: 'resolve';
     };
 
-export type StudentRunnerSubmissionPlan = ReturnType<
-  typeof buildStudentAttemptSubmissionPlan
->;
+export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;
 
-type StudentRunnerSubmissionMessageReason = Extract<
-  StudentRunnerSubmissionPlan,
-  { type: 'blocked' | 'confirm-incomplete' }
->['reason'];
+type StudentRunnerSubmissionMessageReason =
+  | StudentAttemptSubmissionBlockedPlan['reason']
+  | StudentAttemptSubmissionConfirmIncompletePlan['reason'];
 
 type StudentRunnerSubmissionMessageTone = 'error' | 'warning';
-
-type StudentRunnerSubmissionSubmitPlan = Extract<
-  StudentRunnerSubmissionPlan,
-  { type: 'submit' }
->;
 
 export type StudentRunnerSubmissionExecutionPlan =
   | {
@@ -315,8 +311,8 @@ export type StudentRunnerSubmissionExecutionPlan =
     }
   | {
       anonymousToken?: string;
-      input: StudentRunnerSubmissionSubmitPlan['input'];
-      reason: StudentRunnerSubmissionSubmitPlan['reason'];
+      input: StudentAttemptSubmissionSubmitPlan['input'];
+      reason: StudentAttemptSubmissionSubmitPlan['reason'];
       submittedStudentName?: string;
       successMessage: string;
       type: 'submit';
@@ -1018,7 +1014,9 @@ export function buildStudentRunnerSubmissionExecutionPlan({
 }
 
 function getStudentRunnerSubmissionMessageTone(
-  type: Exclude<StudentRunnerSubmissionPlan['type'], 'submit'>
+  type:
+    | StudentAttemptSubmissionBlockedPlan['type']
+    | StudentAttemptSubmissionConfirmIncompletePlan['type']
 ): StudentRunnerSubmissionMessageTone {
   return type === 'confirm-incomplete' ? 'warning' : 'error';
 }

@@ -82,24 +82,30 @@ type StudentAttemptSubmitGate =
       type: 'submit';
     };
 
-type StudentAttemptSubmissionPlan =
-  | {
-      message: string;
-      reason: 'missing-student-name' | 'read-only';
-      type: 'blocked';
-    }
-  | {
-      message: string;
-      reason: 'unanswered-items';
-      type: 'confirm-incomplete';
-      unansweredItemCount: number;
-    }
-  | {
-      anonymousToken?: string;
-      input: StudentAttemptSubmissionInput;
-      reason: 'complete' | 'confirmed-incomplete';
-      type: 'submit';
-    };
+export type StudentAttemptSubmissionBlockedPlan = {
+  message: string;
+  reason: 'missing-student-name' | 'read-only';
+  type: 'blocked';
+};
+
+export type StudentAttemptSubmissionConfirmIncompletePlan = {
+  message: string;
+  reason: 'unanswered-items';
+  type: 'confirm-incomplete';
+  unansweredItemCount: number;
+};
+
+export type StudentAttemptSubmissionSubmitPlan = {
+  anonymousToken?: string;
+  input: StudentAttemptSubmissionInput;
+  reason: 'complete' | 'confirmed-incomplete';
+  type: 'submit';
+};
+
+export type StudentAttemptSubmissionPlan =
+  | StudentAttemptSubmissionBlockedPlan
+  | StudentAttemptSubmissionConfirmIncompletePlan
+  | StudentAttemptSubmissionSubmitPlan;
 
 export type AttemptCompletionCopy = {
   confirmIncompleteSubmit: string;

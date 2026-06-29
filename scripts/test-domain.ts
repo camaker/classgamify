@@ -7479,6 +7479,21 @@ assert.match(
   'Student runner state domain should turn submit gates into route-ready submission execution plans.'
 );
 assert.match(
+  studentRunnerSubmissionSource,
+  /export type StudentAttemptSubmissionBlockedPlan = \{[\s\S]*type: 'blocked';[\s\S]*export type StudentAttemptSubmissionConfirmIncompletePlan = \{[\s\S]*type: 'confirm-incomplete';[\s\S]*export type StudentAttemptSubmissionSubmitPlan = \{[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*type: 'submit';[\s\S]*export type StudentAttemptSubmissionPlan =/,
+  'Student submission domain should expose explicit blocked, confirm-incomplete, submit, and aggregate submission plan contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;[\s\S]*type StudentRunnerSubmissionMessageReason =[\s\S]*StudentAttemptSubmissionBlockedPlan\['reason'\][\s\S]*StudentAttemptSubmissionConfirmIncompletePlan\['reason'\][\s\S]*input: StudentAttemptSubmissionSubmitPlan\['input'\];[\s\S]*reason: StudentAttemptSubmissionSubmitPlan\['reason'\];/,
+  'Student runner state should compose explicit assignment-domain submission plan contracts.'
+);
+assert.doesNotMatch(
+  studentRunnerStateSource,
+  /ReturnType<typeof buildStudentAttemptSubmissionPlan>|Extract<\s*StudentRunnerSubmissionPlan|Exclude<StudentRunnerSubmissionPlan|StudentRunnerSubmissionPlan\['(?:type|reason|input)'\]|StudentRunnerSubmissionSubmitPlan/,
+  'Student runner state should not derive submission execution contracts from builder return types or aggregate runner-plan indexes.'
+);
+assert.match(
   studentRunnerStateSource,
   /function getStudentRunnerSubmissionMessageTone[\s\S]*confirm-incomplete[\s\S]*warning[\s\S]*error/,
   'Student runner state domain should classify incomplete-submit confirmation as a warning, not a submission error.'
