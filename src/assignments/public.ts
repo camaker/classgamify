@@ -1,4 +1,4 @@
-import type { RuntimeItem } from '@/activities/runtime';
+import type { RuntimeItem, RuntimeItemKind } from '@/activities/runtime';
 import type {
   ActivityContent,
   ActivityDifficulty,
@@ -35,7 +35,7 @@ import { resolveAssignmentSettings } from '@/assignments/validation';
 export type PublicRuntimeItem = {
   choices?: string[];
   id: string;
-  kind: RuntimeItem['kind'];
+  kind: RuntimeItemKind;
   prompt: string;
 };
 

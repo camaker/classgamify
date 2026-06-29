@@ -1,4 +1,8 @@
-import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
+import type {
+  ActivitySeed,
+  ActivityTemplateType,
+  AssignmentSeed,
+} from '@/activities/types';
 import type { RuntimeItem } from '@/activities/runtime';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
@@ -29,10 +33,12 @@ import {
   type StudentAttemptControlState,
   type StudentAttemptResultDisplay,
   type StudentAttemptResultNextStepsView,
-  type StudentAttemptSubmissionBlockedPlan,
-  type StudentAttemptSubmissionConfirmIncompletePlan,
+  type StudentAttemptSubmissionBlockedReason,
+  type StudentAttemptSubmissionConfirmIncompleteReason,
+  type StudentAttemptSubmissionInput,
+  type StudentAttemptSubmissionMessageType,
   type StudentAttemptSubmissionPlan,
-  type StudentAttemptSubmissionSubmitPlan,
+  type StudentAttemptSubmissionSubmitReason,
   type StudentAttemptTimerBadge,
   type StudentAnswerMap,
   type StudentAnswerChange,
@@ -156,7 +162,7 @@ export type StudentRunnerRuntimeListView = {
   language?: string;
   revealAnswer: boolean;
   reviewItems?: PublicAttemptReviewItem[];
-  templateType: ActivitySeed['templateType'];
+  templateType: ActivityTemplateType;
 };
 
 export type StudentRunnerSeoView = {
@@ -296,8 +302,8 @@ export type StudentRunnerAnonymousTokenPlan =
 export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;
 
 type StudentRunnerSubmissionMessageReason =
-  | StudentAttemptSubmissionBlockedPlan['reason']
-  | StudentAttemptSubmissionConfirmIncompletePlan['reason'];
+  | StudentAttemptSubmissionBlockedReason
+  | StudentAttemptSubmissionConfirmIncompleteReason;
 
 type StudentRunnerSubmissionMessageTone = 'error' | 'warning';
 
@@ -311,8 +317,8 @@ export type StudentRunnerSubmissionExecutionPlan =
     }
   | {
       anonymousToken?: string;
-      input: StudentAttemptSubmissionSubmitPlan['input'];
-      reason: StudentAttemptSubmissionSubmitPlan['reason'];
+      input: StudentAttemptSubmissionInput;
+      reason: StudentAttemptSubmissionSubmitReason;
       submittedStudentName?: string;
       successMessage: string;
       type: 'submit';
@@ -1014,9 +1020,7 @@ export function buildStudentRunnerSubmissionExecutionPlan({
 }
 
 function getStudentRunnerSubmissionMessageTone(
-  type:
-    | StudentAttemptSubmissionBlockedPlan['type']
-    | StudentAttemptSubmissionConfirmIncompletePlan['type']
+  type: StudentAttemptSubmissionMessageType
 ): StudentRunnerSubmissionMessageTone {
   return type === 'confirm-incomplete' ? 'warning' : 'error';
 }

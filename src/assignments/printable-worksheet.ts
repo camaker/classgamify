@@ -2,6 +2,7 @@ import {
   getActivityTemplateRunnerKind,
   type ActivityTemplateRunnerKind,
   type RuntimeItem,
+  type RuntimeItemKind,
 } from '@/activities/runtime';
 import type {
   ActivityTemplateType,
@@ -51,7 +52,7 @@ export type PrintableWorksheetItem = {
   choicePresentation: PrintableWorksheetChoicePresentation;
   choices: string[];
   id: string;
-  kind: RuntimeItem['kind'];
+  kind: RuntimeItemKind;
   prompt: string;
   responseMode: PrintableWorksheetResponseMode;
   sequenceNumber: number;
@@ -62,7 +63,7 @@ export type PrintableWorksheetAnswerKeyItem = {
   answer: string;
   explanation?: string;
   id: string;
-  kind: RuntimeItem['kind'];
+  kind: RuntimeItemKind;
   prompt: string;
   sequenceNumber: number;
 };

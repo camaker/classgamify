@@ -2,6 +2,7 @@ import {
   formatRuntimeItemKindLabel,
   formatRuntimeItemPrompt,
   type RuntimeItem,
+  type RuntimeItemKind,
 } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
@@ -32,7 +33,7 @@ export type AssignmentItemAnalysis = {
   explanation?: string;
   expectedAnswer: string;
   itemId: string;
-  kind: RuntimeItem['kind'];
+  kind: RuntimeItemKind;
   kindLabel: string;
   prompt: string;
   submittedCount: number;

@@ -3,6 +3,7 @@ import { getTemplateByType } from '@/activities/catalog';
 import {
   isActivityTemplateType,
   type ActivityTemplateDefinition,
+  type ActivityTemplateType,
 } from '@/activities/types';
 import {
   WORKSHEET_MODE_TEMPLATES,
@@ -12,18 +13,18 @@ import {
 import { Routes } from '@/lib/routes';
 
 type CreateActivityTemplateSearch = {
-  template: ActivityTemplateDefinition['type'];
+  template: ActivityTemplateType;
 };
 
 export function buildTemplateCreateSearch(
-  template: ActivityTemplateDefinition['type']
+  template: ActivityTemplateType
 ): CreateActivityTemplateSearch {
   return { template };
 }
 
 export function parseCreateActivityTemplateSearch(
   value: unknown
-): ActivityTemplateDefinition['type'] | undefined {
+): ActivityTemplateType | undefined {
   return isActivityTemplateType(value) ? value : undefined;
 }
 

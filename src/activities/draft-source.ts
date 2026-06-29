@@ -18,6 +18,10 @@ export type ActivitySourceMaterialDraftNoteView = {
   name: string;
 };
 
+export type ActivitySourceMaterialDraftKindCounts = Partial<
+  Record<ActivityMaterialReference['kind'], number>
+>;
+
 type ActivitySourceMaterialDraftNoteSource = Pick<
   ActivityMaterialReference,
   'kind' | 'originalName'
@@ -25,7 +29,7 @@ type ActivitySourceMaterialDraftNoteSource = Pick<
 
 export type ActivitySourceMaterialDraftSummary = {
   hasMaterials: boolean;
-  kindCounts: Partial<Record<ActivityMaterialReference['kind'], number>>;
+  kindCounts: ActivitySourceMaterialDraftKindCounts;
   noteViews: ActivitySourceMaterialDraftNoteView[];
   notesText?: string;
   totalCount: number;
@@ -183,8 +187,8 @@ export function isSafeActivitySourceMaterialDraftNoteView(
 
 function countActivitySourceMaterialDraftKinds(
   materials: ActivityMaterialReference[]
-): ActivitySourceMaterialDraftSummary['kindCounts'] {
-  const counts: ActivitySourceMaterialDraftSummary['kindCounts'] = {};
+): ActivitySourceMaterialDraftKindCounts {
+  const counts: ActivitySourceMaterialDraftKindCounts = {};
 
   for (const material of materials) {
     counts[material.kind] = (counts[material.kind] ?? 0) + 1;

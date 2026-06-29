@@ -37,6 +37,8 @@ export type RuntimeItem =
       prompt: string;
     };
 
+export type RuntimeItemKind = RuntimeItem['kind'];
+
 type RuntimeEvaluation = {
   answers: AttemptAnswer[];
   result: AttemptResult;

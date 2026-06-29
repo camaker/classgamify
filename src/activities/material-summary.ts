@@ -62,13 +62,15 @@ export type ActivitySourceMaterialExtractionAction = {
 export type ActivitySourceMaterialExtractionActionView =
   ActivitySourceMaterialExtractionAction & {
     label: string;
-    nextStep: {
-      description: string;
-      label: string;
-    };
+    nextStep: ActivitySourceMaterialExtractionNextStepView;
     sourceKindSummaryText: string;
     summaryText: string;
   };
+
+export type ActivitySourceMaterialExtractionNextStepView = {
+  description: string;
+  label: string;
+};
 
 export type ActivitySourceMaterialKindBadgeView = {
   count: number;
@@ -101,7 +103,7 @@ export type ActivitySourceMaterialSummaryView = {
   extractionTitle: string;
   hasMaterials: boolean;
   kindBadges: ActivitySourceMaterialKindBadgeView[];
-  primaryNextStep?: ActivitySourceMaterialExtractionActionView['nextStep'];
+  primaryNextStep?: ActivitySourceMaterialExtractionNextStepView;
   readiness: ActivitySourceMaterialReadiness;
   title: string;
 };

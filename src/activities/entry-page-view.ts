@@ -14,12 +14,15 @@ import {
   type WorksheetModeDefinition,
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
-import type { ActivityTemplateDefinition } from '@/activities/types';
+import type {
+  ActivityTemplateDefinition,
+  ActivityTemplateType,
+} from '@/activities/types';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 export type EntryActionSearch = {
-  template: ActivityTemplateDefinition['type'] | WorksheetModeTemplate;
+  template: ActivityTemplateType | WorksheetModeTemplate;
 };
 
 export type EntryAction = {
@@ -49,7 +52,7 @@ export type TemplatesPageCardView = {
   contentRequirements: string[];
   description: string;
   name: string;
-  template: ActivityTemplateDefinition['type'];
+  template: ActivityTemplateType;
 };
 
 export type TemplatesPageViewModelInput = {

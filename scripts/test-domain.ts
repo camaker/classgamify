@@ -2545,6 +2545,16 @@ assert.match(
   /ACTIVITY_PREVIEW_CONTENT_LIMITS[\s\S]*groups: 3[\s\S]*pairs: 4[\s\S]*questions: 3/,
   'Activity preview content slices should expose named display limits.'
 );
+assert.match(
+  activityPreviewViewSource,
+  /ActivityGroup[\s\S]*ActivityPair[\s\S]*ActivityQuestion[\s\S]*type ActivityPreviewGroupView = ActivityGroup[\s\S]*type ActivityPreviewPairView = ActivityPair[\s\S]*type ActivityPreviewQuestionView = ActivityQuestion/,
+  'Activity preview item views should compose explicit activity content item contracts.'
+);
+assert.doesNotMatch(
+  activityPreviewViewSource,
+  /ActivitySeed\['content'\]\['(?:groups|pairs|questions)'\]/,
+  'Activity preview item views should not infer child contracts from ActivitySeed content indexes.'
+);
 for (const key of ['questions', 'pairs', 'groups']) {
   assert.match(
     activityPreviewViewSource,
@@ -5563,8 +5573,13 @@ assert.equal(
 );
 assert.match(
   activityMaterialSummarySource,
-  /export type ActivitySourceMaterialExtractionActionView[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];/,
-  'Activity source-material summary domain should expose explicit extraction action and kind badge view contracts.'
+  /export type ActivitySourceMaterialExtractionActionView[\s\S]*nextStep: ActivitySourceMaterialExtractionNextStepView;[\s\S]*export type ActivitySourceMaterialExtractionNextStepView = \{[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];[\s\S]*primaryNextStep\?: ActivitySourceMaterialExtractionNextStepView;/,
+  'Activity source-material summary domain should expose explicit extraction action, next-step, and kind badge view contracts.'
+);
+assert.doesNotMatch(
+  activityMaterialSummarySource,
+  /ActivitySourceMaterialExtractionActionView\['nextStep'\]/,
+  'Activity source-material summary should not infer primary next-step props from extraction action indexes.'
 );
 assert.match(
   activityMaterialSummarySource,
@@ -7590,12 +7605,12 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptSubmissionBlockedPlan = \{[\s\S]*type: 'blocked';[\s\S]*export type StudentAttemptSubmissionConfirmIncompletePlan = \{[\s\S]*type: 'confirm-incomplete';[\s\S]*export type StudentAttemptSubmissionSubmitPlan = \{[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*type: 'submit';[\s\S]*export type StudentAttemptSubmissionPlan =/,
+  /export type StudentAttemptSubmissionBlockedPlan = \{[\s\S]*reason: StudentAttemptSubmissionBlockedReason;[\s\S]*export type StudentAttemptSubmissionConfirmIncompletePlan = \{[\s\S]*reason: StudentAttemptSubmissionConfirmIncompleteReason;[\s\S]*export type StudentAttemptSubmissionSubmitPlan = \{[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*reason: StudentAttemptSubmissionSubmitReason;[\s\S]*export type StudentAttemptSubmissionSubmitReason =[\s\S]*export type StudentAttemptSubmissionMessageType =/,
   'Student submission domain should expose explicit blocked, confirm-incomplete, submit, and aggregate submission plan contracts.'
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;[\s\S]*type StudentRunnerSubmissionMessageReason =[\s\S]*StudentAttemptSubmissionBlockedPlan\['reason'\][\s\S]*StudentAttemptSubmissionConfirmIncompletePlan\['reason'\][\s\S]*input: StudentAttemptSubmissionSubmitPlan\['input'\];[\s\S]*reason: StudentAttemptSubmissionSubmitPlan\['reason'\];/,
+  /StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*StudentAttemptSubmissionInput[\s\S]*StudentAttemptSubmissionMessageType[\s\S]*StudentAttemptSubmissionSubmitReason[\s\S]*export type StudentRunnerSubmissionPlan = StudentAttemptSubmissionPlan;[\s\S]*type StudentRunnerSubmissionMessageReason =[\s\S]*StudentAttemptSubmissionBlockedReason[\s\S]*StudentAttemptSubmissionConfirmIncompleteReason[\s\S]*input: StudentAttemptSubmissionInput;[\s\S]*reason: StudentAttemptSubmissionSubmitReason;/,
   'Student runner state should compose explicit assignment-domain submission plan contracts.'
 );
 assert.doesNotMatch(
@@ -19551,8 +19566,13 @@ const activityDraftSourceSource = readFileSync(
 );
 assert.match(
   activityDraftSourceSource,
-  /export type ActivitySourceMaterialDraftSummary[\s\S]*hasMaterials[\s\S]*kindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*totalCount/,
+  /export type ActivitySourceMaterialDraftKindCounts = Partial<[\s\S]*Record<ActivityMaterialReference\['kind'\], number>[\s\S]*export type ActivitySourceMaterialDraftSummary[\s\S]*kindCounts: ActivitySourceMaterialDraftKindCounts[\s\S]*noteViews[\s\S]*notesText[\s\S]*totalCount/,
   'AI draft source materials should expose a structured safe provenance summary.'
+);
+assert.doesNotMatch(
+  activityDraftSourceSource,
+  /ActivitySourceMaterialDraftSummary\['kindCounts'\]/,
+  'AI draft source material kind counting should not infer counts from the aggregate summary.'
 );
 assert.match(
   activityDraftSourceSource,
@@ -19883,6 +19903,31 @@ assert.match(
   printableWorksheetSource,
   /PRINTABLE_WORKSHEET_RESPONSE_POLICIES[\s\S]*satisfies Record<[\s\S]*ActivityTemplateRunnerKind,[\s\S]*PrintableWorksheetResponsePolicy/,
   'Printable worksheet response rules should be captured in one exhaustive runner-kind policy table.'
+);
+assert.match(
+  activityRuntimeSource,
+  /export type RuntimeItemKind = RuntimeItem\['kind'\]/,
+  'Activity runtime domain should export an explicit runtime item kind contract.'
+);
+assert.match(
+  printableWorksheetSource,
+  /RuntimeItemKind[\s\S]*kind: RuntimeItemKind[\s\S]*kind: RuntimeItemKind/,
+  'Printable worksheet items and answer keys should consume the explicit runtime item kind contract.'
+);
+assert.match(
+  publicAssignmentSource,
+  /RuntimeItemKind[\s\S]*export type PublicRuntimeItem = \{[\s\S]*kind: RuntimeItemKind;/,
+  'Public runtime payloads should consume the explicit runtime item kind contract.'
+);
+assert.match(
+  assignmentResultsSource,
+  /RuntimeItemKind[\s\S]*export type AssignmentItemAnalysis = \{[\s\S]*kind: RuntimeItemKind;/,
+  'Assignment result analysis should consume the explicit runtime item kind contract.'
+);
+assert.doesNotMatch(
+  `${printableWorksheetSource}\n${publicAssignmentSource}\n${assignmentResultsSource}`,
+  /RuntimeItem\['kind'\]/,
+  'Printable worksheets, public payloads, and result analysis should not infer item kind from aggregate runtime item indexes.'
 );
 assert.match(
   printableWorksheetSource,
@@ -21266,6 +21311,21 @@ assert.match(
   entryPageViewSource,
   /export type EntryActionSearch = \{[\s\S]*export type EntryAction = \{[\s\S]*export type LinkAction = \{[\s\S]*export type CreateLinkAction = Omit<EntryAction, 'search'>;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
   'Entry page view domain should export focused entry and link action contracts.'
+);
+assert.match(
+  templateEntrySource,
+  /ActivityTemplateType[\s\S]*template: ActivityTemplateType[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
+  'Template entry helpers should use the explicit activity template type contract for create search.'
+);
+assert.match(
+  entryPageViewSource,
+  /ActivityTemplateType[\s\S]*EntryActionSearch = \{[\s\S]*template: ActivityTemplateType \| WorksheetModeTemplate[\s\S]*template: ActivityTemplateType;/,
+  'Template and worksheet entry view-models should expose explicit activity template type fields.'
+);
+assert.doesNotMatch(
+  `${templateEntrySource}\n${entryPageViewSource}`,
+  /ActivityTemplateDefinition\['type'\]/,
+  'Template entry view-models should not infer template ids from aggregate template definitions.'
 );
 assert.match(
   entryPageViewSource,

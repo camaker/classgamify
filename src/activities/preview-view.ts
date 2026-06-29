@@ -2,7 +2,13 @@ import {
   formatActivityTemplateClassroomMode,
   getTemplateByType,
 } from '@/activities/catalog';
-import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
+import type {
+  ActivityGroup,
+  ActivityPair,
+  ActivityQuestion,
+  ActivitySeed,
+  AssignmentSeed,
+} from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 
@@ -22,18 +28,17 @@ export type ActivityPreviewPanel = {
   title: string;
 };
 
-type ActivityPreviewGroupView = ActivitySeed['content']['groups'][number] & {
+type ActivityPreviewGroupView = ActivityGroup & {
   summaryText: string;
 };
 
-type ActivityPreviewPairView = ActivitySeed['content']['pairs'][number] & {
+type ActivityPreviewPairView = ActivityPair & {
   summaryText: string;
 };
 
-type ActivityPreviewQuestionView =
-  ActivitySeed['content']['questions'][number] & {
-    summaryText: string;
-  };
+type ActivityPreviewQuestionView = ActivityQuestion & {
+  summaryText: string;
+};
 
 type ActivityPreviewViewModel = {
   content: {
@@ -105,7 +110,7 @@ export function buildActivityPreviewViewModel({
 }
 
 function buildActivityPreviewQuestionViews(
-  questions: ActivitySeed['content']['questions']
+  questions: ActivityQuestion[]
 ): ActivityPreviewQuestionView[] {
   return questions
     .slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.questions)
@@ -116,7 +121,7 @@ function buildActivityPreviewQuestionViews(
 }
 
 function buildActivityPreviewPairViews(
-  pairs: ActivitySeed['content']['pairs']
+  pairs: ActivityPair[]
 ): ActivityPreviewPairView[] {
   return pairs.slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.pairs).map((pair) => ({
     ...pair,
@@ -128,7 +133,7 @@ function buildActivityPreviewPairViews(
 }
 
 function buildActivityPreviewGroupViews(
-  groups: ActivitySeed['content']['groups']
+  groups: ActivityGroup[]
 ): ActivityPreviewGroupView[] {
   return groups
     .slice(0, ACTIVITY_PREVIEW_CONTENT_LIMITS.groups)

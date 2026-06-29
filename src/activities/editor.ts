@@ -273,8 +273,7 @@ export type ActivityEditorTemplateView = {
   templateOptions: ActivityTemplateDefinition[];
 };
 
-export type ActivityEditorSelectedTemplateView =
-  ActivityEditorTemplateView['template'];
+export type ActivityEditorSelectedTemplateView = ActivityTemplateDefinition;
 
 type ActivityCreatePageInputShapeView = {
   items: string[];

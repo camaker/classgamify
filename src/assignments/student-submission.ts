@@ -84,13 +84,13 @@ type StudentAttemptSubmitGate =
 
 export type StudentAttemptSubmissionBlockedPlan = {
   message: string;
-  reason: 'missing-student-name' | 'read-only';
+  reason: StudentAttemptSubmissionBlockedReason;
   type: 'blocked';
 };
 
 export type StudentAttemptSubmissionConfirmIncompletePlan = {
   message: string;
-  reason: 'unanswered-items';
+  reason: StudentAttemptSubmissionConfirmIncompleteReason;
   type: 'confirm-incomplete';
   unansweredItemCount: number;
 };
@@ -98,9 +98,24 @@ export type StudentAttemptSubmissionConfirmIncompletePlan = {
 export type StudentAttemptSubmissionSubmitPlan = {
   anonymousToken?: string;
   input: StudentAttemptSubmissionInput;
-  reason: 'complete' | 'confirmed-incomplete';
+  reason: StudentAttemptSubmissionSubmitReason;
   type: 'submit';
 };
+
+export type StudentAttemptSubmissionSubmitReason =
+  | 'complete'
+  | 'confirmed-incomplete';
+
+export type StudentAttemptSubmissionBlockedReason =
+  | 'missing-student-name'
+  | 'read-only';
+
+export type StudentAttemptSubmissionConfirmIncompleteReason =
+  'unanswered-items';
+
+export type StudentAttemptSubmissionMessageType =
+  | 'blocked'
+  | 'confirm-incomplete';
 
 export type StudentAttemptSubmissionPlan =
   | StudentAttemptSubmissionBlockedPlan
