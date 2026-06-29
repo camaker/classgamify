@@ -86,8 +86,8 @@ import type {
   AssignmentStatus,
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
-import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
+import { m } from '@/locale/paraglide/messages';
 
 export {
   ATTEMPT_REVIEW_FILTER_VALUES,
@@ -278,7 +278,9 @@ export type AssignmentResultHeaderShareAction = {
 };
 
 export type AssignmentResultHeaderPrintAction = {
+  assignmentId: string;
   label: string;
+  to: typeof Routes.PrintAssignmentWorksheet;
 };
 
 export type AssignmentResultHeaderView = {
@@ -784,7 +786,9 @@ export function buildAssignmentResultHeaderView({
     assignmentSharePath: shareAction.sharePath,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
     printAction: {
+      assignmentId: assignment.id,
       label: assignmentResultPageCopy.printWorksheetLabel,
+      to: Routes.PrintAssignmentWorksheet,
     } satisfies AssignmentResultHeaderPrintAction,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: assignment.expiresAt,

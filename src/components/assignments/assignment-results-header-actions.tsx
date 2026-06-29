@@ -17,7 +17,6 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type AssignmentResultsHeaderActionsProps = {
-  assignmentId: string;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   printAction: AssignmentResultHeaderPrintAction;
   resultActions: AssignmentResultActionButton[];
@@ -25,7 +24,6 @@ type AssignmentResultsHeaderActionsProps = {
 };
 
 export function AssignmentResultsHeaderActions({
-  assignmentId,
   onResultAction,
   printAction,
   resultActions,
@@ -36,10 +34,7 @@ export function AssignmentResultsHeaderActions({
       <AssignmentResultsHeaderSharePreviewLink shareAction={shareAction} />
       <AssignmentResultsHeaderSharePath shareAction={shareAction} />
       <AssignmentResultsHeaderCopyShareAction shareAction={shareAction} />
-      <AssignmentResultsHeaderPrintActionLink
-        assignmentId={assignmentId}
-        printAction={printAction}
-      />
+      <AssignmentResultsHeaderPrintActionLink printAction={printAction} />
       <AssignmentResultsHeaderShareDisabledReason shareAction={shareAction} />
       <AssignmentResultsHeaderResultActions
         onResultAction={onResultAction}
@@ -108,16 +103,14 @@ function AssignmentResultsHeaderCopyShareAction({
 }
 
 function AssignmentResultsHeaderPrintActionLink({
-  assignmentId,
   printAction,
 }: {
-  assignmentId: string;
   printAction: AssignmentResultsHeaderPrintAction;
 }) {
   return (
     <Link
-      to="/print/assignments/$assignmentId"
-      params={{ assignmentId }}
+      to={printAction.to}
+      params={{ assignmentId: printAction.assignmentId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-auto'

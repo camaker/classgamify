@@ -114,7 +114,6 @@ function AssignmentResultsPage() {
         </div>
       ) : (
         <LoadedAssignmentResultsPage
-          assignmentId={assignmentId}
           pageView={pageView}
           onControlChange={updateResultControl}
           onResultAction={handleResultAction}
@@ -125,12 +124,10 @@ function AssignmentResultsPage() {
 }
 
 function LoadedAssignmentResultsPage({
-  assignmentId,
   onControlChange,
   onResultAction,
   pageView,
 }: {
-  assignmentId: string;
   onControlChange: (update: AssignmentResultControlUpdate) => void;
   onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
   pageView: ReturnType<typeof buildAssignmentResultsRouteState>['pageView'];
@@ -147,7 +144,6 @@ function LoadedAssignmentResultsPage({
       </section>
 
       <AssignmentResultsHeaderCard
-        assignmentId={assignmentId}
         headerView={headerView}
         onResultAction={(actionButton) => void onResultAction(actionButton)}
         resultActions={pageView.actionButtons}

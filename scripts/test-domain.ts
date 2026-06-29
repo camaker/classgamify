@@ -3830,8 +3830,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /CopyAssignmentShareLinkButton[\s\S]*to="\/print\/assignments\/\$assignmentId"[\s\S]*resultActionIconByAction/,
-  'Assignment result header actions component should own share actions, printable worksheet links, and result action icons.'
+  /CopyAssignmentShareLinkButton[\s\S]*to=\{printAction\.to\}[\s\S]*resultActionIconByAction/,
+  'Assignment result header actions component should own share actions, prepared printable worksheet links, and result action icons.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -3855,8 +3855,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderPrintActionLink[\s\S]*assignmentId[\s\S]*printAction\.label/,
-  'Assignment result print action should render prepared printable action labels.'
+  /function AssignmentResultsHeaderPrintActionLink[\s\S]*to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId[\s\S]*printAction\.label/,
+  'Assignment result print action should render prepared printable action targets and labels.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -19291,8 +19291,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /to="\/print\/assignments\/\$assignmentId"/,
-  'Assignment results header actions should expose the printable worksheet teacher action.'
+  /to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId/,
+  'Assignment results header actions should expose the prepared printable worksheet teacher action.'
 );
 const rootRouteSource = readFileSync('src/routes/__root.tsx', 'utf8');
 assert.match(
@@ -30791,6 +30791,7 @@ assert.deepEqual(
     },
     assignment: {
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
+      id: 'assignment-week-1',
       settingsJson: {
         collectStudentName: false,
         instructions: ' Review the line match quietly. ',
@@ -30816,7 +30817,9 @@ assert.deepEqual(
     assignmentSharePath: '/play/share%20123',
     assignmentTitle: 'Week 1 results',
     printAction: {
+      assignmentId: 'assignment-week-1',
       label: 'Print worksheet',
+      to: Routes.PrintAssignmentWorksheet,
     },
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
@@ -30853,6 +30856,7 @@ assert.deepEqual(
     },
     assignment: {
       expiresAt: new Date('2026-05-01T00:00:00.000Z'),
+      id: 'assignment-expired',
       settingsJson: null,
       shareSlug: 'closed-share',
       status: 'published',
@@ -30867,7 +30871,9 @@ assert.deepEqual(
     assignmentSharePath: '/play/closed-share',
     assignmentTitle: 'Expired results',
     printAction: {
+      assignmentId: 'assignment-expired',
       label: 'Print worksheet',
+      to: Routes.PrintAssignmentWorksheet,
     },
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-05-01T00:00:00.000Z'),

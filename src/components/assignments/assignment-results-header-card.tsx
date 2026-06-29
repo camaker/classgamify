@@ -14,14 +14,12 @@ import {
 } from '@/components/ui/card';
 
 type AssignmentResultsHeaderCardProps = {
-  assignmentId: string;
   headerView: AssignmentResultHeaderView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   resultActions: AssignmentResultActionButton[];
 };
 
 export function AssignmentResultsHeaderCard({
-  assignmentId,
   headerView,
   onResultAction,
   resultActions,
@@ -47,7 +45,6 @@ export function AssignmentResultsHeaderCard({
       <CardContent className="grid gap-4">
         <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
         <AssignmentResultsHeaderActions
-          assignmentId={assignmentId}
           onResultAction={onResultAction}
           printAction={headerView.printAction}
           resultActions={resultActions}
