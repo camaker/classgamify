@@ -483,10 +483,13 @@ import {
   buildPrintableAssignmentDeliveryView,
   buildPrintableAssignmentSearch,
   buildPrintableAssignmentWorksheet,
+  countPrintableWorksheetChoiceBankItems,
+  getPrintableWorksheetResponseModes,
   getPrintableWorksheetResponsePolicy,
   getPrintableWorksheetSequenceNumber,
   normalizePrintableWorksheetSequenceNumber,
   parsePrintableAssignmentSearch,
+  summarizePrintableAssignmentWorksheet,
 } from '@/assignments/printable-worksheet';
 import {
   PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
@@ -13933,7 +13936,20 @@ assert.equal(
 assert.equal(printableSnapshotWorksheet.includeAnswerKey, false);
 assert.equal(printableSnapshotWorksheet.answerKey, undefined);
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(printableSnapshotWorksheet),
+  summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet),
+  {
+    answerKeyItemCount: 0,
+    choiceBankItemCount: 1,
+    itemCount: 1,
+    responseModeCount: 1,
+    responseModes: ['choice'],
+    showAnswerKey: false,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(
+    summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+  ),
   [
     { id: 'items', label: '1 item' },
     { id: 'response-modes', label: 'Multiple choice practice' },
@@ -14031,6 +14047,25 @@ assert.equal(normalizePrintableWorksheetSequenceNumber(1), 1);
 assert.equal(normalizePrintableWorksheetSequenceNumber(3.9), 3);
 assert.equal(normalizePrintableWorksheetSequenceNumber(-3), 1);
 assert.equal(normalizePrintableWorksheetSequenceNumber(Number.NaN), 1);
+assert.deepEqual(
+  getPrintableWorksheetResponseModes([
+    { responseMode: 'short-answer' },
+    { responseMode: 'choice' },
+    { responseMode: 'short-answer' },
+    { responseMode: 'line-match' },
+  ]),
+  ['short-answer', 'choice', 'line-match']
+);
+assert.equal(
+  countPrintableWorksheetChoiceBankItems([
+    { choicePresentation: 'none' },
+    { choicePresentation: 'choice-list' },
+    { choicePresentation: 'answer-bank' },
+    { choicePresentation: 'none' },
+    { choicePresentation: 'group-bank' },
+  ]),
+  3
+);
 const printableChoiceSourceItems = getRuntimeItems(
   'quiz',
   publicPayloadSnapshotContent
@@ -14108,7 +14143,20 @@ assert.deepEqual(messyPrintableWorksheet.answerKey?.[0], {
   sequenceNumber: 1,
 });
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(messyPrintableWorksheet),
+  summarizePrintableAssignmentWorksheet(messyPrintableWorksheet),
+  {
+    answerKeyItemCount: 1,
+    choiceBankItemCount: 1,
+    itemCount: 1,
+    responseModeCount: 1,
+    responseModes: ['choice'],
+    showAnswerKey: true,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(
+    summarizePrintableAssignmentWorksheet(messyPrintableWorksheet)
+  ),
   [
     { id: 'items', label: '1 item' },
     { id: 'response-modes', label: 'Multiple choice practice' },
@@ -14150,10 +14198,60 @@ assert.deepEqual(printableShortAnswerWorksheet.items[0], {
   sequenceNumber: 1,
 });
 assert.deepEqual(
-  buildPrintableWorksheetHeaderOverviewItems(printableShortAnswerWorksheet),
+  summarizePrintableAssignmentWorksheet(printableShortAnswerWorksheet),
+  {
+    answerKeyItemCount: 0,
+    choiceBankItemCount: 0,
+    itemCount: 1,
+    responseModeCount: 1,
+    responseModes: ['short-answer'],
+    showAnswerKey: false,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(
+    summarizePrintableAssignmentWorksheet(printableShortAnswerWorksheet)
+  ),
   [
     { id: 'items', label: '1 item' },
     { id: 'response-modes', label: 'Written answer practice' },
+    { id: 'answer-key', label: 'Answer key hidden' },
+  ]
+);
+const emptyPrintableWorksheet = buildPrintableAssignmentWorksheet({
+  activity: {
+    description: 'Empty printable activity',
+    templateType: 'quiz',
+    title: 'Empty printable activity',
+  },
+  assignment: {
+    expiresAt: null,
+    settingsJson: null,
+    shareSlug: 'empty-printable',
+    title: 'Empty printable assignment',
+  },
+  includeAnswerKey: true,
+  runtimeItems: [],
+  snapshot: null,
+});
+assert.deepEqual(
+  summarizePrintableAssignmentWorksheet(emptyPrintableWorksheet),
+  {
+    answerKeyItemCount: 0,
+    choiceBankItemCount: 0,
+    itemCount: 0,
+    responseModeCount: 0,
+    responseModes: [],
+    showAnswerKey: false,
+  }
+);
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(
+    summarizePrintableAssignmentWorksheet(emptyPrintableWorksheet)
+  ),
+  [
+    { id: 'items', label: '0 items' },
+    { id: 'response-modes', label: '0 response modes' },
     { id: 'answer-key', label: 'Answer key hidden' },
   ]
 );
@@ -14385,20 +14483,22 @@ try {
     },
   ]);
   assert.deepEqual(
-    buildPrintableWorksheetHeaderOverviewItems({
-      ...printableShortAnswerWorksheet,
-      items: [
-        {
-          ...printableShortAnswerWorksheet.items[0]!,
-          responseMode: 'short-answer',
-        },
-        {
-          ...printableShortAnswerWorksheet.items[0]!,
-          id: 'zh-printable-group',
-          responseMode: 'group-choice',
-        },
-      ],
-    }),
+    buildPrintableWorksheetHeaderOverviewItems(
+      summarizePrintableAssignmentWorksheet({
+        ...printableShortAnswerWorksheet,
+        items: [
+          {
+            ...printableShortAnswerWorksheet.items[0]!,
+            responseMode: 'short-answer',
+          },
+          {
+            ...printableShortAnswerWorksheet.items[0]!,
+            id: 'zh-printable-group',
+            responseMode: 'group-choice',
+          },
+        ],
+      })
+    ),
     [
       { id: 'items', label: '2 道题' },
       { id: 'response-modes', label: '2 种作答方式' },
@@ -14448,6 +14548,30 @@ assert.deepEqual(printableSnapshotWorksheetWithAnswers.answerKey, [
     sequenceNumber: 1,
   },
 ]);
+assert.deepEqual(
+  summarizePrintableAssignmentWorksheet(printableSnapshotWorksheetWithAnswers),
+  {
+    answerKeyItemCount: 1,
+    choiceBankItemCount: 1,
+    itemCount: 1,
+    responseModeCount: 1,
+    responseModes: ['choice'],
+    showAnswerKey: true,
+  }
+);
+assert.deepEqual(
+  summarizePrintableAssignmentWorksheet(printableSnapshotWorksheetWithAnswers, {
+    includeAnswerKey: false,
+  }),
+  {
+    answerKeyItemCount: 1,
+    choiceBankItemCount: 1,
+    itemCount: 1,
+    responseModeCount: 1,
+    responseModes: ['choice'],
+    showAnswerKey: false,
+  }
+);
 assert.deepEqual(
   buildPrintableWorksheetAnswerKeyItemView(
     printableSnapshotWorksheetWithAnswers.answerKey[0]!
@@ -20596,6 +20720,26 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
+  /export type PrintableAssignmentWorksheetSummary = \{[\s\S]*answerKeyItemCount: number;[\s\S]*choiceBankItemCount: number;[\s\S]*itemCount: number;[\s\S]*responseModeCount: number;[\s\S]*responseModes: PrintableWorksheetResponseMode\[\];[\s\S]*showAnswerKey: boolean;/,
+  'Printable worksheets should expose a structured worksheet summary contract for view models and future extraction pipelines.'
+);
+assert.match(
+  printableWorksheetSource,
+  /export function summarizePrintableAssignmentWorksheet[\s\S]*answerKeyItemCount[\s\S]*getPrintableWorksheetResponseModes[\s\S]*countPrintableWorksheetChoiceBankItems[\s\S]*showAnswerKey/,
+  'Printable worksheet summaries should centralize answer-key, choice-bank, item, and response-mode counting.'
+);
+assert.match(
+  printableWorksheetSource,
+  /export function getPrintableWorksheetResponseModes[\s\S]*new Set<PrintableWorksheetResponseMode>[\s\S]*responseModes\.push\(item\.responseMode\)/,
+  'Printable worksheet response-mode summaries should preserve first-seen response-mode order.'
+);
+assert.match(
+  printableWorksheetSource,
+  /export function countPrintableWorksheetChoiceBankItems[\s\S]*choicePresentation !== 'none'/,
+  'Printable worksheet choice-bank summaries should count only printable items that actually show a choice bank.'
+);
+assert.match(
+  printableWorksheetSource,
   /export function buildPrintableAssignmentDeliveryView\(\{[\s\S]*formatAssignmentDeliveryPolicyText\(\{[\s\S]*buildAssignmentDeliverySummary\(\{[\s\S]*formatAssignmentDeliveryInstructions\(settings\.instructions\)/,
   'Printable worksheet delivery view should share assignment delivery-summary formatting.'
 );
@@ -20636,7 +20780,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   printableWorksheetSource,
-  /function getPrintableWorksheetResponseMode|function getPrintableWorksheetAnswerSpaceLines|function getPrintableWorksheetChoicePresentation/,
+  /function getPrintableWorksheetResponseMode\(|function getPrintableWorksheetAnswerSpaceLines\(|function getPrintableWorksheetChoicePresentation\(/,
   'Printable worksheet item generation should not keep separate response-mode, answer-line, or choice-presentation switches.'
 );
 assert.doesNotMatch(
@@ -20816,18 +20960,23 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /overviewItems: buildPrintableWorksheetHeaderOverviewItems\([\s\S]*worksheet,[\s\S]*options[\s\S]*const includeAnswerKey =[\s\S]*options\?\.includeAnswerKey \?\? worksheet\.includeAnswerKey/,
-  'Printable worksheet header views should expose prepared worksheet overview metadata with explicit answer-key visibility.'
+  /const summary = summarizePrintableAssignmentWorksheet\(worksheet, options\)[\s\S]*overviewItems: buildPrintableWorksheetHeaderOverviewItems\(summary\)/,
+  'Printable worksheet header views should derive prepared overview metadata from the shared printable worksheet summary.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /const answerKeyView = buildPrintableWorksheetAnswerKeyView[\s\S]*buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*includeAnswerKey: answerKeyView\.show/,
-  'Printable worksheet page view-model should drive header answer-key status from the visible answer-key view.'
+  /const answerKeyView = buildPrintableWorksheetAnswerKeyView[\s\S]*worksheet,[\s\S]*buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*includeAnswerKey: answerKeyView\.show/,
+  'Printable worksheet page view-model should drive header answer-key status from the summary-backed visible answer-key view.'
 );
 assert.match(
   printableWorksheetViewSource,
-  /export function buildPrintableWorksheetHeaderOverviewItems[\s\S]*assignment_printable_overview_answer_key_[\s\S]*function formatPrintableWorksheetOverviewItemCount[\s\S]*assignment_printable_overview_items_[\s\S]*function formatPrintableWorksheetOverviewResponseModes[\s\S]*assignment_printable_overview_response_mode_single/,
+  /export function buildPrintableWorksheetHeaderOverviewItems\([\s\S]*summary: PrintableAssignmentWorksheetSummary[\s\S]*summary\.itemCount[\s\S]*summary\.showAnswerKey[\s\S]*function formatPrintableWorksheetOverviewItemCount[\s\S]*function formatPrintableWorksheetOverviewResponseModes/,
   'Printable worksheet header overview should localize item count, response-mode, and answer-key status.'
+);
+assert.doesNotMatch(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetHeaderOverviewItems\([\s\S]*worksheet\.items\.length|new Set\(items\.map\(\(item\) => item\.responseMode\)\)/,
+  'Printable worksheet view should not rebuild worksheet summary counts locally.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -20866,8 +21015,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /const answerKeyView = buildPrintableWorksheetAnswerKeyView/,
-  'Printable worksheet page view-model should own answer-key section state.'
+  /const answerKeyView = buildPrintableWorksheetAnswerKeyView\(\{[\s\S]*answerKey,[\s\S]*itemViews: answerKeyItemViews \?\? \[\],[\s\S]*worksheet,/,
+  'Printable worksheet page view-model should pass worksheet summary context into answer-key section state.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /buildPrintableWorksheetAnswerKeyView[\s\S]*summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKey,[\s\S]*\)\.showAnswerKey/,
+  'Printable worksheet answer-key visibility should be derived from the shared printable worksheet summary.'
 );
 assert.match(
   printableWorksheetViewSource,

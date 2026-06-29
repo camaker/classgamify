@@ -4,12 +4,16 @@ import {
 } from '@/activities/runtime';
 import type {
   PrintableAssignmentWorksheet,
+  PrintableAssignmentWorksheetSummary,
   PrintableWorksheetAnswerKeyItem,
   PrintableWorksheetChoicePresentation,
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
-import { normalizePrintableWorksheetSequenceNumber } from '@/assignments/printable-worksheet';
+import {
+  normalizePrintableWorksheetSequenceNumber,
+  summarizePrintableAssignmentWorksheet,
+} from '@/assignments/printable-worksheet';
 import {
   formatAcceptedAnswerAlternatives,
   formatAssignmentResultValue,
@@ -230,6 +234,8 @@ export function buildPrintableWorksheetHeaderView(
     includeAnswerKey?: boolean;
   }
 ): PrintableWorksheetHeaderView {
+  const summary = summarizePrintableAssignmentWorksheet(worksheet, options);
+
   return {
     activityDescription: worksheet.activityDescription,
     activityTitle: worksheet.activityTitle,
@@ -238,10 +244,7 @@ export function buildPrintableWorksheetHeaderView(
     deliveryPolicy: worksheet.deliveryPolicyText,
     instructions:
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
-    overviewItems: buildPrintableWorksheetHeaderOverviewItems(
-      worksheet,
-      options
-    ),
+    overviewItems: buildPrintableWorksheetHeaderOverviewItems(summary),
     printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
     sharePathLabel: printableWorksheetPageCopy.sharePathLabel,
@@ -250,26 +253,20 @@ export function buildPrintableWorksheetHeaderView(
 }
 
 export function buildPrintableWorksheetHeaderOverviewItems(
-  worksheet: PrintableAssignmentWorksheet,
-  options?: {
-    includeAnswerKey?: boolean;
-  }
+  summary: PrintableAssignmentWorksheetSummary
 ): PrintableWorksheetHeaderOverviewItem[] {
-  const includeAnswerKey =
-    options?.includeAnswerKey ?? worksheet.includeAnswerKey;
-
   return [
     {
       id: 'items',
-      label: formatPrintableWorksheetOverviewItemCount(worksheet.items.length),
+      label: formatPrintableWorksheetOverviewItemCount(summary.itemCount),
     },
     {
       id: 'response-modes',
-      label: formatPrintableWorksheetOverviewResponseModes(worksheet.items),
+      label: formatPrintableWorksheetOverviewResponseModes(summary),
     },
     {
       id: 'answer-key',
-      label: includeAnswerKey
+      label: summary.showAnswerKey
         ? m.assignment_printable_overview_answer_key_included()
         : m.assignment_printable_overview_answer_key_hidden(),
     },
@@ -291,6 +288,7 @@ export function buildPrintableWorksheetPageViewModel({
   const answerKeyView = buildPrintableWorksheetAnswerKeyView({
     answerKey,
     itemViews: answerKeyItemViews ?? [],
+    worksheet,
   });
   const headerView = buildPrintableWorksheetHeaderView(worksheet, {
     includeAnswerKey: answerKeyView.show,
@@ -452,14 +450,23 @@ export function buildPrintableWorksheetEmptyState(): PrintableWorksheetEmptyStat
 export function buildPrintableWorksheetAnswerKeyView({
   answerKey,
   itemViews,
+  worksheet,
 }: {
   answerKey: boolean;
   itemViews: PrintableWorksheetAnswerKeyItemView[];
+  worksheet?: PrintableAssignmentWorksheet;
 }): PrintableWorksheetAnswerKeyView {
+  const show =
+    worksheet !== undefined
+      ? summarizePrintableAssignmentWorksheet(worksheet, {
+          includeAnswerKey: answerKey,
+        }).showAnswerKey
+      : answerKey && itemViews.length > 0;
+
   return {
     description: printableWorksheetPageCopy.answerKeyDescription,
     itemViews,
-    show: answerKey && itemViews.length > 0,
+    show,
     title: printableWorksheetPageCopy.answerKeyTitle,
   };
 }
@@ -676,22 +683,21 @@ function formatPrintableWorksheetOverviewItemCount(count: number) {
 }
 
 function formatPrintableWorksheetOverviewResponseModes(
-  items: PrintableWorksheetItem[]
+  summary: Pick<
+    PrintableAssignmentWorksheetSummary,
+    'responseModeCount' | 'responseModes'
+  >
 ) {
-  const responseModes = Array.from(
-    new Set(items.map((item) => item.responseMode))
-  );
-
-  if (responseModes.length === 1) {
+  if (summary.responseModeCount === 1 && summary.responseModes[0]) {
     return m.assignment_printable_overview_response_mode_single({
       mode: formatPrintableWorksheetOverviewResponseModeLabel(
-        responseModes[0]!
+        summary.responseModes[0]
       ),
     });
   }
 
   return m.assignment_printable_overview_response_modes_many({
-    count: normalizeRuntimeDisplayCount(responseModes.length, { min: 0 }),
+    count: summary.responseModeCount,
   });
 }
 

@@ -89,6 +89,15 @@ export type PrintableAssignmentWorksheet = {
   templateType: ActivityTemplateType;
 };
 
+export type PrintableAssignmentWorksheetSummary = {
+  answerKeyItemCount: number;
+  choiceBankItemCount: number;
+  itemCount: number;
+  responseModeCount: number;
+  responseModes: PrintableWorksheetResponseMode[];
+  showAnswerKey: boolean;
+};
+
 export type PrintableAssignmentSearch = {
   answerKey?: boolean;
 };
@@ -231,6 +240,61 @@ export function buildPrintableAssignmentWorksheet({
     shareSlug,
     templateType,
   };
+}
+
+export function summarizePrintableAssignmentWorksheet(
+  worksheet: PrintableAssignmentWorksheet,
+  options?: {
+    includeAnswerKey?: boolean;
+  }
+): PrintableAssignmentWorksheetSummary {
+  const answerKeyItemCount = normalizeRuntimeDisplayCount(
+    worksheet.answerKey?.length ?? 0,
+    { min: 0 }
+  );
+  const responseModes = getPrintableWorksheetResponseModes(worksheet.items);
+
+  return {
+    answerKeyItemCount,
+    choiceBankItemCount: countPrintableWorksheetChoiceBankItems(
+      worksheet.items
+    ),
+    itemCount: normalizeRuntimeDisplayCount(worksheet.items.length, {
+      min: 0,
+    }),
+    responseModeCount: normalizeRuntimeDisplayCount(responseModes.length, {
+      min: 0,
+    }),
+    responseModes,
+    showAnswerKey:
+      (options?.includeAnswerKey ?? worksheet.includeAnswerKey) &&
+      answerKeyItemCount > 0,
+  };
+}
+
+export function getPrintableWorksheetResponseModes(
+  items: ReadonlyArray<Pick<PrintableWorksheetItem, 'responseMode'>>
+) {
+  const responseModes: PrintableWorksheetResponseMode[] = [];
+  const seen = new Set<PrintableWorksheetResponseMode>();
+
+  for (const item of items) {
+    if (seen.has(item.responseMode)) continue;
+
+    seen.add(item.responseMode);
+    responseModes.push(item.responseMode);
+  }
+
+  return responseModes;
+}
+
+export function countPrintableWorksheetChoiceBankItems(
+  items: ReadonlyArray<Pick<PrintableWorksheetItem, 'choicePresentation'>>
+) {
+  return normalizeRuntimeDisplayCount(
+    items.filter((item) => item.choicePresentation !== 'none').length,
+    { min: 0 }
+  );
 }
 
 export function buildPrintableAssignmentDeliveryView({
