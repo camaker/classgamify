@@ -33801,6 +33801,16 @@ assert.match(
   /formatAssignmentResultStudentLabel\(/,
   'Assignment student follow-up summaries should format student labels through the shared result-display helper.'
 );
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpRecommendation[\s\S]*assignment_student_follow_up_recommendation_review[\s\S]*assignment_student_follow_up_recommendation_extend/,
+  'Assignment student follow-up recommendations should use localized next-step messages.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /assignment_student_follow_up_line\(\{[\s\S]*recommendation: followUpRecommendation/,
+  'Assignment student follow-up summaries should add localized next-step recommendations to copied follow-up lines.'
+);
 assert.doesNotMatch(
   assignmentStudentFollowUpSummarySource,
   /lines\.join\('\\n'\)|index \+ 1|student: student\.studentLabel/,
@@ -33815,11 +33825,13 @@ assert.deepEqual(
     attemptsLabel: '1 attempt',
     averageAccuracyLabel: '70%',
     bestAccuracyLabel: '70%',
+    followUpRecommendation:
+      'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '70%',
     reviewItemCountLabel: '3 items to review',
     studentKey: 'name:alpha-review',
     studentLabel: 'Alpha review',
-    text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review',
+    text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
   }
 );
 assert.equal(
@@ -33827,7 +33839,17 @@ assert.equal(
     index: -5,
     student: alphaReviewStudent,
   }).text,
-  '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review'
+  '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. Next: review missed or unanswered items, then assign one short retry'
+);
+assert.equal(
+  buildAssignmentStudentFollowUpSummaryStudentView({
+    index: 0,
+    student: {
+      ...alphaReviewStudent,
+      needsReviewCount: 0,
+    },
+  }).followUpRecommendation,
+  'keep reinforcing and offer a harder variant'
 );
 assert.deepEqual(
   buildAssignmentStudentFollowUpSummaryStudentView({
@@ -33880,15 +33902,15 @@ assert.match(
 );
 assert.match(
   studentFollowUpSummary.text,
-  /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
+  /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   studentFollowUpSummary.text,
-  /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review/
+  /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   studentFollowUpSummary.text,
-  /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review/
+  /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review\. Next: keep reinforcing and offer a harder variant/
 );
 const resultCopyArtifacts = buildAssignmentResultCopyArtifacts({
   ...csvExportData,

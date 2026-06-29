@@ -22,6 +22,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   attemptsLabel: string;
   averageAccuracyLabel: string;
   bestAccuracyLabel: string;
+  followUpRecommendation: string;
   latestAccuracyLabel: string;
   reviewItemCountLabel: string;
   studentKey: string;
@@ -85,11 +86,15 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
     student.needsReviewCount
   );
+  const followUpRecommendation = formatStudentFollowUpRecommendation(
+    student.needsReviewCount
+  );
 
   return {
     attemptsLabel,
     averageAccuracyLabel,
     bestAccuracyLabel,
+    followUpRecommendation,
     latestAccuracyLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
@@ -100,10 +105,17 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
       best: bestAccuracyLabel,
       index: formatAssignmentResultCopyOrdinal(index),
       latest: latestAccuracyLabel,
+      recommendation: followUpRecommendation,
       reviewCount: reviewItemCountLabel,
       student: studentLabel,
     }),
   };
+}
+
+function formatStudentFollowUpRecommendation(needsReviewCount: number) {
+  return needsReviewCount > 0
+    ? m.assignment_student_follow_up_recommendation_review()
+    : m.assignment_student_follow_up_recommendation_extend();
 }
 
 function formatStudents(
