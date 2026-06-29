@@ -7147,6 +7147,16 @@ assert.match(
   /getPublicAnswerFeedbackStatus[\s\S]*!reviewItem\.submitted[\s\S]*'unanswered'[\s\S]*getPublicAnswerFeedbackStatusLabel[\s\S]*student_runner_feedback_status_unanswered/,
   'Student answer feedback should render an explicit unanswered review state after partial submissions.'
 );
+assert.match(
+  studentRunnerViewSource,
+  /export type PublicAnswerFeedbackStatus =[\s\S]*'correct'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*status: PublicAnswerFeedbackStatus[\s\S]*getPublicAnswerFeedbackStatus\([\s\S]*\): PublicAnswerFeedbackStatus/,
+  'Student answer feedback should expose an explicit public feedback status contract.'
+);
+assert.doesNotMatch(
+  studentRunnerViewSource,
+  /PublicAnswerFeedbackView\['status'\]/,
+  'Student answer feedback status helpers should not infer status from the aggregate feedback view.'
+);
 assert.doesNotMatch(
   studentRunnerViewSource,
   /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,

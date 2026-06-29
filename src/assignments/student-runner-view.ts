@@ -215,6 +215,11 @@ export type SequentialStudentRunnerNavigationAction =
       type: 'select';
     };
 
+export type PublicAnswerFeedbackStatus =
+  | 'correct'
+  | 'needs-review'
+  | 'unanswered';
+
 type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
   acceptedAnswersText: string | null;
@@ -225,7 +230,7 @@ type PublicAnswerFeedbackView = {
   explanation: string | null;
   explanationLabel: string;
   explanationText: string | null;
-  status: 'correct' | 'needs-review' | 'unanswered';
+  status: PublicAnswerFeedbackStatus;
   statusLabel: string;
   submittedAnswer: string;
   submittedAnswerLabel: string;
@@ -1153,7 +1158,7 @@ export function getStudentRunnerReviewStatusClassName(
 
 function getPublicAnswerFeedbackStatus(
   reviewItem: PublicAttemptReviewItem
-): PublicAnswerFeedbackView['status'] {
+): PublicAnswerFeedbackStatus {
   if (!reviewItem.submitted) return 'unanswered';
   return reviewItem.correct ? 'correct' : 'needs-review';
 }
