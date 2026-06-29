@@ -669,6 +669,7 @@ import {
   formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
   formatAssignmentSummaryUnansweredCount,
+  normalizeAssignmentSummaryCount,
 } from '@/assignments/result-summary-format';
 import {
   compareAssignmentItemsByType,
@@ -28514,6 +28515,10 @@ assert.equal(
   formatAssignmentSummaryUnansweredCount(Number.NaN),
   '0 unanswered'
 );
+assert.equal(normalizeAssignmentSummaryCount(Number.POSITIVE_INFINITY), 0);
+assert.equal(normalizeAssignmentSummaryCount(Number.NaN), 0);
+assert.equal(normalizeAssignmentSummaryCount(-2), 0);
+assert.equal(normalizeAssignmentSummaryCount(2.8), 2);
 assert.equal(formatAssignmentSummaryReviewItemCount(1), '1 item to review');
 assert.equal(formatAssignmentSummaryReviewItemCount(2), '2 items to review');
 assert.equal(formatAssignmentSummaryReviewItemCount(-2), '0 items to review');
@@ -33808,6 +33813,11 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
+  /normalizeAssignmentSummaryCount\(needsReviewCount\) > 0/,
+  'Assignment student follow-up recommendations should reuse the shared summary count normalizer.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
   /assignment_student_follow_up_line\(\{[\s\S]*recommendation: followUpRecommendation/,
   'Assignment student follow-up summaries should add localized next-step recommendations to copied follow-up lines.'
 );
@@ -33850,6 +33860,36 @@ assert.equal(
     },
   }).followUpRecommendation,
   'keep reinforcing and offer a harder variant'
+);
+assert.deepEqual(
+  [
+    Number.NaN,
+    -1,
+    2.8,
+    Number.POSITIVE_INFINITY,
+  ].map((needsReviewCount) => {
+    const studentView = buildAssignmentStudentFollowUpSummaryStudentView({
+      index: 0,
+      student: {
+        ...alphaReviewStudent,
+        needsReviewCount,
+      },
+    });
+
+    return [
+      studentView.reviewItemCountLabel,
+      studentView.followUpRecommendation,
+    ];
+  }),
+  [
+    ['0 items to review', 'keep reinforcing and offer a harder variant'],
+    ['0 items to review', 'keep reinforcing and offer a harder variant'],
+    [
+      '2 items to review',
+      'review missed or unanswered items, then assign one short retry',
+    ],
+    ['0 items to review', 'keep reinforcing and offer a harder variant'],
+  ]
 );
 assert.deepEqual(
   buildAssignmentStudentFollowUpSummaryStudentView({

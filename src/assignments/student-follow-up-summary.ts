@@ -2,6 +2,7 @@ import {
   formatAssignmentSummaryAccuracy,
   formatAssignmentSummaryAttemptCount,
   formatAssignmentSummaryReviewItemCount,
+  normalizeAssignmentSummaryCount,
 } from '@/assignments/result-summary-format';
 import {
   formatAssignmentResultCopyTitle,
@@ -113,7 +114,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
 }
 
 function formatStudentFollowUpRecommendation(needsReviewCount: number) {
-  return needsReviewCount > 0
+  return normalizeAssignmentSummaryCount(needsReviewCount) > 0
     ? m.assignment_student_follow_up_recommendation_review()
     : m.assignment_student_follow_up_recommendation_extend();
 }

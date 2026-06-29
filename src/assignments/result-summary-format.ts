@@ -103,7 +103,7 @@ export function formatAssignmentSummaryItemPerformance({
   });
 }
 
-function normalizeAssignmentSummaryCount(count: number) {
+export function normalizeAssignmentSummaryCount(count: number) {
   if (!Number.isFinite(count)) return 0;
   return Math.max(0, Math.floor(count));
 }
