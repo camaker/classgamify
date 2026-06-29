@@ -7054,6 +7054,10 @@ const attemptDurationSource = readFileSync(
   'src/assignments/attempt-duration.ts',
   'utf8'
 );
+const pureAttemptDurationSource = readFileSync(
+  'src/attempts/duration.ts',
+  'utf8'
+);
 const studentRuntimeItemListDomainSource = readFileSync(
   'src/assignments/student-runtime-item-list.ts',
   'utf8'
@@ -7482,9 +7486,9 @@ assert.match(
   'Student submission domain should expose explicit anonymous copy, control, result, and timer badge contracts.'
 );
 assert.match(
-  attemptDurationSource,
+  pureAttemptDurationSource,
   /export type AttemptTimerState = \{[\s\S]*durationSeconds: number;[\s\S]*timeExpired: boolean;/,
-  'Assignment attempt duration domain should expose an explicit timer state contract.'
+  'Pure attempt duration domain should expose an explicit timer state contract.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -7946,8 +7950,8 @@ assert.doesNotMatch(
   'Student play route should not hand-write the attempt reset bundle.'
 );
 assert.match(
-  attemptDurationSource,
-  /ASSIGNMENT_ATTEMPT_DURATION_UNITS[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60[\s\S]*timerSecondPaddingLength: 2/,
+  pureAttemptDurationSource,
+  /ATTEMPT_DURATION_UNITS[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60[\s\S]*timerSecondPaddingLength: 2/,
   'Attempt duration helpers should expose named time-unit constants.'
 );
 assert.match(
@@ -7956,19 +7960,29 @@ assert.match(
   'Assignment attempt duration formatting should use localized result empty-value copy by default.'
 );
 assert.match(
-  attemptDurationSource,
+  pureAttemptDurationSource,
   /resolveAttemptSubmissionDurationSeconds[\s\S]*buildAttemptTimerState[\s\S]*normalizeAttemptDurationSeconds/,
   'Attempt duration helpers should centralize submitted-duration timer derivation and clamping.'
 );
 assert.doesNotMatch(
-  attemptDurationSource,
+  pureAttemptDurationSource,
   /\* 1000|\/ 1000|\/ 60|% 60|padStart\(2,/,
-  'Attempt duration helpers should not keep local time-unit or timer-padding numbers.'
+  'Pure attempt duration helpers should not keep local time-unit or timer-padding numbers.'
 );
 assert.doesNotMatch(
   attemptDurationSource,
   /emptyValue = options\?\.emptyValue \?\? '-'/,
   'Assignment attempt duration formatting should not hard-code the default empty-value placeholder.'
+);
+assert.match(
+  attemptDurationSource,
+  /from '@\/attempts\/duration'[\s\S]*export \{[\s\S]*normalizeAttemptDurationSeconds[\s\S]*resolveAttemptSubmissionDurationSeconds[\s\S]*type AttemptTimerState[\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS = ATTEMPT_DURATION_UNITS/,
+  'Assignment attempt duration module should re-export pure attempt timing helpers while keeping localized formatting.'
+);
+assert.doesNotMatch(
+  activityRuntimeSource,
+  /from '@\/assignments\//,
+  'Activity runtime scoring should not depend on assignment-domain modules.'
 );
 const activityDistractorsSource = readFileSync(
   'src/activities/distractors.ts',
@@ -27723,6 +27737,33 @@ assert.deepEqual(
       totalPoints: 1,
     },
   }
+);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: [{ answer: 'Paris', itemId: 'q-valid' }],
+    content: dirtyRuntimeContent,
+    durationSeconds: -3,
+    templateType: 'quiz',
+  }).result.durationSeconds,
+  0
+);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: [{ answer: 'Paris', itemId: 'q-valid' }],
+    content: dirtyRuntimeContent,
+    durationSeconds: 4.6,
+    templateType: 'quiz',
+  }).result.durationSeconds,
+  5
+);
+assert.equal(
+  evaluateRuntimeAnswers({
+    answers: [{ answer: 'Paris', itemId: 'q-valid' }],
+    content: dirtyRuntimeContent,
+    durationSeconds: Number.POSITIVE_INFINITY,
+    templateType: 'quiz',
+  }).result.durationSeconds,
+  undefined
 );
 assert.equal(
   evaluateRuntimeAnswers({

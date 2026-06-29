@@ -5,6 +5,7 @@ import {
   normalizeRuntimeDisplayText,
 } from '@/activities/runtime-display';
 import { makeActivityStableId } from '@/activities/stable-id';
+import { normalizeAttemptDurationSeconds } from '@/attempts/duration';
 import type {
   ActivityContent,
   ActivityTemplateType,
@@ -206,6 +207,9 @@ export function evaluateRuntimeAnswers({
   const earnedPoints = correctItemCount;
   const accuracy =
     totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+  const normalizedDurationSeconds = normalizeAttemptDurationSeconds({
+    durationSeconds,
+  });
 
   return {
     answers: scoredAnswers,
@@ -213,7 +217,7 @@ export function evaluateRuntimeAnswers({
       accuracy,
       completedItemCount: countSubmittedRuntimeAnswers(scoredAnswers),
       correctItemCount,
-      durationSeconds,
+      durationSeconds: normalizedDurationSeconds,
       earnedPoints,
       totalPoints,
     },

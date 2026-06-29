@@ -1,118 +1,22 @@
+import {
+  ATTEMPT_DURATION_UNITS,
+  buildAttemptStartedAt,
+  buildAttemptTimerState,
+  normalizeAttemptDurationSeconds,
+  resolveAttemptSubmissionDurationSeconds,
+  type AttemptTimerState,
+} from '@/attempts/duration';
 import { m } from '@/locale/paraglide/messages';
 
-export const ASSIGNMENT_ATTEMPT_DURATION_UNITS = {
-  millisecondsPerSecond: 1000,
-  secondsPerMinute: 60,
-  timerSecondPaddingLength: 2,
-} as const;
-
-export function normalizeAttemptDurationSeconds({
-  durationSeconds,
-  timeLimitSeconds,
-}: {
-  durationSeconds?: number;
-  timeLimitSeconds?: number;
-}) {
-  if (durationSeconds === undefined) return undefined;
-  if (!Number.isFinite(durationSeconds)) return undefined;
-
-  const normalizedDuration = Math.max(0, Math.round(durationSeconds));
-  if (
-    !timeLimitSeconds ||
-    !Number.isFinite(timeLimitSeconds) ||
-    timeLimitSeconds <= 0
-  ) {
-    return normalizedDuration;
-  }
-
-  return Math.min(normalizedDuration, timeLimitSeconds);
-}
-
-export function buildAttemptStartedAt({
-  completedAt,
-  durationSeconds,
-}: {
-  completedAt: Date;
-  durationSeconds?: number;
-}) {
-  if (durationSeconds === undefined || !Number.isFinite(durationSeconds)) {
-    return completedAt;
-  }
-
-  const completedTimestamp = completedAt.getTime();
-  if (!Number.isFinite(completedTimestamp)) return completedAt;
-
-  return new Date(
-    completedTimestamp -
-      Math.max(0, Math.round(durationSeconds)) *
-        ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond
-  );
-}
-
-export type AttemptTimerState = {
-  durationSeconds: number;
-  elapsedSeconds: number;
-  remainingSeconds: number | undefined;
-  timeExpired: boolean;
+export {
+  buildAttemptStartedAt,
+  buildAttemptTimerState,
+  normalizeAttemptDurationSeconds,
+  resolveAttemptSubmissionDurationSeconds,
+  type AttemptTimerState,
 };
 
-export function buildAttemptTimerState({
-  now,
-  startedAt,
-  timeLimitSeconds,
-}: {
-  now: number;
-  startedAt: number;
-  timeLimitSeconds?: number;
-}): AttemptTimerState {
-  const elapsedMilliseconds = now - startedAt;
-  const durationSeconds = Number.isFinite(elapsedMilliseconds)
-    ? Math.max(
-        0,
-        Math.round(
-          elapsedMilliseconds /
-            ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond
-        )
-      )
-    : 0;
-  const normalizedTimeLimitSeconds =
-    timeLimitSeconds &&
-    Number.isFinite(timeLimitSeconds) &&
-    timeLimitSeconds > 0
-      ? timeLimitSeconds
-      : undefined;
-  const remainingSeconds = normalizedTimeLimitSeconds
-    ? Math.max(0, normalizedTimeLimitSeconds - durationSeconds)
-    : undefined;
-
-  return {
-    durationSeconds,
-    elapsedSeconds: durationSeconds,
-    remainingSeconds,
-    timeExpired: Boolean(normalizedTimeLimitSeconds && remainingSeconds === 0),
-  };
-}
-
-export function resolveAttemptSubmissionDurationSeconds({
-  now,
-  startedAt,
-  timeLimitSeconds,
-}: {
-  now: number;
-  startedAt: number;
-  timeLimitSeconds?: number;
-}) {
-  const timerState = buildAttemptTimerState({
-    now,
-    startedAt,
-    timeLimitSeconds,
-  });
-
-  return normalizeAttemptDurationSeconds({
-    durationSeconds: timerState.durationSeconds,
-    timeLimitSeconds,
-  });
-}
+export const ASSIGNMENT_ATTEMPT_DURATION_UNITS = ATTEMPT_DURATION_UNITS;
 
 export function formatAttemptDuration(
   seconds?: number | null,
@@ -129,12 +33,11 @@ export function formatAttemptDuration(
   if (normalizedSeconds <= 0) return emptyValue;
 
   const minutes = Math.floor(
-    normalizedSeconds / ASSIGNMENT_ATTEMPT_DURATION_UNITS.secondsPerMinute
+    normalizedSeconds / ATTEMPT_DURATION_UNITS.secondsPerMinute
   );
-  const remainder =
-    normalizedSeconds % ASSIGNMENT_ATTEMPT_DURATION_UNITS.secondsPerMinute;
+  const remainder = normalizedSeconds % ATTEMPT_DURATION_UNITS.secondsPerMinute;
   const paddedSeconds = String(remainder).padStart(
-    ASSIGNMENT_ATTEMPT_DURATION_UNITS.timerSecondPaddingLength,
+    ATTEMPT_DURATION_UNITS.timerSecondPaddingLength,
     '0'
   );
 
