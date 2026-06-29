@@ -1,4 +1,8 @@
-import type { ActivitySourceMaterialSummaryView } from '@/activities/material-summary';
+import type {
+  ActivitySourceMaterialExtractionActionView,
+  ActivitySourceMaterialKindBadgeView,
+  ActivitySourceMaterialSummaryView,
+} from '@/activities/material-summary';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconPaperclip, IconSparkles } from '@tabler/icons-react';
@@ -51,7 +55,7 @@ export function ActivitySourceMaterialsSummary({
 function ActivitySourceMaterialKindBadge({
   badge,
 }: {
-  badge: ActivitySourceMaterialSummaryView['kindBadges'][number];
+  badge: ActivitySourceMaterialKindBadgeView;
 }) {
   return (
     <Badge variant="secondary" className="rounded-md">
@@ -91,7 +95,7 @@ function ActivitySourceMaterialExtractionSummary({
 function ActivitySourceMaterialExtractionBadge({
   action,
 }: {
-  action: ActivitySourceMaterialSummaryView['extractionActions'][number];
+  action: ActivitySourceMaterialExtractionActionView;
 }) {
   return (
     <div className="rounded-md border bg-background px-2.5 py-2">

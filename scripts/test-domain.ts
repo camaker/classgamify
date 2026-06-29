@@ -2609,8 +2609,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /ActivitySourceMaterialSummaryView/,
-  'Activity source-material summary component should consume the activity-domain summary view contract.'
+  /ActivitySourceMaterialExtractionActionView[\s\S]*ActivitySourceMaterialKindBadgeView[\s\S]*ActivitySourceMaterialSummaryView/,
+  'Activity source-material summary component should consume explicit activity-domain summary and child view contracts.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /ActivitySourceMaterialSummaryView\['(?:kindBadges|extractionActions)'\]\[number\]/,
+  'Activity source-material summary component should not infer child props from aggregate summary indexes.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -5505,6 +5510,11 @@ assert.equal(
     '/teacher/owner/private/<listening>.mp3#frag'
   ),
   'listening.mp3'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /export type ActivitySourceMaterialExtractionActionView[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];/,
+  'Activity source-material summary domain should expose explicit extraction action and kind badge view contracts.'
 );
 assert.match(
   activityMaterialSummarySource,

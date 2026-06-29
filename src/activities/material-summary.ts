@@ -70,6 +70,13 @@ export type ActivitySourceMaterialExtractionActionView =
     summaryText: string;
   };
 
+export type ActivitySourceMaterialKindBadgeView = {
+  count: number;
+  kind: UserFileMaterialKind;
+  label: string;
+  summaryText: string;
+};
+
 export type ActivitySourceMaterialReadiness = {
   capabilities: ActivitySourceMaterialReadinessCapability[];
   extractableCount: number;
@@ -93,12 +100,7 @@ export type ActivitySourceMaterialSummaryView = {
   extractionActions: ActivitySourceMaterialExtractionActionView[];
   extractionTitle: string;
   hasMaterials: boolean;
-  kindBadges: Array<{
-    count: number;
-    kind: UserFileMaterialKind;
-    label: string;
-    summaryText: string;
-  }>;
+  kindBadges: ActivitySourceMaterialKindBadgeView[];
   primaryNextStep?: ActivitySourceMaterialExtractionActionView['nextStep'];
   readiness: ActivitySourceMaterialReadiness;
   title: string;
