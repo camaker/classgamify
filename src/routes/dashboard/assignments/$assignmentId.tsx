@@ -77,10 +77,7 @@ function AssignmentResultsPage() {
   ) {
     const executionPlan = buildAssignmentResultActionExecutionPlan({
       actionButton,
-      data:
-        actionButton.kind === 'copy-text'
-          ? pageView.copyActionData
-          : pageView.actionData,
+      dataSet: pageView.actionDataSet,
     });
 
     if (executionPlan.type === 'blocked') {

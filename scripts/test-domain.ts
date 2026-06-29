@@ -577,6 +577,7 @@ import {
   buildAssignmentItemPerformanceRowView,
   buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionDataSet,
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
@@ -609,6 +610,7 @@ import {
   getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
   normalizeAssignmentResultProgressValue,
+  getAssignmentResultActionExecutionData,
   getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
@@ -1497,8 +1499,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data:[\s\S]*actionButton\.kind === 'copy-text'[\s\S]*pageView\.copyActionData[\s\S]*pageView\.actionData/,
-  'Result route should execute copy actions from the current review view while preserving full action data for CSV downloads.'
+  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*dataSet: pageView\.actionDataSet/,
+  'Result route should execute result actions through the prepared action data set.'
+);
+assert.doesNotMatch(
+  assignmentResultsRouteSource,
+  /actionButton\.kind === 'copy-text'|pageView\.copyActionData\b|pageView\.actionData\b/,
+  'Result route should not choose copy-vs-export action data locally.'
 );
 assert.doesNotMatch(
   assignmentResultsRouteSource,
@@ -1524,6 +1531,16 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultCopyActionData[\s\S]*perItem: items[\s\S]*students/,
   'Assignment result actions should expose a dedicated copy-action data builder for current review-view artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionDataSet[\s\S]*copyActionData[\s\S]*exportActionData/,
+  'Assignment result actions should expose a dedicated action data set for copy and export execution.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /getAssignmentResultActionExecutionData[\s\S]*actionButton\.kind === 'copy-text'[\s\S]*dataSet\.copyActionData[\s\S]*dataSet\.exportActionData/,
+  'Assignment result actions should choose copy-vs-export execution data inside the assignment-domain action model.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1557,7 +1574,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultActionExecutionPlan[\s\S]*buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
+  /buildAssignmentResultActionExecutionPlan[\s\S]*getAssignmentResultActionExecutionData\(\{ actionButton, dataSet \}\)[\s\S]*buildAssignmentResultsCsvDataUrl\(payload\.csv\)/,
   'Assignment result actions should own CSV download execution plans.'
 );
 assert.match(
@@ -1589,6 +1606,11 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(copyArtifacts\)[\s\S]*copyArtifactPreviews,/,
   'Assignment result page view-model should expose prepared copy artifact previews from the current review-view artifact bundle.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /const actionDataSet = buildAssignmentResultActionDataSet\(\{[\s\S]*copyActionData,[\s\S]*exportActionData: data \?\? null,[\s\S]*\}\)[\s\S]*actionDataSet,/,
+  'Assignment result page view-model should expose a prepared action data set for route-level action execution.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
@@ -30167,6 +30189,18 @@ assert.deepEqual(
       scoredResultsPageView.actionData?.analysis.students.map(
         (student) => student.studentLabel
       ),
+    actionDataSetExportItemIds:
+      scoredResultsPageView.actionDataSet.exportActionData?.analysis.perItem.map(
+        (item) => item.itemId
+      ),
+    actionDataSetCopyItemIds:
+      scoredResultsPageView.actionDataSet.copyActionData?.analysis.perItem.map(
+        (item) => item.itemId
+      ),
+    actionDataSetCopyStudentLabels:
+      scoredResultsPageView.actionDataSet.copyActionData?.analysis.students.map(
+        (student) => student.studentLabel
+      ),
     attemptReviewCardViews: scoredResultsPageView.attemptReviewCardViews.map(
       (card) => [card.id, card.studentLabel, card.answerViews.length]
     ),
@@ -30285,6 +30319,9 @@ assert.deepEqual(
     actionDataAssignmentId: 'assignment-results-page',
     actionDataItemIds: ['q-1', 'pair-1'],
     actionDataStudentLabels: ['Alice'],
+    actionDataSetExportItemIds: ['q-1', 'pair-1'],
+    actionDataSetCopyItemIds: ['pair-1', 'q-1'],
+    actionDataSetCopyStudentLabels: ['Alice'],
     attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
@@ -34837,6 +34874,10 @@ const filteredResultCopyActionData = buildAssignmentResultCopyActionData({
     (student) => student.studentKey === 'name:alpha-review'
   ),
 });
+const resultActionDataSet = buildAssignmentResultActionDataSet({
+  copyActionData: filteredResultCopyActionData,
+  exportActionData: csvExportData,
+});
 assert.deepEqual(
   {
     actionDataItemIds: csvExportData.analysis.perItem.map(
@@ -34851,6 +34892,14 @@ assert.deepEqual(
       filteredResultCopyActionData.analysis.students.map(
         (student) => student.studentKey
       ),
+    dataSetCopyItemIds:
+      resultActionDataSet.copyActionData?.analysis.perItem.map(
+        (item) => item.itemId
+      ),
+    dataSetExportItemIds:
+      resultActionDataSet.exportActionData?.analysis.perItem.map(
+        (item) => item.itemId
+      ),
   },
   {
     actionDataItemIds: ['q-1', 'pair-1'],
@@ -34862,6 +34911,8 @@ assert.deepEqual(
     ],
     copyActionDataItemIds: ['pair-1'],
     copyActionDataStudentKeys: ['name:alpha-review'],
+    dataSetCopyItemIds: ['pair-1'],
+    dataSetExportItemIds: ['q-1', 'pair-1'],
   }
 );
 assert.deepEqual(
@@ -35030,19 +35081,52 @@ assert.equal(
   }),
   studentFollowUpSummary.text
 );
+const readyCopyBriefActionButton = {
+  action: 'copy-brief',
+  description:
+    'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+  disabled: false,
+  failureMessage: 'Classroom brief could not be copied.',
+  gate: { type: 'ready' },
+  kind: 'copy-text',
+  label: 'Copy brief',
+  successMessage: 'Classroom brief copied.',
+} as const;
+const readyExportCsvActionButton = {
+  action: 'export-csv',
+  description:
+    'Download gradebook-ready results with delivery policy and item-level answers.',
+  disabled: false,
+  failureMessage: 'Results CSV could not be downloaded.',
+  gate: { type: 'ready' },
+  kind: 'download-csv',
+  label: 'Download CSV',
+  successMessage: 'Results CSV downloaded.',
+} as const;
+assert.equal(
+  getAssignmentResultActionExecutionData({
+    actionButton: readyCopyBriefActionButton,
+    dataSet: resultActionDataSet,
+  }),
+  filteredResultCopyActionData
+);
+assert.equal(
+  getAssignmentResultActionExecutionData({
+    actionButton: readyExportCsvActionButton,
+    dataSet: resultActionDataSet,
+  }),
+  csvExportData
+);
+assert.equal(
+  getAssignmentResultActionExecutionData({
+    actionButton: readyCopyBriefActionButton,
+    dataSet: null,
+  }),
+  null
+);
 assert.deepEqual(
   buildAssignmentResultActionPayload({
-    actionButton: {
-      action: 'copy-brief',
-      description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
-      disabled: false,
-      failureMessage: 'Classroom brief could not be copied.',
-      gate: { type: 'ready' },
-      kind: 'copy-text',
-      label: 'Copy brief',
-      successMessage: 'Classroom brief copied.',
-    },
+    actionButton: readyCopyBriefActionButton,
     data: csvExportData,
   }),
   {
@@ -35052,17 +35136,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
-    actionButton: {
-      action: 'copy-brief',
-      description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
-      disabled: false,
-      failureMessage: 'Classroom brief could not be copied.',
-      gate: { type: 'ready' },
-      kind: 'copy-text',
-      label: 'Copy brief',
-      successMessage: 'Classroom brief copied.',
-    },
+    actionButton: readyCopyBriefActionButton,
     data: csvExportData,
   }),
   {
@@ -35074,18 +35148,21 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
-    actionButton: {
-      action: 'copy-brief',
-      description:
-        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
-      disabled: false,
-      failureMessage: 'Classroom brief could not be copied.',
-      gate: { type: 'ready' },
-      kind: 'copy-text',
-      label: 'Copy brief',
-      successMessage: 'Classroom brief copied.',
-    },
+    actionButton: readyCopyBriefActionButton,
     data: filteredResultCopyActionData,
+  }),
+  {
+    failureMessage: 'Classroom brief could not be copied.',
+    successMessage: 'Classroom brief copied.',
+    text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
+      .classroomBrief.text,
+    type: 'copy-text',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: readyCopyBriefActionButton,
+    dataSet: resultActionDataSet,
   }),
   {
     failureMessage: 'Classroom brief could not be copied.',
@@ -35117,17 +35194,7 @@ assert.throws(
   /Submit at least one attempt before copying a brief\./
 );
 const downloadCsvPayload = buildAssignmentResultActionPayload({
-  actionButton: {
-    action: 'export-csv',
-    description:
-      'Download gradebook-ready results with delivery policy and item-level answers.',
-    disabled: false,
-    failureMessage: 'Results CSV could not be downloaded.',
-    gate: { type: 'ready' },
-    kind: 'download-csv',
-    label: 'Download CSV',
-    successMessage: 'Results CSV downloaded.',
-  },
+  actionButton: readyExportCsvActionButton,
   data: csvExportData,
 });
 assert.equal(downloadCsvPayload.kind, 'download-csv');
@@ -35145,18 +35212,21 @@ assert.equal(
 );
 assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
-    actionButton: {
-      action: 'export-csv',
-      description:
-        'Download gradebook-ready results with delivery policy and item-level answers.',
-      disabled: false,
-      failureMessage: 'Results CSV could not be downloaded.',
-      gate: { type: 'ready' },
-      kind: 'download-csv',
-      label: 'Download CSV',
-      successMessage: 'Results CSV downloaded.',
-    },
+    actionButton: readyExportCsvActionButton,
     data: csvExportData,
+  }),
+  {
+    failureMessage: 'Results CSV could not be downloaded.',
+    filename: buildAssignmentResultsCsvFilename(csvExportData),
+    successMessage: 'Results CSV downloaded.',
+    type: 'download-csv',
+    url: buildAssignmentResultsCsvDataUrl(csv),
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: readyExportCsvActionButton,
+    dataSet: resultActionDataSet,
   }),
   {
     failureMessage: 'Results CSV could not be downloaded.',

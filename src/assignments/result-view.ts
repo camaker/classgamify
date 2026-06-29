@@ -70,11 +70,13 @@ import {
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionDataSet,
   buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultActionState,
   type AssignmentResultActionButton,
+  type AssignmentResultActionDataSet,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifacts,
@@ -129,6 +131,7 @@ export {
   assignmentResultActionDescriptors,
   assignmentResultActionOrder,
   buildAssignmentResultActionButtons,
+  buildAssignmentResultActionDataSet,
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
@@ -137,12 +140,14 @@ export {
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultClassroomBriefStats,
   buildAssignmentResultCopyText,
+  getAssignmentResultActionExecutionData,
   getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   type AssignmentResultActionButton,
+  type AssignmentResultActionDataSet,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
 } from '@/assignments/result-actions';
@@ -316,6 +321,7 @@ type AssignmentResultsPageViewModel<
 > = {
   actionButtons: AssignmentResultActionButton[];
   actionData: AssignmentResultsPageData<TAttempt> | null;
+  actionDataSet: AssignmentResultActionDataSet;
   actionState: AssignmentResultActionState;
   attemptReviewCardViews: ReturnType<
     typeof buildAssignmentAttemptReviewCardViews
@@ -1482,6 +1488,10 @@ export function buildAssignmentResultsPageViewModel<
     studentCount: data?.analysis.students.length ?? 0,
   });
   const actionButtons = buildAssignmentResultActionButtons(actionState);
+  const actionDataSet = buildAssignmentResultActionDataSet({
+    copyActionData,
+    exportActionData: data ?? null,
+  });
   const copyArtifactPreviews = copyArtifacts
     ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts).flatMap(
         (preview) => {
@@ -1504,6 +1514,7 @@ export function buildAssignmentResultsPageViewModel<
   return {
     actionButtons,
     actionData: data ?? null,
+    actionDataSet,
     actionState,
     attemptReviewCardViews,
     attemptRowViews,

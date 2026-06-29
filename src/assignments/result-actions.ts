@@ -149,6 +149,11 @@ export type AssignmentResultCopyActionData = AssignmentResultActionData & {
   };
 };
 
+export type AssignmentResultActionDataSet = {
+  copyActionData: AssignmentResultCopyActionData | null;
+  exportActionData: AssignmentResultActionData | null;
+};
+
 type AssignmentResultCopyArtifactData = {
   analysis: Pick<
     AssignmentResultsExportData['analysis'],
@@ -344,6 +349,30 @@ export function buildAssignmentResultCopyActionData({
       students,
     },
   };
+}
+
+export function buildAssignmentResultActionDataSet({
+  copyActionData,
+  exportActionData,
+}: AssignmentResultActionDataSet): AssignmentResultActionDataSet {
+  return {
+    copyActionData,
+    exportActionData,
+  };
+}
+
+export function getAssignmentResultActionExecutionData({
+  actionButton,
+  dataSet,
+}: {
+  actionButton: AssignmentResultActionButton;
+  dataSet: AssignmentResultActionDataSet | null | undefined;
+}) {
+  if (!dataSet) return null;
+
+  return actionButton.kind === 'copy-text'
+    ? dataSet.copyActionData
+    : dataSet.exportActionData;
 }
 
 export function getAssignmentResultCopyArtifactText({
@@ -608,9 +637,11 @@ export function buildAssignmentResultActionPayload({
 export function buildAssignmentResultActionExecutionPlan({
   actionButton,
   data,
+  dataSet,
 }: {
   actionButton: AssignmentResultActionButton;
   data?: AssignmentResultActionData | null;
+  dataSet?: AssignmentResultActionDataSet | null;
 }): AssignmentResultActionExecutionPlan {
   if (actionButton.gate.type === 'blocked') {
     return {
@@ -620,7 +651,12 @@ export function buildAssignmentResultActionExecutionPlan({
     };
   }
 
-  if (!data) {
+  const executionData =
+    dataSet === undefined
+      ? (data ?? null)
+      : getAssignmentResultActionExecutionData({ actionButton, dataSet });
+
+  if (!executionData) {
     return {
       failureMessage: actionButton.failureMessage,
       message: actionButton.failureMessage,
@@ -630,7 +666,7 @@ export function buildAssignmentResultActionExecutionPlan({
 
   const payload = buildAssignmentResultActionPayload({
     actionButton,
-    data,
+    data: executionData,
   });
 
   if (payload.kind === 'download-csv') {
