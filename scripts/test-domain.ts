@@ -2579,6 +2579,16 @@ assert.match(
 );
 assert.match(
   activitySourceMaterialsFieldSource,
+  /ActivitySourceMaterialPickerItemView[\s\S]*ActivitySourceMaterialPickerStatus[\s\S]*ActivitySourceMaterialPickerView/,
+  'Activity source-material picker component should import explicit picker and child view contracts.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsFieldSource,
+  /ReturnType<typeof buildActivitySourceMaterialPickerView>/,
+  'Activity source-material picker sections should not infer child props from the picker builder.'
+);
+assert.match(
+  activitySourceMaterialsFieldSource,
   /ActivitySourceMaterialsSummary[\s\S]*summary=\{pickerView\.attachedSummary\}/,
   'Activity source-material picker should render attached material readiness through the summary component.'
 );

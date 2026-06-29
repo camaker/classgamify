@@ -4,6 +4,7 @@ import {
   removeActivitySourceMaterialPickerItem,
   type ActivitySourceMaterialPickerItemView,
   type ActivitySourceMaterialPickerStatus,
+  type ActivitySourceMaterialPickerView,
 } from '@/activities/material-summary';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import type { ActivityMaterialReference } from '@/activities/types';
@@ -135,7 +136,7 @@ function ActivitySourceMaterialAttachedSection({
 }: {
   actionSlot?: ReactNode;
   onRemove: (fileId: string) => void;
-  pickerView: ReturnType<typeof buildActivitySourceMaterialPickerView>;
+  pickerView: ActivitySourceMaterialPickerView;
 }) {
   return (
     <section className="grid gap-2">
@@ -180,7 +181,7 @@ function ActivitySourceMaterialAvailableSection({
   pickerView,
 }: {
   onAdd: (itemView: ActivitySourceMaterialPickerItemView) => void;
-  pickerView: ReturnType<typeof buildActivitySourceMaterialPickerView>;
+  pickerView: ActivitySourceMaterialPickerView;
 }) {
   return (
     <section className="grid gap-2">
