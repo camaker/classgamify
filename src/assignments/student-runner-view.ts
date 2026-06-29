@@ -210,6 +210,7 @@ type PublicAnswerFeedbackView = {
   correctAnswer: string;
   correctAnswerLabel: string;
   correctAnswerText: string;
+  detailLines: PublicAnswerFeedbackDetailLine[];
   explanation: string | null;
   explanationLabel: string;
   explanationText: string | null;
@@ -218,6 +219,15 @@ type PublicAnswerFeedbackView = {
   submittedAnswer: string;
   submittedAnswerLabel: string;
   submittedAnswerText: string;
+};
+
+type PublicAnswerFeedbackDetailLine = {
+  id:
+    | 'accepted-answers'
+    | 'correct-answer'
+    | 'explanation'
+    | 'submitted-answer';
+  text: string;
 };
 
 type StudentRunnerInstructionView = {
@@ -1015,37 +1025,66 @@ export function buildPublicAnswerFeedbackView({
   );
   const explanationLabel = m.student_runner_feedback_explanation();
   const explanationValue = reviewItem.explanation ?? null;
+  const submittedAnswerText = m.student_runner_feedback_submitted_answer_line({
+    label: submittedAnswerLabel,
+    value: submittedAnswerValue,
+  });
+  const correctAnswerText = m.student_runner_feedback_correct_answer_line({
+    label: correctAnswerLabel,
+    value: reviewItem.correctAnswer,
+  });
+  const acceptedAnswersText = acceptedAnswersValue
+    ? m.student_runner_feedback_accepted_answers_line({
+        label: acceptedAnswersLabel,
+        value: acceptedAnswersValue,
+      })
+    : null;
+  const explanationText = explanationValue
+    ? m.student_runner_feedback_explanation_line({
+        label: explanationLabel,
+        value: explanationValue,
+      })
+    : null;
+  const detailLines: PublicAnswerFeedbackDetailLine[] = [
+    {
+      id: 'submitted-answer',
+      text: submittedAnswerText,
+    },
+    {
+      id: 'correct-answer',
+      text: correctAnswerText,
+    },
+  ];
+
+  if (acceptedAnswersText) {
+    detailLines.push({
+      id: 'accepted-answers',
+      text: acceptedAnswersText,
+    });
+  }
+
+  if (explanationText) {
+    detailLines.push({
+      id: 'explanation',
+      text: explanationText,
+    });
+  }
 
   return {
     acceptedAnswersLabel,
-    acceptedAnswersText: acceptedAnswersValue
-      ? m.student_runner_feedback_accepted_answers_line({
-          label: acceptedAnswersLabel,
-          value: acceptedAnswersValue,
-        })
-      : null,
+    acceptedAnswersText,
     correctAnswer: reviewItem.correctAnswer,
     correctAnswerLabel,
-    correctAnswerText: m.student_runner_feedback_correct_answer_line({
-      label: correctAnswerLabel,
-      value: reviewItem.correctAnswer,
-    }),
+    correctAnswerText,
+    detailLines,
     explanation: explanationValue,
     explanationLabel,
-    explanationText: explanationValue
-      ? m.student_runner_feedback_explanation_line({
-          label: explanationLabel,
-          value: explanationValue,
-        })
-      : null,
+    explanationText,
     status: getPublicAnswerFeedbackStatus(reviewItem),
     statusLabel: getPublicAnswerFeedbackStatusLabel(reviewItem),
     submittedAnswer: reviewItem.submittedAnswer,
     submittedAnswerLabel,
-    submittedAnswerText: m.student_runner_feedback_submitted_answer_line({
-      label: submittedAnswerLabel,
-      value: submittedAnswerValue,
-    }),
+    submittedAnswerText,
   };
 }
 

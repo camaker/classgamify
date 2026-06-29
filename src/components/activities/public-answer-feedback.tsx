@@ -35,22 +35,11 @@ export function PublicAnswerFeedback({
         <IconX className="size-3.5" />
       )}
       <span>{feedback.statusLabel}</span>
-      <span className="basis-full text-muted-foreground">
-        {feedback.submittedAnswerText}
-      </span>
-      <span className="text-muted-foreground">
-        {feedback.correctAnswerText}
-      </span>
-      {feedback.acceptedAnswersText ? (
-        <span className="basis-full text-muted-foreground">
-          {feedback.acceptedAnswersText}
+      {feedback.detailLines.map((line) => (
+        <span className="basis-full text-muted-foreground" key={line.id}>
+          {line.text}
         </span>
-      ) : null}
-      {feedback.explanationText ? (
-        <span className="basis-full text-muted-foreground">
-          {feedback.explanationText}
-        </span>
-      ) : null}
+      ))}
     </div>
   );
 }

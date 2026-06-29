@@ -4159,8 +4159,8 @@ assert.doesNotMatch(
 );
 assert.match(
   publicAnswerFeedbackSource,
-  /feedback\.submittedAnswerText[\s\S]*feedback\.correctAnswerText[\s\S]*feedback\.acceptedAnswersText[\s\S]*feedback\.explanationText/,
-  'Public answer feedback component should render prepared feedback text lines.'
+  /feedback\.detailLines\.map[\s\S]*line\.id[\s\S]*line\.text/,
+  'Public answer feedback component should render ordered feedback detail lines prepared by the assignment-domain feedback view.'
 );
 const groupSortBoardSource = readFileSync(
   'src/components/activities/group-sort-board.tsx',
@@ -8361,6 +8361,24 @@ assert.deepEqual(
     correctAnswer: 'Paris',
     correctAnswerLabel: 'Correct match',
     correctAnswerText: 'Correct match: Paris',
+    detailLines: [
+      {
+        id: 'submitted-answer',
+        text: 'Your answer: Lyon',
+      },
+      {
+        id: 'correct-answer',
+        text: 'Correct match: Paris',
+      },
+      {
+        id: 'accepted-answers',
+        text: 'Accepted answers: Paris, France',
+      },
+      {
+        id: 'explanation',
+        text: 'Why: Paris is the capital of France.',
+      },
+    ],
     explanation: 'Paris is the capital of France.',
     explanationLabel: 'Why',
     explanationText: 'Why: Paris is the capital of France.',
@@ -8391,6 +8409,20 @@ try {
     zhPublicAnswerFeedbackView?.submittedAnswerText,
     '你的答案：里昂'
   );
+  assert.deepEqual(zhPublicAnswerFeedbackView?.detailLines, [
+    {
+      id: 'submitted-answer',
+      text: '你的答案：里昂',
+    },
+    {
+      id: 'correct-answer',
+      text: '正确答案：Paris',
+    },
+    {
+      id: 'accepted-answers',
+      text: '可接受答案：Paris, France',
+    },
+  ]);
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -8411,6 +8443,16 @@ assert.deepEqual(
     correctAnswer: 'Mitochondria',
     correctAnswerLabel: 'Correct answer',
     correctAnswerText: 'Correct answer: Mitochondria',
+    detailLines: [
+      {
+        id: 'submitted-answer',
+        text: 'Your answer: Mitochondria',
+      },
+      {
+        id: 'correct-answer',
+        text: 'Correct answer: Mitochondria',
+      },
+    ],
     explanation: null,
     explanationLabel: 'Why',
     explanationText: null,
@@ -8452,6 +8494,20 @@ assert.deepEqual(
     correctAnswer: 'Cold',
     correctAnswerLabel: 'Correct answer',
     correctAnswerText: 'Correct answer: Cold',
+    detailLines: [
+      {
+        id: 'submitted-answer',
+        text: 'Your answer: Unanswered',
+      },
+      {
+        id: 'correct-answer',
+        text: 'Correct answer: Cold',
+      },
+      {
+        id: 'explanation',
+        text: 'Why: Hot pairs with cold.',
+      },
+    ],
     explanation: 'Hot pairs with cold.',
     explanationLabel: 'Why',
     explanationText: 'Why: Hot pairs with cold.',
