@@ -482,6 +482,7 @@ import {
   PRINTABLE_WORKSHEET_BODY_PRINT_MODE,
   buildPrintableWorksheetAnswerKeyItemView,
   buildPrintableWorksheetErrorView,
+  buildPrintableWorksheetHeaderOverviewItems,
   buildPrintableWorksheetItemView,
   buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
@@ -12661,6 +12662,14 @@ assert.equal(
 );
 assert.equal(printableSnapshotWorksheet.includeAnswerKey, false);
 assert.equal(printableSnapshotWorksheet.answerKey, undefined);
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(printableSnapshotWorksheet),
+  [
+    { id: 'items', label: '1 item' },
+    { id: 'response-modes', label: 'Multiple choice practice' },
+    { id: 'answer-key', label: 'Answer key hidden' },
+  ]
+);
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: true }), {
   answerKey: true,
 });
@@ -12828,6 +12837,14 @@ assert.deepEqual(messyPrintableWorksheet.answerKey?.[0], {
   prompt: 'Capital of France?',
   sequenceNumber: 1,
 });
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(messyPrintableWorksheet),
+  [
+    { id: 'items', label: '1 item' },
+    { id: 'response-modes', label: 'Multiple choice practice' },
+    { id: 'answer-key', label: 'Answer key included' },
+  ]
+);
 const printableShortAnswerWorksheet = buildPrintableAssignmentWorksheet({
   activity: {
     description: 'Short answer printable activity',
@@ -12862,6 +12879,14 @@ assert.deepEqual(printableShortAnswerWorksheet.items[0], {
   responseMode: 'short-answer',
   sequenceNumber: 1,
 });
+assert.deepEqual(
+  buildPrintableWorksheetHeaderOverviewItems(printableShortAnswerWorksheet),
+  [
+    { id: 'items', label: '1 item' },
+    { id: 'response-modes', label: 'Written answer practice' },
+    { id: 'answer-key', label: 'Answer key hidden' },
+  ]
+);
 const printableSnapshotItemView = buildPrintableWorksheetItemView(
   printableSnapshotWorksheet.items[0]!
 );
@@ -13089,6 +13114,27 @@ try {
       key: 'zh-printable-item-choice-1',
     },
   ]);
+  assert.deepEqual(
+    buildPrintableWorksheetHeaderOverviewItems({
+      ...printableShortAnswerWorksheet,
+      items: [
+        {
+          ...printableShortAnswerWorksheet.items[0]!,
+          responseMode: 'short-answer',
+        },
+        {
+          ...printableShortAnswerWorksheet.items[0]!,
+          id: 'zh-printable-group',
+          responseMode: 'group-choice',
+        },
+      ],
+    }),
+    [
+      { id: 'items', label: '2 道题' },
+      { id: 'response-modes', label: '2 种作答方式' },
+      { id: 'answer-key', label: '未包含答案页' },
+    ]
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -13312,6 +13358,11 @@ assert.deepEqual(
       brandLabel: 'ClassGamify worksheet',
       deliveryPolicy: printableSnapshotWorksheetWithAnswers.deliveryPolicyText,
       instructions: 'Finish on paper.',
+      overviewItems: [
+        { id: 'items', label: '1 item' },
+        { id: 'response-modes', label: 'Multiple choice practice' },
+        { id: 'answer-key', label: 'Answer key included' },
+      ],
       printModeLabel: 'Printable practice',
       sharePath: '/play/printable-1',
       sharePathLabel: 'Student link',
@@ -18844,6 +18895,16 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /overviewItems: buildPrintableWorksheetHeaderOverviewItems\(worksheet\)/,
+  'Printable worksheet header views should expose prepared worksheet overview metadata.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /export function buildPrintableWorksheetHeaderOverviewItems[\s\S]*assignment_printable_overview_answer_key_[\s\S]*function formatPrintableWorksheetOverviewItemCount[\s\S]*assignment_printable_overview_items_[\s\S]*function formatPrintableWorksheetOverviewResponseModes[\s\S]*assignment_printable_overview_response_mode_single/,
+  'Printable worksheet header overview should localize item count, response-mode, and answer-key status.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /buildPrintableWorksheetPageViewModel[\s\S]*worksheet\.items\.map\(buildPrintableWorksheetItemView\)/,
   'Printable worksheet page view-model should own formatted printable item views.'
 );
@@ -18914,6 +18975,16 @@ assert.match(
   printableWorksheetAnswerKeySource,
   /itemView\.headingLabel/,
   'Printable worksheet answer-key component should render the prepared item heading from the domain view.'
+);
+assert.match(
+  printableWorksheetHeaderSource,
+  /headerView\.overviewItems\.map[\s\S]*overviewItem\.label/,
+  'Printable worksheet header component should render prepared overview labels from the domain view.'
+);
+assert.doesNotMatch(
+  printableWorksheetHeaderSource,
+  /items\.length|answerKey|responseMode/,
+  'Printable worksheet header component should not derive worksheet overview metadata locally.'
 );
 assert.match(
   printableAssignmentRouteSource,

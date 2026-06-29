@@ -26,6 +26,11 @@ type PrintableWorksheetHeaderView = ReturnType<
   typeof buildPrintableWorksheetHeaderView
 >;
 
+type PrintableWorksheetHeaderOverviewItem = {
+  id: 'answer-key' | 'items' | 'response-modes';
+  label: string;
+};
+
 type PrintableWorksheetItemView = ReturnType<
   typeof buildPrintableWorksheetItemView
 >;
@@ -177,11 +182,33 @@ export function buildPrintableWorksheetHeaderView(
     deliveryPolicy: worksheet.deliveryPolicyText,
     instructions:
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
+    overviewItems: buildPrintableWorksheetHeaderOverviewItems(worksheet),
     printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
     sharePathLabel: printableWorksheetPageCopy.sharePathLabel,
     templateLabel: getTemplateByType(worksheet.templateType).name,
   };
+}
+
+export function buildPrintableWorksheetHeaderOverviewItems(
+  worksheet: PrintableAssignmentWorksheet
+): PrintableWorksheetHeaderOverviewItem[] {
+  return [
+    {
+      id: 'items',
+      label: formatPrintableWorksheetOverviewItemCount(worksheet.items.length),
+    },
+    {
+      id: 'response-modes',
+      label: formatPrintableWorksheetOverviewResponseModes(worksheet.items),
+    },
+    {
+      id: 'answer-key',
+      label: worksheet.includeAnswerKey
+        ? m.assignment_printable_overview_answer_key_included()
+        : m.assignment_printable_overview_answer_key_hidden(),
+    },
+  ];
 }
 
 export function buildPrintableWorksheetPageViewModel({
@@ -545,6 +572,57 @@ function formatPrintableWorksheetAnswerLineSummary(count: number) {
   return m.assignment_printable_answer_line_summary_many({
     count: normalizedCount,
   });
+}
+
+function formatPrintableWorksheetOverviewItemCount(count: number) {
+  const normalizedCount = normalizeRuntimeDisplayCount(count, { min: 0 });
+
+  if (normalizedCount === 1) {
+    return m.assignment_printable_overview_items_one({
+      count: normalizedCount,
+    });
+  }
+
+  return m.assignment_printable_overview_items_many({
+    count: normalizedCount,
+  });
+}
+
+function formatPrintableWorksheetOverviewResponseModes(
+  items: PrintableWorksheetItem[]
+) {
+  const responseModes = Array.from(
+    new Set(items.map((item) => item.responseMode))
+  );
+
+  if (responseModes.length === 1) {
+    return m.assignment_printable_overview_response_mode_single({
+      mode: formatPrintableWorksheetOverviewResponseModeLabel(
+        responseModes[0]!
+      ),
+    });
+  }
+
+  return m.assignment_printable_overview_response_modes_many({
+    count: normalizeRuntimeDisplayCount(responseModes.length, { min: 0 }),
+  });
+}
+
+function formatPrintableWorksheetOverviewResponseModeLabel(
+  responseMode: PrintableWorksheetResponseMode
+) {
+  switch (responseMode) {
+    case 'choice':
+      return m.assignment_printable_overview_response_choice();
+    case 'group-choice':
+      return m.assignment_printable_overview_response_group_choice();
+    case 'line-match':
+      return m.assignment_printable_overview_response_line_match();
+    case 'matching-pairs':
+      return m.assignment_printable_overview_response_matching_pairs();
+    case 'short-answer':
+      return m.assignment_printable_overview_response_short_answer();
+  }
 }
 
 function formatPrintableWorksheetChoiceBankSummary({

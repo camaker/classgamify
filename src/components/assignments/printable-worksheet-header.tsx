@@ -30,6 +30,17 @@ export function PrintableWorksheetHeader({
         <h1 className="mt-3 text-2xl font-semibold leading-tight">
           {headerView.assignmentTitle}
         </h1>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {headerView.overviewItems.map((overviewItem) => (
+            <Badge
+              key={overviewItem.id}
+              variant="outline"
+              className="rounded-md"
+            >
+              {overviewItem.label}
+            </Badge>
+          ))}
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">
           {headerView.activityTitle}
         </p>
