@@ -789,8 +789,10 @@ import {
   buildStudentRunnerAnonymousTokenPlan,
   buildStudentRunnerAnswerUpdatePlan,
   buildStudentRunnerAttemptClock,
+  buildStudentRunnerAttemptClockStartPlan,
   buildStudentRunnerAttemptRestartPlan,
   buildStudentRunnerAttemptResetState,
+  buildStudentRunnerAttemptSessionResetPlan,
   buildStudentRunnerAnswerState,
   buildStudentRunnerAttemptState,
   buildStudentRunnerPageState,
@@ -801,6 +803,8 @@ import {
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
+  buildStudentRunnerSubmissionSuccessState,
+  buildStudentRunnerTimerTickPlan,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
   shouldStartStudentRunnerAttemptClock,
@@ -6748,9 +6752,14 @@ assert.doesNotMatch(
   'Student play route should not hand-build share paths in route metadata.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerTimerTickPlan[\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS\.millisecondsPerSecond/,
+  'Student runner timer tick plan should reuse the assignment duration unit contract.'
+);
+assert.match(
   playRouteSource,
-  /window\.setInterval\([\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS\.millisecondsPerSecond/,
-  'Student play route timer refresh should reuse the assignment duration unit contract.'
+  /window\.setInterval\([\s\S]*tickPlan\.intervalMs/,
+  'Student play route timer refresh should consume the prepared runner tick interval.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -6851,6 +6860,26 @@ assert.match(
   playRouteSource,
   /buildStudentRunnerAttemptRestartPlan/,
   'Student play route should restart attempts through the assignment-domain restart plan.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerTimerTickPlan\(\{[\s\S]*hasResult: Boolean\(result\),[\s\S]*timeLimitSeconds/,
+  'Student play route should resolve timed-attempt ticking through the runner timer tick plan.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerAttemptSessionResetPlan\(\{[\s\S]*attemptSessionKey,[\s\S]*currentAttemptSessionKey/,
+  'Student play route should resolve assignment-session resets through the runner session reset plan.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerAttemptClockStartPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*hasResult: Boolean\(result\),[\s\S]*itemCount,[\s\S]*ready: Boolean\(assignment\)/,
+  'Student play route should resolve attempt-clock starts through a route-ready runner clock start plan.'
+);
+assert.match(
+  playRouteSource,
+  /buildStudentRunnerSubmissionSuccessState\(\{[\s\S]*executionPlan,[\s\S]*response/,
+  'Student play route should apply submitted-attempt success state through the runner success-state plan.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -7023,13 +7052,13 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /shouldStartStudentRunnerAttemptClock\(/,
-  'Student play route should start attempt clocks through assignment-domain helpers.'
+  /buildStudentRunnerAttemptClockStartPlan\(/,
+  'Student play route should start attempt clocks through assignment-domain start plans.'
 );
 assert.doesNotMatch(
   playRouteSource,
-  /attemptClock\?\.shareId === activeShareId\s*\?\s*attemptClock\.startedAt\s*:\s*now/,
-  'Student play route should not keep local attempt-clock share-id math.'
+  /attemptClock\?\.shareId === activeShareId\s*\?\s*attemptClock\.startedAt\s*:\s*now|shouldStartStudentRunnerAttemptClock\(|buildStudentRunnerAttemptClock\(/,
+  'Student play route should not keep local attempt-clock share-id math or low-level clock start checks.'
 );
 assert.match(
   playRouteSource,
@@ -7108,13 +7137,13 @@ assert.doesNotMatch(
 );
 assert.match(
   playRouteSource,
-  /setResult\(buildStudentRunnerSubmissionResultState\(\{ response \}\)\)/,
-  'Student play route should convert submission responses through the runner state domain.'
+  /setResult\(successState\.result\)/,
+  'Student play route should apply submitted result state from the runner success-state plan.'
 );
 assert.doesNotMatch(
   playRouteSource,
-  /setResult\(\{[\s\S]*response\.result[\s\S]*response\.attemptUsage[\s\S]*response\.reviewItems/,
-  'Student play route should not inline the submitted result-state shape.'
+  /setResult\(\{[\s\S]*response\.result[\s\S]*response\.attemptUsage[\s\S]*response\.reviewItems|buildStudentRunnerSubmissionResultState\(\{ response \}\)|response\.attemptUsage\.usedAttempts|executionPlan\.successMessage/,
+  'Student play route should not inline submitted result-state, attempt-count, or success-message details.'
 );
 assert.match(
   playRouteSource,
@@ -7207,9 +7236,14 @@ assert.doesNotMatch(
   'Matching-pairs should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerAttemptSessionResetPlan[\s\S]*buildStudentRunnerAttemptResetState\(\)/,
+  'Student runner session reset plan should reuse the shared attempt reset state helper.'
+);
+assert.doesNotMatch(
   playRouteSource,
   /buildStudentRunnerAttemptResetState\(\)/,
-  'Student play route should use the shared attempt reset state helper.'
+  'Student play route should not call the low-level attempt reset state helper directly.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -15086,6 +15120,30 @@ assert.equal(
   }),
   false
 );
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    hasResult: false,
+    timeLimitSeconds: 90,
+  }),
+  {
+    intervalMs: 1000,
+    type: 'tick',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    hasResult: true,
+    timeLimitSeconds: 90,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    hasResult: false,
+    timeLimitSeconds: undefined,
+  }),
+  { type: 'skip' }
+);
 assert.deepEqual(buildStudentRunnerAttemptResetState(), {
   answers: {},
   anonymousToken: undefined,
@@ -15094,40 +15152,100 @@ assert.deepEqual(buildStudentRunnerAttemptResetState(), {
   studentName: '',
   submittedAttemptCount: 0,
 });
+assert.deepEqual(
+  buildStudentRunnerAttemptSessionResetPlan({
+    attemptSessionKey: 'session-old',
+    currentAttemptSessionKey: 'session-new',
+  }),
+  {
+    answers: {},
+    anonymousToken: undefined,
+    attemptClock: undefined,
+    confirmIncompleteSubmit: false,
+    nextAttemptSessionKey: 'session-new',
+    result: undefined,
+    studentName: '',
+    submittedAttemptCount: 0,
+    type: 'reset',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptSessionResetPlan({
+    attemptSessionKey: 'session-one',
+    currentAttemptSessionKey: 'session-one',
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptClockStartPlan({
+    activeShareId: ' share-public ',
+    attemptClock: undefined,
+    hasResult: false,
+    itemCount: 2,
+    now: 54_321,
+    ready: true,
+  }),
+  {
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 54_321,
+    },
+    now: 54_321,
+    type: 'start',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerAttemptClockStartPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: ' share-public ',
+      startedAt: 1_000,
+    },
+    hasResult: false,
+    itemCount: 2,
+    now: 54_321,
+    ready: true,
+  }),
+  { type: 'skip' }
+);
 assert.deepEqual(buildStudentRunnerAttemptRestartPlan({ now: 98_765 }), {
   answers: {},
   attemptClock: undefined,
   confirmIncompleteSubmit: false,
+  result: undefined,
   startedAt: 98_765,
 });
+const studentRunnerSubmissionResponse = {
+  attemptUsage: {
+    maxAttempts: 3,
+    remainingAttempts: 2,
+    usedAttempts: 1,
+  },
+  result: {
+    accuracy: 50,
+    completedItemCount: 1,
+    correctItemCount: 1,
+    durationSeconds: 25,
+    earnedPoints: 1,
+    totalPoints: 2,
+  },
+  reviewItems: [
+    {
+      acceptedAnswers: ['Paris'],
+      correct: true,
+      correctAnswer: 'Paris',
+      explanation: 'Capital city',
+      itemId: 'capital-france',
+      submitted: true,
+      submittedAnswer: 'Paris',
+    },
+  ],
+} satisfies Parameters<
+  typeof buildStudentRunnerSubmissionResultState
+>[0]['response'];
 assert.deepEqual(
   buildStudentRunnerSubmissionResultState({
-    response: {
-      attemptUsage: {
-        maxAttempts: 3,
-        remainingAttempts: 2,
-        usedAttempts: 1,
-      },
-      result: {
-        accuracy: 50,
-        completedItemCount: 1,
-        correctItemCount: 1,
-        durationSeconds: 25,
-        earnedPoints: 1,
-        totalPoints: 2,
-      },
-      reviewItems: [
-        {
-          acceptedAnswers: ['Paris'],
-          correct: true,
-          correctAnswer: 'Paris',
-          explanation: 'Capital city',
-          itemId: 'capital-france',
-          submitted: true,
-          submittedAnswer: 'Paris',
-        },
-      ],
-    },
+    response: studentRunnerSubmissionResponse,
   }),
   {
     accuracy: 50,
@@ -15152,6 +15270,38 @@ assert.deepEqual(
       },
     ],
     totalPoints: 2,
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerSubmissionSuccessState({
+    executionPlan: {
+      anonymousToken: 'browser-token-1',
+      input: {
+        anonymousToken: 'browser-token-1',
+        answers: [
+          {
+            answer: 'Paris',
+            itemId: 'capital-france',
+          },
+        ],
+        durationSeconds: 25,
+        shareSlug: 'share-public',
+      },
+      reason: 'complete',
+      submittedStudentName: 'Ada Lovelace',
+      successMessage: 'Attempt submitted.',
+      type: 'submit',
+    },
+    response: studentRunnerSubmissionResponse,
+  }),
+  {
+    anonymousToken: 'browser-token-1',
+    result: buildStudentRunnerSubmissionResultState({
+      response: studentRunnerSubmissionResponse,
+    }),
+    submittedAttemptCount: 1,
+    submittedStudentName: 'Ada Lovelace',
+    successMessage: 'Attempt submitted.',
   }
 );
 assert.deepEqual(

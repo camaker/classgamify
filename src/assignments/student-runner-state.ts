@@ -1,7 +1,10 @@
 import type { ActivitySeed, AssignmentSeed } from '@/activities/types';
 import type { RuntimeItem } from '@/activities/runtime';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
-import { buildAttemptTimerState } from '@/assignments/attempt-duration';
+import {
+  ASSIGNMENT_ATTEMPT_DURATION_UNITS,
+  buildAttemptTimerState,
+} from '@/assignments/attempt-duration';
 import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
 import {
   buildAnonymousAttemptCopy,
@@ -68,7 +71,7 @@ type StudentRunnerAttemptState = {
   runtimeItems: PublicRuntimeItem[];
 };
 
-type StudentRunnerAttemptResult = PublicAttemptResult & {
+export type StudentRunnerAttemptResult = PublicAttemptResult & {
   attemptUsage: AssignmentAttemptUsage;
   reviewItems: PublicAttemptReviewItem[];
 };
@@ -212,6 +215,7 @@ export type StudentRunnerAttemptRestartPlan = Pick<
   StudentRunnerAttemptResetState,
   'answers' | 'attemptClock' | 'confirmIncompleteSubmit'
 > & {
+  result: undefined;
   startedAt: number;
 };
 
@@ -219,6 +223,35 @@ export type StudentRunnerAttemptClock = {
   shareId: string;
   startedAt: number;
 };
+
+export type StudentRunnerTimerTickPlan =
+  | {
+      intervalMs: number;
+      type: 'tick';
+    }
+  | {
+      type: 'skip';
+    };
+
+export type StudentRunnerAttemptSessionResetPlan =
+  | {
+      type: 'skip';
+    }
+  | (StudentRunnerAttemptResetState & {
+      nextAttemptSessionKey: string;
+      result: undefined;
+      type: 'reset';
+    });
+
+export type StudentRunnerAttemptClockStartPlan =
+  | {
+      attemptClock: StudentRunnerAttemptClock;
+      now: number;
+      type: 'start';
+    }
+  | {
+      type: 'skip';
+    };
 
 export type StudentRunnerAttemptSubmissionResponse = {
   attemptUsage: AssignmentAttemptUsage;
@@ -277,6 +310,14 @@ export type StudentRunnerSubmissionExecutionPlan =
       successMessage: string;
       type: 'submit';
     };
+
+export type StudentRunnerSubmissionSuccessState = {
+  anonymousToken: string | undefined;
+  result: StudentRunnerAttemptResult;
+  submittedAttemptCount: number;
+  submittedStudentName?: string;
+  successMessage: string;
+};
 
 export function buildStudentRunnerSeoView(): StudentRunnerSeoView {
   const runnerCopy = getStudentRunnerCopy();
@@ -737,6 +778,21 @@ export function buildStudentRunnerAttemptClock({
   };
 }
 
+export function buildStudentRunnerTimerTickPlan({
+  hasResult,
+  timeLimitSeconds,
+}: {
+  hasResult: boolean;
+  timeLimitSeconds?: number;
+}): StudentRunnerTimerTickPlan {
+  if (hasResult || !timeLimitSeconds) return { type: 'skip' };
+
+  return {
+    intervalMs: ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond,
+    type: 'tick',
+  };
+}
+
 export function buildStudentRunnerAttemptResetState(): StudentRunnerAttemptResetState {
   return {
     answers: {},
@@ -745,6 +801,32 @@ export function buildStudentRunnerAttemptResetState(): StudentRunnerAttemptReset
     confirmIncompleteSubmit: false,
     studentName: '',
     submittedAttemptCount: 0,
+  };
+}
+
+export function buildStudentRunnerAttemptSessionResetPlan({
+  attemptSessionKey,
+  currentAttemptSessionKey,
+}: {
+  attemptSessionKey?: string;
+  currentAttemptSessionKey?: string;
+}): StudentRunnerAttemptSessionResetPlan {
+  if (!currentAttemptSessionKey) return { type: 'skip' };
+
+  if (
+    !shouldResetStudentRunnerAttemptSession({
+      attemptSessionKey,
+      currentAttemptSessionKey,
+    })
+  ) {
+    return { type: 'skip' };
+  }
+
+  return {
+    ...buildStudentRunnerAttemptResetState(),
+    nextAttemptSessionKey: currentAttemptSessionKey,
+    result: undefined,
+    type: 'reset',
   };
 }
 
@@ -759,7 +841,45 @@ export function buildStudentRunnerAttemptRestartPlan({
     answers: resetState.answers,
     attemptClock: resetState.attemptClock,
     confirmIncompleteSubmit: resetState.confirmIncompleteSubmit,
+    result: undefined,
     startedAt: now,
+  };
+}
+
+export function buildStudentRunnerAttemptClockStartPlan({
+  activeShareId,
+  attemptClock,
+  hasResult,
+  itemCount,
+  now,
+  ready,
+}: {
+  activeShareId: string;
+  attemptClock?: StudentRunnerAttemptClock;
+  hasResult: boolean;
+  itemCount: number;
+  now: number;
+  ready: boolean;
+}): StudentRunnerAttemptClockStartPlan {
+  if (
+    !shouldStartStudentRunnerAttemptClock({
+      activeShareId,
+      attemptClock,
+      hasResult,
+      itemCount,
+      ready,
+    })
+  ) {
+    return { type: 'skip' };
+  }
+
+  return {
+    attemptClock: buildStudentRunnerAttemptClock({
+      activeShareId,
+      now,
+    }),
+    now,
+    type: 'start',
   };
 }
 
@@ -772,6 +892,27 @@ export function buildStudentRunnerSubmissionResultState({
     ...response.result,
     attemptUsage: response.attemptUsage,
     reviewItems: response.reviewItems,
+  };
+}
+
+export function buildStudentRunnerSubmissionSuccessState({
+  executionPlan,
+  response,
+}: {
+  executionPlan: Extract<
+    StudentRunnerSubmissionExecutionPlan,
+    { type: 'submit' }
+  >;
+  response: StudentRunnerAttemptSubmissionResponse;
+}): StudentRunnerSubmissionSuccessState {
+  return {
+    anonymousToken: executionPlan.anonymousToken,
+    result: buildStudentRunnerSubmissionResultState({ response }),
+    submittedAttemptCount: response.attemptUsage.usedAttempts,
+    ...(executionPlan.submittedStudentName
+      ? { submittedStudentName: executionPlan.submittedStudentName }
+      : {}),
+    successMessage: executionPlan.successMessage,
   };
 }
 

@@ -1,6 +1,5 @@
 import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getRuntimeItems } from '@/activities/runtime';
-import { ASSIGNMENT_ATTEMPT_DURATION_UNITS } from '@/assignments/attempt-duration';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import {
@@ -10,17 +9,17 @@ import {
 import {
   buildStudentRunnerAnonymousTokenPlan,
   buildStudentRunnerAnswerUpdatePlan,
-  buildStudentRunnerAttemptClock,
+  buildStudentRunnerAttemptClockStartPlan,
   buildStudentRunnerAttemptRestartPlan,
-  buildStudentRunnerAttemptResetState,
+  buildStudentRunnerAttemptSessionResetPlan,
   buildStudentRunnerPageState,
   buildStudentRunnerPageViewModel,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
   buildStudentRunnerSubmissionExecutionPlan,
-  buildStudentRunnerSubmissionResultState,
-  shouldStartStudentRunnerAttemptClock,
-  shouldResetStudentRunnerAttemptSession,
+  buildStudentRunnerSubmissionSuccessState,
+  buildStudentRunnerTimerTickPlan,
+  type StudentRunnerAttemptResult,
   type StudentRunnerAttemptClock,
 } from '@/assignments/student-runner-state';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
@@ -60,7 +59,7 @@ function PlayPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [studentName, setStudentName] = useState('');
   const [attemptClock, setAttemptClock] = useState<StudentRunnerAttemptClock>();
-  const [result, setResult] = useState<AttemptSubmissionResult>();
+  const [result, setResult] = useState<StudentRunnerAttemptResult>();
   const [submittedAttemptCount, setSubmittedAttemptCount] = useState(0);
   const [confirmIncompleteSubmit, setConfirmIncompleteSubmit] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -133,57 +132,49 @@ function PlayPage() {
   );
 
   useEffect(() => {
-    if (result || !timeLimitSeconds) return;
+    const tickPlan = buildStudentRunnerTimerTickPlan({
+      hasResult: Boolean(result),
+      timeLimitSeconds,
+    });
+    if (tickPlan.type === 'skip') return;
 
     const timer = window.setInterval(() => {
       setNow(Date.now());
-    }, ASSIGNMENT_ATTEMPT_DURATION_UNITS.millisecondsPerSecond);
+    }, tickPlan.intervalMs);
 
     return () => window.clearInterval(timer);
   }, [result, timeLimitSeconds]);
 
   useEffect(() => {
-    if (
-      !shouldResetStudentRunnerAttemptSession({
-        attemptSessionKey,
-        currentAttemptSessionKey,
-      })
-    ) {
-      return;
-    }
+    const resetPlan = buildStudentRunnerAttemptSessionResetPlan({
+      attemptSessionKey,
+      currentAttemptSessionKey,
+    });
+    if (resetPlan.type === 'skip') return;
 
-    const nextResetState = buildStudentRunnerAttemptResetState();
-    setAnswers(nextResetState.answers);
-    setResult(undefined);
-    setConfirmIncompleteSubmit(nextResetState.confirmIncompleteSubmit);
-    setStudentName(nextResetState.studentName);
-    setAttemptClock(nextResetState.attemptClock);
-    setSubmittedAttemptCount(nextResetState.submittedAttemptCount);
-    setAnonymousToken(nextResetState.anonymousToken);
-    setAttemptSessionKey(currentAttemptSessionKey);
+    setAnswers(resetPlan.answers);
+    setResult(resetPlan.result);
+    setConfirmIncompleteSubmit(resetPlan.confirmIncompleteSubmit);
+    setStudentName(resetPlan.studentName);
+    setAttemptClock(resetPlan.attemptClock);
+    setSubmittedAttemptCount(resetPlan.submittedAttemptCount);
+    setAnonymousToken(resetPlan.anonymousToken);
+    setAttemptSessionKey(resetPlan.nextAttemptSessionKey);
   }, [attemptSessionKey, currentAttemptSessionKey]);
 
   useEffect(() => {
-    if (
-      !shouldStartStudentRunnerAttemptClock({
-        activeShareId,
-        attemptClock,
-        hasResult: Boolean(result),
-        itemCount,
-        ready: Boolean(assignment),
-      })
-    ) {
-      return;
-    }
+    const startPlan = buildStudentRunnerAttemptClockStartPlan({
+      activeShareId,
+      attemptClock,
+      hasResult: Boolean(result),
+      itemCount,
+      now: Date.now(),
+      ready: Boolean(assignment),
+    });
+    if (startPlan.type === 'skip') return;
 
-    const nextStartedAt = Date.now();
-    setAttemptClock(
-      buildStudentRunnerAttemptClock({
-        activeShareId,
-        now: nextStartedAt,
-      })
-    );
-    setNow(nextStartedAt);
+    setAttemptClock(startPlan.attemptClock);
+    setNow(startPlan.now);
   }, [activeShareId, assignment, attemptClock?.shareId, itemCount, result]);
 
   useEffect(() => {
@@ -225,13 +216,17 @@ function PlayPage() {
       const response = await submitAttemptMutation.mutateAsync(
         executionPlan.input
       );
-      setAnonymousToken(executionPlan.anonymousToken);
-      if (executionPlan.submittedStudentName) {
-        setStudentName(executionPlan.submittedStudentName);
+      const successState = buildStudentRunnerSubmissionSuccessState({
+        executionPlan,
+        response,
+      });
+      setAnonymousToken(successState.anonymousToken);
+      if (successState.submittedStudentName) {
+        setStudentName(successState.submittedStudentName);
       }
-      setResult(buildStudentRunnerSubmissionResultState({ response }));
-      setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
-      toast.success(executionPlan.successMessage);
+      setResult(successState.result);
+      setSubmittedAttemptCount(successState.submittedAttemptCount);
+      toast.success(successState.successMessage);
     } catch (error) {
       toast.error(resolveStudentAttemptSubmissionFailureMessage(error));
     }
@@ -241,7 +236,7 @@ function PlayPage() {
     const restartPlan = buildStudentRunnerAttemptRestartPlan({
       now: Date.now(),
     });
-    setResult(undefined);
+    setResult(restartPlan.result);
     setConfirmIncompleteSubmit(restartPlan.confirmIncompleteSubmit);
     setAnswers(restartPlan.answers);
     setAttemptClock(restartPlan.attemptClock);
@@ -326,7 +321,3 @@ function PlayPage() {
     </Container>
   );
 }
-
-type AttemptSubmissionResult = ReturnType<
-  typeof buildStudentRunnerSubmissionResultState
->;
