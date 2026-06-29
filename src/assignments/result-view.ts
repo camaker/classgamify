@@ -70,8 +70,9 @@ import {
   type StudentSummarySort,
 } from '@/assignments/result-filters';
 import {
-  assignmentShareLinkActionCopy,
+  type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkActionView,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
@@ -425,16 +426,7 @@ type AssignmentResultHeaderSource = {
   } | null;
 };
 
-export type AssignmentResultHeaderShareAction = {
-  copyLabel: string;
-  disabledReason: string | undefined;
-  isAvailable: boolean;
-  label: string;
-  sharePath: string;
-  sharePathLabel: string;
-  shareSlug: string;
-  to: typeof Routes.Play;
-};
+export type AssignmentResultHeaderShareAction = AssignmentShareLinkActionView;
 
 export type AssignmentResultHeaderPrintAction = {
   assignmentId: string;
@@ -980,8 +972,7 @@ export function buildAssignmentResultHeaderShareAction({
     status,
   });
 
-  return {
-    copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
+  return buildAssignmentShareLinkActionView({
     disabledReason: shareAvailability.isAvailable
       ? undefined
       : getAssignmentResultHeaderShareDisabledReason(
@@ -992,10 +983,8 @@ export function buildAssignmentResultHeaderShareAction({
       ? assignmentResultPageCopy.openStudentLinkLabel
       : assignmentResultPageCopy.studentLinkUnavailableLabel,
     sharePath: shareAvailability.sharePath,
-    sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
     shareSlug: shareAvailability.shareSlug,
-    to: Routes.Play,
-  };
+  });
 }
 
 function getAssignmentResultHeaderShareDisabledReason(

@@ -52,8 +52,9 @@ import {
   formatAssignmentResultPercent,
 } from '@/assignments/result-format';
 import {
-  assignmentShareLinkActionCopy,
+  type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkActionView,
   type AssignmentShareLinkAvailability,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
@@ -105,16 +106,7 @@ export type AssignmentListResultAction = {
   to: typeof Routes.DashboardAssignmentResults;
 };
 
-export type AssignmentListShareAction = {
-  copyLabel: string;
-  disabledReason?: string;
-  isAvailable: boolean;
-  label: string;
-  sharePath: string;
-  sharePathLabel: string;
-  shareSlug: string;
-  to: typeof Routes.Play;
-};
+export type AssignmentListShareAction = AssignmentShareLinkActionView;
 
 export type AssignmentListStatusAction = AssignmentStatusAction;
 
@@ -848,18 +840,13 @@ export function buildAssignmentListCardActionView({
         }
       : undefined,
     shareAction: actionState.showShareActions
-      ? {
-          copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
-          ...(actionState.shareDisabledReason
-            ? { disabledReason: actionState.shareDisabledReason }
-            : {}),
+      ? buildAssignmentShareLinkActionView({
+          disabledReason: actionState.shareDisabledReason,
           isAvailable: !actionState.shareDisabledReason,
           label: actionState.shareLabel,
           sharePath: actionState.shareAvailability.sharePath,
-          sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
           shareSlug: actionState.shareAvailability.shareSlug,
-          to: Routes.Play,
-        }
+        })
       : undefined,
     statusAction: actionState.statusAction,
   };

@@ -1,5 +1,8 @@
 import { STARTER_FOOD_ASSIGNMENT_SHARE_ID } from '@/activities/starter-ids';
-import { buildAssignmentSharePath } from '@/assignments/share-link';
+import {
+  ASSIGNMENT_SHARE_ROUTE_TARGET,
+  buildAssignmentSharePath,
+} from '@/assignments/share-link';
 
 const STARTER_PLAY_PATH = buildAssignmentSharePath(
   STARTER_FOOD_ASSIGNMENT_SHARE_ID
@@ -13,7 +16,7 @@ export const Routes = {
   Create: '/create',
   Worksheets: '/worksheets',
   StudentPreview: STARTER_PLAY_PATH,
-  Play: '/play/$shareId',
+  Play: ASSIGNMENT_SHARE_ROUTE_TARGET,
   Resources: '/blog',
   DashboardActivities: '/dashboard/activities',
   DashboardActivityEdit: '/dashboard/activities/$activityId',

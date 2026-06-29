@@ -6,6 +6,8 @@ import {
 } from '@/assignments/lifecycle';
 import { m } from '@/locale/paraglide/messages';
 
+export const ASSIGNMENT_SHARE_ROUTE_TARGET = '/play/$shareId';
+
 export type AssignmentShareLinkAvailability = {
   isAvailable: boolean;
   lifecycleStatus: AssignmentLifecycleStatus;
@@ -17,6 +19,17 @@ export type AssignmentShareLinkAvailabilityState = Pick<
   AssignmentShareLinkAvailability,
   'isAvailable' | 'lifecycleStatus'
 >;
+
+export type AssignmentShareLinkActionView = {
+  copyLabel: string;
+  disabledReason?: string;
+  isAvailable: boolean;
+  label: string;
+  sharePath: string;
+  sharePathLabel: string;
+  shareSlug: string;
+  to: typeof ASSIGNMENT_SHARE_ROUTE_TARGET;
+};
 
 export const assignmentShareLinkActionCopy = {
   get copyLabel() {
@@ -108,6 +121,31 @@ export function buildAssignmentShareLinkAvailability({
     ...availabilityState,
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     shareSlug: normalizedShareSlug,
+  };
+}
+
+export function buildAssignmentShareLinkActionView({
+  disabledReason,
+  isAvailable = true,
+  label,
+  sharePath,
+  shareSlug,
+}: {
+  disabledReason?: string;
+  isAvailable?: boolean;
+  label: string;
+  sharePath: string;
+  shareSlug: string;
+}): AssignmentShareLinkActionView {
+  return {
+    copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
+    ...(disabledReason ? { disabledReason } : {}),
+    isAvailable,
+    label,
+    sharePath,
+    sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
+    shareSlug,
+    to: ASSIGNMENT_SHARE_ROUTE_TARGET,
   };
 }
 

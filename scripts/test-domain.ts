@@ -716,8 +716,10 @@ import {
   resolvePublishedAssignmentPanelAssignment,
 } from '@/assignments/published-assignment';
 import {
+  ASSIGNMENT_SHARE_ROUTE_TARGET,
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
+  buildAssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailabilityState,
   buildAssignmentShareLinkCopyExecutionPlan,
   buildAssignmentSharePath,
@@ -1674,8 +1676,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultHeaderShareAction[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
-  'Assignment result header share action should prepare the shared student-link copy label and path label for the component.'
+  /buildAssignmentResultHeaderShareAction[\s\S]*return buildAssignmentShareLinkActionView\(\{[\s\S]*label: shareAvailability\.isAvailable[\s\S]*sharePath: shareAvailability\.sharePath,[\s\S]*shareSlug: shareAvailability\.shareSlug/,
+  'Assignment result header share action should prepare student-link actions through the shared share-action view helper.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -4457,8 +4459,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /buildAssignmentResultHeaderShareAction[\s\S]*sharePath: shareAvailability\.sharePath[\s\S]*to: Routes\.Play/,
-  'Assignment result header share action should prepare the student-link route target.'
+  /export type AssignmentResultHeaderShareAction = AssignmentShareLinkActionView/,
+  'Assignment result header share action should reuse the shared student-link action contract.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -11466,6 +11468,42 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
   pathLabel: 'Student link',
   successMessage: 'Student link copied.',
 });
+assert.equal(ASSIGNMENT_SHARE_ROUTE_TARGET, Routes.Play);
+assert.deepEqual(
+  buildAssignmentShareLinkActionView({
+    label: 'Open student link',
+    sharePath: '/play/class%20123',
+    shareSlug: 'class 123',
+  }),
+  {
+    copyLabel: 'Copy student link',
+    isAvailable: true,
+    label: 'Open student link',
+    sharePath: '/play/class%20123',
+    sharePathLabel: 'Student link',
+    shareSlug: 'class 123',
+    to: Routes.Play,
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkActionView({
+    disabledReason: 'Publish this assignment before sharing a student link.',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/draft-share',
+    shareSlug: 'draft-share',
+  }),
+  {
+    copyLabel: 'Copy student link',
+    disabledReason: 'Publish this assignment before sharing a student link.',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/draft-share',
+    sharePathLabel: 'Student link',
+    shareSlug: 'draft-share',
+    to: Routes.Play,
+  }
+);
 assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
     baseUrl: 'https://classgamify.test',
@@ -12445,6 +12483,7 @@ assert.deepEqual(
       },
       shareAction: {
         copyLabel: 'Copy student link',
+        isAvailable: true,
         label: 'Open link',
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
@@ -12495,6 +12534,7 @@ assert.deepEqual(
       resultAction: undefined,
       shareAction: {
         copyLabel: 'Copy student link',
+        isAvailable: true,
         label: 'Open link',
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
@@ -12539,6 +12579,7 @@ assert.deepEqual(
       resultAction: undefined,
       shareAction: {
         copyLabel: 'Copy student link',
+        isAvailable: true,
         label: 'Open link',
         sharePath: '/play/missing',
         sharePathLabel: 'Student link',
@@ -19358,7 +19399,7 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListPrintAction = \{[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = \{[\s\S]*to: typeof Routes\.Play;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
+  /export type AssignmentListPrintAction = \{[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = AssignmentShareLinkActionView;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
   'Assignment list card actions should be exported as focused domain contracts.'
 );
 assert.doesNotMatch(
@@ -19528,8 +19569,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePath: actionState\.shareAvailability\.sharePath[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*to: Routes\.Play/,
-  'Assignment list card action view should render shared student-link copy, path labels, prepared paths, normalized slugs, and route targets from the domain layer.'
+  /buildAssignmentListCardActionView[\s\S]*buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReason: actionState\.shareDisabledReason,[\s\S]*label: actionState\.shareLabel,[\s\S]*sharePath: actionState\.shareAvailability\.sharePath,[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
+  'Assignment list card action view should render student-link actions through the shared share-action view helper.'
 );
 assert.match(
   assignmentListViewSource,
@@ -19620,8 +19661,8 @@ assert.match(
 );
 assert.match(
   publishedAssignmentSource,
-  /copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*to: Routes\.Play/,
-  'Published assignment panel action view should prepare shared student-link copy, path labels, and route targets.'
+  /export type PublishedAssignmentPanelShareAction = AssignmentShareLinkActionView[\s\S]*buildPublishedAssignmentPanelActionView[\s\S]*shareAction: buildAssignmentShareLinkActionView\(\{[\s\S]*label: m\.assignment_list_action_open_published_link\(\),[\s\S]*sharePath,[\s\S]*shareSlug/,
+  'Published assignment panel action view should reuse the shared student-link action contract and builder.'
 );
 assert.match(
   publishedAssignmentSource,
@@ -24167,6 +24208,7 @@ assert.deepEqual(
         },
         shareAction: {
           copyLabel: 'Copy student link',
+          isAvailable: true,
           label: 'Open link',
           sharePath: '/play/share-1',
           sharePathLabel: 'Student link',
@@ -33273,7 +33315,6 @@ assert.deepEqual(
     }),
     shareAction: {
       copyLabel: 'Copy student link',
-      disabledReason: undefined,
       isAvailable: true,
       label: 'Open student link',
       sharePath: '/play/share%20123',
@@ -33345,7 +33386,6 @@ assert.deepEqual(
   }),
   {
     copyLabel: 'Copy student link',
-    disabledReason: undefined,
     isAvailable: true,
     label: 'Open student link',
     sharePath: '/play/share%20two',

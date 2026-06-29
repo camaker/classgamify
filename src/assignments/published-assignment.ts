@@ -1,7 +1,8 @@
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import {
-  assignmentShareLinkActionCopy,
+  type AssignmentShareLinkActionView,
   buildAssignmentSharePath,
+  buildAssignmentShareLinkActionView,
 } from '@/assignments/share-link';
 import {
   isSameAssignmentShareSlug,
@@ -40,14 +41,7 @@ export type PublishedAssignmentPanelResultAction = {
   to: typeof Routes.DashboardAssignmentResults;
 };
 
-export type PublishedAssignmentPanelShareAction = {
-  copyLabel: string;
-  label: string;
-  sharePath: string;
-  sharePathLabel: string;
-  shareSlug: string;
-  to: typeof Routes.Play;
-};
+export type PublishedAssignmentPanelShareAction = AssignmentShareLinkActionView;
 
 export type PublishedAssignmentPanelActionView = {
   dismissAction: PublishedAssignmentPanelDismissAction | undefined;
@@ -225,14 +219,11 @@ function buildPublishedAssignmentPanelActionView({
           to: Routes.DashboardAssignmentResults,
         }
       : undefined,
-    shareAction: {
-      copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
+    shareAction: buildAssignmentShareLinkActionView({
       label: m.assignment_list_action_open_published_link(),
       sharePath,
-      sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
       shareSlug,
-      to: Routes.Play,
-    },
+    }),
   };
 }
 
