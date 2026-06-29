@@ -9227,7 +9227,7 @@ assert.deepEqual(
   }),
   {
     readOnlyMessage: undefined,
-    runtimeItemsDisabled: false,
+    runtimeItemsDisabled: true,
     showTimeExpiredMessage: false,
     submitButtonLabel: 'Submitting...',
     submitDisabled: true,
@@ -14272,6 +14272,7 @@ assert.equal(
   pendingSubmitStudentRunnerPageView.controlView.submitButtonLabel,
   'Submitting...'
 );
+assert.equal(pendingSubmitStudentRunnerPageView.runtimeListView.disabled, true);
 assert.deepEqual(
   buildStudentRunnerSubmissionExecutionPlan({
     anonymousToken: ' browser-token-1 ',

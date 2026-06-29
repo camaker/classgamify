@@ -430,7 +430,7 @@ export function buildStudentAttemptControlState({
     readOnlyMessage: canSubmit
       ? undefined
       : STUDENT_RUNNER_COPY.readOnlyPreviewMessage,
-    runtimeItemsDisabled: hasResult || timeExpired,
+    runtimeItemsDisabled: hasResult || timeExpired || showSubmittingLabel,
     showTimeExpiredMessage: timeExpired && !hasResult,
     ...(showSubmittingLabel
       ? { submitButtonLabel: STUDENT_RUNNER_COPY.submissionPendingLabel }
