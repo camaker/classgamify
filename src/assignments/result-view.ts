@@ -210,6 +210,11 @@ type AssignmentResultContentState = {
   hasStudentSummaryRows: boolean;
 };
 
+type AssignmentResultTableView<TRow> = {
+  headers: string[];
+  rows: TRow[];
+};
+
 type AssignmentResultPageBreadcrumb = {
   href?: string;
   isCurrentPage?: boolean;
@@ -352,6 +357,9 @@ type AssignmentResultsPageViewModel<
     typeof buildAssignmentAttemptReviewCardViews
   >;
   attemptRowViews: Array<ReturnType<typeof buildAssignmentAttemptRowDisplay>>;
+  attemptTableView: AssignmentResultTableView<
+    ReturnType<typeof buildAssignmentAttemptRowViews>[number]
+  >;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: AssignmentResultCopyArtifacts['classroomBrief'] | null;
   completedAttemptCount: number;
@@ -375,12 +383,18 @@ type AssignmentResultsPageViewModel<
   itemPerformanceRowViews: ReturnType<
     typeof buildAssignmentItemPerformanceRowViews
   >;
+  itemPerformanceTableView: AssignmentResultTableView<
+    ReturnType<typeof buildAssignmentItemPerformanceRowViews>[number]
+  >;
   metricItems: ReturnType<typeof buildAssignmentResultMetricItems>;
   resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
   studentSummaryRowViews: ReturnType<
     typeof buildAssignmentStudentSummaryRowViews
+  >;
+  studentSummaryTableView: AssignmentResultTableView<
+    ReturnType<typeof buildAssignmentStudentSummaryRowViews>[number]
   >;
   title: string;
   viewState: AssignmentResultResolvedViewState;
@@ -1050,6 +1064,15 @@ export function buildAssignmentAttemptRowViews<
   }));
 }
 
+export function buildAssignmentAttemptTableView<
+  TAttempt extends AssignmentAttemptRowDisplayInput,
+>(input: Parameters<typeof buildAssignmentAttemptRowViews<TAttempt>>[0]) {
+  return {
+    headers: assignmentResultTableHeaders.studentAttempts,
+    rows: buildAssignmentAttemptRowViews(input),
+  };
+}
+
 function getAssignmentAttemptStudentLabel({
   reviewStudentLabel,
   studentName,
@@ -1129,6 +1152,15 @@ export function buildAssignmentStudentSummaryRowViews(
     id: student.studentKey,
     ...buildAssignmentStudentSummaryRowView(student),
   }));
+}
+
+export function buildAssignmentStudentSummaryTableView(
+  students: AssignmentStudentSummary[]
+) {
+  return {
+    headers: assignmentResultTableHeaders.studentSummary,
+    rows: buildAssignmentStudentSummaryRowViews(students),
+  };
 }
 
 export function buildAssignmentItemAnalysisCardView(
@@ -1220,6 +1252,15 @@ export function buildAssignmentItemPerformanceRowViews(
     id: item.itemId,
     ...buildAssignmentItemPerformanceRowView({ index, item }),
   }));
+}
+
+export function buildAssignmentItemPerformanceTableView(
+  items: AssignmentItemAnalysis[]
+) {
+  return {
+    headers: assignmentResultTableHeaders.itemPerformance,
+    rows: buildAssignmentItemPerformanceRowViews(items),
+  };
 }
 
 export function buildAssignmentAttemptAnswerReviewView({
@@ -1521,19 +1562,26 @@ export function buildAssignmentResultsPageViewModel<
     viewState,
   });
   const copyScopeView = buildAssignmentResultCopyScopeView(controlViews);
-  const attemptRowViews = data
-    ? buildAssignmentAttemptRowViews({
+  const attemptTableView = data
+    ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
         timeLimitSeconds:
           headerView?.settingsSummaryView.settings.timeLimitSeconds,
       })
-    : [];
-  const studentSummaryRowViews = buildAssignmentStudentSummaryRowViews(
+    : buildAssignmentAttemptTableView({
+        rows: [],
+        timeLimitSeconds:
+          headerView?.settingsSummaryView.settings.timeLimitSeconds,
+      });
+  const studentSummaryTableView = buildAssignmentStudentSummaryTableView(
     resultView.filteredStudents
   );
-  const itemPerformanceRowViews = buildAssignmentItemPerformanceRowViews(
+  const itemPerformanceTableView = buildAssignmentItemPerformanceTableView(
     resultView.sortedPerformanceItems
   );
+  const attemptRowViews = attemptTableView.rows;
+  const studentSummaryRowViews = studentSummaryTableView.rows;
+  const itemPerformanceRowViews = itemPerformanceTableView.rows;
   const itemAnalysisCardViews = data
     ? buildAssignmentItemAnalysisCardViews(data.analysis.needsReview)
     : [];
@@ -1611,6 +1659,7 @@ export function buildAssignmentResultsPageViewModel<
     actionState,
     attemptReviewCardViews,
     attemptRowViews,
+    attemptTableView,
     breadcrumbs: [
       {
         href: Routes.Dashboard,
@@ -1635,6 +1684,7 @@ export function buildAssignmentResultsPageViewModel<
     headerView,
     itemAnalysisCardViews,
     itemPerformanceRowViews,
+    itemPerformanceTableView,
     loadErrorMessage: assignmentResultPageCopy.loadErrorMessage,
     metricItems: data
       ? buildAssignmentResultMetricItems({
@@ -1649,6 +1699,7 @@ export function buildAssignmentResultsPageViewModel<
     sectionState,
     sectionViews,
     studentSummaryRowViews,
+    studentSummaryTableView,
     title,
     viewState,
   };

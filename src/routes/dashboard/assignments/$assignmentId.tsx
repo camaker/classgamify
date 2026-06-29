@@ -232,7 +232,7 @@ function LoadedAssignmentResultsPage({
                 view={pageView.controlViews.itemPerformanceSort}
               />
               <AssignmentResultsItemPerformanceTable
-                items={pageView.itemPerformanceRowViews}
+                tableView={pageView.itemPerformanceTableView}
               />
             </div>
           </CardContent>
@@ -256,7 +256,7 @@ function LoadedAssignmentResultsPage({
           <CardContent>
             {pageView.contentState.hasStudentSummaryRows ? (
               <AssignmentResultsStudentSummaryTable
-                students={pageView.studentSummaryRowViews}
+                tableView={pageView.studentSummaryTableView}
               />
             ) : (
               <AssignmentResultsEmptyState
@@ -283,7 +283,7 @@ function LoadedAssignmentResultsPage({
         <CardContent>
           {pageView.contentState.hasAttemptRows ? (
             <AssignmentResultsAttemptsTable
-              attempts={pageView.attemptRowViews}
+              tableView={pageView.attemptTableView}
             />
           ) : (
             <AssignmentResultsEmptyState

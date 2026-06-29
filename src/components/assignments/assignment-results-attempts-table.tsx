@@ -1,38 +1,24 @@
-import {
-  assignmentResultTableHeaders,
-  type buildAssignmentResultsPageViewModel,
-} from '@/assignments/result-view';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-type AssignmentResultsAttemptRows = ReturnType<
+type AssignmentResultsAttemptTableView = ReturnType<
   typeof buildAssignmentResultsPageViewModel
->['attemptRowViews'];
+>['attemptTableView'];
+type AssignmentResultsAttemptRows = AssignmentResultsAttemptTableView['rows'];
 
 type AssignmentResultsAttemptsTableProps = {
-  attempts: AssignmentResultsAttemptRows;
+  tableView: AssignmentResultsAttemptTableView;
 };
 
 export function AssignmentResultsAttemptsTable({
-  attempts,
+  tableView,
 }: AssignmentResultsAttemptsTableProps) {
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          {assignmentResultTableHeaders.studentAttempts.map((header) => (
-            <TableHead key={header}>{header}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
+      <AssignmentResultsTableHeader headers={tableView.headers} />
       <TableBody>
-        {attempts.map((rowDisplay) => (
+        {tableView.rows.map((rowDisplay) => (
           <AssignmentResultsAttemptRow
             key={rowDisplay.id}
             rowDisplay={rowDisplay}

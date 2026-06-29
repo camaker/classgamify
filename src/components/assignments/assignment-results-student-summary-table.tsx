@@ -1,28 +1,25 @@
-import {
-  assignmentResultTableHeaders,
-  type buildAssignmentResultsPageViewModel,
-} from '@/assignments/result-view';
+import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-type AssignmentResultsStudentSummaryRows = ReturnType<
+type AssignmentResultsStudentSummaryTableView = ReturnType<
   typeof buildAssignmentResultsPageViewModel
->['studentSummaryRowViews'];
+>['studentSummaryTableView'];
+type AssignmentResultsStudentSummaryRows =
+  AssignmentResultsStudentSummaryTableView['rows'];
 
 type AssignmentResultsStudentSummaryTableProps = {
-  students: AssignmentResultsStudentSummaryRows;
+  tableView: AssignmentResultsStudentSummaryTableView;
 };
 
 export function AssignmentResultsStudentSummaryTable({
-  students,
+  tableView,
 }: AssignmentResultsStudentSummaryTableProps) {
   return (
     <Table>
-      <AssignmentResultsTableHeader
-        headers={assignmentResultTableHeaders.studentSummary}
-      />
+      <AssignmentResultsTableHeader headers={tableView.headers} />
       <TableBody>
-        {students.map((rowView) => (
+        {tableView.rows.map((rowView) => (
           <AssignmentResultsStudentSummaryRow
             key={rowView.id}
             rowView={rowView}

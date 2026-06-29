@@ -571,10 +571,12 @@ import {
   buildAssignmentAttemptReviewCardViews,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentAttemptRowMetricLabels,
+  buildAssignmentAttemptTableView,
   buildAssignmentAttemptRowViews,
   buildAssignmentItemAnalysisCardView,
   buildAssignmentItemAnalysisCardViews,
   buildAssignmentItemPerformanceRowView,
+  buildAssignmentItemPerformanceTableView,
   buildAssignmentItemPerformanceRowViews,
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionDataSet,
@@ -597,6 +599,7 @@ import {
   buildAssignmentResultsPageViewModel,
   buildAssignmentResultsRouteState,
   buildAssignmentStudentSummaryRowView,
+  buildAssignmentStudentSummaryTableView,
   buildAssignmentStudentSummaryRowViews,
   buildAssignmentResultEmptyState,
   attemptReviewFilterOptions,
@@ -3887,13 +3890,13 @@ assert.match(
 );
 assert.match(
   assignmentResultRouteSource,
-  /AssignmentResultsAttemptsTable[\s\S]*attempts=\{pageView\.attemptRowViews\}/,
-  'Assignment result route should delegate attempt row rendering with the assignment-domain page view-model rows.'
+  /AssignmentResultsAttemptsTable[\s\S]*tableView=\{pageView\.attemptTableView\}/,
+  'Assignment result route should delegate attempt table rendering with the assignment-domain page view-model table view.'
 );
 assert.match(
   assignmentResultViewSource,
-  /attemptRowViews: buildAssignmentAttemptRowViews|const attemptRowViews = data[\s\S]*buildAssignmentAttemptRowViews/,
-  'Assignment result page view-model should own formatted attempt row views.'
+  /attemptTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentAttemptTableView[\s\S]*headers: assignmentResultTableHeaders\.studentAttempts[\s\S]*rows: buildAssignmentAttemptRowViews/,
+  'Assignment result page view-model should own formatted attempt table views.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -3916,23 +3919,23 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /AssignmentResultsStudentSummaryTable[\s\S]*students=\{pageView\.studentSummaryRowViews\}/,
-  'Assignment result route should delegate student summary row rendering with the assignment-domain page view-model rows.'
+  /AssignmentResultsStudentSummaryTable[\s\S]*tableView=\{pageView\.studentSummaryTableView\}/,
+  'Assignment result route should delegate student summary table rendering with the assignment-domain page view-model table view.'
 );
 assert.match(
   assignmentResultViewSource,
-  /studentSummaryRowViews: buildAssignmentStudentSummaryRowViews|const studentSummaryRowViews = buildAssignmentStudentSummaryRowViews/,
-  'Assignment result page view-model should own formatted student summary row views.'
+  /studentSummaryTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows: buildAssignmentStudentSummaryRowViews/,
+  'Assignment result page view-model should own formatted student summary table views.'
 );
 assert.match(
   assignmentResultRouteSource,
-  /AssignmentResultsItemPerformanceTable[\s\S]*items=\{pageView\.itemPerformanceRowViews\}/,
-  'Assignment result route should delegate item performance row rendering with the assignment-domain page view-model rows.'
+  /AssignmentResultsItemPerformanceTable[\s\S]*tableView=\{pageView\.itemPerformanceTableView\}/,
+  'Assignment result route should delegate item performance table rendering with the assignment-domain page view-model table view.'
 );
 assert.match(
   assignmentResultViewSource,
-  /itemPerformanceRowViews: buildAssignmentItemPerformanceRowViews|const itemPerformanceRowViews = buildAssignmentItemPerformanceRowViews/,
-  'Assignment result page view-model should own formatted item performance row views.'
+  /itemPerformanceTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows: buildAssignmentItemPerformanceRowViews/,
+  'Assignment result page view-model should own formatted item performance table views.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -4216,8 +4219,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
-  /AssignmentResultsTableHeader[\s\S]*headers=\{assignmentResultTableHeaders\.itemPerformance\}[\s\S]*items\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
-  'Assignment result item performance table component should delegate prepared item row views.'
+  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsItemPerformanceRow[\s\S]*rowView=\{rowView\}/,
+  'Assignment result item performance table component should delegate prepared item table views.'
 );
 assert.match(
   assignmentResultsTableHeaderSource,
@@ -4236,18 +4239,18 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsStudentSummaryTableSource,
-  /AssignmentResultsTableHeader[\s\S]*headers=\{assignmentResultTableHeaders\.studentSummary\}[\s\S]*students\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
-  'Assignment result student summary table component should delegate prepared student row views.'
+  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsStudentSummaryRow[\s\S]*rowView=\{rowView\}/,
+  'Assignment result student summary table component should delegate prepared student table views.'
 );
 assert.doesNotMatch(
-  `${assignmentResultsItemPerformanceTableSource}\n${assignmentResultsStudentSummaryTableSource}`,
-  /TableHeader[\s\S]*assignmentResultTableHeaders\.(?:itemPerformance|studentSummary)\.map/,
-  'Assignment result tables should share the common prepared-header renderer.'
+  `${assignmentResultsItemPerformanceTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsAttemptsTableSource}`,
+  /assignmentResultTableHeaders/,
+  'Assignment result table components should receive prepared table headers instead of importing table-header copy.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
-  /assignmentResultTableHeaders\.studentAttempts[\s\S]*attempts\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
-  'Assignment result attempts table component should delegate prepared attempt row views.'
+  /AssignmentResultsTableHeader[\s\S]*headers=\{tableView\.headers\}[\s\S]*tableView\.rows\.map[\s\S]*AssignmentResultsAttemptRow[\s\S]*rowDisplay=\{rowDisplay\}/,
+  'Assignment result attempts table component should delegate prepared attempt table views.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
@@ -30265,6 +30268,14 @@ assert.deepEqual(
       row.studentLabel,
       row.durationLabel,
     ]),
+    attemptTableView: {
+      headers: scoredResultsPageView.attemptTableView.headers,
+      rows: scoredResultsPageView.attemptTableView.rows.map((row) => [
+        row.id,
+        row.studentLabel,
+        row.durationLabel,
+      ]),
+    },
     breadcrumbs: scoredResultsPageView.breadcrumbs.map(
       (breadcrumb) => breadcrumb.label
     ),
@@ -30350,6 +30361,14 @@ assert.deepEqual(
     itemPerformanceRowViews: scoredResultsPageView.itemPerformanceRowViews.map(
       (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
     ),
+    itemPerformanceTableView: {
+      headers: scoredResultsPageView.itemPerformanceTableView.headers,
+      rows: scoredResultsPageView.itemPerformanceTableView.rows.map((row) => [
+        row.id,
+        row.itemNumberLabel,
+        row.correctRateLabel,
+      ]),
+    },
     itemAnalysisCardViews: scoredResultsPageView.itemAnalysisCardViews.map(
       (item) => [item.id, item.correctRateLabel]
     ),
@@ -30421,6 +30440,13 @@ assert.deepEqual(
     studentSummaryRowViews: scoredResultsPageView.studentSummaryRowViews.map(
       (row) => [row.studentLabel, row.needsReviewLabel]
     ),
+    studentSummaryTableView: {
+      headers: scoredResultsPageView.studentSummaryTableView.headers,
+      rows: scoredResultsPageView.studentSummaryTableView.rows.map((row) => [
+        row.studentLabel,
+        row.needsReviewLabel,
+      ]),
+    },
     title: scoredResultsPageView.title,
     viewState: scoredResultsPageView.viewState,
   },
@@ -30440,6 +30466,10 @@ assert.deepEqual(
     actionDataSetCopyStudentLabels: ['Alice'],
     attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
+    attemptTableView: {
+      headers: ['Student', 'Score', 'Accuracy', 'Answered', 'Time', 'Submitted'],
+      rows: [['completed-attempt', 'Alice', '30s']],
+    },
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
@@ -30561,6 +30591,22 @@ assert.deepEqual(
       ['pair-1', '1.', '0%'],
       ['q-1', '2.', '100%'],
     ],
+    itemPerformanceTableView: {
+      headers: [
+        'Item',
+        'Type',
+        'Correct rate',
+        'Submitted',
+        'Unanswered',
+        'Expected',
+        'Accepted',
+        'Explanation',
+      ],
+      rows: [
+        ['pair-1', '1.', '0%'],
+        ['q-1', '2.', '100%'],
+      ],
+    },
     itemAnalysisCardViews: [
       ['pair-1', '0%'],
       ['q-1', '100%'],
@@ -30635,6 +30681,18 @@ assert.deepEqual(
       },
     },
     studentSummaryRowViews: [['Alice', '1']],
+    studentSummaryTableView: {
+      headers: [
+        'Student',
+        'Attempts',
+        'Latest',
+        'Average',
+        'Best',
+        'Needs review',
+        'Last submitted',
+      ],
+      rows: [['Alice', '1']],
+    },
     title: 'Week 1 results',
     viewState: {
       attemptReviewFilter: 'needs-review',
@@ -30858,6 +30916,22 @@ assert.deepEqual(
     ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
   ]
 );
+assert.deepEqual(
+  {
+    headers: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
+      .headers,
+    rows: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).rows.map(
+      (row) => [row.id, row.itemNumberLabel, row.promptLabel, row.correctRateLabel]
+    ),
+  },
+  {
+    headers: assignmentResultTableHeaders.itemPerformance,
+    rows: [
+      ['q-1', '1.', '1. Capital of France?', '67%'],
+      ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
+    ],
+  }
+);
 assert.equal(
   resultAnalysis.attempts[0]?.answers[0]?.explanation,
   'Paris is the capital of France.'
@@ -31008,6 +31082,36 @@ assert.deepEqual(
     ['name:alice', 'Alice', '2'],
     ['anonymous:empty', 'Anonymous student 2', '0'],
   ]
+);
+const studentSummaryTableView = buildAssignmentStudentSummaryTableView([
+  resultAnalysis.students[1]!,
+  {
+    attempts: 0,
+    averageAccuracy: 0,
+    bestAccuracy: 0,
+    lastCompletedAt: null,
+    latestAccuracy: 0,
+    needsReviewCount: 0,
+    studentKey: 'anonymous:empty',
+    studentLabel: 'Anonymous student 2',
+  },
+]);
+assert.deepEqual(
+  {
+    headers: studentSummaryTableView.headers,
+    rows: studentSummaryTableView.rows.map((row) => [
+      row.id,
+      row.studentLabel,
+      row.attemptsLabel,
+    ]),
+  },
+  {
+    headers: assignmentResultTableHeaders.studentSummary,
+    rows: [
+      ['name:alice', 'Alice', '2'],
+      ['anonymous:empty', 'Anonymous student 2', '0'],
+    ],
+  }
 );
 const runtimeOrderedResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -32103,6 +32207,42 @@ assert.deepEqual(
       submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
     },
   ]
+);
+const attemptTableView = buildAssignmentAttemptTableView({
+  rows: [
+    {
+      attempt: {
+        completedAt: attemptRowCompletedAt,
+        id: 'row-view-1',
+        maxScore: 4,
+        resultJson: {
+          accuracy: 75,
+          completedItemCount: 3,
+          durationSeconds: 62,
+          totalPoints: 4,
+        },
+        score: 3,
+        studentName: ' Raw student ',
+      },
+      review: undefined,
+      studentLabel: ' Ｄｉｓｐｌａｙｅｄ   student ',
+    },
+  ],
+  timeLimitSeconds: 60,
+});
+assert.deepEqual(
+  {
+    headers: attemptTableView.headers,
+    rows: attemptTableView.rows.map((row) => [
+      row.id,
+      row.studentLabel,
+      row.durationLabel,
+    ]),
+  },
+  {
+    headers: assignmentResultTableHeaders.studentAttempts,
+    rows: [['row-view-1', 'Displayed student', '1m 00s']],
+  }
 );
 assert.deepEqual(
   getAssignmentAnswerReviewStatus({ correct: true, submitted: true }),
