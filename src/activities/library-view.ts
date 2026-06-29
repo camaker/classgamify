@@ -448,8 +448,18 @@ export function buildActivityLibraryEmptyStateView({
   }
 
   if (hasFilters) {
+    const sourceFilterView =
+      sourceFilter === 'all'
+        ? undefined
+        : buildActivityLibrarySourceFilterView(sourceFilter);
+
     return {
       ...activityLibraryEmptyStateCopy.filtered,
+      description: sourceFilterView
+        ? m.activity_library_empty_source_filtered_description({
+            source: sourceFilterView.label,
+          })
+        : activityLibraryEmptyStateCopy.filtered.description,
       showStarterActivities: false,
     };
   }

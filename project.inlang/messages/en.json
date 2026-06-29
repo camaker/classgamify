@@ -327,6 +327,7 @@
   "activity_library_empty_filtered_title": "No matching activities.",
   "activity_library_empty_saved_description": "Create the first reusable classroom activity, then publish it as a student assignment link for your class.",
   "activity_library_empty_saved_title": "No saved activities yet.",
+  "activity_library_empty_source_filtered_description": "No activities match the {source} source-material filter yet. Clear filters or attach that classroom material type from the activity editor.",
   "activity_library_filter_active": "Active",
   "activity_library_filter_archived": "Archived",
   "activity_library_filter_clear_filters": "Clear filters",

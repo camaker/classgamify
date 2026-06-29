@@ -20727,11 +20727,25 @@ assert.deepEqual(
   {
     actionLabel: 'Clear filters',
     description:
-      'Try another title, description, template keyword, or template family from your classroom activity library.',
+      'No activities match the Worksheet source-material filter yet. Clear filters or attach that classroom material type from the activity editor.',
     showStarterActivities: false,
     title: 'No matching activities.',
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildActivityLibraryEmptyStateView({
+      search: undefined,
+      source: 'audio',
+      status: 'active',
+      template: 'all',
+    }).description,
+    '当前没有匹配“音频”来源素材筛选的活动。可以清除筛选，或在活动编辑器里附加这种课堂素材。'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(activityLibraryCardCopy.actionLabels, {
   archive: 'Archive',
   duplicate: 'Duplicate',
@@ -24888,7 +24902,7 @@ assert.deepEqual(
     emptyState: {
       actionLabel: 'Clear filters',
       description:
-        'Try another title, description, template keyword, or template family from your classroom activity library.',
+        'No activities match the Worksheet source-material filter yet. Clear filters or attach that classroom material type from the activity editor.',
       showStarterActivities: false,
       title: 'No matching activities.',
     },

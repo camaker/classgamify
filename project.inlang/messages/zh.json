@@ -327,6 +327,7 @@
   "activity_library_empty_filtered_title": "没有匹配的活动。",
   "activity_library_empty_saved_description": "先创建第一份可复用课堂活动，然后发布成学生作业链接发给班级。",
   "activity_library_empty_saved_title": "还没有保存活动。",
+  "activity_library_empty_source_filtered_description": "当前没有匹配“{source}”来源素材筛选的活动。可以清除筛选，或在活动编辑器里附加这种课堂素材。",
   "activity_library_filter_active": "当前",
   "activity_library_filter_archived": "已归档",
   "activity_library_filter_clear_filters": "清除筛选",
