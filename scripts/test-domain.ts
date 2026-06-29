@@ -2225,8 +2225,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationSeconds,[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
+  /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.correctItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.needsReviewItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptSummary\.unansweredItemCount[\s\S]*formatAssignmentResultCsvNumber\(attemptDurationSeconds,[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
   'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /type AssignmentResultsExportAttemptSummary = \{[\s\S]*correctItemCount: number;[\s\S]*needsReviewItemCount: number;[\s\S]*unansweredItemCount: number;[\s\S]*function buildAssignmentResultsExportAttemptSummary[\s\S]*isAssignmentAttemptAnswerNeedsReview[\s\S]*countAssignmentResultsExportAnswers/,
+  'Assignment CSV export should build per-attempt review summary columns from the shared attempt-review answer status rules.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -2262,6 +2267,11 @@ assert.match(
   assignmentResultsExportSource,
   /function buildAssignmentResultsExportAnswerRow[\s\S]*buildAssignmentResultAttemptAnswerTextView\(answer,[\s\S]*buildAssignmentResultsExportItemPerformanceColumns[\s\S]*answerView\.exportStudentAnswerText[\s\S]*answerView\.expectedAnswerText[\s\S]*answerView\.acceptedAlternativesText[\s\S]*answerView\.exportStatusLabel/,
   'Assignment CSV export answer rows should consume the shared answer text view and item performance context.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /assignment_results_export_column_attempt_correct_items[\s\S]*assignment_results_export_column_attempt_needs_review_items[\s\S]*assignment_results_export_column_attempt_unanswered_items/,
+  'Assignment CSV export should expose localized per-attempt review summary column headers.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -4956,7 +4966,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   assignmentResultsExportSource,
-  /formatAssignmentExportStudentAnswer|formatAssignmentExportAnswerStatus|isAssignmentAttemptAnswerNeedsReview|formatPrimaryAcceptedAnswer|formatAcceptedAnswerAlternatives/,
+  /formatAssignmentExportStudentAnswer|formatAssignmentExportAnswerStatus|formatPrimaryAcceptedAnswer|formatAcceptedAnswerAlternatives/,
   'Assignment result CSV export should not rebuild answer status or accepted-answer text locally.'
 );
 assert.match(
@@ -36744,6 +36754,10 @@ assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
 assert.match(csv, /"expires_at","close_time","delivery_policy","instructions"/);
 assert.match(
   csv,
+  /"completed_items","total_items","attempt_correct_items","attempt_needs_review_items","attempt_unanswered_items","duration_seconds"/
+);
+assert.match(
+  csv,
   /"item_number","item_id","item_correct_rate","item_correct_count","item_submitted_count","item_unanswered_count","prompt"/
 );
 assert.match(csv, /"assignment-1","Capital Review, Week 1","share-123","Open"/);
@@ -36762,6 +36776,10 @@ assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
 assert.match(
   csv,
   /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z"/
+);
+assert.match(
+  csv,
+  /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z","0","","0","","2","0","2","1",""/
 );
 assert.match(csv, /"Paris","Paris, France","correct"/);
 assert.match(csv, /"Paris is the capital of France\."/);
@@ -36872,7 +36890,7 @@ const weightedScoreCsv = buildAssignmentResultsCsv({
 });
 assert.match(
   weightedScoreCsv,
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","45"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","10","50","2","2","1","1","0","45"/
 );
 function buildCsvWithStoredAttemptDuration(durationSeconds: number) {
   return buildAssignmentResultsCsv({
@@ -36890,19 +36908,19 @@ function buildCsvWithStoredAttemptDuration(durationSeconds: number) {
 }
 assert.match(
   buildCsvWithStoredAttemptDuration(120),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","60"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","60"/
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(-3),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","0"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","0"/
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(4.6),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","5"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","5"/
 );
 assert.match(
   buildCsvWithStoredAttemptDuration(Number.POSITIVE_INFINITY),
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2",""/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0",""/
 );
 const zeroAverageDurationCsv = buildAssignmentResultsCsv({
   ...csvExportData,
@@ -36947,7 +36965,7 @@ const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
 assert.doesNotMatch(invalidStoredAttemptCsv, /NaN|Infinity/);
 assert.match(
   invalidStoredAttemptCsv,
-  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","45"/
+  /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","0","","50","0","2","1","1","0","45"/
 );
 const activityTemplateFallbackCsv = buildAssignmentResultsCsv({
   ...csvExportData,

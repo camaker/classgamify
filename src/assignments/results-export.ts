@@ -10,6 +10,7 @@ import {
 } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import type {
   AssignmentAttemptReview,
   AssignmentAttemptReviewAnswer,
@@ -93,6 +94,12 @@ type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;
 type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;
 
 type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;
+
+type AssignmentResultsExportAttemptSummary = {
+  correctItemCount: number;
+  needsReviewItemCount: number;
+  unansweredItemCount: number;
+};
 
 type AssignmentResultsExportContext = {
   assignmentTitle: string;
@@ -206,6 +213,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
   const { deliveryView, resolvedSource, statsView } = exportContext;
   const storedAttempt = exportContext.attemptsById.get(attempt.id);
   const studentSummary = exportContext.studentsByKey.get(attempt.studentKey);
+  const attemptSummary = buildAssignmentResultsExportAttemptSummary(attempt);
   const attemptDurationSeconds = normalizeAttemptDurationSeconds({
     durationSeconds: storedAttempt?.resultJson?.durationSeconds,
     timeLimitSeconds: deliveryView.timeLimitSeconds,
@@ -255,6 +263,15 @@ function buildAssignmentResultsExportAttemptBaseColumns({
       }
     ),
     exportContext.runtimeItemCount,
+    formatAssignmentResultCsvNumber(attemptSummary.correctItemCount, {
+      min: 0,
+    }),
+    formatAssignmentResultCsvNumber(attemptSummary.needsReviewItemCount, {
+      min: 0,
+    }),
+    formatAssignmentResultCsvNumber(attemptSummary.unansweredItemCount, {
+      min: 0,
+    }),
     formatAssignmentResultCsvNumber(attemptDurationSeconds, {
       min: 0,
       round: true,
@@ -271,6 +288,32 @@ function buildAssignmentResultsExportAttemptBaseColumns({
       min: 0,
     }),
   ];
+}
+
+function buildAssignmentResultsExportAttemptSummary(
+  attempt: AssignmentResultsExportAttemptReview
+): AssignmentResultsExportAttemptSummary {
+  return {
+    correctItemCount: countAssignmentResultsExportAnswers(
+      attempt.answers,
+      (answer) => answer.submitted && answer.correct
+    ),
+    needsReviewItemCount: countAssignmentResultsExportAnswers(
+      attempt.answers,
+      isAssignmentAttemptAnswerNeedsReview
+    ),
+    unansweredItemCount: countAssignmentResultsExportAnswers(
+      attempt.answers,
+      (answer) => !answer.submitted
+    ),
+  };
+}
+
+function countAssignmentResultsExportAnswers(
+  answers: AssignmentResultsExportAttemptAnswer[],
+  predicate: (answer: AssignmentResultsExportAttemptAnswer) => boolean
+) {
+  return answers.filter(predicate).length;
 }
 
 function buildAssignmentResultsExportAnswerRow({
@@ -421,6 +464,9 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_attempt_accuracy(),
     m.assignment_results_export_column_completed_items(),
     m.assignment_results_export_column_total_items(),
+    m.assignment_results_export_column_attempt_correct_items(),
+    m.assignment_results_export_column_attempt_needs_review_items(),
+    m.assignment_results_export_column_attempt_unanswered_items(),
     m.assignment_results_export_column_duration_seconds(),
     m.assignment_results_export_column_student_attempts(),
     m.assignment_results_export_column_student_latest_accuracy(),
