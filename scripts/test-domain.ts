@@ -576,6 +576,7 @@ import {
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyText,
   buildAssignmentResultContentState,
   buildAssignmentResultHeaderView,
@@ -601,6 +602,7 @@ import {
   getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
   normalizeAssignmentResultProgressValue,
+  getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -1503,8 +1505,18 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyText[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
-  'Assignment result actions should own teacher copy artifact construction.'
+  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
+  'Assignment result actions should own unified teacher copy artifact construction.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultCopyText[\s\S]*getAssignmentResultCopyArtifactText[\s\S]*buildAssignmentResultCopyArtifacts\(data\)/,
+  'Assignment result copy text should resolve through unified result copy artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionPayload[\s\S]*const artifacts = buildAssignmentResultCopyArtifacts\(data\)[\s\S]*getAssignmentResultCopyArtifactText\(\{[\s\S]*artifacts/,
+  'Assignment result copy payloads should reuse one prepared artifact bundle.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1536,9 +1548,14 @@ assert.match(
   /from '@\/assignments\/result-actions'/,
   'Assignment result page view-model should consume result actions from the dedicated domain module.'
 );
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /const copyArtifacts = data \? buildAssignmentResultCopyArtifacts\(data\) : null[\s\S]*const classroomBrief = copyArtifacts\?\.classroomBrief \?\? null/,
+  'Assignment result page view-model should derive classroom brief previews from unified result copy artifacts.'
+);
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultsCsv\(|buildAssignmentResultsCsvDataUrl\(|buildAssignmentResultsCsvFilename\(|buildAssignmentItemReviewSummary\(|buildAssignmentReteachPlan\(|buildAssignmentStudentFollowUpSummary\(/,
+  /buildAssignmentResultsCsv\(|buildAssignmentResultsCsvDataUrl\(|buildAssignmentResultsCsvFilename\(|buildAssignmentClassroomBrief\(|buildAssignmentItemReviewSummary\(|buildAssignmentReteachPlan\(|buildAssignmentStudentFollowUpSummary\(/,
   'Assignment result page view-model should not rebuild result action artifacts.'
 );
 assert.match(
@@ -29201,6 +29218,11 @@ assert.equal(
   }).pageView.actionData,
   null
 );
+assert.equal(
+  scoredResultsPageView.classroomBrief?.text,
+  buildAssignmentResultCopyArtifacts(scoredResultsPageView.actionData!)
+    .classroomBrief.text
+);
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
@@ -33615,6 +33637,72 @@ assert.match(
 assert.match(
   studentFollowUpSummary.text,
   /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review/
+);
+const resultCopyArtifacts = buildAssignmentResultCopyArtifacts({
+  ...csvExportData,
+  analysis: {
+    ...csvExportData.analysis,
+    students: followUpPriorityStudents,
+  },
+});
+assert.deepEqual(
+  {
+    brief: resultCopyArtifacts.classroomBrief.text,
+    briefFollowUpKeys: resultCopyArtifacts.classroomBrief.followUpStudents.map(
+      (student) => student.studentKey
+    ),
+    followUp: resultCopyArtifacts.studentFollowUpSummary.text,
+    followUpKeys: resultCopyArtifacts.studentFollowUpSummary.students.map(
+      (student) => student.studentKey
+    ),
+    itemReview: resultCopyArtifacts.itemReviewSummary.text,
+    reteach: resultCopyArtifacts.reteachPlan.text,
+  },
+  {
+    brief: resultCopyArtifacts.classroomBrief.text,
+    briefFollowUpKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+    ],
+    followUp: studentFollowUpSummary.text,
+    followUpKeys: [
+      'name:alpha-review',
+      'name:more-review',
+      'name:lower-score',
+      'name:no-review',
+    ],
+    itemReview: itemReviewSummary.text,
+    reteach: reteachPlan.text,
+  }
+);
+assert.equal(
+  getAssignmentResultCopyArtifactText({
+    action: 'copy-brief',
+    artifacts: resultCopyArtifacts,
+  }),
+  resultCopyArtifacts.classroomBrief.text
+);
+assert.equal(
+  getAssignmentResultCopyArtifactText({
+    action: 'copy-reteach-plan',
+    artifacts: resultCopyArtifacts,
+  }),
+  resultCopyArtifacts.reteachPlan.text
+);
+assert.equal(
+  getAssignmentResultCopyArtifactText({
+    action: 'copy-item-review',
+    artifacts: resultCopyArtifacts,
+  }),
+  resultCopyArtifacts.itemReviewSummary.text
+);
+assert.equal(
+  getAssignmentResultCopyArtifactText({
+    action: 'copy-follow-up',
+    artifacts: resultCopyArtifacts,
+  }),
+  resultCopyArtifacts.studentFollowUpSummary.text
 );
 assert.equal(
   buildAssignmentResultCopyText({

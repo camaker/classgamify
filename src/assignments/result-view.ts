@@ -6,7 +6,6 @@ import type {
 } from '@/assignments/results';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
-import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   formatAttemptDuration,
@@ -71,9 +70,10 @@ import {
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
   buildAssignmentResultActionButtons,
+  buildAssignmentResultCopyArtifacts,
   buildAssignmentResultActionState,
-  buildAssignmentResultClassroomBriefStats,
   type AssignmentResultActionButton,
+  type AssignmentResultCopyArtifacts,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
 import type {
@@ -128,8 +128,10 @@ export {
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyArtifacts,
   buildAssignmentResultClassroomBriefStats,
   buildAssignmentResultCopyText,
+  getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -294,7 +296,7 @@ type AssignmentResultsPageViewModel<
   >;
   attemptRowViews: Array<ReturnType<typeof buildAssignmentAttemptRowDisplay>>;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
-  classroomBrief: ReturnType<typeof buildAssignmentClassroomBrief> | null;
+  classroomBrief: AssignmentResultCopyArtifacts['classroomBrief'] | null;
   completedAttemptCount: number;
   completedAttemptReviewCount: number;
   completedAttempts: TAttempt[];
@@ -1400,14 +1402,8 @@ export function buildAssignmentResultsPageViewModel<
     attemptRowCount: attemptRowViews.length,
     studentSummaryRowCount: studentSummaryRowViews.length,
   });
-  const classroomBrief = data
-    ? buildAssignmentClassroomBrief({
-        assignmentTitle: formatAssignmentDisplayTitle(data.assignment.title),
-        items: data.analysis.perItem,
-        stats: buildAssignmentResultClassroomBriefStats(data.stats),
-        students: data.analysis.students,
-      })
-    : null;
+  const copyArtifacts = data ? buildAssignmentResultCopyArtifacts(data) : null;
+  const classroomBrief = copyArtifacts?.classroomBrief ?? null;
   const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
     data?.stats.completions
   );

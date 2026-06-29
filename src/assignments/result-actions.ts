@@ -1,14 +1,26 @@
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
-import { buildAssignmentClassroomBrief } from '@/assignments/classroom-brief';
-import { buildAssignmentItemReviewSummary } from '@/assignments/item-review-summary';
-import { buildAssignmentReteachPlan } from '@/assignments/reteach-plan';
+import {
+  buildAssignmentClassroomBrief,
+  type AssignmentClassroomBrief,
+} from '@/assignments/classroom-brief';
+import {
+  buildAssignmentItemReviewSummary,
+  type AssignmentItemReviewSummary,
+} from '@/assignments/item-review-summary';
+import {
+  buildAssignmentReteachPlan,
+  type AssignmentReteachPlan,
+} from '@/assignments/reteach-plan';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
   buildAssignmentResultsCsvFilename,
   type AssignmentResultsExportData,
 } from '@/assignments/results-export';
-import { buildAssignmentStudentFollowUpSummary } from '@/assignments/student-follow-up-summary';
+import {
+  buildAssignmentStudentFollowUpSummary,
+  type AssignmentStudentFollowUpSummary,
+} from '@/assignments/student-follow-up-summary';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentResultAction =
@@ -130,6 +142,24 @@ type AssignmentResultActionStats = {
 
 export type AssignmentResultActionData = AssignmentResultsExportData;
 
+type AssignmentResultCopyArtifactData = {
+  analysis: Pick<
+    AssignmentResultsExportData['analysis'],
+    'perItem' | 'students'
+  >;
+  assignment: {
+    title: string;
+  };
+  stats: AssignmentResultActionStats;
+};
+
+export type AssignmentResultCopyArtifacts = {
+  classroomBrief: AssignmentClassroomBrief;
+  reteachPlan: AssignmentReteachPlan;
+  itemReviewSummary: AssignmentItemReviewSummary;
+  studentFollowUpSummary: AssignmentStudentFollowUpSummary;
+};
+
 export const assignmentResultActionDescriptors = [
   {
     action: 'copy-brief',
@@ -239,6 +269,58 @@ export function getAssignmentResultActionDisabledReason(
   return gate.type === 'blocked' ? gate.message : undefined;
 }
 
+export function buildAssignmentResultCopyArtifacts(
+  data: AssignmentResultCopyArtifactData
+): AssignmentResultCopyArtifacts {
+  const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
+  const items = data.analysis.perItem;
+  const students = data.analysis.students;
+
+  return {
+    classroomBrief: buildAssignmentClassroomBrief({
+      assignmentTitle,
+      items,
+      stats: buildAssignmentResultClassroomBriefStats(data.stats),
+      students,
+    }),
+    reteachPlan: buildAssignmentReteachPlan({
+      assignmentTitle,
+      items,
+      students,
+    }),
+    itemReviewSummary: buildAssignmentItemReviewSummary({
+      assignmentTitle,
+      items,
+    }),
+    studentFollowUpSummary: buildAssignmentStudentFollowUpSummary({
+      assignmentTitle,
+      students,
+    }),
+  };
+}
+
+export function getAssignmentResultCopyArtifactText({
+  action,
+  artifacts,
+}: {
+  action: AssignmentResultCopyAction;
+  artifacts: AssignmentResultCopyArtifacts;
+}) {
+  if (action === 'copy-brief') {
+    return artifacts.classroomBrief.text;
+  }
+
+  if (action === 'copy-reteach-plan') {
+    return artifacts.reteachPlan.text;
+  }
+
+  if (action === 'copy-item-review') {
+    return artifacts.itemReviewSummary.text;
+  }
+
+  return artifacts.studentFollowUpSummary.text;
+}
+
 export function buildAssignmentResultCopyText({
   action,
   data,
@@ -246,38 +328,10 @@ export function buildAssignmentResultCopyText({
   action: AssignmentResultCopyAction;
   data: AssignmentResultActionData;
 }) {
-  const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
-  const items = data.analysis.perItem;
-  const students = data.analysis.students;
-
-  if (action === 'copy-brief') {
-    return buildAssignmentClassroomBrief({
-      assignmentTitle,
-      items,
-      stats: buildAssignmentResultClassroomBriefStats(data.stats),
-      students,
-    }).text;
-  }
-
-  if (action === 'copy-reteach-plan') {
-    return buildAssignmentReteachPlan({
-      assignmentTitle,
-      items,
-      students,
-    }).text;
-  }
-
-  if (action === 'copy-item-review') {
-    return buildAssignmentItemReviewSummary({
-      assignmentTitle,
-      items,
-    }).text;
-  }
-
-  return buildAssignmentStudentFollowUpSummary({
-    assignmentTitle,
-    students,
-  }).text;
+  return getAssignmentResultCopyArtifactText({
+    action,
+    artifacts: buildAssignmentResultCopyArtifacts(data),
+  });
 }
 
 export function buildAssignmentResultActionPayload({
@@ -299,11 +353,13 @@ export function buildAssignmentResultActionPayload({
     };
   }
 
+  const artifacts = buildAssignmentResultCopyArtifacts(data);
+
   return {
     kind: 'copy-text',
-    text: buildAssignmentResultCopyText({
+    text: getAssignmentResultCopyArtifactText({
       action: actionButton.action,
-      data,
+      artifacts,
     }),
   };
 }
