@@ -1707,6 +1707,11 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /formatStudentFollowUpRecommendation[\s\S]*recommendation: followUpRecommendation/,
+  'Classroom brief student follow-up rows should reuse shared student next-step recommendations.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /kindLabel: item\.kindLabel/,
   'Classroom brief focus item views should expose prepared item type labels for teacher scanning.'
 );
@@ -33377,22 +33382,26 @@ assert.deepEqual(
   }),
   {
     accuracyLabel: 'Latest 0% · best 0%',
+    followUpRecommendation:
+      'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '0%',
     needsReviewLabel: '2 reviews',
     reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
-    text: '- 1. Anonymous student 1: 0% latest, 2 items to review',
+    text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
   }
 );
 assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
+  followUpRecommendation:
+    'review missed or unanswered items, then assign one short retry',
   latestAccuracyLabel: '0%',
   needsReviewLabel: '2 reviews',
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
-  text: '- 1. Anonymous student 1: 0% latest, 2 items to review',
+  text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
 });
 assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
 assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
@@ -33426,7 +33435,7 @@ assert.equal(
     index: Number.NaN,
     student: classroomBrief.followUpStudents[0]!,
   }).text,
-  '- 1. Anonymous student 1: 0% latest, 2 items to review'
+  '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry'
 );
 assert.deepEqual(
   buildAssignmentClassroomBriefFollowUpStudentView({
@@ -33469,7 +33478,7 @@ assert.match(
 );
 assert.match(
   classroomBrief.text,
-  /- 1\. Anonymous student 1: 0% latest, 2 items to review/
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,

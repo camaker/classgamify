@@ -732,7 +732,7 @@
   "assignment_classroom_brief_focus_heading": "课堂复盘重点：",
   "assignment_classroom_brief_focus_item": "- {promptLabel}（{performance}）",
   "assignment_classroom_brief_follow_up_heading": "学生跟进：",
-  "assignment_classroom_brief_follow_up_student": "- {index}. {student}：最近 {accuracy}，{reviewCount}",
+  "assignment_classroom_brief_follow_up_student": "- {index}. {student}：最近 {accuracy}，{reviewCount}。下一步：{recommendation}",
   "assignment_classroom_brief_stats_label": "班级快照",
   "assignment_classroom_brief_title": "ClassGamify 课堂简报：{title}",
   "assignment_delivery_answer_reveal_after_submit": "提交后显示",

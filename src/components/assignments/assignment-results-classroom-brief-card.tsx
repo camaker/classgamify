@@ -198,6 +198,9 @@ function AssignmentResultsFollowUpStudent({
         <p className="text-muted-foreground text-xs">
           {studentView.accuracyLabel}
         </p>
+        <p className="text-muted-foreground text-xs">
+          {studentView.followUpRecommendation}
+        </p>
       </div>
       <Badge variant="secondary" className="rounded-md">
         {studentView.needsReviewLabel}

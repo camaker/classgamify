@@ -20,6 +20,7 @@ import {
   formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
+import { formatStudentFollowUpRecommendation } from '@/assignments/student-follow-up-summary';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
@@ -80,6 +81,7 @@ export type AssignmentClassroomBriefFocusItemView = {
 
 export type AssignmentClassroomBriefFollowUpStudentView = {
   accuracyLabel: string;
+  followUpRecommendation: string;
   latestAccuracyLabel: string;
   needsReviewLabel: string;
   reviewItemCountLabel: string;
@@ -244,9 +246,13 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
     student.needsReviewCount
   );
+  const followUpRecommendation = formatStudentFollowUpRecommendation(
+    student.needsReviewCount
+  );
 
   return {
     accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
+    followUpRecommendation,
     latestAccuracyLabel,
     needsReviewLabel: formatAssignmentSummaryReviewCount(
       student.needsReviewCount
@@ -257,6 +263,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     text: m.assignment_classroom_brief_follow_up_student({
       accuracy: latestAccuracyLabel,
       index: formatAssignmentResultCopyOrdinal(index),
+      recommendation: followUpRecommendation,
       reviewCount: reviewItemCountLabel,
       student: studentLabel,
     }),
