@@ -43,6 +43,7 @@ import {
 import {
   buildPublishedAssignmentPanelContext,
   resolvePublishedAssignmentPanelAssignment,
+  type PublishedAssignmentPanelContext,
 } from '@/assignments/published-assignment';
 import {
   formatAssignmentResultNumber,
@@ -235,9 +236,7 @@ type AssignmentListPageViewModel<TItem extends AssignmentListPageItem> = {
   emptyState: AssignmentListEmptyStateView;
   hasAssignments: boolean;
   loadErrorMessage: string;
-  publishedPanelContext?: ReturnType<
-    typeof buildPublishedAssignmentPanelContext
-  >;
+  publishedPanelContext?: PublishedAssignmentPanelContext;
   resolvedSearch: AssignmentListPageResolvedSearch;
   starterPreview: AssignmentListStarterPreview;
   summaryMetrics: AssignmentListSummaryMetric[];

@@ -19098,8 +19098,23 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelContext/,
-  'Published assignment panel action and context contracts should be explicit domain exports.'
+  /export type PublishedAssignmentPanelAssignment = \{[\s\S]*id: string;[\s\S]*shareSlug: string;[\s\S]*title: string;[\s\S]*export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelContext/,
+  'Published assignment panel assignment, action, and context contracts should be explicit domain exports.'
+);
+assert.doesNotMatch(
+  publishedAssignmentSource,
+  /PublishedAssignmentListItem\['assignment'\]/,
+  'Published assignment panel assignment contract should not be derived from the list-item aggregate index.'
+);
+assert.match(
+  assignmentListViewSource,
+  /type PublishedAssignmentPanelContext[\s\S]*publishedPanelContext\?: PublishedAssignmentPanelContext;/,
+  'Assignment list page view-model should compose the explicit published assignment panel context contract.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /publishedPanelContext\?: ReturnType<\s*typeof buildPublishedAssignmentPanelContext\s*>/,
+  'Assignment list page view-model should not infer published panel context from the builder return type.'
 );
 assert.match(
   publishedAssignmentSource,

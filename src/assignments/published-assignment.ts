@@ -18,8 +18,11 @@ type PublishedAssignmentListItem = {
   };
 };
 
-type PublishedAssignmentPanelAssignment =
-  PublishedAssignmentListItem['assignment'];
+export type PublishedAssignmentPanelAssignment = {
+  id: string;
+  shareSlug: string;
+  title: string;
+};
 
 export type PublishedAssignmentPanelDismissAction = {
   label: string;
