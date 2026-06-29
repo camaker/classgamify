@@ -1,5 +1,7 @@
 import {
   type AssignmentResultActionButton,
+  type AssignmentAttemptRowDisplayInput,
+  type AssignmentResultsPageViewModel,
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultsRouteState,
 } from '@/assignments/result-view';
@@ -126,7 +128,7 @@ function LoadedAssignmentResultsPage({
 }: {
   onControlChange: (update: AssignmentResultControlUpdate) => void;
   onResultAction: (actionButton: AssignmentResultActionButton) => Promise<void>;
-  pageView: ReturnType<typeof buildAssignmentResultsRouteState>['pageView'];
+  pageView: AssignmentResultsPageViewModel<AssignmentAttemptRowDisplayInput>;
 }) {
   const headerView = pageView.headerView;
   if (!headerView) return null;

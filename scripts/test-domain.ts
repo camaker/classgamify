@@ -3843,10 +3843,20 @@ assert.match(
   /routeState\.status === 'loading'[\s\S]*routeState\.status === 'error'[\s\S]*LoadedAssignmentResultsPage[\s\S]*pageView=\{pageView\}/,
   'Assignment result route should render loading, error, and ready states from the assignment-domain route state.'
 );
+assert.match(
+  assignmentResultViewSource,
+  /export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput &[\s\S]*export type AssignmentResultsPageViewModel<[\s\S]*export type AssignmentResultsRouteState</,
+  'Assignment result view domain should export explicit route-facing result page and route-state contracts.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /AssignmentResultsPageViewModel<AssignmentAttemptRowDisplayInput>/,
+  'Assignment result route loaded page should consume the explicit result page view-model contract.'
+);
 assert.doesNotMatch(
   assignmentResultRouteSource,
-  /buildAssignmentResultsPageViewModel|if \(isLoading\)|isError \|\| !data/,
-  'Assignment result route should not directly build page views or branch on raw query loading/error flags.'
+  /buildAssignmentResultsPageViewModel|if \(isLoading\)|isError \|\| !data|ReturnType<typeof buildAssignmentResultsRouteState>/,
+  'Assignment result route should not directly build page views, branch on raw query loading/error flags, or infer page types from the route-state builder.'
 );
 assert.match(
   assignmentResultViewSource,

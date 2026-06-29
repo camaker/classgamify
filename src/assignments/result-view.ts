@@ -308,7 +308,7 @@ export type AssignmentResultCopyScopeView = {
   title: string;
 };
 
-type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
+export type AssignmentAttemptRowDisplayInput = AssignmentAttemptRowInput & {
   completedAt: Date | string | null;
   maxScore: number | null;
   resultJson: {
@@ -385,7 +385,7 @@ export type AssignmentResultsPageData<
   };
 };
 
-type AssignmentResultsPageViewModel<
+export type AssignmentResultsPageViewModel<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > = {
   actionButtons: AssignmentResultActionButton[];
@@ -425,7 +425,7 @@ type AssignmentResultsPageViewModel<
   viewState: AssignmentResultResolvedViewState;
 };
 
-type AssignmentResultsRouteState<
+export type AssignmentResultsRouteState<
   TAttempt extends AssignmentAttemptRowDisplayInput,
 > =
   | {
