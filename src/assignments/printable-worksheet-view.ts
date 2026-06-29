@@ -179,6 +179,7 @@ export function buildPrintableWorksheetHeaderView(
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
     printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
+    sharePathLabel: printableWorksheetPageCopy.sharePathLabel,
     templateLabel: getTemplateByType(worksheet.templateType).name,
   };
 }

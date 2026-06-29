@@ -47,6 +47,9 @@ export function PrintableWorksheetHeader({
           <IconSchool className="size-4" />
           {headerView.brandLabel}
         </div>
+        <p className="mt-2 text-muted-foreground text-xs">
+          {headerView.sharePathLabel}
+        </p>
         <p className="mt-1 text-muted-foreground">{headerView.sharePath}</p>
       </div>
     </header>

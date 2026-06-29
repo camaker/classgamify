@@ -13285,6 +13285,7 @@ assert.deepEqual(
       instructions: 'Finish on paper.',
       printModeLabel: 'Printable practice',
       sharePath: '/play/printable-1',
+      sharePathLabel: 'Student link',
       templateLabel: 'Quiz',
     },
     itemIds: ['q-frozen-prompt'],
@@ -19102,7 +19103,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetHeaderSource,
-  /headerView\.assignmentTitle[\s\S]*headerView\.sharePath/,
+  /headerView\.assignmentTitle[\s\S]*headerView\.sharePathLabel[\s\S]*headerView\.sharePath/,
   'Printable worksheet header should consume header view fields.'
 );
 assert.match(
