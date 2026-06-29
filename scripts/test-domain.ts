@@ -19143,8 +19143,13 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelAssignment = \{[\s\S]*id: string;[\s\S]*shareSlug: string;[\s\S]*title: string;[\s\S]*export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelContext/,
+  /export type PublishedAssignmentPanelAssignment = \{[\s\S]*id: string;[\s\S]*shareSlug: string;[\s\S]*title: string;[\s\S]*export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelStatus = 'found' \| 'loading' \| 'missing';[\s\S]*export type PublishedAssignmentPanelContext/,
   'Published assignment panel assignment, action, and context contracts should be explicit domain exports.'
+);
+assert.doesNotMatch(
+  publishedAssignmentSource,
+  /PublishedAssignmentPanelContext\['status'\]/,
+  'Published assignment panel helpers should consume an explicit status contract instead of indexing the aggregate context.'
 );
 assert.doesNotMatch(
   publishedAssignmentSource,

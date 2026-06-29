@@ -56,6 +56,8 @@ export type PublishedAssignmentPanelActionView = {
   shareAction: PublishedAssignmentPanelShareAction | undefined;
 };
 
+export type PublishedAssignmentPanelStatus = 'found' | 'loading' | 'missing';
+
 export function findPublishedAssignmentInList<
   TItem extends PublishedAssignmentListItem,
 >({ items, shareSlug }: { items: TItem[]; shareSlug?: string }) {
@@ -101,7 +103,7 @@ export type PublishedAssignmentPanelContext = {
   sharePath: string;
   sharePathLabel: string;
   showMissingHint: boolean;
-  status: 'found' | 'loading' | 'missing';
+  status: PublishedAssignmentPanelStatus;
   title: string;
 };
 
@@ -180,7 +182,7 @@ function buildPublishedAssignmentPanelActionView({
   assignment?: PublishedAssignmentPanelAssignment;
   sharePath: string;
   shareSlug: string;
-  status: PublishedAssignmentPanelContext['status'];
+  status: PublishedAssignmentPanelStatus;
 }): PublishedAssignmentPanelActionView {
   const hasAssignment = status === 'found' && assignment;
 
@@ -214,7 +216,7 @@ function buildPublishedAssignmentPanelActionView({
 }
 
 function buildPublishedAssignmentPanelNextSteps(
-  status: PublishedAssignmentPanelContext['status']
+  status: PublishedAssignmentPanelStatus
 ) {
   const baseSteps = [
     m.assignment_published_panel_next_step_copy_link(),
