@@ -879,6 +879,7 @@
   "assignment_printable_snapshot_source_label": "Snapshot source",
   "assignment_printable_snapshot_source_value": "Frozen from {activityTitle} for {sharePath}",
   "assignment_printable_student_name_label": "Student name",
+  "assignment_printable_template_label": "Template",
   "assignment_publish_dialog_cancel": "Cancel",
   "assignment_publish_dialog_close_after_help": "Optional. Leave blank to keep the link open until it is closed manually.",
   "assignment_publish_dialog_close_after_label": "Close after",

@@ -41,7 +41,12 @@ type PrintableWorksheetAssignmentFieldView =
       label: string;
     }
   | {
-      id: 'delivery-policy' | 'instructions' | 'share-path' | 'snapshot-source';
+      id:
+        | 'delivery-policy'
+        | 'instructions'
+        | 'share-path'
+        | 'snapshot-source'
+        | 'template';
       kind: 'text';
       label: string;
       value: string;
@@ -155,6 +160,9 @@ export const printableWorksheetPageCopy = {
   },
   get studentNameLabel() {
     return m.assignment_printable_student_name_label();
+  },
+  get templateLabel() {
+    return m.assignment_printable_template_label();
   },
 } as const;
 
@@ -288,6 +296,12 @@ export function buildPrintableWorksheetAssignmentFieldViews(
       kind: 'text',
       label: printableWorksheetPageCopy.sharePathLabel,
       value: headerView.sharePath,
+    },
+    {
+      id: 'template',
+      kind: 'text',
+      label: printableWorksheetPageCopy.templateLabel,
+      value: headerView.templateLabel,
     },
     buildPrintableWorksheetSnapshotSourceFieldView(headerView),
     {

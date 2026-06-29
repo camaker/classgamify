@@ -13238,6 +13238,12 @@ assert.deepEqual(
         value: '/play/printable-1',
       },
       {
+        id: 'template',
+        kind: 'text',
+        label: 'Template',
+        value: 'Quiz',
+      },
+      {
         id: 'snapshot-source',
         kind: 'text',
         label: 'Snapshot source',
@@ -18820,6 +18826,11 @@ assert.match(
   printableWorksheetViewSource,
   /assignmentFieldViews:[\s\S]*buildPrintableWorksheetAssignmentFieldViews/,
   'Printable worksheet page view-model should own printable assignment field rows.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /id: 'template'[\s\S]*label: printableWorksheetPageCopy\.templateLabel[\s\S]*value: headerView\.templateLabel/,
+  'Printable worksheet assignment fields should expose the prepared template label from the header view.'
 );
 assert.match(
   printableWorksheetViewSource,

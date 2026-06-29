@@ -879,6 +879,7 @@
   "assignment_printable_snapshot_source_label": "快照来源",
   "assignment_printable_snapshot_source_value": "来自 {activityTitle} 为 {sharePath} 冻结的作业快照",
   "assignment_printable_student_name_label": "学生姓名",
+  "assignment_printable_template_label": "模板",
   "assignment_publish_dialog_cancel": "取消",
   "assignment_publish_dialog_close_after_help": "可选。留空则链接保持开放，直到手动关闭。",
   "assignment_publish_dialog_close_after_label": "关闭时间",
