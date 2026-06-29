@@ -6734,8 +6734,13 @@ assert.match(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /function StudentRunnerTeacherActionLink[\s\S]*action\.to === 'assignment-results'[\s\S]*Routes\.DashboardAssignmentResults[\s\S]*params=\{\{ assignmentId: action\.assignmentId \}\}[\s\S]*Routes\.Create/,
-  'Student runner header card should route prepared teacher actions to results or creation.'
+  /function StudentRunnerTeacherActionLink[\s\S]*action\.type === 'view-results'[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ assignmentId: action\.assignmentId \}\}[\s\S]*<Link to=\{action\.to\}/,
+  'Student runner header card should consume prepared teacher action route targets.'
+);
+assert.doesNotMatch(
+  studentRunnerHeaderCardSource,
+  /Routes\.DashboardAssignmentResults|Routes\.Create/,
+  'Student runner header card should not hardcode teacher action route targets.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -12082,7 +12087,7 @@ assert.deepEqual(studentRunnerHeaderView, {
   teacherAction: {
     assignmentId: 'assignment-public-1',
     label: 'Teacher results',
-    to: 'assignment-results',
+    to: Routes.DashboardAssignmentResults,
     type: 'view-results',
   },
   title: 'Public assignment',
@@ -12108,7 +12113,7 @@ assert.deepEqual(
   }).teacherAction,
   {
     label: 'Create activity',
-    to: 'create',
+    to: Routes.Create,
     type: 'create-activity',
   }
 );

@@ -2,7 +2,6 @@ import type { buildStudentRunnerPageViewModel } from '@/assignments/student-runn
 import { PublicAssignmentRules } from '@/components/assignments/public-assignment-rules';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconClipboardText, IconDeviceGamepad2 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -54,10 +53,10 @@ function StudentRunnerTeacherActionLink({
     'w-fit bg-background'
   );
 
-  if (action.to === 'assignment-results') {
+  if (action.type === 'view-results') {
     return (
       <Link
-        to={Routes.DashboardAssignmentResults}
+        to={action.to}
         params={{ assignmentId: action.assignmentId }}
         className={className}
       >
@@ -67,7 +66,7 @@ function StudentRunnerTeacherActionLink({
   }
 
   return (
-    <Link to={Routes.Create} className={className}>
+    <Link to={action.to} className={className}>
       {action.label}
     </Link>
   );

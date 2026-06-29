@@ -29,6 +29,7 @@ import {
   getStudentRunnerCopy,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type StudentRunnerReviewStatus =
@@ -238,13 +239,13 @@ type StudentRunnerInstructionView = {
 type StudentRunnerTeacherAction =
   | {
       label: string;
-      to: 'create';
+      to: typeof Routes.Create;
       type: 'create-activity';
     }
   | {
       assignmentId: string;
       label: string;
-      to: 'assignment-results';
+      to: typeof Routes.DashboardAssignmentResults;
       type: 'view-results';
     };
 
@@ -307,14 +308,14 @@ function buildStudentRunnerTeacherAction({
     return {
       assignmentId: assignment.id,
       label: runnerCopy.teacherResultsLabel,
-      to: 'assignment-results',
+      to: Routes.DashboardAssignmentResults,
       type: 'view-results',
     };
   }
 
   return {
     label: runnerCopy.createActivityLabel,
-    to: 'create',
+    to: Routes.Create,
     type: 'create-activity',
   };
 }
