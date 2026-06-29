@@ -157,6 +157,9 @@ function LoadedAssignmentResultsPage({
             <AssignmentResultsClassroomBriefCard
               brief={pageView.classroomBrief}
               copyArtifactPreviews={pageView.copyArtifactPreviews}
+              onResultAction={(actionButton) =>
+                void onResultAction(actionButton)
+              }
             />
           ) : null}
           <AssignmentResultsStudentSearch

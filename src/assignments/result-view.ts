@@ -305,7 +305,11 @@ type AssignmentResultsPageViewModel<
   completedAttempts: TAttempt[];
   contentState: AssignmentResultContentState;
   controlViews: AssignmentResultControlViews;
-  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  copyArtifactPreviews: Array<
+    AssignmentResultCopyArtifactPreview & {
+      actionButton: AssignmentResultActionButton;
+    }
+  >;
   description: string;
   headerView: AssignmentResultHeaderView | null;
   itemAnalysisCardViews: ReturnType<
@@ -1408,9 +1412,6 @@ export function buildAssignmentResultsPageViewModel<
   });
   const copyArtifacts = data ? buildAssignmentResultCopyArtifacts(data) : null;
   const classroomBrief = copyArtifacts?.classroomBrief ?? null;
-  const copyArtifactPreviews = copyArtifacts
-    ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts)
-    : [];
   const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
     data?.stats.completions
   );
@@ -1424,9 +1425,28 @@ export function buildAssignmentResultsPageViewModel<
     itemCount: data?.analysis.perItem.length ?? 0,
     studentCount: data?.analysis.students.length ?? 0,
   });
+  const actionButtons = buildAssignmentResultActionButtons(actionState);
+  const copyArtifactPreviews = copyArtifacts
+    ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts).flatMap(
+        (preview) => {
+          const actionButton = actionButtons.find(
+            (button) => button.action === preview.action
+          );
+
+          return actionButton
+            ? [
+                {
+                  ...preview,
+                  actionButton,
+                },
+              ]
+            : [];
+        }
+      )
+    : [];
 
   return {
-    actionButtons: buildAssignmentResultActionButtons(actionState),
+    actionButtons,
     actionData: data ?? null,
     actionState,
     attemptReviewCardViews,

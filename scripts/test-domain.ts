@@ -3726,8 +3726,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultRouteSource,
-  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}/,
-  'Assignment result route should pass prepared copy artifact previews into the classroom brief card.'
+  /<AssignmentResultsClassroomBriefCard[\s\S]*brief=\{pageView\.classroomBrief\}[\s\S]*copyArtifactPreviews=\{pageView\.copyArtifactPreviews\}[\s\S]*onResultAction=\{\(actionButton\) =>[\s\S]*void onResultAction\(actionButton\)[\s\S]*\}/,
+  'Assignment result route should pass prepared copy artifact previews and the result action handler into the classroom brief card.'
 );
 assert.doesNotMatch(
   assignmentResultRouteSource,
@@ -3836,7 +3836,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}/,
+  /AssignmentResultsClassroomBriefStats[\s\S]*brief=\{brief\}[\s\S]*AssignmentResultsClassFocusPanel[\s\S]*focusItemViews=\{brief\.focusItemViews\}[\s\S]*AssignmentResultsFollowUpPanel[\s\S]*followUpStudentViews=\{brief\.followUpStudentViews\}[\s\S]*AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyArtifactPreviews=\{copyArtifactPreviews\}[\s\S]*onResultAction=\{onResultAction\}/,
   'Assignment classroom brief card should delegate prepared stats, focus item, follow-up student, and copy-preview views to focused panels.'
 );
 assert.match(
@@ -3896,13 +3896,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview/,
-  'Assignment classroom brief copy preview should render prepared copy artifact previews.'
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*brief\.copyPreview\.label[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
+  'Assignment classroom brief copy preview should render prepared copy artifact previews with the prepared result action handler.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.text/,
-  'Assignment classroom brief copy artifact preview cards should render prepared label, description, and copied text.'
+  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.text/,
+  'Assignment classroom brief copy artifact preview cards should render prepared label, description, copied text, and action button state.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -29270,7 +29270,13 @@ assert.deepEqual(
     contentState: scoredResultsPageView.contentState,
     classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
     copyArtifactPreviews: scoredResultsPageView.copyArtifactPreviews.map(
-      (preview) => [preview.action, preview.label, preview.text.length > 0]
+      (preview) => [
+        preview.action,
+        preview.label,
+        preview.actionButton.action,
+        preview.actionButton.disabled,
+        preview.text.length > 0,
+      ]
     ),
     controlViews: {
       attemptReviewFilter: [
@@ -29347,10 +29353,16 @@ assert.deepEqual(
     },
     classroomBriefReady: true,
     copyArtifactPreviews: [
-      ['copy-brief', 'Copy brief', true],
-      ['copy-reteach-plan', 'Copy reteach plan', true],
-      ['copy-item-review', 'Copy item review', true],
-      ['copy-follow-up', 'Copy follow-up', true],
+      ['copy-brief', 'Copy brief', 'copy-brief', false, true],
+      [
+        'copy-reteach-plan',
+        'Copy reteach plan',
+        'copy-reteach-plan',
+        false,
+        true,
+      ],
+      ['copy-item-review', 'Copy item review', 'copy-item-review', false, true],
+      ['copy-follow-up', 'Copy follow-up', 'copy-follow-up', false, true],
     ],
     controlViews: {
       attemptReviewFilter: ['needs-review', ['all', 'needs-review']],

@@ -1,9 +1,11 @@
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import {
   assignmentResultSectionCopy,
+  type AssignmentResultActionButton,
   type AssignmentResultCopyArtifactPreview,
 } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,16 +13,22 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { IconClipboardText } from '@tabler/icons-react';
+import { IconClipboardText, IconCopy } from '@tabler/icons-react';
 
 type AssignmentResultsClassroomBriefCardProps = {
   brief: AssignmentClassroomBrief;
-  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  copyArtifactPreviews: Array<
+    AssignmentResultCopyArtifactPreview & {
+      actionButton: AssignmentResultActionButton;
+    }
+  >;
+  onResultAction: (actionButton: AssignmentResultActionButton) => void;
 };
 
 export function AssignmentResultsClassroomBriefCard({
   brief,
   copyArtifactPreviews,
+  onResultAction,
 }: AssignmentResultsClassroomBriefCardProps) {
   return (
     <Card className="rounded-lg">
@@ -50,6 +58,7 @@ export function AssignmentResultsClassroomBriefCard({
         <AssignmentResultsClassroomBriefCopyPreview
           brief={brief}
           copyArtifactPreviews={copyArtifactPreviews}
+          onResultAction={onResultAction}
         />
       </CardContent>
     </Card>
@@ -196,9 +205,15 @@ function AssignmentResultsFollowUpStudent({
 function AssignmentResultsClassroomBriefCopyPreview({
   brief,
   copyArtifactPreviews,
+  onResultAction,
 }: {
   brief: AssignmentClassroomBrief;
-  copyArtifactPreviews: AssignmentResultCopyArtifactPreview[];
+  copyArtifactPreviews: Array<
+    AssignmentResultCopyArtifactPreview & {
+      actionButton: AssignmentResultActionButton;
+    }
+  >;
+  onResultAction: (actionButton: AssignmentResultActionButton) => void;
 }) {
   return (
     <section className="grid gap-2 rounded-lg border bg-muted/20 p-4">
@@ -207,6 +222,7 @@ function AssignmentResultsClassroomBriefCopyPreview({
         {copyArtifactPreviews.map((preview) => (
           <AssignmentResultsCopyArtifactPreview
             key={preview.action}
+            onResultAction={onResultAction}
             preview={preview}
           />
         ))}
@@ -216,15 +232,32 @@ function AssignmentResultsClassroomBriefCopyPreview({
 }
 
 function AssignmentResultsCopyArtifactPreview({
+  onResultAction,
   preview,
 }: {
-  preview: AssignmentResultCopyArtifactPreview;
+  onResultAction: (actionButton: AssignmentResultActionButton) => void;
+  preview: AssignmentResultCopyArtifactPreview & {
+    actionButton: AssignmentResultActionButton;
+  };
 }) {
   return (
     <article className="grid gap-2 rounded-md border bg-background p-3">
-      <div className="grid gap-1">
-        <h4 className="font-medium text-sm">{preview.label}</h4>
-        <p className="text-muted-foreground text-xs">{preview.description}</p>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="grid gap-1">
+          <h4 className="font-medium text-sm">{preview.label}</h4>
+          <p className="text-muted-foreground text-xs">{preview.description}</p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="shrink-0 bg-background"
+          disabled={preview.actionButton.disabled}
+          onClick={() => onResultAction(preview.actionButton)}
+        >
+          <IconCopy className="size-4" />
+          {preview.actionButton.label}
+        </Button>
       </div>
       <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-muted-foreground text-xs">
         {preview.text}
