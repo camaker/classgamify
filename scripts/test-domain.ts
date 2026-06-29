@@ -1759,6 +1759,11 @@ assert.match(
   /formatAssignmentResultStudentLabel\(/,
   'Reteach plan should format student labels through the shared result-display helper.'
 );
+assert.match(
+  assignmentReteachPlanSource,
+  /formatStudentFollowUpRecommendation[\s\S]*recommendation: followUpRecommendation/,
+  'Reteach plan student follow-up rows should reuse shared student next-step recommendations.'
+);
 assert.doesNotMatch(
   assignmentReteachPlanSource,
   /lines\.join\('\\n'\)|student: student\.studentLabel/,
@@ -33531,11 +33536,20 @@ assert.deepEqual(
 );
 assert.deepEqual(buildAssignmentReteachPlanStudentView(alphaReviewStudent), {
   accuracyLabel: '70%',
+  followUpRecommendation:
+    'review missed or unanswered items, then assign one short retry',
   reviewItemCountLabel: '3 items to review',
   studentKey: 'name:alpha-review',
   studentLabel: 'Alpha review',
-  text: '- Alpha review: 70% latest accuracy, 3 items to review',
+  text: '- Alpha review: 70% latest accuracy, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
 });
+assert.equal(
+  buildAssignmentReteachPlanStudentView({
+    ...alphaReviewStudent,
+    needsReviewCount: 0,
+  }).followUpRecommendation,
+  'keep reinforcing and offer a harder variant'
+);
 assert.deepEqual(
   buildAssignmentReteachPlanStudentView({
     ...alphaReviewStudent,
@@ -33595,7 +33609,7 @@ assert.match(
 );
 assert.match(
   reteachPlan.text,
-  /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
+  /Alpha review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- More review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- Lower score: 10% latest accuracy, 1 item to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 const expandedReteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,

@@ -113,7 +113,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   };
 }
 
-function formatStudentFollowUpRecommendation(needsReviewCount: number) {
+export function formatStudentFollowUpRecommendation(needsReviewCount: number) {
   return normalizeAssignmentSummaryCount(needsReviewCount) > 0
     ? m.assignment_student_follow_up_recommendation_review()
     : m.assignment_student_follow_up_recommendation_extend();

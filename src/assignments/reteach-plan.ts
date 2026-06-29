@@ -17,6 +17,7 @@ import {
 } from '@/assignments/result-copy-format';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
+import { formatStudentFollowUpRecommendation } from '@/assignments/student-follow-up-summary';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentReteachPlanInput = {
@@ -39,6 +40,7 @@ export type AssignmentReteachPlanItemView = {
 
 export type AssignmentReteachPlanStudentView = {
   accuracyLabel: string;
+  followUpRecommendation: string;
   reviewItemCountLabel: string;
   studentKey: string;
   studentLabel: string;
@@ -144,14 +146,19 @@ export function buildAssignmentReteachPlanStudentView(
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
     student.needsReviewCount
   );
+  const followUpRecommendation = formatStudentFollowUpRecommendation(
+    student.needsReviewCount
+  );
 
   return {
     accuracyLabel,
+    followUpRecommendation,
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
     text: m.assignment_reteach_plan_student({
       accuracy: accuracyLabel,
+      recommendation: followUpRecommendation,
       reviewCount: reviewItemCountLabel,
       student: studentLabel,
     }),
