@@ -132,6 +132,7 @@ type StudentRunnerCopy = {
   studentNameLabel: string;
   studentNamePlaceholder: string;
   submissionFailureMessage: string;
+  submissionPendingLabel: string;
   submissionSuccessMessage: string;
   timeExpiredMessage: string;
   timeEndedLabel: string;
@@ -164,6 +165,7 @@ type StudentAttemptControlState = {
   readOnlyMessage?: string;
   runtimeItemsDisabled: boolean;
   showTimeExpiredMessage: boolean;
+  submitButtonLabel?: string;
   submitDisabled: boolean;
   unansweredLabel?: string;
 };
@@ -253,6 +255,9 @@ const STUDENT_RUNNER_COPY = {
   },
   get submissionFailureMessage() {
     return m.student_runner_submission_failure();
+  },
+  get submissionPendingLabel() {
+    return m.student_runner_submission_pending();
   },
   get submissionSuccessMessage() {
     return m.student_runner_submission_success();
@@ -419,12 +424,17 @@ export function buildStudentAttemptControlState({
   timeExpired: boolean;
   unansweredLabel?: string;
 }): StudentAttemptControlState {
+  const showSubmittingLabel = canSubmit && !hasResult && isSubmitting;
+
   return {
     readOnlyMessage: canSubmit
       ? undefined
       : STUDENT_RUNNER_COPY.readOnlyPreviewMessage,
     runtimeItemsDisabled: hasResult || timeExpired,
     showTimeExpiredMessage: timeExpired && !hasResult,
+    ...(showSubmittingLabel
+      ? { submitButtonLabel: STUDENT_RUNNER_COPY.submissionPendingLabel }
+      : {}),
     submitDisabled: !canSubmit || hasResult || isSubmitting,
     unansweredLabel: hasResult ? undefined : unansweredLabel,
   };

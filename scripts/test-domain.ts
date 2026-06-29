@@ -7466,6 +7466,7 @@ assert.deepEqual(getStudentRunnerCopy(), {
   studentNameLabel: 'Student name',
   studentNamePlaceholder: 'Type your name',
   submissionFailureMessage: 'Attempt could not be saved.',
+  submissionPendingLabel: 'Submitting...',
   submissionSuccessMessage: 'Attempt submitted.',
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
   timeEndedLabel: 'Time ended',
@@ -9214,6 +9215,23 @@ assert.deepEqual(
     showTimeExpiredMessage: false,
     submitDisabled: true,
     unansweredLabel: undefined,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptControlState({
+    canSubmit: true,
+    hasResult: false,
+    isSubmitting: true,
+    timeExpired: false,
+    unansweredLabel: '1 item left unanswered.',
+  }),
+  {
+    readOnlyMessage: undefined,
+    runtimeItemsDisabled: false,
+    showTimeExpiredMessage: false,
+    submitButtonLabel: 'Submitting...',
+    submitDisabled: true,
+    unansweredLabel: '1 item left unanswered.',
   }
 );
 assert.deepEqual(
@@ -14249,6 +14267,10 @@ const pendingSubmitStudentRunnerPageView = buildStudentRunnerPageViewModel({
 assert.equal(
   pendingSubmitStudentRunnerPageView.attemptControlState.submitDisabled,
   true
+);
+assert.equal(
+  pendingSubmitStudentRunnerPageView.controlView.submitButtonLabel,
+  'Submitting...'
 );
 assert.deepEqual(
   buildStudentRunnerSubmissionExecutionPlan({

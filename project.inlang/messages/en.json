@@ -2045,6 +2045,7 @@
   "student_runner_student_name_label": "Student name",
   "student_runner_student_name_placeholder": "Type your name",
   "student_runner_submission_failure": "Attempt could not be saved.",
+  "student_runner_submission_pending": "Submitting...",
   "student_runner_submission_success": "Attempt submitted.",
   "student_runner_teacher_view": "Teacher view",
   "student_runner_time_ended": "Time ended",

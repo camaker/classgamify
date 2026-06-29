@@ -522,7 +522,9 @@ export function buildStudentRunnerPageViewModel({
       runnerTitle: activityRunnerCopy?.title ?? '',
       runtimeItemsDisabled: attemptControlState.runtimeItemsDisabled,
       showTimeExpiredMessage: attemptControlState.showTimeExpiredMessage,
-      submitButtonLabel: completionCopy.submitButtonLabel,
+      submitButtonLabel:
+        attemptControlState.submitButtonLabel ??
+        completionCopy.submitButtonLabel,
       submitConfirmationMessage:
         confirmIncompleteSubmit && attemptControlState.unansweredLabel
           ? completionCopy.confirmIncompleteSubmit

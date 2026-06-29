@@ -2045,6 +2045,7 @@
   "student_runner_student_name_label": "学生姓名",
   "student_runner_student_name_placeholder": "输入你的姓名",
   "student_runner_submission_failure": "无法保存作答。",
+  "student_runner_submission_pending": "正在提交...",
   "student_runner_submission_success": "作答已提交。",
   "student_runner_teacher_view": "老师视图",
   "student_runner_time_ended": "时间已结束",
