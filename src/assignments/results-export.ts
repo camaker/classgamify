@@ -4,7 +4,10 @@ import type {
 } from '@/activities/types';
 import { getTemplateByType } from '@/activities/catalog';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
-import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
+import {
+  buildAssignmentAttemptStatsView,
+  type AssignmentAttemptStatsView,
+} from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import type { AssignmentResultsAnalysis } from '@/assignments/results';
@@ -22,7 +25,10 @@ import {
 } from '@/assignments/delivery-summary';
 import { formatAssignmentResultCopyOrdinal } from '@/assignments/result-copy-format';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
-import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
+import {
+  resolveAssignmentSnapshotSource,
+  type ResolvedAssignmentSnapshotSource,
+} from '@/assignments/snapshot';
 import { resolveAssignmentSettings } from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
@@ -89,12 +95,12 @@ type AssignmentResultsExportStudentSummary =
 type AssignmentResultsExportContext = {
   assignmentTitle: string;
   attemptsById: Map<string, ExportAttempt>;
-  deliveryView: ReturnType<typeof buildAssignmentResultsExportDeliveryView>;
+  deliveryView: AssignmentResultsExportDeliveryView;
   itemAnalysisById: Map<string, AssignmentResultsExportItemAnalysis>;
-  resolvedSource: ReturnType<typeof resolveAssignmentSnapshotSource>;
+  resolvedSource: ResolvedAssignmentSnapshotSource;
   runtimeItemCount: number;
   shareSlug: string;
-  statsView: ReturnType<typeof buildAssignmentAttemptStatsView>;
+  statsView: AssignmentAttemptStatsView;
   studentsByKey: Map<string, AssignmentResultsExportStudentSummary>;
 };
 
@@ -334,13 +340,25 @@ export function buildAssignmentResultsCsvDataUrl(csv: string) {
   return `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
 }
 
+export type AssignmentResultsExportDeliveryView = {
+  answerReveal: string;
+  closeTime: string;
+  identityMode: string;
+  instructions: string;
+  itemOrder: string;
+  maxAttempts: string;
+  policyText: string;
+  settings: AssignmentSettings;
+  timeLimitSeconds: number | undefined;
+};
+
 export function buildAssignmentResultsExportDeliveryView({
   expiresAt,
   settings,
 }: {
   expiresAt: Date | string | null;
   settings: AssignmentSettings;
-}) {
+}): AssignmentResultsExportDeliveryView {
   const exportSettings = buildAssignmentExportSettings(settings);
   const deliverySummaryById = new Map(
     buildAssignmentDeliverySummary({

@@ -2088,6 +2088,21 @@ assert.match(
 );
 assert.match(
   assignmentResultsExportSource,
+  /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*policyText: string;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
+  'Assignment CSV export domain should expose an explicit delivery view contract.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /type AssignmentResultsExportContext = \{[\s\S]*deliveryView: AssignmentResultsExportDeliveryView;[\s\S]*resolvedSource: ResolvedAssignmentSnapshotSource;[\s\S]*statsView: AssignmentAttemptStatsView;/,
+  'Assignment CSV export context should compose explicit delivery, snapshot-source, and stats view contracts.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /ReturnType<typeof (?:buildAssignmentResultsExportDeliveryView|resolveAssignmentSnapshotSource|buildAssignmentAttemptStatsView)>/,
+  'Assignment CSV export context should not infer delivery, snapshot-source, or stats contracts from helper return types.'
+);
+assert.match(
+  assignmentResultsExportSource,
   /function buildAssignmentResultsExportAttemptBaseColumns[\s\S]*formatAssignmentResultCsvNumber\(statsView\.completions[\s\S]*formatAssignmentResultCsvNumber\(storedAttempt\?\.score \?\? attempt\.score[\s\S]*formatAssignmentResultCsvNumber\(studentSummary\?\.needsReviewCount/,
   'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
 );
