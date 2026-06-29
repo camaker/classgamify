@@ -183,7 +183,7 @@ export function ActivityLibraryCard({
             cardDisplayView.actionState.showEditAction &&
             cardDisplayView.sourceMaterials.hasMaterials ? (
               <ActivityLibrarySourceMaterialEditAction
-                activityId={activity.id}
+                action={cardDisplayView.sourceMaterialEditAction}
               />
             ) : undefined
           }
@@ -198,7 +198,7 @@ export function ActivityLibraryCard({
         />
         <ActivityLibraryCardActions
           actionState={cardDisplayView.actionState}
-          activityId={activity.id}
+          editAction={cardDisplayView.editAction}
           isArchiving={archiveMutation.isPending}
           isDuplicating={duplicateMutation.isPending}
           isRestoring={restoreMutation.isPending}
@@ -230,27 +230,27 @@ export function ActivityLibraryCard({
 }
 
 function ActivityLibrarySourceMaterialEditAction({
-  activityId,
+  action,
 }: {
-  activityId: string;
+  action: ActivityLibraryCardDisplayView['sourceMaterialEditAction'];
 }) {
   return (
     <Link
-      to="/dashboard/activities/$activityId"
-      params={{ activityId }}
+      to={action.to}
+      params={{ activityId: action.activityId }}
       className={cn(
         buttonVariants({ size: 'sm', variant: 'outline' }),
         'h-7 rounded-md bg-background px-2 text-xs'
       )}
     >
-      {activityLibraryCardCopy.sourceMaterialEditActionLabel}
+      {action.label}
     </Link>
   );
 }
 
 function ActivityLibraryCardActions({
   actionState,
-  activityId,
+  editAction,
   isArchiving,
   isDuplicating,
   isRestoring,
@@ -260,7 +260,7 @@ function ActivityLibraryCardActions({
   onRestore,
 }: {
   actionState: ActivityLibraryCardDisplayView['actionState'];
-  activityId: string;
+  editAction: ActivityLibraryCardDisplayView['editAction'];
   isArchiving: boolean;
   isDuplicating: boolean;
   isRestoring: boolean;
@@ -274,7 +274,7 @@ function ActivityLibraryCardActions({
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
       {actionState.showEditAction ? (
-        <ActivityLibraryEditActionLink activityId={activityId} />
+        <ActivityLibraryEditActionLink action={editAction} />
       ) : null}
       {actionState.showDerivativeActions ? (
         <ActivityLibraryDuplicateActionButton
@@ -305,18 +305,22 @@ function ActivityLibraryCardActions({
   );
 }
 
-function ActivityLibraryEditActionLink({ activityId }: { activityId: string }) {
+function ActivityLibraryEditActionLink({
+  action,
+}: {
+  action: ActivityLibraryCardDisplayView['editAction'];
+}) {
   return (
     <Link
-      to="/dashboard/activities/$activityId"
-      params={{ activityId }}
+      to={action.to}
+      params={{ activityId: action.activityId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-fit'
       )}
     >
       <IconEdit className="size-4" />
-      {activityLibraryCardCopy.actionLabels.edit}
+      {action.label}
     </Link>
   );
 }

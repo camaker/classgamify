@@ -105,8 +105,8 @@ function CreatedActivityPanelActions({
       {context.showPublishAction && activity ? (
         <CreatedActivityPublishActionButton onClick={onPublish} />
       ) : null}
-      {context.showEditAction && activity ? (
-        <CreatedActivityEditActionLink activityId={activity.id} />
+      {context.showEditAction && context.editAction ? (
+        <CreatedActivityEditActionLink action={context.editAction} />
       ) : null}
       {context.showCreateAction ? <CreatedActivityNewActionLink /> : null}
       {context.showDismissAction ? (
@@ -129,18 +129,22 @@ function CreatedActivityPublishActionButton({
   );
 }
 
-function CreatedActivityEditActionLink({ activityId }: { activityId: string }) {
+function CreatedActivityEditActionLink({
+  action,
+}: {
+  action: NonNullable<CreatedActivityPanelContext['editAction']>;
+}) {
   return (
     <Link
-      to="/dashboard/activities/$activityId"
-      params={{ activityId }}
+      to={action.to}
+      params={{ activityId: action.activityId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-auto'
       )}
     >
       <IconEdit className="size-4" />
-      {activityLibraryCardCopy.actionLabels.edit}
+      {action.label}
     </Link>
   );
 }

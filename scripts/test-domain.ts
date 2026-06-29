@@ -16154,6 +16154,11 @@ assert.deepEqual(
   {
     activity: createdActivities[1],
     body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
+    editAction: {
+      activityId: 'activity-2',
+      label: 'Edit activity',
+      to: Routes.DashboardActivityEdit,
+    },
     showCreateAction: true,
     showDismissAction: true,
     showEditAction: true,
@@ -17410,13 +17415,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
+  /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*action=\{cardDisplayView\.sourceMaterialEditAction\}[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
   'Activity library card component should render source-material summary with an edit action only when the activity can be edited.'
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibrarySourceMaterialEditAction[\s\S]*to="\/dashboard\/activities\/\$activityId"[\s\S]*activityLibraryCardCopy\.sourceMaterialEditActionLabel/,
-  'Activity library source-material edit action should route to the activity editor with domain copy.'
+  /function ActivityLibrarySourceMaterialEditAction[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}/,
+  'Activity library source-material edit action should consume the prepared editor route action.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -17425,7 +17430,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*activityId=\{activity\.id\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
+  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
   'Activity library card component should delegate persisted action rendering to a focused action component.'
 );
 assert.match(
@@ -17435,8 +17440,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryEditActionLink[\s\S]*activityLibraryCardCopy\.actionLabels\.edit[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.duplicate[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.archive[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish/,
+  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.duplicate[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.archive[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish/,
   'Activity library action subcomponents should render localized action labels from activity library card copy.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /\/dashboard\/activities\/\$activityId/,
+  'Activity library card component should not hardcode the activity editor route.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -17520,13 +17530,18 @@ assert.match(
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /function CreatedActivityPanelActions[\s\S]*context\.showPublishAction[\s\S]*CreatedActivityPublishActionButton[\s\S]*context\.showEditAction[\s\S]*CreatedActivityEditActionLink[\s\S]*context\.showCreateAction[\s\S]*CreatedActivityNewActionLink[\s\S]*context\.showDismissAction[\s\S]*CreatedActivityDismissActionButton/,
+  /function CreatedActivityPanelActions[\s\S]*context\.showPublishAction[\s\S]*CreatedActivityPublishActionButton[\s\S]*context\.showEditAction && context\.editAction[\s\S]*CreatedActivityEditActionLink[\s\S]*context\.showCreateAction[\s\S]*CreatedActivityNewActionLink[\s\S]*context\.showDismissAction[\s\S]*CreatedActivityDismissActionButton/,
   'Created activity panel actions should split publish, edit, create, and dismiss rendering.'
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /function CreatedActivityPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish[\s\S]*function CreatedActivityEditActionLink[\s\S]*activityLibraryCardCopy\.actionLabels\.edit[\s\S]*function CreatedActivityNewActionLink[\s\S]*activityLibraryPageCopy\.createActivityLabel[\s\S]*function CreatedActivityDismissActionButton[\s\S]*activityLibraryActionCopy\.dismiss/,
-  'Created activity panel action subcomponents should render localized action labels from activity-domain copy.'
+  /function CreatedActivityPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish[\s\S]*function CreatedActivityEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function CreatedActivityNewActionLink[\s\S]*activityLibraryPageCopy\.createActivityLabel[\s\S]*function CreatedActivityDismissActionButton[\s\S]*activityLibraryActionCopy\.dismiss/,
+  'Created activity panel action subcomponents should render localized action labels from prepared activity-domain actions.'
+);
+assert.doesNotMatch(
+  createdActivityPanelComponentSource,
+  /\/dashboard\/activities\/\$activityId/,
+  'Created activity panel should not hardcode the activity editor route.'
 );
 assert.match(
   createdActivityPanelComponentSource,
@@ -17542,6 +17557,11 @@ assert.match(
   activityLibraryViewSource,
   /buildCreatedActivityPanelContext[\s\S]*canEditActivity\(activity\.visibility\)[\s\S]*canDeriveActivityWork\(activity\.visibility\)/,
   'Created activity panel context should resolve edit and publish actions through activity lifecycle helpers.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryEditorAction[\s\S]*to: Routes\.DashboardActivityEdit/,
+  'Activity library view model should prepare activity editor route targets.'
 );
 assert.doesNotMatch(
   dashboardActivitiesRouteSource,
@@ -25423,6 +25443,11 @@ assert.deepEqual(
         visibility: 'draft',
       },
       body: 'This draft keeps the reusable content and switches the primary template. Review the structure before publishing so the original activity and existing snapshots stay unchanged.',
+      editAction: {
+        activityId: 'persisted-activity-1',
+        label: 'Edit activity',
+        to: Routes.DashboardActivityEdit,
+      },
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: true,

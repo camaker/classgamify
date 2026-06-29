@@ -127,10 +127,12 @@ type ActivityLibraryCardViewModel = {
 };
 
 type ActivityLibraryCardDisplayView = {
+  editAction: ActivityLibraryEditorActionView;
   actionState: ActivityLibraryCardActionState;
   actionView: ActivityLibraryCardActionView;
   compatibility: ActivityLibraryCompatibilityView;
   sourceMaterials: ActivitySourceMaterialSummaryView;
+  sourceMaterialEditAction: ActivityLibraryEditorActionView;
   stats: ActivityLibraryCardStat[];
   statusLabel: string;
   templateName: string;
@@ -147,6 +149,7 @@ type CreatedActivityListItem = {
 type CreatedActivityPanelContext = {
   activity?: CreatedActivityListItem;
   body: string;
+  editAction?: ActivityLibraryEditorActionView;
   showCreateAction: boolean;
   showDismissAction: boolean;
   showEditAction: boolean;
@@ -198,6 +201,12 @@ type ActivityLibraryCardActionView = {
   duplicate: ReturnType<typeof buildActivityLifecycleActionView>;
   remix: ReturnType<typeof buildActivityLifecycleActionView>;
   restore: ReturnType<typeof getActivityLifecycleActionCopy>;
+};
+
+type ActivityLibraryEditorActionView = {
+  activityId: string;
+  label: string;
+  to: typeof Routes.DashboardActivityEdit;
 };
 
 type ActivityLibraryPageItem = PersistedActivityLibraryCardSource & {
@@ -760,6 +769,14 @@ export function buildCreatedActivityPanelContext({
     return {
       activity,
       body: getCreatedActivityPanelFoundBody(createdFrom),
+      ...(canEdit
+        ? {
+            editAction: buildActivityLibraryEditorAction({
+              activityId: activity.id,
+              label: activityLibraryCardCopy.actionLabels.edit,
+            }),
+          }
+        : {}),
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: canEdit,
@@ -881,9 +898,17 @@ export function buildActivityLibraryCardDisplayView({
       currentTemplateType: activity.templateType,
       summary,
     }),
+    editAction: buildActivityLibraryEditorAction({
+      activityId: activity.id,
+      label: activityLibraryCardCopy.actionLabels.edit,
+    }),
     sourceMaterials: buildActivitySourceMaterialSummaryView(
       activity.content.sourceMaterials
     ),
+    sourceMaterialEditAction: buildActivityLibraryEditorAction({
+      activityId: activity.id,
+      label: activityLibraryCardCopy.sourceMaterialEditActionLabel,
+    }),
     stats: buildActivityLibraryCardStats({
       groups: summary.contentCounts.groups,
       pairs: summary.contentCounts.pairs,
@@ -892,6 +917,20 @@ export function buildActivityLibraryCardDisplayView({
     statusLabel: formatActivityLibraryCardStatusLabel(activity),
     templateName: template.name,
     templateType: template.type,
+  };
+}
+
+function buildActivityLibraryEditorAction({
+  activityId,
+  label,
+}: {
+  activityId: string;
+  label: string;
+}): ActivityLibraryEditorActionView {
+  return {
+    activityId,
+    label,
+    to: Routes.DashboardActivityEdit,
   };
 }
 
