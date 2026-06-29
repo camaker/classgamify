@@ -1974,6 +1974,8 @@
   "student_runner_feedback_explanation_line": "{label}: {value}",
   "student_runner_feedback_status_correct": "Correct",
   "student_runner_feedback_status_needs_review": "Needs review",
+  "student_runner_feedback_submitted_answer": "Your answer",
+  "student_runner_feedback_submitted_answer_line": "{label}: {value}",
   "student_runner_item_position_label": "{index}. {prompt}",
   "student_runner_loading": "Loading student activity...",
   "student_runner_missing_assignment_closed_description": "This assignment link has been closed by the teacher. Ask your teacher for a reopened or new link.",

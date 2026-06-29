@@ -211,6 +211,9 @@ type PublicAnswerFeedbackView = {
   explanationText: string | null;
   status: 'correct' | 'needs-review';
   statusLabel: string;
+  submittedAnswer: string;
+  submittedAnswerLabel: string;
+  submittedAnswerText: string;
 };
 
 type StudentRunnerInstructionView = {
@@ -997,6 +1000,7 @@ export function buildPublicAnswerFeedbackView({
   if (!reviewItem.submitted) return null;
 
   const acceptedAnswersLabel = m.student_runner_feedback_accepted_answers();
+  const submittedAnswerLabel = m.student_runner_feedback_submitted_answer();
   const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
     reviewItem.acceptedAnswers,
     {
@@ -1033,6 +1037,12 @@ export function buildPublicAnswerFeedbackView({
     statusLabel: reviewItem.correct
       ? m.student_runner_feedback_status_correct()
       : m.student_runner_feedback_status_needs_review(),
+    submittedAnswer: reviewItem.submittedAnswer,
+    submittedAnswerLabel,
+    submittedAnswerText: m.student_runner_feedback_submitted_answer_line({
+      label: submittedAnswerLabel,
+      value: reviewItem.submittedAnswer,
+    }),
   };
 }
 

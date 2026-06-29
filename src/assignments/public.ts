@@ -46,6 +46,7 @@ export type PublicAttemptReviewItem = {
   explanation?: string;
   itemId: string;
   submitted: boolean;
+  submittedAnswer: string;
 };
 
 export type PublicAttemptResult = {
@@ -334,6 +335,7 @@ function buildPublicAttemptReviewItem({
   item: RuntimeItem;
 }): PublicAttemptReviewItem {
   const acceptedAnswers = getRuntimeDisplayAcceptedAnswers(item.answer);
+  const submittedAnswer = normalizeOptionalRuntimeDisplayText(answer?.answer);
 
   return {
     acceptedAnswers,
@@ -343,7 +345,8 @@ function buildPublicAttemptReviewItem({
     ),
     explanation: normalizeOptionalRuntimeDisplayText(item.explanation),
     itemId: item.id,
-    submitted: hasRuntimeDisplayText(answer?.answer),
+    submitted: hasRuntimeDisplayText(submittedAnswer),
+    submittedAnswer: submittedAnswer ?? '',
   };
 }
 

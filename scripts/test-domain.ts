@@ -2108,7 +2108,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
+  /const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\)/,
   'Public attempt review items should derive submitted state through the shared runtime display-text helper.'
 );
 assert.match(
@@ -2123,7 +2123,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(answer\?\.answer\)/,
+  /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\),[\s\S]*submittedAnswer: submittedAnswer \?\? ''/,
   'Public attempt review items should explicitly pick the only fields allowed in post-submit student review payloads.'
 );
 assert.match(
@@ -4146,12 +4146,12 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   publicAnswerFeedbackSource,
-  /\{feedback\.(?:correctAnswerLabel|acceptedAnswersLabel|explanationLabel)\}:/,
+  /\{feedback\.(?:correctAnswerLabel|acceptedAnswersLabel|explanationLabel|submittedAnswerLabel)\}:/,
   'Public answer feedback component should not hand-compose visible feedback label separators.'
 );
 assert.match(
   publicAnswerFeedbackSource,
-  /feedback\.correctAnswerText[\s\S]*feedback\.acceptedAnswersText[\s\S]*feedback\.explanationText/,
+  /feedback\.submittedAnswerText[\s\S]*feedback\.correctAnswerText[\s\S]*feedback\.acceptedAnswersText[\s\S]*feedback\.explanationText/,
   'Public answer feedback component should render prepared feedback text lines.'
 );
 const groupSortBoardSource = readFileSync(
@@ -7807,6 +7807,7 @@ assert.deepEqual(
         correctAnswer: 'Paris',
         itemId: 'q-1',
         submitted: true,
+        submittedAnswer: 'Paris',
       },
     ],
   }).map((itemView) => ({
@@ -7949,6 +7950,7 @@ const sequentialStudentRunnerView = buildSequentialStudentRunnerView({
       correctAnswer: 'Paris',
       itemId: 'q-1',
       submitted: true,
+      submittedAnswer: 'Paris',
     },
   ],
 });
@@ -8298,6 +8300,7 @@ assert.deepEqual(
         correctAnswer: 'apple',
         itemId: 'blank-1',
         submitted: true,
+        submittedAnswer: 'appl',
       },
     ],
   }).fillBlankItemViews.map((itemView) => [
@@ -8336,6 +8339,7 @@ assert.deepEqual(
       explanation: 'Paris is the capital of France.',
       itemId: 'item-1',
       submitted: true,
+      submittedAnswer: 'Lyon',
     },
   }),
   {
@@ -8349,21 +8353,30 @@ assert.deepEqual(
     explanationText: 'Why: Paris is the capital of France.',
     status: 'needs-review',
     statusLabel: 'Needs review',
+    submittedAnswer: 'Lyon',
+    submittedAnswerLabel: 'Your answer',
+    submittedAnswerText: 'Your answer: Lyon',
   }
 );
 overwriteGetLocale(() => 'zh');
 try {
+  const zhPublicAnswerFeedbackView = buildPublicAnswerFeedbackView({
+    reviewItem: {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      correct: false,
+      correctAnswer: 'Paris',
+      itemId: 'item-zh',
+      submitted: true,
+      submittedAnswer: '里昂',
+    },
+  });
   assert.equal(
-    buildPublicAnswerFeedbackView({
-      reviewItem: {
-        acceptedAnswers: ['Paris', 'Paris, France'],
-        correct: false,
-        correctAnswer: 'Paris',
-        itemId: 'item-zh',
-        submitted: true,
-      },
-    })?.acceptedAnswersText,
+    zhPublicAnswerFeedbackView?.acceptedAnswersText,
     '可接受答案：Paris, France'
+  );
+  assert.equal(
+    zhPublicAnswerFeedbackView?.submittedAnswerText,
+    '你的答案：里昂'
   );
 } finally {
   overwriteGetLocale(() => 'en');
@@ -8376,6 +8389,7 @@ assert.deepEqual(
       correctAnswer: 'Mitochondria',
       itemId: 'item-2',
       submitted: true,
+      submittedAnswer: 'Mitochondria',
     },
   }),
   {
@@ -8389,6 +8403,9 @@ assert.deepEqual(
     explanationText: null,
     status: 'correct',
     statusLabel: 'Correct',
+    submittedAnswer: 'Mitochondria',
+    submittedAnswerLabel: 'Your answer',
+    submittedAnswerText: 'Your answer: Mitochondria',
   }
 );
 assert.equal(
@@ -8408,6 +8425,7 @@ assert.equal(
       correctAnswer: 'Cold',
       itemId: 'pair-1',
       submitted: false,
+      submittedAnswer: '',
     },
   }),
   null
@@ -14422,6 +14440,7 @@ assert.deepEqual(
           explanation: 'Capital city',
           itemId: 'capital-france',
           submitted: true,
+          submittedAnswer: 'Paris',
         },
       ],
     },
@@ -14445,6 +14464,7 @@ assert.deepEqual(
         explanation: 'Capital city',
         itemId: 'capital-france',
         submitted: true,
+        submittedAnswer: 'Paris',
       },
     ],
     totalPoints: 2,
@@ -14762,6 +14782,7 @@ const publicReviewMap = buildPublicAttemptReviewItemMap([
     explanation: 'Paris is the capital of France.',
     itemId: 'q-1',
     submitted: true,
+    submittedAnswer: 'Paris',
   },
   {
     acceptedAnswers: ['Cold'],
@@ -14769,6 +14790,7 @@ const publicReviewMap = buildPublicAttemptReviewItemMap([
     correctAnswer: 'Cold',
     itemId: 'pair-1',
     submitted: true,
+    submittedAnswer: 'Warm',
   },
 ]);
 assert.equal(publicReviewMap.get('q-1')?.correctAnswer, 'Paris');
@@ -15215,6 +15237,7 @@ const reviewedGroupSortBoardView = buildGroupSortRunnerView({
       correctAnswer: 'Fruit',
       itemId: 'group-fruit-apple',
       submitted: true,
+      submittedAnswer: 'Fruit',
     },
     {
       acceptedAnswers: ['Drink'],
@@ -15222,6 +15245,7 @@ const reviewedGroupSortBoardView = buildGroupSortRunnerView({
       correctAnswer: 'Drink',
       itemId: 'group-drink-water',
       submitted: true,
+      submittedAnswer: 'fruit',
     },
   ],
   selectedItemId: 'group-fruit-pear',
@@ -15280,6 +15304,7 @@ assert.deepEqual(
       explanation: 'Paris is the capital of France.',
       itemId: 'q-1',
       submitted: true,
+      submittedAnswer: 'Paris',
     },
   ]
 );
@@ -15305,6 +15330,7 @@ assert.deepEqual(
       explanation: 'France capital.',
       itemId: 'messy-q-1',
       submitted: true,
+      submittedAnswer: 'paris',
     },
   ]
 );
@@ -15331,6 +15357,7 @@ assert.deepEqual(
       explanation: undefined,
       itemId: 'messy-q-1',
       submitted: true,
+      submittedAnswer: 'paris',
     },
   ]
 );
@@ -15355,6 +15382,7 @@ assert.deepEqual(
       explanation: undefined,
       itemId: 'q-1',
       submitted: false,
+      submittedAnswer: '',
     },
   ]
 );
@@ -15386,6 +15414,7 @@ assert.deepEqual(partialPublicReviewItems, [
     explanation: 'Paris is the capital of France.',
     itemId: 'q-1',
     submitted: true,
+    submittedAnswer: 'Paris',
   },
   {
     acceptedAnswers: ['Cold'],
@@ -15394,6 +15423,7 @@ assert.deepEqual(partialPublicReviewItems, [
     explanation: undefined,
     itemId: 'pair-1',
     submitted: false,
+    submittedAnswer: '',
   },
 ]);
 const publicReviewItemsWithPrivateFields = buildPublicAttemptReviewItems({
@@ -15434,6 +15464,7 @@ assert.deepEqual(Object.keys(publicReviewItemsWithPrivateFields[0]!).sort(), [
   'explanation',
   'itemId',
   'submitted',
+  'submittedAnswer',
 ]);
 assert.deepEqual(publicReviewItemsWithPrivateFields, [
   {
@@ -15443,6 +15474,7 @@ assert.deepEqual(publicReviewItemsWithPrivateFields, [
     explanation: 'Paris is the capital of France.',
     itemId: 'q-private-review',
     submitted: true,
+    submittedAnswer: 'Paris',
   },
 ]);
 assert.equal(

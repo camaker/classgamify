@@ -37,6 +37,9 @@ export function PublicAnswerFeedback({
         <IconX className="size-3.5" />
       )}
       <span>{feedback.statusLabel}</span>
+      <span className="basis-full text-muted-foreground">
+        {feedback.submittedAnswerText}
+      </span>
       <span className="text-muted-foreground">
         {feedback.correctAnswerText}
       </span>
