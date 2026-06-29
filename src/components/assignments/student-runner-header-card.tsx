@@ -34,6 +34,7 @@ export function StudentRunnerHeaderCard({
         {view.instructions ? (
           <StudentRunnerInstructionsCard instructions={view.instructions} />
         ) : null}
+        <StudentRunnerPrepareCard prepareView={view.prepareView} />
         <PublicAssignmentRules rules={view.ruleItems} />
       </div>
       <Link
@@ -46,6 +47,28 @@ export function StudentRunnerHeaderCard({
         {view.teacherActionLabel}
       </Link>
     </section>
+  );
+}
+
+function StudentRunnerPrepareCard({
+  prepareView,
+}: {
+  prepareView: NonNullable<
+    StudentRunnerPageViewModel['headerView']
+  >['prepareView'];
+}) {
+  return (
+    <div className="max-w-2xl rounded-lg border bg-background p-3 text-sm leading-6">
+      <div className="font-medium text-foreground">{prepareView.title}</div>
+      <ul className="mt-2 grid gap-1 text-muted-foreground text-xs leading-5">
+        {prepareView.steps.map((step) => (
+          <li className="flex gap-2" key={step}>
+            <span aria-hidden="true">-</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

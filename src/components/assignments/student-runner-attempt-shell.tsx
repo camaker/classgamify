@@ -150,6 +150,7 @@ function StudentRunnerResultPanel({
           {view.attemptUsageLabel}
         </p>
       ) : null}
+      <StudentRunnerResultNextSteps view={view.nextStepsView} />
       {view.showStartAnotherAttempt ? (
         <Button
           type="button"
@@ -162,6 +163,28 @@ function StudentRunnerResultPanel({
           {view.startAnotherAttemptLabel}
         </Button>
       ) : null}
+    </div>
+  );
+}
+
+function StudentRunnerResultNextSteps({
+  view,
+}: {
+  view: NonNullable<
+    StudentRunnerPageViewModel['resultPanelView'] & { show: true }
+  >['nextStepsView'];
+}) {
+  return (
+    <div className="mt-3 rounded-md border bg-background/80 p-2">
+      <p className="text-xs font-medium">{view.title}</p>
+      <ul className="mt-1 grid gap-1 text-muted-foreground text-xs leading-5">
+        {view.steps.map((step) => (
+          <li className="flex gap-2" key={step}>
+            <span aria-hidden="true">-</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

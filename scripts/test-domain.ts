@@ -801,6 +801,7 @@ import {
   buildStudentAttemptControlState,
   buildStudentAnswerChange,
   buildStudentAnswerChanges,
+  buildStudentAttemptResultNextStepsView,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptSubmissionInput,
   buildStudentAttemptSubmissionPlan,
@@ -6234,6 +6235,11 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /student_runner_result_next_step_done[\s\S]*student_runner_result_next_step_feedback[\s\S]*student_runner_result_next_step_review_score[\s\S]*student_runner_result_next_step_start_another[\s\S]*student_runner_result_next_step_teacher_review[\s\S]*student_runner_result_next_steps_title[\s\S]*buildStudentAttemptResultNextStepsView[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepReviewScore[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepFeedback[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepTeacherReview[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepStartAnother[\s\S]*STUDENT_RUNNER_COPY\.resultNextStepDone/,
+  'Student result next-step copy should be prepared from localized assignment-domain messages.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /m\.student_attempt_progress_label/,
   'Student attempt progress labels should come from localized message formatting.'
 );
@@ -6404,6 +6410,11 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /buildStudentRunnerPrepareView[\s\S]*student_runner_prepare_step_review_rules[\s\S]*student_runner_prepare_step_name[\s\S]*student_runner_prepare_step_anonymous[\s\S]*student_runner_prepare_step_timer[\s\S]*student_runner_prepare_step_no_timer[\s\S]*student_runner_prepare_step_submit/,
+  'Student runner prepare guidance should be prepared from localized assignment-domain messages.'
+);
+assert.match(
+  studentRunnerViewSource,
   /formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*student_runner_choice_separator/,
   'Student answer feedback should show accepted alternatives without repeating the primary correct answer.'
 );
@@ -6525,6 +6536,11 @@ assert.match(
   'Student runner page view-model should prepare activity-preview answer visibility.'
 );
 assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerResultPanelView\(\{[\s\S]*assignment,[\s\S]*attemptResultDisplay,[\s\S]*showStartAnotherAttempt[\s\S]*buildStudentAttemptResultNextStepsView\(\{[\s\S]*canStartAnotherAttempt: showStartAnotherAttempt,[\s\S]*showCorrectAnswers: Boolean\(assignment\?\.settings\.showCorrectAnswers\)/,
+  'Student runner result panel should prepare post-submit next steps from assignment settings and attempt availability.'
+);
+assert.match(
   playRouteSource,
   /StudentRuntimeItemList/,
   'Student play route should delegate template runtime item rendering to the student runtime item list component.'
@@ -6580,6 +6596,11 @@ assert.match(
   'Student runner header card should consume header instructions, rules, and teacher action view fields.'
 );
 assert.match(
+  studentRunnerHeaderCardSource,
+  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.steps\.map/,
+  'Student runner header card should render prepared before-start guidance from the header view.'
+);
+assert.match(
   studentRunnerAttemptShellSource,
   /StudentRunnerAttemptStatusBar[\s\S]*controlView=\{controlView\}[\s\S]*StudentRunnerIdentityPanel[\s\S]*identityView=\{identityView\}[\s\S]*StudentRunnerResultPanel[\s\S]*StudentRunnerTimeExpiredNotice/,
   'Student runner attempt shell should delegate status, identity, result-panel, and time-expired presentation.'
@@ -6598,6 +6619,11 @@ assert.match(
   studentRunnerAttemptShellSource,
   /function StudentRunnerTimeExpiredNotice[\s\S]*controlView\.showTimeExpiredMessage[\s\S]*controlView\.timeExpiredMessage/,
   'Student runner time-expired notice should render prepared timer-expired state.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*view\.steps\.map/,
+  'Student runner result panel should render prepared post-submit next steps from the result panel view.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -7334,6 +7360,14 @@ assert.deepEqual(getStudentRunnerCopy(), {
   readOnlyPreviewMessage:
     'Preview assignments are read-only until a teacher publishes a share link.',
   resultAccuracyLabel: 'accuracy',
+  resultNextStepDone: 'You are done for this assignment.',
+  resultNextStepFeedback:
+    'Check the feedback your teacher allowed after submission.',
+  resultNextStepReviewScore: 'Review your score and saved time.',
+  resultNextStepStartAnother:
+    'Start another attempt if you want to improve your work.',
+  resultNextStepTeacherReview: 'Your teacher will review the submitted answers.',
+  resultNextStepsTitle: 'Next steps',
   resultSubmittedLabel: 'Score submitted',
   resultTimePrefix: 'Time:',
   seoDescription:
@@ -9114,6 +9148,34 @@ assert.equal(
     usedAttempts: 12,
   }),
   'Additional attempts allowed'
+);
+assert.deepEqual(
+  buildStudentAttemptResultNextStepsView({
+    canStartAnotherAttempt: true,
+    showCorrectAnswers: true,
+  }),
+  {
+    steps: [
+      'Review your score and saved time.',
+      'Check the feedback your teacher allowed after submission.',
+      'Start another attempt if you want to improve your work.',
+    ],
+    title: 'Next steps',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptResultNextStepsView({
+    canStartAnotherAttempt: false,
+    showCorrectAnswers: false,
+  }),
+  {
+    steps: [
+      'Review your score and saved time.',
+      'Your teacher will review the submitted answers.',
+      'You are done for this assignment.',
+    ],
+    title: 'Next steps',
+  }
 );
 assert.equal(
   canStartAnotherStudentAttempt({
@@ -11735,6 +11797,15 @@ assert.deepEqual(studentRunnerHeaderView, {
     label: 'Student instructions',
     value: 'Read each prompt carefully.',
   },
+  prepareView: {
+    steps: [
+      'Read the teacher instructions and assignment rules.',
+      'Type your name before submitting so your teacher can find your work.',
+      'The timer starts once the activity is ready, then your submitted time is saved.',
+      'Answer the items below and submit when you are finished.',
+    ],
+    title: 'Before you start',
+  },
   ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
     expiresAt: null,
     itemCount: 2,
@@ -11771,6 +11842,30 @@ assert.deepEqual(
   {
     label: 'Student instructions',
     value: 'Review carefully.',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerHeaderView({
+    assignment: {
+      expiresAt: null,
+      settings: {
+        collectStudentName: false,
+        instructions: 'Review carefully.',
+        showCorrectAnswers: false,
+        shuffleItems: true,
+      },
+      title: 'Anonymous assignment',
+    },
+    itemCount: 1,
+  }).prepareView,
+  {
+    steps: [
+      'Read the teacher instructions and assignment rules.',
+      'This browser identifies your attempt, so use the same device if you try again.',
+      'There is no timer, so submit when your answers are ready.',
+      'Answer the items below and submit when you are finished.',
+    ],
+    title: 'Before you start',
   }
 );
 assert.equal(
@@ -13776,6 +13871,14 @@ assert.deepEqual(
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',
       durationLabel: 'Time: 1:20',
+      nextStepsView: {
+        steps: [
+          'Review your score and saved time.',
+          'Check the feedback your teacher allowed after submission.',
+          'Start another attempt if you want to improve your work.',
+        ],
+        title: 'Next steps',
+      },
       scoreLabel: '1/2',
       show: true,
       showStartAnotherAttempt: true,

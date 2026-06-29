@@ -117,6 +117,12 @@ type StudentRunnerCopy = {
   publicRouteBadgeLabel: string;
   readOnlyPreviewMessage: string;
   resultAccuracyLabel: string;
+  resultNextStepDone: string;
+  resultNextStepFeedback: string;
+  resultNextStepReviewScore: string;
+  resultNextStepStartAnother: string;
+  resultNextStepTeacherReview: string;
+  resultNextStepsTitle: string;
   resultSubmittedLabel: string;
   resultTimePrefix: string;
   seoDescription: string;
@@ -147,6 +153,11 @@ type StudentAttemptResultDisplay = {
   accuracyLabel: string;
   durationLabel: string;
   scoreLabel: string;
+};
+
+type StudentAttemptResultNextStepsView = {
+  steps: string[];
+  title: string;
 };
 
 type StudentAttemptControlState = {
@@ -197,6 +208,24 @@ const STUDENT_RUNNER_COPY = {
   },
   get resultAccuracyLabel() {
     return m.student_runner_result_accuracy();
+  },
+  get resultNextStepDone() {
+    return m.student_runner_result_next_step_done();
+  },
+  get resultNextStepFeedback() {
+    return m.student_runner_result_next_step_feedback();
+  },
+  get resultNextStepReviewScore() {
+    return m.student_runner_result_next_step_review_score();
+  },
+  get resultNextStepStartAnother() {
+    return m.student_runner_result_next_step_start_another();
+  },
+  get resultNextStepTeacherReview() {
+    return m.student_runner_result_next_step_teacher_review();
+  },
+  get resultNextStepsTitle() {
+    return m.student_runner_result_next_steps_title();
   },
   get resultSubmittedLabel() {
     return m.student_runner_result_submitted();
@@ -349,6 +378,27 @@ export function buildStudentAttemptResultDisplay({
       earnedPoints: normalizedEarnedPoints,
       totalPoints: normalizedTotalPoints,
     }),
+  };
+}
+
+export function buildStudentAttemptResultNextStepsView({
+  canStartAnotherAttempt,
+  showCorrectAnswers,
+}: {
+  canStartAnotherAttempt: boolean;
+  showCorrectAnswers: boolean;
+}): StudentAttemptResultNextStepsView {
+  return {
+    steps: [
+      STUDENT_RUNNER_COPY.resultNextStepReviewScore,
+      showCorrectAnswers
+        ? STUDENT_RUNNER_COPY.resultNextStepFeedback
+        : STUDENT_RUNNER_COPY.resultNextStepTeacherReview,
+      canStartAnotherAttempt
+        ? STUDENT_RUNNER_COPY.resultNextStepStartAnother
+        : STUDENT_RUNNER_COPY.resultNextStepDone,
+    ],
+    title: STUDENT_RUNNER_COPY.resultNextStepsTitle,
   };
 }
 

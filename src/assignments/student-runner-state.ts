@@ -10,6 +10,7 @@ import {
   buildStudentAttemptSessionKey,
   buildStudentAttemptControlState,
   buildStudentAttemptResultDisplay,
+  buildStudentAttemptResultNextStepsView,
   buildStudentAttemptTimerBadge,
   buildStudentRunnerMissingView,
   canStartAnotherStudentAttempt,
@@ -116,6 +117,7 @@ type StudentRunnerResultPanelView =
       accuracyLabel: string;
       attemptUsageLabel?: string;
       durationLabel: string;
+      nextStepsView: ReturnType<typeof buildStudentAttemptResultNextStepsView>;
       scoreLabel: string;
       show: true;
       showStartAnotherAttempt: boolean;
@@ -559,6 +561,7 @@ export function buildStudentRunnerPageViewModel({
           }
         : undefined,
     resultPanelView: buildStudentRunnerResultPanelView({
+      assignment,
       attemptResultDisplay,
       attemptUsageLabel,
       showStartAnotherAttempt,
@@ -667,10 +670,12 @@ function buildStudentRunnerIdentityView({
 }
 
 function buildStudentRunnerResultPanelView({
+  assignment,
   attemptResultDisplay,
   attemptUsageLabel,
   showStartAnotherAttempt,
 }: {
+  assignment?: AssignmentSeed;
   attemptResultDisplay?: ReturnType<typeof buildStudentAttemptResultDisplay>;
   attemptUsageLabel?: string;
   showStartAnotherAttempt: boolean;
@@ -685,6 +690,10 @@ function buildStudentRunnerResultPanelView({
     accuracyLabel: attemptResultDisplay.accuracyLabel,
     attemptUsageLabel,
     durationLabel: attemptResultDisplay.durationLabel,
+    nextStepsView: buildStudentAttemptResultNextStepsView({
+      canStartAnotherAttempt: showStartAnotherAttempt,
+      showCorrectAnswers: Boolean(assignment?.settings.showCorrectAnswers),
+    }),
     scoreLabel: attemptResultDisplay.scoreLabel,
     show: true,
     showStartAnotherAttempt,

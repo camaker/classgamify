@@ -221,8 +221,14 @@ type StudentRunnerInstructionView = {
 type StudentRunnerHeaderView = {
   description: string;
   instructions?: StudentRunnerInstructionView;
+  prepareView: StudentRunnerPrepareView;
   ruleItems: PublicAssignmentRuleSummaryItem[];
   teacherActionLabel: string;
+  title: string;
+};
+
+type StudentRunnerPrepareView = {
+  steps: string[];
   title: string;
 };
 
@@ -244,6 +250,7 @@ export function buildStudentRunnerHeaderView({
     instructions: buildStudentRunnerInstructionView(
       assignment.settings.instructions
     ),
+    prepareView: buildStudentRunnerPrepareView(assignment.settings),
     ruleItems: buildPublicAssignmentRuleSummaryFromSettings({
       expiresAt: assignment.expiresAt ?? null,
       itemCount,
@@ -251,6 +258,24 @@ export function buildStudentRunnerHeaderView({
     }),
     teacherActionLabel: getStudentRunnerCopy().teacherViewLabel,
     title: formatAssignmentDisplayTitle(assignment.title),
+  };
+}
+
+function buildStudentRunnerPrepareView(
+  settings: AssignmentSettings
+): StudentRunnerPrepareView {
+  return {
+    steps: [
+      m.student_runner_prepare_step_review_rules(),
+      settings.collectStudentName
+        ? m.student_runner_prepare_step_name()
+        : m.student_runner_prepare_step_anonymous(),
+      settings.timeLimitSeconds
+        ? m.student_runner_prepare_step_timer()
+        : m.student_runner_prepare_step_no_timer(),
+      m.student_runner_prepare_step_submit(),
+    ],
+    title: m.student_runner_prepare_title(),
   };
 }
 
