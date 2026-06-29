@@ -37,16 +37,39 @@ export function StudentRunnerHeaderCard({
         <StudentRunnerPrepareCard prepareView={view.prepareView} />
         <PublicAssignmentRules rules={view.ruleItems} />
       </div>
-      <Link
-        to={Routes.Create}
-        className={cn(
-          buttonVariants({ variant: 'outline' }),
-          'w-fit bg-background'
-        )}
-      >
-        {view.teacherActionLabel}
-      </Link>
+      <StudentRunnerTeacherActionLink action={view.teacherAction} />
     </section>
+  );
+}
+
+function StudentRunnerTeacherActionLink({
+  action,
+}: {
+  action: NonNullable<
+    StudentRunnerPageViewModel['headerView']
+  >['teacherAction'];
+}) {
+  const className = cn(
+    buttonVariants({ variant: 'outline' }),
+    'w-fit bg-background'
+  );
+
+  if (action.to === 'assignment-results') {
+    return (
+      <Link
+        to={Routes.DashboardAssignmentResults}
+        params={{ assignmentId: action.assignmentId }}
+        className={className}
+      >
+        {action.label}
+      </Link>
+    );
+  }
+
+  return (
+    <Link to={Routes.Create} className={className}>
+      {action.label}
+    </Link>
   );
 }
 

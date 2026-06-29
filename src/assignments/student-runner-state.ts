@@ -540,6 +540,7 @@ export function buildStudentRunnerPageViewModel({
         ? buildStudentRunnerHeaderView({
             assignment,
             itemCount: attemptState.itemCount,
+            source: pageState.source,
           })
         : undefined,
     identityView: assignment

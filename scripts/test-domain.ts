@@ -6712,8 +6712,13 @@ assert.match(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /view\.instructions[\s\S]*view\.ruleItems[\s\S]*view\.teacherActionLabel/,
+  /view\.instructions[\s\S]*view\.ruleItems[\s\S]*StudentRunnerTeacherActionLink[\s\S]*action=\{view\.teacherAction\}/,
   'Student runner header card should consume header instructions, rules, and teacher action view fields.'
+);
+assert.match(
+  studentRunnerHeaderCardSource,
+  /function StudentRunnerTeacherActionLink[\s\S]*action\.to === 'assignment-results'[\s\S]*Routes\.DashboardAssignmentResults[\s\S]*params=\{\{ assignmentId: action\.assignmentId \}\}[\s\S]*Routes\.Create/,
+  'Student runner header card should route prepared teacher actions to results or creation.'
 );
 assert.match(
   studentRunnerHeaderCardSource,
@@ -7470,6 +7475,7 @@ assert.deepEqual(
 );
 assert.deepEqual(getStudentRunnerCopy(), {
   browseTemplatesLabel: 'Browse templates',
+  createActivityLabel: 'Create activity',
   loadingMessage: 'Loading student activity...',
   missingAssignmentDescription:
     'This link may have been unpublished, closed, or typed incorrectly.',
@@ -7500,9 +7506,9 @@ assert.deepEqual(getStudentRunnerCopy(), {
   submissionFailureMessage: 'Attempt could not be saved.',
   submissionPendingLabel: 'Submitting...',
   submissionSuccessMessage: 'Attempt submitted.',
+  teacherResultsLabel: 'Teacher results',
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
   timeEndedLabel: 'Time ended',
-  teacherViewLabel: 'Teacher view',
 });
 assert.deepEqual(buildStudentRunnerSeoView(), {
   description:
@@ -12009,6 +12015,7 @@ try {
 const studentRunnerHeaderView = buildStudentRunnerHeaderView({
   assignment: {
     expiresAt: null,
+    id: 'assignment-public-1',
     settings: {
       collectStudentName: true,
       instructions: '  Read each prompt carefully.  ',
@@ -12020,6 +12027,7 @@ const studentRunnerHeaderView = buildStudentRunnerHeaderView({
     title: ' Ｐｕｂｌｉｃ\u00A0　assignment ',
   },
   itemCount: 2,
+  source: 'public-assignment',
 });
 assert.deepEqual(studentRunnerHeaderView, {
   description:
@@ -12049,7 +12057,12 @@ assert.deepEqual(studentRunnerHeaderView, {
       timeLimitSeconds: 120,
     },
   }),
-  teacherActionLabel: 'Teacher view',
+  teacherAction: {
+    assignmentId: 'assignment-public-1',
+    label: 'Teacher results',
+    to: 'assignment-results',
+    type: 'view-results',
+  },
   title: 'Public assignment',
 });
 assert.equal(
@@ -12060,6 +12073,28 @@ assert.deepEqual(
   buildStudentRunnerHeaderView({
     assignment: {
       expiresAt: null,
+      id: 'starter-assignment-1',
+      settings: {
+        collectStudentName: true,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+      },
+      title: 'Starter preview',
+    },
+    itemCount: 1,
+    source: 'starter-preview',
+  }).teacherAction,
+  {
+    label: 'Create activity',
+    to: 'create',
+    type: 'create-activity',
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerHeaderView({
+    assignment: {
+      expiresAt: null,
+      id: 'assignment-instructions',
       settings: {
         collectStudentName: false,
         instructions: '  Ｒｅｖｉｅｗ\u00A0　carefully.  ',
@@ -12079,6 +12114,7 @@ assert.deepEqual(
   buildStudentRunnerHeaderView({
     assignment: {
       expiresAt: null,
+      id: 'assignment-anonymous',
       settings: {
         collectStudentName: false,
         instructions: 'Review carefully.',
@@ -12103,6 +12139,7 @@ assert.equal(
   buildStudentRunnerHeaderView({
     assignment: {
       expiresAt: null,
+      id: 'assignment-empty-instructions',
       settings: {
         collectStudentName: false,
         instructions: '   ',
@@ -14159,6 +14196,7 @@ assert.deepEqual(
     headerView: buildStudentRunnerHeaderView({
       assignment: publicRunnerState.assignment,
       itemCount: publicRunnerState.runtimeItems.length,
+      source: 'public-assignment',
     }),
     identityView: {
       copy: {

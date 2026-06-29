@@ -110,6 +110,7 @@ type AttemptCompletionCopy = {
 
 type StudentRunnerCopy = {
   browseTemplatesLabel: string;
+  createActivityLabel: string;
   loadingMessage: string;
   missingAssignmentDescription: string;
   missingAssignmentTitle: string;
@@ -134,9 +135,9 @@ type StudentRunnerCopy = {
   submissionFailureMessage: string;
   submissionPendingLabel: string;
   submissionSuccessMessage: string;
+  teacherResultsLabel: string;
   timeExpiredMessage: string;
   timeEndedLabel: string;
-  teacherViewLabel: string;
 };
 
 type AnonymousAttemptCopy = {
@@ -189,6 +190,9 @@ type StudentRunnerMissingView = {
 const STUDENT_RUNNER_COPY = {
   get browseTemplatesLabel() {
     return m.student_runner_browse_templates();
+  },
+  get createActivityLabel() {
+    return m.student_runner_create_activity();
   },
   get loadingMessage() {
     return m.student_runner_loading();
@@ -262,14 +266,14 @@ const STUDENT_RUNNER_COPY = {
   get submissionSuccessMessage() {
     return m.student_runner_submission_success();
   },
+  get teacherResultsLabel() {
+    return m.student_runner_teacher_results();
+  },
   get timeExpiredMessage() {
     return m.student_runner_time_expired();
   },
   get timeEndedLabel() {
     return m.student_runner_time_ended();
-  },
-  get teacherViewLabel() {
-    return m.student_runner_teacher_view();
   },
 } satisfies StudentRunnerCopy;
 

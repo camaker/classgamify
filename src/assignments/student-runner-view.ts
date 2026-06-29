@@ -235,12 +235,25 @@ type StudentRunnerInstructionView = {
   value: string;
 };
 
+type StudentRunnerTeacherAction =
+  | {
+      label: string;
+      to: 'create';
+      type: 'create-activity';
+    }
+  | {
+      assignmentId: string;
+      label: string;
+      to: 'assignment-results';
+      type: 'view-results';
+    };
+
 type StudentRunnerHeaderView = {
   description: string;
   instructions?: StudentRunnerInstructionView;
   prepareView: StudentRunnerPrepareView;
   ruleItems: PublicAssignmentRuleSummaryItem[];
-  teacherActionLabel: string;
+  teacherAction: StudentRunnerTeacherAction;
   title: string;
 };
 
@@ -251,6 +264,7 @@ type StudentRunnerPrepareView = {
 
 type StudentRunnerHeaderAssignment = {
   expiresAt: AssignmentDate;
+  id: string;
   settings: AssignmentSettings;
   title: string;
 };
@@ -258,9 +272,11 @@ type StudentRunnerHeaderAssignment = {
 export function buildStudentRunnerHeaderView({
   assignment,
   itemCount,
+  source,
 }: {
   assignment: StudentRunnerHeaderAssignment;
   itemCount: number;
+  source?: 'public-assignment' | 'starter-preview';
 }): StudentRunnerHeaderView {
   return {
     description: getStudentRunnerCopy().publicAssignmentDescription,
@@ -273,8 +289,33 @@ export function buildStudentRunnerHeaderView({
       itemCount,
       settings: assignment.settings,
     }),
-    teacherActionLabel: getStudentRunnerCopy().teacherViewLabel,
+    teacherAction: buildStudentRunnerTeacherAction({ assignment, source }),
     title: formatAssignmentDisplayTitle(assignment.title),
+  };
+}
+
+function buildStudentRunnerTeacherAction({
+  assignment,
+  source,
+}: {
+  assignment: StudentRunnerHeaderAssignment;
+  source?: 'public-assignment' | 'starter-preview';
+}): StudentRunnerTeacherAction {
+  const runnerCopy = getStudentRunnerCopy();
+
+  if (source === 'public-assignment') {
+    return {
+      assignmentId: assignment.id,
+      label: runnerCopy.teacherResultsLabel,
+      to: 'assignment-results',
+      type: 'view-results',
+    };
+  }
+
+  return {
+    label: runnerCopy.createActivityLabel,
+    to: 'create',
+    type: 'create-activity',
   };
 }
 
