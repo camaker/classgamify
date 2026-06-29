@@ -6880,6 +6880,31 @@ assert.match(
   'Student runner view should normalize browser answers to current runtime items before deriving display state.'
 );
 assert.match(
+  studentRunnerSubmissionSource,
+  /export type AttemptCompletionSummary = \{[\s\S]*answeredItemCount: number;[\s\S]*itemCount: number;[\s\S]*unansweredItemCount: number;/,
+  'Student submission domain should expose an explicit completion-summary contract for runner views.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*export type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
+  'Student runner domain should expose explicit base item, list, choice, and default-card view contracts.'
+);
+assert.match(
+  studentRuntimeItemListDomainSource,
+  /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
+  'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /type RuntimeChoiceButtonView[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];|import type \{ RuntimeChoiceButtonView \}[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];/,
+  'Student runtime item list component should consume explicit choice-button view contracts.'
+);
+assert.doesNotMatch(
+  `${studentRunnerViewSource}\n${studentRuntimeItemListDomainSource}\n${studentRuntimeItemListSource}`,
+  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView)>/,
+  'Student runner and runtime list surfaces should not infer public renderer contracts from builder return types.'
+);
+assert.match(
   studentRunnerViewSource,
   /title: formatAssignmentDisplayTitle\(assignment\.title\)/,
   'Student runner headers should normalize assignment titles through the shared assignment display helper.'

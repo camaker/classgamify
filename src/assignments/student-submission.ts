@@ -48,7 +48,7 @@ export type StudentAttemptSubmissionInput = {
   studentName?: string;
 };
 
-type AttemptCompletionSummary = {
+export type AttemptCompletionSummary = {
   answeredItemCount: number;
   itemCount: number;
   unansweredItemCount: number;

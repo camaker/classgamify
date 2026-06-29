@@ -27,6 +27,8 @@ import {
   getAttemptCompletionSummary,
   normalizeStudentAnswersForRuntimeItems,
   getStudentRunnerCopy,
+  type AttemptCompletionSummary,
+  type StudentAttemptAnswerState,
   type StudentAnswerMap,
 } from '@/assignments/student-submission';
 import { Routes } from '@/lib/routes';
@@ -45,7 +47,7 @@ type RuntimeChoiceAnswerChange = {
   itemId: string;
 };
 
-type RuntimeChoiceButtonView = {
+export type RuntimeChoiceButtonView = {
   choice: string;
   selected: boolean;
 };
@@ -57,30 +59,44 @@ type RuntimeChoiceView = {
   usedByItemId: string | undefined;
 };
 
-type DefaultRuntimeItemCardView = ReturnType<
-  typeof buildStudentRunnerView
->['itemViews'][number] & {
+export type StudentRunnerItemView = StudentAttemptAnswerState & {
+  item: PublicRuntimeItem;
+  kindLabel: string;
+  positionLabel: string;
+  prompt: string;
+  reviewItem: PublicAttemptReviewItem | undefined;
+  status: StudentRunnerReviewStatus;
+};
+
+export type StudentRunnerView = {
+  choices: string[];
+  completionSummary: AttemptCompletionSummary;
+  itemViews: StudentRunnerItemView[];
+  itemViewsById: Map<string, StudentRunnerItemView>;
+  normalizedAnswers: StudentAnswerMap;
+  progressLabel: string;
+};
+
+export type DefaultRuntimeItemCardView = StudentRunnerItemView & {
   choiceViews: RuntimeChoiceButtonView[];
   correctAnswerLabel: string;
   inputPlaceholder: string;
   showChoices: boolean;
 };
 
-type ChoicePairingRunnerView = ReturnType<typeof buildStudentRunnerView> & {
+type ChoicePairingRunnerView = StudentRunnerView & {
   choiceViews: RuntimeChoiceView[];
   promptItemViews: ChoicePairingPromptItemView[];
 };
 
-type ChoicePairingPromptItemView = ReturnType<
-  typeof buildStudentRunnerView
->['itemViews'][number] & {
+type ChoicePairingPromptItemView = StudentRunnerItemView & {
   action: ChoicePairingRunnerAction;
   promptLabel: string;
   reviewStatusClassName: string | undefined;
   selected: boolean;
 };
 
-type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
+type GroupSortRunnerView = StudentRunnerView & {
   groupViews: Array<{
     action: GroupSortRunnerAction;
     group: string;
@@ -91,9 +107,7 @@ type GroupSortRunnerView = ReturnType<typeof buildStudentRunnerView> & {
   unplacedItemViews: GroupSortItemView[];
 };
 
-type GroupSortItemView = ReturnType<
-  typeof buildStudentRunnerView
->['itemViews'][number] & {
+type GroupSortItemView = StudentRunnerItemView & {
   action: GroupSortRunnerAction;
   reviewStatusClassName: string | undefined;
   selected: boolean;
@@ -156,9 +170,7 @@ type InlineBlankPromptView =
       prompt: string;
     };
 
-type FillBlankWorksheetItemView = ReturnType<
-  typeof buildStudentRunnerView
->['itemViews'][number] & {
+type FillBlankWorksheetItemView = StudentRunnerItemView & {
   promptView: InlineBlankPromptView;
   reviewStatusClassName: string | undefined;
   sequenceLabel: string;
@@ -166,13 +178,11 @@ type FillBlankWorksheetItemView = ReturnType<
   wordBankText: string | null;
 };
 
-type FillBlankWorksheetView = ReturnType<typeof buildStudentRunnerView> & {
+type FillBlankWorksheetView = StudentRunnerView & {
   fillBlankItemViews: FillBlankWorksheetItemView[];
 };
 
-type SequentialStudentRunnerItemView = ReturnType<
-  typeof buildStudentRunnerView
->['itemViews'][number] & {
+type SequentialStudentRunnerItemView = StudentRunnerItemView & {
   sequenceLabel: string;
 };
 
@@ -360,7 +370,7 @@ export function buildStudentRunnerView({
   items: PublicRuntimeItem[];
   progressVerb?: string;
   reviewItems?: PublicAttemptReviewItem[];
-}) {
+}): StudentRunnerView {
   const normalizedAnswers = normalizeStudentAnswersForRuntimeItems({
     answers,
     runtimeItems: items,

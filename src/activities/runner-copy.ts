@@ -5,7 +5,7 @@ import {
 import type { ActivityTemplateType } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
-type ActivityRunnerCopy = {
+export type ActivityRunnerCopy = {
   clearSelectionLabel?: string;
   correctAnswerLabel: string;
   emptyItemsLabel?: string;

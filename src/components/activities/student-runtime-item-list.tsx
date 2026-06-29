@@ -8,6 +8,7 @@ import {
   buildStudentRuntimeSingleAnswerChanges,
   type StudentAnswerChange,
 } from '@/assignments/student-runtime-item-list';
+import type { RuntimeChoiceButtonView } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { FillBlankWorksheet } from '@/components/activities/fill-blank-worksheet';
 import { GroupSortBoard } from '@/components/activities/group-sort-board';
@@ -185,9 +186,7 @@ function RuntimeItemCard({
   showChoices,
 }: {
   answer: string;
-  choiceViews: ReturnType<
-    typeof buildStudentRuntimeItemListView
-  >['defaultItemCardViews'][number]['choiceViews'];
+  choiceViews: RuntimeChoiceButtonView[];
   correctAnswerLabel: string;
   disabled: boolean;
   inputPlaceholder: string;
@@ -236,9 +235,7 @@ function ChoiceGrid({
   disabled,
   onAnswerChange,
 }: {
-  choices: ReturnType<
-    typeof buildStudentRuntimeItemListView
-  >['defaultItemCardViews'][number]['choiceViews'];
+  choices: RuntimeChoiceButtonView[];
   disabled: boolean;
   onAnswerChange: (answer: string) => void;
 }) {

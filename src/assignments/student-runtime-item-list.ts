@@ -4,11 +4,15 @@ import {
 } from '@/activities/runtime';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import type { ActivityTemplateType } from '@/activities/types';
+import type { ActivityRunnerCopy } from '@/activities/runner-copy';
 import type {
   PublicAttemptReviewItem,
   PublicRuntimeItem,
 } from '@/assignments/public';
-import { buildDefaultRuntimeItemCardViews } from '@/assignments/student-runner-view';
+import {
+  buildDefaultRuntimeItemCardViews,
+  type DefaultRuntimeItemCardView,
+} from '@/assignments/student-runner-view';
 import {
   buildStudentAnswerChanges,
   type StudentAnswerChange,
@@ -19,8 +23,8 @@ export type { StudentAnswerChange };
 export type StudentRuntimeItemListSurface = ActivityTemplateRunnerKind;
 
 type StudentRuntimeItemListView = {
-  defaultItemCardViews: ReturnType<typeof buildDefaultRuntimeItemCardViews>;
-  runnerCopy: ReturnType<typeof getActivityTemplateRunnerCopy>;
+  defaultItemCardViews: DefaultRuntimeItemCardView[];
+  runnerCopy: ActivityRunnerCopy;
   surface: StudentRuntimeItemListSurface;
 };
 
