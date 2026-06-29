@@ -226,6 +226,9 @@ function PlayPage() {
         executionPlan.input
       );
       setAnonymousToken(executionPlan.anonymousToken);
+      if (executionPlan.submittedStudentName) {
+        setStudentName(executionPlan.submittedStudentName);
+      }
       setResult(buildStudentRunnerSubmissionResultState({ response }));
       setSubmittedAttemptCount(response.attemptUsage.usedAttempts);
       toast.success(executionPlan.successMessage);

@@ -270,6 +270,7 @@ export type StudentRunnerSubmissionExecutionPlan =
       anonymousToken?: string;
       input: StudentRunnerSubmissionSubmitPlan['input'];
       reason: StudentRunnerSubmissionSubmitPlan['reason'];
+      submittedStudentName?: string;
       successMessage: string;
       type: 'submit';
     };
@@ -844,9 +845,14 @@ export function buildStudentRunnerSubmissionExecutionPlan({
   }
 
   return {
-    anonymousToken: submissionPlan.anonymousToken,
+    ...(submissionPlan.anonymousToken
+      ? { anonymousToken: submissionPlan.anonymousToken }
+      : {}),
     input: submissionPlan.input,
     reason: submissionPlan.reason,
+    ...(submissionPlan.input.studentName
+      ? { submittedStudentName: submissionPlan.input.studentName }
+      : {}),
     successMessage: pageView.submissionSuccessMessage,
     type: 'submit',
   };

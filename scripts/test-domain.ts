@@ -14239,6 +14239,61 @@ assert.deepEqual(
     type: 'message',
   }
 );
+const namedAnsweredStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 5_000,
+  isSubmitting: false,
+  pageState: buildStudentRunnerReadyState({
+    activity: publicRunnerState.activity,
+    assignment: {
+      ...publicRunnerState.assignment,
+      settings: {
+        ...publicRunnerState.assignment.settings,
+        collectStudentName: true,
+      },
+    },
+    runtimeItems: publicRunnerState.runtimeItems,
+    source: 'public-assignment',
+  }),
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  buildStudentRunnerSubmissionExecutionPlan({
+    answers: {
+      [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+    },
+    confirmIncompleteSubmit: true,
+    createAnonymousToken: () => 'unused-token',
+    now: 31_400,
+    pageView: namedAnsweredStudentRunnerPageView,
+    studentName: ' Ada   Lovelace ',
+  }),
+  {
+    input: {
+      answers: [
+        {
+          answer: 'Student answer',
+          itemId: publicRunnerState.runtimeItems[0]!.id,
+        },
+      ],
+      durationSeconds: 30,
+      shareSlug: 'share-public',
+      studentName: 'Ada Lovelace',
+    },
+    reason: 'complete',
+    submittedStudentName: 'Ada Lovelace',
+    successMessage: 'Attempt submitted.',
+    type: 'submit',
+  }
+);
 assert.deepEqual(
   buildStudentRunnerAnonymousTokenPlan({
     pageView: submittableStudentRunnerPageView,
