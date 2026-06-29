@@ -1,15 +1,16 @@
-import type { buildActivityEditorTemplateView } from '@/activities/editor';
+import type {
+  ActivityEditorTemplateScaffoldCoverageMetricView,
+  ActivityEditorTemplateScaffoldReadyOptionView,
+  ActivityEditorTemplateScaffoldSummaryView,
+  ActivityEditorTemplateSetupView,
+} from '@/activities/editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { IconSparkles } from '@tabler/icons-react';
 
-type ActivityEditorTemplateView = ReturnType<
-  typeof buildActivityEditorTemplateView
->;
-
 type ActivityTemplateScaffoldPanelProps = {
   onApplyScaffold: () => void;
-  setupView: ActivityEditorTemplateView['setupView'];
+  setupView: ActivityEditorTemplateSetupView;
 };
 
 export function ActivityTemplateScaffoldPanel({
@@ -70,7 +71,7 @@ function ActivityTemplateRequirementBadge({
 function ActivityTemplateScaffoldSummary({
   summary,
 }: {
-  summary: ActivityEditorTemplateView['setupView']['scaffoldSummary'];
+  summary: ActivityEditorTemplateScaffoldSummaryView;
 }) {
   return (
     <div className="mt-4 space-y-3 border-t pt-3">
@@ -106,7 +107,7 @@ function ActivityTemplateScaffoldSummary({
 function ActivityTemplateScaffoldMetricBadge({
   metric,
 }: {
-  metric: ActivityEditorTemplateView['setupView']['scaffoldSummary']['coverageMetrics'][number];
+  metric: ActivityEditorTemplateScaffoldCoverageMetricView;
 }) {
   return (
     <Badge variant="secondary" className="rounded-md bg-background">
@@ -118,7 +119,7 @@ function ActivityTemplateScaffoldMetricBadge({
 function ActivityTemplateScaffoldReadyBadge({
   option,
 }: {
-  option: ActivityEditorTemplateView['setupView']['scaffoldSummary']['readyTemplateOptions'][number];
+  option: ActivityEditorTemplateScaffoldReadyOptionView;
 }) {
   return (
     <Badge variant="outline" className="rounded-md bg-background">

@@ -2771,6 +2771,11 @@ assert.match(
   'Activity editor form should consume the activity-domain template view.'
 );
 assert.match(
+  activityEditorSource,
+  /export type ActivityEditorTemplateSetupView[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView/,
+  'Activity editor domain should expose explicit template scaffold view contracts.'
+);
+assert.match(
   activityEditorFormSource,
   /buildActivityEditorDraftGenerationExecutionPlan/,
   'Activity editor form should consume the activity-domain AI draft generation execution plan.'
@@ -2974,6 +2979,16 @@ assert.match(
   activityTemplateScaffoldPanelSource,
   /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
   'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
+);
+assert.match(
+  activityTemplateScaffoldPanelSource,
+  /ActivityEditorTemplateSetupView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView/,
+  'Activity editor scaffold panel should import explicit template scaffold view contracts.'
+);
+assert.doesNotMatch(
+  activityTemplateScaffoldPanelSource,
+  /ReturnType<typeof buildActivityEditorTemplateView>|ActivityEditorTemplateView\[/,
+  'Activity editor scaffold panel should not infer scaffold props from the full editor template view.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,

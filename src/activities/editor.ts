@@ -97,7 +97,7 @@ type ActivityEditorPreviewPanel = {
   title: string;
 };
 
-type ActivityEditorTemplateSetupView = {
+export type ActivityEditorTemplateSetupView = {
   actionLabel: string;
   description: string;
   requirementBadges: string[];
@@ -106,6 +106,15 @@ type ActivityEditorTemplateSetupView = {
   successMessage: string;
   title: string;
 };
+
+export type ActivityEditorTemplateScaffoldSummaryView =
+  ActivityEditorTemplateSetupView['scaffoldSummary'];
+
+export type ActivityEditorTemplateScaffoldCoverageMetricView =
+  ActivityEditorTemplateScaffoldSummaryView['coverageMetrics'][number];
+
+export type ActivityEditorTemplateScaffoldReadyOptionView =
+  ActivityEditorTemplateScaffoldSummaryView['readyTemplateOptions'][number];
 
 type ActivityEditorSelectOption<TValue extends string> = {
   label: string;
