@@ -140,6 +140,7 @@ export {
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   type AssignmentResultActionButton,
+  type AssignmentResultCopyArtifactPreview,
 } from '@/assignments/result-actions';
 
 export type AssignmentResultEmptyState = {

@@ -17,6 +17,7 @@ import {
   buildAssignmentResultsCsvFilename,
   type AssignmentResultsExportData,
 } from '@/assignments/results-export';
+import { formatAssignmentResultNumber } from '@/assignments/result-format';
 import {
   buildAssignmentStudentFollowUpSummary,
   type AssignmentStudentFollowUpSummary,
@@ -164,7 +165,20 @@ export type AssignmentResultCopyArtifactPreview = {
   action: AssignmentResultCopyAction;
   description: string;
   label: string;
+  metaItems: AssignmentResultCopyArtifactPreviewMetaItem[];
+  summaryLabel: string;
   text: string;
+};
+
+export type AssignmentResultCopyArtifactPreviewMetaItem = {
+  key:
+    | 'focus-items'
+    | 'follow-up-students'
+    | 'lines'
+    | 'review-items'
+    | 'students';
+  label: string;
+  value: string;
 };
 
 export const assignmentResultActionDescriptors = [
@@ -341,6 +355,14 @@ export function buildAssignmentResultCopyArtifactPreviews(
         action: descriptor.action,
         description: actionCopy.description,
         label: actionCopy.label,
+        metaItems: buildAssignmentResultCopyArtifactPreviewMetaItems({
+          action: descriptor.action,
+          artifacts,
+        }),
+        summaryLabel: getAssignmentResultCopyArtifactPreviewSummary({
+          action: descriptor.action,
+          artifacts,
+        }),
         text: getAssignmentResultCopyArtifactText({
           action: descriptor.action,
           artifacts,
@@ -348,6 +370,155 @@ export function buildAssignmentResultCopyArtifactPreviews(
       },
     ];
   });
+}
+
+export function getAssignmentResultCopyArtifactPreviewSummary({
+  action,
+  artifacts,
+}: {
+  action: AssignmentResultCopyAction;
+  artifacts: AssignmentResultCopyArtifacts;
+}) {
+  if (action === 'copy-brief') {
+    return m.assignment_result_copy_preview_summary_brief({
+      focusItems: formatAssignmentResultNumber(
+        artifacts.classroomBrief.focusItems.length,
+        { min: 0 }
+      ),
+      students: formatAssignmentResultNumber(
+        artifacts.classroomBrief.followUpStudents.length,
+        { min: 0 }
+      ),
+    });
+  }
+
+  if (action === 'copy-reteach-plan') {
+    return m.assignment_result_copy_preview_summary_reteach({
+      items: formatAssignmentResultNumber(
+        artifacts.reteachPlan.reviewItems.length,
+        { min: 0 }
+      ),
+      students: formatAssignmentResultNumber(
+        artifacts.reteachPlan.reviewStudents.length,
+        { min: 0 }
+      ),
+    });
+  }
+
+  if (action === 'copy-item-review') {
+    return m.assignment_result_copy_preview_summary_item_review({
+      items: formatAssignmentResultNumber(
+        artifacts.itemReviewSummary.items.length,
+        { min: 0 }
+      ),
+    });
+  }
+
+  return m.assignment_result_copy_preview_summary_follow_up({
+    students: formatAssignmentResultNumber(
+      artifacts.studentFollowUpSummary.students.length,
+      { min: 0 }
+    ),
+  });
+}
+
+export function buildAssignmentResultCopyArtifactPreviewMetaItems({
+  action,
+  artifacts,
+}: {
+  action: AssignmentResultCopyAction;
+  artifacts: AssignmentResultCopyArtifacts;
+}): AssignmentResultCopyArtifactPreviewMetaItem[] {
+  const text = getAssignmentResultCopyArtifactText({ action, artifacts });
+  const lineCount = getAssignmentResultCopyArtifactLineCount(text);
+
+  if (action === 'copy-brief') {
+    return [
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'focus-items',
+        label: m.assignment_result_copy_preview_meta_focus_items(),
+        value: artifacts.classroomBrief.focusItems.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'follow-up-students',
+        label: m.assignment_result_copy_preview_meta_follow_up_students(),
+        value: artifacts.classroomBrief.followUpStudents.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'lines',
+        label: m.assignment_result_copy_preview_meta_lines(),
+        value: lineCount,
+      }),
+    ];
+  }
+
+  if (action === 'copy-reteach-plan') {
+    return [
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'review-items',
+        label: m.assignment_result_copy_preview_meta_review_items(),
+        value: artifacts.reteachPlan.reviewItems.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'follow-up-students',
+        label: m.assignment_result_copy_preview_meta_follow_up_students(),
+        value: artifacts.reteachPlan.reviewStudents.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'lines',
+        label: m.assignment_result_copy_preview_meta_lines(),
+        value: lineCount,
+      }),
+    ];
+  }
+
+  if (action === 'copy-item-review') {
+    return [
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'review-items',
+        label: m.assignment_result_copy_preview_meta_review_items(),
+        value: artifacts.itemReviewSummary.items.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'lines',
+        label: m.assignment_result_copy_preview_meta_lines(),
+        value: lineCount,
+      }),
+    ];
+  }
+
+  return [
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'students',
+      label: m.assignment_result_copy_preview_meta_students(),
+      value: artifacts.studentFollowUpSummary.students.length,
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'lines',
+      label: m.assignment_result_copy_preview_meta_lines(),
+      value: lineCount,
+    }),
+  ];
+}
+
+function buildAssignmentResultCopyArtifactPreviewMetaItem({
+  key,
+  label,
+  value,
+}: {
+  key: AssignmentResultCopyArtifactPreviewMetaItem['key'];
+  label: string;
+  value: number;
+}): AssignmentResultCopyArtifactPreviewMetaItem {
+  return {
+    key,
+    label,
+    value: formatAssignmentResultNumber(value, { min: 0 }),
+  };
+}
+
+function getAssignmentResultCopyArtifactLineCount(text: string) {
+  return text.split(/\r?\n/).filter((line) => line.trim()).length;
 }
 
 export function buildAssignmentResultCopyText({

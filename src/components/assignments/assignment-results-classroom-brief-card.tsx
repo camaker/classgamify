@@ -259,6 +259,20 @@ function AssignmentResultsCopyArtifactPreview({
           {preview.actionButton.label}
         </Button>
       </div>
+      <div className="grid gap-2">
+        <p className="font-medium text-xs">{preview.summaryLabel}</p>
+        <div className="flex flex-wrap gap-2">
+          {preview.metaItems.map((metaItem) => (
+            <Badge
+              key={metaItem.key}
+              variant="secondary"
+              className="rounded-md"
+            >
+              {metaItem.label}: {metaItem.value}
+            </Badge>
+          ))}
+        </div>
+      </div>
       <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-muted-foreground text-xs">
         {preview.text}
       </pre>

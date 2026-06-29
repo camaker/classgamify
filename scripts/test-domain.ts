@@ -1521,8 +1521,18 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifactPreviews[\s\S]*assignmentResultActionDescriptors\.flatMap[\s\S]*getAssignmentResultActionCopy\(descriptor\.action\)[\s\S]*getAssignmentResultCopyArtifactText/,
-  'Assignment result copy artifact previews should derive labels, descriptions, and text from action descriptors and prepared artifacts.'
+  /buildAssignmentResultCopyArtifactPreviews[\s\S]*assignmentResultActionDescriptors\.flatMap[\s\S]*getAssignmentResultActionCopy\(descriptor\.action\)[\s\S]*buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactPreviewSummary[\s\S]*getAssignmentResultCopyArtifactText/,
+  'Assignment result copy artifact previews should derive labels, descriptions, metadata, summaries, and text from action descriptors and prepared artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactLineCount[\s\S]*m\.assignment_result_copy_preview_meta_/,
+  'Assignment result copy artifact preview metadata should be prepared in the assignment-domain action model.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /getAssignmentResultCopyArtifactPreviewSummary[\s\S]*m\.assignment_result_copy_preview_summary_brief[\s\S]*m\.assignment_result_copy_preview_summary_reteach[\s\S]*m\.assignment_result_copy_preview_summary_item_review[\s\S]*m\.assignment_result_copy_preview_summary_follow_up/,
+  'Assignment result copy artifact preview summaries should use localized assignment-domain copy.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -3901,8 +3911,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.text/,
-  'Assignment classroom brief copy artifact preview cards should render prepared label, description, copied text, and action button state.'
+  /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
+  'Assignment classroom brief copy artifact preview cards should render prepared label, description, summary, metadata, copied text, and action button state.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -29275,6 +29285,12 @@ assert.deepEqual(
         preview.label,
         preview.actionButton.action,
         preview.actionButton.disabled,
+        preview.summaryLabel,
+        preview.metaItems.map((metaItem) => [
+          metaItem.key,
+          metaItem.label,
+          metaItem.value,
+        ]),
         preview.text.length > 0,
       ]
     ),
@@ -29353,16 +29369,56 @@ assert.deepEqual(
     },
     classroomBriefReady: true,
     copyArtifactPreviews: [
-      ['copy-brief', 'Copy brief', 'copy-brief', false, true],
+      [
+        'copy-brief',
+        'Copy brief',
+        'copy-brief',
+        false,
+        'Focus items: 2 · Follow-up students: 1',
+        [
+          ['focus-items', 'Focus items', '2'],
+          ['follow-up-students', 'Follow-up students', '1'],
+          ['lines', 'Lines', '10'],
+        ],
+        true,
+      ],
       [
         'copy-reteach-plan',
         'Copy reteach plan',
         'copy-reteach-plan',
         false,
+        'Review items: 2 · Priority students: 1',
+        [
+          ['review-items', 'Review items', '2'],
+          ['follow-up-students', 'Follow-up students', '1'],
+          ['lines', 'Lines', '6'],
+        ],
         true,
       ],
-      ['copy-item-review', 'Copy item review', 'copy-item-review', false, true],
-      ['copy-follow-up', 'Copy follow-up', 'copy-follow-up', false, true],
+      [
+        'copy-item-review',
+        'Copy item review',
+        'copy-item-review',
+        false,
+        'Reviewed items with answers and notes: 2',
+        [
+          ['review-items', 'Review items', '2'],
+          ['lines', 'Lines', '3'],
+        ],
+        true,
+      ],
+      [
+        'copy-follow-up',
+        'Copy follow-up',
+        'copy-follow-up',
+        false,
+        'Students sorted by follow-up need: 1',
+        [
+          ['students', 'Students', '1'],
+          ['lines', 'Lines', '2'],
+        ],
+        true,
+      ],
     ],
     controlViews: {
       attemptReviewFilter: ['needs-review', ['all', 'needs-review']],
@@ -33752,6 +33808,12 @@ assert.deepEqual(
       preview.action,
       preview.label,
       preview.description,
+      preview.summaryLabel,
+      preview.metaItems.map((metaItem) => [
+        metaItem.key,
+        metaItem.label,
+        metaItem.value,
+      ]),
       preview.text,
     ]
   ),
@@ -33760,24 +33822,46 @@ assert.deepEqual(
       'copy-brief',
       'Copy brief',
       'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      'Focus items: 2 · Follow-up students: 3',
+      [
+        ['focus-items', 'Focus items', '2'],
+        ['follow-up-students', 'Follow-up students', '3'],
+        ['lines', 'Lines', '12'],
+      ],
       resultCopyArtifacts.classroomBrief.text,
     ],
     [
       'copy-reteach-plan',
       'Copy reteach plan',
       'Copy a lesson-ready script for the weakest items and priority students.',
+      'Review items: 2 · Priority students: 3',
+      [
+        ['review-items', 'Review items', '2'],
+        ['follow-up-students', 'Follow-up students', '3'],
+        ['lines', 'Lines', '8'],
+      ],
       resultCopyArtifacts.reteachPlan.text,
     ],
     [
       'copy-item-review',
       'Copy item review',
       'Copy prompt-level performance with expected answers, alternatives, and notes.',
+      'Reviewed items with answers and notes: 2',
+      [
+        ['review-items', 'Review items', '2'],
+        ['lines', 'Lines', '3'],
+      ],
       resultCopyArtifacts.itemReviewSummary.text,
     ],
     [
       'copy-follow-up',
       'Copy follow-up',
       'Copy a student-by-student support list sorted by review need.',
+      'Students sorted by follow-up need: 4',
+      [
+        ['students', 'Students', '4'],
+        ['lines', 'Lines', '5'],
+      ],
       resultCopyArtifacts.studentFollowUpSummary.text,
     ],
   ]
