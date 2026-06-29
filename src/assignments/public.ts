@@ -49,6 +49,22 @@ export type PublicAttemptReviewItem = {
   submittedAnswer: string;
 };
 
+export type PublicAttemptReviewSummary = {
+  correctItemCount: number;
+  hiddenBySettings: boolean;
+  needsReviewItemCount: number;
+  reviewItemCount: number;
+  showCorrectAnswers: boolean;
+  submittedItemCount: number;
+  totalItemCount: number;
+  unansweredItemCount: number;
+};
+
+export type PublicAttemptReviewSummaryView = {
+  items: PublicAttemptReviewItem[];
+  summary: PublicAttemptReviewSummary;
+};
+
 export type PublicAttemptResult = {
   accuracy: number;
   completedItemCount: number;
@@ -376,12 +392,89 @@ export function buildPublicAttemptReviewItems({
   runtimeItems: RuntimeItem[];
   showCorrectAnswers: boolean;
 }): PublicAttemptReviewItem[] {
-  if (!showCorrectAnswers) return [];
+  return buildPublicAttemptReviewSummaryView({
+    answers,
+    runtimeItems,
+    showCorrectAnswers,
+  }).items;
+}
 
-  return buildAttemptReviewItems({
+export function buildPublicAttemptReviewSummaryView({
+  answers,
+  runtimeItems,
+  showCorrectAnswers,
+}: {
+  answers: AttemptAnswer[];
+  runtimeItems: RuntimeItem[];
+  showCorrectAnswers: boolean;
+}): PublicAttemptReviewSummaryView {
+  if (!showCorrectAnswers) {
+    return buildHiddenPublicAttemptReviewSummary({
+      runtimeItems,
+      showCorrectAnswers,
+    });
+  }
+
+  const items = buildAttemptReviewItems({
     answers,
     runtimeItems,
   });
+
+  return {
+    items,
+    summary: summarizePublicAttemptReviewItems({
+      items,
+      runtimeItems,
+      showCorrectAnswers,
+    }),
+  };
+}
+
+function summarizePublicAttemptReviewItems({
+  items,
+  runtimeItems,
+  showCorrectAnswers,
+}: {
+  items: PublicAttemptReviewItem[];
+  runtimeItems: RuntimeItem[];
+  showCorrectAnswers: boolean;
+}): PublicAttemptReviewSummary {
+  const submittedItemCount = normalizeRuntimeDisplayCount(
+    items.filter((item) => item.submitted).length
+  );
+  const correctItemCount = normalizeRuntimeDisplayCount(
+    items.filter((item) => item.correct).length
+  );
+  const reviewItemCount = normalizeRuntimeDisplayCount(items.length);
+  const totalItemCount = normalizeRuntimeDisplayCount(runtimeItems.length);
+
+  return {
+    correctItemCount,
+    hiddenBySettings: !showCorrectAnswers,
+    needsReviewItemCount: Math.max(0, submittedItemCount - correctItemCount),
+    reviewItemCount,
+    showCorrectAnswers,
+    submittedItemCount,
+    totalItemCount,
+    unansweredItemCount: Math.max(0, totalItemCount - submittedItemCount),
+  };
+}
+
+function buildHiddenPublicAttemptReviewSummary({
+  runtimeItems,
+  showCorrectAnswers,
+}: {
+  runtimeItems: RuntimeItem[];
+  showCorrectAnswers: boolean;
+}): PublicAttemptReviewSummaryView {
+  return {
+    items: [],
+    summary: summarizePublicAttemptReviewItems({
+      items: [],
+      runtimeItems,
+      showCorrectAnswers,
+    }),
+  };
 }
 
 export function buildPublicAttemptReviewItemMap(

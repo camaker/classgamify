@@ -455,6 +455,7 @@ import {
   buildPublicAttemptResult,
   buildPublicAttemptReviewItems,
   buildPublicAttemptReviewItemMap,
+  buildPublicAttemptReviewSummaryView,
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
   stripRuntimeAnswer,
   stripRuntimeAnswers,
@@ -2372,6 +2373,16 @@ assert.match(
   publicAssignmentSource,
   /const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\)/,
   'Public attempt review items should derive submitted state through the shared runtime display-text helper.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export type PublicAttemptReviewSummary = \{[\s\S]*correctItemCount: number;[\s\S]*hiddenBySettings: boolean;[\s\S]*needsReviewItemCount: number;[\s\S]*reviewItemCount: number;[\s\S]*showCorrectAnswers: boolean;[\s\S]*submittedItemCount: number;[\s\S]*totalItemCount: number;[\s\S]*unansweredItemCount: number;/,
+  'Public attempt review should expose a structured post-submit review summary contract.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export function buildPublicAttemptReviewSummaryView[\s\S]*if \(!showCorrectAnswers\)[\s\S]*buildHiddenPublicAttemptReviewSummary[\s\S]*items,[\s\S]*summary: summarizePublicAttemptReviewItems/,
+  'Public attempt review summary views should centralize visible review items and safe summary metadata.'
 );
 assert.match(
   publicAssignmentSource,
@@ -7891,6 +7902,16 @@ assert.match(
   studentRunnerStateSource,
   /export function buildStudentRunnerSubmissionResultState/,
   'Student runner state domain should expose the submission response to result-state conversion.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /type PublicAttemptReviewSummary[\s\S]*export type StudentRunnerAttemptResult = PublicAttemptResult & \{[\s\S]*reviewSummary: PublicAttemptReviewSummary;[\s\S]*reviewItems: PublicAttemptReviewItem\[\];/,
+  'Student runner attempt results should carry the public review summary alongside review items.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /buildStudentRunnerSubmissionResultState[\s\S]*reviewSummary:[\s\S]*response\.reviewSummary \?\?[\s\S]*buildStudentRunnerFallbackReviewSummary\(response\.reviewItems\)/,
+  'Student runner submission result state should preserve server review summary with a compatibility fallback.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -16497,6 +16518,16 @@ const studentRunnerSubmissionResponse = {
       submittedAnswer: 'Paris',
     },
   ],
+  reviewSummary: {
+    correctItemCount: 1,
+    hiddenBySettings: false,
+    needsReviewItemCount: 0,
+    reviewItemCount: 1,
+    showCorrectAnswers: true,
+    submittedItemCount: 1,
+    totalItemCount: 1,
+    unansweredItemCount: 0,
+  },
 } satisfies Parameters<
   typeof buildStudentRunnerSubmissionResultState
 >[0]['response'];
@@ -16515,6 +16546,16 @@ assert.deepEqual(
     correctItemCount: 1,
     durationSeconds: 25,
     earnedPoints: 1,
+    reviewSummary: {
+      correctItemCount: 1,
+      hiddenBySettings: false,
+      needsReviewItemCount: 0,
+      reviewItemCount: 1,
+      showCorrectAnswers: true,
+      submittedItemCount: 1,
+      totalItemCount: 1,
+      unansweredItemCount: 0,
+    },
     reviewItems: [
       {
         acceptedAnswers: ['Paris'],
@@ -16527,6 +16568,24 @@ assert.deepEqual(
       },
     ],
     totalPoints: 2,
+  }
+);
+assert.deepEqual(
+  buildStudentRunnerSubmissionResultState({
+    response: {
+      ...studentRunnerSubmissionResponse,
+      reviewSummary: undefined,
+    },
+  }).reviewSummary,
+  {
+    correctItemCount: 1,
+    hiddenBySettings: false,
+    needsReviewItemCount: 0,
+    reviewItemCount: 1,
+    showCorrectAnswers: true,
+    submittedItemCount: 1,
+    totalItemCount: 1,
+    unansweredItemCount: 0,
   }
 );
 assert.deepEqual(
@@ -17375,6 +17434,34 @@ assert.deepEqual(
   []
 );
 assert.deepEqual(
+  buildPublicAttemptReviewSummaryView({
+    answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris / Paris, France',
+        explanation: 'Paris is the capital of France.',
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+    ],
+    showCorrectAnswers: false,
+  }),
+  {
+    items: [],
+    summary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
+      showCorrectAnswers: false,
+      submittedItemCount: 0,
+      totalItemCount: 1,
+      unansweredItemCount: 1,
+    },
+  }
+);
+assert.deepEqual(
   buildPublicAttemptReviewItems({
     answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
     runtimeItems: [
@@ -17498,6 +17585,38 @@ const partialPublicReviewItems = buildPublicAttemptReviewItems({
   ],
   showCorrectAnswers: true,
 });
+assert.deepEqual(
+  buildPublicAttemptReviewSummaryView({
+    answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris / Paris, France',
+        explanation: 'Paris is the capital of France.',
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+      {
+        answer: 'Cold',
+        choices: ['Cold', 'Warm'],
+        id: 'pair-1',
+        kind: 'pair',
+        prompt: 'Hot',
+      },
+    ],
+    showCorrectAnswers: true,
+  }).summary,
+  {
+    correctItemCount: 1,
+    hiddenBySettings: false,
+    needsReviewItemCount: 0,
+    reviewItemCount: 2,
+    showCorrectAnswers: true,
+    submittedItemCount: 1,
+    totalItemCount: 2,
+    unansweredItemCount: 1,
+  }
+);
 assert.deepEqual(partialPublicReviewItems, [
   {
     acceptedAnswers: ['Paris', 'Paris, France'],
@@ -19564,6 +19683,11 @@ assert.match(
   'Submit attempt API should normalize submitted item ids once before validation and scoring.'
 );
 assert.match(
+  assignmentsApiSource,
+  /const reviewSummaryView = buildPublicAttemptReviewSummaryView\(\{[\s\S]*answers: evaluation\.answers,[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers,[\s\S]*\}\)[\s\S]*reviewItems: reviewSummaryView\.items,[\s\S]*reviewSummary: reviewSummaryView\.summary/,
+  'Assignment submission API should return student review items and review summary from one public review summary view.'
+);
+assert.match(
   attemptAnswersSource,
   /normalizeSubmittedAttemptAnswers[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
   'Attempt answer helpers should normalize submitted item ids before scoring uses them.'
@@ -20170,8 +20294,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /buildPublicAttemptReviewItems\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
-  'Submit attempt API should build student review payloads in the same stable delivery order.'
+  /buildPublicAttemptReviewSummaryView\(\{[\s\S]*runtimeItems: orderedRuntimeItems,[\s\S]*showCorrectAnswers: settings\.showCorrectAnswers/,
+  'Submit attempt API should build student review payload summaries in the same stable delivery order.'
 );
 assert.match(
   assignmentsApiSource,

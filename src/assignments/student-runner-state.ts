@@ -49,6 +49,7 @@ import {
   buildPublicAssignmentPreviewAssignment,
   stripRuntimeAnswers,
   type PublicAssignmentLookupResult,
+  type PublicAttemptReviewSummary,
   type PublicAttemptReviewItem,
   type PublicAttemptResult,
   type PublicRuntimeItem,
@@ -56,6 +57,7 @@ import {
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
+import { normalizeRuntimeDisplayCount } from '@/assignments/runtime-display';
 import {
   buildStudentRunnerHeaderView,
   type StudentRunnerHeaderView,
@@ -94,6 +96,7 @@ type StudentRunnerAttemptState = {
 
 export type StudentRunnerAttemptResult = PublicAttemptResult & {
   attemptUsage: AssignmentAttemptUsage;
+  reviewSummary: PublicAttemptReviewSummary;
   reviewItems: PublicAttemptReviewItem[];
 };
 
@@ -277,6 +280,7 @@ export type StudentRunnerAttemptClockStartPlan =
 export type StudentRunnerAttemptSubmissionResponse = {
   attemptUsage: AssignmentAttemptUsage;
   result: PublicAttemptResult;
+  reviewSummary?: PublicAttemptReviewSummary;
   reviewItems: PublicAttemptReviewItem[];
 };
 
@@ -916,7 +920,33 @@ export function buildStudentRunnerSubmissionResultState({
   return {
     ...response.result,
     attemptUsage: response.attemptUsage,
+    reviewSummary:
+      response.reviewSummary ??
+      buildStudentRunnerFallbackReviewSummary(response.reviewItems),
     reviewItems: response.reviewItems,
+  };
+}
+
+function buildStudentRunnerFallbackReviewSummary(
+  reviewItems: PublicAttemptReviewItem[]
+): PublicAttemptReviewSummary {
+  const submittedItemCount = normalizeRuntimeDisplayCount(
+    reviewItems.filter((item) => item.submitted).length
+  );
+  const correctItemCount = normalizeRuntimeDisplayCount(
+    reviewItems.filter((item) => item.correct).length
+  );
+  const reviewItemCount = normalizeRuntimeDisplayCount(reviewItems.length);
+
+  return {
+    correctItemCount,
+    hiddenBySettings: reviewItemCount === 0,
+    needsReviewItemCount: Math.max(0, submittedItemCount - correctItemCount),
+    reviewItemCount,
+    showCorrectAnswers: reviewItemCount > 0,
+    submittedItemCount,
+    totalItemCount: reviewItemCount,
+    unansweredItemCount: Math.max(0, reviewItemCount - submittedItemCount),
   };
 }
 

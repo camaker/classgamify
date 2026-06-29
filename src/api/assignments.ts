@@ -65,7 +65,7 @@ import {
 import {
   buildPublicAssignmentLookupResult,
   buildPublicAttemptResult,
-  buildPublicAttemptReviewItems,
+  buildPublicAttemptReviewSummaryView,
 } from '@/assignments/public';
 import { buildPrintableAssignmentWorksheet } from '@/assignments/printable-worksheet';
 import {
@@ -599,6 +599,11 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         templateType,
       })
     );
+    const reviewSummaryView = buildPublicAttemptReviewSummaryView({
+      answers: evaluation.answers,
+      runtimeItems: orderedRuntimeItems,
+      showCorrectAnswers: settings.showCorrectAnswers,
+    });
 
     return {
       attemptUsage: buildAssignmentAttemptUsage({
@@ -606,11 +611,8 @@ export const submitAttempt = createServerFn({ method: 'POST' })
         previousAttemptCount,
       }),
       id,
-      reviewItems: buildPublicAttemptReviewItems({
-        answers: evaluation.answers,
-        runtimeItems: orderedRuntimeItems,
-        showCorrectAnswers: settings.showCorrectAnswers,
-      }),
+      reviewItems: reviewSummaryView.items,
+      reviewSummary: reviewSummaryView.summary,
       result: buildPublicAttemptResult(evaluation.result),
     };
   });
