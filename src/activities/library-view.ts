@@ -147,8 +147,7 @@ export type ActivityLibraryCardDisplayView = {
   templateType: ActivityTemplateType;
 };
 
-export type ActivityLibraryCardTemplateType =
-  ActivityLibraryCardViewModel['templateType'];
+export type ActivityLibraryCardTemplateType = ActivityTemplateType;
 
 export type CreatedActivityListItem = {
   id: string;
@@ -170,12 +169,9 @@ export type CreatedActivityPanelContext = {
   title: string;
 };
 
-export type CreatedActivityPanelActivity =
-  CreatedActivityPanelContext['activity'];
+export type CreatedActivityPanelActivity = CreatedActivityListItem | undefined;
 
-export type CreatedActivityPanelEditAction = NonNullable<
-  CreatedActivityPanelContext['editAction']
->;
+export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;
 
 type ActivityLibraryPageBreadcrumb = {
   href?: string;

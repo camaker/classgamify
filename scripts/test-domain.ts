@@ -18042,7 +18042,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.match(
@@ -18257,8 +18257,13 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*export type CreatedActivityPanelActivity[\s\S]*export type CreatedActivityPanelEditAction/,
+  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*export type CreatedActivityPanelActivity = CreatedActivityListItem \| undefined;[\s\S]*export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;/,
   'Activity library domain should expose explicit created-activity panel contracts.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /ActivityLibraryCardViewModel\['templateType'\]|CreatedActivityPanelContext\['activity'\]|NonNullable<\s*CreatedActivityPanelContext\['editAction'\]/,
+  'Activity library card and created-panel contracts should not derive focused view types from aggregate view-model indexes.'
 );
 assert.match(
   createdActivityPanelComponentSource,
