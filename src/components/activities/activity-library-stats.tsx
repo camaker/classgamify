@@ -1,11 +1,7 @@
-import type { buildActivityLibraryCardDisplayView } from '@/activities/library-view';
-
-type ActivityLibraryCardDisplayView = ReturnType<
-  typeof buildActivityLibraryCardDisplayView
->;
+import type { ActivityLibraryCardStat } from '@/activities/library-view';
 
 type ActivityLibraryStatsProps = {
-  stats: ActivityLibraryCardDisplayView['stats'];
+  stats: ActivityLibraryCardStat[];
 };
 
 export function ActivityLibraryStats({ stats }: ActivityLibraryStatsProps) {

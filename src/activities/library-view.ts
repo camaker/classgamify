@@ -69,13 +69,13 @@ type ActivityLibraryEmptyStateView = {
 
 type ActivityLibraryCardStatKey = 'groups' | 'pairs' | 'questions';
 
-type ActivityLibraryCardStat = {
+export type ActivityLibraryCardStat = {
   key: ActivityLibraryCardStatKey;
   label: string;
   value: number;
 };
 
-type ActivityLibraryCompatibilityView = {
+export type ActivityLibraryCompatibilityView = {
   lockedTemplateDiagnostics: string[];
   readyTemplateOptions: Array<
     ActivityLibraryTemplateOption & {
@@ -90,12 +90,18 @@ type ActivityLibraryCompatibilityView = {
   remixHint?: string;
 };
 
+export type ActivityLibraryReadyTemplateOptionView =
+  ActivityLibraryCompatibilityView['readyTemplateOptions'][number];
+
+export type ActivityLibraryRemixActionOptionView =
+  ActivityLibraryCompatibilityView['remixActionOptions'][number];
+
 export const ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS = {
   lockedTemplateDiagnostics: 2,
   remixActionOptions: 3,
 } as const;
 
-type ActivityLibraryCardActionState = {
+export type ActivityLibraryCardActionState = {
   canCreateDerivedWork: boolean;
   showArchiveAction: boolean;
   showDerivativeActions: boolean;
@@ -116,7 +122,7 @@ type PersistedActivityLibraryCardSource = {
   visibility: ActivityVisibility;
 };
 
-type ActivityLibraryCardViewModel = {
+export type ActivityLibraryCardViewModel = {
   content: ActivityContent;
   description: string;
   id: string;
@@ -126,7 +132,7 @@ type ActivityLibraryCardViewModel = {
   title: string;
 };
 
-type ActivityLibraryCardDisplayView = {
+export type ActivityLibraryCardDisplayView = {
   editAction: ActivityLibraryEditorActionView;
   actionState: ActivityLibraryCardActionState;
   actionView: ActivityLibraryCardActionView;
@@ -138,6 +144,9 @@ type ActivityLibraryCardDisplayView = {
   templateName: string;
   templateType: ActivityTemplateType;
 };
+
+export type ActivityLibraryCardTemplateType =
+  ActivityLibraryCardViewModel['templateType'];
 
 type CreatedActivityListItem = {
   id: string;
@@ -203,7 +212,7 @@ type ActivityLibraryCardActionView = {
   restore: ReturnType<typeof getActivityLifecycleActionCopy>;
 };
 
-type ActivityLibraryEditorActionView = {
+export type ActivityLibraryEditorActionView = {
   activityId: string;
   label: string;
   to: typeof Routes.DashboardActivityEdit;

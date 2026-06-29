@@ -1,22 +1,20 @@
 import type {
-  buildActivityLibraryCardDisplayView,
-  buildActivityLibraryCardViewModel,
+  ActivityLibraryCardActionState,
+  ActivityLibraryCardTemplateType,
+  ActivityLibraryCompatibilityView,
+  ActivityLibraryReadyTemplateOptionView,
+  ActivityLibraryRemixActionOptionView,
 } from '@/activities/library-view';
 import { activityLibraryCardCopy } from '@/activities/library-view';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { IconLayoutGrid, IconSwitchHorizontal } from '@tabler/icons-react';
 
-type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
-type ActivityLibraryCardDisplayView = ReturnType<
-  typeof buildActivityLibraryCardDisplayView
->;
-
 type ActivityLibraryCompatibilityPanelProps = {
-  actionState: ActivityLibraryCardDisplayView['actionState'];
-  compatibility: ActivityLibraryCardDisplayView['compatibility'];
+  actionState: ActivityLibraryCardActionState;
+  compatibility: ActivityLibraryCompatibilityView;
   isRemixing: boolean;
-  onRemix: (targetTemplateType: ActivityCardData['templateType']) => void;
+  onRemix: (targetTemplateType: ActivityLibraryCardTemplateType) => void;
 };
 
 export function ActivityLibraryCompatibilityPanel({
@@ -73,7 +71,7 @@ export function ActivityLibraryCompatibilityPanel({
 function ActivityLibraryReadyTemplateBadge({
   option,
 }: {
-  option: ActivityLibraryCardDisplayView['compatibility']['readyTemplateOptions'][number];
+  option: ActivityLibraryReadyTemplateOptionView;
 }) {
   return (
     <Badge
@@ -92,7 +90,7 @@ function ActivityLibraryRemixActionButton({
 }: {
   disabled: boolean;
   onClick: () => void;
-  option: ActivityLibraryCardDisplayView['compatibility']['remixActionOptions'][number];
+  option: ActivityLibraryRemixActionOptionView;
 }) {
   return (
     <Button

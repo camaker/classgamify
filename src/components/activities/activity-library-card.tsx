@@ -4,7 +4,11 @@ import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
   activityLibraryCardCopy,
   buildActivityLibraryCardDisplayView,
-  type buildActivityLibraryCardViewModel,
+  type ActivityLibraryCardActionState,
+  type ActivityLibraryCardDisplayView,
+  type ActivityLibraryCardTemplateType,
+  type ActivityLibraryCardViewModel,
+  type ActivityLibraryEditorActionView,
 } from '@/activities/library-view';
 import {
   buildActivityDerivativeActionExecutionPlan,
@@ -43,13 +47,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type ActivityCardData = ReturnType<typeof buildActivityLibraryCardViewModel>;
-type ActivityLibraryCardDisplayView = ReturnType<
-  typeof buildActivityLibraryCardDisplayView
->;
-
 type ActivityLibraryCardProps = {
-  activity: ActivityCardData;
+  activity: ActivityLibraryCardViewModel;
   libraryStatus: ActivityLibraryStatus;
 };
 
@@ -69,7 +68,7 @@ export function ActivityLibraryCard({
   });
 
   async function remixActivity(
-    targetTemplateType: ActivityCardData['templateType']
+    targetTemplateType: ActivityLibraryCardTemplateType
   ) {
     const executionPlan = buildActivityDerivativeActionExecutionPlan({
       action: 'remix',
@@ -232,7 +231,7 @@ export function ActivityLibraryCard({
 function ActivityLibrarySourceMaterialEditAction({
   action,
 }: {
-  action: ActivityLibraryCardDisplayView['sourceMaterialEditAction'];
+  action: ActivityLibraryEditorActionView;
 }) {
   return (
     <Link
@@ -259,8 +258,8 @@ function ActivityLibraryCardActions({
   onPublish,
   onRestore,
 }: {
-  actionState: ActivityLibraryCardDisplayView['actionState'];
-  editAction: ActivityLibraryCardDisplayView['editAction'];
+  actionState: ActivityLibraryCardActionState;
+  editAction: ActivityLibraryEditorActionView;
   isArchiving: boolean;
   isDuplicating: boolean;
   isRestoring: boolean;
@@ -308,7 +307,7 @@ function ActivityLibraryCardActions({
 function ActivityLibraryEditActionLink({
   action,
 }: {
-  action: ActivityLibraryCardDisplayView['editAction'];
+  action: ActivityLibraryEditorActionView;
 }) {
   return (
     <Link
@@ -385,7 +384,7 @@ function ActivityLibraryRestoreAction({
   disabled,
   onRestore,
 }: {
-  actionState: ActivityLibraryCardDisplayView['actionState'];
+  actionState: ActivityLibraryCardActionState;
   disabled: boolean;
   onRestore: () => void;
 }) {

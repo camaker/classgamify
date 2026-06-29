@@ -17887,6 +17887,21 @@ assert.match(
   'Activity library card component should render card display state from the activity-domain card display view.'
 );
 assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType[\s\S]*export type ActivityLibraryEditorActionView/,
+  'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryCardViewModel[\s\S]*ActivityLibraryCardDisplayView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryEditorActionView/,
+  'Activity library card component should import explicit card display and action view contracts.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /ReturnType<typeof buildActivityLibraryCard(?:DisplayView|ViewModel)>|type ActivityCardData/,
+  'Activity library card component should not infer card props from library view builders.'
+);
+assert.match(
   activityLibraryCardComponentSource,
   /buildActivityDerivativeActionExecutionPlan/,
   'Activity library card component should build derivative mutation input through the activity-domain execution plan.'
@@ -18023,6 +18038,16 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
+  /ActivityLibraryCompatibilityView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryReadyTemplateOptionView[\s\S]*ActivityLibraryRemixActionOptionView/,
+  'Activity library compatibility panel should import explicit compatibility view contracts.'
+);
+assert.doesNotMatch(
+  activityLibraryCompatibilityPanelSource,
+  /ReturnType<typeof buildActivityLibraryCard(?:DisplayView|ViewModel)>|type ActivityCardData|ActivityLibraryCardDisplayView\[/,
+  'Activity library compatibility panel should not infer props from library card builders.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
   /compatibility\.readyTemplateOptions\.map[\s\S]*ActivityLibraryReadyTemplateBadge[\s\S]*option=\{option\}/,
   'Activity library compatibility panel should delegate prepared ready-template options.'
 );
@@ -18053,8 +18078,13 @@ assert.match(
 );
 assert.match(
   activityLibraryStatsComponentSource,
-  /ActivityLibraryCardDisplayView\['stats'\]/,
-  'Activity library stats component should consume the activity-domain stat item contract.'
+  /ActivityLibraryCardStat/,
+  'Activity library stats component should consume the explicit activity-domain stat item contract.'
+);
+assert.doesNotMatch(
+  activityLibraryStatsComponentSource,
+  /ReturnType<typeof buildActivityLibraryCardDisplayView>|ActivityLibraryCardDisplayView\[/,
+  'Activity library stats component should not infer stat props from the card display builder.'
 );
 assert.match(
   activityLibraryStatsComponentSource,
