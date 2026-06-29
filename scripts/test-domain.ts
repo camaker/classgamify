@@ -3049,6 +3049,16 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
+  /summaryView\.reviewChecklistStatusViews\.map[\s\S]*statusView\.label/,
+  'AI draft summary component should render prepared checklist status overview labels.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /filter\(\(itemView\) => itemView\.status|reviewChecklistItems\.length/,
+  'AI draft summary component should not count checklist status badges locally.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
   /ActivityDraftCoverageStat[\s\S]*stat=\{stat\}/,
   'AI draft summary component should pass prepared coverage stat views into the coverage stat component.'
 );
@@ -3169,6 +3179,16 @@ assert.match(
   activityDraftMetaSource,
   /reviewChecklist: reviewChecklistItems\.map\(\(item\) => item\.label\)[\s\S]*reviewChecklistItems/,
   'AI draft meta should derive legacy checklist labels from structured review checklist items.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews[\s\S]*reviewChecklistStatusViews:[\s\S]*buildActivityDraftReviewChecklistStatusViews\(reviewChecklistItems\)/,
+  'AI draft meta summary should derive checklist status overview badges from prepared checklist item views.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /function buildActivityDraftReviewChecklistStatusViews[\s\S]*activity_draft_meta_checklist_status_summary_action_needed[\s\S]*activity_draft_meta_checklist_status_summary_review[\s\S]*activity_draft_meta_checklist_status_summary_ready/,
+  'AI draft checklist status overview should use localized status summary copy.'
 );
 assert.doesNotMatch(
   activityDraftMetaSource,
@@ -26496,6 +26516,11 @@ assert.deepEqual(fallbackDraftMetaSummary.reviewChecklistItems[0], {
   status: 'review',
   statusLabel: 'Review',
 });
+assert.deepEqual(fallbackDraftMetaSummary.reviewChecklistStatusViews, [
+  { id: 'action-needed', label: '0 action needed' },
+  { id: 'review', label: '3 to review' },
+  { id: 'ready', label: '1 ready' },
+]);
 assert.ok(
   fallbackDraftMetaSummary.reviewChecklistItems.some(
     (item) =>
@@ -26690,6 +26715,11 @@ assert.deepEqual(
     statusLabel: 'Action needed',
   }
 );
+assert.deepEqual(questionOnlyDraftMetaSummary.reviewChecklistStatusViews, [
+  { id: 'action-needed', label: '2 action needed' },
+  { id: 'review', label: '2 to review' },
+  { id: 'ready', label: '1 ready' },
+]);
 assert.equal(
   questionOnlyDraftMetaSummary.draftFocusLineText,
   'Focus: Remix ready'
@@ -26911,6 +26941,11 @@ try {
     status: 'review',
     statusLabel: '待检查',
   });
+  assert.deepEqual(zhFallbackDraftMetaSummary.reviewChecklistStatusViews, [
+    { id: 'action-needed', label: '0 项需要处理' },
+    { id: 'review', label: '3 项待检查' },
+    { id: 'ready', label: '1 项已就绪' },
+  ]);
   const zhSparseDraftMetaSummary = buildActivityDraftMetaSummaryView({
     meta: buildActivityDraftMeta({
       activity: {

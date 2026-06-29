@@ -176,6 +176,7 @@ type ActivityDraftMetaSummaryView = {
   readyTemplatesTitle: string;
   reviewChecklist: string[];
   reviewChecklistItems: ActivityDraftReviewChecklistItemView[];
+  reviewChecklistStatusViews: ActivityDraftReviewChecklistStatusView[];
   sourceMaterialCapabilityDescription: string;
   sourceMaterialCapabilityTitle: string;
   sourceMaterialCapabilityViews: ActivityDraftMetaSummarySourceMaterialCapabilityView[];
@@ -192,6 +193,11 @@ type ActivityDraftMetaSummaryView = {
 
 type ActivityDraftReviewChecklistItemView = ActivityDraftReviewChecklistItem & {
   statusLabel: string;
+};
+
+type ActivityDraftReviewChecklistStatusView = {
+  id: ActivityDraftReviewChecklistItem['status'];
+  label: string;
 };
 
 type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
@@ -299,6 +305,10 @@ export function buildActivityDraftMetaSummaryView({
   const draftFocusName = formatActivityAiDraftFocusLabel(normalizedDraftFocus);
   const normalizedSourceMaterialNoteViews =
     normalizeActivityDraftSourceMaterialNoteViews(sourceMaterialNoteViews);
+  const reviewChecklistItems = buildActivityDraftReviewChecklistItemViews({
+    checklist: meta.reviewChecklist,
+    items: meta.reviewChecklistItems,
+  });
 
   return {
     appliedDescription: m.activity_draft_meta_applied_description(),
@@ -384,10 +394,9 @@ export function buildActivityDraftMetaSummaryView({
           }),
     readyTemplatesTitle: m.activity_draft_meta_ready_templates_title(),
     reviewChecklist: meta.reviewChecklist,
-    reviewChecklistItems: buildActivityDraftReviewChecklistItemViews({
-      checklist: meta.reviewChecklist,
-      items: meta.reviewChecklistItems,
-    }),
+    reviewChecklistItems,
+    reviewChecklistStatusViews:
+      buildActivityDraftReviewChecklistStatusViews(reviewChecklistItems),
     sourceMaterialCapabilityDescription:
       m.activity_draft_meta_source_material_capabilities_description(),
     sourceMaterialCapabilityTitle:
@@ -664,6 +673,40 @@ function buildActivityDraftReviewChecklistItemViews({
     ...item,
     statusLabel: formatActivityDraftReviewChecklistStatus(item.status),
   }));
+}
+
+function buildActivityDraftReviewChecklistStatusViews(
+  items: ActivityDraftReviewChecklistItemView[]
+): ActivityDraftReviewChecklistStatusView[] {
+  return [
+    {
+      id: 'action-needed',
+      label: m.activity_draft_meta_checklist_status_summary_action_needed({
+        count: countActivityDraftReviewChecklistStatus(items, 'action-needed'),
+      }),
+    },
+    {
+      id: 'review',
+      label: m.activity_draft_meta_checklist_status_summary_review({
+        count: countActivityDraftReviewChecklistStatus(items, 'review'),
+      }),
+    },
+    {
+      id: 'ready',
+      label: m.activity_draft_meta_checklist_status_summary_ready({
+        count: countActivityDraftReviewChecklistStatus(items, 'ready'),
+      }),
+    },
+  ];
+}
+
+function countActivityDraftReviewChecklistStatus(
+  items: ActivityDraftReviewChecklistItemView[],
+  status: ActivityDraftReviewChecklistItem['status']
+) {
+  return normalizeActivityDraftMetaCount(
+    items.filter((item) => item.status === status).length
+  );
 }
 
 function buildLegacyActivityDraftReviewChecklistItem(

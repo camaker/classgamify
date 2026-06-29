@@ -161,7 +161,18 @@ export function ActivityDraftMetaSummary({
           </div>
         </>
       ) : null}
-      <div className="mt-4 grid gap-2">
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {summaryView.reviewChecklistStatusViews.map((statusView) => (
+          <Badge
+            key={statusView.id}
+            variant={statusView.id === 'ready' ? 'secondary' : 'outline'}
+            className="rounded-md"
+          >
+            {statusView.label}
+          </Badge>
+        ))}
+      </div>
+      <div className="mt-2 grid gap-2">
         {summaryView.reviewChecklistItems.map((itemView) => (
           <ActivityDraftReviewChecklistItem
             itemView={itemView}
