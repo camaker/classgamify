@@ -1,4 +1,4 @@
-import type { WorksheetsPageViewModel } from '@/activities/entry-page-view';
+import type { WorksheetsPageModeCardView } from '@/activities/entry-page-view';
 import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type WorksheetModeCardProps = {
-  mode: WorksheetsPageViewModel['modeCards'][number];
+  mode: WorksheetsPageModeCardView;
 };
 
 export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {

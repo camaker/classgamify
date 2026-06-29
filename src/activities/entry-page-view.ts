@@ -18,19 +18,26 @@ import type { ActivityTemplateDefinition } from '@/activities/types';
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
-type EntryActionSearch = {
+export type EntryActionSearch = {
   template: ActivityTemplateDefinition['type'] | WorksheetModeTemplate;
 };
 
-type EntryAction = {
+export type EntryAction = {
   label: string;
   search: EntryActionSearch;
   to: typeof Routes.Create;
 };
 
-type LinkAction = {
+export type LinkAction = {
   label: string;
   to: typeof Routes.StudentPreview | typeof Routes.Templates;
+};
+
+export type CreateLinkAction = Omit<EntryAction, 'search'>;
+
+export type WorksheetsPageHeroActionView = EntryAction & {
+  isPrimary: boolean;
+  template: WorksheetModeTemplate;
 };
 
 export type TemplatesPageCardView = {
@@ -52,7 +59,7 @@ export type TemplatesPageViewModelInput = {
 export type TemplatesPageViewModel = {
   cards: TemplatesPageCardView[];
   footer: {
-    createAction: Omit<EntryAction, 'search'>;
+    createAction: CreateLinkAction;
     description: string;
     title: string;
   };
@@ -79,12 +86,7 @@ export type WorksheetsPageViewModel = {
     description: string;
     title: string;
   };
-  heroActions: Array<{
-    isPrimary: boolean;
-    label: string;
-    search: EntryActionSearch;
-    template: WorksheetModeTemplate;
-  }>;
+  heroActions: WorksheetsPageHeroActionView[];
   modeCards: WorksheetsPageModeCardView[];
   printable: {
     description: string;

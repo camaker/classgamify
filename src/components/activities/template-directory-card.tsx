@@ -1,4 +1,4 @@
-import type { TemplatesPageViewModel } from '@/activities/entry-page-view';
+import type { TemplatesPageCardView } from '@/activities/entry-page-view';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -13,7 +13,7 @@ import { IconDeviceGamepad2, IconPlus } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
 type TemplateDirectoryCardProps = {
-  template: TemplatesPageViewModel['cards'][number];
+  template: TemplatesPageCardView;
 };
 
 export function TemplateDirectoryCard({

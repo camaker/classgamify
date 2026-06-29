@@ -3639,8 +3639,8 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /TemplatesPageViewModel\['cards'\]\[number\]/,
-  'Template directory cards should consume the activity entry-page view-model card contract.'
+  /TemplatesPageCardView/,
+  'Template directory cards should consume the focused activity entry-page card contract.'
 );
 assert.match(
   templateDirectoryCardSource,
@@ -3671,6 +3671,16 @@ assert.match(
   worksheetsRouteSource,
   /pageView\.heroActions\.map[\s\S]*WorksheetHeroActionLink[\s\S]*action=\{action\}/,
   'Worksheets route should delegate prepared hero actions to focused action links.'
+);
+assert.doesNotMatch(
+  `${worksheetsRouteSource}\n${worksheetModeCardSource}\n${templateDirectoryCardSource}`,
+  /ReturnType<typeof buildWorksheetsPageViewModel>|WorksheetsPageViewModel\[|TemplatesPageViewModel\[/,
+  'Public entry routes and cards should import focused entry-page view contracts instead of indexing page view-models.'
+);
+assert.match(
+  worksheetsRouteSource,
+  /WorksheetsPageHeroActionView/,
+  'Worksheets route hero action link should consume the focused worksheet hero action contract.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -3709,8 +3719,8 @@ assert.match(
 );
 assert.match(
   worksheetModeCardSource,
-  /WorksheetsPageViewModel\['modeCards'\]\[number\]/,
-  'Worksheet mode cards should consume the worksheet page view-model card contract.'
+  /WorksheetsPageModeCardView/,
+  'Worksheet mode cards should consume the focused worksheet mode-card contract.'
 );
 assert.match(
   worksheetModeCardSource,
@@ -20908,6 +20918,16 @@ const templateEntrySource = readFileSync(
 const entryPageViewSource = readFileSync(
   'src/activities/entry-page-view.ts',
   'utf8'
+);
+assert.match(
+  entryPageViewSource,
+  /export type EntryActionSearch = \{[\s\S]*export type EntryAction = \{[\s\S]*export type LinkAction = \{[\s\S]*export type CreateLinkAction = Omit<EntryAction, 'search'>;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
+  'Entry page view domain should export focused entry and link action contracts.'
+);
+assert.match(
+  entryPageViewSource,
+  /heroActions: WorksheetsPageHeroActionView\[\];[\s\S]*modeCards: WorksheetsPageModeCardView\[\];/,
+  'Worksheets page view-model should compose focused hero action and mode-card contracts.'
 );
 const publicCopyMessages = {
   en: JSON.parse(

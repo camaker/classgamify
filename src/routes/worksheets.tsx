@@ -2,7 +2,10 @@ import Container from '@/components/layout/container';
 import { WorksheetModeCard } from '@/components/activities/worksheet-mode-card';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { buildWorksheetsPageViewModel } from '@/activities/entry-page-view';
+import {
+  buildWorksheetsPageViewModel,
+  type WorksheetsPageHeroActionView,
+} from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -15,8 +18,6 @@ import {
   IconPencilPlus,
 } from '@tabler/icons-react';
 import { Link, createFileRoute } from '@tanstack/react-router';
-
-type WorksheetsPageViewModel = ReturnType<typeof buildWorksheetsPageViewModel>;
 
 export const Route = createFileRoute('/worksheets')({
   head: () =>
@@ -120,7 +121,7 @@ function WorksheetsPage() {
 function WorksheetHeroActionLink({
   action,
 }: {
-  action: WorksheetsPageViewModel['heroActions'][number];
+  action: WorksheetsPageHeroActionView;
 }) {
   return (
     <Link
