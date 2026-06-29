@@ -1,11 +1,11 @@
 import {
   assignmentPublishDialogCopy,
-  buildAssignmentPublishCloseAfterMinLocal,
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
   type AssignmentPublishToggleView,
 } from '@/assignments/publish-input';
+import { buildAssignmentPublishCloseAfterMinLocal } from '@/assignments/publish-schedule';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
   ASSIGNMENT_PUBLISH_FIELD_LIMITS,

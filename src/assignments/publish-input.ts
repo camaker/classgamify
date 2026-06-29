@@ -14,65 +14,12 @@ import {
   defaultAssignmentSettings,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
+import {
+  parseAssignmentDateTimeLocal,
+  resolveAssignmentPublishCloseAfterLocal,
+} from '@/assignments/publish-schedule';
 import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 import { m } from '@/locale/paraglide/messages';
-
-export const ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS = {
-  minLeadMinutes: 1,
-  millisecondsPerSecond: 1000,
-  secondsPerMinute: 60,
-} as const;
-
-export function formatAssignmentDateTimeLocal(date: Date) {
-  const localDate = new Date(
-    date.getTime() -
-      date.getTimezoneOffset() *
-        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
-        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
-  );
-  return localDate.toISOString().slice(0, 16);
-}
-
-export function buildAssignmentPublishCloseAfterMinLocal(now = new Date()) {
-  return formatAssignmentDateTimeLocal(
-    new Date(
-      now.getTime() +
-        ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.minLeadMinutes *
-          ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
-          ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
-    )
-  );
-}
-
-export function parseAssignmentDateTimeLocal(value: string) {
-  const trimmed = normalizePublishDraftText(value);
-  if (!trimmed) return null;
-
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
-    trimmed
-  );
-  if (!match) return null;
-
-  const [, year, month, day, hour, minute, second = '0'] = match;
-  const date = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    Number(hour),
-    Number(minute),
-    Number(second)
-  );
-  if (Number.isNaN(date.getTime())) return null;
-
-  return date.getFullYear() === Number(year) &&
-    date.getMonth() === Number(month) - 1 &&
-    date.getDate() === Number(day) &&
-    date.getHours() === Number(hour) &&
-    date.getMinutes() === Number(minute) &&
-    date.getSeconds() === Number(second)
-    ? date
-    : null;
-}
 
 export function parseOptionalWholeNumber(value: string) {
   const trimmed = normalizePublishDraftText(value).replace(/\s+/gu, '');
@@ -431,15 +378,18 @@ export function validateAssignmentPublishDraft({
     };
   }
 
-  const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
-  if (normalizePublishDraftText(expiresAtLocal) && !expiresAt) {
+  const closeAfter = resolveAssignmentPublishCloseAfterLocal({
+    now,
+    value: expiresAtLocal,
+  });
+  if (closeAfter.status === 'invalid') {
     return {
       message: m.assignment_publish_validation_close_time_valid(),
       ok: false,
     };
   }
 
-  if (expiresAt && expiresAt.getTime() <= now.getTime()) {
+  if (closeAfter.status === 'past') {
     return {
       message: m.assignment_publish_validation_close_time_future(),
       ok: false,

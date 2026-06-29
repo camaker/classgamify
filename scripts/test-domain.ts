@@ -725,11 +725,9 @@ import {
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
 import {
-  ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS,
   assignmentPublishDialogCopy,
   assignmentPublishToggleOptions,
   buildAssignmentPublishDraft,
-  buildAssignmentPublishCloseAfterMinLocal,
   buildAssignmentPublishDraftDefaults,
   buildAssignmentPublishDialogState,
   buildAssignmentPublishDialogViewModel,
@@ -737,11 +735,18 @@ import {
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   buildAssignmentPublishToggleViews,
-  formatAssignmentDateTimeLocal,
-  parseAssignmentDateTimeLocal,
   parseOptionalWholeNumber,
   validateAssignmentPublishDraft,
 } from '@/assignments/publish-input';
+import {
+  ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS,
+  buildAssignmentPublishCloseAfterMinLocal,
+  formatAssignmentDateTimeLocal,
+  parseAssignmentDateTimeLocal,
+  resolveAssignmentPublishCloseAfterDate,
+  resolveAssignmentPublishCloseAfterIso,
+  resolveAssignmentPublishCloseAfterLocal,
+} from '@/assignments/publish-schedule';
 import {
   buildAssignmentStudentFollowUpSummary,
   buildAssignmentStudentFollowUpSummaryStudentView,
@@ -2270,20 +2275,34 @@ const assignmentPublishSource = readFileSync(
   'src/assignments/publish-input.ts',
   'utf8'
 );
+const assignmentPublishScheduleSource = readFileSync(
+  'src/assignments/publish-schedule.ts',
+  'utf8'
+);
 assert.match(
-  assignmentPublishSource,
+  assignmentPublishScheduleSource,
   /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS[\s\S]*minLeadMinutes: 1[\s\S]*millisecondsPerSecond: 1000[\s\S]*secondsPerMinute: 60/,
   'Assignment publish close-after helpers should expose named time-unit constants.'
 );
 assert.match(
-  assignmentPublishSource,
+  assignmentPublishScheduleSource,
   /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.minLeadMinutes[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.secondsPerMinute[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.millisecondsPerSecond/,
   'Assignment publish close-after minimum should reuse the named time units.'
 );
 assert.doesNotMatch(
-  assignmentPublishSource,
+  assignmentPublishScheduleSource,
   /60 \* 1000|60000/,
   'Assignment publish close-after helpers should not keep local millisecond constants.'
+);
+assert.match(
+  assignmentPublishSource,
+  /resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now,[\s\S]*value: expiresAtLocal/,
+  'Assignment publish draft validation should use the shared close-after schedule resolver.'
+);
+assert.doesNotMatch(
+  assignmentPublishSource,
+  /expiresAt\.getTime\(\) <= now\.getTime\(\)|new Date\(\s*Number\(year\)/,
+  'Assignment publish draft validation should not keep local close-after parsing or future-time checks.'
 );
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
@@ -11457,6 +11476,86 @@ assert.equal(
   '2026-01-10T09:31'
 );
 assert.deepEqual(
+  resolveAssignmentPublishCloseAfterLocal({
+    now: new Date(2026, 0, 1, 0, 0),
+    value: '',
+  }),
+  {
+    expiresAt: null,
+    status: 'none',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterLocal({
+    now: new Date(2026, 0, 1, 0, 0),
+    value: 'not-a-date',
+  }),
+  {
+    expiresAt: null,
+    status: 'invalid',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterLocal({
+    now: new Date(2026, 0, 1, 0, 0),
+    value: '2025-12-31T23:59',
+  }),
+  {
+    expiresAt: new Date('2025-12-31T23:59'),
+    status: 'past',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterLocal({
+    now: new Date(2026, 0, 1, 0, 0),
+    value: '2026-01-01T00:01',
+  }),
+  {
+    expiresAt: new Date('2026-01-01T00:01'),
+    status: 'ready',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterIso({
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    value: undefined,
+  }),
+  {
+    expiresAt: null,
+    status: 'none',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterIso({
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    value: 'not-a-date',
+  }),
+  {
+    expiresAt: null,
+    status: 'invalid',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterIso({
+    now: new Date('2026-01-01T00:00:00.000Z'),
+    value: '2026-01-01T00:01:00.000Z',
+  }),
+  {
+    expiresAt: new Date('2026-01-01T00:01:00.000Z'),
+    status: 'ready',
+  }
+);
+assert.deepEqual(
+  resolveAssignmentPublishCloseAfterDate({
+    expiresAt: new Date('2025-12-31T23:59:00.000Z'),
+    now: new Date('2026-01-01T00:00:00.000Z'),
+  }),
+  {
+    expiresAt: new Date('2025-12-31T23:59:00.000Z'),
+    status: 'past',
+  }
+);
+assert.deepEqual(
   buildAssignmentPublishDraftDefaults({
     activityId: 'activity-1',
     title: 'Food groups',
@@ -18897,6 +18996,16 @@ assert.match(
   assignmentsApiSource,
   /export const publishAssignment[\s\S]*buildPublishedAssignmentInsert\(\{[\s\S]*sourceActivity,[\s\S]*title: data\.title,[\s\S]*userId,[\s\S]*\}\)[\s\S]*buildPublishedAssignmentSnapshotInsert\(\{[\s\S]*assignmentId: id,[\s\S]*sourceActivity/,
   'Publish assignment API should build assignment and snapshot insert payloads through assignment persistence helpers.'
+);
+assert.match(
+  assignmentsApiSource,
+  /export const publishAssignment[\s\S]*resolveAssignmentPublishCloseAfterIso\(\{[\s\S]*now,[\s\S]*value: data\.expiresAt,[\s\S]*\}\)[\s\S]*closeAfter\.status !== 'none' && closeAfter\.status !== 'ready'[\s\S]*expiresAt: closeAfter\.expiresAt|export const publishAssignment[\s\S]*resolveAssignmentPublishCloseAfterIso\(\{[\s\S]*now,[\s\S]*value: data\.expiresAt,[\s\S]*\}\)[\s\S]*const expiresAt = closeAfter\.expiresAt[\s\S]*buildPublishedAssignmentInsert\(\{[\s\S]*expiresAt,/,
+  'Publish assignment API should validate and persist close-after time through the shared assignment schedule resolver.'
+);
+assert.doesNotMatch(
+  assignmentsApiSource,
+  /new Date\(data\.expiresAt\)|expiresAt\.getTime\(\) <= now\.getTime\(\)/,
+  'Publish assignment API should not keep local close-after date parsing or future-time checks.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,

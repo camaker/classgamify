@@ -89,6 +89,7 @@ import {
   updateAssignmentStatusInputSchema,
   withResolvedAssignmentSettings,
 } from '@/assignments/validation';
+import { resolveAssignmentPublishCloseAfterIso } from '@/assignments/publish-schedule';
 import {
   ASSIGNMENT_SHARE_SLUG_LENGTH,
   normalizeAssignmentShareSlug,
@@ -258,10 +259,14 @@ export const publishAssignment = createServerFn({ method: 'POST' })
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);
     const shareSlug = nanoid(ASSIGNMENT_SHARE_SLUG_LENGTH.generated);
-    const expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
-    if (expiresAt && expiresAt.getTime() <= now.getTime()) {
+    const closeAfter = resolveAssignmentPublishCloseAfterIso({
+      now,
+      value: data.expiresAt,
+    });
+    if (closeAfter.status !== 'none' && closeAfter.status !== 'ready') {
       throw new Error(m.assignment_api_error_close_time_future());
     }
+    const expiresAt = closeAfter.expiresAt;
     const settings = resolveAssignmentSettings(data.settings);
 
     await db.transaction(async (tx) => {
