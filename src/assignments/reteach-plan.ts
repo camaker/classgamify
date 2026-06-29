@@ -15,7 +15,7 @@ import {
   formatAssignmentResultCopyTitle,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
-import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import { m } from '@/locale/paraglide/messages';
 
@@ -50,7 +50,7 @@ export function buildAssignmentReteachPlan({
   items,
   students,
 }: AssignmentReteachPlanInput) {
-  const reviewItems = getSubmittedAssignmentReviewPriorityItems(items, {
+  const reviewItems = getAssignmentReviewPriorityItems(items, {
     limit: ASSIGNMENT_RETEACH_PLAN_LIMITS.reviewItems,
   });
   const reviewStudents = getAssignmentStudentFollowUpPriorityStudents(

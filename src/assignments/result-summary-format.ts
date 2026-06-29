@@ -30,6 +30,20 @@ export function formatAssignmentSummaryCorrectCount({
   });
 }
 
+export function formatAssignmentSummaryUnansweredCount(count: number) {
+  const normalizedCount = normalizeAssignmentSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_result_summary_unanswered_one({
+      count: normalizedCount,
+    });
+  }
+
+  return m.assignment_result_summary_unanswered_many({
+    count: normalizedCount,
+  });
+}
+
 export function formatAssignmentSummaryReviewItemCount(count: number) {
   const normalizedCount = normalizeAssignmentSummaryCount(count);
 
@@ -70,10 +84,12 @@ export function formatAssignmentSummaryItemPerformance({
   correctCount,
   correctRate,
   submittedCount,
+  unansweredCount = 0,
 }: {
   correctCount: number;
   correctRate: number;
   submittedCount: number;
+  unansweredCount?: number;
 }) {
   const normalizedCorrectCount = normalizeAssignmentSummaryCount(correctCount);
   const normalizedSubmittedCount =
@@ -83,6 +99,7 @@ export function formatAssignmentSummaryItemPerformance({
     correctCount: normalizedCorrectCount,
     correctRate: formatAssignmentSummaryCorrectRate(correctRate),
     submittedCount: normalizedSubmittedCount,
+    unanswered: formatAssignmentSummaryUnansweredCount(unansweredCount),
   });
 }
 

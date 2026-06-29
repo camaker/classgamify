@@ -20,7 +20,7 @@ import {
   formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
 } from '@/assignments/result-summary-format';
-import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
   formatAssignmentResultCopyOrdinal,
@@ -274,7 +274,7 @@ export function formatAssignmentBriefStudentAccuracy({
 }
 
 function getClassroomBriefFocusItems(items: AssignmentItemAnalysis[]) {
-  return getSubmittedAssignmentReviewPriorityItems(items, {
+  return getAssignmentReviewPriorityItems(items, {
     limit: ASSIGNMENT_CLASSROOM_BRIEF_LIMITS.focusItems,
   });
 }

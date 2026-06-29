@@ -662,9 +662,11 @@ import {
   formatAssignmentSummaryItemPerformance,
   formatAssignmentSummaryReviewCount,
   formatAssignmentSummaryReviewItemCount,
+  formatAssignmentSummaryUnansweredCount,
 } from '@/assignments/result-summary-format';
 import {
   compareAssignmentItemsByType,
+  getAssignmentReviewPriorityItems,
   getSubmittedAssignmentReviewPriorityItems,
   sortAssignmentItemsByReviewPriority,
 } from '@/assignments/review-priority';
@@ -1613,7 +1615,7 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /getSubmittedAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.focusItems/,
+  /getAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_CLASSROOM_BRIEF_LIMITS\.focusItems/,
   'Classroom brief focus-item selection should reuse the classroom brief limit.'
 );
 assert.match(
@@ -1667,7 +1669,7 @@ assert.match(
 );
 assert.match(
   assignmentReteachPlanSource,
-  /getSubmittedAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_RETEACH_PLAN_LIMITS\.reviewItems/,
+  /getAssignmentReviewPriorityItems\(items,[\s\S]*ASSIGNMENT_RETEACH_PLAN_LIMITS\.reviewItems/,
   'Reteach plan review-item selection should reuse the reteach plan limit.'
 );
 assert.match(
@@ -28131,15 +28133,23 @@ assert.equal(
     correctRate: 67,
     submittedCount: 3,
   }),
-  '67% correct, 2/3'
+  '67% correct, 2/3; 0 unanswered'
 );
 assert.equal(
   formatAssignmentSummaryItemPerformance({
     correctCount: Number.POSITIVE_INFINITY,
     correctRate: Number.NaN,
     submittedCount: -1,
+    unansweredCount: 2.8,
   }),
-  '- correct, 0/0'
+  '- correct, 0/0; 2 unanswered'
+);
+assert.equal(formatAssignmentSummaryUnansweredCount(1), '1 unanswered');
+assert.equal(formatAssignmentSummaryUnansweredCount(2), '2 unanswered');
+assert.equal(formatAssignmentSummaryUnansweredCount(-2), '0 unanswered');
+assert.equal(
+  formatAssignmentSummaryUnansweredCount(Number.NaN),
+  '0 unanswered'
 );
 assert.equal(formatAssignmentSummaryReviewItemCount(1), '1 item to review');
 assert.equal(formatAssignmentSummaryReviewItemCount(2), '2 items to review');
@@ -29062,7 +29072,10 @@ assert.deepEqual(
       ['pair-1', '1.', '0%'],
       ['q-1', '2.', '100%'],
     ],
-    itemAnalysisCardViews: [['q-1', '100%']],
+    itemAnalysisCardViews: [
+      ['pair-1', '0%'],
+      ['q-1', '100%'],
+    ],
     metricValues: [
       ['completions', '1'],
       ['average-accuracy', '100%'],
@@ -29187,6 +29200,7 @@ assert.deepEqual(
     explanationText: 'Paris is the capital of France.',
     kindLabel: 'Question',
     prompt: 'Capital of France?',
+    unansweredLabel: '0 unanswered',
   }
 );
 assert.deepEqual(
@@ -29209,6 +29223,7 @@ assert.deepEqual(
     explanationText: null,
     kindLabel: 'Pair',
     prompt: 'Match "Hot" with its pair.',
+    unansweredLabel: '1 unanswered',
   }
 );
 assert.deepEqual(
@@ -29262,6 +29277,7 @@ assert.deepEqual(
     prompt: 'Capital of France?',
     promptLabel: '1. Capital of France?',
     submittedLabel: '2/3',
+    unansweredLabel: '0 unanswered',
   }
 );
 assert.deepEqual(
@@ -29284,6 +29300,7 @@ assert.deepEqual(
     prompt: 'Match "Hot" with its pair.',
     promptLabel: '1. Match "Hot" with its pair.',
     submittedLabel: '1/2',
+    unansweredLabel: '1 unanswered',
   }
 );
 assert.deepEqual(
@@ -29503,6 +29520,7 @@ assert.deepEqual(
     correctRate: item.correctRate,
     itemId: item.itemId,
     submittedCount: item.submittedCount,
+    unansweredCount: item.unansweredCount,
   })),
   [
     {
@@ -29510,18 +29528,20 @@ assert.deepEqual(
       correctRate: 0,
       itemId: 'pair-1',
       submittedCount: 0,
+      unansweredCount: 1,
     },
     {
       correctCount: 1,
       correctRate: 100,
       itemId: 'q-1',
       submittedCount: 1,
+      unansweredCount: 0,
     },
   ]
 );
 assert.deepEqual(
   runtimeOrderedResultAnalysis.needsReview.map((item) => item.itemId),
-  ['q-1']
+  ['pair-1', 'q-1']
 );
 const sanitizedResultAnalysis = analyzeAssignmentResults({
   attempts: [
@@ -29650,6 +29670,7 @@ assert.deepEqual(normalizedResultDisplayAnalysis.perItem, [
     kindLabel: 'Question',
     prompt: 'Capital of France?',
     submittedCount: 1,
+    unansweredCount: 1,
   },
 ]);
 assert.deepEqual(
@@ -30249,6 +30270,7 @@ assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
   'Type',
   'Correct rate',
   'Submitted',
+  'Unanswered',
   'Expected',
   'Accepted',
   'Explanation',
@@ -31947,6 +31969,7 @@ const reviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Unsubmitted item',
     submittedCount: 0,
+    unansweredCount: 2,
   },
   {
     acceptedAnswers: ['A'],
@@ -31958,6 +31981,7 @@ const reviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Tie with more submissions',
     submittedCount: 6,
+    unansweredCount: 0,
   },
   {
     acceptedAnswers: ['B'],
@@ -31969,6 +31993,7 @@ const reviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Tie with fewer submissions',
     submittedCount: 2,
+    unansweredCount: 0,
   },
   {
     acceptedAnswers: ['C'],
@@ -31980,6 +32005,7 @@ const reviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Higher accuracy',
     submittedCount: 4,
+    unansweredCount: 0,
   },
 ] satisfies typeof resultAnalysis.perItem;
 assert.deepEqual(
@@ -31993,6 +32019,40 @@ assert.deepEqual(
     'higher-accuracy',
   ]
 );
+assert.deepEqual(
+  getAssignmentReviewPriorityItems(reviewPriorityItems, {
+    limit: 3,
+  }).map((item) => item.itemId),
+  ['unsubmitted', 'tie-more-submitted', 'tie-fewer-submitted']
+);
+assert.deepEqual(
+  getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {
+    limit: 2,
+  }).map((item) => item.itemId),
+  ['tie-more-submitted', 'tie-fewer-submitted']
+);
+const unansweredTieReviewPriorityItems = [
+  {
+    ...reviewPriorityItems[1]!,
+    itemId: 'tie-submitted-only',
+    prompt: 'Submitted-only tie',
+    submittedCount: 6,
+    unansweredCount: 0,
+  },
+  {
+    ...reviewPriorityItems[2]!,
+    itemId: 'tie-more-unanswered',
+    prompt: 'More unanswered tie',
+    submittedCount: 2,
+    unansweredCount: 3,
+  },
+] satisfies typeof resultAnalysis.perItem;
+assert.deepEqual(
+  sortAssignmentItemsByReviewPriority(unansweredTieReviewPriorityItems).map(
+    (item) => item.itemId
+  ),
+  ['tie-more-unanswered', 'tie-submitted-only']
+);
 const stableTieReviewPriorityItems = [
   {
     acceptedAnswers: ['Question B'],
@@ -32004,6 +32064,7 @@ const stableTieReviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Same prompt',
     submittedCount: 3,
+    unansweredCount: 0,
   },
   {
     acceptedAnswers: ['Pair Z'],
@@ -32015,6 +32076,7 @@ const stableTieReviewPriorityItems = [
     kindLabel: 'Pair',
     prompt: 'Alpha prompt',
     submittedCount: 3,
+    unansweredCount: 0,
   },
   {
     acceptedAnswers: ['Question A'],
@@ -32026,6 +32088,7 @@ const stableTieReviewPriorityItems = [
     kindLabel: 'Question',
     prompt: 'Same prompt',
     submittedCount: 3,
+    unansweredCount: 0,
   },
   {
     acceptedAnswers: ['Group Z'],
@@ -32037,6 +32100,7 @@ const stableTieReviewPriorityItems = [
     kindLabel: 'Group item',
     prompt: 'Zoo prompt',
     submittedCount: 3,
+    unansweredCount: 0,
   },
 ] satisfies typeof resultAnalysis.perItem;
 const stableTieItemOrder = ['group-z', 'pair-z', 'question-a', 'question-b'];
@@ -32119,12 +32183,6 @@ assert.deepEqual(
   ),
   localeStableTieItemOrder
 );
-assert.deepEqual(
-  getSubmittedAssignmentReviewPriorityItems(reviewPriorityItems, {
-    limit: 2,
-  }).map((item) => item.itemId),
-  ['tie-more-submitted', 'tie-fewer-submitted']
-);
 const abnormalReviewPriorityItems = [
   {
     ...reviewPriorityItems[0]!,
@@ -32155,7 +32213,7 @@ assert.deepEqual(
   sortAssignmentItemsByReviewPriority(abnormalReviewPriorityItems).map(
     (item) => item.itemId
   ),
-  ['zero-rate', 'negative-rate', 'nan-unsubmitted', 'fractional-rate']
+  ['nan-unsubmitted', 'zero-rate', 'negative-rate', 'fractional-rate']
 );
 assert.deepEqual(
   getSubmittedAssignmentReviewPriorityItems(abnormalReviewPriorityItems, {
@@ -32747,10 +32805,10 @@ assert.deepEqual(
     itemId: 'pair-1',
     itemNumberLabel: '1.',
     kindLabel: 'Pair',
-    performanceLabel: '50% correct, 1/2',
+    performanceLabel: '50% correct, 1/2; 1 unanswered',
     prompt: 'Match "Hot" with its pair.',
     promptLabel: '1. Match "Hot" with its pair.',
-    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
+    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2; 1 unanswered)',
   }
 );
 assert.deepEqual(classroomBrief.focusItemViews[0], {
@@ -32759,10 +32817,10 @@ assert.deepEqual(classroomBrief.focusItemViews[0], {
   itemId: 'pair-1',
   itemNumberLabel: '1.',
   kindLabel: 'Pair',
-  performanceLabel: '50% correct, 1/2',
+  performanceLabel: '50% correct, 1/2; 1 unanswered',
   prompt: 'Match "Hot" with its pair.',
   promptLabel: '1. Match "Hot" with its pair.',
-  text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
+  text: '- 1. Match "Hot" with its pair. (50% correct, 1/2; 1 unanswered)',
 });
 assert.deepEqual(
   buildAssignmentClassroomBriefFollowUpStudentView({
@@ -32859,7 +32917,7 @@ assert.match(classroomBrief.text, /Average accuracy: 50%/);
 assert.match(classroomBrief.text, /Average time: 45s/);
 assert.match(
   classroomBrief.text,
-  /- 1\. Match "Hot" with its pair\. \(50% correct, 1\/2\)/
+  /- 1\. Match "Hot" with its pair\. \(50% correct, 1\/2; 1 unanswered\)/
 );
 assert.match(
   classroomBrief.text,
@@ -32925,9 +32983,9 @@ assert.deepEqual(
   }),
   {
     itemId: 'pair-1',
-    performanceLabel: '50% correct, 1/2',
+    performanceLabel: '50% correct, 1/2; 1 unanswered',
     promptLabel: '1. Match "Hot" with its pair.',
-    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2)',
+    text: '- 1. Match "Hot" with its pair. (50% correct, 1/2; 1 unanswered)',
   }
 );
 assert.deepEqual(buildAssignmentReteachPlanStudentView(alphaReviewStudent), {
@@ -32955,7 +33013,10 @@ assert.match(
 );
 assert.match(reteachPlan, /Review first:/);
 assert.match(reteachPlan, /Student follow-up:/);
-assert.match(reteachPlan, /Match "Hot" with its pair\. \(50% correct, 1\/2\)/);
+assert.match(
+  reteachPlan,
+  /Match "Hot" with its pair\. \(50% correct, 1\/2; 1 unanswered\)/
+);
 assert.match(
   reteachPlan,
   /Alpha review: 70% latest accuracy, 3 items to review\n- More review: 70% latest accuracy, 3 items to review\n- Lower score: 10% latest accuracy, 1 item to review/
@@ -32974,6 +33035,7 @@ const expandedReteachPlan = buildAssignmentReteachPlan({
       kindLabel: 'Question',
       prompt: 'Lower than tie',
       submittedCount: 5,
+      unansweredCount: 0,
     },
     {
       acceptedAnswers: ['E'],
@@ -32985,6 +33047,7 @@ const expandedReteachPlan = buildAssignmentReteachPlan({
       kindLabel: 'Question',
       prompt: 'Another reviewed item',
       submittedCount: 1,
+      unansweredCount: 0,
     },
   ],
   students: [
@@ -33062,7 +33125,8 @@ assert.deepEqual(
     itemId: 'q-1',
     kindLabel: 'Question',
     promptLabel: '1. Capital of France?',
-    text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct. Expected: Paris. Accepted answers: Paris, France. Notes: Paris is the capital of France.',
+    text: '- 1. Capital of France? (Question) - 67% correct, 2/3 correct; 0 unanswered. Expected: Paris. Accepted answers: Paris, France. Notes: Paris is the capital of France.',
+    unansweredLabel: '0 unanswered',
   }
 );
 assert.deepEqual(

@@ -43,6 +43,9 @@ function AssignmentResultsItemAnalysisAnswerNotes({
       <p className="mt-2 text-xs text-muted-foreground">
         {itemView.expectedAnswerSummaryText}
       </p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        {itemView.unansweredLabel}
+      </p>
       {itemView.acceptedAnswersLineText ? (
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {itemView.acceptedAnswersLineText}

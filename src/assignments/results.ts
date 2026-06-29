@@ -6,7 +6,7 @@ import {
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
 import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
 import { createStudentIdentityResolver } from '@/assignments/identity';
-import { getSubmittedAssignmentReviewPriorityItems } from '@/assignments/review-priority';
+import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
   getRuntimeDisplayAcceptedAnswers,
   hasRuntimeDisplayText,
@@ -36,6 +36,7 @@ export type AssignmentItemAnalysis = {
   kindLabel: string;
   prompt: string;
   submittedCount: number;
+  unansweredCount: number;
 };
 
 export type AssignmentAttemptReview = {
@@ -97,6 +98,7 @@ export function analyzeAssignmentResults({
   const completedAttemptAnswerMaps = completedAttempts.map((attempt) =>
     buildAttemptAnswerMapByItemId(attempt.answersJson.answers)
   );
+  const completedAttemptCount = normalizeResultCount(completedAttempts.length);
   const identityResolver = createStudentIdentityResolver(completedAttempts);
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getResultAcceptedAnswers(item.answer);
@@ -109,6 +111,7 @@ export function analyzeAssignmentResults({
       (answer) => answer.correct
     ).length;
     const submittedCount = submittedAnswers.length;
+    const normalizedSubmittedCount = normalizeResultCount(submittedCount);
 
     return {
       acceptedAnswers,
@@ -124,7 +127,10 @@ export function analyzeAssignmentResults({
       kind: item.kind,
       kindLabel: formatRuntimeItemKindLabel(item),
       prompt: normalizeRuntimeDisplayText(formatRuntimeItemPrompt(item)),
-      submittedCount: normalizeResultCount(submittedCount),
+      submittedCount: normalizedSubmittedCount,
+      unansweredCount: normalizeResultCount(
+        completedAttemptCount - normalizedSubmittedCount
+      ),
     };
   });
 
@@ -147,7 +153,7 @@ export function analyzeAssignmentResults({
 
   return {
     attempts: attemptReviews,
-    needsReview: getSubmittedAssignmentReviewPriorityItems(perItem, {
+    needsReview: getAssignmentReviewPriorityItems(perItem, {
       limit: ASSIGNMENT_RESULTS_ANALYSIS_LIMITS.needsReviewItems,
     }),
     perItem,

@@ -10,6 +10,7 @@ import {
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryCorrectRate,
+  formatAssignmentSummaryUnansweredCount,
 } from '@/assignments/result-summary-format';
 import { formatAssignmentResultPromptLabel } from '@/assignments/result-display';
 import { sortAssignmentItemsByReviewPriority } from '@/assignments/review-priority';
@@ -31,6 +32,7 @@ export type AssignmentItemReviewSummaryItemView = {
   kindLabel: string;
   promptLabel: string;
   text: string;
+  unansweredLabel: string;
 };
 
 export function buildAssignmentItemReviewSummary({
@@ -75,6 +77,9 @@ export function buildAssignmentItemReviewSummaryItemView({
   const correctCountLabel = formatAssignmentSummaryCorrectCount(item);
   const correctRateLabel = formatAssignmentSummaryCorrectRate(item.correctRate);
   const expectedAnswerText = formatPrimaryAcceptedAnswer(item.acceptedAnswers);
+  const unansweredLabel = formatAssignmentSummaryUnansweredCount(
+    item.unansweredCount
+  );
   const promptLabel = formatAssignmentResultPromptLabel({
     index,
     prompt: item.prompt,
@@ -103,7 +108,9 @@ export function buildAssignmentItemReviewSummaryItemView({
         ? m.assignment_item_review_notes({ notes: explanationText })
         : '',
       promptLabel,
+      unanswered: unansweredLabel,
     }),
+    unansweredLabel,
   };
 }
 

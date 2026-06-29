@@ -31,6 +31,7 @@ import {
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryReviewCount,
+  formatAssignmentSummaryUnansweredCount,
 } from '@/assignments/result-summary-format';
 import {
   formatAssignmentResultFraction,
@@ -469,6 +470,7 @@ export const assignmentResultTableHeaders = {
       m.assignment_result_table_header_type(),
       m.assignment_result_table_header_correct_rate(),
       m.assignment_result_table_header_submitted(),
+      m.assignment_result_review_unanswered(),
       m.assignment_result_table_header_expected(),
       m.assignment_result_table_header_accepted(),
       m.assignment_result_table_header_explanation(),
@@ -1018,6 +1020,9 @@ export function buildAssignmentItemAnalysisCardView(
     explanationText: item.explanation || null,
     kindLabel: item.kindLabel,
     prompt: item.prompt,
+    unansweredLabel: formatAssignmentSummaryUnansweredCount(
+      item.unansweredCount
+    ),
   };
 }
 
@@ -1057,6 +1062,9 @@ export function buildAssignmentItemPerformanceRowView({
     submittedLabel: formatAssignmentResultFraction(
       item.correctCount,
       item.submittedCount
+    ),
+    unansweredLabel: formatAssignmentSummaryUnansweredCount(
+      item.unansweredCount
     ),
   };
 }
