@@ -1534,8 +1534,8 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactLineCount[\s\S]*m\.assignment_result_copy_preview_meta_/,
-  'Assignment result copy artifact preview metadata should be prepared in the assignment-domain action model.'
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactLineCount[\s\S]*next-steps[\s\S]*assignment_result_copy_preview_meta_next_steps/,
+  'Assignment result copy artifact preview metadata should include prepared next-step counts for student follow-up artifacts.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -29489,6 +29489,7 @@ assert.deepEqual(
         [
           ['review-items', 'Review items', '2'],
           ['follow-up-students', 'Follow-up students', '1'],
+          ['next-steps', 'Next steps', '1'],
           ['lines', 'Lines', '6'],
         ],
         true,
@@ -29513,6 +29514,7 @@ assert.deepEqual(
         'Students sorted by follow-up need: 1',
         [
           ['students', 'Students', '1'],
+          ['next-steps', 'Next steps', '1'],
           ['lines', 'Lines', '2'],
         ],
         true,
@@ -34108,6 +34110,7 @@ assert.deepEqual(
       [
         ['review-items', 'Review items', '2'],
         ['follow-up-students', 'Follow-up students', '3'],
+        ['next-steps', 'Next steps', '3'],
         ['lines', 'Lines', '8'],
       ],
       resultCopyArtifacts.reteachPlan.text,
@@ -34130,6 +34133,7 @@ assert.deepEqual(
       'Students sorted by follow-up need: 4',
       [
         ['students', 'Students', '4'],
+        ['next-steps', 'Next steps', '4'],
         ['lines', 'Lines', '5'],
       ],
       resultCopyArtifacts.studentFollowUpSummary.text,

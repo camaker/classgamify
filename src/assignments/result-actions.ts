@@ -181,6 +181,7 @@ export type AssignmentResultCopyArtifactPreviewMetaItem = {
     | 'focus-items'
     | 'follow-up-students'
     | 'lines'
+    | 'next-steps'
     | 'review-items'
     | 'students';
   label: string;
@@ -490,6 +491,11 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         value: artifacts.reteachPlan.reviewStudents.length,
       }),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'next-steps',
+        label: m.assignment_result_copy_preview_meta_next_steps(),
+        value: artifacts.reteachPlan.studentViews.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
         value: lineCount,
@@ -517,6 +523,11 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
       key: 'students',
       label: m.assignment_result_copy_preview_meta_students(),
       value: artifacts.studentFollowUpSummary.students.length,
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'next-steps',
+      label: m.assignment_result_copy_preview_meta_next_steps(),
+      value: artifacts.studentFollowUpSummary.studentViews.length,
     }),
     buildAssignmentResultCopyArtifactPreviewMetaItem({
       key: 'lines',
