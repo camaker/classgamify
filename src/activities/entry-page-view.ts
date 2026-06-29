@@ -47,7 +47,7 @@ export type TemplatesPageViewModelInput = {
 export type TemplatesPageViewModel = {
   cards: TemplatesPageCardView[];
   footer: {
-    createActivityLabel: string;
+    createAction: Omit<EntryAction, 'search'>;
     description: string;
     title: string;
   };
@@ -119,7 +119,10 @@ export function buildTemplatesPageViewModel({
   return {
     cards,
     footer: {
-      createActivityLabel: m.templates_page_create_activity(),
+      createAction: {
+        label: m.templates_page_create_activity(),
+        to: Routes.Create,
+      },
       description: m.templates_page_bottom_description(),
       title: m.templates_page_bottom_title(),
     },

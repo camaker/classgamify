@@ -3461,6 +3461,16 @@ assert.match(
   'Templates route hero should use the prepared template create action.'
 );
 assert.match(
+  templatesRouteSource,
+  /pageView\.footer\.createAction\.to[\s\S]*pageView\.footer\.createAction\.label/,
+  'Templates route footer should use the prepared template footer create action.'
+);
+assert.doesNotMatch(
+  templatesRouteSource,
+  /Routes\.Create/,
+  'Templates route should not hardcode create route targets.'
+);
+assert.match(
   templateDirectoryCardSource,
   /TemplatesPageViewModel\['cards'\]\[number\]/,
   'Template directory cards should consume the activity entry-page view-model card contract.'
@@ -19683,7 +19693,10 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     template: template.type,
   })),
   footer: {
-    createActivityLabel: 'Create activity',
+    createAction: {
+      label: 'Create activity',
+      to: Routes.Create,
+    },
     description:
       'Open the editor, load an example for the selected game format, then publish it as a shareable student assignment link.',
     title: 'Ready to draft one?',

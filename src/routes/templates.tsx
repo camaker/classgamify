@@ -76,9 +76,12 @@ function TemplatesPage() {
                 {pageView.footer.description}
               </p>
             </div>
-            <Link to={Routes.Create} className={cn(buttonVariants(), 'w-fit')}>
+            <Link
+              to={pageView.footer.createAction.to}
+              className={cn(buttonVariants(), 'w-fit')}
+            >
               <IconPlus className="size-4" />
-              {pageView.footer.createActivityLabel}
+              {pageView.footer.createAction.label}
             </Link>
           </div>
         </div>
