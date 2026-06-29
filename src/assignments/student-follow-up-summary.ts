@@ -9,13 +9,22 @@ import {
   formatAssignmentResultCopyOrdinal,
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
-import { formatAssignmentResultStudentLabel } from '@/assignments/result-display';
+import {
+  formatAssignmentResultFraction,
+  formatAssignmentResultStudentLabel,
+} from '@/assignments/result-display';
+import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
+import { sortAssignmentAttemptReviewsByCompletedAt } from '@/assignments/result-filters';
 import { sortAssignmentStudentsByFollowUpPriority } from '@/assignments/student-follow-up-priority';
-import type { AssignmentStudentSummary } from '@/assignments/results';
+import type {
+  AssignmentAttemptReview,
+  AssignmentStudentSummary,
+} from '@/assignments/results';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentStudentFollowUpSummaryInput = {
   assignmentTitle: string;
+  attempts?: AssignmentAttemptReview[];
   students: AssignmentStudentSummary[];
 };
 
@@ -25,6 +34,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   bestAccuracyLabel: string;
   followUpRecommendation: string;
   latestAccuracyLabel: string;
+  latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
   studentKey: string;
   studentLabel: string;
@@ -40,11 +50,16 @@ export type AssignmentStudentFollowUpSummary = {
 
 export function buildAssignmentStudentFollowUpSummary({
   assignmentTitle,
+  attempts = [],
   students,
 }: AssignmentStudentFollowUpSummaryInput): AssignmentStudentFollowUpSummary {
   const sortedStudents = sortAssignmentStudentsByFollowUpPriority(students);
-  const studentViews =
-    buildAssignmentStudentFollowUpSummaryStudentViews(sortedStudents);
+  const studentViews = buildAssignmentStudentFollowUpSummaryStudentViews(
+    sortedStudents,
+    {
+      attempts,
+    }
+  );
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const title = m.assignment_student_follow_up_title({ title: copyTitle });
 
@@ -59,18 +74,31 @@ export function buildAssignmentStudentFollowUpSummary({
 }
 
 export function buildAssignmentStudentFollowUpSummaryStudentViews(
-  students: AssignmentStudentSummary[]
+  students: AssignmentStudentSummary[],
+  options?: {
+    attempts?: AssignmentAttemptReview[];
+  }
 ): AssignmentStudentFollowUpSummaryStudentView[] {
+  const latestAttemptByStudentKey = buildLatestAttemptReviewByStudentKey(
+    options?.attempts ?? []
+  );
+
   return students.map((student, index) =>
-    buildAssignmentStudentFollowUpSummaryStudentView({ index, student })
+    buildAssignmentStudentFollowUpSummaryStudentView({
+      index,
+      latestAttempt: latestAttemptByStudentKey.get(student.studentKey),
+      student,
+    })
   );
 }
 
 export function buildAssignmentStudentFollowUpSummaryStudentView({
   index,
+  latestAttempt,
   student,
 }: {
   index: number;
+  latestAttempt?: AssignmentAttemptReview;
   student: AssignmentStudentSummary;
 }): AssignmentStudentFollowUpSummaryStudentView {
   const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
@@ -90,6 +118,19 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptSummaryLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    : null;
+  const lineInput = {
+    attempts: attemptsLabel,
+    average: averageAccuracyLabel,
+    best: bestAccuracyLabel,
+    index: formatAssignmentResultCopyOrdinal(index),
+    latest: latestAccuracyLabel,
+    recommendation: followUpRecommendation,
+    reviewCount: reviewItemCountLabel,
+    student: studentLabel,
+  };
 
   return {
     attemptsLabel,
@@ -97,19 +138,16 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     bestAccuracyLabel,
     followUpRecommendation,
     latestAccuracyLabel,
+    latestAttemptSummaryLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
-    text: m.assignment_student_follow_up_line({
-      attempts: attemptsLabel,
-      average: averageAccuracyLabel,
-      best: bestAccuracyLabel,
-      index: formatAssignmentResultCopyOrdinal(index),
-      latest: latestAccuracyLabel,
-      recommendation: followUpRecommendation,
-      reviewCount: reviewItemCountLabel,
-      student: studentLabel,
-    }),
+    text: latestAttemptSummaryLabel
+      ? m.assignment_student_follow_up_line_with_latest_attempt({
+          ...lineInput,
+          latestAttemptSummary: latestAttemptSummaryLabel,
+        })
+      : m.assignment_student_follow_up_line(lineInput),
   };
 }
 
@@ -117,6 +155,40 @@ export function formatStudentFollowUpRecommendation(needsReviewCount: number) {
   return normalizeAssignmentSummaryCount(needsReviewCount) > 0
     ? m.assignment_student_follow_up_recommendation_review()
     : m.assignment_student_follow_up_recommendation_extend();
+}
+
+export function formatStudentFollowUpLatestAttemptSummary(
+  attempt: Pick<AssignmentAttemptReview, 'answers'>
+) {
+  const summary = buildAssignmentAttemptReviewSummary(attempt);
+
+  return m.assignment_student_follow_up_latest_attempt_summary({
+    correct: formatAssignmentResultFraction(
+      summary.correctItemCount,
+      summary.totalItemCount
+    ),
+    needsReview: formatAssignmentSummaryReviewItemCount(
+      summary.needsReviewItemCount
+    ),
+    submitted: formatAssignmentResultFraction(
+      summary.submittedItemCount,
+      summary.totalItemCount
+    ),
+  });
+}
+
+export function buildLatestAttemptReviewByStudentKey(
+  attempts: AssignmentAttemptReview[]
+) {
+  const latestAttemptByStudentKey = new Map<string, AssignmentAttemptReview>();
+
+  for (const attempt of sortAssignmentAttemptReviewsByCompletedAt(attempts)) {
+    if (!latestAttemptByStudentKey.has(attempt.studentKey)) {
+      latestAttemptByStudentKey.set(attempt.studentKey, attempt);
+    }
+  }
+
+  return latestAttemptByStudentKey;
 }
 
 function formatStudents(

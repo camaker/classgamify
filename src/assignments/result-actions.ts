@@ -164,7 +164,10 @@ export type AssignmentResultActionDataSet = {
 };
 
 type AssignmentResultCopyArtifactData = {
-  analysis: Pick<AssignmentResultsAnalysis, 'perItem' | 'students'>;
+  analysis: Pick<
+    AssignmentResultsAnalysis,
+    'attempts' | 'perItem' | 'students'
+  >;
   assignment: {
     title: string;
   };
@@ -335,6 +338,7 @@ export function buildAssignmentResultCopyArtifacts(
     }),
     studentFollowUpSummary: buildAssignmentStudentFollowUpSummary({
       assignmentTitle,
+      attempts: data.analysis.attempts,
       students,
     }),
   };

@@ -768,8 +768,10 @@ import {
   resolveAssignmentPublishCloseAfterLocal,
 } from '@/assignments/publish-schedule';
 import {
+  buildLatestAttemptReviewByStudentKey,
   buildAssignmentStudentFollowUpSummary,
   buildAssignmentStudentFollowUpSummaryStudentView,
+  formatStudentFollowUpLatestAttemptSummary,
 } from '@/assignments/student-follow-up-summary';
 import {
   formatAssignmentResultItemNumberLabel,
@@ -1562,6 +1564,11 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /type AssignmentResultCopyArtifactData = \{[\s\S]*analysis: Pick<[\s\S]*AssignmentResultsAnalysis,[\s\S]*'attempts' \| 'perItem' \| 'students'[\s\S]*>/,
+  'Assignment result copy artifacts should carry attempts, items, and students so follow-up text can reuse attempt-review summaries.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'students';/,
   'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
 );
@@ -1572,7 +1579,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
+  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
   'Assignment result actions should own unified teacher copy artifact construction.'
 );
 assert.match(
@@ -37730,8 +37737,18 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /assignment_student_follow_up_line\(\{[\s\S]*recommendation: followUpRecommendation/,
+  /assignment_student_follow_up_line_with_latest_attempt\(\{[\s\S]*latestAttemptSummary: latestAttemptSummaryLabel[\s\S]*assignment_student_follow_up_line\(lineInput\)/,
   'Assignment student follow-up summaries should add localized next-step recommendations to copied follow-up lines.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /buildLatestAttemptReviewByStudentKey[\s\S]*sortAssignmentAttemptReviewsByCompletedAt\(attempts\)/,
+  'Assignment student follow-up summaries should resolve latest attempts through the shared attempt-review sort helper.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)/,
+  'Assignment student follow-up latest-attempt summaries should reuse the shared attempt-review summary helper.'
 );
 assert.doesNotMatch(
   assignmentStudentFollowUpSummarySource,
@@ -37750,10 +37767,51 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '70%',
+    latestAttemptSummaryLabel: null,
     reviewItemCountLabel: '3 items to review',
     studentKey: 'name:alpha-review',
     studentLabel: 'Alpha review',
     text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
+  }
+);
+assert.equal(
+  formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!),
+  'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.'
+);
+assert.equal(
+  buildLatestAttemptReviewByStudentKey(resultAnalysis.attempts).get(
+    'name:alice'
+  )?.id,
+  'attempt-2'
+);
+assert.deepEqual(
+  buildAssignmentStudentFollowUpSummaryStudentView({
+    index: 0,
+    latestAttempt: resultAnalysis.attempts[2]!,
+    student: {
+      attempts: 1,
+      averageAccuracy: 0,
+      bestAccuracy: 0,
+      lastCompletedAt: new Date('2026-01-03T10:00:00.000Z'),
+      latestAccuracy: 0,
+      needsReviewCount: 2,
+      studentKey: 'anonymous:1',
+      studentLabel: 'Anonymous student 1',
+    },
+  }),
+  {
+    attemptsLabel: '1 attempt',
+    averageAccuracyLabel: '0%',
+    bestAccuracyLabel: '0%',
+    followUpRecommendation:
+      'review missed or unanswered items, then assign one short retry',
+    latestAccuracyLabel: '0%',
+    latestAttemptSummaryLabel:
+      'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+    reviewItemCountLabel: '2 items to review',
+    studentKey: 'anonymous:1',
+    studentLabel: 'Anonymous student 1',
+    text: '- 1. Anonymous student 1: latest 0%, average 0%, best 0%, 1 attempt, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
   }
 );
 assert.equal(
