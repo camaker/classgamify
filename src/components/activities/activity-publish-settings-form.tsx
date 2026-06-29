@@ -4,6 +4,7 @@ import {
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
+  type AssignmentPublishToggleView,
 } from '@/assignments/publish-input';
 import {
   ASSIGNMENT_MAX_ATTEMPTS_RANGE,
@@ -106,7 +107,7 @@ function ActivityPublishToggleGroup({
 }: {
   activityId: string;
   onDraftChange: ActivityPublishDraftFieldChange;
-  toggleViews: AssignmentPublishDialogViewModel['toggleViews'];
+  toggleViews: AssignmentPublishToggleView[];
 }) {
   return (
     <div className="grid gap-3 rounded-lg border bg-muted/20 p-3">

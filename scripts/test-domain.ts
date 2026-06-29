@@ -3607,6 +3607,11 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
+  /AssignmentPublishDialogViewModel[\s\S]*AssignmentPublishDraft[\s\S]*AssignmentPublishDraftValues[\s\S]*AssignmentPublishToggleView/,
+  'Assignment publish settings form should import the explicit assignment-domain toggle view contract.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
   /AssignmentSettingsSummary[\s\S]*view=\{view\.preview\.settingsSummaryView\}/,
   'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
 );
@@ -3629,6 +3634,11 @@ assert.match(
   activityPublishSettingsFormSource,
   /function ActivityPublishToggleGroup[\s\S]*toggleViews\.map[\s\S]*PublishSetting[\s\S]*onDraftChange\(option\.key, checked\)/,
   'Assignment publish toggle group should own prepared toggle binding.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /AssignmentPublishDialogViewModel\['toggleViews'\]/,
+  'Assignment publish toggle group should not infer child props from the aggregate dialog view-model.'
 );
 assert.match(
   assignmentSettingsSummarySource,
