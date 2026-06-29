@@ -105,10 +105,10 @@ function WorksheetsPage() {
             </p>
           </div>
           <Link
-            to={Routes.Templates}
+            to={pageView.templatesCta.action.to}
             className={cn(buttonVariants(), 'w-full md:w-auto')}
           >
-            {pageView.templatesCta.label}
+            {pageView.templatesCta.action.label}
             <IconArrowRight className="size-4" />
           </Link>
         </section>

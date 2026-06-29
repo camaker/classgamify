@@ -28,6 +28,11 @@ type EntryAction = {
   to: typeof Routes.Create;
 };
 
+type LinkAction = {
+  label: string;
+  to: typeof Routes.Templates;
+};
+
 export type TemplatesPageCardView = {
   action: EntryAction;
   bestFor: string;
@@ -87,8 +92,8 @@ export type WorksheetsPageViewModel = {
   };
   resultSignals: string[];
   templatesCta: {
+    action: LinkAction;
     description: string;
-    label: string;
     title: string;
   };
   workflowSteps: string[];
@@ -179,8 +184,11 @@ export function buildWorksheetsPageViewModel({
       m.worksheets_page_result_signal_csv(),
     ],
     templatesCta: {
+      action: {
+        label: m.worksheets_page_browse_templates(),
+        to: Routes.Templates,
+      },
       description: m.worksheets_page_templates_cta_description(),
-      label: m.worksheets_page_browse_templates(),
       title: m.worksheets_page_templates_cta_title(),
     },
     workflowSteps: [

@@ -3517,6 +3517,16 @@ assert.match(
 );
 assert.match(
   worksheetsRouteSource,
+  /pageView\.templatesCta\.action\.to[\s\S]*pageView\.templatesCta\.action\.label/,
+  'Worksheets route should render the prepared templates CTA action.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /Routes\.Templates/,
+  'Worksheets route should not hardcode the templates CTA route target.'
+);
+assert.match(
+  worksheetsRouteSource,
   /function WorksheetHeroActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.search[\s\S]*action\.isPrimary[\s\S]*action\.label/,
   'Worksheet hero action links should render prepared create-entry actions.'
 );
@@ -20072,9 +20082,12 @@ assert.deepEqual(worksheetsPageView, {
     'CSV export',
   ],
   templatesCta: {
+    action: {
+      label: 'Browse templates',
+      to: Routes.Templates,
+    },
     description:
       'Browse the full template library to switch the same structured content into quiz, matching games, box reveals, and group play.',
-    label: 'Browse templates',
     title: 'Want a different game view for the same lesson?',
   },
   workflowSteps: [
