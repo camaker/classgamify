@@ -17,6 +17,7 @@ import {
 import { formatAssignmentResultStudentLabel } from '@/assignments/result-display';
 import {
   buildAssignmentDeliverySummary,
+  formatAssignmentExpiry,
   formatAssignmentDeliveryPolicyText,
 } from '@/assignments/delivery-summary';
 import { formatAssignmentResultCopyOrdinal } from '@/assignments/result-copy-format';
@@ -212,6 +213,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
       status: data.assignment.status,
     }),
     formatAssignmentResultCsvDate(data.assignment.expiresAt),
+    deliveryView.closeTime,
     deliveryView.policyText,
     deliveryView.instructions,
     deliveryView.identityMode,
@@ -353,6 +355,7 @@ export function buildAssignmentResultsExportDeliveryView({
 
   return {
     answerReveal: deliverySummaryById.get('answerReveal') ?? '',
+    closeTime: formatAssignmentExpiry(expiresAt),
     identityMode: deliverySummaryById.get('identity') ?? '',
     instructions: exportSettings.instructions ?? '',
     itemOrder: deliverySummaryById.get('itemOrder') ?? '',
@@ -373,6 +376,7 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_share_slug(),
     m.assignment_results_export_column_assignment_status(),
     m.assignment_results_export_column_expires_at(),
+    m.assignment_results_export_column_close_time(),
     m.assignment_results_export_column_delivery_policy(),
     m.assignment_results_export_column_instructions(),
     m.assignment_results_export_column_collect_student_name(),

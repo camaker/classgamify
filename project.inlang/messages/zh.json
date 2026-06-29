@@ -1100,6 +1100,7 @@
   "assignment_results_export_column_average_accuracy": "平均正确率",
   "assignment_results_export_column_average_duration_seconds": "平均用时秒数",
   "assignment_results_export_column_average_points": "平均得分",
+  "assignment_results_export_column_close_time": "关闭时间文本",
   "assignment_results_export_column_collect_student_name": "收集学生姓名",
   "assignment_results_export_column_completed_items": "已完成题目",
   "assignment_results_export_column_completions": "完成次数",

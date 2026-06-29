@@ -32901,6 +32901,7 @@ assert.deepEqual(
   }),
   {
     answerReveal: 'After submit',
+    closeTime: '2026年1月10日 18:00',
     identityMode: 'Names',
     instructions: 'Use "complete sentences", then submit.',
     itemOrder: 'Fixed order',
@@ -32919,7 +32920,7 @@ assert.deepEqual(
   }
 );
 assert.ok(csv.startsWith('\uFEFF"assignment_id","assignment_title"'));
-assert.match(csv, /"expires_at","delivery_policy","instructions"/);
+assert.match(csv, /"expires_at","close_time","delivery_policy","instructions"/);
 assert.match(
   csv,
   /"item_number","item_id","item_correct_rate","item_correct_count","item_submitted_count","item_unanswered_count","prompt"/
@@ -32933,7 +32934,7 @@ assert.match(csv, /Answer reveal: After submit; Item order: Fixed order/);
 assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
-  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
+  /"2026年1月10日 18:00","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);

@@ -1100,6 +1100,7 @@
   "assignment_results_export_column_average_accuracy": "average_accuracy",
   "assignment_results_export_column_average_duration_seconds": "average_duration_seconds",
   "assignment_results_export_column_average_points": "average_points",
+  "assignment_results_export_column_close_time": "close_time",
   "assignment_results_export_column_collect_student_name": "collect_student_name",
   "assignment_results_export_column_completed_items": "completed_items",
   "assignment_results_export_column_completions": "completions",
