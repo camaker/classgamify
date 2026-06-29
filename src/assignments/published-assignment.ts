@@ -7,6 +7,7 @@ import {
   isSameAssignmentShareSlug,
   normalizeAssignmentShareSlug,
 } from '@/assignments/share-slug';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type PublishedAssignmentListItem = {
@@ -30,12 +31,14 @@ export type PublishedAssignmentPanelActionView = {
     | {
         assignmentId: string;
         label: string;
+        to: typeof Routes.PrintAssignmentWorksheet;
       }
     | undefined;
   resultAction:
     | {
         assignmentId: string;
         label: string;
+        to: typeof Routes.DashboardAssignmentResults;
       }
     | undefined;
   shareAction:
@@ -45,6 +48,7 @@ export type PublishedAssignmentPanelActionView = {
         sharePath: string;
         sharePathLabel: string;
         shareSlug: string;
+        to: typeof Routes.Play;
       }
     | undefined;
 };
@@ -185,12 +189,14 @@ function buildPublishedAssignmentPanelActionView({
       ? {
           assignmentId: assignment.id,
           label: m.assignment_list_action_print_worksheet(),
+          to: Routes.PrintAssignmentWorksheet,
         }
       : undefined,
     resultAction: hasAssignment
       ? {
           assignmentId: assignment.id,
           label: m.assignment_list_action_view_results(),
+          to: Routes.DashboardAssignmentResults,
         }
       : undefined,
     shareAction: {
@@ -199,6 +205,7 @@ function buildPublishedAssignmentPanelActionView({
       sharePath,
       sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
       shareSlug,
+      to: Routes.Play,
     },
   };
 }

@@ -11430,10 +11430,12 @@ assert.deepEqual(
       printAction: {
         assignmentId: 'assignment-2',
         label: 'Print worksheet',
+        to: Routes.PrintAssignmentWorksheet,
       },
       resultAction: {
         assignmentId: 'assignment-2',
         label: 'View results',
+        to: Routes.DashboardAssignmentResults,
       },
       shareAction: {
         copyLabel: 'Copy student link',
@@ -11441,6 +11443,7 @@ assert.deepEqual(
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
         shareSlug: 'share-2',
+        to: Routes.Play,
       },
     },
     assignment: publishedAssignments[1]?.assignment,
@@ -11476,6 +11479,7 @@ assert.deepEqual(
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
         shareSlug: 'share-2',
+        to: Routes.Play,
       },
     },
     body: 'Loading the newly published assignment link and classroom actions.',
@@ -11509,6 +11513,7 @@ assert.deepEqual(
         sharePath: '/play/missing',
         sharePathLabel: 'Student link',
         shareSlug: 'missing',
+        to: Routes.Play,
       },
     },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
@@ -18085,7 +18090,7 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to="\/play\/\$shareId"[\s\S]*action\.shareSlug[\s\S]*action\.label/,
+  /function AssignmentListSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug[\s\S]*action\.label/,
   'Assignment list share preview action should render prepared share availability and label.'
 );
 assert.match(
@@ -18105,8 +18110,13 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
-  'Assignment list card action view should prepare shared student-link copy and path labels in the domain layer.'
+  /buildAssignmentListCardActionView[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*to: Routes\.Play/,
+  'Assignment list card action view should prepare shared student-link copy, path labels, and route targets in the domain layer.'
+);
+assert.match(
+  assignmentListViewSource,
+  /printAction:[\s\S]*to: Routes\.PrintAssignmentWorksheet[\s\S]*resultAction:[\s\S]*to: Routes\.DashboardAssignmentResults/,
+  'Assignment list card action view should prepare printable worksheet and result route targets.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -18125,8 +18135,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /to="\/print\/assignments\/\$assignmentId"/,
-  'Assignment list card component should link persisted assignments to the printable worksheet route.'
+  /function AssignmentListResultActionLink[\s\S]*to=\{action\.to\}[\s\S]*function AssignmentListPrintActionLink[\s\S]*to=\{action\.to\}/,
+  'Assignment list result and print actions should render prepared route targets.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -18160,8 +18170,13 @@ assert.match(
 );
 assert.match(
   publishedAssignmentSource,
-  /copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
-  'Published assignment panel action view should prepare shared student-link copy and path labels.'
+  /copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel[\s\S]*to: Routes\.Play/,
+  'Published assignment panel action view should prepare shared student-link copy, path labels, and route targets.'
+);
+assert.match(
+  publishedAssignmentSource,
+  /printAction:[\s\S]*to: Routes\.PrintAssignmentWorksheet[\s\S]*resultAction:[\s\S]*to: Routes\.DashboardAssignmentResults/,
+  'Published assignment panel action view should prepare printable worksheet and result route targets.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
@@ -18190,8 +18205,8 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentResultsActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label/,
-  'Published assignment result and print actions should render prepared assignment ids and action labels.'
+  /function PublishedAssignmentResultsActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*action\.label[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  'Published assignment result and print actions should render prepared route targets, assignment ids, and action labels.'
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
@@ -18205,8 +18220,8 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /to="\/print\/assignments\/\$assignmentId"/,
-  'Published assignment panel component should link newly published assignments to the printable worksheet route.'
+  /function PublishedAssignmentShareActions[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug/,
+  'Published assignment panel share action should render the prepared student-link route target.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
@@ -22336,10 +22351,12 @@ assert.deepEqual(
         printAction: {
           assignmentId: 'persisted-assignment-1',
           label: 'Print worksheet',
+          to: Routes.PrintAssignmentWorksheet,
         },
         resultAction: {
           assignmentId: 'persisted-assignment-1',
           label: 'View results',
+          to: Routes.DashboardAssignmentResults,
         },
         shareAction: {
           copyLabel: 'Copy student link',
@@ -22347,6 +22364,7 @@ assert.deepEqual(
           sharePath: '/play/share-1',
           sharePathLabel: 'Student link',
           shareSlug: 'share-1',
+          to: Routes.Play,
         },
       },
       assignment: {
@@ -22465,10 +22483,12 @@ assert.deepEqual(
       printAction: {
         assignmentId: 'persisted-assignment-1',
         label: 'Print worksheet',
+        to: Routes.PrintAssignmentWorksheet,
       },
       resultAction: {
         assignmentId: 'persisted-assignment-1',
         label: 'View results',
+        to: Routes.DashboardAssignmentResults,
       },
       shareAction: {
         copyLabel: 'Copy student link',
@@ -22477,6 +22497,7 @@ assert.deepEqual(
         sharePath: '/play/share-1',
         sharePathLabel: 'Student link',
         shareSlug: 'share-1',
+        to: Routes.Play,
       },
       statusAction: {
         failureMessage: 'Assignment status could not be updated.',
@@ -22574,6 +22595,7 @@ assert.deepEqual(
         sharePath: '/play/demo-food',
         sharePathLabel: 'Student link',
         shareSlug: 'demo-food',
+        to: Routes.Play,
       },
       statusAction: undefined,
     },
@@ -22716,10 +22738,12 @@ assert.deepEqual(
     printAction: {
       assignmentId: 'assignment-with-space',
       label: 'Print worksheet',
+      to: Routes.PrintAssignmentWorksheet,
     },
     resultAction: {
       assignmentId: 'assignment-with-space',
       label: 'View results',
+      to: Routes.DashboardAssignmentResults,
     },
     shareAction: {
       copyLabel: 'Copy student link',
@@ -22728,6 +22752,7 @@ assert.deepEqual(
       sharePath: '/play/share%20123',
       sharePathLabel: 'Student link',
       shareSlug: 'share 123',
+      to: Routes.Play,
     },
     statusAction: undefined,
   }
@@ -22757,6 +22782,7 @@ assert.deepEqual(
       sharePath: '/play/draft-share',
       sharePathLabel: 'Student link',
       shareSlug: 'draft-share',
+      to: Routes.Play,
     },
     statusAction: undefined,
   }

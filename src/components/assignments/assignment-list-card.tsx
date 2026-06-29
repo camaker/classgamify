@@ -155,7 +155,7 @@ function AssignmentListResultActionLink({
 }) {
   return (
     <Link
-      to="/dashboard/assignments/$assignmentId"
+      to={action.to}
       params={{ assignmentId: action.assignmentId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
@@ -175,7 +175,7 @@ function AssignmentListPrintActionLink({
 }) {
   return (
     <Link
-      to="/print/assignments/$assignmentId"
+      to={action.to}
       params={{ assignmentId: action.assignmentId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
@@ -278,7 +278,7 @@ function AssignmentListSharePreviewAction({
 
   return (
     <Link
-      to="/play/$shareId"
+      to={action.to}
       params={{ shareId: action.shareSlug }}
       className={cn(buttonVariants(), 'w-full lg:w-auto')}
     >

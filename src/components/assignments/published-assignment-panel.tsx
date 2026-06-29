@@ -123,7 +123,7 @@ function PublishedAssignmentResultsActionLink({
 }) {
   return (
     <Link
-      to="/dashboard/assignments/$assignmentId"
+      to={action.to}
       params={{ assignmentId: action.assignmentId }}
       className={cn(
         buttonVariants({ variant: 'outline' }),
@@ -143,7 +143,7 @@ function PublishedAssignmentPrintActionLink({
 }) {
   return (
     <Link
-      to="/print/assignments/$assignmentId"
+      to={action.to}
       params={{
         assignmentId: action.assignmentId,
       }}
@@ -166,7 +166,7 @@ function PublishedAssignmentShareActions({
   return (
     <>
       <Link
-        to="/play/$shareId"
+        to={action.to}
         params={{ shareId: action.shareSlug }}
         className={cn(
           buttonVariants({ variant: 'outline' }),

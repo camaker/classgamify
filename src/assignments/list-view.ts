@@ -96,12 +96,14 @@ type AssignmentListCardActionView = {
     | {
         assignmentId: string;
         label: string;
+        to: typeof Routes.PrintAssignmentWorksheet;
       }
     | undefined;
   resultAction:
     | {
         assignmentId: string;
         label: string;
+        to: typeof Routes.DashboardAssignmentResults;
       }
     | undefined;
   shareAction:
@@ -113,6 +115,7 @@ type AssignmentListCardActionView = {
         sharePath: string;
         sharePathLabel: string;
         shareSlug: string;
+        to: typeof Routes.Play;
       }
     | undefined;
   statusAction: AssignmentStatusAction | undefined;
@@ -839,12 +842,14 @@ export function buildAssignmentListCardActionView({
       ? {
           assignmentId,
           label: assignmentListActionCopy.printWorksheet,
+          to: Routes.PrintAssignmentWorksheet,
         }
       : undefined,
     resultAction: actionState.showResultsAction
       ? {
           assignmentId,
           label: assignmentListActionCopy.viewResults,
+          to: Routes.DashboardAssignmentResults,
         }
       : undefined,
     shareAction: actionState.showShareActions
@@ -858,6 +863,7 @@ export function buildAssignmentListCardActionView({
           sharePath: buildAssignmentSharePath(normalizedShareSlug),
           sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
           shareSlug: normalizedShareSlug,
+          to: Routes.Play,
         }
       : undefined,
     statusAction: actionState.statusAction,
