@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { IconDeviceGamepad2, IconPlus } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -54,7 +53,7 @@ export function TemplateDirectoryCard({
           ))}
         </div>
         <Link
-          to={Routes.Create}
+          to={template.action.to}
           search={template.action.search}
           className={cn(
             buttonVariants({ variant: 'outline' }),

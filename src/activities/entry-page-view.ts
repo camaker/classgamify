@@ -15,6 +15,7 @@ import {
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
 import type { ActivityTemplateDefinition } from '@/activities/types';
+import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
 type EntryActionSearch = {
@@ -24,6 +25,7 @@ type EntryActionSearch = {
 type EntryAction = {
   label: string;
   search: EntryActionSearch;
+  to: typeof Routes.Create;
 };
 
 export type TemplatesPageCardView = {
@@ -111,6 +113,7 @@ export function buildTemplatesPageViewModel({
   const defaultCreateAction = cards[0]?.action ?? {
     label: m.templates_page_create_from_template(),
     search: buildTemplateCreateSearch('quiz'),
+    to: Routes.Create,
   };
 
   return {

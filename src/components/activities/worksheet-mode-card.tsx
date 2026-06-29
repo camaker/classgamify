@@ -2,7 +2,6 @@ import type { WorksheetsPageViewModel } from '@/activities/entry-page-view';
 import type { WorksheetModeTemplate } from '@/activities/worksheet-modes';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { Routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import {
   IconCategory2,
@@ -39,7 +38,7 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
         </div>
       ) : null}
       <Link
-        to={Routes.Create}
+        to={mode.action.to}
         search={mode.action.search}
         className={cn(
           buttonVariants({ variant: 'outline' }),

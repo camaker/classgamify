@@ -3467,8 +3467,13 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /template\.contentRequirements\.map[\s\S]*template\.action\.search/,
+  /template\.contentRequirements\.map[\s\S]*to=\{template\.action\.to\}[\s\S]*template\.action\.search/,
   'Template directory cards should own card requirement badges and create actions.'
+);
+assert.doesNotMatch(
+  templateDirectoryCardSource,
+  /Routes\.Create/,
+  'Template directory cards should not hardcode template create route targets.'
 );
 assert.doesNotMatch(
   templatesRouteSource,
@@ -3522,8 +3527,13 @@ assert.match(
 );
 assert.match(
   worksheetModeCardSource,
-  /mode\.contentRequirements\.map[\s\S]*<Badge[\s\S]*\{requirement\}[\s\S]*mode\.action\.search/,
+  /mode\.contentRequirements\.map[\s\S]*<Badge[\s\S]*\{requirement\}[\s\S]*to=\{mode\.action\.to\}[\s\S]*mode\.action\.search/,
   'Worksheet mode cards should render prepared content requirement badges before the create action.'
+);
+assert.doesNotMatch(
+  worksheetModeCardSource,
+  /Routes\.Create/,
+  'Worksheet mode cards should not hardcode worksheet create route targets.'
 );
 assert.match(
   worksheetModeCardSource,
@@ -19538,6 +19548,7 @@ assert.deepEqual(
   activityTemplates.map((template) => ({
     label: `Start ${template.shortName}`,
     search: { template: template.type },
+    to: Routes.Create,
   }))
 );
 assert.deepEqual(buildHomePageViewModel(), {
@@ -19658,6 +19669,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     action: {
       label: `Start ${template.shortName}`,
       search: { template: template.type },
+      to: Routes.Create,
     },
     bestFor: template.bestFor,
     bestForLabel: 'Best for',
@@ -19681,6 +19693,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     createAction: {
       label: 'Create from template',
       search: { template: 'quiz' },
+      to: Routes.Create,
     },
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
@@ -19693,6 +19706,7 @@ assert.deepEqual(
   {
     label: 'Create from template',
     search: { template: 'quiz' },
+    to: Routes.Create,
   }
 );
 assert.deepEqual(buildRoadmapPageViewModel(), {
@@ -19959,24 +19973,28 @@ assert.deepEqual(worksheetsPageView, {
       label: 'Create fill blanks',
       search: { template: 'fill-blank' },
       template: 'fill-blank',
+      to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Start line match',
       search: { template: 'line-match' },
       template: 'line-match',
+      to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Create listening',
       search: { template: 'listening' },
       template: 'listening',
+      to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Create sort',
       search: { template: 'group-sort' },
       template: 'group-sort',
+      to: Routes.Create,
     },
   ],
   modeCards: [
@@ -19984,6 +20002,7 @@ assert.deepEqual(worksheetsPageView, {
       action: {
         label: 'Create fill blanks',
         search: { template: 'fill-blank' },
+        to: Routes.Create,
       },
       contentRequirements: ['questions'],
       description:
@@ -19995,6 +20014,7 @@ assert.deepEqual(worksheetsPageView, {
       action: {
         label: 'Start line match',
         search: { template: 'line-match' },
+        to: Routes.Create,
       },
       contentRequirements: ['match pairs'],
       description:
@@ -20006,6 +20026,7 @@ assert.deepEqual(worksheetsPageView, {
       action: {
         label: 'Create listening',
         search: { template: 'listening' },
+        to: Routes.Create,
       },
       contentRequirements: ['questions'],
       description:
@@ -20017,6 +20038,7 @@ assert.deepEqual(worksheetsPageView, {
       action: {
         label: 'Create sort',
         search: { template: 'group-sort' },
+        to: Routes.Create,
       },
       contentRequirements: ['groups'],
       description:
@@ -20056,6 +20078,7 @@ assert.deepEqual(
   getWorksheetModeDefinitions().map((mode) => ({
     label: mode.action,
     search: { template: mode.template },
+    to: Routes.Create,
   }))
 );
 assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
@@ -20064,24 +20087,28 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
     label: 'Create fill blanks',
     search: { template: 'fill-blank' },
     template: 'fill-blank',
+    to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Start line match',
     search: { template: 'line-match' },
     template: 'line-match',
+    to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Create listening',
     search: { template: 'listening' },
     template: 'listening',
+    to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Create sort',
     search: { template: 'group-sort' },
     template: 'group-sort',
+    to: Routes.Create,
   },
 ]);
 assert.deepEqual(
@@ -20095,6 +20122,7 @@ assert.deepEqual(
     label: 'Create Lines',
     search: { template: 'line-match' },
     template: 'line-match',
+    to: Routes.Create,
   }
 );
 const worksheetsPageWithoutLineMatch = buildWorksheetsPageViewModel({
@@ -20111,6 +20139,7 @@ assert.deepEqual(worksheetsPageWithoutLineMatch.heroActions[1], {
   label: 'Create Lines',
   search: { template: 'line-match' },
   template: 'line-match',
+  to: Routes.Create,
 });
 assert.deepEqual(
   worksheetsPageWithoutLineMatch.modeCards.map((card) => card.template),
@@ -20208,6 +20237,7 @@ try {
       label: '创建连线',
       search: { template: 'line-match' },
       template: 'line-match',
+      to: Routes.Create,
     }
   );
 } finally {

@@ -9,6 +9,7 @@ import {
   type WorksheetModeDefinition,
   type WorksheetModeTemplate,
 } from '@/activities/worksheet-modes';
+import { Routes } from '@/lib/routes';
 
 type CreateActivityTemplateSearch = {
   template: ActivityTemplateDefinition['type'];
@@ -30,6 +31,7 @@ export function buildTemplateEntryAction(template: ActivityTemplateDefinition) {
   return {
     label: m.activity_template_start_action({ template: template.shortName }),
     search: buildTemplateCreateSearch(template.type),
+    to: Routes.Create,
   };
 }
 
@@ -37,6 +39,7 @@ export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
   return {
     label: mode.action,
     search: buildTemplateCreateSearch(mode.template),
+    to: Routes.Create,
   };
 }
 
@@ -63,6 +66,7 @@ function buildWorksheetHeroAction(
       }),
       search: buildTemplateCreateSearch(template),
       template,
+      to: Routes.Create,
     };
   }
 
