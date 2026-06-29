@@ -1,5 +1,8 @@
 import type {
+  AssignmentResultAction,
   AssignmentResultActionButton,
+} from '@/assignments/result-actions';
+import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
 } from '@/assignments/result-view';
@@ -236,7 +239,7 @@ function getResultActionDisabledReasonId({
 }
 
 const resultActionIconByAction: Record<
-  AssignmentResultActionButton['action'],
+  AssignmentResultAction,
   typeof IconCopy
 > = {
   'copy-brief': IconClipboardText,

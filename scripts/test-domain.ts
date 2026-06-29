@@ -4255,6 +4255,11 @@ assert.match(
   /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction/,
   'Assignment result header actions should import explicit assignment-domain print and share action contracts.'
 );
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultAction[\s\S]*AssignmentResultActionButton[\s\S]*resultActionIconByAction: Record<[\s\S]*AssignmentResultAction/,
+  'Assignment result header actions should type result-action icons with the explicit result action contract.'
+);
 assert.doesNotMatch(
   `${assignmentResultsHeaderCardSource}\n${assignmentResultsHeaderActionsSource}`,
   /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
@@ -4299,6 +4304,11 @@ assert.doesNotMatch(
   `${assignmentResultsMetricCardSource}\n${assignmentResultsAttemptReviewCardSource}\n${assignmentResultsAttemptsTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsItemPerformanceTableSource}`,
   /AssignmentResult(?:AttemptTableView|StudentSummaryTableView|ItemPerformanceTableView)\['rows'\]\[number\]|AssignmentResultAttemptReviewCardView\['answerViews'\]\[number\]|AssignmentResultMetricItem\['key'\]/,
   'Assignment result display components should not infer child prop contracts from aggregate table, review-card, or metric indexes.'
+);
+assert.doesNotMatch(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultActionButton\['action'\]/,
+  'Assignment result header action icons should not infer action keys from the aggregate action button.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
