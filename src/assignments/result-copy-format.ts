@@ -30,6 +30,12 @@ export function joinAssignmentResultCopyLines(
   return normalizedLines.join(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT.lineBreak);
 }
 
+export function countAssignmentResultCopyLines(text: string) {
+  return text
+    .split(/\r?\n/)
+    .filter((line) => formatAssignmentResultCopyLine(line).length > 0).length;
+}
+
 export function formatAssignmentResultCopyTitle(value: string) {
   return formatAssignmentResultCopyLine(value);
 }

@@ -767,6 +767,7 @@ import {
 } from '@/assignments/result-display';
 import {
   ASSIGNMENT_RESULT_COPY_TEXT_FORMAT,
+  countAssignmentResultCopyLines,
   formatAssignmentResultCopyLine,
   formatAssignmentResultCopyOrdinal,
   formatAssignmentResultCopyTitle,
@@ -1593,8 +1594,13 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactLineCount[\s\S]*next-steps[\s\S]*assignment_result_copy_preview_meta_next_steps/,
-  'Assignment result copy artifact preview metadata should include prepared next-step counts for student follow-up artifacts.'
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*countAssignmentResultCopyLines\(text\)[\s\S]*next-steps[\s\S]*assignment_result_copy_preview_meta_next_steps/,
+  'Assignment result copy artifact preview metadata should include prepared line and next-step counts for student follow-up artifacts.'
+);
+assert.doesNotMatch(
+  assignmentResultActionsSource,
+  /split\([\s\S]*filter\(\(line\) => line\.trim\(\)\)/,
+  'Assignment result actions should use the shared copy-line counter instead of local raw trim rules.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1703,6 +1709,11 @@ assert.match(
   assignmentResultCopyFormatSource,
   /joinAssignmentResultCopyLines[\s\S]*ASSIGNMENT_RESULT_COPY_TEXT_FORMAT\.lineBreak/,
   'Assignment result copy formatting should expose a shared line joiner.'
+);
+assert.match(
+  assignmentResultCopyFormatSource,
+  /countAssignmentResultCopyLines[\s\S]*formatAssignmentResultCopyLine\(line\)/,
+  'Assignment result copy formatting should expose a shared effective-line counter.'
 );
 assert.match(
   assignmentResultCopyFormatSource,
@@ -36324,6 +36335,12 @@ assert.equal(
 assert.equal(
   formatAssignmentResultCopyLine('  Ｃｌａｓｓ\t result\u00A0　line  '),
   'Class result line'
+);
+assert.equal(
+  countAssignmentResultCopyLines(
+    '\r\n  Ｏｎｅ\t line  \n \t \nＴｗｏ\u00A0　line\n'
+  ),
+  2
 );
 assert.equal(
   formatAssignmentResultCopyTitle('  Ｃａｐｉｔａｌ\u00A0　Review,\tWeek   1 '),

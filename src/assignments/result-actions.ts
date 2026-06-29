@@ -11,6 +11,7 @@ import {
   buildAssignmentReteachPlan,
   type AssignmentReteachPlan,
 } from '@/assignments/reteach-plan';
+import { countAssignmentResultCopyLines } from '@/assignments/result-copy-format';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
@@ -492,7 +493,7 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
   artifacts: AssignmentResultCopyArtifacts;
 }): AssignmentResultCopyArtifactPreviewMetaItem[] {
   const text = getAssignmentResultCopyArtifactText({ action, artifacts });
-  const lineCount = getAssignmentResultCopyArtifactLineCount(text);
+  const lineCount = countAssignmentResultCopyLines(text);
 
   if (action === 'copy-brief') {
     return [
@@ -592,10 +593,6 @@ function buildAssignmentResultCopyArtifactPreviewMetaItem({
     label,
     value: formatAssignmentResultNumber(value, { min: 0 }),
   };
-}
-
-function getAssignmentResultCopyArtifactLineCount(text: string) {
-  return text.split(/\r?\n/).filter((line) => line.trim()).length;
 }
 
 export function buildAssignmentResultCopyText({
