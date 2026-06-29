@@ -109,6 +109,7 @@ function StudentRunnerIdentityPanel({
         <Input
           id="student-name"
           value={studentName}
+          disabled={identityView.disabled}
           onChange={(event) => onStudentNameChange(event.target.value)}
           placeholder={identityView.placeholder}
           className="mt-2"

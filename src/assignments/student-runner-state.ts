@@ -86,6 +86,7 @@ type StudentRunnerMissingPageView = {
 
 type StudentRunnerIdentityView =
   | {
+      disabled: boolean;
       label: string;
       mode: 'student-name';
       placeholder: string;
@@ -542,6 +543,8 @@ export function buildStudentRunnerPageViewModel({
       ? buildStudentRunnerIdentityView({
           anonymousToken,
           collectStudentName: assignment.settings.collectStudentName,
+          submittedAttemptCount:
+            result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
         })
       : undefined,
     itemCount: attemptState.itemCount,
@@ -647,14 +650,18 @@ function buildStudentRunnerMissingPageView(
 function buildStudentRunnerIdentityView({
   anonymousToken,
   collectStudentName,
+  submittedAttemptCount,
 }: {
   anonymousToken?: string;
   collectStudentName: boolean;
+  submittedAttemptCount: number;
 }): StudentRunnerIdentityView {
   if (collectStudentName) {
     const runnerCopy = getStudentRunnerCopy();
 
     return {
+      disabled:
+        normalizeStudentRunnerSubmittedAttemptCount(submittedAttemptCount) > 0,
       label: runnerCopy.studentNameLabel,
       mode: 'student-name',
       placeholder: runnerCopy.studentNamePlaceholder,
@@ -667,6 +674,10 @@ function buildStudentRunnerIdentityView({
     }),
     mode: 'anonymous',
   };
+}
+
+function normalizeStudentRunnerSubmittedAttemptCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
 function buildStudentRunnerResultPanelView({

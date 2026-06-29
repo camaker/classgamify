@@ -6625,8 +6625,8 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*identityView\.copy\.description/,
-  'Student runner identity panel should render prepared named-student and anonymous browser identity views.'
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.copy\.description/,
+  'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -14341,10 +14341,59 @@ const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   submittedAttemptCount: 0,
 });
 assert.deepEqual(namedStudentRunnerPageView.identityView, {
+  disabled: false,
   label: 'Student name',
   mode: 'student-name',
   placeholder: 'Type your name',
 });
+const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 2_000,
+  isSubmitting: false,
+  pageState: starterRunnerState,
+  result: {
+    accuracy: 100,
+    attemptUsage: {
+      maxAttempts: 2,
+      remainingAttempts: 1,
+      usedAttempts: 1,
+    },
+    completedItemCount: 1,
+    correctItemCount: 1,
+    earnedPoints: 1,
+    reviewItems: [],
+    totalPoints: 1,
+  },
+  shareId: 'demo-runner',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  submittedNamedStudentRunnerPageView.identityView,
+  {
+    disabled: true,
+    label: 'Student name',
+    mode: 'student-name',
+    placeholder: 'Type your name',
+  }
+);
+const previousNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  answers: {},
+  attemptClock: undefined,
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 2_000,
+  isSubmitting: false,
+  pageState: starterRunnerState,
+  shareId: 'demo-runner',
+  submittedAttemptCount: 1,
+});
+assert.equal(
+  previousNamedStudentRunnerPageView.identityView?.mode === 'student-name'
+    ? previousNamedStudentRunnerPageView.identityView.disabled
+    : undefined,
+  true
+);
 assert.deepEqual(
   buildStudentRunnerAnonymousTokenPlan({
     pageView: namedStudentRunnerPageView,
