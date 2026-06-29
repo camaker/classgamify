@@ -215,6 +215,39 @@ type AssignmentResultTableView<TRow> = {
   rows: TRow[];
 };
 
+export type AssignmentResultMetricItem = ReturnType<
+  typeof buildAssignmentResultMetricItems
+>[number];
+
+export type AssignmentResultAttemptRowView = ReturnType<
+  typeof buildAssignmentAttemptRowViews
+>[number];
+
+export type AssignmentResultAttemptTableView =
+  AssignmentResultTableView<AssignmentResultAttemptRowView>;
+
+export type AssignmentResultAttemptReviewCardView = ReturnType<
+  typeof buildAssignmentAttemptReviewCardViews
+>[number];
+
+export type AssignmentResultStudentSummaryRowView = ReturnType<
+  typeof buildAssignmentStudentSummaryRowViews
+>[number];
+
+export type AssignmentResultStudentSummaryTableView =
+  AssignmentResultTableView<AssignmentResultStudentSummaryRowView>;
+
+export type AssignmentResultItemAnalysisCardView = ReturnType<
+  typeof buildAssignmentItemAnalysisCardViews
+>[number];
+
+export type AssignmentResultItemPerformanceRowView = ReturnType<
+  typeof buildAssignmentItemPerformanceRowViews
+>[number];
+
+export type AssignmentResultItemPerformanceTableView =
+  AssignmentResultTableView<AssignmentResultItemPerformanceRowView>;
+
 type AssignmentResultPageBreadcrumb = {
   href?: string;
   isCurrentPage?: boolean;
@@ -359,13 +392,9 @@ type AssignmentResultsPageViewModel<
   actionData: AssignmentResultsPageData<TAttempt> | null;
   actionDataSet: AssignmentResultActionDataSet;
   actionState: AssignmentResultActionState;
-  attemptReviewCardViews: ReturnType<
-    typeof buildAssignmentAttemptReviewCardViews
-  >;
-  attemptRowViews: Array<ReturnType<typeof buildAssignmentAttemptRowDisplay>>;
-  attemptTableView: AssignmentResultTableView<
-    ReturnType<typeof buildAssignmentAttemptRowViews>[number]
-  >;
+  attemptReviewCardViews: AssignmentResultAttemptReviewCardView[];
+  attemptRowViews: AssignmentResultAttemptRowView[];
+  attemptTableView: AssignmentResultAttemptTableView;
   breadcrumbs: AssignmentResultPageBreadcrumb[];
   classroomBrief: AssignmentResultCopyArtifacts['classroomBrief'] | null;
   completedAttemptCount: number;
@@ -382,26 +411,16 @@ type AssignmentResultsPageViewModel<
   copyScopeView: AssignmentResultCopyScopeView;
   description: string;
   headerView: AssignmentResultHeaderView | null;
-  itemAnalysisCardViews: ReturnType<
-    typeof buildAssignmentItemAnalysisCardViews
-  >;
+  itemAnalysisCardViews: AssignmentResultItemAnalysisCardView[];
   loadErrorMessage: string;
-  itemPerformanceRowViews: ReturnType<
-    typeof buildAssignmentItemPerformanceRowViews
-  >;
-  itemPerformanceTableView: AssignmentResultTableView<
-    ReturnType<typeof buildAssignmentItemPerformanceRowViews>[number]
-  >;
-  metricItems: ReturnType<typeof buildAssignmentResultMetricItems>;
+  itemPerformanceRowViews: AssignmentResultItemPerformanceRowView[];
+  itemPerformanceTableView: AssignmentResultItemPerformanceTableView;
+  metricItems: AssignmentResultMetricItem[];
   resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
   sectionState: AssignmentResultSectionState;
   sectionViews: AssignmentResultSectionViews;
-  studentSummaryRowViews: ReturnType<
-    typeof buildAssignmentStudentSummaryRowViews
-  >;
-  studentSummaryTableView: AssignmentResultTableView<
-    ReturnType<typeof buildAssignmentStudentSummaryRowViews>[number]
-  >;
+  studentSummaryRowViews: AssignmentResultStudentSummaryRowView[];
+  studentSummaryTableView: AssignmentResultStudentSummaryTableView;
   title: string;
   viewState: AssignmentResultResolvedViewState;
 };

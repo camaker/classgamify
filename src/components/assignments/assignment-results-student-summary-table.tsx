@@ -1,15 +1,9 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultStudentSummaryTableView } from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-type AssignmentResultsStudentSummaryTableView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['studentSummaryTableView'];
-type AssignmentResultsStudentSummaryRows =
-  AssignmentResultsStudentSummaryTableView['rows'];
-
 type AssignmentResultsStudentSummaryTableProps = {
-  tableView: AssignmentResultsStudentSummaryTableView;
+  tableView: AssignmentResultStudentSummaryTableView;
 };
 
 export function AssignmentResultsStudentSummaryTable({
@@ -33,7 +27,7 @@ export function AssignmentResultsStudentSummaryTable({
 function AssignmentResultsStudentSummaryRow({
   rowView,
 }: {
-  rowView: AssignmentResultsStudentSummaryRows[number];
+  rowView: AssignmentResultStudentSummaryTableView['rows'][number];
 }) {
   return (
     <TableRow>

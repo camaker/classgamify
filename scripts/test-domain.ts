@@ -3900,7 +3900,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /attemptTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentAttemptTableView[\s\S]*headers: assignmentResultTableHeaders\.studentAttempts[\s\S]*rows: buildAssignmentAttemptRowViews/,
+  /attemptTableView:\s*AssignmentResultAttemptTableView[\s\S]*buildAssignmentAttemptTableView[\s\S]*headers: assignmentResultTableHeaders\.studentAttempts[\s\S]*rows: buildAssignmentAttemptRowViews/,
   'Assignment result page view-model should own formatted attempt table views.'
 );
 assert.match(
@@ -3929,7 +3929,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /studentSummaryTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows: buildAssignmentStudentSummaryRowViews/,
+  /studentSummaryTableView:\s*AssignmentResultStudentSummaryTableView[\s\S]*buildAssignmentStudentSummaryTableView[\s\S]*headers: assignmentResultTableHeaders\.studentSummary[\s\S]*rows: buildAssignmentStudentSummaryRowViews/,
   'Assignment result page view-model should own formatted student summary table views.'
 );
 assert.match(
@@ -3939,7 +3939,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /itemPerformanceTableView:\s*AssignmentResultTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows: buildAssignmentItemPerformanceRowViews/,
+  /itemPerformanceTableView:\s*AssignmentResultItemPerformanceTableView[\s\S]*buildAssignmentItemPerformanceTableView[\s\S]*headers: assignmentResultTableHeaders\.itemPerformance[\s\S]*rows: buildAssignmentItemPerformanceRowViews/,
   'Assignment result page view-model should own formatted item performance table views.'
 );
 assert.match(
@@ -3998,6 +3998,11 @@ assert.match(
   'Assignment result header share, print, and header-view contracts should be explicit assignment-domain exports.'
 );
 assert.match(
+  assignmentResultViewSource,
+  /export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
+  'Assignment result view domain should expose explicit result metric, review-card, and table view contracts.'
+);
+assert.match(
   assignmentResultsHeaderCardSource,
   /AssignmentResultHeaderView/,
   'Assignment result header card should import the explicit assignment-domain header-view contract.'
@@ -4011,6 +4016,41 @@ assert.doesNotMatch(
   `${assignmentResultsHeaderCardSource}\n${assignmentResultsHeaderActionsSource}`,
   /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
   'Assignment result header components should not infer header contracts from the full result page view-model ReturnType.'
+);
+assert.match(
+  assignmentResultsMetricCardSource,
+  /AssignmentResultMetricItem/,
+  'Assignment result metric card should import the explicit metric view contract.'
+);
+assert.match(
+  assignmentResultsItemAnalysisCardSource,
+  /AssignmentResultItemAnalysisCardView/,
+  'Assignment result item analysis card should import the explicit item analysis view contract.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /AssignmentResultAttemptReviewCardView/,
+  'Assignment result attempt review card should import the explicit attempt review card contract.'
+);
+assert.match(
+  assignmentResultsAttemptsTableSource,
+  /AssignmentResultAttemptTableView/,
+  'Assignment result attempts table should import the explicit attempt table view contract.'
+);
+assert.match(
+  assignmentResultsStudentSummaryTableSource,
+  /AssignmentResultStudentSummaryTableView/,
+  'Assignment result student summary table should import the explicit student summary table view contract.'
+);
+assert.match(
+  assignmentResultsItemPerformanceTableSource,
+  /AssignmentResultItemPerformanceTableView/,
+  'Assignment result item performance table should import the explicit item performance table view contract.'
+);
+assert.doesNotMatch(
+  `${assignmentResultsMetricCardSource}\n${assignmentResultsItemAnalysisCardSource}\n${assignmentResultsAttemptReviewCardSource}\n${assignmentResultsAttemptsTableSource}\n${assignmentResultsStudentSummaryTableSource}\n${assignmentResultsItemPerformanceTableSource}`,
+  /ReturnType<typeof buildAssignmentResultsPageViewModel>/,
+  'Assignment result display components should not infer focused props from the full result page view-model.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,

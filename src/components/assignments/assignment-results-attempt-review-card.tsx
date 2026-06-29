@@ -1,13 +1,9 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultAttemptReviewCardView } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { IconListDetails } from '@tabler/icons-react';
 
-type AssignmentResultsAttemptReviewView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['attemptReviewCardViews'][number];
-
 type AssignmentResultsAttemptReviewCardProps = {
-  attemptView: AssignmentResultsAttemptReviewView;
+  attemptView: AssignmentResultAttemptReviewCardView;
 };
 
 export function AssignmentResultsAttemptReviewCard({
@@ -44,7 +40,7 @@ export function AssignmentResultsAttemptReviewCard({
 function AssignmentResultsAttemptAnswerReview({
   answerView,
 }: {
-  answerView: AssignmentResultsAttemptReviewView['answerViews'][number];
+  answerView: AssignmentResultAttemptReviewCardView['answerViews'][number];
 }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3">

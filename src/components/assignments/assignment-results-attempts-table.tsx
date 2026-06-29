@@ -1,14 +1,9 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultAttemptTableView } from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-type AssignmentResultsAttemptTableView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['attemptTableView'];
-type AssignmentResultsAttemptRows = AssignmentResultsAttemptTableView['rows'];
-
 type AssignmentResultsAttemptsTableProps = {
-  tableView: AssignmentResultsAttemptTableView;
+  tableView: AssignmentResultAttemptTableView;
 };
 
 export function AssignmentResultsAttemptsTable({
@@ -32,7 +27,7 @@ export function AssignmentResultsAttemptsTable({
 function AssignmentResultsAttemptRow({
   rowDisplay,
 }: {
-  rowDisplay: AssignmentResultsAttemptRows[number];
+  rowDisplay: AssignmentResultAttemptTableView['rows'][number];
 }) {
   return (
     <TableRow>

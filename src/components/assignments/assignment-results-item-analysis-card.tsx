@@ -1,13 +1,9 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultItemAnalysisCardView } from '@/assignments/result-view';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
-type AssignmentResultsItemAnalysisView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['itemAnalysisCardViews'][number];
-
 type AssignmentResultsItemAnalysisCardProps = {
-  itemView: AssignmentResultsItemAnalysisView;
+  itemView: AssignmentResultItemAnalysisCardView;
 };
 
 export function AssignmentResultsItemAnalysisCard({
@@ -36,7 +32,7 @@ export function AssignmentResultsItemAnalysisCard({
 function AssignmentResultsItemAnalysisAnswerNotes({
   itemView,
 }: {
-  itemView: AssignmentResultsItemAnalysisView;
+  itemView: AssignmentResultItemAnalysisCardView;
 }) {
   return (
     <>

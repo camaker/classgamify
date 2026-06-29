@@ -1,4 +1,4 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultMetricItem } from '@/assignments/result-view';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   IconCalendarTime,
@@ -7,12 +7,8 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 
-type AssignmentResultsMetric = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['metricItems'][number];
-
 type AssignmentResultsMetricCardProps = {
-  metric: AssignmentResultsMetric;
+  metric: AssignmentResultMetricItem;
 };
 
 export function AssignmentResultsMetricCard({
@@ -35,7 +31,7 @@ export function AssignmentResultsMetricCard({
 }
 
 const resultMetricIconByKey: Record<
-  AssignmentResultsMetric['key'],
+  AssignmentResultMetricItem['key'],
   typeof IconUsers
 > = {
   'average-accuracy': IconChartBar,

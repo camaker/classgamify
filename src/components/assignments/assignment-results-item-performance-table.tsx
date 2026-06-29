@@ -1,15 +1,9 @@
-import type { buildAssignmentResultsPageViewModel } from '@/assignments/result-view';
+import type { AssignmentResultItemPerformanceTableView } from '@/assignments/result-view';
 import { AssignmentResultsTableHeader } from '@/components/assignments/assignment-results-table-header';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-type AssignmentResultsItemPerformanceTableView = ReturnType<
-  typeof buildAssignmentResultsPageViewModel
->['itemPerformanceTableView'];
-type AssignmentResultsItemPerformanceRows =
-  AssignmentResultsItemPerformanceTableView['rows'];
-
 type AssignmentResultsItemPerformanceTableProps = {
-  tableView: AssignmentResultsItemPerformanceTableView;
+  tableView: AssignmentResultItemPerformanceTableView;
 };
 
 export function AssignmentResultsItemPerformanceTable({
@@ -33,7 +27,7 @@ export function AssignmentResultsItemPerformanceTable({
 function AssignmentResultsItemPerformanceRow({
   rowView,
 }: {
-  rowView: AssignmentResultsItemPerformanceRows[number];
+  rowView: AssignmentResultItemPerformanceTableView['rows'][number];
 }) {
   return (
     <TableRow>
