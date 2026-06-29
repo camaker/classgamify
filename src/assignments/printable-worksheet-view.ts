@@ -225,7 +225,10 @@ export const printableWorksheetPageCopy = {
 } as const;
 
 export function buildPrintableWorksheetHeaderView(
-  worksheet: PrintableAssignmentWorksheet
+  worksheet: PrintableAssignmentWorksheet,
+  options?: {
+    includeAnswerKey?: boolean;
+  }
 ): PrintableWorksheetHeaderView {
   return {
     activityDescription: worksheet.activityDescription,
@@ -235,7 +238,10 @@ export function buildPrintableWorksheetHeaderView(
     deliveryPolicy: worksheet.deliveryPolicyText,
     instructions:
       worksheet.instructions || printableWorksheetPageCopy.instructionsFallback,
-    overviewItems: buildPrintableWorksheetHeaderOverviewItems(worksheet),
+    overviewItems: buildPrintableWorksheetHeaderOverviewItems(
+      worksheet,
+      options
+    ),
     printModeLabel: printableWorksheetPageCopy.printModeLabel,
     sharePath: worksheet.sharePath,
     sharePathLabel: printableWorksheetPageCopy.sharePathLabel,
@@ -244,8 +250,14 @@ export function buildPrintableWorksheetHeaderView(
 }
 
 export function buildPrintableWorksheetHeaderOverviewItems(
-  worksheet: PrintableAssignmentWorksheet
+  worksheet: PrintableAssignmentWorksheet,
+  options?: {
+    includeAnswerKey?: boolean;
+  }
 ): PrintableWorksheetHeaderOverviewItem[] {
+  const includeAnswerKey =
+    options?.includeAnswerKey ?? worksheet.includeAnswerKey;
+
   return [
     {
       id: 'items',
@@ -257,7 +269,7 @@ export function buildPrintableWorksheetHeaderOverviewItems(
     },
     {
       id: 'answer-key',
-      label: worksheet.includeAnswerKey
+      label: includeAnswerKey
         ? m.assignment_printable_overview_answer_key_included()
         : m.assignment_printable_overview_answer_key_hidden(),
     },
@@ -276,10 +288,12 @@ export function buildPrintableWorksheetPageViewModel({
   const answerKeyItemViews = worksheet.answerKey?.map(
     buildPrintableWorksheetAnswerKeyItemView
   );
-  const headerView = buildPrintableWorksheetHeaderView(worksheet);
   const answerKeyView = buildPrintableWorksheetAnswerKeyView({
     answerKey,
     itemViews: answerKeyItemViews ?? [],
+  });
+  const headerView = buildPrintableWorksheetHeaderView(worksheet, {
+    includeAnswerKey: answerKeyView.show,
   });
 
   return {

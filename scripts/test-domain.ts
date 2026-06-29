@@ -14628,6 +14628,18 @@ assert.deepEqual(
   }).answerKeyView.show,
   false
 );
+assert.deepEqual(
+  buildPrintableWorksheetPageViewModel({
+    answerKey: false,
+    assignmentId: 'assignment-printable-1',
+    worksheet: printableSnapshotWorksheetWithAnswers,
+  }).headerView.overviewItems,
+  [
+    { id: 'items', label: '1 item' },
+    { id: 'response-modes', label: 'Multiple choice practice' },
+    { id: 'answer-key', label: 'Answer key hidden' },
+  ]
+);
 assert.equal(PRINTABLE_WORKSHEET_BODY_PRINT_MODE, 'worksheet');
 assert.deepEqual(
   buildPrintableWorksheetRouteState({
@@ -20721,8 +20733,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /overviewItems: buildPrintableWorksheetHeaderOverviewItems\(worksheet\)/,
-  'Printable worksheet header views should expose prepared worksheet overview metadata.'
+  /overviewItems: buildPrintableWorksheetHeaderOverviewItems\([\s\S]*worksheet,[\s\S]*options[\s\S]*const includeAnswerKey =[\s\S]*options\?\.includeAnswerKey \?\? worksheet\.includeAnswerKey/,
+  'Printable worksheet header views should expose prepared worksheet overview metadata with explicit answer-key visibility.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /const answerKeyView = buildPrintableWorksheetAnswerKeyView[\s\S]*buildPrintableWorksheetHeaderView\(worksheet,[\s\S]*includeAnswerKey: answerKeyView\.show/,
+  'Printable worksheet page view-model should drive header answer-key status from the visible answer-key view.'
 );
 assert.match(
   printableWorksheetViewSource,
