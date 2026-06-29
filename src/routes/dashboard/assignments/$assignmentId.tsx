@@ -2,7 +2,6 @@ import {
   type AssignmentResultActionButton,
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultsRouteState,
-  assignmentResultSectionCopy,
 } from '@/assignments/result-view';
 import {
   buildAssignmentResultControlRouteSearch,
@@ -131,6 +130,7 @@ function LoadedAssignmentResultsPage({
 }) {
   const headerView = pageView.headerView;
   if (!headerView) return null;
+  const sectionViews = pageView.sectionViews;
 
   return (
     <div className="grid gap-6">
@@ -174,17 +174,19 @@ function LoadedAssignmentResultsPage({
         </>
       ) : null}
 
-      {pageView.sectionState.showReteachPriorities ? (
+      {sectionViews.reteachPriorities.isVisible ? (
         <Card className="rounded-lg">
           <CardHeader>
             <CardTitle>
               <h2 className="text-lg font-semibold">
-                {assignmentResultSectionCopy.reteachPriorities.title}
+                {sectionViews.reteachPriorities.title}
               </h2>
             </CardTitle>
-            <CardDescription>
-              <p>{assignmentResultSectionCopy.reteachPriorities.description}</p>
-            </CardDescription>
+            {sectionViews.reteachPriorities.description ? (
+              <CardDescription>
+                <p>{sectionViews.reteachPriorities.description}</p>
+              </CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-3">
             {pageView.itemAnalysisCardViews.length > 0 ? (
@@ -196,24 +198,26 @@ function LoadedAssignmentResultsPage({
               ))
             ) : (
               <div className="rounded-lg border border-dashed bg-muted/20 p-4 text-sm text-muted-foreground md:col-span-3">
-                {assignmentResultSectionCopy.reteachPriorities.emptyMessage}
+                {sectionViews.reteachPriorities.emptyMessage}
               </div>
             )}
           </CardContent>
         </Card>
       ) : null}
 
-      {pageView.sectionState.showItemPerformance ? (
+      {sectionViews.itemPerformance.isVisible ? (
         <Card className="rounded-lg">
           <CardHeader>
             <CardTitle>
               <h2 className="text-lg font-semibold">
-                {assignmentResultSectionCopy.itemPerformance.title}
+                {sectionViews.itemPerformance.title}
               </h2>
             </CardTitle>
-            <CardDescription>
-              <p>{assignmentResultSectionCopy.itemPerformance.description}</p>
-            </CardDescription>
+            {sectionViews.itemPerformance.description ? (
+              <CardDescription>
+                <p>{sectionViews.itemPerformance.description}</p>
+              </CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
@@ -234,17 +238,19 @@ function LoadedAssignmentResultsPage({
         </Card>
       ) : null}
 
-      {pageView.sectionState.showStudentSummary ? (
+      {sectionViews.studentSummary.isVisible ? (
         <Card className="rounded-lg">
           <CardHeader>
             <CardTitle>
               <h2 className="text-lg font-semibold">
-                {assignmentResultSectionCopy.studentSummary.title}
+                {sectionViews.studentSummary.title}
               </h2>
             </CardTitle>
-            <CardDescription>
-              <p>{assignmentResultSectionCopy.studentSummary.description}</p>
-            </CardDescription>
+            {sectionViews.studentSummary.description ? (
+              <CardDescription>
+                <p>{sectionViews.studentSummary.description}</p>
+              </CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent>
             {pageView.contentState.hasStudentSummaryRows ? (
@@ -253,7 +259,7 @@ function LoadedAssignmentResultsPage({
               />
             ) : (
               <AssignmentResultsEmptyState
-                state={pageView.resultView.emptyStates.studentSummary}
+                state={sectionViews.studentSummary.emptyState}
               />
             )}
           </CardContent>
@@ -264,12 +270,14 @@ function LoadedAssignmentResultsPage({
         <CardHeader>
           <CardTitle>
             <h2 className="text-lg font-semibold">
-              {assignmentResultSectionCopy.studentAttempts.title}
+              {sectionViews.studentAttempts.title}
             </h2>
           </CardTitle>
-          <CardDescription>
-            <p>{assignmentResultSectionCopy.studentAttempts.description}</p>
-          </CardDescription>
+          {sectionViews.studentAttempts.description ? (
+            <CardDescription>
+              <p>{sectionViews.studentAttempts.description}</p>
+            </CardDescription>
+          ) : null}
         </CardHeader>
         <CardContent>
           {pageView.contentState.hasAttemptRows ? (
@@ -278,25 +286,27 @@ function LoadedAssignmentResultsPage({
             />
           ) : (
             <AssignmentResultsEmptyState
-              state={pageView.resultView.emptyStates.attemptRows}
+              state={sectionViews.studentAttempts.emptyState}
             />
           )}
         </CardContent>
       </Card>
 
-      {pageView.sectionState.showAnswerReview ? (
+      {sectionViews.answerReview.isVisible ? (
         <Card className="rounded-lg">
           <CardHeader>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <CardTitle>
                   <h2 className="text-lg font-semibold">
-                    {assignmentResultSectionCopy.answerReview.title}
+                    {sectionViews.answerReview.title}
                   </h2>
                 </CardTitle>
-                <CardDescription>
-                  <p>{assignmentResultSectionCopy.answerReview.description}</p>
-                </CardDescription>
+                {sectionViews.answerReview.description ? (
+                  <CardDescription>
+                    <p>{sectionViews.answerReview.description}</p>
+                  </CardDescription>
+                ) : null}
               </div>
               <AssignmentResultsAttemptReviewFilterControl
                 onFilterChange={(value) =>
@@ -308,9 +318,11 @@ function LoadedAssignmentResultsPage({
                 view={pageView.controlViews.attemptReviewFilter}
               />
             </div>
-            <CardDescription>
-              <p>{pageView.resultView.attemptReviewSubmissionSummary}</p>
-            </CardDescription>
+            {sectionViews.answerReview.submissionSummary ? (
+              <CardDescription>
+                <p>{sectionViews.answerReview.submissionSummary}</p>
+              </CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent className="grid gap-3">
             {pageView.contentState.hasAttemptReviewCards ? (
@@ -322,7 +334,7 @@ function LoadedAssignmentResultsPage({
               ))
             ) : (
               <AssignmentResultsEmptyState
-                state={pageView.resultView.emptyStates.attemptReview}
+                state={sectionViews.answerReview.emptyState}
               />
             )}
           </CardContent>

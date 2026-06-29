@@ -590,6 +590,7 @@ import {
   buildAssignmentResultHeaderShareAction,
   buildAssignmentResultMetricItems,
   buildAssignmentResultSectionState,
+  buildAssignmentResultSectionViews,
   buildAssignmentResultControlViews,
   buildAssignmentResultCopyScopeView,
   buildAssignmentResultViewModel,
@@ -3848,6 +3849,36 @@ assert.match(
   assignmentResultViewSource,
   /controlViews:\s*AssignmentResultControlViews/,
   'Assignment result page view-model should expose route-ready control views.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /sectionViews:\s*AssignmentResultSectionViews/,
+  'Assignment result page view-model should expose route-ready section views.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultSectionViews[\s\S]*assignmentResultSectionCopy\.reteachPriorities\.title[\s\S]*assignmentResultSectionCopy\.studentAttempts\.title[\s\S]*assignmentResultSectionCopy\.studentSummary\.title/,
+  'Assignment result section views should prepare localized titles, empty states, and answer-review summaries in the assignment domain.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultSectionViews[\s\S]*resultView\.emptyStates\.attemptReview[\s\S]*resultView\.attemptReviewSubmissionSummary/,
+  'Assignment result section views should prepare answer-review empty state and submission summary in the assignment domain.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentResultSectionViews[\s\S]*resultView\.emptyStates\.attemptRows[\s\S]*resultView\.emptyStates\.studentSummary/,
+  'Assignment result section views should prepare student attempt and student summary empty states in the assignment domain.'
+);
+assert.doesNotMatch(
+  assignmentResultRouteSource,
+  /assignmentResultSectionCopy|pageView\.resultView\.emptyStates|pageView\.resultView\.attemptReviewSubmissionSummary/,
+  'Assignment result route should render prepared section views instead of reading section copy or result empty-state details directly.'
+);
+assert.match(
+  assignmentResultRouteSource,
+  /const sectionViews = pageView\.sectionViews[\s\S]*sectionViews\.reteachPriorities\.isVisible[\s\S]*sectionViews\.studentAttempts\.emptyState[\s\S]*sectionViews\.answerReview\.submissionSummary/,
+  'Assignment result route should render section visibility, headings, empty states, and answer-review summaries from pageView.sectionViews.'
 );
 assert.match(
   assignmentResultRouteSource,
@@ -30302,6 +30333,48 @@ assert.deepEqual(
       metric.value,
     ]),
     sectionState: scoredResultsPageView.sectionState,
+    sectionViews: {
+      answerReview: {
+        description: scoredResultsPageView.sectionViews.answerReview.description,
+        emptyStateTitle:
+          scoredResultsPageView.sectionViews.answerReview.emptyState?.title,
+        isVisible: scoredResultsPageView.sectionViews.answerReview.isVisible,
+        submissionSummary:
+          scoredResultsPageView.sectionViews.answerReview.submissionSummary,
+        title: scoredResultsPageView.sectionViews.answerReview.title,
+      },
+      itemPerformance: {
+        description:
+          scoredResultsPageView.sectionViews.itemPerformance.description,
+        isVisible: scoredResultsPageView.sectionViews.itemPerformance.isVisible,
+        title: scoredResultsPageView.sectionViews.itemPerformance.title,
+      },
+      reteachPriorities: {
+        description:
+          scoredResultsPageView.sectionViews.reteachPriorities.description,
+        emptyMessage:
+          scoredResultsPageView.sectionViews.reteachPriorities.emptyMessage,
+        isVisible:
+          scoredResultsPageView.sectionViews.reteachPriorities.isVisible,
+        title: scoredResultsPageView.sectionViews.reteachPriorities.title,
+      },
+      studentAttempts: {
+        description:
+          scoredResultsPageView.sectionViews.studentAttempts.description,
+        emptyStateTitle:
+          scoredResultsPageView.sectionViews.studentAttempts.emptyState?.title,
+        isVisible: scoredResultsPageView.sectionViews.studentAttempts.isVisible,
+        title: scoredResultsPageView.sectionViews.studentAttempts.title,
+      },
+      studentSummary: {
+        description:
+          scoredResultsPageView.sectionViews.studentSummary.description,
+        emptyStateTitle:
+          scoredResultsPageView.sectionViews.studentSummary.emptyState?.title,
+        isVisible: scoredResultsPageView.sectionViews.studentSummary.isVisible,
+        title: scoredResultsPageView.sectionViews.studentSummary.title,
+      },
+    },
     studentSummaryRowViews: scoredResultsPageView.studentSummaryRowViews.map(
       (row) => [row.studentLabel, row.needsReviewLabel]
     ),
@@ -30463,6 +30536,44 @@ assert.deepEqual(
       showReteachPriorities: true,
       showStudentSearch: true,
       showStudentSummary: true,
+    },
+    sectionViews: {
+      answerReview: {
+        description:
+          'Item-level answers are scored from the frozen assignment snapshot, so teacher edits never change historical results.',
+        emptyStateTitle: 'No matching answer reviews.',
+        isVisible: true,
+        submissionSummary: 'Showing 1 of 1 submission.',
+        title: 'Answer review',
+      },
+      itemPerformance: {
+        description:
+          'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+        isVisible: true,
+        title: 'Item performance',
+      },
+      reteachPriorities: {
+        description:
+          'Items are sorted by the lowest correct rate so teachers can quickly decide what to review with the class.',
+        emptyMessage:
+          'Submit at least one answered attempt to calculate item review priorities.',
+        isVisible: true,
+        title: 'Reteach priorities',
+      },
+      studentAttempts: {
+        description:
+          'Latest submitted attempts are shown first, with detailed answer review below.',
+        emptyStateTitle: 'No matching attempts.',
+        isVisible: true,
+        title: 'Student attempts',
+      },
+      studentSummary: {
+        description:
+          'Sort students by review priority, best score, name, or attempt volume before reading every submitted answer.',
+        emptyStateTitle: 'No matching students.',
+        isVisible: true,
+        title: 'Student summary',
+      },
     },
     studentSummaryRowViews: [['Alice', '1']],
     title: 'Week 1 results',
@@ -32403,6 +32514,80 @@ assert.deepEqual(
     showReteachPriorities: true,
     showStudentSearch: true,
     showStudentSummary: true,
+  }
+);
+const directAssignmentResultSectionViews = buildAssignmentResultSectionViews({
+  resultView: scoredResultsPageView.resultView,
+  sectionState: scoredResultsPageView.sectionState,
+});
+assert.deepEqual(
+  {
+    answerReview: {
+      isVisible: directAssignmentResultSectionViews.answerReview.isVisible,
+      submissionSummary:
+        directAssignmentResultSectionViews.answerReview.submissionSummary,
+      title: directAssignmentResultSectionViews.answerReview.title,
+    },
+    itemPerformance: {
+      description:
+        directAssignmentResultSectionViews.itemPerformance.description,
+      isVisible: directAssignmentResultSectionViews.itemPerformance.isVisible,
+      title: directAssignmentResultSectionViews.itemPerformance.title,
+    },
+    reteachPriorities: {
+      emptyMessage:
+        directAssignmentResultSectionViews.reteachPriorities.emptyMessage,
+      isVisible: directAssignmentResultSectionViews.reteachPriorities.isVisible,
+      title: directAssignmentResultSectionViews.reteachPriorities.title,
+    },
+    studentAttempts: {
+      emptyState:
+        directAssignmentResultSectionViews.studentAttempts.emptyState,
+      isVisible: directAssignmentResultSectionViews.studentAttempts.isVisible,
+      title: directAssignmentResultSectionViews.studentAttempts.title,
+    },
+    studentSummary: {
+      emptyState: directAssignmentResultSectionViews.studentSummary.emptyState,
+      isVisible: directAssignmentResultSectionViews.studentSummary.isVisible,
+      title: directAssignmentResultSectionViews.studentSummary.title,
+    },
+  },
+  {
+    answerReview: {
+      isVisible: true,
+      submissionSummary: 'Showing 1 of 1 submission.',
+      title: 'Answer review',
+    },
+    itemPerformance: {
+      description:
+        'Review every prompt from the frozen assignment snapshot, including submitted counts, correct rates, and answer notes.',
+      isVisible: true,
+      title: 'Item performance',
+    },
+    reteachPriorities: {
+      emptyMessage:
+        'Submit at least one answered attempt to calculate item review priorities.',
+      isVisible: true,
+      title: 'Reteach priorities',
+    },
+    studentAttempts: {
+      emptyState: {
+        description:
+          'Clear the search or try another student name from this assignment.',
+        title: 'No matching attempts.',
+      },
+      isVisible: true,
+      title: 'Student attempts',
+    },
+    studentSummary: {
+      emptyState: {
+        description:
+          'Clear the search or try another student name from this assignment.',
+        title: 'No matching students.',
+      },
+      isVisible: true,
+      title: 'Student summary',
+    },
   }
 );
 assert.equal(parseStudentSummarySort('best'), 'best');

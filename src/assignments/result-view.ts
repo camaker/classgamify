@@ -179,6 +179,23 @@ type AssignmentResultSectionState = {
   showStudentSummary: boolean;
 };
 
+type AssignmentResultSectionView = {
+  description?: string;
+  emptyMessage?: string;
+  emptyState?: AssignmentResultEmptyState;
+  isVisible: boolean;
+  submissionSummary?: string;
+  title: string;
+};
+
+type AssignmentResultSectionViews = {
+  answerReview: AssignmentResultSectionView;
+  itemPerformance: AssignmentResultSectionView;
+  reteachPriorities: AssignmentResultSectionView;
+  studentAttempts: AssignmentResultSectionView;
+  studentSummary: AssignmentResultSectionView;
+};
+
 type AssignmentResultContentState = {
   hasAttemptReviewCards: boolean;
   hasAttemptRows: boolean;
@@ -353,6 +370,7 @@ type AssignmentResultsPageViewModel<
   metricItems: ReturnType<typeof buildAssignmentResultMetricItems>;
   resultView: ReturnType<typeof buildAssignmentResultViewModel<TAttempt>>;
   sectionState: AssignmentResultSectionState;
+  sectionViews: AssignmentResultSectionViews;
   studentSummaryRowViews: ReturnType<
     typeof buildAssignmentStudentSummaryRowViews
   >;
@@ -893,6 +911,47 @@ export function buildAssignmentResultSectionState({
     showReteachPriorities: itemCount > 0,
     showStudentSearch: attemptCount > 0,
     showStudentSummary: studentCount > 0,
+  };
+}
+
+export function buildAssignmentResultSectionViews({
+  resultView,
+  sectionState,
+}: {
+  resultView: ReturnType<typeof buildAssignmentResultViewModel>;
+  sectionState: AssignmentResultSectionState;
+}): AssignmentResultSectionViews {
+  return {
+    answerReview: {
+      description: assignmentResultSectionCopy.answerReview.description,
+      emptyState: resultView.emptyStates.attemptReview,
+      isVisible: sectionState.showAnswerReview,
+      submissionSummary: resultView.attemptReviewSubmissionSummary,
+      title: assignmentResultSectionCopy.answerReview.title,
+    },
+    itemPerformance: {
+      description: assignmentResultSectionCopy.itemPerformance.description,
+      isVisible: sectionState.showItemPerformance,
+      title: assignmentResultSectionCopy.itemPerformance.title,
+    },
+    reteachPriorities: {
+      description: assignmentResultSectionCopy.reteachPriorities.description,
+      emptyMessage: assignmentResultSectionCopy.reteachPriorities.emptyMessage,
+      isVisible: sectionState.showReteachPriorities,
+      title: assignmentResultSectionCopy.reteachPriorities.title,
+    },
+    studentAttempts: {
+      description: assignmentResultSectionCopy.studentAttempts.description,
+      emptyState: resultView.emptyStates.attemptRows,
+      isVisible: true,
+      title: assignmentResultSectionCopy.studentAttempts.title,
+    },
+    studentSummary: {
+      description: assignmentResultSectionCopy.studentSummary.description,
+      emptyState: resultView.emptyStates.studentSummary,
+      isVisible: sectionState.showStudentSummary,
+      title: assignmentResultSectionCopy.studentSummary.title,
+    },
   };
 }
 
@@ -1492,6 +1551,17 @@ export function buildAssignmentResultsPageViewModel<
     copyActionData,
     exportActionData: data ?? null,
   });
+  const sectionState = buildAssignmentResultSectionState({
+    attemptCount: completedAttemptCount,
+    attemptReviewCount: completedAttemptReviewCount,
+    classroomBriefReady: Boolean(classroomBrief),
+    itemCount: data?.analysis.perItem.length ?? 0,
+    studentCount: data?.analysis.students.length ?? 0,
+  });
+  const sectionViews = buildAssignmentResultSectionViews({
+    resultView,
+    sectionState,
+  });
   const copyArtifactPreviews = copyArtifacts
     ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts).flatMap(
         (preview) => {
@@ -1553,13 +1623,8 @@ export function buildAssignmentResultsPageViewModel<
         })
       : [],
     resultView,
-    sectionState: buildAssignmentResultSectionState({
-      attemptCount: completedAttemptCount,
-      attemptReviewCount: completedAttemptReviewCount,
-      classroomBriefReady: Boolean(classroomBrief),
-      itemCount: data?.analysis.perItem.length ?? 0,
-      studentCount: data?.analysis.students.length ?? 0,
-    }),
+    sectionState,
+    sectionViews,
     studentSummaryRowViews,
     title,
     viewState,
