@@ -19,6 +19,7 @@ import { getActivityTemplates } from '@/activities/catalog';
 import {
   activityEditPageCopy,
   buildActivityEditAccessView,
+  type ActivityEditAccessView,
 } from '@/activities/lifecycle';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
@@ -305,7 +306,13 @@ type ActivityEditorPageBreadcrumb = {
   label: string;
 };
 
-type ActivityEditPageViewModel = {
+export type ActivityEditPageEditorView = {
+  activityId: string;
+  initialValues: CreateActivityInput;
+  mode: 'edit';
+};
+
+export type ActivityEditPageViewModel = {
   archivedActivitiesAction: {
     href: typeof Routes.DashboardActivities;
     search: {
@@ -318,17 +325,21 @@ type ActivityEditPageViewModel = {
   };
   breadcrumbs: ActivityEditorPageBreadcrumb[];
   description: string;
-  editAccessView: ReturnType<typeof buildActivityEditAccessView> | null;
-  editor?: {
-    activityId: string;
-    initialValues: CreateActivityInput;
-    mode: 'edit';
-  };
+  editAccessView: ActivityEditAccessView | null;
+  editor?: ActivityEditPageEditorView;
   loadErrorMessage: string;
   title: string;
 };
 
-type ActivityEditRouteState =
+type ActivityEditBlockedPageViewModel = ActivityEditPageViewModel & {
+  editAccessView: ActivityEditAccessView;
+};
+
+type ActivityEditReadyPageViewModel = ActivityEditPageViewModel & {
+  editor: ActivityEditPageEditorView;
+};
+
+export type ActivityEditRouteState =
   | {
       pageView: ActivityEditPageViewModel;
       status: 'loading';
@@ -338,17 +349,11 @@ type ActivityEditRouteState =
       status: 'error';
     }
   | {
-      pageView: ActivityEditPageViewModel & {
-        editAccessView: NonNullable<
-          ActivityEditPageViewModel['editAccessView']
-        >;
-      };
+      pageView: ActivityEditBlockedPageViewModel;
       status: 'blocked';
     }
   | {
-      pageView: ActivityEditPageViewModel & {
-        editor: NonNullable<ActivityEditPageViewModel['editor']>;
-      };
+      pageView: ActivityEditReadyPageViewModel;
       status: 'ready';
     };
 

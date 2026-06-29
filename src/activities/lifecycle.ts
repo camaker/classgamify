@@ -149,6 +149,13 @@ const activityEditAccessCopy = {
   },
 } as const;
 
+export type ActivityEditAccessView = {
+  actionLabel: string;
+  canEdit: boolean;
+  description: string;
+  title: string;
+};
+
 export function isActivityArchived(visibility: ActivityVisibility) {
   return visibility === 'archived';
 }
@@ -314,7 +321,9 @@ export function buildActivityVisibilityActionExecutionPlan({
   };
 }
 
-export function buildActivityEditAccessView(visibility: ActivityVisibility) {
+export function buildActivityEditAccessView(
+  visibility: ActivityVisibility
+): ActivityEditAccessView {
   if (!canEditActivity(visibility)) {
     return {
       ...activityEditAccessCopy.archived,

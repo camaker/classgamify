@@ -2724,7 +2724,26 @@ const activityTemplateScaffoldPanelSource = readFileSync(
   'src/components/activities/activity-template-scaffold-panel.tsx',
   'utf8'
 );
+const activityLifecycleSource = readFileSync(
+  'src/activities/lifecycle.ts',
+  'utf8'
+);
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
+assert.match(
+  activityLifecycleSource,
+  /export type ActivityEditAccessView = \{[\s\S]*canEdit: boolean;[\s\S]*export function buildActivityEditAccessView\([\s\S]*\): ActivityEditAccessView/,
+  'Activity lifecycle domain should expose an explicit activity edit access view contract.'
+);
+assert.match(
+  activityEditorSource,
+  /export type ActivityEditPageEditorView = \{[\s\S]*activityId: string;[\s\S]*initialValues: CreateActivityInput;[\s\S]*mode: 'edit';[\s\S]*export type ActivityEditPageViewModel = \{[\s\S]*editAccessView: ActivityEditAccessView \| null;[\s\S]*editor\?: ActivityEditPageEditorView;[\s\S]*export type ActivityEditRouteState =/,
+  'Activity editor domain should expose explicit edit page, editor, and route-state contracts.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /ReturnType<typeof buildActivityEditAccessView>|ActivityEditPageViewModel\['editAccessView'\]|NonNullable<ActivityEditPageViewModel\['editor'\]>/,
+  'Activity editor route state should compose explicit edit access and editor view contracts instead of deriving them from builder return types.'
+);
 assert.match(
   activityEditorSource,
   /ACTIVITY_EDITOR_READINESS_PANEL_LIMITS[\s\S]*lockedOptions: 4/,
