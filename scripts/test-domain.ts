@@ -17330,6 +17330,11 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /buildAssignmentListRouteSearch/,
+  'Activity library card component should route newly published assignments through the assignment-domain route search helper.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /buildActivityVisibilityActionExecutionPlan/,
   'Activity library card component should build archive and restore mutation input through the activity-domain execution plan.'
 );
@@ -17367,6 +17372,11 @@ assert.match(
   activityLibraryCardComponentSource,
   /duplicateActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{[\s\S]*created: result\.id,[\s\S]*createdFrom: 'duplicate'[\s\S]*\}\)/,
   'Activity library card duplicate action should return to the library created panel with the new draft id and source.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /onPublished=\{\(result\) =>[\s\S]*to: Routes\.DashboardAssignments[\s\S]*search: buildAssignmentListRouteSearch\(\{[\s\S]*published: result\.assignment\.shareSlug[\s\S]*\}\)/,
+  'Activity library card publish action should return to the assignment published panel through the assignment-domain route search helper.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -17490,6 +17500,11 @@ assert.match(
 );
 assert.match(
   createdActivityPanelComponentSource,
+  /buildAssignmentListRouteSearch/,
+  'Created activity panel should route newly published assignments through the assignment-domain route search helper.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
   /CreatedActivityPanelActions[\s\S]*activity=\{activity\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}/,
   'Created activity panel should delegate saved-activity actions to a focused action component.'
 );
@@ -17502,6 +17517,16 @@ assert.match(
   createdActivityPanelComponentSource,
   /function CreatedActivityPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish[\s\S]*function CreatedActivityEditActionLink[\s\S]*activityLibraryCardCopy\.actionLabels\.edit[\s\S]*function CreatedActivityNewActionLink[\s\S]*activityLibraryPageCopy\.createActivityLabel[\s\S]*function CreatedActivityDismissActionButton[\s\S]*activityLibraryActionCopy\.dismiss/,
   'Created activity panel action subcomponents should render localized action labels from activity-domain copy.'
+);
+assert.match(
+  createdActivityPanelComponentSource,
+  /onPublished=\{\(result\) =>[\s\S]*to: Routes\.DashboardAssignments[\s\S]*search: buildAssignmentListRouteSearch\(\{[\s\S]*published: result\.assignment\.shareSlug[\s\S]*\}\)/,
+  'Created activity panel publish action should return to the assignment published panel through the assignment-domain route search helper.'
+);
+assert.doesNotMatch(
+  `${activityLibraryCardComponentSource}\n${createdActivityPanelComponentSource}`,
+  /search: \{ published: result\.assignment\.shareSlug \}/,
+  'Activity publish entry points should not hand-build published assignment route search state.'
 );
 assert.match(
   activityLibraryViewSource,

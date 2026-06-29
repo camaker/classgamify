@@ -5,6 +5,7 @@ import {
   activityLibraryPageCopy,
   buildCreatedActivityPanelContext,
 } from '@/activities/library-view';
+import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Routes } from '@/lib/routes';
@@ -77,7 +78,9 @@ export function CreatedActivityPanel({
           onPublished={(result) =>
             navigate({
               to: Routes.DashboardAssignments,
-              search: { published: result.assignment.shareSlug },
+              search: buildAssignmentListRouteSearch({
+                published: result.assignment.shareSlug,
+              }),
             })
           }
         />

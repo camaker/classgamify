@@ -1,4 +1,5 @@
 import type { ActivityLibraryStatus } from '@/activities/library-filters';
+import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
   activityLibraryCardCopy,
@@ -218,7 +219,9 @@ export function ActivityLibraryCard({
         onPublished={(result) =>
           navigate({
             to: Routes.DashboardAssignments,
-            search: { published: result.assignment.shareSlug },
+            search: buildAssignmentListRouteSearch({
+              published: result.assignment.shareSlug,
+            }),
           })
         }
       />
