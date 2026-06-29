@@ -52,7 +52,6 @@ export type TemplatesPageViewModel = {
   hero: {
     badgeLabel: string;
     createAction: EntryAction;
-    createFromTemplateLabel: string;
     description: string;
     openStudentPreviewLabel: string;
     title: string;
@@ -127,7 +126,6 @@ export function buildTemplatesPageViewModel({
         ...defaultCreateAction,
         label: m.templates_page_create_from_template(),
       },
-      createFromTemplateLabel: m.templates_page_create_from_template(),
       description: m.templates_page_description(),
       openStudentPreviewLabel: m.templates_page_open_student_preview(),
       title: m.templates_page_title(),

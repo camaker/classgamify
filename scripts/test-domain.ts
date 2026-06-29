@@ -19492,7 +19492,6 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
       label: 'Create from template',
       search: { template: 'quiz' },
     },
-    createFromTemplateLabel: 'Create from template',
     description:
       'ClassGamify templates render shared questions, pairs, groups, and vocabulary as quick checks, matching games, worksheet practice, listening prompts, or whole-class reveal rounds.',
     openStudentPreviewLabel: 'Open student preview',
