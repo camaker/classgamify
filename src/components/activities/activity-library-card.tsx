@@ -85,7 +85,10 @@ export function ActivityLibraryCard({
       toast.success(executionPlan.successMessage);
       navigate({
         to: Routes.DashboardActivities,
-        search: buildActivityLibraryRouteSearch({ created: result.id }),
+        search: buildActivityLibraryRouteSearch({
+          created: result.id,
+          createdFrom: 'remix',
+        }),
       });
     } catch {
       toast.error(executionPlan.failureMessage);
@@ -107,7 +110,10 @@ export function ActivityLibraryCard({
       toast.success(executionPlan.successMessage);
       navigate({
         to: Routes.DashboardActivities,
-        search: buildActivityLibraryRouteSearch({ created: result.id }),
+        search: buildActivityLibraryRouteSearch({
+          created: result.id,
+          createdFrom: 'duplicate',
+        }),
       });
     } catch {
       toast.error(executionPlan.failureMessage);

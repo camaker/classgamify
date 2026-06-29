@@ -38,10 +38,11 @@ export const Route = createFileRoute('/dashboard/activities')({
 
 function DashboardActivitiesPage() {
   const navigate = useNavigate({ from: '/dashboard/activities' });
-  const { created, page, q, source, status, template } = Route.useSearch();
+  const { created, createdFrom, page, q, source, status, template } =
+    Route.useSearch();
   const search = useMemo(
-    () => ({ created, page, q, source, status, template }),
-    [created, page, q, source, status, template]
+    () => ({ created, createdFrom, page, q, source, status, template }),
+    [created, createdFrom, page, q, source, status, template]
   );
   const initialRouteState = useMemo(
     () =>
@@ -106,6 +107,7 @@ function DashboardActivitiesPage() {
       replace: true,
       search: buildActivityLibraryFilterRouteSearch({
         created,
+        createdFrom,
         current: {
           q: searchQuery,
           source: sourceFilter,
@@ -128,6 +130,7 @@ function DashboardActivitiesPage() {
       search: buildActivityLibraryPageRouteSearch({
         current: {
           created,
+          createdFrom,
           q: searchQuery,
           source: sourceFilter,
           status: libraryStatus,
@@ -141,7 +144,7 @@ function DashboardActivitiesPage() {
   function clearLibraryFilters() {
     void navigate({
       replace: true,
-      search: buildActivityLibraryRouteSearch({ created }),
+      search: buildActivityLibraryRouteSearch({ created, createdFrom }),
     });
   }
 

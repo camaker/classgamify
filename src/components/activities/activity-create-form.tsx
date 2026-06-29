@@ -20,6 +20,7 @@ import {
   ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
   type ActivityAiDraftFocus,
 } from '@/activities/ai-draft-focus';
+import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import { ActivityAiDraftPanel } from '@/components/activities/activity-ai-draft-panel';
 import {
   ActivityEditorDetailsFields,
@@ -209,7 +210,10 @@ export function ActivityCreateForm({
       toast.success(executionPlan.successMessage);
       navigate({
         to: Routes.DashboardActivities,
-        search: { created: activity.id },
+        search: buildActivityLibraryRouteSearch({
+          created: activity.id,
+          createdFrom: 'create',
+        }),
       });
     } catch {
       toast.error(executionPlan.failureMessage);

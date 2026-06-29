@@ -5,6 +5,7 @@ import {
 } from '@/activities/catalog';
 import {
   ACTIVITY_LIBRARY_PAGE_SIZE,
+  type ActivityLibraryCreatedSource,
   type ActivityLibraryStatus,
   type ActivitySourceMaterialFilter,
   type ActivityTemplateFilter,
@@ -163,6 +164,7 @@ type ActivityLibraryPageBreadcrumb = {
 
 type ActivityLibraryPageSearchState = {
   created?: string;
+  createdFrom?: ActivityLibraryCreatedSource;
   page?: number;
   q?: string;
   source?: ActivitySourceMaterialFilter;
@@ -498,6 +500,7 @@ export function buildActivityLibraryPageViewModel<
   const createdPanelContext = search.created
     ? buildCreatedActivityPanelContext({
         activity: createdPanelActivity,
+        createdFrom: search.createdFrom,
         isLoading,
       })
     : undefined;
@@ -743,9 +746,11 @@ export function resolveCreatedActivityPanelActivity<
 
 export function buildCreatedActivityPanelContext({
   activity,
+  createdFrom = 'create',
   isLoading,
 }: {
   activity?: CreatedActivityListItem;
+  createdFrom?: ActivityLibraryCreatedSource;
   isLoading: boolean;
 }): CreatedActivityPanelContext {
   if (activity) {
@@ -754,7 +759,7 @@ export function buildCreatedActivityPanelContext({
 
     return {
       activity,
-      body: m.activity_created_panel_found_body(),
+      body: getCreatedActivityPanelFoundBody(createdFrom),
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: canEdit,
@@ -788,6 +793,19 @@ export function buildCreatedActivityPanelContext({
     status: 'missing',
     title: m.activity_created_panel_missing_title(),
   };
+}
+
+function getCreatedActivityPanelFoundBody(
+  createdFrom: ActivityLibraryCreatedSource
+) {
+  switch (createdFrom) {
+    case 'duplicate':
+      return m.activity_created_panel_duplicate_body();
+    case 'remix':
+      return m.activity_created_panel_remix_body();
+    case 'create':
+      return m.activity_created_panel_found_body();
+  }
 }
 
 export function buildActivityLibraryCardStats({

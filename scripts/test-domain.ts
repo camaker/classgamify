@@ -93,6 +93,7 @@ import {
 import {
   ACTIVITY_LIBRARY_INPUT_LIMITS,
   ACTIVITY_LIBRARY_PAGE_SIZE,
+  ACTIVITY_LIBRARY_CREATED_SOURCES,
   ACTIVITY_LIBRARY_STATUSES,
   ACTIVITY_SOURCE_MATERIAL_FILTERS,
   buildActivityLibraryDismissCreatedRouteSearch,
@@ -103,6 +104,7 @@ import {
   getActivityLibraryTotalPages,
   matchesActivitySourceMaterialFilter,
   normalizeActivityLibrarySearch,
+  parseActivityLibraryCreatedSource,
   parseActivityLibraryStatus,
   parseActivitySourceMaterialFilter,
   parseActivityTemplateFilter,
@@ -4412,6 +4414,11 @@ assert.match(
   activityCreateFormSource,
   /toast\.error\(executionPlan\.failureMessage\)/,
   'Activity draft generation and save failures should use localized execution-plan failure messages.'
+);
+assert.match(
+  activityCreateFormSource,
+  /buildActivityLibraryRouteSearch\(\{[\s\S]*created: activity\.id,[\s\S]*createdFrom: 'create'[\s\S]*\}\)/,
+  'Activity create form should route saved activities through the activity-domain created-panel search helper.'
 );
 const contactFormCardSource = readFileSync(
   'src/components/contact/contact-form-card.tsx',
@@ -16153,6 +16160,22 @@ assert.deepEqual(
     title: 'Archived words',
   }
 );
+assert.equal(
+  buildCreatedActivityPanelContext({
+    activity: createdActivities[0],
+    createdFrom: 'duplicate',
+    isLoading: false,
+  }).body,
+  'This draft is an independent copy. Edit it safely, then publish a new assignment link when you are ready; the original activity and existing snapshots stay unchanged.'
+);
+assert.equal(
+  buildCreatedActivityPanelContext({
+    activity: createdActivities[0],
+    createdFrom: 'remix',
+    isLoading: false,
+  }).body,
+  'This draft keeps the reusable content and switches the primary template. Review the structure before publishing so the original activity and existing snapshots stay unchanged.'
+);
 assert.deepEqual(
   buildCreatedActivityPanelContext({
     activity: undefined,
@@ -16203,6 +16226,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: undefined,
     page: 4,
     q: 'Group 1',
     source: 'worksheet',
@@ -16221,6 +16245,7 @@ assert.deepEqual(
   }),
   {
     created: undefined,
+    createdFrom: undefined,
     page: undefined,
     q: undefined,
     source: undefined,
@@ -16231,6 +16256,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryRouteSearch({
     created: 'activity-1',
+    createdFrom: 'duplicate',
     page: 1,
     q: '  word   match  ',
     source: 'all',
@@ -16239,6 +16265,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'duplicate',
     page: undefined,
     q: 'word match',
     source: undefined,
@@ -16249,6 +16276,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryRouteSearch({
     created: 'activity-1',
+    createdFrom: 'remix',
     page: 3,
     q: ' sort ',
     source: 'audio',
@@ -16257,6 +16285,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'remix',
     page: 3,
     q: 'sort',
     source: 'audio',
@@ -16267,6 +16296,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryRouteSearch({
     created: 'activity-1',
+    createdFrom: 'source-uploaded',
     page: 2,
     q: ' valid ',
     source: 'video',
@@ -16275,8 +16305,24 @@ assert.deepEqual(
   } as never),
   {
     created: 'activity-1',
+    createdFrom: undefined,
     page: 2,
     q: 'valid',
+    source: undefined,
+    status: undefined,
+    template: undefined,
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryRouteSearch({
+    created: undefined,
+    createdFrom: 'remix',
+  }),
+  {
+    created: undefined,
+    createdFrom: undefined,
+    page: undefined,
+    q: undefined,
     source: undefined,
     status: undefined,
     template: undefined,
@@ -16286,6 +16332,7 @@ assert.deepEqual(
   buildActivityLibraryPageRouteSearch({
     current: {
       created: 'activity-1',
+      createdFrom: 'duplicate',
       q: '  word   match  ',
       source: 'all',
       status: 'active',
@@ -16295,6 +16342,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'duplicate',
     page: undefined,
     q: 'word match',
     source: undefined,
@@ -16306,6 +16354,7 @@ assert.deepEqual(
   buildActivityLibraryPageRouteSearch({
     current: {
       created: 'activity-1',
+      createdFrom: 'remix',
       q: ' sort ',
       source: 'spreadsheet',
       status: 'archived',
@@ -16315,6 +16364,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'remix',
     page: 5,
     q: 'sort',
     source: 'spreadsheet',
@@ -16325,6 +16375,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryFilterRouteSearch({
     created: 'activity-1',
+    createdFrom: 'duplicate',
     current: {
       q: 'old search',
       source: 'audio',
@@ -16338,6 +16389,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'duplicate',
     page: undefined,
     q: 'New search',
     source: 'worksheet',
@@ -16348,6 +16400,7 @@ assert.deepEqual(
 assert.deepEqual(
   buildActivityLibraryFilterRouteSearch({
     created: 'activity-1',
+    createdFrom: 'remix',
     current: {
       q: 'old search',
       source: 'audio',
@@ -16363,6 +16416,7 @@ assert.deepEqual(
   }),
   {
     created: 'activity-1',
+    createdFrom: 'remix',
     page: undefined,
     q: undefined,
     source: undefined,
@@ -16382,6 +16436,7 @@ assert.deepEqual(
   }),
   {
     created: undefined,
+    createdFrom: undefined,
     page: undefined,
     q: 'word match',
     source: undefined,
@@ -16401,6 +16456,7 @@ assert.deepEqual(
   }),
   {
     created: undefined,
+    createdFrom: undefined,
     page: 3,
     q: 'group',
     source: 'spreadsheet',
@@ -16408,6 +16464,10 @@ assert.deepEqual(
     template: 'group-sort',
   }
 );
+assert.equal(parseActivityLibraryCreatedSource('duplicate'), 'duplicate');
+assert.equal(parseActivityLibraryCreatedSource('remix'), 'remix');
+assert.equal(parseActivityLibraryCreatedSource('create'), undefined);
+assert.equal(parseActivityLibraryCreatedSource('edit'), undefined);
 assert.equal(parseActivityLibraryStatus('archived'), 'archived');
 assert.equal(parseActivityLibraryStatus('deleted'), undefined);
 assert.equal(parseActivitySourceMaterialFilter('extractable'), 'extractable');
@@ -16439,6 +16499,11 @@ assert.equal(
   ACTIVITY_STABLE_ID_LENGTH.max
 );
 assert.deepEqual(ACTIVITY_LIBRARY_STATUSES, ['active', 'archived']);
+assert.deepEqual(ACTIVITY_LIBRARY_CREATED_SOURCES, [
+  'create',
+  'duplicate',
+  'remix',
+]);
 assert.deepEqual(ACTIVITY_SOURCE_MATERIAL_FILTERS, [
   'all',
   'audio',
@@ -17125,8 +17190,8 @@ const createdActivityPanelComponentSource = readFileSync(
 );
 assert.match(
   dashboardActivitiesRouteSource,
-  /const \{ created, page, q, source, status, template \} = Route\.useSearch\(\)/,
-  'Activity library route should read the source-material filter from URL search.'
+  /const \{ created, createdFrom, page, q, source, status, template \} =\s*Route\.useSearch\(\)/,
+  'Activity library route should read created draft source and source-material filters from URL search.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -17187,6 +17252,16 @@ assert.match(
   dashboardActivitiesRouteSource,
   /buildActivityLibraryDismissCreatedRouteSearch/,
   'Activity dashboard route should dismiss created-panel state through the activity-domain route helper.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibraryFilterRouteSearch\(\{[\s\S]*created,[\s\S]*createdFrom,[\s\S]*current:/,
+  'Activity dashboard route should preserve created draft source while filters change.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
+  /buildActivityLibraryPageRouteSearch\(\{[\s\S]*current: \{[\s\S]*created,[\s\S]*createdFrom,/,
+  'Activity dashboard route should preserve created draft source while paginating.'
 );
 assert.match(
   dashboardActivitiesRouteSource,
@@ -17275,13 +17350,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /remixActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{ created: result\.id \}\)/,
-  'Activity library card remix action should return to the library created panel with the new draft id.'
+  /remixActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{[\s\S]*created: result\.id,[\s\S]*createdFrom: 'remix'[\s\S]*\}\)/,
+  'Activity library card remix action should return to the library created panel with the new draft id and source.'
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /duplicateActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{ created: result\.id \}\)/,
-  'Activity library card duplicate action should return to the library created panel with the new draft id.'
+  /duplicateActivity[\s\S]*to: Routes\.DashboardActivities[\s\S]*search: buildActivityLibraryRouteSearch\(\{[\s\S]*created: result\.id,[\s\S]*createdFrom: 'duplicate'[\s\S]*\}\)/,
+  'Activity library card duplicate action should return to the library created panel with the new draft id and source.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -25101,6 +25176,7 @@ const filteredActivityLibraryPageData = {
 } satisfies Parameters<typeof buildActivityLibraryPageViewModel>[0]['data'];
 const filteredActivityLibrarySearch = {
   created: 'persisted-activity-1',
+  createdFrom: 'remix',
   page: 3,
   q: '  Food   words ',
   source: 'worksheet',
@@ -25260,7 +25336,7 @@ assert.deepEqual(
         title: 'Persisted quiz',
         visibility: 'draft',
       },
-      body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
+      body: 'This draft keeps the reusable content and switches the primary template. Review the structure before publishing so the original activity and existing snapshots stay unchanged.',
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: true,

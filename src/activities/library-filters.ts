@@ -6,6 +6,7 @@ import {
 import { summarizeActivitySourceMaterials } from '@/activities/material-summary';
 
 export type ActivityLibraryStatus = 'active' | 'archived';
+export type ActivityLibraryCreatedSource = 'create' | 'duplicate' | 'remix';
 export type ActivitySourceMaterialFilter =
   | 'all'
   | 'audio'
@@ -26,6 +27,11 @@ export const ACTIVITY_LIBRARY_STATUSES = [
   'active',
   'archived',
 ] as const satisfies readonly ActivityLibraryStatus[];
+export const ACTIVITY_LIBRARY_CREATED_SOURCES = [
+  'create',
+  'duplicate',
+  'remix',
+] as const satisfies readonly ActivityLibraryCreatedSource[];
 export const ACTIVITY_SOURCE_MATERIAL_FILTERS = [
   'all',
   'audio',
@@ -42,6 +48,7 @@ export const ACTIVITY_FILTERABLE_SOURCE_MATERIALS = [
 
 type ActivityLibrarySearchState = {
   created?: string;
+  createdFrom?: ActivityLibraryCreatedSource;
   page?: number;
   q?: string;
   source?: ActivitySourceMaterialFilter;
@@ -51,6 +58,7 @@ type ActivityLibrarySearchState = {
 
 type ActivityLibraryRouteSearch = {
   created?: string;
+  createdFrom?: Exclude<ActivityLibraryCreatedSource, 'create'>;
   page?: number;
   q?: string;
   source?: Exclude<ActivitySourceMaterialFilter, 'all'>;
@@ -70,6 +78,7 @@ function normalizeActivityLibraryCreatedSearch(value?: string | null) {
 
 export function buildActivityLibraryRouteSearch({
   created,
+  createdFrom = 'create',
   page,
   q,
   source = 'all',
@@ -82,9 +91,16 @@ export function buildActivityLibraryRouteSearch({
   const normalizedSource = resolveActivitySourceMaterialFilter(source);
   const normalizedStatus = resolveActivityLibraryStatus(status);
   const normalizedTemplate = resolveActivityTemplateFilter(template);
+  const normalizedCreatedSource =
+    resolveActivityLibraryCreatedSource(createdFrom);
+  const normalizedCreated = normalizeActivityLibraryCreatedSearch(created);
 
   return {
-    created: normalizeActivityLibraryCreatedSearch(created),
+    created: normalizedCreated,
+    createdFrom:
+      !normalizedCreated || normalizedCreatedSource === 'create'
+        ? undefined
+        : normalizedCreatedSource,
     page: normalizedPage,
     q: normalizedSearch,
     source: normalizedSource === 'all' ? undefined : normalizedSource,
@@ -108,15 +124,20 @@ export function buildActivityLibraryPageRouteSearch({
 
 export function buildActivityLibraryFilterRouteSearch({
   created,
+  createdFrom,
   current,
   next,
 }: {
   created?: string;
-  current: Omit<ActivityLibrarySearchState, 'created' | 'page'>;
-  next: Partial<Omit<ActivityLibrarySearchState, 'created' | 'page'>>;
+  createdFrom?: ActivityLibraryCreatedSource;
+  current: Omit<ActivityLibrarySearchState, 'created' | 'createdFrom' | 'page'>;
+  next: Partial<
+    Omit<ActivityLibrarySearchState, 'created' | 'createdFrom' | 'page'>
+  >;
 }): ActivityLibraryRouteSearch {
   return buildActivityLibraryRouteSearch({
     created,
+    createdFrom,
     q: next.q ?? current.q,
     source: next.source ?? current.source,
     status: next.status ?? current.status,
@@ -127,7 +148,7 @@ export function buildActivityLibraryFilterRouteSearch({
 export function buildActivityLibraryDismissCreatedRouteSearch({
   current,
 }: {
-  current: Omit<ActivityLibrarySearchState, 'created'>;
+  current: Omit<ActivityLibrarySearchState, 'created' | 'createdFrom'>;
 }): ActivityLibraryRouteSearch {
   return buildActivityLibraryRouteSearch(current);
 }
@@ -136,6 +157,12 @@ export function parseActivityLibraryStatus(
   value: unknown
 ): ActivityLibraryStatus | undefined {
   return isActivityLibraryStatus(value) ? value : undefined;
+}
+
+export function parseActivityLibraryCreatedSource(
+  value: unknown
+): Exclude<ActivityLibraryCreatedSource, 'create'> | undefined {
+  return isActivityLibraryDerivativeCreatedSource(value) ? value : undefined;
 }
 
 export function parseActivitySourceMaterialFilter(
@@ -153,11 +180,16 @@ export function parseActivityTemplateFilter(
 export function buildActivityLibraryValidatedSearch(
   search: Record<string, unknown>
 ): ActivityLibraryRouteSearch {
+  const created =
+    typeof search.created === 'string'
+      ? normalizeActivityLibraryCreatedSearch(search.created)
+      : undefined;
+
   return {
-    created:
-      typeof search.created === 'string'
-        ? normalizeActivityLibraryCreatedSearch(search.created)
-        : undefined,
+    created,
+    createdFrom: created
+      ? parseActivityLibraryCreatedSource(search.createdFrom)
+      : undefined,
     page: parseActivityLibraryPageSearch(search.page),
     q:
       typeof search.q === 'string'
@@ -178,6 +210,23 @@ function isActivityLibraryStatus(
   );
 }
 
+function isActivityLibraryCreatedSource(
+  value: unknown
+): value is ActivityLibraryCreatedSource {
+  return (
+    typeof value === 'string' &&
+    ACTIVITY_LIBRARY_CREATED_SOURCES.includes(
+      value as ActivityLibraryCreatedSource
+    )
+  );
+}
+
+function isActivityLibraryDerivativeCreatedSource(
+  value: unknown
+): value is Exclude<ActivityLibraryCreatedSource, 'create'> {
+  return value === 'duplicate' || value === 'remix';
+}
+
 function isActivityFilterableSourceMaterial(
   value: unknown
 ): value is Exclude<ActivitySourceMaterialFilter, 'all'> {
@@ -191,6 +240,12 @@ function isActivityFilterableSourceMaterial(
 
 function resolveActivityLibraryStatus(value: unknown): ActivityLibraryStatus {
   return isActivityLibraryStatus(value) ? value : 'active';
+}
+
+function resolveActivityLibraryCreatedSource(
+  value: unknown
+): ActivityLibraryCreatedSource {
+  return isActivityLibraryCreatedSource(value) ? value : 'create';
 }
 
 function resolveActivitySourceMaterialFilter(
