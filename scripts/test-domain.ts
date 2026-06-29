@@ -1638,6 +1638,16 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
+  /type AssignmentLifecycleStatus[\s\S]*getAssignmentResultHeaderShareDisabledReason\(\s*lifecycleStatus: AssignmentLifecycleStatus/,
+  'Assignment result share-disabled copy should consume the explicit assignment lifecycle status contract.'
+);
+assert.doesNotMatch(
+  assignmentResultViewActionBoundarySource,
+  /AssignmentShareLinkAvailability\['lifecycleStatus'\]/,
+  'Assignment result share-disabled copy should not infer lifecycle status from share-link availability.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
   /buildAssignmentResultHeaderShareAction[\s\S]*copyLabel: assignmentShareLinkActionCopy\.copyStudentLabel[\s\S]*sharePathLabel: assignmentShareLinkActionCopy\.pathLabel/,
   'Assignment result header share action should prepare the shared student-link copy label and path label for the component.'
 );
@@ -19098,6 +19108,16 @@ assert.match(
   assignmentListViewSource,
   /buildAssignmentShareLinkAvailability\(\{[\s\S]*expiresAt,[\s\S]*shareSlug,[\s\S]*status,[\s\S]*\}\)/,
   'Assignment list card action state should resolve share-link state and path through the shared assignment share helper.'
+);
+assert.match(
+  assignmentListViewSource,
+  /type AssignmentLifecycleStatus[\s\S]*getAssignmentListShareDisabledReason\(\s*lifecycleStatus: AssignmentLifecycleStatus/,
+  'Assignment list share-disabled copy should consume the explicit assignment lifecycle status contract.'
+);
+assert.doesNotMatch(
+  assignmentListViewSource,
+  /AssignmentShareLinkAvailability\['lifecycleStatus'\]/,
+  'Assignment list share-disabled copy should not infer lifecycle status from share-link availability.'
 );
 assert.match(
   assignmentListViewSource,

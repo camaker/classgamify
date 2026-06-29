@@ -6,7 +6,10 @@ import type {
 } from '@/assignments/results';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
-import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
+import {
+  type AssignmentLifecycleStatus,
+  getAssignmentStatusLabel,
+} from '@/assignments/lifecycle';
 import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
@@ -67,7 +70,6 @@ import {
 import {
   assignmentShareLinkActionCopy,
   buildAssignmentShareLinkAvailability,
-  type AssignmentShareLinkAvailability,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
@@ -994,7 +996,7 @@ export function buildAssignmentResultHeaderShareAction({
 }
 
 function getAssignmentResultHeaderShareDisabledReason(
-  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
+  lifecycleStatus: AssignmentLifecycleStatus
 ) {
   if (lifecycleStatus === 'expired') {
     return assignmentResultPageCopy.studentLinkExpiredMessage;

@@ -36,6 +36,7 @@ import {
   type AssignmentListStatusMetric,
 } from '@/assignments/list-summary';
 import {
+  type AssignmentLifecycleStatus,
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
@@ -865,7 +866,7 @@ export function buildAssignmentListCardActionView({
 }
 
 function getAssignmentListShareDisabledReason(
-  lifecycleStatus: AssignmentShareLinkAvailability['lifecycleStatus']
+  lifecycleStatus: AssignmentLifecycleStatus
 ) {
   if (lifecycleStatus === 'closed') {
     return m.assignment_list_share_link_closed();
