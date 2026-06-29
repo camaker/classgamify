@@ -142,6 +142,12 @@ type AssignmentResultActionStats = {
 };
 
 export type AssignmentResultActionData = AssignmentResultsExportData;
+export type AssignmentResultCopyActionData = AssignmentResultActionData & {
+  analysis: AssignmentResultActionData['analysis'] & {
+    perItem: AssignmentResultActionData['analysis']['perItem'];
+    students: AssignmentResultActionData['analysis']['students'];
+  };
+};
 
 type AssignmentResultCopyArtifactData = {
   analysis: Pick<
@@ -317,6 +323,25 @@ export function buildAssignmentResultCopyArtifacts(
       assignmentTitle,
       students,
     }),
+  };
+}
+
+export function buildAssignmentResultCopyActionData({
+  data,
+  items,
+  students,
+}: {
+  data: AssignmentResultActionData;
+  items: AssignmentResultCopyArtifactData['analysis']['perItem'];
+  students: AssignmentResultCopyArtifactData['analysis']['students'];
+}): AssignmentResultCopyActionData {
+  return {
+    ...data,
+    analysis: {
+      ...data.analysis,
+      perItem: items,
+      students,
+    },
   };
 }
 

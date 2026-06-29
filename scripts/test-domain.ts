@@ -576,6 +576,7 @@ import {
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultCopyText,
@@ -1486,8 +1487,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsRouteSource,
-  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data: pageView\.actionData,[\s\S]*\}\)/,
-  'Result route should let the assignment-domain execution plan build copy and CSV download artifacts from prepared page action data.'
+  /buildAssignmentResultActionExecutionPlan\(\{\s*actionButton,[\s\S]*data:[\s\S]*actionButton\.kind === 'copy-text'[\s\S]*pageView\.copyActionData[\s\S]*pageView\.actionData/,
+  'Result route should execute copy actions from the current review view while preserving full action data for CSV downloads.'
 );
 assert.doesNotMatch(
   assignmentResultsRouteSource,
@@ -1508,6 +1509,11 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary/,
   'Assignment result actions should own unified teacher copy artifact construction.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultCopyActionData[\s\S]*perItem: items[\s\S]*students/,
+  'Assignment result actions should expose a dedicated copy-action data builder for current review-view artifacts.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1566,13 +1572,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /const copyArtifacts = data \? buildAssignmentResultCopyArtifacts\(data\) : null[\s\S]*const classroomBrief = copyArtifacts\?\.classroomBrief \?\? null/,
-  'Assignment result page view-model should derive classroom brief previews from unified result copy artifacts.'
+  /const copyActionData = data[\s\S]*buildAssignmentResultCopyActionData\(\{[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*students: resultView\.filteredStudents,[\s\S]*\}\)[\s\S]*const copyArtifacts = copyActionData[\s\S]*buildAssignmentResultCopyArtifacts\(copyActionData\)/,
+  'Assignment result page view-model should derive classroom brief previews from current sorted item and filtered student review data.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
   /const copyArtifactPreviews = copyArtifacts[\s\S]*buildAssignmentResultCopyArtifactPreviews\(copyArtifacts\)[\s\S]*copyArtifactPreviews,/,
-  'Assignment result page view-model should expose prepared copy artifact previews from the unified artifact bundle.'
+  'Assignment result page view-model should expose prepared copy artifact previews from the current review-view artifact bundle.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -29251,7 +29257,7 @@ assert.equal(
 );
 assert.equal(
   scoredResultsPageView.classroomBrief?.text,
-  buildAssignmentResultCopyArtifacts(scoredResultsPageView.actionData!)
+  buildAssignmentResultCopyArtifacts(scoredResultsPageView.copyActionData!)
     .classroomBrief.text
 );
 assert.deepEqual(
@@ -29261,6 +29267,13 @@ assert.deepEqual(
       button.disabled,
     ]),
     actionDataAssignmentId: scoredResultsPageView.actionData?.assignment.id,
+    actionDataItemIds: scoredResultsPageView.actionData?.analysis.perItem.map(
+      (item) => item.itemId
+    ),
+    actionDataStudentLabels:
+      scoredResultsPageView.actionData?.analysis.students.map(
+        (student) => student.studentLabel
+      ),
     attemptReviewCardViews: scoredResultsPageView.attemptReviewCardViews.map(
       (card) => [card.id, card.studentLabel, card.answerViews.length]
     ),
@@ -29279,6 +29292,14 @@ assert.deepEqual(
       scoredResultsPageView.completedAttemptReviewCount,
     contentState: scoredResultsPageView.contentState,
     classroomBriefReady: Boolean(scoredResultsPageView.classroomBrief),
+    copyActionDataItemIds:
+      scoredResultsPageView.copyActionData?.analysis.perItem.map(
+        (item) => item.itemId
+      ),
+    copyActionDataStudentLabels:
+      scoredResultsPageView.copyActionData?.analysis.students.map(
+        (student) => student.studentLabel
+      ),
     copyArtifactPreviews: scoredResultsPageView.copyArtifactPreviews.map(
       (preview) => [
         preview.action,
@@ -29357,6 +29378,8 @@ assert.deepEqual(
       ['export-csv', false],
     ],
     actionDataAssignmentId: 'assignment-results-page',
+    actionDataItemIds: ['q-1', 'pair-1'],
+    actionDataStudentLabels: ['Alice'],
     attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
@@ -29368,6 +29391,8 @@ assert.deepEqual(
       hasStudentSummaryRows: true,
     },
     classroomBriefReady: true,
+    copyActionDataItemIds: ['pair-1', 'q-1'],
+    copyActionDataStudentLabels: ['Alice'],
     copyArtifactPreviews: [
       [
         'copy-brief',
@@ -33743,6 +33768,46 @@ const resultCopyArtifacts = buildAssignmentResultCopyArtifacts({
     students: followUpPriorityStudents,
   },
 });
+const filteredResultCopyActionData = buildAssignmentResultCopyActionData({
+  data: {
+    ...csvExportData,
+    analysis: {
+      ...csvExportData.analysis,
+      students: followUpPriorityStudents,
+    },
+  },
+  items: resultAnalysis.perItem.filter((item) => item.itemId === 'pair-1'),
+  students: followUpPriorityStudents.filter(
+    (student) => student.studentKey === 'name:alpha-review'
+  ),
+});
+assert.deepEqual(
+  {
+    actionDataItemIds: csvExportData.analysis.perItem.map(
+      (item) => item.itemId
+    ),
+    actionDataStudentKeys: followUpPriorityStudents.map(
+      (student) => student.studentKey
+    ),
+    copyActionDataItemIds:
+      filteredResultCopyActionData.analysis.perItem.map((item) => item.itemId),
+    copyActionDataStudentKeys:
+      filteredResultCopyActionData.analysis.students.map(
+        (student) => student.studentKey
+      ),
+  },
+  {
+    actionDataItemIds: ['q-1', 'pair-1'],
+    actionDataStudentKeys: [
+      'name:no-review',
+      'name:more-review',
+      'name:lower-score',
+      'name:alpha-review',
+    ],
+    copyActionDataItemIds: ['pair-1'],
+    copyActionDataStudentKeys: ['name:alpha-review'],
+  }
+);
 assert.deepEqual(
   {
     brief: resultCopyArtifacts.classroomBrief.text,
@@ -33945,6 +34010,29 @@ assert.deepEqual(
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
     text: classroomBrief.text,
+    type: 'copy-text',
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultActionExecutionPlan({
+    actionButton: {
+      action: 'copy-brief',
+      description:
+        'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
+      disabled: false,
+      failureMessage: 'Classroom brief could not be copied.',
+      gate: { type: 'ready' },
+      kind: 'copy-text',
+      label: 'Copy brief',
+      successMessage: 'Classroom brief copied.',
+    },
+    data: filteredResultCopyActionData,
+  }),
+  {
+    failureMessage: 'Classroom brief could not be copied.',
+    successMessage: 'Classroom brief copied.',
+    text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
+      .classroomBrief.text,
     type: 'copy-text',
   }
 );

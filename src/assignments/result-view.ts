@@ -70,10 +70,12 @@ import {
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import {
   buildAssignmentResultActionButtons,
+  buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultActionState,
   type AssignmentResultActionButton,
+  type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
   type AssignmentResultCopyArtifacts,
   type AssignmentResultActionState,
@@ -130,6 +132,7 @@ export {
   buildAssignmentResultActionExecutionPlan,
   buildAssignmentResultActionPayload,
   buildAssignmentResultActionState,
+  buildAssignmentResultCopyActionData,
   buildAssignmentResultCopyArtifacts,
   buildAssignmentResultCopyArtifactPreviews,
   buildAssignmentResultClassroomBriefStats,
@@ -140,6 +143,7 @@ export {
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   type AssignmentResultActionButton,
+  type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
 } from '@/assignments/result-actions';
 
@@ -306,6 +310,7 @@ type AssignmentResultsPageViewModel<
   completedAttempts: TAttempt[];
   contentState: AssignmentResultContentState;
   controlViews: AssignmentResultControlViews;
+  copyActionData: AssignmentResultCopyActionData | null;
   copyArtifactPreviews: Array<
     AssignmentResultCopyArtifactPreview & {
       actionButton: AssignmentResultActionButton;
@@ -1411,7 +1416,16 @@ export function buildAssignmentResultsPageViewModel<
     attemptRowCount: attemptRowViews.length,
     studentSummaryRowCount: studentSummaryRowViews.length,
   });
-  const copyArtifacts = data ? buildAssignmentResultCopyArtifacts(data) : null;
+  const copyActionData = data
+    ? buildAssignmentResultCopyActionData({
+        data,
+        items: resultView.sortedPerformanceItems,
+        students: resultView.filteredStudents,
+      })
+    : null;
+  const copyArtifacts = copyActionData
+    ? buildAssignmentResultCopyArtifacts(copyActionData)
+    : null;
   const classroomBrief = copyArtifacts?.classroomBrief ?? null;
   const completedAttemptCount = getAssignmentResultCompletedAttemptCount(
     data?.stats.completions
@@ -1469,6 +1483,7 @@ export function buildAssignmentResultsPageViewModel<
     completedAttempts,
     contentState,
     controlViews,
+    copyActionData,
     copyArtifactPreviews,
     description: assignmentResultPageCopy.description,
     headerView,
