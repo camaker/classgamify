@@ -32989,6 +32989,8 @@ assert.equal(
 assert.equal(matchesResultSearch('Anonymous student 1', 'student 1'), true);
 assert.equal(matchesResultSearch('Ava Chen', '  ａｖａ '), true);
 assert.equal(matchesResultSearch('İstanbul Student', ' i̇stanbul '), true);
+assert.equal(matchesResultSearch('Ava Chen', '   '), true);
+assert.equal(matchesResultSearch(null, '   '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
 assert.equal(
   buildResultSearchSummary({

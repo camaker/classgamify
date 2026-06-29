@@ -571,7 +571,9 @@ export function matchesResultSearch(
   value: string | null | undefined,
   search: string
 ) {
-  const normalizedSearch = normalizeResultSearch(search) ?? search;
+  const normalizedSearch = normalizeResultSearch(search);
+  if (!normalizedSearch) return true;
+
   return normalizeResultSearch(value)?.includes(normalizedSearch) ?? false;
 }
 
