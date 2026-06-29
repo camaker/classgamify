@@ -63,6 +63,7 @@ import {
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
   type AssignmentResultReviewScope,
+  type AssignmentResultReviewScopeSummary,
   type AssignmentResultResolvedViewState,
   type AssignmentResultSearchState,
   type AttemptReviewFilter,
@@ -107,6 +108,7 @@ export {
   ITEM_PERFORMANCE_SORT_VALUES,
   STUDENT_SUMMARY_SORT_VALUES,
   buildAssignmentResultReviewScope,
+  buildAssignmentResultReviewScopeSummary,
   buildAssignmentResultControlRouteSearch,
   buildAssignmentResultControlSearchState,
   buildAssignmentResultRouteSearch,
@@ -116,6 +118,7 @@ export {
   filterAssignmentResultCompletedAttemptRows,
   filterAttemptReviews,
   matchesResultSearch,
+  normalizeAssignmentResultScopeCount,
   normalizeResultSearch,
   normalizeResultSearchQuery,
   parseAttemptReviewFilter,
@@ -128,6 +131,7 @@ export {
   type AssignmentAttemptReviewRow,
   type AssignmentAttemptRowInput,
   type AssignmentResultReviewScope,
+  type AssignmentResultReviewScopeSummary,
   type AssignmentResultControlSearchUpdate,
   type AssignmentResultResolvedViewState,
   type AssignmentResultSearchState,
@@ -390,6 +394,7 @@ export type AssignmentResultCopyScopeItemView = {
 export type AssignmentResultCopyScopeView = {
   description: string;
   itemViews: AssignmentResultCopyScopeItemView[];
+  summary?: AssignmentResultReviewScopeSummary;
   title: string;
 };
 
@@ -1441,9 +1446,8 @@ export function normalizeAssignmentResultProgressValue(value: number) {
 }
 
 type ResultSearchSummaryInput = {
-  matchedAttempts: number;
-  matchedStudents: number;
   search: string;
+  summary: AssignmentResultReviewScopeSummary;
 };
 
 type AttemptReviewSubmissionSummaryInput = {
@@ -1528,9 +1532,8 @@ export function buildAssignmentResultViewModel<
     filteredStudents: reviewScope.filteredStudents,
     reviewScope,
     resultSearchSummary: buildResultSearchSummary({
-      matchedAttempts: reviewScope.counts.matchedAttemptRows,
-      matchedStudents: reviewScope.counts.matchedStudents,
       search,
+      summary: reviewScope.summary,
     }),
     sortedPerformanceItems: reviewScope.sortedPerformanceItems,
   };
@@ -1619,17 +1622,16 @@ export function buildAssignmentResultEmptyState(
 }
 
 export function buildResultSearchSummary({
-  matchedAttempts,
-  matchedStudents,
   search,
+  summary,
 }: ResultSearchSummaryInput) {
   if (!normalizeResultSearch(search)) {
     return m.assignment_result_search_summary_all_students();
   }
 
   return joinAssignmentResultSearchSummaryParts([
-    formatResultStudentCount(matchedStudents),
-    formatResultAttemptCount(matchedAttempts),
+    formatResultStudentCount(summary.students.matched),
+    formatResultAttemptCount(summary.attemptRows.matched),
   ]);
 }
 
@@ -1681,7 +1683,10 @@ export function buildAssignmentResultsPageViewModel<
     resultSearchSummary: resultView.resultSearchSummary,
     viewState,
   });
-  const copyScopeView = buildAssignmentResultCopyScopeView(controlViews);
+  const copyScopeView = buildAssignmentResultCopyScopeView({
+    controlViews,
+    summary: resultView.reviewScope.summary,
+  });
   const attemptTableView = data
     ? buildAssignmentAttemptTableView({
         rows: resultView.filteredAttemptRows,
@@ -1930,9 +1935,13 @@ export function buildAssignmentResultControlViews({
   };
 }
 
-export function buildAssignmentResultCopyScopeView(
-  controlViews: AssignmentResultControlViews
-): AssignmentResultCopyScopeView {
+export function buildAssignmentResultCopyScopeView({
+  controlViews,
+  summary,
+}: {
+  controlViews: AssignmentResultControlViews;
+  summary?: AssignmentResultReviewScopeSummary;
+}): AssignmentResultCopyScopeView {
   return {
     description: assignmentResultCopyScopeCopy.description,
     itemViews: [
@@ -1957,6 +1966,7 @@ export function buildAssignmentResultCopyScopeView(
         value: controlViews.attemptReviewFilter.selectedFilterOption.label,
       },
     ],
+    ...(summary ? { summary } : {}),
     title: assignmentResultCopyScopeCopy.title,
   };
 }

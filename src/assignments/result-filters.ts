@@ -109,6 +109,25 @@ export type AssignmentResultReviewScopeCounts = {
   totalStudents: number;
 };
 
+export type AssignmentResultReviewScopeSummary = {
+  attemptReviews: {
+    matched: number;
+    total: number;
+  };
+  attemptRows: {
+    matched: number;
+    total: number;
+  };
+  itemPerformance: {
+    matched: number;
+    total: number;
+  };
+  students: {
+    matched: number;
+    total: number;
+  };
+};
+
 export type AssignmentResultReviewScope<
   TAttempt extends AssignmentAttemptRowInput,
 > = {
@@ -116,6 +135,7 @@ export type AssignmentResultReviewScope<
   filteredAttemptReviews: AssignmentAttemptReview[];
   filteredAttemptRows: Array<AssignmentAttemptReviewRow<TAttempt>>;
   filteredStudents: AssignmentStudentSummary[];
+  summary: AssignmentResultReviewScopeSummary;
   sortedPerformanceItems: AssignmentItemAnalysis[];
 };
 
@@ -156,19 +176,61 @@ export function buildAssignmentResultReviewScope<
     search,
   });
 
+  const counts = {
+    matchedAttemptReviews: filteredAttemptReviews.length,
+    matchedAttemptRows: filteredAttemptRows.length,
+    matchedStudents: filteredStudents.length,
+    totalAttemptReviews: reviews.length,
+    totalAttemptRows: attempts.length,
+    totalStudents: students.length,
+  } satisfies AssignmentResultReviewScopeCounts;
+  const sortedPerformanceItems = sortItemPerformance(
+    items,
+    itemPerformanceSort
+  );
+
   return {
-    counts: {
-      matchedAttemptReviews: filteredAttemptReviews.length,
-      matchedAttemptRows: filteredAttemptRows.length,
-      matchedStudents: filteredStudents.length,
-      totalAttemptReviews: reviews.length,
-      totalAttemptRows: attempts.length,
-      totalStudents: students.length,
-    },
+    counts,
     filteredAttemptReviews,
     filteredAttemptRows,
     filteredStudents,
-    sortedPerformanceItems: sortItemPerformance(items, itemPerformanceSort),
+    summary: buildAssignmentResultReviewScopeSummary({
+      counts,
+      sortedPerformanceItemCount: sortedPerformanceItems.length,
+      totalItemCount: items.length,
+    }),
+    sortedPerformanceItems,
+  };
+}
+
+export function buildAssignmentResultReviewScopeSummary({
+  counts,
+  sortedPerformanceItemCount,
+  totalItemCount,
+}: {
+  counts: AssignmentResultReviewScopeCounts;
+  sortedPerformanceItemCount: number;
+  totalItemCount: number;
+}): AssignmentResultReviewScopeSummary {
+  return {
+    attemptReviews: {
+      matched: normalizeAssignmentResultScopeCount(
+        counts.matchedAttemptReviews
+      ),
+      total: normalizeAssignmentResultScopeCount(counts.totalAttemptReviews),
+    },
+    attemptRows: {
+      matched: normalizeAssignmentResultScopeCount(counts.matchedAttemptRows),
+      total: normalizeAssignmentResultScopeCount(counts.totalAttemptRows),
+    },
+    itemPerformance: {
+      matched: normalizeAssignmentResultScopeCount(sortedPerformanceItemCount),
+      total: normalizeAssignmentResultScopeCount(totalItemCount),
+    },
+    students: {
+      matched: normalizeAssignmentResultScopeCount(counts.matchedStudents),
+      total: normalizeAssignmentResultScopeCount(counts.totalStudents),
+    },
   };
 }
 
@@ -575,6 +637,10 @@ export function matchesResultSearch(
   if (!normalizedSearch) return true;
 
   return normalizeResultSearch(value)?.includes(normalizedSearch) ?? false;
+}
+
+export function normalizeAssignmentResultScopeCount(value: number) {
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
 function isStudentSummarySort(value: unknown): value is StudentSummarySort {

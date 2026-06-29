@@ -605,6 +605,7 @@ import {
   buildAssignmentResultSectionViews,
   buildAssignmentResultControlViews,
   buildAssignmentResultCopyScopeView,
+  buildAssignmentResultReviewScopeSummary,
   buildAssignmentResultViewModel,
   buildAssignmentResultsPageViewModel,
   buildAssignmentResultsRouteState,
@@ -623,6 +624,7 @@ import {
   getAssignmentAnswerReviewStatus,
   getAssignmentResultCompletedAttemptCount,
   itemPerformanceSortOptions,
+  normalizeAssignmentResultScopeCount,
   normalizeAssignmentResultProgressValue,
   getAssignmentResultActionExecutionData,
   getAssignmentResultCopyArtifactText,
@@ -1659,13 +1661,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /const controlViews = buildAssignmentResultControlViews\([\s\S]*const copyScopeView = buildAssignmentResultCopyScopeView\(controlViews\)[\s\S]*copyScopeView,/,
-  'Assignment result page view-model should derive copy-scope previews from the prepared result control views.'
+  /const controlViews = buildAssignmentResultControlViews\([\s\S]*const copyScopeView = buildAssignmentResultCopyScopeView\(\{[\s\S]*controlViews,[\s\S]*summary: resultView\.reviewScope\.summary,[\s\S]*\}\)[\s\S]*copyScopeView,/,
+  'Assignment result page view-model should derive copy-scope previews from the prepared result control views and shared review scope summary.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /export function buildAssignmentResultCopyScopeView[\s\S]*controlViews\.studentSearch\.summary[\s\S]*controlViews\.itemPerformanceSort\.selectedSortOption\.label[\s\S]*controlViews\.attemptReviewFilter\.selectedFilterOption\.label/,
-  'Assignment result copy scope should describe student, item, and review scope from prepared control views.'
+  /export function buildAssignmentResultCopyScopeView\(\{[\s\S]*controlViews,[\s\S]*summary,[\s\S]*\}\)[\s\S]*controlViews\.studentSearch\.summary[\s\S]*controlViews\.itemPerformanceSort\.selectedSortOption\.label[\s\S]*controlViews\.attemptReviewFilter\.selectedFilterOption\.label[\s\S]*summary \? \{ summary \} : \{\}/,
+  'Assignment result copy scope should describe student, item, and review scope from prepared control views while carrying the shared scope summary.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -2031,13 +2033,33 @@ assert.match(
 );
 assert.match(
   assignmentResultFiltersSource,
-  /export function buildAssignmentResultReviewScope[\s\S]*filterAndSortStudentSummaries[\s\S]*buildFilteredAttemptRows[\s\S]*filterAttemptReviews[\s\S]*sortItemPerformance/,
-  'Assignment result review scope should centralize filtered students, attempt rows, answer reviews, and item sorting.'
+  /export function buildAssignmentResultReviewScope[\s\S]*filterAndSortStudentSummaries[\s\S]*buildFilteredAttemptRows[\s\S]*filterAttemptReviews[\s\S]*const counts =[\s\S]*const sortedPerformanceItems = sortItemPerformance[\s\S]*summary: buildAssignmentResultReviewScopeSummary/,
+  'Assignment result review scope should centralize filtered students, attempt rows, answer reviews, item sorting, and structured scope summary.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export type AssignmentResultReviewScopeSummary[\s\S]*attemptReviews[\s\S]*attemptRows[\s\S]*itemPerformance[\s\S]*students/,
+  'Assignment result review scope should expose a structured scope summary.'
+);
+assert.match(
+  assignmentResultFiltersSource,
+  /export function normalizeAssignmentResultScopeCount/,
+  'Assignment result review scope summary counts should normalize abnormal numeric inputs.'
 );
 assert.match(
   assignmentResultViewSource,
-  /const reviewScope = buildAssignmentResultReviewScope\([\s\S]*reviewScope\.counts\.matchedAttemptReviews[\s\S]*reviewScope\.filteredAttemptRows[\s\S]*reviewScope\.sortedPerformanceItems/,
+  /const reviewScope = buildAssignmentResultReviewScope\([\s\S]*reviewScope\.filteredAttemptRows[\s\S]*reviewScope\.sortedPerformanceItems/,
   'Assignment result view model should consume the shared result-review scope instead of recomputing filtered result sections.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildResultSearchSummary\(\{[\s\S]*search,[\s\S]*summary: reviewScope\.summary/,
+  'Assignment result view model should build search summaries from the shared review scope summary.'
+);
+assert.doesNotMatch(
+  assignmentResultViewSource,
+  /buildResultSearchSummary\(\{[\s\S]*matchedAttempts|buildResultSearchSummary\(\{[\s\S]*matchedStudents/,
+  'Assignment result view model should not rebuild search-summary counts outside the shared review scope summary.'
 );
 assert.match(
   assignmentResultFiltersSource,
@@ -32274,6 +32296,7 @@ assert.deepEqual(
           itemView.description,
         ]
       ),
+      summary: scoredResultsPageView.copyScopeView.summary,
       title: scoredResultsPageView.copyScopeView.title,
     },
     controlViews: {
@@ -32521,6 +32544,12 @@ assert.deepEqual(
           'Focus the answer review on submissions with at least one missed or unanswered item.',
         ],
       ],
+      summary: {
+        attemptReviews: { matched: 1, total: 1 },
+        attemptRows: { matched: 1, total: 1 },
+        itemPerformance: { matched: 2, total: 2 },
+        students: { matched: 1, total: 1 },
+      },
       title: 'Copy scope',
     },
     controlViews: {
@@ -33348,29 +33377,77 @@ assert.equal(matchesResultSearch('İstanbul Student', ' i̇stanbul '), true);
 assert.equal(matchesResultSearch('Ava Chen', '   '), true);
 assert.equal(matchesResultSearch(null, '   '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
+const buildResultSearchSummaryTestScope = ({
+  matchedAttempts,
+  matchedStudents,
+}: {
+  matchedAttempts: number;
+  matchedStudents: number;
+}) =>
+  buildAssignmentResultReviewScopeSummary({
+    counts: {
+      matchedAttemptReviews: matchedAttempts,
+      matchedAttemptRows: matchedAttempts,
+      matchedStudents,
+      totalAttemptReviews: matchedAttempts,
+      totalAttemptRows: matchedAttempts,
+      totalStudents: matchedStudents,
+    },
+    sortedPerformanceItemCount: 0,
+    totalItemCount: 0,
+  });
 assert.equal(
   buildResultSearchSummary({
-    matchedAttempts: 3,
-    matchedStudents: 2,
     search: '',
+    summary: buildResultSearchSummaryTestScope({
+      matchedAttempts: 3,
+      matchedStudents: 2,
+    }),
   }),
   'All students'
 );
 assert.equal(
   buildResultSearchSummary({
-    matchedAttempts: 1,
-    matchedStudents: 1,
     search: 'alice',
+    summary: buildResultSearchSummaryTestScope({
+      matchedAttempts: 1,
+      matchedStudents: 1,
+    }),
   }),
   '1 student · 1 attempt'
 );
 assert.equal(
   buildResultSearchSummary({
-    matchedAttempts: 2,
-    matchedStudents: 1,
     search: ' alice ',
+    summary: buildResultSearchSummaryTestScope({
+      matchedAttempts: 2,
+      matchedStudents: 1,
+    }),
   }),
   '1 student · 2 attempts'
+);
+assert.equal(normalizeAssignmentResultScopeCount(Number.NaN), 0);
+assert.equal(normalizeAssignmentResultScopeCount(-2.4), 0);
+assert.equal(normalizeAssignmentResultScopeCount(3.9), 3);
+assert.deepEqual(
+  buildAssignmentResultReviewScopeSummary({
+    counts: {
+      matchedAttemptReviews: 1.8,
+      matchedAttemptRows: 2.9,
+      matchedStudents: Number.NaN,
+      totalAttemptReviews: 3.9,
+      totalAttemptRows: -1,
+      totalStudents: 4.2,
+    },
+    sortedPerformanceItemCount: 2.8,
+    totalItemCount: Number.POSITIVE_INFINITY,
+  }),
+  {
+    attemptReviews: { matched: 1, total: 3 },
+    attemptRows: { matched: 2, total: 0 },
+    itemPerformance: { matched: 2, total: 0 },
+    students: { matched: 0, total: 4 },
+  }
 );
 assert.equal(
   buildAttemptReviewSubmissionSummary({
@@ -33529,8 +33606,8 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
-  buildAssignmentResultCopyScopeView(
-    buildAssignmentResultControlViews({
+  buildAssignmentResultCopyScopeView({
+    controlViews: buildAssignmentResultControlViews({
       resultSearchSummary: '1 student · 2 attempts',
       viewState: {
         attemptReviewFilter: 'needs-review',
@@ -33538,8 +33615,12 @@ assert.deepEqual(
         studentSearch: 'alice',
         studentSort: 'best',
       },
-    })
-  ),
+    }),
+    summary: buildResultSearchSummaryTestScope({
+      matchedAttempts: 2,
+      matchedStudents: 1,
+    }),
+  }),
   {
     description:
       'Copied materials follow the current student search, item sort, and review view.',
@@ -33565,6 +33646,12 @@ assert.deepEqual(
         value: 'Needs review only',
       },
     ],
+    summary: {
+      attemptReviews: { matched: 2, total: 2 },
+      attemptRows: { matched: 2, total: 2 },
+      itemPerformance: { matched: 0, total: 0 },
+      students: { matched: 1, total: 1 },
+    },
     title: 'Copy scope',
   }
 );
@@ -35252,6 +35339,12 @@ assert.deepEqual(assignmentResultReviewScope.counts, {
   totalAttemptRows: 3,
   totalStudents: 2,
 });
+assert.deepEqual(assignmentResultReviewScope.summary, {
+  attemptReviews: { matched: 1, total: 3 },
+  attemptRows: { matched: 1, total: 3 },
+  itemPerformance: { matched: 2, total: 2 },
+  students: { matched: 1, total: 2 },
+});
 assert.deepEqual(
   assignmentResultReviewScope.filteredStudents.map(
     (student) => student.studentLabel
@@ -35524,6 +35617,12 @@ assert.deepEqual(assignmentResultViewModel.reviewScope.counts, {
   totalAttemptReviews: 3,
   totalAttemptRows: 3,
   totalStudents: 2,
+});
+assert.deepEqual(assignmentResultViewModel.reviewScope.summary, {
+  attemptReviews: { matched: 1, total: 3 },
+  attemptRows: { matched: 1, total: 3 },
+  itemPerformance: { matched: 2, total: 2 },
+  students: { matched: 1, total: 2 },
 });
 assert.equal(
   assignmentResultViewModel.resultSearchSummary,
