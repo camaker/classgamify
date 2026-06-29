@@ -28,6 +28,16 @@ export function AssignmentResultsAttemptReviewCard({
           {attemptView.badgeLabel}
         </Badge>
       </div>
+      <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-y py-3 sm:grid-cols-4">
+        {attemptView.summaryMetricViews.map((metricView) => (
+          <div key={`${attemptView.id}-${metricView.key}`}>
+            <dt className="text-[11px] text-muted-foreground">
+              {metricView.label}
+            </dt>
+            <dd className="mt-1 font-semibold text-sm">{metricView.value}</dd>
+          </div>
+        ))}
+      </dl>
       <div className="mt-3 grid gap-2">
         {attemptView.answerViews.map((answerView) => (
           <AssignmentResultsAttemptAnswerReview

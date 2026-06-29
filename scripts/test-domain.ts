@@ -582,6 +582,7 @@ import {
   buildAssignmentAttemptAnswerReviewViews,
   buildAssignmentAttemptReviewCardView,
   buildAssignmentAttemptReviewCardViews,
+  buildAssignmentAttemptReviewSummaryMetricViews,
   buildAssignmentAttemptRowDisplay,
   buildAssignmentAttemptRowMetricLabels,
   buildAssignmentAttemptTableView,
@@ -685,6 +686,7 @@ import {
   buildAssignmentResultAnswerStatusView,
   buildAssignmentResultAttemptAnswerTextView,
 } from '@/assignments/result-answer-view';
+import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryAccuracy,
   formatAssignmentSummaryAttemptCount,
@@ -2193,6 +2195,10 @@ const assignmentResultsExportSource = readFileSync(
   'src/assignments/results-export.ts',
   'utf8'
 );
+const assignmentResultReviewSummarySource = readFileSync(
+  'src/assignments/result-review-summary.ts',
+  'utf8'
+);
 assert.match(
   assignmentResultsExportSource,
   /AssignmentAttemptReview[\s\S]*AssignmentAttemptReviewAnswer[\s\S]*AssignmentItemAnalysis[\s\S]*AssignmentStudentSummary[\s\S]*type AssignmentResultsExportAttemptReview = AssignmentAttemptReview;[\s\S]*type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;[\s\S]*type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;[\s\S]*type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;/,
@@ -2229,9 +2235,19 @@ assert.match(
   'Assignment CSV export attempt base columns should format numeric cells through the shared result-format CSV helper.'
 );
 assert.match(
+  assignmentResultReviewSummarySource,
+  /export type AssignmentAttemptReviewSummary = \{[\s\S]*correctItemCount: number;[\s\S]*needsReviewItemCount: number;[\s\S]*submittedItemCount: number;[\s\S]*totalItemCount: number;[\s\S]*unansweredItemCount: number;[\s\S]*export function buildAssignmentAttemptReviewSummary[\s\S]*isAssignmentAttemptAnswerNeedsReview/,
+  'Assignment attempt review summaries should centralize per-attempt review counts through the shared answer status rules.'
+);
+assert.match(
   assignmentResultsExportSource,
-  /type AssignmentResultsExportAttemptSummary = \{[\s\S]*correctItemCount: number;[\s\S]*needsReviewItemCount: number;[\s\S]*unansweredItemCount: number;[\s\S]*function buildAssignmentResultsExportAttemptSummary[\s\S]*isAssignmentAttemptAnswerNeedsReview[\s\S]*countAssignmentResultsExportAnswers/,
-  'Assignment CSV export should build per-attempt review summary columns from the shared attempt-review answer status rules.'
+  /buildAssignmentAttemptReviewSummary[\s\S]*const attemptSummary = buildAssignmentAttemptReviewSummary\(attempt\)/,
+  'Assignment CSV export should consume the shared attempt-review summary helper.'
+);
+assert.doesNotMatch(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportAttemptSummary|countAssignmentResultsExportAnswers|isAssignmentAttemptAnswerNeedsReview/,
+  'Assignment CSV export should not keep private per-attempt review summary logic.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -4428,7 +4444,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
+  /export type AssignmentResultMetricKey[\s\S]*export type AssignmentResultMetricItem[\s\S]*export type AssignmentResultAttemptRowMetricLabels[\s\S]*export type AssignmentResultAttemptRowView[\s\S]*export type AssignmentResultAttemptTableView[\s\S]*export type AssignmentResultAttemptAnswerReviewDisplayView[\s\S]*export type AssignmentResultAttemptAnswerReviewView[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricKey[\s\S]*export type AssignmentResultAttemptReviewSummaryMetricView[\s\S]*export type AssignmentResultAttemptReviewCardView[\s\S]*export type AssignmentResultStudentSummaryRowDisplayView[\s\S]*export type AssignmentResultStudentSummaryRowView[\s\S]*export type AssignmentResultStudentSummaryTableView[\s\S]*export type AssignmentResultItemAnalysisCardDisplayView[\s\S]*export type AssignmentResultItemAnalysisCardView[\s\S]*export type AssignmentResultItemPerformanceRowDisplayView[\s\S]*export type AssignmentResultItemPerformanceRowView[\s\S]*export type AssignmentResultItemPerformanceTableView/,
   'Assignment result view domain should expose explicit result metric, row, review-card, answer-review, and table view contracts.'
 );
 assert.doesNotMatch(
@@ -4440,6 +4456,11 @@ assert.match(
   assignmentResultViewSource,
   /AssignmentAttemptReviewAnswer[\s\S]*AssignmentClassroomBrief[\s\S]*classroomBrief: AssignmentClassroomBrief \| null;[\s\S]*answer: AssignmentAttemptReviewAnswer;[\s\S]*answers: AssignmentAttemptReviewAnswer\[\]/,
   'Assignment result page view-model should compose explicit classroom brief and attempt answer contracts.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentAttemptReviewSummaryMetricViews[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)[\s\S]*summary\.submittedItemCount[\s\S]*summary\.correctItemCount[\s\S]*summary\.needsReviewItemCount[\s\S]*summary\.unansweredItemCount/,
+  'Assignment result attempt review cards should prepare summary metrics from the shared attempt-review summary helper.'
 );
 assert.doesNotMatch(
   assignmentResultViewSource,
@@ -4480,6 +4501,16 @@ assert.match(
   assignmentResultsAttemptReviewCardSource,
   /AssignmentResultAttemptAnswerReviewView[\s\S]*AssignmentResultAttemptReviewCardView/,
   'Assignment result attempt review card should import explicit attempt review card and answer-review item contracts.'
+);
+assert.match(
+  assignmentResultsAttemptReviewCardSource,
+  /attemptView\.summaryMetricViews\.map[\s\S]*metricView\.label[\s\S]*metricView\.value/,
+  'Assignment result attempt review card component should render prepared summary metric views.'
+);
+assert.doesNotMatch(
+  assignmentResultsAttemptReviewCardSource,
+  /answerViews\.length|answers\.filter|needsReviewItemCount|unansweredItemCount|correctItemCount/,
+  'Assignment result attempt review card component should not calculate review summary metrics locally.'
 );
 assert.match(
   assignmentResultsAttemptsTableSource,
@@ -33382,6 +33413,57 @@ assert.equal(
   false
 );
 assert.deepEqual(
+  buildAssignmentAttemptReviewSummary({
+    answers: [
+      {
+        acceptedAnswers: ['Paris'],
+        answer: 'Paris',
+        correct: true,
+        expectedAnswer: 'Paris',
+        itemId: 'q-1',
+        prompt: 'Capital?',
+        submitted: true,
+      },
+      {
+        acceptedAnswers: ['Cold'],
+        answer: 'Warm',
+        correct: false,
+        expectedAnswer: 'Cold',
+        itemId: 'pair-1',
+        prompt: 'Hot',
+        submitted: true,
+      },
+      {
+        acceptedAnswers: ['Blue'],
+        answer: '',
+        correct: false,
+        expectedAnswer: 'Blue',
+        itemId: 'q-2',
+        prompt: 'Sky?',
+        submitted: false,
+      },
+    ],
+  }),
+  {
+    correctItemCount: 1,
+    needsReviewItemCount: 2,
+    submittedItemCount: 2,
+    totalItemCount: 3,
+    unansweredItemCount: 1,
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptReviewSummaryMetricViews({
+    answers: resultAnalysis.attempts[2]!.answers,
+  }),
+  [
+    { key: 'submitted', label: 'Submitted', value: '1/2' },
+    { key: 'correct', label: 'Correct', value: '0' },
+    { key: 'needs-review', label: 'Needs review', value: '2' },
+    { key: 'unanswered', label: 'Unanswered', value: '1' },
+  ]
+);
+assert.deepEqual(
   buildAssignmentAttemptAnswerReviewView({
     answer: {
       ...resultAnalysis.attempts[0]!.answers[1]!,
@@ -34793,6 +34875,12 @@ assert.deepEqual(
     ],
     badgeLabel: '2 pts · 67%',
     id: 'attempt-1',
+    summaryMetricViews: [
+      { key: 'submitted', label: 'Submitted', value: '1/1' },
+      { key: 'correct', label: 'Correct', value: '1' },
+      { key: 'needs-review', label: 'Needs review', value: '0' },
+      { key: 'unanswered', label: 'Unanswered', value: '0' },
+    ],
     studentLabel: 'Alice',
     submittedAtLabel: formatAssignmentResultDate(attemptRowCompletedAt),
   }
@@ -34810,6 +34898,12 @@ assert.deepEqual(
     answerViews: [],
     badgeLabel: '0 pts · 0%',
     id: 'attempt-empty',
+    summaryMetricViews: [
+      { key: 'submitted', label: 'Submitted', value: '0/0' },
+      { key: 'correct', label: 'Correct', value: '0' },
+      { key: 'needs-review', label: 'Needs review', value: '0' },
+      { key: 'unanswered', label: 'Unanswered', value: '0' },
+    ],
     studentLabel: 'Anonymous student',
     submittedAtLabel: '-',
   }

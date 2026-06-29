@@ -10,7 +10,6 @@ import {
 } from '@/assignments/attempt-stats';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
-import { isAssignmentAttemptAnswerNeedsReview } from '@/assignments/results';
 import type {
   AssignmentAttemptReview,
   AssignmentAttemptReviewAnswer,
@@ -18,6 +17,7 @@ import type {
   AssignmentResultsAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
+import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result-answer-view';
 import {
   formatAssignmentResultCsvDate,
@@ -94,12 +94,6 @@ type AssignmentResultsExportAttemptAnswer = AssignmentAttemptReviewAnswer;
 type AssignmentResultsExportItemAnalysis = AssignmentItemAnalysis;
 
 type AssignmentResultsExportStudentSummary = AssignmentStudentSummary;
-
-type AssignmentResultsExportAttemptSummary = {
-  correctItemCount: number;
-  needsReviewItemCount: number;
-  unansweredItemCount: number;
-};
 
 type AssignmentResultsExportContext = {
   assignmentTitle: string;
@@ -213,7 +207,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
   const { deliveryView, resolvedSource, statsView } = exportContext;
   const storedAttempt = exportContext.attemptsById.get(attempt.id);
   const studentSummary = exportContext.studentsByKey.get(attempt.studentKey);
-  const attemptSummary = buildAssignmentResultsExportAttemptSummary(attempt);
+  const attemptSummary = buildAssignmentAttemptReviewSummary(attempt);
   const attemptDurationSeconds = normalizeAttemptDurationSeconds({
     durationSeconds: storedAttempt?.resultJson?.durationSeconds,
     timeLimitSeconds: deliveryView.timeLimitSeconds,
@@ -288,32 +282,6 @@ function buildAssignmentResultsExportAttemptBaseColumns({
       min: 0,
     }),
   ];
-}
-
-function buildAssignmentResultsExportAttemptSummary(
-  attempt: AssignmentResultsExportAttemptReview
-): AssignmentResultsExportAttemptSummary {
-  return {
-    correctItemCount: countAssignmentResultsExportAnswers(
-      attempt.answers,
-      (answer) => answer.submitted && answer.correct
-    ),
-    needsReviewItemCount: countAssignmentResultsExportAnswers(
-      attempt.answers,
-      isAssignmentAttemptAnswerNeedsReview
-    ),
-    unansweredItemCount: countAssignmentResultsExportAnswers(
-      attempt.answers,
-      (answer) => !answer.submitted
-    ),
-  };
-}
-
-function countAssignmentResultsExportAnswers(
-  answers: AssignmentResultsExportAttemptAnswer[],
-  predicate: (answer: AssignmentResultsExportAttemptAnswer) => boolean
-) {
-  return answers.filter(predicate).length;
 }
 
 function buildAssignmentResultsExportAnswerRow({

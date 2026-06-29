@@ -33,6 +33,7 @@ import {
   buildAssignmentResultAttemptAnswerTextView,
   type AssignmentResultAnswerStatusTone,
 } from '@/assignments/result-answer-view';
+import { buildAssignmentAttemptReviewSummary } from '@/assignments/result-review-summary';
 import {
   formatAssignmentSummaryCorrectCount,
   formatAssignmentSummaryReviewCount,
@@ -269,10 +270,23 @@ export type AssignmentResultAttemptAnswerReviewView =
     id: string;
   };
 
+export type AssignmentResultAttemptReviewSummaryMetricKey =
+  | 'correct'
+  | 'needs-review'
+  | 'submitted'
+  | 'unanswered';
+
+export type AssignmentResultAttemptReviewSummaryMetricView = {
+  key: AssignmentResultAttemptReviewSummaryMetricKey;
+  label: string;
+  value: string;
+};
+
 export type AssignmentResultAttemptReviewCardView = {
   answerViews: AssignmentResultAttemptAnswerReviewView[];
   badgeLabel: string;
   id: string;
+  summaryMetricViews: AssignmentResultAttemptReviewSummaryMetricView[];
   studentLabel: string;
   submittedAtLabel: string;
 };
@@ -722,6 +736,18 @@ export const assignmentResultReviewCopy = {
   },
   get expectedAnswerLabel() {
     return m.assignment_result_review_expected();
+  },
+  get reviewSummaryCorrectLabel() {
+    return m.assignment_result_attempt_review_summary_correct();
+  },
+  get reviewSummaryNeedsReviewLabel() {
+    return m.assignment_result_attempt_review_summary_needs_review();
+  },
+  get reviewSummarySubmittedLabel() {
+    return m.assignment_result_attempt_review_summary_submitted();
+  },
+  get reviewSummaryUnansweredLabel() {
+    return m.assignment_result_attempt_review_summary_unanswered();
   },
   get itemAnswerLabel() {
     return m.assignment_result_review_item_answer();
@@ -1222,6 +1248,7 @@ export function buildAssignmentAttemptReviewCardView(
     answerViews: buildAssignmentAttemptAnswerReviewViews(attempt.answers),
     badgeLabel: formatAssignmentAttemptReviewBadge(attempt),
     id: attempt.id,
+    summaryMetricViews: buildAssignmentAttemptReviewSummaryMetricViews(attempt),
     studentLabel: formatAssignmentResultStudentLabel(attempt.studentLabel),
     submittedAtLabel: formatAssignmentResultDate(attempt.completedAt),
   };
@@ -1233,6 +1260,44 @@ export function buildAssignmentAttemptReviewCardViews(
   return attempts.map((attempt) =>
     buildAssignmentAttemptReviewCardView(attempt)
   );
+}
+
+export function buildAssignmentAttemptReviewSummaryMetricViews(
+  attempt: Pick<AssignmentAttemptReview, 'answers'>
+): AssignmentResultAttemptReviewSummaryMetricView[] {
+  const summary = buildAssignmentAttemptReviewSummary(attempt);
+
+  return [
+    {
+      key: 'submitted',
+      label: assignmentResultReviewCopy.reviewSummarySubmittedLabel,
+      value: formatAssignmentResultFraction(
+        summary.submittedItemCount,
+        summary.totalItemCount
+      ),
+    },
+    {
+      key: 'correct',
+      label: assignmentResultReviewCopy.reviewSummaryCorrectLabel,
+      value: formatAssignmentResultNumber(summary.correctItemCount, {
+        min: 0,
+      }),
+    },
+    {
+      key: 'needs-review',
+      label: assignmentResultReviewCopy.reviewSummaryNeedsReviewLabel,
+      value: formatAssignmentResultNumber(summary.needsReviewItemCount, {
+        min: 0,
+      }),
+    },
+    {
+      key: 'unanswered',
+      label: assignmentResultReviewCopy.reviewSummaryUnansweredLabel,
+      value: formatAssignmentResultNumber(summary.unansweredItemCount, {
+        min: 0,
+      }),
+    },
+  ];
 }
 
 export function buildAssignmentStudentSummaryRowView(
