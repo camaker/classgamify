@@ -7,6 +7,7 @@ import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
   hasActivitySourceMaterialDraftNotes,
   removeActivitySourceMaterialDraftNotes,
+  sanitizeActivityDraftSourceTextForAi,
 } from '@/activities/draft-source';
 import {
   ACTIVITY_EDITOR_FIELD_LIMITS,
@@ -499,6 +500,7 @@ export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
   const data = generateActivityDraftInputSchema.parse(input);
   const template = getTemplateByType(data.templateType);
   const templateContext = `${template.name}: ${template.bestFor}`;
+  const safeSourceText = sanitizeActivityDraftSourceTextForAi(data.sourceText);
 
   return [
     m.activity_ai_prompt_intro(),
@@ -517,7 +519,7 @@ export function buildActivityDraftPrompt(input: GenerateActivityDraftInput) {
     m.activity_ai_prompt_target_item_count({
       itemCount: String(data.itemCount),
     }),
-    m.activity_ai_prompt_source_notes({ sourceText: data.sourceText }),
+    m.activity_ai_prompt_source_notes({ sourceText: safeSourceText }),
     '',
     m.activity_ai_prompt_return_shape(),
     buildActivityDraftPromptJsonExample(),
@@ -1079,7 +1081,9 @@ export function createFallbackActivityDraft(
     locale
   );
 
-  const sourceSummary = summarizeSource(data.sourceText);
+  const sourceSummary = summarizeSource(
+    sanitizeActivityDraftSourceTextForAi(data.sourceText)
+  );
   const focusLabel = formatActivityAiDraftFocusLabel(data.draftFocus, locale);
   const activity = {
     description: m.activity_ai_fallback_description(
@@ -1281,8 +1285,9 @@ export function buildFallbackActivityDraftTerms({
   locale: Locale;
 }) {
   const data = generateActivityDraftInputSchema.parse(input);
+  const safeSourceText = sanitizeActivityDraftSourceTextForAi(data.sourceText);
   const sourceTerms = extractActivityDraftSourceTerms({
-    sourceText: data.sourceText,
+    sourceText: safeSourceText,
     subject: data.subject,
   }).slice(0, data.itemCount);
 

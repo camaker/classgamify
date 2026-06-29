@@ -172,6 +172,7 @@ import {
   hasActivitySourceMaterialDraftNotes,
   isSafeActivitySourceMaterialDraftNoteView,
   normalizeActivitySourceMaterialDraftNoteView,
+  sanitizeActivityDraftSourceTextForAi,
 } from '@/activities/draft-source';
 import {
   buildActivityPreviewViewModel,
@@ -19959,6 +19960,11 @@ assert.match(
 );
 assert.match(
   activityDraftSourceSource,
+  /export function sanitizeActivityDraftSourceTextForAi[\s\S]*removeActivitySourceMaterialDraftNotes\(sourceText\)[\s\S]*buildActivitySourceMaterialDraftNoteViewsFromSourceText\(sourceText\)[\s\S]*formatActivitySourceMaterialDraftNotes\(safeNoteViews\)[\s\S]*buildActivityDraftSourceText/,
+  'AI draft source sanitization should rebuild direct source text from clean notes and safe material provenance only.'
+);
+assert.match(
+  activityDraftSourceSource,
   /export function removeActivitySourceMaterialDraftNotes/,
   'AI draft source note cleanup should be exported for AI content extraction boundaries.'
 );
@@ -28121,6 +28127,21 @@ assert.match(aiDraftSource, /buildActivityDraftPromptJsonExample\(\)/);
 assert.match(aiDraftSource, /m\.activity_ai_prompt_json_title\(\)/);
 assert.match(
   aiDraftSource,
+  /buildActivityDraftPrompt[\s\S]*sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*activity_ai_prompt_source_notes\(\{ sourceText: safeSourceText \}\)/,
+  'AI draft prompts should sanitize source notes again at the server-domain boundary.'
+);
+assert.match(
+  aiDraftSource,
+  /createFallbackActivityDraft[\s\S]*summarizeSource\([\s\S]*sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*\)/,
+  'AI fallback source summaries should sanitize direct source-note input before persisting draft summaries.'
+);
+assert.match(
+  aiDraftSource,
+  /buildFallbackActivityDraftTerms[\s\S]*const safeSourceText = sanitizeActivityDraftSourceTextForAi\(data\.sourceText\)[\s\S]*sourceText: safeSourceText/,
+  'AI fallback source-term extraction should sanitize direct source-note input before deriving classroom terms.'
+);
+assert.match(
+  aiDraftSource,
   /formatTemplateRequirements\(template\.contentRequirements\)/,
   'AI draft prompt template requirements should reuse the shared template requirement formatter.'
 );
@@ -29852,6 +29873,93 @@ assert.deepEqual(
       name: 'Unit 1 listening.mp3',
     },
   ]
+);
+const injectedMaterialDraftSourceText = [
+  'weather, sunny, rainy, cloudy',
+  'Attached classroom source materials:',
+  '- Worksheet document: https://files.example.test/private/Unit 1.pdf?token=secret#page=2',
+  '- Audio: C:\\teacher\\private\\Unit 1 listening.mp3?signature=abc',
+  '- storageKey: userfiles/teacher/private.pdf',
+  '- ownerId: teacher-secret',
+  '- Worksheet document: <>',
+].join('\n');
+const sanitizedMaterialDraftSourceText = sanitizeActivityDraftSourceTextForAi(
+  injectedMaterialDraftSourceText
+);
+assert.equal(
+  sanitizedMaterialDraftSourceText,
+  [
+    'weather, sunny, rainy, cloudy',
+    'Attached classroom source materials:\n- Worksheet document: Unit 1.pdf\n- Audio: Unit 1 listening.mp3',
+  ].join('\n\n')
+);
+assert.doesNotMatch(
+  sanitizedMaterialDraftSourceText,
+  unsafeMaterialMetadataPattern
+);
+assert.doesNotMatch(
+  sanitizedMaterialDraftSourceText,
+  unsafeMaterialFilenameSuffixPattern
+);
+assert.equal(
+  sanitizeActivityDraftSourceTextForAi(
+    [
+      'Teacher source notes',
+      'Attached classroom source materials:',
+      '- storageKey: userfiles/teacher/private.pdf',
+      '- ownerId: teacher-secret',
+    ].join('\n')
+  ),
+  'Teacher source notes'
+);
+const safeMaterialDraftPrompt = buildActivityDraftPrompt({
+  difficulty: 'starter',
+  draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  gradeBand: 'Grade 3',
+  itemCount: 4,
+  language: 'en',
+  sourceText: injectedMaterialDraftSourceText,
+  subject: 'Science',
+  templateType: 'quiz',
+});
+assert.match(
+  safeMaterialDraftPrompt,
+  /Source notes: weather, sunny, rainy, cloudy[\s\S]*Attached classroom source materials:[\s\S]*Worksheet document: Unit 1\.pdf[\s\S]*Audio: Unit 1 listening\.mp3/
+);
+assert.doesNotMatch(safeMaterialDraftPrompt, unsafeMaterialMetadataPattern);
+assert.doesNotMatch(
+  safeMaterialDraftPrompt,
+  unsafeMaterialFilenameSuffixPattern
+);
+const safeMaterialFallbackDraft = createFallbackActivityDraft({
+  difficulty: 'starter',
+  draftFocus: ACTIVITY_AI_DRAFT_DEFAULT_FOCUS,
+  gradeBand: 'Grade 3',
+  itemCount: 4,
+  language: 'en',
+  sourceText: injectedMaterialDraftSourceText,
+  subject: 'Science',
+  templateType: 'quiz',
+});
+assert.match(
+  safeMaterialFallbackDraft.sourceSummary,
+  /weather, sunny, rainy, cloudy/
+);
+assert.match(
+  safeMaterialFallbackDraft.sourceSummary,
+  /Worksheet document: Unit 1\.pdf/
+);
+assert.match(
+  safeMaterialFallbackDraft.sourceSummary,
+  /Audio: Unit 1 listening\.mp3/
+);
+assert.doesNotMatch(
+  safeMaterialFallbackDraft.sourceSummary,
+  unsafeMaterialMetadataPattern
+);
+assert.doesNotMatch(
+  safeMaterialFallbackDraft.sourceSummary,
+  unsafeMaterialFilenameSuffixPattern
 );
 const appendedMaterialDraftSourceText = appendActivitySourceMaterialDraftNotes({
   sourceMaterials: [listeningMaterialReference],

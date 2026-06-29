@@ -123,6 +123,17 @@ export function appendActivitySourceMaterialDraftNotes({
   ]);
 }
 
+export function sanitizeActivityDraftSourceTextForAi(sourceText: string) {
+  const cleanSourceText = removeActivitySourceMaterialDraftNotes(sourceText);
+  const safeNoteViews =
+    buildActivitySourceMaterialDraftNoteViewsFromSourceText(sourceText);
+  const safeNotesText = formatActivitySourceMaterialDraftNotes(safeNoteViews);
+
+  if (!safeNotesText) return cleanSourceText;
+
+  return buildActivityDraftSourceText([cleanSourceText, safeNotesText]);
+}
+
 export function normalizeActivityDraftSourceText(value: string | undefined) {
   return normalizeDraftSourceText(value);
 }
