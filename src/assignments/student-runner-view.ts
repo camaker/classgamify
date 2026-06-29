@@ -31,7 +31,11 @@ import {
 } from '@/assignments/student-submission';
 import { m } from '@/locale/paraglide/messages';
 
-type StudentRunnerReviewStatus = 'correct' | 'idle' | 'needs-review';
+type StudentRunnerReviewStatus =
+  | 'correct'
+  | 'idle'
+  | 'needs-review'
+  | 'unanswered';
 
 export type { StudentRunnerReviewStatus };
 
@@ -209,7 +213,7 @@ type PublicAnswerFeedbackView = {
   explanation: string | null;
   explanationLabel: string;
   explanationText: string | null;
-  status: 'correct' | 'needs-review';
+  status: 'correct' | 'needs-review' | 'unanswered';
   statusLabel: string;
   submittedAnswer: string;
   submittedAnswerLabel: string;
@@ -996,11 +1000,12 @@ export function buildPublicAnswerFeedbackView({
 }: {
   correctAnswerLabel?: string;
   reviewItem: PublicAttemptReviewItem;
-}): PublicAnswerFeedbackView | null {
-  if (!reviewItem.submitted) return null;
-
+}): PublicAnswerFeedbackView {
   const acceptedAnswersLabel = m.student_runner_feedback_accepted_answers();
   const submittedAnswerLabel = m.student_runner_feedback_submitted_answer();
+  const submittedAnswerValue = reviewItem.submitted
+    ? reviewItem.submittedAnswer
+    : m.student_runner_feedback_submitted_answer_empty();
   const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
     reviewItem.acceptedAnswers,
     {
@@ -1033,15 +1038,13 @@ export function buildPublicAnswerFeedbackView({
           value: explanationValue,
         })
       : null,
-    status: reviewItem.correct ? 'correct' : 'needs-review',
-    statusLabel: reviewItem.correct
-      ? m.student_runner_feedback_status_correct()
-      : m.student_runner_feedback_status_needs_review(),
+    status: getPublicAnswerFeedbackStatus(reviewItem),
+    statusLabel: getPublicAnswerFeedbackStatusLabel(reviewItem),
     submittedAnswer: reviewItem.submittedAnswer,
     submittedAnswerLabel,
     submittedAnswerText: m.student_runner_feedback_submitted_answer_line({
       label: submittedAnswerLabel,
-      value: reviewItem.submittedAnswer,
+      value: submittedAnswerValue,
     }),
   };
 }
@@ -1050,17 +1053,36 @@ export function getStudentRunnerReviewStatusClassName(
   status: StudentRunnerReviewStatus
 ) {
   if (status === 'correct') return 'border-primary/35 bg-primary/5';
-  if (status === 'needs-review') {
+  if (status === 'needs-review' || status === 'unanswered') {
     return 'border-destructive/30 bg-destructive/5';
   }
 
   return undefined;
 }
 
+function getPublicAnswerFeedbackStatus(
+  reviewItem: PublicAttemptReviewItem
+): PublicAnswerFeedbackView['status'] {
+  if (!reviewItem.submitted) return 'unanswered';
+  return reviewItem.correct ? 'correct' : 'needs-review';
+}
+
+function getPublicAnswerFeedbackStatusLabel(
+  reviewItem: PublicAttemptReviewItem
+) {
+  if (!reviewItem.submitted) {
+    return m.student_runner_feedback_status_unanswered();
+  }
+
+  return reviewItem.correct
+    ? m.student_runner_feedback_status_correct()
+    : m.student_runner_feedback_status_needs_review();
+}
+
 function getStudentRunnerReviewStatus(
   reviewItem?: PublicAttemptReviewItem
 ): StudentRunnerReviewStatus {
   if (!reviewItem) return 'idle';
-  if (!reviewItem.submitted) return 'idle';
+  if (!reviewItem.submitted) return 'unanswered';
   return reviewItem.correct ? 'correct' : 'needs-review';
 }

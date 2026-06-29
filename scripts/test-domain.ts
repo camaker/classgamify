@@ -6418,6 +6418,11 @@ assert.match(
   /formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*student_runner_choice_separator/,
   'Student answer feedback should show accepted alternatives without repeating the primary correct answer.'
 );
+assert.match(
+  studentRunnerViewSource,
+  /getPublicAnswerFeedbackStatus[\s\S]*!reviewItem\.submitted[\s\S]*'unanswered'[\s\S]*getPublicAnswerFeedbackStatusLabel[\s\S]*student_runner_feedback_status_unanswered/,
+  'Student answer feedback should render an explicit unanswered review state after partial submissions.'
+);
 assert.doesNotMatch(
   studentRunnerViewSource,
   /`\$\{index \+ 1\}\. \$\{prompt\}`|\.join\(', '\)|separator: ' \| '/,
@@ -8416,19 +8421,38 @@ assert.equal(
   getStudentRunnerReviewStatusClassName('needs-review'),
   'border-destructive/30 bg-destructive/5'
 );
-assert.equal(getStudentRunnerReviewStatusClassName('idle'), undefined);
 assert.equal(
+  getStudentRunnerReviewStatusClassName('unanswered'),
+  'border-destructive/30 bg-destructive/5'
+);
+assert.equal(getStudentRunnerReviewStatusClassName('idle'), undefined);
+assert.deepEqual(
   buildPublicAnswerFeedbackView({
     reviewItem: {
       acceptedAnswers: ['Cold'],
       correct: false,
       correctAnswer: 'Cold',
+      explanation: 'Hot pairs with cold.',
       itemId: 'pair-1',
       submitted: false,
       submittedAnswer: '',
     },
   }),
-  null
+  {
+    acceptedAnswersLabel: 'Accepted answers',
+    acceptedAnswersText: null,
+    correctAnswer: 'Cold',
+    correctAnswerLabel: 'Correct answer',
+    correctAnswerText: 'Correct answer: Cold',
+    explanation: 'Hot pairs with cold.',
+    explanationLabel: 'Why',
+    explanationText: 'Why: Hot pairs with cold.',
+    status: 'unanswered',
+    statusLabel: 'Unanswered',
+    submittedAnswer: '',
+    submittedAnswerLabel: 'Your answer',
+    submittedAnswerText: 'Your answer: Unanswered',
+  }
 );
 
 assert.deepEqual(
@@ -15502,7 +15526,28 @@ assert.equal(
     ],
     reviewItems: partialPublicReviewItems,
   }).itemViewsById.get('pair-1')?.status,
-  'idle'
+  'unanswered'
+);
+assert.equal(
+  buildStudentRunnerView({
+    answers: { 'q-1': 'Paris' },
+    items: [
+      {
+        choices: ['Paris', 'Rome'],
+        id: 'q-1',
+        kind: 'question',
+        prompt: 'Capital of France?',
+      },
+      {
+        choices: ['Cold', 'Warm'],
+        id: 'pair-1',
+        kind: 'pair',
+        prompt: 'Hot',
+      },
+    ],
+    reviewItems: partialPublicReviewItems,
+  }).itemViewsById.get('pair-1')?.reviewItem?.submitted,
+  false
 );
 const publicRuntimeItem = stripRuntimeAnswer({
   answer: 'Paris',
