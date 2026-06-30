@@ -119,6 +119,8 @@ import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
   ACTIVITY_AI_DRAFT_SOURCE_TERM_LIMITS,
   buildActivityDraftPrompt,
+  buildAiDraftQuestionOptionId,
+  buildAiDraftQuestionOptionViews,
   buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
   canApplyActivityDraftResultToEditor,
@@ -23643,6 +23645,21 @@ assert.match(
   /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*fallback: AiActivityDraftGroupList;[\s\S]*primary: AiActivityDraftGroupList \| undefined;[\s\S]*const groups: AiActivityDraftGroupList = \[\];[\s\S]*addGroup = \(group: AiActivityDraftGroup\)[\s\S]*countAiDraftGroupItems\(groups: AiActivityDraftGroupList\)[\s\S]*limitAiDraftGroupsToItemCount\(\s*groups: AiActivityDraftGroupList,/,
   'AI draft editor shaping, group completion, counting, and template limiting should compose explicit child contracts.'
 );
+assert.match(
+  activityAiDraftSource,
+  /export function buildAiDraftQuestionOptionViews\(options: string\[\]\)[\s\S]*buildAiDraftQuestionOptionId\(\{ index, text \}\)[\s\S]*export function buildAiDraftQuestionOptionId/,
+  'AI draft question options should expose stable option ids separately from generated visible text.'
+);
+assert.match(
+  activityAiDraftSource,
+  /toEditorQuestionInput\(question: AiActivityDraftQuestion\)[\s\S]*buildAiDraftQuestionOptionViews[\s\S]*buildAiDraftQuestionOptions[\s\S]*buildFallbackQuestions/,
+  'AI draft editor and fallback question options should use the shared stable option-id helper.'
+);
+assert.doesNotMatch(
+  activityAiDraftSource,
+  /id: text/,
+  'AI draft question options should not use visible option text as the option id.'
+);
 assert.doesNotMatch(
   activityAiDraftSource,
   /NormalizedAiActivityDraft\['(?:questions|groups)'\]|AiActivityDraftCompletion\['groups'\]|AiActivityDraft\['groups'\]/,
@@ -28670,6 +28687,17 @@ assert.deepEqual(
     options: ['cat', ' CAT ', 'ｔｒｅｅ'],
   }),
   ['Cat', 'tree']
+);
+assert.equal(
+  buildAiDraftQuestionOptionId({ index: 0, text: ' Ｐａｒｉｓ ' }),
+  'option:paris:1'
+);
+assert.deepEqual(
+  buildAiDraftQuestionOptionViews(['Paris', 'Rome']),
+  [
+    { id: 'option:paris:1', text: 'Paris' },
+    { id: 'option:rome:2', text: 'Rome' },
+  ]
 );
 assert.equal(formatEditorInlineList([' cat ', '', ' tree ']), 'cat, tree');
 assert.equal(

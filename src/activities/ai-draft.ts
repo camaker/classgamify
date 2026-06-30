@@ -683,11 +683,47 @@ function toEditorQuestionInput(question: AiActivityDraftQuestion) {
   return {
     ...question,
     answer,
-    options: buildQuestionOptionTexts({
-      answer,
-      options: question.options ?? [],
-    }).map((text) => ({ id: text, text })),
+    options: buildAiDraftQuestionOptionViews(
+      buildQuestionOptionTexts({
+        answer,
+        options: question.options ?? [],
+      })
+    ),
   };
+}
+
+export function buildAiDraftQuestionOptionViews(options: string[]) {
+  return options.map((text, index) => ({
+    id: buildAiDraftQuestionOptionId({ index, text }),
+    text,
+  }));
+}
+
+export function buildAiDraftQuestionOptionId({
+  index,
+  text,
+}: {
+  index: number;
+  text: string;
+}) {
+  const optionKey = normalizeAiDraftCompletionKey(text) || 'blank';
+
+  return `option:${optionKey}:${index + 1}`;
+}
+
+function buildAiDraftQuestionOptions({
+  answer,
+  options,
+}: {
+  answer: string;
+  options: string[];
+}) {
+  return buildAiDraftQuestionOptionViews(
+    buildQuestionOptionTexts({
+      answer,
+      options,
+    })
+  );
 }
 
 export function normalizeAiActivityDraft({
@@ -1171,10 +1207,10 @@ function buildFallbackQuestions({
     const question = {
       answer: term,
       explanation,
-      options: buildQuestionOptionTexts({
+      options: buildAiDraftQuestionOptions({
         answer: term,
         options,
-      }).map((text) => ({ id: text, text })),
+      }),
       prompt: '',
     };
 
