@@ -10,6 +10,7 @@ import {
   formatRuntimeItemKindLabel,
   formatRuntimeItemPrompt,
 } from '@/activities/runtime';
+import { getAttemptAnswerByRuntimeItemId } from '@/assignments/attempt-answers';
 import {
   buildPublicAttemptReviewItemMap,
   type PublicAttemptReviewItem,
@@ -397,7 +398,7 @@ export function buildStudentRunnerView({
   const itemViews = items.map((item, index) => {
     const answerState = answerStateByItemId.get(item.id);
     const answer = answerState?.answer ?? '';
-    const reviewItem = reviewByItemId.get(item.id);
+    const reviewItem = getAttemptAnswerByRuntimeItemId(reviewByItemId, item.id);
     const prompt = formatRuntimeItemPrompt(item);
 
     return {

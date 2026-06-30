@@ -2626,6 +2626,11 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
+  /export function buildPublicAttemptReviewItemMap[\s\S]*normalizeAttemptAnswerItemId\(reviewItem\.itemId\)/,
+  'Public attempt review maps should normalize item ids through the shared attempt-answer helper.'
+);
+assert.match(
+  publicAssignmentSource,
   /function buildPublicAttemptReviewItem[\s\S]*const acceptedAnswers = getRuntimeDisplayAcceptedAnswers\(item\.answer\)[\s\S]*const submittedAnswer = normalizeOptionalRuntimeDisplayText\(answer\?\.answer\)[\s\S]*acceptedAnswers,[\s\S]*correct: Boolean\(answer\?\.correct\),[\s\S]*correctAnswer: normalizeRuntimeDisplayText\([\s\S]*explanation: normalizeOptionalRuntimeDisplayText\(item\.explanation\),[\s\S]*itemId: item\.id,[\s\S]*submitted: hasRuntimeDisplayText\(submittedAnswer\),[\s\S]*submittedAnswer: submittedAnswer \?\? ''/,
   'Public attempt review items should explicitly pick the only fields allowed in post-submit student review payloads.'
 );
@@ -7582,6 +7587,11 @@ assert.match(
   studentRunnerSubmissionSource,
   /function getUniqueSubmissionRuntimeItemIds[\s\S]*return getAttemptAnswerRuntimeItemIds\(\{ runtimeItems \}\)/,
   'Student submission session keys should derive runtime ids from attempt-answer helpers.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /const reviewByItemId = buildPublicAttemptReviewItemMap\(reviewItems\)[\s\S]*getAttemptAnswerByRuntimeItemId\(reviewByItemId, item\.id\)/,
+  'Student runner review feedback should look up public review items through the shared normalized item-id helper.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -18207,6 +18217,43 @@ assert.equal(
 );
 assert.equal(studentRunnerView.itemViewsById.get('pair-1')?.kindLabel, 'Pair');
 assert.equal(studentRunnerView.itemViewsById.get('pair-2')?.answered, false);
+const normalizedPublicReviewMap = buildPublicAttemptReviewItemMap([
+  {
+    acceptedAnswers: ['Paris'],
+    correct: true,
+    correctAnswer: 'Paris',
+    itemId: ' ｍｅｓｓｙ－ｑ－１ ',
+    submitted: true,
+    submittedAnswer: 'Paris',
+  },
+]);
+assert.equal(
+  normalizedPublicReviewMap.get('messy-q-1')?.correctAnswer,
+  'Paris'
+);
+assert.deepEqual(
+  buildStudentRunnerView({
+    answers: { 'messy-q-1': 'Paris' },
+    items: [
+      {
+        choices: ['Paris', 'Rome'],
+        id: 'messy-q-1',
+        kind: 'question',
+        prompt: 'Capital?',
+      },
+    ],
+    reviewItems: [...normalizedPublicReviewMap.values()],
+  }).itemViews.map((itemView) => ({
+    reviewItemId: itemView.reviewItem?.itemId,
+    status: itemView.status,
+  })),
+  [
+    {
+      reviewItemId: ' ｍｅｓｓｙ－ｑ－１ ',
+      status: 'correct',
+    },
+  ]
+);
 const runtimeScopedStudentRunnerView = buildStudentRunnerView({
   answers: {
     'legacy-item': 'Paris',

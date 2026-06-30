@@ -14,6 +14,7 @@ import type {
 import {
   buildAttemptAnswerMapByItemId,
   getAttemptAnswerByRuntimeItemId,
+  normalizeAttemptAnswerItemId,
 } from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
@@ -510,7 +511,10 @@ export function buildPublicAttemptReviewItemMap(
   reviewItems: PublicAttemptReviewItem[] | undefined
 ) {
   return new Map(
-    reviewItems?.map((reviewItem) => [reviewItem.itemId, reviewItem]) ?? []
+    reviewItems?.map((reviewItem) => [
+      normalizeAttemptAnswerItemId(reviewItem.itemId),
+      reviewItem,
+    ]) ?? []
   );
 }
 
