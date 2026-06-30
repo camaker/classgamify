@@ -24639,8 +24639,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function getPrintableWorksheetItemLayoutClassName[\s\S]*layout === 'matching'[\s\S]*sm:grid sm:grid-cols-\[1fr_18rem\] sm:gap-4[\s\S]*layout === 'classification'[\s\S]*border-primary\/20 bg-primary\/5/,
-  'Printable worksheet item layout classes should prepare distinct matching and classification paper layouts.'
+  /PRINTABLE_WORKSHEET_ITEM_LAYOUT_CLASS_NAMES[\s\S]*classification: 'border-primary\/20 bg-primary\/5'[\s\S]*matching: 'sm:grid sm:grid-cols-\[1fr_18rem\] sm:gap-4'[\s\S]*satisfies Record<PrintableWorksheetItemLayout, string>/,
+  'Printable worksheet item layout classes should use an exhaustive paper-layout class map.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -24649,8 +24649,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function getPrintableWorksheetResponsePanelClassName[\s\S]*layout === 'classification'[\s\S]*rounded-md bg-background p-3[\s\S]*layout === 'short-answer'[\s\S]*rounded-md border border-dashed bg-muted\/20 p-3/,
-  'Printable worksheet response panels should prepare distinct classification and short-answer paper layouts.'
+  /PRINTABLE_WORKSHEET_RESPONSE_PANEL_CLASS_NAMES[\s\S]*classification: 'rounded-md bg-background p-3'[\s\S]*matching: 'mt-4 sm:mt-0'[\s\S]*'short-answer': 'rounded-md border border-dashed bg-muted\/20 p-3'[\s\S]*satisfies Record<PrintableWorksheetItemLayout, string>/,
+  'Printable worksheet response panels should use an exhaustive paper-layout class map.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -24659,13 +24659,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function getPrintableWorksheetWritingAreaClassName[\s\S]*layout === 'short-answer'[\s\S]*mt-3 grid gap-4[\s\S]*return 'mt-4 grid gap-3'/,
-  'Printable worksheet writing areas should use a roomier short-answer paper layout.'
+  /PRINTABLE_WORKSHEET_WRITING_AREA_CLASS_NAMES[\s\S]*classification: 'mt-4 grid gap-3'[\s\S]*matching: 'mt-4 grid gap-3'[\s\S]*'multiple-choice': 'mt-4 grid gap-3'[\s\S]*'short-answer': 'mt-3 grid gap-4'[\s\S]*satisfies Record<PrintableWorksheetItemLayout, string>/,
+  'Printable worksheet writing areas should use an exhaustive paper-layout class map.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function getPrintableWorksheetWritingLineClassName[\s\S]*layout === 'short-answer'[\s\S]*h-10 border-b border-foreground\/50[\s\S]*return 'h-8 border-b'/,
-  'Printable worksheet writing lines should use taller short-answer writing lines.'
+  /PRINTABLE_WORKSHEET_WRITING_LINE_CLASS_NAMES[\s\S]*classification: 'h-8 border-b'[\s\S]*matching: 'h-8 border-b'[\s\S]*'multiple-choice': 'h-8 border-b'[\s\S]*'short-answer': 'h-10 border-b border-foreground\/50'[\s\S]*satisfies Record<PrintableWorksheetItemLayout, string>/,
+  'Printable worksheet writing lines should use an exhaustive paper-layout class map.'
+);
+assert.doesNotMatch(
+  printableWorksheetItemListSource,
+  /layout === '(?:classification|matching|multiple-choice|short-answer)'/,
+  'Printable worksheet item list should not branch on printable layout strings outside exhaustive class maps.'
 );
 assert.doesNotMatch(
   printableWorksheetItemListSource,

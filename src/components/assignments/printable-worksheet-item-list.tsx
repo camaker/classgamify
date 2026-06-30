@@ -13,6 +13,34 @@ type PrintableWorksheetItemListProps = {
   itemViews: PrintableWorksheetItemView[];
 };
 
+const PRINTABLE_WORKSHEET_ITEM_LAYOUT_CLASS_NAMES = {
+  classification: 'border-primary/20 bg-primary/5',
+  matching: 'sm:grid sm:grid-cols-[1fr_18rem] sm:gap-4',
+  'multiple-choice': '',
+  'short-answer': '',
+} as const satisfies Record<PrintableWorksheetItemLayout, string>;
+
+const PRINTABLE_WORKSHEET_RESPONSE_PANEL_CLASS_NAMES = {
+  classification: 'rounded-md bg-background p-3',
+  matching: 'mt-4 sm:mt-0',
+  'multiple-choice': '',
+  'short-answer': 'rounded-md border border-dashed bg-muted/20 p-3',
+} as const satisfies Record<PrintableWorksheetItemLayout, string>;
+
+const PRINTABLE_WORKSHEET_WRITING_AREA_CLASS_NAMES = {
+  classification: 'mt-4 grid gap-3',
+  matching: 'mt-4 grid gap-3',
+  'multiple-choice': 'mt-4 grid gap-3',
+  'short-answer': 'mt-3 grid gap-4',
+} as const satisfies Record<PrintableWorksheetItemLayout, string>;
+
+const PRINTABLE_WORKSHEET_WRITING_LINE_CLASS_NAMES = {
+  classification: 'h-8 border-b',
+  matching: 'h-8 border-b',
+  'multiple-choice': 'h-8 border-b',
+  'short-answer': 'h-10 border-b border-foreground/50',
+} as const satisfies Record<PrintableWorksheetItemLayout, string>;
+
 export function PrintableWorksheetItemList({
   emptyState,
   itemViews,
@@ -68,10 +96,7 @@ function PrintableWorksheetItem({
         </p>
       </div>
       <div
-        className={cn(
-          itemView.layout === 'matching' ? 'mt-4 sm:mt-0' : '',
-          getPrintableWorksheetResponsePanelClassName(itemView.layout)
-        )}
+        className={getPrintableWorksheetResponsePanelClassName(itemView.layout)}
       >
         <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
         <PrintableWorksheetWritingArea itemView={itemView} />
@@ -83,49 +108,25 @@ function PrintableWorksheetItem({
 function getPrintableWorksheetItemLayoutClassName(
   layout: PrintableWorksheetItemLayout
 ) {
-  if (layout === 'matching') {
-    return 'sm:grid sm:grid-cols-[1fr_18rem] sm:gap-4';
-  }
-
-  if (layout === 'classification') {
-    return 'border-primary/20 bg-primary/5';
-  }
-
-  return '';
+  return PRINTABLE_WORKSHEET_ITEM_LAYOUT_CLASS_NAMES[layout];
 }
 
 function getPrintableWorksheetResponsePanelClassName(
   layout: PrintableWorksheetItemLayout
 ) {
-  if (layout === 'classification') {
-    return 'rounded-md bg-background p-3';
-  }
-
-  if (layout === 'short-answer') {
-    return 'rounded-md border border-dashed bg-muted/20 p-3';
-  }
-
-  return '';
+  return PRINTABLE_WORKSHEET_RESPONSE_PANEL_CLASS_NAMES[layout];
 }
 
 function getPrintableWorksheetWritingAreaClassName(
   layout: PrintableWorksheetItemLayout
 ) {
-  if (layout === 'short-answer') {
-    return 'mt-3 grid gap-4';
-  }
-
-  return 'mt-4 grid gap-3';
+  return PRINTABLE_WORKSHEET_WRITING_AREA_CLASS_NAMES[layout];
 }
 
 function getPrintableWorksheetWritingLineClassName(
   layout: PrintableWorksheetItemLayout
 ) {
-  if (layout === 'short-answer') {
-    return 'h-10 border-b border-foreground/50';
-  }
-
-  return 'h-8 border-b';
+  return PRINTABLE_WORKSHEET_WRITING_LINE_CLASS_NAMES[layout];
 }
 
 function PrintableWorksheetWritingArea({
