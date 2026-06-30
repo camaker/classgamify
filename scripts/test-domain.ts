@@ -14895,7 +14895,13 @@ assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: true }), {
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'true' }), {
   answerKey: true,
 });
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: ' TRUE ' }), {
+  answerKey: true,
+});
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '1' }), {
+  answerKey: true,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '　１　' }), {
   answerKey: true,
 });
 assert.deepEqual(buildPrintableAssignmentSearch({ answerKey: true }), {
@@ -14911,6 +14917,12 @@ assert.deepEqual(
   { answerKey: true }
 );
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'yes' }), {
+  answerKey: undefined,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: 'false' }), {
+  answerKey: undefined,
+});
+assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: '0' }), {
   answerKey: undefined,
 });
 assert.deepEqual(parsePrintableAssignmentSearch({}), {
@@ -22416,6 +22428,11 @@ assert.match(
   printableAssignmentRouteSource,
   /parsePrintableAssignmentSearch/,
   'Printable worksheet route should reuse the assignment-domain search parser.'
+);
+assert.match(
+  printableWorksheetSource,
+  /function isPrintableAnswerKeySearchEnabled[\s\S]*normalizeRuntimeDisplayText\(value\)\.toLowerCase\(\)[\s\S]*normalizedValue === 'true' \|\| normalizedValue === '1'/,
+  'Printable worksheet answer-key search parsing should normalize string values before matching enabled flags.'
 );
 assert.match(
   printableAssignmentRouteSource,

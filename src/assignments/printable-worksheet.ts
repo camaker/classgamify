@@ -325,7 +325,11 @@ export function buildPrintableAssignmentDeliveryView({
 }
 
 function isPrintableAnswerKeySearchEnabled(value: unknown) {
-  return value === true || value === 'true' || value === '1';
+  if (value === true) return true;
+  if (typeof value !== 'string') return false;
+
+  const normalizedValue = normalizeRuntimeDisplayText(value).toLowerCase();
+  return normalizedValue === 'true' || normalizedValue === '1';
 }
 
 function toPrintableWorksheetItem({
