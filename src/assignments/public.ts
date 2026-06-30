@@ -443,6 +443,22 @@ function summarizePublicAttemptReviewItems({
   runtimeItems: RuntimeItem[];
   showCorrectAnswers: boolean;
 }): PublicAttemptReviewSummary {
+  return summarizePublicAttemptReviewItemsForTotal({
+    items,
+    showCorrectAnswers,
+    totalItemCount: runtimeItems.length,
+  });
+}
+
+export function summarizePublicAttemptReviewItemsForTotal({
+  items,
+  showCorrectAnswers,
+  totalItemCount,
+}: {
+  items: PublicAttemptReviewItem[];
+  showCorrectAnswers: boolean;
+  totalItemCount: number;
+}): PublicAttemptReviewSummary {
   const submittedItemCount = normalizeRuntimeDisplayCount(
     items.filter((item) => item.submitted).length
   );
@@ -450,7 +466,7 @@ function summarizePublicAttemptReviewItems({
     items.filter((item) => item.correct).length
   );
   const reviewItemCount = normalizeRuntimeDisplayCount(items.length);
-  const totalItemCount = normalizeRuntimeDisplayCount(runtimeItems.length);
+  const normalizedTotalItemCount = normalizeRuntimeDisplayCount(totalItemCount);
 
   return {
     correctItemCount,
@@ -459,8 +475,11 @@ function summarizePublicAttemptReviewItems({
     reviewItemCount,
     showCorrectAnswers,
     submittedItemCount,
-    totalItemCount,
-    unansweredItemCount: Math.max(0, totalItemCount - submittedItemCount),
+    totalItemCount: normalizedTotalItemCount,
+    unansweredItemCount: Math.max(
+      0,
+      normalizedTotalItemCount - submittedItemCount
+    ),
   };
 }
 

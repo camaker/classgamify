@@ -460,6 +460,7 @@ import {
   PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES,
   stripRuntimeAnswer,
   stripRuntimeAnswers,
+  summarizePublicAttemptReviewItemsForTotal,
 } from '@/assignments/public';
 import {
   compareRuntimeDisplaySearchText,
@@ -2571,6 +2572,11 @@ assert.match(
   publicAssignmentSource,
   /export function buildPublicAttemptReviewSummaryView[\s\S]*if \(!showCorrectAnswers\)[\s\S]*buildHiddenPublicAttemptReviewSummary[\s\S]*items,[\s\S]*summary: summarizePublicAttemptReviewItems/,
   'Public attempt review summary views should centralize visible review items and safe summary metadata.'
+);
+assert.match(
+  publicAssignmentSource,
+  /export function summarizePublicAttemptReviewItemsForTotal[\s\S]*submittedItemCount[\s\S]*correctItemCount[\s\S]*reviewItemCount[\s\S]*normalizedTotalItemCount[\s\S]*unansweredItemCount/,
+  'Public attempt review summary counts should be reusable for server responses and student-runner compatibility fallbacks.'
 );
 assert.match(
   publicAssignmentSource,
@@ -8210,6 +8216,20 @@ assert.match(
   studentRunnerStateSource,
   /buildStudentRunnerSubmissionResultState[\s\S]*reviewSummary:[\s\S]*response\.reviewSummary \?\?[\s\S]*buildStudentRunnerFallbackReviewSummary\(response\.reviewItems\)/,
   'Student runner submission result state should preserve server review summary with a compatibility fallback.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /function buildStudentRunnerFallbackReviewSummary[\s\S]*summarizePublicAttemptReviewItemsForTotal\(\{[\s\S]*items: reviewItems,[\s\S]*showCorrectAnswers: reviewItems\.length > 0,[\s\S]*totalItemCount: reviewItems\.length/,
+  'Student runner fallback review summary should reuse the public attempt review summary helper.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    studentRunnerStateSource,
+    'function buildStudentRunnerFallbackReviewSummary',
+    'export function buildStudentRunnerSubmissionSuccessState'
+  ),
+  /reviewItems\.filter|submittedItemCount|correctItemCount|unansweredItemCount|reviewItemCount/,
+  'Student runner fallback review summary should not duplicate public review-summary counting rules.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -17318,6 +17338,23 @@ assert.deepEqual(
     submittedItemCount: 1,
     totalItemCount: 1,
     unansweredItemCount: 0,
+  }
+);
+assert.deepEqual(
+  summarizePublicAttemptReviewItemsForTotal({
+    items: studentRunnerSubmissionResponse.reviewItems,
+    showCorrectAnswers: false,
+    totalItemCount: 3,
+  }),
+  {
+    correctItemCount: 1,
+    hiddenBySettings: true,
+    needsReviewItemCount: 0,
+    reviewItemCount: 1,
+    showCorrectAnswers: false,
+    submittedItemCount: 1,
+    totalItemCount: 3,
+    unansweredItemCount: 2,
   }
 );
 assert.deepEqual(
