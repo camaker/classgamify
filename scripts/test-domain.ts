@@ -1491,6 +1491,10 @@ const copyAssignmentShareLinkButtonSource = readFileSync(
   'src/components/assignments/copy-assignment-share-link-button.tsx',
   'utf8'
 );
+const assignmentShareLinkSource = readFileSync(
+  'src/assignments/share-link.ts',
+  'utf8'
+);
 assert.doesNotMatch(
   copyAssignmentShareLinkButtonSource,
   /error\.message|error instanceof Error/,
@@ -1515,6 +1519,16 @@ assert.doesNotMatch(
   copyAssignmentShareLinkButtonSource,
   /buildAssignmentShareUrl|disabledMessage \?\? assignmentShareLinkActionCopy\.failureMessage/,
   'Share-link copy button should not rebuild share URLs or disabled fallback messages locally.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /export function normalizeShareBaseUrl[\s\S]*\.normalize\('NFKC'\)[\s\S]*\.replace\(\s*\/\\s\+\/gu,\s*''\s*\)/,
+  'Share-link base URL normalization should remove whitespace before copying student links.'
+);
+assert.doesNotMatch(
+  assignmentShareLinkSource,
+  /const normalized = baseUrl\.trim\(\)/,
+  'Share-link base URL normalization should not use trim-only cleanup.'
 );
 const assignmentResultsRouteSource = readFileSync(
   'src/routes/dashboard/assignments/$assignmentId.tsx',
@@ -11975,12 +11989,20 @@ assert.equal(
   'https://classgamify.test'
 );
 assert.equal(
+  normalizeShareBaseUrl('　https://classgamify.test / classroom ///　'),
+  'https://classgamify.test'
+);
+assert.equal(
   normalizeShareBaseUrl('https://classgamify.test/app?utm=teacher#share'),
   'https://classgamify.test'
 );
 assert.equal(
   normalizeShareBaseUrl('http://localhost:3000/base/path'),
   'http://localhost:3000'
+);
+assert.equal(
+  normalizeShareBaseUrl('　classgamify.test / classroom ///　'),
+  'classgamify.test/classroom'
 );
 assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),

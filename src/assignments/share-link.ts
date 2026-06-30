@@ -182,7 +182,7 @@ export function buildAssignmentShareLinkCopyExecutionPlan({
 }
 
 export function normalizeShareBaseUrl(baseUrl: string) {
-  const normalized = baseUrl.trim();
+  const normalized = baseUrl.normalize('NFKC').replace(/\s+/gu, '').trim();
   if (!normalized) return '';
 
   try {
