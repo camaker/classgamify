@@ -13715,11 +13715,6 @@ assert.deepEqual(
     },
     assignment: publishedAssignments[1]?.assignment,
     body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-    nextSteps: [
-      'Copy the student link into your class chat or LMS.',
-      'Open the link once as a student before sending it.',
-      'Keep the results page ready for submissions and follow-up.',
-    ],
     nextStepViews: [
       {
         id: 'copy-link',
@@ -13765,10 +13760,6 @@ assert.deepEqual(
       },
     },
     body: 'Loading the newly published assignment link and classroom actions.',
-    nextSteps: [
-      'Copy the student link into your class chat or LMS.',
-      'Open the link once as a student before sending it.',
-    ],
     nextStepViews: [
       {
         id: 'copy-link',
@@ -13810,10 +13801,6 @@ assert.deepEqual(
       },
     },
     body: 'Copy the student link for your class or open the student preview. Results will appear once the assignment is visible in this list.',
-    nextSteps: [
-      'Copy the student link into your class chat or LMS.',
-      'Open the link once as a student before sending it.',
-    ],
     nextStepViews: [
       {
         id: 'copy-link',
@@ -21915,8 +21902,13 @@ assert.match(
 );
 assert.match(
   publishedAssignmentSource,
-  /nextStepViews: PublishedAssignmentPanelNextStepView\[\]/,
+  /export type PublishedAssignmentPanelContext = \{[\s\S]*nextStepViews: PublishedAssignmentPanelNextStepView\[\];/,
   'Published assignment panel context should expose structured next-step views.'
+);
+assert.doesNotMatch(
+  publishedAssignmentSource,
+  /nextSteps: string\[\]|getPublishedAssignmentPanelNextStepLabels/,
+  'Published assignment panel context should not duplicate structured next steps as localized string arrays.'
 );
 assert.match(
   publishedAssignmentSource,
@@ -26836,11 +26828,6 @@ assert.deepEqual(
         title: 'Persisted assignment',
       },
       body: 'Copy the student link for your class, open the student preview, or jump into the results page before submissions arrive.',
-      nextSteps: [
-        'Copy the student link into your class chat or LMS.',
-        'Open the link once as a student before sending it.',
-        'Keep the results page ready for submissions and follow-up.',
-      ],
       nextStepViews: [
         {
           id: 'copy-link',

@@ -108,7 +108,6 @@ export type PublishedAssignmentPanelContext = {
   actionView: PublishedAssignmentPanelActionView;
   assignment?: PublishedAssignmentPanelAssignment;
   body: string;
-  nextSteps: string[];
   nextStepViews: PublishedAssignmentPanelNextStepView[];
   sharePath: string;
   sharePathLabel: string;
@@ -144,7 +143,6 @@ export function buildPublishedAssignmentPanelContext({
       }),
       assignment,
       body: m.assignment_published_panel_found_body(),
-      nextSteps: getPublishedAssignmentPanelNextStepLabels(foundNextStepViews),
       nextStepViews: foundNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
@@ -162,8 +160,6 @@ export function buildPublishedAssignmentPanelContext({
         status: 'loading',
       }),
       body: m.assignment_published_panel_loading_body(),
-      nextSteps:
-        getPublishedAssignmentPanelNextStepLabels(loadingNextStepViews),
       nextStepViews: loadingNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
@@ -180,7 +176,6 @@ export function buildPublishedAssignmentPanelContext({
       status: 'missing',
     }),
     body: m.assignment_published_panel_missing_body(),
-    nextSteps: getPublishedAssignmentPanelNextStepLabels(missingNextStepViews),
     nextStepViews: missingNextStepViews,
     sharePath,
     sharePathLabel: m.assignment_published_panel_share_path_label(),
@@ -250,12 +245,6 @@ export function buildPublishedAssignmentPanelNextStepViews(
         },
       ]
     : baseSteps;
-}
-
-function getPublishedAssignmentPanelNextStepLabels(
-  nextSteps: PublishedAssignmentPanelNextStepView[]
-) {
-  return nextSteps.map((step) => step.label);
 }
 
 function normalizeOptionalAssignmentShareSlug(shareSlug?: string) {
