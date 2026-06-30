@@ -1,4 +1,5 @@
 import type {
+  ActivityEditorTemplateRequirementBadgeView,
   ActivityEditorTemplateScaffoldCoverageMetricView,
   ActivityEditorTemplateScaffoldReadyOptionView,
   ActivityEditorTemplateScaffoldSummaryView,
@@ -59,7 +60,7 @@ export function ActivityTemplateScaffoldPanel({
 function ActivityTemplateRequirementBadge({
   requirement,
 }: {
-  requirement: ActivityEditorTemplateSetupView['requirementBadges'][number];
+  requirement: ActivityEditorTemplateRequirementBadgeView;
 }) {
   return (
     <Badge variant="secondary" className="rounded-md">

@@ -109,12 +109,15 @@ type ActivityEditorPreviewPanel = {
 export type ActivityEditorTemplateSetupView = {
   actionLabel: string;
   description: string;
-  requirementBadges: TemplateRequirementView[];
+  requirementBadges: ActivityEditorTemplateRequirementBadgeView[];
   scaffoldSummary: ActivityTemplateScaffoldReadinessSummary;
   shortName: string;
   successMessage: string;
   title: string;
 };
+
+export type ActivityEditorTemplateRequirementBadgeView =
+  TemplateRequirementView;
 
 export type ActivityEditorTemplateScaffoldSummaryView =
   ActivityTemplateScaffoldReadinessSummary;

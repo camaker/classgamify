@@ -3535,7 +3535,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityEditorTemplateSetupView[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
+  /export type ActivityEditorTemplateSetupView[\s\S]*requirementBadges: ActivityEditorTemplateRequirementBadgeView\[\];[\s\S]*export type ActivityEditorTemplateRequirementBadgeView =\s*TemplateRequirementView;[\s\S]*export type ActivityEditorTemplateScaffoldSummaryView =\s*ActivityTemplateScaffoldReadinessSummary;[\s\S]*export type ActivityEditorTemplateScaffoldCoverageMetricView =\s*ActivityTemplateScaffoldCoverageMetricView;[\s\S]*export type ActivityEditorTemplateScaffoldReadyOptionView =\s*ActivityTemplateScaffoldReadyOptionView;/,
   'Activity editor domain should expose explicit template scaffold view contracts.'
 );
 assert.match(
@@ -3845,8 +3845,13 @@ assert.match(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateRequirementBadge[\s\S]*ActivityEditorTemplateSetupView\['requirementBadges'\]\[number\][\s\S]*requirement\.label/,
+  /function ActivityTemplateRequirementBadge[\s\S]*ActivityEditorTemplateRequirementBadgeView[\s\S]*requirement\.label/,
   'Activity editor scaffold panel should render requirement badges from the structured setup view contract.'
+);
+assert.doesNotMatch(
+  activityTemplateScaffoldPanelSource,
+  /ActivityEditorTemplateSetupView\['requirementBadges'\]\[number\]/,
+  'Activity editor scaffold panel should not infer requirement badge props from the aggregate setup view.'
 );
 assert.doesNotMatch(
   activityTemplateScaffoldPanelSource,
@@ -3855,7 +3860,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /ActivityEditorTemplateSetupView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView/,
+  /ActivityEditorTemplateSetupView[\s\S]*ActivityEditorTemplateRequirementBadgeView[\s\S]*ActivityEditorTemplateScaffoldSummaryView[\s\S]*ActivityEditorTemplateScaffoldCoverageMetricView[\s\S]*ActivityEditorTemplateScaffoldReadyOptionView/,
   'Activity editor scaffold panel should import explicit template scaffold view contracts.'
 );
 assert.doesNotMatch(
