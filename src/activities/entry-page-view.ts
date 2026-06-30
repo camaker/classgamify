@@ -78,6 +78,29 @@ export type WorksheetsPageModeCardView = {
   title: string;
 };
 
+export type WorksheetsPageResultSignalId =
+  | 'accepted-answers'
+  | 'attempts'
+  | 'csv-export'
+  | 'reteach';
+
+export type WorksheetsPageResultSignalView = {
+  id: WorksheetsPageResultSignalId;
+  label: string;
+};
+
+export type WorksheetsPageWorkflowStepId =
+  | 'assign'
+  | 'create'
+  | 'review'
+  | 'student-submit';
+
+export type WorksheetsPageWorkflowStepView = {
+  id: WorksheetsPageWorkflowStepId;
+  label: string;
+  positionLabel: string;
+};
+
 export type WorksheetsPageViewModel = {
   hero: {
     badgeLabel: string;
@@ -90,13 +113,13 @@ export type WorksheetsPageViewModel = {
     description: string;
     title: string;
   };
-  resultSignals: string[];
+  resultSignals: WorksheetsPageResultSignalView[];
   templatesCta: {
     action: LinkAction;
     description: string;
     title: string;
   };
-  workflowSteps: string[];
+  workflowSteps: WorksheetsPageWorkflowStepView[];
 };
 
 export function buildTemplatesPageViewModel({
@@ -181,10 +204,22 @@ export function buildWorksheetsPageViewModel({
       title: m.worksheets_page_printable_title(),
     },
     resultSignals: [
-      m.worksheets_page_result_signal_attempts(),
-      m.worksheets_page_result_signal_alternatives(),
-      m.worksheets_page_result_signal_reteach(),
-      m.worksheets_page_result_signal_csv(),
+      {
+        id: 'attempts',
+        label: m.worksheets_page_result_signal_attempts(),
+      },
+      {
+        id: 'accepted-answers',
+        label: m.worksheets_page_result_signal_alternatives(),
+      },
+      {
+        id: 'reteach',
+        label: m.worksheets_page_result_signal_reteach(),
+      },
+      {
+        id: 'csv-export',
+        label: m.worksheets_page_result_signal_csv(),
+      },
     ],
     templatesCta: {
       action: {
@@ -195,10 +230,29 @@ export function buildWorksheetsPageViewModel({
       title: m.worksheets_page_templates_cta_title(),
     },
     workflowSteps: [
-      m.worksheets_page_workflow_step_1(),
-      m.worksheets_page_workflow_step_2(),
-      m.worksheets_page_workflow_step_3(),
-      m.worksheets_page_workflow_step_4(),
-    ],
+      {
+        id: 'create',
+        label: m.worksheets_page_workflow_step_1(),
+      },
+      {
+        id: 'assign',
+        label: m.worksheets_page_workflow_step_2(),
+      },
+      {
+        id: 'student-submit',
+        label: m.worksheets_page_workflow_step_3(),
+      },
+      {
+        id: 'review',
+        label: m.worksheets_page_workflow_step_4(),
+      },
+    ].map((step, index) => ({
+      ...step,
+      positionLabel: formatWorksheetsPageWorkflowPosition(index),
+    })),
   };
+}
+
+function formatWorksheetsPageWorkflowPosition(index: number) {
+  return String(index + 1);
 }

@@ -5,6 +5,8 @@ import { buttonVariants } from '@/components/ui/button';
 import {
   buildWorksheetsPageViewModel,
   type WorksheetsPageHeroActionView,
+  type WorksheetsPageResultSignalView,
+  type WorksheetsPageWorkflowStepView,
 } from '@/activities/entry-page-view';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
@@ -63,8 +65,8 @@ function WorksheetsPage() {
               {m.worksheets_page_delivery_loop_title()}
             </p>
             <ol className="mt-4 space-y-3">
-              {pageView.workflowSteps.map((item, index) => (
-                <WorksheetWorkflowStep index={index} item={item} key={item} />
+              {pageView.workflowSteps.map((stepView) => (
+                <WorksheetWorkflowStep key={stepView.id} stepView={stepView} />
               ))}
             </ol>
           </div>
@@ -90,8 +92,11 @@ function WorksheetsPage() {
           </div>
 
           <div className="grid gap-2">
-            {pageView.resultSignals.map((signal) => (
-              <WorksheetResultSignal key={signal} signal={signal} />
+            {pageView.resultSignals.map((signalView) => (
+              <WorksheetResultSignal
+                key={signalView.id}
+                signalView={signalView}
+              />
             ))}
           </div>
         </section>
@@ -144,26 +149,28 @@ function WorksheetHeroActionLink({
 }
 
 function WorksheetWorkflowStep({
-  index,
-  item,
+  stepView,
 }: {
-  index: number;
-  item: string;
+  stepView: WorksheetsPageWorkflowStepView;
 }) {
   return (
     <li className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-3 text-sm leading-6">
       <span className="flex size-7 items-center justify-center rounded-lg border bg-background text-xs font-semibold text-primary">
-        {index + 1}
+        {stepView.positionLabel}
       </span>
-      <span>{item}</span>
+      <span>{stepView.label}</span>
     </li>
   );
 }
 
-function WorksheetResultSignal({ signal }: { signal: string }) {
+function WorksheetResultSignal({
+  signalView,
+}: {
+  signalView: WorksheetsPageResultSignalView;
+}) {
   return (
     <div className="rounded-lg border bg-background px-3 py-2 text-sm font-medium">
-      {signal}
+      {signalView.label}
     </div>
   );
 }

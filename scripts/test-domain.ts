@@ -4354,18 +4354,23 @@ assert.doesNotMatch(
 );
 assert.match(
   worksheetsRouteSource,
-  /WorksheetsPageHeroActionView/,
-  'Worksheets route hero action link should consume the focused worksheet hero action contract.'
+  /WorksheetsPageHeroActionView[\s\S]*WorksheetsPageResultSignalView[\s\S]*WorksheetsPageWorkflowStepView/,
+  'Worksheets route should consume focused worksheet hero action, result signal, and workflow step contracts.'
 );
 assert.match(
   worksheetsRouteSource,
-  /pageView\.workflowSteps\.map[\s\S]*WorksheetWorkflowStep[\s\S]*item=\{item\}/,
+  /pageView\.workflowSteps\.map[\s\S]*WorksheetWorkflowStep[\s\S]*key=\{stepView\.id\}[\s\S]*stepView=\{stepView\}/,
   'Worksheets route should delegate prepared workflow steps to focused rows.'
 );
 assert.match(
   worksheetsRouteSource,
-  /pageView\.resultSignals\.map[\s\S]*WorksheetResultSignal[\s\S]*signal=\{signal\}/,
+  /pageView\.resultSignals\.map[\s\S]*WorksheetResultSignal[\s\S]*key=\{signalView\.id\}[\s\S]*signalView=\{signalView\}/,
   'Worksheets route should delegate prepared result signals to focused chips.'
+);
+assert.doesNotMatch(
+  worksheetsRouteSource,
+  /key=\{item\}|key=\{signal\}|index \+ 1/,
+  'Worksheets route should not key workflow or result signal rows by localized text or derive workflow numbering locally.'
 );
 assert.match(
   worksheetsRouteSource,
@@ -4384,12 +4389,12 @@ assert.match(
 );
 assert.match(
   worksheetsRouteSource,
-  /function WorksheetWorkflowStep[\s\S]*index \+ 1[\s\S]*item/,
-  'Worksheet workflow steps should render prepared workflow copy with ordered labels.'
+  /function WorksheetWorkflowStep[\s\S]*stepView: WorksheetsPageWorkflowStepView[\s\S]*stepView\.positionLabel[\s\S]*stepView\.label/,
+  'Worksheet workflow steps should render prepared workflow labels and ordered position labels.'
 );
 assert.match(
   worksheetsRouteSource,
-  /function WorksheetResultSignal[\s\S]*signal/,
+  /function WorksheetResultSignal[\s\S]*signalView: WorksheetsPageResultSignalView[\s\S]*signalView\.label/,
   'Worksheet result signal chips should render prepared result signal copy.'
 );
 assert.match(
@@ -24319,10 +24324,10 @@ assert.deepEqual(worksheetsPageView, {
     title: 'Printable follow-up can build on the same assignment record.',
   },
   resultSignals: [
-    'Attempt summaries',
-    'Accepted answer alternatives',
-    'Reteach priorities',
-    'CSV export',
+    { id: 'attempts', label: 'Attempt summaries' },
+    { id: 'accepted-answers', label: 'Accepted answer alternatives' },
+    { id: 'reteach', label: 'Reteach priorities' },
+    { id: 'csv-export', label: 'CSV export' },
   ],
   templatesCta: {
     action: {
@@ -24334,10 +24339,30 @@ assert.deepEqual(worksheetsPageView, {
     title: 'Want a different game view for the same lesson?',
   },
   workflowSteps: [
-    'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
-    'Choose a worksheet-style template and review the example before saving.',
-    'Publish a student assignment link with attempts, timer, answer reveal, and close time.',
-    'Review submissions, accepted answers, reteach priorities, and CSV exports.',
+    {
+      id: 'create',
+      label:
+        'Paste lesson material once into questions, pairs, groups, vocabulary, and notes.',
+      positionLabel: '1',
+    },
+    {
+      id: 'assign',
+      label:
+        'Choose a worksheet-style template and review the example before saving.',
+      positionLabel: '2',
+    },
+    {
+      id: 'student-submit',
+      label:
+        'Publish a student assignment link with attempts, timer, answer reveal, and close time.',
+      positionLabel: '3',
+    },
+    {
+      id: 'review',
+      label:
+        'Review submissions, accepted answers, reteach priorities, and CSV exports.',
+      positionLabel: '4',
+    },
   ],
 });
 assert.deepEqual(
@@ -24463,8 +24488,18 @@ assert.match(
 );
 assert.match(
   entryPageViewSource,
-  /heroActions: WorksheetsPageHeroActionView\[\];[\s\S]*modeCards: WorksheetsPageModeCardView\[\];/,
-  'Worksheets page view-model should compose focused hero action and mode-card contracts.'
+  /heroActions: WorksheetsPageHeroActionView\[\];[\s\S]*modeCards: WorksheetsPageModeCardView\[\];[\s\S]*resultSignals: WorksheetsPageResultSignalView\[\];[\s\S]*workflowSteps: WorksheetsPageWorkflowStepView\[\];/,
+  'Worksheets page view-model should compose focused hero action, mode-card, result-signal, and workflow-step contracts.'
+);
+assert.match(
+  entryPageViewSource,
+  /export type WorksheetsPageResultSignalId =[\s\S]*'accepted-answers'[\s\S]*'attempts'[\s\S]*'csv-export'[\s\S]*'reteach'[\s\S]*export type WorksheetsPageResultSignalView = \{[\s\S]*id: WorksheetsPageResultSignalId;[\s\S]*label: string;[\s\S]*export type WorksheetsPageWorkflowStepId =[\s\S]*'assign'[\s\S]*'create'[\s\S]*'review'[\s\S]*'student-submit'[\s\S]*export type WorksheetsPageWorkflowStepView = \{[\s\S]*id: WorksheetsPageWorkflowStepId;[\s\S]*label: string;[\s\S]*positionLabel: string;/,
+  'Worksheets page view-model should expose stable ids for workflow steps and result signals.'
+);
+assert.doesNotMatch(
+  entryPageViewSource,
+  /resultSignals: string\[\]|workflowSteps: string\[\]/,
+  'Worksheets page view-model should not expose workflow steps or result signals as bare localized strings.'
 );
 const publicCopyMessages = {
   en: JSON.parse(
