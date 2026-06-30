@@ -364,6 +364,7 @@ export type AssignmentResultItemPerformanceTableView =
 
 type AssignmentResultPageBreadcrumb = {
   href?: string;
+  id: 'assignments' | 'current' | 'dashboard';
   isCurrentPage?: boolean;
   label: string;
 };
@@ -1965,13 +1966,15 @@ export function buildAssignmentResultsPageViewModel<
     breadcrumbs: [
       {
         href: Routes.Dashboard,
+        id: 'dashboard',
         label: assignmentResultPageCopy.breadcrumbDashboard,
       },
       {
         href: Routes.DashboardAssignments,
+        id: 'assignments',
         label: assignmentResultPageCopy.breadcrumbAssignments,
       },
-      { isCurrentPage: true, label: title },
+      { id: 'current', isCurrentPage: true, label: title },
     ],
     classroomBrief,
     completedAttemptCount,

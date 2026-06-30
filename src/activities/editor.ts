@@ -318,6 +318,7 @@ type ActivityEditPageActivitySource = Omit<ActivityEditorSource, 'content'> & {
 
 type ActivityEditorPageBreadcrumb = {
   href?: string;
+  id: 'activities' | 'current' | 'dashboard';
   isCurrentPage?: boolean;
   label: string;
 };
@@ -956,14 +957,16 @@ export function buildActivityEditPageViewModel(
     },
     breadcrumbs: [
       {
+        id: 'dashboard',
         label: activityEditPageCopy.breadcrumbDashboard,
         href: Routes.Dashboard,
       },
       {
+        id: 'activities',
         label: activityEditPageCopy.breadcrumbActivities,
         href: Routes.DashboardActivities,
       },
-      { label: title, isCurrentPage: true },
+      { id: 'current', label: title, isCurrentPage: true },
     ],
     description:
       editAccessView?.description ?? activityEditPageCopy.fallbackDescription,

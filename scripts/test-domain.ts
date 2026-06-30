@@ -4167,6 +4167,10 @@ const navbarMobileSource = readFileSync(
   'utf8'
 );
 const footerSource = readFileSync('src/components/layout/footer.tsx', 'utf8');
+const dashboardHeaderSource = readFileSync(
+  'src/components/layout/dashboard-header.tsx',
+  'utf8'
+);
 const sidebarMainSource = readFileSync(
   'src/components/layout/sidebar-main.tsx',
   'utf8'
@@ -7617,6 +7621,16 @@ for (const [source, label] of [
     `${label} should not key menu items by localized titles.`
   );
 }
+assert.match(
+  dashboardHeaderSource,
+  /interface DashboardBreadcrumbItem \{[\s\S]*id\?: string;[\s\S]*breadcrumbs\.map\(\(item, index\) =>[\s\S]*key=\{item\.id \?\? getBreadcrumbItemKey\(item\)\}/,
+  'Dashboard header breadcrumbs should prefer stable breadcrumb ids.'
+);
+assert.doesNotMatch(
+  dashboardHeaderSource,
+  /key=\{`breadcrumb-\$\{index\}`\}|key=\{`(?:sep|item)-\$\{index\}`\}/,
+  'Dashboard header breadcrumbs should not key breadcrumb rows or separators by array position.'
+);
 assert.ok(
   getNavbarLinks().some(
     (item) => item.href === Routes.Blog && item.title === 'Blog'
@@ -25810,9 +25824,9 @@ assert.deepEqual(buildActivityEditPageViewModel(undefined), {
     label: 'Back to library',
   },
   breadcrumbs: [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/dashboard/activities', label: 'Activities' },
-    { isCurrentPage: true, label: 'Edit activity' },
+    { href: '/dashboard', id: 'dashboard', label: 'Dashboard' },
+    { href: '/dashboard/activities', id: 'activities', label: 'Activities' },
+    { id: 'current', isCurrentPage: true, label: 'Edit activity' },
   ],
   description:
     'Update reusable activity content before publishing or reusing it across templates.',
@@ -27079,8 +27093,8 @@ assert.deepEqual(
   },
   {
     breadcrumbs: [
-      { href: '/dashboard', label: 'Dashboard' },
-      { isCurrentPage: true, label: 'Assignments' },
+      { href: '/dashboard', id: 'dashboard', label: 'Dashboard' },
+      { id: 'assignments', isCurrentPage: true, label: 'Assignments' },
     ],
     emptyState: {
       description:
@@ -28450,8 +28464,8 @@ assert.deepEqual(
   {
     accessTitle: editableActivityPageView.editAccessView?.title,
     backHref: editableActivityPageView.backAction.href,
-    breadcrumbLabels: editableActivityPageView.breadcrumbs.map(
-      (breadcrumb) => breadcrumb.label
+    breadcrumbItems: editableActivityPageView.breadcrumbs.map(
+      (breadcrumb) => [breadcrumb.id, breadcrumb.label]
     ),
     editorActivityId: editableActivityPageView.editor?.activityId,
     editorMode: editableActivityPageView.editor?.mode,
@@ -28461,7 +28475,11 @@ assert.deepEqual(
   {
     accessTitle: 'Edit reusable activity',
     backHref: '/dashboard/activities',
-    breadcrumbLabels: ['Dashboard', 'Activities', 'Default source summary'],
+    breadcrumbItems: [
+      ['dashboard', 'Dashboard'],
+      ['activities', 'Activities'],
+      ['current', 'Default source summary'],
+    ],
     editorActivityId: 'activity-edit-1',
     editorMode: 'edit',
     editorTitle: 'Default source summary',
@@ -30391,8 +30409,8 @@ assert.deepEqual(
   {
     activityIds: [],
     breadcrumbs: [
-      { href: '/dashboard', label: 'Dashboard' },
-      { isCurrentPage: true, label: 'Activities' },
+      { href: '/dashboard', id: 'dashboard', label: 'Dashboard' },
+      { id: 'activities', isCurrentPage: true, label: 'Activities' },
     ],
     createdPanelContext: undefined,
     emptyState: {
@@ -35423,9 +35441,13 @@ assert.deepEqual(
   {
     actionCount: 5,
     breadcrumbs: [
-      { href: '/dashboard', label: 'Dashboard' },
-      { href: '/dashboard/assignments', label: 'Assignments' },
-      { isCurrentPage: true, label: 'Assignment results' },
+      { href: '/dashboard', id: 'dashboard', label: 'Dashboard' },
+      {
+        href: '/dashboard/assignments',
+        id: 'assignments',
+        label: 'Assignments',
+      },
+      { id: 'current', isCurrentPage: true, label: 'Assignment results' },
     ],
     completedAttemptCount: 0,
     contentState: {
@@ -35632,7 +35654,7 @@ assert.deepEqual(
       ]),
     },
     breadcrumbs: scoredResultsPageView.breadcrumbs.map(
-      (breadcrumb) => breadcrumb.label
+      (breadcrumb) => [breadcrumb.id, breadcrumb.label]
     ),
     completedAttemptIds: scoredResultsPageView.completedAttempts.map(
       (attempt) => attempt.id
@@ -35834,7 +35856,11 @@ assert.deepEqual(
       headers: ['Student', 'Score', 'Accuracy', 'Answered', 'Time', 'Submitted'],
       rows: [['completed-attempt', 'Alice', '30s']],
     },
-    breadcrumbs: ['Dashboard', 'Assignments', 'Week 1 results'],
+    breadcrumbs: [
+      ['dashboard', 'Dashboard'],
+      ['assignments', 'Assignments'],
+      ['current', 'Week 1 results'],
+    ],
     completedAttemptIds: ['completed-attempt'],
     completedAttemptReviewCount: 1,
     contentState: {

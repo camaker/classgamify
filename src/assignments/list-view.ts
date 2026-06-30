@@ -197,6 +197,7 @@ type AssignmentListEmptyStateView = {
 
 type AssignmentListPageBreadcrumb = {
   href?: string;
+  id: 'assignments' | 'dashboard';
   isCurrentPage?: boolean;
   label: string;
 };
@@ -537,9 +538,11 @@ export function buildAssignmentListPageViewModel<
     breadcrumbs: [
       {
         href: Routes.Dashboard,
+        id: 'dashboard',
         label: assignmentListPageCopy.breadcrumbDashboard,
       },
       {
+        id: 'assignments',
         isCurrentPage: true,
         label: assignmentListPageCopy.breadcrumbCurrent,
       },

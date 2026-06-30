@@ -16,6 +16,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 export interface DashboardBreadcrumbItem {
+  id?: string;
   label: string;
   href?: string;
   isCurrentPage?: boolean;
@@ -47,15 +48,11 @@ export function DashboardHeader({
         <Breadcrumb className="min-w-0 flex-1">
           <BreadcrumbList className="text-base font-medium">
             {breadcrumbs.map((item, index) => (
-              <React.Fragment key={`breadcrumb-${index}`}>
+              <React.Fragment key={item.id ?? getBreadcrumbItemKey(item)}>
                 {index > 0 && (
-                  <BreadcrumbSeparator
-                    key={`sep-${index}`}
-                    className="hidden md:block"
-                  />
+                  <BreadcrumbSeparator className="hidden md:block" />
                 )}
                 <BreadcrumbItem
-                  key={`item-${index}`}
                   className={
                     index < breadcrumbs.length - 1 ? 'hidden md:block' : ''
                   }
@@ -83,4 +80,8 @@ export function DashboardHeader({
       </div>
     </header>
   );
+}
+
+function getBreadcrumbItemKey(item: DashboardBreadcrumbItem) {
+  return item.href ?? item.label;
 }

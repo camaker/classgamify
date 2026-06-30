@@ -193,6 +193,7 @@ export type CreatedActivityPanelActionView = {
 
 type ActivityLibraryPageBreadcrumb = {
   href?: string;
+  id: 'activities' | 'dashboard';
   isCurrentPage?: boolean;
   label: string;
 };
@@ -579,9 +580,11 @@ export function buildActivityLibraryPageViewModel<
     breadcrumbs: [
       {
         href: Routes.Dashboard,
+        id: 'dashboard',
         label: activityLibraryPageCopy.breadcrumbDashboard,
       },
       {
+        id: 'activities',
         isCurrentPage: true,
         label: activityLibraryPageCopy.breadcrumbCurrent,
       },
