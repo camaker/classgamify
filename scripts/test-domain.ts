@@ -5313,6 +5313,16 @@ assert.doesNotMatch(
   /@\/locale\/paraglide\/messages/,
   'Public answer feedback component should render localized text prepared by the assignment-domain feedback view.'
 );
+assert.match(
+  publicAnswerFeedbackSource,
+  /type PublicAnswerFeedbackView[\s\S]*const feedback: PublicAnswerFeedbackView = buildPublicAnswerFeedbackView/,
+  'Public answer feedback component should consume the explicit assignment-domain feedback view contract.'
+);
+assert.doesNotMatch(
+  publicAnswerFeedbackSource,
+  /ReturnType<\s*typeof buildPublicAnswerFeedbackView/,
+  'Public answer feedback component should not infer its feedback view contract from the builder return type.'
+);
 assert.doesNotMatch(
   publicAnswerFeedbackSource,
   /\{feedback\.(?:correctAnswerLabel|acceptedAnswersLabel|explanationLabel|submittedAnswerLabel)\}:/,
@@ -7908,8 +7918,8 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type PublicAnswerFeedbackStatus =[\s\S]*'correct'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*status: PublicAnswerFeedbackStatus[\s\S]*getPublicAnswerFeedbackStatus\([\s\S]*\): PublicAnswerFeedbackStatus/,
-  'Student answer feedback should expose an explicit public feedback status contract.'
+  /export type PublicAnswerFeedbackStatus =[\s\S]*'correct'[\s\S]*'needs-review'[\s\S]*'unanswered'[\s\S]*export type PublicAnswerFeedbackDetailLineId =[\s\S]*'accepted-answers'[\s\S]*'correct-answer'[\s\S]*'explanation'[\s\S]*'submitted-answer'[\s\S]*export type PublicAnswerFeedbackDetailLine = \{[\s\S]*id: PublicAnswerFeedbackDetailLineId;[\s\S]*text: string;[\s\S]*export type PublicAnswerFeedbackView = \{[\s\S]*detailLines: PublicAnswerFeedbackDetailLine\[\];[\s\S]*status: PublicAnswerFeedbackStatus;[\s\S]*getPublicAnswerFeedbackStatus\([\s\S]*\): PublicAnswerFeedbackStatus/,
+  'Student answer feedback should expose explicit public feedback status, detail-line, and view contracts.'
 );
 assert.doesNotMatch(
   studentRunnerViewSource,

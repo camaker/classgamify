@@ -242,7 +242,18 @@ export type PublicAnswerFeedbackStatus =
   | 'needs-review'
   | 'unanswered';
 
-type PublicAnswerFeedbackView = {
+export type PublicAnswerFeedbackDetailLineId =
+  | 'accepted-answers'
+  | 'correct-answer'
+  | 'explanation'
+  | 'submitted-answer';
+
+export type PublicAnswerFeedbackDetailLine = {
+  id: PublicAnswerFeedbackDetailLineId;
+  text: string;
+};
+
+export type PublicAnswerFeedbackView = {
   acceptedAnswersLabel: string;
   acceptedAnswersText: string | null;
   correctAnswer: string;
@@ -257,15 +268,6 @@ type PublicAnswerFeedbackView = {
   submittedAnswer: string;
   submittedAnswerLabel: string;
   submittedAnswerText: string;
-};
-
-type PublicAnswerFeedbackDetailLine = {
-  id:
-    | 'accepted-answers'
-    | 'correct-answer'
-    | 'explanation'
-    | 'submitted-answer';
-  text: string;
 };
 
 export type StudentRunnerInstructionView = {
