@@ -1137,6 +1137,20 @@ assert.doesNotMatch(
   /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)|from '@\/activities\/library-filters'/,
   'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel and avoid library-filter search parsing.'
 );
+const pricingRouteSource = readFileSync(
+  'src/routes/(pages)/pricing.tsx',
+  'utf8'
+);
+assert.match(
+  pricingRouteSource,
+  /pageView\.faq\.items\.map[\s\S]*<AccordionItem key=\{item\.id\} value=\{item\.id\}>[\s\S]*item\.question[\s\S]*item\.answer/,
+  'The pricing route should render FAQ accordion rows with stable FAQ ids.'
+);
+assert.doesNotMatch(
+  pricingRouteSource,
+  /<AccordionItem key=\{item\.question\} value=\{item\.question\}>/,
+  'The pricing route should not key FAQ accordion rows by localized question copy.'
+);
 const activityEditRouteSource = readFileSync(
   'src/routes/dashboard/activities/$activityId.tsx',
   'utf8'
@@ -24121,13 +24135,13 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
-  buildPricingFaqItems().map((item) => item.question),
+  buildPricingFaqItems().map((item) => [item.id, item.question]),
   [
-    'What is the free plan for?',
-    'What will Pro unlock?',
-    'Why are there only a few templates first?',
-    'Do students need accounts?',
-    'Can schools or tutoring teams use it?',
+    ['free', 'What is the free plan for?'],
+    ['pro', 'What will Pro unlock?'],
+    ['templates', 'Why are there only a few templates first?'],
+    ['student-accounts', 'Do students need accounts?'],
+    ['schools', 'Can schools or tutoring teams use it?'],
   ]
 );
 assert.deepEqual(buildPricingPageViewModel().faq.items, buildPricingFaqItems());

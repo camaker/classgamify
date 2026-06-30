@@ -133,7 +133,7 @@ function PricingPage() {
             className="rounded-lg border px-4"
           >
             {pageView.faq.items.map((item) => (
-              <AccordionItem key={item.question} value={item.question}>
+              <AccordionItem key={item.id} value={item.id}>
                 <AccordionTrigger className="text-left">
                   {item.question}
                 </AccordionTrigger>

@@ -204,8 +204,16 @@ export type PricingPageViewModel = {
 
 export type PricingValueCardId = 'ai' | 'assignments' | 'templates';
 
-type PricingFaqItemView = {
+export type PricingFaqItemId =
+  | 'free'
+  | 'pro'
+  | 'schools'
+  | 'student-accounts'
+  | 'templates';
+
+export type PricingFaqItemView = {
   answer: string;
+  id: PricingFaqItemId;
   question: string;
 };
 
@@ -587,22 +595,27 @@ export function buildPricingFaqItems(): PricingFaqItemView[] {
   return [
     {
       answer: m.pricing_faq_free_answer(),
+      id: 'free',
       question: m.pricing_faq_free_question(),
     },
     {
       answer: m.pricing_faq_pro_answer(),
+      id: 'pro',
       question: m.pricing_faq_pro_question(),
     },
     {
       answer: m.pricing_faq_templates_answer(),
+      id: 'templates',
       question: m.pricing_faq_templates_question(),
     },
     {
       answer: m.pricing_faq_student_accounts_answer(),
+      id: 'student-accounts',
       question: m.pricing_faq_student_accounts_question(),
     },
     {
       answer: m.pricing_faq_schools_answer(),
+      id: 'schools',
       question: m.pricing_faq_schools_question(),
     },
   ];
