@@ -2,6 +2,7 @@ import type { AssignmentStatus } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
 export type AssignmentDate = Date | string | null | undefined;
+export type AssignmentLifecycleNow = AssignmentDate | number;
 export type AssignmentLifecycleStatus = 'closed' | 'draft' | 'expired' | 'open';
 export const ASSIGNMENT_MANAGED_STATUSES = ['published', 'closed'] as const;
 export type ManagedAssignmentStatus = Extract<
@@ -32,26 +33,45 @@ export type AssignmentStatusActionExecutionPlan =
       type: 'update-status';
     };
 
-function getAssignmentTimestamp(value: AssignmentDate) {
-  if (!value) return undefined;
+export function normalizeAssignmentLifecycleTimestamp(
+  value: AssignmentLifecycleNow
+) {
+  if (value === null || value === undefined || value === '') return undefined;
 
   const timestamp =
-    value instanceof Date ? value.getTime() : new Date(value).getTime();
-  return Number.isNaN(timestamp) ? undefined : timestamp;
+    value instanceof Date
+      ? value.getTime()
+      : typeof value === 'number'
+        ? value
+        : new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : undefined;
+}
+
+export function normalizeAssignmentLifecycleNowTimestamp(
+  now: AssignmentLifecycleNow = Date.now()
+) {
+  return normalizeAssignmentLifecycleTimestamp(now) ?? Date.now();
+}
+
+export function normalizeAssignmentLifecycleNowDate(
+  now: AssignmentLifecycleNow = new Date()
+) {
+  return new Date(normalizeAssignmentLifecycleNowTimestamp(now));
 }
 
 export function isAssignmentExpired(
   expiresAt: AssignmentDate,
-  now = Date.now()
+  now: AssignmentLifecycleNow = Date.now()
 ) {
-  const timestamp = getAssignmentTimestamp(expiresAt);
-  return timestamp !== undefined && timestamp <= now;
+  const timestamp = normalizeAssignmentLifecycleTimestamp(expiresAt);
+  const nowTimestamp = normalizeAssignmentLifecycleNowTimestamp(now);
+  return timestamp !== undefined && timestamp <= nowTimestamp;
 }
 
 export function isAssignmentOpen(
   status: AssignmentStatus | string,
   expiresAt: AssignmentDate,
-  now = Date.now()
+  now: AssignmentLifecycleNow = Date.now()
 ) {
   return getAssignmentLifecycleStatus(status, expiresAt, now) === 'open';
 }
@@ -59,7 +79,7 @@ export function isAssignmentOpen(
 export function getAssignmentLifecycleStatus(
   status: AssignmentStatus | string,
   expiresAt: AssignmentDate,
-  now = Date.now()
+  now: AssignmentLifecycleNow = Date.now()
 ): AssignmentLifecycleStatus {
   if (status === 'published') {
     return isAssignmentExpired(expiresAt, now) ? 'expired' : 'open';
@@ -78,7 +98,7 @@ export function matchesAssignmentLifecycleStatus({
 }: {
   expiresAt: AssignmentDate;
   filter: AssignmentLifecycleStatus;
-  now?: number;
+  now?: AssignmentLifecycleNow;
   status: AssignmentStatus | string;
 }) {
   return getAssignmentLifecycleStatus(status, expiresAt, now) === filter;
@@ -90,7 +110,7 @@ export function getAssignmentSubmissionErrorMessage({
   status,
 }: {
   expiresAt: AssignmentDate;
-  now?: number;
+  now?: AssignmentLifecycleNow;
   status: AssignmentStatus | string;
 }) {
   const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
@@ -108,7 +128,7 @@ export function getAssignmentSubmissionErrorMessage({
 
 export function assertAssignmentAcceptsSubmissions(input: {
   expiresAt: AssignmentDate;
-  now?: number;
+  now?: AssignmentLifecycleNow;
   status: AssignmentStatus | string;
 }) {
   const errorMessage = getAssignmentSubmissionErrorMessage(input);
@@ -121,7 +141,7 @@ export function assertAssignmentAcceptsSubmissions(input: {
 export function getAssignmentStatusLabel(
   status: AssignmentStatus | string,
   expiresAt: AssignmentDate,
-  now = Date.now()
+  now: AssignmentLifecycleNow = Date.now()
 ) {
   const lifecycleStatus = getAssignmentLifecycleStatus(status, expiresAt, now);
 
@@ -141,7 +161,7 @@ export function getAssignmentStatusTransitionError({
   currentStatus: AssignmentStatus;
   expiresAt: AssignmentDate;
   nextStatus: ManagedAssignmentStatus;
-  now?: number;
+  now?: AssignmentLifecycleNow;
 }) {
   if (currentStatus === nextStatus) {
     return nextStatus === 'published'
@@ -203,7 +223,7 @@ export function buildAssignmentStatusAction({
   currentStatus: AssignmentStatus;
   expiresAt: AssignmentDate;
   isPersisted?: boolean;
-  now?: number;
+  now?: AssignmentLifecycleNow;
 }): AssignmentStatusAction | undefined {
   if (!isPersisted) return undefined;
 
@@ -255,7 +275,7 @@ export function assertAssignmentStatusTransition(input: {
   currentStatus: AssignmentStatus;
   expiresAt: AssignmentDate;
   nextStatus: ManagedAssignmentStatus;
-  now?: number;
+  now?: AssignmentLifecycleNow;
 }) {
   const errorMessage = getAssignmentStatusTransitionError(input);
   if (!errorMessage) return;

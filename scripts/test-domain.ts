@@ -563,8 +563,12 @@ import {
   getAssignmentStatusActionCopy,
   getAssignmentStatusLabel,
   getAssignmentStatusTransitionError,
+  isAssignmentExpired,
   isAssignmentOpen,
   matchesAssignmentLifecycleStatus,
+  normalizeAssignmentLifecycleNowDate,
+  normalizeAssignmentLifecycleNowTimestamp,
+  normalizeAssignmentLifecycleTimestamp,
 } from '@/assignments/lifecycle';
 import { buildAssignmentLifecycleStatusFilter } from '@/assignments/lifecycle-query';
 import {
@@ -11323,6 +11327,30 @@ assert.deepEqual(getAssignmentStatusActionCopy('published'), {
 });
 const assignmentLifecycleNow = new Date('2026-01-01T10:00:00.000Z').getTime();
 assert.equal(
+  normalizeAssignmentLifecycleTimestamp(
+    new Date('2026-01-01T10:00:00.000Z')
+  ),
+  assignmentLifecycleNow
+);
+assert.equal(
+  normalizeAssignmentLifecycleTimestamp('2026-01-01T10:00:00.000Z'),
+  assignmentLifecycleNow
+);
+assert.equal(
+  normalizeAssignmentLifecycleTimestamp(Number.POSITIVE_INFINITY),
+  undefined
+);
+assert.equal(normalizeAssignmentLifecycleTimestamp(Number.NaN), undefined);
+assert.equal(normalizeAssignmentLifecycleTimestamp('not-a-date'), undefined);
+assert.equal(
+  normalizeAssignmentLifecycleNowTimestamp('2026-01-01T10:00:00.000Z'),
+  assignmentLifecycleNow
+);
+assert.equal(
+  normalizeAssignmentLifecycleNowDate('2026-01-01T10:00:00.000Z').toISOString(),
+  '2026-01-01T10:00:00.000Z'
+);
+assert.equal(
   getAssignmentLifecycleStatus(
     'published',
     new Date('2026-01-01T10:00:01.000Z'),
@@ -11345,6 +11373,14 @@ assert.equal(
     assignmentLifecycleNow
   ),
   'open'
+);
+assert.equal(
+  getAssignmentLifecycleStatus(
+    'published',
+    '2026-01-01T10:00:00.000Z',
+    '2026-01-01T10:00:00.000Z'
+  ),
+  'expired'
 );
 assert.equal(
   getAssignmentLifecycleStatus('closed', null, assignmentLifecycleNow),
@@ -11385,6 +11421,16 @@ assert.match(
   /assertAssignmentStatusTransition[\s\S]*const errorMessage = getAssignmentStatusTransitionError\(input\)[\s\S]*if \(!errorMessage\) return[\s\S]*throw new Error\(errorMessage\)/,
   'Assignment status assertions should throw the shared transition error message.'
 );
+assert.match(
+  assignmentLifecycleSource,
+  /export function normalizeAssignmentLifecycleTimestamp[\s\S]*Number\.isFinite\(timestamp\)[\s\S]*export function normalizeAssignmentLifecycleNowTimestamp[\s\S]*normalizeAssignmentLifecycleTimestamp\(now\) \?\? Date\.now\(\)/,
+  'Assignment lifecycle should normalize both stored expiry dates and current-time inputs through shared helpers.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /isAssignmentExpired[\s\S]*const timestamp = normalizeAssignmentLifecycleTimestamp\(expiresAt\)[\s\S]*const nowTimestamp = normalizeAssignmentLifecycleNowTimestamp\(now\)[\s\S]*timestamp <= nowTimestamp/,
+  'Assignment expiry checks should compare normalized lifecycle timestamps.'
+);
 assert.doesNotMatch(
   assignmentLifecycleSource,
   /function canUpdateAssignmentStatus/,
@@ -11397,6 +11443,24 @@ assert.equal(
     assignmentLifecycleNow
   ),
   true
+);
+assert.equal(
+  isAssignmentExpired(
+    new Date('2026-01-01T10:00:00.000Z'),
+    new Date('2026-01-01T10:00:00.000Z')
+  ),
+  true
+);
+assert.equal(
+  isAssignmentExpired(
+    new Date(Date.now() + 60_000),
+    Number.NEGATIVE_INFINITY
+  ),
+  false
+);
+assert.equal(
+  isAssignmentExpired('not-a-date', assignmentLifecycleNow),
+  false
 );
 assert.equal(
   isAssignmentOpen(
@@ -20162,13 +20226,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentLifecycleQuerySource,
-  /export function buildAssignmentLifecycleStatusFilter[\s\S]*status === 'open'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNull\(assignment\.expiresAt\)[\s\S]*gt\(assignment\.expiresAt, now\)/,
-  'Assignment lifecycle query helper should encode the open-link SQL filter.'
+  /export function buildAssignmentLifecycleStatusFilter[\s\S]*const normalizedNow = normalizeAssignmentLifecycleNowDate\(now\)[\s\S]*status === 'open'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNull\(assignment\.expiresAt\)[\s\S]*gt\(assignment\.expiresAt, normalizedNow\)/,
+  'Assignment lifecycle query helper should encode the open-link SQL filter with normalized current time.'
 );
 assert.match(
   assignmentLifecycleQuerySource,
-  /status === 'expired'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNotNull\(assignment\.expiresAt\)[\s\S]*lte\(assignment\.expiresAt, now\)/,
-  'Assignment lifecycle query helper should encode the expired-link SQL filter.'
+  /status === 'expired'[\s\S]*eq\(assignment\.status, 'published'\)[\s\S]*isNotNull\(assignment\.expiresAt\)[\s\S]*lte\(assignment\.expiresAt, normalizedNow\)/,
+  'Assignment lifecycle query helper should encode the expired-link SQL filter with normalized current time.'
 );
 assert.match(
   assignmentsApiSource,
