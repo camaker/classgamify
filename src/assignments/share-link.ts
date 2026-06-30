@@ -53,6 +53,7 @@ export type AssignmentShareLinkCopyExecutionPlan =
   | {
       failureMessage: string;
       message: string;
+      reason: 'disabled' | 'missing-share-slug';
       type: 'blocked';
     }
   | {
@@ -169,6 +170,16 @@ export function buildAssignmentShareLinkCopyExecutionPlan({
     return {
       failureMessage: assignmentShareLinkActionCopy.failureMessage,
       message: disabledMessage ?? assignmentShareLinkActionCopy.failureMessage,
+      reason: 'disabled',
+      type: 'blocked',
+    };
+  }
+
+  if (!normalizeAssignmentShareSlug(shareSlug)) {
+    return {
+      failureMessage: assignmentShareLinkActionCopy.failureMessage,
+      message: assignmentShareLinkActionCopy.failureMessage,
+      reason: 'missing-share-slug',
       type: 'blocked',
     };
   }

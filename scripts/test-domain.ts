@@ -1681,6 +1681,16 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentShareLinkSource,
+  /reason: 'disabled' \| 'missing-share-slug'[\s\S]*reason: 'disabled'[\s\S]*reason: 'missing-share-slug'/,
+  'Share-link copy execution plans should expose structured blocked reasons.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /if \(!normalizeAssignmentShareSlug\(shareSlug\)\)[\s\S]*reason: 'missing-share-slug'/,
+  'Share-link copy execution plans should block blank share slugs before building a URL.'
+);
+assert.match(
+  assignmentShareLinkSource,
   /export function normalizeShareBaseUrl[\s\S]*\.normalize\('NFKC'\)[\s\S]*\.replace\(\s*\/\\s\+\/gu,\s*''\s*\)[\s\S]*normalizeShareAbsoluteUrl\(normalized\)[\s\S]*normalizeShareAbsoluteUrl\(`https:\/\/\$\{normalized\}`\)/,
   'Share-link base URL normalization should remove whitespace and repair schemeless host URLs before copying student links.'
 );
@@ -13457,6 +13467,7 @@ assert.deepEqual(
   {
     failureMessage: 'Student link could not be copied.',
     message: 'This assignment is closed.',
+    reason: 'disabled',
     type: 'blocked',
   }
 );
@@ -13468,6 +13479,18 @@ assert.deepEqual(
   {
     failureMessage: 'Student link could not be copied.',
     message: 'Student link could not be copied.',
+    reason: 'disabled',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    shareSlug: '   ',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    message: 'Student link could not be copied.',
+    reason: 'missing-share-slug',
     type: 'blocked',
   }
 );
