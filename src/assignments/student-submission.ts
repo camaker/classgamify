@@ -931,10 +931,19 @@ export function buildAttemptSubmissionAnswers({
     runtimeItems,
   });
 
-  return getUniqueSubmissionRuntimeItemEntries(runtimeItems).map((entry) => ({
-    answer: normalizedAnswers[entry.itemId] ?? '',
-    itemId: entry.itemId,
-  }));
+  return getUniqueSubmissionRuntimeItemEntries(runtimeItems).flatMap(
+    (entry) => {
+      const answer = normalizedAnswers[entry.itemId] ?? '';
+      if (!isStudentAnswerFilled(answer)) return [];
+
+      return [
+        {
+          answer,
+          itemId: entry.itemId,
+        },
+      ];
+    }
+  );
 }
 
 export function buildStudentAnswerChange({

@@ -10537,8 +10537,6 @@ assert.deepEqual(
   }),
   [
     { answer: 'apple', itemId: 'item-1' },
-    { answer: '', itemId: 'item-2' },
-    { answer: '', itemId: 'item-3' },
   ]
 );
 assert.deepEqual(
@@ -10550,6 +10548,16 @@ assert.deepEqual(
     { answer: 'Apple', itemId: 'item-1' },
     { answer: 'banana', itemId: 'item-2' },
   ]
+);
+assert.deepEqual(
+  buildAttemptSubmissionAnswers({
+    answers: {
+      'item-1': '\u00A0　\t',
+      'item-2': ' Ｂａｎａｎａ ',
+    },
+    runtimeItems: submissionRuntimeItems,
+  }),
+  [{ answer: 'Banana', itemId: 'item-2' }]
 );
 assert.deepEqual(
   normalizeStudentAnswersForRuntimeItems({
@@ -11164,8 +11172,6 @@ assert.deepEqual(
   {
     answers: [
       { answer: 'apple', itemId: 'item-1' },
-      { answer: '', itemId: 'item-2' },
-      { answer: '', itemId: 'item-3' },
     ],
     durationSeconds: 89,
     shareSlug: 'share-one',
@@ -11184,8 +11190,6 @@ assert.deepEqual(
   {
     answers: [
       { answer: 'apple', itemId: 'item-1' },
-      { answer: '', itemId: 'item-2' },
-      { answer: '', itemId: 'item-3' },
     ],
     shareSlug: 'share-one',
     studentName: 'Ava Chen',
@@ -11203,8 +11207,6 @@ assert.deepEqual(
   {
     answers: [
       { answer: 'apple', itemId: 'item-1' },
-      { answer: '', itemId: 'item-2' },
-      { answer: '', itemId: 'item-3' },
     ],
     durationSeconds: 5,
     shareSlug: 'share-one',
@@ -11224,8 +11226,6 @@ assert.deepEqual(
     anonymousToken: 'anonymous-token-1',
     answers: [
       { answer: 'apple', itemId: 'item-1' },
-      { answer: '', itemId: 'item-2' },
-      { answer: '', itemId: 'item-3' },
     ],
     shareSlug: 'share-two',
   }
@@ -11279,8 +11279,6 @@ assert.deepEqual(
       anonymousToken: 'created-plan-token',
       answers: [
         { answer: 'apple', itemId: 'item-1' },
-        { answer: '', itemId: 'item-2' },
-        { answer: '', itemId: 'item-3' },
       ],
       durationSeconds: 6,
       shareSlug: 'share-two',
@@ -11317,8 +11315,6 @@ assert.deepEqual(
     input: {
       answers: [
         { answer: 'apple', itemId: 'item-1' },
-        { answer: '', itemId: 'item-2' },
-        { answer: '', itemId: 'item-3' },
       ],
       durationSeconds: 10,
       shareSlug: 'share-three',
