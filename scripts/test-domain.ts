@@ -13283,6 +13283,21 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+assert.deepEqual(
+  buildAssignmentDeliverySummary({
+    expiresAt: null,
+    maxAttempts: 2,
+    timeLimitSeconds: 60.8,
+  }).map((item) => [item.id, item.value]),
+  [
+    ['attempts', '2 max'],
+    ['timer', '1 min'],
+    ['closes', 'No close time'],
+    ['identity', 'Names'],
+    ['answerReveal', 'After submit'],
+    ['itemOrder', 'Shuffled'],
+  ]
+);
 const partialAssignmentSettingsSummaryView = buildAssignmentSettingsSummaryView(
   {
     expiresAt: null,
@@ -13492,6 +13507,31 @@ assert.deepEqual(
       'answerReveal',
     ],
     showsCorrectAnswers: false,
+  }
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    expiresAt: null,
+    itemCount: 3,
+    maxAttempts: 2,
+    timeLimitSeconds: 60.8,
+  }).summary,
+  {
+    collectsStudentName: true,
+    hasAttemptLimit: true,
+    hasCloseTime: false,
+    hasTimer: true,
+    itemCount: 3,
+    ruleCount: 6,
+    ruleIds: [
+      'items',
+      'attempts',
+      'timer',
+      'closes',
+      'identity',
+      'answerReveal',
+    ],
+    showsCorrectAnswers: true,
   }
 );
 assert.equal(
@@ -21443,6 +21483,16 @@ assert.match(
   assignmentDeliverySummarySource,
   /export type AssignmentDeliverySummaryItem = \{[\s\S]*id: AssignmentDeliverySummaryId;[\s\S]*label: string;[\s\S]*value: string;/,
   'Assignment delivery summary domain should expose an explicit delivery summary item contract.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /normalizeAttemptTimeLimitSeconds[\s\S]*formatAssignmentTimeLimit[\s\S]*normalizeAttemptTimeLimitSeconds\(seconds\)/,
+  'Assignment delivery summaries should reuse the shared attempt time-limit normalizer.'
+);
+assert.doesNotMatch(
+  assignmentDeliverySummarySource,
+  /Number\.isInteger\(seconds\)/,
+  'Assignment delivery summaries should not reject legacy fractional timer values with local integer checks.'
 );
 assert.match(
   printableWorksheetSource,

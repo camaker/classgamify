@@ -1,5 +1,6 @@
 import type { AssignmentSettings } from '@/activities/types';
 import type { AssignmentDate } from '@/assignments/lifecycle';
+import { normalizeAttemptTimeLimitSeconds } from '@/assignments/attempt-duration';
 import {
   defaultAssignmentSettings,
   resolveAssignmentSettings,
@@ -306,7 +307,7 @@ function buildPublicAssignmentRuleSummaryStats({
     collectsStudentName: collectStudentName,
     hasAttemptLimit: isPositiveWholeNumber(maxAttempts),
     hasCloseTime: hasAssignmentCloseTime(expiresAt),
-    hasTimer: isPositiveWholeNumber(timeLimitSeconds),
+    hasTimer: normalizeAttemptTimeLimitSeconds(timeLimitSeconds) !== undefined,
     itemCount: normalizeAssignmentItemCount(itemCount),
     ruleCount: ruleIds.length,
     ruleIds,
@@ -342,10 +343,12 @@ export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
 }
 
 function formatAssignmentTimeLimit(seconds?: number | null) {
-  if (!isPositiveWholeNumber(seconds))
+  const normalizedSeconds = normalizeAttemptTimeLimitSeconds(seconds);
+  if (normalizedSeconds === undefined) {
     return m.assignment_delivery_timer_none();
+  }
 
-  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  const minutes = Math.max(1, Math.ceil(normalizedSeconds / 60));
   return m.assignment_delivery_timer_minutes({ minutes });
 }
 
