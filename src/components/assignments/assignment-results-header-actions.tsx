@@ -50,7 +50,7 @@ export function AssignmentResultsHeaderActions({
 function AssignmentResultsHeaderSharePreviewLink({
   shareAction,
 }: {
-  shareAction: AssignmentResultsHeaderShareAction;
+  shareAction: AssignmentResultHeaderShareAction;
 }) {
   if (!shareAction.isAvailable) {
     return (
@@ -78,7 +78,7 @@ function AssignmentResultsHeaderSharePreviewLink({
 function AssignmentResultsHeaderSharePath({
   shareAction,
 }: {
-  shareAction: AssignmentResultsHeaderShareAction;
+  shareAction: AssignmentResultHeaderShareAction;
 }) {
   return (
     <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
@@ -92,7 +92,7 @@ function AssignmentResultsHeaderSharePath({
 function AssignmentResultsHeaderCopyShareAction({
   shareAction,
 }: {
-  shareAction: AssignmentResultsHeaderShareAction;
+  shareAction: AssignmentResultHeaderShareAction;
 }) {
   return (
     <CopyAssignmentShareLinkButton
@@ -108,7 +108,7 @@ function AssignmentResultsHeaderCopyShareAction({
 function AssignmentResultsHeaderPrintActionLink({
   printAction,
 }: {
-  printAction: AssignmentResultsHeaderPrintAction;
+  printAction: AssignmentResultHeaderPrintAction;
 }) {
   return (
     <Link
@@ -129,7 +129,7 @@ function AssignmentResultsHeaderPrintActionLink({
 function AssignmentResultsHeaderShareDisabledReason({
   shareAction,
 }: {
-  shareAction: AssignmentResultsHeaderShareAction;
+  shareAction: AssignmentResultHeaderShareAction;
 }) {
   if (!shareAction.disabledReason) return null;
 

@@ -4752,6 +4752,11 @@ assert.match(
   /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction/,
   'Assignment result header actions should import explicit assignment-domain print and share action contracts.'
 );
+assert.doesNotMatch(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultsHeader(?:Print|Share)Action\b/,
+  'Assignment result header actions should not reference misspelled local header action type names.'
+);
 assert.match(
   assignmentResultsHeaderActionsSource,
   /AssignmentResultAction[\s\S]*AssignmentResultActionButton[\s\S]*resultActionIconByAction: Record<[\s\S]*AssignmentResultAction/,
