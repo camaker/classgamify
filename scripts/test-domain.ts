@@ -17450,6 +17450,34 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  summarizePublicAttemptReviewItemsForTotal({
+    items: [
+      ...studentRunnerSubmissionResponse.reviewItems,
+      {
+        acceptedAnswers: ['Cold'],
+        correct: false,
+        correctAnswer: 'Cold',
+        explanation: undefined,
+        itemId: 'pair-1',
+        submitted: false,
+        submittedAnswer: '',
+      },
+    ],
+    showCorrectAnswers: true,
+    totalItemCount: 2,
+  }),
+  {
+    correctItemCount: 1,
+    hiddenBySettings: false,
+    needsReviewItemCount: 1,
+    reviewItemCount: 2,
+    showCorrectAnswers: true,
+    submittedItemCount: 1,
+    totalItemCount: 2,
+    unansweredItemCount: 1,
+  }
+);
+assert.deepEqual(
   buildStudentRunnerSubmissionSuccessState({
     executionPlan: {
       anonymousToken: 'browser-token-1',
@@ -18539,7 +18567,7 @@ assert.deepEqual(
   {
     correctItemCount: 1,
     hiddenBySettings: false,
-    needsReviewItemCount: 0,
+    needsReviewItemCount: 1,
     reviewItemCount: 2,
     showCorrectAnswers: true,
     submittedItemCount: 1,

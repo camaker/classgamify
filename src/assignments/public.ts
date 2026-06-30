@@ -467,11 +467,14 @@ export function summarizePublicAttemptReviewItemsForTotal({
   );
   const reviewItemCount = normalizeRuntimeDisplayCount(items.length);
   const normalizedTotalItemCount = normalizeRuntimeDisplayCount(totalItemCount);
+  const needsReviewItemCount = showCorrectAnswers
+    ? Math.max(0, normalizedTotalItemCount - correctItemCount)
+    : 0;
 
   return {
     correctItemCount,
     hiddenBySettings: !showCorrectAnswers,
-    needsReviewItemCount: Math.max(0, submittedItemCount - correctItemCount),
+    needsReviewItemCount,
     reviewItemCount,
     showCorrectAnswers,
     submittedItemCount,
