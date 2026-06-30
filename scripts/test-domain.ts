@@ -3551,6 +3551,11 @@ assert.match(
   'Activity editor form should consume the activity-domain AI draft generation execution plan.'
 );
 assert.match(
+  activityEditorSource,
+  /export type ActivityEditorDraftGenerationBlockedReason =[\s\S]*'auth-required'[\s\S]*'source-required'[\s\S]*'source-too-long'[\s\S]*reason: ActivityEditorDraftGenerationBlockedReason/,
+  'Activity editor draft generation gates and blocked plans should expose structured blocked reasons.'
+);
+assert.match(
   activityEditorFormSource,
   /buildActivityEditorDraftGenerationExecutionPlan\(\{[\s\S]*current,[\s\S]*draftFocus,[\s\S]*hasUser: Boolean\(session\?\.user\),[\s\S]*itemCount: draftItemCount,[\s\S]*sourceText: draftSourceText,[\s\S]*\}\)/,
   'Activity editor form should build AI draft generation execution plans from auth, source text, focus, item count, and current values.'
@@ -3599,6 +3604,11 @@ assert.match(
   activityEditorFormSource,
   /buildActivityEditorSaveExecutionPlan/,
   'Activity editor form should consume the activity-domain save execution plan.'
+);
+assert.match(
+  activityEditorSource,
+  /export type ActivityEditorSaveBlockedReason =[\s\S]*'auth-required'[\s\S]*'missing-activity-id'[\s\S]*reason: ActivityEditorSaveBlockedReason/,
+  'Activity editor save gates and blocked plans should expose structured blocked reasons.'
 );
 assert.match(
   activityEditorFormSource,
@@ -29364,6 +29374,7 @@ assert.deepEqual(
   {
     canGenerate: false,
     errorMessage: 'Sign in to generate AI activity drafts.',
+    reason: 'auth-required',
     sourceText: 'apples',
   }
 );
@@ -29375,6 +29386,7 @@ assert.deepEqual(
   {
     canGenerate: false,
     errorMessage: 'Add a topic, vocabulary list, or source notes first.',
+    reason: 'source-required',
     sourceText: '',
   }
 );
@@ -29386,6 +29398,7 @@ assert.deepEqual(
   {
     canGenerate: false,
     errorMessage: 'Source notes are too long. Keep them under 2000 characters.',
+    reason: 'source-too-long',
     sourceText: 'A'.repeat(ACTIVITY_DRAFT_SOURCE_MAX_LENGTH + 1),
   }
 );
@@ -29520,6 +29533,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity draft could not be generated.',
     message: 'Sign in to generate AI activity drafts.',
+    reason: 'auth-required',
     type: 'blocked',
   }
 );
@@ -29534,6 +29548,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity draft could not be generated.',
     message: 'Add a topic, vocabulary list, or source notes first.',
+    reason: 'source-required',
     type: 'blocked',
   }
 );
@@ -29548,6 +29563,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity draft could not be generated.',
     message: 'Source notes are too long. Keep them under 2000 characters.',
+    reason: 'source-too-long',
     type: 'blocked',
   }
 );
@@ -29590,6 +29606,7 @@ assert.deepEqual(
     canSave: false,
     errorMessage: 'Sign in to save activities to your teacher library.',
     mode: 'create',
+    reason: 'auth-required',
   }
 );
 assert.deepEqual(
@@ -29601,6 +29618,7 @@ assert.deepEqual(
     canSave: false,
     errorMessage: 'Activity could not be identified for editing.',
     mode: 'edit',
+    reason: 'missing-activity-id',
   }
 );
 assert.deepEqual(
@@ -29642,6 +29660,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be saved.',
     message: 'Sign in to save activities to your teacher library.',
+    reason: 'auth-required',
     type: 'blocked',
   }
 );
@@ -29654,6 +29673,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be saved.',
     message: 'Activity could not be identified for editing.',
+    reason: 'missing-activity-id',
     type: 'blocked',
   }
 );

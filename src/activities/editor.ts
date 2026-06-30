@@ -194,10 +194,16 @@ export type ActivityEditorAiDraftPanelView = {
 export type ActivityEditorAiDraftSourceCapabilityCardView =
   ActivityEditorAiDraftSourceCapabilityView;
 
+export type ActivityEditorDraftGenerationBlockedReason =
+  | 'auth-required'
+  | 'source-required'
+  | 'source-too-long';
+
 type ActivityEditorDraftGenerationGate =
   | {
       canGenerate: false;
       errorMessage: string;
+      reason: ActivityEditorDraftGenerationBlockedReason;
       sourceText: string;
     }
   | {
@@ -209,6 +215,7 @@ export type ActivityEditorDraftGenerationExecutionPlan =
   | {
       failureMessage: string;
       message: string;
+      reason: ActivityEditorDraftGenerationBlockedReason;
       type: 'blocked';
     }
   | {
@@ -227,11 +234,16 @@ export type ActivityEditorModeView = {
   title: string;
 };
 
+export type ActivityEditorSaveBlockedReason =
+  | 'auth-required'
+  | 'missing-activity-id';
+
 type ActivityEditorSaveGate =
   | {
       canSave: false;
       errorMessage: string;
       mode: ActivityEditorMode;
+      reason: ActivityEditorSaveBlockedReason;
     }
   | {
       canSave: true;
@@ -247,6 +259,7 @@ export type ActivityEditorSaveExecutionPlan =
   | {
       failureMessage: string;
       message: string;
+      reason: ActivityEditorSaveBlockedReason;
       type: 'blocked';
     }
   | {
@@ -641,6 +654,7 @@ export function buildActivityEditorDraftGenerationGate({
     return {
       canGenerate: false,
       errorMessage: m.activity_form_toast_sign_in_generate_draft(),
+      reason: 'auth-required',
       sourceText: trimmedSourceText,
     };
   }
@@ -649,6 +663,7 @@ export function buildActivityEditorDraftGenerationGate({
     return {
       canGenerate: false,
       errorMessage: m.activity_form_toast_missing_draft_source(),
+      reason: 'source-required',
       sourceText: trimmedSourceText,
     };
   }
@@ -657,6 +672,7 @@ export function buildActivityEditorDraftGenerationGate({
     return {
       canGenerate: false,
       errorMessage: m.activity_ai_source_max_error(),
+      reason: 'source-too-long',
       sourceText: trimmedSourceText,
     };
   }
@@ -690,6 +706,7 @@ export function buildActivityEditorDraftGenerationExecutionPlan({
     return {
       failureMessage,
       message: draftGate.errorMessage,
+      reason: draftGate.reason,
       type: 'blocked',
     };
   }
@@ -752,6 +769,7 @@ export function buildActivityEditorSaveGate({
       canSave: false,
       errorMessage: m.activity_form_toast_sign_in_save(),
       mode,
+      reason: 'auth-required',
     };
   }
 
@@ -761,6 +779,7 @@ export function buildActivityEditorSaveGate({
         canSave: false,
         errorMessage: m.activity_form_toast_edit_missing_activity(),
         mode,
+        reason: 'missing-activity-id',
       };
     }
 
@@ -800,6 +819,7 @@ export function buildActivityEditorSaveExecutionPlan({
     return {
       failureMessage,
       message: saveGate.errorMessage,
+      reason: saveGate.reason,
       type: 'blocked',
     };
   }
