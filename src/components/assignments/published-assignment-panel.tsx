@@ -156,26 +156,93 @@ function PublishedAssignmentShareActions({
 }: {
   action: PublishedAssignmentPanelShareAction;
 }) {
+  const disabledReasonId = getPublishedAssignmentShareDisabledReasonId(action);
+
   return (
     <>
-      <Link
-        to={action.to}
-        params={{ shareId: action.shareSlug }}
-        className={cn(
-          buttonVariants({ variant: 'outline' }),
-          'w-full bg-background sm:w-auto'
-        )}
-      >
-        <IconPlayerPlay className="size-4" />
-        {action.label}
-      </Link>
+      <PublishedAssignmentSharePreviewAction
+        action={action}
+        disabledReasonId={disabledReasonId}
+      />
       <CopyAssignmentShareLinkButton
+        disabled={!action.isAvailable}
+        disabledReasonCode={action.disabledReasonCode}
+        disabledMessage={action.disabledReason}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
         className="w-full bg-background sm:w-auto"
       />
+      <PublishedAssignmentShareDisabledReason
+        action={action}
+        disabledReasonId={disabledReasonId}
+      />
     </>
   );
+}
+
+function PublishedAssignmentSharePreviewAction({
+  action,
+  disabledReasonId,
+}: {
+  action: PublishedAssignmentPanelShareAction;
+  disabledReasonId: string | undefined;
+}) {
+  if (!action.isAvailable) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full bg-background sm:w-auto"
+        disabled
+        aria-describedby={disabledReasonId}
+      >
+        <IconPlayerPlay className="size-4" />
+        {action.label}
+      </Button>
+    );
+  }
+
+  return (
+    <Link
+      to={action.to}
+      params={{ shareId: action.shareSlug }}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'w-full bg-background sm:w-auto'
+      )}
+    >
+      <IconPlayerPlay className="size-4" />
+      {action.label}
+    </Link>
+  );
+}
+
+function PublishedAssignmentShareDisabledReason({
+  action,
+  disabledReasonId,
+}: {
+  action: PublishedAssignmentPanelShareAction;
+  disabledReasonId: string | undefined;
+}) {
+  if (!action.disabledReason) return null;
+
+  return (
+    <p
+      id={disabledReasonId}
+      className="max-w-56 text-muted-foreground text-xs leading-5"
+    >
+      {action.disabledReason}
+    </p>
+  );
+}
+
+function getPublishedAssignmentShareDisabledReasonId({
+  disabledReason,
+  shareSlug,
+}: PublishedAssignmentPanelShareAction) {
+  return disabledReason
+    ? `published-assignment-share-${shareSlug}-disabled-reason`
+    : undefined;
 }
 
 function PublishedAssignmentDismissActionButton({

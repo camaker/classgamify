@@ -1714,8 +1714,8 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkSource,
-  /buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*const resolvedIsAvailable = isAvailable && !disabledReasonCode[\s\S]*isAvailable: resolvedIsAvailable/,
-  'Share-link action views should preserve disabled reason codes and use them when resolving availability.'
+  /buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*const resolvedDisabledReasonCode =[\s\S]*getAssignmentShareLinkDisabledReasonCode\(\{[\s\S]*lifecycleStatus: 'open'[\s\S]*shareSlug: normalizedShareSlug[\s\S]*const resolvedIsAvailable = isAvailable && !resolvedDisabledReasonCode[\s\S]*disabledReasonCode: resolvedDisabledReasonCode[\s\S]*isAvailable: resolvedIsAvailable/,
+  'Share-link action views should preserve and derive disabled reason codes before resolving availability.'
 );
 assert.match(
   assignmentShareLinkSource,
@@ -13659,6 +13659,22 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildAssignmentShareLinkActionView({
+    label: 'Open student link',
+    shareSlug: '   ',
+  }),
+  {
+    copyLabel: 'Copy student link',
+    disabledReasonCode: 'missing-share-slug',
+    isAvailable: false,
+    label: 'Open student link',
+    sharePath: '/play/',
+    sharePathLabel: 'Student link',
+    shareSlug: '',
+    to: Routes.Play,
+  }
+);
+assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
     baseUrl: 'https://classgamify.test',
     shareSlug: 'abc 123',
@@ -23200,8 +23216,8 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*action\.shareSlug[\s\S]*action\.label[\s\S]*CopyAssignmentShareLinkButton[\s\S]*label=\{action\.copyLabel\}[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
-  'Published assignment share and dismiss actions should render prepared share data, action labels, copy labels, and copy-link behavior.'
+  /function PublishedAssignmentShareActions[\s\S]*PublishedAssignmentSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*label=\{action\.copyLabel\}[\s\S]*shareSlug=\{action\.shareSlug\}[\s\S]*PublishedAssignmentShareDisabledReason[\s\S]*function PublishedAssignmentDismissActionButton[\s\S]*action\.label/,
+  'Published assignment share and dismiss actions should render prepared share data, disabled state, copy labels, and copy-link behavior.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,
@@ -23210,8 +23226,13 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentShareActions[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug/,
+  /function PublishedAssignmentSharePreviewAction[\s\S]*!action\.isAvailable[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*to=\{action\.to\}[\s\S]*action\.shareSlug/,
   'Published assignment panel share action should render the prepared student-link route target.'
+);
+assert.match(
+  publishedAssignmentPanelComponentSource,
+  /function PublishedAssignmentShareDisabledReason[\s\S]*if \(!action\.disabledReason\) return null;[\s\S]*id=\{disabledReasonId\}[\s\S]*action\.disabledReason/,
+  'Published assignment panel should render prepared share-link disabled reasons when the student link is unavailable.'
 );
 assert.doesNotMatch(
   publishedAssignmentPanelComponentSource,

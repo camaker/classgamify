@@ -152,11 +152,19 @@ export function buildAssignmentShareLinkActionView({
   shareSlug: string;
 }): AssignmentShareLinkActionView {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
-  const resolvedIsAvailable = isAvailable && !disabledReasonCode;
+  const resolvedDisabledReasonCode =
+    disabledReasonCode ??
+    getAssignmentShareLinkDisabledReasonCode({
+      lifecycleStatus: 'open',
+      shareSlug: normalizedShareSlug,
+    }).disabledReasonCode;
+  const resolvedIsAvailable = isAvailable && !resolvedDisabledReasonCode;
 
   return {
     copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
-    ...(disabledReasonCode ? { disabledReasonCode } : {}),
+    ...(resolvedDisabledReasonCode
+      ? { disabledReasonCode: resolvedDisabledReasonCode }
+      : {}),
     ...(disabledReason ? { disabledReason } : {}),
     isAvailable: resolvedIsAvailable,
     label,
