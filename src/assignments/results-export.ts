@@ -36,7 +36,10 @@ import {
   resolveAssignmentSnapshotSource,
   type ResolvedAssignmentSnapshotSource,
 } from '@/assignments/snapshot';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  type AssignmentSettingsInput,
+  resolveAssignmentSettings,
+} from '@/assignments/validation';
 import { m } from '@/locale/paraglide/messages';
 
 export const ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS = {
@@ -67,7 +70,7 @@ export type AssignmentResultsExportData = {
   assignment: {
     expiresAt: Date | string | null;
     id: string;
-    settingsJson: Partial<AssignmentSettings> | null | undefined;
+    settingsJson: AssignmentSettingsInput;
     shareSlug: string;
     status: string;
     title: string;

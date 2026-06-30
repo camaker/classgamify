@@ -31,7 +31,10 @@ import {
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  type AssignmentSettingsInput,
+  resolveAssignmentSettings,
+} from '@/assignments/validation';
 
 export type PublicRuntimeItem = {
   choices?: string[];
@@ -151,7 +154,7 @@ type PublicAssignmentPayloadSource = {
   assignment: {
     expiresAt: Date | null;
     id: string;
-    settingsJson: Partial<AssignmentSettings> | null | undefined;
+    settingsJson: AssignmentSettingsInput;
     shareSlug: string;
     status: AssignmentStatus;
     title: string;

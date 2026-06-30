@@ -26,7 +26,10 @@ import {
   normalizeRuntimeDisplayCount,
   normalizeRuntimeDisplayText,
 } from '@/assignments/runtime-display';
-import { resolveAssignmentSettings } from '@/assignments/validation';
+import {
+  type AssignmentSettingsInput,
+  resolveAssignmentSettings,
+} from '@/assignments/validation';
 
 export type PrintableWorksheetResponseMode =
   | 'choice'
@@ -110,7 +113,7 @@ type PrintableAssignmentWorksheetSource = {
   };
   assignment: {
     expiresAt: Date | string | null;
-    settingsJson: Partial<AssignmentSettings> | null | undefined;
+    settingsJson: AssignmentSettingsInput;
     shareSlug: string;
     title: string;
   };

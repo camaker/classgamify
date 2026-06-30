@@ -6,6 +6,7 @@ import {
 import { normalizeAttemptTimeLimitSeconds } from '@/assignments/attempt-duration';
 import {
   defaultAssignmentSettings,
+  type AssignmentSettingsInput,
   resolveAssignmentSettings,
 } from '@/assignments/validation';
 import { normalizeOptionalRuntimeDisplayText } from '@/assignments/runtime-display';
@@ -64,7 +65,7 @@ type AssignmentDeliverySummaryInput = {
 
 type AssignmentSettingsSummaryInput = AssignmentDeliverySummaryInput & {
   instructions?: string;
-  settings?: Partial<AssignmentSettings> | null;
+  settings?: AssignmentSettingsInput;
 };
 
 export type AssignmentInstructionSummary = {
@@ -166,7 +167,7 @@ export function formatAssignmentDeliveryPolicyText({
   settings,
 }: {
   expiresAt: AssignmentDate;
-  settings?: Partial<AssignmentSettings> | null;
+  settings?: AssignmentSettingsInput;
 }) {
   const summaryView = buildAssignmentSettingsSummaryView({
     expiresAt,
@@ -248,7 +249,7 @@ export function buildPublicAssignmentRuleSummaryFromSettings({
 }: {
   expiresAt: AssignmentDate;
   itemCount: number;
-  settings?: Partial<AssignmentSettings> | null;
+  settings?: AssignmentSettingsInput;
 }): PublicAssignmentRuleSummaryItem[] {
   return buildPublicAssignmentRuleSummaryViewFromSettings({
     expiresAt,
@@ -264,7 +265,7 @@ export function buildPublicAssignmentRuleSummaryViewFromSettings({
 }: {
   expiresAt: AssignmentDate;
   itemCount: number;
-  settings?: Partial<AssignmentSettings> | null;
+  settings?: AssignmentSettingsInput;
 }): PublicAssignmentRuleSummaryView {
   const resolvedSettings = resolveAssignmentSettings(settings);
 

@@ -77,6 +77,7 @@ import {
   buildAssignmentShareLinkActionView,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
+import type { AssignmentSettingsInput } from '@/assignments/validation';
 import {
   buildAssignmentResultActionButtons,
   buildAssignmentResultActionDataSet,
@@ -435,7 +436,7 @@ type AssignmentResultHeaderSource = {
     id: string;
     shareSlug: string;
     status: AssignmentStatus | string;
-    settingsJson: Partial<AssignmentSettings> | null;
+    settingsJson: AssignmentSettingsInput;
     title: string;
   };
   snapshot: {

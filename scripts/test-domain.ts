@@ -14522,6 +14522,28 @@ assert.equal(publicAssignmentPayload.summary.subject, 'History');
 assert.equal(publicAssignmentPayload.summary.gradeBand, 'Grade 4');
 assert.equal(publicAssignmentPayload.summary.itemCount, 1);
 assert.equal(publicAssignmentPayload.summary.estimatedMinutes, 5);
+const stringSettingsPublicAssignmentPayload = buildPublicAssignmentPayload({
+  ...publicAssignmentPayloadSource,
+  assignment: {
+    ...publicAssignmentPayloadSource.assignment,
+    settingsJson: JSON.stringify({
+      collectStudentName: false,
+      instructions: ' Imported public instructions. ',
+      maxAttempts: null,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    }),
+  },
+});
+assert.deepEqual(stringSettingsPublicAssignmentPayload.assignment.settingsJson, {
+  collectStudentName: false,
+  instructions: 'Imported public instructions.',
+  maxAttempts: null,
+  showCorrectAnswers: false,
+  shuffleItems: false,
+  timeLimitSeconds: 120,
+});
 assert.equal(
   buildPublicAssignmentPayload({
     ...publicAssignmentPayloadSource,
@@ -14787,6 +14809,29 @@ assert.deepEqual(
     ['answerReveal', 'Hidden'],
     ['itemOrder', 'Fixed order'],
   ]
+);
+const stringSettingsPrintableWorksheet = buildPrintableAssignmentWorksheet({
+  ...printableSnapshotWorksheetSource,
+  assignment: {
+    ...printableSnapshotWorksheetSource.assignment,
+    settingsJson: JSON.stringify(
+      printableSnapshotWorksheetSource.assignment.settingsJson
+    ),
+  },
+});
+assert.deepEqual(
+  stringSettingsPrintableWorksheet.deliverySummary.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  printableSnapshotWorksheet.deliverySummary.map((item) => [
+    item.id,
+    item.value,
+  ])
+);
+assert.equal(
+  stringSettingsPrintableWorksheet.instructions,
+  printableSnapshotWorksheet.instructions
 );
 assert.deepEqual(printableSnapshotWorksheet.items[0], {
   answerSpaceLines: 1,
@@ -35137,6 +35182,48 @@ assert.deepEqual(
     to: Routes.Play,
   }
 );
+const stringSettingsResultHeaderView = buildAssignmentResultHeaderView({
+  activity: {
+    description: 'Current activity description',
+    templateType: 'quiz',
+    title: 'Current activity title',
+  },
+  assignment: {
+    expiresAt: new Date('2026-07-01T00:00:00.000Z'),
+    id: 'assignment-week-1',
+    settingsJson: JSON.stringify({
+      collectStudentName: false,
+      instructions: ' Review the line match quietly. ',
+      maxAttempts: 2,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 120,
+    }),
+    shareSlug: 'share-123',
+    status: 'published',
+    title: 'Week 1 results',
+  },
+  now: new Date('2026-06-01T00:00:00.000Z').getTime(),
+  snapshot: null,
+});
+assert.deepEqual(
+  stringSettingsResultHeaderView.settingsSummaryView.items.map((item) => [
+    item.id,
+    item.value,
+  ]),
+  [
+    ['attempts', '2 max'],
+    ['timer', '2 min'],
+    ['closes', formatAssignmentExpiry(new Date('2026-07-01T00:00:00.000Z'))],
+    ['identity', 'Anonymous'],
+    ['answerReveal', 'Hidden'],
+    ['itemOrder', 'Fixed order'],
+  ]
+);
+assert.equal(
+  stringSettingsResultHeaderView.settingsSummaryView.instructions.value,
+  'Review the line match quietly.'
+);
 assert.deepEqual(
   buildAssignmentResultHeaderShareAction({
     expiresAt: null,
@@ -37614,6 +37701,17 @@ assert.match(csv, /"Use ""complete sentences"", then submit\."/);
 assert.match(
   csv,
   /"2026年1月10日 18:00","Student instructions: Use ""complete sentences"", then submit\.; Attempts: 2 max; Timer: 1 min; Closes: 2026年1月10日 18:00; Student identity: Names; Answer reveal: After submit; Item order: Fixed order","Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
+);
+const stringSettingsCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  assignment: {
+    ...csvExportData.assignment,
+    settingsJson: JSON.stringify(csvExportData.assignment.settingsJson),
+  },
+});
+assert.match(
+  stringSettingsCsv,
+  /"Use ""complete sentences"", then submit\.","Names","After submit","Fixed order","2","60"/
 );
 assert.match(csv, /"Snapshot Capitals","Quiz"/);
 assert.match(csv, /"attempt-1","Alice","2026-01-01T10:00:00\.000Z"/);
