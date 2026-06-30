@@ -1354,16 +1354,30 @@ export function buildAssignmentStudentSummaryRowView(
   return {
     attemptsLabel: formatAssignmentResultNumber(student.attempts, { min: 0 }),
     averageAccuracyLabel: formatAssignmentResultPercent(
-      student.averageAccuracy
+      normalizeAssignmentResultPercentLabelValue(student.averageAccuracy)
     ),
-    bestAccuracyLabel: formatAssignmentResultPercent(student.bestAccuracy),
+    bestAccuracyLabel: formatAssignmentResultPercent(
+      normalizeAssignmentResultPercentLabelValue(student.bestAccuracy)
+    ),
     lastSubmittedLabel: formatAssignmentResultDate(student.lastCompletedAt),
-    latestAccuracyLabel: formatAssignmentResultPercent(student.latestAccuracy),
+    latestAccuracyLabel: formatAssignmentResultPercent(
+      normalizeAssignmentResultPercentLabelValue(student.latestAccuracy)
+    ),
     needsReviewLabel: formatAssignmentResultNumber(student.needsReviewCount, {
       min: 0,
     }),
     studentLabel: formatAssignmentResultStudentLabel(student.studentLabel),
   };
+}
+
+function normalizeAssignmentResultPercentLabelValue(
+  value: number | null | undefined
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return Number.NaN;
+  }
+
+  return Math.min(100, Math.max(0, value));
 }
 
 export function buildAssignmentStudentSummaryRowViews(

@@ -4559,6 +4559,11 @@ assert.match(
   'Assignment result page view-model should own formatted student summary table views.'
 );
 assert.match(
+  assignmentResultViewSource,
+  /export function buildAssignmentStudentSummaryRowView[\s\S]*normalizeAssignmentResultPercentLabelValue\(student\.averageAccuracy\)[\s\S]*normalizeAssignmentResultPercentLabelValue\(student\.bestAccuracy\)[\s\S]*normalizeAssignmentResultPercentLabelValue\(student\.latestAccuracy\)/,
+  'Assignment result student summary rows should normalize bounded percent labels before display.'
+);
+assert.match(
   assignmentResultRouteSource,
   /AssignmentResultsItemPerformanceTable[\s\S]*tableView=\{pageView\.itemPerformanceTableView\}/,
   'Assignment result route should delegate item performance table rendering with the assignment-domain page view-model table view.'
@@ -34378,6 +34383,27 @@ assert.deepEqual(
     latestAccuracyLabel: '0%',
     needsReviewLabel: '0',
     studentLabel: 'Anonymous student 2',
+  }
+);
+assert.deepEqual(
+  buildAssignmentStudentSummaryRowView({
+    attempts: 2.9,
+    averageAccuracy: 150,
+    bestAccuracy: 120,
+    lastCompletedAt: null,
+    latestAccuracy: -10,
+    needsReviewCount: -3,
+    studentKey: 'name:bounded',
+    studentLabel: 'Bounded Student',
+  }),
+  {
+    attemptsLabel: '2',
+    averageAccuracyLabel: '100%',
+    bestAccuracyLabel: '100%',
+    lastSubmittedLabel: '-',
+    latestAccuracyLabel: '0%',
+    needsReviewLabel: '0',
+    studentLabel: 'Bounded Student',
   }
 );
 assert.deepEqual(
