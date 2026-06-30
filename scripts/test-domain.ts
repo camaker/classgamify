@@ -6671,8 +6671,8 @@ assert.match(
 );
 assert.match(
   activityMaterialReferencesSource,
-  /export function normalizeActivityMaterialReferenceFilename[\s\S]*getSafeReferenceFilename[\s\S]*split\(\s*\/\[\?#\]\/u\s*\)[\s\S]*split\(\s*\/\[\\\\\/\]\/u\s*\)/,
-  'Activity source material filenames should be normalized through an exported safe basename helper.'
+  /SENSITIVE_REFERENCE_FILENAME_KEYS[\s\S]*export function normalizeActivityMaterialReferenceFilename[\s\S]*getSafeReferenceFilename[\s\S]*split\(\s*\/\[\?#\]\/u\s*\)[\s\S]*split\(\s*\/\[\\\\\/\]\/u\s*\)[\s\S]*removeSensitiveReferenceFilenameParts/,
+  'Activity source material filenames should be normalized through an exported safe basename helper that removes sensitive key-value fragments.'
 );
 assert.doesNotMatch(
   activityMaterialReferencesSource,
@@ -6706,6 +6706,16 @@ assert.equal(
     'https:%2F%2Ffiles.example.test%2Fteacher%5Cprivate%2Fencoded unit.pdf?token=secret'
   ),
   'encoded unit.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'worksheet.pdf storageKey=classroom/private/unit.pdf token:secret permission=owner'
+  ),
+  'worksheet.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename('token=secret storageKey=r2Key'),
+  undefined
 );
 assert.equal(getActivityMaterialReferenceKey(' File １ '), 'file 1');
 assert.equal(getActivityMaterialReferenceKey('\u00A0　\t'), undefined);
@@ -7776,6 +7786,28 @@ assert.deepEqual(activityDraftSourceMaterialSummary, {
     'Attached classroom source materials:\n- Worksheet document: Worksheet Scan 1.pdf\n- Audio: 三年级听力.mp3\n- Worksheet document: Parent guide.pdf',
   totalCount: 3,
 });
+const sensitiveNamedMaterialReference = buildActivityMaterialReferenceFromUserFile({
+  contentType: 'application/pdf',
+  id: 'safe-material-id',
+  originalName:
+    'unit worksheet.pdf storageKey=classroom/private/unit.pdf token:secret ownerId=teacher-1',
+});
+assert.deepEqual(
+  buildActivitySourceMaterialDraftSummary([sensitiveNamedMaterialReference])
+    .noteViews,
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'unit worksheet.pdf',
+    },
+  ]
+);
+assert.doesNotMatch(
+  buildActivitySourceMaterialDraftNotes([sensitiveNamedMaterialReference]) ??
+    '',
+  /storageKey|token|ownerId|classroom\/private|teacher-1/i,
+  'AI draft source material notes should strip sensitive key-value fragments embedded in filenames.'
+);
 assert.deepEqual(buildActivitySourceMaterialDraftSummary([]), {
   hasMaterials: false,
   kindCounts: {},

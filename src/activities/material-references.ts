@@ -11,6 +11,21 @@ export const ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS = {
   originalNameMaxLength: 200,
 } as const;
 
+const SENSITIVE_REFERENCE_FILENAME_KEYS = [
+  'auth',
+  'authorization',
+  'credential',
+  'key',
+  'ownerid',
+  'permission',
+  'r2key',
+  'secret',
+  'signature',
+  'signed',
+  'storagekey',
+  'token',
+] as const;
+
 type UserFileMaterialReferenceInput = {
   contentType?: string | null;
   filename?: string | null;
@@ -151,8 +166,11 @@ function getSafeReferenceFilename(value: string) {
     decodeReferenceFilenamePathSeparators(value);
   const withoutUrlSuffix =
     withDecodedPathSeparators.split(/[?#]/u)[0]?.trim() ?? '';
+  const withoutSensitiveParts =
+    removeSensitiveReferenceFilenameParts(withoutUrlSuffix);
   const lastSegment =
-    withoutUrlSuffix.split(/[\\/]/u).at(-1)?.trim() ?? withoutUrlSuffix;
+    withoutSensitiveParts.split(/[\\/]/u).at(-1)?.trim() ??
+    withoutSensitiveParts;
   const normalized = lastSegment.replace(/[\r\n"<>]/gu, '').trim();
   if (!normalized) return undefined;
 
@@ -162,6 +180,28 @@ function getSafeReferenceFilename(value: string) {
 function decodeReferenceFilenamePathSeparators(value: string) {
   return value.replace(/%(?:2f|5c)/giu, (match) =>
     match.toLowerCase() === '%2f' ? '/' : '\\'
+  );
+}
+
+function removeSensitiveReferenceFilenameParts(value: string) {
+  return value
+    .split(/[\s,;&]+/u)
+    .filter((part) => !isSensitiveReferenceFilenamePart(part))
+    .join(' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
+function isSensitiveReferenceFilenamePart(value: string) {
+  const [rawKey] = value.split(/[:=]/u);
+  const key = rawKey?.replace(/[^a-z0-9]/giu, '').toLowerCase() ?? '';
+
+  return Boolean(
+    key &&
+      value !== rawKey &&
+      SENSITIVE_REFERENCE_FILENAME_KEYS.some((sensitiveKey) =>
+        key.includes(sensitiveKey)
+      )
   );
 }
 
