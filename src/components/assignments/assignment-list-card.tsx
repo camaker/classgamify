@@ -169,6 +169,7 @@ function AssignmentListPrintActionLink({
     <Link
       to={action.to}
       params={{ assignmentId: action.assignmentId }}
+      search={action.search}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background lg:w-auto'

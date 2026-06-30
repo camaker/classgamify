@@ -114,6 +114,7 @@ function AssignmentResultsHeaderPrintActionLink({
     <Link
       to={printAction.to}
       params={{ assignmentId: printAction.assignmentId }}
+      search={printAction.search}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-auto'

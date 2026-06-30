@@ -42,6 +42,10 @@ import {
   getAssignmentStatusLabel,
 } from '@/assignments/lifecycle';
 import {
+  buildPrintableAssignmentSearch,
+  type PrintableAssignmentSearch,
+} from '@/assignments/printable-worksheet';
+import {
   buildPublishedAssignmentPanelContext,
   resolvePublishedAssignmentPanelAssignment,
   type PublishedAssignmentPanelAssignment,
@@ -97,6 +101,7 @@ export type AssignmentListCardActionState = {
 export type AssignmentListPrintAction = {
   assignmentId: string;
   label: string;
+  search: PrintableAssignmentSearch;
   to: typeof Routes.PrintAssignmentWorksheet;
 };
 
@@ -874,6 +879,7 @@ export function buildAssignmentListCardActionView({
       ? {
           assignmentId,
           label: assignmentListActionCopy.printWorksheet,
+          search: buildPrintableAssignmentSearch({ answerKey: false }),
           to: Routes.PrintAssignmentWorksheet,
         }
       : undefined,

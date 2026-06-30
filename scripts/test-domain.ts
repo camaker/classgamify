@@ -4695,7 +4695,7 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*export type AssignmentResultHeaderView/,
+  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type AssignmentResultHeaderView/,
   'Assignment result header share, print, and header-view contracts should be explicit assignment-domain exports.'
 );
 assert.match(
@@ -4830,7 +4830,7 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderPrintActionLink[\s\S]*to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId[\s\S]*printAction\.label/,
+  /function AssignmentResultsHeaderPrintActionLink[\s\S]*to=\{printAction\.to\}[\s\S]*assignmentId: printAction\.assignmentId[\s\S]*search=\{printAction\.search\}[\s\S]*printAction\.label/,
   'Assignment result print action should render prepared printable action targets and labels.'
 );
 assert.match(
@@ -13427,6 +13427,7 @@ assert.deepEqual(
       printAction: {
         assignmentId: 'assignment-2',
         label: 'Print worksheet',
+        search: buildPrintableAssignmentSearch({ answerKey: false }),
         to: Routes.PrintAssignmentWorksheet,
       },
       resultAction: {
@@ -21287,7 +21288,7 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListPrintAction = \{[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = AssignmentShareLinkActionView;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
+  /export type AssignmentListPrintAction = \{[\s\S]*search: PrintableAssignmentSearch;[\s\S]*to: typeof Routes\.PrintAssignmentWorksheet;[\s\S]*export type AssignmentListResultAction = \{[\s\S]*to: typeof Routes\.DashboardAssignmentResults;[\s\S]*export type AssignmentListShareAction = AssignmentShareLinkActionView;[\s\S]*export type AssignmentListStatusAction = AssignmentStatusAction;[\s\S]*export type AssignmentListCardActionView = \{[\s\S]*printAction: AssignmentListPrintAction \| undefined;[\s\S]*resultAction: AssignmentListResultAction \| undefined;[\s\S]*shareAction: AssignmentListShareAction \| undefined;[\s\S]*statusAction: AssignmentListStatusAction \| undefined;/,
   'Assignment list card actions should be exported as focused domain contracts.'
 );
 assert.doesNotMatch(
@@ -21402,7 +21403,7 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListPrintActionLink[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  /function AssignmentListPrintActionLink[\s\S]*action\.assignmentId[\s\S]*search=\{action\.search\}[\s\S]*action\.label/,
   'Assignment list print action should render prepared printable worksheet links.'
 );
 assert.match(
@@ -21509,7 +21510,7 @@ assert.doesNotMatch(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelAssignment = \{[\s\S]*id: string;[\s\S]*shareSlug: string;[\s\S]*title: string;[\s\S]*export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelStatus = 'found' \| 'loading' \| 'missing';[\s\S]*export type PublishedAssignmentPanelContext/,
+  /export type PublishedAssignmentPanelAssignment = \{[\s\S]*id: string;[\s\S]*shareSlug: string;[\s\S]*title: string;[\s\S]*export type PublishedAssignmentPanelDismissAction[\s\S]*export type PublishedAssignmentPanelPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type PublishedAssignmentPanelResultAction[\s\S]*export type PublishedAssignmentPanelShareAction[\s\S]*export type PublishedAssignmentPanelActionView[\s\S]*dismissAction: PublishedAssignmentPanelDismissAction \| undefined;[\s\S]*printAction: PublishedAssignmentPanelPrintAction \| undefined;[\s\S]*resultAction: PublishedAssignmentPanelResultAction \| undefined;[\s\S]*shareAction: PublishedAssignmentPanelShareAction \| undefined;[\s\S]*export type PublishedAssignmentPanelStatus = 'found' \| 'loading' \| 'missing';[\s\S]*export type PublishedAssignmentPanelContext/,
   'Published assignment panel assignment, action, and context contracts should be explicit domain exports.'
 );
 assert.doesNotMatch(
@@ -21594,7 +21595,7 @@ assert.match(
 );
 assert.match(
   publishedAssignmentPanelComponentSource,
-  /function PublishedAssignmentResultsActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*action\.label[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*action\.label/,
+  /function PublishedAssignmentResultsActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*action\.label[\s\S]*function PublishedAssignmentPrintActionLink[\s\S]*to=\{action\.to\}[\s\S]*action\.assignmentId[\s\S]*search=\{action\.search\}[\s\S]*action\.label/,
   'Published assignment result and print actions should render prepared route targets, assignment ids, and action labels.'
 );
 assert.match(
@@ -26387,6 +26388,7 @@ assert.deepEqual(
         printAction: {
           assignmentId: 'persisted-assignment-1',
           label: 'Print worksheet',
+          search: buildPrintableAssignmentSearch({ answerKey: false }),
           to: Routes.PrintAssignmentWorksheet,
         },
         resultAction: {
@@ -26565,6 +26567,7 @@ assert.deepEqual(
       printAction: {
         assignmentId: 'persisted-assignment-1',
         label: 'Print worksheet',
+        search: buildPrintableAssignmentSearch({ answerKey: false }),
         to: Routes.PrintAssignmentWorksheet,
       },
       resultAction: {
@@ -26860,6 +26863,7 @@ assert.deepEqual(
     printAction: {
       assignmentId: 'assignment-with-space',
       label: 'Print worksheet',
+      search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     },
     resultAction: {
@@ -36503,6 +36507,7 @@ assert.deepEqual(
     printAction: {
       assignmentId: 'assignment-week-1',
       label: 'Print worksheet',
+      search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     },
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -36557,6 +36562,7 @@ assert.deepEqual(
     printAction: {
       assignmentId: 'assignment-expired',
       label: 'Print worksheet',
+      search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     },
     settingsSummaryView: buildAssignmentSettingsSummaryView({

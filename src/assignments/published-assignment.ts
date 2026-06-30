@@ -1,5 +1,9 @@
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import {
+  buildPrintableAssignmentSearch,
+  type PrintableAssignmentSearch,
+} from '@/assignments/printable-worksheet';
+import {
   type AssignmentShareLinkActionView,
   buildAssignmentSharePath,
   buildAssignmentShareLinkActionView,
@@ -32,6 +36,7 @@ export type PublishedAssignmentPanelDismissAction = {
 export type PublishedAssignmentPanelPrintAction = {
   assignmentId: string;
   label: string;
+  search: PrintableAssignmentSearch;
   to: typeof Routes.PrintAssignmentWorksheet;
 };
 
@@ -204,6 +209,7 @@ function buildPublishedAssignmentPanelActionView({
       ? {
           assignmentId: assignment.id,
           label: m.assignment_list_action_print_worksheet(),
+          search: buildPrintableAssignmentSearch({ answerKey: false }),
           to: Routes.PrintAssignmentWorksheet,
         }
       : undefined,

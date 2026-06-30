@@ -20,6 +20,10 @@ import {
   buildAssignmentSettingsSummaryView,
   formatAssignmentExpiry,
 } from '@/assignments/delivery-summary';
+import {
+  buildPrintableAssignmentSearch,
+  type PrintableAssignmentSearch,
+} from '@/assignments/printable-worksheet';
 import { normalizeStudentName } from '@/assignments/identity';
 import {
   formatAssignmentResultNumber,
@@ -453,6 +457,7 @@ export type AssignmentResultHeaderShareAction = AssignmentShareLinkActionView;
 export type AssignmentResultHeaderPrintAction = {
   assignmentId: string;
   label: string;
+  search: PrintableAssignmentSearch;
   to: typeof Routes.PrintAssignmentWorksheet;
 };
 
@@ -978,6 +983,7 @@ export function buildAssignmentResultHeaderView({
     printAction: {
       assignmentId: assignment.id,
       label: assignmentResultPageCopy.printWorksheetLabel,
+      search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     } satisfies AssignmentResultHeaderPrintAction,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
