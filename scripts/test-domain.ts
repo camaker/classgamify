@@ -2570,8 +2570,17 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /export function buildPublicAttemptResult[\s\S]*accuracy: result\.accuracy,[\s\S]*completedItemCount: result\.completedItemCount,[\s\S]*correctItemCount: result\.correctItemCount,[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints,[\s\S]*totalPoints: result\.totalPoints/,
-  'Public attempt results should explicitly pick the only score fields allowed in student submission responses.'
+  /export function buildPublicAttemptResult[\s\S]*normalizeAttemptDurationSeconds\(\{[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*accuracy: result\.accuracy,[\s\S]*completedItemCount: result\.completedItemCount,[\s\S]*correctItemCount: result\.correctItemCount,[\s\S]*durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints,[\s\S]*totalPoints: result\.totalPoints/,
+  'Public attempt results should explicitly pick the only score fields allowed in student submission responses and normalize duration.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    publicAssignmentSource,
+    'export function buildPublicAttemptResult',
+    'export function buildPublicAssignmentPreviewActivity'
+  ),
+  /return \{[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints/,
+  'Public attempt results should not expose raw stored duration values.'
 );
 assert.match(
   publicAssignmentSource,
@@ -17495,6 +17504,39 @@ assert.deepEqual(publicAttemptResultWithPrivateFields, {
 });
 assert.equal('rawAnswers' in publicAttemptResultWithPrivateFields, false);
 assert.equal('scorerTraceId' in publicAttemptResultWithPrivateFields, false);
+assert.equal(
+  buildPublicAttemptResult({
+    accuracy: 0,
+    completedItemCount: 0,
+    correctItemCount: 0,
+    durationSeconds: 4.6,
+    earnedPoints: 0,
+    totalPoints: 1,
+  }).durationSeconds,
+  5
+);
+assert.equal(
+  buildPublicAttemptResult({
+    accuracy: 0,
+    completedItemCount: 0,
+    correctItemCount: 0,
+    durationSeconds: -3,
+    earnedPoints: 0,
+    totalPoints: 1,
+  }).durationSeconds,
+  0
+);
+assert.equal(
+  buildPublicAttemptResult({
+    accuracy: 0,
+    completedItemCount: 0,
+    correctItemCount: 0,
+    durationSeconds: Number.POSITIVE_INFINITY,
+    earnedPoints: 0,
+    totalPoints: 1,
+  }).durationSeconds,
+  undefined
+);
 const studentRunnerView = buildStudentRunnerView({
   answers: { 'pair-1': 'Cold', 'q-1': 'Paris' },
   items: [

@@ -12,6 +12,7 @@ import type {
   AttemptResult,
 } from '@/activities/types';
 import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
+import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { formatAssignmentDeliveryInstructions } from '@/assignments/delivery-summary';
 import {
@@ -488,11 +489,15 @@ export function buildPublicAttemptReviewItemMap(
 export function buildPublicAttemptResult(
   result: AttemptResult
 ): PublicAttemptResult {
+  const durationSeconds = normalizeAttemptDurationSeconds({
+    durationSeconds: result.durationSeconds,
+  });
+
   return {
     accuracy: result.accuracy,
     completedItemCount: result.completedItemCount,
     correctItemCount: result.correctItemCount,
-    durationSeconds: result.durationSeconds,
+    durationSeconds,
     earnedPoints: result.earnedPoints,
     totalPoints: result.totalPoints,
   };
