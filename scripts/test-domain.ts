@@ -1534,8 +1534,13 @@ assert.match(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
-  /label = assignmentShareLinkActionCopy\.copyLabel[\s\S]*label\?: string[\s\S]*\{label\}/,
-  'Share-link copy button should accept prepared copy labels while keeping the shared fallback copy.'
+  /label,[\s\S]*label: string;[\s\S]*\{label\}/,
+  'Share-link copy button should require prepared copy labels from assignment-domain action views.'
+);
+assert.doesNotMatch(
+  copyAssignmentShareLinkButtonSource,
+  /assignmentShareLinkActionCopy/,
+  'Share-link copy button should not read localized share-link copy directly.'
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
