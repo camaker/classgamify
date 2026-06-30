@@ -20,6 +20,7 @@ import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority'
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
   buildLatestAttemptReviewByStudentKey,
+  formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
 } from '@/assignments/student-follow-up-summary';
@@ -47,6 +48,7 @@ export type AssignmentReteachPlanItemView = {
 export type AssignmentReteachPlanStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
+  latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
   studentKey: string;
@@ -175,8 +177,14 @@ export function buildAssignmentReteachPlanStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptCompletedAtLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
+    : null;
   const latestAttemptSummaryLabel = latestAttempt
-    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    ? formatStudentFollowUpLatestAttemptSummary({
+        attempt: latestAttempt,
+        completedAtLabel: latestAttemptCompletedAtLabel,
+      })
     : null;
   const lineInput = {
     accuracy: accuracyLabel,
@@ -188,6 +196,7 @@ export function buildAssignmentReteachPlanStudentView({
   return {
     accuracyLabel,
     followUpRecommendation,
+    latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,

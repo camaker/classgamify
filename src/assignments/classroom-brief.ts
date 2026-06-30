@@ -23,6 +23,7 @@ import {
 } from '@/assignments/result-summary-format';
 import {
   buildLatestAttemptReviewByStudentKey,
+  formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
 } from '@/assignments/student-follow-up-summary';
@@ -89,6 +90,7 @@ export type AssignmentClassroomBriefFollowUpStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
   latestAccuracyLabel: string;
+  latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   needsReviewLabel: string;
   reviewItemCountLabel: string;
@@ -269,8 +271,14 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptCompletedAtLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
+    : null;
   const latestAttemptSummaryLabel = latestAttempt
-    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    ? formatStudentFollowUpLatestAttemptSummary({
+        attempt: latestAttempt,
+        completedAtLabel: latestAttemptCompletedAtLabel,
+      })
     : null;
   const lineInput = {
     accuracy: latestAccuracyLabel,
@@ -284,6 +292,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     accuracyLabel: formatAssignmentBriefStudentAccuracy(student),
     followUpRecommendation,
     latestAccuracyLabel,
+    latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     needsReviewLabel: formatAssignmentSummaryReviewCount(
       student.needsReviewCount

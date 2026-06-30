@@ -38,6 +38,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   bestAccuracyLabel: string;
   followUpRecommendation: string;
   latestAccuracyLabel: string;
+  latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
   studentKey: string;
@@ -122,8 +123,14 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptCompletedAtLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
+    : null;
   const latestAttemptSummaryLabel = latestAttempt
-    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    ? formatStudentFollowUpLatestAttemptSummary({
+        attempt: latestAttempt,
+        completedAtLabel: latestAttemptCompletedAtLabel,
+      })
     : null;
   const lineInput = {
     attempts: attemptsLabel,
@@ -142,6 +149,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     bestAccuracyLabel,
     followUpRecommendation,
     latestAccuracyLabel,
+    latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
@@ -162,12 +170,19 @@ export function formatStudentFollowUpRecommendation(needsReviewCount: number) {
 }
 
 export function formatStudentFollowUpLatestAttemptSummary(
-  attempt: Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>
+  input:
+    | Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>
+    | {
+        attempt: Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>;
+        completedAtLabel: string | null;
+      }
 ) {
+  const attempt = 'attempt' in input ? input.attempt : input;
   const summary = buildAssignmentAttemptReviewSummary(attempt);
-  const completedAtLabel = formatAssignmentResultDate(attempt.completedAt, {
-    emptyValue: '',
-  });
+  const completedAtLabel =
+    'attempt' in input
+      ? input.completedAtLabel
+      : formatStudentFollowUpLatestAttemptCompletedAt(attempt);
   const summaryInput = {
     correct: formatAssignmentResultFraction(
       summary.correctItemCount,
@@ -192,6 +207,18 @@ export function formatStudentFollowUpLatestAttemptSummary(
   }
 
   return m.assignment_student_follow_up_latest_attempt_summary(summaryInput);
+}
+
+export function formatStudentFollowUpLatestAttemptCompletedAt(
+  attempt: Pick<AssignmentAttemptReview, 'completedAt'>
+) {
+  const completedAtLabel = formatAssignmentResultDate(attempt.completedAt, {
+    emptyValue: '',
+  });
+
+  return completedAtLabel
+    ? formatAssignmentResultValue(completedAtLabel, { emptyValue: '' })
+    : null;
 }
 
 export function buildLatestAttemptReviewByStudentKey(

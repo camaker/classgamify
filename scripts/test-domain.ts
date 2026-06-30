@@ -771,6 +771,7 @@ import {
   buildLatestAttemptReviewByStudentKey,
   buildAssignmentStudentFollowUpSummary,
   buildAssignmentStudentFollowUpSummaryStudentView,
+  formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
 } from '@/assignments/student-follow-up-summary';
 import {
@@ -1569,7 +1570,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempts'[\s\S]*'students';/,
+  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempt-times'[\s\S]*'latest-attempts'[\s\S]*'students';/,
   'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
 );
 assert.doesNotMatch(
@@ -1624,8 +1625,18 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*latest-attempt-times[\s\S]*assignment_result_copy_preview_meta_latest_attempt_times[\s\S]*countAssignmentResultCopyLatestAttemptTimeViews/,
+  'Assignment result copy artifact preview metadata should expose latest-attempt submitted-time coverage for student follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /countAssignmentResultCopyLatestAttemptViews\([\s\S]*latestAttemptSummaryLabel/,
   'Assignment result copy latest-attempt metadata should count the same structured student views used by copied text.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /countAssignmentResultCopyLatestAttemptTimeViews\([\s\S]*latestAttemptCompletedAtLabel/,
+  'Assignment result copy latest-attempt-time metadata should count structured submitted-time labels instead of parsing copied text.'
 );
 assert.doesNotMatch(
   assignmentResultActionsSource,
@@ -1832,8 +1843,13 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /formatStudentFollowUpLatestAttemptSummary\(latestAttempt\)[\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt/,
+  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel[\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt/,
   'Classroom brief student follow-up rows should reuse the shared latest-attempt summary label.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*latestAttemptCompletedAtLabel/,
+  'Classroom brief student follow-up rows should expose shared latest-attempt submitted-time labels.'
 );
 assert.match(
   assignmentClassroomBriefSource,
@@ -1901,8 +1917,13 @@ assert.match(
 );
 assert.match(
   assignmentReteachPlanSource,
-  /formatStudentFollowUpLatestAttemptSummary\(latestAttempt\)[\s\S]*assignment_reteach_plan_student_with_latest_attempt/,
+  /formatStudentFollowUpLatestAttemptSummary\(\{[\s\S]*attempt: latestAttempt,[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel[\s\S]*assignment_reteach_plan_student_with_latest_attempt/,
   'Reteach plan student follow-up rows should reuse the shared latest-attempt summary label.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*latestAttemptCompletedAtLabel/,
+  'Reteach plan student follow-up rows should expose shared latest-attempt submitted-time labels.'
 );
 assert.doesNotMatch(
   assignmentReteachPlanSource,
@@ -32954,6 +32975,7 @@ assert.deepEqual(
           ['follow-up-students', 'Follow-up students', '1'],
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
+          ['latest-attempt-times', 'Attempt times', '1'],
           ['lines', 'Lines', '10'],
         ],
         true,
@@ -32969,6 +32991,7 @@ assert.deepEqual(
           ['follow-up-students', 'Follow-up students', '1'],
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
+          ['latest-attempt-times', 'Attempt times', '1'],
           ['lines', 'Lines', '6'],
         ],
         true,
@@ -32995,6 +33018,7 @@ assert.deepEqual(
           ['students', 'Students', '1'],
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
+          ['latest-attempt-times', 'Attempt times', '1'],
           ['lines', 'Lines', '2'],
         ],
         true,
@@ -37219,6 +37243,8 @@ const classroomBriefWithAttempts = buildAssignmentClassroomBrief({
 });
 const anonymousLatestAttemptSummary =
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!);
+const anonymousLatestAttemptCompletedAtLabel =
+  formatStudentFollowUpLatestAttemptCompletedAt(resultAnalysis.attempts[2]!);
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -37315,6 +37341,7 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '0%',
+    latestAttemptCompletedAtLabel: null,
     latestAttemptSummaryLabel: null,
     needsReviewLabel: '2 reviews',
     reviewItemCountLabel: '2 items to review',
@@ -37328,6 +37355,7 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
   latestAccuracyLabel: '0%',
+  latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
   needsReviewLabel: '2 reviews',
   reviewItemCountLabel: '2 items to review',
@@ -37340,6 +37368,7 @@ assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
   latestAccuracyLabel: '0%',
+  latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
   needsReviewLabel: '2 reviews',
   reviewItemCountLabel: '2 items to review',
@@ -37511,6 +37540,7 @@ assert.deepEqual(buildAssignmentReteachPlanStudentView({
   accuracyLabel: '70%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
   reviewItemCountLabel: '3 items to review',
   studentKey: 'name:alpha-review',
@@ -37521,6 +37551,7 @@ assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
   accuracyLabel: '0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
@@ -37829,6 +37860,11 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
+  /latestAttemptCompletedAtLabel = latestAttempt[\s\S]*formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*completedAtLabel: latestAttemptCompletedAtLabel/,
+  'Assignment student follow-up summaries should expose the same submitted-time label used by latest-attempt copied text.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
   /buildLatestAttemptReviewByStudentKey[\s\S]*sortAssignmentAttemptReviewsByCompletedAt\(attempts\)/,
   'Assignment student follow-up summaries should resolve latest attempts through the shared attempt-review sort helper.'
 );
@@ -37836,6 +37872,11 @@ assert.match(
   assignmentStudentFollowUpSummarySource,
   /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)[\s\S]*formatAssignmentResultDate\(attempt\.completedAt/,
   'Assignment student follow-up latest-attempt summaries should reuse shared attempt-review and result-date helpers.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLatestAttemptCompletedAt[\s\S]*formatAssignmentResultDate\(attempt\.completedAt[\s\S]*formatAssignmentResultValue\(completedAtLabel/,
+  'Assignment student follow-up latest-attempt submitted-time labels should reuse shared result-date and value helpers.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -37859,6 +37900,7 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '70%',
+    latestAttemptCompletedAtLabel: null,
     latestAttemptSummaryLabel: null,
     reviewItemCountLabel: '3 items to review',
     studentKey: 'name:alpha-review',
@@ -37905,6 +37947,7 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '0%',
+    latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
     reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
@@ -38166,6 +38209,7 @@ assert.deepEqual(
         ['follow-up-students', 'Follow-up students', '3'],
         ['next-steps', 'Next steps', '3'],
         ['latest-attempts', 'Latest attempts', '0'],
+        ['latest-attempt-times', 'Attempt times', '0'],
         ['lines', 'Lines', '12'],
       ],
       resultCopyArtifacts.classroomBrief.text,
@@ -38180,6 +38224,7 @@ assert.deepEqual(
         ['follow-up-students', 'Follow-up students', '3'],
         ['next-steps', 'Next steps', '3'],
         ['latest-attempts', 'Latest attempts', '0'],
+        ['latest-attempt-times', 'Attempt times', '0'],
         ['lines', 'Lines', '8'],
       ],
       resultCopyArtifacts.reteachPlan.text,
@@ -38204,6 +38249,7 @@ assert.deepEqual(
         ['students', 'Students', '4'],
         ['next-steps', 'Next steps', '4'],
         ['latest-attempts', 'Latest attempts', '0'],
+        ['latest-attempt-times', 'Attempt times', '0'],
         ['lines', 'Lines', '5'],
       ],
       resultCopyArtifacts.studentFollowUpSummary.text,
@@ -38223,14 +38269,36 @@ assert.deepEqual(
   ).map((preview) => [
     preview.action,
     preview.metaItems
-      .filter((metaItem) => metaItem.key === 'latest-attempts')
-      .map((metaItem) => [metaItem.label, metaItem.value]),
+      .filter(
+        (metaItem) =>
+          metaItem.key === 'latest-attempts' ||
+          metaItem.key === 'latest-attempt-times'
+      )
+      .map((metaItem) => [metaItem.key, metaItem.label, metaItem.value]),
   ]),
   [
-    ['copy-brief', [['Latest attempts', '1']]],
-    ['copy-reteach-plan', [['Latest attempts', '1']]],
+    [
+      'copy-brief',
+      [
+        ['latest-attempts', 'Latest attempts', '1'],
+        ['latest-attempt-times', 'Attempt times', '1'],
+      ],
+    ],
+    [
+      'copy-reteach-plan',
+      [
+        ['latest-attempts', 'Latest attempts', '1'],
+        ['latest-attempt-times', 'Attempt times', '1'],
+      ],
+    ],
     ['copy-item-review', []],
-    ['copy-follow-up', [['Latest attempts', '2']]],
+    [
+      'copy-follow-up',
+      [
+        ['latest-attempts', 'Latest attempts', '2'],
+        ['latest-attempt-times', 'Attempt times', '2'],
+      ],
+    ],
   ]
 );
 assert.equal(

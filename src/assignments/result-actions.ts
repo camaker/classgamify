@@ -199,6 +199,7 @@ export type AssignmentResultCopyArtifactPreviewMetaItem = {
 export type AssignmentResultCopyArtifactPreviewMetaKey =
   | 'focus-items'
   | 'follow-up-students'
+  | 'latest-attempt-times'
   | 'latest-attempts'
   | 'lines'
   | 'next-steps'
@@ -527,6 +528,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         ),
       }),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'latest-attempt-times',
+        label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
+        value: countAssignmentResultCopyLatestAttemptTimeViews(
+          artifacts.classroomBrief.followUpStudentViews
+        ),
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
         value: lineCount,
@@ -555,6 +563,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         key: 'latest-attempts',
         label: m.assignment_result_copy_preview_meta_latest_attempts(),
         value: countAssignmentResultCopyLatestAttemptViews(
+          artifacts.reteachPlan.studentViews
+        ),
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'latest-attempt-times',
+        label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
+        value: countAssignmentResultCopyLatestAttemptTimeViews(
           artifacts.reteachPlan.studentViews
         ),
       }),
@@ -600,6 +615,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
       ),
     }),
     buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'latest-attempt-times',
+      label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
+      value: countAssignmentResultCopyLatestAttemptTimeViews(
+        artifacts.studentFollowUpSummary.studentViews
+      ),
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
       key: 'lines',
       label: m.assignment_result_copy_preview_meta_lines(),
       value: lineCount,
@@ -628,6 +650,14 @@ function countAssignmentResultCopyLatestAttemptViews(
 ) {
   return studentViews.filter((studentView) =>
     Boolean(studentView.latestAttemptSummaryLabel)
+  ).length;
+}
+
+function countAssignmentResultCopyLatestAttemptTimeViews(
+  studentViews: Array<{ latestAttemptCompletedAtLabel: string | null }>
+) {
+  return studentViews.filter((studentView) =>
+    Boolean(studentView.latestAttemptCompletedAtLabel)
   ).length;
 }
 

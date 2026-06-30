@@ -965,6 +965,7 @@
   "assignment_result_brief_student_accuracy": "最近 {latest} · 最佳 {best}",
   "assignment_result_copy_preview_meta_focus_items": "重点题目",
   "assignment_result_copy_preview_meta_follow_up_students": "跟进学生",
+  "assignment_result_copy_preview_meta_latest_attempt_times": "作答时间",
   "assignment_result_copy_preview_meta_latest_attempts": "最近作答",
   "assignment_result_copy_preview_meta_lines": "行数",
   "assignment_result_copy_preview_meta_next_steps": "下一步",
