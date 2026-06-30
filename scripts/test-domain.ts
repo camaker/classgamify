@@ -5162,6 +5162,11 @@ assert.match(
   /correctRateProgressValue: normalizeAssignmentResultProgressValue\(\s*item\.correctRate\s*\)/,
   'Assignment item analysis cards should use the shared progress-value normalizer.'
 );
+assert.match(
+  assignmentResultViewSource,
+  /buildAssignmentItemAnalysisCardView[\s\S]*correctRateLabel: formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)[\s\S]*buildAssignmentItemPerformanceRowView[\s\S]*correctRateLabel: formatAssignmentResultPercent\(\s*normalizeAssignmentResultPercentLabelValue\(item\.correctRate\)/,
+  'Assignment item performance labels should normalize bounded percentages before display.'
+);
 assert.doesNotMatch(
   assignmentResultViewSource,
   /clampProgressValue/,
@@ -34118,6 +34123,13 @@ assert.equal(
 assert.equal(
   buildAssignmentItemAnalysisCardView({
     ...resultAnalysis.perItem[0]!,
+    correctRate: 120,
+  }).correctRateLabel,
+  '100%'
+);
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
     correctRate: Number.NaN,
   }).correctRateProgressValue,
   0
@@ -34128,6 +34140,13 @@ assert.equal(
     correctRate: -20,
   }).correctRateProgressValue,
   0
+);
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
+    correctRate: -20,
+  }).correctRateLabel,
+  '0%'
 );
 assert.equal(normalizeAssignmentResultProgressValue(67), 67);
 assert.equal(normalizeAssignmentResultProgressValue(120), 100);
@@ -34173,6 +34192,26 @@ assert.deepEqual(
     submittedLabel: '1/2',
     unansweredLabel: '1 unanswered',
   }
+);
+assert.equal(
+  buildAssignmentItemPerformanceRowView({
+    index: 0,
+    item: {
+      ...resultAnalysis.perItem[0]!,
+      correctRate: 120,
+    },
+  }).correctRateLabel,
+  '100%'
+);
+assert.equal(
+  buildAssignmentItemPerformanceRowView({
+    index: 0,
+    item: {
+      ...resultAnalysis.perItem[0]!,
+      correctRate: -20,
+    },
+  }).correctRateLabel,
+  '0%'
 );
 assert.deepEqual(
   buildAssignmentItemPerformanceRowViews(resultAnalysis.perItem).map((row) => [

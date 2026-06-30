@@ -1416,7 +1416,9 @@ export function buildAssignmentItemAnalysisCardView(
         })
       : null,
     acceptedAnswersText: answerView.optionalAcceptedAlternativesText,
-    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctRateLabel: formatAssignmentResultPercent(
+      normalizeAssignmentResultPercentLabelValue(item.correctRate)
+    ),
     correctRateProgressValue: normalizeAssignmentResultProgressValue(
       item.correctRate
     ),
@@ -1460,7 +1462,9 @@ export function buildAssignmentItemPerformanceRowView({
 
   return {
     acceptedAnswersText: answerView.acceptedAlternativesText,
-    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctRateLabel: formatAssignmentResultPercent(
+      normalizeAssignmentResultPercentLabelValue(item.correctRate)
+    ),
     expectedAnswerText: answerView.expectedAnswerText,
     explanationText: formatAssignmentResultValue(item.explanation),
     itemNumberLabel,
