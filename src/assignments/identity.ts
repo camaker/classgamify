@@ -27,7 +27,7 @@ export function normalizeStudentName(value?: string | null) {
 }
 
 export function normalizeAnonymousToken(value?: string | null) {
-  return (value ?? '').normalize('NFKC').trim();
+  return (value ?? '').normalize('NFKC').replace(/\s+/gu, '');
 }
 
 export function getAnonymousBrowserLabel(value?: string | null) {

@@ -8476,7 +8476,29 @@ assert.equal(
   ),
   'replacement-token'
 );
+anonymousTokenStorage.set(
+  buildAnonymousAttemptTokenStorageKey('spaced-token-share'),
+  ' anonymous \n token \t 1 '
+);
+assert.equal(
+  getOrCreateAnonymousAttemptToken({
+    createToken: () => 'unused-token',
+    shareId: 'spaced-token-share',
+    storage: anonymousTokenStore,
+  }),
+  'anonymoustoken1'
+);
+assert.equal(
+  anonymousTokenStorage.get(
+    buildAnonymousAttemptTokenStorageKey('spaced-token-share')
+  ),
+  'anonymoustoken1'
+);
 assert.equal(normalizeAnonymousToken('  ａｎｏｎ－１２３  '), 'anon-123');
+assert.equal(
+  normalizeAnonymousToken(' anonymous \n token \t 1 '),
+  'anonymoustoken1'
+);
 assert.equal(buildStudentNameIdentityKey(' Ava   Chen '), 'name:ava chen');
 assert.equal(
   buildStudentNameIdentityKey(' ＡＶＡ　ＣＨＥＮ '),
@@ -8491,6 +8513,10 @@ assert.equal(
   'anonymous:anonymous-token-1'
 );
 assert.equal(
+  buildAnonymousIdentityKey(' anonymous \n token \t 1 '),
+  'anonymous:anonymoustoken1'
+);
+assert.equal(
   buildStudentIdentityGroupingKey({
     anonymousToken: 'stale-token',
     studentName: ' Ava Chen ',
@@ -8502,6 +8528,12 @@ assert.equal(
     anonymousToken: ' anonymous-token-1 ',
   }),
   'anonymous:anonymous-token-1'
+);
+assert.equal(
+  buildStudentIdentityGroupingKey({
+    anonymousToken: ' anonymous \n token \t 1 ',
+  }),
+  'anonymous:anonymoustoken1'
 );
 assert.equal(buildStudentIdentityGroupingKey({}), 'anonymous:unknown');
 assert.deepEqual(
@@ -8523,6 +8555,17 @@ assert.deepEqual(
   {
     identity: {
       anonymousToken: 'anonymous-token-1',
+    },
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptIdentityCountStrategy({
+    anonymousToken: ' anonymous \n token \t 1 ',
+  }),
+  {
+    identity: {
+      anonymousToken: 'anonymoustoken1',
     },
     type: 'anonymous-token',
   }
@@ -8586,6 +8629,18 @@ assert.deepEqual(
 );
 assert.deepEqual(
   resolveAttemptSubmissionIdentity({
+    anonymousToken: ' anonymous \n token \t 1 ',
+    collectStudentName: false,
+    studentName: 'Stale Name',
+  }),
+  {
+    anonymousToken: 'anonymoustoken1',
+    studentName: null,
+    type: 'anonymous-token',
+  }
+);
+assert.deepEqual(
+  resolveAttemptSubmissionIdentity({
     collectStudentName: true,
     studentName: '   ',
   }),
@@ -8632,6 +8687,19 @@ assert.equal(
     ],
     identity: {
       anonymousToken: 'anonymous-token-1',
+    },
+  }),
+  2
+);
+assert.equal(
+  countMatchingStudentIdentityAttempts({
+    attempts: [
+      { anonymousToken: ' anonymous \n token \t 1 ', studentName: null },
+      { anonymousToken: 'anonymoustoken1', studentName: null },
+      { anonymousToken: 'anonymous-token-2', studentName: null },
+    ],
+    identity: {
+      anonymousToken: ' anonymous token 1 ',
     },
   }),
   2
@@ -21182,6 +21250,11 @@ assert.match(
   assignmentIdentitySource,
   /export function buildAnonymousIdentityKey[\s\S]*normalizeAnonymousToken\(anonymousToken\)/,
   'Assignment identity helpers should expose normalized anonymous-token identity keys.'
+);
+assert.match(
+  assignmentIdentitySource,
+  /export function normalizeAnonymousToken[\s\S]*\.normalize\('NFKC'\)[\s\S]*\.replace\(\s*\/\\s\+\/gu,\s*''\s*\)/,
+  'Assignment anonymous-token normalization should remove whitespace before grouping attempts.'
 );
 assert.match(
   assignmentIdentitySource,
