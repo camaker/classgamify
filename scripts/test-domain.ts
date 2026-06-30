@@ -1650,6 +1650,11 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /function buildAssignmentResultCopyArtifactStudentAttemptMetaItems[\s\S]*latest-attempts[\s\S]*latest-attempt-times[\s\S]*student-last-submitted/,
+  'Assignment result copy artifact preview metadata should share student-attempt metadata across follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*latest-attempts[\s\S]*assignment_result_copy_preview_meta_latest_attempts[\s\S]*countAssignmentResultCopyLatestAttemptViews/,
   'Assignment result copy artifact preview metadata should expose latest-attempt summary coverage for student follow-up artifacts.'
 );

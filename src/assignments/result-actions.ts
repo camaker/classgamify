@@ -521,27 +521,9 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         label: m.assignment_result_copy_preview_meta_next_steps(),
         value: artifacts.classroomBrief.followUpStudentViews.length,
       }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'latest-attempts',
-        label: m.assignment_result_copy_preview_meta_latest_attempts(),
-        value: countAssignmentResultCopyLatestAttemptViews(
-          artifacts.classroomBrief.followUpStudentViews
-        ),
-      }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'latest-attempt-times',
-        label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
-        value: countAssignmentResultCopyLatestAttemptTimeViews(
-          artifacts.classroomBrief.followUpStudentViews
-        ),
-      }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'student-last-submitted',
-        label: m.assignment_result_copy_preview_meta_student_last_submitted(),
-        value: countAssignmentResultCopyStudentLastSubmittedViews(
-          artifacts.classroomBrief.followUpStudentViews
-        ),
-      }),
+      ...buildAssignmentResultCopyArtifactStudentAttemptMetaItems(
+        artifacts.classroomBrief.followUpStudentViews
+      ),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
@@ -567,27 +549,9 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         label: m.assignment_result_copy_preview_meta_next_steps(),
         value: artifacts.reteachPlan.studentViews.length,
       }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'latest-attempts',
-        label: m.assignment_result_copy_preview_meta_latest_attempts(),
-        value: countAssignmentResultCopyLatestAttemptViews(
-          artifacts.reteachPlan.studentViews
-        ),
-      }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'latest-attempt-times',
-        label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
-        value: countAssignmentResultCopyLatestAttemptTimeViews(
-          artifacts.reteachPlan.studentViews
-        ),
-      }),
-      buildAssignmentResultCopyArtifactPreviewMetaItem({
-        key: 'student-last-submitted',
-        label: m.assignment_result_copy_preview_meta_student_last_submitted(),
-        value: countAssignmentResultCopyStudentLastSubmittedViews(
-          artifacts.reteachPlan.studentViews
-        ),
-      }),
+      ...buildAssignmentResultCopyArtifactStudentAttemptMetaItems(
+        artifacts.reteachPlan.studentViews
+      ),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
@@ -622,27 +586,9 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
       label: m.assignment_result_copy_preview_meta_next_steps(),
       value: artifacts.studentFollowUpSummary.studentViews.length,
     }),
-    buildAssignmentResultCopyArtifactPreviewMetaItem({
-      key: 'latest-attempts',
-      label: m.assignment_result_copy_preview_meta_latest_attempts(),
-      value: countAssignmentResultCopyLatestAttemptViews(
-        artifacts.studentFollowUpSummary.studentViews
-      ),
-    }),
-    buildAssignmentResultCopyArtifactPreviewMetaItem({
-      key: 'latest-attempt-times',
-      label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
-      value: countAssignmentResultCopyLatestAttemptTimeViews(
-        artifacts.studentFollowUpSummary.studentViews
-      ),
-    }),
-    buildAssignmentResultCopyArtifactPreviewMetaItem({
-      key: 'student-last-submitted',
-      label: m.assignment_result_copy_preview_meta_student_last_submitted(),
-      value: countAssignmentResultCopyStudentLastSubmittedViews(
-        artifacts.studentFollowUpSummary.studentViews
-      ),
-    }),
+    ...buildAssignmentResultCopyArtifactStudentAttemptMetaItems(
+      artifacts.studentFollowUpSummary.studentViews
+    ),
     buildAssignmentResultCopyArtifactPreviewMetaItem({
       key: 'lines',
       label: m.assignment_result_copy_preview_meta_lines(),
@@ -665,6 +611,32 @@ function buildAssignmentResultCopyArtifactPreviewMetaItem({
     label,
     value: formatAssignmentResultNumber(value, { min: 0 }),
   };
+}
+
+function buildAssignmentResultCopyArtifactStudentAttemptMetaItems(
+  studentViews: Array<{
+    lastSubmittedLabel: string | null;
+    latestAttemptCompletedAtLabel: string | null;
+    latestAttemptSummaryLabel: string | null;
+  }>
+) {
+  return [
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'latest-attempts',
+      label: m.assignment_result_copy_preview_meta_latest_attempts(),
+      value: countAssignmentResultCopyLatestAttemptViews(studentViews),
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'latest-attempt-times',
+      label: m.assignment_result_copy_preview_meta_latest_attempt_times(),
+      value: countAssignmentResultCopyLatestAttemptTimeViews(studentViews),
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'student-last-submitted',
+      label: m.assignment_result_copy_preview_meta_student_last_submitted(),
+      value: countAssignmentResultCopyStudentLastSubmittedViews(studentViews),
+    }),
+  ];
 }
 
 function countAssignmentResultCopyLatestAttemptViews(
