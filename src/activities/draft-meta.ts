@@ -79,6 +79,7 @@ export type ActivityDraftReviewChecklistItem = {
   label: string;
   priority: 'high' | 'normal';
   status: ActivityDraftReviewChecklistStatus;
+  templateType?: ActivityTemplateType;
 };
 
 export type ActivityDraftTemplateOption = TemplateRemixTemplateOption;
@@ -255,7 +256,7 @@ export function buildActivityDraftMeta({
   const readyTemplates = readyTemplateOptions.map((option) => option.shortName);
   const reviewChecklistItems = buildDraftReviewChecklistItems({
     content,
-    lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
+    lockedTemplateOptions: remixSummary.lockedTemplateOptions,
     suggestedTemplates,
   });
 
@@ -890,11 +891,11 @@ function formatActivityTemplateQuizChoiceReadinessStatus(
 
 function buildDraftReviewChecklistItems({
   content,
-  lockedTemplateDiagnostics,
+  lockedTemplateOptions,
   suggestedTemplates,
 }: {
   content: ActivityContent;
-  lockedTemplateDiagnostics: string[];
+  lockedTemplateOptions: TemplateRemixLockedOption[];
   suggestedTemplates: string[];
 }): ActivityDraftReviewChecklistItem[] {
   const checklist: ActivityDraftReviewChecklistItem[] = [
@@ -926,15 +927,17 @@ function buildDraftReviewChecklistItems({
       status: 'ready',
     });
 
-    if (lockedTemplateDiagnostics[0]) {
+    const nextLockedTemplate = lockedTemplateOptions[0];
+    if (nextLockedTemplate) {
       checklist.push({
         description: m.activity_draft_meta_checklist_next_gap_description(),
         id: 'next-gap',
         label: m.activity_draft_meta_checklist_next_gap({
-          diagnosis: lockedTemplateDiagnostics[0],
+          diagnosis: nextLockedTemplate.diagnosis,
         }),
         priority: 'normal',
         status: 'action-needed',
+        templateType: nextLockedTemplate.template,
       });
     }
 
@@ -946,10 +949,13 @@ function buildDraftReviewChecklistItems({
       m.activity_draft_meta_checklist_add_more_structure_description(),
     id: 'content-gap',
     label:
-      lockedTemplateDiagnostics[0] ??
+      lockedTemplateOptions[0]?.diagnosis ??
       m.activity_draft_meta_checklist_add_more_structure(),
     priority: 'high',
     status: 'action-needed',
+    ...(lockedTemplateOptions[0]
+      ? { templateType: lockedTemplateOptions[0].template }
+      : {}),
   });
 
   return checklist;

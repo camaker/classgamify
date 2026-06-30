@@ -4050,6 +4050,21 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /templateType\?: ActivityTemplateType/,
+  'AI draft review checklist items should carry optional template identity for template-gap actions.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /lockedTemplateOptions: remixSummary\.lockedTemplateOptions[\s\S]*nextLockedTemplate[\s\S]*templateType: nextLockedTemplate\.template/,
+  'AI draft review checklist should derive template-gap identity from structured locked template options.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSource,
+  /lockedTemplateDiagnostics: remixSummary\.lockedTemplateDiagnostics/,
+  'AI draft review checklist should not pass bare locked-template diagnostic strings into checklist building.'
+);
+assert.match(
+  activityDraftMetaSource,
   /const readyTemplateOptions = remixSummary\.readyTemplateOptions[\s\S]*const suggestedTemplateOptions = remixSummary\.suggestedTemplateOptions[\s\S]*readyTemplateCount: readyTemplateOptions\.length[\s\S]*suggestedTemplateCount: suggestedTemplateOptions\.length/,
   'AI draft meta should derive ready and suggested template counts from the exported option lists.'
 );
@@ -33319,6 +33334,20 @@ assert.ok(
     'Next content gap: Add match pairs to unlock Match.'
   )
 );
+assert.deepEqual(
+  questionOnlyDraftMeta.reviewChecklistItems.find(
+    (item) => item.id === 'next-gap'
+  ),
+  {
+    description:
+      'This is the fastest missing structure to add when you want more playable templates.',
+    id: 'next-gap',
+    label: 'Next content gap: Add match pairs to unlock Match.',
+    priority: 'normal',
+    status: 'action-needed',
+    templateType: 'match-up',
+  }
+);
 assert.ok(
   questionOnlyDraftMeta.reviewChecklist.includes(
     'Add distractor choices or vocabulary for 1 quiz question before publishing.'
@@ -33371,6 +33400,20 @@ const lockedOnlyDraftMeta = buildActivityDraftMeta({
 });
 assert.ok(
   lockedOnlyDraftMeta.reviewChecklist.includes('Add questions to unlock Quiz.')
+);
+assert.deepEqual(
+  lockedOnlyDraftMeta.reviewChecklistItems.find(
+    (item) => item.id === 'content-gap'
+  ),
+  {
+    description:
+      'More pairs or groups make the same activity usable in matching, connecting, and classification templates.',
+    id: 'content-gap',
+    label: 'Add questions to unlock Quiz.',
+    priority: 'high',
+    status: 'action-needed',
+    templateType: 'quiz',
+  }
 );
 const fallbackFillBlankDraft = createFallbackActivityDraft({
   difficulty: 'starter',
