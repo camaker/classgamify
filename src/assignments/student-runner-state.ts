@@ -128,6 +128,7 @@ export type StudentRunnerIdentityView =
 export type StudentRunnerControlView = {
   progressLabel: string;
   readOnlyMessage?: string;
+  requiresIncompleteSubmitConfirmation: boolean;
   runnerTitle: string;
   runtimeItemsDisabled: boolean;
   showTimeExpiredMessage: boolean;
@@ -553,6 +554,9 @@ export function buildStudentRunnerPageViewModel({
   const attemptUsageLabel = result
     ? formatStudentAttemptUsageLabel(result.attemptUsage)
     : undefined;
+  const requiresIncompleteSubmitConfirmation = Boolean(
+    confirmIncompleteSubmit && attemptControlState.unansweredLabel
+  );
   const revealAnswers = Boolean(
     result && assignment?.settings.showCorrectAnswers
   );
@@ -584,16 +588,16 @@ export function buildStudentRunnerPageViewModel({
     controlView: {
       progressLabel: completionCopy.progressLabel,
       readOnlyMessage: attemptControlState.readOnlyMessage,
+      requiresIncompleteSubmitConfirmation,
       runnerTitle: activityRunnerCopy?.title ?? '',
       runtimeItemsDisabled: attemptControlState.runtimeItemsDisabled,
       showTimeExpiredMessage: attemptControlState.showTimeExpiredMessage,
       submitButtonLabel:
         attemptControlState.submitButtonLabel ??
         completionCopy.submitButtonLabel,
-      submitConfirmationMessage:
-        confirmIncompleteSubmit && attemptControlState.unansweredLabel
-          ? completionCopy.confirmIncompleteSubmit
-          : undefined,
+      submitConfirmationMessage: requiresIncompleteSubmitConfirmation
+        ? completionCopy.confirmIncompleteSubmit
+        : undefined,
       submitDisabled: attemptControlState.submitDisabled,
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
       timerBadge: attemptTimerBadge,

@@ -16,6 +16,9 @@ export function StudentRunnerSubmitControls({
       <Button
         type="button"
         className="w-full sm:w-fit"
+        data-confirm-incomplete={
+          controlView.requiresIncompleteSubmitConfirmation ? true : undefined
+        }
         disabled={controlView.submitDisabled}
         onClick={onSubmit}
       >

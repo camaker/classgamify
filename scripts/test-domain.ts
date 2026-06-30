@@ -7834,8 +7834,13 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.submitConfirmationMessage[\s\S]*controlView\.readOnlyMessage/,
-  'Student runner submit controls should render prepared submit disabled state, label, confirmation, and hint copy.'
+  /data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.submitConfirmationMessage[\s\S]*controlView\.readOnlyMessage/,
+  'Student runner submit controls should render prepared submit disabled state, label, structured incomplete-confirmation state, confirmation, and hint copy.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage: requiresIncompleteSubmitConfirmation/,
+  'Student runner page view-model should expose a structured incomplete-submit confirmation state instead of making components infer it from copy.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -7969,7 +7974,7 @@ assert.match(
 );
 assert.doesNotMatch(
   playRouteSource,
-  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|headerView\.ruleSummaryView|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
+  /runnerPageView\.loadingView\.message|missingView\.browseTemplatesLabel|headerView\.ruleItems|headerView\.ruleSummaryView|identityView\.mode|resultPanelView\.scoreLabel|controlView\.timerBadge\.label|controlView\.submitButtonLabel|controlView\.unansweredLabel|controlView\.requiresIncompleteSubmitConfirmation|controlView\.submitConfirmationMessage|controlView\.readOnlyMessage|pageState\.hidePreviewAnswers/,
   'Student play route should not render low-level student-runner display fields directly.'
 );
 assert.match(
@@ -15980,6 +15985,7 @@ assert.deepEqual(
     controlView: {
       progressLabel: '1/1 answered',
       readOnlyMessage: undefined,
+      requiresIncompleteSubmitConfirmation: false,
       runnerTitle: 'Quiz',
       runtimeItemsDisabled: true,
       showTimeExpiredMessage: false,
@@ -16305,12 +16311,16 @@ assert.deepEqual(
     submitConfirmationMessage:
       confirmIncompleteStudentRunnerPageView.controlView
         .submitConfirmationMessage,
+    requiresIncompleteSubmitConfirmation:
+      confirmIncompleteStudentRunnerPageView.controlView
+        .requiresIncompleteSubmitConfirmation,
     unansweredLabel:
       confirmIncompleteStudentRunnerPageView.controlView.unansweredLabel,
   },
   {
     submitButtonLabel: 'Submit anyway',
     submitConfirmationMessage: '1 question is still unanswered.',
+    requiresIncompleteSubmitConfirmation: true,
     unansweredLabel: '1 item left unanswered.',
   }
 );
