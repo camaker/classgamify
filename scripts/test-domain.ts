@@ -17557,6 +17557,75 @@ assert.deepEqual(
     successMessage: 'Attempt submitted.',
   }
 );
+assert.equal(
+  buildStudentRunnerSubmissionSuccessState({
+    executionPlan: {
+      anonymousToken: undefined,
+      input: {
+        answers: [],
+        durationSeconds: 25,
+        shareSlug: 'share-public',
+      },
+      reason: 'complete',
+      successMessage: 'Attempt submitted.',
+      type: 'submit',
+    },
+    response: {
+      ...studentRunnerSubmissionResponse,
+      attemptUsage: {
+        ...studentRunnerSubmissionResponse.attemptUsage,
+        usedAttempts: 2.9,
+      },
+    },
+  }).submittedAttemptCount,
+  2
+);
+assert.equal(
+  buildStudentRunnerSubmissionSuccessState({
+    executionPlan: {
+      anonymousToken: undefined,
+      input: {
+        answers: [],
+        durationSeconds: 25,
+        shareSlug: 'share-public',
+      },
+      reason: 'complete',
+      successMessage: 'Attempt submitted.',
+      type: 'submit',
+    },
+    response: {
+      ...studentRunnerSubmissionResponse,
+      attemptUsage: {
+        ...studentRunnerSubmissionResponse.attemptUsage,
+        usedAttempts: -1,
+      },
+    },
+  }).submittedAttemptCount,
+  0
+);
+assert.equal(
+  buildStudentRunnerSubmissionSuccessState({
+    executionPlan: {
+      anonymousToken: undefined,
+      input: {
+        answers: [],
+        durationSeconds: 25,
+        shareSlug: 'share-public',
+      },
+      reason: 'complete',
+      successMessage: 'Attempt submitted.',
+      type: 'submit',
+    },
+    response: {
+      ...studentRunnerSubmissionResponse,
+      attemptUsage: {
+        ...studentRunnerSubmissionResponse.attemptUsage,
+        usedAttempts: Number.NaN,
+      },
+    },
+  }).submittedAttemptCount,
+  0
+);
 assert.deepEqual(
   buildStudentRunnerAnswerUpdatePlan({
     answers: {

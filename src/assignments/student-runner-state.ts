@@ -10,7 +10,10 @@ import {
   buildAttemptTimerState,
   type AttemptTimerState,
 } from '@/assignments/attempt-duration';
-import type { AssignmentAttemptUsage } from '@/assignments/attempt-limits';
+import {
+  normalizeAssignmentAttemptCount,
+  type AssignmentAttemptUsage,
+} from '@/assignments/attempt-limits';
 import {
   buildAnonymousAttemptCopy,
   buildAttemptCompletionCopy,
@@ -755,7 +758,7 @@ function buildStudentRunnerIdentityView({
 }
 
 function normalizeStudentRunnerSubmittedAttemptCount(value: number) {
-  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+  return normalizeAssignmentAttemptCount(value);
 }
 
 function buildStudentRunnerResultPanelView({
@@ -964,7 +967,9 @@ export function buildStudentRunnerSubmissionSuccessState({
     anonymousToken: executionPlan.anonymousToken,
     confirmIncompleteSubmit: false,
     result: buildStudentRunnerSubmissionResultState({ response }),
-    submittedAttemptCount: response.attemptUsage.usedAttempts,
+    submittedAttemptCount: normalizeStudentRunnerSubmittedAttemptCount(
+      response.attemptUsage.usedAttempts
+    ),
     ...(executionPlan.submittedStudentName
       ? { submittedStudentName: executionPlan.submittedStudentName }
       : {}),
