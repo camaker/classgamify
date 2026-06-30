@@ -36,7 +36,10 @@ import {
   assertActivityCanArchive,
   assertActivityCanRestore,
 } from '@/activities/lifecycle';
-import { getTemplateRemixOption } from '@/activities/template-remix';
+import {
+  assertTemplateRemixOptionReady,
+  getTemplateRemixOption,
+} from '@/activities/template-remix';
 import { getDb } from '@/db';
 import { activity } from '@/db/app.schema';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
@@ -259,9 +262,7 @@ export const remixActivityTemplate = createServerFn({ method: 'POST' })
       currentTemplateType: sourceActivity.templateType,
       template: targetTemplate,
     });
-    if (!remixOption.isReady) {
-      throw new Error(remixOption.diagnosis);
-    }
+    assertTemplateRemixOptionReady(remixOption);
 
     const now = new Date();
     const id = nanoid(APP_ENTITY_ID_LENGTH.generated);

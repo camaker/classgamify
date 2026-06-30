@@ -20,7 +20,10 @@ import {
 } from '@/activities/question-options';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
 import { makeActivityStableId } from '@/activities/stable-id';
-import { getTemplateRemixOption } from '@/activities/template-remix';
+import {
+  assertTemplateRemixOptionReady,
+  getTemplateRemixOption,
+} from '@/activities/template-remix';
 import { m } from '@/locale/paraglide/messages';
 import { z } from 'zod';
 
@@ -152,9 +155,7 @@ function assertTemplateRequirements(
     template,
   });
 
-  if (!remixOption.isReady) {
-    throw new Error(remixOption.diagnosis);
-  }
+  assertTemplateRemixOptionReady(remixOption);
 }
 
 function parseQuestions(raw?: string): ActivityQuestion[] {

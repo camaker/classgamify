@@ -258,6 +258,7 @@ import {
   normalizeListeningSpeechLanguage,
 } from '@/activities/listening-speech';
 import {
+  assertTemplateRemixOptionReady,
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
   formatTemplateRequirementList,
@@ -265,6 +266,7 @@ import {
   formatTemplateRequirement,
   formatTemplateRequirements,
   getTemplateRemixPlan,
+  isTemplateRemixReadinessError,
 } from '@/activities/template-remix';
 import {
   buildTemplateCreateSearch,
@@ -960,6 +962,19 @@ function getAttemptAnswerValidationError(action: () => void) {
   return error;
 }
 
+function getTemplateRemixReadinessError(action: () => void) {
+  let error: unknown;
+
+  try {
+    action();
+  } catch (caught) {
+    error = caught;
+  }
+
+  assert.ok(isTemplateRemixReadinessError(error));
+  return error;
+}
+
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
 
 const submissionRuntimeItems = [
@@ -1585,6 +1600,11 @@ assert.match(
   activityTemplateRemixSource,
   /hasRuntimeDisplayText\(question\.prompt\)[\s\S]*hasRuntimeDisplayText\(question\.answer\)/,
   'Template remix question readiness should use the shared runtime display-text helper.'
+);
+assert.match(
+  activityTemplateRemixSource,
+  /export class TemplateRemixReadinessError extends Error[\s\S]*readonly code: TemplateRemixReadinessErrorCode[\s\S]*readonly diagnosis: string[\s\S]*readonly missingRequirements: ActivityTemplateContentRequirement\[\][\s\S]*readonly templateType: ActivityTemplateType[\s\S]*export function assertTemplateRemixOptionReady\(option: TemplateRemixOption\)/,
+  'Template remix readiness failures should expose a structured domain error contract.'
 );
 assert.doesNotMatch(
   activityTemplateRemixSource,
@@ -20771,6 +20791,16 @@ assert.doesNotMatch(
   /teacherNotesText: z\.string\(\)\.max\(2000\)/,
   'Activity notes schema should not maintain a local field length.'
 );
+assert.match(
+  activityValidationSource,
+  /assertTemplateRemixOptionReady\(remixOption\)/,
+  'Activity validation should reuse the template remix readiness assertion.'
+);
+assert.doesNotMatch(
+  activityValidationSource,
+  /throw new Error\(remixOption\.diagnosis\)/,
+  'Activity validation should not throw raw template remix diagnostic strings.'
+);
 const activityStableIdSource = readFileSync(
   'src/activities/stable-id.ts',
   'utf8'
@@ -21098,6 +21128,16 @@ assert.match(
   activitiesApiSource,
   /remixActivityTemplate[\s\S]*buildRemixedActivityInsert[\s\S]*\.select\(buildActivityDetailSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId: id, userId \}\)/,
   'Template remix API should reload remixed drafts through the activity detail query helpers.'
+);
+assert.match(
+  remixActivityApiSource,
+  /getTemplateRemixOption\([\s\S]*assertTemplateRemixOptionReady\(remixOption\)/,
+  'Template remix API should validate target readiness through the template remix domain assertion.'
+);
+assert.doesNotMatch(
+  remixActivityApiSource,
+  /throw new Error\(remixOption\.diagnosis\)/,
+  'Template remix API should not throw raw template readiness diagnostics.'
 );
 assert.match(
   activitiesApiSource,
@@ -29813,6 +29853,29 @@ const questionOnlyRemixPlan = getTemplateRemixPlan({
   content: questionOnlyContent,
   currentTemplateType: 'quiz',
 });
+const questionOnlyMatchRemixOption = questionOnlyRemixPlan.options.find(
+  (option) => option.template.type === 'match-up'
+);
+assert.ok(questionOnlyMatchRemixOption);
+const questionOnlyMatchReadinessError = getTemplateRemixReadinessError(() =>
+  assertTemplateRemixOptionReady(questionOnlyMatchRemixOption)
+);
+assert.deepEqual(
+  {
+    code: questionOnlyMatchReadinessError.code,
+    diagnosis: questionOnlyMatchReadinessError.diagnosis,
+    message: questionOnlyMatchReadinessError.message,
+    missingRequirements: questionOnlyMatchReadinessError.missingRequirements,
+    templateType: questionOnlyMatchReadinessError.templateType,
+  },
+  {
+    code: 'missing-content',
+    diagnosis: 'Add match pairs to unlock Match.',
+    message: 'Add match pairs to unlock Match.',
+    missingRequirements: ['pairs'],
+    templateType: 'match-up',
+  }
+);
 const blankStructuredRemixPlan = getTemplateRemixPlan({
   content: {
     ...questionOnlyContent,

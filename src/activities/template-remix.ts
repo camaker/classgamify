@@ -41,6 +41,24 @@ export type TemplateRemixPlan = {
   suggestedOptions: TemplateRemixOption[];
 };
 
+export type TemplateRemixReadinessErrorCode = 'missing-content';
+
+export class TemplateRemixReadinessError extends Error {
+  readonly code: TemplateRemixReadinessErrorCode;
+  readonly diagnosis: string;
+  readonly missingRequirements: ActivityTemplateContentRequirement[];
+  readonly templateType: ActivityTemplateType;
+
+  constructor(option: TemplateRemixOption) {
+    super(option.diagnosis);
+    this.code = 'missing-content';
+    this.diagnosis = option.diagnosis;
+    this.missingRequirements = option.missingRequirements;
+    this.name = 'TemplateRemixReadinessError';
+    this.templateType = option.template.type;
+  }
+}
+
 export type TemplateRemixSummary = {
   lockedTemplateDiagnostics: string[];
   lockedTemplateOptions: TemplateRemixLockedOption[];
@@ -121,6 +139,18 @@ export function getTemplateRemixOption({
       : m.template_remix_needs_more_content(),
     template,
   };
+}
+
+export function assertTemplateRemixOptionReady(option: TemplateRemixOption) {
+  if (!option.isReady) {
+    throw new TemplateRemixReadinessError(option);
+  }
+}
+
+export function isTemplateRemixReadinessError(
+  error: unknown
+): error is TemplateRemixReadinessError {
+  return error instanceof TemplateRemixReadinessError;
 }
 
 function toTemplateOptionSummary(
