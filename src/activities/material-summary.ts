@@ -1,6 +1,7 @@
 import {
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
+  getActivityMaterialReferenceKey,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
 import {
@@ -278,7 +279,9 @@ export function buildActivitySourceMaterialPickerView({
   const attachedMaterials =
     normalizeActivityMaterialReferences(selectedMaterials);
   const selectedIds = new Set(
-    attachedMaterials.map((material) => material.fileId)
+    attachedMaterials
+      .map((material) => getActivityMaterialReferenceKey(material.fileId))
+      .filter((key): key is string => Boolean(key))
   );
   const availableItems = availableFiles.flatMap((file) => {
     const material = buildActivityMaterialReferenceFromUserFile(file);
@@ -289,7 +292,10 @@ export function buildActivitySourceMaterialPickerView({
             isAtLimit:
               attachedMaterials.length >= ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
             material,
-            selected: selectedIds.has(material.fileId),
+            selected: isActivitySourceMaterialSelected({
+              material,
+              selectedIds,
+            }),
           }),
         ]
       : [];
@@ -345,9 +351,25 @@ export function removeActivitySourceMaterialPickerItem({
   current: unknown;
   fileId: string;
 }) {
+  const removedMaterialKey = getActivityMaterialReferenceKey(fileId);
+  if (!removedMaterialKey) return normalizeActivityMaterialReferences(current);
+
   return normalizeActivityMaterialReferences(current).filter(
-    (material) => material.fileId !== fileId
+    (material) =>
+      getActivityMaterialReferenceKey(material.fileId) !== removedMaterialKey
   );
+}
+
+function isActivitySourceMaterialSelected({
+  material,
+  selectedIds,
+}: {
+  material: ActivityMaterialReference;
+  selectedIds: Set<string>;
+}) {
+  const materialKey = getActivityMaterialReferenceKey(material.fileId);
+
+  return Boolean(materialKey && selectedIds.has(materialKey));
 }
 
 export function formatActivitySourceMaterialReferenceMeta(

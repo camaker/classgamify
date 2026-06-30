@@ -211,6 +211,7 @@ import {
   ACTIVITY_SOURCE_MATERIAL_REFERENCE_LIMITS,
   ACTIVITY_SOURCE_MATERIALS_MAX_COUNT,
   buildActivityMaterialReferenceFromUserFile,
+  getActivityMaterialReferenceKey,
   normalizeActivityMaterialReferenceFilename,
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
@@ -5995,6 +5996,8 @@ assert.equal(
   ),
   'encoded unit.pdf'
 );
+assert.equal(getActivityMaterialReferenceKey(' File １ '), 'file 1');
+assert.equal(getActivityMaterialReferenceKey('\u00A0　\t'), undefined);
 assert.match(
   activityMaterialSummarySource,
   /export type ActivitySourceMaterialExtractionActionView[\s\S]*nextStep: ActivitySourceMaterialExtractionNextStepView;[\s\S]*export type ActivitySourceMaterialExtractionNextStepView = \{[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];[\s\S]*primaryNextStep\?: ActivitySourceMaterialExtractionNextStepView;/,
@@ -6197,6 +6200,35 @@ assert.equal(
   sourceMaterialPickerView.availableItems[1]?.attachLabel,
   'Attach Worksheet Scan.pdf'
 );
+const normalizedSelectedSourceMaterialPickerView =
+  buildActivitySourceMaterialPickerView({
+    availableFiles: [
+      {
+        contentType: 'application/pdf',
+        id: 'file 1',
+        originalName: 'Worksheet Scan.pdf',
+      },
+    ],
+    canLoadFiles: true,
+    isError: false,
+    isLoading: false,
+    selectedMaterials: [
+      {
+        contentType: 'application/pdf',
+        fileId: ' File １ ',
+        kind: 'worksheet-document',
+        originalName: 'Attached worksheet.pdf',
+      },
+    ],
+  });
+assert.equal(
+  normalizedSelectedSourceMaterialPickerView.availableItems[0]?.selected,
+  true
+);
+assert.equal(
+  normalizedSelectedSourceMaterialPickerView.availableItems[0]?.disabled,
+  true
+);
 assert.equal(
   buildActivitySourceMaterialPickerView({
     availableFiles: [],
@@ -6265,6 +6297,20 @@ assert.deepEqual(
     material: sourceMaterialPickerView.availableItems[1]!.material,
   }).map((material) => material.fileId),
   ['audio-1', 'worksheet-1']
+);
+assert.deepEqual(
+  removeActivitySourceMaterialPickerItem({
+    current: [
+      ...sourceMaterialPickerView.attachedItems.map((item) => item.material),
+      {
+        fileId: ' File １ ',
+        kind: 'worksheet-document',
+        originalName: 'Worksheet.pdf',
+      },
+    ],
+    fileId: 'file 1',
+  }).map((material) => material.fileId),
+  ['audio-1']
 );
 assert.deepEqual(
   removeActivitySourceMaterialPickerItem({
