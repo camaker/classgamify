@@ -38355,6 +38355,7 @@ const csvExportData = {
 } satisfies Parameters<typeof buildAssignmentResultsCsv>[0];
 
 const csv = buildAssignmentResultsCsv(csvExportData);
+const csvRows = parseCsvRows(csv);
 assert.deepEqual(
   buildAssignmentResultsExportDeliveryView({
     expiresAt: csvExportData.assignment.expiresAt,
@@ -38422,6 +38423,10 @@ assert.match(
   csv,
   /"attempt-3","Anonymous student 1","2026-01-03T10:00:00\.000Z","0","","0","","2","0","2","1","","1","0","0","0","2","2026-01-03T10:00:00\.000Z"/
 );
+const csvHeaderRow = csvRows[0] ?? [];
+const emptyAnswerCsvRow = csvRows.find((row) => row.includes('attempt-3'));
+assert.ok(emptyAnswerCsvRow);
+assert.equal(emptyAnswerCsvRow.length, csvHeaderRow.length);
 assert.match(
   csv,
   /"attempt-1","Alice","2026-01-01T10:00:00\.000Z","1","2","50","2","2","1","1","0","45","2","100","75","100","0","2026-01-02T10:00:00\.000Z","1","q-1"/
@@ -40265,5 +40270,51 @@ assert.deepEqual(
     type: 'blocked',
   }
 );
+
+function parseCsvRows(csvText: string) {
+  const normalizedCsv = csvText.replace(/^\uFEFF/u, '');
+  const rows: string[][] = [];
+  let cell = '';
+  let row: string[] = [];
+  let inQuotes = false;
+
+  for (let index = 0; index < normalizedCsv.length; index += 1) {
+    const char = normalizedCsv[index];
+    const nextChar = normalizedCsv[index + 1];
+
+    if (char === '"' && inQuotes && nextChar === '"') {
+      cell += '"';
+      index += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      row.push(cell);
+      cell = '';
+      continue;
+    }
+
+    if (char === '\r' && nextChar === '\n' && !inQuotes) {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+      index += 1;
+      continue;
+    }
+
+    cell += char;
+  }
+
+  row.push(cell);
+  rows.push(row);
+
+  return rows;
+}
 
 console.log('Domain tests passed.');

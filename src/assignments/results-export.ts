@@ -325,7 +325,10 @@ function buildAssignmentResultsExportAnswerRow({
 }
 
 function buildAssignmentResultsExportEmptyAnswerRow(baseColumns: unknown[]) {
-  return [...baseColumns, '', '', '', '', '', '', '', '', '', '', '', ''];
+  return [
+    ...baseColumns,
+    ...getAssignmentResultsExportAnswerColumns().map(() => ''),
+  ];
 }
 
 function buildAssignmentResultsExportItemPerformanceColumns({
@@ -449,6 +452,12 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_student_best_accuracy(),
     m.assignment_results_export_column_student_needs_review_count(),
     m.assignment_results_export_column_student_last_submitted(),
+    ...getAssignmentResultsExportAnswerColumns(),
+  ] as const;
+}
+
+function getAssignmentResultsExportAnswerColumns() {
+  return [
     m.assignment_results_export_column_item_number(),
     m.assignment_results_export_column_item_id(),
     m.assignment_results_export_column_item_correct_rate(),
