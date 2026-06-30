@@ -772,6 +772,7 @@ import {
   buildAssignmentStudentFollowUpSummary,
   buildAssignmentStudentFollowUpSummaryStudentView,
   formatStudentFollowUpLastSubmitted,
+  formatStudentFollowUpLastSubmittedContext,
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
 } from '@/assignments/student-follow-up-summary';
@@ -1869,6 +1870,16 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /formatStudentFollowUpLastSubmittedContext\(\{[\s\S]*lastSubmittedLabel,[\s\S]*latestAttemptCompletedAtLabel[\s\S]*lastSubmittedContext: lastSubmittedContextLabel/,
+  'Classroom brief student follow-up rows should share the student follow-up last-submitted copy context.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
+  /text: formatAssignmentResultCopyLine\([\s\S]*assignment_classroom_brief_follow_up_student_with_latest_attempt[\s\S]*assignment_classroom_brief_follow_up_student/,
+  'Classroom brief student follow-up rows should normalize copied lines after optional last-submitted context is injected.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /kindLabel: item\.kindLabel/,
   'Classroom brief focus item views should expose prepared item type labels for teacher scanning.'
 );
@@ -1945,6 +1956,16 @@ assert.match(
   assignmentReteachPlanSource,
   /formatStudentFollowUpLastSubmitted\(student\)[\s\S]*lastSubmittedLabel/,
   'Reteach plan student follow-up rows should expose shared student-level last-submitted labels.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /formatStudentFollowUpLastSubmittedContext\(\{[\s\S]*lastSubmittedLabel,[\s\S]*latestAttemptCompletedAtLabel[\s\S]*lastSubmittedContext: lastSubmittedContextLabel/,
+  'Reteach plan student follow-up rows should share the student follow-up last-submitted copy context.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /text: formatAssignmentResultCopyLine\([\s\S]*assignment_reteach_plan_student_with_latest_attempt[\s\S]*assignment_reteach_plan_student/,
+  'Reteach plan student follow-up rows should normalize copied lines after optional last-submitted context is injected.'
 );
 assert.doesNotMatch(
   assignmentReteachPlanSource,
@@ -37281,6 +37302,17 @@ const anonymousLatestAttemptCompletedAtLabel =
 const anonymousStudentLastSubmittedLabel = formatStudentFollowUpLastSubmitted(
   resultAnalysis.students[0]!
 );
+const anonymousStudentLastSubmittedContext =
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
+    latestAttemptCompletedAtLabel: null,
+  });
+const anonymousStudentLastSubmittedContextWithLatestAttempt =
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
+    latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
+  });
+assert.equal(anonymousStudentLastSubmittedContextWithLatestAttempt, '');
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -37384,7 +37416,7 @@ assert.deepEqual(
     reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
-    text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+    text: `- 1. Anonymous student 1: 0% latest, 2 items to review. ${anonymousStudentLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`,
   }
 );
 assert.deepEqual(classroomBrief.followUpStudentViews[0], {
@@ -37399,7 +37431,7 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
-  text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+  text: `- 1. Anonymous student 1: 0% latest, 2 items to review. ${anonymousStudentLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`,
 });
 assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
@@ -37453,7 +37485,7 @@ assert.equal(
     index: Number.NaN,
     student: classroomBrief.followUpStudents[0]!,
   }).text,
-  '- 1. Anonymous student 1: 0% latest, 2 items to review. Next: review missed or unanswered items, then assign one short retry'
+  `- 1. Anonymous student 1: 0% latest, 2 items to review. ${anonymousStudentLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`
 );
 assert.deepEqual(
   buildAssignmentClassroomBriefFollowUpStudentView({
@@ -37496,7 +37528,7 @@ assert.match(
 );
 assert.match(
   classroomBrief.text,
-  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   classroomBriefWithAttempts.text,
@@ -37563,6 +37595,11 @@ const alphaReviewStudent = followUpPriorityStudents.find(
 )!;
 const alphaReviewLastSubmittedLabel =
   formatStudentFollowUpLastSubmitted(alphaReviewStudent);
+const alphaReviewLastSubmittedContext =
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: alphaReviewLastSubmittedLabel,
+    latestAttemptCompletedAtLabel: null,
+  });
 assert.deepEqual(
   buildAssignmentReteachPlanItemView({
     index: 0,
@@ -37587,7 +37624,7 @@ assert.deepEqual(buildAssignmentReteachPlanStudentView({
   reviewItemCountLabel: '3 items to review',
   studentKey: 'name:alpha-review',
   studentLabel: 'Alpha review',
-  text: '- Alpha review: 70% latest accuracy, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
+  text: `- Alpha review: 70% latest accuracy, 3 items to review. ${alphaReviewLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`,
 });
 assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
   accuracyLabel: '0%',
@@ -37671,7 +37708,7 @@ assert.match(
 );
 assert.match(
   reteachPlan.text,
-  /Alpha review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- More review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- Lower score: 10% latest accuracy, 1 item to review\. Next: review missed or unanswered items, then assign one short retry/
+  /Alpha review: 70% latest accuracy, 3 items to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry\n- More review: 70% latest accuracy, 3 items to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry\n- Lower score: 10% latest accuracy, 1 item to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   reteachPlanWithAttempts.text,
@@ -37908,6 +37945,16 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLastSubmittedContext\(\{[\s\S]*lastSubmittedLabel,[\s\S]*latestAttemptCompletedAtLabel[\s\S]*lastSubmittedContext: lastSubmittedContextLabel/,
+  'Assignment student follow-up summaries should reuse shared last-submitted context in copied follow-up lines.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /text: formatAssignmentResultCopyLine\([\s\S]*assignment_student_follow_up_line_with_latest_attempt[\s\S]*assignment_student_follow_up_line/,
+  'Assignment student follow-up summaries should normalize copied lines after optional last-submitted context is injected.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
   /buildLatestAttemptReviewByStudentKey[\s\S]*sortAssignmentAttemptReviewsByCompletedAt\(attempts\)/,
   'Assignment student follow-up summaries should resolve latest attempts through the shared attempt-review sort helper.'
 );
@@ -37925,6 +37972,11 @@ assert.match(
   assignmentStudentFollowUpSummarySource,
   /assignment_student_follow_up_latest_attempt_summary_with_time[\s\S]*assignment_student_follow_up_latest_attempt_summary/,
   'Assignment student follow-up latest-attempt summaries should use localized timed and untimed copy.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /formatStudentFollowUpLastSubmittedContext[\s\S]*if \(!lastSubmittedLabel \|\| latestAttemptCompletedAtLabel\) return ''[\s\S]*assignment_student_follow_up_last_submitted_context/,
+  'Assignment student follow-up last-submitted copy should omit duplicate timing when the latest-attempt summary already includes a submitted time.'
 );
 assert.doesNotMatch(
   assignmentStudentFollowUpSummarySource,
@@ -37949,8 +38001,29 @@ assert.deepEqual(
     reviewItemCountLabel: '3 items to review',
     studentKey: 'name:alpha-review',
     studentLabel: 'Alpha review',
-    text: '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
+    text: `- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. ${alphaReviewLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`,
   }
+);
+assert.equal(
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: alphaReviewLastSubmittedLabel,
+    latestAttemptCompletedAtLabel: null,
+  }),
+  alphaReviewLastSubmittedContext
+);
+assert.equal(
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: alphaReviewLastSubmittedLabel,
+    latestAttemptCompletedAtLabel: alphaReviewLastSubmittedLabel,
+  }),
+  ''
+);
+assert.equal(
+  formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel: null,
+    latestAttemptCompletedAtLabel: null,
+  }),
+  ''
 );
 assert.equal(
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!),
@@ -38005,7 +38078,7 @@ assert.equal(
     index: -5,
     student: alphaReviewStudent,
   }).text,
-  '- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. Next: review missed or unanswered items, then assign one short retry'
+  `- 1. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review. ${alphaReviewLastSubmittedContext} Next: review missed or unanswered items, then assign one short retry`
 );
 assert.equal(
   buildAssignmentStudentFollowUpSummaryStudentView({
@@ -38098,15 +38171,15 @@ assert.match(
 );
 assert.match(
   studentFollowUpSummary.text,
-  /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Next: review missed or unanswered items, then assign one short retry/
+  /1\. Alpha review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   studentFollowUpSummary.text,
-  /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Next: review missed or unanswered items, then assign one short retry/
+  /2\. More review: latest 70%, average 70%, best 70%, 1 attempt, 3 items to review\. Last submitted: .*\. Next: review missed or unanswered items, then assign one short retry/
 );
 assert.match(
   studentFollowUpSummary.text,
-  /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review\. Next: keep reinforcing and offer a harder variant/
+  /4\. No review: latest 0%, average 0%, best 0%, 1 attempt, 0 items to review\. Last submitted: .*\. Next: keep reinforcing and offer a harder variant/
 );
 const resultCopyArtifacts = buildAssignmentResultCopyArtifacts({
   ...csvExportData,

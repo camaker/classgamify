@@ -5,6 +5,7 @@ import {
   normalizeAssignmentSummaryCount,
 } from '@/assignments/result-summary-format';
 import {
+  formatAssignmentResultCopyLine,
   formatAssignmentResultCopyTitle,
   formatAssignmentResultCopyOrdinal,
   joinAssignmentResultCopyLines,
@@ -134,12 +135,17 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
         completedAtLabel: latestAttemptCompletedAtLabel,
       })
     : null;
+  const lastSubmittedContextLabel = formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel,
+    latestAttemptCompletedAtLabel,
+  });
   const lineInput = {
     attempts: attemptsLabel,
     average: averageAccuracyLabel,
     best: bestAccuracyLabel,
     index: formatAssignmentResultCopyOrdinal(index),
     latest: latestAccuracyLabel,
+    lastSubmittedContext: lastSubmittedContextLabel,
     recommendation: followUpRecommendation,
     reviewCount: reviewItemCountLabel,
     student: studentLabel,
@@ -157,12 +163,14 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
-    text: latestAttemptSummaryLabel
-      ? m.assignment_student_follow_up_line_with_latest_attempt({
-          ...lineInput,
-          latestAttemptSummary: latestAttemptSummaryLabel,
-        })
-      : m.assignment_student_follow_up_line(lineInput),
+    text: formatAssignmentResultCopyLine(
+      latestAttemptSummaryLabel
+        ? m.assignment_student_follow_up_line_with_latest_attempt({
+            ...lineInput,
+            latestAttemptSummary: latestAttemptSummaryLabel,
+          })
+        : m.assignment_student_follow_up_line(lineInput)
+    ),
   };
 }
 
@@ -237,6 +245,20 @@ export function formatStudentFollowUpLastSubmitted(
   return lastSubmittedLabel
     ? formatAssignmentResultValue(lastSubmittedLabel, { emptyValue: '' })
     : null;
+}
+
+export function formatStudentFollowUpLastSubmittedContext({
+  lastSubmittedLabel,
+  latestAttemptCompletedAtLabel,
+}: {
+  lastSubmittedLabel: string | null;
+  latestAttemptCompletedAtLabel: string | null;
+}) {
+  if (!lastSubmittedLabel || latestAttemptCompletedAtLabel) return '';
+
+  return m.assignment_student_follow_up_last_submitted_context({
+    lastSubmitted: lastSubmittedLabel,
+  });
 }
 
 export function buildLatestAttemptReviewByStudentKey(

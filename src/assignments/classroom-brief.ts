@@ -24,6 +24,7 @@ import {
 import {
   buildLatestAttemptReviewByStudentKey,
   formatStudentFollowUpLastSubmitted,
+  formatStudentFollowUpLastSubmittedContext,
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
@@ -31,6 +32,7 @@ import {
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
+  formatAssignmentResultCopyLine,
   formatAssignmentResultCopyOrdinal,
   formatAssignmentResultCopyTitle,
   joinAssignmentResultCopyLines,
@@ -283,9 +285,14 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
         completedAtLabel: latestAttemptCompletedAtLabel,
       })
     : null;
+  const lastSubmittedContextLabel = formatStudentFollowUpLastSubmittedContext({
+    lastSubmittedLabel,
+    latestAttemptCompletedAtLabel,
+  });
   const lineInput = {
     accuracy: latestAccuracyLabel,
     index: formatAssignmentResultCopyOrdinal(index),
+    lastSubmittedContext: lastSubmittedContextLabel,
     recommendation: followUpRecommendation,
     reviewCount: reviewItemCountLabel,
     student: studentLabel,
@@ -304,12 +311,14 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
-    text: latestAttemptSummaryLabel
-      ? m.assignment_classroom_brief_follow_up_student_with_latest_attempt({
-          ...lineInput,
-          latestAttemptSummary: latestAttemptSummaryLabel,
-        })
-      : m.assignment_classroom_brief_follow_up_student(lineInput),
+    text: formatAssignmentResultCopyLine(
+      latestAttemptSummaryLabel
+        ? m.assignment_classroom_brief_follow_up_student_with_latest_attempt({
+            ...lineInput,
+            latestAttemptSummary: latestAttemptSummaryLabel,
+          })
+        : m.assignment_classroom_brief_follow_up_student(lineInput)
+    ),
   };
 }
 
