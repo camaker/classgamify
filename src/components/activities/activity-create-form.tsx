@@ -14,6 +14,7 @@ import {
 } from '@/activities/editor';
 import {
   ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE,
+  canApplyActivityDraftResultToEditor,
   type ActivityDraftResult,
 } from '@/activities/ai-draft';
 import {
@@ -148,6 +149,11 @@ export function ActivityCreateForm({
 
     try {
       const result = await draftMutation.mutateAsync(executionPlan.input);
+
+      if (!canApplyActivityDraftResultToEditor(result)) {
+        toast.error(executionPlan.failureMessage);
+        return;
+      }
 
       form.reset({
         ...result.activity,

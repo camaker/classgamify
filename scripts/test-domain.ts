@@ -111,6 +111,7 @@ import {
   parseActivityTemplateFilter,
 } from '@/activities/library-filters';
 import {
+  ACTIVITY_DRAFT_REVIEW_STATE,
   ACTIVITY_AI_DRAFT_ITEM_COUNT_OPTIONS,
   ACTIVITY_AI_DRAFT_COMPLETION_LIMITS,
   ACTIVITY_AI_DRAFT_FIELD_LIMITS,
@@ -119,6 +120,7 @@ import {
   buildActivityDraftPrompt,
   buildFallbackActivityDraftTerms,
   buildGenerateActivityDraftInputFromEditor,
+  canApplyActivityDraftResultToEditor,
   createActivityInputFromAiDraft,
   createFallbackActivityDraft,
   createFallbackActivityDraftResult,
@@ -22077,6 +22079,36 @@ assert.match(
 );
 assert.match(
   activityAiDraftSource,
+  /export type ActivityDraftReviewState = \{[\s\S]*applicationMode: 'editor-review';[\s\S]*persistenceMode: 'not-persisted';[\s\S]*reviewRequired: true;/,
+  'AI draft review state should explicitly require editor review before persistence.'
+);
+assert.match(
+  activityAiDraftSource,
+  /ACTIVITY_DRAFT_REVIEW_STATE[\s\S]*applicationMode: 'editor-review'[\s\S]*persistenceMode: 'not-persisted'[\s\S]*reviewRequired: true/,
+  'AI draft review state constants should preserve the editor-review and not-persisted workflow contract.'
+);
+assert.match(
+  activityAiDraftSource,
+  /type ActivityDraftResult = \{[\s\S]*reviewState: ActivityDraftReviewState;/,
+  'AI draft results should carry the explicit review-state contract.'
+);
+assert.match(
+  activityAiDraftSource,
+  /function createActivityDraftResult[\s\S]*reviewState: ACTIVITY_DRAFT_REVIEW_STATE/,
+  'AI draft result construction should attach the shared review-state contract.'
+);
+assert.match(
+  activityAiDraftSource,
+  /canApplyActivityDraftResultToEditor[\s\S]*applicationMode ===[\s\S]*ACTIVITY_DRAFT_REVIEW_STATE\.applicationMode[\s\S]*persistenceMode ===[\s\S]*ACTIVITY_DRAFT_REVIEW_STATE\.persistenceMode[\s\S]*reviewRequired === true/,
+  'AI draft editor application should be gated by the structured review-state contract.'
+);
+assert.match(
+  activityCreateFormSource,
+  /canApplyActivityDraftResultToEditor[\s\S]*const result = await draftMutation\.mutateAsync\(executionPlan\.input\)[\s\S]*if \(!canApplyActivityDraftResultToEditor\(result\)\)[\s\S]*toast\.error\(executionPlan\.failureMessage\)[\s\S]*form\.reset/,
+  'Activity editor form should verify the AI draft review-state contract before applying generated fields.'
+);
+assert.match(
+  activityAiDraftSource,
   /itemCount: z[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.min[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.max[\s\S]*ACTIVITY_AI_DRAFT_ITEM_COUNT_RANGE\.default/,
   'AI draft input schema should reuse the domain item-count range.'
 );
@@ -30821,6 +30853,21 @@ assert.equal(fallbackDraftResult.draftFocus, 'listening-script');
 assert.equal(fallbackDraftResult.model, 'test-model');
 assert.equal(fallbackDraftResult.notice, 'Fallback used for testing.');
 assert.equal(fallbackDraftResult.activity.templateType, 'listening');
+assert.deepEqual(
+  fallbackDraftResult.reviewState,
+  ACTIVITY_DRAFT_REVIEW_STATE
+);
+assert.equal(canApplyActivityDraftResultToEditor(fallbackDraftResult), true);
+assert.equal(
+  canApplyActivityDraftResultToEditor({
+    reviewState: {
+      ...ACTIVITY_DRAFT_REVIEW_STATE,
+      persistenceMode: 'persisted' as 'not-persisted',
+    },
+  }),
+  false
+);
+assert.equal(canApplyActivityDraftResultToEditor({}), false);
 assert.equal(fallbackDraftResult.meta.coverage.questions, 5);
 assert.equal(
   fallbackDraftResult.meta.readyTemplateCount,

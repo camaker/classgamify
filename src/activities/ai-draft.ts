@@ -243,7 +243,36 @@ export type ActivityDraftResult = {
   model: string;
   notice?: string;
   provider: 'fallback' | 'workers-ai';
+  reviewState: ActivityDraftReviewState;
 };
+
+export type ActivityDraftReviewState = {
+  applicationMode: 'editor-review';
+  persistenceMode: 'not-persisted';
+  reviewRequired: true;
+};
+
+export const ACTIVITY_DRAFT_REVIEW_STATE = {
+  applicationMode: 'editor-review',
+  persistenceMode: 'not-persisted',
+  reviewRequired: true,
+} as const satisfies ActivityDraftReviewState;
+
+export function canApplyActivityDraftResultToEditor(result: {
+  reviewState?: Partial<ActivityDraftReviewState> | null;
+}) {
+  const reviewState = result.reviewState;
+
+  if (!reviewState) return false;
+
+  return (
+    reviewState.applicationMode ===
+      ACTIVITY_DRAFT_REVIEW_STATE.applicationMode &&
+    reviewState.persistenceMode ===
+      ACTIVITY_DRAFT_REVIEW_STATE.persistenceMode &&
+    reviewState.reviewRequired === true
+  );
+}
 
 const aiQuestionSchema = z.object({
   answer: z
@@ -991,6 +1020,7 @@ function createActivityDraftResult({
       activity,
       currentTemplateType: input.templateType,
     }),
+    reviewState: ACTIVITY_DRAFT_REVIEW_STATE,
   };
 }
 
