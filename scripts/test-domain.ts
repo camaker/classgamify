@@ -531,6 +531,7 @@ import {
   buildAssignmentListSummary,
   buildAssignmentListStatusMetrics,
   buildAssignmentListSummaryMetrics,
+  normalizeAssignmentListSummaryCount,
 } from '@/assignments/list-summary';
 import {
   assignmentListActionCopy,
@@ -2120,7 +2121,12 @@ assert.match(
 );
 assert.match(
   assignmentListSummarySource,
-  /export function buildEmptyAssignmentListSummary[\s\S]*totalAssignments,[\s\S]*buildAssignmentListSummaryMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(totalAssignments\)[\s\S]*buildAssignmentListStatusMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(\)/,
+  /export function buildAssignmentListSummary[\s\S]*totalAssignments: normalizeAssignmentListSummaryCount\(totalAssignments\)[\s\S]*export function buildEmptyAssignmentListSummary[\s\S]*totalAssignments: normalizeAssignmentListSummaryCount\(totalAssignments\)[\s\S]*function formatAssignmentListMatches[\s\S]*normalizeAssignmentListSummaryCount\(count\)[\s\S]*function formatAssignmentListTotal[\s\S]*normalizeAssignmentListSummaryCount\(count\)[\s\S]*export function normalizeAssignmentListSummaryCount/,
+  'Assignment list summary and filter counts should normalize abnormal totals through one assignment-domain helper.'
+);
+assert.match(
+  assignmentListSummarySource,
+  /export function buildEmptyAssignmentListSummary[\s\S]*totalAssignments[\s\S]*buildAssignmentListSummaryMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(totalAssignments\)[\s\S]*buildAssignmentListStatusMetrics[\s\S]*summary \?\? buildEmptyAssignmentListSummary\(\)/,
   'Assignment list summary surfaces should share one empty-summary fallback contract.'
 );
 assert.doesNotMatch(
@@ -24489,6 +24495,24 @@ assert.deepEqual(
   { hasFilters: true, text: '2 matches' }
 );
 assert.deepEqual(
+  buildAssignmentListFilterSummary({
+    isLoading: false,
+    search: undefined,
+    status: 'all',
+    total: 2.9,
+  }),
+  { hasFilters: false, text: '2 total assignments' }
+);
+assert.deepEqual(
+  buildAssignmentListFilterSummary({
+    isLoading: false,
+    search: 'week',
+    status: 'open',
+    total: Number.POSITIVE_INFINITY,
+  }),
+  { hasFilters: true, text: '0 matches' }
+);
+assert.deepEqual(
   buildAssignmentListSearchPanelView({
     isLoading: false,
     search: ' week ',
@@ -24607,6 +24631,44 @@ assert.deepEqual(
     totalAssignments: 4,
   }
 );
+assert.deepEqual(
+  buildAssignmentListSummary({
+    assignments: [
+      {
+        expiresAt: null,
+        status: 'published',
+      },
+    ],
+    attempts: [],
+    now: Date.parse('2026-01-01T00:00:00.000Z'),
+    totalAssignments: 4.9,
+  }),
+  {
+    averageScore: 0,
+    closedAssignments: 0,
+    completions: 0,
+    draftAssignments: 0,
+    expiredAssignments: 0,
+    openAssignments: 1,
+    totalAssignments: 4,
+  }
+);
+assert.deepEqual(
+  buildAssignmentListSummary({
+    assignments: [],
+    attempts: [],
+    totalAssignments: Number.POSITIVE_INFINITY,
+  }),
+  {
+    averageScore: 0,
+    closedAssignments: 0,
+    completions: 0,
+    draftAssignments: 0,
+    expiredAssignments: 0,
+    openAssignments: 0,
+    totalAssignments: 0,
+  }
+);
 assert.deepEqual(buildEmptyAssignmentListSummary(12), {
   averageScore: 0,
   closedAssignments: 0,
@@ -24615,6 +24677,15 @@ assert.deepEqual(buildEmptyAssignmentListSummary(12), {
   expiredAssignments: 0,
   openAssignments: 0,
   totalAssignments: 12,
+});
+assert.deepEqual(buildEmptyAssignmentListSummary(-3.5), {
+  averageScore: 0,
+  closedAssignments: 0,
+  completions: 0,
+  draftAssignments: 0,
+  expiredAssignments: 0,
+  openAssignments: 0,
+  totalAssignments: 0,
 });
 assert.deepEqual(buildEmptyAssignmentListSummary(), {
   averageScore: 0,
@@ -24625,6 +24696,9 @@ assert.deepEqual(buildEmptyAssignmentListSummary(), {
   openAssignments: 0,
   totalAssignments: 0,
 });
+assert.equal(normalizeAssignmentListSummaryCount(3.9), 3);
+assert.equal(normalizeAssignmentListSummaryCount(-2), 0);
+assert.equal(normalizeAssignmentListSummaryCount(Number.NaN), 0);
 assert.deepEqual(
   buildAssignmentListSummaryMetrics({
     hasFilters: false,

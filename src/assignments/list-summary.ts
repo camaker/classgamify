@@ -75,7 +75,7 @@ export function buildAssignmentListSummary({
     draftAssignments: statusCounts.draft,
     expiredAssignments: statusCounts.expired,
     openAssignments: statusCounts.open,
-    totalAssignments,
+    totalAssignments: normalizeAssignmentListSummaryCount(totalAssignments),
   };
 }
 
@@ -89,7 +89,7 @@ export function buildEmptyAssignmentListSummary(
     draftAssignments: 0,
     expiredAssignments: 0,
     openAssignments: 0,
-    totalAssignments,
+    totalAssignments: normalizeAssignmentListSummaryCount(totalAssignments),
   };
 }
 
@@ -292,17 +292,34 @@ function formatAssignmentListDescriptionCount(value: number) {
 }
 
 function formatAssignmentListMatches(count: number) {
-  if (count === 1) {
-    return m.assignment_list_filter_summary_matches_one({ count });
+  const normalizedCount = normalizeAssignmentListSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_list_filter_summary_matches_one({
+      count: normalizedCount,
+    });
   }
 
-  return m.assignment_list_filter_summary_matches_many({ count });
+  return m.assignment_list_filter_summary_matches_many({
+    count: normalizedCount,
+  });
 }
 
 function formatAssignmentListTotal(count: number) {
-  if (count === 1) {
-    return m.assignment_list_filter_summary_total_one({ count });
+  const normalizedCount = normalizeAssignmentListSummaryCount(count);
+
+  if (normalizedCount === 1) {
+    return m.assignment_list_filter_summary_total_one({
+      count: normalizedCount,
+    });
   }
 
-  return m.assignment_list_filter_summary_total_many({ count });
+  return m.assignment_list_filter_summary_total_many({
+    count: normalizedCount,
+  });
+}
+
+export function normalizeAssignmentListSummaryCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
