@@ -1064,14 +1064,27 @@ export function buildAssignmentResultSectionState({
   itemCount: number;
   studentCount: number;
 }): AssignmentResultSectionState {
+  const normalizedAttemptCount =
+    normalizeAssignmentResultSectionCount(attemptCount);
+  const normalizedAttemptReviewCount =
+    normalizeAssignmentResultSectionCount(attemptReviewCount);
+  const normalizedItemCount = normalizeAssignmentResultSectionCount(itemCount);
+  const normalizedStudentCount =
+    normalizeAssignmentResultSectionCount(studentCount);
+
   return {
-    showAnswerReview: attemptReviewCount > 0,
+    showAnswerReview: normalizedAttemptReviewCount > 0,
     showClassroomBrief: classroomBriefReady,
-    showItemPerformance: itemCount > 0,
-    showReteachPriorities: itemCount > 0,
-    showStudentSearch: attemptCount > 0,
-    showStudentSummary: studentCount > 0,
+    showItemPerformance: normalizedItemCount > 0,
+    showReteachPriorities: normalizedItemCount > 0,
+    showStudentSearch: normalizedAttemptCount > 0,
+    showStudentSummary: normalizedStudentCount > 0,
   };
+}
+
+function normalizeAssignmentResultSectionCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
 
 export function buildAssignmentResultSectionViews<

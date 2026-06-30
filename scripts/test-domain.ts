@@ -36910,6 +36910,40 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentResultSectionState({
+    attemptCount: 1.9,
+    attemptReviewCount: 1.2,
+    classroomBriefReady: false,
+    itemCount: 0.9,
+    studentCount: 1.1,
+  }),
+  {
+    showAnswerReview: true,
+    showClassroomBrief: false,
+    showItemPerformance: false,
+    showReteachPriorities: false,
+    showStudentSearch: true,
+    showStudentSummary: true,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSectionState({
+    attemptCount: Number.POSITIVE_INFINITY,
+    attemptReviewCount: Number.NaN,
+    classroomBriefReady: true,
+    itemCount: -3,
+    studentCount: Number.POSITIVE_INFINITY,
+  }),
+  {
+    showAnswerReview: false,
+    showClassroomBrief: true,
+    showItemPerformance: false,
+    showReteachPriorities: false,
+    showStudentSearch: false,
+    showStudentSummary: false,
+  }
+);
+assert.deepEqual(
+  buildAssignmentResultSectionState({
     attemptCount: 2,
     attemptReviewCount: 2,
     classroomBriefReady: true,
