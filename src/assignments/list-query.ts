@@ -6,7 +6,7 @@ import {
 } from '@/assignments/list-filters';
 import { activity, assignment, assignmentSnapshot } from '@/db/app.schema';
 import { sqlLikeContains } from '@/lib/sql-like';
-import { and, count, desc, eq, or, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, or, type SQL } from 'drizzle-orm';
 
 export function buildAssignmentListCountSelect() {
   return {
@@ -93,5 +93,5 @@ export function getAssignmentListOffset({
 }
 
 export function buildAssignmentListOrderBy() {
-  return desc(assignment.updatedAt);
+  return [desc(assignment.updatedAt), asc(assignment.id)] as const;
 }

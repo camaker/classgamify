@@ -20779,13 +20779,13 @@ assert.match(
 );
 assert.match(
   assignmentListQuerySource,
-  /buildAssignmentListOrderBy[\s\S]*desc\(assignment\.updatedAt\)/,
-  'Assignment list ordering should live in the assignment query domain.'
+  /buildAssignmentListOrderBy[\s\S]*desc\(assignment\.updatedAt\)[\s\S]*asc\(assignment\.id\)/,
+  'Assignment list ordering should live in the assignment query domain with a stable id tie breaker.'
 );
 assert.match(
   assignmentsApiSource,
-  /orderBy\(buildAssignmentListOrderBy\(\)\)/,
-  'Assignment list API should delegate updated-at ordering to the assignment query domain.'
+  /orderBy\(\.\.\.buildAssignmentListOrderBy\(\)\)/,
+  'Assignment list API should delegate stable ordering to the assignment query domain.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,

@@ -189,7 +189,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
       .innerJoin(activity, buildAssignmentActivityJoin())
       .leftJoin(assignmentSnapshot, buildAssignmentSnapshotJoin())
       .where(where)
-      .orderBy(buildAssignmentListOrderBy())
+      .orderBy(...buildAssignmentListOrderBy())
       .limit(data.pageSize)
       .offset(
         getAssignmentListOffset({
