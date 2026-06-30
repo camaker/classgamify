@@ -17105,6 +17105,67 @@ assert.deepEqual(
     placeholder: 'Type your name',
   }
 );
+const invalidAttemptUsageStudentRunnerPageView =
+  buildStudentRunnerPageViewModel({
+    answers: {},
+    attemptClock: undefined,
+    confirmIncompleteSubmit: false,
+    fallbackStartedAt: 2_000,
+    isSubmitting: false,
+    pageState: {
+      ...starterRunnerState,
+      assignment: {
+        ...starterRunnerState.assignment,
+        settings: {
+          ...starterRunnerState.assignment.settings,
+          maxAttempts: 1,
+        },
+      },
+    },
+    result: {
+      accuracy: 100,
+      attemptUsage: {
+        maxAttempts: 1,
+        remainingAttempts: Number.NaN,
+        usedAttempts: Number.NaN,
+      },
+      completedItemCount: 1,
+      correctItemCount: 1,
+      earnedPoints: 1,
+      reviewItems: [],
+      reviewSummary: {
+        correctItemCount: 0,
+        hiddenBySettings: true,
+        needsReviewItemCount: 0,
+        reviewItemCount: 0,
+        showCorrectAnswers: false,
+        submittedItemCount: 0,
+        totalItemCount: 1,
+        unansweredItemCount: 1,
+      },
+      totalPoints: 1,
+    },
+    shareId: 'demo-runner',
+    submittedAttemptCount: 0,
+  });
+assert.equal(
+  invalidAttemptUsageStudentRunnerPageView.identityView?.mode ===
+    'student-name'
+    ? invalidAttemptUsageStudentRunnerPageView.identityView.disabled
+    : undefined,
+  true
+);
+assert.equal(
+  invalidAttemptUsageStudentRunnerPageView.showStartAnotherAttempt,
+  false
+);
+assert.equal(
+  invalidAttemptUsageStudentRunnerPageView.resultPanelView.show
+    ? invalidAttemptUsageStudentRunnerPageView.resultPanelView
+        .showStartAnotherAttempt
+    : undefined,
+  false
+);
 const previousNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   answers: {},
   attemptClock: undefined,
@@ -17601,7 +17662,7 @@ assert.equal(
       },
     },
   }).submittedAttemptCount,
-  0
+  1
 );
 assert.equal(
   buildStudentRunnerSubmissionSuccessState({
@@ -17624,7 +17685,7 @@ assert.equal(
       },
     },
   }).submittedAttemptCount,
-  0
+  1
 );
 assert.deepEqual(
   buildStudentRunnerAnswerUpdatePlan({

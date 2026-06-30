@@ -557,6 +557,11 @@ export function buildStudentRunnerPageViewModel({
   const attemptUsageLabel = result
     ? formatStudentAttemptUsageLabel(result.attemptUsage)
     : undefined;
+  const effectiveSubmittedAttemptCount =
+    resolveStudentRunnerSubmittedAttemptCount({
+      result,
+      submittedAttemptCount,
+    });
   const requiresIncompleteSubmitConfirmation = Boolean(
     confirmIncompleteSubmit && attemptControlState.unansweredLabel
   );
@@ -568,8 +573,7 @@ export function buildStudentRunnerPageViewModel({
     hasResult: Boolean(result),
     maxAttempts:
       result?.attemptUsage.maxAttempts ?? assignment?.settings.maxAttempts,
-    submittedAttemptCount:
-      result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
+    submittedAttemptCount: effectiveSubmittedAttemptCount,
   });
 
   return {
@@ -620,8 +624,7 @@ export function buildStudentRunnerPageViewModel({
           anonymousToken,
           collectStudentName: assignment.settings.collectStudentName,
           isSubmitting,
-          submittedAttemptCount:
-            result?.attemptUsage.usedAttempts ?? submittedAttemptCount,
+          submittedAttemptCount: effectiveSubmittedAttemptCount,
         })
       : undefined,
     itemCount: attemptState.itemCount,
@@ -759,6 +762,31 @@ function buildStudentRunnerIdentityView({
 
 function normalizeStudentRunnerSubmittedAttemptCount(value: number) {
   return normalizeAssignmentAttemptCount(value);
+}
+
+function normalizeStudentRunnerSuccessfulAttemptCount(value: number) {
+  return Math.max(1, normalizeStudentRunnerSubmittedAttemptCount(value));
+}
+
+function resolveStudentRunnerSubmittedAttemptCount({
+  result,
+  submittedAttemptCount,
+}: {
+  result?: StudentRunnerAttemptResult;
+  submittedAttemptCount: number;
+}) {
+  const currentCount = normalizeStudentRunnerSubmittedAttemptCount(
+    submittedAttemptCount
+  );
+
+  if (!result) return currentCount;
+
+  return Math.max(
+    currentCount,
+    normalizeStudentRunnerSuccessfulAttemptCount(
+      result.attemptUsage.usedAttempts
+    )
+  );
 }
 
 function buildStudentRunnerResultPanelView({
@@ -967,7 +995,7 @@ export function buildStudentRunnerSubmissionSuccessState({
     anonymousToken: executionPlan.anonymousToken,
     confirmIncompleteSubmit: false,
     result: buildStudentRunnerSubmissionResultState({ response }),
-    submittedAttemptCount: normalizeStudentRunnerSubmittedAttemptCount(
+    submittedAttemptCount: normalizeStudentRunnerSuccessfulAttemptCount(
       response.attemptUsage.usedAttempts
     ),
     ...(executionPlan.submittedStudentName
