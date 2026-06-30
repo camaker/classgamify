@@ -49,12 +49,19 @@ export type AssignmentResultActionDataScope =
 export type AssignmentResultActionButtonId =
   `${AssignmentResultAction}:${AssignmentResultActionDataScope}`;
 
+export type AssignmentResultActionBlockedReason =
+  | 'brief-not-ready'
+  | 'missing-attempts'
+  | 'missing-items'
+  | 'missing-students';
+
 export type AssignmentResultActionGate =
   | {
       type: 'ready';
     }
   | {
       message: string;
+      reason: AssignmentResultActionBlockedReason;
       type: 'blocked';
     };
 
@@ -127,6 +134,7 @@ export type AssignmentResultActionExecutionPlan =
       dataScope: AssignmentResultActionDataScope;
       failureMessage: string;
       message: string;
+      reason: AssignmentResultActionBlockedReason | 'missing-data';
       type: 'blocked';
     }
   | {
@@ -819,6 +827,7 @@ export function buildAssignmentResultActionExecutionPlan({
       dataScope,
       failureMessage: actionButton.failureMessage,
       message: actionButton.gate.message,
+      reason: actionButton.gate.reason,
       type: 'blocked',
     };
   }
@@ -833,6 +842,7 @@ export function buildAssignmentResultActionExecutionPlan({
       dataScope,
       failureMessage: actionButton.failureMessage,
       message: actionButton.failureMessage,
+      reason: 'missing-data',
       type: 'blocked',
     };
   }
@@ -884,34 +894,34 @@ export function getAssignmentResultActionGate({
   if (action === 'copy-item-review') {
     return normalizedItemCount > 0
       ? { type: 'ready' }
-      : {
+      : buildBlockedAssignmentResultActionGate({
           message: m.assignment_result_action_gate_add_items_item_review(),
-          type: 'blocked',
-        };
+          reason: 'missing-items',
+        });
   }
 
   if (action === 'copy-follow-up') {
     return normalizedStudentCount > 0
       ? { type: 'ready' }
-      : {
+      : buildBlockedAssignmentResultActionGate({
           message: m.assignment_result_action_gate_submit_attempt_follow_up(),
-          type: 'blocked',
-        };
+          reason: 'missing-students',
+        });
   }
 
   if (action === 'copy-brief' && !classroomBriefReady) {
-    return {
+    return buildBlockedAssignmentResultActionGate({
       message: m.assignment_result_action_gate_submit_attempt_brief(),
-      type: 'blocked',
-    };
+      reason: 'brief-not-ready',
+    });
   }
 
   if (normalizedAttemptCount > 0) return { type: 'ready' };
 
-  return {
+  return buildBlockedAssignmentResultActionGate({
     message: getNoAttemptResultActionMessage(action),
-    type: 'blocked',
-  };
+    reason: 'missing-attempts',
+  });
 }
 
 export function getAssignmentResultActionCopy(
@@ -980,6 +990,20 @@ function getNoAttemptResultActionMessage(action: AssignmentResultAction) {
   }
 
   return m.assignment_result_action_gate_submit_attempt_brief();
+}
+
+function buildBlockedAssignmentResultActionGate({
+  message,
+  reason,
+}: {
+  message: string;
+  reason: AssignmentResultActionBlockedReason;
+}): AssignmentResultActionGate {
+  return {
+    message,
+    reason,
+    type: 'blocked',
+  };
 }
 
 function normalizeAssignmentResultActionCount(value: number) {

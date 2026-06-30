@@ -1771,6 +1771,21 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /export type AssignmentResultActionBlockedReason =[\s\S]*'brief-not-ready'[\s\S]*'missing-attempts'[\s\S]*'missing-items'[\s\S]*'missing-students'/,
+  'Assignment result action gates should expose stable blocked-reason codes separately from localized messages.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /message: string;[\s\S]*reason: AssignmentResultActionBlockedReason;[\s\S]*type: 'blocked'/,
+  'Assignment result blocked gates should carry structured reason codes with display messages.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /reason: AssignmentResultActionBlockedReason \| 'missing-data'[\s\S]*reason: actionButton\.gate\.reason[\s\S]*reason: 'missing-data'/,
+  'Assignment result blocked execution plans should preserve gate reasons and identify missing execution data.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /buildAssignmentResultActionDataSet[\s\S]*copyActionData[\s\S]*exportActionData[\s\S]*scope:[\s\S]*copyActionData: 'current-review'[\s\S]*exportActionData: 'full-assignment-results'/,
   'Assignment result actions should expose a dedicated action data set with explicit copy and export execution scopes.'
 );
@@ -38747,6 +38762,7 @@ assert.deepEqual(
       failureMessage: 'Classroom brief could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying a brief.',
+        reason: 'brief-not-ready',
         type: 'blocked',
       },
       id: 'copy-brief:current-review',
@@ -38765,6 +38781,7 @@ assert.deepEqual(
       failureMessage: 'Reteach plan could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying a reteach plan.',
+        reason: 'missing-attempts',
         type: 'blocked',
       },
       id: 'copy-reteach-plan:current-review',
@@ -38782,6 +38799,7 @@ assert.deepEqual(
       failureMessage: 'Item review could not be copied.',
       gate: {
         message: 'Add assignment items before copying item review.',
+        reason: 'missing-items',
         type: 'blocked',
       },
       id: 'copy-item-review:current-review',
@@ -38799,6 +38817,7 @@ assert.deepEqual(
       failureMessage: 'Student follow-up could not be copied.',
       gate: {
         message: 'Submit at least one attempt before copying follow-up.',
+        reason: 'missing-students',
         type: 'blocked',
       },
       id: 'copy-follow-up:current-review',
@@ -38816,6 +38835,7 @@ assert.deepEqual(
       failureMessage: 'Results CSV could not be downloaded.',
       gate: {
         message: 'Submit at least one attempt before exporting results.',
+        reason: 'missing-attempts',
         type: 'blocked',
       },
       id: 'export-csv:full-assignment-results',
@@ -38908,6 +38928,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before copying a brief.',
+    reason: 'brief-not-ready',
     type: 'blocked',
   }
 );
@@ -40001,6 +40022,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before exporting results.',
+    reason: 'missing-attempts',
     type: 'blocked',
   }
 );
@@ -40013,6 +40035,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before exporting results.',
+    reason: 'missing-attempts',
     type: 'blocked',
   }
 );
@@ -40025,6 +40048,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before copying a reteach plan.',
+    reason: 'missing-attempts',
     type: 'blocked',
   }
 );
@@ -40038,6 +40062,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before copying a brief.',
+    reason: 'brief-not-ready',
     type: 'blocked',
   }
 );
@@ -40050,6 +40075,7 @@ assert.deepEqual(
   }),
   {
     message: 'Add assignment items before copying item review.',
+    reason: 'missing-items',
     type: 'blocked',
   }
 );
@@ -40062,6 +40088,7 @@ assert.deepEqual(
   }),
   {
     message: 'Add assignment items before copying item review.',
+    reason: 'missing-items',
     type: 'blocked',
   }
 );
@@ -40074,6 +40101,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before copying follow-up.',
+    reason: 'missing-students',
     type: 'blocked',
   }
 );
@@ -40086,6 +40114,7 @@ assert.deepEqual(
   }),
   {
     message: 'Submit at least one attempt before copying follow-up.',
+    reason: 'missing-students',
     type: 'blocked',
   }
 );
@@ -42557,6 +42586,7 @@ assert.throws(
         failureMessage: 'Classroom brief could not be copied.',
         gate: {
           message: 'Submit at least one attempt before copying a brief.',
+          reason: 'brief-not-ready',
           type: 'blocked',
         },
         kind: 'copy-text',
@@ -42624,6 +42654,7 @@ assert.throws(
         failureMessage: 'Results CSV could not be downloaded.',
         gate: {
           message: 'Submit at least one attempt before exporting results.',
+          reason: 'missing-attempts',
           type: 'blocked',
         },
         kind: 'download-csv',
@@ -42645,6 +42676,7 @@ assert.deepEqual(
       failureMessage: 'Results CSV could not be downloaded.',
       gate: {
         message: 'Submit at least one attempt before exporting results.',
+        reason: 'missing-attempts',
         type: 'blocked',
       },
       kind: 'download-csv',
@@ -42657,6 +42689,7 @@ assert.deepEqual(
     dataScope: 'full-assignment-results',
     failureMessage: 'Results CSV could not be downloaded.',
     message: 'Submit at least one attempt before exporting results.',
+    reason: 'missing-attempts',
     type: 'blocked',
   }
 );
@@ -42680,6 +42713,7 @@ assert.deepEqual(
     dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     message: 'Classroom brief could not be copied.',
+    reason: 'missing-data',
     type: 'blocked',
   }
 );
