@@ -5920,6 +5920,12 @@ assert.equal(
   ),
   'listening.mp3'
 );
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'https:%2F%2Ffiles.example.test%2Fteacher%5Cprivate%2Fencoded unit.pdf?token=secret'
+  ),
+  'encoded unit.pdf'
+);
 assert.match(
   activityMaterialSummarySource,
   /export type ActivitySourceMaterialExtractionActionView[\s\S]*nextStep: ActivitySourceMaterialExtractionNextStepView;[\s\S]*export type ActivitySourceMaterialExtractionNextStepView = \{[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];[\s\S]*primaryNextStep\?: ActivitySourceMaterialExtractionNextStepView;/,
@@ -31162,6 +31168,12 @@ const safeBasenameMaterialDraftNotes = buildActivitySourceMaterialDraftNotes([
     kind: 'audio',
     originalName: 'C:\\teacher\\private\\Weather listening.mp3?sig=abc',
   },
+  {
+    fileId: 'file-encoded-worksheet',
+    kind: 'worksheet-document',
+    originalName:
+      'https:%2F%2Ffiles.example.test%2Fprivate%5CEncoded worksheet.pdf?token=secret',
+  },
 ]);
 assert.equal(
   safeBasenameMaterialDraftNotes,
@@ -31169,6 +31181,7 @@ assert.equal(
     'Attached classroom source materials:',
     '- Worksheet document: Weather worksheet.pdf',
     '- Audio: Weather listening.mp3',
+    '- Worksheet document: Encoded worksheet.pdf',
   ].join('\n')
 );
 assert.doesNotMatch(

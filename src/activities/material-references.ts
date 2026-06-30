@@ -143,13 +143,22 @@ function normalizeReferenceText(
 }
 
 function getSafeReferenceFilename(value: string) {
-  const withoutUrlSuffix = value.split(/[?#]/u)[0]?.trim() ?? '';
+  const withDecodedPathSeparators =
+    decodeReferenceFilenamePathSeparators(value);
+  const withoutUrlSuffix =
+    withDecodedPathSeparators.split(/[?#]/u)[0]?.trim() ?? '';
   const lastSegment =
     withoutUrlSuffix.split(/[\\/]/u).at(-1)?.trim() ?? withoutUrlSuffix;
   const normalized = lastSegment.replace(/[\r\n"<>]/gu, '').trim();
   if (!normalized) return undefined;
 
   return normalized;
+}
+
+function decodeReferenceFilenamePathSeparators(value: string) {
+  return value.replace(/%(?:2f|5c)/giu, (match) =>
+    match.toLowerCase() === '%2f' ? '/' : '\\'
+  );
 }
 
 function normalizeReferenceKey(value: string | undefined) {
