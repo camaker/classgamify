@@ -42,6 +42,10 @@ export type AssignmentResultCopyAction = Exclude<
   'export-csv'
 >;
 
+export type AssignmentResultActionDataScope =
+  | 'current-review'
+  | 'full-assignment-results';
+
 export type AssignmentResultActionGate =
   | {
       type: 'ready';
@@ -61,16 +65,22 @@ type AssignmentResultActionCopy = {
 export type AssignmentResultActionDescriptor =
   | {
       action: AssignmentResultCopyAction;
+      dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
       kind: 'copy-text';
     }
   | {
       action: 'export-csv';
+      dataScope: Extract<
+        AssignmentResultActionDataScope,
+        'full-assignment-results'
+      >;
       kind: 'download-csv';
     };
 
 export type AssignmentResultActionButton =
   | {
       action: AssignmentResultCopyAction;
+      dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
       description: string;
       disabled: boolean;
       disabledReason?: string;
@@ -82,6 +92,10 @@ export type AssignmentResultActionButton =
     }
   | {
       action: 'export-csv';
+      dataScope: Extract<
+        AssignmentResultActionDataScope,
+        'full-assignment-results'
+      >;
       description: string;
       disabled: boolean;
       disabledReason?: string;
@@ -105,17 +119,20 @@ export type AssignmentResultActionPayload =
 
 export type AssignmentResultActionExecutionPlan =
   | {
+      dataScope: AssignmentResultActionDataScope;
       failureMessage: string;
       message: string;
       type: 'blocked';
     }
   | {
+      dataScope: AssignmentResultActionDataScope;
       failureMessage: string;
       successMessage: string;
       text: string;
       type: 'copy-text';
     }
   | {
+      dataScope: AssignmentResultActionDataScope;
       failureMessage: string;
       filename: string;
       successMessage: string;
@@ -161,7 +178,19 @@ export type AssignmentResultCopyActionData = AssignmentResultActionData & {
 export type AssignmentResultActionDataSet = {
   copyActionData: AssignmentResultCopyActionData | null;
   exportActionData: AssignmentResultActionData | null;
+  scope: {
+    copyActionData: Extract<AssignmentResultActionDataScope, 'current-review'>;
+    exportActionData: Extract<
+      AssignmentResultActionDataScope,
+      'full-assignment-results'
+    >;
+  };
 };
+
+type AssignmentResultActionDataSetInput = Pick<
+  AssignmentResultActionDataSet,
+  'copyActionData' | 'exportActionData'
+>;
 
 type AssignmentResultCopyArtifactData = {
   analysis: Pick<
@@ -210,22 +239,27 @@ export type AssignmentResultCopyArtifactPreviewMetaKey =
 export const assignmentResultActionDescriptors = [
   {
     action: 'copy-brief',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-reteach-plan',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-item-review',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-follow-up',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'export-csv',
+    dataScope: 'full-assignment-results',
     kind: 'download-csv',
   },
 ] satisfies AssignmentResultActionDescriptor[];
@@ -282,6 +316,7 @@ export function buildAssignmentResultActionButtons({
       return {
         ...base,
         action: descriptor.action,
+        dataScope: descriptor.dataScope,
         kind: 'download-csv',
       };
     }
@@ -289,6 +324,7 @@ export function buildAssignmentResultActionButtons({
     return {
       ...base,
       action: descriptor.action,
+      dataScope: descriptor.dataScope,
       kind: 'copy-text',
     };
   });
@@ -371,10 +407,14 @@ export function buildAssignmentResultCopyActionData({
 export function buildAssignmentResultActionDataSet({
   copyActionData,
   exportActionData,
-}: AssignmentResultActionDataSet): AssignmentResultActionDataSet {
+}: AssignmentResultActionDataSetInput): AssignmentResultActionDataSet {
   return {
     copyActionData,
     exportActionData,
+    scope: {
+      copyActionData: 'current-review',
+      exportActionData: 'full-assignment-results',
+    },
   };
 }
 
@@ -390,6 +430,31 @@ export function getAssignmentResultActionExecutionData({
   return actionButton.kind === 'copy-text'
     ? dataSet.copyActionData
     : dataSet.exportActionData;
+}
+
+export function getAssignmentResultActionExecutionDataScope({
+  actionButton,
+  dataSet,
+}: {
+  actionButton: AssignmentResultActionButton;
+  dataSet: AssignmentResultActionDataSet | null | undefined;
+}): AssignmentResultActionDataScope {
+  if (!dataSet) {
+    return (
+      actionButton.dataScope ??
+      getAssignmentResultActionDataScope(actionButton.action)
+    );
+  }
+
+  return actionButton.kind === 'copy-text'
+    ? dataSet.scope.copyActionData
+    : dataSet.scope.exportActionData;
+}
+
+export function getAssignmentResultActionDataScope(
+  action: AssignmentResultAction
+): AssignmentResultActionDataScope {
+  return action === 'export-csv' ? 'full-assignment-results' : 'current-review';
 }
 
 export function getAssignmentResultCopyArtifactText({
@@ -715,8 +780,14 @@ export function buildAssignmentResultActionExecutionPlan({
   data?: AssignmentResultActionData | null;
   dataSet?: AssignmentResultActionDataSet | null;
 }): AssignmentResultActionExecutionPlan {
+  const dataScope = getAssignmentResultActionExecutionDataScope({
+    actionButton,
+    dataSet,
+  });
+
   if (actionButton.gate.type === 'blocked') {
     return {
+      dataScope,
       failureMessage: actionButton.failureMessage,
       message: actionButton.gate.message,
       type: 'blocked',
@@ -730,6 +801,7 @@ export function buildAssignmentResultActionExecutionPlan({
 
   if (!executionData) {
     return {
+      dataScope,
       failureMessage: actionButton.failureMessage,
       message: actionButton.failureMessage,
       type: 'blocked',
@@ -743,6 +815,7 @@ export function buildAssignmentResultActionExecutionPlan({
 
   if (payload.kind === 'download-csv') {
     return {
+      dataScope,
       failureMessage: actionButton.failureMessage,
       filename: payload.filename,
       successMessage: actionButton.successMessage,
@@ -752,6 +825,7 @@ export function buildAssignmentResultActionExecutionPlan({
   }
 
   return {
+    dataScope,
     failureMessage: actionButton.failureMessage,
     successMessage: actionButton.successMessage,
     text: payload.text,

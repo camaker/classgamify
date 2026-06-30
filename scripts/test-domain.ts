@@ -640,6 +640,7 @@ import {
   normalizeAssignmentResultScopeCount,
   normalizeAssignmentResultProgressValue,
   getAssignmentResultActionExecutionData,
+  getAssignmentResultActionExecutionDataScope,
   getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
@@ -1632,8 +1633,18 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultActionDataSet[\s\S]*copyActionData[\s\S]*exportActionData/,
-  'Assignment result actions should expose a dedicated action data set for copy and export execution.'
+  /AssignmentResultActionDataScope[\s\S]*'current-review'[\s\S]*'full-assignment-results'/,
+  'Assignment result actions should expose explicit action data scopes for current review copy artifacts and full assignment CSV exports.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultActionDataSet[\s\S]*copyActionData[\s\S]*exportActionData[\s\S]*scope:[\s\S]*copyActionData: 'current-review'[\s\S]*exportActionData: 'full-assignment-results'/,
+  'Assignment result actions should expose a dedicated action data set with explicit copy and export execution scopes.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /getAssignmentResultActionExecutionDataScope[\s\S]*dataSet\.scope\.copyActionData[\s\S]*dataSet\.scope\.exportActionData/,
+  'Assignment result actions should resolve copy-vs-export execution scope inside the assignment-domain action model.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -37087,22 +37098,27 @@ assert.equal(getAssignmentResultCompletedAttemptCount(null), 0);
 assert.deepEqual(assignmentResultActionDescriptors, [
   {
     action: 'copy-brief',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-reteach-plan',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-item-review',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'copy-follow-up',
+    dataScope: 'current-review',
     kind: 'copy-text',
   },
   {
     action: 'export-csv',
+    dataScope: 'full-assignment-results',
     kind: 'download-csv',
   },
 ]);
@@ -37143,6 +37159,7 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: true,
@@ -37158,6 +37175,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-reteach-plan',
+      dataScope: 'current-review',
       description:
         'Copy a lesson-ready script for the weakest items and priority students.',
       disabled: true,
@@ -37174,6 +37192,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-item-review',
+      dataScope: 'current-review',
       description:
         'Copy prompt-level performance with expected answers, alternatives, and notes.',
       disabled: true,
@@ -37189,6 +37208,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-follow-up',
+      dataScope: 'current-review',
       description:
         'Copy a student-by-student support list sorted by review need.',
       disabled: true,
@@ -37204,6 +37224,7 @@ assert.deepEqual(
     },
     {
       action: 'export-csv',
+      dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: true,
@@ -37230,6 +37251,7 @@ assert.deepEqual(
   [
     {
       action: 'copy-brief',
+      dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
@@ -37241,6 +37263,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-reteach-plan',
+      dataScope: 'current-review',
       description:
         'Copy a lesson-ready script for the weakest items and priority students.',
       disabled: false,
@@ -37252,6 +37275,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-item-review',
+      dataScope: 'current-review',
       description:
         'Copy prompt-level performance with expected answers, alternatives, and notes.',
       disabled: false,
@@ -37263,6 +37287,7 @@ assert.deepEqual(
     },
     {
       action: 'copy-follow-up',
+      dataScope: 'current-review',
       description:
         'Copy a student-by-student support list sorted by review need.',
       disabled: false,
@@ -37274,6 +37299,7 @@ assert.deepEqual(
     },
     {
       action: 'export-csv',
+      dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: false,
@@ -40801,6 +40827,7 @@ assert.equal(
 );
 const readyCopyBriefActionButton = {
   action: 'copy-brief',
+  dataScope: 'current-review',
   description:
     'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
   disabled: false,
@@ -40812,6 +40839,7 @@ const readyCopyBriefActionButton = {
 } as const;
 const readyExportCsvActionButton = {
   action: 'export-csv',
+  dataScope: 'full-assignment-results',
   description:
     'Download gradebook-ready results with delivery policy and item-level answers.',
   disabled: false,
@@ -40842,6 +40870,27 @@ assert.equal(
   }),
   null
 );
+assert.equal(
+  getAssignmentResultActionExecutionDataScope({
+    actionButton: readyCopyBriefActionButton,
+    dataSet: resultActionDataSet,
+  }),
+  'current-review'
+);
+assert.equal(
+  getAssignmentResultActionExecutionDataScope({
+    actionButton: readyExportCsvActionButton,
+    dataSet: resultActionDataSet,
+  }),
+  'full-assignment-results'
+);
+assert.equal(
+  getAssignmentResultActionExecutionDataScope({
+    actionButton: readyCopyBriefActionButton,
+    dataSet: null,
+  }),
+  'current-review'
+);
 assert.deepEqual(
   buildAssignmentResultActionPayload({
     actionButton: readyCopyBriefActionButton,
@@ -40858,6 +40907,7 @@ assert.deepEqual(
     data: csvExportData,
   }),
   {
+    dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
     text: classroomBriefWithAttempts.text,
@@ -40870,6 +40920,7 @@ assert.deepEqual(
     data: filteredResultCopyActionData,
   }),
   {
+    dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
     text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
@@ -40883,6 +40934,7 @@ assert.deepEqual(
     dataSet: resultActionDataSet,
   }),
   {
+    dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
     text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
@@ -40895,6 +40947,7 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'copy-brief',
+        dataScope: 'current-review',
         description:
           'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
         disabled: true,
@@ -40934,6 +40987,7 @@ assert.deepEqual(
     data: csvExportData,
   }),
   {
+    dataScope: 'full-assignment-results',
     failureMessage: 'Results CSV could not be downloaded.',
     filename: buildAssignmentResultsCsvFilename(csvExportData),
     successMessage: 'Results CSV downloaded.',
@@ -40947,6 +41001,7 @@ assert.deepEqual(
     dataSet: resultActionDataSet,
   }),
   {
+    dataScope: 'full-assignment-results',
     failureMessage: 'Results CSV could not be downloaded.',
     filename: buildAssignmentResultsCsvFilename(csvExportData),
     successMessage: 'Results CSV downloaded.',
@@ -40959,6 +41014,7 @@ assert.throws(
     buildAssignmentResultActionPayload({
       actionButton: {
         action: 'export-csv',
+        dataScope: 'full-assignment-results',
         description:
           'Download gradebook-ready results with delivery policy and item-level answers.',
         disabled: true,
@@ -40979,6 +41035,7 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'export-csv',
+      dataScope: 'full-assignment-results',
       description:
         'Download gradebook-ready results with delivery policy and item-level answers.',
       disabled: true,
@@ -40994,6 +41051,7 @@ assert.deepEqual(
     data: csvExportData,
   }),
   {
+    dataScope: 'full-assignment-results',
     failureMessage: 'Results CSV could not be downloaded.',
     message: 'Submit at least one attempt before exporting results.',
     type: 'blocked',
@@ -41003,6 +41061,7 @@ assert.deepEqual(
   buildAssignmentResultActionExecutionPlan({
     actionButton: {
       action: 'copy-brief',
+      dataScope: 'current-review',
       description:
         'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       disabled: false,
@@ -41015,6 +41074,7 @@ assert.deepEqual(
     data: null,
   }),
   {
+    dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     message: 'Classroom brief could not be copied.',
     type: 'blocked',
