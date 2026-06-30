@@ -12,9 +12,22 @@ import {
 } from '@/activities/worksheet-modes';
 import { Routes } from '@/lib/routes';
 
-type CreateActivityTemplateSearch = {
+export type CreateActivityTemplateSearch = {
   template: ActivityTemplateType;
 };
+
+export type TemplateEntryAction = {
+  label: string;
+  search: CreateActivityTemplateSearch;
+  to: typeof Routes.Create;
+};
+
+export type TemplateEntryLinkAction = {
+  label: string;
+  to: typeof Routes.StudentPreview | typeof Routes.Templates;
+};
+
+export type TemplateEntryCreateLinkAction = Omit<TemplateEntryAction, 'search'>;
 
 export function buildTemplateCreateSearch(
   template: ActivityTemplateType
@@ -28,7 +41,9 @@ export function parseCreateActivityTemplateSearch(
   return isActivityTemplateType(value) ? value : undefined;
 }
 
-export function buildTemplateEntryAction(template: ActivityTemplateDefinition) {
+export function buildTemplateEntryAction(
+  template: ActivityTemplateDefinition
+): TemplateEntryAction {
   return {
     label: m.activity_template_start_action({ template: template.shortName }),
     search: buildTemplateCreateSearch(template.type),
@@ -36,7 +51,9 @@ export function buildTemplateEntryAction(template: ActivityTemplateDefinition) {
   };
 }
 
-export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
+export function buildWorksheetModeEntryAction(
+  mode: WorksheetModeDefinition
+): TemplateEntryAction {
   return {
     label: mode.action,
     search: buildTemplateCreateSearch(mode.template),
@@ -46,7 +63,12 @@ export function buildWorksheetModeEntryAction(mode: WorksheetModeDefinition) {
 
 export function buildWorksheetHeroActions(
   modes: readonly WorksheetModeDefinition[]
-) {
+): Array<
+  TemplateEntryAction & {
+    isPrimary: boolean;
+    template: WorksheetModeTemplate;
+  }
+> {
   return WORKSHEET_MODE_TEMPLATES.map((template, index) => ({
     ...buildWorksheetHeroAction(modes, template),
     isPrimary: index === 0,
@@ -56,7 +78,9 @@ export function buildWorksheetHeroActions(
 function buildWorksheetHeroAction(
   modes: readonly WorksheetModeDefinition[],
   template: WorksheetModeTemplate
-) {
+): TemplateEntryAction & {
+  template: WorksheetModeTemplate;
+} {
   const mode = modes.find((item) => item.template === template);
   if (!mode) {
     const fallbackTemplate = getTemplateByType(template);

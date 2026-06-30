@@ -7,6 +7,10 @@ import {
   buildTemplateEntryAction,
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
+  type CreateActivityTemplateSearch,
+  type TemplateEntryAction,
+  type TemplateEntryCreateLinkAction,
+  type TemplateEntryLinkAction,
 } from '@/activities/template-entry';
 import { formatTemplateRequirements } from '@/activities/template-remix';
 import {
@@ -21,22 +25,13 @@ import type {
 import { Routes } from '@/lib/routes';
 import { m } from '@/locale/paraglide/messages';
 
-export type EntryActionSearch = {
-  template: ActivityTemplateType | WorksheetModeTemplate;
-};
+export type EntryActionSearch = CreateActivityTemplateSearch;
 
-export type EntryAction = {
-  label: string;
-  search: EntryActionSearch;
-  to: typeof Routes.Create;
-};
+export type EntryAction = TemplateEntryAction;
 
-export type LinkAction = {
-  label: string;
-  to: typeof Routes.StudentPreview | typeof Routes.Templates;
-};
+export type LinkAction = TemplateEntryLinkAction;
 
-export type CreateLinkAction = Omit<EntryAction, 'search'>;
+export type CreateLinkAction = TemplateEntryCreateLinkAction;
 
 export type WorksheetsPageHeroActionView = EntryAction & {
   isPrimary: boolean;

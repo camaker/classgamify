@@ -24251,23 +24251,33 @@ const entryPageViewSource = readFileSync(
 );
 assert.match(
   entryPageViewSource,
-  /export type EntryActionSearch = \{[\s\S]*export type EntryAction = \{[\s\S]*export type LinkAction = \{[\s\S]*export type CreateLinkAction = Omit<EntryAction, 'search'>;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
+  /export type EntryActionSearch = CreateActivityTemplateSearch;[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*export type LinkAction = TemplateEntryLinkAction;[\s\S]*export type CreateLinkAction = TemplateEntryCreateLinkAction;[\s\S]*export type WorksheetsPageHeroActionView = EntryAction & \{/,
   'Entry page view domain should export focused entry and link action contracts.'
 );
 assert.match(
   templateEntrySource,
-  /ActivityTemplateType[\s\S]*template: ActivityTemplateType[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
-  'Template entry helpers should use the explicit activity template type contract for create search.'
+  /export type CreateActivityTemplateSearch = \{[\s\S]*template: ActivityTemplateType;[\s\S]*export type TemplateEntryAction = \{[\s\S]*search: CreateActivityTemplateSearch;[\s\S]*to: typeof Routes\.Create;[\s\S]*export type TemplateEntryLinkAction = \{[\s\S]*to: typeof Routes\.StudentPreview \| typeof Routes\.Templates;[\s\S]*export type TemplateEntryCreateLinkAction = Omit<[\s\S]*TemplateEntryAction,[\s\S]*'search'[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
+  'Template entry helpers should expose explicit create-search, action, link-action, and create-link contracts.'
 );
 assert.match(
   entryPageViewSource,
-  /ActivityTemplateType[\s\S]*EntryActionSearch = \{[\s\S]*template: ActivityTemplateType \| WorksheetModeTemplate[\s\S]*template: ActivityTemplateType;/,
-  'Template and worksheet entry view-models should expose explicit activity template type fields.'
+  /type CreateActivityTemplateSearch,[\s\S]*type TemplateEntryAction,[\s\S]*type TemplateEntryCreateLinkAction,[\s\S]*type TemplateEntryLinkAction,[\s\S]*export type EntryActionSearch = CreateActivityTemplateSearch;[\s\S]*export type EntryAction = TemplateEntryAction;[\s\S]*export type LinkAction = TemplateEntryLinkAction;[\s\S]*export type CreateLinkAction = TemplateEntryCreateLinkAction;/,
+  'Template and worksheet entry view-models should reuse the explicit template-entry action contracts.'
 );
 assert.doesNotMatch(
   `${templateEntrySource}\n${entryPageViewSource}`,
   /ActivityTemplateDefinition\['type'\]/,
   'Template entry view-models should not infer template ids from aggregate template definitions.'
+);
+assert.doesNotMatch(
+  entryPageViewSource,
+  /export type EntryAction = \{[\s\S]*to: typeof Routes\.Create|export type LinkAction = \{[\s\S]*Routes\.StudentPreview/,
+  'Entry page view-models should not redeclare route action shapes locally.'
+);
+assert.match(
+  templateEntrySource,
+  /export function buildTemplateEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*export function buildWorksheetModeEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*buildWorksheetHeroActions\([\s\S]*\): Array<[\s\S]*TemplateEntryAction &/,
+  'Template entry builders should return the explicit template-entry action contracts.'
 );
 assert.match(
   entryPageViewSource,
