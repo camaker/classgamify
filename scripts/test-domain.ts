@@ -15818,16 +15818,20 @@ assert.deepEqual(
       },
     ],
     controlView: {
-      answerKeyDescription:
-        'Teacher-only answers from the frozen assignment snapshot.',
-      answerKeyLabel: 'Include answer key',
-      answerKeyValue: true,
+      answerKeyToggle: {
+        description:
+          'Teacher-only answers from the frozen assignment snapshot.',
+        label: 'Include answer key',
+        value: true,
+      },
       backToResultsAction: {
         assignmentId: 'assignment-printable-1',
         label: 'Back to results',
         to: Routes.DashboardAssignmentResults,
       },
-      printButtonLabel: 'Print',
+      printAction: {
+        label: 'Print',
+      },
     },
     emptyState: {
       description:
@@ -22751,7 +22755,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
 assert.match(
@@ -22766,8 +22770,8 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /PrintableWorksheetBackToResultsAction[\s\S]*PrintableWorksheetControlView/,
-  'Printable worksheet toolbar should consume explicit printable control and back-to-results action contracts.'
+  /PrintableWorksheetAnswerKeyToggleView[\s\S]*PrintableWorksheetBackToResultsAction[\s\S]*PrintableWorksheetControlView[\s\S]*PrintableWorksheetPrintAction/,
+  'Printable worksheet toolbar should consume explicit printable control, answer-key toggle, back-to-results, and print action contracts.'
 );
 assert.match(
   printableWorksheetStatePanelSource,
@@ -22906,7 +22910,7 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   printableAssignmentRouteSource,
-  /pageView\.assignmentFieldViews\.map|pageView\.answerKeyView\.show|pageView\.emptyState\.title|controlView\.printButtonLabel|data-print-choice-bank=\{itemView\.choiceBank\.presentation\}|itemView\.answerLines\.map|pageView\.answerKeyView\.itemViews\.map|<Switch|<Badge|<Card|<Spinner/,
+  /pageView\.assignmentFieldViews\.map|pageView\.answerKeyView\.show|pageView\.emptyState\.title|controlView\.printAction|controlView\.printButtonLabel|data-print-choice-bank=\{itemView\.choiceBank\.presentation\}|itemView\.answerLines\.map|pageView\.answerKeyView\.itemViews\.map|<Switch|<Badge|<Card|<Spinner/,
   'Printable worksheet route should not render low-level printable worksheet fields, items, answer keys, or controls directly.'
 );
 assert.match(
@@ -23021,18 +23025,28 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /controlView\.printButtonLabel/,
-  'Printable worksheet toolbar should render toolbar copy from the printable worksheet control view.'
+  /const \{ answerKeyToggle, backToResultsAction, printAction \} = controlView[\s\S]*PrintableWorksheetPrintButton[\s\S]*action=\{printAction\}/,
+  'Printable worksheet toolbar should render prepared print actions from the printable worksheet control view.'
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /const \{ backToResultsAction \} = controlView[\s\S]*PrintableWorksheetBackToResultsLink[\s\S]*action=\{backToResultsAction\}/,
+  /const \{ answerKeyToggle, backToResultsAction, printAction \} = controlView[\s\S]*PrintableWorksheetBackToResultsLink[\s\S]*action=\{backToResultsAction\}/,
   'Printable worksheet toolbar should render the prepared back-to-results action target and label.'
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /controlView\.answerKeyDescription/,
-  'Printable worksheet toolbar should render the prepared answer-key description from the printable worksheet control view.'
+  /PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView=\{answerKeyToggle\}/,
+  'Printable worksheet toolbar should render the prepared answer-key toggle from the printable worksheet control view.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
+  /function PrintableWorksheetAnswerKeyToggle[\s\S]*toggleView: PrintableWorksheetAnswerKeyToggleView[\s\S]*checked=\{toggleView\.value\}[\s\S]*toggleView\.label[\s\S]*toggleView\.description/,
+  'Printable worksheet answer-key toggle should consume a focused prepared toggle view.'
+);
+assert.match(
+  printableWorksheetToolbarSource,
+  /function PrintableWorksheetPrintButton[\s\S]*action: PrintableWorksheetPrintAction[\s\S]*onPrint: \(\) => void[\s\S]*onClick=\{onPrint\}[\s\S]*action\.label/,
+  'Printable worksheet print button should consume a focused prepared print action.'
 );
 assert.doesNotMatch(
   printableWorksheetToolbarSource,

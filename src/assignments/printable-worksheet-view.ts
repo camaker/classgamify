@@ -125,12 +125,20 @@ export type PrintableWorksheetBackToResultsAction = {
   to: typeof Routes.DashboardAssignmentResults;
 };
 
+export type PrintableWorksheetAnswerKeyToggleView = {
+  description: string;
+  label: string;
+  value: boolean;
+};
+
+export type PrintableWorksheetPrintAction = {
+  label: string;
+};
+
 export type PrintableWorksheetControlView = {
-  answerKeyDescription: string;
-  answerKeyLabel: string;
-  answerKeyValue: boolean;
+  answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;
   backToResultsAction: PrintableWorksheetBackToResultsAction;
-  printButtonLabel: string;
+  printAction: PrintableWorksheetPrintAction;
 };
 
 export type PrintableWorksheetEmptyState = {
@@ -371,15 +379,19 @@ export function buildPrintableWorksheetControlView({
   assignmentId: string;
 }): PrintableWorksheetControlView {
   return {
-    answerKeyDescription: printableWorksheetPageCopy.answerKeyDescription,
-    answerKeyLabel: printableWorksheetPageCopy.answerKeyLabel,
-    answerKeyValue: answerKey,
+    answerKeyToggle: {
+      description: printableWorksheetPageCopy.answerKeyDescription,
+      label: printableWorksheetPageCopy.answerKeyLabel,
+      value: answerKey,
+    },
     backToResultsAction: {
       assignmentId,
       label: printableWorksheetPageCopy.backToResultsLabel,
       to: Routes.DashboardAssignmentResults,
     },
-    printButtonLabel: printableWorksheetPageCopy.printButtonLabel,
+    printAction: {
+      label: printableWorksheetPageCopy.printButtonLabel,
+    },
   };
 }
 
