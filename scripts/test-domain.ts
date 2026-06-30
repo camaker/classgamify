@@ -20513,8 +20513,8 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /buildActivityDerivativeActionExecutionPlan\(\{[\s\S]*action: 'remix'[\s\S]*activityId: activity\.id[\s\S]*targetTemplateType[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
-  'Activity library card component should build remix execution plans from the selected target template.'
+  /buildActivityDerivativeActionExecutionPlan\(\{[\s\S]*action: 'remix'[\s\S]*activityId: activity\.id[\s\S]*currentTemplateType: activity\.templateType[\s\S]*targetTemplateType[\s\S]*visibility: activity\.status[\s\S]*\}\)/,
+  'Activity library card component should build remix execution plans from the selected target template and current template.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -24655,6 +24655,7 @@ assert.deepEqual(
   buildActivityDerivativeActionExecutionPlan({
     action: 'remix',
     activityId: 'activity-1',
+    currentTemplateType: 'quiz',
     targetTemplateType: 'group-sort',
     visibility: 'public',
   }),
@@ -24667,6 +24668,20 @@ assert.deepEqual(
     },
     successMessage: 'Template remix created.',
     type: 'remix',
+  }
+);
+assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'remix',
+    activityId: 'activity-1',
+    currentTemplateType: 'quiz',
+    targetTemplateType: 'quiz',
+    visibility: 'public',
+  }),
+  {
+    failureMessage: 'Activity could not be remixed.',
+    message: 'Choose a different template to remix into.',
+    type: 'blocked',
   }
 );
 assert.deepEqual(
@@ -24685,6 +24700,7 @@ assert.deepEqual(
   buildActivityDerivativeActionExecutionPlan({
     action: 'remix',
     activityId: 'activity-1',
+    currentTemplateType: 'quiz',
     targetTemplateType: 'quiz',
     visibility: 'archived',
   }),

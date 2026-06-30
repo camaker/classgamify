@@ -74,6 +74,7 @@ type ActivityDerivativeActionExecutionPlanInput =
   | {
       action: 'remix';
       activityId: string;
+      currentTemplateType: ActivityTemplateType;
       targetTemplateType: ActivityTemplateType;
       visibility: ActivityVisibility;
     };
@@ -176,6 +177,10 @@ export function canRestoreActivity(visibility: ActivityVisibility) {
   return isActivityArchived(visibility);
 }
 
+export function getSameTemplateRemixError() {
+  return m.activity_api_error_remix_same_template();
+}
+
 export function buildActivityDerivativeActionGate({
   action,
   visibility,
@@ -272,6 +277,14 @@ export function buildActivityDerivativeActionExecutionPlan(
       },
       successMessage: actionView.successMessage,
       type: 'duplicate',
+    };
+  }
+
+  if (input.currentTemplateType === input.targetTemplateType) {
+    return {
+      failureMessage: actionView.failureMessage,
+      message: getSameTemplateRemixError(),
+      type: 'blocked',
     };
   }
 

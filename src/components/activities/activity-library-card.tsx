@@ -73,6 +73,7 @@ export function ActivityLibraryCard({
     const executionPlan = buildActivityDerivativeActionExecutionPlan({
       action: 'remix',
       activityId: activity.id,
+      currentTemplateType: activity.templateType,
       targetTemplateType,
       visibility: activity.status,
     });
