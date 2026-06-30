@@ -155,7 +155,7 @@ function RoadmapColumn({
       <ul className="mt-5 space-y-3">
         {column.items.map((item) => (
           <li
-            key={item.title}
+            key={item.id}
             className="grid grid-cols-[1rem_minmax(0,1fr)] gap-2 text-sm leading-6"
           >
             <IconCheck className="mt-1 size-4 text-primary" />

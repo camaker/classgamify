@@ -4092,6 +4092,10 @@ const roadmapRouteSource = readFileSync(
   'src/routes/(pages)/roadmap.tsx',
   'utf8'
 );
+const publicPageViewSource = readFileSync(
+  'src/pages/public-page-view.ts',
+  'utf8'
+);
 const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
 const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
 const blogCtaActionLinkSource = readFileSync(
@@ -4312,6 +4316,21 @@ assert.doesNotMatch(
   roadmapRouteSource,
   /Routes\.(Create|Templates|ContactClassroom)/,
   'Roadmap route should not hardcode CTA route targets.'
+);
+assert.match(
+  roadmapRouteSource,
+  /column\.items\.map[\s\S]*key=\{item\.id\}/,
+  'Roadmap route should key roadmap tasks by prepared stable task ids.'
+);
+assert.doesNotMatch(
+  roadmapRouteSource,
+  /key=\{item\.title\}/,
+  'Roadmap route should not key roadmap tasks by localized titles.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*id: RoadmapTaskId;[\s\S]*title: string;/,
+  'Roadmap task view models should expose stable ids separate from localized titles.'
 );
 assert.match(
   blogListRouteSource,
@@ -23998,11 +24017,13 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
         {
           description:
             'Teachers can create reusable structured activities, publish assignment links, and keep snapshots stable for student attempts.',
+          id: 'activity-assignment-loop',
           title: 'Activity to assignment loop',
         },
         {
           description:
             'Quiz, matching games, group sorting, line matching, fill-ins, listening, pair matching, and box reveal modes share one content model.',
+          id: 'playable-template-foundation',
           title: 'Playable template foundation',
         },
       ],
@@ -24017,11 +24038,13 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
         {
           description:
             'Make completion, scores, item misses, exports, and review filters clearer for teacher follow-up.',
+          id: 'results-reteach-summaries',
           title: 'Results and reteach summaries',
         },
         {
           description:
             'Tighten printable follow-up, fill-in, line matching, and listening flows around the same assignment snapshot.',
+          id: 'worksheet-style-delivery',
           title: 'Worksheet-style delivery',
         },
       ],
@@ -24036,16 +24059,19 @@ assert.deepEqual(buildRoadmapPageViewModel(), {
         {
           description:
             'Turn teacher notes, vocabulary lists, and worksheet prompts into reviewable activity drafts without bypassing teacher control.',
+          id: 'ai-assisted-activity-drafting',
           title: 'AI-assisted activity drafting',
         },
         {
           description:
             'Read teacher-uploaded worksheets into structured prompts, accepted answers, and printable follow-up modes.',
+          id: 'worksheet-extraction',
           title: 'Worksheet extraction',
         },
         {
           description:
             'Add multi-teacher sharing, class-level result retention, and permission rules for schools and learning centers.',
+          id: 'school-team-workflows',
           title: 'School team workflows',
         },
       ],

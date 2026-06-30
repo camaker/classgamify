@@ -91,8 +91,18 @@ type RoadmapSnapshotView = {
   title: string;
 };
 
+export type RoadmapTaskId =
+  | 'ai-assisted-activity-drafting'
+  | 'activity-assignment-loop'
+  | 'playable-template-foundation'
+  | 'results-reteach-summaries'
+  | 'school-team-workflows'
+  | 'worksheet-extraction'
+  | 'worksheet-style-delivery';
+
 type RoadmapTaskView = {
   description: string;
+  id: RoadmapTaskId;
   title: string;
 };
 
@@ -293,10 +303,12 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         items: [
           {
             description: m.roadmap_board_tasks_done_0_description(),
+            id: 'activity-assignment-loop',
             title: m.roadmap_board_tasks_done_0_title(),
           },
           {
             description: m.roadmap_board_tasks_done_1_description(),
+            id: 'playable-template-foundation',
             title: m.roadmap_board_tasks_done_1_title(),
           },
         ],
@@ -309,10 +321,12 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         items: [
           {
             description: m.roadmap_board_tasks_in_progress_0_description(),
+            id: 'results-reteach-summaries',
             title: m.roadmap_board_tasks_in_progress_0_title(),
           },
           {
             description: m.roadmap_board_tasks_in_progress_1_description(),
+            id: 'worksheet-style-delivery',
             title: m.roadmap_board_tasks_in_progress_1_title(),
           },
         ],
@@ -325,14 +339,17 @@ export function buildRoadmapPageViewModel(): RoadmapPageViewModel {
         items: [
           {
             description: m.roadmap_board_tasks_backlog_0_description(),
+            id: 'ai-assisted-activity-drafting',
             title: m.roadmap_board_tasks_backlog_0_title(),
           },
           {
             description: m.roadmap_board_tasks_backlog_1_description(),
+            id: 'worksheet-extraction',
             title: m.roadmap_board_tasks_backlog_1_title(),
           },
           {
             description: m.roadmap_board_tasks_backlog_2_description(),
+            id: 'school-team-workflows',
             title: m.roadmap_board_tasks_backlog_2_title(),
           },
         ],
