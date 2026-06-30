@@ -157,8 +157,8 @@ export type CreatedActivityListItem = {
 
 export type CreatedActivityPanelContext = {
   activity?: CreatedActivityListItem;
+  actionView: CreatedActivityPanelActionView;
   body: string;
-  editAction?: ActivityLibraryEditorActionView;
   showCreateAction: boolean;
   showDismissAction: boolean;
   showEditAction: boolean;
@@ -171,6 +171,25 @@ export type CreatedActivityPanelContext = {
 export type CreatedActivityPanelActivity = CreatedActivityListItem | undefined;
 
 export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;
+
+export type CreatedActivityPanelPublishActionView =
+  ActivityLibraryCardDerivativeActionView;
+
+export type CreatedActivityPanelCreateActionView = {
+  label: string;
+  to: typeof Routes.Create;
+};
+
+export type CreatedActivityPanelDismissActionView = {
+  label: string;
+};
+
+export type CreatedActivityPanelActionView = {
+  create: CreatedActivityPanelCreateActionView;
+  dismiss: CreatedActivityPanelDismissActionView;
+  edit?: CreatedActivityPanelEditAction;
+  publish?: CreatedActivityPanelPublishActionView;
+};
 
 type ActivityLibraryPageBreadcrumb = {
   href?: string;
@@ -826,21 +845,16 @@ export function buildCreatedActivityPanelContext({
   createdFrom?: ActivityLibraryCreatedSource;
   isLoading: boolean;
 }): CreatedActivityPanelContext {
+  const actionView = buildCreatedActivityPanelActionView(activity);
+
   if (activity) {
     const canEdit = canEditActivity(activity.visibility);
     const canPublish = canDeriveActivityWork(activity.visibility);
 
     return {
       activity,
+      actionView,
       body: getCreatedActivityPanelFoundBody(createdFrom),
-      ...(canEdit
-        ? {
-            editAction: buildActivityLibraryEditorAction({
-              activityId: activity.id,
-              label: activityLibraryCardCopy.actionLabels.edit,
-            }),
-          }
-        : {}),
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: canEdit,
@@ -853,6 +867,7 @@ export function buildCreatedActivityPanelContext({
 
   if (isLoading) {
     return {
+      actionView,
       body: m.activity_created_panel_loading_body(),
       showCreateAction: true,
       showDismissAction: true,
@@ -865,6 +880,7 @@ export function buildCreatedActivityPanelContext({
   }
 
   return {
+    actionView,
     body: m.activity_created_panel_missing_body(),
     showCreateAction: true,
     showDismissAction: true,
@@ -873,6 +889,36 @@ export function buildCreatedActivityPanelContext({
     showPublishAction: false,
     status: 'missing',
     title: m.activity_created_panel_missing_title(),
+  };
+}
+
+function buildCreatedActivityPanelActionView(
+  activity?: CreatedActivityListItem
+): CreatedActivityPanelActionView {
+  return {
+    create: {
+      label: activityLibraryPageCopy.createActivityLabel,
+      to: Routes.Create,
+    },
+    dismiss: {
+      label: activityLibraryActionCopy.dismiss,
+    },
+    ...(activity && canEditActivity(activity.visibility)
+      ? {
+          edit: buildActivityLibraryEditorAction({
+            activityId: activity.id,
+            label: activityLibraryCardCopy.actionLabels.edit,
+          }),
+        }
+      : {}),
+    ...(activity && canDeriveActivityWork(activity.visibility)
+      ? {
+          publish: buildActivityLibraryCardDerivativeActionView({
+            action: 'publish',
+            visibility: activity.visibility,
+          }),
+        }
+      : {}),
   };
 }
 

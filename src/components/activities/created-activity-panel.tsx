@@ -1,12 +1,12 @@
 import {
-  activityLibraryActionCopy,
-  activityLibraryCardCopy,
   activityLibraryCreatedPanelCopy,
-  activityLibraryPageCopy,
   buildCreatedActivityPanelContext,
-  type CreatedActivityPanelActivity,
+  type CreatedActivityPanelActionView,
+  type CreatedActivityPanelCreateActionView,
   type CreatedActivityPanelContext,
+  type CreatedActivityPanelDismissActionView,
   type CreatedActivityPanelEditAction,
+  type CreatedActivityPanelPublishActionView,
 } from '@/activities/library-view';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { ActivityPublishDialog } from '@/components/activities/activity-publish-dialog';
@@ -60,7 +60,7 @@ export function CreatedActivityPanel({
           ) : null}
         </div>
         <CreatedActivityPanelActions
-          activity={activity}
+          actionView={panelContext.actionView}
           context={panelContext}
           onDismiss={onDismiss}
           onPublish={() => setPublishDialogOpen(true)}
@@ -90,41 +90,53 @@ export function CreatedActivityPanel({
 }
 
 function CreatedActivityPanelActions({
-  activity,
+  actionView,
   context,
   onDismiss,
   onPublish,
 }: {
-  activity: CreatedActivityPanelActivity;
+  actionView: CreatedActivityPanelActionView;
   context: CreatedActivityPanelContext;
   onDismiss: () => void;
   onPublish: () => void;
 }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-      {context.showPublishAction && activity ? (
-        <CreatedActivityPublishActionButton onClick={onPublish} />
+      {context.showPublishAction ? (
+        <CreatedActivityPublishActionButton
+          action={actionView.publish}
+          onClick={onPublish}
+        />
       ) : null}
-      {context.showEditAction && context.editAction ? (
-        <CreatedActivityEditActionLink action={context.editAction} />
+      {context.showEditAction && actionView.edit ? (
+        <CreatedActivityEditActionLink action={actionView.edit} />
       ) : null}
-      {context.showCreateAction ? <CreatedActivityNewActionLink /> : null}
+      {context.showCreateAction ? (
+        <CreatedActivityNewActionLink action={actionView.create} />
+      ) : null}
       {context.showDismissAction ? (
-        <CreatedActivityDismissActionButton onClick={onDismiss} />
+        <CreatedActivityDismissActionButton
+          action={actionView.dismiss}
+          onClick={onDismiss}
+        />
       ) : null}
     </div>
   );
 }
 
 function CreatedActivityPublishActionButton({
+  action,
   onClick,
 }: {
+  action?: CreatedActivityPanelPublishActionView;
   onClick: () => void;
 }) {
+  if (!action) return null;
+
   return (
     <Button type="button" className="w-full sm:w-auto" onClick={onClick}>
       <IconPlus className="size-4" />
-      {activityLibraryCardCopy.actionLabels.publish}
+      {action.label}
     </Button>
   );
 }
@@ -149,24 +161,30 @@ function CreatedActivityEditActionLink({
   );
 }
 
-function CreatedActivityNewActionLink() {
+function CreatedActivityNewActionLink({
+  action,
+}: {
+  action: CreatedActivityPanelCreateActionView;
+}) {
   return (
     <Link
-      to={Routes.Create}
+      to={action.to}
       className={cn(
         buttonVariants({ variant: 'outline' }),
         'w-full bg-background sm:w-auto'
       )}
     >
       <IconPlus className="size-4" />
-      {activityLibraryPageCopy.createActivityLabel}
+      {action.label}
     </Link>
   );
 }
 
 function CreatedActivityDismissActionButton({
+  action,
   onClick,
 }: {
+  action: CreatedActivityPanelDismissActionView;
   onClick: () => void;
 }) {
   return (
@@ -177,7 +195,7 @@ function CreatedActivityDismissActionButton({
       onClick={onClick}
     >
       <IconX className="size-4" />
-      {activityLibraryActionCopy.dismiss}
+      {action.label}
     </Button>
   );
 }

@@ -19387,12 +19387,27 @@ assert.deepEqual(
   }),
   {
     activity: createdActivities[1],
-    body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
-    editAction: {
-      activityId: 'activity-2',
-      label: 'Edit activity',
-      to: Routes.DashboardActivityEdit,
+    actionView: {
+      create: {
+        label: 'Create activity',
+        to: Routes.Create,
+      },
+      dismiss: {
+        label: 'Dismiss',
+      },
+      edit: {
+        activityId: 'activity-2',
+        label: 'Edit activity',
+        to: Routes.DashboardActivityEdit,
+      },
+      publish: {
+        failureMessage: 'Assignment could not be published.',
+        gate: { type: 'ready' },
+        label: 'Publish assignment',
+        successMessage: 'Assignment link published.',
+      },
     },
+    body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
     showCreateAction: true,
     showDismissAction: true,
     showEditAction: true,
@@ -19409,6 +19424,15 @@ assert.deepEqual(
   }),
   {
     activity: archivedCreatedActivity,
+    actionView: {
+      create: {
+        label: 'Create activity',
+        to: Routes.Create,
+      },
+      dismiss: {
+        label: 'Dismiss',
+      },
+    },
     body: 'Review the structured content, keep building the library, or publish it from the activity card when you are ready to share it with students.',
     showCreateAction: true,
     showDismissAction: true,
@@ -19441,6 +19465,15 @@ assert.deepEqual(
     isLoading: true,
   }),
   {
+    actionView: {
+      create: {
+        label: 'Create activity',
+        to: Routes.Create,
+      },
+      dismiss: {
+        label: 'Dismiss',
+      },
+    },
     body: 'Loading the newly saved activity and next classroom actions.',
     showCreateAction: true,
     showDismissAction: true,
@@ -19457,6 +19490,15 @@ assert.deepEqual(
     isLoading: false,
   }),
   {
+    actionView: {
+      create: {
+        label: 'Create activity',
+        to: Routes.Create,
+      },
+      dismiss: {
+        label: 'Dismiss',
+      },
+    },
     body: 'The activity was saved, but it is not visible in the current list view yet. Filters or pagination may be hiding it.',
     showCreateAction: true,
     showDismissAction: true,
@@ -20865,17 +20907,17 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*export type CreatedActivityPanelActivity = CreatedActivityListItem \| undefined;[\s\S]*export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;/,
+  /export type CreatedActivityListItem[\s\S]*export type CreatedActivityPanelContext[\s\S]*actionView: CreatedActivityPanelActionView;[\s\S]*export type CreatedActivityPanelActivity = CreatedActivityListItem \| undefined;[\s\S]*export type CreatedActivityPanelEditAction = ActivityLibraryEditorActionView;[\s\S]*export type CreatedActivityPanelPublishActionView =[\s\S]*export type CreatedActivityPanelCreateActionView = \{[\s\S]*to: typeof Routes\.Create;[\s\S]*export type CreatedActivityPanelDismissActionView = \{[\s\S]*export type CreatedActivityPanelActionView = \{[\s\S]*create: CreatedActivityPanelCreateActionView;[\s\S]*dismiss: CreatedActivityPanelDismissActionView;[\s\S]*edit\?: CreatedActivityPanelEditAction;[\s\S]*publish\?: CreatedActivityPanelPublishActionView;/,
   'Activity library domain should expose explicit created-activity panel contracts.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
-  /ActivityLibraryCardViewModel\['templateType'\]|CreatedActivityPanelContext\['activity'\]|NonNullable<\s*CreatedActivityPanelContext\['editAction'\]/,
+  /ActivityLibraryCardViewModel\['templateType'\]|CreatedActivityPanelContext\['activity'\]|CreatedActivityPanelContext\['(?:editAction|actionView)'\]|NonNullable<\s*CreatedActivityPanelContext\['(?:editAction|actionView)'\]/,
   'Activity library card and created-panel contracts should not derive focused view types from aggregate view-model indexes.'
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /CreatedActivityPanelContext[\s\S]*CreatedActivityPanelActivity[\s\S]*CreatedActivityPanelEditAction/,
+  /CreatedActivityPanelActionView[\s\S]*CreatedActivityPanelCreateActionView[\s\S]*CreatedActivityPanelContext[\s\S]*CreatedActivityPanelDismissActionView[\s\S]*CreatedActivityPanelEditAction[\s\S]*CreatedActivityPanelPublishActionView/,
   'Created activity panel component should import explicit created-panel contracts.'
 );
 assert.doesNotMatch(
@@ -20890,18 +20932,23 @@ assert.match(
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /CreatedActivityPanelActions[\s\S]*activity=\{activity\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}/,
+  /CreatedActivityPanelActions[\s\S]*actionView=\{panelContext\.actionView\}[\s\S]*context=\{panelContext\}[\s\S]*onDismiss=\{onDismiss\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}/,
   'Created activity panel should delegate saved-activity actions to a focused action component.'
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /function CreatedActivityPanelActions[\s\S]*context\.showPublishAction[\s\S]*CreatedActivityPublishActionButton[\s\S]*context\.showEditAction && context\.editAction[\s\S]*CreatedActivityEditActionLink[\s\S]*context\.showCreateAction[\s\S]*CreatedActivityNewActionLink[\s\S]*context\.showDismissAction[\s\S]*CreatedActivityDismissActionButton/,
+  /function CreatedActivityPanelActions[\s\S]*actionView: CreatedActivityPanelActionView[\s\S]*context\.showPublishAction[\s\S]*CreatedActivityPublishActionButton[\s\S]*action=\{actionView\.publish\}[\s\S]*context\.showEditAction && actionView\.edit[\s\S]*CreatedActivityEditActionLink[\s\S]*context\.showCreateAction[\s\S]*CreatedActivityNewActionLink[\s\S]*action=\{actionView\.create\}[\s\S]*context\.showDismissAction[\s\S]*CreatedActivityDismissActionButton[\s\S]*action=\{actionView\.dismiss\}/,
   'Created activity panel actions should split publish, edit, create, and dismiss rendering.'
 );
 assert.match(
   createdActivityPanelComponentSource,
-  /function CreatedActivityPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish[\s\S]*function CreatedActivityEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function CreatedActivityNewActionLink[\s\S]*activityLibraryPageCopy\.createActivityLabel[\s\S]*function CreatedActivityDismissActionButton[\s\S]*activityLibraryActionCopy\.dismiss/,
-  'Created activity panel action subcomponents should render localized action labels from prepared activity-domain actions.'
+  /function CreatedActivityPublishActionButton[\s\S]*action\?: CreatedActivityPanelPublishActionView[\s\S]*\{action\.label\}[\s\S]*function CreatedActivityEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function CreatedActivityNewActionLink[\s\S]*to=\{action\.to\}[\s\S]*\{action\.label\}[\s\S]*function CreatedActivityDismissActionButton[\s\S]*action: CreatedActivityPanelDismissActionView[\s\S]*\{action\.label\}/,
+  'Created activity panel action subcomponents should render labels and routes from prepared activity-domain actions.'
+);
+assert.doesNotMatch(
+  createdActivityPanelComponentSource,
+  /activityLibrary(?:Action|Card|Page)Copy/,
+  'Created activity panel component should not read localized action copy directly.'
 );
 assert.doesNotMatch(
   createdActivityPanelComponentSource,
@@ -29939,12 +29986,27 @@ assert.deepEqual(
         title: 'Persisted quiz',
         visibility: 'draft',
       },
-      body: 'This draft keeps the reusable content and switches the primary template. Review the structure before publishing so the original activity and existing snapshots stay unchanged.',
-      editAction: {
-        activityId: 'persisted-activity-1',
-        label: 'Edit activity',
-        to: Routes.DashboardActivityEdit,
+      actionView: {
+        create: {
+          label: 'Create activity',
+          to: Routes.Create,
+        },
+        dismiss: {
+          label: 'Dismiss',
+        },
+        edit: {
+          activityId: 'persisted-activity-1',
+          label: 'Edit activity',
+          to: Routes.DashboardActivityEdit,
+        },
+        publish: {
+          failureMessage: 'Assignment could not be published.',
+          gate: { type: 'ready' },
+          label: 'Publish assignment',
+          successMessage: 'Assignment link published.',
+        },
       },
+      body: 'This draft keeps the reusable content and switches the primary template. Review the structure before publishing so the original activity and existing snapshots stay unchanged.',
       showCreateAction: true,
       showDismissAction: true,
       showEditAction: true,
