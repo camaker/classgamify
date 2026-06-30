@@ -59,7 +59,7 @@ export type RoadmapPageViewModel = {
 
 export type RoadmapColumnId = 'backlog' | 'done' | 'in-progress';
 
-type RoadmapColumnView = {
+export type RoadmapColumnView = {
   description: string;
   id: RoadmapColumnId;
   items: RoadmapTaskView[];
@@ -77,7 +77,7 @@ type RoadmapHeroView = {
 
 export type RoadmapPrincipleId = 'focus' | 'learning' | 'validation';
 
-type RoadmapPrincipleView = {
+export type RoadmapPrincipleView = {
   description: string;
   id: RoadmapPrincipleId;
   title: string;
@@ -139,9 +139,22 @@ export type ContactPageViewModel = {
 
 export type ContactTopicId = 'classroom' | 'partnership' | 'product';
 
+export type ContactChecklistItemId =
+  | 'classroom-learners'
+  | 'classroom-routine'
+  | 'classroom-worksheets'
+  | 'device'
+  | 'goal'
+  | 'page';
+
+type ContactChecklistItemView = {
+  id: ContactChecklistItemId;
+  text: string;
+};
+
 type ContactChecklistView = {
   description: string;
-  items: string[];
+  items: ContactChecklistItemView[];
   title: string;
 };
 
@@ -150,7 +163,7 @@ type ContactHeroView = {
   title: string;
 };
 
-type ContactInquiryPanelView = {
+export type ContactInquiryPanelView = {
   description: string;
   highlights: ContactInquiryPanelHighlightView[];
   title: string;
@@ -600,9 +613,18 @@ function buildContactChecklist(intent: ContactIntent): ContactChecklistView {
     return {
       description: m.contact_classroom_checklist_description(),
       items: [
-        m.contact_classroom_checklist_learners(),
-        m.contact_classroom_checklist_routine(),
-        m.contact_classroom_checklist_worksheets(),
+        {
+          id: 'classroom-learners',
+          text: m.contact_classroom_checklist_learners(),
+        },
+        {
+          id: 'classroom-routine',
+          text: m.contact_classroom_checklist_routine(),
+        },
+        {
+          id: 'classroom-worksheets',
+          text: m.contact_classroom_checklist_worksheets(),
+        },
       ],
       title: m.contact_classroom_checklist_title(),
     };
@@ -611,9 +633,18 @@ function buildContactChecklist(intent: ContactIntent): ContactChecklistView {
   return {
     description: m.contact_checklist_description(),
     items: [
-      m.contact_checklist_page(),
-      m.contact_checklist_device(),
-      m.contact_checklist_goal(),
+      {
+        id: 'page',
+        text: m.contact_checklist_page(),
+      },
+      {
+        id: 'device',
+        text: m.contact_checklist_device(),
+      },
+      {
+        id: 'goal',
+        text: m.contact_checklist_goal(),
+      },
     ],
     title: m.contact_checklist_title(),
   };

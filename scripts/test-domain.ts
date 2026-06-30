@@ -4092,6 +4092,10 @@ const teachersRouteSource = readFileSync(
   'src/routes/(pages)/teachers.tsx',
   'utf8'
 );
+const contactRouteSource = readFileSync(
+  'src/routes/(pages)/contact.tsx',
+  'utf8'
+);
 const roadmapRouteSource = readFileSync(
   'src/routes/(pages)/roadmap.tsx',
   'utf8'
@@ -4331,6 +4335,21 @@ assert.doesNotMatch(
   'Teachers route should not hardcode CTA route targets.'
 );
 assert.match(
+  contactRouteSource,
+  /pageView\.checklist\.items\.map[\s\S]*key=\{item\.id\}[\s\S]*item\.text/,
+  'Contact route should render checklist items by stable prepared item ids.'
+);
+assert.doesNotMatch(
+  contactRouteSource,
+  /key=\{item\}|ReturnType<typeof buildContactPageViewModel>/,
+  'Contact route should not key checklist rows by localized copy or infer child contracts from page builders.'
+);
+assert.match(
+  contactRouteSource,
+  /ContactInquiryPanelView/,
+  'Contact route should consume the focused classroom inquiry panel view contract.'
+);
+assert.match(
   roadmapRouteSource,
   /pageView\.hero\.primaryAction\.to[\s\S]*pageView\.hero\.primaryAction\.label[\s\S]*pageView\.hero\.secondaryAction\.to[\s\S]*pageView\.hero\.secondaryAction\.label[\s\S]*pageView\.validation\.action\.to[\s\S]*pageView\.validation\.action\.label/,
   'Roadmap route should render prepared hero and validation CTA actions.'
@@ -4347,13 +4366,28 @@ assert.match(
 );
 assert.doesNotMatch(
   roadmapRouteSource,
+  /ReturnType<typeof buildRoadmapPageViewModel>/,
+  'Roadmap route child components should consume explicit public-page view contracts.'
+);
+assert.doesNotMatch(
+  roadmapRouteSource,
   /key=\{item\.title\}/,
   'Roadmap route should not key roadmap tasks by localized titles.'
+);
+assert.match(
+  roadmapRouteSource,
+  /RoadmapColumnView[\s\S]*RoadmapPrincipleView/,
+  'Roadmap route should import focused roadmap child view contracts.'
 );
 assert.match(
   publicPageViewSource,
   /export type RoadmapTaskId[\s\S]*type RoadmapTaskView = \{[\s\S]*id: RoadmapTaskId;[\s\S]*title: string;/,
   'Roadmap task view models should expose stable ids separate from localized titles.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type RoadmapColumnView[\s\S]*export type RoadmapPrincipleView/,
+  'Public page view contracts should expose focused roadmap child view types.'
 );
 assert.match(
   blogListRouteSource,
@@ -23914,6 +23948,16 @@ try {
   );
   assert.equal(localizedStarterActivities[1]?.content.groups[0]?.label, '固体');
   assert.equal(localizedStarterAssignments[0]?.title, '食物词汇作业');
+  assert.deepEqual(
+    buildContactPageViewModel().checklist.items.map((item) => item.id),
+    ['page', 'device', 'goal']
+  );
+  assert.deepEqual(
+    buildContactPageViewModel('classroom').checklist.items.map(
+      (item) => item.id
+    ),
+    ['classroom-learners', 'classroom-routine', 'classroom-worksheets']
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -23999,9 +24043,18 @@ assert.deepEqual(buildContactPageViewModel().hero, {
 assert.deepEqual(buildContactPageViewModel().checklist, {
   description: 'A little context helps us answer faster.',
   items: [
-    'Share the activity, template, assignment, page URL, or workflow you mean.',
-    'Tell us which device, browser, or printer setup you used.',
-    'Say whether this is for a class, tutoring group, family practice, or worksheet follow-up.',
+    {
+      id: 'page',
+      text: 'Share the activity, template, assignment, page URL, or workflow you mean.',
+    },
+    {
+      id: 'device',
+      text: 'Tell us which device, browser, or printer setup you used.',
+    },
+    {
+      id: 'goal',
+      text: 'Say whether this is for a class, tutoring group, family practice, or worksheet follow-up.',
+    },
   ],
   title: 'What to include',
 });
@@ -24016,6 +24069,10 @@ assert.deepEqual(buildContactPageViewModel('classroom').hero, {
     'Tell us how you want to use ClassGamify with students, tutoring groups, or a school team, and we will help shape the workflow around your routine.',
   title: 'Classroom inquiry',
 });
+assert.deepEqual(
+  buildContactPageViewModel('classroom').checklist.items.map((item) => item.id),
+  ['classroom-learners', 'classroom-routine', 'classroom-worksheets']
+);
 assert.deepEqual(
   buildContactPageViewModel('classroom').inquiryPanel?.highlights.map(
     (item) => item.id

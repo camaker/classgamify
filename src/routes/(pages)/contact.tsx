@@ -7,6 +7,7 @@ import { seo } from '@/lib/seo';
 import { getMailtoUrl } from '@/lib/urls';
 import {
   buildContactPageViewModel,
+  type ContactInquiryPanelView,
   type ContactIntent,
   type ContactTopicId,
 } from '@/pages/public-page-view';
@@ -93,9 +94,9 @@ function ContactPage() {
               </div>
               <ul className="mt-5 grid gap-3 text-sm text-muted-foreground">
                 {pageView.checklist.items.map((item) => (
-                  <li key={item} className="flex gap-3">
+                  <li key={item.id} className="flex gap-3">
                     <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-                    <span>{item}</span>
+                    <span>{item.text}</span>
                   </li>
                 ))}
               </ul>
@@ -141,13 +142,7 @@ function ContactPage() {
   );
 }
 
-function ClassroomInquiryPanel({
-  panel,
-}: {
-  panel: NonNullable<
-    ReturnType<typeof buildContactPageViewModel>['inquiryPanel']
-  >;
-}) {
+function ClassroomInquiryPanel({ panel }: { panel: ContactInquiryPanelView }) {
   return (
     <div className="rounded-lg border border-primary/20 bg-primary/5 p-5">
       <div className="flex items-start gap-3">

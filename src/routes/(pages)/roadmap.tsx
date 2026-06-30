@@ -8,7 +8,9 @@ import { seo } from '@/lib/seo';
 import {
   buildRoadmapPageViewModel,
   type RoadmapColumnId,
+  type RoadmapColumnView,
   type RoadmapPrincipleId,
+  type RoadmapPrincipleView,
 } from '@/pages/public-page-view';
 import { cn } from '@/lib/utils';
 import {
@@ -127,11 +129,7 @@ function RoadmapPage() {
   );
 }
 
-function RoadmapColumn({
-  column,
-}: {
-  column: ReturnType<typeof buildRoadmapPageViewModel>['columns'][number];
-}) {
+function RoadmapColumn({ column }: { column: RoadmapColumnView }) {
   const Icon = roadmapColumnIcons[column.id];
 
   return (
@@ -172,11 +170,7 @@ function RoadmapColumn({
   );
 }
 
-function PrincipleCard({
-  item,
-}: {
-  item: ReturnType<typeof buildRoadmapPageViewModel>['principles'][number];
-}) {
+function PrincipleCard({ item }: { item: RoadmapPrincipleView }) {
   const Icon = roadmapPrincipleIcons[item.id];
 
   return (
