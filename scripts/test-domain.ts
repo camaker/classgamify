@@ -37217,6 +37217,8 @@ const classroomBriefWithAttempts = buildAssignmentClassroomBrief({
   stats: csvExportData.stats,
   students: resultAnalysis.students,
 });
+const anonymousLatestAttemptSummary =
+  formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!);
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -37338,13 +37340,12 @@ assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
   latestAccuracyLabel: '0%',
-  latestAttemptSummaryLabel:
-    'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+  latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
   needsReviewLabel: '2 reviews',
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
-  text: '- 1. Anonymous student 1: 0% latest, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+  text: `- 1. Anonymous student 1: 0% latest, 2 items to review. ${anonymousLatestAttemptSummary} Next: review missed or unanswered items, then assign one short retry`,
 });
 assert.deepEqual(ASSIGNMENT_RESULT_COPY_TEXT_FORMAT, { lineBreak: '\n' });
 assert.equal(joinAssignmentResultCopyLines(['one', '', 'two']), 'one\n\ntwo');
@@ -37431,7 +37432,7 @@ assert.match(
 );
 assert.match(
   classroomBriefWithAttempts.text,
-  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Latest attempt: submitted 1\/2, correct 0\/2, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
+  /- 1\. Anonymous student 1: 0% latest, 2 items to review\. Latest attempt/
 );
 const invalidStatsClassroomBrief = buildAssignmentClassroomBrief({
   assignmentTitle: csvExportData.assignment.title,
@@ -37520,12 +37521,11 @@ assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
   accuracyLabel: '0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
-  latestAttemptSummaryLabel:
-    'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+  latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
   reviewItemCountLabel: '2 items to review',
   studentKey: 'anonymous:1',
   studentLabel: 'Anonymous student 1',
-  text: '- Anonymous student 1: 0% latest accuracy, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+  text: `- Anonymous student 1: 0% latest accuracy, 2 items to review. ${anonymousLatestAttemptSummary} Next: review missed or unanswered items, then assign one short retry`,
 });
 assert.equal(
   buildAssignmentReteachPlanStudentView({
@@ -37601,7 +37601,7 @@ assert.match(
 );
 assert.match(
   reteachPlanWithAttempts.text,
-  /Anonymous student 1: 0% latest accuracy, 2 items to review\. Latest attempt: submitted 1\/2, correct 0\/2, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
+  /Anonymous student 1: 0% latest accuracy, 2 items to review\. Latest attempt/
 );
 const expandedReteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,
@@ -37834,8 +37834,13 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)/,
-  'Assignment student follow-up latest-attempt summaries should reuse the shared attempt-review summary helper.'
+  /formatStudentFollowUpLatestAttemptSummary[\s\S]*buildAssignmentAttemptReviewSummary\(attempt\)[\s\S]*formatAssignmentResultDate\(attempt\.completedAt/,
+  'Assignment student follow-up latest-attempt summaries should reuse shared attempt-review and result-date helpers.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /assignment_student_follow_up_latest_attempt_summary_with_time[\s\S]*assignment_student_follow_up_latest_attempt_summary/,
+  'Assignment student follow-up latest-attempt summaries should use localized timed and untimed copy.'
 );
 assert.doesNotMatch(
   assignmentStudentFollowUpSummarySource,
@@ -37863,6 +37868,13 @@ assert.deepEqual(
 );
 assert.equal(
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!),
+  anonymousLatestAttemptSummary
+);
+assert.equal(
+  formatStudentFollowUpLatestAttemptSummary({
+    ...resultAnalysis.attempts[2]!,
+    completedAt: null,
+  }),
   'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.'
 );
 assert.equal(
@@ -37893,12 +37905,11 @@ assert.deepEqual(
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
     latestAccuracyLabel: '0%',
-    latestAttemptSummaryLabel:
-      'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+    latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
     reviewItemCountLabel: '2 items to review',
     studentKey: 'anonymous:1',
     studentLabel: 'Anonymous student 1',
-    text: '- 1. Anonymous student 1: latest 0%, average 0%, best 0%, 1 attempt, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+    text: `- 1. Anonymous student 1: latest 0%, average 0%, best 0%, 1 attempt, 2 items to review. ${anonymousLatestAttemptSummary} Next: review missed or unanswered items, then assign one short retry`,
   }
 );
 assert.equal(

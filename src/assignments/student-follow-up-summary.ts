@@ -10,6 +10,10 @@ import {
   joinAssignmentResultCopyLines,
 } from '@/assignments/result-copy-format';
 import {
+  formatAssignmentResultDate,
+  formatAssignmentResultValue,
+} from '@/assignments/result-format';
+import {
   formatAssignmentResultFraction,
   formatAssignmentResultStudentLabel,
 } from '@/assignments/result-display';
@@ -158,11 +162,13 @@ export function formatStudentFollowUpRecommendation(needsReviewCount: number) {
 }
 
 export function formatStudentFollowUpLatestAttemptSummary(
-  attempt: Pick<AssignmentAttemptReview, 'answers'>
+  attempt: Pick<AssignmentAttemptReview, 'answers' | 'completedAt'>
 ) {
   const summary = buildAssignmentAttemptReviewSummary(attempt);
-
-  return m.assignment_student_follow_up_latest_attempt_summary({
+  const completedAtLabel = formatAssignmentResultDate(attempt.completedAt, {
+    emptyValue: '',
+  });
+  const summaryInput = {
     correct: formatAssignmentResultFraction(
       summary.correctItemCount,
       summary.totalItemCount
@@ -174,7 +180,18 @@ export function formatStudentFollowUpLatestAttemptSummary(
       summary.submittedItemCount,
       summary.totalItemCount
     ),
-  });
+  };
+
+  if (completedAtLabel) {
+    return m.assignment_student_follow_up_latest_attempt_summary_with_time({
+      ...summaryInput,
+      completedAt: formatAssignmentResultValue(completedAtLabel, {
+        emptyValue: '',
+      }),
+    });
+  }
+
+  return m.assignment_student_follow_up_latest_attempt_summary(summaryInput);
 }
 
 export function buildLatestAttemptReviewByStudentKey(

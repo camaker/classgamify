@@ -1194,6 +1194,7 @@
   "assignment_status_label_open": "Open",
   "assignment_student_follow_up_empty": "- No student attempts yet.",
   "assignment_student_follow_up_latest_attempt_summary": "Latest attempt: submitted {submitted}, correct {correct}, {needsReview}.",
+  "assignment_student_follow_up_latest_attempt_summary_with_time": "Latest attempt on {completedAt}: submitted {submitted}, correct {correct}, {needsReview}.",
   "assignment_student_follow_up_line": "- {index}. {student}: latest {latest}, average {average}, best {best}, {attempts}, {reviewCount}. Next: {recommendation}",
   "assignment_student_follow_up_line_with_latest_attempt": "- {index}. {student}: latest {latest}, average {average}, best {best}, {attempts}, {reviewCount}. {latestAttemptSummary} Next: {recommendation}",
   "assignment_student_follow_up_recommendation_extend": "keep reinforcing and offer a harder variant",
