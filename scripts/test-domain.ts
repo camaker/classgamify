@@ -25617,7 +25617,7 @@ assert.deepEqual(
     totalAssignments: 99,
   }),
   [
-    { id: 'total', label: 'Matching', value: '-' },
+    { id: 'total', label: 'Matching', value: '0' },
     {
       description: '0 links are currently available to students.',
       id: 'open',
@@ -25628,7 +25628,7 @@ assert.deepEqual(
       description: '0 submitted attempts in this view.',
       id: 'completions',
       label: 'Completions',
-      value: '-',
+      value: '0',
     },
     {
       description: 'No scored attempts yet.',
@@ -25636,6 +25636,23 @@ assert.deepEqual(
       label: 'Average',
       value: '-',
     },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListStatusMetrics({
+    averageScore: 80,
+    closedAssignments: Number.POSITIVE_INFINITY,
+    completions: 4,
+    draftAssignments: Number.NaN,
+    expiredAssignments: -2,
+    openAssignments: 2.9,
+    totalAssignments: 11,
+  }),
+  [
+    { label: 'Open', status: 'open', value: '2' },
+    { label: 'Closed', status: 'closed', value: '0' },
+    { label: 'Expired', status: 'expired', value: '0' },
+    { label: 'Draft', status: 'draft', value: '0' },
   ]
 );
 assert.deepEqual(

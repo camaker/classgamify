@@ -125,8 +125,9 @@ export function buildAssignmentListSummaryMetrics({
   summary?: AssignmentListSummary;
   totalAssignments: number;
 }): AssignmentListSummaryMetric[] {
-  const resolvedSummary =
-    summary ?? buildEmptyAssignmentListSummary(totalAssignments);
+  const resolvedSummary = normalizeAssignmentListSummaryForMetrics(
+    summary ?? buildEmptyAssignmentListSummary(totalAssignments)
+  );
   const statsView = buildAssignmentAttemptStatsView(resolvedSummary);
 
   return [
@@ -167,7 +168,9 @@ export function buildAssignmentListSummaryMetrics({
 export function buildAssignmentListStatusMetrics(
   summary?: AssignmentListSummary
 ): AssignmentListStatusMetric[] {
-  const resolvedSummary = summary ?? buildEmptyAssignmentListSummary();
+  const resolvedSummary = normalizeAssignmentListSummaryForMetrics(
+    summary ?? buildEmptyAssignmentListSummary()
+  );
 
   return [
     {
@@ -317,6 +320,30 @@ function formatAssignmentListTotal(count: number) {
   return m.assignment_list_filter_summary_total_many({
     count: normalizedCount,
   });
+}
+
+function normalizeAssignmentListSummaryForMetrics(
+  summary: AssignmentListSummary
+): AssignmentListSummary {
+  return {
+    ...summary,
+    closedAssignments: normalizeAssignmentListSummaryCount(
+      summary.closedAssignments
+    ),
+    completions: normalizeAssignmentListSummaryCount(summary.completions),
+    draftAssignments: normalizeAssignmentListSummaryCount(
+      summary.draftAssignments
+    ),
+    expiredAssignments: normalizeAssignmentListSummaryCount(
+      summary.expiredAssignments
+    ),
+    openAssignments: normalizeAssignmentListSummaryCount(
+      summary.openAssignments
+    ),
+    totalAssignments: normalizeAssignmentListSummaryCount(
+      summary.totalAssignments
+    ),
+  };
 }
 
 export function normalizeAssignmentListSummaryCount(value: number) {
