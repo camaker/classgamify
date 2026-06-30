@@ -489,7 +489,7 @@ export function buildAssignmentListPageViewModel<
 >({
   data,
   isLoading,
-  starterPreview = buildAssignmentListStarterPreview(),
+  starterPreview,
   search,
 }: {
   data?: AssignmentListPageData<TItem> | null;
@@ -520,6 +520,12 @@ export function buildAssignmentListPageViewModel<
         shareSlug: search.published,
       })
     : undefined;
+  const resolvedStarterPreview = resolveAssignmentListStarterPreview({
+    assignments,
+    emptyState,
+    isLoading,
+    starterPreview,
+  });
 
   return {
     assignments,
@@ -539,7 +545,7 @@ export function buildAssignmentListPageViewModel<
     loadErrorMessage: assignmentListPageCopy.loadErrorMessage,
     publishedPanelContext,
     resolvedSearch,
-    starterPreview,
+    starterPreview: resolvedStarterPreview,
     summaryMetrics: buildAssignmentListSummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
       summary: data?.summary,
@@ -568,6 +574,9 @@ export function buildAssignmentListRouteState<
     data,
     isLoading,
     search,
+    ...(isError && !data
+      ? { starterPreview: createEmptyAssignmentListStarterPreview() }
+      : {}),
   });
 
   if (isLoading) {
@@ -617,6 +626,35 @@ export function buildAssignmentListStarterPreview(): AssignmentListStarterPrevie
     })),
     source: 'starter-preview',
   };
+}
+
+function createEmptyAssignmentListStarterPreview(): AssignmentListStarterPreview {
+  return {
+    assignments: [],
+    source: 'starter-preview',
+  };
+}
+
+function resolveAssignmentListStarterPreview<TItem>({
+  assignments,
+  emptyState,
+  isLoading,
+  starterPreview,
+}: {
+  assignments: TItem[];
+  emptyState: AssignmentListEmptyStateView;
+  isLoading: boolean;
+  starterPreview?: AssignmentListStarterPreview;
+}) {
+  if (
+    isLoading ||
+    assignments.length > 0 ||
+    !emptyState.showStarterAssignments
+  ) {
+    return createEmptyAssignmentListStarterPreview();
+  }
+
+  return starterPreview ?? buildAssignmentListStarterPreview();
 }
 
 export function resolveAssignmentListPageSearch(

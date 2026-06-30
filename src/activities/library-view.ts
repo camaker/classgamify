@@ -497,7 +497,7 @@ export function buildActivityLibraryPageViewModel<
 >({
   data,
   isLoading,
-  starterPreview = buildActivityLibraryStarterPreview(),
+  starterPreview,
   search,
 }: {
   data?: ActivityLibraryPageData<TItem> | null;
@@ -524,6 +524,18 @@ export function buildActivityLibraryPageViewModel<
         isLoading,
       })
     : undefined;
+  const emptyState = buildActivityLibraryEmptyStateView({
+    search: resolvedSearch.normalizedSearchQuery,
+    source: resolvedSearch.sourceFilter,
+    status: resolvedSearch.libraryStatus,
+    template: resolvedSearch.templateFilter,
+  });
+  const resolvedStarterPreview = resolveActivityLibraryStarterPreview({
+    activities,
+    emptyState,
+    isLoading,
+    starterPreview,
+  });
 
   return {
     activities,
@@ -539,17 +551,12 @@ export function buildActivityLibraryPageViewModel<
     ],
     createdPanelContext,
     description: activityLibraryPageCopy.description,
-    emptyState: buildActivityLibraryEmptyStateView({
-      search: resolvedSearch.normalizedSearchQuery,
-      source: resolvedSearch.sourceFilter,
-      status: resolvedSearch.libraryStatus,
-      template: resolvedSearch.templateFilter,
-    }),
+    emptyState,
     hasActivities: activities.length > 0,
     hero: activityLibraryHeroCopy,
     loadErrorMessage: activityLibraryPageCopy.loadErrorMessage,
     resolvedSearch,
-    starterPreview,
+    starterPreview: resolvedStarterPreview,
     summaryMetrics: buildActivityLibrarySummaryMetrics({
       hasFilters: resolvedSearch.hasFilters,
       summary: data?.summary,
@@ -578,6 +585,9 @@ export function buildActivityLibraryRouteState<
     data,
     isLoading,
     search,
+    ...(isError && !data
+      ? { starterPreview: createEmptyActivityLibraryStarterPreview() }
+      : {}),
   });
 
   if (isLoading) {
@@ -624,6 +634,31 @@ export function buildActivityLibraryStarterPreview(): ActivityLibraryStarterPrev
     activities: getStarterActivities(),
     source: 'starter-preview',
   };
+}
+
+function createEmptyActivityLibraryStarterPreview(): ActivityLibraryStarterPreview {
+  return {
+    activities: [],
+    source: 'starter-preview',
+  };
+}
+
+function resolveActivityLibraryStarterPreview<TItem>({
+  activities,
+  emptyState,
+  isLoading,
+  starterPreview,
+}: {
+  activities: TItem[];
+  emptyState: ActivityLibraryEmptyStateView;
+  isLoading: boolean;
+  starterPreview?: ActivityLibraryStarterPreview;
+}) {
+  if (isLoading || activities.length > 0 || !emptyState.showStarterActivities) {
+    return createEmptyActivityLibraryStarterPreview();
+  }
+
+  return starterPreview ?? buildActivityLibraryStarterPreview();
 }
 
 export function buildActivityLibrarySearchPanelView({

@@ -26061,11 +26061,16 @@ assert.deepEqual(
   {
     pageTitle: loadingAssignmentListRouteState.pageView.title,
     showLoadError: loadingAssignmentListRouteState.showLoadError,
+    starterPreviewAssignmentIds:
+      loadingAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     status: loadingAssignmentListRouteState.status,
   },
   {
     pageTitle: 'Assignments',
     showLoadError: false,
+    starterPreviewAssignmentIds: [],
     status: 'loading',
   }
 );
@@ -26079,12 +26084,17 @@ assert.deepEqual(
   {
     message: errorAssignmentListRouteState.pageView.loadErrorMessage,
     showLoadError: errorAssignmentListRouteState.showLoadError,
+    starterPreviewAssignmentIds:
+      errorAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     status: errorAssignmentListRouteState.status,
   },
   {
     message:
       'Assignments could not be loaded. Refresh the page or sign in again.',
     showLoadError: true,
+    starterPreviewAssignmentIds: [],
     status: 'error',
   }
 );
@@ -26100,11 +26110,16 @@ assert.deepEqual(
     showStarterAssignments:
       filteredEmptyAssignmentListRouteState.pageView.emptyState
         .showStarterAssignments,
+    starterPreviewAssignmentIds:
+      filteredEmptyAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     status: filteredEmptyAssignmentListRouteState.status,
   },
   {
     showLoadError: false,
     showStarterAssignments: false,
+    starterPreviewAssignmentIds: [],
     status: 'empty-filtered',
   }
 );
@@ -26120,11 +26135,16 @@ assert.deepEqual(
     showStarterAssignments:
       starterEmptyAssignmentListRouteState.pageView.emptyState
         .showStarterAssignments,
+    starterPreviewAssignmentIds:
+      starterEmptyAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     status: starterEmptyAssignmentListRouteState.status,
   },
   {
     showLoadError: false,
     showStarterAssignments: true,
+    starterPreviewAssignmentIds: ['assignment-food-demo'],
     status: 'empty-starter',
   }
 );
@@ -26145,14 +26165,24 @@ assert.deepEqual(
     assignmentIds: readyAssignmentListRouteState.pageView.assignments.map(
       (item) => item.assignment.id
     ),
+    readyStarterPreviewAssignmentIds:
+      readyAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     showLoadError: staleReadyAssignmentListRouteState.showLoadError,
     staleDataStatus: staleReadyAssignmentListRouteState.status,
+    staleStarterPreviewAssignmentIds:
+      staleReadyAssignmentListRouteState.pageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     status: readyAssignmentListRouteState.status,
   },
   {
     assignmentIds: ['persisted-assignment-1'],
+    readyStarterPreviewAssignmentIds: [],
     showLoadError: true,
     staleDataStatus: 'ready',
+    staleStarterPreviewAssignmentIds: [],
     status: 'ready',
   }
 );
@@ -26165,6 +26195,10 @@ assert.deepEqual(
     hasAssignments: filteredAssignmentListPageView.hasAssignments,
     publishedPanelContext: filteredAssignmentListPageView.publishedPanelContext,
     resolvedSearch: filteredAssignmentListPageView.resolvedSearch,
+    starterPreviewAssignmentIds:
+      filteredAssignmentListPageView.starterPreview.assignments.map(
+        (item) => item.assignment.id
+      ),
     summaryMetrics: filteredAssignmentListPageView.summaryMetrics,
     totalAssignments: filteredAssignmentListPageView.totalAssignments,
     totalPages: filteredAssignmentListPageView.totalPages,
@@ -26242,6 +26276,7 @@ assert.deepEqual(
       searchQuery: '  Week   1 ',
       statusFilter: 'open',
     },
+    starterPreviewAssignmentIds: [],
     summaryMetrics: [
       { id: 'total', label: 'Matching', value: '1' },
       {
@@ -29331,11 +29366,16 @@ assert.deepEqual(
   {
     pageTitle: loadingActivityLibraryRouteState.pageView.title,
     showLoadError: loadingActivityLibraryRouteState.showLoadError,
+    starterPreviewActivityIds:
+      loadingActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: loadingActivityLibraryRouteState.status,
   },
   {
     pageTitle: 'Activity library',
     showLoadError: false,
+    starterPreviewActivityIds: [],
     status: 'loading',
   }
 );
@@ -29349,12 +29389,17 @@ assert.deepEqual(
   {
     message: errorActivityLibraryRouteState.pageView.loadErrorMessage,
     showLoadError: errorActivityLibraryRouteState.showLoadError,
+    starterPreviewActivityIds:
+      errorActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: errorActivityLibraryRouteState.status,
   },
   {
     message:
       'Activities could not be loaded. Refresh the page or sign in again.',
     showLoadError: true,
+    starterPreviewActivityIds: [],
     status: 'error',
   }
 );
@@ -29370,11 +29415,16 @@ assert.deepEqual(
     showStarterActivities:
       filteredEmptyActivityLibraryRouteState.pageView.emptyState
         .showStarterActivities,
+    starterPreviewActivityIds:
+      filteredEmptyActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: filteredEmptyActivityLibraryRouteState.status,
   },
   {
     showLoadError: false,
     showStarterActivities: false,
+    starterPreviewActivityIds: [],
     status: 'empty-filtered',
   }
 );
@@ -29391,11 +29441,16 @@ assert.deepEqual(
     showStarterActivities:
       archivedEmptyActivityLibraryRouteState.pageView.emptyState
         .showStarterActivities,
+    starterPreviewActivityIds:
+      archivedEmptyActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: archivedEmptyActivityLibraryRouteState.status,
   },
   {
     emptyTitle: 'No archived activities.',
     showStarterActivities: false,
+    starterPreviewActivityIds: [],
     status: 'empty-filtered',
   }
 );
@@ -29411,11 +29466,16 @@ assert.deepEqual(
     showStarterActivities:
       starterEmptyActivityLibraryRouteState.pageView.emptyState
         .showStarterActivities,
+    starterPreviewActivityIds:
+      starterEmptyActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: starterEmptyActivityLibraryRouteState.status,
   },
   {
     showLoadError: false,
     showStarterActivities: true,
+    starterPreviewActivityIds: ['english-food-quiz', 'science-materials-sort'],
     status: 'empty-starter',
   }
 );
@@ -29436,14 +29496,24 @@ assert.deepEqual(
     activityIds: readyActivityLibraryRouteState.pageView.activities.map(
       (item) => item.id
     ),
+    readyStarterPreviewActivityIds:
+      readyActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     showLoadError: staleReadyActivityLibraryRouteState.showLoadError,
     staleDataStatus: staleReadyActivityLibraryRouteState.status,
+    staleStarterPreviewActivityIds:
+      staleReadyActivityLibraryRouteState.pageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     status: readyActivityLibraryRouteState.status,
   },
   {
     activityIds: ['persisted-activity-1'],
+    readyStarterPreviewActivityIds: [],
     showLoadError: true,
     staleDataStatus: 'ready',
+    staleStarterPreviewActivityIds: [],
     status: 'ready',
   }
 );
@@ -29456,6 +29526,10 @@ assert.deepEqual(
     emptyState: filteredActivityLibraryPageView.emptyState,
     hasActivities: filteredActivityLibraryPageView.hasActivities,
     resolvedSearch: filteredActivityLibraryPageView.resolvedSearch,
+    starterPreviewActivityIds:
+      filteredActivityLibraryPageView.starterPreview.activities.map(
+        (item) => item.id
+      ),
     summaryMetrics: filteredActivityLibraryPageView.summaryMetrics,
     totalActivities: filteredActivityLibraryPageView.totalActivities,
     totalPages: filteredActivityLibraryPageView.totalPages,
@@ -29500,6 +29574,7 @@ assert.deepEqual(
       sourceFilter: 'worksheet',
       templateFilter: 'quiz',
     },
+    starterPreviewActivityIds: [],
     summaryMetrics: [
       { id: 'total', label: 'Matching activities', value: '2' },
       {
