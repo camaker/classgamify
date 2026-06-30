@@ -922,11 +922,13 @@ export function buildAssignmentResultMetricItems({
   completions: number;
   expiresAt: Date | string | null | undefined;
 }): AssignmentResultMetricItem[] {
+  const completedAttemptCount =
+    getAssignmentResultCompletedAttemptCount(completions);
   const statsView = buildAssignmentAttemptStatsView({
     averageDurationSeconds,
     averagePoints,
     averageScore,
-    completions,
+    completions: completedAttemptCount,
   });
   const valueByMetric = {
     'average-accuracy': formatAssignmentResultPercent(statsView.averageScore),

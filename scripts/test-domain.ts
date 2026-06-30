@@ -35686,7 +35686,7 @@ assert.deepEqual(
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
       label: 'Completions',
-      value: '-',
+      value: '0',
     },
     {
       description:
@@ -35714,6 +35714,94 @@ assert.deepEqual(
       key: 'closes',
       label: 'Closes',
       value: formatAssignmentExpiry('not-a-date'),
+    },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationSeconds: 91.6,
+    averagePoints: 4.6,
+    averageScore: 66.4,
+    completions: 2.9,
+    expiresAt: null,
+  }),
+  [
+    {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '2',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '66%',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '5',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '1m 32s',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry(null),
+    },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentResultMetricItems({
+    averageDurationSeconds: 91.6,
+    averagePoints: 4.6,
+    averageScore: 66.4,
+    completions: -1,
+    expiresAt: null,
+  }),
+  [
+    {
+      description: 'Submitted attempts matched to scored result records.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      description:
+        'Calculated from scored student attempts in this assignment.',
+      key: 'average-accuracy',
+      label: 'Average accuracy',
+      value: '-',
+    },
+    {
+      description: 'Average points earned across completed, scored attempts.',
+      key: 'average-points',
+      label: 'Average points',
+      value: '-',
+    },
+    {
+      description:
+        'Average submitted duration after assignment timer normalization.',
+      key: 'average-time',
+      label: 'Average time',
+      value: '-',
+    },
+    {
+      description:
+        'The homework window cutoff currently enforced for students.',
+      key: 'closes',
+      label: 'Closes',
+      value: formatAssignmentExpiry(null),
     },
   ]
 );
