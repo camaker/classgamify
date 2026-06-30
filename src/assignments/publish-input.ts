@@ -15,7 +15,7 @@ import {
   resolveAssignmentSettings,
 } from '@/assignments/validation';
 import {
-  parseAssignmentDateTimeLocal,
+  type AssignmentPublishCloseAfterResolution,
   resolveAssignmentPublishCloseAfterLocal,
 } from '@/assignments/publish-schedule';
 import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
@@ -100,6 +100,7 @@ type AssignmentPublishDraftValidation =
     };
 
 type AssignmentPublishPreview = {
+  closeAfter: AssignmentPublishCloseAfterResolution;
   expiresAt: Date | null;
   settings: AssignmentSettings;
   settingsSummaryView: AssignmentSettingsSummaryView;
@@ -281,7 +282,11 @@ export function buildAssignmentPublishDialogViewModel({
   values: AssignmentPublishDraftValues;
 }): AssignmentPublishDialogViewModel {
   const draft = buildAssignmentPublishDraft({ defaults, values });
-  const validation = validateAssignmentPublishDraft({ ...draft, now });
+  const effectiveNow = now ?? new Date();
+  const validation = validateAssignmentPublishDraft({
+    ...draft,
+    now: effectiveNow,
+  });
 
   return {
     dialogState: buildAssignmentPublishDialogState({
@@ -289,19 +294,31 @@ export function buildAssignmentPublishDialogViewModel({
       validation,
     }),
     draft,
-    preview: buildAssignmentPublishPreviewFromDraft(draft),
+    preview: buildAssignmentPublishPreviewFromDraft({
+      draft,
+      now: effectiveNow,
+    }),
     toggleViews: buildAssignmentPublishToggleViews(draft),
     validation,
   };
 }
 
-export function buildAssignmentPublishPreviewFromDraft(
-  draft: AssignmentPublishDraft
-): AssignmentPublishPreview {
-  const expiresAt = parseAssignmentDateTimeLocal(draft.expiresAtLocal);
+export function buildAssignmentPublishPreviewFromDraft({
+  draft,
+  now,
+}: {
+  draft: AssignmentPublishDraft;
+  now?: Date;
+}): AssignmentPublishPreview {
+  const closeAfter = resolveAssignmentPublishCloseAfterLocal({
+    now,
+    value: draft.expiresAtLocal,
+  });
+  const expiresAt = closeAfter.status === 'ready' ? closeAfter.expiresAt : null;
   const settings = buildAssignmentPublishSettingsFromDraft(draft);
 
   return {
+    closeAfter,
     expiresAt,
     settings,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -439,7 +456,10 @@ export function buildAssignmentPublishInputFromDraft({
   if (!validation.ok) return validation;
 
   const trimmedTitle = normalizePublishDraftText(title);
-  const expiresAt = parseAssignmentDateTimeLocal(expiresAtLocal);
+  const closeAfter = resolveAssignmentPublishCloseAfterLocal({
+    now,
+    value: expiresAtLocal,
+  });
   const settings = buildAssignmentPublishSettingsFromDraft({
     activityId,
     collectStudentName,
@@ -456,7 +476,7 @@ export function buildAssignmentPublishInputFromDraft({
   return {
     input: {
       activityId,
-      expiresAt: expiresAt?.toISOString(),
+      expiresAt: closeAfter.expiresAt?.toISOString(),
       settings,
       title: trimmedTitle,
     },

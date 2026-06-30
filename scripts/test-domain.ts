@@ -2590,10 +2590,20 @@ assert.match(
   /resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now,[\s\S]*value: expiresAtLocal/,
   'Assignment publish draft validation should use the shared close-after schedule resolver.'
 );
+assert.match(
+  assignmentPublishSource,
+  /function buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*draft,[\s\S]*now,[\s\S]*resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now,[\s\S]*value: draft\.expiresAtLocal,[\s\S]*closeAfter\.status === 'ready' \? closeAfter\.expiresAt : null/,
+  'Assignment publish preview should resolve close-after state through the shared schedule resolver.'
+);
+assert.match(
+  assignmentPublishSource,
+  /export function buildAssignmentPublishInputFromDraft[\s\S]*const closeAfter = resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now,[\s\S]*value: expiresAtLocal,[\s\S]*expiresAt: closeAfter\.expiresAt\?\.toISOString\(\)/,
+  'Assignment publish input should serialize close-after time from the shared schedule resolver.'
+);
 assert.doesNotMatch(
   assignmentPublishSource,
-  /expiresAt\.getTime\(\) <= now\.getTime\(\)|new Date\(\s*Number\(year\)/,
-  'Assignment publish draft validation should not keep local close-after parsing or future-time checks.'
+  /parseAssignmentDateTimeLocal|expiresAt\.getTime\(\) <= now\.getTime\(\)|new Date\(\s*Number\(year\)/,
+  'Assignment publish input should not keep local close-after parsing or future-time checks.'
 );
 const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
@@ -12235,6 +12245,11 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
+  /buildAssignmentPublishDialogViewModel[\s\S]*const effectiveNow = now \?\? new Date\(\)[\s\S]*validateAssignmentPublishDraft\(\{[\s\S]*now: effectiveNow,[\s\S]*buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*now: effectiveNow/,
+  'Assignment publish dialog view-model should use the same current-time value for validation and preview.'
+);
+assert.match(
+  assignmentPublishInputSource,
   /export function buildAssignmentPublishInputFromDraft[\s\S]*const settings = buildAssignmentPublishSettingsFromDraft/,
   'Assignment publish input should derive delivery settings through the same shared draft settings helper as the preview.'
 );
@@ -12737,6 +12752,10 @@ assert.deepEqual(
       title: 'Week 1 review',
     },
     preview: {
+      closeAfter: {
+        expiresAt: new Date('2026-01-10T09:30'),
+        status: 'ready',
+      },
       expiresAt: new Date('2026-01-10T09:30'),
       settings: {
         collectStudentName: false,
@@ -12800,17 +12819,24 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
-    activityId: 'activity-1',
-    collectStudentName: false,
-    expiresAtLocal: '2026-01-10T09:30',
-    instructions: ' Ｆｉｎｉｓｈ\tbefore   class. ',
-    maxAttempts: ' ３ ',
-    showCorrectAnswers: false,
-    shuffleItems: false,
-    timeLimitMinutes: ' １ ５ ',
-    title: ' Ｗｅｅｋ   １ review ',
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: false,
+      expiresAtLocal: '2026-01-10T09:30',
+      instructions: ' Ｆｉｎｉｓｈ\tbefore   class. ',
+      maxAttempts: ' ３ ',
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitMinutes: ' １ ５ ',
+      title: ' Ｗｅｅｋ   １ review ',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
   }),
   {
+    closeAfter: {
+      expiresAt: new Date('2026-01-10T09:30'),
+      status: 'ready',
+    },
     expiresAt: new Date('2026-01-10T09:30'),
     settings: {
       collectStudentName: false,
@@ -12835,17 +12861,24 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
-    activityId: 'activity-1',
-    collectStudentName: true,
-    expiresAtLocal: 'not-a-date',
-    instructions: '  ',
-    maxAttempts: 'abc',
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitMinutes: '1.5',
-    title: 'Week 1 review',
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: 'not-a-date',
+      instructions: '  ',
+      maxAttempts: 'abc',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '1.5',
+      title: 'Week 1 review',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
   }),
   {
+    closeAfter: {
+      expiresAt: null,
+      status: 'invalid',
+    },
     expiresAt: null,
     settings: {
       collectStudentName: true,
@@ -12870,17 +12903,24 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
-    activityId: 'activity-1',
-    collectStudentName: true,
-    expiresAtLocal: '',
-    instructions: '',
-    maxAttempts: '0',
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitMinutes: '181',
-    title: 'Week 1 review',
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '0',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '181',
+      title: 'Week 1 review',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
   }),
   {
+    closeAfter: {
+      expiresAt: null,
+      status: 'none',
+    },
     expiresAt: null,
     settings: {
       collectStudentName: true,
@@ -12905,15 +12945,60 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
-    activityId: 'activity-1',
-    collectStudentName: true,
-    expiresAtLocal: '',
-    instructions: '',
-    maxAttempts: '11',
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitMinutes: '180',
-    title: 'Week 1 review',
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '2025-12-31T23:59',
+      instructions: '',
+      maxAttempts: '2',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '',
+      title: 'Week 1 review',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
+  }),
+  {
+    closeAfter: {
+      expiresAt: new Date('2025-12-31T23:59'),
+      status: 'past',
+    },
+    expiresAt: null,
+    settings: {
+      collectStudentName: true,
+      instructions: undefined,
+      maxAttempts: 2,
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitSeconds: undefined,
+    },
+    settingsSummaryView: buildAssignmentSettingsSummaryView({
+      expiresAt: null,
+      settings: {
+        collectStudentName: true,
+        instructions: undefined,
+        maxAttempts: 2,
+        showCorrectAnswers: true,
+        shuffleItems: true,
+        timeLimitSeconds: undefined,
+      },
+    }),
+  }
+);
+assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '11',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '180',
+      title: 'Week 1 review',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
   }).settings,
   {
     collectStudentName: true,
@@ -12926,15 +13011,18 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
-    activityId: 'activity-1',
-    collectStudentName: true,
-    expiresAtLocal: '',
-    instructions: '',
-    maxAttempts: '   ',
-    showCorrectAnswers: true,
-    shuffleItems: true,
-    timeLimitMinutes: '',
-    title: 'Open practice',
+    draft: {
+      activityId: 'activity-1',
+      collectStudentName: true,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '   ',
+      showCorrectAnswers: true,
+      shuffleItems: true,
+      timeLimitMinutes: '',
+      title: 'Open practice',
+    },
+    now: new Date('2026-01-01T00:00:00.000Z'),
   }).settings,
   {
     collectStudentName: true,
