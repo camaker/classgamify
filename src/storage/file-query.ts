@@ -1,5 +1,5 @@
 import { userFiles } from '@/db/app.schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 
 export const USER_FILE_LIST_INPUT_LIMITS = {
   pageSizeMax: 100,
@@ -24,7 +24,7 @@ export function buildUserFileDetailOwnerWhere({
 }
 
 export function buildUserFileListOrderBy() {
-  return desc(userFiles.createdAt);
+  return [desc(userFiles.createdAt), asc(userFiles.id)] as const;
 }
 
 export function getUserFileListOffset({

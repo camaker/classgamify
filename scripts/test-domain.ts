@@ -5784,8 +5784,13 @@ assert.match(
 );
 assert.match(
   userFilesApiSource,
-  /orderBy\(buildUserFileListOrderBy\(\)\)/,
-  'User file list APIs should delegate created-at ordering to the storage query domain.'
+  /orderBy\(\.\.\.buildUserFileListOrderBy\(\)\)/,
+  'User file list APIs should delegate stable ordering to the storage query domain.'
+);
+assert.match(
+  userFileQuerySource,
+  /buildUserFileListOrderBy[\s\S]*desc\(userFiles\.createdAt\)[\s\S]*asc\(userFiles\.id\)/,
+  'User file list ordering should sort by created time with a stable file-id tie breaker.'
 );
 assert.match(
   userFilesApiSource,

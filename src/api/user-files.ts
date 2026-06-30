@@ -46,7 +46,7 @@ export const listUserFiles = createServerFn({ method: 'GET' })
       .select()
       .from(userFiles)
       .where(where)
-      .orderBy(buildUserFileListOrderBy())
+      .orderBy(...buildUserFileListOrderBy())
       .limit(data.pageSize)
       .offset(
         getUserFileListOffset({
@@ -95,7 +95,7 @@ export const listUserFileMaterials = createServerFn({ method: 'GET' })
       })
       .from(userFiles)
       .where(where)
-      .orderBy(buildUserFileListOrderBy())
+      .orderBy(...buildUserFileListOrderBy())
       .limit(data.pageSize)
       .offset(
         getUserFileListOffset({
