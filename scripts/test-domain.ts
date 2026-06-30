@@ -2518,6 +2518,11 @@ assert.match(
   /ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.minLeadMinutes[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.secondsPerMinute[\s\S]*ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS\.millisecondsPerSecond/,
   'Assignment publish close-after minimum should reuse the named time units.'
 );
+assert.match(
+  assignmentPublishScheduleSource,
+  /formatAssignmentDateTimeLocal[\s\S]*const safeDate = normalizeScheduleDate\(date\)[\s\S]*buildAssignmentPublishCloseAfterMinLocal[\s\S]*const safeNow = normalizeScheduleDate\(now\)[\s\S]*function normalizeScheduleDate[\s\S]*Number\.isFinite\(date\.getTime\(\)\)/,
+  'Assignment publish close-after formatting should normalize invalid dates before building datetime-local values.'
+);
 assert.doesNotMatch(
   assignmentPublishScheduleSource,
   /60 \* 1000|60000/,
@@ -12251,6 +12256,10 @@ assert.match(
   formatAssignmentDateTimeLocal(new Date('2026-01-10T09:30:00.000Z')),
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 );
+assert.match(
+  formatAssignmentDateTimeLocal(new Date('not-a-date')),
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+);
 assert.deepEqual(ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS, {
   minLeadMinutes: 1,
   millisecondsPerSecond: 1000,
@@ -12259,6 +12268,10 @@ assert.deepEqual(ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS, {
 assert.equal(
   buildAssignmentPublishCloseAfterMinLocal(new Date(2026, 0, 10, 9, 30, 45)),
   '2026-01-10T09:31'
+);
+assert.match(
+  buildAssignmentPublishCloseAfterMinLocal(new Date('not-a-date')),
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 );
 assert.deepEqual(
   resolveAssignmentPublishCloseAfterLocal({

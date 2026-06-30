@@ -18,9 +18,10 @@ export type AssignmentPublishCloseAfterResolution = {
 };
 
 export function formatAssignmentDateTimeLocal(date: Date) {
+  const safeDate = normalizeScheduleDate(date);
   const localDate = new Date(
-    date.getTime() -
-      date.getTimezoneOffset() *
+    safeDate.getTime() -
+      safeDate.getTimezoneOffset() *
         ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
         ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
   );
@@ -28,9 +29,11 @@ export function formatAssignmentDateTimeLocal(date: Date) {
 }
 
 export function buildAssignmentPublishCloseAfterMinLocal(now = new Date()) {
+  const safeNow = normalizeScheduleDate(now);
+
   return formatAssignmentDateTimeLocal(
     new Date(
-      now.getTime() +
+      safeNow.getTime() +
         ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.minLeadMinutes *
           ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.secondsPerMinute *
           ASSIGNMENT_PUBLISH_CLOSE_AFTER_UNITS.millisecondsPerSecond
@@ -136,4 +139,8 @@ export function resolveAssignmentPublishCloseAfterIso({
 
 function normalizeScheduleText(value: string) {
   return normalizeRuntimeDisplayText(value);
+}
+
+function normalizeScheduleDate(date: Date) {
+  return Number.isFinite(date.getTime()) ? date : new Date();
 }
