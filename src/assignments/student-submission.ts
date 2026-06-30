@@ -199,8 +199,20 @@ export type StudentAttemptResultDisplay = {
   scoreLabel: string;
 };
 
+export type StudentAttemptResultNextStepId =
+  | 'done'
+  | 'feedback'
+  | 'review-score'
+  | 'start-another'
+  | 'teacher-review';
+
+export type StudentAttemptResultNextStepView = {
+  id: StudentAttemptResultNextStepId;
+  label: string;
+};
+
 export type StudentAttemptResultNextStepsView = {
-  steps: string[];
+  stepViews: StudentAttemptResultNextStepView[];
   title: string;
 };
 
@@ -495,14 +507,29 @@ export function buildStudentAttemptResultNextStepsView({
   showCorrectAnswers: boolean;
 }): StudentAttemptResultNextStepsView {
   return {
-    steps: [
-      STUDENT_RUNNER_COPY.resultNextStepReviewScore,
+    stepViews: [
+      {
+        id: 'review-score',
+        label: STUDENT_RUNNER_COPY.resultNextStepReviewScore,
+      },
       showCorrectAnswers
-        ? STUDENT_RUNNER_COPY.resultNextStepFeedback
-        : STUDENT_RUNNER_COPY.resultNextStepTeacherReview,
+        ? {
+            id: 'feedback',
+            label: STUDENT_RUNNER_COPY.resultNextStepFeedback,
+          }
+        : {
+            id: 'teacher-review',
+            label: STUDENT_RUNNER_COPY.resultNextStepTeacherReview,
+          },
       canStartAnotherAttempt
-        ? STUDENT_RUNNER_COPY.resultNextStepStartAnother
-        : STUDENT_RUNNER_COPY.resultNextStepDone,
+        ? {
+            id: 'start-another',
+            label: STUDENT_RUNNER_COPY.resultNextStepStartAnother,
+          }
+        : {
+            id: 'done',
+            label: STUDENT_RUNNER_COPY.resultNextStepDone,
+          },
     ],
     title: STUDENT_RUNNER_COPY.resultNextStepsTitle,
   };

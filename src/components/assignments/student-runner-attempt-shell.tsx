@@ -210,10 +210,10 @@ function StudentRunnerResultNextSteps({
     <div className="mt-3 rounded-md border bg-background/80 p-2">
       <p className="text-xs font-medium">{view.title}</p>
       <ul className="mt-1 grid gap-1 text-muted-foreground text-xs leading-5">
-        {view.steps.map((step) => (
-          <li className="flex gap-2" key={step}>
+        {view.stepViews.map((step) => (
+          <li className="flex gap-2" key={step.id}>
             <span aria-hidden="true">-</span>
-            <span>{step}</span>
+            <span>{step.label}</span>
           </li>
         ))}
       </ul>

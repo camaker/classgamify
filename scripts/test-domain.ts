@@ -7623,6 +7623,11 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
+  /export type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
+  'Student result next steps should expose stable step ids and structured labels.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
   /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
   'Student submission domain should expose an explicit post-submit review summary view contract.'
 );
@@ -8258,8 +8263,13 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*view\.steps\.map/,
+  /StudentRunnerResultNextSteps[\s\S]*view=\{view\.nextStepsView\}[\s\S]*view\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
   'Student runner result panel should render prepared post-submit next steps from the result panel view.'
+);
+assert.doesNotMatch(
+  studentRunnerAttemptShellSource,
+  /key=\{step\}|view\.steps\.map/,
+  'Student runner result next steps should not key list items by localized step copy.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -11261,10 +11271,19 @@ assert.deepEqual(
     showCorrectAnswers: true,
   }),
   {
-    steps: [
-      'Review your score and saved time.',
-      'Check the feedback your teacher allowed after submission.',
-      'Start another attempt if you want to improve your work.',
+    stepViews: [
+      {
+        id: 'review-score',
+        label: 'Review your score and saved time.',
+      },
+      {
+        id: 'feedback',
+        label: 'Check the feedback your teacher allowed after submission.',
+      },
+      {
+        id: 'start-another',
+        label: 'Start another attempt if you want to improve your work.',
+      },
     ],
     title: 'Next steps',
   }
@@ -11275,10 +11294,19 @@ assert.deepEqual(
     showCorrectAnswers: false,
   }),
   {
-    steps: [
-      'Review your score and saved time.',
-      'Your teacher will review the submitted answers.',
-      'You are done for this assignment.',
+    stepViews: [
+      {
+        id: 'review-score',
+        label: 'Review your score and saved time.',
+      },
+      {
+        id: 'teacher-review',
+        label: 'Your teacher will review the submitted answers.',
+      },
+      {
+        id: 'done',
+        label: 'You are done for this assignment.',
+      },
     ],
     title: 'Next steps',
   }
@@ -16989,10 +17017,19 @@ assert.deepEqual(
       attemptUsageLabel: '1 attempt left',
       durationLabel: 'Time: 1:20',
       nextStepsView: {
-        steps: [
-          'Review your score and saved time.',
-          'Check the feedback your teacher allowed after submission.',
-          'Start another attempt if you want to improve your work.',
+        stepViews: [
+          {
+            id: 'review-score',
+            label: 'Review your score and saved time.',
+          },
+          {
+            id: 'feedback',
+            label: 'Check the feedback your teacher allowed after submission.',
+          },
+          {
+            id: 'start-another',
+            label: 'Start another attempt if you want to improve your work.',
+          },
         ],
         title: 'Next steps',
       },
