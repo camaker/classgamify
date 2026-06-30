@@ -1367,7 +1367,10 @@ export function buildAssignmentStudentSummaryRowView(
   student: AssignmentStudentSummary
 ): AssignmentResultStudentSummaryRowDisplayView {
   return {
-    attemptsLabel: formatAssignmentResultNumber(student.attempts, { min: 0 }),
+    attemptsLabel: formatAssignmentResultNumber(
+      normalizeAssignmentStudentSummaryRowCount(student.attempts),
+      { min: 0 }
+    ),
     averageAccuracyLabel: formatAssignmentResultPercent(
       normalizeAssignmentResultPercentLabelValue(student.averageAccuracy)
     ),
@@ -1378,11 +1381,17 @@ export function buildAssignmentStudentSummaryRowView(
     latestAccuracyLabel: formatAssignmentResultPercent(
       normalizeAssignmentResultPercentLabelValue(student.latestAccuracy)
     ),
-    needsReviewLabel: formatAssignmentResultNumber(student.needsReviewCount, {
-      min: 0,
-    }),
+    needsReviewLabel: formatAssignmentResultNumber(
+      normalizeAssignmentStudentSummaryRowCount(student.needsReviewCount),
+      { min: 0 }
+    ),
     studentLabel: formatAssignmentResultStudentLabel(student.studentLabel),
   };
+}
+
+function normalizeAssignmentStudentSummaryRowCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
 
 function normalizeAssignmentResultPercentLabelValue(

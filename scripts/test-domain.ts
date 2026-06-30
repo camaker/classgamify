@@ -34963,6 +34963,27 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildAssignmentStudentSummaryRowView({
+    attempts: Number.POSITIVE_INFINITY,
+    averageAccuracy: Number.NaN,
+    bestAccuracy: Number.POSITIVE_INFINITY,
+    lastCompletedAt: null,
+    latestAccuracy: Number.NaN,
+    needsReviewCount: Number.NaN,
+    studentKey: 'name:invalid-counts',
+    studentLabel: 'Invalid Counts',
+  }),
+  {
+    attemptsLabel: '0',
+    averageAccuracyLabel: '-',
+    bestAccuracyLabel: '-',
+    lastSubmittedLabel: '-',
+    latestAccuracyLabel: '-',
+    needsReviewLabel: '0',
+    studentLabel: 'Invalid Counts',
+  }
+);
+assert.deepEqual(
   buildAssignmentStudentSummaryRowViews([
     resultAnalysis.students[1]!,
     {
