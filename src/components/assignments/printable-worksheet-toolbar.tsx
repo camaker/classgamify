@@ -1,4 +1,7 @@
-import type { PrintableWorksheetControlView } from '@/assignments/printable-worksheet-view';
+import type {
+  PrintableWorksheetBackToResultsAction,
+  PrintableWorksheetControlView,
+} from '@/assignments/printable-worksheet-view';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -23,14 +26,7 @@ export function PrintableWorksheetToolbar({
       data-print-hidden
       className="flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between"
     >
-      <Link
-        to={backToResultsAction.to}
-        params={{ assignmentId: backToResultsAction.assignmentId }}
-        className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
-      >
-        <IconArrowLeft className="size-4" />
-        {backToResultsAction.label}
-      </Link>
+      <PrintableWorksheetBackToResultsLink action={backToResultsAction} />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label
           htmlFor="printable-answer-key"
@@ -54,5 +50,22 @@ export function PrintableWorksheetToolbar({
         </Button>
       </div>
     </div>
+  );
+}
+
+function PrintableWorksheetBackToResultsLink({
+  action,
+}: {
+  action: PrintableWorksheetBackToResultsAction;
+}) {
+  return (
+    <Link
+      to={action.to}
+      params={{ assignmentId: action.assignmentId }}
+      className={cn(buttonVariants({ variant: 'outline' }), 'w-fit')}
+    >
+      <IconArrowLeft className="size-4" />
+      {action.label}
+    </Link>
   );
 }

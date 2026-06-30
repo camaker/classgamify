@@ -22751,7 +22751,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
 assert.match(
@@ -22766,8 +22766,8 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /PrintableWorksheetControlView/,
-  'Printable worksheet toolbar should consume the explicit printable control view contract.'
+  /PrintableWorksheetBackToResultsAction[\s\S]*PrintableWorksheetControlView/,
+  'Printable worksheet toolbar should consume explicit printable control and back-to-results action contracts.'
 );
 assert.match(
   printableWorksheetStatePanelSource,
@@ -23026,7 +23026,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /const \{ backToResultsAction \} = controlView[\s\S]*to=\{backToResultsAction\.to\}[\s\S]*assignmentId: backToResultsAction\.assignmentId[\s\S]*backToResultsAction\.label/,
+  /const \{ backToResultsAction \} = controlView[\s\S]*PrintableWorksheetBackToResultsLink[\s\S]*action=\{backToResultsAction\}/,
   'Printable worksheet toolbar should render the prepared back-to-results action target and label.'
 );
 assert.match(
@@ -23071,7 +23071,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetToolbarSource,
-  /to=\{backToResultsAction\.to\}[\s\S]*assignmentId: backToResultsAction\.assignmentId/,
+  /function PrintableWorksheetBackToResultsLink[\s\S]*action: PrintableWorksheetBackToResultsAction[\s\S]*to=\{action\.to\}[\s\S]*assignmentId: action\.assignmentId/,
   'Printable worksheet toolbar should link teachers back to assignment results through the prepared action.'
 );
 assert.match(

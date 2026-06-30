@@ -119,15 +119,17 @@ export type PrintableWorksheetAnswerKeyView = {
   title: string;
 };
 
+export type PrintableWorksheetBackToResultsAction = {
+  assignmentId: string;
+  label: string;
+  to: typeof Routes.DashboardAssignmentResults;
+};
+
 export type PrintableWorksheetControlView = {
   answerKeyDescription: string;
   answerKeyLabel: string;
   answerKeyValue: boolean;
-  backToResultsAction: {
-    assignmentId: string;
-    label: string;
-    to: typeof Routes.DashboardAssignmentResults;
-  };
+  backToResultsAction: PrintableWorksheetBackToResultsAction;
   printButtonLabel: string;
 };
 
