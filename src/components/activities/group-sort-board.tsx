@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildGroupSortRunnerView,
   resolveGroupSortRunnerAction,
+  resolveGroupSortSelectedItemId,
   type GroupSortRunnerAction,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
@@ -17,7 +18,7 @@ import {
   IconCircle,
   IconLayoutColumns,
 } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type GroupSortBoardProps = {
   answers: Record<string, string>;
@@ -38,6 +39,14 @@ export function GroupSortBoard({
 }: GroupSortBoardProps) {
   const copy = getActivityRunnerKindCopy('group-sort');
   const [selectedItemId, setSelectedItemId] = useState<string>();
+  useEffect(() => {
+    setSelectedItemId((current) =>
+      resolveGroupSortSelectedItemId({
+        items,
+        selectedItemId: current,
+      })
+    );
+  }, [items]);
   const runnerView = useMemo(
     () =>
       buildGroupSortRunnerView({

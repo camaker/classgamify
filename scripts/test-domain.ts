@@ -423,7 +423,9 @@ import {
   normalizeSequentialRunnerActiveIndex,
   normalizeSequentialRunnerOffset,
   resolveChoicePairingRunnerAction,
+  resolveChoicePairingSelectedItemId,
   resolveGroupSortRunnerAction,
+  resolveGroupSortSelectedItemId,
   resolveSequentialStudentRunnerActiveItemId,
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
@@ -5351,12 +5353,17 @@ assert.match(
 );
 assert.match(
   groupSortBoardSource,
+  /resolveGroupSortSelectedItemId[\s\S]*setSelectedItemId\(\(current\) =>[\s\S]*items,[\s\S]*selectedItemId: current,/,
+  'Group-sort runner should keep stale selected item state aligned through the assignment-domain helper.'
+);
+assert.match(
+  groupSortBoardSource,
   /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
   'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
 );
 assert.doesNotMatch(
   groupSortBoardSource,
-  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|setSelectedItemId\(\(current\)|onAnswerChange\(selectedItemId|getStudentRunnerReviewStatusClassName/,
+  /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|onAnswerChange\(selectedItemId|getStudentRunnerReviewStatusClassName/,
   'Group-sort runner should not rebuild selected, unplaced, grouped, placement action, or review class rules in the component.'
 );
 for (const filePath of [
@@ -8577,9 +8584,14 @@ assert.match(
   /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
   'Line-match should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
 );
+assert.match(
+  lineMatchBoardSource,
+  /resolveChoicePairingSelectedItemId[\s\S]*setSelectedItemId\(\(current\) =>[\s\S]*items,[\s\S]*selectedItemId: current,/,
+  'Line-match should keep stale selected prompt state aligned through the assignment-domain helper.'
+);
 assert.doesNotMatch(
   lineMatchBoardSource,
-  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges|setSelectedItemId\(\(current\)/,
+  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges/,
   'Line-match should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
@@ -8587,9 +8599,14 @@ assert.match(
   /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
   'Matching-pairs should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
 );
+assert.match(
+  matchingPairsBoardSource,
+  /resolveChoicePairingSelectedItemId[\s\S]*setSelectedItemId\(\(current\) =>[\s\S]*items,[\s\S]*selectedItemId: current,/,
+  'Matching-pairs should keep stale selected prompt state aligned through the assignment-domain helper.'
+);
 assert.doesNotMatch(
   matchingPairsBoardSource,
-  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges|setSelectedItemId\(\(current\)/,
+  /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges/,
   'Matching-pairs should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
@@ -9556,6 +9573,39 @@ assert.deepEqual(
     selectedItemId: 'item-1',
     type: 'select',
   }
+);
+assert.equal(
+  resolveChoicePairingSelectedItemId({
+    items: [
+      {
+        id: 'target-item',
+        kind: 'pair',
+        prompt: 'Capital of France',
+      },
+    ],
+    selectedItemId: 'target-item',
+  }),
+  'target-item'
+);
+assert.equal(
+  resolveChoicePairingSelectedItemId({
+    items: [
+      {
+        id: 'target-item',
+        kind: 'pair',
+        prompt: 'Capital of France',
+      },
+    ],
+    selectedItemId: 'stale-item',
+  }),
+  undefined
+);
+assert.equal(
+  resolveChoicePairingSelectedItemId({
+    items: [],
+    selectedItemId: 'stale-item',
+  }),
+  undefined
 );
 assert.deepEqual(
   buildRuntimeChoiceButtonViews({
@@ -18914,6 +18964,27 @@ assert.deepEqual(
     selectedItemId: 'group-fruit-pear',
     type: 'select',
   }
+);
+assert.equal(
+  resolveGroupSortSelectedItemId({
+    items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+    selectedItemId: 'group-fruit-pear',
+  }),
+  'group-fruit-pear'
+);
+assert.equal(
+  resolveGroupSortSelectedItemId({
+    items: groupSortRunnerView.itemViews.map((itemView) => itemView.item),
+    selectedItemId: 'stale-group-item',
+  }),
+  undefined
+);
+assert.equal(
+  resolveGroupSortSelectedItemId({
+    items: [],
+    selectedItemId: 'stale-group-item',
+  }),
+  undefined
 );
 const reviewedGroupSortBoardView = buildGroupSortRunnerView({
   answers: {

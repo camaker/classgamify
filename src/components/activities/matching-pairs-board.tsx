@@ -7,13 +7,14 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildChoicePairingRunnerView,
   resolveChoicePairingRunnerAction,
+  resolveChoicePairingSelectedItemId,
   type ChoicePairingRunnerAction,
 } from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { IconArrowsExchange, IconCheck, IconCircle } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type MatchingPairsBoardProps = {
   answers: Record<string, string>;
@@ -34,6 +35,14 @@ export function MatchingPairsBoard({
 }: MatchingPairsBoardProps) {
   const copy = getActivityRunnerKindCopy('matching-pairs');
   const [selectedItemId, setSelectedItemId] = useState<string>();
+  useEffect(() => {
+    setSelectedItemId((current) =>
+      resolveChoicePairingSelectedItemId({
+        items,
+        selectedItemId: current,
+      })
+    );
+  }, [items]);
   const runnerView = useMemo(
     () =>
       buildChoicePairingRunnerView({

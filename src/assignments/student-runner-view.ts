@@ -983,6 +983,18 @@ export function resolveChoicePairingRunnerAction({
   };
 }
 
+export function resolveChoicePairingSelectedItemId({
+  items,
+  selectedItemId,
+}: {
+  items: PublicRuntimeItem[];
+  selectedItemId?: string;
+}) {
+  return items.some((item) => item.id === selectedItemId)
+    ? selectedItemId
+    : undefined;
+}
+
 export function resolveGroupSortRunnerAction({
   action,
   disabled = false,
@@ -1029,6 +1041,18 @@ export function resolveGroupSortRunnerAction({
     selectedItemId: undefined,
     type: 'answer',
   };
+}
+
+export function resolveGroupSortSelectedItemId({
+  items,
+  selectedItemId,
+}: {
+  items: PublicRuntimeItem[];
+  selectedItemId?: string;
+}) {
+  return items.some((item) => item.id === selectedItemId)
+    ? selectedItemId
+    : undefined;
 }
 
 export function buildInlineBlankPromptView(
