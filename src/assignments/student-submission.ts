@@ -452,8 +452,10 @@ export function buildStudentAttemptResultDisplay({
   fallbackDurationSeconds?: number;
   totalPoints: number;
 }): StudentAttemptResultDisplay {
-  const normalizedEarnedPoints = normalizeStudentResultScore(earnedPoints);
   const normalizedTotalPoints = normalizeStudentResultScore(totalPoints);
+  const normalizedEarnedPoints = normalizeStudentResultScore(earnedPoints, {
+    max: normalizedTotalPoints,
+  });
   const normalizedDurationSeconds =
     normalizeAttemptDurationSeconds({ durationSeconds }) ??
     normalizeAttemptDurationSeconds({
@@ -462,7 +464,9 @@ export function buildStudentAttemptResultDisplay({
 
   return {
     accuracyLabel: m.student_runner_result_accuracy_line({
-      accuracy: formatAssignmentResultPercent(accuracy),
+      accuracy: formatAssignmentResultPercent(
+        normalizeStudentResultAccuracy(accuracy)
+      ),
       label: STUDENT_RUNNER_COPY.resultAccuracyLabel,
     }),
     durationLabel: m.student_runner_result_time_line({
@@ -557,8 +561,26 @@ export function buildStudentAttemptReviewSummaryView({
   };
 }
 
-function normalizeStudentResultScore(value: number) {
-  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
+function normalizeStudentResultScore(
+  value: number,
+  options?: {
+    max?: number;
+  }
+) {
+  const normalizedValue = Number.isFinite(value)
+    ? Math.max(0, Math.trunc(value))
+    : 0;
+
+  if (options?.max === undefined || !Number.isFinite(options.max)) {
+    return normalizedValue;
+  }
+
+  return Math.min(normalizedValue, options.max);
+}
+
+function normalizeStudentResultAccuracy(value: number) {
+  if (!Number.isFinite(value)) return Number.NaN;
+  return Math.min(100, Math.max(0, value));
 }
 
 function formatStudentReviewSummaryCount(value: number) {

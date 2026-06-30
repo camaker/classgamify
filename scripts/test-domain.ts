@@ -10641,6 +10641,32 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildStudentAttemptResultDisplay({
+    accuracy: 150,
+    earnedPoints: 5,
+    fallbackDurationSeconds: 5,
+    totalPoints: 2,
+  }),
+  {
+    accuracyLabel: '100% accuracy',
+    durationLabel: 'Time: 5s',
+    scoreLabel: '2/2',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptResultDisplay({
+    accuracy: -20,
+    earnedPoints: 1,
+    fallbackDurationSeconds: 5,
+    totalPoints: 2,
+  }),
+  {
+    accuracyLabel: '0% accuracy',
+    durationLabel: 'Time: 5s',
+    scoreLabel: '1/2',
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptResultDisplay({
     accuracy: Number.NaN,
     durationSeconds: Number.POSITIVE_INFINITY,
     earnedPoints: Number.NaN,
