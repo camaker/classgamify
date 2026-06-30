@@ -1483,6 +1483,12 @@ export function buildAssignmentItemPerformanceRowView({
   const answerView = buildAssignmentResultAcceptedAnswerView(
     item.acceptedAnswers
   );
+  const correctCount = normalizeAssignmentItemPerformanceRowCount(
+    item.correctCount
+  );
+  const submittedCount = normalizeAssignmentItemPerformanceRowCount(
+    item.submittedCount
+  );
 
   return {
     acceptedAnswersText: answerView.acceptedAlternativesText,
@@ -1499,13 +1505,18 @@ export function buildAssignmentItemPerformanceRowView({
       prompt: item.prompt,
     }),
     submittedLabel: formatAssignmentResultFraction(
-      item.correctCount,
-      item.submittedCount
+      correctCount,
+      submittedCount
     ),
     unansweredLabel: formatAssignmentSummaryUnansweredCount(
       item.unansweredCount
     ),
   };
+}
+
+function normalizeAssignmentItemPerformanceRowCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
 
 export function buildAssignmentItemPerformanceRowViews(

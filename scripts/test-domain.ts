@@ -34731,6 +34731,40 @@ assert.equal(
   '0%'
 );
 assert.deepEqual(
+  buildAssignmentItemPerformanceRowView({
+    index: 0,
+    item: {
+      ...resultAnalysis.perItem[0]!,
+      correctCount: Number.POSITIVE_INFINITY,
+      submittedCount: Number.NaN,
+      unansweredCount: Number.POSITIVE_INFINITY,
+    },
+  }),
+  {
+    acceptedAnswersText: 'Paris, France',
+    correctRateLabel: '67%',
+    expectedAnswerText: 'Paris',
+    explanationText: 'Paris is the capital of France.',
+    itemNumberLabel: '1.',
+    kindLabel: 'Question',
+    prompt: 'Capital of France?',
+    promptLabel: '1. Capital of France?',
+    submittedLabel: '0/0',
+    unansweredLabel: '0 unanswered',
+  }
+);
+assert.equal(
+  buildAssignmentItemPerformanceRowView({
+    index: 0,
+    item: {
+      ...resultAnalysis.perItem[0]!,
+      correctCount: 2.9,
+      submittedCount: 3.9,
+    },
+  }).submittedLabel,
+  '2/3'
+);
+assert.deepEqual(
   buildAssignmentItemPerformanceRowViews(resultAnalysis.perItem).map((row) => [
     row.id,
     row.itemNumberLabel,
