@@ -54,7 +54,7 @@ export type RuntimeChoiceButtonView = {
   selected: boolean;
 };
 
-type RuntimeChoiceView = {
+export type RuntimeChoiceView = {
   action: ChoicePairingRunnerAction;
   choice: string;
   selected: boolean;
@@ -86,30 +86,32 @@ export type DefaultRuntimeItemCardView = StudentRunnerItemView & {
   showChoices: boolean;
 };
 
-type ChoicePairingRunnerView = StudentRunnerView & {
+export type ChoicePairingRunnerView = StudentRunnerView & {
   choiceViews: RuntimeChoiceView[];
   promptItemViews: ChoicePairingPromptItemView[];
 };
 
-type ChoicePairingPromptItemView = StudentRunnerItemView & {
+export type ChoicePairingPromptItemView = StudentRunnerItemView & {
   action: ChoicePairingRunnerAction;
   promptLabel: string;
   reviewStatusClassName: string | undefined;
   selected: boolean;
 };
 
-type GroupSortRunnerView = StudentRunnerView & {
-  groupViews: Array<{
-    action: GroupSortRunnerAction;
-    group: string;
-    placedItemViews: GroupSortItemView[];
-  }>;
+export type GroupSortRunnerView = StudentRunnerView & {
+  groupViews: GroupSortGroupView[];
   selectedClearAction: GroupSortRunnerAction | undefined;
   selectedItem?: PublicRuntimeItem;
   unplacedItemViews: GroupSortItemView[];
 };
 
-type GroupSortItemView = StudentRunnerItemView & {
+export type GroupSortGroupView = {
+  action: GroupSortRunnerAction;
+  group: string;
+  placedItemViews: GroupSortItemView[];
+};
+
+export type GroupSortItemView = StudentRunnerItemView & {
   action: GroupSortRunnerAction;
   reviewStatusClassName: string | undefined;
   selected: boolean;

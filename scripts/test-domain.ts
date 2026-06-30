@@ -7768,8 +7768,23 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /export type RuntimeChoiceView = \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*usedByItemId: string \| undefined;[\s\S]*export type ChoicePairingRunnerView = StudentRunnerView & \{[\s\S]*choiceViews: RuntimeChoiceView\[\];[\s\S]*promptItemViews: ChoicePairingPromptItemView\[\];[\s\S]*export type ChoicePairingPromptItemView = StudentRunnerItemView & \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  'Student runner domain should expose explicit choice-pairing view contracts for line-match and matching-pairs templates.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export type GroupSortRunnerView = StudentRunnerView & \{[\s\S]*groupViews: GroupSortGroupView\[\];[\s\S]*selectedClearAction: GroupSortRunnerAction \| undefined;[\s\S]*selectedItem\?: PublicRuntimeItem;[\s\S]*unplacedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortGroupView = \{[\s\S]*placedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortItemView = StudentRunnerItemView & \{[\s\S]*action: GroupSortRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  'Student runner domain should expose explicit group-sort board view contracts.'
+);
+assert.match(
+  studentRunnerViewSource,
   /export type InlineBlankPromptView =[\s\S]*mode: 'inline';[\s\S]*mode: 'standalone';[\s\S]*prompt: string;[\s\S]*export type FillBlankWorksheetItemView = StudentRunnerItemView & \{[\s\S]*promptView: InlineBlankPromptView;[\s\S]*export type FillBlankWorksheetView = StudentRunnerView & \{[\s\S]*fillBlankItemViews: FillBlankWorksheetItemView\[\];/,
   'Student runner domain should expose explicit fill-blank worksheet prompt and item view contracts.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export function buildChoicePairingRunnerView\([\s\S]*\): ChoicePairingRunnerView[\s\S]*export function buildGroupSortRunnerView\([\s\S]*\): GroupSortRunnerView/,
+  'Choice-pairing and group-sort builders should return explicit template runner view contracts.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -7798,7 +7813,7 @@ assert.match(
 );
 assert.doesNotMatch(
   `${studentRunnerViewSource}\n${studentRuntimeItemListDomainSource}\n${studentRuntimeItemListSource}\n${fillBlankWorksheetSource}`,
-  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView|buildFillBlankWorksheetView)>/,
+  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView|buildFillBlankWorksheetView|buildChoicePairingRunnerView|buildGroupSortRunnerView)>/,
   'Student runner and runtime list surfaces should not infer public renderer contracts from builder return types.'
 );
 assert.match(
