@@ -1,4 +1,5 @@
 import type {
+  PrintableWorksheetChoiceBankChoiceView,
   PrintableWorksheetChoiceBankView,
   PrintableWorksheetEmptyState,
   PrintableWorksheetItemView,
@@ -160,51 +161,94 @@ function PrintableWorksheetChoiceBank({
   if (!choiceBank.show) return null;
 
   if (choiceBank.choices.length === 0) {
-    return choiceBank.emptySummary ? (
-      <p className="mt-4 text-muted-foreground text-xs">
-        {choiceBank.emptySummary}
-      </p>
-    ) : null;
+    return <PrintableWorksheetEmptyChoiceBank choiceBank={choiceBank} />;
   }
 
   return (
     <div className="grid gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {choiceBank.label ? (
-          <p className="font-medium text-muted-foreground text-xs">
-            {choiceBank.label}
-          </p>
-        ) : null}
-        <p className="text-muted-foreground text-xs">{choiceBank.summary}</p>
-      </div>
-      <div
-        data-print-choice-bank={choiceBank.presentation}
-        className={cn(
-          'grid gap-2',
-          choiceBank.presentation === 'group-bank'
-            ? 'sm:grid-cols-3'
-            : 'sm:grid-cols-2'
-        )}
-      >
-        {choiceBank.choices.map(({ choice, indexLabel, key }) => (
-          <div
-            key={key}
-            className={cn(
-              'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
-              choiceBank.presentation === 'group-bank'
-                ? 'justify-center bg-background font-medium'
-                : 'bg-muted/20'
-            )}
-          >
-            {choiceBank.showIndexLabels ? (
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
-                {indexLabel}
-              </span>
-            ) : null}
-            <span>{choice}</span>
-          </div>
-        ))}
-      </div>
+      <PrintableWorksheetChoiceBankHeader choiceBank={choiceBank} />
+      <PrintableWorksheetChoiceBankGrid choiceBank={choiceBank} />
+    </div>
+  );
+}
+
+function PrintableWorksheetEmptyChoiceBank({
+  choiceBank,
+}: {
+  choiceBank: PrintableWorksheetChoiceBankView;
+}) {
+  return choiceBank.emptySummary ? (
+    <p className="mt-4 text-muted-foreground text-xs">
+      {choiceBank.emptySummary}
+    </p>
+  ) : null;
+}
+
+function PrintableWorksheetChoiceBankHeader({
+  choiceBank,
+}: {
+  choiceBank: PrintableWorksheetChoiceBankView;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      {choiceBank.label ? (
+        <p className="font-medium text-muted-foreground text-xs">
+          {choiceBank.label}
+        </p>
+      ) : null}
+      <p className="text-muted-foreground text-xs">{choiceBank.summary}</p>
+    </div>
+  );
+}
+
+function PrintableWorksheetChoiceBankGrid({
+  choiceBank,
+}: {
+  choiceBank: PrintableWorksheetChoiceBankView;
+}) {
+  return (
+    <div
+      data-print-choice-bank={choiceBank.presentation}
+      className={cn(
+        'grid gap-2',
+        choiceBank.presentation === 'group-bank'
+          ? 'sm:grid-cols-3'
+          : 'sm:grid-cols-2'
+      )}
+    >
+      {choiceBank.choices.map((choiceView) => (
+        <PrintableWorksheetChoiceBankChoice
+          choiceView={choiceView}
+          key={choiceView.key}
+          choiceBank={choiceBank}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PrintableWorksheetChoiceBankChoice({
+  choiceBank,
+  choiceView,
+}: {
+  choiceBank: PrintableWorksheetChoiceBankView;
+  choiceView: PrintableWorksheetChoiceBankChoiceView;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
+        choiceBank.presentation === 'group-bank'
+          ? 'justify-center bg-background font-medium'
+          : 'bg-muted/20'
+      )}
+    >
+      {choiceBank.showIndexLabels ? (
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-full border bg-background text-xs">
+          {choiceView.indexLabel}
+        </span>
+      ) : null}
+      <span>{choiceView.choice}</span>
     </div>
   );
 }

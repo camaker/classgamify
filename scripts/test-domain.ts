@@ -22806,6 +22806,11 @@ assert.match(
   'Printable worksheet item list should consume explicit empty-state, item, and choice-bank view contracts.'
 );
 assert.match(
+  printableWorksheetItemListSource,
+  /PrintableWorksheetChoiceBankChoiceView/,
+  'Printable worksheet item list should consume the explicit choice-bank choice view contract.'
+);
+assert.match(
   printableWorksheetAnswerKeySource,
   /PrintableWorksheetAnswerKeyDetailView[\s\S]*PrintableWorksheetAnswerKeyItemView[\s\S]*PrintableWorksheetAnswerKeyView/,
   'Printable worksheet answer key should consume explicit answer-key section, item, and detail view contracts.'
@@ -23012,8 +23017,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /function PrintableWorksheetChoiceBank[\s\S]*choiceBank\.label[\s\S]*choiceBank\.label/,
-  'Printable worksheet choice-bank component should render prepared choice-bank labels from the item view.'
+  /function PrintableWorksheetChoiceBankHeader[\s\S]*choiceBank\.label[\s\S]*choiceBank\.summary/,
+  'Printable worksheet choice-bank header should render prepared labels and summaries from the item view.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -23032,12 +23037,12 @@ assert.match(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /choiceBank\.summary/,
+  /PrintableWorksheetChoiceBankHeader[\s\S]*choiceBank\.summary/,
   'Printable worksheet choice-bank component should render prepared choice-bank summaries.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /choiceBank\.emptySummary/,
+  /PrintableWorksheetEmptyChoiceBank[\s\S]*choiceBank\.emptySummary/,
   'Printable worksheet choice-bank component should render prepared empty choice-bank summaries.'
 );
 assert.match(
@@ -23082,18 +23087,18 @@ assert.doesNotMatch(
 );
 assert.match(
   printableWorksheetItemListSource,
-  /data-print-choice-bank=\{choiceBank\.presentation\}/,
-  'Printable worksheet choice-bank component should render choice-bank presentation metadata for print layout variants.'
+  /function PrintableWorksheetChoiceBankGrid[\s\S]*data-print-choice-bank=\{choiceBank\.presentation\}/,
+  'Printable worksheet choice-bank grid should render choice-bank presentation metadata for print layout variants.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
-  'Printable worksheet choice-bank component should render group banks as a denser classification layout.'
+  /function PrintableWorksheetChoiceBankGrid[\s\S]*choiceBank\.presentation === 'group-bank'[\s\S]*sm:grid-cols-3/,
+  'Printable worksheet choice-bank grid should render group banks as a denser classification layout.'
 );
 assert.match(
   printableWorksheetItemListSource,
-  /choiceBank\.showIndexLabels \?[\s\S]*indexLabel/,
-  'Printable worksheet choice-bank component should render lettered choice labels only when the choice-bank view asks for them.'
+  /function PrintableWorksheetChoiceBankChoice[\s\S]*choiceBank\.showIndexLabels \?[\s\S]*choiceView\.indexLabel/,
+  'Printable worksheet choice-bank choice should render lettered choice labels only when the choice-bank view asks for them.'
 );
 assert.match(
   printableWorksheetItemListSource,
