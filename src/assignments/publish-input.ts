@@ -43,6 +43,20 @@ export type AssignmentPublishDraft = {
   title: string;
 };
 
+export type AssignmentPublishValidationCode =
+  | 'close-time-invalid'
+  | 'close-time-past'
+  | 'instructions-too-long'
+  | 'max-attempts-invalid'
+  | 'time-limit-invalid'
+  | 'title-required'
+  | 'title-too-long'
+  | 'title-too-short';
+
+export type AssignmentPublishBlockedReason =
+  | AssignmentPublishValidationCode
+  | 'activity-gate-blocked';
+
 type AssignmentPublishDraftResult =
   | {
       input: {
@@ -63,12 +77,14 @@ type AssignmentPublishDraftResult =
   | {
       message: string;
       ok: false;
+      reason: AssignmentPublishValidationCode;
     };
 
 export type AssignmentPublishExecutionPlan =
   | {
       failureMessage: string;
       message: string;
+      reason: AssignmentPublishBlockedReason;
       type: 'blocked';
     }
   | {
@@ -97,6 +113,7 @@ type AssignmentPublishDraftValidation =
   | {
       message: string;
       ok: false;
+      reason: AssignmentPublishValidationCode;
     };
 
 type AssignmentPublishPreview = {
@@ -341,6 +358,7 @@ export function validateAssignmentPublishDraft({
     return {
       message: m.assignment_publish_validation_title_required(),
       ok: false,
+      reason: 'title-required',
     };
   }
 
@@ -350,6 +368,7 @@ export function validateAssignmentPublishDraft({
         min: ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMinLength,
       }),
       ok: false,
+      reason: 'title-too-short',
     };
   }
 
@@ -359,6 +378,7 @@ export function validateAssignmentPublishDraft({
         max: ASSIGNMENT_PUBLISH_FIELD_LIMITS.titleMaxLength,
       }),
       ok: false,
+      reason: 'title-too-long',
     };
   }
 
@@ -371,6 +391,7 @@ export function validateAssignmentPublishDraft({
         max: ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength,
       }),
       ok: false,
+      reason: 'instructions-too-long',
     };
   }
 
@@ -381,6 +402,7 @@ export function validateAssignmentPublishDraft({
     return {
       message: m.assignment_publish_validation_max_attempts(),
       ok: false,
+      reason: 'max-attempts-invalid',
     };
   }
 
@@ -392,6 +414,7 @@ export function validateAssignmentPublishDraft({
     return {
       message: m.assignment_publish_validation_time_limit(),
       ok: false,
+      reason: 'time-limit-invalid',
     };
   }
 
@@ -403,6 +426,7 @@ export function validateAssignmentPublishDraft({
     return {
       message: m.assignment_publish_validation_close_time_valid(),
       ok: false,
+      reason: 'close-time-invalid',
     };
   }
 
@@ -410,6 +434,7 @@ export function validateAssignmentPublishDraft({
     return {
       message: m.assignment_publish_validation_close_time_future(),
       ok: false,
+      reason: 'close-time-past',
     };
   }
 
@@ -500,6 +525,7 @@ export function buildActivityPublishExecutionPlan({
     return {
       failureMessage: actionView.failureMessage,
       message: actionView.gate.message,
+      reason: 'activity-gate-blocked',
       type: 'blocked',
     };
   }
@@ -510,6 +536,7 @@ export function buildActivityPublishExecutionPlan({
     return {
       failureMessage: actionView.failureMessage,
       message: draftResult.message,
+      reason: draftResult.reason,
       type: 'blocked',
     };
   }

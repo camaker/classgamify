@@ -13185,6 +13185,21 @@ assert.match(
   /ASSIGNMENT_PUBLISH_FIELD_LIMITS/,
   'Publish dialog input validation should reuse assignment-domain field limits.'
 );
+assert.match(
+  assignmentPublishInputSource,
+  /export type AssignmentPublishValidationCode =[\s\S]*'close-time-invalid'[\s\S]*'close-time-past'[\s\S]*'instructions-too-long'[\s\S]*'max-attempts-invalid'[\s\S]*'time-limit-invalid'[\s\S]*'title-required'[\s\S]*'title-too-long'[\s\S]*'title-too-short'/,
+  'Assignment publish validation should expose stable validation codes separately from localized messages.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /export type AssignmentPublishBlockedReason =[\s\S]*AssignmentPublishValidationCode[\s\S]*'activity-gate-blocked'/,
+  'Assignment publish execution plans should expose stable blocked reasons for draft validation and activity lifecycle gates.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /message: string;[\s\S]*ok: false;[\s\S]*reason: AssignmentPublishValidationCode/,
+  'Assignment publish draft validation failures should include structured validation reasons.'
+);
 assert.doesNotMatch(
   assignmentPublishInputSource,
   /const PUBLISH_ATTEMPTS_RANGE|const PUBLISH_TIME_LIMIT_MINUTES_RANGE/,
@@ -13209,6 +13224,11 @@ assert.match(
   assignmentPublishInputSource,
   /buildActivityPublishExecutionPlan[\s\S]*buildActivityLifecycleActionView\(\{[\s\S]*action: 'publish'[\s\S]*buildAssignmentPublishInputFromDraft\(draft\)/,
   'Assignment publish execution plans should combine activity lifecycle gates with publish draft input validation in the assignment domain.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /reason: 'activity-gate-blocked'[\s\S]*reason: draftResult\.reason/,
+  'Assignment publish execution plans should preserve structured blocked reasons from lifecycle gates and draft validation.'
 );
 assert.match(
   assignmentPublishInputSource,
@@ -14028,6 +14048,7 @@ assert.deepEqual(
   {
     message: 'Assignment title must be at least 3 characters.',
     ok: false,
+    reason: 'title-too-short',
   }
 );
 assert.deepEqual(
@@ -14045,6 +14066,7 @@ assert.deepEqual(
   {
     message: 'Assignment title must be 120 characters or fewer.',
     ok: false,
+    reason: 'title-too-long',
   }
 );
 assert.deepEqual(
@@ -14064,6 +14086,7 @@ assert.deepEqual(
   {
     message: 'Instructions must be 500 characters or fewer.',
     ok: false,
+    reason: 'instructions-too-long',
   }
 );
 assert.deepEqual(
@@ -14100,6 +14123,7 @@ assert.deepEqual(
   {
     message: 'Max attempts must be a whole number from 1 to 10.',
     ok: false,
+    reason: 'max-attempts-invalid',
   }
 );
 assert.deepEqual(
@@ -14107,6 +14131,7 @@ assert.deepEqual(
     validation: {
       message: 'Max attempts must be a whole number from 1 to 10.',
       ok: false,
+      reason: 'max-attempts-invalid',
     },
   }),
   {
@@ -14129,6 +14154,7 @@ assert.deepEqual(
   {
     message: 'Time limit must be a whole number from 1 to 180 minutes.',
     ok: false,
+    reason: 'time-limit-invalid',
   }
 );
 assert.deepEqual(
@@ -14146,6 +14172,7 @@ assert.deepEqual(
   {
     message: 'Choose a valid close time.',
     ok: false,
+    reason: 'close-time-invalid',
   }
 );
 assert.deepEqual(
@@ -14164,6 +14191,7 @@ assert.deepEqual(
   {
     message: 'Close time must be in the future.',
     ok: false,
+    reason: 'close-time-past',
   }
 );
 assert.deepEqual(
@@ -14271,6 +14299,7 @@ assert.deepEqual(
   {
     message: 'Add an assignment title before publishing.',
     ok: false,
+    reason: 'title-required',
   }
 );
 assert.deepEqual(
@@ -14288,6 +14317,7 @@ assert.deepEqual(
   {
     message: 'Max attempts must be a whole number from 1 to 10.',
     ok: false,
+    reason: 'max-attempts-invalid',
   }
 );
 assert.deepEqual(
@@ -14305,6 +14335,7 @@ assert.deepEqual(
   {
     message: 'Time limit must be a whole number from 1 to 180 minutes.',
     ok: false,
+    reason: 'time-limit-invalid',
   }
 );
 assert.deepEqual(
@@ -14323,6 +14354,7 @@ assert.deepEqual(
   {
     message: 'Close time must be in the future.',
     ok: false,
+    reason: 'close-time-past',
   }
 );
 assert.deepEqual(
@@ -14377,6 +14409,7 @@ assert.deepEqual(
   {
     failureMessage: 'Assignment could not be published.',
     message: 'Add an assignment title before publishing.',
+    reason: 'title-required',
     type: 'blocked',
   }
 );
@@ -14399,6 +14432,7 @@ assert.deepEqual(
     failureMessage: 'Assignment could not be published.',
     message:
       'Restore this activity before publishing, duplicating, or remixing it.',
+    reason: 'activity-gate-blocked',
     type: 'blocked',
   }
 );
