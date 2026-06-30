@@ -47,6 +47,7 @@ function DashboardPage() {
     <DashboardLayout
       breadcrumbs={[
         {
+          id: 'dashboard',
           label: dashboardOverviewPageCopy.breadcrumbLabel,
           isCurrentPage: true,
         },

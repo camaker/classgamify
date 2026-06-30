@@ -30,8 +30,12 @@ export const Route = createFileRoute('/settings/payment')({
 function PaymentPage() {
   const search = useSearch({ from: '/settings/payment' });
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_billing_breadcrumb(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    {
+      id: 'payment',
+      label: m.settings_billing_breadcrumb(),
+      isCurrentPage: true,
+    },
   ];
   return (
     <>

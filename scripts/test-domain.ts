@@ -1398,6 +1398,10 @@ const adminUsersTableSource = readFileSync(
   'src/components/admin/users/users-table.tsx',
   'utf8'
 );
+const adminUsersRouteSource = readFileSync(
+  'src/routes/admin/users.tsx',
+  'utf8'
+);
 const useAuthSource = readFileSync('src/hooks/use-auth.ts', 'utf8');
 assert.match(
   adminUsersTableSource,
@@ -1448,6 +1452,11 @@ assert.match(
   adminUserDetailViewerSource,
   /const message = m\.admin_users_unban_error\(\);/,
   'Admin user unban failures should use the localized unban failure message.'
+);
+assert.match(
+  adminUsersRouteSource,
+  /id: 'admin'[\s\S]*id: 'users'[\s\S]*isCurrentPage: true/,
+  'Admin users route should pass stable breadcrumb ids.'
 );
 assert.doesNotMatch(
   useAuthSource,
@@ -7664,6 +7673,14 @@ const settingsFilesRouteSource = readFileSync(
   'src/routes/settings/files.tsx',
   'utf8'
 );
+const settingsProfileRouteSource = readFileSync(
+  'src/routes/settings/profile.tsx',
+  'utf8'
+);
+const settingsSecurityRouteSource = readFileSync(
+  'src/routes/settings/security.tsx',
+  'utf8'
+);
 const settingsBillingRouteSource = readFileSync(
   'src/routes/settings/billing.tsx',
   'utf8'
@@ -7696,6 +7713,22 @@ assert.match(
   settingsNotificationsRouteSource,
   /websiteConfig\.newsletter\?\.enable !== true/
 );
+for (const [source, breadcrumbId] of [
+  [settingsProfileRouteSource, 'profile'],
+  [settingsSecurityRouteSource, 'security'],
+  [settingsFilesRouteSource, 'files'],
+  [settingsBillingRouteSource, 'billing'],
+  [settingsNotificationsRouteSource, 'notifications'],
+  [settingsPaymentRouteSource, 'payment'],
+] as const) {
+  assert.match(
+    source,
+    new RegExp(
+      `id: 'settings'[\\s\\S]*id: '${breadcrumbId}'[\\s\\S]*isCurrentPage: true`
+    ),
+    `Settings ${breadcrumbId} route should pass stable breadcrumb ids.`
+  );
+}
 assert.doesNotMatch(
   settingsFilesRouteSource,
   /beforeLoad:\s*\(\)\s*=>\s*\{\s*throw notFound/s,
@@ -25419,6 +25452,11 @@ assert.match(
   dashboardOverviewRouteSource,
   /buildDashboardOverviewRouteViewModel\(\{[\s\S]*activitiesData,[\s\S]*activitiesLoading,[\s\S]*assignmentsData,[\s\S]*assignmentsLoading/,
   'Dashboard overview route should pass owner-scoped API query results into the dashboard-domain route view-model.'
+);
+assert.match(
+  dashboardOverviewRouteSource,
+  /breadcrumbs=\{\[[\s\S]*id: 'dashboard'[\s\S]*isCurrentPage: true/,
+  'Dashboard overview route should pass a stable dashboard breadcrumb id.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,

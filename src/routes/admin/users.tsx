@@ -9,8 +9,8 @@ export const Route = createFileRoute('/admin/users')({
 
 function AdminUsersPage() {
   const breadcrumbs = [
-    { label: m.admin_title(), isCurrentPage: false },
-    { label: m.admin_users_title(), isCurrentPage: true },
+    { id: 'admin', label: m.admin_title(), isCurrentPage: false },
+    { id: 'users', label: m.admin_users_title(), isCurrentPage: true },
   ];
   return (
     <>

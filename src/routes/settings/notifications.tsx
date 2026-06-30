@@ -15,8 +15,12 @@ export const Route = createFileRoute('/settings/notifications')({
 
 function NotificationsPage() {
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_notification_title(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    {
+      id: 'notifications',
+      label: m.settings_notification_title(),
+      isCurrentPage: true,
+    },
   ];
   return (
     <DashboardLayout

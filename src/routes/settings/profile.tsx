@@ -10,8 +10,8 @@ export const Route = createFileRoute('/settings/profile')({
 
 function ProfilePage() {
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_profile_title(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    { id: 'profile', label: m.settings_profile_title(), isCurrentPage: true },
   ];
   return (
     <DashboardLayout

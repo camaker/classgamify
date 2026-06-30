@@ -15,8 +15,8 @@ export const Route = createFileRoute('/settings/files')({
 
 function FilesPage() {
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_files_title(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    { id: 'files', label: m.settings_files_title(), isCurrentPage: true },
   ];
   return (
     <DashboardLayout

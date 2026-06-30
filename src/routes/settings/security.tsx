@@ -11,8 +11,8 @@ export const Route = createFileRoute('/settings/security')({
 
 function SecurityPage() {
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_security_title(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    { id: 'security', label: m.settings_security_title(), isCurrentPage: true },
   ];
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? false;

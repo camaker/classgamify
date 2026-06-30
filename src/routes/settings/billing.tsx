@@ -15,8 +15,12 @@ export const Route = createFileRoute('/settings/billing')({
 
 function BillingPage() {
   const breadcrumbs = [
-    { label: m.common_settings(), isCurrentPage: false },
-    { label: m.settings_billing_breadcrumb(), isCurrentPage: true },
+    { id: 'settings', label: m.common_settings(), isCurrentPage: false },
+    {
+      id: 'billing',
+      label: m.settings_billing_breadcrumb(),
+      isCurrentPage: true,
+    },
   ];
   return (
     <DashboardLayout
