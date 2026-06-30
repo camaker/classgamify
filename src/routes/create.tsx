@@ -50,8 +50,8 @@ function CreatePage() {
           <div className="rounded-lg border bg-card p-4">
             <p className="text-sm font-medium">{pageView.inputShape.title}</p>
             <ol className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              {pageView.inputShape.items.map((item) => (
-                <li key={item}>{item}</li>
+              {pageView.inputShape.itemViews.map((itemView) => (
+                <li key={itemView.id}>{itemView.label}</li>
               ))}
             </ol>
           </div>

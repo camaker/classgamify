@@ -1116,6 +1116,16 @@ assert.match(
   /from '@\/activities\/template-entry'/,
   'The create route should parse template-entry search state through the activity template entry domain.'
 );
+assert.match(
+  createRouteSource,
+  /pageView\.inputShape\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
+  'The create route should render structured input-shape items with stable ids.'
+);
+assert.doesNotMatch(
+  createRouteSource,
+  /inputShape\.items|key=\{item\}/,
+  'The create route should not key input-shape items by localized text.'
+);
 assert.doesNotMatch(
   createRouteSource,
   /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)|from '@\/activities\/library-filters'/,
@@ -3234,6 +3244,16 @@ assert.doesNotMatch(
   activityEditorSource,
   /ReturnType<typeof buildActivityEditAccessView>|ActivityEditPageViewModel\['editAccessView'\]|NonNullable<ActivityEditPageViewModel\['editor'\]>/,
   'Activity editor route state should compose explicit edit access and editor view contracts instead of deriving them from builder return types.'
+);
+assert.match(
+  activityEditorSource,
+  /export type ActivityCreatePageInputShapeItemId =[\s\S]*'groups'[\s\S]*'notes'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*export type ActivityCreatePageInputShapeItemView = \{[\s\S]*id: ActivityCreatePageInputShapeItemId;[\s\S]*label: string;[\s\S]*export type ActivityCreatePageInputShapeView = \{[\s\S]*itemViews: ActivityCreatePageInputShapeItemView\[\];[\s\S]*export type ActivityCreatePageViewModel = \{/,
+  'Activity editor domain should expose structured create-page input-shape item contracts.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /type ActivityCreatePageInputShapeView = \{[\s\S]*items: string\[\]/,
+  'Activity create-page input-shape view should not expose localized strings as bare list items.'
 );
 assert.match(
   activityEditorSource,
@@ -28201,11 +28221,23 @@ assert.deepEqual(buildActivityCreatePageViewModel(), {
     title: 'Create once, teach through many templates.',
   },
   inputShape: {
-    items: [
-      '1. Questions: prompt | answer | options.',
-      '2. Match pairs: left | right.',
-      '3. Groups: label | item one, item two.',
-      '4. Notes and vocabulary as simple lists.',
+    itemViews: [
+      {
+        id: 'questions',
+        label: '1. Questions: prompt | answer | options.',
+      },
+      {
+        id: 'pairs',
+        label: '2. Match pairs: left | right.',
+      },
+      {
+        id: 'groups',
+        label: '3. Groups: label | item one, item two.',
+      },
+      {
+        id: 'notes',
+        label: '4. Notes and vocabulary as simple lists.',
+      },
     ],
     title: 'Supported input shapes',
   },

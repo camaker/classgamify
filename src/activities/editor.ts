@@ -276,12 +276,23 @@ export type ActivityEditorTemplateView = {
 
 export type ActivityEditorSelectedTemplateView = ActivityTemplateDefinition;
 
-type ActivityCreatePageInputShapeView = {
-  items: string[];
+export type ActivityCreatePageInputShapeItemId =
+  | 'groups'
+  | 'notes'
+  | 'pairs'
+  | 'questions';
+
+export type ActivityCreatePageInputShapeItemView = {
+  id: ActivityCreatePageInputShapeItemId;
+  label: string;
+};
+
+export type ActivityCreatePageInputShapeView = {
+  itemViews: ActivityCreatePageInputShapeItemView[];
   title: string;
 };
 
-type ActivityCreatePageViewModel = {
+export type ActivityCreatePageViewModel = {
   hero: {
     badgeLabel: string;
     description: string;
@@ -291,7 +302,7 @@ type ActivityCreatePageViewModel = {
   previewLabel: string;
 };
 
-type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
+export type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
   initialValues?: CreateActivityInput;
   previewActivity: ActivitySeed;
   previewPanel: ActivityEditorPreviewPanel;
@@ -872,11 +883,23 @@ export function buildActivityCreatePageViewModel(): ActivityCreatePageViewModel 
       title: m.create_page_title(),
     },
     inputShape: {
-      items: [
-        m.create_page_input_shape_questions(),
-        m.create_page_input_shape_pairs(),
-        m.create_page_input_shape_groups(),
-        m.create_page_input_shape_notes(),
+      itemViews: [
+        {
+          id: 'questions',
+          label: m.create_page_input_shape_questions(),
+        },
+        {
+          id: 'pairs',
+          label: m.create_page_input_shape_pairs(),
+        },
+        {
+          id: 'groups',
+          label: m.create_page_input_shape_groups(),
+        },
+        {
+          id: 'notes',
+          label: m.create_page_input_shape_notes(),
+        },
       ],
       title: m.create_page_input_shapes_title(),
     },
