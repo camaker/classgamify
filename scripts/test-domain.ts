@@ -22207,6 +22207,16 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /actionState\.showArchiveAction \? \([\s\S]*ActivityLibraryArchiveActionButton[\s\S]*actionState\.showPublishAction \? \([\s\S]*ActivityLibraryPublishActionButton[\s\S]*actionState\.showRestoreAction \|\|[\s\S]*actionState\.showRestoreRequiredMessage \? \([\s\S]*ActivityLibraryRestoreAction/,
+  'Activity library card actions should render restore controls only through explicit restore action-state gates.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /showArchiveAction \|\| actionState\.showPublishAction \? \([\s\S]*\) : \([\s\S]*ActivityLibraryRestoreAction/,
+  'Activity library card actions should not use archive-or-publish as an implicit restore fallback.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*action: ActivityLibraryCardActionButtonView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}/,
   'Activity library action subcomponents should render prepared action labels from the activity-domain action view.'
 );

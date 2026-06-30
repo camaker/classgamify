@@ -288,30 +288,28 @@ function ActivityLibraryCardActions({
           onClick={onDuplicate}
         />
       ) : null}
-      {actionState.showArchiveAction || actionState.showPublishAction ? (
-        <>
-          {actionState.showArchiveAction ? (
-            <ActivityLibraryArchiveActionButton
-              action={actionView.archive}
-              disabled={isArchiving}
-              onClick={onArchive}
-            />
-          ) : null}
-          {actionState.showPublishAction ? (
-            <ActivityLibraryPublishActionButton
-              action={actionView.publish}
-              onClick={onPublish}
-            />
-          ) : null}
-        </>
-      ) : (
+      {actionState.showArchiveAction ? (
+        <ActivityLibraryArchiveActionButton
+          action={actionView.archive}
+          disabled={isArchiving}
+          onClick={onArchive}
+        />
+      ) : null}
+      {actionState.showPublishAction ? (
+        <ActivityLibraryPublishActionButton
+          action={actionView.publish}
+          onClick={onPublish}
+        />
+      ) : null}
+      {actionState.showRestoreAction ||
+      actionState.showRestoreRequiredMessage ? (
         <ActivityLibraryRestoreAction
           action={actionView.restore}
           actionState={actionState}
           disabled={isRestoring}
           onRestore={onRestore}
         />
-      )}
+      ) : null}
     </div>
   );
 }
