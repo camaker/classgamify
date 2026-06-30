@@ -1399,9 +1399,11 @@ function fallbackTerms(
   input: NormalizedGenerateActivityDraftInput,
   locale: Locale
 ) {
+  const safeSourceText = sanitizeActivityDraftSourceTextForAi(input.sourceText);
+
   return unique([
     ...extractActivityDraftSourceTerms({
-      sourceText: input.sourceText,
+      sourceText: safeSourceText,
       subject: input.subject,
     }),
     m.activity_ai_fallback_term_key_word({}, { locale }),

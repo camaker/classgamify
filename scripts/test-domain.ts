@@ -32716,6 +32716,11 @@ assert.match(
 );
 assert.match(
   aiDraftSource,
+  /function fallbackTerms[\s\S]*const safeSourceText = sanitizeActivityDraftSourceTextForAi\(input\.sourceText\)[\s\S]*sourceText: safeSourceText/,
+  'AI fallback supplemental terms should sanitize direct source-note input before deriving classroom terms.'
+);
+assert.match(
+  aiDraftSource,
   /formatTemplateRequirements\(template\.contentRequirements\)/,
   'AI draft prompt template requirements should reuse the shared template requirement formatter.'
 );
