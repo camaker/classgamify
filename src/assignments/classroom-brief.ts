@@ -5,10 +5,7 @@ import type {
 } from '@/assignments/results';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
 import { formatAttemptDuration } from '@/assignments/attempt-duration';
-import {
-  formatAssignmentResultNumber,
-  formatAssignmentResultPercent,
-} from '@/assignments/result-format';
+import { formatAssignmentResultNumber } from '@/assignments/result-format';
 import {
   formatAssignmentResultItemNumberLabel,
   formatAssignmentResultPromptLabel,
@@ -243,7 +240,7 @@ export function buildAssignmentClassroomBriefFocusItemView({
   });
 
   return {
-    correctRateLabel: formatAssignmentResultPercent(item.correctRate),
+    correctRateLabel: formatAssignmentSummaryAccuracy(item.correctRate),
     correctSummaryLabel: formatAssignmentSummaryCorrectCount(item),
     itemId: item.itemId,
     itemNumberLabel,
@@ -334,8 +331,8 @@ export function formatAssignmentBriefStudentAccuracy({
   latestAccuracy,
 }: Pick<AssignmentStudentSummary, 'bestAccuracy' | 'latestAccuracy'>) {
   return m.assignment_result_brief_student_accuracy({
-    best: formatAssignmentResultPercent(bestAccuracy),
-    latest: formatAssignmentResultPercent(latestAccuracy),
+    best: formatAssignmentSummaryAccuracy(bestAccuracy),
+    latest: formatAssignmentSummaryAccuracy(latestAccuracy),
   });
 }
 

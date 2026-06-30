@@ -4,7 +4,9 @@ import { m } from '@/locale/paraglide/messages';
 export function formatAssignmentSummaryAccuracy(
   value: number | null | undefined
 ) {
-  return formatAssignmentResultPercent(value);
+  return formatAssignmentResultPercent(
+    normalizeAssignmentSummaryPercent(value)
+  );
 }
 
 export function formatAssignmentSummaryCorrectRate(value: number) {
@@ -106,4 +108,14 @@ export function formatAssignmentSummaryItemPerformance({
 export function normalizeAssignmentSummaryCount(count: number) {
   if (!Number.isFinite(count)) return 0;
   return Math.max(0, Math.floor(count));
+}
+
+export function normalizeAssignmentSummaryPercent(
+  value: number | null | undefined
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return Number.NaN;
+  }
+
+  return Math.min(100, Math.max(0, value));
 }

@@ -32572,8 +32572,11 @@ assert.equal(formatAssignmentResultValue(null, { emptyValue: '' }), '');
 assert.equal(formatAssignmentResultValue('', { emptyValue: 'none' }), 'none');
 assert.equal(formatAssignmentSummaryAccuracy(67), '67%');
 assert.equal(formatAssignmentSummaryAccuracy(67.4), '67%');
+assert.equal(formatAssignmentSummaryAccuracy(150), '100%');
+assert.equal(formatAssignmentSummaryAccuracy(-20), '0%');
 assert.equal(formatAssignmentSummaryAccuracy(Number.NaN), '-');
 assert.equal(formatAssignmentSummaryCorrectRate(67), '67% correct');
+assert.equal(formatAssignmentSummaryCorrectRate(150), '100% correct');
 assert.equal(
   formatAssignmentSummaryCorrectCount({
     correctCount: 2,
@@ -32611,6 +32614,14 @@ assert.equal(
     unansweredCount: 2.8,
   }),
   '- correct, 0/0; 2 unanswered'
+);
+assert.equal(
+  formatAssignmentSummaryItemPerformance({
+    correctCount: 2,
+    correctRate: 150,
+    submittedCount: 3,
+  }),
+  '100% correct, 2/3; 0 unanswered'
 );
 assert.equal(formatAssignmentSummaryUnansweredCount(1), '1 unanswered');
 assert.equal(formatAssignmentSummaryUnansweredCount(2), '2 unanswered');
@@ -35983,6 +35994,13 @@ assert.equal(
     latestAccuracy: 75,
   }),
   'Latest 75% · best 100%'
+);
+assert.equal(
+  formatAssignmentBriefStudentAccuracy({
+    bestAccuracy: 150,
+    latestAccuracy: -20,
+  }),
+  'Latest 0% · best 100%'
 );
 assert.equal(
   formatAssignmentItemCorrectSummary({
