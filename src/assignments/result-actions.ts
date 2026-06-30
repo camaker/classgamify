@@ -245,10 +245,10 @@ export function buildAssignmentResultActionState({
   studentCount: number;
 }): AssignmentResultActionState {
   return {
-    attemptCount,
+    attemptCount: normalizeAssignmentResultActionCount(attemptCount),
     classroomBriefReady,
-    itemCount,
-    studentCount,
+    itemCount: normalizeAssignmentResultActionCount(itemCount),
+    studentCount: normalizeAssignmentResultActionCount(studentCount),
   };
 }
 
@@ -772,8 +772,14 @@ export function getAssignmentResultActionGate({
   itemCount: number;
   studentCount: number;
 }): AssignmentResultActionGate {
+  const normalizedAttemptCount =
+    normalizeAssignmentResultActionCount(attemptCount);
+  const normalizedItemCount = normalizeAssignmentResultActionCount(itemCount);
+  const normalizedStudentCount =
+    normalizeAssignmentResultActionCount(studentCount);
+
   if (action === 'copy-item-review') {
-    return itemCount > 0
+    return normalizedItemCount > 0
       ? { type: 'ready' }
       : {
           message: m.assignment_result_action_gate_add_items_item_review(),
@@ -782,7 +788,7 @@ export function getAssignmentResultActionGate({
   }
 
   if (action === 'copy-follow-up') {
-    return studentCount > 0
+    return normalizedStudentCount > 0
       ? { type: 'ready' }
       : {
           message: m.assignment_result_action_gate_submit_attempt_follow_up(),
@@ -797,7 +803,7 @@ export function getAssignmentResultActionGate({
     };
   }
 
-  if (attemptCount > 0) return { type: 'ready' };
+  if (normalizedAttemptCount > 0) return { type: 'ready' };
 
   return {
     message: getNoAttemptResultActionMessage(action),
@@ -871,4 +877,10 @@ function getNoAttemptResultActionMessage(action: AssignmentResultAction) {
   }
 
   return m.assignment_result_action_gate_submit_attempt_brief();
+}
+
+function normalizeAssignmentResultActionCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+
+  return Math.max(0, Math.floor(value));
 }

@@ -36544,6 +36544,20 @@ assert.deepEqual(emptyAssignmentResultActionState, {
   studentCount: 0,
 });
 assert.deepEqual(
+  buildAssignmentResultActionState({
+    attemptCount: Number.NaN,
+    classroomBriefReady: true,
+    itemCount: -1,
+    studentCount: 2.9,
+  }),
+  {
+    attemptCount: 0,
+    classroomBriefReady: true,
+    itemCount: 0,
+    studentCount: 2,
+  }
+);
+assert.deepEqual(
   buildAssignmentResultActionButtons(emptyAssignmentResultActionState),
   [
     {
@@ -37700,6 +37714,18 @@ assert.deepEqual(
 );
 assert.deepEqual(
   getAssignmentResultActionGate({
+    action: 'export-csv',
+    attemptCount: Number.NaN,
+    itemCount: 2,
+    studentCount: 1,
+  }),
+  {
+    message: 'Submit at least one attempt before exporting results.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
     action: 'copy-reteach-plan',
     attemptCount: 0,
     itemCount: 2,
@@ -37727,6 +37753,18 @@ assert.deepEqual(
   getAssignmentResultActionGate({
     action: 'copy-item-review',
     attemptCount: 0,
+    itemCount: 0.9,
+    studentCount: 1,
+  }),
+  {
+    message: 'Add assignment items before copying item review.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-item-review',
+    attemptCount: 0,
     itemCount: 0,
     studentCount: 0,
   }),
@@ -37741,6 +37779,18 @@ assert.deepEqual(
     attemptCount: 1,
     itemCount: 2,
     studentCount: 0,
+  }),
+  {
+    message: 'Submit at least one attempt before copying follow-up.',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  getAssignmentResultActionGate({
+    action: 'copy-follow-up',
+    attemptCount: 1,
+    itemCount: 2,
+    studentCount: Number.POSITIVE_INFINITY,
   }),
   {
     message: 'Submit at least one attempt before copying follow-up.',
