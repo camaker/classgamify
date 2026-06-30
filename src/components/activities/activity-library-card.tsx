@@ -2,10 +2,12 @@ import type { ActivityLibraryStatus } from '@/activities/library-filters';
 import { buildAssignmentListRouteSearch } from '@/assignments/list-filters';
 import { buildActivityLibraryRouteSearch } from '@/activities/library-filters';
 import {
-  activityLibraryCardCopy,
   buildActivityLibraryCardDisplayView,
+  type ActivityLibraryCardActionButtonView,
+  type ActivityLibraryCardActionView,
+  type ActivityLibraryCardDerivativeActionView,
   type ActivityLibraryCardActionState,
-  type ActivityLibraryCardDisplayView,
+  type ActivityLibraryCardRestoreActionView,
   type ActivityLibraryCardTemplateType,
   type ActivityLibraryCardViewModel,
   type ActivityLibraryEditorActionView,
@@ -198,6 +200,7 @@ export function ActivityLibraryCard({
         />
         <ActivityLibraryCardActions
           actionState={cardDisplayView.actionState}
+          actionView={cardDisplayView.actionView}
           editAction={cardDisplayView.editAction}
           isArchiving={archiveMutation.isPending}
           isDuplicating={duplicateMutation.isPending}
@@ -250,6 +253,7 @@ function ActivityLibrarySourceMaterialEditAction({
 
 function ActivityLibraryCardActions({
   actionState,
+  actionView,
   editAction,
   isArchiving,
   isDuplicating,
@@ -260,6 +264,7 @@ function ActivityLibraryCardActions({
   onRestore,
 }: {
   actionState: ActivityLibraryCardActionState;
+  actionView: ActivityLibraryCardActionView;
   editAction: ActivityLibraryEditorActionView;
   isArchiving: boolean;
   isDuplicating: boolean;
@@ -278,6 +283,7 @@ function ActivityLibraryCardActions({
       ) : null}
       {actionState.showDerivativeActions ? (
         <ActivityLibraryDuplicateActionButton
+          action={actionView.duplicate}
           disabled={isDuplicating}
           onClick={onDuplicate}
         />
@@ -286,16 +292,21 @@ function ActivityLibraryCardActions({
         <>
           {actionState.showArchiveAction ? (
             <ActivityLibraryArchiveActionButton
+              action={actionView.archive}
               disabled={isArchiving}
               onClick={onArchive}
             />
           ) : null}
           {actionState.showPublishAction ? (
-            <ActivityLibraryPublishActionButton onClick={onPublish} />
+            <ActivityLibraryPublishActionButton
+              action={actionView.publish}
+              onClick={onPublish}
+            />
           ) : null}
         </>
       ) : (
         <ActivityLibraryRestoreAction
+          action={actionView.restore}
           actionState={actionState}
           disabled={isRestoring}
           onRestore={onRestore}
@@ -326,9 +337,11 @@ function ActivityLibraryEditActionLink({
 }
 
 function ActivityLibraryDuplicateActionButton({
+  action,
   disabled,
   onClick,
 }: {
+  action: ActivityLibraryCardDerivativeActionView;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -341,15 +354,17 @@ function ActivityLibraryDuplicateActionButton({
       onClick={onClick}
     >
       <IconCopy className="size-4" />
-      {activityLibraryCardCopy.actionLabels.duplicate}
+      {action.label}
     </Button>
   );
 }
 
 function ActivityLibraryArchiveActionButton({
+  action,
   disabled,
   onClick,
 }: {
+  action: ActivityLibraryCardActionButtonView;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -362,29 +377,33 @@ function ActivityLibraryArchiveActionButton({
       onClick={onClick}
     >
       <IconFolderOff className="size-4" />
-      {activityLibraryCardCopy.actionLabels.archive}
+      {action.label}
     </Button>
   );
 }
 
 function ActivityLibraryPublishActionButton({
+  action,
   onClick,
 }: {
+  action: ActivityLibraryCardDerivativeActionView;
   onClick: () => void;
 }) {
   return (
     <Button type="button" className="w-full sm:w-fit" onClick={onClick}>
       <IconPlus className="size-4" />
-      {activityLibraryCardCopy.actionLabels.publish}
+      {action.label}
     </Button>
   );
 }
 
 function ActivityLibraryRestoreAction({
+  action,
   actionState,
   disabled,
   onRestore,
 }: {
+  action: ActivityLibraryCardRestoreActionView;
   actionState: ActivityLibraryCardActionState;
   disabled: boolean;
   onRestore: () => void;
@@ -392,10 +411,13 @@ function ActivityLibraryRestoreAction({
   return (
     <>
       {actionState.showRestoreRequiredMessage ? (
-        <ActivityLibraryRestoreRequiredMessage />
+        <ActivityLibraryRestoreRequiredMessage
+          message={action.requiredMessage}
+        />
       ) : null}
       {actionState.showRestoreAction ? (
         <ActivityLibraryRestoreActionButton
+          action={action}
           disabled={disabled}
           onClick={onRestore}
         />
@@ -404,18 +426,20 @@ function ActivityLibraryRestoreAction({
   );
 }
 
-function ActivityLibraryRestoreRequiredMessage() {
-  return (
-    <p className="text-sm text-muted-foreground sm:mr-auto">
-      {activityLibraryCardCopy.restoreRequiredMessage}
-    </p>
-  );
+function ActivityLibraryRestoreRequiredMessage({
+  message,
+}: {
+  message: string;
+}) {
+  return <p className="text-sm text-muted-foreground sm:mr-auto">{message}</p>;
 }
 
 function ActivityLibraryRestoreActionButton({
+  action,
   disabled,
   onClick,
 }: {
+  action: ActivityLibraryCardRestoreActionView;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -427,7 +451,7 @@ function ActivityLibraryRestoreActionButton({
       onClick={onClick}
     >
       <IconRotateClockwise className="size-4" />
-      {activityLibraryCardCopy.actionLabels.restore}
+      {action.label}
     </Button>
   );
 }

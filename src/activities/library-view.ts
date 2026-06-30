@@ -15,6 +15,8 @@ import {
 import {
   canEditActivity,
   canDeriveActivityWork,
+  type ActivityDerivativeAction,
+  type ActivityLifecycleAction,
   buildActivityLifecycleActionView,
   type ActivityLifecycleActionCopy,
   type ActivityLifecycleActionView,
@@ -207,11 +209,27 @@ type ActivityLibrarySearchPanelView = {
   templateOptions: ActivityLibraryTemplateFilterOption[];
 };
 
-type ActivityLibraryCardActionView = {
-  archive: ActivityLifecycleActionCopy;
-  duplicate: ActivityLifecycleActionView;
+export type ActivityLibraryCardActionButtonView =
+  ActivityLifecycleActionCopy & {
+    label: string;
+  };
+
+export type ActivityLibraryCardDerivativeActionView =
+  ActivityLifecycleActionView & {
+    label: string;
+  };
+
+export type ActivityLibraryCardRestoreActionView =
+  ActivityLibraryCardActionButtonView & {
+    requiredMessage: string;
+  };
+
+export type ActivityLibraryCardActionView = {
+  archive: ActivityLibraryCardActionButtonView;
+  duplicate: ActivityLibraryCardDerivativeActionView;
+  publish: ActivityLibraryCardDerivativeActionView;
   remix: ActivityLifecycleActionView;
-  restore: ActivityLifecycleActionCopy;
+  restore: ActivityLibraryCardRestoreActionView;
 };
 
 export type ActivityLibraryEditorActionView = {
@@ -984,17 +1002,55 @@ export function buildActivityLibraryCardActionView(
   visibility: ActivityVisibility
 ): ActivityLibraryCardActionView {
   return {
-    archive: getActivityLifecycleActionCopy('archive'),
-    duplicate: buildActivityLifecycleActionView({
+    archive: buildActivityLibraryCardActionButtonView('archive'),
+    duplicate: buildActivityLibraryCardDerivativeActionView({
       action: 'duplicate',
+      visibility,
+    }),
+    publish: buildActivityLibraryCardDerivativeActionView({
+      action: 'publish',
       visibility,
     }),
     remix: buildActivityLifecycleActionView({
       action: 'remix',
       visibility,
     }),
-    restore: getActivityLifecycleActionCopy('restore'),
+    restore: {
+      ...buildActivityLibraryCardActionButtonView('restore'),
+      requiredMessage: activityLibraryCardCopy.restoreRequiredMessage,
+    },
   };
+}
+
+function buildActivityLibraryCardActionButtonView(
+  action: Extract<ActivityLifecycleAction, 'archive' | 'restore'>
+): ActivityLibraryCardActionButtonView {
+  return {
+    ...getActivityLifecycleActionCopy(action),
+    label: getActivityLibraryCardActionLabel(action),
+  };
+}
+
+function buildActivityLibraryCardDerivativeActionView({
+  action,
+  visibility,
+}: {
+  action: Exclude<ActivityDerivativeAction, 'remix'>;
+  visibility: ActivityVisibility;
+}): ActivityLibraryCardDerivativeActionView {
+  return {
+    ...buildActivityLifecycleActionView({
+      action,
+      visibility,
+    }),
+    label: getActivityLibraryCardActionLabel(action),
+  };
+}
+
+function getActivityLibraryCardActionLabel(
+  action: Exclude<ActivityLifecycleAction, 'remix'>
+) {
+  return activityLibraryCardCopy.actionLabels[action];
 }
 
 function formatActivityLibraryCardStatusLabel({

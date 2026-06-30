@@ -3204,8 +3204,8 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLifecycleActionCopy;[\s\S]*duplicate: ActivityLifecycleActionView;[\s\S]*remix: ActivityLifecycleActionView;[\s\S]*restore: ActivityLifecycleActionCopy;/,
-  'Activity library card actions should compose explicit lifecycle action view contracts.'
+  /export type ActivityLibraryCardActionButtonView =[\s\S]*ActivityLifecycleActionCopy & \{[\s\S]*label: string;[\s\S]*export type ActivityLibraryCardDerivativeActionView =[\s\S]*ActivityLifecycleActionView & \{[\s\S]*label: string;[\s\S]*export type ActivityLibraryCardRestoreActionView =[\s\S]*ActivityLibraryCardActionButtonView & \{[\s\S]*requiredMessage: string;[\s\S]*export type ActivityLibraryCardActionView = \{[\s\S]*archive: ActivityLibraryCardActionButtonView;[\s\S]*duplicate: ActivityLibraryCardDerivativeActionView;[\s\S]*publish: ActivityLibraryCardDerivativeActionView;[\s\S]*remix: ActivityLifecycleActionView;[\s\S]*restore: ActivityLibraryCardRestoreActionView;/,
+  'Activity library card actions should compose explicit lifecycle action view contracts with prepared labels and restore guidance.'
 );
 assert.doesNotMatch(
   activityLibraryViewSource,
@@ -20640,7 +20640,7 @@ assert.match(
 );
 assert.match(
   activityLibraryViewSource,
-  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryEditorActionView/,
+  /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
 assert.doesNotMatch(
@@ -20650,7 +20650,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardViewModel[\s\S]*ActivityLibraryCardDisplayView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryEditorActionView/,
+  /ActivityLibraryCardActionButtonView[\s\S]*ActivityLibraryCardActionView[\s\S]*ActivityLibraryCardDerivativeActionView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryCardRestoreActionView[\s\S]*ActivityLibraryCardViewModel[\s\S]*ActivityLibraryEditorActionView/,
   'Activity library card component should import explicit card display and action view contracts.'
 );
 assert.doesNotMatch(
@@ -20755,7 +20755,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
+  /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*actionView=\{cardDisplayView\.actionView\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
   'Activity library card component should delegate persisted action rendering to a focused action component.'
 );
 assert.match(
@@ -20765,8 +20765,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.duplicate[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.archive[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.publish/,
-  'Activity library action subcomponents should render localized action labels from activity library card copy.'
+  /function ActivityLibraryEditActionLink[\s\S]*to=\{action\.to\}[\s\S]*params=\{\{ activityId: action\.activityId \}\}[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryDuplicateActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryArchiveActionButton[\s\S]*action: ActivityLibraryCardActionButtonView[\s\S]*\{action\.label\}[\s\S]*function ActivityLibraryPublishActionButton[\s\S]*action: ActivityLibraryCardDerivativeActionView[\s\S]*\{action\.label\}/,
+  'Activity library action subcomponents should render prepared action labels from the activity-domain action view.'
+);
+assert.doesNotMatch(
+  activityLibraryCardComponentSource,
+  /activityLibraryCardCopy/,
+  'Activity library card component should not read localized action copy directly.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -20780,8 +20785,8 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
-  /function ActivityLibraryRestoreRequiredMessage[\s\S]*activityLibraryCardCopy\.restoreRequiredMessage[\s\S]*function ActivityLibraryRestoreActionButton[\s\S]*activityLibraryCardCopy\.actionLabels\.restore/,
-  'Activity library restore action components should use localized restore copy.'
+  /function ActivityLibraryRestoreAction[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*message=\{action\.requiredMessage\}[\s\S]*ActivityLibraryRestoreActionButton[\s\S]*action=\{action\}[\s\S]*function ActivityLibraryRestoreRequiredMessage[\s\S]*message: string;[\s\S]*\{message\}[\s\S]*function ActivityLibraryRestoreActionButton[\s\S]*action: ActivityLibraryCardRestoreActionView[\s\S]*\{action\.label\}/,
+  'Activity library restore action components should render prepared restore guidance and labels from the activity-domain action view.'
 );
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
@@ -25477,7 +25482,18 @@ assert.deepEqual(buildActivityLibraryCardActionView('archived').duplicate, {
     message: archivedActivityDerivationError,
     type: 'blocked',
   },
+  label: 'Duplicate',
   successMessage: 'Activity duplicated.',
+});
+assert.deepEqual(buildActivityLibraryCardActionView('archived').publish, {
+  failureMessage: 'Assignment could not be published.',
+  gate: {
+    action: 'publish',
+    message: archivedActivityDerivationError,
+    type: 'blocked',
+  },
+  label: 'Publish assignment',
+  successMessage: 'Assignment link published.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('draft').remix, {
   failureMessage: 'Activity could not be remixed.',
@@ -25486,10 +25502,13 @@ assert.deepEqual(buildActivityLibraryCardActionView('draft').remix, {
 });
 assert.deepEqual(buildActivityLibraryCardActionView('private').archive, {
   failureMessage: 'Activity could not be archived.',
+  label: 'Archive',
   successMessage: 'Activity archived.',
 });
 assert.deepEqual(buildActivityLibraryCardActionView('archived').restore, {
   failureMessage: 'Activity could not be restored.',
+  label: 'Restore',
+  requiredMessage: archivedActivityDerivationError,
   successMessage: 'Activity restored to drafts.',
 });
 assert.equal(
