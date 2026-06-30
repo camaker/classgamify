@@ -37453,6 +37453,67 @@ assert.deepEqual(
     [
       {
         ...resultAnalysis.students[0]!,
+        attempts: Number.POSITIVE_INFINITY,
+        studentLabel: 'Infinite attempts',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        attempts: Number.NaN,
+        studentLabel: 'NaN attempts',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        attempts: 2.9,
+        studentLabel: 'Fractional attempts',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        attempts: -1,
+        studentLabel: 'Negative attempts',
+      },
+    ],
+    'attempts'
+  ).map((student) => student.studentLabel),
+  [
+    'Fractional attempts',
+    'Infinite attempts',
+    'NaN attempts',
+    'Negative attempts',
+  ]
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        bestAccuracy: Number.POSITIVE_INFINITY,
+        studentLabel: 'Infinite best',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        bestAccuracy: Number.NaN,
+        studentLabel: 'NaN best',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        bestAccuracy: 82.5,
+        studentLabel: 'Fractional best',
+      },
+      {
+        ...resultAnalysis.students[0]!,
+        bestAccuracy: -1,
+        studentLabel: 'Negative best',
+      },
+    ],
+    'best'
+  ).map((student) => student.studentLabel),
+  ['Fractional best', 'Infinite best', 'NaN best', 'Negative best']
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
         studentLabel: ' Ｂｅｔａ ',
       },
       {

@@ -730,6 +730,16 @@ function compareStudentsDescending(
   leftStudent: AssignmentStudentSummary,
   rightStudent: AssignmentStudentSummary
 ) {
-  if (leftValue !== rightValue) return rightValue - leftValue;
+  const normalizedLeftValue = normalizeStudentSummarySortNumber(leftValue);
+  const normalizedRightValue = normalizeStudentSummarySortNumber(rightValue);
+
+  if (normalizedLeftValue !== normalizedRightValue) {
+    return normalizedRightValue - normalizedLeftValue;
+  }
+
   return compareAssignmentStudentsByDisplayLabel(leftStudent, rightStudent);
+}
+
+function normalizeStudentSummarySortNumber(value: number) {
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
