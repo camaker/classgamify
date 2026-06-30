@@ -107,18 +107,41 @@ function getAttemptDurationSeconds(
 }
 
 function getAttemptAccuracy(item: AssignmentAttemptStatsSource) {
-  return getFiniteNumber(item.resultJson?.accuracy, 0);
+  return normalizeAttemptStatsPercent(item.resultJson?.accuracy);
 }
 
 function getAttemptPoints(item: AssignmentAttemptStatsSource) {
-  const score = getFiniteNumber(item.score);
+  const totalPoints = normalizeAttemptStatsNumber(item.resultJson?.totalPoints);
+  const score = normalizeAttemptStatsNumber(item.score, {
+    max: totalPoints,
+  });
   if (score !== undefined) return score;
 
-  return getFiniteNumber(item.resultJson?.earnedPoints, 0);
+  return (
+    normalizeAttemptStatsNumber(item.resultJson?.earnedPoints, {
+      max: totalPoints,
+    }) ?? 0
+  );
 }
 
-function getFiniteNumber(value: number | null | undefined, fallback?: number) {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+function normalizeAttemptStatsNumber(
+  value: number | null | undefined,
+  options?: {
+    max?: number;
+  }
+) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+
+  const normalizedValue = Math.max(0, value);
+  if (options?.max === undefined || !Number.isFinite(options.max)) {
+    return normalizedValue;
+  }
+
+  return Math.min(normalizedValue, options.max);
+}
+
+function normalizeAttemptStatsPercent(value: number | null | undefined) {
+  return normalizeAttemptStatsNumber(value, { max: 100 }) ?? 0;
 }
 
 export function summarizeAssignmentAttemptsByAssignmentId(

@@ -2059,6 +2059,11 @@ assert.match(
   /AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;[\s\S]*resolveAssignmentSettings\(item\.settingsJson\)/,
   'Assignment attempt stats should consume the explicit assignment settings input contract.'
 );
+assert.match(
+  assignmentAttemptStatsSource,
+  /function getAttemptAccuracy[\s\S]*normalizeAttemptStatsPercent\(item\.resultJson\?\.accuracy\)[\s\S]*function getAttemptPoints[\s\S]*normalizeAttemptStatsNumber\(item\.score,[\s\S]*max: totalPoints[\s\S]*normalizeAttemptStatsNumber\(item\.resultJson\?\.earnedPoints/,
+  'Assignment attempt stats should normalize accuracy and point values before averaging.'
+);
 assert.doesNotMatch(
   assignmentAttemptStatsSource,
   /Parameters<typeof resolveAssignmentSettings>/,
@@ -32813,6 +32818,38 @@ assert.deepEqual(
     averagePoints: 0,
     averageScore: 0,
     completions: 0,
+  }
+);
+assert.deepEqual(
+  summarizeAssignmentAttempts([
+    {
+      resultJson: {
+        accuracy: 150,
+        completedItemCount: 2,
+        correctItemCount: 2,
+        durationSeconds: 10,
+        earnedPoints: 8,
+        totalPoints: 2,
+      },
+      score: 5,
+    },
+    {
+      resultJson: {
+        accuracy: -20,
+        completedItemCount: 0,
+        correctItemCount: 0,
+        durationSeconds: 20,
+        earnedPoints: -3,
+        totalPoints: 2,
+      },
+      score: -1,
+    },
+  ]),
+  {
+    averageDurationSeconds: 15,
+    averagePoints: 1,
+    averageScore: 50,
+    completions: 2,
   }
 );
 assert.deepEqual(
