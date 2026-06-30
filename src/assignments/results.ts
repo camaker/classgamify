@@ -270,7 +270,8 @@ function buildStudentSummaries(
 }
 
 function getDateTimestamp(value: Date | null) {
-  return value?.getTime() ?? 0;
+  const timestamp = value?.getTime() ?? 0;
+  return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
 export function isAssignmentAttemptAnswerNeedsReview(

@@ -2302,6 +2302,11 @@ assert.match(
   /function getResultAcceptedAnswers\(answer: string\)[\s\S]*getRuntimeDisplayAcceptedAnswers\(answer\)/,
   'Assignment result analysis should delegate accepted-answer display normalization to the shared runtime helper.'
 );
+assert.match(
+  assignmentResultsSource,
+  /function getDateTimestamp\(value: Date \| null\)[\s\S]*const timestamp = value\?\.getTime\(\) \?\? 0[\s\S]*Number\.isFinite\(timestamp\) \? timestamp : 0/,
+  'Assignment result analysis should normalize invalid completed-at dates before sorting student summaries.'
+);
 assert.doesNotMatch(
   assignmentResultsSource,
   /limit: 3/,
@@ -33015,6 +33020,62 @@ assert.equal(
     'browser-token'
   ),
   false
+);
+
+const invalidCompletedAtStudentSummaryAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('not-a-date'),
+      id: 'invalid-date-attempt',
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        correctItemCount: 0,
+        earnedPoints: 0,
+        totalPoints: 1,
+      },
+      score: 0,
+      studentName: 'Casey',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-04T10:00:00.000Z'),
+      id: 'valid-date-attempt',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'casey',
+    },
+  ],
+  runtimeItems: resultRuntimeItems.slice(0, 1),
+});
+assert.deepEqual(
+  invalidCompletedAtStudentSummaryAnalysis.students.map((student) => ({
+    latestAccuracy: student.latestAccuracy,
+    lastCompletedAt: student.lastCompletedAt,
+    studentLabel: student.studentLabel,
+  })),
+  [
+    {
+      latestAccuracy: 100,
+      lastCompletedAt: new Date('2026-01-04T10:00:00.000Z'),
+      studentLabel: 'casey',
+    },
+  ]
 );
 
 const resultAnalysisWithUnscoredAttempt = analyzeAssignmentResults({
