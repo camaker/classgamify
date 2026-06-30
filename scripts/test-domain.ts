@@ -4531,6 +4531,11 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /export function buildAssignmentAttemptRowMetricLabels[\s\S]*normalizeAssignmentAttemptRowMetricCount\([\s\S]*resultJson\?\.totalPoints[\s\S]*max: totalPoints[\s\S]*normalizeAssignmentAttemptRowAccuracy/,
+  'Assignment attempt row metric labels should normalize bounded counts before formatting labels.'
+);
+assert.match(
+  assignmentResultViewSource,
   /buildAssignmentAttemptRowDisplay[\s\S]*buildAssignmentAttemptRowMetricLabels\(attempt\)/,
   'Assignment attempt row displays should consume prepared metric labels.'
 );
@@ -35431,6 +35436,40 @@ assert.deepEqual(
     accuracyLabel: '-',
     answeredLabel: '-',
     scoreLabel: '-',
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowMetricLabels({
+    maxScore: 2,
+    resultJson: {
+      accuracy: 150,
+      completedItemCount: 4,
+      durationSeconds: 62,
+      totalPoints: 2,
+    },
+    score: 5,
+  }),
+  {
+    accuracyLabel: '100%',
+    answeredLabel: '2/2',
+    scoreLabel: '2/2',
+  }
+);
+assert.deepEqual(
+  buildAssignmentAttemptRowMetricLabels({
+    maxScore: 2,
+    resultJson: {
+      accuracy: -20,
+      completedItemCount: 1.9,
+      durationSeconds: 62,
+      totalPoints: 2.9,
+    },
+    score: -1,
+  }),
+  {
+    accuracyLabel: '0%',
+    answeredLabel: '1/2',
+    scoreLabel: '0/2',
   }
 );
 assert.deepEqual(

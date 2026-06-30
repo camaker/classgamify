@@ -1167,19 +1167,60 @@ export function buildAssignmentAttemptRowMetricLabels(
     'maxScore' | 'resultJson' | 'score'
   >
 ): AssignmentResultAttemptRowMetricLabels {
+  const totalPoints = normalizeAssignmentAttemptRowMetricCount(
+    attempt.resultJson?.totalPoints ?? 0
+  );
+  const completedItemCount = normalizeAssignmentAttemptRowMetricCount(
+    attempt.resultJson?.completedItemCount ?? 0,
+    {
+      max: totalPoints,
+    }
+  );
+  const maxScore = normalizeAssignmentAttemptRowMetricCount(
+    attempt.maxScore ?? 0
+  );
+  const score = normalizeAssignmentAttemptRowMetricCount(attempt.score ?? 0, {
+    max: maxScore,
+  });
+
   return {
     accuracyLabel: formatAssignmentResultPercent(
-      attempt.resultJson?.accuracy ?? 0
+      normalizeAssignmentAttemptRowAccuracy(attempt.resultJson?.accuracy ?? 0)
     ),
     answeredLabel: formatAssignmentResultFraction(
-      attempt.resultJson?.completedItemCount ?? 0,
-      attempt.resultJson?.totalPoints ?? 0
+      completedItemCount,
+      totalPoints
     ),
-    scoreLabel: formatAssignmentResultFraction(
-      attempt.score ?? 0,
-      attempt.maxScore ?? 0
-    ),
+    scoreLabel: formatAssignmentResultFraction(score, maxScore),
   };
+}
+
+function normalizeAssignmentAttemptRowMetricCount(
+  value: number | null | undefined,
+  options?: {
+    max?: number;
+  }
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return Number.NaN;
+  }
+
+  const normalizedValue = Math.max(0, Math.floor(value));
+  if (options?.max === undefined || !Number.isFinite(options.max)) {
+    return normalizedValue;
+  }
+
+  return Math.min(normalizedValue, options.max);
+}
+
+function normalizeAssignmentAttemptRowAccuracy(
+  value: number | null | undefined
+) {
+  if (value === null || value === undefined || !Number.isFinite(value)) {
+    return Number.NaN;
+  }
+
+  return Math.min(100, Math.max(0, value));
 }
 
 export function buildAssignmentAttemptRowViews<
