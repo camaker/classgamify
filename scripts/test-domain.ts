@@ -370,9 +370,11 @@ import {
 import { buildSettingsBillingCardViewModel } from '@/payment/billing-view';
 import type { PricePlan, Subscription } from '@/payment/types';
 import {
+  AssignmentAttemptAnswerValidationError,
   assertSubmittedAnswersMatchRuntimeItems,
   getAttemptAnswerRuntimeItemEntries,
   getAttemptAnswerRuntimeItemIds,
+  isAssignmentAttemptAnswerValidationError,
   normalizeAttemptAnswerItemId,
   normalizeSubmittedAttemptAnswers,
 } from '@/assignments/attempt-answers';
@@ -943,6 +945,19 @@ function getSourceSlice(
   assert.notEqual(end, -1, `Missing source end marker: ${endMarker}`);
 
   return source.slice(start, end);
+}
+
+function getAttemptAnswerValidationError(action: () => void) {
+  let error: unknown;
+
+  try {
+    action();
+  } catch (caught) {
+    error = caught;
+  }
+
+  assert.ok(isAssignmentAttemptAnswerValidationError(error));
+  return error;
 }
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
@@ -9710,7 +9725,19 @@ assert.equal(
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
+    new AssignmentAttemptAnswerValidationError('unknown-item')
+  ),
+  'Submitted answers include an unknown item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
     new Error('Submitted answers include a duplicate item.')
+  ),
+  'Submitted answers include a duplicate item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new AssignmentAttemptAnswerValidationError('duplicate-item')
   ),
   'Submitted answers include a duplicate item.'
 );
@@ -9719,6 +9746,18 @@ assert.equal(
     new Error('Submitted answers exceed assignment item count.')
   ),
   'Submitted answers exceed assignment item count.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new AssignmentAttemptAnswerValidationError('too-many')
+  ),
+  'Submitted answers exceed assignment item count.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureMessage(
+    new AssignmentAttemptAnswerValidationError('duplicate-runtime-item')
+  ),
+  'Attempt could not be saved.'
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -21978,6 +22017,26 @@ assert.match(
 );
 assert.match(
   attemptAnswersSource,
+  /export type AssignmentAttemptAnswerValidationErrorCode =[\s\S]*'duplicate-item'[\s\S]*'duplicate-runtime-item'[\s\S]*'too-many'[\s\S]*'unknown-item'[\s\S]*export class AssignmentAttemptAnswerValidationError extends Error[\s\S]*readonly code: AssignmentAttemptAnswerValidationErrorCode/,
+  'Attempt answer validation errors should expose stable error codes alongside localized messages.'
+);
+assert.match(
+  attemptAnswersSource,
+  /throw new AssignmentAttemptAnswerValidationError\('too-many'\)[\s\S]*throw new AssignmentAttemptAnswerValidationError\('unknown-item'\)[\s\S]*throw new AssignmentAttemptAnswerValidationError\('duplicate-item'\)[\s\S]*throw new AssignmentAttemptAnswerValidationError\(\s*'duplicate-runtime-item'\s*\)/,
+  'Attempt answer validation should throw structured validation errors for every submission failure branch.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /isAssignmentAttemptAnswerValidationError\(error\)[\s\S]*isSafeStudentAttemptAnswerValidationErrorCode\(error\.code\)[\s\S]*return error\.message/,
+  'Student submission failure copy should allow structured attempt-answer validation errors by code.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /function isSafeStudentAttemptAnswerValidationErrorCode[\s\S]*duplicate-item[\s\S]*too-many[\s\S]*unknown-item/,
+  'Student submission failure copy should whitelist only student-actionable attempt-answer error codes.'
+);
+assert.match(
+  attemptAnswersSource,
   /assertSubmittedAnswersMatchRuntimeItems[\s\S]*getAttemptAnswerRuntimeItemIds\(\{[\s\S]*runtimeItems,[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)[\s\S]*!itemId \|\| !runtimeItemIds\.has\(itemId\)/,
   'Attempt answer validation should reject blank submitted item ids and compare normalized runtime ids.'
 );
@@ -34227,79 +34286,123 @@ assert.doesNotThrow(() =>
   })
 );
 
-assert.throws(
-  () =>
-    assertSubmittedAnswersMatchRuntimeItems({
-      answers: [
-        { itemId: 'item-1' },
-        { itemId: 'item-2' },
-        { itemId: 'item-3' },
-        { itemId: 'item-4' },
-      ],
-      runtimeItems: submissionRuntimeItems,
-    }),
-  /exceed assignment item count/
+const tooManyAttemptAnswersError = getAttemptAnswerValidationError(() =>
+  assertSubmittedAnswersMatchRuntimeItems({
+    answers: [
+      { itemId: 'item-1' },
+      { itemId: 'item-2' },
+      { itemId: 'item-3' },
+      { itemId: 'item-4' },
+    ],
+    runtimeItems: submissionRuntimeItems,
+  })
+);
+assert.deepEqual(
+  {
+    code: tooManyAttemptAnswersError.code,
+    message: tooManyAttemptAnswersError.message,
+  },
+  {
+    code: 'too-many',
+    message: 'Submitted answers exceed assignment item count.',
+  }
 );
 
-assert.throws(
-  () =>
-    assertSubmittedAnswersMatchRuntimeItems({
-      answers: [{ itemId: 'unknown-item' }],
-      runtimeItems: submissionRuntimeItems,
-    }),
-  /unknown item/
+const unknownAttemptAnswerError = getAttemptAnswerValidationError(() =>
+  assertSubmittedAnswersMatchRuntimeItems({
+    answers: [{ itemId: 'unknown-item' }],
+    runtimeItems: submissionRuntimeItems,
+  })
 );
-assert.throws(
-  () =>
+assert.deepEqual(
+  {
+    code: unknownAttemptAnswerError.code,
+    message: unknownAttemptAnswerError.message,
+  },
+  {
+    code: 'unknown-item',
+    message: 'Submitted answers include an unknown item.',
+  }
+);
+assert.deepEqual(
+  getAttemptAnswerValidationError(() =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: '  ' }],
       runtimeItems: submissionRuntimeItems,
-    }),
-  /unknown item/
+    })
+  ).code,
+  'unknown-item'
 );
 
-assert.throws(
-  () =>
-    assertSubmittedAnswersMatchRuntimeItems({
-      answers: [{ itemId: 'item-1' }, { itemId: 'item-1' }],
-      runtimeItems: submissionRuntimeItems,
-    }),
-  /duplicate item/
+const duplicateAttemptAnswerError = getAttemptAnswerValidationError(() =>
+  assertSubmittedAnswersMatchRuntimeItems({
+    answers: [{ itemId: 'item-1' }, { itemId: 'item-1' }],
+    runtimeItems: submissionRuntimeItems,
+  })
 );
-
-assert.throws(
-  () =>
+assert.deepEqual(
+  {
+    code: duplicateAttemptAnswerError.code,
+    message: duplicateAttemptAnswerError.message,
+  },
+  {
+    code: 'duplicate-item',
+    message: 'Submitted answers include a duplicate item.',
+  }
+);
+assert.deepEqual(
+  getAttemptAnswerValidationError(() =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }, { itemId: ' ｉｔｅｍ－１ ' }],
       runtimeItems: submissionRuntimeItems,
-    }),
-  /duplicate item/
+    })
+  ).code,
+  'duplicate-item'
 );
 
-assert.throws(
-  () =>
+const duplicateRuntimeItemError = getAttemptAnswerValidationError(() =>
+  assertSubmittedAnswersMatchRuntimeItems({
+    answers: [{ itemId: 'item-1' }, { itemId: 'item-2' }],
+    runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
+  })
+);
+assert.deepEqual(
+  {
+    code: duplicateRuntimeItemError.code,
+    message: duplicateRuntimeItemError.message,
+  },
+  {
+    code: 'duplicate-runtime-item',
+    message: 'Assignment runtime items include a duplicate item id.',
+  }
+);
+assert.deepEqual(
+  getAttemptAnswerValidationError(() =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }, { itemId: 'item-2' }],
-      runtimeItems: [{ id: 'item-1' }, { id: 'item-1' }, { id: 'item-2' }],
-    }),
-  /runtime items include a duplicate item id/
+      runtimeItems: [{ id: 'item-1' }, { id: ' ｉｔｅｍ－１ ' }],
+    })
+  ).code,
+  'duplicate-runtime-item'
 );
 
-assert.throws(
-  () =>
+assert.deepEqual(
+  getAttemptAnswerValidationError(() =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }],
       runtimeItems: [{ id: 'item-1' }, { id: ' ｉｔｅｍ－１ ' }],
-    }),
-  /runtime items include a duplicate item id/
+    })
+  ).code,
+  'duplicate-runtime-item'
 );
-assert.throws(
-  () =>
+assert.deepEqual(
+  getAttemptAnswerValidationError(() =>
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }],
       runtimeItems: [{ id: 'item-1' }, { id: '  ' }],
-    }),
-  /runtime items include a duplicate item id/
+    })
+  ).code,
+  'duplicate-runtime-item'
 );
 
 assert.equal(

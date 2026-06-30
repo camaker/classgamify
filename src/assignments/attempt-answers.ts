@@ -16,6 +16,22 @@ export type AttemptAnswerRuntimeItemEntry = {
   originalIds: string[];
 };
 
+export type AssignmentAttemptAnswerValidationErrorCode =
+  | 'duplicate-item'
+  | 'duplicate-runtime-item'
+  | 'too-many'
+  | 'unknown-item';
+
+export class AssignmentAttemptAnswerValidationError extends Error {
+  readonly code: AssignmentAttemptAnswerValidationErrorCode;
+
+  constructor(code: AssignmentAttemptAnswerValidationErrorCode) {
+    super(getAssignmentAttemptAnswerValidationErrorMessage(code));
+    this.code = code;
+    this.name = 'AssignmentAttemptAnswerValidationError';
+  }
+}
+
 export function assertSubmittedAnswersMatchRuntimeItems({
   answers,
   runtimeItems,
@@ -26,7 +42,7 @@ export function assertSubmittedAnswersMatchRuntimeItems({
   assertRuntimeItemIdsAreUnique(runtimeItems);
 
   if (answers.length > runtimeItems.length) {
-    throw new Error(m.assignment_attempt_answers_error_too_many());
+    throw new AssignmentAttemptAnswerValidationError('too-many');
   }
 
   const runtimeItemIds = new Set(
@@ -40,11 +56,11 @@ export function assertSubmittedAnswersMatchRuntimeItems({
     const itemId = normalizeAttemptAnswerItemId(answer.itemId);
 
     if (!itemId || !runtimeItemIds.has(itemId)) {
-      throw new Error(m.assignment_attempt_answers_error_unknown_item());
+      throw new AssignmentAttemptAnswerValidationError('unknown-item');
     }
 
     if (submittedItemIds.has(itemId)) {
-      throw new Error(m.assignment_attempt_answers_error_duplicate_item());
+      throw new AssignmentAttemptAnswerValidationError('duplicate-item');
     }
 
     submittedItemIds.add(itemId);
@@ -125,11 +141,33 @@ function assertRuntimeItemIdsAreUnique(
     runtimeItems,
   })) {
     if (!entry.itemId || entry.originalIds.length > 1) {
-      throw new Error(
-        m.assignment_attempt_answers_error_duplicate_runtime_item()
+      throw new AssignmentAttemptAnswerValidationError(
+        'duplicate-runtime-item'
       );
     }
   }
+}
+
+export function isAssignmentAttemptAnswerValidationError(
+  error: unknown
+): error is AssignmentAttemptAnswerValidationError {
+  return error instanceof AssignmentAttemptAnswerValidationError;
+}
+
+function getAssignmentAttemptAnswerValidationErrorMessage(
+  code: AssignmentAttemptAnswerValidationErrorCode
+) {
+  if (code === 'duplicate-item') {
+    return m.assignment_attempt_answers_error_duplicate_item();
+  }
+  if (code === 'duplicate-runtime-item') {
+    return m.assignment_attempt_answers_error_duplicate_runtime_item();
+  }
+  if (code === 'too-many') {
+    return m.assignment_attempt_answers_error_too_many();
+  }
+
+  return m.assignment_attempt_answers_error_unknown_item();
 }
 
 export function normalizeAttemptAnswerItemId(value: string | undefined) {

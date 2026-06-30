@@ -12,7 +12,9 @@ import {
 import {
   getAttemptAnswerRuntimeItemEntries,
   getAttemptAnswerRuntimeItemIds,
+  isAssignmentAttemptAnswerValidationError,
   normalizeAttemptAnswerItemId,
+  type AssignmentAttemptAnswerValidationErrorCode,
   type AttemptAnswerRuntimeItem,
   type AttemptAnswerRuntimeItemEntry,
 } from '@/assignments/attempt-answers';
@@ -390,10 +392,25 @@ export function resolveStudentAttemptSubmissionFailureMessage(error: unknown) {
   const fallbackMessage = STUDENT_RUNNER_COPY.submissionFailureMessage;
   if (!(error instanceof Error)) return fallbackMessage;
 
+  if (
+    isAssignmentAttemptAnswerValidationError(error) &&
+    isSafeStudentAttemptAnswerValidationErrorCode(error.code)
+  ) {
+    return error.message;
+  }
+
   const message = error.message.trim();
   return getSafeStudentAttemptSubmissionFailureMessages().includes(message)
     ? message
     : fallbackMessage;
+}
+
+function isSafeStudentAttemptAnswerValidationErrorCode(
+  code: AssignmentAttemptAnswerValidationErrorCode
+) {
+  return (
+    code === 'duplicate-item' || code === 'too-many' || code === 'unknown-item'
+  );
 }
 
 function getSafeStudentAttemptSubmissionFailureMessages() {
