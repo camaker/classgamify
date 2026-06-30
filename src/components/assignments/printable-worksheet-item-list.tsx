@@ -44,35 +44,44 @@ function PrintableWorksheetItem({
     <section
       data-print-item
       data-print-item-layout={itemView.layout}
-      className="break-inside-avoid rounded-lg border bg-background p-4"
+      className={cn(
+        'break-inside-avoid rounded-lg border bg-background p-4',
+        itemView.layout === 'matching'
+          ? 'sm:grid sm:grid-cols-[1fr_18rem] sm:gap-4'
+          : ''
+      )}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-muted-foreground text-xs">
-            {itemView.headingLabel}
-          </p>
-          <h2 className="mt-2 font-semibold leading-6">{itemView.prompt}</h2>
+      <div>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-muted-foreground text-xs">
+              {itemView.headingLabel}
+            </p>
+            <h2 className="mt-2 font-semibold leading-6">{itemView.prompt}</h2>
+          </div>
+          <Badge variant="outline" className="rounded-md">
+            {itemView.responseHelp}
+          </Badge>
         </div>
-        <Badge variant="outline" className="rounded-md">
-          {itemView.responseHelp}
-        </Badge>
+        <p className="mt-3 text-muted-foreground text-xs">
+          {itemView.responseModeLabel}
+        </p>
       </div>
-      <p className="mt-3 text-muted-foreground text-xs">
-        {itemView.responseModeLabel}
-      </p>
-      <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
-      <div className="mt-4 grid gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="font-medium text-muted-foreground text-xs">
-            {itemView.answerAreaLabel}
-          </p>
-          <p className="text-muted-foreground text-xs">
-            {itemView.answerLineSummary}
-          </p>
+      <div className={cn(itemView.layout === 'matching' ? 'mt-4 sm:mt-0' : '')}>
+        <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
+        <div className="mt-4 grid gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-medium text-muted-foreground text-xs">
+              {itemView.answerAreaLabel}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              {itemView.answerLineSummary}
+            </p>
+          </div>
+          {itemView.answerLines.map((line) => (
+            <div key={line.key} className="h-8 border-b" />
+          ))}
         </div>
-        {itemView.answerLines.map((line) => (
-          <div key={line.key} className="h-8 border-b" />
-        ))}
       </div>
     </section>
   );
@@ -94,7 +103,7 @@ function PrintableWorksheetChoiceBank({
   }
 
   return (
-    <div className="mt-4 grid gap-2">
+    <div className="grid gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         {choiceBank.label ? (
           <p className="font-medium text-muted-foreground text-xs">
