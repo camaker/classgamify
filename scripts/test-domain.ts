@@ -900,6 +900,7 @@ import {
   isStudentAnswerFilled,
   normalizeAttemptUnansweredItemCount,
   normalizeStudentAnswersForRuntimeItems,
+  resolveStudentAttemptSubmissionFailureCode,
   resolveStudentAttemptSubmissionFailureMessage,
   resolveStudentAttemptAnonymousToken,
 } from '@/assignments/student-submission';
@@ -9801,10 +9802,22 @@ assert.equal(
   'This assignment has reached its attempt limit.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('This assignment has reached its attempt limit.')
+  ),
+  'attempt-limit-reached'
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
     new Error('Assignment runtime items include a duplicate item id.')
   ),
   'Attempt could not be saved.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('Assignment runtime items include a duplicate item id.')
+  ),
+  undefined
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -9813,10 +9826,22 @@ assert.equal(
   'Submitted answers include an unknown item.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('Submitted answers include an unknown item.')
+  ),
+  'unknown-item'
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
     new AssignmentAttemptAnswerValidationError('unknown-item')
   ),
   'Submitted answers include an unknown item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new AssignmentAttemptAnswerValidationError('unknown-item')
+  ),
+  'unknown-item'
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -9825,10 +9850,22 @@ assert.equal(
   'Submitted answers include a duplicate item.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('Submitted answers include a duplicate item.')
+  ),
+  'duplicate-item'
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
     new AssignmentAttemptAnswerValidationError('duplicate-item')
   ),
   'Submitted answers include a duplicate item.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new AssignmentAttemptAnswerValidationError('duplicate-item')
+  ),
+  'duplicate-item'
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -9837,10 +9874,22 @@ assert.equal(
   'Submitted answers exceed assignment item count.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('Submitted answers exceed assignment item count.')
+  ),
+  'too-many'
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
     new AssignmentAttemptAnswerValidationError('too-many')
   ),
   'Submitted answers exceed assignment item count.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new AssignmentAttemptAnswerValidationError('too-many')
+  ),
+  'too-many'
 );
 assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
@@ -9849,14 +9898,30 @@ assert.equal(
   'Attempt could not be saved.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new AssignmentAttemptAnswerValidationError('duplicate-runtime-item')
+  ),
+  undefined
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage(
     new Error('database timeout for assignment_attempts')
   ),
   'Attempt could not be saved.'
 );
 assert.equal(
+  resolveStudentAttemptSubmissionFailureCode(
+    new Error('database timeout for assignment_attempts')
+  ),
+  undefined
+);
+assert.equal(
   resolveStudentAttemptSubmissionFailureMessage('network closed'),
   'Attempt could not be saved.'
+);
+assert.equal(
+  resolveStudentAttemptSubmissionFailureCode('network closed'),
+  undefined
 );
 assert.deepEqual(buildStudentRunnerMissingView('not-found'), {
   description:
@@ -22218,13 +22283,38 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /isAssignmentAttemptAnswerValidationError\(error\)[\s\S]*isSafeStudentAttemptAnswerValidationErrorCode\(error\.code\)[\s\S]*return error\.message/,
+  /export type StudentAttemptSubmissionFailureCode =[\s\S]*AssignmentAttemptAnswerValidationErrorCode[\s\S]*'anonymous-token-required'[\s\S]*'assignment-closed'[\s\S]*'assignment-expired'[\s\S]*'assignment-not-found'[\s\S]*'assignment-not-published'[\s\S]*'attempt-limit-reached'[\s\S]*'student-name-required'/,
+  'Student submission failure copy should expose stable failure codes for student-actionable submission errors.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /type SafeStudentAttemptSubmissionFailureCode = Exclude<[\s\S]*StudentAttemptSubmissionFailureCode,[\s\S]*'duplicate-runtime-item'[\s\S]*>/,
+  'Student submission failure copy should exclude internal runtime item errors from the safe display-code set.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /resolveStudentAttemptSubmissionFailureMessage[\s\S]*const failureCode = resolveStudentAttemptSubmissionFailureCode\(error\)[\s\S]*getSafeStudentAttemptSubmissionFailureMessage\(failureCode\)/,
+  'Student submission failure copy should resolve display messages from stable failure codes.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /isAssignmentAttemptAnswerValidationError\(error\)[\s\S]*isSafeStudentAttemptAnswerValidationErrorCode\(error\.code\)[\s\S]*\? error\.code[\s\S]*: undefined/,
   'Student submission failure copy should allow structured attempt-answer validation errors by code.'
 );
 assert.match(
   studentRunnerSubmissionSource,
   /function isSafeStudentAttemptAnswerValidationErrorCode[\s\S]*duplicate-item[\s\S]*too-many[\s\S]*unknown-item/,
   'Student submission failure copy should whitelist only student-actionable attempt-answer error codes.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /getSafeStudentAttemptSubmissionFailureCodeByMessage[\s\S]*getSafeStudentAttemptSubmissionFailureEntries\(\)\.find[\s\S]*entry\.message === message[\s\S]*\?\.code/,
+  'Student submission failure copy should keep server Error-message compatibility through a code lookup table.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /getSafeStudentAttemptSubmissionFailureMessages/,
+  'Student submission failure copy should not keep a bare localized-message whitelist.'
 );
 assert.match(
   attemptAnswersSource,

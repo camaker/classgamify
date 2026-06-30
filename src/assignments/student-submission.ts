@@ -119,6 +119,21 @@ export type StudentAttemptSubmissionBlockedReason =
   | 'missing-student-name'
   | 'read-only';
 
+export type StudentAttemptSubmissionFailureCode =
+  | AssignmentAttemptAnswerValidationErrorCode
+  | 'anonymous-token-required'
+  | 'assignment-closed'
+  | 'assignment-expired'
+  | 'assignment-not-found'
+  | 'assignment-not-published'
+  | 'attempt-limit-reached'
+  | 'student-name-required';
+
+type SafeStudentAttemptSubmissionFailureCode = Exclude<
+  StudentAttemptSubmissionFailureCode,
+  'duplicate-runtime-item'
+>;
+
 export type StudentAttemptSubmissionConfirmIncompleteReason =
   'unanswered-items';
 
@@ -390,19 +405,53 @@ export function getStudentRunnerCopy(): StudentRunnerCopy {
 
 export function resolveStudentAttemptSubmissionFailureMessage(error: unknown) {
   const fallbackMessage = STUDENT_RUNNER_COPY.submissionFailureMessage;
-  if (!(error instanceof Error)) return fallbackMessage;
+  const failureCode = resolveStudentAttemptSubmissionFailureCode(error);
 
-  if (
-    isAssignmentAttemptAnswerValidationError(error) &&
-    isSafeStudentAttemptAnswerValidationErrorCode(error.code)
-  ) {
-    return error.message;
+  return failureCode
+    ? getSafeStudentAttemptSubmissionFailureMessage(failureCode)
+    : fallbackMessage;
+}
+
+export function resolveStudentAttemptSubmissionFailureCode(
+  error: unknown
+): StudentAttemptSubmissionFailureCode | undefined {
+  if (!(error instanceof Error)) return undefined;
+
+  if (isAssignmentAttemptAnswerValidationError(error)) {
+    return isSafeStudentAttemptAnswerValidationErrorCode(error.code)
+      ? error.code
+      : undefined;
   }
 
   const message = error.message.trim();
-  return getSafeStudentAttemptSubmissionFailureMessages().includes(message)
-    ? message
-    : fallbackMessage;
+  return getSafeStudentAttemptSubmissionFailureCodeByMessage(message);
+}
+
+function getSafeStudentAttemptSubmissionFailureMessage(
+  code: SafeStudentAttemptSubmissionFailureCode
+) {
+  switch (code) {
+    case 'anonymous-token-required':
+      return m.assignment_api_error_anonymous_token_required();
+    case 'assignment-closed':
+      return m.assignment_api_error_assignment_closed();
+    case 'assignment-expired':
+      return m.assignment_api_error_assignment_expired();
+    case 'assignment-not-found':
+      return m.assignment_api_error_assignment_not_found();
+    case 'assignment-not-published':
+      return m.assignment_api_error_assignment_not_published();
+    case 'attempt-limit-reached':
+      return m.assignment_api_error_attempt_limit_reached();
+    case 'student-name-required':
+      return m.assignment_api_error_student_name_required();
+    case 'duplicate-item':
+      return m.assignment_attempt_answers_error_duplicate_item();
+    case 'too-many':
+      return m.assignment_attempt_answers_error_too_many();
+    case 'unknown-item':
+      return m.assignment_attempt_answers_error_unknown_item();
+  }
 }
 
 function isSafeStudentAttemptAnswerValidationErrorCode(
@@ -413,18 +462,59 @@ function isSafeStudentAttemptAnswerValidationErrorCode(
   );
 }
 
-function getSafeStudentAttemptSubmissionFailureMessages() {
+function getSafeStudentAttemptSubmissionFailureCodeByMessage(
+  message: string
+): StudentAttemptSubmissionFailureCode | undefined {
+  return getSafeStudentAttemptSubmissionFailureEntries().find(
+    (entry) => entry.message === message
+  )?.code;
+}
+
+function getSafeStudentAttemptSubmissionFailureEntries(): Array<{
+  code: SafeStudentAttemptSubmissionFailureCode;
+  message: string;
+}> {
   return [
-    m.assignment_api_error_anonymous_token_required(),
-    m.assignment_api_error_assignment_closed(),
-    m.assignment_api_error_assignment_expired(),
-    m.assignment_api_error_assignment_not_found(),
-    m.assignment_api_error_assignment_not_published(),
-    m.assignment_api_error_attempt_limit_reached(),
-    m.assignment_api_error_student_name_required(),
-    m.assignment_attempt_answers_error_duplicate_item(),
-    m.assignment_attempt_answers_error_too_many(),
-    m.assignment_attempt_answers_error_unknown_item(),
+    {
+      code: 'anonymous-token-required',
+      message: m.assignment_api_error_anonymous_token_required(),
+    },
+    {
+      code: 'assignment-closed',
+      message: m.assignment_api_error_assignment_closed(),
+    },
+    {
+      code: 'assignment-expired',
+      message: m.assignment_api_error_assignment_expired(),
+    },
+    {
+      code: 'assignment-not-found',
+      message: m.assignment_api_error_assignment_not_found(),
+    },
+    {
+      code: 'assignment-not-published',
+      message: m.assignment_api_error_assignment_not_published(),
+    },
+    {
+      code: 'attempt-limit-reached',
+      message: m.assignment_api_error_attempt_limit_reached(),
+    },
+    {
+      code: 'student-name-required',
+      message: m.assignment_api_error_student_name_required(),
+    },
+    {
+      code: 'duplicate-item',
+      message: m.assignment_attempt_answers_error_duplicate_item(),
+    },
+    {
+      code: 'too-many',
+      message: m.assignment_attempt_answers_error_too_many(),
+    },
+    {
+      code: 'unknown-item',
+      message: m.assignment_attempt_answers_error_unknown_item(),
+    },
   ];
 }
 
