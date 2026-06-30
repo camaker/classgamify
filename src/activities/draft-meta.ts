@@ -238,12 +238,12 @@ export function buildActivityDraftMeta({
     currentTemplateType,
   });
   const remixSummary = buildTemplateRemixSummary(remixPlan);
-  const suggestedTemplates = remixSummary.suggestedTemplateOptions.map(
+  const readyTemplateOptions = remixSummary.readyTemplateOptions;
+  const suggestedTemplateOptions = remixSummary.suggestedTemplateOptions;
+  const suggestedTemplates = suggestedTemplateOptions.map(
     (option) => option.shortName
   );
-  const readyTemplates = remixSummary.readyTemplateOptions.map(
-    (option) => option.shortName
-  );
+  const readyTemplates = readyTemplateOptions.map((option) => option.shortName);
   const reviewChecklistItems = buildDraftReviewChecklistItems({
     content,
     lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
@@ -259,13 +259,13 @@ export function buildActivityDraftMeta({
       vocabulary: content.vocabulary.length,
     },
     questionChoiceReadiness: buildQuestionChoiceReadinessSummary({ content }),
-    readyTemplateCount: remixPlan.readyOptions.length,
-    readyTemplateOptions: remixSummary.readyTemplateOptions,
+    readyTemplateCount: readyTemplateOptions.length,
+    readyTemplateOptions,
     readyTemplates,
     reviewChecklist: reviewChecklistItems.map((item) => item.label),
     reviewChecklistItems,
-    suggestedTemplateCount: suggestedTemplates.length,
-    suggestedTemplateOptions: remixSummary.suggestedTemplateOptions,
+    suggestedTemplateCount: suggestedTemplateOptions.length,
+    suggestedTemplateOptions,
     suggestedTemplates,
     templateReadiness: remixPlan.options.map((option) => ({
       diagnosis: option.diagnosis,

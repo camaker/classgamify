@@ -3779,6 +3779,11 @@ assert.match(
   /reviewChecklist: reviewChecklistItems\.map\(\(item\) => item\.label\)[\s\S]*reviewChecklistItems/,
   'AI draft meta should derive compatibility checklist labels from structured review checklist items.'
 );
+assert.match(
+  activityDraftMetaSource,
+  /const readyTemplateOptions = remixSummary\.readyTemplateOptions[\s\S]*const suggestedTemplateOptions = remixSummary\.suggestedTemplateOptions[\s\S]*readyTemplateCount: readyTemplateOptions\.length[\s\S]*suggestedTemplateCount: suggestedTemplateOptions\.length/,
+  'AI draft meta should derive ready and suggested template counts from the exported option lists.'
+);
 assert.doesNotMatch(
   activeLocaleMessageText,
   /activity_draft_meta_checklist_legacy_description/,
