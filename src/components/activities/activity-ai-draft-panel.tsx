@@ -151,7 +151,7 @@ function ActivityAiDraftSourceControls({
           <div className="flex flex-wrap gap-1.5">
             {panelView.sourceMaterialNoteViews.map((noteView) => (
               <Badge
-                key={noteView.displayText}
+                key={noteView.key}
                 variant="outline"
                 className="max-w-full rounded-md"
               >

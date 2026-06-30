@@ -3337,7 +3337,7 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /ActivitySourceMaterialDraftNoteView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView =\s*ActivitySourceMaterialDraftNoteView & \{[\s\S]*displayText: string;/,
+  /ActivitySourceMaterialDraftNoteView[\s\S]*export type ActivityEditorSourceMaterialDraftNoteView =\s*ActivitySourceMaterialDraftNoteView & \{[\s\S]*displayText: string;[\s\S]*key: string;/,
   'Activity editor AI draft source notes should compose the explicit draft-source note contract.'
 );
 assert.doesNotMatch(
@@ -3394,6 +3394,16 @@ assert.match(
   activityAiDraftPanelSource,
   /function ActivityAiDraftSourceControls[\s\S]*panelView\.badgeLabel[\s\S]*panelView\.reviewNote[\s\S]*panelView\.safeSourceDescription[\s\S]*panelView\.sourceTextLabel[\s\S]*panelView\.canSyncDraftSourceMaterials[\s\S]*panelView\.syncMaterialsHelpText[\s\S]*panelView\.sourcePlaceholder[\s\S]*panelView\.sourceMaterialNoteViews/,
   'Activity AI draft source controls should render prepared labels and sync gate state.'
+);
+assert.match(
+  activityAiDraftPanelSource,
+  /panelView\.sourceMaterialNoteViews\.map[\s\S]*key=\{noteView\.key\}/,
+  'Activity AI draft source controls should key source material notes by stable note keys.'
+);
+assert.doesNotMatch(
+  activityAiDraftPanelSource,
+  /key=\{noteView\.displayText\}/,
+  'Activity AI draft source controls should not key source material notes by display text.'
 );
 assert.match(
   activityAiDraftPanelSource,
@@ -3676,6 +3686,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export type ActivityDraftMetaSummarySourceMaterialNoteView =[\s\S]*ActivitySourceMaterialDraftNoteView & \{[\s\S]*displayText: string;[\s\S]*key: string;/,
+  'AI draft meta source material note views should expose stable keys separately from display text.'
+);
+assert.match(
+  activityDraftMetaSource,
   /QuestionChoiceReadinessStatus[\s\S]*export type ActivityDraftReviewChecklistStatus =[\s\S]*status: ActivityDraftReviewChecklistStatus;[\s\S]*status: QuestionChoiceReadinessStatus;/,
   'AI draft meta domain should use explicit checklist and quiz-choice status contracts.'
 );
@@ -3763,6 +3778,16 @@ assert.match(
   activityDraftMetaSummarySource,
   /summaryView\.sourceMaterialNoteViews\.map[\s\S]*noteView\.displayText/,
   'AI draft summary component should render prepared source-material provenance display text.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.sourceMaterialNoteViews\.map[\s\S]*key=\{noteView\.key\}/,
+  'AI draft summary component should key source-material provenance chips by stable note keys.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /key=\{noteView\.displayText\}/,
+  'AI draft summary component should not key source-material provenance chips by display text.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -28434,11 +28459,13 @@ assert.deepEqual(
     sourceMaterialNoteViews: [
       {
         displayText: 'Worksheet document · Weather worksheet.pdf',
+        key: 'worksheet-document\u0000weather worksheet.pdf',
         kindLabel: 'Worksheet document',
         name: 'Weather worksheet.pdf',
       },
       {
         displayText: 'Audio · Weather listening.mp3',
+        key: 'audio\u0000weather listening.mp3',
         kindLabel: 'Audio',
         name: 'Weather listening.mp3',
       },
@@ -31750,11 +31777,13 @@ assert.equal(
 assert.deepEqual(fallbackDraftMetaSummary.sourceMaterialNoteViews, [
   {
     displayText: 'Worksheet document · Weather worksheet.pdf',
+    key: 'worksheet-document\u0000weather worksheet.pdf',
     kindLabel: 'Worksheet document',
     name: 'Weather worksheet.pdf',
   },
   {
     displayText: 'Audio · Weather listening.mp3',
+    key: 'audio\u0000weather listening.mp3',
     kindLabel: 'Audio',
     name: 'Weather listening.mp3',
   },
@@ -31836,6 +31865,7 @@ const dedupedMaterialDraftMetaSummary = buildActivityDraftMetaSummaryView({
 assert.deepEqual(dedupedMaterialDraftMetaSummary.sourceMaterialNoteViews, [
   {
     displayText: 'Worksheet document · Unit 1.pdf',
+    key: 'worksheet-document\u0000unit 1.pdf',
     kindLabel: 'Worksheet document',
     name: 'Unit 1.pdf',
   },

@@ -30,6 +30,7 @@ import {
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftSummary,
+  getActivitySourceMaterialDraftNoteIdentityKey,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
   normalizeActivityDraftSourceText,
@@ -153,6 +154,7 @@ export type ActivityEditorAiDraftSourceCapabilityView =
 export type ActivityEditorSourceMaterialDraftNoteView =
   ActivitySourceMaterialDraftNoteView & {
     displayText: string;
+    key: string;
   };
 
 export type ActivityEditorAiDraftSourceReadinessView = {
@@ -440,13 +442,21 @@ export function buildActivityEditorAiDraftPanelView({
   const sourceMaterialNoteViews =
     buildActivitySourceMaterialDraftNoteViewsFromSourceText(
       draftSourceText
-    ).map((noteView) => ({
-      ...noteView,
-      displayText: m.activity_form_ai_source_material_item({
-        kind: noteView.kindLabel,
-        name: noteView.name,
-      }),
-    }));
+    ).flatMap((noteView) => {
+      const key = getActivitySourceMaterialDraftNoteIdentityKey(noteView);
+      if (!key) return [];
+
+      return [
+        {
+          ...noteView,
+          displayText: m.activity_form_ai_source_material_item({
+            kind: noteView.kindLabel,
+            name: noteView.name,
+          }),
+          key,
+        },
+      ];
+    });
 
   return {
     badgeLabel: m.activity_form_ai_draft_badge(),

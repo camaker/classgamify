@@ -158,6 +158,7 @@ export type ActivityDraftMetaSummaryReadinessOption = {
 export type ActivityDraftMetaSummarySourceMaterialNoteView =
   ActivitySourceMaterialDraftNoteView & {
     displayText: string;
+    key: string;
   };
 
 export type ActivityDraftMetaSummarySourceMaterialCapabilityView =
@@ -672,6 +673,7 @@ function normalizeActivityDraftSourceMaterialNoteViews(
         kind: kindLabel,
         name,
       }),
+      key,
       kindLabel,
       name,
     });
