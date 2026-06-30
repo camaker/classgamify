@@ -1155,6 +1155,7 @@
   "assignment_results_export_column_student_attempts": "学生作答次数",
   "assignment_results_export_column_student_average_accuracy": "学生平均正确率",
   "assignment_results_export_column_student_best_accuracy": "学生最佳正确率",
+  "assignment_results_export_column_student_last_submitted": "学生最近提交时间",
   "assignment_results_export_column_student_latest_accuracy": "学生最近正确率",
   "assignment_results_export_column_student_needs_review_count": "学生需复盘题数",
   "assignment_results_export_column_submitted_at": "提交时间",

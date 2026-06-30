@@ -1155,6 +1155,7 @@
   "assignment_results_export_column_student_attempts": "student_attempts",
   "assignment_results_export_column_student_average_accuracy": "student_average_accuracy",
   "assignment_results_export_column_student_best_accuracy": "student_best_accuracy",
+  "assignment_results_export_column_student_last_submitted": "student_last_submitted",
   "assignment_results_export_column_student_latest_accuracy": "student_latest_accuracy",
   "assignment_results_export_column_student_needs_review_count": "student_needs_review_count",
   "assignment_results_export_column_submitted_at": "submitted_at",

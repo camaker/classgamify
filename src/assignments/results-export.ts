@@ -281,6 +281,7 @@ function buildAssignmentResultsExportAttemptBaseColumns({
     formatAssignmentResultCsvNumber(studentSummary?.needsReviewCount, {
       min: 0,
     }),
+    formatAssignmentResultCsvDate(studentSummary?.lastCompletedAt),
   ];
 }
 
@@ -441,6 +442,7 @@ function getAssignmentResultsExportColumns() {
     m.assignment_results_export_column_student_average_accuracy(),
     m.assignment_results_export_column_student_best_accuracy(),
     m.assignment_results_export_column_student_needs_review_count(),
+    m.assignment_results_export_column_student_last_submitted(),
     m.assignment_results_export_column_item_number(),
     m.assignment_results_export_column_item_id(),
     m.assignment_results_export_column_item_correct_rate(),
