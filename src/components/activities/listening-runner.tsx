@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialStudentRunnerView,
   getInitialSequentialStudentRunnerActiveItemId,
+  resolveSequentialStudentRunnerActiveItemId,
   resolveSequentialStudentRunnerNavigationAction,
   type SequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
@@ -47,6 +48,14 @@ export function ListeningRunner({
     getInitialSequentialStudentRunnerActiveItemId(items)
   );
   const [speechSupported, setSpeechSupported] = useState(false);
+  useEffect(() => {
+    setActiveItemId((current) =>
+      resolveSequentialStudentRunnerActiveItemId({
+        activeItemId: current,
+        items,
+      })
+    );
+  }, [items]);
   const runnerView = useMemo(
     () =>
       buildSequentialStudentRunnerView({

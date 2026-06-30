@@ -582,6 +582,18 @@ export function getInitialSequentialStudentRunnerActiveItemId(
   return items[0]?.id;
 }
 
+export function resolveSequentialStudentRunnerActiveItemId({
+  activeItemId,
+  items,
+}: {
+  activeItemId?: string;
+  items: PublicRuntimeItem[];
+}) {
+  return items.some((item) => item.id === activeItemId)
+    ? activeItemId
+    : getInitialSequentialStudentRunnerActiveItemId(items);
+}
+
 export function resolveSequentialStudentRunnerNavigationAction({
   action,
   fallbackItemId,

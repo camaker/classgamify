@@ -6,6 +6,7 @@ import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
 import {
   buildSequentialStudentRunnerView,
   getInitialSequentialStudentRunnerActiveItemId,
+  resolveSequentialStudentRunnerActiveItemId,
   resolveSequentialStudentRunnerNavigationAction,
   type SequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
@@ -20,7 +21,7 @@ import {
   IconBox,
   IconCheck,
 } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type OpenBoxRunnerProps = {
   answers: Record<string, string>;
@@ -43,6 +44,14 @@ export function OpenBoxRunner({
   const [activeItemId, setActiveItemId] = useState(() =>
     getInitialSequentialStudentRunnerActiveItemId(items)
   );
+  useEffect(() => {
+    setActiveItemId((current) =>
+      resolveSequentialStudentRunnerActiveItemId({
+        activeItemId: current,
+        items,
+      })
+    );
+  }, [items]);
   const runnerView = useMemo(
     () =>
       buildSequentialStudentRunnerView({

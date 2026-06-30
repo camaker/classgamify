@@ -424,6 +424,7 @@ import {
   normalizeSequentialRunnerOffset,
   resolveChoicePairingRunnerAction,
   resolveGroupSortRunnerAction,
+  resolveSequentialStudentRunnerActiveItemId,
   resolveSequentialStudentRunnerNavigationAction,
 } from '@/assignments/student-runner-view';
 import {
@@ -5381,6 +5382,11 @@ for (const filePath of [
   );
   assert.match(
     source,
+    /resolveSequentialStudentRunnerActiveItemId[\s\S]*setActiveItemId\(\(current\) =>[\s\S]*activeItemId: current,[\s\S]*items,/,
+    `${filePath} should keep stale active item state aligned through the assignment-domain helper.`
+  );
+  assert.match(
+    source,
     /resolveSequentialStudentRunnerNavigationAction/,
     `${filePath} should resolve sequence actions through the assignment-domain helper.`
   );
@@ -9804,6 +9810,31 @@ assert.equal(
   'first-track'
 );
 assert.equal(getInitialSequentialStudentRunnerActiveItemId([]), undefined);
+assert.equal(
+  resolveSequentialStudentRunnerActiveItemId({
+    activeItemId: 'pair-1',
+    items: sequentialStudentRunnerView.sequenceView.itemViews.map(
+      (itemView) => itemView.item
+    ),
+  }),
+  'pair-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerActiveItemId({
+    activeItemId: 'stale-track',
+    items: sequentialStudentRunnerView.sequenceView.itemViews.map(
+      (itemView) => itemView.item
+    ),
+  }),
+  'q-1'
+);
+assert.equal(
+  resolveSequentialStudentRunnerActiveItemId({
+    activeItemId: 'stale-track',
+    items: [],
+  }),
+  undefined
+);
 assert.equal(
   resolveSequentialStudentRunnerNavigationAction({
     action: sequentialStudentRunnerView.navigationView.nextAction,
