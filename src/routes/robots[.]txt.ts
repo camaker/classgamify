@@ -9,8 +9,6 @@ const disallowedPaths = [
   '/dashboard',
   '/print',
   '/play',
-  '/test-404',
-  '/test-error',
 ];
 
 function getDisallowRules() {

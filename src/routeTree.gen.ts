@@ -41,8 +41,6 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as ApiPingRouteImport } from './routes/api/ping'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
-import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
 import { Route as pagesTeachersRouteImport } from './routes/(pages)/teachers'
 import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
 import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
@@ -220,16 +218,6 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
-const testsTestErrorRoute = testsTestErrorRouteImport.update({
-  id: '/(tests)/test-error',
-  path: '/test-error',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const testsTest404Route = testsTest404RouteImport.update({
-  id: '/(tests)/test-404',
-  path: '/test-404',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const pagesTeachersRoute = pagesTeachersRouteImport.update({
   id: '/(pages)/teachers',
   path: '/teachers',
@@ -333,8 +321,6 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
   '/teachers': typeof pagesTeachersRoute
-  '/test-404': typeof testsTest404Route
-  '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/ping': typeof ApiPingRoute
   '/auth/error': typeof AuthErrorRoute
@@ -382,8 +368,6 @@ export interface FileRoutesByTo {
   '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
   '/teachers': typeof pagesTeachersRoute
-  '/test-404': typeof testsTest404Route
-  '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/ping': typeof ApiPingRoute
   '/auth/error': typeof AuthErrorRoute
@@ -435,8 +419,6 @@ export interface FileRoutesById {
   '/(pages)/pricing': typeof pagesPricingRoute
   '/(pages)/roadmap': typeof pagesRoadmapRoute
   '/(pages)/teachers': typeof pagesTeachersRoute
-  '/(tests)/test-404': typeof testsTest404Route
-  '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/ping': typeof ApiPingRoute
   '/auth/error': typeof AuthErrorRoute
@@ -489,8 +471,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roadmap'
     | '/teachers'
-    | '/test-404'
-    | '/test-error'
     | '/admin/users'
     | '/api/ping'
     | '/auth/error'
@@ -538,8 +518,6 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roadmap'
     | '/teachers'
-    | '/test-404'
-    | '/test-error'
     | '/admin/users'
     | '/api/ping'
     | '/auth/error'
@@ -590,8 +568,6 @@ export interface FileRouteTypes {
     | '/(pages)/pricing'
     | '/(pages)/roadmap'
     | '/(pages)/teachers'
-    | '/(tests)/test-404'
-    | '/(tests)/test-error'
     | '/admin/users'
     | '/api/ping'
     | '/auth/error'
@@ -643,8 +619,6 @@ export interface RootRouteChildren {
   pagesPricingRoute: typeof pagesPricingRoute
   pagesRoadmapRoute: typeof pagesRoadmapRoute
   pagesTeachersRoute: typeof pagesTeachersRoute
-  testsTest404Route: typeof testsTest404Route
-  testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
   PlayShareIdRoute: typeof PlayShareIdRoute
@@ -884,20 +858,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/(tests)/test-error': {
-      id: '/(tests)/test-error'
-      path: '/test-error'
-      fullPath: '/test-error'
-      preLoaderRoute: typeof testsTestErrorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(tests)/test-404': {
-      id: '/(tests)/test-404'
-      path: '/test-404'
-      fullPath: '/test-404'
-      preLoaderRoute: typeof testsTest404RouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(pages)/teachers': {
       id: '/(pages)/teachers'
       path: '/teachers'
@@ -1124,8 +1084,6 @@ const rootRouteChildren: RootRouteChildren = {
   pagesPricingRoute: pagesPricingRoute,
   pagesRoadmapRoute: pagesRoadmapRoute,
   pagesTeachersRoute: pagesTeachersRoute,
-  testsTest404Route: testsTest404Route,
-  testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
   PlayShareIdRoute: PlayShareIdRoute,

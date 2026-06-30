@@ -7432,8 +7432,28 @@ assert.equal(
   false,
   'Legacy product migration component should stay removed.'
 );
+for (const retiredTestRouteFile of [
+  'src/routes/(tests)/test-404.tsx',
+  'src/routes/(tests)/test-error.tsx',
+]) {
+  assert.equal(
+    existsSync(retiredTestRouteFile),
+    false,
+    `${retiredTestRouteFile} should stay unmounted as copied template test UI.`
+  );
+}
 assert.doesNotMatch(robotsRouteSource, /['"]\/worksheets['"]/);
 assert.match(robotsRouteSource, /['"]\/play['"]/);
+assert.doesNotMatch(
+  robotsRouteSource,
+  /['"]\/test-(?:404|error)['"]/,
+  'Robots should not preserve copied template test routes.'
+);
+assert.doesNotMatch(
+  readFileSync('src/routeTree.gen.ts', 'utf8'),
+  /test-(?:404|error)|\(tests\)/,
+  'Generated route tree should not mount copied template test routes.'
+);
 for (const retiredStubRoute of [
   '/about',
   '/ai',
