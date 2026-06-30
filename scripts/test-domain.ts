@@ -19131,6 +19131,7 @@ assert.equal(
   makeActivityStableId('A'.repeat(ACTIVITY_STABLE_ID_LENGTH.max + 5)).length,
   ACTIVITY_STABLE_ID_LENGTH.max
 );
+assert.equal(makeActivityStableId('  Ｃａｔ　Food!  '), 'cat-food');
 assert.deepEqual(ACTIVITY_LIBRARY_STATUSES, ['active', 'archived']);
 assert.deepEqual(ACTIVITY_LIBRARY_CREATED_SOURCES, [
   'create',
@@ -19375,6 +19376,16 @@ assert.match(
   activityStableIdSource,
   /slice\(0, ACTIVITY_STABLE_ID_LENGTH\.max\)/,
   'Activity stable id generation should reuse the stable-id length constant.'
+);
+assert.match(
+  activityStableIdSource,
+  /normalize\('NFKC'\)[\s\S]*\.toLowerCase\(\)/,
+  'Activity stable id generation should use locale-independent lower-casing for assignment item ids.'
+);
+assert.doesNotMatch(
+  activityStableIdSource,
+  /toLocaleLowerCase\(/,
+  'Activity stable id generation should not depend on runtime locale for assignment item ids.'
 );
 assert.doesNotMatch(
   activityStableIdSource,
