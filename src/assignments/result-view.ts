@@ -1940,7 +1940,7 @@ export function buildAssignmentResultsPageViewModel<
     ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts).flatMap(
         (preview) => {
           const actionButton = actionButtons.find(
-            (button) => button.action === preview.action
+            (button) => button.id === preview.actionButtonId
           );
 
           return actionButton

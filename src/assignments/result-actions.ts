@@ -225,6 +225,8 @@ export type AssignmentResultCopyArtifacts = {
 
 export type AssignmentResultCopyArtifactPreview = {
   action: AssignmentResultCopyAction;
+  actionButtonId: AssignmentResultActionButtonId;
+  dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
   description: string;
   id: AssignmentResultCopyArtifactPreviewId;
   label: string;
@@ -520,6 +522,8 @@ export function buildAssignmentResultCopyArtifactPreviews(
     return [
       {
         action: descriptor.action,
+        actionButtonId: getAssignmentResultActionButtonId(descriptor),
+        dataScope: descriptor.dataScope,
         description: actionCopy.description,
         id: getAssignmentResultCopyArtifactPreviewId(descriptor.action),
         label: actionCopy.label,
