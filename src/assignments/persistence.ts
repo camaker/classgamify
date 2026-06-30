@@ -4,6 +4,8 @@ import {
   type AssignmentSnapshotInsert,
   type AssignmentSnapshotSourceActivity,
 } from '@/assignments/snapshot';
+import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
+import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 
 type PublishedAssignmentInsert = {
   activityId: string;
@@ -51,9 +53,9 @@ export function buildPublishedAssignmentInsert({
     id,
     ownerId: userId,
     settingsJson: settings,
-    shareSlug,
+    shareSlug: normalizeAssignmentShareSlug(shareSlug),
     status: 'published',
-    title,
+    title: formatAssignmentDisplayTitle(title),
     updatedAt: now,
   };
 }

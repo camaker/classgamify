@@ -14360,11 +14360,11 @@ const publishedAssignmentInsert = buildPublishedAssignmentInsert({
     shuffleItems: false,
     timeLimitSeconds: 600,
   },
-  shareSlug: 'share-published-1',
+  shareSlug: '　share-published-１　',
   sourceActivity: {
     id: 'activity-source-1',
   },
-  title: 'Published homework link',
+  title: ' Ｐｕｂｌｉｓｈｅｄ\u00A0　homework   link ',
   userId: 'teacher-1',
 });
 assert.deepEqual(publishedAssignmentInsert, {
@@ -14457,8 +14457,8 @@ assert.deepEqual(
 );
 assert.match(
   assignmentPersistenceSource,
-  /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*status: 'published'[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert[\s\S]*buildAssignmentStatusUpdateSet[\s\S]*status: nextStatus[\s\S]*updatedAt/,
-  'Assignment persistence should own published assignment, snapshot insert, and status update payload shapes.'
+  /buildPublishedAssignmentInsert[\s\S]*activityId: sourceActivity\.id[\s\S]*settingsJson: settings[\s\S]*shareSlug: normalizeAssignmentShareSlug\(shareSlug\)[\s\S]*status: 'published'[\s\S]*title: formatAssignmentDisplayTitle\(title\)[\s\S]*buildPublishedAssignmentSnapshotInsert[\s\S]*buildAssignmentSnapshotInsert[\s\S]*buildAssignmentStatusUpdateSet[\s\S]*status: nextStatus[\s\S]*updatedAt/,
+  'Assignment persistence should own normalized published assignment, snapshot insert, and status update payload shapes.'
 );
 assert.match(
   assignmentAttemptPersistenceSource,
