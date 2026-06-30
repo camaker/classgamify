@@ -85,10 +85,13 @@ export type PrintableWorksheetItemView = {
   sequenceLabel: string;
 };
 
+export type PrintableWorksheetAnswerKeyDetailView = {
+  label: string;
+  tone: 'primary' | 'secondary';
+};
+
 export type PrintableWorksheetAnswerKeyItemView = {
-  acceptedAnswersLabel?: string;
-  answerLabel: string;
-  explanationLabel?: string;
+  detailViews: PrintableWorksheetAnswerKeyDetailView[];
   headingLabel: string;
   id: string;
   prompt: string;
@@ -542,22 +545,12 @@ export function buildPrintableWorksheetAnswerKeyItemView(
   });
 
   return {
-    acceptedAnswersLabel: acceptedAnswers
-      ? m.assignment_printable_answer_key_accepted({
-          acceptedAnswers,
-        })
-      : undefined,
-    answerLabel: m.assignment_printable_answer_key_item({
-      answer: formatPrintableWorksheetValue(item.answer),
-      sequenceNumber: normalizePrintableWorksheetSequenceNumber(
-        item.sequenceNumber
-      ),
+    detailViews: buildPrintableWorksheetAnswerKeyDetailViews({
+      acceptedAnswers,
+      answer: item.answer,
+      explanation,
+      sequenceNumber: item.sequenceNumber,
     }),
-    explanationLabel: explanation
-      ? m.assignment_printable_answer_key_explanation({
-          explanation,
-        })
-      : undefined,
     headingLabel: m.assignment_printable_item_heading({
       kindLabel: formatRuntimeItemKindLabel(item),
       sequenceLabel,
@@ -565,6 +558,49 @@ export function buildPrintableWorksheetAnswerKeyItemView(
     id: item.id,
     prompt: formatPrintableWorksheetAnswerKeyPrompt(item),
   };
+}
+
+function buildPrintableWorksheetAnswerKeyDetailViews({
+  acceptedAnswers,
+  answer,
+  explanation,
+  sequenceNumber,
+}: {
+  acceptedAnswers: string;
+  answer: string | undefined;
+  explanation: string | undefined;
+  sequenceNumber: number;
+}): PrintableWorksheetAnswerKeyDetailView[] {
+  return [
+    {
+      label: m.assignment_printable_answer_key_item({
+        answer: formatPrintableWorksheetValue(answer),
+        sequenceNumber:
+          normalizePrintableWorksheetSequenceNumber(sequenceNumber),
+      }),
+      tone: 'primary',
+    },
+    ...(acceptedAnswers
+      ? [
+          {
+            label: m.assignment_printable_answer_key_accepted({
+              acceptedAnswers,
+            }),
+            tone: 'secondary',
+          } satisfies PrintableWorksheetAnswerKeyDetailView,
+        ]
+      : []),
+    ...(explanation
+      ? [
+          {
+            label: m.assignment_printable_answer_key_explanation({
+              explanation,
+            }),
+            tone: 'secondary',
+          } satisfies PrintableWorksheetAnswerKeyDetailView,
+        ]
+      : []),
+  ];
 }
 
 function buildPrintableWorksheetChoiceBankView(

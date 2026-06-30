@@ -15661,9 +15661,14 @@ assert.deepEqual(
     printableSnapshotWorksheetWithAnswers.answerKey[0]!
   ),
   {
-    acceptedAnswersLabel: 'Accepted alternatives: Frozen accepted',
-    answerLabel: '1. Frozen answer',
-    explanationLabel: 'Explanation: Frozen explanation',
+    detailViews: [
+      { label: '1. Frozen answer', tone: 'primary' },
+      {
+        label: 'Accepted alternatives: Frozen accepted',
+        tone: 'secondary',
+      },
+      { label: 'Explanation: Frozen explanation', tone: 'secondary' },
+    ],
     headingLabel: 'Item 1 · Question',
     id: 'q-frozen-prompt',
     prompt: 'Frozen prompt?',
@@ -15680,9 +15685,11 @@ assert.deepEqual(
     sequenceNumber: Number.POSITIVE_INFINITY,
   }),
   {
-    acceptedAnswersLabel: 'Accepted alternatives: Paris, France',
-    answerLabel: '1. Paris',
-    explanationLabel: 'Explanation: France capital.',
+    detailViews: [
+      { label: '1. Paris', tone: 'primary' },
+      { label: 'Accepted alternatives: Paris, France', tone: 'secondary' },
+      { label: 'Explanation: France capital.', tone: 'secondary' },
+    ],
     headingLabel: 'Item 1 · Question',
     id: 'messy-answer-key',
     prompt: 'Capital of France?',
@@ -15705,9 +15712,13 @@ assert.deepEqual(
     sequenceNumber: 2,
   }),
   {
-    acceptedAnswersLabel: 'Accepted alternatives: Paris, France, La capitale',
-    answerLabel: '2. Paris',
-    explanationLabel: undefined,
+    detailViews: [
+      { label: '2. Paris', tone: 'primary' },
+      {
+        label: 'Accepted alternatives: Paris, France, La capitale',
+        tone: 'secondary',
+      },
+    ],
     headingLabel: 'Item 2 · Question',
     id: 'deduped-answer-key',
     prompt: 'Capital?',
@@ -15725,9 +15736,10 @@ try {
       sequenceNumber: 1,
     }),
     {
-      acceptedAnswersLabel: '可接受变体：答案一，答案二',
-      answerLabel: '1. 答案',
-      explanationLabel: undefined,
+      detailViews: [
+        { label: '1. 答案', tone: 'primary' },
+        { label: '可接受变体：答案一，答案二', tone: 'secondary' },
+      ],
       headingLabel: '第 1 题 · 题目',
       id: 'zh-answer-key',
       prompt: '题目?',
@@ -22517,7 +22529,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /assignment_printable_answer_key_item\(\{[\s\S]*normalizePrintableWorksheetSequenceNumber\(\s*item\.sequenceNumber\s*\)/,
+  /buildPrintableWorksheetAnswerKeyDetailViews[\s\S]*assignment_printable_answer_key_item\(\{[\s\S]*normalizePrintableWorksheetSequenceNumber\(\s*sequenceNumber\s*\)/,
   'Printable worksheet answer keys should normalize sequence numbers through the shared printable helper.'
 );
 assert.doesNotMatch(
@@ -22750,7 +22762,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{/,
+  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{[\s\S]*detailViews: PrintableWorksheetAnswerKeyDetailView\[\];/,
   'Printable worksheet view domain should export focused header, item, choice-bank, answer-line, and answer-key item contracts.'
 );
 assert.match(
@@ -22795,8 +22807,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /PrintableWorksheetAnswerKeyView[\s\S]*PrintableWorksheetAnswerKeyItemView/,
-  'Printable worksheet answer key should consume explicit answer-key section and item view contracts.'
+  /PrintableWorksheetAnswerKeyDetailView[\s\S]*PrintableWorksheetAnswerKeyItemView[\s\S]*PrintableWorksheetAnswerKeyView/,
+  'Printable worksheet answer key should consume explicit answer-key section, item, and detail view contracts.'
 );
 assert.doesNotMatch(
   printableWorksheetHeaderSource,
@@ -23095,8 +23107,18 @@ assert.match(
 );
 assert.match(
   printableWorksheetAnswerKeySource,
-  /function PrintableWorksheetAnswerKeyItem[\s\S]*itemView\.answerLabel[\s\S]*itemView\.acceptedAnswersLabel[\s\S]*itemView\.explanationLabel/,
-  'Printable worksheet answer-key item component should render prepared answer, accepted-answer, and explanation labels.'
+  /function PrintableWorksheetAnswerKeyItem[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}/,
+  'Printable worksheet answer-key item component should render prepared answer-key detail views.'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /function PrintableWorksheetAnswerKeyDetail[\s\S]*detailView: PrintableWorksheetAnswerKeyDetailView[\s\S]*detailView\.tone === 'primary'[\s\S]*detailView\.label/,
+  'Printable worksheet answer-key detail component should render prepared detail labels with their display tone.'
+);
+assert.doesNotMatch(
+  printableWorksheetAnswerKeySource,
+  /acceptedAnswersLabel|answerLabel|explanationLabel/,
+  'Printable worksheet answer-key component should not know individual answer detail label fields.'
 );
 assert.match(
   printableWorksheetToolbarSource,

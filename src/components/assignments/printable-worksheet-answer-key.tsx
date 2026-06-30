@@ -1,7 +1,9 @@
 import type {
+  PrintableWorksheetAnswerKeyDetailView,
   PrintableWorksheetAnswerKeyItemView,
   PrintableWorksheetAnswerKeyView,
 } from '@/assignments/printable-worksheet-view';
+import { cn } from '@/lib/utils';
 import { IconKey } from '@tabler/icons-react';
 
 type PrintableWorksheetAnswerKeyProps = {
@@ -42,18 +44,31 @@ function PrintableWorksheetAnswerKeyItem({
   return (
     <div className="rounded-lg border bg-muted/20 p-3 text-sm">
       <p className="text-muted-foreground text-xs">{itemView.headingLabel}</p>
-      <p className="mt-1 font-medium">{itemView.answerLabel}</p>
       <p className="mt-1 text-muted-foreground">{itemView.prompt}</p>
-      {itemView.acceptedAnswersLabel ? (
-        <p className="mt-1 text-muted-foreground">
-          {itemView.acceptedAnswersLabel}
-        </p>
-      ) : null}
-      {itemView.explanationLabel ? (
-        <p className="mt-1 text-muted-foreground">
-          {itemView.explanationLabel}
-        </p>
-      ) : null}
+      <div className="mt-1 grid gap-1">
+        {itemView.detailViews.map((detailView) => (
+          <PrintableWorksheetAnswerKeyDetail
+            detailView={detailView}
+            key={detailView.label}
+          />
+        ))}
+      </div>
     </div>
+  );
+}
+
+function PrintableWorksheetAnswerKeyDetail({
+  detailView,
+}: {
+  detailView: PrintableWorksheetAnswerKeyDetailView;
+}) {
+  return (
+    <p
+      className={cn(
+        detailView.tone === 'primary' ? 'font-medium' : 'text-muted-foreground'
+      )}
+    >
+      {detailView.label}
+    </p>
   );
 }
