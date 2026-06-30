@@ -21538,7 +21538,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentsApiSource,
-  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentResultsAttemptSelect\(\)\)[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*analyzeAssignmentResults/,
+  /export const getAssignmentResults[\s\S]*\.select\(buildAssignmentResultsAttemptSelect\(\)\)[\s\S]*buildScoredAssignmentAttemptWhere\(\{[\s\S]*assignmentId: row\.assignment\.id,[\s\S]*\}\)[\s\S]*orderBy\(\.\.\.buildAttemptCompletedAtOrderBy\(\)\)[\s\S]*analyzeAssignmentResults/,
   'Assignment results API should load explicit scored-attempt result fields through the assignment-domain query helper.'
 );
 assert.doesNotMatch(
@@ -21706,8 +21706,8 @@ assert.equal(typeof buildScoredAnonymousAssignmentAttemptWhere, 'function');
 assert.equal(typeof buildScoredAssignmentAttemptWhere, 'function');
 assert.match(
   assignmentAttemptQuerySource,
-  /buildAssignmentAttemptStatsSelect[\s\S]*resultJson: attempt\.resultJson[\s\S]*settingsJson: assignment\.settingsJson[\s\S]*buildAssignmentAttemptStatsByAssignmentSelect[\s\S]*assignmentId: attempt\.assignmentId[\s\S]*buildAssignmentResultsAttemptSelect[\s\S]*anonymousToken: attempt\.anonymousToken[\s\S]*answersJson: attempt\.answersJson[\s\S]*completedAt: attempt\.completedAt[\s\S]*maxScore: attempt\.maxScore[\s\S]*resultJson: attempt\.resultJson[\s\S]*score: attempt\.score[\s\S]*studentName: attempt\.studentName[\s\S]*buildAttemptAssignmentJoin[\s\S]*eq\(attempt\.assignmentId, assignment\.id\)[\s\S]*buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)/,
-  'Assignment scored-attempt SQL filtering, stats selects, and results select shape should live in assignment-domain query helpers.'
+  /buildAssignmentAttemptStatsSelect[\s\S]*resultJson: attempt\.resultJson[\s\S]*settingsJson: assignment\.settingsJson[\s\S]*buildAssignmentAttemptStatsByAssignmentSelect[\s\S]*assignmentId: attempt\.assignmentId[\s\S]*buildAssignmentResultsAttemptSelect[\s\S]*anonymousToken: attempt\.anonymousToken[\s\S]*answersJson: attempt\.answersJson[\s\S]*completedAt: attempt\.completedAt[\s\S]*maxScore: attempt\.maxScore[\s\S]*resultJson: attempt\.resultJson[\s\S]*score: attempt\.score[\s\S]*studentName: attempt\.studentName[\s\S]*buildAttemptAssignmentJoin[\s\S]*eq\(attempt\.assignmentId, assignment\.id\)[\s\S]*buildScoredAttemptWhere[\s\S]*isNotNull\(attempt\.resultJson\)[\s\S]*buildAssignmentAttemptsInWhere[\s\S]*inArray\(attempt\.assignmentId, assignmentIds\)[\s\S]*buildScoredAssignmentAttemptWhere[\s\S]*buildScoredAnonymousAssignmentAttemptWhere[\s\S]*buildAttemptCompletedAtOrderBy[\s\S]*desc\(attempt\.completedAt\)[\s\S]*asc\(attempt\.id\)/,
+  'Assignment scored-attempt SQL filtering, stats selects, stable results ordering, and results select shape should live in assignment-domain query helpers.'
 );
 assert.doesNotMatch(
   assignmentsApiSource,

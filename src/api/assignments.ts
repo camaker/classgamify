@@ -396,7 +396,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
           assignmentId: row.assignment.id,
         })
       )
-      .orderBy(buildAttemptCompletedAtOrderBy());
+      .orderBy(...buildAttemptCompletedAtOrderBy());
     const settings = resolveAssignmentSettings(row.assignment.settingsJson);
     const stats = summarizeAssignmentAttempts(attempts, {
       timeLimitSeconds: settings.timeLimitSeconds,

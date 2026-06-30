@@ -1,5 +1,5 @@
 import { assignment, attempt } from '@/db/app.schema';
-import { and, desc, eq, inArray, isNotNull, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, type SQL } from 'drizzle-orm';
 
 export function buildAssignmentAttemptStatsSelect() {
   return {
@@ -76,5 +76,5 @@ export function buildScoredAnonymousAssignmentAttemptWhere({
 }
 
 export function buildAttemptCompletedAtOrderBy() {
-  return desc(attempt.completedAt);
+  return [desc(attempt.completedAt), asc(attempt.id)] as const;
 }
