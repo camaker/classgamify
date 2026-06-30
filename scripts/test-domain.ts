@@ -3781,8 +3781,13 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.reviewChecklistItems\.map[\s\S]*ActivityDraftReviewChecklistItem[\s\S]*itemView\.label[\s\S]*itemView\.statusLabel[\s\S]*itemView\.description/,
+  /summaryView\.reviewChecklistItems\.map[\s\S]*ActivityDraftReviewChecklistItem[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.statusLabel[\s\S]*itemView\.description/,
   'AI draft summary component should render structured review checklist items with labels, status, and descriptions.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /key=\{`\$\{itemView\.id\}-\$\{itemView\.label\}`\}|key=\{itemView\.label\}/,
+  'AI draft summary component should not key review checklist items by localized labels.'
 );
 assert.match(
   activityDraftMetaSummarySource,

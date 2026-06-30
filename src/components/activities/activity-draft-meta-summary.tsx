@@ -181,7 +181,7 @@ export function ActivityDraftMetaSummary({
         {summaryView.reviewChecklistItems.map((itemView) => (
           <ActivityDraftReviewChecklistItem
             itemView={itemView}
-            key={`${itemView.id}-${itemView.label}`}
+            key={itemView.id}
           />
         ))}
       </div>
