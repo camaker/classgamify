@@ -7601,7 +7601,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /getAttemptAnswerRuntimeItemEntries[\s\S]*getAttemptAnswerRuntimeItemIds[\s\S]*normalizeAttemptAnswerItemId[\s\S]*export function normalizeStudentAnswersForRuntimeItems[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)[\s\S]*normalizeSubmissionAnswer\(getSubmissionEntryAnswer\(entry, answers\)\)/,
+  /getAttemptAnswerRuntimeItemEntries[\s\S]*getAttemptAnswerRuntimeItemIds[\s\S]*normalizeAttemptAnswerItemId[\s\S]*type NormalizeStudentAnswersForRuntimeItemsOptions[\s\S]*includeUnanswered\?: boolean[\s\S]*export function normalizeStudentAnswersForRuntimeItems[\s\S]*getUniqueSubmissionRuntimeItemEntries\(runtimeItems\)\.flatMap[\s\S]*normalizeSubmissionAnswer\([\s\S]*getSubmissionEntryAnswer\(entry, answers\)[\s\S]*!includeUnanswered && !isStudentAnswerFilled\(answer\)/,
   'Student submission domain should expose runtime-scoped answer-map normalization for runner state, progress, and submission payloads.'
 );
 assert.match(
@@ -7646,7 +7646,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /applyStudentAnswerChanges[\s\S]*const nextAnswers = \{ \.\.\.answers \}[\s\S]*const itemId = normalizeSubmissionItemId\(change\.itemId\)[\s\S]*nextAnswers\[itemId\] = change\.answer/,
+  /applyStudentAnswerChanges[\s\S]*const nextAnswers = \{ \.\.\.answers \}[\s\S]*const itemId = normalizeSubmissionItemId\(change\.itemId\)[\s\S]*if \(!isStudentAnswerFilled\(change\.answer\)\)[\s\S]*delete nextAnswers\[itemId\][\s\S]*nextAnswers\[itemId\] = change\.answer/,
   'Student submission domain should normalize changed item ids without mutating current browser answers.'
 );
 assert.match(
@@ -10670,6 +10670,20 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  normalizeStudentAnswersForRuntimeItems({
+    answers: {
+      'item-1': '   ',
+      'item-2': ' Real answer ',
+      stale: 'Legacy answer',
+    },
+    includeUnanswered: false,
+    runtimeItems: [{ id: 'item-1' }, { id: ' item-2 ' }],
+  }),
+  {
+    'item-2': 'Real answer',
+  }
+);
+assert.deepEqual(
   getAttemptAnswerRuntimeItemEntries({
     runtimeItems: dirtySubmissionRuntimeItems,
   }),
@@ -10728,7 +10742,6 @@ const batchChangedAnswers = applyStudentAnswerChanges({
 });
 assert.deepEqual(batchChangedAnswers, {
   'item-1': ' apple ',
-  'item-2': '',
   'item-3': 'pear',
 });
 assert.deepEqual(answers, {
@@ -17889,9 +17902,7 @@ assert.deepEqual(
     ],
   }),
   {
-    answers: {
-      target: '',
-    },
+    answers: {},
     confirmIncompleteSubmit: false,
     type: 'updated',
   }

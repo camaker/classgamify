@@ -136,6 +136,10 @@ export type AttemptCompletionCopy = {
   unansweredLabel?: string;
 };
 
+type NormalizeStudentAnswersForRuntimeItemsOptions = {
+  includeUnanswered?: boolean;
+};
+
 type StudentRunnerCopy = {
   browseTemplatesLabel: string;
   createActivityLabel: string;
@@ -757,16 +761,22 @@ export function buildStudentAttemptAnswerStateByItemId({
 
 export function normalizeStudentAnswersForRuntimeItems({
   answers,
+  includeUnanswered = true,
   runtimeItems,
 }: {
   answers: StudentAnswerMap;
   runtimeItems: StudentSubmissionRuntimeItem[];
-}): StudentAnswerMap {
+} & NormalizeStudentAnswersForRuntimeItemsOptions): StudentAnswerMap {
   return Object.fromEntries(
-    getUniqueSubmissionRuntimeItemEntries(runtimeItems).map((entry) => [
-      entry.itemId,
-      normalizeSubmissionAnswer(getSubmissionEntryAnswer(entry, answers)),
-    ])
+    getUniqueSubmissionRuntimeItemEntries(runtimeItems).flatMap((entry) => {
+      const answer = normalizeSubmissionAnswer(
+        getSubmissionEntryAnswer(entry, answers)
+      );
+
+      if (!includeUnanswered && !isStudentAnswerFilled(answer)) return [];
+
+      return [[entry.itemId, answer]];
+    })
   );
 }
 
@@ -973,6 +983,12 @@ export function applyStudentAnswerChanges({
   for (const change of changes) {
     const itemId = normalizeSubmissionItemId(change.itemId);
     if (!itemId) continue;
+
+    if (!isStudentAnswerFilled(change.answer)) {
+      delete nextAnswers[itemId];
+      continue;
+    }
+
     nextAnswers[itemId] = change.answer;
   }
 

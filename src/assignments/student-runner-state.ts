@@ -1135,6 +1135,7 @@ export function buildStudentRunnerAnswerUpdatePlan({
 
   const normalizedAnswers = normalizeStudentAnswersForRuntimeItems({
     answers,
+    includeUnanswered: false,
     runtimeItems,
   });
   const nextAnswers = normalizeStudentAnswersForRuntimeItems({
@@ -1142,6 +1143,7 @@ export function buildStudentRunnerAnswerUpdatePlan({
       answers: normalizedAnswers,
       changes,
     }),
+    includeUnanswered: false,
     runtimeItems,
   });
 
