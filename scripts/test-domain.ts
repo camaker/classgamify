@@ -48,6 +48,7 @@ import {
   buildActivityLibrarySourceCapabilityMetrics,
   buildActivityLibrarySummaryMetrics,
   createEmptySourceMaterialCapabilityCounts,
+  normalizeActivityLibraryListCount,
   normalizeActivityLibraryMetricNumber,
   summarizeActivityLibrary,
 } from '@/activities/library-summary';
@@ -28808,6 +28809,37 @@ assert.deepEqual(
   }),
   { hasFilters: true, text: '0 matches' }
 );
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: 'food',
+    status: 'active',
+    template: 'all',
+    total: Number.NaN,
+  }),
+  { hasFilters: true, text: '0 matches' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: undefined,
+    status: 'active',
+    template: 'all',
+    total: 3.7,
+  }),
+  { hasFilters: false, text: '3 saved activities' }
+);
+assert.deepEqual(
+  buildActivityLibraryFilterSummary({
+    isLoading: false,
+    search: undefined,
+    source: 'audio',
+    status: 'active',
+    template: 'all',
+    total: -2,
+  }),
+  { hasFilters: true, text: '0 matches' }
+);
 assert.equal(normalizeActivityLibraryMetricNumber(Number.NaN), undefined);
 assert.equal(
   normalizeActivityLibraryMetricNumber(Number.POSITIVE_INFINITY),
@@ -28815,6 +28847,9 @@ assert.equal(
 );
 assert.equal(normalizeActivityLibraryMetricNumber(-3.1), 0);
 assert.equal(normalizeActivityLibraryMetricNumber(4.9), 4);
+assert.equal(normalizeActivityLibraryListCount(Number.NaN), 0);
+assert.equal(normalizeActivityLibraryListCount(-3.1), 0);
+assert.equal(normalizeActivityLibraryListCount(4.9), 4);
 assert.deepEqual(createEmptySourceMaterialCapabilityCounts(), {
   'audio-extraction': 0,
   'spreadsheet-import': 0,
@@ -29099,6 +29134,42 @@ assert.equal(
     search: { page: 0 },
   }).resolvedSearch.currentPage,
   1
+);
+assert.deepEqual(
+  {
+    totalActivities: buildActivityLibraryPageViewModel({
+      data: { items: [], total: Number.NaN },
+      isLoading: false,
+      search: {},
+    }).totalActivities,
+    totalPages: buildActivityLibraryPageViewModel({
+      data: { items: [], total: Number.NaN },
+      isLoading: false,
+      search: {},
+    }).totalPages,
+  },
+  {
+    totalActivities: 0,
+    totalPages: 1,
+  }
+);
+assert.deepEqual(
+  {
+    totalActivities: buildActivityLibraryPageViewModel({
+      data: { items: [], total: 25.9 },
+      isLoading: false,
+      search: {},
+    }).totalActivities,
+    totalPages: buildActivityLibraryPageViewModel({
+      data: { items: [], total: 25.9 },
+      isLoading: false,
+      search: {},
+    }).totalPages,
+  },
+  {
+    totalActivities: 25,
+    totalPages: 3,
+  }
 );
 const filteredActivityLibraryPageData = {
   createdActivity: {

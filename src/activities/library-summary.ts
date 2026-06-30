@@ -94,14 +94,20 @@ export function buildActivityLibraryFilterSummary({
   total: number;
 }): ActivityLibraryFilterSummary {
   const hasFilters = Boolean(search) || source !== 'all' || template !== 'all';
+  const normalizedTotal = normalizeActivityLibraryListCount(total);
+
   if (hasFilters) {
     return {
       hasFilters,
       text: isLoading
         ? m.activity_library_filter_summary_filtering()
-        : total === 1
-          ? m.activity_library_filter_summary_matches_one({ count: total })
-          : m.activity_library_filter_summary_matches_many({ count: total }),
+        : normalizedTotal === 1
+          ? m.activity_library_filter_summary_matches_one({
+              count: normalizedTotal,
+            })
+          : m.activity_library_filter_summary_matches_many({
+              count: normalizedTotal,
+            }),
     };
   }
 
@@ -114,13 +120,13 @@ export function buildActivityLibraryFilterSummary({
     hasFilters,
     text: isLoading
       ? m.activity_library_filter_summary_loading()
-      : total === 1
+      : normalizedTotal === 1
         ? m.activity_library_filter_summary_total_one({
-            count: total,
+            count: normalizedTotal,
             status: statusLabel,
           })
         : m.activity_library_filter_summary_total_many({
-            count: total,
+            count: normalizedTotal,
             status: statusLabel,
           }),
   };
@@ -340,6 +346,10 @@ export function buildEmptyActivityLibrarySummary(
 export function normalizeActivityLibraryMetricNumber(value: number) {
   if (!Number.isFinite(value)) return undefined;
   return Math.floor(Math.max(0, value));
+}
+
+export function normalizeActivityLibraryListCount(value: number) {
+  return normalizeActivityLibraryMetricNumber(value) ?? 0;
 }
 
 export const createEmptySourceMaterialCapabilityCounts =

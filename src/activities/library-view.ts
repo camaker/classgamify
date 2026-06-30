@@ -32,6 +32,7 @@ import {
   type ActivityLibrarySummary,
   type ActivityLibrarySummaryMetric,
   type ActivityLibraryTemplateOption,
+  normalizeActivityLibraryListCount,
 } from '@/activities/library-summary';
 import {
   buildActivitySourceMaterialSummaryView,
@@ -506,7 +507,7 @@ export function buildActivityLibraryPageViewModel<
 }): ActivityLibraryPageViewModel<TItem> {
   const resolvedSearch = resolveActivityLibraryPageSearch(search);
   const activities = data?.items ?? [];
-  const totalActivities = data?.total ?? 0;
+  const totalActivities = normalizeActivityLibraryListCount(data?.total ?? 0);
   const totalPages = getActivityLibraryTotalPages({
     pageSize: ACTIVITY_LIBRARY_PAGE_SIZE,
     total: totalActivities,
