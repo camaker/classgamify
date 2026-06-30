@@ -97,9 +97,18 @@ export function LoginForm({
       description={m.auth_login_context_description()}
       returnHint={m.auth_login_return_hint()}
       benefits={[
-        m.auth_login_benefit_progress(),
-        m.auth_login_benefit_worksheets(),
-        m.auth_login_benefit_review(),
+        {
+          id: 'progress',
+          text: m.auth_login_benefit_progress(),
+        },
+        {
+          id: 'worksheets',
+          text: m.auth_login_benefit_worksheets(),
+        },
+        {
+          id: 'review',
+          text: m.auth_login_benefit_review(),
+        },
       ]}
       trustNote={m.auth_login_trust_note()}
       bottomButtonLabel={m.auth_login_sign_up_hint()}

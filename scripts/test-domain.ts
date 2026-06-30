@@ -4149,6 +4149,18 @@ const userButtonMobileSource = readFileSync(
   'src/components/shared/user-button-mobile.tsx',
   'utf8'
 );
+const authCardSource = readFileSync(
+  'src/components/auth/auth-card.tsx',
+  'utf8'
+);
+const loginFormSource = readFileSync(
+  'src/components/auth/login-form.tsx',
+  'utf8'
+);
+const registerFormSource = readFileSync(
+  'src/components/auth/register-form.tsx',
+  'utf8'
+);
 const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
 const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
 const blogCtaActionLinkSource = readFileSync(
@@ -4524,6 +4536,31 @@ assert.doesNotMatch(
   worksheetsRouteSource,
   /Routes\.Templates/,
   'Worksheets route should not hardcode the templates CTA route target.'
+);
+assert.match(
+  authCardSource,
+  /export type AuthCardBenefitItem = \{[\s\S]*id: string;[\s\S]*text: string;[\s\S]*benefits\?: AuthCardBenefitItem\[\];[\s\S]*key=\{benefit\.id\}[\s\S]*benefit\.text/,
+  'Auth cards should render benefit rows from structured benefit ids and text.'
+);
+assert.match(
+  authCardSource,
+  /export type AuthWorkflowStep = \{[\s\S]*id: string;[\s\S]*workflowSteps\?: AuthWorkflowStep\[\];[\s\S]*key=\{step\.id\}/,
+  'Auth cards should render workflow steps from stable step ids.'
+);
+assert.doesNotMatch(
+  authCardSource,
+  /key=\{benefit\}|key=\{`\$\{step\.label\}-\$\{step\.title\}`\}/,
+  'Auth cards should not key benefit or workflow rows by localized copy.'
+);
+assert.match(
+  loginFormSource,
+  /benefits=\{\[[\s\S]*id: 'progress'[\s\S]*auth_login_benefit_progress[\s\S]*id: 'worksheets'[\s\S]*auth_login_benefit_worksheets[\s\S]*id: 'review'[\s\S]*auth_login_benefit_review/,
+  'Login form should pass structured auth benefit rows.'
+);
+assert.match(
+  registerFormSource,
+  /benefits=\{\[[\s\S]*id: 'progress'[\s\S]*auth_register_benefit_progress[\s\S]*id: 'worksheets'[\s\S]*auth_register_benefit_worksheets[\s\S]*id: 'review'[\s\S]*auth_register_benefit_review/,
+  'Register form should pass structured auth benefit rows.'
 );
 assert.match(
   worksheetsRouteSource,

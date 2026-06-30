@@ -15,18 +15,24 @@ import {
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
-interface AuthWorkflowStep {
+export type AuthCardBenefitItem = {
+  id: string;
+  text: string;
+};
+
+export type AuthWorkflowStep = {
+  id: string;
   label: string;
   title: string;
   description: string;
-}
+};
 
 interface AuthCardProps {
   children: React.ReactNode;
   eyebrow?: string;
   headerLabel: string;
   description?: string;
-  benefits?: string[];
+  benefits?: AuthCardBenefitItem[];
   workflowSteps?: AuthWorkflowStep[];
   returnHint?: string;
   trustNote?: string;
@@ -90,7 +96,7 @@ export function AuthCard({
             <ul className="space-y-2">
               {benefits.map((benefit) => (
                 <li
-                  key={benefit}
+                  key={benefit.id}
                   className="grid grid-cols-[1rem_1fr] gap-2 text-xs leading-relaxed text-muted-foreground"
                 >
                   <IconCircleCheck
@@ -98,7 +104,7 @@ export function AuthCard({
                     className="mt-0.5 size-4 text-primary"
                     stroke={1.8}
                   />
-                  <span>{benefit}</span>
+                  <span>{benefit.text}</span>
                 </li>
               ))}
             </ul>
@@ -109,7 +115,7 @@ export function AuthCard({
             <ol className="space-y-2.5">
               {workflowSteps.map((step) => (
                 <li
-                  key={`${step.label}-${step.title}`}
+                  key={step.id}
                   className="grid grid-cols-[1.65rem_1fr] gap-2"
                 >
                   <span className="flex size-6 items-center justify-center rounded-md border border-border bg-muted text-[0.68rem] font-semibold text-foreground">
