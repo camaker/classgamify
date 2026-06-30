@@ -647,6 +647,7 @@ import {
   normalizeAssignmentResultProgressValue,
   getAssignmentResultActionExecutionData,
   getAssignmentResultActionExecutionDataScope,
+  getAssignmentResultActionButtonId,
   getAssignmentResultCopyArtifactText,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
@@ -5051,12 +5052,22 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*actionButton\.disabledReason[\s\S]*disabledReason\.message[\s\S]*getResultActionDisabledReasonId/,
+  /resultActions\.map[\s\S]*key=\{actionButton\.id\}/,
+  'Assignment result action buttons should render with stable action-button ids.'
+);
+assert.doesNotMatch(
+  assignmentResultsHeaderActionsSource,
+  /key=\{actionButton\.action\}|key=\{disabledReason\.action\}/,
+  'Assignment result action controls should not key buttons or disabled reasons by action alone.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /AssignmentResultsHeaderResultActionDisabledReasons[\s\S]*actionButton\.disabledReason[\s\S]*actionButton\.id[\s\S]*disabledReason\.message[\s\S]*getResultActionDisabledReasonId/,
   'Assignment result action controls should render prepared disabled reasons for blocked teacher result actions.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /aria-describedby=\{disabledReasonId\}[\s\S]*id=\{getResultActionDisabledReasonId/,
+  /aria-describedby=\{disabledReasonId\}[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
   'Assignment result action disabled buttons should be associated with their prepared disabled reason text.'
 );
 assert.doesNotMatch(
@@ -35467,6 +35478,7 @@ assert.equal(
 assert.deepEqual(
   {
     actionDisabled: scoredResultsPageView.actionButtons.map((button) => [
+      button.id,
       button.action,
       button.disabled,
     ]),
@@ -35690,11 +35702,11 @@ assert.deepEqual(
   },
   {
     actionDisabled: [
-      ['copy-brief', false],
-      ['copy-reteach-plan', false],
-      ['copy-item-review', false],
-      ['copy-follow-up', false],
-      ['export-csv', false],
+      ['copy-brief:current-review', 'copy-brief', false],
+      ['copy-reteach-plan:current-review', 'copy-reteach-plan', false],
+      ['copy-item-review:current-review', 'copy-item-review', false],
+      ['copy-follow-up:current-review', 'copy-follow-up', false],
+      ['export-csv:full-assignment-results', 'export-csv', false],
     ],
     actionDataAssignmentId: 'assignment-results-page',
     actionDataItemIds: ['q-1', 'pair-1'],
@@ -38205,6 +38217,20 @@ assert.deepEqual(assignmentResultActionOrder, [
   'copy-follow-up',
   'export-csv',
 ]);
+assert.equal(
+  getAssignmentResultActionButtonId({
+    action: 'copy-brief',
+    dataScope: 'current-review',
+  }),
+  'copy-brief:current-review'
+);
+assert.equal(
+  getAssignmentResultActionButtonId({
+    action: 'export-csv',
+    dataScope: 'full-assignment-results',
+  }),
+  'export-csv:full-assignment-results'
+);
 const emptyAssignmentResultActionState = buildAssignmentResultActionState({
   attemptCount: 0,
   itemCount: 0,
@@ -38245,6 +38271,7 @@ assert.deepEqual(
         message: 'Submit at least one attempt before copying a brief.',
         type: 'blocked',
       },
+      id: 'copy-brief:current-review',
       kind: 'copy-text',
       label: 'Copy brief',
       successMessage: 'Classroom brief copied.',
@@ -38262,6 +38289,7 @@ assert.deepEqual(
         message: 'Submit at least one attempt before copying a reteach plan.',
         type: 'blocked',
       },
+      id: 'copy-reteach-plan:current-review',
       kind: 'copy-text',
       label: 'Copy reteach plan',
       successMessage: 'Reteach plan copied.',
@@ -38278,6 +38306,7 @@ assert.deepEqual(
         message: 'Add assignment items before copying item review.',
         type: 'blocked',
       },
+      id: 'copy-item-review:current-review',
       kind: 'copy-text',
       label: 'Copy item review',
       successMessage: 'Item review copied.',
@@ -38294,6 +38323,7 @@ assert.deepEqual(
         message: 'Submit at least one attempt before copying follow-up.',
         type: 'blocked',
       },
+      id: 'copy-follow-up:current-review',
       kind: 'copy-text',
       label: 'Copy follow-up',
       successMessage: 'Student follow-up copied.',
@@ -38310,6 +38340,7 @@ assert.deepEqual(
         message: 'Submit at least one attempt before exporting results.',
         type: 'blocked',
       },
+      id: 'export-csv:full-assignment-results',
       kind: 'download-csv',
       label: 'Download CSV',
       successMessage: 'Results CSV downloaded.',
@@ -38333,6 +38364,7 @@ assert.deepEqual(
       disabled: false,
       failureMessage: 'Classroom brief could not be copied.',
       gate: { type: 'ready' },
+      id: 'copy-brief:current-review',
       kind: 'copy-text',
       label: 'Copy brief',
       successMessage: 'Classroom brief copied.',
@@ -38345,6 +38377,7 @@ assert.deepEqual(
       disabled: false,
       failureMessage: 'Reteach plan could not be copied.',
       gate: { type: 'ready' },
+      id: 'copy-reteach-plan:current-review',
       kind: 'copy-text',
       label: 'Copy reteach plan',
       successMessage: 'Reteach plan copied.',
@@ -38357,6 +38390,7 @@ assert.deepEqual(
       disabled: false,
       failureMessage: 'Item review could not be copied.',
       gate: { type: 'ready' },
+      id: 'copy-item-review:current-review',
       kind: 'copy-text',
       label: 'Copy item review',
       successMessage: 'Item review copied.',
@@ -38369,6 +38403,7 @@ assert.deepEqual(
       disabled: false,
       failureMessage: 'Student follow-up could not be copied.',
       gate: { type: 'ready' },
+      id: 'copy-follow-up:current-review',
       kind: 'copy-text',
       label: 'Copy follow-up',
       successMessage: 'Student follow-up copied.',
@@ -38381,6 +38416,7 @@ assert.deepEqual(
       disabled: false,
       failureMessage: 'Results CSV could not be downloaded.',
       gate: { type: 'ready' },
+      id: 'export-csv:full-assignment-results',
       kind: 'download-csv',
       label: 'Download CSV',
       successMessage: 'Results CSV downloaded.',

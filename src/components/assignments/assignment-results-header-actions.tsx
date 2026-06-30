@@ -152,7 +152,7 @@ function AssignmentResultsHeaderResultActions({
       {resultActions.map((actionButton) => (
         <AssignmentResultsHeaderResultActionButton
           actionButton={actionButton}
-          key={actionButton.action}
+          key={actionButton.id}
           disabledReasonId={getResultActionDisabledReasonId(actionButton)}
           onClick={() => onResultAction(actionButton)}
         />
@@ -204,7 +204,7 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
     actionButton.disabledReason
       ? [
           {
-            action: actionButton.action,
+            id: actionButton.id,
             message: actionButton.disabledReason,
           },
         ]
@@ -218,10 +218,10 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
       {disabledReasons.map((disabledReason) => (
         <p
           id={getResultActionDisabledReasonId({
-            action: disabledReason.action,
+            id: disabledReason.id,
             disabledReason: disabledReason.message,
           })}
-          key={disabledReason.action}
+          key={disabledReason.id}
         >
           {disabledReason.message}
         </p>
@@ -231,11 +231,11 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
 }
 
 function getResultActionDisabledReasonId({
-  action,
+  id,
   disabledReason,
-}: Pick<AssignmentResultActionButton, 'action' | 'disabledReason'>) {
+}: Pick<AssignmentResultActionButton, 'disabledReason' | 'id'>) {
   return disabledReason
-    ? `assignment-result-action-${action}-disabled-reason`
+    ? `assignment-result-action-${id}-disabled-reason`
     : undefined;
 }
 

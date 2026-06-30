@@ -46,6 +46,9 @@ export type AssignmentResultActionDataScope =
   | 'current-review'
   | 'full-assignment-results';
 
+export type AssignmentResultActionButtonId =
+  `${AssignmentResultAction}:${AssignmentResultActionDataScope}`;
+
 export type AssignmentResultActionGate =
   | {
       type: 'ready';
@@ -86,6 +89,7 @@ export type AssignmentResultActionButton =
       disabledReason?: string;
       failureMessage: string;
       gate: AssignmentResultActionGate;
+      id: AssignmentResultActionButtonId;
       kind: 'copy-text';
       label: string;
       successMessage: string;
@@ -101,6 +105,7 @@ export type AssignmentResultActionButton =
       disabledReason?: string;
       failureMessage: string;
       gate: AssignmentResultActionGate;
+      id: AssignmentResultActionButtonId;
       kind: 'download-csv';
       label: string;
       successMessage: string;
@@ -311,12 +316,14 @@ export function buildAssignmentResultActionButtons({
       label: actionCopy.label,
       successMessage: actionCopy.successMessage,
     } satisfies AssignmentResultActionButtonBase;
+    const id = getAssignmentResultActionButtonId(descriptor);
 
     if (descriptor.kind === 'download-csv') {
       return {
         ...base,
         action: descriptor.action,
         dataScope: descriptor.dataScope,
+        id,
         kind: 'download-csv',
       };
     }
@@ -325,9 +332,20 @@ export function buildAssignmentResultActionButtons({
       ...base,
       action: descriptor.action,
       dataScope: descriptor.dataScope,
+      id,
       kind: 'copy-text',
     };
   });
+}
+
+export function getAssignmentResultActionButtonId({
+  action,
+  dataScope,
+}: Pick<
+  AssignmentResultActionDescriptor,
+  'action' | 'dataScope'
+>): AssignmentResultActionButtonId {
+  return `${action}:${dataScope}`;
 }
 
 export function getAssignmentResultActionGateFromState({
