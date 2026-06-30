@@ -298,6 +298,10 @@ function AssignmentResultsCopyArtifactPreview({
     actionButton: AssignmentResultActionButton;
   };
 }) {
+  const disabledReasonId = getCopyArtifactPreviewDisabledReasonId(
+    preview.actionButton
+  );
+
   return (
     <article className="grid gap-2 rounded-md border bg-background p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -312,11 +316,16 @@ function AssignmentResultsCopyArtifactPreview({
           className="shrink-0 bg-background"
           disabled={preview.actionButton.disabled}
           onClick={() => onResultAction(preview.actionButton)}
+          aria-describedby={disabledReasonId}
         >
           <IconCopy className="size-4" />
           {preview.actionButton.label}
         </Button>
       </div>
+      <AssignmentResultsCopyArtifactDisabledReason
+        actionButton={preview.actionButton}
+        disabledReasonId={disabledReasonId}
+      />
       <div className="grid gap-2">
         <p className="font-medium text-xs">{preview.summaryLabel}</p>
         <div className="flex flex-wrap gap-2">
@@ -336,4 +345,29 @@ function AssignmentResultsCopyArtifactPreview({
       </pre>
     </article>
   );
+}
+
+function AssignmentResultsCopyArtifactDisabledReason({
+  actionButton,
+  disabledReasonId,
+}: {
+  actionButton: AssignmentResultActionButton;
+  disabledReasonId: string | undefined;
+}) {
+  if (!actionButton.disabledReason) return null;
+
+  return (
+    <p id={disabledReasonId} className="text-muted-foreground text-xs">
+      {actionButton.disabledReason}
+    </p>
+  );
+}
+
+function getCopyArtifactPreviewDisabledReasonId({
+  disabledReason,
+  id,
+}: Pick<AssignmentResultActionButton, 'disabledReason' | 'id'>) {
+  return disabledReason
+    ? `assignment-result-copy-preview-${id}-disabled-reason`
+    : undefined;
 }

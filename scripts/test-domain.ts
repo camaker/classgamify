@@ -5538,6 +5538,21 @@ assert.match(
   /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
   'Assignment classroom brief copy artifact preview cards should render prepared label, description, summary, metadata, copied text, and action button state.'
 );
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /const disabledReasonId = getCopyArtifactPreviewDisabledReasonId\([\s\S]*preview\.actionButton[\s\S]*aria-describedby=\{disabledReasonId\}[\s\S]*AssignmentResultsCopyArtifactDisabledReason[\s\S]*actionButton=\{preview\.actionButton\}[\s\S]*disabledReasonId=\{disabledReasonId\}/,
+  'Assignment classroom brief copy artifact preview buttons should associate disabled actions with their prepared disabled reason text.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsCopyArtifactDisabledReason[\s\S]*if \(!actionButton\.disabledReason\) return null;[\s\S]*id=\{disabledReasonId\}[\s\S]*actionButton\.disabledReason/,
+  'Assignment classroom brief copy artifact preview cards should render prepared disabled reasons for blocked copy actions.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /function getCopyArtifactPreviewDisabledReasonId[\s\S]*`assignment-result-copy-preview-\$\{id\}-disabled-reason`/,
+  'Assignment classroom brief copy artifact disabled reason ids should be stable per prepared action-button id.'
+);
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
   /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|brief\.text/,
