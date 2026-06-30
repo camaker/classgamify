@@ -2,7 +2,10 @@ import {
   buildTemplateRemixSummary,
   getTemplateRemixPlan,
 } from '@/activities/template-remix';
-import type { TemplateRemixTemplateOption } from '@/activities/template-remix';
+import type {
+  TemplateRemixLockedOption,
+  TemplateRemixTemplateOption,
+} from '@/activities/template-remix';
 import {
   ACTIVITY_TEMPLATE_TYPES,
   type ActivityContent,
@@ -24,6 +27,8 @@ import { m } from '@/locale/paraglide/messages';
 
 export type ActivityLibraryTemplateOption = TemplateRemixTemplateOption;
 
+export type ActivityLibraryLockedTemplateOption = TemplateRemixLockedOption;
+
 export type ActivityLibraryCardSummary = {
   contentCounts: {
     groups: number;
@@ -31,6 +36,7 @@ export type ActivityLibraryCardSummary = {
     questions: number;
   };
   lockedTemplateDiagnostics: string[];
+  lockedTemplateOptions: ActivityLibraryLockedTemplateOption[];
   readyTemplateOptions: ActivityLibraryTemplateOption[];
   suggestedTemplateOptions: ActivityLibraryTemplateOption[];
 };
@@ -210,6 +216,7 @@ export function buildActivityLibraryCardSummary({
       questions: content.questions.length,
     },
     lockedTemplateDiagnostics: remixSummary.lockedTemplateDiagnostics,
+    lockedTemplateOptions: remixSummary.lockedTemplateOptions,
     readyTemplateOptions: remixSummary.readyTemplateOptions,
     suggestedTemplateOptions: remixSummary.suggestedTemplateOptions,
   };

@@ -90,8 +90,13 @@ export type ActivityLibraryRemixActionOptionView =
     actionLabel: string;
   };
 
+export type ActivityLibraryLockedTemplateDiagnosticView = {
+  diagnosis: string;
+  id: ActivityTemplateType;
+};
+
 export type ActivityLibraryCompatibilityView = {
-  lockedTemplateDiagnostics: string[];
+  lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
   remixActionOptions: ActivityLibraryRemixActionOptionView[];
   remixHint?: string;
@@ -1163,10 +1168,12 @@ export function buildActivityLibraryCompatibilityView({
   summary: ActivityLibraryCardSummary;
 }): ActivityLibraryCompatibilityView {
   return {
-    lockedTemplateDiagnostics: summary.lockedTemplateDiagnostics.slice(
-      0,
-      ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics
-    ),
+    lockedTemplateDiagnostics: summary.lockedTemplateOptions
+      .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics)
+      .map((option) => ({
+        diagnosis: option.diagnosis,
+        id: option.template,
+      })),
     readyTemplateOptions: summary.readyTemplateOptions.map((option) => ({
       ...option,
       isCurrent: option.template === currentTemplateType,

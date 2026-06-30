@@ -2879,6 +2879,21 @@ assert.match(
   /ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS\.lockedTemplateDiagnostics[\s\S]*ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS\.remixActionOptions/,
   'Activity library compatibility view should reuse named display limits.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /ActivityLibraryLockedTemplateDiagnosticView[\s\S]*id: ActivityTemplateType[\s\S]*lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView\[\]/,
+  'Activity library compatibility view should expose stable locked-template diagnostic ids.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /lockedTemplateDiagnostics: summary\.lockedTemplateOptions[\s\S]*id: option\.template/,
+  'Activity library compatibility view should derive locked-template diagnostic ids from template types.'
+);
+assert.doesNotMatch(
+  activityLibraryViewSource,
+  /lockedTemplateDiagnostics: summary\.lockedTemplateDiagnostics\.slice/,
+  'Activity library compatibility view should not derive locked-template identity from localized diagnostics.'
+);
 assert.doesNotMatch(
   activityLibraryViewSource,
   /slice\(0, 2\)|slice\(0, 3\)/,
@@ -21507,7 +21522,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /ActivityLibraryCompatibilityView[\s\S]*ActivityLibraryCardActionState[\s\S]*ActivityLibraryReadyTemplateOptionView[\s\S]*ActivityLibraryRemixActionOptionView/,
+  /ActivityLibraryCardActionState[\s\S]*ActivityLibraryCompatibilityView[\s\S]*ActivityLibraryLockedTemplateDiagnosticView[\s\S]*ActivityLibraryReadyTemplateOptionView[\s\S]*ActivityLibraryRemixActionOptionView/,
   'Activity library compatibility panel should import explicit compatibility view contracts.'
 );
 assert.doesNotMatch(
@@ -21527,8 +21542,13 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /compatibility\.lockedTemplateDiagnostics\.map[\s\S]*ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnosis=\{diagnosis\}/,
-  'Activity library compatibility panel should delegate prepared locked-template diagnostics.'
+  /compatibility\.lockedTemplateDiagnostics\.map\(\(diagnostic\) => \([\s\S]*ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnostic=\{diagnostic\}[\s\S]*key=\{diagnostic\.id\}/,
+  'Activity library compatibility panel should delegate prepared locked-template diagnostic views.'
+);
+assert.doesNotMatch(
+  activityLibraryCompatibilityPanelSource,
+  /key=\{diagnosis\}/,
+  'Activity library compatibility panel should not key locked-template diagnostics by localized copy.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
@@ -21542,7 +21562,7 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
-  /function ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnosis/,
+  /function ActivityLibraryLockedTemplateDiagnostic[\s\S]*diagnostic: ActivityLibraryLockedTemplateDiagnosticView[\s\S]*diagnostic\.diagnosis/,
   'Activity library locked template diagnostic should render prepared diagnostics.'
 );
 assert.match(
@@ -29986,6 +30006,10 @@ assert.ok(
     'Add match pairs to unlock Match.'
   )
 );
+assert.deepEqual(questionOnlyCardSummary.lockedTemplateOptions.slice(0, 2), [
+  { diagnosis: 'Add match pairs to unlock Match.', template: 'match-up' },
+  { diagnosis: 'Add match pairs to unlock Lines.', template: 'line-match' },
+]);
 assert.deepEqual(
   buildActivityLibraryCompatibilityView({
     currentTemplateType: 'quiz',
@@ -29993,8 +30017,14 @@ assert.deepEqual(
   }),
   {
     lockedTemplateDiagnostics: [
-      'Add match pairs to unlock Match.',
-      'Add match pairs to unlock Lines.',
+      {
+        diagnosis: 'Add match pairs to unlock Match.',
+        id: 'match-up',
+      },
+      {
+        diagnosis: 'Add match pairs to unlock Lines.',
+        id: 'line-match',
+      },
     ],
     readyTemplateOptions: [
       { isCurrent: true, shortName: 'Quiz', template: 'quiz' },

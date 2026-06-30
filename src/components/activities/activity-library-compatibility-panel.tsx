@@ -2,6 +2,7 @@ import type {
   ActivityLibraryCardActionState,
   ActivityLibraryCardTemplateType,
   ActivityLibraryCompatibilityView,
+  ActivityLibraryLockedTemplateDiagnosticView,
   ActivityLibraryReadyTemplateOptionView,
   ActivityLibraryRemixActionOptionView,
 } from '@/activities/library-view';
@@ -56,10 +57,10 @@ export function ActivityLibraryCompatibilityPanel({
       ) : null}
       {compatibility.lockedTemplateDiagnostics.length ? (
         <div className="mt-3 grid gap-1.5">
-          {compatibility.lockedTemplateDiagnostics.map((diagnosis) => (
+          {compatibility.lockedTemplateDiagnostics.map((diagnostic) => (
             <ActivityLibraryLockedTemplateDiagnostic
-              diagnosis={diagnosis}
-              key={diagnosis}
+              diagnostic={diagnostic}
+              key={diagnostic.id}
             />
           ))}
         </div>
@@ -108,9 +109,13 @@ function ActivityLibraryRemixActionButton({
 }
 
 function ActivityLibraryLockedTemplateDiagnostic({
-  diagnosis,
+  diagnostic,
 }: {
-  diagnosis: string;
+  diagnostic: ActivityLibraryLockedTemplateDiagnosticView;
 }) {
-  return <p className="text-xs leading-5 text-muted-foreground">{diagnosis}</p>;
+  return (
+    <p className="text-xs leading-5 text-muted-foreground">
+      {diagnostic.diagnosis}
+    </p>
+  );
 }
