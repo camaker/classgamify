@@ -3660,6 +3660,11 @@ assert.match(
 );
 assert.match(
   activityAiDraftPanelSource,
+  /const syncMaterialsHelpTextId = 'activity-ai-sync-materials-help'[\s\S]*aria-describedby=\{syncMaterialsHelpTextId\}[\s\S]*id=\{syncMaterialsHelpTextId\}[\s\S]*panelView\.syncMaterialsHelpText/,
+  'Activity AI draft source sync controls should associate the sync button with the prepared help text.'
+);
+assert.match(
+  activityAiDraftPanelSource,
   /panelView\.sourceMaterialNoteViews\.map[\s\S]*key=\{noteView\.key\}/,
   'Activity AI draft source controls should key source material notes by stable note keys.'
 );

@@ -95,6 +95,8 @@ function ActivityAiDraftSourceControls({
   onSyncSourceMaterials: () => void;
   panelView: ActivityEditorAiDraftPanelView;
 }) {
+  const syncMaterialsHelpTextId = 'activity-ai-sync-materials-help';
+
   return (
     <div className="min-w-0 flex-1 space-y-2">
       <div className="flex items-center gap-2">
@@ -121,11 +123,15 @@ function ActivityAiDraftSourceControls({
             className="bg-background"
             onClick={onSyncSourceMaterials}
             disabled={!panelView.canSyncDraftSourceMaterials}
+            aria-describedby={syncMaterialsHelpTextId}
           >
             <IconPaperclip className="size-3.5" />
             {panelView.syncMaterialsLabel}
           </Button>
-          <span className="text-xs text-muted-foreground">
+          <span
+            id={syncMaterialsHelpTextId}
+            className="text-xs text-muted-foreground"
+          >
             {panelView.syncMaterialsHelpText}
           </span>
         </div>
