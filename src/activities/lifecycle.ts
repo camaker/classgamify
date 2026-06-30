@@ -19,6 +19,10 @@ export type ActivityLifecycleActionCopy = {
   successMessage: string;
 };
 
+export type ActivityDerivativeBlockedReason =
+  | 'activity-archived'
+  | 'same-template';
+
 export type ActivityDerivativeActionGate =
   | {
       type: 'ready';
@@ -26,6 +30,7 @@ export type ActivityDerivativeActionGate =
   | {
       action: ActivityDerivativeAction;
       message: string;
+      reason: Extract<ActivityDerivativeBlockedReason, 'activity-archived'>;
       type: 'blocked';
     };
 
@@ -36,6 +41,7 @@ export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & {
 type ActivityDerivativeBlockedExecutionPlan = {
   failureMessage: string;
   message: string;
+  reason: ActivityDerivativeBlockedReason;
   type: 'blocked';
 };
 
@@ -84,10 +90,20 @@ type ActivityVisibilityAction = Extract<
   'archive' | 'restore'
 >;
 
+export type ActivityVisibilityBlockedReason =
+  | 'already-archived'
+  | 'not-archived';
+
 type ActivityVisibilityBlockedExecutionPlan = {
   failureMessage: string;
   message: string;
+  reason: ActivityVisibilityBlockedReason;
   type: 'blocked';
+};
+
+type ActivityVisibilityBlockedView = {
+  message: string;
+  reason: ActivityVisibilityBlockedReason;
 };
 
 type ActivityVisibilityUpdateExecutionPlan = {
@@ -195,6 +211,7 @@ export function buildActivityDerivativeActionGate({
   return {
     action,
     message: getArchivedActivityDerivationError(),
+    reason: 'activity-archived',
     type: 'blocked',
   };
 }
@@ -264,6 +281,7 @@ export function buildActivityDerivativeActionExecutionPlan(
     return {
       failureMessage: actionView.failureMessage,
       message: actionView.gate.message,
+      reason: actionView.gate.reason,
       type: 'blocked',
     };
   }
@@ -284,6 +302,7 @@ export function buildActivityDerivativeActionExecutionPlan(
     return {
       failureMessage: actionView.failureMessage,
       message: getSameTemplateRemixError(),
+      reason: 'same-template',
       type: 'blocked',
     };
   }
@@ -310,15 +329,16 @@ export function buildActivityVisibilityActionExecutionPlan({
   visibility: ActivityVisibility;
 }): ActivityVisibilityActionExecutionPlan {
   const actionCopy = getActivityLifecycleActionCopy(action);
-  const message =
+  const blockedView =
     action === 'archive'
-      ? getActivityArchiveBlockedMessage(visibility)
-      : getActivityRestoreBlockedMessage(visibility);
+      ? getActivityArchiveBlockedView(visibility)
+      : getActivityRestoreBlockedView(visibility);
 
-  if (message) {
+  if (blockedView) {
     return {
       failureMessage: actionCopy.failureMessage,
-      message,
+      message: blockedView.message,
+      reason: blockedView.reason,
       type: 'blocked',
     };
   }
@@ -363,29 +383,39 @@ export function assertActivityCanEdit(visibility: ActivityVisibility) {
 }
 
 export function assertActivityCanArchive(visibility: ActivityVisibility) {
-  const message = getActivityArchiveBlockedMessage(visibility);
+  const blockedView = getActivityArchiveBlockedView(visibility);
 
-  if (message) {
-    throw new Error(message);
+  if (blockedView) {
+    throw new Error(blockedView.message);
   }
 }
 
 export function assertActivityCanRestore(visibility: ActivityVisibility) {
-  const message = getActivityRestoreBlockedMessage(visibility);
+  const blockedView = getActivityRestoreBlockedView(visibility);
 
-  if (message) {
-    throw new Error(message);
+  if (blockedView) {
+    throw new Error(blockedView.message);
   }
 }
 
-function getActivityArchiveBlockedMessage(visibility: ActivityVisibility) {
-  return canArchiveActivity(visibility)
-    ? undefined
-    : m.activity_lifecycle_archive_blocked();
+function getActivityArchiveBlockedView(
+  visibility: ActivityVisibility
+): ActivityVisibilityBlockedView | undefined {
+  if (canArchiveActivity(visibility)) return undefined;
+
+  return {
+    message: m.activity_lifecycle_archive_blocked(),
+    reason: 'already-archived',
+  };
 }
 
-function getActivityRestoreBlockedMessage(visibility: ActivityVisibility) {
-  return canRestoreActivity(visibility)
-    ? undefined
-    : m.activity_lifecycle_restore_blocked();
+function getActivityRestoreBlockedView(
+  visibility: ActivityVisibility
+): ActivityVisibilityBlockedView | undefined {
+  if (canRestoreActivity(visibility)) return undefined;
+
+  return {
+    message: m.activity_lifecycle_restore_blocked(),
+    reason: 'not-archived',
+  };
 }

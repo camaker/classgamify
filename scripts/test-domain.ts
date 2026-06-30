@@ -3427,8 +3427,13 @@ const activityScaffoldsSource = readFileSync(
 const activityEditorSource = readFileSync('src/activities/editor.ts', 'utf8');
 assert.match(
   activityLifecycleSource,
-  /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
-  'Activity lifecycle domain should expose explicit lifecycle action copy, gate, and view contracts.'
+  /export type ActivityLifecycleActionCopy = \{[\s\S]*failureMessage: string;[\s\S]*successMessage: string;[\s\S]*export type ActivityDerivativeBlockedReason =[\s\S]*'activity-archived'[\s\S]*'same-template'[\s\S]*export type ActivityDerivativeActionGate =[\s\S]*reason: Extract<ActivityDerivativeBlockedReason, 'activity-archived'>;[\s\S]*export type ActivityLifecycleActionView = ActivityLifecycleActionCopy & \{[\s\S]*gate: ActivityDerivativeActionGate;/,
+  'Activity lifecycle domain should expose explicit lifecycle action copy, blocked reason, gate, and view contracts.'
+);
+assert.match(
+  activityLifecycleSource,
+  /export type ActivityVisibilityBlockedReason =[\s\S]*'already-archived'[\s\S]*'not-archived'[\s\S]*reason: ActivityVisibilityBlockedReason/,
+  'Activity visibility execution plans should expose structured blocked reasons.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -26132,6 +26137,7 @@ assert.deepEqual(
   {
     action: 'duplicate',
     message: archivedActivityDerivationError,
+    reason: 'activity-archived',
     type: 'blocked',
   }
 );
@@ -26176,6 +26182,7 @@ assert.deepEqual(
     gate: {
       action: 'publish',
       message: archivedActivityDerivationError,
+      reason: 'activity-archived',
       type: 'blocked',
     },
     successMessage: 'Assignment link published.',
@@ -26227,6 +26234,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be remixed.',
     message: 'Choose a different template to remix into.',
+    reason: 'same-template',
     type: 'blocked',
   }
 );
@@ -26239,6 +26247,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be duplicated.',
     message: archivedActivityDerivationError,
+    reason: 'activity-archived',
     type: 'blocked',
   }
 );
@@ -26253,6 +26262,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be remixed.',
     message: archivedActivityDerivationError,
+    reason: 'activity-archived',
     type: 'blocked',
   }
 );
@@ -26297,6 +26307,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be archived.',
     message: 'This activity is already archived.',
+    reason: 'already-archived',
     type: 'blocked',
   }
 );
@@ -26309,6 +26320,7 @@ assert.deepEqual(
   {
     failureMessage: 'Activity could not be restored.',
     message: 'Only archived activities can be restored.',
+    reason: 'not-archived',
     type: 'blocked',
   }
 );
@@ -26789,6 +26801,7 @@ assert.deepEqual(buildActivityLibraryCardActionView('archived').duplicate, {
   gate: {
     action: 'duplicate',
     message: archivedActivityDerivationError,
+    reason: 'activity-archived',
     type: 'blocked',
   },
   label: 'Duplicate',
@@ -26799,6 +26812,7 @@ assert.deepEqual(buildActivityLibraryCardActionView('archived').publish, {
   gate: {
     action: 'publish',
     message: archivedActivityDerivationError,
+    reason: 'activity-archived',
     type: 'blocked',
   },
   label: 'Publish assignment',
