@@ -27,7 +27,10 @@ export type TemplateEntryLinkAction = {
   to: typeof Routes.StudentPreview | typeof Routes.Templates;
 };
 
-export type TemplateEntryCreateLinkAction = Omit<TemplateEntryAction, 'search'>;
+export type TemplateEntryCreateLinkAction = {
+  label: string;
+  to: typeof Routes.Create;
+};
 
 export function buildTemplateCreateSearch(
   template: ActivityTemplateType

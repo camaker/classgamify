@@ -25650,8 +25650,13 @@ assert.match(
 );
 assert.match(
   templateEntrySource,
-  /export type CreateActivityTemplateSearch = \{[\s\S]*template: ActivityTemplateType;[\s\S]*export type TemplateEntryAction = \{[\s\S]*search: CreateActivityTemplateSearch;[\s\S]*to: typeof Routes\.Create;[\s\S]*export type TemplateEntryLinkAction = \{[\s\S]*to: typeof Routes\.StudentPreview \| typeof Routes\.Templates;[\s\S]*export type TemplateEntryCreateLinkAction = Omit<[\s\S]*TemplateEntryAction,[\s\S]*'search'[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
+  /export type CreateActivityTemplateSearch = \{[\s\S]*template: ActivityTemplateType;[\s\S]*export type TemplateEntryAction = \{[\s\S]*search: CreateActivityTemplateSearch;[\s\S]*to: typeof Routes\.Create;[\s\S]*export type TemplateEntryLinkAction = \{[\s\S]*to: typeof Routes\.StudentPreview \| typeof Routes\.Templates;[\s\S]*export type TemplateEntryCreateLinkAction = \{[\s\S]*label: string;[\s\S]*to: typeof Routes\.Create;[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
   'Template entry helpers should expose explicit create-search, action, link-action, and create-link contracts.'
+);
+assert.doesNotMatch(
+  templateEntrySource,
+  /Omit<TemplateEntryAction,\s*['"]search['"]>/,
+  'Template entry create-link actions should not be derived from template-search actions.'
 );
 assert.match(
   entryPageViewSource,
