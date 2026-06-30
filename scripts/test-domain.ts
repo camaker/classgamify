@@ -8318,6 +8318,16 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
+  /summaryView\.items\.map[\s\S]*key=\{rule\.id\}/,
+  'Public assignment rules component should key rule cards by stable rule ids.'
+);
+assert.doesNotMatch(
+  publicAssignmentRulesComponentSource,
+  /key=\{rule\.label\}/,
+  'Public assignment rules component should not key rule cards by localized labels.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
   /function PublicAssignmentRuleItem[\s\S]*aria-label=\{rule\.ariaLabel\}[\s\S]*rule\.description/,
   'Public assignment rule item should render prepared rule accessibility labels and student-facing descriptions.'
 );

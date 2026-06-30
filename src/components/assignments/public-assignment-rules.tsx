@@ -22,7 +22,7 @@ export function PublicAssignmentRules({
   return (
     <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {summaryView.items.map((rule) => (
-        <PublicAssignmentRuleItem key={rule.label} rule={rule} />
+        <PublicAssignmentRuleItem key={rule.id} rule={rule} />
       ))}
     </div>
   );
