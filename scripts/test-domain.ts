@@ -8072,6 +8072,16 @@ assert.match(
   'Public assignment rule summary views should centralize rule items and rule summary metadata.'
 );
 assert.match(
+  assignmentDeliverySummarySource,
+  /normalizeAssignmentLifecycleTimestamp[\s\S]*function hasAssignmentCloseTime[\s\S]*normalizeAssignmentLifecycleTimestamp\(expiresAt\)[\s\S]*export function formatAssignmentExpiry[\s\S]*const timestamp = normalizeAssignmentLifecycleTimestamp\(expiresAt\)/,
+  'Assignment delivery close-time summaries should reuse shared lifecycle timestamp normalization.'
+);
+assert.doesNotMatch(
+  assignmentDeliverySummarySource,
+  /new Date\(expiresAt\)/,
+  'Assignment delivery close-time summaries should not parse expiry dates locally.'
+);
+assert.match(
   studentRunnerViewSource,
   /const ruleSummaryView = buildPublicAssignmentRuleSummaryViewFromSettings\(\{[\s\S]*expiresAt: assignment\.expiresAt \?\? null,[\s\S]*itemCount,[\s\S]*settings: assignment\.settings,[\s\S]*\}\)[\s\S]*ruleItems: ruleSummaryView\.items,[\s\S]*ruleSummaryView,/,
   'Student runner headers should prepare public assignment rules through the shared rule summary view.'
@@ -13341,6 +13351,30 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    expiresAt: '2026-02-01T00:00:00.000Z',
+    itemCount: 2,
+  }).summary,
+  {
+    collectsStudentName: true,
+    hasAttemptLimit: true,
+    hasCloseTime: true,
+    hasTimer: false,
+    itemCount: 2,
+    ruleCount: 6,
+    ruleIds: [
+      'items',
+      'attempts',
+      'timer',
+      'closes',
+      'identity',
+      'answerReveal',
+    ],
+    showsCorrectAnswers: true,
+  }
+);
+assert.equal(formatAssignmentExpiry('not-a-date'), 'No close time');
 assert.deepEqual(
   buildAssignmentDeliverySummary({
     expiresAt: null,

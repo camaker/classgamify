@@ -1,5 +1,8 @@
 import type { AssignmentSettings } from '@/activities/types';
-import type { AssignmentDate } from '@/assignments/lifecycle';
+import {
+  type AssignmentDate,
+  normalizeAssignmentLifecycleTimestamp,
+} from '@/assignments/lifecycle';
 import { normalizeAttemptTimeLimitSeconds } from '@/assignments/attempt-duration';
 import {
   defaultAssignmentSettings,
@@ -316,10 +319,7 @@ function buildPublicAssignmentRuleSummaryStats({
 }
 
 function hasAssignmentCloseTime(expiresAt: AssignmentDate) {
-  if (!expiresAt) return false;
-
-  const date = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-  return Number.isFinite(date.getTime());
+  return normalizeAssignmentLifecycleTimestamp(expiresAt) !== undefined;
 }
 
 export function formatAssignmentAttempts(maxAttempts?: number | null) {
@@ -329,17 +329,15 @@ export function formatAssignmentAttempts(maxAttempts?: number | null) {
 }
 
 export function formatAssignmentExpiry(expiresAt: AssignmentDate) {
-  if (!expiresAt) return m.assignment_delivery_expiry_none();
-
-  const date = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-  if (Number.isNaN(date.getTime())) {
+  const timestamp = normalizeAssignmentLifecycleTimestamp(expiresAt);
+  if (timestamp === undefined) {
     return m.assignment_delivery_expiry_none();
   }
 
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',
-  }).format(date);
+  }).format(new Date(timestamp));
 }
 
 function formatAssignmentTimeLimit(seconds?: number | null) {
