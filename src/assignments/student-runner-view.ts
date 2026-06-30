@@ -161,7 +161,7 @@ export type GroupSortRunnerActionResult =
       type: 'select';
     };
 
-type InlineBlankPromptView =
+export type InlineBlankPromptView =
   | {
       after: string;
       before: string;
@@ -172,7 +172,7 @@ type InlineBlankPromptView =
       prompt: string;
     };
 
-type FillBlankWorksheetItemView = StudentRunnerItemView & {
+export type FillBlankWorksheetItemView = StudentRunnerItemView & {
   promptView: InlineBlankPromptView;
   reviewStatusClassName: string | undefined;
   sequenceLabel: string;
@@ -180,7 +180,7 @@ type FillBlankWorksheetItemView = StudentRunnerItemView & {
   wordBankText: string | null;
 };
 
-type FillBlankWorksheetView = StudentRunnerView & {
+export type FillBlankWorksheetView = StudentRunnerView & {
   fillBlankItemViews: FillBlankWorksheetItemView[];
 };
 

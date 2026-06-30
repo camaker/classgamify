@@ -7754,6 +7754,11 @@ assert.match(
   'Student runner domain should expose explicit base item, list, choice, and default-card view contracts.'
 );
 assert.match(
+  studentRunnerViewSource,
+  /export type InlineBlankPromptView =[\s\S]*mode: 'inline';[\s\S]*mode: 'standalone';[\s\S]*prompt: string;[\s\S]*export type FillBlankWorksheetItemView = StudentRunnerItemView & \{[\s\S]*promptView: InlineBlankPromptView;[\s\S]*export type FillBlankWorksheetView = StudentRunnerView & \{[\s\S]*fillBlankItemViews: FillBlankWorksheetItemView\[\];/,
+  'Student runner domain should expose explicit fill-blank worksheet prompt and item view contracts.'
+);
+assert.match(
   studentRuntimeItemListDomainSource,
   /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
   'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
@@ -7763,9 +7768,14 @@ assert.match(
   /type RuntimeChoiceButtonView[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];|import type \{ RuntimeChoiceButtonView \}[\s\S]*choiceViews: RuntimeChoiceButtonView\[\];[\s\S]*choices: RuntimeChoiceButtonView\[\];/,
   'Student runtime item list component should consume explicit choice-button view contracts.'
 );
+assert.match(
+  fillBlankWorksheetSource,
+  /type InlineBlankPromptView[\s\S]*promptView: InlineBlankPromptView;/,
+  'Fill-blank worksheet component should consume the explicit inline blank prompt view contract.'
+);
 assert.doesNotMatch(
-  `${studentRunnerViewSource}\n${studentRuntimeItemListDomainSource}\n${studentRuntimeItemListSource}`,
-  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView)>/,
+  `${studentRunnerViewSource}\n${studentRuntimeItemListDomainSource}\n${studentRuntimeItemListSource}\n${fillBlankWorksheetSource}`,
+  /ReturnType<typeof (?:buildStudentRunnerView|buildDefaultRuntimeItemCardViews|buildStudentRuntimeItemListView|buildFillBlankWorksheetView)>/,
   'Student runner and runtime list surfaces should not infer public renderer contracts from builder return types.'
 );
 assert.match(

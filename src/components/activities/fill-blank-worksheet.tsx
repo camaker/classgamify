@@ -3,7 +3,10 @@ import type {
   PublicRuntimeItem,
 } from '@/assignments/public';
 import { getActivityRunnerKindCopy } from '@/activities/runner-copy';
-import { buildFillBlankWorksheetView } from '@/assignments/student-runner-view';
+import {
+  buildFillBlankWorksheetView,
+  type InlineBlankPromptView,
+} from '@/assignments/student-runner-view';
 import { PublicAnswerFeedback } from '@/components/activities/public-answer-feedback';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -120,9 +123,7 @@ function InlineBlankPrompt({
   inlinePlaceholder: string;
   onAnswerChange: (answer: string) => void;
   placeholder: string;
-  promptView: ReturnType<
-    typeof buildFillBlankWorksheetView
-  >['fillBlankItemViews'][number]['promptView'];
+  promptView: InlineBlankPromptView;
 }) {
   if (promptView.mode === 'standalone') {
     return (
