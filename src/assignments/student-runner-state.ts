@@ -209,6 +209,7 @@ export type StudentRunnerPageViewModel = {
   headerView?: StudentRunnerHeaderView;
   identityView?: StudentRunnerIdentityView;
   itemCount: number;
+  missingReason?: StudentRunnerMissingReason;
   loadingView: StudentRunnerLoadingView;
   missingView?: StudentRunnerMissingPageView;
   previewView?: StudentRunnerActivityPreviewView;
@@ -229,6 +230,7 @@ export type StudentRunnerRouteState =
   | {
       missingView: StudentRunnerMissingPageView;
       pageView: StudentRunnerPageViewModel;
+      reason: StudentRunnerMissingReason;
       status: 'missing';
     }
   | {
@@ -649,6 +651,8 @@ export function buildStudentRunnerPageViewModel({
     loadingView: {
       message: runnerCopy.loadingMessage,
     },
+    missingReason:
+      pageState.status === 'missing' ? pageState.reason : undefined,
     missingView:
       pageState.status === 'missing'
         ? buildStudentRunnerMissingPageView(pageState.reason)
@@ -727,6 +731,7 @@ export function buildStudentRunnerRouteState(
     return {
       missingView: pageView.missingView,
       pageView,
+      reason: pageView.missingReason ?? 'not-found',
       status: 'missing',
     };
   }

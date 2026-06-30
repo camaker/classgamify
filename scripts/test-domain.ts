@@ -8557,6 +8557,16 @@ assert.match(
   /buildStudentRunnerRouteState[\s\S]*status: 'missing'[\s\S]*status: 'loading'[\s\S]*status: 'unavailable'[\s\S]*status: 'ready'/,
   'Student runner state domain should own loading, missing, unavailable, and ready route-state selection.'
 );
+assert.match(
+  studentRunnerStateSource,
+  /missingReason\?: StudentRunnerMissingReason[\s\S]*missingReason:[\s\S]*pageState\.status === 'missing' \? pageState\.reason : undefined/,
+  'Student runner page view-model should preserve structured missing reasons from public assignment lookup.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /missingView: pageView\.missingView[\s\S]*reason: pageView\.missingReason \?\? 'not-found'[\s\S]*status: 'missing'/,
+  'Student runner route state should carry structured missing reasons for closed, expired, draft, and missing links.'
+);
 assert.doesNotMatch(
   playRouteSource,
   /pageState\.status === 'loading'|pageState\.status === 'missing'|const missingView = runnerPageView\.missingView|!activity \|\| !assignment \|\| !headerView \|\| !identityView/,
@@ -18269,6 +18279,7 @@ const missingStudentRunnerPageView = buildStudentRunnerPageViewModel({
 assert.deepEqual(missingStudentRunnerPageView.loadingView, {
   message: 'Loading student activity...',
 });
+assert.equal(missingStudentRunnerPageView.missingReason, 'closed');
 const missingStudentRunnerRouteState = buildStudentRunnerRouteState(
   missingStudentRunnerPageView
 );
@@ -18289,10 +18300,12 @@ assert.equal(missingStudentRunnerPageView.identityView, undefined);
 assert.deepEqual(
   {
     missingTitle: missingStudentRunnerRouteState.missingView.title,
+    reason: missingStudentRunnerRouteState.reason,
     status: missingStudentRunnerRouteState.status,
   },
   {
     missingTitle: 'Assignment closed',
+    reason: 'closed',
     status: 'missing',
   }
 );
