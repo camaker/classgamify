@@ -20,6 +20,7 @@ import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority'
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
 import {
   buildLatestAttemptReviewByStudentKey,
+  formatStudentFollowUpLastSubmitted,
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
@@ -48,6 +49,7 @@ export type AssignmentReteachPlanItemView = {
 export type AssignmentReteachPlanStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
+  lastSubmittedLabel: string | null;
   latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
@@ -177,6 +179,7 @@ export function buildAssignmentReteachPlanStudentView({
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const lastSubmittedLabel = formatStudentFollowUpLastSubmitted(student);
   const latestAttemptCompletedAtLabel = latestAttempt
     ? formatStudentFollowUpLatestAttemptCompletedAt(latestAttempt)
     : null;
@@ -196,6 +199,7 @@ export function buildAssignmentReteachPlanStudentView({
   return {
     accuracyLabel,
     followUpRecommendation,
+    lastSubmittedLabel,
     latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     reviewItemCountLabel,

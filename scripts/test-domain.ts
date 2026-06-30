@@ -771,6 +771,7 @@ import {
   buildLatestAttemptReviewByStudentKey,
   buildAssignmentStudentFollowUpSummary,
   buildAssignmentStudentFollowUpSummaryStudentView,
+  formatStudentFollowUpLastSubmitted,
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
 } from '@/assignments/student-follow-up-summary';
@@ -1570,7 +1571,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempt-times'[\s\S]*'latest-attempts'[\s\S]*'students';/,
+  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempt-times'[\s\S]*'latest-attempts'[\s\S]*'student-last-submitted'[\s\S]*'students';/,
   'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
 );
 assert.doesNotMatch(
@@ -1630,6 +1631,11 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*student-last-submitted[\s\S]*assignment_result_copy_preview_meta_student_last_submitted[\s\S]*countAssignmentResultCopyStudentLastSubmittedViews/,
+  'Assignment result copy artifact preview metadata should expose student-level last-submitted coverage for student follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /countAssignmentResultCopyLatestAttemptViews\([\s\S]*latestAttemptSummaryLabel/,
   'Assignment result copy latest-attempt metadata should count the same structured student views used by copied text.'
 );
@@ -1637,6 +1643,11 @@ assert.match(
   assignmentResultActionsSource,
   /countAssignmentResultCopyLatestAttemptTimeViews\([\s\S]*latestAttemptCompletedAtLabel/,
   'Assignment result copy latest-attempt-time metadata should count structured submitted-time labels instead of parsing copied text.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /countAssignmentResultCopyStudentLastSubmittedViews\([\s\S]*lastSubmittedLabel/,
+  'Assignment result copy student-last-submitted metadata should count structured student summary labels instead of parsing copied text.'
 );
 assert.doesNotMatch(
   assignmentResultActionsSource,
@@ -1853,6 +1864,11 @@ assert.match(
 );
 assert.match(
   assignmentClassroomBriefSource,
+  /formatStudentFollowUpLastSubmitted\(student\)[\s\S]*lastSubmittedLabel/,
+  'Classroom brief student follow-up rows should expose shared student-level last-submitted labels.'
+);
+assert.match(
+  assignmentClassroomBriefSource,
   /kindLabel: item\.kindLabel/,
   'Classroom brief focus item views should expose prepared item type labels for teacher scanning.'
 );
@@ -1924,6 +1940,11 @@ assert.match(
   assignmentReteachPlanSource,
   /formatStudentFollowUpLatestAttemptCompletedAt\(latestAttempt\)[\s\S]*latestAttemptCompletedAtLabel/,
   'Reteach plan student follow-up rows should expose shared latest-attempt submitted-time labels.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /formatStudentFollowUpLastSubmitted\(student\)[\s\S]*lastSubmittedLabel/,
+  'Reteach plan student follow-up rows should expose shared student-level last-submitted labels.'
 );
 assert.doesNotMatch(
   assignmentReteachPlanSource,
@@ -32981,6 +33002,7 @@ assert.deepEqual(
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
+          ['student-last-submitted', 'Student last submitted', '1'],
           ['lines', 'Lines', '10'],
         ],
         true,
@@ -32997,6 +33019,7 @@ assert.deepEqual(
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
+          ['student-last-submitted', 'Student last submitted', '1'],
           ['lines', 'Lines', '6'],
         ],
         true,
@@ -33024,6 +33047,7 @@ assert.deepEqual(
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
+          ['student-last-submitted', 'Student last submitted', '1'],
           ['lines', 'Lines', '2'],
         ],
         true,
@@ -37254,6 +37278,9 @@ const anonymousLatestAttemptSummary =
   formatStudentFollowUpLatestAttemptSummary(resultAnalysis.attempts[2]!);
 const anonymousLatestAttemptCompletedAtLabel =
   formatStudentFollowUpLatestAttemptCompletedAt(resultAnalysis.attempts[2]!);
+const anonymousStudentLastSubmittedLabel = formatStudentFollowUpLastSubmitted(
+  resultAnalysis.students[0]!
+);
 assert.equal(classroomBrief.focusItems[0]?.itemId, 'pair-1');
 assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
@@ -37349,6 +37376,7 @@ assert.deepEqual(
     accuracyLabel: 'Latest 0% · best 0%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
     latestAccuracyLabel: '0%',
     latestAttemptCompletedAtLabel: null,
     latestAttemptSummaryLabel: null,
@@ -37363,6 +37391,7 @@ assert.deepEqual(classroomBrief.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
@@ -37376,6 +37405,7 @@ assert.deepEqual(classroomBriefWithAttempts.followUpStudentViews[0], {
   accuracyLabel: 'Latest 0% · best 0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAccuracyLabel: '0%',
   latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
@@ -37531,6 +37561,8 @@ const reteachPlanWithAttempts = buildAssignmentReteachPlan({
 const alphaReviewStudent = followUpPriorityStudents.find(
   (student) => student.studentKey === 'name:alpha-review'
 )!;
+const alphaReviewLastSubmittedLabel =
+  formatStudentFollowUpLastSubmitted(alphaReviewStudent);
 assert.deepEqual(
   buildAssignmentReteachPlanItemView({
     index: 0,
@@ -37549,6 +37581,7 @@ assert.deepEqual(buildAssignmentReteachPlanStudentView({
   accuracyLabel: '70%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  lastSubmittedLabel: alphaReviewLastSubmittedLabel,
   latestAttemptCompletedAtLabel: null,
   latestAttemptSummaryLabel: null,
   reviewItemCountLabel: '3 items to review',
@@ -37560,6 +37593,7 @@ assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
   accuracyLabel: '0%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
   latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
   latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
   reviewItemCountLabel: '2 items to review',
@@ -37908,6 +37942,7 @@ assert.deepEqual(
     bestAccuracyLabel: '70%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    lastSubmittedLabel: alphaReviewLastSubmittedLabel,
     latestAccuracyLabel: '70%',
     latestAttemptCompletedAtLabel: null,
     latestAttemptSummaryLabel: null,
@@ -37955,6 +37990,7 @@ assert.deepEqual(
     bestAccuracyLabel: '0%',
     followUpRecommendation:
       'review missed or unanswered items, then assign one short retry',
+    lastSubmittedLabel: anonymousStudentLastSubmittedLabel,
     latestAccuracyLabel: '0%',
     latestAttemptCompletedAtLabel: anonymousLatestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel: anonymousLatestAttemptSummary,
@@ -38219,6 +38255,7 @@ assert.deepEqual(
         ['next-steps', 'Next steps', '3'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
+        ['student-last-submitted', 'Student last submitted', '3'],
         ['lines', 'Lines', '12'],
       ],
       resultCopyArtifacts.classroomBrief.text,
@@ -38234,6 +38271,7 @@ assert.deepEqual(
         ['next-steps', 'Next steps', '3'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
+        ['student-last-submitted', 'Student last submitted', '3'],
         ['lines', 'Lines', '8'],
       ],
       resultCopyArtifacts.reteachPlan.text,
@@ -38259,6 +38297,7 @@ assert.deepEqual(
         ['next-steps', 'Next steps', '4'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
+        ['student-last-submitted', 'Student last submitted', '4'],
         ['lines', 'Lines', '5'],
       ],
       resultCopyArtifacts.studentFollowUpSummary.text,
@@ -38281,7 +38320,8 @@ assert.deepEqual(
       .filter(
         (metaItem) =>
           metaItem.key === 'latest-attempts' ||
-          metaItem.key === 'latest-attempt-times'
+          metaItem.key === 'latest-attempt-times' ||
+          metaItem.key === 'student-last-submitted'
       )
       .map((metaItem) => [metaItem.key, metaItem.label, metaItem.value]),
   ]),
@@ -38291,6 +38331,7 @@ assert.deepEqual(
       [
         ['latest-attempts', 'Latest attempts', '1'],
         ['latest-attempt-times', 'Attempt times', '1'],
+        ['student-last-submitted', 'Student last submitted', '1'],
       ],
     ],
     [
@@ -38298,6 +38339,7 @@ assert.deepEqual(
       [
         ['latest-attempts', 'Latest attempts', '1'],
         ['latest-attempt-times', 'Attempt times', '1'],
+        ['student-last-submitted', 'Student last submitted', '1'],
       ],
     ],
     ['copy-item-review', []],
@@ -38306,6 +38348,7 @@ assert.deepEqual(
       [
         ['latest-attempts', 'Latest attempts', '2'],
         ['latest-attempt-times', 'Attempt times', '2'],
+        ['student-last-submitted', 'Student last submitted', '2'],
       ],
     ],
   ]

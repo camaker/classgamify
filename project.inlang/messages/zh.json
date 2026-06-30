@@ -970,6 +970,7 @@
   "assignment_result_copy_preview_meta_lines": "行数",
   "assignment_result_copy_preview_meta_next_steps": "下一步",
   "assignment_result_copy_preview_meta_review_items": "复盘题目",
+  "assignment_result_copy_preview_meta_student_last_submitted": "学生最近提交",
   "assignment_result_copy_preview_meta_students": "学生",
   "assignment_result_copy_preview_summary_brief": "重点题目：{focusItems} · 跟进学生：{students}",
   "assignment_result_copy_preview_summary_follow_up": "按跟进优先级排序的学生：{students}",

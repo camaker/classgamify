@@ -37,6 +37,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   averageAccuracyLabel: string;
   bestAccuracyLabel: string;
   followUpRecommendation: string;
+  lastSubmittedLabel: string | null;
   latestAccuracyLabel: string;
   latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
@@ -120,6 +121,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
     student.needsReviewCount
   );
+  const lastSubmittedLabel = formatStudentFollowUpLastSubmitted(student);
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
@@ -148,6 +150,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     averageAccuracyLabel,
     bestAccuracyLabel,
     followUpRecommendation,
+    lastSubmittedLabel,
     latestAccuracyLabel,
     latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
@@ -218,6 +221,21 @@ export function formatStudentFollowUpLatestAttemptCompletedAt(
 
   return completedAtLabel
     ? formatAssignmentResultValue(completedAtLabel, { emptyValue: '' })
+    : null;
+}
+
+export function formatStudentFollowUpLastSubmitted(
+  student: Pick<AssignmentStudentSummary, 'lastCompletedAt'>
+) {
+  const lastSubmittedLabel = formatAssignmentResultDate(
+    student.lastCompletedAt,
+    {
+      emptyValue: '',
+    }
+  );
+
+  return lastSubmittedLabel
+    ? formatAssignmentResultValue(lastSubmittedLabel, { emptyValue: '' })
     : null;
 }
 
