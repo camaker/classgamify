@@ -3,6 +3,8 @@ import {
   resolveUserFileMaterialKind,
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
+import { m } from '@/locale/paraglide/messages';
+import { formatBytes } from '@/lib/formatter';
 
 interface UserFileSummaryInput {
   contentType?: string | null;
@@ -22,6 +24,18 @@ export interface UserFileMaterialSummary {
   worksheetFiles: number;
 }
 
+export type UserFileMaterialSummaryItemId =
+  | 'audio-materials'
+  | 'total-files'
+  | 'total-storage'
+  | 'worksheet-materials';
+
+export type UserFileMaterialSummaryItemView = {
+  id: UserFileMaterialSummaryItemId;
+  label: string;
+  value: string;
+};
+
 function createEmptyUserFileMaterialSummary(): UserFileMaterialSummary {
   return {
     audioFiles: 0,
@@ -34,6 +48,33 @@ function createEmptyUserFileMaterialSummary(): UserFileMaterialSummary {
     totalFiles: 0,
     worksheetFiles: 0,
   };
+}
+
+export function buildUserFileMaterialSummaryItems(
+  summary: UserFileMaterialSummary
+): UserFileMaterialSummaryItemView[] {
+  return [
+    {
+      id: 'total-files',
+      label: m.settings_files_summary_total_files(),
+      value: String(summary.totalFiles),
+    },
+    {
+      id: 'total-storage',
+      label: m.settings_files_summary_total_storage(),
+      value: formatBytes(summary.totalBytes),
+    },
+    {
+      id: 'worksheet-materials',
+      label: m.settings_files_summary_worksheet_materials(),
+      value: String(summary.worksheetFiles),
+    },
+    {
+      id: 'audio-materials',
+      label: m.settings_files_summary_audio_materials(),
+      value: String(summary.audioFiles),
+    },
+  ];
 }
 
 export function buildUserFileMaterialSummary(

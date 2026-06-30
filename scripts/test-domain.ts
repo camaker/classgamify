@@ -914,7 +914,10 @@ import {
   resolveUserFileMaterialKind,
 } from '@/storage/file-materials';
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
-import { buildUserFileMaterialSummary } from '@/storage/file-summary';
+import {
+  buildUserFileMaterialSummary,
+  buildUserFileMaterialSummaryItems,
+} from '@/storage/file-summary';
 import { buildAttachmentContentDisposition } from '@/storage/content-disposition';
 import { STORAGE_ERROR_CODES, UploadError } from '@/storage/types';
 import type { RuntimeItem } from '@/activities/runtime';
@@ -5962,6 +5965,16 @@ assert.match(
   /formatDate\(d\) : m\.common_empty_value\(\)/,
   'Settings files table should render missing uploaded dates through localized empty-value copy.'
 );
+assert.match(
+  filesTableSource,
+  /buildUserFileMaterialSummaryItems\(summary\)[\s\S]*key=\{item\.id\}/,
+  'Settings files summary strip should render prepared material summary items by stable ids.'
+);
+assert.doesNotMatch(
+  filesTableSource,
+  /key=\{item\.label\}/,
+  'Settings files summary strip should not key material stats by localized labels.'
+);
 assert.doesNotMatch(
   filesTableSource,
   /['"]—['"]/,
@@ -6172,6 +6185,28 @@ assert.equal(userFileMaterialSummary.privateFiles, 3);
 assert.equal(userFileMaterialSummary.audioFiles, 1);
 assert.equal(userFileMaterialSummary.worksheetFiles, 2);
 assert.equal(userFileMaterialSummary.byKind.spreadsheet, 1);
+assert.deepEqual(buildUserFileMaterialSummaryItems(userFileMaterialSummary), [
+  {
+    id: 'total-files',
+    label: 'Materials',
+    value: '4',
+  },
+  {
+    id: 'total-storage',
+    label: 'Storage',
+    value: '3.8 KB',
+  },
+  {
+    id: 'worksheet-materials',
+    label: 'Worksheet files',
+    value: '2',
+  },
+  {
+    id: 'audio-materials',
+    label: 'Audio tracks',
+    value: '1',
+  },
+]);
 const abnormalUserFileMaterialSummary = buildUserFileMaterialSummary([
   {
     contentType: 'application/pdf; charset=utf-8',

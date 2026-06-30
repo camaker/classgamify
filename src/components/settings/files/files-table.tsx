@@ -39,6 +39,7 @@ import {
 import { formatUserFileMaterialKind } from '@/storage/file-material-labels';
 import {
   buildUserFileMaterialSummary,
+  buildUserFileMaterialSummaryItems,
   type UserFileMaterialSummary,
 } from '@/storage/file-summary';
 import {
@@ -90,29 +91,12 @@ function TableRowSkeleton({ columns }: { columns: number }) {
 }
 
 function FilesSummaryStrip({ summary }: { summary: UserFileMaterialSummary }) {
-  const items = [
-    {
-      label: m.settings_files_summary_total_files(),
-      value: String(summary.totalFiles),
-    },
-    {
-      label: m.settings_files_summary_total_storage(),
-      value: formatBytes(summary.totalBytes),
-    },
-    {
-      label: m.settings_files_summary_worksheet_materials(),
-      value: String(summary.worksheetFiles),
-    },
-    {
-      label: m.settings_files_summary_audio_materials(),
-      value: String(summary.audioFiles),
-    },
-  ];
+  const items = buildUserFileMaterialSummaryItems(summary);
 
   return (
     <div className="grid gap-3 rounded-lg border bg-muted/20 p-3 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item) => (
-        <div key={item.label} className="min-w-0">
+        <div key={item.id} className="min-w-0">
           <div className="text-muted-foreground text-xs font-medium">
             {item.label}
           </div>
