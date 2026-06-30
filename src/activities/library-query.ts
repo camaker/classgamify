@@ -16,6 +16,7 @@ type ActivityLibrarySourceItem = {
 };
 
 type ActivityLibraryPagedItem = {
+  id: string;
   updatedAt: Date;
 };
 
@@ -113,6 +114,17 @@ export function getActivityLibraryPageItems<
   const start = normalizedPageIndex * normalizedPageSize;
 
   return [...items]
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .sort(compareActivityLibraryPageItems)
     .slice(start, start + normalizedPageSize);
+}
+
+function compareActivityLibraryPageItems(
+  a: ActivityLibraryPagedItem,
+  b: ActivityLibraryPagedItem
+) {
+  const updatedAtDelta = b.updatedAt.getTime() - a.updatedAt.getTime();
+
+  if (updatedAtDelta !== 0) return updatedAtDelta;
+
+  return a.id.localeCompare(b.id);
 }

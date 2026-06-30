@@ -19470,6 +19470,27 @@ assert.deepEqual(
   ['oldest']
 );
 assert.deepEqual(
+  getActivityLibraryPageItems({
+    items: [
+      {
+        id: 'same-time-b',
+        updatedAt: new Date('2026-01-03T00:00:00.000Z'),
+      },
+      {
+        id: 'same-time-a',
+        updatedAt: new Date('2026-01-03T00:00:00.000Z'),
+      },
+      {
+        id: 'newer',
+        updatedAt: new Date('2026-01-04T00:00:00.000Z'),
+      },
+    ],
+    pageIndex: 0,
+    pageSize: 3,
+  }).map((item) => item.id),
+  ['newer', 'same-time-a', 'same-time-b']
+);
+assert.deepEqual(
   activityLibraryPageItems.map((item) => item.id),
   ['oldest', 'newest', 'middle']
 );
@@ -19797,6 +19818,11 @@ assert.match(
   activityLibraryQuerySource,
   /filterActivityLibrarySourceItems[\s\S]*matchesActivitySourceMaterialFilter\({[\s\S]*content: item\.contentJson,[\s\S]*source/,
   'Activity list source-material filtering should live in the activity query domain.'
+);
+assert.match(
+  activityLibraryQuerySource,
+  /getActivityLibraryPageItems[\s\S]*sort\(compareActivityLibraryPageItems\)[\s\S]*function compareActivityLibraryPageItems[\s\S]*updatedAtDelta[\s\S]*a\.id\.localeCompare\(b\.id\)/,
+  'Activity library pagination should sort by updated time with a stable activity-id tie breaker.'
 );
 assert.equal(typeof buildActivityLibraryItemSelect, 'function');
 assert.equal(typeof buildCreatedActivityListItemSelect, 'function');
