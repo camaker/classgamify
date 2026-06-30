@@ -43,7 +43,7 @@ function BlogListPage() {
         </div>
         <div className="flex flex-wrap justify-center gap-2 rounded-lg border bg-muted/20 p-3">
           {ctaActions.map((action) => (
-            <BlogCtaActionLink action={action} key={action.to} />
+            <BlogCtaActionLink action={action} key={action.id} />
           ))}
         </div>
         <BlogGrid posts={posts} />

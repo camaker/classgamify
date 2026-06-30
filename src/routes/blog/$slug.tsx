@@ -115,7 +115,7 @@ function BlogPostPage() {
             </div>
             <div className="flex flex-wrap gap-2 sm:justify-end">
               {ctaActions.map((action) => (
-                <BlogCtaActionLink action={action} key={action.to} />
+                <BlogCtaActionLink action={action} key={action.id} />
               ))}
             </div>
           </div>

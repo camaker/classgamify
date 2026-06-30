@@ -4358,13 +4358,23 @@ assert.match(
   'Blog list route should render prepared blog CTA actions through the shared component.'
 );
 assert.match(
+  blogListRouteSource,
+  /ctaActions\.map[\s\S]*key=\{action\.id\}/,
+  'Blog list route should key prepared CTA actions by stable action ids.'
+);
+assert.match(
   blogPostRouteSource,
   /getBlogCtaActions\(\)[\s\S]*BlogCtaActionLink[\s\S]*action=\{action\}/,
   'Blog post route should render prepared blog CTA actions through the shared component.'
 );
+assert.match(
+  blogPostRouteSource,
+  /ctaActions\.map[\s\S]*key=\{action\.id\}/,
+  'Blog post route should key prepared CTA actions by stable action ids.'
+);
 assert.doesNotMatch(
   `${blogListRouteSource}\n${blogPostRouteSource}`,
-  /Routes\.(Create|Templates|StudentPreview)|blog_page_create_activity|blog_page_browse_templates|blog_page_student_preview/,
+  /Routes\.(Create|Templates|StudentPreview)|blog_page_create_activity|blog_page_browse_templates|blog_page_student_preview|key=\{action\.to\}/,
   'Blog routes should not hardcode product CTA route targets or labels.'
 );
 assert.match(
@@ -4374,8 +4384,13 @@ assert.match(
 );
 assert.match(
   blogPageViewSource,
-  /getBlogCtaActions[\s\S]*to: Routes\.Create[\s\S]*to: Routes\.Templates[\s\S]*to: Routes\.StudentPreview/,
-  'Blog page view should prepare the blog product CTA route targets.'
+  /export type BlogCtaAction = \{[\s\S]*id: BlogCtaActionIcon;[\s\S]*to:/,
+  'Blog CTA action view should expose stable ids separate from route targets.'
+);
+assert.match(
+  blogPageViewSource,
+  /id: 'create'[\s\S]*to: Routes\.Create[\s\S]*id: 'templates'[\s\S]*to: Routes\.Templates[\s\S]*id: 'preview'[\s\S]*to: Routes\.StudentPreview/,
+  'Blog page view should prepare the blog product CTA identities and route targets.'
 );
 assert.match(
   templateDirectoryCardSource,
@@ -24000,17 +24015,20 @@ assert.deepEqual(buildPricingPageViewModel().faq.items, buildPricingFaqItems());
 assert.deepEqual(getBlogCtaActions(), [
   {
     icon: 'create',
+    id: 'create',
     label: 'Create activity',
     to: Routes.Create,
   },
   {
     icon: 'templates',
+    id: 'templates',
     label: 'Browse templates',
     to: Routes.Templates,
     variant: 'outline',
   },
   {
     icon: 'preview',
+    id: 'preview',
     label: 'Student preview',
     to: Routes.StudentPreview,
     variant: 'outline',
