@@ -4,6 +4,32 @@ import { m } from '@/locale/paraglide/messages';
 
 type VisualTone = 'templates' | 'assignments' | 'ai' | 'results';
 
+type BlogVisualMetricId =
+  | 'accuracy'
+  | 'attempts'
+  | 'draft'
+  | 'link'
+  | 'match'
+  | 'open'
+  | 'quiz'
+  | 'reteach'
+  | 'review'
+  | 'save'
+  | 'sort'
+  | 'timer';
+
+type BlogVisualMetricView = {
+  id: BlogVisualMetricId;
+  label: string;
+};
+
+type BlogVisualCopy = {
+  footer: string;
+  label: string;
+  metrics: BlogVisualMetricView[];
+  title: string;
+};
+
 const visualStyles: Record<VisualTone, { accent: string }> = {
   templates: {
     accent: 'bg-indigo-600',
@@ -58,15 +84,15 @@ export function BlogPostVisual({
           <p className="mt-4 truncate text-sm font-semibold">{copy.title}</p>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
-          {copy.metrics.map((metric, index) => (
+          {copy.metrics.map((metric) => (
             <div
               className={cn(
                 'flex aspect-square items-center justify-center rounded-md border border-zinc-200 bg-white px-1 text-center text-[10px] font-bold shadow-sm sm:text-xs',
                 isHero && 'sm:text-sm'
               )}
-              key={`${metric}-${index}`}
+              key={metric.id}
             >
-              {metric}
+              {metric.label}
             </div>
           ))}
         </div>
@@ -99,16 +125,25 @@ export function BlogPostVisual({
   );
 }
 
-function getVisualCopy(tone: VisualTone) {
+function getVisualCopy(tone: VisualTone): BlogVisualCopy {
   switch (tone) {
     case 'assignments':
       return {
         footer: m.blog_visual_assignments_footer(),
         label: m.blog_visual_assignments_label(),
         metrics: [
-          m.blog_visual_assignments_metric_link(),
-          m.blog_visual_assignments_metric_timer(),
-          m.blog_visual_assignments_metric_open(),
+          {
+            id: 'link',
+            label: m.blog_visual_assignments_metric_link(),
+          },
+          {
+            id: 'timer',
+            label: m.blog_visual_assignments_metric_timer(),
+          },
+          {
+            id: 'open',
+            label: m.blog_visual_assignments_metric_open(),
+          },
         ],
         title: m.blog_visual_assignments_title(),
       };
@@ -117,9 +152,18 @@ function getVisualCopy(tone: VisualTone) {
         footer: m.blog_visual_ai_footer(),
         label: m.blog_visual_ai_label(),
         metrics: [
-          m.blog_visual_ai_metric_draft(),
-          m.blog_visual_ai_metric_review(),
-          m.blog_visual_ai_metric_save(),
+          {
+            id: 'draft',
+            label: m.blog_visual_ai_metric_draft(),
+          },
+          {
+            id: 'review',
+            label: m.blog_visual_ai_metric_review(),
+          },
+          {
+            id: 'save',
+            label: m.blog_visual_ai_metric_save(),
+          },
         ],
         title: m.blog_visual_ai_title(),
       };
@@ -128,9 +172,18 @@ function getVisualCopy(tone: VisualTone) {
         footer: m.blog_visual_results_footer(),
         label: m.blog_visual_results_label(),
         metrics: [
-          m.blog_visual_results_metric_accuracy(),
-          m.blog_visual_results_metric_attempts(),
-          m.blog_visual_results_metric_reteach(),
+          {
+            id: 'accuracy',
+            label: m.blog_visual_results_metric_accuracy(),
+          },
+          {
+            id: 'attempts',
+            label: m.blog_visual_results_metric_attempts(),
+          },
+          {
+            id: 'reteach',
+            label: m.blog_visual_results_metric_reteach(),
+          },
         ],
         title: m.blog_visual_results_title(),
       };
@@ -139,9 +192,18 @@ function getVisualCopy(tone: VisualTone) {
         footer: m.blog_visual_templates_footer(),
         label: m.blog_visual_templates_label(),
         metrics: [
-          m.blog_visual_templates_metric_quiz(),
-          m.blog_visual_templates_metric_match(),
-          m.blog_visual_templates_metric_sort(),
+          {
+            id: 'quiz',
+            label: m.blog_visual_templates_metric_quiz(),
+          },
+          {
+            id: 'match',
+            label: m.blog_visual_templates_metric_match(),
+          },
+          {
+            id: 'sort',
+            label: m.blog_visual_templates_metric_sort(),
+          },
         ],
         title: m.blog_visual_templates_title(),
       };

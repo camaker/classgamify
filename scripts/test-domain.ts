@@ -1112,6 +1112,10 @@ const activeClassGamifySurfaceText = activeClassGamifySurfaceFiles
   })
   .join('\n');
 assert.match(activeClassGamifySurfaceText, /ClassGamify/);
+const blogPostVisualSource = readFileSync(
+  'src/components/blog/blog-post-visual.tsx',
+  'utf8'
+);
 const createRouteSource = readFileSync('src/routes/create.tsx', 'utf8');
 assert.match(
   createRouteSource,
@@ -1274,9 +1278,24 @@ for (const filePath of environmentTemplateFiles) {
   );
 }
 assert.doesNotMatch(
-  readFileSync('src/components/blog/blog-post-visual.tsx', 'utf8'),
+  blogPostVisualSource,
   />ClassGamify</,
   'Blog visual brand copy should come from locale messages.'
+);
+assert.match(
+  blogPostVisualSource,
+  /type BlogVisualMetricId =[\s\S]*'accuracy'[\s\S]*'timer'[\s\S]*type BlogVisualMetricView = \{[\s\S]*id: BlogVisualMetricId;[\s\S]*label: string;[\s\S]*type BlogVisualCopy = \{[\s\S]*metrics: BlogVisualMetricView\[\];/,
+  'Blog visual metrics should expose stable metric ids separate from localized labels.'
+);
+assert.match(
+  blogPostVisualSource,
+  /copy\.metrics\.map\(\(metric\) =>[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label/,
+  'Blog visual metric chips should key by prepared metric ids and render localized labels.'
+);
+assert.doesNotMatch(
+  blogPostVisualSource,
+  /key=\{`\$\{metric\}-\$\{index\}`\}|copy\.metrics\.map\(\(metric, index\)/,
+  'Blog visual metric chips should not key by localized metric text or array position.'
 );
 const activeLocaleMessageText = [
   'project.inlang/messages/en.json',
