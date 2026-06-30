@@ -211,6 +211,11 @@ function AssignmentResultsFollowUpStudent({
         <p className="text-muted-foreground text-xs">
           {studentView.accuracyLabel}
         </p>
+        {studentView.submittedContextLabel ? (
+          <p className="text-muted-foreground text-xs">
+            {studentView.submittedContextLabel}
+          </p>
+        ) : null}
         <p className="text-muted-foreground text-xs">
           {studentView.followUpRecommendation}
         </p>

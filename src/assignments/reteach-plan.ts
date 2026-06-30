@@ -26,6 +26,7 @@ import {
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
+  formatStudentFollowUpSubmittedContext,
 } from '@/assignments/student-follow-up-summary';
 import { m } from '@/locale/paraglide/messages';
 
@@ -55,6 +56,7 @@ export type AssignmentReteachPlanStudentView = {
   latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
+  submittedContextLabel: string | null;
   studentKey: string;
   studentLabel: string;
   text: string;
@@ -195,6 +197,10 @@ export function buildAssignmentReteachPlanStudentView({
     lastSubmittedLabel,
     latestAttemptCompletedAtLabel,
   });
+  const submittedContextLabel = formatStudentFollowUpSubmittedContext({
+    lastSubmittedLabel,
+    latestAttemptCompletedAtLabel,
+  });
   const lineInput = {
     accuracy: accuracyLabel,
     lastSubmittedContext: lastSubmittedContextLabel,
@@ -210,6 +216,7 @@ export function buildAssignmentReteachPlanStudentView({
     latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     reviewItemCountLabel,
+    submittedContextLabel,
     studentKey: student.studentKey,
     studentLabel,
     text: formatAssignmentResultCopyLine(

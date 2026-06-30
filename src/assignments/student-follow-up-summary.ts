@@ -43,6 +43,7 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   latestAttemptCompletedAtLabel: string | null;
   latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
+  submittedContextLabel: string | null;
   studentKey: string;
   studentLabel: string;
   text: string;
@@ -139,6 +140,10 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     lastSubmittedLabel,
     latestAttemptCompletedAtLabel,
   });
+  const submittedContextLabel = formatStudentFollowUpSubmittedContext({
+    lastSubmittedLabel,
+    latestAttemptCompletedAtLabel,
+  });
   const lineInput = {
     attempts: attemptsLabel,
     average: averageAccuracyLabel,
@@ -161,6 +166,7 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
     latestAttemptCompletedAtLabel,
     latestAttemptSummaryLabel,
     reviewItemCountLabel,
+    submittedContextLabel,
     studentKey: student.studentKey,
     studentLabel,
     text: formatAssignmentResultCopyLine(
@@ -259,6 +265,28 @@ export function formatStudentFollowUpLastSubmittedContext({
   return m.assignment_student_follow_up_last_submitted_context({
     lastSubmitted: lastSubmittedLabel,
   });
+}
+
+export function formatStudentFollowUpSubmittedContext({
+  lastSubmittedLabel,
+  latestAttemptCompletedAtLabel,
+}: {
+  lastSubmittedLabel: string | null;
+  latestAttemptCompletedAtLabel: string | null;
+}) {
+  if (latestAttemptCompletedAtLabel) {
+    return m.assignment_student_follow_up_latest_attempt_submitted_context({
+      submittedAt: latestAttemptCompletedAtLabel,
+    });
+  }
+
+  if (lastSubmittedLabel) {
+    return m.assignment_student_follow_up_last_submitted_context({
+      lastSubmitted: lastSubmittedLabel,
+    });
+  }
+
+  return null;
 }
 
 export function buildLatestAttemptReviewByStudentKey(

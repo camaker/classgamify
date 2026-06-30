@@ -28,6 +28,7 @@ import {
   formatStudentFollowUpLatestAttemptCompletedAt,
   formatStudentFollowUpLatestAttemptSummary,
   formatStudentFollowUpRecommendation,
+  formatStudentFollowUpSubmittedContext,
 } from '@/assignments/student-follow-up-summary';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
@@ -98,6 +99,7 @@ export type AssignmentClassroomBriefFollowUpStudentView = {
   latestAttemptSummaryLabel: string | null;
   needsReviewLabel: string;
   reviewItemCountLabel: string;
+  submittedContextLabel: string | null;
   studentKey: string;
   studentLabel: string;
   text: string;
@@ -289,6 +291,10 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
     lastSubmittedLabel,
     latestAttemptCompletedAtLabel,
   });
+  const submittedContextLabel = formatStudentFollowUpSubmittedContext({
+    lastSubmittedLabel,
+    latestAttemptCompletedAtLabel,
+  });
   const lineInput = {
     accuracy: latestAccuracyLabel,
     index: formatAssignmentResultCopyOrdinal(index),
@@ -309,6 +315,7 @@ export function buildAssignmentClassroomBriefFollowUpStudentView({
       student.needsReviewCount
     ),
     reviewItemCountLabel,
+    submittedContextLabel,
     studentKey: student.studentKey,
     studentLabel,
     text: formatAssignmentResultCopyLine(
