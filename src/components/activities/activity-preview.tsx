@@ -153,10 +153,7 @@ export function ActivityPreview({
           {previewView.panel.actions?.length ? (
             <div className="mt-2 flex flex-col gap-2">
               {previewView.panel.actions.map((action) => (
-                <ActivityPreviewActionLink
-                  action={action}
-                  key={`${action.label}-${action.to ?? action.href}`}
-                />
+                <ActivityPreviewActionLink action={action} key={action.id} />
               ))}
             </div>
           ) : null}

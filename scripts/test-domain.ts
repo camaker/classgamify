@@ -2917,6 +2917,7 @@ const activityPreviewView = buildActivityPreviewViewModel({
 });
 assert.deepEqual(
   {
+    actionIds: activityPreviewView.panel.actions?.map((action) => action.id),
     actionLabels: activityPreviewView.panel.actions?.map(
       (action) => action.label
     ),
@@ -2936,6 +2937,7 @@ assert.deepEqual(
     templateName: activityPreviewView.templateName,
   },
   {
+    actionIds: ['create-activity', 'student-preview'],
     actionLabels: ['Create activity', 'Open student preview'],
     groupSummaries: ['Group A: one, two', 'Group B: three', 'Group C: four'],
     groupCount: 3,
@@ -2972,6 +2974,10 @@ assert.deepEqual(
   buildDefaultActivityPreviewPanel().actions?.map((action) => action.to),
   [Routes.Create, Routes.StudentPreview]
 );
+assert.deepEqual(
+  buildDefaultActivityPreviewPanel().actions?.map((action) => action.id),
+  ['create-activity', 'student-preview']
+);
 assert.match(
   activityPreviewViewSource,
   /ACTIVITY_PREVIEW_CONTENT_LIMITS[\s\S]*groups: 3[\s\S]*pairs: 4[\s\S]*questions: 3/,
@@ -3004,6 +3010,11 @@ assert.match(
   /formatActivityPreviewGroupItems[\s\S]*activity_preview_group_item_separator/,
   'Activity preview group summaries should format item lists through localized domain copy.'
 );
+assert.match(
+  activityPreviewViewSource,
+  /export type ActivityPreviewAction = \{[\s\S]*id: string;[\s\S]*label: string;[\s\S]*export type ActivityPreviewPanel = \{[\s\S]*actions\?: ActivityPreviewAction\[\];/,
+  'Activity preview actions should expose stable ids separately from localized labels.'
+);
 assert.doesNotMatch(
   activityPreviewViewSource,
   /group\.items\.join\(', '\)/,
@@ -3023,6 +3034,16 @@ assert.match(
   activityPreviewSource,
   /question\.summaryText[\s\S]*pair\.summaryText[\s\S]*group\.summaryText/,
   'Activity preview component should render prepared question, pair, and group summary text.'
+);
+assert.match(
+  activityPreviewSource,
+  /previewView\.panel\.actions\.map[\s\S]*key=\{action\.id\}/,
+  'Activity preview component should key panel actions by stable action ids.'
+);
+assert.doesNotMatch(
+  activityPreviewSource,
+  /key=\{`\$\{action\.label\}-/,
+  'Activity preview component should not key panel actions by localized labels.'
 );
 assert.match(
   activitySourceMaterialsFieldSource,
@@ -3249,6 +3270,11 @@ assert.match(
   activityEditorSource,
   /export type ActivityCreatePageInputShapeItemId =[\s\S]*'groups'[\s\S]*'notes'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*export type ActivityCreatePageInputShapeItemView = \{[\s\S]*id: ActivityCreatePageInputShapeItemId;[\s\S]*label: string;[\s\S]*export type ActivityCreatePageInputShapeView = \{[\s\S]*itemViews: ActivityCreatePageInputShapeItemView\[\];[\s\S]*export type ActivityCreatePageViewModel = \{/,
   'Activity editor domain should expose structured create-page input-shape item contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /type ActivityEditorPreviewPanel = \{[\s\S]*actions: Array<\{[\s\S]*href: `#\$\{string\}`;[\s\S]*icon: 'edit';[\s\S]*id: string;[\s\S]*label: string;/,
+  'Activity editor preview panel actions should expose stable ids separately from localized labels.'
 );
 assert.doesNotMatch(
   activityEditorSource,
@@ -28330,6 +28356,7 @@ assert.deepEqual(lineMatchPreviewPanel.actions, [
   {
     href: '#activity-editor',
     icon: 'edit',
+    id: 'review-fields',
     label: 'Review example fields',
   },
 ]);

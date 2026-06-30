@@ -15,6 +15,7 @@ import { Routes } from '@/lib/routes';
 export type ActivityPreviewAction = {
   href?: string;
   icon?: ActivityPreviewActionIcon;
+  id: string;
   label: string;
   to?: string;
   variant?: 'default' | 'outline';
@@ -158,11 +159,13 @@ export function buildDefaultActivityPreviewPanel(): ActivityPreviewPanel {
     actions: [
       {
         icon: 'sparkles',
+        id: 'create-activity',
         label: m.activity_preview_create_activity(),
         to: Routes.Create,
       },
       {
         icon: 'share',
+        id: 'student-preview',
         label: m.activity_preview_open_student_preview(),
         to: Routes.StudentPreview,
         variant: 'outline',

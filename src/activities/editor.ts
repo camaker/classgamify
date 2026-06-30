@@ -96,6 +96,7 @@ type ActivityEditorPreviewPanel = {
   actions: Array<{
     href: `#${string}`;
     icon: 'edit';
+    id: string;
     label: string;
   }>;
   description: string;
@@ -1048,6 +1049,7 @@ export function buildActivityEditorPreviewPanel(
       {
         href: `#${activityEditorSectionId}`,
         icon: 'edit',
+        id: 'review-fields',
         label: m.activity_editor_review_scaffold_fields(),
       },
     ],
