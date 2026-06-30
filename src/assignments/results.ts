@@ -12,6 +12,7 @@ import {
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
+  compareRuntimeDisplaySearchText,
   getRuntimeDisplayAcceptedAnswers,
   hasRuntimeDisplayText,
   normalizeOptionalRuntimeDisplayText,
@@ -242,9 +243,7 @@ function buildStudentSummaries(
   return [...byStudent.entries()]
     .map(([studentKey, studentAttempts]) => {
       const sortedAttempts = [...studentAttempts].sort(
-        (left, right) =>
-          getDateTimestamp(right.completedAt) -
-          getDateTimestamp(left.completedAt)
+        compareResultAnalysisAttemptsByLatest
       );
       const latestAttempt = sortedAttempts[0];
       const normalizedAccuracies = studentAttempts.map((attempt) =>
@@ -275,11 +274,28 @@ function buildStudentSummaries(
       if (left.latestAccuracy !== right.latestAccuracy) {
         return left.latestAccuracy - right.latestAccuracy;
       }
-      return (
+
+      const lastCompletedAtCompare =
         getDateTimestamp(right.lastCompletedAt) -
-        getDateTimestamp(left.lastCompletedAt)
+        getDateTimestamp(left.lastCompletedAt);
+      if (lastCompletedAtCompare !== 0) return lastCompletedAtCompare;
+
+      return compareRuntimeDisplaySearchText(
+        left.studentLabel,
+        right.studentLabel
       );
     });
+}
+
+function compareResultAnalysisAttemptsByLatest(
+  left: Pick<AssignmentAttemptReview, 'completedAt' | 'id'>,
+  right: Pick<AssignmentAttemptReview, 'completedAt' | 'id'>
+) {
+  const completedAtCompare =
+    getDateTimestamp(right.completedAt) - getDateTimestamp(left.completedAt);
+  if (completedAtCompare !== 0) return completedAtCompare;
+
+  return compareRuntimeDisplaySearchText(left.id, right.id);
 }
 
 function getDateTimestamp(value: Date | null) {

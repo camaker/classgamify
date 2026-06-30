@@ -2325,6 +2325,16 @@ assert.match(
   /function getDateTimestamp\(value: Date \| null\)[\s\S]*const timestamp = value\?\.getTime\(\) \?\? 0[\s\S]*Number\.isFinite\(timestamp\) \? timestamp : 0/,
   'Assignment result analysis should normalize invalid completed-at dates before sorting student summaries.'
 );
+assert.match(
+  assignmentResultsSource,
+  /function compareResultAnalysisAttemptsByLatest[\s\S]*getDateTimestamp\(right\.completedAt\) - getDateTimestamp\(left\.completedAt\)[\s\S]*compareRuntimeDisplaySearchText\(left\.id, right\.id\)/,
+  'Assignment result analysis should break same-time latest-attempt ties with stable attempt ids.'
+);
+assert.match(
+  assignmentResultsSource,
+  /left\.latestAccuracy !== right\.latestAccuracy[\s\S]*lastCompletedAtCompare[\s\S]*compareRuntimeDisplaySearchText\(\s*left\.studentLabel,\s*right\.studentLabel\s*\)/,
+  'Assignment result student summaries should use a stable display-label fallback after score and last-submitted comparisons.'
+);
 assert.doesNotMatch(
   assignmentResultsSource,
   /limit: 3/,
@@ -33860,6 +33870,108 @@ assert.deepEqual(
       latestAccuracy: 100,
       lastCompletedAt: new Date('2026-01-04T10:00:00.000Z'),
       studentLabel: 'casey',
+    },
+  ]
+);
+
+const sameTimeStudentSummaryAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Rome', correct: false, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'same-time-z',
+      resultJson: {
+        accuracy: 0,
+        completedItemCount: 1,
+        correctItemCount: 0,
+        earnedPoints: 0,
+        totalPoints: 1,
+      },
+      score: 0,
+      studentName: 'Tie Student',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'same-time-a',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'tie student',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'same-time-b',
+      resultJson: {
+        accuracy: 25,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'Beta Tie',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'same-time-c',
+      resultJson: {
+        accuracy: 25,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'Alpha Tie',
+    },
+  ],
+  runtimeItems: resultRuntimeItems.slice(0, 1),
+});
+assert.deepEqual(
+  sameTimeStudentSummaryAnalysis.students.map((student) => ({
+    latestAccuracy: student.latestAccuracy,
+    needsReviewCount: student.needsReviewCount,
+    studentLabel: student.studentLabel,
+  })),
+  [
+    {
+      latestAccuracy: 25,
+      needsReviewCount: 0,
+      studentLabel: 'Alpha Tie',
+    },
+    {
+      latestAccuracy: 25,
+      needsReviewCount: 0,
+      studentLabel: 'Beta Tie',
+    },
+    {
+      latestAccuracy: 100,
+      needsReviewCount: 0,
+      studentLabel: 'Tie Student',
     },
   ]
 );
