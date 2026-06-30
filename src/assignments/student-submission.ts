@@ -1,6 +1,7 @@
 import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
+  normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
@@ -644,7 +645,7 @@ export function buildStudentAttemptTimerBadge({
   timeExpired: boolean;
   timeLimitSeconds?: number;
 }): StudentAttemptTimerBadge {
-  if (!isValidStudentTimerLimit(timeLimitSeconds)) {
+  if (normalizeAttemptTimeLimitSeconds(timeLimitSeconds) === undefined) {
     return {
       label: '',
       show: false,
@@ -667,10 +668,6 @@ export function buildStudentAttemptTimerBadge({
     label,
     show: Boolean(label),
   };
-}
-
-function isValidStudentTimerLimit(value: number | undefined) {
-  return value !== undefined && Number.isFinite(value) && value > 0;
 }
 
 export function getAttemptCompletionSummary({

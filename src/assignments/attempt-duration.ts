@@ -3,6 +3,7 @@ import {
   buildAttemptStartedAt,
   buildAttemptTimerState,
   normalizeAttemptDurationSeconds,
+  normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
   type AttemptTimerState,
 } from '@/attempts/duration';
@@ -12,6 +13,7 @@ export {
   buildAttemptStartedAt,
   buildAttemptTimerState,
   normalizeAttemptDurationSeconds,
+  normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
   type AttemptTimerState,
 };

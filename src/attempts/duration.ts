@@ -9,21 +9,31 @@ export function normalizeAttemptDurationSeconds({
   timeLimitSeconds,
 }: {
   durationSeconds?: number;
-  timeLimitSeconds?: number;
+  timeLimitSeconds?: number | null;
 }) {
   if (durationSeconds === undefined) return undefined;
   if (!Number.isFinite(durationSeconds)) return undefined;
 
   const normalizedDuration = Math.max(0, Math.round(durationSeconds));
+  const normalizedTimeLimit =
+    normalizeAttemptTimeLimitSeconds(timeLimitSeconds);
+  if (normalizedTimeLimit === undefined) return normalizedDuration;
+
+  return Math.min(normalizedDuration, normalizedTimeLimit);
+}
+
+export function normalizeAttemptTimeLimitSeconds(
+  timeLimitSeconds?: number | null
+) {
   if (
-    !timeLimitSeconds ||
-    !Number.isFinite(timeLimitSeconds) ||
-    timeLimitSeconds <= 0
+    typeof timeLimitSeconds !== 'number' ||
+    !Number.isFinite(timeLimitSeconds)
   ) {
-    return normalizedDuration;
+    return undefined;
   }
 
-  return Math.min(normalizedDuration, timeLimitSeconds);
+  const normalizedTimeLimit = Math.max(0, Math.floor(timeLimitSeconds));
+  return normalizedTimeLimit > 0 ? normalizedTimeLimit : undefined;
 }
 
 export function buildAttemptStartedAt({
@@ -61,7 +71,7 @@ export function buildAttemptTimerState({
 }: {
   now: number;
   startedAt: number;
-  timeLimitSeconds?: number;
+  timeLimitSeconds?: number | null;
 }): AttemptTimerState {
   const elapsedMilliseconds = now - startedAt;
   const durationSeconds = Number.isFinite(elapsedMilliseconds)
@@ -73,11 +83,7 @@ export function buildAttemptTimerState({
       )
     : 0;
   const normalizedTimeLimitSeconds =
-    timeLimitSeconds &&
-    Number.isFinite(timeLimitSeconds) &&
-    timeLimitSeconds > 0
-      ? timeLimitSeconds
-      : undefined;
+    normalizeAttemptTimeLimitSeconds(timeLimitSeconds);
   const remainingSeconds = normalizedTimeLimitSeconds
     ? Math.max(0, normalizedTimeLimitSeconds - durationSeconds)
     : undefined;
@@ -97,7 +103,7 @@ export function resolveAttemptSubmissionDurationSeconds({
 }: {
   now: number;
   startedAt: number;
-  timeLimitSeconds?: number;
+  timeLimitSeconds?: number | null;
 }) {
   const timerState = buildAttemptTimerState({
     now,

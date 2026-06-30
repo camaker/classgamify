@@ -384,6 +384,7 @@ import {
   buildAttemptTimerState,
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
+  normalizeAttemptTimeLimitSeconds,
   resolveAttemptSubmissionDurationSeconds,
 } from '@/assignments/attempt-duration';
 import {
@@ -8345,8 +8346,18 @@ assert.doesNotMatch(
 );
 assert.match(
   attemptDurationSource,
-  /from '@\/attempts\/duration'[\s\S]*export \{[\s\S]*normalizeAttemptDurationSeconds[\s\S]*resolveAttemptSubmissionDurationSeconds[\s\S]*type AttemptTimerState[\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS = ATTEMPT_DURATION_UNITS/,
+  /from '@\/attempts\/duration'[\s\S]*export \{[\s\S]*normalizeAttemptDurationSeconds[\s\S]*normalizeAttemptTimeLimitSeconds[\s\S]*resolveAttemptSubmissionDurationSeconds[\s\S]*type AttemptTimerState[\s\S]*ASSIGNMENT_ATTEMPT_DURATION_UNITS = ATTEMPT_DURATION_UNITS/,
   'Assignment attempt duration module should re-export pure attempt timing helpers while keeping localized formatting.'
+);
+assert.match(
+  studentRunnerSubmissionSource,
+  /normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\)/,
+  'Student timer badges should reuse the assignment duration time-limit normalizer.'
+);
+assert.doesNotMatch(
+  studentRunnerSubmissionSource,
+  /isValidStudentTimerLimit|Number\.isFinite\(timeLimitSeconds\)/,
+  'Student timer badges should not rebuild timer-limit validity checks locally.'
 );
 assert.doesNotMatch(
   activityRuntimeSource,
@@ -11098,6 +11109,14 @@ assert.equal(
     now: 12_000,
     startedAt: 1_000,
     timeLimitSeconds: 10,
+  }),
+  10
+);
+assert.equal(
+  resolveAttemptSubmissionDurationSeconds({
+    now: 12_000,
+    startedAt: 1_000,
+    timeLimitSeconds: 10.8,
   }),
   10
 );
@@ -31817,10 +31836,22 @@ assert.equal(
 assert.equal(
   normalizeAttemptDurationSeconds({
     durationSeconds: 90,
+    timeLimitSeconds: 60.8,
+  }),
+  60
+);
+assert.equal(
+  normalizeAttemptDurationSeconds({
+    durationSeconds: 90,
     timeLimitSeconds: -60,
   }),
   90
 );
+assert.equal(normalizeAttemptTimeLimitSeconds(undefined), undefined);
+assert.equal(normalizeAttemptTimeLimitSeconds(null), undefined);
+assert.equal(normalizeAttemptTimeLimitSeconds(Number.NaN), undefined);
+assert.equal(normalizeAttemptTimeLimitSeconds(0), undefined);
+assert.equal(normalizeAttemptTimeLimitSeconds(60.8), 60);
 assert.equal(
   buildAttemptStartedAt({
     completedAt: new Date('2026-01-01T10:00:00.000Z'),
@@ -31879,6 +31910,19 @@ assert.deepEqual(
     now: 6_500,
     startedAt: 1_000,
     timeLimitSeconds: 10,
+  }),
+  {
+    durationSeconds: 6,
+    elapsedSeconds: 6,
+    remainingSeconds: 4,
+    timeExpired: false,
+  }
+);
+assert.deepEqual(
+  buildAttemptTimerState({
+    now: 6_500,
+    startedAt: 1_000,
+    timeLimitSeconds: 10.8,
   }),
   {
     durationSeconds: 6,
