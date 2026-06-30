@@ -15871,6 +15871,26 @@ assert.deepEqual(
   }).answerKeyView.show,
   false
 );
+const printableWorksheetPageViewWithoutAnswerKey =
+  buildPrintableWorksheetPageViewModel({
+    answerKey: false,
+    assignmentId: 'assignment-printable-1',
+    worksheet: printableSnapshotWorksheetWithAnswers,
+  });
+assert.deepEqual(
+  {
+    answerKeyItemViews:
+      printableWorksheetPageViewWithoutAnswerKey.answerKeyItemViews,
+    answerKeyViewItemViews:
+      printableWorksheetPageViewWithoutAnswerKey.answerKeyView.itemViews,
+    showAnswerKey: printableWorksheetPageViewWithoutAnswerKey.showAnswerKey,
+  },
+  {
+    answerKeyItemViews: [],
+    answerKeyViewItemViews: [],
+    showAnswerKey: false,
+  }
+);
 assert.deepEqual(
   buildPrintableWorksheetPageViewModel({
     answerKey: false,
@@ -22610,8 +22630,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /buildPrintableWorksheetPageViewModel[\s\S]*worksheet\.answerKey\?\.map\(\s*buildPrintableWorksheetAnswerKeyItemView\s*\)/,
-  'Printable worksheet page view-model should own formatted answer-key item views.'
+  /const answerKeyItemViews = answerKey[\s\S]*worksheet\.answerKey\?\.map\(buildPrintableWorksheetAnswerKeyItemView\)[\s\S]*: \[\]/,
+  'Printable worksheet page view-model should only prepare teacher-only answer-key item views when answer key display is requested.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -22640,7 +22660,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /const answerKeyView = buildPrintableWorksheetAnswerKeyView\(\{[\s\S]*answerKey,[\s\S]*itemViews: answerKeyItemViews \?\? \[\],[\s\S]*worksheet,/,
+  /const answerKeyView = buildPrintableWorksheetAnswerKeyView\(\{[\s\S]*answerKey,[\s\S]*itemViews: answerKeyItemViews,[\s\S]*worksheet,/,
   'Printable worksheet page view-model should pass worksheet summary context into answer-key section state.'
 );
 assert.match(

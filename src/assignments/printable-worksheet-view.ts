@@ -284,12 +284,12 @@ export function buildPrintableWorksheetPageViewModel({
   assignmentId: string;
   worksheet: PrintableAssignmentWorksheet;
 }): PrintableWorksheetPageViewModel {
-  const answerKeyItemViews = worksheet.answerKey?.map(
-    buildPrintableWorksheetAnswerKeyItemView
-  );
+  const answerKeyItemViews = answerKey
+    ? (worksheet.answerKey?.map(buildPrintableWorksheetAnswerKeyItemView) ?? [])
+    : [];
   const answerKeyView = buildPrintableWorksheetAnswerKeyView({
     answerKey,
-    itemViews: answerKeyItemViews ?? [],
+    itemViews: answerKeyItemViews,
     worksheet,
   });
   const headerView = buildPrintableWorksheetHeaderView(worksheet, {
@@ -298,7 +298,7 @@ export function buildPrintableWorksheetPageViewModel({
 
   return {
     answerKeyView,
-    answerKeyItemViews: answerKeyItemViews ?? [],
+    answerKeyItemViews,
     assignmentFieldViews:
       buildPrintableWorksheetAssignmentFieldViews(headerView),
     controlView: buildPrintableWorksheetControlView({
