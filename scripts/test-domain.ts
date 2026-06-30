@@ -189,6 +189,7 @@ import {
   buildActivityTemplateReadinessPanelSummary,
   getActivityTemplateQuizChoiceReadinessItemPosition,
   normalizeActivityDraftMetaCount,
+  type ActivityDraftReviewChecklistItem,
 } from '@/activities/draft-meta';
 import {
   ACTIVITY_SOURCE_MATERIAL_EXTRACTION_ACTIONS,
@@ -973,6 +974,33 @@ function getTemplateRemixReadinessError(action: () => void) {
 
   assert.ok(isTemplateRemixReadinessError(error));
   return error;
+}
+
+function findActivityDraftChecklistItem<
+  T extends Pick<ActivityDraftReviewChecklistItem, 'id' | 'templateType'>,
+>({
+  id,
+  items,
+  templateType,
+}: {
+  id: ActivityDraftReviewChecklistItem['id'];
+  items: readonly T[];
+  templateType?: ActivityTemplateType;
+}): T {
+  const item = items.find(
+    (candidate) =>
+      candidate.id === id &&
+      (templateType === undefined || candidate.templateType === templateType)
+  );
+
+  assert.ok(
+    item,
+    `Expected AI draft checklist item "${id}"${
+      templateType ? ` for ${templateType}` : ''
+    }.`
+  );
+
+  return item;
 }
 
 const activityEditorDefaultInput = getActivityEditorDefaultInput();
@@ -3851,6 +3879,16 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export type ActivityDraftReviewChecklistItemView =[\s\S]*key: string;[\s\S]*statusLabel: string;/,
+  'AI draft checklist item views should expose stable keys separately from localized labels.'
+);
+assert.match(
+  activityDraftMetaSource,
+  /buildActivityDraftReviewChecklistItemKey[\s\S]*item\.id[\s\S]*item\.templateType \?\? 'all'[\s\S]*index/,
+  'AI draft checklist item keys should be derived from structured identity and position, not localized labels.'
+);
+assert.match(
+  activityDraftMetaSource,
   /QuestionChoiceReadinessStatus[\s\S]*export type ActivityDraftReviewChecklistStatus =[\s\S]*status: ActivityDraftReviewChecklistStatus;[\s\S]*status: QuestionChoiceReadinessStatus;/,
   'AI draft meta domain should use explicit checklist and quiz-choice status contracts.'
 );
@@ -3891,13 +3929,13 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /summaryView\.reviewChecklistItems\.map[\s\S]*ActivityDraftReviewChecklistItem[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.statusLabel[\s\S]*itemView\.description/,
-  'AI draft summary component should render structured review checklist items with labels, status, and descriptions.'
+  /summaryView\.reviewChecklistItems\.map[\s\S]*ActivityDraftReviewChecklistItem[\s\S]*key=\{itemView\.key\}[\s\S]*itemView\.label[\s\S]*itemView\.statusLabel[\s\S]*itemView\.description/,
+  'AI draft summary component should render structured review checklist items with stable keys, labels, status, and descriptions.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
-  /key=\{`\$\{itemView\.id\}-\$\{itemView\.label\}`\}|key=\{itemView\.label\}/,
-  'AI draft summary component should not key review checklist items by localized labels.'
+  /key=\{itemView\.(?:id|label)\}|key=\{`\$\{itemView\.id\}-\$\{itemView\.label\}`\}/,
+  'AI draft summary component should not key review checklist items by bare ids or localized labels.'
 );
 assert.match(
   activityDraftMetaSummarySource,
@@ -32168,10 +32206,12 @@ assert.ok(
       option.diagnosis === 'Listen is selected and ready.'
   )
 );
-assert.ok(
-  fallbackDraftResult.meta.reviewChecklist.some((item) =>
-    item.includes('Review every answer')
-  )
+assert.equal(
+  findActivityDraftChecklistItem({
+    id: 'review-answers',
+    items: fallbackDraftResult.meta.reviewChecklistItems,
+  }).label,
+  'Review every answer before saving.'
 );
 assert.equal(fallbackContent.questions.length, 5);
 assert.equal(fallbackContent.pairs.length, 5);
@@ -32244,10 +32284,15 @@ assert.ok(
       option.readinessLabel === 'Ready'
   )
 );
-assert.ok(
-  fallbackDraftMeta.reviewChecklist.some((item) =>
-    item.includes('Ready to remix after saving')
-  )
+const fallbackReadyRemixChecklistItem = findActivityDraftChecklistItem({
+  id: 'ready-remix',
+  items: fallbackDraftMeta.reviewChecklistItems,
+});
+assert.equal(fallbackReadyRemixChecklistItem.status, 'ready');
+assert.equal(fallbackReadyRemixChecklistItem.priority, 'normal');
+assert.match(
+  fallbackReadyRemixChecklistItem.label,
+  /^Ready to remix after saving: .+\.$/
 );
 const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
   draftFocus: fallbackDraftResult.draftFocus,
@@ -32384,6 +32429,7 @@ assert.deepEqual(fallbackDraftMetaSummary.reviewChecklistItems[0], {
   description:
     'AI drafts stay teacher-reviewable; answer keys should be checked before any assignment link exists.',
   id: 'review-answers',
+  key: 'review-answers:all:0',
   label: 'Review every answer before saving.',
   priority: 'high',
   status: 'review',
@@ -32398,6 +32444,7 @@ assert.ok(
   fallbackDraftMetaSummary.reviewChecklistItems.some(
     (item) =>
       item.id === 'ready-remix' &&
+      item.key === 'ready-remix:all:3' &&
       item.status === 'ready' &&
       item.statusLabel === 'Ready' &&
       item.description ===
@@ -32613,19 +32660,23 @@ assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.detail,
   'Add 3 more choices or vocabulary terms before publishing this quiz.'
 );
-assert.ok(
-  questionOnlyDraftMetaSummary.reviewChecklist.includes(
-    'Add distractor choices or vocabulary for 1 quiz question before publishing.'
-  )
+assert.equal(
+  findActivityDraftChecklistItem({
+    id: 'question-review',
+    items: questionOnlyDraftMetaSummary.reviewChecklistItems,
+  }).label,
+  'Add distractor choices or vocabulary for 1 quiz question before publishing.'
 );
 assert.deepEqual(
-  questionOnlyDraftMetaSummary.reviewChecklistItems.find(
-    (item) => item.id === 'question-review'
-  ),
+  findActivityDraftChecklistItem({
+    id: 'question-review',
+    items: questionOnlyDraftMetaSummary.reviewChecklistItems,
+  }),
   {
     description:
       'Teacher-approved choices keep quiz play fair and prevent weak generated distractors.',
     id: 'question-review',
+    key: 'question-review:all:2',
     label:
       'Add distractor choices or vocabulary for 1 quiz question before publishing.',
     priority: 'high',
@@ -32846,14 +32897,17 @@ try {
     ]
   );
   assert.equal(zhFallbackDraftMetaSummary.lockedTemplatesTitle, '暂不可用模板');
-  assert.ok(
-    zhFallbackDraftMetaSummary.reviewChecklist.some((item) =>
-      /保存后可改编为：.+、.+。/.test(item)
-    )
+  assert.match(
+    findActivityDraftChecklistItem({
+      id: 'ready-remix',
+      items: zhFallbackDraftMetaSummary.reviewChecklistItems,
+    }).label,
+    /保存后可改编为：.+、.+。/
   );
   assert.deepEqual(zhFallbackDraftMetaSummary.reviewChecklistItems[0], {
     description: 'AI 草稿必须由老师检查；生成作业链接前请先确认答案键。',
     id: 'review-answers',
+    key: 'review-answers:all:0',
     label: '保存前请检查每个答案。',
     priority: 'high',
     status: 'review',
@@ -32879,15 +32933,18 @@ try {
     model: 'test-model',
     provider: 'workers-ai',
   });
-  assert.ok(
-    zhSparseDraftMetaSummary.reviewChecklist.includes(
-      '发布前请为 1 道测验题补充干扰选项或词汇。'
-    )
+  assert.equal(
+    findActivityDraftChecklistItem({
+      id: 'question-review',
+      items: zhSparseDraftMetaSummary.reviewChecklistItems,
+    }).label,
+    '发布前请为 1 道测验题补充干扰选项或词汇。'
   );
   assert.equal(
-    zhSparseDraftMetaSummary.reviewChecklistItems.find(
-      (item) => item.id === 'question-review'
-    )?.statusLabel,
+    findActivityDraftChecklistItem({
+      id: 'question-review',
+      items: zhSparseDraftMetaSummary.reviewChecklistItems,
+    }).statusLabel,
     '需要处理'
   );
 } finally {
@@ -33329,15 +33386,12 @@ const questionOnlyDraftMeta = buildActivityDraftMeta({
   },
   currentTemplateType: 'quiz',
 });
-assert.ok(
-  questionOnlyDraftMeta.reviewChecklist.includes(
-    'Next content gap: Add match pairs to unlock Match.'
-  )
-);
 assert.deepEqual(
-  questionOnlyDraftMeta.reviewChecklistItems.find(
-    (item) => item.id === 'next-gap'
-  ),
+  findActivityDraftChecklistItem({
+    id: 'next-gap',
+    items: questionOnlyDraftMeta.reviewChecklistItems,
+    templateType: 'match-up',
+  }),
   {
     description:
       'This is the fastest missing structure to add when you want more playable templates.',
@@ -33348,10 +33402,12 @@ assert.deepEqual(
     templateType: 'match-up',
   }
 );
-assert.ok(
-  questionOnlyDraftMeta.reviewChecklist.includes(
-    'Add distractor choices or vocabulary for 1 quiz question before publishing.'
-  )
+assert.equal(
+  findActivityDraftChecklistItem({
+    id: 'question-review',
+    items: questionOnlyDraftMeta.reviewChecklistItems,
+  }).label,
+  'Add distractor choices or vocabulary for 1 quiz question before publishing.'
 );
 const choiceReadyMissingExplanationDraftMeta = buildActivityDraftMeta({
   activity: {
@@ -33373,10 +33429,12 @@ const choiceReadyMissingExplanationDraftMeta = buildActivityDraftMeta({
   },
   currentTemplateType: 'quiz',
 });
-assert.ok(
-  choiceReadyMissingExplanationDraftMeta.reviewChecklist.includes(
-    'Add short explanations before students see answer feedback.'
-  )
+assert.equal(
+  findActivityDraftChecklistItem({
+    id: 'question-review',
+    items: choiceReadyMissingExplanationDraftMeta.reviewChecklistItems,
+  }).label,
+  'Add short explanations before students see answer feedback.'
 );
 const lockedOnlyDraftMeta = buildActivityDraftMeta({
   activity: {
@@ -33398,13 +33456,12 @@ const lockedOnlyDraftMeta = buildActivityDraftMeta({
   },
   currentTemplateType: 'group-sort',
 });
-assert.ok(
-  lockedOnlyDraftMeta.reviewChecklist.includes('Add questions to unlock Quiz.')
-);
 assert.deepEqual(
-  lockedOnlyDraftMeta.reviewChecklistItems.find(
-    (item) => item.id === 'content-gap'
-  ),
+  findActivityDraftChecklistItem({
+    id: 'content-gap',
+    items: lockedOnlyDraftMeta.reviewChecklistItems,
+    templateType: 'quiz',
+  }),
   {
     description:
       'More pairs or groups make the same activity usable in matching, connecting, and classification templates.',

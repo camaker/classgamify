@@ -212,6 +212,7 @@ export type ActivityDraftMetaSummaryView = {
 
 export type ActivityDraftReviewChecklistItemView =
   ActivityDraftReviewChecklistItem & {
+    key: string;
     statusLabel: string;
   };
 
@@ -697,10 +698,18 @@ function buildActivityDraftReviewChecklistItemViews({
           buildFallbackActivityDraftReviewChecklistItem(label, index)
         );
 
-  return sourceItems.map((item) => ({
+  return sourceItems.map((item, index) => ({
     ...item,
+    key: buildActivityDraftReviewChecklistItemKey(item, index),
     statusLabel: formatActivityDraftReviewChecklistStatus(item.status),
   }));
+}
+
+function buildActivityDraftReviewChecklistItemKey(
+  item: ActivityDraftReviewChecklistItem,
+  index: number
+) {
+  return [item.id, item.templateType ?? 'all', index].join(':');
 }
 
 function buildActivityDraftReviewChecklistStatusViews(
