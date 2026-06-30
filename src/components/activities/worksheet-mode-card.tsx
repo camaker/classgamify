@@ -31,8 +31,12 @@ export function WorksheetModeCard({ mode }: WorksheetModeCardProps) {
       {mode.contentRequirements.length ? (
         <div className="mt-4 flex flex-wrap gap-1.5">
           {mode.contentRequirements.map((requirement) => (
-            <Badge variant="secondary" className="rounded-md" key={requirement}>
-              {requirement}
+            <Badge
+              variant="secondary"
+              className="rounded-md"
+              key={requirement.id}
+            >
+              {requirement.label}
             </Badge>
           ))}
         </div>

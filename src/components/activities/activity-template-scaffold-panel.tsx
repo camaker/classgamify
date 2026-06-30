@@ -33,7 +33,7 @@ export function ActivityTemplateScaffoldPanel({
           <div className="mt-3 flex flex-wrap gap-2">
             {setupView.requirementBadges.map((requirement) => (
               <ActivityTemplateRequirementBadge
-                key={requirement}
+                key={requirement.id}
                 requirement={requirement}
               />
             ))}
@@ -59,11 +59,11 @@ export function ActivityTemplateScaffoldPanel({
 function ActivityTemplateRequirementBadge({
   requirement,
 }: {
-  requirement: string;
+  requirement: ActivityEditorTemplateSetupView['requirementBadges'][number];
 }) {
   return (
     <Badge variant="secondary" className="rounded-md">
-      {requirement}
+      {requirement.label}
     </Badge>
   );
 }

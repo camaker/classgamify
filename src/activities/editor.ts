@@ -74,8 +74,10 @@ import {
   type CreateActivityInput,
 } from '@/activities/validation';
 import {
+  formatTemplateRequirementViews,
   getTemplateRemixPlan,
   formatTemplateRequirements,
+  type TemplateRequirementView,
   type TemplateRemixPlan,
 } from '@/activities/template-remix';
 import { normalizeOptionalRuntimeDisplayText } from '@/activities/runtime-display';
@@ -107,7 +109,7 @@ type ActivityEditorPreviewPanel = {
 export type ActivityEditorTemplateSetupView = {
   actionLabel: string;
   description: string;
-  requirementBadges: string[];
+  requirementBadges: TemplateRequirementView[];
   scaffoldSummary: ActivityTemplateScaffoldReadinessSummary;
   shortName: string;
   successMessage: string;
@@ -1070,11 +1072,14 @@ export function buildActivityEditorTemplateSetupView(
   return {
     actionLabel: m.activity_editor_load_scaffold(),
     description: template.description,
-    requirementBadges: formatTemplateRequirements(
+    requirementBadges: formatTemplateRequirementViews(
       template.contentRequirements
-    ).map((requirement) =>
-      m.activity_editor_requires_requirement({ requirement })
-    ),
+    ).map((requirement) => ({
+      ...requirement,
+      label: m.activity_editor_requires_requirement({
+        requirement: requirement.label,
+      }),
+    })),
     scaffoldSummary: buildActivityTemplateScaffoldReadinessSummary({
       current,
       templateType,

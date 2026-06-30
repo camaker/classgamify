@@ -261,6 +261,7 @@ import {
   getActivityTemplateDraftGuidance,
   buildTemplateRemixSummary,
   formatTemplateRequirementList,
+  formatTemplateRequirementViews,
   formatTemplateRequirement,
   formatTemplateRequirements,
   getTemplateRemixPlan,
@@ -3648,8 +3649,18 @@ assert.match(
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
-  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
+  /function ActivityTemplateScaffoldPanel[\s\S]*setupView\.shortName[\s\S]*setupView\.title[\s\S]*setupView\.description[\s\S]*setupView\.requirementBadges\.map[\s\S]*key=\{requirement\.id\}[\s\S]*ActivityTemplateScaffoldSummary[\s\S]*summary=\{setupView\.scaffoldSummary\}/,
   'Activity editor scaffold panel should render prepared setup view labels and delegate scaffold summary details.'
+);
+assert.match(
+  activityTemplateScaffoldPanelSource,
+  /function ActivityTemplateRequirementBadge[\s\S]*ActivityEditorTemplateSetupView\['requirementBadges'\]\[number\][\s\S]*requirement\.label/,
+  'Activity editor scaffold panel should render requirement badges from the structured setup view contract.'
+);
+assert.doesNotMatch(
+  activityTemplateScaffoldPanelSource,
+  /key=\{requirement\}|>\s*\{requirement\}\s*</,
+  'Activity editor scaffold panel should not key or render requirement badges from bare localized strings.'
 );
 assert.match(
   activityTemplateScaffoldPanelSource,
@@ -3718,8 +3729,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activityEditorSource,
-  /formatTemplateRequirements\([\s\S]*template\.contentRequirements/,
-  'Activity editor template setup should use the activity-domain requirement list formatter.'
+  /formatTemplateRequirementViews\([\s\S]*template\.contentRequirements[\s\S]*activity_editor_requires_requirement\(\{[\s\S]*requirement: requirement\.label/,
+  'Activity editor template setup should use the activity-domain requirement view formatter.'
 );
 assert.doesNotMatch(
   activityEditorSource,
@@ -4474,8 +4485,13 @@ assert.match(
 );
 assert.match(
   templateDirectoryCardSource,
-  /template\.contentRequirements\.map[\s\S]*to=\{template\.action\.to\}[\s\S]*template\.action\.search/,
-  'Template directory cards should own card requirement badges and create actions.'
+  /template\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{template\.action\.to\}[\s\S]*template\.action\.search/,
+  'Template directory cards should own structured requirement badges and create actions.'
+);
+assert.doesNotMatch(
+  templateDirectoryCardSource,
+  /key=\{requirement\}|>\s*\{requirement\}\s*</,
+  'Template directory cards should not key or render requirement badges from bare localized strings.'
 );
 assert.doesNotMatch(
   templateDirectoryCardSource,
@@ -4584,8 +4600,13 @@ assert.match(
 );
 assert.match(
   worksheetModeCardSource,
-  /mode\.contentRequirements\.map[\s\S]*<Badge[\s\S]*\{requirement\}[\s\S]*to=\{mode\.action\.to\}[\s\S]*mode\.action\.search/,
-  'Worksheet mode cards should render prepared content requirement badges before the create action.'
+  /mode\.contentRequirements\.map[\s\S]*key=\{requirement\.id\}[\s\S]*requirement\.label[\s\S]*to=\{mode\.action\.to\}[\s\S]*mode\.action\.search/,
+  'Worksheet mode cards should render structured content requirement badges before the create action.'
+);
+assert.doesNotMatch(
+  worksheetModeCardSource,
+  /key=\{requirement\}|>\s*\{requirement\}\s*</,
+  'Worksheet mode cards should not key or render requirement badges from bare localized strings.'
 );
 assert.doesNotMatch(
   worksheetModeCardSource,
@@ -24215,7 +24236,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     bestForLabel: 'Best for',
     classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
     classroomModeLabel: 'Classroom mode',
-    contentRequirements: formatTemplateRequirements(
+    contentRequirements: formatTemplateRequirementViews(
       template.contentRequirements
     ),
     description: template.description,
@@ -24522,13 +24543,16 @@ assert.deepEqual(
 assert.deepEqual(
   worksheetsPageView.modeCards.map((card) => [
     card.template,
-    card.contentRequirements,
+    card.contentRequirements.map((requirement) => [
+      requirement.id,
+      requirement.label,
+    ]),
   ]),
   [
-    ['fill-blank', ['questions']],
-    ['line-match', ['match pairs']],
-    ['listening', ['questions']],
-    ['group-sort', ['groups']],
+    ['fill-blank', [['questions', 'questions']]],
+    ['line-match', [['pairs', 'match pairs']]],
+    ['listening', [['questions', 'questions']]],
+    ['group-sort', [['groups', 'groups']]],
   ]
 );
 assert.deepEqual(worksheetsPageView, {
@@ -24575,7 +24599,7 @@ assert.deepEqual(worksheetsPageView, {
         search: { template: 'fill-blank' },
         to: Routes.Create,
       },
-      contentRequirements: ['questions'],
+      contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Place short answers directly into sentence gaps for grammar, spelling, vocabulary, or reading checks.',
       template: 'fill-blank',
@@ -24587,7 +24611,7 @@ assert.deepEqual(worksheetsPageView, {
         search: { template: 'line-match' },
         to: Routes.Create,
       },
-      contentRequirements: ['match pairs'],
+      contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
       description:
         'Turn terms and definitions into a two-column connection board that feels familiar to worksheet users.',
       template: 'line-match',
@@ -24599,7 +24623,7 @@ assert.deepEqual(worksheetsPageView, {
         search: { template: 'listening' },
         to: Routes.Create,
       },
-      contentRequirements: ['questions'],
+      contentRequirements: [{ id: 'questions', label: 'questions' }],
       description:
         'Use spoken tracks for dictation, comprehension, or pronunciation follow-up while hiding transcripts before review.',
       template: 'listening',
@@ -24611,7 +24635,7 @@ assert.deepEqual(worksheetsPageView, {
         search: { template: 'group-sort' },
         to: Routes.Create,
       },
-      contentRequirements: ['groups'],
+      contentRequirements: [{ id: 'groups', label: 'groups' }],
       description:
         'Ask learners to classify words, examples, or concepts into teacher-defined groups before seeing the answer pattern.',
       template: 'group-sort',
@@ -24845,13 +24869,13 @@ assert.match(
 );
 assert.match(
   entryPageViewSource,
-  /formatTemplateRequirements\([\s\S]*template\.contentRequirements/,
-  'Template entry page view-model should use the activity-domain requirement list formatter.'
+  /formatTemplateRequirementViews\([\s\S]*template\.contentRequirements/,
+  'Template entry page view-model should use the activity-domain requirement view formatter.'
 );
 assert.match(
   entryPageViewSource,
-  /buildWorksheetsPageViewModel[\s\S]*activityTemplates = getActivityTemplates\(\)[\s\S]*formatTemplateRequirements\(template\.contentRequirements\)/,
-  'Worksheets page view-model should derive mode card requirements from shared activity template definitions.'
+  /buildWorksheetsPageViewModel[\s\S]*activityTemplates = getActivityTemplates\(\)[\s\S]*formatTemplateRequirementViews\(template\.contentRequirements\)/,
+  'Worksheets page view-model should derive structured mode card requirements from shared activity template definitions.'
 );
 assert.doesNotMatch(
   entryPageViewSource,
@@ -28638,7 +28662,7 @@ assert.deepEqual(buildActivityEditorTemplateSetupView('group-sort'), {
   actionLabel: 'Load example',
   description:
     'Students drag items into teacher-defined groups and compare patterns.',
-  requirementBadges: ['Requires groups'],
+  requirementBadges: [{ id: 'groups', label: 'Requires groups' }],
   scaffoldSummary: {
     coverageMetrics: [
       {
@@ -29966,6 +29990,14 @@ assert.deepEqual(formatTemplateRequirements(['questions', 'pairs', 'groups']), [
   'match pairs',
   'groups',
 ]);
+assert.deepEqual(
+  formatTemplateRequirementViews(['questions', 'pairs', 'groups']),
+  [
+    { id: 'questions', label: 'questions' },
+    { id: 'pairs', label: 'match pairs' },
+    { id: 'groups', label: 'groups' },
+  ]
+);
 assert.equal(formatTemplateRequirementList(['questions']), 'questions');
 assert.equal(
   formatTemplateRequirementList(['questions', 'match pairs']),

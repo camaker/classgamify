@@ -13,6 +13,11 @@ export type TemplateRemixTemplateOption = {
   template: ActivityTemplateType;
 };
 
+export type TemplateRequirementView = {
+  id: ActivityTemplateContentRequirement;
+  label: string;
+};
+
 export type TemplateRemixLockedOption = {
   diagnosis: string;
   template: ActivityTemplateType;
@@ -253,11 +258,19 @@ export function formatTemplateRequirement(
 export function formatTemplateRequirements(
   requirements: readonly ActivityTemplateContentRequirement[]
 ) {
-  return requirements.map((requirement) =>
-    formatTemplateRequirement(requirement)
+  return formatTemplateRequirementViews(requirements).map(
+    (requirement) => requirement.label
   );
 }
 
+export function formatTemplateRequirementViews(
+  requirements: readonly ActivityTemplateContentRequirement[]
+): TemplateRequirementView[] {
+  return requirements.map((requirement) => ({
+    id: requirement,
+    label: formatTemplateRequirement(requirement),
+  }));
+}
 export function getActivityTemplateDraftGuidance(
   templateType: ActivityTemplateType
 ) {

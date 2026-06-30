@@ -47,8 +47,12 @@ export function TemplateDirectoryCard({
         </div>
         <div className="flex flex-wrap gap-1.5">
           {template.contentRequirements.map((requirement) => (
-            <Badge key={requirement} variant="secondary" className="rounded-md">
-              {requirement}
+            <Badge
+              key={requirement.id}
+              variant="secondary"
+              className="rounded-md"
+            >
+              {requirement.label}
             </Badge>
           ))}
         </div>

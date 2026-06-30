@@ -12,7 +12,10 @@ import {
   type TemplateEntryCreateLinkAction,
   type TemplateEntryLinkAction,
 } from '@/activities/template-entry';
-import { formatTemplateRequirements } from '@/activities/template-remix';
+import {
+  formatTemplateRequirementViews,
+  type TemplateRequirementView,
+} from '@/activities/template-remix';
 import {
   getWorksheetModeDefinitions,
   type WorksheetModeDefinition,
@@ -44,7 +47,7 @@ export type TemplatesPageCardView = {
   bestForLabel: string;
   classroomMode: string;
   classroomModeLabel: string;
-  contentRequirements: string[];
+  contentRequirements: TemplateRequirementView[];
   description: string;
   name: string;
   template: ActivityTemplateType;
@@ -72,7 +75,7 @@ export type TemplatesPageViewModel = {
 
 export type WorksheetsPageModeCardView = {
   action: EntryAction;
-  contentRequirements: string[];
+  contentRequirements: TemplateRequirementView[];
   description: string;
   template: WorksheetModeTemplate;
   title: string;
@@ -131,7 +134,7 @@ export function buildTemplatesPageViewModel({
     bestForLabel: m.templates_page_best_for_label(),
     classroomMode: formatActivityTemplateClassroomMode(template.classroomMode),
     classroomModeLabel: m.templates_page_classroom_mode_label(),
-    contentRequirements: formatTemplateRequirements(
+    contentRequirements: formatTemplateRequirementViews(
       template.contentRequirements
     ),
     description: template.description,
@@ -192,7 +195,7 @@ export function buildWorksheetsPageViewModel({
       return {
         action: buildWorksheetModeEntryAction(mode),
         contentRequirements: template
-          ? formatTemplateRequirements(template.contentRequirements)
+          ? formatTemplateRequirementViews(template.contentRequirements)
           : [],
         description: mode.description,
         template: mode.template,
