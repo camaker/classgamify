@@ -849,6 +849,9 @@ function getStudentSummarySortOptionLabel(value: StudentSummarySort) {
   if (value === 'best') return m.assignment_result_sort_best_score();
   if (value === 'name') return m.assignment_result_sort_student_name();
   if (value === 'attempts') return m.assignment_result_sort_attempts();
+  if (value === 'last-submitted') {
+    return m.assignment_result_sort_last_submitted();
+  }
 
   return m.assignment_result_sort_needs_review();
 }
@@ -861,6 +864,9 @@ function getStudentSummarySortOptionDescription(value: StudentSummarySort) {
   }
   if (value === 'attempts') {
     return m.assignment_result_sort_attempts_description();
+  }
+  if (value === 'last-submitted') {
+    return m.assignment_result_sort_last_submitted_description();
   }
 
   return m.assignment_result_sort_needs_review_description();

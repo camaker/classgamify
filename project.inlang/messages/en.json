@@ -1077,6 +1077,8 @@
   "assignment_result_sort_best_score_description": "Scan strongest performances before opening individual attempts.",
   "assignment_result_sort_item_type": "Item type",
   "assignment_result_sort_item_type_description": "Group prompts by runtime item type for template-specific review.",
+  "assignment_result_sort_last_submitted": "Last submitted",
+  "assignment_result_sort_last_submitted_description": "Scan the newest student submissions first.",
   "assignment_result_sort_lowest_accuracy": "Lowest accuracy",
   "assignment_result_sort_lowest_accuracy_description": "Surface the prompts with the lowest correct rate first.",
   "assignment_result_sort_most_answered": "Most answered",

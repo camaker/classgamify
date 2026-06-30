@@ -1077,6 +1077,8 @@
   "assignment_result_sort_best_score_description": "先查看表现最好的学生，再打开单次作答。",
   "assignment_result_sort_item_type": "题目类型",
   "assignment_result_sort_item_type_description": "按运行题型归组，方便做模板维度复盘。",
+  "assignment_result_sort_last_submitted": "最近提交",
+  "assignment_result_sort_last_submitted_description": "优先查看最新提交的学生。",
   "assignment_result_sort_lowest_accuracy": "最低正确率",
   "assignment_result_sort_lowest_accuracy_description": "把正确率最低的题目优先显示出来。",
   "assignment_result_sort_most_answered": "最多作答",

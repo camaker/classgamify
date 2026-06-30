@@ -2184,6 +2184,11 @@ assert.match(
   'Assignment result student sorting should reuse the shared normalized display-label comparator.'
 );
 assert.match(
+  assignmentResultFiltersSource,
+  /sort === 'last-submitted'[\s\S]*compareAssignmentResultCompletedAt\(\s*left\.lastCompletedAt,\s*right\.lastCompletedAt\s*\)[\s\S]*compareAssignmentStudentsByDisplayLabel\(left, right\)/,
+  'Assignment result last-submitted student sorting should compare the latest submission time before falling back to the display-label comparator.'
+);
+assert.match(
   assignmentStudentFollowUpPrioritySource,
   /export function compareAssignmentStudentsByDisplayLabel[\s\S]*compareRuntimeDisplaySearchText/,
   'Assignment student follow-up ordering should expose a stable display-label comparator.'
@@ -33134,7 +33139,13 @@ assert.deepEqual(
         placeholder: 'Search by student name',
         sort: 'name',
         sortLabel: 'Sort students',
-        sortOptions: ['needs-review', 'best', 'name', 'attempts'],
+        sortOptions: [
+          'needs-review',
+          'best',
+          'name',
+          'attempts',
+          'last-submitted',
+        ],
         summary: '1 student · 1 attempt',
         value: 'Alice',
       },
@@ -34086,6 +34097,7 @@ assert.deepEqual(STUDENT_SUMMARY_SORT_VALUES, [
   'best',
   'name',
   'attempts',
+  'last-submitted',
 ]);
 assert.deepEqual(ITEM_PERFORMANCE_SORT_VALUES, [
   'original',
@@ -34096,7 +34108,7 @@ assert.deepEqual(ITEM_PERFORMANCE_SORT_VALUES, [
 assert.deepEqual(ATTEMPT_REVIEW_FILTER_VALUES, ['all', 'needs-review']);
 assert.deepEqual(
   studentSummarySortOptions.map((option) => option.value),
-  ['needs-review', 'best', 'name', 'attempts']
+  ['needs-review', 'best', 'name', 'attempts', 'last-submitted']
 );
 assert.deepEqual(
   studentSummarySortOptions.map((option) => [
@@ -34124,6 +34136,11 @@ assert.deepEqual(
       'attempts',
       'Attempts',
       'Put students with the most submitted attempts first.',
+    ],
+    [
+      'last-submitted',
+      'Last submitted',
+      'Scan the newest student submissions first.',
     ],
   ]
 );
@@ -35515,6 +35532,10 @@ assert.deepEqual(
   }
 );
 assert.equal(parseStudentSummarySort('best'), 'best');
+assert.equal(
+  parseStudentSummarySort('last-submitted'),
+  'last-submitted'
+);
 assert.equal(parseStudentSummarySort('needs-review'), undefined);
 assert.equal(parseItemPerformanceSort('submitted'), 'submitted');
 assert.equal(parseItemPerformanceSort('original'), undefined);
@@ -35528,13 +35549,13 @@ assert.deepEqual(
   buildAssignmentResultRouteSearch({
     itemSort: 'submitted',
     review: 'needs-review',
-    sort: 'attempts',
+    sort: 'last-submitted',
     student: '  Ａｖａ   Ｃｈｅｎ  ',
   }),
   {
     itemSort: 'submitted',
     review: 'needs-review',
-    sort: 'attempts',
+    sort: 'last-submitted',
     student: 'Ava Chen',
   }
 );
@@ -35576,14 +35597,14 @@ assert.deepEqual(
   resolveAssignmentResultViewState({
     itemSort: 'type',
     review: 'needs-review',
-    sort: 'name',
+    sort: 'last-submitted',
     student: 'Ava Chen',
   }),
   {
     attemptReviewFilter: 'needs-review',
     itemPerformanceSort: 'type',
     studentSearch: 'Ava Chen',
-    studentSort: 'name',
+    studentSort: 'last-submitted',
   }
 );
 assert.deepEqual(
@@ -35606,14 +35627,14 @@ assert.deepEqual(
     next: {
       itemSort: 'accuracy',
       review: 'needs-review',
-      sort: 'best',
+      sort: 'last-submitted',
       student: '  Ava   Chen  ',
     },
   }),
   {
     itemSort: 'accuracy',
     review: 'needs-review',
-    sort: 'best',
+    sort: 'last-submitted',
     student: 'Ava Chen',
   }
 );
@@ -35922,6 +35943,42 @@ assert.deepEqual(
     'name'
   ).map((student) => student.studentLabel),
   ['izmir student', ' İstanbul Student ']
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        lastCompletedAt: new Date('2026-01-02T10:00:00.000Z'),
+        studentLabel: 'Earlier submission',
+      },
+      {
+        ...resultAnalysis.students[1]!,
+        lastCompletedAt: new Date('2026-01-03T10:00:00.000Z'),
+        studentLabel: 'Newest submission',
+      },
+    ],
+    'last-submitted'
+  ).map((student) => student.studentLabel),
+  ['Newest submission', 'Earlier submission']
+);
+assert.deepEqual(
+  sortStudentSummaries(
+    [
+      {
+        ...resultAnalysis.students[0]!,
+        lastCompletedAt: undefined,
+        studentLabel: ' Ｂｅｔａ ',
+      },
+      {
+        ...resultAnalysis.students[1]!,
+        lastCompletedAt: undefined,
+        studentLabel: 'alpha',
+      },
+    ],
+    'last-submitted'
+  ).map((student) => student.studentLabel),
+  ['alpha', ' Ｂｅｔａ ']
 );
 assert.deepEqual(
   filterAndSortStudentSummaries({
@@ -36428,6 +36485,12 @@ assert.deepEqual(
     (student) => student.studentLabel
   ),
   ['Alpha review', 'More review', 'Lower score', 'No review']
+);
+assert.deepEqual(
+  sortStudentSummaries(followUpPriorityStudents, 'last-submitted').map(
+    (student) => student.studentLabel
+  ),
+  ['Alpha review', 'No review', 'More review', 'Lower score']
 );
 assert.deepEqual(
   sortAssignmentStudentsByFollowUpPriority([

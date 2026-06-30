@@ -19,7 +19,12 @@ import {
   normalizeRuntimeDisplaySearchKey,
 } from '@/assignments/runtime-display';
 
-export type StudentSummarySort = 'attempts' | 'best' | 'name' | 'needs-review';
+export type StudentSummarySort =
+  | 'attempts'
+  | 'best'
+  | 'last-submitted'
+  | 'name'
+  | 'needs-review';
 export type ItemPerformanceSort =
   | 'accuracy'
   | 'original'
@@ -39,6 +44,7 @@ export const STUDENT_SUMMARY_SORT_VALUES = [
   'best',
   'name',
   'attempts',
+  'last-submitted',
 ] as const satisfies readonly StudentSummarySort[];
 
 export const ITEM_PERFORMANCE_SORT_VALUES = [
@@ -440,6 +446,16 @@ export function sortStudentSummaries(
         left,
         right
       );
+    }
+
+    if (sort === 'last-submitted') {
+      const lastSubmittedCompare = compareAssignmentResultCompletedAt(
+        left.lastCompletedAt,
+        right.lastCompletedAt
+      );
+      if (lastSubmittedCompare !== 0) return lastSubmittedCompare;
+
+      return compareAssignmentStudentsByDisplayLabel(left, right);
     }
 
     return compareAssignmentStudentsByFollowUpPriority(left, right);
