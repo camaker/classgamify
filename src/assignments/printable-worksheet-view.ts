@@ -7,6 +7,7 @@ import type {
   PrintableAssignmentWorksheetSummary,
   PrintableWorksheetAnswerKeyItem,
   PrintableWorksheetChoicePresentation,
+  PrintableWorksheetItemLayout,
   PrintableWorksheetItem,
   PrintableWorksheetResponseMode,
 } from '@/assignments/printable-worksheet';
@@ -77,6 +78,7 @@ export type PrintableWorksheetItemView = {
   headingLabel: string;
   id: string;
   kindLabel: string;
+  layout: PrintableWorksheetItemLayout;
   prompt: string;
   responseHelp: string;
   responseModeLabel: string;
@@ -498,6 +500,7 @@ export function buildPrintableWorksheetItemView(
     }),
     id: item.id,
     kindLabel,
+    layout: item.layout,
     prompt: formatRuntimeItemPrompt(item),
     responseHelp: getPrintableWorksheetResponseHelp(item.responseMode),
     responseModeLabel: formatPrintableWorksheetResponseModeLabel(

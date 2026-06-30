@@ -15102,6 +15102,7 @@ assert.deepEqual(printableSnapshotWorksheet.items[0], {
   choices: ['Frozen answer / Frozen accepted', 'Frozen answer', 'Other'],
   id: 'q-frozen-prompt',
   kind: 'question',
+  layout: 'multiple-choice',
   prompt: 'Frozen prompt?',
   responseMode: 'choice',
   sequenceNumber: 1,
@@ -15196,6 +15197,7 @@ assert.deepEqual(messyPrintableWorksheet.items[0], {
   choices: ['Paris', 'Rome'],
   id: 'messy-print-q',
   kind: 'question',
+  layout: 'multiple-choice',
   prompt: 'Capital of France?',
   responseMode: 'choice',
   sequenceNumber: 1,
@@ -15260,6 +15262,7 @@ assert.deepEqual(printableShortAnswerWorksheet.items[0], {
   choices: [],
   id: 'open-box-print-q',
   kind: 'question',
+  layout: 'short-answer',
   prompt: 'Name the capital of France.',
   responseMode: 'short-answer',
   sequenceNumber: 1,
@@ -15363,6 +15366,7 @@ const messyPrintableItemView = buildPrintableWorksheetItemView({
   choices: [' Ｐａｒｉｓ ', 'Paris', '', 'Rome'],
   id: 'messy-print-item',
   kind: 'question',
+  layout: 'multiple-choice',
   prompt: '  Choose   the   capital.  ',
   responseMode: 'choice',
   sequenceNumber: Number.NaN,
@@ -15403,6 +15407,7 @@ assert.equal(
     choices: [],
     id: 'printable-four-lines',
     kind: 'question',
+    layout: 'short-answer',
     prompt: 'Explain it.',
     responseMode: 'short-answer',
     sequenceNumber: 1,
@@ -15416,6 +15421,7 @@ assert.equal(
     choices: ['left', 'right'],
     id: 'printable-answer-bank',
     kind: 'pair',
+    layout: 'matching',
     prompt: 'Match it.',
     responseMode: 'line-match',
     sequenceNumber: 2,
@@ -15429,6 +15435,7 @@ assert.equal(
     choices: ['left', 'right'],
     id: 'printable-answer-bank-summary',
     kind: 'pair',
+    layout: 'matching',
     prompt: 'Match it.',
     responseMode: 'line-match',
     sequenceNumber: 2,
@@ -15442,6 +15449,7 @@ assert.equal(
     choices: ['Animals', 'Food'],
     id: 'printable-group-bank',
     kind: 'group-item',
+    layout: 'classification',
     prompt: 'Classify it.',
     responseMode: 'group-choice',
     sequenceNumber: 3,
@@ -15455,6 +15463,7 @@ assert.equal(
     choices: ['Animals', 'Food'],
     id: 'printable-group-bank-summary',
     kind: 'group-item',
+    layout: 'classification',
     prompt: 'Classify it.',
     responseMode: 'group-choice',
     sequenceNumber: 3,
@@ -15468,6 +15477,7 @@ assert.equal(
     choices: [],
     id: 'printable-no-bank',
     kind: 'question',
+    layout: 'short-answer',
     prompt: 'Write it.',
     responseMode: 'short-answer',
     sequenceNumber: 4,
@@ -15481,6 +15491,7 @@ assert.equal(
     choices: ['Hidden option', 'Hidden distractor'],
     id: 'printable-hidden-bank',
     kind: 'question',
+    layout: 'short-answer',
     prompt: 'Write it.',
     responseMode: 'short-answer',
     sequenceNumber: 4,
@@ -15494,6 +15505,7 @@ assert.deepEqual(
     choices: ['Hidden option', 'Hidden distractor'],
     id: 'printable-hidden-bank-choices',
     kind: 'question',
+    layout: 'short-answer',
     prompt: 'Write it.',
     responseMode: 'short-answer',
     sequenceNumber: 4,
@@ -15506,6 +15518,7 @@ const printableNoBankItemView = buildPrintableWorksheetItemView({
   choices: [],
   id: 'printable-no-bank-summary',
   kind: 'question',
+  layout: 'short-answer',
   prompt: 'Write it.',
   responseMode: 'short-answer',
   sequenceNumber: 4,
@@ -15525,6 +15538,7 @@ try {
     choices: ['苹果', '香蕉'],
     id: 'zh-printable-item',
     kind: 'question',
+    layout: 'multiple-choice',
     prompt: '选择水果。',
     responseMode: 'choice',
     sequenceNumber: 2,
@@ -16026,36 +16040,43 @@ assert.deepEqual(PRINTABLE_WORKSHEET_RESPONSE_POLICIES, {
   'choice-list': {
     answerSpaceLines: 1,
     choicePresentation: 'choice-list',
+    itemLayout: 'multiple-choice',
     responseMode: 'choice',
   },
   'fill-blank': {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
   'group-sort': {
     answerSpaceLines: 1,
     choicePresentation: 'group-bank',
+    itemLayout: 'classification',
     responseMode: 'group-choice',
   },
   'line-match': {
     answerSpaceLines: 1,
     choicePresentation: 'answer-bank',
+    itemLayout: 'matching',
     responseMode: 'line-match',
   },
   listening: {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
   'matching-pairs': {
     answerSpaceLines: 1,
     choicePresentation: 'answer-bank',
+    itemLayout: 'matching',
     responseMode: 'matching-pairs',
   },
   'open-box': {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
 });
@@ -16123,6 +16144,12 @@ for (const templateType of ACTIVITY_TEMPLATE_TYPES) {
   assert.equal(
     printableWorksheet.items.every(
       (item) => item.choicePresentation === responsePolicy.choicePresentation
+    ),
+    true
+  );
+  assert.equal(
+    printableWorksheet.items.every(
+      (item) => item.layout === responsePolicy.itemLayout
     ),
     true
   );
@@ -22263,8 +22290,13 @@ assert.match(
 );
 assert.match(
   printableWorksheetSource,
-  /toPrintableWorksheetItem[\s\S]*const responsePolicy = getPrintableWorksheetResponsePolicy\(templateType\)[\s\S]*answerSpaceLines: responsePolicy\.answerSpaceLines[\s\S]*choicePresentation: responsePolicy\.choicePresentation[\s\S]*responseMode: responsePolicy\.responseMode/,
-  'Printable worksheet item generation should consume the shared response policy.'
+  /PrintableWorksheetItemLayout[\s\S]*'classification'[\s\S]*'matching'[\s\S]*'multiple-choice'[\s\S]*'short-answer'/,
+  'Printable worksheet items should expose explicit layout metadata for future paper-specific rendering.'
+);
+assert.match(
+  printableWorksheetSource,
+  /toPrintableWorksheetItem[\s\S]*const responsePolicy = getPrintableWorksheetResponsePolicy\(templateType\)[\s\S]*answerSpaceLines: responsePolicy\.answerSpaceLines[\s\S]*choicePresentation: responsePolicy\.choicePresentation[\s\S]*layout: responsePolicy\.itemLayout[\s\S]*responseMode: responsePolicy\.responseMode/,
+  'Printable worksheet item generation should consume the shared response policy, including prepared item layout metadata.'
 );
 assert.match(
   printableWorksheetSource,
@@ -22395,6 +22427,11 @@ assert.match(
   printableWorksheetViewSource,
   /choicePresentation: item\.choicePresentation/,
   'Printable worksheet view should preserve structured choice presentation metadata.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /layout: item\.layout/,
+  'Printable worksheet view should preserve prepared printable item layout metadata.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -22833,6 +22870,11 @@ assert.match(
   printableWorksheetItemListSource,
   /emptyState\.title/,
   'Printable worksheet item list component should render the empty printable state from the printable worksheet page view-model.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /data-print-item-layout=\{itemView\.layout\}/,
+  'Printable worksheet item list should render prepared layout metadata for print-specific layout variants.'
 );
 assert.doesNotMatch(
   printableWorksheetItemListSource,

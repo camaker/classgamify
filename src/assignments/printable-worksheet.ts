@@ -44,9 +44,16 @@ export type PrintableWorksheetChoicePresentation =
   | 'group-bank'
   | 'none';
 
+export type PrintableWorksheetItemLayout =
+  | 'classification'
+  | 'matching'
+  | 'multiple-choice'
+  | 'short-answer';
+
 export type PrintableWorksheetResponsePolicy = {
   answerSpaceLines: number;
   choicePresentation: PrintableWorksheetChoicePresentation;
+  itemLayout: PrintableWorksheetItemLayout;
   responseMode: PrintableWorksheetResponseMode;
 };
 
@@ -56,6 +63,7 @@ export type PrintableWorksheetItem = {
   choices: string[];
   id: string;
   kind: RuntimeItemKind;
+  layout: PrintableWorksheetItemLayout;
   prompt: string;
   responseMode: PrintableWorksheetResponseMode;
   sequenceNumber: number;
@@ -130,36 +138,43 @@ export const PRINTABLE_WORKSHEET_RESPONSE_POLICIES = {
   'choice-list': {
     answerSpaceLines: 1,
     choicePresentation: 'choice-list',
+    itemLayout: 'multiple-choice',
     responseMode: 'choice',
   },
   'fill-blank': {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
   'group-sort': {
     answerSpaceLines: 1,
     choicePresentation: 'group-bank',
+    itemLayout: 'classification',
     responseMode: 'group-choice',
   },
   'line-match': {
     answerSpaceLines: 1,
     choicePresentation: 'answer-bank',
+    itemLayout: 'matching',
     responseMode: 'line-match',
   },
   listening: {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
   'matching-pairs': {
     answerSpaceLines: 1,
     choicePresentation: 'answer-bank',
+    itemLayout: 'matching',
     responseMode: 'matching-pairs',
   },
   'open-box': {
     answerSpaceLines: 2,
     choicePresentation: 'none',
+    itemLayout: 'short-answer',
     responseMode: 'short-answer',
   },
 } as const satisfies Record<
@@ -352,6 +367,7 @@ function toPrintableWorksheetItem({
     }),
     id: item.id,
     kind: item.kind,
+    layout: responsePolicy.itemLayout,
     prompt: normalizeRuntimeDisplayText(item.prompt),
     responseMode: responsePolicy.responseMode,
     sequenceNumber: getPrintableWorksheetSequenceNumber(index),

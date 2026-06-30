@@ -43,6 +43,7 @@ function PrintableWorksheetItem({
   return (
     <section
       data-print-item
+      data-print-item-layout={itemView.layout}
       className="break-inside-avoid rounded-lg border bg-background p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
