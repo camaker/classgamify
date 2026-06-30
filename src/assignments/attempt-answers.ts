@@ -69,6 +69,13 @@ export function buildAttemptAnswerMapByItemId(answers: AttemptAnswer[]) {
   );
 }
 
+export function getAttemptAnswerByRuntimeItemId<TAnswer>(
+  answersByItemId: Map<string, TAnswer>,
+  itemId: string | undefined
+) {
+  return answersByItemId.get(normalizeAttemptAnswerItemId(itemId));
+}
+
 export function getAttemptAnswerRuntimeItemIds({
   includeEmpty = false,
   runtimeItems,

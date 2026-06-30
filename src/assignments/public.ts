@@ -11,7 +11,10 @@ import type {
   AttemptAnswer,
   AttemptResult,
 } from '@/activities/types';
-import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
+import {
+  buildAttemptAnswerMapByItemId,
+  getAttemptAnswerByRuntimeItemId,
+} from '@/assignments/attempt-answers';
 import { normalizeAttemptDurationSeconds } from '@/assignments/attempt-duration';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { formatAssignmentDeliveryInstructions } from '@/assignments/delivery-summary';
@@ -381,7 +384,7 @@ function buildAttemptReviewItems({
 
   return runtimeItems.map((item) =>
     buildPublicAttemptReviewItem({
-      answer: answerByItemId.get(item.id),
+      answer: getAttemptAnswerByRuntimeItemId(answerByItemId, item.id),
       item,
     })
   );

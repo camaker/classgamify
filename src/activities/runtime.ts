@@ -184,12 +184,12 @@ export function evaluateRuntimeAnswers({
   const runtimeItems = getRuntimeItems(templateType, content);
   const answerMap = new Map(
     answers.map((answer) => [
-      answer.itemId,
+      normalizeRuntimeItemId(answer.itemId),
       normalizeRuntimeDisplayText(answer.answer),
     ])
   );
   const scoredAnswers = runtimeItems.map((item) => {
-    const submitted = answerMap.get(item.id) ?? '';
+    const submitted = getRuntimeSubmittedAnswer(answerMap, item.id);
     const match = matchAnswer({
       expectedAnswer: item.answer,
       submittedAnswer: submitted,
@@ -222,6 +222,17 @@ export function evaluateRuntimeAnswers({
       totalPoints,
     },
   };
+}
+
+function getRuntimeSubmittedAnswer(
+  answersByItemId: Map<string, string>,
+  itemId: string
+) {
+  return answersByItemId.get(normalizeRuntimeItemId(itemId)) ?? '';
+}
+
+function normalizeRuntimeItemId(value: string | undefined) {
+  return normalizeRuntimeDisplayText(value);
 }
 
 function countSubmittedRuntimeAnswers(answers: AttemptAnswer[]) {

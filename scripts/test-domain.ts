@@ -1450,6 +1450,11 @@ assert.match(
 );
 assert.match(
   activityRuntimeSource,
+  /answers\.map\(\(answer\) => \[[\s\S]*normalizeRuntimeItemId\(answer\.itemId\)[\s\S]*function getRuntimeSubmittedAnswer[\s\S]*answersByItemId\.get\(normalizeRuntimeItemId\(itemId\)\) \?\? ''[\s\S]*function normalizeRuntimeItemId[\s\S]*normalizeRuntimeDisplayText\(value\)/,
+  'Runtime evaluation should compare submitted and runtime item ids through the same normalized runtime item-id helper.'
+);
+assert.match(
+  activityRuntimeSource,
   /completedItemCount: countSubmittedRuntimeAnswers\(scoredAnswers\)/,
   'Runtime evaluation should derive completed item count through the shared submitted-answer helper.'
 );
@@ -2296,8 +2301,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsSource,
-  /completedAttemptAnswerMaps = completedAttempts\.map\([\s\S]*buildAttemptAnswerMapByItemId\(attempt\.answersJson\.answers\)[\s\S]*completedAttemptAnswerMaps\.flatMap\([\s\S]*answerMap\.get\(item\.id\)/,
-  'Assignment result analysis should look up submitted answers through the shared item-id map helper.'
+  /completedAttemptAnswerMaps = completedAttempts\.map\([\s\S]*buildAttemptAnswerMapByItemId\(attempt\.answersJson\.answers\)[\s\S]*completedAttemptAnswerMaps\.flatMap\([\s\S]*getAttemptAnswerByRuntimeItemId\(answerMap, item\.id\)/,
+  'Assignment result analysis should look up submitted answers through the shared normalized item-id helper.'
 );
 assert.match(
   activityRuntimeDisplaySource,
@@ -2554,6 +2559,15 @@ const publicAssignmentSource = readFileSync(
   'src/assignments/public.ts',
   'utf8'
 );
+assert.doesNotMatch(
+  [
+    activityRuntimeSource,
+    assignmentResultsSource,
+    publicAssignmentSource,
+  ].join('\n'),
+  /(?:answerMap|answerByItemId|answersByItemId)\.get\(item\.id\)/,
+  'Runtime scoring, public review, and teacher result analysis should not look up submitted answers by raw runtime item ids.'
+);
 assert.match(
   publicAssignmentSource,
   /PUBLIC_ASSIGNMENT_ESTIMATED_MINUTES[\s\S]*max: 20[\s\S]*min: 5[\s\S]*perItem: 2/,
@@ -2586,7 +2600,7 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /return runtimeItems\.map\(\(item\) =>[\s\S]*buildPublicAttemptReviewItem\(\{[\s\S]*answer: answerByItemId\.get\(item\.id\),[\s\S]*item,/,
+  /return runtimeItems\.map\(\(item\) =>[\s\S]*buildPublicAttemptReviewItem\(\{[\s\S]*answer: getAttemptAnswerByRuntimeItemId\(answerByItemId, item\.id\),[\s\S]*item,/,
   'Public attempt review lists should delegate per-item sanitization to the public review item helper.'
 );
 assert.match(
@@ -18496,6 +18510,31 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildPublicAttemptReviewItems({
+    answers: [{ answer: 'paris', correct: true, itemId: 'messy-q-1' }],
+    runtimeItems: [
+      {
+        answer: 'Paris',
+        id: ' ｍｅｓｓｙ－ｑ－１ ',
+        kind: 'question',
+        prompt: 'Capital?',
+      },
+    ],
+    showCorrectAnswers: true,
+  }),
+  [
+    {
+      acceptedAnswers: ['Paris'],
+      correct: true,
+      correctAnswer: 'Paris',
+      explanation: undefined,
+      itemId: ' ｍｅｓｓｙ－ｑ－１ ',
+      submitted: true,
+      submittedAnswer: 'paris',
+    },
+  ]
+);
+assert.deepEqual(
+  buildPublicAttemptReviewItems({
     answers: [{ answer: '\u00A0　\t', correct: false, itemId: 'q-1' }],
     runtimeItems: [
       {
@@ -29300,6 +29339,40 @@ assert.deepEqual(
     },
   }
 );
+assert.deepEqual(
+  evaluateRuntimeAnswers({
+    answers: [{ answer: 'Paris', itemId: ' ｑ－ｃａｐｉｔａｌ－ｏｆ－ｆｒａｎｃｅ ' }],
+    content: buildActivityContent({
+      description: 'Messy submitted item id scoring',
+      difficulty: 'starter',
+      gradeBand: 'Grade 4',
+      groupsText: '',
+      language: 'en',
+      learningGoal: 'Students answer items even when submitted ids are messy.',
+      pairsText: '',
+      questionsText: 'Capital of France? | Paris',
+      sourceSummary: 'Normalize submitted item ids before scoring.',
+      subject: 'Geography',
+      teacherNotesText: '',
+      templateType: 'quiz',
+      title: 'Messy submitted item id scoring',
+      visibility: 'draft',
+      vocabularyText: '',
+    }),
+    templateType: 'quiz',
+  }),
+  {
+    answers: [{ answer: 'Paris', correct: true, itemId: 'q-capital-of-france' }],
+    result: {
+      accuracy: 100,
+      completedItemCount: 1,
+      correctItemCount: 1,
+      durationSeconds: undefined,
+      earnedPoints: 1,
+      totalPoints: 1,
+    },
+  }
+);
 assert.equal(
   evaluateRuntimeAnswers({
     answers: [{ answer: 'Paris', itemId: 'q-valid' }],
@@ -33241,6 +33314,71 @@ const resultAnalysis = analyzeAssignmentResults({
   ],
   runtimeItems: resultRuntimeItems,
 });
+const normalizedRuntimeItemIdResultAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-01T10:00:00.000Z'),
+      id: 'normalized-runtime-id-attempt',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 1,
+        totalPoints: 1,
+      },
+      score: 1,
+      studentName: 'Alice',
+    },
+  ],
+  runtimeItems: [
+    {
+      answer: 'Paris',
+      choices: ['Paris', 'Rome'],
+      id: ' ｑ－１ ',
+      kind: 'question',
+      prompt: 'Capital of France?',
+    },
+  ],
+});
+assert.deepEqual(
+  normalizedRuntimeItemIdResultAnalysis.perItem.map((item) => ({
+    correctCount: item.correctCount,
+    correctRate: item.correctRate,
+    itemId: item.itemId,
+    submittedCount: item.submittedCount,
+    unansweredCount: item.unansweredCount,
+  })),
+  [
+    {
+      correctCount: 1,
+      correctRate: 100,
+      itemId: ' ｑ－１ ',
+      submittedCount: 1,
+      unansweredCount: 0,
+    },
+  ]
+);
+assert.deepEqual(
+  normalizedRuntimeItemIdResultAnalysis.attempts[0]?.answers.map((answer) => ({
+    answer: answer.answer,
+    correct: answer.correct,
+    itemId: answer.itemId,
+    submitted: answer.submitted,
+  })),
+  [
+    {
+      answer: 'Paris',
+      correct: true,
+      itemId: ' ｑ－１ ',
+      submitted: true,
+    },
+  ]
+);
 assert.deepEqual(ASSIGNMENT_RESULTS_ANALYSIS_LIMITS, {
   needsReviewItems: 3,
 });

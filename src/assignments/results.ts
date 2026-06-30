@@ -5,7 +5,10 @@ import {
   type RuntimeItemKind,
 } from '@/activities/runtime';
 import type { AttemptAnswers, AttemptResult } from '@/activities/types';
-import { buildAttemptAnswerMapByItemId } from '@/assignments/attempt-answers';
+import {
+  buildAttemptAnswerMapByItemId,
+  getAttemptAnswerByRuntimeItemId,
+} from '@/assignments/attempt-answers';
 import { createStudentIdentityResolver } from '@/assignments/identity';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import {
@@ -104,7 +107,7 @@ export function analyzeAssignmentResults({
   const perItem = runtimeItems.map((item) => {
     const acceptedAnswers = getResultAcceptedAnswers(item.answer);
     const submittedAnswers = completedAttemptAnswerMaps.flatMap((answerMap) => {
-      const answer = answerMap.get(item.id);
+      const answer = getAttemptAnswerByRuntimeItemId(answerMap, item.id);
 
       return hasRuntimeDisplayText(answer?.answer) ? [answer] : [];
     });
@@ -174,7 +177,10 @@ function buildAttemptReviewAnswers({
   );
 
   return runtimeItems.map((item) => {
-    const submittedAnswer = answerByItemId.get(item.id);
+    const submittedAnswer = getAttemptAnswerByRuntimeItemId(
+      answerByItemId,
+      item.id
+    );
     const acceptedAnswers = getResultAcceptedAnswers(item.answer);
 
     return {
