@@ -17,7 +17,7 @@ const config = defineConfig(({ mode }) => {
 
   return {
     server: {
-      allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
+      allowedHosts: ['.trycloudflare.com'],
     },
     resolve: {
       tsconfigPaths: true,

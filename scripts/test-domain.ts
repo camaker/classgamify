@@ -987,6 +987,7 @@ const githubIssueTemplateConfigSource = readFileSync(
   '.github/ISSUE_TEMPLATE/config.yml',
   'utf8'
 );
+const viteConfigSource = readFileSync('vite.config.ts', 'utf8');
 assert.match(
   githubIssueTemplateConfigSource,
   /ClassGamify Product Direction[\s\S]*docs\/product\.md[\s\S]*ClassGamify Classroom Feedback/,
@@ -996,6 +997,16 @@ assert.doesNotMatch(
   githubIssueTemplateConfigSource,
   /TanStack Starter|tanstackstarter|mksaas\.link/,
   'GitHub issue template contact links should not point contributors back to copied starter-template resources.'
+);
+assert.doesNotMatch(
+  viteConfigSource,
+  /tanstarter\.dev|mksaas\.link/,
+  'Vite dev server config should not keep copied starter-template hosts.'
+);
+assert.match(
+  viteConfigSource,
+  /allowedHosts:\s*\[\s*['"]\.trycloudflare\.com['"]\s*\]/,
+  'Vite dev server config should only allow the current tunnel host needed for local ClassGamify previews.'
 );
 const secretScanFileExtensions = ['.json', '.md', '.ts', '.tsx', '.txt'];
 
