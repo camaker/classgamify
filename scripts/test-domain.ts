@@ -1533,8 +1533,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentShareLinkSource,
-  /export function normalizeShareBaseUrl[\s\S]*\.normalize\('NFKC'\)[\s\S]*\.replace\(\s*\/\\s\+\/gu,\s*''\s*\)/,
-  'Share-link base URL normalization should remove whitespace before copying student links.'
+  /export function normalizeShareBaseUrl[\s\S]*\.normalize\('NFKC'\)[\s\S]*\.replace\(\s*\/\\s\+\/gu,\s*''\s*\)[\s\S]*normalizeShareAbsoluteUrl\(normalized\)[\s\S]*normalizeShareAbsoluteUrl\(`https:\/\/\$\{normalized\}`\)/,
+  'Share-link base URL normalization should remove whitespace and repair schemeless host URLs before copying student links.'
 );
 assert.doesNotMatch(
   assignmentShareLinkSource,
@@ -12263,10 +12263,18 @@ assert.equal(
 );
 assert.equal(
   normalizeShareBaseUrl('　classgamify.test / classroom ///　'),
-  'classgamify.test/classroom'
+  'https://classgamify.test'
+);
+assert.equal(
+  normalizeShareBaseUrl('classgamify.test/dashboard?utm=teacher#share'),
+  'https://classgamify.test'
 );
 assert.equal(
   buildAssignmentShareUrl('abc 123', 'https://classgamify.test/'),
+  'https://classgamify.test/play/abc%20123'
+);
+assert.equal(
+  buildAssignmentShareUrl('abc 123', ' classgamify.test/dashboard '),
   'https://classgamify.test/play/abc%20123'
 );
 assert.equal(
@@ -12333,6 +12341,18 @@ assert.deepEqual(
     successMessage: 'Student link copied.',
     type: 'copy-link',
     url: 'https://classgamify.test/play/abc%20123',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    baseUrl: '　classgamify.test / dashboard　',
+    shareSlug: 'class share',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    successMessage: 'Student link copied.',
+    type: 'copy-link',
+    url: 'https://classgamify.test/play/class%20share',
   }
 );
 assert.deepEqual(

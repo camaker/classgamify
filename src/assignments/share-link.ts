@@ -185,10 +185,20 @@ export function normalizeShareBaseUrl(baseUrl: string) {
   const normalized = baseUrl.normalize('NFKC').replace(/\s+/gu, '').trim();
   if (!normalized) return '';
 
+  const absoluteUrl = normalizeShareAbsoluteUrl(normalized);
+  if (absoluteUrl) return absoluteUrl;
+
+  const secureUrl = normalizeShareAbsoluteUrl(`https://${normalized}`);
+  if (secureUrl) return secureUrl;
+
+  return normalized.replace(/\/+$/, '');
+}
+
+function normalizeShareAbsoluteUrl(value: string) {
   try {
-    return new URL(normalized).origin;
+    return new URL(value).origin;
   } catch {
-    return normalized.replace(/\/+$/, '');
+    return '';
   }
 }
 
