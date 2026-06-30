@@ -409,10 +409,12 @@ import {
   buildDefaultRuntimeItemCardViews,
   buildFillBlankWorksheetView,
   buildGroupSortRunnerView,
+  buildGroupSortGroupViewId,
   buildInlineBlankPromptView,
   buildExclusiveChoiceAnswerChanges,
   buildPublicAnswerFeedbackView,
   buildRuntimeChoiceButtonViews,
+  buildRuntimeChoiceViewId,
   buildRuntimeChoiceViews,
   buildSequentialStudentRunnerNavigationView,
   buildSequentialStudentRunnerView,
@@ -5864,6 +5866,16 @@ assert.match(
   /<GroupSortItemButton[\s\S]*correctLabel=\{copy\.correctAnswerLabel\}/,
   'Group-sort runner should pass the template-specific correct-answer label into item feedback.'
 );
+assert.match(
+  groupSortBoardSource,
+  /groupViews\.map\(\s*\(\{[\s\S]*id,[\s\S]*\}\) =>[\s\S]*key=\{id\}/,
+  'Group-sort runner should render group columns with stable domain group-view ids.'
+);
+assert.doesNotMatch(
+  groupSortBoardSource,
+  /key=\{group\}/,
+  'Group-sort runner should not use visible group text as the React key.'
+);
 assert.doesNotMatch(
   groupSortBoardSource,
   /buildStudentRunnerView|isSameRuntimeChoice|itemViews\.filter|selectedItemId === item\.id|onAnswerChange\(selectedItemId|getStudentRunnerReviewStatusClassName/,
@@ -5919,6 +5931,16 @@ assert.match(
   listeningRunnerSource,
   /runnerView\.activeChoiceViews/,
   'Listening runner should render choice state from the sequential runner view.'
+);
+assert.match(
+  listeningRunnerSource,
+  /activeChoiceViews\.map\(\(choiceView\)[\s\S]*key=\{choiceView\.id\}/,
+  'Listening runner should render choice buttons with stable domain choice-view ids.'
+);
+assert.doesNotMatch(
+  listeningRunnerSource,
+  /key=\{choiceView\.choice\}/,
+  'Listening runner should not use visible choice text as the React key.'
 );
 assert.match(
   listeningRunnerSource,
@@ -8377,18 +8399,23 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
-  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*export type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
+  /export type RuntimeChoiceButtonView = \{[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*selected: boolean;[\s\S]*export type StudentRunnerItemView = StudentAttemptAnswerState & \{[\s\S]*item: PublicRuntimeItem;[\s\S]*reviewItem: PublicAttemptReviewItem \| undefined;[\s\S]*status: StudentRunnerReviewStatus;[\s\S]*export type StudentRunnerView = \{[\s\S]*completionSummary: AttemptCompletionSummary;[\s\S]*itemViews: StudentRunnerItemView\[\];[\s\S]*itemViewsById: Map<string, StudentRunnerItemView>;[\s\S]*export type DefaultRuntimeItemCardView = StudentRunnerItemView & \{/,
   'Student runner domain should expose explicit base item, list, choice, and default-card view contracts.'
 );
 assert.match(
   studentRunnerViewSource,
-  /export type RuntimeChoiceView = \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*usedByItemId: string \| undefined;[\s\S]*export type ChoicePairingRunnerView = StudentRunnerView & \{[\s\S]*choiceViews: RuntimeChoiceView\[\];[\s\S]*promptItemViews: ChoicePairingPromptItemView\[\];[\s\S]*export type ChoicePairingPromptItemView = StudentRunnerItemView & \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  /export type RuntimeChoiceView = \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*choice: string;[\s\S]*id: string;[\s\S]*usedByItemId: string \| undefined;[\s\S]*export type ChoicePairingRunnerView = StudentRunnerView & \{[\s\S]*choiceViews: RuntimeChoiceView\[\];[\s\S]*promptItemViews: ChoicePairingPromptItemView\[\];[\s\S]*export type ChoicePairingPromptItemView = StudentRunnerItemView & \{[\s\S]*action: ChoicePairingRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
   'Student runner domain should expose explicit choice-pairing view contracts for line-match and matching-pairs templates.'
 );
 assert.match(
   studentRunnerViewSource,
-  /export type GroupSortRunnerView = StudentRunnerView & \{[\s\S]*groupViews: GroupSortGroupView\[\];[\s\S]*selectedClearAction: GroupSortRunnerAction \| undefined;[\s\S]*selectedItem\?: PublicRuntimeItem;[\s\S]*unplacedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortGroupView = \{[\s\S]*placedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortItemView = StudentRunnerItemView & \{[\s\S]*action: GroupSortRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
+  /export type GroupSortRunnerView = StudentRunnerView & \{[\s\S]*groupViews: GroupSortGroupView\[\];[\s\S]*selectedClearAction: GroupSortRunnerAction \| undefined;[\s\S]*selectedItem\?: PublicRuntimeItem;[\s\S]*unplacedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortGroupView = \{[\s\S]*group: string;[\s\S]*id: string;[\s\S]*placedItemViews: GroupSortItemView\[\];[\s\S]*export type GroupSortItemView = StudentRunnerItemView & \{[\s\S]*action: GroupSortRunnerAction;[\s\S]*reviewStatusClassName: string \| undefined;[\s\S]*selected: boolean;/,
   'Student runner domain should expose explicit group-sort board view contracts.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export function buildRuntimeChoiceViewId\(choice: string\)[\s\S]*getRuntimeChoiceDisplayKey\(choice\)[\s\S]*export function buildGroupSortGroupViewId\(group: string\)[\s\S]*getRuntimeChoiceDisplayKey\(group\)/,
+  'Student runner choice and group views should expose stable ids derived from normalized runtime choice keys.'
 );
 assert.match(
   studentRunnerViewSource,
@@ -9238,6 +9265,11 @@ assert.match(
   /function handleSingleAnswerChange\(itemId: string, answer: string\)[\s\S]*buildStudentRuntimeSingleAnswerChanges\(\{[\s\S]*answer,[\s\S]*itemId,[\s\S]*\}\)/,
   'Student runtime item list should convert simple answer events through one local batch handler backed by the assignment-domain helper.'
 );
+assert.match(
+  studentRuntimeItemListSource,
+  /choices\.map\(\(choiceView\)[\s\S]*key=\{choiceView\.id\}/,
+  'Student runtime item list should render choice buttons with stable domain choice-view ids.'
+);
 assert.doesNotMatch(
   studentRuntimeItemListSource,
   /onAnswerChange=\{\(itemId, answer\) =>[\s\S]*buildStudentRuntimeSingleAnswerChanges/,
@@ -9259,6 +9291,16 @@ assert.doesNotMatch(
   'Line-match should not rebuild exclusive choice changes or selection toggles in the component.'
 );
 assert.match(
+  lineMatchBoardSource,
+  /choiceViews\.map\([\s\S]*id,[\s\S]*key=\{id\}/,
+  'Line-match should render choice buttons with stable domain choice-view ids.'
+);
+assert.doesNotMatch(
+  lineMatchBoardSource,
+  /key=\{choice\}/,
+  'Line-match should not use visible choice text as the React key.'
+);
+assert.match(
   matchingPairsBoardSource,
   /resolveChoicePairingRunnerAction\(\{[\s\S]*action,[\s\S]*answers,[\s\S]*disabled,[\s\S]*items,[\s\S]*selectedItemId,[\s\S]*onAnswerChanges\(result\.answerChanges\)/,
   'Matching-pairs should resolve prompt and choice interactions through the assignment-domain pairing action helper with current runtime items.'
@@ -9272,6 +9314,16 @@ assert.doesNotMatch(
   matchingPairsBoardSource,
   /buildExclusiveChoiceAnswerChanges|for \(const change of buildExclusiveChoiceAnswerChanges/,
   'Matching-pairs should not rebuild exclusive choice changes or selection toggles in the component.'
+);
+assert.match(
+  matchingPairsBoardSource,
+  /choiceViews\.map\([\s\S]*id,[\s\S]*key=\{id\}/,
+  'Matching-pairs should render choice buttons with stable domain choice-view ids.'
+);
+assert.doesNotMatch(
+  matchingPairsBoardSource,
+  /key=\{choice\}/,
+  'Matching-pairs should not use visible choice text as the React key.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -10080,8 +10132,8 @@ assert.deepEqual(
     {
       answer: 'Paris',
       choiceViews: [
-        { choice: 'Paris', selected: true },
-        { choice: 'Rome', selected: false },
+        { choice: 'Paris', id: 'choice:paris', selected: true },
+        { choice: 'Rome', id: 'choice:rome', selected: false },
       ],
       positionLabel: '1. Capital of France?',
     },
@@ -10212,6 +10264,7 @@ assert.deepEqual(
         type: 'choose-choice',
       },
       choice: 'Paris',
+      id: 'choice:paris',
       selected: false,
       usedByItemId: 'item-1',
     },
@@ -10221,11 +10274,14 @@ assert.deepEqual(
         type: 'choose-choice',
       },
       choice: 'Rome',
+      id: 'choice:rome',
       selected: true,
       usedByItemId: 'item-2',
     },
   ]
 );
+assert.equal(buildRuntimeChoiceViewId(' Ｐａｒｉｓ '), 'choice:paris');
+assert.equal(buildGroupSortGroupViewId(' Ｆｒｕｉｔ '), 'group:fruit');
 assert.deepEqual(
   resolveChoicePairingRunnerAction({
     action: {
@@ -10367,10 +10423,12 @@ assert.deepEqual(
   [
     {
       choice: 'Paris',
+      id: 'choice:paris',
       selected: true,
     },
     {
       choice: 'Rome',
+      id: 'choice:rome',
       selected: false,
     },
   ]
@@ -10416,10 +10474,12 @@ assert.deepEqual(
       choiceViews: [
         {
           choice: 'Paris',
+          id: 'choice:paris',
           selected: true,
         },
         {
           choice: 'Rome',
+          id: 'choice:rome',
           selected: false,
         },
       ],
@@ -10554,10 +10614,12 @@ assert.equal(sequentialStudentRunnerView.activeReviewItem?.correct, true);
 assert.deepEqual(sequentialStudentRunnerView.activeChoiceViews, [
   {
     choice: 'Paris',
+    id: 'choice:paris',
     selected: true,
   },
   {
     choice: 'Lyon',
+    id: 'choice:lyon',
     selected: false,
   },
 ]);
@@ -19679,36 +19741,42 @@ assert.deepEqual(choicePairingRunnerView.choiceViews, [
   {
     action: { choice: 'Paris', type: 'choose-choice' },
     choice: 'Paris',
+    id: 'choice:paris',
     selected: false,
     usedByItemId: 'q-1',
   },
   {
     action: { choice: 'Lyon', type: 'choose-choice' },
     choice: 'Lyon',
+    id: 'choice:lyon',
     selected: false,
     usedByItemId: undefined,
   },
   {
     action: { choice: 'Cold', type: 'choose-choice' },
     choice: 'Cold',
+    id: 'choice:cold',
     selected: false,
     usedByItemId: 'pair-1',
   },
   {
     action: { choice: 'Warm', type: 'choose-choice' },
     choice: 'Warm',
+    id: 'choice:warm',
     selected: false,
     usedByItemId: undefined,
   },
   {
     action: { choice: 'North', type: 'choose-choice' },
     choice: 'North',
+    id: 'choice:north',
     selected: false,
     usedByItemId: undefined,
   },
   {
     action: { choice: 'South', type: 'choose-choice' },
     choice: 'South',
+    id: 'choice:south',
     selected: false,
     usedByItemId: undefined,
   },
@@ -19803,11 +19871,14 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
-  groupSortBoardView.groupViews.map(({ action, group, placedItemViews }) => [
-    action,
-    group,
-    placedItemViews.map((itemView) => itemView.item.id),
-  ]),
+  groupSortBoardView.groupViews.map(
+    ({ action, group, id, placedItemViews }) => [
+      action,
+      group,
+      id,
+      placedItemViews.map((itemView) => itemView.item.id),
+    ]
+  ),
   [
     [
       {
@@ -19815,6 +19886,7 @@ assert.deepEqual(
         type: 'place-selected',
       },
       'Fruit',
+      'group:fruit',
       ['group-fruit-apple'],
     ],
     [
@@ -19823,6 +19895,7 @@ assert.deepEqual(
         type: 'place-selected',
       },
       'Drink',
+      'group:drink',
       ['group-drink-water'],
     ],
   ]

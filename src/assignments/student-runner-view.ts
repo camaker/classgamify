@@ -51,12 +51,14 @@ type RuntimeChoiceAnswerChange = {
 
 export type RuntimeChoiceButtonView = {
   choice: string;
+  id: string;
   selected: boolean;
 };
 
 export type RuntimeChoiceView = {
   action: ChoicePairingRunnerAction;
   choice: string;
+  id: string;
   selected: boolean;
   usedByItemId: string | undefined;
 };
@@ -108,6 +110,7 @@ export type GroupSortRunnerView = StudentRunnerView & {
 export type GroupSortGroupView = {
   action: GroupSortRunnerAction;
   group: string;
+  id: string;
   placedItemViews: GroupSortItemView[];
 };
 
@@ -800,6 +803,7 @@ export function buildRuntimeChoiceViews({
   return choices.map((choice) => ({
     action: buildChoicePairingChoiceAction(choice),
     choice,
+    id: buildRuntimeChoiceViewId(choice),
     selected: selectedItemId
       ? isSameRuntimeChoice(answers[selectedItemId], choice)
       : false,
@@ -816,6 +820,7 @@ export function buildRuntimeChoiceButtonViews({
 }): RuntimeChoiceButtonView[] {
   return choices.map((choice) => ({
     choice,
+    id: buildRuntimeChoiceViewId(choice),
     selected: isSameRuntimeChoice(answer, choice),
   }));
 }
@@ -928,6 +933,7 @@ export function buildGroupSortRunnerView({
     groupViews: runnerView.choices.map((group) => ({
       action: buildGroupSortPlaceAction(group),
       group,
+      id: buildGroupSortGroupViewId(group),
       placedItemViews: itemViews.filter((itemView) =>
         isSameRuntimeChoice(itemView.answer, group)
       ),
@@ -940,6 +946,14 @@ export function buildGroupSortRunnerView({
       : undefined,
     unplacedItemViews: itemViews.filter((itemView) => !itemView.answered),
   };
+}
+
+export function buildRuntimeChoiceViewId(choice: string) {
+  return `choice:${getRuntimeChoiceDisplayKey(choice)}`;
+}
+
+export function buildGroupSortGroupViewId(group: string) {
+  return `group:${getRuntimeChoiceDisplayKey(group)}`;
 }
 
 export function buildExclusiveChoiceAnswerChanges({

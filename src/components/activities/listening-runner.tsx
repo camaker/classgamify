@@ -226,7 +226,7 @@ export function ListeningRunner({
               {runnerView.activeChoiceViews.map((choiceView) => {
                 return (
                   <button
-                    key={choiceView.choice}
+                    key={choiceView.id}
                     type="button"
                     disabled={disabled}
                     className={cn(

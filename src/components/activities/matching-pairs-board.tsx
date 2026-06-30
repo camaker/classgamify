@@ -135,9 +135,9 @@ export function MatchingPairsBoard({
 
         <div className="grid content-start gap-2">
           {runnerView.choiceViews.map(
-            ({ action, choice, selected, usedByItemId }) => (
+            ({ action, choice, id, selected, usedByItemId }) => (
               <button
-                key={choice}
+                key={id}
                 type="button"
                 disabled={!selectedItemId || disabled}
                 className={cn(

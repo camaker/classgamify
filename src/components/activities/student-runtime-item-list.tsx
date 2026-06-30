@@ -244,7 +244,7 @@ function ChoiceGrid({
       {choices.map((choiceView) => {
         return (
           <button
-            key={choiceView.choice}
+            key={choiceView.id}
             type="button"
             disabled={disabled}
             className={cn(

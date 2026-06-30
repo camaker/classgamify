@@ -148,60 +148,62 @@ export function GroupSortBoard({
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {runnerView.groupViews.map(({ action, group, placedItemViews }) => {
-            return (
-              <div key={group} className="rounded-lg border bg-background p-3">
-                <button
-                  type="button"
-                  disabled={!selectedItemId || disabled}
-                  className={cn(
-                    'min-h-14 w-full rounded-lg border bg-muted/20 p-3 text-left transition-colors',
-                    'disabled:cursor-default disabled:opacity-100',
-                    selectedItemId &&
-                      !disabled &&
-                      'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
-                  )}
-                  onClick={() => handleRunnerAction(action)}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold">{group}</p>
-                    <Badge variant="secondary" className="rounded-md">
-                      {placedItemViews.length}
-                    </Badge>
-                  </div>
-                </button>
+          {runnerView.groupViews.map(
+            ({ action, group, id, placedItemViews }) => {
+              return (
+                <div key={id} className="rounded-lg border bg-background p-3">
+                  <button
+                    type="button"
+                    disabled={!selectedItemId || disabled}
+                    className={cn(
+                      'min-h-14 w-full rounded-lg border bg-muted/20 p-3 text-left transition-colors',
+                      'disabled:cursor-default disabled:opacity-100',
+                      selectedItemId &&
+                        !disabled &&
+                        'border-primary/40 hover:border-primary/60 hover:bg-primary/5'
+                    )}
+                    onClick={() => handleRunnerAction(action)}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold">{group}</p>
+                      <Badge variant="secondary" className="rounded-md">
+                        {placedItemViews.length}
+                      </Badge>
+                    </div>
+                  </button>
 
-                <div className="mt-3 grid gap-2">
-                  {placedItemViews.map(
-                    ({
-                      action,
-                      item,
-                      reviewItem,
-                      reviewStatusClassName,
-                      selected,
-                    }) => (
-                      <GroupSortItemButton
-                        key={item.id}
-                        correctLabel={copy.correctAnswerLabel}
-                        action={action}
-                        item={item}
-                        reviewItem={reviewItem}
-                        revealAnswer={revealAnswer}
-                        reviewStatusClassName={reviewStatusClassName}
-                        selected={selected}
-                        onSelect={handleRunnerAction}
-                        disabled={disabled}
-                        compact
-                      />
-                    )
-                  )}
-                  {!placedItemViews.length ? (
-                    <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
-                  ) : null}
+                  <div className="mt-3 grid gap-2">
+                    {placedItemViews.map(
+                      ({
+                        action,
+                        item,
+                        reviewItem,
+                        reviewStatusClassName,
+                        selected,
+                      }) => (
+                        <GroupSortItemButton
+                          key={item.id}
+                          correctLabel={copy.correctAnswerLabel}
+                          action={action}
+                          item={item}
+                          reviewItem={reviewItem}
+                          revealAnswer={revealAnswer}
+                          reviewStatusClassName={reviewStatusClassName}
+                          selected={selected}
+                          onSelect={handleRunnerAction}
+                          disabled={disabled}
+                          compact
+                        />
+                      )
+                    )}
+                    {!placedItemViews.length ? (
+                      <div className="min-h-12 rounded-lg border border-dashed bg-muted/10 p-3" />
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            }
+          )}
         </div>
       </div>
     </div>
