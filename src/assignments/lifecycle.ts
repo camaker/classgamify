@@ -10,6 +10,18 @@ export type ManagedAssignmentStatus = Extract<
   (typeof ASSIGNMENT_MANAGED_STATUSES)[number]
 >;
 export type AssignmentStatusActionKind = 'close-link' | 'reopen-link';
+export type AssignmentStatusTransitionErrorCode =
+  | 'already-closed'
+  | 'already-open'
+  | 'close-only-published'
+  | 'reopen-expired'
+  | 'reopen-only-closed'
+  | 'unsupported-transition';
+
+export type AssignmentStatusTransitionErrorView = {
+  code: AssignmentStatusTransitionErrorCode;
+  message: string;
+};
 
 export type AssignmentStatusAction = {
   failureMessage: string;
@@ -156,38 +168,75 @@ export function getAssignmentStatusTransitionError({
   currentStatus,
   expiresAt,
   nextStatus,
-  now = Date.now(),
+  now,
 }: {
   currentStatus: AssignmentStatus;
   expiresAt: AssignmentDate;
   nextStatus: ManagedAssignmentStatus;
   now?: AssignmentLifecycleNow;
 }) {
+  return getAssignmentStatusTransitionErrorView({
+    currentStatus,
+    expiresAt,
+    nextStatus,
+    now,
+  })?.message;
+}
+
+export function getAssignmentStatusTransitionErrorView({
+  currentStatus,
+  expiresAt,
+  nextStatus,
+  now = Date.now(),
+}: {
+  currentStatus: AssignmentStatus;
+  expiresAt: AssignmentDate;
+  nextStatus: ManagedAssignmentStatus;
+  now?: AssignmentLifecycleNow;
+}): AssignmentStatusTransitionErrorView | undefined {
   if (currentStatus === nextStatus) {
     return nextStatus === 'published'
-      ? m.assignment_status_error_already_open()
-      : m.assignment_status_error_already_closed();
+      ? {
+          code: 'already-open',
+          message: m.assignment_status_error_already_open(),
+        }
+      : {
+          code: 'already-closed',
+          message: m.assignment_status_error_already_closed(),
+        };
   }
 
   if (nextStatus === 'closed') {
     return currentStatus === 'published'
       ? undefined
-      : m.assignment_status_error_close_only_published();
+      : {
+          code: 'close-only-published',
+          message: m.assignment_status_error_close_only_published(),
+        };
   }
 
   if (nextStatus === 'published') {
     if (currentStatus !== 'closed') {
-      return m.assignment_status_error_reopen_only_closed();
+      return {
+        code: 'reopen-only-closed',
+        message: m.assignment_status_error_reopen_only_closed(),
+      };
     }
 
     if (isAssignmentExpired(expiresAt, now)) {
-      return m.assignment_status_error_reopen_expired();
+      return {
+        code: 'reopen-expired',
+        message: m.assignment_status_error_reopen_expired(),
+      };
     }
 
     return undefined;
   }
 
-  return m.assignment_status_action_failure();
+  return {
+    code: 'unsupported-transition',
+    message: m.assignment_status_action_failure(),
+  };
 }
 
 function getNextManagedAssignmentStatus(
@@ -230,7 +279,7 @@ export function buildAssignmentStatusAction({
   const nextStatus = getNextManagedAssignmentStatus(currentStatus);
 
   if (
-    getAssignmentStatusTransitionError({
+    getAssignmentStatusTransitionErrorView({
       currentStatus,
       expiresAt,
       nextStatus,
@@ -277,8 +326,8 @@ export function assertAssignmentStatusTransition(input: {
   nextStatus: ManagedAssignmentStatus;
   now?: AssignmentLifecycleNow;
 }) {
-  const errorMessage = getAssignmentStatusTransitionError(input);
-  if (!errorMessage) return;
+  const transitionError = getAssignmentStatusTransitionErrorView(input);
+  if (!transitionError) return;
 
-  throw new Error(errorMessage);
+  throw new Error(transitionError.message);
 }

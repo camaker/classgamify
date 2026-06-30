@@ -578,6 +578,7 @@ import {
   getAssignmentStatusActionCopy,
   getAssignmentStatusLabel,
   getAssignmentStatusTransitionError,
+  getAssignmentStatusTransitionErrorView,
   isAssignmentExpired,
   isAssignmentOpen,
   matchesAssignmentLifecycleStatus,
@@ -12452,18 +12453,28 @@ const assignmentLifecycleSource = readFileSync(
 );
 assert.match(
   assignmentLifecycleSource,
-  /export function getAssignmentStatusTransitionError[\s\S]*currentStatus === nextStatus[\s\S]*nextStatus === 'closed'[\s\S]*nextStatus === 'published'/,
-  'Assignment lifecycle should expose one shared status-transition error helper.'
+  /export type AssignmentStatusTransitionErrorCode =[\s\S]*'already-closed'[\s\S]*'already-open'[\s\S]*'close-only-published'[\s\S]*'reopen-expired'[\s\S]*'reopen-only-closed'[\s\S]*'unsupported-transition'/,
+  'Assignment lifecycle should expose stable status-transition error codes separately from localized messages.'
 );
 assert.match(
   assignmentLifecycleSource,
-  /buildAssignmentStatusAction[\s\S]*getAssignmentStatusTransitionError\(\{[\s\S]*currentStatus,[\s\S]*expiresAt,[\s\S]*nextStatus,[\s\S]*now,[\s\S]*\}/,
-  'Assignment status actions should use the shared transition error helper.'
+  /export function getAssignmentStatusTransitionError\([\s\S]*getAssignmentStatusTransitionErrorView\([\s\S]*\)\?\.message/,
+  'Assignment lifecycle should keep the legacy transition error message helper as a compatibility wrapper.'
 );
 assert.match(
   assignmentLifecycleSource,
-  /assertAssignmentStatusTransition[\s\S]*const errorMessage = getAssignmentStatusTransitionError\(input\)[\s\S]*if \(!errorMessage\) return[\s\S]*throw new Error\(errorMessage\)/,
-  'Assignment status assertions should throw the shared transition error message.'
+  /export function getAssignmentStatusTransitionErrorView[\s\S]*currentStatus === nextStatus[\s\S]*code: 'already-open'[\s\S]*code: 'already-closed'[\s\S]*nextStatus === 'closed'[\s\S]*code: 'close-only-published'[\s\S]*nextStatus === 'published'[\s\S]*code: 'reopen-only-closed'[\s\S]*code: 'reopen-expired'/,
+  'Assignment lifecycle should expose one shared structured status-transition error helper.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /buildAssignmentStatusAction[\s\S]*getAssignmentStatusTransitionErrorView\(\{[\s\S]*currentStatus,[\s\S]*expiresAt,[\s\S]*nextStatus,[\s\S]*now,[\s\S]*\}/,
+  'Assignment status actions should use the shared structured transition error helper.'
+);
+assert.match(
+  assignmentLifecycleSource,
+  /assertAssignmentStatusTransition[\s\S]*const transitionError = getAssignmentStatusTransitionErrorView\(input\)[\s\S]*if \(!transitionError\) return[\s\S]*throw new Error\(transitionError\.message\)/,
+  'Assignment status assertions should throw the structured transition error message.'
 );
 assert.match(
   assignmentLifecycleSource,
@@ -12708,7 +12719,23 @@ assert.equal(
   undefined
 );
 assert.equal(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'published',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  undefined
+);
+assert.equal(
   getAssignmentStatusTransitionError({
+    currentStatus: 'closed',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  undefined
+);
+assert.equal(
+  getAssignmentStatusTransitionErrorView({
     currentStatus: 'closed',
     expiresAt: null,
     nextStatus: 'published',
@@ -12723,6 +12750,17 @@ assert.equal(
   }),
   'Assignment link is already open.'
 );
+assert.deepEqual(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'published',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  {
+    code: 'already-open',
+    message: 'Assignment link is already open.',
+  }
+);
 assert.equal(
   getAssignmentStatusTransitionError({
     currentStatus: 'closed',
@@ -12730,6 +12768,17 @@ assert.equal(
     nextStatus: 'closed',
   }),
   'Assignment link is already closed.'
+);
+assert.deepEqual(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'closed',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  {
+    code: 'already-closed',
+    message: 'Assignment link is already closed.',
+  }
 );
 assert.equal(
   getAssignmentStatusTransitionError({
@@ -12739,6 +12788,17 @@ assert.equal(
   }),
   'Only published assignment links can be closed.'
 );
+assert.deepEqual(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'draft',
+    expiresAt: null,
+    nextStatus: 'closed',
+  }),
+  {
+    code: 'close-only-published',
+    message: 'Only published assignment links can be closed.',
+  }
+);
 assert.equal(
   getAssignmentStatusTransitionError({
     currentStatus: 'draft',
@@ -12746,6 +12806,17 @@ assert.equal(
     nextStatus: 'published',
   }),
   'Only closed assignment links can be reopened.'
+);
+assert.deepEqual(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'draft',
+    expiresAt: null,
+    nextStatus: 'published',
+  }),
+  {
+    code: 'reopen-only-closed',
+    message: 'Only closed assignment links can be reopened.',
+  }
 );
 assert.equal(
   getAssignmentStatusTransitionError({
@@ -12755,6 +12826,18 @@ assert.equal(
     now: new Date('2026-01-01T10:00:00.000Z').getTime(),
   }),
   'Expired assignments cannot be reopened.'
+);
+assert.deepEqual(
+  getAssignmentStatusTransitionErrorView({
+    currentStatus: 'closed',
+    expiresAt: new Date('2026-01-01T09:00:00.000Z'),
+    nextStatus: 'published',
+    now: new Date('2026-01-01T10:00:00.000Z').getTime(),
+  }),
+  {
+    code: 'reopen-expired',
+    message: 'Expired assignments cannot be reopened.',
+  }
 );
 assert.doesNotThrow(() =>
   assertAssignmentStatusTransition({
