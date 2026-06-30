@@ -57,13 +57,15 @@ const assignmentTimeLimitSecondsSchema = z
   .max(ASSIGNMENT_TIME_LIMIT_SECONDS_RANGE.max)
   .optional();
 
-export type AssignmentSettingsInput = Partial<AssignmentSettings> | null;
+export type AssignmentSettingsInput =
+  | Partial<AssignmentSettings>
+  | string
+  | null;
 
 export function resolveAssignmentSettings(
   settings?: AssignmentSettingsInput
 ): AssignmentSettings {
-  const source: Partial<AssignmentSettings> =
-    settings && typeof settings === 'object' ? settings : {};
+  const source = normalizeAssignmentSettingsSource(settings);
 
   return {
     collectStudentName: resolveBooleanSetting(
@@ -86,6 +88,25 @@ export function resolveAssignmentSettings(
       assignmentTimeLimitSecondsSchema
     ),
   };
+}
+
+function normalizeAssignmentSettingsSource(settings?: AssignmentSettingsInput) {
+  if (!settings) return {};
+
+  if (typeof settings === 'string') {
+    try {
+      const parsed = JSON.parse(settings);
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed as Partial<AssignmentSettings>)
+        : {};
+    } catch {
+      return {};
+    }
+  }
+
+  return typeof settings === 'object' && !Array.isArray(settings)
+    ? settings
+    : {};
 }
 
 export function withResolvedAssignmentSettings<

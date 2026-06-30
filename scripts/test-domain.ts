@@ -11840,6 +11840,42 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  resolveAssignmentSettings(
+    JSON.stringify({
+      collectStudentName: false,
+      instructions: '  Imported homework policy.  ',
+      maxAttempts: null,
+      showCorrectAnswers: false,
+      shuffleItems: false,
+      timeLimitSeconds: 600,
+    })
+  ),
+  {
+    collectStudentName: false,
+    instructions: 'Imported homework policy.',
+    maxAttempts: null,
+    showCorrectAnswers: false,
+    shuffleItems: false,
+    timeLimitSeconds: 600,
+  }
+);
+assert.deepEqual(resolveAssignmentSettings('not-json'), {
+  collectStudentName: true,
+  instructions: undefined,
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(resolveAssignmentSettings('[]'), {
+  collectStudentName: true,
+  instructions: undefined,
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+});
+assert.deepEqual(
   withResolvedAssignmentSettings({
     assignment: {
       id: 'assignment-1',
@@ -11872,8 +11908,13 @@ const assignmentValidationContractSource = readFileSync(
 );
 assert.match(
   assignmentValidationContractSource,
-  /export type AssignmentSettingsInput = Partial<AssignmentSettings> \| null;[\s\S]*resolveAssignmentSettings\(\s*settings\?: AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;/,
+  /export type AssignmentSettingsInput =[\s\S]*Partial<AssignmentSettings>[\s\S]*string[\s\S]*null;[\s\S]*resolveAssignmentSettings\(\s*settings\?: AssignmentSettingsInput[\s\S]*settingsJson: AssignmentSettingsInput;/,
   'Assignment settings resolution should expose an explicit settings input contract.'
+);
+assert.match(
+  assignmentValidationContractSource,
+  /function normalizeAssignmentSettingsSource[\s\S]*typeof settings === 'string'[\s\S]*JSON\.parse\(settings\)[\s\S]*!Array\.isArray\(parsed\)/,
+  'Assignment settings resolution should safely parse persisted JSON strings without accepting arrays.'
 );
 assert.doesNotMatch(
   assignmentValidationContractSource,
