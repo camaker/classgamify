@@ -2470,6 +2470,11 @@ assert.doesNotMatch(
   /function formatAssignmentExportNumber/,
   'Assignment CSV export should not keep local numeric cell formatting.'
 );
+assert.match(
+  assignmentResultsExportSource,
+  /function formatCsvCell[\s\S]*typeof value === 'string'[\s\S]*prefixCsvFormulaText\(text\)[\s\S]*function prefixCsvFormulaText[\s\S]*CSV_FORMULA_PREFIX_PATTERN\.test/,
+  'Assignment CSV export should protect string cells that spreadsheet apps could interpret as formulas.'
+);
 assert.doesNotMatch(
   assignmentResultsExportSource,
   /index \+ 1/,
@@ -37787,6 +37792,100 @@ assert.match(normalizedDisplayCsv, /"correct","France capital\."/);
 assert.doesNotMatch(
   normalizedDisplayCsv,
   /Ａｖａ|Ｃａｐｉｔａｌ|Ｆｉｎｉｓｈ|Ｆｒａｎｃｅ|１２３|\u00A0/
+);
+const formulaLikeCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  analysis: {
+    attempts: [
+      {
+        accuracy: 100,
+        answers: [
+          {
+            acceptedAnswers: [' =Expected value', '@Alternative value'],
+            answer: '+student value',
+            correct: true,
+            expectedAnswer: '=Expected value',
+            explanation: '-explanation value',
+            itemId: '@item-id',
+            prompt: '＝Formula prompt',
+            submitted: true,
+          },
+        ],
+        completedAt: new Date('2026-01-01T10:00:00.000Z'),
+        id: 'attempt-formula',
+        score: 1,
+        studentKey: 'name:+student',
+        studentLabel: '+Student',
+      },
+    ],
+    needsReview: [],
+    perItem: [
+      {
+        acceptedAnswers: [' =Expected value', '@Alternative value'],
+        correctCount: 1,
+        correctRate: 100,
+        explanation: '-explanation value',
+        expectedAnswer: '=Expected value',
+        itemId: '@item-id',
+        kind: 'question',
+        kindLabel: 'Question',
+        prompt: '＝Formula prompt',
+        submittedCount: 1,
+        unansweredCount: 0,
+      },
+    ],
+    students: [
+      {
+        attempts: 1,
+        averageAccuracy: 100,
+        bestAccuracy: 100,
+        lastCompletedAt: new Date('2026-01-01T10:00:00.000Z'),
+        latestAccuracy: 100,
+        needsReviewCount: 0,
+        studentKey: 'name:+student',
+        studentLabel: '+Student',
+      },
+    ],
+  },
+  assignment: {
+    ...csvExportData.assignment,
+    settingsJson: {
+      ...csvExportData.assignment.settingsJson,
+      instructions: '@Read carefully',
+    },
+    shareSlug: '-share',
+    title: '=Formula title',
+  },
+  attempts: [
+    {
+      ...csvExportData.attempts[0]!,
+      id: 'attempt-formula',
+    },
+  ],
+  snapshot: {
+    ...csvExportData.snapshot!,
+    activityTitle: '-Activity title',
+  },
+});
+assert.match(
+  formulaLikeCsv,
+  /"'=Formula title","'-share","Open"/
+);
+assert.match(
+  formulaLikeCsv,
+  /"'@Read carefully","Names","After submit","Fixed order"/
+);
+assert.match(
+  formulaLikeCsv,
+  /"'-Activity title","Quiz","1","50","1","45","attempt-formula","'\+Student"/
+);
+assert.match(
+  formulaLikeCsv,
+  /"'@item-id","100","1","1","0","'=Formula prompt","'\+student value","'=Expected value","'@Alternative value","correct","'-explanation value"/
+);
+assert.doesNotMatch(
+  formulaLikeCsv,
+  /,"\s*[=+\-@][^"]*"/
 );
 const csvWithUnscoredAttempt = buildAssignmentResultsCsv({
   ...csvExportData,

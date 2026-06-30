@@ -47,6 +47,9 @@ export const ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS = {
   titleMaxLength: 80,
 } as const;
 
+const CSV_FORMULA_PREFIX = "'";
+const CSV_FORMULA_PREFIX_PATTERN = /^[=+\-@]/u;
+
 type ExportAttempt = {
   completedAt: Date | string | null;
   id: string;
@@ -503,7 +506,17 @@ function rowsToCsv(rows: readonly (readonly unknown[])[]) {
 
 function formatCsvCell(value: unknown) {
   const text = value === null || value === undefined ? '' : String(value);
-  return `"${text.replace(/"/g, '""')}"`;
+  const safeText =
+    typeof value === 'string' ? prefixCsvFormulaText(text) : text;
+
+  return `"${safeText.replace(/"/g, '""')}"`;
+}
+
+function prefixCsvFormulaText(text: string) {
+  const formulaCheckText = text.normalize('NFKC').trimStart();
+  if (!CSV_FORMULA_PREFIX_PATTERN.test(formulaCheckText)) return text;
+
+  return `${CSV_FORMULA_PREFIX}${text}`;
 }
 
 function slugifyFilename(
