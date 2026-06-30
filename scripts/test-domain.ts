@@ -7913,6 +7913,11 @@ assert.match(
 );
 assert.match(
   studentRunnerViewSource,
+  /export type StudentRunnerPrepareView = \{[\s\S]*stepViews: StudentRunnerPrepareStepView\[\];[\s\S]*title: string;[\s\S]*export type StudentRunnerPrepareStepId =[\s\S]*'anonymous'[\s\S]*'no-timer'[\s\S]*'review-rules'[\s\S]*'student-name'[\s\S]*'submit'[\s\S]*'timer'[\s\S]*export type StudentRunnerPrepareStepView = \{[\s\S]*id: StudentRunnerPrepareStepId;[\s\S]*label: string;/,
+  'Student runner prepare guidance should expose stable step ids and structured labels.'
+);
+assert.match(
+  studentRunnerViewSource,
   /formatOptionalAcceptedAnswerAlternatives\([\s\S]*includePrimary: false[\s\S]*student_runner_choice_separator/,
   'Student answer feedback should show accepted alternatives without repeating the primary correct answer.'
 );
@@ -8233,8 +8238,13 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerHeaderCardSource,
-  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.steps\.map/,
+  /StudentRunnerPrepareCard[\s\S]*prepareView=\{view\.prepareView\}[\s\S]*prepareView\.stepViews\.map[\s\S]*key=\{step\.id\}[\s\S]*step\.label/,
   'Student runner header card should render prepared before-start guidance from the header view.'
+);
+assert.doesNotMatch(
+  studentRunnerHeaderCardSource,
+  /key=\{step\}|prepareView\.steps\.map/,
+  'Student runner prepare card should not key before-start guidance by localized step copy.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -14537,11 +14547,25 @@ assert.deepEqual(studentRunnerHeaderView, {
     value: 'Read each prompt carefully.',
   },
   prepareView: {
-    steps: [
-      'Read the teacher instructions and assignment rules.',
-      'Type your name before submitting so your teacher can find your work.',
-      'The timer starts once the activity is ready, then your submitted time is saved.',
-      'Answer the items below and submit when you are finished.',
+    stepViews: [
+      {
+        id: 'review-rules',
+        label: 'Read the teacher instructions and assignment rules.',
+      },
+      {
+        id: 'student-name',
+        label:
+          'Type your name before submitting so your teacher can find your work.',
+      },
+      {
+        id: 'timer',
+        label:
+          'The timer starts once the activity is ready, then your submitted time is saved.',
+      },
+      {
+        id: 'submit',
+        label: 'Answer the items below and submit when you are finished.',
+      },
     ],
     title: 'Before you start',
   },
@@ -14638,11 +14662,24 @@ assert.deepEqual(
     itemCount: 1,
   }).prepareView,
   {
-    steps: [
-      'Read the teacher instructions and assignment rules.',
-      'This browser identifies your attempt, so use the same device if you try again.',
-      'There is no timer, so submit when your answers are ready.',
-      'Answer the items below and submit when you are finished.',
+    stepViews: [
+      {
+        id: 'review-rules',
+        label: 'Read the teacher instructions and assignment rules.',
+      },
+      {
+        id: 'anonymous',
+        label:
+          'This browser identifies your attempt, so use the same device if you try again.',
+      },
+      {
+        id: 'no-timer',
+        label: 'There is no timer, so submit when your answers are ready.',
+      },
+      {
+        id: 'submit',
+        label: 'Answer the items below and submit when you are finished.',
+      },
     ],
     title: 'Before you start',
   }

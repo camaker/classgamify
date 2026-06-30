@@ -299,8 +299,21 @@ export type StudentRunnerHeaderView = {
 };
 
 export type StudentRunnerPrepareView = {
-  steps: string[];
+  stepViews: StudentRunnerPrepareStepView[];
   title: string;
+};
+
+export type StudentRunnerPrepareStepId =
+  | 'anonymous'
+  | 'no-timer'
+  | 'review-rules'
+  | 'student-name'
+  | 'submit'
+  | 'timer';
+
+export type StudentRunnerPrepareStepView = {
+  id: StudentRunnerPrepareStepId;
+  label: string;
 };
 
 type StudentRunnerHeaderAssignment = {
@@ -367,15 +380,33 @@ function buildStudentRunnerPrepareView(
   settings: AssignmentSettings
 ): StudentRunnerPrepareView {
   return {
-    steps: [
-      m.student_runner_prepare_step_review_rules(),
+    stepViews: [
+      {
+        id: 'review-rules',
+        label: m.student_runner_prepare_step_review_rules(),
+      },
       settings.collectStudentName
-        ? m.student_runner_prepare_step_name()
-        : m.student_runner_prepare_step_anonymous(),
+        ? {
+            id: 'student-name',
+            label: m.student_runner_prepare_step_name(),
+          }
+        : {
+            id: 'anonymous',
+            label: m.student_runner_prepare_step_anonymous(),
+          },
       settings.timeLimitSeconds
-        ? m.student_runner_prepare_step_timer()
-        : m.student_runner_prepare_step_no_timer(),
-      m.student_runner_prepare_step_submit(),
+        ? {
+            id: 'timer',
+            label: m.student_runner_prepare_step_timer(),
+          }
+        : {
+            id: 'no-timer',
+            label: m.student_runner_prepare_step_no_timer(),
+          },
+      {
+        id: 'submit',
+        label: m.student_runner_prepare_step_submit(),
+      },
     ],
     title: m.student_runner_prepare_title(),
   };
