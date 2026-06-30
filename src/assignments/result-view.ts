@@ -233,8 +233,34 @@ type AssignmentResultContentState = {
 };
 
 type AssignmentResultTableView<TRow> = {
-  headers: string[];
+  headers: AssignmentResultTableHeaderView[];
   rows: TRow[];
+};
+
+export type AssignmentResultTableHeaderId =
+  | 'accepted'
+  | 'accuracy'
+  | 'answered'
+  | 'attempts'
+  | 'average'
+  | 'best'
+  | 'correct-rate'
+  | 'expected'
+  | 'explanation'
+  | 'item'
+  | 'last-submitted'
+  | 'latest'
+  | 'needs-review'
+  | 'score'
+  | 'student'
+  | 'submitted'
+  | 'time'
+  | 'type'
+  | 'unanswered';
+
+export type AssignmentResultTableHeaderView = {
+  id: AssignmentResultTableHeaderId;
+  label: string;
 };
 
 export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & {
@@ -696,38 +722,108 @@ export const assignmentResultSectionCopy = {
 export const assignmentResultTableHeaders = {
   get itemPerformance() {
     return [
-      m.assignment_result_table_header_item(),
-      m.assignment_result_table_header_type(),
-      m.assignment_result_table_header_correct_rate(),
-      m.assignment_result_table_header_submitted(),
-      m.assignment_result_review_unanswered(),
-      m.assignment_result_table_header_expected(),
-      m.assignment_result_table_header_accepted(),
-      m.assignment_result_table_header_explanation(),
+      buildAssignmentResultTableHeaderView(
+        'item',
+        m.assignment_result_table_header_item()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'type',
+        m.assignment_result_table_header_type()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'correct-rate',
+        m.assignment_result_table_header_correct_rate()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'submitted',
+        m.assignment_result_table_header_submitted()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'unanswered',
+        m.assignment_result_review_unanswered()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'expected',
+        m.assignment_result_table_header_expected()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'accepted',
+        m.assignment_result_table_header_accepted()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'explanation',
+        m.assignment_result_table_header_explanation()
+      ),
     ];
   },
   get studentAttempts() {
     return [
-      m.assignment_result_table_header_student(),
-      m.assignment_result_table_header_score(),
-      m.assignment_result_table_header_accuracy(),
-      m.assignment_result_table_header_answered(),
-      m.assignment_result_table_header_time(),
-      m.assignment_result_table_header_submitted(),
+      buildAssignmentResultTableHeaderView(
+        'student',
+        m.assignment_result_table_header_student()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'score',
+        m.assignment_result_table_header_score()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'accuracy',
+        m.assignment_result_table_header_accuracy()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'answered',
+        m.assignment_result_table_header_answered()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'time',
+        m.assignment_result_table_header_time()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'submitted',
+        m.assignment_result_table_header_submitted()
+      ),
     ];
   },
   get studentSummary() {
     return [
-      m.assignment_result_table_header_student(),
-      m.assignment_result_table_header_attempts(),
-      m.assignment_result_table_header_latest(),
-      m.assignment_result_table_header_average(),
-      m.assignment_result_table_header_best(),
-      m.assignment_result_table_header_needs_review(),
-      m.assignment_result_table_header_last_submitted(),
+      buildAssignmentResultTableHeaderView(
+        'student',
+        m.assignment_result_table_header_student()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'attempts',
+        m.assignment_result_table_header_attempts()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'latest',
+        m.assignment_result_table_header_latest()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'average',
+        m.assignment_result_table_header_average()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'best',
+        m.assignment_result_table_header_best()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'needs-review',
+        m.assignment_result_table_header_needs_review()
+      ),
+      buildAssignmentResultTableHeaderView(
+        'last-submitted',
+        m.assignment_result_table_header_last_submitted()
+      ),
     ];
   },
 } as const;
+
+function buildAssignmentResultTableHeaderView(
+  id: AssignmentResultTableHeaderId,
+  label: string
+): AssignmentResultTableHeaderView {
+  return { id, label };
+}
 
 export const assignmentResultReviewCopy = {
   get acceptedAnswersLabel() {

@@ -664,6 +664,7 @@ import {
   getAssignmentResultActionGate,
   getAssignmentResultActionGateFromState,
   studentSummarySortOptions,
+  type AssignmentResultTableHeaderView,
 } from '@/assignments/result-view';
 import {
   ATTEMPT_REVIEW_FILTER_VALUES,
@@ -952,6 +953,12 @@ function getSourceSlice(
   assert.notEqual(end, -1, `Missing source end marker: ${endMarker}`);
 
   return source.slice(start, end);
+}
+
+function summarizeAssignmentResultTableHeaders(
+  headers: AssignmentResultTableHeaderView[]
+) {
+  return headers.map((header) => [header.id, header.label]);
 }
 
 function getAttemptAnswerValidationError(action: () => void) {
@@ -5085,6 +5092,16 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
+  /type AssignmentResultTableView<TRow> = \{[\s\S]*headers: AssignmentResultTableHeaderView\[\];[\s\S]*export type AssignmentResultTableHeaderId =[\s\S]*'student'[\s\S]*'submitted'[\s\S]*export type AssignmentResultTableHeaderView = \{[\s\S]*id: AssignmentResultTableHeaderId;[\s\S]*label: string;/,
+  'Assignment result table views should expose stable table-header ids separately from localized labels.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /assignmentResultTableHeaders = \{[\s\S]*buildAssignmentResultTableHeaderView\([\s\S]*'student'[\s\S]*m\.assignment_result_table_header_student\(\)[\s\S]*buildAssignmentResultTableHeaderView\([\s\S]*'submitted'[\s\S]*m\.assignment_result_table_header_submitted\(\)/,
+  'Assignment result table headers should pair stable header ids with localized labels.'
+);
+assert.match(
+  assignmentResultViewSource,
   /attemptTableView:\s*AssignmentResultAttemptTableView[\s\S]*buildAssignmentAttemptTableView[\s\S]*headers: assignmentResultTableHeaders\.studentAttempts[\s\S]*rows: buildAssignmentAttemptRowViews/,
   'Assignment result page view-model should own formatted attempt table views.'
 );
@@ -5559,8 +5576,13 @@ assert.match(
 );
 assert.match(
   assignmentResultsTableHeaderSource,
-  /headers\.map[\s\S]*TableHead[\s\S]*key=\{header\}/,
-  'Assignment result table header should render prepared result-table headers.'
+  /headers\.map\(\(header\)[\s\S]*TableHead[\s\S]*key=\{header\.id\}[\s\S]*header\.label/,
+  'Assignment result table header should render prepared result-table headers with stable ids.'
+);
+assert.doesNotMatch(
+  assignmentResultsTableHeaderSource,
+  /key=\{header\}/,
+  'Assignment result table header should not use visible header text as the React key.'
 );
 assert.match(
   assignmentResultsItemPerformanceTableSource,
@@ -36426,7 +36448,9 @@ assert.deepEqual(
       row.durationLabel,
     ]),
     attemptTableView: {
-      headers: scoredResultsPageView.attemptTableView.headers,
+      headers: summarizeAssignmentResultTableHeaders(
+        scoredResultsPageView.attemptTableView.headers
+      ),
       rows: scoredResultsPageView.attemptTableView.rows.map((row) => [
         row.id,
         row.studentLabel,
@@ -36531,7 +36555,9 @@ assert.deepEqual(
       (row) => [row.id, row.itemNumberLabel, row.correctRateLabel]
     ),
     itemPerformanceTableView: {
-      headers: scoredResultsPageView.itemPerformanceTableView.headers,
+      headers: summarizeAssignmentResultTableHeaders(
+        scoredResultsPageView.itemPerformanceTableView.headers
+      ),
       rows: scoredResultsPageView.itemPerformanceTableView.rows.map((row) => [
         row.id,
         row.itemNumberLabel,
@@ -36610,7 +36636,9 @@ assert.deepEqual(
       (row) => [row.studentLabel, row.needsReviewLabel]
     ),
     studentSummaryTableView: {
-      headers: scoredResultsPageView.studentSummaryTableView.headers,
+      headers: summarizeAssignmentResultTableHeaders(
+        scoredResultsPageView.studentSummaryTableView.headers
+      ),
       rows: scoredResultsPageView.studentSummaryTableView.rows.map((row) => [
         row.studentLabel,
         row.needsReviewLabel,
@@ -36636,7 +36664,14 @@ assert.deepEqual(
     attemptReviewCardViews: [['completed-attempt', 'Alice', 2]],
     attemptRowViews: [['completed-attempt', 'Alice', '30s']],
     attemptTableView: {
-      headers: ['Student', 'Score', 'Accuracy', 'Answered', 'Time', 'Submitted'],
+      headers: [
+        ['student', 'Student'],
+        ['score', 'Score'],
+        ['accuracy', 'Accuracy'],
+        ['answered', 'Answered'],
+        ['time', 'Time'],
+        ['submitted', 'Submitted'],
+      ],
       rows: [['completed-attempt', 'Alice', '30s']],
     },
     breadcrumbs: [
@@ -36812,14 +36847,14 @@ assert.deepEqual(
     ],
     itemPerformanceTableView: {
       headers: [
-        'Item',
-        'Type',
-        'Correct rate',
-        'Submitted',
-        'Unanswered',
-        'Expected',
-        'Accepted',
-        'Explanation',
+        ['item', 'Item'],
+        ['type', 'Type'],
+        ['correct-rate', 'Correct rate'],
+        ['submitted', 'Submitted'],
+        ['unanswered', 'Unanswered'],
+        ['expected', 'Expected'],
+        ['accepted', 'Accepted'],
+        ['explanation', 'Explanation'],
       ],
       rows: [
         ['pair-1', '1.', '0%'],
@@ -36902,13 +36937,13 @@ assert.deepEqual(
     studentSummaryRowViews: [['Alice', '1']],
     studentSummaryTableView: {
       headers: [
-        'Student',
-        'Attempts',
-        'Latest',
-        'Average',
-        'Best',
-        'Needs review',
-        'Last submitted',
+        ['student', 'Student'],
+        ['attempts', 'Attempts'],
+        ['latest', 'Latest'],
+        ['average', 'Average'],
+        ['best', 'Best'],
+        ['needs-review', 'Needs review'],
+        ['last-submitted', 'Last submitted'],
       ],
       rows: [['Alice', '1']],
     },
@@ -37205,14 +37240,17 @@ assert.deepEqual(
 );
 assert.deepEqual(
   {
-    headers: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem)
-      .headers,
+    headers: summarizeAssignmentResultTableHeaders(
+      buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).headers
+    ),
     rows: buildAssignmentItemPerformanceTableView(resultAnalysis.perItem).rows.map(
       (row) => [row.id, row.itemNumberLabel, row.promptLabel, row.correctRateLabel]
     ),
   },
   {
-    headers: assignmentResultTableHeaders.itemPerformance,
+    headers: summarizeAssignmentResultTableHeaders(
+      assignmentResultTableHeaders.itemPerformance
+    ),
     rows: [
       ['q-1', '1.', '1. Capital of France?', '67%'],
       ['pair-1', '2.', '2. Match "Hot" with its pair.', '50%'],
@@ -37478,7 +37516,9 @@ const studentSummaryTableView = buildAssignmentStudentSummaryTableView([
 ]);
 assert.deepEqual(
   {
-    headers: studentSummaryTableView.headers,
+    headers: summarizeAssignmentResultTableHeaders(
+      studentSummaryTableView.headers
+    ),
     rows: studentSummaryTableView.rows.map((row) => [
       row.id,
       row.studentLabel,
@@ -37486,7 +37526,9 @@ assert.deepEqual(
     ]),
   },
   {
-    headers: assignmentResultTableHeaders.studentSummary,
+    headers: summarizeAssignmentResultTableHeaders(
+      assignmentResultTableHeaders.studentSummary
+    ),
     rows: [
       ['name:alice', 'Alice', '2'],
       ['anonymous:empty', 'Anonymous student 2', '0'],
@@ -38579,31 +38621,31 @@ assert.equal(
   'This assignment link has expired. Students cannot open it from the results page.'
 );
 assert.deepEqual(assignmentResultTableHeaders.studentAttempts, [
-  'Student',
-  'Score',
-  'Accuracy',
-  'Answered',
-  'Time',
-  'Submitted',
+  { id: 'student', label: 'Student' },
+  { id: 'score', label: 'Score' },
+  { id: 'accuracy', label: 'Accuracy' },
+  { id: 'answered', label: 'Answered' },
+  { id: 'time', label: 'Time' },
+  { id: 'submitted', label: 'Submitted' },
 ]);
 assert.deepEqual(assignmentResultTableHeaders.studentSummary, [
-  'Student',
-  'Attempts',
-  'Latest',
-  'Average',
-  'Best',
-  'Needs review',
-  'Last submitted',
+  { id: 'student', label: 'Student' },
+  { id: 'attempts', label: 'Attempts' },
+  { id: 'latest', label: 'Latest' },
+  { id: 'average', label: 'Average' },
+  { id: 'best', label: 'Best' },
+  { id: 'needs-review', label: 'Needs review' },
+  { id: 'last-submitted', label: 'Last submitted' },
 ]);
 assert.deepEqual(assignmentResultTableHeaders.itemPerformance, [
-  'Item',
-  'Type',
-  'Correct rate',
-  'Submitted',
-  'Unanswered',
-  'Expected',
-  'Accepted',
-  'Explanation',
+  { id: 'item', label: 'Item' },
+  { id: 'type', label: 'Type' },
+  { id: 'correct-rate', label: 'Correct rate' },
+  { id: 'submitted', label: 'Submitted' },
+  { id: 'unanswered', label: 'Unanswered' },
+  { id: 'expected', label: 'Expected' },
+  { id: 'accepted', label: 'Accepted' },
+  { id: 'explanation', label: 'Explanation' },
 ]);
 assert.equal(assignmentResultReviewCopy.emptyValue, '-');
 const attemptRowCompletedAt = new Date('2026-01-01T00:00:00.000Z');
@@ -38897,7 +38939,7 @@ const attemptTableView = buildAssignmentAttemptTableView({
 });
 assert.deepEqual(
   {
-    headers: attemptTableView.headers,
+    headers: summarizeAssignmentResultTableHeaders(attemptTableView.headers),
     rows: attemptTableView.rows.map((row) => [
       row.id,
       row.studentLabel,
@@ -38905,7 +38947,9 @@ assert.deepEqual(
     ]),
   },
   {
-    headers: assignmentResultTableHeaders.studentAttempts,
+    headers: summarizeAssignmentResultTableHeaders(
+      assignmentResultTableHeaders.studentAttempts
+    ),
     rows: [['row-view-1', 'Displayed student', '1m 00s']],
   }
 );
