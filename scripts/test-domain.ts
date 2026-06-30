@@ -2374,7 +2374,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsExportSource,
-  /function buildAssignmentResultsExportContext[\s\S]*const statsView = buildAssignmentAttemptStatsView\(data\.stats\)/,
+  /function buildAssignmentResultsExportContext[\s\S]*const statsView = buildAssignmentAttemptStatsView\(\s*normalizeAssignmentResultsExportStats\(data\.stats\)\s*\)/,
   'Assignment CSV export context should format aggregate metrics through the shared attempt stats view.'
 );
 assert.match(
@@ -38913,7 +38913,20 @@ const invalidStatsCsv = buildAssignmentResultsCsv({
 assert.doesNotMatch(invalidStatsCsv, /NaN|Infinity/);
 assert.match(
   invalidStatsCsv,
-  /"Snapshot Capitals","Quiz","","","","","attempt-1"/
+  /"Snapshot Capitals","Quiz","0","","","","attempt-1"/
+);
+const fractionalCompletionStatsCsv = buildAssignmentResultsCsv({
+  ...csvExportData,
+  stats: {
+    averageDurationSeconds: 91.6,
+    averagePoints: 4.6,
+    averageScore: 66.4,
+    completions: 2.9,
+  },
+});
+assert.match(
+  fractionalCompletionStatsCsv,
+  /"Snapshot Capitals","Quiz","2","66","5","92","attempt-1"/
 );
 const invalidStoredAttemptCsv = buildAssignmentResultsCsv({
   ...csvExportData,

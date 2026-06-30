@@ -134,7 +134,9 @@ function buildAssignmentResultsExportContext(
   const resolvedSource = resolveAssignmentSnapshotSource(data);
   const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
   const shareSlug = normalizeAssignmentShareSlug(data.assignment.shareSlug);
-  const statsView = buildAssignmentAttemptStatsView(data.stats);
+  const statsView = buildAssignmentAttemptStatsView(
+    normalizeAssignmentResultsExportStats(data.stats)
+  );
   const attemptsById = new Map(data.attempts.map((item) => [item.id, item]));
   const itemAnalysisById = new Map(
     data.analysis.perItem.map((item) => [item.itemId, item])
@@ -154,6 +156,20 @@ function buildAssignmentResultsExportContext(
     statsView,
     studentsByKey,
   };
+}
+
+function normalizeAssignmentResultsExportStats(
+  stats: AssignmentResultsExportData['stats']
+) {
+  return {
+    ...stats,
+    completions: normalizeAssignmentResultsExportCount(stats.completions),
+  };
+}
+
+function normalizeAssignmentResultsExportCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
 
 function buildAssignmentResultsExportRows({
