@@ -12603,6 +12603,11 @@ assert.match(
 );
 assert.match(
   assignmentLifecycleSource,
+  /export type AssignmentStatusActionBlockedReason = 'missing-status-action'[\s\S]*reason: AssignmentStatusActionBlockedReason;[\s\S]*type: 'blocked'/,
+  'Assignment status action execution plans should expose a structured blocked reason.'
+);
+assert.match(
+  assignmentLifecycleSource,
   /assertAssignmentStatusTransition[\s\S]*const transitionError = getAssignmentStatusTransitionErrorView\(input\)[\s\S]*if \(!transitionError\) return[\s\S]*throw new Error\(transitionError\.message\)/,
   'Assignment status assertions should throw the structured transition error message.'
 );
@@ -12837,6 +12842,7 @@ assert.deepEqual(
     statusAction: undefined,
   }),
   {
+    reason: 'missing-status-action',
     type: 'blocked',
   }
 );

@@ -31,8 +31,11 @@ export type AssignmentStatusAction = {
   successMessage: string;
 };
 
+export type AssignmentStatusActionBlockedReason = 'missing-status-action';
+
 export type AssignmentStatusActionExecutionPlan =
   | {
+      reason: AssignmentStatusActionBlockedReason;
       type: 'blocked';
     }
   | {
@@ -305,6 +308,7 @@ export function buildAssignmentStatusActionExecutionPlan({
 }): AssignmentStatusActionExecutionPlan {
   if (!statusAction) {
     return {
+      reason: 'missing-status-action',
       type: 'blocked',
     };
   }
