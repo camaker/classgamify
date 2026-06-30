@@ -130,7 +130,15 @@ export type ActivityTemplateQuizChoiceReadinessItemView = {
 
 type ActivityDraftProvider = 'fallback' | 'workers-ai';
 
+export type ActivityDraftMetaSummaryCoverageStatId =
+  | 'groups'
+  | 'pairs'
+  | 'questions'
+  | 'teacher-notes'
+  | 'vocabulary';
+
 export type ActivityDraftMetaSummaryCoverageStatView = {
+  id: ActivityDraftMetaSummaryCoverageStatId;
   label: string;
   value: number;
 };
@@ -325,22 +333,27 @@ export function buildActivityDraftMetaSummaryView({
     appliedLabel: m.activity_draft_meta_applied_label(),
     coverageStats: [
       {
+        id: 'questions',
         label: m.activity_draft_meta_coverage_questions(),
         value: normalizeActivityDraftMetaCount(meta.coverage.questions),
       },
       {
+        id: 'pairs',
         label: m.activity_draft_meta_coverage_pairs(),
         value: normalizeActivityDraftMetaCount(meta.coverage.pairs),
       },
       {
+        id: 'groups',
         label: m.activity_draft_meta_coverage_groups(),
         value: normalizeActivityDraftMetaCount(meta.coverage.groups),
       },
       {
+        id: 'vocabulary',
         label: m.activity_draft_meta_coverage_vocab(),
         value: normalizeActivityDraftMetaCount(meta.coverage.vocabulary),
       },
       {
+        id: 'teacher-notes',
         label: m.activity_draft_meta_coverage_notes(),
         value: normalizeActivityDraftMetaCount(meta.coverage.teacherNotes),
       },

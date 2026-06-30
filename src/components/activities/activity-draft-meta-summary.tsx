@@ -73,7 +73,7 @@ export function ActivityDraftMetaSummary({
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-5">
         {summaryView.coverageStats.map((stat) => (
-          <ActivityDraftCoverageStat key={stat.label} stat={stat} />
+          <ActivityDraftCoverageStat key={stat.id} stat={stat} />
         ))}
       </div>
       <div className="mt-4 rounded-lg border bg-background p-3">

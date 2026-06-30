@@ -3671,6 +3671,11 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSource,
+  /export type ActivityDraftMetaSummaryCoverageStatId =[\s\S]*'groups'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*'teacher-notes'[\s\S]*'vocabulary'[\s\S]*export type ActivityDraftMetaSummaryCoverageStatView = \{[\s\S]*id: ActivityDraftMetaSummaryCoverageStatId;[\s\S]*label: string;[\s\S]*value: number;/,
+  'AI draft coverage stats should expose stable ids separately from localized labels.'
+);
+assert.match(
+  activityDraftMetaSource,
   /QuestionChoiceReadinessStatus[\s\S]*export type ActivityDraftReviewChecklistStatus =[\s\S]*status: ActivityDraftReviewChecklistStatus;[\s\S]*status: QuestionChoiceReadinessStatus;/,
   'AI draft meta domain should use explicit checklist and quiz-choice status contracts.'
 );
@@ -3728,6 +3733,16 @@ assert.match(
   activityDraftMetaSummarySource,
   /ActivityDraftCoverageStat[\s\S]*stat=\{stat\}/,
   'AI draft summary component should pass prepared coverage stat views into the coverage stat component.'
+);
+assert.match(
+  activityDraftMetaSummarySource,
+  /summaryView\.coverageStats\.map[\s\S]*key=\{stat\.id\}/,
+  'AI draft summary component should key coverage stats by stable stat ids.'
+);
+assert.doesNotMatch(
+  activityDraftMetaSummarySource,
+  /key=\{stat\.label\}/,
+  'AI draft summary component should not key coverage stats by localized labels.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -31591,11 +31606,23 @@ const fallbackDraftMetaSummary = buildActivityDraftMetaSummaryView({
   ],
 });
 assert.deepEqual(fallbackDraftMetaSummary.coverageStats, [
-  { label: 'Questions', value: 5 },
-  { label: 'Pairs', value: 5 },
-  { label: 'Groups', value: fallbackDraftMeta.coverage.groups },
-  { label: 'Vocab', value: fallbackDraftMeta.coverage.vocabulary },
-  { label: 'Notes', value: fallbackDraftMeta.coverage.teacherNotes },
+  { id: 'questions', label: 'Questions', value: 5 },
+  { id: 'pairs', label: 'Pairs', value: 5 },
+  {
+    id: 'groups',
+    label: 'Groups',
+    value: fallbackDraftMeta.coverage.groups,
+  },
+  {
+    id: 'vocabulary',
+    label: 'Vocab',
+    value: fallbackDraftMeta.coverage.vocabulary,
+  },
+  {
+    id: 'teacher-notes',
+    label: 'Notes',
+    value: fallbackDraftMeta.coverage.teacherNotes,
+  },
 ]);
 assert.equal(fallbackDraftMetaSummary.title, 'AI draft coverage');
 assert.equal(
@@ -32006,11 +32033,11 @@ assert.equal(normalizeActivityDraftMetaCount(Number.POSITIVE_INFINITY), 0);
 assert.equal(normalizeActivityDraftMetaCount(-1.8), 0);
 assert.equal(normalizeActivityDraftMetaCount(6.7), 6);
 assert.deepEqual(malformedDraftMetaSummary.coverageStats, [
-  { label: 'Questions', value: 0 },
-  { label: 'Pairs', value: 0 },
-  { label: 'Groups', value: 2 },
-  { label: 'Vocab', value: 4 },
-  { label: 'Notes', value: 0 },
+  { id: 'questions', label: 'Questions', value: 0 },
+  { id: 'pairs', label: 'Pairs', value: 0 },
+  { id: 'groups', label: 'Groups', value: 2 },
+  { id: 'vocabulary', label: 'Vocab', value: 4 },
+  { id: 'teacher-notes', label: 'Notes', value: 0 },
 ]);
 assert.equal(malformedDraftMetaSummary.readyTemplateLabel, '0 ready templates');
 assert.equal(
