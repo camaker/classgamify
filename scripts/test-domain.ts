@@ -22938,6 +22938,31 @@ assert.match(
   /function getPrintableWorksheetItemLayoutClassName[\s\S]*layout === 'matching'[\s\S]*sm:grid sm:grid-cols-\[1fr_18rem\] sm:gap-4[\s\S]*layout === 'classification'[\s\S]*border-primary\/20 bg-primary\/5/,
   'Printable worksheet item layout classes should prepare distinct matching and classification paper layouts.'
 );
+assert.match(
+  printableWorksheetItemListSource,
+  /getPrintableWorksheetResponsePanelClassName\(itemView\.layout\)/,
+  'Printable worksheet item list should choose response-panel classes from prepared printable layout metadata.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function getPrintableWorksheetResponsePanelClassName[\s\S]*layout === 'classification'[\s\S]*rounded-md bg-background p-3[\s\S]*layout === 'short-answer'[\s\S]*rounded-md border border-dashed bg-muted\/20 p-3/,
+  'Printable worksheet response panels should prepare distinct classification and short-answer paper layouts.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /PrintableWorksheetWritingArea[\s\S]*itemView=\{itemView\}/,
+  'Printable worksheet item list should delegate writing-area rendering to a focused component.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function getPrintableWorksheetWritingAreaClassName[\s\S]*layout === 'short-answer'[\s\S]*mt-3 grid gap-4[\s\S]*return 'mt-4 grid gap-3'/,
+  'Printable worksheet writing areas should use a roomier short-answer paper layout.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function getPrintableWorksheetWritingLineClassName[\s\S]*layout === 'short-answer'[\s\S]*h-10 border-b border-foreground\/50[\s\S]*return 'h-8 border-b'/,
+  'Printable worksheet writing lines should use taller short-answer writing lines.'
+);
 assert.doesNotMatch(
   printableWorksheetItemListSource,
   /itemView\.sequenceLabel[\s\S]*·[\s\S]*itemView\.kindLabel/,

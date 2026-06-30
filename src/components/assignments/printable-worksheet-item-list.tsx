@@ -69,25 +69,11 @@ function PrintableWorksheetItem({
       <div
         className={cn(
           itemView.layout === 'matching' ? 'mt-4 sm:mt-0' : '',
-          itemView.layout === 'classification'
-            ? 'rounded-md bg-background p-3'
-            : ''
+          getPrintableWorksheetResponsePanelClassName(itemView.layout)
         )}
       >
         <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
-        <div className="mt-4 grid gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="font-medium text-muted-foreground text-xs">
-              {itemView.answerAreaLabel}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              {itemView.answerLineSummary}
-            </p>
-          </div>
-          {itemView.answerLines.map((line) => (
-            <div key={line.key} className="h-8 border-b" />
-          ))}
-        </div>
+        <PrintableWorksheetWritingArea itemView={itemView} />
       </div>
     </section>
   );
@@ -105,6 +91,65 @@ function getPrintableWorksheetItemLayoutClassName(
   }
 
   return '';
+}
+
+function getPrintableWorksheetResponsePanelClassName(
+  layout: PrintableWorksheetItemLayout
+) {
+  if (layout === 'classification') {
+    return 'rounded-md bg-background p-3';
+  }
+
+  if (layout === 'short-answer') {
+    return 'rounded-md border border-dashed bg-muted/20 p-3';
+  }
+
+  return '';
+}
+
+function getPrintableWorksheetWritingAreaClassName(
+  layout: PrintableWorksheetItemLayout
+) {
+  if (layout === 'short-answer') {
+    return 'mt-3 grid gap-4';
+  }
+
+  return 'mt-4 grid gap-3';
+}
+
+function getPrintableWorksheetWritingLineClassName(
+  layout: PrintableWorksheetItemLayout
+) {
+  if (layout === 'short-answer') {
+    return 'h-10 border-b border-foreground/50';
+  }
+
+  return 'h-8 border-b';
+}
+
+function PrintableWorksheetWritingArea({
+  itemView,
+}: {
+  itemView: PrintableWorksheetItemView;
+}) {
+  return (
+    <div className={getPrintableWorksheetWritingAreaClassName(itemView.layout)}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-muted-foreground text-xs">
+          {itemView.answerAreaLabel}
+        </p>
+        <p className="text-muted-foreground text-xs">
+          {itemView.answerLineSummary}
+        </p>
+      </div>
+      {itemView.answerLines.map((line) => (
+        <div
+          key={line.key}
+          className={getPrintableWorksheetWritingLineClassName(itemView.layout)}
+        />
+      ))}
+    </div>
+  );
 }
 
 function PrintableWorksheetChoiceBank({
