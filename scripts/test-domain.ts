@@ -361,6 +361,7 @@ import {
 import { buildDashboardPaginationView } from '@/dashboard/pagination';
 import {
   buildContactPageViewModel,
+  buildHomePageStarterPreview,
   buildHomePageViewModel,
   buildPricingFaqItems,
   buildPricingPageViewModel,
@@ -4591,6 +4592,31 @@ assert.doesNotMatch(
   homeRouteSource,
   /Routes\.(Create|Templates)/,
   'Home route should not hardcode hero CTA route targets.'
+);
+assert.match(
+  homeRouteSource,
+  /<ActivityPreview[\s\S]*activity=\{pageView\.preview\.activity\}[\s\S]*assignment=\{pageView\.preview\.assignment\}/,
+  'Home route should render the starter activity preview from the prepared page view-model.'
+);
+assert.doesNotMatch(
+  homeRouteSource,
+  /getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
+  'Home route should not read starter catalog data directly.'
+);
+assert.match(
+  publicPageViewSource,
+  /export type HomePagePreviewView = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*source: 'starter-preview';[\s\S]*export type HomePageSignalId/,
+  'Home page view model should expose a structured starter preview contract.'
+);
+assert.match(
+  publicPageViewSource,
+  /export function buildHomePageViewModel\(\{[\s\S]*preview = buildHomePageStarterPreview\(\)[\s\S]*preview\?: HomePagePreviewView;[\s\S]*preview,[\s\S]*signals:/,
+  'Home page view model should own the default starter preview composition.'
+);
+assert.match(
+  publicPageViewSource,
+  /export function buildHomePageStarterPreview[\s\S]*getStarterAssignment\(\)[\s\S]*getStarterActivity\(assignment\.activityId\)[\s\S]*source: 'starter-preview'/,
+  'Home page starter preview builder should isolate starter catalog reads.'
 );
 assert.match(
   teachersRouteSource,
@@ -24833,7 +24859,22 @@ assert.deepEqual(
     to: Routes.Create,
   }))
 );
-assert.deepEqual(buildHomePageViewModel(), {
+const homePageStarterPreview = buildHomePageStarterPreview();
+assert.deepEqual(
+  {
+    activityId: homePageStarterPreview.activity.id,
+    assignmentActivityId: homePageStarterPreview.assignment.activityId,
+    assignmentId: homePageStarterPreview.assignment.id,
+    source: homePageStarterPreview.source,
+  },
+  {
+    activityId: 'english-food-quiz',
+    assignmentActivityId: 'english-food-quiz',
+    assignmentId: 'assignment-food-demo',
+    source: 'starter-preview',
+  }
+);
+assert.deepEqual(buildHomePageViewModel({ preview: homePageStarterPreview }), {
   features: [
     {
       description:
@@ -24874,12 +24915,14 @@ assert.deepEqual(buildHomePageViewModel(), {
     },
     title: 'Make classroom practice feel like a game',
   },
+  preview: homePageStarterPreview,
   signals: [
     { id: 'templates', label: 'Templates', value: '8 first' },
     { id: 'delivery', label: 'Delivery', value: 'Share link' },
     { id: 'results', label: 'Results', value: 'Attempt log' },
   ],
 });
+assert.equal(buildHomePageViewModel().preview.source, 'starter-preview');
 assert.deepEqual(
   buildContactPageViewModel().topics.map((topic) => [
     topic.id,

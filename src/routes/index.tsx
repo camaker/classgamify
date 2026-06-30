@@ -2,7 +2,6 @@ import { ActivityPreview } from '@/components/activities/activity-preview';
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { websiteConfig } from '@/config/website';
 import { getLocale, localeConfig } from '@/lib/locale';
 import { seo } from '@/lib/seo';
@@ -54,8 +53,6 @@ export const Route = createFileRoute('/')({
 });
 
 function HomePage() {
-  const activity = getStarterActivity();
-  const assignment = getStarterAssignment();
   const pageView = buildHomePageViewModel();
 
   return (
@@ -110,7 +107,10 @@ function HomePage() {
           </div>
         </section>
 
-        <ActivityPreview activity={activity} assignment={assignment} />
+        <ActivityPreview
+          activity={pageView.preview.activity}
+          assignment={pageView.preview.assignment}
+        />
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {pageView.features.map((item) => {

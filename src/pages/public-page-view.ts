@@ -1,10 +1,16 @@
 import {
   formatActivityTemplateClassroomMode,
+  getStarterActivity,
+  getStarterAssignment,
   getActivityTemplates,
 } from '@/activities/catalog';
 import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
-import type { ActivityTemplateType } from '@/activities/types';
+import type {
+  ActivitySeed,
+  ActivityTemplateType,
+  AssignmentSeed,
+} from '@/activities/types';
 
 type PublicPageRouteAction = {
   label: string;
@@ -18,6 +24,7 @@ type PublicPageRouteAction = {
 export type HomePageViewModel = {
   features: HomePageFeature[];
   hero: HomePageHeroView;
+  preview: HomePagePreviewView;
   signals: HomePageSignal[];
 };
 
@@ -39,6 +46,12 @@ type HomePageHeroView = {
   description: string;
   primaryAction: PublicPageRouteAction;
   title: string;
+};
+
+export type HomePagePreviewView = {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+  source: 'starter-preview';
 };
 
 export type HomePageSignalId = 'delivery' | 'results' | 'templates';
@@ -258,7 +271,11 @@ type TeachersTemplatePanelItemView = {
   templateType: ActivityTemplateType;
 };
 
-export function buildHomePageViewModel(): HomePageViewModel {
+export function buildHomePageViewModel({
+  preview = buildHomePageStarterPreview(),
+}: {
+  preview?: HomePagePreviewView;
+} = {}): HomePageViewModel {
   return {
     features: [
       {
@@ -295,6 +312,7 @@ export function buildHomePageViewModel(): HomePageViewModel {
       },
       title: m.home_hero_title(),
     },
+    preview,
     signals: [
       {
         id: 'templates',
@@ -312,6 +330,16 @@ export function buildHomePageViewModel(): HomePageViewModel {
         value: m.home_signal_results_value(),
       },
     ],
+  };
+}
+
+export function buildHomePageStarterPreview(): HomePagePreviewView {
+  const assignment = getStarterAssignment();
+
+  return {
+    activity: getStarterActivity(assignment.activityId),
+    assignment,
+    source: 'starter-preview',
   };
 }
 
