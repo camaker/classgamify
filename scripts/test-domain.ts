@@ -12324,6 +12324,22 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentShareLinkActionView({
+    label: 'Open student link',
+    sharePath: '/play/wrong-path',
+    shareSlug: '　class １２３　',
+  }),
+  {
+    copyLabel: 'Copy student link',
+    isAvailable: true,
+    label: 'Open student link',
+    sharePath: '/play/class%20123',
+    sharePathLabel: 'Student link',
+    shareSlug: 'class 123',
+    to: Routes.Play,
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkActionView({
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',

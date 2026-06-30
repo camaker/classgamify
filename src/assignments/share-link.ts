@@ -128,7 +128,6 @@ export function buildAssignmentShareLinkActionView({
   disabledReason,
   isAvailable = true,
   label,
-  sharePath,
   shareSlug,
 }: {
   disabledReason?: string;
@@ -137,14 +136,16 @@ export function buildAssignmentShareLinkActionView({
   sharePath: string;
   shareSlug: string;
 }): AssignmentShareLinkActionView {
+  const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+
   return {
     copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
     ...(disabledReason ? { disabledReason } : {}),
     isAvailable,
     label,
-    sharePath,
+    sharePath: buildAssignmentSharePath(normalizedShareSlug),
     sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
-    shareSlug,
+    shareSlug: normalizedShareSlug,
     to: ASSIGNMENT_SHARE_ROUTE_TARGET,
   };
 }
