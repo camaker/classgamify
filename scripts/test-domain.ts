@@ -15982,12 +15982,17 @@ assert.deepEqual(
   ),
   {
     detailViews: [
-      { label: '1. Frozen answer', tone: 'primary' },
+      { id: 'expected-answer', label: '1. Frozen answer', tone: 'primary' },
       {
+        id: 'accepted-answers',
         label: 'Accepted alternatives: Frozen accepted',
         tone: 'secondary',
       },
-      { label: 'Explanation: Frozen explanation', tone: 'secondary' },
+      {
+        id: 'explanation',
+        label: 'Explanation: Frozen explanation',
+        tone: 'secondary',
+      },
     ],
     headingLabel: 'Item 1 · Question',
     id: 'q-frozen-prompt',
@@ -16006,9 +16011,17 @@ assert.deepEqual(
   }),
   {
     detailViews: [
-      { label: '1. Paris', tone: 'primary' },
-      { label: 'Accepted alternatives: Paris, France', tone: 'secondary' },
-      { label: 'Explanation: France capital.', tone: 'secondary' },
+      { id: 'expected-answer', label: '1. Paris', tone: 'primary' },
+      {
+        id: 'accepted-answers',
+        label: 'Accepted alternatives: Paris, France',
+        tone: 'secondary',
+      },
+      {
+        id: 'explanation',
+        label: 'Explanation: France capital.',
+        tone: 'secondary',
+      },
     ],
     headingLabel: 'Item 1 · Question',
     id: 'messy-answer-key',
@@ -16033,8 +16046,9 @@ assert.deepEqual(
   }),
   {
     detailViews: [
-      { label: '2. Paris', tone: 'primary' },
+      { id: 'expected-answer', label: '2. Paris', tone: 'primary' },
       {
+        id: 'accepted-answers',
         label: 'Accepted alternatives: Paris, France, La capitale',
         tone: 'secondary',
       },
@@ -16057,8 +16071,12 @@ try {
     }),
     {
       detailViews: [
-        { label: '1. 答案', tone: 'primary' },
-        { label: '可接受变体：答案一，答案二', tone: 'secondary' },
+        { id: 'expected-answer', label: '1. 答案', tone: 'primary' },
+        {
+          id: 'accepted-answers',
+          label: '可接受变体：答案一，答案二',
+          tone: 'secondary',
+        },
       ],
       headingLabel: '第 1 题 · 题目',
       id: 'zh-answer-key',
@@ -23187,6 +23205,11 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
+  /export type PrintableWorksheetAnswerKeyDetailId =[\s\S]*'accepted-answers'[\s\S]*'expected-answer'[\s\S]*'explanation'[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*id: PrintableWorksheetAnswerKeyDetailId;[\s\S]*label: string;[\s\S]*tone: 'primary' \| 'secondary';/,
+  'Printable worksheet answer-key details should expose stable ids separately from localized labels.'
+);
+assert.match(
+  printableWorksheetViewSource,
   /export type PrintableWorksheetBlankFieldView = \{[\s\S]*kind: 'blank-line';[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
@@ -23534,6 +23557,16 @@ assert.match(
   printableWorksheetAnswerKeySource,
   /function PrintableWorksheetAnswerKeyItem[\s\S]*itemView\.detailViews\.map[\s\S]*PrintableWorksheetAnswerKeyDetail[\s\S]*detailView=\{detailView\}/,
   'Printable worksheet answer-key item component should render prepared answer-key detail views.'
+);
+assert.match(
+  printableWorksheetAnswerKeySource,
+  /itemView\.detailViews\.map[\s\S]*key=\{detailView\.id\}/,
+  'Printable worksheet answer-key item component should key answer detail rows by stable ids.'
+);
+assert.doesNotMatch(
+  printableWorksheetAnswerKeySource,
+  /key=\{detailView\.label\}/,
+  'Printable worksheet answer-key item component should not key answer detail rows by localized labels.'
 );
 assert.match(
   printableWorksheetAnswerKeySource,

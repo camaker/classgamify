@@ -85,7 +85,13 @@ export type PrintableWorksheetItemView = {
   sequenceLabel: string;
 };
 
+export type PrintableWorksheetAnswerKeyDetailId =
+  | 'accepted-answers'
+  | 'expected-answer'
+  | 'explanation';
+
 export type PrintableWorksheetAnswerKeyDetailView = {
+  id: PrintableWorksheetAnswerKeyDetailId;
   label: string;
   tone: 'primary' | 'secondary';
 };
@@ -573,6 +579,7 @@ function buildPrintableWorksheetAnswerKeyDetailViews({
 }): PrintableWorksheetAnswerKeyDetailView[] {
   return [
     {
+      id: 'expected-answer',
       label: m.assignment_printable_answer_key_item({
         answer: formatPrintableWorksheetValue(answer),
         sequenceNumber:
@@ -583,6 +590,7 @@ function buildPrintableWorksheetAnswerKeyDetailViews({
     ...(acceptedAnswers
       ? [
           {
+            id: 'accepted-answers',
             label: m.assignment_printable_answer_key_accepted({
               acceptedAnswers,
             }),
@@ -593,6 +601,7 @@ function buildPrintableWorksheetAnswerKeyDetailViews({
     ...(explanation
       ? [
           {
+            id: 'explanation',
             label: m.assignment_printable_answer_key_explanation({
               explanation,
             }),

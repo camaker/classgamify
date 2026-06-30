@@ -49,7 +49,7 @@ function PrintableWorksheetAnswerKeyItem({
         {itemView.detailViews.map((detailView) => (
           <PrintableWorksheetAnswerKeyDetail
             detailView={detailView}
-            key={detailView.label}
+            key={detailView.id}
           />
         ))}
       </div>
