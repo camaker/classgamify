@@ -38409,6 +38409,12 @@ assert.deepEqual(
   ['q-1', 'pair-1']
 );
 assert.deepEqual(
+  sortItemPerformance(abnormalReviewPriorityItems, 'submitted').map(
+    (item) => item.itemId
+  ),
+  ['fractional-rate', 'zero-rate', 'negative-rate', 'nan-unsubmitted']
+);
+assert.deepEqual(
   sortItemPerformance(resultAnalysis.perItem, 'type').map(
     (item) => item.itemId
   ),

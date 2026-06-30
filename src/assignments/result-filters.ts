@@ -474,12 +474,28 @@ export function sortItemPerformance(
     }
 
     if (sort === 'submitted') {
-      if (left.submittedCount !== right.submittedCount) {
-        return right.submittedCount - left.submittedCount;
+      const leftSubmittedCount = normalizeItemPerformanceSortCount(
+        left.submittedCount
+      );
+      const rightSubmittedCount = normalizeItemPerformanceSortCount(
+        right.submittedCount
+      );
+
+      if (leftSubmittedCount !== rightSubmittedCount) {
+        return rightSubmittedCount - leftSubmittedCount;
       }
-      if (left.correctRate !== right.correctRate) {
-        return left.correctRate - right.correctRate;
+
+      const leftCorrectRate = normalizeItemPerformanceSortNumber(
+        left.correctRate
+      );
+      const rightCorrectRate = normalizeItemPerformanceSortNumber(
+        right.correctRate
+      );
+
+      if (leftCorrectRate !== rightCorrectRate) {
+        return leftCorrectRate - rightCorrectRate;
       }
+
       return compareAssignmentItemsByStableOrder(left, right);
     }
 
@@ -489,6 +505,16 @@ export function sortItemPerformance(
 
     return 0;
   });
+}
+
+function normalizeItemPerformanceSortCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
+}
+
+function normalizeItemPerformanceSortNumber(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, value);
 }
 
 export function parseStudentSummarySort(
