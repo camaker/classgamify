@@ -61,18 +61,18 @@ export function SidebarMain() {
     return p === h;
   };
 
-  const renderItem = (item: MenuItemConfig, key: string) => {
+  const renderItem = (item: MenuItemConfig) => {
     const Icon = item.icon;
     if (item.items && item.items.length > 0) {
       return (
-        <SidebarGroup key={key}>
+        <SidebarGroup key={item.id}>
           <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col gap-0.5">
             <SidebarMenu>
               {item.items.map((sub) => {
                 const SubIcon = sub.icon;
                 return (
-                  <SidebarMenuItem key={sub.title} className="py-1">
+                  <SidebarMenuItem key={sub.id} className="py-1">
                     <SidebarMenuButton
                       render={
                         <Link to={sub.href ?? '#'} onClick={closeMobileSidebar}>
@@ -117,14 +117,5 @@ export function SidebarMain() {
     );
   };
 
-  return (
-    <>
-      {items.map((item) =>
-        renderItem(
-          item,
-          item.title + (item.items?.map((i) => i.title).join('-') ?? '')
-        )
-      )}
-    </>
-  );
+  return <>{items.map((item) => renderItem(item))}</>;
 }

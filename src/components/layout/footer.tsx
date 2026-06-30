@@ -95,7 +95,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4"
           >
             {footerLinks.map((section) => (
-              <div key={section.title} className="min-w-0">
+              <div key={section.id} className="min-w-0">
                 <h2 className="text-xs font-semibold uppercase text-muted-foreground">
                   {section.title}
                 </h2>
@@ -103,7 +103,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                   {section.items?.map(
                     (item) =>
                       item.href && (
-                        <li key={item.title}>
+                        <li key={item.id}>
                           <FooterLink item={item} pathname={pathname} />
                         </li>
                       )

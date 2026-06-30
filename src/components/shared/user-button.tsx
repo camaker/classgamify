@@ -55,7 +55,7 @@ export function UserButton({ user }: UserButtonProps) {
         <DropdownMenuSeparator />
         {avatarLinks.map((item) =>
           item.href ? (
-            <Link key={item.title} to={item.href} className="block">
+            <Link key={item.id} to={item.href} className="block">
               <DropdownMenuItem>
                 {item.icon ? <item.icon className="mr-2 size-4" /> : null}
                 {item.title}

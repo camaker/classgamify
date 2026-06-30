@@ -21,29 +21,34 @@ import { websiteConfig } from './website';
 export function getSidebarLinks(): MenuItemConfig[] {
   return [
     {
+      id: 'dashboard',
       title: m.dashboard_sidebar_dashboard(),
       icon: IconLayoutDashboard,
       href: Routes.Dashboard,
       external: false,
     },
     {
+      id: 'activities',
       title: m.dashboard_sidebar_activities(),
       icon: IconDeviceGamepad2,
       href: Routes.DashboardActivities,
       external: false,
     },
     {
+      id: 'assignments',
       title: m.dashboard_sidebar_assignments(),
       icon: IconListCheck,
       href: Routes.DashboardAssignments,
       external: false,
     },
     {
+      id: 'admin',
       title: m.admin_title(),
       icon: IconShieldCheck,
       authorizeOnly: ['admin'],
       items: [
         {
+          id: 'users',
           title: m.admin_users_title(),
           icon: IconUsers,
           href: Routes.AdminUsers,
@@ -52,10 +57,12 @@ export function getSidebarLinks(): MenuItemConfig[] {
       ],
     },
     {
+      id: 'settings',
       title: m.dashboard_sidebar_settings(),
       icon: IconSettings2,
       items: [
         {
+          id: 'profile',
           title: m.dashboard_sidebar_profile(),
           icon: IconUserCircle,
           href: Routes.SettingsProfile,
@@ -64,6 +71,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
         ...(websiteConfig.storage?.enable
           ? [
               {
+                id: 'files',
                 title: m.dashboard_sidebar_files(),
                 icon: IconFiles,
                 href: Routes.SettingsFiles,
@@ -74,6 +82,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
         ...(websiteConfig.payment?.enable
           ? [
               {
+                id: 'billing',
                 title: m.dashboard_sidebar_billing(),
                 icon: IconCreditCard,
                 href: Routes.SettingsBilling,
@@ -82,6 +91,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
             ]
           : []),
         {
+          id: 'security',
           title: m.dashboard_sidebar_security(),
           icon: IconLock,
           href: Routes.SettingsSecurity,
@@ -90,6 +100,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
         ...(websiteConfig.newsletter?.enable
           ? [
               {
+                id: 'notifications',
                 title: m.dashboard_sidebar_notifications(),
                 icon: IconBell,
                 href: Routes.SettingsNotifications,

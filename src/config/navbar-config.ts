@@ -15,22 +15,35 @@ import type { MenuItemConfig } from '../types';
 export function getNavbarLinks(): MenuItemConfig[] {
   return [
     {
+      id: 'templates',
       title: m.nav_templates(),
       href: Routes.Templates,
       icon: IconLayoutGrid,
     },
     {
+      id: 'worksheets',
       title: m.nav_worksheets(),
       href: Routes.Worksheets,
       icon: IconListDetails,
     },
-    { title: m.nav_create(), href: Routes.Create, icon: IconPlus },
     {
+      id: 'create',
+      title: m.nav_create(),
+      href: Routes.Create,
+      icon: IconPlus,
+    },
+    {
+      id: 'student-preview',
       title: m.nav_student_preview(),
       href: Routes.StudentPreview,
       icon: IconDeviceGamepad2,
     },
-    { title: m.nav_pricing(), href: Routes.Pricing, icon: IconSparkles },
-    { title: m.nav_blog(), href: Routes.Blog, icon: IconArticle },
+    {
+      id: 'pricing',
+      title: m.nav_pricing(),
+      href: Routes.Pricing,
+      icon: IconSparkles,
+    },
+    { id: 'blog', title: m.nav_blog(), href: Routes.Blog, icon: IconArticle },
   ];
 }

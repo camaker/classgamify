@@ -115,7 +115,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                   ? isLinkActive(item.href, pathname)
                   : item.items?.some((sub) => isLinkActive(sub.href, pathname));
                 return (
-                  <li key={item.title} className="py-1">
+                  <li key={item.id} className="py-1">
                     {item.items ? (
                       <Collapsible>
                         <CollapsibleTrigger
@@ -138,7 +138,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                         <CollapsibleContent className="pl-2">
                           <ul className="mt-2 space-y-2">
                             {item.items.map((sub) => (
-                              <li key={sub.title}>
+                              <li key={sub.id}>
                                 <Link
                                   to={sub.href ?? '#'}
                                   target={sub.external ? '_blank' : undefined}

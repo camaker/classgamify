@@ -13,6 +13,7 @@ import { websiteConfig } from './website';
 export function getAvatarLinks(): MenuItemConfig[] {
   return [
     {
+      id: 'dashboard',
       title: m.dashboard_avatar_dashboard(),
       href: Routes.Dashboard,
       icon: IconLayoutDashboard,
@@ -20,6 +21,7 @@ export function getAvatarLinks(): MenuItemConfig[] {
     ...(websiteConfig.payment?.enable
       ? [
           {
+            id: 'billing',
             title: m.dashboard_avatar_billing(),
             href: Routes.SettingsBilling,
             icon: IconCreditCard,
@@ -27,6 +29,7 @@ export function getAvatarLinks(): MenuItemConfig[] {
         ]
       : []),
     {
+      id: 'settings',
       title: m.dashboard_avatar_settings(),
       href: Routes.SettingsProfile,
       icon: IconSettings2,

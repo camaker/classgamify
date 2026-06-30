@@ -82,7 +82,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
               <NavigationMenuList aria-orientation={undefined}>
                 {menuLinks?.map((item) =>
                   item.items ? (
-                    <NavigationMenuItem key={item.title} value={item.title}>
+                    <NavigationMenuItem key={item.id} value={item.id}>
                       <NavigationMenuTrigger
                         className={cn(
                           'bg-transparent',
@@ -96,7 +96,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                       <NavigationMenuContent>
                         <ul className="grid w-100 gap-3 p-3 md:w-125 md:grid-cols-2 lg:w-150">
                           {item.items.map((sub) => (
-                            <li key={sub.title}>
+                            <li key={sub.id}>
                               <NavigationMenuLink
                                 closeOnClick
                                 className={cn(
@@ -142,7 +142,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                   ) : (
-                    <NavigationMenuItem key={item.title}>
+                    <NavigationMenuItem key={item.id}>
                       <NavigationMenuLink
                         render={<Link to={item.href ?? '#'} />}
                         className={cn(

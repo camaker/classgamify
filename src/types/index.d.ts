@@ -110,6 +110,7 @@ export interface PriceConfig {
 
 /** Menu item for navbar links, sidebar links, footer links. */
 export interface MenuItemConfig {
+  id: string;                                       // Stable identity for rendering and tracking
   title: string;                                    // The text to display
   description?: string;                             // The description of the item
   href?: string;                                    // The url to link to

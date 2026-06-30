@@ -6,6 +6,7 @@ import { Routes } from '@/lib/routes';
 import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
 import { APP_ENTITY_ID_LENGTH } from '@/lib/entity-id';
+import { getAvatarLinks } from '@/config/avatar-config';
 import { getFooterLinks } from '@/config/footer-config';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { getSidebarLinks } from '@/config/sidebar-config';
@@ -4096,6 +4097,25 @@ const publicPageViewSource = readFileSync(
   'src/pages/public-page-view.ts',
   'utf8'
 );
+const menuItemConfigSource = readFileSync('src/types/index.d.ts', 'utf8');
+const navbarSource = readFileSync('src/components/layout/navbar.tsx', 'utf8');
+const navbarMobileSource = readFileSync(
+  'src/components/layout/navbar-mobile.tsx',
+  'utf8'
+);
+const footerSource = readFileSync('src/components/layout/footer.tsx', 'utf8');
+const sidebarMainSource = readFileSync(
+  'src/components/layout/sidebar-main.tsx',
+  'utf8'
+);
+const userButtonSource = readFileSync(
+  'src/components/shared/user-button.tsx',
+  'utf8'
+);
+const userButtonMobileSource = readFileSync(
+  'src/components/shared/user-button-mobile.tsx',
+  'utf8'
+);
 const blogListRouteSource = readFileSync('src/routes/blog/index.tsx', 'utf8');
 const blogPostRouteSource = readFileSync('src/routes/blog/$slug.tsx', 'utf8');
 const blogCtaActionLinkSource = readFileSync(
@@ -7355,6 +7375,46 @@ assert.match(
   /blog:\s*\{\s*enable:\s*true,\s*paginationSize:\s*6,/s,
   'ClassGamify articles should be enabled because /blog is an indexed product resource.'
 );
+assert.match(
+  menuItemConfigSource,
+  /interface MenuItemConfig \{[\s\S]*id: string;[\s\S]*title: string;/,
+  'Shared menu item config should expose stable ids separate from visible titles.'
+);
+assert.deepEqual(
+  getNavbarLinks().map((item) => item.id),
+  ['templates', 'worksheets', 'create', 'student-preview', 'pricing', 'blog']
+);
+const avatarLinkIds = getAvatarLinks().map((item) => item.id);
+assert.deepEqual(
+  avatarLinkIds.filter((id) => id !== 'billing'),
+  ['dashboard', 'settings']
+);
+assert.ok(
+  avatarLinkIds.every((id) => ['dashboard', 'billing', 'settings'].includes(id))
+);
+assert.deepEqual(
+  getFooterLinks().map((item) => item.id),
+  ['product', 'platform', 'support', 'legal']
+);
+assert.deepEqual(
+  getSidebarLinks().map((item) => item.id),
+  ['dashboard', 'activities', 'assignments', 'admin', 'settings']
+);
+for (const [source, label] of [
+  [navbarSource, 'Desktop navbar'],
+  [navbarMobileSource, 'Mobile navbar'],
+  [footerSource, 'Footer'],
+  [sidebarMainSource, 'Sidebar'],
+  [userButtonSource, 'User button'],
+  [userButtonMobileSource, 'Mobile user button'],
+] as const) {
+  assert.match(source, /key=\{(?:item|sub|section)\.id\}/);
+  assert.doesNotMatch(
+    source,
+    /key=\{(?:item|sub|section)\.title\}/,
+    `${label} should not key menu items by localized titles.`
+  );
+}
 assert.ok(
   getNavbarLinks().some(
     (item) => item.href === Routes.Blog && item.title === 'Blog'

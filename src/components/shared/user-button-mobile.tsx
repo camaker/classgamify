@@ -72,7 +72,7 @@ export function UserButtonMobile({ user }: UserButtonMobileProps) {
           {avatarLinks.map((item) =>
             item.href ? (
               <li
-                key={item.title}
+                key={item.id}
                 className="rounded-lg text-foreground hover:bg-muted"
               >
                 <Link

@@ -7,30 +7,35 @@ import type { MenuItemConfig } from '../types';
 export function getFooterLinks(): MenuItemConfig[] {
   const productItems: MenuItemConfig[] = [
     {
+      id: 'templates',
       title: m.nav_templates(),
       href: Routes.Templates,
       description: m.footer_link_templates_desc(),
       external: false,
     },
     {
+      id: 'worksheets',
       title: m.footer_link_worksheets(),
       href: Routes.Worksheets,
       description: m.footer_link_worksheets_desc(),
       external: false,
     },
     {
+      id: 'create',
       title: m.nav_create(),
       href: Routes.Create,
       description: m.footer_link_create_desc(),
       external: false,
     },
     {
+      id: 'student-preview',
       title: m.nav_student_preview(),
       href: Routes.StudentPreview,
       description: m.footer_link_play_desc(),
       external: false,
     },
     {
+      id: 'pricing',
       title: m.nav_pricing(),
       href: Routes.Pricing,
       description: m.footer_link_pricing_desc(),
@@ -39,12 +44,14 @@ export function getFooterLinks(): MenuItemConfig[] {
   ];
   const platformItems: MenuItemConfig[] = [
     {
+      id: 'activities',
       title: m.dashboard_sidebar_activities(),
       href: Routes.DashboardActivities,
       description: m.footer_link_activities_desc(),
       external: false,
     },
     {
+      id: 'assignments',
       title: m.dashboard_sidebar_assignments(),
       href: Routes.DashboardAssignments,
       description: m.footer_link_assignments_desc(),
@@ -53,24 +60,28 @@ export function getFooterLinks(): MenuItemConfig[] {
   ];
   const supportItems: MenuItemConfig[] = [
     {
+      id: 'roadmap',
       title: m.nav_roadmap_title(),
       href: Routes.Roadmap,
       description: m.nav_roadmap_description(),
       external: false,
     },
     {
+      id: 'articles',
       title: m.footer_link_articles(),
       href: Routes.Blog,
       description: m.footer_link_articles_desc(),
       external: false,
     },
     {
+      id: 'support',
       title: m.footer_link_support(),
       href: Routes.Contact,
       description: m.footer_link_support_desc(),
       external: false,
     },
     {
+      id: 'teachers',
       title: m.footer_link_teachers(),
       href: Routes.Teachers,
       description: m.footer_link_teachers_desc(),
@@ -80,25 +91,32 @@ export function getFooterLinks(): MenuItemConfig[] {
 
   const legalItems: MenuItemConfig[] = [
     {
+      id: 'privacy',
       title: m.nav_privacy_policy_title(),
       href: Routes.PrivacyPolicy,
       external: false,
     },
     {
+      id: 'cookies',
       title: m.nav_cookie_policy_title(),
       href: Routes.CookiePolicy,
       external: false,
     },
     {
+      id: 'terms',
       title: m.nav_terms_of_service_title(),
       href: Routes.TermsOfService,
       external: false,
     },
   ];
   return [
-    { title: m.footer_section_product(), items: productItems },
-    { title: m.footer_section_platform(), items: platformItems },
-    { title: m.footer_section_support(), items: supportItems },
-    { title: m.nav_legal(), items: legalItems },
+    { id: 'product', title: m.footer_section_product(), items: productItems },
+    {
+      id: 'platform',
+      title: m.footer_section_platform(),
+      items: platformItems,
+    },
+    { id: 'support', title: m.footer_section_support(), items: supportItems },
+    { id: 'legal', title: m.nav_legal(), items: legalItems },
   ];
 }
