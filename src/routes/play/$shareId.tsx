@@ -1,5 +1,3 @@
-import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
-import { getRuntimeItems } from '@/activities/runtime';
 import { buildAssignmentSharePath } from '@/assignments/share-link';
 import { getOrCreateAnonymousAttemptToken } from '@/assignments/identity';
 import {
@@ -16,6 +14,7 @@ import {
   buildStudentRunnerPageViewModel,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerStarterPreview,
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionSuccessState,
   buildStudentRunnerTimerTickPlan,
@@ -65,12 +64,9 @@ function PlayPage() {
   const [now, setNow] = useState(() => Date.now());
   const [anonymousToken, setAnonymousToken] = useState<string>();
   const [attemptSessionKey, setAttemptSessionKey] = useState<string>();
-  const starterAssignment = getStarterAssignment(normalizedShareId);
-  const starterActivity = getStarterActivity(starterAssignment.activityId);
-  const starterRuntimeItems = useMemo(
-    () =>
-      getRuntimeItems(starterActivity.templateType, starterActivity.content),
-    [starterActivity]
+  const starterPreview = useMemo(
+    () => buildStudentRunnerStarterPreview(normalizedShareId),
+    [normalizedShareId]
   );
   const pageState = useMemo(
     () =>
@@ -78,18 +74,9 @@ function PlayPage() {
         data,
         isLoading,
         shareId: normalizedShareId,
-        starterActivity,
-        starterAssignment,
-        starterRuntimeItems,
+        starterPreview,
       }),
-    [
-      data,
-      isLoading,
-      normalizedShareId,
-      starterActivity,
-      starterAssignment,
-      starterRuntimeItems,
-    ]
+    [data, isLoading, normalizedShareId, starterPreview]
   );
   const runnerPageView = useMemo(
     () =>

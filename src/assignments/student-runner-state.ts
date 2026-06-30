@@ -3,7 +3,8 @@ import type {
   ActivityTemplateType,
   AssignmentSeed,
 } from '@/activities/types';
-import type { RuntimeItem } from '@/activities/runtime';
+import { getRuntimeItems } from '@/activities/runtime';
+import { getStarterActivity, getStarterAssignment } from '@/activities/catalog';
 import { getActivityTemplateRunnerCopy } from '@/activities/runner-copy';
 import {
   ASSIGNMENT_ATTEMPT_DURATION_UNITS,
@@ -70,6 +71,12 @@ import {
 } from '@/assignments/student-runner-view';
 
 type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
+
+export type StudentRunnerStarterPreview = {
+  activity: ActivitySeed;
+  assignment: AssignmentSeed;
+  runtimeItems: PublicRuntimeItem[];
+};
 
 type StudentRunnerReadyState = {
   activity: ActivitySeed;
@@ -371,16 +378,12 @@ export function buildStudentRunnerPageState({
   data,
   isLoading,
   shareId,
-  starterActivity,
-  starterAssignment,
-  starterRuntimeItems,
+  starterPreview,
 }: {
   data?: PublicAssignmentLookupResult | null;
   isLoading: boolean;
   shareId: string;
-  starterActivity: ActivitySeed;
-  starterAssignment: AssignmentSeed;
-  starterRuntimeItems: RuntimeItem[];
+  starterPreview: StudentRunnerStarterPreview;
 }): StudentRunnerPageState {
   if (isLoading) {
     return { status: 'loading' };
@@ -405,20 +408,39 @@ export function buildStudentRunnerPageState({
 
   if (
     normalizedShareId !==
-    normalizeAssignmentShareSlug(starterAssignment.shareId)
+    normalizeAssignmentShareSlug(starterPreview.assignment.shareId)
   ) {
     return { reason: 'not-found', status: 'missing' };
   }
 
   return buildStudentRunnerReadyState({
+    activity: starterPreview.activity,
+    assignment: starterPreview.assignment,
+    runtimeItems: starterPreview.runtimeItems,
+    source: 'starter-preview',
+  });
+}
+
+export function buildStudentRunnerStarterPreview(
+  shareId: string
+): StudentRunnerStarterPreview {
+  const starterAssignment = getStarterAssignment(
+    normalizeAssignmentShareSlug(shareId)
+  );
+  const starterActivity = getStarterActivity(starterAssignment.activityId);
+  const starterRuntimeItems = getRuntimeItems(
+    starterActivity.templateType,
+    starterActivity.content
+  );
+
+  return {
     activity: starterActivity,
     assignment: starterAssignment,
     runtimeItems: orderStudentRunnerRuntimeItems({
       items: stripRuntimeAnswers(starterRuntimeItems),
       assignment: starterAssignment,
     }),
-    source: 'starter-preview',
-  });
+  };
 }
 
 export function buildStudentRunnerReadyState({

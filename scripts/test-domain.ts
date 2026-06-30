@@ -868,6 +868,7 @@ import {
   buildStudentRunnerReadyState,
   buildStudentRunnerRouteState,
   buildStudentRunnerSeoView,
+  buildStudentRunnerStarterPreview,
   buildStudentRunnerSubmissionExecutionPlan,
   buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
@@ -8687,6 +8688,26 @@ assert.doesNotMatch(
   playRouteSource,
   /getStudentRunnerAttemptStartedAt|buildStudentRunnerAttemptState|buildAttemptTimerState|buildAttemptCompletionCopy|buildAnonymousAttemptCopy|buildStudentAttemptControlState|buildStudentAttemptResultDisplay|buildStudentAttemptTimerBadge|canStartAnotherStudentAttempt|formatStudentAttemptUsageLabel|buildStudentRunnerHeaderView/,
   'Student play route should not rebuild runner page, timer, completion, result, or header view state directly.'
+);
+assert.match(
+  playRouteSource,
+  /const starterPreview = useMemo\([\s\S]*buildStudentRunnerStarterPreview\(normalizedShareId\)[\s\S]*buildStudentRunnerPageState\(\{[\s\S]*starterPreview,/,
+  'Student play route should consume a prepared assignment-domain starter preview.'
+);
+assert.doesNotMatch(
+  playRouteSource,
+  /getStarterActivity|getStarterAssignment|getRuntimeItems/,
+  'Student play route should not read starter catalog or runtime items directly.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerStarterPreview = \{[\s\S]*activity: ActivitySeed;[\s\S]*assignment: AssignmentSeed;[\s\S]*runtimeItems: PublicRuntimeItem\[\];[\s\S]*export function buildStudentRunnerPageState\(\{[\s\S]*starterPreview,/,
+  'Student runner state should expose a structured starter preview contract for page-state construction.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerStarterPreview[\s\S]*getStarterAssignment\([\s\S]*normalizeAssignmentShareSlug\(shareId\)[\s\S]*getStarterActivity\(starterAssignment\.activityId\)[\s\S]*getRuntimeItems\([\s\S]*starterActivity\.templateType,[\s\S]*starterActivity\.content[\s\S]*stripRuntimeAnswers\(starterRuntimeItems\)[\s\S]*orderStudentRunnerRuntimeItems/,
+  'Student runner state should own starter catalog reads, runtime generation, answer stripping, and item ordering.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -17633,14 +17654,17 @@ const runnerStateStarterRuntimeItems = getRuntimeItems(
   'quiz',
   publicPayloadSnapshotContent
 );
+const runnerStateStarterPreview = {
+  activity: runnerStateStarterActivity,
+  assignment: runnerStateStarterAssignment,
+  runtimeItems: stripRuntimeAnswers(runnerStateStarterRuntimeItems),
+};
 assert.deepEqual(
   buildStudentRunnerPageState({
     data: publicAssignmentLookupAvailable,
     isLoading: true,
     shareId: 'share-public',
-    starterActivity: runnerStateStarterActivity,
-    starterAssignment: runnerStateStarterAssignment,
-    starterRuntimeItems: runnerStateStarterRuntimeItems,
+    starterPreview: runnerStateStarterPreview,
   }),
   { status: 'loading' }
 );
@@ -17649,9 +17673,7 @@ assert.deepEqual(
     data: null,
     isLoading: false,
     shareId: 'missing-share',
-    starterActivity: runnerStateStarterActivity,
-    starterAssignment: runnerStateStarterAssignment,
-    starterRuntimeItems: runnerStateStarterRuntimeItems,
+    starterPreview: runnerStateStarterPreview,
   }),
   { reason: 'not-found', status: 'missing' }
 );
@@ -17663,9 +17685,7 @@ assert.deepEqual(
     },
     isLoading: false,
     shareId: 'share-public',
-    starterActivity: runnerStateStarterActivity,
-    starterAssignment: runnerStateStarterAssignment,
-    starterRuntimeItems: runnerStateStarterRuntimeItems,
+    starterPreview: runnerStateStarterPreview,
   }),
   { reason: 'closed', status: 'missing' }
 );
@@ -17677,9 +17697,7 @@ assert.deepEqual(
     },
     isLoading: false,
     shareId: 'share-public',
-    starterActivity: runnerStateStarterActivity,
-    starterAssignment: runnerStateStarterAssignment,
-    starterRuntimeItems: runnerStateStarterRuntimeItems,
+    starterPreview: runnerStateStarterPreview,
   }),
   { reason: 'expired', status: 'missing' }
 );
@@ -17691,9 +17709,7 @@ assert.deepEqual(
     },
     isLoading: false,
     shareId: 'share-public',
-    starterActivity: runnerStateStarterActivity,
-    starterAssignment: runnerStateStarterAssignment,
-    starterRuntimeItems: runnerStateStarterRuntimeItems,
+    starterPreview: runnerStateStarterPreview,
   }),
   { reason: 'draft', status: 'missing' }
 );
@@ -17701,9 +17717,7 @@ const publicRunnerState = buildStudentRunnerPageState({
   data: publicAssignmentLookupAvailable,
   isLoading: false,
   shareId: ' share-public ',
-  starterActivity: runnerStateStarterActivity,
-  starterAssignment: runnerStateStarterAssignment,
-  starterRuntimeItems: runnerStateStarterRuntimeItems,
+  starterPreview: runnerStateStarterPreview,
 });
 if (publicRunnerState.status !== 'ready') {
   throw new Error('Expected public runner state to be ready.');
@@ -17720,9 +17734,7 @@ const orderedPublicRunnerState = buildStudentRunnerPageState({
   data: publicRuntimeOrderingLookup,
   isLoading: false,
   shareId: ' share-public-order ',
-  starterActivity: runnerStateStarterActivity,
-  starterAssignment: runnerStateStarterAssignment,
-  starterRuntimeItems: runnerStateStarterRuntimeItems,
+  starterPreview: runnerStateStarterPreview,
 });
 if (orderedPublicRunnerState.status !== 'ready') {
   throw new Error('Expected ordered public runner state to be ready.');
@@ -17788,6 +17800,63 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+const starterFoodPreview = buildStudentRunnerStarterPreview(
+  ` ${STARTER_FOOD_ASSIGNMENT_SHARE_ID} `
+);
+const starterFoodRuntimeItems = getRuntimeItems(
+  starterFoodPreview.activity.templateType,
+  starterFoodPreview.activity.content
+);
+const expectedStarterFoodRuntimeItems = stripRuntimeAnswers(
+  orderAssignmentRuntimeItems({
+    items: starterFoodRuntimeItems,
+    shareSlug: STARTER_FOOD_ASSIGNMENT_SHARE_ID,
+    shuffleItems: Boolean(starterFoodPreview.assignment.settings.shuffleItems),
+  })
+);
+assert.equal(
+  starterFoodPreview.assignment.shareId,
+  STARTER_FOOD_ASSIGNMENT_SHARE_ID
+);
+assert.deepEqual(
+  starterFoodPreview.runtimeItems.map((item) => item.id),
+  expectedStarterFoodRuntimeItems.map((item) => item.id)
+);
+assert.equal(
+  starterFoodPreview.runtimeItems.every((item) => !('answer' in item)),
+  true
+);
+assert.equal(
+  starterFoodPreview.runtimeItems.every((item) => !('explanation' in item)),
+  true
+);
+assert.deepEqual(
+  buildStudentRunnerPageState({
+    data: null,
+    isLoading: false,
+    shareId: 'missing-public-share',
+    starterPreview: starterFoodPreview,
+  }),
+  { reason: 'not-found', status: 'missing' }
+);
+const starterFoodRunnerState = buildStudentRunnerPageState({
+  data: null,
+  isLoading: false,
+  shareId: ` ${STARTER_FOOD_ASSIGNMENT_SHARE_ID} `,
+  starterPreview: buildStudentRunnerStarterPreview('missing-public-share'),
+});
+if (starterFoodRunnerState.status !== 'ready') {
+  throw new Error('Expected starter food runner state to be ready.');
+}
+assert.equal(
+  starterFoodRunnerState.assignment.shareId,
+  STARTER_FOOD_ASSIGNMENT_SHARE_ID
+);
+assert.equal(starterFoodRunnerState.source, 'starter-preview');
+assert.deepEqual(
+  starterFoodRunnerState.runtimeItems.map((item) => item.id),
+  expectedStarterFoodRuntimeItems.map((item) => item.id)
+);
 assert.deepEqual(
   buildStudentRunnerAttemptState({
     answers: {
@@ -17818,9 +17887,7 @@ const starterRunnerState = buildStudentRunnerPageState({
   data: null,
   isLoading: false,
   shareId: ' demo-runner ',
-  starterActivity: runnerStateStarterActivity,
-  starterAssignment: runnerStateStarterAssignment,
-  starterRuntimeItems: runnerStateStarterRuntimeItems,
+  starterPreview: runnerStateStarterPreview,
 });
 if (starterRunnerState.status !== 'ready') {
   throw new Error('Expected starter runner state to be ready.');
