@@ -1170,6 +1170,7 @@
   "assignment_reteach_plan_item": "- {promptLabel} ({performance})",
   "assignment_reteach_plan_review_first": "Review first:",
   "assignment_reteach_plan_student": "- {student}: {accuracy} latest accuracy, {reviewCount}. Next: {recommendation}",
+  "assignment_reteach_plan_student_with_latest_attempt": "- {student}: {accuracy} latest accuracy, {reviewCount}. {latestAttemptSummary} Next: {recommendation}",
   "assignment_reteach_plan_title": "ClassGamify reteach plan: {title}",
   "assignment_share_link_copy_failure": "Student link could not be copied.",
   "assignment_share_link_copy_label": "Copy link",

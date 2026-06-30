@@ -1579,7 +1579,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentReteachPlan[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
+  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentReteachPlan\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
   'Assignment result actions should own unified teacher copy artifact construction with attempt-review context.'
 );
 assert.match(
@@ -1883,6 +1883,16 @@ assert.match(
   assignmentReteachPlanSource,
   /formatStudentFollowUpRecommendation[\s\S]*recommendation: followUpRecommendation/,
   'Reteach plan student follow-up rows should reuse shared student next-step recommendations.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /buildAssignmentReteachPlanStudentViews[\s\S]*buildLatestAttemptReviewByStudentKey[\s\S]*latestAttempt: latestAttemptByStudentKey\.get\(student\.studentKey\)/,
+  'Reteach plan student follow-up rows should resolve latest attempts through the shared follow-up helper.'
+);
+assert.match(
+  assignmentReteachPlanSource,
+  /formatStudentFollowUpLatestAttemptSummary\(latestAttempt\)[\s\S]*assignment_reteach_plan_student_with_latest_attempt/,
+  'Reteach plan student follow-up rows should reuse the shared latest-attempt summary label.'
 );
 assert.doesNotMatch(
   assignmentReteachPlanSource,
@@ -37460,6 +37470,12 @@ const reteachPlan = buildAssignmentReteachPlan({
   items: resultAnalysis.perItem,
   students: followUpPriorityStudents,
 });
+const reteachPlanWithAttempts = buildAssignmentReteachPlan({
+  assignmentTitle: csvExportData.assignment.title,
+  attempts: resultAnalysis.attempts,
+  items: resultAnalysis.perItem,
+  students: resultAnalysis.students,
+});
 const alphaReviewStudent = followUpPriorityStudents.find(
   (student) => student.studentKey === 'name:alpha-review'
 )!;
@@ -37475,26 +37491,44 @@ assert.deepEqual(
     text: '- 1. Match "Hot" with its pair. (50% correct, 1/2; 1 unanswered)',
   }
 );
-assert.deepEqual(buildAssignmentReteachPlanStudentView(alphaReviewStudent), {
+assert.deepEqual(buildAssignmentReteachPlanStudentView({
+  student: alphaReviewStudent,
+}), {
   accuracyLabel: '70%',
   followUpRecommendation:
     'review missed or unanswered items, then assign one short retry',
+  latestAttemptSummaryLabel: null,
   reviewItemCountLabel: '3 items to review',
   studentKey: 'name:alpha-review',
   studentLabel: 'Alpha review',
   text: '- Alpha review: 70% latest accuracy, 3 items to review. Next: review missed or unanswered items, then assign one short retry',
 });
+assert.deepEqual(reteachPlanWithAttempts.studentViews[0], {
+  accuracyLabel: '0%',
+  followUpRecommendation:
+    'review missed or unanswered items, then assign one short retry',
+  latestAttemptSummaryLabel:
+    'Latest attempt: submitted 1/2, correct 0/2, 2 items to review.',
+  reviewItemCountLabel: '2 items to review',
+  studentKey: 'anonymous:1',
+  studentLabel: 'Anonymous student 1',
+  text: '- Anonymous student 1: 0% latest accuracy, 2 items to review. Latest attempt: submitted 1/2, correct 0/2, 2 items to review. Next: review missed or unanswered items, then assign one short retry',
+});
 assert.equal(
   buildAssignmentReteachPlanStudentView({
-    ...alphaReviewStudent,
-    needsReviewCount: 0,
+    student: {
+      ...alphaReviewStudent,
+      needsReviewCount: 0,
+    },
   }).followUpRecommendation,
   'keep reinforcing and offer a harder variant'
 );
 assert.deepEqual(
   buildAssignmentReteachPlanStudentView({
-    ...alphaReviewStudent,
-    studentLabel: ' Ａｖａ\u00A0　Chen ',
+    student: {
+      ...alphaReviewStudent,
+      studentLabel: ' Ａｖａ\u00A0　Chen ',
+    },
   }).studentLabel,
   'Ava Chen'
 );
@@ -37551,6 +37585,10 @@ assert.match(
 assert.match(
   reteachPlan.text,
   /Alpha review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- More review: 70% latest accuracy, 3 items to review\. Next: review missed or unanswered items, then assign one short retry\n- Lower score: 10% latest accuracy, 1 item to review\. Next: review missed or unanswered items, then assign one short retry/
+);
+assert.match(
+  reteachPlanWithAttempts.text,
+  /Anonymous student 1: 0% latest accuracy, 2 items to review\. Latest attempt: submitted 1\/2, correct 0\/2, 2 items to review\. Next: review missed or unanswered items, then assign one short retry/
 );
 const expandedReteachPlan = buildAssignmentReteachPlan({
   assignmentTitle: csvExportData.assignment.title,

@@ -1170,6 +1170,7 @@
   "assignment_reteach_plan_item": "- {promptLabel}（{performance}）",
   "assignment_reteach_plan_review_first": "优先复盘：",
   "assignment_reteach_plan_student": "- {student}：最近正确率 {accuracy}，{reviewCount}。下一步：{recommendation}",
+  "assignment_reteach_plan_student_with_latest_attempt": "- {student}：最近正确率 {accuracy}，{reviewCount}。{latestAttemptSummary} 下一步：{recommendation}",
   "assignment_reteach_plan_title": "ClassGamify 再教学计划：{title}",
   "assignment_share_link_copy_failure": "无法复制学生链接。",
   "assignment_share_link_copy_label": "复制链接",

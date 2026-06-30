@@ -1,4 +1,5 @@
 import type {
+  AssignmentAttemptReview,
   AssignmentItemAnalysis,
   AssignmentStudentSummary,
 } from '@/assignments/results';
@@ -17,11 +18,16 @@ import {
 } from '@/assignments/result-copy-format';
 import { getAssignmentReviewPriorityItems } from '@/assignments/review-priority';
 import { getAssignmentStudentFollowUpPriorityStudents } from '@/assignments/student-follow-up-priority';
-import { formatStudentFollowUpRecommendation } from '@/assignments/student-follow-up-summary';
+import {
+  buildLatestAttemptReviewByStudentKey,
+  formatStudentFollowUpLatestAttemptSummary,
+  formatStudentFollowUpRecommendation,
+} from '@/assignments/student-follow-up-summary';
 import { m } from '@/locale/paraglide/messages';
 
 type AssignmentReteachPlanInput = {
   assignmentTitle: string;
+  attempts?: AssignmentAttemptReview[];
   items: AssignmentItemAnalysis[];
   students: AssignmentStudentSummary[];
 };
@@ -41,6 +47,7 @@ export type AssignmentReteachPlanItemView = {
 export type AssignmentReteachPlanStudentView = {
   accuracyLabel: string;
   followUpRecommendation: string;
+  latestAttemptSummaryLabel: string | null;
   reviewItemCountLabel: string;
   studentKey: string;
   studentLabel: string;
@@ -60,6 +67,7 @@ export type AssignmentReteachPlan = {
 
 export function buildAssignmentReteachPlan({
   assignmentTitle,
+  attempts = [],
   items,
   students,
 }: AssignmentReteachPlanInput): AssignmentReteachPlan {
@@ -73,7 +81,9 @@ export function buildAssignmentReteachPlan({
     }
   );
   const itemViews = buildAssignmentReteachPlanItemViews(reviewItems);
-  const studentViews = buildAssignmentReteachPlanStudentViews(reviewStudents);
+  const studentViews = buildAssignmentReteachPlanStudentViews(reviewStudents, {
+    attempts,
+  });
   const copyTitle = formatAssignmentResultCopyTitle(assignmentTitle);
   const title = m.assignment_reteach_plan_title({ title: copyTitle });
   const reviewHeading = m.assignment_reteach_plan_review_first();
@@ -133,14 +143,30 @@ export function buildAssignmentReteachPlanItemView({
 }
 
 export function buildAssignmentReteachPlanStudentViews(
-  students: AssignmentStudentSummary[]
+  students: AssignmentStudentSummary[],
+  options?: {
+    attempts?: AssignmentAttemptReview[];
+  }
 ): AssignmentReteachPlanStudentView[] {
-  return students.map(buildAssignmentReteachPlanStudentView);
+  const latestAttemptByStudentKey = buildLatestAttemptReviewByStudentKey(
+    options?.attempts ?? []
+  );
+
+  return students.map((student) =>
+    buildAssignmentReteachPlanStudentView({
+      latestAttempt: latestAttemptByStudentKey.get(student.studentKey),
+      student,
+    })
+  );
 }
 
-export function buildAssignmentReteachPlanStudentView(
-  student: AssignmentStudentSummary
-): AssignmentReteachPlanStudentView {
+export function buildAssignmentReteachPlanStudentView({
+  latestAttempt,
+  student,
+}: {
+  latestAttempt?: AssignmentAttemptReview;
+  student: AssignmentStudentSummary;
+}): AssignmentReteachPlanStudentView {
   const studentLabel = formatAssignmentResultStudentLabel(student.studentLabel);
   const accuracyLabel = formatAssignmentSummaryAccuracy(student.latestAccuracy);
   const reviewItemCountLabel = formatAssignmentSummaryReviewItemCount(
@@ -149,19 +175,29 @@ export function buildAssignmentReteachPlanStudentView(
   const followUpRecommendation = formatStudentFollowUpRecommendation(
     student.needsReviewCount
   );
+  const latestAttemptSummaryLabel = latestAttempt
+    ? formatStudentFollowUpLatestAttemptSummary(latestAttempt)
+    : null;
+  const lineInput = {
+    accuracy: accuracyLabel,
+    recommendation: followUpRecommendation,
+    reviewCount: reviewItemCountLabel,
+    student: studentLabel,
+  };
 
   return {
     accuracyLabel,
     followUpRecommendation,
+    latestAttemptSummaryLabel,
     reviewItemCountLabel,
     studentKey: student.studentKey,
     studentLabel,
-    text: m.assignment_reteach_plan_student({
-      accuracy: accuracyLabel,
-      recommendation: followUpRecommendation,
-      reviewCount: reviewItemCountLabel,
-      student: studentLabel,
-    }),
+    text: latestAttemptSummaryLabel
+      ? m.assignment_reteach_plan_student_with_latest_attempt({
+          ...lineInput,
+          latestAttemptSummary: latestAttemptSummaryLabel,
+        })
+      : m.assignment_reteach_plan_student(lineInput),
   };
 }
 

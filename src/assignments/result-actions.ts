@@ -330,6 +330,7 @@ export function buildAssignmentResultCopyArtifacts(
     }),
     reteachPlan: buildAssignmentReteachPlan({
       assignmentTitle,
+      attempts: data.analysis.attempts,
       items,
       students,
     }),
