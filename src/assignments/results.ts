@@ -203,11 +203,18 @@ function getAttemptReviewAccuracy(attempt: AttemptForAnalysis) {
 }
 
 function getAttemptReviewScore(attempt: AttemptForAnalysis) {
+  const totalPoints = getFiniteNumber(attempt.resultJson?.totalPoints);
+  const maxScore =
+    totalPoints === undefined ? undefined : normalizeResultCount(totalPoints);
   const score = getFiniteNumber(attempt.score);
-  if (score !== undefined) return normalizeResultCount(score);
+  if (score !== undefined)
+    return normalizeResultCount(score, { max: maxScore });
 
   return normalizeResultCount(
-    getFiniteNumber(attempt.resultJson?.earnedPoints, 0)
+    getFiniteNumber(attempt.resultJson?.earnedPoints, 0),
+    {
+      max: maxScore,
+    }
   );
 }
 
@@ -284,8 +291,13 @@ function getResultAcceptedAnswers(answer: string) {
   return getRuntimeDisplayAcceptedAnswers(answer);
 }
 
-function normalizeResultCount(value: number | undefined) {
-  return normalizeRuntimeDisplayCount(value ?? 0);
+function normalizeResultCount(
+  value: number | undefined,
+  options?: {
+    max?: number;
+  }
+) {
+  return normalizeRuntimeDisplayCount(value ?? 0, options);
 }
 
 function normalizeResultPercent(value: number | undefined) {

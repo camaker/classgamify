@@ -34662,6 +34662,51 @@ assert.deepEqual(
 assert.equal(sanitizedResultAnalysis.students[0]?.averageAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.bestAccuracy, 0);
 assert.equal(sanitizedResultAnalysis.students[0]?.latestAccuracy, 0);
+const cappedResultScoreAnalysis = analyzeAssignmentResults({
+  attempts: [
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-05T10:00:00.000Z'),
+      id: 'attempt-over-total-score',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 4,
+        totalPoints: 2,
+      },
+      score: 5,
+      studentName: 'Score Cap',
+    },
+    {
+      anonymousToken: null,
+      answersJson: {
+        answers: [{ answer: 'Paris', correct: true, itemId: 'q-1' }],
+        templateType: 'quiz',
+      },
+      completedAt: new Date('2026-01-06T10:00:00.000Z'),
+      id: 'attempt-over-total-earned-points',
+      resultJson: {
+        accuracy: 100,
+        completedItemCount: 1,
+        correctItemCount: 1,
+        earnedPoints: 4,
+        totalPoints: 2,
+      },
+      score: null,
+      studentName: 'Score Cap',
+    },
+  ],
+  runtimeItems: resultRuntimeItems,
+});
+assert.deepEqual(
+  cappedResultScoreAnalysis.attempts.map((attempt) => attempt.score),
+  [2, 2]
+);
 const normalizedResultDisplayAnalysis = analyzeAssignmentResults({
   attempts: [
     {
