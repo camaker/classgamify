@@ -199,6 +199,7 @@ export type AssignmentResultCopyArtifactPreviewMetaItem = {
 export type AssignmentResultCopyArtifactPreviewMetaKey =
   | 'focus-items'
   | 'follow-up-students'
+  | 'latest-attempts'
   | 'lines'
   | 'next-steps'
   | 'review-items'
@@ -519,6 +520,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         value: artifacts.classroomBrief.followUpStudentViews.length,
       }),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'latest-attempts',
+        label: m.assignment_result_copy_preview_meta_latest_attempts(),
+        value: countAssignmentResultCopyLatestAttemptViews(
+          artifacts.classroomBrief.followUpStudentViews
+        ),
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
         label: m.assignment_result_copy_preview_meta_lines(),
         value: lineCount,
@@ -542,6 +550,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
         key: 'next-steps',
         label: m.assignment_result_copy_preview_meta_next_steps(),
         value: artifacts.reteachPlan.studentViews.length,
+      }),
+      buildAssignmentResultCopyArtifactPreviewMetaItem({
+        key: 'latest-attempts',
+        label: m.assignment_result_copy_preview_meta_latest_attempts(),
+        value: countAssignmentResultCopyLatestAttemptViews(
+          artifacts.reteachPlan.studentViews
+        ),
       }),
       buildAssignmentResultCopyArtifactPreviewMetaItem({
         key: 'lines',
@@ -578,6 +593,13 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
       value: artifacts.studentFollowUpSummary.studentViews.length,
     }),
     buildAssignmentResultCopyArtifactPreviewMetaItem({
+      key: 'latest-attempts',
+      label: m.assignment_result_copy_preview_meta_latest_attempts(),
+      value: countAssignmentResultCopyLatestAttemptViews(
+        artifacts.studentFollowUpSummary.studentViews
+      ),
+    }),
+    buildAssignmentResultCopyArtifactPreviewMetaItem({
       key: 'lines',
       label: m.assignment_result_copy_preview_meta_lines(),
       value: lineCount,
@@ -599,6 +621,14 @@ function buildAssignmentResultCopyArtifactPreviewMetaItem({
     label,
     value: formatAssignmentResultNumber(value, { min: 0 }),
   };
+}
+
+function countAssignmentResultCopyLatestAttemptViews(
+  studentViews: Array<{ latestAttemptSummaryLabel: string | null }>
+) {
+  return studentViews.filter((studentView) =>
+    Boolean(studentView.latestAttemptSummaryLabel)
+  ).length;
 }
 
 export function buildAssignmentResultCopyText({

@@ -1569,7 +1569,7 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'students';/,
+  /export type AssignmentResultCopyArtifactPreviewMetaItem = \{[\s\S]*key: AssignmentResultCopyArtifactPreviewMetaKey;[\s\S]*export type AssignmentResultCopyArtifactPreviewMetaKey =[\s\S]*'focus-items'[\s\S]*'latest-attempts'[\s\S]*'students';/,
   'Assignment result copy artifact metadata should expose an explicit meta-key contract.'
 );
 assert.doesNotMatch(
@@ -1616,6 +1616,16 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*countAssignmentResultCopyLines\(text\)[\s\S]*next-steps[\s\S]*assignment_result_copy_preview_meta_next_steps/,
   'Assignment result copy artifact preview metadata should include prepared line and next-step counts for student follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*latest-attempts[\s\S]*assignment_result_copy_preview_meta_latest_attempts[\s\S]*countAssignmentResultCopyLatestAttemptViews/,
+  'Assignment result copy artifact preview metadata should expose latest-attempt summary coverage for student follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /countAssignmentResultCopyLatestAttemptViews\([\s\S]*latestAttemptSummaryLabel/,
+  'Assignment result copy latest-attempt metadata should count the same structured student views used by copied text.'
 );
 assert.doesNotMatch(
   assignmentResultActionsSource,
@@ -32943,6 +32953,7 @@ assert.deepEqual(
           ['focus-items', 'Focus items', '2'],
           ['follow-up-students', 'Follow-up students', '1'],
           ['next-steps', 'Next steps', '1'],
+          ['latest-attempts', 'Latest attempts', '1'],
           ['lines', 'Lines', '10'],
         ],
         true,
@@ -32957,6 +32968,7 @@ assert.deepEqual(
           ['review-items', 'Review items', '2'],
           ['follow-up-students', 'Follow-up students', '1'],
           ['next-steps', 'Next steps', '1'],
+          ['latest-attempts', 'Latest attempts', '1'],
           ['lines', 'Lines', '6'],
         ],
         true,
@@ -32982,6 +32994,7 @@ assert.deepEqual(
         [
           ['students', 'Students', '1'],
           ['next-steps', 'Next steps', '1'],
+          ['latest-attempts', 'Latest attempts', '1'],
           ['lines', 'Lines', '2'],
         ],
         true,
@@ -38141,6 +38154,7 @@ assert.deepEqual(
         ['focus-items', 'Focus items', '2'],
         ['follow-up-students', 'Follow-up students', '3'],
         ['next-steps', 'Next steps', '3'],
+        ['latest-attempts', 'Latest attempts', '0'],
         ['lines', 'Lines', '12'],
       ],
       resultCopyArtifacts.classroomBrief.text,
@@ -38154,6 +38168,7 @@ assert.deepEqual(
         ['review-items', 'Review items', '2'],
         ['follow-up-students', 'Follow-up students', '3'],
         ['next-steps', 'Next steps', '3'],
+        ['latest-attempts', 'Latest attempts', '0'],
         ['lines', 'Lines', '8'],
       ],
       resultCopyArtifacts.reteachPlan.text,
@@ -38177,10 +38192,34 @@ assert.deepEqual(
       [
         ['students', 'Students', '4'],
         ['next-steps', 'Next steps', '4'],
+        ['latest-attempts', 'Latest attempts', '0'],
         ['lines', 'Lines', '5'],
       ],
       resultCopyArtifacts.studentFollowUpSummary.text,
     ],
+  ]
+);
+const latestAttemptResultCopyArtifacts = buildAssignmentResultCopyArtifacts({
+  ...csvExportData,
+  analysis: {
+    ...csvExportData.analysis,
+    students: resultAnalysis.students,
+  },
+});
+assert.deepEqual(
+  buildAssignmentResultCopyArtifactPreviews(
+    latestAttemptResultCopyArtifacts
+  ).map((preview) => [
+    preview.action,
+    preview.metaItems
+      .filter((metaItem) => metaItem.key === 'latest-attempts')
+      .map((metaItem) => [metaItem.label, metaItem.value]),
+  ]),
+  [
+    ['copy-brief', [['Latest attempts', '1']]],
+    ['copy-reteach-plan', [['Latest attempts', '1']]],
+    ['copy-item-review', []],
+    ['copy-follow-up', [['Latest attempts', '2']]],
   ]
 );
 assert.equal(
