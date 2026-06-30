@@ -3,6 +3,7 @@ import type {
   PrintableWorksheetEmptyState,
   PrintableWorksheetItemView,
 } from '@/assignments/printable-worksheet-view';
+import type { PrintableWorksheetItemLayout } from '@/assignments/printable-worksheet';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -46,9 +47,7 @@ function PrintableWorksheetItem({
       data-print-item-layout={itemView.layout}
       className={cn(
         'break-inside-avoid rounded-lg border bg-background p-4',
-        itemView.layout === 'matching'
-          ? 'sm:grid sm:grid-cols-[1fr_18rem] sm:gap-4'
-          : ''
+        getPrintableWorksheetItemLayoutClassName(itemView.layout)
       )}
     >
       <div>
@@ -67,7 +66,14 @@ function PrintableWorksheetItem({
           {itemView.responseModeLabel}
         </p>
       </div>
-      <div className={cn(itemView.layout === 'matching' ? 'mt-4 sm:mt-0' : '')}>
+      <div
+        className={cn(
+          itemView.layout === 'matching' ? 'mt-4 sm:mt-0' : '',
+          itemView.layout === 'classification'
+            ? 'rounded-md bg-background p-3'
+            : ''
+        )}
+      >
         <PrintableWorksheetChoiceBank choiceBank={itemView.choiceBank} />
         <div className="mt-4 grid gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -85,6 +91,20 @@ function PrintableWorksheetItem({
       </div>
     </section>
   );
+}
+
+function getPrintableWorksheetItemLayoutClassName(
+  layout: PrintableWorksheetItemLayout
+) {
+  if (layout === 'matching') {
+    return 'sm:grid sm:grid-cols-[1fr_18rem] sm:gap-4';
+  }
+
+  if (layout === 'classification') {
+    return 'border-primary/20 bg-primary/5';
+  }
+
+  return '';
 }
 
 function PrintableWorksheetChoiceBank({

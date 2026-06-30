@@ -22876,6 +22876,16 @@ assert.match(
   /data-print-item-layout=\{itemView\.layout\}/,
   'Printable worksheet item list should render prepared layout metadata for print-specific layout variants.'
 );
+assert.match(
+  printableWorksheetItemListSource,
+  /getPrintableWorksheetItemLayoutClassName\(itemView\.layout\)/,
+  'Printable worksheet item list should choose item container layout classes from prepared printable layout metadata.'
+);
+assert.match(
+  printableWorksheetItemListSource,
+  /function getPrintableWorksheetItemLayoutClassName[\s\S]*layout === 'matching'[\s\S]*sm:grid sm:grid-cols-\[1fr_18rem\] sm:gap-4[\s\S]*layout === 'classification'[\s\S]*border-primary\/20 bg-primary\/5/,
+  'Printable worksheet item layout classes should prepare distinct matching and classification paper layouts.'
+);
 assert.doesNotMatch(
   printableWorksheetItemListSource,
   /itemView\.sequenceLabel[\s\S]*·[\s\S]*itemView\.kindLabel/,
