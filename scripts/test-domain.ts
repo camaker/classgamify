@@ -2589,8 +2589,8 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /export function buildPublicAttemptResult[\s\S]*normalizeAttemptDurationSeconds\(\{[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*accuracy: result\.accuracy,[\s\S]*completedItemCount: result\.completedItemCount,[\s\S]*correctItemCount: result\.correctItemCount,[\s\S]*durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints,[\s\S]*totalPoints: result\.totalPoints/,
-  'Public attempt results should explicitly pick the only score fields allowed in student submission responses and normalize duration.'
+  /export function buildPublicAttemptResult[\s\S]*normalizeAttemptDurationSeconds\(\{[\s\S]*const totalPoints = normalizePublicAttemptResultCount\(result\.totalPoints\)[\s\S]*const completedItemCount = normalizePublicAttemptResultCount\([\s\S]*result\.completedItemCount,[\s\S]*max: totalPoints[\s\S]*const correctItemCount = normalizePublicAttemptResultCount\([\s\S]*result\.correctItemCount,[\s\S]*max: completedItemCount[\s\S]*accuracy: normalizePublicAttemptResultPercent\(result\.accuracy\)[\s\S]*earnedPoints: normalizePublicAttemptResultCount\(result\.earnedPoints,[\s\S]*max: totalPoints/,
+  'Public attempt results should explicitly pick and normalize the only score fields allowed in student submission responses.'
 );
 assert.doesNotMatch(
   getSourceSlice(
@@ -2598,8 +2598,8 @@ assert.doesNotMatch(
     'export function buildPublicAttemptResult',
     'export function buildPublicAssignmentPreviewActivity'
   ),
-  /return \{[\s\S]*durationSeconds: result\.durationSeconds,[\s\S]*earnedPoints: result\.earnedPoints/,
-  'Public attempt results should not expose raw stored duration values.'
+  /return \{[\s\S]*(?:durationSeconds: result\.durationSeconds|accuracy: result\.accuracy|completedItemCount: result\.completedItemCount|correctItemCount: result\.correctItemCount|earnedPoints: result\.earnedPoints|totalPoints: result\.totalPoints)/,
+  'Public attempt results should not expose raw scorer result values.'
 );
 assert.match(
   publicAssignmentSource,
@@ -17711,6 +17711,42 @@ assert.deepEqual(publicAttemptResultWithPrivateFields, {
 });
 assert.equal('rawAnswers' in publicAttemptResultWithPrivateFields, false);
 assert.equal('scorerTraceId' in publicAttemptResultWithPrivateFields, false);
+assert.deepEqual(
+  buildPublicAttemptResult({
+    accuracy: 150,
+    completedItemCount: 4,
+    correctItemCount: 3,
+    durationSeconds: 12,
+    earnedPoints: 5,
+    totalPoints: 2,
+  }),
+  {
+    accuracy: 100,
+    completedItemCount: 2,
+    correctItemCount: 2,
+    durationSeconds: 12,
+    earnedPoints: 2,
+    totalPoints: 2,
+  }
+);
+assert.deepEqual(
+  buildPublicAttemptResult({
+    accuracy: Number.NaN,
+    completedItemCount: Number.NEGATIVE_INFINITY,
+    correctItemCount: 1,
+    durationSeconds: 12,
+    earnedPoints: Number.POSITIVE_INFINITY,
+    totalPoints: -2,
+  }),
+  {
+    accuracy: 0,
+    completedItemCount: 0,
+    correctItemCount: 0,
+    durationSeconds: 12,
+    earnedPoints: 0,
+    totalPoints: 0,
+  }
+);
 assert.equal(
   buildPublicAttemptResult({
     accuracy: 0,

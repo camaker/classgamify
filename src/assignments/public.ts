@@ -495,15 +495,46 @@ export function buildPublicAttemptResult(
   const durationSeconds = normalizeAttemptDurationSeconds({
     durationSeconds: result.durationSeconds,
   });
+  const totalPoints = normalizePublicAttemptResultCount(result.totalPoints);
+  const completedItemCount = normalizePublicAttemptResultCount(
+    result.completedItemCount,
+    {
+      max: totalPoints,
+    }
+  );
+  const correctItemCount = normalizePublicAttemptResultCount(
+    result.correctItemCount,
+    {
+      max: completedItemCount,
+    }
+  );
 
   return {
-    accuracy: result.accuracy,
-    completedItemCount: result.completedItemCount,
-    correctItemCount: result.correctItemCount,
+    accuracy: normalizePublicAttemptResultPercent(result.accuracy),
+    completedItemCount,
+    correctItemCount,
     durationSeconds,
-    earnedPoints: result.earnedPoints,
-    totalPoints: result.totalPoints,
+    earnedPoints: normalizePublicAttemptResultCount(result.earnedPoints, {
+      max: totalPoints,
+    }),
+    totalPoints,
   };
+}
+
+function normalizePublicAttemptResultCount(
+  value: number,
+  options?: {
+    max?: number;
+  }
+) {
+  return normalizeRuntimeDisplayCount(value, options);
+}
+
+function normalizePublicAttemptResultPercent(value: number) {
+  return normalizeRuntimeDisplayCount(value, {
+    max: 100,
+    min: 0,
+  });
 }
 
 export function buildPublicAssignmentPreviewActivity(
