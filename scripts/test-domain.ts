@@ -1771,7 +1771,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultHeaderShareAction[\s\S]*return buildAssignmentShareLinkActionView\(\{[\s\S]*label: shareAvailability\.isAvailable[\s\S]*sharePath: shareAvailability\.sharePath,[\s\S]*shareSlug: shareAvailability\.shareSlug/,
+  /buildAssignmentResultHeaderShareAction[\s\S]*return buildAssignmentShareLinkActionView\(\{[\s\S]*label: shareAvailability\.isAvailable[\s\S]*shareSlug: shareAvailability\.shareSlug/,
   'Assignment result header share action should prepare student-link actions through the shared share-action view helper.'
 );
 assert.doesNotMatch(
@@ -12335,7 +12335,6 @@ assert.equal(ASSIGNMENT_SHARE_ROUTE_TARGET, Routes.Play);
 assert.deepEqual(
   buildAssignmentShareLinkActionView({
     label: 'Open student link',
-    sharePath: '/play/class%20123',
     shareSlug: 'class 123',
   }),
   {
@@ -12351,7 +12350,6 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentShareLinkActionView({
     label: 'Open student link',
-    sharePath: '/play/wrong-path',
     shareSlug: '　class １２３　',
   }),
   {
@@ -12369,7 +12367,6 @@ assert.deepEqual(
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',
-    sharePath: '/play/draft-share',
     shareSlug: 'draft-share',
   }),
   {
@@ -21358,7 +21355,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentListCardActionView[\s\S]*buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReason: actionState\.shareDisabledReason,[\s\S]*label: actionState\.shareLabel,[\s\S]*sharePath: actionState\.shareAvailability\.sharePath,[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
+  /buildAssignmentListCardActionView[\s\S]*buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReason: actionState\.shareDisabledReason,[\s\S]*label: actionState\.shareLabel,[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
   'Assignment list card action view should render student-link actions through the shared share-action view helper.'
 );
 assert.match(
@@ -21450,7 +21447,7 @@ assert.match(
 );
 assert.match(
   publishedAssignmentSource,
-  /export type PublishedAssignmentPanelShareAction = AssignmentShareLinkActionView[\s\S]*buildPublishedAssignmentPanelActionView[\s\S]*shareAction: buildAssignmentShareLinkActionView\(\{[\s\S]*label: m\.assignment_list_action_open_published_link\(\),[\s\S]*sharePath,[\s\S]*shareSlug/,
+  /export type PublishedAssignmentPanelShareAction = AssignmentShareLinkActionView[\s\S]*buildPublishedAssignmentPanelActionView[\s\S]*shareAction: buildAssignmentShareLinkActionView\(\{[\s\S]*label: m\.assignment_list_action_open_published_link\(\),[\s\S]*shareSlug/,
   'Published assignment panel action view should reuse the shared student-link action contract and builder.'
 );
 assert.match(

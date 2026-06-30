@@ -134,7 +134,6 @@ export function buildPublishedAssignmentPanelContext({
     return {
       actionView: buildPublishedAssignmentPanelActionView({
         assignment,
-        sharePath,
         shareSlug: normalizedShareSlug,
         status: 'found',
       }),
@@ -154,7 +153,6 @@ export function buildPublishedAssignmentPanelContext({
     return {
       actionView: buildPublishedAssignmentPanelActionView({
         assignment,
-        sharePath,
         shareSlug: normalizedShareSlug,
         status: 'loading',
       }),
@@ -173,7 +171,6 @@ export function buildPublishedAssignmentPanelContext({
   return {
     actionView: buildPublishedAssignmentPanelActionView({
       assignment,
-      sharePath,
       shareSlug: normalizedShareSlug,
       status: 'missing',
     }),
@@ -190,12 +187,10 @@ export function buildPublishedAssignmentPanelContext({
 
 function buildPublishedAssignmentPanelActionView({
   assignment,
-  sharePath,
   shareSlug,
   status,
 }: {
   assignment?: PublishedAssignmentPanelAssignment;
-  sharePath: string;
   shareSlug: string;
   status: PublishedAssignmentPanelStatus;
 }): PublishedAssignmentPanelActionView {
@@ -221,7 +216,6 @@ function buildPublishedAssignmentPanelActionView({
       : undefined,
     shareAction: buildAssignmentShareLinkActionView({
       label: m.assignment_list_action_open_published_link(),
-      sharePath,
       shareSlug,
     }),
   };

@@ -1022,7 +1022,6 @@ export function buildAssignmentResultHeaderShareAction({
     label: shareAvailability.isAvailable
       ? assignmentResultPageCopy.openStudentLinkLabel
       : assignmentResultPageCopy.studentLinkUnavailableLabel,
-    sharePath: shareAvailability.sharePath,
     shareSlug: shareAvailability.shareSlug,
   });
 }

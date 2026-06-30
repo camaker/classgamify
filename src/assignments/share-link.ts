@@ -133,7 +133,6 @@ export function buildAssignmentShareLinkActionView({
   disabledReason?: string;
   isAvailable?: boolean;
   label: string;
-  sharePath: string;
   shareSlug: string;
 }): AssignmentShareLinkActionView {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);

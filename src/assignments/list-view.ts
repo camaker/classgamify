@@ -851,7 +851,6 @@ export function buildAssignmentListCardActionView({
           disabledReason: actionState.shareDisabledReason,
           isAvailable: !actionState.shareDisabledReason,
           label: actionState.shareLabel,
-          sharePath: actionState.shareAvailability.sharePath,
           shareSlug: actionState.shareAvailability.shareSlug,
         })
       : undefined,
