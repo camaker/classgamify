@@ -1069,7 +1069,7 @@
   "assignment_result_section_student_attempts_title": "Student attempts",
   "assignment_result_section_student_follow_up_empty": "No student-specific review needs yet.",
   "assignment_result_section_student_follow_up_title": "Student follow-up",
-  "assignment_result_section_student_summary_description": "Sort students by review priority, best score, name, or attempt volume before reading every submitted answer.",
+  "assignment_result_section_student_summary_description": "Sort students by review priority, best score, name, attempt volume, or last submitted time before reading every submitted answer.",
   "assignment_result_section_student_summary_title": "Student summary",
   "assignment_result_sort_attempts": "Attempts",
   "assignment_result_sort_attempts_description": "Put students with the most submitted attempts first.",

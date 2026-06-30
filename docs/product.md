@@ -307,11 +307,13 @@ so summary rows, attempt rows, and answer review cards stay aligned without
 exposing raw anonymous tokens. Answer review cards can also switch between all
 submissions and submissions with at least one missed item, with the focused view
 stored in the URL for repeat review passes. Student summaries can be sorted by
-review need, best score, student name, or attempt volume so teachers can choose
-the scan order that matches grading, reteaching, or participation follow-up.
+review need, best score, student name, attempt volume, or most recent
+submission so teachers can choose the scan order that matches grading,
+reteaching, participation follow-up, or the newest homework handoff.
 Result-page search, sort, and review-filter rules belong in assignment-domain
 helpers so teacher tables, copied artifacts, and future API views do not drift
-from the same normalized student labels and item performance ordering.
+from the same normalized student labels, submission timing, and item
+performance ordering.
 Teachers can also view and copy a compact classroom brief that combines
 assignment-level metrics, the three lowest-performing submitted items, and the
 students who most need follow-up. The brief is teacher-only result data

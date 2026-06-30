@@ -1069,7 +1069,7 @@
   "assignment_result_section_student_attempts_title": "学生作答",
   "assignment_result_section_student_follow_up_empty": "暂无需要单独跟进的学生。",
   "assignment_result_section_student_follow_up_title": "学生跟进",
-  "assignment_result_section_student_summary_description": "先按复盘优先级、最佳分数、姓名或作答次数排序，再阅读每次提交。",
+  "assignment_result_section_student_summary_description": "先按复盘优先级、最佳分数、姓名、作答次数或最近提交时间排序，再阅读每次提交。",
   "assignment_result_section_student_summary_title": "学生摘要",
   "assignment_result_sort_attempts": "作答次数",
   "assignment_result_sort_attempts_description": "把提交次数最多的学生排在前面。",

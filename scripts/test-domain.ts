@@ -33249,7 +33249,7 @@ assert.deepEqual(
       },
       studentSummary: {
         description:
-          'Sort students by review priority, best score, name, or attempt volume before reading every submitted answer.',
+          'Sort students by review priority, best score, name, attempt volume, or last submitted time before reading every submitted answer.',
         emptyStateTitle: 'No matching students.',
         isVisible: true,
         title: 'Student summary',
