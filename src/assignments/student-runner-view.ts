@@ -184,18 +184,18 @@ export type FillBlankWorksheetView = StudentRunnerView & {
   fillBlankItemViews: FillBlankWorksheetItemView[];
 };
 
-type SequentialStudentRunnerItemView = StudentRunnerItemView & {
+export type SequentialStudentRunnerItemView = StudentRunnerItemView & {
   sequenceLabel: string;
 };
 
-type SequentialStudentRunnerNavigationItemView =
+export type SequentialStudentRunnerNavigationItemView =
   SequentialStudentRunnerItemView & {
     reviewStatusClassName: string | undefined;
     selected: boolean;
     selectAction: SequentialStudentRunnerNavigationAction;
   };
 
-type SequentialStudentRunnerNavigationView = {
+export type SequentialStudentRunnerNavigationView = {
   activePanelStatusClassName: string | undefined;
   canMove: boolean;
   itemViews: SequentialStudentRunnerNavigationItemView[];
@@ -216,6 +216,24 @@ export type SequentialStudentRunnerNavigationAction =
       itemId: string;
       type: 'select';
     };
+
+export type SequentialStudentRunnerSequenceView = {
+  activeIndex: number;
+  activeItem: PublicRuntimeItem | undefined;
+  activeItemView: SequentialStudentRunnerItemView | undefined;
+  activeLabel: string;
+  itemViews: SequentialStudentRunnerItemView[];
+};
+
+export type SequentialStudentRunnerView = StudentRunnerView & {
+  activeAnswer: string;
+  activeChoiceViews: RuntimeChoiceButtonView[];
+  activeItem: PublicRuntimeItem | undefined;
+  activeItemView: SequentialStudentRunnerItemView | undefined;
+  activeReviewItem: PublicAttemptReviewItem | undefined;
+  navigationView: SequentialStudentRunnerNavigationView;
+  sequenceView: SequentialStudentRunnerSequenceView;
+};
 
 export type PublicAnswerFeedbackStatus =
   | 'correct'
@@ -480,7 +498,7 @@ export function buildSequentialStudentRunnerView({
   progressVerb?: string;
   revealAnswer?: boolean;
   reviewItems?: PublicAttemptReviewItem[];
-}) {
+}): SequentialStudentRunnerView {
   const runnerView = buildStudentRunnerView({
     answers,
     items,

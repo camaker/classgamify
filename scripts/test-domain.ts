@@ -7759,6 +7759,16 @@ assert.match(
   'Student runner domain should expose explicit fill-blank worksheet prompt and item view contracts.'
 );
 assert.match(
+  studentRunnerViewSource,
+  /export type SequentialStudentRunnerItemView = StudentRunnerItemView & \{[\s\S]*sequenceLabel: string;[\s\S]*export type SequentialStudentRunnerNavigationItemView =[\s\S]*selectAction: SequentialStudentRunnerNavigationAction;[\s\S]*export type SequentialStudentRunnerNavigationView = \{[\s\S]*itemViews: SequentialStudentRunnerNavigationItemView\[\];[\s\S]*export type SequentialStudentRunnerSequenceView = \{[\s\S]*activeItemView: SequentialStudentRunnerItemView \| undefined;[\s\S]*export type SequentialStudentRunnerView = StudentRunnerView & \{[\s\S]*activeChoiceViews: RuntimeChoiceButtonView\[\];[\s\S]*navigationView: SequentialStudentRunnerNavigationView;[\s\S]*sequenceView: SequentialStudentRunnerSequenceView;/,
+  'Student runner domain should expose explicit sequential runner view contracts for listening and open-box templates.'
+);
+assert.match(
+  studentRunnerViewSource,
+  /export function buildSequentialStudentRunnerView\([\s\S]*\): SequentialStudentRunnerView/,
+  'Sequential runner builder should return the explicit sequential runner view contract.'
+);
+assert.match(
   studentRuntimeItemListDomainSource,
   /defaultItemCardViews: DefaultRuntimeItemCardView\[\];[\s\S]*runnerCopy: ActivityRunnerCopy;/,
   'Student runtime item list domain should compose explicit runner copy and default-card contracts.'
