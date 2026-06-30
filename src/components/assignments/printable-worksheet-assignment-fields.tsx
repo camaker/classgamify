@@ -1,4 +1,8 @@
-import type { PrintableWorksheetAssignmentFieldView } from '@/assignments/printable-worksheet-view';
+import type {
+  PrintableWorksheetAssignmentFieldView,
+  PrintableWorksheetBlankFieldView,
+  PrintableWorksheetTextFieldView,
+} from '@/assignments/printable-worksheet-view';
 
 type PrintableWorksheetAssignmentFieldsProps = {
   fieldViews: PrintableWorksheetAssignmentFieldView[];
@@ -27,14 +31,35 @@ function PrintableWorksheetAssignmentField({
 }: {
   fieldView: PrintableWorksheetAssignmentFieldView;
 }) {
+  if (fieldView.kind === 'blank-line') {
+    return <PrintableWorksheetBlankField fieldView={fieldView} />;
+  }
+
+  return <PrintableWorksheetTextField fieldView={fieldView} />;
+}
+
+function PrintableWorksheetBlankField({
+  fieldView,
+}: {
+  fieldView: PrintableWorksheetBlankFieldView;
+}) {
   return (
     <div>
       <p className="font-medium">{fieldView.label}</p>
-      {fieldView.kind === 'blank-line' ? (
-        <div className="mt-3 h-8 border-b" />
-      ) : (
-        <p className="mt-2 text-muted-foreground">{fieldView.value}</p>
-      )}
+      <div className="mt-3 h-8 border-b" />
+    </div>
+  );
+}
+
+function PrintableWorksheetTextField({
+  fieldView,
+}: {
+  fieldView: PrintableWorksheetTextFieldView;
+}) {
+  return (
+    <div>
+      <p className="font-medium">{fieldView.label}</p>
+      <p className="mt-2 text-muted-foreground">{fieldView.value}</p>
     </div>
   );
 }

@@ -94,23 +94,27 @@ export type PrintableWorksheetAnswerKeyItemView = {
   prompt: string;
 };
 
+export type PrintableWorksheetBlankFieldView = {
+  id: 'date' | 'score' | 'student-name';
+  kind: 'blank-line';
+  label: string;
+};
+
+export type PrintableWorksheetTextFieldView = {
+  id:
+    | 'delivery-policy'
+    | 'instructions'
+    | 'share-path'
+    | 'snapshot-source'
+    | 'template';
+  kind: 'text';
+  label: string;
+  value: string;
+};
+
 export type PrintableWorksheetAssignmentFieldView =
-  | {
-      id: 'date' | 'score' | 'student-name';
-      kind: 'blank-line';
-      label: string;
-    }
-  | {
-      id:
-        | 'delivery-policy'
-        | 'instructions'
-        | 'share-path'
-        | 'snapshot-source'
-        | 'template';
-      kind: 'text';
-      label: string;
-      value: string;
-    };
+  | PrintableWorksheetBlankFieldView
+  | PrintableWorksheetTextFieldView;
 
 export type PrintableWorksheetAnswerKeyView = {
   description: string;

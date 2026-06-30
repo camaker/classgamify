@@ -22755,7 +22755,7 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetAssignmentFieldView =[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
+  /export type PrintableWorksheetBlankFieldView = \{[\s\S]*kind: 'blank-line';[\s\S]*export type PrintableWorksheetTextFieldView = \{[\s\S]*kind: 'text';[\s\S]*export type PrintableWorksheetAssignmentFieldView =[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView;[\s\S]*export type PrintableWorksheetAnswerKeyView = \{[\s\S]*export type PrintableWorksheetBackToResultsAction = \{[\s\S]*export type PrintableWorksheetAnswerKeyToggleView = \{[\s\S]*export type PrintableWorksheetPrintAction = \{[\s\S]*export type PrintableWorksheetControlView = \{[\s\S]*answerKeyToggle: PrintableWorksheetAnswerKeyToggleView;[\s\S]*backToResultsAction: PrintableWorksheetBackToResultsAction;[\s\S]*printAction: PrintableWorksheetPrintAction;[\s\S]*export type PrintableWorksheetEmptyState = \{[\s\S]*export type PrintableWorksheetLoadStateView = \{[\s\S]*export type PrintableWorksheetPageViewModel = \{/,
   'Printable worksheet view domain should export focused assignment-field, answer-key, control, empty, load, and page view contracts.'
 );
 assert.match(
@@ -22785,8 +22785,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetAssignmentFieldsSource,
-  /PrintableWorksheetAssignmentFieldView/,
-  'Printable worksheet assignment fields should consume the explicit assignment field view contract.'
+  /PrintableWorksheetAssignmentFieldView[\s\S]*PrintableWorksheetBlankFieldView[\s\S]*PrintableWorksheetTextFieldView/,
+  'Printable worksheet assignment fields should consume explicit assignment field, blank field, and text field contracts.'
 );
 assert.match(
   printableWorksheetItemListSource,
@@ -22917,6 +22917,21 @@ assert.match(
   printableWorksheetAssignmentFieldsSource,
   /fieldViews\.map/,
   'Printable worksheet assignment fields component should render assignment fields from the printable worksheet page view-model.'
+);
+assert.match(
+  printableWorksheetAssignmentFieldsSource,
+  /fieldView\.kind === 'blank-line'[\s\S]*PrintableWorksheetBlankField[\s\S]*PrintableWorksheetTextField/,
+  'Printable worksheet assignment fields should dispatch blank and text fields to focused renderers.'
+);
+assert.match(
+  printableWorksheetAssignmentFieldsSource,
+  /function PrintableWorksheetBlankField[\s\S]*fieldView: PrintableWorksheetBlankFieldView[\s\S]*fieldView\.label[\s\S]*h-8 border-b/,
+  'Printable worksheet blank assignment fields should render prepared labels with blank print lines.'
+);
+assert.match(
+  printableWorksheetAssignmentFieldsSource,
+  /function PrintableWorksheetTextField[\s\S]*fieldView: PrintableWorksheetTextFieldView[\s\S]*fieldView\.label[\s\S]*fieldView\.value/,
+  'Printable worksheet text assignment fields should render prepared labels and values.'
 );
 assert.match(
   printableWorksheetAnswerKeySource,
