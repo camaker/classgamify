@@ -645,9 +645,11 @@ export function buildAssignmentListCardStats({
   averageScore,
   completions,
 }: AssignmentListCardStats): AssignmentListCardStat[] {
+  const normalizedCompletions =
+    normalizeAssignmentListCardStatCount(completions);
   const statsView = buildAssignmentAttemptStatsView({
     averageScore,
-    completions,
+    completions: normalizedCompletions,
   });
 
   return [
@@ -815,6 +817,11 @@ export function getAssignmentListCardActionState({
       now,
     }),
   };
+}
+
+function normalizeAssignmentListCardStatCount(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.floor(Math.max(0, value));
 }
 
 export function buildAssignmentListCardActionView({

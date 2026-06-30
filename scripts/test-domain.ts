@@ -26150,7 +26150,37 @@ assert.deepEqual(
     completions: Number.NaN,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '-' },
+    { key: 'completions', label: 'Completions', value: '0' },
+    { key: 'average', label: 'Average', value: '-' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: 81.7,
+    completions: 2.9,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '2' },
+    { key: 'average', label: 'Average', value: '82%' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: 81.7,
+    completions: Number.POSITIVE_INFINITY,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '0' },
+    { key: 'average', label: 'Average', value: '-' },
+  ]
+);
+assert.deepEqual(
+  buildAssignmentListCardStats({
+    averageScore: 81.7,
+    completions: -2,
+  }),
+  [
+    { key: 'completions', label: 'Completions', value: '0' },
     { key: 'average', label: 'Average', value: '-' },
   ]
 );
