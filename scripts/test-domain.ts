@@ -9375,6 +9375,16 @@ assert.match(
 );
 assert.match(
   studentRuntimeItemListSource,
+  /if \(listView\.surface === 'choice-list'\)[\s\S]*listView\.defaultItemCardViews\.map[\s\S]*assertUnhandledStudentRuntimeItemListSurface\(listView\.surface\)/,
+  'Student runtime item list should render default item cards only through an explicit choice-list surface branch.'
+);
+assert.match(
+  studentRuntimeItemListSource,
+  /function assertUnhandledStudentRuntimeItemListSurface\(surface: never\): never/,
+  'Student runtime item list should use a never-typed surface guard so new runner kinds cannot silently fall back to choice-list cards.'
+);
+assert.match(
+  studentRuntimeItemListSource,
   /choices\.map\(\(choiceView\)[\s\S]*key=\{choiceView\.id\}/,
   'Student runtime item list should render choice buttons with stable domain choice-view ids.'
 );

@@ -148,28 +148,36 @@ export function StudentRuntimeItemList({
     );
   }
 
-  return (
-    <div className="mt-4 grid gap-3">
-      {listView.defaultItemCardViews.map((itemView) => (
-        <RuntimeItemCard
-          key={itemView.item.id}
-          answer={itemView.answer}
-          choiceViews={itemView.choiceViews}
-          correctAnswerLabel={itemView.correctAnswerLabel}
-          disabled={disabled}
-          inputPlaceholder={itemView.inputPlaceholder}
-          kindLabel={itemView.kindLabel}
-          positionLabel={itemView.positionLabel}
-          reviewItem={itemView.reviewItem}
-          revealAnswer={revealAnswer}
-          showChoices={itemView.showChoices}
-          onAnswerChange={(answer) =>
-            handleSingleAnswerChange(itemView.item.id, answer)
-          }
-        />
-      ))}
-    </div>
-  );
+  if (listView.surface === 'choice-list') {
+    return (
+      <div className="mt-4 grid gap-3">
+        {listView.defaultItemCardViews.map((itemView) => (
+          <RuntimeItemCard
+            key={itemView.item.id}
+            answer={itemView.answer}
+            choiceViews={itemView.choiceViews}
+            correctAnswerLabel={itemView.correctAnswerLabel}
+            disabled={disabled}
+            inputPlaceholder={itemView.inputPlaceholder}
+            kindLabel={itemView.kindLabel}
+            positionLabel={itemView.positionLabel}
+            reviewItem={itemView.reviewItem}
+            revealAnswer={revealAnswer}
+            showChoices={itemView.showChoices}
+            onAnswerChange={(answer) =>
+              handleSingleAnswerChange(itemView.item.id, answer)
+            }
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return assertUnhandledStudentRuntimeItemListSurface(listView.surface);
+}
+
+function assertUnhandledStudentRuntimeItemListSurface(surface: never): never {
+  throw new Error(`Unhandled student runtime item-list surface: ${surface}`);
 }
 
 function RuntimeItemCard({
