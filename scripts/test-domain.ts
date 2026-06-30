@@ -854,6 +854,7 @@ import {
   buildStudentRunnerSubmissionPlan,
   buildStudentRunnerSubmissionResultState,
   buildStudentRunnerSubmissionSuccessState,
+  buildStudentRunnerSubmitHintViews,
   buildStudentRunnerTimerTickPlan,
   getStudentRunnerAttemptStartedAt,
   shouldResetStudentRunnerAttemptSession,
@@ -8065,18 +8066,32 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*StudentRunnerSubmitHint[\s\S]*controlView\.unansweredLabel[\s\S]*controlView\.submitConfirmationMessage[\s\S]*controlView\.readOnlyMessage/,
-  'Student runner submit controls should render prepared submit disabled state, label, structured incomplete-confirmation state, confirmation, and hint copy.'
+  /data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*text=\{hintView\.text\}/,
+  'Student runner submit controls should render prepared submit disabled state, label, structured incomplete-confirmation state, and domain-prepared hint views.'
 );
 assert.match(
   studentRunnerStateSource,
-  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage: requiresIncompleteSubmitConfirmation/,
+  /const requiresIncompleteSubmitConfirmation = Boolean\([\s\S]*confirmIncompleteSubmit[\s\S]*attemptControlState\.unansweredLabel[\s\S]*const submitConfirmationMessage = requiresIncompleteSubmitConfirmation[\s\S]*requiresIncompleteSubmitConfirmation,[\s\S]*submitConfirmationMessage,[\s\S]*submitHintViews: buildStudentRunnerSubmitHintViews\(\{/,
   'Student runner page view-model should expose a structured incomplete-submit confirmation state instead of making components infer it from copy.'
 );
 assert.match(
-  studentRunnerSubmitControlsSource,
-  /function StudentRunnerSubmitHint[\s\S]*if \(!text\) return null[\s\S]*text/,
-  'Student runner submit controls should delegate optional hint rendering to a focused component.'
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmitHintId =[\s\S]*'confirm-incomplete'[\s\S]*'read-only'[\s\S]*'unanswered'[\s\S]*export type StudentRunnerSubmitHintView = \{[\s\S]*id: StudentRunnerSubmitHintId;[\s\S]*text: string;/,
+  'Student runner submit hints should expose explicit hint ids and text contracts.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export function buildStudentRunnerSubmitHintViews\(\{[\s\S]*unansweredLabel[\s\S]*submitConfirmationMessage[\s\S]*readOnlyMessage[\s\S]*\.flatMap/,
+  'Student runner state should prepare submit hint order and empty-message filtering in the assignment domain.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    studentRunnerSubmitControlsSource,
+    'export function StudentRunnerSubmitControls',
+    'function StudentRunnerSubmitHint'
+  ),
+  /controlView\.(?:unansweredLabel|submitConfirmationMessage|readOnlyMessage)|if \(!text\) return null/,
+  'Student runner submit controls should not choose optional hint copy locally.'
 );
 assert.match(
   playRouteSource,
@@ -10960,6 +10975,40 @@ assert.deepEqual(
     submitDisabled: true,
     unansweredLabel: '1 item left unanswered.',
   }
+);
+assert.deepEqual(
+  buildStudentRunnerSubmitHintViews({
+    readOnlyMessage: 'Preview assignments are read-only.',
+    submitConfirmationMessage: '1 question is still unanswered.',
+    unansweredLabel: '1 item left unanswered.',
+  }),
+  [
+    {
+      id: 'unanswered',
+      text: '1 item left unanswered.',
+    },
+    {
+      id: 'confirm-incomplete',
+      text: '1 question is still unanswered.',
+    },
+    {
+      id: 'read-only',
+      text: 'Preview assignments are read-only.',
+    },
+  ]
+);
+assert.deepEqual(
+  buildStudentRunnerSubmitHintViews({
+    readOnlyMessage: '',
+    submitConfirmationMessage: undefined,
+    unansweredLabel: '  １   item　left unanswered.  ',
+  }),
+  [
+    {
+      id: 'unanswered',
+      text: '1 item left unanswered.',
+    },
+  ]
 );
 assert.deepEqual(
   buildAssignmentAttemptUsage({
@@ -16781,6 +16830,7 @@ assert.deepEqual(
       submitButtonLabel: 'Submit answers',
       submitConfirmationMessage: undefined,
       submitDisabled: true,
+      submitHintViews: [],
       timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
       timerBadge: {
         label: '',
@@ -17103,6 +17153,8 @@ assert.deepEqual(
     requiresIncompleteSubmitConfirmation:
       confirmIncompleteStudentRunnerPageView.controlView
         .requiresIncompleteSubmitConfirmation,
+    submitHintViews:
+      confirmIncompleteStudentRunnerPageView.controlView.submitHintViews,
     unansweredLabel:
       confirmIncompleteStudentRunnerPageView.controlView.unansweredLabel,
   },
@@ -17110,6 +17162,16 @@ assert.deepEqual(
     submitButtonLabel: 'Submit anyway',
     submitConfirmationMessage: '1 question is still unanswered.',
     requiresIncompleteSubmitConfirmation: true,
+    submitHintViews: [
+      {
+        id: 'unanswered',
+        text: '1 item left unanswered.',
+      },
+      {
+        id: 'confirm-incomplete',
+        text: '1 question is still unanswered.',
+      },
+    ],
     unansweredLabel: '1 item left unanswered.',
   }
 );

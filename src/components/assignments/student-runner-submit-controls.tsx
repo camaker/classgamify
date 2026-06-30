@@ -25,15 +25,13 @@ export function StudentRunnerSubmitControls({
         <IconCheck className="size-4" />
         {controlView.submitButtonLabel}
       </Button>
-      <StudentRunnerSubmitHint text={controlView.unansweredLabel} />
-      <StudentRunnerSubmitHint text={controlView.submitConfirmationMessage} />
-      <StudentRunnerSubmitHint text={controlView.readOnlyMessage} />
+      {controlView.submitHintViews.map((hintView) => (
+        <StudentRunnerSubmitHint key={hintView.id} text={hintView.text} />
+      ))}
     </div>
   );
 }
 
-function StudentRunnerSubmitHint({ text }: { text?: string }) {
-  if (!text) return null;
-
+function StudentRunnerSubmitHint({ text }: { text: string }) {
   return <p className="mt-2 text-xs text-muted-foreground">{text}</p>;
 }

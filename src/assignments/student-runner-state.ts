@@ -62,6 +62,7 @@ import {
 } from '@/assignments/public';
 import { getAnonymousBrowserLabel } from '@/assignments/identity';
 import { orderAssignmentRuntimeItems } from '@/assignments/item-order';
+import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
 import { normalizeAssignmentShareSlug } from '@/assignments/share-slug';
 import {
   buildStudentRunnerHeaderView,
@@ -138,9 +139,20 @@ export type StudentRunnerControlView = {
   submitButtonLabel: string;
   submitConfirmationMessage?: string;
   submitDisabled: boolean;
+  submitHintViews: StudentRunnerSubmitHintView[];
   timeExpiredMessage: string;
   timerBadge: StudentAttemptTimerBadge;
   unansweredLabel?: string;
+};
+
+export type StudentRunnerSubmitHintId =
+  | 'confirm-incomplete'
+  | 'read-only'
+  | 'unanswered';
+
+export type StudentRunnerSubmitHintView = {
+  id: StudentRunnerSubmitHintId;
+  text: string;
 };
 
 export type StudentRunnerResultPanelView =
@@ -565,6 +577,9 @@ export function buildStudentRunnerPageViewModel({
   const requiresIncompleteSubmitConfirmation = Boolean(
     confirmIncompleteSubmit && attemptControlState.unansweredLabel
   );
+  const submitConfirmationMessage = requiresIncompleteSubmitConfirmation
+    ? completionCopy.confirmIncompleteSubmit
+    : undefined;
   const revealAnswers = Boolean(
     result && assignment?.settings.showCorrectAnswers
   );
@@ -602,10 +617,13 @@ export function buildStudentRunnerPageViewModel({
       submitButtonLabel:
         attemptControlState.submitButtonLabel ??
         completionCopy.submitButtonLabel,
-      submitConfirmationMessage: requiresIncompleteSubmitConfirmation
-        ? completionCopy.confirmIncompleteSubmit
-        : undefined,
+      submitConfirmationMessage,
       submitDisabled: attemptControlState.submitDisabled,
+      submitHintViews: buildStudentRunnerSubmitHintViews({
+        readOnlyMessage: attemptControlState.readOnlyMessage,
+        submitConfirmationMessage,
+        unansweredLabel: attemptControlState.unansweredLabel,
+      }),
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
       timerBadge: attemptTimerBadge,
       unansweredLabel: attemptControlState.unansweredLabel,
@@ -664,6 +682,42 @@ export function buildStudentRunnerPageViewModel({
     submissionSuccessMessage: runnerCopy.submissionSuccessMessage,
     timeLimitSeconds,
   };
+}
+
+export function buildStudentRunnerSubmitHintViews({
+  readOnlyMessage,
+  submitConfirmationMessage,
+  unansweredLabel,
+}: {
+  readOnlyMessage?: string;
+  submitConfirmationMessage?: string;
+  unansweredLabel?: string;
+}): StudentRunnerSubmitHintView[] {
+  return [
+    buildStudentRunnerSubmitHintView({
+      id: 'unanswered',
+      text: unansweredLabel,
+    }),
+    buildStudentRunnerSubmitHintView({
+      id: 'confirm-incomplete',
+      text: submitConfirmationMessage,
+    }),
+    buildStudentRunnerSubmitHintView({
+      id: 'read-only',
+      text: readOnlyMessage,
+    }),
+  ].flatMap((hintView) => (hintView ? [hintView] : []));
+}
+
+function buildStudentRunnerSubmitHintView({
+  id,
+  text,
+}: {
+  id: StudentRunnerSubmitHintId;
+  text?: string;
+}): StudentRunnerSubmitHintView | null {
+  const normalizedText = normalizeRuntimeDisplayText(text);
+  return normalizedText ? { id, text: normalizedText } : null;
 }
 
 export function buildStudentRunnerRouteState(
