@@ -20316,8 +20316,8 @@ assert.match(
 );
 assert.match(
   attemptAnswersSource,
-  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*getAttemptAnswerRuntimeItemIds\(\{[\s\S]*includeEmpty: true,[\s\S]*runtimeItems,[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)/,
-  'Attempt answer validation should compare shared normalized runtime ids with normalized submitted item ids.'
+  /assertSubmittedAnswersMatchRuntimeItems[\s\S]*getAttemptAnswerRuntimeItemIds\(\{[\s\S]*runtimeItems,[\s\S]*normalizeAttemptAnswerItemId\(answer\.itemId\)[\s\S]*!itemId \|\| !runtimeItemIds\.has\(itemId\)/,
+  'Attempt answer validation should reject blank submitted item ids and compare normalized runtime ids.'
 );
 assert.match(
   attemptAnswersSource,
@@ -20333,6 +20333,11 @@ assert.match(
   attemptAnswersSource,
   /export function getAttemptAnswerRuntimeItemEntries[\s\S]*includeEmpty = false[\s\S]*normalizeAttemptAnswerItemId\(item\.id\)[\s\S]*originalIds/,
   'Attempt answer helpers should own normalized runtime item entry grouping.'
+);
+assert.match(
+  attemptAnswersSource,
+  /function assertRuntimeItemIdsAreUnique[\s\S]*includeEmpty: true[\s\S]*!entry\.itemId \|\| entry\.originalIds\.length > 1/,
+  'Attempt answer validation should reject blank runtime item ids before accepting submitted answers.'
 );
 assert.match(
   attemptAnswersSource,
@@ -32020,6 +32025,14 @@ assert.throws(
     }),
   /unknown item/
 );
+assert.throws(
+  () =>
+    assertSubmittedAnswersMatchRuntimeItems({
+      answers: [{ itemId: '  ' }],
+      runtimeItems: submissionRuntimeItems,
+    }),
+  /unknown item/
+);
 
 assert.throws(
   () =>
@@ -32053,6 +32066,14 @@ assert.throws(
     assertSubmittedAnswersMatchRuntimeItems({
       answers: [{ itemId: 'item-1' }],
       runtimeItems: [{ id: 'item-1' }, { id: ' ｉｔｅｍ－１ ' }],
+    }),
+  /runtime items include a duplicate item id/
+);
+assert.throws(
+  () =>
+    assertSubmittedAnswersMatchRuntimeItems({
+      answers: [{ itemId: 'item-1' }],
+      runtimeItems: [{ id: 'item-1' }, { id: '  ' }],
     }),
   /runtime items include a duplicate item id/
 );

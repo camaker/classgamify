@@ -31,7 +31,6 @@ export function assertSubmittedAnswersMatchRuntimeItems({
 
   const runtimeItemIds = new Set(
     getAttemptAnswerRuntimeItemIds({
-      includeEmpty: true,
       runtimeItems,
     })
   );
@@ -40,7 +39,7 @@ export function assertSubmittedAnswersMatchRuntimeItems({
   for (const answer of answers) {
     const itemId = normalizeAttemptAnswerItemId(answer.itemId);
 
-    if (!runtimeItemIds.has(itemId)) {
+    if (!itemId || !runtimeItemIds.has(itemId)) {
       throw new Error(m.assignment_attempt_answers_error_unknown_item());
     }
 
@@ -118,7 +117,7 @@ function assertRuntimeItemIdsAreUnique(
     includeEmpty: true,
     runtimeItems,
   })) {
-    if (entry.originalIds.length > 1) {
+    if (!entry.itemId || entry.originalIds.length > 1) {
       throw new Error(
         m.assignment_attempt_answers_error_duplicate_runtime_item()
       );
