@@ -222,6 +222,7 @@ function AssignmentListShareActions({
       />
       <CopyAssignmentShareLinkButton
         disabled={!action.isAvailable}
+        disabledReasonCode={action.disabledReasonCode}
         disabledMessage={action.disabledReason}
         label={action.copyLabel}
         shareSlug={action.shareSlug}

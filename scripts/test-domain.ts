@@ -1661,6 +1661,11 @@ assert.match(
 );
 assert.match(
   copyAssignmentShareLinkButtonSource,
+  /disabledReasonCode,[\s\S]*disabledReasonCode\?: AssignmentShareLinkDisabledReasonCode;[\s\S]*disabledReasonCode,/,
+  'Share-link copy button should pass structured disabled reason codes into the assignment-domain copy plan.'
+);
+assert.match(
+  copyAssignmentShareLinkButtonSource,
   /label,[\s\S]*label: string;[\s\S]*\{label\}/,
   'Share-link copy button should require prepared copy labels from assignment-domain action views.'
 );
@@ -1681,8 +1686,23 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentShareLinkSource,
-  /reason: 'disabled' \| 'missing-share-slug'[\s\S]*reason: 'disabled'[\s\S]*reason: 'missing-share-slug'/,
+  /export type AssignmentShareLinkDisabledReasonCode =[\s\S]*Exclude<AssignmentLifecycleStatus, 'open'>[\s\S]*'missing-share-slug'/,
+  'Share-link disabled reasons should expose stable codes for lifecycle and missing-slug states.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /reason: AssignmentShareLinkDisabledReasonCode \| 'disabled'[\s\S]*reason: disabledReasonCode \?\? 'disabled'[\s\S]*reason: 'missing-share-slug'/,
   'Share-link copy execution plans should expose structured blocked reasons.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /export type AssignmentShareLinkAvailability = \{[\s\S]*disabledReasonCode\?: AssignmentShareLinkDisabledReasonCode;[\s\S]*buildAssignmentShareLinkAvailability[\s\S]*getAssignmentShareLinkDisabledReasonCode[\s\S]*isAvailable:[\s\S]*availabilityState\.isAvailable && !disabledReason\.disabledReasonCode/,
+  'Share-link availability should carry structured disabled reason codes and block blank share slugs.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*const resolvedIsAvailable = isAvailable && !disabledReasonCode[\s\S]*isAvailable: resolvedIsAvailable/,
+  'Share-link action views should preserve disabled reason codes and use them when resolving availability.'
 );
 assert.match(
   assignmentShareLinkSource,
@@ -1958,8 +1978,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /type AssignmentLifecycleStatus[\s\S]*getAssignmentResultHeaderShareDisabledReason\(\s*lifecycleStatus: AssignmentLifecycleStatus/,
-  'Assignment result share-disabled copy should consume the explicit assignment lifecycle status contract.'
+  /type AssignmentShareLinkDisabledReasonCode[\s\S]*getAssignmentResultHeaderShareDisabledReason\([\s\S]*reasonCode: AssignmentShareLinkDisabledReasonCode[\s\S]*reasonCode === 'expired'[\s\S]*reasonCode === 'closed'[\s\S]*reasonCode === 'draft'/,
+  'Assignment result share-disabled copy should consume the explicit assignment share disabled-reason code contract.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -1968,8 +1988,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /buildAssignmentResultHeaderShareAction[\s\S]*return buildAssignmentShareLinkActionView\(\{[\s\S]*label: shareAvailability\.isAvailable[\s\S]*shareSlug: shareAvailability\.shareSlug/,
-  'Assignment result header share action should prepare student-link actions through the shared share-action view helper.'
+  /const disabledReasonCode = shareAvailability\.disabledReasonCode[\s\S]*return buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*disabledReason: disabledReasonCode[\s\S]*getAssignmentResultHeaderShareDisabledReason\(disabledReasonCode\)[\s\S]*label: shareAvailability\.isAvailable[\s\S]*shareSlug: shareAvailability\.shareSlug/,
+  'Assignment result header share action should prepare student-link actions with structured disabled reason codes through the shared share-action view helper.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -5282,8 +5302,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /function AssignmentResultsHeaderCopyShareAction[\s\S]*disabled=\{!shareAction\.isAvailable\}[\s\S]*disabledMessage=\{shareAction\.disabledReason\}[\s\S]*shareSlug=\{shareAction\.shareSlug\}/,
-  'Assignment result copy-share action should render prepared disabled state and share slug.'
+  /function AssignmentResultsHeaderCopyShareAction[\s\S]*disabled=\{!shareAction\.isAvailable\}[\s\S]*disabledReasonCode=\{shareAction\.disabledReasonCode\}[\s\S]*disabledMessage=\{shareAction\.disabledReason\}[\s\S]*shareSlug=\{shareAction\.shareSlug\}/,
+  'Assignment result copy-share action should render prepared disabled state, reason code, and share slug.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -13339,10 +13359,26 @@ assert.deepEqual(
     status: 'draft',
   }),
   {
+    disabledReasonCode: 'draft',
     isAvailable: false,
     lifecycleStatus: 'draft',
     sharePath: '/play/draft-share',
     shareSlug: 'draft-share',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkAvailability({
+    expiresAt: null,
+    now: new Date('2026-01-01T00:00:00.000Z').getTime(),
+    shareSlug: '   ',
+    status: 'published',
+  }),
+  {
+    disabledReasonCode: 'missing-share-slug',
+    isAvailable: false,
+    lifecycleStatus: 'open',
+    sharePath: '/play/',
+    shareSlug: '',
   }
 );
 assert.equal(
@@ -13428,6 +13464,7 @@ assert.deepEqual(
 );
 assert.deepEqual(
   buildAssignmentShareLinkActionView({
+    disabledReasonCode: 'draft',
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',
@@ -13435,12 +13472,30 @@ assert.deepEqual(
   }),
   {
     copyLabel: 'Copy student link',
+    disabledReasonCode: 'draft',
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',
     sharePath: '/play/draft-share',
     sharePathLabel: 'Student link',
     shareSlug: 'draft-share',
+    to: Routes.Play,
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkActionView({
+    disabledReasonCode: 'missing-share-slug',
+    label: 'Student link unavailable',
+    shareSlug: '   ',
+  }),
+  {
+    copyLabel: 'Copy student link',
+    disabledReasonCode: 'missing-share-slug',
+    isAvailable: false,
+    label: 'Student link unavailable',
+    sharePath: '/play/',
+    sharePathLabel: 'Student link',
+    shareSlug: '',
     to: Routes.Play,
   }
 );
@@ -13471,13 +13526,14 @@ assert.deepEqual(
 assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
     disabled: true,
+    disabledReasonCode: 'closed',
     disabledMessage: 'This assignment is closed.',
     shareSlug: 'closed-share',
   }),
   {
     failureMessage: 'Student link could not be copied.',
     message: 'This assignment is closed.',
-    reason: 'disabled',
+    reason: 'closed',
     type: 'blocked',
   }
 );
@@ -22736,8 +22792,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
-  'Assignment list share actions should render prepared student-link availability, copy-disabled state, and disabled reason text.'
+  /function AssignmentListShareActions[\s\S]*AssignmentListSharePreviewAction[\s\S]*CopyAssignmentShareLinkButton[\s\S]*disabled=\{!action\.isAvailable\}[\s\S]*disabledReasonCode=\{action\.disabledReasonCode\}[\s\S]*disabledMessage=\{action\.disabledReason\}[\s\S]*AssignmentListShareDisabledReason/,
+  'Assignment list share actions should render prepared student-link availability, copy-disabled state, disabled reason code, and disabled reason text.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -22771,8 +22827,8 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /type AssignmentLifecycleStatus[\s\S]*getAssignmentListShareDisabledReason\(\s*lifecycleStatus: AssignmentLifecycleStatus/,
-  'Assignment list share-disabled copy should consume the explicit assignment lifecycle status contract.'
+  /AssignmentShareLinkDisabledReasonCode[\s\S]*shareDisabledReasonCode\?: AssignmentShareLinkDisabledReasonCode/,
+  'Assignment list share action state should preserve the shared student-link disabled reason code.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -22781,8 +22837,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListViewSource,
-  /buildAssignmentListCardActionView[\s\S]*buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReason: actionState\.shareDisabledReason,[\s\S]*label: actionState\.shareLabel,[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
-  'Assignment list card action view should render student-link actions through the shared share-action view helper.'
+  /buildAssignmentListCardActionView[\s\S]*buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode: actionState\.shareDisabledReasonCode,[\s\S]*disabledReason: actionState\.shareDisabledReason,[\s\S]*label: actionState\.shareLabel,[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug/,
+  'Assignment list card action view should render student-link actions with structured disabled reason codes through the shared share-action view helper.'
 );
 assert.match(
   assignmentListViewSource,
@@ -28243,11 +28299,13 @@ assert.deepEqual(
   {
     isPersisted: true,
     shareAvailability: {
+      disabledReasonCode: 'closed',
       isAvailable: false,
       lifecycleStatus: 'closed',
       sharePath: '/play/closed-share',
       shareSlug: 'closed-share',
     },
+    shareDisabledReasonCode: 'closed',
     shareDisabledReason:
       'This assignment is closed. Reopen it before sharing the student link.',
     shareLabel: 'Share link unavailable',
@@ -28273,11 +28331,13 @@ assert.deepEqual(
   {
     isPersisted: true,
     shareAvailability: {
+      disabledReasonCode: 'expired',
       isAvailable: false,
       lifecycleStatus: 'expired',
       sharePath: '/play/expired-share',
       shareSlug: 'expired-share',
     },
+    shareDisabledReasonCode: 'expired',
     shareDisabledReason:
       'This assignment link has expired. Students cannot open it from the assignment list.',
     shareLabel: 'Share link unavailable',
@@ -28302,11 +28362,13 @@ assert.deepEqual(
   {
     isPersisted: true,
     shareAvailability: {
+      disabledReasonCode: 'draft',
       isAvailable: false,
       lifecycleStatus: 'draft',
       sharePath: '/play/draft-share',
       shareSlug: 'draft-share',
     },
+    shareDisabledReasonCode: 'draft',
     shareDisabledReason:
       'Publish this assignment before sharing a student link.',
     shareLabel: 'Share link unavailable',
@@ -28361,11 +28423,13 @@ assert.deepEqual(
     actionState: {
       isPersisted: true,
       shareAvailability: {
+        disabledReasonCode: 'draft',
         isAvailable: false,
         lifecycleStatus: 'draft',
         sharePath: '/play/draft-share',
         shareSlug: 'draft-share',
       },
+      shareDisabledReasonCode: 'draft',
       shareDisabledReason:
         'Publish this assignment before sharing a student link.',
       shareLabel: 'Share link unavailable',
@@ -28380,6 +28444,7 @@ assert.deepEqual(
     resultAction: undefined,
     shareAction: {
       copyLabel: 'Copy student link',
+      disabledReasonCode: 'draft',
       disabledReason: 'Publish this assignment before sharing a student link.',
       isAvailable: false,
       label: 'Share link unavailable',
@@ -38254,6 +38319,7 @@ assert.deepEqual(
     }),
     shareAction: {
       copyLabel: 'Copy student link',
+      disabledReasonCode: 'expired',
       disabledReason:
         'This assignment link has expired. Students cannot open it from the results page.',
       isAvailable: false,
@@ -38337,6 +38403,7 @@ assert.deepEqual(
   }),
   {
     copyLabel: 'Copy student link',
+    disabledReasonCode: 'closed',
     disabledReason:
       'This assignment is closed. Reopen it before sharing the student link.',
     isAvailable: false,
@@ -38356,6 +38423,7 @@ assert.deepEqual(
   }),
   {
     copyLabel: 'Copy student link',
+    disabledReasonCode: 'draft',
     disabledReason: 'Publish this assignment before sharing a student link.',
     isAvailable: false,
     label: 'Student link unavailable',
@@ -38374,6 +38442,7 @@ assert.deepEqual(
   }),
   {
     copyLabel: 'Copy student link',
+    disabledReasonCode: 'expired',
     disabledReason:
       'This assignment link has expired. Students cannot open it from the results page.',
     isAvailable: false,

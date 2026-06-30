@@ -9,6 +9,7 @@ import { m } from '@/locale/paraglide/messages';
 export const ASSIGNMENT_SHARE_ROUTE_TARGET = '/play/$shareId';
 
 export type AssignmentShareLinkAvailability = {
+  disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   isAvailable: boolean;
   lifecycleStatus: AssignmentLifecycleStatus;
   sharePath: string;
@@ -22,6 +23,7 @@ export type AssignmentShareLinkAvailabilityState = Pick<
 
 export type AssignmentShareLinkActionView = {
   copyLabel: string;
+  disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledReason?: string;
   isAvailable: boolean;
   label: string;
@@ -30,6 +32,10 @@ export type AssignmentShareLinkActionView = {
   shareSlug: string;
   to: typeof ASSIGNMENT_SHARE_ROUTE_TARGET;
 };
+
+export type AssignmentShareLinkDisabledReasonCode =
+  | Exclude<AssignmentLifecycleStatus, 'open'>
+  | 'missing-share-slug';
 
 export const assignmentShareLinkActionCopy = {
   get copyLabel() {
@@ -53,7 +59,7 @@ export type AssignmentShareLinkCopyExecutionPlan =
   | {
       failureMessage: string;
       message: string;
-      reason: 'disabled' | 'missing-share-slug';
+      reason: AssignmentShareLinkDisabledReasonCode | 'disabled';
       type: 'blocked';
     }
   | {
@@ -117,31 +123,42 @@ export function buildAssignmentShareLinkAvailability({
     status,
   });
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+  const disabledReason = getAssignmentShareLinkDisabledReasonCode({
+    lifecycleStatus: availabilityState.lifecycleStatus,
+    shareSlug: normalizedShareSlug,
+  });
 
   return {
     ...availabilityState,
+    ...disabledReason,
+    isAvailable:
+      availabilityState.isAvailable && !disabledReason.disabledReasonCode,
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     shareSlug: normalizedShareSlug,
   };
 }
 
 export function buildAssignmentShareLinkActionView({
+  disabledReasonCode,
   disabledReason,
   isAvailable = true,
   label,
   shareSlug,
 }: {
+  disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledReason?: string;
   isAvailable?: boolean;
   label: string;
   shareSlug: string;
 }): AssignmentShareLinkActionView {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
+  const resolvedIsAvailable = isAvailable && !disabledReasonCode;
 
   return {
     copyLabel: assignmentShareLinkActionCopy.copyStudentLabel,
+    ...(disabledReasonCode ? { disabledReasonCode } : {}),
     ...(disabledReason ? { disabledReason } : {}),
-    isAvailable,
+    isAvailable: resolvedIsAvailable,
     label,
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
@@ -158,11 +175,13 @@ export function buildAssignmentShareUrl(shareSlug: string, baseUrl?: string) {
 export function buildAssignmentShareLinkCopyExecutionPlan({
   baseUrl,
   disabled,
+  disabledReasonCode,
   disabledMessage,
   shareSlug,
 }: {
   baseUrl?: string;
   disabled?: boolean;
+  disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledMessage?: string;
   shareSlug: string;
 }): AssignmentShareLinkCopyExecutionPlan {
@@ -170,7 +189,7 @@ export function buildAssignmentShareLinkCopyExecutionPlan({
     return {
       failureMessage: assignmentShareLinkActionCopy.failureMessage,
       message: disabledMessage ?? assignmentShareLinkActionCopy.failureMessage,
-      reason: 'disabled',
+      reason: disabledReasonCode ?? 'disabled',
       type: 'blocked',
     };
   }
@@ -221,4 +240,17 @@ function getRuntimeBaseUrl() {
   return normalizeShareBaseUrl(
     import.meta.env?.VITE_BASE_URL ?? 'http://localhost:3000'
   );
+}
+
+function getAssignmentShareLinkDisabledReasonCode({
+  lifecycleStatus,
+  shareSlug,
+}: {
+  lifecycleStatus: AssignmentLifecycleStatus;
+  shareSlug: string;
+}): { disabledReasonCode?: AssignmentShareLinkDisabledReasonCode } {
+  if (!shareSlug) return { disabledReasonCode: 'missing-share-slug' };
+  if (lifecycleStatus === 'open') return {};
+
+  return { disabledReasonCode: lifecycleStatus };
 }

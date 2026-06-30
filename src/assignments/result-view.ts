@@ -8,10 +8,7 @@ import type {
 } from '@/assignments/results';
 import { formatAssignmentDisplayTitle } from '@/assignments/assignment-display';
 import { buildAssignmentAttemptStatsView } from '@/assignments/attempt-stats';
-import {
-  type AssignmentLifecycleStatus,
-  getAssignmentStatusLabel,
-} from '@/assignments/lifecycle';
+import { getAssignmentStatusLabel } from '@/assignments/lifecycle';
 import {
   formatAttemptDuration,
   normalizeAttemptDurationSeconds,
@@ -79,6 +76,7 @@ import {
   type AssignmentShareLinkActionView,
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
+  type AssignmentShareLinkDisabledReasonCode,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import type { AssignmentSettingsInput } from '@/assignments/validation';
@@ -1024,13 +1022,13 @@ export function buildAssignmentResultHeaderShareAction({
     shareSlug,
     status,
   });
+  const disabledReasonCode = shareAvailability.disabledReasonCode;
 
   return buildAssignmentShareLinkActionView({
-    disabledReason: shareAvailability.isAvailable
-      ? undefined
-      : getAssignmentResultHeaderShareDisabledReason(
-          shareAvailability.lifecycleStatus
-        ),
+    disabledReasonCode,
+    disabledReason: disabledReasonCode
+      ? getAssignmentResultHeaderShareDisabledReason(disabledReasonCode)
+      : undefined,
     isAvailable: shareAvailability.isAvailable,
     label: shareAvailability.isAvailable
       ? assignmentResultPageCopy.openStudentLinkLabel
@@ -1040,17 +1038,21 @@ export function buildAssignmentResultHeaderShareAction({
 }
 
 function getAssignmentResultHeaderShareDisabledReason(
-  lifecycleStatus: AssignmentLifecycleStatus
+  reasonCode: AssignmentShareLinkDisabledReasonCode
 ) {
-  if (lifecycleStatus === 'expired') {
+  if (reasonCode === 'expired') {
     return assignmentResultPageCopy.studentLinkExpiredMessage;
   }
 
-  if (lifecycleStatus === 'closed') {
+  if (reasonCode === 'closed') {
     return assignmentResultPageCopy.studentLinkClosedMessage;
   }
 
-  return assignmentResultPageCopy.studentLinkDraftMessage;
+  if (reasonCode === 'draft') {
+    return assignmentResultPageCopy.studentLinkDraftMessage;
+  }
+
+  return undefined;
 }
 
 export function getAssignmentResultCompletedAttemptCount(

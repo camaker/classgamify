@@ -36,7 +36,6 @@ import {
   type AssignmentListStatusMetric,
 } from '@/assignments/list-summary';
 import {
-  type AssignmentLifecycleStatus,
   type AssignmentStatusAction,
   buildAssignmentStatusAction,
   getAssignmentStatusLabel,
@@ -60,6 +59,7 @@ import {
   buildAssignmentShareLinkAvailability,
   buildAssignmentShareLinkActionView,
   type AssignmentShareLinkAvailability,
+  type AssignmentShareLinkDisabledReasonCode,
 } from '@/assignments/share-link';
 import { resolveAssignmentSnapshotSource } from '@/assignments/snapshot';
 import { Routes } from '@/lib/routes';
@@ -91,6 +91,7 @@ export type AssignmentListCardStat = {
 export type AssignmentListCardActionState = {
   isPersisted: boolean;
   shareAvailability: AssignmentShareLinkAvailability;
+  shareDisabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   shareDisabledReason?: string;
   shareLabel: string;
   showResultsAction: boolean;
@@ -843,13 +844,15 @@ export function getAssignmentListCardActionState({
     shareSlug,
     status,
   });
-  const shareDisabledReason = shareAvailability.isAvailable
-    ? undefined
-    : getAssignmentListShareDisabledReason(shareAvailability.lifecycleStatus);
+  const shareDisabledReasonCode = shareAvailability.disabledReasonCode;
+  const shareDisabledReason = shareDisabledReasonCode
+    ? getAssignmentListShareDisabledReason(shareDisabledReasonCode)
+    : undefined;
 
   return {
     isPersisted: persisted,
     shareAvailability,
+    ...(shareDisabledReasonCode ? { shareDisabledReasonCode } : {}),
     ...(shareDisabledReason ? { shareDisabledReason } : {}),
     shareLabel: shareAvailability.isAvailable
       ? assignmentListActionCopy.openShareLink
@@ -895,8 +898,9 @@ export function buildAssignmentListCardActionView({
       : undefined,
     shareAction: actionState.showShareActions
       ? buildAssignmentShareLinkActionView({
+          disabledReasonCode: actionState.shareDisabledReasonCode,
           disabledReason: actionState.shareDisabledReason,
-          isAvailable: !actionState.shareDisabledReason,
+          isAvailable: actionState.shareAvailability.isAvailable,
           label: actionState.shareLabel,
           shareSlug: actionState.shareAvailability.shareSlug,
         })
@@ -906,17 +910,17 @@ export function buildAssignmentListCardActionView({
 }
 
 function getAssignmentListShareDisabledReason(
-  lifecycleStatus: AssignmentLifecycleStatus
+  reasonCode: AssignmentShareLinkDisabledReasonCode
 ) {
-  if (lifecycleStatus === 'closed') {
+  if (reasonCode === 'closed') {
     return m.assignment_list_share_link_closed();
   }
 
-  if (lifecycleStatus === 'expired') {
+  if (reasonCode === 'expired') {
     return m.assignment_list_share_link_expired();
   }
 
-  if (lifecycleStatus === 'draft') {
+  if (reasonCode === 'draft') {
     return m.assignment_list_share_link_draft();
   }
 

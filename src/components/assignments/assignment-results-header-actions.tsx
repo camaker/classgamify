@@ -97,6 +97,7 @@ function AssignmentResultsHeaderCopyShareAction({
   return (
     <CopyAssignmentShareLinkButton
       disabled={!shareAction.isAvailable}
+      disabledReasonCode={shareAction.disabledReasonCode}
       disabledMessage={shareAction.disabledReason}
       label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
