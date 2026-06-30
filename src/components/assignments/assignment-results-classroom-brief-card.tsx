@@ -249,7 +249,7 @@ function AssignmentResultsClassroomBriefCopyPreview({
       <div className="grid gap-3 lg:grid-cols-2">
         {copyArtifactPreviews.map((preview) => (
           <AssignmentResultsCopyArtifactPreview
-            key={preview.action}
+            key={preview.id}
             onResultAction={onResultAction}
             preview={preview}
           />

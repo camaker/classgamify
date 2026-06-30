@@ -218,11 +218,15 @@ export type AssignmentResultCopyArtifacts = {
 export type AssignmentResultCopyArtifactPreview = {
   action: AssignmentResultCopyAction;
   description: string;
+  id: AssignmentResultCopyArtifactPreviewId;
   label: string;
   metaItems: AssignmentResultCopyArtifactPreviewMetaItem[];
   summaryLabel: string;
   text: string;
 };
+
+export type AssignmentResultCopyArtifactPreviewId =
+  `preview:${AssignmentResultCopyAction}`;
 
 export type AssignmentResultCopyArtifactPreviewMetaItem = {
   key: AssignmentResultCopyArtifactPreviewMetaKey;
@@ -509,6 +513,7 @@ export function buildAssignmentResultCopyArtifactPreviews(
       {
         action: descriptor.action,
         description: actionCopy.description,
+        id: getAssignmentResultCopyArtifactPreviewId(descriptor.action),
         label: actionCopy.label,
         metaItems: buildAssignmentResultCopyArtifactPreviewMetaItems({
           action: descriptor.action,
@@ -525,6 +530,12 @@ export function buildAssignmentResultCopyArtifactPreviews(
       },
     ];
   });
+}
+
+export function getAssignmentResultCopyArtifactPreviewId(
+  action: AssignmentResultCopyAction
+): AssignmentResultCopyArtifactPreviewId {
+  return `preview:${action}`;
 }
 
 export function getAssignmentResultCopyArtifactPreviewSummary({

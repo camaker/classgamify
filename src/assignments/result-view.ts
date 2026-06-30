@@ -161,6 +161,7 @@ export {
   getAssignmentResultActionExecutionData,
   getAssignmentResultActionExecutionDataScope,
   getAssignmentResultCopyArtifactText,
+  getAssignmentResultCopyArtifactPreviewId,
   getAssignmentResultActionButtonId,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
@@ -172,6 +173,7 @@ export {
   type AssignmentResultActionDataSet,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
+  type AssignmentResultCopyArtifactPreviewId,
 } from '@/assignments/result-actions';
 
 export type AssignmentResultEmptyState = {

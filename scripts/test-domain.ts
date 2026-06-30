@@ -649,6 +649,7 @@ import {
   getAssignmentResultActionExecutionDataScope,
   getAssignmentResultActionButtonId,
   getAssignmentResultCopyArtifactText,
+  getAssignmentResultCopyArtifactPreviewId,
   getAssignmentResultActionDisabledReason,
   getAssignmentResultActionCopy,
   getAssignmentResultActionGate,
@@ -1689,8 +1690,13 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifactPreviews[\s\S]*assignmentResultActionDescriptors\.flatMap[\s\S]*getAssignmentResultActionCopy\(descriptor\.action\)[\s\S]*buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactPreviewSummary[\s\S]*getAssignmentResultCopyArtifactText/,
+  /buildAssignmentResultCopyArtifactPreviews[\s\S]*assignmentResultActionDescriptors\.flatMap[\s\S]*getAssignmentResultActionCopy\(descriptor\.action\)[\s\S]*getAssignmentResultCopyArtifactPreviewId\(descriptor\.action\)[\s\S]*buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*getAssignmentResultCopyArtifactPreviewSummary[\s\S]*getAssignmentResultCopyArtifactText/,
   'Assignment result copy artifact previews should derive labels, descriptions, metadata, summaries, and text from action descriptors and prepared artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /export type AssignmentResultCopyArtifactPreviewId[\s\S]*`preview:\$\{AssignmentResultCopyAction\}`/,
+  'Assignment result copy artifact previews should expose stable preview ids.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -5177,8 +5183,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*onResultAction=\{onResultAction\}/,
+  /function AssignmentResultsClassroomBriefCopyPreview[\s\S]*copyPreview\.label[\s\S]*AssignmentResultsCopyScopeView[\s\S]*copyScopeView=\{copyScopeView\}[\s\S]*copyArtifactPreviews\.map[\s\S]*AssignmentResultsCopyArtifactPreview[\s\S]*key=\{preview\.id\}[\s\S]*onResultAction=\{onResultAction\}/,
   'Assignment classroom brief copy preview should render prepared copy scope and copy artifact previews with the prepared result action handler.'
+);
+assert.doesNotMatch(
+  assignmentResultsClassroomBriefCardSource,
+  /key=\{preview\.action\}/,
+  'Assignment classroom brief copy preview cards should not key by action alone.'
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
@@ -35539,6 +35550,7 @@ assert.deepEqual(
     copyArtifactPreviews: scoredResultsPageView.copyArtifactPreviews.map(
       (preview) => [
         preview.action,
+        preview.id,
         preview.label,
         preview.actionButton.action,
         preview.actionButton.disabled,
@@ -35734,6 +35746,7 @@ assert.deepEqual(
     copyArtifactPreviews: [
       [
         'copy-brief',
+        'preview:copy-brief',
         'Copy brief',
         'copy-brief',
         false,
@@ -35751,6 +35764,7 @@ assert.deepEqual(
       ],
       [
         'copy-reteach-plan',
+        'preview:copy-reteach-plan',
         'Copy reteach plan',
         'copy-reteach-plan',
         false,
@@ -35768,6 +35782,7 @@ assert.deepEqual(
       ],
       [
         'copy-item-review',
+        'preview:copy-item-review',
         'Copy item review',
         'copy-item-review',
         false,
@@ -35780,6 +35795,7 @@ assert.deepEqual(
       ],
       [
         'copy-follow-up',
+        'preview:copy-follow-up',
         'Copy follow-up',
         'copy-follow-up',
         false,
@@ -41772,10 +41788,15 @@ assert.equal(
   }),
   resultCopyArtifacts.studentFollowUpSummary.text
 );
+assert.equal(
+  getAssignmentResultCopyArtifactPreviewId('copy-brief'),
+  'preview:copy-brief'
+);
 assert.deepEqual(
   buildAssignmentResultCopyArtifactPreviews(resultCopyArtifacts).map(
     (preview) => [
       preview.action,
+      preview.id,
       preview.label,
       preview.description,
       preview.summaryLabel,
@@ -41790,6 +41811,7 @@ assert.deepEqual(
   [
     [
       'copy-brief',
+      'preview:copy-brief',
       'Copy brief',
       'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
       'Focus items: 2 · Follow-up students: 3',
@@ -41806,6 +41828,7 @@ assert.deepEqual(
     ],
     [
       'copy-reteach-plan',
+      'preview:copy-reteach-plan',
       'Copy reteach plan',
       'Copy a lesson-ready script for the weakest items and priority students.',
       'Review items: 2 · Priority students: 3',
@@ -41822,6 +41845,7 @@ assert.deepEqual(
     ],
     [
       'copy-item-review',
+      'preview:copy-item-review',
       'Copy item review',
       'Copy prompt-level performance with expected answers, alternatives, and notes.',
       'Reviewed items with answers and notes: 2',
@@ -41833,6 +41857,7 @@ assert.deepEqual(
     ],
     [
       'copy-follow-up',
+      'preview:copy-follow-up',
       'Copy follow-up',
       'Copy a student-by-student support list sorted by review need.',
       'Students sorted by follow-up need: 4',
@@ -41860,6 +41885,7 @@ assert.deepEqual(
     latestAttemptResultCopyArtifacts
   ).map((preview) => [
     preview.action,
+    preview.id,
     preview.metaItems
       .filter(
         (metaItem) =>
@@ -41872,6 +41898,7 @@ assert.deepEqual(
   [
     [
       'copy-brief',
+      'preview:copy-brief',
       [
         ['latest-attempts', 'Latest attempts', '1'],
         ['latest-attempt-times', 'Attempt times', '1'],
@@ -41880,15 +41907,17 @@ assert.deepEqual(
     ],
     [
       'copy-reteach-plan',
+      'preview:copy-reteach-plan',
       [
         ['latest-attempts', 'Latest attempts', '1'],
         ['latest-attempt-times', 'Attempt times', '1'],
         ['student-last-submitted', 'Student last submitted', '1'],
       ],
     ],
-    ['copy-item-review', []],
+    ['copy-item-review', 'preview:copy-item-review', []],
     [
       'copy-follow-up',
+      'preview:copy-follow-up',
       [
         ['latest-attempts', 'Latest attempts', '2'],
         ['latest-attempt-times', 'Attempt times', '2'],
