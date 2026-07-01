@@ -9,6 +9,7 @@ import type {
   AssignmentResultActionButton,
   AssignmentResultClassroomBriefSectionViews,
   AssignmentResultCopyArtifactPreview,
+  AssignmentResultCopyArtifactPreviewScope,
   AssignmentResultCopyScopeView,
   AssignmentResultSectionView,
 } from '@/assignments/result-view';
@@ -326,6 +327,9 @@ function AssignmentResultsCopyArtifactPreview({
         actionButton={preview.actionButton}
         disabledReasonId={disabledReasonId}
       />
+      <AssignmentResultsCopyArtifactPreviewScope
+        copyScopeView={preview.copyScopeView}
+      />
       <div className="grid gap-2">
         <p className="font-medium text-xs">{preview.summaryLabel}</p>
         <div className="flex flex-wrap gap-2">
@@ -344,6 +348,40 @@ function AssignmentResultsCopyArtifactPreview({
         {preview.text}
       </pre>
     </article>
+  );
+}
+
+function AssignmentResultsCopyArtifactPreviewScope({
+  copyScopeView,
+}: {
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+}) {
+  return (
+    <div className="grid gap-2 rounded-md bg-muted/30 p-2 text-xs">
+      <p className="font-medium">{copyScopeView.title}</p>
+      <div className="flex flex-wrap gap-2">
+        {copyScopeView.itemViews.map((itemView) => (
+          <Badge key={itemView.id} variant="outline" className="rounded-md">
+            <span>{itemView.label}</span>
+            <span className="ml-1 font-medium">{itemView.value}</span>
+          </Badge>
+        ))}
+      </div>
+      {copyScopeView.summaryItems.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {copyScopeView.summaryItems.map((summaryItem) => (
+            <Badge
+              key={summaryItem.id}
+              variant="secondary"
+              className="rounded-md"
+            >
+              <span>{summaryItem.label}</span>
+              <span className="ml-1 font-medium">{summaryItem.value}</span>
+            </Badge>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 

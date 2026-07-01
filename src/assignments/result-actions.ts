@@ -226,6 +226,7 @@ export type AssignmentResultCopyArtifacts = {
 export type AssignmentResultCopyArtifactPreview = {
   action: AssignmentResultCopyAction;
   actionButtonId: AssignmentResultActionButtonId;
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
   dataScope: Extract<AssignmentResultActionDataScope, 'current-review'>;
   description: string;
   id: AssignmentResultCopyArtifactPreviewId;
@@ -237,6 +238,37 @@ export type AssignmentResultCopyArtifactPreview = {
 
 export type AssignmentResultCopyArtifactPreviewId =
   `preview:${AssignmentResultCopyAction}`;
+
+export type AssignmentResultCopyArtifactPreviewScopeItemId =
+  | 'items'
+  | 'review'
+  | 'students';
+
+export type AssignmentResultCopyArtifactPreviewScopeItem = {
+  description: string;
+  id: AssignmentResultCopyArtifactPreviewScopeItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentResultCopyArtifactPreviewScopeSummaryItemId =
+  | 'answer-reviews'
+  | 'attempts'
+  | 'items'
+  | 'students';
+
+export type AssignmentResultCopyArtifactPreviewScopeSummaryItem = {
+  id: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentResultCopyArtifactPreviewScope = {
+  description: string;
+  itemViews: AssignmentResultCopyArtifactPreviewScopeItem[];
+  summaryItems: AssignmentResultCopyArtifactPreviewScopeSummaryItem[];
+  title: string;
+};
 
 export type AssignmentResultCopyArtifactPreviewMetaItem = {
   key: AssignmentResultCopyArtifactPreviewMetaKey;
@@ -511,9 +543,13 @@ export function getAssignmentResultCopyArtifactText({
   return artifacts.studentFollowUpSummary.text;
 }
 
-export function buildAssignmentResultCopyArtifactPreviews(
-  artifacts: AssignmentResultCopyArtifacts
-): AssignmentResultCopyArtifactPreview[] {
+export function buildAssignmentResultCopyArtifactPreviews({
+  artifacts,
+  copyScopeView,
+}: {
+  artifacts: AssignmentResultCopyArtifacts;
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+}): AssignmentResultCopyArtifactPreview[] {
   return assignmentResultActionDescriptors.flatMap((descriptor) => {
     if (descriptor.kind !== 'copy-text') return [];
 
@@ -523,6 +559,8 @@ export function buildAssignmentResultCopyArtifactPreviews(
       {
         action: descriptor.action,
         actionButtonId: getAssignmentResultActionButtonId(descriptor),
+        copyScopeView:
+          buildAssignmentResultCopyArtifactPreviewScope(copyScopeView),
         dataScope: descriptor.dataScope,
         description: actionCopy.description,
         id: getAssignmentResultCopyArtifactPreviewId(descriptor.action),
@@ -542,6 +580,26 @@ export function buildAssignmentResultCopyArtifactPreviews(
       },
     ];
   });
+}
+
+function buildAssignmentResultCopyArtifactPreviewScope(
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope
+): AssignmentResultCopyArtifactPreviewScope {
+  return {
+    description: copyScopeView.description,
+    itemViews: copyScopeView.itemViews.map((itemView) => ({
+      description: itemView.description,
+      id: itemView.id,
+      label: itemView.label,
+      value: itemView.value,
+    })),
+    summaryItems: copyScopeView.summaryItems.map((summaryItem) => ({
+      id: summaryItem.id,
+      label: summaryItem.label,
+      value: summaryItem.value,
+    })),
+    title: copyScopeView.title,
+  };
 }
 
 export function getAssignmentResultCopyArtifactPreviewId(

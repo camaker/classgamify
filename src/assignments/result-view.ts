@@ -171,6 +171,7 @@ export {
   type AssignmentResultActionDataSet,
   type AssignmentResultCopyActionData,
   type AssignmentResultCopyArtifactPreview,
+  type AssignmentResultCopyArtifactPreviewScope,
   type AssignmentResultCopyArtifactPreviewId,
 } from '@/assignments/result-actions';
 
@@ -441,10 +442,23 @@ export type AssignmentResultCopyScopeItemView = {
   value: string;
 };
 
+type AssignmentResultCopyScopeSummaryItemId =
+  | 'answer-reviews'
+  | 'attempts'
+  | 'items'
+  | 'students';
+
+export type AssignmentResultCopyScopeSummaryItemView = {
+  id: AssignmentResultCopyScopeSummaryItemId;
+  label: string;
+  value: string;
+};
+
 export type AssignmentResultCopyScopeView = {
   description: string;
   itemViews: AssignmentResultCopyScopeItemView[];
   summary?: AssignmentResultReviewScopeSummary;
+  summaryItems: AssignmentResultCopyScopeSummaryItemView[];
   title: string;
 };
 
@@ -632,6 +646,12 @@ export const assignmentResultSearchCopy = {
 } as const;
 
 export const assignmentResultCopyScopeCopy = {
+  get answerReviewsLabel() {
+    return m.assignment_result_copy_scope_summary_answer_reviews();
+  },
+  get attemptsLabel() {
+    return m.assignment_result_copy_scope_summary_attempts();
+  },
   get description() {
     return m.assignment_result_copy_scope_description();
   },
@@ -640,6 +660,12 @@ export const assignmentResultCopyScopeCopy = {
   },
   get reviewLabel() {
     return m.assignment_result_copy_scope_review_label();
+  },
+  get summaryItemsLabel() {
+    return m.assignment_result_copy_scope_summary_items();
+  },
+  get summaryStudentsLabel() {
+    return m.assignment_result_copy_scope_summary_students();
   },
   get studentLabel() {
     return m.assignment_result_copy_scope_student_label();
@@ -2043,22 +2069,23 @@ export function buildAssignmentResultsPageViewModel<
     sectionState,
   });
   const copyArtifactPreviews = copyArtifacts
-    ? buildAssignmentResultCopyArtifactPreviews(copyArtifacts).flatMap(
-        (preview) => {
-          const actionButton = actionButtons.find(
-            (button) => button.id === preview.actionButtonId
-          );
+    ? buildAssignmentResultCopyArtifactPreviews({
+        artifacts: copyArtifacts,
+        copyScopeView,
+      }).flatMap((preview) => {
+        const actionButton = actionButtons.find(
+          (button) => button.id === preview.actionButtonId
+        );
 
-          return actionButton
-            ? [
-                {
-                  ...preview,
-                  actionButton,
-                },
-              ]
-            : [];
-        }
-      )
+        return actionButton
+          ? [
+              {
+                ...preview,
+                actionButton,
+              },
+            ]
+          : [];
+      })
     : [];
 
   return {
@@ -2253,8 +2280,55 @@ export function buildAssignmentResultCopyScopeView({
       },
     ],
     ...(summary ? { summary } : {}),
+    summaryItems: summary
+      ? buildAssignmentResultCopyScopeSummaryItems(summary)
+      : [],
     title: assignmentResultCopyScopeCopy.title,
   };
+}
+
+function buildAssignmentResultCopyScopeSummaryItems(
+  summary: AssignmentResultReviewScopeSummary
+): AssignmentResultCopyScopeSummaryItemView[] {
+  return [
+    {
+      id: 'students',
+      label: assignmentResultCopyScopeCopy.summaryStudentsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
+    },
+    {
+      id: 'attempts',
+      label: assignmentResultCopyScopeCopy.attemptsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
+    },
+    {
+      id: 'items',
+      label: assignmentResultCopyScopeCopy.summaryItemsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(
+        summary.itemPerformance
+      ),
+    },
+    {
+      id: 'answer-reviews',
+      label: assignmentResultCopyScopeCopy.answerReviewsLabel,
+      value: formatAssignmentResultCopyScopeSummaryCount(
+        summary.attemptReviews
+      ),
+    },
+  ];
+}
+
+function formatAssignmentResultCopyScopeSummaryCount({
+  matched,
+  total,
+}: {
+  matched: number;
+  total: number;
+}) {
+  return m.assignment_result_copy_scope_summary_count({
+    matched: formatAssignmentResultNumber(matched, { min: 0 }),
+    total: formatAssignmentResultNumber(total, { min: 0 }),
+  });
 }
 
 function resolveAssignmentResultControlOption<TValue extends string>(
