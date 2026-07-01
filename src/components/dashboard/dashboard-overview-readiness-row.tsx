@@ -14,6 +14,9 @@ export function DashboardOverviewReadinessRow({
         <span>{row.label}</span>
         <span className="text-muted-foreground">{row.value}%</span>
       </div>
+      <p className="text-muted-foreground text-xs leading-5">
+        {row.description}
+      </p>
       <Progress value={row.value} />
     </div>
   );

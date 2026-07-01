@@ -26516,23 +26516,41 @@ assert.deepEqual(
       value: '-',
     },
     {
-      description: 'Template families represented by your active activities',
+      description: 'Loading template coverage...',
       id: 'templates',
       label: 'Templates',
-      value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
+      value: '-',
     },
     {
-      description: 'Open classroom share links',
+      description: 'Loading classroom share links...',
       id: 'assignments',
       label: 'Assignments',
       value: '-',
     },
     {
-      description: '0 submitted attempts logged',
+      description: 'Loading submitted attempts...',
       id: 'results',
       label: 'Results',
-      value: '0%',
+      value: '-',
     },
+  ]
+);
+assert.deepEqual(
+  buildDashboardOverviewMetrics({
+    activitiesLoading: true,
+    assignmentSummary: {
+      averageScore: 82.6,
+      completions: 14,
+      openAssignments: 3,
+      totalAssignments: 6,
+    },
+    assignmentsLoading: false,
+  }).map((metric) => [metric.id, metric.value, metric.description]),
+  [
+    ['activities', '-', 'Loading your library...'],
+    ['templates', '-', 'Loading template coverage...'],
+    ['assignments', '3', '3 open links across 6 assignments'],
+    ['results', '83%', '14 submitted attempts logged'],
   ]
 );
 assert.deepEqual(
@@ -26552,19 +26570,19 @@ assert.deepEqual(
   }),
   [
     {
-      description: '2 drafts in your active library',
+      description: '2 drafts across 9 active activities',
       id: 'activities',
       label: 'Activities',
       value: '9',
     },
     {
-      description: 'Template families represented by your active activities',
+      description: `5 of ${ACTIVITY_TEMPLATE_TYPES.length} template families represented by active activities`,
       id: 'templates',
       label: 'Templates',
       value: `5/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
     {
-      description: 'Open classroom share links',
+      description: '3 open links across 6 assignments',
       id: 'assignments',
       label: 'Assignments',
       value: '3',
@@ -26639,6 +26657,20 @@ const loadingDashboardOverviewRouteView = buildDashboardOverviewRouteViewModel({
   assignmentsData: null,
   assignmentsLoading: false,
 });
+const partiallyLoadedDashboardOverviewRouteView =
+  buildDashboardOverviewRouteViewModel({
+    activitiesData: null,
+    activitiesLoading: true,
+    assignmentsData: {
+      summary: {
+        averageScore: 90,
+        completions: 2,
+        openAssignments: 1,
+        totalAssignments: 1,
+      },
+    },
+    assignmentsLoading: false,
+  });
 const dashboardOverviewStarterPreview = buildDashboardOverviewStarterPreview();
 const dashboardStarterPreviewOnlyPageView = buildDashboardOverviewPageViewModel(
   {
@@ -26672,26 +26704,42 @@ assert.deepEqual(
     previewAssignmentId:
       dashboardStarterPreviewOnlyPageView.preview.assignment.id,
     readinessValues: dashboardStarterPreviewOnlyPageView.readinessRows.map(
-      (row) => [row.id, row.value]
+      (row) => [row.id, row.value, row.description]
     ),
   },
   {
     metricValues: [
-      ['activities', '-', '0 drafts in your active library'],
+      ['activities', '0', '0 drafts across 0 active activities'],
       [
         'templates',
         `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
-        'Template families represented by your active activities',
+        `0 of ${ACTIVITY_TEMPLATE_TYPES.length} template families represented by active activities`,
       ],
-      ['assignments', '-', 'Open classroom share links'],
+      ['assignments', '0', '0 open links across 0 assignments'],
       ['results', '0%', '0 submitted attempts logged'],
     ],
     previewAssignmentId: 'assignment-food-demo',
     readinessValues: [
-      ['activity-authoring', 0],
-      ['assignment-links', 0],
-      ['student-runner', 0],
-      ['teacher-results', 0],
+      [
+        'activity-authoring',
+        0,
+        'Create a reusable activity before publishing a class link.',
+      ],
+      [
+        'assignment-links',
+        0,
+        'Publish an activity to create the first student share link.',
+      ],
+      [
+        'student-runner',
+        0,
+        'Open assignment links will let students play the frozen snapshot.',
+      ],
+      [
+        'teacher-results',
+        0,
+        'Results appear after students submit scored attempts.',
+      ],
     ],
   }
 );
@@ -26711,21 +26759,53 @@ assert.deepEqual(
   {
     loadingDescription:
       loadingDashboardOverviewRouteView.metrics[0]?.description,
+    partialAssignmentMetric:
+      partiallyLoadedDashboardOverviewRouteView.metrics[2],
+    partialResultMetric: partiallyLoadedDashboardOverviewRouteView.metrics[3],
     metricIds: dashboardOverviewRouteView.metrics.map((metric) => metric.id),
     readinessValues: dashboardOverviewRouteView.readinessRows.map((row) => [
       row.id,
       row.value,
+      row.description,
     ]),
     resultMetric: dashboardOverviewRouteView.metrics[3]?.value,
   },
   {
     loadingDescription: 'Loading your library...',
+    partialAssignmentMetric: {
+      description: '1 open link across 1 assignment',
+      id: 'assignments',
+      label: 'Assignments',
+      value: '1',
+    },
+    partialResultMetric: {
+      description: '2 submitted attempts logged',
+      id: 'results',
+      label: 'Results',
+      value: '90%',
+    },
     metricIds: ['activities', 'templates', 'assignments', 'results'],
     readinessValues: [
-      ['activity-authoring', 100],
-      ['assignment-links', 100],
-      ['student-runner', 100],
-      ['teacher-results', 100],
+      [
+        'activity-authoring',
+        100,
+        '9 active activities are ready for editing, duplication, or publishing.',
+      ],
+      [
+        'assignment-links',
+        100,
+        '3 open assignment links can receive student work.',
+      ],
+      [
+        'student-runner',
+        100,
+        '14 submitted attempts prove the student loop is active.',
+      ],
+      [
+        'teacher-results',
+        100,
+        '14 scored attempts are available for review.',
+      ],
     ],
     resultMetric: '83%',
   }
@@ -26737,36 +26817,58 @@ assert.deepEqual(
     readinessValues: dashboardOverviewPageView.readinessRows.map((row) => [
       row.id,
       row.value,
+      row.description,
     ]),
   },
   {
     actionCardIds: ['activities', 'assignments', 'student-preview'],
     metricIds: ['activities', 'templates', 'assignments', 'results'],
     readinessValues: [
-      ['activity-authoring', 100],
-      ['assignment-links', 100],
-      ['student-runner', 100],
-      ['teacher-results', 100],
+      [
+        'activity-authoring',
+        100,
+        '9 active activities are ready for editing, duplication, or publishing.',
+      ],
+      [
+        'assignment-links',
+        100,
+        '3 open assignment links can receive student work.',
+      ],
+      [
+        'student-runner',
+        100,
+        '14 submitted attempts prove the student loop is active.',
+      ],
+      [
+        'teacher-results',
+        100,
+        '14 scored attempts are available for review.',
+      ],
     ],
   }
 );
 assert.deepEqual(buildDashboardCoreLoopReadiness(), [
   {
+    description: 'Create a reusable activity before publishing a class link.',
     id: 'activity-authoring',
     label: 'Activity authoring',
     value: 0,
   },
   {
+    description: 'Publish an activity to create the first student share link.',
     id: 'assignment-links',
     label: 'Assignment links',
     value: 0,
   },
   {
+    description:
+      'Open assignment links will let students play the frozen snapshot.',
     id: 'student-runner',
     label: 'Student runner',
     value: 0,
   },
   {
+    description: 'Results appear after students submit scored attempts.',
     id: 'teacher-results',
     label: 'Teacher results',
     value: 0,
@@ -26788,21 +26890,27 @@ assert.deepEqual(
   }),
   [
     {
+      description:
+        '1 active activities are ready for editing, duplication, or publishing.',
       id: 'activity-authoring',
       label: 'Activity authoring',
       value: 100,
     },
     {
+      description: 'Publish an activity to create the first student share link.',
       id: 'assignment-links',
       label: 'Assignment links',
       value: 0,
     },
     {
+      description:
+        'Open assignment links will let students play the frozen snapshot.',
       id: 'student-runner',
       label: 'Student runner',
       value: 0,
     },
     {
+      description: 'Results appear after students submit scored attempts.',
       id: 'teacher-results',
       label: 'Teacher results',
       value: 0,
@@ -26825,21 +26933,26 @@ assert.deepEqual(
   }),
   [
     {
+      description:
+        '2 active activities are ready for editing, duplication, or publishing.',
       id: 'activity-authoring',
       label: 'Activity authoring',
       value: 100,
     },
     {
+      description: '1 open assignment link can receive student work.',
       id: 'assignment-links',
       label: 'Assignment links',
       value: 100,
     },
     {
+      description: '1 open link is ready for students to start.',
       id: 'student-runner',
       label: 'Student runner',
       value: 75,
     },
     {
+      description: 'Results appear after students submit scored attempts.',
       id: 'teacher-results',
       label: 'Teacher results',
       value: 0,
@@ -26862,21 +26975,27 @@ assert.deepEqual(
   }),
   [
     {
+      description:
+        '3 active activities are ready for editing, duplication, or publishing.',
       id: 'activity-authoring',
       label: 'Activity authoring',
       value: 100,
     },
     {
+      description:
+        '2 assignments exist, but none are currently open to students.',
       id: 'assignment-links',
       label: 'Assignment links',
       value: 60,
     },
     {
+      description: '8 submitted attempts prove the student loop is active.',
       id: 'student-runner',
       label: 'Student runner',
       value: 100,
     },
     {
+      description: '8 scored attempts are available for review.',
       id: 'teacher-results',
       label: 'Teacher results',
       value: 100,
@@ -26899,21 +27018,27 @@ assert.deepEqual(
   }),
   [
     {
+      description: 'Create a reusable activity before publishing a class link.',
       id: 'activity-authoring',
       label: 'Activity authoring',
       value: 0,
     },
     {
+      description:
+        '1 assignment exists, but it is not currently open to students.',
       id: 'assignment-links',
       label: 'Assignment links',
       value: 60,
     },
     {
+      description:
+        '1 assignment exists; reopen or publish one to test student work.',
       id: 'student-runner',
       label: 'Student runner',
       value: 40,
     },
     {
+      description: 'Results appear after students submit scored attempts.',
       id: 'teacher-results',
       label: 'Teacher results',
       value: 0,
@@ -27007,8 +27132,8 @@ assert.match(
 );
 assert.match(
   dashboardOverviewReadinessRowSource,
-  /Progress/,
-  'Dashboard overview readiness component should own readiness progress rendering.'
+  /row\.description[\s\S]*Progress/,
+  'Dashboard overview readiness component should render prepared row descriptions and own progress rendering.'
 );
 assert.match(
   dashboardOverviewActionCardSource,
@@ -27053,6 +27178,16 @@ assert.doesNotMatch(
   `${dashboardOverviewMetricsSource}\n${dashboardOverviewReadinessSource}`,
   /preview|starter|getStarterActivity|getStarterAssignment|getStarterActivities|getStarterAssignments/,
   'Dashboard metrics and readiness should not consume starter-preview data.'
+);
+assert.match(
+  dashboardOverviewMetricsSource,
+  /activitiesLoading[\s\S]*assignmentsLoading[\s\S]*resolvedActivitiesLoading[\s\S]*resolvedAssignmentsLoading/,
+  'Dashboard metrics should keep activity and assignment loading states separate so loaded owner-scoped summaries are not hidden by unrelated queries.'
+);
+assert.match(
+  dashboardOverviewReadinessSource,
+  /description:[\s\S]*dashboard_overview_readiness_activity_authoring[\s\S]*description: getDashboardAssignmentLinkReadinessDescription[\s\S]*description: getDashboardStudentRunnerReadinessDescription[\s\S]*dashboard_overview_readiness_teacher_results/,
+  'Dashboard readiness rows should expose localized next-step descriptions from the dashboard domain.'
 );
 assert.doesNotMatch(
   dashboardOverviewRouteSource,
