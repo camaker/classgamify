@@ -14,6 +14,7 @@ export type ActivityRunnerCopy = {
   inputPlaceholder: string;
   itemListLabel?: string;
   listeningPromptLabel?: string;
+  listeningReadinessLabel?: string;
   playAudioLabel?: string;
   progressVerb: string;
   sequenceItemLabel?: string;
@@ -77,6 +78,7 @@ export function getActivityRunnerKindCopy(
       helpText: m.activity_runner_listening_help(),
       inputPlaceholder: m.activity_runner_listening_placeholder(),
       listeningPromptLabel: m.activity_runner_listening_prompt_label(),
+      listeningReadinessLabel: m.activity_runner_listening_readiness_label(),
       playAudioLabel: m.activity_runner_play_audio(),
       progressVerb: m.activity_runner_progress_answered(),
       sequenceItemLabel: m.activity_runner_listening_track_label(),

@@ -6380,6 +6380,31 @@ assert.match(
   /buildListeningPromptView/,
   'Listening runner should delegate speech language and transcript visibility to the listening prompt view helper.'
 );
+assert.match(
+  listeningRunnerSource,
+  /speechSupported,[\s\S]*\}\)/,
+  'Listening runner should pass browser speech support into the listening prompt view helper.'
+);
+assert.match(
+  listeningRunnerSource,
+  /<dl[\s\S]*aria-label=\{copy\.listeningReadinessLabel\}[\s\S]*activePromptView\.statusItemViews\.map/,
+  'Listening runner should render the listening readiness status list prepared by the prompt view helper.'
+);
+assert.match(
+  listeningRunnerSource,
+  /aria-describedby=\{`\$\{playDescriptionId\} \$\{describedBy\}`\}/,
+  'Listening runner play control should describe speech support, help, and readiness status.'
+);
+assert.match(
+  listeningRunnerSource,
+  /aria-describedby=\{`\$\{inputDescriptionId\} \$\{describedBy\}`\}/,
+  'Listening runner answer input should describe transcript visibility, help, and readiness status.'
+);
+assert.match(
+  listeningRunnerSource,
+  /activePromptView\?\.transcriptText/,
+  'Listening runner should render transcripts only from the listening prompt view helper.'
+);
 assert.doesNotMatch(
   listeningRunnerSource,
   /normalizeListeningSpeechLanguage|isSameRuntimeChoice|activeItem\.choices|answers\[activeItem\.id\]|revealAnswer \?[\s\S]*activeItem\.prompt/,
@@ -11051,6 +11076,7 @@ assert.deepEqual(getActivityRunnerKindCopy('listening'), {
   helpText: 'Use the play button, then answer what you heard.',
   inputPlaceholder: 'Type what you heard',
   listeningPromptLabel: 'Listen first',
+  listeningReadinessLabel: 'Listening readiness',
   playAudioLabel: 'Play audio',
   progressVerb: 'answered',
   sequenceItemLabel: 'Track',
@@ -34415,10 +34441,34 @@ assert.deepEqual(
     language: '中文',
     prompt: '今天天气很好。',
     revealAnswer: false,
+    speechSupported: false,
   }),
   {
     speechLanguage: 'zh-CN',
     speechText: '今天天气很好。',
+    statusItemViews: [
+      {
+        description:
+          'The browser voice uses this language when speaking the track.',
+        id: 'language',
+        label: 'Voice language',
+        value: 'zh-CN',
+      },
+      {
+        description:
+          'This browser cannot play the spoken track. Ask your teacher for another way to listen.',
+        id: 'speech',
+        label: 'Audio',
+        value: 'Not available',
+      },
+      {
+        description:
+          'The transcript stays hidden until review so you can answer from listening.',
+        id: 'transcript',
+        label: 'Transcript',
+        value: 'Hidden until review',
+      },
+    ],
     transcriptText: undefined,
   }
 );
@@ -34427,11 +34477,47 @@ assert.deepEqual(
     language: 'en_US',
     prompt: 'The weather is sunny.',
     revealAnswer: true,
+    speechSupported: true,
   }),
   {
     speechLanguage: 'en-US',
     speechText: 'The weather is sunny.',
+    statusItemViews: [
+      {
+        description:
+          'The browser voice uses this language when speaking the track.',
+        id: 'language',
+        label: 'Voice language',
+        value: 'en-US',
+      },
+      {
+        description: 'Audio playback is available in this browser.',
+        id: 'speech',
+        label: 'Audio',
+        value: 'Ready to play',
+      },
+      {
+        description:
+          'The transcript is visible now because this attempt is in review.',
+        id: 'transcript',
+        label: 'Transcript',
+        value: 'Visible in review',
+      },
+    ],
     transcriptText: 'The weather is sunny.',
+  }
+);
+assert.deepEqual(
+  buildListeningPromptView({
+    language: 'not a language tag!',
+    prompt: 'Fallback voice.',
+    revealAnswer: false,
+  }).statusItemViews[0],
+  {
+    description: 'The browser voice uses this language when speaking the track.',
+    id: 'language',
+    label: 'Voice language',
+    value: 'Device default',
   }
 );
 assert.deepEqual(

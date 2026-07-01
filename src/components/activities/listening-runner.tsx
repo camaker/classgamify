@@ -99,9 +99,10 @@ export function ListeningRunner({
             language,
             prompt: activeItem.prompt,
             revealAnswer,
+            speechSupported,
           })
         : undefined,
-    [activeItem, language, revealAnswer]
+    [activeItem, language, revealAnswer, speechSupported]
   );
 
   useEffect(() => {
@@ -133,6 +134,13 @@ export function ListeningRunner({
   if (!activeItem) {
     return null;
   }
+
+  const panelId = `listening-panel-${activeItem.id}`;
+  const helpId = `${panelId}-help`;
+  const statusId = `${panelId}-status`;
+  const playDescriptionId = `${panelId}-play-description`;
+  const inputDescriptionId = `${panelId}-input-description`;
+  const describedBy = `${helpId} ${statusId}`;
 
   return (
     <div className="rounded-lg border bg-card p-3">
@@ -195,6 +203,7 @@ export function ListeningRunner({
             <Button
               type="button"
               variant="outline"
+              aria-describedby={`${playDescriptionId} ${describedBy}`}
               disabled={!speechSupported}
               onClick={playPrompt}
             >
@@ -207,13 +216,46 @@ export function ListeningRunner({
             </Button>
           </div>
 
+          <p id={playDescriptionId} className="sr-only">
+            {
+              activePromptView?.statusItemViews.find(
+                (itemView) => itemView.id === 'speech'
+              )?.description
+            }
+          </p>
+
           <div className="mt-6 rounded-lg border bg-muted/20 p-4">
             <p className="text-xs font-medium uppercase text-muted-foreground">
               {copy.listeningPromptLabel}
             </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            <p
+              id={helpId}
+              className="mt-2 text-sm leading-6 text-muted-foreground"
+            >
               {copy.helpText}
             </p>
+            {activePromptView ? (
+              <dl
+                id={statusId}
+                aria-label={copy.listeningReadinessLabel}
+                className="mt-4 grid gap-2 sm:grid-cols-3"
+              >
+                {activePromptView.statusItemViews.map((itemView) => (
+                  <div
+                    key={itemView.id}
+                    className="rounded-md border bg-background px-3 py-2"
+                  >
+                    <dt className="text-xs font-medium text-muted-foreground">
+                      {itemView.label}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold">
+                      {itemView.value}
+                    </dd>
+                    <dd className="sr-only">{itemView.description}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
             {activePromptView?.transcriptText ? (
               <p className="mt-4 text-base font-semibold leading-7">
                 {activePromptView.transcriptText}
@@ -248,6 +290,7 @@ export function ListeningRunner({
             <Input
               value={runnerView.activeAnswer}
               disabled={disabled}
+              aria-describedby={`${inputDescriptionId} ${describedBy}`}
               onChange={(event) =>
                 onAnswerChange(activeItem.id, event.target.value)
               }
@@ -255,6 +298,14 @@ export function ListeningRunner({
               className="mt-4"
             />
           )}
+
+          <p id={inputDescriptionId} className="sr-only">
+            {
+              activePromptView?.statusItemViews.find(
+                (itemView) => itemView.id === 'transcript'
+              )?.description
+            }
+          </p>
 
           {revealAnswer && runnerView.activeReviewItem ? (
             <PublicAnswerFeedback

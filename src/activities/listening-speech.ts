@@ -1,3 +1,14 @@
+import { m } from '@/locale/paraglide/messages';
+
+export type ListeningPromptStatusItemId = 'language' | 'speech' | 'transcript';
+
+export type ListeningPromptStatusItemView = {
+  description: string;
+  id: ListeningPromptStatusItemId;
+  label: string;
+  value: string;
+};
+
 const SPEECH_LANGUAGE_ALIASES = new Map<string, string>([
   ['chinese', 'zh-CN'],
   ['mandarin', 'zh-CN'],
@@ -35,15 +46,75 @@ export function buildListeningPromptView({
   language,
   prompt,
   revealAnswer,
+  speechSupported = false,
 }: {
   language: string | null | undefined;
   prompt: string;
   revealAnswer: boolean;
+  speechSupported?: boolean;
 }) {
+  const speechLanguage = normalizeListeningSpeechLanguage(language);
+
   return {
-    speechLanguage: normalizeListeningSpeechLanguage(language),
+    speechLanguage,
     speechText: prompt,
+    statusItemViews: [
+      buildListeningLanguageStatusView(speechLanguage),
+      buildListeningSpeechSupportStatusView(speechSupported),
+      buildListeningTranscriptStatusView(revealAnswer),
+    ],
     transcriptText: revealAnswer ? prompt : undefined,
+  };
+}
+
+function buildListeningLanguageStatusView(
+  speechLanguage: string | undefined
+): ListeningPromptStatusItemView {
+  return {
+    description: m.activity_runner_listening_language_description(),
+    id: 'language',
+    label: m.activity_runner_listening_language_label(),
+    value: speechLanguage ?? m.activity_runner_listening_language_unknown(),
+  };
+}
+
+function buildListeningSpeechSupportStatusView(
+  speechSupported: boolean
+): ListeningPromptStatusItemView {
+  if (speechSupported) {
+    return {
+      description: m.activity_runner_listening_speech_available_description(),
+      id: 'speech',
+      label: m.activity_runner_listening_speech_status_label(),
+      value: m.activity_runner_listening_speech_available_value(),
+    };
+  }
+
+  return {
+    description: m.activity_runner_listening_speech_unavailable_description(),
+    id: 'speech',
+    label: m.activity_runner_listening_speech_status_label(),
+    value: m.activity_runner_listening_speech_unavailable_value(),
+  };
+}
+
+function buildListeningTranscriptStatusView(
+  revealAnswer: boolean
+): ListeningPromptStatusItemView {
+  if (revealAnswer) {
+    return {
+      description: m.activity_runner_listening_transcript_visible_description(),
+      id: 'transcript',
+      label: m.activity_runner_listening_transcript_status_label(),
+      value: m.activity_runner_listening_transcript_visible_value(),
+    };
+  }
+
+  return {
+    description: m.activity_runner_listening_transcript_hidden_description(),
+    id: 'transcript',
+    label: m.activity_runner_listening_transcript_status_label(),
+    value: m.activity_runner_listening_transcript_hidden_value(),
   };
 }
 
