@@ -104,6 +104,8 @@ export type AssignmentListSearchPanelView = {
 export type AssignmentListCardStatKey = 'average' | 'completions';
 
 export type AssignmentListCardStat = {
+  ariaLabel: string;
+  description: string;
   key: AssignmentListCardStatKey;
   label: string;
   value: string;
@@ -153,11 +155,15 @@ export type AssignmentListCardStats = {
 
 export type AssignmentListCardViewModel = {
   actionView: AssignmentListCardActionView;
+  actionsLabel: string;
   activityDescription: string;
+  ariaLabel: string;
   id: string;
   persisted: boolean;
   settingsSummaryView: AssignmentSettingsSummaryView;
   shareSlug: string;
+  statsLabel: string;
+  summaryLabel: string;
   status: AssignmentStatus;
   templateLabel: string;
   templateType: ActivityTemplateType;
@@ -467,7 +473,10 @@ export function buildAssignmentListSearchPanelView({
     }),
     hasSearchValue: Boolean(normalizedSearch),
     searchDescription: assignmentListSearchCopy.searchDescription,
-    statusDescription: statusView.description,
+    statusDescription: m.assignment_list_search_status_description({
+      description: statusView.description,
+      status: statusView.label,
+    }),
     statusLabel: statusView.label,
     statusMetrics: buildAssignmentListStatusMetrics(summary),
     statusOptions: assignmentStatusFilterOptions,
@@ -857,17 +866,38 @@ export function buildAssignmentListCardStats({
     averageScore,
     completions: normalizedCompletions,
   });
+  const completionsDescription =
+    m.assignment_list_card_stat_completions_description();
+  const completionsLabel = m.assignment_list_card_stat_completions();
+  const completionsValue = formatAssignmentResultNumber(statsView.completions, {
+    min: 0,
+  });
+  const averageDescription = m.assignment_list_card_stat_average_description();
+  const averageLabel = m.assignment_list_card_stat_average();
+  const averageValue = formatAssignmentResultPercent(statsView.averageScore);
 
   return [
     {
+      ariaLabel: formatAssignmentListCardStatAriaLabel({
+        description: completionsDescription,
+        label: completionsLabel,
+        value: completionsValue,
+      }),
+      description: completionsDescription,
       key: 'completions',
-      label: m.assignment_list_card_stat_completions(),
-      value: formatAssignmentResultNumber(statsView.completions, { min: 0 }),
+      label: completionsLabel,
+      value: completionsValue,
     },
     {
+      ariaLabel: formatAssignmentListCardStatAriaLabel({
+        description: averageDescription,
+        label: averageLabel,
+        value: averageValue,
+      }),
+      description: averageDescription,
       key: 'average',
-      label: m.assignment_list_card_stat_average(),
-      value: formatAssignmentResultPercent(statsView.averageScore),
+      label: averageLabel,
+      value: averageValue,
     },
   ];
 }
@@ -892,13 +922,28 @@ export function buildAssignmentListCardViewModel({
     shareSlug: assignment.shareSlug,
     status: assignment.status,
   });
+  const statusLabel = getAssignmentListCardStatusLabel({
+    expiresAt: assignment.expiresAt,
+    now,
+    persisted,
+    status: assignment.status,
+  });
+  const templateLabel = getTemplateByType(templateType).name;
+  const title = formatAssignmentDisplayTitle(assignment.title);
 
   return {
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
     }),
+    actionsLabel: m.assignment_list_card_actions_label({ title }),
     activityDescription: resolvedSource.activityDescription ?? '',
+    ariaLabel: m.assignment_list_card_aria_label({
+      shareSlug: actionState.shareAvailability.shareSlug,
+      status: statusLabel,
+      template: templateLabel,
+      title,
+    }),
     id: assignment.id,
     persisted,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -907,17 +952,14 @@ export function buildAssignmentListCardViewModel({
     }),
     shareSlug: actionState.shareAvailability.shareSlug,
     stats,
+    statsLabel: m.assignment_list_card_stats_label({ title }),
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
-    statusLabel: getAssignmentListCardStatusLabel({
-      expiresAt: assignment.expiresAt,
-      now,
-      persisted,
-      status: assignment.status,
-    }),
-    templateLabel: getTemplateByType(templateType).name,
+    statusLabel,
+    summaryLabel: m.assignment_list_card_summary_label({ title }),
+    templateLabel,
     templateType,
-    title: formatAssignmentDisplayTitle(assignment.title),
+    title,
   };
 }
 
@@ -937,13 +979,27 @@ export function buildStarterAssignmentListCardViewModel({
     shareSlug: assignment.shareId,
     status: assignment.status,
   });
+  const statusLabel = getAssignmentListCardStatusLabel({
+    expiresAt,
+    persisted,
+    status: assignment.status,
+  });
+  const templateLabel = getTemplateByType(activity.templateType).name;
+  const title = formatAssignmentDisplayTitle(assignment.title);
 
   return {
     actionView: buildAssignmentListCardActionView({
       actionState,
       assignmentId: assignment.id,
     }),
+    actionsLabel: m.assignment_list_card_actions_label({ title }),
     activityDescription: formatAssignmentDisplayText(activity.description),
+    ariaLabel: m.assignment_list_card_aria_label({
+      shareSlug: actionState.shareAvailability.shareSlug,
+      status: statusLabel,
+      template: templateLabel,
+      title,
+    }),
     id: assignment.id,
     persisted,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -952,16 +1008,14 @@ export function buildStarterAssignmentListCardViewModel({
     }),
     shareSlug: actionState.shareAvailability.shareSlug,
     stats,
+    statsLabel: m.assignment_list_card_stats_label({ title }),
     statItems: buildAssignmentListCardStats(stats),
     status: assignment.status,
-    statusLabel: getAssignmentListCardStatusLabel({
-      expiresAt,
-      persisted,
-      status: assignment.status,
-    }),
-    templateLabel: getTemplateByType(activity.templateType).name,
+    statusLabel,
+    summaryLabel: m.assignment_list_card_summary_label({ title }),
+    templateLabel,
     templateType: activity.templateType,
-    title: formatAssignmentDisplayTitle(assignment.title),
+    title,
   };
 }
 
@@ -1040,6 +1094,22 @@ export function getAssignmentListCardActionState({
 function normalizeAssignmentListCardStatCount(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.floor(Math.max(0, value));
+}
+
+function formatAssignmentListCardStatAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: string;
+}) {
+  return m.assignment_list_card_stat_aria_label({
+    description,
+    label,
+    value,
+  });
 }
 
 export function buildAssignmentListCardActionView({

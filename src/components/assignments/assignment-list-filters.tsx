@@ -100,23 +100,17 @@ export function AssignmentListFilters({
           id={statusFilterDescriptionId}
           className="text-xs leading-5 text-muted-foreground"
         >
-          <span className="font-medium text-foreground">
-            {searchPanelView.statusLabel}
-          </span>
-          {' - '}
           {searchPanelView.statusDescription}
         </p>
         <div className="flex flex-wrap gap-1.5">
           {searchPanelView.statusMetrics.map((metric) => (
-            <span
+            <output
               key={metric.status}
+              aria-label={metric.ariaLabel}
               className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
             >
-              <span className="font-medium text-foreground">
-                {metric.value}
-              </span>{' '}
-              {metric.label}
-            </span>
+              {metric.text}
+            </output>
           ))}
         </div>
       </div>

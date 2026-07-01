@@ -56,11 +56,16 @@ export function AssignmentListCard({ assignment }: AssignmentListCardProps) {
   }
 
   return (
-    <Card className="rounded-lg">
+    <Card
+      role="article"
+      aria-label={assignment.ariaLabel}
+      className="rounded-lg"
+    >
       <AssignmentListCardHeader assignment={assignment} />
       <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <AssignmentListCardSummary assignment={assignment} />
         <AssignmentListCardActions
+          label={assignment.actionsLabel}
           actionView={assignment.actionView}
           statusPending={updateStatusMutation.isPending}
           onUpdateStatus={updateStatus}
@@ -102,24 +107,32 @@ function AssignmentListCardSummary({
   assignment: AssignmentListCardViewModel;
 }) {
   return (
-    <div className="grid gap-4">
+    <section aria-label={assignment.summaryLabel} className="grid gap-4">
       <AssignmentSettingsSummary view={assignment.settingsSummaryView} />
-      <AssignmentListStats statItems={assignment.statItems} />
-    </div>
+      <AssignmentListStats
+        label={assignment.statsLabel}
+        statItems={assignment.statItems}
+      />
+    </section>
   );
 }
 
 function AssignmentListCardActions({
   actionView,
+  label,
   onUpdateStatus,
   statusPending,
 }: {
   actionView: AssignmentListCardActionView;
+  label: string;
   onUpdateStatus: () => void;
   statusPending: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+    <section
+      aria-label={label}
+      className="flex flex-col gap-2 sm:flex-row lg:flex-col"
+    >
       {actionView.resultAction ? (
         <AssignmentListResultActionLink action={actionView.resultAction} />
       ) : null}
@@ -136,7 +149,7 @@ function AssignmentListCardActions({
       {actionView.shareAction ? (
         <AssignmentListShareActions action={actionView.shareAction} />
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -154,7 +167,7 @@ function AssignmentListResultActionLink({
         'w-full bg-background lg:w-auto'
       )}
     >
-      <IconChartBar className="size-4" />
+      <IconChartBar aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -175,7 +188,7 @@ function AssignmentListPrintActionLink({
         'w-full bg-background lg:w-auto'
       )}
     >
-      <IconPrinter className="size-4" />
+      <IconPrinter aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -200,7 +213,7 @@ function AssignmentListStatusActionButton({
       disabled={disabled}
       onClick={onUpdateStatus}
     >
-      <Icon className="size-4" />
+      <Icon aria-hidden="true" className="size-4" />
       {statusAction.label}
     </Button>
   );
@@ -268,7 +281,7 @@ function AssignmentListSharePreviewAction({
         disabled
         aria-describedby={disabledReasonId}
       >
-        <IconPlayerPlay className="size-4" />
+        <IconPlayerPlay aria-hidden="true" className="size-4" />
         {action.label}
       </Button>
     );
@@ -280,7 +293,7 @@ function AssignmentListSharePreviewAction({
       params={{ shareId: action.shareSlug }}
       className={cn(buttonVariants(), 'w-full lg:w-auto')}
     >
-      <IconPlayerPlay className="size-4" />
+      <IconPlayerPlay aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );

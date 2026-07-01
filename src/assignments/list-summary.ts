@@ -37,7 +37,8 @@ export type AssignmentListSummaryMetricId =
   | 'average';
 
 export type AssignmentListSummaryMetric = {
-  description?: string;
+  ariaLabel: string;
+  description: string;
   id: AssignmentListSummaryMetricId;
   label: string;
   value: string;
@@ -49,8 +50,10 @@ export type AssignmentListFilterSummary = {
 };
 
 export type AssignmentListStatusMetric = {
+  ariaLabel: string;
   label: string;
   status: AssignmentStatusFilter;
+  text: string;
   value: string;
 };
 
@@ -129,38 +132,81 @@ export function buildAssignmentListSummaryMetrics({
     summary ?? buildEmptyAssignmentListSummary(totalAssignments)
   );
   const statsView = buildAssignmentAttemptStatsView(resolvedSummary);
+  const totalDescription = hasFilters
+    ? m.assignment_list_summary_matching_description()
+    : m.assignment_list_summary_assignments_description();
+  const totalLabel = hasFilters
+    ? m.assignment_list_summary_matching()
+    : m.assignment_list_summary_assignments();
+  const totalValue = formatAssignmentResultNumber(
+    resolvedSummary.totalAssignments,
+    {
+      min: 0,
+    }
+  );
+  const openDescription = formatAssignmentOpenLinksDescription(resolvedSummary);
+  const openLabel = m.assignment_list_summary_open_links();
+  const openValue = formatAssignmentResultNumber(
+    resolvedSummary.openAssignments,
+    {
+      min: 0,
+    }
+  );
+  const completionsDescription =
+    formatAssignmentCompletionsDescription(resolvedSummary);
+  const completionsLabel = m.assignment_list_summary_completions();
+  const completionsValue = formatAssignmentResultNumber(statsView.completions, {
+    min: 0,
+  });
+  const averageDescription =
+    formatAssignmentAverageDescription(resolvedSummary);
+  const averageLabel = m.assignment_list_summary_average();
+  const averageValue = formatAssignmentResultPercent(statsView.averageScore);
 
   return [
     {
+      ariaLabel: formatAssignmentListSummaryMetricAriaLabel({
+        description: totalDescription,
+        label: totalLabel,
+        value: totalValue,
+      }),
+      description: totalDescription,
       id: 'total',
-      label: hasFilters
-        ? m.assignment_list_summary_matching()
-        : m.assignment_list_summary_assignments(),
-      value: formatAssignmentResultNumber(resolvedSummary.totalAssignments, {
-        min: 0,
-      }),
+      label: totalLabel,
+      value: totalValue,
     },
     {
-      description: formatAssignmentOpenLinksDescription(resolvedSummary),
+      ariaLabel: formatAssignmentListSummaryMetricAriaLabel({
+        description: openDescription,
+        label: openLabel,
+        value: openValue,
+      }),
+      description: openDescription,
       id: 'open',
-      label: m.assignment_list_summary_open_links(),
-      value: formatAssignmentResultNumber(resolvedSummary.openAssignments, {
-        min: 0,
-      }),
+      label: openLabel,
+      value: openValue,
     },
     {
-      description: formatAssignmentCompletionsDescription(resolvedSummary),
+      ariaLabel: formatAssignmentListSummaryMetricAriaLabel({
+        description: completionsDescription,
+        label: completionsLabel,
+        value: completionsValue,
+      }),
+      description: completionsDescription,
       id: 'completions',
-      label: m.assignment_list_summary_completions(),
-      value: formatAssignmentResultNumber(statsView.completions, {
-        min: 0,
-      }),
+      label: completionsLabel,
+      value: completionsValue,
     },
     {
-      description: formatAssignmentAverageDescription(resolvedSummary),
+      ariaLabel: formatAssignmentListSummaryMetricAriaLabel({
+        description: averageDescription,
+        label: averageLabel,
+        value: averageValue,
+      }),
+      description: averageDescription,
       id: 'average',
-      label: m.assignment_list_summary_average(),
-      value: formatAssignmentResultPercent(statsView.averageScore),
+      label: averageLabel,
+      value: averageValue,
     },
   ];
 }
@@ -171,37 +217,115 @@ export function buildAssignmentListStatusMetrics(
   const resolvedSummary = normalizeAssignmentListSummaryForMetrics(
     summary ?? buildEmptyAssignmentListSummary()
   );
+  const openLabel = m.assignment_list_status_filter_published();
+  const openValue = formatAssignmentResultNumber(
+    resolvedSummary.openAssignments,
+    {
+      min: 0,
+    }
+  );
+  const closedLabel = m.assignment_list_status_filter_closed();
+  const closedValue = formatAssignmentResultNumber(
+    resolvedSummary.closedAssignments,
+    {
+      min: 0,
+    }
+  );
+  const expiredLabel = m.assignment_list_status_filter_expired();
+  const expiredValue = formatAssignmentResultNumber(
+    resolvedSummary.expiredAssignments,
+    {
+      min: 0,
+    }
+  );
+  const draftLabel = m.assignment_list_status_filter_draft();
+  const draftValue = formatAssignmentResultNumber(
+    resolvedSummary.draftAssignments,
+    {
+      min: 0,
+    }
+  );
 
   return [
     {
-      label: m.assignment_list_status_filter_published(),
+      ariaLabel: formatAssignmentListStatusMetricAriaLabel({
+        label: openLabel,
+        value: openValue,
+      }),
+      label: openLabel,
       status: 'open',
-      value: formatAssignmentResultNumber(resolvedSummary.openAssignments, {
-        min: 0,
+      text: formatAssignmentListStatusMetricAriaLabel({
+        label: openLabel,
+        value: openValue,
       }),
+      value: openValue,
     },
     {
-      label: m.assignment_list_status_filter_closed(),
+      ariaLabel: formatAssignmentListStatusMetricAriaLabel({
+        label: closedLabel,
+        value: closedValue,
+      }),
+      label: closedLabel,
       status: 'closed',
-      value: formatAssignmentResultNumber(resolvedSummary.closedAssignments, {
-        min: 0,
+      text: formatAssignmentListStatusMetricAriaLabel({
+        label: closedLabel,
+        value: closedValue,
       }),
+      value: closedValue,
     },
     {
-      label: m.assignment_list_status_filter_expired(),
+      ariaLabel: formatAssignmentListStatusMetricAriaLabel({
+        label: expiredLabel,
+        value: expiredValue,
+      }),
+      label: expiredLabel,
       status: 'expired',
-      value: formatAssignmentResultNumber(resolvedSummary.expiredAssignments, {
-        min: 0,
+      text: formatAssignmentListStatusMetricAriaLabel({
+        label: expiredLabel,
+        value: expiredValue,
       }),
+      value: expiredValue,
     },
     {
-      label: m.assignment_list_status_filter_draft(),
-      status: 'draft',
-      value: formatAssignmentResultNumber(resolvedSummary.draftAssignments, {
-        min: 0,
+      ariaLabel: formatAssignmentListStatusMetricAriaLabel({
+        label: draftLabel,
+        value: draftValue,
       }),
+      label: draftLabel,
+      status: 'draft',
+      text: formatAssignmentListStatusMetricAriaLabel({
+        label: draftLabel,
+        value: draftValue,
+      }),
+      value: draftValue,
     },
   ];
+}
+
+function formatAssignmentListSummaryMetricAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: string;
+}) {
+  return m.assignment_list_summary_metric_aria_label({
+    description,
+    label,
+    value,
+  });
+}
+
+function formatAssignmentListStatusMetricAriaLabel({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return m.assignment_list_status_metric_aria_label({ label, value });
 }
 
 function buildAssignmentListStatusCounts({

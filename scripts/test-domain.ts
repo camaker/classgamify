@@ -24504,8 +24504,18 @@ assert.match(
 );
 assert.match(
   assignmentListFiltersComponentSource,
-  /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
+  /searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
   'Assignment list filters component should explain the selected status filter and status counts from the domain view.'
+);
+assert.match(
+  assignmentListFiltersComponentSource,
+  /searchPanelView\.statusMetrics\.map[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.text/,
+  'Assignment list filters component should render prepared status metric text and aria labels from the domain view.'
+);
+assert.doesNotMatch(
+  assignmentListFiltersComponentSource,
+  /\{metric\.value\}[\s\S]*\{metric\.label\}|\{' - '\}/,
+  'Assignment list filters component should not compose visible status metric or status-description copy locally.'
 );
 assert.match(
   assignmentListViewSource,
@@ -24529,6 +24539,11 @@ assert.match(
 );
 assert.match(
   assignmentListScopePanelComponentSource,
+  /<dl[\s\S]*view\.items\.map[\s\S]*<dt[\s\S]*item\.label[\s\S]*<dd[\s\S]*item\.value[\s\S]*<dd[\s\S]*item\.description/,
+  'Assignment list scope panel should expose current-view scope items as a semantic description list.'
+);
+assert.match(
+  assignmentListScopePanelComponentSource,
   /function AssignmentListScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
   'Assignment list scope panel items should render prepared labels, values, and descriptions.'
 );
@@ -24544,8 +24559,8 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentListSummaryCardComponentSource,
-  /metric\.description[\s\S]*\{metric\.description\}/,
-  'Assignment list summary cards should render optional domain-provided metric descriptions.'
+  /role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.value[\s\S]*metric\.label[\s\S]*metric\.description/,
+  'Assignment list summary cards should render prepared metric values, descriptions, and aria labels.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -24559,8 +24574,13 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /export type AssignmentListCardStatKey = 'average' \| 'completions';[\s\S]*export type AssignmentListCardStat = \{[\s\S]*key: AssignmentListCardStatKey;[\s\S]*export type AssignmentListCardStatItems = AssignmentListCardStat\[\];/,
-  'Assignment list stat items should be exported as focused domain contracts.'
+  /export type AssignmentListCardStatKey = 'average' \| 'completions';[\s\S]*export type AssignmentListCardStat = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*key: AssignmentListCardStatKey;[\s\S]*export type AssignmentListCardStatItems = AssignmentListCardStat\[\];/,
+  'Assignment list stat items should be exported as focused domain contracts with prepared accessibility labels and descriptions.'
+);
+assert.match(
+  assignmentListViewSource,
+  /export type AssignmentListCardViewModel = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*statsLabel: string;[\s\S]*summaryLabel: string;/,
+  'Assignment list card view-model should expose prepared card, summary, stats, and action labels.'
 );
 assert.match(
   assignmentListViewSource,
@@ -24604,8 +24624,23 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /AssignmentListStats[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card component should delegate prepared stat item rendering to a focused component.'
+  /<Card[\s\S]*role="article"[\s\S]*aria-label=\{assignment\.ariaLabel\}/,
+  'Assignment list card component should expose the prepared assignment card aria label.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card component should delegate prepared stat item rendering and stats labels to a focused component.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /<section[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentSettingsSummary[\s\S]*AssignmentListStats/,
+  'Assignment list card summary should expose the prepared summary-region label.'
+);
+assert.match(
+  assignmentListCardComponentSource,
+  /AssignmentListCardActions[\s\S]*label=\{assignment\.actionsLabel\}[\s\S]*function AssignmentListCardActions[\s\S]*<section[\s\S]*aria-label=\{label\}/,
+  'Assignment list card actions should expose the prepared action-region label.'
 );
 assert.doesNotMatch(
   assignmentListCardComponentSource,
@@ -24624,8 +24659,13 @@ assert.match(
 );
 assert.match(
   assignmentListStatsComponentSource,
-  /statItems\.map[\s\S]*assignmentListCardStatIcons\[stat\.key\][\s\S]*stat\.value/,
-  'Assignment list stats component should render prepared stat values with stat-key icons.'
+  /<dl[\s\S]*aria-label=\{label\}[\s\S]*statItems\.map[\s\S]*ariaLabel=\{stat\.ariaLabel\}[\s\S]*description=\{stat\.description\}/,
+  'Assignment list stats component should render prepared stat labels, descriptions, and aria labels in a semantic list.'
+);
+assert.match(
+  assignmentListStatsComponentSource,
+  /<dt[\s\S]*\{label\}[\s\S]*<dd[\s\S]*<output[\s\S]*aria-label=\{ariaLabel\}[\s\S]*\{value\}[\s\S]*<dd[\s\S]*\{description\}/,
+  'Assignment list stat items should expose label, value, and description through semantic terms and details.'
 );
 assert.doesNotMatch(
   assignmentListViewSource,
@@ -24669,8 +24709,8 @@ assert.match(
 );
 assert.match(
   assignmentListCardComponentSource,
-  /function AssignmentListCardSummary[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*statItems=\{assignment\.statItems\}/,
-  'Assignment list card summary should render prepared settings summary and stats.'
+  /function AssignmentListCardSummary[\s\S]*aria-label=\{assignment\.summaryLabel\}[\s\S]*AssignmentSettingsSummary[\s\S]*view=\{assignment\.settingsSummaryView\}[\s\S]*AssignmentListStats[\s\S]*label=\{assignment\.statsLabel\}[\s\S]*statItems=\{assignment\.statItems\}/,
+  'Assignment list card summary should render prepared settings summary, stats label, and stats.'
 );
 assert.match(
   assignmentListCardComponentSource,
@@ -24946,7 +24986,7 @@ assert.match(
 );
 assert.match(
   assignmentListViewSource,
-  /title: formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*title: formatAssignmentDisplayTitle\(assignment\.title\)/,
+  /const title = formatAssignmentDisplayTitle\(assignment\.title\)[\s\S]*shareSlug: actionState\.shareAvailability\.shareSlug[\s\S]*const title = formatAssignmentDisplayTitle\(assignment\.title\)/,
   'Assignment list card view-models should normalize persisted and starter assignment titles through the shared assignment display helper.'
 );
 assert.match(
@@ -29510,13 +29550,37 @@ assert.deepEqual(
     searchDescription:
       'Search only your assignment links by assignment title, share id, or source activity text.',
     statusDescription:
-      'Show published links that students can still open and submit.',
+      'Open: Show published links that students can still open and submit.',
     statusLabel: 'Open',
     statusMetrics: [
-      { label: 'Open', status: 'open', value: '2' },
-      { label: 'Closed', status: 'closed', value: '1' },
-      { label: 'Expired', status: 'expired', value: '2' },
-      { label: 'Draft', status: 'draft', value: '1' },
+      {
+        ariaLabel: '2 Open',
+        label: 'Open',
+        status: 'open',
+        text: '2 Open',
+        value: '2',
+      },
+      {
+        ariaLabel: '1 Closed',
+        label: 'Closed',
+        status: 'closed',
+        text: '1 Closed',
+        value: '1',
+      },
+      {
+        ariaLabel: '2 Expired',
+        label: 'Expired',
+        status: 'expired',
+        text: '2 Expired',
+        value: '2',
+      },
+      {
+        ariaLabel: '1 Draft',
+        label: 'Draft',
+        status: 'draft',
+        text: '1 Draft',
+        value: '1',
+      },
     ],
     statusOptions: assignmentStatusFilterOptions,
   }
@@ -29537,13 +29601,37 @@ assert.deepEqual(
     searchDescription:
       'Search only your assignment links by assignment title, share id, or source activity text.',
     statusDescription:
-      'Show every assignment link, including drafts, open links, closed links, and expired homework windows.',
+      'All statuses: Show every assignment link, including drafts, open links, closed links, and expired homework windows.',
     statusLabel: 'All statuses',
     statusMetrics: [
-      { label: 'Open', status: 'open', value: '0' },
-      { label: 'Closed', status: 'closed', value: '0' },
-      { label: 'Expired', status: 'expired', value: '0' },
-      { label: 'Draft', status: 'draft', value: '0' },
+      {
+        ariaLabel: '0 Open',
+        label: 'Open',
+        status: 'open',
+        text: '0 Open',
+        value: '0',
+      },
+      {
+        ariaLabel: '0 Closed',
+        label: 'Closed',
+        status: 'closed',
+        text: '0 Closed',
+        value: '0',
+      },
+      {
+        ariaLabel: '0 Expired',
+        label: 'Expired',
+        status: 'expired',
+        text: '0 Expired',
+        value: '0',
+      },
+      {
+        ariaLabel: '0 Draft',
+        label: 'Draft',
+        status: 'draft',
+        text: '0 Draft',
+        value: '0',
+      },
     ],
     statusOptions: assignmentStatusFilterOptions,
   }
@@ -29557,6 +29645,32 @@ assert.equal(
   }).hasSearchValue,
   false
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildAssignmentListSearchPanelView({
+      isLoading: false,
+      search: '',
+      status: 'closed',
+      total: 0,
+    }).statusDescription,
+    '已关闭：显示老师主动关闭、但结果仍可查看的链接。'
+  );
+  assert.deepEqual(
+    buildAssignmentListStatusMetrics({
+      averageScore: 0,
+      closedAssignments: 1,
+      completions: 0,
+      draftAssignments: 2,
+      expiredAssignments: 3,
+      openAssignments: 4,
+      totalAssignments: 10,
+    }).map((metric) => metric.text),
+    ['开放中：4', '已关闭：1', '已过期：3', '草稿：2']
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildAssignmentListPageScopeView({
     currentPage: 2,
@@ -29813,20 +29927,31 @@ assert.deepEqual(
     totalAssignments: 0,
   }),
   [
-    { id: 'total', label: 'Assignments', value: '0' },
     {
+      ariaLabel:
+        'Assignments: 0. Total assignment links in the current list scope.',
+      description: 'Total assignment links in the current list scope.',
+      id: 'total',
+      label: 'Assignments',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Open links: 0. 0 links are currently available to students.',
       description: '0 links are currently available to students.',
       id: 'open',
       label: 'Open links',
       value: '0',
     },
     {
+      ariaLabel: 'Completions: 0. 0 submitted attempts in this view.',
       description: '0 submitted attempts in this view.',
       id: 'completions',
       label: 'Completions',
       value: '0',
     },
     {
+      ariaLabel: 'Average: -. No scored attempts yet.',
       description: 'No scored attempts yet.',
       id: 'average',
       label: 'Average',
@@ -29849,20 +29974,32 @@ assert.deepEqual(
     totalAssignments: 99,
   }),
   [
-    { id: 'total', label: 'Matching', value: '5' },
     {
+      ariaLabel:
+        'Matching: 5. Assignment links matching the active search and status filters.',
+      description:
+        'Assignment links matching the active search and status filters.',
+      id: 'total',
+      label: 'Matching',
+      value: '5',
+    },
+    {
+      ariaLabel:
+        'Open links: 2. 2 links are currently available to students.',
       description: '2 links are currently available to students.',
       id: 'open',
       label: 'Open links',
       value: '2',
     },
     {
+      ariaLabel: 'Completions: 11. 11 submitted attempts in this view.',
       description: '11 submitted attempts in this view.',
       id: 'completions',
       label: 'Completions',
       value: '11',
     },
     {
+      ariaLabel: 'Average: 77%. Calculated from scored student attempts.',
       description: 'Calculated from scored student attempts.',
       id: 'average',
       label: 'Average',
@@ -29885,20 +30022,32 @@ assert.deepEqual(
     totalAssignments: 99,
   }),
   [
-    { id: 'total', label: 'Matching', value: '0' },
     {
+      ariaLabel:
+        'Matching: 0. Assignment links matching the active search and status filters.',
+      description:
+        'Assignment links matching the active search and status filters.',
+      id: 'total',
+      label: 'Matching',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Open links: 0. 0 links are currently available to students.',
       description: '0 links are currently available to students.',
       id: 'open',
       label: 'Open links',
       value: '0',
     },
     {
+      ariaLabel: 'Completions: 0. 0 submitted attempts in this view.',
       description: '0 submitted attempts in this view.',
       id: 'completions',
       label: 'Completions',
       value: '0',
     },
     {
+      ariaLabel: 'Average: -. No scored attempts yet.',
       description: 'No scored attempts yet.',
       id: 'average',
       label: 'Average',
@@ -29917,10 +30066,34 @@ assert.deepEqual(
     totalAssignments: 11,
   }),
   [
-    { label: 'Open', status: 'open', value: '2' },
-    { label: 'Closed', status: 'closed', value: '0' },
-    { label: 'Expired', status: 'expired', value: '0' },
-    { label: 'Draft', status: 'draft', value: '0' },
+    {
+      ariaLabel: '2 Open',
+      label: 'Open',
+      status: 'open',
+      text: '2 Open',
+      value: '2',
+    },
+    {
+      ariaLabel: '0 Closed',
+      label: 'Closed',
+      status: 'closed',
+      text: '0 Closed',
+      value: '0',
+    },
+    {
+      ariaLabel: '0 Expired',
+      label: 'Expired',
+      status: 'expired',
+      text: '0 Expired',
+      value: '0',
+    },
+    {
+      ariaLabel: '0 Draft',
+      label: 'Draft',
+      status: 'draft',
+      text: '0 Draft',
+      value: '0',
+    },
   ]
 );
 assert.deepEqual(
@@ -29934,10 +30107,34 @@ assert.deepEqual(
     totalAssignments: 11,
   }),
   [
-    { label: 'Open', status: 'open', value: '5' },
-    { label: 'Closed', status: 'closed', value: '1' },
-    { label: 'Expired', status: 'expired', value: '2' },
-    { label: 'Draft', status: 'draft', value: '3' },
+    {
+      ariaLabel: '5 Open',
+      label: 'Open',
+      status: 'open',
+      text: '5 Open',
+      value: '5',
+    },
+    {
+      ariaLabel: '1 Closed',
+      label: 'Closed',
+      status: 'closed',
+      text: '1 Closed',
+      value: '1',
+    },
+    {
+      ariaLabel: '2 Expired',
+      label: 'Expired',
+      status: 'expired',
+      text: '2 Expired',
+      value: '2',
+    },
+    {
+      ariaLabel: '3 Draft',
+      label: 'Draft',
+      status: 'draft',
+      text: '3 Draft',
+      value: '3',
+    },
   ]
 );
 assert.deepEqual(
@@ -30116,20 +30313,31 @@ assert.deepEqual(
       source: 'starter-preview',
     },
     summaryMetrics: [
-      { id: 'total', label: 'Assignments', value: '0' },
       {
+        ariaLabel:
+          'Assignments: 0. Total assignment links in the current list scope.',
+        description: 'Total assignment links in the current list scope.',
+        id: 'total',
+        label: 'Assignments',
+        value: '0',
+      },
+      {
+        ariaLabel:
+          'Open links: 0. 0 links are currently available to students.',
         description: '0 links are currently available to students.',
         id: 'open',
         label: 'Open links',
         value: '0',
       },
       {
+        ariaLabel: 'Completions: 0. 0 submitted attempts in this view.',
         description: '0 submitted attempts in this view.',
         id: 'completions',
         label: 'Completions',
         value: '0',
       },
       {
+        ariaLabel: 'Average: -. No scored attempts yet.',
         description: 'No scored attempts yet.',
         id: 'average',
         label: 'Average',
@@ -30479,20 +30687,32 @@ assert.deepEqual(
     },
     starterPreviewAssignmentIds: [],
     summaryMetrics: [
-      { id: 'total', label: 'Matching', value: '1' },
       {
+        ariaLabel:
+          'Matching: 1. Assignment links matching the active search and status filters.',
+        description:
+          'Assignment links matching the active search and status filters.',
+        id: 'total',
+        label: 'Matching',
+        value: '1',
+      },
+      {
+        ariaLabel:
+          'Open links: 1. 1 link is currently available to students.',
         description: '1 link is currently available to students.',
         id: 'open',
         label: 'Open links',
         value: '1',
       },
       {
+        ariaLabel: 'Completions: 9. 9 submitted attempts in this view.',
         description: '9 submitted attempts in this view.',
         id: 'completions',
         label: 'Completions',
         value: '9',
       },
       {
+        ariaLabel: 'Average: 76%. Calculated from scored student attempts.',
         description: 'Calculated from scored student attempts.',
         id: 'average',
         label: 'Average',
@@ -30509,8 +30729,22 @@ assert.deepEqual(
     completions: 12,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '12' },
-    { key: 'average', label: 'Average', value: '83%' },
+    {
+      ariaLabel:
+        'Completions: 12. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '12',
+    },
+    {
+      ariaLabel:
+        'Average: 83%. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '83%',
+    },
   ]
 );
 assert.deepEqual(
@@ -30519,8 +30753,21 @@ assert.deepEqual(
     completions: Number.NaN,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
-    { key: 'average', label: 'Average', value: '-' },
+    {
+      ariaLabel: 'Completions: 0. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Average: -. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '-',
+    },
   ]
 );
 assert.deepEqual(
@@ -30529,8 +30776,21 @@ assert.deepEqual(
     completions: 2.9,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '2' },
-    { key: 'average', label: 'Average', value: '82%' },
+    {
+      ariaLabel: 'Completions: 2. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '2',
+    },
+    {
+      ariaLabel:
+        'Average: 82%. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '82%',
+    },
   ]
 );
 assert.deepEqual(
@@ -30539,8 +30799,21 @@ assert.deepEqual(
     completions: Number.POSITIVE_INFINITY,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
-    { key: 'average', label: 'Average', value: '-' },
+    {
+      ariaLabel: 'Completions: 0. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Average: -. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '-',
+    },
   ]
 );
 assert.deepEqual(
@@ -30549,8 +30822,21 @@ assert.deepEqual(
     completions: -2,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
-    { key: 'average', label: 'Average', value: '-' },
+    {
+      ariaLabel: 'Completions: 0. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Average: -. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '-',
+    },
   ]
 );
 assert.deepEqual(
@@ -30559,8 +30845,21 @@ assert.deepEqual(
     completions: 0,
   }),
   [
-    { key: 'completions', label: 'Completions', value: '0' },
-    { key: 'average', label: 'Average', value: '-' },
+    {
+      ariaLabel: 'Completions: 0. Submitted attempts for this assignment.',
+      description: 'Submitted attempts for this assignment.',
+      key: 'completions',
+      label: 'Completions',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Average: -. Average score across scored attempts for this assignment.',
+      description: 'Average score across scored attempts for this assignment.',
+      key: 'average',
+      label: 'Average',
+      value: '-',
+    },
   ]
 );
 assert.deepEqual(
@@ -30626,7 +30925,10 @@ assert.deepEqual(
         successMessage: 'Assignment link closed.',
       },
     },
+    actionsLabel: 'Actions for Persisted assignment',
     activityDescription: 'Frozen activity description',
+    ariaLabel:
+      'Persisted assignment, Open, Line match, share id share-1',
     id: 'persisted-assignment-1',
     persisted: true,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -30645,12 +30947,28 @@ assert.deepEqual(
       averageScore: 76,
       completions: 9,
     },
+    statsLabel: 'Result stats for Persisted assignment',
     statItems: [
-      { key: 'completions', label: 'Completions', value: '9' },
-      { key: 'average', label: 'Average', value: '76%' },
+      {
+        ariaLabel: 'Completions: 9. Submitted attempts for this assignment.',
+        description: 'Submitted attempts for this assignment.',
+        key: 'completions',
+        label: 'Completions',
+        value: '9',
+      },
+      {
+        ariaLabel:
+          'Average: 76%. Average score across scored attempts for this assignment.',
+        description:
+          'Average score across scored attempts for this assignment.',
+        key: 'average',
+        label: 'Average',
+        value: '76%',
+      },
     ],
     status: 'published',
     statusLabel: 'Open',
+    summaryLabel: 'Assignment settings and results for Persisted assignment',
     templateLabel: 'Line match',
     templateType: 'line-match',
     title: 'Persisted assignment',
@@ -30720,7 +31038,9 @@ assert.deepEqual(
       },
       statusAction: undefined,
     },
+    actionsLabel: 'Actions for Food words homework',
     activityDescription: 'Starter activity description',
+    ariaLabel: 'Food words homework, Preview, Group sort, share id demo-food',
     id: 'assignment-food-demo',
     persisted: false,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
@@ -30737,12 +31057,29 @@ assert.deepEqual(
       averageScore: 84,
       completions: 18,
     },
+    statsLabel: 'Result stats for Food words homework',
     statItems: [
-      { key: 'completions', label: 'Completions', value: '18' },
-      { key: 'average', label: 'Average', value: '84%' },
+      {
+        ariaLabel:
+          'Completions: 18. Submitted attempts for this assignment.',
+        description: 'Submitted attempts for this assignment.',
+        key: 'completions',
+        label: 'Completions',
+        value: '18',
+      },
+      {
+        ariaLabel:
+          'Average: 84%. Average score across scored attempts for this assignment.',
+        description:
+          'Average score across scored attempts for this assignment.',
+        key: 'average',
+        label: 'Average',
+        value: '84%',
+      },
     ],
     status: 'published',
     statusLabel: 'Preview',
+    summaryLabel: 'Assignment settings and results for Food words homework',
     templateLabel: 'Group sort',
     templateType: 'group-sort',
     title: 'Food words homework',
