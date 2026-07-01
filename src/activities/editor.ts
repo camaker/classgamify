@@ -179,6 +179,7 @@ export type ActivityEditorAiDraftPanelView = {
   focusLabel: string;
   focusOptions: ActivityAiDraftFocusOption[];
   generateButtonLabel: string;
+  itemCountDescription: string;
   itemCountLabel: string;
   reviewNote: string;
   safeSourceDescription: string;
@@ -499,6 +500,7 @@ export function buildActivityEditorAiDraftPanelView({
     focusLabel: m.activity_form_ai_focus_label(),
     focusOptions: buildActivityAiDraftFocusOptions(),
     generateButtonLabel: m.activity_form_generate_draft(),
+    itemCountDescription: m.activity_form_ai_item_count_description(),
     itemCountLabel: m.activity_form_ai_item_count_label(),
     reviewNote: m.activity_form_ai_draft_review_note(),
     safeSourceDescription: m.activity_form_ai_safe_source_description(),

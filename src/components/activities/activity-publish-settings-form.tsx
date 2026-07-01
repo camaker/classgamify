@@ -70,6 +70,9 @@ function ActivityPublishIdentityFields({
   draft: AssignmentPublishDraft;
   onDraftChange: ActivityPublishDraftFieldChange;
 }) {
+  const titleHelpId = `assignment-title-${activityId}-help`;
+  const instructionsHelpId = `assignment-instructions-${activityId}-help`;
+
   return (
     <>
       <div className="grid gap-2">
@@ -79,10 +82,14 @@ function ActivityPublishIdentityFields({
         <Input
           id={`assignment-title-${activityId}`}
           value={draft.title}
+          aria-describedby={titleHelpId}
           onChange={(event) =>
             onDraftChange('title', event.currentTarget.value)
           }
         />
+        <p id={titleHelpId} className="text-xs leading-5 text-muted-foreground">
+          {assignmentPublishDialogCopy.titleHelp}
+        </p>
       </div>
       <div className="grid gap-2">
         <label htmlFor={`assignment-instructions-${activityId}`}>
@@ -94,10 +101,17 @@ function ActivityPublishIdentityFields({
           maxLength={ASSIGNMENT_PUBLISH_FIELD_LIMITS.instructionsMaxLength}
           value={draft.instructions}
           placeholder={assignmentPublishDialogCopy.instructionsPlaceholder}
+          aria-describedby={instructionsHelpId}
           onChange={(event) =>
             onDraftChange('instructions', event.currentTarget.value)
           }
         />
+        <p
+          id={instructionsHelpId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
+          {assignmentPublishDialogCopy.instructionsHelp}
+        </p>
       </div>
     </>
   );

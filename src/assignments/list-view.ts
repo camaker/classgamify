@@ -74,6 +74,7 @@ type AssignmentListControlOption = {
 export type AssignmentListSearchPanelView = {
   filterSummary: AssignmentListFilterSummary;
   hasSearchValue: boolean;
+  searchDescription: string;
   statusDescription: string;
   statusLabel: string;
   statusMetrics: AssignmentListStatusMetric[];
@@ -309,6 +310,9 @@ export const assignmentListSearchCopy = {
   get placeholder() {
     return m.assignment_list_search_placeholder();
   },
+  get searchDescription() {
+    return m.assignment_list_search_description();
+  },
   get statusLabel() {
     return m.assignment_list_search_status_label();
   },
@@ -441,6 +445,7 @@ export function buildAssignmentListSearchPanelView({
       total,
     }),
     hasSearchValue: Boolean(normalizedSearch),
+    searchDescription: assignmentListSearchCopy.searchDescription,
     statusDescription: statusView.description,
     statusLabel: statusView.label,
     statusMetrics: buildAssignmentListStatusMetrics(summary),

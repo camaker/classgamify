@@ -227,11 +227,14 @@ type ActivityLibraryPageResolvedSearch = {
 type ActivityLibrarySearchPanelView = {
   filterSummary: ActivityLibraryFilterSummary;
   hasSearchValue: boolean;
+  searchDescription: string;
   sourceCapabilityMetrics: ActivityLibrarySourceCapabilityMetric[];
   sourceFilterDescription: string;
   sourceFilterLabel: string;
   sourceOptions: ActivitySourceMaterialFilterOption[];
+  statusDescription: string;
   statusOptions: ActivityLibraryStatusOption[];
+  templateDescription: string;
   templateOptions: ActivityLibraryTemplateFilterOption[];
 };
 
@@ -388,6 +391,9 @@ export const activityLibrarySearchCopy = {
   get placeholder() {
     return m.activity_library_filter_placeholder();
   },
+  get searchDescription() {
+    return m.activity_library_filter_search_description();
+  },
   get statusOptions() {
     return [
       { label: m.activity_library_filter_active(), value: 'active' },
@@ -396,6 +402,9 @@ export const activityLibrarySearchCopy = {
   },
   get sourceLabel() {
     return m.activity_library_filter_source_label();
+  },
+  get statusDescription() {
+    return m.activity_library_filter_status_description();
   },
   get sourceOptions() {
     return [
@@ -418,6 +427,9 @@ export const activityLibrarySearchCopy = {
   get templateLabel() {
     return m.activity_library_filter_template_label();
   },
+  get templateDescription() {
+    return m.activity_library_filter_template_description();
+  },
   get templatePlaceholder() {
     return m.activity_library_filter_template_placeholder();
   },
@@ -426,9 +438,12 @@ export const activityLibrarySearchCopy = {
   clearSearchLabel: string;
   label: string;
   placeholder: string;
+  searchDescription: string;
   sourceLabel: string;
   sourceOptions: ActivitySourceMaterialFilterOption[];
+  statusDescription: string;
   statusOptions: ActivityLibraryStatusOption[];
+  templateDescription: string;
   templateLabel: string;
   templatePlaceholder: string;
 } as const;
@@ -737,12 +752,15 @@ export function buildActivityLibrarySearchPanelView({
       total,
     }),
     hasSearchValue: Boolean(normalizedSearch),
+    searchDescription: activityLibrarySearchCopy.searchDescription,
     sourceCapabilityMetrics:
       buildActivityLibrarySourceCapabilityMetrics(summary),
     sourceFilterDescription: sourceFilterView.description,
     sourceFilterLabel: sourceFilterView.label,
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusDescription: activityLibrarySearchCopy.statusDescription,
     statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateDescription: activityLibrarySearchCopy.templateDescription,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   };
 }

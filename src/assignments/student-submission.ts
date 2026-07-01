@@ -199,6 +199,8 @@ type StudentRunnerCopy = {
   teacherResultsLabel: string;
   timeExpiredMessage: string;
   timeEndedLabel: string;
+  timerActiveDescription: string;
+  timerOffDescription: string;
 };
 
 export type AnonymousAttemptCopy = {
@@ -274,6 +276,7 @@ export type StudentAttemptControlState = {
 };
 
 export type StudentAttemptTimerBadge = {
+  description: string;
   label: string;
   show: boolean;
 };
@@ -412,6 +415,12 @@ const STUDENT_RUNNER_COPY = {
   },
   get timeEndedLabel() {
     return m.student_runner_time_ended();
+  },
+  get timerActiveDescription() {
+    return m.student_runner_timer_active_description();
+  },
+  get timerOffDescription() {
+    return m.student_runner_timer_off_description();
   },
 } satisfies StudentRunnerCopy;
 
@@ -838,6 +847,7 @@ export function buildStudentAttemptTimerBadge({
 }): StudentAttemptTimerBadge {
   if (normalizeAttemptTimeLimitSeconds(timeLimitSeconds) === undefined) {
     return {
+      description: STUDENT_RUNNER_COPY.timerOffDescription,
       label: '',
       show: false,
     };
@@ -845,6 +855,7 @@ export function buildStudentAttemptTimerBadge({
 
   if (timeExpired) {
     return {
+      description: STUDENT_RUNNER_COPY.timerActiveDescription,
       label: STUDENT_RUNNER_COPY.timeEndedLabel,
       show: true,
     };
@@ -856,6 +867,7 @@ export function buildStudentAttemptTimerBadge({
   });
 
   return {
+    description: STUDENT_RUNNER_COPY.timerActiveDescription,
     label,
     show: Boolean(label),
   };

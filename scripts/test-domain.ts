@@ -10335,6 +10335,9 @@ assert.deepEqual(getStudentRunnerCopy(), {
   teacherResultsLabel: 'Teacher results',
   timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
   timeEndedLabel: 'Time ended',
+  timerActiveDescription:
+    'The visible timer counts down only after this playable assignment has loaded.',
+  timerOffDescription: 'This assignment has no visible countdown timer.',
 });
 assert.deepEqual(buildStudentRunnerSeoView(), {
   description:
@@ -12667,6 +12670,7 @@ assert.deepEqual(
     timeLimitSeconds: undefined,
   }),
   {
+    description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
   }
@@ -12678,6 +12682,7 @@ assert.deepEqual(
     timeLimitSeconds: Number.NaN,
   }),
   {
+    description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
   }
@@ -12689,6 +12694,7 @@ assert.deepEqual(
     timeLimitSeconds: -120,
   }),
   {
+    description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
   }
@@ -12700,6 +12706,8 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    description:
+      'The visible timer counts down only after this playable assignment has loaded.',
     label: '1:05',
     show: true,
   }
@@ -12711,6 +12719,8 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    description:
+      'The visible timer counts down only after this playable assignment has loaded.',
     label: '',
     show: false,
   }
@@ -12722,6 +12732,8 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    description:
+      'The visible timer counts down only after this playable assignment has loaded.',
     label: 'Time ended',
     show: true,
   }
@@ -17762,6 +17774,8 @@ assert.deepEqual(
         to: Routes.DashboardAssignmentResults,
       },
       printAction: {
+        description:
+          'Open the browser print dialog for this teacher-only worksheet view.',
         label: 'Print',
       },
     },
@@ -18656,6 +18670,7 @@ assert.deepEqual(
       scoreLabel: '1/2',
     },
     attemptTimerBadge: {
+      description: 'This assignment has no visible countdown timer.',
       label: '',
       show: false,
     },
@@ -18667,6 +18682,7 @@ assert.deepEqual(
       unansweredLabel: undefined,
     },
     controlView: {
+      progressDescription: 'Current completion progress: 1/1 answered.',
       progressLabel: '1/1 answered',
       readOnlyMessage: undefined,
       requiresIncompleteSubmitConfirmation: false,
@@ -18679,6 +18695,7 @@ assert.deepEqual(
       submitHintViews: [],
       timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
       timerBadge: {
+        description: 'This assignment has no visible countdown timer.',
         label: '',
         show: false,
       },
@@ -27429,6 +27446,8 @@ assert.deepEqual(
   {
     filterSummary: { hasFilters: true, text: '3 matches' },
     hasSearchValue: true,
+    searchDescription:
+      'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
     sourceCapabilityMetrics: [
       { capability: 'audio-extraction', label: 'audio-ready', value: '0' },
       {
@@ -27446,7 +27465,11 @@ assert.deepEqual(
       'Show activities with worksheet images or documents ready for worksheet extraction.',
     sourceFilterLabel: 'Worksheet',
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusDescription:
+      'Switch between active and archived activity views without widening beyond your own saved activities.',
     statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateDescription:
+      'Limit the activity library to one exact template family, or show every template.',
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   }
 );
@@ -27478,6 +27501,8 @@ assert.deepEqual(
   {
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: false,
+    searchDescription:
+      'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
     sourceCapabilityMetrics: [
       { capability: 'audio-extraction', label: 'audio-ready', value: '1' },
       {
@@ -27495,7 +27520,11 @@ assert.deepEqual(
       'Show activities with audio, worksheet, or spreadsheet material ready for future AI extraction.',
     sourceFilterLabel: 'Any extractable source',
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
+    statusDescription:
+      'Switch between active and archived activity views without widening beyond your own saved activities.',
     statusOptions: activityLibrarySearchCopy.statusOptions,
+    templateDescription:
+      'Limit the activity library to one exact template family, or show every template.',
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
   }
 );
@@ -28192,6 +28221,8 @@ assert.deepEqual(
   {
     filterSummary: { hasFilters: true, text: '2 matches' },
     hasSearchValue: true,
+    searchDescription:
+      'Search only your assignment links by assignment title, share id, or source activity text.',
     statusDescription:
       'Show published links that students can still open and submit.',
     statusLabel: 'Open',
@@ -28217,6 +28248,8 @@ assert.deepEqual(
       text: 'Loading assignments...',
     },
     hasSearchValue: false,
+    searchDescription:
+      'Search only your assignment links by assignment title, share id, or source activity text.',
     statusDescription:
       'Show every assignment link, including drafts, open links, closed links, and expired homework windows.',
     statusLabel: 'All statuses',
@@ -30425,6 +30458,8 @@ assert.deepEqual(
     focusOptions: buildActivityAiDraftFocusOptions(),
     generateButtonLabel: 'Generate draft',
     generationDisabledReason: undefined,
+    itemCountDescription:
+      'Choose how many teacher-reviewable items the draft should generate before you save the activity.',
     itemCountLabel: 'Items',
     reviewNote: 'Teacher reviews before saving',
     safeSourceDescription:
@@ -30851,6 +30886,8 @@ assert.deepEqual(disabledAiDraftPanelView, {
   ],
   generateButtonLabel: 'Generate draft',
   generationDisabledReason: 'Sign in to generate an AI draft.',
+  itemCountDescription:
+    'Choose how many teacher-reviewable items the draft should generate before you save the activity.',
   itemCountLabel: 'Items',
   reviewNote: 'Teacher reviews before saving',
   safeSourceDescription:

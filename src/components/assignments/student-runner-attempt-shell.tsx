@@ -60,20 +60,37 @@ function StudentRunnerAttemptStatusBar({
 }: {
   controlView: StudentRunnerControlView;
 }) {
+  const progressDescriptionId = 'student-runner-progress-description';
+  const timerDescriptionId = 'student-runner-timer-description';
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2 text-sm font-medium">
         <IconPlayerPlay className="size-4 text-primary" />
         {controlView.runnerTitle}
       </div>
-      <Badge variant="secondary" className="rounded-md">
+      <Badge
+        variant="secondary"
+        className="rounded-md"
+        aria-describedby={progressDescriptionId}
+      >
         {controlView.progressLabel}
       </Badge>
+      <span id={progressDescriptionId} className="sr-only">
+        {controlView.progressDescription}
+      </span>
       {controlView.timerBadge.show ? (
-        <Badge variant="outline" className="rounded-md">
+        <Badge
+          variant="outline"
+          className="rounded-md"
+          aria-describedby={timerDescriptionId}
+        >
           {controlView.timerBadge.label}
         </Badge>
       ) : null}
+      <span id={timerDescriptionId} className="sr-only">
+        {controlView.timerBadge.description}
+      </span>
     </div>
   );
 }

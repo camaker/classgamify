@@ -69,6 +69,7 @@ import {
   buildStudentRunnerHeaderView,
   type StudentRunnerHeaderView,
 } from '@/assignments/student-runner-view';
+import { m } from '@/locale/paraglide/messages';
 
 type StudentRunnerReadyStateSource = 'public-assignment' | 'starter-preview';
 
@@ -138,6 +139,7 @@ export type StudentRunnerIdentityView =
     };
 
 export type StudentRunnerControlView = {
+  progressDescription: string;
   progressLabel: string;
   readOnlyMessage?: string;
   requiresIncompleteSubmitConfirmation: boolean;
@@ -633,6 +635,9 @@ export function buildStudentRunnerPageViewModel({
     attemptUsageLabel,
     completionCopy,
     controlView: {
+      progressDescription: m.student_runner_progress_description({
+        progress: completionCopy.progressLabel,
+      }),
       progressLabel: completionCopy.progressLabel,
       readOnlyMessage: attemptControlState.readOnlyMessage,
       requiresIncompleteSubmitConfirmation,

@@ -145,6 +145,7 @@ export type PrintableWorksheetAnswerKeyToggleView = {
 };
 
 export type PrintableWorksheetPrintAction = {
+  description: string;
   label: string;
 };
 
@@ -232,6 +233,9 @@ export const printableWorksheetPageCopy = {
   },
   get printButtonLabel() {
     return m.assignment_printable_print_button();
+  },
+  get printButtonDescription() {
+    return m.assignment_printable_print_button_description();
   },
   get printModeLabel() {
     return m.assignment_printable_mode_label();
@@ -403,6 +407,7 @@ export function buildPrintableWorksheetControlView({
       to: Routes.DashboardAssignmentResults,
     },
     printAction: {
+      description: printableWorksheetPageCopy.printButtonDescription,
       label: printableWorksheetPageCopy.printButtonLabel,
     },
   };

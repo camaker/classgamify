@@ -245,6 +245,8 @@ function ActivityAiDraftItemCountSelect({
   onDraftItemCountChange: (itemCount: number) => void;
   panelView: ActivityEditorAiDraftPanelView;
 }) {
+  const itemCountDescriptionId = 'activity-ai-item-count-description';
+
   return (
     <div className="space-y-2">
       <label htmlFor="activity-ai-item-count" className="font-medium text-sm">
@@ -253,6 +255,7 @@ function ActivityAiDraftItemCountSelect({
       <NativeSelect
         id="activity-ai-item-count"
         value={String(draftItemCount)}
+        aria-describedby={itemCountDescriptionId}
         onChange={(event) =>
           onDraftItemCountChange(Number(event.currentTarget.value))
         }
@@ -264,6 +267,9 @@ function ActivityAiDraftItemCountSelect({
           </NativeSelectOption>
         ))}
       </NativeSelect>
+      <p id={itemCountDescriptionId} className="text-xs text-muted-foreground">
+        {panelView.itemCountDescription}
+      </p>
     </div>
   );
 }

@@ -34,6 +34,7 @@ export function AssignmentListFilters({
   summary,
   total,
 }: AssignmentListFiltersProps) {
+  const searchDescriptionId = 'assignment-list-search-description';
   const statusFilterDescriptionId = 'assignment-status-filter-description';
   const searchPanelView = buildAssignmentListSearchPanelView({
     isLoading,
@@ -56,6 +57,7 @@ export function AssignmentListFilters({
             value={search}
             placeholder={assignmentListSearchCopy.placeholder}
             className="pl-9 pr-9"
+            aria-describedby={searchDescriptionId}
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {searchPanelView.hasSearchValue ? (
@@ -69,6 +71,9 @@ export function AssignmentListFilters({
             </button>
           ) : null}
         </div>
+        <p id={searchDescriptionId} className="sr-only">
+          {searchPanelView.searchDescription}
+        </p>
       </div>
       <div className="grid gap-2">
         <label

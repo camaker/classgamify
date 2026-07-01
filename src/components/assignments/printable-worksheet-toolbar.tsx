@@ -80,11 +80,22 @@ function PrintableWorksheetPrintButton({
   action: PrintableWorksheetPrintAction;
   onPrint: () => void;
 }) {
+  const printDescriptionId = 'printable-worksheet-print-description';
+
   return (
-    <Button type="button" onClick={onPrint}>
-      <IconPrinter className="size-4" />
-      {action.label}
-    </Button>
+    <>
+      <Button
+        type="button"
+        aria-describedby={printDescriptionId}
+        onClick={onPrint}
+      >
+        <IconPrinter className="size-4" />
+        {action.label}
+      </Button>
+      <span id={printDescriptionId} className="sr-only">
+        {action.description}
+      </span>
+    </>
   );
 }
 

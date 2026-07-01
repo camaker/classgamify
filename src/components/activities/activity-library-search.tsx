@@ -52,8 +52,11 @@ export function ActivityLibrarySearch({
   total,
   value,
 }: ActivityLibrarySearchProps) {
+  const searchDescriptionId = 'activity-library-search-description';
   const sourceFilterDescriptionId = 'activity-source-filter-description';
+  const statusFilterDescriptionId = 'activity-status-filter-description';
   const statusFilterGroupLabelId = 'activity-status-filter-label';
+  const templateFilterDescriptionId = 'activity-template-filter-description';
   const searchPanelView = buildActivityLibrarySearchPanelView({
     isLoading,
     search: value,
@@ -80,6 +83,7 @@ export function ActivityLibrarySearch({
             value={value}
             placeholder={activityLibrarySearchCopy.placeholder}
             className="pl-9 pr-9"
+            aria-describedby={searchDescriptionId}
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {searchPanelView.hasSearchValue ? (
@@ -93,6 +97,9 @@ export function ActivityLibrarySearch({
             </button>
           ) : null}
         </div>
+        <p id={searchDescriptionId} className="sr-only">
+          {searchPanelView.searchDescription}
+        </p>
       </div>
       <div className="grid gap-2">
         <label
@@ -104,6 +111,7 @@ export function ActivityLibrarySearch({
         <NativeSelect
           id="activity-template-filter"
           value={template}
+          aria-describedby={templateFilterDescriptionId}
           onChange={(event) =>
             onTemplateChange(
               event.currentTarget.value as ActivityTemplateFilter
@@ -116,6 +124,9 @@ export function ActivityLibrarySearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
+        <p id={templateFilterDescriptionId} className="sr-only">
+          {searchPanelView.templateDescription}
+        </p>
       </div>
       <div className="grid gap-2">
         <label htmlFor="activity-source-filter" className="font-medium text-sm">
@@ -164,6 +175,7 @@ export function ActivityLibrarySearch({
       <div className="flex flex-col gap-3 lg:items-end">
         <fieldset
           className="inline-flex rounded-lg border bg-background p-1"
+          aria-describedby={statusFilterDescriptionId}
           aria-labelledby={statusFilterGroupLabelId}
         >
           <legend id={statusFilterGroupLabelId} className="sr-only">
@@ -187,6 +199,9 @@ export function ActivityLibrarySearch({
             );
           })}
         </fieldset>
+        <p id={statusFilterDescriptionId} className="sr-only">
+          {searchPanelView.statusDescription}
+        </p>
         <p className="text-sm text-muted-foreground lg:text-right">
           {searchPanelView.filterSummary.text}
         </p>

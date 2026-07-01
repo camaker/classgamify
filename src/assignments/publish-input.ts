@@ -210,6 +210,9 @@ export const assignmentPublishDialogCopy = {
   get instructionsLabel() {
     return m.assignment_publish_dialog_instructions_label();
   },
+  get instructionsHelp() {
+    return m.assignment_publish_dialog_instructions_help();
+  },
   get instructionsPlaceholder() {
     return m.assignment_publish_dialog_instructions_placeholder();
   },
@@ -242,6 +245,9 @@ export const assignmentPublishDialogCopy = {
   },
   get title() {
     return m.assignment_publish_dialog_title();
+  },
+  get titleHelp() {
+    return m.assignment_publish_dialog_title_help();
   },
   get titleLabel() {
     return m.assignment_publish_dialog_title_label();
