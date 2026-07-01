@@ -27,10 +27,12 @@ import {
   buildActivityLibraryCardSummary,
   buildActivityLibraryFilterSummary,
   buildActivityLibrarySourceCapabilityMetrics,
+  buildActivityLibraryStatusMetrics,
   buildActivityLibrarySummaryMetrics,
   type ActivityLibraryCardSummary,
   type ActivityLibraryFilterSummary,
   type ActivityLibrarySourceCapabilityMetric,
+  type ActivityLibraryStatusMetric,
   type ActivityLibrarySummary,
   type ActivityLibrarySummaryMetric,
   type ActivityLibraryTemplateOption,
@@ -233,6 +235,8 @@ type ActivityLibrarySearchPanelView = {
   sourceFilterLabel: string;
   sourceOptions: ActivitySourceMaterialFilterOption[];
   statusDescription: string;
+  statusLabel: string;
+  statusMetrics: ActivityLibraryStatusMetric[];
   statusOptions: ActivityLibraryStatusOption[];
   templateDescription: string;
   templateOptions: ActivityLibraryTemplateFilterOption[];
@@ -278,6 +282,7 @@ type ActivityLibraryPageData<TItem extends ActivityLibraryPageItem> = {
   createdActivity?: CreatedActivityListItem | null;
   items: TItem[];
   summary?: ActivityLibrarySummary;
+  statusSummary?: ActivityLibrarySummary;
   total: number;
 };
 
@@ -403,6 +408,9 @@ export const activityLibrarySearchCopy = {
   get sourceLabel() {
     return m.activity_library_filter_source_label();
   },
+  get statusLabel() {
+    return m.activity_library_filter_status_label();
+  },
   get statusDescription() {
     return m.activity_library_filter_status_description();
   },
@@ -446,6 +454,7 @@ export const activityLibrarySearchCopy = {
   templateDescription: string;
   templateLabel: string;
   templatePlaceholder: string;
+  statusLabel: string;
 } as const;
 
 export const activityLibraryCardCopy = {
@@ -728,6 +737,7 @@ export function buildActivityLibrarySearchPanelView({
   source,
   status,
   summary,
+  statusSummary,
   template,
   total,
 }: {
@@ -736,11 +746,13 @@ export function buildActivityLibrarySearchPanelView({
   source: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
   summary?: ActivityLibrarySummary;
+  statusSummary?: ActivityLibrarySummary;
   template: ActivityTemplateFilter;
   total: number;
 }): ActivityLibrarySearchPanelView {
   const normalizedSearch = normalizeActivityLibrarySearch(search);
   const sourceFilterView = buildActivityLibrarySourceFilterView(source);
+  const statusFilterView = buildActivityLibraryStatusFilterView(status);
 
   return {
     filterSummary: buildActivityLibraryFilterSummary({
@@ -758,10 +770,24 @@ export function buildActivityLibrarySearchPanelView({
     sourceFilterDescription: sourceFilterView.description,
     sourceFilterLabel: sourceFilterView.label,
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
-    statusDescription: activityLibrarySearchCopy.statusDescription,
+    statusDescription: statusFilterView.description,
+    statusLabel: statusFilterView.label,
+    statusMetrics: buildActivityLibraryStatusMetrics(statusSummary ?? summary),
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription: activityLibrarySearchCopy.templateDescription,
     templateOptions: buildActivityLibraryTemplateFilterOptions(),
+  };
+}
+
+function buildActivityLibraryStatusFilterView(status: ActivityLibraryStatus) {
+  const option =
+    activityLibrarySearchCopy.statusOptions.find(
+      (item) => item.value === status
+    ) ?? activityLibrarySearchCopy.statusOptions[0];
+
+  return {
+    description: activityLibrarySearchCopy.statusDescription,
+    label: option.label,
   };
 }
 

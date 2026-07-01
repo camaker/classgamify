@@ -48,6 +48,7 @@ import {
   buildEmptyActivityLibrarySummary,
   buildActivityLibraryFilterSummary,
   buildActivityLibrarySourceCapabilityMetrics,
+  buildActivityLibraryStatusMetrics,
   buildActivityLibrarySummaryMetrics,
   createEmptySourceMaterialCapabilityCounts,
   normalizeActivityLibraryListCount,
@@ -22247,8 +22248,22 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /const where = buildActivityLibraryWhere\(\{[\s\S]*userId,[\s\S]*\}\);[\s\S]*const matchingRows = await db[\s\S]*\.where\(where\)[\s\S]*const matchingActivities = filterActivityLibrarySourceItems[\s\S]*summary: summarizeActivityLibrary\(matchingActivities\)/,
-  'Activity list summary should be derived from owner-scoped filtered activity rows, not starter preview content.'
+  /const where = buildActivityLibraryWhere\(\{[\s\S]*status: data\.status,[\s\S]*\}\);[\s\S]*const matchingRows = await db[\s\S]*\.where\(where\)[\s\S]*const matchingActivities = filterActivityLibrarySourceItems[\s\S]*summary: summarizeActivityLibrary\(matchingActivities\)/,
+  'Activity list summary should be derived from the current owner-scoped status, search, template, and source filtered rows.'
+);
+assert.match(
+  activitiesApiSource,
+  /const summaryWhere = buildActivityLibraryWhere\(\{[\s\S]*search: data\.search,[\s\S]*template: data\.template,[\s\S]*userId,[\s\S]*\}\);[\s\S]*const summaryRows = await db[\s\S]*\.where\(summaryWhere\)[\s\S]*const summaryActivities = filterActivityLibrarySourceItems\(\{[\s\S]*items: summaryRows,[\s\S]*source: data\.source,[\s\S]*statusSummary: summarizeActivityLibrary\(summaryActivities\)/,
+  'Activity status metrics should use owner-scoped search, template, and source filters without applying the active/archived status filter.'
+);
+assert.doesNotMatch(
+  getSourceSlice(
+    activitiesApiSource,
+    'const summaryWhere = buildActivityLibraryWhere',
+    'const matchingRows = await db'
+  ),
+  /status: data\.status/,
+  'Activity status-summary query should omit the current status filter so the status switch can show both active and archived matching counts.'
 );
 const activityLibrarySummaryDomainSource = readFileSync(
   'src/activities/library-summary.ts',
@@ -22593,6 +22608,11 @@ assert.match(
 );
 assert.match(
   dashboardActivitiesRouteSource,
+  /<ActivityLibrarySearch[\s\S]*statusSummary=\{data\?\.statusSummary\}/,
+  'Activity library route should pass cross-status activity summary data into the search panel.'
+);
+assert.match(
+  dashboardActivitiesRouteSource,
   /buildActivityLibraryRouteState/,
   'Activity dashboard route should consume the activity-domain route state helper.'
 );
@@ -22685,10 +22705,15 @@ assert.match(
   /searchPanelView\.sourceFilterLabel[\s\S]*searchPanelView\.sourceFilterDescription[\s\S]*searchPanelView\.sourceCapabilityMetrics\.map/,
   'Activity library search component should explain the selected source-material filter and capability counts from the domain view.'
 );
+assert.match(
+  activityLibrarySearchComponentSource,
+  /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
+  'Activity library search component should explain the selected status filter and status counts from the domain view.'
+);
 assert.doesNotMatch(
   activityLibrarySearchComponentSource,
-  /audio-ready|worksheet-ready|spreadsheet-ready|future AI extraction|练习纸提取/,
-  'Activity library search component should not hardcode source-material explanatory copy.'
+  /audio-ready|worksheet-ready|spreadsheet-ready|future AI extraction|activity status|练习纸提取|活动状态/,
+  'Activity library search component should not hardcode filter explanatory copy.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
@@ -23014,6 +23039,11 @@ assert.match(
   activityLibraryViewSource,
   /buildCreatedActivityPanelContext[\s\S]*canEditActivity\(activity\.visibility\)[\s\S]*canDeriveActivityWork\(activity\.visibility\)/,
   'Created activity panel context should resolve edit and publish actions through activity lifecycle helpers.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /type ActivityLibrarySearchPanelView = \{[\s\S]*sourceCapabilityMetrics: ActivityLibrarySourceCapabilityMetric\[\];[\s\S]*statusLabel: string;[\s\S]*statusMetrics: ActivityLibraryStatusMetric\[\];/,
+  'Activity library search panel view should expose status labels and status metrics as explicit domain data.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -27248,6 +27278,57 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildActivityDerivativeActionExecutionPlan({
+    action: 'remix',
+    activityId: 'activity-archived',
+    currentTemplateType: 'line-match',
+    targetTemplateType: 'group-sort',
+    visibility: 'archived',
+  }),
+  {
+    failureMessage: 'Activity could not be remixed.',
+    message: archivedActivityDerivationError,
+    reason: 'activity-archived',
+    type: 'blocked',
+  }
+);
+assert.deepEqual(
+  [
+    buildActivityLifecycleActionView({
+      action: 'publish',
+      visibility: 'archived',
+    }).gate,
+    buildActivityLifecycleActionView({
+      action: 'duplicate',
+      visibility: 'archived',
+    }).gate,
+    buildActivityLifecycleActionView({
+      action: 'remix',
+      visibility: 'archived',
+    }).gate,
+  ],
+  [
+    {
+      action: 'publish',
+      message: archivedActivityDerivationError,
+      reason: 'activity-archived',
+      type: 'blocked',
+    },
+    {
+      action: 'duplicate',
+      message: archivedActivityDerivationError,
+      reason: 'activity-archived',
+      type: 'blocked',
+    },
+    {
+      action: 'remix',
+      message: archivedActivityDerivationError,
+      reason: 'activity-archived',
+      type: 'blocked',
+    },
+  ]
+);
+assert.deepEqual(
   buildActivityVisibilityActionExecutionPlan({
     action: 'archive',
     activityId: 'activity-1',
@@ -27472,6 +27553,11 @@ assert.deepEqual(
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusDescription:
       'Switch between active and archived activity views without widening beyond your own saved activities.',
+    statusLabel: 'Active',
+    statusMetrics: [
+      { label: 'Active', status: 'active', value: '0' },
+      { label: 'Archived', status: 'archived', value: '0' },
+    ],
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription:
       'Limit the activity library to one exact template family, or show every template.',
@@ -27500,6 +27586,22 @@ assert.deepEqual(
       totalExtractableSourceMaterials: 3,
       totalReadyTemplateOptions: 2,
     },
+    statusSummary: {
+      archivedActivities: 1,
+      draftActivities: 1,
+      extractableSourceActivities: 3,
+      remixReadyActivities: 2,
+      sourceMaterialCapabilityCounts: {
+        'audio-extraction': 2,
+        'spreadsheet-import': 1,
+        'worksheet-extraction': 1,
+      },
+      templateCoverage: 2,
+      templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+      totalActivities: 3,
+      totalExtractableSourceMaterials: 4,
+      totalReadyTemplateOptions: 4,
+    },
     template: 'all',
     total: 2,
   }),
@@ -27527,6 +27629,11 @@ assert.deepEqual(
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusDescription:
       'Switch between active and archived activity views without widening beyond your own saved activities.',
+    statusLabel: 'Active',
+    statusMetrics: [
+      { label: 'Active', status: 'active', value: '2' },
+      { label: 'Archived', status: 'archived', value: '1' },
+    ],
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription:
       'Limit the activity library to one exact template family, or show every template.',
@@ -27543,6 +27650,43 @@ assert.deepEqual(
     total: 0,
   }).filterSummary,
   { hasFilters: false, text: 'Loading activities...' }
+);
+assert.deepEqual(
+  buildActivityLibrarySearchPanelView({
+    isLoading: false,
+    search: '',
+    source: 'all',
+    status: 'archived',
+    summary: {
+      archivedActivities: 1,
+      draftActivities: 1,
+      extractableSourceActivities: 0,
+      remixReadyActivities: 0,
+      sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
+      templateCoverage: 0,
+      templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+      totalActivities: 2,
+      totalExtractableSourceMaterials: 0,
+      totalReadyTemplateOptions: 0,
+    },
+    template: 'all',
+    total: 2,
+  }).statusMetrics,
+  [
+    { label: 'Active', status: 'active', value: '1' },
+    { label: 'Archived', status: 'archived', value: '1' },
+  ]
+);
+assert.equal(
+  buildActivityLibrarySearchPanelView({
+    isLoading: false,
+    search: '',
+    source: 'all',
+    status: 'archived',
+    template: 'all',
+    total: 0,
+  }).statusLabel,
+  'Archived'
 );
 assert.equal(
   buildActivityLibrarySearchPanelView({
@@ -32022,6 +32166,46 @@ assert.deepEqual(
       label: 'spreadsheet-ready',
       value: '0',
     },
+  ]
+);
+assert.deepEqual(buildActivityLibraryStatusMetrics(librarySummary), [
+  { label: 'Active', status: 'active', value: '1' },
+  { label: 'Archived', status: 'archived', value: '1' },
+]);
+assert.deepEqual(
+  buildActivityLibraryStatusMetrics({
+    archivedActivities: Number.NaN,
+    draftActivities: 0,
+    extractableSourceActivities: 0,
+    remixReadyActivities: 0,
+    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
+    templateCoverage: 0,
+    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+    totalActivities: 4.8,
+    totalExtractableSourceMaterials: 0,
+    totalReadyTemplateOptions: 0,
+  }),
+  [
+    { label: 'Active', status: 'active', value: '4' },
+    { label: 'Archived', status: 'archived', value: '0' },
+  ]
+);
+assert.deepEqual(
+  buildActivityLibraryStatusMetrics({
+    archivedActivities: 9,
+    draftActivities: 0,
+    extractableSourceActivities: 0,
+    remixReadyActivities: 0,
+    sourceMaterialCapabilityCounts: createEmptySourceMaterialCapabilityCounts(),
+    templateCoverage: 0,
+    templateCoverageTotal: ACTIVITY_TEMPLATE_TYPES.length,
+    totalActivities: 2,
+    totalExtractableSourceMaterials: 0,
+    totalReadyTemplateOptions: 0,
+  }),
+  [
+    { label: 'Active', status: 'active', value: '0' },
+    { label: 'Archived', status: 'archived', value: '9' },
   ]
 );
 const emptyActivityLibraryPageView = buildActivityLibraryPageViewModel({

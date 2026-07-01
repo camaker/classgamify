@@ -352,6 +352,7 @@
   "activity_library_filter_source_worksheet": "练习纸",
   "activity_library_filter_source_worksheet_description": "显示已附加练习纸图片或文档、可为练习纸提取做准备的活动。",
   "activity_library_filter_status_description": "在当前活动和归档活动视图之间切换，不会扩大到其他老师的活动。",
+  "activity_library_filter_status_label": "活动状态",
   "activity_library_filter_summary_filtering": "正在筛选活动...",
   "activity_library_filter_summary_loading": "正在加载活动...",
   "activity_library_filter_summary_matches_many": "{count} 个匹配结果",

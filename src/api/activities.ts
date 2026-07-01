@@ -88,13 +88,26 @@ export const listActivities = createServerFn({ method: 'GET' })
       template: data.template,
       userId,
     });
+    const summaryWhere = buildActivityLibraryWhere({
+      search: data.search,
+      template: data.template,
+      userId,
+    });
 
     const matchingRows = await db
       .select(buildActivityLibraryItemSelect())
       .from(activity)
       .where(where);
+    const summaryRows = await db
+      .select(buildActivityLibraryItemSelect())
+      .from(activity)
+      .where(summaryWhere);
     const matchingActivities = filterActivityLibrarySourceItems({
       items: matchingRows,
+      source: data.source,
+    });
+    const summaryActivities = filterActivityLibrarySourceItems({
+      items: summaryRows,
       source: data.source,
     });
     const total = matchingActivities.length;
@@ -120,6 +133,7 @@ export const listActivities = createServerFn({ method: 'GET' })
       createdActivity,
       items,
       summary: summarizeActivityLibrary(matchingActivities),
+      statusSummary: summarizeActivityLibrary(summaryActivities),
       total,
     };
   });

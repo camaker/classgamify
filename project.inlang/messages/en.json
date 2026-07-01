@@ -352,6 +352,7 @@
   "activity_library_filter_source_worksheet": "Worksheet",
   "activity_library_filter_source_worksheet_description": "Show activities with worksheet images or documents ready for worksheet extraction.",
   "activity_library_filter_status_description": "Switch between active and archived activity views without widening beyond your own saved activities.",
+  "activity_library_filter_status_label": "Activity status",
   "activity_library_filter_summary_filtering": "Filtering activities...",
   "activity_library_filter_summary_loading": "Loading activities...",
   "activity_library_filter_summary_matches_many": "{count} matches",

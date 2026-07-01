@@ -32,6 +32,7 @@ type ActivityLibrarySearchProps = {
   source: ActivitySourceMaterialFilter;
   status: ActivityLibraryStatus;
   summary?: ActivityLibrarySummary;
+  statusSummary?: ActivityLibrarySummary;
   template: ActivityTemplateFilter;
   total: number;
   value: string;
@@ -48,6 +49,7 @@ export function ActivityLibrarySearch({
   source,
   status,
   summary,
+  statusSummary,
   template,
   total,
   value,
@@ -63,12 +65,13 @@ export function ActivityLibrarySearch({
     source,
     status,
     summary,
+    statusSummary,
     template,
     total,
   });
 
   return (
-    <section className="grid gap-4 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_auto] xl:items-end">
+    <section className="grid gap-4 rounded-lg border bg-card p-4 xl:grid-cols-[minmax(0,1fr)_13rem_13rem_13rem_auto] xl:items-end">
       <div className="grid gap-2">
         <label
           htmlFor="activity-library-search"
@@ -172,9 +175,9 @@ export function ActivityLibrarySearch({
           ))}
         </div>
       </div>
-      <div className="flex flex-col gap-3 lg:items-end">
+      <div className="grid gap-2">
         <fieldset
-          className="inline-flex rounded-lg border bg-background p-1"
+          className="inline-flex w-fit rounded-lg border bg-background p-1"
           aria-describedby={statusFilterDescriptionId}
           aria-labelledby={statusFilterGroupLabelId}
         >
@@ -199,9 +202,31 @@ export function ActivityLibrarySearch({
             );
           })}
         </fieldset>
-        <p id={statusFilterDescriptionId} className="sr-only">
+        <p
+          id={statusFilterDescriptionId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
+          <span className="font-medium text-foreground">
+            {searchPanelView.statusLabel}
+          </span>
+          {' - '}
           {searchPanelView.statusDescription}
         </p>
+        <div className="flex flex-wrap gap-1.5">
+          {searchPanelView.statusMetrics.map((metric) => (
+            <span
+              key={metric.status}
+              className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
+            >
+              <span className="font-medium text-foreground">
+                {metric.value}
+              </span>{' '}
+              {metric.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-3 lg:items-end">
         <p className="text-sm text-muted-foreground lg:text-right">
           {searchPanelView.filterSummary.text}
         </p>

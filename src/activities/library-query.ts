@@ -43,7 +43,7 @@ export function buildActivityLibraryItemSelect() {
 
 export function buildActivityLibraryWhere({
   search,
-  status = 'active',
+  status,
   template,
   userId,
 }: {
@@ -53,12 +53,15 @@ export function buildActivityLibraryWhere({
   userId: string;
 }) {
   const normalizedSearch = normalizeActivityLibrarySearch(search);
-  const filters: SQL[] = [
-    eq(activity.ownerId, userId),
-    status === 'archived'
-      ? eq(activity.visibility, 'archived')
-      : ne(activity.visibility, 'archived'),
-  ];
+  const filters: SQL[] = [eq(activity.ownerId, userId)];
+
+  if (status) {
+    filters.push(
+      status === 'archived'
+        ? eq(activity.visibility, 'archived')
+        : ne(activity.visibility, 'archived')
+    );
+  }
 
   if (template && template !== 'all') {
     filters.push(eq(activity.templateType, template));

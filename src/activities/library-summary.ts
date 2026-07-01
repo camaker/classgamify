@@ -79,6 +79,12 @@ export type ActivityLibrarySourceCapabilityMetric = {
   value: string;
 };
 
+export type ActivityLibraryStatusMetric = {
+  label: string;
+  status: ActivityLibraryStatus;
+  value: string;
+};
+
 export type ActivityLibraryFilterSummary = {
   hasFilters: boolean;
   text: string;
@@ -294,6 +300,31 @@ export function buildActivityLibrarySourceCapabilityMetrics(
   });
 }
 
+export function buildActivityLibraryStatusMetrics(
+  summary?: ActivityLibrarySummary
+): ActivityLibraryStatusMetric[] {
+  const resolvedSummary = normalizeActivityLibrarySummaryForMetrics(
+    summary ?? buildEmptyActivityLibrarySummary()
+  );
+  const activeActivities =
+    resolvedSummary.totalActivities - resolvedSummary.archivedActivities;
+
+  return [
+    {
+      label: m.activity_library_filter_active(),
+      status: 'active',
+      value: formatActivityLibraryMetricNumber(activeActivities),
+    },
+    {
+      label: m.activity_library_filter_archived(),
+      status: 'archived',
+      value: formatActivityLibraryMetricNumber(
+        resolvedSummary.archivedActivities
+      ),
+    },
+  ];
+}
+
 function formatActivityLibrarySourceExtractionDescription(
   summary: ActivityLibrarySummary
 ) {
@@ -347,6 +378,37 @@ export function buildEmptyActivityLibrarySummary(
     totalActivities: normalizeActivityLibraryMetricNumber(totalActivities) ?? 0,
     totalExtractableSourceMaterials: 0,
     totalReadyTemplateOptions: 0,
+  };
+}
+
+function normalizeActivityLibrarySummaryForMetrics(
+  summary: ActivityLibrarySummary
+): ActivityLibrarySummary {
+  return {
+    ...summary,
+    archivedActivities: normalizeActivityLibraryListCount(
+      summary.archivedActivities
+    ),
+    draftActivities: normalizeActivityLibraryListCount(summary.draftActivities),
+    extractableSourceActivities: normalizeActivityLibraryListCount(
+      summary.extractableSourceActivities
+    ),
+    remixReadyActivities: normalizeActivityLibraryListCount(
+      summary.remixReadyActivities
+    ),
+    templateCoverage: normalizeActivityLibraryListCount(
+      summary.templateCoverage
+    ),
+    templateCoverageTotal: normalizeActivityLibraryListCount(
+      summary.templateCoverageTotal
+    ),
+    totalActivities: normalizeActivityLibraryListCount(summary.totalActivities),
+    totalExtractableSourceMaterials: normalizeActivityLibraryListCount(
+      summary.totalExtractableSourceMaterials
+    ),
+    totalReadyTemplateOptions: normalizeActivityLibraryListCount(
+      summary.totalReadyTemplateOptions
+    ),
   };
 }
 
