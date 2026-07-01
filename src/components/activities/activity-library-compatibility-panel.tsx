@@ -38,7 +38,7 @@ export function ActivityLibraryCompatibilityPanel({
           />
         ))}
       </div>
-      {compatibility.remixHint ? (
+      {actionState.showRemixHint && compatibility.remixHint ? (
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
           {compatibility.remixHint}
         </p>

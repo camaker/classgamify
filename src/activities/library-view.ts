@@ -116,6 +116,7 @@ export type ActivityLibraryCardActionState = {
   showPublishAction: boolean;
   showRestoreAction: boolean;
   showRestoreRequiredMessage: boolean;
+  showRemixHint: boolean;
   showRemixActions: boolean;
 };
 
@@ -1206,6 +1207,7 @@ export function buildActivityLibraryCardActionState({
   const archived = isActivityArchived(visibility);
   const showDerivativeActions =
     persisted && showActiveActions && canCreateDerivedWork;
+  const hasRemixOptions = readyRemixCount > 0;
 
   return {
     canCreateDerivedWork,
@@ -1216,6 +1218,7 @@ export function buildActivityLibraryCardActionState({
     showPublishAction: persisted && showActiveActions && canCreateDerivedWork,
     showRestoreAction: persisted && archived,
     showRestoreRequiredMessage: persisted && archived,
-    showRemixActions: showDerivativeActions && readyRemixCount > 0,
+    showRemixHint: showDerivativeActions && hasRemixOptions,
+    showRemixActions: showDerivativeActions && hasRemixOptions,
   };
 }

@@ -22457,6 +22457,16 @@ assert.match(
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
+  /actionState\.showRemixHint && compatibility\.remixHint[\s\S]*\{compatibility\.remixHint\}/,
+  'Activity library compatibility panel should only show remix guidance through the explicit remix-hint action state.'
+);
+assert.doesNotMatch(
+  activityLibraryCompatibilityPanelSource,
+  /\{compatibility\.remixHint \? \(/,
+  'Activity library compatibility panel should not show remix guidance without the prepared action-state gate.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
   /actionState\.showRemixActions[\s\S]*compatibility\.remixActionOptions\.map[\s\S]*ActivityLibraryRemixActionButton[\s\S]*option=\{option\}/,
   'Activity library compatibility panel should delegate prepared remix actions from the activity-domain view.'
 );
@@ -27436,6 +27446,7 @@ assert.deepEqual(
     showPublishAction: true,
     showRestoreAction: false,
     showRestoreRequiredMessage: false,
+    showRemixHint: true,
     showRemixActions: true,
   }
 );
@@ -27455,6 +27466,7 @@ assert.deepEqual(
     showPublishAction: false,
     showRestoreAction: true,
     showRestoreRequiredMessage: true,
+    showRemixHint: false,
     showRemixActions: false,
   }
 );
@@ -27474,6 +27486,7 @@ assert.deepEqual(
     showPublishAction: false,
     showRestoreAction: true,
     showRestoreRequiredMessage: true,
+    showRemixHint: false,
     showRemixActions: false,
   }
 );
@@ -27493,6 +27506,7 @@ assert.deepEqual(
     showPublishAction: false,
     showRestoreAction: false,
     showRestoreRequiredMessage: false,
+    showRemixHint: false,
     showRemixActions: false,
   }
 );
@@ -27503,6 +27517,15 @@ assert.equal(
     readyRemixCount: 0,
     visibility: 'public',
   }).showRemixActions,
+  false
+);
+assert.equal(
+  buildActivityLibraryCardActionState({
+    libraryStatus: 'active',
+    persisted: true,
+    readyRemixCount: 0,
+    visibility: 'public',
+  }).showRemixHint,
   false
 );
 assert.equal(normalizeAssignmentListSearch('  share   123  '), 'share 123');
