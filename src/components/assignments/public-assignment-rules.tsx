@@ -1,8 +1,11 @@
 import type {
   PublicAssignmentRuleSummaryId,
   PublicAssignmentRuleSummaryItem,
+  PublicAssignmentRuleSummaryStatusView,
   PublicAssignmentRuleSummaryView,
 } from '@/assignments/delivery-summary';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import {
   IconClock,
   IconEye,
@@ -20,11 +23,41 @@ export function PublicAssignmentRules({
   summaryView,
 }: PublicAssignmentRulesProps) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-      {summaryView.items.map((rule) => (
-        <PublicAssignmentRuleItem key={rule.id} rule={rule} />
-      ))}
-    </div>
+    <section aria-label={summaryView.title} className="grid gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">{summaryView.title}</p>
+          <p className="mt-1 max-w-2xl text-muted-foreground text-xs leading-5">
+            {summaryView.description}
+          </p>
+        </div>
+        <PublicAssignmentRuleStatus statusView={summaryView.status} />
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        {summaryView.items.map((rule) => (
+          <PublicAssignmentRuleItem key={rule.id} rule={rule} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PublicAssignmentRuleStatus({
+  statusView,
+}: {
+  statusView: PublicAssignmentRuleSummaryStatusView;
+}) {
+  return (
+    <Badge
+      variant="outline"
+      aria-label={statusView.ariaLabel}
+      className={cn(
+        'rounded-md bg-background',
+        statusView.tone === 'attention' && 'border-primary/40 text-primary'
+      )}
+    >
+      {statusView.label}
+    </Badge>
   );
 }
 

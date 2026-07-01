@@ -69,9 +69,29 @@ export type PublicAssignmentRuleSummaryStats = {
   showsCorrectAnswers: boolean;
 };
 
+export type PublicAssignmentRuleSummaryStatus =
+  | 'attempt-limited'
+  | 'open'
+  | 'scheduled'
+  | 'timed'
+  | 'timed-scheduled';
+
+export type PublicAssignmentRuleSummaryStatusTone = 'attention' | 'neutral';
+
+export type PublicAssignmentRuleSummaryStatusView = {
+  ariaLabel: string;
+  description: string;
+  label: string;
+  status: PublicAssignmentRuleSummaryStatus;
+  tone: PublicAssignmentRuleSummaryStatusTone;
+};
+
 export type PublicAssignmentRuleSummaryView = {
+  description: string;
   items: PublicAssignmentRuleSummaryItem[];
+  status: PublicAssignmentRuleSummaryStatusView;
   summary: PublicAssignmentRuleSummaryStats;
+  title: string;
 };
 
 type AssignmentDeliverySummaryInput = {
@@ -284,18 +304,22 @@ export function buildPublicAssignmentRuleSummaryView({
     },
   ] satisfies PublicAssignmentRuleSummarySourceItem[];
   const items = ruleItems.map(toPublicAssignmentRuleSummaryItem);
+  const summary = buildPublicAssignmentRuleSummaryStats({
+    collectStudentName,
+    expiresAt,
+    itemCount,
+    maxAttempts,
+    ruleIds: items.map((item) => item.id),
+    showCorrectAnswers,
+    timeLimitSeconds,
+  });
 
   return {
+    description: m.assignment_delivery_public_rules_description(),
     items,
-    summary: buildPublicAssignmentRuleSummaryStats({
-      collectStudentName,
-      expiresAt,
-      itemCount,
-      maxAttempts,
-      ruleIds: items.map((item) => item.id),
-      showCorrectAnswers,
-      timeLimitSeconds,
-    }),
+    status: buildPublicAssignmentRuleSummaryStatusView(summary),
+    summary,
+    title: m.assignment_delivery_public_rules_title(),
   };
 }
 
@@ -374,6 +398,79 @@ function buildPublicAssignmentRuleSummaryStats({
     ruleIds,
     showsCorrectAnswers: showCorrectAnswers,
   };
+}
+
+function buildPublicAssignmentRuleSummaryStatusView(
+  summary: PublicAssignmentRuleSummaryStats
+): PublicAssignmentRuleSummaryStatusView {
+  const status = resolvePublicAssignmentRuleSummaryStatus(summary);
+  const label = formatPublicAssignmentRuleSummaryStatusLabel(status);
+  const description =
+    formatPublicAssignmentRuleSummaryStatusDescription(status);
+
+  return {
+    ariaLabel: m.assignment_delivery_public_rules_status_aria({
+      description,
+      label,
+    }),
+    description,
+    label,
+    status,
+    tone:
+      status === 'open' || status === 'attempt-limited'
+        ? 'neutral'
+        : 'attention',
+  };
+}
+
+function resolvePublicAssignmentRuleSummaryStatus({
+  hasAttemptLimit,
+  hasCloseTime,
+  hasTimer,
+}: Pick<
+  PublicAssignmentRuleSummaryStats,
+  'hasAttemptLimit' | 'hasCloseTime' | 'hasTimer'
+>): PublicAssignmentRuleSummaryStatus {
+  if (hasTimer && hasCloseTime) return 'timed-scheduled';
+  if (hasTimer) return 'timed';
+  if (hasCloseTime) return 'scheduled';
+  if (hasAttemptLimit) return 'attempt-limited';
+
+  return 'open';
+}
+
+function formatPublicAssignmentRuleSummaryStatusLabel(
+  status: PublicAssignmentRuleSummaryStatus
+) {
+  switch (status) {
+    case 'attempt-limited':
+      return m.assignment_delivery_public_rules_status_attempt_limited_label();
+    case 'open':
+      return m.assignment_delivery_public_rules_status_open_label();
+    case 'scheduled':
+      return m.assignment_delivery_public_rules_status_scheduled_label();
+    case 'timed':
+      return m.assignment_delivery_public_rules_status_timed_label();
+    case 'timed-scheduled':
+      return m.assignment_delivery_public_rules_status_timed_scheduled_label();
+  }
+}
+
+function formatPublicAssignmentRuleSummaryStatusDescription(
+  status: PublicAssignmentRuleSummaryStatus
+) {
+  switch (status) {
+    case 'attempt-limited':
+      return m.assignment_delivery_public_rules_status_attempt_limited_description();
+    case 'open':
+      return m.assignment_delivery_public_rules_status_open_description();
+    case 'scheduled':
+      return m.assignment_delivery_public_rules_status_scheduled_description();
+    case 'timed':
+      return m.assignment_delivery_public_rules_status_timed_description();
+    case 'timed-scheduled':
+      return m.assignment_delivery_public_rules_status_timed_scheduled_description();
+  }
 }
 
 function hasAssignmentCloseTime(expiresAt: AssignmentDate) {

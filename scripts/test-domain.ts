@@ -9343,6 +9343,11 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
+  /summaryView\.title[\s\S]*summaryView\.description[\s\S]*PublicAssignmentRuleStatus[\s\S]*statusView=\{summaryView\.status\}/,
+  'Public assignment rules component should render the prepared public rule summary heading, description, and status.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
   /summaryView\.items\.map[\s\S]*PublicAssignmentRuleItem[\s\S]*rule=\{rule\}/,
   'Public assignment rules component should delegate prepared rule summary item rendering from the summary view.'
 );
@@ -9363,6 +9368,11 @@ assert.match(
 );
 assert.match(
   publicAssignmentRulesComponentSource,
+  /function PublicAssignmentRuleStatus[\s\S]*statusView\.ariaLabel[\s\S]*statusView\.tone === 'attention'[\s\S]*statusView\.label/,
+  'Public assignment rules component should render prepared status copy, accessibility text, and tone.'
+);
+assert.match(
+  publicAssignmentRulesComponentSource,
   /publicAssignmentRuleIcons[\s\S]*answerReveal: IconEye[\s\S]*attempts: IconRepeat[\s\S]*closes: IconClock[\s\S]*identity: IconUser[\s\S]*items: IconListCheck[\s\S]*timer: IconClock[\s\S]*satisfies Record<PublicAssignmentRuleSummaryId, Icon>/,
   'Public assignment rules should map every rule id to a typed classroom policy icon.'
 );
@@ -9373,8 +9383,8 @@ assert.doesNotMatch(
 );
 assert.doesNotMatch(
   publicAssignmentRulesComponentSource,
-  /timer starts|submitted attempts|student identity|答案|作答|计时|匿名/,
-  'Public assignment rules component should not hard-code student-facing rule explanations.'
+  /Assignment rules|Open link|Timer on|Close scheduled|Attempt limit|timer starts|submitted attempts|student identity|作业规则|链接开放|已开启计时|答案|作答|计时|匿名/,
+  'Public assignment rules component should not hard-code student-facing rule copy or status labels.'
 );
 assert.match(
   publicAssignmentRulesComponentSource,
@@ -9392,13 +9402,23 @@ assert.match(
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /export type PublicAssignmentRuleSummaryView = \{[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*summary: PublicAssignmentRuleSummaryStats;/,
-  'Assignment delivery summary should expose a structured public rule summary view contract.'
+  /export type PublicAssignmentRuleSummaryStatus =[\s\S]*'attempt-limited'[\s\S]*'open'[\s\S]*'scheduled'[\s\S]*'timed'[\s\S]*'timed-scheduled'[\s\S]*export type PublicAssignmentRuleSummaryStatusView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*label: string;[\s\S]*status: PublicAssignmentRuleSummaryStatus;[\s\S]*tone: PublicAssignmentRuleSummaryStatusTone;[\s\S]*export type PublicAssignmentRuleSummaryView = \{[\s\S]*description: string;[\s\S]*items: PublicAssignmentRuleSummaryItem\[\];[\s\S]*status: PublicAssignmentRuleSummaryStatusView;[\s\S]*summary: PublicAssignmentRuleSummaryStats;[\s\S]*title: string;/,
+  'Assignment delivery summary should expose structured public rule summary, status, and heading contracts.'
 );
 assert.match(
   assignmentDeliverySummarySource,
-  /export function buildPublicAssignmentRuleSummaryView[\s\S]*items,[\s\S]*summary: buildPublicAssignmentRuleSummaryStats/,
-  'Public assignment rule summary views should centralize rule items and rule summary metadata.'
+  /export function buildPublicAssignmentRuleSummaryView[\s\S]*const summary = buildPublicAssignmentRuleSummaryStats[\s\S]*description: m\.assignment_delivery_public_rules_description\(\),[\s\S]*items,[\s\S]*status: buildPublicAssignmentRuleSummaryStatusView\(summary\),[\s\S]*summary,[\s\S]*title: m\.assignment_delivery_public_rules_title\(\)/,
+  'Public assignment rule summary views should centralize rule items, heading copy, status, and rule summary metadata.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /buildPublicAssignmentRuleSummaryStatusView[\s\S]*resolvePublicAssignmentRuleSummaryStatus\(summary\)[\s\S]*assignment_delivery_public_rules_status_aria[\s\S]*status === 'open' \|\| status === 'attempt-limited'[\s\S]*resolvePublicAssignmentRuleSummaryStatus[\s\S]*hasTimer && hasCloseTime[\s\S]*if \(hasTimer\)[\s\S]*if \(hasCloseTime\)[\s\S]*if \(hasAttemptLimit\)/,
+  'Public assignment rule status should be derived from normalized timer, close-time, and attempt-limit metadata.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /formatPublicAssignmentRuleSummaryStatusLabel[\s\S]*assignment_delivery_public_rules_status_attempt_limited_label[\s\S]*assignment_delivery_public_rules_status_open_label[\s\S]*assignment_delivery_public_rules_status_scheduled_label[\s\S]*assignment_delivery_public_rules_status_timed_label[\s\S]*assignment_delivery_public_rules_status_timed_scheduled_label[\s\S]*formatPublicAssignmentRuleSummaryStatusDescription[\s\S]*assignment_delivery_public_rules_status_attempt_limited_description[\s\S]*assignment_delivery_public_rules_status_open_description[\s\S]*assignment_delivery_public_rules_status_scheduled_description[\s\S]*assignment_delivery_public_rules_status_timed_description[\s\S]*assignment_delivery_public_rules_status_timed_scheduled_description/,
+  'Public assignment rule status labels and descriptions should come from localized assignment delivery messages.'
 );
 assert.match(
   assignmentDeliverySummarySource,
@@ -9451,8 +9471,8 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentDeliverySummarySource,
-  /playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|可作答项目|次数限制|计时才会开始/,
-  'Assignment delivery summary should not hard-code public rule descriptions.'
+  /Assignment rules|Open link|Timer on|Close scheduled|Attempt limit|playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|作业规则|链接开放|已开启计时|可作答项目|次数限制|计时才会开始/,
+  'Assignment delivery summary should not hard-code public rule descriptions or status copy.'
 );
 assert.doesNotMatch(
   playRouteSource,
@@ -15592,27 +15612,47 @@ assert.deepEqual(
     ['itemOrder', 'Fixed order'],
   ]
 );
+const scheduledPublicRuleSummaryView = buildPublicAssignmentRuleSummaryView({
+  expiresAt: '2026-02-01T00:00:00.000Z',
+  itemCount: 2,
+});
 assert.deepEqual(
-  buildPublicAssignmentRuleSummaryView({
-    expiresAt: '2026-02-01T00:00:00.000Z',
-    itemCount: 2,
-  }).summary,
   {
-    collectsStudentName: true,
-    hasAttemptLimit: true,
-    hasCloseTime: true,
-    hasTimer: false,
-    itemCount: 2,
-    ruleCount: 6,
-    ruleIds: [
-      'items',
-      'attempts',
-      'timer',
-      'closes',
-      'identity',
-      'answerReveal',
-    ],
-    showsCorrectAnswers: true,
+    description: scheduledPublicRuleSummaryView.description,
+    status: scheduledPublicRuleSummaryView.status,
+    summary: scheduledPublicRuleSummaryView.summary,
+    title: scheduledPublicRuleSummaryView.title,
+  },
+  {
+    description:
+      "These rules come from the teacher's published assignment settings. They explain how to submit without revealing answer keys.",
+    status: {
+      ariaLabel:
+        'Close scheduled. The link has a close time, so submit before the scheduled deadline.',
+      description:
+        'The link has a close time, so submit before the scheduled deadline.',
+      label: 'Close scheduled',
+      status: 'scheduled',
+      tone: 'attention',
+    },
+    summary: {
+      collectsStudentName: true,
+      hasAttemptLimit: true,
+      hasCloseTime: true,
+      hasTimer: false,
+      itemCount: 2,
+      ruleCount: 6,
+      ruleIds: [
+        'items',
+        'attempts',
+        'timer',
+        'closes',
+        'identity',
+        'answerReveal',
+      ],
+      showsCorrectAnswers: true,
+    },
+    title: 'Assignment rules',
   }
 );
 assert.equal(formatAssignmentExpiry('not-a-date'), 'No close time');
@@ -15901,23 +15941,15 @@ assert.deepEqual(
     maxAttempts: 2,
     showCorrectAnswers: false,
     timeLimitSeconds: 60,
-  }).summary,
+  }).status,
   {
-    collectsStudentName: false,
-    hasAttemptLimit: true,
-    hasCloseTime: true,
-    hasTimer: true,
-    itemCount: 1,
-    ruleCount: 6,
-    ruleIds: [
-      'items',
-      'attempts',
-      'timer',
-      'closes',
-      'identity',
-      'answerReveal',
-    ],
-    showsCorrectAnswers: false,
+    ariaLabel:
+      'Timer and close time. The assignment has both a timer and a scheduled close time.',
+    description:
+      'The assignment has both a timer and a scheduled close time.',
+    label: 'Timer and close time',
+    status: 'timed-scheduled',
+    tone: 'attention',
   }
 );
 assert.deepEqual(
@@ -15951,6 +15983,53 @@ assert.equal(
     itemCount: Number.POSITIVE_INFINITY,
   })[0]?.value,
   '0 items'
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    expiresAt: null,
+    itemCount: Number.POSITIVE_INFINITY,
+  }).status,
+  {
+    ariaLabel:
+      'Attempt limit. Submissions are limited, but the link has no timer or close time right now.',
+    description:
+      'Submissions are limited, but the link has no timer or close time right now.',
+    label: 'Attempt limit',
+    status: 'attempt-limited',
+    tone: 'neutral',
+  }
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    expiresAt: null,
+    itemCount: 1,
+    maxAttempts: null,
+  }).status,
+  {
+    ariaLabel:
+      'Open link. The link has no timer, close time, or attempt cap right now.',
+    description:
+      'The link has no timer, close time, or attempt cap right now.',
+    label: 'Open link',
+    status: 'open',
+    tone: 'neutral',
+  }
+);
+assert.deepEqual(
+  buildPublicAssignmentRuleSummaryView({
+    expiresAt: null,
+    itemCount: 3,
+    maxAttempts: null,
+    timeLimitSeconds: 60,
+  }).status,
+  {
+    ariaLabel:
+      'Timer on. The assignment timer starts after the activity is ready.',
+    description: 'The assignment timer starts after the activity is ready.',
+    label: 'Timer on',
+    status: 'timed',
+    tone: 'attention',
+  }
 );
 assert.deepEqual(
   buildPublicAssignmentRuleSummary({
