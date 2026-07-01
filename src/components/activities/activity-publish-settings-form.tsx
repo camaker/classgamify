@@ -134,6 +134,10 @@ function ActivityPublishDeliveryLimitFields({
   draft: AssignmentPublishDraft;
   onDraftChange: ActivityPublishDraftFieldChange;
 }) {
+  const maxAttemptsHelpId = `max-attempts-${activityId}-help`;
+  const timeLimitHelpId = `time-limit-${activityId}-help`;
+  const closeAfterHelpId = `expires-at-${activityId}-help`;
+
   return (
     <>
       <div className="grid gap-2">
@@ -146,11 +150,15 @@ function ActivityPublishDeliveryLimitFields({
           min={ASSIGNMENT_MAX_ATTEMPTS_RANGE.min}
           max={ASSIGNMENT_MAX_ATTEMPTS_RANGE.max}
           value={draft.maxAttempts}
+          aria-describedby={maxAttemptsHelpId}
           onChange={(event) =>
             onDraftChange('maxAttempts', event.currentTarget.value)
           }
         />
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={maxAttemptsHelpId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           {assignmentPublishDialogCopy.maxAttemptsHelp}
         </p>
       </div>
@@ -165,11 +173,15 @@ function ActivityPublishDeliveryLimitFields({
           max={ASSIGNMENT_TIME_LIMIT_MINUTES_RANGE.max}
           value={draft.timeLimitMinutes}
           placeholder={assignmentPublishDialogCopy.timeLimitPlaceholder}
+          aria-describedby={timeLimitHelpId}
           onChange={(event) =>
             onDraftChange('timeLimitMinutes', event.currentTarget.value)
           }
         />
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={timeLimitHelpId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           {assignmentPublishDialogCopy.timeLimitHelp}
         </p>
       </div>
@@ -182,11 +194,15 @@ function ActivityPublishDeliveryLimitFields({
           type="datetime-local"
           min={buildAssignmentPublishCloseAfterMinLocal()}
           value={draft.expiresAtLocal}
+          aria-describedby={closeAfterHelpId}
           onChange={(event) =>
             onDraftChange('expiresAtLocal', event.currentTarget.value)
           }
         />
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={closeAfterHelpId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           {assignmentPublishDialogCopy.closeAfterHelp}
         </p>
       </div>
@@ -227,17 +243,27 @@ function PublishSetting({
   label: string;
   onCheckedChange: (checked: boolean) => void;
 }) {
+  const descriptionId = `${id}-description`;
+
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <label htmlFor={id} className="font-medium text-sm">
           {label}
         </label>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+        <p
+          id={descriptionId}
+          className="mt-1 text-xs leading-5 text-muted-foreground"
+        >
           {description}
         </p>
       </div>
-      <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+      <Switch
+        id={id}
+        checked={checked}
+        aria-describedby={descriptionId}
+        onCheckedChange={onCheckedChange}
+      />
     </div>
   );
 }

@@ -52,6 +52,8 @@ export function ActivityLibrarySearch({
   total,
   value,
 }: ActivityLibrarySearchProps) {
+  const sourceFilterDescriptionId = 'activity-source-filter-description';
+  const statusFilterGroupLabelId = 'activity-status-filter-label';
   const searchPanelView = buildActivityLibrarySearchPanelView({
     isLoading,
     search: value,
@@ -122,6 +124,7 @@ export function ActivityLibrarySearch({
         <NativeSelect
           id="activity-source-filter"
           value={source}
+          aria-describedby={sourceFilterDescriptionId}
           onChange={(event) =>
             onSourceChange(
               event.currentTarget.value as ActivitySourceMaterialFilter
@@ -134,7 +137,10 @@ export function ActivityLibrarySearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={sourceFilterDescriptionId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           <span className="font-medium text-foreground">
             {searchPanelView.sourceFilterLabel}
           </span>
@@ -156,7 +162,13 @@ export function ActivityLibrarySearch({
         </div>
       </div>
       <div className="flex flex-col gap-3 lg:items-end">
-        <div className="inline-flex rounded-lg border bg-background p-1">
+        <fieldset
+          className="inline-flex rounded-lg border bg-background p-1"
+          aria-labelledby={statusFilterGroupLabelId}
+        >
+          <legend id={statusFilterGroupLabelId} className="sr-only">
+            {activityLibrarySearchCopy.statusLabel}
+          </legend>
           {searchPanelView.statusOptions.map((option) => {
             const Icon = option.value === 'active' ? IconFolder : IconFolderOff;
 
@@ -167,13 +179,14 @@ export function ActivityLibrarySearch({
                 variant={status === option.value ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => onStatusChange(option.value)}
+                aria-pressed={status === option.value}
               >
                 <Icon className="size-4" />
                 {option.label}
               </Button>
             );
           })}
-        </div>
+        </fieldset>
         <p className="text-sm text-muted-foreground lg:text-right">
           {searchPanelView.filterSummary.text}
         </p>

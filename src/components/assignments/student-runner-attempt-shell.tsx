@@ -102,6 +102,8 @@ function StudentRunnerIdentityPanel({
   studentName: string;
 }) {
   if (identityView.mode === 'student-name') {
+    const studentNameDescriptionId = 'student-name-description';
+
     return (
       <div>
         <label
@@ -114,10 +116,17 @@ function StudentRunnerIdentityPanel({
           id="student-name"
           value={studentName}
           disabled={identityView.disabled}
+          aria-describedby={studentNameDescriptionId}
           onChange={(event) => onStudentNameChange(event.target.value)}
           placeholder={identityView.placeholder}
           className="mt-2"
         />
+        <p
+          id={studentNameDescriptionId}
+          className="mt-1 text-xs leading-5 text-muted-foreground"
+        >
+          {identityView.copy.description}
+        </p>
       </div>
     );
   }

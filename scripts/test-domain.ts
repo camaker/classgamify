@@ -4510,8 +4510,28 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
+  /const maxAttemptsHelpId = `max-attempts-\$\{activityId\}-help`[\s\S]*aria-describedby=\{maxAttemptsHelpId\}[\s\S]*id=\{maxAttemptsHelpId\}[\s\S]*assignmentPublishDialogCopy\.maxAttemptsHelp/,
+  'Assignment publish max-attempts input should be associated with its prepared help text.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /const timeLimitHelpId = `time-limit-\$\{activityId\}-help`[\s\S]*aria-describedby=\{timeLimitHelpId\}[\s\S]*id=\{timeLimitHelpId\}[\s\S]*assignmentPublishDialogCopy\.timeLimitHelp/,
+  'Assignment publish timer input should be associated with its prepared help text.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /const closeAfterHelpId = `expires-at-\$\{activityId\}-help`[\s\S]*aria-describedby=\{closeAfterHelpId\}[\s\S]*id=\{closeAfterHelpId\}[\s\S]*assignmentPublishDialogCopy\.closeAfterHelp/,
+  'Assignment publish close-time input should be associated with its prepared help text.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
   /function ActivityPublishToggleGroup[\s\S]*toggleViews\.map[\s\S]*PublishSetting[\s\S]*onDraftChange\(option\.key, checked\)/,
   'Assignment publish toggle group should own prepared toggle binding.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function PublishSetting[\s\S]*const descriptionId = `\$\{id\}-description`[\s\S]*id=\{descriptionId\}[\s\S]*description[\s\S]*aria-describedby=\{descriptionId\}/,
+  'Assignment publish toggle controls should be associated with their prepared descriptions.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormSource,
@@ -8905,6 +8925,11 @@ assert.match(
   studentRunnerSubmitControlsSource,
   /data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*text=\{hintView\.text\}/,
   'Student runner submit controls should render prepared submit disabled state, label, structured incomplete-confirmation state, and domain-prepared hint views.'
+);
+assert.match(
+  studentRunnerSubmitControlsSource,
+  /const submitHintIds = controlView\.submitHintViews\.map[\s\S]*aria-describedby=\{[\s\S]*submitHintIds\.join\(' '\)[\s\S]*id=\{buildStudentRunnerSubmitHintId\(hintView\.id\)\}[\s\S]*function buildStudentRunnerSubmitHintId[\s\S]*student-runner-submit-\$\{id\}-hint/,
+  'Student runner submit button should be associated with every prepared submit hint.'
 );
 assert.match(
   studentRunnerStateSource,

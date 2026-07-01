@@ -280,6 +280,7 @@ function ActivityAiDraftFocusSelect({
   const selectedFocusOption =
     panelView.focusOptions.find((option) => option.value === draftFocus) ??
     panelView.focusOptions[0];
+  const focusDescriptionId = 'activity-ai-focus-description';
 
   return (
     <div className="space-y-2">
@@ -289,6 +290,7 @@ function ActivityAiDraftFocusSelect({
       <NativeSelect
         id="activity-ai-focus"
         value={draftFocus}
+        aria-describedby={focusDescriptionId}
         onChange={(event) =>
           onDraftFocusChange(event.currentTarget.value as ActivityAiDraftFocus)
         }
@@ -301,7 +303,7 @@ function ActivityAiDraftFocusSelect({
         ))}
       </NativeSelect>
       {selectedFocusOption ? (
-        <p className="text-xs text-muted-foreground">
+        <p id={focusDescriptionId} className="text-xs text-muted-foreground">
           {selectedFocusOption.description}
         </p>
       ) : null}
@@ -318,6 +320,8 @@ function ActivityAiDraftGenerateButton({
   onGenerateDraft: () => void;
   panelView: ActivityEditorAiDraftPanelView;
 }) {
+  const generationDisabledReasonId = 'activity-ai-generate-disabled-reason';
+
   return (
     <>
       <Button
@@ -325,6 +329,11 @@ function ActivityAiDraftGenerateButton({
         variant="secondary"
         onClick={onGenerateDraft}
         disabled={!panelView.canGenerateDraft}
+        aria-describedby={
+          panelView.generationDisabledReason
+            ? generationDisabledReasonId
+            : undefined
+        }
         className="self-end sm:col-span-2"
       >
         {isGeneratingDraft ? (
@@ -335,7 +344,10 @@ function ActivityAiDraftGenerateButton({
         {panelView.generateButtonLabel}
       </Button>
       {panelView.generationDisabledReason ? (
-        <p className="sm:col-span-2 text-xs text-muted-foreground">
+        <p
+          id={generationDisabledReasonId}
+          className="sm:col-span-2 text-xs text-muted-foreground"
+        >
           {panelView.generationDisabledReason}
         </p>
       ) : null}

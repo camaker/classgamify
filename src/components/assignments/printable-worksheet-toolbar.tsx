@@ -47,6 +47,8 @@ function PrintableWorksheetAnswerKeyToggle({
   onAnswerKeyChange: (answerKey: boolean) => void;
   toggleView: PrintableWorksheetAnswerKeyToggleView;
 }) {
+  const answerKeyDescriptionId = 'printable-answer-key-description';
+
   return (
     <label
       htmlFor="printable-answer-key"
@@ -55,11 +57,15 @@ function PrintableWorksheetAnswerKeyToggle({
       <Switch
         id="printable-answer-key"
         checked={toggleView.value}
+        aria-describedby={answerKeyDescriptionId}
         onCheckedChange={onAnswerKeyChange}
       />
       <span className="grid gap-1">
         <span>{toggleView.label}</span>
-        <span className="max-w-64 text-muted-foreground text-xs leading-snug">
+        <span
+          id={answerKeyDescriptionId}
+          className="max-w-64 text-muted-foreground text-xs leading-snug"
+        >
           {toggleView.description}
         </span>
       </span>

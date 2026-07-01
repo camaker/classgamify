@@ -34,6 +34,7 @@ export function AssignmentListFilters({
   summary,
   total,
 }: AssignmentListFiltersProps) {
+  const statusFilterDescriptionId = 'assignment-status-filter-description';
   const searchPanelView = buildAssignmentListSearchPanelView({
     isLoading,
     search,
@@ -79,6 +80,7 @@ export function AssignmentListFilters({
         <NativeSelect
           id="assignment-status-filter"
           value={status}
+          aria-describedby={statusFilterDescriptionId}
           onChange={(event) =>
             onStatusChange(event.currentTarget.value as AssignmentStatusFilter)
           }
@@ -89,7 +91,10 @@ export function AssignmentListFilters({
             </NativeSelectOption>
           ))}
         </NativeSelect>
-        <p className="text-xs leading-5 text-muted-foreground">
+        <p
+          id={statusFilterDescriptionId}
+          className="text-xs leading-5 text-muted-foreground"
+        >
           <span className="font-medium text-foreground">
             {searchPanelView.statusLabel}
           </span>
