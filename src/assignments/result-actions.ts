@@ -289,6 +289,7 @@ export type AssignmentResultCopyArtifactPreviewMetaKey =
   | 'lines'
   | 'next-steps'
   | 'review-items'
+  | 'review-needed-students'
   | 'student-last-submitted'
   | 'students';
 
@@ -849,11 +850,22 @@ export function buildAssignmentResultCopyArtifactPreviewMetaItems({
   }
 
   return [
-    buildAssignmentResultCopyArtifactPreviewMetaItem({
-      key: 'students',
-      label: m.assignment_result_copy_preview_meta_students(),
-      value: artifacts.studentFollowUpSummary.students.length,
-    }),
+    ...artifacts.studentFollowUpSummary.coverageViews.flatMap(
+      (coverageView) => {
+        const key = getAssignmentResultCopyArtifactPreviewCoverageMetaKey(
+          coverageView.id
+        );
+        if (!key) return [];
+
+        return [
+          {
+            key,
+            label: coverageView.label,
+            value: coverageView.value,
+          },
+        ];
+      }
+    ),
     buildAssignmentResultCopyArtifactPreviewMetaItem({
       key: 'next-steps',
       label: m.assignment_result_copy_preview_meta_next_steps(),
@@ -884,6 +896,15 @@ function buildAssignmentResultCopyArtifactPreviewMetaItem({
     label,
     value: formatAssignmentResultNumber(value, { min: 0 }),
   };
+}
+
+function getAssignmentResultCopyArtifactPreviewCoverageMetaKey(
+  id: string
+): Extract<
+  AssignmentResultCopyArtifactPreviewMetaKey,
+  'review-needed-students' | 'students'
+> | null {
+  return id === 'students' || id === 'review-needed-students' ? id : null;
 }
 
 function buildAssignmentResultCopyArtifactStudentAttemptMetaItems(

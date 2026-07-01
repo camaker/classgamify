@@ -12,6 +12,7 @@ import {
 } from '@/assignments/result-copy-format';
 import {
   formatAssignmentResultDate,
+  formatAssignmentResultNumber,
   formatAssignmentResultValue,
 } from '@/assignments/result-format';
 import {
@@ -49,7 +50,21 @@ export type AssignmentStudentFollowUpSummaryStudentView = {
   text: string;
 };
 
+export type AssignmentStudentFollowUpSummaryCoverageItemId =
+  | 'latest-attempt-details'
+  | 'last-submitted-context'
+  | 'review-needed-students'
+  | 'students';
+
+export type AssignmentStudentFollowUpSummaryCoverageItemView = {
+  description: string;
+  id: AssignmentStudentFollowUpSummaryCoverageItemId;
+  label: string;
+  value: string;
+};
+
 export type AssignmentStudentFollowUpSummary = {
+  coverageViews: AssignmentStudentFollowUpSummaryCoverageItemView[];
   studentViews: AssignmentStudentFollowUpSummaryStudentView[];
   students: AssignmentStudentSummary[];
   text: string;
@@ -74,10 +89,79 @@ export function buildAssignmentStudentFollowUpSummary({
   const lines = [title, '', ...formatStudents(studentViews)];
 
   return {
+    coverageViews: buildAssignmentStudentFollowUpSummaryCoverageViews({
+      studentViews,
+      students: sortedStudents,
+    }),
     studentViews,
     students: sortedStudents,
     text: joinAssignmentResultCopyLines(lines),
     title,
+  };
+}
+
+export function buildAssignmentStudentFollowUpSummaryCoverageViews(input: {
+  studentViews: AssignmentStudentFollowUpSummaryStudentView[];
+  students: AssignmentStudentSummary[];
+}): AssignmentStudentFollowUpSummaryCoverageItemView[] {
+  const summary = buildAssignmentStudentFollowUpSummaryCoverage(input);
+
+  return [
+    {
+      description:
+        m.assignment_student_follow_up_coverage_students_description(),
+      id: 'students',
+      label: m.assignment_student_follow_up_coverage_students_label(),
+      value: formatAssignmentStudentFollowUpCoverageCount(summary.studentCount),
+    },
+    {
+      description:
+        m.assignment_student_follow_up_coverage_review_needed_description(),
+      id: 'review-needed-students',
+      label: m.assignment_student_follow_up_coverage_review_needed_label(),
+      value: formatAssignmentStudentFollowUpCoverageCount(
+        summary.reviewNeededStudentCount
+      ),
+    },
+    {
+      description:
+        m.assignment_student_follow_up_coverage_latest_attempts_description(),
+      id: 'latest-attempt-details',
+      label: m.assignment_student_follow_up_coverage_latest_attempts_label(),
+      value: formatAssignmentStudentFollowUpCoverageCount(
+        summary.latestAttemptDetailCount
+      ),
+    },
+    {
+      description:
+        m.assignment_student_follow_up_coverage_last_submitted_description(),
+      id: 'last-submitted-context',
+      label: m.assignment_student_follow_up_coverage_last_submitted_label(),
+      value: formatAssignmentStudentFollowUpCoverageCount(
+        summary.lastSubmittedContextCount
+      ),
+    },
+  ];
+}
+
+function buildAssignmentStudentFollowUpSummaryCoverage(input: {
+  studentViews: AssignmentStudentFollowUpSummaryStudentView[];
+  students: AssignmentStudentSummary[];
+}) {
+  return {
+    lastSubmittedContextCount: countAssignmentStudentFollowUpViews(
+      input.studentViews,
+      (studentView) => Boolean(studentView.lastSubmittedLabel)
+    ),
+    latestAttemptDetailCount: countAssignmentStudentFollowUpViews(
+      input.studentViews,
+      (studentView) => Boolean(studentView.latestAttemptSummaryLabel)
+    ),
+    reviewNeededStudentCount: countAssignmentStudentFollowUpStudents(
+      input.students,
+      (student) => normalizeAssignmentSummaryCount(student.needsReviewCount) > 0
+    ),
+    studentCount: input.studentViews.length,
   };
 }
 
@@ -178,6 +262,26 @@ export function buildAssignmentStudentFollowUpSummaryStudentView({
         : m.assignment_student_follow_up_line(lineInput)
     ),
   };
+}
+
+function countAssignmentStudentFollowUpViews(
+  studentViews: AssignmentStudentFollowUpSummaryStudentView[],
+  predicate: (
+    studentView: AssignmentStudentFollowUpSummaryStudentView
+  ) => boolean
+) {
+  return studentViews.filter(predicate).length;
+}
+
+function countAssignmentStudentFollowUpStudents(
+  students: AssignmentStudentSummary[],
+  predicate: (student: AssignmentStudentSummary) => boolean
+) {
+  return students.filter(predicate).length;
+}
+
+function formatAssignmentStudentFollowUpCoverageCount(value: number) {
+  return formatAssignmentResultNumber(value, { min: 0 });
 }
 
 export function formatStudentFollowUpRecommendation(needsReviewCount: number) {

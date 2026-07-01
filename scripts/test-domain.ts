@@ -813,6 +813,7 @@ import {
 import {
   buildLatestAttemptReviewByStudentKey,
   buildAssignmentStudentFollowUpSummary,
+  buildAssignmentStudentFollowUpSummaryCoverageViews,
   buildAssignmentStudentFollowUpSummaryStudentView,
   formatStudentFollowUpLastSubmitted,
   formatStudentFollowUpLastSubmittedContext,
@@ -1959,6 +1960,11 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifactPreviewMetaItems[\s\S]*latest-attempts[\s\S]*assignment_result_copy_preview_meta_latest_attempts[\s\S]*countAssignmentResultCopyLatestAttemptViews/,
   'Assignment result copy artifact preview metadata should expose latest-attempt summary coverage for student follow-up artifacts.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /review-needed-students[\s\S]*studentFollowUpSummary\.coverageViews[\s\S]*flatMap[\s\S]*getAssignmentResultCopyArtifactPreviewCoverageMetaKey/,
+  'Assignment result copy artifact preview metadata should reuse prepared student follow-up coverage views for review-need counts.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -5850,7 +5856,7 @@ assert.match(
 );
 assert.doesNotMatch(
   assignmentResultsClassroomBriefCardSource,
-  /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|brief\.text|Attempts reviewed|Follow-up students|Brief coverage|已复盘作答|简报覆盖范围/,
+  /assignment_classroom_brief_|assignment_result_metric_|assignment_result_action_copy_|assignment_student_follow_up_coverage_|brief\.text|Attempts reviewed|Follow-up students|Brief coverage|Needs review|Latest attempt details|已复盘作答|简报覆盖范围|需要复盘|最近作答详情/,
   'Assignment classroom brief component should not call locale messages, raw copied-text fields, or hard-code scope copy directly.'
 );
 assert.match(
@@ -39640,6 +39646,7 @@ assert.deepEqual(
         'Students sorted by follow-up need: 1',
         [
           ['students', 'Students', '1'],
+          ['review-needed-students', 'Needs review', '1'],
           ['next-steps', 'Next steps', '1'],
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
@@ -45410,8 +45417,28 @@ assert.match(
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
-  /export type AssignmentStudentFollowUpSummary[\s\S]*studentViews: AssignmentStudentFollowUpSummaryStudentView\[\][\s\S]*students: AssignmentStudentSummary\[\][\s\S]*text: string/,
+  /export type AssignmentStudentFollowUpSummary[\s\S]*coverageViews: AssignmentStudentFollowUpSummaryCoverageItemView\[\][\s\S]*studentViews: AssignmentStudentFollowUpSummaryStudentView\[\][\s\S]*students: AssignmentStudentSummary\[\][\s\S]*text: string/,
   'Assignment student follow-up summaries should expose a structured teacher-review object alongside the copied text.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /export type AssignmentStudentFollowUpSummaryCoverageItemId[\s\S]*'latest-attempt-details'[\s\S]*'last-submitted-context'[\s\S]*'review-needed-students'[\s\S]*'students'[\s\S]*export type AssignmentStudentFollowUpSummaryCoverageItemView = \{[\s\S]*description: string;[\s\S]*id: AssignmentStudentFollowUpSummaryCoverageItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Assignment student follow-up summaries should expose stable prepared coverage item views.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /buildAssignmentStudentFollowUpSummaryCoverageViews\(\{[\s\S]*studentViews,[\s\S]*students: sortedStudents[\s\S]*\}\)/,
+  'Assignment student follow-up summaries should attach prepared coverage views from sorted students and rendered student rows.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /assignment_student_follow_up_coverage_students_label[\s\S]*assignment_student_follow_up_coverage_review_needed_label[\s\S]*assignment_student_follow_up_coverage_latest_attempts_label[\s\S]*assignment_student_follow_up_coverage_last_submitted_label/,
+  'Assignment student follow-up coverage views should use localized labels.'
+);
+assert.match(
+  assignmentStudentFollowUpSummarySource,
+  /normalizeAssignmentSummaryCount\(student\.needsReviewCount\) > 0/,
+  'Assignment student follow-up coverage should count review needs from structured student summaries instead of localized labels.'
 );
 assert.match(
   assignmentStudentFollowUpSummarySource,
@@ -45670,6 +45697,12 @@ assert.deepEqual(
 );
 assert.deepEqual(
   {
+    coverage: studentFollowUpSummary.coverageViews.map((coverageView) => [
+      coverageView.id,
+      coverageView.label,
+      coverageView.value,
+      coverageView.description,
+    ]),
     studentKeys: studentFollowUpSummary.students.map(
       (student) => student.studentKey
     ),
@@ -45680,6 +45713,32 @@ assert.deepEqual(
     viewCount: studentFollowUpSummary.studentViews.length,
   },
   {
+    coverage: [
+      [
+        'students',
+        'Students',
+        '4',
+        'Students included in this follow-up artifact after current result filters.',
+      ],
+      [
+        'review-needed-students',
+        'Needs review',
+        '3',
+        'Students with missed or unanswered items counted as follow-up needs.',
+      ],
+      [
+        'latest-attempt-details',
+        'Latest attempt details',
+        '0',
+        'Students whose latest attempt can show submitted, correct, and review counts.',
+      ],
+      [
+        'last-submitted-context',
+        'Last submitted',
+        '4',
+        'Students with a normalized latest submission time from the current review scope.',
+      ],
+    ],
     studentKeys: [
       'name:alpha-review',
       'name:more-review',
@@ -45696,6 +45755,84 @@ assert.deepEqual(
     viewCount: 4,
   }
 );
+const latestAttemptStudentFollowUpSummary = buildAssignmentStudentFollowUpSummary(
+  {
+    assignmentTitle: csvExportData.assignment.title,
+    attempts: resultAnalysis.attempts,
+    students: resultAnalysis.students,
+  }
+);
+assert.deepEqual(
+  latestAttemptStudentFollowUpSummary.coverageViews.map((coverageView) => [
+    coverageView.id,
+    coverageView.label,
+    coverageView.value,
+  ]),
+  [
+    ['students', 'Students', '2'],
+    ['review-needed-students', 'Needs review', '1'],
+    ['latest-attempt-details', 'Latest attempt details', '2'],
+    ['last-submitted-context', 'Last submitted', '2'],
+  ]
+);
+assert.deepEqual(
+  buildAssignmentStudentFollowUpSummaryCoverageViews({
+    studentViews: [],
+    students: [],
+  }).map((coverageView) => [
+    coverageView.id,
+    coverageView.label,
+    coverageView.value,
+  ]),
+  [
+    ['students', 'Students', '0'],
+    ['review-needed-students', 'Needs review', '0'],
+    ['latest-attempt-details', 'Latest attempt details', '0'],
+    ['last-submitted-context', 'Last submitted', '0'],
+  ]
+);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.deepEqual(
+    buildAssignmentStudentFollowUpSummaryCoverageViews({
+      studentViews: latestAttemptStudentFollowUpSummary.studentViews,
+      students: latestAttemptStudentFollowUpSummary.students,
+    }).map((coverageView) => [
+      coverageView.id,
+      coverageView.label,
+      coverageView.value,
+      coverageView.description,
+    ]),
+    [
+      [
+        'students',
+        '学生',
+        '2',
+        '经过当前结果筛选后进入这份跟进材料的学生数。',
+      ],
+      [
+        'review-needed-students',
+        '需要复盘',
+        '1',
+        '把错题或未答题计入跟进需求后的学生数。',
+      ],
+      [
+        'latest-attempt-details',
+        '最近作答详情',
+        '2',
+        '可显示已提交、正确数和复盘数的最近作答学生数。',
+      ],
+      [
+        'last-submitted-context',
+        '最近提交',
+        '2',
+        '当前复盘范围内带有规范化最近提交时间的学生数。',
+      ],
+    ]
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.match(
   studentFollowUpSummary.text,
   /ClassGamify student follow-up: Capital Review, Week 1/
@@ -46039,6 +46176,7 @@ assert.deepEqual(
       'Students sorted by follow-up need: 1',
       [
         ['students', 'Students', '1'],
+        ['review-needed-students', 'Needs review', '1'],
         ['next-steps', 'Next steps', '1'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
@@ -46077,6 +46215,7 @@ assert.deepEqual(
         (metaItem) =>
           metaItem.key === 'latest-attempts' ||
           metaItem.key === 'latest-attempt-times' ||
+          metaItem.key === 'review-needed-students' ||
           metaItem.key === 'student-last-submitted'
       )
       .map((metaItem) => [metaItem.key, metaItem.label, metaItem.value]),
@@ -46117,6 +46256,7 @@ assert.deepEqual(
       'current-review',
       'preview:copy-follow-up',
       [
+        ['review-needed-students', 'Needs review', '1'],
         ['latest-attempts', 'Latest attempts', '2'],
         ['latest-attempt-times', 'Attempt times', '2'],
         ['student-last-submitted', 'Student last submitted', '2'],
