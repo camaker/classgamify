@@ -162,10 +162,9 @@ function normalizeReferenceText(
 }
 
 function getSafeReferenceFilename(value: string) {
-  const withDecodedPathSeparators =
-    decodeReferenceFilenamePathSeparators(value);
+  const withDecodedUrlEscapes = decodeReferenceFilenameUrlEscapes(value);
   const withoutUrlSuffix =
-    withDecodedPathSeparators.split(/[?#]/u)[0]?.trim() ?? '';
+    withDecodedUrlEscapes.split(/[?#]/u)[0]?.trim() ?? '';
   const withoutSensitiveParts =
     removeSensitiveReferenceFilenameParts(withoutUrlSuffix);
   const lastSegment =
@@ -181,6 +180,35 @@ function decodeReferenceFilenamePathSeparators(value: string) {
   return value.replace(/%(?:2f|5c)/giu, (match) =>
     match.toLowerCase() === '%2f' ? '/' : '\\'
   );
+}
+
+function decodeReferenceFilenameUrlEscapes(value: string) {
+  const withDecodedPathSeparators =
+    decodeReferenceFilenamePathSeparators(value);
+
+  try {
+    return decodeURIComponent(withDecodedPathSeparators);
+  } catch {
+    return withDecodedPathSeparators.replace(
+      /%(?:23|26|3a|3d|3f)/giu,
+      (match) => {
+        switch (match.toLowerCase()) {
+          case '%23':
+            return '#';
+          case '%26':
+            return '&';
+          case '%3a':
+            return ':';
+          case '%3d':
+            return '=';
+          case '%3f':
+            return '?';
+          default:
+            return match;
+        }
+      }
+    );
+  }
 }
 
 function removeSensitiveReferenceFilenameParts(value: string) {

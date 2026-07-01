@@ -4150,8 +4150,8 @@ assert.match(
 );
 assert.match(
   activityDraftMetaSummarySource,
-  /function ActivityDraftQuestionChoiceReadinessItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.statusLabel[\s\S]*itemView\.detail/,
-  'AI draft quiz choice readiness item should render prepared prompt, status, and detail labels.'
+  /function ActivityDraftQuestionChoiceReadinessItem[\s\S]*itemView\.promptLabel[\s\S]*itemView\.statusLabel[\s\S]*itemView\.detail[\s\S]*itemView\.choiceCountLabel[\s\S]*itemView\.sourceLabel[\s\S]*itemView\.answerLabel/,
+  'AI draft quiz choice readiness item should render prepared prompt, status, detail, source, choice-count, and answer labels.'
 );
 assert.doesNotMatch(
   activityDraftMetaSummarySource,
@@ -6787,6 +6787,18 @@ assert.equal(
     'https:%2F%2Ffiles.example.test%2Fteacher%5Cprivate%2Fencoded unit.pdf?token=secret'
   ),
   'encoded unit.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'https:%2F%2Ffiles.example.test%2Fteacher%2Fprivate%2Fencoded%20unit.pdf%3Ftoken%3Dsecret%26signature%3Dabc'
+  ),
+  'encoded unit.pdf'
+);
+assert.equal(
+  normalizeActivityMaterialReferenceFilename(
+    'worksheet%20scan.pdf%20storageKey%3Dclassroom%2Fprivate%2Fscan.pdf%20token%3Asecret'
+  ),
+  'worksheet scan.pdf'
 );
 assert.equal(
   normalizeActivityMaterialReferenceFilename(
@@ -33016,6 +33028,32 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(
+  buildActivitySourceMaterialDraftNoteViewsFromSourceText(
+    [
+      'weather terms',
+      '',
+      'Attached classroom source materials:',
+      '- Worksheet document: Unit 1.pdf%3Ftoken%3Dsecret',
+      '',
+      'teacher-added notes',
+      '',
+      'Attached classroom source materials:',
+      '- Audio: https:%2F%2Ffiles.example.test%2Fclass%2FUnit%201.mp3%3Fsignature%3Dabc',
+      '- storageKey: classroom/private/unit.pdf',
+    ].join('\n')
+  ),
+  [
+    {
+      kindLabel: 'Worksheet document',
+      name: 'Unit 1.pdf',
+    },
+    {
+      kindLabel: 'Audio',
+      name: 'Unit 1.mp3',
+    },
+  ]
+);
+assert.deepEqual(
   extractActivityDraftSourceTerms({
     sourceText: sourceMaterialDraftNotesText,
     subject: 'Science',
@@ -33511,9 +33549,12 @@ assert.equal(
 assert.deepEqual(
   fallbackDraftMetaSummary.questionChoiceReadiness?.itemViews[0],
   {
+    answerLabel: 'Answer is present in the playable choices.',
+    choiceCountLabel: '4/4 playable choices (4 explicit, 0 local).',
     detail: 'The draft already includes 4/4 explicit choices.',
     key: fallbackDraftMeta.questionChoiceReadiness.items[0]?.questionId,
     promptLabel: '1. Track 1: The Science listening word is weather.',
+    sourceLabel: 'Candidate sources: 1 sibling answers, 0 vocabulary terms.',
     status: 'explicit-ready',
     statusLabel: 'Explicit choices',
   }
@@ -33760,6 +33801,21 @@ assert.equal(
 assert.equal(
   questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]?.detail,
   'Add 3 more choices or vocabulary terms before publishing this quiz.'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
+    ?.choiceCountLabel,
+  '1/4 playable choices (1 explicit, 0 local).'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
+    ?.sourceLabel,
+  'Candidate sources: 0 sibling answers, 0 vocabulary terms.'
+);
+assert.equal(
+  questionOnlyDraftMetaSummary.questionChoiceReadiness?.itemViews[0]
+    ?.answerLabel,
+  'Answer is present in the playable choices.'
 );
 assert.equal(
   findActivityDraftChecklistItem({

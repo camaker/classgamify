@@ -107,24 +107,10 @@ export function buildActivitySourceMaterialDraftNoteViews(
 export function buildActivitySourceMaterialDraftNoteViewsFromSourceText(
   sourceText: string
 ): ActivitySourceMaterialDraftNoteView[] {
-  const materialNotesParagraph = getActivityDraftSourceTextParagraphs(
-    sourceText
-  ).find(hasActivitySourceMaterialDraftNotesParagraph);
-
-  if (!materialNotesParagraph) return [];
-
-  const lines = materialNotesParagraph.split(/\r?\n/);
-  const noteStartIndex = lines.findIndex((line) =>
-    isActivitySourceMaterialDraftNotesParagraph(line)
-  );
-
-  if (noteStartIndex === -1) return [];
-
   return uniqueActivitySourceMaterialDraftNoteViews(
-    lines
-      .slice(noteStartIndex + 1)
-      .map(parseActivitySourceMaterialDraftNoteLine)
-      .filter((noteView) => noteView !== null)
+    getActivityDraftSourceTextParagraphs(sourceText).flatMap(
+      parseActivitySourceMaterialDraftNotesParagraph
+    )
   );
 }
 
@@ -402,6 +388,22 @@ function parseActivitySourceMaterialDraftNoteLine(
   }
 
   return noteView;
+}
+
+function parseActivitySourceMaterialDraftNotesParagraph(paragraph: string) {
+  if (!hasActivitySourceMaterialDraftNotesParagraph(paragraph)) return [];
+
+  const lines = paragraph.split(/\r?\n/);
+  const noteStartIndex = lines.findIndex((line) =>
+    isActivitySourceMaterialDraftNotesParagraph(line)
+  );
+
+  if (noteStartIndex === -1) return [];
+
+  return lines
+    .slice(noteStartIndex + 1)
+    .map(parseActivitySourceMaterialDraftNoteLine)
+    .filter((noteView) => noteView !== null);
 }
 
 function unique(values: string[]) {

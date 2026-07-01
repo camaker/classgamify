@@ -319,6 +319,11 @@ function ActivityDraftQuestionChoiceReadinessItem({
       <p className="mt-1 text-muted-foreground text-xs leading-5">
         {itemView.detail}
       </p>
+      <div className="mt-2 grid gap-1 text-muted-foreground text-xs leading-5">
+        <p>{itemView.choiceCountLabel}</p>
+        <p>{itemView.sourceLabel}</p>
+        <p>{itemView.answerLabel}</p>
+      </div>
     </div>
   );
 }

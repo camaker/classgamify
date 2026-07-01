@@ -229,9 +229,12 @@ export type ActivityDraftMetaSummaryQuestionChoiceReadinessView = {
 };
 
 export type ActivityDraftMetaSummaryQuestionChoiceReadinessItemView = {
+  answerLabel: string;
+  choiceCountLabel: string;
   detail: string;
   key: string;
   promptLabel: string;
+  sourceLabel: string;
   status: QuestionChoiceReadinessStatus;
   statusLabel: string;
 };
@@ -487,11 +490,24 @@ function buildActivityDraftMetaSummaryQuestionChoiceReadinessItemView({
   item: QuestionChoiceReadinessItem;
 }): ActivityDraftMetaSummaryQuestionChoiceReadinessItemView {
   return {
+    answerLabel: item.answerIncluded
+      ? m.activity_draft_meta_quiz_choices_answer_included()
+      : m.activity_draft_meta_quiz_choices_answer_missing(),
+    choiceCountLabel: m.activity_draft_meta_quiz_choices_choice_count({
+      completedCount: item.completedChoiceCount,
+      deterministicCount: item.deterministicChoiceCount,
+      explicitCount: item.explicitChoiceCount,
+      targetCount: item.targetCount,
+    }),
     detail: buildActivityDraftMetaSummaryQuestionChoiceReadinessDetail(item),
     key: item.questionId,
     promptLabel: m.activity_draft_meta_quiz_choices_prompt({
       index: getActivityTemplateQuizChoiceReadinessItemPosition(index),
       prompt: item.prompt,
+    }),
+    sourceLabel: m.activity_draft_meta_quiz_choices_sources({
+      siblingCount: item.siblingAnswerCandidateCount,
+      vocabularyCount: item.vocabularyCandidateCount,
     }),
     status: item.status,
     statusLabel: formatActivityDraftMetaSummaryQuestionChoiceReadinessStatus(
