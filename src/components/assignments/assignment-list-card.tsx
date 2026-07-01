@@ -227,6 +227,7 @@ function AssignmentListShareActions({
         disabledReasonId={disabledReasonId}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
+        shareUrl={action.shareUrl}
         className="w-full bg-background lg:w-auto"
       />
       <AssignmentListShareDisabledReason
@@ -243,8 +244,10 @@ function AssignmentListSharePath({
   action: AssignmentListShareAction;
 }) {
   return (
-    <div className="max-w-56 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5">
-      <span className="font-medium">{action.sharePathLabel}</span>
+    <div className="max-w-64 rounded-lg border bg-muted/30 px-3 py-2 text-muted-foreground text-xs leading-5">
+      <span className="font-medium">{action.shareUrlLabel}</span>
+      <span className="mt-1 block break-all font-mono">{action.shareUrl}</span>
+      <span className="mt-1 block font-medium">{action.sharePathLabel}</span>
       <span className="mt-1 block truncate font-mono">{action.sharePath}</span>
     </div>
   );

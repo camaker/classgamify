@@ -1226,6 +1226,7 @@
   "assignment_share_link_copy_student_label": "Copy student link",
   "assignment_share_link_copy_success": "Student link copied.",
   "assignment_share_link_path_label": "Student link",
+  "assignment_share_link_url_label": "Full student link",
   "assignment_status_action_close_label": "Close link",
   "assignment_status_action_close_success": "Assignment link closed.",
   "assignment_status_action_failure": "Assignment status could not be updated.",

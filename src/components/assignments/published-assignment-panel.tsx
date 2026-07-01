@@ -50,9 +50,17 @@ export function PublishedAssignmentPanel({
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
           {panelContext.body}
         </p>
-        <div className="mt-2 w-fit rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
-          <span className="font-medium">{panelContext.sharePathLabel}</span>
-          <span className="ml-2 font-mono">{panelContext.sharePath}</span>
+        <div className="mt-2 grid w-fit max-w-full gap-1 rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground">
+          <span>
+            <span className="font-medium">{panelContext.shareUrlLabel}</span>
+            <span className="ml-2 break-all font-mono">
+              {panelContext.shareUrl}
+            </span>
+          </span>
+          <span>
+            <span className="font-medium">{panelContext.sharePathLabel}</span>
+            <span className="ml-2 font-mono">{panelContext.sharePath}</span>
+          </span>
         </div>
         {panelContext.nextStepViews.length ? (
           <ul className="mt-3 grid gap-1 text-muted-foreground text-xs leading-5">
@@ -171,6 +179,7 @@ function PublishedAssignmentShareActions({
         disabledReasonId={disabledReasonId}
         label={action.copyLabel}
         shareSlug={action.shareSlug}
+        shareUrl={action.shareUrl}
         className="w-full bg-background sm:w-auto"
       />
       <PublishedAssignmentShareDisabledReason

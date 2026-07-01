@@ -1705,6 +1705,11 @@ assert.match(
   /label,[\s\S]*label: string;[\s\S]*\{label\}/,
   'Share-link copy button should require prepared copy labels from assignment-domain action views.'
 );
+assert.match(
+  copyAssignmentShareLinkButtonSource,
+  /shareUrl,[\s\S]*shareUrl\?: string;[\s\S]*shareUrl,/,
+  'Share-link copy button should pass prepared absolute student-link URLs into the assignment-domain copy plan.'
+);
 assert.doesNotMatch(
   copyAssignmentShareLinkButtonSource,
   /assignmentShareLinkActionCopy/,
@@ -1732,13 +1737,23 @@ assert.match(
 );
 assert.match(
   assignmentShareLinkSource,
+  /export type AssignmentShareLinkActionView = \{[\s\S]*sharePath: string;[\s\S]*sharePathLabel: string;[\s\S]*shareSlug: string;[\s\S]*shareUrl: string;[\s\S]*shareUrlLabel: string;/,
+  'Share-link action views should expose both route paths and absolute student-link URLs for teacher distribution surfaces.'
+);
+assert.match(
+  assignmentShareLinkSource,
   /export type AssignmentShareLinkAvailability = \{[\s\S]*disabledReasonCode\?: AssignmentShareLinkDisabledReasonCode;[\s\S]*buildAssignmentShareLinkAvailability[\s\S]*getAssignmentShareLinkDisabledReasonCode[\s\S]*isAvailable:[\s\S]*availabilityState\.isAvailable && !disabledReason\.disabledReasonCode/,
   'Share-link availability should carry structured disabled reason codes and block blank share slugs.'
 );
 assert.match(
   assignmentShareLinkSource,
-  /buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*const resolvedDisabledReasonCode =[\s\S]*getAssignmentShareLinkDisabledReasonCode\(\{[\s\S]*lifecycleStatus: 'open'[\s\S]*shareSlug: normalizedShareSlug[\s\S]*const resolvedIsAvailable = isAvailable && !resolvedDisabledReasonCode[\s\S]*disabledReasonCode: resolvedDisabledReasonCode[\s\S]*isAvailable: resolvedIsAvailable/,
+  /buildAssignmentShareLinkActionView\(\{[\s\S]*disabledReasonCode,[\s\S]*const resolvedDisabledReasonCode =[\s\S]*getAssignmentShareLinkDisabledReasonCode\(\{[\s\S]*lifecycleStatus: 'open'[\s\S]*shareSlug: normalizedShareSlug[\s\S]*const resolvedIsAvailable = isAvailable && !resolvedDisabledReasonCode[\s\S]*disabledReasonCode: resolvedDisabledReasonCode[\s\S]*isAvailable: resolvedIsAvailable[\s\S]*shareUrl: buildAssignmentShareUrl\(normalizedShareSlug, baseUrl\)[\s\S]*shareUrlLabel: assignmentShareLinkActionCopy\.urlLabel/,
   'Share-link action views should preserve and derive disabled reason codes before resolving availability.'
+);
+assert.match(
+  assignmentShareLinkSource,
+  /url: shareUrl \?\? buildAssignmentShareUrl\(shareSlug, baseUrl\)/,
+  'Share-link copy execution plans should prefer prepared absolute student-link URLs when available.'
 );
 assert.match(
   assignmentShareLinkSource,
@@ -14019,6 +14034,7 @@ assert.deepEqual(assignmentShareLinkActionCopy, {
   failureMessage: 'Student link could not be copied.',
   pathLabel: 'Student link',
   successMessage: 'Student link copied.',
+  urlLabel: 'Full student link',
 });
 assert.equal(ASSIGNMENT_SHARE_ROUTE_TARGET, Routes.Play);
 assert.deepEqual(
@@ -14033,6 +14049,8 @@ assert.deepEqual(
     sharePath: '/play/class%20123',
     sharePathLabel: 'Student link',
     shareSlug: 'class 123',
+    shareUrl: buildAssignmentShareUrl('class 123'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -14048,6 +14066,8 @@ assert.deepEqual(
     sharePath: '/play/class%20123',
     sharePathLabel: 'Student link',
     shareSlug: 'class 123',
+    shareUrl: buildAssignmentShareUrl('class 123'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -14068,6 +14088,8 @@ assert.deepEqual(
     sharePath: '/play/draft-share',
     sharePathLabel: 'Student link',
     shareSlug: 'draft-share',
+    shareUrl: buildAssignmentShareUrl('draft-share'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -14085,6 +14107,8 @@ assert.deepEqual(
     sharePath: '/play/',
     sharePathLabel: 'Student link',
     shareSlug: '',
+    shareUrl: buildAssignmentShareUrl(''),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -14101,6 +14125,8 @@ assert.deepEqual(
     sharePath: '/play/',
     sharePathLabel: 'Student link',
     shareSlug: '',
+    shareUrl: buildAssignmentShareUrl(''),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -14120,6 +14146,18 @@ assert.deepEqual(
   buildAssignmentShareLinkCopyExecutionPlan({
     baseUrl: '　classgamify.test / dashboard　',
     shareSlug: 'class share',
+  }),
+  {
+    failureMessage: 'Student link could not be copied.',
+    successMessage: 'Student link copied.',
+    type: 'copy-link',
+    url: 'https://classgamify.test/play/class%20share',
+  }
+);
+assert.deepEqual(
+  buildAssignmentShareLinkCopyExecutionPlan({
+    shareSlug: 'class share',
+    shareUrl: 'https://classgamify.test/play/class%20share',
   }),
   {
     failureMessage: 'Student link could not be copied.',
@@ -15348,6 +15386,8 @@ assert.deepEqual(
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
         shareSlug: 'share-2',
+        shareUrl: buildAssignmentShareUrl('share-2'),
+        shareUrlLabel: 'Full student link',
         to: Routes.Play,
       },
     },
@@ -15369,6 +15409,8 @@ assert.deepEqual(
     ],
     sharePath: '/play/share-2',
     sharePathLabel: 'Student link',
+    shareUrl: buildAssignmentShareUrl('share-2'),
+    shareUrlLabel: 'Full student link',
     showMissingHint: false,
     status: 'found',
     title: 'Week 2',
@@ -15394,6 +15436,8 @@ assert.deepEqual(
         sharePath: '/play/share-2',
         sharePathLabel: 'Student link',
         shareSlug: 'share-2',
+        shareUrl: buildAssignmentShareUrl('share-2'),
+        shareUrlLabel: 'Full student link',
         to: Routes.Play,
       },
     },
@@ -15410,6 +15454,8 @@ assert.deepEqual(
     ],
     sharePath: '/play/share-2',
     sharePathLabel: 'Student link',
+    shareUrl: buildAssignmentShareUrl('share-2'),
+    shareUrlLabel: 'Full student link',
     showMissingHint: false,
     status: 'loading',
     title: 'Student share link is being prepared.',
@@ -15435,6 +15481,8 @@ assert.deepEqual(
         sharePath: '/play/missing',
         sharePathLabel: 'Student link',
         shareSlug: 'missing',
+        shareUrl: buildAssignmentShareUrl('missing'),
+        shareUrlLabel: 'Full student link',
         to: Routes.Play,
       },
     },
@@ -15451,6 +15499,8 @@ assert.deepEqual(
     ],
     sharePath: '/play/missing',
     sharePathLabel: 'Student link',
+    shareUrl: buildAssignmentShareUrl('missing'),
+    shareUrlLabel: 'Full student link',
     showMissingHint: true,
     status: 'missing',
     title: 'Student share link is ready.',
@@ -29240,6 +29290,8 @@ assert.deepEqual(
           sharePath: '/play/share-1',
           sharePathLabel: 'Student link',
           shareSlug: 'share-1',
+          shareUrl: buildAssignmentShareUrl('share-1'),
+          shareUrlLabel: 'Full student link',
           to: Routes.Play,
         },
       },
@@ -29265,6 +29317,8 @@ assert.deepEqual(
       ],
       sharePath: '/play/share-1',
       sharePathLabel: 'Student link',
+      shareUrl: buildAssignmentShareUrl('share-1'),
+      shareUrlLabel: 'Full student link',
       showMissingHint: false,
       status: 'found',
       title: 'Persisted assignment',
@@ -29414,6 +29468,8 @@ assert.deepEqual(
         sharePath: '/play/share-1',
         sharePathLabel: 'Student link',
         shareSlug: 'share-1',
+        shareUrl: buildAssignmentShareUrl('share-1'),
+        shareUrlLabel: 'Full student link',
         to: Routes.Play,
       },
       statusAction: {
@@ -29512,6 +29568,8 @@ assert.deepEqual(
         sharePath: '/play/demo-food',
         sharePathLabel: 'Student link',
         shareSlug: 'demo-food',
+        shareUrl: buildAssignmentShareUrl('demo-food'),
+        shareUrlLabel: 'Full student link',
         to: Routes.Play,
       },
       statusAction: undefined,
@@ -29716,6 +29774,8 @@ assert.deepEqual(
       sharePath: '/play/share%20123',
       sharePathLabel: 'Student link',
       shareSlug: 'share 123',
+      shareUrl: buildAssignmentShareUrl('share 123'),
+      shareUrlLabel: 'Full student link',
       to: Routes.Play,
     },
     statusAction: undefined,
@@ -29754,6 +29814,8 @@ assert.deepEqual(
       sharePath: '/play/draft-share',
       sharePathLabel: 'Student link',
       shareSlug: 'draft-share',
+      shareUrl: buildAssignmentShareUrl('draft-share'),
+      shareUrlLabel: 'Full student link',
       to: Routes.Play,
     },
     statusAction: undefined,
@@ -39858,6 +39920,7 @@ assert.deepEqual(
     activityDescription: 'Snapshot description',
     activityTitle: 'Snapshot title',
     assignmentSharePath: '/play/share%20123',
+    assignmentShareUrl: buildAssignmentShareUrl('share 123'),
     assignmentTitle: 'Week 1 results',
     printAction: {
       assignmentId: 'assignment-week-1',
@@ -39883,6 +39946,8 @@ assert.deepEqual(
       sharePath: '/play/share%20123',
       sharePathLabel: 'Student link',
       shareSlug: 'share 123',
+      shareUrl: buildAssignmentShareUrl('share 123'),
+      shareUrlLabel: 'Full student link',
       to: Routes.Play,
     },
     shareSlug: 'share 123',
@@ -39913,6 +39978,7 @@ assert.deepEqual(
     activityDescription: '',
     activityTitle: 'Current activity title',
     assignmentSharePath: '/play/closed-share',
+    assignmentShareUrl: buildAssignmentShareUrl('closed-share'),
     assignmentTitle: 'Expired results',
     printAction: {
       assignmentId: 'assignment-expired',
@@ -39934,6 +40000,8 @@ assert.deepEqual(
       sharePath: '/play/closed-share',
       sharePathLabel: 'Student link',
       shareSlug: 'closed-share',
+      shareUrl: buildAssignmentShareUrl('closed-share'),
+      shareUrlLabel: 'Full student link',
       to: Routes.Play,
     },
     shareSlug: 'closed-share',
@@ -39956,6 +40024,8 @@ assert.deepEqual(
     sharePath: '/play/share%20two',
     sharePathLabel: 'Student link',
     shareSlug: 'share two',
+    shareUrl: buildAssignmentShareUrl('share two'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -40018,6 +40088,8 @@ assert.deepEqual(
     sharePath: '/play/closed-share',
     sharePathLabel: 'Student link',
     shareSlug: 'closed-share',
+    shareUrl: buildAssignmentShareUrl('closed-share'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -40037,6 +40109,8 @@ assert.deepEqual(
     sharePath: '/play/draft-share',
     sharePathLabel: 'Student link',
     shareSlug: 'draft-share',
+    shareUrl: buildAssignmentShareUrl('draft-share'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );
@@ -40057,6 +40131,8 @@ assert.deepEqual(
     sharePath: '/play/expired-share',
     sharePathLabel: 'Student link',
     shareSlug: 'expired-share',
+    shareUrl: buildAssignmentShareUrl('expired-share'),
+    shareUrlLabel: 'Full student link',
     to: Routes.Play,
   }
 );

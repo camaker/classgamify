@@ -111,6 +111,8 @@ export type PublishedAssignmentPanelContext = {
   nextStepViews: PublishedAssignmentPanelNextStepView[];
   sharePath: string;
   sharePathLabel: string;
+  shareUrl: string;
+  shareUrlLabel: string;
   showMissingHint: boolean;
   status: PublishedAssignmentPanelStatus;
   title: string;
@@ -127,6 +129,10 @@ export function buildPublishedAssignmentPanelContext({
 }): PublishedAssignmentPanelContext {
   const normalizedShareSlug = normalizeAssignmentShareSlug(shareSlug);
   const sharePath = buildAssignmentSharePath(normalizedShareSlug);
+  const shareAction = buildAssignmentShareLinkActionView({
+    label: m.assignment_list_action_open_published_link(),
+    shareSlug: normalizedShareSlug,
+  });
   const foundNextStepViews =
     buildPublishedAssignmentPanelNextStepViews('found');
   const loadingNextStepViews =
@@ -146,6 +152,8 @@ export function buildPublishedAssignmentPanelContext({
       nextStepViews: foundNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
+      shareUrl: shareAction.shareUrl,
+      shareUrlLabel: shareAction.shareUrlLabel,
       showMissingHint: false,
       status: 'found',
       title: formatAssignmentDisplayTitle(assignment.title),
@@ -163,6 +171,8 @@ export function buildPublishedAssignmentPanelContext({
       nextStepViews: loadingNextStepViews,
       sharePath,
       sharePathLabel: m.assignment_published_panel_share_path_label(),
+      shareUrl: shareAction.shareUrl,
+      shareUrlLabel: shareAction.shareUrlLabel,
       showMissingHint: false,
       status: 'loading',
       title: m.assignment_published_panel_loading_title(),
@@ -179,6 +189,8 @@ export function buildPublishedAssignmentPanelContext({
     nextStepViews: missingNextStepViews,
     sharePath,
     sharePathLabel: m.assignment_published_panel_share_path_label(),
+    shareUrl: shareAction.shareUrl,
+    shareUrlLabel: shareAction.shareUrlLabel,
     showMissingHint: true,
     status: 'missing',
     title: m.assignment_published_panel_missing_title(),

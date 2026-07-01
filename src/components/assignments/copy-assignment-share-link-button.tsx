@@ -15,6 +15,7 @@ export function CopyAssignmentShareLinkButton({
   disabledReasonId,
   label,
   shareSlug,
+  shareUrl,
 }: {
   className?: string;
   disabled?: boolean;
@@ -23,6 +24,7 @@ export function CopyAssignmentShareLinkButton({
   disabledReasonId?: string;
   label: string;
   shareSlug: string;
+  shareUrl?: string;
 }) {
   async function copyShareLink() {
     const executionPlan = buildAssignmentShareLinkCopyExecutionPlan({
@@ -30,6 +32,7 @@ export function CopyAssignmentShareLinkButton({
       disabledReasonCode,
       disabledMessage,
       shareSlug,
+      shareUrl,
     });
     if (executionPlan.type === 'blocked') {
       toast.error(executionPlan.message);

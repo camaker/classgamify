@@ -1226,6 +1226,7 @@
   "assignment_share_link_copy_student_label": "复制学生链接",
   "assignment_share_link_copy_success": "学生链接已复制。",
   "assignment_share_link_path_label": "学生链接",
+  "assignment_share_link_url_label": "完整学生链接",
   "assignment_status_action_close_label": "关闭链接",
   "assignment_status_action_close_success": "作业链接已关闭。",
   "assignment_status_action_failure": "无法更新作业状态。",

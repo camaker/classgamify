@@ -30,6 +30,8 @@ export type AssignmentShareLinkActionView = {
   sharePath: string;
   sharePathLabel: string;
   shareSlug: string;
+  shareUrl: string;
+  shareUrlLabel: string;
   to: typeof ASSIGNMENT_SHARE_ROUTE_TARGET;
 };
 
@@ -52,6 +54,9 @@ export const assignmentShareLinkActionCopy = {
   },
   get successMessage() {
     return m.assignment_share_link_copy_success();
+  },
+  get urlLabel() {
+    return m.assignment_share_link_url_label();
   },
 } as const;
 
@@ -139,12 +144,14 @@ export function buildAssignmentShareLinkAvailability({
 }
 
 export function buildAssignmentShareLinkActionView({
+  baseUrl,
   disabledReasonCode,
   disabledReason,
   isAvailable = true,
   label,
   shareSlug,
 }: {
+  baseUrl?: string;
   disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledReason?: string;
   isAvailable?: boolean;
@@ -171,6 +178,8 @@ export function buildAssignmentShareLinkActionView({
     sharePath: buildAssignmentSharePath(normalizedShareSlug),
     sharePathLabel: assignmentShareLinkActionCopy.pathLabel,
     shareSlug: normalizedShareSlug,
+    shareUrl: buildAssignmentShareUrl(normalizedShareSlug, baseUrl),
+    shareUrlLabel: assignmentShareLinkActionCopy.urlLabel,
     to: ASSIGNMENT_SHARE_ROUTE_TARGET,
   };
 }
@@ -186,12 +195,14 @@ export function buildAssignmentShareLinkCopyExecutionPlan({
   disabledReasonCode,
   disabledMessage,
   shareSlug,
+  shareUrl,
 }: {
   baseUrl?: string;
   disabled?: boolean;
   disabledReasonCode?: AssignmentShareLinkDisabledReasonCode;
   disabledMessage?: string;
   shareSlug: string;
+  shareUrl?: string;
 }): AssignmentShareLinkCopyExecutionPlan {
   if (disabled) {
     return {
@@ -215,7 +226,7 @@ export function buildAssignmentShareLinkCopyExecutionPlan({
     failureMessage: assignmentShareLinkActionCopy.failureMessage,
     successMessage: assignmentShareLinkActionCopy.successMessage,
     type: 'copy-link',
-    url: buildAssignmentShareUrl(shareSlug, baseUrl),
+    url: shareUrl ?? buildAssignmentShareUrl(shareSlug, baseUrl),
   };
 }
 

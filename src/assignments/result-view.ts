@@ -508,6 +508,7 @@ export type AssignmentResultHeaderView = {
   activityDescription: string;
   activityTitle: string;
   assignmentSharePath: string;
+  assignmentShareUrl: string;
   assignmentTitle: string;
   printAction: AssignmentResultHeaderPrintAction;
   settingsSummaryView: AssignmentSettingsSummaryView;
@@ -1104,6 +1105,7 @@ export function buildAssignmentResultHeaderView({
     activityDescription: resolvedSource.activityDescription ?? '',
     activityTitle: resolvedSource.activityTitle,
     assignmentSharePath: shareAction.sharePath,
+    assignmentShareUrl: shareAction.shareUrl,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
     printAction: {
       assignmentId: assignment.id,

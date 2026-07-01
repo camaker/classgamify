@@ -100,8 +100,12 @@ function AssignmentResultsHeaderSharePath({
   shareAction: AssignmentResultHeaderShareAction;
 }) {
   return (
-    <div className="flex min-h-8 items-center gap-2 rounded-lg border bg-muted/30 px-3 text-sm text-muted-foreground">
+    <div className="flex min-h-8 max-w-full flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
       <IconShare3 className="size-4" />
+      <span className="font-medium">{shareAction.shareUrlLabel}</span>
+      <span className="break-all font-mono text-xs">
+        {shareAction.shareUrl}
+      </span>
       <span className="font-medium">{shareAction.sharePathLabel}</span>
       <span className="font-mono text-xs">{shareAction.sharePath}</span>
     </div>
@@ -123,6 +127,7 @@ function AssignmentResultsHeaderCopyShareAction({
       disabledReasonId={disabledReasonId}
       label={shareAction.copyLabel}
       shareSlug={shareAction.shareSlug}
+      shareUrl={shareAction.shareUrl}
       className="w-full bg-background sm:w-auto"
     />
   );
