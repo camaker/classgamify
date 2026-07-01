@@ -134,6 +134,17 @@ assignment publishing is enabled.
 | 26 | Billing settings use ClassGamify plan language | Sign in, open `/settings/billing` for `en` and `zh`, verify the current-plan card describes ClassGamify plans, activity access, classroom routines, saved activity sets, assignment workflows, and hosted billing status, and verify it does not mention copied Lang Study, HSK, Hanzi, Chinese-character, or saved-character-list plan copy. |
 | 27 | Core classroom controls expose accessible descriptions | Sign in and walk `/create`, `/dashboard/activities`, `/dashboard/assignments`, `/play/:shareId`, and `/print/assignments/:assignmentId`; verify AI draft focus and generate controls, activity source/status filters, assignment status filters, publish-setting inputs and toggles, printable answer-key toggle, student identity input, and submit button are associated with their prepared help text, descriptions, or submit hints through semantic grouping or `aria-describedby` while continuing to use localized runtime copy. |
 
+## 6. Student Runner Smoke
+
+**File:** `specs/student-runner.spec.ts` | **Priority:** P1
+
+Verifies the public student runner can be opened and interacted with from a
+stable starter link before release.
+
+| # | Test name | Flow |
+|---|---|---|
+| 1 | Starter play link stays interactive while read-only | Open `/play/demo-food`, verify the starter assignment heading and progress badge render, answer two visible quiz choices, verify progress advances, verify the submit button stays disabled because starter preview assignments are read-only, verify the read-only hint is visible and associated with the submit control, and assert no browser errors. |
+
 ## Deferred Coverage
 
 These flows should be added after their dependencies are made deterministic:
