@@ -263,6 +263,8 @@ export type AssignmentResultCopyArtifactPreviewScopeSummaryItemId =
   | 'students';
 
 export type AssignmentResultCopyArtifactPreviewScopeSummaryItem = {
+  ariaLabel: string;
+  description: string;
   id: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;
   label: string;
   value: string;
@@ -614,6 +616,8 @@ function buildAssignmentResultCopyArtifactPreviewScope(
       value: itemView.value,
     })),
     summaryItems: copyScopeView.summaryItems.map((summaryItem) => ({
+      ariaLabel: summaryItem.ariaLabel,
+      description: summaryItem.description,
       id: summaryItem.id,
       label: summaryItem.label,
       value: summaryItem.value,

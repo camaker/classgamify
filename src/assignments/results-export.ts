@@ -122,6 +122,7 @@ export type AssignmentResultsExportPreparationItemId =
   | 'students';
 
 export type AssignmentResultsExportPreparationItemView = {
+  ariaLabel: string;
   description: string;
   id: AssignmentResultsExportPreparationItemId;
   label: string;
@@ -156,55 +157,64 @@ export function buildAssignmentResultsExportPreparationView(
     deliveryView,
   });
 
+  const itemViews = [
+    {
+      description:
+        m.assignment_results_export_preparation_attempts_description(),
+      id: 'attempts',
+      label: m.assignment_results_export_preparation_attempts_label(),
+      value: formatAssignmentResultsExportPreparationCount(
+        summary.attemptCount
+      ),
+    },
+    {
+      description:
+        m.assignment_results_export_preparation_students_description(),
+      id: 'students',
+      label: m.assignment_results_export_preparation_students_label(),
+      value: formatAssignmentResultsExportPreparationCount(
+        summary.studentCount
+      ),
+    },
+    {
+      description:
+        m.assignment_results_export_preparation_delivery_policy_description(),
+      id: 'delivery-policy',
+      label: m.assignment_results_export_preparation_delivery_policy_label(),
+      value: formatAssignmentResultsExportPreparationCount(
+        summary.deliveryPolicyFieldCount
+      ),
+    },
+    {
+      description:
+        m.assignment_results_export_preparation_answer_rows_description(),
+      id: 'answer-rows',
+      label: m.assignment_results_export_preparation_answer_rows_label(),
+      value: formatAssignmentResultsExportPreparationCount(
+        summary.answerRowCount
+      ),
+    },
+    {
+      description:
+        m.assignment_results_export_preparation_columns_description(),
+      id: 'columns',
+      label: m.assignment_results_export_preparation_columns_label(),
+      value: formatAssignmentResultsExportPreparationCount(summary.columnCount),
+    },
+  ] satisfies Array<
+    Omit<AssignmentResultsExportPreparationItemView, 'ariaLabel'>
+  >;
+
   return {
     description: m.assignment_results_export_preparation_description(),
-    itemViews: [
-      {
-        description:
-          m.assignment_results_export_preparation_attempts_description(),
-        id: 'attempts',
-        label: m.assignment_results_export_preparation_attempts_label(),
-        value: formatAssignmentResultsExportPreparationCount(
-          summary.attemptCount
-        ),
-      },
-      {
-        description:
-          m.assignment_results_export_preparation_students_description(),
-        id: 'students',
-        label: m.assignment_results_export_preparation_students_label(),
-        value: formatAssignmentResultsExportPreparationCount(
-          summary.studentCount
-        ),
-      },
-      {
-        description:
-          m.assignment_results_export_preparation_delivery_policy_description(),
-        id: 'delivery-policy',
-        label: m.assignment_results_export_preparation_delivery_policy_label(),
-        value: formatAssignmentResultsExportPreparationCount(
-          summary.deliveryPolicyFieldCount
-        ),
-      },
-      {
-        description:
-          m.assignment_results_export_preparation_answer_rows_description(),
-        id: 'answer-rows',
-        label: m.assignment_results_export_preparation_answer_rows_label(),
-        value: formatAssignmentResultsExportPreparationCount(
-          summary.answerRowCount
-        ),
-      },
-      {
-        description:
-          m.assignment_results_export_preparation_columns_description(),
-        id: 'columns',
-        label: m.assignment_results_export_preparation_columns_label(),
-        value: formatAssignmentResultsExportPreparationCount(
-          summary.columnCount
-        ),
-      },
-    ],
+    itemViews: itemViews.map((itemView) => ({
+      ...itemView,
+      ariaLabel: m.assignment_results_export_preparation_item_aria_label({
+        description: itemView.description,
+        label: itemView.label,
+        value: itemView.value,
+      }),
+    })),
     title: m.assignment_results_export_preparation_title(),
   };
 }

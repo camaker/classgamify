@@ -95,14 +95,18 @@ function AssignmentResultsReviewScopeSummaryItem({
 }) {
   const labelId = `assignment-result-review-scope-summary-${summaryItem.id}-label`;
   const valueId = `assignment-result-review-scope-summary-${summaryItem.id}-value`;
+  const descriptionId = `assignment-result-review-scope-summary-${summaryItem.id}-description`;
 
   return (
     <div className="flex min-w-0 items-center justify-between gap-3 text-sm">
       <dt id={labelId} className="text-muted-foreground">
         {summaryItem.label}
       </dt>
-      <dd id={valueId} className="font-medium">
-        {summaryItem.value}
+      <dd aria-describedby={descriptionId} id={valueId} className="font-medium">
+        <output aria-label={summaryItem.ariaLabel}>{summaryItem.value}</output>
+        <span id={descriptionId} className="sr-only">
+          {summaryItem.description}
+        </span>
       </dd>
     </div>
   );

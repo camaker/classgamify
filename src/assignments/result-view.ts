@@ -269,6 +269,7 @@ export type AssignmentResultTableHeaderView = {
 };
 
 export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & {
+  ariaLabel: string;
   value: string;
 };
 
@@ -453,6 +454,8 @@ type AssignmentResultCopyScopeSummaryItemId =
   | 'students';
 
 export type AssignmentResultCopyScopeSummaryItemView = {
+  ariaLabel: string;
+  description: string;
   id: AssignmentResultCopyScopeSummaryItemId;
   label: string;
   value: string;
@@ -463,6 +466,7 @@ export type AssignmentResultCopyScopeView = {
   itemViews: AssignmentResultCopyScopeItemView[];
   summary?: AssignmentResultReviewScopeSummary;
   summaryItems: AssignmentResultCopyScopeSummaryItemView[];
+  summaryLabel: string;
   title: string;
 };
 
@@ -486,6 +490,8 @@ type AssignmentResultReviewScopeSummaryItemId =
   | 'students';
 
 export type AssignmentResultReviewScopeSummaryItemView = {
+  ariaLabel: string;
+  description: string;
   id: AssignmentResultReviewScopeSummaryItemId;
   label: string;
   value: string;
@@ -549,6 +555,7 @@ export type AssignmentResultHeaderView = {
   assignmentTitle: string;
   exportPreparationView: AssignmentResultsExportPreparationView;
   printAction: AssignmentResultHeaderPrintAction;
+  resultActionsLabel: string;
   settingsSummaryView: AssignmentSettingsSummaryView;
   shareAction: AssignmentResultHeaderShareAction;
   shareSlug: string;
@@ -704,6 +711,9 @@ export const assignmentResultCopyScopeCopy = {
   get summaryItemsLabel() {
     return m.assignment_result_copy_scope_summary_items();
   },
+  get summaryLabel() {
+    return m.assignment_result_copy_scope_summary_label();
+  },
   get summaryStudentsLabel() {
     return m.assignment_result_copy_scope_summary_students();
   },
@@ -751,6 +761,12 @@ export const assignmentResultReviewScopeCopy = {
   },
   get title() {
     return m.assignment_result_review_scope_title();
+  },
+} as const;
+
+export const assignmentResultActionRegionCopy = {
+  get label() {
+    return m.assignment_result_actions_label();
   },
 } as const;
 
@@ -1153,10 +1169,19 @@ export function buildAssignmentResultMetricItems({
     }),
   } satisfies Record<AssignmentResultMetricKey, string>;
 
-  return assignmentResultMetricDescriptors.map((metric) => ({
-    ...metric,
-    value: valueByMetric[metric.key],
-  }));
+  return assignmentResultMetricDescriptors.map((metric) => {
+    const value = valueByMetric[metric.key];
+
+    return {
+      ...metric,
+      ariaLabel: m.assignment_result_metric_aria_label({
+        description: metric.description,
+        label: metric.label,
+        value,
+      }),
+      value,
+    };
+  });
 }
 
 export function buildAssignmentResultHeaderView({
@@ -1197,6 +1222,7 @@ export function buildAssignmentResultHeaderView({
       search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     } satisfies AssignmentResultHeaderPrintAction,
+    resultActionsLabel: assignmentResultActionRegionCopy.label,
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: assignment.expiresAt,
       settings: assignment.settingsJson,
@@ -2383,6 +2409,7 @@ export function buildAssignmentResultCopyScopeView({
     summaryItems: summary
       ? buildAssignmentResultCopyScopeSummaryItems(summary)
       : [],
+    summaryLabel: assignmentResultCopyScopeCopy.summaryLabel,
     title: assignmentResultCopyScopeCopy.title,
   };
 }
@@ -2435,18 +2462,23 @@ export function buildAssignmentResultReviewScopeView({
 function buildAssignmentResultCopyScopeSummaryItems(
   summary: AssignmentResultReviewScopeSummary
 ): AssignmentResultCopyScopeSummaryItemView[] {
-  return [
+  const items = [
     {
+      description:
+        m.assignment_result_copy_scope_summary_students_description(),
       id: 'students',
       label: assignmentResultCopyScopeCopy.summaryStudentsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
     },
     {
+      description:
+        m.assignment_result_copy_scope_summary_attempts_description(),
       id: 'attempts',
       label: assignmentResultCopyScopeCopy.attemptsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
     },
     {
+      description: m.assignment_result_copy_scope_summary_items_description(),
       id: 'items',
       label: assignmentResultCopyScopeCopy.summaryItemsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(
@@ -2454,6 +2486,8 @@ function buildAssignmentResultCopyScopeSummaryItems(
       ),
     },
     {
+      description:
+        m.assignment_result_copy_scope_summary_answer_reviews_description(),
       id: 'answer-reviews',
       label: assignmentResultCopyScopeCopy.answerReviewsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(
@@ -2461,23 +2495,37 @@ function buildAssignmentResultCopyScopeSummaryItems(
       ),
     },
   ];
+
+  return items.map((item) => ({
+    ...item,
+    ariaLabel: m.assignment_result_copy_scope_summary_item_aria_label({
+      description: item.description,
+      label: item.label,
+      value: item.value,
+    }),
+  }));
 }
 
 function buildAssignmentResultReviewScopeSummaryItems(
   summary: AssignmentResultReviewScopeSummary
 ): AssignmentResultReviewScopeSummaryItemView[] {
-  return [
+  const items = [
     {
+      description:
+        m.assignment_result_review_scope_summary_students_description(),
       id: 'students',
       label: assignmentResultReviewScopeCopy.studentsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(summary.students),
     },
     {
+      description:
+        m.assignment_result_review_scope_summary_attempts_description(),
       id: 'attempts',
       label: assignmentResultReviewScopeCopy.attemptsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(summary.attemptRows),
     },
     {
+      description: m.assignment_result_review_scope_summary_items_description(),
       id: 'items',
       label: assignmentResultReviewScopeCopy.itemsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(
@@ -2485,6 +2533,8 @@ function buildAssignmentResultReviewScopeSummaryItems(
       ),
     },
     {
+      description:
+        m.assignment_result_review_scope_summary_answer_reviews_description(),
       id: 'answer-reviews',
       label: assignmentResultReviewScopeCopy.answerReviewsLabel,
       value: formatAssignmentResultCopyScopeSummaryCount(
@@ -2492,6 +2542,15 @@ function buildAssignmentResultReviewScopeSummaryItems(
       ),
     },
   ];
+
+  return items.map((item) => ({
+    ...item,
+    ariaLabel: m.assignment_result_review_scope_summary_item_aria_label({
+      description: item.description,
+      label: item.label,
+      value: item.value,
+    }),
+  }));
 }
 
 function formatAssignmentResultCopyScopeSummaryCount({

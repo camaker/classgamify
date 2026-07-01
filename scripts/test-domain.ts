@@ -1929,8 +1929,18 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
+  /export type AssignmentResultCopyArtifactPreviewScopeSummaryItem = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyArtifactPreviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Assignment result copy artifact preview scope summary items should carry prepared accessible labels and descriptions.'
+);
+assert.match(
+  assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifactPreviews\(\{[\s\S]*artifacts,[\s\S]*copyScopeView,[\s\S]*\}[\s\S]*copyScopeView:[\s\S]*buildAssignmentResultCopyArtifactPreviewScope\(copyScopeView\)/,
   'Assignment result copy artifact previews should receive and clone the prepared copy-scope view for each preview card.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /summaryItems: copyScopeView\.summaryItems\.map\(\(summaryItem\) => \(\{[\s\S]*ariaLabel: summaryItem\.ariaLabel,[\s\S]*description: summaryItem\.description,[\s\S]*id: summaryItem\.id,/,
+  'Assignment result copy artifact preview scope cloning should preserve prepared summary aria labels and descriptions.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -2066,6 +2076,26 @@ assert.match(
   assignmentResultViewActionBoundarySource,
   /summaryItems: summary[\s\S]*buildAssignmentResultCopyScopeSummaryItems\(summary\)[\s\S]*formatAssignmentResultCopyScopeSummaryCount[\s\S]*assignment_result_copy_scope_summary_count/,
   'Assignment result copy scope should prepare localized summary count items from the shared review scope summary.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /export type AssignmentResultMetricItem = AssignmentResultMetricDescriptor & \{[\s\S]*ariaLabel: string;[\s\S]*value: string;/,
+  'Assignment result metric items should carry domain-prepared accessible labels for result metric cards.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /export type AssignmentResultCopyScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultCopyScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Assignment result copy-scope summary items should carry domain-prepared accessible labels and descriptions.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /export type AssignmentResultReviewScopeSummaryItemView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentResultReviewScopeSummaryItemId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Assignment result review-scope summary items should carry domain-prepared accessible labels and descriptions.'
+);
+assert.match(
+  assignmentResultViewActionBoundarySource,
+  /ariaLabel: m\.assignment_result_metric_aria_label\(\{[\s\S]*description: metric\.description,[\s\S]*label: metric\.label,[\s\S]*value,/,
+  'Assignment result metrics should build accessible labels from localized assignment-domain copy.'
 );
 assert.doesNotMatch(
   assignmentResultViewActionBoundarySource,
@@ -5520,6 +5550,11 @@ assert.match(
   /const summaryLabelId = 'assignment-result-review-scope-summary-label'[\s\S]*<section[\s\S]*aria-labelledby=\{summaryLabelId\}[\s\S]*id=\{summaryLabelId\}[\s\S]*<dl[\s\S]*const labelId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*<dd[\s\S]*id=\{valueId\}/,
   'Assignment result review-scope summary counts should expose stable labels and values for assistive technology.'
 );
+assert.match(
+  assignmentResultsReviewScopePanelSource,
+  /const descriptionId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-description`[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  'Assignment result review-scope summary counts should render prepared accessible labels and hidden descriptions.'
+);
 assert.doesNotMatch(
   `${assignmentResultsReviewScopePanelSource}\n${assignmentResultRouteSource}`,
   /Current review scope|Matched records|Student search|学生搜索|当前复盘范围|匹配记录/,
@@ -5609,6 +5644,11 @@ assert.match(
   assignmentResultsMetricCardSource,
   /AssignmentResultMetricItem[\s\S]*AssignmentResultMetricKey/,
   'Assignment result metric card should import the explicit metric view contract.'
+);
+assert.match(
+  assignmentResultsMetricCardSource,
+  /<Card[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*role="article"[\s\S]*<output[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.description/,
+  'Assignment result metric cards should render prepared accessible metric labels, values, and descriptions.'
 );
 assert.match(
   assignmentResultsItemAnalysisCardSource,
@@ -5712,6 +5752,11 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
+  /resultActionsLabel: string[\s\S]*<section[\s\S]*aria-label=\{resultActionsLabel\}[\s\S]*resultActions\.map/,
+  'Assignment result action buttons should be grouped in a labelled result-action region.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
   /resultActions\.map[\s\S]*key=\{actionButton\.id\}/,
   'Assignment result action buttons should render with stable action-button ids.'
 );
@@ -5734,6 +5779,11 @@ assert.match(
   assignmentResultsHeaderActionsSource,
   /function AssignmentResultsExportPreparation[\s\S]*exportPreparationView\.title[\s\S]*exportPreparationView\.description[\s\S]*exportPreparationView\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
   'Assignment result header actions should render prepared CSV export coverage title, description, labels, values, and descriptions.'
+);
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsExportPreparation[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*<article[\s\S]*aria-label=\{itemView\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{itemView\.ariaLabel\}/,
+  'Assignment result CSV export coverage should render prepared accessible labels for each full-export coverage item.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
@@ -5777,7 +5827,7 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentClassroomBriefSource,
-  /export type AssignmentClassroomBrief = \{[\s\S]*scopeLabel: string;[\s\S]*scopeSummary: AssignmentClassroomBriefScopeSummary;[\s\S]*scopeViews: AssignmentClassroomBriefScopeView\[\];[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefScopeId =[\s\S]*'attempts'[\s\S]*'focus-items'[\s\S]*'students'[\s\S]*'total-items'[\s\S]*export type AssignmentClassroomBriefScopeSummary = \{[\s\S]*attemptCount: number;[\s\S]*focusItemCount: number;[\s\S]*followUpStudentCount: number;[\s\S]*totalItemCount: number;[\s\S]*export type AssignmentClassroomBriefScopeView = \{[\s\S]*description: string;[\s\S]*id: AssignmentClassroomBriefScopeId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
+  /export type AssignmentClassroomBrief = \{[\s\S]*scopeLabel: string;[\s\S]*scopeSummary: AssignmentClassroomBriefScopeSummary;[\s\S]*scopeViews: AssignmentClassroomBriefScopeView\[\];[\s\S]*export type AssignmentClassroomBriefStatView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*export type AssignmentClassroomBriefCopyPreview = \{[\s\S]*export type AssignmentClassroomBriefScopeId =[\s\S]*'attempts'[\s\S]*'focus-items'[\s\S]*'students'[\s\S]*'total-items'[\s\S]*export type AssignmentClassroomBriefScopeSummary = \{[\s\S]*attemptCount: number;[\s\S]*focusItemCount: number;[\s\S]*followUpStudentCount: number;[\s\S]*totalItemCount: number;[\s\S]*export type AssignmentClassroomBriefScopeView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: AssignmentClassroomBriefScopeId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type AssignmentClassroomBriefFocusItemView = \{[\s\S]*export type AssignmentClassroomBriefFollowUpStudentView = \{/,
   'Assignment classroom brief should expose explicit aggregate, scope, stat, copy-preview, focus-item, and follow-up student view contracts.'
 );
 assert.match(
@@ -5802,8 +5852,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*scopeView\.label[\s\S]*scopeView\.value[\s\S]*scopeView\.description/,
-  'Assignment classroom brief scope items should render prepared labels, values, and descriptions.'
+  /function AssignmentResultsClassroomBriefScopeItem[\s\S]*scopeView\.label[\s\S]*<output[\s\S]*aria-label=\{scopeView\.ariaLabel\}[\s\S]*scopeView\.value[\s\S]*scopeView\.description/,
+  'Assignment classroom brief scope items should render prepared labels, values, descriptions, and accessible labels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -5812,8 +5862,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
-  /function AssignmentResultsClassroomBriefStat[\s\S]*statView\.label[\s\S]*statView\.value/,
-  'Assignment classroom brief stat cards should render prepared stat labels and values.'
+  /function AssignmentResultsClassroomBriefStat[\s\S]*statView\.label[\s\S]*<output[\s\S]*aria-label=\{statView\.ariaLabel\}[\s\S]*statView\.value[\s\S]*statView\.description/,
+  'Assignment classroom brief stat cards should render prepared stat labels, values, descriptions, and accessible labels.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -5872,6 +5922,11 @@ assert.match(
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
+  /function AssignmentResultsCopyScopeSummaryItem[\s\S]*AssignmentResultCopyScopeSummaryItemView[\s\S]*<output[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  'Assignment classroom brief copy-scope summary should render prepared accessible labels and descriptions.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
   /function AssignmentResultsCopyArtifactPreview[\s\S]*preview\.label[\s\S]*preview\.description[\s\S]*preview\.actionButton\.disabled[\s\S]*onResultAction\(preview\.actionButton\)[\s\S]*preview\.actionButton\.label[\s\S]*preview\.summaryLabel[\s\S]*preview\.metaItems\.map[\s\S]*metaItem\.label[\s\S]*metaItem\.value[\s\S]*preview\.text/,
   'Assignment classroom brief copy artifact preview cards should render prepared label, description, summary, metadata, copied text, and action button state.'
 );
@@ -5879,6 +5934,11 @@ assert.match(
   assignmentResultsClassroomBriefCardSource,
   /AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView=\{preview\.copyScopeView\}[\s\S]*function AssignmentResultsCopyArtifactPreviewScope[\s\S]*copyScopeView\.title[\s\S]*copyScopeView\.itemViews\.map[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*copyScopeView\.summaryItems\.map[\s\S]*summaryItem\.label[\s\S]*summaryItem\.value/,
   'Assignment classroom brief copy artifact preview cards should render each preview-specific copy scope and summary count item.'
+);
+assert.match(
+  assignmentResultsClassroomBriefCardSource,
+  /copyScopeView\.summaryItems\.map[\s\S]*aria-label=\{summaryItem\.ariaLabel\}[\s\S]*summaryItem\.description/,
+  'Assignment classroom brief copy artifact preview summaries should render prepared accessible labels and descriptions.'
 );
 assert.match(
   assignmentResultsClassroomBriefCardSource,
@@ -40369,10 +40429,42 @@ assert.deepEqual(
       },
     ],
     summaryItems: [
-      { id: 'students', label: 'Students', value: '1/1' },
-      { id: 'attempts', label: 'Attempts', value: '1/1' },
-      { id: 'items', label: 'Items', value: '2/2' },
-      { id: 'answer-reviews', label: 'Answer review', value: '1/1' },
+      {
+        ariaLabel:
+          'Students: 1/1. Student summary rows currently visible after search filtering.',
+        description:
+          'Student summary rows currently visible after search filtering.',
+        id: 'students',
+        label: 'Students',
+        value: '1/1',
+      },
+      {
+        ariaLabel:
+          'Attempts: 1/1. Attempt rows currently visible after student search filtering.',
+        description:
+          'Attempt rows currently visible after student search filtering.',
+        id: 'attempts',
+        label: 'Attempts',
+        value: '1/1',
+      },
+      {
+        ariaLabel:
+          'Items: 2/2. Item performance rows currently available in the selected item scope.',
+        description:
+          'Item performance rows currently available in the selected item scope.',
+        id: 'items',
+        label: 'Items',
+        value: '2/2',
+      },
+      {
+        ariaLabel:
+          'Answer review: 1/1. Answer review cards currently visible after search and review filtering.',
+        description:
+          'Answer review cards currently visible after search and review filtering.',
+        id: 'answer-reviews',
+        label: 'Answer review',
+        value: '1/1',
+      },
     ],
     summaryLabel: 'Matched records',
     title: 'Current review scope',
@@ -42279,11 +42371,43 @@ assert.deepEqual(
       students: { matched: 1, total: 1 },
     },
     summaryItems: [
-      { id: 'students', label: 'Students', value: '1/1' },
-      { id: 'attempts', label: 'Attempts', value: '2/2' },
-      { id: 'items', label: 'Items', value: '0/0' },
-      { id: 'answer-reviews', label: 'Answer reviews', value: '2/2' },
+      {
+        ariaLabel:
+          'Students: 1/1. Students matched by the current search before copying classroom materials.',
+        description:
+          'Students matched by the current search before copying classroom materials.',
+        id: 'students',
+        label: 'Students',
+        value: '1/1',
+      },
+      {
+        ariaLabel:
+          'Attempts: 2/2. Attempt rows matched by the current student search.',
+        description: 'Attempt rows matched by the current student search.',
+        id: 'attempts',
+        label: 'Attempts',
+        value: '2/2',
+      },
+      {
+        ariaLabel:
+          'Items: 0/0. Item performance rows matched by the current item sort scope.',
+        description:
+          'Item performance rows matched by the current item sort scope.',
+        id: 'items',
+        label: 'Items',
+        value: '0/0',
+      },
+      {
+        ariaLabel:
+          'Answer reviews: 2/2. Answer review cards matched by the current student search and review filter.',
+        description:
+          'Answer review cards matched by the current student search and review filter.',
+        id: 'answer-reviews',
+        label: 'Answer reviews',
+        value: '2/2',
+      },
     ],
+    summaryLabel: 'Matched records',
     title: 'Copy scope',
   }
 );
@@ -42312,6 +42436,74 @@ assert.deepEqual(
     'Student summary',
   ]
 );
+function expectAssignmentResultMetricItems(
+  items: ReturnType<typeof buildAssignmentResultMetricItems>
+) {
+  return items.map((item) => ({
+    ...item,
+    ariaLabel: `${item.label}: ${item.value}. ${item.description}`,
+  }));
+}
+
+function expectAssignmentResultsExportPreparationItemViews(
+  itemViews: Array<
+    Omit<
+      ReturnType<typeof buildAssignmentResultsExportPreparationView>['itemViews'][number],
+      'ariaLabel'
+    >
+  >
+) {
+  return itemViews.map((itemView) => ({
+    ...itemView,
+    ariaLabel: `${itemView.label}: ${itemView.value}. ${itemView.description}`,
+  }));
+}
+
+function expectAssignmentClassroomBriefStatViews(
+  statViews: Array<
+    Omit<
+      ReturnType<typeof buildAssignmentClassroomBriefStatViews>[number],
+      'ariaLabel' | 'description'
+    >
+  >
+) {
+  const descriptionByKey = {
+    'average-accuracy':
+      'Calculated from scored student attempts in this assignment.',
+    'average-points': 'Average points earned across completed, scored attempts.',
+    'average-time':
+      'Average submitted duration after assignment timer normalization.',
+    completions: 'Submitted attempts matched to scored result records.',
+  } satisfies Record<
+    ReturnType<typeof buildAssignmentClassroomBriefStatViews>[number]['key'],
+    string
+  >;
+
+  return statViews.map((statView) => {
+    const description = descriptionByKey[statView.key];
+
+    return {
+      ...statView,
+      ariaLabel: `${statView.label}: ${statView.value}. ${description}`,
+      description,
+    };
+  });
+}
+
+function expectAssignmentClassroomBriefScopeViews(
+  scopeViews: Array<
+    Omit<
+      ReturnType<typeof buildAssignmentClassroomBriefScopeViews>[number],
+      'ariaLabel'
+    >
+  >
+) {
+  return scopeViews.map((scopeView) => ({
+    ...scopeView,
+    ariaLabel: `${scopeView.label}: ${scopeView.value}. ${scopeView.description}`,
+  }));
+}
+
 assert.deepEqual(
   buildAssignmentResultMetricItems({
     averageDurationSeconds: 150,
@@ -42320,7 +42512,7 @@ assert.deepEqual(
     completions: 12,
     expiresAt: '2026-06-30T12:00:00.000Z',
   }),
-  [
+  expectAssignmentResultMetricItems([
     {
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
@@ -42354,7 +42546,7 @@ assert.deepEqual(
       label: 'Closes',
       value: formatAssignmentExpiry('2026-06-30T12:00:00.000Z'),
     },
-  ]
+  ])
 );
 assert.deepEqual(
   buildAssignmentResultMetricItems({
@@ -42364,7 +42556,7 @@ assert.deepEqual(
     completions: Number.POSITIVE_INFINITY,
     expiresAt: 'not-a-date',
   }),
-  [
+  expectAssignmentResultMetricItems([
     {
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
@@ -42398,7 +42590,7 @@ assert.deepEqual(
       label: 'Closes',
       value: formatAssignmentExpiry('not-a-date'),
     },
-  ]
+  ])
 );
 assert.deepEqual(
   buildAssignmentResultMetricItems({
@@ -42408,7 +42600,7 @@ assert.deepEqual(
     completions: 2.9,
     expiresAt: null,
   }),
-  [
+  expectAssignmentResultMetricItems([
     {
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
@@ -42442,7 +42634,7 @@ assert.deepEqual(
       label: 'Closes',
       value: formatAssignmentExpiry(null),
     },
-  ]
+  ])
 );
 assert.deepEqual(
   buildAssignmentResultMetricItems({
@@ -42452,7 +42644,7 @@ assert.deepEqual(
     completions: -1,
     expiresAt: null,
   }),
-  [
+  expectAssignmentResultMetricItems([
     {
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
@@ -42486,7 +42678,7 @@ assert.deepEqual(
       label: 'Closes',
       value: formatAssignmentExpiry(null),
     },
-  ]
+  ])
 );
 assert.deepEqual(
   buildAssignmentResultMetricItems({
@@ -42496,7 +42688,7 @@ assert.deepEqual(
     completions: 0,
     expiresAt: null,
   }),
-  [
+  expectAssignmentResultMetricItems([
     {
       description: 'Submitted attempts matched to scored result records.',
       key: 'completions',
@@ -42530,7 +42722,7 @@ assert.deepEqual(
       label: 'Closes',
       value: formatAssignmentExpiry(null),
     },
-  ]
+  ])
 );
 assert.deepEqual(
   buildAssignmentResultHeaderView({
@@ -42570,7 +42762,7 @@ assert.deepEqual(
     exportPreparationView: {
       description:
         'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: [
+      itemViews: expectAssignmentResultsExportPreparationItemViews([
         {
           description:
             'Completed attempt reviews included in the full export scope.',
@@ -42606,7 +42798,7 @@ assert.deepEqual(
           label: 'Columns',
           value: '49',
         },
-      ],
+      ]),
       title: 'CSV export coverage',
     },
     printAction: {
@@ -42615,6 +42807,7 @@ assert.deepEqual(
       search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     },
+    resultActionsLabel: 'Result actions',
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-07-01T00:00:00.000Z'),
       settings: {
@@ -42670,7 +42863,7 @@ assert.deepEqual(
     exportPreparationView: {
       description:
         'CSV export uses the full assignment result set, independent of the current search or review filter.',
-      itemViews: [
+      itemViews: expectAssignmentResultsExportPreparationItemViews([
         {
           description:
             'Completed attempt reviews included in the full export scope.',
@@ -42706,7 +42899,7 @@ assert.deepEqual(
           label: 'Columns',
           value: '49',
         },
-      ],
+      ]),
       title: 'CSV export coverage',
     },
     printAction: {
@@ -42715,6 +42908,7 @@ assert.deepEqual(
       search: buildPrintableAssignmentSearch({ answerKey: false }),
       to: Routes.PrintAssignmentWorksheet,
     },
+    resultActionsLabel: 'Result actions',
     settingsSummaryView: buildAssignmentSettingsSummaryView({
       expiresAt: new Date('2026-05-01T00:00:00.000Z'),
       settings: null,
@@ -46111,7 +46305,9 @@ assert.equal(
   classroomBrief.followUpStudents[0]?.studentLabel,
   'Anonymous student 1'
 );
-assert.deepEqual(buildAssignmentClassroomBriefStatViews(csvExportData.stats), [
+assert.deepEqual(
+  buildAssignmentClassroomBriefStatViews(csvExportData.stats),
+  expectAssignmentClassroomBriefStatViews([
   {
     key: 'completions',
     label: 'Completions',
@@ -46136,8 +46332,9 @@ assert.deepEqual(buildAssignmentClassroomBriefStatViews(csvExportData.stats), [
     text: 'Average time: 45s',
     value: '45s',
   },
-]);
-assert.deepEqual(classroomBrief.statViews, [
+])
+);
+assert.deepEqual(classroomBrief.statViews, expectAssignmentClassroomBriefStatViews([
   {
     key: 'completions',
     label: 'Completions',
@@ -46162,7 +46359,7 @@ assert.deepEqual(classroomBrief.statViews, [
     text: 'Average time: 45s',
     value: '45s',
   },
-]);
+]));
 assert.equal(classroomBrief.scopeLabel, 'Brief coverage');
 assert.deepEqual(
   buildAssignmentClassroomBriefScopeSummary({
@@ -46204,7 +46401,9 @@ assert.deepEqual(
     totalItemCount: 1,
   }
 );
-assert.deepEqual(buildAssignmentClassroomBriefScopeViews(classroomBrief.scopeSummary), [
+assert.deepEqual(
+  buildAssignmentClassroomBriefScopeViews(classroomBrief.scopeSummary),
+  expectAssignmentClassroomBriefScopeViews([
   {
     description: 'Completed attempts included in this brief.',
     id: 'attempts',
@@ -46230,8 +46429,9 @@ assert.deepEqual(buildAssignmentClassroomBriefScopeViews(classroomBrief.scopeSum
     label: 'Analyzed items',
     value: '2',
   },
-]);
-assert.deepEqual(classroomBrief.scopeViews, [
+])
+);
+assert.deepEqual(classroomBrief.scopeViews, expectAssignmentClassroomBriefScopeViews([
   {
     description: 'Completed attempts included in this brief.',
     id: 'attempts',
@@ -46257,7 +46457,7 @@ assert.deepEqual(classroomBrief.scopeViews, [
     label: 'Analyzed items',
     value: '2',
   },
-]);
+]));
 assert.equal(classroomBrief.statSummaryLabel, 'Class snapshot');
 assert.deepEqual(
   buildAssignmentClassroomBriefFocusItemView({

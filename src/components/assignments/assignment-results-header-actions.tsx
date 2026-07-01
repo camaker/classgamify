@@ -24,6 +24,7 @@ type AssignmentResultsHeaderActionsProps = {
   exportPreparationView: AssignmentResultsExportPreparationView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   printAction: AssignmentResultHeaderPrintAction;
+  resultActionsLabel: string;
   resultActions: AssignmentResultActionButton[];
   shareAction: AssignmentResultHeaderShareAction;
 };
@@ -32,6 +33,7 @@ export function AssignmentResultsHeaderActions({
   exportPreparationView,
   onResultAction,
   printAction,
+  resultActionsLabel,
   resultActions,
   shareAction,
 }: AssignmentResultsHeaderActionsProps) {
@@ -56,6 +58,7 @@ export function AssignmentResultsHeaderActions({
       />
       <AssignmentResultsHeaderResultActions
         onResultAction={onResultAction}
+        resultActionsLabel={resultActionsLabel}
         resultActions={resultActions}
       />
       <AssignmentResultsExportPreparation
@@ -80,7 +83,7 @@ function AssignmentResultsHeaderSharePreviewLink({
         disabled
         aria-describedby={disabledReasonId}
       >
-        <IconPlayerPlay className="size-4" />
+        <IconPlayerPlay aria-hidden="true" className="size-4" />
         {shareAction.label}
       </Button>
     );
@@ -94,7 +97,7 @@ function AssignmentResultsHeaderSharePreviewLink({
       }}
       className={cn(buttonVariants(), 'w-full sm:w-auto')}
     >
-      <IconPlayerPlay className="size-4" />
+      <IconPlayerPlay aria-hidden="true" className="size-4" />
       {shareAction.label}
     </Link>
   );
@@ -107,7 +110,7 @@ function AssignmentResultsHeaderSharePath({
 }) {
   return (
     <div className="flex min-h-8 max-w-full flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-      <IconShare3 className="size-4" />
+      <IconShare3 aria-hidden="true" className="size-4" />
       <span className="font-medium">{shareAction.shareUrlLabel}</span>
       <span className="break-all font-mono text-xs">
         {shareAction.shareUrl}
@@ -154,7 +157,7 @@ function AssignmentResultsHeaderPrintActionLink({
         'w-full bg-background sm:w-auto'
       )}
     >
-      <IconPrinter className="size-4" />
+      <IconPrinter aria-hidden="true" className="size-4" />
       {printAction.label}
     </Link>
   );
@@ -190,13 +193,18 @@ function getAssignmentResultHeaderShareDisabledReasonId({
 
 function AssignmentResultsHeaderResultActions({
   onResultAction,
+  resultActionsLabel,
   resultActions,
 }: {
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
+  resultActionsLabel: string;
   resultActions: AssignmentResultActionButton[];
 }) {
   return (
-    <div className="grid basis-full gap-2 md:grid-cols-2 xl:grid-cols-5">
+    <section
+      aria-label={resultActionsLabel}
+      className="grid basis-full gap-2 md:grid-cols-2 xl:grid-cols-5"
+    >
       {resultActions.map((actionButton) => (
         <AssignmentResultsHeaderResultActionButton
           actionButton={actionButton}
@@ -208,7 +216,7 @@ function AssignmentResultsHeaderResultActions({
       <AssignmentResultsHeaderResultActionDisabledReasons
         resultActions={resultActions}
       />
-    </div>
+    </section>
   );
 }
 
@@ -233,7 +241,7 @@ function AssignmentResultsHeaderResultActionButton({
         onClick={onClick}
         aria-describedby={disabledReasonId}
       >
-        <Icon className="size-4" />
+        <Icon aria-hidden="true" className="size-4" />
         {actionButton.label}
       </Button>
       <p className="text-muted-foreground text-xs leading-snug">
@@ -283,26 +291,38 @@ function AssignmentResultsExportPreparation({
 }: {
   exportPreparationView: AssignmentResultsExportPreparationView;
 }) {
+  const titleId = 'assignment-results-export-preparation-title';
+  const descriptionId = 'assignment-results-export-preparation-description';
+
   return (
-    <section className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3">
+    <section
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
+      className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3"
+    >
       <div className="grid gap-1">
-        <h3 className="font-medium text-sm">{exportPreparationView.title}</h3>
-        <p className="text-muted-foreground text-xs">
+        <h3 id={titleId} className="font-medium text-sm">
+          {exportPreparationView.title}
+        </h3>
+        <p id={descriptionId} className="text-muted-foreground text-xs">
           {exportPreparationView.description}
         </p>
       </div>
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {exportPreparationView.itemViews.map((itemView) => (
-          <div
+          <article
+            aria-label={itemView.ariaLabel}
             className="grid gap-1 rounded-md border bg-background p-3"
             key={itemView.id}
           >
             <p className="text-muted-foreground text-xs">{itemView.label}</p>
-            <p className="font-semibold text-lg">{itemView.value}</p>
+            <output aria-label={itemView.ariaLabel}>
+              <span className="font-semibold text-lg">{itemView.value}</span>
+            </output>
             <p className="text-muted-foreground text-xs">
               {itemView.description}
             </p>
-          </div>
+          </article>
         ))}
       </div>
     </section>

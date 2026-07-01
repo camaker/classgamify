@@ -67,6 +67,8 @@ export type AssignmentClassroomBrief = {
 };
 
 export type AssignmentClassroomBriefStatView = {
+  ariaLabel: string;
+  description: string;
   key: 'average-accuracy' | 'average-points' | 'average-time' | 'completions';
   label: string;
   text: string;
@@ -92,6 +94,7 @@ export type AssignmentClassroomBriefScopeSummary = {
 };
 
 export type AssignmentClassroomBriefScopeView = {
+  ariaLabel: string;
   description: string;
   id: AssignmentClassroomBriefScopeId;
   label: string;
@@ -211,7 +214,7 @@ export function buildAssignmentClassroomBriefScopeSummary({
 export function buildAssignmentClassroomBriefScopeViews(
   summary: AssignmentClassroomBriefScopeSummary
 ): AssignmentClassroomBriefScopeView[] {
-  return [
+  const scopeViews = [
     {
       description: m.assignment_classroom_brief_scope_attempts_description(),
       id: 'attempts',
@@ -239,6 +242,15 @@ export function buildAssignmentClassroomBriefScopeViews(
       value: formatAssignmentResultNumber(summary.totalItemCount, { min: 0 }),
     },
   ];
+
+  return scopeViews.map((scopeView) => ({
+    ...scopeView,
+    ariaLabel: m.assignment_classroom_brief_scope_item_aria_label({
+      description: scopeView.description,
+      label: scopeView.label,
+      value: scopeView.value,
+    }),
+  }));
 }
 
 function normalizeAssignmentClassroomBriefScopeCount(value: number) {
@@ -252,6 +264,14 @@ export function buildAssignmentClassroomBriefStatViews(
 
   return [
     {
+      ariaLabel: m.assignment_classroom_brief_stat_aria_label({
+        description: m.assignment_result_metric_completions_description(),
+        label: m.assignment_result_metric_completions(),
+        value: formatAssignmentResultNumber(statsView.completions ?? 0, {
+          min: 0,
+        }),
+      }),
+      description: m.assignment_result_metric_completions_description(),
       key: 'completions',
       label: m.assignment_result_metric_completions(),
       text: m.assignment_classroom_brief_completions({
@@ -262,6 +282,12 @@ export function buildAssignmentClassroomBriefStatViews(
       }),
     },
     {
+      ariaLabel: m.assignment_classroom_brief_stat_aria_label({
+        description: m.assignment_result_metric_average_accuracy_description(),
+        label: m.assignment_result_metric_average_accuracy(),
+        value: formatAssignmentSummaryAccuracy(statsView.averageScore),
+      }),
+      description: m.assignment_result_metric_average_accuracy_description(),
       key: 'average-accuracy',
       label: m.assignment_result_metric_average_accuracy(),
       text: m.assignment_classroom_brief_average_accuracy({
@@ -270,6 +296,12 @@ export function buildAssignmentClassroomBriefStatViews(
       value: formatAssignmentSummaryAccuracy(statsView.averageScore),
     },
     {
+      ariaLabel: m.assignment_classroom_brief_stat_aria_label({
+        description: m.assignment_result_metric_average_points_description(),
+        label: m.assignment_result_metric_average_points(),
+        value: formatAssignmentResultNumber(statsView.averagePoints),
+      }),
+      description: m.assignment_result_metric_average_points_description(),
       key: 'average-points',
       label: m.assignment_result_metric_average_points(),
       text: m.assignment_classroom_brief_average_points({
@@ -278,6 +310,12 @@ export function buildAssignmentClassroomBriefStatViews(
       value: formatAssignmentResultNumber(statsView.averagePoints),
     },
     {
+      ariaLabel: m.assignment_classroom_brief_stat_aria_label({
+        description: m.assignment_result_metric_average_time_description(),
+        label: m.assignment_result_metric_average_time(),
+        value: formatAttemptDuration(statsView.averageDurationSeconds),
+      }),
+      description: m.assignment_result_metric_average_time_description(),
       key: 'average-time',
       label: m.assignment_result_metric_average_time(),
       text: m.assignment_classroom_brief_average_time({

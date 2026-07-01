@@ -48,6 +48,7 @@ export function AssignmentResultsHeaderCard({
           exportPreparationView={headerView.exportPreparationView}
           onResultAction={onResultAction}
           printAction={headerView.printAction}
+          resultActionsLabel={headerView.resultActionsLabel}
           resultActions={resultActions}
           shareAction={headerView.shareAction}
         />

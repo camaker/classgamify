@@ -20,10 +20,12 @@ export function AssignmentResultsMetricCard({
   const Icon = resultMetricIconByKey[metric.key];
 
   return (
-    <Card className="rounded-lg">
+    <Card aria-label={metric.ariaLabel} className="rounded-lg" role="article">
       <CardContent className="p-4">
-        <Icon className="size-5 text-primary" />
-        <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
+        <Icon aria-hidden="true" className="size-5 text-primary" />
+        <output aria-label={metric.ariaLabel} className="mt-4 block">
+          <span className="text-2xl font-semibold">{metric.value}</span>
+        </output>
         <p className="text-sm text-muted-foreground">{metric.label}</p>
         <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
           {metric.description}
