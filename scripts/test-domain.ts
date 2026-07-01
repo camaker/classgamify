@@ -9063,7 +9063,7 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*export type StudentAttemptResultDisplay = \{[\s\S]*export type StudentAttemptControlState = \{[\s\S]*export type StudentAttemptTimerBadge = \{/,
+  /type StudentRunnerCopy = \{[\s\S]*studentNameDescription: string;[\s\S]*studentNameLockedDescription: string;[\s\S]*export type AnonymousAttemptCopy = \{[\s\S]*browserLabelAriaLabel: string;[\s\S]*browserLabel: string;[\s\S]*browserLabelCaption: string;[\s\S]*retryDescription: string;[\s\S]*summary: \{[\s\S]*hidesRawToken: boolean;[\s\S]*showsBrowserLabel: boolean;[\s\S]*export type StudentAttemptResultDisplay = \{/,
   'Student submission domain should expose explicit identity copy, control, result, and timer badge contracts.'
 );
 assert.match(
@@ -9232,7 +9232,7 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*identityView\.copy\.description/,
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.retryDescription/,
   'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
 );
 assert.doesNotMatch(
@@ -9243,6 +9243,11 @@ assert.doesNotMatch(
   ),
   /identityView\.copy/,
   'Named-student identity panel should not read anonymous-only copy fields.'
+);
+assert.doesNotMatch(
+  studentRunnerAttemptShellSource,
+  /This assignment does not collect|Current browser identity|same browser|anonymous-token|匿名学生令牌|当前浏览器身份/,
+  'Student runner identity panel should not hard-code anonymous identity explanations or raw token language.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -10219,25 +10224,65 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(buildAnonymousAttemptCopy({}), {
+  browserLabelAriaLabel: 'Current browser identity: Anonymous browser',
+  browserLabel: 'Anonymous browser',
+  browserLabelCaption: 'Current browser identity',
   description:
     'This assignment does not collect student names. This browser will submit as Anonymous browser.',
+  retryDescription:
+    'If you submit again, use this same browser so your attempts stay together.',
+  summary: {
+    hidesRawToken: true,
+    showsBrowserLabel: true,
+  },
   title: 'Anonymous attempt',
 });
 assert.deepEqual(
   buildAnonymousAttemptCopy({ browserLabel: ' Anonymous browser A1B2C3 ' }),
   {
+    browserLabelAriaLabel:
+      'Current browser identity: Anonymous browser A1B2C3',
+    browserLabel: 'Anonymous browser A1B2C3',
+    browserLabelCaption: 'Current browser identity',
     description:
       'This assignment does not collect student names. This browser will submit as Anonymous browser A1B2C3.',
+    retryDescription:
+      'If you submit again, use this same browser so your attempts stay together.',
+    summary: {
+      hidesRawToken: true,
+      showsBrowserLabel: true,
+    },
     title: 'Anonymous attempt',
   }
 );
 assert.deepEqual(
   buildAnonymousAttemptCopy({ browserLabel: ' Ａｎｏｎ   １ ' }),
   {
+    browserLabelAriaLabel: 'Current browser identity: Anon 1',
+    browserLabel: 'Anon 1',
+    browserLabelCaption: 'Current browser identity',
     description:
       'This assignment does not collect student names. This browser will submit as Anon 1.',
+    retryDescription:
+      'If you submit again, use this same browser so your attempts stay together.',
+    summary: {
+      hidesRawToken: true,
+      showsBrowserLabel: true,
+    },
     title: 'Anonymous attempt',
   }
+);
+const anonymousAttemptCopyWithToken = buildAnonymousAttemptCopy({
+  browserLabel: getAnonymousBrowserLabel('anonymous-token-1'),
+});
+assert.equal(
+  JSON.stringify(anonymousAttemptCopyWithToken).includes('anonymous-token-1'),
+  false
+);
+assert.equal(anonymousAttemptCopyWithToken.summary.hidesRawToken, true);
+assert.match(
+  anonymousAttemptCopyWithToken.browserLabel,
+  /^Anonymous browser [0-9A-Z]{6}$/
 );
 assert.deepEqual(getStudentRunnerCopy(), {
   browseTemplatesLabel: 'Browse templates',
@@ -18547,6 +18592,26 @@ const readyStudentRunnerRouteState = buildStudentRunnerRouteState(
 if (readyStudentRunnerRouteState.status !== 'ready') {
   throw new Error('Expected student runner route state to be ready.');
 }
+const studentRunnerAnonymousBrowserLabel = getAnonymousBrowserLabel(
+  'browser-1'
+);
+const studentRunnerAnonymousAttemptCopy = {
+  browserLabelAriaLabel: `Current browser identity: ${studentRunnerAnonymousBrowserLabel}`,
+  browserLabel: studentRunnerAnonymousBrowserLabel,
+  browserLabelCaption: 'Current browser identity',
+  description: `This assignment does not collect student names. This browser will submit as ${studentRunnerAnonymousBrowserLabel}.`,
+  retryDescription:
+    'If you submit again, use this same browser so your attempts stay together.',
+  summary: {
+    hidesRawToken: true,
+    showsBrowserLabel: true,
+  },
+  title: 'Anonymous attempt',
+};
+assert.equal(
+  JSON.stringify(studentRunnerAnonymousAttemptCopy).includes('browser-1'),
+  false
+);
 assert.deepEqual(
   {
     activeShareId: studentRunnerPageView.activeShareId,
@@ -18577,10 +18642,7 @@ assert.deepEqual(
   },
   {
     activeShareId: 'share-public',
-    anonymousAttemptCopy: {
-      description: `This assignment does not collect student names. This browser will submit as ${getAnonymousBrowserLabel('browser-1')}.`,
-      title: 'Anonymous attempt',
-    },
+    anonymousAttemptCopy: studentRunnerAnonymousAttemptCopy,
     attemptControlState: {
       readOnlyMessage: undefined,
       runtimeItemsDisabled: true,
@@ -18634,10 +18696,7 @@ assert.deepEqual(
       source: 'public-assignment',
     }),
     identityView: {
-      copy: {
-        description: `This assignment does not collect student names. This browser will submit as ${getAnonymousBrowserLabel('browser-1')}.`,
-        title: 'Anonymous attempt',
-      },
+      copy: studentRunnerAnonymousAttemptCopy,
       mode: 'anonymous',
     },
     itemCount: publicRunnerState.runtimeItems.length,

@@ -137,6 +137,20 @@ function StudentRunnerIdentityPanel({
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         {identityView.copy.description}
       </p>
+      <section
+        aria-label={identityView.copy.browserLabelAriaLabel}
+        className="mt-3 rounded-md border bg-background px-3 py-2"
+      >
+        <p className="text-[11px] uppercase text-muted-foreground">
+          {identityView.copy.browserLabelCaption}
+        </p>
+        <p className="mt-1 font-medium text-sm">
+          {identityView.copy.browserLabel}
+        </p>
+      </section>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">
+        {identityView.copy.retryDescription}
+      </p>
     </div>
   );
 }

@@ -202,7 +202,15 @@ type StudentRunnerCopy = {
 };
 
 export type AnonymousAttemptCopy = {
+  browserLabelAriaLabel: string;
+  browserLabel: string;
+  browserLabelCaption: string;
   description: string;
+  retryDescription: string;
+  summary: {
+    hidesRawToken: boolean;
+    showsBrowserLabel: boolean;
+  };
   title: string;
 };
 
@@ -565,7 +573,17 @@ export function buildAnonymousAttemptCopy({
     normalizeRuntimeDisplayText(browserLabel) || getAnonymousBrowserLabel();
 
   return {
+    browserLabelAriaLabel: m.student_runner_anonymous_browser_label_aria({
+      label,
+    }),
+    browserLabel: label,
+    browserLabelCaption: m.student_runner_anonymous_browser_label_caption(),
     description: m.student_runner_anonymous_attempt_description({ label }),
+    retryDescription: m.student_runner_anonymous_retry_description(),
+    summary: {
+      hidesRawToken: true,
+      showsBrowserLabel: Boolean(label),
+    },
     title: m.student_runner_anonymous_attempt_title(),
   };
 }
