@@ -22,6 +22,7 @@ import { buildAssignmentResultAttemptAnswerTextView } from '@/assignments/result
 import {
   formatAssignmentResultCsvDate,
   formatAssignmentResultCsvNumber,
+  formatAssignmentResultNumber,
   formatAssignmentResultValue,
 } from '@/assignments/result-format';
 import { formatAssignmentResultStudentLabel } from '@/assignments/result-display';
@@ -113,6 +114,26 @@ type AssignmentResultsExportContext = {
   studentsByKey: Map<string, AssignmentResultsExportStudentSummary>;
 };
 
+export type AssignmentResultsExportPreparationItemId =
+  | 'answer-rows'
+  | 'attempts'
+  | 'columns'
+  | 'delivery-policy'
+  | 'students';
+
+export type AssignmentResultsExportPreparationItemView = {
+  description: string;
+  id: AssignmentResultsExportPreparationItemId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentResultsExportPreparationView = {
+  description: string;
+  itemViews: AssignmentResultsExportPreparationItemView[];
+  title: string;
+};
+
 export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   const exportContext = buildAssignmentResultsExportContext(data);
   const rows = buildAssignmentResultsExportRows({
@@ -121,6 +142,90 @@ export function buildAssignmentResultsCsv(data: AssignmentResultsExportData) {
   });
 
   return rowsToCsv([getAssignmentResultsExportColumns(), ...rows]);
+}
+
+export function buildAssignmentResultsExportPreparationView(
+  data: Pick<AssignmentResultsExportData, 'analysis' | 'assignment'>
+): AssignmentResultsExportPreparationView {
+  const deliveryView = buildAssignmentResultsExportDeliveryView({
+    expiresAt: data.assignment.expiresAt,
+    settings: resolveAssignmentSettings(data.assignment.settingsJson),
+  });
+  const summary = buildAssignmentResultsExportPreparationSummary({
+    data,
+    deliveryView,
+  });
+
+  return {
+    description: m.assignment_results_export_preparation_description(),
+    itemViews: [
+      {
+        description:
+          m.assignment_results_export_preparation_attempts_description(),
+        id: 'attempts',
+        label: m.assignment_results_export_preparation_attempts_label(),
+        value: formatAssignmentResultsExportPreparationCount(
+          summary.attemptCount
+        ),
+      },
+      {
+        description:
+          m.assignment_results_export_preparation_students_description(),
+        id: 'students',
+        label: m.assignment_results_export_preparation_students_label(),
+        value: formatAssignmentResultsExportPreparationCount(
+          summary.studentCount
+        ),
+      },
+      {
+        description:
+          m.assignment_results_export_preparation_delivery_policy_description(),
+        id: 'delivery-policy',
+        label: m.assignment_results_export_preparation_delivery_policy_label(),
+        value: formatAssignmentResultsExportPreparationCount(
+          summary.deliveryPolicyFieldCount
+        ),
+      },
+      {
+        description:
+          m.assignment_results_export_preparation_answer_rows_description(),
+        id: 'answer-rows',
+        label: m.assignment_results_export_preparation_answer_rows_label(),
+        value: formatAssignmentResultsExportPreparationCount(
+          summary.answerRowCount
+        ),
+      },
+      {
+        description:
+          m.assignment_results_export_preparation_columns_description(),
+        id: 'columns',
+        label: m.assignment_results_export_preparation_columns_label(),
+        value: formatAssignmentResultsExportPreparationCount(
+          summary.columnCount
+        ),
+      },
+    ],
+    title: m.assignment_results_export_preparation_title(),
+  };
+}
+
+function buildAssignmentResultsExportPreparationSummary({
+  data,
+  deliveryView,
+}: {
+  data: Pick<AssignmentResultsExportData, 'analysis'>;
+  deliveryView: AssignmentResultsExportDeliveryView;
+}) {
+  return {
+    answerRowCount: countAssignmentResultsExportAnswerRows(
+      data.analysis.attempts
+    ),
+    attemptCount: data.analysis.attempts.length,
+    columnCount: getAssignmentResultsExportColumns().length,
+    deliveryPolicyFieldCount:
+      countAssignmentResultsExportDeliveryFields(deliveryView),
+    studentCount: data.analysis.students.length,
+  };
 }
 
 function buildAssignmentResultsExportContext(
@@ -215,6 +320,37 @@ function buildAssignmentResultsExportAttemptRows({
       index,
     })
   );
+}
+
+function countAssignmentResultsExportAnswerRows(
+  attempts: AssignmentResultsExportAttemptReview[]
+) {
+  return attempts.reduce(
+    (count, attempt) => count + Math.max(1, attempt.answers.length),
+    0
+  );
+}
+
+function countAssignmentResultsExportDeliveryFields({
+  answerReveal,
+  closeTime,
+  identityMode,
+  instructions,
+  itemOrder,
+  maxAttempts,
+  policyText,
+  timeLimitSeconds,
+}: AssignmentResultsExportDeliveryView) {
+  return [
+    answerReveal,
+    closeTime,
+    identityMode,
+    instructions,
+    itemOrder,
+    maxAttempts,
+    policyText,
+    timeLimitSeconds,
+  ].filter((value) => value !== '' && value !== undefined).length;
 }
 
 function buildAssignmentResultsExportAttemptBaseColumns({
@@ -509,6 +645,10 @@ function formatAssignmentExportStatusLabel({
 
 function formatAssignmentExportMaxAttempts(value: number | null | undefined) {
   return value === null ? m.assignment_delivery_attempts_open() : (value ?? '');
+}
+
+function formatAssignmentResultsExportPreparationCount(value: number) {
+  return formatAssignmentResultNumber(value, { min: 0 });
 }
 
 function buildAssignmentExportSettings(

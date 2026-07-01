@@ -758,6 +758,7 @@ import {
 } from '@/assignments/results';
 import {
   ASSIGNMENT_RESULTS_EXPORT_FILENAME_LIMITS,
+  buildAssignmentResultsExportPreparationView,
   buildAssignmentResultsExportDeliveryView,
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
@@ -2729,6 +2730,21 @@ assert.match(
   assignmentResultsExportSource,
   /export type AssignmentResultsExportDeliveryView = \{[\s\S]*answerReveal: string;[\s\S]*policyText: string;[\s\S]*settings: AssignmentSettings;[\s\S]*timeLimitSeconds: number \| undefined;/,
   'Assignment CSV export domain should expose an explicit delivery view contract.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /export type AssignmentResultsExportPreparationItemId =[\s\S]*'answer-rows'[\s\S]*'attempts'[\s\S]*'columns'[\s\S]*'delivery-policy'[\s\S]*'students'[\s\S]*export type AssignmentResultsExportPreparationView = \{[\s\S]*description: string;[\s\S]*itemViews: AssignmentResultsExportPreparationItemView\[\];[\s\S]*title: string;/,
+  'Assignment CSV export domain should expose a stable prepared export coverage view contract.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /export function buildAssignmentResultsExportPreparationView[\s\S]*buildAssignmentResultsExportPreparationSummary[\s\S]*assignment_results_export_preparation_attempts_label[\s\S]*assignment_results_export_preparation_students_label[\s\S]*assignment_results_export_preparation_delivery_policy_label[\s\S]*assignment_results_export_preparation_answer_rows_label[\s\S]*assignment_results_export_preparation_columns_label/,
+  'Assignment CSV export preparation views should use localized labels for each export coverage item.'
+);
+assert.match(
+  assignmentResultsExportSource,
+  /function buildAssignmentResultsExportPreparationSummary[\s\S]*answerRowCount: countAssignmentResultsExportAnswerRows[\s\S]*attemptCount: data\.analysis\.attempts\.length[\s\S]*columnCount: getAssignmentResultsExportColumns\(\)\.length[\s\S]*deliveryPolicyFieldCount:[\s\S]*countAssignmentResultsExportDeliveryFields[\s\S]*studentCount: data\.analysis\.students\.length/,
+  'Assignment CSV export preparation summaries should count attempts, students, answer rows, columns, and delivery-policy fields from the export domain.'
 );
 assert.match(
   assignmentResultsExportSource,
@@ -5516,8 +5532,13 @@ assert.match(
 );
 assert.match(
   assignmentResultViewSource,
-  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type AssignmentResultHeaderView/,
-  'Assignment result header share, print, and header-view contracts should be explicit assignment-domain exports.'
+  /export type AssignmentResultHeaderShareAction[\s\S]*export type AssignmentResultHeaderPrintAction[\s\S]*search: PrintableAssignmentSearch;[\s\S]*export type AssignmentResultHeaderView[\s\S]*exportPreparationView: AssignmentResultsExportPreparationView;/,
+  'Assignment result header share, print, CSV export preparation, and header-view contracts should be explicit assignment-domain exports.'
+);
+assert.match(
+  assignmentResultViewSource,
+  /exportPreparationView: buildAssignmentResultsExportPreparationView\(\{[\s\S]*analysis: analysis \?\? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,[\s\S]*assignment[\s\S]*\}\)/,
+  'Assignment result header view should prepare CSV export coverage from the full assignment result scope.'
 );
 assert.match(
   assignmentResultViewSource,
@@ -5550,9 +5571,14 @@ assert.match(
   'Assignment result header card should import the explicit assignment-domain header-view contract.'
 );
 assert.match(
+  assignmentResultsHeaderCardSource,
+  /exportPreparationView=\{headerView\.exportPreparationView\}/,
+  'Assignment result header card should pass prepared CSV export coverage into focused header actions.'
+);
+assert.match(
   assignmentResultsHeaderActionsSource,
-  /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction/,
-  'Assignment result header actions should import explicit assignment-domain print and share action contracts.'
+  /AssignmentResultHeaderPrintAction[\s\S]*AssignmentResultHeaderShareAction[\s\S]*AssignmentResultsExportPreparationView/,
+  'Assignment result header actions should import explicit assignment-domain print/share action contracts and export preparation view.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
@@ -5631,8 +5657,8 @@ assert.match(
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
-  /AssignmentResultsHeaderSharePreviewLink[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*AssignmentResultsHeaderPrintActionLink[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*AssignmentResultsHeaderResultActions/,
-  'Assignment result header actions should delegate preview, share path, copy, print, disabled reason, and result actions to focused components.'
+  /AssignmentResultsHeaderSharePreviewLink[\s\S]*AssignmentResultsHeaderSharePath[\s\S]*AssignmentResultsHeaderCopyShareAction[\s\S]*AssignmentResultsHeaderPrintActionLink[\s\S]*AssignmentResultsHeaderShareDisabledReason[\s\S]*AssignmentResultsHeaderResultActions[\s\S]*AssignmentResultsExportPreparation/,
+  'Assignment result header actions should delegate preview, share path, copy, print, disabled reason, result actions, and export preparation coverage to focused components.'
 );
 assert.match(
   assignmentResultsHeaderActionsSource,
@@ -5694,10 +5720,15 @@ assert.match(
   /aria-describedby=\{disabledReasonId\}[\s\S]*id=\{getResultActionDisabledReasonId[\s\S]*id: disabledReason\.id/,
   'Assignment result action disabled buttons should be associated with their prepared disabled reason text.'
 );
+assert.match(
+  assignmentResultsHeaderActionsSource,
+  /function AssignmentResultsExportPreparation[\s\S]*exportPreparationView\.title[\s\S]*exportPreparationView\.description[\s\S]*exportPreparationView\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
+  'Assignment result header actions should render prepared CSV export coverage title, description, labels, values, and descriptions.'
+);
 assert.doesNotMatch(
   assignmentResultsHeaderActionsSource,
-  /gate\.message/,
-  'Assignment result action controls should not read raw gate messages directly; disabled copy should come from prepared action-button fields.'
+  /gate\.message|assignment_results_export_preparation_|CSV export coverage|Delivery fields|Answer rows|CSV 导出覆盖范围|投放字段|答案行/,
+  'Assignment result action controls should not read raw gate messages or hard-code export preparation copy.'
 );
 assert.doesNotMatch(
   assignmentResultsHeaderCardSource,
@@ -39405,6 +39436,22 @@ assert.deepEqual(
       scoredResultsPageView.resultView.filteredAttemptRows.map(
         ({ attempt }) => attempt.id
       ),
+    headerExportPreparation: scoredResultsPageView.headerView
+      ? {
+          description:
+            scoredResultsPageView.headerView.exportPreparationView.description,
+          itemViews:
+            scoredResultsPageView.headerView.exportPreparationView.itemViews.map(
+              (itemView) => [
+                itemView.id,
+                itemView.label,
+                itemView.value,
+                itemView.description,
+              ]
+            ),
+          title: scoredResultsPageView.headerView.exportPreparationView.title,
+        }
+      : null,
     headerDeliveryItems:
       scoredResultsPageView.headerView?.settingsSummaryView.items.map(
         (item) => [item.id, item.value]
@@ -39723,6 +39770,43 @@ assert.deepEqual(
       },
     },
     filteredAttemptIds: ['completed-attempt'],
+    headerExportPreparation: {
+      description:
+        'CSV export uses the full assignment result set, independent of the current search or review filter.',
+      itemViews: [
+        [
+          'attempts',
+          'Attempts',
+          '1',
+          'Completed attempt reviews included in the full export scope.',
+        ],
+        [
+          'students',
+          'Students',
+          '1',
+          'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
+        ],
+        [
+          'delivery-policy',
+          'Delivery fields',
+          '7',
+          'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+        ],
+        [
+          'answer-rows',
+          'Answer rows',
+          '2',
+          'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
+        ],
+        [
+          'columns',
+          'Columns',
+          '49',
+          'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
+        ],
+      ],
+      title: 'CSV export coverage',
+    },
     headerDeliveryItems: [
       ['attempts', '2 max'],
       ['timer', '1 min'],
@@ -41372,6 +41456,48 @@ assert.deepEqual(
     assignmentSharePath: '/play/share%20123',
     assignmentShareUrl: buildAssignmentShareUrl('share 123'),
     assignmentTitle: 'Week 1 results',
+    exportPreparationView: {
+      description:
+        'CSV export uses the full assignment result set, independent of the current search or review filter.',
+      itemViews: [
+        {
+          description:
+            'Completed attempt reviews included in the full export scope.',
+          id: 'attempts',
+          label: 'Attempts',
+          value: '0',
+        },
+        {
+          description:
+            'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
+          id: 'students',
+          label: 'Students',
+          value: '0',
+        },
+        {
+          description:
+            'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+          id: 'delivery-policy',
+          label: 'Delivery fields',
+          value: '8',
+        },
+        {
+          description:
+            'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
+          id: 'answer-rows',
+          label: 'Answer rows',
+          value: '0',
+        },
+        {
+          description:
+            'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
+          id: 'columns',
+          label: 'Columns',
+          value: '49',
+        },
+      ],
+      title: 'CSV export coverage',
+    },
     printAction: {
       assignmentId: 'assignment-week-1',
       label: 'Print worksheet',
@@ -41430,6 +41556,48 @@ assert.deepEqual(
     assignmentSharePath: '/play/closed-share',
     assignmentShareUrl: buildAssignmentShareUrl('closed-share'),
     assignmentTitle: 'Expired results',
+    exportPreparationView: {
+      description:
+        'CSV export uses the full assignment result set, independent of the current search or review filter.',
+      itemViews: [
+        {
+          description:
+            'Completed attempt reviews included in the full export scope.',
+          id: 'attempts',
+          label: 'Attempts',
+          value: '0',
+        },
+        {
+          description:
+            'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
+          id: 'students',
+          label: 'Students',
+          value: '0',
+        },
+        {
+          description:
+            'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+          id: 'delivery-policy',
+          label: 'Delivery fields',
+          value: '6',
+        },
+        {
+          description:
+            'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
+          id: 'answer-rows',
+          label: 'Answer rows',
+          value: '0',
+        },
+        {
+          description:
+            'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
+          id: 'columns',
+          label: 'Columns',
+          value: '49',
+        },
+      ],
+      title: 'CSV export coverage',
+    },
     printAction: {
       assignmentId: 'assignment-expired',
       label: 'Print worksheet',
@@ -44210,6 +44378,112 @@ const csvExportData = {
 
 const csv = buildAssignmentResultsCsv(csvExportData);
 const csvRows = parseCsvRows(csv);
+const csvExportPreparationView =
+  buildAssignmentResultsExportPreparationView(csvExportData);
+assert.deepEqual(
+  {
+    description: csvExportPreparationView.description,
+    itemViews: csvExportPreparationView.itemViews.map((itemView) => [
+      itemView.id,
+      itemView.label,
+      itemView.value,
+      itemView.description,
+    ]),
+    title: csvExportPreparationView.title,
+  },
+  {
+    description:
+      'CSV export uses the full assignment result set, independent of the current search or review filter.',
+    itemViews: [
+      [
+        'attempts',
+        'Attempts',
+        '3',
+        'Completed attempt reviews included in the full export scope.',
+      ],
+      [
+        'students',
+        'Students',
+        '2',
+        'Student summary records included with latest, average, best, follow-up count, and last submitted fields.',
+      ],
+      [
+        'delivery-policy',
+        'Delivery fields',
+        '8',
+        'Delivery fields captured for offline records, including attempts, timer, identity, reveal, order, close time, and instructions when present.',
+      ],
+      [
+        'answer-rows',
+        'Answer rows',
+        '6',
+        'Rows prepared from every submitted answer, with empty-answer attempts kept aligned to the header.',
+      ],
+      [
+        'columns',
+        'Columns',
+        '49',
+        'CSV columns covering assignment, delivery, student summary, attempts, items, and answer details.',
+      ],
+    ],
+    title: 'CSV export coverage',
+  }
+);
+overwriteGetLocale(() => 'zh');
+try {
+  const zhCsvExportPreparationView =
+    buildAssignmentResultsExportPreparationView(csvExportData);
+  assert.deepEqual(
+    {
+      description: zhCsvExportPreparationView.description,
+      itemViews: zhCsvExportPreparationView.itemViews.map((itemView) => [
+        itemView.id,
+        itemView.label,
+        itemView.value,
+        itemView.description,
+      ]),
+      title: zhCsvExportPreparationView.title,
+    },
+    {
+      description: 'CSV 导出使用完整作业结果，不受当前搜索或复盘筛选影响。',
+      itemViews: [
+        [
+          'attempts',
+          '作答',
+          '3',
+          '完整导出范围内包含的已完成作答复盘。',
+        ],
+        [
+          'students',
+          '学生',
+          '2',
+          '包含最近、平均、最佳、跟进数量和最近提交时间字段的学生汇总记录。',
+        ],
+        [
+          'delivery-policy',
+          '投放字段',
+          '8',
+          '为离线记录保留作答次数、计时器、身份、答案显示、题目顺序、关闭时间以及有内容时的说明。',
+        ],
+        [
+          'answer-rows',
+          '答案行',
+          '6',
+          '按每个已提交答案生成的行；无答案作答也会保留与表头对齐的空答案行。',
+        ],
+        [
+          'columns',
+          '列',
+          '49',
+          '覆盖作业、投放规则、学生汇总、作答、题目和答案详情的 CSV 列。',
+        ],
+      ],
+      title: 'CSV 导出覆盖范围',
+    }
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 assert.deepEqual(
   buildAssignmentResultsExportDeliveryView({
     expiresAt: csvExportData.assignment.expiresAt,

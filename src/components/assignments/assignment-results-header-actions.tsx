@@ -2,6 +2,7 @@ import type {
   AssignmentResultAction,
   AssignmentResultActionButton,
 } from '@/assignments/result-actions';
+import type { AssignmentResultsExportPreparationView } from '@/assignments/results-export';
 import type {
   AssignmentResultHeaderPrintAction,
   AssignmentResultHeaderShareAction,
@@ -20,6 +21,7 @@ import {
 import { Link } from '@tanstack/react-router';
 
 type AssignmentResultsHeaderActionsProps = {
+  exportPreparationView: AssignmentResultsExportPreparationView;
   onResultAction: (actionButton: AssignmentResultActionButton) => void;
   printAction: AssignmentResultHeaderPrintAction;
   resultActions: AssignmentResultActionButton[];
@@ -27,6 +29,7 @@ type AssignmentResultsHeaderActionsProps = {
 };
 
 export function AssignmentResultsHeaderActions({
+  exportPreparationView,
   onResultAction,
   printAction,
   resultActions,
@@ -54,6 +57,9 @@ export function AssignmentResultsHeaderActions({
       <AssignmentResultsHeaderResultActions
         onResultAction={onResultAction}
         resultActions={resultActions}
+      />
+      <AssignmentResultsExportPreparation
+        exportPreparationView={exportPreparationView}
       />
     </div>
   );
@@ -269,6 +275,37 @@ function AssignmentResultsHeaderResultActionDisabledReasons({
         </p>
       ))}
     </div>
+  );
+}
+
+function AssignmentResultsExportPreparation({
+  exportPreparationView,
+}: {
+  exportPreparationView: AssignmentResultsExportPreparationView;
+}) {
+  return (
+    <section className="grid basis-full gap-3 rounded-lg border bg-muted/20 p-3">
+      <div className="grid gap-1">
+        <h3 className="font-medium text-sm">{exportPreparationView.title}</h3>
+        <p className="text-muted-foreground text-xs">
+          {exportPreparationView.description}
+        </p>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+        {exportPreparationView.itemViews.map((itemView) => (
+          <div
+            className="grid gap-1 rounded-md border bg-background p-3"
+            key={itemView.id}
+          >
+            <p className="text-muted-foreground text-xs">{itemView.label}</p>
+            <p className="font-semibold text-lg">{itemView.value}</p>
+            <p className="text-muted-foreground text-xs">
+              {itemView.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

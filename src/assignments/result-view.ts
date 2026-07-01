@@ -94,6 +94,10 @@ import {
   type AssignmentResultCopyArtifacts,
   type AssignmentResultActionState,
 } from '@/assignments/result-actions';
+import {
+  buildAssignmentResultsExportPreparationView,
+  type AssignmentResultsExportPreparationView,
+} from '@/assignments/results-export';
 import type { AssignmentClassroomBrief } from '@/assignments/classroom-brief';
 import type {
   ActivityTemplateType,
@@ -543,6 +547,7 @@ export type AssignmentResultHeaderView = {
   assignmentSharePath: string;
   assignmentShareUrl: string;
   assignmentTitle: string;
+  exportPreparationView: AssignmentResultsExportPreparationView;
   printAction: AssignmentResultHeaderPrintAction;
   settingsSummaryView: AssignmentSettingsSummaryView;
   shareAction: AssignmentResultHeaderShareAction;
@@ -1156,10 +1161,12 @@ export function buildAssignmentResultMetricItems({
 
 export function buildAssignmentResultHeaderView({
   activity,
+  analysis,
   assignment,
   now,
   snapshot,
 }: AssignmentResultHeaderSource & {
+  analysis?: AssignmentResultsAnalysis;
   now?: number;
 }): AssignmentResultHeaderView {
   const resolvedSource = resolveAssignmentSnapshotSource({
@@ -1180,6 +1187,10 @@ export function buildAssignmentResultHeaderView({
     assignmentSharePath: shareAction.sharePath,
     assignmentShareUrl: shareAction.shareUrl,
     assignmentTitle: formatAssignmentDisplayTitle(assignment.title),
+    exportPreparationView: buildAssignmentResultsExportPreparationView({
+      analysis: analysis ?? EMPTY_ASSIGNMENT_RESULTS_ANALYSIS,
+      assignment,
+    }),
     printAction: {
       assignmentId: assignment.id,
       label: assignmentResultPageCopy.printWorksheetLabel,
@@ -1201,6 +1212,13 @@ export function buildAssignmentResultHeaderView({
     templateType,
   };
 }
+
+const EMPTY_ASSIGNMENT_RESULTS_ANALYSIS = {
+  attempts: [],
+  needsReview: [],
+  perItem: [],
+  students: [],
+} satisfies AssignmentResultsAnalysis;
 
 export function buildAssignmentResultHeaderShareAction({
   expiresAt,

@@ -45,6 +45,7 @@ export function AssignmentResultsHeaderCard({
       <CardContent className="grid gap-4">
         <AssignmentSettingsSummary view={headerView.settingsSummaryView} />
         <AssignmentResultsHeaderActions
+          exportPreparationView={headerView.exportPreparationView}
           onResultAction={onResultAction}
           printAction={headerView.printAction}
           resultActions={resultActions}
