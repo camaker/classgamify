@@ -273,7 +273,7 @@ function DataTableFilterItem<TData>({ filter, index, filterItemId, joinOperator,
             setShowValueSelector,
         })}
       </div>
-      <Button aria-controls={filterItemId} variant="outline" size="icon" className="size-8 rounded" onClick={() => onFilterRemove(filter.filterId)}>
+      <Button aria-controls={filterItemId} aria-label={m.common_table_clear_filter_label({ title: columnMeta?.label ?? column.id })} variant="outline" size="icon" className="size-8 rounded" onClick={() => onFilterRemove(filter.filterId)}>
         <IconTrash />
       </Button>
     </li>);
@@ -287,8 +287,14 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
     showValueSelector: boolean;
     setShowValueSelector: (value: boolean) => void;
 }) {
+    const columnLabel = columnMeta?.label ?? m.common_table_filter();
     if (filter.operator === "isEmpty" || filter.operator === "isNotEmpty") {
-        return (<div id={inputId} role="status" aria-label={`${columnMeta?.label} filter is ${filter.operator === "isEmpty" ? "empty" : "not empty"}`} aria-live="polite" className="h-8 w-full rounded border bg-transparent dark:bg-input/30"/>);
+        return (<div id={inputId} role="status" aria-label={m.common_table_filter_state_label({
+                title: columnLabel,
+                state: filter.operator === "isEmpty"
+                    ? m.common_table_empty()
+                    : m.common_table_not_empty(),
+            })} aria-live="polite" className="h-8 w-full rounded border bg-transparent dark:bg-input/30"/>);
     }
     switch (filter.variant) {
         case "text":
@@ -299,7 +305,7 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
                 return (<DataTableRangeFilter filter={filter} column={column} inputId={inputId} onFilterUpdate={onFilterUpdate}/>);
             }
             const isNumber = filter.variant === "number" || filter.variant === "range";
-            return (<Input id={inputId} type={isNumber ? "number" : filter.variant} aria-label={`${columnMeta?.label} filter value`} aria-describedby={`${inputId}-description`} inputMode={isNumber ? "numeric" : undefined} placeholder={columnMeta?.placeholder ?? m.common_table_enter_value()} className="h-8 w-full rounded" defaultValue={typeof filter.value === "string" ? filter.value : undefined} onChange={(event) => onFilterUpdate(filter.filterId, {
+            return (<Input id={inputId} type={isNumber ? "number" : filter.variant} aria-label={m.common_table_filter_value_label({ title: columnLabel })} aria-describedby={`${inputId}-description`} inputMode={isNumber ? "numeric" : undefined} placeholder={columnMeta?.placeholder ?? m.common_table_enter_value()} className="h-8 w-full rounded" defaultValue={typeof filter.value === "string" ? filter.value : undefined} onChange={(event) => onFilterUpdate(filter.filterId, {
                     value: event.target.value,
                 })}/>);
         }
@@ -312,7 +318,7 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
                         onFilterUpdate(filter.filterId, { value });
                     }
                 }}>
-          <SelectTrigger id={inputId} aria-controls={inputListboxId} aria-label={`${columnMeta?.label} boolean filter`} className="h-8 w-full rounded data-size:h-8">
+          <SelectTrigger id={inputId} aria-controls={inputListboxId} aria-label={m.common_table_boolean_filter_label({ title: columnLabel })} className="h-8 w-full rounded data-size:h-8">
             <SelectValue placeholder={filter.value ? m.common_table_bool_true() : m.common_table_bool_false()}/>
           </SelectTrigger>
           <SelectContent id={inputListboxId}>
@@ -335,7 +341,9 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
                     : [];
             const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
             return (<Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
-          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={`${columnMeta?.label} filter value${multiple ? "s" : ""}`} variant="outline" size="sm" className="w-full rounded font-normal">
+          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={multiple
+                    ? m.common_table_filter_values_label({ title: columnLabel })
+                    : m.common_table_filter_value_label({ title: columnLabel })} variant="outline" size="sm" className="w-full rounded font-normal">
                 {selectedOptions.length === 0 ? (columnMeta?.placeholder ??
                         (multiple ? m.common_table_select_options() : m.common_table_select_option())) : (<span className="truncate">
                     {selectedOptions.length > 1
@@ -345,7 +353,7 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
               </Button>)}/>
           <PopoverContent id={inputListboxId} className="w-[200px] p-0">
             <Command>
-              <CommandInput aria-label={`Search ${columnMeta?.label} options`} placeholder={columnMeta?.placeholder ?? m.common_table_search_options()}/>
+              <CommandInput aria-label={m.common_table_search_options_for({ title: columnLabel })} placeholder={columnMeta?.placeholder ?? m.common_table_search_options()}/>
               <CommandList>
                 <CommandEmpty>{m.common_table_no_options_found()}</CommandEmpty>
                 <CommandGroup>
@@ -385,12 +393,12 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
                     ? formatDate(new Date(Number(dateValue[0])))
                     : m.common_table_pick_date();
             return (<Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
-          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={`${columnMeta?.label} date filter`} variant="outline" size="sm" className={cn("w-full justify-start rounded text-left font-normal", !filter.value && "text-muted-foreground")}>
+          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={m.common_table_date_filter_label({ title: columnLabel })} variant="outline" size="sm" className={cn("w-full justify-start rounded text-left font-normal", !filter.value && "text-muted-foreground")}>
                 <IconCalendar />
                 <span className="truncate">{displayValue}</span>
               </Button>)}/>
           <PopoverContent id={inputListboxId} align="start" className="w-auto p-0">
-            {filter.operator === "isBetween" ? (<Calendar aria-label={`Select ${columnMeta?.label} date range`} autoFocus captionLayout="dropdown" mode="range" selected={dateValue.length === 2
+            {filter.operator === "isBetween" ? (<Calendar aria-label={m.common_table_select_date_range_for({ title: columnLabel })} autoFocus captionLayout="dropdown" mode="range" selected={dateValue.length === 2
                         ? {
                             from: new Date(Number(dateValue[0])),
                             to: new Date(Number(dateValue[1])),
@@ -407,7 +415,7 @@ function onFilterInputRender<TData>({ filter, inputId, column, columnMeta, onFil
                                 ]
                                 : [],
                         });
-                    }}/>) : (<Calendar aria-label={`Select ${columnMeta?.label} date`} autoFocus captionLayout="dropdown" mode="single" selected={dateValue[0] ? new Date(Number(dateValue[0])) : undefined} onSelect={(date) => {
+                    }}/>) : (<Calendar aria-label={m.common_table_select_date_for({ title: columnLabel })} autoFocus captionLayout="dropdown" mode="single" selected={dateValue[0] ? new Date(Number(dateValue[0])) : undefined} onSelect={(date) => {
                         onFilterUpdate(filter.filterId, {
                             value: (date?.getTime() ?? "").toString(),
                         });

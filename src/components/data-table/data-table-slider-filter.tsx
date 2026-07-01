@@ -37,6 +37,7 @@ interface DataTableSliderFilterProps<TData> {
 }
 export function DataTableSliderFilter<TData>({ column, title, }: DataTableSliderFilterProps<TData>) {
     const id = React.useId();
+    const filterTitle = title ?? m.common_table_filter();
     const columnFilterValue = parseValuesAsNumbers(column.getFilterValue());
     const defaultRange = column.columnDef.meta?.range;
     const unit = column.columnDef.meta?.unit;
@@ -98,10 +99,10 @@ export function DataTableSliderFilter<TData>({ column, title, }: DataTableSlider
     }, [column]);
     return (<Popover>
       <PopoverTrigger render={(props) => (<Button {...props} variant="outline" size="sm" className="border-dashed font-normal">
-            {columnFilterValue ? (<div role="button" aria-label={`${m.common_table_clear()} ${title} ${m.common_table_filter()}`} tabIndex={0} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onClick={onReset}>
+            {columnFilterValue ? (<div role="button" aria-label={m.common_table_clear_filter_label({ title: filterTitle })} tabIndex={0} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onClick={onReset}>
                 <IconCircleX />
               </div>) : (<IconCirclePlus />)}
-            <span>{title}</span>
+            <span>{filterTitle}</span>
             {columnFilterValue ? (<>
                 <Separator orientation="vertical" className="mx-0.5 h-4 self-auto!"/>
                 {formatValue(columnFilterValue[0])} -{" "}
@@ -112,7 +113,7 @@ export function DataTableSliderFilter<TData>({ column, title, }: DataTableSlider
       <PopoverContent align="start" className="flex w-auto flex-col gap-4">
         <div className="flex flex-col gap-3">
           <p className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            {title}
+            {filterTitle}
           </p>
           <div className="flex items-center gap-4">
             <Label htmlFor={`${id}-from`} className="sr-only">
@@ -135,11 +136,11 @@ export function DataTableSliderFilter<TData>({ column, title, }: DataTableSlider
             </div>
           </div>
           <Label htmlFor={`${id}-slider`} className="sr-only">
-            {title} {m.common_table_slider()}
+            {filterTitle} {m.common_table_slider()}
           </Label>
           <Slider id={`${id}-slider`} min={min} max={max} step={step} value={range} onValueChange={onSliderValueChange}/>
         </div>
-        <Button aria-label={`${m.common_table_clear()} ${title} ${m.common_table_filter()}`} variant="outline" size="sm" onClick={onReset}>
+        <Button aria-label={m.common_table_clear_filter_label({ title: filterTitle })} variant="outline" size="sm" onClick={onReset}>
           {m.common_table_clear()}
         </Button>
       </PopoverContent>

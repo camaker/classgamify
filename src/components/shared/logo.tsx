@@ -1,4 +1,5 @@
 import { websiteConfig } from '@/config/website';
+import { m } from '@/locale/paraglide/messages';
 import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
@@ -10,7 +11,7 @@ export function Logo({ className }: { className?: string }) {
     <>
       <img
         src={logoLight}
-        alt={`${name} logo`}
+        alt={m.common_logo_alt({ name })}
         className={cn('size-8 rounded-md dark:hidden', className)}
         width={32}
         height={32}
@@ -18,7 +19,7 @@ export function Logo({ className }: { className?: string }) {
       />
       <img
         src={logoDark}
-        alt={`${name} logo`}
+        alt={m.common_logo_alt({ name })}
         className={cn('size-8 rounded-md hidden dark:block', className)}
         width={32}
         height={32}

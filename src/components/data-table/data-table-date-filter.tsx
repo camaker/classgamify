@@ -42,6 +42,7 @@ interface DataTableDateFilterProps<TData> {
     multiple?: boolean;
 }
 export function DataTableDateFilter<TData>({ column, title, multiple, }: DataTableDateFilterProps<TData>) {
+    const filterTitle = title ?? m.common_table_filter();
     const columnFilterValue = column.getFilterValue();
     const selectedDates = React.useMemo<DateSelection>(() => {
         if (!columnFilterValue) {
@@ -103,7 +104,7 @@ export function DataTableDateFilter<TData>({ column, title, multiple, }: DataTab
                 ? formatDateRange(selectedDates)
                 : m.common_table_select_date_range();
             return (<span className="flex items-center gap-2">
-          <span>{title}</span>
+          <span>{filterTitle}</span>
           {hasSelectedDates && (<>
               <Separator orientation="vertical" className="mx-0.5 h-4 self-auto!"/>
               <span>{dateText}</span>
@@ -117,24 +118,24 @@ export function DataTableDateFilter<TData>({ column, title, multiple, }: DataTab
             ? formatDate(selectedDates[0])
             : m.common_table_select_date();
         return (<span className="flex items-center gap-2">
-        <span>{title}</span>
+        <span>{filterTitle}</span>
         {hasSelectedDate && (<>
             <Separator orientation="vertical" className="mx-0.5 h-4 self-auto!"/>
             <span>{dateText}</span>
           </>)}
       </span>);
-    }, [selectedDates, multiple, formatDateRange, title]);
+    }, [selectedDates, multiple, formatDateRange, filterTitle]);
     return (<Popover>
       <PopoverTrigger render={(props) => (<Button {...props} variant="outline" size="sm" className="border-dashed font-normal">
-            {hasValue ? (<div role="button" aria-label={`${m.common_table_clear()} ${title} ${m.common_table_filter()}`} tabIndex={0} onClick={onReset} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            {hasValue ? (<div role="button" aria-label={m.common_table_clear_filter_label({ title: filterTitle })} tabIndex={0} onClick={onReset} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                 <IconCircleX />
               </div>) : (<IconCalendar />)}
             {label}
           </Button>)}/>
       <PopoverContent className="w-auto p-0" align="start">
-        {multiple ? (<Calendar autoFocus captionLayout="dropdown" mode="range" selected={getIsDateRange(selectedDates)
+        {multiple ? (<Calendar aria-label={m.common_table_select_date_range_for({ title: filterTitle })} autoFocus captionLayout="dropdown" mode="range" selected={getIsDateRange(selectedDates)
                 ? selectedDates
-                : { from: undefined, to: undefined }} onSelect={onSelect}/>) : (<Calendar captionLayout="dropdown" mode="single" selected={!getIsDateRange(selectedDates) ? selectedDates[0] : undefined} onSelect={onSelect}/>)}
+                : { from: undefined, to: undefined }} onSelect={onSelect}/>) : (<Calendar aria-label={m.common_table_select_date_for({ title: filterTitle })} captionLayout="dropdown" mode="single" selected={!getIsDateRange(selectedDates) ? selectedDates[0] : undefined} onSelect={onSelect}/>)}
       </PopoverContent>
     </Popover>);
 }

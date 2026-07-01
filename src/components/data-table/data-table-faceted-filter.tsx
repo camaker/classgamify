@@ -17,6 +17,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
 }
 export function DataTableFacetedFilter<TData, TValue>({ column, title, options, multiple, }: DataTableFacetedFilterProps<TData, TValue>) {
     const [open, setOpen] = React.useState(false);
+    const filterTitle = title ?? m.common_table_filter();
     const columnFilterValue = column?.getFilterValue();
     const selectedValues = new Set(Array.isArray(columnFilterValue) ? columnFilterValue : []);
     const onItemSelect = React.useCallback((option: Option, isSelected: boolean) => {
@@ -46,14 +47,14 @@ export function DataTableFacetedFilter<TData, TValue>({ column, title, options, 
       <PopoverTrigger render={(props) => (<Button {...props} variant="outline" size="sm" className="border-dashed font-normal">
             {selectedValues?.size > 0 ? (<div 
             // biome-ignore lint/a11y/useSemanticElements: Using div with role="button" for clear filter functionality within a composite widget
-            role="button" tabIndex={0} aria-label={`Clear ${title} filter`} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onMouseDown={(event) => {
+            role="button" tabIndex={0} aria-label={m.common_table_clear_filter_label({ title: filterTitle })} className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" onMouseDown={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     onReset();
                 }}>
                 <IconCircleX />
               </div>) : (<IconCirclePlus />)}
-            {title}
+            {filterTitle}
             {selectedValues?.size > 0 && (<>
                 <Separator orientation="vertical" className="mx-0.5 h-4 self-auto!"/>
                 <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
@@ -72,7 +73,7 @@ export function DataTableFacetedFilter<TData, TValue>({ column, title, options, 
           </Button>)}/>
       <PopoverContent className="w-50 p-0" align="start">
         <Command>
-          <CommandInput placeholder={title}/>
+          <CommandInput placeholder={filterTitle}/>
           <CommandList className="max-h-full">
             <CommandEmpty>{m.common_table_no_results_found()}</CommandEmpty>
             <CommandGroup className="max-h-[300px] scroll-py-1 overflow-y-auto overflow-x-hidden">

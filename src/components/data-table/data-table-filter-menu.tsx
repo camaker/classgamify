@@ -187,6 +187,7 @@ function DataTableFilterItem<TData>({ filter, filterItemId, columns, onFilterUpd
         const operatorListboxId = `${filterItemId}-operator-listbox`;
         const inputId = `${filterItemId}-input`;
         const columnMeta = column?.columnDef.meta;
+        const columnLabel = columnMeta?.label ?? column?.id ?? m.common_table_filter();
         const filterOperators = getFilterOperators(filter.variant);
         const onItemKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
             if (event.target instanceof HTMLInputElement ||
@@ -269,7 +270,7 @@ function DataTableFilterItem<TData>({ filter, filterItemId, columns, onFilterUpd
                 showValueSelector,
                 setShowValueSelector,
             })}
-        <Button aria-controls={filterItemId} variant="ghost" size="sm" className="h-full rounded-none rounded-r-md border border-l-0 px-1.5 font-normal dark:bg-input/30" onClick={() => onFilterRemove(filter.filterId)}>
+        <Button aria-controls={filterItemId} aria-label={m.common_table_clear_filter_label({ title: columnLabel })} variant="ghost" size="sm" className="h-full rounded-none rounded-r-md border border-l-0 px-1.5 font-normal dark:bg-input/30" onClick={() => onFilterRemove(filter.filterId)}>
           <IconX className="size-3.5"/>
         </Button>
       </div>);
@@ -330,8 +331,14 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
     showValueSelector: boolean;
     setShowValueSelector: (value: boolean) => void;
 }) {
+    const columnLabel = column.columnDef.meta?.label ?? m.common_table_filter();
     if (filter.operator === "isEmpty" || filter.operator === "isNotEmpty") {
-        return (<div id={inputId} role="status" aria-label={`${column.columnDef.meta?.label} ${m.common_table_filter()} ${filter.operator === "isEmpty" ? m.common_table_empty() : m.common_table_not_empty()}`} aria-live="polite" className="h-full w-16 rounded-none border bg-transparent px-1.5 py-0.5 text-muted-foreground dark:bg-input/30"/>);
+        return (<div id={inputId} role="status" aria-label={m.common_table_filter_state_label({
+                title: columnLabel,
+                state: filter.operator === "isEmpty"
+                    ? m.common_table_empty()
+                    : m.common_table_not_empty(),
+            })} aria-live="polite" className="h-full w-16 rounded-none border bg-transparent px-1.5 py-0.5 text-muted-foreground dark:bg-input/30"/>);
     }
     switch (filter.variant) {
         case "text":
@@ -342,7 +349,7 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
                 return (<DataTableRangeFilter filter={filter} column={column} inputId={inputId} onFilterUpdate={onFilterUpdate} className="size-full max-w-28 gap-0 **:data-[slot='range-min']:border-r-0 [&_input]:rounded-none [&_input]:px-1.5"/>);
             }
             const isNumber = filter.variant === "number" || filter.variant === "range";
-            return (<Input id={inputId} type={isNumber ? "number" : "text"} inputMode={isNumber ? "numeric" : undefined} placeholder={column.columnDef.meta?.placeholder ?? m.common_table_enter_value()} className="h-full w-24 rounded-none px-1.5" defaultValue={typeof filter.value === "string" ? filter.value : ""} onChange={(event) => onFilterUpdate(filter.filterId, { value: event.target.value })}/>);
+            return (<Input id={inputId} type={isNumber ? "number" : "text"} aria-label={m.common_table_filter_value_label({ title: columnLabel })} inputMode={isNumber ? "numeric" : undefined} placeholder={column.columnDef.meta?.placeholder ?? m.common_table_enter_value()} className="h-full w-24 rounded-none px-1.5" defaultValue={typeof filter.value === "string" ? filter.value : ""} onChange={(event) => onFilterUpdate(filter.filterId, { value: event.target.value })}/>);
         }
         case "boolean": {
             const inputListboxId = `${inputId}-listbox`;
@@ -350,7 +357,7 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
                     if (value)
                         onFilterUpdate(filter.filterId, { value });
                 }}>
-          <SelectTrigger id={inputId} aria-controls={inputListboxId} className="rounded-none bg-transparent px-1.5 py-0.5 [&_svg]:hidden">
+          <SelectTrigger id={inputId} aria-controls={inputListboxId} aria-label={m.common_table_boolean_filter_label({ title: columnLabel })} className="rounded-none bg-transparent px-1.5 py-0.5 [&_svg]:hidden">
             <SelectValue placeholder={filter.value ? m.common_table_bool_true() : m.common_table_bool_false()}/>
           </SelectTrigger>
           <SelectContent id={inputListboxId}>
@@ -368,7 +375,9 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
                 : [filter.value];
             const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
             return (<Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
-          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} variant="ghost" size="sm" className="h-full min-w-16 rounded-none border px-1.5 font-normal dark:bg-input/30">
+          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={filter.variant === "multiSelect"
+                    ? m.common_table_filter_values_label({ title: columnLabel })
+                    : m.common_table_filter_value_label({ title: columnLabel })} variant="ghost" size="sm" className="h-full min-w-16 rounded-none border px-1.5 font-normal dark:bg-input/30">
                 {selectedOptions.length === 0 ? (filter.variant === "multiSelect" ? (m.common_table_select_options()) : (m.common_table_select_option())) : (<>
                     <div className="-space-x-2 flex items-center rtl:space-x-reverse">
                       {selectedOptions.map((selectedOption) => selectedOption.icon ? (<div key={selectedOption.value} className="rounded-full border bg-background p-0.5">
@@ -384,7 +393,7 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
               </Button>)}/>
           <PopoverContent id={inputListboxId} align="start" className="w-48 p-0">
             <Command>
-              <CommandInput placeholder={m.common_table_search_options()}/>
+              <CommandInput aria-label={m.common_table_search_options_for({ title: columnLabel })} placeholder={m.common_table_search_options()}/>
               <CommandList>
                 <CommandEmpty>{m.common_table_no_options_found()}</CommandEmpty>
                 <CommandGroup>
@@ -420,12 +429,12 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
                     ? formatDate(new Date(Number(dateValue[0])))
                     : m.common_table_pick_date_ellipsis();
             return (<Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
-          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} variant="ghost" size="sm" className={cn("h-full rounded-none border px-1.5 font-normal dark:bg-input/30", !filter.value && "text-muted-foreground")}>
+          <PopoverTrigger render={(triggerProps) => (<Button {...triggerProps} id={inputId} aria-controls={inputListboxId} aria-label={m.common_table_date_filter_label({ title: columnLabel })} variant="ghost" size="sm" className={cn("h-full rounded-none border px-1.5 font-normal dark:bg-input/30", !filter.value && "text-muted-foreground")}>
                 <IconCalendar className="size-3.5"/>
                 <span className="truncate">{displayValue}</span>
               </Button>)}/>
           <PopoverContent id={inputListboxId} align="start" className="w-auto p-0">
-            {filter.operator === "isBetween" ? (<Calendar autoFocus captionLayout="dropdown" mode="range" selected={dateValue.length === 2
+            {filter.operator === "isBetween" ? (<Calendar aria-label={m.common_table_select_date_range_for({ title: columnLabel })} autoFocus captionLayout="dropdown" mode="range" selected={dateValue.length === 2
                         ? {
                             from: new Date(Number(dateValue[0])),
                             to: new Date(Number(dateValue[1])),
@@ -442,7 +451,7 @@ function onFilterInputRender<TData>({ filter, column, inputId, onFilterUpdate, s
                                 ]
                                 : [],
                         });
-                    }}/>) : (<Calendar autoFocus captionLayout="dropdown" mode="single" selected={dateValue[0] ? new Date(Number(dateValue[0])) : undefined} onSelect={(date) => {
+                    }}/>) : (<Calendar aria-label={m.common_table_select_date_for({ title: columnLabel })} autoFocus captionLayout="dropdown" mode="single" selected={dateValue[0] ? new Date(Number(dateValue[0])) : undefined} onSelect={(date) => {
                         onFilterUpdate(filter.filterId, {
                             value: (date?.getTime() ?? "").toString(),
                         });
