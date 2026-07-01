@@ -78,6 +78,8 @@ type ActivityLibraryEmptyStateView = {
 type ActivityLibraryCardStatKey = 'groups' | 'pairs' | 'questions';
 
 export type ActivityLibraryCardStat = {
+  ariaLabel: string;
+  description: string;
   key: ActivityLibraryCardStatKey;
   label: string;
   value: number;
@@ -147,8 +149,15 @@ export type ActivityLibraryCardDisplayView = {
   editAction: ActivityLibraryEditorActionView;
   actionState: ActivityLibraryCardActionState;
   actionView: ActivityLibraryCardActionView;
+  actionsLabel: string;
+  ariaLabel: string;
   compatibility: ActivityLibraryCompatibilityView;
+  compatibilityLabel: string;
+  contentLabel: string;
+  detailsLabel: string;
+  restoreRequiredLabel: string;
   sourceMaterials: ActivitySourceMaterialSummaryView;
+  sourceMaterialsLabel: string;
   sourceMaterialEditAction: ActivityLibraryEditorActionView;
   stats: ActivityLibraryCardStat[];
   statusLabel: string;
@@ -805,10 +814,17 @@ export function buildActivityLibrarySearchPanelView({
     searchDescription: activityLibrarySearchCopy.searchDescription,
     sourceCapabilityMetrics:
       buildActivityLibrarySourceCapabilityMetrics(summary),
-    sourceFilterDescription: sourceFilterView.description,
+    sourceFilterDescription:
+      m.activity_library_filter_source_selected_description({
+        description: sourceFilterView.description,
+        source: sourceFilterView.label,
+      }),
     sourceFilterLabel: sourceFilterView.label,
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
-    statusDescription: statusFilterView.description,
+    statusDescription: m.activity_library_filter_status_selected_description({
+      description: statusFilterView.description,
+      status: statusFilterView.label,
+    }),
     statusLabel: statusFilterView.label,
     statusMetrics: buildActivityLibraryStatusMetrics(statusSummary ?? summary),
     statusOptions: activityLibrarySearchCopy.statusOptions,
@@ -1208,14 +1224,47 @@ export function buildActivityLibraryCardStats({
   pairs: number;
   questions: number;
 }): ActivityLibraryCardStat[] {
+  const questionsLabel = m.activity_library_stat_questions();
+  const questionsDescription = m.activity_library_stat_questions_description();
+  const pairsLabel = m.activity_library_stat_pairs();
+  const pairsDescription = m.activity_library_stat_pairs_description();
+  const groupsLabel = m.activity_library_stat_groups();
+  const groupsDescription = m.activity_library_stat_groups_description();
+
   return [
     {
+      ariaLabel: formatActivityLibraryStatAriaLabel({
+        description: questionsDescription,
+        label: questionsLabel,
+        value: questions,
+      }),
+      description: questionsDescription,
       key: 'questions',
-      label: m.activity_library_stat_questions(),
+      label: questionsLabel,
       value: questions,
     },
-    { key: 'pairs', label: m.activity_library_stat_pairs(), value: pairs },
-    { key: 'groups', label: m.activity_library_stat_groups(), value: groups },
+    {
+      ariaLabel: formatActivityLibraryStatAriaLabel({
+        description: pairsDescription,
+        label: pairsLabel,
+        value: pairs,
+      }),
+      description: pairsDescription,
+      key: 'pairs',
+      label: pairsLabel,
+      value: pairs,
+    },
+    {
+      ariaLabel: formatActivityLibraryStatAriaLabel({
+        description: groupsDescription,
+        label: groupsLabel,
+        value: groups,
+      }),
+      description: groupsDescription,
+      key: 'groups',
+      label: groupsLabel,
+      value: groups,
+    },
   ];
 }
 
@@ -1259,6 +1308,7 @@ export function buildActivityLibraryCardDisplayView({
     content: activity.content,
     templateType: template.type,
   });
+  const statusLabel = formatActivityLibraryCardStatusLabel(activity);
 
   return {
     actionState: buildActivityLibraryCardActionState({
@@ -1268,18 +1318,41 @@ export function buildActivityLibraryCardDisplayView({
       visibility: activity.status,
     }),
     actionView: buildActivityLibraryCardActionView(activity.status),
+    actionsLabel: m.activity_library_card_actions_label({
+      title: activity.title,
+    }),
+    ariaLabel: m.activity_library_card_aria_label({
+      status: statusLabel,
+      template: template.name,
+      title: activity.title,
+    }),
     compatibility: buildActivityLibraryCompatibilityView({
       currentTemplateType: activity.templateType,
       summary,
       visibility: activity.status,
     }),
+    compatibilityLabel: m.activity_library_card_compatibility_label({
+      title: activity.title,
+    }),
+    contentLabel: m.activity_library_card_content_label({
+      title: activity.title,
+    }),
+    detailsLabel: m.activity_library_card_details_label({
+      title: activity.title,
+    }),
     editAction: buildActivityLibraryEditorAction({
       activityId: activity.id,
       label: activityLibraryCardCopy.actionLabels.edit,
     }),
+    restoreRequiredLabel: m.activity_library_card_restore_required_label({
+      title: activity.title,
+    }),
     sourceMaterials: buildActivitySourceMaterialSummaryView(
       activity.content.sourceMaterials
     ),
+    sourceMaterialsLabel: m.activity_library_card_source_materials_label({
+      title: activity.title,
+    }),
     sourceMaterialEditAction: buildActivityLibraryEditorAction({
       activityId: activity.id,
       label: activityLibraryCardCopy.sourceMaterialEditActionLabel,
@@ -1289,10 +1362,26 @@ export function buildActivityLibraryCardDisplayView({
       pairs: summary.contentCounts.pairs,
       questions: summary.contentCounts.questions,
     }),
-    statusLabel: formatActivityLibraryCardStatusLabel(activity),
+    statusLabel,
     templateName: template.name,
     templateType: template.type,
   };
+}
+
+function formatActivityLibraryStatAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: number;
+}) {
+  return m.activity_library_stat_aria_label({
+    description,
+    label,
+    value: String(value),
+  });
 }
 
 function buildActivityLibraryEditorAction({

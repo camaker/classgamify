@@ -15,6 +15,7 @@ type ActivityLibraryCompatibilityPanelProps = {
   actionState: ActivityLibraryCardActionState;
   compatibility: ActivityLibraryCompatibilityView;
   isRemixing: boolean;
+  label: string;
   onRemix: (targetTemplateType: ActivityLibraryCardTemplateType) => void;
 };
 
@@ -22,12 +23,13 @@ export function ActivityLibraryCompatibilityPanel({
   actionState,
   compatibility,
   isRemixing,
+  label,
   onRemix,
 }: ActivityLibraryCompatibilityPanelProps) {
   return (
-    <div className="rounded-lg border bg-muted/30 p-3">
+    <section aria-label={label} className="rounded-lg border bg-muted/30 p-3">
       <div className="flex items-center gap-2 text-sm font-medium">
-        <IconLayoutGrid className="size-4 text-primary" />
+        <IconLayoutGrid aria-hidden="true" className="size-4 text-primary" />
         {activityLibraryCardCopy.compatibleTemplatesLabel}
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -71,7 +73,7 @@ export function ActivityLibraryCompatibilityPanel({
           ))}
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -108,7 +110,7 @@ function ActivityLibraryRemixActionButton({
       disabled={disabled}
       onClick={onClick}
     >
-      <IconSwitchHorizontal className="size-4" />
+      <IconSwitchHorizontal aria-hidden="true" className="size-4" />
       {option.actionLabel}
     </Button>
   );

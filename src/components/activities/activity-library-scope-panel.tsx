@@ -19,11 +19,11 @@ export function ActivityLibraryScopePanel({
         <h2 className="font-semibold text-base">{view.label}</h2>
         <p className="text-muted-foreground text-sm">{view.summary}</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+      <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {view.items.map((item) => (
           <ActivityLibraryScopeItem item={item} key={item.id} />
         ))}
-      </div>
+      </dl>
     </section>
   );
 }
@@ -35,11 +35,11 @@ function ActivityLibraryScopeItem({
 }) {
   return (
     <div className="rounded-md border bg-background p-3">
-      <p className="text-muted-foreground text-xs">{item.label}</p>
-      <p className="mt-1 break-words font-semibold text-base">{item.value}</p>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <dt className="text-muted-foreground text-xs">{item.label}</dt>
+      <dd className="mt-1 break-words font-semibold text-base">{item.value}</dd>
+      <dd className="mt-1 text-muted-foreground text-xs leading-5">
         {item.description}
-      </p>
+      </dd>
     </div>
   );
 }

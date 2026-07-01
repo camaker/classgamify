@@ -11,25 +11,27 @@ import type { ReactNode } from 'react';
 type ActivitySourceMaterialsSummaryProps = {
   actionSlot?: ReactNode;
   className?: string;
+  label?: string;
   summary: ActivitySourceMaterialSummaryView;
 };
 
 export function ActivitySourceMaterialsSummary({
   actionSlot,
   className,
+  label,
   summary,
 }: ActivitySourceMaterialsSummaryProps) {
   if (!summary.hasMaterials) return null;
 
   return (
     <section
-      aria-label={summary.ariaLabel}
+      aria-label={label ?? summary.ariaLabel}
       className={cn('rounded-lg border bg-background p-3', className)}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <IconPaperclip className="size-4 text-primary" />
+            <IconPaperclip aria-hidden="true" className="size-4 text-primary" />
             <p className="font-medium text-sm">{summary.title}</p>
           </div>
           <p className="mt-1 text-muted-foreground text-xs">
@@ -109,7 +111,7 @@ function ActivitySourceMaterialExtractionBadge({
   return (
     <div className="rounded-md border bg-background px-2.5 py-2">
       <Badge variant="outline" className="rounded-md bg-background">
-        <IconSparkles className="size-3" />
+        <IconSparkles aria-hidden="true" className="size-3" />
         {action.summaryText}
       </Badge>
       <p className="mt-1 font-medium text-xs">{action.nextStep.label}</p>

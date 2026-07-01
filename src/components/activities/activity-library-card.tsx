@@ -160,14 +160,18 @@ export function ActivityLibraryCard({
   }
 
   return (
-    <Card className="rounded-lg">
+    <Card
+      role="article"
+      aria-label={cardDisplayView.ariaLabel}
+      className="rounded-lg"
+    >
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md">
             {cardDisplayView.statusLabel}
           </Badge>
           <Badge variant="outline" className="rounded-md">
-            <IconDeviceGamepad2 className="size-3.5" />
+            <IconDeviceGamepad2 aria-hidden="true" className="size-3.5" />
             {cardDisplayView.templateName}
           </Badge>
         </div>
@@ -179,28 +183,40 @@ export function ActivityLibraryCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ActivityLibraryStats stats={cardDisplayView.stats} />
-        <ActivitySourceMaterialsSummary
-          actionSlot={
-            cardDisplayView.actionState.showEditAction &&
-            cardDisplayView.sourceMaterials.hasMaterials ? (
-              <ActivityLibrarySourceMaterialEditAction
-                action={cardDisplayView.sourceMaterialEditAction}
-              />
-            ) : undefined
-          }
-          className="bg-muted/30"
-          summary={cardDisplayView.sourceMaterials}
-        />
+        <section
+          aria-label={cardDisplayView.detailsLabel}
+          className="space-y-4"
+        >
+          <ActivityLibraryStats
+            label={cardDisplayView.contentLabel}
+            stats={cardDisplayView.stats}
+          />
+          <ActivitySourceMaterialsSummary
+            actionSlot={
+              cardDisplayView.actionState.showEditAction &&
+              cardDisplayView.sourceMaterials.hasMaterials ? (
+                <ActivityLibrarySourceMaterialEditAction
+                  action={cardDisplayView.sourceMaterialEditAction}
+                />
+              ) : undefined
+            }
+            className="bg-muted/30"
+            label={cardDisplayView.sourceMaterialsLabel}
+            summary={cardDisplayView.sourceMaterials}
+          />
+        </section>
         <ActivityLibraryCompatibilityPanel
           actionState={cardDisplayView.actionState}
           compatibility={cardDisplayView.compatibility}
           isRemixing={remixMutation.isPending}
+          label={cardDisplayView.compatibilityLabel}
           onRemix={remixActivity}
         />
         <ActivityLibraryCardActions
           actionState={cardDisplayView.actionState}
           actionView={cardDisplayView.actionView}
+          label={cardDisplayView.actionsLabel}
+          restoreRequiredLabel={cardDisplayView.restoreRequiredLabel}
           editAction={cardDisplayView.editAction}
           isArchiving={archiveMutation.isPending}
           isDuplicating={duplicateMutation.isPending}
@@ -258,10 +274,12 @@ function ActivityLibraryCardActions({
   isArchiving,
   isDuplicating,
   isRestoring,
+  label,
   onArchive,
   onDuplicate,
   onPublish,
   onRestore,
+  restoreRequiredLabel,
 }: {
   actionState: ActivityLibraryCardActionState;
   actionView: ActivityLibraryCardActionView;
@@ -269,15 +287,17 @@ function ActivityLibraryCardActions({
   isArchiving: boolean;
   isDuplicating: boolean;
   isRestoring: boolean;
+  label: string;
   onArchive: () => void;
   onDuplicate: () => void;
   onPublish: () => void;
   onRestore: () => void;
+  restoreRequiredLabel: string;
 }) {
   if (!actionState.showPersistedActions) return null;
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <section aria-label={label} className="flex flex-col gap-2 sm:flex-row">
       {actionState.showEditAction ? (
         <ActivityLibraryEditActionLink action={editAction} />
       ) : null}
@@ -308,9 +328,10 @@ function ActivityLibraryCardActions({
           actionState={actionState}
           disabled={isRestoring}
           onRestore={onRestore}
+          requiredLabel={restoreRequiredLabel}
         />
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -328,7 +349,7 @@ function ActivityLibraryEditActionLink({
         'w-full bg-background sm:w-fit'
       )}
     >
-      <IconEdit className="size-4" />
+      <IconEdit aria-hidden="true" className="size-4" />
       {action.label}
     </Link>
   );
@@ -351,7 +372,7 @@ function ActivityLibraryDuplicateActionButton({
       disabled={disabled}
       onClick={onClick}
     >
-      <IconCopy className="size-4" />
+      <IconCopy aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
   );
@@ -374,7 +395,7 @@ function ActivityLibraryArchiveActionButton({
       disabled={disabled}
       onClick={onClick}
     >
-      <IconFolderOff className="size-4" />
+      <IconFolderOff aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
   );
@@ -389,7 +410,7 @@ function ActivityLibraryPublishActionButton({
 }) {
   return (
     <Button type="button" className="w-full sm:w-fit" onClick={onClick}>
-      <IconPlus className="size-4" />
+      <IconPlus aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
   );
@@ -400,17 +421,20 @@ function ActivityLibraryRestoreAction({
   actionState,
   disabled,
   onRestore,
+  requiredLabel,
 }: {
   action: ActivityLibraryCardRestoreActionView;
   actionState: ActivityLibraryCardActionState;
   disabled: boolean;
   onRestore: () => void;
+  requiredLabel: string;
 }) {
   return (
     <>
       {actionState.showRestoreRequiredMessage ? (
         <ActivityLibraryRestoreRequiredMessage
           message={action.requiredMessage}
+          label={requiredLabel}
         />
       ) : null}
       {actionState.showRestoreAction ? (
@@ -425,11 +449,20 @@ function ActivityLibraryRestoreAction({
 }
 
 function ActivityLibraryRestoreRequiredMessage({
+  label,
   message,
 }: {
+  label: string;
   message: string;
 }) {
-  return <p className="text-sm text-muted-foreground sm:mr-auto">{message}</p>;
+  return (
+    <section
+      aria-label={label}
+      className="text-sm text-muted-foreground sm:mr-auto"
+    >
+      <p>{message}</p>
+    </section>
+  );
 }
 
 function ActivityLibraryRestoreActionButton({
@@ -448,7 +481,7 @@ function ActivityLibraryRestoreActionButton({
       disabled={disabled}
       onClick={onClick}
     >
-      <IconRotateClockwise className="size-4" />
+      <IconRotateClockwise aria-hidden="true" className="size-4" />
       {action.label}
     </Button>
   );

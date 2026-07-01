@@ -20,16 +20,14 @@ export function ActivityLibrarySummaryCard({
   const Icon = activitySummaryMetricIcons[metric.id];
 
   return (
-    <Card className="rounded-lg">
+    <Card role="article" aria-label={metric.ariaLabel} className="rounded-lg">
       <CardContent className="p-4">
-        <Icon className="size-5 text-primary" />
+        <Icon aria-hidden="true" className="size-5 text-primary" />
         <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
         <p className="text-sm text-muted-foreground">{metric.label}</p>
-        {metric.description ? (
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            {metric.description}
-          </p>
-        ) : null}
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {metric.description}
+        </p>
       </CardContent>
     </Card>
   );

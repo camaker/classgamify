@@ -80,7 +80,10 @@ export function ActivityLibrarySearch({
           {activityLibrarySearchCopy.label}
         </label>
         <div className="relative max-w-xl">
-          <IconSearch className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
+          <IconSearch
+            aria-hidden="true"
+            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
+          />
           <Input
             id="activity-library-search"
             value={value}
@@ -96,7 +99,7 @@ export function ActivityLibrarySearch({
               className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground"
               onClick={onClearSearch}
             >
-              <IconX className="size-4" />
+              <IconX aria-hidden="true" className="size-4" />
             </button>
           ) : null}
         </div>
@@ -155,23 +158,17 @@ export function ActivityLibrarySearch({
           id={sourceFilterDescriptionId}
           className="text-xs leading-5 text-muted-foreground"
         >
-          <span className="font-medium text-foreground">
-            {searchPanelView.sourceFilterLabel}
-          </span>
-          {' - '}
           {searchPanelView.sourceFilterDescription}
         </p>
         <div className="flex flex-wrap gap-1.5">
           {searchPanelView.sourceCapabilityMetrics.map((metric) => (
-            <span
+            <output
               key={metric.capability}
+              aria-label={metric.ariaLabel}
               className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
             >
-              <span className="font-medium text-foreground">
-                {metric.value}
-              </span>{' '}
-              {metric.label}
-            </span>
+              {metric.text}
+            </output>
           ))}
         </div>
       </div>
@@ -196,7 +193,7 @@ export function ActivityLibrarySearch({
                 onClick={() => onStatusChange(option.value)}
                 aria-pressed={status === option.value}
               >
-                <Icon className="size-4" />
+                <Icon aria-hidden="true" className="size-4" />
                 {option.label}
               </Button>
             );
@@ -206,23 +203,17 @@ export function ActivityLibrarySearch({
           id={statusFilterDescriptionId}
           className="text-xs leading-5 text-muted-foreground"
         >
-          <span className="font-medium text-foreground">
-            {searchPanelView.statusLabel}
-          </span>
-          {' - '}
           {searchPanelView.statusDescription}
         </p>
         <div className="flex flex-wrap gap-1.5">
           {searchPanelView.statusMetrics.map((metric) => (
-            <span
+            <output
               key={metric.status}
+              aria-label={metric.ariaLabel}
               className="rounded-md border bg-background px-2 py-1 text-xs text-muted-foreground"
             >
-              <span className="font-medium text-foreground">
-                {metric.value}
-              </span>{' '}
-              {metric.label}
-            </span>
+              {metric.text}
+            </output>
           ))}
         </div>
       </div>
@@ -238,7 +229,7 @@ export function ActivityLibrarySearch({
             className="w-full bg-background lg:w-auto"
             onClick={onClearFilters}
           >
-            <IconX className="size-4" />
+            <IconX aria-hidden="true" className="size-4" />
             {activityLibrarySearchCopy.clearFiltersLabel}
           </Button>
         ) : null}

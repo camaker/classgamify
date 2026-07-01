@@ -3442,7 +3442,7 @@ assert.doesNotMatch(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /<section[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText[\s\S]*summary\.readinessStatus\.description[\s\S]*variant=\{summary\.readinessStatus\.badgeVariant\}[\s\S]*summary\.readinessStatus\.value/,
+  /label\?: string[\s\S]*<section[\s\S]*aria-label=\{label \?\? summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText[\s\S]*summary\.readinessStatus\.description[\s\S]*variant=\{summary\.readinessStatus\.badgeVariant\}[\s\S]*summary\.readinessStatus\.value/,
   'Activity source-material summary component should render prepared compact, accessible, and readiness status text from the domain view.'
 );
 assert.match(
@@ -23134,6 +23134,41 @@ assert.match(
   /buildActivityLibrarySourceCapabilityMetrics[\s\S]*activity_library_source_capability_audio[\s\S]*activity_library_source_capability_spreadsheet[\s\S]*activity_library_source_capability_worksheet/,
   'Activity library capability metrics should reuse shared source-material capability view building.'
 );
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /export type ActivityLibrarySummaryMetric = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*id: ActivityLibrarySummaryMetricId;[\s\S]*label: string;[\s\S]*value: string;/,
+  'Activity library summary metrics should expose domain-prepared descriptions and accessible labels.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /export type ActivityLibrarySourceCapabilityMetric = \{[\s\S]*ariaLabel: string;[\s\S]*capability: ActivitySourceMaterialReadinessCapability;[\s\S]*label: string;[\s\S]*text: string;[\s\S]*value: string;/,
+  'Activity library source capability metrics should expose prepared visible text and accessible labels.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /export type ActivityLibraryStatusMetric = \{[\s\S]*ariaLabel: string;[\s\S]*label: string;[\s\S]*status: ActivityLibraryStatus;[\s\S]*text: string;[\s\S]*value: string;/,
+  'Activity library status metrics should expose prepared visible text and accessible labels.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildActivityLibrarySummaryMetrics[\s\S]*description: totalDescription[\s\S]*description: coverageDescription[\s\S]*description: remixDescription[\s\S]*description: sourceExtractionDescription/,
+  'Activity library summary metric descriptions should be prepared in the activity-domain layer.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /function formatActivityLibrarySummaryAriaLabel[\s\S]*m\.activity_library_summary_aria_label/,
+  'Activity library summary metric aria labels should be localized in the activity-domain layer.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildActivityLibrarySourceCapabilityMetrics[\s\S]*ariaLabel: formatActivityLibrarySourceCapabilityMetricAriaLabel\(metric\)[\s\S]*text: formatActivityLibrarySourceCapabilityMetricAriaLabel\(metric\)/,
+  'Activity library source capability metrics should prepare reusable count text before reaching React components.'
+);
+assert.match(
+  activityLibrarySummaryDomainSource,
+  /buildActivityLibraryStatusMetrics[\s\S]*ariaLabel: formatActivityLibraryStatusMetricAriaLabel[\s\S]*text: formatActivityLibraryStatusMetricAriaLabel/,
+  'Activity library status metrics should prepare reusable count text before reaching React components.'
+);
 assert.doesNotMatch(
   activityLibrarySummaryDomainSource,
   /const resolvedSummary = summary \?\? \{[\s\S]*totalActivities,[\s\S]*totalReadyTemplateOptions: 0,[\s\S]*\};/,
@@ -23431,6 +23466,10 @@ const activityLibrarySummaryCardComponentSource = readFileSync(
   'src/components/activities/activity-library-summary-card.tsx',
   'utf8'
 );
+const activitySourceMaterialsSummaryComponentSource = readFileSync(
+  'src/components/activities/activity-source-materials-summary.tsx',
+  'utf8'
+);
 const createdActivityPanelComponentSource = readFileSync(
   'src/components/activities/created-activity-panel.tsx',
   'utf8'
@@ -23561,13 +23600,28 @@ assert.match(
 );
 assert.match(
   activityLibrarySearchComponentSource,
-  /searchPanelView\.sourceFilterLabel[\s\S]*searchPanelView\.sourceFilterDescription[\s\S]*searchPanelView\.sourceCapabilityMetrics\.map/,
+  /searchPanelView\.sourceFilterDescription[\s\S]*searchPanelView\.sourceCapabilityMetrics\.map/,
   'Activity library search component should explain the selected source-material filter and capability counts from the domain view.'
 );
 assert.match(
   activityLibrarySearchComponentSource,
-  /searchPanelView\.statusLabel[\s\S]*searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
+  /searchPanelView\.sourceCapabilityMetrics\.map[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*\{metric\.text\}/,
+  'Activity library search component should render source capability count text and aria labels prepared by the domain view.'
+);
+assert.match(
+  activityLibrarySearchComponentSource,
+  /searchPanelView\.statusDescription[\s\S]*searchPanelView\.statusMetrics\.map/,
   'Activity library search component should explain the selected status filter and status counts from the domain view.'
+);
+assert.match(
+  activityLibrarySearchComponentSource,
+  /searchPanelView\.statusMetrics\.map[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*\{metric\.text\}/,
+  'Activity library search component should render status count text and aria labels prepared by the domain view.'
+);
+assert.doesNotMatch(
+  activityLibrarySearchComponentSource,
+  /\{metric\.value\}\s*[-:·]\s*\{metric\.label\}|metric\.value\}\s*<\//,
+  'Activity library search component should not rebuild metric count text from raw value and label.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -23591,6 +23645,11 @@ assert.match(
 );
 assert.match(
   activityLibraryScopePanelComponentSource,
+  /<dl[\s\S]*view\.items\.map[\s\S]*<dt[\s\S]*item\.label[\s\S]*<dd[\s\S]*item\.value[\s\S]*<dd[\s\S]*item\.description/,
+  'Activity library scope panel should render current-view scope as semantic label/value/description items.'
+);
+assert.match(
+  activityLibraryScopePanelComponentSource,
   /function ActivityLibraryScopeItem[\s\S]*item\.label[\s\S]*item\.value[\s\S]*item\.description/,
   'Activity library scope panel items should render prepared labels, values, and descriptions.'
 );
@@ -23606,8 +23665,13 @@ assert.doesNotMatch(
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
-  /metric\.description[\s\S]*\{metric\.description\}/,
+  /\{metric\.description\}/,
   'Activity library summary cards should render optional domain-provided metric descriptions.'
+);
+assert.match(
+  activityLibrarySummaryCardComponentSource,
+  /<Card[\s\S]*role="article"[\s\S]*aria-label=\{metric\.ariaLabel\}[\s\S]*metric\.description/,
+  'Activity library summary cards should expose each prepared metric as an accessible article.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -23618,6 +23682,16 @@ assert.match(
   activityLibraryViewSource,
   /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibraryCardStat = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*key: ActivityLibraryCardStatKey;[\s\S]*label: string;[\s\S]*value: number;/,
+  'Activity library card stat items should expose domain-prepared descriptions and accessible labels.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibraryCardDisplayView = \{[\s\S]*actionsLabel: string;[\s\S]*ariaLabel: string;[\s\S]*compatibilityLabel: string;[\s\S]*contentLabel: string;[\s\S]*detailsLabel: string;[\s\S]*restoreRequiredLabel: string;[\s\S]*sourceMaterialsLabel: string;/,
+  'Activity library card display view should expose prepared card and section labels for semantic rendering.'
 );
 assert.match(
   activityLibraryViewSource,
@@ -23719,6 +23793,16 @@ assert.match(
   /ActivityLibraryStats[\s\S]*stats=\{cardDisplayView\.stats\}/,
   'Activity library card component should delegate prepared stat rendering to a focused component.'
 );
+assert.match(
+  activityLibraryCardComponentSource,
+  /<Card[\s\S]*role="article"[\s\S]*aria-label=\{cardDisplayView\.ariaLabel\}[\s\S]*<section[\s\S]*aria-label=\{cardDisplayView\.detailsLabel\}/,
+  'Activity library card component should expose the prepared card and details labels semantically.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryStats[\s\S]*label=\{cardDisplayView\.contentLabel\}[\s\S]*stats=\{cardDisplayView\.stats\}/,
+  'Activity library card component should pass the prepared content-count section label into stats rendering.'
+);
 assert.doesNotMatch(
   activityLibraryCardComponentSource,
   /cardDisplayView\.stats\.map|function ActivityStat/,
@@ -23728,6 +23812,11 @@ assert.match(
   activityLibraryCardComponentSource,
   /ActivitySourceMaterialsSummary[\s\S]*actionSlot=\{[\s\S]*cardDisplayView\.actionState\.showEditAction[\s\S]*cardDisplayView\.sourceMaterials\.hasMaterials[\s\S]*ActivityLibrarySourceMaterialEditAction[\s\S]*action=\{cardDisplayView\.sourceMaterialEditAction\}[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
   'Activity library card component should render source-material summary with an edit action only when the activity can be edited.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivitySourceMaterialsSummary[\s\S]*label=\{cardDisplayView\.sourceMaterialsLabel\}[\s\S]*summary=\{cardDisplayView\.sourceMaterials\}/,
+  'Activity library card component should pass the prepared source-material section label into source summary rendering.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -23741,8 +23830,18 @@ assert.match(
 );
 assert.match(
   activityLibraryCardComponentSource,
+  /ActivityLibraryCompatibilityPanel[\s\S]*label=\{cardDisplayView\.compatibilityLabel\}[\s\S]*onRemix=\{remixActivity\}/,
+  'Activity library card component should pass the prepared compatibility section label into compatibility rendering.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
   /ActivityLibraryCardActions[\s\S]*actionState=\{cardDisplayView\.actionState\}[\s\S]*actionView=\{cardDisplayView\.actionView\}[\s\S]*editAction=\{cardDisplayView\.editAction\}[\s\S]*onArchive=\{archiveActivity\}[\s\S]*onDuplicate=\{duplicateActivity\}[\s\S]*onPublish=\{\(\) => setPublishDialogOpen\(true\)\}[\s\S]*onRestore=\{restoreActivity\}/,
   'Activity library card component should delegate persisted action rendering to a focused action component.'
+);
+assert.match(
+  activityLibraryCardComponentSource,
+  /ActivityLibraryCardActions[\s\S]*label=\{cardDisplayView\.actionsLabel\}[\s\S]*restoreRequiredLabel=\{cardDisplayView\.restoreRequiredLabel\}/,
+  'Activity library card component should pass prepared action-region and restore-required labels into action rendering.'
 );
 assert.match(
   activityLibraryCardComponentSource,
@@ -23798,6 +23897,11 @@ assert.match(
   activityLibraryCompatibilityPanelSource,
   /ActivityLibraryCardActionState[\s\S]*ActivityLibraryCompatibilityView[\s\S]*ActivityLibraryLockedTemplateDiagnosticView[\s\S]*ActivityLibraryReadyTemplateOptionView[\s\S]*ActivityLibraryRemixActionOptionView/,
   'Activity library compatibility panel should import explicit compatibility view contracts.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /label: string;[\s\S]*<section aria-label=\{label\}/,
+  'Activity library compatibility panel should expose the prepared compatibility label on its section.'
 );
 assert.doesNotMatch(
   activityLibraryCompatibilityPanelSource,
@@ -23859,6 +23963,16 @@ assert.match(
   /ActivityLibraryCardStat/,
   'Activity library stats component should consume the explicit activity-domain stat item contract.'
 );
+assert.match(
+  activityLibraryStatsComponentSource,
+  /stats\.map[\s\S]*ariaLabel=\{stat\.ariaLabel\}[\s\S]*description=\{stat\.description\}[\s\S]*label=\{stat\.label\}[\s\S]*value=\{stat\.value\}/,
+  'Activity library stats component should pass prepared stat labels, values, and descriptions into semantic stat items.'
+);
+assert.match(
+  activityLibraryStatsComponentSource,
+  /<dl aria-label=\{label\}[\s\S]*<dt[\s\S]*\{label\}[\s\S]*<output aria-label=\{ariaLabel\}[\s\S]*<dd className="sr-only">\{description\}/,
+  'Activity library stats component should render prepared stat labels, values, and descriptions as semantic items.'
+);
 assert.doesNotMatch(
   activityLibraryStatsComponentSource,
   /ReturnType<typeof buildActivityLibraryCardDisplayView>|ActivityLibraryCardDisplayView\[/,
@@ -23868,6 +23982,11 @@ assert.match(
   activityLibraryStatsComponentSource,
   /stats\.map[\s\S]*stat\.label[\s\S]*stat\.value/,
   'Activity library stats component should render prepared stat labels and values.'
+);
+assert.match(
+  activitySourceMaterialsSummaryComponentSource,
+  /label\?: string;[\s\S]*aria-label=\{label \?\? summary\.ariaLabel\}/,
+  'Activity source-material summary should accept a card-specific section label while preserving the source-summary fallback label.'
 );
 assert.match(
   activityLibrarySummaryCardComponentSource,
@@ -28688,28 +28807,50 @@ assert.deepEqual(
     searchDescription:
       'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
     sourceCapabilityMetrics: [
-      { capability: 'audio-extraction', label: 'audio-ready', value: '0' },
       {
-        capability: 'worksheet-extraction',
-        label: 'worksheet-ready',
+        ariaLabel: '0 audio-ready',
+        capability: 'audio-extraction',
+        label: 'audio-ready',
+        text: '0 audio-ready',
         value: '0',
       },
       {
+        ariaLabel: '0 worksheet-ready',
+        capability: 'worksheet-extraction',
+        label: 'worksheet-ready',
+        text: '0 worksheet-ready',
+        value: '0',
+      },
+      {
+        ariaLabel: '0 spreadsheet-ready',
         capability: 'spreadsheet-import',
         label: 'spreadsheet-ready',
+        text: '0 spreadsheet-ready',
         value: '0',
       },
     ],
     sourceFilterDescription:
-      'Show activities with worksheet images or documents ready for worksheet extraction.',
+      'Worksheet: Show activities with worksheet images or documents ready for worksheet extraction.',
     sourceFilterLabel: 'Worksheet',
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusDescription:
-      'Switch between active and archived activity views without widening beyond your own saved activities.',
+      'Active: Switch between active and archived activity views without widening beyond your own saved activities.',
     statusLabel: 'Active',
     statusMetrics: [
-      { label: 'Active', status: 'active', value: '0' },
-      { label: 'Archived', status: 'archived', value: '0' },
+      {
+        ariaLabel: '0 Active',
+        label: 'Active',
+        status: 'active',
+        text: '0 Active',
+        value: '0',
+      },
+      {
+        ariaLabel: '0 Archived',
+        label: 'Archived',
+        status: 'archived',
+        text: '0 Archived',
+        value: '0',
+      },
     ],
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription:
@@ -28764,28 +28905,50 @@ assert.deepEqual(
     searchDescription:
       'Search only your activity library by title, description, or template label; filters stay owner-scoped.',
     sourceCapabilityMetrics: [
-      { capability: 'audio-extraction', label: 'audio-ready', value: '1' },
       {
-        capability: 'worksheet-extraction',
-        label: 'worksheet-ready',
+        ariaLabel: '1 audio-ready',
+        capability: 'audio-extraction',
+        label: 'audio-ready',
+        text: '1 audio-ready',
         value: '1',
       },
       {
+        ariaLabel: '1 worksheet-ready',
+        capability: 'worksheet-extraction',
+        label: 'worksheet-ready',
+        text: '1 worksheet-ready',
+        value: '1',
+      },
+      {
+        ariaLabel: '1 spreadsheet-ready',
         capability: 'spreadsheet-import',
         label: 'spreadsheet-ready',
+        text: '1 spreadsheet-ready',
         value: '1',
       },
     ],
     sourceFilterDescription:
-      'Show activities with audio, worksheet, or spreadsheet material ready for future AI extraction.',
+      'Any extractable source: Show activities with audio, worksheet, or spreadsheet material ready for future AI extraction.',
     sourceFilterLabel: 'Any extractable source',
     sourceOptions: activityLibrarySearchCopy.sourceOptions,
     statusDescription:
-      'Switch between active and archived activity views without widening beyond your own saved activities.',
+      'Active: Switch between active and archived activity views without widening beyond your own saved activities.',
     statusLabel: 'Active',
     statusMetrics: [
-      { label: 'Active', status: 'active', value: '2' },
-      { label: 'Archived', status: 'archived', value: '1' },
+      {
+        ariaLabel: '2 Active',
+        label: 'Active',
+        status: 'active',
+        text: '2 Active',
+        value: '2',
+      },
+      {
+        ariaLabel: '1 Archived',
+        label: 'Archived',
+        status: 'archived',
+        text: '1 Archived',
+        value: '1',
+      },
     ],
     statusOptions: activityLibrarySearchCopy.statusOptions,
     templateDescription:
@@ -28826,8 +28989,20 @@ assert.deepEqual(
     total: 2,
   }).statusMetrics,
   [
-    { label: 'Active', status: 'active', value: '1' },
-    { label: 'Archived', status: 'archived', value: '1' },
+    {
+      ariaLabel: '1 Active',
+      label: 'Active',
+      status: 'active',
+      text: '1 Active',
+      value: '1',
+    },
+    {
+      ariaLabel: '1 Archived',
+      label: 'Archived',
+      status: 'archived',
+      text: '1 Archived',
+      value: '1',
+    },
   ]
 );
 assert.equal(
@@ -28960,9 +29135,27 @@ assert.deepEqual(
     questions: 3,
   }),
   [
-    { key: 'questions', label: 'Questions', value: 3 },
-    { key: 'pairs', label: 'Pairs', value: 4 },
-    { key: 'groups', label: 'Groups', value: 2 },
+    {
+      ariaLabel: 'Questions: 3. Question prompts stored in this activity.',
+      description: 'Question prompts stored in this activity.',
+      key: 'questions',
+      label: 'Questions',
+      value: 3,
+    },
+    {
+      ariaLabel: 'Pairs: 4. Reusable matching pairs stored in this activity.',
+      description: 'Reusable matching pairs stored in this activity.',
+      key: 'pairs',
+      label: 'Pairs',
+      value: 4,
+    },
+    {
+      ariaLabel: 'Groups: 2. Sorting categories stored in this activity.',
+      description: 'Sorting categories stored in this activity.',
+      key: 'groups',
+      label: 'Groups',
+      value: 2,
+    },
   ]
 );
 const starterActivityCardView = buildStarterActivityLibraryCardViewModel(
@@ -29004,9 +29197,27 @@ assert.equal(starterActivityDisplayView.templateName, 'Quiz');
 assert.equal(starterActivityDisplayView.templateType, 'quiz');
 assert.equal(starterActivityDisplayView.statusLabel, 'Preview');
 assert.deepEqual(starterActivityDisplayView.stats, [
-  { key: 'questions', label: 'Questions', value: 3 },
-  { key: 'pairs', label: 'Pairs', value: 4 },
-  { key: 'groups', label: 'Groups', value: 2 },
+  {
+    ariaLabel: 'Questions: 3. Question prompts stored in this activity.',
+    description: 'Question prompts stored in this activity.',
+    key: 'questions',
+    label: 'Questions',
+    value: 3,
+  },
+  {
+    ariaLabel: 'Pairs: 4. Reusable matching pairs stored in this activity.',
+    description: 'Reusable matching pairs stored in this activity.',
+    key: 'pairs',
+    label: 'Pairs',
+    value: 4,
+  },
+  {
+    ariaLabel: 'Groups: 2. Sorting categories stored in this activity.',
+    description: 'Sorting categories stored in this activity.',
+    key: 'groups',
+    label: 'Groups',
+    value: 2,
+  },
 ]);
 assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
   ariaLabel: 'Source materials, 0 files',
@@ -33836,14 +34047,34 @@ assert.deepEqual(
     totalActivities: 0,
   }),
   [
-    { id: 'total', label: 'Activities', value: '0' },
     {
+      ariaLabel:
+        'Activities: 0. Saved activities in the current library scope.',
+      description: 'Saved activities in the current library scope.',
+      id: 'total',
+      label: 'Activities',
+      value: '0',
+    },
+    {
+      ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      description:
+        'Template families represented by the current library scope.',
       id: 'coverage',
       label: 'Template coverage',
       value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
-    { id: 'remix', label: 'Ready to remix', value: '0' },
     {
+      ariaLabel:
+        'Ready to remix: 0. Activities with at least one additional template family ready for remix.',
+      description:
+        'Activities with at least one additional template family ready for remix.',
+      id: 'remix',
+      label: 'Ready to remix',
+      value: '0',
+    },
+    {
+      ariaLabel:
+        'Source extraction: 0. No attached source materials are ready for extraction yet.',
       description: 'No attached source materials are ready for extraction yet.',
       id: 'sourceExtraction',
       label: 'Source extraction',
@@ -33858,14 +34089,35 @@ assert.deepEqual(
     totalActivities: 99,
   }),
   [
-    { id: 'total', label: 'Matching activities', value: '2' },
     {
+      ariaLabel:
+        'Matching activities: 2. Activities matching the active search, template, source, and status filters.',
+      description:
+        'Activities matching the active search, template, source, and status filters.',
+      id: 'total',
+      label: 'Matching activities',
+      value: '2',
+    },
+    {
+      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      description:
+        'Template families represented by the current library scope.',
       id: 'coverage',
       label: 'Template coverage',
       value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
-    { id: 'remix', label: 'Ready to remix', value: '2' },
     {
+      ariaLabel:
+        'Ready to remix: 2. Activities with at least one additional template family ready for remix.',
+      description:
+        'Activities with at least one additional template family ready for remix.',
+      id: 'remix',
+      label: 'Ready to remix',
+      value: '2',
+    },
+    {
+      ariaLabel:
+        'Source extraction: 3. 2 activities have extractable classroom material.',
       description: '2 activities have extractable classroom material.',
       id: 'sourceExtraction',
       label: 'Source extraction',
@@ -33895,15 +34147,37 @@ assert.deepEqual(
     totalActivities: 99,
   }),
   [
-    { id: 'total', label: 'Matching activities', value: '-' },
     {
+      ariaLabel:
+        'Matching activities: -. Activities matching the active search, template, source, and status filters.',
+      description:
+        'Activities matching the active search, template, source, and status filters.',
+      id: 'total',
+      label: 'Matching activities',
+      value: '-',
+    },
+    {
+      ariaLabel:
+        'Template coverage: -. Template families represented by the current library scope.',
+      description:
+        'Template families represented by the current library scope.',
       id: 'coverage',
       label: 'Template coverage',
       value: '-',
     },
-    { id: 'remix', label: 'Ready to remix', value: '-' },
     {
-      description: undefined,
+      ariaLabel:
+        'Ready to remix: -. Activities with at least one additional template family ready for remix.',
+      description:
+        'Activities with at least one additional template family ready for remix.',
+      id: 'remix',
+      label: 'Ready to remix',
+      value: '-',
+    },
+    {
+      ariaLabel:
+        'Source extraction: -. No attached source materials are ready for extraction yet.',
+      description: 'No attached source materials are ready for extraction yet.',
       id: 'sourceExtraction',
       label: 'Source extraction',
       value: '-',
@@ -33932,14 +34206,35 @@ assert.deepEqual(
     totalActivities: 99,
   }),
   [
-    { id: 'total', label: 'Matching activities', value: '3' },
     {
+      ariaLabel:
+        'Matching activities: 3. Activities matching the active search, template, source, and status filters.',
+      description:
+        'Activities matching the active search, template, source, and status filters.',
+      id: 'total',
+      label: 'Matching activities',
+      value: '3',
+    },
+    {
+      ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+      description:
+        'Template families represented by the current library scope.',
       id: 'coverage',
       label: 'Template coverage',
       value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
     },
-    { id: 'remix', label: 'Ready to remix', value: '1' },
     {
+      ariaLabel:
+        'Ready to remix: 1. Activities with at least one additional template family ready for remix.',
+      description:
+        'Activities with at least one additional template family ready for remix.',
+      id: 'remix',
+      label: 'Ready to remix',
+      value: '1',
+    },
+    {
+      ariaLabel:
+        'Source extraction: 4. No attached source materials are ready for extraction yet.',
       description: 'No attached source materials are ready for extraction yet.',
       id: 'sourceExtraction',
       label: 'Source extraction',
@@ -33948,15 +34243,25 @@ assert.deepEqual(
   ]
 );
 assert.deepEqual(buildActivityLibrarySourceCapabilityMetrics(librarySummary), [
-  { capability: 'audio-extraction', label: 'audio-ready', value: '1' },
   {
-    capability: 'worksheet-extraction',
-    label: 'worksheet-ready',
+    ariaLabel: '1 audio-ready',
+    capability: 'audio-extraction',
+    label: 'audio-ready',
+    text: '1 audio-ready',
     value: '1',
   },
   {
+    ariaLabel: '1 worksheet-ready',
+    capability: 'worksheet-extraction',
+    label: 'worksheet-ready',
+    text: '1 worksheet-ready',
+    value: '1',
+  },
+  {
+    ariaLabel: '1 spreadsheet-ready',
     capability: 'spreadsheet-import',
     label: 'spreadsheet-ready',
+    text: '1 spreadsheet-ready',
     value: '1',
   },
 ]);
@@ -33970,22 +34275,44 @@ assert.deepEqual(
     },
   }),
   [
-    { capability: 'audio-extraction', label: 'audio-ready', value: '-' },
     {
+      ariaLabel: '- audio-ready',
+      capability: 'audio-extraction',
+      label: 'audio-ready',
+      text: '- audio-ready',
+      value: '-',
+    },
+    {
+      ariaLabel: '2 worksheet-ready',
       capability: 'worksheet-extraction',
       label: 'worksheet-ready',
+      text: '2 worksheet-ready',
       value: '2',
     },
     {
+      ariaLabel: '0 spreadsheet-ready',
       capability: 'spreadsheet-import',
       label: 'spreadsheet-ready',
+      text: '0 spreadsheet-ready',
       value: '0',
     },
   ]
 );
 assert.deepEqual(buildActivityLibraryStatusMetrics(librarySummary), [
-  { label: 'Active', status: 'active', value: '1' },
-  { label: 'Archived', status: 'archived', value: '1' },
+  {
+    ariaLabel: '1 Active',
+    label: 'Active',
+    status: 'active',
+    text: '1 Active',
+    value: '1',
+  },
+  {
+    ariaLabel: '1 Archived',
+    label: 'Archived',
+    status: 'archived',
+    text: '1 Archived',
+    value: '1',
+  },
 ]);
 assert.deepEqual(
   buildActivityLibraryStatusMetrics({
@@ -34001,8 +34328,20 @@ assert.deepEqual(
     totalReadyTemplateOptions: 0,
   }),
   [
-    { label: 'Active', status: 'active', value: '4' },
-    { label: 'Archived', status: 'archived', value: '0' },
+    {
+      ariaLabel: '4 Active',
+      label: 'Active',
+      status: 'active',
+      text: '4 Active',
+      value: '4',
+    },
+    {
+      ariaLabel: '0 Archived',
+      label: 'Archived',
+      status: 'archived',
+      text: '0 Archived',
+      value: '0',
+    },
   ]
 );
 assert.deepEqual(
@@ -34019,8 +34358,20 @@ assert.deepEqual(
     totalReadyTemplateOptions: 0,
   }),
   [
-    { label: 'Active', status: 'active', value: '0' },
-    { label: 'Archived', status: 'archived', value: '9' },
+    {
+      ariaLabel: '0 Active',
+      label: 'Active',
+      status: 'active',
+      text: '0 Active',
+      value: '0',
+    },
+    {
+      ariaLabel: '9 Archived',
+      label: 'Archived',
+      status: 'archived',
+      text: '9 Archived',
+      value: '9',
+    },
   ]
 );
 assert.deepEqual(
@@ -34310,14 +34661,34 @@ assert.deepEqual(
       source: 'starter-preview',
     },
     summaryMetrics: [
-      { id: 'total', label: 'Activities', value: '0' },
       {
+        ariaLabel:
+          'Activities: 0. Saved activities in the current library scope.',
+        description: 'Saved activities in the current library scope.',
+        id: 'total',
+        label: 'Activities',
+        value: '0',
+      },
+      {
+        ariaLabel: `Template coverage: 0/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+        description:
+          'Template families represented by the current library scope.',
         id: 'coverage',
         label: 'Template coverage',
         value: `0/${ACTIVITY_TEMPLATE_TYPES.length}`,
       },
-      { id: 'remix', label: 'Ready to remix', value: '0' },
       {
+        ariaLabel:
+          'Ready to remix: 0. Activities with at least one additional template family ready for remix.',
+        description:
+          'Activities with at least one additional template family ready for remix.',
+        id: 'remix',
+        label: 'Ready to remix',
+        value: '0',
+      },
+      {
+        ariaLabel:
+          'Source extraction: 0. No attached source materials are ready for extraction yet.',
         description:
           'No attached source materials are ready for extraction yet.',
         id: 'sourceExtraction',
@@ -34706,14 +35077,35 @@ assert.deepEqual(
     },
     starterPreviewActivityIds: [],
     summaryMetrics: [
-      { id: 'total', label: 'Matching activities', value: '2' },
       {
+        ariaLabel:
+          'Matching activities: 2. Activities matching the active search, template, source, and status filters.',
+        description:
+          'Activities matching the active search, template, source, and status filters.',
+        id: 'total',
+        label: 'Matching activities',
+        value: '2',
+      },
+      {
+        ariaLabel: `Template coverage: 2/${ACTIVITY_TEMPLATE_TYPES.length}. Template families represented by the current library scope.`,
+        description:
+          'Template families represented by the current library scope.',
         id: 'coverage',
         label: 'Template coverage',
         value: `2/${ACTIVITY_TEMPLATE_TYPES.length}`,
       },
-      { id: 'remix', label: 'Ready to remix', value: '2' },
       {
+        ariaLabel:
+          'Ready to remix: 2. Activities with at least one additional template family ready for remix.',
+        description:
+          'Activities with at least one additional template family ready for remix.',
+        id: 'remix',
+        label: 'Ready to remix',
+        value: '2',
+      },
+      {
+        ariaLabel:
+          'Source extraction: 3. 2 activities have extractable classroom material.',
         description: '2 activities have extractable classroom material.',
         id: 'sourceExtraction',
         label: 'Source extraction',

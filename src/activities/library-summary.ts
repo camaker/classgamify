@@ -67,21 +67,26 @@ export type ActivityLibrarySummaryMetricId =
   | 'sourceExtraction';
 
 export type ActivityLibrarySummaryMetric = {
-  description?: string;
+  ariaLabel: string;
+  description: string;
   id: ActivityLibrarySummaryMetricId;
   label: string;
   value: string;
 };
 
 export type ActivityLibrarySourceCapabilityMetric = {
+  ariaLabel: string;
   capability: ActivitySourceMaterialReadinessCapability;
   label: string;
+  text: string;
   value: string;
 };
 
 export type ActivityLibraryStatusMetric = {
+  ariaLabel: string;
   label: string;
   status: ActivityLibraryStatus;
+  text: string;
   value: string;
 };
 
@@ -239,38 +244,79 @@ export function buildActivityLibrarySummaryMetrics({
 }): ActivityLibrarySummaryMetric[] {
   const resolvedSummary =
     summary ?? buildEmptyActivityLibrarySummary(totalActivities);
+  const totalLabel = hasFilters
+    ? m.activity_library_summary_matching_activities()
+    : m.activity_library_summary_activities();
+  const totalDescription = hasFilters
+    ? m.activity_library_summary_matching_activities_description()
+    : m.activity_library_summary_activities_description();
+  const totalValue = formatActivityLibraryMetricNumber(
+    resolvedSummary.totalActivities
+  );
+  const coverageLabel = m.activity_library_summary_template_coverage();
+  const coverageDescription =
+    m.activity_library_summary_template_coverage_description();
+  const coverageValue = formatActivityLibraryMetricFraction(
+    resolvedSummary.templateCoverage,
+    resolvedSummary.templateCoverageTotal
+  );
+  const remixLabel = m.activity_library_summary_ready_to_remix();
+  const remixDescription =
+    m.activity_library_summary_ready_to_remix_description();
+  const remixValue = formatActivityLibraryMetricNumber(
+    resolvedSummary.remixReadyActivities
+  );
+  const sourceExtractionLabel = m.activity_library_summary_source_extraction();
+  const sourceExtractionDescription =
+    formatActivityLibrarySourceExtractionDescription(resolvedSummary);
+  const sourceExtractionValue = formatActivityLibraryMetricNumber(
+    resolvedSummary.totalExtractableSourceMaterials
+  );
 
   return [
     {
+      ariaLabel: formatActivityLibrarySummaryAriaLabel({
+        description: totalDescription,
+        label: totalLabel,
+        value: totalValue,
+      }),
+      description: totalDescription,
       id: 'total',
-      label: hasFilters
-        ? m.activity_library_summary_matching_activities()
-        : m.activity_library_summary_activities(),
-      value: formatActivityLibraryMetricNumber(resolvedSummary.totalActivities),
+      label: totalLabel,
+      value: totalValue,
     },
     {
+      ariaLabel: formatActivityLibrarySummaryAriaLabel({
+        description: coverageDescription,
+        label: coverageLabel,
+        value: coverageValue,
+      }),
+      description: coverageDescription,
       id: 'coverage',
-      label: m.activity_library_summary_template_coverage(),
-      value: formatActivityLibraryMetricFraction(
-        resolvedSummary.templateCoverage,
-        resolvedSummary.templateCoverageTotal
-      ),
+      label: coverageLabel,
+      value: coverageValue,
     },
     {
+      ariaLabel: formatActivityLibrarySummaryAriaLabel({
+        description: remixDescription,
+        label: remixLabel,
+        value: remixValue,
+      }),
+      description: remixDescription,
       id: 'remix',
-      label: m.activity_library_summary_ready_to_remix(),
-      value: formatActivityLibraryMetricNumber(
-        resolvedSummary.remixReadyActivities
-      ),
+      label: remixLabel,
+      value: remixValue,
     },
     {
+      ariaLabel: formatActivityLibrarySummaryAriaLabel({
+        description: sourceExtractionDescription,
+        label: sourceExtractionLabel,
+        value: sourceExtractionValue,
+      }),
+      description: sourceExtractionDescription,
       id: 'sourceExtraction',
-      label: m.activity_library_summary_source_extraction(),
-      description:
-        formatActivityLibrarySourceExtractionDescription(resolvedSummary),
-      value: formatActivityLibraryMetricNumber(
-        resolvedSummary.totalExtractableSourceMaterials
-      ),
+      label: sourceExtractionLabel,
+      value: sourceExtractionValue,
     },
   ];
 }
@@ -297,7 +343,11 @@ export function buildActivityLibrarySourceCapabilityMetrics(
     },
     formatValue: formatActivityLibraryMetricNumber,
     includeZero: true,
-  });
+  }).map((metric) => ({
+    ...metric,
+    ariaLabel: formatActivityLibrarySourceCapabilityMetricAriaLabel(metric),
+    text: formatActivityLibrarySourceCapabilityMetricAriaLabel(metric),
+  }));
 }
 
 export function buildActivityLibraryStatusMetrics(
@@ -308,19 +358,39 @@ export function buildActivityLibraryStatusMetrics(
   );
   const activeActivities =
     resolvedSummary.totalActivities - resolvedSummary.archivedActivities;
+  const activeLabel = m.activity_library_filter_active();
+  const activeValue = formatActivityLibraryMetricNumber(activeActivities);
+  const archivedLabel = m.activity_library_filter_archived();
+  const archivedValue = formatActivityLibraryMetricNumber(
+    resolvedSummary.archivedActivities
+  );
 
   return [
     {
-      label: m.activity_library_filter_active(),
+      ariaLabel: formatActivityLibraryStatusMetricAriaLabel({
+        label: activeLabel,
+        value: activeValue,
+      }),
+      label: activeLabel,
       status: 'active',
-      value: formatActivityLibraryMetricNumber(activeActivities),
+      text: formatActivityLibraryStatusMetricAriaLabel({
+        label: activeLabel,
+        value: activeValue,
+      }),
+      value: activeValue,
     },
     {
-      label: m.activity_library_filter_archived(),
+      ariaLabel: formatActivityLibraryStatusMetricAriaLabel({
+        label: archivedLabel,
+        value: archivedValue,
+      }),
+      label: archivedLabel,
       status: 'archived',
-      value: formatActivityLibraryMetricNumber(
-        resolvedSummary.archivedActivities
-      ),
+      text: formatActivityLibraryStatusMetricAriaLabel({
+        label: archivedLabel,
+        value: archivedValue,
+      }),
+      value: archivedValue,
     },
   ];
 }
@@ -332,7 +402,9 @@ function formatActivityLibrarySourceExtractionDescription(
     summary.extractableSourceActivities
   );
 
-  if (extractableActivities === undefined) return undefined;
+  if (extractableActivities === undefined) {
+    return m.activity_library_summary_source_extraction_empty();
+  }
   if (extractableActivities === 0) {
     return m.activity_library_summary_source_extraction_empty();
   }
@@ -345,6 +417,45 @@ function formatActivityLibrarySourceExtractionDescription(
   return m.activity_library_summary_source_extraction_many({
     count: extractableActivities,
   });
+}
+
+function formatActivityLibrarySummaryAriaLabel({
+  description,
+  label,
+  value,
+}: {
+  description: string;
+  label: string;
+  value: string;
+}) {
+  return m.activity_library_summary_aria_label({
+    description,
+    label,
+    value,
+  });
+}
+
+function formatActivityLibrarySourceCapabilityMetricAriaLabel({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return m.activity_library_source_capability_metric_aria_label({
+    label,
+    value,
+  });
+}
+
+function formatActivityLibraryStatusMetricAriaLabel({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return m.activity_library_status_metric_aria_label({ label, value });
 }
 
 function formatActivityLibraryMetricNumber(value: number) {
