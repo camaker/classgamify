@@ -4,6 +4,8 @@ import type {
 } from '@/activities/types';
 import { m } from '@/locale/paraglide/messages';
 
+export const ACTIVITY_RESTORED_VISIBILITY = 'draft' as const;
+
 export function getArchivedActivityDerivationError() {
   return m.activity_lifecycle_derivation_blocked();
 }

@@ -18,6 +18,7 @@ import {
   type ActivityDerivativeAction,
   type ActivityLifecycleAction,
   buildActivityLifecycleActionView,
+  buildActivityDerivativeActionGate,
   type ActivityLifecycleActionCopy,
   type ActivityLifecycleActionView,
   getActivityLifecycleActionCopy,
@@ -101,6 +102,7 @@ export type ActivityLibraryCompatibilityView = {
   lockedTemplateDiagnostics: ActivityLibraryLockedTemplateDiagnosticView[];
   readyTemplateOptions: ActivityLibraryReadyTemplateOptionView[];
   remixActionOptions: ActivityLibraryRemixActionOptionView[];
+  restoreRequiredMessage?: string;
   remixHint?: string;
 };
 
@@ -472,6 +474,9 @@ export const activityLibraryCardCopy = {
   },
   get restoreRequiredMessage() {
     return m.activity_library_card_restore_required();
+  },
+  get remixRestoreRequiredMessage() {
+    return m.activity_library_card_remix_restore_required();
   },
   get sourceMaterialEditActionLabel() {
     return m.activity_library_card_source_material_edit_action();
@@ -1060,6 +1065,7 @@ export function buildActivityLibraryCardDisplayView({
     compatibility: buildActivityLibraryCompatibilityView({
       currentTemplateType: activity.templateType,
       summary,
+      visibility: activity.status,
     }),
     editAction: buildActivityLibraryEditorAction({
       activityId: activity.id,
@@ -1208,10 +1214,17 @@ export function buildActivityLibraryRemixActionLabel(shortName: string) {
 export function buildActivityLibraryCompatibilityView({
   currentTemplateType,
   summary,
+  visibility = 'draft',
 }: {
   currentTemplateType: ActivityTemplateType;
   summary: ActivityLibraryCardSummary;
+  visibility?: ActivityVisibility;
 }): ActivityLibraryCompatibilityView {
+  const remixGate = buildActivityDerivativeActionGate({
+    action: 'remix',
+    visibility,
+  });
+
   return {
     lockedTemplateDiagnostics: summary.lockedTemplateOptions
       .slice(0, ACTIVITY_LIBRARY_COMPATIBILITY_LIMITS.lockedTemplateDiagnostics)
@@ -1229,6 +1242,12 @@ export function buildActivityLibraryCompatibilityView({
         ...option,
         actionLabel: buildActivityLibraryRemixActionLabel(option.shortName),
       })),
+    ...(remixGate.type === 'blocked'
+      ? {
+          restoreRequiredMessage:
+            activityLibraryCardCopy.remixRestoreRequiredMessage,
+        }
+      : {}),
     remixHint: buildActivityLibraryRemixHint(
       summary.suggestedTemplateOptions.map((option) => option.shortName)
     ),

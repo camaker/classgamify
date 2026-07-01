@@ -322,6 +322,7 @@
   "activity_library_breadcrumb_current": "Activities",
   "activity_library_breadcrumb_dashboard": "Dashboard",
   "activity_library_card_compatible_templates": "Compatible template families",
+  "activity_library_card_remix_restore_required": "Ready template modes are preserved, but remix actions unlock only after restore.",
   "activity_library_card_restore_required": "Restore this activity before publishing, duplicating, or remixing it.",
   "activity_library_card_source_material_edit_action": "Review in editor",
   "activity_library_created_panel_label": "Activity saved",

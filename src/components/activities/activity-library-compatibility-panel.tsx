@@ -43,6 +43,12 @@ export function ActivityLibraryCompatibilityPanel({
           {compatibility.remixHint}
         </p>
       ) : null}
+      {actionState.showRestoreRequiredMessage &&
+      compatibility.restoreRequiredMessage ? (
+        <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          {compatibility.restoreRequiredMessage}
+        </p>
+      ) : null}
       {actionState.showRemixActions ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {compatibility.remixActionOptions.map((option) => (

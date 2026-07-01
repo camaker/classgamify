@@ -31,6 +31,7 @@ import {
 } from '@/activities/library-query';
 import { summarizeActivityLibrary } from '@/activities/library-summary';
 import {
+  ACTIVITY_RESTORED_VISIBILITY,
   assertActivityCanDeriveWork,
   assertActivityCanEdit,
   assertActivityCanArchive,
@@ -365,7 +366,7 @@ export const restoreActivity = createServerFn({ method: 'POST' })
       action: 'restore',
       activityId: data.activityId,
       ownerId: context.userId,
-      nextVisibility: 'draft',
+      nextVisibility: ACTIVITY_RESTORED_VISIBILITY,
     })
   );
 
@@ -382,7 +383,7 @@ async function updateActivityVisibility({
 }) {
   const db = getDb();
   const [row] = await db
-    .select(buildActivityDetailSelect())
+    .select(buildActivityLifecycleGateSelect())
     .from(activity)
     .where(buildActivityDetailOwnerWhere({ activityId, userId: ownerId }))
     .limit(1);

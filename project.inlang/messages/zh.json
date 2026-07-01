@@ -322,6 +322,7 @@
   "activity_library_breadcrumb_current": "活动",
   "activity_library_breadcrumb_dashboard": "工作台",
   "activity_library_card_compatible_templates": "兼容的模板类型",
+  "activity_library_card_remix_restore_required": "可用模板模式会保留，但恢复后才开放改编操作。",
   "activity_library_card_restore_required": "请先恢复这份活动，再发布、复制或改编。",
   "activity_library_card_source_material_edit_action": "在编辑器中检查",
   "activity_library_created_panel_label": "活动已保存",

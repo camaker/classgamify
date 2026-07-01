@@ -226,6 +226,7 @@ import {
   normalizeActivityMaterialReferences,
 } from '@/activities/material-references';
 import {
+  ACTIVITY_RESTORED_VISIBILITY,
   activityEditPageCopy,
   assertActivityCanArchive,
   assertActivityCanEdit,
@@ -13811,7 +13812,7 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
-  /export type AssignmentPublishBlockedReason =[\s\S]*AssignmentPublishValidationCode[\s\S]*'activity-gate-blocked'/,
+  /type ActivityDerivativeBlockedReason[\s\S]*export type AssignmentPublishBlockedReason =[\s\S]*AssignmentPublishValidationCode[\s\S]*ActivityDerivativeBlockedReason/,
   'Assignment publish execution plans should expose stable blocked reasons for draft validation and activity lifecycle gates.'
 );
 assert.match(
@@ -13871,7 +13872,7 @@ assert.match(
 );
 assert.match(
   assignmentPublishInputSource,
-  /reason: 'activity-gate-blocked'[\s\S]*reason: draftResult\.reason/,
+  /reason: actionView\.gate\.reason[\s\S]*reason: draftResult\.reason/,
   'Assignment publish execution plans should preserve structured blocked reasons from lifecycle gates and draft validation.'
 );
 assert.match(
@@ -15302,7 +15303,7 @@ assert.deepEqual(
     failureMessage: 'Assignment could not be published.',
     message:
       'Restore this activity before publishing, duplicating, or remixing it.',
-    reason: 'activity-gate-blocked',
+    reason: 'activity-archived',
     type: 'blocked',
   }
 );
@@ -22472,8 +22473,8 @@ assert.match(
 );
 assert.match(
   activitiesApiSource,
-  /updateActivityVisibility[\s\S]*\.select\(buildActivityDetailSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId, userId: ownerId \}\)/,
-  'Archive and restore APIs should load owner-scoped activity details through the activity detail query helpers.'
+  /updateActivityVisibility[\s\S]*\.select\(buildActivityLifecycleGateSelect\(\)\)[\s\S]*buildActivityDetailOwnerWhere\(\{ activityId, userId: ownerId \}\)/,
+  'Archive and restore APIs should load owner-scoped lifecycle gates through the activity detail query helpers.'
 );
 assert.doesNotMatch(
   activitiesApiSource,
@@ -22516,6 +22517,11 @@ assert.match(
   activitiesApiSource,
   /assertActivityCanRestore\(row\.visibility\)/,
   'Restore activity API should enforce the activity lifecycle transition server-side.'
+);
+assert.match(
+  activitiesApiSource,
+  /restoreActivity[\s\S]*nextVisibility: ACTIVITY_RESTORED_VISIBILITY/,
+  'Restore activity API should use the activity lifecycle restored visibility contract.'
 );
 assert.match(
   activitiesApiSource,
@@ -22780,6 +22786,16 @@ assert.match(
   /export type ActivityLibraryCardStat[\s\S]*export type ActivityLibraryReadyTemplateOptionView[\s\S]*isCurrent: boolean;[\s\S]*export type ActivityLibraryRemixActionOptionView[\s\S]*actionLabel: string;[\s\S]*export type ActivityLibraryCompatibilityView[\s\S]*readyTemplateOptions: ActivityLibraryReadyTemplateOptionView\[\];[\s\S]*remixActionOptions: ActivityLibraryRemixActionOptionView\[\];[\s\S]*export type ActivityLibraryCardActionState[\s\S]*export type ActivityLibraryCardViewModel[\s\S]*export type ActivityLibraryCardDisplayView[\s\S]*export type ActivityLibraryCardTemplateType = ActivityTemplateType;[\s\S]*export type ActivityLibraryCardActionView[\s\S]*export type ActivityLibraryEditorActionView/,
   'Activity library domain should expose explicit card, compatibility, action, and stat view contracts.'
 );
+assert.match(
+  activityLibraryViewSource,
+  /export type ActivityLibraryCompatibilityView = \{[\s\S]*restoreRequiredMessage\?: string;[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*visibility = 'draft'[\s\S]*buildActivityDerivativeActionGate\(\{[\s\S]*action: 'remix'[\s\S]*visibility,[\s\S]*restoreRequiredMessage/,
+  'Activity library compatibility view should expose restore guidance from the remix lifecycle gate.'
+);
+assert.match(
+  activityLibraryViewSource,
+  /buildActivityLibraryCardDisplayView[\s\S]*buildActivityLibraryCompatibilityView\(\{[\s\S]*currentTemplateType: activity\.templateType,[\s\S]*summary,[\s\S]*visibility: activity\.status/,
+  'Activity library card display view should pass activity visibility into compatibility rendering.'
+);
 assert.doesNotMatch(
   activityLibraryViewSource,
   /ActivityLibraryCompatibilityView\['(?:readyTemplateOptions|remixActionOptions)'\]\[number\]/,
@@ -22969,6 +22985,11 @@ assert.doesNotMatch(
   activityLibraryCompatibilityPanelSource,
   /\{compatibility\.remixHint \? \(/,
   'Activity library compatibility panel should not show remix guidance without the prepared action-state gate.'
+);
+assert.match(
+  activityLibraryCompatibilityPanelSource,
+  /actionState\.showRestoreRequiredMessage[\s\S]*compatibility\.restoreRequiredMessage[\s\S]*\{compatibility\.restoreRequiredMessage\}/,
+  'Activity library compatibility panel should render prepared restore guidance for archived remix actions.'
 );
 assert.match(
   activityLibraryCompatibilityPanelSource,
@@ -27311,6 +27332,7 @@ try {
 }
 assert.equal(isActivityArchived('archived'), true);
 assert.equal(isActivityArchived('draft'), false);
+assert.equal(ACTIVITY_RESTORED_VISIBILITY, 'draft');
 assert.equal(canDeriveActivityWork('draft'), true);
 assert.equal(canDeriveActivityWork('public'), true);
 assert.equal(canDeriveActivityWork('archived'), false);
@@ -27955,6 +27977,10 @@ try {
     }).description,
     '当前没有匹配“音频”来源素材筛选的活动。可以清除筛选，或在活动编辑器里附加这种课堂素材。'
   );
+  assert.equal(
+    activityLibraryCardCopy.remixRestoreRequiredMessage,
+    '可用模板模式会保留，但恢复后才开放改编操作。'
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -27972,6 +27998,10 @@ assert.equal(
 assert.equal(
   activityLibraryCardCopy.restoreRequiredMessage,
   archivedActivityDerivationError
+);
+assert.equal(
+  activityLibraryCardCopy.remixRestoreRequiredMessage,
+  'Ready template modes are preserved, but remix actions unlock only after restore.'
 );
 assert.equal(
   activityLibraryCardCopy.sourceMaterialEditActionLabel,
@@ -31977,6 +32007,51 @@ assert.deepEqual(
         template: 'open-box',
       },
     ],
+    remixHint: 'Ready to remix into Fill, Listen, Box.',
+  }
+);
+assert.deepEqual(
+  buildActivityLibraryCompatibilityView({
+    currentTemplateType: 'quiz',
+    summary: questionOnlyCardSummary,
+    visibility: 'archived',
+  }),
+  {
+    lockedTemplateDiagnostics: [
+      {
+        diagnosis: 'Add match pairs to unlock Match.',
+        id: 'match-up',
+      },
+      {
+        diagnosis: 'Add match pairs to unlock Lines.',
+        id: 'line-match',
+      },
+    ],
+    readyTemplateOptions: [
+      { isCurrent: true, shortName: 'Quiz', template: 'quiz' },
+      { isCurrent: false, shortName: 'Fill', template: 'fill-blank' },
+      { isCurrent: false, shortName: 'Listen', template: 'listening' },
+      { isCurrent: false, shortName: 'Box', template: 'open-box' },
+    ],
+    remixActionOptions: [
+      {
+        actionLabel: 'Copy as Fill',
+        shortName: 'Fill',
+        template: 'fill-blank',
+      },
+      {
+        actionLabel: 'Copy as Listen',
+        shortName: 'Listen',
+        template: 'listening',
+      },
+      {
+        actionLabel: 'Copy as Box',
+        shortName: 'Box',
+        template: 'open-box',
+      },
+    ],
+    restoreRequiredMessage:
+      'Ready template modes are preserved, but remix actions unlock only after restore.',
     remixHint: 'Ready to remix into Fill, Listen, Box.',
   }
 );

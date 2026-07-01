@@ -1,4 +1,7 @@
-import { buildActivityLifecycleActionView } from '@/activities/lifecycle';
+import {
+  buildActivityLifecycleActionView,
+  type ActivityDerivativeBlockedReason,
+} from '@/activities/lifecycle';
 import type {
   ActivityVisibility,
   AssignmentSettings,
@@ -56,7 +59,7 @@ export type AssignmentPublishValidationCode =
 
 export type AssignmentPublishBlockedReason =
   | AssignmentPublishValidationCode
-  | 'activity-gate-blocked';
+  | ActivityDerivativeBlockedReason;
 
 type AssignmentPublishDraftResult =
   | {
@@ -673,7 +676,7 @@ export function buildActivityPublishExecutionPlan({
     return {
       failureMessage: actionView.failureMessage,
       message: actionView.gate.message,
-      reason: 'activity-gate-blocked',
+      reason: actionView.gate.reason,
       type: 'blocked',
     };
   }
