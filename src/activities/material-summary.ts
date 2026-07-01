@@ -106,6 +106,19 @@ export type ActivitySourceMaterialKindBadgeView = {
   summaryText: string;
 };
 
+export type ActivitySourceMaterialReadinessStatusId =
+  | 'extractable'
+  | 'none'
+  | 'reference-only';
+
+export type ActivitySourceMaterialReadinessStatusView = {
+  badgeVariant: 'outline' | 'secondary';
+  description: string;
+  id: ActivitySourceMaterialReadinessStatusId;
+  label: string;
+  value: string;
+};
+
 export type ActivitySourceMaterialReadiness = {
   capabilities: ActivitySourceMaterialReadinessCapability[];
   extractableCount: number;
@@ -132,6 +145,7 @@ export type ActivitySourceMaterialSummaryView = {
   kindBadges: ActivitySourceMaterialKindBadgeView[];
   primaryNextStep?: ActivitySourceMaterialExtractionNextStepView;
   readiness: ActivitySourceMaterialReadiness;
+  readinessStatus: ActivitySourceMaterialReadinessStatusView;
   title: string;
 };
 
@@ -206,6 +220,10 @@ export function buildActivitySourceMaterialSummaryView(
   const extractionActions = summary.extractionActions.map(
     toActivitySourceMaterialExtractionActionView
   );
+  const readinessStatus = buildActivitySourceMaterialReadinessStatusView({
+    readiness: summary.readiness,
+    total: summary.total,
+  });
 
   return {
     ariaLabel: formatActivitySourceMaterialSummaryAriaLabel({
@@ -232,7 +250,57 @@ export function buildActivitySourceMaterialSummaryView(
     }),
     primaryNextStep: extractionActions[0]?.nextStep,
     readiness: summary.readiness,
+    readinessStatus,
     title: m.activity_source_material_summary_title(),
+  };
+}
+
+function buildActivitySourceMaterialReadinessStatusView({
+  readiness,
+  total,
+}: {
+  readiness: ActivitySourceMaterialReadiness;
+  total: number;
+}): ActivitySourceMaterialReadinessStatusView {
+  const normalizedTotal = normalizeActivitySourceMaterialCount(total);
+  const extractableCount = normalizeActivitySourceMaterialCount(
+    readiness.extractableCount
+  );
+
+  if (normalizedTotal === 0) {
+    return {
+      badgeVariant: 'outline',
+      description: m.activity_source_material_readiness_none_description(),
+      id: 'none',
+      label: m.activity_source_material_readiness_label(),
+      value: m.activity_source_material_readiness_none_value(),
+    };
+  }
+
+  if (extractableCount === 0) {
+    return {
+      badgeVariant: 'outline',
+      description:
+        m.activity_source_material_readiness_reference_only_description(),
+      id: 'reference-only',
+      label: m.activity_source_material_readiness_label(),
+      value: m.activity_source_material_readiness_reference_only_value(),
+    };
+  }
+
+  return {
+    badgeVariant: 'secondary',
+    description: m.activity_source_material_readiness_extractable_description(),
+    id: 'extractable',
+    label: m.activity_source_material_readiness_label(),
+    value:
+      extractableCount === 1
+        ? m.activity_source_material_readiness_extractable_value_one({
+            count: extractableCount,
+          })
+        : m.activity_source_material_readiness_extractable_value_many({
+            count: extractableCount,
+          }),
   };
 }
 

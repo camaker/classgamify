@@ -3419,8 +3419,8 @@ assert.doesNotMatch(
 );
 assert.match(
   activitySourceMaterialsSummarySource,
-  /<section[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText/,
-  'Activity source-material summary component should render prepared compact and accessible summary text from the domain view.'
+  /<section[\s\S]*aria-label=\{summary\.ariaLabel\}[\s\S]*summary\.compactSummaryText[\s\S]*summary\.readinessStatus\.description[\s\S]*variant=\{summary\.readinessStatus\.badgeVariant\}[\s\S]*summary\.readinessStatus\.value/,
+  'Activity source-material summary component should render prepared compact, accessible, and readiness status text from the domain view.'
 );
 assert.match(
   activitySourceMaterialsSummarySource,
@@ -3461,6 +3461,11 @@ assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
   /summary\.extractionActions\[0\]|find\(\(action\)|filter\(\(action\)|hasAudio|hasSpreadsheet|hasWorksheet/,
   'Activity source-material summary component should not choose the primary extraction next step locally.'
+);
+assert.doesNotMatch(
+  activitySourceMaterialsSummarySource,
+  /readinessStatus\.id ===|activity_source_material_readiness_|Material readiness|extraction-ready|Reference only|No materials|素材准备度|可提取|仅作引用|暂无素材/,
+  'Activity source-material summary component should not branch on readiness status ids or hard-code readiness copy.'
 );
 assert.doesNotMatch(
   activitySourceMaterialsSummarySource,
@@ -7040,10 +7045,25 @@ assert.match(
   /export type ActivitySourceMaterialExtractionActionView[\s\S]*nextStep: ActivitySourceMaterialExtractionNextStepView;[\s\S]*export type ActivitySourceMaterialExtractionNextStepView = \{[\s\S]*export type ActivitySourceMaterialKindBadgeView[\s\S]*kindBadges: ActivitySourceMaterialKindBadgeView\[\];[\s\S]*primaryNextStep\?: ActivitySourceMaterialExtractionNextStepView;/,
   'Activity source-material summary domain should expose explicit extraction action, next-step, and kind badge view contracts.'
 );
+assert.match(
+  activityMaterialSummarySource,
+  /export type ActivitySourceMaterialReadinessStatusId[\s\S]*'extractable'[\s\S]*'none'[\s\S]*'reference-only'[\s\S]*export type ActivitySourceMaterialReadinessStatusView = \{[\s\S]*badgeVariant: 'outline' \| 'secondary';[\s\S]*id: ActivitySourceMaterialReadinessStatusId;[\s\S]*readinessStatus: ActivitySourceMaterialReadinessStatusView;/,
+  'Activity source-material summary domain should expose explicit readiness status ids, badge variants, and summary view contracts.'
+);
 assert.doesNotMatch(
   activityMaterialSummarySource,
   /ActivitySourceMaterialExtractionActionView\['nextStep'\]/,
   'Activity source-material summary should not infer primary next-step props from extraction action indexes.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialReadinessStatusView[\s\S]*activity_source_material_readiness_none_description[\s\S]*activity_source_material_readiness_none_value[\s\S]*activity_source_material_readiness_reference_only_description[\s\S]*activity_source_material_readiness_reference_only_value[\s\S]*activity_source_material_readiness_extractable_description[\s\S]*activity_source_material_readiness_extractable_value_one[\s\S]*activity_source_material_readiness_extractable_value_many/,
+  'Activity source-material readiness status copy should be prepared from localized activity-domain messages for none, reference-only, and extractable states.'
+);
+assert.match(
+  activityMaterialSummarySource,
+  /buildActivitySourceMaterialReadinessStatusView[\s\S]*badgeVariant: 'outline'[\s\S]*badgeVariant: 'secondary'/,
+  'Activity source-material readiness badge variants should be chosen in the domain view model.'
 );
 assert.match(
   activityMaterialSummarySource,
@@ -7850,7 +7870,33 @@ assert.deepEqual(
       hasSpreadsheet: false,
       hasWorksheet: true,
     },
+    readinessStatus: {
+      badgeVariant: 'secondary',
+      description:
+        'At least one attached classroom file can feed a future AI extraction or import workflow while staying private.',
+      id: 'extractable',
+      label: 'Material readiness',
+      value: '2 extraction-ready files',
+    },
     title: 'Source materials',
+  }
+);
+assert.deepEqual(
+  buildActivitySourceMaterialSummaryView([
+    {
+      contentType: 'video/mp4',
+      fileId: 'video-reference',
+      kind: 'video',
+      originalName: 'lesson reference.mp4',
+    },
+  ]).readinessStatus,
+  {
+    badgeVariant: 'outline',
+    description:
+      'Attached files are preserved as private references, but none match the current extraction-ready material types.',
+    id: 'reference-only',
+    label: 'Material readiness',
+    value: 'Reference only',
   }
 );
 assert.deepEqual(
@@ -7961,6 +8007,30 @@ try {
         kind: 'worksheet-image',
         originalName: '练习纸.png',
       },
+    ]).readinessStatus,
+    {
+      badgeVariant: 'secondary',
+      description:
+        '至少有一个已附加课堂文件可用于后续 AI 提取或导入流程，同时文件仍保持私有。',
+      id: 'extractable',
+      label: '素材准备度',
+      value: '2 个文件可提取',
+    }
+  );
+  assert.deepEqual(
+    buildActivitySourceMaterialSummaryView([
+      {
+        contentType: 'application/pdf',
+        fileId: 'zh-worksheet-doc',
+        kind: 'worksheet-document',
+        originalName: '练习纸.pdf',
+      },
+      {
+        contentType: 'image/png',
+        fileId: 'zh-worksheet-image',
+        kind: 'worksheet-image',
+        originalName: '练习纸.png',
+      },
     ]).extractionActions,
     [
       {
@@ -8015,6 +8085,14 @@ assert.deepEqual(buildActivitySourceMaterialSummaryView([]), {
     hasAudio: false,
     hasSpreadsheet: false,
     hasWorksheet: false,
+  },
+  readinessStatus: {
+    badgeVariant: 'outline',
+    description:
+      'Attach uploaded classroom files when this activity needs audio, worksheet, or spreadsheet support.',
+    id: 'none',
+    label: 'Material readiness',
+    value: 'No materials',
   },
   title: 'Source materials',
 });
@@ -28406,6 +28484,14 @@ assert.deepEqual(starterActivityDisplayView.sourceMaterials, {
     hasSpreadsheet: false,
     hasWorksheet: false,
   },
+  readinessStatus: {
+    badgeVariant: 'outline',
+    description:
+      'Attach uploaded classroom files when this activity needs audio, worksheet, or spreadsheet support.',
+    id: 'none',
+    label: 'Material readiness',
+    value: 'No materials',
+  },
   title: 'Source materials',
 });
 assert.deepEqual(
@@ -28460,6 +28546,14 @@ assert.deepEqual(
       hasAudio: true,
       hasSpreadsheet: false,
       hasWorksheet: false,
+    },
+    readinessStatus: {
+      badgeVariant: 'secondary',
+      description:
+        'At least one attached classroom file can feed a future AI extraction or import workflow while staying private.',
+      id: 'extractable',
+      label: 'Material readiness',
+      value: '1 extraction-ready file',
     },
     title: 'Source materials',
   }

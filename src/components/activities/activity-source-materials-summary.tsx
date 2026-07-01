@@ -35,8 +35,17 @@ export function ActivitySourceMaterialsSummary({
           <p className="mt-1 text-muted-foreground text-xs">
             {summary.compactSummaryText}
           </p>
+          <p className="mt-1 text-muted-foreground text-xs leading-5">
+            {summary.readinessStatus.description}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
+          <Badge
+            variant={summary.readinessStatus.badgeVariant}
+            className="rounded-md"
+          >
+            {summary.readinessStatus.value}
+          </Badge>
           {actionSlot}
           <div className="flex flex-wrap gap-1.5">
             {summary.kindBadges.map((badge) => (
