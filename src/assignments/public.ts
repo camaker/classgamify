@@ -418,6 +418,7 @@ export function buildPublicAttemptReviewSummaryView({
 }): PublicAttemptReviewSummaryView {
   if (!showCorrectAnswers) {
     return buildHiddenPublicAttemptReviewSummary({
+      answers,
       runtimeItems,
       showCorrectAnswers,
     });
@@ -491,19 +492,32 @@ export function summarizePublicAttemptReviewItemsForTotal({
 }
 
 function buildHiddenPublicAttemptReviewSummary({
+  answers,
   runtimeItems,
   showCorrectAnswers,
 }: {
+  answers: AttemptAnswer[];
   runtimeItems: RuntimeItem[];
   showCorrectAnswers: boolean;
 }): PublicAttemptReviewSummaryView {
+  const submittedItemCount = countSubmittedPublicAttemptReviewAnswers({
+    answers,
+    runtimeItems,
+  });
+  const totalItemCount = normalizeRuntimeDisplayCount(runtimeItems.length);
+
   return {
     items: [],
-    summary: summarizePublicAttemptReviewItems({
-      items: [],
-      runtimeItems,
+    summary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
       showCorrectAnswers,
-    }),
+      submittedItemCount,
+      totalItemCount,
+      unansweredItemCount: Math.max(0, totalItemCount - submittedItemCount),
+    },
   };
 }
 
@@ -515,6 +529,24 @@ export function buildPublicAttemptReviewItemMap(
       normalizeAttemptAnswerItemId(reviewItem.itemId),
       reviewItem,
     ]) ?? []
+  );
+}
+
+function countSubmittedPublicAttemptReviewAnswers({
+  answers,
+  runtimeItems,
+}: {
+  answers: AttemptAnswer[];
+  runtimeItems: RuntimeItem[];
+}) {
+  const answerByItemId = buildAttemptAnswerMapByItemId(answers);
+
+  return normalizeRuntimeDisplayCount(
+    runtimeItems.filter((item) => {
+      const answer = getAttemptAnswerByRuntimeItemId(answerByItemId, item.id);
+
+      return hasRuntimeDisplayText(answer?.answer);
+    }).length
   );
 }
 

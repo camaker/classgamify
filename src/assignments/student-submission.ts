@@ -664,9 +664,14 @@ export function buildStudentAttemptReviewSummaryView({
       hiddenBySettings,
       metrics: [
         {
-          key: 'items',
-          label: STUDENT_RUNNER_COPY.reviewSummaryItemCountLabel,
-          value: formatStudentReviewSummaryCount(summary.totalItemCount),
+          key: 'submitted',
+          label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
+          value: formatStudentReviewSummaryCount(summary.submittedItemCount),
+        },
+        {
+          key: 'unanswered',
+          label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
+          value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
         },
         {
           key: 'review',

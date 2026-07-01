@@ -2867,8 +2867,13 @@ assert.match(
 );
 assert.match(
   publicAssignmentSource,
-  /export function buildPublicAttemptReviewSummaryView[\s\S]*if \(!showCorrectAnswers\)[\s\S]*buildHiddenPublicAttemptReviewSummary[\s\S]*items,[\s\S]*summary: summarizePublicAttemptReviewItems/,
+  /export function buildPublicAttemptReviewSummaryView[\s\S]*if \(!showCorrectAnswers\)[\s\S]*buildHiddenPublicAttemptReviewSummary\(\{[\s\S]*answers,[\s\S]*runtimeItems,[\s\S]*showCorrectAnswers/,
   'Public attempt review summary views should centralize visible review items and safe summary metadata.'
+);
+assert.match(
+  publicAssignmentSource,
+  /function countSubmittedPublicAttemptReviewAnswers[\s\S]*buildAttemptAnswerMapByItemId\(answers\)[\s\S]*getAttemptAnswerByRuntimeItemId\(answerByItemId, item\.id\)[\s\S]*hasRuntimeDisplayText\(answer\?\.answer\)/,
+  'Hidden public attempt review summaries should count submitted answers without exposing per-item review details.'
 );
 assert.match(
   publicAssignmentSource,
@@ -12478,9 +12483,9 @@ assert.deepEqual(
       needsReviewItemCount: 0,
       reviewItemCount: 0,
       showCorrectAnswers: false,
-      submittedItemCount: 0,
+      submittedItemCount: 3,
       totalItemCount: 6,
-      unansweredItemCount: 6,
+      unansweredItemCount: 3,
     },
   }),
   {
@@ -12488,7 +12493,8 @@ assert.deepEqual(
       'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
     hiddenBySettings: true,
     metrics: [
-      { key: 'items', label: 'Items', value: '6' },
+      { key: 'submitted', label: 'Submitted', value: '3' },
+      { key: 'unanswered', label: 'Unanswered', value: '3' },
       {
         key: 'review',
         label: 'Answer review',
@@ -20632,9 +20638,9 @@ assert.deepEqual(
       needsReviewItemCount: 0,
       reviewItemCount: 0,
       showCorrectAnswers: false,
-      submittedItemCount: 0,
+      submittedItemCount: 1,
       totalItemCount: 1,
-      unansweredItemCount: 1,
+      unansweredItemCount: 0,
     },
   }
 );
