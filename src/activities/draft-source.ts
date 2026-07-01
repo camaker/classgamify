@@ -15,8 +15,6 @@ import {
   type UserFileMaterialKind,
 } from '@/storage/file-materials';
 
-export const DEFAULT_ACTIVITY_DRAFT_SOURCE =
-  'apple, bread, milk, rice, water, egg';
 export const ACTIVITY_DRAFT_SOURCE_MAX_LENGTH = 2000;
 
 export type ActivitySourceMaterialDraftNoteView = {
@@ -59,7 +57,29 @@ export function getActivityDraftSourceText(values: CreateActivityInput) {
     sourceMaterialSummary.notesText,
   ]);
 
-  return sourceText || DEFAULT_ACTIVITY_DRAFT_SOURCE;
+  return sourceText || getDefaultActivityDraftSource();
+}
+
+export function getDefaultActivityDraftSource() {
+  return m.activity_draft_default_source();
+}
+
+export function isDefaultActivityDraftSourceText(value: string | undefined) {
+  const normalizedValue = normalizeActivityDraftSourceText(value);
+  if (!normalizedValue) return false;
+
+  return getDefaultActivityDraftSourceTexts().some(
+    (sourceText) =>
+      normalizedValue === normalizeActivityDraftSourceText(sourceText)
+  );
+}
+
+function getDefaultActivityDraftSourceTexts() {
+  return [
+    m.activity_draft_default_source(),
+    m.activity_draft_default_source({}, { locale: 'en' }),
+    m.activity_draft_default_source({}, { locale: 'zh' }),
+  ];
 }
 
 export function buildActivitySourceMaterialDraftSummary(

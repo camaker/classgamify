@@ -1564,7 +1564,7 @@ export function buildAssignmentItemAnalysisCardView(
       value: answerView.expectedAnswerText,
     }),
     expectedAnswerText: answerView.expectedAnswerText,
-    explanationText: item.explanation || null,
+    explanationText: formatAssignmentResultOptionalText(item.explanation),
     kindLabel: item.kindLabel,
     prompt: item.prompt,
     unansweredLabel: formatAssignmentSummaryUnansweredCount(
@@ -1629,6 +1629,14 @@ function normalizeAssignmentItemPerformanceRowCount(value: number) {
   return Math.floor(Math.max(0, value));
 }
 
+function formatAssignmentResultOptionalText(value: string | null | undefined) {
+  const formattedValue = formatAssignmentResultValue(value, {
+    emptyValue: '',
+  });
+
+  return formattedValue || null;
+}
+
 export function buildAssignmentItemPerformanceRowViews(
   items: AssignmentItemAnalysis[]
 ): AssignmentResultItemPerformanceRowView[] {
@@ -1671,7 +1679,7 @@ export function buildAssignmentAttemptAnswerReviewView({
       value: answerView.expectedAnswerText,
     }),
     expectedAnswerText: answerView.expectedAnswerText,
-    explanationText: answer.explanation || null,
+    explanationText: formatAssignmentResultOptionalText(answer.explanation),
     promptLabel: formatAssignmentResultPromptLabel({
       index,
       prompt: answer.prompt,

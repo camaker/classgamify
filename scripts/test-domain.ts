@@ -168,7 +168,6 @@ import {
 } from '@/activities/persistence';
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
-  DEFAULT_ACTIVITY_DRAFT_SOURCE,
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteView,
   buildActivitySourceMaterialDraftNoteViews,
@@ -177,8 +176,10 @@ import {
   buildActivitySourceMaterialDraftSummary,
   getActivitySourceMaterialDraftNoteIdentityKey,
   getActivityDraftSourceText,
+  getDefaultActivityDraftSource,
   hasActivitySourceMaterialDraftNotes,
   isSafeActivitySourceMaterialDraftNoteView,
+  isDefaultActivityDraftSourceText,
   normalizeActivitySourceMaterialDraftNoteView,
   sanitizeActivityDraftSourceTextForAi,
 } from '@/activities/draft-source';
@@ -11376,6 +11377,39 @@ assert.deepEqual(
     submittedAnswerText: 'Your answer: Lyon',
   }
 );
+assert.deepEqual(
+  buildPublicAnswerFeedbackView({
+    correctAnswerLabel: 'Correct match',
+    reviewItem: {
+      acceptedAnswers: ['Paris', 'Paris, France'],
+      correct: false,
+      correctAnswer: '  Paris  ',
+      explanation: '  Paris is the capital of France.  ',
+      itemId: 'item-trimmed',
+      submitted: true,
+      submittedAnswer: '  Lyon  ',
+    },
+  }).detailLines,
+  [
+    {
+      id: 'submitted-answer',
+      text: 'Your answer: Lyon',
+    },
+    {
+      id: 'correct-answer',
+      text: 'Correct match: Paris',
+    },
+    {
+      id: 'accepted-answers',
+      text: 'Accepted answers: Paris, France',
+    },
+    {
+      id: 'explanation',
+      text: 'Why: Paris is the capital of France.',
+    },
+  ],
+  'Student post-submit feedback should format submitted answers, correct answers, and explanations through shared result-display rules.'
+);
 overwriteGetLocale(() => 'zh');
 try {
   const zhPublicAnswerFeedbackView = buildPublicAnswerFeedbackView({
@@ -11500,7 +11534,7 @@ assert.deepEqual(
     explanationText: 'Why: Hot pairs with cold.',
     status: 'unanswered',
     statusLabel: 'Unanswered',
-    submittedAnswer: '',
+    submittedAnswer: 'Unanswered',
     submittedAnswerLabel: 'Your answer',
     submittedAnswerText: 'Your answer: Unanswered',
   }
@@ -29978,6 +30012,17 @@ assert.deepEqual(
   }
 );
 assert.deepEqual(
+  buildActivityEditorDraftGenerationGate({
+    hasUser: true,
+    sourceText: '  Ａｐｐｌｅ　　ｍｉｌｋ  ',
+  }),
+  {
+    canGenerate: true,
+    sourceText: 'Apple milk',
+  },
+  'AI draft generation should normalize source notes before sending them to the draft service.'
+);
+assert.deepEqual(
   buildActivityEditorAiDraftPanelView({
     draftSourceText: [
       'weather source notes',
@@ -30145,7 +30190,7 @@ assert.deepEqual(
     draftFocus: 'worksheet-practice',
     hasUser: true,
     itemCount: 8,
-    sourceText: '  solids liquids gases  ',
+    sourceText: '  ｓｏｌｉｄｓ　liquids   gases  ',
   }),
   {
     failureMessage: 'Activity draft could not be generated.',
@@ -30339,6 +30384,25 @@ assert.deepEqual(
     sourceLength: 36,
   }
 );
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    buildActivityEditorDraftSourceState({
+      draftSourceText: 'apple, bread, milk, rice, water, egg',
+      sourceMaterials: [],
+    }).isDefaultSource,
+    true
+  );
+  assert.equal(
+    buildActivityEditorDraftSourceState({
+      draftSourceText: '苹果、面包、牛奶、米饭、水、鸡蛋',
+      sourceMaterials: [],
+    }).isDefaultSource,
+    true
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const syncedEditorDraftSource = buildActivityEditorSyncedDraftSourceText({
   sourceMaterials: [
     {
@@ -32965,6 +33029,12 @@ assert.match(
 assert.match(groupSortDraftPrompt, /Make groups the primary structure/);
 const aiDraftSource = readFileSync('src/activities/ai-draft.ts', 'utf8');
 assert.match(aiDraftSource, /m\.activity_ai_prompt_intro\(\)/);
+assert.match(aiDraftSource, /content: m\.activity_ai_prompt_system\(\)/);
+assert.doesNotMatch(
+  aiDraftSource,
+  /You are an expert classroom activity designer\./,
+  'AI draft system prompt copy should live in locale messages, not source code.'
+);
 assert.match(aiDraftSource, /buildActivityDraftPromptJsonExample\(\)/);
 assert.match(aiDraftSource, /m\.activity_ai_prompt_json_title\(\)/);
 assert.match(
@@ -35142,8 +35212,47 @@ assert.equal(
     teacherNotesText: '',
     vocabularyText: '',
   }),
-  DEFAULT_ACTIVITY_DRAFT_SOURCE
+  getDefaultActivityDraftSource()
 );
+assert.equal(
+  getDefaultActivityDraftSource(),
+  'apple, bread, milk, rice, water, egg'
+);
+assert.equal(
+  isDefaultActivityDraftSourceText('  apple, bread, milk, rice, water, egg  '),
+  true
+);
+assert.equal(isDefaultActivityDraftSourceText('teacher source notes'), false);
+overwriteGetLocale(() => 'zh');
+try {
+  assert.equal(
+    getDefaultActivityDraftSource(),
+    '苹果、面包、牛奶、米饭、水、鸡蛋'
+  );
+  assert.equal(
+    isDefaultActivityDraftSourceText('apple, bread, milk, rice, water, egg'),
+    true
+  );
+  assert.equal(
+    isDefaultActivityDraftSourceText(' 苹果、面包、牛奶、米饭、水、鸡蛋 '),
+    true
+  );
+  assert.equal(
+    getActivityDraftSourceText({
+      ...fallbackDraft,
+      groupsText: '',
+      pairsText: '',
+      questionsText: '',
+      sourceMaterials: [],
+      sourceSummary: '',
+      teacherNotesText: '',
+      vocabularyText: '',
+    }),
+    '苹果、面包、牛奶、米饭、水、鸡蛋'
+  );
+} finally {
+  overwriteGetLocale(() => 'en');
+}
 const longDraftSourceText = getActivityDraftSourceText({
   ...fallbackDraft,
   groupsText: '',
@@ -37527,6 +37636,14 @@ assert.deepEqual(
     unansweredLabel: '0 unanswered',
   }
 );
+assert.equal(
+  buildAssignmentItemAnalysisCardView({
+    ...resultAnalysis.perItem[0]!,
+    explanation: ' Ｐａｒｉｓ\u00A0　is the capital. ',
+  }).explanationText,
+  'Paris is the capital.',
+  'Result item analysis cards should normalize explanation notes before rendering.'
+);
 assert.deepEqual(
   buildAssignmentItemAnalysisCardView({
     ...resultAnalysis.perItem[1]!,
@@ -37750,6 +37867,17 @@ assert.deepEqual(
     studentAnswerLineText: 'Student: paris france',
     studentAnswerText: 'paris france',
   }
+);
+assert.equal(
+  buildAssignmentAttemptAnswerReviewView({
+    answer: {
+      ...resultAnalysis.attempts[0]!.answers[0]!,
+      explanation: ' Ｐａｒｉｓ\u00A0　is the capital. ',
+    },
+    index: 0,
+  }).explanationText,
+  'Paris is the capital.',
+  'Attempt answer review cards should normalize explanation notes before rendering.'
 );
 assert.equal(
   isAssignmentAttemptAnswerNeedsReview({ correct: false, submitted: true }),

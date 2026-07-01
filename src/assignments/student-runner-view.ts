@@ -16,7 +16,10 @@ import {
   type PublicAttemptReviewItem,
   type PublicRuntimeItem,
 } from '@/assignments/public';
-import { formatOptionalAcceptedAnswerAlternatives } from '@/assignments/result-format';
+import {
+  formatAssignmentResultValue,
+  formatOptionalAcceptedAnswerAlternatives,
+} from '@/assignments/result-format';
 import {
   getRuntimeChoiceDisplayKey,
   normalizeRuntimeChoiceList,
@@ -1179,9 +1182,16 @@ export function buildPublicAnswerFeedbackView({
 }): PublicAnswerFeedbackView {
   const acceptedAnswersLabel = m.student_runner_feedback_accepted_answers();
   const submittedAnswerLabel = m.student_runner_feedback_submitted_answer();
+  const submittedAnswerEmptyValue =
+    m.student_runner_feedback_submitted_answer_empty();
   const submittedAnswerValue = reviewItem.submitted
-    ? reviewItem.submittedAnswer
-    : m.student_runner_feedback_submitted_answer_empty();
+    ? formatAssignmentResultValue(reviewItem.submittedAnswer, {
+        emptyValue: submittedAnswerEmptyValue,
+      })
+    : submittedAnswerEmptyValue;
+  const correctAnswerValue = formatAssignmentResultValue(
+    reviewItem.correctAnswer
+  );
   const acceptedAnswersValue = formatOptionalAcceptedAnswerAlternatives(
     reviewItem.acceptedAnswers,
     {
@@ -1190,14 +1200,16 @@ export function buildPublicAnswerFeedbackView({
     }
   );
   const explanationLabel = m.student_runner_feedback_explanation();
-  const explanationValue = reviewItem.explanation ?? null;
+  const explanationValue = formatPublicAnswerFeedbackOptionalValue(
+    reviewItem.explanation
+  );
   const submittedAnswerText = m.student_runner_feedback_submitted_answer_line({
     label: submittedAnswerLabel,
     value: submittedAnswerValue,
   });
   const correctAnswerText = m.student_runner_feedback_correct_answer_line({
     label: correctAnswerLabel,
-    value: reviewItem.correctAnswer,
+    value: correctAnswerValue,
   });
   const acceptedAnswersText = acceptedAnswersValue
     ? m.student_runner_feedback_accepted_answers_line({
@@ -1239,7 +1251,7 @@ export function buildPublicAnswerFeedbackView({
   return {
     acceptedAnswersLabel,
     acceptedAnswersText,
-    correctAnswer: reviewItem.correctAnswer,
+    correctAnswer: correctAnswerValue,
     correctAnswerLabel,
     correctAnswerText,
     detailLines,
@@ -1248,10 +1260,20 @@ export function buildPublicAnswerFeedbackView({
     explanationText,
     status: getPublicAnswerFeedbackStatus(reviewItem),
     statusLabel: getPublicAnswerFeedbackStatusLabel(reviewItem),
-    submittedAnswer: reviewItem.submittedAnswer,
+    submittedAnswer: submittedAnswerValue,
     submittedAnswerLabel,
     submittedAnswerText,
   };
+}
+
+function formatPublicAnswerFeedbackOptionalValue(
+  value: string | null | undefined
+) {
+  const formattedValue = formatAssignmentResultValue(value, {
+    emptyValue: '',
+  });
+
+  return formattedValue || null;
 }
 
 export function getStudentRunnerReviewStatusClassName(

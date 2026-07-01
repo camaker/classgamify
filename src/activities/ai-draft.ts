@@ -478,8 +478,7 @@ export async function generateActivityDraftFromAi(
     max_tokens: 1800,
     messages: [
       {
-        content:
-          'You are an expert classroom activity designer. Return only valid JSON. No markdown, no commentary, no code fence.',
+        content: m.activity_ai_prompt_system(),
         role: 'system',
       },
       {

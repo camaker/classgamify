@@ -26,13 +26,13 @@ import { m } from '@/locale/paraglide/messages';
 import { Routes } from '@/lib/routes';
 import {
   ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
-  DEFAULT_ACTIVITY_DRAFT_SOURCE,
   appendActivitySourceMaterialDraftNotes,
   buildActivitySourceMaterialDraftNoteViewsFromSourceText,
   buildActivitySourceMaterialDraftSummary,
   getActivitySourceMaterialDraftNoteIdentityKey,
   getActivityDraftSourceText,
   hasActivitySourceMaterialDraftNotes,
+  isDefaultActivityDraftSourceText,
   normalizeActivityDraftSourceText,
   type ActivitySourceMaterialDraftNoteView,
 } from '@/activities/draft-source';
@@ -446,9 +446,7 @@ export function buildActivityEditorDraftSourceState({
       hasAttachedSourceMaterials || hasDraftSourceMaterialNotes,
     hasAttachedSourceMaterials,
     hasDraftSourceMaterialNotes,
-    isDefaultSource:
-      normalizedSourceText ===
-      normalizeActivityDraftSourceText(DEFAULT_ACTIVITY_DRAFT_SOURCE),
+    isDefaultSource: isDefaultActivityDraftSourceText(normalizedSourceText),
     isTooLong: normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH,
     safeSourceMaterialNoteCount,
     sourceMaterialCapabilityCounts:
@@ -651,38 +649,38 @@ export function buildActivityEditorDraftGenerationGate({
   hasUser: boolean;
   sourceText: string;
 }): ActivityEditorDraftGenerationGate {
-  const trimmedSourceText = sourceText.trim();
+  const normalizedSourceText = normalizeActivityDraftSourceText(sourceText);
 
   if (!hasUser) {
     return {
       canGenerate: false,
       errorMessage: m.activity_form_toast_sign_in_generate_draft(),
       reason: 'auth-required',
-      sourceText: trimmedSourceText,
+      sourceText: normalizedSourceText,
     };
   }
 
-  if (!trimmedSourceText) {
+  if (!normalizedSourceText) {
     return {
       canGenerate: false,
       errorMessage: m.activity_form_toast_missing_draft_source(),
       reason: 'source-required',
-      sourceText: trimmedSourceText,
+      sourceText: normalizedSourceText,
     };
   }
 
-  if (trimmedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH) {
+  if (normalizedSourceText.length > ACTIVITY_DRAFT_SOURCE_MAX_LENGTH) {
     return {
       canGenerate: false,
       errorMessage: m.activity_ai_source_max_error(),
       reason: 'source-too-long',
-      sourceText: trimmedSourceText,
+      sourceText: normalizedSourceText,
     };
   }
 
   return {
     canGenerate: true,
-    sourceText: trimmedSourceText,
+    sourceText: normalizedSourceText,
   };
 }
 
