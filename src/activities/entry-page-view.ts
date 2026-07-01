@@ -143,7 +143,7 @@ export function buildTemplatesPageViewModel({
   }));
   const defaultCreateAction = cards[0]?.action ?? {
     label: m.templates_page_create_from_template(),
-    search: buildTemplateCreateSearch('quiz'),
+    search: buildTemplateCreateSearch('quiz', 'templates'),
     to: Routes.Create,
   };
 

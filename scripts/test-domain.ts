@@ -284,6 +284,7 @@ import {
   buildWorksheetHeroActions,
   buildWorksheetModeEntryAction,
   parseCreateActivityTemplateSearch,
+  parseCreateActivityTemplateSourceSearch,
 } from '@/activities/template-entry';
 import {
   buildTemplatesPageViewModel,
@@ -1212,18 +1213,28 @@ assert.match(
 );
 assert.match(
   createRouteSource,
+  /source: parseCreateActivityTemplateSourceSearch\(search\.source\)[\s\S]*template: parseCreateActivityTemplateSearch\(search\.template\)/,
+  'The create route should parse template source and template id through the template-entry domain.'
+);
+assert.match(
+  createRouteSource,
+  /buildActivityCreatePageEditorViewModel\(\{[\s\S]*templateSource: source,[\s\S]*templateType: template,[\s\S]*\}\)/,
+  'The create route should pass template-entry source context into the create-page view-model.'
+);
+assert.match(
+  createRouteSource,
   /pageView\.inputShape\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
   'The create route should render structured input-shape items with stable ids.'
 );
 assert.match(
   createRouteSource,
-  /pageView\.templateEntry\.shortName[\s\S]*pageView\.templateEntry\.title[\s\S]*pageView\.templateEntry\.description[\s\S]*pageView\.templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*pageView\.templateEntry\.nextStep/,
-  'The create route should render prepared template-entry summary, metrics, and next-step guidance.'
+  /pageView\.templateEntry\.sourceLabel[\s\S]*pageView\.templateEntry\.shortName[\s\S]*pageView\.templateEntry\.title[\s\S]*pageView\.templateEntry\.description[\s\S]*pageView\.templateEntry\.sourceDescription[\s\S]*pageView\.templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*pageView\.templateEntry\.nextStep/,
+  'The create route should render prepared template-entry source, summary, metrics, and next-step guidance.'
 );
 assert.doesNotMatch(
   createRouteSource,
-  /inputShape\.items|key=\{item\}|key=\{metric\.(?:label|value)\}/,
-  'The create route should not key input-shape or template-entry metric items by localized text.'
+  /inputShape\.items|key=\{item\}|key=\{metric\.(?:label|value)\}|source === ['"](?:templates|worksheets)['"]/,
+  'The create route should not key input-shape/template-entry metric items by localized text or branch on raw source ids.'
 );
 assert.doesNotMatch(
   createRouteSource,
@@ -3574,8 +3585,8 @@ assert.match(
 );
 assert.match(
   activityEditorSource,
-  /export type ActivityCreatePageTemplateEntryMetricId =[\s\S]*'readyModes'[\s\S]*'runtimeItems'[\s\S]*export type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*id: ActivityCreatePageTemplateEntryMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityCreatePageTemplateEntryView = \{[\s\S]*isTemplateEntry: boolean;[\s\S]*metrics: ActivityCreatePageTemplateEntryMetricView\[\];[\s\S]*nextStep: string;[\s\S]*shortName: string;[\s\S]*title: string;[\s\S]*templateEntry: ActivityCreatePageTemplateEntryView;/,
-  'Activity editor domain should expose structured create-page template-entry summary and metric contracts.'
+  /export type ActivityCreatePageTemplateEntryMetricId =[\s\S]*'readyModes'[\s\S]*'runtimeItems'[\s\S]*export type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*id: ActivityCreatePageTemplateEntryMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;[\s\S]*export type ActivityCreatePageTemplateEntryView = \{[\s\S]*isTemplateEntry: boolean;[\s\S]*metrics: ActivityCreatePageTemplateEntryMetricView\[\];[\s\S]*nextStep: string;[\s\S]*shortName: string;[\s\S]*source: ActivityCreatePageTemplateSource \| 'direct';[\s\S]*sourceDescription: string;[\s\S]*sourceLabel: string;[\s\S]*title: string;[\s\S]*templateEntry: ActivityCreatePageTemplateEntryView;/,
+  'Activity editor domain should expose structured create-page template-entry summary, metric, and source-context contracts.'
 );
 assert.match(
   activityEditorSource,
@@ -3591,6 +3602,16 @@ assert.doesNotMatch(
   activityEditorSource,
   /type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*(?:label|value): ActivityCreatePageTemplateEntryMetricId|templateEntry: \{[\s\S]*metrics: string\[\]/,
   'Activity create-page template-entry metrics should not collapse stable metric ids into localized labels or bare string lists.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityCreatePageTemplateEntrySourceView[\s\S]*create_page_template_entry_source_templates_label[\s\S]*create_page_template_entry_source_worksheets_label[\s\S]*create_page_template_entry_source_direct_template_label[\s\S]*create_page_template_entry_source_direct_label/,
+  'Activity create-page template-entry source context should be assembled in the editor domain from localized copy.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /sourceLabel:\s*['"`]|sourceDescription:\s*['"`]/,
+  'Activity create-page template-entry source labels and descriptions should not be hard-coded in the editor domain.'
 );
 assert.match(
   activityEditorSource,
@@ -22041,9 +22062,25 @@ assert.equal(parseActivitySourceMaterialFilter('worksheet'), 'worksheet');
 assert.equal(parseActivitySourceMaterialFilter('video'), undefined);
 assert.equal(parseActivityTemplateFilter('group-sort'), 'group-sort');
 assert.equal(parseActivityTemplateFilter('flashcards'), undefined);
+assert.deepEqual(buildTemplateCreateSearch('quiz'), { template: 'quiz' });
+assert.deepEqual(buildTemplateCreateSearch('quiz', 'templates'), {
+  source: 'templates',
+  template: 'quiz',
+});
+assert.deepEqual(buildTemplateCreateSearch('fill-blank', 'worksheets'), {
+  source: 'worksheets',
+  template: 'fill-blank',
+});
 assert.equal(parseCreateActivityTemplateSearch('line-match'), 'line-match');
 assert.equal(parseCreateActivityTemplateSearch('worksheet'), undefined);
 assert.equal(parseCreateActivityTemplateSearch(['quiz']), undefined);
+assert.equal(parseCreateActivityTemplateSourceSearch('templates'), 'templates');
+assert.equal(
+  parseCreateActivityTemplateSourceSearch('worksheets'),
+  'worksheets'
+);
+assert.equal(parseCreateActivityTemplateSourceSearch('dashboard'), undefined);
+assert.equal(parseCreateActivityTemplateSourceSearch(['templates']), undefined);
 assert.equal(isActivityTemplateType('open-box'), true);
 assert.equal(isActivityTemplateType('memory-game'), false);
 assert.equal(ACTIVITY_LIBRARY_PAGE_SIZE, 12);
@@ -25985,7 +26022,7 @@ assert.deepEqual(
   activityTemplates.map((template) => buildTemplateEntryAction(template)),
   activityTemplates.map((template) => ({
     label: `Start ${template.shortName}`,
-    search: { template: template.type },
+    search: { source: 'templates', template: template.type },
     to: Routes.Create,
   }))
 );
@@ -26164,7 +26201,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
   cards: activityTemplates.map((template) => ({
     action: {
       label: `Start ${template.shortName}`,
-      search: { template: template.type },
+      search: { source: 'templates', template: template.type },
       to: Routes.Create,
     },
     bestFor: template.bestFor,
@@ -26191,7 +26228,7 @@ assert.deepEqual(buildTemplatesPageViewModel(), {
     badgeLabel: 'Template library',
     createAction: {
       label: 'Create from template',
-      search: { template: 'quiz' },
+      search: { source: 'templates', template: 'quiz' },
       to: Routes.Create,
     },
     description:
@@ -26207,7 +26244,7 @@ assert.deepEqual(
   buildTemplatesPageViewModel({ activityTemplates: [] }).hero.createAction,
   {
     label: 'Create from template',
-    search: { template: 'quiz' },
+    search: { source: 'templates', template: 'quiz' },
     to: Routes.Create,
   }
 );
@@ -26501,28 +26538,28 @@ assert.deepEqual(worksheetsPageView, {
     {
       isPrimary: true,
       label: 'Create fill blanks',
-      search: { template: 'fill-blank' },
+      search: { source: 'worksheets', template: 'fill-blank' },
       template: 'fill-blank',
       to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Start line match',
-      search: { template: 'line-match' },
+      search: { source: 'worksheets', template: 'line-match' },
       template: 'line-match',
       to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Create listening',
-      search: { template: 'listening' },
+      search: { source: 'worksheets', template: 'listening' },
       template: 'listening',
       to: Routes.Create,
     },
     {
       isPrimary: false,
       label: 'Create sort',
-      search: { template: 'group-sort' },
+      search: { source: 'worksheets', template: 'group-sort' },
       template: 'group-sort',
       to: Routes.Create,
     },
@@ -26531,7 +26568,7 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         label: 'Create fill blanks',
-        search: { template: 'fill-blank' },
+        search: { source: 'worksheets', template: 'fill-blank' },
         to: Routes.Create,
       },
       contentRequirements: [{ id: 'questions', label: 'questions' }],
@@ -26543,7 +26580,7 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         label: 'Start line match',
-        search: { template: 'line-match' },
+        search: { source: 'worksheets', template: 'line-match' },
         to: Routes.Create,
       },
       contentRequirements: [{ id: 'pairs', label: 'match pairs' }],
@@ -26555,7 +26592,7 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         label: 'Create listening',
-        search: { template: 'listening' },
+        search: { source: 'worksheets', template: 'listening' },
         to: Routes.Create,
       },
       contentRequirements: [{ id: 'questions', label: 'questions' }],
@@ -26567,7 +26604,7 @@ assert.deepEqual(worksheetsPageView, {
     {
       action: {
         label: 'Create sort',
-        search: { template: 'group-sort' },
+        search: { source: 'worksheets', template: 'group-sort' },
         to: Routes.Create,
       },
       contentRequirements: [{ id: 'groups', label: 'groups' }],
@@ -26630,7 +26667,7 @@ assert.deepEqual(
   ),
   getWorksheetModeDefinitions().map((mode) => ({
     label: mode.action,
-    search: { template: mode.template },
+    search: { source: 'worksheets', template: mode.template },
     to: Routes.Create,
   }))
 );
@@ -26638,28 +26675,28 @@ assert.deepEqual(buildWorksheetHeroActions(getWorksheetModeDefinitions()), [
   {
     isPrimary: true,
     label: 'Create fill blanks',
-    search: { template: 'fill-blank' },
+    search: { source: 'worksheets', template: 'fill-blank' },
     template: 'fill-blank',
     to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Start line match',
-    search: { template: 'line-match' },
+    search: { source: 'worksheets', template: 'line-match' },
     template: 'line-match',
     to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Create listening',
-    search: { template: 'listening' },
+    search: { source: 'worksheets', template: 'listening' },
     template: 'listening',
     to: Routes.Create,
   },
   {
     isPrimary: false,
     label: 'Create sort',
-    search: { template: 'group-sort' },
+    search: { source: 'worksheets', template: 'group-sort' },
     template: 'group-sort',
     to: Routes.Create,
   },
@@ -26673,7 +26710,7 @@ assert.deepEqual(
   {
     isPrimary: false,
     label: 'Create Lines',
-    search: { template: 'line-match' },
+    search: { source: 'worksheets', template: 'line-match' },
     template: 'line-match',
     to: Routes.Create,
   }
@@ -26690,7 +26727,7 @@ assert.deepEqual(
 assert.deepEqual(worksheetsPageWithoutLineMatch.heroActions[1], {
   isPrimary: false,
   label: 'Create Lines',
-  search: { template: 'line-match' },
+  search: { source: 'worksheets', template: 'line-match' },
   template: 'line-match',
   to: Routes.Create,
 });
@@ -26722,8 +26759,8 @@ assert.match(
 );
 assert.match(
   templateEntrySource,
-  /export type CreateActivityTemplateSearch = \{[\s\S]*template: ActivityTemplateType;[\s\S]*export type TemplateEntryAction = \{[\s\S]*search: CreateActivityTemplateSearch;[\s\S]*to: typeof Routes\.Create;[\s\S]*export type TemplateEntryLinkAction = \{[\s\S]*to: typeof Routes\.StudentPreview \| typeof Routes\.Templates;[\s\S]*export type TemplateEntryCreateLinkAction = \{[\s\S]*label: string;[\s\S]*to: typeof Routes\.Create;[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined/,
-  'Template entry helpers should expose explicit create-search, action, link-action, and create-link contracts.'
+  /export type CreateActivityTemplateSearch = \{[\s\S]*source\?: CreateActivityTemplateSource;[\s\S]*template: ActivityTemplateType;[\s\S]*export type CreateActivityTemplateSource = 'templates' \| 'worksheets';[\s\S]*export type TemplateEntryAction = \{[\s\S]*search: CreateActivityTemplateSearch;[\s\S]*to: typeof Routes\.Create;[\s\S]*export type TemplateEntryLinkAction = \{[\s\S]*to: typeof Routes\.StudentPreview \| typeof Routes\.Templates;[\s\S]*export type TemplateEntryCreateLinkAction = \{[\s\S]*label: string;[\s\S]*to: typeof Routes\.Create;[\s\S]*buildTemplateCreateSearch\(\s*template: ActivityTemplateType,[\s\S]*source\?: CreateActivityTemplateSource[\s\S]*parseCreateActivityTemplateSearch\([\s\S]*\): ActivityTemplateType \| undefined[\s\S]*parseCreateActivityTemplateSourceSearch\([\s\S]*\): CreateActivityTemplateSource \| undefined/,
+  'Template entry helpers should expose explicit create-search source, action, link-action, and create-link contracts.'
 );
 assert.doesNotMatch(
   templateEntrySource,
@@ -26747,8 +26784,8 @@ assert.doesNotMatch(
 );
 assert.match(
   templateEntrySource,
-  /export function buildTemplateEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*export function buildWorksheetModeEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*buildWorksheetHeroActions\([\s\S]*\): Array<[\s\S]*TemplateEntryAction &/,
-  'Template entry builders should return the explicit template-entry action contracts.'
+  /export function buildTemplateEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*buildTemplateCreateSearch\(template\.type, 'templates'\)[\s\S]*export function buildWorksheetModeEntryAction\([\s\S]*\): TemplateEntryAction[\s\S]*buildTemplateCreateSearch\(mode\.template, 'worksheets'\)[\s\S]*buildWorksheetHeroActions\([\s\S]*\): Array<[\s\S]*TemplateEntryAction &/,
+  'Template entry builders should return explicit source-aware template-entry action contracts.'
 );
 assert.match(
   entryPageViewSource,
@@ -26838,7 +26875,7 @@ try {
     {
       isPrimary: false,
       label: '创建连线',
-      search: { template: 'line-match' },
+      search: { source: 'worksheets', template: 'line-match' },
       template: 'line-match',
       to: Routes.Create,
     }
@@ -31091,6 +31128,10 @@ assert.deepEqual(buildActivityCreatePageViewModel(), {
     nextStep:
       'Choose a template below or save the draft when the structure is ready.',
     shortName: 'Quiz',
+    source: 'direct',
+    sourceDescription:
+      'Start from the general activity builder, then choose a template when the classroom content is ready.',
+    sourceLabel: 'Activity builder',
     title: 'Reusable activity draft',
   },
 });
@@ -31132,8 +31173,52 @@ assert.deepEqual(
       ],
       nextStep: 'Review the Lines fields, then save this activity to your library.',
       shortName: 'Lines',
+      source: 'direct',
+      sourceDescription:
+        'This template was opened from a direct create link, so the matching scaffold is loaded without assuming a public entry page.',
+      sourceLabel: 'Template link',
       title: 'Line match example loaded',
     },
+  }
+);
+const templatesSourceCreatePageView = buildActivityCreatePageEditorViewModel({
+  templateSource: 'templates',
+  templateType: 'open-box',
+});
+assert.deepEqual(
+  {
+    source: templatesSourceCreatePageView.templateEntry.source,
+    sourceDescription:
+      templatesSourceCreatePageView.templateEntry.sourceDescription,
+    sourceLabel: templatesSourceCreatePageView.templateEntry.sourceLabel,
+    templateType: templatesSourceCreatePageView.initialValues?.templateType,
+  },
+  {
+    source: 'templates',
+    sourceDescription:
+      'Opened from the template directory, with the selected game mode and scaffold ready for review.',
+    sourceLabel: 'Template directory',
+    templateType: 'open-box',
+  }
+);
+const worksheetsSourceCreatePageView = buildActivityCreatePageEditorViewModel({
+  templateSource: 'worksheets',
+  templateType: 'fill-blank',
+});
+assert.deepEqual(
+  {
+    source: worksheetsSourceCreatePageView.templateEntry.source,
+    sourceDescription:
+      worksheetsSourceCreatePageView.templateEntry.sourceDescription,
+    sourceLabel: worksheetsSourceCreatePageView.templateEntry.sourceLabel,
+    templateType: worksheetsSourceCreatePageView.initialValues?.templateType,
+  },
+  {
+    source: 'worksheets',
+    sourceDescription:
+      'Opened from the worksheets entry point, with worksheet-style content and the normal activity-assignment flow preserved.',
+    sourceLabel: 'Worksheet entry',
+    templateType: 'fill-blank',
   }
 );
 const defaultEditorPreviewSeed = buildActivityEditorPreviewSeed();

@@ -3,7 +3,10 @@ import { ActivityCreateForm } from '@/components/activities/activity-create-form
 import Container from '@/components/layout/container';
 import { Badge } from '@/components/ui/badge';
 import { buildActivityCreatePageEditorViewModel } from '@/activities/editor';
-import { parseCreateActivityTemplateSearch } from '@/activities/template-entry';
+import {
+  parseCreateActivityTemplateSearch,
+  parseCreateActivityTemplateSourceSearch,
+} from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
@@ -13,6 +16,7 @@ import { useMemo } from 'react';
 
 export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
+    source: parseCreateActivityTemplateSourceSearch(search.source),
     template: parseCreateActivityTemplateSearch(search.template),
   }),
   head: () =>
@@ -24,10 +28,14 @@ export const Route = createFileRoute('/create')({
 });
 
 function CreatePage() {
-  const { template } = Route.useSearch();
+  const { source, template } = Route.useSearch();
   const pageView = useMemo(
-    () => buildActivityCreatePageEditorViewModel(template),
-    [template]
+    () =>
+      buildActivityCreatePageEditorViewModel({
+        templateSource: source,
+        templateType: template,
+      }),
+    [source, template]
   );
 
   return (
@@ -49,6 +57,9 @@ function CreatePage() {
 
           <div className="rounded-lg border bg-card p-4">
             <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="rounded-md">
+                {pageView.templateEntry.sourceLabel}
+              </Badge>
               <Badge variant="secondary" className="rounded-md">
                 {pageView.templateEntry.shortName}
               </Badge>
@@ -58,6 +69,9 @@ function CreatePage() {
             </div>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {pageView.templateEntry.description}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {pageView.templateEntry.sourceDescription}
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
               {pageView.templateEntry.metrics.map((metric) => (

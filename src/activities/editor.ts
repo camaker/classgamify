@@ -68,6 +68,7 @@ import {
   buildActivityTemplateReadinessPanelSummary,
   type ActivityTemplateReadinessPanelSummary,
 } from '@/activities/draft-meta';
+import type { CreateActivityTemplateSource } from '@/activities/template-entry';
 import {
   buildActivityContent,
   createActivityInputSchema,
@@ -323,12 +324,17 @@ export type ActivityCreatePageTemplateEntryMetricView = {
   value: string;
 };
 
+export type ActivityCreatePageTemplateSource = CreateActivityTemplateSource;
+
 export type ActivityCreatePageTemplateEntryView = {
   description: string;
   isTemplateEntry: boolean;
   metrics: ActivityCreatePageTemplateEntryMetricView[];
   nextStep: string;
   shortName: string;
+  source: ActivityCreatePageTemplateSource | 'direct';
+  sourceDescription: string;
+  sourceLabel: string;
   title: string;
 };
 
@@ -347,6 +353,11 @@ export type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
   initialValues?: CreateActivityInput;
   previewActivity: ActivitySeed;
   previewPanel: ActivityEditorPreviewPanel;
+};
+
+type ActivityCreatePageEditorInput = {
+  templateSource?: CreateActivityTemplateSource;
+  templateType?: ActivityTemplateType;
 };
 
 type ActivityEditPageActivitySource = Omit<ActivityEditorSource, 'content'> & {
@@ -925,13 +936,16 @@ export function buildActivityEditorInitialValues(
 
 export function buildActivityCreatePageViewModel({
   initialValues,
+  templateSource,
   templateType,
 }: {
   initialValues?: CreateActivityInput;
+  templateSource?: CreateActivityTemplateSource;
   templateType?: ActivityTemplateType;
 } = {}): ActivityCreatePageViewModel {
   const templateEntry = buildActivityCreatePageTemplateEntryView({
     initialValues,
+    templateSource,
     templateType,
   });
 
@@ -968,23 +982,37 @@ export function buildActivityCreatePageViewModel({
 }
 
 export function buildActivityCreatePageEditorViewModel(
-  templateType?: ActivityTemplateType
+  input?: ActivityTemplateType | ActivityCreatePageEditorInput
 ): ActivityCreatePageEditorViewModel {
+  const { templateSource, templateType } =
+    normalizeActivityCreatePageEditorInput(input);
   const initialValues = buildActivityEditorInitialValues(templateType);
 
   return {
-    ...buildActivityCreatePageViewModel({ initialValues, templateType }),
+    ...buildActivityCreatePageViewModel({
+      initialValues,
+      templateSource,
+      templateType,
+    }),
     initialValues,
     previewActivity: buildActivityEditorPreviewSeed(initialValues),
     previewPanel: buildActivityEditorPreviewPanel(initialValues),
   };
 }
 
+function normalizeActivityCreatePageEditorInput(
+  input?: ActivityTemplateType | ActivityCreatePageEditorInput
+): ActivityCreatePageEditorInput {
+  return typeof input === 'string' ? { templateType: input } : (input ?? {});
+}
+
 function buildActivityCreatePageTemplateEntryView({
   initialValues,
+  templateSource,
   templateType,
 }: {
   initialValues?: CreateActivityInput;
+  templateSource?: CreateActivityTemplateSource;
   templateType?: ActivityTemplateType;
 }): ActivityCreatePageTemplateEntryView {
   const effectiveInput = initialValues ?? getActivityEditorDefaultInput();
@@ -995,6 +1023,10 @@ function buildActivityCreatePageTemplateEntryView({
     content,
     currentTemplateType: effectiveTemplateType,
   }).readyOptions.length;
+  const sourceView = buildActivityCreatePageTemplateEntrySourceView({
+    templateSource,
+    templateType,
+  });
 
   return {
     description: templateType
@@ -1025,11 +1057,57 @@ function buildActivityCreatePageTemplateEntryView({
         })
       : m.create_page_template_entry_next_step_default(),
     shortName: template.shortName,
+    source: sourceView.source,
+    sourceDescription: sourceView.description,
+    sourceLabel: sourceView.label,
     title: templateType
       ? m.create_page_template_entry_title({
           template: template.name,
         })
       : m.create_page_template_entry_default_title(),
+  };
+}
+
+function buildActivityCreatePageTemplateEntrySourceView({
+  templateSource,
+  templateType,
+}: {
+  templateSource?: CreateActivityTemplateSource;
+  templateType?: ActivityTemplateType;
+}): {
+  description: string;
+  label: string;
+  source: ActivityCreatePageTemplateEntryView['source'];
+} {
+  if (templateSource === 'templates') {
+    return {
+      description: m.create_page_template_entry_source_templates_description(),
+      label: m.create_page_template_entry_source_templates_label(),
+      source: 'templates',
+    };
+  }
+
+  if (templateSource === 'worksheets') {
+    return {
+      description: m.create_page_template_entry_source_worksheets_description(),
+      label: m.create_page_template_entry_source_worksheets_label(),
+      source: 'worksheets',
+    };
+  }
+
+  if (templateType) {
+    return {
+      description:
+        m.create_page_template_entry_source_direct_template_description(),
+      label: m.create_page_template_entry_source_direct_template_label(),
+      source: 'direct',
+    };
+  }
+
+  return {
+    description: m.create_page_template_entry_source_direct_description(),
+    label: m.create_page_template_entry_source_direct_label(),
+    source: 'direct',
   };
 }
 
