@@ -7,7 +7,7 @@ import { parseCreateActivityTemplateSearch } from '@/activities/template-entry';
 import { websiteConfig } from '@/config/website';
 import { m } from '@/locale/paraglide/messages';
 import { seo } from '@/lib/seo';
-import { IconSparkles } from '@tabler/icons-react';
+import { IconChevronDown, IconSparkles } from '@tabler/icons-react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
@@ -48,13 +48,44 @@ function CreatePage() {
           </div>
 
           <div className="rounded-lg border bg-card p-4">
-            <p className="text-sm font-medium">{pageView.inputShape.title}</p>
-            <ol className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-              {pageView.inputShape.itemViews.map((itemView) => (
-                <li key={itemView.id}>{itemView.label}</li>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="rounded-md">
+                {pageView.templateEntry.shortName}
+              </Badge>
+              <p className="text-sm font-medium">
+                {pageView.templateEntry.title}
+              </p>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {pageView.templateEntry.description}
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              {pageView.templateEntry.metrics.map((metric) => (
+                <div
+                  key={metric.id}
+                  className="rounded-md border bg-muted/30 px-3 py-2"
+                >
+                  <p className="text-muted-foreground text-xs">
+                    {metric.label}
+                  </p>
+                  <p className="font-medium text-sm">{metric.value}</p>
+                </div>
               ))}
-            </ol>
+            </div>
+            <p className="mt-3 flex items-center gap-2 text-primary text-sm">
+              <IconChevronDown className="size-4 shrink-0" />
+              {pageView.templateEntry.nextStep}
+            </p>
           </div>
+        </div>
+
+        <div className="rounded-lg border bg-card p-4">
+          <p className="text-sm font-medium">{pageView.inputShape.title}</p>
+          <ol className="mt-3 grid gap-2 text-sm leading-6 text-muted-foreground md:grid-cols-2">
+            {pageView.inputShape.itemViews.map((itemView) => (
+              <li key={itemView.id}>{itemView.label}</li>
+            ))}
+          </ol>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_26rem]">

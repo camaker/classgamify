@@ -48,6 +48,7 @@ import {
   formatEditorQuestionRows,
 } from '@/activities/editor-serialization';
 import { normalizeActivityMaterialReferences } from '@/activities/material-references';
+import { getRuntimeItems } from '@/activities/runtime';
 import {
   buildActivitySourceMaterialCapabilityCountsFromActions,
   buildActivitySourceMaterialCapabilityViews,
@@ -312,6 +313,25 @@ export type ActivityCreatePageInputShapeView = {
   title: string;
 };
 
+export type ActivityCreatePageTemplateEntryMetricId =
+  | 'readyModes'
+  | 'runtimeItems';
+
+export type ActivityCreatePageTemplateEntryMetricView = {
+  id: ActivityCreatePageTemplateEntryMetricId;
+  label: string;
+  value: string;
+};
+
+export type ActivityCreatePageTemplateEntryView = {
+  description: string;
+  isTemplateEntry: boolean;
+  metrics: ActivityCreatePageTemplateEntryMetricView[];
+  nextStep: string;
+  shortName: string;
+  title: string;
+};
+
 export type ActivityCreatePageViewModel = {
   hero: {
     badgeLabel: string;
@@ -320,6 +340,7 @@ export type ActivityCreatePageViewModel = {
   };
   inputShape: ActivityCreatePageInputShapeView;
   previewLabel: string;
+  templateEntry: ActivityCreatePageTemplateEntryView;
 };
 
 export type ActivityCreatePageEditorViewModel = ActivityCreatePageViewModel & {
@@ -902,7 +923,18 @@ export function buildActivityEditorInitialValues(
   };
 }
 
-export function buildActivityCreatePageViewModel(): ActivityCreatePageViewModel {
+export function buildActivityCreatePageViewModel({
+  initialValues,
+  templateType,
+}: {
+  initialValues?: CreateActivityInput;
+  templateType?: ActivityTemplateType;
+} = {}): ActivityCreatePageViewModel {
+  const templateEntry = buildActivityCreatePageTemplateEntryView({
+    initialValues,
+    templateType,
+  });
+
   return {
     hero: {
       badgeLabel: m.create_page_eyebrow(),
@@ -931,6 +963,7 @@ export function buildActivityCreatePageViewModel(): ActivityCreatePageViewModel 
       title: m.create_page_input_shapes_title(),
     },
     previewLabel: m.create_page_preview_label(),
+    templateEntry,
   };
 }
 
@@ -940,10 +973,63 @@ export function buildActivityCreatePageEditorViewModel(
   const initialValues = buildActivityEditorInitialValues(templateType);
 
   return {
-    ...buildActivityCreatePageViewModel(),
+    ...buildActivityCreatePageViewModel({ initialValues, templateType }),
     initialValues,
     previewActivity: buildActivityEditorPreviewSeed(initialValues),
     previewPanel: buildActivityEditorPreviewPanel(initialValues),
+  };
+}
+
+function buildActivityCreatePageTemplateEntryView({
+  initialValues,
+  templateType,
+}: {
+  initialValues?: CreateActivityInput;
+  templateType?: ActivityTemplateType;
+}): ActivityCreatePageTemplateEntryView {
+  const effectiveInput = initialValues ?? getActivityEditorDefaultInput();
+  const effectiveTemplateType = templateType ?? effectiveInput.templateType;
+  const template = getTemplateByType(effectiveTemplateType);
+  const content = buildActivityContent(effectiveInput);
+  const readyTemplateCount = getTemplateRemixPlan({
+    content,
+    currentTemplateType: effectiveTemplateType,
+  }).readyOptions.length;
+
+  return {
+    description: templateType
+      ? m.create_page_template_entry_description({
+          template: template.name,
+        })
+      : m.create_page_template_entry_default_description(),
+    isTemplateEntry: Boolean(templateType),
+    metrics: [
+      {
+        id: 'runtimeItems',
+        label: m.create_page_template_entry_runtime_items_label(),
+        value: m.create_page_template_entry_runtime_items_value({
+          count: getRuntimeItems(effectiveTemplateType, content).length,
+        }),
+      },
+      {
+        id: 'readyModes',
+        label: m.create_page_template_entry_ready_modes_label(),
+        value: m.create_page_template_entry_ready_modes_value({
+          count: readyTemplateCount,
+        }),
+      },
+    ],
+    nextStep: templateType
+      ? m.create_page_template_entry_next_step_template({
+          template: template.shortName,
+        })
+      : m.create_page_template_entry_next_step_default(),
+    shortName: template.shortName,
+    title: templateType
+      ? m.create_page_template_entry_title({
+          template: template.name,
+        })
+      : m.create_page_template_entry_default_title(),
   };
 }
 

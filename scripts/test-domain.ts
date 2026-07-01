@@ -1210,14 +1210,19 @@ assert.match(
   /pageView\.inputShape\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label/,
   'The create route should render structured input-shape items with stable ids.'
 );
-assert.doesNotMatch(
+assert.match(
   createRouteSource,
-  /inputShape\.items|key=\{item\}/,
-  'The create route should not key input-shape items by localized text.'
+  /pageView\.templateEntry\.shortName[\s\S]*pageView\.templateEntry\.title[\s\S]*pageView\.templateEntry\.description[\s\S]*pageView\.templateEntry\.metrics\.map[\s\S]*key=\{metric\.id\}[\s\S]*metric\.label[\s\S]*metric\.value[\s\S]*pageView\.templateEntry\.nextStep/,
+  'The create route should render prepared template-entry summary, metrics, and next-step guidance.'
 );
 assert.doesNotMatch(
   createRouteSource,
-  /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label)|from '@\/activities\/library-filters'/,
+  /inputShape\.items|key=\{item\}|key=\{metric\.(?:label|value)\}/,
+  'The create route should not key input-shape or template-entry metric items by localized text.'
+);
+assert.doesNotMatch(
+  createRouteSource,
+  /m\.create_page_(?:eyebrow|title|description|input_shape|preview_label|template_entry)|from '@\/activities\/library-filters'/,
   'The create route should render localized create-page copy from buildActivityCreatePageEditorViewModel and avoid library-filter search parsing.'
 );
 const pricingRouteSource = readFileSync(
@@ -3541,6 +3546,26 @@ assert.match(
   activityEditorSource,
   /export type ActivityCreatePageInputShapeItemId =[\s\S]*'groups'[\s\S]*'notes'[\s\S]*'pairs'[\s\S]*'questions'[\s\S]*export type ActivityCreatePageInputShapeItemView = \{[\s\S]*id: ActivityCreatePageInputShapeItemId;[\s\S]*label: string;[\s\S]*export type ActivityCreatePageInputShapeView = \{[\s\S]*itemViews: ActivityCreatePageInputShapeItemView\[\];[\s\S]*export type ActivityCreatePageViewModel = \{/,
   'Activity editor domain should expose structured create-page input-shape item contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /export type ActivityCreatePageTemplateEntryMetricId =[\s\S]*'readyModes'[\s\S]*'runtimeItems'[\s\S]*export type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*id: ActivityCreatePageTemplateEntryMetricId;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type ActivityCreatePageTemplateEntryView = \{[\s\S]*isTemplateEntry: boolean;[\s\S]*metrics: ActivityCreatePageTemplateEntryMetricView\[\];[\s\S]*nextStep: string;[\s\S]*shortName: string;[\s\S]*title: string;[\s\S]*templateEntry: ActivityCreatePageTemplateEntryView;/,
+  'Activity editor domain should expose structured create-page template-entry summary and metric contracts.'
+);
+assert.match(
+  activityEditorSource,
+  /buildActivityCreatePageTemplateEntryView\(\{[\s\S]*initialValues,[\s\S]*templateType,[\s\S]*\}[\s\S]*\): ActivityCreatePageTemplateEntryView[\s\S]*const effectiveInput = initialValues \?\? getActivityEditorDefaultInput\(\);[\s\S]*const effectiveTemplateType = templateType \?\? effectiveInput\.templateType;[\s\S]*const content = buildActivityContent\(effectiveInput\);/,
+  'Activity create-page template-entry summaries should be built from the same editor input contract as saved activities.'
+);
+assert.match(
+  activityEditorSource,
+  /getTemplateRemixPlan\(\{[\s\S]*content,[\s\S]*currentTemplateType: effectiveTemplateType,[\s\S]*\}\)\.readyOptions\.length[\s\S]*getRuntimeItems\(effectiveTemplateType, content\)\.length/,
+  'Activity create-page template-entry metrics should use domain remix readiness and runtime item helpers.'
+);
+assert.doesNotMatch(
+  activityEditorSource,
+  /type ActivityCreatePageTemplateEntryMetricView = \{[\s\S]*(?:label|value): ActivityCreatePageTemplateEntryMetricId|templateEntry: \{[\s\S]*metrics: string\[\]/,
+  'Activity create-page template-entry metrics should not collapse stable metric ids into localized labels or bare string lists.'
 );
 assert.match(
   activityEditorSource,
@@ -30587,6 +30612,27 @@ assert.deepEqual(buildActivityCreatePageViewModel(), {
     title: 'Supported input shapes',
   },
   previewLabel: 'Example rendering',
+  templateEntry: {
+    description:
+      'Start from the reusable activity model, then choose or load a template example when you want a more specific classroom mode.',
+    isTemplateEntry: false,
+    metrics: [
+      {
+        id: 'runtimeItems',
+        label: 'Playable items',
+        value: '2 items',
+      },
+      {
+        id: 'readyModes',
+        label: 'Reusable modes',
+        value: '8 ready',
+      },
+    ],
+    nextStep:
+      'Choose a template below or save the draft when the structure is ready.',
+    shortName: 'Quiz',
+    title: 'Reusable activity draft',
+  },
 });
 assert.equal(buildActivityEditorInitialValues(undefined), undefined);
 assert.deepEqual(buildActivityEditorInitialValues('group-sort'), {
@@ -30602,11 +30648,32 @@ assert.deepEqual(
     initialTemplate: lineMatchCreatePageView.initialValues?.templateType,
     previewPanelTitle: lineMatchCreatePageView.previewPanel.title,
     previewTemplate: lineMatchCreatePageView.previewActivity.templateType,
+    templateEntry: lineMatchCreatePageView.templateEntry,
   },
   {
     initialTemplate: 'line-match',
     previewPanelTitle: 'Line match example preview',
     previewTemplate: 'line-match',
+    templateEntry: {
+      description:
+        'Line match example content is already loaded into the editor and preview, so you can review fields instead of starting from a blank form.',
+      isTemplateEntry: true,
+      metrics: [
+        {
+          id: 'runtimeItems',
+          label: 'Playable items',
+          value: '8 items',
+        },
+        {
+          id: 'readyModes',
+          label: 'Reusable modes',
+          value: '8 ready',
+        },
+      ],
+      nextStep: 'Review the Lines fields, then save this activity to your library.',
+      shortName: 'Lines',
+      title: 'Line match example loaded',
+    },
   }
 );
 const defaultEditorPreviewSeed = buildActivityEditorPreviewSeed();
