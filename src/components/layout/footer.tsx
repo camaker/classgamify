@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { getFooterLinks } from '@/config/footer-config';
 import { websiteConfig } from '@/config/website';
 import { Routes } from '@/lib/routes';
-import { isLinkActive } from '@/lib/urls';
+import { isLinkSectionActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import {
   IconArrowRight,
@@ -169,7 +169,9 @@ function FooterLink({
   pathname: string;
 }) {
   const active =
-    !item.external && isLinkActive(item.href, pathname) ? 'true' : undefined;
+    !item.external && isLinkSectionActive(item.href, pathname)
+      ? 'true'
+      : undefined;
   const className =
     'group/link -mx-2 block rounded-md px-2 py-1.5 transition-colors hover:bg-background/70 focus-visible:bg-background focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-[active=true]:bg-background data-[active=true]:text-primary';
   const content = (

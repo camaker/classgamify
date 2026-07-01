@@ -8,6 +8,8 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { getSidebarLinks } from '@/config/sidebar-config';
+import { Routes } from '@/lib/routes';
+import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
 import type { MenuItemConfig } from '@/types';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { authClient } from '@/auth/client';
@@ -54,12 +56,10 @@ export function SidebarMain() {
     if (isMobile) setOpenMobile(false);
   };
 
-  const isActive = (href: string | undefined): boolean => {
-    if (!href) return false;
-    const p = pathname.replace(/\/$/, '') || '/';
-    const h = href.replace(/\/$/, '') || '/';
-    return p === h;
-  };
+  const isActive = (href: string | undefined): boolean =>
+    href === Routes.Dashboard
+      ? isLinkActive(href, pathname)
+      : isLinkSectionActive(href, pathname);
 
   const renderItem = (item: MenuItemConfig) => {
     const Icon = item.icon;
@@ -95,7 +95,7 @@ export function SidebarMain() {
       );
     }
     return (
-      <SidebarGroup key={key}>
+      <SidebarGroup key={item.id}>
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
             <SidebarMenuItem>

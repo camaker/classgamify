@@ -1,7 +1,7 @@
 import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { authClient } from '@/auth/client';
-import { isLinkActive } from '@/lib/urls';
+import { isLinkSectionActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
 import { buttonVariants } from '@/components/ui/button';
@@ -112,8 +112,10 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
             <ul className="w-full space-y-1">
               {menuLinks?.map((item) => {
                 const active = item.href
-                  ? isLinkActive(item.href, pathname)
-                  : item.items?.some((sub) => isLinkActive(sub.href, pathname));
+                  ? isLinkSectionActive(item.href, pathname)
+                  : item.items?.some((sub) =>
+                      isLinkSectionActive(sub.href, pathname)
+                    );
                 return (
                   <li key={item.id} className="py-1">
                     {item.items ? (
@@ -150,7 +152,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                                   onClick={() => setOpen(false)}
                                   className={cn(
                                     mobileSubLinkClass,
-                                    isLinkActive(sub.href, pathname) &&
+                                    isLinkSectionActive(sub.href, pathname) &&
                                       mobileLinkActiveClass
                                   )}
                                 >

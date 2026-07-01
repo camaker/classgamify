@@ -2,7 +2,7 @@ import { m } from '@/locale/paraglide/messages';
 import { getNavbarLinks } from '@/config/navbar-config';
 import { useScroll } from '@/hooks/use-scroll';
 import { authClient } from '@/auth/client';
-import { isLinkActive } from '@/lib/urls';
+import { isLinkSectionActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { Routes } from '@/lib/routes';
 import { buttonVariants } from '@/components/ui/button';
@@ -87,7 +87,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                         className={cn(
                           'bg-transparent',
                           item.items.some((sub) =>
-                            isLinkActive(sub.href, pathname)
+                            isLinkSectionActive(sub.href, pathname)
                           ) && 'font-semibold text-foreground'
                         )}
                       >
@@ -104,7 +104,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                                   'p-2 leading-none no-underline outline-hidden transition-colors',
                                   'hover:bg-accent hover:text-accent-foreground',
                                   'focus:bg-accent focus:text-accent-foreground',
-                                  isLinkActive(sub.href, pathname) &&
+                                  isLinkSectionActive(sub.href, pathname) &&
                                     'bg-accent text-accent-foreground'
                                 )}
                                 render={
@@ -148,7 +148,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                         className={cn(
                           navigationMenuTriggerStyle(),
                           'bg-transparent',
-                          isLinkActive(item.href, pathname) &&
+                          isLinkSectionActive(item.href, pathname) &&
                             'font-semibold text-primary'
                         )}
                       >

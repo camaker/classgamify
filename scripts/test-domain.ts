@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { overwriteGetLocale } from '@/locale/paraglide/runtime';
 import { isLocalizedPath } from '@/lib/locale';
+import { isLinkActive, isLinkSectionActive } from '@/lib/urls';
 import { Routes } from '@/lib/routes';
 import { getPricePlans } from '@/lib/price-plan';
 import { buildSqlLikeContainsPattern } from '@/lib/sql-like';
@@ -7965,10 +7966,26 @@ for (const [source, label] of [
   assert.match(source, /key=\{(?:item|sub|section)\.id\}/);
   assert.doesNotMatch(
     source,
-    /key=\{(?:item|sub|section)\.title\}/,
-    `${label} should not key menu items by localized titles.`
+    /key=\{(?:item|sub|section)\.title\}|key=\{key\}/,
+    `${label} should not key menu items by localized titles or undefined local variables.`
   );
 }
+for (const [source, label] of [
+  [navbarSource, 'Desktop navbar'],
+  [navbarMobileSource, 'Mobile navbar'],
+  [footerSource, 'Footer'],
+] as const) {
+  assert.match(
+    source,
+    /isLinkSectionActive/,
+    `${label} should keep parent navigation active on localized child routes.`
+  );
+}
+assert.match(
+  sidebarMainSource,
+  /href === Routes\.Dashboard[\s\S]*isLinkActive\(href, pathname\)[\s\S]*isLinkSectionActive\(href, pathname\)/,
+  'Sidebar should keep dashboard root exact while child sections stay active on detail pages.'
+);
 assert.match(
   dashboardHeaderSource,
   /interface DashboardBreadcrumbItem \{[\s\S]*id\?: string;[\s\S]*breadcrumbs\.map\(\(item, index\) =>[\s\S]*key=\{item\.id \?\? getBreadcrumbItemKey\(item\)\}/,
@@ -8309,6 +8326,16 @@ assert.doesNotMatch(sitemapRouteSource, /Routes\.StudentPreview/);
 assert.doesNotMatch(routeConstantsSource, /['"]\/play\/demo-food['"]/);
 assert.equal(isLocalizedPath('/worksheets'), true);
 assert.equal(isLocalizedPath('/play/demo-food'), false);
+assert.equal(isLinkActive(Routes.Templates, '/zh/templates'), true);
+assert.equal(isLinkActive(Routes.ContactClassroom, '/zh/contact?subject=classroom'), true);
+assert.equal(isLinkActive(Routes.Blog, '/blog/wordwall-style-activity-loop'), false);
+assert.equal(isLinkSectionActive(Routes.Blog, '/blog/wordwall-style-activity-loop'), true);
+assert.equal(isLinkSectionActive(Routes.DashboardAssignments, '/zh/dashboard/assignments/assignment-1'), true);
+assert.equal(isLinkActive(Routes.Dashboard, '/dashboard/assignments'), false);
+assert.equal(isLinkSectionActive(Routes.Dashboard, '/dashboard/assignments'), true);
+assert.equal(isLinkSectionActive(Routes.Features, '/'), false);
+assert.equal(isLinkSectionActive('https://example.com/templates', '/templates'), false);
+assert.equal(isLinkSectionActive('/dashboard/assignment', '/dashboard/assignments'), false);
 assert.equal(
   Routes.StudentPreview,
   buildAssignmentSharePath(STARTER_FOOD_ASSIGNMENT_SHARE_ID)

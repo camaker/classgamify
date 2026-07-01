@@ -148,23 +148,52 @@ export function twitterHandleFromUrl(href: string): string | null {
   }
 }
 
+function normalizeInternalLinkPath(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  if (trimmed.includes('#')) return null;
+  if (trimmed.startsWith('//')) return null;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return null;
+
+  const path = deLocalizeHref(trimmed.split(/[?#]/)[0] ?? '/');
+  if (!path.startsWith('/')) return null;
+
+  return path === '/' ? '/' : path.replace(/\/$/, '') || '/';
+}
+
 /**
  * Whether the current pathname exactly matches the given link.
- * Anchor links (e.g. /#features) are never considered active when only pathname
- * is compared, so the homepage root does not highlight "Features" / "Faqs" etc.
+ * Anchor links are never considered active when only pathname is compared.
  */
 export function isLinkActive(
   href: string | undefined,
   pathname: string
 ): boolean {
-  if (!href) return false;
-  if (href.includes('#')) return false;
-  if (/^https?:\/\//.test(href)) return false;
+  const normalizedHref = normalizeInternalLinkPath(href);
+  const normalizedPath = normalizeInternalLinkPath(pathname);
 
-  const path = deLocalizeHref(href.split('#')[0] ?? '/');
-  const currentPath = deLocalizeHref(pathname);
-  const normalizedHref = path === '/' ? '/' : path.replace(/\/$/, '') || '/';
-  const normalizedPath =
-    currentPath === '/' ? '/' : currentPath.replace(/\/$/, '') || '/';
-  return normalizedPath === normalizedHref;
+  return Boolean(
+    normalizedHref && normalizedPath && normalizedPath === normalizedHref
+  );
+}
+
+/**
+ * Whether the current pathname is inside a link's route section.
+ * Keeps anchors and external links inactive, but lets parent routes such as
+ * /dashboard/assignments highlight for /dashboard/assignments/:assignmentId.
+ */
+export function isLinkSectionActive(
+  href: string | undefined,
+  pathname: string
+): boolean {
+  const normalizedHref = normalizeInternalLinkPath(href);
+  const normalizedPath = normalizeInternalLinkPath(pathname);
+
+  if (!normalizedHref || !normalizedPath) return false;
+  if (normalizedHref === '/') return normalizedPath === '/';
+
+  return (
+    normalizedPath === normalizedHref ||
+    normalizedPath.startsWith(`${normalizedHref}/`)
+  );
 }
