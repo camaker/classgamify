@@ -1547,6 +1547,20 @@ assert.match(
   'Client auth hook account fetch errors should use localized security copy.'
 );
 const adminUsersApiSource = readFileSync('src/api/users.ts', 'utf8');
+const apiServerFunctionSources = readdirSync('src/api')
+  .filter((fileName) => fileName.endsWith('.ts'))
+  .map((fileName) => {
+    const filePath = `src/api/${fileName}`;
+
+    return [filePath, readFileSync(filePath, 'utf8')] as const;
+  });
+for (const [filePath, fileText] of apiServerFunctionSources) {
+  assert.doesNotMatch(
+    fileText,
+    /\.inputValidator\(/,
+    `${filePath} should use createServerFn().validator() instead of the deprecated inputValidator API.`
+  );
+}
 const adminUsersQuerySource = readFileSync('src/admin/users-query.ts', 'utf8');
 assert.deepEqual(ADMIN_USER_LIST_INPUT_LIMITS, {
   pageSizeMax: 100,

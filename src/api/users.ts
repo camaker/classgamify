@@ -28,7 +28,7 @@ const listUsersInputSchema = z.object({
 });
 
 export const listUsers = createServerFn({ method: 'GET' })
-  .inputValidator(listUsersInputSchema)
+  .validator(listUsersInputSchema)
   .middleware([adminApiMiddleware])
   .handler(async ({ data }) => {
     const db = getDb();

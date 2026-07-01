@@ -141,7 +141,7 @@ const listAssignmentsInputSchema = z.object({
 });
 
 export const listAssignments = createServerFn({ method: 'GET' })
-  .inputValidator(listAssignmentsInputSchema)
+  .validator(listAssignmentsInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -235,7 +235,7 @@ export const listAssignments = createServerFn({ method: 'GET' })
   });
 
 export const publishAssignment = createServerFn({ method: 'POST' })
-  .inputValidator(publishAssignmentInputSchema)
+  .validator(publishAssignmentInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -308,7 +308,7 @@ export const publishAssignment = createServerFn({ method: 'POST' })
   });
 
 export const updateAssignmentStatus = createServerFn({ method: 'POST' })
-  .inputValidator(updateAssignmentStatusInputSchema)
+  .validator(updateAssignmentStatusInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -366,7 +366,7 @@ const getPrintableAssignmentWorksheetInputSchema = z.object({
 });
 
 export const getAssignmentResults = createServerFn({ method: 'GET' })
-  .inputValidator(getAssignmentResultsInputSchema)
+  .validator(getAssignmentResultsInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -417,7 +417,7 @@ export const getAssignmentResults = createServerFn({ method: 'GET' })
 export const getPrintableAssignmentWorksheet = createServerFn({
   method: 'GET',
 })
-  .inputValidator(getPrintableAssignmentWorksheetInputSchema)
+  .validator(getPrintableAssignmentWorksheetInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -455,7 +455,7 @@ const getPublicAssignmentInputSchema = z.object({
 });
 
 export const getPublicAssignment = createServerFn({ method: 'GET' })
-  .inputValidator(getPublicAssignmentInputSchema)
+  .validator(getPublicAssignmentInputSchema)
   .handler(async ({ data }) => {
     const db = getDb();
     const [row] = await db
@@ -508,7 +508,7 @@ const submitAttemptInputSchema = z.object({
 });
 
 export const submitAttempt = createServerFn({ method: 'POST' })
-  .inputValidator(submitAttemptInputSchema)
+  .validator(submitAttemptInputSchema)
   .handler(async ({ data }) => {
     const db = getDb();
     const [row] = await db

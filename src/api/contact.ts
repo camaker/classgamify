@@ -12,7 +12,7 @@ const schema = z.object({
     .max(2000, m.contact_message_max()),
 });
 export const sendContactMessage = createServerFn({ method: 'POST' })
-  .inputValidator(schema)
+  .validator(schema)
   .handler(async ({ data }) => {
     const supportEmail = websiteConfig.mail?.supportEmail;
     if (!supportEmail) {

@@ -29,7 +29,7 @@ const checkoutSchema = z.object({
 });
 
 export const createCheckoutSession = createServerFn({ method: 'POST' })
-  .inputValidator(checkoutSchema)
+  .validator(checkoutSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -87,7 +87,7 @@ const portalSchema = z.object({
 });
 
 export const createCustomerPortalSession = createServerFn({ method: 'POST' })
-  .inputValidator(portalSchema)
+  .validator(portalSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -221,7 +221,7 @@ const checkCompletionSchema = z.object({ sessionId: z.string().min(1) });
  * Used by Stripe flow where the session ID is embedded in the redirect URL.
  */
 export const checkPaymentCompletion = createServerFn({ method: 'GET' })
-  .inputValidator(checkCompletionSchema)
+  .validator(checkCompletionSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const db = getDb();

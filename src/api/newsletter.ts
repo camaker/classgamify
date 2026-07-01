@@ -14,7 +14,7 @@ function ensureNewsletterEnabled(): void {
 }
 
 export const getNewsletterStatus = createServerFn({ method: 'GET' })
-  .inputValidator(z.object({ email: emailSchema }))
+  .validator(z.object({ email: emailSchema }))
   .handler(async ({ data }) => {
     ensureNewsletterEnabled();
     try {
@@ -27,7 +27,7 @@ export const getNewsletterStatus = createServerFn({ method: 'GET' })
   });
 
 export const subscribeNewsletter = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ email: emailSchema }))
+  .validator(z.object({ email: emailSchema }))
   .handler(async ({ data }) => {
     ensureNewsletterEnabled();
     try {
@@ -55,7 +55,7 @@ export const subscribeNewsletter = createServerFn({ method: 'POST' })
   });
 
 export const unsubscribeNewsletter = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ email: emailSchema }))
+  .validator(z.object({ email: emailSchema }))
   .handler(async ({ data }) => {
     ensureNewsletterEnabled();
     try {

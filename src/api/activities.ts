@@ -77,7 +77,7 @@ const listActivitiesInputSchema = z.object({
 });
 
 export const listActivities = createServerFn({ method: 'GET' })
-  .inputValidator(listActivitiesInputSchema)
+  .validator(listActivitiesInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -129,7 +129,7 @@ const getActivityInputSchema = z.object({
 });
 
 export const getActivity = createServerFn({ method: 'GET' })
-  .inputValidator(getActivityInputSchema)
+  .validator(getActivityInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -148,7 +148,7 @@ export const getActivity = createServerFn({ method: 'GET' })
   });
 
 export const createActivity = createServerFn({ method: 'POST' })
-  .inputValidator(createActivityInputSchema)
+  .validator(createActivityInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -178,7 +178,7 @@ const duplicateActivityInputSchema = z.object({
 });
 
 export const duplicateActivity = createServerFn({ method: 'POST' })
-  .inputValidator(duplicateActivityInputSchema)
+  .validator(duplicateActivityInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -229,7 +229,7 @@ const remixActivityTemplateInputSchema = z.object({
 });
 
 export const remixActivityTemplate = createServerFn({ method: 'POST' })
-  .inputValidator(remixActivityTemplateInputSchema)
+  .validator(remixActivityTemplateInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -294,7 +294,7 @@ const updateActivityInputSchema = createActivityInputSchema.extend({
 });
 
 export const updateActivity = createServerFn({ method: 'POST' })
-  .inputValidator(updateActivityInputSchema)
+  .validator(updateActivityInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -332,9 +332,7 @@ const updateActivityVisibilityInputSchema = z.object({
 });
 
 export const archiveActivity = createServerFn({ method: 'POST' })
-  .inputValidator(
-    updateActivityVisibilityInputSchema.pick({ activityId: true })
-  )
+  .validator(updateActivityVisibilityInputSchema.pick({ activityId: true }))
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) =>
     updateActivityVisibility({
@@ -346,9 +344,7 @@ export const archiveActivity = createServerFn({ method: 'POST' })
   );
 
 export const restoreActivity = createServerFn({ method: 'POST' })
-  .inputValidator(
-    updateActivityVisibilityInputSchema.pick({ activityId: true })
-  )
+  .validator(updateActivityVisibilityInputSchema.pick({ activityId: true }))
   .middleware([authApiMiddleware])
   .handler(async ({ data, context }) =>
     updateActivityVisibility({

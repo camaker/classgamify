@@ -6,6 +6,6 @@ import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 
 export const generateActivityDraft = createServerFn({ method: 'POST' })
-  .inputValidator(generateActivityDraftInputSchema)
+  .validator(generateActivityDraftInputSchema)
   .middleware([authApiMiddleware])
   .handler(async ({ data }) => generateActivityDraftFromAi(data));
