@@ -1808,8 +1808,8 @@ assert.match(
 );
 assert.match(
   assignmentResultActionsSource,
-  /type AssignmentResultCopyArtifactData = \{[\s\S]*analysis: Pick<[\s\S]*AssignmentResultsAnalysis,[\s\S]*'attempts' \| 'perItem' \| 'students'[\s\S]*>/,
-  'Assignment result copy artifacts should carry attempts, items, and students so follow-up text can reuse attempt-review summaries.'
+  /type AssignmentResultCopyArtifactData = \{[\s\S]*analysis: Pick<[\s\S]*AssignmentResultsAnalysis,[\s\S]*'attempts' \| 'perItem' \| 'students'[\s\S]*copyScopeView\?: AssignmentResultCopyArtifactPreviewScope;/,
+  'Assignment result copy artifacts should carry attempts, items, students, and copy scope so follow-up text can reuse attempt-review summaries and current result controls.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1823,13 +1823,13 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyArtifacts[\s\S]*buildAssignmentClassroomBrief\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentReteachPlan\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*attempts: data\.analysis\.attempts/,
-  'Assignment result actions should own unified teacher copy artifact construction with attempt-review context.'
+  /buildAssignmentResultCopyArtifacts[\s\S]*copyScopeView[\s\S]*buildAssignmentClassroomBrief\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentReteachPlan\(\{[\s\S]*attempts: data\.analysis\.attempts[\s\S]*buildAssignmentItemReviewSummary[\s\S]*buildAssignmentStudentFollowUpSummary\(\{[\s\S]*appendAssignmentResultCopyScopeToArtifacts/,
+  'Assignment result actions should own unified teacher copy artifact construction with attempt-review context and optional current copy-scope context.'
 );
 assert.match(
   assignmentResultActionsSource,
-  /buildAssignmentResultCopyActionData[\s\S]*perItem: items[\s\S]*students/,
-  'Assignment result actions should expose a dedicated copy-action data builder for current review-view artifacts.'
+  /buildAssignmentResultCopyActionData[\s\S]*attempts\?: AssignmentAttemptReview\[\][\s\S]*copyScopeView\?: AssignmentResultCopyArtifactPreviewScope[\s\S]*attempts: attempts \?\? data\.analysis\.attempts[\s\S]*perItem: items[\s\S]*students[\s\S]*copyScopeView \? \{ copyScopeView \} : \{\}/,
+  'Assignment result actions should expose a dedicated copy-action data builder for current review-view artifacts, filtered attempts, and current copy-scope context.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1890,6 +1890,11 @@ assert.match(
   assignmentResultActionsSource,
   /buildAssignmentResultCopyArtifactPreviews\(\{[\s\S]*artifacts,[\s\S]*copyScopeView,[\s\S]*\}[\s\S]*copyScopeView:[\s\S]*buildAssignmentResultCopyArtifactPreviewScope\(copyScopeView\)/,
   'Assignment result copy artifact previews should receive and clone the prepared copy-scope view for each preview card.'
+);
+assert.match(
+  assignmentResultActionsSource,
+  /appendAssignmentResultCopyScopeToArtifacts[\s\S]*appendAssignmentResultCopyScopeText[\s\S]*assignment_result_copy_scope_text_heading[\s\S]*assignment_result_copy_scope_text_line[\s\S]*assignment_result_copy_scope_text_summary_heading[\s\S]*assignment_result_copy_scope_text_summary_line/,
+  'Assignment result copy artifacts should append localized current-scope context to copied teacher materials.'
 );
 assert.match(
   assignmentResultActionsSource,
@@ -1983,8 +1988,8 @@ assert.match(
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
-  /const copyActionData = data[\s\S]*buildAssignmentResultCopyActionData\(\{[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*students: resultView\.filteredStudents,[\s\S]*\}\)[\s\S]*const copyArtifacts = copyActionData[\s\S]*buildAssignmentResultCopyArtifacts\(copyActionData\)/,
-  'Assignment result page view-model should derive classroom brief previews from current sorted item and filtered student review data.'
+  /const copyActionData = data[\s\S]*buildAssignmentResultCopyActionData\(\{[\s\S]*attempts: resultView\.filteredAttemptReviews,[\s\S]*copyScopeView,[\s\S]*items: resultView\.sortedPerformanceItems,[\s\S]*students: resultView\.filteredStudents,[\s\S]*\}\)[\s\S]*const copyArtifacts = copyActionData[\s\S]*buildAssignmentResultCopyArtifacts\(copyActionData\)/,
+  'Assignment result page view-model should derive classroom brief previews from current sorted item, filtered student review data, filtered attempt reviews, and prepared copy scope.'
 );
 assert.match(
   assignmentResultViewActionBoundarySource,
@@ -37793,7 +37798,7 @@ assert.deepEqual(
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
           ['student-last-submitted', 'Student last submitted', '1'],
-          ['lines', 'Lines', '10'],
+          ['lines', 'Lines', '20'],
         ],
         true,
       ],
@@ -37815,7 +37820,7 @@ assert.deepEqual(
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
           ['student-last-submitted', 'Student last submitted', '1'],
-          ['lines', 'Lines', '6'],
+          ['lines', 'Lines', '16'],
         ],
         true,
       ],
@@ -37832,7 +37837,7 @@ assert.deepEqual(
         'Reviewed items with answers and notes: 2',
         [
           ['review-items', 'Review items', '2'],
-          ['lines', 'Lines', '3'],
+          ['lines', 'Lines', '13'],
         ],
         true,
       ],
@@ -37853,7 +37858,7 @@ assert.deepEqual(
           ['latest-attempts', 'Latest attempts', '1'],
           ['latest-attempt-times', 'Attempt times', '1'],
           ['student-last-submitted', 'Student last submitted', '1'],
-          ['lines', 'Lines', '2'],
+          ['lines', 'Lines', '12'],
         ],
         true,
       ],
@@ -38960,22 +38965,30 @@ assert.equal(matchesResultSearch(null, '   '), true);
 assert.equal(matchesResultSearch(null, 'student 1'), false);
 const buildResultSearchSummaryTestScope = ({
   matchedAttempts,
+  matchedItems = 0,
   matchedStudents,
+  totalAttempts = matchedAttempts,
+  totalItems = matchedItems,
+  totalStudents = matchedStudents,
 }: {
   matchedAttempts: number;
+  matchedItems?: number;
   matchedStudents: number;
+  totalAttempts?: number;
+  totalItems?: number;
+  totalStudents?: number;
 }) =>
   buildAssignmentResultReviewScopeSummary({
     counts: {
       matchedAttemptReviews: matchedAttempts,
       matchedAttemptRows: matchedAttempts,
       matchedStudents,
-      totalAttemptReviews: matchedAttempts,
-      totalAttemptRows: matchedAttempts,
-      totalStudents: matchedStudents,
+      totalAttemptReviews: totalAttempts,
+      totalAttemptRows: totalAttempts,
+      totalStudents,
     },
-    sortedPerformanceItemCount: 0,
-    totalItemCount: 0,
+    sortedPerformanceItemCount: matchedItems,
+    totalItemCount: totalItems,
   });
 assert.equal(
   buildResultSearchSummary({
@@ -43792,7 +43805,11 @@ const resultCopyArtifactPreviewScope = buildAssignmentResultCopyScopeView({
   }),
   summary: buildResultSearchSummaryTestScope({
     matchedAttempts: 2,
+    matchedItems: 1,
     matchedStudents: 1,
+    totalAttempts: 3,
+    totalItems: 2,
+    totalStudents: 4,
   }),
 });
 const resultCopyArtifactPreviewScopeSummary = {
@@ -43812,6 +43829,10 @@ const resultCopyArtifactPreviewScopeSummary = {
   title: resultCopyArtifactPreviewScope.title,
 };
 const filteredResultCopyActionData = buildAssignmentResultCopyActionData({
+  attempts: resultAnalysis.attempts.filter(
+    (attempt) => attempt.id === 'attempt-3'
+  ),
+  copyScopeView: resultCopyArtifactPreviewScope,
   data: {
     ...csvExportData,
     analysis: {
@@ -43828,6 +43849,9 @@ const resultActionDataSet = buildAssignmentResultActionDataSet({
   copyActionData: filteredResultCopyActionData,
   exportActionData: csvExportData,
 });
+const scopedResultCopyArtifacts = buildAssignmentResultCopyArtifacts(
+  filteredResultCopyActionData
+);
 assert.deepEqual(
   {
     actionDataItemIds: csvExportData.analysis.perItem.map(
@@ -43838,13 +43862,27 @@ assert.deepEqual(
     ),
     copyActionDataItemIds:
       filteredResultCopyActionData.analysis.perItem.map((item) => item.itemId),
+    copyActionDataAttemptIds:
+      filteredResultCopyActionData.analysis.attempts.map(
+        (attempt) => attempt.id
+      ),
+    copyActionDataScopeTitle:
+      filteredResultCopyActionData.copyScopeView?.title,
     copyActionDataStudentKeys:
       filteredResultCopyActionData.analysis.students.map(
         (student) => student.studentKey
       ),
+    dataSetCopyAttemptIds:
+      resultActionDataSet.copyActionData?.analysis.attempts.map(
+        (attempt) => attempt.id
+      ),
     dataSetCopyItemIds:
       resultActionDataSet.copyActionData?.analysis.perItem.map(
         (item) => item.itemId
+      ),
+    dataSetExportAttemptIds:
+      resultActionDataSet.exportActionData?.analysis.attempts.map(
+        (attempt) => attempt.id
       ),
     dataSetExportItemIds:
       resultActionDataSet.exportActionData?.analysis.perItem.map(
@@ -43860,8 +43898,12 @@ assert.deepEqual(
       'name:alpha-review',
     ],
     copyActionDataItemIds: ['pair-1'],
+    copyActionDataAttemptIds: ['attempt-3'],
+    copyActionDataScopeTitle: 'Copy scope',
     copyActionDataStudentKeys: ['name:alpha-review'],
+    dataSetCopyAttemptIds: ['attempt-3'],
     dataSetCopyItemIds: ['pair-1'],
+    dataSetExportAttemptIds: ['attempt-1', 'attempt-2', 'attempt-3'],
     dataSetExportItemIds: ['q-1', 'pair-1'],
   }
 );
@@ -43895,6 +43937,42 @@ assert.deepEqual(
     itemReview: itemReviewSummary.text,
     reteach: reteachPlan.text,
   }
+);
+assert.doesNotMatch(resultCopyArtifacts.classroomBrief.text, /Copy scope:/);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /Copy scope:/);
+assert.match(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /- Students: 1 student · 2 attempts\. Scan strongest performances before opening individual attempts\./
+);
+assert.match(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /- Items: Lowest accuracy\. Surface the prompts with the lowest correct rate first\./
+);
+assert.match(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /- Review: Needs review only\. Focus the answer review on submissions with at least one missed or unanswered item\./
+);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /Matched records:/);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /- Students: 1\/4/);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /- Attempts: 2\/3/);
+assert.match(scopedResultCopyArtifacts.classroomBrief.text, /- Items: 1\/2/);
+assert.match(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /- Answer reviews: 2\/3/
+);
+assert.match(scopedResultCopyArtifacts.reteachPlan.text, /Copy scope:/);
+assert.match(scopedResultCopyArtifacts.itemReviewSummary.text, /Copy scope:/);
+assert.match(
+  scopedResultCopyArtifacts.studentFollowUpSummary.text,
+  /Copy scope:/
+);
+assert.match(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /Alpha review: 70% latest/
+);
+assert.doesNotMatch(
+  scopedResultCopyArtifacts.classroomBrief.text,
+  /Anonymous student 1/
 );
 assert.equal(
   getAssignmentResultCopyArtifactText({
@@ -43930,7 +44008,7 @@ assert.equal(
 );
 assert.deepEqual(
   buildAssignmentResultCopyArtifactPreviews({
-    artifacts: resultCopyArtifacts,
+    artifacts: scopedResultCopyArtifacts,
     copyScopeView: resultCopyArtifactPreviewScope,
   }).map((preview) => [
     preview.action,
@@ -43970,17 +44048,17 @@ assert.deepEqual(
       'preview:copy-brief',
       'Copy brief',
       'Copy a compact class snapshot with metrics, reteach focus, and students who need follow-up.',
-      'Focus items: 2 · Follow-up students: 3',
+      'Focus items: 1 · Follow-up students: 1',
       [
-        ['focus-items', 'Focus items', '2'],
-        ['follow-up-students', 'Follow-up students', '3'],
-        ['next-steps', 'Next steps', '3'],
+        ['focus-items', 'Focus items', '1'],
+        ['follow-up-students', 'Follow-up students', '1'],
+        ['next-steps', 'Next steps', '1'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
-        ['student-last-submitted', 'Student last submitted', '3'],
-        ['lines', 'Lines', '12'],
+        ['student-last-submitted', 'Student last submitted', '1'],
+        ['lines', 'Lines', '19'],
       ],
-      resultCopyArtifacts.classroomBrief.text,
+      scopedResultCopyArtifacts.classroomBrief.text,
     ],
     [
       'copy-reteach-plan',
@@ -43990,17 +44068,17 @@ assert.deepEqual(
       'preview:copy-reteach-plan',
       'Copy reteach plan',
       'Copy a lesson-ready script for the weakest items and priority students.',
-      'Review items: 2 · Priority students: 3',
+      'Review items: 1 · Priority students: 1',
       [
-        ['review-items', 'Review items', '2'],
-        ['follow-up-students', 'Follow-up students', '3'],
-        ['next-steps', 'Next steps', '3'],
+        ['review-items', 'Review items', '1'],
+        ['follow-up-students', 'Follow-up students', '1'],
+        ['next-steps', 'Next steps', '1'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
-        ['student-last-submitted', 'Student last submitted', '3'],
-        ['lines', 'Lines', '8'],
+        ['student-last-submitted', 'Student last submitted', '1'],
+        ['lines', 'Lines', '15'],
       ],
-      resultCopyArtifacts.reteachPlan.text,
+      scopedResultCopyArtifacts.reteachPlan.text,
     ],
     [
       'copy-item-review',
@@ -44010,12 +44088,12 @@ assert.deepEqual(
       'preview:copy-item-review',
       'Copy item review',
       'Copy prompt-level performance with expected answers, alternatives, and notes.',
-      'Reviewed items with answers and notes: 2',
+      'Reviewed items with answers and notes: 1',
       [
-        ['review-items', 'Review items', '2'],
-        ['lines', 'Lines', '3'],
+        ['review-items', 'Review items', '1'],
+        ['lines', 'Lines', '12'],
       ],
-      resultCopyArtifacts.itemReviewSummary.text,
+      scopedResultCopyArtifacts.itemReviewSummary.text,
     ],
     [
       'copy-follow-up',
@@ -44025,16 +44103,16 @@ assert.deepEqual(
       'preview:copy-follow-up',
       'Copy follow-up',
       'Copy a student-by-student support list sorted by review need.',
-      'Students sorted by follow-up need: 4',
+      'Students sorted by follow-up need: 1',
       [
-        ['students', 'Students', '4'],
-        ['next-steps', 'Next steps', '4'],
+        ['students', 'Students', '1'],
+        ['next-steps', 'Next steps', '1'],
         ['latest-attempts', 'Latest attempts', '0'],
         ['latest-attempt-times', 'Attempt times', '0'],
-        ['student-last-submitted', 'Student last submitted', '4'],
-        ['lines', 'Lines', '5'],
+        ['student-last-submitted', 'Student last submitted', '1'],
+        ['lines', 'Lines', '12'],
       ],
-      resultCopyArtifacts.studentFollowUpSummary.text,
+      scopedResultCopyArtifacts.studentFollowUpSummary.text,
     ],
   ]
 );
@@ -44222,11 +44300,11 @@ assert.equal(
 assert.deepEqual(
   buildAssignmentResultActionPayload({
     actionButton: readyCopyBriefActionButton,
-    data: csvExportData,
+    data: filteredResultCopyActionData,
   }),
   {
     kind: 'copy-text',
-    text: classroomBriefWithAttempts.text,
+    text: scopedResultCopyArtifacts.classroomBrief.text,
   }
 );
 assert.deepEqual(
@@ -44251,8 +44329,7 @@ assert.deepEqual(
     dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
-    text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
-      .classroomBrief.text,
+    text: scopedResultCopyArtifacts.classroomBrief.text,
     type: 'copy-text',
   }
 );
@@ -44265,8 +44342,7 @@ assert.deepEqual(
     dataScope: 'current-review',
     failureMessage: 'Classroom brief could not be copied.',
     successMessage: 'Classroom brief copied.',
-    text: buildAssignmentResultCopyArtifacts(filteredResultCopyActionData)
-      .classroomBrief.text,
+    text: scopedResultCopyArtifacts.classroomBrief.text,
     type: 'copy-text',
   }
 );

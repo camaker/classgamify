@@ -11,7 +11,10 @@ import {
   buildAssignmentReteachPlan,
   type AssignmentReteachPlan,
 } from '@/assignments/reteach-plan';
-import { countAssignmentResultCopyLines } from '@/assignments/result-copy-format';
+import {
+  countAssignmentResultCopyLines,
+  joinAssignmentResultCopyLines,
+} from '@/assignments/result-copy-format';
 import {
   buildAssignmentResultsCsv,
   buildAssignmentResultsCsvDataUrl,
@@ -186,6 +189,7 @@ export type AssignmentResultCopyActionAnalysis = AssignmentResultsAnalysis & {
 
 export type AssignmentResultCopyActionData = AssignmentResultActionData & {
   analysis: AssignmentResultCopyActionAnalysis;
+  copyScopeView?: AssignmentResultCopyArtifactPreviewScope;
 };
 
 export type AssignmentResultActionDataSet = {
@@ -213,6 +217,7 @@ type AssignmentResultCopyArtifactData = {
   assignment: {
     title: string;
   };
+  copyScopeView?: AssignmentResultCopyArtifactPreviewScope;
   stats: AssignmentResultActionStats;
 };
 
@@ -422,8 +427,9 @@ export function buildAssignmentResultCopyArtifacts(
   const assignmentTitle = formatAssignmentDisplayTitle(data.assignment.title);
   const items = data.analysis.perItem;
   const students = data.analysis.students;
-
-  return {
+  const copyScopeView =
+    'copyScopeView' in data ? data.copyScopeView : undefined;
+  const artifacts = {
     classroomBrief: buildAssignmentClassroomBrief({
       assignmentTitle,
       attempts: data.analysis.attempts,
@@ -447,13 +453,24 @@ export function buildAssignmentResultCopyArtifacts(
       students,
     }),
   };
+
+  return copyScopeView
+    ? appendAssignmentResultCopyScopeToArtifacts({
+        artifacts,
+        copyScopeView,
+      })
+    : artifacts;
 }
 
 export function buildAssignmentResultCopyActionData({
+  attempts,
+  copyScopeView,
   data,
   items,
   students,
 }: {
+  attempts?: AssignmentAttemptReview[];
+  copyScopeView?: AssignmentResultCopyArtifactPreviewScope;
   data: AssignmentResultActionData;
   items: AssignmentItemAnalysis[];
   students: AssignmentStudentSummary[];
@@ -462,9 +479,11 @@ export function buildAssignmentResultCopyActionData({
     ...data,
     analysis: {
       ...data.analysis,
+      attempts: attempts ?? data.analysis.attempts,
       perItem: items,
       students,
     },
+    ...(copyScopeView ? { copyScopeView } : {}),
   };
 }
 
@@ -600,6 +619,96 @@ function buildAssignmentResultCopyArtifactPreviewScope(
     })),
     title: copyScopeView.title,
   };
+}
+
+function appendAssignmentResultCopyScopeToArtifacts({
+  artifacts,
+  copyScopeView,
+}: {
+  artifacts: AssignmentResultCopyArtifacts;
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+}): AssignmentResultCopyArtifacts {
+  const classroomBriefText = appendAssignmentResultCopyScopeText({
+    copyScopeView,
+    text: artifacts.classroomBrief.text,
+  });
+
+  return {
+    classroomBrief: {
+      ...artifacts.classroomBrief,
+      copyPreview: {
+        ...artifacts.classroomBrief.copyPreview,
+        text: classroomBriefText,
+      },
+      text: classroomBriefText,
+    },
+    itemReviewSummary: {
+      ...artifacts.itemReviewSummary,
+      text: appendAssignmentResultCopyScopeText({
+        copyScopeView,
+        text: artifacts.itemReviewSummary.text,
+      }),
+    },
+    reteachPlan: {
+      ...artifacts.reteachPlan,
+      text: appendAssignmentResultCopyScopeText({
+        copyScopeView,
+        text: artifacts.reteachPlan.text,
+      }),
+    },
+    studentFollowUpSummary: {
+      ...artifacts.studentFollowUpSummary,
+      text: appendAssignmentResultCopyScopeText({
+        copyScopeView,
+        text: artifacts.studentFollowUpSummary.text,
+      }),
+    },
+  };
+}
+
+function appendAssignmentResultCopyScopeText({
+  copyScopeView,
+  text,
+}: {
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope;
+  text: string;
+}) {
+  const scopeLines = buildAssignmentResultCopyScopeTextLines(copyScopeView);
+  if (scopeLines.length === 0) return text;
+
+  return joinAssignmentResultCopyLines([
+    ...text.split(/\r?\n/),
+    '',
+    ...scopeLines,
+  ]);
+}
+
+function buildAssignmentResultCopyScopeTextLines(
+  copyScopeView: AssignmentResultCopyArtifactPreviewScope
+) {
+  return [
+    m.assignment_result_copy_scope_text_heading(),
+    copyScopeView.description,
+    ...copyScopeView.itemViews.map((itemView) =>
+      m.assignment_result_copy_scope_text_line({
+        description: itemView.description,
+        label: itemView.label,
+        value: itemView.value,
+      })
+    ),
+    ...(copyScopeView.summaryItems.length > 0
+      ? [
+          '',
+          m.assignment_result_copy_scope_text_summary_heading(),
+          ...copyScopeView.summaryItems.map((summaryItem) =>
+            m.assignment_result_copy_scope_text_summary_line({
+              label: summaryItem.label,
+              value: summaryItem.value,
+            })
+          ),
+        ]
+      : []),
+  ];
 }
 
 export function getAssignmentResultCopyArtifactPreviewId(

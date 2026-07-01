@@ -2030,6 +2030,8 @@ export function buildAssignmentResultsPageViewModel<
   });
   const copyActionData = data
     ? buildAssignmentResultCopyActionData({
+        attempts: resultView.filteredAttemptReviews,
+        copyScopeView,
         data,
         items: resultView.sortedPerformanceItems,
         students: resultView.filteredStudents,
