@@ -74,7 +74,7 @@ export function buildAttemptTimerState({
   timeLimitSeconds?: number | null;
 }): AttemptTimerState {
   const elapsedMilliseconds = now - startedAt;
-  const durationSeconds = Number.isFinite(elapsedMilliseconds)
+  const elapsedSeconds = Number.isFinite(elapsedMilliseconds)
     ? Math.max(
         0,
         Math.round(
@@ -84,13 +84,18 @@ export function buildAttemptTimerState({
     : 0;
   const normalizedTimeLimitSeconds =
     normalizeAttemptTimeLimitSeconds(timeLimitSeconds);
+  const durationSeconds =
+    normalizeAttemptDurationSeconds({
+      durationSeconds: elapsedSeconds,
+      timeLimitSeconds,
+    }) ?? 0;
   const remainingSeconds = normalizedTimeLimitSeconds
-    ? Math.max(0, normalizedTimeLimitSeconds - durationSeconds)
+    ? Math.max(0, normalizedTimeLimitSeconds - elapsedSeconds)
     : undefined;
 
   return {
     durationSeconds,
-    elapsedSeconds: durationSeconds,
+    elapsedSeconds,
     remainingSeconds,
     timeExpired: Boolean(normalizedTimeLimitSeconds && remainingSeconds === 0),
   };

@@ -575,7 +575,7 @@ export function buildStudentRunnerPageViewModel({
         accuracy: result.accuracy,
         durationSeconds: result.durationSeconds,
         earnedPoints: result.earnedPoints,
-        fallbackDurationSeconds: attemptTimer.elapsedSeconds,
+        fallbackDurationSeconds: attemptTimer.durationSeconds,
         totalPoints: result.totalPoints,
       })
     : undefined;
@@ -931,16 +931,19 @@ export function buildStudentRunnerTimerTickPlan({
   attemptClock,
   canSubmit,
   hasResult,
+  timeExpired,
   timeLimitSeconds,
 }: {
   activeShareId: string;
   attemptClock?: StudentRunnerAttemptClock;
   canSubmit: boolean;
   hasResult: boolean;
+  timeExpired: boolean;
   timeLimitSeconds?: number;
 }): StudentRunnerTimerTickPlan {
   if (
     hasResult ||
+    timeExpired ||
     !timeLimitSeconds ||
     !canSubmit ||
     normalizeAssignmentShareSlug(attemptClock?.shareId ?? '') !==

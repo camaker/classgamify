@@ -9079,7 +9079,7 @@ assert.match(
 );
 assert.match(
   playRouteSource,
-  /buildStudentRunnerTimerTickPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*canSubmit: runnerPageView\.attemptState\.canSubmit,[\s\S]*hasResult: Boolean\(result\),[\s\S]*timeLimitSeconds/,
+  /buildStudentRunnerTimerTickPlan\(\{[\s\S]*activeShareId,[\s\S]*attemptClock,[\s\S]*canSubmit: runnerPageView\.attemptState\.canSubmit,[\s\S]*hasResult: Boolean\(result\),[\s\S]*timeExpired: runnerPageView\.attemptTimer\.timeExpired,[\s\S]*timeLimitSeconds/,
   'Student play route should resolve timed-attempt ticking through the runner timer tick plan.'
 );
 assert.match(
@@ -18505,6 +18505,74 @@ assert.deepEqual(
     status: 'ready',
   }
 );
+const expiredTimedStudentRunnerPageView = buildStudentRunnerPageViewModel({
+  anonymousToken: 'browser-1',
+  answers: {
+    [publicRunnerState.runtimeItems[0]!.id]: 'Student answer',
+  },
+  attemptClock: {
+    shareId: ' share-public ',
+    startedAt: 1_000,
+  },
+  confirmIncompleteSubmit: false,
+  fallbackStartedAt: 12_000,
+  isSubmitting: false,
+  pageState: buildStudentRunnerReadyState({
+    activity: publicRunnerState.activity,
+    assignment: {
+      ...publicRunnerState.assignment,
+      settings: {
+        ...publicRunnerState.assignment.settings,
+        timeLimitSeconds: 10,
+      },
+    },
+    runtimeItems: publicRunnerState.runtimeItems,
+    source: 'public-assignment',
+  }),
+  result: {
+    accuracy: 50,
+    attemptUsage: {
+      maxAttempts: 2,
+      remainingAttempts: 1,
+      usedAttempts: 1,
+    },
+    completedItemCount: 1,
+    correctItemCount: 1,
+    earnedPoints: 1,
+    reviewItems: [],
+    reviewSummary: {
+      correctItemCount: 0,
+      hiddenBySettings: true,
+      needsReviewItemCount: 0,
+      reviewItemCount: 0,
+      showCorrectAnswers: false,
+      submittedItemCount: 0,
+      totalItemCount: 1,
+      unansweredItemCount: 1,
+    },
+    totalPoints: 2,
+  },
+  shareId: ' share-public ',
+  submittedAttemptCount: 0,
+});
+assert.deepEqual(
+  {
+    durationLabel:
+      expiredTimedStudentRunnerPageView.attemptResultDisplay?.durationLabel,
+    durationSeconds:
+      expiredTimedStudentRunnerPageView.attemptTimer.durationSeconds,
+    elapsedSeconds:
+      expiredTimedStudentRunnerPageView.attemptTimer.elapsedSeconds,
+    showTimeExpiredMessage:
+      expiredTimedStudentRunnerPageView.controlView.showTimeExpiredMessage,
+  },
+  {
+    durationLabel: 'Time: 10s',
+    durationSeconds: 10,
+    elapsedSeconds: 11,
+    showTimeExpiredMessage: false,
+  }
+);
 const submittableStudentRunnerPageView = buildStudentRunnerPageViewModel({
   anonymousToken: ' browser-token-1 ',
   answers: {
@@ -19187,6 +19255,7 @@ assert.deepEqual(
     },
     canSubmit: true,
     hasResult: false,
+    timeExpired: false,
     timeLimitSeconds: 90,
   }),
   {
@@ -19203,6 +19272,7 @@ assert.deepEqual(
     },
     canSubmit: true,
     hasResult: true,
+    timeExpired: false,
     timeLimitSeconds: 90,
   }),
   { type: 'skip' }
@@ -19216,6 +19286,21 @@ assert.deepEqual(
     },
     canSubmit: true,
     hasResult: false,
+    timeExpired: true,
+    timeLimitSeconds: 90,
+  }),
+  { type: 'skip' }
+);
+assert.deepEqual(
+  buildStudentRunnerTimerTickPlan({
+    activeShareId: 'share-public',
+    attemptClock: {
+      shareId: 'share-public',
+      startedAt: 1_000,
+    },
+    canSubmit: true,
+    hasResult: false,
+    timeExpired: false,
     timeLimitSeconds: undefined,
   }),
   { type: 'skip' }
@@ -19226,6 +19311,7 @@ assert.deepEqual(
     attemptClock: undefined,
     canSubmit: false,
     hasResult: false,
+    timeExpired: false,
     timeLimitSeconds: 90,
   }),
   { type: 'skip' }
@@ -19236,6 +19322,7 @@ assert.deepEqual(
     attemptClock: undefined,
     canSubmit: true,
     hasResult: false,
+    timeExpired: false,
     timeLimitSeconds: 90,
   }),
   { type: 'skip' }
@@ -19249,6 +19336,7 @@ assert.deepEqual(
     },
     canSubmit: true,
     hasResult: false,
+    timeExpired: false,
     timeLimitSeconds: 90,
   }),
   { type: 'skip' }
@@ -35746,7 +35834,7 @@ assert.deepEqual(
     timeLimitSeconds: 10,
   }),
   {
-    durationSeconds: 11,
+    durationSeconds: 10,
     elapsedSeconds: 11,
     remainingSeconds: 0,
     timeExpired: true,

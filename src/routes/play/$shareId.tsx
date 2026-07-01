@@ -122,6 +122,7 @@ function PlayPage() {
       attemptClock,
       canSubmit: runnerPageView.attemptState.canSubmit,
       hasResult: Boolean(result),
+      timeExpired: runnerPageView.attemptTimer.timeExpired,
       timeLimitSeconds,
     });
     if (tickPlan.type === 'skip') return;
@@ -136,6 +137,7 @@ function PlayPage() {
     attemptClock?.shareId,
     result,
     runnerPageView.attemptState.canSubmit,
+    runnerPageView.attemptTimer.timeExpired,
     timeLimitSeconds,
   ]);
 
