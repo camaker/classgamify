@@ -785,6 +785,7 @@ import {
   buildAssignmentPublishDialogState,
   buildAssignmentPublishDialogViewModel,
   buildActivityPublishExecutionPlan,
+  buildAssignmentPublishPreviewContextView,
   buildAssignmentPublishPreviewFromDraft,
   buildAssignmentPublishInputFromDraft,
   buildAssignmentPublishToggleViews,
@@ -2834,7 +2835,7 @@ assert.match(
 );
 assert.match(
   assignmentPublishSource,
-  /function buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*draft,[\s\S]*now,[\s\S]*resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now,[\s\S]*value: draft\.expiresAtLocal,[\s\S]*closeAfter\.status === 'ready' \? closeAfter\.expiresAt : null/,
+  /function buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*draft,[\s\S]*now,[\s\S]*const effectiveNow = now \?\? new Date\(\)[\s\S]*resolveAssignmentPublishCloseAfterLocal\(\{[\s\S]*now: effectiveNow,[\s\S]*value: draft\.expiresAtLocal,[\s\S]*closeAfter\.status === 'ready' \? closeAfter\.expiresAt : null/,
   'Assignment publish preview should resolve close-after state through the shared schedule resolver.'
 );
 assert.match(
@@ -4531,8 +4532,23 @@ assert.match(
 );
 assert.match(
   activityPublishSettingsFormSource,
+  /AssignmentPublishPreviewContextTone[\s\S]*AssignmentPublishPreviewContextView/,
+  'Assignment publish settings form should import the explicit assignment-domain preview context contract.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
   /AssignmentSettingsSummary[\s\S]*view=\{view\.preview\.settingsSummaryView\}/,
   'Assignment publish settings form should render the delivery preview from the assignment-domain view-model.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /ActivityPublishPreviewContext[\s\S]*context=\{view\.preview\.context\}/,
+  'Assignment publish settings form should render the prepared frozen-link preview context.'
+);
+assert.match(
+  activityPublishSettingsFormSource,
+  /function ActivityPublishPreviewContext[\s\S]*context\.title[\s\S]*context\.description[\s\S]*context\.status\.label[\s\S]*context\.status\.message[\s\S]*context\.statItems\.map[\s\S]*item\.label[\s\S]*item\.value/,
+  'Assignment publish preview context component should render prepared title, status, message, and stat items.'
 );
 assert.match(
   activityPublishSettingsFormSource,
@@ -4579,6 +4595,11 @@ assert.doesNotMatch(
   /AssignmentPublishDialogViewModel\['toggleViews'\]/,
   'Assignment publish toggle group should not infer child props from the aggregate dialog view-model.'
 );
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /AssignmentPublishDialogViewModel\['preview'\]\['context'\]|AssignmentPublishPreviewContextView\['(?:status|statItems|summary)'\]/,
+  'Assignment publish preview context child components should not infer props from aggregate preview indexes.'
+);
 assert.match(
   assignmentSettingsSummarySource,
   /AssignmentInstructionsTile[\s\S]*instructions=\{summaryView\.instructions\}/,
@@ -4613,6 +4634,11 @@ assert.doesNotMatch(
   activityPublishSettingsFormSource,
   /expiresAt=\{view\.preview\.expiresAt\}|settings=\{view\.preview\.settings\}/,
   'Assignment publish settings form should not pass raw preview delivery settings to the summary component.'
+);
+assert.doesNotMatch(
+  activityPublishSettingsFormSource,
+  /view\.preview\.settings(?:\.|\[)|view\.preview\.closeAfter(?:\.|\[)|view\.validation(?:\.|\[)/,
+  'Assignment publish settings form should not rebuild preview context from raw settings, close-after, or validation state.'
 );
 assert.doesNotMatch(
   activityPublishSettingsFormRootSource,
@@ -13722,13 +13748,38 @@ assert.doesNotMatch(
 );
 assert.match(
   assignmentPublishInputSource,
-  /function buildAssignmentPublishPreviewFromDraft[\s\S]*const settings = buildAssignmentPublishSettingsFromDraft\(draft\)[\s\S]*settingsSummaryView: buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt,[\s\S]*settings,/,
+  /function buildAssignmentPublishPreviewFromDraft[\s\S]*const settings = buildAssignmentPublishSettingsFromDraft\(draft\)[\s\S]*const settingsSummaryView = buildAssignmentSettingsSummaryView\(\{[\s\S]*expiresAt,[\s\S]*settings,[\s\S]*settingsSummaryView,/,
   'Assignment publish preview should derive delivery settings through the shared draft settings helper.'
 );
 assert.match(
   assignmentPublishInputSource,
-  /buildAssignmentPublishDialogViewModel[\s\S]*const effectiveNow = now \?\? new Date\(\)[\s\S]*validateAssignmentPublishDraft\(\{[\s\S]*now: effectiveNow,[\s\S]*buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*now: effectiveNow/,
+  /buildAssignmentPublishDialogViewModel[\s\S]*const effectiveNow = now \?\? new Date\(\)[\s\S]*validateAssignmentPublishDraft\(\{[\s\S]*now: effectiveNow,[\s\S]*buildAssignmentPublishPreviewFromDraft\(\{[\s\S]*now: effectiveNow,[\s\S]*validation,/,
   'Assignment publish dialog view-model should use the same current-time value for validation and preview.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /export type AssignmentPublishPreviewContextView = \{[\s\S]*description: string;[\s\S]*statItems: AssignmentPublishPreviewContextStatView\[\];[\s\S]*status: AssignmentPublishPreviewContextStatusView;[\s\S]*summary: AssignmentPublishPreviewContextSummary;[\s\S]*title: string;/,
+  'Assignment publish preview should expose a structured frozen-link context contract.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /buildAssignmentPublishPreviewFromDraft[\s\S]*context: buildAssignmentPublishPreviewContextView\(\{[\s\S]*closeAfter,[\s\S]*settingsSummaryView,[\s\S]*validation: previewValidation,/,
+  'Assignment publish preview should attach the prepared frozen-link context from close-after, delivery summary, and validation.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /buildAssignmentPublishPreviewContextView[\s\S]*hasInstructions = !settingsSummaryView\.instructions\.isEmpty[\s\S]*hasTimer = settingsSummaryView\.settings\.timeLimitSeconds !== undefined[\s\S]*hasCloseAfter = closeAfter\.status === 'ready'[\s\S]*deliveryRuleCount = settingsSummaryView\.items\.length/,
+  'Assignment publish preview context should derive trust stats from the prepared settings summary and close-after status.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /assignment_publish_preview_context_title[\s\S]*assignment_publish_preview_context_description[\s\S]*assignment_publish_preview_stat_rules_value[\s\S]*assignment_publish_preview_status_ready_message[\s\S]*assignment_publish_preview_status_blocked_message/,
+  'Assignment publish preview context should use localized assignment-domain copy for visible text.'
+);
+assert.match(
+  assignmentPublishInputSource,
+  /formatAssignmentPublishPreviewCloseAfterStat[\s\S]*case 'ready'[\s\S]*assignment_publish_preview_stat_close_after_scheduled[\s\S]*case 'invalid'[\s\S]*assignment_publish_preview_stat_close_after_invalid[\s\S]*case 'past'[\s\S]*assignment_publish_preview_stat_close_after_past[\s\S]*case 'none'[\s\S]*assignment_publish_preview_stat_close_after_open/,
+  'Assignment publish preview context should not collapse invalid or past close times into open-link copy.'
 );
 assert.match(
   assignmentPublishInputSource,
@@ -14231,6 +14282,14 @@ assert.equal(
   'Freeze this activity into a student share link with classroom delivery settings.'
 );
 assert.equal(assignmentPublishDialogCopy.previewLabel, 'Delivery preview');
+assert.equal(
+  assignmentPublishDialogCopy.previewContextTitle,
+  'Frozen link rules'
+);
+assert.equal(
+  assignmentPublishDialogCopy.previewContextDescription,
+  'These settings are the teacher-facing preview of the rules that will be saved with the assignment snapshot and student share link.'
+);
 assert.equal(assignmentPublishDialogCopy.timeLimitPlaceholder, 'No limit');
 assert.equal(
   assignmentPublishDialogCopy.maxAttemptsHelp,
@@ -14261,6 +14320,244 @@ assert.deepEqual(
     timeLimitMinutes: '',
     title: 'Week 1 homework',
   }
+);
+const assignmentPublishPreviewContextDescription =
+  'These settings are the teacher-facing preview of the rules that will be saved with the assignment snapshot and student share link.';
+const assignmentPublishPreviewContextTitle = 'Frozen link rules';
+const assignmentPublishReadyCloseAfter = {
+  expiresAt: new Date('2026-01-10T09:30'),
+  status: 'ready' as const,
+};
+const assignmentPublishReadySettings = {
+  collectStudentName: false,
+  instructions: 'Finish before class.',
+  maxAttempts: 3,
+  showCorrectAnswers: false,
+  shuffleItems: false,
+  timeLimitSeconds: 900,
+};
+const assignmentPublishReadySettingsSummaryView =
+  buildAssignmentSettingsSummaryView({
+    expiresAt: assignmentPublishReadyCloseAfter.expiresAt,
+    settings: assignmentPublishReadySettings,
+  });
+const assignmentPublishReadyPreviewContext = {
+  description: assignmentPublishPreviewContextDescription,
+  statItems: [
+    {
+      id: 'deliveryRules',
+      label: 'Delivery rules',
+      value: '6 rules',
+    },
+    {
+      id: 'studentInstructions',
+      label: 'Student instructions',
+      value: 'Added',
+    },
+    {
+      id: 'timer',
+      label: 'Timer',
+      value: 'Enabled',
+    },
+    {
+      id: 'closeAfter',
+      label: 'Close time',
+      value: 'Scheduled',
+    },
+  ],
+  status: {
+    label: 'Ready to publish',
+    message: 'Publishing will freeze this preview into the student link.',
+    tone: 'ready',
+  },
+  summary: {
+    closeAfterStatus: 'ready',
+    deliveryRuleCount: 6,
+    hasCloseAfter: true,
+    hasInstructions: true,
+    hasTimer: true,
+    status: 'ready',
+  },
+  title: assignmentPublishPreviewContextTitle,
+};
+const assignmentPublishReadyPreview = {
+  closeAfter: assignmentPublishReadyCloseAfter,
+  context: assignmentPublishReadyPreviewContext,
+  expiresAt: assignmentPublishReadyCloseAfter.expiresAt,
+  settings: assignmentPublishReadySettings,
+  settingsSummaryView: assignmentPublishReadySettingsSummaryView,
+};
+const assignmentPublishOpenEmptySettings = {
+  collectStudentName: true,
+  instructions: undefined,
+  maxAttempts: 2,
+  showCorrectAnswers: true,
+  shuffleItems: true,
+  timeLimitSeconds: undefined,
+};
+const assignmentPublishOpenEmptySettingsSummaryView =
+  buildAssignmentSettingsSummaryView({
+    expiresAt: null,
+    settings: assignmentPublishOpenEmptySettings,
+  });
+const assignmentPublishInvalidCloseAfter = {
+  expiresAt: null,
+  status: 'invalid' as const,
+};
+const assignmentPublishNoneCloseAfter = {
+  expiresAt: null,
+  status: 'none' as const,
+};
+const assignmentPublishPastCloseAfter = {
+  expiresAt: new Date('2025-12-31T23:59'),
+  status: 'past' as const,
+};
+function buildAssignmentPublishBlockedPreviewContext({
+  closeAfterStatus,
+  closeAfterValue,
+}: {
+  closeAfterStatus: 'invalid' | 'none' | 'past';
+  closeAfterValue: 'In the past' | 'Invalid' | 'Open';
+}) {
+  return {
+    description: assignmentPublishPreviewContextDescription,
+    statItems: [
+      {
+        id: 'deliveryRules',
+        label: 'Delivery rules',
+        value: '6 rules',
+      },
+      {
+        id: 'studentInstructions',
+        label: 'Student instructions',
+        value: 'Empty',
+      },
+      {
+        id: 'timer',
+        label: 'Timer',
+        value: 'Off',
+      },
+      {
+        id: 'closeAfter',
+        label: 'Close time',
+        value: closeAfterValue,
+      },
+    ],
+    status: {
+      label: 'Needs attention',
+      message:
+        'Fix the highlighted setting before the share link can be created.',
+      tone: 'blocked',
+    },
+    summary: {
+      closeAfterStatus,
+      deliveryRuleCount: 6,
+      hasCloseAfter: false,
+      hasInstructions: false,
+      hasTimer: false,
+      status: 'blocked',
+    },
+    title: assignmentPublishPreviewContextTitle,
+  };
+}
+const assignmentPublishInvalidPreviewContext =
+  buildAssignmentPublishBlockedPreviewContext({
+    closeAfterStatus: 'invalid',
+    closeAfterValue: 'Invalid',
+  });
+const assignmentPublishNoneBlockedPreviewContext =
+  buildAssignmentPublishBlockedPreviewContext({
+    closeAfterStatus: 'none',
+    closeAfterValue: 'Open',
+  });
+const assignmentPublishPastPreviewContext =
+  buildAssignmentPublishBlockedPreviewContext({
+    closeAfterStatus: 'past',
+    closeAfterValue: 'In the past',
+  });
+const assignmentPublishInvalidPreview = {
+  closeAfter: assignmentPublishInvalidCloseAfter,
+  context: assignmentPublishInvalidPreviewContext,
+  expiresAt: null,
+  settings: assignmentPublishOpenEmptySettings,
+  settingsSummaryView: assignmentPublishOpenEmptySettingsSummaryView,
+};
+const assignmentPublishNoneBlockedPreview = {
+  closeAfter: assignmentPublishNoneCloseAfter,
+  context: assignmentPublishNoneBlockedPreviewContext,
+  expiresAt: null,
+  settings: assignmentPublishOpenEmptySettings,
+  settingsSummaryView: assignmentPublishOpenEmptySettingsSummaryView,
+};
+const assignmentPublishPastPreview = {
+  closeAfter: assignmentPublishPastCloseAfter,
+  context: assignmentPublishPastPreviewContext,
+  expiresAt: null,
+  settings: assignmentPublishOpenEmptySettings,
+  settingsSummaryView: assignmentPublishOpenEmptySettingsSummaryView,
+};
+const assignmentPublishOpenReadyPreviewContext = {
+  description: assignmentPublishPreviewContextDescription,
+  statItems: [
+    {
+      id: 'deliveryRules',
+      label: 'Delivery rules',
+      value: '6 rules',
+    },
+    {
+      id: 'studentInstructions',
+      label: 'Student instructions',
+      value: 'Empty',
+    },
+    {
+      id: 'timer',
+      label: 'Timer',
+      value: 'Off',
+    },
+    {
+      id: 'closeAfter',
+      label: 'Close time',
+      value: 'Open',
+    },
+  ],
+  status: {
+    label: 'Ready to publish',
+    message: 'Publishing will freeze this preview into the student link.',
+    tone: 'ready',
+  },
+  summary: {
+    closeAfterStatus: 'none',
+    deliveryRuleCount: 6,
+    hasCloseAfter: false,
+    hasInstructions: false,
+    hasTimer: false,
+    status: 'ready',
+  },
+  title: assignmentPublishPreviewContextTitle,
+};
+const assignmentPublishOpenReadyPreview = {
+  closeAfter: assignmentPublishNoneCloseAfter,
+  context: assignmentPublishOpenReadyPreviewContext,
+  expiresAt: null,
+  settings: {
+    ...assignmentPublishOpenEmptySettings,
+    maxAttempts: null,
+  },
+  settingsSummaryView: buildAssignmentSettingsSummaryView({
+    expiresAt: null,
+    settings: {
+      ...assignmentPublishOpenEmptySettings,
+      maxAttempts: null,
+    },
+  }),
+};
+assert.deepEqual(
+  buildAssignmentPublishPreviewContextView({
+    closeAfter: assignmentPublishReadyCloseAfter,
+    settingsSummaryView: assignmentPublishReadySettingsSummaryView,
+    validation: { ok: true },
+  }),
+  assignmentPublishReadyPreviewContext
 );
 const assignmentPublishDialogViewModel = buildAssignmentPublishDialogViewModel({
   defaults: buildAssignmentPublishDraftDefaults({
@@ -14303,32 +14600,7 @@ assert.deepEqual(
       timeLimitMinutes: '１５',
       title: 'Week 1 review',
     },
-    preview: {
-      closeAfter: {
-        expiresAt: new Date('2026-01-10T09:30'),
-        status: 'ready',
-      },
-      expiresAt: new Date('2026-01-10T09:30'),
-      settings: {
-        collectStudentName: false,
-        instructions: 'Finish before class.',
-        maxAttempts: 3,
-        showCorrectAnswers: false,
-        shuffleItems: false,
-        timeLimitSeconds: 900,
-      },
-      settingsSummaryView: buildAssignmentSettingsSummaryView({
-        expiresAt: new Date('2026-01-10T09:30'),
-        settings: {
-          collectStudentName: false,
-          instructions: 'Finish before class.',
-          maxAttempts: 3,
-          showCorrectAnswers: false,
-          shuffleItems: false,
-          timeLimitSeconds: 900,
-        },
-      }),
-    },
+    preview: assignmentPublishReadyPreview,
     toggleViews: [
       {
         checked: false,
@@ -14384,32 +14656,7 @@ assert.deepEqual(
     },
     now: new Date('2026-01-01T00:00:00.000Z'),
   }),
-  {
-    closeAfter: {
-      expiresAt: new Date('2026-01-10T09:30'),
-      status: 'ready',
-    },
-    expiresAt: new Date('2026-01-10T09:30'),
-    settings: {
-      collectStudentName: false,
-      instructions: 'Finish before class.',
-      maxAttempts: 3,
-      showCorrectAnswers: false,
-      shuffleItems: false,
-      timeLimitSeconds: 900,
-    },
-    settingsSummaryView: buildAssignmentSettingsSummaryView({
-      expiresAt: new Date('2026-01-10T09:30'),
-      settings: {
-        collectStudentName: false,
-        instructions: 'Finish before class.',
-        maxAttempts: 3,
-        showCorrectAnswers: false,
-        shuffleItems: false,
-        timeLimitSeconds: 900,
-      },
-    }),
-  }
+  assignmentPublishReadyPreview
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
@@ -14426,32 +14673,7 @@ assert.deepEqual(
     },
     now: new Date('2026-01-01T00:00:00.000Z'),
   }),
-  {
-    closeAfter: {
-      expiresAt: null,
-      status: 'invalid',
-    },
-    expiresAt: null,
-    settings: {
-      collectStudentName: true,
-      instructions: undefined,
-      maxAttempts: 2,
-      showCorrectAnswers: true,
-      shuffleItems: true,
-      timeLimitSeconds: undefined,
-    },
-    settingsSummaryView: buildAssignmentSettingsSummaryView({
-      expiresAt: null,
-      settings: {
-        collectStudentName: true,
-        instructions: undefined,
-        maxAttempts: 2,
-        showCorrectAnswers: true,
-        shuffleItems: true,
-        timeLimitSeconds: undefined,
-      },
-    }),
-  }
+  assignmentPublishInvalidPreview
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
@@ -14468,32 +14690,7 @@ assert.deepEqual(
     },
     now: new Date('2026-01-01T00:00:00.000Z'),
   }),
-  {
-    closeAfter: {
-      expiresAt: null,
-      status: 'none',
-    },
-    expiresAt: null,
-    settings: {
-      collectStudentName: true,
-      instructions: undefined,
-      maxAttempts: 2,
-      showCorrectAnswers: true,
-      shuffleItems: true,
-      timeLimitSeconds: undefined,
-    },
-    settingsSummaryView: buildAssignmentSettingsSummaryView({
-      expiresAt: null,
-      settings: {
-        collectStudentName: true,
-        instructions: undefined,
-        maxAttempts: 2,
-        showCorrectAnswers: true,
-        shuffleItems: true,
-        timeLimitSeconds: undefined,
-      },
-    }),
-  }
+  assignmentPublishNoneBlockedPreview
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({
@@ -14510,32 +14707,24 @@ assert.deepEqual(
     },
     now: new Date('2026-01-01T00:00:00.000Z'),
   }),
-  {
-    closeAfter: {
-      expiresAt: new Date('2025-12-31T23:59'),
-      status: 'past',
-    },
-    expiresAt: null,
-    settings: {
+  assignmentPublishPastPreview
+);
+assert.deepEqual(
+  buildAssignmentPublishPreviewFromDraft({
+    draft: {
+      activityId: 'activity-1',
       collectStudentName: true,
-      instructions: undefined,
-      maxAttempts: 2,
+      expiresAtLocal: '',
+      instructions: '',
+      maxAttempts: '   ',
       showCorrectAnswers: true,
       shuffleItems: true,
-      timeLimitSeconds: undefined,
+      timeLimitMinutes: '',
+      title: 'Open practice',
     },
-    settingsSummaryView: buildAssignmentSettingsSummaryView({
-      expiresAt: null,
-      settings: {
-        collectStudentName: true,
-        instructions: undefined,
-        maxAttempts: 2,
-        showCorrectAnswers: true,
-        shuffleItems: true,
-        timeLimitSeconds: undefined,
-      },
-    }),
-  }
+    now: new Date('2026-01-01T00:00:00.000Z'),
+  }),
+  assignmentPublishOpenReadyPreview
 );
 assert.deepEqual(
   buildAssignmentPublishPreviewFromDraft({

@@ -3,6 +3,8 @@ import {
   type AssignmentPublishDialogViewModel,
   type AssignmentPublishDraft,
   type AssignmentPublishDraftValues,
+  type AssignmentPublishPreviewContextTone,
+  type AssignmentPublishPreviewContextView,
   type AssignmentPublishToggleView,
 } from '@/assignments/publish-input';
 import { buildAssignmentPublishCloseAfterMinLocal } from '@/assignments/publish-schedule';
@@ -15,6 +17,7 @@ import { AssignmentSettingsSummary } from '@/components/assignments/assignment-s
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 type ActivityPublishDraftFieldChange = <
   TKey extends keyof AssignmentPublishDraftValues,
@@ -220,6 +223,7 @@ function ActivityPublishPreview({
       <p className="font-medium text-sm">
         {assignmentPublishDialogCopy.previewLabel}
       </p>
+      <ActivityPublishPreviewContext context={view.preview.context} />
       <AssignmentSettingsSummary view={view.preview.settingsSummaryView} />
       {view.dialogState.errorMessage ? (
         <p className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-destructive text-sm">
@@ -228,6 +232,65 @@ function ActivityPublishPreview({
       ) : null}
     </div>
   );
+}
+
+function ActivityPublishPreviewContext({
+  context,
+}: {
+  context: AssignmentPublishPreviewContextView;
+}) {
+  return (
+    <section className="grid gap-3 rounded-lg border bg-muted/20 p-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium text-sm">{context.title}</p>
+          <p className="mt-1 text-muted-foreground text-xs leading-5">
+            {context.description}
+          </p>
+        </div>
+        <span
+          className={cn(
+            'shrink-0 rounded-md px-2 py-1 font-medium text-xs',
+            getActivityPublishPreviewStatusClass(context.status.tone)
+          )}
+        >
+          {context.status.label}
+        </span>
+      </div>
+      <p
+        className={cn(
+          'rounded-md border px-3 py-2 text-sm',
+          getActivityPublishPreviewMessageClass(context.status.tone)
+        )}
+      >
+        {context.status.message}
+      </p>
+      <dl className="grid gap-2 sm:grid-cols-2">
+        {context.statItems.map((item) => (
+          <div key={item.id} className="rounded-md border bg-background p-2">
+            <dt className="text-muted-foreground text-xs">{item.label}</dt>
+            <dd className="mt-1 font-medium text-sm">{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function getActivityPublishPreviewStatusClass(
+  tone: AssignmentPublishPreviewContextTone
+) {
+  return tone === 'ready'
+    ? 'border border-primary/20 bg-primary/10 text-primary'
+    : 'border border-destructive/30 bg-destructive/10 text-destructive';
+}
+
+function getActivityPublishPreviewMessageClass(
+  tone: AssignmentPublishPreviewContextTone
+) {
+  return tone === 'ready'
+    ? 'border-primary/20 bg-primary/5 text-primary'
+    : 'border-destructive/30 bg-destructive/5 text-destructive';
 }
 
 function PublishSetting({

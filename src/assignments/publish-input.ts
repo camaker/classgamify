@@ -16,6 +16,7 @@ import {
 } from '@/assignments/validation';
 import {
   type AssignmentPublishCloseAfterResolution,
+  type AssignmentPublishCloseAfterStatus,
   resolveAssignmentPublishCloseAfterLocal,
 } from '@/assignments/publish-schedule';
 import { normalizeRuntimeDisplayText } from '@/assignments/runtime-display';
@@ -106,7 +107,7 @@ export type AssignmentPublishExecutionPlan =
       type: 'publish';
     };
 
-type AssignmentPublishDraftValidation =
+export type AssignmentPublishDraftValidation =
   | {
       ok: true;
     }
@@ -116,8 +117,46 @@ type AssignmentPublishDraftValidation =
       reason: AssignmentPublishValidationCode;
     };
 
+export type AssignmentPublishPreviewContextStatId =
+  | 'closeAfter'
+  | 'deliveryRules'
+  | 'studentInstructions'
+  | 'timer';
+
+export type AssignmentPublishPreviewContextTone = 'blocked' | 'ready';
+
+export type AssignmentPublishPreviewContextStatusView = {
+  label: string;
+  message: string;
+  tone: AssignmentPublishPreviewContextTone;
+};
+
+export type AssignmentPublishPreviewContextStatView = {
+  id: AssignmentPublishPreviewContextStatId;
+  label: string;
+  value: string;
+};
+
+export type AssignmentPublishPreviewContextSummary = {
+  closeAfterStatus: AssignmentPublishCloseAfterStatus;
+  deliveryRuleCount: number;
+  hasCloseAfter: boolean;
+  hasInstructions: boolean;
+  hasTimer: boolean;
+  status: AssignmentPublishPreviewContextTone;
+};
+
+export type AssignmentPublishPreviewContextView = {
+  description: string;
+  statItems: AssignmentPublishPreviewContextStatView[];
+  status: AssignmentPublishPreviewContextStatusView;
+  summary: AssignmentPublishPreviewContextSummary;
+  title: string;
+};
+
 type AssignmentPublishPreview = {
   closeAfter: AssignmentPublishCloseAfterResolution;
+  context: AssignmentPublishPreviewContextView;
   expiresAt: Date | null;
   settings: AssignmentSettings;
   settingsSummaryView: AssignmentSettingsSummaryView;
@@ -182,6 +221,12 @@ export const assignmentPublishDialogCopy = {
   },
   get previewLabel() {
     return m.assignment_publish_dialog_preview_label();
+  },
+  get previewContextDescription() {
+    return m.assignment_publish_preview_context_description();
+  },
+  get previewContextTitle() {
+    return m.assignment_publish_preview_context_title();
   },
   get publishLabel() {
     return m.assignment_publish_dialog_publish();
@@ -314,6 +359,7 @@ export function buildAssignmentPublishDialogViewModel({
     preview: buildAssignmentPublishPreviewFromDraft({
       draft,
       now: effectiveNow,
+      validation,
     }),
     toggleViews: buildAssignmentPublishToggleViews(draft),
     validation,
@@ -323,26 +369,122 @@ export function buildAssignmentPublishDialogViewModel({
 export function buildAssignmentPublishPreviewFromDraft({
   draft,
   now,
+  validation,
 }: {
   draft: AssignmentPublishDraft;
   now?: Date;
+  validation?: AssignmentPublishDraftValidation;
 }): AssignmentPublishPreview {
+  const effectiveNow = now ?? new Date();
   const closeAfter = resolveAssignmentPublishCloseAfterLocal({
-    now,
+    now: effectiveNow,
     value: draft.expiresAtLocal,
   });
   const expiresAt = closeAfter.status === 'ready' ? closeAfter.expiresAt : null;
   const settings = buildAssignmentPublishSettingsFromDraft(draft);
+  const settingsSummaryView = buildAssignmentSettingsSummaryView({
+    expiresAt,
+    settings,
+  });
+  const previewValidation =
+    validation ??
+    validateAssignmentPublishDraft({
+      ...draft,
+      now: effectiveNow,
+    });
 
   return {
     closeAfter,
+    context: buildAssignmentPublishPreviewContextView({
+      closeAfter,
+      settingsSummaryView,
+      validation: previewValidation,
+    }),
     expiresAt,
     settings,
-    settingsSummaryView: buildAssignmentSettingsSummaryView({
-      expiresAt,
-      settings,
-    }),
+    settingsSummaryView,
   };
+}
+
+export function buildAssignmentPublishPreviewContextView({
+  closeAfter,
+  settingsSummaryView,
+  validation,
+}: {
+  closeAfter: AssignmentPublishCloseAfterResolution;
+  settingsSummaryView: AssignmentSettingsSummaryView;
+  validation: AssignmentPublishDraftValidation;
+}): AssignmentPublishPreviewContextView {
+  const status = validation.ok ? 'ready' : 'blocked';
+  const hasInstructions = !settingsSummaryView.instructions.isEmpty;
+  const hasTimer = settingsSummaryView.settings.timeLimitSeconds !== undefined;
+  const hasCloseAfter = closeAfter.status === 'ready';
+  const deliveryRuleCount = settingsSummaryView.items.length;
+
+  return {
+    description: m.assignment_publish_preview_context_description(),
+    statItems: [
+      {
+        id: 'deliveryRules',
+        label: m.assignment_publish_preview_stat_rules_label(),
+        value: m.assignment_publish_preview_stat_rules_value({
+          count: deliveryRuleCount,
+        }),
+      },
+      {
+        id: 'studentInstructions',
+        label: m.assignment_publish_preview_stat_instructions_label(),
+        value: hasInstructions
+          ? m.assignment_publish_preview_stat_instructions_ready()
+          : m.assignment_publish_preview_stat_instructions_empty(),
+      },
+      {
+        id: 'timer',
+        label: m.assignment_publish_preview_stat_timer_label(),
+        value: hasTimer
+          ? m.assignment_publish_preview_stat_timer_enabled()
+          : m.assignment_publish_preview_stat_timer_off(),
+      },
+      {
+        id: 'closeAfter',
+        label: m.assignment_publish_preview_stat_close_after_label(),
+        value: formatAssignmentPublishPreviewCloseAfterStat(closeAfter.status),
+      },
+    ],
+    status: {
+      label: validation.ok
+        ? m.assignment_publish_preview_status_ready_label()
+        : m.assignment_publish_preview_status_blocked_label(),
+      message: validation.ok
+        ? m.assignment_publish_preview_status_ready_message()
+        : m.assignment_publish_preview_status_blocked_message(),
+      tone: status,
+    },
+    summary: {
+      closeAfterStatus: closeAfter.status,
+      deliveryRuleCount,
+      hasCloseAfter,
+      hasInstructions,
+      hasTimer,
+      status,
+    },
+    title: m.assignment_publish_preview_context_title(),
+  };
+}
+
+function formatAssignmentPublishPreviewCloseAfterStat(
+  status: AssignmentPublishCloseAfterStatus
+) {
+  switch (status) {
+    case 'ready':
+      return m.assignment_publish_preview_stat_close_after_scheduled();
+    case 'invalid':
+      return m.assignment_publish_preview_stat_close_after_invalid();
+    case 'past':
+      return m.assignment_publish_preview_stat_close_after_past();
+    case 'none':
+      return m.assignment_publish_preview_stat_close_after_open();
+  }
 }
 
 export function validateAssignmentPublishDraft({
