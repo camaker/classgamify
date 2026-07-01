@@ -225,6 +225,7 @@ type StudentAttemptAnonymousTokenResolver = {
 export type StudentAttemptResultDisplay = {
   accuracyLabel: string;
   durationLabel: string;
+  scoreAriaLabel: string;
   scoreLabel: string;
 };
 
@@ -241,6 +242,7 @@ export type StudentAttemptResultNextStepView = {
 };
 
 export type StudentAttemptResultNextStepsView = {
+  ariaLabel: string;
   stepViews: StudentAttemptResultNextStepView[];
   title: string;
 };
@@ -260,6 +262,7 @@ export type StudentAttemptReviewSummaryMetricView = {
 };
 
 export type StudentAttemptReviewSummaryView = {
+  ariaLabel: string;
   description: string;
   hiddenBySettings: boolean;
   metrics: StudentAttemptReviewSummaryMetricView[];
@@ -276,6 +279,7 @@ export type StudentAttemptControlState = {
 };
 
 export type StudentAttemptTimerBadge = {
+  ariaLabel: string;
   description: string;
   label: string;
   show: boolean;
@@ -726,6 +730,10 @@ export function buildStudentAttemptResultDisplay({
     normalizeAttemptDurationSeconds({
       durationSeconds: fallbackDurationSeconds,
     });
+  const scoreLabel = m.student_runner_result_score_line({
+    earnedPoints: normalizedEarnedPoints,
+    totalPoints: normalizedTotalPoints,
+  });
 
   return {
     accuracyLabel: m.student_runner_result_accuracy_line({
@@ -741,10 +749,8 @@ export function buildStudentAttemptResultDisplay({
         style: 'timer',
       }),
     }),
-    scoreLabel: m.student_runner_result_score_line({
-      earnedPoints: normalizedEarnedPoints,
-      totalPoints: normalizedTotalPoints,
-    }),
+    scoreAriaLabel: m.student_runner_result_score_aria({ score: scoreLabel }),
+    scoreLabel,
   };
 }
 
@@ -756,6 +762,7 @@ export function buildStudentAttemptResultNextStepsView({
   showCorrectAnswers: boolean;
 }): StudentAttemptResultNextStepsView {
   return {
+    ariaLabel: m.student_runner_result_next_steps_aria_label(),
     stepViews: [
       {
         id: 'review-score',
@@ -794,6 +801,7 @@ export function buildStudentAttemptReviewSummaryView({
 
   if (hiddenBySettings) {
     return {
+      ariaLabel: m.student_runner_review_summary_aria_label(),
       description: STUDENT_RUNNER_COPY.reviewSummaryHiddenDescription,
       hiddenBySettings,
       metrics: [
@@ -818,6 +826,7 @@ export function buildStudentAttemptReviewSummaryView({
   }
 
   return {
+    ariaLabel: m.student_runner_review_summary_aria_label(),
     description: STUDENT_RUNNER_COPY.reviewSummaryVisibleDescription,
     hiddenBySettings,
     metrics: [
@@ -954,6 +963,7 @@ export function buildStudentAttemptTimerBadge({
 }): StudentAttemptTimerBadge {
   if (normalizeAttemptTimeLimitSeconds(timeLimitSeconds) === undefined) {
     return {
+      ariaLabel: m.student_runner_timer_badge_off_aria(),
       description: STUDENT_RUNNER_COPY.timerOffDescription,
       label: '',
       show: false,
@@ -962,6 +972,9 @@ export function buildStudentAttemptTimerBadge({
 
   if (timeExpired) {
     return {
+      ariaLabel: m.student_runner_timer_badge_aria({
+        timer: STUDENT_RUNNER_COPY.timeEndedLabel,
+      }),
       description: STUDENT_RUNNER_COPY.timerActiveDescription,
       label: STUDENT_RUNNER_COPY.timeEndedLabel,
       show: true,
@@ -974,6 +987,9 @@ export function buildStudentAttemptTimerBadge({
   });
 
   return {
+    ariaLabel: label
+      ? m.student_runner_timer_badge_aria({ timer: label })
+      : m.student_runner_timer_badge_pending_aria(),
     description: STUDENT_RUNNER_COPY.timerActiveDescription,
     label,
     show: Boolean(label),

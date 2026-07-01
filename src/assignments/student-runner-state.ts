@@ -130,6 +130,7 @@ export type StudentRunnerMissingPageView = {
 
 export type StudentRunnerIdentityView =
   | {
+      ariaLabel: string;
       description: string;
       disabled: boolean;
       label: string;
@@ -137,12 +138,16 @@ export type StudentRunnerIdentityView =
       placeholder: string;
     }
   | {
+      ariaLabel: string;
       copy: AnonymousAttemptCopy;
       mode: 'anonymous';
     };
 
 export type StudentRunnerControlView = {
+  attemptRegionDescription: string;
+  attemptRegionLabel: string;
   progressDescription: string;
+  statusBarLabel: string;
   progressLabel: string;
   readOnlyMessage?: string;
   requiresIncompleteSubmitConfirmation: boolean;
@@ -153,6 +158,7 @@ export type StudentRunnerControlView = {
   submitConfirmationMessage?: string;
   submitDisabled: boolean;
   submitHintViews: StudentRunnerSubmitHintView[];
+  timeExpiredNoticeLabel: string;
   timeExpiredMessage: string;
   timerBadge: StudentAttemptTimerBadge;
   unansweredLabel?: string;
@@ -173,11 +179,13 @@ export type StudentRunnerResultPanelView =
       show: false;
     }
   | {
+      ariaLabel: string;
       accuracyLabel: string;
       attemptUsageLabel?: string;
       durationLabel: string;
       nextStepsView: StudentAttemptResultNextStepsView;
       reviewSummaryView: StudentAttemptReviewSummaryView;
+      scoreAriaLabel: string;
       scoreLabel: string;
       show: true;
       showStartAnotherAttempt: boolean;
@@ -638,6 +646,8 @@ export function buildStudentRunnerPageViewModel({
     attemptUsageLabel,
     completionCopy,
     controlView: {
+      attemptRegionDescription: m.student_runner_attempt_region_description(),
+      attemptRegionLabel: m.student_runner_attempt_region_label(),
       progressDescription: m.student_runner_progress_description({
         progress: completionCopy.progressLabel,
       }),
@@ -647,6 +657,7 @@ export function buildStudentRunnerPageViewModel({
       runnerTitle: activityRunnerCopy?.title ?? '',
       runtimeItemsDisabled: attemptControlState.runtimeItemsDisabled,
       showTimeExpiredMessage: attemptControlState.showTimeExpiredMessage,
+      statusBarLabel: m.student_runner_status_bar_label(),
       submitButtonLabel:
         attemptControlState.submitButtonLabel ??
         completionCopy.submitButtonLabel,
@@ -657,6 +668,7 @@ export function buildStudentRunnerPageViewModel({
         submitConfirmationMessage,
         unansweredLabel: attemptControlState.unansweredLabel,
       }),
+      timeExpiredNoticeLabel: m.student_runner_time_expired_notice_label(),
       timeExpiredMessage: runnerCopy.timeExpiredMessage,
       timerBadge: attemptTimerBadge,
       unansweredLabel: attemptControlState.unansweredLabel,
@@ -838,6 +850,7 @@ function buildStudentRunnerIdentityView({
       normalizeStudentRunnerSubmittedAttemptCount(submittedAttemptCount) > 0;
 
     return {
+      ariaLabel: m.student_runner_identity_region_label(),
       description: disabled
         ? runnerCopy.studentNameLockedDescription
         : runnerCopy.studentNameDescription,
@@ -849,6 +862,7 @@ function buildStudentRunnerIdentityView({
   }
 
   return {
+    ariaLabel: m.student_runner_identity_region_label(),
     copy: buildAnonymousAttemptCopy({
       browserLabel: getAnonymousBrowserLabel(anonymousToken),
     }),
@@ -905,6 +919,7 @@ function buildStudentRunnerResultPanelView({
   const runnerCopy = getStudentRunnerCopy();
 
   return {
+    ariaLabel: m.student_runner_result_region_label(),
     accuracyLabel: attemptResultDisplay.accuracyLabel,
     attemptUsageLabel,
     durationLabel: attemptResultDisplay.durationLabel,
@@ -915,6 +930,7 @@ function buildStudentRunnerResultPanelView({
     reviewSummaryView: buildStudentAttemptReviewSummaryView({
       summary: reviewSummary,
     }),
+    scoreAriaLabel: attemptResultDisplay.scoreAriaLabel,
     scoreLabel: attemptResultDisplay.scoreLabel,
     show: true,
     showStartAnotherAttempt,

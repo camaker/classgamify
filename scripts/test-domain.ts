@@ -8890,7 +8890,7 @@ const matchingPairsBoardSource = readFileSync(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line[\s\S]*m\.student_runner_result_score_line/,
+  /m\.student_runner_result_score_line[\s\S]*m\.student_runner_result_accuracy_line[\s\S]*m\.student_runner_result_time_line/,
   'Student submission display should format result accuracy, time, and score through localized message lines.'
 );
 assert.match(
@@ -8900,12 +8900,12 @@ assert.match(
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
+  /export type StudentAttemptResultNextStepId =[\s\S]*'done'[\s\S]*'feedback'[\s\S]*'review-score'[\s\S]*'start-another'[\s\S]*'teacher-review'[\s\S]*export type StudentAttemptResultNextStepView = \{[\s\S]*id: StudentAttemptResultNextStepId;[\s\S]*label: string;[\s\S]*export type StudentAttemptResultNextStepsView = \{[\s\S]*ariaLabel: string;[\s\S]*stepViews: StudentAttemptResultNextStepView\[\];[\s\S]*title: string;/,
   'Student result next steps should expose stable step ids and structured labels.'
 );
 assert.match(
   studentRunnerSubmissionSource,
-  /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
+  /export type StudentAttemptReviewSummaryMetricView = \{[\s\S]*key: StudentAttemptReviewSummaryMetricKey;[\s\S]*label: string;[\s\S]*value: string;[\s\S]*export type StudentAttemptReviewSummaryView = \{[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*hiddenBySettings: boolean;[\s\S]*metrics: StudentAttemptReviewSummaryMetricView\[\];[\s\S]*title: string;/,
   'Student submission domain should expose an explicit post-submit review summary view contract.'
 );
 assert.match(
@@ -9406,7 +9406,7 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*export type StudentRunnerIdentityView =[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
+  /export type StudentRunnerLoadingView = \{[\s\S]*export type StudentRunnerMissingPageView = \{[\s\S]*reason: StudentRunnerMissingReason;[\s\S]*scopeItems: StudentRunnerMissingScopeItem\[\];[\s\S]*export type StudentRunnerIdentityView =[\s\S]*ariaLabel: string;[\s\S]*description: string;[\s\S]*disabled: boolean;[\s\S]*export type StudentRunnerControlView = \{[\s\S]*attemptRegionLabel: string;[\s\S]*statusBarLabel: string;[\s\S]*export type StudentRunnerResultPanelView =[\s\S]*ariaLabel: string;[\s\S]*export type StudentRunnerActivityPreviewView = \{[\s\S]*export type StudentRunnerRuntimeListView = \{[\s\S]*export type StudentRunnerPageViewModel = \{/,
   'Student runner state domain should export focused route-facing page and sub-view contracts.'
 );
 assert.match(
@@ -9605,7 +9605,17 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.retryDescription/,
+  /aria-label=\{controlView\.attemptRegionLabel\}[\s\S]*student-runner-attempt-region-description[\s\S]*controlView\.attemptRegionDescription/,
+  'Student runner attempt shell should label the whole attempt workspace from the runner control view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /aria-label=\{controlView\.statusBarLabel\}[\s\S]*aria-label=\{controlView\.timerBadge\.ariaLabel\}/,
+  'Student runner attempt status bar should expose domain-prepared status and timer labels.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerIdentityPanel[\s\S]*identityView\.mode === 'student-name'[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*id="student-name"[\s\S]*disabled=\{identityView\.disabled\}[\s\S]*identityView\.description[\s\S]*aria-label=\{identityView\.ariaLabel\}[\s\S]*identityView\.copy\.description[\s\S]*aria-label=\{identityView\.copy\.browserLabelAriaLabel\}[\s\S]*identityView\.copy\.browserLabelCaption[\s\S]*identityView\.copy\.browserLabel[\s\S]*identityView\.copy\.retryDescription/,
   'Student runner identity panel should render prepared named-student lock state and anonymous browser identity views.'
 );
 assert.doesNotMatch(
@@ -9624,8 +9634,13 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerTimeExpiredNotice[\s\S]*controlView\.showTimeExpiredMessage[\s\S]*controlView\.timeExpiredMessage/,
+  /function StudentRunnerTimeExpiredNotice[\s\S]*controlView\.showTimeExpiredMessage[\s\S]*aria-label=\{controlView\.timeExpiredNoticeLabel\}[\s\S]*controlView\.timeExpiredMessage/,
   'Student runner time-expired notice should render prepared timer-expired state.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerResultPanel[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*<output[\s\S]*aria-label=\{view\.scoreAriaLabel\}/,
+  'Student runner result panel should use domain-prepared result and score labels.'
 );
 assert.match(
   studentRunnerAttemptShellSource,
@@ -9641,6 +9656,11 @@ assert.match(
   studentRunnerAttemptShellSource,
   /StudentRunnerReviewSummary[\s\S]*view=\{view\.reviewSummaryView\}[\s\S]*function StudentRunnerReviewSummary[\s\S]*view\.title[\s\S]*view\.description[\s\S]*view\.metrics\.map[\s\S]*metric\.value[\s\S]*metric\.label/,
   'Student runner result panel should render prepared post-submit review summary metrics from the result panel view.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /function StudentRunnerReviewSummary[\s\S]*aria-label=\{view\.ariaLabel\}[\s\S]*function StudentRunnerResultNextSteps[\s\S]*aria-label=\{view\.ariaLabel\}/,
+  'Student runner review summary and next-step panels should use domain-prepared accessible labels.'
 );
 assert.doesNotMatch(
   studentRunnerAttemptShellSource,
@@ -12747,6 +12767,7 @@ assert.deepEqual(
   {
     accuracyLabel: '67% accuracy',
     durationLabel: 'Time: 1:05',
+    scoreAriaLabel: 'Score: 2/3',
     scoreLabel: '2/3',
   }
 );
@@ -12760,6 +12781,7 @@ assert.deepEqual(
   {
     accuracyLabel: '100% accuracy',
     durationLabel: 'Time: 5s',
+    scoreAriaLabel: 'Score: 4/4',
     scoreLabel: '4/4',
   }
 );
@@ -12773,6 +12795,7 @@ assert.deepEqual(
   {
     accuracyLabel: '100% accuracy',
     durationLabel: 'Time: 5s',
+    scoreAriaLabel: 'Score: 2/2',
     scoreLabel: '2/2',
   }
 );
@@ -12786,6 +12809,7 @@ assert.deepEqual(
   {
     accuracyLabel: '0% accuracy',
     durationLabel: 'Time: 5s',
+    scoreAriaLabel: 'Score: 1/2',
     scoreLabel: '1/2',
   }
 );
@@ -12800,6 +12824,7 @@ assert.deepEqual(
   {
     accuracyLabel: '- accuracy',
     durationLabel: 'Time: 5s',
+    scoreAriaLabel: 'Score: 0/0',
     scoreLabel: '0/0',
   }
 );
@@ -12813,6 +12838,7 @@ assert.deepEqual(
   {
     accuracyLabel: '50% accuracy',
     durationLabel: 'Time: 5s',
+    scoreAriaLabel: 'Score: 1/2',
     scoreLabel: '1/2',
   }
 );
@@ -12828,6 +12854,7 @@ try {
     {
       accuracyLabel: '50% 正确率',
       durationLabel: '用时：5 秒',
+      scoreAriaLabel: '得分：1/2',
       scoreLabel: '1/2',
     }
   );
@@ -13068,6 +13095,7 @@ assert.deepEqual(
     showCorrectAnswers: true,
   }),
   {
+    ariaLabel: 'Post-submit next steps',
     stepViews: [
       {
         id: 'review-score',
@@ -13091,6 +13119,7 @@ assert.deepEqual(
     showCorrectAnswers: false,
   }),
   {
+    ariaLabel: 'Post-submit next steps',
     stepViews: [
       {
         id: 'review-score',
@@ -13122,6 +13151,7 @@ assert.deepEqual(
     },
   }),
   {
+    ariaLabel: 'Submission review summary',
     description:
       'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
     hiddenBySettings: false,
@@ -13148,6 +13178,7 @@ assert.deepEqual(
     },
   }),
   {
+    ariaLabel: 'Submission review summary',
     description:
       'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
     hiddenBySettings: true,
@@ -13223,6 +13254,7 @@ assert.deepEqual(
     timeLimitSeconds: undefined,
   }),
   {
+    ariaLabel: 'No countdown timer',
     description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
@@ -13235,6 +13267,7 @@ assert.deepEqual(
     timeLimitSeconds: Number.NaN,
   }),
   {
+    ariaLabel: 'No countdown timer',
     description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
@@ -13247,6 +13280,7 @@ assert.deepEqual(
     timeLimitSeconds: -120,
   }),
   {
+    ariaLabel: 'No countdown timer',
     description: 'This assignment has no visible countdown timer.',
     label: '',
     show: false,
@@ -13259,6 +13293,7 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    ariaLabel: 'Time remaining: 1:05',
     description:
       'The visible timer counts down only after this playable assignment has loaded.',
     label: '1:05',
@@ -13272,6 +13307,7 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    ariaLabel: 'Countdown timer loading',
     description:
       'The visible timer counts down only after this playable assignment has loaded.',
     label: '',
@@ -13285,6 +13321,7 @@ assert.deepEqual(
     timeLimitSeconds: 120,
   }),
   {
+    ariaLabel: 'Time remaining: Time ended',
     description:
       'The visible timer counts down only after this playable assignment has loaded.',
     label: 'Time ended',
@@ -19420,9 +19457,11 @@ assert.deepEqual(
     attemptResultDisplay: {
       accuracyLabel: '50% accuracy',
       durationLabel: 'Time: 1:20',
+      scoreAriaLabel: 'Score: 1/2',
       scoreLabel: '1/2',
     },
     attemptTimerBadge: {
+      ariaLabel: 'No countdown timer',
       description: 'This assignment has no visible countdown timer.',
       label: '',
       show: false,
@@ -19435,6 +19474,9 @@ assert.deepEqual(
       unansweredLabel: undefined,
     },
     controlView: {
+      attemptRegionDescription:
+        'Answer the activity items, review progress, and submit this attempt from this area.',
+      attemptRegionLabel: 'Student attempt workspace',
       progressDescription: 'Current completion progress: 1/1 answered.',
       progressLabel: '1/1 answered',
       readOnlyMessage: undefined,
@@ -19442,12 +19484,15 @@ assert.deepEqual(
       runnerTitle: 'Quiz',
       runtimeItemsDisabled: true,
       showTimeExpiredMessage: false,
+      statusBarLabel: 'Attempt status',
       submitButtonLabel: 'Submit answers',
       submitConfirmationMessage: undefined,
       submitDisabled: true,
       submitHintViews: [],
+      timeExpiredNoticeLabel: 'Time expired notice',
       timeExpiredMessage: 'Time is up. Review your saved answers, then submit.',
       timerBadge: {
+        ariaLabel: 'No countdown timer',
         description: 'This assignment has no visible countdown timer.',
         label: '',
         show: false,
@@ -19466,6 +19511,7 @@ assert.deepEqual(
       source: 'public-assignment',
     }),
     identityView: {
+      ariaLabel: 'Student identity',
       copy: studentRunnerAnonymousAttemptCopy,
       mode: 'anonymous',
     },
@@ -19480,10 +19526,12 @@ assert.deepEqual(
       hideAnswers: true,
     },
     resultPanelView: {
+      ariaLabel: 'Submitted attempt result',
       accuracyLabel: '50% accuracy',
       attemptUsageLabel: '1 attempt left',
       durationLabel: 'Time: 1:20',
       nextStepsView: {
+        ariaLabel: 'Post-submit next steps',
         stepViews: [
           {
             id: 'review-score',
@@ -19501,6 +19549,7 @@ assert.deepEqual(
         title: 'Next steps',
       },
       reviewSummaryView: {
+        ariaLabel: 'Submission review summary',
         description:
           'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
         hiddenBySettings: false,
@@ -19512,6 +19561,7 @@ assert.deepEqual(
         ],
         title: 'Submission review',
       },
+      scoreAriaLabel: 'Score: 1/2',
       scoreLabel: '1/2',
       show: true,
       showStartAnotherAttempt: true,
@@ -20096,6 +20146,7 @@ const namedStudentRunnerPageView = buildStudentRunnerPageViewModel({
   submittedAttemptCount: 0,
 });
 assert.deepEqual(namedStudentRunnerPageView.identityView, {
+  ariaLabel: 'Student identity',
   description: 'Type the name your teacher should see in results.',
   disabled: false,
   label: 'Student name',
@@ -20138,6 +20189,7 @@ const submittedNamedStudentRunnerPageView = buildStudentRunnerPageViewModel({
 assert.deepEqual(
   submittedNamedStudentRunnerPageView.identityView,
   {
+    ariaLabel: 'Student identity',
     description:
       'This name is saved for this assignment link and stays locked for the next attempt.',
     disabled: true,

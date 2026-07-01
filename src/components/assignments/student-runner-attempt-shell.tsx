@@ -33,7 +33,14 @@ export function StudentRunnerAttemptShell({
   studentName,
 }: StudentRunnerAttemptShellProps) {
   return (
-    <div className="rounded-lg border bg-muted/20 p-4">
+    <section
+      aria-label={controlView.attemptRegionLabel}
+      aria-describedby="student-runner-attempt-region-description"
+      className="rounded-lg border bg-muted/20 p-4"
+    >
+      <p id="student-runner-attempt-region-description" className="sr-only">
+        {controlView.attemptRegionDescription}
+      </p>
       <StudentRunnerAttemptStatusBar controlView={controlView} />
 
       <div className="mt-4 grid gap-3 rounded-lg border bg-card p-3 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
@@ -51,7 +58,7 @@ export function StudentRunnerAttemptShell({
       <StudentRunnerTimeExpiredNotice controlView={controlView} />
 
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -64,7 +71,10 @@ function StudentRunnerAttemptStatusBar({
   const timerDescriptionId = 'student-runner-timer-description';
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
+    <section
+      aria-label={controlView.statusBarLabel}
+      className="flex flex-wrap items-center justify-between gap-3"
+    >
       <div className="flex items-center gap-2 text-sm font-medium">
         <IconPlayerPlay className="size-4 text-primary" />
         {controlView.runnerTitle}
@@ -84,6 +94,7 @@ function StudentRunnerAttemptStatusBar({
           variant="outline"
           className="rounded-md"
           aria-describedby={timerDescriptionId}
+          aria-label={controlView.timerBadge.ariaLabel}
         >
           {controlView.timerBadge.label}
         </Badge>
@@ -91,7 +102,7 @@ function StudentRunnerAttemptStatusBar({
       <span id={timerDescriptionId} className="sr-only">
         {controlView.timerBadge.description}
       </span>
-    </div>
+    </section>
   );
 }
 
@@ -103,9 +114,12 @@ function StudentRunnerTimeExpiredNotice({
   if (!controlView.showTimeExpiredMessage) return null;
 
   return (
-    <div className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground">
+    <section
+      aria-label={controlView.timeExpiredNoticeLabel}
+      className="mt-4 rounded-lg border bg-background p-3 text-sm text-muted-foreground"
+    >
       {controlView.timeExpiredMessage}
-    </div>
+    </section>
   );
 }
 
@@ -122,7 +136,7 @@ function StudentRunnerIdentityPanel({
     const studentNameDescriptionId = 'student-name-description';
 
     return (
-      <div>
+      <section aria-label={identityView.ariaLabel}>
         <label
           htmlFor="student-name"
           className="text-sm font-medium text-foreground"
@@ -144,12 +158,15 @@ function StudentRunnerIdentityPanel({
         >
           {identityView.description}
         </p>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-muted/20 p-3">
+    <section
+      aria-label={identityView.ariaLabel}
+      className="rounded-lg border bg-muted/20 p-3"
+    >
       <p className="text-sm font-medium">{identityView.copy.title}</p>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         {identityView.copy.description}
@@ -168,7 +185,7 @@ function StudentRunnerIdentityPanel({
       <p className="mt-2 text-xs leading-5 text-muted-foreground">
         {identityView.copy.retryDescription}
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -182,12 +199,20 @@ function StudentRunnerResultPanel({
   if (!view.show) return null;
 
   return (
-    <div className="rounded-lg border bg-primary/5 p-3">
+    <section
+      aria-label={view.ariaLabel}
+      className="rounded-lg border bg-primary/5 p-3"
+    >
       <div className="flex items-center gap-2 text-sm font-medium">
         <IconCheck className="size-4 text-primary" />
         {view.statusLabel}
       </div>
-      <p className="mt-2 text-2xl font-semibold">{view.scoreLabel}</p>
+      <output
+        className="mt-2 block text-2xl font-semibold"
+        aria-label={view.scoreAriaLabel}
+      >
+        {view.scoreLabel}
+      </output>
       <p className="text-xs text-muted-foreground">{view.accuracyLabel}</p>
       <p className="text-xs text-muted-foreground">{view.durationLabel}</p>
       {view.attemptUsageLabel ? (
@@ -209,7 +234,7 @@ function StudentRunnerResultPanel({
           {view.startAnotherAttemptLabel}
         </Button>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -219,7 +244,10 @@ function StudentRunnerReviewSummary({
   view: StudentAttemptReviewSummaryView;
 }) {
   return (
-    <div className="mt-3 rounded-md border bg-background/80 p-2">
+    <section
+      aria-label={view.ariaLabel}
+      className="mt-3 rounded-md border bg-background/80 p-2"
+    >
       <p className="text-xs font-medium">{view.title}</p>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         {view.description}
@@ -237,7 +265,7 @@ function StudentRunnerReviewSummary({
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -247,7 +275,10 @@ function StudentRunnerResultNextSteps({
   view: StudentAttemptResultNextStepsView;
 }) {
   return (
-    <div className="mt-3 rounded-md border bg-background/80 p-2">
+    <section
+      aria-label={view.ariaLabel}
+      className="mt-3 rounded-md border bg-background/80 p-2"
+    >
       <p className="text-xs font-medium">{view.title}</p>
       <ul className="mt-1 grid gap-1 text-muted-foreground text-xs leading-5">
         {view.stepViews.map((step) => (
@@ -257,6 +288,6 @@ function StudentRunnerResultNextSteps({
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }
