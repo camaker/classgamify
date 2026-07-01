@@ -16,6 +16,8 @@ export function AssignmentResultsAttemptReviewFilterControl({
   onFilterChange,
   view,
 }: AssignmentResultsAttemptReviewFilterControlProps) {
+  const descriptionId = 'attempt-review-filter-description';
+
   return (
     <div className="flex flex-col gap-2 sm:w-48">
       <label htmlFor="attempt-review-filter" className="font-medium text-sm">
@@ -24,6 +26,7 @@ export function AssignmentResultsAttemptReviewFilterControl({
       <NativeSelect
         id="attempt-review-filter"
         value={view.filter}
+        aria-describedby={descriptionId}
         onChange={(event) =>
           onFilterChange(event.currentTarget.value as AttemptReviewFilter)
         }
@@ -34,7 +37,10 @@ export function AssignmentResultsAttemptReviewFilterControl({
           </NativeSelectOption>
         ))}
       </NativeSelect>
-      <p className="text-xs leading-relaxed text-muted-foreground">
+      <p
+        id={descriptionId}
+        className="text-xs leading-relaxed text-muted-foreground"
+      >
         {view.selectedFilterOption.description}
       </p>
     </div>

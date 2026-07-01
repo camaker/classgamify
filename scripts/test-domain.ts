@@ -5507,8 +5507,18 @@ assert.match(
 );
 assert.match(
   assignmentResultsReviewScopePanelSource,
-  /AssignmentResultReviewScopeItemView[\s\S]*AssignmentResultReviewScopeSummaryItemView[\s\S]*AssignmentResultReviewScopeView[\s\S]*aria-label=\{view\.title\}[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}/,
-  'Assignment result review-scope panel should render prepared scope and summary items keyed by stable ids.'
+  /AssignmentResultReviewScopeItemView[\s\S]*AssignmentResultReviewScopeSummaryItemView[\s\S]*AssignmentResultReviewScopeView[\s\S]*const titleId = 'assignment-result-review-scope-title'[\s\S]*const descriptionId = 'assignment-result-review-scope-description'[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{titleId\}[\s\S]*id=\{titleId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.itemViews\.map[\s\S]*key=\{itemView\.id\}[\s\S]*view\.summaryItems\.map[\s\S]*key=\{summaryItem\.id\}/,
+  'Assignment result review-scope panel should render prepared scope and summary items in a labelled and described section keyed by stable ids.'
+);
+assert.match(
+  assignmentResultsReviewScopePanelSource,
+  /const labelId = `assignment-result-review-scope-\$\{itemView\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-\$\{itemView\.id\}-value`[\s\S]*const descriptionId = `assignment-result-review-scope-\$\{itemView\.id\}-description`[\s\S]*<article[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*aria-labelledby=\{`\$\{labelId\} \$\{valueId\}`\}[\s\S]*id=\{labelId\}[\s\S]*id=\{valueId\}[\s\S]*id=\{descriptionId\}/,
+  'Assignment result review-scope items should associate each prepared scope value with its prepared explanation.'
+);
+assert.match(
+  assignmentResultsReviewScopePanelSource,
+  /const summaryLabelId = 'assignment-result-review-scope-summary-label'[\s\S]*<section[\s\S]*aria-labelledby=\{summaryLabelId\}[\s\S]*id=\{summaryLabelId\}[\s\S]*<dl[\s\S]*const labelId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-label`[\s\S]*const valueId = `assignment-result-review-scope-summary-\$\{summaryItem\.id\}-value`[\s\S]*<dt[\s\S]*id=\{labelId\}[\s\S]*<dd[\s\S]*id=\{valueId\}/,
+  'Assignment result review-scope summary counts should expose stable labels and values for assistive technology.'
 );
 assert.doesNotMatch(
   `${assignmentResultsReviewScopePanelSource}\n${assignmentResultRouteSource}`,
@@ -5900,6 +5910,16 @@ assert.match(
   /view\.selectedSortOption\.description/,
   'Assignment result student search component should render the selected sort description from the domain control view.'
 );
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /const searchSummaryId = 'assignment-result-search-summary'[\s\S]*<Input[\s\S]*id="assignment-result-search"[\s\S]*aria-describedby=\{searchSummaryId\}[\s\S]*id=\{searchSummaryId\}[\s\S]*view\.summary/,
+  'Assignment result student search input should be associated with the prepared current-result summary.'
+);
+assert.match(
+  assignmentResultsStudentSearchSource,
+  /const studentSortDescriptionId = 'student-summary-sort-description'[\s\S]*<NativeSelect[\s\S]*id="student-summary-sort"[\s\S]*aria-describedby=\{studentSortDescriptionId\}[\s\S]*id=\{studentSortDescriptionId\}[\s\S]*view\.selectedSortOption\.description/,
+  'Assignment result student summary sort select should be associated with its prepared sort explanation.'
+);
 assert.doesNotMatch(
   `${assignmentResultsStudentSearchSource}\n${assignmentResultsAttemptReviewFilterSource}\n${assignmentResultsItemPerformanceSortSource}`,
   /assignmentResultSearchCopy/,
@@ -5936,6 +5956,11 @@ assert.match(
   'Assignment result attempt review filter component should render the selected filter description from the domain control view.'
 );
 assert.match(
+  assignmentResultsAttemptReviewFilterSource,
+  /const descriptionId = 'attempt-review-filter-description'[\s\S]*<NativeSelect[\s\S]*id="attempt-review-filter"[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.selectedFilterOption\.description/,
+  'Assignment result attempt review filter select should be associated with its prepared filter explanation.'
+);
+assert.match(
   assignmentResultsItemPerformanceSortSource,
   /view\.label[\s\S]*view\.options/,
   'Assignment result item performance sort component should render prepared label and sort options.'
@@ -5944,6 +5969,11 @@ assert.match(
   assignmentResultsItemPerformanceSortSource,
   /view\.selectedSortOption\.description/,
   'Assignment result item performance sort component should render the selected sort description from the domain control view.'
+);
+assert.match(
+  assignmentResultsItemPerformanceSortSource,
+  /const descriptionId = 'item-performance-sort-description'[\s\S]*<NativeSelect[\s\S]*id="item-performance-sort"[\s\S]*aria-describedby=\{descriptionId\}[\s\S]*id=\{descriptionId\}[\s\S]*view\.selectedSortOption\.description/,
+  'Assignment result item performance sort select should be associated with its prepared sort explanation.'
 );
 assert.match(
   assignmentResultsMetricCardSource,

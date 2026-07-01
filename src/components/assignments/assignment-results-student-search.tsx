@@ -22,6 +22,9 @@ export function AssignmentResultsStudentSearch({
   onSortChange,
   view,
 }: AssignmentResultsStudentSearchProps) {
+  const searchSummaryId = 'assignment-result-search-summary';
+  const studentSortDescriptionId = 'student-summary-sort-description';
+
   return (
     <section className="grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-start">
       <div className="grid gap-2">
@@ -38,6 +41,7 @@ export function AssignmentResultsStudentSearch({
             value={view.value}
             placeholder={view.placeholder}
             className="pl-9 pr-9"
+            aria-describedby={searchSummaryId}
             onChange={(event) => onSearch(event.currentTarget.value)}
           />
           {view.hasSearchValue ? (
@@ -59,6 +63,7 @@ export function AssignmentResultsStudentSearch({
         <NativeSelect
           id="student-summary-sort"
           value={view.sort}
+          aria-describedby={studentSortDescriptionId}
           onChange={(event) =>
             onSortChange(event.currentTarget.value as StudentSummarySort)
           }
@@ -69,11 +74,17 @@ export function AssignmentResultsStudentSearch({
             </NativeSelectOption>
           ))}
         </NativeSelect>
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p
+          id={studentSortDescriptionId}
+          className="text-xs leading-relaxed text-muted-foreground"
+        >
           {view.selectedSortOption.description}
         </p>
       </div>
-      <p className="text-sm text-muted-foreground md:pt-7 md:text-right">
+      <p
+        id={searchSummaryId}
+        className="text-sm text-muted-foreground md:pt-7 md:text-right"
+      >
         {view.summary}
       </p>
     </section>

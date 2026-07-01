@@ -16,6 +16,8 @@ export function AssignmentResultsItemPerformanceSortControl({
   onSortChange,
   view,
 }: AssignmentResultsItemPerformanceSortControlProps) {
+  const descriptionId = 'item-performance-sort-description';
+
   return (
     <div className="flex flex-col gap-2 sm:w-52">
       <label htmlFor="item-performance-sort" className="font-medium text-sm">
@@ -24,6 +26,7 @@ export function AssignmentResultsItemPerformanceSortControl({
       <NativeSelect
         id="item-performance-sort"
         value={view.sort}
+        aria-describedby={descriptionId}
         onChange={(event) =>
           onSortChange(event.currentTarget.value as ItemPerformanceSort)
         }
@@ -34,7 +37,10 @@ export function AssignmentResultsItemPerformanceSortControl({
           </NativeSelectOption>
         ))}
       </NativeSelect>
-      <p className="text-xs leading-relaxed text-muted-foreground">
+      <p
+        id={descriptionId}
+        className="text-xs leading-relaxed text-muted-foreground"
+      >
         {view.selectedSortOption.description}
       </p>
     </div>

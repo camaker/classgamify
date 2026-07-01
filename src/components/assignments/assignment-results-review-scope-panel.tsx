@@ -11,14 +11,23 @@ type AssignmentResultsReviewScopePanelProps = {
 export function AssignmentResultsReviewScopePanel({
   view,
 }: AssignmentResultsReviewScopePanelProps) {
+  const titleId = 'assignment-result-review-scope-title';
+  const descriptionId = 'assignment-result-review-scope-description';
+  const summaryLabelId = 'assignment-result-review-scope-summary-label';
+
   return (
     <section
-      aria-label={view.title}
+      aria-describedby={descriptionId}
+      aria-labelledby={titleId}
       className="grid gap-4 rounded-lg border bg-card p-4"
     >
       <div className="grid gap-1">
-        <h2 className="font-semibold text-base">{view.title}</h2>
-        <p className="text-muted-foreground text-sm">{view.description}</p>
+        <h2 id={titleId} className="font-semibold text-base">
+          {view.title}
+        </h2>
+        <p id={descriptionId} className="text-muted-foreground text-sm">
+          {view.description}
+        </p>
       </div>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {view.itemViews.map((itemView) => (
@@ -28,17 +37,22 @@ export function AssignmentResultsReviewScopePanel({
           />
         ))}
       </div>
-      <div className="grid gap-3 rounded-md border bg-background p-3">
-        <p className="font-medium text-sm">{view.summaryLabel}</p>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      <section
+        className="grid gap-3 rounded-md border bg-background p-3"
+        aria-labelledby={summaryLabelId}
+      >
+        <p id={summaryLabelId} className="font-medium text-sm">
+          {view.summaryLabel}
+        </p>
+        <dl className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {view.summaryItems.map((summaryItem) => (
             <AssignmentResultsReviewScopeSummaryItem
               summaryItem={summaryItem}
               key={summaryItem.id}
             />
           ))}
-        </div>
-      </div>
+        </dl>
+      </section>
     </section>
   );
 }
@@ -48,16 +62,29 @@ function AssignmentResultsReviewScopeItem({
 }: {
   itemView: AssignmentResultReviewScopeItemView;
 }) {
+  const labelId = `assignment-result-review-scope-${itemView.id}-label`;
+  const valueId = `assignment-result-review-scope-${itemView.id}-value`;
+  const descriptionId = `assignment-result-review-scope-${itemView.id}-description`;
+
   return (
-    <div className="rounded-md border bg-background p-3">
-      <p className="text-muted-foreground text-xs">{itemView.label}</p>
-      <p className="mt-1 break-words font-semibold text-base">
+    <article
+      className="rounded-md border bg-background p-3"
+      aria-describedby={descriptionId}
+      aria-labelledby={`${labelId} ${valueId}`}
+    >
+      <p id={labelId} className="text-muted-foreground text-xs">
+        {itemView.label}
+      </p>
+      <p id={valueId} className="mt-1 break-words font-semibold text-base">
         {itemView.value}
       </p>
-      <p className="mt-1 text-muted-foreground text-xs leading-5">
+      <p
+        id={descriptionId}
+        className="mt-1 text-muted-foreground text-xs leading-5"
+      >
         {itemView.description}
       </p>
-    </div>
+    </article>
   );
 }
 
@@ -66,10 +93,17 @@ function AssignmentResultsReviewScopeSummaryItem({
 }: {
   summaryItem: AssignmentResultReviewScopeSummaryItemView;
 }) {
+  const labelId = `assignment-result-review-scope-summary-${summaryItem.id}-label`;
+  const valueId = `assignment-result-review-scope-summary-${summaryItem.id}-value`;
+
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="text-muted-foreground">{summaryItem.label}</span>
-      <span className="font-medium">{summaryItem.value}</span>
+    <div className="flex min-w-0 items-center justify-between gap-3 text-sm">
+      <dt id={labelId} className="text-muted-foreground">
+        {summaryItem.label}
+      </dt>
+      <dd id={valueId} className="font-medium">
+        {summaryItem.value}
+      </dd>
     </div>
   );
 }
