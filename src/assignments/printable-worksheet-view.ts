@@ -34,6 +34,24 @@ export type PrintableWorksheetHeaderOverviewItem = {
   label: string;
 };
 
+export type PrintableWorksheetPreparationItemId =
+  | 'answer-key'
+  | 'response-plan'
+  | 'student-fields';
+
+export type PrintableWorksheetPreparationItemView = {
+  description: string;
+  id: PrintableWorksheetPreparationItemId;
+  label: string;
+  value: string;
+};
+
+export type PrintableWorksheetPreparationView = {
+  description: string;
+  items: PrintableWorksheetPreparationItemView[];
+  title: string;
+};
+
 export type PrintableWorksheetHeaderView = {
   activityDescription: string | null;
   activityTitle: string;
@@ -172,6 +190,7 @@ export type PrintableWorksheetPageViewModel = {
   emptyState: PrintableWorksheetEmptyState;
   headerView: PrintableWorksheetHeaderView;
   itemViews: PrintableWorksheetItemView[];
+  preparationView: PrintableWorksheetPreparationView;
   showAnswerKey: boolean;
 };
 
@@ -230,6 +249,36 @@ export const printableWorksheetPageCopy = {
   },
   get loadingLabel() {
     return m.assignment_printable_loading();
+  },
+  get preparationAnswerKeyHiddenDescription() {
+    return m.assignment_printable_preparation_answer_key_hidden_description();
+  },
+  get preparationAnswerKeyIncludedDescription() {
+    return m.assignment_printable_preparation_answer_key_included_description();
+  },
+  get preparationAnswerKeyLabel() {
+    return m.assignment_printable_preparation_answer_key_label();
+  },
+  get preparationDescription() {
+    return m.assignment_printable_preparation_description();
+  },
+  get preparationResponsePlanDescription() {
+    return m.assignment_printable_preparation_response_plan_description();
+  },
+  get preparationResponsePlanLabel() {
+    return m.assignment_printable_preparation_response_plan_label();
+  },
+  get preparationStudentFieldsDescription() {
+    return m.assignment_printable_preparation_student_fields_description();
+  },
+  get preparationStudentFieldsLabel() {
+    return m.assignment_printable_preparation_student_fields_label();
+  },
+  get preparationStudentFieldsValue() {
+    return m.assignment_printable_preparation_student_fields_value();
+  },
+  get preparationTitle() {
+    return m.assignment_printable_preparation_title();
   },
   get printButtonLabel() {
     return m.assignment_printable_print_button();
@@ -322,6 +371,9 @@ export function buildPrintableWorksheetPageViewModel({
   const headerView = buildPrintableWorksheetHeaderView(worksheet, {
     includeAnswerKey: answerKeyView.show,
   });
+  const summary = summarizePrintableAssignmentWorksheet(worksheet, {
+    includeAnswerKey: answerKeyView.show,
+  });
 
   return {
     answerKeyView,
@@ -335,7 +387,49 @@ export function buildPrintableWorksheetPageViewModel({
     emptyState: buildPrintableWorksheetEmptyState(),
     headerView,
     itemViews: worksheet.items.map(buildPrintableWorksheetItemView),
+    preparationView: buildPrintableWorksheetPreparationView(summary),
     showAnswerKey: answerKeyView.show,
+  };
+}
+
+export function buildPrintableWorksheetPreparationView(
+  summary: PrintableAssignmentWorksheetSummary
+): PrintableWorksheetPreparationView {
+  return {
+    description: printableWorksheetPageCopy.preparationDescription,
+    items: [
+      {
+        description:
+          printableWorksheetPageCopy.preparationStudentFieldsDescription,
+        id: 'student-fields',
+        label: printableWorksheetPageCopy.preparationStudentFieldsLabel,
+        value: printableWorksheetPageCopy.preparationStudentFieldsValue,
+      },
+      {
+        description:
+          printableWorksheetPageCopy.preparationResponsePlanDescription,
+        id: 'response-plan',
+        label: printableWorksheetPageCopy.preparationResponsePlanLabel,
+        value: m.assignment_printable_preparation_response_plan_value({
+          itemCount: formatPrintableWorksheetOverviewItemCount(
+            summary.itemCount
+          ),
+          responseSummary:
+            formatPrintableWorksheetOverviewResponseModes(summary),
+        }),
+      },
+      {
+        description: summary.showAnswerKey
+          ? printableWorksheetPageCopy.preparationAnswerKeyIncludedDescription
+          : printableWorksheetPageCopy.preparationAnswerKeyHiddenDescription,
+        id: 'answer-key',
+        label: printableWorksheetPageCopy.preparationAnswerKeyLabel,
+        value: summary.showAnswerKey
+          ? m.assignment_printable_overview_answer_key_included()
+          : m.assignment_printable_overview_answer_key_hidden(),
+      },
+    ],
+    title: printableWorksheetPageCopy.preparationTitle,
   };
 }
 

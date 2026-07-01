@@ -531,6 +531,7 @@ import {
   buildPrintableWorksheetItemView,
   buildPrintableWorksheetLoadingView,
   buildPrintableWorksheetPageViewModel,
+  buildPrintableWorksheetPreparationView,
   buildPrintableWorksheetRouteState,
   buildPrintableWorksheetSnapshotSourceFieldView,
   getPrintableWorksheetChoiceIndexValue,
@@ -17274,6 +17275,39 @@ assert.deepEqual(
     { id: 'answer-key', label: 'Answer key hidden' },
   ]
 );
+assert.deepEqual(
+  buildPrintableWorksheetPreparationView(
+    summarizePrintableAssignmentWorksheet(printableSnapshotWorksheet)
+  ),
+  {
+    description:
+      'Check the paper handout before opening the browser print dialog.',
+    items: [
+      {
+        description:
+          'Student name, date, and score lines are already included for offline collection.',
+        id: 'student-fields',
+        label: 'Handout fields',
+        value: 'Name, date, score',
+      },
+      {
+        description:
+          'Printable items use the same frozen runtime order, response modes, and choice banks as the assignment snapshot.',
+        id: 'response-plan',
+        label: 'Student practice',
+        value: '1 item · Multiple choice practice',
+      },
+      {
+        description:
+          'Students receive practice pages only; teacher-only answers stay hidden until you include the key.',
+        id: 'answer-key',
+        label: 'Answer key',
+        value: 'Answer key hidden',
+      },
+    ],
+    title: 'Before printing',
+  }
+);
 assert.deepEqual(parsePrintableAssignmentSearch({ answerKey: true }), {
   answerKey: true,
 });
@@ -17872,6 +17906,50 @@ try {
       { id: 'answer-key', label: '未包含答案页' },
     ]
   );
+  assert.deepEqual(
+    buildPrintableWorksheetPreparationView(
+      summarizePrintableAssignmentWorksheet({
+        ...printableShortAnswerWorksheet,
+        items: [
+          {
+            ...printableShortAnswerWorksheet.items[0]!,
+            responseMode: 'short-answer',
+          },
+          {
+            ...printableShortAnswerWorksheet.items[0]!,
+            id: 'zh-printable-group',
+            responseMode: 'group-choice',
+          },
+        ],
+      })
+    ),
+    {
+      description: '打开浏览器打印窗口前，先检查这份纸质发放版本。',
+      items: [
+        {
+          description: '学生姓名、日期和得分线已准备好，便于线下收集。',
+          id: 'student-fields',
+          label: '发放字段',
+          value: '姓名、日期、得分',
+        },
+        {
+          description:
+            '可打印题目沿用同一个冻结作业快照里的题目顺序、作答方式和选项库。',
+          id: 'response-plan',
+          label: '学生练习',
+          value: '2 道题 · 2 种作答方式',
+        },
+        {
+          description:
+            '学生只会拿到练习页；教师答案会保持隐藏，直到你选择包含答案页。',
+          id: 'answer-key',
+          label: '答案页',
+          value: '未包含答案页',
+        },
+      ],
+      title: '打印前检查',
+    }
+  );
 } finally {
   overwriteGetLocale(() => 'en');
 }
@@ -18072,6 +18150,7 @@ assert.deepEqual(
     emptyState: printableWorksheetPageView.emptyState,
     headerView: printableWorksheetPageView.headerView,
     itemIds: printableWorksheetPageView.itemViews.map((item) => item.id),
+    preparationView: printableWorksheetPageView.preparationView,
     showAnswerKey: printableWorksheetPageView.showAnswerKey,
   },
   {
@@ -18171,6 +18250,34 @@ assert.deepEqual(
       templateLabel: 'Quiz',
     },
     itemIds: ['q-frozen-prompt'],
+    preparationView: {
+      description:
+        'Check the paper handout before opening the browser print dialog.',
+      items: [
+        {
+          description:
+            'Student name, date, and score lines are already included for offline collection.',
+          id: 'student-fields',
+          label: 'Handout fields',
+          value: 'Name, date, score',
+        },
+        {
+          description:
+            'Printable items use the same frozen runtime order, response modes, and choice banks as the assignment snapshot.',
+          id: 'response-plan',
+          label: 'Student practice',
+          value: '1 item · Multiple choice practice',
+        },
+        {
+          description:
+            'The printable view includes teacher-only answers, accepted alternatives, and explanations after the student pages.',
+          id: 'answer-key',
+          label: 'Answer key',
+          value: 'Answer key included',
+        },
+      ],
+      title: 'Before printing',
+    },
     showAnswerKey: true,
   }
 );
@@ -25501,6 +25608,16 @@ assert.match(
   /export function buildPrintableWorksheetHeaderOverviewItems\([\s\S]*summary: PrintableAssignmentWorksheetSummary[\s\S]*summary\.itemCount[\s\S]*summary\.showAnswerKey[\s\S]*function formatPrintableWorksheetOverviewItemCount[\s\S]*function formatPrintableWorksheetOverviewResponseModes/,
   'Printable worksheet header overview should localize item count, response-mode, and answer-key status.'
 );
+assert.match(
+  printableWorksheetViewSource,
+  /export function buildPrintableWorksheetPreparationView\([\s\S]*summary: PrintableAssignmentWorksheetSummary[\s\S]*preparationStudentFieldsLabel[\s\S]*assignment_printable_preparation_response_plan_value[\s\S]*summary\.showAnswerKey[\s\S]*assignment_printable_overview_answer_key_included[\s\S]*assignment_printable_overview_answer_key_hidden/,
+  'Printable worksheet preparation summary should localize student fields, response plan, and answer-key state from the shared worksheet summary.'
+);
+assert.match(
+  printableWorksheetViewSource,
+  /const summary = summarizePrintableAssignmentWorksheet\(worksheet,[\s\S]*includeAnswerKey: answerKeyView\.show[\s\S]*preparationView: buildPrintableWorksheetPreparationView\(summary\)/,
+  'Printable worksheet page view-model should derive preparation summary from the same answer-key visibility used by the header.'
+);
 assert.doesNotMatch(
   printableWorksheetViewSource,
   /buildPrintableWorksheetHeaderOverviewItems\([\s\S]*worksheet\.items\.length|new Set\(items\.map\(\(item\) => item\.responseMode\)\)/,
@@ -25584,6 +25701,10 @@ const printableWorksheetAnswerKeySource = readFileSync(
   'src/components/assignments/printable-worksheet-answer-key.tsx',
   'utf8'
 );
+const printableWorksheetPreparationSummarySource = readFileSync(
+  'src/components/assignments/printable-worksheet-preparation-summary.tsx',
+  'utf8'
+);
 assert.match(
   printableWorksheetAnswerKeySource,
   /itemView\.headingLabel/,
@@ -25596,8 +25717,8 @@ assert.match(
 );
 assert.match(
   printableWorksheetViewSource,
-  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{[\s\S]*detailViews: PrintableWorksheetAnswerKeyDetailView\[\];/,
-  'Printable worksheet view domain should export focused header, item, choice-bank, answer-line, and answer-key item contracts.'
+  /export type PrintableWorksheetHeaderOverviewItem = \{[\s\S]*export type PrintableWorksheetPreparationItemId =[\s\S]*'answer-key'[\s\S]*'response-plan'[\s\S]*'student-fields'[\s\S]*export type PrintableWorksheetPreparationView = \{[\s\S]*export type PrintableWorksheetHeaderView = \{[\s\S]*overviewItems: PrintableWorksheetHeaderOverviewItem\[\];[\s\S]*export type PrintableWorksheetAnswerLineView = \{[\s\S]*export type PrintableWorksheetChoiceBankView = \{[\s\S]*export type PrintableWorksheetItemView = \{[\s\S]*choiceBank: PrintableWorksheetChoiceBankView;[\s\S]*export type PrintableWorksheetAnswerKeyDetailView = \{[\s\S]*export type PrintableWorksheetAnswerKeyItemView = \{[\s\S]*detailViews: PrintableWorksheetAnswerKeyDetailView\[\];/,
+  'Printable worksheet view domain should export focused header, preparation, item, choice-bank, answer-line, and answer-key item contracts.'
 );
 assert.match(
   printableWorksheetViewSource,
@@ -25615,7 +25736,7 @@ assert.match(
   'Printable worksheet builders should return explicit printable view contracts.'
 );
 assert.doesNotMatch(
-  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}`,
+  `${printableWorksheetToolbarSource}\n${printableWorksheetStatePanelSource}\n${printableWorksheetHeaderSource}\n${printableWorksheetAssignmentFieldsSource}\n${printableWorksheetItemListSource}\n${printableWorksheetAnswerKeySource}\n${printableWorksheetPreparationSummarySource}`,
   /buildPrintableWorksheetPageViewModel|PrintableWorksheetPageViewModel\[|ReturnType<\s*typeof buildPrintableWorksheet(?:LoadingView|ErrorView|PageViewModel)/,
   'Printable worksheet components should import focused view contracts instead of deriving them from printable page builders.'
 );
@@ -25653,6 +25774,21 @@ assert.match(
   printableWorksheetAnswerKeySource,
   /PrintableWorksheetAnswerKeyDetailView[\s\S]*PrintableWorksheetAnswerKeyItemView[\s\S]*PrintableWorksheetAnswerKeyView/,
   'Printable worksheet answer key should consume explicit answer-key section, item, and detail view contracts.'
+);
+assert.match(
+  printableWorksheetPreparationSummarySource,
+  /PrintableWorksheetPreparationItemView[\s\S]*PrintableWorksheetPreparationView/,
+  'Printable worksheet preparation summary should consume explicit preparation summary and item view contracts.'
+);
+assert.match(
+  printableWorksheetPreparationSummarySource,
+  /view\.title[\s\S]*view\.description[\s\S]*view\.items\.map[\s\S]*key=\{itemView\.id\}[\s\S]*itemView\.label[\s\S]*itemView\.value[\s\S]*itemView\.description/,
+  'Printable worksheet preparation summary should render prepared title, description, stable item ids, labels, values, and descriptions.'
+);
+assert.doesNotMatch(
+  printableWorksheetPreparationSummarySource,
+  /Before printing|Student practice|Handout fields|Answer key|打印前检查|学生练习|发放字段|答案页|assignment_printable_preparation_/,
+  'Printable worksheet preparation summary component should not hard-code preparation copy or read locale keys directly.'
 );
 assert.doesNotMatch(
   printableWorksheetHeaderSource,
@@ -25738,6 +25874,11 @@ assert.match(
   printableAssignmentRouteSource,
   /PrintableWorksheetHeader[\s\S]*headerView=\{headerView\}/,
   'Printable worksheet route should delegate worksheet header rendering.'
+);
+assert.match(
+  printableAssignmentRouteSource,
+  /PrintableWorksheetPreparationSummary[\s\S]*view=\{pageView\.preparationView\}/,
+  'Printable worksheet route should delegate print-preparation summary rendering with the prepared page view.'
 );
 assert.match(
   printableAssignmentRouteSource,

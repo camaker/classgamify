@@ -10,6 +10,7 @@ import { PrintableWorksheetAnswerKey } from '@/components/assignments/printable-
 import { PrintableWorksheetAssignmentFields } from '@/components/assignments/printable-worksheet-assignment-fields';
 import { PrintableWorksheetHeader } from '@/components/assignments/printable-worksheet-header';
 import { PrintableWorksheetItemList } from '@/components/assignments/printable-worksheet-item-list';
+import { PrintableWorksheetPreparationSummary } from '@/components/assignments/printable-worksheet-preparation-summary';
 import { PrintableWorksheetStatePanel } from '@/components/assignments/printable-worksheet-state-panel';
 import { PrintableWorksheetToolbar } from '@/components/assignments/printable-worksheet-toolbar';
 import { usePrintableAssignmentWorksheet } from '@/hooks/use-assignments';
@@ -109,6 +110,10 @@ function PrintableAssignmentWorksheetPage() {
 
         <article data-print-root className="grid gap-6">
           <PrintableWorksheetHeader headerView={headerView} />
+
+          <PrintableWorksheetPreparationSummary
+            view={pageView.preparationView}
+          />
 
           <PrintableWorksheetAssignmentFields
             fieldViews={pageView.assignmentFieldViews}
