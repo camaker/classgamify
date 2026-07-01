@@ -21,6 +21,7 @@ import {
   buildStudentAttemptSubmissionPlan,
   buildStudentAttemptSessionKey,
   buildStudentAttemptControlState,
+  buildStudentAttemptProgressView,
   buildStudentAttemptReviewSummaryView,
   buildStudentAttemptResultDisplay,
   buildStudentAttemptResultNextStepsView,
@@ -35,6 +36,7 @@ import {
   type AnonymousAttemptCopy,
   type AttemptCompletionCopy,
   type AttemptCompletionSummary,
+  type StudentAttemptProgressView,
   type StudentAttemptControlState,
   type StudentAttemptReviewSummaryView,
   type StudentAttemptResultDisplay,
@@ -147,6 +149,7 @@ export type StudentRunnerControlView = {
   attemptRegionDescription: string;
   attemptRegionLabel: string;
   progressDescription: string;
+  progressView: StudentAttemptProgressView;
   statusBarLabel: string;
   progressLabel: string;
   readOnlyMessage?: string;
@@ -155,6 +158,8 @@ export type StudentRunnerControlView = {
   runtimeItemsDisabled: boolean;
   showTimeExpiredMessage: boolean;
   submitButtonLabel: string;
+  submitButtonAriaLabel: string;
+  submitControlsLabel: string;
   submitConfirmationMessage?: string;
   submitDisabled: boolean;
   submitHintViews: StudentRunnerSubmitHintView[];
@@ -170,8 +175,10 @@ export type StudentRunnerSubmitHintId =
   | 'unanswered';
 
 export type StudentRunnerSubmitHintView = {
+  ariaLabel: string;
   id: StudentRunnerSubmitHintId;
   text: string;
+  tone: 'info' | 'warning';
 };
 
 export type StudentRunnerResultPanelView =
@@ -364,11 +371,19 @@ export type StudentRunnerSubmissionExecutionPlan =
   | {
       anonymousToken?: string;
       input: StudentAttemptSubmissionInput;
+      payloadSummary: StudentRunnerSubmissionPayloadSummary;
       reason: StudentAttemptSubmissionSubmitReason;
       submittedStudentName?: string;
       successMessage: string;
       type: 'submit';
     };
+
+export type StudentRunnerSubmissionPayloadSummary = {
+  answerCount: number;
+  itemCount: number;
+  shareSlug: string;
+  unansweredItemCount: number;
+};
 
 export type StudentRunnerSubmissionSuccessState = {
   anonymousToken: string | undefined;
@@ -583,6 +598,10 @@ export function buildStudentRunnerPageViewModel({
     confirmIncompleteSubmit,
     progressVerb: activityRunnerCopy?.progressVerb,
   });
+  const progressView = buildStudentAttemptProgressView({
+    completionSummary: attemptState.completionSummary,
+    verb: activityRunnerCopy?.progressVerb,
+  });
   const attemptResultDisplay = result
     ? buildStudentAttemptResultDisplay({
         accuracy: result.accuracy,
@@ -649,9 +668,10 @@ export function buildStudentRunnerPageViewModel({
       attemptRegionDescription: m.student_runner_attempt_region_description(),
       attemptRegionLabel: m.student_runner_attempt_region_label(),
       progressDescription: m.student_runner_progress_description({
-        progress: completionCopy.progressLabel,
+        progress: progressView.label,
       }),
-      progressLabel: completionCopy.progressLabel,
+      progressLabel: progressView.label,
+      progressView,
       readOnlyMessage: attemptControlState.readOnlyMessage,
       requiresIncompleteSubmitConfirmation,
       runnerTitle: activityRunnerCopy?.title ?? '',
@@ -661,6 +681,13 @@ export function buildStudentRunnerPageViewModel({
       submitButtonLabel:
         attemptControlState.submitButtonLabel ??
         completionCopy.submitButtonLabel,
+      submitButtonAriaLabel: runnerCopy.submitButtonAriaLabel({
+        label:
+          attemptControlState.submitButtonLabel ??
+          completionCopy.submitButtonLabel,
+        progress: progressView.label,
+      }),
+      submitControlsLabel: runnerCopy.submitControlsLabel,
       submitConfirmationMessage,
       submitDisabled: attemptControlState.submitDisabled,
       submitHintViews: buildStudentRunnerSubmitHintViews({
@@ -764,7 +791,37 @@ function buildStudentRunnerSubmitHintView({
   text?: string;
 }): StudentRunnerSubmitHintView | null {
   const normalizedText = normalizeRuntimeDisplayText(text);
-  return normalizedText ? { id, text: normalizedText } : null;
+  if (!normalizedText) return null;
+
+  return {
+    ariaLabel: getStudentRunnerSubmitHintAriaLabel({
+      id,
+      text: normalizedText,
+    }),
+    id,
+    text: normalizedText,
+    tone: id === 'confirm-incomplete' ? 'warning' : 'info',
+  };
+}
+
+function getStudentRunnerSubmitHintAriaLabel({
+  id,
+  text,
+}: {
+  id: StudentRunnerSubmitHintId;
+  text: string;
+}) {
+  const runnerCopy = getStudentRunnerCopy();
+
+  if (id === 'confirm-incomplete') {
+    return runnerCopy.submitHintConfirmIncompleteAriaLabel({ hint: text });
+  }
+
+  if (id === 'read-only') {
+    return runnerCopy.submitHintReadOnlyAriaLabel({ hint: text });
+  }
+
+  return runnerCopy.submitHintUnansweredAriaLabel({ hint: text });
 }
 
 export function buildStudentRunnerRouteState(
@@ -1201,12 +1258,32 @@ export function buildStudentRunnerSubmissionExecutionPlan({
       ? { anonymousToken: submissionPlan.anonymousToken }
       : {}),
     input: submissionPlan.input,
+    payloadSummary: buildStudentRunnerSubmissionPayloadSummary({
+      input: submissionPlan.input,
+      pageView,
+    }),
     reason: submissionPlan.reason,
     ...(submissionPlan.input.studentName
       ? { submittedStudentName: submissionPlan.input.studentName }
       : {}),
     successMessage: pageView.submissionSuccessMessage,
     type: 'submit',
+  };
+}
+
+function buildStudentRunnerSubmissionPayloadSummary({
+  input,
+  pageView,
+}: {
+  input: StudentAttemptSubmissionInput;
+  pageView: StudentRunnerPageViewModel;
+}): StudentRunnerSubmissionPayloadSummary {
+  return {
+    answerCount: input.answers.length,
+    itemCount: pageView.attemptState.completionSummary.itemCount,
+    shareSlug: input.shareSlug,
+    unansweredItemCount:
+      pageView.attemptState.completionSummary.unansweredItemCount,
   };
 }
 

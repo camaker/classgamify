@@ -63,6 +63,12 @@ export type AttemptCompletionSummary = {
   unansweredItemCount: number;
 };
 
+export type StudentAttemptProgressView = AttemptCompletionSummary & {
+  ariaLabel: string;
+  description: string;
+  label: string;
+};
+
 type AttemptSubmitDecision =
   | {
       reason: 'complete' | 'confirmed-incomplete';
@@ -193,6 +199,11 @@ type StudentRunnerCopy = {
   studentNameLabel: string;
   studentNameLockedDescription: string;
   studentNamePlaceholder: string;
+  submitButtonAriaLabel: (input: { label: string; progress: string }) => string;
+  submitControlsLabel: string;
+  submitHintConfirmIncompleteAriaLabel: (input: { hint: string }) => string;
+  submitHintReadOnlyAriaLabel: (input: { hint: string }) => string;
+  submitHintUnansweredAriaLabel: (input: { hint: string }) => string;
   submissionFailureMessage: string;
   submissionPendingLabel: string;
   submissionSuccessMessage: string;
@@ -256,6 +267,7 @@ export type StudentAttemptReviewSummaryMetricKey =
   | 'unanswered';
 
 export type StudentAttemptReviewSummaryMetricView = {
+  ariaLabel: string;
   key: StudentAttemptReviewSummaryMetricKey;
   label: string;
   value: string;
@@ -416,6 +428,21 @@ const STUDENT_RUNNER_COPY = {
   },
   get studentNamePlaceholder() {
     return m.student_runner_student_name_placeholder();
+  },
+  submitButtonAriaLabel(input) {
+    return m.student_runner_submit_button_aria(input);
+  },
+  get submitControlsLabel() {
+    return m.student_runner_submit_controls_label();
+  },
+  submitHintConfirmIncompleteAriaLabel(input) {
+    return m.student_runner_submit_hint_confirm_incomplete_aria(input);
+  },
+  submitHintReadOnlyAriaLabel(input) {
+    return m.student_runner_submit_hint_read_only_aria(input);
+  },
+  submitHintUnansweredAriaLabel(input) {
+    return m.student_runner_submit_hint_unanswered_aria(input);
   },
   get submissionFailureMessage() {
     return m.student_runner_submission_failure();
@@ -805,21 +832,21 @@ export function buildStudentAttemptReviewSummaryView({
       description: STUDENT_RUNNER_COPY.reviewSummaryHiddenDescription,
       hiddenBySettings,
       metrics: [
-        {
+        buildStudentAttemptReviewSummaryMetricView({
           key: 'submitted',
           label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
           value: formatStudentReviewSummaryCount(summary.submittedItemCount),
-        },
-        {
+        }),
+        buildStudentAttemptReviewSummaryMetricView({
           key: 'unanswered',
           label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
           value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
-        },
-        {
+        }),
+        buildStudentAttemptReviewSummaryMetricView({
           key: 'review',
           label: STUDENT_RUNNER_COPY.reviewSummaryReviewVisibilityLabel,
           value: STUDENT_RUNNER_COPY.reviewSummaryReviewHiddenValue,
-        },
+        }),
       ],
       title: STUDENT_RUNNER_COPY.reviewSummaryTitle,
     };
@@ -830,26 +857,26 @@ export function buildStudentAttemptReviewSummaryView({
     description: STUDENT_RUNNER_COPY.reviewSummaryVisibleDescription,
     hiddenBySettings,
     metrics: [
-      {
+      buildStudentAttemptReviewSummaryMetricView({
         key: 'submitted',
         label: STUDENT_RUNNER_COPY.reviewSummarySubmittedLabel,
         value: formatStudentReviewSummaryCount(summary.submittedItemCount),
-      },
-      {
+      }),
+      buildStudentAttemptReviewSummaryMetricView({
         key: 'correct',
         label: STUDENT_RUNNER_COPY.reviewSummaryCorrectLabel,
         value: formatStudentReviewSummaryCount(summary.correctItemCount),
-      },
-      {
+      }),
+      buildStudentAttemptReviewSummaryMetricView({
         key: 'needs-review',
         label: STUDENT_RUNNER_COPY.reviewSummaryNeedsReviewLabel,
         value: formatStudentReviewSummaryCount(summary.needsReviewItemCount),
-      },
-      {
+      }),
+      buildStudentAttemptReviewSummaryMetricView({
         key: 'unanswered',
         label: STUDENT_RUNNER_COPY.reviewSummaryUnansweredLabel,
         value: formatStudentReviewSummaryCount(summary.unansweredItemCount),
-      },
+      }),
     ],
     title: STUDENT_RUNNER_COPY.reviewSummaryTitle,
   };
@@ -879,6 +906,26 @@ function normalizeStudentResultAccuracy(value: number) {
 
 function formatStudentReviewSummaryCount(value: number) {
   return String(normalizeRuntimeDisplayCount(value));
+}
+
+function buildStudentAttemptReviewSummaryMetricView({
+  key,
+  label,
+  value,
+}: {
+  key: StudentAttemptReviewSummaryMetricKey;
+  label: string;
+  value: string;
+}): StudentAttemptReviewSummaryMetricView {
+  return {
+    ariaLabel: m.student_runner_review_summary_metric_aria({
+      label,
+      value,
+    }),
+    key,
+    label,
+    value,
+  };
 }
 
 export function buildStudentAttemptControlState({
@@ -1150,6 +1197,42 @@ export function formatAttemptCompletionProgressLabel({
     itemCount,
     verb: progressVerb,
   });
+}
+
+export function buildStudentAttemptProgressView({
+  completionSummary,
+  verb,
+}: {
+  completionSummary: AttemptCompletionSummary;
+  verb?: string;
+}): StudentAttemptProgressView {
+  const answeredItemCount = normalizeRuntimeDisplayCount(
+    completionSummary.answeredItemCount
+  );
+  const itemCount = normalizeRuntimeDisplayCount(completionSummary.itemCount);
+  const unansweredItemCount =
+    normalizeAttemptUnansweredItemCount(completionSummary);
+  const label = formatAttemptCompletionProgressLabel({
+    completionSummary: {
+      answeredItemCount,
+      itemCount,
+      unansweredItemCount,
+    },
+    verb,
+  });
+
+  return {
+    answeredItemCount,
+    ariaLabel: m.student_attempt_progress_aria_label({ progress: label }),
+    description: m.student_attempt_progress_description({
+      answeredCount: answeredItemCount,
+      itemCount,
+      unansweredCount: unansweredItemCount,
+    }),
+    itemCount,
+    label,
+    unansweredItemCount,
+  };
 }
 
 export function buildStudentAttemptSessionKey({

@@ -82,12 +82,13 @@ function StudentRunnerAttemptStatusBar({
       <Badge
         variant="secondary"
         className="rounded-md"
+        aria-label={controlView.progressView.ariaLabel}
         aria-describedby={progressDescriptionId}
       >
-        {controlView.progressLabel}
+        <output>{controlView.progressView.label}</output>
       </Badge>
       <span id={progressDescriptionId} className="sr-only">
-        {controlView.progressDescription}
+        {controlView.progressView.description}
       </span>
       {controlView.timerBadge.show ? (
         <Badge
@@ -252,19 +253,21 @@ function StudentRunnerReviewSummary({
       <p className="mt-1 text-xs leading-5 text-muted-foreground">
         {view.description}
       </p>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      <dl className="mt-2 grid grid-cols-2 gap-2">
         {view.metrics.map((metric) => (
           <div
             key={metric.key}
             className="rounded-md border bg-muted/20 px-2 py-1.5"
           >
-            <p className="text-sm font-semibold">{metric.value}</p>
-            <p className="text-[11px] leading-4 text-muted-foreground">
+            <dd className="text-sm font-semibold">
+              <output aria-label={metric.ariaLabel}>{metric.value}</output>
+            </dd>
+            <dt className="text-[11px] leading-4 text-muted-foreground">
               {metric.label}
-            </p>
+            </dt>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   );
 }

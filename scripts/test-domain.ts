@@ -901,6 +901,7 @@ import {
   buildAttemptSubmissionAnswers,
   buildStudentAttemptAnswerStateByItemId,
   buildStudentAttemptControlState,
+  buildStudentAttemptProgressView,
   buildStudentAnswerChange,
   buildStudentAnswerChanges,
   buildStudentAttemptReviewSummaryView,
@@ -8717,9 +8718,12 @@ assert.doesNotMatch(
   'Visible settings copy should use ClassGamify teacher-workspace language.'
 );
 for (const key of [
+  'student_attempt_progress_aria_label',
+  'student_attempt_progress_description',
   'student_runner_review_summary_correct_label',
   'student_runner_review_summary_hidden_description',
   'student_runner_review_summary_item_count_label',
+  'student_runner_review_summary_metric_aria',
   'student_runner_review_summary_needs_review_label',
   'student_runner_review_summary_review_hidden_value',
   'student_runner_review_summary_review_visibility_label',
@@ -8729,6 +8733,11 @@ for (const key of [
   'student_runner_review_summary_visible_description',
   'student_runner_student_name_description',
   'student_runner_student_name_locked_description',
+  'student_runner_submit_button_aria',
+  'student_runner_submit_controls_label',
+  'student_runner_submit_hint_confirm_incomplete_aria',
+  'student_runner_submit_hint_read_only_aria',
+  'student_runner_submit_hint_unanswered_aria',
 ]) {
   assert.ok(enLocaleMessages[key], `Missing English locale key: ${key}`);
   assert.ok(zhLocaleMessages[key], `Missing Chinese locale key: ${key}`);
@@ -9521,8 +9530,8 @@ assert.doesNotMatch(
 );
 assert.match(
   studentRunnerSubmitControlsSource,
-  /data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*text=\{hintView\.text\}/,
-  'Student runner submit controls should render prepared submit disabled state, label, structured incomplete-confirmation state, and domain-prepared hint views.'
+  /aria-label=\{controlView\.submitControlsLabel\}[\s\S]*data-confirm-incomplete=[\s\S]*controlView\.requiresIncompleteSubmitConfirmation[\s\S]*controlView\.submitDisabled[\s\S]*aria-label=\{controlView\.submitButtonAriaLabel\}[\s\S]*controlView\.submitButtonLabel[\s\S]*controlView\.submitHintViews\.map\(\(hintView\)[\s\S]*key=\{hintView\.id\}[\s\S]*ariaLabel=\{hintView\.ariaLabel\}[\s\S]*text=\{hintView\.text\}[\s\S]*tone=\{hintView\.tone\}/,
+  'Student runner submit controls should render prepared submit disabled state, labels, structured incomplete-confirmation state, and domain-prepared hint views.'
 );
 assert.match(
   studentRunnerSubmitControlsSource,
@@ -9536,8 +9545,8 @@ assert.match(
 );
 assert.match(
   studentRunnerStateSource,
-  /export type StudentRunnerSubmitHintId =[\s\S]*'confirm-incomplete'[\s\S]*'read-only'[\s\S]*'unanswered'[\s\S]*export type StudentRunnerSubmitHintView = \{[\s\S]*id: StudentRunnerSubmitHintId;[\s\S]*text: string;/,
-  'Student runner submit hints should expose explicit hint ids and text contracts.'
+  /export type StudentRunnerSubmitHintId =[\s\S]*'confirm-incomplete'[\s\S]*'read-only'[\s\S]*'unanswered'[\s\S]*export type StudentRunnerSubmitHintView = \{[\s\S]*ariaLabel: string;[\s\S]*id: StudentRunnerSubmitHintId;[\s\S]*text: string;[\s\S]*tone: 'info' \| 'warning';/,
+  'Student runner submit hints should expose explicit hint ids, aria labels, text, and tone contracts.'
 );
 assert.match(
   studentRunnerStateSource,
@@ -9552,6 +9561,16 @@ assert.doesNotMatch(
   ),
   /controlView\.(?:unansweredLabel|submitConfirmationMessage|readOnlyMessage)|if \(!text\) return null/,
   'Student runner submit controls should not choose optional hint copy locally.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /aria-label=\{controlView\.progressView\.ariaLabel\}[\s\S]*<output>\{controlView\.progressView\.label\}<\/output>[\s\S]*controlView\.progressView\.description/,
+  'Student runner attempt status bar should render progress as a semantic output with prepared accessible labels.'
+);
+assert.match(
+  studentRunnerAttemptShellSource,
+  /<dl[\s\S]*view\.metrics\.map[\s\S]*<dd[\s\S]*<output aria-label=\{metric\.ariaLabel\}>\{metric\.value\}<\/output>[\s\S]*<dt[\s\S]*\{metric\.label\}/,
+  'Student runner post-submit review summary should render metric values as semantic labelled outputs.'
 );
 assert.match(
   playRouteSource,
@@ -9660,7 +9679,7 @@ assert.match(
 );
 assert.match(
   studentRunnerAttemptShellSource,
-  /function StudentRunnerAttemptStatusBar[\s\S]*controlView\.runnerTitle[\s\S]*controlView\.progressLabel[\s\S]*controlView\.timerBadge/,
+  /function StudentRunnerAttemptStatusBar[\s\S]*controlView\.runnerTitle[\s\S]*controlView\.progressView\.label[\s\S]*controlView\.timerBadge/,
   'Student runner attempt status bar should render prepared runner, progress, and timer labels.'
 );
 assert.match(
@@ -9929,6 +9948,11 @@ assert.match(
   studentRunnerStateSource,
   /export function buildStudentRunnerSubmissionExecutionPlan[\s\S]*buildStudentRunnerSubmissionPlan\(\{[\s\S]*pageView,[\s\S]*if \(submissionPlan\.type !== 'submit'\)[\s\S]*messageTone: getStudentRunnerSubmissionMessageTone\(submissionPlan\.type\)[\s\S]*nextConfirmIncompleteSubmit:[\s\S]*submissionPlan\.type === 'confirm-incomplete'[\s\S]*successMessage: pageView\.submissionSuccessMessage/,
   'Student runner state domain should turn submit gates into route-ready submission execution plans.'
+);
+assert.match(
+  studentRunnerStateSource,
+  /export type StudentRunnerSubmissionPayloadSummary = \{[\s\S]*answerCount: number;[\s\S]*itemCount: number;[\s\S]*shareSlug: string;[\s\S]*unansweredItemCount: number;[\s\S]*payloadSummary: buildStudentRunnerSubmissionPayloadSummary\(\{[\s\S]*input: submissionPlan\.input,[\s\S]*pageView,[\s\S]*function buildStudentRunnerSubmissionPayloadSummary/,
+  'Student runner submission execution plans should expose a route-safe summary of the normalized browser payload.'
 );
 assert.match(
   studentRunnerSubmissionSource,
@@ -10757,7 +10781,79 @@ assert.match(
   anonymousAttemptCopyWithToken.browserLabel,
   /^Anonymous browser [0-9A-Z]{6}$/
 );
-assert.deepEqual(getStudentRunnerCopy(), {
+const studentRunnerCopy = getStudentRunnerCopy();
+assert.deepEqual(
+  {
+    browseTemplatesLabel: studentRunnerCopy.browseTemplatesLabel,
+    createActivityLabel: studentRunnerCopy.createActivityLabel,
+    loadingMessage: studentRunnerCopy.loadingMessage,
+    missingAssignmentDescription:
+      studentRunnerCopy.missingAssignmentDescription,
+    missingAssignmentTitle: studentRunnerCopy.missingAssignmentTitle,
+    publicAssignmentDescription: studentRunnerCopy.publicAssignmentDescription,
+    publicRouteBadgeLabel: studentRunnerCopy.publicRouteBadgeLabel,
+    readOnlyPreviewMessage: studentRunnerCopy.readOnlyPreviewMessage,
+    resultAccuracyLabel: studentRunnerCopy.resultAccuracyLabel,
+    resultNextStepDone: studentRunnerCopy.resultNextStepDone,
+    resultNextStepFeedback: studentRunnerCopy.resultNextStepFeedback,
+    resultNextStepReviewScore: studentRunnerCopy.resultNextStepReviewScore,
+    resultNextStepStartAnother: studentRunnerCopy.resultNextStepStartAnother,
+    resultNextStepTeacherReview: studentRunnerCopy.resultNextStepTeacherReview,
+    resultNextStepsTitle: studentRunnerCopy.resultNextStepsTitle,
+    resultSubmittedLabel: studentRunnerCopy.resultSubmittedLabel,
+    resultTimePrefix: studentRunnerCopy.resultTimePrefix,
+    reviewSummaryCorrectLabel: studentRunnerCopy.reviewSummaryCorrectLabel,
+    reviewSummaryHiddenDescription:
+      studentRunnerCopy.reviewSummaryHiddenDescription,
+    reviewSummaryItemCountLabel: studentRunnerCopy.reviewSummaryItemCountLabel,
+    reviewSummaryNeedsReviewLabel:
+      studentRunnerCopy.reviewSummaryNeedsReviewLabel,
+    reviewSummaryReviewHiddenValue:
+      studentRunnerCopy.reviewSummaryReviewHiddenValue,
+    reviewSummaryReviewVisibilityLabel:
+      studentRunnerCopy.reviewSummaryReviewVisibilityLabel,
+    reviewSummarySubmittedLabel: studentRunnerCopy.reviewSummarySubmittedLabel,
+    reviewSummaryTitle: studentRunnerCopy.reviewSummaryTitle,
+    reviewSummaryUnansweredLabel:
+      studentRunnerCopy.reviewSummaryUnansweredLabel,
+    reviewSummaryVisibleDescription:
+      studentRunnerCopy.reviewSummaryVisibleDescription,
+    seoDescription: studentRunnerCopy.seoDescription,
+    seoTitlePrefix: studentRunnerCopy.seoTitlePrefix,
+    startAnotherAttemptLabel: studentRunnerCopy.startAnotherAttemptLabel,
+    missingStudentNameMessage: studentRunnerCopy.missingStudentNameMessage,
+    studentNameDescription: studentRunnerCopy.studentNameDescription,
+    studentNameLabel: studentRunnerCopy.studentNameLabel,
+    studentNameLockedDescription:
+      studentRunnerCopy.studentNameLockedDescription,
+    studentNamePlaceholder: studentRunnerCopy.studentNamePlaceholder,
+    submitButtonAriaLabel: studentRunnerCopy.submitButtonAriaLabel({
+      label: 'Submit anyway',
+      progress: '1/2 answered',
+    }),
+    submitControlsLabel: studentRunnerCopy.submitControlsLabel,
+    submitHintConfirmIncompleteAriaLabel:
+      studentRunnerCopy.submitHintConfirmIncompleteAriaLabel({
+        hint: '1 question is still unanswered.',
+      }),
+    submitHintReadOnlyAriaLabel:
+      studentRunnerCopy.submitHintReadOnlyAriaLabel({
+        hint: 'Preview assignments are read-only.',
+      }),
+    submitHintUnansweredAriaLabel:
+      studentRunnerCopy.submitHintUnansweredAriaLabel({
+        hint: '1 item left unanswered.',
+      }),
+    submissionFailureMessage: studentRunnerCopy.submissionFailureMessage,
+    submissionPendingLabel: studentRunnerCopy.submissionPendingLabel,
+    submissionSuccessMessage: studentRunnerCopy.submissionSuccessMessage,
+    teacherResultsLabel: studentRunnerCopy.teacherResultsLabel,
+    timeExpiredMessage: studentRunnerCopy.timeExpiredMessage,
+    timeEndedLabel: studentRunnerCopy.timeEndedLabel,
+    timerActiveDescription: studentRunnerCopy.timerActiveDescription,
+    timerOffDescription: studentRunnerCopy.timerOffDescription,
+  },
+  {
   browseTemplatesLabel: 'Browse templates',
   createActivityLabel: 'Create activity',
   loadingMessage: 'Loading student activity...',
@@ -10802,6 +10898,14 @@ assert.deepEqual(getStudentRunnerCopy(), {
   studentNameLockedDescription:
     'This name is saved for this assignment link and stays locked for the next attempt.',
   studentNamePlaceholder: 'Type your name',
+  submitButtonAriaLabel: 'Submit anyway. 1/2 answered.',
+  submitControlsLabel: 'Submit attempt controls',
+  submitHintConfirmIncompleteAriaLabel:
+    'Incomplete attempt confirmation: 1 question is still unanswered.',
+  submitHintReadOnlyAriaLabel:
+    'Submission unavailable: Preview assignments are read-only.',
+  submitHintUnansweredAriaLabel:
+    'Unanswered item reminder: 1 item left unanswered.',
   submissionFailureMessage: 'Attempt could not be saved.',
   submissionPendingLabel: 'Submitting...',
   submissionSuccessMessage: 'Attempt submitted.',
@@ -10811,7 +10915,8 @@ assert.deepEqual(getStudentRunnerCopy(), {
   timerActiveDescription:
     'The visible timer counts down only after this playable assignment has loaded.',
   timerOffDescription: 'This assignment has no visible countdown timer.',
-});
+  }
+);
 assert.deepEqual(buildStudentRunnerSeoView(), {
   description:
     'Open a public student activity runner from a teacher assignment link.',
@@ -12549,6 +12654,37 @@ assert.equal(
   }),
   '1/3 answered'
 );
+assert.deepEqual(
+  buildStudentAttemptProgressView({
+    completionSummary: incompleteCompletionSummary,
+  }),
+  {
+    answeredItemCount: 1,
+    ariaLabel: 'Completion progress: 1/3 answered',
+    description: '1 of 3 items answered; 2 unanswered.',
+    itemCount: 3,
+    label: '1/3 answered',
+    unansweredItemCount: 2,
+  }
+);
+assert.deepEqual(
+  buildStudentAttemptProgressView({
+    completionSummary: {
+      answeredItemCount: Number.NaN,
+      itemCount: -1,
+      unansweredItemCount: 9,
+    },
+    verb: ' ｓｏｒｔｅｄ ',
+  }),
+  {
+    answeredItemCount: 0,
+    ariaLabel: 'Completion progress: 0/0 sorted',
+    description: '0 of 0 items answered; 9 unanswered.',
+    itemCount: 0,
+    label: '0/0 sorted',
+    unansweredItemCount: 9,
+  }
+);
 assert.equal(
   formatAttemptCompletionProgressLabel({
     completionSummary: incompleteCompletionSummary,
@@ -13009,16 +13145,23 @@ assert.deepEqual(
   }),
   [
     {
+      ariaLabel: 'Unanswered item reminder: 1 item left unanswered.',
       id: 'unanswered',
       text: '1 item left unanswered.',
+      tone: 'info',
     },
     {
+      ariaLabel:
+        'Incomplete attempt confirmation: 1 question is still unanswered.',
       id: 'confirm-incomplete',
       text: '1 question is still unanswered.',
+      tone: 'warning',
     },
     {
+      ariaLabel: 'Submission unavailable: Preview assignments are read-only.',
       id: 'read-only',
       text: 'Preview assignments are read-only.',
+      tone: 'info',
     },
   ]
 );
@@ -13030,8 +13173,10 @@ assert.deepEqual(
   }),
   [
     {
+      ariaLabel: 'Unanswered item reminder: 1 item left unanswered.',
       id: 'unanswered',
       text: '1 item left unanswered.',
+      tone: 'info',
     },
   ]
 );
@@ -13216,10 +13361,30 @@ assert.deepEqual(
       'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
     hiddenBySettings: false,
     metrics: [
-      { key: 'submitted', label: 'Submitted', value: '3' },
-      { key: 'correct', label: 'Correct', value: '1' },
-      { key: 'needs-review', label: 'Needs review', value: '2' },
-      { key: 'unanswered', label: 'Unanswered', value: '2' },
+      {
+        ariaLabel: 'Submitted: 3',
+        key: 'submitted',
+        label: 'Submitted',
+        value: '3',
+      },
+      {
+        ariaLabel: 'Correct: 1',
+        key: 'correct',
+        label: 'Correct',
+        value: '1',
+      },
+      {
+        ariaLabel: 'Needs review: 2',
+        key: 'needs-review',
+        label: 'Needs review',
+        value: '2',
+      },
+      {
+        ariaLabel: 'Unanswered: 2',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '2',
+      },
     ],
     title: 'Submission review',
   }
@@ -13243,9 +13408,20 @@ assert.deepEqual(
       'Your teacher will review the submitted answers. Correct answers are not shown on this link.',
     hiddenBySettings: true,
     metrics: [
-      { key: 'submitted', label: 'Submitted', value: '3' },
-      { key: 'unanswered', label: 'Unanswered', value: '3' },
       {
+        ariaLabel: 'Submitted: 3',
+        key: 'submitted',
+        label: 'Submitted',
+        value: '3',
+      },
+      {
+        ariaLabel: 'Unanswered: 3',
+        key: 'unanswered',
+        label: 'Unanswered',
+        value: '3',
+      },
+      {
+        ariaLabel: 'Answer review: Teacher review',
         key: 'review',
         label: 'Answer review',
         value: 'Teacher review',
@@ -19539,13 +19715,23 @@ assert.deepEqual(
       attemptRegionLabel: 'Student attempt workspace',
       progressDescription: 'Current completion progress: 1/1 answered.',
       progressLabel: '1/1 answered',
+      progressView: {
+        answeredItemCount: 1,
+        ariaLabel: 'Completion progress: 1/1 answered',
+        description: '1 of 1 items answered; 0 unanswered.',
+        itemCount: 1,
+        label: '1/1 answered',
+        unansweredItemCount: 0,
+      },
       readOnlyMessage: undefined,
       requiresIncompleteSubmitConfirmation: false,
       runnerTitle: 'Quiz',
       runtimeItemsDisabled: true,
       showTimeExpiredMessage: false,
       statusBarLabel: 'Attempt status',
+      submitButtonAriaLabel: 'Submit answers. 1/1 answered.',
       submitButtonLabel: 'Submit answers',
+      submitControlsLabel: 'Submit attempt controls',
       submitConfirmationMessage: undefined,
       submitDisabled: true,
       submitHintViews: [],
@@ -19614,10 +19800,30 @@ assert.deepEqual(
           'Review the items your teacher allows after submission. Alternatives and explanations appear in the activity below.',
         hiddenBySettings: false,
         metrics: [
-          { key: 'submitted', label: 'Submitted', value: '1' },
-          { key: 'correct', label: 'Correct', value: '1' },
-          { key: 'needs-review', label: 'Needs review', value: '0' },
-          { key: 'unanswered', label: 'Unanswered', value: '0' },
+          {
+            ariaLabel: 'Submitted: 1',
+            key: 'submitted',
+            label: 'Submitted',
+            value: '1',
+          },
+          {
+            ariaLabel: 'Correct: 1',
+            key: 'correct',
+            label: 'Correct',
+            value: '1',
+          },
+          {
+            ariaLabel: 'Needs review: 0',
+            key: 'needs-review',
+            label: 'Needs review',
+            value: '0',
+          },
+          {
+            ariaLabel: 'Unanswered: 0',
+            key: 'unanswered',
+            label: 'Unanswered',
+            value: '0',
+          },
         ],
         title: 'Submission review',
       },
@@ -19813,6 +20019,12 @@ assert.deepEqual(
       durationSeconds: 30,
       shareSlug: 'share-public',
     },
+    payloadSummary: {
+      answerCount: 1,
+      itemCount: 1,
+      shareSlug: 'share-public',
+      unansweredItemCount: 0,
+    },
     reason: 'complete',
     successMessage: 'Attempt submitted.',
     type: 'submit',
@@ -19947,6 +20159,10 @@ assert.deepEqual(
   {
     submitButtonLabel:
       confirmIncompleteStudentRunnerPageView.controlView.submitButtonLabel,
+    submitButtonAriaLabel:
+      confirmIncompleteStudentRunnerPageView.controlView.submitButtonAriaLabel,
+    submitControlsLabel:
+      confirmIncompleteStudentRunnerPageView.controlView.submitControlsLabel,
     submitConfirmationMessage:
       confirmIncompleteStudentRunnerPageView.controlView
         .submitConfirmationMessage,
@@ -19960,16 +20176,23 @@ assert.deepEqual(
   },
   {
     submitButtonLabel: 'Submit anyway',
+    submitButtonAriaLabel: 'Submit anyway. 1/2 answered.',
+    submitControlsLabel: 'Submit attempt controls',
     submitConfirmationMessage: '1 question is still unanswered.',
     requiresIncompleteSubmitConfirmation: true,
     submitHintViews: [
       {
+        ariaLabel: 'Unanswered item reminder: 1 item left unanswered.',
         id: 'unanswered',
         text: '1 item left unanswered.',
+        tone: 'info',
       },
       {
+        ariaLabel:
+          'Incomplete attempt confirmation: 1 question is still unanswered.',
         id: 'confirm-incomplete',
         text: '1 question is still unanswered.',
+        tone: 'warning',
       },
     ],
     unansweredLabel: '1 item left unanswered.',
@@ -20064,6 +20287,12 @@ assert.deepEqual(
       durationSeconds: 30,
       shareSlug: 'share-public',
       studentName: 'Ada Lovelace',
+    },
+    payloadSummary: {
+      answerCount: 1,
+      itemCount: 1,
+      shareSlug: 'share-public',
+      unansweredItemCount: 0,
     },
     reason: 'complete',
     submittedStudentName: 'Ada Lovelace',
@@ -20773,6 +21002,12 @@ assert.deepEqual(
         durationSeconds: 25,
         shareSlug: 'share-public',
       },
+      payloadSummary: {
+        answerCount: 1,
+        itemCount: 1,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      },
       reason: 'complete',
       submittedStudentName: 'Ada Lovelace',
       successMessage: 'Attempt submitted.',
@@ -20800,6 +21035,12 @@ assert.equal(
         durationSeconds: 25,
         shareSlug: 'share-public',
       },
+      payloadSummary: {
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      },
       reason: 'complete',
       successMessage: 'Attempt submitted.',
       type: 'submit',
@@ -20823,6 +21064,12 @@ assert.equal(
         durationSeconds: 25,
         shareSlug: 'share-public',
       },
+      payloadSummary: {
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
+      },
       reason: 'complete',
       successMessage: 'Attempt submitted.',
       type: 'submit',
@@ -20845,6 +21092,12 @@ assert.equal(
         answers: [],
         durationSeconds: 25,
         shareSlug: 'share-public',
+      },
+      payloadSummary: {
+        answerCount: 0,
+        itemCount: 0,
+        shareSlug: 'share-public',
+        unansweredItemCount: 0,
       },
       reason: 'complete',
       successMessage: 'Attempt submitted.',

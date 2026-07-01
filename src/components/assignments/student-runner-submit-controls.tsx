@@ -16,7 +16,7 @@ export function StudentRunnerSubmitControls({
   );
 
   return (
-    <div className="mt-4">
+    <section aria-label={controlView.submitControlsLabel} className="mt-4">
       <Button
         type="button"
         className="w-full sm:w-fit"
@@ -24,6 +24,7 @@ export function StudentRunnerSubmitControls({
           controlView.requiresIncompleteSubmitConfirmation ? true : undefined
         }
         disabled={controlView.submitDisabled}
+        aria-label={controlView.submitButtonAriaLabel}
         aria-describedby={
           submitHintIds.length > 0 ? submitHintIds.join(' ') : undefined
         }
@@ -36,16 +37,34 @@ export function StudentRunnerSubmitControls({
         <StudentRunnerSubmitHint
           id={buildStudentRunnerSubmitHintId(hintView.id)}
           key={hintView.id}
+          ariaLabel={hintView.ariaLabel}
           text={hintView.text}
+          tone={hintView.tone}
         />
       ))}
-    </div>
+    </section>
   );
 }
 
-function StudentRunnerSubmitHint({ id, text }: { id: string; text: string }) {
+function StudentRunnerSubmitHint({
+  ariaLabel,
+  id,
+  text,
+  tone,
+}: {
+  ariaLabel: string;
+  id: string;
+  text: string;
+  tone: 'info' | 'warning';
+}) {
   return (
-    <p id={id} className="mt-2 text-xs text-muted-foreground">
+    <p
+      aria-label={ariaLabel}
+      data-tone={tone}
+      id={id}
+      role="note"
+      className="mt-2 text-xs text-muted-foreground"
+    >
       {text}
     </p>
   );
