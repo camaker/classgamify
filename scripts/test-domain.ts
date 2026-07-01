@@ -9304,6 +9304,35 @@ assert.match(
   /getPublicAssignmentRuleDescription[\s\S]*assignment_delivery_public_rule_items_description[\s\S]*assignment_delivery_public_rule_attempts_open_description[\s\S]*assignment_delivery_public_rule_attempts_limited_description[\s\S]*assignment_delivery_public_rule_timer_none_description[\s\S]*assignment_delivery_public_rule_timer_limited_description[\s\S]*assignment_delivery_public_rule_closes_none_description[\s\S]*assignment_delivery_public_rule_closes_scheduled_description[\s\S]*assignment_delivery_public_rule_identity_anonymous_description[\s\S]*assignment_delivery_public_rule_identity_names_description[\s\S]*assignment_delivery_public_rule_review_visible_description[\s\S]*assignment_delivery_public_rule_review_hidden_description/,
   'Public assignment rule descriptions should come from localized assignment delivery messages and account for the resolved delivery setting values.'
 );
+assert.match(
+  assignmentDeliverySummarySource,
+  /type PublicAssignmentRuleDescriptionState =[\s\S]*'attemptsOpen'[\s\S]*'attemptsLimited'[\s\S]*'timerNone'[\s\S]*'timerLimited'[\s\S]*'closesNone'[\s\S]*'closesScheduled'[\s\S]*'identityAnonymous'[\s\S]*'identityNames'[\s\S]*'reviewVisible'[\s\S]*'reviewHidden'/,
+  'Public assignment rule descriptions should be keyed by structured delivery states.'
+);
+assert.match(
+  assignmentDeliverySummarySource,
+  /descriptionState: isPositiveWholeNumber\(maxAttempts\)[\s\S]*descriptionState:[\s\S]*normalizeAttemptTimeLimitSeconds\(timeLimitSeconds\)[\s\S]*descriptionState: hasAssignmentCloseTime\(expiresAt\)[\s\S]*descriptionState: collectStudentName[\s\S]*descriptionState: showCorrectAnswers/,
+  'Public assignment rule summary items should resolve description states from normalized assignment settings.'
+);
+const publicRuleDescriptionSource = getSourceSlice(
+  assignmentDeliverySummarySource,
+  'function getPublicAssignmentRuleDescription',
+  ''
+);
+assert.doesNotMatch(
+  publicRuleDescriptionSource,
+  /value\s*={2,3}\s*m\.assignment_delivery_|m\.assignment_delivery_(attempts_open|timer_none|expiry_none|identity_anonymous|answer_reveal_after_submit)\(\)/,
+  'Public rule descriptions should not infer delivery semantics by comparing localized display values.'
+);
+assert.match(
+  getSourceSlice(
+    assignmentDeliverySummarySource,
+    'function toPublicAssignmentRuleSummaryItem',
+    'function getPublicAssignmentRuleDescription'
+  ),
+  /getPublicAssignmentRuleDescription\(\s*item\.descriptionState\s*\)/,
+  'Public assignment rule item formatting should pass structured description state into the localized description mapper.'
+);
 assert.doesNotMatch(
   assignmentDeliverySummarySource,
   /playable items|submitted attempts|activity is ready|stops accepting|work is identified|answers appear|可作答项目|次数限制|计时才会开始/,
